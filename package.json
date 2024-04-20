@@ -41,6 +41,7 @@
     "@types/react-dom": "^18",
     "autoprefixer": "^10",
     "copy-webpack-plugin": "^11.0.0",
+    "daisyui": "^4.10.2",
     "eslint": "^8",
     "eslint-config-next": "14.0.0",
     "node-polyfill-webpack-plugin": "^3.0.0",

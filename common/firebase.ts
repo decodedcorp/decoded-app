@@ -14,7 +14,13 @@ import {
   ref,
   StorageReference,
 } from "firebase/storage";
-import { imageDoc } from "@/types/model";
+import {
+  ImageDetail,
+  ItemMetadata,
+  HoverItem,
+  TaggedItem,
+  News,
+} from "@/types/model";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -33,7 +39,7 @@ export class FirebaseHelper {
       process.env.NEXT_PUBLIC_FIREBASE_APP_ID === undefined ||
       process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID === undefined
     ) {
-      throw new Error("FIREBASE_API_KEY is undefined");
+      throw new Error("Environment variable is undefined");
     }
     this.config = {
       apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -47,50 +53,100 @@ export class FirebaseHelper {
     this.app = initializeApp(this.config);
   }
 
-  public static getInstance(): FirebaseHelper {
+  public static getInstance(): FirebaseHelper | never {
     if (!FirebaseHelper.instance) {
-      FirebaseHelper.instance = new FirebaseHelper();
+      try {
+        FirebaseHelper.instance = new FirebaseHelper();
+      } catch (error) {
+        throw new Error(
+          "Error occured while creating instance of `FirebaseHelper`"
+        );
+      }
     }
     return FirebaseHelper.instance;
   }
 
-  public static app(): FirebaseApp {
-    return this.getInstance().app;
-  }
-
-  public static db(): Firestore {
-    return getFirestore(this.getInstance().app);
-  }
-
-  public static async getDoc(
-    collectionName: string,
-    docId?: string
-  ): Promise<imageDoc | undefined> {
-    const db = this.db();
-    if (docId) {
-      const docRef = doc(db, collectionName, docId);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        console.log("Data exists!");
-        console.log(docSnap.data());
-        const data = docSnap.data() as imageDoc; // Type assertion to imageDoc
-        return data;
-      } else {
-        console.log("No such document!");
-      }
-    } else {
-      const querySnapshot = await getDocs(collection(db, collectionName));
-      querySnapshot.forEach((doc) => {
-        console.log(doc.data());
-      });
+  public static app(): FirebaseApp | never {
+    try {
+      return this.getInstance().app;
+    } catch (error) {
+      throw new Error("Error occured while getting app instance");
     }
   }
 
-  public static storage_ref(points: string): StorageReference {
-    let storage = getStorage(
-      this.getInstance().app,
-      `gs://${this.getInstance().config.storageBucket}`
-    );
-    return ref(storage, points);
+  public static db(): Firestore | never {
+    try {
+      return getFirestore(this.app());
+    } catch (error) {
+      throw new Error("Error occured while getting db instance");
+    }
+  }
+
+  public static storage(): FirebaseStorage | never {
+    try {
+      return getStorage(
+        this.app(),
+        `gs://${this.getInstance().config.storageBucket}`
+      );
+    } catch (error) {
+      throw new Error("Error occured while getting storage instance");
+    }
+  }
+
+  public static async getImageDetail(
+    collectionName: string,
+    docId?: string
+  ): Promise<ImageDetail | ImageDetail[] | undefined> {
+    try {
+      const db = this.db();
+      if (docId) {
+        const docRef = doc(db, collectionName, docId);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          let imageDetail = docSnap.data() as ImageDetail;
+          try {
+            const hoverItemList: Promise<HoverItem | undefined>[] =
+              imageDetail.taggedItem.map(async (item) => {
+                const taggedItem = item as TaggedItem;
+                const docRef = doc(db, "items", taggedItem.id);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                  const itemMetadata = docSnap.data() as ItemMetadata;
+                  return {
+                    position: taggedItem.position,
+                    metadata: itemMetadata,
+                  };
+                }
+              });
+            imageDetail.taggedItem = (await Promise.all(hoverItemList)).filter(
+              (item) => item !== undefined
+            ) as HoverItem[];
+            console.log("🚀🚀 Final result", imageDetail);
+            return imageDetail;
+          } catch (error) {
+            console.log(error);
+          }
+        } else {
+          console.log("No such document!");
+        }
+      } else {
+        const querySnapshot = await getDocs(collection(db, collectionName));
+        querySnapshot.forEach((doc) => {
+          console.log(doc.data());
+        });
+      }
+    } catch (error) {
+      throw new Error(
+        `Error occured while trying to get document for ${collectionName}`
+      );
+    }
+  }
+
+  public static storageRef(points: string): StorageReference | never {
+    try {
+      return ref(this.storage(), points);
+    } catch (error) {
+      throw new Error("Error occured while getting storage reference");
+    }
   }
 }

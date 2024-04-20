@@ -29,6 +29,7 @@ const config: Config = {
   plugins: [
     require("tailwindcss-animate"),
     require("@tailwindcss/aspect-ratio"),
+    require("daisyui"),
   ],
 };
 export default config;

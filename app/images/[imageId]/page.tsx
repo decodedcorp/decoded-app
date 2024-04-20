@@ -3,46 +3,54 @@
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import { custom_font } from "@/components/helpers/util";
-import imglyRemoveBackground from "@imgly/background-removal";
 import { FirebaseHelper } from "@/common/firebase";
 import { useSearchParams } from "next/navigation";
-import { notFound } from "next/navigation";
-import { imageDoc, HoverItem } from "@/types/model";
+import {
+  ImageDetail,
+  TaggedItem,
+  ItemMetadata,
+  HoverItem,
+  Position,
+} from "@/types/model";
 interface PageProps {
   params: {
     imageId: string;
   };
 }
 
-async function Page({ params: { imageId } }: PageProps) {
+function Page({ params: { imageId } }: PageProps) {
   console.log(imageId);
   const searchParams = useSearchParams();
   const imageUrl = searchParams.get("imageUrl") ?? "";
-  console.log(imageUrl);
-  // if (!imageUrl) {
-  //   notFound();
-  // }
-  let [hoveredItem, setHoveredItem] = useState<HoverItem | null>(null);
 
-  const handleSaveClick = () => {
-    alert("Not ready yet!");
-  };
+  let [imageDetail, setImageDetail] = useState<ImageDetail | null>(null);
+  let [tags, setTags] = useState<HoverItem[]>([]);
+  let [hoverItem, setHoverItem] = useState<HoverItem | null>(null);
+  let [isFetching, setIsFetching] = useState(false);
 
   const handleMouseOver = (item: HoverItem) => {
-    setHoveredItem(item);
+    setHoverItem(item);
   };
 
   const handleMouseOut = () => {
-    setHoveredItem(null);
+    setHoverItem(null);
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      const doc = await FirebaseHelper.getDoc("images", imageId);
-      if (doc !== undefined) {
-        console.log("HoverItem => ", doc.hoverItem);
+      const imageDetail = (await FirebaseHelper.getImageDetail(
+        "images",
+        imageId
+      )) as ImageDetail;
+      if (imageDetail !== undefined) {
+        setImageDetail(imageDetail);
+        setTags(imageDetail.taggedItem as HoverItem[]);
+        setIsFetching(false);
+      } else {
+        setIsFetching(false);
       }
     };
+    setIsFetching(true);
     fetchData();
   }, []);
 
@@ -58,10 +66,79 @@ async function Page({ params: { imageId } }: PageProps) {
               height: "auto",
               aspectRatio: "3/4",
             }}
-          ></div>
+          >
+            <div className="relative flex h-full">
+              {isFetching ? (
+                <div className="absolute inset-0 flex justify-center items-center">
+                  <span className="loading loading-dots loading-md"></span>
+                </div>
+              ) : (
+                <>
+                  <Image
+                    src={imageUrl}
+                    alt="Featured fashion"
+                    layout="fill"
+                    objectFit="cover"
+                  />
+                  {imageDetail &&
+                    tags.map((item) => (
+                      <a
+                        key={item.metadata.id}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          position: "absolute",
+                          top: item.position.top,
+                          right: item.position.right,
+                          bottom: item.position.bottom,
+                          left: item.position.left,
+                          cursor: "pointer",
+                        }}
+                      >
+                        <div
+                          onMouseOver={() => handleMouseOver(item)}
+                          onMouseOut={handleMouseOut}
+                          style={{
+                            width: "10px",
+                            height: "10px",
+                            borderRadius: "50%",
+                            backgroundColor: "white",
+                            boxShadow: "0 0 2px 2px rgba(0, 0, 0, 0.2)",
+                          }}
+                        ></div>
+                      </a>
+                    ))}
+                </>
+              )}
+              {/* Display information for the hovered item */}
+              {hoverItem && (
+                <div
+                  className={`absolute bg-black border border-gray-600 rounded-lg shadow-lg p-2 flex items-center gap-2 transform -translate-x-1/2 -translate-y-full transition-opacity duration-300 ease-in-out ${
+                    hoverItem ? "opacity-100" : "opacity-0"
+                  }`}
+                  style={{
+                    top: hoverItem.position.top,
+                    right: hoverItem.position.right,
+                    bottom: hoverItem.position.bottom,
+                    left: hoverItem.position.left,
+                    zIndex: 50, // Ensure it's above other elements
+                  }}
+                  onMouseOut={handleMouseOut}
+                >
+                  <div className="relative bg-black bg-opacity-80 rounded-lg shadow-lg p-2 flex items-center gap-2">
+                    <div className="text-white">
+                      <p className="text-sm font-bold">
+                        {hoverItem.metadata.name}
+                      </p>
+                      <p className="text-xs">{hoverItem.metadata.price}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
-      {/* More to explore section */}
       <div className="my-4">
         <h2 className="text-white text-lg font-bold my-2 pt-5">
           More to explore

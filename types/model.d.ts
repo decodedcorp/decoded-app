@@ -1,25 +1,45 @@
-export interface imageDoc {
-  id: String;
-  hoverItem: HoverItem;
-  tags: String[];
+import { ReferrerEnum } from "next/dist/lib/metadata/types/metadata-types";
+
+export interface ImageDetail {
+  id: string;
+  name: string;
+  taggedItem: TaggedItem[] | HoverItem[];
+  tags: string[];
 }
 
-export interface HoverItem {
-  itemDocId: String;
+export interface TaggedItem {
+  id: string;
   position: Position;
 }
 
 export interface Position {
-  top?: String;
-  left?: String;
-  right?: String;
-  bottom?: String;
+  top?: string;
+  left?: string;
+  right?: string;
+  bottom?: string;
 }
 
-export interface Item {
-  id: String;
-  name: String;
-  price: String;
-  url: String;
-  tags: String[];
+export interface ItemMetadata {
+  id: string;
+  name: string;
+  price: string;
+  url: string;
+  tags: string[];
+}
+
+export interface HoverItem {
+  position: Position;
+  metadata: ItemMetadata;
+}
+
+export enum ArticleType {
+  Any = "C",
+  Generate = "G",
+}
+
+export interface News {
+  article_type: ArticleType;
+  time: string;
+  title: string;
+  url: string;
 }
