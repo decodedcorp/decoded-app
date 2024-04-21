@@ -2,7 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
+body {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 body {
   padding-top: 150px;
+  flex: 1;
   background-color: #ffffff;
 }

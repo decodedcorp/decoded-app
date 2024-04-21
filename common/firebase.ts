@@ -1,4 +1,5 @@
 import { initializeApp, FirebaseApp, FirebaseOptions } from "firebase/app";
+import { getAuth, Auth, signInWithEmailAndPassword } from "firebase/auth";
 import {
   getFirestore,
   Firestore,
@@ -71,6 +72,36 @@ export class FirebaseHelper {
       return this.getInstance().app;
     } catch (error) {
       throw new Error("Error occured while getting app instance");
+    }
+  }
+
+  public static auth(): Auth | never {
+    try {
+      return getAuth(this.app());
+    } catch (error) {
+      throw new Error("Error occured while getting auth instance");
+    }
+  }
+
+  public static async adminLogin(
+    email: string,
+    password: string
+  ): Promise<boolean> {
+    const auth = this.auth();
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      console.log(userCredential.user.uid);
+      if (userCredential.user.uid === process.env.NEXT_PUBLIC_ADMIN_UID) {
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.log("Error on login!", error);
+      return false;
     }
   }
 

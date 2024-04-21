@@ -12,18 +12,18 @@ function Header() {
   const newsOpacity = path === "/news" ? "text-opacity-100" : "text-opacity-50";
 
   return (
-    <header className="flex flex-col items-center fixed w-full mx-10 sm:mx-6 top-5 sm:rounded-lg py-5 left-1/2 -translate-x-1/2 z-10">
-      <div className="flex justify-between w-full items-center">
+    <header className="flex flex-col items-center fixed w-full sm:rounded-lg py-5 top-0 z-50 bg-white">
+      <div className="flex justify-between w-full items-center px-5 ">
         <Link
           href="/"
           prefetch={false}
-          className={`${custom_font.className} text-2xl font-bold`}
+          className={`${custom_font.className} text-2xl font-bold text-black`}
         >
-          #TAGGED
+          TAGGED
         </Link>
         <Search />
       </div>
-      <nav className="w-full m-10">
+      <nav className="w-full mt-5 justify-items-center">
         <ul className="flex justify-center gap-20">
           <li className="list-none transition-all duration-100 ease-in-out hover:scale-150">
             <Link

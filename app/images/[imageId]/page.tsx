@@ -5,13 +5,9 @@ import React, { useState, useEffect } from "react";
 import { custom_font } from "@/components/helpers/util";
 import { FirebaseHelper } from "@/common/firebase";
 import { useSearchParams } from "next/navigation";
-import {
-  ImageDetail,
-  TaggedItem,
-  ItemMetadata,
-  HoverItem,
-  Position,
-} from "@/types/model";
+import { notFound } from "next/navigation";
+
+import { ImageDetail, HoverItem } from "@/types/model";
 interface PageProps {
   params: {
     imageId: string;
@@ -19,10 +15,12 @@ interface PageProps {
 }
 
 function Page({ params: { imageId } }: PageProps) {
-  console.log(imageId);
   const searchParams = useSearchParams();
   const imageUrl = searchParams.get("imageUrl") ?? "";
-
+  console.log("Page for => ", imageId, "URL => ", imageUrl);
+  if (!imageUrl) {
+    notFound();
+  }
   let [imageDetail, setImageDetail] = useState<ImageDetail | null>(null);
   let [tags, setTags] = useState<HoverItem[]>([]);
   let [hoverItem, setHoverItem] = useState<HoverItem | null>(null);
@@ -55,7 +53,7 @@ function Page({ params: { imageId } }: PageProps) {
   }, []);
 
   return (
-    <div className="container flex-col mx-auto p-4 justify-center items-center">
+    <div className="container flex-col mx-auto p-4 justify-center items-center z-0">
       <div className="flex flex-row">
         <div className="container flex mx-auto p-4 justify-center items-center sm:w-full sm:h-auto">
           <div
@@ -84,6 +82,7 @@ function Page({ params: { imageId } }: PageProps) {
                     tags.map((item) => (
                       <a
                         key={item.metadata.id}
+                        href={item.metadata.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{
@@ -139,8 +138,10 @@ function Page({ params: { imageId } }: PageProps) {
           </div>
         </div>
       </div>
-      <div className="my-4">
-        <h2 className="text-white text-lg font-bold my-2 pt-5">
+      <div className="my-4 w-full">
+        <h2
+          className={`text-black dark:text-white text-lg font-bold my-2 pt-5 ${custom_font.className}`}
+        >
           More to explore
         </h2>
         <div className="grid grid-cols-2 gap-4"></div>

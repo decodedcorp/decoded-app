@@ -3,17 +3,34 @@ import { News } from "@/types/model";
 import { doc, getDocs, collection } from "firebase/firestore";
 import Link from "next/link";
 
+interface SectionProps {
+  title: string;
+  description?: string;
+}
+
 function Page() {
   return (
-    <div className="m-10">
+    <div className="flex flex-col items-center justify-center w-full text-black">
+      <Section title="TAGGED daily" description="Happened daily" />
+      <DailyCardNews />
+      <Section title="NEWS" />
       <Card />
+    </div>
+  );
+}
+
+function Section({ title, description }: SectionProps) {
+  return (
+    <div className="flex flex-col border-b-2 border-gray-200 py-4 mb-6 items-center justify-center">
+      <h1 className="text-3xl font-bold">{title}</h1>
+      <p> {description} </p>
     </div>
   );
 }
 
 async function DailyCardNews() {
   return (
-    <div className="flex flex-col items-center bg-red-500">
+    <div className="flex flex-col items-center w-96 mb-5">
       <div className="carousel rounded-box">
         <div className="carousel-item w-full">
           <img
@@ -81,10 +98,10 @@ async function Card() {
     }
   });
   return (
-    <div className="grid grid-cols-1 gap-5">
+    <div className="grid grid-cols-1 gap-5 w-1/2">
       {newsList?.map((news) => (
-        <Link href={news.url} className="card card-side bg-base-100 shadow-xl">
-          <div className="card lg:card-side bg-base-100 shadow-xl">
+        <Link href={news.url} className="card card-side shadow-xl">
+          <div className="card lg:card-side">
             <figure>
               <img
                 src="https://daisyui.com/images/stock/photo-1494232410401-ad00d5433cfa.jpg"
