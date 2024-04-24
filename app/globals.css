@@ -14,3 +14,16 @@ body {
   flex: 1;
   background-color: #ffffff;
 }
+
+@keyframes scale-up {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.5);
+  }
+}
+
+.point-animation {
+  animation: scale-up 0.5s ease-in-out infinite alternate;
+}
