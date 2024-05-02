@@ -1,16 +1,16 @@
 import React from "react";
-import { custom_font } from "./helpers/util";
+import { main_font, secondary_font } from "./helpers/util";
 
 function Footer() {
   return (
-    <footer className="bg-[#F4D1AE]">
+    <footer className="bg-[#000000]">
       <div
-        className={`${custom_font.className} text-center text-3xl font-bold border-2 border-black p-4 rounded-md`}
+        className={`${main_font.className} text-center text-3xl font-bold border-2 border-black p-5 rounded-md`}
       >
         TAGGED
       </div>
       <div className="grid grid-cols-4 rounded-md border-r-2 border-l-2 border-black p-2">
-        <div className={`${custom_font.className}`}>
+        <div className={`${secondary_font.className}`}>
           <h3 className="font-bold mb-3">MENU</h3>
           {/* <ul>
             <li>News</li>
@@ -19,7 +19,7 @@ function Footer() {
             <li>Shop</li>
           </ul> */}
         </div>
-        <div className={`${custom_font.className}`}>
+        <div className={`${secondary_font.className}`}>
           <h3 className="font-bold mb-3">INFORMATION</h3>
           {/* <ul>
             <li>Terms & Conditions</li>
@@ -28,7 +28,7 @@ function Footer() {
             <li>Careers</li>
           </ul> */}
         </div>
-        <div className={`${custom_font.className}`}>
+        <div className={`${secondary_font.className}`}>
           <h3 className="font-bold mb-3">NEWS</h3>
           {/* <ul>
             <li>Style</li>
@@ -40,7 +40,7 @@ function Footer() {
           </ul> */}
         </div>
         <div>
-          <h3 className={`font-bold mb-3 ${custom_font.className}`}>
+          <h3 className={`font-bold mb-3 ${secondary_font.className}`}>
             SUBSCRIBE
           </h3>
           <form>

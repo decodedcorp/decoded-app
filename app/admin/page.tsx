@@ -1,7 +1,7 @@
 "use client";
 
 import { FirebaseHelper } from "@/common/firebase";
-import { custom_font, validateEmail } from "@/components/helpers/util";
+import { main_font, validateEmail } from "@/components/helpers/util";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 

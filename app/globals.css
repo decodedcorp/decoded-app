@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --text-color: rgb(185, 28, 28);
+  --text-color: #222831;
+  --footer-text-color: #ffffff;
 }
 
 html,
@@ -18,7 +19,7 @@ body {
   position: relative;
   display: flex;
   flex: 1;
-  background-color: #f8e6d1;
+  background-color: #ffffff;
   min-height: 100vh;
   margin-bottom: 50px;
   height: 100vh;
@@ -30,14 +31,14 @@ header {
   top: 0;
   left: 0;
   right: 0;
-  padding: 20px;
+  padding: 8px;
   z-index: 1000;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: #f8e6d1;
+  background-color: #ffffff;
 }
 
 footer {
-  color: var(--text-color);
+  color: var(--footer-text-color);
   left: 0;
   right: 0;
   bottom: 0;

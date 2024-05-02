@@ -37,8 +37,9 @@ export enum ArticleType {
   Generate = "G",
 }
 
-export interface News {
+export interface Article {
   article_type: ArticleType;
+  src?: string;
   time: string;
   title: string;
   url: string;

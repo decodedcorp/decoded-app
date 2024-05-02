@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
-import { custom_font } from "@/components/helpers/util";
+import { main_font } from "@/components/helpers/util";
 import { FirebaseHelper } from "@/common/firebase";
 import { useSearchParams } from "next/navigation";
 import { notFound } from "next/navigation";
@@ -140,7 +140,7 @@ function Page({ params: { imageId } }: PageProps) {
       </div>
       <div className="my-4 w-full">
         <h2
-          className={`text-black dark:text-white text-lg font-bold my-2 pt-5 ${custom_font.className}`}
+          className={`text-black dark:text-white text-lg font-bold my-2 pt-5 ${main_font.className}`}
         >
           More to explore
         </h2>

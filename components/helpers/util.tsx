@@ -1,7 +1,11 @@
 import localFont from "next/font/local";
 
-export const custom_font = localFont({
-  src: "../../fonts/utah-condensed-bold.ttf",
+export const main_font = localFont({
+  src: "../../fonts/Blinker-Bold.ttf",
+});
+
+export const secondary_font = localFont({
+  src: "../../fonts/Blinker-SemiBold.ttf",
 });
 
 export const validateEmail = (email: string): boolean => {
