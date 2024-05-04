@@ -36,6 +36,17 @@ function UploadImageSection() {
     [key: number]: boolean;
   }>({});
 
+  const reset = () => {
+    setSelectedImage(null);
+    setFile(null);
+    setFileName("");
+    setImageName(null);
+    setImageTags([]);
+    setHoverItems([]);
+    setSelectedPointIndex(null);
+    setExpandedSections({});
+  };
+
   const upload = async () => {
     if (!fileName || !imageName || !file || imageTags.length === 0) {
       alert("Required fields are empty!");
@@ -79,6 +90,8 @@ function UploadImageSection() {
         "Compressed File Size (KB):",
         (compressedFile.size / 1024).toFixed(2)
       );
+      reset();
+      alert("Image uploaded successfully!");
     } catch (error) {
       console.error("Error saving image detail:", error);
     }
@@ -261,7 +274,7 @@ function UploadImageSection() {
                     <input
                       type="text"
                       placeholder="Tags (comma separated)"
-                      value={item.metadata.tags.join(",")}
+                      value={item.metadata.tags?.join(",")}
                       onChange={(e) => {
                         handleMetadataChange(
                           index,

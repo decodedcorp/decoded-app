@@ -21,7 +21,11 @@ const nextConfig = {
     return config;
   },
   images: {
-    domains: ["cloud.appwrite.io", "firebasestorage.googleapis.com"],
+    domains: [
+      "cloud.appwrite.io",
+      "firebasestorage.googleapis.com",
+      "www-prd-kr.gentlemonster.com",
+    ],
   },
 };
 

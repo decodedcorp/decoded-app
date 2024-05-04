@@ -1,141 +1,291 @@
+"use client";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FirebaseHelper } from "../../common/firebase";
 import { listAll, getDownloadURL, getMetadata } from "firebase/storage";
 import { main_font } from "@/components/helpers/util";
-import { Article } from "@/types/model";
-import { getDocs, collection, Timestamp } from "firebase/firestore";
+import { Article, ImageDetail, ItemMetadata, TaggedItem } from "@/types/model";
+import {
+  getDocs,
+  collection,
+  Timestamp,
+  doc,
+  getDoc,
+} from "firebase/firestore";
+import {
+  ArrowLeftCircleIcon,
+  ArrowRightCircleIcon,
+} from "@heroicons/react/20/solid";
 
-const fetchAllImages = async (point: string) => {
-  try {
-    const storage_ref = FirebaseHelper.storageRef(point);
-    const res = await listAll(storage_ref);
-    const urlAndHash = await Promise.all(
-      res.items.map(async (itemRef) => {
-        const [metadata, url] = await Promise.all([
-          getMetadata(itemRef),
-          getDownloadURL(itemRef),
-        ]);
-        if (metadata.md5Hash) {
-          console.log(metadata.md5Hash);
-          return { url, hash: metadata.md5Hash };
-        }
-        return null;
-      })
-    );
-    return urlAndHash.filter(
-      (item): item is { url: string; hash: string } => item !== null
-    );
-  } catch (error) {
-    if (error instanceof Error) {
-      console.log(error.message);
-    }
-    return [];
-  }
-};
+interface MainImageDetail {
+  name?: String;
+  tags?: String[];
+  itemMetadata?: ItemMetadata[];
+}
 
-const fetchAllArticles = async (): Promise<Article[]> => {
-  let newsList: Article[] = [];
-  const db = FirebaseHelper.db();
-  const querySnapshot = await getDocs(collection(db, "article"));
-  const current_timestamp = Timestamp.fromDate(new Date());
-  querySnapshot.forEach((doc) => {
-    const article = doc.data() as Article;
-    // if (article.time !== undefined) {
-    //   const dateOnly = article.time.split("T")[0];
-    //   console.log("Article Date", dateOnly);
-    // }
-    // console.log("current_timestamp", current_timestamp.toString());
-    newsList.push(article);
-  });
-  return newsList;
-};
-
-async function Home() {
+function Home() {
   return (
     <div>
-      <NewTaggedSection />
-      <ArticleSection />
+      <MainView />
+      <ArticleView />
       {/* <SpotlightSection /> */}
       {/* <MostHypeSection /> */}
     </div>
   );
 }
 
-async function NewTaggedSection() {
+function MainView() {
+  const [urlAndHash, setUrlAndHash] = useState<{ url: string; hash: string }[]>(
+    []
+  );
+  const [mainImageDetail, setMainImageDetail] = useState<MainImageDetail[]>([]);
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  useEffect(() => {
+    const fetchAllImages = async () => {
+      const urlAndHash = [];
+      let mainImageDetail: MainImageDetail[] = [];
+      try {
+        const storage_ref = FirebaseHelper.storageRef("images");
+        const res = await listAll(storage_ref);
+        for (const itemRef of res.items) {
+          try {
+            const [metadata, url] = await Promise.all([
+              getMetadata(itemRef),
+              getDownloadURL(itemRef),
+            ]);
+            if (metadata.md5Hash) {
+              const docRef = doc(
+                FirebaseHelper.db(),
+                "images",
+                metadata.md5Hash
+              );
+              const imageDocSnap = await getDoc(docRef);
+              if (imageDocSnap.exists()) {
+                const imageDetail = imageDocSnap.data() as ImageDetail;
+                let itemMetadataList: ItemMetadata[] = [];
+                imageDetail.taggedItem.map(async (item) => {
+                  const taggedItem = item as TaggedItem;
+                  const docRef = doc(
+                    FirebaseHelper.db(),
+                    "items",
+                    taggedItem.id
+                  );
+                  const itemDocSnap = await getDoc(docRef);
+                  if (itemDocSnap.exists()) {
+                    const itemMetadata = itemDocSnap.data() as ItemMetadata;
+                    itemMetadataList.push(itemMetadata);
+                  }
+                });
+                mainImageDetail.push({
+                  name: imageDetail.name,
+                  tags: imageDetail.tags,
+                  itemMetadata: itemMetadataList,
+                });
+                urlAndHash.push({ url, hash: metadata.md5Hash });
+              }
+            }
+          } catch (error) {
+            console.error("Error processing item:", error);
+            continue;
+          }
+        }
+      } catch (error) {
+        if (error instanceof Error) {
+          console.log(error.message);
+        }
+      } finally {
+        setUrlAndHash(urlAndHash);
+        setMainImageDetail(mainImageDetail);
+      }
+    };
+    fetchAllImages();
+  }, []);
   return (
-    <div className="h-full rounded-md border-l-2 border-r-2 border-b-2 border-black p-3">
+    <div className="h-full rounded-md border-l-2 border-r-2 border-b-2 border-black p-3 bg-yellow-500">
       <div className="flex justify-start items-stretch h-full">
-        <div className="flex flex-col w-full h-full">
+        <div className="flex flex-col w-full justify-evenly">
           <h1 className={`${main_font.className} text-2xl font-bold`}>
             Today's Pick
           </h1>
-          <h2 className="text-lg font-bold">Description </h2>
+          <ItemDetailView
+            mainImageDetail={mainImageDetail}
+            currentIndex={currentIndex}
+          />
         </div>
-        <ImageCarousel />
+        <ImageCarouselView
+          urlAndHash={urlAndHash}
+          currentIndex={currentIndex}
+          setCurrentIndex={setCurrentIndex}
+        />
       </div>
     </div>
   );
 }
 
-async function ImageCarousel() {
-  const urlsAndHashes = await fetchAllImages("images");
-  return (
-    <div className="w-60 carousel rounded-box mx-5" style={{ width: "70vw" }}>
-      {urlsAndHashes.map(({ url, hash }) => (
-        <div
-          key={hash}
-          className="carousel-item w-full relative aspect-w-5 aspect-h-6"
-        >
-          <Link
-            href={`images/${hash}?imageUrl=${encodeURIComponent(url)}`}
-            prefetch={false}
-          >
-            <Image
-              alt="LOADING"
-              className="w-full h-auto rounded-lg"
-              layout="fill"
-              src={url}
-              quality={80}
-              objectFit="cover"
-              placeholder="blur"
-              blurDataURL="data:image/jpeg;base64,..."
-              sizes="100vw"
-            />
-          </Link>
+function ItemDetailView({
+  mainImageDetail,
+  currentIndex,
+}: {
+  mainImageDetail: MainImageDetail[];
+  currentIndex: number;
+}) {
+  return mainImageDetail.length !== 0 ? (
+    <div className="flex flex-col justify-center h-full">
+      <div>
+        {/* <h1 className={`${main_font.className} text-xl bg-[#FF204E]`}>
+          {mainImageDetail[currentIndex].name}
+        </h1> */}
+        <div>
+          {mainImageDetail[currentIndex].itemMetadata?.map((item, index) => {
+            return (
+              <div className="flex flex-col justify-center mt-10 border-2 border-black rounded-lg p-2">
+                <Image
+                  src={item.image_url ?? ""}
+                  alt={item.name}
+                  width={100}
+                  height={100}
+                />
+                <div key={index} className="flex flex-col p-2">
+                  <div className={`${main_font.className} text-xl`}>
+                    {item.name}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
-      ))}
+      </div>
+    </div>
+  ) : (
+    <div className="flex justify-center items-center h-full w-full bg-gray-300 animate-pulse">
+      Loading...
     </div>
   );
 }
 
-async function ArticleSection() {
-  const articles = await fetchAllArticles();
+function ImageCarouselView({
+  urlAndHash,
+  currentIndex,
+  setCurrentIndex,
+}: {
+  urlAndHash: { url: string; hash: string }[];
+  currentIndex: number;
+  setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
+}) {
+  const handleNext = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % urlAndHash.length);
+  };
+
+  const handlePrev = () => {
+    setCurrentIndex(
+      (prevIndex) => (prevIndex - 1 + urlAndHash.length) % urlAndHash.length
+    );
+  };
+  if (urlAndHash.length === 0) {
+    return (
+      <div className="w-60 carousel rounded-box mx-5" style={{ width: "70vw" }}>
+        <div className="flex justify-center items-center h-full w-full aspect-w-5 aspect-h-6 rounded-l animate-pulse bg-gray-300"></div>
+      </div>
+    );
+  }
+  const { url, hash } = urlAndHash[currentIndex];
+
+  return (
+    <div
+      className="flex flex-col w-60 carousel rounded-box mx-5"
+      style={{ width: "70vw" }}
+    >
+      <div
+        key={hash}
+        className="carousel-item w-full relative aspect-w-5 aspect-h-6"
+      >
+        <Link
+          href={`images/${hash}?imageUrl=${encodeURIComponent(url)}`}
+          prefetch={false}
+        >
+          <Image
+            alt="Image"
+            className="w-full h-auto rounded-lg"
+            layout="fill"
+            src={url}
+            quality={80}
+            objectFit="cover"
+            placeholder="blur"
+            blurDataURL="data:image/jpeg;base64,..."
+            sizes="100vw"
+          />
+        </Link>
+      </div>
+      <div className="flex justify-around items-end m-3">
+        <button className="rounded-md p-1 mr-2" onClick={handlePrev}>
+          <ArrowLeftCircleIcon className="w-6 h-6" />
+        </button>
+        <button className=" rounded-md p-1" onClick={handleNext}>
+          <ArrowRightCircleIcon className="w-6 h-6" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ArticleView() {
+  const [articles, setArticles] = useState<Article[]>([]);
+
+  useEffect(() => {
+    const fetchAllArticles = async () => {
+      let articles: Article[] = [];
+      const db = FirebaseHelper.db();
+      const querySnapshot = await getDocs(collection(db, "article"));
+      const current_timestamp = Timestamp.fromDate(new Date());
+      querySnapshot.forEach((doc) => {
+        const article = doc.data() as Article;
+        // if (article.time !== undefined) {
+        //   const dateOnly = article.time.split("T")[0];
+        //   console.log("Article Date", dateOnly);
+        // }
+        // console.log("current_timestamp", current_timestamp.toString());
+        articles.push(article);
+      });
+      setArticles(articles);
+    };
+    fetchAllArticles();
+  }, []);
+
   return (
     <div className="rounded-md border-l-2 border-r-2 border-black p-3">
       <h1 className={`${main_font.className} text-2xl font-bold mb-4`}>
         LATEST NEWS
       </h1>
-      <div className="grid grid-cols-3 gap-4">
-        {articles.map((article, index) => (
-          <div key={index} className="news-item">
-            {article.src && (
-              <a href={article.url}>
-                {" "}
-                {/* 링크 추가 */}
-                <img
-                  src={article.src.split(" ")[0]} // 공백을 기준으로 문자열을 분리하고 첫 번째 요소를 사용
-                  alt={article.title}
-                  className="w-full h-auto"
-                />
-              </a>
-            )}
-            <div className="text-sm bg-black text-white p-2">
-              {article.title}
+      {articles.length === 0 ? (
+        <div className="grid grid-cols-3 gap-4">
+          {Array.from({ length: 3 }, (_, index) => (
+            <div
+              key={index}
+              className="animate-pulse bg-gray-300 h-32 rounded-md"
+            ></div>
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-3 gap-4">
+          {articles.map((article, index) => (
+            <div key={index} className="news-item">
+              {article.src && (
+                <a href={article.url}>
+                  <img
+                    src={article.src.split(" ")[0]}
+                    alt={article.title}
+                    className="w-full h-auto"
+                  />
+                </a>
+              )}
+              <div className="text-sm bg-black text-white p-2">
+                {article.title}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
       <button className="w-full text-align-center mt-4 py-2 px-6 bg-[#FF204E] text-white rounded">
         See More
       </button>
