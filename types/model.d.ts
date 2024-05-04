@@ -1,26 +1,23 @@
 import { ReferrerEnum } from "next/dist/lib/metadata/types/metadata-types";
 
 export interface ImageDetail {
-  id: string;
   name: string;
   taggedItem: TaggedItem[] | HoverItem[];
+  updateAt: Date;
   tags: string[];
 }
 
 export interface TaggedItem {
-  id: string;
+  id: string; // Same as item doc id
   position: Position;
 }
 
 export interface Position {
   top?: string;
   left?: string;
-  right?: string;
-  bottom?: string;
 }
 
 export interface ItemMetadata {
-  id: string;
   name: string;
   price: string;
   url: string;

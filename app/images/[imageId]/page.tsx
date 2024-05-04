@@ -36,9 +36,10 @@ function Page({ params: { imageId } }: PageProps) {
 
   useEffect(() => {
     const fetchData = async () => {
+      const decoded = decodeURIComponent(imageId);
       const imageDetail = (await FirebaseHelper.getImageDetail(
         "images",
-        imageId
+        decoded
       )) as ImageDetail;
       if (imageDetail !== undefined) {
         setImageDetail(imageDetail);
@@ -81,15 +82,13 @@ function Page({ params: { imageId } }: PageProps) {
                   {imageDetail &&
                     tags.map((item) => (
                       <a
-                        key={item.metadata.id}
+                        key={imageId}
                         href={item.metadata.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{
                           position: "absolute",
                           top: item.position.top,
-                          right: item.position.right,
-                          bottom: item.position.bottom,
                           left: item.position.left,
                           cursor: "pointer",
                         }}
@@ -117,8 +116,6 @@ function Page({ params: { imageId } }: PageProps) {
                   }`}
                   style={{
                     top: hoverItem.position.top,
-                    right: hoverItem.position.right,
-                    bottom: hoverItem.position.bottom,
                     left: hoverItem.position.left,
                     zIndex: 50, // Ensure it's above other elements
                   }}
@@ -138,9 +135,9 @@ function Page({ params: { imageId } }: PageProps) {
           </div>
         </div>
       </div>
-      <div className="my-4 w-full">
+      <div className="my-4 w-full text-center">
         <h2
-          className={`text-black dark:text-white text-lg font-bold my-2 pt-5 ${main_font.className}`}
+          className={`text-lg text-blacktext-lg font-bold my-2 pt-3 ${main_font.className}`}
         >
           More to explore
         </h2>

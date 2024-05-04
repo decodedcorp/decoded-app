@@ -1,9 +1,17 @@
 "use client";
 import Image from "next/image";
 import { useState, ChangeEvent } from "react";
-import { TaggedItem, HoverItem, ItemMetadata } from "@/types/model";
+import {
+  TaggedItem,
+  HoverItem,
+  ItemMetadata,
+  ImageDetail,
+} from "@/types/model";
 import { FirebaseHelper } from "@/common/firebase";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import { main_font } from "@/components/helpers/util";
+import { uploadBytes } from "firebase/storage";
+import imageCompression from "browser-image-compression";
 
 function AdminDashboard() {
   return (
@@ -13,12 +21,14 @@ function AdminDashboard() {
     </div>
   );
 }
-// Firestore 사용을 위한 import가 필요합니다. 예: import { db } from '../your/firebase/config';
-// Firestore에 데이터를 추가하는 함수를 import합니다. 예: import { addHoverItemToFirestore } from '../your/firebase/services';
 
 function UploadImageSection() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [hoverItems, setHoverItems] = useState<HoverItem[]>([]);
+  const [file, setFile] = useState<File | null>(null);
+  const [fileName, setFileName] = useState("");
+  const [imageName, setImageName] = useState<string | null>(null);
+  const [imageTags, setImageTags] = useState<string[]>([]);
   const [selectedPointIndex, setSelectedPointIndex] = useState<number | null>(
     null
   );
@@ -26,19 +36,52 @@ function UploadImageSection() {
     [key: number]: boolean;
   }>({});
 
-  const saveAll = async () => {
+  const upload = async () => {
+    if (!fileName || !imageName || !file || imageTags.length === 0) {
+      alert("Required fields are empty!");
+      return;
+    }
     const taggedItems: TaggedItem[] = [];
-    // 모든 포인트를 저장하는 로직
-    // 예를 들어, Firestore에 모든 포인트를 저장하는 API 호출 등
     console.log("Saving all points:", hoverItems);
-    // 모든 HoverItem에 대해 Firestore에 Item 데이터를 추가
     for (const hoverItem of hoverItems) {
       const docRef = await addDoc(
         collection(FirebaseHelper.db(), "items"),
         hoverItem.metadata
       );
+      taggedItems.push({ id: docRef.id, position: hoverItem.position });
     }
-    alert("All points saved!");
+    const imageDetail: ImageDetail = {
+      name: imageName,
+      taggedItem: taggedItems,
+      updateAt: new Date(),
+      tags: imageTags,
+    };
+    try {
+      const options = {
+        maxSizeMB: 1, // (옵션) 최대 파일 크기
+        maxWidthOrHeight: 1920, // (옵션) 이미지의 최대 너비 또는 높이
+        useWebWorker: true,
+      };
+      const compressedFile = await imageCompression(file, options);
+      const storageRef = FirebaseHelper.storageRef("images/" + fileName);
+      const snapshot = await uploadBytes(storageRef, compressedFile);
+      if (snapshot.metadata.md5Hash) {
+        await setDoc(
+          doc(FirebaseHelper.db(), "images", snapshot.metadata.md5Hash),
+          imageDetail
+        );
+      } else {
+        alert("Error saving image detail!");
+        return;
+      }
+      console.log("Original File Size (KB):", (file.size / 1024).toFixed(2));
+      console.log(
+        "Compressed File Size (KB):",
+        (compressedFile.size / 1024).toFixed(2)
+      );
+    } catch (error) {
+      console.error("Error saving image detail:", error);
+    }
   };
 
   const toggleSection = (index: number) => {
@@ -49,19 +92,18 @@ function UploadImageSection() {
   };
 
   const removePoint = (index: number) => {
-    // 특정 인덱스의 포인트를 제거합니다.
     const updatedHoverItems = hoverItems.filter(
       (_, itemIndex) => itemIndex !== index
     );
     setHoverItems(updatedHoverItems);
-
-    // 선택된 포인트 인덱스를 초기화합니다.
     setSelectedPointIndex(null);
   };
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const fileURL = URL.createObjectURL(e.target.files[0]);
+      const file = e.target.files[0];
+      const fileURL = URL.createObjectURL(file);
       setSelectedImage(fileURL);
+      setFile(file);
       setHoverItems([]);
     }
   };
@@ -80,7 +122,7 @@ function UploadImageSection() {
       ...hoverItems,
       {
         position: { top: topPercent, left: leftPercent },
-        metadata: { id: "", name: "", price: "", url: "", tags: [] },
+        metadata: { name: "", price: "", url: "", tags: [] },
       },
     ]);
   };
@@ -92,19 +134,16 @@ function UploadImageSection() {
   ) => {
     const updatedHoverItems = [...hoverItems];
     if (field === "tags") {
-      // 'tags' 필드의 경우, value가 문자열일 때만 split을 사용합니다.
       if (typeof value === "string") {
         updatedHoverItems[index].metadata[field] = value
           .split(",")
           .map((tag) => tag.trim());
       } else {
-        // value가 이미 string[] 타입인 경우, 직접 할당합니다.
         updatedHoverItems[index].metadata[field] = value.map((tag) =>
           tag.trim()
         );
       }
     } else {
-      // 'tags'가 아닌 다른 필드의 경우, 문자열 값을 직접 할당합니다.
       updatedHoverItems[index].metadata[field] = value as string;
     }
     setHoverItems(updatedHoverItems);
@@ -112,14 +151,17 @@ function UploadImageSection() {
 
   const handleSubmit = async (index: number) => {
     const hoverItem = hoverItems[index];
-    // Firestore에 hoverItem 저장 로직
     alert(`HoverItem ${index + 1} saved!`);
   };
 
   return (
-    <div className="max-w-4xl mx-auto mt-5">
+    <div className="mx-auto p-3 border-l-2 border-r-2 border-b-2 border-black rounded-md">
+      <h1 className={`text-2xl font-bold mb-5 ${main_font.className}`}>
+        Upload
+      </h1>
       <div className="flex flex-col md:flex-row items-center justify-center gap-4">
         <input type="file" onChange={handleImageChange} className="mb-4" />
+        {/* Image Section */}
         <div className="flex-1 relative">
           {selectedImage && (
             <div
@@ -157,6 +199,7 @@ function UploadImageSection() {
             </div>
           )}
         </div>
+        {/* HoverItem Section */}
         <div className="flex-1 space-y-4 align-top justify-between">
           {hoverItems.map((item, index) => (
             <div
@@ -188,15 +231,6 @@ function UploadImageSection() {
               >
                 {expandedSections[index] && (
                   <div>
-                    <input
-                      type="text"
-                      placeholder="ID"
-                      value={item.metadata.id}
-                      onChange={(e) => {
-                        handleMetadataChange(index, "id", e.target.value);
-                      }}
-                      className="input input-bordered w-full mb-2"
-                    />
                     <input
                       type="text"
                       placeholder="Name"
@@ -242,19 +276,95 @@ function UploadImageSection() {
               </div>
             </div>
           ))}
-          {hoverItems.length > 0 && (
-            <button onClick={saveAll} className="btn btn-primary mt-4">
-              Save All Points
-            </button>
-          )}
         </div>
       </div>
+      {selectedImage && (
+        <div className="p-4 border-t border-gray-200">
+          <input
+            type="text"
+            placeholder="File Name"
+            value={fileName}
+            onChange={(e) => setFileName(e.target.value)}
+            className="input input-bordered w-full mb-2"
+          />
+          <input
+            type="text"
+            placeholder="Image Name"
+            value={imageName || ""}
+            onChange={(e) => setImageName(e.target.value)}
+            className="input input-bordered w-full mb-2"
+          />
+          <input
+            type="text"
+            placeholder="Tags (comma separated)"
+            value={imageTags.join(",")}
+            onChange={(e) =>
+              setImageTags(e.target.value.split(",").map((tag) => tag.trim()))
+            }
+            className="input input-bordered w-full mb-2"
+          />
+          <button
+            onClick={upload}
+            className="btn btn-primary mt-4 w-full bg-gradient-to-r from-blue-500 to-purple-600"
+          >
+            Upload
+          </button>
+        </div>
+      )}
     </div>
   );
 }
 
 function RequestListSection() {
-  return <div>RequestList</div>;
+  // Mock 데이터
+  const requests = [
+    {
+      request_id: 1,
+      description: "새로운 아이템 추가 요청",
+      name: "아이템1",
+      status: "대기중",
+    },
+    {
+      request_id: 2,
+      description: "가격 업데이트 요청",
+      name: "아이템2",
+      status: "완료",
+    },
+    {
+      request_id: 3,
+      description: "제품 정보 수정",
+      name: "아이템3",
+      status: "진행중",
+    },
+  ];
+
+  return (
+    <div
+      className={`p-4 text-2xl font-bold ${main_font.className} border-l-2 border-r-2 border-b-2 border-black rounded-md`}
+    >
+      <h2>Requests</h2>
+      <table className="table-auto w-full mt-4">
+        <thead>
+          <tr>
+            <th className="px-4 py-2">Request ID</th>
+            <th className="px-4 py-2">Description</th>
+            <th className="px-4 py-2">Name</th>
+            <th className="px-4 py-2">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {requests.map((request) => (
+            <tr key={request.request_id}>
+              <td className="border px-4 py-2">{request.request_id}</td>
+              <td className="border px-4 py-2">{request.description}</td>
+              <td className="border px-4 py-2">{request.name}</td>
+              <td className="border px-4 py-2">{request.status}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }
 
 export default AdminDashboard;

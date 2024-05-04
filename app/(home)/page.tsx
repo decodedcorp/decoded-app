@@ -17,6 +17,7 @@ const fetchAllImages = async (point: string) => {
           getDownloadURL(itemRef),
         ]);
         if (metadata.md5Hash) {
+          console.log(metadata.md5Hash);
           return { url, hash: metadata.md5Hash };
         }
         return null;

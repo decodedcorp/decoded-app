@@ -20,7 +20,7 @@ import {
   ItemMetadata,
   HoverItem,
   TaggedItem,
-  News,
+  Article,
 } from "@/types/model";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
