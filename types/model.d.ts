@@ -21,7 +21,7 @@ export interface ItemMetadata {
   name: string;
   price?: string;
   url?: string;
-  image_url?: string;
+  imageUrl?: string;
   tags?: string[];
 }
 

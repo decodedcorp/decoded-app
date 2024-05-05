@@ -48,6 +48,7 @@ function MainView() {
       try {
         const storage_ref = FirebaseHelper.storageRef("images");
         const res = await listAll(storage_ref);
+        console.log("Items", res.items);
         for (const itemRef of res.items) {
           try {
             const [metadata, url] = await Promise.all([
@@ -55,6 +56,7 @@ function MainView() {
               getDownloadURL(itemRef),
             ]);
             if (metadata.md5Hash) {
+              console.log("Hash", metadata.md5Hash);
               const docRef = doc(
                 FirebaseHelper.db(),
                 "images",
@@ -101,6 +103,7 @@ function MainView() {
     };
     fetchAllImages();
   }, []);
+  console.log("urlAndHash", urlAndHash);
   return (
     <div className="h-full rounded-md border-l-2 border-r-2 border-b-2 border-black p-3 bg-yellow-500">
       <div className="flex justify-start items-stretch h-full">
@@ -139,18 +142,19 @@ function ItemDetailView({
         <div>
           {mainImageDetail[currentIndex].itemMetadata?.map((item, index) => {
             return (
-              <div className="flex flex-col justify-center mt-10 border-2 border-black rounded-lg p-2">
+              <div key={index} className="flex flex-col justify-center mt-10">
                 <Image
-                  src={item.image_url ?? ""}
+                  src={item.imageUrl ?? ""}
                   alt={item.name}
                   width={100}
                   height={100}
+                  className="rounded-lg"
                 />
-                <div key={index} className="flex flex-col p-2">
+                {/* <div key={index} className="flex flex-col p-2">
                   <div className={`${main_font.className} text-xl`}>
                     {item.name}
                   </div>
-                </div>
+                </div> */}
               </div>
             );
           })}

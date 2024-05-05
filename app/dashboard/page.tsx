@@ -10,7 +10,7 @@ import {
 import { FirebaseHelper } from "@/common/firebase";
 import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { main_font } from "@/components/helpers/util";
-import { uploadBytes } from "firebase/storage";
+import { uploadBytes, getDownloadURL } from "firebase/storage";
 import imageCompression from "browser-image-compression";
 
 function AdminDashboard() {
@@ -35,6 +35,9 @@ function UploadImageSection() {
   const [expandedSections, setExpandedSections] = useState<{
     [key: number]: boolean;
   }>({});
+  const [hoverItemFiles, setHoverItemFiles] = useState<{
+    [key: number]: File | null;
+  }>({});
 
   const reset = () => {
     setSelectedImage(null);
@@ -45,6 +48,7 @@ function UploadImageSection() {
     setHoverItems([]);
     setSelectedPointIndex(null);
     setExpandedSections({});
+    setHoverItemFiles({});
   };
 
   const upload = async () => {
@@ -53,8 +57,39 @@ function UploadImageSection() {
       return;
     }
     const taggedItems: TaggedItem[] = [];
-    console.log("Saving all points:", hoverItems);
-    for (const hoverItem of hoverItems) {
+    for (let index = 0; index < hoverItems.length; index++) {
+      // hoverItemFiles에서 해당 인덱스의 파일 업로드
+      const hoverFile = hoverItemFiles[index];
+      let hoverItem = hoverItems[index];
+      let downloadUrl = "";
+      if (
+        hoverFile &&
+        (hoverFile.type.includes("jpeg") || hoverFile.type.includes("png"))
+      ) {
+        try {
+          const hoverFileOptions = {
+            maxSizeMB: 1,
+            maxWidthOrHeight: 1280,
+            useWebWorker: true,
+          };
+          const compressedHoverFile = await imageCompression(
+            hoverFile,
+            hoverFileOptions
+          );
+          const hoverItemRef = FirebaseHelper.storageRef(
+            "items/" + hoverItem.metadata.name
+          );
+          const snapshot = await uploadBytes(hoverItemRef, compressedHoverFile);
+          downloadUrl = await getDownloadURL(snapshot.ref);
+        } catch (error) {
+          console.error("Error saving hover item image:", error, hoverItem);
+          continue;
+        }
+      } else {
+        alert("Image file is not valid!");
+        return;
+      }
+      hoverItem.metadata.imageUrl = downloadUrl;
       const docRef = await addDoc(
         collection(FirebaseHelper.db(), "items"),
         hoverItem.metadata
@@ -69,8 +104,8 @@ function UploadImageSection() {
     };
     try {
       const options = {
-        maxSizeMB: 1, // (옵션) 최대 파일 크기
-        maxWidthOrHeight: 1920, // (옵션) 이미지의 최대 너비 또는 높이
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
         useWebWorker: true,
       };
       const compressedFile = await imageCompression(file, options);
@@ -162,9 +197,16 @@ function UploadImageSection() {
     setHoverItems(updatedHoverItems);
   };
 
-  const handleSubmit = async (index: number) => {
-    const hoverItem = hoverItems[index];
-    alert(`HoverItem ${index + 1} saved!`);
+  const handleHoverItemImageChange = (
+    index: number,
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setHoverItemFiles((prev) => ({ ...prev, [index]: file }));
+    } else {
+      console.log("No file selected");
+    }
   };
 
   return (
@@ -283,6 +325,11 @@ function UploadImageSection() {
                         );
                       }}
                       className="input input-bordered w-full mb-2"
+                    />
+                    <input
+                      type="file"
+                      onChange={(e) => handleHoverItemImageChange(index, e)}
+                      className="input w-full"
                     />
                   </div>
                 )}
