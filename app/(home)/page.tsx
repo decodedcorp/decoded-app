@@ -17,6 +17,7 @@ import {
   ArrowLeftCircleIcon,
   ArrowRightCircleIcon,
 } from "@heroicons/react/20/solid";
+import ProgressBar from "@/components/ui/progress-bar";
 
 interface MainImageDetail {
   name?: String;
@@ -29,7 +30,7 @@ function Home() {
     <div>
       <MainView />
       <ArticleView />
-      {/* <SpotlightSection /> */}
+      <MoreTaggedView />
       {/* <MostHypeSection /> */}
     </div>
   );
@@ -105,11 +106,11 @@ function MainView() {
   }, []);
   console.log("urlAndHash", urlAndHash);
   return (
-    <div className="h-full rounded-md border-l-2 border-r-2 border-b-2 border-black p-3 bg-yellow-500">
-      <div className="flex justify-start items-stretch h-full">
+    <div className="h-full rounded-md border-l-2 border-r-2 border-b-2 border-black p-3 bg-green-500">
+      <div className="flex flex-col sm:flex-row justify-start items-stretch h-full">
         <div className="flex flex-col w-full justify-evenly">
           <h1 className={`${main_font.className} text-2xl font-bold`}>
-            Today's Pick
+            Today's TAGGED
           </h1>
           <ItemDetailView
             mainImageDetail={mainImageDetail}
@@ -140,9 +141,9 @@ function ItemDetailView({
           {mainImageDetail[currentIndex].name}
         </h1> */}
         <div>
-          {mainImageDetail[currentIndex].itemMetadata?.map((item, index) => {
+          {mainImageDetail[currentIndex]?.itemMetadata?.map((item, index) => {
             return (
-              <div key={index} className="flex flex-col justify-center mt-10">
+              <div key={index} className="flex flex-row items-center mt-10">
                 <Image
                   src={item.imageUrl ?? ""}
                   alt={item.name}
@@ -150,11 +151,11 @@ function ItemDetailView({
                   height={100}
                   className="rounded-lg"
                 />
-                {/* <div key={index} className="flex flex-col p-2">
+                <div key={index} className="flex flex-col p-2">
                   <div className={`${main_font.className} text-xl`}>
                     {item.name}
                   </div>
-                </div> */}
+                </div>
               </div>
             );
           })}
@@ -162,8 +163,16 @@ function ItemDetailView({
       </div>
     </div>
   ) : (
-    <div className="flex justify-center items-center h-full w-full bg-gray-300 animate-pulse">
-      Loading...
+    <div
+      className="grid grid-cols-2 gap-4 p-4 justify-center items-center"
+      style={{ minHeight: "100vh" }}
+    >
+      {Array.from({ length: 4 }, (_, index) => (
+        <div
+          key={index}
+          className="animate-pulse bg-gray-300 h-32 w-32 rounded-md"
+        ></div>
+      ))}
     </div>
   );
 }
@@ -177,6 +186,16 @@ function ImageCarouselView({
   currentIndex: number;
   setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
 }) {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (urlAndHash.length > 0) {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % urlAndHash.length);
+      }
+    }, 10000);
+
+    return () => clearTimeout(timer);
+  }, [currentIndex, urlAndHash.length]);
+
   const handleNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % urlAndHash.length);
   };
@@ -193,17 +212,24 @@ function ImageCarouselView({
       </div>
     );
   }
+
+  const itemCount = urlAndHash.length;
   const { url, hash } = urlAndHash[currentIndex];
 
   return (
     <div
       className="flex flex-col w-60 carousel rounded-box mx-5"
-      style={{ width: "70vw" }}
+      style={{ width: "70vw", position: "relative" }}
     >
       <div
         key={hash}
         className="carousel-item w-full relative aspect-w-5 aspect-h-6"
       >
+        <ProgressBar
+          duration={10000}
+          currentIndex={currentIndex}
+          totalItems={itemCount}
+        />
         <Link
           href={`images/${hash}?imageUrl=${encodeURIComponent(url)}`}
           prefetch={false}
@@ -214,10 +240,10 @@ function ImageCarouselView({
             layout="fill"
             src={url}
             quality={80}
+            fill={true}
             objectFit="cover"
             placeholder="blur"
             blurDataURL="data:image/jpeg;base64,..."
-            sizes="100vw"
           />
         </Link>
       </div>
@@ -297,11 +323,11 @@ function ArticleView() {
   );
 }
 
-async function SpotlightSection() {
+function MoreTaggedView() {
   return (
-    <div className="rounded-md border-2 border-black p-3 bg-black">
+    <div className="rounded-md border-2 border-black p-3 bg-blue-500">
       <div className="text-center mb-6">
-        <h1 className="text-4xl font-bold">SPOTLIGHT</h1>
+        <h1 className="text-4xl font-bold">More TAGGED</h1>
         <h2 className="text-2xl font-bold">JENNIE 24SS</h2>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

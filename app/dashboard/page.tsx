@@ -217,15 +217,15 @@ function UploadImageSection() {
       <div className="flex flex-col md:flex-row items-center justify-center gap-4">
         <input type="file" onChange={handleImageChange} className="mb-4" />
         {/* Image Section */}
-        <div className="flex-1 relative">
+        <div className="flex-1">
           {selectedImage && (
             <div
               className="rounded-lg shadow-lg overflow-hidden mt-10"
               style={{
                 width: "100%",
                 maxWidth: "400px",
-                height: "auto",
                 aspectRatio: "3/4",
+                position: "relative",
               }}
             >
               <Image
