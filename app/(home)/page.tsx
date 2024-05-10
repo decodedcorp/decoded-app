@@ -119,18 +119,25 @@ function MainView() {
   console.log("urlAndHash", urlAndHash);
   return (
     <div className="rounded-md border-l-2 border-r-2 border-b-2 border-black">
-      <div className="flex flex-col sm:flex-row justify-between">
+      <div className="flex flex-col sm:flex-row items-center md:items-start">
         <div className="flex flex-col w-full">
-          <h1 className={`${main_font.className} text-5xl md:text-8xl p-2`}>
+          <h1 className={`${main_font.className} text-7xl md:text-8xl p-2`}>
             TODAY'S NEW TAGGED
           </h1>
-          <h2 className={`${main_font.className} text-2xl md:text-7xl p-2`}>
+          <h2 className={`${main_font.className} text-6xl md:text-7xl p-2`}>
             {currentDateTime.toLocaleTimeString()}
           </h2>
-          <ItemDetailView
+          <ImageDescriptionView
             mainImageDetail={mainImageDetail}
             currentIndex={currentIndex}
           />
+          {/* 모바일에서 숨기고 데스크탑에서 보이는 ItemDetailView */}
+          <div className="hidden sm:block">
+            <ItemDetailView
+              mainImageDetail={mainImageDetail}
+              currentIndex={currentIndex}
+            />
+          </div>
         </div>
         <ImageCarouselView
           urlAndHash={urlAndHash}
@@ -138,7 +145,49 @@ function MainView() {
           setCurrentIndex={setCurrentIndex}
         />
       </div>
+      {/* 데스크탑에서 숨기고 모바일에서 보이는 ItemDetailView */}
+      <div className="sm:hidden">
+        <ItemDetailView
+          mainImageDetail={mainImageDetail}
+          currentIndex={currentIndex}
+        />
+      </div>
     </div>
+  );
+}
+
+function ImageDescriptionView({
+  mainImageDetail,
+  currentIndex,
+}: {
+  mainImageDetail: MainImageDetail[];
+  currentIndex: number;
+}) {
+  return mainImageDetail.length !== 0 ? (
+    <div className="flex flex-col h-full p-2">
+      <h1 className={`${main_font.className} text-3xl`}>
+        {mainImageDetail[currentIndex].name}
+      </h1>
+      <h2 className={`${main_font.className} text-sm pt-4`}>
+        {mainImageDetail[currentIndex].tags?.map((tag, index) => (
+          <span
+            key={index}
+            className="shadow-custom border border-[#FF204E] text-black px-2 py-1 rounded-xl mr-2"
+          >
+            {tag.replace(/_/g, " ").toUpperCase()}
+          </span>
+        ))}
+      </h2>
+      <h3 className={`${main_font.className} text-md pt-5 pb-5`}>
+        {mainImageDetail[currentIndex].description}
+      </h3>
+    </div>
+  ) : (
+    <h1
+      className={`${main_font.className} text-2xl md:text-5xl loading-text p-5`}
+    >
+      Loading
+    </h1>
   );
 }
 
@@ -149,69 +198,41 @@ function ItemDetailView({
   mainImageDetail: MainImageDetail[];
   currentIndex: number;
 }) {
-  return mainImageDetail.length !== 0 ? (
-    <div className="flex flex-col justify-center h-full p-2 m-2">
-      <div>
-        <div className="flex flex-col">
-          <h1 className={`${main_font.className} text-3xl`}>
-            {mainImageDetail[currentIndex].name}
-          </h1>
-          <h2 className={`${main_font.className} text-sm pt-3`}>
-            {mainImageDetail[currentIndex].tags?.map((tag, index) => (
-              <span
-                key={index}
-                className="shadow-custom border border-[#FF204E] text-black px-2 py-1 rounded-xl mr-2"
-              >
-                {tag.replace(/_/g, " ").toUpperCase()}
-              </span>
-            ))}
-          </h2>
-          <h3 className={`${main_font.className} text-md pt-5 pb-5`}>
-            {mainImageDetail[currentIndex].description}
-          </h3>
-        </div>
-        <div>
-          <h3 className={`${main_font.className} text-2xl pt-2 pb-2`}>
-            {mainImageDetail[currentIndex].artistName.toUpperCase()}'s Items
-          </h3>
-          <div className="rounded-md p-2">
-            {mainImageDetail[currentIndex]?.itemMetadata?.map((item, index) => {
-              return (
-                <div key={index} className="flex flex-row items-center">
-                  <Image
-                    src={item.imageUrl ?? ""}
-                    alt={item.name}
-                    width={100}
-                    height={100}
-                    className="rounded-lg shadow-lg"
-                  />
-                  <div key={index} className="flex flex-col p-2 m-5 w-full">
-                    <div className={`${secondary_font.className} text-xl`}>
-                      {item.name}
-                    </div>
-                    <div className={`${secondary_font.className} text-xl`}>
-                      {item.price}
-                    </div>
-                    <button
-                      className={`${main_font.className} mt-2 bg-[#FF204E] hover:bg-black text-white font-bold py-2 px-4 rounded w-full`}
-                      onClick={() => (window.location.href = item.url ?? "#")}
-                    >
-                      구매하기
-                    </button>
-                  </div>
+  return (
+    <div className="p-2 m-2 justify-start w-full">
+      <h3 className={`${main_font.className} text-3xl pt-2 pb-2`}>
+        {mainImageDetail[currentIndex].artistName.toUpperCase()}'s Items
+      </h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 rounded-md p-2">
+        {mainImageDetail[currentIndex]?.itemMetadata?.map((item, index) => {
+          return (
+            <div key={index} className="flex flex-row items-center">
+              <Image
+                src={item.imageUrl ?? ""}
+                alt={item.name}
+                width={100}
+                height={100}
+                className="rounded-lg shadow-lg"
+              />
+              <div key={index} className="flex flex-col p-2 m-5 w-full">
+                <div className={`${secondary_font.className} text-xl`}>
+                  {item.name}
                 </div>
-              );
-            })}
-          </div>
-        </div>
+                <div className={`${secondary_font.className} text-xl`}>
+                  {item.price}
+                </div>
+                <button
+                  className={`${main_font.className} mt-2 bg-[#FF204E] hover:bg-black text-white font-bold py-2 px-4 rounded w-full`}
+                  onClick={() => (window.location.href = item.url ?? "#")}
+                >
+                  구매하기
+                </button>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
-  ) : (
-    <h1
-      className={`${main_font.className} text-2xl md:text-5xl loading-text p-5`}
-    >
-      Loading
-    </h1>
   );
 }
 
@@ -257,11 +278,11 @@ function ImageCarouselView({
   return (
     <div
       className="flex flex-col w-60 carousel rounded-box mx-5 p-5"
-      style={{ width: "70vw", position: "relative" }}
+      style={{ width: "65vw", position: "relative" }}
     >
       <div
         key={hash}
-        className="carousel-item w-full relative aspect-w-5 aspect-h-6"
+        className="carousel-item w-full relative aspect-w-3 aspect-h-4"
       >
         <ProgressBar
           duration={10000}
