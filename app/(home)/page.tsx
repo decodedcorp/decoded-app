@@ -4,8 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { FirebaseHelper } from "../../common/firebase";
 import { listAll, getDownloadURL, getMetadata } from "firebase/storage";
-import { main_font } from "@/components/helpers/util";
-import { Article, ImageDetail, ItemMetadata, TaggedItem } from "@/types/model";
+import { main_font, secondary_font } from "@/components/helpers/util";
+import {
+  Article,
+  ImageDetail,
+  ItemMetadata,
+  TaggedItem,
+  MainImageDetail,
+} from "@/types/model";
 import {
   getDocs,
   collection,
@@ -19,19 +25,12 @@ import {
 } from "@heroicons/react/20/solid";
 import ProgressBar from "@/components/ui/progress-bar";
 
-interface MainImageDetail {
-  name?: String;
-  tags?: String[];
-  itemMetadata?: ItemMetadata[];
-}
-
 function Home() {
   return (
     <div>
       <MainView />
       <ArticleView />
-      <MoreTaggedView />
-      {/* <MostHypeSection /> */}
+      <HypedTaggedView />
     </div>
   );
 }
@@ -42,6 +41,16 @@ function MainView() {
   );
   const [mainImageDetail, setMainImageDetail] = useState<MainImageDetail[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
+
+  useEffect(() => {
+    const timerId = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timerId);
+  }, []);
+
   useEffect(() => {
     const fetchAllImages = async () => {
       const urlAndHash = [];
@@ -82,8 +91,11 @@ function MainView() {
                 });
                 mainImageDetail.push({
                   name: imageDetail.name,
+                  artistName: imageDetail.artistName,
                   tags: imageDetail.tags,
                   itemMetadata: itemMetadataList,
+                  description: imageDetail.description,
+                  hyped: imageDetail.hyped,
                 });
                 urlAndHash.push({ url, hash: metadata.md5Hash });
               }
@@ -106,12 +118,15 @@ function MainView() {
   }, []);
   console.log("urlAndHash", urlAndHash);
   return (
-    <div className="h-full rounded-md border-l-2 border-r-2 border-b-2 border-black p-3 bg-green-500">
-      <div className="flex flex-col sm:flex-row justify-start items-stretch h-full">
-        <div className="flex flex-col w-full justify-evenly">
-          <h1 className={`${main_font.className} text-2xl font-bold`}>
-            Today's TAGGED
+    <div className="rounded-md border-l-2 border-r-2 border-b-2 border-black">
+      <div className="flex flex-col sm:flex-row justify-between">
+        <div className="flex flex-col w-full">
+          <h1 className={`${main_font.className} text-5xl md:text-8xl p-2`}>
+            TODAY'S NEW TAGGED
           </h1>
+          <h2 className={`${main_font.className} text-2xl md:text-7xl p-2`}>
+            {currentDateTime.toLocaleTimeString()}
+          </h2>
           <ItemDetailView
             mainImageDetail={mainImageDetail}
             currentIndex={currentIndex}
@@ -135,45 +150,68 @@ function ItemDetailView({
   currentIndex: number;
 }) {
   return mainImageDetail.length !== 0 ? (
-    <div className="flex flex-col justify-center h-full">
+    <div className="flex flex-col justify-center h-full p-2 m-2">
       <div>
-        {/* <h1 className={`${main_font.className} text-xl bg-[#FF204E]`}>
-          {mainImageDetail[currentIndex].name}
-        </h1> */}
+        <div className="flex flex-col">
+          <h1 className={`${main_font.className} text-3xl`}>
+            {mainImageDetail[currentIndex].name}
+          </h1>
+          <h2 className={`${main_font.className} text-sm pt-3`}>
+            {mainImageDetail[currentIndex].tags?.map((tag, index) => (
+              <span
+                key={index}
+                className="shadow-custom border border-[#FF204E] text-black px-2 py-1 rounded-xl mr-2"
+              >
+                {tag.replace(/_/g, " ").toUpperCase()}
+              </span>
+            ))}
+          </h2>
+          <h3 className={`${main_font.className} text-md pt-5 pb-5`}>
+            {mainImageDetail[currentIndex].description}
+          </h3>
+        </div>
         <div>
-          {mainImageDetail[currentIndex]?.itemMetadata?.map((item, index) => {
-            return (
-              <div key={index} className="flex flex-row items-center mt-10">
-                <Image
-                  src={item.imageUrl ?? ""}
-                  alt={item.name}
-                  width={100}
-                  height={100}
-                  className="rounded-lg"
-                />
-                <div key={index} className="flex flex-col p-2">
-                  <div className={`${main_font.className} text-xl`}>
-                    {item.name}
+          <h3 className={`${main_font.className} text-2xl pt-2 pb-2`}>
+            {mainImageDetail[currentIndex].artistName.toUpperCase()}'s Items
+          </h3>
+          <div className="rounded-md p-2">
+            {mainImageDetail[currentIndex]?.itemMetadata?.map((item, index) => {
+              return (
+                <div key={index} className="flex flex-row items-center">
+                  <Image
+                    src={item.imageUrl ?? ""}
+                    alt={item.name}
+                    width={100}
+                    height={100}
+                    className="rounded-lg shadow-lg"
+                  />
+                  <div key={index} className="flex flex-col p-2 m-5 w-full">
+                    <div className={`${secondary_font.className} text-xl`}>
+                      {item.name}
+                    </div>
+                    <div className={`${secondary_font.className} text-xl`}>
+                      {item.price}
+                    </div>
+                    <button
+                      className={`${main_font.className} mt-2 bg-[#FF204E] hover:bg-black text-white font-bold py-2 px-4 rounded w-full`}
+                      onClick={() => (window.location.href = item.url ?? "#")}
+                    >
+                      구매하기
+                    </button>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
   ) : (
-    <div
-      className="grid grid-cols-2 gap-4 p-4 justify-center items-center"
-      style={{ minHeight: "100vh" }}
+    <h1
+      className={`${main_font.className} text-2xl md:text-5xl loading-text p-5`}
     >
-      {Array.from({ length: 4 }, (_, index) => (
-        <div
-          key={index}
-          className="animate-pulse bg-gray-300 h-32 w-32 rounded-md"
-        ></div>
-      ))}
-    </div>
+      Loading
+    </h1>
   );
 }
 
@@ -218,7 +256,7 @@ function ImageCarouselView({
 
   return (
     <div
-      className="flex flex-col w-60 carousel rounded-box mx-5"
+      className="flex flex-col w-60 carousel rounded-box mx-5 p-5"
       style={{ width: "70vw", position: "relative" }}
     >
       <div
@@ -247,7 +285,7 @@ function ImageCarouselView({
           />
         </Link>
       </div>
-      <div className="flex justify-around items-end m-3">
+      <div className="flex justify-around m-3 items-center">
         <button className="rounded-md p-1 mr-2" onClick={handlePrev}>
           <ArrowLeftCircleIcon className="w-6 h-6" />
         </button>
@@ -284,7 +322,9 @@ function ArticleView() {
 
   return (
     <div className="rounded-md border-l-2 border-r-2 border-black p-3">
-      <h1 className={`${main_font.className} text-2xl font-bold mb-4`}>
+      <h1
+        className={`${main_font.className} text-2xl sm:text-6xl font-bold mb-4`}
+      >
         LATEST NEWS
       </h1>
       {articles.length === 0 ? (
@@ -323,11 +363,13 @@ function ArticleView() {
   );
 }
 
-function MoreTaggedView() {
+function HypedTaggedView() {
   return (
-    <div className="rounded-md border-2 border-black p-3 bg-blue-500">
+    <div className="rounded-md border-2 border-black p-3">
       <div className="text-center mb-6">
-        <h1 className="text-4xl font-bold">More TAGGED</h1>
+        <h1 className={`${main_font.className} text-2xl sm:text-6xl font-bold`}>
+          HYPED TAGGED
+        </h1>
         <h2 className="text-2xl font-bold">JENNIE 24SS</h2>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

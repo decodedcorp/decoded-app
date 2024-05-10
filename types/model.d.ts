@@ -2,8 +2,11 @@ import { ReferrerEnum } from "next/dist/lib/metadata/types/metadata-types";
 
 export interface ImageDetail {
   name: string;
+  artistName: String;
   taggedItem: TaggedItem[] | HoverItem[];
   updateAt: Date;
+  description?: string;
+  hyped: number;
   tags: string[];
 }
 
@@ -33,6 +36,15 @@ export interface HoverItem {
 export enum ArticleType {
   Any = "C",
   Generate = "G",
+}
+
+export interface MainImageDetail {
+  name?: String;
+  artistName: String;
+  tags?: String[];
+  description?: string;
+  hyped?: number;
+  itemMetadata?: ItemMetadata[];
 }
 
 export interface Article {

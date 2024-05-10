@@ -45,7 +45,7 @@ function MenuSection() {
           <Link
             href="/"
             prefetch={false}
-            className={`text-sm ${homeOpacity} ${secondary_font.className}`}
+            className={`text-sm ${homeOpacity} ${main_font.className}`}
           >
             HOME
           </Link>
@@ -56,7 +56,7 @@ function MenuSection() {
           <Link
             href="/news"
             prefetch={false}
-            className={`text-sm ${newsOpacity} ${secondary_font.className}`}
+            className={`text-sm ${newsOpacity} ${main_font.className}`}
           >
             NEWS
           </Link>

@@ -13,3 +13,7 @@ export const validateEmail = (email: string): boolean => {
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@(([^<>()[\]\\.,;:\s@"]+\.)+[^<>()[\]\\.,;:\s@"]{2,})$/i;
   return re.test(String(email).toLowerCase());
 };
+
+export function getByteSize(str: string) {
+  return new Blob([str]).size;
+}

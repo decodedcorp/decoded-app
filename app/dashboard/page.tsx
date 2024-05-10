@@ -9,7 +9,7 @@ import {
 } from "@/types/model";
 import { FirebaseHelper } from "@/common/firebase";
 import { addDoc, collection, doc, setDoc } from "firebase/firestore";
-import { main_font } from "@/components/helpers/util";
+import { main_font, getByteSize } from "@/components/helpers/util";
 import { uploadBytes, getDownloadURL } from "firebase/storage";
 import imageCompression from "browser-image-compression";
 
@@ -28,6 +28,8 @@ function UploadImageSection() {
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState("");
   const [imageName, setImageName] = useState<string | null>(null);
+  const [artistName, setArtistName] = useState<string | null>(null);
+  const [description, setDescription] = useState<string | null>(null);
   const [imageTags, setImageTags] = useState<string[]>([]);
   const [selectedPointIndex, setSelectedPointIndex] = useState<number | null>(
     null
@@ -52,7 +54,14 @@ function UploadImageSection() {
   };
 
   const upload = async () => {
-    if (!fileName || !imageName || !file || imageTags.length === 0) {
+    if (
+      !fileName ||
+      !imageName ||
+      !file ||
+      imageTags.length === 0 ||
+      !artistName ||
+      !description
+    ) {
       alert("Required fields are empty!");
       return;
     }
@@ -98,6 +107,9 @@ function UploadImageSection() {
     }
     const imageDetail: ImageDetail = {
       name: imageName,
+      artistName: artistName,
+      description: description,
+      hyped: 0,
       taggedItem: taggedItems,
       updateAt: new Date(),
       tags: imageTags,
@@ -345,14 +357,33 @@ function UploadImageSection() {
             placeholder="File Name"
             value={fileName}
             onChange={(e) => setFileName(e.target.value)}
-            className="input input-bordered w-full mb-2"
+            className="input input-bordered w-full mb-2 dark:bg-white"
           />
           <input
             type="text"
             placeholder="Image Name"
             value={imageName || ""}
             onChange={(e) => setImageName(e.target.value)}
-            className="input input-bordered w-full mb-2"
+            className="input input-bordered w-full mb-2 dark:bg-white"
+          />
+          <input
+            type="text"
+            placeholder="Artist Name"
+            value={artistName || ""}
+            onChange={(e) => setArtistName(e.target.value)}
+            className="input input-bordered w-full mb-2 dark:bg-white"
+          />
+          <input
+            type="text"
+            placeholder="Description"
+            value={description || ""}
+            onChange={(e) => {
+              const inputText = e.target.value;
+              if (getByteSize(inputText) <= 500) {
+                setDescription(inputText);
+              }
+            }}
+            className="input input-bordered w-full mb-2 dark:bg-white"
           />
           <input
             type="text"
@@ -361,7 +392,7 @@ function UploadImageSection() {
             onChange={(e) =>
               setImageTags(e.target.value.split(",").map((tag) => tag.trim()))
             }
-            className="input input-bordered w-full mb-2"
+            className="input input-bordered w-full mb-2 dark:bg-white"
           />
           <button
             onClick={upload}

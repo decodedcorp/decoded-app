@@ -30,7 +30,7 @@ function ProgressBar({
 
   return (
     <div
-      className="flex progress-bar-container"
+      className="flex progress-bar-container h-1"
       style={{ width: "100%", position: "absolute", top: 0, zIndex: 10 }}
     >
       {Array.from({ length: totalItems }, (_, index) => (
