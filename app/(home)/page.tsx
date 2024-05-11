@@ -58,8 +58,8 @@ function MainView() {
       try {
         const storage_ref = FirebaseHelper.storageRef("images");
         const res = await listAll(storage_ref);
-        console.log("Items", res.items);
-        for (const itemRef of res.items) {
+        const itemsToProcess = res.items.slice(0, 10);
+        for (const itemRef of itemsToProcess) {
           try {
             const [metadata, url] = await Promise.all([
               getMetadata(itemRef),
@@ -184,7 +184,7 @@ function ImageDescriptionView({
     </div>
   ) : (
     <h1
-      className={`${main_font.className} text-2xl md:text-5xl loading-text p-5`}
+      className={`${main_font.className} text-4xl md:text-5xl loading-text p-5`}
     >
       Loading
     </h1>
@@ -200,9 +200,11 @@ function ItemDetailView({
 }) {
   return (
     <div className="p-2 m-2 justify-start w-full">
-      <h3 className={`${main_font.className} text-3xl pt-2 pb-2`}>
-        {mainImageDetail[currentIndex].artistName.toUpperCase()}'s Items
-      </h3>
+      {mainImageDetail[currentIndex] && (
+        <h3 className={`${main_font.className} text-3xl pt-2 pb-2`}>
+          {mainImageDetail[currentIndex].artistName.toUpperCase()}'s Items
+        </h3>
+      )}
       <div className="grid grid-cols-1 md:grid-cols-2 rounded-md p-2">
         {mainImageDetail[currentIndex]?.itemMetadata?.map((item, index) => {
           return (
@@ -267,7 +269,7 @@ function ImageCarouselView({
   if (urlAndHash.length === 0) {
     return (
       <div className="w-60 carousel rounded-box mx-5" style={{ width: "70vw" }}>
-        <div className="flex justify-center items-center h-full w-full aspect-w-5 aspect-h-6 rounded-l animate-pulse bg-gray-300"></div>
+        <div className="flex justify-center items-center h-full w-full aspect-w-5 aspect-h-6"></div>
       </div>
     );
   }
@@ -344,7 +346,7 @@ function ArticleView() {
   return (
     <div className="rounded-md border-l-2 border-r-2 border-black p-3">
       <h1
-        className={`${main_font.className} text-2xl sm:text-6xl font-bold mb-4`}
+        className={`${main_font.className} text-5xl sm:text-6xl font-bold mb-4`}
       >
         LATEST NEWS
       </h1>

@@ -35,7 +35,7 @@ function ProgressBar({
     >
       {Array.from({ length: totalItems }, (_, index) => (
         <div
-          className="progress-bar bg-slate-400 m-5 opacity-30"
+          className="progress-bar bg-slate-400 mt-5 mr-1 ml-1 opacity-30"
           style={{
             width: `${100 / totalItems}%`,
             height: "5px",

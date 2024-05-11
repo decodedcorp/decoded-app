@@ -23,6 +23,7 @@ function AdminDashboard() {
 }
 
 function UploadImageSection() {
+  const [isUploading, setIsUploading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [hoverItems, setHoverItems] = useState<HoverItem[]>([]);
   const [file, setFile] = useState<File | null>(null);
@@ -49,6 +50,8 @@ function UploadImageSection() {
     setImageTags([]);
     setHoverItems([]);
     setSelectedPointIndex(null);
+    setArtistName(null);
+    setDescription(null);
     setExpandedSections({});
     setHoverItemFiles({});
   };
@@ -65,6 +68,7 @@ function UploadImageSection() {
       alert("Required fields are empty!");
       return;
     }
+    setIsUploading(true);
     const taggedItems: TaggedItem[] = [];
     for (let index = 0; index < hoverItems.length; index++) {
       // hoverItemFiles에서 해당 인덱스의 파일 업로드
@@ -141,6 +145,8 @@ function UploadImageSection() {
       alert("Image uploaded successfully!");
     } catch (error) {
       console.error("Error saving image detail:", error);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -398,7 +404,11 @@ function UploadImageSection() {
             onClick={upload}
             className="btn btn-primary mt-4 w-full bg-gradient-to-r from-blue-500 to-purple-600"
           >
-            Upload
+            {isUploading ? (
+              <span className="loading loading-spinner loading-md"></span>
+            ) : (
+              "Upload"
+            )}
           </button>
         </div>
       )}
