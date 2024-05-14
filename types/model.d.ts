@@ -1,13 +1,30 @@
 import { ReferrerEnum } from "next/dist/lib/metadata/types/metadata-types";
 
 export interface ImageDetail {
-  name: string;
-  artistName: String;
+  title: string;
+  artistName: string;
   taggedItem: TaggedItem[] | HoverItem[];
   updateAt: Date;
   description?: string;
   hyped: number;
   tags: string[];
+}
+
+export interface ArtistMetadata {
+  name: string;
+  group?: string;
+  sns?: {
+    platform: Platform;
+    url: string;
+  }[];
+}
+
+export interface GroupMetadata {
+  name: string;
+  sns: {
+    platform: Platform;
+    url: string;
+  }[];
 }
 
 export interface TaggedItem {
@@ -22,10 +39,30 @@ export interface Position {
 
 export interface ItemMetadata {
   name: string;
+  brands: string[];
   price?: string;
+  unit?: string;
   url?: string;
   imageUrl?: string;
   tags?: string[];
+}
+
+export interface BrandMetadata {
+  name: string;
+  websiteUrl: string;
+  logoUrl: string;
+  sns: {
+    platform: Platform;
+    url: string;
+  }[];
+}
+
+enum Platform {
+  X = "X",
+  TikTok = "TikTok",
+  Instagram = "Instagram",
+  LinkedIn = "LinkedIn",
+  YouTube = "YouTube",
 }
 
 export interface HoverItem {
@@ -39,7 +76,7 @@ export enum ArticleType {
 }
 
 export interface MainImageDetail {
-  name?: String;
+  title?: String;
   artistName: String;
   tags?: String[];
   description?: string;

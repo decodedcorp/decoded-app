@@ -90,7 +90,7 @@ function MainView() {
                   }
                 });
                 mainImageDetail.push({
-                  name: imageDetail.name,
+                  title: imageDetail.title,
                   artistName: imageDetail.artistName,
                   tags: imageDetail.tags,
                   itemMetadata: itemMetadataList,
@@ -166,7 +166,7 @@ function ImageDescriptionView({
   return mainImageDetail.length !== 0 ? (
     <div className="flex flex-col h-full p-2">
       <h1 className={`${main_font.className} text-3xl`}>
-        {mainImageDetail[currentIndex].name}
+        {mainImageDetail[currentIndex].title}
       </h1>
       <h2 className={`${main_font.className} text-sm pt-4`}>
         {mainImageDetail[currentIndex].tags?.map((tag, index) => (
@@ -220,9 +220,9 @@ function ItemDetailView({
                 <div className={`${secondary_font.className} text-xl`}>
                   {item.name}
                 </div>
-                <div className={`${secondary_font.className} text-xl`}>
+                {/* <div className={`${secondary_font.className} text-xl`}>
                   {item.price}
-                </div>
+                </div> */}
                 <button
                   className={`${main_font.className} mt-2 bg-[#FF204E] hover:bg-black text-white font-bold py-2 px-4 rounded w-full`}
                   onClick={() => (window.location.href = item.url ?? "#")}

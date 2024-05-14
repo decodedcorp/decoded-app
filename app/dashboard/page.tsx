@@ -6,6 +6,7 @@ import {
   HoverItem,
   ItemMetadata,
   ImageDetail,
+  Platform,
 } from "@/types/model";
 import { FirebaseHelper } from "@/common/firebase";
 import { addDoc, collection, doc, setDoc } from "firebase/firestore";
@@ -77,7 +78,10 @@ function UploadImageSection() {
       let downloadUrl = "";
       if (
         hoverFile &&
-        (hoverFile.type.includes("jpeg") || hoverFile.type.includes("png"))
+        (hoverFile.type.includes("jpeg") ||
+          hoverFile.type.includes("png") ||
+          hoverFile.type.includes("webp") ||
+          hoverFile.type.includes("avif"))
       ) {
         try {
           const hoverFileOptions = {
@@ -100,6 +104,7 @@ function UploadImageSection() {
         }
       } else {
         alert("Image file is not valid!");
+        setIsUploading(false);
         return;
       }
       hoverItem.metadata.imageUrl = downloadUrl;
@@ -110,7 +115,7 @@ function UploadImageSection() {
       taggedItems.push({ id: docRef.id, position: hoverItem.position });
     }
     const imageDetail: ImageDetail = {
-      name: imageName,
+      title: imageName,
       artistName: artistName,
       description: description,
       hyped: 0,
@@ -188,7 +193,14 @@ function UploadImageSection() {
       ...hoverItems,
       {
         position: { top: topPercent, left: leftPercent },
-        metadata: { name: "", price: "", url: "", tags: [] },
+        metadata: {
+          name: "",
+          brands: [],
+          price: "",
+          unit: "",
+          url: "",
+          tags: [],
+        },
       },
     ]);
   };
@@ -209,6 +221,11 @@ function UploadImageSection() {
           tag.trim()
         );
       }
+    } else if (field === "brands") {
+      let brands = value as string[];
+      updatedHoverItems[index].metadata[field] = brands.map((brand) =>
+        brand.trim()
+      );
     } else {
       updatedHoverItems[index].metadata[field] = value as string;
     }
@@ -311,7 +328,20 @@ function UploadImageSection() {
                       onChange={(e) => {
                         handleMetadataChange(index, "name", e.target.value);
                       }}
-                      className="input input-bordered w-full mb-2"
+                      className="input input-bordered w-full mb-2 dark:bg-white"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Brand"
+                      value={item.metadata.brands.join(",")}
+                      onChange={(e) => {
+                        handleMetadataChange(
+                          index,
+                          "brands",
+                          e.target.value.split(",").map((brand) => brand.trim())
+                        );
+                      }}
+                      className="input input-bordered w-full mb-2 dark:bg-white"
                     />
                     <input
                       type="text"
@@ -320,7 +350,16 @@ function UploadImageSection() {
                       onChange={(e) => {
                         handleMetadataChange(index, "price", e.target.value);
                       }}
-                      className="input input-bordered w-full mb-2"
+                      className="input input-bordered w-full mb-2 dark:bg-white"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Unit"
+                      value={item.metadata.unit}
+                      onChange={(e) => {
+                        handleMetadataChange(index, "unit", e.target.value);
+                      }}
+                      className="input input-bordered w-full mb-2 dark:bg-white"
                     />
                     <input
                       type="text"
@@ -329,7 +368,7 @@ function UploadImageSection() {
                       onChange={(e) => {
                         handleMetadataChange(index, "url", e.target.value);
                       }}
-                      className="input input-bordered w-full mb-2"
+                      className="input input-bordered w-full mb-2 dark:bg-white"
                     />
                     <input
                       type="text"
@@ -342,12 +381,12 @@ function UploadImageSection() {
                           e.target.value.split(",").map((tag) => tag.trim())
                         );
                       }}
-                      className="input input-bordered w-full mb-2"
+                      className="input input-bordered w-full mb-2 dark:bg-white"
                     />
                     <input
                       type="file"
                       onChange={(e) => handleHoverItemImageChange(index, e)}
-                      className="input w-full"
+                      className="input w-full dark:bg-white"
                     />
                   </div>
                 )}
