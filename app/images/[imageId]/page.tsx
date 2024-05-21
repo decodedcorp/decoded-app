@@ -51,7 +51,7 @@ function Page({ params: { imageId } }: PageProps) {
     };
     setIsFetching(true);
     fetchData();
-  }, []);
+  }, [imageId]);
 
   return (
     <div className="container flex-col mx-auto p-4 justify-center items-center z-0">
@@ -117,7 +117,7 @@ function Page({ params: { imageId } }: PageProps) {
                   style={{
                     top: hoverItem.position.top,
                     left: hoverItem.position.left,
-                    zIndex: 50, // Ensure it's above other elements
+                    zIndex: 50,
                   }}
                   onMouseOut={handleMouseOut}
                 >

@@ -1,21 +1,42 @@
 "use client";
 import Image from "next/image";
-import { useState, ChangeEvent } from "react";
-import {
-  TaggedItem,
-  HoverItem,
-  ItemMetadata,
-  ImageDetail,
-  Platform,
-} from "@/types/model";
+import { useState, ChangeEvent, useEffect } from "react";
+import { TaggedItem, HoverItem, ItemInfo, ImageInfo } from "@/types/model";
 import { FirebaseHelper } from "@/common/firebase";
 import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { main_font, getByteSize } from "@/components/helpers/util";
 import { uploadBytes, getDownloadURL } from "firebase/storage";
 import imageCompression from "browser-image-compression";
+import { ConvertImageAndCompress } from "@/components/helpers/util";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import AdminLogin from "../admin/page";
 
 function AdminDashboard() {
-  return (
+  const [isLogin, setIsLogin] = useState(false);
+  const [adminEmail, setAdminEmail] = useState("");
+  const [adminPassword, setAdminPassword] = useState("");
+
+  useEffect(() => {
+    const auth = getAuth(FirebaseHelper.app());
+    signInWithEmailAndPassword(auth, adminEmail, adminPassword)
+      .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        // ...
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+      });
+  }, []);
+
+  return !isLogin ? (
+    <AdminLogin
+      setAdminEmail={setAdminEmail}
+      setAdminPassword={setAdminPassword}
+      setIsLogin={setIsLogin}
+    />
+  ) : (
     <div>
       <UploadImageSection />
       <RequestListSection />
@@ -27,12 +48,12 @@ function UploadImageSection() {
   const [isUploading, setIsUploading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [hoverItems, setHoverItems] = useState<HoverItem[]>([]);
+  const [currency, setCurrency] = useState<string>("");
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState("");
   const [imageName, setImageName] = useState<string | null>(null);
   const [artistName, setArtistName] = useState<string | null>(null);
   const [description, setDescription] = useState<string | null>(null);
-  const [imageTags, setImageTags] = useState<string[]>([]);
   const [selectedPointIndex, setSelectedPointIndex] = useState<number | null>(
     null
   );
@@ -48,7 +69,6 @@ function UploadImageSection() {
     setFile(null);
     setFileName("");
     setImageName(null);
-    setImageTags([]);
     setHoverItems([]);
     setSelectedPointIndex(null);
     setArtistName(null);
@@ -58,14 +78,7 @@ function UploadImageSection() {
   };
 
   const upload = async () => {
-    if (
-      !fileName ||
-      !imageName ||
-      !file ||
-      imageTags.length === 0 ||
-      !artistName ||
-      !description
-    ) {
+    if (!fileName || !imageName || !file || !artistName || !description) {
       alert("Required fields are empty!");
       return;
     }
@@ -84,44 +97,39 @@ function UploadImageSection() {
           hoverFile.type.includes("avif"))
       ) {
         try {
-          const hoverFileOptions = {
-            maxSizeMB: 1,
-            maxWidthOrHeight: 1280,
-            useWebWorker: true,
-          };
-          const compressedHoverFile = await imageCompression(
-            hoverFile,
-            hoverFileOptions
-          );
+          console.log("Trying to convert to webp...");
+          const itemImage = await ConvertImageAndCompress(hoverFile, 1, 1280);
+          console.log("Convert & Compress done!");
+          console.log("Creating storage ref items/", hoverItem.info.name);
           const hoverItemRef = FirebaseHelper.storageRef(
-            "items/" + hoverItem.metadata.name
+            "items/" + hoverItem.info.name
           );
-          const snapshot = await uploadBytes(hoverItemRef, compressedHoverFile);
+          const snapshot = await uploadBytes(hoverItemRef, itemImage);
           downloadUrl = await getDownloadURL(snapshot.ref);
         } catch (error) {
-          console.error("Error saving hover item image:", error, hoverItem);
-          continue;
+          console.error("Error saving item image:", error, hoverItem);
+          alert("Error saving item image!");
+          return;
         }
       } else {
         alert("Image file is not valid!");
         setIsUploading(false);
         return;
       }
-      hoverItem.metadata.imageUrl = downloadUrl;
+      hoverItem.info.imageUrl = downloadUrl;
       const docRef = await addDoc(
         collection(FirebaseHelper.db(), "items"),
-        hoverItem.metadata
+        hoverItem.info
       );
-      taggedItems.push({ id: docRef.id, position: hoverItem.position });
+      taggedItems.push({ id: docRef.id, pos: hoverItem.pos });
     }
-    const imageDetail: ImageDetail = {
+    const imageInfo: ImageInfo = {
       title: imageName,
-      artistName: artistName,
       description: description,
       hyped: 0,
       taggedItem: taggedItems,
       updateAt: new Date(),
-      tags: imageTags,
+      tags: {}, // TODO
     };
     try {
       const options = {
@@ -135,7 +143,7 @@ function UploadImageSection() {
       if (snapshot.metadata.md5Hash) {
         await setDoc(
           doc(FirebaseHelper.db(), "images", snapshot.metadata.md5Hash),
-          imageDetail
+          imageInfo
         );
       } else {
         alert("Error saving image detail!");
@@ -192,14 +200,16 @@ function UploadImageSection() {
     setHoverItems([
       ...hoverItems,
       {
-        position: { top: topPercent, left: leftPercent },
-        metadata: {
+        pos: { top: topPercent, left: leftPercent },
+        info: {
           name: "",
-          brands: [],
-          price: "",
-          unit: "",
-          url: "",
-          tags: [],
+          price: ["", ""],
+          hyped: 0,
+          affiliateUrl: "",
+          imageUrl: "",
+          category: "",
+          tags: {},
+          description: "",
         },
       },
     ]);
@@ -207,28 +217,20 @@ function UploadImageSection() {
 
   const handleMetadataChange = (
     index: number,
-    field: keyof ItemMetadata,
-    value: string | string[]
+    field: keyof ItemInfo,
+    value: number | string | string[]
   ) => {
     const updatedHoverItems = [...hoverItems];
     if (field === "tags") {
-      if (typeof value === "string") {
-        updatedHoverItems[index].metadata[field] = value
-          .split(",")
-          .map((tag) => tag.trim());
-      } else {
-        updatedHoverItems[index].metadata[field] = value.map((tag) =>
-          tag.trim()
-        );
-      }
-    } else if (field === "brands") {
-      let brands = value as string[];
-      updatedHoverItems[index].metadata[field] = brands.map((brand) =>
-        brand.trim()
-      );
+      return;
+    } else if (field === "hyped") {
+      updatedHoverItems[index].info[field] = value as number;
+    } else if (field === "price") {
+      updatedHoverItems[index].info[field] = [value as string, currency];
     } else {
-      updatedHoverItems[index].metadata[field] = value as string;
+      updatedHoverItems[index].info[field] = value as string;
     }
+    console.log(hoverItems[index]);
     setHoverItems(updatedHoverItems);
   };
 
@@ -279,8 +281,8 @@ function UploadImageSection() {
                       : "opacity-50"
                   }`}
                   style={{
-                    top: item.position.top,
-                    left: item.position.left,
+                    top: item.pos.top,
+                    left: item.pos.left,
                     transform: "translate(-50%, -50%)",
                   }}
                   onClick={() => setSelectedPointIndex(index)}
@@ -324,65 +326,73 @@ function UploadImageSection() {
                     <input
                       type="text"
                       placeholder="Name"
-                      value={item.metadata.name}
+                      value={item.info.name}
                       onChange={(e) => {
                         handleMetadataChange(index, "name", e.target.value);
                       }}
                       className="input input-bordered w-full mb-2 dark:bg-white"
                     />
-                    <input
-                      type="text"
-                      placeholder="Brand"
-                      value={item.metadata.brands.join(",")}
-                      onChange={(e) => {
-                        handleMetadataChange(
-                          index,
-                          "brands",
-                          e.target.value.split(",").map((brand) => brand.trim())
-                        );
-                      }}
-                      className="input input-bordered w-full mb-2 dark:bg-white"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Price"
-                      value={item.metadata.price}
-                      onChange={(e) => {
-                        handleMetadataChange(index, "price", e.target.value);
-                      }}
-                      className="input input-bordered w-full mb-2 dark:bg-white"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Unit"
-                      value={item.metadata.unit}
-                      onChange={(e) => {
-                        handleMetadataChange(index, "unit", e.target.value);
-                      }}
-                      className="input input-bordered w-full mb-2 dark:bg-white"
-                    />
+                    <div className="flex">
+                      <input
+                        type="text"
+                        placeholder="Price"
+                        value={item.info.price?.[0] || ""}
+                        onChange={(e) => {
+                          handleMetadataChange(index, "price", e.target.value);
+                        }}
+                        className="input input-bordered w-full mb-2 dark:bg-white"
+                      />
+                      <select
+                        value={currency}
+                        onChange={(e) => {
+                          setCurrency(e.target.value);
+                        }}
+                        className="input w-20 mb-2 dark:bg-white"
+                      >
+                        {Object.values(Currency).map((currency) => (
+                          <option key={currency} value={currency}>
+                            {currency}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                     <input
                       type="text"
                       placeholder="URL"
-                      value={item.metadata.url}
-                      onChange={(e) => {
-                        handleMetadataChange(index, "url", e.target.value);
-                      }}
-                      className="input input-bordered w-full mb-2 dark:bg-white"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Tags (comma separated)"
-                      value={item.metadata.tags?.join(",")}
+                      value={item.info.affiliateUrl}
                       onChange={(e) => {
                         handleMetadataChange(
                           index,
-                          "tags",
-                          e.target.value.split(",").map((tag) => tag.trim())
+                          "affiliateUrl",
+                          e.target.value
                         );
                       }}
                       className="input input-bordered w-full mb-2 dark:bg-white"
                     />
+                    <div className="flex">
+                      <select
+                        value={item.info.category}
+                        onChange={(e) => {
+                          handleMetadataChange(
+                            index,
+                            "category",
+                            e.target.value
+                          );
+                        }}
+                        className="input input-bordered w-full mb-2 dark:bg-white"
+                      >
+                        <option value={ItemCategory.Clothing}>Clothing</option>
+                        <option value={ItemCategory.Accessory}>
+                          Accessory
+                        </option>
+                        <option value={ItemCategory.Shoes}>Shoes</option>
+                        <option value={ItemCategory.Bag}>Bag</option>
+                        <option value={ItemCategory.Paint}>Paint</option>
+                        <option value={ItemCategory.Furniture}>
+                          Furniture
+                        </option>
+                      </select>
+                    </div>
                     <input
                       type="file"
                       onChange={(e) => handleHoverItemImageChange(index, e)}
@@ -399,25 +409,26 @@ function UploadImageSection() {
         <div className="p-4 border-t border-gray-200">
           <input
             type="text"
-            placeholder="File Name"
+            placeholder="File Name (e.g rose_in_nyc)"
             value={fileName}
             onChange={(e) => setFileName(e.target.value)}
             className="input input-bordered w-full mb-2 dark:bg-white"
           />
           <input
             type="text"
-            placeholder="Image Name"
+            placeholder="Image Title (e.g Rose in NYC)"
             value={imageName || ""}
             onChange={(e) => setImageName(e.target.value)}
             className="input input-bordered w-full mb-2 dark:bg-white"
           />
           <input
             type="text"
-            placeholder="Artist Name"
+            placeholder="Artist Name(e.g rose)"
             value={artistName || ""}
             onChange={(e) => setArtistName(e.target.value)}
             className="input input-bordered w-full mb-2 dark:bg-white"
           />
+          {/* TODO: Replace with generated by LLM */}
           <input
             type="text"
             placeholder="Description"
@@ -428,15 +439,6 @@ function UploadImageSection() {
                 setDescription(inputText);
               }
             }}
-            className="input input-bordered w-full mb-2 dark:bg-white"
-          />
-          <input
-            type="text"
-            placeholder="Tags (comma separated)"
-            value={imageTags.join(",")}
-            onChange={(e) =>
-              setImageTags(e.target.value.split(",").map((tag) => tag.trim()))
-            }
             className="input input-bordered w-full mb-2 dark:bg-white"
           />
           <button
@@ -505,6 +507,51 @@ function RequestListSection() {
       </table>
     </div>
   );
+}
+
+enum Brand {
+  Balenciaga = "balenciaga",
+  Gucci = "gucci",
+  LouisVuitton = "louis_vuitton",
+  Prada = "prada",
+  Chanel = "chanel",
+  Dior = "dior",
+  Bvlgari = "bvlgari",
+  Celine = "celine",
+  Tiffany = "tiffany",
+  Versace = "versace",
+  YvesSaintLaurent = "yves_saint_laurent",
+  Givenchy = "givenchy",
+  Zara = "zara",
+  Supreme = "supreme",
+  Nike = "nike",
+  Adidas = "adidas",
+  Puma = "puma",
+}
+
+enum Platform {
+  X = "X",
+  TikTok = "TikTok",
+  Instagram = "Instagram",
+  LinkedIn = "LinkedIn",
+  YouTube = "YouTube",
+}
+
+enum ItemCategory {
+  Clothing = "clothing",
+  Paint = "paint",
+  Furniture = "furniture",
+  Accessory = "accessory",
+  Shoes = "shoes",
+  Bag = "bag",
+}
+
+enum Currency {
+  USD = "USD",
+  KRW = "KRW",
+  EUR = "EUR",
+  JPY = "JPY",
+  GBP = "GBP",
 }
 
 export default AdminDashboard;

@@ -24,7 +24,6 @@
     "clsx": "^2.0.0",
     "firebase": "^10.11.0",
     "firebaseui": "^6.1.0",
-    "jest": "^29.7.0",
     "lucide-react": "^0.294.0",
     "next": "14.0.0",
     "npyjs": "^0.5.0",
@@ -32,12 +31,16 @@
     "react": "^18",
     "react-dom": "^18",
     "sha256": "^0.2.0",
+    "sharp": "^0.33.4",
     "tailwind-merge": "^2.1.0",
     "tailwindcss-animate": "^1.0.7",
     "underscore": "^1.13.6",
+    "webp-converter-browser": "^1.0.4",
     "webpack": "^5.89.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.4.5",
+    "@types/jest": "^29.5.12",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
@@ -46,9 +49,13 @@
     "daisyui": "^4.10.2",
     "eslint": "^8",
     "eslint-config-next": "14.0.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "node-polyfill-webpack-plugin": "^3.0.0",
     "postcss": "^8",
     "tailwindcss": "^3",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }

@@ -6,11 +6,11 @@ import { FirebaseHelper } from "../../common/firebase";
 import { listAll, getDownloadURL, getMetadata } from "firebase/storage";
 import { main_font, secondary_font } from "@/components/helpers/util";
 import {
-  Article,
-  ImageDetail,
-  ItemMetadata,
+  ArticleInfo,
+  ImageInfo,
+  ItemInfo,
+  MainImageInfo,
   TaggedItem,
-  MainImageDetail,
 } from "@/types/model";
 import {
   getDocs,
@@ -30,7 +30,7 @@ function Home() {
     <div>
       <MainView />
       <ArticleView />
-      <HypedTaggedView />
+      {/* <HypedTaggedView /> */}
     </div>
   );
 }
@@ -39,13 +39,16 @@ function MainView() {
   const [urlAndHash, setUrlAndHash] = useState<{ url: string; hash: string }[]>(
     []
   );
-  const [mainImageDetail, setMainImageDetail] = useState<MainImageDetail[]>([]);
+  const [mainImageInfoList, setMainImageInfoList] = useState<MainImageInfo[]>(
+    []
+  );
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [currentDateTime, setCurrentDateTime] = useState(new Date());
+  const [currentDateTime, setCurrentDateTime] = useState("");
 
   useEffect(() => {
+    setCurrentDateTime(new Date().toLocaleTimeString());
     const timerId = setInterval(() => {
-      setCurrentDateTime(new Date());
+      setCurrentDateTime(new Date().toLocaleTimeString());
     }, 1000);
 
     return () => clearInterval(timerId);
@@ -54,7 +57,7 @@ function MainView() {
   useEffect(() => {
     const fetchAllImages = async () => {
       const urlAndHash = [];
-      let mainImageDetail: MainImageDetail[] = [];
+      let mainImageInfoList: MainImageInfo[] = [];
       try {
         const storage_ref = FirebaseHelper.storageRef("images");
         const res = await listAll(storage_ref);
@@ -66,7 +69,6 @@ function MainView() {
               getDownloadURL(itemRef),
             ]);
             if (metadata.md5Hash) {
-              console.log("Hash", metadata.md5Hash);
               const docRef = doc(
                 FirebaseHelper.db(),
                 "images",
@@ -74,9 +76,9 @@ function MainView() {
               );
               const imageDocSnap = await getDoc(docRef);
               if (imageDocSnap.exists()) {
-                const imageDetail = imageDocSnap.data() as ImageDetail;
-                let itemMetadataList: ItemMetadata[] = [];
-                imageDetail.taggedItem.map(async (item) => {
+                const imageInfo = imageDocSnap.data() as ImageInfo;
+                let itemInfoList: ItemInfo[] = [];
+                imageInfo.taggedItem?.map(async (item) => {
                   const taggedItem = item as TaggedItem;
                   const docRef = doc(
                     FirebaseHelper.db(),
@@ -85,17 +87,15 @@ function MainView() {
                   );
                   const itemDocSnap = await getDoc(docRef);
                   if (itemDocSnap.exists()) {
-                    const itemMetadata = itemDocSnap.data() as ItemMetadata;
-                    itemMetadataList.push(itemMetadata);
+                    const itemInfo = itemDocSnap.data() as ItemInfo;
+                    itemInfoList.push(itemInfo);
                   }
                 });
-                mainImageDetail.push({
-                  title: imageDetail.title,
-                  artistName: imageDetail.artistName,
-                  tags: imageDetail.tags,
-                  itemMetadata: itemMetadataList,
-                  description: imageDetail.description,
-                  hyped: imageDetail.hyped,
+                mainImageInfoList.push({
+                  title: imageInfo.title,
+                  itemInfoList: itemInfoList,
+                  description: imageInfo.description,
+                  hyped: imageInfo.hyped,
                 });
                 urlAndHash.push({ url, hash: metadata.md5Hash });
               }
@@ -111,30 +111,29 @@ function MainView() {
         }
       } finally {
         setUrlAndHash(urlAndHash);
-        setMainImageDetail(mainImageDetail);
+        setMainImageInfoList(mainImageInfoList);
       }
     };
     fetchAllImages();
   }, []);
-  console.log("urlAndHash", urlAndHash);
   return (
     <div className="rounded-md border-l-2 border-r-2 border-b-2 border-black">
       <div className="flex flex-col sm:flex-row items-center md:items-start">
         <div className="flex flex-col w-full">
           <h1 className={`${main_font.className} text-7xl md:text-8xl p-2`}>
-            TODAY'S NEW TAGGED
+            TODAY&apos;S NEW TAGGED
           </h1>
-          <h2 className={`${main_font.className} text-6xl md:text-7xl p-2`}>
-            {currentDateTime.toLocaleTimeString()}
+          <h2 className={`${main_font.className} text-7xl md:text-8xl p-2`}>
+            {currentDateTime}
           </h2>
           <ImageDescriptionView
-            mainImageDetail={mainImageDetail}
+            mainImageInfoList={mainImageInfoList}
             currentIndex={currentIndex}
           />
           {/* 모바일에서 숨기고 데스크탑에서 보이는 ItemDetailView */}
           <div className="hidden sm:block">
             <ItemDetailView
-              mainImageDetail={mainImageDetail}
+              mainImageInfoList={mainImageInfoList}
               currentIndex={currentIndex}
             />
           </div>
@@ -148,7 +147,7 @@ function MainView() {
       {/* 데스크탑에서 숨기고 모바일에서 보이는 ItemDetailView */}
       <div className="sm:hidden">
         <ItemDetailView
-          mainImageDetail={mainImageDetail}
+          mainImageInfoList={mainImageInfoList}
           currentIndex={currentIndex}
         />
       </div>
@@ -157,29 +156,30 @@ function MainView() {
 }
 
 function ImageDescriptionView({
-  mainImageDetail,
+  mainImageInfoList,
   currentIndex,
 }: {
-  mainImageDetail: MainImageDetail[];
+  mainImageInfoList: MainImageInfo[];
   currentIndex: number;
 }) {
-  return mainImageDetail.length !== 0 ? (
+  return mainImageInfoList.length !== 0 ? (
     <div className="flex flex-col h-full p-2">
       <h1 className={`${main_font.className} text-3xl`}>
-        {mainImageDetail[currentIndex].title}
+        {mainImageInfoList[currentIndex].title}
       </h1>
       <h2 className={`${main_font.className} text-sm pt-4`}>
-        {mainImageDetail[currentIndex].tags?.map((tag, index) => (
+        {mainImageInfoList[currentIndex].tags?.map((tag, index) => (
           <span
             key={index}
             className="shadow-custom border border-[#FF204E] text-black px-2 py-1 rounded-xl mr-2"
           >
+            {/* TODO: */}
             {tag.replace(/_/g, " ").toUpperCase()}
           </span>
         ))}
       </h2>
       <h3 className={`${main_font.className} text-md pt-5 pb-5`}>
-        {mainImageDetail[currentIndex].description}
+        {mainImageInfoList[currentIndex].description}
       </h3>
     </div>
   ) : (
@@ -192,21 +192,22 @@ function ImageDescriptionView({
 }
 
 function ItemDetailView({
-  mainImageDetail,
+  mainImageInfoList,
   currentIndex,
 }: {
-  mainImageDetail: MainImageDetail[];
+  mainImageInfoList: MainImageInfo[];
   currentIndex: number;
 }) {
   return (
     <div className="p-2 m-2 justify-start w-full">
-      {mainImageDetail[currentIndex] && (
+      {/* {mainImageInfoList[currentIndex] && (
         <h3 className={`${main_font.className} text-3xl pt-2 pb-2`}>
-          {mainImageDetail[currentIndex].artistName.toUpperCase()}'s Items
+          {mainImageInfoList[currentIndex].artistName.toUpperCase()}&apos;s
+          Items
         </h3>
-      )}
+      )} */}
       <div className="grid grid-cols-1 md:grid-cols-2 rounded-md p-2">
-        {mainImageDetail[currentIndex]?.itemMetadata?.map((item, index) => {
+        {mainImageInfoList[currentIndex]?.itemInfoList?.map((item, index) => {
           return (
             <div key={index} className="flex flex-row items-center">
               <Image
@@ -220,12 +221,15 @@ function ItemDetailView({
                 <div className={`${secondary_font.className} text-xl`}>
                   {item.name}
                 </div>
+                {/* TODO: Consider real-time price */}
                 {/* <div className={`${secondary_font.className} text-xl`}>
-                  {item.price}
+                  {item.price?.[0]} {item.price?.[1] ?? ""}
                 </div> */}
                 <button
                   className={`${main_font.className} mt-2 bg-[#FF204E] hover:bg-black text-white font-bold py-2 px-4 rounded w-full`}
-                  onClick={() => (window.location.href = item.url ?? "#")}
+                  onClick={() =>
+                    (window.location.href = item.affiliateUrl ?? "#")
+                  }
                 >
                   구매하기
                 </button>
@@ -247,6 +251,7 @@ function ImageCarouselView({
   currentIndex: number;
   setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
 }) {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const timer = setTimeout(() => {
       if (urlAndHash.length > 0) {
@@ -303,6 +308,7 @@ function ImageCarouselView({
             quality={80}
             fill={true}
             objectFit="cover"
+            sizes="100vw"
             placeholder="blur"
             blurDataURL="data:image/jpeg;base64,..."
           />
@@ -321,24 +327,24 @@ function ImageCarouselView({
 }
 
 function ArticleView() {
-  const [articles, setArticles] = useState<Article[]>([]);
+  const [articles, setArticles] = useState<ArticleInfo[]>([]);
 
   useEffect(() => {
     const fetchAllArticles = async () => {
-      let articles: Article[] = [];
+      let articleInfoList: ArticleInfo[] = [];
       const db = FirebaseHelper.db();
       const querySnapshot = await getDocs(collection(db, "article"));
       const current_timestamp = Timestamp.fromDate(new Date());
       querySnapshot.forEach((doc) => {
-        const article = doc.data() as Article;
+        const articleInfo = doc.data() as ArticleInfo;
         // if (article.time !== undefined) {
         //   const dateOnly = article.time.split("T")[0];
         //   console.log("Article Date", dateOnly);
         // }
         // console.log("current_timestamp", current_timestamp.toString());
-        articles.push(article);
+        articleInfoList.push(articleInfo);
       });
-      setArticles(articles);
+      setArticles(articleInfoList);
     };
     fetchAllArticles();
   }, []);
@@ -364,11 +370,13 @@ function ArticleView() {
           {articles.map((article, index) => (
             <div key={index} className="news-item">
               {article.src && (
-                <a href={article.url}>
-                  <img
-                    src={article.src.split(" ")[0]}
+                <a href={article.src as string}>
+                  <Image
+                    src={article.imageUrl?.split(" ")[0] ?? ""}
                     alt={article.title}
                     className="w-full h-auto"
+                    width={100}
+                    height={100}
                   />
                 </a>
               )}
@@ -397,14 +405,14 @@ function HypedTaggedView() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="col-span-1 md:col-span-3">
-          <img
+          <Image
             src="path/to/jennie-main.jpg"
             alt="Jennie Main"
             className="w-full"
           />
         </div>
         <div className="col-span-1">
-          <img src="path/to/product.jpg" alt="Product" className="w-full" />
+          <Image src="path/to/product.jpg" alt="Product" className="w-full" />
           <p className="text-center mt-2">
             Baby Fox Patch Cardigan
             <br />
@@ -412,60 +420,15 @@ function HypedTaggedView() {
           </p>
         </div>
         <div className="col-span-1">
-          <img src="path/to/jennie-1.jpg" alt="Jennie 1" className="w-full" />
+          <Image src="path/to/jennie-1.jpg" alt="Jennie 1" className="w-full" />
         </div>
         <div className="col-span-1">
-          <img src="path/to/jennie-2.jpg" alt="Jennie 2" className="w-full" />
+          <Image src="path/to/jennie-2.jpg" alt="Jennie 2" className="w-full" />
         </div>
         <div className="col-span-1">
-          <img src="path/to/jennie-3.jpg" alt="Jennie 3" className="w-full" />
+          <Image src="path/to/jennie-3.jpg" alt="Jennie 3" className="w-full" />
         </div>
       </div>
-    </div>
-  );
-}
-
-async function MostHypeSection() {
-  return (
-    <div className="rounded-md border-l-2 border-r-2 border-black p-3">
-      <h1 className={`${main_font.className} text-2xl font-bold mb-4`}>
-        MOST HYPE
-      </h1>
-      <div className="grid grid-cols-3 gap-4">
-        <div className="news-item">
-          <img
-            src="path/to/image1.jpg"
-            alt="News Image 1"
-            className="w-full h-auto"
-          />
-          <div className="text-sm bg-black text-white p-2">
-            HYPEBEAST 디스인증페배이 '로텐덤' 브랜드를 출시했다
-          </div>
-        </div>
-        <div className="news-item">
-          <img
-            src="path/to/image2.jpg"
-            alt="News Image 2"
-            className="w-full h-auto"
-          />
-          <div className="text-sm bg-black text-white p-2">
-            슈프림 '30주년 기념 티셔츠 1994-2024' 출시
-          </div>
-        </div>
-        <div className="news-item">
-          <img
-            src="path/to/image3.jpg"
-            alt="News Image 3"
-            className="w-full h-auto"
-          />
-          <div className="text-sm bg-black text-white p-2">
-            루이 비통, 파페 VIA 바스티예 채널 디자인한 백주 공개
-          </div>
-        </div>
-      </div>
-      <button className="w-full text-align-center mt-4 py-2 px-6 bg-[#FF204E] text-white rounded">
-        See More
-      </button>
     </div>
   );
 }

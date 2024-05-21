@@ -16,11 +16,11 @@ import {
   StorageReference,
 } from "firebase/storage";
 import {
-  ImageDetail,
-  ItemMetadata,
+  ImageInfo,
+  ItemInfo,
   HoverItem,
   TaggedItem,
-  Article,
+  ArticleInfo,
 } from "@/types/model";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -127,28 +127,28 @@ export class FirebaseHelper {
   public static async getImageDetail(
     collectionName: string,
     docId?: string
-  ): Promise<ImageDetail | ImageDetail[] | undefined> {
+  ): Promise<ImageInfo | ImageInfo[] | undefined> {
     try {
       const db = this.db();
       if (docId) {
         const docRef = doc(db, collectionName, docId);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          let imageDetail = docSnap.data() as ImageDetail;
+          let imageDetail = docSnap.data() as ImageInfo;
           try {
             const hoverItemList: Promise<HoverItem | undefined>[] =
-              imageDetail.taggedItem.map(async (item) => {
+              imageDetail.taggedItem?.map(async (item) => {
                 const taggedItem = item as TaggedItem;
                 const docRef = doc(db, "items", taggedItem.id);
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
-                  const itemMetadata = docSnap.data() as ItemMetadata;
+                  const itemMetadata = docSnap.data() as ItemInfo;
                   return {
-                    position: taggedItem.position,
-                    metadata: itemMetadata,
+                    pos: taggedItem.pos,
+                    info: itemMetadata,
                   };
                 }
-              });
+              }) || [];
             imageDetail.taggedItem = (await Promise.all(hoverItemList)).filter(
               (item) => item !== undefined
             ) as HoverItem[];

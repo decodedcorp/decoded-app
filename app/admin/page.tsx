@@ -5,7 +5,15 @@ import { main_font, validateEmail } from "@/components/helpers/util";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-function page() {
+function AdminLogin({
+  setAdminEmail,
+  setAdminPassword,
+  setIsLogin,
+}: {
+  setAdminEmail: (email: string) => void;
+  setAdminPassword: (password: string) => void;
+  setIsLogin: (isLogin: boolean) => void;
+}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
@@ -17,7 +25,9 @@ function page() {
     }
     FirebaseHelper.adminLogin(email, password).then((isAdmin) => {
       if (isAdmin) {
-        router.push("/dashboard");
+        setIsLogin(true);
+        setAdminEmail(email);
+        setAdminPassword(password);
       } else {
         alert("No Permission!");
       }
@@ -49,4 +59,4 @@ function page() {
   );
 }
 
-export default page;
+export default AdminLogin;

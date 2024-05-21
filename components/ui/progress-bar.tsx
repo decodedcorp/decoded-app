@@ -35,6 +35,7 @@ function ProgressBar({
     >
       {Array.from({ length: totalItems }, (_, index) => (
         <div
+          key={index}
           className="progress-bar bg-slate-400 mt-5 mr-1 ml-1 opacity-30"
           style={{
             width: `${100 / totalItems}%`,
@@ -43,7 +44,7 @@ function ProgressBar({
           }}
         >
           <div
-            className="progress-ba bg-gray-800"
+            className="progress-bar bg-gray-800"
             style={{
               width: `${index === currentIndex ? progress : 0}%`, // 현재 index일 때 progress에 따라 width가 채워지도록 설정
               height: "5px",
