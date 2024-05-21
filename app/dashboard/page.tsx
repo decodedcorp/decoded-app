@@ -1,34 +1,55 @@
 "use client";
 import Image from "next/image";
 import { useState, ChangeEvent, useEffect } from "react";
-import { TaggedItem, HoverItem, ItemInfo, ImageInfo } from "@/types/model";
+import {
+  TaggedItem,
+  HoverItem,
+  ItemInfo,
+  ImageInfo,
+  BrandInfo,
+} from "@/types/model";
 import { FirebaseHelper } from "@/common/firebase";
-import { addDoc, collection, doc, setDoc } from "firebase/firestore";
-import { main_font, getByteSize } from "@/components/helpers/util";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDocs,
+  setDoc,
+  QuerySnapshot,
+} from "firebase/firestore";
+import {
+  main_font,
+  getByteSize,
+  create_doc_id,
+} from "@/components/helpers/util";
 import { uploadBytes, getDownloadURL } from "firebase/storage";
 import imageCompression from "browser-image-compression";
 import { ConvertImageAndCompress } from "@/components/helpers/util";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import AdminLogin from "../admin/page";
+import { sha256 } from "js-sha256";
 
 function AdminDashboard() {
   const [isLogin, setIsLogin] = useState(false);
-  const [adminEmail, setAdminEmail] = useState("");
-  const [adminPassword, setAdminPassword] = useState("");
+  const [_adminEmail, setAdminEmail] = useState("");
+  const [_adminPassword, setAdminPassword] = useState("");
+  const [brands, setBrands] = useState<string[] | null>(null);
 
   useEffect(() => {
-    const auth = getAuth(FirebaseHelper.app());
-    signInWithEmailAndPassword(auth, adminEmail, adminPassword)
-      .then((userCredential) => {
-        // Signed in
-        const user = userCredential.user;
-        // ...
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
+    const fetchBrands = async () => {
+      if (!isLogin) return;
+      const db = FirebaseHelper.db();
+      console.log("Fetching brands...");
+      const querySnapshot = await getDocs(collection(db, "brands"));
+      const fetchedBrands: string[] = [];
+      querySnapshot.forEach((doc) => {
+        const brand = doc.data() as BrandInfo;
+        fetchedBrands.push(brand.name);
       });
-  }, []);
+      setBrands(fetchedBrands);
+    };
+    fetchBrands();
+  }, [isLogin]);
 
   return !isLogin ? (
     <AdminLogin
@@ -38,13 +59,19 @@ function AdminDashboard() {
     />
   ) : (
     <div>
-      <UploadImageSection />
+      <UploadImageSection brands={brands} setBrands={setBrands} />
       <RequestListSection />
     </div>
   );
 }
 
-function UploadImageSection() {
+function UploadImageSection({
+  brands,
+  setBrands,
+}: {
+  brands: string[] | null;
+  setBrands: (brands: string[]) => void;
+}) {
   const [isUploading, setIsUploading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [hoverItems, setHoverItems] = useState<HoverItem[]>([]);
@@ -54,6 +81,8 @@ function UploadImageSection() {
   const [imageName, setImageName] = useState<string | null>(null);
   const [artistName, setArtistName] = useState<string | null>(null);
   const [description, setDescription] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [newBrand, setNewBrand] = useState("");
   const [selectedPointIndex, setSelectedPointIndex] = useState<number | null>(
     null
   );
@@ -63,6 +92,26 @@ function UploadImageSection() {
   const [hoverItemFiles, setHoverItemFiles] = useState<{
     [key: number]: File | null;
   }>({});
+
+  const upload = async () => {
+    if (!fileName || !imageName || !file || !artistName || !description) {
+      alert("Required fields are empty!");
+      return;
+    }
+    setIsUploading(true);
+    let taggedItems = await handleUploadHoverItem();
+    if (taggedItems instanceof Error) {
+      console.error("Error saving hover item:", taggedItems);
+      alert("Error saving hover item!");
+      return;
+    }
+    let res = await handleUploadImage(taggedItems);
+    const image_doc_id = sha256(await file.arrayBuffer());
+    const item_doc_ids = taggedItems.map((item) => {
+      return item.id;
+    });
+    const artist_doc_id = create_doc_id(artistName);
+  };
 
   const reset = () => {
     setSelectedImage(null);
@@ -75,92 +124,6 @@ function UploadImageSection() {
     setDescription(null);
     setExpandedSections({});
     setHoverItemFiles({});
-  };
-
-  const upload = async () => {
-    if (!fileName || !imageName || !file || !artistName || !description) {
-      alert("Required fields are empty!");
-      return;
-    }
-    setIsUploading(true);
-    const taggedItems: TaggedItem[] = [];
-    for (let index = 0; index < hoverItems.length; index++) {
-      // hoverItemFiles에서 해당 인덱스의 파일 업로드
-      const hoverFile = hoverItemFiles[index];
-      let hoverItem = hoverItems[index];
-      let downloadUrl = "";
-      if (
-        hoverFile &&
-        (hoverFile.type.includes("jpeg") ||
-          hoverFile.type.includes("png") ||
-          hoverFile.type.includes("webp") ||
-          hoverFile.type.includes("avif"))
-      ) {
-        try {
-          console.log("Trying to convert to webp...");
-          const itemImage = await ConvertImageAndCompress(hoverFile, 1, 1280);
-          console.log("Convert & Compress done!");
-          console.log("Creating storage ref items/", hoverItem.info.name);
-          const hoverItemRef = FirebaseHelper.storageRef(
-            "items/" + hoverItem.info.name
-          );
-          const snapshot = await uploadBytes(hoverItemRef, itemImage);
-          downloadUrl = await getDownloadURL(snapshot.ref);
-        } catch (error) {
-          console.error("Error saving item image:", error, hoverItem);
-          alert("Error saving item image!");
-          return;
-        }
-      } else {
-        alert("Image file is not valid!");
-        setIsUploading(false);
-        return;
-      }
-      hoverItem.info.imageUrl = downloadUrl;
-      const docRef = await addDoc(
-        collection(FirebaseHelper.db(), "items"),
-        hoverItem.info
-      );
-      taggedItems.push({ id: docRef.id, pos: hoverItem.pos });
-    }
-    const imageInfo: ImageInfo = {
-      title: imageName,
-      description: description,
-      hyped: 0,
-      taggedItem: taggedItems,
-      updateAt: new Date(),
-      tags: {}, // TODO
-    };
-    try {
-      const options = {
-        maxSizeMB: 1,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-      const compressedFile = await imageCompression(file, options);
-      const storageRef = FirebaseHelper.storageRef("images/" + fileName);
-      const snapshot = await uploadBytes(storageRef, compressedFile);
-      if (snapshot.metadata.md5Hash) {
-        await setDoc(
-          doc(FirebaseHelper.db(), "images", snapshot.metadata.md5Hash),
-          imageInfo
-        );
-      } else {
-        alert("Error saving image detail!");
-        return;
-      }
-      console.log("Original File Size (KB):", (file.size / 1024).toFixed(2));
-      console.log(
-        "Compressed File Size (KB):",
-        (compressedFile.size / 1024).toFixed(2)
-      );
-      reset();
-      alert("Image uploaded successfully!");
-    } catch (error) {
-      console.error("Error saving image detail:", error);
-    } finally {
-      setIsUploading(false);
-    }
   };
 
   const toggleSection = (index: number) => {
@@ -245,6 +208,115 @@ function UploadImageSection() {
       console.log("No file selected");
     }
   };
+
+  const handleUploadImage = async (taggedItems: TaggedItem[]) => {
+    const imageInfo: ImageInfo = {
+      title: imageName!,
+      description: description!,
+      hyped: 0,
+      taggedItem: taggedItems,
+      updateAt: new Date(),
+      tags: {},
+    };
+    try {
+      const image = await ConvertImageAndCompress(file!, 1, 1280);
+      const storageRef = FirebaseHelper.storageRef("images/" + fileName);
+      const snapshot = await uploadBytes(storageRef, image);
+      if (snapshot.metadata.md5Hash) {
+        await setDoc(
+          doc(FirebaseHelper.db(), "images", snapshot.metadata.md5Hash),
+          imageInfo
+        );
+      } else {
+        alert("Error saving image detail!");
+        return;
+      }
+      console.log("Original File Size (KB):", (file!.size / 1024).toFixed(2));
+      console.log("Compressed File Size (KB):", (image.size / 1024).toFixed(2));
+      reset();
+      alert("Image uploaded successfully!");
+    } catch (error) {
+      console.error("Error saving image detail:", error);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleUploadHoverItem = async (): Promise<TaggedItem[] | Error> => {
+    var taggedItems: TaggedItem[] = [];
+    for (let index = 0; index < hoverItems.length; index++) {
+      const hoverFile = hoverItemFiles[index];
+      let hoverItem = hoverItems[index];
+      const storage_file_name = hoverItem.info.name
+        .replace(/\s+/g, "_")
+        .toLowerCase();
+      let downloadUrl = "";
+      if (
+        hoverFile &&
+        (hoverFile.type.includes("jpeg") ||
+          hoverFile.type.includes("png") ||
+          hoverFile.type.includes("webp") ||
+          hoverFile.type.includes("avif"))
+      ) {
+        try {
+          console.log("Trying to convert to webp...");
+          const itemImage = await ConvertImageAndCompress(hoverFile, 1, 1280);
+          console.log("Convert & Compress done!");
+          console.log("Creating storage ref items/", storage_file_name);
+          // TODO: Duplicate check
+          const hoverItemRef = FirebaseHelper.storageRef(
+            "items/" + storage_file_name
+          );
+          const snapshot = await uploadBytes(hoverItemRef, itemImage);
+          downloadUrl = await getDownloadURL(snapshot.ref);
+        } catch (error) {
+          console.error("Error saving item image:", error, hoverItem);
+          alert("Error saving item image!");
+          return new Error("Error saving item image!");
+        }
+      } else {
+        alert(
+          "Image file format is not valid! Should be either jpeg, png, webp, avif"
+        );
+        setIsUploading(false);
+        return new Error("Image file format is not valid!");
+      }
+      hoverItem.info.imageUrl = downloadUrl;
+      const doc_id = create_doc_id(storage_file_name);
+      console.log("Set document for ", doc_id);
+      await setDoc(doc(FirebaseHelper.db(), "items", doc_id), hoverItem.info);
+      console.log("Done!");
+      taggedItems.push({ id: doc_id, pos: hoverItem.pos });
+    }
+    return taggedItems;
+  };
+
+  const addBrandToFirebase = async () => {
+    if (!newBrand) {
+      alert("브랜드 이름을 입력해주세요.");
+      return;
+    }
+    const db = FirebaseHelper.db();
+    const brandRef = collection(db, "brands");
+    const newBrandInfo: BrandInfo = {
+      name: newBrand,
+      websiteUrl: "",
+      logoImageUrl: "",
+      sns: {},
+      tags: {},
+    };
+    await setDoc(
+      doc(FirebaseHelper.db(), "brands", sha256(newBrand)),
+      newBrandInfo
+    );
+    setBrands([...(brands || []), newBrand]); // 브랜드 목록 업데이트
+    setNewBrand(""); // 입력 필드 초기화
+    alert("브랜드가 추가되었습니다.");
+  };
+
+  const filteredBrands = brands?.filter((brand) =>
+    brand?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="mx-auto p-3 border-l-2 border-r-2 border-b-2 border-black rounded-md">
@@ -393,6 +465,40 @@ function UploadImageSection() {
                         </option>
                       </select>
                     </div>
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="브랜드 검색..."
+                        className="input input-bordered w-full mb-2 dark:bg-white"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)} // 검색어 상태 업데이트
+                      />
+                      <select className="input input-bordered w-full mb-2 dark:bg-white">
+                        {filteredBrands?.map((brand, index) => (
+                          <option key={index} value={brand}>
+                            {brand}
+                          </option>
+                        ))}
+                      </select>
+                      {filteredBrands?.length == 0 && (
+                        <>
+                          {" "}
+                          <input
+                            type="text"
+                            placeholder="새 브랜드 추가"
+                            className="input input-bordered w-full mb-2 dark:bg-white"
+                            value={newBrand}
+                            onChange={(e) => setNewBrand(e.target.value)}
+                          />
+                          <button
+                            onClick={addBrandToFirebase}
+                            className="btn btn-primary w-full"
+                          >
+                            브랜드 추가
+                          </button>
+                        </>
+                      )}
+                    </div>
                     <input
                       type="file"
                       onChange={(e) => handleHoverItemImageChange(index, e)}
@@ -507,26 +613,6 @@ function RequestListSection() {
       </table>
     </div>
   );
-}
-
-enum Brand {
-  Balenciaga = "balenciaga",
-  Gucci = "gucci",
-  LouisVuitton = "louis_vuitton",
-  Prada = "prada",
-  Chanel = "chanel",
-  Dior = "dior",
-  Bvlgari = "bvlgari",
-  Celine = "celine",
-  Tiffany = "tiffany",
-  Versace = "versace",
-  YvesSaintLaurent = "yves_saint_laurent",
-  Givenchy = "givenchy",
-  Zara = "zara",
-  Supreme = "supreme",
-  Nike = "nike",
-  Adidas = "adidas",
-  Puma = "puma",
 }
 
 enum Platform {

@@ -7,7 +7,7 @@ import { FirebaseHelper } from "@/common/firebase";
 import { useSearchParams } from "next/navigation";
 import { notFound } from "next/navigation";
 
-import { ImageDetail, HoverItem } from "@/types/model";
+import { ImageInfo, HoverItem } from "@/types/model";
 interface PageProps {
   params: {
     imageId: string;
@@ -21,7 +21,7 @@ function Page({ params: { imageId } }: PageProps) {
   if (!imageUrl) {
     notFound();
   }
-  let [imageDetail, setImageDetail] = useState<ImageDetail | null>(null);
+  let [imageDetail, setImageDetail] = useState<ImageInfo | null>(null);
   let [tags, setTags] = useState<HoverItem[]>([]);
   let [hoverItem, setHoverItem] = useState<HoverItem | null>(null);
   let [isFetching, setIsFetching] = useState(false);
@@ -40,7 +40,7 @@ function Page({ params: { imageId } }: PageProps) {
       const imageDetail = (await FirebaseHelper.getImageDetail(
         "images",
         decoded
-      )) as ImageDetail;
+      )) as ImageInfo;
       if (imageDetail !== undefined) {
         setImageDetail(imageDetail);
         setTags(imageDetail.taggedItem as HoverItem[]);
@@ -83,13 +83,13 @@ function Page({ params: { imageId } }: PageProps) {
                     tags.map((item) => (
                       <a
                         key={imageId}
-                        href={item.metadata.url}
+                        href={item.info.affiliateUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{
                           position: "absolute",
-                          top: item.position.top,
-                          left: item.position.left,
+                          top: item.pos.top,
+                          left: item.pos.left,
                           cursor: "pointer",
                         }}
                       >
@@ -115,18 +115,16 @@ function Page({ params: { imageId } }: PageProps) {
                     hoverItem ? "opacity-100" : "opacity-0"
                   }`}
                   style={{
-                    top: hoverItem.position.top,
-                    left: hoverItem.position.left,
+                    top: hoverItem.pos.top,
+                    left: hoverItem.pos.left,
                     zIndex: 50,
                   }}
                   onMouseOut={handleMouseOut}
                 >
                   <div className="relative bg-black bg-opacity-80 rounded-lg shadow-lg p-2 flex items-center gap-2">
                     <div className="text-white">
-                      <p className="text-sm font-bold">
-                        {hoverItem.metadata.name}
-                      </p>
-                      <p className="text-xs">{hoverItem.metadata.price}</p>
+                      <p className="text-sm font-bold">{hoverItem.info.name}</p>
+                      <p className="text-xs">{hoverItem.info.price}</p>
                     </div>
                   </div>
                 </div>

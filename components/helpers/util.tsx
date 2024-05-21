@@ -1,6 +1,7 @@
 import localFont from "next/font/local";
 import { arrayBufferToWebP } from "webp-converter-browser";
 import imageCompression from "browser-image-compression";
+import { sha256 } from "js-sha256";
 
 export const main_font = localFont({
   src: "../../fonts/Blinker-Bold.ttf",
@@ -18,6 +19,10 @@ export const validateEmail = (email: string): boolean => {
 
 export function getByteSize(str: string) {
   return new Blob([str]).size;
+}
+
+export function create_doc_id(name: string): string {
+  return sha256(name);
 }
 
 /**
