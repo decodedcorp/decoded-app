@@ -132,7 +132,6 @@ export interface Position {
  *
  * Fields
  * - name: Name of the item
- * - brand: Name of the brand if any
  * - category: Name of the category if any
  * - hyped: Number of hyped(e.g Number of clicks)
  * - designedBy: Name of designer if any
@@ -181,6 +180,8 @@ export interface ItemInfo {
 
 export interface BrandInfo {
   name: string;
+  category: string;
+  creativeDirector?: string[];
   websiteUrl?: string;
   logoImageUrl?: string;
   sns?: Record<string, string>;

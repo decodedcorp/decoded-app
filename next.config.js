@@ -11,6 +11,9 @@ const nextConfig = {
       "image-cdn.hypb.st",
     ],
   },
+  publicRuntimeConfig: {
+    IS_LOCAL_DEV: process.argv.includes("dev"),
+  },
 };
 
 module.exports = nextConfig;

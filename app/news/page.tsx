@@ -1,6 +1,5 @@
 import { FirebaseHelper } from "@/common/firebase";
 import { ArticleInfo } from "@/types/model";
-import { doc, getDocs, collection } from "firebase/firestore";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -76,10 +75,8 @@ async function DailyCardNews() {
 
 async function Card() {
   let articleInfoList: ArticleInfo[] = [];
-  const db = FirebaseHelper.db();
-  const querySnapshot = await getDocs(collection(db, "article"));
-  querySnapshot.docs;
-  querySnapshot.forEach((doc) => {
+  const docs = await FirebaseHelper.docs("articles");
+  docs.forEach((doc) => {
     const newsData = doc.data() as ArticleInfo;
     if (newsData.src) {
       articleInfoList.push(newsData);

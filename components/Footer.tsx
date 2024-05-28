@@ -1,76 +1,46 @@
-import React from "react";
+"use client";
 import { main_font, secondary_font } from "./helpers/util";
 
 function Footer() {
   return (
-    <footer className="bg-[#000000]">
-      <div
-        className={`${main_font.className} text-center text-3xl font-bold border-2 border-black p-5 rounded-md`}
-      >
-        TAGGED
-      </div>
-      <div className="grid grid-cols-4 rounded-md border-r-2 border-l-2 border-black p-2">
-        <div className={`${secondary_font.className}`}>
-          <h3 className="font-bold mb-3">MENU</h3>
-          {/* <ul>
-            <li>News</li>
-            <li>About</li>
-            <li>Magazine</li>
-            <li>Shop</li>
-          </ul> */}
-        </div>
-        <div className={`${secondary_font.className}`}>
-          <h3 className="font-bold mb-3">INFORMATION</h3>
-          {/* <ul>
-            <li>Terms & Conditions</li>
-            <li>Archive</li>
-            <li>Future Academy 2.0</li>
-            <li>Careers</li>
-          </ul> */}
-        </div>
-        <div className={`${secondary_font.className}`}>
-          <h3 className="font-bold mb-3">NEWS</h3>
-          {/* <ul>
-            <li>Style</li>
-            <li>Music</li>
-            <li>Culture</li>
-            <li>Beauty</li>
-            <li>Society</li>
-            <li>Life</li>
-          </ul> */}
-        </div>
-        <div>
-          <h3 className={`font-bold mb-3 ${secondary_font.className}`}>
-            SUBSCRIBE
-          </h3>
-          <form>
-            <div className="flex">
+    <footer className="bg-[#ffffff] border-2 border-black rounded-md">
+      <div className="flex justify-center items-center">
+        <div className="flex flex-col items-center mb-20">
+          <div className="flex flex-col items-center mb-10">
+            <h1
+              className={`font-bold ${main_font.className} text-5xl p-5 dark:text-[#000000] text-[#FF204E]`}
+            >
+              "TAGGED Delivery Service"
+            </h1>
+            <h2
+              className={`${secondary_font.className} text-xl opacity-50 dark:text-[#000000]`}
+            >
+              "Unsubscribe any time"
+            </h2>
+          </div>
+          <form className="flex flex-col items-center">
+            <div className="flex items-center">
               <input
                 type="email"
-                placeholder="Email"
-                className="p-2 border border-gray-300 rounded-xl"
+                placeholder="Write Your Email"
+                className="p-2 border-b border-[#FF204E] w-[500px] dark:bg-[#ffffff] focus:outline-none text-black dark:text-white"
               />
               <button
                 type="submit"
-                className="p-2 bg-red-700 text-white rounded-xl mx-2"
+                className="p-1 bg-[#FF204E] text-white rounded-md mx-2"
+                onClick={() => {
+                  alert("WIP");
+                }}
               >
                 →
               </button>
             </div>
-            <div className="mt-2">
-              <input
-                type="checkbox"
-                id="dataProcessing"
-                name="dataProcessing"
-              />
-              <label htmlFor="dataProcessing" className="text-xs ml-2">
-                I agree to the processing of personal data
-              </label>
-            </div>
           </form>
         </div>
       </div>
-      <div className="text-center border-2 font-bold border-black rounded-md p-4">
+      <div
+        className={`${main_font.className} text-center font-bold rounded-md p-4 text-xl text-black`}
+      >
         © 2023 TAGGED PLATFORM
       </div>
     </footer>

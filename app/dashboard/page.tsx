@@ -3,46 +3,34 @@ import Image from "next/image";
 import { useState, ChangeEvent, useEffect } from "react";
 import {
   TaggedItem,
-  HoverItem,
   ItemInfo,
   ImageInfo,
   BrandInfo,
+  Position,
 } from "@/types/model";
 import { FirebaseHelper } from "@/common/firebase";
-import {
-  addDoc,
-  collection,
-  doc,
-  getDocs,
-  setDoc,
-  QuerySnapshot,
-} from "firebase/firestore";
 import {
   main_font,
   getByteSize,
   create_doc_id,
 } from "@/components/helpers/util";
-import { uploadBytes, getDownloadURL } from "firebase/storage";
-import imageCompression from "browser-image-compression";
 import { ConvertImageAndCompress } from "@/components/helpers/util";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import AdminLogin from "../admin/page";
 import { sha256 } from "js-sha256";
 
+import { Modal } from "@/components/ui/modal";
+
 function AdminDashboard() {
   const [isLogin, setIsLogin] = useState(false);
-  const [_adminEmail, setAdminEmail] = useState("");
-  const [_adminPassword, setAdminPassword] = useState("");
   const [brands, setBrands] = useState<string[] | null>(null);
 
   useEffect(() => {
     const fetchBrands = async () => {
       if (!isLogin) return;
-      const db = FirebaseHelper.db();
       console.log("Fetching brands...");
-      const querySnapshot = await getDocs(collection(db, "brands"));
+      const docs = await FirebaseHelper.docs("brands");
       const fetchedBrands: string[] = [];
-      querySnapshot.forEach((doc) => {
+      docs.forEach((doc) => {
         const brand = doc.data() as BrandInfo;
         fetchedBrands.push(brand.name);
       });
@@ -52,78 +40,143 @@ function AdminDashboard() {
   }, [isLogin]);
 
   return !isLogin ? (
-    <AdminLogin
-      setAdminEmail={setAdminEmail}
-      setAdminPassword={setAdminPassword}
-      setIsLogin={setIsLogin}
-    />
+    <AdminLogin setIsLogin={setIsLogin} />
   ) : (
     <div>
-      <UploadImageSection brands={brands} setBrands={setBrands} />
+      <UploadImageSection brands={brands} />
       <RequestListSection />
     </div>
   );
 }
 
-function UploadImageSection({
-  brands,
-  setBrands,
-}: {
-  brands: string[] | null;
-  setBrands: (brands: string[]) => void;
-}) {
+function UploadImageSection({ brands }: { brands: string[] | null }) {
+  const [uploadImageState, setUploadImageState] =
+    useState<UploadImageState | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [hoverItems, setHoverItems] = useState<HoverItem[]>([]);
-  const [currency, setCurrency] = useState<string>("");
-  const [file, setFile] = useState<File | null>(null);
-  const [fileName, setFileName] = useState("");
-  const [imageName, setImageName] = useState<string | null>(null);
-  const [artistName, setArtistName] = useState<string | null>(null);
-  const [description, setDescription] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [newBrand, setNewBrand] = useState("");
+  const [searchKeyword, setSearchKeyword] = useState("");
   const [selectedPointIndex, setSelectedPointIndex] = useState<number | null>(
     null
   );
   const [expandedSections, setExpandedSections] = useState<{
     [key: number]: boolean;
   }>({});
-  const [hoverItemFiles, setHoverItemFiles] = useState<{
-    [key: number]: File | null;
-  }>({});
 
   const upload = async () => {
-    if (!fileName || !imageName || !file || !artistName || !description) {
+    setIsUploading(true);
+    console.log(uploadImageState);
+    if (!uploadSanityCheck()) {
       alert("Required fields are empty!");
       return;
     }
-    setIsUploading(true);
-    let taggedItems = await handleUploadHoverItem();
+    const file = uploadImageState?.imageFile;
+    const hoverItemInfo = uploadImageState?.hoverItems;
+    const artistName = uploadImageState?.artistName;
+    // It is safe to force unwrap due to sanity check
+    const tags = await prepareTags(file!, hoverItemInfo!, artistName!);
+    if (tags instanceof Error) {
+      alert("Error preparing tags!");
+      setIsUploading(false);
+      return false;
+    }
+    if (!tagsSanityCheck(tags)) {
+      alert("Invalid tags!");
+      setIsUploading(false);
+      return;
+    }
+    console.log(tags);
+    console.log("Handle hover item");
+    let taggedItems = await handleUploadHoverItem(tags);
     if (taggedItems instanceof Error) {
       console.error("Error saving hover item:", taggedItems);
       alert("Error saving hover item!");
       return;
     }
-    let res = await handleUploadImage(taggedItems);
+    console.log("Handle upload image");
+    await handleUploadImage(tags, taggedItems);
+    console.log("Handle remain tags");
+    await handleRemain(tags);
+    console.log("Upload: All Done! ✅");
+    reset();
+    setIsUploading(false);
+  };
+
+  const tagsSanityCheck = (tags: Record<string, string[]> | Error): boolean => {
+    const requiredKeys = ["brands", "artists", "images", "items"];
+    const missingKeys = requiredKeys.filter((key) => !tags.hasOwnProperty(key));
+    return missingKeys.length === 0;
+  };
+
+  const uploadSanityCheck = (): boolean => {
+    if (
+      !uploadImageState?.imageName ||
+      !uploadImageState?.imageFile ||
+      !uploadImageState?.artistName ||
+      !uploadImageState?.description ||
+      !uploadImageState?.hoverItems ||
+      !uploadImageState?.selectedImageUrl ||
+      !uploadImageState?.imageFileName
+    ) {
+      return false;
+    }
+    return true;
+  };
+
+  const prepareTags = async (
+    file: File,
+    hoverItems: HoverItemInfo[],
+    artistName: string
+  ): Promise<Record<string, string[]> | Error> => {
+    const tags: Record<string, string[]> = {};
+    for (let index = 0; index < hoverItems.length; index++) {
+      const hoverItemInfo = hoverItems[index];
+      const item_doc_id = sha256(hoverItemInfo.info.name);
+      if (!hoverItemInfo.brandName) {
+        throw new Error("Invalid data!");
+      }
+      const brand_doc_ids = hoverItemInfo.brandName.map((b) => sha256(b));
+      // { "items" => [] }
+      tags["items"] = [...(tags["items"] || []), item_doc_id];
+      // { "brands" => [] }
+      tags["brands"] = [...(tags["brands"] || []), ...brand_doc_ids];
+      // { item_doc_id => brands}
+      tags[item_doc_id] = brand_doc_ids;
+    }
     const image_doc_id = sha256(await file.arrayBuffer());
-    const item_doc_ids = taggedItems.map((item) => {
-      return item.id;
-    });
+    tags["images"] = [image_doc_id];
     const artist_doc_id = create_doc_id(artistName);
+    tags["artists"] = [artist_doc_id];
+    return tags;
+  };
+
+  const handleHoverItemTags = (
+    tags: Record<string, string[]>,
+    hoverItem: HoverItemInfo
+  ) => {
+    // TODO: Save tags to db
+    const item_doc_id = sha256(hoverItem.info.name);
+    const brand_doc_ids = tags[item_doc_id];
+    hoverItem.info.tags = {
+      images: tags["images"],
+      brands: brand_doc_ids,
+      artists: tags["artists"],
+    };
+  };
+
+  const handleImageTags = (
+    tags: Record<string, string[]>,
+    imageInfo: ImageInfo
+  ) => {
+    imageInfo.tags = {
+      items: tags["items"],
+      brands: tags["brands"],
+      artists: tags["artists"],
+    };
   };
 
   const reset = () => {
-    setSelectedImage(null);
-    setFile(null);
-    setFileName("");
-    setImageName(null);
-    setHoverItems([]);
+    setUploadImageState(null);
     setSelectedPointIndex(null);
-    setArtistName(null);
-    setDescription(null);
     setExpandedSections({});
-    setHoverItemFiles({});
   };
 
   const toggleSection = (index: number) => {
@@ -134,23 +187,29 @@ function UploadImageSection({
   };
 
   const removePoint = (index: number) => {
-    const updatedHoverItems = hoverItems.filter(
+    const updatedHoverItems = uploadImageState?.hoverItems?.filter(
       (_, itemIndex) => itemIndex !== index
     );
-    setHoverItems(updatedHoverItems);
+    setUploadImageState((prev) => ({
+      ...prev,
+      hoverItems: updatedHoverItems,
+    }));
     setSelectedPointIndex(null);
   };
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       const fileURL = URL.createObjectURL(file);
-      setSelectedImage(fileURL);
-      setFile(file);
-      setHoverItems([]);
+      setUploadImageState((prevState) => ({
+        ...prevState,
+        selectedImageUrl: fileURL,
+        imageFile: file,
+        hoverItems: [],
+      }));
     }
   };
 
-  const handleImageClick = (event: React.MouseEvent<HTMLImageElement>) => {
+  const handlePointClick = (event: React.MouseEvent<HTMLImageElement>) => {
     const target = event.target as HTMLImageElement;
     const rect = target.getBoundingClientRect();
     const x = event.clientX - rect.left;
@@ -160,80 +219,129 @@ function UploadImageSection({
     const leftPercent = `${((x / rect.width) * 100).toFixed(2)}%`;
 
     console.log(topPercent, leftPercent);
-    setHoverItems([
-      ...hoverItems,
-      {
-        pos: { top: topPercent, left: leftPercent },
-        info: {
-          name: "",
-          price: ["", ""],
-          hyped: 0,
-          affiliateUrl: "",
-          imageUrl: "",
-          category: "",
-          tags: {},
-          description: "",
+    setUploadImageState((prevState) => ({
+      ...prevState,
+      hoverItems: [
+        ...(prevState?.hoverItems || []),
+        {
+          pos: { top: topPercent, left: leftPercent },
+          info: {
+            name: "",
+            price: ["", ""],
+            hyped: 0,
+            affiliateUrl: "",
+            imageUrl: "",
+            category: "",
+            tags: {},
+            description: "",
+          },
         },
+      ],
+    }));
+  };
+
+  const handleHoverItemInfo = (
+    index: number,
+    field: keyof ItemInfo | undefined,
+    isCurrency: boolean,
+    value: number | string | string[] | File
+  ) => {
+    setUploadImageState((prevState) => {
+      if (!prevState) return null; // prevState가 null이면 아무 작업도 하지 않고 null을 반환
+
+      const hoverItems = prevState.hoverItems || [];
+      // prevState에서 hoverItems를 복사하여 새로운 배열을 생성
+      const updatedHoverItems = [...hoverItems];
+
+      // field 값에 따라 적절한 타입으로 값을 할당
+      if (field === "tags") {
+        return prevState; // tags는 여기서 처리하지 않음
+      } else if (field === "hyped") {
+        updatedHoverItems[index].info[field] = value as number;
+      } else if (field === "price") {
+        if (isCurrency) {
+          updatedHoverItems[index].info[field]![1] = value as string;
+        } else {
+          updatedHoverItems[index].info[field]![0] = value as string;
+        }
+      } else {
+        if (field) {
+          updatedHoverItems[index].info[field] = value as string;
+        } else {
+          if (value instanceof File) {
+            updatedHoverItems[index].hoverItemFile = value;
+          } else {
+            // Brands
+            updatedHoverItems[index].brandName = value as string[];
+          }
+        }
+      }
+      // 업데이트된 hoverItems로 상태를 업데이트
+      return { ...prevState, hoverItems: updatedHoverItems };
+    });
+  };
+
+  const handleRemain = async (tags: Record<string, string[]>) => {
+    const db = FirebaseHelper.db();
+    const brands = tags["brands"];
+    brands.map(async (b) => {
+      await FirebaseHelper.updateDoc("brands", b, {
+        tags: {
+          images: tags["images"],
+          artists: tags["artists"],
+          items: tags["items"],
+        },
+      });
+    });
+    // There will be only one artist
+    const artistDocId = tags["artists"][0];
+    await FirebaseHelper.updateDoc("artists", artistDocId, {
+      tags: {
+        images: tags["images"],
+        brands: tags["brands"],
+        items: tags["items"],
       },
-    ]);
+    });
   };
 
-  const handleMetadataChange = (
-    index: number,
-    field: keyof ItemInfo,
-    value: number | string | string[]
+  const handleUploadImage = async (
+    tags: Record<string, string[]>,
+    taggedItems: TaggedItem[]
   ) => {
-    const updatedHoverItems = [...hoverItems];
-    if (field === "tags") {
-      return;
-    } else if (field === "hyped") {
-      updatedHoverItems[index].info[field] = value as number;
-    } else if (field === "price") {
-      updatedHoverItems[index].info[field] = [value as string, currency];
-    } else {
-      updatedHoverItems[index].info[field] = value as string;
-    }
-    console.log(hoverItems[index]);
-    setHoverItems(updatedHoverItems);
-  };
-
-  const handleHoverItemImageChange = (
-    index: number,
-    event: ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setHoverItemFiles((prev) => ({ ...prev, [index]: file }));
-    } else {
-      console.log("No file selected");
-    }
-  };
-
-  const handleUploadImage = async (taggedItems: TaggedItem[]) => {
     const imageInfo: ImageInfo = {
-      title: imageName!,
-      description: description!,
+      title: uploadImageState?.imageName!,
+      description: uploadImageState?.description,
       hyped: 0,
       taggedItem: taggedItems,
       updateAt: new Date(),
       tags: {},
     };
     try {
-      const image = await ConvertImageAndCompress(file!, 1, 1280);
-      const storageRef = FirebaseHelper.storageRef("images/" + fileName);
-      const snapshot = await uploadBytes(storageRef, image);
-      if (snapshot.metadata.md5Hash) {
-        await setDoc(
-          doc(FirebaseHelper.db(), "images", snapshot.metadata.md5Hash),
-          imageInfo
-        );
-      } else {
-        alert("Error saving image detail!");
-        return;
-      }
-      console.log("Original File Size (KB):", (file!.size / 1024).toFixed(2));
-      console.log("Compressed File Size (KB):", (image.size / 1024).toFixed(2));
-      reset();
+      const imageFile = await ConvertImageAndCompress(
+        uploadImageState?.imageFile!,
+        1,
+        1280
+      );
+      const path = "images/" + uploadImageState?.imageName!;
+      const image_doc_id = tags["images"][0];
+      // Upload image to storage
+      await FirebaseHelper.uploadDataToStorage(path, imageFile, {
+        customMetadata: {
+          // Hash of image is only one
+          id: image_doc_id,
+        },
+      });
+      handleImageTags(tags, imageInfo);
+      // Upload `imageInfo` to db
+      await FirebaseHelper.setDoc("images", image_doc_id, imageInfo);
+      console.log(
+        "Original File Size (KB):",
+        (uploadImageState?.imageFile!.size! / 1024).toFixed(2)
+      );
+      console.log(
+        "Compressed File Size (KB):",
+        (imageFile.size / 1024).toFixed(2)
+      );
       alert("Image uploaded successfully!");
     } catch (error) {
       console.error("Error saving image detail:", error);
@@ -242,11 +350,15 @@ function UploadImageSection({
     }
   };
 
-  const handleUploadHoverItem = async (): Promise<TaggedItem[] | Error> => {
+  const handleUploadHoverItem = async (
+    tags: Record<string, string[]>
+  ): Promise<TaggedItem[] | Error> => {
     var taggedItems: TaggedItem[] = [];
+    const hoverItems = uploadImageState?.hoverItems!;
     for (let index = 0; index < hoverItems.length; index++) {
-      const hoverFile = hoverItemFiles[index];
-      let hoverItem = hoverItems[index];
+      const hoverFile = hoverItems[index].hoverItemFile;
+      var hoverItem = hoverItems[index];
+      // Handle image such as converting to webp and uploading to db
       const storage_file_name = hoverItem.info.name
         .replace(/\s+/g, "_")
         .toLowerCase();
@@ -264,11 +376,11 @@ function UploadImageSection({
           console.log("Convert & Compress done!");
           console.log("Creating storage ref items/", storage_file_name);
           // TODO: Duplicate check
-          const hoverItemRef = FirebaseHelper.storageRef(
-            "items/" + storage_file_name
+          const uploadRes = await FirebaseHelper.uploadDataToStorage(
+            "items/" + storage_file_name,
+            itemImage
           );
-          const snapshot = await uploadBytes(hoverItemRef, itemImage);
-          downloadUrl = await getDownloadURL(snapshot.ref);
+          downloadUrl = await FirebaseHelper.downloadUrl(uploadRes.ref);
         } catch (error) {
           console.error("Error saving item image:", error, hoverItem);
           alert("Error saving item image!");
@@ -282,40 +394,19 @@ function UploadImageSection({
         return new Error("Image file format is not valid!");
       }
       hoverItem.info.imageUrl = downloadUrl;
+      // Handle hoverItem tags
+      handleHoverItemTags(tags, hoverItem);
       const doc_id = create_doc_id(storage_file_name);
       console.log("Set document for ", doc_id);
-      await setDoc(doc(FirebaseHelper.db(), "items", doc_id), hoverItem.info);
+      await FirebaseHelper.setDoc("items", doc_id, hoverItem.info);
       console.log("Done!");
       taggedItems.push({ id: doc_id, pos: hoverItem.pos });
     }
     return taggedItems;
   };
 
-  const addBrandToFirebase = async () => {
-    if (!newBrand) {
-      alert("브랜드 이름을 입력해주세요.");
-      return;
-    }
-    const db = FirebaseHelper.db();
-    const brandRef = collection(db, "brands");
-    const newBrandInfo: BrandInfo = {
-      name: newBrand,
-      websiteUrl: "",
-      logoImageUrl: "",
-      sns: {},
-      tags: {},
-    };
-    await setDoc(
-      doc(FirebaseHelper.db(), "brands", sha256(newBrand)),
-      newBrandInfo
-    );
-    setBrands([...(brands || []), newBrand]); // 브랜드 목록 업데이트
-    setNewBrand(""); // 입력 필드 초기화
-    alert("브랜드가 추가되었습니다.");
-  };
-
   const filteredBrands = brands?.filter((brand) =>
-    brand?.toLowerCase().includes(searchTerm.toLowerCase())
+    brand?.toLowerCase().includes(searchKeyword.toLowerCase())
   );
 
   return (
@@ -327,7 +418,7 @@ function UploadImageSection({
         <input type="file" onChange={handleImageChange} className="mb-4" />
         {/* Image Section */}
         <div className="flex-1">
-          {selectedImage && (
+          {uploadImageState?.selectedImageUrl && (
             <div
               className="rounded-lg shadow-lg overflow-hidden mt-10"
               style={{
@@ -338,13 +429,13 @@ function UploadImageSection({
               }}
             >
               <Image
-                src={selectedImage}
+                src={uploadImageState?.selectedImageUrl}
                 alt="Featured fashion"
                 layout="fill"
                 objectFit="cover"
-                onClick={handleImageClick}
+                onClick={handlePointClick}
               />
-              {hoverItems.map((item, index) => (
+              {uploadImageState?.hoverItems?.map((item, index) => (
                 <div
                   key={index}
                   className={`absolute w-3 h-3 bg-blue-500 rounded-full ${
@@ -365,29 +456,24 @@ function UploadImageSection({
         </div>
         {/* HoverItem Section */}
         <div className="flex-1 space-y-4 align-top justify-between">
-          {hoverItems.map((item, index) => (
+          {uploadImageState?.hoverItems?.map((item, index) => (
             <div
               key={index}
               className="flex flex-col p-4 border-b border-gray-200 items-center "
             >
-              <div className="flex flex-1 w-full justify-between">
-                <h3 className="mb-2 text-lg font-semibold">
-                  Point {index + 1}
-                </h3>
-                <div>
-                  <button
-                    onClick={() => toggleSection(index)}
-                    className="btn btn-info btn-sm"
-                  >
-                    {expandedSections[index] ? "Hide" : "Show"}
-                  </button>
-                  <button
-                    onClick={() => removePoint(index)}
-                    className="btn btn-error btn-xs ml-5"
-                  >
-                    X
-                  </button>
-                </div>
+              <div className="flex flex-1 w-full items-center m-2 justify-between">
+                <button
+                  onClick={() => toggleSection(index)}
+                  className="btn bg-[#FF204E] btn-xs text-black"
+                >
+                  {expandedSections[index] ? "Hide" : "Show"}
+                </button>
+                <button
+                  onClick={() => removePoint(index)}
+                  className="btn bg-[#FF204E] btn-xs text-black"
+                >
+                  x
+                </button>
               </div>
               <div
                 className="flex flex-1 justify-between"
@@ -400,7 +486,12 @@ function UploadImageSection({
                       placeholder="Name"
                       value={item.info.name}
                       onChange={(e) => {
-                        handleMetadataChange(index, "name", e.target.value);
+                        handleHoverItemInfo(
+                          index,
+                          "name",
+                          false,
+                          e.target.value
+                        );
                       }}
                       className="input input-bordered w-full mb-2 dark:bg-white"
                     />
@@ -408,16 +499,26 @@ function UploadImageSection({
                       <input
                         type="text"
                         placeholder="Price"
-                        value={item.info.price?.[0] || ""}
+                        value={item.info.price?.[0]}
                         onChange={(e) => {
-                          handleMetadataChange(index, "price", e.target.value);
+                          handleHoverItemInfo(
+                            index,
+                            "price",
+                            false,
+                            e.target.value
+                          );
                         }}
                         className="input input-bordered w-full mb-2 dark:bg-white"
                       />
                       <select
-                        value={currency}
+                        value={item.info.price?.[1]}
                         onChange={(e) => {
-                          setCurrency(e.target.value);
+                          handleHoverItemInfo(
+                            index,
+                            "price",
+                            true,
+                            e.target.value
+                          );
                         }}
                         className="input w-20 mb-2 dark:bg-white"
                       >
@@ -433,9 +534,10 @@ function UploadImageSection({
                       placeholder="URL"
                       value={item.info.affiliateUrl}
                       onChange={(e) => {
-                        handleMetadataChange(
+                        handleHoverItemInfo(
                           index,
                           "affiliateUrl",
+                          false,
                           e.target.value
                         );
                       }}
@@ -445,24 +547,20 @@ function UploadImageSection({
                       <select
                         value={item.info.category}
                         onChange={(e) => {
-                          handleMetadataChange(
+                          handleHoverItemInfo(
                             index,
                             "category",
+                            false,
                             e.target.value
                           );
                         }}
                         className="input input-bordered w-full mb-2 dark:bg-white"
                       >
-                        <option value={ItemCategory.Clothing}>Clothing</option>
-                        <option value={ItemCategory.Accessory}>
-                          Accessory
-                        </option>
-                        <option value={ItemCategory.Shoes}>Shoes</option>
-                        <option value={ItemCategory.Bag}>Bag</option>
-                        <option value={ItemCategory.Paint}>Paint</option>
-                        <option value={ItemCategory.Furniture}>
-                          Furniture
-                        </option>
+                        {Object.values(ItemCategory).map((category) => (
+                          <option key={category} value={category}>
+                            {category}
+                          </option>
+                        ))}
                       </select>
                     </div>
                     <div>
@@ -470,10 +568,28 @@ function UploadImageSection({
                         type="text"
                         placeholder="브랜드 검색..."
                         className="input input-bordered w-full mb-2 dark:bg-white"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)} // 검색어 상태 업데이트
+                        value={searchKeyword}
+                        onChange={(e) => {
+                          setSearchKeyword(e.target.value);
+                        }}
                       />
-                      <select className="input input-bordered w-full mb-2 dark:bg-white">
+                      <select
+                        multiple={true}
+                        className="input input-bordered w-full mb-2 dark:bg-white"
+                        value={item.brandName}
+                        onChange={(e) => {
+                          const selectedOptions = Array.from(
+                            e.target.selectedOptions,
+                            (option) => option.value
+                          );
+                          handleHoverItemInfo(
+                            index,
+                            undefined,
+                            false,
+                            selectedOptions
+                          );
+                        }}
+                      >
                         {filteredBrands?.map((brand, index) => (
                           <option key={index} value={brand}>
                             {brand}
@@ -482,26 +598,32 @@ function UploadImageSection({
                       </select>
                       {filteredBrands?.length == 0 && (
                         <>
-                          {" "}
-                          <input
-                            type="text"
-                            placeholder="새 브랜드 추가"
-                            className="input input-bordered w-full mb-2 dark:bg-white"
-                            value={newBrand}
-                            onChange={(e) => setNewBrand(e.target.value)}
-                          />
                           <button
-                            onClick={addBrandToFirebase}
-                            className="btn btn-primary w-full"
+                            className={`btn bg-[#FF204E] ${main_font.className} m-2 text-black`}
+                            onClick={() =>
+                              (
+                                document.getElementById(
+                                  "my_modal_2"
+                                ) as HTMLDialogElement
+                              )?.showModal()
+                            }
                           >
-                            브랜드 추가
+                            Add New Brand
                           </button>
+                          <Modal />
                         </>
                       )}
                     </div>
                     <input
                       type="file"
-                      onChange={(e) => handleHoverItemImageChange(index, e)}
+                      onChange={(e) =>
+                        handleHoverItemInfo(
+                          index,
+                          undefined,
+                          false,
+                          e.target.files![0]
+                        )
+                      }
                       className="input w-full dark:bg-white"
                     />
                   </div>
@@ -511,38 +633,56 @@ function UploadImageSection({
           ))}
         </div>
       </div>
-      {selectedImage && (
+      {uploadImageState?.selectedImageUrl && (
         <div className="p-4 border-t border-gray-200">
           <input
             type="text"
             placeholder="File Name (e.g rose_in_nyc)"
-            value={fileName}
-            onChange={(e) => setFileName(e.target.value)}
+            value={uploadImageState?.imageFileName ?? ""}
+            onChange={(e) =>
+              setUploadImageState({
+                ...uploadImageState,
+                imageFileName: e.target.value,
+              })
+            }
             className="input input-bordered w-full mb-2 dark:bg-white"
           />
           <input
             type="text"
             placeholder="Image Title (e.g Rose in NYC)"
-            value={imageName || ""}
-            onChange={(e) => setImageName(e.target.value)}
+            value={uploadImageState?.imageName ?? ""}
+            onChange={(e) =>
+              setUploadImageState({
+                ...uploadImageState,
+                imageName: e.target.value,
+              })
+            }
             className="input input-bordered w-full mb-2 dark:bg-white"
           />
           <input
             type="text"
             placeholder="Artist Name(e.g rose)"
-            value={artistName || ""}
-            onChange={(e) => setArtistName(e.target.value)}
+            value={uploadImageState?.artistName ?? ""}
+            onChange={(e) =>
+              setUploadImageState({
+                ...uploadImageState,
+                artistName: e.target.value,
+              })
+            }
             className="input input-bordered w-full mb-2 dark:bg-white"
           />
           {/* TODO: Replace with generated by LLM */}
           <input
             type="text"
             placeholder="Description"
-            value={description || ""}
+            value={uploadImageState?.description ?? ""}
             onChange={(e) => {
               const inputText = e.target.value;
               if (getByteSize(inputText) <= 500) {
-                setDescription(inputText);
+                setUploadImageState({
+                  ...uploadImageState,
+                  description: inputText,
+                });
               }
             }}
             className="input input-bordered w-full mb-2 dark:bg-white"
@@ -563,29 +703,15 @@ function UploadImageSection({
   );
 }
 
-function RequestListSection() {
-  // Mock 데이터
-  const requests = [
-    {
-      request_id: 1,
-      description: "새로운 아이템 추가 요청",
-      name: "아이템1",
-      status: "대기중",
-    },
-    {
-      request_id: 2,
-      description: "가격 업데이트 요청",
-      name: "아이템2",
-      status: "완료",
-    },
-    {
-      request_id: 3,
-      description: "제품 정보 수정",
-      name: "아이템3",
-      status: "진행중",
-    },
-  ];
+interface Request {
+  request_id: string;
+  description: string;
+  name: string;
+  status: string;
+}
 
+function RequestListSection() {
+  const [requests, setRequests] = useState<Request[]>([]);
   return (
     <div
       className={`p-4 text-2xl font-bold ${main_font.className} border-l-2 border-r-2 border-b-2 border-black rounded-md`}
@@ -615,12 +741,21 @@ function RequestListSection() {
   );
 }
 
-enum Platform {
-  X = "X",
-  TikTok = "TikTok",
-  Instagram = "Instagram",
-  LinkedIn = "LinkedIn",
-  YouTube = "YouTube",
+interface UploadImageState {
+  selectedImageUrl?: string;
+  hoverItems?: HoverItemInfo[];
+  imageFile?: File;
+  imageFileName?: string;
+  imageName?: string;
+  artistName?: string;
+  description?: string;
+}
+
+interface HoverItemInfo {
+  pos: Position;
+  info: ItemInfo;
+  brandName?: string[];
+  hoverItemFile?: File;
 }
 
 enum ItemCategory {

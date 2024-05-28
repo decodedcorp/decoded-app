@@ -3,20 +3,14 @@
 import { FirebaseHelper } from "@/common/firebase";
 import { main_font, validateEmail } from "@/components/helpers/util";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 function AdminLogin({
-  setAdminEmail,
-  setAdminPassword,
   setIsLogin,
 }: {
-  setAdminEmail: (email: string) => void;
-  setAdminPassword: (password: string) => void;
   setIsLogin: (isLogin: boolean) => void;
 }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const router = useRouter();
 
   const handleLogin = async () => {
     if (!validateEmail(email)) {
@@ -26,8 +20,6 @@ function AdminLogin({
     FirebaseHelper.adminLogin(email, password).then((isAdmin) => {
       if (isAdmin) {
         setIsLogin(true);
-        setAdminEmail(email);
-        setAdminPassword(password);
       } else {
         alert("No Permission!");
       }

@@ -7,6 +7,13 @@ import {
   collection,
   doc,
   getDoc,
+  DocumentReference,
+  DocumentData,
+  Timestamp,
+  updateDoc,
+  UpdateData,
+  setDoc,
+  WithFieldValue,
 } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
 import {
@@ -14,6 +21,11 @@ import {
   FirebaseStorage,
   ref,
   StorageReference,
+  listAll,
+  getMetadata,
+  getDownloadURL,
+  UploadMetadata,
+  uploadBytes,
 } from "firebase/storage";
 import {
   ImageInfo,
@@ -122,6 +134,58 @@ export class FirebaseHelper {
     } catch (error) {
       throw new Error("Error occured while getting storage instance");
     }
+  }
+
+  static docRef(collectionName: string, docId: string) {
+    return doc(this.db(), collectionName, docId);
+  }
+
+  public static async doc(collectionName: string, docId: string) {
+    return await getDoc(this.docRef(collectionName, docId));
+  }
+
+  public static async docs(collectionName: string) {
+    return await getDocs(collection(this.db(), collectionName));
+  }
+
+  public static async setDoc(
+    collectionName: string,
+    docId: string,
+    data: WithFieldValue<DocumentData>
+  ) {
+    return await setDoc(this.docRef(collectionName, docId), data);
+  }
+
+  public static async updateDoc(
+    collectionName: string,
+    docId: string,
+    data: UpdateData<any>
+  ) {
+    await updateDoc(this.docRef(collectionName, docId), data);
+  }
+
+  public static async listAllStorageItems(collectionName: string) {
+    return await listAll(FirebaseHelper.storageRef("images"));
+  }
+
+  public static async metadata(storageRef: StorageReference) {
+    return await getMetadata(storageRef);
+  }
+
+  public static async downloadUrl(storageRef: StorageReference) {
+    return await getDownloadURL(storageRef);
+  }
+
+  public static async uploadDataToStorage(
+    path: string,
+    data: Blob | ArrayBuffer | Uint8Array,
+    metadata?: UploadMetadata
+  ) {
+    return await uploadBytes(this.storageRef(path), data, metadata);
+  }
+
+  public static currentTimestamp(): Timestamp {
+    return Timestamp.fromDate(new Date());
   }
 
   public static async getImageDetail(

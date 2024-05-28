@@ -21,7 +21,6 @@ body {
   flex: 1;
   background-color: #ffffff;
   min-height: 100vh;
-  margin-bottom: 50px;
   height: 100vh;
 }
 
@@ -42,6 +41,7 @@ footer {
   left: 0;
   right: 0;
   bottom: 0;
+  padding: 20px;
   margin-top: auto;
 }
 

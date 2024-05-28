@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FirebaseHelper } from "../../common/firebase";
-import { listAll, getDownloadURL, getMetadata } from "firebase/storage";
 import { main_font, secondary_font } from "@/components/helpers/util";
 import {
   ArticleInfo,
@@ -12,13 +11,6 @@ import {
   MainImageInfo,
   TaggedItem,
 } from "@/types/model";
-import {
-  getDocs,
-  collection,
-  Timestamp,
-  doc,
-  getDoc,
-} from "firebase/firestore";
 import {
   ArrowLeftCircleIcon,
   ArrowRightCircleIcon,
@@ -35,10 +27,13 @@ function Home() {
   );
 }
 
+interface UrlAndId {
+  url: string;
+  docId: string;
+}
+
 function MainView() {
-  const [urlAndHash, setUrlAndHash] = useState<{ url: string; hash: string }[]>(
-    []
-  );
+  const [urlAndId, setUrlAndId] = useState<UrlAndId[]>([]);
   const [mainImageInfoList, setMainImageInfoList] = useState<MainImageInfo[]>(
     []
   );
@@ -56,61 +51,57 @@ function MainView() {
 
   useEffect(() => {
     const fetchAllImages = async () => {
-      const urlAndHash = [];
+      const urlAndId: UrlAndId[] = [];
       let mainImageInfoList: MainImageInfo[] = [];
       try {
-        const storage_ref = FirebaseHelper.storageRef("images");
-        const res = await listAll(storage_ref);
-        const itemsToProcess = res.items.slice(0, 10);
-        for (const itemRef of itemsToProcess) {
+        const storageItems = await FirebaseHelper.listAllStorageItems("images");
+        // Up to 10 items will be processed
+        const imageStorage = storageItems.items.slice(0, 10);
+        imageStorage.forEach(async (image) => {
           try {
             const [metadata, url] = await Promise.all([
-              getMetadata(itemRef),
-              getDownloadURL(itemRef),
+              FirebaseHelper.metadata(image),
+              FirebaseHelper.downloadUrl(image),
             ]);
-            if (metadata.md5Hash) {
-              const docRef = doc(
-                FirebaseHelper.db(),
-                "images",
-                metadata.md5Hash
-              );
-              const imageDocSnap = await getDoc(docRef);
-              if (imageDocSnap.exists()) {
-                const imageInfo = imageDocSnap.data() as ImageInfo;
-                let itemInfoList: ItemInfo[] = [];
-                imageInfo.taggedItem?.map(async (item) => {
-                  const taggedItem = item as TaggedItem;
-                  const docRef = doc(
-                    FirebaseHelper.db(),
-                    "items",
-                    taggedItem.id
-                  );
-                  const itemDocSnap = await getDoc(docRef);
-                  if (itemDocSnap.exists()) {
-                    const itemInfo = itemDocSnap.data() as ItemInfo;
-                    itemInfoList.push(itemInfo);
-                  }
-                });
-                mainImageInfoList.push({
-                  title: imageInfo.title,
-                  itemInfoList: itemInfoList,
-                  description: imageInfo.description,
-                  hyped: imageInfo.hyped,
-                });
-                urlAndHash.push({ url, hash: metadata.md5Hash });
-              }
+            const imageDocId = metadata.customMetadata?.id;
+            if (!imageDocId) {
+              console.log("Image Doc Id not existed");
+              return;
+            }
+            const imageDoc = await FirebaseHelper.doc("images", imageDocId);
+            if (imageDoc.exists()) {
+              const imageInfo = imageDoc.data() as ImageInfo;
+              let itemInfoList: ItemInfo[] = [];
+              imageInfo.taggedItem?.map(async (item) => {
+                const taggedItem = item as TaggedItem;
+                const itemDoc = await FirebaseHelper.doc(
+                  "items",
+                  taggedItem.id
+                );
+                if (itemDoc.exists()) {
+                  const itemInfo = itemDoc.data() as ItemInfo;
+                  itemInfoList.push(itemInfo);
+                }
+              });
+              mainImageInfoList.push({
+                title: imageInfo.title,
+                itemInfoList: itemInfoList,
+                description: imageInfo.description,
+                hyped: imageInfo.hyped,
+              });
+              urlAndId.push({ url, docId: imageDocId });
             }
           } catch (error) {
             console.error("Error processing item:", error);
-            continue;
+            return;
           }
-        }
+        });
       } catch (error) {
         if (error instanceof Error) {
           console.log(error.message);
         }
       } finally {
-        setUrlAndHash(urlAndHash);
+        setUrlAndId(urlAndId);
         setMainImageInfoList(mainImageInfoList);
       }
     };
@@ -139,7 +130,7 @@ function MainView() {
           </div>
         </div>
         <ImageCarouselView
-          urlAndHash={urlAndHash}
+          urlAndId={urlAndId}
           currentIndex={currentIndex}
           setCurrentIndex={setCurrentIndex}
         />
@@ -243,35 +234,35 @@ function ItemDetailView({
 }
 
 function ImageCarouselView({
-  urlAndHash,
+  urlAndId,
   currentIndex,
   setCurrentIndex,
 }: {
-  urlAndHash: { url: string; hash: string }[];
+  urlAndId: UrlAndId[];
   currentIndex: number;
   setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
 }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (urlAndHash.length > 0) {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % urlAndHash.length);
+      if (urlAndId.length > 0) {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % urlAndId.length);
       }
     }, 10000);
 
     return () => clearTimeout(timer);
-  }, [currentIndex, urlAndHash.length]);
+  }, [currentIndex, urlAndId.length]);
 
   const handleNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % urlAndHash.length);
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % urlAndId.length);
   };
 
   const handlePrev = () => {
     setCurrentIndex(
-      (prevIndex) => (prevIndex - 1 + urlAndHash.length) % urlAndHash.length
+      (prevIndex) => (prevIndex - 1 + urlAndId.length) % urlAndId.length
     );
   };
-  if (urlAndHash.length === 0) {
+  if (urlAndId.length === 0) {
     return (
       <div className="w-60 carousel rounded-box mx-5" style={{ width: "70vw" }}>
         <div className="flex justify-center items-center h-full w-full aspect-w-5 aspect-h-6"></div>
@@ -279,8 +270,8 @@ function ImageCarouselView({
     );
   }
 
-  const itemCount = urlAndHash.length;
-  const { url, hash } = urlAndHash[currentIndex];
+  const itemCount = urlAndId.length;
+  const { url, docId } = urlAndId[currentIndex];
 
   return (
     <div
@@ -288,7 +279,7 @@ function ImageCarouselView({
       style={{ width: "65vw", position: "relative" }}
     >
       <div
-        key={hash}
+        key={docId}
         className="carousel-item w-full relative aspect-w-3 aspect-h-4"
       >
         <ProgressBar
@@ -297,7 +288,7 @@ function ImageCarouselView({
           totalItems={itemCount}
         />
         <Link
-          href={`images/${hash}?imageUrl=${encodeURIComponent(url)}`}
+          href={`images/${docId}?imageUrl=${encodeURIComponent(url)}`}
           prefetch={false}
         >
           <Image
@@ -332,9 +323,8 @@ function ArticleView() {
   useEffect(() => {
     const fetchAllArticles = async () => {
       let articleInfoList: ArticleInfo[] = [];
-      const db = FirebaseHelper.db();
-      const querySnapshot = await getDocs(collection(db, "article"));
-      const current_timestamp = Timestamp.fromDate(new Date());
+      const querySnapshot = await FirebaseHelper.docs("articles");
+      const current_timestamp = FirebaseHelper.currentTimestamp();
       querySnapshot.forEach((doc) => {
         const articleInfo = doc.data() as ArticleInfo;
         // if (article.time !== undefined) {
