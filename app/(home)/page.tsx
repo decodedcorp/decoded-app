@@ -377,7 +377,9 @@ function ArticleView() {
           ))}
         </div>
       )}
-      <button className="w-full text-align-center mt-4 py-2 px-6 bg-[#FF204E] text-white rounded">
+      <button
+        className={`${main_font.className} w-full text-align-center mt-4 py-2 px-6 bg-[#FF204E] text-white rounded`}
+      >
         See More
       </button>
     </div>

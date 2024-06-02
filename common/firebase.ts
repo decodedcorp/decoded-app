@@ -140,6 +140,10 @@ export class FirebaseHelper {
     return doc(this.db(), collectionName, docId);
   }
 
+  public static async docExists(collectionName: string, docId: string) {
+    return (await this.doc(collectionName, docId)).exists();
+  }
+
   public static async doc(collectionName: string, docId: string) {
     return await getDoc(this.docRef(collectionName, docId));
   }
@@ -157,15 +161,20 @@ export class FirebaseHelper {
   }
 
   public static async updateDoc(
+    isDocExist: boolean,
     collectionName: string,
     docId: string,
     data: UpdateData<any>
   ) {
-    await updateDoc(this.docRef(collectionName, docId), data);
+    if (isDocExist) {
+      return await updateDoc(this.docRef(collectionName, docId), data);
+    } else {
+      this.setDoc(collectionName, docId, data);
+    }
   }
 
   public static async listAllStorageItems(collectionName: string) {
-    return await listAll(FirebaseHelper.storageRef("images"));
+    return await listAll(FirebaseHelper.storageRef(collectionName));
   }
 
   public static async metadata(storageRef: StorageReference) {

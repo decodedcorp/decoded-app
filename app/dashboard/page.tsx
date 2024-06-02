@@ -6,6 +6,7 @@ import {
   ItemInfo,
   ImageInfo,
   BrandInfo,
+  ArtistInfo,
   Position,
 } from "@/types/model";
 import { FirebaseHelper } from "@/common/firebase";
@@ -18,38 +19,65 @@ import { ConvertImageAndCompress } from "@/components/helpers/util";
 import AdminLogin from "../admin/page";
 import { sha256 } from "js-sha256";
 
-import { Modal } from "@/components/ui/modal";
+import { ArtistModal, BrandModal } from "@/components/ui/modal";
 
 function AdminDashboard() {
   const [isLogin, setIsLogin] = useState(false);
+  const [isDataAdded, setIsDataAdded] = useState(false);
   const [brands, setBrands] = useState<string[] | null>(null);
+  const [artists, setArtists] = useState<string[] | null>(null);
 
   useEffect(() => {
-    const fetchBrands = async () => {
+    const fetchData = async () => {
       if (!isLogin) return;
-      console.log("Fetching brands...");
-      const docs = await FirebaseHelper.docs("brands");
-      const fetchedBrands: string[] = [];
-      docs.forEach((doc) => {
-        const brand = doc.data() as BrandInfo;
-        fetchedBrands.push(brand.name);
+      console.log("Fetching brands and artists...");
+      const artists: string[] = [];
+      const brands: string[] = [];
+      Promise.all([
+        FirebaseHelper.docs("brands"),
+        FirebaseHelper.docs("artists"),
+      ]).then(([b, a]) => {
+        b.forEach((doc) => {
+          const brand = doc.data() as BrandInfo;
+          brands.push(brand.name);
+          setBrands(brands);
+        });
+        a.forEach((doc) => {
+          const artist = doc.data() as ArtistInfo;
+          artists.push(artist.name);
+          setArtists(artists);
+        });
+        setIsDataAdded(false);
+        console.log("Fetched brands: ", brands);
+        console.log("Fetched artists: ", artists);
       });
-      setBrands(fetchedBrands);
     };
-    fetchBrands();
-  }, [isLogin]);
+    fetchData();
+  }, [isLogin, isDataAdded]);
 
   return !isLogin ? (
     <AdminLogin setIsLogin={setIsLogin} />
   ) : (
     <div>
-      <UploadImageSection brands={brands} />
+      <UploadImageSection
+        brands={brands}
+        artists={artists}
+        setIsDataAdded={setIsDataAdded}
+      />
       <RequestListSection />
     </div>
   );
 }
 
-function UploadImageSection({ brands }: { brands: string[] | null }) {
+function UploadImageSection({
+  brands,
+  artists,
+  setIsDataAdded,
+}: {
+  brands: string[] | null;
+  artists: string[] | null;
+  setIsDataAdded: (isDataAdded: boolean) => void;
+}) {
   const [uploadImageState, setUploadImageState] =
     useState<UploadImageState | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -66,93 +94,180 @@ function UploadImageSection({ brands }: { brands: string[] | null }) {
     console.log(uploadImageState);
     if (!uploadSanityCheck()) {
       alert("Required fields are empty!");
+      setIsUploading(false);
       return;
     }
     const file = uploadImageState?.imageFile;
     const hoverItemInfo = uploadImageState?.hoverItems;
-    const artistName = uploadImageState?.artistName;
     // It is safe to force unwrap due to sanity check
-    const tags = await prepareTags(file!, hoverItemInfo!, artistName!);
+    const tags = await prepareTags(file!, hoverItemInfo!);
     if (tags instanceof Error) {
       alert("Error preparing tags!");
       setIsUploading(false);
       return false;
     }
-    if (!tagsSanityCheck(tags)) {
+    const requiredKeys = ["brands", "artists", "images", "items"];
+    if (!tagsSanityCheck(tags, requiredKeys)) {
       alert("Invalid tags!");
       setIsUploading(false);
       return;
     }
-    console.log(tags);
+    console.log("Tags Info: ", tags);
     console.log("Handle hover item");
-    let taggedItems = await handleUploadHoverItem(tags);
+    // "items"
+    let taggedItems = await handleUploadHoverItem(tags, requiredKeys);
     if (taggedItems instanceof Error) {
       console.error("Error saving hover item:", taggedItems);
       alert("Error saving hover item!");
       return;
     }
     console.log("Handle upload image");
+    // "images"
     await handleUploadImage(tags, taggedItems);
     console.log("Handle remain tags");
-    await handleRemain(tags);
+    // "brands", "artists"
+    await handleRemain(tags, requiredKeys);
     console.log("Upload: All Done! ✅");
     reset();
     setIsUploading(false);
   };
 
-  const tagsSanityCheck = (tags: Record<string, string[]> | Error): boolean => {
-    const requiredKeys = ["brands", "artists", "images", "items"];
+  const tagsSanityCheck = async (
+    tags: Record<string, string[]>,
+    requiredKeys: string[]
+  ): Promise<boolean> => {
+    var isGood = true;
+    // 1. Check whether required keys are in tags
     const missingKeys = requiredKeys.filter((key) => !tags.hasOwnProperty(key));
-    return missingKeys.length === 0;
+    if (missingKeys.length > 0) {
+      isGood = false;
+    }
+    // 2. Check for duplicate in db
+    const imageDocExists = await FirebaseHelper.docExists(
+      "images",
+      tags["images"][0]
+    );
+    if (imageDocExists) {
+      // If image is already exist, then it is not good
+      isGood = false;
+    }
+    const brandDocExists = tags["brands"].map(
+      async (b) => await FirebaseHelper.docExists("brands", b)
+    );
+    if (brandDocExists.some((b) => !b)) {
+      isGood = false;
+    }
+    const artistDocExists = tags["artists"].map(
+      async (a) => await FirebaseHelper.docExists("artists", a)
+    );
+    if (artistDocExists.some((a) => !a)) {
+      isGood = false;
+    }
+
+    return isGood;
   };
 
   const uploadSanityCheck = (): boolean => {
-    if (
-      !uploadImageState?.imageName ||
-      !uploadImageState?.imageFile ||
-      !uploadImageState?.artistName ||
-      !uploadImageState?.description ||
-      !uploadImageState?.hoverItems ||
-      !uploadImageState?.selectedImageUrl ||
-      !uploadImageState?.imageFileName
-    ) {
+    if (!uploadImageState) {
       return false;
     }
-    return true;
+
+    const hasRequiredFields = !!(
+      uploadImageState.imageName &&
+      uploadImageState.imageFile &&
+      uploadImageState.description &&
+      uploadImageState.hoverItems &&
+      uploadImageState.selectedImageUrl &&
+      uploadImageState.imageFileName
+    );
+
+    if (!hasRequiredFields) {
+      return false;
+    }
+
+    const hasValidHoverItems = uploadImageState.hoverItems!.every((item) => {
+      return (
+        item.artistName &&
+        item.brandName &&
+        item.hoverItemFile &&
+        item.info &&
+        item.info.name.length > 0 &&
+        item.info.price &&
+        item.info.price[0].length > 0 &&
+        item.info.price[1].length > 0 &&
+        item.info.category.length > 0
+      );
+    });
+
+    return hasValidHoverItems;
   };
 
   const prepareTags = async (
     file: File,
-    hoverItems: HoverItemInfo[],
-    artistName: string
+    hoverItems: HoverItemInfo[]
   ): Promise<Record<string, string[]> | Error> => {
     const tags: Record<string, string[]> = {};
+    const artistNames: string[] = [];
     for (let index = 0; index < hoverItems.length; index++) {
+      // Which item
       const hoverItemInfo = hoverItems[index];
+      // Item Doc Id = Hash(item_name)
       const item_doc_id = sha256(hoverItemInfo.info.name);
+      if (!artistNames.includes(hoverItemInfo.artistName!)) {
+        artistNames.push(hoverItemInfo.artistName!);
+      }
+      // Artist Doc Id = Hash(artist_name)
+      const artist_doc_id = sha256(hoverItemInfo.artistName!);
       if (!hoverItemInfo.brandName) {
         throw new Error("Invalid data!");
       }
+      // Create brand doc ids related to this item
       const brand_doc_ids = hoverItemInfo.brandName.map((b) => sha256(b));
-      // { "items" => [] }
+      // Item Doc Ids = { "items" => [] }
       tags["items"] = [...(tags["items"] || []), item_doc_id];
-      // { "brands" => [] }
+      // Brand Doc Ids = { "brands" => [] }
       tags["brands"] = [...(tags["brands"] || []), ...brand_doc_ids];
-      // { item_doc_id => brands}
+      // { item_doc_id => brands }
+      // Brands that related to this item
       tags[item_doc_id] = brand_doc_ids;
+      // { artist_doc_id+"items" => [] }
+      // Items that related to this artist
+      tags[artist_doc_id + "items"] = [
+        ...(tags[artist_doc_id + "items"] || []),
+        item_doc_id,
+      ];
+      // What it does:
+      // { artist_doc_id+"brands" => [] }
+      // { brand_doc_id+"items" => [] }
+      // { brand_doc_id+"artists" => [] }
+      brand_doc_ids.forEach((b) => {
+        // Brand that related to artist
+        tags[artist_doc_id + "brands"] = [
+          ...(tags[artist_doc_id + "brands"] || []),
+          b,
+        ];
+        // Item that related to brand
+        tags[b + "items"] = [...(tags[b + "items"] || []), item_doc_id];
+        // Artist that related to brand
+        tags[b + "artists"] = [...(tags[b + "artists"] || []), artist_doc_id];
+      });
     }
     const image_doc_id = sha256(await file.arrayBuffer());
     tags["images"] = [image_doc_id];
-    const artist_doc_id = create_doc_id(artistName);
-    tags["artists"] = [artist_doc_id];
+    const artist_doc_id = artistNames.map((name) => create_doc_id(name));
+    tags["artists"] = artist_doc_id;
+
     return tags;
   };
 
-  const handleHoverItemTags = (
+  const handleItemInfo = async (
+    docExists: boolean,
+    itemDocId: string,
+    requiredKeys: string[],
     tags: Record<string, string[]>,
     hoverItem: HoverItemInfo
-  ) => {
-    // TODO: Save tags to db
+  ): Promise<ItemInfo> => {
+    var itemInfo: ItemInfo;
     const item_doc_id = sha256(hoverItem.info.name);
     const brand_doc_ids = tags[item_doc_id];
     hoverItem.info.tags = {
@@ -160,6 +275,31 @@ function UploadImageSection({ brands }: { brands: string[] | null }) {
       brands: brand_doc_ids,
       artists: tags["artists"],
     };
+    if (docExists) {
+      // Get existed document
+      const existedItem = await FirebaseHelper.doc("items", itemDocId);
+      itemInfo = existedItem.data() as ItemInfo;
+      // Update tags
+      requiredKeys.forEach((key) => {
+        if (itemInfo.tags) {
+          // If tags already exists, concat new tags with old tags
+          var newTags = itemInfo.tags[key] ?? [];
+          newTags.concat(tags[key]);
+          itemInfo.tags[key] = newTags;
+        } else {
+          // There's no tags info
+          itemInfo.tags = {
+            [key]: tags[key],
+          };
+        }
+      });
+    } else {
+      // No document for given 'itemDocId'
+      // Create new document
+      itemInfo = hoverItem.info;
+    }
+
+    return itemInfo;
   };
 
   const handleImageTags = (
@@ -190,10 +330,17 @@ function UploadImageSection({ brands }: { brands: string[] | null }) {
     const updatedHoverItems = uploadImageState?.hoverItems?.filter(
       (_, itemIndex) => itemIndex !== index
     );
-    setUploadImageState((prev) => ({
-      ...prev,
-      hoverItems: updatedHoverItems,
-    }));
+    if (updatedHoverItems?.length === 0) {
+      setUploadImageState((prev) => ({
+        ...prev,
+        hoverItems: undefined,
+      }));
+    } else {
+      setUploadImageState((prev) => ({
+        ...prev,
+        hoverItems: updatedHoverItems,
+      }));
+    }
     setSelectedPointIndex(null);
   };
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -204,7 +351,6 @@ function UploadImageSection({ brands }: { brands: string[] | null }) {
         ...prevState,
         selectedImageUrl: fileURL,
         imageFile: file,
-        hoverItems: [],
       }));
     }
   };
@@ -222,7 +368,7 @@ function UploadImageSection({ brands }: { brands: string[] | null }) {
     setUploadImageState((prevState) => ({
       ...prevState,
       hoverItems: [
-        ...(prevState?.hoverItems || []),
+        ...(prevState?.hoverItems ?? []),
         {
           pos: { top: topPercent, left: leftPercent },
           info: {
@@ -266,13 +412,17 @@ function UploadImageSection({ brands }: { brands: string[] | null }) {
         }
       } else {
         if (field) {
+          // Reamining fields
           updatedHoverItems[index].info[field] = value as string;
         } else {
           if (value instanceof File) {
             updatedHoverItems[index].hoverItemFile = value;
-          } else {
+          } else if (value instanceof Array) {
             // Brands
             updatedHoverItems[index].brandName = value as string[];
+          } else {
+            // Artist
+            updatedHoverItems[index].artistName = value as string;
           }
         }
       }
@@ -281,26 +431,84 @@ function UploadImageSection({ brands }: { brands: string[] | null }) {
     });
   };
 
-  const handleRemain = async (tags: Record<string, string[]>) => {
-    const db = FirebaseHelper.db();
-    const brands = tags["brands"];
-    brands.map(async (b) => {
-      await FirebaseHelper.updateDoc("brands", b, {
-        tags: {
-          images: tags["images"],
-          artists: tags["artists"],
-          items: tags["items"],
-        },
+  const handleRemain = async (
+    tags: Record<string, string[]>,
+    requiredKeys: string[]
+  ) => {
+    tags["brands"].forEach(async (b) => {
+      // Get existed brand document
+      // We can assume that brand document exists because we already checked it in `tagsSanityCheck` function
+      var brandInfo = (
+        await FirebaseHelper.doc("brands", b)
+      ).data() as BrandInfo;
+      requiredKeys.forEach((key) => {
+        // Skip for "brands"
+        if (key === "brands") return;
+        var custom_key: string;
+        if (key === "images") {
+          // Key = "images"
+          custom_key = key;
+        } else {
+          // e.g Key = "brand_doc_id" + "items"
+          // e.g Key = "brand_doc_id" + "artists"
+          custom_key = b + key;
+        }
+        console.log(custom_key);
+        if (brandInfo.tags) {
+          console.log("Brands: tags already exists");
+          // If tags already exists, concat new tags with old tags
+          var newTags = brandInfo.tags[key] ?? [];
+          console.log("Before update", newTags);
+          newTags = newTags.concat(tags[custom_key]);
+          console.log("After update", newTags);
+          brandInfo.tags[key] = newTags;
+        } else {
+          console.log("Brands: tags not exists");
+          // There's no tags info
+          brandInfo.tags = {
+            [key]: tags[custom_key],
+          };
+        }
       });
+      console.log("brandInfo", brandInfo);
+      await FirebaseHelper.setDoc("brands", b, brandInfo);
     });
-    // There will be only one artist
-    const artistDocId = tags["artists"][0];
-    await FirebaseHelper.updateDoc("artists", artistDocId, {
-      tags: {
-        images: tags["images"],
-        brands: tags["brands"],
-        items: tags["items"],
-      },
+    tags["artists"].forEach(async (a) => {
+      // We can assume artist exists on db
+      const artistInfo = (
+        await FirebaseHelper.doc("artists", a)
+      ).data() as ArtistInfo;
+      requiredKeys.forEach((key) => {
+        // Handled only "items", "brands", "images" tags. Skip for "artists"
+        if (key === "artists") return;
+        var custom_key: string;
+        if (key === "images") {
+          // "images"
+          custom_key = key;
+        } else {
+          // e.g  "artist_doc_id" + "items"
+          // e.g "artist_doc_id" + "brands"
+          custom_key = a + key;
+        }
+        if (artistInfo.tags) {
+          console.log("Artists: tags already exists");
+          // 1. Get existed tags
+          var newTags = artistInfo.tags[key] ?? [];
+          // 2. Concat with new tags with given custom_key
+          newTags = newTags.concat(tags[custom_key]);
+          // 3. Update tags info
+          artistInfo.tags[key] = newTags;
+        } else {
+          console.log("Artists: tags not exists");
+          // No tag info in document
+          //
+          artistInfo.tags = {
+            [key]: tags[custom_key],
+          };
+        }
+      });
+      console.log("artistInfo", artistInfo);
+      await FirebaseHelper.setDoc("artists", a, artistInfo);
     });
   };
 
@@ -351,19 +559,23 @@ function UploadImageSection({ brands }: { brands: string[] | null }) {
   };
 
   const handleUploadHoverItem = async (
-    tags: Record<string, string[]>
+    tags: Record<string, string[]>,
+    requiredKeys: string[]
   ): Promise<TaggedItem[] | Error> => {
     var taggedItems: TaggedItem[] = [];
     const hoverItems = uploadImageState?.hoverItems!;
     for (let index = 0; index < hoverItems.length; index++) {
+      const itemDocId = tags["items"][index];
+      console.log("Set document for ", itemDocId);
+      const docExists = await FirebaseHelper.docExists("items", itemDocId);
       const hoverFile = hoverItems[index].hoverItemFile;
       var hoverItem = hoverItems[index];
       // Handle image such as converting to webp and uploading to db
       const storage_file_name = hoverItem.info.name
         .replace(/\s+/g, "_")
         .toLowerCase();
-      let downloadUrl = "";
       if (
+        !docExists &&
         hoverFile &&
         (hoverFile.type.includes("jpeg") ||
           hoverFile.type.includes("png") ||
@@ -380,7 +592,8 @@ function UploadImageSection({ brands }: { brands: string[] | null }) {
             "items/" + storage_file_name,
             itemImage
           );
-          downloadUrl = await FirebaseHelper.downloadUrl(uploadRes.ref);
+          const downloadUrl = await FirebaseHelper.downloadUrl(uploadRes.ref);
+          hoverItem.info.imageUrl = downloadUrl;
         } catch (error) {
           console.error("Error saving item image:", error, hoverItem);
           alert("Error saving item image!");
@@ -393,14 +606,17 @@ function UploadImageSection({ brands }: { brands: string[] | null }) {
         setIsUploading(false);
         return new Error("Image file format is not valid!");
       }
-      hoverItem.info.imageUrl = downloadUrl;
-      // Handle hoverItem tags
-      handleHoverItemTags(tags, hoverItem);
-      const doc_id = create_doc_id(storage_file_name);
-      console.log("Set document for ", doc_id);
-      await FirebaseHelper.setDoc("items", doc_id, hoverItem.info);
+      // Update itemInfo based on whether document exists or not
+      const itemInfo = await handleItemInfo(
+        docExists,
+        itemDocId,
+        requiredKeys,
+        tags,
+        hoverItem
+      );
+      await FirebaseHelper.setDoc("items", itemDocId, itemInfo);
       console.log("Done!");
-      taggedItems.push({ id: doc_id, pos: hoverItem.pos });
+      taggedItems.push({ id: itemDocId, pos: hoverItem.pos });
     }
     return taggedItems;
   };
@@ -481,6 +697,52 @@ function UploadImageSection({ brands }: { brands: string[] | null }) {
               >
                 {expandedSections[index] && (
                   <div>
+                    <p className={`${main_font.className} text-md font-bold`}>
+                      Artist
+                    </p>
+                    <div className="flex justify-center mt-2">
+                      <select
+                        multiple={false}
+                        className="input input-bordered w-full mb-2 dark:bg-white"
+                        value={item.artistName}
+                        onChange={(e) => {
+                          handleHoverItemInfo(
+                            index,
+                            undefined,
+                            false,
+                            e.target.value
+                          );
+                        }}
+                      >
+                        {artists?.map((artist, index) => (
+                          <option key={index} value={artist}>
+                            {artist
+                              .split("_")
+                              .map(
+                                (word) =>
+                                  word.charAt(0).toUpperCase() + word.slice(1)
+                              )
+                              .join(" ")}
+                          </option>
+                        ))}
+                      </select>
+                      <button
+                        className={`btn btn-primary ${main_font.className} ml-2 text-black`}
+                        onClick={() =>
+                          (
+                            document.getElementById(
+                              "my_modal_1"
+                            ) as HTMLDialogElement
+                          )?.showModal()
+                        }
+                      >
+                        Add Artist
+                      </button>
+                      <ArtistModal setIsDataAdded={setIsDataAdded} />
+                    </div>
+                    <p className={`${main_font.className} text-md font-bold`}>
+                      Item Detail
+                    </p>
                     <input
                       type="text"
                       placeholder="Name"
@@ -592,7 +854,10 @@ function UploadImageSection({ brands }: { brands: string[] | null }) {
                       >
                         {filteredBrands?.map((brand, index) => (
                           <option key={index} value={brand}>
-                            {brand}
+                            {brand
+                              .split("_")
+                              .map((word) => word.toUpperCase())
+                              .join(" ")}
                           </option>
                         ))}
                       </select>
@@ -610,7 +875,7 @@ function UploadImageSection({ brands }: { brands: string[] | null }) {
                           >
                             Add New Brand
                           </button>
-                          <Modal />
+                          <BrandModal setIsDataAdded={setIsDataAdded} />
                         </>
                       )}
                     </div>
@@ -655,18 +920,6 @@ function UploadImageSection({ brands }: { brands: string[] | null }) {
               setUploadImageState({
                 ...uploadImageState,
                 imageName: e.target.value,
-              })
-            }
-            className="input input-bordered w-full mb-2 dark:bg-white"
-          />
-          <input
-            type="text"
-            placeholder="Artist Name(e.g rose)"
-            value={uploadImageState?.artistName ?? ""}
-            onChange={(e) =>
-              setUploadImageState({
-                ...uploadImageState,
-                artistName: e.target.value,
               })
             }
             className="input input-bordered w-full mb-2 dark:bg-white"
@@ -747,13 +1000,13 @@ interface UploadImageState {
   imageFile?: File;
   imageFileName?: string;
   imageName?: string;
-  artistName?: string;
   description?: string;
 }
 
 interface HoverItemInfo {
   pos: Position;
   info: ItemInfo;
+  artistName?: string;
   brandName?: string[];
   hoverItemFile?: File;
 }

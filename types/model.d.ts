@@ -37,6 +37,7 @@ export interface ImageInfo {
 /**
  * The ArtistInfo interface defines the structure for artist information.
  * @param name The name of the artist.
+ * @param category The category of the artist.
  * @param also_known_as Optional array of other names the artist is known by.
  * @param group Optional group the artist belongs to.
  * @param sns Optional record of social media links, with string keys and values.
@@ -48,6 +49,10 @@ export interface ArtistInfo {
    * @example "Jennie"
    */
   name: string;
+  /**
+   * @example "photographer"
+   */
+  category: string[];
   /**
    * @example ["Jenni, "JenDeuk", "제니"]
    */
@@ -185,7 +190,7 @@ export interface BrandInfo {
   websiteUrl?: string;
   logoImageUrl?: string;
   sns?: Record<string, string>;
-  tags?: Record<string, string>;
+  tags?: Record<string, string[]>;
 }
 
 export interface MainImageInfo {
