@@ -284,7 +284,7 @@ function UploadImageSection({
         if (itemInfo.tags) {
           // If tags already exists, concat new tags with old tags
           var newTags = itemInfo.tags[key] ?? [];
-          newTags.concat(tags[key]);
+          newTags = Array.from(new Set(newTags.concat(tags[key])));
           itemInfo.tags[key] = newTags;
         } else {
           // There's no tags info
@@ -431,6 +431,7 @@ function UploadImageSection({
     });
   };
 
+  // TODO: Duplicate doc ids
   const handleRemain = async (
     tags: Record<string, string[]>,
     requiredKeys: string[]
@@ -453,24 +454,18 @@ function UploadImageSection({
           // e.g Key = "brand_doc_id" + "artists"
           custom_key = b + key;
         }
-        console.log(custom_key);
         if (brandInfo.tags) {
-          console.log("Brands: tags already exists");
           // If tags already exists, concat new tags with old tags
           var newTags = brandInfo.tags[key] ?? [];
-          console.log("Before update", newTags);
-          newTags = newTags.concat(tags[custom_key]);
-          console.log("After update", newTags);
+          newTags = Array.from(new Set(newTags.concat(tags[custom_key])));
           brandInfo.tags[key] = newTags;
         } else {
-          console.log("Brands: tags not exists");
           // There's no tags info
           brandInfo.tags = {
             [key]: tags[custom_key],
           };
         }
       });
-      console.log("brandInfo", brandInfo);
       await FirebaseHelper.setDoc("brands", b, brandInfo);
     });
     tags["artists"].forEach(async (a) => {
@@ -491,15 +486,13 @@ function UploadImageSection({
           custom_key = a + key;
         }
         if (artistInfo.tags) {
-          console.log("Artists: tags already exists");
           // 1. Get existed tags
           var newTags = artistInfo.tags[key] ?? [];
           // 2. Concat with new tags with given custom_key
-          newTags = newTags.concat(tags[custom_key]);
+          newTags = Array.from(new Set(newTags.concat(tags[custom_key])));
           // 3. Update tags info
           artistInfo.tags[key] = newTags;
         } else {
-          console.log("Artists: tags not exists");
           // No tag info in document
           //
           artistInfo.tags = {
@@ -507,7 +500,6 @@ function UploadImageSection({
           };
         }
       });
-      console.log("artistInfo", artistInfo);
       await FirebaseHelper.setDoc("artists", a, artistInfo);
     });
   };
@@ -575,7 +567,6 @@ function UploadImageSection({
         .replace(/\s+/g, "_")
         .toLowerCase();
       if (
-        !docExists &&
         hoverFile &&
         (hoverFile.type.includes("jpeg") ||
           hoverFile.type.includes("png") ||
@@ -583,17 +574,19 @@ function UploadImageSection({
           hoverFile.type.includes("avif"))
       ) {
         try {
-          console.log("Trying to convert to webp...");
-          const itemImage = await ConvertImageAndCompress(hoverFile, 1, 1280);
-          console.log("Convert & Compress done!");
-          console.log("Creating storage ref items/", storage_file_name);
-          // TODO: Duplicate check
-          const uploadRes = await FirebaseHelper.uploadDataToStorage(
-            "items/" + storage_file_name,
-            itemImage
-          );
-          const downloadUrl = await FirebaseHelper.downloadUrl(uploadRes.ref);
-          hoverItem.info.imageUrl = downloadUrl;
+          if (!docExists) {
+            console.log("Trying to convert to webp...");
+            const itemImage = await ConvertImageAndCompress(hoverFile, 1, 1280);
+            console.log("Convert & Compress done!");
+            console.log("Creating storage ref items/", storage_file_name);
+            // TODO: Duplicate check
+            const uploadRes = await FirebaseHelper.uploadDataToStorage(
+              "items/" + storage_file_name,
+              itemImage
+            );
+            const downloadUrl = await FirebaseHelper.downloadUrl(uploadRes.ref);
+            hoverItem.info.imageUrl = downloadUrl;
+          }
         } catch (error) {
           console.error("Error saving item image:", error, hoverItem);
           alert("Error saving item image!");
