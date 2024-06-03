@@ -45,7 +45,7 @@ export const BrandModal = ({
     const imageFile = await ConvertImageAndCompress(logoImage, 1, 1280);
 
     const imageName = brandName + "_logo";
-    const path = "images/" + imageName;
+    const path = "logos/" + imageName;
     // Upload image to storage
     const res = await FirebaseHelper.uploadDataToStorage(path, imageFile);
     const url = await getDownloadURL(res.ref);
@@ -309,6 +309,9 @@ enum ArtistCategory {
   Musician = "musician",
   Actor = "actor",
   Artist = "artist",
+  KPop = "kpop",
+  Rapper = "rapper",
+  Producer = "producer",
 }
 
 enum BrandCategory {

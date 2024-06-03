@@ -198,7 +198,7 @@ export interface MainImageInfo {
   title?: string;
   tags?: string[];
   description?: string;
-  itemInfoList?: ItemInfo[];
+  itemInfoList?: [ItemInfo?, BrandInfo[]?][];
 }
 
 /**

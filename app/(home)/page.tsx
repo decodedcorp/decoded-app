@@ -7,6 +7,7 @@ import { main_font, secondary_font } from "@/components/helpers/util";
 import {
   ArticleInfo,
   ImageInfo,
+  BrandInfo,
   ItemInfo,
   MainImageInfo,
   TaggedItem,
@@ -71,7 +72,7 @@ function MainView() {
             const imageDoc = await FirebaseHelper.doc("images", imageDocId);
             if (imageDoc.exists()) {
               const imageInfo = imageDoc.data() as ImageInfo;
-              let itemInfoList: ItemInfo[] = [];
+              var itemInfoList: [ItemInfo?, BrandInfo[]?][] = [];
               imageInfo.taggedItem?.map(async (item) => {
                 const taggedItem = item as TaggedItem;
                 const itemDoc = await FirebaseHelper.doc(
@@ -80,7 +81,18 @@ function MainView() {
                 );
                 if (itemDoc.exists()) {
                   const itemInfo = itemDoc.data() as ItemInfo;
-                  itemInfoList.push(itemInfo);
+                  var brandInfo: BrandInfo[] = [];
+                  const brandTags = itemInfo.tags?.["brands"];
+                  if (brandTags) {
+                    brandTags.map(async (b) => {
+                      const doc = await FirebaseHelper.doc("brands", b);
+                      if (doc.exists()) {
+                        const data = doc.data() as BrandInfo;
+                        brandInfo.push(data);
+                      }
+                    });
+                  }
+                  itemInfoList.push([itemInfo, brandInfo]);
                 }
               });
               mainImageInfoList.push({
@@ -198,36 +210,54 @@ function ItemDetailView({
         </h3>
       )} */}
       <div className="grid grid-cols-1 md:grid-cols-2 rounded-md p-2">
-        {mainImageInfoList[currentIndex]?.itemInfoList?.map((item, index) => {
-          return (
-            <div key={index} className="flex flex-row items-center">
-              <Image
-                src={item.imageUrl ?? ""}
-                alt={item.name}
-                width={100}
-                height={100}
-                className="rounded-lg shadow-lg"
-              />
-              <div key={index} className="flex flex-col p-2 m-5 w-full">
-                <div className={`${secondary_font.className} text-xl`}>
-                  {item.name}
+        {mainImageInfoList[currentIndex]?.itemInfoList?.map(
+          ([item, brands], index) => {
+            return (
+              <div key={index} className="flex flex-row items-center">
+                <Image
+                  src={item?.imageUrl ?? ""}
+                  alt={item?.name ?? ""}
+                  width={100}
+                  height={100}
+                  className="rounded-lg shadow-lg"
+                />
+                <div key={index} className="flex flex-col p-2 m-5 w-full">
+                  {/* TODO: Consider real-time price */}
+                  <div className={`flex ${secondary_font.className} text-xs`}>
+                    {brands && brands.length > 0 && (
+                      <div
+                        key={brands[0].name}
+                        className="flex items-center space-x-2"
+                      >
+                        <Image
+                          src={brands[0].logoImageUrl ?? ""}
+                          alt={brands[0].name}
+                          className="rounded-full w-6 h-6 border border-black-opacity-50"
+                          width={100}
+                          height={100}
+                        />
+                        <div className="rounded-lg p-1 text-md">
+                          {brands[0].name.replace(/_/g, " ").toUpperCase()}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className={`${main_font.className} text-sm`}>
+                    {item?.name.toUpperCase() ?? ""}
+                  </div>
+                  <button
+                    className={`${main_font.className} mt-2 bg-[#FF204E] hover:bg-black text-white font-bold py-2 px-4 rounded w-full`}
+                    onClick={() =>
+                      (window.location.href = item?.affiliateUrl ?? "#")
+                    }
+                  >
+                    구매하기
+                  </button>
                 </div>
-                {/* TODO: Consider real-time price */}
-                {/* <div className={`${secondary_font.className} text-xl`}>
-                  {item.price?.[0]} {item.price?.[1] ?? ""}
-                </div> */}
-                <button
-                  className={`${main_font.className} mt-2 bg-[#FF204E] hover:bg-black text-white font-bold py-2 px-4 rounded w-full`}
-                  onClick={() =>
-                    (window.location.href = item.affiliateUrl ?? "#")
-                  }
-                >
-                  구매하기
-                </button>
               </div>
-            </div>
-          );
-        })}
+            );
+          }
+        )}
       </div>
     </div>
   );

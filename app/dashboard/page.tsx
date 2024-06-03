@@ -522,7 +522,7 @@ function UploadImageSection({
         1,
         1280
       );
-      const path = "images/" + uploadImageState?.imageName!;
+      const path = "images/" + uploadImageState?.imageFileName!;
       const image_doc_id = tags["images"][0];
       // Upload image to storage
       await FirebaseHelper.uploadDataToStorage(path, imageFile, {
