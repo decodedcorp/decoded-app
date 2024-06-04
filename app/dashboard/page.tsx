@@ -107,7 +107,7 @@ function UploadImageSection({
       return false;
     }
     const requiredKeys = ["brands", "artists", "images", "items"];
-    if (!tagsSanityCheck(tags, requiredKeys)) {
+    if (!(await tagsSanityCheck(tags, requiredKeys))) {
       alert("Invalid tags!");
       setIsUploading(false);
       return;
@@ -136,11 +136,10 @@ function UploadImageSection({
     tags: Record<string, string[]>,
     requiredKeys: string[]
   ): Promise<boolean> => {
-    var isGood = true;
     // 1. Check whether required keys are in tags
     const missingKeys = requiredKeys.filter((key) => !tags.hasOwnProperty(key));
     if (missingKeys.length > 0) {
-      isGood = false;
+      return false;
     }
     // 2. Check for duplicate in db
     const imageDocExists = await FirebaseHelper.docExists(
@@ -149,22 +148,22 @@ function UploadImageSection({
     );
     if (imageDocExists) {
       // If image is already exist, then it is not good
-      isGood = false;
+      return false;
     }
     const brandDocExists = tags["brands"].map(
       async (b) => await FirebaseHelper.docExists("brands", b)
     );
     if (brandDocExists.some((b) => !b)) {
-      isGood = false;
+      return false;
     }
     const artistDocExists = tags["artists"].map(
       async (a) => await FirebaseHelper.docExists("artists", a)
     );
     if (artistDocExists.some((a) => !a)) {
-      isGood = false;
+      return false;
     }
 
-    return isGood;
+    return true;
   };
 
   const uploadSanityCheck = (): boolean => {
