@@ -199,6 +199,7 @@ export interface MainImageInfo {
   tags?: string[];
   description?: string;
   itemInfoList?: [ItemInfo?, BrandInfo[]?][];
+  artistInfoList?: ArtistInfo[];
 }
 
 /**

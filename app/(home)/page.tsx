@@ -8,6 +8,7 @@ import {
   ArticleInfo,
   ImageInfo,
   BrandInfo,
+  ArtistInfo,
   ItemInfo,
   MainImageInfo,
   TaggedItem,
@@ -53,7 +54,7 @@ function MainView() {
   useEffect(() => {
     const fetchAllImages = async () => {
       const urlAndId: UrlAndId[] = [];
-      let mainImageInfoList: MainImageInfo[] = [];
+      var mainImageInfoList: MainImageInfo[] = [];
       try {
         const storageItems = await FirebaseHelper.listAllStorageItems("images");
         // Up to 10 items will be processed
@@ -73,6 +74,17 @@ function MainView() {
             if (imageDoc.exists()) {
               const imageInfo = imageDoc.data() as ImageInfo;
               var itemInfoList: [ItemInfo?, BrandInfo[]?][] = [];
+              var artistInfo: ArtistInfo[] = [];
+              var artistsTags = imageInfo.tags?.["artists"];
+              if (artistsTags) {
+                artistsTags.map(async (artist) => {
+                  const artistDoc = await FirebaseHelper.doc("artists", artist);
+                  if (artistDoc.exists()) {
+                    const artist = artistDoc.data() as ArtistInfo;
+                    artistInfo.push(artist);
+                  }
+                });
+              }
               imageInfo.taggedItem?.map(async (item) => {
                 const taggedItem = item as TaggedItem;
                 const itemDoc = await FirebaseHelper.doc(
@@ -98,6 +110,7 @@ function MainView() {
               mainImageInfoList.push({
                 title: imageInfo.title,
                 itemInfoList: itemInfoList,
+                artistInfoList: artistInfo,
                 description: imageInfo.description,
                 hyped: imageInfo.hyped,
               });
@@ -113,6 +126,7 @@ function MainView() {
           console.log(error.message);
         }
       } finally {
+        console.log("mainImageInfoList", mainImageInfoList);
         setUrlAndId(urlAndId);
         setMainImageInfoList(mainImageInfoList);
       }
@@ -203,15 +217,23 @@ function ItemDetailView({
 }) {
   return (
     <div className="p-2 m-2 justify-start w-full">
-      {/* {mainImageInfoList[currentIndex] && (
-        <h3 className={`${main_font.className} text-3xl pt-2 pb-2`}>
-          {mainImageInfoList[currentIndex].artistName.toUpperCase()}&apos;s
-          Items
-        </h3>
-      )} */}
+      <div className={`flex flex-row ${main_font.className} text-2xl`}>
+        {mainImageInfoList[currentIndex]?.artistInfoList?.map(
+          (artist, index, array) => {
+            return (
+              <div key={index} className="bg-gray-500 w-full">
+                {artist.name.toUpperCase()}&apos;s
+                {index < array.length - 1 && " &"}
+              </div>
+            );
+          }
+        )}
+        {mainImageInfoList.length > 0 && <p className="mx-2">Items</p>}
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 rounded-md p-2">
-        {mainImageInfoList[currentIndex]?.itemInfoList?.map(
-          ([item, brands], index) => {
+        {mainImageInfoList[currentIndex]?.itemInfoList
+          ?.slice(0, 4)
+          .map(([item, brands], index) => {
             return (
               <div key={index} className="flex flex-row items-center">
                 <Image
@@ -246,7 +268,7 @@ function ItemDetailView({
                     {item?.name.toUpperCase() ?? ""}
                   </div>
                   <button
-                    className={`${main_font.className} mt-2 bg-[#FF204E] hover:bg-black text-white font-bold py-2 px-4 rounded w-full`}
+                    className={`${main_font.className} mt-5 bg-[#FF204E] hover:bg-black text-white font-bold rounded w-full h-8 text-sm`}
                     onClick={() =>
                       (window.location.href = item?.affiliateUrl ?? "#")
                     }
@@ -256,8 +278,7 @@ function ItemDetailView({
                 </div>
               </div>
             );
-          }
-        )}
+          })}
       </div>
     </div>
   );
