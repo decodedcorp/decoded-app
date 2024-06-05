@@ -58,7 +58,7 @@ function MainView() {
       try {
         const storageItems = await FirebaseHelper.listAllStorageItems("images");
         // Up to 10 items will be processed
-        const imageStorage = storageItems.items.slice(0, 10);
+        const imageStorage = storageItems.items.slice(0, 20);
         imageStorage.forEach(async (image) => {
           try {
             const [metadata, url] = await Promise.all([
@@ -151,6 +151,7 @@ function MainView() {
           <div className="hidden sm:block">
             <ItemDetailView
               mainImageInfoList={mainImageInfoList}
+              urlAndId={urlAndId}
               currentIndex={currentIndex}
             />
           </div>
@@ -165,6 +166,7 @@ function MainView() {
       <div className="sm:hidden">
         <ItemDetailView
           mainImageInfoList={mainImageInfoList}
+          urlAndId={urlAndId}
           currentIndex={currentIndex}
         />
       </div>
@@ -180,7 +182,7 @@ function ImageDescriptionView({
   currentIndex: number;
 }) {
   return mainImageInfoList.length !== 0 ? (
-    <div className="flex flex-col h-full p-2">
+    <div className="flex flex-col h-full pt-5 pl-2">
       <h1 className={`${main_font.className} text-3xl`}>
         {mainImageInfoList[currentIndex].title}
       </h1>
@@ -195,7 +197,7 @@ function ImageDescriptionView({
           </span>
         ))}
       </h2>
-      <h3 className={`${main_font.className} text-md pt-5 pb-5`}>
+      <h3 className={`${main_font.className} text-md pt-1 pb-5`}>
         {mainImageInfoList[currentIndex].description}
       </h3>
     </div>
@@ -210,29 +212,47 @@ function ImageDescriptionView({
 
 function ItemDetailView({
   mainImageInfoList,
+  urlAndId,
   currentIndex,
 }: {
   mainImageInfoList: MainImageInfo[];
+  urlAndId: UrlAndId[];
   currentIndex: number;
 }) {
+  if (urlAndId.length === 0) {
+    return <div></div>;
+  }
   return (
     <div className="p-2 m-2 justify-start w-full">
-      <div className={`flex flex-row ${main_font.className} text-2xl`}>
-        {mainImageInfoList[currentIndex]?.artistInfoList?.map(
-          (artist, index, array) => {
-            return (
-              <div key={index} className="bg-gray-500 w-full">
-                {artist.name.toUpperCase()}&apos;s
-                {index < array.length - 1 && " &"}
-              </div>
-            );
-          }
-        )}
-        {mainImageInfoList.length > 0 && <p className="mx-2">Items</p>}
+      <div
+        className={`flex flex-row ${main_font.className} text-2xl w-full justify-between`}
+      >
+        <div className="flex flex-row">
+          {mainImageInfoList[currentIndex]?.artistInfoList?.map(
+            (artist, index, array) => {
+              return (
+                <div key={index}>
+                  {artist.name.toUpperCase()}&apos;s
+                  {index < array.length - 1 && " &"}
+                </div>
+              );
+            }
+          )}
+          {mainImageInfoList.length > 0 && <p className="mx-2">ITEMS</p>}
+        </div>
+        <Link
+          href={`images/${
+            urlAndId[currentIndex].docId
+          }?imageUrl=${encodeURIComponent(urlAndId[currentIndex].url)}`}
+          prefetch={false}
+          className={`${main_font.className} text-xs bg-[#000000] text-white p-2 rounded-md mx-3`}
+        >
+          MORE
+        </Link>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 rounded-md p-2">
         {mainImageInfoList[currentIndex]?.itemInfoList
-          ?.slice(0, 4)
+          ?.slice(0, 2)
           .map(([item, brands], index) => {
             return (
               <div key={index} className="flex flex-row items-center">

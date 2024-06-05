@@ -7,7 +7,13 @@ import { FirebaseHelper } from "@/common/firebase";
 import { useSearchParams } from "next/navigation";
 import { notFound } from "next/navigation";
 
-import { ImageInfo, HoverItem } from "@/types/model";
+import {
+  ImageInfo,
+  ArtistInfo,
+  TaggedItem,
+  HoverItem,
+  ItemInfo,
+} from "@/types/model";
 interface PageProps {
   params: {
     imageId: string;
@@ -22,6 +28,7 @@ function Page({ params: { imageId } }: PageProps) {
     notFound();
   }
   let [imageDetail, setImageDetail] = useState<ImageInfo | null>(null);
+  let [artistItems, setArtistItems] = useState<ItemInfo[]>([]);
   let [tags, setTags] = useState<HoverItem[]>([]);
   let [hoverItem, setHoverItem] = useState<HoverItem | null>(null);
   let [isFetching, setIsFetching] = useState(false);
@@ -36,17 +43,37 @@ function Page({ params: { imageId } }: PageProps) {
 
   useEffect(() => {
     const fetchData = async () => {
-      const decoded = decodeURIComponent(imageId);
-      const imageDetail = (await FirebaseHelper.getImageDetail(
-        "images",
-        decoded
-      )) as ImageInfo;
-      if (imageDetail !== undefined) {
-        setImageDetail(imageDetail);
-        setTags(imageDetail.taggedItem as HoverItem[]);
+      const docId = decodeURIComponent(imageId);
+      const imageInfo = (
+        await FirebaseHelper.doc("images", docId)
+      ).data() as ImageInfo;
+      const artistTags = imageInfo.tags?.artists;
+      if (imageInfo !== undefined) {
+        setImageDetail(imageInfo);
+        setTags(imageInfo.taggedItem as HoverItem[]);
         setIsFetching(false);
       } else {
         setIsFetching(false);
+      }
+      if (artistTags) {
+        const artistInfoList = await Promise.all(
+          artistTags.map(async (artist) => {
+            const artistInfo = await FirebaseHelper.doc("artists", artist);
+            return artistInfo.data() as ArtistInfo;
+          })
+        );
+        artistInfoList.map(async (a) => {
+          const itemDocId = a.tags?.["items"];
+          if (itemDocId) {
+            const items = await Promise.all(
+              itemDocId.map(async (docId) => {
+                const item = await FirebaseHelper.doc("items", docId);
+                return item.data() as ItemInfo;
+              })
+            );
+            setArtistItems(items);
+          }
+        });
       }
     };
     setIsFetching(true);
@@ -80,10 +107,10 @@ function Page({ params: { imageId } }: PageProps) {
                     objectFit="cover"
                   />
                   {imageDetail &&
-                    tags.map((item) => (
+                    tags?.map((item) => (
                       <a
                         key={imageId}
-                        href={item.info.affiliateUrl}
+                        href={item.info?.affiliateUrl ?? ""}
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{
@@ -135,11 +162,26 @@ function Page({ params: { imageId } }: PageProps) {
       </div>
       <div className="my-4 w-full text-center">
         <h2
-          className={`text-lg text-blacktext-lg font-bold my-2 pt-3 ${main_font.className}`}
+          className={`text-7xl text-blacktext-lg font-bold my-2 p-5 ${main_font.className}`}
         >
-          More to explore
+          MORE TO EXPLORE
         </h2>
-        <div className="grid grid-cols-2 gap-4"></div>
+        <div className="grid grid-cols-6 gap-4">
+          {artistItems.map((item) => (
+            <div
+              key={item?.name}
+              className={`${main_font.className} flex flex-col text-black text-md items-center justify-center bg-red-500 rounded-lg`}
+            >
+              <Image
+                src={item?.imageUrl ?? ""}
+                alt={item?.name}
+                width={100}
+                height={100}
+              />
+              <p className="mt-2">{item?.name}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
