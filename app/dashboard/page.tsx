@@ -752,7 +752,8 @@ function UploadImageSection({
                     </p>
                     <CustomDropdown
                       items={items}
-                      hoverItemInfo={item}
+                      index={index}
+                      setUploadImageState={setUploadImageState}
                       setIsAdd={setIsAdd}
                     />
                     {isAdd && (
@@ -1014,11 +1015,13 @@ function RequestListSection() {
 
 function CustomDropdown({
   items,
-  hoverItemInfo,
+  index,
+  setUploadImageState,
   setIsAdd,
 }: {
   items: ItemInfo[] | null;
-  hoverItemInfo: HoverItemInfo;
+  index: number;
+  setUploadImageState: (setUploadImageState: UploadImageState) => void;
   setIsAdd: (isSelected: boolean) => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
