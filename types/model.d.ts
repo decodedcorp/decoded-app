@@ -219,3 +219,14 @@ export interface ArticleInfo {
   summary?: string;
   tags?: Record<string, string>;
 }
+
+/**
+ * Interface for uploading items
+ */
+interface HoverItemInfo {
+  pos: Position;
+  info: ItemInfo;
+  artistName?: string;
+  brandName?: string[];
+  hoverItemFile?: File;
+}

@@ -8,6 +8,7 @@ import {
   BrandInfo,
   ArtistInfo,
   Position,
+  HoverItemInfo,
 } from "@/types/model";
 import { FirebaseHelper } from "@/common/firebase";
 import {
@@ -19,7 +20,7 @@ import { ConvertImageAndCompress } from "@/components/helpers/util";
 import AdminLogin from "../admin/page";
 import { sha256 } from "js-sha256";
 
-import { ArtistModal, BrandModal } from "@/components/ui/modal";
+import { ArtistModal, BrandModal, ItemModal } from "@/components/ui/modal";
 
 function AdminDashboard() {
   const [isLogin, setIsLogin] = useState(false);
@@ -101,6 +102,7 @@ function UploadImageSection({
   const [expandedSections, setExpandedSections] = useState<{
     [key: number]: boolean;
   }>({});
+  const [isAdd, setIsAdd] = useState(false);
 
   const upload = async () => {
     setIsUploading(true);
@@ -732,7 +734,7 @@ function UploadImageSection({
                         ))}
                       </select>
                       <button
-                        className={`btn btn-primary ${main_font.className} ml-2 text-black`}
+                        className={`btn btn-primary ${main_font.className} ml-2 text-white`}
                         onClick={() =>
                           (
                             document.getElementById(
@@ -748,103 +750,111 @@ function UploadImageSection({
                     <p className={`${main_font.className} text-md font-bold`}>
                       Item Detail
                     </p>
-                    <CustomDropdown items={items} />
-                    <input
-                      type="text"
-                      placeholder="Name"
-                      value={item.info.name}
-                      onChange={(e) => {
-                        handleHoverItemInfo(
-                          index,
-                          "name",
-                          false,
-                          e.target.value
-                        );
-                      }}
-                      className="input input-bordered w-full mb-2 dark:bg-white"
+                    <CustomDropdown
+                      items={items}
+                      hoverItemInfo={item}
+                      setIsAdd={setIsAdd}
                     />
-                    <div className="flex">
-                      <input
-                        type="text"
-                        placeholder="Price"
-                        value={item.info.price?.[0]}
-                        onChange={(e) => {
-                          handleHoverItemInfo(
-                            index,
-                            "price",
-                            false,
-                            e.target.value
-                          );
-                        }}
-                        className="input input-bordered w-full mb-2 dark:bg-white"
-                      />
-                      <select
-                        value={item.info.price?.[1]}
-                        onChange={(e) => {
-                          handleHoverItemInfo(
-                            index,
-                            "price",
-                            true,
-                            e.target.value
-                          );
-                        }}
-                        className="input w-20 mb-2 dark:bg-white"
-                      >
-                        {Object.values(Currency).map((currency) => (
-                          <option key={currency} value={currency}>
-                            {currency}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <input
-                      type="text"
-                      placeholder="URL"
-                      value={item.info.affiliateUrl}
-                      onChange={(e) => {
-                        handleHoverItemInfo(
-                          index,
-                          "affiliateUrl",
-                          false,
-                          e.target.value
-                        );
-                      }}
-                      className="input input-bordered w-full mb-2 dark:bg-white"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Designer"
-                      value={item.info.designedBy}
-                      onChange={(e) => {
-                        handleHoverItemInfo(
-                          index,
-                          "designedBy",
-                          false,
-                          e.target.value
-                        );
-                      }}
-                      className="input input-bordered w-full mb-2 dark:bg-white"
-                    />
-                    <div className="flex">
-                      <select
-                        value={item.info.category}
-                        onChange={(e) => {
-                          handleHoverItemInfo(
-                            index,
-                            "category",
-                            false,
-                            e.target.value
-                          );
-                        }}
-                        className="input input-bordered w-full mb-2 dark:bg-white"
-                      >
-                        {Object.values(ItemCategory).map((category) => (
-                          <option key={category} value={category}>
-                            {category}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                    {isAdd && (
+                      <>
+                        <input
+                          type="text"
+                          placeholder="Name"
+                          value={item.info.name}
+                          onChange={(e) => {
+                            handleHoverItemInfo(
+                              index,
+                              "name",
+                              false,
+                              e.target.value
+                            );
+                          }}
+                          className="input input-bordered w-full mb-2 dark:bg-white"
+                        />
+                        <div className="flex">
+                          <input
+                            type="text"
+                            placeholder="Price"
+                            value={item.info.price?.[0]}
+                            onChange={(e) => {
+                              handleHoverItemInfo(
+                                index,
+                                "price",
+                                false,
+                                e.target.value
+                              );
+                            }}
+                            className="input input-bordered w-full mb-2 dark:bg-white"
+                          />
+                          <select
+                            value={item.info.price?.[1]}
+                            onChange={(e) => {
+                              handleHoverItemInfo(
+                                index,
+                                "price",
+                                true,
+                                e.target.value
+                              );
+                            }}
+                            className="input w-20 mb-2 dark:bg-white"
+                          >
+                            {Object.values(Currency).map((currency) => (
+                              <option key={currency} value={currency}>
+                                {currency}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <input
+                          type="text"
+                          placeholder="URL"
+                          value={item.info.affiliateUrl}
+                          onChange={(e) => {
+                            handleHoverItemInfo(
+                              index,
+                              "affiliateUrl",
+                              false,
+                              e.target.value
+                            );
+                          }}
+                          className="input input-bordered w-full mb-2 dark:bg-white"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Designer"
+                          value={item.info.designedBy}
+                          onChange={(e) => {
+                            handleHoverItemInfo(
+                              index,
+                              "designedBy",
+                              false,
+                              e.target.value
+                            );
+                          }}
+                          className="input input-bordered w-full mb-2 dark:bg-white"
+                        />
+                        <div className="flex">
+                          <select
+                            value={item.info.category}
+                            onChange={(e) => {
+                              handleHoverItemInfo(
+                                index,
+                                "category",
+                                false,
+                                e.target.value
+                              );
+                            }}
+                            className="input input-bordered w-full mb-2 dark:bg-white"
+                          >
+                            {Object.values(ItemCategory).map((category) => (
+                              <option key={category} value={category}>
+                                {category}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </>
+                    )}
                     <div>
                       <input
                         type="text"
@@ -1002,17 +1012,31 @@ function RequestListSection() {
   );
 }
 
-function CustomDropdown({ items }: { items: ItemInfo[] | null }) {
+function CustomDropdown({
+  items,
+  hoverItemInfo,
+  setIsAdd,
+}: {
+  items: ItemInfo[] | null;
+  hoverItemInfo: HoverItemInfo;
+  setIsAdd: (isSelected: boolean) => void;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState("");
-  const [showAddItem, setShowAddItem] = useState(true);
+  const [isSelect, setIsSelect] = useState(false);
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
   const handleSelect = (item: ItemInfo) => {
     setSelectedItem(item.name);
     setIsOpen(false);
-    setShowAddItem(false);
+    setIsSelect(true);
+  };
+
+  const clearSelection = () => {
+    setSelectedItem("");
+    setIsSelect(false);
+    setIsAdd(false);
   };
 
   return (
@@ -1037,22 +1061,27 @@ function CustomDropdown({ items }: { items: ItemInfo[] | null }) {
                 width={30}
                 height={30}
                 style={{ marginRight: "10px" }}
+                className="rounded-md"
               />
               {item.name}
             </li>
           ))}
         </ul>
       )}
-      {showAddItem && (
+      <div className="flex justify-between w-full">
         <button
-          className="btn btn-primary mb-2"
-          onClick={() => {
-            /* 로직을 추가하여 아이템 추가 처리 */
-          }}
+          className={`text-white btn btn-primary mb-2 mt-2 w-60 ${main_font.className}`}
+          onClick={() => setIsAdd(true)}
         >
-          Add Item
+          ADD ITEM
         </button>
-      )}
+        <button
+          className={`text-white btn btn-primary mb-2 mt-2 ml-2 ${main_font.className}`}
+          onClick={clearSelection}
+        >
+          CLEAR
+        </button>
+      </div>
     </div>
   );
 }
@@ -1063,14 +1092,6 @@ interface UploadImageState {
   imageFile?: File;
   imageName?: string;
   description?: string;
-}
-
-interface HoverItemInfo {
-  pos: Position;
-  info: ItemInfo;
-  artistName?: string;
-  brandName?: string[];
-  hoverItemFile?: File;
 }
 
 enum ItemCategory {
