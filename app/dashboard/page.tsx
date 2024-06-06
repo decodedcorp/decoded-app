@@ -26,6 +26,7 @@ function AdminDashboard() {
   const [isDataAdded, setIsDataAdded] = useState(false);
   const [brands, setBrands] = useState<string[] | null>(null);
   const [artists, setArtists] = useState<string[] | null>(null);
+  const [items, setItems] = useState<ItemInfo[] | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,10 +34,13 @@ function AdminDashboard() {
       console.log("Fetching brands and artists...");
       const artists: string[] = [];
       const brands: string[] = [];
+      const items: ItemInfo[] = [];
+
       Promise.all([
         FirebaseHelper.docs("brands"),
         FirebaseHelper.docs("artists"),
-      ]).then(([b, a]) => {
+        FirebaseHelper.docs("items"),
+      ]).then(([b, a, i]) => {
         b.forEach((doc) => {
           const brand = doc.data() as BrandInfo;
           brands.push(brand.name);
@@ -47,9 +51,15 @@ function AdminDashboard() {
           artists.push(artist.name);
           setArtists(artists);
         });
+        i.forEach((doc) => {
+          const item = doc.data() as ItemInfo;
+          items.push(item);
+          setItems(items);
+        });
         setIsDataAdded(false);
         console.log("Fetched brands: ", brands);
         console.log("Fetched artists: ", artists);
+        console.log("Fetched items: ", items);
       });
     };
     fetchData();
@@ -62,6 +72,7 @@ function AdminDashboard() {
       <UploadImageSection
         brands={brands}
         artists={artists}
+        items={items}
         setIsDataAdded={setIsDataAdded}
       />
       <RequestListSection />
@@ -72,10 +83,12 @@ function AdminDashboard() {
 function UploadImageSection({
   brands,
   artists,
+  items,
   setIsDataAdded,
 }: {
   brands: string[] | null;
   artists: string[] | null;
+  items: ItemInfo[] | null;
   setIsDataAdded: (isDataAdded: boolean) => void;
 }) {
   const [uploadImageState, setUploadImageState] =
@@ -176,8 +189,7 @@ function UploadImageSection({
       uploadImageState.imageFile &&
       uploadImageState.description &&
       uploadImageState.hoverItems &&
-      uploadImageState.selectedImageUrl &&
-      uploadImageState.imageFileName
+      uploadImageState.selectedImageUrl
     );
 
     if (!hasRequiredFields) {
@@ -521,7 +533,8 @@ function UploadImageSection({
         1,
         1280
       );
-      const path = "images/" + uploadImageState?.imageFileName!;
+      // path = "images/{image_doc_id}"
+      const path = "images/" + tags["images"][0];
       const image_doc_id = tags["images"][0];
       // Upload image to storage
       await FirebaseHelper.uploadDataToStorage(path, imageFile, {
@@ -735,6 +748,7 @@ function UploadImageSection({
                     <p className={`${main_font.className} text-md font-bold`}>
                       Item Detail
                     </p>
+                    <CustomDropdown items={items} />
                     <input
                       type="text"
                       placeholder="Name"
@@ -791,6 +805,20 @@ function UploadImageSection({
                         handleHoverItemInfo(
                           index,
                           "affiliateUrl",
+                          false,
+                          e.target.value
+                        );
+                      }}
+                      className="input input-bordered w-full mb-2 dark:bg-white"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Designer"
+                      value={item.info.designedBy}
+                      onChange={(e) => {
+                        handleHoverItemInfo(
+                          index,
+                          "designedBy",
                           false,
                           e.target.value
                         );
@@ -894,18 +922,6 @@ function UploadImageSection({
         <div className="p-4 border-t border-gray-200">
           <input
             type="text"
-            placeholder="File Name (e.g rose_in_nyc)"
-            value={uploadImageState?.imageFileName ?? ""}
-            onChange={(e) =>
-              setUploadImageState({
-                ...uploadImageState,
-                imageFileName: e.target.value,
-              })
-            }
-            className="input input-bordered w-full mb-2 dark:bg-white"
-          />
-          <input
-            type="text"
             placeholder="Image Title (e.g Rose in NYC)"
             value={uploadImageState?.imageName ?? ""}
             onChange={(e) =>
@@ -986,11 +1002,65 @@ function RequestListSection() {
   );
 }
 
+function CustomDropdown({ items }: { items: ItemInfo[] | null }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState("");
+  const [showAddItem, setShowAddItem] = useState(true);
+
+  const toggleDropdown = () => setIsOpen(!isOpen);
+
+  const handleSelect = (item: ItemInfo) => {
+    setSelectedItem(item.name);
+    setIsOpen(false);
+    setShowAddItem(false);
+  };
+
+  return (
+    <div className="relative">
+      <button
+        onClick={toggleDropdown}
+        className="input input-bordered w-full dark:bg-white"
+      >
+        {selectedItem || "Select Item"}
+      </button>
+      {isOpen && (
+        <ul className="absolute z-10 w-full bg-white border border-gray-300">
+          {items?.map((item, idx) => (
+            <li
+              key={idx}
+              className="flex items-center p-2 cursor-pointer hover:bg-gray-100"
+              onClick={() => handleSelect(item)}
+            >
+              <Image
+                src={item.imageUrl ?? ""}
+                alt={item.name}
+                width={30}
+                height={30}
+                style={{ marginRight: "10px" }}
+              />
+              {item.name}
+            </li>
+          ))}
+        </ul>
+      )}
+      {showAddItem && (
+        <button
+          className="btn btn-primary mb-2"
+          onClick={() => {
+            /* 로직을 추가하여 아이템 추가 처리 */
+          }}
+        >
+          Add Item
+        </button>
+      )}
+    </div>
+  );
+}
+
 interface UploadImageState {
   selectedImageUrl?: string;
   hoverItems?: HoverItemInfo[];
   imageFile?: File;
-  imageFileName?: string;
   imageName?: string;
   description?: string;
 }
@@ -1010,6 +1080,7 @@ enum ItemCategory {
   Accessory = "accessory",
   Shoes = "shoes",
   Bag = "bag",
+  Location = "location",
 }
 
 enum Currency {

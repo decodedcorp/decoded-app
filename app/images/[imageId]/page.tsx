@@ -6,7 +6,7 @@ import { main_font } from "@/components/helpers/util";
 import { FirebaseHelper } from "@/common/firebase";
 import { useSearchParams } from "next/navigation";
 import { notFound } from "next/navigation";
-
+import Link from "next/link";
 import {
   ImageInfo,
   ArtistInfo,
@@ -23,13 +23,14 @@ interface PageProps {
 function Page({ params: { imageId } }: PageProps) {
   const searchParams = useSearchParams();
   const imageUrl = searchParams.get("imageUrl") ?? "";
-  console.log("Page for => ", imageId, "URL => ", imageUrl);
   if (!imageUrl) {
     notFound();
   }
   let [imageDetail, setImageDetail] = useState<ImageInfo | null>(null);
+  let [artistImages, setArtistImages] = useState<[string, string][]>([]);
   let [artistItems, setArtistItems] = useState<ItemInfo[]>([]);
-  let [tags, setTags] = useState<HoverItem[]>([]);
+  let [artistName, setArtistName] = useState<string[]>([]);
+  let [imageTags, setImageTags] = useState<HoverItem[]>([]);
   let [hoverItem, setHoverItem] = useState<HoverItem | null>(null);
   let [isFetching, setIsFetching] = useState(false);
 
@@ -43,15 +44,15 @@ function Page({ params: { imageId } }: PageProps) {
 
   useEffect(() => {
     const fetchData = async () => {
-      const docId = decodeURIComponent(imageId);
+      const imageDocId = decodeURIComponent(imageId);
       const imageInfo = (
-        await FirebaseHelper.doc("images", docId)
+        await FirebaseHelper.doc("images", imageDocId)
       ).data() as ImageInfo;
       const artistTags = imageInfo.tags?.artists;
       if (imageInfo !== undefined) {
+        const hoverItems = await FirebaseHelper.getHoverItems(imageDocId);
+        setImageTags(hoverItems);
         setImageDetail(imageInfo);
-        setTags(imageInfo.taggedItem as HoverItem[]);
-        setIsFetching(false);
       } else {
         setIsFetching(false);
       }
@@ -62,28 +63,55 @@ function Page({ params: { imageId } }: PageProps) {
             return artistInfo.data() as ArtistInfo;
           })
         );
+        const artistNames: string[] = [];
         artistInfoList.map(async (a) => {
-          const itemDocId = a.tags?.["items"];
-          if (itemDocId) {
+          artistNames.push(a.name);
+          const imageDocIds = a.tags?.images;
+          const itemDocIds = a.tags?.["items"];
+          if (itemDocIds) {
             const items = await Promise.all(
-              itemDocId.map(async (docId) => {
+              itemDocIds.map(async (docId) => {
                 const item = await FirebaseHelper.doc("items", docId);
                 return item.data() as ItemInfo;
               })
             );
             setArtistItems(items);
           }
+          if (imageDocIds) {
+            const allImages = await FirebaseHelper.listAllStorageItems(
+              "images"
+            );
+            allImages.items.map(async (image) => {
+              const metadata = await FirebaseHelper.metadata(image);
+              const docId = metadata?.customMetadata?.id;
+              if (docId && imageDocIds.includes(docId)) {
+                if (docId === imageDocId) {
+                  return;
+                }
+                const imageUrl = await FirebaseHelper.downloadUrl(image);
+                setArtistImages((prev) => {
+                  // Check if the docId already exists in the previous state
+                  if (prev.some(([id, _]) => id === docId)) {
+                    return prev; // If it exists, return the previous state
+                  }
+                  return [...prev, [docId, imageUrl]]; // Otherwise, add the new image
+                });
+              }
+            });
+          }
         });
+        setArtistName(artistNames);
       }
+      setIsFetching(false);
     };
     setIsFetching(true);
     fetchData();
   }, [imageId]);
 
   return (
-    <div className="container flex-col mx-auto p-4 justify-center items-center z-0">
-      <div className="flex flex-row">
-        <div className="container flex mx-auto p-4 justify-center items-center sm:w-full sm:h-auto">
+    <div className="flex-col border-b-2 border-l-2 border-r-2 border-black rounded-lg justify-center items-center z-0">
+      <div className="flex flex-row ">
+        <div className="flex p-4 justify-center items-center sm:w-full sm:h-auto my-20">
           <div
             className="rounded-lg shadow-lg overflow-hidden"
             style={{
@@ -107,9 +135,9 @@ function Page({ params: { imageId } }: PageProps) {
                     objectFit="cover"
                   />
                   {imageDetail &&
-                    tags?.map((item) => (
+                    imageTags?.map((item) => (
                       <a
-                        key={imageId}
+                        key={item.info.name}
                         href={item.info?.affiliateUrl ?? ""}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -138,7 +166,7 @@ function Page({ params: { imageId } }: PageProps) {
               {/* Display information for the hovered item */}
               {hoverItem && (
                 <div
-                  className={`absolute bg-black border border-gray-600 rounded-lg shadow-lg p-2 flex items-center gap-2 transform -translate-x-1/2 -translate-y-full transition-opacity duration-300 ease-in-out ${
+                  className={`absolute transform -translate-x-1/2 -translate-y-full transition-opacity duration-300 ease-in-out ${
                     hoverItem ? "opacity-100" : "opacity-0"
                   }`}
                   style={{
@@ -148,10 +176,17 @@ function Page({ params: { imageId } }: PageProps) {
                   }}
                   onMouseOut={handleMouseOut}
                 >
-                  <div className="relative bg-black bg-opacity-80 rounded-lg shadow-lg p-2 flex items-center gap-2">
+                  <div className="relative bg-gray-500 bg-opacity-80 rounded-lg p-2 flex items-center gap-2 w-[250px]">
+                    <Image
+                      src={hoverItem.info.imageUrl ?? ""}
+                      alt={hoverItem.info.name}
+                      width={30}
+                      height={30}
+                      className="rounded-lg w-[50px] h-[50px]"
+                    />
                     <div className="text-white">
                       <p className="text-sm font-bold">{hoverItem.info.name}</p>
-                      <p className="text-xs">{hoverItem.info.price}</p>
+                      <p className="text-xs">{hoverItem.info?.price}</p>
                     </div>
                   </div>
                 </div>
@@ -160,28 +195,73 @@ function Page({ params: { imageId } }: PageProps) {
           </div>
         </div>
       </div>
-      <div className="my-4 w-full text-center">
-        <h2
-          className={`text-7xl text-blacktext-lg font-bold my-2 p-5 ${main_font.className}`}
-        >
-          MORE TO EXPLORE
-        </h2>
-        <div className="grid grid-cols-6 gap-4">
-          {artistItems.map((item) => (
-            <div
-              key={item?.name}
-              className={`${main_font.className} flex flex-col text-black text-md items-center justify-center bg-red-500 rounded-lg`}
-            >
-              <Image
-                src={item?.imageUrl ?? ""}
-                alt={item?.name}
-                width={100}
-                height={100}
-              />
-              <p className="mt-2">{item?.name}</p>
-            </div>
-          ))}
+      <div className="my-10 w-full text-center">
+        <div className="flex justify-center items-center">
+          <h2
+            className={`text-7xl text-black font-bold ${main_font.className}`}
+          >
+            MORE FROM
+          </h2>
+          <div className="flex flex-wrap">
+            {artistName.map((name, index) => (
+              <Link
+                key={index}
+                href={`/artists/${encodeURIComponent(name)}`}
+                className={`${main_font.className} text-6xl font-bold bg-[#FF204E] rounded-lg mx-3 p-2 text-center underline`}
+              >
+                "{name.toUpperCase()}"
+              </Link>
+            ))}
+          </div>
         </div>
+        {artistImages.length > 0 && (
+          <div>
+            <h2 className={`${main_font.className} text-5xl font-bold my-20`}>
+              MORE TAGGED
+            </h2>
+            <div className="grid grid-cols-3 gap-1 items-center place-items-center">
+              {artistImages.map((image) => (
+                <Link
+                  key={image[0]}
+                  href={`${image[0]}?imageUrl=${encodeURIComponent(image[1])}`}
+                  prefetch={false}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Image
+                    src={image[1]}
+                    alt="Artist Image"
+                    width={300}
+                    height={300}
+                    className="rounded-xl"
+                  />
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+        {artistItems.length > 0 && (
+          <div>
+            <h2 className={`${main_font.className} text-5xl font-bold my-20`}>
+              MORE ITEMS
+            </h2>
+            <div className="grid grid-cols-3 gap-2 items-center p-1 place-items-center">
+              {artistItems.map((item) => (
+                <div
+                  key={item?.name}
+                  className={`${main_font.className} flex flex-col text-black text-md items-center justify-center rounded-lg border border-black w-full h-[400px]`}
+                >
+                  <Image
+                    src={item?.imageUrl ?? ""}
+                    alt={item?.name}
+                    width={100}
+                    height={100}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

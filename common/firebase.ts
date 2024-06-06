@@ -197,52 +197,42 @@ export class FirebaseHelper {
     return Timestamp.fromDate(new Date());
   }
 
-  public static async getImageDetail(
-    collectionName: string,
-    docId?: string
-  ): Promise<ImageInfo | ImageInfo[] | undefined> {
+  public static async getHoverItems(docId: string): Promise<HoverItem[]> {
     try {
-      const db = this.db();
-      if (docId) {
-        const docRef = doc(db, collectionName, docId);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          let imageDetail = docSnap.data() as ImageInfo;
-          try {
-            const hoverItemList: Promise<HoverItem | undefined>[] =
-              imageDetail.taggedItem?.map(async (item) => {
-                const taggedItem = item as TaggedItem;
-                const docRef = doc(db, "items", taggedItem.id);
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                  const itemMetadata = docSnap.data() as ItemInfo;
-                  return {
-                    pos: taggedItem.pos,
-                    info: itemMetadata,
-                  };
-                }
-              }) || [];
-            imageDetail.taggedItem = (await Promise.all(hoverItemList)).filter(
-              (item) => item !== undefined
-            ) as HoverItem[];
-            console.log("🚀🚀 Final result", imageDetail);
-            return imageDetail;
-          } catch (error) {
-            console.log(error);
-          }
-        } else {
-          console.log("No such document!");
+      const imageDoc = await this.doc("images", docId);
+      if (imageDoc.exists()) {
+        let imageInfo = imageDoc.data() as ImageInfo;
+        try {
+          const hoverItemList = await Promise.all(
+            imageInfo.taggedItem?.map(async (item) => {
+              const taggedItem = item as TaggedItem;
+              const itemDoc = await this.doc("items", taggedItem.id);
+              if (itemDoc.exists()) {
+                const itemInfo = itemDoc.data() as ItemInfo;
+                return {
+                  pos: taggedItem.pos,
+                  info: itemInfo,
+                } as HoverItem;
+              } else {
+                return undefined;
+              }
+            }) || []
+          );
+
+          const res = (await Promise.all(hoverItemList)).filter(
+            (item) => item !== undefined
+          ) as HoverItem[];
+          return res;
+        } catch (error) {
+          console.log(error);
+          return [];
         }
       } else {
-        const querySnapshot = await getDocs(collection(db, collectionName));
-        querySnapshot.forEach((doc) => {
-          console.log(doc.data());
-        });
+        console.log("No such document!");
+        return [];
       }
     } catch (error) {
-      throw new Error(
-        `Error occured while trying to get document for ${collectionName}`
-      );
+      throw new Error(`Error occured while trying to get document`);
     }
   }
 
