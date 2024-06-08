@@ -24,7 +24,6 @@ function Home() {
     <div>
       <MainView />
       <ArticleView />
-      {/* <HypedTaggedView /> */}
     </div>
   );
 }

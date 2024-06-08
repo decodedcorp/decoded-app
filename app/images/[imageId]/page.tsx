@@ -10,7 +10,6 @@ import Link from "next/link";
 import {
   ImageInfo,
   ArtistInfo,
-  TaggedItem,
   HoverItem,
   ItemInfo,
   BrandInfo,
@@ -21,18 +20,43 @@ interface PageProps {
   };
 }
 
-function Page({ params: { imageId } }: PageProps) {
+interface DetailPageState {
+  /**
+   * Image info
+   */
+  img?: ImageInfo;
+  /**
+   * Hover items
+   */
+  itemList?: HoverItem[];
+  /**
+   * Brand names
+   */
+  brandList?: string[];
+  /**
+   * Artist names
+   */
+  artistList?: string[];
+  /**
+   * [docId, imageUrl]
+   */
+  artistImgList?: [string, string][];
+  /**
+   * Artist items
+   */
+  artistItemList?: ItemInfo[];
+}
+
+function DetailPage({ params: { imageId } }: PageProps) {
   const searchParams = useSearchParams();
   const imageUrl = searchParams.get("imageUrl") ?? "";
   if (!imageUrl) {
     notFound();
   }
-  let [imageDetail, setImageDetail] = useState<ImageInfo | null>(null);
-  let [artistImages, setArtistImages] = useState<[string, string][]>([]);
-  let [artistItems, setArtistItems] = useState<ItemInfo[]>([]);
-  let [artistName, setArtistName] = useState<string[]>([]);
-  let [brands, setBrands] = useState<string[]>([]);
-  let [imageTags, setImageTags] = useState<HoverItem[]>([]);
+  // Detail page state
+  let [detailPageState, setDetailPageState] = useState<DetailPageState>({});
+
+  // Independent state
   let [hoverItem, setHoverItem] = useState<HoverItem | null>(null);
   let [isFetching, setIsFetching] = useState(false);
 
@@ -46,74 +70,99 @@ function Page({ params: { imageId } }: PageProps) {
 
   useEffect(() => {
     const fetchData = async () => {
-      const imageDocId = decodeURIComponent(imageId);
-      const imageInfo = (
-        await FirebaseHelper.doc("images", imageDocId)
-      ).data() as ImageInfo;
-      const brandTags = imageInfo.tags?.brands;
-      const artistTags = imageInfo.tags?.artists;
-      if (imageInfo !== undefined) {
-        const hoverItems = await FirebaseHelper.getHoverItems(imageDocId);
-        setImageTags(hoverItems);
-        setImageDetail(imageInfo);
-      } else {
+      const imgDocId = decodeURIComponent(imageId);
+      if (!(await FirebaseHelper.docExists("images", imgDocId))) {
         setIsFetching(false);
+        return;
       }
-      const brands: string[] = [];
-      if (brandTags) {
-        brandTags.map(async (brand) => {
-          const brandInfo = await FirebaseHelper.doc("brands", brand);
-          const brandData = brandInfo.data() as BrandInfo;
-          brands.push(brandData.name);
-        });
-      }
-      setBrands(brands);
-      if (artistTags) {
-        const artistInfoList = await Promise.all(
-          artistTags.map(async (artist) => {
-            const artistInfo = await FirebaseHelper.doc("artists", artist);
-            return artistInfo.data() as ArtistInfo;
+      const img = (
+        await FirebaseHelper.doc("images", imgDocId)
+      ).data() as ImageInfo;
+      const itemList: HoverItem[] = await FirebaseHelper.getHoverItems(
+        imgDocId
+      );
+      var brandList: string[] = [];
+      var artistList: string[] = [];
+      var artistItemList: ItemInfo[] = [];
+      var artistImgList: [string, string][] = [];
+
+      // Image brand tags
+      const imgBrandTags = img.tags?.brands;
+      // Image artist tags
+      const imgArtistTags = img.tags?.artists;
+
+      // Update image related brand list if any
+      if (imgBrandTags) {
+        await Promise.all(
+          imgBrandTags.map(async (brand) => {
+            const brandInfo = (
+              await FirebaseHelper.doc("brands", brand)
+            ).data() as BrandInfo;
+            brandList.push(brandInfo.name);
           })
         );
-        const artistNames: string[] = [];
-        artistInfoList.map(async (a) => {
-          artistNames.push(a.name);
-          const imageDocIds = a.tags?.images;
-          const itemDocIds = a.tags?.["items"];
-          if (itemDocIds) {
-            const items = await Promise.all(
-              itemDocIds.map(async (docId) => {
-                const item = await FirebaseHelper.doc("items", docId);
-                return item.data() as ItemInfo;
-              })
-            );
-            setArtistItems(items);
-          }
-          if (imageDocIds) {
-            const allImages = await FirebaseHelper.listAllStorageItems(
-              "images"
-            );
-            allImages.items.map(async (image) => {
-              const metadata = await FirebaseHelper.metadata(image);
-              const docId = metadata?.customMetadata?.id;
-              if (docId && imageDocIds.includes(docId)) {
-                if (docId === imageDocId) {
-                  return;
-                }
-                const imageUrl = await FirebaseHelper.downloadUrl(image);
-                setArtistImages((prev) => {
-                  // Check if the docId already exists in the previous state
-                  if (prev.some(([id, _]) => id === docId)) {
-                    return prev; // If it exists, return the previous state
-                  }
-                  return [...prev, [docId, imageUrl]]; // Otherwise, add the new image
-                });
-              }
-            });
-          }
-        });
-        setArtistName(artistNames);
       }
+
+      // Update image related artist stuff if any
+      if (imgArtistTags) {
+        const artistInfoList = await Promise.all(
+          imgArtistTags.map(async (artistDocId) => {
+            return (
+              await FirebaseHelper.doc("artists", artistDocId)
+            ).data() as ArtistInfo;
+          })
+        );
+        await Promise.all(
+          artistInfoList.map(async (a) => {
+            // Update artist name list
+            artistList.push(a.name);
+
+            const artistImgDocIdList = a.tags?.images;
+            const artistItemDocIdList = a.tags?.items;
+
+            // Get all artist-related items
+            // if (artistItemDocIdList) {
+            //   const itemList = await Promise.all(
+            //     artistItemDocIdList.slice(0, 10).map(async (itemDocId) => {
+            //       return (
+            //         await FirebaseHelper.doc("items", itemDocId)
+            //       ).data() as ItemInfo;
+            //     })
+            //   );
+            //   artistItemList = itemList;
+            // }
+
+            // Get all artist-related images
+            if (artistImgDocIdList) {
+              const images = await FirebaseHelper.listAllStorageItems("images");
+              // Since item_doc_id is stored as custom metadata, logic is a bit complicated.
+              // After changing item_doc_id as file name, it would be simpler
+              await Promise.all(
+                images.items.slice(0, 10).map(async (image) => {
+                  const metadata = await FirebaseHelper.metadata(image);
+                  const docId = metadata?.customMetadata?.id;
+                  if (docId && artistImgDocIdList.includes(docId)) {
+                    // Skip if it's the same image
+                    if (docId === imgDocId) {
+                      return;
+                    }
+                    const imageUrl = await FirebaseHelper.downloadUrl(image);
+                    artistImgList.push([docId, imageUrl]);
+                  }
+                })
+              );
+            }
+          })
+        );
+      }
+      setDetailPageState({
+        img: img,
+        itemList: itemList,
+        brandList: brandList,
+        artistList: artistList,
+        artistImgList: artistImgList,
+        artistItemList: artistItemList,
+      });
       setIsFetching(false);
     };
     setIsFetching(true);
@@ -124,17 +173,17 @@ function Page({ params: { imageId } }: PageProps) {
     <div className="flex-col rounded-lg justify-center items-center z-0">
       <div className="flex flex-col">
         {/* DESCRIPTION */}
-        {imageDetail ? (
+        {detailPageState.img ? (
           <div className="flex flex-col w-full text-center my-10 pl-10 pr-10">
             <h2 className={`${main_font.className} text-4xl font-bold`}>
-              {imageDetail.title}
+              {detailPageState.img.title}
             </h2>
-            <p className="text-lg my-2 ">{imageDetail.description}</p>
+            <p className="text-lg my-2 ">{detailPageState.img.description}</p>
             {/* DETAILS */}
             <div className="flex flex-col text-center justify-center items-center my-10">
               <div className="flex flex-col my-2 items-center">
                 <p className={`${main_font.className} text-2xl`}>ARTIST:</p>
-                {artistName.map((name, index) => (
+                {detailPageState.artistList?.map((name, index) => (
                   <Link
                     key={index}
                     href={`/artists/${encodeURIComponent(name)}`}
@@ -144,9 +193,11 @@ function Page({ params: { imageId } }: PageProps) {
                   </Link>
                 ))}
               </div>
+
+              {/* List all brands */}
               <div className="flex flex-col my-2">
                 <p className={`${main_font.className} text-2xl`}>BRANDS: </p>
-                {brands.map((brand, index) => (
+                {detailPageState.brandList?.map((brand, index) => (
                   <Link
                     key={index}
                     href={`/brands/${encodeURIComponent(brand)}`}
@@ -156,16 +207,18 @@ function Page({ params: { imageId } }: PageProps) {
                   </Link>
                 ))}
               </div>
+
+              {/* Categorize with item category */}
               <div>
                 {Object.entries(
-                  imageTags.reduce((acc, tag) => {
+                  detailPageState.itemList?.reduce((acc, tag) => {
                     const category = tag.info.category.toUpperCase();
                     if (!acc[category]) {
                       acc[category] = [];
                     }
                     acc[category].push(tag);
                     return acc;
-                  }, {} as Record<string, HoverItem[]>)
+                  }, {} as Record<string, HoverItem[]>) || []
                 ).map(([category, tags]) => (
                   <div key={category} className="flex flex-col my-2">
                     <p className={`${main_font.className} text-2xl`}>
@@ -174,7 +227,7 @@ function Page({ params: { imageId } }: PageProps) {
                     {tags.map((tag) => (
                       <Link
                         key={tag.info.name}
-                        href={`/items/${encodeURIComponent(tag.info.name)}`}
+                        href={`${tag.info.affiliateUrl}`}
                         className={`${main_font.className} text-xl font-bold rounded-lg mx-2`}
                       >
                         <p className="underline">
@@ -213,8 +266,8 @@ function Page({ params: { imageId } }: PageProps) {
                         objectFit="cover"
                         className="border-2 border-black rounded-lg"
                       />
-                      {imageDetail &&
-                        imageTags?.map((item) => (
+                      {detailPageState.img &&
+                        detailPageState.itemList?.map((item) => (
                           <a
                             key={item.info.name}
                             href={item.info?.affiliateUrl ?? ""}
@@ -282,7 +335,7 @@ function Page({ params: { imageId } }: PageProps) {
                 aspectRatio: "3/4",
               }}
             >
-              {imageTags?.map((item) => (
+              {detailPageState.itemList?.map((item) => (
                 <div key={item.info.name} className="relative w-full pb-[100%]">
                   <Image
                     src={item.info.imageUrl ?? ""}
@@ -298,13 +351,13 @@ function Page({ params: { imageId } }: PageProps) {
         </div>
       </div>
       <div className="my-10 w-full text-center">
-        {artistImages.length > 0 && (
+        {detailPageState.artistImgList && (
           <div>
             <h2 className={`${main_font.className} text-5xl font-bold my-20`}>
               MORE TAGGED
             </h2>
             <div className="grid grid-cols-3 gap-1 items-center place-items-center">
-              {artistImages.map((image) => (
+              {detailPageState.artistImgList.map((image) => (
                 <Link
                   key={image[0]}
                   href={`${image[0]}?imageUrl=${encodeURIComponent(image[1])}`}
@@ -324,32 +377,9 @@ function Page({ params: { imageId } }: PageProps) {
             </div>
           </div>
         )}
-        {artistItems.length > 0 && (
-          <div>
-            <h2 className={`${main_font.className} text-5xl font-bold my-20`}>
-              MORE ITEMS
-            </h2>
-            <div className="grid grid-cols-3 gap-2 items-center p-1 place-items-center">
-              {artistItems.map((item) => (
-                <div
-                  key={item?.name}
-                  className={`${main_font.className} relative flex flex-col text-black text-md items-center justify-center rounded-lg border border-black w-full h-[400px]`}
-                >
-                  <Image
-                    src={item?.imageUrl ?? ""}
-                    alt={item?.name}
-                    layout="fill"
-                    objectFit="contain"
-                    className="rounded-lg"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
 }
 
-export default Page;
+export default DetailPage;

@@ -7,7 +7,6 @@ import {
   ImageInfo,
   BrandInfo,
   ArtistInfo,
-  Position,
   HoverItemInfo,
 } from "@/types/model";
 import { FirebaseHelper } from "@/common/firebase";
@@ -92,8 +91,9 @@ function UploadImageSection({
   items: ItemInfo[] | null;
   setIsDataAdded: (isDataAdded: boolean) => void;
 }) {
-  const [uploadImageState, setUploadImageState] =
-    useState<UploadImageState | null>(null);
+  const [uploadImageState, setUploadImageState] = useState<UploadImageState>(
+    {}
+  );
   const [isUploading, setIsUploading] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [selectedPointIndex, setSelectedPointIndex] = useState<number | null>(
@@ -186,30 +186,35 @@ function UploadImageSection({
       return false;
     }
 
-    const hasRequiredFields = !!(
-      uploadImageState.imageName &&
-      uploadImageState.imageFile &&
-      uploadImageState.description &&
-      uploadImageState.hoverItems &&
-      uploadImageState.selectedImageUrl
-    );
+    const requiredFields = [
+      uploadImageState.imageName,
+      uploadImageState.imageFile,
+      uploadImageState.description,
+      uploadImageState.hoverItems,
+      uploadImageState.selectedImageUrl,
+    ];
 
-    if (!hasRequiredFields) {
+    if (requiredFields.some((field) => !field)) {
       return false;
     }
 
     const hasValidHoverItems = uploadImageState.hoverItems!.every((item) => {
-      return (
+      const { category, name, price } = item.info;
+      const isPriceNeeded = category !== "location";
+      const hasCommonFields =
         item.artistName &&
         item.brandName &&
         item.hoverItemFile &&
-        item.info &&
-        item.info.name.length > 0 &&
-        item.info.price &&
-        item.info.price[0].length > 0 &&
-        item.info.price[1].length > 0 &&
-        item.info.category.length > 0
-      );
+        name.length > 0 &&
+        category.length > 0;
+
+      if (isPriceNeeded) {
+        return (
+          hasCommonFields && price && price[0].length > 0 && price[1].length > 0
+        );
+      } else {
+        return hasCommonFields;
+      }
     });
 
     return hasValidHoverItems;
@@ -327,7 +332,7 @@ function UploadImageSection({
   };
 
   const reset = () => {
-    setUploadImageState(null);
+    setUploadImageState({});
     setSelectedPointIndex(null);
     setExpandedSections({});
   };
@@ -406,7 +411,7 @@ function UploadImageSection({
     value: number | string | string[] | File
   ) => {
     setUploadImageState((prevState) => {
-      if (!prevState) return null; // prevState가 null이면 아무 작업도 하지 않고 null을 반환
+      if (!prevState) return {}; // prevState가 null이면 아무 작업도 하지 않고 null을 반환
 
       const hoverItems = prevState.hoverItems || [];
       // prevState에서 hoverItems를 복사하여 새로운 배열을 생성
