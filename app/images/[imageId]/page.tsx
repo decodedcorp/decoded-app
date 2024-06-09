@@ -98,7 +98,7 @@ function DetailPage({ params: { imageId } }: PageProps) {
             const brandInfo = (
               await FirebaseHelper.doc("brands", brand)
             ).data() as BrandInfo;
-            brandList.push(brandInfo.name);
+            brandList = Array.from(new Set([...brandList, brandInfo.name]));
           })
         );
       }
@@ -138,7 +138,7 @@ function DetailPage({ params: { imageId } }: PageProps) {
               // Since item_doc_id is stored as custom metadata, logic is a bit complicated.
               // After changing item_doc_id as file name, it would be simpler
               await Promise.all(
-                images.items.slice(0, 10).map(async (image) => {
+                images.items.map(async (image) => {
                   const metadata = await FirebaseHelper.metadata(image);
                   const docId = metadata?.customMetadata?.id;
                   if (docId && artistImgDocIdList.includes(docId)) {

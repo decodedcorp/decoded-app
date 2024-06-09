@@ -14,7 +14,6 @@ const nextConfig = {
   publicRuntimeConfig: {
     IS_LOCAL_DEV: process.argv.includes("dev"),
   },
-  output: "export",
 };
 
 module.exports = nextConfig;
