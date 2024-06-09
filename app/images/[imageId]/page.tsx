@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { main_font } from "@/components/helpers/util";
 import { FirebaseHelper } from "@/common/firebase";
 import { useSearchParams } from "next/navigation";
@@ -14,6 +14,9 @@ import {
   ItemInfo,
   BrandInfo,
 } from "@/types/model";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
 interface PageProps {
   params: {
     imageId: string;
@@ -48,6 +51,8 @@ interface DetailPageState {
 }
 
 function DetailPage({ params: { imageId } }: PageProps) {
+  const pointTriggerRef = useRef<HTMLDivElement>(null);
+  const itemTriggerRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
   const imageUrl = searchParams.get("imageUrl") ?? "";
   if (!imageUrl) {
@@ -67,6 +72,91 @@ function DetailPage({ params: { imageId } }: PageProps) {
   const handleMouseOut = () => {
     setHoverItem(null);
   };
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const points = gsap.utils.toArray(".point") as Element[];
+    const items = gsap.utils.toArray(".item") as Element[];
+    const infoDiv = document.createElement("div");
+    infoDiv.className =
+      "info-div absolute bg-gray-500 bg-opacity-80 rounded-lg p-2 flex items-center gap-2 w-[250px]";
+    infoDiv.style.opacity = "0";
+    infoDiv.style.transition = "opacity 0.5s ease-in-out";
+    infoDiv.style.zIndex = "10000"; // 높은 z-index 값으로 설정
+    document.body.appendChild(infoDiv);
+
+    points.forEach((point, index) => {
+      const item = items[index];
+      // 포인트에 대한 애니메이션 설정
+      gsap.fromTo(
+        point,
+        { opacity: 0.5, scale: 0.5 },
+        {
+          opacity: 1,
+          scale: 2,
+          scrollTrigger: {
+            trigger: point,
+            start: "top bottom",
+            end: "bottom center",
+            scrub: true,
+            markers: true,
+          },
+        }
+      );
+
+      // 아이템에 대한 애니메이션 설정 (scale 변화 없음)
+      gsap.fromTo(
+        item,
+        { opacity: 0.5 },
+        {
+          opacity: 1,
+          scrollTrigger: {
+            trigger: point,
+            start: "top bottom",
+            end: "bottom center",
+            scrub: true,
+            markers: true,
+          },
+        }
+      );
+
+      ScrollTrigger.create({
+        trigger: point,
+        start: "top center+=100", // 뷰포트 중앙보다 100px 위에서 트리거
+        end: "bottom center-=100", // 뷰포트 중앙보다 100px 아래에서 트리거 해제
+        onEnter: () => {
+          const rect = point.getBoundingClientRect();
+          infoDiv.style.top = `${
+            window.scrollY + rect.top - rect.height - 10
+          }px`; // 포인트 위에 위치
+          infoDiv.style.left = `${
+            rect.left + rect.width / 2 - infoDiv.offsetWidth / 2
+          }px`; // 포인트 가운데 정렬
+
+          infoDiv.innerHTML = `
+            <div class="relative w-[50px] h-[50px]">
+              <img src="${detailPageState?.itemList?.[index]?.info.imageUrl}" alt="${detailPageState?.itemList?.[index]?.info.name}" width="50" height="50" class="rounded-lg" />
+            </div>
+            <div class="text-white">
+              <p class="text-sm font-bold">${detailPageState?.itemList?.[index]?.info.name}</p>
+              <p class="text-xs">${detailPageState?.itemList?.[index]?.info.price}</p>
+            </div>
+          `;
+          gsap.to(infoDiv, { opacity: 1, duration: 0.3 });
+        },
+        onLeave: () => {
+          gsap.to(infoDiv, { opacity: 0, duration: 0.3 });
+        },
+        onEnterBack: () => {
+          gsap.to(infoDiv, { opacity: 1, duration: 0.3 });
+        },
+        onLeaveBack: () => {
+          gsap.to(infoDiv, { opacity: 0, duration: 0.3 });
+        },
+      });
+    });
+  }, [detailPageState.itemList]); // itemList가 변경될 때마다 useEffect가 재실행됩니다.
 
   useEffect(() => {
     const fetchData = async () => {
@@ -266,33 +356,36 @@ function DetailPage({ params: { imageId } }: PageProps) {
                         objectFit="cover"
                         className="border-2 border-black rounded-lg"
                       />
-                      {detailPageState.img &&
-                        detailPageState.itemList?.map((item) => (
-                          <a
-                            key={item.info.name}
-                            href={item.info?.affiliateUrl ?? ""}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{
-                              position: "absolute",
-                              top: item.pos.top,
-                              left: item.pos.left,
-                              cursor: "pointer",
-                            }}
-                          >
-                            <div
-                              onMouseOver={() => handleMouseOver(item)}
-                              onMouseOut={handleMouseOut}
+                      <div ref={pointTriggerRef}>
+                        {detailPageState.img &&
+                          detailPageState.itemList?.map((item) => (
+                            <a
+                              key={item.info.name}
+                              href={item.info?.affiliateUrl ?? ""}
+                              target="_blank"
+                              rel="noopener noreferrer"
                               style={{
-                                width: "10px",
-                                height: "10px",
-                                borderRadius: "50%",
-                                backgroundColor: "white",
-                                boxShadow: "0 0 2px 2px rgba(0, 0, 0, 0.2)",
+                                position: "absolute",
+                                top: item.pos.top,
+                                left: item.pos.left,
+                                cursor: "pointer",
                               }}
-                            ></div>
-                          </a>
-                        ))}
+                              className="point"
+                            >
+                              <div
+                                onMouseOver={() => handleMouseOver(item)}
+                                onMouseOut={handleMouseOut}
+                                style={{
+                                  width: "10px",
+                                  height: "10px",
+                                  borderRadius: "50%",
+                                  backgroundColor: "white",
+                                  boxShadow: "0 0 2px 2px rgba(0, 0, 0, 0.2)",
+                                }}
+                              ></div>
+                            </a>
+                          ))}
+                      </div>
                     </>
                   </div>
                 )}
@@ -334,9 +427,13 @@ function DetailPage({ params: { imageId } }: PageProps) {
                 height: "auto",
                 aspectRatio: "3/4",
               }}
+              ref={itemTriggerRef}
             >
               {detailPageState.itemList?.map((item) => (
-                <div key={item.info.name} className="relative w-full pb-[100%]">
+                <div
+                  key={item.info.name}
+                  className="item relative w-full pb-[100%]"
+                >
                   <Image
                     src={item.info.imageUrl ?? ""}
                     alt={item.info.name}
