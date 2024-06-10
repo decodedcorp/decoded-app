@@ -1,6 +1,12 @@
 "use client";
 import Image from "next/image";
-import { useState, ChangeEvent, useEffect } from "react";
+import {
+  useState,
+  ChangeEvent,
+  useEffect,
+  Dispatch,
+  SetStateAction,
+} from "react";
 import {
   TaggedItem,
   ItemInfo,
@@ -8,6 +14,7 @@ import {
   BrandInfo,
   ArtistInfo,
   HoverItemInfo,
+  Position,
 } from "@/types/model";
 import { FirebaseHelper } from "@/common/firebase";
 import {
@@ -107,43 +114,43 @@ function UploadImageSection({
   const upload = async () => {
     setIsUploading(true);
     console.log(uploadImageState);
-    if (!uploadSanityCheck()) {
-      alert("Required fields are empty!");
-      setIsUploading(false);
-      return;
-    }
-    const file = uploadImageState?.imageFile;
-    const hoverItemInfo = uploadImageState?.hoverItems;
-    // It is safe to force unwrap due to sanity check
-    const tags = await prepareTags(file!, hoverItemInfo!);
-    if (tags instanceof Error) {
-      alert("Error preparing tags!");
-      setIsUploading(false);
-      return false;
-    }
-    const requiredKeys = ["brands", "artists", "images", "items"];
-    if (!(await tagsSanityCheck(tags, requiredKeys))) {
-      alert("Invalid tags!");
-      setIsUploading(false);
-      return;
-    }
-    console.log("Tags Info: ", tags);
-    console.log("Handle hover item");
-    // "items"
-    let taggedItems = await handleUploadHoverItem(tags, requiredKeys);
-    if (taggedItems instanceof Error) {
-      console.error("Error saving hover item:", taggedItems);
-      alert("Error saving hover item!");
-      return;
-    }
-    console.log("Handle upload image");
-    // "images"
-    await handleUploadImage(tags, taggedItems);
-    console.log("Handle remain tags");
-    // "brands", "artists"
-    await handleRemain(tags, requiredKeys);
-    console.log("Upload: All Done! ✅");
-    reset();
+    // if (!uploadSanityCheck()) {
+    //   alert("Required fields are empty!");
+    //   setIsUploading(false);
+    //   return;
+    // }
+    // const file = uploadImageState?.imageFile;
+    // const hoverItemInfo = uploadImageState?.hoverItems;
+    // // It is safe to force unwrap due to sanity check
+    // const tags = await prepareTags(file!, hoverItemInfo!);
+    // if (tags instanceof Error) {
+    //   alert("Error preparing tags!");
+    //   setIsUploading(false);
+    //   return false;
+    // }
+    // const requiredKeys = ["brands", "artists", "images", "items"];
+    // if (!(await tagsSanityCheck(tags, requiredKeys))) {
+    //   alert("Invalid tags!");
+    //   setIsUploading(false);
+    //   return;
+    // }
+    // console.log("Tags Info: ", tags);
+    // console.log("Handle hover item");
+    // // "items"
+    // let taggedItems = await handleUploadHoverItem(tags, requiredKeys);
+    // if (taggedItems instanceof Error) {
+    //   console.error("Error saving hover item:", taggedItems);
+    //   alert("Error saving hover item!");
+    //   return;
+    // }
+    // console.log("Handle upload image");
+    // // "images"
+    // await handleUploadImage(tags, taggedItems);
+    // console.log("Handle remain tags");
+    // // "brands", "artists"
+    // await handleRemain(tags, requiredKeys);
+    // console.log("Upload: All Done! ✅");
+    // reset();
     setIsUploading(false);
   };
 
@@ -201,12 +208,15 @@ function UploadImageSection({
     const hasValidHoverItems = uploadImageState.hoverItems!.every((item) => {
       const { category, name, price } = item.info;
       const isPriceNeeded = category !== "location";
-      const hasCommonFields =
-        item.artistName &&
-        item.brandName &&
-        item.hoverItemFile &&
-        name.length > 0 &&
-        category.length > 0;
+      var hasCommonFields: boolean = true;
+      if (item.isNew) {
+        hasCommonFields =
+          item.artistName !== undefined &&
+          item.brandName !== undefined &&
+          item.hoverItemImg !== undefined &&
+          name.length > 0 &&
+          category.length > 0;
+      }
 
       if (isPriceNeeded) {
         return (
@@ -388,6 +398,7 @@ function UploadImageSection({
       hoverItems: [
         ...(prevState?.hoverItems ?? []),
         {
+          isNew: true,
           pos: { top: topPercent, left: leftPercent },
           info: {
             name: "",
@@ -434,7 +445,7 @@ function UploadImageSection({
           updatedHoverItems[index].info[field] = value as string;
         } else {
           if (value instanceof File) {
-            updatedHoverItems[index].hoverItemFile = value;
+            updatedHoverItems[index].hoverItemImg = value;
           } else if (value instanceof Array) {
             // Brands
             updatedHoverItems[index].brandName = value as string[];
@@ -579,23 +590,27 @@ function UploadImageSection({
       const itemDocId = tags["items"][index];
       console.log("Set document for ", itemDocId);
       const docExists = await FirebaseHelper.docExists("items", itemDocId);
-      const hoverFile = hoverItems[index].hoverItemFile;
+      const hoverItemImg = hoverItems[index].hoverItemImg;
       var hoverItem = hoverItems[index];
       // Handle image such as converting to webp and uploading to db
       const storage_file_name = hoverItem.info.name
         .replace(/\s+/g, "_")
         .toLowerCase();
       if (
-        hoverFile &&
-        (hoverFile.type.includes("jpeg") ||
-          hoverFile.type.includes("png") ||
-          hoverFile.type.includes("webp") ||
-          hoverFile.type.includes("avif"))
+        hoverItemImg &&
+        (hoverItemImg.type.includes("jpeg") ||
+          hoverItemImg.type.includes("png") ||
+          hoverItemImg.type.includes("webp") ||
+          hoverItemImg.type.includes("avif"))
       ) {
         try {
           if (!docExists) {
             console.log("Trying to convert to webp...");
-            const itemImage = await ConvertImageAndCompress(hoverFile, 1, 1280);
+            const itemImage = await ConvertImageAndCompress(
+              hoverItemImg,
+              1,
+              1280
+            );
             console.log("Convert & Compress done!");
             console.log("Creating storage ref items/", storage_file_name);
             // TODO: Duplicate check
@@ -757,9 +772,10 @@ function UploadImageSection({
                     </p>
                     <CustomDropdown
                       items={items}
+                      pos={uploadImageState.hoverItems?.[index].pos}
                       index={index}
-                      setUploadImageState={setUploadImageState}
                       setIsAdd={setIsAdd}
+                      setUploadImageState={setUploadImageState}
                     />
                     {isAdd && (
                       <>
@@ -859,74 +875,74 @@ function UploadImageSection({
                             ))}
                           </select>
                         </div>
+                        <div>
+                          <input
+                            type="text"
+                            placeholder="브랜드 검색..."
+                            className="input input-bordered w-full mb-2 dark:bg-white"
+                            value={searchKeyword}
+                            onChange={(e) => {
+                              setSearchKeyword(e.target.value);
+                            }}
+                          />
+                          <select
+                            multiple={true}
+                            className="input input-bordered w-full mb-2 dark:bg-white"
+                            value={item.brandName}
+                            onChange={(e) => {
+                              const selectedOptions = Array.from(
+                                e.target.selectedOptions,
+                                (option) => option.value
+                              );
+                              handleHoverItemInfo(
+                                index,
+                                undefined,
+                                false,
+                                selectedOptions
+                              );
+                            }}
+                          >
+                            {filteredBrands?.map((brand, index) => (
+                              <option key={index} value={brand}>
+                                {brand
+                                  .split("_")
+                                  .map((word) => word.toUpperCase())
+                                  .join(" ")}
+                              </option>
+                            ))}
+                          </select>
+                          {filteredBrands?.length == 0 && (
+                            <>
+                              <button
+                                className={`btn bg-[#FF204E] ${main_font.className} m-2 text-black`}
+                                onClick={() =>
+                                  (
+                                    document.getElementById(
+                                      "my_modal_2"
+                                    ) as HTMLDialogElement
+                                  )?.showModal()
+                                }
+                              >
+                                Add New Brand
+                              </button>
+                              <BrandModal setIsDataAdded={setIsDataAdded} />
+                            </>
+                          )}
+                        </div>
+                        <input
+                          type="file"
+                          onChange={(e) =>
+                            handleHoverItemInfo(
+                              index,
+                              undefined,
+                              false,
+                              e.target.files![0]
+                            )
+                          }
+                          className="input w-full dark:bg-white"
+                        />
                       </>
                     )}
-                    <div>
-                      <input
-                        type="text"
-                        placeholder="브랜드 검색..."
-                        className="input input-bordered w-full mb-2 dark:bg-white"
-                        value={searchKeyword}
-                        onChange={(e) => {
-                          setSearchKeyword(e.target.value);
-                        }}
-                      />
-                      <select
-                        multiple={true}
-                        className="input input-bordered w-full mb-2 dark:bg-white"
-                        value={item.brandName}
-                        onChange={(e) => {
-                          const selectedOptions = Array.from(
-                            e.target.selectedOptions,
-                            (option) => option.value
-                          );
-                          handleHoverItemInfo(
-                            index,
-                            undefined,
-                            false,
-                            selectedOptions
-                          );
-                        }}
-                      >
-                        {filteredBrands?.map((brand, index) => (
-                          <option key={index} value={brand}>
-                            {brand
-                              .split("_")
-                              .map((word) => word.toUpperCase())
-                              .join(" ")}
-                          </option>
-                        ))}
-                      </select>
-                      {filteredBrands?.length == 0 && (
-                        <>
-                          <button
-                            className={`btn bg-[#FF204E] ${main_font.className} m-2 text-black`}
-                            onClick={() =>
-                              (
-                                document.getElementById(
-                                  "my_modal_2"
-                                ) as HTMLDialogElement
-                              )?.showModal()
-                            }
-                          >
-                            Add New Brand
-                          </button>
-                          <BrandModal setIsDataAdded={setIsDataAdded} />
-                        </>
-                      )}
-                    </div>
-                    <input
-                      type="file"
-                      onChange={(e) =>
-                        handleHoverItemInfo(
-                          index,
-                          undefined,
-                          false,
-                          e.target.files![0]
-                        )
-                      }
-                      className="input w-full dark:bg-white"
-                    />
                   </div>
                 )}
               </div>
@@ -1020,29 +1036,42 @@ function RequestListSection() {
 
 function CustomDropdown({
   items,
+  pos,
   index,
-  setUploadImageState,
   setIsAdd,
+  setUploadImageState,
 }: {
   items: ItemInfo[] | null;
+  pos: Position | undefined;
   index: number;
-  setUploadImageState: (setUploadImageState: UploadImageState) => void;
   setIsAdd: (isSelected: boolean) => void;
+  setUploadImageState: Dispatch<SetStateAction<UploadImageState>>;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState("");
+  const [selectedItem, setSelectedItem] = useState<ItemInfo | null>(null);
   const [isSelect, setIsSelect] = useState(false);
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
   const handleSelect = (item: ItemInfo) => {
-    setSelectedItem(item.name);
+    setSelectedItem(item);
     setIsOpen(false);
     setIsSelect(true);
+    setUploadImageState((prev) => {
+      if (!prev) return {}; // prevState가 null이면 아무 작업도 하지 않고 null을 반환
+
+      const hoverItems = prev.hoverItems || [];
+      hoverItems[index] = {
+        isNew: false,
+        pos: pos!,
+        info: item,
+      };
+      return { ...prev, hoverItems };
+    });
   };
 
   const clearSelection = () => {
-    setSelectedItem("");
+    setSelectedItem(null);
     setIsSelect(false);
     setIsAdd(false);
   };
@@ -1053,7 +1082,7 @@ function CustomDropdown({
         onClick={toggleDropdown}
         className="input input-bordered w-full dark:bg-white"
       >
-        {selectedItem || "Select Item"}
+        {selectedItem ? selectedItem.name : "Select Item"}
       </button>
       {isOpen && (
         <ul className="absolute z-10 w-full bg-white border border-gray-300">

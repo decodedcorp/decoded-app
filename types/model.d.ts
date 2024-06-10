@@ -224,9 +224,19 @@ export interface ArticleInfo {
  * Interface for uploading items
  */
 interface HoverItemInfo {
+  isNew: boolean;
   pos: Position;
   info: ItemInfo;
+  /**
+   * @example Raw artist name if it is new
+   */
   artistName?: string;
+  /**
+   * @example Raw brand names
+   */
   brandName?: string[];
-  hoverItemFile?: File;
+  /**
+   * @example Type would be `File` if it is new
+   */
+  hoverItemImg?: File;
 }
