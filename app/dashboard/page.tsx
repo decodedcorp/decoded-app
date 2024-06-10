@@ -22,10 +22,12 @@ import {
   getByteSize,
   create_doc_id,
 } from "@/components/helpers/util";
-import { ConvertImageAndCompress } from "@/components/helpers/util";
+import {
+  ConvertImageAndCompress,
+  extractColorsFromImage,
+} from "@/components/helpers/util";
 import AdminLogin from "../admin/page";
 import { sha256 } from "js-sha256";
-
 import { ArtistModal, BrandModal, ItemModal } from "@/components/ui/modal";
 
 function AdminDashboard() {
@@ -119,7 +121,9 @@ function UploadImageSection({
     //   setIsUploading(false);
     //   return;
     // }
-    // const file = uploadImageState?.imageFile;
+    const file = uploadImageState?.imageFile;
+    const extractedColors = await extractColorsFromImage(file!);
+    console.log("Extracted colors:", extractedColors);
     // const hoverItemInfo = uploadImageState?.hoverItems;
     // // It is safe to force unwrap due to sanity check
     // const tags = await prepareTags(file!, hoverItemInfo!);
@@ -549,7 +553,8 @@ function UploadImageSection({
       const imageFile = await ConvertImageAndCompress(
         uploadImageState?.imageFile!,
         1,
-        1280
+        1280,
+        false
       );
       // path = "images/{image_doc_id}"
       const path = "images/" + tags["images"][0];
@@ -609,7 +614,8 @@ function UploadImageSection({
             const itemImage = await ConvertImageAndCompress(
               hoverItemImg,
               1,
-              1280
+              1280,
+              true
             );
             console.log("Convert & Compress done!");
             console.log("Creating storage ref items/", storage_file_name);
@@ -1073,7 +1079,14 @@ function CustomDropdown({
   const clearSelection = () => {
     setSelectedItem(null);
     setIsSelect(false);
-    setIsAdd(false);
+    setIsAdd(true);
+    setUploadImageState((prev) => {
+      if (!prev) return {}; // prevState가 null이면 아무 작업도 하지 않고 null을 반환
+
+      const hoverItems = prev.hoverItems || [];
+      hoverItems.splice(index, 1);
+      return { ...prev, hoverItems };
+    });
   };
 
   return (

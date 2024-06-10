@@ -6,6 +6,7 @@
  * @param taggedItem Optional array of tagged items.
  * @param tags Optional record of tags related to the image, with string keys and values.
  * @param description Optional description of the image.
+ * @param extractedColors Optional array of extracted colors.
  */
 export interface ImageInfo {
   /**
@@ -32,6 +33,11 @@ export interface ImageInfo {
    * @example "Description for the image"
    */
   description?: string;
+
+  /**
+   * @example ["#FFFFFF", "#000000"]
+   */
+  extractedColors?: string[];
 }
 
 /**

@@ -448,32 +448,35 @@ function DetailPage({ params: { imageId } }: PageProps) {
         </div>
       </div>
       <div className="my-10 w-full text-center">
-        {detailPageState.artistImgList && (
-          <div>
-            <h2 className={`${main_font.className} text-5xl font-bold my-20`}>
-              MORE TAGGED
-            </h2>
-            <div className="grid grid-cols-3 gap-1 items-center place-items-center">
-              {detailPageState.artistImgList.map((image) => (
-                <Link
-                  key={image[0]}
-                  href={`${image[0]}?imageUrl=${encodeURIComponent(image[1])}`}
-                  prefetch={false}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Image
-                    src={image[1]}
-                    alt="Artist Image"
-                    width={300}
-                    height={300}
-                    className="rounded-xl"
-                  />
-                </Link>
-              ))}
+        {detailPageState.artistImgList &&
+          detailPageState.artistImgList.length > 0 && (
+            <div>
+              <h2 className={`${main_font.className} text-5xl font-bold my-20`}>
+                MORE TAGGED
+              </h2>
+              <div className="grid grid-cols-3 gap-1 items-center place-items-center">
+                {detailPageState.artistImgList.map((image) => (
+                  <Link
+                    key={image[0]}
+                    href={`${image[0]}?imageUrl=${encodeURIComponent(
+                      image[1]
+                    )}`}
+                    prefetch={false}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Image
+                      src={image[1]}
+                      alt="Artist Image"
+                      width={300}
+                      height={300}
+                      className="rounded-xl"
+                    />
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
       </div>
     </div>
   );
