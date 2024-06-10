@@ -358,7 +358,7 @@ function ImageCarouselView({
           totalItems={itemCount}
         />
         <Link
-          href={`images/${docId}?imageUrl=${encodeURIComponent(url)}`}
+          href={`images?imageId=${docId}?imageUrl=${encodeURIComponent(url)}`}
           prefetch={false}
         >
           <Image

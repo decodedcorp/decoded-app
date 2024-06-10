@@ -50,12 +50,13 @@ interface DetailPageState {
   artistItemList?: ItemInfo[];
 }
 
-function DetailPage({ params: { imageId } }: PageProps) {
+function DetailPage() {
   const pointTriggerRef = useRef<HTMLDivElement>(null);
   const itemTriggerRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
+  const imageId = searchParams.get("imageId") ?? "";
   const imageUrl = searchParams.get("imageUrl") ?? "";
-  if (!imageUrl) {
+  if (!imageId || !imageUrl) {
     notFound();
   }
   // Detail page state
