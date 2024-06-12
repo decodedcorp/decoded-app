@@ -348,7 +348,7 @@ function DetailPage() {
                     <span className="loading loading-dots loading-md"></span>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-3 gap-4 w-full">
+                  <div className="detail-image grid grid-cols-3 gap-4 w-full">
                     <>
                       <Image
                         src={imageUrl}
@@ -357,7 +357,7 @@ function DetailPage() {
                         objectFit="cover"
                         className="border-2 border-black rounded-lg"
                       />
-                      <div ref={pointTriggerRef}>
+                      <div className="points" ref={pointTriggerRef}>
                         {detailPageState.img &&
                           detailPageState.itemList?.map((item) => (
                             <a
@@ -423,9 +423,8 @@ function DetailPage() {
               </div>
             </div>
             <div
-              className="text-black grid grid-cols-2 w-full"
+              className="items-wrapper text-black grid grid-cols-2 w-full"
               style={{
-                height: "auto",
                 aspectRatio: "3/4",
               }}
               ref={itemTriggerRef}
@@ -444,6 +443,7 @@ function DetailPage() {
                   />
                 </div>
               ))}
+              <div className="end-anim"></div>
             </div>
           </div>
         </div>
@@ -459,7 +459,7 @@ function DetailPage() {
                 {detailPageState.artistImgList.map((image) => (
                   <Link
                     key={image[0]}
-                    href={`${image[0]}?imageUrl=${encodeURIComponent(
+                    href={`?imageId=${image[0]}&imageUrl=${encodeURIComponent(
                       image[1]
                     )}`}
                     prefetch={false}

@@ -1056,6 +1056,8 @@ function CustomDropdown({
   const [isOpen, setIsOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<ItemInfo | null>(null);
   const [isSelect, setIsSelect] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
@@ -1079,7 +1081,7 @@ function CustomDropdown({
   const clearSelection = () => {
     setSelectedItem(null);
     setIsSelect(false);
-    setIsAdd(true);
+    setIsAdd(false);
     setUploadImageState((prev) => {
       if (!prev) return {}; // prevState가 null이면 아무 작업도 하지 않고 null을 반환
 
@@ -1088,6 +1090,11 @@ function CustomDropdown({
       return { ...prev, hoverItems };
     });
   };
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = items?.slice(indexOfFirstItem, indexOfLastItem);
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   return (
     <div className="relative">
@@ -1098,25 +1105,49 @@ function CustomDropdown({
         {selectedItem ? selectedItem.name : "Select Item"}
       </button>
       {isOpen && (
-        <ul className="absolute z-10 w-full bg-white border border-gray-300">
-          {items?.map((item, idx) => (
-            <li
-              key={idx}
-              className="flex items-center p-2 cursor-pointer hover:bg-gray-100"
-              onClick={() => handleSelect(item)}
-            >
-              <Image
-                src={item.imageUrl ?? ""}
-                alt={item.name}
-                width={30}
-                height={30}
-                style={{ marginRight: "10px" }}
-                className="rounded-md"
-              />
-              {item.name}
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="absolute z-10 w-full bg-white border border-gray-300">
+            {currentItems?.map((item, idx) => (
+              <li
+                key={idx}
+                className="flex items-center p-2 cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSelect(item)}
+              >
+                <Image
+                  src={item.imageUrl ?? ""}
+                  alt={item.name}
+                  width={30}
+                  height={30}
+                  style={{ marginRight: "10px", width: "30px", height: "30px" }}
+                  className="rounded-md"
+                />
+                <div>
+                  <p>{item.name}</p>
+                </div>
+              </li>
+            ))}
+            <div className="flex justify-evenly mt-2 ">
+              <button
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="btn bg-[#FF204E]"
+              >
+                이전
+              </button>
+              <button
+                onClick={() => paginate(currentPage + 1)}
+                disabled={
+                  items
+                    ? currentPage === Math.ceil(items.length / itemsPerPage)
+                    : true
+                }
+                className="btn bg-[#FF204E]"
+              >
+                다음
+              </button>
+            </div>
+          </ul>
+        </>
       )}
       <div className="flex justify-between w-full">
         <button
