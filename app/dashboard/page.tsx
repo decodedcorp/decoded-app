@@ -553,8 +553,7 @@ function UploadImageSection({
       const imageFile = await ConvertImageAndCompress(
         uploadImageState?.imageFile!,
         1,
-        1280,
-        false
+        1280
       );
       // path = "images/{image_doc_id}"
       const path = "images/" + tags["images"][0];
@@ -614,8 +613,7 @@ function UploadImageSection({
             const itemImage = await ConvertImageAndCompress(
               hoverItemImg,
               1,
-              1280,
-              true
+              1280
             );
             console.log("Convert & Compress done!");
             console.log("Creating storage ref items/", storage_file_name);

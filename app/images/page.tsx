@@ -17,12 +17,6 @@ import {
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-interface PageProps {
-  params: {
-    imageId: string;
-  };
-}
-
 interface DetailPageState {
   /**
    * Image info
@@ -52,7 +46,6 @@ interface DetailPageState {
 
 function DetailPage() {
   const pointTriggerRef = useRef<HTMLDivElement>(null);
-  const itemTriggerRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
   const imageId = searchParams.get("imageId") ?? "";
   const imageUrl = searchParams.get("imageUrl") ?? "";
@@ -79,81 +72,74 @@ function DetailPage() {
 
     const points = gsap.utils.toArray(".point") as Element[];
     const items = gsap.utils.toArray(".item") as Element[];
-    const infoDiv = document.createElement("div");
-    infoDiv.className =
-      "info-div absolute bg-gray-500 bg-opacity-80 rounded-lg p-2 flex items-center gap-2 w-[250px]";
-    infoDiv.style.opacity = "0";
-    infoDiv.style.transition = "opacity 0.5s ease-in-out";
-    infoDiv.style.zIndex = "10000"; // 높은 z-index 값으로 설정
-    document.body.appendChild(infoDiv);
+    const moreTagged = gsap.utils.toArray(".more-tagged") as Element[];
 
-    points.forEach((point, index) => {
-      const item = items[index];
-      // 포인트에 대한 애니메이션 설정
-      gsap.fromTo(
-        point,
-        { opacity: 0.5, scale: 0.5 },
-        {
-          opacity: 1,
-          scale: 2,
-          scrollTrigger: {
-            trigger: point,
-            start: "top bottom",
-            end: "bottom center",
-            scrub: true,
-            markers: true,
-          },
-        }
-      );
-
-      // 아이템에 대한 애니메이션 설정 (scale 변화 없음)
-      gsap.fromTo(
-        item,
-        { opacity: 0.5 },
-        {
-          opacity: 1,
-          scrollTrigger: {
-            trigger: point,
-            start: "top bottom",
-            end: "bottom center",
-            scrub: true,
-            markers: true,
-          },
-        }
-      );
-
-      ScrollTrigger.create({
-        trigger: point,
-        start: "top center+=100", // 뷰포트 중앙보다 100px 위에서 트리거
-        end: "bottom center-=100", // 뷰포트 중앙보다 100px 아래에서 트리거 해제
-        onEnter: () => {
-          const rect = point.getBoundingClientRect();
-          infoDiv.style.top = `${
-            window.scrollY + rect.top - rect.height - 10
-          }px`; // 포인트 위에 위치
-          infoDiv.style.left = `${
-            rect.left + rect.width / 2 - infoDiv.offsetWidth / 2
-          }px`; // 포인트 가운데 정렬
-
-          infoDiv.innerHTML = `
-            <div class="relative w-[50px] h-[50px]">
-              <img src="${detailPageState?.itemList?.[index]?.info.imageUrl}" alt="${detailPageState?.itemList?.[index]?.info.name}" width="50" height="50" class="rounded-lg" />
-            </div>
-            <div class="text-white">
-              <p class="text-sm font-bold">${detailPageState?.itemList?.[index]?.info.name}</p>
-              <p class="text-xs">${detailPageState?.itemList?.[index]?.info.price}</p>
-            </div>
-          `;
-          gsap.to(infoDiv, { opacity: 1, duration: 0.3 });
+    if (detailPageState.img) {
+      gsap.to(".image-detail", {
+        scale: 0.8,
+        scrollTrigger: {
+          trigger: ".image-detail",
+          start: "top-=10 top",
+          end: "+=2000",
+          pin: true,
+          pinSpacing: true,
+          endTrigger: ".end-anim",
+          markers: true,
+          scrub: 1,
         },
-        onLeave: () => {
-          gsap.to(infoDiv, { opacity: 0, duration: 0.3 });
-        },
-        onEnterBack: () => {
-          gsap.to(infoDiv, { opacity: 1, duration: 0.3 });
-        },
-        onLeaveBack: () => {
-          gsap.to(infoDiv, { opacity: 0, duration: 0.3 });
+      });
+      points.forEach((point, index) => {
+        gsap.fromTo(
+          point,
+          { opacity: 0.5, scale: 0.5 },
+          {
+            opacity: 1,
+            scale: 2,
+            scrollTrigger: {
+              trigger: point,
+              start: `top+=${index * 200} top+=100`,
+              end: "bottom bottom",
+              scrub: true,
+              markers: false,
+            },
+          }
+        );
+      });
+      items.forEach((item, index) => {
+        const scale = 0.9 - 0.025 * index;
+        gsap.fromTo(
+          item,
+          { opacity: 0, x: 300, scale: 1 },
+          {
+            x: 50 * index,
+            y: 100 * index,
+            scale: scale,
+            opacity: 1,
+            scrollTrigger: {
+              trigger: item,
+              start: `top+=${index * 200} top+=100`,
+              end: "bottom bottom",
+              scrub: 1,
+              pin: true,
+              pinSpacing: false,
+              markers: true,
+            },
+            ease: "power1.inOut",
+          }
+        );
+      });
+    }
+
+    moreTagged.forEach((moreTagged, index) => {
+      gsap.to(moreTagged, {
+        opacity: 1,
+        y: -50,
+        backgroundColor: "#ff0000",
+        scrollTrigger: {
+          trigger: ".start-more-anim",
+          start: `top top+=40px`,
+          end: "bottom bottom",
+          scrub: 2,
         },
       });
     });
@@ -333,33 +319,48 @@ function DetailPage() {
           </div>
         ) : null}
         {/* IMAGE */}
-        <div className="flex flex-row">
-          <div className="grid grid-cols-1 lg:grid-cols-2 justify-center items-center w-full sm:h-auto mb-2">
-            <div
-              className="rounded-lg shadow-lg overflow-hidden"
-              style={{
-                height: "auto",
-                aspectRatio: "3/4",
-              }}
+        {isFetching ? (
+          <div className="flex justify-center items-center ">
+            <h1
+              className={`${main_font.className} text-7xl md:text-5xl loading-text p-5`}
             >
-              <div className="relative h-full w-full">
-                {isFetching ? (
-                  <div className="absolute inset-0 flex justify-center items-center">
-                    <span className="loading loading-dots loading-md"></span>
-                  </div>
-                ) : (
-                  <div className="detail-image grid grid-cols-3 gap-4 w-full">
-                    <>
-                      <Image
-                        src={imageUrl}
-                        alt="Featured fashion"
-                        layout="fill"
-                        objectFit="cover"
-                        className="border-2 border-black rounded-lg"
-                      />
-                      <div className="points" ref={pointTriggerRef}>
-                        {detailPageState.img &&
-                          detailPageState.itemList?.map((item) => (
+              LOADING
+            </h1>
+          </div>
+        ) : (
+          <div className="image-detail flex flex-row border-2 border-black rounded-lg">
+            <div className="grid grid-cols-2 justify-center items-center w-full sm:h-auto">
+              <div
+                className="rounded-lg shadow-lg overflow-hidden"
+                style={{
+                  height: "auto",
+                  aspectRatio: "3/4",
+                }}
+              >
+                <div className="relative w-full h-full">
+                  <div className="flex w-full h-full">
+                    <Image
+                      src={imageUrl}
+                      alt="Featured fashion"
+                      layout="fill"
+                      objectFit="cover"
+                    />
+                    <div className="points" ref={pointTriggerRef}>
+                      {detailPageState.img &&
+                        detailPageState.itemList
+                          ?.sort((a, b) => {
+                            // top 값 비교
+                            const topA = parseInt(a.pos.top || "0%");
+                            const topB = parseInt(b.pos.top || "0%");
+                            if (topA !== topB) {
+                              return topA - topB;
+                            }
+                            // top 값이 같을 경우 left 값 비교
+                            const leftA = parseInt(a.pos.left || "0%");
+                            const leftB = parseInt(b.pos.left || "0%");
+                            return leftA - leftB;
+                          })
+                          .map((item) => (
                             <a
                               key={item.info.name}
                               href={item.info?.affiliateUrl ?? ""}
@@ -386,68 +387,105 @@ function DetailPage() {
                               ></div>
                             </a>
                           ))}
-                      </div>
-                    </>
-                  </div>
-                )}
-                {/* Display information for the hovered item */}
-                {hoverItem && (
-                  <div
-                    className={`absolute transform -translate-x-1/2 -translate-y-full transition-opacity duration-300 ease-in-out ${
-                      hoverItem ? "opacity-100" : "opacity-0"
-                    }`}
-                    style={{
-                      top: hoverItem.pos.top,
-                      left: hoverItem.pos.left,
-                      zIndex: 50,
-                    }}
-                    onMouseOut={handleMouseOut}
-                  >
-                    <div className="relative bg-gray-500 bg-opacity-80 rounded-lg p-2 flex items-center gap-2 w-[250px]">
-                      <Image
-                        src={hoverItem.info.imageUrl ?? ""}
-                        alt={hoverItem.info.name}
-                        width={30}
-                        height={30}
-                        className="rounded-lg w-[50px] h-[50px]"
-                      />
-                      <div className="text-white">
-                        <p className="text-sm font-bold">
-                          {hoverItem.info.name}
-                        </p>
-                        <p className="text-xs">{hoverItem.info?.price}</p>
-                      </div>
                     </div>
                   </div>
-                )}
+                  {/* Display information for the hovered item */}
+                  {hoverItem && (
+                    <div
+                      className={`absolute transform -translate-x-1/2 -translate-y-full transition-opacity duration-300 ease-in-out ${
+                        hoverItem ? "opacity-100" : "opacity-0"
+                      }`}
+                      style={{
+                        top: hoverItem.pos.top,
+                        left: hoverItem.pos.left,
+                        zIndex: 50,
+                      }}
+                      onMouseOut={handleMouseOut}
+                    >
+                      <div className="relative bg-gray-500 bg-opacity-80 rounded-lg p-2 flex items-center gap-2 w-[250px]">
+                        <Image
+                          src={hoverItem.info.imageUrl ?? ""}
+                          alt={hoverItem.info.name}
+                          width={30}
+                          height={30}
+                          className="rounded-lg w-[50px] h-[50px]"
+                        />
+                        <div className="text-white">
+                          <p className="text-sm font-bold">
+                            {hoverItem.info.name}
+                          </p>
+                          <p className="text-xs">{hoverItem.info?.price}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div
+                className="relative text-black flex flex-col w-full"
+                style={{
+                  aspectRatio: "3/4",
+                }}
+              >
+                {detailPageState.itemList
+                  ?.sort((a, b) => {
+                    // top 값 비교
+                    const topA = parseInt(a.pos.top || "0%");
+                    const topB = parseInt(b.pos.top || "0%");
+                    if (topA !== topB) {
+                      return topA - topB;
+                    }
+                    // top 값이 같을 경우 left 값 비교
+                    const leftA = parseInt(a.pos.left || "0%");
+                    const leftB = parseInt(b.pos.left || "0%");
+                    return leftA - leftB;
+                  })
+                  .map((item, index) => (
+                    <div
+                      key={item.info.name}
+                      className="item flex flex-col absolute w-[80%] h-[60%]"
+                      style={{
+                        transform: `translate(${index * 10}px, ${
+                          index * 10
+                        }px)`,
+                        zIndex: (detailPageState.itemList?.length || 0) + index,
+                      }}
+                    >
+                      <Image
+                        src={item.info.imageUrl ?? ""}
+                        alt={item.info.name}
+                        layout="fill"
+                        objectFit="cover" // contain or cover
+                        className="rounded-xl"
+                      />
+                      <div className="flex flex-col items-center justify-center bg-white bg-opacity-80 p-2 rounded-b-xl absolute bottom-0 translate-y-full w-full">
+                        <p
+                          className={`${main_font.className} text-xl font-bold text-black dark:text-[#FF204E] m-1`}
+                        >
+                          {item.info.name}
+                        </p>
+                        <p
+                          className={`${main_font.className} text-lg text-black dark:text-[#FF204E] font-bold`}
+                        >
+                          {detailPageState?.brandList?.[index]
+                            .replace(/_/g, " ")
+                            .toUpperCase()}
+                        </p>
+                        <p
+                          className={`${main_font.className} text-md text-black dark:text-[#FF204E] underline m-1`}
+                        >
+                          {item.info.price}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
               </div>
             </div>
-            <div
-              className="items-wrapper text-black grid grid-cols-2 w-full"
-              style={{
-                aspectRatio: "3/4",
-              }}
-              ref={itemTriggerRef}
-            >
-              {detailPageState.itemList?.map((item) => (
-                <div
-                  key={item.info.name}
-                  className="item relative w-full pb-[100%]"
-                >
-                  <Image
-                    src={item.info.imageUrl ?? ""}
-                    alt={item.info.name}
-                    layout="fill"
-                    objectFit="contain"
-                    className="rounded-lg border-2 border-black"
-                  />
-                </div>
-              ))}
-              <div className="end-anim"></div>
-            </div>
           </div>
-        </div>
+        )}
+        <div className="end-anim"></div>
       </div>
+      <div className="start-more-anim"></div>
       <div className="my-10 w-full text-center">
         {detailPageState.artistImgList &&
           detailPageState.artistImgList.length > 0 && (
@@ -471,7 +509,7 @@ function DetailPage() {
                       alt="Artist Image"
                       width={300}
                       height={300}
-                      className="rounded-xl"
+                      className="more-tagged rounded-xl opacity-0"
                     />
                   </Link>
                 ))}

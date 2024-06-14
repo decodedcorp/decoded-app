@@ -1,7 +1,7 @@
 import localFont from "next/font/local";
 import { arrayBufferToWebP } from "webp-converter-browser";
 import imageCompression from "browser-image-compression";
-import { removeBackground } from "@imgly/background-removal";
+import { removeBackground, Config, preload } from "@imgly/background-removal";
 import { extractColors } from "extract-colors";
 import { sha256 } from "js-sha256";
 
@@ -30,10 +30,10 @@ export function create_doc_id(name: string): string {
 export async function extractColorsFromImage(image: File): Promise<string[]> {
   console.log("Extracting colors from image...");
   try {
-    const img = await convertFileToHTMLImageElement(image);
-    const colors = await extractColors(img);
-    console.log("Extracted colors:", colors);
-    return colors.map((color) => color.hex);
+    const ogImg = await convertFileToHTMLImageElement(image);
+    const allColors = await extractColors(ogImg);
+    // TODO: background img and subject img
+    return allColors.map((color) => color.hex);
   } catch (error) {
     console.error("Error extracting colors:", error);
     return [];
@@ -71,18 +71,11 @@ function convertFileToHTMLImageElement(file: File): Promise<HTMLImageElement> {
 export async function ConvertImageAndCompress(
   file: File,
   maxSize: number,
-  maxWidthOrHeight: number,
-  isRemoveBackground: boolean
+  maxWidthOrHeight: number
 ): Promise<File> {
   console.log("Trying to convert to webp...");
   const buf = await file.arrayBuffer();
-  var blobToFile: File;
-  if (isRemoveBackground) {
-    const blob = await (await removeBackground(buf)).arrayBuffer();
-    blobToFile = (await arrayBufferToWebP(blob)) as File;
-  } else {
-    blobToFile = (await arrayBufferToWebP(buf)) as File;
-  }
+  var blobToFile: File = (await arrayBufferToWebP(buf)) as File;
   const hoverFileOptions = {
     maxSizeMB: maxSize,
     maxWidthOrHeight: maxWidthOrHeight,
