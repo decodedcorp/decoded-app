@@ -443,6 +443,8 @@ function UploadImageSection({
         } else {
           updatedHoverItems[index].info[field]![0] = value as string;
         }
+      } else if (field === "brands") {
+        return prevState; // brands는 여기서 처리하지 않음
       } else {
         if (field) {
           // Reamining fields

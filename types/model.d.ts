@@ -22,6 +22,10 @@ export interface ImageInfo {
    */
   hyped: number;
   /**
+   * @example "grunge", "minimalist",
+   */
+  style?: string;
+  /**
    * @example TaggedItem { "id": "123", "pos": { "top": "100px", "left": "100px" } }
    */
   taggedItem?: TaggedItem[] | HoverItem[];
@@ -33,11 +37,10 @@ export interface ImageInfo {
    * @example "Description for the image"
    */
   description?: string;
-
   /**
-   * @example ["#FFFFFF", "#000000"]
+   * @example { "background": ["#FFFFFF", "#000000"], "style": ["#FFFFFF", "#000000"] }
    */
-  extractedColors?: string[];
+  colorInfo?: ColorInfo;
 }
 
 /**
@@ -160,6 +163,11 @@ export interface ItemInfo {
    * @example "Clothing"
    */
   category: string;
+
+  /**
+   * @example ["Brand1", "Brand2"]. Two if it is collab
+   */
+  brands?: string[];
   /**
    */
   hyped: number;
@@ -245,4 +253,15 @@ interface HoverItemInfo {
    * @example Type would be `File` if it is new
    */
   hoverItemImg?: File;
+}
+
+interface ColorInfo {
+  /**
+   * @example ["#FFFFFF", "#000000"]
+   */
+  background?: string;
+  /**
+   * @example ["#FFFFFF", "#000000"]
+   */
+  style?: string[];
 }

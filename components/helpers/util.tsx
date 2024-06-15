@@ -4,6 +4,7 @@ import imageCompression from "browser-image-compression";
 import { removeBackground, Config, preload } from "@imgly/background-removal";
 import { extractColors } from "extract-colors";
 import { sha256 } from "js-sha256";
+import { CSSProperties } from "react";
 
 export const main_font = localFont({
   src: "../../fonts/Blinker-Bold.ttf",
@@ -86,4 +87,25 @@ export async function ConvertImageAndCompress(
     hoverFileOptions
   );
   return compressedHoverFile;
+}
+
+export function handleMagnifyIn(
+  e: React.MouseEvent<HTMLDivElement>,
+  setZoomStyle: React.Dispatch<React.SetStateAction<CSSProperties>>
+) {
+  const target = e.currentTarget as HTMLDivElement;
+  const rect = target.getBoundingClientRect();
+  const offsetX = e.clientX - rect.left;
+  const offsetY = e.clientY - rect.top;
+
+  const { offsetWidth, offsetHeight } = target;
+  const x = (offsetX / offsetWidth) * 100;
+  const y = (offsetY / offsetHeight) * 100;
+  setZoomStyle({
+    backgroundPosition: `${x}% ${y}%`,
+    backgroundSize: "500%",
+    backgroundRepeat: "no-repeat",
+    top: `${offsetY - 100}px`,
+    left: `${offsetX - 100}px`,
+  });
 }

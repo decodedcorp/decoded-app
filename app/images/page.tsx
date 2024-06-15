@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState, useEffect, useRef } from "react";
-import { main_font } from "@/components/helpers/util";
+import React, { useState, useEffect, useRef, CSSProperties } from "react";
+import { main_font, handleMagnifyIn } from "@/components/helpers/util";
 import { FirebaseHelper } from "@/common/firebase";
 import { useSearchParams } from "next/navigation";
 import { notFound } from "next/navigation";
@@ -13,6 +13,7 @@ import {
   HoverItem,
   ItemInfo,
   BrandInfo,
+  ColorInfo,
 } from "@/types/model";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -42,6 +43,10 @@ interface DetailPageState {
    * Artist items
    */
   artistItemList?: ItemInfo[];
+  /**
+   * Extracted color info from image
+   */
+  colorInfo?: ColorInfo;
 }
 
 function DetailPage() {
@@ -49,6 +54,8 @@ function DetailPage() {
   const searchParams = useSearchParams();
   const imageId = searchParams.get("imageId") ?? "";
   const imageUrl = searchParams.get("imageUrl") ?? "";
+  const [zoomStyle, setZoomStyle] = useState<CSSProperties>({});
+  const zoomRef = useRef(null);
   if (!imageId || !imageUrl) {
     notFound();
   }
@@ -58,6 +65,10 @@ function DetailPage() {
   // Independent state
   let [hoverItem, setHoverItem] = useState<HoverItem | null>(null);
   let [isFetching, setIsFetching] = useState(false);
+
+  const handleMagnifyOut = () => {
+    setZoomStyle({});
+  };
 
   const handleMouseOver = (item: HoverItem) => {
     setHoverItem(item);
@@ -72,18 +83,29 @@ function DetailPage() {
 
     const points = gsap.utils.toArray(".point") as Element[];
     const items = gsap.utils.toArray(".item") as Element[];
-    const moreTagged = gsap.utils.toArray(".more-tagged") as Element[];
 
     if (detailPageState.img) {
+      gsap.to("#image-detail-wrapper", {
+        backgroundColor: `${
+          detailPageState?.colorInfo?.background ?? "#FFFFFF"
+        }`,
+        scrollTrigger: {
+          trigger: "#image-detail-wrapper",
+          start: "top top",
+          end: "-=500",
+          scrub: 1,
+        },
+        ease: "power1.inOut",
+      });
       gsap.to(".image-detail", {
         scale: 0.8,
         scrollTrigger: {
           trigger: ".image-detail",
           start: "top-=10 top",
-          end: "+=2000",
+          end: "+=1000",
+          endTrigger: ".end-anim",
           pin: true,
           pinSpacing: true,
-          endTrigger: ".end-anim",
           markers: true,
           scrub: 1,
         },
@@ -96,7 +118,7 @@ function DetailPage() {
             opacity: 1,
             scale: 2,
             scrollTrigger: {
-              trigger: point,
+              trigger: `#item-${index}`,
               start: `top+=${index * 200} top+=100`,
               end: "bottom bottom",
               scrub: true,
@@ -106,7 +128,7 @@ function DetailPage() {
         );
       });
       items.forEach((item, index) => {
-        const scale = 0.9 - 0.025 * index;
+        const scale = 0.8 + 0.025 * index;
         gsap.fromTo(
           item,
           { opacity: 0, x: 300, scale: 1 },
@@ -129,20 +151,6 @@ function DetailPage() {
         );
       });
     }
-
-    moreTagged.forEach((moreTagged, index) => {
-      gsap.to(moreTagged, {
-        opacity: 1,
-        y: -50,
-        backgroundColor: "#ff0000",
-        scrollTrigger: {
-          trigger: ".start-more-anim",
-          start: `top top+=40px`,
-          end: "bottom bottom",
-          scrub: 2,
-        },
-      });
-    });
   }, [detailPageState.itemList]); // itemList가 변경될 때마다 useEffect가 재실행됩니다.
 
   useEffect(() => {
@@ -163,22 +171,14 @@ function DetailPage() {
       var artistItemList: ItemInfo[] = [];
       var artistImgList: [string, string][] = [];
 
-      // Image brand tags
-      const imgBrandTags = img.tags?.brands;
+      const colorInfo = img.colorInfo;
+
       // Image artist tags
       const imgArtistTags = img.tags?.artists;
 
-      // Update image related brand list if any
-      if (imgBrandTags) {
-        await Promise.all(
-          imgBrandTags.map(async (brand) => {
-            const brandInfo = (
-              await FirebaseHelper.doc("brands", brand)
-            ).data() as BrandInfo;
-            brandList = Array.from(new Set([...brandList, brandInfo.name]));
-          })
-        );
-      }
+      brandList = Array.from(
+        new Set(itemList.map((item) => item.info.brands || []).flat())
+      );
 
       // Update image related artist stuff if any
       if (imgArtistTags) {
@@ -239,6 +239,7 @@ function DetailPage() {
         artistList: artistList,
         artistImgList: artistImgList,
         artistItemList: artistItemList,
+        colorInfo: colorInfo,
       });
       setIsFetching(false);
     };
@@ -248,18 +249,24 @@ function DetailPage() {
 
   return (
     <div className="flex-col rounded-lg justify-center items-center z-0">
-      <div className="flex flex-col">
+      <div className="flex flex-col text-center">
         {/* DESCRIPTION */}
         {detailPageState.img ? (
           <div className="flex flex-col w-full text-center my-10 pl-10 pr-10">
-            <h2 className={`${main_font.className} text-4xl font-bold`}>
+            <h2
+              className={`${main_font.className} text-4xl md:text-6xl font-bold mb-4 mt-36`}
+            >
               {detailPageState.img.title}
             </h2>
-            <p className="text-lg my-2 ">{detailPageState.img.description}</p>
+            <p className="text-2xl md:text-3xl mt-20">
+              {detailPageState.img.description}
+            </p>
             {/* DETAILS */}
             <div className="flex flex-col text-center justify-center items-center my-10">
-              <div className="flex flex-col my-2 items-center">
-                <p className={`${main_font.className} text-2xl`}>ARTIST:</p>
+              <div className="flex flex-col mt-20 items-center">
+                <p className={`${main_font.className} text-2xl md:text-4xl`}>
+                  ARTIST:
+                </p>
                 {detailPageState.artistList?.map((name, index) => (
                   <Link
                     key={index}
@@ -272,8 +279,10 @@ function DetailPage() {
               </div>
 
               {/* List all brands */}
-              <div className="flex flex-col my-2">
-                <p className={`${main_font.className} text-2xl`}>BRANDS: </p>
+              <div className="flex flex-col mt-10">
+                <p className={`${main_font.className} text-2xl md:text-4xl`}>
+                  BRANDS:{" "}
+                </p>
                 {detailPageState.brandList?.map((brand, index) => (
                   <Link
                     key={index}
@@ -297,8 +306,10 @@ function DetailPage() {
                     return acc;
                   }, {} as Record<string, HoverItem[]>) || []
                 ).map(([category, tags]) => (
-                  <div key={category} className="flex flex-col my-2">
-                    <p className={`${main_font.className} text-2xl`}>
+                  <div key={category} className="flex flex-col">
+                    <p
+                      className={`${main_font.className} text-2xl md:text-4xl mt-10`}
+                    >
                       {category} :
                     </p>
                     {tags.map((tag) => (
@@ -315,6 +326,22 @@ function DetailPage() {
                   </div>
                 ))}
               </div>
+
+              {/* List all colors */}
+              <div className="items-center justify-center mt-10">
+                <p className={`${main_font.className} text-2xl md:text-4xl`}>
+                  STYLE COLORS:{" "}
+                </p>
+                <div className="flex flex-row w-full justify-center">
+                  {detailPageState?.colorInfo?.style?.map((color) => (
+                    <div
+                      key={color}
+                      className="w-10 h-10 rounded-full m-2"
+                      style={{ backgroundColor: color }}
+                    ></div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         ) : null}
@@ -328,164 +355,175 @@ function DetailPage() {
             </h1>
           </div>
         ) : (
-          <div className="image-detail flex flex-row border-2 border-black rounded-lg">
-            <div className="grid grid-cols-2 justify-center items-center w-full sm:h-auto">
-              <div
-                className="rounded-lg shadow-lg overflow-hidden"
-                style={{
-                  height: "auto",
-                  aspectRatio: "3/4",
-                }}
-              >
-                <div className="relative w-full h-full">
-                  <div className="flex w-full h-full">
-                    <Image
-                      src={imageUrl}
-                      alt="Featured fashion"
-                      layout="fill"
-                      objectFit="cover"
-                    />
-                    <div className="points" ref={pointTriggerRef}>
-                      {detailPageState.img &&
-                        detailPageState.itemList
-                          ?.sort((a, b) => {
-                            // top 값 비교
-                            const topA = parseInt(a.pos.top || "0%");
-                            const topB = parseInt(b.pos.top || "0%");
-                            if (topA !== topB) {
-                              return topA - topB;
-                            }
-                            // top 값이 같을 경우 left 값 비교
-                            const leftA = parseInt(a.pos.left || "0%");
-                            const leftB = parseInt(b.pos.left || "0%");
-                            return leftA - leftB;
-                          })
-                          .map((item) => (
-                            <a
-                              key={item.info.name}
-                              href={item.info?.affiliateUrl ?? ""}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              style={{
-                                position: "absolute",
-                                top: item.pos.top,
-                                left: item.pos.left,
-                                cursor: "pointer",
-                              }}
-                              className="point"
-                            >
-                              <div
-                                onMouseOver={() => handleMouseOver(item)}
-                                onMouseOut={handleMouseOut}
-                                style={{
-                                  width: "10px",
-                                  height: "10px",
-                                  borderRadius: "50%",
-                                  backgroundColor: "white",
-                                  boxShadow: "0 0 2px 2px rgba(0, 0, 0, 0.2)",
-                                }}
-                              ></div>
-                            </a>
-                          ))}
-                    </div>
-                  </div>
-                  {/* Display information for the hovered item */}
-                  {hoverItem && (
+          <div id="image-detail-wrapper" className="bg-white mt-20">
+            <div className="image-detail flex flex-row border-2 border-black rounded-lg">
+              <div className="grid grid-cols-2 justify-center items-center w-full sm:h-auto">
+                <div
+                  className="rounded-lg shadow-lg overflow-hidden"
+                  style={{
+                    height: "auto",
+                    aspectRatio: "3/4",
+                  }}
+                >
+                  <div className="relative w-full h-full ">
                     <div
-                      className={`absolute transform -translate-x-1/2 -translate-y-full transition-opacity duration-300 ease-in-out ${
-                        hoverItem ? "opacity-100" : "opacity-0"
-                      }`}
-                      style={{
-                        top: hoverItem.pos.top,
-                        left: hoverItem.pos.left,
-                        zIndex: 50,
-                      }}
-                      onMouseOut={handleMouseOut}
-                    >
-                      <div className="relative bg-gray-500 bg-opacity-80 rounded-lg p-2 flex items-center gap-2 w-[250px]">
-                        <Image
-                          src={hoverItem.info.imageUrl ?? ""}
-                          alt={hoverItem.info.name}
-                          width={30}
-                          height={30}
-                          className="rounded-lg w-[50px] h-[50px]"
-                        />
-                        <div className="text-white">
-                          <p className="text-sm font-bold">
-                            {hoverItem.info.name}
-                          </p>
-                          <p className="text-xs">{hoverItem.info?.price}</p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-              <div
-                className="relative text-black flex flex-col w-full"
-                style={{
-                  aspectRatio: "3/4",
-                }}
-              >
-                {detailPageState.itemList
-                  ?.sort((a, b) => {
-                    // top 값 비교
-                    const topA = parseInt(a.pos.top || "0%");
-                    const topB = parseInt(b.pos.top || "0%");
-                    if (topA !== topB) {
-                      return topA - topB;
-                    }
-                    // top 값이 같을 경우 left 값 비교
-                    const leftA = parseInt(a.pos.left || "0%");
-                    const leftB = parseInt(b.pos.left || "0%");
-                    return leftA - leftB;
-                  })
-                  .map((item, index) => (
-                    <div
-                      key={item.info.name}
-                      className="item flex flex-col absolute w-[80%] h-[60%]"
-                      style={{
-                        transform: `translate(${index * 10}px, ${
-                          index * 10
-                        }px)`,
-                        zIndex: (detailPageState.itemList?.length || 0) + index,
-                      }}
+                      className="image-elem flex w-full h-full"
+                      // onMouseMove={(e) => handleMagnifyIn(e, setZoomStyle)}
+                      // onMouseLeave={handleMagnifyOut}
                     >
                       <Image
-                        src={item.info.imageUrl ?? ""}
-                        alt={item.info.name}
+                        src={imageUrl}
+                        alt="Featured fashion"
                         layout="fill"
-                        objectFit="cover" // contain or cover
-                        className="rounded-xl"
+                        objectFit="cover"
                       />
-                      <div className="flex flex-col items-center justify-center bg-white bg-opacity-80 p-2 rounded-b-xl absolute bottom-0 translate-y-full w-full">
-                        <p
-                          className={`${main_font.className} text-xl font-bold text-black dark:text-[#FF204E] m-1`}
-                        >
-                          {item.info.name}
-                        </p>
-                        <p
-                          className={`${main_font.className} text-lg text-black dark:text-[#FF204E] font-bold`}
-                        >
-                          {detailPageState?.brandList?.[index]
-                            .replace(/_/g, " ")
-                            .toUpperCase()}
-                        </p>
-                        <p
-                          className={`${main_font.className} text-md text-black dark:text-[#FF204E] underline m-1`}
-                        >
-                          {item.info.price}
-                        </p>
+                      {/* Magnifying */}
+                      <div
+                        ref={zoomRef}
+                        className="absolute w-[400px] h-[200px] border-2 border-black bg-cover hidden cursor-none"
+                        style={{
+                          ...zoomStyle,
+                          backgroundImage: `url(${imageUrl})`,
+                          display: zoomStyle.backgroundPosition
+                            ? "block"
+                            : "none",
+                        }}
+                      ></div>
+                      <div className="points" ref={pointTriggerRef}>
+                        {detailPageState.img &&
+                          detailPageState.itemList
+                            ?.sort((a, b) => {
+                              // top 값 비교
+                              const topA = parseInt(a.pos.top || "0%");
+                              const topB = parseInt(b.pos.top || "0%");
+                              if (topA !== topB) {
+                                return topA - topB;
+                              }
+                              // top 값이 같을 경우 left 값 비교
+                              const leftA = parseInt(a.pos.left || "0%");
+                              const leftB = parseInt(b.pos.left || "0%");
+                              return leftA - leftB;
+                            })
+                            .map((item) => (
+                              <a
+                                key={item.info.name}
+                                href={item.info?.affiliateUrl ?? ""}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                  position: "absolute",
+                                  top: item.pos.top,
+                                  left: item.pos.left,
+                                  cursor: "pointer",
+                                }}
+                                className="point"
+                              >
+                                <div
+                                  onMouseOver={() => handleMouseOver(item)}
+                                  onMouseOut={handleMouseOut}
+                                  style={{
+                                    width: "10px",
+                                    height: "10px",
+                                    borderRadius: "50%",
+                                    backgroundColor: "white",
+                                    boxShadow: "0 0 2px 2px rgba(0, 0, 0, 0.2)",
+                                  }}
+                                ></div>
+                              </a>
+                            ))}
                       </div>
                     </div>
-                  ))}
+                    {/* Display information for the hovered item */}
+                    {hoverItem && (
+                      <div
+                        className={`absolute transform -translate-x-1/2 -translate-y-full transition-opacity duration-300 ease-in-out ${
+                          hoverItem ? "opacity-100" : "opacity-0"
+                        }`}
+                        style={{
+                          top: hoverItem.pos.top,
+                          left: hoverItem.pos.left,
+                          zIndex: 50,
+                        }}
+                        onMouseOut={handleMouseOut}
+                      >
+                        <div className="relative bg-gray-500 bg-opacity-80 rounded-lg p-2 flex items-center gap-2 w-[250px]">
+                          <Image
+                            src={hoverItem.info.imageUrl ?? ""}
+                            alt={hoverItem.info.name}
+                            width={30}
+                            height={30}
+                            className="rounded-lg w-[50px] h-[50px]"
+                          />
+                          <div className="text-white">
+                            <p className="text-sm font-bold">
+                              {hoverItem.info.name}
+                            </p>
+                            <p className="text-xs">{hoverItem.info?.price}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div
+                  className="relative text-black flex flex-col w-full"
+                  style={{
+                    aspectRatio: "3/4",
+                  }}
+                >
+                  {detailPageState.itemList
+                    ?.sort((a, b) => {
+                      // top 값 비교
+                      const topA = parseInt(a.pos.top || "0%");
+                      const topB = parseInt(b.pos.top || "0%");
+                      if (topA !== topB) {
+                        return topA - topB;
+                      }
+                      // top 값이 같을 경우 left 값 비교
+                      const leftA = parseInt(a.pos.left || "0%");
+                      const leftB = parseInt(b.pos.left || "0%");
+                      return leftA - leftB;
+                    })
+                    .map((item, index) => (
+                      <div
+                        key={item.info.name}
+                        id={`item-${index}`}
+                        className="item flex flex-col absolute w-[80%] h-[60%]"
+                        style={{
+                          transform: `translate(${index * 10}px, ${
+                            index * 10
+                          }px)`,
+                          zIndex:
+                            (detailPageState.itemList?.length || 0) + index,
+                        }}
+                      >
+                        <Image
+                          src={item.info.imageUrl ?? ""}
+                          alt={item.info.name}
+                          layout="fill"
+                          objectFit="cover" // contain or cover
+                          className="rounded-2xl shadow-custom"
+                        />
+                        <div className="flex flex-col items-center justify-center p-2 rounded-b-xl absolute bottom-0 translate-y-full w-full">
+                          <p
+                            className={`${main_font.className} text-3xl text-[#FF204E] dark:text-white font-bold`}
+                          >
+                            {item.info.brands
+                              ?.map((brandName) =>
+                                brandName.replace(/_/g, " ").toUpperCase()
+                              )
+                              .join(", ")}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                </div>
               </div>
             </div>
           </div>
         )}
         <div className="end-anim"></div>
       </div>
-      <div className="start-more-anim"></div>
       <div className="my-10 w-full text-center">
         {detailPageState.artistImgList &&
           detailPageState.artistImgList.length > 0 && (
@@ -509,7 +547,7 @@ function DetailPage() {
                       alt="Artist Image"
                       width={300}
                       height={300}
-                      className="more-tagged rounded-xl opacity-0"
+                      className="more-tagged rounded-xl"
                     />
                   </Link>
                 ))}

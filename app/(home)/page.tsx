@@ -134,9 +134,9 @@ function MainView() {
   }, []);
   return (
     <div className="rounded-md border-l-2 border-r-2 border-b-2 border-black">
-      <div className="flex flex-col sm:flex-row items-center md:items-start">
+      <div className="flex flex-col md:flex-row items-center md:items-start">
         <div className="flex flex-col w-full">
-          <h1 className={`${main_font.className} text-7xl md:text-8xl p-2`}>
+          <h1 className={`${main_font.className} text-7xl md:text-9xl p-2`}>
             TODAY&apos;S NEW TAGGED
           </h1>
           <h2 className={`${main_font.className} text-7xl md:text-8xl p-2`}>
@@ -147,7 +147,7 @@ function MainView() {
             currentIndex={currentIndex}
           />
           {/* 모바일에서 숨기고 데스크탑에서 보이는 ItemDetailView */}
-          <div className="hidden sm:block">
+          <div className="hidden md:block">
             <ItemDetailView
               mainImageInfoList={mainImageInfoList}
               urlAndId={urlAndId}
@@ -162,7 +162,7 @@ function MainView() {
         />
       </div>
       {/* 데스크탑에서 숨기고 모바일에서 보이는 ItemDetailView */}
-      <div className="sm:hidden">
+      <div className="md:hidden">
         <ItemDetailView
           mainImageInfoList={mainImageInfoList}
           urlAndId={urlAndId}
@@ -183,10 +183,10 @@ function ImageDescriptionView({
   return mainImageInfoList.length !== 0 ? (
     <div className="flex flex-col h-full pt-5 pl-2">
       <h1 className={`${main_font.className} text-3xl`}>
-        {mainImageInfoList[currentIndex].title}
+        {mainImageInfoList[currentIndex]?.title}
       </h1>
       <h2 className={`${main_font.className} text-sm pt-4`}>
-        {mainImageInfoList[currentIndex].tags?.map((tag, index) => (
+        {mainImageInfoList[currentIndex]?.tags?.map((tag, index) => (
           <span
             key={index}
             className="shadow-custom border border-[#FF204E] text-black px-2 py-1 rounded-xl mr-2"
@@ -226,7 +226,7 @@ function ItemDetailView({
       <div
         className={`flex flex-row ${main_font.className} text-2xl w-full justify-between`}
       >
-        <div className="flex flex-row">
+        <div className="flex flex-row mt-12">
           {mainImageInfoList[currentIndex]?.artistInfoList?.map(
             (artist, index, array) => {
               return (
@@ -239,19 +239,19 @@ function ItemDetailView({
           )}
           {mainImageInfoList.length > 0 && <p className="mx-2">ITEMS</p>}
         </div>
-        <Link
-          href={`images/${
+        {/* <Link
+          href={`images?${
             urlAndId[currentIndex].docId
-          }?imageUrl=${encodeURIComponent(urlAndId[currentIndex].url)}`}
+          }&imageUrl=${encodeURIComponent(urlAndId[currentIndex].url)}`}
           prefetch={false}
           className={`${main_font.className} text-xs bg-[#000000] text-white p-2 rounded-md mx-3`}
         >
           MORE
-        </Link>
+        </Link> */}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 rounded-md p-2">
         {mainImageInfoList[currentIndex]?.itemInfoList
-          ?.slice(0, 2)
+          ?.slice(0, 4)
           .map(([item, brands], index) => {
             return (
               <div key={index} className="flex flex-row items-center">
