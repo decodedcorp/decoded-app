@@ -529,6 +529,21 @@ function DetailPage() {
         )}
         <div className="end-anim"></div>
       </div>
+      {/** Sub Images */}
+      <div className="sub-image-wrapper flex flex-row flex-wrap mt-20 w-full justify-center">
+        {detailPageState?.img?.subImageUrls?.map((image, index) => (
+          <div key={index} className={"sub-image-container m-2 w-1/2"}>
+            <Image
+              src={image}
+              alt="Sub Image"
+              width={300}
+              height={300}
+              className="rounded-md w-full"
+            />
+          </div>
+        ))}
+      </div>
+      {/** More tagged */}
       <div className="my-10 w-full text-center">
         {detailPageState.artistImgList &&
           detailPageState.artistImgList.length > 0 && (

@@ -22,6 +22,14 @@ export interface ImageInfo {
    */
   hyped: number;
   /**
+   * @example "https://example.com/image.jpg"
+   */
+  mainImageUrl?: string;
+  /**
+   * @example ["https://example.com/image1.jpg", "https://example.com/image2.jpg"]
+   */
+  subImageUrls?: string[];
+  /**
    * @example "grunge", "minimalist",
    */
   style?: string;
@@ -41,6 +49,10 @@ export interface ImageInfo {
    * @example { "background": ["#FFFFFF", "#000000"], "style": ["#FFFFFF", "#000000"] }
    */
   colorInfo?: ColorInfo;
+  /**
+   * @example "Source url"
+   */
+  source?: string;
 }
 
 /**
@@ -63,7 +75,11 @@ export interface ArtistInfo {
    */
   category: string[];
   /**
-   * @example ["Jenni, "JenDeuk", "제니"]
+   * @example "https://example.com/image.jpg"
+   */
+  profileImageUrl?: string;
+  /**
+   * @example ["Jenni", "JenDeuk", "제니"]
    */
   also_known_as?: string[];
   /**
