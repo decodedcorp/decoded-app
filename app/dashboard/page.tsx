@@ -75,7 +75,7 @@ function AdminDashboard() {
   }, [isLogin, isDataAdded]);
 
   return !isLogin ? (
-    <AdminLogin setIsLogin={setIsLogin} />
+    <AdminLogin params={{ setIsLogin: setIsLogin }} />
   ) : (
     <div>
       <UploadImageSection

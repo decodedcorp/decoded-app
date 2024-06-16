@@ -4,15 +4,13 @@ import Image from "next/image";
 import React, { useState, useEffect, useRef, CSSProperties } from "react";
 import { main_font, handleMagnifyIn } from "@/components/helpers/util";
 import { FirebaseHelper } from "@/common/firebase";
-import { useSearchParams } from "next/navigation";
-import { notFound } from "next/navigation";
+import { useSearchParams, notFound } from "next/navigation";
 import Link from "next/link";
 import {
   ImageInfo,
   ArtistInfo,
   HoverItem,
   ItemInfo,
-  BrandInfo,
   ColorInfo,
 } from "@/types/model";
 import gsap from "gsap";
@@ -151,7 +149,11 @@ function DetailPage() {
         );
       });
     }
-  }, [detailPageState.itemList]); // itemList가 변경될 때마다 useEffect가 재실행됩니다.
+  }, [
+    detailPageState.itemList,
+    detailPageState.colorInfo?.background,
+    detailPageState.img,
+  ]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -270,7 +272,7 @@ function DetailPage() {
                 {detailPageState.artistList?.map((name, index) => (
                   <Link
                     key={index}
-                    href={`/artists/${encodeURIComponent(name)}`}
+                    href={`/artists?name=${encodeURIComponent(name)}`}
                     className={`${main_font.className} text-xl font-bold rounded-lg mx-2`}
                   >
                     <p className="underline">{name.toUpperCase()}</p>

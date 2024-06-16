@@ -1,13 +1,16 @@
 "use client";
 
+import { Dispatch, SetStateAction } from "react";
 import { FirebaseHelper } from "@/common/firebase";
 import { main_font, validateEmail } from "@/components/helpers/util";
 import { useState } from "react";
 
 function AdminLogin({
-  setIsLogin,
+  params,
 }: {
-  setIsLogin: (isLogin: boolean) => void;
+  params: {
+    setIsLogin: Dispatch<SetStateAction<boolean>>;
+  };
 }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,7 +22,7 @@ function AdminLogin({
     }
     FirebaseHelper.adminLogin(email, password).then((isAdmin) => {
       if (isAdmin) {
-        setIsLogin(true);
+        params.setIsLogin(true);
       } else {
         alert("No Permission!");
       }
