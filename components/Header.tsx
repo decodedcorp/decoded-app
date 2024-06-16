@@ -3,8 +3,13 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { MagnifyingGlassIcon, Bars3Icon } from "@heroicons/react/20/solid";
+import { useState, useRef } from "react";
+import {
+  MagnifyingGlassIcon,
+  Bars3Icon,
+  PlayIcon,
+  PauseIcon,
+} from "@heroicons/react/20/solid";
 import { main_font, secondary_font } from "@/components/helpers/util";
 
 function Header() {
@@ -12,6 +17,7 @@ function Header() {
     <header className="grid grid-cols-3 items-center rounded-md border-2 border-black">
       <LogoSection />
       <MenuSection />
+      {/* <MusicPlayer /> */}
       <SearchSection />
     </header>
   );
@@ -26,6 +32,31 @@ function LogoSection() {
     >
       TAGGED
     </Link>
+  );
+}
+
+function MusicPlayer() {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef(
+    new Audio(
+      "https://api.soundcloud.com/tracks/TRACK_ID/stream?client_id=YOUR_CLIENT_ID"
+    )
+  );
+
+  const togglePlayPause = () => {
+    const prevValue = isPlaying;
+    setIsPlaying(!prevValue);
+  };
+
+  return (
+    <div className="flex flex-row">
+      <button>
+        <PlayIcon className="w-4 h-4" />
+      </button>
+      <button>
+        <PauseIcon className="w-4 h-4" />
+      </button>
+    </div>
   );
 }
 

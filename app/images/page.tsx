@@ -96,7 +96,7 @@ function DetailPage() {
         ease: "power1.inOut",
       });
       gsap.to(".image-detail", {
-        scale: 0.8,
+        scale: 0.7,
         scrollTrigger: {
           trigger: ".image-detail",
           start: "top-=10 top",
@@ -260,7 +260,7 @@ function DetailPage() {
             >
               {detailPageState.img.title}
             </h2>
-            <p className="text-2xl md:text-3xl mt-20">
+            <p className="text-xl md:text-2xl mt-20">
               {detailPageState.img.description}
             </p>
             {/* DETAILS */}
@@ -357,8 +357,11 @@ function DetailPage() {
             </h1>
           </div>
         ) : (
-          <div id="image-detail-wrapper" className="bg-white mt-20">
-            <div className="image-detail flex flex-row border-2 border-black rounded-lg">
+          <div
+            id="image-detail-wrapper"
+            className="bg-white mt-20 custom-shadow z-10"
+          >
+            <div className="image-detail flex flex-row rounded-lg">
               <div className="grid grid-cols-2 justify-center items-center w-full sm:h-auto">
                 <div
                   className="rounded-lg shadow-lg overflow-hidden"
@@ -369,15 +372,15 @@ function DetailPage() {
                 >
                   <div className="relative w-full h-full ">
                     <div
-                      className="image-elem flex w-full h-full"
-                      // onMouseMove={(e) => handleMagnifyIn(e, setZoomStyle)}
-                      // onMouseLeave={handleMagnifyOut}
+                      className="flex w-full h-full"
+                      onMouseMove={(e) => handleMagnifyIn(e, setZoomStyle)}
+                      onMouseLeave={handleMagnifyOut}
                     >
                       <Image
                         src={imageUrl}
                         alt="Featured fashion"
-                        layout="fill"
-                        objectFit="cover"
+                        fill={true}
+                        style={{ objectFit: "cover" }}
                       />
                       {/* Magnifying */}
                       <div
@@ -502,8 +505,8 @@ function DetailPage() {
                         <Image
                           src={item.info.imageUrl ?? ""}
                           alt={item.info.name}
-                          layout="fill"
-                          objectFit="cover" // contain or cover
+                          fill={true}
+                          style={{ objectFit: "cover" }}
                           className="rounded-2xl shadow-custom"
                         />
                         <div className="flex flex-col items-center justify-center p-2 rounded-b-xl absolute bottom-0 translate-y-full w-full">

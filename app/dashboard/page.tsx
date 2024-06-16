@@ -116,45 +116,44 @@ function UploadImageSection({
   const upload = async () => {
     setIsUploading(true);
     console.log(uploadImageState);
-    // if (!uploadSanityCheck()) {
-    //   alert("Required fields are empty!");
-    //   setIsUploading(false);
-    //   return;
-    // }
+    if (!uploadSanityCheck()) {
+      alert("Required fields are empty!");
+      setIsUploading(false);
+      return;
+    }
     const file = uploadImageState?.imageFile;
-    const extractedColors = await extractColorsFromImage(file!);
-    console.log("Extracted colors:", extractedColors);
-    // const hoverItemInfo = uploadImageState?.hoverItems;
-    // // It is safe to force unwrap due to sanity check
-    // const tags = await prepareTags(file!, hoverItemInfo!);
-    // if (tags instanceof Error) {
-    //   alert("Error preparing tags!");
-    //   setIsUploading(false);
-    //   return false;
-    // }
-    // const requiredKeys = ["brands", "artists", "images", "items"];
-    // if (!(await tagsSanityCheck(tags, requiredKeys))) {
-    //   alert("Invalid tags!");
-    //   setIsUploading(false);
-    //   return;
-    // }
-    // console.log("Tags Info: ", tags);
-    // console.log("Handle hover item");
-    // // "items"
-    // let taggedItems = await handleUploadHoverItem(tags, requiredKeys);
-    // if (taggedItems instanceof Error) {
-    //   console.error("Error saving hover item:", taggedItems);
-    //   alert("Error saving hover item!");
-    //   return;
-    // }
-    // console.log("Handle upload image");
-    // // "images"
-    // await handleUploadImage(tags, taggedItems);
-    // console.log("Handle remain tags");
-    // // "brands", "artists"
-    // await handleRemain(tags, requiredKeys);
-    // console.log("Upload: All Done! ✅");
-    // reset();
+    const hoverItemInfo = uploadImageState?.hoverItems;
+    // It is safe to force unwrap due to sanity check
+    const tags = await prepareTags(file!, hoverItemInfo!);
+    console.log(tags);
+    if (tags instanceof Error) {
+      alert("Error preparing tags!");
+      setIsUploading(false);
+      return false;
+    }
+    const requiredKeys = ["brands", "artists", "images", "items"];
+    if (!(await tagsSanityCheck(tags, requiredKeys))) {
+      alert("Invalid tags!");
+      setIsUploading(false);
+      return;
+    }
+    console.log("Tags Info: ", tags);
+    console.log("Handle hover item");
+    // "items"
+    let taggedItems = await handleUploadHoverItem(tags, requiredKeys);
+    if (taggedItems instanceof Error) {
+      console.error("Error saving hover item:", taggedItems);
+      alert("Error saving hover item!");
+      return;
+    }
+    console.log("Handle upload image");
+    // "images"
+    await handleUploadImage(tags, taggedItems);
+    console.log("Handle remain tags");
+    // "brands", "artists"
+    await handleRemain(tags, requiredKeys);
+    console.log("Upload: All Done! ✅");
+    reset();
     setIsUploading(false);
   };
 
@@ -250,15 +249,24 @@ function UploadImageSection({
       }
       // Artist Doc Id = Hash(artist_name)
       const artist_doc_id = sha256(hoverItemInfo.artistName!);
-      if (!hoverItemInfo.brandName) {
-        throw new Error("Invalid data!");
+      if (!hoverItemInfo.isNew) {
+        hoverItemInfo.brandName = hoverItemInfo.info.brands;
+      } else {
+        if (!hoverItemInfo.brandName) {
+          throw new Error("No brandName");
+        }
       }
       // Create brand doc ids related to this item
-      const brand_doc_ids = hoverItemInfo.brandName.map((b) => sha256(b));
+      const brand_doc_ids =
+        hoverItemInfo.brandName?.map((b) => sha256(b)) ?? [];
       // Item Doc Ids = { "items" => [] }
-      tags["items"] = [...(tags["items"] || []), item_doc_id];
+      tags["items"] = Array.from(
+        new Set([...(tags["items"] || []), item_doc_id])
+      );
       // Brand Doc Ids = { "brands" => [] }
-      tags["brands"] = [...(tags["brands"] || []), ...brand_doc_ids];
+      tags["brands"] = Array.from(
+        new Set([...(tags["brands"] || []), ...brand_doc_ids])
+      );
       // { item_doc_id => brands }
       // Brands that related to this item
       tags[item_doc_id] = brand_doc_ids;
@@ -287,7 +295,7 @@ function UploadImageSection({
     const image_doc_id = sha256(await file.arrayBuffer());
     tags["images"] = [image_doc_id];
     const artist_doc_id = artistNames.map((name) => create_doc_id(name));
-    tags["artists"] = artist_doc_id;
+    tags["artists"] = Array.from(new Set(artist_doc_id));
 
     return tags;
   };
@@ -598,46 +606,57 @@ function UploadImageSection({
       const docExists = await FirebaseHelper.docExists("items", itemDocId);
       const hoverItemImg = hoverItems[index].hoverItemImg;
       var hoverItem = hoverItems[index];
+
+      // Storage name => {item_doc_id}
+      const storage_file_name = itemDocId;
+      // Upload item if it is new
       // Handle image such as converting to webp and uploading to db
-      const storage_file_name = hoverItem.info.name
-        .replace(/\s+/g, "_")
-        .toLowerCase();
-      if (
-        hoverItemImg &&
-        (hoverItemImg.type.includes("jpeg") ||
-          hoverItemImg.type.includes("png") ||
-          hoverItemImg.type.includes("webp") ||
-          hoverItemImg.type.includes("avif"))
-      ) {
-        try {
-          if (!docExists) {
-            console.log("Trying to convert to webp...");
-            const itemImage = await ConvertImageAndCompress(
-              hoverItemImg,
-              1,
-              1280
-            );
-            console.log("Convert & Compress done!");
-            console.log("Creating storage ref items/", storage_file_name);
-            // TODO: Duplicate check
-            const uploadRes = await FirebaseHelper.uploadDataToStorage(
-              "items/" + storage_file_name,
-              itemImage
-            );
-            const downloadUrl = await FirebaseHelper.downloadUrl(uploadRes.ref);
-            hoverItem.info.imageUrl = downloadUrl;
+      if (hoverItem.isNew) {
+        if (
+          hoverItemImg &&
+          (hoverItemImg.type.includes("jpeg") ||
+            hoverItemImg.type.includes("png") ||
+            hoverItemImg.type.includes("webp") ||
+            hoverItemImg.type.includes("avif"))
+        ) {
+          try {
+            if (!docExists) {
+              console.log("Trying to convert to webp...");
+              const itemImage = await ConvertImageAndCompress(
+                hoverItemImg,
+                1,
+                1280
+              );
+              console.log("Convert & Compress done!");
+              console.log("Creating storage ref items/", storage_file_name);
+              // TODO: Duplicate check
+              if (await FirebaseHelper.docExists("items", storage_file_name)) {
+                alert("Item already exists!");
+                return new Error("Item already exists!");
+              }
+              const uploadRes = await FirebaseHelper.uploadDataToStorage(
+                "items/" + storage_file_name,
+                itemImage
+              );
+              const downloadUrl = await FirebaseHelper.downloadUrl(
+                uploadRes.ref
+              );
+              hoverItem.info.imageUrl = downloadUrl;
+              // Update brands for item
+              hoverItem.info.brands = hoverItem.brandName;
+            }
+          } catch (error) {
+            console.error("Error saving item image:", error, hoverItem);
+            alert("Error saving item image!");
+            return new Error("Error saving item image!");
           }
-        } catch (error) {
-          console.error("Error saving item image:", error, hoverItem);
-          alert("Error saving item image!");
-          return new Error("Error saving item image!");
+        } else {
+          alert(
+            "Image file format is not valid! Should be either jpeg, png, webp, avif"
+          );
+          setIsUploading(false);
+          return new Error("Image file format is not valid!");
         }
-      } else {
-        alert(
-          "Image file format is not valid! Should be either jpeg, png, webp, avif"
-        );
-        setIsUploading(false);
-        return new Error("Image file format is not valid!");
       }
       // Update itemInfo based on whether document exists or not
       const itemInfo = await handleItemInfo(
@@ -680,8 +699,8 @@ function UploadImageSection({
               <Image
                 src={uploadImageState?.selectedImageUrl}
                 alt="Featured fashion"
-                layout="fill"
-                objectFit="cover"
+                fill={true}
+                style={{ objectFit: "cover" }}
                 onClick={handlePointClick}
               />
               {uploadImageState?.hoverItems?.map((item, index) => (
@@ -1069,12 +1088,11 @@ function CustomDropdown({
       if (!prev) return {}; // prevState가 null이면 아무 작업도 하지 않고 null을 반환
 
       const hoverItems = prev.hoverItems || [];
-      hoverItems[index] = {
-        isNew: false,
-        pos: pos!,
-        info: item,
-      };
-      return { ...prev, hoverItems };
+      const copy = [...hoverItems];
+      copy[index].isNew = false;
+      copy[index].pos = pos!;
+      copy[index].info = item;
+      return { ...prev, hoverItems: copy };
     });
   };
 

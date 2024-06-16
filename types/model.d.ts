@@ -152,6 +152,8 @@ export interface Position {
  * - price: [price, currency]
  * - affiliateUrl: Affiliate URL
  * - imageUrl: Image URL
+ * - season: Season
+ * - runway_url: Runway URL
  * - tags: Tags
  */
 export interface ItemInfo {
@@ -168,6 +170,17 @@ export interface ItemInfo {
    * @example ["Brand1", "Brand2"]. Two if it is collab
    */
   brands?: string[];
+
+  /**
+   * @example "24ss"
+   */
+  season?: string;
+
+  /**
+   * @example "https://example.com/"
+   */
+  runway_url?: string;
+
   /**
    */
   hyped: number;

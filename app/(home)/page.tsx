@@ -134,7 +134,7 @@ function MainView() {
   }, []);
   return (
     <div className="rounded-md border-l-2 border-r-2 border-b-2 border-black">
-      <div className="flex flex-col md:flex-row items-center md:items-start">
+      <div className="flex flex-col md:flex-row items-center  md:items-start">
         <div className="flex flex-col w-full">
           <h1 className={`${main_font.className} text-7xl md:text-9xl p-2`}>
             TODAY&apos;S NEW TAGGED
@@ -345,8 +345,8 @@ function ImageCarouselView({
 
   return (
     <div
-      className="flex flex-col w-60 carousel rounded-box mx-5 p-5"
-      style={{ width: "65vw", position: "relative" }}
+      className="flex flex-col relative carousel rounded-box mx-5 mt-5 p-5"
+      style={{ width: "65vw" }}
     >
       <div
         key={docId}
@@ -364,11 +364,10 @@ function ImageCarouselView({
           <Image
             alt="Image"
             className="w-full h-auto rounded-lg"
-            layout="fill"
             src={url}
             quality={80}
             fill={true}
-            objectFit="cover"
+            style={{ objectFit: "cover" }}
             sizes="100vw"
             placeholder="blur"
             blurDataURL="data:image/jpeg;base64,..."
