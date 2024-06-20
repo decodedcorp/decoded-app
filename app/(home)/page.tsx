@@ -34,10 +34,9 @@ interface UrlAndId {
 }
 
 function MainView() {
-  const [urlAndId, setUrlAndId] = useState<UrlAndId[]>([]);
-  const [mainImageInfoList, setMainImageInfoList] = useState<MainImageInfo[]>(
-    []
-  );
+  const [mainImageInfoList, setMainImageInfoList] = useState<
+    MainImageInfo[] | null
+  >(null);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [currentDateTime, setCurrentDateTime] = useState("");
 
@@ -107,6 +106,8 @@ function MainView() {
                 }
               });
               mainImageInfoList.push({
+                imageUrl: url,
+                docId: imageDocId,
                 title: imageInfo.title,
                 itemInfoList: itemInfoList,
                 artistInfoList: artistInfo,
@@ -125,47 +126,37 @@ function MainView() {
           console.log(error.message);
         }
       } finally {
-        console.log("mainImageInfoList", mainImageInfoList);
-        setUrlAndId(urlAndId);
         setMainImageInfoList(mainImageInfoList);
       }
     };
     fetchAllImages();
   }, []);
   return (
-    <div className="rounded-md border-l-2 border-r-2 border-b-2 border-black">
-      <div className="flex flex-col md:flex-row items-center  md:items-start">
-        <div className="flex flex-col w-full">
-          <h1 className={`${main_font.className} text-7xl md:text-9xl p-2`}>
-            TODAY&apos;S NEW TAGGED
+    <div className="grid grid-cols-1 lg:grid-cols-2 rounded-md border-l-2 border-r-2 border-b-2 border-black">
+      <div className="items-center md:items-start ml-2 p-10">
+        <div className="flex flex-col w-full leading-1 -mt-2 lg:-mt-6">
+          <h1 className={`${main_font.className} text-7xl md:text-9xl w-[60%]`}>
+            TODAY
           </h1>
-          <h2 className={`${main_font.className} text-7xl md:text-8xl p-2`}>
+          <h2 className={`${main_font.className} text-7xl md:text-8xl`}>
             {currentDateTime}
           </h2>
+        </div>
+        <div className="hidden lg:block">
           <ImageDescriptionView
             mainImageInfoList={mainImageInfoList}
             currentIndex={currentIndex}
           />
-          {/* 모바일에서 숨기고 데스크탑에서 보이는 ItemDetailView */}
-          <div className="hidden md:block">
-            <ItemDetailView
-              mainImageInfoList={mainImageInfoList}
-              urlAndId={urlAndId}
-              currentIndex={currentIndex}
-            />
-          </div>
         </div>
-        <ImageCarouselView
-          urlAndId={urlAndId}
-          currentIndex={currentIndex}
-          setCurrentIndex={setCurrentIndex}
-        />
       </div>
-      {/* 데스크탑에서 숨기고 모바일에서 보이는 ItemDetailView */}
-      <div className="md:hidden">
-        <ItemDetailView
+      <ImageCarouselView
+        mainImageInfoList={mainImageInfoList}
+        currentIndex={currentIndex}
+        setCurrentIndex={setCurrentIndex}
+      />
+      <div className="lg:hidden">
+        <ImageDescriptionView
           mainImageInfoList={mainImageInfoList}
-          urlAndId={urlAndId}
           currentIndex={currentIndex}
         />
       </div>
@@ -177,32 +168,25 @@ function ImageDescriptionView({
   mainImageInfoList,
   currentIndex,
 }: {
-  mainImageInfoList: MainImageInfo[];
+  mainImageInfoList: MainImageInfo[] | null;
   currentIndex: number;
 }) {
-  return mainImageInfoList.length !== 0 ? (
-    <div className="flex flex-col h-full pt-5 pl-2">
-      <h1 className={`${main_font.className} text-3xl`}>
+  return mainImageInfoList ? (
+    <div className="flex flex-col mt-5">
+      <h2 className={`${main_font.className} text-4xl`}>
         {mainImageInfoList[currentIndex]?.title}
-      </h1>
-      <h2 className={`${main_font.className} text-sm pt-4`}>
-        {mainImageInfoList[currentIndex]?.tags?.map((tag, index) => (
-          <span
-            key={index}
-            className="shadow-custom border border-[#FF204E] text-black px-2 py-1 rounded-xl mr-2"
-          >
-            {/* TODO: */}
-            {tag.replace(/_/g, " ").toUpperCase()}
-          </span>
-        ))}
       </h2>
-      <h3 className={`${main_font.className} text-md pt-1 pb-5`}>
-        {mainImageInfoList[currentIndex].description}
+      <h3 className={`${main_font.className} text-md mt-5`}>
+        {mainImageInfoList[currentIndex]?.description}
       </h3>
+      <ItemDetailView
+        mainImageInfoList={mainImageInfoList}
+        currentIndex={currentIndex}
+      />
     </div>
   ) : (
     <h1
-      className={`${main_font.className} text-4xl md:text-5xl loading-text p-5`}
+      className={`${main_font.className} text-4xl md:text-5xl loading-text bg-red-500`}
     >
       Loading
     </h1>
@@ -211,45 +195,14 @@ function ImageDescriptionView({
 
 function ItemDetailView({
   mainImageInfoList,
-  urlAndId,
   currentIndex,
 }: {
-  mainImageInfoList: MainImageInfo[];
-  urlAndId: UrlAndId[];
+  mainImageInfoList: MainImageInfo[] | null;
   currentIndex: number;
 }) {
-  if (urlAndId.length === 0) {
-    return <div></div>;
-  }
   return (
-    <div className="p-2 m-2 justify-start w-full">
-      <div
-        className={`flex flex-row ${main_font.className} text-2xl w-full justify-between`}
-      >
-        <div className="flex flex-row mt-12">
-          {mainImageInfoList[currentIndex]?.artistInfoList?.map(
-            (artist, index, array) => {
-              return (
-                <div key={index}>
-                  {artist.name.toUpperCase()}&apos;s
-                  {index < array.length - 1 && " &"}
-                </div>
-              );
-            }
-          )}
-          {mainImageInfoList.length > 0 && <p className="mx-2">ITEMS</p>}
-        </div>
-        {/* <Link
-          href={`images?${
-            urlAndId[currentIndex].docId
-          }&imageUrl=${encodeURIComponent(urlAndId[currentIndex].url)}`}
-          prefetch={false}
-          className={`${main_font.className} text-xs bg-[#000000] text-white p-2 rounded-md mx-3`}
-        >
-          MORE
-        </Link> */}
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 rounded-md p-2">
+    mainImageInfoList && (
+      <div className="grid grid-cols-1 md:grid-cols-2 mt-5">
         {mainImageInfoList[currentIndex]?.itemInfoList
           ?.slice(0, 4)
           .map(([item, brands], index) => {
@@ -262,8 +215,7 @@ function ItemDetailView({
                   height={100}
                   className="rounded-lg shadow-lg"
                 />
-                <div key={index} className="flex flex-col p-2 m-5 w-full">
-                  {/* TODO: Consider real-time price */}
+                <div key={index} className="flex flex-col m-5 w-full">
                   <div className={`flex ${secondary_font.className} text-xs`}>
                     {brands && brands.length > 0 && (
                       <div
@@ -299,90 +251,67 @@ function ItemDetailView({
             );
           })}
       </div>
-    </div>
+    )
   );
 }
 
 function ImageCarouselView({
-  urlAndId,
+  mainImageInfoList,
   currentIndex,
   setCurrentIndex,
 }: {
-  urlAndId: UrlAndId[];
+  mainImageInfoList: MainImageInfo[] | null;
   currentIndex: number;
   setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
 }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (urlAndId.length > 0) {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % urlAndId.length);
+      if (mainImageInfoList && mainImageInfoList.length > 0) {
+        setCurrentIndex(
+          (prevIndex) => (prevIndex + 1) % mainImageInfoList.length
+        );
       }
     }, 10000);
 
     return () => clearTimeout(timer);
-  }, [currentIndex, urlAndId.length]);
-
-  const handleNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % urlAndId.length);
-  };
-
-  const handlePrev = () => {
-    setCurrentIndex(
-      (prevIndex) => (prevIndex - 1 + urlAndId.length) % urlAndId.length
-    );
-  };
-  if (urlAndId.length === 0) {
-    return (
-      <div className="w-60 carousel rounded-box mx-5" style={{ width: "70vw" }}>
-        <div className="flex justify-center items-center h-full w-full aspect-w-5 aspect-h-6"></div>
-      </div>
-    );
-  }
-
-  const itemCount = urlAndId.length;
-  const { url, docId } = urlAndId[currentIndex];
+  }, [currentIndex, mainImageInfoList?.length]);
 
   return (
-    <div
-      className="flex flex-col relative carousel rounded-box mx-5 mt-5 p-5"
-      style={{ width: "65vw" }}
-    >
-      <div
-        key={docId}
-        className="carousel-item w-full relative aspect-w-3 aspect-h-4"
-      >
-        <ProgressBar
-          duration={10000}
-          currentIndex={currentIndex}
-          totalItems={itemCount}
-        />
-        <Link
-          href={`images?imageId=${docId}&imageUrl=${encodeURIComponent(url)}`}
-          prefetch={false}
+    mainImageInfoList && (
+      <div className="flex flex-col relative carousel">
+        <div
+          key={mainImageInfoList[currentIndex]?.docId}
+          className="carousel-item w-full relative aspect-w-3 aspect-h-4"
         >
-          <Image
-            alt="Image"
-            className="w-full h-auto rounded-lg"
-            src={url}
-            quality={80}
-            fill={true}
-            style={{ objectFit: "cover" }}
-            sizes="100vw"
-            placeholder="blur"
-            blurDataURL="data:image/jpeg;base64,..."
+          <ProgressBar
+            duration={5000}
+            currentIndex={currentIndex}
+            totalItems={mainImageInfoList.length}
           />
-        </Link>
+          <Link
+            href={`images?imageId=${
+              mainImageInfoList[currentIndex]?.docId
+            }&imageUrl=${encodeURIComponent(
+              mainImageInfoList[currentIndex]?.imageUrl
+            )}`}
+            prefetch={false}
+          >
+            <Image
+              alt="Image"
+              className="w-full h-auto"
+              src={mainImageInfoList[currentIndex]?.imageUrl}
+              quality={80}
+              fill={true}
+              style={{ objectFit: "cover" }}
+              sizes="100vw"
+              placeholder="blur"
+              blurDataURL="data:image/jpeg;base64,..."
+            />
+          </Link>
+        </div>
       </div>
-      <div className="flex justify-around m-3 items-center">
-        <button className="rounded-md p-1 mr-2" onClick={handlePrev}>
-          <ArrowLeftCircleIcon className="w-6 h-6" />
-        </button>
-        <button className=" rounded-md p-1" onClick={handleNext}>
-          <ArrowRightCircleIcon className="w-6 h-6" />
-        </button>
-      </div>
-    </div>
+    )
   );
 }
 
@@ -409,9 +338,9 @@ function ArticleView() {
   }, []);
 
   return (
-    <div className="rounded-md border-l-2 border-r-2 border-black p-3">
+    <div className="rounded-md border-l-2 border-r-2 border-black p-10">
       <h1
-        className={`${main_font.className} text-5xl sm:text-6xl font-bold mb-4`}
+        className={`${main_font.className} text-4xl lg:text-8xl font-bold mb-4`}
       >
         LATEST NEWS
       </h1>

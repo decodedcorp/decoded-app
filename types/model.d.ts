@@ -237,6 +237,8 @@ export interface BrandInfo {
 }
 
 export interface MainImageInfo {
+  imageUrl: string;
+  docId: string;
   hyped: number;
   title?: string;
   tags?: string[];
