@@ -24,6 +24,7 @@ function Home() {
     <div>
       <MainView />
       <ArticleView />
+      <HypedTaggedView />
     </div>
   );
 }
@@ -132,8 +133,8 @@ function MainView() {
     fetchAllImages();
   }, []);
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 rounded-md border-l-2 border-r-2 border-b-2 border-black">
-      <div className="items-center md:items-start ml-2 p-10">
+    <div className="grid grid-cols-1 lg:grid-cols-2">
+      <div className="items-center md:items-start ml-2">
         <div className="flex flex-col w-full leading-1 -mt-2 lg:-mt-6">
           <h1 className={`${main_font.className} text-7xl md:text-9xl w-[60%]`}>
             TODAY
@@ -172,7 +173,7 @@ function ImageDescriptionView({
   currentIndex: number;
 }) {
   return mainImageInfoList ? (
-    <div className="flex flex-col mt-5">
+    <div className="flex flex-col mt-20">
       <h2 className={`${main_font.className} text-4xl`}>
         {mainImageInfoList[currentIndex]?.title}
       </h2>
@@ -338,7 +339,7 @@ function ArticleView() {
   }, []);
 
   return (
-    <div className="rounded-md border-l-2 border-r-2 border-black p-10">
+    <div className=" p-10">
       <h1
         className={`${main_font.className} text-4xl lg:text-8xl font-bold mb-4`}
       >
@@ -375,34 +376,34 @@ function ArticleView() {
           ))}
         </div>
       )}
-      <button
-        className={`${main_font.className} w-full text-align-center mt-4 py-2 px-6 bg-[#FF204E] text-white rounded`}
-      >
-        See More
-      </button>
+      <Link href={"/news"} className={`${main_font.className} w-full`}>
+        <div className="w-full mt-4 py-2 px-6 bg-[#FF204E] text-white text-center rounded-lg">
+          See More
+        </div>
+      </Link>
     </div>
   );
 }
 
 function HypedTaggedView() {
   return (
-    <div className="rounded-md border-2 border-black p-3">
-      <div className="text-center mb-6">
-        <h1 className={`${main_font.className} text-2xl sm:text-6xl font-bold`}>
-          HYPED TAGGED
+    <div className="rounded-md p-3">
+      <div className="mb-6">
+        <h1 className={`${main_font.className} text-4xl sm:text-8xl font-bold`}>
+          SPOTLIGHT
         </h1>
-        <h2 className="text-2xl font-bold">JENNIE 24SS</h2>
+        <h2 className="text-2xl font-bold bg-red-500">JENNIE 24SS</h2>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="col-span-1 md:col-span-3">
-          <Image
-            src="path/to/jennie-main.jpg"
-            alt="Jennie Main"
-            className="w-full"
-          />
+          <Image src="" alt="Jennie Main" className="w-full" />
         </div>
         <div className="col-span-1">
-          <Image src="path/to/product.jpg" alt="Product" className="w-full" />
+          <Image
+            src=""
+            alt="Product"
+            className="w-full border-2 border-black"
+          />
           <p className="text-center mt-2">
             Baby Fox Patch Cardigan
             <br />
@@ -410,13 +411,25 @@ function HypedTaggedView() {
           </p>
         </div>
         <div className="col-span-1">
-          <Image src="path/to/jennie-1.jpg" alt="Jennie 1" className="w-full" />
+          <Image
+            src=""
+            alt="Jennie 1"
+            className="w-full border-2 border-black"
+          />
         </div>
         <div className="col-span-1">
-          <Image src="path/to/jennie-2.jpg" alt="Jennie 2" className="w-full" />
+          <Image
+            src=""
+            alt="Jennie 2"
+            className="w-full border-2 border-black"
+          />
         </div>
         <div className="col-span-1">
-          <Image src="path/to/jennie-3.jpg" alt="Jennie 3" className="w-full" />
+          <Image
+            src=""
+            alt="Jennie 3"
+            className="w-full border-2 border-black"
+          />
         </div>
       </div>
     </div>

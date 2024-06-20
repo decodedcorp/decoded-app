@@ -1,106 +1,89 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { FirebaseHelper } from "@/common/firebase";
 import { ArticleInfo } from "@/types/model";
 import Image from "next/image";
 import Link from "next/link";
-
-interface SectionProps {
-  title: string;
-  description?: string;
-}
+import { main_font } from "@/components/helpers/util";
 
 function Page() {
-  return (
-    <div className="flex flex-col items-center justify-center w-full text-black">
-      <Section title="TAGGED daily" description="Happened daily" />
-      <Section title="NEWS" />
-      <DailyCardNews />
-      <Card />
-    </div>
-  );
+  return <NewsView />;
 }
 
-function Section({ title, description }: SectionProps) {
+function NewsView() {
   return (
-    <div className="flex flex-col border-b-2 border-gray-200 py-4 mb-6 items-center justify-center">
-      <h1 className="text-3xl font-bold">{title}</h1>
-      <p> {description} </p>
-    </div>
-  );
-}
-
-async function DailyCardNews() {
-  return (
-    <div className="flex flex-col items-center w-96 mb-5">
-      <div className="carousel rounded-box">
-        <div className="carousel-item w-full">
-          <Image
-            src="https://daisyui.com/images/stock/photo-1559703248-dcaaec9fab78.jpg"
-            className="w-full rounded-lg"
-            alt="Tailwind CSS Carousel component"
-            fill={true}
-            objectFit="cover"
-          />
+    <div>
+      <div className="flex flex-col w-full ">
+        <div className="fixed flex flex-col w-full" style={{ zIndex: 100 }}>
+          <div>
+            <h1
+              className={`${main_font.className} leading-3 text-9xl`}
+              style={{ marginTop: "1.8rem" }}
+            >
+              NEWS
+            </h1>
+          </div>
         </div>
-        <div className="carousel-item w-full">
-          <Image
-            src="https://daisyui.com/images/stock/photo-1565098772267-60af42b81ef2.jpg"
-            className="w-full"
-            alt="Tailwind CSS Carousel component"
-            fill={true}
-            objectFit="cover"
-          />
-        </div>
-        <div className="carousel-item w-full">
-          <Image
-            src="https://daisyui.com/images/stock/photo-1572635148818-ef6fd45eb394.jpg"
-            className="w-full"
-            alt="Tailwind CSS Carousel component"
-            fill={true}
-            objectFit="cover"
-          />
-        </div>
-        <div className="carousel-item w-full">
-          <Image
-            src="https://daisyui.com/images/stock/photo-1494253109108-2e30c049369b.jpg"
-            className="w-full"
-            alt="Tailwind CSS Carousel component"
-            fill={true}
-            objectFit="cover"
-          />
-        </div>
+        <NewsList />
       </div>
     </div>
   );
 }
 
-async function Card() {
-  let articleInfoList: ArticleInfo[] = [];
-  const docs = await FirebaseHelper.docs("articles");
-  docs.forEach((doc) => {
-    const newsData = doc.data() as ArticleInfo;
-    if (newsData.src) {
-      articleInfoList.push(newsData);
-    }
-  });
+function NewsList() {
+  const [articleInfoList, setArticleInfoList] = useState<ArticleInfo[] | null>(
+    null
+  );
+
+  useEffect(() => {
+    const fetchArticleInfoList = async () => {
+      const docs = await FirebaseHelper.docs("articles");
+      const articleInfoList: ArticleInfo[] = [];
+      docs.forEach((doc) => {
+        const newsData = doc.data() as ArticleInfo;
+        if (newsData.src) {
+          articleInfoList.push(newsData);
+        }
+      });
+      setArticleInfoList(articleInfoList);
+    };
+    fetchArticleInfoList();
+  }, []);
+
+  const handleMouseOver = (index: number) => {
+    document.querySelectorAll(".news-item").forEach((item, idx) => {
+      if (idx !== index) {
+        item.classList.add("blur");
+      }
+    });
+  };
+
+  const handleMouseOut = () => {
+    document.querySelectorAll(".news-item").forEach((item) => {
+      item.classList.remove("blur");
+    });
+  };
+
   return (
-    <div className="grid grid-cols-1 gap-5 w-1/2">
+    <div className="grid grid-cols-4 gap-3 mt-80 p-10">
       {articleInfoList?.map((news, index) => (
-        <Link
-          key={index}
-          href={news.src as string}
-          className="card card-side shadow-xl"
-        >
-          <div className="card lg:card-side">
-            <figure>
-              <Image
-                src="https://daisyui.com/images/stock/photo-1494232410401-ad00d5433cfa.jpg"
-                alt="Album"
-              />
-            </figure>
-            <div className="card-body">
-              <h2 className="card-title">{news.title}</h2>
-              <p>{news.createdAt}</p>
-            </div>
+        <Link key={index} href={news.src as string}>
+          <div
+            className="news-item"
+            onMouseOver={() => handleMouseOver(index)}
+            onMouseOut={handleMouseOut}
+          >
+            <Image
+              src={(news.imageUrl as string) ?? ""}
+              alt="Album"
+              width={300}
+              height={300}
+              style={{ objectFit: "cover" }}
+            />
+            {/* <div className="card-body">
+              <h2 className="card-title">{news.title.toUpperCase()}</h2>
+            </div> */}
           </div>
         </Link>
       ))}

@@ -14,7 +14,7 @@ import { main_font, secondary_font } from "@/components/helpers/util";
 
 function Header() {
   return (
-    <header className="grid grid-cols-3 items-center rounded-md border-2 border-black">
+    <header className="grid grid-cols-3 items-center">
       <LogoSection />
       <MenuSection />
       {/* <MusicPlayer /> */}
@@ -28,7 +28,7 @@ function LogoSection() {
     <Link
       href="/"
       prefetch={false}
-      className={`${main_font.className} text-3xl font-bold`}
+      className={`${main_font.className} text-9xl font-bold`}
     >
       TAGGED
     </Link>

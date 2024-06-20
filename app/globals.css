@@ -30,10 +30,8 @@ header {
   top: 0;
   left: 0;
   right: 0;
-  padding: 8px;
+  padding: 2px;
   z-index: 1000;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: #ffffff;
 }
 
 footer {
@@ -92,4 +90,17 @@ footer {
 .shadow-custom {
   box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1),
     0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.blur {
+  filter: blur(5px);
+}
+
+.image-item {
+  transition: transform 0.3s ease; /* border-radius에 대한 transition 포함 */
+}
+
+.image-item:hover {
+  transform: scale(1.3);
+  border-radius: 1rem;
 }

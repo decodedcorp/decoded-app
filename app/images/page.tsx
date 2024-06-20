@@ -2,7 +2,11 @@
 
 import Image from "next/image";
 import React, { useState, useEffect, useRef, CSSProperties } from "react";
-import { main_font, handleMagnifyIn } from "@/components/helpers/util";
+import {
+  main_font,
+  handleMagnifyIn,
+  secondary_font,
+} from "@/components/helpers/util";
 import { FirebaseHelper } from "@/common/firebase";
 import { useSearchParams, notFound } from "next/navigation";
 import Link from "next/link";
@@ -12,6 +16,7 @@ import {
   HoverItem,
   ItemInfo,
   ColorInfo,
+  ArticleInfo,
 } from "@/types/model";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -37,6 +42,10 @@ interface DetailPageState {
    * [docId, imageUrl]
    */
   artistImgList?: [string, string][];
+  /**
+   * Artist articles
+   */
+  artistArticleList?: ArticleInfo[];
   /**
    * Artist items
    */
@@ -172,6 +181,7 @@ function DetailPage() {
       var artistList: string[] = [];
       var artistItemList: ItemInfo[] = [];
       var artistImgList: [string, string][] = [];
+      var artistArticleList: ArticleInfo[] = [];
 
       const colorInfo = img.colorInfo;
 
@@ -198,6 +208,18 @@ function DetailPage() {
 
             const artistImgDocIdList = a.tags?.images;
             const artistItemDocIdList = a.tags?.items;
+            const artistArticleDocIdList = a.tags?.articles;
+
+            if (artistArticleDocIdList) {
+              const articles = await Promise.all(
+                artistArticleDocIdList.map(async (articleDocId) => {
+                  return (
+                    await FirebaseHelper.doc("articles", articleDocId)
+                  ).data() as ArticleInfo;
+                })
+              );
+              artistArticleList = articles;
+            }
 
             // Get all artist-related items
             // if (artistItemDocIdList) {
@@ -241,6 +263,7 @@ function DetailPage() {
         artistList: artistList,
         artistImgList: artistImgList,
         artistItemList: artistItemList,
+        artistArticleList: artistArticleList,
         colorInfo: colorInfo,
       });
       setIsFetching(false);
@@ -575,6 +598,35 @@ function DetailPage() {
             </div>
           )}
       </div>
+      {/* Articles */}
+      {detailPageState.artistArticleList &&
+        detailPageState.artistArticleList.length > 0 && (
+          <div className="flex flex-col w-full justify-center items-center">
+            <h2 className={`${main_font.className} text-4xl font-bold my-20`}>
+              ARTICLES
+            </h2>
+            <div className="grid grid-cols-3 gap-1 items-center place-items-center p-10">
+              {detailPageState.artistArticleList.map((article, index) => (
+                <Link
+                  key={index}
+                  href={(article.src as string) ?? ""}
+                  className="flex flex-col items-center justify-center bg-white rounded-xl shadow-lg"
+                >
+                  <Image
+                    src={article.imageUrl ?? ""}
+                    alt={article.title}
+                    width={300}
+                    height={300}
+                    className="rounded-xl"
+                  />
+                  <p className={`${secondary_font.className} text-xl w-[60%]`}>
+                    {article.title.toUpperCase().replace("-", " ")}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
     </div>
   );
 }

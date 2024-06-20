@@ -6,7 +6,7 @@ function Footer() {
   const [isType, setIsType] = useState<boolean>(false);
 
   return (
-    <footer className="bg-[#ffffff] border-2 border-black rounded-md">
+    <footer className="bg-[#ffffff]">
       <div className="grid grid-cols-1 justify-center items-center">
         <div className="flex flex-col items-center">
           <div className="flex flex-col items-center mb-10">
