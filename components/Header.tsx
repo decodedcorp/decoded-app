@@ -12,13 +12,14 @@ import {
 } from "@heroicons/react/20/solid";
 import { main_font, secondary_font } from "@/components/helpers/util";
 
+const headers = ["home", "news", "about", "search"];
+
 function Header() {
   return (
-    <header className="grid grid-cols-3 items-center">
+    <header className="grid grid-cols-2 items-center">
       <LogoSection />
-      <MenuSection />
       {/* <MusicPlayer /> */}
-      <SearchSection />
+      <MenuSection />
     </header>
   );
 }
@@ -28,10 +29,42 @@ function LogoSection() {
     <Link
       href="/"
       prefetch={false}
-      className={`${main_font.className} text-9xl font-bold`}
+      className={`${main_font.className} text-6xl lg:text-8xl font-bold`}
     >
       TAGGED
     </Link>
+  );
+}
+
+function MenuSection() {
+  const pathname = usePathname();
+  const cleanedPath = pathname.replace(/^\//, "");
+  const [currentPath, setCurrentPath] = useState(cleanedPath);
+
+  return (
+    <nav className="w-full justify-end hidden lg:block">
+      <ul className="flex flex-row gap-3 justify-end pr-1">
+        {headers.map((header, index) => {
+          return (
+            <li
+              key={index}
+              className={`list-none transition-all duration-100 ease-in-out hover:scale-100 ${
+                header === currentPath ? "border-b-2 border-[#000000]" : ""
+              }`}
+            >
+              <Link
+                href={header === "home" ? "/" : `/${header}`}
+                prefetch={false}
+                className={`text-2xl ${secondary_font.className}`}
+                onClick={() => setCurrentPath(header)}
+              >
+                {header.toUpperCase()}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
   );
 }
 
@@ -57,67 +90,6 @@ function MusicPlayer() {
         <PauseIcon className="w-4 h-4" />
       </button>
     </div>
-  );
-}
-
-function MenuSection() {
-  const path = usePathname();
-  const homeBorder = path === "/" ? "border-b-2 border-[#FF204E]" : "";
-  const newsBorder = path === "/news" ? "border-b-2 border-[#FF204E]" : "";
-  const homeOpacity = path === "/" ? "text-opacity-100" : "text-opacity-50";
-  const newsOpacity = path === "/news" ? "text-opacity-100" : "text-opacity-50";
-
-  return (
-    <nav className="w-full justify-items-center">
-      <ul className="flex justify-center gap-5">
-        <li
-          className={`list-none transition-all duration-100 ease-in-out hover:scale-150 ${homeBorder}`}
-        >
-          <Link
-            href="/"
-            prefetch={false}
-            className={`text-sm ${homeOpacity} ${main_font.className}`}
-          >
-            HOME
-          </Link>
-        </li>
-        <li
-          className={`list-none transition-all duration-100 ease-in-out hover:scale-150 ${newsBorder}`}
-        >
-          <Link
-            href="/news"
-            prefetch={false}
-            className={`text-sm ${newsOpacity} ${main_font.className}`}
-          >
-            NEWS
-          </Link>
-        </li>
-      </ul>
-    </nav>
-  );
-}
-
-function SearchSection() {
-  const [searchValue, setSearchValue] = useState("");
-
-  const handleInputChange = (event: any) => {
-    setSearchValue(event.target.value);
-  };
-
-  const clearSearch = () => {
-    setSearchValue("");
-  };
-
-  return (
-    <button
-      className="flex justify-end items-center"
-      onClick={() => {
-        alert("WIP");
-      }}
-    >
-      <MagnifyingGlassIcon className="w-4 h-4" />
-      <p className={`mx-1 ${secondary_font.className} text-sm`}>SEARCH</p>
-    </button>
   );
 }
 

@@ -133,34 +133,26 @@ function MainView() {
     fetchAllImages();
   }, []);
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2">
-      <div className="items-center md:items-start ml-2">
-        <div className="flex flex-col w-full leading-1 -mt-2 lg:-mt-6">
-          <h1 className={`${main_font.className} text-7xl md:text-9xl w-[60%]`}>
+    <div className="grid grid-cols-1 lg:grid-cols-2 mb-20">
+      <div className="items-start ml-2">
+        <div className="sticky flex flex-col mb-5 lg:mb-0 lg:w-full top-2 lg:top-5 bg-white">
+          <h1 className={`${main_font.className} text-6xl lg:text-7xl w-[60%]`}>
             TODAY
           </h1>
-          <h2 className={`${main_font.className} text-7xl md:text-8xl`}>
+          <h2 className={`${main_font.className} text-6xl lg:text-7xl`}>
             {currentDateTime}
           </h2>
         </div>
-        <div className="hidden lg:block">
-          <ImageDescriptionView
-            mainImageInfoList={mainImageInfoList}
-            currentIndex={currentIndex}
-          />
-        </div>
+        <ImageDescriptionView
+          mainImageInfoList={mainImageInfoList}
+          currentIndex={currentIndex}
+        />
       </div>
       <ImageCarouselView
         mainImageInfoList={mainImageInfoList}
         currentIndex={currentIndex}
         setCurrentIndex={setCurrentIndex}
       />
-      <div className="lg:hidden">
-        <ImageDescriptionView
-          mainImageInfoList={mainImageInfoList}
-          currentIndex={currentIndex}
-        />
-      </div>
     </div>
   );
 }
@@ -173,7 +165,7 @@ function ImageDescriptionView({
   currentIndex: number;
 }) {
   return mainImageInfoList ? (
-    <div className="flex flex-col mt-20">
+    <div className="flex flex-col mt-5 lg:mt-20">
       <h2 className={`${main_font.className} text-4xl`}>
         {mainImageInfoList[currentIndex]?.title}
       </h2>
@@ -203,7 +195,7 @@ function ItemDetailView({
 }) {
   return (
     mainImageInfoList && (
-      <div className="grid grid-cols-1 md:grid-cols-2 mt-5">
+      <div className="grid grid-cols-2 mt-5 p-2">
         {mainImageInfoList[currentIndex]?.itemInfoList
           ?.slice(0, 4)
           .map(([item, brands], index) => {
@@ -219,10 +211,7 @@ function ItemDetailView({
                 <div key={index} className="flex flex-col m-5 w-full">
                   <div className={`flex ${secondary_font.className} text-xs`}>
                     {brands && brands.length > 0 && (
-                      <div
-                        key={brands[0].name}
-                        className="flex items-center space-x-2"
-                      >
+                      <div key={index} className="flex items-center space-x-2">
                         <Image
                           src={brands[0].logoImageUrl ?? ""}
                           alt={brands[0].name}
@@ -235,9 +224,6 @@ function ItemDetailView({
                         </div>
                       </div>
                     )}
-                  </div>
-                  <div className={`${main_font.className} text-sm`}>
-                    {item?.name.toUpperCase() ?? ""}
                   </div>
                   <button
                     className={`${main_font.className} mt-5 bg-[#FF204E] hover:bg-black text-white font-bold rounded w-full h-8 text-sm`}
@@ -339,12 +325,12 @@ function ArticleView() {
   }, []);
 
   return (
-    <div className=" p-10">
-      <h1
-        className={`${main_font.className} text-4xl lg:text-8xl font-bold mb-4`}
-      >
-        LATEST NEWS
-      </h1>
+    <div className="flex flex-col p-2">
+      <div className="sticky top-16 lg:top-24 flex mb-10 bg-white">
+        <h1 className={`${main_font.className} text-6xl lg:text-7xl`}>
+          LATEST NEWS
+        </h1>
+      </div>
       {articles.length === 0 ? (
         <div className="grid grid-cols-3 gap-4">
           {Array.from({ length: 3 }, (_, index) => (
@@ -389,7 +375,10 @@ function HypedTaggedView() {
   return (
     <div className="rounded-md p-3">
       <div className="mb-6">
-        <h1 className={`${main_font.className} text-4xl sm:text-8xl font-bold`}>
+        <h1
+          className={`${main_font.className} text-4xl sm:text-7xl font-bold`}
+          style={{ position: "sticky", top: 90 }}
+        >
           SPOTLIGHT
         </h1>
         <h2 className="text-2xl font-bold bg-red-500">JENNIE 24SS</h2>

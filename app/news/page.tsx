@@ -14,13 +14,13 @@ function Page() {
 function NewsView() {
   return (
     <div>
-      <div className="flex flex-col w-full ">
-        <div className="fixed flex flex-col w-full" style={{ zIndex: 100 }}>
-          <div>
-            <h1
-              className={`${main_font.className} leading-3 text-9xl`}
-              style={{ marginTop: "1.8rem" }}
-            >
+      <div className="flex flex-col w-full">
+        <div
+          className="sticky flex flex-col w-full top-14 lg:top-20 ml-2"
+          style={{ zIndex: 100 }}
+        >
+          <div className="bg-white">
+            <h1 className={`${main_font.className} text-6xl lg:text-8xl`}>
               NEWS
             </h1>
           </div>
@@ -66,7 +66,7 @@ function NewsList() {
   };
 
   return (
-    <div className="grid grid-cols-4 gap-3 mt-80 p-10">
+    <div className="grid grid-cols-4 gap-2 lg:gap-8 mt-10 lg:mt-40 p-5 lg:p-20">
       {articleInfoList?.map((news, index) => (
         <Link key={index} href={news.src as string}>
           <div
@@ -81,9 +81,9 @@ function NewsList() {
               height={300}
               style={{ objectFit: "cover" }}
             />
-            {/* <div className="card-body">
-              <h2 className="card-title">{news.title.toUpperCase()}</h2>
-            </div> */}
+            <div className="hidden lg:block text-lg w-full">
+              <h2 className="">{news.title.toUpperCase()}</h2>
+            </div>
           </div>
         </Link>
       ))}
