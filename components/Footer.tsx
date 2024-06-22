@@ -21,30 +21,6 @@ function Footer() {
               "Unsubscribe any time"
             </h2>
           </div>
-          <form className="flex flex-col items-center w-full">
-            <div className="flex items-center w-[50%] mb-10">
-              <input
-                type="email"
-                placeholder="*@*.com"
-                className="w-full border-b-2 border-[#FF204E] dark:bg-[#ffffff] focus:outline-none text-black dark:text-white"
-                onChange={(e) => {
-                  if (e.target.value.length > 0) {
-                    setIsType(true);
-                  } else {
-                    setIsType(false);
-                  }
-                }}
-              />
-              {isType ? (
-                <button
-                  type="submit"
-                  className="p-1 bg-[#FF204E] text-white rounded-md mx-2"
-                >
-                  →
-                </button>
-              ) : null}
-            </div>
-          </form>
         </div>
       </div>
     </footer>

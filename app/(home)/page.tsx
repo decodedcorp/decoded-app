@@ -13,10 +13,6 @@ import {
   MainImageInfo,
   TaggedItem,
 } from "@/types/model";
-import {
-  ArrowLeftCircleIcon,
-  ArrowRightCircleIcon,
-} from "@heroicons/react/20/solid";
 import ProgressBar from "@/components/ui/progress-bar";
 
 function Home() {
@@ -24,7 +20,7 @@ function Home() {
     <div>
       <MainView />
       <ArticleView />
-      <HypedTaggedView />
+      {/* <SpotlightView /> */}
     </div>
   );
 }
@@ -56,8 +52,7 @@ function MainView() {
       var mainImageInfoList: MainImageInfo[] = [];
       try {
         const storageItems = await FirebaseHelper.listAllStorageItems("images");
-        // Up to 10 items will be processed
-        const imageStorage = storageItems.items.slice(0, 20);
+        const imageStorage = storageItems.items.slice(0, 10);
         imageStorage.forEach(async (image) => {
           try {
             const [metadata, url] = await Promise.all([
@@ -165,7 +160,7 @@ function ImageDescriptionView({
   currentIndex: number;
 }) {
   return mainImageInfoList ? (
-    <div className="flex flex-col mt-5 lg:mt-20">
+    <div className="flex flex-col mt-5 lg:mt-10 p-10">
       <h2 className={`${main_font.className} text-4xl`}>
         {mainImageInfoList[currentIndex]?.title}
       </h2>
@@ -195,12 +190,15 @@ function ItemDetailView({
 }) {
   return (
     mainImageInfoList && (
-      <div className="grid grid-cols-2 mt-5 p-2">
+      <div className="grid grid-cols-2 mt-5">
         {mainImageInfoList[currentIndex]?.itemInfoList
           ?.slice(0, 4)
           .map(([item, brands], index) => {
             return (
-              <div key={index} className="flex flex-row items-center">
+              <div
+                key={index}
+                className="flex flex-col lg:flex-row items-center"
+              >
                 <Image
                   src={item?.imageUrl ?? ""}
                   alt={item?.name ?? ""}
@@ -208,10 +206,16 @@ function ItemDetailView({
                   height={100}
                   className="rounded-lg shadow-lg"
                 />
-                <div key={index} className="flex flex-col m-5 w-full">
+                <div
+                  key={index}
+                  className="flex flex-col m-5 w-full lg:block items-center"
+                >
                   <div className={`flex ${secondary_font.className} text-xs`}>
                     {brands && brands.length > 0 && (
-                      <div key={index} className="flex items-center space-x-2">
+                      <div
+                        key={index}
+                        className="flex items-center space-x-2 w-full justify-center lg:justify-start"
+                      >
                         <Image
                           src={brands[0].logoImageUrl ?? ""}
                           alt={brands[0].name}
@@ -226,7 +230,7 @@ function ItemDetailView({
                     )}
                   </div>
                   <button
-                    className={`${main_font.className} mt-5 bg-[#FF204E] hover:bg-black text-white font-bold rounded w-full h-8 text-sm`}
+                    className={`${main_font.className} mt-5 bg-[#FF204E] hover:bg-black text-white font-bold rounded w-full h-8 text-sm hidden lg:block`}
                     onClick={() =>
                       (window.location.href = item?.affiliateUrl ?? "#")
                     }
@@ -371,58 +375,60 @@ function ArticleView() {
   );
 }
 
-function HypedTaggedView() {
-  return (
-    <div className="rounded-md p-3">
-      <div className="mb-6">
-        <h1
-          className={`${main_font.className} text-4xl sm:text-7xl font-bold`}
-          style={{ position: "sticky", top: 90 }}
-        >
-          SPOTLIGHT
-        </h1>
-        <h2 className="text-2xl font-bold bg-red-500">JENNIE 24SS</h2>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="col-span-1 md:col-span-3">
-          <Image src="" alt="Jennie Main" className="w-full" />
-        </div>
-        <div className="col-span-1">
-          <Image
-            src=""
-            alt="Product"
-            className="w-full border-2 border-black"
-          />
-          <p className="text-center mt-2">
-            Baby Fox Patch Cardigan
-            <br />
-            $415
-          </p>
-        </div>
-        <div className="col-span-1">
-          <Image
-            src=""
-            alt="Jennie 1"
-            className="w-full border-2 border-black"
-          />
-        </div>
-        <div className="col-span-1">
-          <Image
-            src=""
-            alt="Jennie 2"
-            className="w-full border-2 border-black"
-          />
-        </div>
-        <div className="col-span-1">
-          <Image
-            src=""
-            alt="Jennie 3"
-            className="w-full border-2 border-black"
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
+// function SpotlightView() {
+//   const [artistImgList, setArtistImgList] = useState<string[] | null>(null);
+//   useEffect(() => {
+//     const fetchSpotlight = async () => {
+//       // Jennie-mock
+//       const doc = await FirebaseHelper.doc(
+//         "artists",
+//         "80fd73d0ae9df67b132c85fcb38da0a3930d207e209636f5c75f4e158b32ee3b"
+//       );
+//       const artistInfo = doc.data() as ArtistInfo;
+//       const imageTags = artistInfo.tags?.images;
+//       let artistImgList: string[] = [];
+//       if (imageTags) {
+//         const images = await FirebaseHelper.listAllStorageItems("images");
+//         // Since item_doc_id is stored as custom metadata, logic is a bit complicated.
+//         // After changing item_doc_id as file name, it would be simpler
+//         await Promise.all(
+//           images.items.map(async (image) => {
+//             const metadata = await FirebaseHelper.metadata(image);
+//             const docId = metadata?.customMetadata?.id;
+//             if (docId && imageTags.includes(docId)) {
+//               const imageUrl = await FirebaseHelper.downloadUrl(image);
+//               artistImgList.push(imageUrl);
+//             }
+//           })
+//         );
+//         setArtistImgList(artistImgList);
+//       }
+//     };
+//     fetchSpotlight();
+//   }, []);
+
+//   return artistImgList ? (
+//     <div className="rounded-md p-3">
+//       <div className="mb-6">
+//         <h1
+//           className={`${main_font.className} text-6xl lg:text-8xl font-bold`}
+//           style={{ position: "sticky", top: 90 }}
+//         >
+//           SPOTLIGHT
+//         </h1>
+//         <h2 className={`${main_font.className} text-4xl lg:text-6xl font-bold`}>
+//           JENNIE 24SS
+//         </h2>
+//       </div>
+//       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+//         {artistImgList.map((image, index) => (
+//           <div key={index} className="col-span-1">
+//             <Image src={image} alt="Jennie" width={300} height={300} />
+//           </div>
+//         ))}
+//       </div>
+//     </div>
+//   ) : null;
+// }
 
 export default Home;

@@ -11,14 +11,15 @@ import {
   PauseIcon,
 } from "@heroicons/react/20/solid";
 import { main_font, secondary_font } from "@/components/helpers/util";
+import ReactPlayer from "react-player";
 
 const headers = ["home", "news", "about", "search"];
 
 function Header() {
   return (
-    <header className="grid grid-cols-2 items-center">
+    <header className="grid grid-cols-2 lg:grid-cols-3 items-center">
       <LogoSection />
-      {/* <MusicPlayer /> */}
+      <MusicPlayer />
       <MenuSection />
     </header>
   );
@@ -40,7 +41,7 @@ function MenuSection() {
   const pathname = usePathname();
   const cleanedPath = pathname.replace(/^\//, "");
   const [currentPath, setCurrentPath] = useState(cleanedPath);
-
+  console.log(pathname);
   return (
     <nav className="w-full justify-end hidden lg:block">
       <ul className="flex flex-row gap-3 justify-end pr-1">
@@ -49,7 +50,13 @@ function MenuSection() {
             <li
               key={index}
               className={`list-none transition-all duration-100 ease-in-out hover:scale-100 ${
-                header === currentPath ? "border-b-2 border-[#000000]" : ""
+                header === "home"
+                  ? pathname === "/"
+                    ? "border-b-2 border-[#000000]"
+                    : ""
+                  : currentPath === header
+                  ? "border-b-2 border-[#000000]"
+                  : ""
               }`}
             >
               <Link
@@ -69,20 +76,8 @@ function MenuSection() {
 }
 
 function MusicPlayer() {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef(
-    new Audio(
-      "https://api.soundcloud.com/tracks/TRACK_ID/stream?client_id=YOUR_CLIENT_ID"
-    )
-  );
-
-  const togglePlayPause = () => {
-    const prevValue = isPlaying;
-    setIsPlaying(!prevValue);
-  };
-
   return (
-    <div className="flex flex-row">
+    <div className="flex flex-row justify-center">
       <button>
         <PlayIcon className="w-4 h-4" />
       </button>
