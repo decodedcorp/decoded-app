@@ -14,6 +14,8 @@ import {
   TaggedItem,
 } from "@/types/model";
 import ProgressBar from "@/components/ui/progress-bar";
+import { InstagramEmbed, YouTubeEmbed } from "react-social-media-embed";
+import { InstaMockUrls, YoutubeMockUrls } from "@/components/helpers/mock";
 
 function Home() {
   return (
@@ -21,6 +23,8 @@ function Home() {
       <MainView />
       <ArticleView />
       {/* <SpotlightView /> */}
+      <RunwayView />
+      <SocialMediaView />
     </div>
   );
 }
@@ -197,7 +201,7 @@ function ItemDetailView({
             return (
               <div
                 key={index}
-                className="flex flex-col lg:flex-row items-center"
+                className="flex flex-col lg:flex-row items-center mt-5"
               >
                 <Image
                   src={item?.imageUrl ?? ""}
@@ -329,7 +333,7 @@ function ArticleView() {
   }, []);
 
   return (
-    <div className="flex flex-col p-2">
+    <div className="flex flex-col p-2 mb-20">
       <div className="sticky top-16 lg:top-24 flex mb-10 bg-white">
         <h1 className={`${main_font.className} text-6xl lg:text-7xl`}>
           LATEST NEWS
@@ -371,6 +375,40 @@ function ArticleView() {
           See More
         </div>
       </Link>
+    </div>
+  );
+}
+
+function RunwayView() {
+  return (
+    <div>
+      <div className="sticky top-16 lg:top-24 flex mb-10 bg-white justify-end">
+        <h1 className={`${main_font.className} text-6xl lg:text-7xl`}>
+          Runway 25SS
+        </h1>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-2">
+        {YoutubeMockUrls.map((url, index) => (
+          <YouTubeEmbed key={index} url={url} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SocialMediaView() {
+  return (
+    <div>
+      <div className="sticky top-16 lg:top-24 flex mb-10 bg-white">
+        <h1 className={`${main_font.className} text-6xl lg:text-7xl`}>
+          Curation
+        </h1>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-2">
+        {InstaMockUrls.map((url, index) => (
+          <InstagramEmbed key={index} url={url} />
+        ))}
+      </div>
     </div>
   );
 }
