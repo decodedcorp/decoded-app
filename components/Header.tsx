@@ -13,7 +13,7 @@ import {
 import { main_font, secondary_font } from "@/components/helpers/util";
 import ReactPlayer from "react-player";
 
-const headers = ["home", "news", "about", "search"];
+const headers = ["home", "news"];
 
 function Header() {
   return (

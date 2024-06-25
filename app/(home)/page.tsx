@@ -18,38 +18,9 @@ import { InstagramEmbed, YouTubeEmbed } from "react-social-media-embed";
 import { InstaMockUrls, YoutubeMockUrls } from "@/components/helpers/mock";
 
 function Home() {
-  return (
-    <div>
-      <MainView />
-      <ArticleView />
-      {/* <SpotlightView /> */}
-      <RunwayView />
-      <SocialMediaView />
-    </div>
-  );
-}
-
-interface UrlAndId {
-  url: string;
-  docId: string;
-}
-
-function MainView() {
   const [mainImageInfoList, setMainImageInfoList] = useState<
     MainImageInfo[] | null
   >(null);
-  const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [currentDateTime, setCurrentDateTime] = useState("");
-
-  useEffect(() => {
-    setCurrentDateTime(new Date().toLocaleTimeString());
-    const timerId = setInterval(() => {
-      setCurrentDateTime(new Date().toLocaleTimeString());
-    }, 1000);
-
-    return () => clearInterval(timerId);
-  }, []);
-
   useEffect(() => {
     const fetchAllImages = async () => {
       const urlAndId: UrlAndId[] = [];
@@ -131,6 +102,36 @@ function MainView() {
     };
     fetchAllImages();
   }, []);
+  return (
+    <div>
+      <MainView mainImageInfoList={mainImageInfoList} />
+      <AllTaggedView mainImageInfoList={mainImageInfoList} />
+    </div>
+  );
+}
+
+interface UrlAndId {
+  url: string;
+  docId: string;
+}
+
+function MainView({
+  mainImageInfoList,
+}: {
+  mainImageInfoList: MainImageInfo[] | null;
+}) {
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [currentDateTime, setCurrentDateTime] = useState("");
+
+  useEffect(() => {
+    setCurrentDateTime(new Date().toLocaleTimeString());
+    const timerId = setInterval(() => {
+      setCurrentDateTime(new Date().toLocaleTimeString());
+    }, 1000);
+
+    return () => clearInterval(timerId);
+  }, []);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 mb-20">
       <div className="items-start ml-2">
@@ -379,94 +380,53 @@ function ArticleView() {
   );
 }
 
-function RunwayView() {
+function AllTaggedView({
+  mainImageInfoList,
+}: {
+  mainImageInfoList: MainImageInfo[] | null;
+}) {
+  console.log("mainImageInfoList => ", mainImageInfoList);
   return (
-    <div>
-      <div className="sticky top-16 lg:top-24 flex mb-10 bg-white justify-end">
-        <h1 className={`${main_font.className} text-6xl lg:text-7xl`}>
-          Runway 25SS
-        </h1>
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-2">
-        {YoutubeMockUrls.map((url, index) => (
-          <YouTubeEmbed key={index} url={url} />
-        ))}
-      </div>
+    <div className="grid grid-cols-1 w-full bg-red-500">
+      {mainImageInfoList?.map((image, index) => (
+        <div key={index}>{image.title}</div>
+      ))}
     </div>
   );
 }
 
-function SocialMediaView() {
-  return (
-    <div>
-      <div className="sticky top-16 lg:top-24 flex mb-10 bg-white">
-        <h1 className={`${main_font.className} text-6xl lg:text-7xl`}>
-          Curation
-        </h1>
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-2">
-        {InstaMockUrls.map((url, index) => (
-          <InstagramEmbed key={index} url={url} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// function SpotlightView() {
-//   const [artistImgList, setArtistImgList] = useState<string[] | null>(null);
-//   useEffect(() => {
-//     const fetchSpotlight = async () => {
-//       // Jennie-mock
-//       const doc = await FirebaseHelper.doc(
-//         "artists",
-//         "80fd73d0ae9df67b132c85fcb38da0a3930d207e209636f5c75f4e158b32ee3b"
-//       );
-//       const artistInfo = doc.data() as ArtistInfo;
-//       const imageTags = artistInfo.tags?.images;
-//       let artistImgList: string[] = [];
-//       if (imageTags) {
-//         const images = await FirebaseHelper.listAllStorageItems("images");
-//         // Since item_doc_id is stored as custom metadata, logic is a bit complicated.
-//         // After changing item_doc_id as file name, it would be simpler
-//         await Promise.all(
-//           images.items.map(async (image) => {
-//             const metadata = await FirebaseHelper.metadata(image);
-//             const docId = metadata?.customMetadata?.id;
-//             if (docId && imageTags.includes(docId)) {
-//               const imageUrl = await FirebaseHelper.downloadUrl(image);
-//               artistImgList.push(imageUrl);
-//             }
-//           })
-//         );
-//         setArtistImgList(artistImgList);
-//       }
-//     };
-//     fetchSpotlight();
-//   }, []);
-
-//   return artistImgList ? (
-//     <div className="rounded-md p-3">
-//       <div className="mb-6">
-//         <h1
-//           className={`${main_font.className} text-6xl lg:text-8xl font-bold`}
-//           style={{ position: "sticky", top: 90 }}
-//         >
-//           SPOTLIGHT
+// function RunwayView() {
+//   return (
+//     <div>
+//       <div className="sticky top-16 lg:top-24 flex mb-10 bg-white justify-end">
+//         <h1 className={`${main_font.className} text-6xl lg:text-7xl`}>
+//           Runway 25SS
 //         </h1>
-//         <h2 className={`${main_font.className} text-4xl lg:text-6xl font-bold`}>
-//           JENNIE 24SS
-//         </h2>
 //       </div>
-//       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-//         {artistImgList.map((image, index) => (
-//           <div key={index} className="col-span-1">
-//             <Image src={image} alt="Jennie" width={300} height={300} />
-//           </div>
+//       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-2">
+//         {YoutubeMockUrls.map((url, index) => (
+//           <YouTubeEmbed key={index} url={url} />
 //         ))}
 //       </div>
 //     </div>
-//   ) : null;
+//   );
+// }
+
+// function SocialMediaView() {
+//   return (
+//     <div>
+//       <div className="sticky top-16 lg:top-24 flex mb-10 bg-white">
+//         <h1 className={`${main_font.className} text-6xl lg:text-7xl`}>
+//           Curation
+//         </h1>
+//       </div>
+//       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-2">
+//         {InstaMockUrls.map((url, index) => (
+//           <InstagramEmbed key={index} url={url} />
+//         ))}
+//       </div>
+//     </div>
+//   );
 // }
 
 export default Home;
