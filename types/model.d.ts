@@ -243,7 +243,7 @@ export interface MainImageInfo {
   title?: string;
   tags?: string[];
   description?: string;
-  itemInfoList?: [ItemInfo?, BrandInfo[]?][];
+  itemInfoList: Map<ItemInfo, BrandInfo[]>;
   artistInfoList?: ArtistInfo[];
 }
 

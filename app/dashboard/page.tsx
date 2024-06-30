@@ -210,18 +210,18 @@ function UploadImageSection({
 
     const hasValidHoverItems = uploadImageState.hoverItems!.every((item) => {
       const { category, name, price } = item.info;
-      const isPriceNeeded = category !== "location";
+      const isAdditionalInfoNeeded = category !== "location";
       var hasCommonFields: boolean = true;
       if (item.isNew) {
         hasCommonFields =
           item.artistName !== undefined &&
-          item.brandName !== undefined &&
           item.hoverItemImg !== undefined &&
           name.length > 0 &&
-          category.length > 0;
+          category.length > 0 &&
+          (!isAdditionalInfoNeeded || item.brandName !== undefined);
       }
 
-      if (isPriceNeeded) {
+      if (isAdditionalInfoNeeded) {
         return (
           hasCommonFields && price && price[0].length > 0 && price[1].length > 0
         );

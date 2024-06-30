@@ -16,6 +16,9 @@ import {
 import ProgressBar from "@/components/ui/progress-bar";
 import { InstagramEmbed, YouTubeEmbed } from "react-social-media-embed";
 import { InstaMockUrls, YoutubeMockUrls } from "@/components/helpers/mock";
+import { ChevronRightIcon } from "@heroicons/react/20/solid";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 
 function Home() {
   const [mainImageInfoList, setMainImageInfoList] = useState<
@@ -23,12 +26,10 @@ function Home() {
   >(null);
   useEffect(() => {
     const fetchAllImages = async () => {
-      const urlAndId: UrlAndId[] = [];
-      var mainImageInfoList: MainImageInfo[] = [];
-      try {
-        const storageItems = await FirebaseHelper.listAllStorageItems("images");
-        const imageStorage = storageItems.items.slice(0, 10);
-        imageStorage.forEach(async (image) => {
+      const storageItems = await FirebaseHelper.listAllStorageItems("images");
+      const imageStorage = storageItems.items;
+      const images = await Promise.all(
+        imageStorage.map(async (image) => {
           try {
             const [metadata, url] = await Promise.all([
               FirebaseHelper.metadata(image),
@@ -36,75 +37,86 @@ function Home() {
             ]);
             const imageDocId = metadata.customMetadata?.id;
             if (!imageDocId) {
-              console.log("Image Doc Id not existed");
               return;
             }
             const imageDoc = await FirebaseHelper.doc("images", imageDocId);
             if (imageDoc.exists()) {
               const imageInfo = imageDoc.data() as ImageInfo;
-              var itemInfoList: [ItemInfo?, BrandInfo[]?][] = [];
-              var artistInfo: ArtistInfo[] = [];
+              var artistInfoList: ArtistInfo[] | undefined;
               var artistsTags = imageInfo.tags?.["artists"];
               if (artistsTags) {
-                artistsTags.map(async (artist) => {
+                const artistPromises = artistsTags.map(async (artist) => {
                   const artistDoc = await FirebaseHelper.doc("artists", artist);
                   if (artistDoc.exists()) {
-                    const artist = artistDoc.data() as ArtistInfo;
-                    artistInfo.push(artist);
+                    return artistDoc.data() as ArtistInfo;
                   }
                 });
-              }
-              imageInfo.taggedItem?.map(async (item) => {
-                const taggedItem = item as TaggedItem;
-                const itemDoc = await FirebaseHelper.doc(
-                  "items",
-                  taggedItem.id
+                const res = await Promise.all(artistPromises);
+                artistInfoList = res.filter(
+                  (artist): artist is ArtistInfo => artist !== undefined
                 );
-                if (itemDoc.exists()) {
-                  const itemInfo = itemDoc.data() as ItemInfo;
-                  var brandInfo: BrandInfo[] = [];
-                  const brandTags = itemInfo.tags?.["brands"];
-                  if (brandTags) {
-                    brandTags.map(async (b) => {
-                      const doc = await FirebaseHelper.doc("brands", b);
-                      if (doc.exists()) {
-                        const data = doc.data() as BrandInfo;
-                        brandInfo.push(data);
-                      }
-                    });
+              }
+              var itemInfoList = new Map<ItemInfo, BrandInfo[]>();
+              if (imageInfo.taggedItem) {
+                const itemPromises = imageInfo.taggedItem.map(async (item) => {
+                  const taggedItem = item as TaggedItem;
+                  const itemDoc = await FirebaseHelper.doc(
+                    "items",
+                    taggedItem.id
+                  );
+                  if (itemDoc.exists()) {
+                    const itemInfo = itemDoc.data() as ItemInfo;
+                    let brandInfo: BrandInfo[] = [];
+                    const brandTags = itemInfo.tags?.["brands"];
+                    if (brandTags) {
+                      const brandPromises = brandTags.map(async (b) => {
+                        const doc = await FirebaseHelper.doc("brands", b);
+                        if (doc.exists()) {
+                          return doc.data() as BrandInfo;
+                        }
+                        return undefined;
+                      });
+                      const res = await Promise.all(brandPromises);
+                      brandInfo = res.filter(
+                        (brand): brand is BrandInfo => brand !== undefined
+                      );
+                    }
+                    itemInfoList.set(itemInfo, brandInfo);
                   }
-                  itemInfoList.push([itemInfo, brandInfo]);
-                }
-              });
-              mainImageInfoList.push({
+                });
+
+                await Promise.all(itemPromises);
+              }
+              let mainImageInfo: MainImageInfo = {
                 imageUrl: url,
                 docId: imageDocId,
                 title: imageInfo.title,
-                itemInfoList: itemInfoList,
-                artistInfoList: artistInfo,
+                itemInfoList,
+                artistInfoList,
                 description: imageInfo.description,
                 hyped: imageInfo.hyped,
-              });
-              urlAndId.push({ url, docId: imageDocId });
+              };
+              return mainImageInfo;
             }
           } catch (error) {
             console.error("Error processing item:", error);
             return;
           }
-        });
-      } catch (error) {
-        if (error instanceof Error) {
-          console.log(error.message);
-        }
-      } finally {
-        setMainImageInfoList(mainImageInfoList);
-      }
+        })
+      );
+      let filtered = images.filter(
+        (image): image is MainImageInfo => image !== undefined
+      );
+      setMainImageInfoList(filtered);
     };
     fetchAllImages();
   }, []);
   return (
     <div>
       <MainView mainImageInfoList={mainImageInfoList} />
+      <p className={`${secondary_font.className} text-center text-xl`}>
+        More to explore
+      </p>
       <AllTaggedView mainImageInfoList={mainImageInfoList} />
     </div>
   );
@@ -133,7 +145,7 @@ function MainView({
   }, []);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 mb-20">
+    <div className="grid grid-cols-1 lg:grid-cols-2 mb-10">
       <div className="items-start ml-2">
         <div className="sticky flex flex-col mb-5 lg:mb-0 lg:w-full top-2 lg:top-5 bg-white">
           <h1 className={`${main_font.className} text-6xl lg:text-7xl w-[60%]`}>
@@ -149,7 +161,7 @@ function MainView({
         />
       </div>
       <ImageCarouselView
-        mainImageInfoList={mainImageInfoList}
+        mainImageInfoList={mainImageInfoList?.slice(0, 10)}
         currentIndex={currentIndex}
         setCurrentIndex={setCurrentIndex}
       />
@@ -196,56 +208,48 @@ function ItemDetailView({
   return (
     mainImageInfoList && (
       <div className="grid grid-cols-2 mt-5">
-        {mainImageInfoList[currentIndex]?.itemInfoList
-          ?.slice(0, 4)
-          .map(([item, brands], index) => {
-            return (
-              <div
-                key={index}
-                className="flex flex-col lg:flex-row items-center mt-5"
-              >
-                <Image
-                  src={item?.imageUrl ?? ""}
-                  alt={item?.name ?? ""}
-                  width={100}
-                  height={100}
-                  className="rounded-lg shadow-lg"
-                />
-                <div
-                  key={index}
-                  className="flex flex-col m-5 w-full lg:block items-center"
-                >
-                  <div className={`flex ${secondary_font.className} text-xs`}>
-                    {brands && brands.length > 0 && (
-                      <div
-                        key={index}
-                        className="flex items-center space-x-2 w-full justify-center lg:justify-start"
-                      >
-                        <Image
-                          src={brands[0].logoImageUrl ?? ""}
-                          alt={brands[0].name}
-                          className="rounded-full w-6 h-6 border border-black-opacity-50"
-                          width={100}
-                          height={100}
-                        />
-                        <div className="rounded-lg p-1 text-md">
-                          {brands[0].name.replace(/_/g, " ").toUpperCase()}
-                        </div>
-                      </div>
-                    )}
+        {Array.from(
+          mainImageInfoList[currentIndex]?.itemInfoList.entries()
+        ).map(([item, brands], index) => (
+          <div
+            key={index}
+            className="flex flex-col lg:flex-row items-center mt-5"
+          >
+            <Image
+              src={item.imageUrl ?? ""}
+              alt={item.name ?? ""}
+              width={100}
+              height={100}
+              className="rounded-lg shadow-lg"
+            />
+            <div className="flex flex-col m-5 w-full lg:block items-center">
+              <div className={`flex ${secondary_font.className} text-xs`}>
+                {brands && brands.length > 0 && (
+                  <div className="flex items-center space-x-2 w-full justify-center lg:justify-start">
+                    <Image
+                      src={brands[0].logoImageUrl ?? ""}
+                      alt={brands[0].name}
+                      className="rounded-full w-6 h-6 border border-black-opacity-50"
+                      width={100}
+                      height={100}
+                    />
+                    <div className="rounded-lg p-1 text-md">
+                      {brands[0].name.replace(/_/g, " ").toUpperCase()}
+                    </div>
                   </div>
-                  <button
-                    className={`${main_font.className} mt-5 bg-[#FF204E] hover:bg-black text-white font-bold rounded w-full h-8 text-sm hidden lg:block`}
-                    onClick={() =>
-                      (window.location.href = item?.affiliateUrl ?? "#")
-                    }
-                  >
-                    구매하기
-                  </button>
-                </div>
+                )}
               </div>
-            );
-          })}
+              <button
+                className={`${main_font.className} mt-5 bg-[#FF204E] hover:bg-black text-white font-bold rounded w-full h-8 text-sm hidden lg:block`}
+                onClick={() =>
+                  (window.location.href = item.affiliateUrl ?? "#")
+                }
+              >
+                구매하기
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
     )
   );
@@ -256,7 +260,7 @@ function ImageCarouselView({
   currentIndex,
   setCurrentIndex,
 }: {
-  mainImageInfoList: MainImageInfo[] | null;
+  mainImageInfoList: MainImageInfo[] | undefined;
   currentIndex: number;
   setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
 }) {
@@ -385,13 +389,83 @@ function AllTaggedView({
 }: {
   mainImageInfoList: MainImageInfo[] | null;
 }) {
-  console.log("mainImageInfoList => ", mainImageInfoList);
+  console.log(mainImageInfoList);
   return (
-    <div className="grid grid-cols-1 w-full bg-red-500">
-      {mainImageInfoList?.map((image, index) => (
-        <div key={index}>{image.title}</div>
-      ))}
-    </div>
+    mainImageInfoList && (
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 p-10 gap-10 md:gap-32 lg:gap-16 w-full justify-center items-center md:p-32 lg:p-12">
+        {mainImageInfoList.map((image, index) => (
+          <div
+            key={index}
+            className="flex flex-col w-full h-auto rounded-lg border-2 border-black shadow-xl"
+          >
+            <Link
+              href={`images?imageId=${
+                image.docId
+              }&imageUrl=${encodeURIComponent(image.imageUrl)}`}
+              className="w-full h-96 relative overflow-hidden"
+            >
+              <Image
+                src={image.imageUrl ?? ""}
+                alt={image.title ?? ""}
+                fill={true}
+                style={{
+                  objectFit: "cover",
+                }}
+              />
+            </Link>
+            <div className="flex flex-row justify-between items-center z-10 shadow-lg p-4">
+              <div className={`${main_font.className}`}>
+                {image.artistInfoList?.map((artist, index) => {
+                  return (
+                    <div className="pb-1 justify-between" key={index}>
+                      <div className="flex flex-row items-center">
+                        <div className="rounded-xl w-5 h-5 bg-gray-400 mr-2"></div>
+                        {artist.name.toUpperCase()}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <FavoriteBorderIcon className="w-4 h-4" />
+            </div>
+            <div
+              className={`flex flex-col w-full ${main_font.className} max-h-72 overflow-y-auto`}
+            >
+              {Array.from(image.itemInfoList.entries()).map(
+                ([item, brand], index) => {
+                  return (
+                    <Link
+                      href={item?.affiliateUrl ?? "#"}
+                      className="p-2 m-2 border-b-2 border-opacity-50 flex flex-row"
+                      key={index}
+                    >
+                      <div className="w-16 h-20 relative border border-black rounded-md">
+                        <Image
+                          src={item.imageUrl ?? ""}
+                          alt={item.name}
+                          fill={true}
+                          style={{ objectFit: "cover" }}
+                        />
+                      </div>
+                      <div className="flex flex-col ml-2">
+                        <div className="text-md">
+                          {brand[0]?.name.replace(/_/g, " ").toUpperCase()}
+                        </div>
+                        <div
+                          className={`flex flex-row text-sm ${secondary_font.className} w-full justify-between`}
+                        >
+                          {item.name}
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                }
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    )
   );
 }
 
