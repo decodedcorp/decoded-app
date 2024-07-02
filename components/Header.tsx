@@ -11,9 +11,9 @@ import {
   PauseIcon,
 } from "@heroicons/react/20/solid";
 import { main_font, secondary_font } from "@/components/helpers/util";
-import ReactPlayer from "react-player";
+import { LoginModal } from "./ui/modal";
 
-const headers = ["home", "news"];
+const headers = ["home", "news", "login"];
 
 function Header() {
   return (
@@ -41,11 +41,28 @@ function MenuSection() {
   const pathname = usePathname();
   const cleanedPath = pathname.replace(/^\//, "");
   const [currentPath, setCurrentPath] = useState(cleanedPath);
-  console.log(pathname);
+
   return (
     <nav className="w-full justify-end hidden lg:block">
       <ul className="flex flex-row gap-3 justify-end pr-1">
         {headers.map((header, index) => {
+          if (header === "login") {
+            return (
+              <div
+                key={index}
+                className={`${secondary_font.className} text-2xl cursor-pointer`}
+                onClick={() =>
+                  (
+                    document.getElementById("my_modal_4") as HTMLDialogElement
+                  )?.showModal()
+                }
+              >
+                {header.toUpperCase()}
+                {/* TODO: get nonce from server */}
+                <LoginModal nonce="1234567890" />
+              </div>
+            );
+          }
           return (
             <li
               key={index}

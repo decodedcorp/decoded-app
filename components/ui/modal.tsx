@@ -8,6 +8,54 @@ import { BrandInfo, ArtistInfo } from "@/types/model";
 import { ConvertImageAndCompress } from "@/components/helpers/util";
 import { getDownloadURL } from "firebase/storage";
 import { HoverItemInfo } from "@/types/model";
+import { Button } from "@mui/material";
+import GoogleLogo from "@/app/google.svg";
+
+export const LoginModal = ({ nonce }: { nonce: string }) => {
+  return (
+    <dialog id="my_modal_4" className="modal">
+      <div className="modal-box">
+        <h3 className="font-bold text-lg">Login</h3>
+        <p className="py-4">Press ESC key or click the button below to close</p>
+        <div className="modal-action">
+          <Button
+            sx={{
+              mt: "24px",
+            }}
+            disabled={!nonce}
+            variant="contained"
+            onClick={() => {
+              // TODO
+              const params = new URLSearchParams({
+                client_id: process.env.AUTH_GOOGLE_ID!,
+                redirect_uri: process.env.REDIRECT_URI!,
+                response_type: "id_token",
+                scope: "openid",
+                nonce: nonce,
+              });
+              const loginURL = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
+              window.location.replace(loginURL);
+            }}
+          >
+            <img
+              src={GoogleLogo}
+              width="16px"
+              style={{
+                marginRight: "8px",
+              }}
+              alt="Google"
+            />{" "}
+            Sign In With Google
+          </Button>
+          <form method="dialog">
+            {/* if there is a button in form, it will close the modal */}
+            <button className="btn">Close</button>
+          </form>
+        </div>
+      </div>
+    </dialog>
+  );
+};
 
 export const ItemModal = (hoverItemInfo: { hoverItemInfo: HoverItemInfo }) => {
   return (
