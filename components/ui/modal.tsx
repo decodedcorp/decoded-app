@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FirebaseHelper } from "@/common/firebase";
 import { collection, setDoc, doc } from "firebase/firestore";
 import { sha256 } from "js-sha256";
@@ -10,8 +10,24 @@ import { getDownloadURL } from "firebase/storage";
 import { HoverItemInfo } from "@/types/model";
 import { Button } from "@mui/material";
 import GoogleLogo from "@/app/google.svg";
+import queryString from "query-string";
+import { JwtPayload, jwtDecode } from "jwt-decode";
+import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
+import { generateRandomness, generateNonce } from "@mysten/zklogin";
+import { SuiClient, getFullnodeUrl } from "@mysten/sui/client";
 
-export const LoginModal = ({ nonce }: { nonce: string }) => {
+export const LoginModal = () => {
+  const [oauthParams, setOauthParams] =
+    useState<queryString.ParsedQuery<string>>();
+
+  // query jwt id_token
+  useEffect(() => {
+    if (oauthParams && oauthParams.id_token) {
+      const decodedJwt = jwtDecode(oauthParams.id_token as string);
+      console.log(decodedJwt);
+    }
+  }, [oauthParams]);
+
   return (
     <dialog id="my_modal_4" className="modal">
       <div className="modal-box">
@@ -22,13 +38,31 @@ export const LoginModal = ({ nonce }: { nonce: string }) => {
             sx={{
               mt: "24px",
             }}
-            disabled={!nonce}
             variant="contained"
-            onClick={() => {
+            onClick={async () => {
               // TODO
+              const epk = Ed25519Keypair.generate();
+              window.sessionStorage.setItem("EPK_SECRET", epk.getSecretKey());
+              const randomness = generateRandomness();
+              window.sessionStorage.setItem("RANDOMNESS", randomness);
+              const rpcUrl = getFullnodeUrl("devnet");
+              const suiClient = new SuiClient({
+                url: rpcUrl,
+              });
+              const suiSysState = await suiClient.getLatestSuiSystemState();
+              const currentEpoch = suiSysState.epoch;
+              let maxEpoch: number = parseInt(currentEpoch) + 10;
+              const nonce = generateNonce(
+                epk.getPublicKey(),
+                maxEpoch,
+                randomness
+              );
+              console.log(nonce);
+              console.log(process.env.NEXT_PUBLIC_AUTH_CLIENT_ID);
+              console.log(process.env.NEXT_PUBLIC_REDIRECT_URI);
               const params = new URLSearchParams({
-                client_id: process.env.AUTH_GOOGLE_ID!,
-                redirect_uri: process.env.REDIRECT_URI!,
+                client_id: process.env.NEXT_PUBLIC_AUTH_CLIENT_ID!,
+                redirect_uri: process.env.NEXT_PUBLIC_REDIRECT_URI!,
                 response_type: "id_token",
                 scope: "openid",
                 nonce: nonce,

@@ -59,7 +59,7 @@ function MenuSection() {
               >
                 {header.toUpperCase()}
                 {/* TODO: get nonce from server */}
-                <LoginModal nonce="1234567890" />
+                <LoginModal />
               </div>
             );
           }
