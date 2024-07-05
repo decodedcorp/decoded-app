@@ -7,9 +7,11 @@ import { useState, useRef } from "react";
 import {
   MagnifyingGlassIcon,
   Bars3Icon,
+  PlusCircleIcon,
   PlayIcon,
   PauseIcon,
 } from "@heroicons/react/20/solid";
+import AddIcon from "@mui/icons-material/Add";
 import { main_font, secondary_font } from "@/components/helpers/util";
 import { LoginModal } from "./ui/modal";
 
@@ -19,7 +21,14 @@ function Header() {
   return (
     <header className="grid grid-cols-2 lg:grid-cols-3 items-center">
       <LogoSection />
-      <MusicPlayer />
+      <div
+        className="flex justify-center items-center cursor-pointer"
+        onClick={() => {
+          alert("Coming Soon!");
+        }}
+      >
+        <AddIcon className="w-10 h-10 bg-[#FF204E] rounded-xl" />
+      </div>
       <MenuSection />
     </header>
   );
