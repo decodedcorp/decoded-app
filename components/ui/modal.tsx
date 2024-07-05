@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { FirebaseHelper } from "@/common/firebase";
 import { collection, setDoc, doc } from "firebase/firestore";
 import { sha256 } from "js-sha256";
@@ -13,20 +14,48 @@ import GoogleLogo from "@/app/google.svg";
 import queryString from "query-string";
 import { JwtPayload, jwtDecode } from "jwt-decode";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
-import { generateRandomness, generateNonce } from "@mysten/zklogin";
+import {
+  generateRandomness,
+  generateNonce,
+  jwtToAddress,
+} from "@mysten/zklogin";
 import { SuiClient, getFullnodeUrl } from "@mysten/sui/client";
 
 export const LoginModal = () => {
+  const pathName = usePathname();
+
   const [oauthParams, setOauthParams] =
     useState<queryString.ParsedQuery<string>>();
 
-  // query jwt id_token
   useEffect(() => {
-    if (oauthParams && oauthParams.id_token) {
-      const decodedJwt = jwtDecode(oauthParams.id_token as string);
-      console.log(decodedJwt);
+    console.log(pathName);
+
+    // 해시 값 읽기
+    const hash = window.location.hash;
+    if (hash) {
+      const params = new URLSearchParams(hash.substring(1));
+      const token = params.get("id_token");
+      if (token) {
+        const decoded_jwt = jwtDecode(token);
+        const sub = decoded_jwt.sub;
+        const iss = decoded_jwt.iss;
+        const aud = decoded_jwt.aud;
+        if (sub && iss && aud) {
+          // TODO: GET server_host/user?doc_id={}
+          // let res = fetch(server_host/user?doc_id={})
+          // let salt = res.salt
+          let docId = sha256(sub + iss + aud);
+          // TODO: Fetch salt from server
+          const salt = generateRandomness();
+          const address = jwtToAddress(token, salt);
+          console.log("SUI address:", address);
+        } else {
+          alert("Login failed!");
+        }
+        window.history.replaceState(null, "", window.location.pathname);
+      }
     }
-  }, [oauthParams]);
+  }, [pathName]);
 
   return (
     <dialog id="my_modal_4" className="modal">
@@ -58,8 +87,6 @@ export const LoginModal = () => {
                 randomness
               );
               console.log(nonce);
-              console.log(process.env.NEXT_PUBLIC_AUTH_CLIENT_ID);
-              console.log(process.env.NEXT_PUBLIC_REDIRECT_URI);
               const params = new URLSearchParams({
                 client_id: process.env.NEXT_PUBLIC_AUTH_CLIENT_ID!,
                 redirect_uri: process.env.NEXT_PUBLIC_REDIRECT_URI!,
