@@ -22,17 +22,12 @@ export class NetworkManager {
     return response.data;
   }
 
-  public static async login(credentials: {
-    username: string;
-    password: string;
-  }) {
+  public static async login(docId: string) {
     try {
-      const response = await axios.post(
-        "http://localhost:8080/admin/login",
-        credentials
+      const response = await axios.get(
+        `http://localhost:8080/user/login?doc_id=${docId}`
       );
-      // Store token in local storage
-      localStorage.setItem("token", response.data.access_token);
+      return response;
     } catch (error) {
       if (isAxiosError(error)) {
         console.error("Auth Error:", error.response?.data);

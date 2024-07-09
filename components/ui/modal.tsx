@@ -1,18 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { usePathname } from "next/navigation";
 import { FirebaseHelper } from "@/common/firebase";
-import { collection, setDoc, doc } from "firebase/firestore";
+import { NetworkManager } from "@/common/network";
+import { setDoc, doc } from "firebase/firestore";
 import { sha256 } from "js-sha256";
 import { BrandInfo, ArtistInfo } from "@/types/model";
 import { ConvertImageAndCompress } from "@/components/helpers/util";
 import { getDownloadURL } from "firebase/storage";
 import { HoverItemInfo } from "@/types/model";
 import { Button } from "@mui/material";
-import GoogleLogo from "@/app/google.svg";
-import queryString from "query-string";
-import { JwtPayload, jwtDecode } from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import {
   generateRandomness,
@@ -21,38 +20,40 @@ import {
 } from "@mysten/zklogin";
 import { SuiClient, getFullnodeUrl } from "@mysten/sui/client";
 
-export const LoginModal = () => {
+export const LoginModal = ({
+  setIsLogin,
+}: {
+  setIsLogin: Dispatch<SetStateAction<boolean>>;
+}) => {
   const pathName = usePathname();
 
-  const [oauthParams, setOauthParams] =
-    useState<queryString.ParsedQuery<string>>();
-
   useEffect(() => {
-    console.log(pathName);
-
-    // 해시 값 읽기
     const hash = window.location.hash;
+    const login = async (token: string) => {
+      const decoded_jwt = jwtDecode(token);
+      const sub = decoded_jwt.sub;
+      const iss = decoded_jwt.iss;
+      const aud = decoded_jwt.aud;
+      if (sub && iss && aud) {
+        let docId = sha256(sub + iss + aud);
+        try {
+          const res = await NetworkManager.login(docId);
+          const address = jwtToAddress(token, res.data.salt);
+          setIsLogin(true);
+          window.sessionStorage.setItem("USER_DOC_ID", docId);
+          window.sessionStorage.setItem("SUI_ADDRESS", address);
+        } catch (error) {
+          setIsLogin(false);
+        } finally {
+          window.history.replaceState(null, "", window.location.pathname);
+        }
+      }
+    };
     if (hash) {
       const params = new URLSearchParams(hash.substring(1));
       const token = params.get("id_token");
       if (token) {
-        const decoded_jwt = jwtDecode(token);
-        const sub = decoded_jwt.sub;
-        const iss = decoded_jwt.iss;
-        const aud = decoded_jwt.aud;
-        if (sub && iss && aud) {
-          // TODO: GET server_host/user?doc_id={}
-          // let res = fetch(server_host/user?doc_id={})
-          // let salt = res.salt
-          let docId = sha256(sub + iss + aud);
-          // TODO: Fetch salt from server
-          const salt = generateRandomness();
-          const address = jwtToAddress(token, salt);
-          console.log("SUI address:", address);
-        } else {
-          alert("Login failed!");
-        }
-        window.history.replaceState(null, "", window.location.pathname);
+        login(token);
       }
     }
   }, [pathName]);
@@ -60,16 +61,14 @@ export const LoginModal = () => {
   return (
     <dialog id="my_modal_4" className="modal">
       <div className="modal-box">
-        <h3 className="font-bold text-lg">Login</h3>
-        <p className="py-4">Press ESC key or click the button below to close</p>
-        <div className="modal-action">
+        <h3 className="font-bold text-2xl">Login</h3>
+        <div className="modal-action items-center">
           <Button
-            sx={{
-              mt: "24px",
+            style={{
+              backgroundColor: "#4285f4",
             }}
             variant="contained"
             onClick={async () => {
-              // TODO
               const epk = Ed25519Keypair.generate();
               window.sessionStorage.setItem("EPK_SECRET", epk.getSecretKey());
               const randomness = generateRandomness();
@@ -98,14 +97,6 @@ export const LoginModal = () => {
               window.location.replace(loginURL);
             }}
           >
-            <img
-              src={GoogleLogo}
-              width="16px"
-              style={{
-                marginRight: "8px",
-              }}
-              alt="Google"
-            />{" "}
             Sign In With Google
           </Button>
           <form method="dialog">

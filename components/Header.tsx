@@ -1,16 +1,8 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useRef } from "react";
-import {
-  MagnifyingGlassIcon,
-  Bars3Icon,
-  PlusCircleIcon,
-  PlayIcon,
-  PauseIcon,
-} from "@heroicons/react/20/solid";
+import { useState, Dispatch, SetStateAction } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import { main_font, secondary_font } from "@/components/helpers/util";
 import { LoginModal } from "./ui/modal";
@@ -18,23 +10,29 @@ import { LoginModal } from "./ui/modal";
 const headers = ["home", "news", "login"];
 
 function Header() {
+  const [isLogin, setIsLogin] = useState(false);
+
   return (
     <header className="grid grid-cols-2 lg:grid-cols-3 items-center">
-      <LogoSection />
+      <Logo />
       <div
         className="flex justify-center items-center cursor-pointer"
         onClick={() => {
           alert("Coming Soon!");
         }}
       >
-        <AddIcon className="w-10 h-10 bg-[#FF204E] rounded-xl" />
+        {isLogin ? (
+          <AddIcon className="w-10 h-10 bg-[#FF204E] rounded-xl" />
+        ) : (
+          <div></div>
+        )}
       </div>
-      <MenuSection />
+      <MenuSection isLogin={isLogin} setIsLogin={setIsLogin} />
     </header>
   );
 }
 
-function LogoSection() {
+function Logo() {
   return (
     <Link
       href="/"
@@ -46,7 +44,13 @@ function LogoSection() {
   );
 }
 
-function MenuSection() {
+function MenuSection({
+  isLogin,
+  setIsLogin,
+}: {
+  isLogin: boolean;
+  setIsLogin: Dispatch<SetStateAction<boolean>>;
+}) {
   const pathname = usePathname();
   const cleanedPath = pathname.replace(/^\//, "");
   const [currentPath, setCurrentPath] = useState(cleanedPath);
@@ -66,9 +70,17 @@ function MenuSection() {
                   )?.showModal()
                 }
               >
-                {header.toUpperCase()}
-                {/* TODO: get nonce from server */}
-                <LoginModal />
+                {isLogin ? (
+                  <div
+                    className="cursor-pointer"
+                    onClick={() => setIsLogin(false)}
+                  >
+                    LOGOUT
+                  </div>
+                ) : (
+                  header.toUpperCase()
+                )}
+                <LoginModal setIsLogin={setIsLogin} />
               </div>
             );
           }
@@ -98,19 +110,6 @@ function MenuSection() {
         })}
       </ul>
     </nav>
-  );
-}
-
-function MusicPlayer() {
-  return (
-    <div className="flex flex-row justify-center">
-      <button>
-        <PlayIcon className="w-4 h-4" />
-      </button>
-      <button>
-        <PauseIcon className="w-4 h-4" />
-      </button>
-    </div>
   );
 }
 
