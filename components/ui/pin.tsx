@@ -53,11 +53,11 @@ function Pin({ image }: { image: MainImageInfo }) {
                     src={item.imageUrl ?? ""}
                     alt={item.name}
                     fill={true}
-                    style={{ objectFit: "cover" }}
+                    style={{ objectFit: "contain" }}
                   />
                 </div>
-                <div className="flex flex-col ml-2">
-                  <div className="text-md">
+                <div className="flex flex-col ml-4 overflow-clip">
+                  <div className="text-sm">
                     {brand[0]?.name.replace(/_/g, " ").toUpperCase()}
                   </div>
                   <div

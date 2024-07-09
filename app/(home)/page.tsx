@@ -137,7 +137,7 @@ function MainView({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 mb-10">
       <div className="items-start ml-2">
-        <div className="sticky flex flex-col mb-5 lg:mb-0 lg:w-full top-2 lg:top-5 bg-white">
+        <div className="sticky flex flex-col mb-5 lg:mb-0 lg:w-full top-2 lg:top-5 bg-white z-10">
           <h1 className={`${main_font.className} text-6xl lg:text-7xl w-[60%]`}>
             TODAY
           </h1>
@@ -315,7 +315,7 @@ function PinView({
   console.log(mainImageInfoList);
   return (
     mainImageInfoList && (
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 p-10 gap-10 md:gap-32 lg:gap-16 w-full justify-center items-center md:p-32 lg:p-12">
+      <div className="grid grid-cols-1 lg:grid-cols-3 p-10 gap-10 md:gap-32 lg:gap-16 w-full justify-center items-center md:p-32 lg:p-12">
         {mainImageInfoList.map((image, index) => (
           <Pin key={index} image={image} />
         ))}
