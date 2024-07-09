@@ -11,7 +11,7 @@ function Pin({ image }: { image: MainImageInfo }) {
         href={`images?imageId=${image.docId}&imageUrl=${encodeURIComponent(
           image.imageUrl
         )}`}
-        className="w-full h-96 relative overflow-hidden"
+        className="w-full h-96 relative overflow-hidden aspect-w-3 aspect-h-4"
       >
         <Image
           src={image.imageUrl ?? ""}
