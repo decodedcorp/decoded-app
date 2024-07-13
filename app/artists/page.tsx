@@ -6,12 +6,10 @@ import { FirebaseHelper } from "@/common/firebase";
 import { ArtistInfo, ItemInfo, ImageInfo } from "@/types/model";
 import { sha256 } from "js-sha256";
 
-interface BrandInfo {
-  category: string;
-  creativeDirector: string[];
-  logoImageUrl: string;
+interface ItemInfoWithImage {
+  id: string;
+  imageUrl: string;
   name: string;
-  websiteUrl: string;
 }
 
 function ArtistPage() {
@@ -20,9 +18,8 @@ function ArtistPage() {
   const [artistName, setArtistName] = useState<string | null>(null);
   const [artistInfo, setArtistInfo] = useState<ArtistInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [brandInfo, setBrandInfo] = useState<BrandInfo[]>([]);
   const [imageInfo, setImageInfo] = useState<string[]>([]);
-  const [itemInfo, setItemInfo] = useState<string[]>([]);
+  const [itemInfo, setItemInfo] = useState<ItemInfoWithImage[]>([]);
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
@@ -44,20 +41,8 @@ function ArtistPage() {
         const artist = artistDoc.data() as ArtistInfo;
         setArtistInfo(artist);
 
-        // Fetch brand info
-        if (artist.tags?.brands) {
-          const brands = await FirebaseHelper.listAllStorageItems("brand");
-          const brandDetails = brands.items
-            .filter((brand) => artist.tags?.brands.includes(brand.id))
-            .map((brand) => ({
-              category: brand.category,
-              creativeDirector: brand.creativeDirector,
-              logoImageUrl: brand.logoImageUrl,
-              name: brand.name,
-              websiteUrl: brand.websiteUrl,
-            }));
-          setBrandInfo(brandDetails);
-        }
+        // 콘솔에 artist.tags?.items 출력
+        console.log("artist.tags?.items:", artist.tags?.items);
 
         // Fetch image info
         if (artist.tags?.images) {
@@ -70,11 +55,26 @@ function ArtistPage() {
 
         // Fetch item info
         if (artist.tags?.items) {
-          const items = await FirebaseHelper.listAllStorageItems("items");
-          const itemDetails = items.items
-            .filter((item) => artist.tags?.items.includes(item.id))
-            .map((item) => item.brand);
-          setItemInfo(itemDetails);
+          const itemDetails = await Promise.all(
+            artist.tags.items.map(async (itemId) => {
+              const itemDoc = await FirebaseHelper.doc("items", itemId);
+              if (itemDoc.exists) {
+                const itemData = itemDoc.data();
+                console.log("item.data():", itemData);
+                return {
+                  id: itemId,
+                  imageUrl: itemData.imageUrl,
+                  name: itemData.name,
+                };
+              } else {
+                console.log(`No such document for item ID: ${itemId}`);
+                return null;
+              }
+            })
+          );
+          setItemInfo(
+            itemDetails.filter((item) => item !== null) as ItemInfoWithImage[]
+          );
         }
       } else {
         setNotFound(true);
@@ -98,85 +98,73 @@ function ArtistPage() {
   }
 
   return (
-    <div>
-      <h1>
+    <div className="p-4">
+      <h1 className="text-3xl font-bold mb-4">
         {artistInfo.name["en"]} ({artistInfo.name["ko"]})
       </h1>
       {artistInfo.also_known_as && (
-        <p>Also known as: {artistInfo.also_known_as.join(", ")}</p>
+        <p className="mb-4">
+          Also known as: {artistInfo.also_known_as.join(", ")}
+        </p>
       )}
-      {artistInfo.group && <p>Group: {artistInfo.group}</p>}
+      {artistInfo.group && <p className="mb-4">Group: {artistInfo.group}</p>}
       {artistInfo.sns && (
-        <div>
-          <h2>Social Media</h2>
-          <ul>
-            {Object.entries(artistInfo.sns).map(([platform, url]) => (
-              <li key={platform}>
-                <a href={url} target="_blank" rel="noopener noreferrer">
-                  {platform}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {artistInfo.tags && (
-        <div>
-          <h2>Tags</h2>
-          <ul>
-            {Object.entries(artistInfo.tags).map(([tag, values]) => (
-              <li key={tag}>
-                {tag}: {values.join(", ")}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {brandInfo.length > 0 && (
-        <div>
-          <h2>Brands</h2>
-          <ul>
-            {brandInfo.map((brand) => (
-              <li key={brand.name}>
-                <img
-                  src={brand.logoImageUrl}
-                  alt={brand.name}
-                  width={50}
-                  height={50}
-                />
-                <p>{brand.name}</p>
-                <p>Category: {brand.category}</p>
-                <p>Creative Director: {brand.creativeDirector.join(", ")}</p>
-                <a
-                  href={brand.websiteUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Website
-                </a>
-              </li>
-            ))}
-          </ul>
+        <div className="mb-4">
+          <h2 className="text-2xl font-semibold mb-2">Social Media</h2>
+          <div className="flex space-x-4">
+            {artistInfo.sns["instagram"] && (
+              <a
+                href={artistInfo.sns["instagram"]}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-pink-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-pink-600 transition"
+              >
+                Instagram
+              </a>
+            )}
+            {artistInfo.sns["youtube"] && (
+              <a
+                href={artistInfo.sns["youtube"]}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-red-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-600 transition"
+              >
+                YouTube
+              </a>
+            )}
+            {/* 다른 SNS 플랫폼도 추가 가능 */}
+          </div>
         </div>
       )}
       {imageInfo.length > 0 && (
-        <div>
-          <h2>Images</h2>
-          <ul>
+        <div className="mb-4">
+          <h2 className="text-2xl font-semibold mb-2">Images</h2>
+          <ul className="grid grid-cols-3 gap-4">
             {imageInfo.map((url, index) => (
               <li key={index}>
-                <img src={url} alt={`Image ${index + 1}`} />
+                <img
+                  src={url}
+                  alt={`Image ${index + 1}`}
+                  className="w-full h-auto rounded-lg shadow-md"
+                />
               </li>
             ))}
           </ul>
         </div>
       )}
       {itemInfo.length > 0 && (
-        <div>
-          <h2>Items</h2>
-          <ul>
-            {itemInfo.map((brand, index) => (
-              <li key={index}>{brand}</li>
+        <div className="mb-4">
+          <h2 className="text-2xl font-semibold mb-2">Items</h2>
+          <ul className="grid grid-cols-3 gap-4">
+            {itemInfo.map((item) => (
+              <li key={item.id}>
+                <h3 className="text-xl font-semibold mb-2">{item.name}</h3>
+                <img
+                  src={item.imageUrl}
+                  alt={`Item ${item.id}`}
+                  className="w-full h-auto rounded-lg shadow-md"
+                />
+              </li>
             ))}
           </ul>
         </div>
