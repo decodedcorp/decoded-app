@@ -14,6 +14,7 @@ import {
 } from "@/types/model";
 import ProgressBar from "@/components/ui/progress-bar";
 import Pin from "@/components/ui/pin";
+import Search from "@/components/ui/search";
 
 function Home() {
   const [mainImageInfoList, setMainImageInfoList] = useState<
@@ -109,9 +110,6 @@ function Home() {
   return (
     <div>
       <MainView mainImageInfoList={mainImageInfoList} />
-      <p className={`${secondary_font.className} text-center text-xl`}>
-        More to explore
-      </p>
       <PinView mainImageInfoList={mainImageInfoList} />
     </div>
   );
@@ -198,50 +196,50 @@ function ItemDetailView({
   return (
     mainImageInfoList && (
       <div className="grid grid-cols-2 mt-5">
-        {Array.from(
-          mainImageInfoList[currentIndex]?.itemInfoList.entries()
-        ).map(([item, brands], index) => (
-          <div
-            key={index}
-            className="flex flex-col lg:flex-row items-center mt-5 "
-          >
-            <div className="w-52 h-32 relative rounded-lg">
-              <Image
-                src={item.imageUrl ?? ""}
-                alt={item.name ?? ""}
-                fill={true}
-                style={{ objectFit: "cover" }}
-                className="rounded-lg"
-              />
-            </div>
-            <div className="flex flex-col m-5 w-full lg:block items-center">
-              <div className={`flex ${secondary_font.className} text-xs`}>
-                {brands && brands.length > 0 && (
-                  <div className="flex items-center space-x-2 w-full justify-center lg:justify-start">
-                    <Image
-                      src={brands[0].logoImageUrl ?? ""}
-                      alt={brands[0].name}
-                      className="rounded-full w-6 h-6 border border-black-opacity-50"
-                      width={100}
-                      height={100}
-                    />
-                    <div className="rounded-lg p-1 text-md">
-                      {brands[0].name.replace(/_/g, " ").toUpperCase()}
-                    </div>
-                  </div>
-                )}
+        {Array.from(mainImageInfoList[currentIndex]?.itemInfoList.entries())
+          .slice(0, 4)
+          .map(([item, brands], index) => (
+            <div
+              key={index}
+              className="flex flex-col lg:flex-row items-center mt-5 "
+            >
+              <div className="w-52 h-32 relative rounded-lg">
+                <Image
+                  src={item.imageUrl ?? ""}
+                  alt={item.name ?? ""}
+                  fill={true}
+                  style={{ objectFit: "cover" }}
+                  className="rounded-lg"
+                />
               </div>
-              <button
-                className={`${main_font.className} mt-5 bg-[#FF204E] hover:bg-black text-white font-bold rounded w-full h-8 text-sm hidden lg:block`}
-                onClick={() =>
-                  (window.location.href = item.affiliateUrl ?? "#")
-                }
-              >
-                구매하기
-              </button>
+              <div className="flex flex-col m-5 w-full lg:block items-center">
+                <div className={`flex ${secondary_font.className} text-xs`}>
+                  {brands && brands.length > 0 && (
+                    <div className="flex items-center space-x-2 w-full justify-center lg:justify-start">
+                      <Image
+                        src={brands[0].logoImageUrl ?? ""}
+                        alt={brands[0].name}
+                        className="rounded-full w-6 h-6 border border-black-opacity-50"
+                        width={100}
+                        height={100}
+                      />
+                      <div className="rounded-lg p-1 text-md">
+                        {brands[0].name.replace(/_/g, " ").toUpperCase()}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <button
+                  className={`${main_font.className} mt-5 bg-[#FF204E] hover:bg-black text-white font-bold rounded w-full h-8 text-sm hidden lg:block`}
+                  onClick={() =>
+                    (window.location.href = item.affiliateUrl ?? "#")
+                  }
+                >
+                  구매하기
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
     )
   );
@@ -312,15 +310,30 @@ function PinView({
 }: {
   mainImageInfoList: MainImageInfo[] | null;
 }) {
-  console.log(mainImageInfoList);
+  const [search, setSearch] = useState("");
+  if (!mainImageInfoList) {
+    return null;
+  }
+  const filteredMainImageInfoList = mainImageInfoList.filter(
+    (image) =>
+      image.artistInfoList?.some((artist) =>
+        artist.name.toLowerCase().includes(search.toLowerCase())
+      ) ||
+      Array.from(image.itemInfoList.values()).some((brands) =>
+        brands.some((brand) =>
+          brand.name.toLowerCase().includes(search.toLowerCase())
+        )
+      )
+  );
   return (
-    mainImageInfoList && (
-      <div className="grid grid-cols-1 lg:grid-cols-3 p-10 gap-10 md:gap-32 lg:gap-16 w-full justify-center items-center md:p-32 lg:p-12">
-        {mainImageInfoList.map((image, index) => (
+    <div>
+      <Search setSearch={setSearch} />
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 p-10 gap-10 md:gap-32 lg:gap-16 w-full justify-center items-center md:p-32 lg:p-12">
+        {filteredMainImageInfoList.map((image, index) => (
           <Pin key={index} image={image} />
         ))}
       </div>
-    )
+    </div>
   );
 }
 
