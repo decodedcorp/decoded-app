@@ -7,7 +7,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { main_font, secondary_font } from "@/components/helpers/util";
 import { LoginModal } from "./ui/modal";
 
-const headers = ["home", "news", "login"];
+const headers = ["home", "news", "login", "search"];
 
 function Header() {
   const [isLogin, setIsLogin] = useState(false);
@@ -37,7 +37,7 @@ function Logo() {
     <Link
       href="/"
       prefetch={false}
-      className={`${main_font.className} text-6xl lg:text-8xl font-bold`}
+      className={`${main_font.className} text-4xl lg:text-7xl font-bold`}
     >
       TAGGED
     </Link>

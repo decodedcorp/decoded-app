@@ -6,7 +6,7 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
 function Pin({ image }: { image: MainImageInfo }) {
   return (
-    <div className="flex flex-col w-full h-auto rounded-lg border-2 border-black shadow-xl">
+    <div className="flex flex-col w-full h-auto rounded-lg shadow-xl">
       <Link
         href={`images?imageId=${image.docId}&imageUrl=${encodeURIComponent(
           image.imageUrl

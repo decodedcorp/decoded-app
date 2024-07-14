@@ -296,3 +296,38 @@ interface ColorInfo {
    */
   style?: string[];
 }
+
+interface DetailPageState {
+  /**
+   * Image info
+   */
+  img?: ImageInfo;
+  /**
+   * Hover items
+   */
+  itemList?: HoverItem[];
+  /**
+   * Brand names
+   */
+  brandList?: string[];
+  /**
+   * Artist names
+   */
+  artistList?: string[];
+  /**
+   * [docId, imageUrl]
+   */
+  artistImgList?: [string, string][];
+  /**
+   * Artist articles
+   */
+  artistArticleList?: ArticleInfo[];
+  /**
+   * Artist items
+   */
+  artistItemList?: ItemInfo[];
+  /**
+   * Extracted color info from image
+   */
+  colorInfo?: ColorInfo;
+}
