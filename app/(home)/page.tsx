@@ -122,7 +122,6 @@ function Home() {
       <div className="p-10 text-center text-2xl">{currentDateTime}</div>
       <CarouselView images={mainImageInfoList} />
       <div className="p-10 text-center text-2xl">NEWS</div>
-      {/* <PinView images={mainImageInfoList} /> */}
     </div>
   );
 }

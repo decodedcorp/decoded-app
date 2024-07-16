@@ -32,13 +32,13 @@ const Carousel = ({ images }: { images: MainImageInfo[] | null }) => {
     <div className="relative pb-5">
       <button
         onClick={handlePrev}
-        className="absolute left-0 top-[calc(50%-24px)] z-[1] flex h-[48px] w-[48px] items-center justify-center bg-white border border-black rounded-md"
+        className="absolute left-0 top-[calc(50%-24px)] z-[1] flex h-[48px] w-[48px] items-center justify-center bg-white border border-black"
       >
         &lt;
       </button>
       <button
         onClick={handleNext}
-        className="absolute right-0 top-[calc(50%-24px)] z-[1] flex h-[48px] w-[48px] items-center justify-center bg-white border border-black rounded-md"
+        className="absolute right-0 top-[calc(50%-24px)] z-[1] flex h-[48px] w-[48px] items-center justify-center bg-white border border-black"
       >
         &gt;
       </button>
@@ -57,7 +57,7 @@ const Carousel = ({ images }: { images: MainImageInfo[] | null }) => {
                   src={image.imageUrl}
                   alt="carousel image"
                   fill={true}
-                  className="rounded-xl border border-black"
+                  className="border border-black"
                   style={{ objectFit: "cover" }}
                 />
               </Link>
@@ -69,18 +69,17 @@ const Carousel = ({ images }: { images: MainImageInfo[] | null }) => {
                     .map(([item, brands], mapIndex) => (
                       <div
                         key={mapIndex}
-                        className="flex flex-col lg:flex-row items-center bg-[#f6f6f6] rounded-lg p-2 mt-2 border border-black"
+                        className="flex flex-col lg:flex-row items-center bg-[#f6f6f6] p-2 mt-2 border border-black"
                       >
                         <Link
                           href={item.affiliateUrl ?? ""}
-                          className="w-[200px] h-[100px] relative rounded-lg"
+                          className="w-[200px] h-[100px] relative "
                         >
                           <Image
                             src={item.imageUrl ?? ""}
                             alt={item.name ?? ""}
                             fill={true}
                             style={{ objectFit: "cover" }}
-                            className="rounded-lg"
                           />
                         </Link>
                         <div className="flex flex-col m-5 w-full lg:block items-center">
@@ -96,7 +95,7 @@ const Carousel = ({ images }: { images: MainImageInfo[] | null }) => {
                                   width={100}
                                   height={100}
                                 />
-                                <div className="rounded-lg p-1 text-md">
+                                <div className="p-1 text-md">
                                   {brands[0].name
                                     .replace(/_/g, " ")
                                     .toUpperCase()}
@@ -113,7 +112,7 @@ const Carousel = ({ images }: { images: MainImageInfo[] | null }) => {
                     }&imageUrl=${encodeURIComponent(image.imageUrl)}`}
                   >
                     <p
-                      className={`text-md bg-[#FF204E] text-white rounded-lg p-2 text-center font-bold ${main_font.className} mt-2`}
+                      className={`text-md text-black p-2 text-center mt-2 border border-black hover:bg-[#FF204E] hover:text-white`}
                     >
                       View More
                     </p>

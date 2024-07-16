@@ -40,11 +40,7 @@ function Header() {
 
 function Logo() {
   return (
-    <Link
-      href="/"
-      prefetch={false}
-      className={`${secondary_font.className} text-2xl lg:text-4xl text-center`}
-    >
+    <Link href="/" prefetch={false} className="text-lg lg:text-2xl text-center">
       DECODED
     </Link>
   );
@@ -69,7 +65,7 @@ function MenuSection({
             return (
               <div
                 key={index}
-                className={`${secondary_font.className} text-xl cursor-pointer`}
+                className="text-md cursor-pointer"
                 onClick={() =>
                   (
                     document.getElementById("my_modal_4") as HTMLDialogElement
@@ -106,7 +102,7 @@ function MenuSection({
               <Link
                 href={header === "home" ? "/" : `/${header}`}
                 prefetch={false}
-                className={`text-xl ${secondary_font.className}`}
+                className="text-md"
                 onClick={() => setCurrentPath(header)}
               >
                 {header.toUpperCase()}

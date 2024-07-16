@@ -152,16 +152,16 @@ function DetailPage() {
         {/* DESCRIPTION */}
         {detailPageState.img ? (
           <div className="flex flex-1">
-            <div className="flex flex-col w-full text-center my-10">
+            <div className="flex flex-col w-full text-center my-20">
               <h2 className={`${main_font.className} text-4xl font-bold mb-4`}>
                 {detailPageState.img.title}
               </h2>
-              <p className="text-lg md:text-md px-2 md:px-32 mt-5">
+              <p className="text-lg md:text-md px-2 md:px-32 mt-2">
                 {detailPageState.img.description}
               </p>
-              <div className="flex flex-col md:flex-row justify-center mt-10">
+              <div className="flex flex-col md:flex-row justify-center mt-20">
                 <div
-                  className="rounded-lg shadow-lg overflow-hidden"
+                  className="shadow-lg overflow-hidden"
                   style={{
                     height: "auto",
                     aspectRatio: "3/4",
@@ -230,7 +230,7 @@ function DetailPage() {
                         }}
                         onMouseOut={handleMouseOut}
                       >
-                        <div className="relative bg-gray-500 bg-opacity-80 rounded-lg p-2 flex items-center gap-2 w-[250px]">
+                        <div className="relative bg-gray-500 bg-opacity-80 p-2 flex items-center gap-2 w-[250px]">
                           <Image
                             src={hoverItem.info.imageUrl ?? ""}
                             alt={hoverItem.info.name}
@@ -262,7 +262,7 @@ function DetailPage() {
                         <Link
                           key={index}
                           href={`/artists?name=${encodeURIComponent(name)}`}
-                          className={`${main_font.className} text-md font-bold rounded-lg mx-2`}
+                          className={`${secondary_font.className} text-md font-bold mx-2`}
                         >
                           <p className="underline">{name.toUpperCase()}</p>
                         </Link>
@@ -280,7 +280,7 @@ function DetailPage() {
                         <Link
                           key={index}
                           href={`/brands/${encodeURIComponent(brand)}`}
-                          className={`${main_font.className} text-md font-bold rounded-lg mx-2`}
+                          className={`${secondary_font.className} text-md font-bold mx-2`}
                         >
                           <p className="underline">{brand.toUpperCase()}</p>
                         </Link>
@@ -309,7 +309,7 @@ function DetailPage() {
                             <Link
                               key={tag.info.name}
                               href={`${tag.info.affiliateUrl}`}
-                              className={`${main_font.className} text-xl font-bold rounded-lg mx-2`}
+                              className={`${secondary_font.className} text-md font-bold mx-2`}
                             >
                               <p className="underline">
                                 {tag.info.name.toUpperCase()}
@@ -359,10 +359,9 @@ function DetailPage() {
             </div>
           </div>
         )}
-        <div className="end-anim"></div>
       </div>
       {/** Sub Images */}
-      <div className="sub-image-wrapper flex flex-row flex-wrap mt-20 w-full justify-center">
+      {/* <div className="flex flex-row flex-wrap w-full justify-center">
         {detailPageState?.img?.subImageUrls?.map((image, index) => (
           <div key={index} className={"sub-image-container m-2 w-1/2"}>
             <Image
@@ -370,20 +369,18 @@ function DetailPage() {
               alt="Sub Image"
               width={300}
               height={300}
-              className="rounded-md w-full"
+              className="w-full"
             />
           </div>
         ))}
-      </div>
+      </div> */}
       {/** More tagged */}
-      <div className="my-10 w-full text-center">
+      <div className="w-full text-center">
         {detailPageState.artistImgList &&
           detailPageState.artistImgList.length > 0 && (
             <div>
-              <h2 className={`${main_font.className} text-xl`}>
-                More to explore
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 items-center place-items-center my-10">
+              <h2 className="text-xl">More to explore</h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-0 items-stretch place-items-stretch my-10">
                 {detailPageState.artistImgList.map((image) => (
                   <Link
                     key={image[0]}
@@ -393,13 +390,14 @@ function DetailPage() {
                     prefetch={false}
                     target="_blank"
                     rel="noopener noreferrer"
+                    className="relative w-full h-[600px]"
                   >
                     <Image
                       src={image[1]}
                       alt="Artist Image"
-                      width={300}
-                      height={300}
-                      className="more-tagged rounded-xl"
+                      fill={true}
+                      style={{ objectFit: "cover" }}
+                      className="more-tagged border border-black"
                     />
                   </Link>
                 ))}
