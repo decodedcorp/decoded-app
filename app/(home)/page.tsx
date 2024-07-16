@@ -20,6 +20,16 @@ function Home() {
   const [mainImageInfoList, setMainImageInfoList] = useState<
     MainImageInfo[] | null
   >(null);
+  const [currentDateTime, setCurrentDateTime] = useState("");
+
+  useEffect(() => {
+    setCurrentDateTime(new Date().toLocaleTimeString());
+    const timerId = setInterval(() => {
+      setCurrentDateTime(new Date().toLocaleTimeString());
+    }, 1000);
+
+    return () => clearInterval(timerId);
+  }, []);
   useEffect(() => {
     const fetchAllImages = async () => {
       const storageItems = await FirebaseHelper.listAllStorageItems("images");
@@ -109,34 +119,24 @@ function Home() {
   }, []);
   return (
     <div>
+      <div className="p-10 text-center text-2xl">{currentDateTime}</div>
       <CarouselView images={mainImageInfoList} />
-      <PinView images={mainImageInfoList} />
+      <div className="p-10 text-center text-2xl">NEWS</div>
+      {/* <PinView images={mainImageInfoList} /> */}
     </div>
   );
 }
 
 function CarouselView({ images }: { images: MainImageInfo[] | null }) {
-  const [currentDateTime, setCurrentDateTime] = useState("");
-
-  useEffect(() => {
-    setCurrentDateTime(new Date().toLocaleTimeString());
-    const timerId = setInterval(() => {
-      setCurrentDateTime(new Date().toLocaleTimeString());
-    }, 1000);
-
-    return () => clearInterval(timerId);
-  }, []);
   return (
-    <div>
-      <div
-        className={`flex flex-col ${main_font.className} text-6xl font-bold mb-4 p-2`}
+    <div className="border-b border-black p-2">
+      {/* <div
+        className={`flex ${main_font.className} text-2xl md:text-4xl font-bold mb-4`}
       >
-        NOW
-        {/* <p>{currentDateTime}</p> */}
-      </div>
-      <div className="p-2">
-        <Carousel images={images} />
-      </div>
+        <p>LIVE</p>
+        <p className="ml-2">{currentDateTime}</p>
+      </div> */}
+      <Carousel images={images} />
     </div>
   );
 }

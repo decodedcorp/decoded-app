@@ -6,16 +6,20 @@ import { useState, Dispatch, SetStateAction } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import { main_font, secondary_font } from "@/components/helpers/util";
 import { LoginModal } from "./ui/modal";
+import SearchBar from "./ui/search";
 
 const headers = ["home", "news", "login", "search"];
 
 function Header() {
   const [isLogin, setIsLogin] = useState(false);
+  const [search, setSearch] = useState("");
 
   return (
-    <header className="grid grid-cols-2 lg:grid-cols-3 items-center">
-      <Logo />
-      <div
+    <header>
+      <div className="grid grid-cols-3 items-center border-t border-b border-black p-2">
+        <div></div>
+        <Logo />
+        {/* <div
         className="flex justify-center items-center cursor-pointer"
         onClick={() => {
           alert("Coming Soon!");
@@ -26,8 +30,10 @@ function Header() {
         ) : (
           <div></div>
         )}
+      </div> */}
+        <MenuSection isLogin={isLogin} setIsLogin={setIsLogin} />
       </div>
-      <MenuSection isLogin={isLogin} setIsLogin={setIsLogin} />
+      <SearchBar setSearch={setSearch} />
     </header>
   );
 }
@@ -37,9 +43,9 @@ function Logo() {
     <Link
       href="/"
       prefetch={false}
-      className={`${main_font.className} text-4xl lg:text-7xl font-bold`}
+      className={`${secondary_font.className} text-2xl lg:text-4xl text-center`}
     >
-      TAGGED
+      DECODED
     </Link>
   );
 }
@@ -63,7 +69,7 @@ function MenuSection({
             return (
               <div
                 key={index}
-                className={`${secondary_font.className} text-2xl cursor-pointer`}
+                className={`${secondary_font.className} text-xl cursor-pointer`}
                 onClick={() =>
                   (
                     document.getElementById("my_modal_4") as HTMLDialogElement
@@ -100,7 +106,7 @@ function MenuSection({
               <Link
                 href={header === "home" ? "/" : `/${header}`}
                 prefetch={false}
-                className={`text-2xl ${secondary_font.className}`}
+                className={`text-xl ${secondary_font.className}`}
                 onClick={() => setCurrentPath(header)}
               >
                 {header.toUpperCase()}
