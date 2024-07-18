@@ -10,7 +10,7 @@ import Link from "next/link";
 const Carousel = ({ images }: { images: MainImageInfo[] | null }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
-    Autoplay({ delay: 4000 }),
+    Autoplay({ delay: 10000 }),
   ]);
   const selectedScrollSnap = useCallback((emblaApi: EmblaCarouselType) => {
     setSelectedIndex(emblaApi.selectedScrollSnap());
