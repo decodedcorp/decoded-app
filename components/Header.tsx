@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, Dispatch, SetStateAction } from "react";
 import AddIcon from "@mui/icons-material/Add";
-import { main_font, secondary_font } from "@/components/helpers/util";
+import { bold_font, semi_bold_font } from "@/components/helpers/util";
 import { LoginModal } from "./ui/modal";
 import SearchBar from "./ui/search";
 
@@ -40,7 +40,11 @@ function Header() {
 
 function Logo() {
   return (
-    <Link href="/" prefetch={false} className="text-lg lg:text-2xl text-center">
+    <Link
+      href="/"
+      prefetch={false}
+      className={`${bold_font.className} text-lg lg:text-4xl text-center font-bold`}
+    >
       DECODED
     </Link>
   );
@@ -65,7 +69,7 @@ function MenuSection({
             return (
               <div
                 key={index}
-                className="text-md cursor-pointer"
+                className={`text-md cursor-pointer ${semi_bold_font.className}`}
                 onClick={() =>
                   (
                     document.getElementById("my_modal_4") as HTMLDialogElement
@@ -102,7 +106,7 @@ function MenuSection({
               <Link
                 href={header === "home" ? "/" : `/${header}`}
                 prefetch={false}
-                className="text-md"
+                className={`${semi_bold_font.className} text-md`}
                 onClick={() => setCurrentPath(header)}
               >
                 {header.toUpperCase()}

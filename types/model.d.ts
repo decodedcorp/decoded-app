@@ -296,6 +296,14 @@ interface ColorInfo {
   style?: string[];
 }
 
+interface FeaturedInfo {
+  imageUrl: string;
+  title: string;
+  description: string;
+  category: string;
+  images: string[];
+}
+
 interface DetailPageState {
   /**
    * Image info

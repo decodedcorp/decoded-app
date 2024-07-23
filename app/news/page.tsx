@@ -5,7 +5,7 @@ import { FirebaseHelper } from "@/common/firebase";
 import { ArticleInfo } from "@/types/model";
 import Image from "next/image";
 import Link from "next/link";
-import { main_font } from "@/components/helpers/util";
+import { bold_font } from "@/components/helpers/util";
 
 function Page() {
   return <NewsView />;
@@ -20,7 +20,7 @@ function NewsView() {
           style={{ zIndex: 100 }}
         >
           <div className="bg-white">
-            <h1 className={`${main_font.className} text-6xl lg:text-8xl`}>
+            <h1 className={`${bold_font.className} text-6xl lg:text-8xl`}>
               NEWS
             </h1>
           </div>

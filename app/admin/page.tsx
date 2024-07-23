@@ -2,7 +2,7 @@
 
 import { Dispatch, SetStateAction } from "react";
 import { FirebaseHelper } from "@/common/firebase";
-import { main_font, validateEmail } from "@/components/helpers/util";
+import { bold_font, validateEmail } from "@/components/helpers/util";
 import { useState } from "react";
 
 function AdminLogin({

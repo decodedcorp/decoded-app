@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
-import { main_font, secondary_font } from "@/components/helpers/util";
+import { bold_font, semi_bold_font } from "@/components/helpers/util";
 import { FirebaseHelper } from "@/common/firebase";
 import { useSearchParams, notFound } from "next/navigation";
 import Link from "next/link";
@@ -153,7 +153,7 @@ function DetailPage() {
         {detailPageState.img ? (
           <div className="flex flex-1">
             <div className="flex flex-col w-full text-center my-20">
-              <h2 className={`${main_font.className} text-4xl font-bold mb-4`}>
+              <h2 className={`${bold_font.className} text-4xl font-bold mb-4`}>
                 {detailPageState.img.title}
               </h2>
               <p className="text-lg md:text-md px-2 md:px-32 mt-2">
@@ -254,7 +254,7 @@ function DetailPage() {
                   <div className="flex flex-col justify-center p-10">
                     <div className="flex flex-col items-center">
                       <p
-                        className={`${main_font.className} text-lg md:text-2xl`}
+                        className={`${bold_font.className} text-lg md:text-2xl`}
                       >
                         ARTIST:
                       </p>
@@ -262,7 +262,7 @@ function DetailPage() {
                         <Link
                           key={index}
                           href={`/artists?name=${encodeURIComponent(name)}`}
-                          className={`${secondary_font.className} text-md font-bold mx-2`}
+                          className={`${semi_bold_font.className} text-md font-bold mx-2`}
                         >
                           <p className="underline">{name.toUpperCase()}</p>
                         </Link>
@@ -272,7 +272,7 @@ function DetailPage() {
                     {/* List all brands */}
                     <div className="flex flex-col mt-5">
                       <p
-                        className={`${main_font.className} text-lg md:text-2xl`}
+                        className={`${bold_font.className} text-lg md:text-2xl`}
                       >
                         BRANDS:{" "}
                       </p>
@@ -280,7 +280,7 @@ function DetailPage() {
                         <Link
                           key={index}
                           href={`/brands/${encodeURIComponent(brand)}`}
-                          className={`${secondary_font.className} text-md font-bold mx-2`}
+                          className={`${semi_bold_font.className} text-md font-bold mx-2`}
                         >
                           <p className="underline">{brand.toUpperCase()}</p>
                         </Link>
@@ -301,7 +301,7 @@ function DetailPage() {
                       ).map(([category, tags]) => (
                         <div key={category} className="flex flex-col">
                           <p
-                            className={`${main_font.className} text-lg md:text-2xl mt-5`}
+                            className={`${bold_font.className} text-lg md:text-2xl mt-5`}
                           >
                             {category} :
                           </p>
@@ -309,7 +309,7 @@ function DetailPage() {
                             <Link
                               key={tag.info.name}
                               href={`${tag.info.affiliateUrl}`}
-                              className={`${secondary_font.className} text-md font-bold mx-2`}
+                              className={`${semi_bold_font.className} text-md font-bold mx-2`}
                             >
                               <p className="underline">
                                 {tag.info.name.toUpperCase()}
@@ -323,7 +323,7 @@ function DetailPage() {
                     {/* List all colors */}
                     <div className="items-center justify-center mt-5">
                       <p
-                        className={`${main_font.className} text-lg md:text-2xl`}
+                        className={`${bold_font.className} text-lg md:text-2xl`}
                       >
                         COLORS:{" "}
                       </p>
@@ -347,7 +347,7 @@ function DetailPage() {
         {isFetching ? (
           <div className="flex justify-center items-center ">
             <h1
-              className={`${main_font.className} text-7xl md:text-5xl loading-text p-5`}
+              className={`${bold_font.className} text-7xl md:text-5xl loading-text p-5`}
             >
               LOADING
             </h1>

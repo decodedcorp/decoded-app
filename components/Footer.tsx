@@ -1,12 +1,12 @@
 "use client";
 import { useState } from "react";
-import { main_font, secondary_font } from "./helpers/util";
+import { bold_font, semi_bold_font } from "./helpers/util";
 
 function Footer() {
   const [isType, setIsType] = useState<boolean>(false);
 
   return (
-    <footer className="footer footer-center border-t border-black text-base-content rounded p-10">
+    <footer className="footer footer-center border-t border-black text-base-content p-10">
       <nav className="grid grid-flow-col gap-4">
         <a className="link link-hover">About us</a>
         <a className="link link-hover">Contact</a>

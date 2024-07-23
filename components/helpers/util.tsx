@@ -6,12 +6,28 @@ import { extractColors } from "extract-colors";
 import { sha256 } from "js-sha256";
 import { CSSProperties } from "react";
 
-export const main_font = localFont({
-  src: "../../fonts/Blinker-Bold.ttf",
+export const bold_font = localFont({
+  src: "../../fonts/Pretendard-Bold.otf",
 });
 
-export const secondary_font = localFont({
-  src: "../../fonts/Blinker-SemiBold.ttf",
+export const extra_bold_font = localFont({
+  src: "../../fonts/Pretendard-ExtraBold.otf",
+});
+
+export const semi_bold_font = localFont({
+  src: "../../fonts/Pretendard-SemiBold.otf",
+});
+
+export const medium_font = localFont({
+  src: "../../fonts/Pretendard-Medium.otf",
+});
+
+export const light_font = localFont({
+  src: "../../fonts/Pretendard-Light.otf",
+});
+
+export const regular_font = localFont({
+  src: "../../fonts/Pretendard-Regular.otf",
 });
 
 export const validateEmail = (email: string): boolean => {

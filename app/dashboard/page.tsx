@@ -18,7 +18,7 @@ import {
 } from "@/types/model";
 import { FirebaseHelper } from "@/common/firebase";
 import {
-  main_font,
+  bold_font,
   getByteSize,
   create_doc_id,
 } from "@/components/helpers/util";
@@ -742,7 +742,7 @@ function UploadImageSection({
               </div>
               {expandedSections[index] && (
                 <div>
-                  <p className={`${main_font.className} text-md font-bold`}>
+                  <p className={`${bold_font.className} text-md font-bold`}>
                     Artist
                   </p>
                   <div className="flex justify-center mt-2">
@@ -772,7 +772,7 @@ function UploadImageSection({
                       ))}
                     </select>
                     <button
-                      className={`btn bg-white ${main_font.className} ml-2 text-black hover:text-white`}
+                      className={`btn bg-white ${bold_font.className} ml-2 text-black hover:text-white`}
                       onClick={() =>
                         (
                           document.getElementById(
@@ -785,7 +785,7 @@ function UploadImageSection({
                     </button>
                     <ArtistModal setIsDataAdded={setIsDataAdded} />
                   </div>
-                  <p className={`${main_font.className} text-md font-bold`}>
+                  <p className={`${bold_font.className} text-md font-bold`}>
                     Item Detail
                   </p>
                   <CustomDropdown
@@ -935,7 +935,7 @@ function UploadImageSection({
                         {filteredBrands?.length == 0 && (
                           <>
                             <button
-                              className={`btn bg-[#FF204E] ${main_font.className} m-2 text-black`}
+                              className={`btn bg-[#FF204E] ${bold_font.className} m-2 text-black`}
                               onClick={() =>
                                 (
                                   document.getElementById(
