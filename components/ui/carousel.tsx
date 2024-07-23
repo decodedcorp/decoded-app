@@ -1,17 +1,27 @@
 import Image from "next/image";
 import { useState, useCallback, useEffect } from "react";
-import { MainImageInfo } from "@/types/model";
+import { MainImage } from "@/types/model";
 import useEmblaCarousel from "embla-carousel-react";
 import EmblaCarousel, { EmblaCarouselType } from "embla-carousel";
 import Autoplay from "embla-carousel-autoplay";
-import { main_font, secondary_font } from "../helpers/util";
 import Link from "next/link";
 
-const Carousel = ({ images }: { images: MainImageInfo[] | null }) => {
+const Carousel = ({ images }: { images: MainImage[] | null }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
-    Autoplay({ delay: 10000 }),
-  ]);
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    {
+      loop: true,
+      containScroll: "keepSnaps",
+      dragFree: true,
+    },
+    [
+      Autoplay({
+        delay: 5000,
+        stopOnMouseEnter: true,
+        stopOnInteraction: false,
+      }),
+    ]
+  );
   const selectedScrollSnap = useCallback((emblaApi: EmblaCarouselType) => {
     setSelectedIndex(emblaApi.selectedScrollSnap());
   }, []);
@@ -28,8 +38,12 @@ const Carousel = ({ images }: { images: MainImageInfo[] | null }) => {
     emblaApi?.scrollNext();
   };
 
+  const [hoveredImageIndex, setHoveredImageIndex] = useState<number | null>(
+    null
+  );
+
   return (
-    <div className="relative pb-5">
+    <div className="relative">
       <button
         onClick={handlePrev}
         className="absolute left-0 top-[calc(50%-24px)] z-[1] flex h-[48px] w-[48px] items-center justify-center bg-white border border-black"
@@ -44,81 +58,36 @@ const Carousel = ({ images }: { images: MainImageInfo[] | null }) => {
       </button>
       <div className="embla overflow-hidden max-w-full" ref={emblaRef}>
         <div className="embla__container flex">
-          {images?.slice(0, 6).map((image, index) => (
+          {images?.slice(0, 10).map((image, index) => (
             <div key={index} className="flex flex-col md:flex-row items-center">
               <Link
                 href={`images?imageId=${
                   image.docId
                 }&imageUrl=${encodeURIComponent(image.imageUrl)}`}
-                className="embla__slide relative flex-grow-0 flex-shrink-0 w-96 h-[500px] m-2"
+                className="embla__slide relative w-96 h-[500px]"
                 key={index}
               >
-                <Image
-                  src={image.imageUrl}
-                  alt="carousel image"
-                  fill={true}
-                  className="border border-black"
-                  style={{ objectFit: "cover" }}
-                />
-              </Link>
-              {selectedIndex === index && (
-                <div>
-                  <p className={`${secondary_font.className} text-xl`}>ITEMS</p>
-                  {Array.from(image.itemInfoList.entries())
-                    .slice(0, 3)
-                    .map(([item, brands], mapIndex) => (
-                      <div
-                        key={mapIndex}
-                        className="flex flex-col lg:flex-row items-center bg-[#f6f6f6] p-2 mt-2 border border-black"
-                      >
-                        <Link
-                          href={item.affiliateUrl ?? ""}
-                          className="w-[200px] h-[100px] relative "
-                        >
-                          <Image
-                            src={item.imageUrl ?? ""}
-                            alt={item.name ?? ""}
-                            fill={true}
-                            style={{ objectFit: "cover" }}
-                          />
-                        </Link>
-                        <div className="flex flex-col m-5 w-full lg:block items-center">
-                          <div
-                            className={`flex ${secondary_font.className} text-xs`}
-                          >
-                            {brands && brands.length > 0 && (
-                              <div className="flex items-center space-x-2 w-full justify-center lg:justify-start">
-                                <Image
-                                  src={brands[0].logoImageUrl ?? ""}
-                                  alt={brands[0].name}
-                                  className="rounded-full w-6 h-6 border border-black-opacity-50"
-                                  width={100}
-                                  height={100}
-                                />
-                                <div className="p-1 text-md">
-                                  {brands[0].name
-                                    .replace(/_/g, " ")
-                                    .toUpperCase()}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  <Link
-                    href={`images?imageId=${
-                      image.docId
-                    }&imageUrl=${encodeURIComponent(image.imageUrl)}`}
-                  >
-                    <p
-                      className={`text-md text-black p-2 text-center mt-2 border border-black hover:bg-[#FF204E] hover:text-white`}
-                    >
-                      View More
-                    </p>
-                  </Link>
+                <div
+                  className="flex flex-row w-full h-full"
+                  onMouseEnter={() => setHoveredImageIndex(index)}
+                  onMouseLeave={() => setHoveredImageIndex(null)}
+                >
+                  <Image
+                    src={image.imageUrl}
+                    alt="carousel image"
+                    fill={true}
+                    className="border border-black"
+                    style={{ objectFit: "cover" }}
+                  />
+                  {hoveredImageIndex === index && (
+                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                      <p className="px-4 py-2 bg-white text-black rounded-md hover:bg-gray-200 transition-colors">
+                        아이템 둘러보기
+                      </p>
+                    </div>
+                  )}
                 </div>
-              )}
+              </Link>
             </div>
           ))}
         </div>

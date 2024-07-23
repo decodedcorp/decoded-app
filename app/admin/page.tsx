@@ -35,14 +35,14 @@ function AdminLogin({
         <input
           type="text"
           placeholder="id"
-          className="input input-bordered w-full max-w-xs"
+          className="input input-bordered w-full max-w-xs bg-white"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
         <input
           type="password"
           placeholder="password"
-          className="input input-bordered w-full max-w-xs mt-5"
+          className="input input-bordered w-full max-w-xs mt-5 bg-white"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />

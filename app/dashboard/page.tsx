@@ -66,9 +66,6 @@ function AdminDashboard() {
           setItems(items);
         });
         setIsDataAdded(false);
-        console.log("Fetched brands: ", brands);
-        console.log("Fetched artists: ", artists);
-        console.log("Fetched items: ", items);
       });
     };
     fetchData();
@@ -104,14 +101,20 @@ function UploadImageSection({
     {}
   );
   const [isUploading, setIsUploading] = useState(false);
-  const [searchKeyword, setSearchKeyword] = useState("");
+  const [searchKeywords, setSearchKeywords] = useState<{
+    [key: number]: string;
+  }>({});
   const [selectedPointIndex, setSelectedPointIndex] = useState<number | null>(
     null
   );
   const [expandedSections, setExpandedSections] = useState<{
     [key: number]: boolean;
   }>({});
-  const [isAdd, setIsAdd] = useState(false);
+  const [isAdd, setIsAdd] = useState<{ [key: number]: boolean }>({});
+
+  const handleSearchKeyword = (index: number, keyword: string) => {
+    setSearchKeywords((prev) => ({ ...prev, [index]: keyword }));
+  };
 
   const upload = async () => {
     setIsUploading(true);
@@ -673,304 +676,296 @@ function UploadImageSection({
     return taggedItems;
   };
 
-  const filteredBrands = brands?.filter((brand) =>
-    brand?.toLowerCase().includes(searchKeyword.toLowerCase())
-  );
+  const filteredBrands = (index: number) => {
+    return brands?.filter((brand) =>
+      brand?.toLowerCase().includes(searchKeywords[index]?.toLowerCase())
+    );
+  };
 
   return (
-    <div className="mx-auto p-3 border-l-2 border-r-2 border-b-2 border-black rounded-md">
-      <h1 className={`text-2xl font-bold mb-5 ${main_font.className}`}>
-        Upload
-      </h1>
-      <div className="flex flex-col md:flex-row items-center justify-center gap-4">
-        <input type="file" onChange={handleImageChange} className="mb-4" />
-        {/* Image Section */}
-        <div className="flex-1">
-          {uploadImageState?.selectedImageUrl && (
-            <div
-              className="rounded-lg shadow-lg overflow-hidden mt-10"
-              style={{
-                width: "100%",
-                maxWidth: "400px",
-                aspectRatio: "3/4",
-                position: "relative",
-              }}
-            >
-              <Image
-                src={uploadImageState?.selectedImageUrl}
-                alt="Featured fashion"
-                fill={true}
-                style={{ objectFit: "cover" }}
-                onClick={handlePointClick}
-              />
-              {uploadImageState?.hoverItems?.map((item, index) => (
-                <div
-                  key={index}
-                  className={`absolute w-3 h-3 bg-blue-500 rounded-full ${
-                    index === selectedPointIndex
-                      ? "opacity-100 point-animation"
-                      : "opacity-50"
-                  }`}
-                  style={{
-                    top: item.pos.top,
-                    left: item.pos.left,
-                    transform: "translate(-50%, -50%)",
-                  }}
-                  onClick={() => setSelectedPointIndex(index)}
-                ></div>
-              ))}
-            </div>
-          )}
+    <div className="mx-auto border-b border-black">
+      <div className="flex flex-row items-center justify-center gap-4">
+        <div className="flex flex-col w-[50%] p-20">
+          <input type="file" onChange={handleImageChange} className="mb-4" />
+          {/* Image Section */}
+          <div className="flex-1">
+            {uploadImageState?.selectedImageUrl && (
+              <div className="relative m-2 w-full aspect-w-3 aspect-h-4">
+                <Image
+                  src={uploadImageState?.selectedImageUrl}
+                  alt="Featured fashion"
+                  fill={true}
+                  style={{ objectFit: "cover" }}
+                  onClick={handlePointClick}
+                />
+                {uploadImageState?.hoverItems?.map((item, index) => (
+                  <div
+                    key={index}
+                    className={`absolute w-3 h-3 bg-blue-500 rounded-full ${
+                      index === selectedPointIndex
+                        ? "opacity-100 point-animation"
+                        : "opacity-50"
+                    }`}
+                    style={{
+                      top: item.pos.top,
+                      left: item.pos.left,
+                      transform: "translate(-50%, -50%)",
+                    }}
+                    onClick={() => setSelectedPointIndex(index)}
+                  ></div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
         {/* HoverItem Section */}
         <div className="flex-1 space-y-4 align-top justify-between">
           {uploadImageState?.hoverItems?.map((item, index) => (
             <div
               key={index}
-              className="flex flex-col p-4 border-b border-gray-200 items-center "
+              className="flex flex-col justify-between p-20"
+              onClick={() => setSelectedPointIndex(index)}
             >
-              <div className="flex flex-1 w-full items-center m-2 justify-between">
+              <div className="flex flex-1 w-full items-center justify-between mb-2">
                 <button
                   onClick={() => toggleSection(index)}
-                  className="btn bg-[#FF204E] btn-xs text-black"
+                  className="btn bg-white btn-xs text-black hover:text-white"
                 >
                   {expandedSections[index] ? "Hide" : "Show"}
                 </button>
                 <button
                   onClick={() => removePoint(index)}
-                  className="btn bg-[#FF204E] btn-xs text-black"
+                  className="btn bg-white btn-xs text-black hover:text-white"
                 >
                   x
                 </button>
               </div>
-              <div
-                className="flex flex-1 justify-between"
-                onClick={() => setSelectedPointIndex(index)}
-              >
-                {expandedSections[index] && (
-                  <div>
-                    <p className={`${main_font.className} text-md font-bold`}>
-                      Artist
-                    </p>
-                    <div className="flex justify-center mt-2">
-                      <select
-                        multiple={false}
-                        className="input input-bordered w-full mb-2 dark:bg-white"
-                        value={item.artistName}
+              {expandedSections[index] && (
+                <div>
+                  <p className={`${main_font.className} text-md font-bold`}>
+                    Artist
+                  </p>
+                  <div className="flex justify-center mt-2">
+                    <select
+                      multiple={false}
+                      className="input input-bordered w-full mb-2 dark:bg-white"
+                      value={item.artistName}
+                      onChange={(e) => {
+                        handleHoverItemInfo(
+                          index,
+                          undefined,
+                          false,
+                          e.target.value
+                        );
+                      }}
+                    >
+                      {artists?.map((artist, index) => (
+                        <option key={index} value={artist}>
+                          {artist
+                            .split("_")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() + word.slice(1)
+                            )
+                            .join(" ")}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      className={`btn bg-white ${main_font.className} ml-2 text-black hover:text-white`}
+                      onClick={() =>
+                        (
+                          document.getElementById(
+                            "my_modal_1"
+                          ) as HTMLDialogElement
+                        )?.showModal()
+                      }
+                    >
+                      Add Artist
+                    </button>
+                    <ArtistModal setIsDataAdded={setIsDataAdded} />
+                  </div>
+                  <p className={`${main_font.className} text-md font-bold`}>
+                    Item Detail
+                  </p>
+                  <CustomDropdown
+                    items={items}
+                    pos={uploadImageState.hoverItems?.[index].pos}
+                    index={index}
+                    setIsAdd={setIsAdd}
+                    setUploadImageState={setUploadImageState}
+                  />
+                  {isAdd[index] && (
+                    <>
+                      <input
+                        type="text"
+                        placeholder="Name"
+                        value={item.info.name}
                         onChange={(e) => {
                           handleHoverItemInfo(
                             index,
-                            undefined,
+                            "name",
                             false,
                             e.target.value
                           );
                         }}
-                      >
-                        {artists?.map((artist, index) => (
-                          <option key={index} value={artist}>
-                            {artist
-                              .split("_")
-                              .map(
-                                (word) =>
-                                  word.charAt(0).toUpperCase() + word.slice(1)
-                              )
-                              .join(" ")}
-                          </option>
-                        ))}
-                      </select>
-                      <button
-                        className={`btn btn-primary ${main_font.className} ml-2 text-white`}
-                        onClick={() =>
-                          (
-                            document.getElementById(
-                              "my_modal_1"
-                            ) as HTMLDialogElement
-                          )?.showModal()
-                        }
-                      >
-                        Add Artist
-                      </button>
-                      <ArtistModal setIsDataAdded={setIsDataAdded} />
-                    </div>
-                    <p className={`${main_font.className} text-md font-bold`}>
-                      Item Detail
-                    </p>
-                    <CustomDropdown
-                      items={items}
-                      pos={uploadImageState.hoverItems?.[index].pos}
-                      index={index}
-                      setIsAdd={setIsAdd}
-                      setUploadImageState={setUploadImageState}
-                    />
-                    {isAdd && (
-                      <>
+                        className="input input-bordered w-full mb-2 dark:bg-white"
+                      />
+                      <div className="flex">
                         <input
                           type="text"
-                          placeholder="Name"
-                          value={item.info.name}
+                          placeholder="Price"
+                          value={item.info.price?.[0]}
                           onChange={(e) => {
                             handleHoverItemInfo(
                               index,
-                              "name",
+                              "price",
                               false,
                               e.target.value
                             );
                           }}
                           className="input input-bordered w-full mb-2 dark:bg-white"
                         />
-                        <div className="flex">
-                          <input
-                            type="text"
-                            placeholder="Price"
-                            value={item.info.price?.[0]}
-                            onChange={(e) => {
-                              handleHoverItemInfo(
-                                index,
-                                "price",
-                                false,
-                                e.target.value
-                              );
-                            }}
-                            className="input input-bordered w-full mb-2 dark:bg-white"
-                          />
-                          <select
-                            value={item.info.price?.[1]}
-                            onChange={(e) => {
-                              handleHoverItemInfo(
-                                index,
-                                "price",
-                                true,
-                                e.target.value
-                              );
-                            }}
-                            className="input w-20 mb-2 dark:bg-white"
-                          >
-                            {Object.values(Currency).map((currency) => (
-                              <option key={currency} value={currency}>
-                                {currency}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        <input
-                          type="text"
-                          placeholder="URL"
-                          value={item.info.affiliateUrl}
+                        <select
+                          value={item.info.price?.[1]}
                           onChange={(e) => {
                             handleHoverItemInfo(
                               index,
-                              "affiliateUrl",
+                              "price",
+                              true,
+                              e.target.value
+                            );
+                          }}
+                          className="input w-20 mb-2 dark:bg-white"
+                        >
+                          {Object.values(Currency).map((currency) => (
+                            <option key={currency} value={currency}>
+                              {currency}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="URL"
+                        value={item.info.affiliateUrl}
+                        onChange={(e) => {
+                          handleHoverItemInfo(
+                            index,
+                            "affiliateUrl",
+                            false,
+                            e.target.value
+                          );
+                        }}
+                        className="input input-bordered w-full mb-2 dark:bg-white"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Designer"
+                        value={item.info.designedBy}
+                        onChange={(e) => {
+                          handleHoverItemInfo(
+                            index,
+                            "designedBy",
+                            false,
+                            e.target.value
+                          );
+                        }}
+                        className="input input-bordered w-full mb-2 dark:bg-white"
+                      />
+                      <div className="flex">
+                        <select
+                          value={item.info.category}
+                          onChange={(e) => {
+                            handleHoverItemInfo(
+                              index,
+                              "category",
                               false,
                               e.target.value
                             );
                           }}
                           className="input input-bordered w-full mb-2 dark:bg-white"
-                        />
+                        >
+                          {Object.values(ItemCategory).map((category) => (
+                            <option key={category} value={category}>
+                              {category}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
                         <input
                           type="text"
-                          placeholder="Designer"
-                          value={item.info.designedBy}
-                          onChange={(e) => {
-                            handleHoverItemInfo(
-                              index,
-                              "designedBy",
-                              false,
-                              e.target.value
-                            );
-                          }}
+                          placeholder="브랜드 검색..."
                           className="input input-bordered w-full mb-2 dark:bg-white"
+                          value={searchKeywords[index]}
+                          onChange={(e) => {
+                            setSearchKeywords((prev) => ({
+                              ...prev,
+                              [index]: e.target.value,
+                            }));
+                          }}
                         />
-                        <div className="flex">
-                          <select
-                            value={item.info.category}
-                            onChange={(e) => {
-                              handleHoverItemInfo(
-                                index,
-                                "category",
-                                false,
-                                e.target.value
-                              );
-                            }}
-                            className="input input-bordered w-full mb-2 dark:bg-white"
-                          >
-                            {Object.values(ItemCategory).map((category) => (
-                              <option key={category} value={category}>
-                                {category}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        <div>
-                          <input
-                            type="text"
-                            placeholder="브랜드 검색..."
-                            className="input input-bordered w-full mb-2 dark:bg-white"
-                            value={searchKeyword}
-                            onChange={(e) => {
-                              setSearchKeyword(e.target.value);
-                            }}
-                          />
-                          <select
-                            multiple={true}
-                            className="input input-bordered w-full mb-2 dark:bg-white"
-                            value={item.brandName}
-                            onChange={(e) => {
-                              const selectedOptions = Array.from(
-                                e.target.selectedOptions,
-                                (option) => option.value
-                              );
-                              handleHoverItemInfo(
-                                index,
-                                undefined,
-                                false,
-                                selectedOptions
-                              );
-                            }}
-                          >
-                            {filteredBrands?.map((brand, index) => (
-                              <option key={index} value={brand}>
-                                {brand
-                                  .split("_")
-                                  .map((word) => word.toUpperCase())
-                                  .join(" ")}
-                              </option>
-                            ))}
-                          </select>
-                          {filteredBrands?.length == 0 && (
-                            <>
-                              <button
-                                className={`btn bg-[#FF204E] ${main_font.className} m-2 text-black`}
-                                onClick={() =>
-                                  (
-                                    document.getElementById(
-                                      "my_modal_2"
-                                    ) as HTMLDialogElement
-                                  )?.showModal()
-                                }
-                              >
-                                Add New Brand
-                              </button>
-                              <BrandModal setIsDataAdded={setIsDataAdded} />
-                            </>
-                          )}
-                        </div>
-                        <input
-                          type="file"
-                          onChange={(e) =>
+                        <select
+                          multiple={true}
+                          className="input input-bordered w-full mb-2 dark:bg-white"
+                          value={item.brandName}
+                          onChange={(e) => {
+                            const selectedOptions = Array.from(
+                              e.target.selectedOptions,
+                              (option) => option.value
+                            );
                             handleHoverItemInfo(
                               index,
                               undefined,
                               false,
-                              e.target.files![0]
-                            )
-                          }
-                          className="input w-full dark:bg-white"
-                        />
-                      </>
-                    )}
-                  </div>
-                )}
-              </div>
+                              selectedOptions
+                            );
+                          }}
+                        >
+                          {filteredBrands(index)?.map((brand, index) => (
+                            <option key={index} value={brand}>
+                              {brand
+                                .split("_")
+                                .map((word) => word.toUpperCase())
+                                .join(" ")}
+                            </option>
+                          ))}
+                        </select>
+                        {filteredBrands?.length == 0 && (
+                          <>
+                            <button
+                              className={`btn bg-[#FF204E] ${main_font.className} m-2 text-black`}
+                              onClick={() =>
+                                (
+                                  document.getElementById(
+                                    "my_modal_2"
+                                  ) as HTMLDialogElement
+                                )?.showModal()
+                              }
+                            >
+                              Add New Brand
+                            </button>
+                            <BrandModal setIsDataAdded={setIsDataAdded} />
+                          </>
+                        )}
+                      </div>
+                      <input
+                        type="file"
+                        onChange={(e) =>
+                          handleHoverItemInfo(
+                            index,
+                            undefined,
+                            false,
+                            e.target.files![0]
+                          )
+                        }
+                        className="input w-full dark:bg-white"
+                      />
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -1031,10 +1026,7 @@ interface Request {
 function RequestListSection() {
   const [requests, setRequests] = useState<Request[]>([]);
   return (
-    <div
-      className={`p-4 text-2xl font-bold ${main_font.className} border-l-2 border-r-2 border-b-2 border-black rounded-md`}
-    >
-      <h2>Requests</h2>
+    <div className={`p-2 border-b border-black`}>
       <table className="table-auto w-full mt-4">
         <thead>
           <tr>
@@ -1069,7 +1061,11 @@ function CustomDropdown({
   items: ItemInfo[] | null;
   pos: Position | undefined;
   index: number;
-  setIsAdd: (isSelected: boolean) => void;
+  setIsAdd: Dispatch<
+    SetStateAction<{
+      [key: number]: boolean;
+    }>
+  >;
   setUploadImageState: Dispatch<SetStateAction<UploadImageState>>;
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -1085,7 +1081,7 @@ function CustomDropdown({
     setIsOpen(false);
     setIsSelect(true);
     setUploadImageState((prev) => {
-      if (!prev) return {}; // prevState가 null이면 아무 작업도 하지 않고 null을 반환
+      if (!prev) return {};
 
       const hoverItems = prev.hoverItems || [];
       const copy = [...hoverItems];
@@ -1099,9 +1095,9 @@ function CustomDropdown({
   const clearSelection = () => {
     setSelectedItem(null);
     setIsSelect(false);
-    setIsAdd(false);
+    setIsAdd((prev) => ({ ...prev, [index]: false }));
     setUploadImageState((prev) => {
-      if (!prev) return {}; // prevState가 null이면 아무 작업도 하지 않고 null을 반환
+      if (!prev) return {};
 
       const hoverItems = prev.hoverItems || [];
       hoverItems.splice(index, 1);
@@ -1169,13 +1165,15 @@ function CustomDropdown({
       )}
       <div className="flex justify-between w-full">
         <button
-          className={`text-white btn btn-primary mb-2 mt-2 w-60 ${main_font.className}`}
-          onClick={() => setIsAdd(true)}
+          className={`text-black btn bg-white mb-2 mt-2 w-60 hover:text-white`}
+          onClick={() =>
+            setIsAdd((prev) => ({ ...prev, [index]: !prev[index] }))
+          }
         >
           ADD ITEM
         </button>
         <button
-          className={`text-white btn btn-primary mb-2 mt-2 ml-2 ${main_font.className}`}
+          className={`text-black btn bg-white mb-2 mt-2 ml-2 hover:text-white`}
           onClick={clearSelection}
         >
           CLEAR

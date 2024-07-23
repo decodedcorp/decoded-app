@@ -236,14 +236,13 @@ export interface BrandInfo {
   tags?: Record<string, string[]>;
 }
 
-export interface MainImageInfo {
+export interface MainImage {
   imageUrl: string;
   docId: string;
-  hyped: number;
   title?: string;
   tags?: string[];
   description?: string;
-  itemInfoList: Map<ItemInfo, BrandInfo[]>;
+  itemInfoList: Map<ItemInfo, [Position, BrandInfo[]]>;
   artistInfoList?: ArtistInfo[];
 }
 

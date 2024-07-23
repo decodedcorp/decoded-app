@@ -1,25 +1,19 @@
 "use client";
 import { useEffect, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
 import { FirebaseHelper } from "../../common/firebase";
-import { main_font, secondary_font } from "@/components/helpers/util";
 import {
   ImageInfo,
   BrandInfo,
   ArtistInfo,
   ItemInfo,
-  MainImageInfo,
+  MainImage,
   TaggedItem,
+  Position,
 } from "@/types/model";
-import ProgressBar from "@/components/ui/progress-bar";
-import Pin from "@/components/ui/pin";
 import Carousel from "@/components/ui/carousel";
 
 function Home() {
-  const [mainImageInfoList, setMainImageInfoList] = useState<
-    MainImageInfo[] | null
-  >(null);
+  const [mainImages, setMainImages] = useState<MainImage[] | null>(null);
   const [currentDateTime, setCurrentDateTime] = useState("");
 
   useEffect(() => {
@@ -62,7 +56,7 @@ function Home() {
                   (artist): artist is ArtistInfo => artist !== undefined
                 );
               }
-              var itemInfoList = new Map<ItemInfo, BrandInfo[]>();
+              var itemInfoList = new Map<ItemInfo, [Position, BrandInfo[]]>();
               if (imageInfo.taggedItem) {
                 const itemPromises = imageInfo.taggedItem.map(async (item) => {
                   const taggedItem = item as TaggedItem;
@@ -87,22 +81,21 @@ function Home() {
                         (brand): brand is BrandInfo => brand !== undefined
                       );
                     }
-                    itemInfoList.set(itemInfo, brandInfo);
+                    itemInfoList.set(itemInfo, [taggedItem.pos, brandInfo]);
                   }
                 });
 
                 await Promise.all(itemPromises);
               }
-              let mainImageInfo: MainImageInfo = {
+              let mainImage: MainImage = {
                 imageUrl: url,
                 docId: imageDocId,
                 title: imageInfo.title,
                 itemInfoList,
                 artistInfoList,
                 description: imageInfo.description,
-                hyped: imageInfo.hyped,
               };
-              return mainImageInfo;
+              return mainImage;
             }
           } catch (error) {
             console.error("Error processing item:", error);
@@ -111,47 +104,25 @@ function Home() {
         })
       );
       let filtered = images.filter(
-        (image): image is MainImageInfo => image !== undefined
+        (image): image is MainImage => image !== undefined
       );
-      setMainImageInfoList(filtered);
+      setMainImages(filtered);
     };
     fetchAllImages();
   }, []);
   return (
     <div>
       <div className="p-10 text-center text-2xl">{currentDateTime}</div>
-      <CarouselView images={mainImageInfoList} />
-      <div className="p-10 text-center text-2xl">NEWS</div>
+      <CarouselView images={mainImages} />
+      <div className="p-10 text-center text-2xl">FEATURED</div>
     </div>
   );
 }
 
-function CarouselView({ images }: { images: MainImageInfo[] | null }) {
+function CarouselView({ images }: { images: MainImage[] | null }) {
   return (
-    <div className="border-b border-black p-2">
-      {/* <div
-        className={`flex ${main_font.className} text-2xl md:text-4xl font-bold mb-4`}
-      >
-        <p>LIVE</p>
-        <p className="ml-2">{currentDateTime}</p>
-      </div> */}
+    <div className="border-b border-black">
       <Carousel images={images} />
-    </div>
-  );
-}
-
-function PinView({ images }: { images: MainImageInfo[] | null }) {
-  if (!images) {
-    return null;
-  }
-
-  return (
-    <div>
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 p-10 gap-10 md:gap-32 lg:gap-16 w-full justify-center items-center md:p-32 lg:p-12">
-        {images.map((image, index) => (
-          <Pin key={index} image={image} />
-        ))}
-      </div>
     </div>
   );
 }
