@@ -14,6 +14,7 @@ import {
   BrandInfo,
   ArtistInfo,
   HoverItemInfo,
+  FeaturedInfo,
   Position,
 } from "@/types/model";
 import { FirebaseHelper } from "@/common/firebase";
@@ -124,9 +125,6 @@ function UploadImageSection({
   const [selectedPointIndex, setSelectedPointIndex] = useState<number | null>(
     null
   );
-  const [expandedSections, setExpandedSections] = useState<{
-    [key: number]: boolean;
-  }>({});
   const [isAdd, setIsAdd] = useState<{ [key: number]: boolean }>({});
 
   const handleSearchKeyword = (index: number, keyword: string) => {
@@ -376,14 +374,6 @@ function UploadImageSection({
   const reset = () => {
     setUploadImageState({});
     setSelectedPointIndex(null);
-    setExpandedSections({});
-  };
-
-  const toggleSection = (index: number) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [index]: !prev[index],
-    }));
   };
 
   const removePoint = (index: number) => {
@@ -983,7 +973,7 @@ function UploadImageSection({
         </div>
       </div>
       {uploadImageState?.selectedImageUrl && (
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4">
           <input
             type="text"
             placeholder="Image Title (e.g Rose in NYC)"
@@ -1014,7 +1004,7 @@ function UploadImageSection({
           />
           <button
             onClick={upload}
-            className={`${bold_font.className} bg-white border border-black mt-10 w-full p-2`}
+            className={`${bold_font.className} bg-white border border-black w-full p-2`}
           >
             {isUploading ? (
               <span className="loading loading-spinner loading-md"></span>
@@ -1029,9 +1019,91 @@ function UploadImageSection({
 }
 
 function UploadFeaturedSection() {
+  const [featuredImage, setFeaturedImage] = useState<File | null>(null);
+  const [featuredInfo, setFeaturedInfo] = useState<FeaturedInfo>({
+    imageUrl: "",
+    title: "",
+    description: "",
+    category: "",
+    images: [],
+  });
+
+  const handleFeaturedInfo = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setFeaturedInfo((prevInfo) => {
+      return {
+        ...prevInfo,
+        [e.target.name]: e.target.value,
+      };
+    });
+  };
+
   return (
-    <div className={`p-10 border-b border-black`}>
-      <input type="file" onChange={() => {}} className="mb-4" />
+    <div className={`flex flex-col p-10 border-b border-black`}>
+      <input
+        type="file"
+        onChange={(e) => setFeaturedImage(e.target.files![0])}
+        className="mb-4"
+      />
+      {featuredImage && (
+        <div className="flex w-full">
+          <div className="flex relative w-[50%] h-[40vh]">
+            <Image
+              src={URL.createObjectURL(featuredImage)}
+              alt="Featured fashion"
+              fill={true}
+              style={{ objectFit: "cover" }}
+            />
+          </div>
+          <div className="flex flex-col w-[50%] pl-4">
+            <input
+              type="text"
+              name="title"
+              placeholder="Title"
+              value={featuredInfo.title}
+              onChange={handleFeaturedInfo}
+              className="input border border-black w-full mb-2 dark:bg-white"
+            />
+            <textarea
+              name="description"
+              placeholder="Description"
+              value={featuredInfo.description}
+              onChange={handleFeaturedInfo}
+              className="input border border-black w-full mb-2 h-24 dark:bg-white"
+            />
+            <input
+              type="text"
+              name="category"
+              placeholder="Category"
+              value={featuredInfo.category}
+              onChange={handleFeaturedInfo}
+              className="input border border-black w-full mb-2 dark:bg-white"
+            />
+            <input
+              type="text"
+              name="imageUrl"
+              placeholder="Image URL"
+              value={featuredInfo.imageUrl}
+              onChange={handleFeaturedInfo}
+              className="input border border-black w-full mb-2 dark:bg-white"
+            />
+            <input
+              type="text"
+              name="images"
+              placeholder="Additional Images (comma-separated URLs)"
+              value={featuredInfo.images.join(",")}
+              onChange={(e) =>
+                setFeaturedInfo((prevInfo) => ({
+                  ...prevInfo,
+                  images: e.target.value.split(",").map((url) => url.trim()),
+                }))
+              }
+              className="input border border-black w-full mb-2 dark:bg-white"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
