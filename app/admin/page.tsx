@@ -35,18 +35,21 @@ function AdminLogin({
         <input
           type="text"
           placeholder="id"
-          className="input input-bordered w-full max-w-xs bg-white"
+          className="border border-black w-full max-w-xs bg-white p-3 fill-none"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
         <input
           type="password"
           placeholder="password"
-          className="input input-bordered w-full max-w-xs mt-5 bg-white"
+          className="border border-black w-full max-w-xs mt-5 bg-white p-3"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button onClick={handleLogin} className="btn btn-primary mt-5">
+        <button
+          onClick={handleLogin}
+          className="bg-white text-black border border-black mt-5"
+        >
           Login
         </button>
       </div>
