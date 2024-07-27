@@ -1,4 +1,6 @@
 "use client";
+import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { FirebaseHelper } from "../../common/firebase";
 import { bold_font, regular_font } from "@/components/helpers/util";
@@ -14,8 +16,7 @@ import {
   FeaturedInfo,
 } from "@/types/model";
 import Carousel from "@/components/ui/carousel";
-import Link from "next/link";
-import Image from "next/image";
+import Header from "@/components/Header";
 
 function Home() {
   const [mainImages, setMainImages] = useState<MainImage[] | null>(null);
@@ -117,15 +118,18 @@ function Home() {
   }, []);
   return (
     <div>
-      <FeaturedSection />
-      <div className="p-10 text-center text-2xl font-bold">
+      {/* <div className="p-10 text-center text-2xl font-bold">
         {currentDateTime}
+      </div> */}
+      <FeaturedSection />
+      <div className="p-10 text-center text-2xl border-b border-black font-bold">
+        Trending
       </div>
       <CarouselView images={mainImages} />
-      <div className="p-10 text-center text-2xl border-b border-black font-bold">
+      {/* <div className="p-10 text-center text-2xl border-b border-black font-bold">
         NEWS
       </div>
-      <NewsSection />
+      <NewsSection /> */}
     </div>
   );
 }
@@ -155,12 +159,12 @@ function FeaturedSection() {
   }, []);
 
   return (
-    <div className="border-b border-black w-[100vw] h-[78vh]">
+    <div className="w-full h-[100vh]">
       {featured?.map((f, i) => {
         return (
           <div
             key={i}
-            className="flex relative w-full h-full cursor-pointer overflow-hidden group"
+            className="flex relative w-full h-full cursor-pointer overflow-hidden"
             onClick={() => alert("WIP!")}
           >
             <Image
@@ -168,11 +172,11 @@ function FeaturedSection() {
               alt={f.title}
               fill={true}
               style={{ objectFit: "cover" }}
-              className="border border-black transition-transform duration-300 ease-in-out group-hover:scale-110"
+              className="border border-black transition-transform duration-300 ease-in-out"
             />
             <div className="flex flex-col absolute inset-0 items-center justify-end p-4 bg-gradient-to-t from-black/80 to-transparent">
               <h2
-                className={`text-white text-6xl md:text-8xl font-bold drop-shadow-lg p-2 md:p-10 leading-snug ${bold_font.className}`}
+                className={`text-white text-6xl md:text-8xl font-bold drop-shadow-lg p-2 md:p-10 leading-snug ${bold_font.className} hover:text-red-400`}
               >
                 {f.title}
               </h2>
