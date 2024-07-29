@@ -1,59 +1,68 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 function ProgressBar({
   duration,
   currentIndex,
+  setCurrentIndex,
   totalItems,
 }: {
   duration: number;
   currentIndex: number;
+  setCurrentIndex: (index: number) => void;
   totalItems: number;
 }) {
   const [progress, setProgress] = useState(0);
+  const animationRef = useRef<number>();
+  const startTimeRef = useRef<number>();
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress((prevProgress) => {
-        if (prevProgress < 100) {
-          return prevProgress + 100 / (duration / 1000); // 1초마다 증가할 진행률 계산
-        }
-        return 100;
-      });
-    }, 1000);
+    const animate = (timestamp: number) => {
+      if (!startTimeRef.current) {
+        startTimeRef.current = timestamp;
+      }
 
-    return () => clearInterval(interval);
-  }, [duration]);
+      const elapsedTime = timestamp - startTimeRef.current;
+      const newProgress = Math.min((elapsedTime / duration) * 100, 100);
+
+      setProgress(newProgress);
+
+      if (newProgress < 100) {
+        animationRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [duration, currentIndex]);
 
   useEffect(() => {
     setProgress(0);
+    startTimeRef.current = undefined;
   }, [currentIndex]);
 
   return (
-    <div
-      className="flex progress-bar-container h-1"
-      style={{ width: "100%", position: "absolute", top: 0, zIndex: 10 }}
-    >
+    <div className="z-10 flex w-full space-x-2 mt-20">
       {Array.from({ length: totalItems }, (_, index) => (
         <div
           key={index}
-          className="progress-bar bg-slate-400 mt-5 mr-1 ml-1 opacity-30"
-          style={{
-            width: `${100 / totalItems}%`,
-            height: "5px",
-            position: "relative", // 상위 div를 relative로 설정
-          }}
+          className={`h-2 bg-white bg-opacity-20 transition-all duration-300 cursor-pointer ${
+            index === currentIndex ? "w-16 rounded-xl" : "w-2 rounded-full"
+          }`}
+          onClick={() => setCurrentIndex(index)}
         >
-          <div
-            className="progress-bar bg-gray-800"
-            style={{
-              width: `${index === currentIndex ? progress : 0}%`, // 현재 index일 때 progress에 따라 width가 채워지도록 설정
-              height: "5px",
-              position: "absolute", // 내부 div를 absolute로 설정하여 상위 div에 겹치도록 함
-              top: 0,
-              left: 0,
-              transition: "width 2s ease-in-out",
-            }}
-          ></div>
+          {index === currentIndex && (
+            <div
+              className="h-full bg-white transition-all duration-300 ease-linear"
+              style={{
+                width: `${progress}%`,
+              }}
+            ></div>
+          )}
         </div>
       ))}
     </div>

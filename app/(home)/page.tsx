@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { FirebaseHelper } from "../../common/firebase";
 import { bold_font, regular_font } from "@/components/helpers/util";
 import {
@@ -16,20 +16,13 @@ import {
   FeaturedInfo,
 } from "@/types/model";
 import Carousel from "@/components/ui/carousel";
-import Header from "@/components/Header";
+import ProgressBar from "@/components/ui/progress-bar";
+import SearchBar from "@/components/ui/search";
+import black_logo from "@/assets/black_logo.png";
 
 function Home() {
   const [mainImages, setMainImages] = useState<MainImage[] | null>(null);
-  const [currentDateTime, setCurrentDateTime] = useState("");
 
-  useEffect(() => {
-    setCurrentDateTime(new Date().toLocaleTimeString());
-    const timerId = setInterval(() => {
-      setCurrentDateTime(new Date().toLocaleTimeString());
-    }, 1000);
-
-    return () => clearInterval(timerId);
-  }, []);
   useEffect(() => {
     const fetchAllImages = async () => {
       const storageItems = await FirebaseHelper.listAllStorageItems("images");
@@ -118,72 +111,124 @@ function Home() {
   }, []);
   return (
     <div>
-      {/* <div className="p-10 text-center text-2xl font-bold">
-        {currentDateTime}
-      </div> */}
       <FeaturedSection />
-      <div className="p-10 text-center text-2xl border-b border-black font-bold">
-        Trending
-      </div>
-      <CarouselView images={mainImages} />
-      {/* <div className="p-10 text-center text-2xl border-b border-black font-bold">
-        NEWS
-      </div>
-      <NewsSection /> */}
+      <SearchSection images={mainImages} />
+      <FollowUsSection />
     </div>
   );
 }
 
 function CarouselView({ images }: { images: MainImage[] | null }) {
   return (
-    <div className="border-b border-black">
+    <div className="mt-20">
       <Carousel images={images} />
     </div>
   );
 }
 
-function FeaturedSection() {
-  const [featured, setFeatured] = useState<FeaturedInfo[] | null>([]);
+const CELEBRITIES = ["블랙핑크", "제니", "로제", "민지", "리사", "지수", "BTS"];
+
+function SearchSection({ images }: { images: MainImage[] | null }) {
+  const [currentCelebrity, setCurrentCelebrity] = useState("");
+  const celebrities = useMemo(() => CELEBRITIES, []);
+
   useEffect(() => {
-    const featchFeatured = async () => {
+    const changeCelebrity = () => {
+      const randomIndex = Math.floor(Math.random() * celebrities.length);
+      setCurrentCelebrity(celebrities[randomIndex]);
+    };
+
+    changeCelebrity();
+    const intervalId = setInterval(changeCelebrity, 2000);
+
+    return () => clearInterval(intervalId);
+  }, [celebrities]);
+
+  return (
+    <div className="flex flex-col p-20 w-full mt-20">
+      <h2
+        className={`flex text-4xl ${bold_font.className} mb-10 justify-center`}
+      >
+        <span className="relative inline-block w-[100px] h-12 border-b border-black">
+          <span
+            key={currentCelebrity}
+            className="absolute w-fit text-blue-500 transition-all duration-300 ease-in-out animate-slide-up"
+          >
+            {currentCelebrity}
+          </span>
+        </span>
+        의 아이템은 뭘까?
+      </h2>
+      <SearchBar setSearch={() => {}} />
+      <CarouselView images={images} />
+    </div>
+  );
+}
+
+function FeaturedSection() {
+  const [featured, setFeatured] = useState<FeaturedInfo[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const slideDuration = 8000;
+
+  useEffect(() => {
+    const fetchFeatured = async () => {
       const docs = await FirebaseHelper.docs("featured");
       const featuredInfoList: FeaturedInfo[] = [];
       docs.forEach((doc) => {
         const featuredData = doc.data() as FeaturedInfo;
-        console.log(featuredData);
         featuredInfoList.push(featuredData);
       });
       setFeatured(featuredInfoList);
     };
-    featchFeatured();
+    fetchFeatured();
   }, []);
 
+  useEffect(() => {
+    if (featured.length === 0) return;
+    const timer = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % featured.length);
+    }, slideDuration);
+
+    return () => clearInterval(timer);
+  }, [featured]);
+
+  if (featured.length === 0) return null;
+
   return (
-    <div className="w-full h-[100vh]">
-      {featured?.map((f, i) => {
-        return (
+    <div className="w-full h-[100vh] relative overflow-hidden">
+      <div className="flex h-full">
+        {featured.map((f, index) => (
           <div
-            key={i}
-            className="flex relative w-full h-full cursor-pointer overflow-hidden"
-            onClick={() => alert("WIP!")}
+            key={index}
+            className="w-full h-full flex-shrink-0 transition-transform duration-1000 ease-in-out absolute"
+            style={{
+              transform: `translateX(${(index - currentIndex) * 100}%)`,
+              zIndex: index === currentIndex ? 1 : 0,
+            }}
           >
             <Image
               src={f.imageUrl}
               alt={f.title}
               fill={true}
               style={{ objectFit: "cover" }}
-              className="border border-black transition-transform duration-300 ease-in-out"
+              className="border border-black"
             />
-            <div className="flex flex-col absolute inset-0 items-center justify-end p-4 bg-gradient-to-t from-black/80 to-transparent">
+            <div className="flex flex-col absolute inset-0 justify-end pb-40 pl-10 md:pl-20 bg-gradient-to-t from-black/70 to-transparent cursor-pointer">
               <h2
-                className={`text-white text-6xl md:text-8xl font-bold drop-shadow-lg p-2 md:p-10 leading-snug ${bold_font.className} hover:text-red-400`}
+                className={`text-white text-4xl md:text-5xl font-bold ${bold_font.className} hover:underline w-[80%] lg:w-[40%]`}
               >
                 {f.title}
               </h2>
+              <ProgressBar
+                duration={slideDuration}
+                currentIndex={currentIndex}
+                setCurrentIndex={setCurrentIndex}
+                totalItems={featured.length}
+              />
             </div>
           </div>
-        );
-      })}
+        ))}
+      </div>
     </div>
   );
 }
@@ -276,6 +321,18 @@ function NewsSection() {
         >
           More NEWS
         </Link>
+      </div>
+    </div>
+  );
+}
+
+function FollowUsSection() {
+  return (
+    <div className="flex p-40 w-full">
+      <div
+        className={`flex w-full items-center justify-center text-4xl ${regular_font.className}`}
+      >
+        Follow Us
       </div>
     </div>
   );

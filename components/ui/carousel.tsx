@@ -5,6 +5,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import EmblaCarousel, { EmblaCarouselType } from "embla-carousel";
 import Autoplay from "embla-carousel-autoplay";
 import Link from "next/link";
+import { regular_font } from "@/components/helpers/util";
 
 const Carousel = ({ images }: { images: MainImage[] | null }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -46,13 +47,13 @@ const Carousel = ({ images }: { images: MainImage[] | null }) => {
     <div className="relative">
       <button
         onClick={handlePrev}
-        className="absolute left-0 top-[calc(50%-24px)] z-[1] flex h-[48px] w-[48px] items-center justify-center bg-white border border-black"
+        className="absolute left-0 top-[calc(50%-24px)] z-[1] flex h-[48px] w-[48px] items-center justify-center text-white font-bold"
       >
         &lt;
       </button>
       <button
         onClick={handleNext}
-        className="absolute right-0 top-[calc(50%-24px)] z-[1] flex h-[48px] w-[48px] items-center justify-center bg-white border border-black"
+        className="absolute right-0 top-[calc(50%-24px)] z-[1] flex h-[48px] w-[48px] items-center justify-center text-white font-bold"
       >
         &gt;
       </button>
@@ -76,12 +77,13 @@ const Carousel = ({ images }: { images: MainImage[] | null }) => {
                     src={image.imageUrl}
                     alt="carousel image"
                     fill={true}
-                    className="border border-black"
                     style={{ objectFit: "cover" }}
                   />
                   {hoveredImageIndex === index && (
                     <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                      <p className="px-4 py-2 bg-white text-black rounded-md hover:bg-gray-200 transition-colors">
+                      <p
+                        className={`${regular_font.className} px-4 py-2 bg-white text-black rounded-md hover:bg-gray-200 transition-colors`}
+                      >
                         아이템 둘러보기
                       </p>
                     </div>
