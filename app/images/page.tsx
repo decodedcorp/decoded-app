@@ -23,6 +23,9 @@ function DetailPage() {
   const searchParams = useSearchParams();
   const imageId = searchParams.get("imageId") ?? "";
   const imageUrl = searchParams.get("imageUrl") ?? "";
+  const [hoveredImageIndex, setHoveredImageIndex] = useState<number | null>(
+    null
+  );
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
@@ -65,7 +68,7 @@ function DetailPage() {
       const brandLogo: Map<string, string> = new Map();
       var artistList: string[] = [];
       var artistArticleList: ArticleInfo[] = [];
-
+      var artistImgList: [string, string][] = [];
       const colorInfo = img.colorInfo;
 
       // Image artist tags
@@ -103,6 +106,7 @@ function DetailPage() {
             artistList.push(a.name);
 
             const artistArticleDocIdList = a.tags?.articles;
+            const artistImgDocIdList = a.tags?.images;
 
             if (artistArticleDocIdList) {
               const articles = await Promise.all(
@@ -114,6 +118,25 @@ function DetailPage() {
               );
               artistArticleList = articles;
             }
+            if (artistImgDocIdList) {
+              const images = await FirebaseHelper.listAllStorageItems("images");
+              // Since item_doc_id is stored as custom metadata, logic is a bit complicated.
+              // After changing item_doc_id as file name, it would be simpler
+              await Promise.all(
+                images.items.map(async (image) => {
+                  const metadata = await FirebaseHelper.metadata(image);
+                  const docId = metadata?.customMetadata?.id;
+                  if (docId && artistImgDocIdList.includes(docId)) {
+                    // Skip if it's the same image
+                    if (docId === imgDocId) {
+                      return;
+                    }
+                    const imageUrl = await FirebaseHelper.downloadUrl(image);
+                    artistImgList.push([docId, imageUrl]);
+                  }
+                })
+              );
+            }
           })
         );
       }
@@ -122,6 +145,7 @@ function DetailPage() {
         itemList: itemList,
         brandList: brandList,
         brandImgList: brandLogo,
+        artistImgList: artistImgList,
         artistList: artistList,
         artistArticleList: artistArticleList,
         colorInfo: colorInfo,
@@ -179,7 +203,7 @@ function DetailPage() {
                 </div>
               )}
               <div className="flex flex-col md:flex-row justify-center px-2 md:px-20 mt-10">
-                <div className="w-full">
+                <div className="w-full p-10">
                   <div className="relative w-full aspect-w-3 aspect-h-4">
                     <Image
                       src={imageUrl}
@@ -253,26 +277,35 @@ function DetailPage() {
                             {item.info.brands?.[0].toUpperCase()}
                           </p>
                         </div>
-                        <Link
-                          href={item.info.affiliateUrl ?? ""}
-                          className="flex flex-col items-center justify-center p-10  hover:scale-105 transition-all duration-300"
-                          onMouseOver={() => handleCurrentIndex(index)}
-                        >
-                          <Image
-                            src={item.info.imageUrl ?? ""}
-                            alt={item.info.name}
-                            width={300}
-                            height={300}
-                            className="w-full"
-                          />
-                          <div className="flex flex-col w-full items-center mt-2">
-                            <p
-                              className={`${regular_font.className} text-sm md:text-md mt-2`}
-                            >
-                              {item.info.name}
-                            </p>
-                          </div>
-                        </Link>
+                        <div className="relative group">
+                          <Link
+                            href={item.info.affiliateUrl ?? ""}
+                            className="block hover:scale-100 transition-all duration-300"
+                            onMouseOver={() => handleCurrentIndex(index)}
+                          >
+                            <div className="relative">
+                              <Image
+                                src={item.info.imageUrl ?? ""}
+                                alt={item.info.name}
+                                width={300}
+                                height={300}
+                                className="w-full p-6"
+                              />
+                              <div className="flex flex-col absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 items-center justify-center">
+                                <p
+                                  className={`${regular_font.className} text-sm md:text-md p-2 text-white text-center`}
+                                >
+                                  {item.info.name}
+                                </p>
+                                <p
+                                  className={`${regular_font.className} text-sm md:text-md p-2 text-white text-center`}
+                                >
+                                  {item.info.price}
+                                </p>
+                              </div>
+                            </div>
+                          </Link>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -337,8 +370,8 @@ function DetailPage() {
           detailPageState.artistImgList.length > 0 && (
             <div>
               <h2 className="text-xl">More to explore</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-0 items-stretch place-items-stretch my-10">
-                {detailPageState.artistImgList.map((image) => (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 items-stretch place-items-stretch my-10">
+                {detailPageState.artistImgList.map((image, index) => (
                   <Link
                     key={image[0]}
                     href={`?imageId=${image[0]}&imageUrl=${encodeURIComponent(
@@ -348,6 +381,8 @@ function DetailPage() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="relative w-full h-[600px]"
+                    onMouseOver={() => setHoveredImageIndex(index)}
+                    onMouseOut={() => setHoveredImageIndex(null)}
                   >
                     <Image
                       src={image[1]}
@@ -356,6 +391,15 @@ function DetailPage() {
                       style={{ objectFit: "cover" }}
                       className="more-tagged border border-black"
                     />
+                    {hoveredImageIndex === index && (
+                      <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                        <p
+                          className={`${regular_font.className} px-4 py-2 bg-white text-black rounded-md hover:bg-gray-200 transition-colors`}
+                        >
+                          아이템 둘러보기
+                        </p>
+                      </div>
+                    )}
                   </Link>
                 ))}
               </div>
