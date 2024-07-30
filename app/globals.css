@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --text-color: #222831;
+  --text-color: #ffffff;
   --footer-text-color: #ffffff;
 }
 
@@ -19,7 +19,7 @@ body {
   position: relative;
   display: flex;
   flex: 1;
-  background-color: #ffffff;
+  background-color: #000000;
   min-height: 100vh;
   height: 100vh;
   z-index: -3;

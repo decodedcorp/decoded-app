@@ -2,16 +2,19 @@
 
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
-import { bold_font, semi_bold_font } from "@/components/helpers/util";
+import {
+  bold_font,
+  regular_font,
+  semi_bold_font,
+} from "@/components/helpers/util";
 import { FirebaseHelper } from "@/common/firebase";
 import { useSearchParams, notFound } from "next/navigation";
 import Link from "next/link";
 import {
   ImageInfo,
   ArtistInfo,
+  BrandInfo,
   HoverItem,
-  ItemInfo,
-  ColorInfo,
   ArticleInfo,
   DetailPageState,
 } from "@/types/model";
@@ -20,22 +23,29 @@ function DetailPage() {
   const searchParams = useSearchParams();
   const imageId = searchParams.get("imageId") ?? "";
   const imageUrl = searchParams.get("imageUrl") ?? "";
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 4;
   if (!imageId || !imageUrl) {
     notFound();
   }
   // Detail page state
   let [detailPageState, setDetailPageState] = useState<DetailPageState>({});
+  const totalPages = Math.ceil(
+    (detailPageState.itemList?.length || 0) / itemsPerPage
+  );
+  const currentItems = detailPageState.itemList?.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   // Independent state
   let [hoverItem, setHoverItem] = useState<HoverItem | null>(null);
   let [isFetching, setIsFetching] = useState(false);
 
-  const handleMouseOver = (item: HoverItem) => {
-    setHoverItem(item);
-  };
-
-  const handleMouseOut = () => {
-    setHoverItem(null);
+  const handleCurrentIndex = (index: number) => {
+    const curr = itemsPerPage * (currentPage - 1) + index;
+    setCurrentIndex(curr);
   };
 
   useEffect(() => {
@@ -52,20 +62,32 @@ function DetailPage() {
         imgDocId
       );
       var brandList: string[] = [];
+      const brandLogo: Map<string, string> = new Map();
       var artistList: string[] = [];
-      var artistItemList: ItemInfo[] = [];
-      var artistImgList: [string, string][] = [];
       var artistArticleList: ArticleInfo[] = [];
 
       const colorInfo = img.colorInfo;
 
       // Image artist tags
       const imgArtistTags = img.tags?.artists;
+      const brandTags = img.tags?.brands;
 
       brandList = Array.from(
         new Set(itemList.map((item) => item.info.brands || []).flat())
       );
 
+      if (brandTags) {
+        const brandInfoList = await Promise.all(
+          brandTags.map(async (brandDocId) => {
+            return (
+              await FirebaseHelper.doc("brands", brandDocId)
+            ).data() as BrandInfo;
+          })
+        );
+        brandInfoList.map((brand) => {
+          brandLogo.set(brand.name, brand.logoImageUrl ?? "");
+        });
+      }
       // Update image related artist stuff if any
       if (imgArtistTags) {
         const artistInfoList = await Promise.all(
@@ -80,8 +102,6 @@ function DetailPage() {
             // Update artist name list
             artistList.push(a.name);
 
-            const artistImgDocIdList = a.tags?.images;
-            const artistItemDocIdList = a.tags?.items;
             const artistArticleDocIdList = a.tags?.articles;
 
             if (artistArticleDocIdList) {
@@ -94,39 +114,6 @@ function DetailPage() {
               );
               artistArticleList = articles;
             }
-
-            // Get all artist-related items
-            // if (artistItemDocIdList) {
-            //   const itemList = await Promise.all(
-            //     artistItemDocIdList.slice(0, 10).map(async (itemDocId) => {
-            //       return (
-            //         await FirebaseHelper.doc("items", itemDocId)
-            //       ).data() as ItemInfo;
-            //     })
-            //   );
-            //   artistItemList = itemList;
-            // }
-
-            // Get all artist-related images
-            if (artistImgDocIdList) {
-              const images = await FirebaseHelper.listAllStorageItems("images");
-              // Since item_doc_id is stored as custom metadata, logic is a bit complicated.
-              // After changing item_doc_id as file name, it would be simpler
-              await Promise.all(
-                images.items.map(async (image) => {
-                  const metadata = await FirebaseHelper.metadata(image);
-                  const docId = metadata?.customMetadata?.id;
-                  if (docId && artistImgDocIdList.includes(docId)) {
-                    // Skip if it's the same image
-                    if (docId === imgDocId) {
-                      return;
-                    }
-                    const imageUrl = await FirebaseHelper.downloadUrl(image);
-                    artistImgList.push([docId, imageUrl]);
-                  }
-                })
-              );
-            }
           })
         );
       }
@@ -134,9 +121,8 @@ function DetailPage() {
         img: img,
         itemList: itemList,
         brandList: brandList,
+        brandImgList: brandLogo,
         artistList: artistList,
-        artistImgList: artistImgList,
-        artistItemList: artistItemList,
         artistArticleList: artistArticleList,
         colorInfo: colorInfo,
       });
@@ -152,29 +138,56 @@ function DetailPage() {
         {/* DESCRIPTION */}
         {detailPageState.img ? (
           <div className="flex flex-1">
-            <div className="flex flex-col w-full text-center my-20">
+            <div className="flex flex-col w-full text-center my-40">
               <h2 className={`${bold_font.className} text-4xl font-bold mb-4`}>
                 {detailPageState.img.title}
               </h2>
-              <p className="text-lg md:text-md px-2 md:px-32 mt-2">
+              <p
+                className={`${regular_font.className} text-lg md:text-md px-2 md:px-32 mt-2`}
+              >
                 {detailPageState.img.description}
               </p>
-              <div className="flex flex-col md:flex-row justify-center mt-20">
-                <div
-                  className="shadow-lg overflow-hidden"
-                  style={{
-                    height: "auto",
-                    aspectRatio: "3/4",
-                  }}
-                >
-                  <div className="relative w-full h-full">
+              <div className="flex flex-col items-center mt-10">
+                <p className={`${bold_font.className} text-lg md:text-2xl`}>
+                  ARTIST:
+                </p>
+                {detailPageState.artistList?.map((name, index) => (
+                  <Link
+                    key={index}
+                    href={`/artists?name=${encodeURIComponent(name)}`}
+                    className={`${semi_bold_font.className} text-md font-bold mx-2`}
+                  >
+                    <p className="underline">{name.toUpperCase()}</p>
+                  </Link>
+                ))}
+              </div>
+              {/* List all colors */}
+              {detailPageState.colorInfo?.style?.length && (
+                <div className="items-center justify-center my-5">
+                  <p className={`${bold_font.className} text-lg md:text-2xl`}>
+                    STYLE COLORS:{" "}
+                  </p>
+                  <div className="flex flex-row w-full justify-center">
+                    {detailPageState?.colorInfo?.style?.map((color) => (
+                      <div
+                        key={color}
+                        className="w-10 h-10 rounded-full m-2"
+                        style={{ backgroundColor: color }}
+                      ></div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div className="flex flex-col md:flex-row justify-center px-2 md:px-20 mt-10">
+                <div className="w-full">
+                  <div className="relative w-full aspect-w-3 aspect-h-4">
                     <Image
                       src={imageUrl}
                       alt="Featured fashion"
                       fill={true}
                       style={{ objectFit: "cover" }}
                     />
-                    <div>
+                    <div className="w-full">
                       {detailPageState.img &&
                         detailPageState.itemList
                           ?.sort((a, b) => {
@@ -189,7 +202,7 @@ function DetailPage() {
                             const leftB = parseInt(b.pos.left || "0%");
                             return leftA - leftB;
                           })
-                          .map((item) => (
+                          .map((item, index) => (
                             <a
                               key={item.info.name}
                               href={item.info?.affiliateUrl ?? ""}
@@ -204,140 +217,84 @@ function DetailPage() {
                               className="point"
                             >
                               <div
-                                onMouseOver={() => handleMouseOver(item)}
-                                onMouseOut={handleMouseOut}
                                 style={{
-                                  width: "10px",
-                                  height: "10px",
+                                  width: "20px",
+                                  height: "20px",
                                   borderRadius: "50%",
-                                  backgroundColor: "white",
+                                  backgroundColor:
+                                    currentIndex === index
+                                      ? "red"
+                                      : "transparent",
                                   boxShadow: "0 0 2px 2px rgba(0, 0, 0, 0.2)",
                                 }}
                               ></div>
                             </a>
                           ))}
                     </div>
-                    {/* Display information for the hovered item */}
-                    {hoverItem && (
-                      <div
-                        className={`absolute transform -translate-x-1/2 -translate-y-full transition-opacity duration-300 ease-in-out ${
-                          hoverItem ? "opacity-100" : "opacity-0"
-                        }`}
-                        style={{
-                          top: hoverItem.pos.top,
-                          left: hoverItem.pos.left,
-                          zIndex: 50,
-                        }}
-                        onMouseOut={handleMouseOut}
-                      >
-                        <div className="relative bg-gray-500 bg-opacity-80 p-2 flex items-center gap-2 w-[250px]">
-                          <Image
-                            src={hoverItem.info.imageUrl ?? ""}
-                            alt={hoverItem.info.name}
-                            width={30}
-                            height={30}
-                            className="rounded-lg w-[50px] h-[50px]"
-                          />
-                          <div className="text-white">
-                            <p className="text-sm font-bold">
-                              {hoverItem.info.name}
-                            </p>
-                            <p className="text-xs">{hoverItem.info?.price}</p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
-                <div className="bg-white shadow-lg">
-                  {/* DETAILS */}
-                  <div className="flex flex-col justify-center p-10">
-                    <div className="flex flex-col items-center">
-                      <p
-                        className={`${bold_font.className} text-lg md:text-2xl`}
-                      >
-                        ARTIST:
-                      </p>
-                      {detailPageState.artistList?.map((name, index) => (
-                        <Link
-                          key={index}
-                          href={`/artists?name=${encodeURIComponent(name)}`}
-                          className={`${semi_bold_font.className} text-md font-bold mx-2`}
-                        >
-                          <p className="underline">{name.toUpperCase()}</p>
-                        </Link>
-                      ))}
-                    </div>
-
-                    {/* List all brands */}
-                    <div className="flex flex-col mt-5">
-                      <p
-                        className={`${bold_font.className} text-lg md:text-2xl`}
-                      >
-                        BRANDS:{" "}
-                      </p>
-                      {detailPageState.brandList?.map((brand, index) => (
-                        <Link
-                          key={index}
-                          href={`/brands/${encodeURIComponent(brand)}`}
-                          className={`${semi_bold_font.className} text-md font-bold mx-2`}
-                        >
-                          <p className="underline">{brand.toUpperCase()}</p>
-                        </Link>
-                      ))}
-                    </div>
-
-                    {/* Categorize with item category */}
-                    <div>
-                      {Object.entries(
-                        detailPageState.itemList?.reduce((acc, tag) => {
-                          const category = tag.info.category.toUpperCase();
-                          if (!acc[category]) {
-                            acc[category] = [];
-                          }
-                          acc[category].push(tag);
-                          return acc;
-                        }, {} as Record<string, HoverItem[]>) || []
-                      ).map(([category, tags]) => (
-                        <div key={category} className="flex flex-col">
-                          <p
-                            className={`${bold_font.className} text-lg md:text-2xl mt-5`}
-                          >
-                            {category} :
+                <div className="flex flex-col bg-black w-full h-auto justify-between">
+                  <div className="grid grid-cols-2 justify-center p-10">
+                    {currentItems?.map((item, index) => (
+                      <div key={index} className="justify-center">
+                        <div className="flex items-center justify-center">
+                          <Image
+                            src={
+                              detailPageState.brandImgList?.get(
+                                item.info.brands?.[0] ?? ""
+                              ) ?? ""
+                            }
+                            alt={item.info.brands?.[0] ?? ""}
+                            width={20}
+                            height={20}
+                            className="rounded-full"
+                          />
+                          <p className={`${bold_font.className} text-lg ml-2`}>
+                            {item.info.brands?.[0].toUpperCase()}
                           </p>
-                          {tags.map((tag) => (
-                            <Link
-                              key={tag.info.name}
-                              href={`${tag.info.affiliateUrl}`}
-                              className={`${semi_bold_font.className} text-md font-bold mx-2`}
-                            >
-                              <p className="underline">
-                                {tag.info.name.toUpperCase()}
-                              </p>
-                            </Link>
-                          ))}
                         </div>
-                      ))}
-                    </div>
-
-                    {/* List all colors */}
-                    <div className="items-center justify-center mt-5">
-                      <p
-                        className={`${bold_font.className} text-lg md:text-2xl`}
-                      >
-                        COLORS:{" "}
-                      </p>
-                      <div className="flex flex-row w-full justify-center">
-                        {detailPageState?.colorInfo?.style?.map((color) => (
-                          <div
-                            key={color}
-                            className="w-10 h-10 rounded-full m-2"
-                            style={{ backgroundColor: color }}
-                          ></div>
-                        ))}
+                        <Link
+                          href={item.info.affiliateUrl ?? ""}
+                          className="flex flex-col items-center justify-center p-10  hover:scale-105 transition-all duration-300"
+                          onMouseOver={() => handleCurrentIndex(index)}
+                        >
+                          <Image
+                            src={item.info.imageUrl ?? ""}
+                            alt={item.info.name}
+                            width={300}
+                            height={300}
+                            className="w-full"
+                          />
+                          <div className="flex flex-col w-full items-center mt-2">
+                            <p
+                              className={`${regular_font.className} text-sm md:text-md mt-2`}
+                            >
+                              {item.info.name}
+                            </p>
+                          </div>
+                        </Link>
                       </div>
-                    </div>
+                    ))}
                   </div>
+                  {totalPages > 1 && (
+                    <div className="flex justify-center mt-4 space-x-2">
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                        (page) => (
+                          <button
+                            key={page}
+                            onClick={() => setCurrentPage(page)}
+                            className={`px-3 py-1 rounded ${
+                              currentPage === page
+                                ? "bg-blue-500 text-white"
+                                : "bg-gray-200 text-black"
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        )
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

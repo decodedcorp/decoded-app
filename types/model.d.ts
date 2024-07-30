@@ -318,6 +318,10 @@ interface DetailPageState {
    */
   brandList?: string[];
   /**
+   * Brand image list
+   */
+  brandImgList?: Map<string, string>;
+  /**
    * Artist names
    */
   artistList?: string[];
