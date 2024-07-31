@@ -65,7 +65,7 @@ const Carousel = ({ images }: { images: MainImage[] | null }) => {
                 href={`images?imageId=${
                   image.docId
                 }&imageUrl=${encodeURIComponent(image.imageUrl)}`}
-                className="embla__slide relative w-96 h-[500px]"
+                className="embla__slide relative w-80 md:w-96 h-[500px]"
                 key={index}
               >
                 <div
@@ -82,7 +82,7 @@ const Carousel = ({ images }: { images: MainImage[] | null }) => {
                   {hoveredImageIndex === index && (
                     <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                       <p
-                        className={`${regular_font.className} px-4 py-2 bg-white text-black rounded-md hover:bg-gray-200 transition-colors`}
+                        className={`${regular_font.className} px-4 py-2 bg-white text-black rounded-md hover:bg-gray-200 transition-colors text-sm`}
                       >
                         아이템 둘러보기
                       </p>

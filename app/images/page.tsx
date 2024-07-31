@@ -26,9 +26,9 @@ function DetailPage() {
   const [hoveredImageIndex, setHoveredImageIndex] = useState<number | null>(
     null
   );
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4;
+  const itemsPerPage = 1;
   if (!imageId || !imageUrl) {
     notFound();
   }
@@ -172,7 +172,9 @@ function DetailPage() {
                 {detailPageState.img.description}
               </p>
               <div className="flex flex-col items-center mt-10">
-                <p className={`${bold_font.className} text-lg md:text-2xl`}>
+                <p
+                  className={`${semi_bold_font.className} text-lg md:text-2xl`}
+                >
                   ARTIST:
                 </p>
                 {detailPageState.artistList?.map((name, index) => (
@@ -186,9 +188,11 @@ function DetailPage() {
                 ))}
               </div>
               {/* List all colors */}
-              {detailPageState.colorInfo?.style?.length && (
+              {/* {detailPageState.colorInfo?.style?.length && (
                 <div className="items-center justify-center my-5">
-                  <p className={`${bold_font.className} text-lg md:text-2xl`}>
+                  <p
+                    className={`${semi_bold_font.className} text-lg md:text-2xl`}
+                  >
                     STYLE COLORS:{" "}
                   </p>
                   <div className="flex flex-row w-full justify-center">
@@ -201,7 +205,7 @@ function DetailPage() {
                     ))}
                   </div>
                 </div>
-              )}
+              )} */}
               <div className="flex flex-col md:flex-row justify-center px-2 md:px-20 mt-10">
                 <div className="w-full p-10">
                   <div className="relative w-full aspect-w-3 aspect-h-4">
@@ -257,10 +261,10 @@ function DetailPage() {
                     </div>
                   </div>
                 </div>
-                <div className="flex flex-col bg-black w-full h-auto justify-between">
-                  <div className="grid grid-cols-2 justify-center p-10">
+                <div className="flex flex-col w-full h-full justify-between p-10">
+                  <div className="flex w-full justify-center p-10">
                     {currentItems?.map((item, index) => (
-                      <div key={index} className="justify-center">
+                      <div key={index} className="justify-center w-full">
                         <div className="flex items-center justify-center">
                           <Image
                             src={
@@ -269,18 +273,18 @@ function DetailPage() {
                               ) ?? ""
                             }
                             alt={item.info.brands?.[0] ?? ""}
-                            width={20}
-                            height={20}
+                            width={30}
+                            height={30}
                             className="rounded-full"
                           />
-                          <p className={`${bold_font.className} text-lg ml-2`}>
+                          <p className={`${bold_font.className} text-xl ml-2`}>
                             {item.info.brands?.[0].toUpperCase()}
                           </p>
                         </div>
                         <div className="relative group">
                           <Link
                             href={item.info.affiliateUrl ?? ""}
-                            className="block hover:scale-100 transition-all duration-300"
+                            className="block hover:scale-100 transition-all duration-300 p-4"
                             onMouseOver={() => handleCurrentIndex(index)}
                           >
                             <div className="relative">
@@ -289,7 +293,7 @@ function DetailPage() {
                                 alt={item.info.name}
                                 width={300}
                                 height={300}
-                                className="w-full p-6"
+                                className="w-full"
                               />
                               <div className="flex flex-col absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 items-center justify-center">
                                 <p
@@ -310,12 +314,15 @@ function DetailPage() {
                     ))}
                   </div>
                   {totalPages > 1 && (
-                    <div className="flex justify-center mt-4 space-x-2">
+                    <div className="flex justify-center space-x-2">
                       {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                         (page) => (
                           <button
                             key={page}
-                            onClick={() => setCurrentPage(page)}
+                            onClick={() => {
+                              setCurrentPage(page);
+                              setCurrentIndex(page - 1);
+                            }}
                             className={`px-3 py-1 rounded ${
                               currentPage === page
                                 ? "bg-blue-500 text-white"
@@ -335,12 +342,10 @@ function DetailPage() {
         ) : null}
         {/* IMAGE */}
         {isFetching ? (
-          <div className="flex justify-center items-center ">
+          <div className="flex justify-center items-center h-[100vh]">
             <h1
-              className={`${bold_font.className} text-7xl md:text-5xl loading-text p-5`}
-            >
-              LOADING
-            </h1>
+              className={`${bold_font.className} text-7xl md:text-5xl loading-text p-5 mt-20`}
+            ></h1>
           </div>
         ) : (
           <div className="bg-white mt-20 custom-shadow z-10">
@@ -370,17 +375,17 @@ function DetailPage() {
           detailPageState.artistImgList.length > 0 && (
             <div>
               <h2 className="text-xl">More to explore</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 items-stretch place-items-stretch my-10">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 items-stretch place-items-stretch my-10 px-20">
                 {detailPageState.artistImgList.map((image, index) => (
                   <Link
-                    key={image[0]}
+                    key={index}
                     href={`?imageId=${image[0]}&imageUrl=${encodeURIComponent(
                       image[1]
                     )}`}
                     prefetch={false}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="relative w-full h-[600px]"
+                    className="relative w-full h-[300px] md:h-[600px] aspect-w-3 aspect-h-4"
                     onMouseOver={() => setHoveredImageIndex(index)}
                     onMouseOut={() => setHoveredImageIndex(null)}
                   >
@@ -389,12 +394,12 @@ function DetailPage() {
                       alt="Artist Image"
                       fill={true}
                       style={{ objectFit: "cover" }}
-                      className="more-tagged border border-black"
+                      className="more-tagged rounded-md"
                     />
                     {hoveredImageIndex === index && (
-                      <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                      <div className="absolute inset-0 bg-[#101011] bg-opacity-50 flex items-center justify-center">
                         <p
-                          className={`${regular_font.className} px-4 py-2 bg-white text-black rounded-md hover:bg-gray-200 transition-colors`}
+                          className={`${regular_font.className} px-4 py-2 bg-white text-black rounded-md hover:bg-gray-200 transition-colors text-sm md:text-md`}
                         >
                           아이템 둘러보기
                         </p>

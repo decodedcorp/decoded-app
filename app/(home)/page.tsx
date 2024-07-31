@@ -120,7 +120,7 @@ function Home() {
 
 function CarouselView({ images }: { images: MainImage[] | null }) {
   return (
-    <div className="mt-20">
+    <div className="mt-10">
       <Carousel images={images} />
     </div>
   );
@@ -147,19 +147,19 @@ function SearchSection({ images }: { images: MainImage[] | null }) {
   return (
     <div className="flex flex-col p-20 w-full mt-20">
       <h2
-        className={`flex text-4xl ${bold_font.className} mb-10 justify-center`}
+        className={`flex ${bold_font.className} mb-10 justify-center text-4xl`}
       >
-        <span className="relative inline-block w-[100px] h-12 border-b border-black">
+        <span className="relative inline-block w-[200px] h-12 border-b border-[#373737]">
           <span
             key={currentCelebrity}
-            className="absolute w-fit text-blue-500 transition-all duration-300 ease-in-out animate-slide-up"
+            className="absolute w-full text-center text-blue-500 transition-all duration-300 ease-in-out animate-slide-up"
           >
             {currentCelebrity}
           </span>
         </span>
         의 아이템은 뭘까?
       </h2>
-      <SearchBar setSearch={() => {}} />
+      {/* <SearchBar setSearch={() => {}} /> */}
       <CarouselView images={images} />
     </div>
   );
