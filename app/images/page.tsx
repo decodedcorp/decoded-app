@@ -293,7 +293,7 @@ function DetailPage() {
                                 alt={item.info.name}
                                 width={300}
                                 height={300}
-                                className="w-full"
+                                className="w-full p-20"
                               />
                               <div className="flex flex-col absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 items-center justify-center">
                                 <p
@@ -342,7 +342,7 @@ function DetailPage() {
         ) : null}
         {/* IMAGE */}
         {isFetching ? (
-          <div className="flex justify-center items-center h-[100vh]">
+          <div className="flex justify-center items-center">
             <h1
               className={`${bold_font.className} text-7xl md:text-5xl loading-text p-5 mt-20`}
             ></h1>

@@ -19,6 +19,7 @@ import Carousel from "@/components/ui/carousel";
 import ProgressBar from "@/components/ui/progress-bar";
 import SearchBar from "@/components/ui/search";
 import black_logo from "@/assets/black_logo.png";
+import { Button } from "@mui/material";
 
 function Home() {
   const [mainImages, setMainImages] = useState<MainImage[] | null>(null);
@@ -328,11 +329,25 @@ function NewsSection() {
 
 function FollowUsSection() {
   return (
-    <div className="flex p-40 w-full">
+    <div
+      className={`flex flex-col w-full text-2xl justify-center ${regular_font.className} my-20`}
+    >
       <div
-        className={`flex w-full items-center justify-center text-4xl ${regular_font.className}`}
+        className={`flex flex-col p-20 items-center justify-center bg-[#212124] opacity-80`}
       >
-        Follow Us
+        좋아하는 셀럽들의 아이템이 궁금하다면?
+        <Button
+          style={{
+            color: "white",
+            border: "1px solid white",
+            width: "200px",
+            height: "40px",
+            marginTop: "40px",
+          }}
+          onClick={() => alert("WIP")}
+        >
+          요청하기
+        </Button>
       </div>
     </div>
   );
