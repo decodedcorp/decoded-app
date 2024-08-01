@@ -158,7 +158,7 @@ function SearchSection({ images }: { images: MainImage[] | null }) {
             {currentCelebrity}
           </span>
         </span>
-        의 아이템은 뭘까?
+        의 아이템 둘러보기
       </h2>
       {/* <SearchBar setSearch={() => {}} /> */}
       <CarouselView images={images} />
@@ -335,7 +335,7 @@ function FollowUsSection() {
       <div
         className={`flex flex-col p-20 items-center justify-center bg-[#212124] opacity-80`}
       >
-        좋아하는 셀럽들의 아이템이 궁금하다면?
+        내가 좋아하는 셀럽의 아이템이 궁금하다면?
         <Button
           style={{
             color: "white",
