@@ -17,9 +17,8 @@ import {
 } from "@/types/model";
 import Carousel from "@/components/ui/carousel";
 import ProgressBar from "@/components/ui/progress-bar";
-import SearchBar from "@/components/ui/search";
-import black_logo from "@/assets/black_logo.png";
 import { Button } from "@mui/material";
+import { MockCelebrities } from "@/components/helpers/mock";
 
 function Home() {
   const [mainImages, setMainImages] = useState<MainImage[] | null>(null);
@@ -110,63 +109,17 @@ function Home() {
     };
     fetchAllImages();
   }, []);
+
   return (
-    <div>
-      <FeaturedSection />
-      <SearchSection images={mainImages} />
-      <FollowUsSection />
+    <div className="flex flex-col">
+      <FeaturedView />
+      <ImageSelectView images={mainImages} />
+      <RequestSection />
     </div>
   );
 }
 
-function CarouselView({ images }: { images: MainImage[] | null }) {
-  return (
-    <div className="mt-10">
-      <Carousel images={images} />
-    </div>
-  );
-}
-
-const CELEBRITIES = ["블랙핑크", "제니", "로제", "민지", "리사", "지수", "BTS"];
-
-function SearchSection({ images }: { images: MainImage[] | null }) {
-  const [currentCelebrity, setCurrentCelebrity] = useState("");
-  const celebrities = useMemo(() => CELEBRITIES, []);
-
-  useEffect(() => {
-    const changeCelebrity = () => {
-      const randomIndex = Math.floor(Math.random() * celebrities.length);
-      setCurrentCelebrity(celebrities[randomIndex]);
-    };
-
-    changeCelebrity();
-    const intervalId = setInterval(changeCelebrity, 2000);
-
-    return () => clearInterval(intervalId);
-  }, [celebrities]);
-
-  return (
-    <div className="flex flex-col p-20 w-full mt-20">
-      <h2
-        className={`flex ${bold_font.className} mb-10 justify-center text-4xl`}
-      >
-        <span className="relative inline-block w-[200px] h-12 border-b border-[#373737]">
-          <span
-            key={currentCelebrity}
-            className="absolute w-full text-center text-blue-500 transition-all duration-300 ease-in-out animate-slide-up"
-          >
-            {currentCelebrity}
-          </span>
-        </span>
-        의 아이템 둘러보기
-      </h2>
-      {/* <SearchBar setSearch={() => {}} /> */}
-      <CarouselView images={images} />
-    </div>
-  );
-}
-
-function FeaturedSection() {
+function FeaturedView() {
   const [featured, setFeatured] = useState<FeaturedInfo[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const slideDuration = 8000;
@@ -216,7 +169,7 @@ function FeaturedSection() {
             />
             <div className="flex flex-col absolute inset-0 justify-end pb-40 pl-10 md:pl-20 bg-gradient-to-t from-black/70 to-transparent cursor-pointer">
               <h2
-                className={`text-white text-4xl md:text-5xl font-bold ${bold_font.className} hover:underline w-[80%] lg:w-[40%]`}
+                className={`text-white text-4xl md:text-7xl font-bold ${bold_font.className} hover:underline w-[80%] lg:w-[70%]`}
               >
                 {f.title}
               </h2>
@@ -229,6 +182,44 @@ function FeaturedSection() {
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+function ImageSelectView({ images }: { images: MainImage[] | null }) {
+  const [currentCelebrity, setCurrentCelebrity] = useState("");
+  const celebrities = useMemo(() => MockCelebrities, []);
+
+  useEffect(() => {
+    const changeCelebrity = () => {
+      const randomIndex = Math.floor(Math.random() * celebrities.length);
+      setCurrentCelebrity(celebrities[randomIndex]);
+    };
+
+    changeCelebrity();
+    const intervalId = setInterval(changeCelebrity, 2000);
+
+    return () => clearInterval(intervalId);
+  }, [celebrities]);
+
+  return (
+    <div className="flex flex-col p-20 w-full mt-20">
+      <h2
+        className={`flex ${bold_font.className} mb-10 justify-center text-4xl`}
+      >
+        <span className="relative inline-block w-[200px] h-12 border-b border-[#373737]">
+          <span
+            key={currentCelebrity}
+            className="absolute w-full text-center text-blue-500 transition-all duration-300 ease-in-out animate-slide-up"
+          >
+            {currentCelebrity}
+          </span>
+        </span>
+        의 아이템 둘러보기
+      </h2>
+      <div className="mt-10">
+        <Carousel images={images} />
       </div>
     </div>
   );
@@ -327,7 +318,16 @@ function NewsSection() {
   );
 }
 
-function FollowUsSection() {
+function RequestSection() {
+  const handleRequest = () => {
+    const userDocId = window.sessionStorage.getItem("USER_DOC_ID");
+    if (!userDocId) {
+      alert("로그인 후 이용해주세요");
+      return;
+    }
+    (document.getElementById("my_modal_1") as HTMLDialogElement)?.showModal();
+  };
+
   return (
     <div
       className={`flex flex-col w-full text-2xl justify-center ${regular_font.className} my-20`}
@@ -335,7 +335,7 @@ function FollowUsSection() {
       <div
         className={`flex flex-col p-20 items-center justify-center bg-[#212124] opacity-80`}
       >
-        내가 좋아하는 셀럽의 아이템이 궁금하다면?
+        좋아하는 셀럽의 아이템이 궁금하다면?
         <Button
           style={{
             color: "white",
@@ -344,12 +344,82 @@ function FollowUsSection() {
             height: "40px",
             marginTop: "40px",
           }}
-          onClick={() => alert("WIP")}
+          onClick={() => handleRequest()}
         >
           요청하기
         </Button>
       </div>
+      <RequestModal />
     </div>
+  );
+}
+
+function RequestModal() {
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setSelectedImage(event.target.files[0]);
+    }
+  };
+
+  return (
+    <dialog
+      id="my_modal_1"
+      className="modal flex flex-col w-[50vw] h-[90vh] p-4 rounded-xl left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] overflow-y-scroll bg-[#101011]"
+      onClose={() => setSelectedImage(null)}
+    >
+      <div className="flex flex-col items-center w-full">
+        <div className="flex flex-col text-center mb-5">
+          <h2 className={`${bold_font.className} text-lg`}>아이템 요청</h2>
+          <h3 className={`${regular_font.className} text-sm mt-2`}>
+            찾고자 하는 아이템의 위치를 찍어주세요
+          </h3>
+        </div>
+        <div className="flex flex-col items-center">
+          <div className="mb-4">
+            <label htmlFor="imageUpload" className="btn cursor-pointer">
+              이미지 선택
+            </label>
+            <input
+              type="file"
+              id="imageUpload"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
+          </div>
+          <div className="relative w-[500px] h-[500px] flex items-center justify-center mb-4">
+            {selectedImage ? (
+              <Image
+                src={URL.createObjectURL(selectedImage)}
+                fill={true}
+                style={{ objectFit: "contain" }}
+                alt="업로드된 이미지"
+                className="max-w-full max-h-full object-contain"
+              />
+            ) : (
+              <span className="text-gray-500">이미지를 선택하세요</span>
+            )}
+          </div>
+          <div className="flex flex-1 mt-4 justify-center items-center">
+            {selectedImage && (
+              <button className="btn w-full ml-4">업로드</button>
+            )}
+            <button
+              className="btn w-full ml-4"
+              onClick={() =>
+                (
+                  document.getElementById("my_modal_1") as HTMLDialogElement
+                )?.close()
+              }
+            >
+              취소
+            </button>
+          </div>
+        </div>
+      </div>
+    </dialog>
   );
 }
 

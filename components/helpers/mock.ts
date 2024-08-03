@@ -9,3 +9,14 @@ export const YoutubeMockUrls = [
   "https://www.youtube.com/watch?v=krfcr9DtB4M&pp=ygURbG91cyB2dWl0dG9uIG1lbnM%3D",
   "https://www.youtube.com/watch?v=4kD2CrWB_6k&pp=ygUKZ3VjY2kgMjVzcw%3D%3D",
 ];
+
+export const MockCelebrities = [
+  "제니",
+  "로제",
+  "민지",
+  "리사",
+  "지수",
+  "뷔",
+  "정국",
+  "지디",
+];

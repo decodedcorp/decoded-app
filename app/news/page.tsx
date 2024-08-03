@@ -5,28 +5,13 @@ import { FirebaseHelper } from "@/common/firebase";
 import { ArticleInfo } from "@/types/model";
 import Image from "next/image";
 import Link from "next/link";
-import { bold_font } from "@/components/helpers/util";
+import { regular_font, bold_font } from "@/components/helpers/util";
+import { LoadingView } from "@/components/ui/loading";
 
 function Page() {
-  return <NewsView />;
-}
-
-function NewsView() {
   return (
-    <div>
-      <div className="flex flex-col w-full">
-        <div
-          className="sticky flex flex-col w-full top-14 lg:top-20 ml-2"
-          style={{ zIndex: 100 }}
-        >
-          <div className="bg-white">
-            <h1 className={`${bold_font.className} text-6xl lg:text-8xl`}>
-              NEWS
-            </h1>
-          </div>
-        </div>
-        <NewsList />
-      </div>
+    <div className="justify-center">
+      <NewsList />
     </div>
   );
 }
@@ -34,6 +19,13 @@ function NewsView() {
 function NewsList() {
   const [articleInfoList, setArticleInfoList] = useState<ArticleInfo[] | null>(
     null
+  );
+  const ItemsPerPage = 8;
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil((articleInfoList?.length || 0) / ItemsPerPage);
+  const currentItems = articleInfoList?.slice(
+    (currentPage - 1) * ItemsPerPage,
+    currentPage * ItemsPerPage
   );
 
   useEffect(() => {
@@ -65,29 +57,54 @@ function NewsList() {
     });
   };
 
-  return (
-    <div className="grid grid-cols-4 gap-2 lg:gap-8 mt-10 lg:mt-40 p-5 lg:p-20">
-      {articleInfoList?.map((news, index) => (
-        <Link key={index} href={news.src as string}>
-          <div
-            className="news-item"
-            onMouseOver={() => handleMouseOver(index)}
-            onMouseOut={handleMouseOut}
-          >
-            <Image
-              src={(news.imageUrl as string) ?? ""}
-              alt="Album"
-              width={300}
-              height={300}
-              style={{ objectFit: "cover" }}
-            />
-            <div className="hidden lg:block text-lg w-full">
-              <h2 className="">{news.title.toUpperCase()}</h2>
+  return articleInfoList ? (
+    <div className="flex flex-col">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-2 lg:gap-8 p-5 lg:p-20 w-full mt-20">
+        {currentItems?.map((news, index) => (
+          <Link key={index} href={news.src as string}>
+            <div
+              className="news-item"
+              onMouseOver={() => handleMouseOver(index)}
+              onMouseOut={handleMouseOut}
+            >
+              <Image
+                src={(news.imageUrl as string) ?? ""}
+                alt="Album"
+                width={300}
+                height={300}
+                style={{ objectFit: "cover" }}
+              />
+              <div className="text-lg w-full mt-2">
+                {news.source && (
+                  <h2 className={`${bold_font.className} text-sm`}>
+                    {news.source.toUpperCase()}
+                  </h2>
+                )}
+                <h2 className={`${regular_font.className} mt-2`}>
+                  {news.title.toUpperCase()}
+                </h2>
+              </div>
             </div>
-          </div>
-        </Link>
-      ))}
+          </Link>
+        ))}
+      </div>
+      {totalPages > 1 && (
+        <div className="flex justify-center space-x-2 text-lg">
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              onClick={() => {
+                setCurrentPage(page);
+              }}
+            >
+              {page}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
+  ) : (
+    <LoadingView />
   );
 }
 

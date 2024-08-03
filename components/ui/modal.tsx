@@ -52,7 +52,7 @@ export const LoginModal = ({
         login(token);
       }
     }
-  }, [pathName]);
+  }, [pathName, setIsLogin]);
 
   return (
     <dialog id="my_modal_4" className="modal">

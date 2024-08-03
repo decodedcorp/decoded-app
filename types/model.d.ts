@@ -257,6 +257,7 @@ export interface MainImage {
  */
 export interface ArticleInfo {
   title: string;
+  source?: string;
   src?: string | string[];
   createdAt?: string;
   imageUrl?: string;
