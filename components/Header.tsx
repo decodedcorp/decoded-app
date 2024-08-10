@@ -2,26 +2,23 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState, Dispatch, SetStateAction, useEffect } from "react";
-import AddIcon from "@mui/icons-material/Add";
 import { bold_font, regular_font } from "@/components/helpers/util";
 import { LoginModal } from "./ui/modal";
-import SearchBar from "./ui/search";
 import white_logo from "@/assets/white_logo.png";
-import black_logo from "@/assets/black_logo.png";
+import SearchIcon from "@mui/icons-material/Search";
+import CloseIcon from "@mui/icons-material/Close";
 
 const headers = ["home", "news", "login", "search"];
 
 function Header() {
   const [isLogin, setIsLogin] = useState(false);
-  const [search, setSearch] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
   const [lastScrollTop, setLastScrollTop] = useState(0);
-  const [currentDateTime, setCurrentDateTime] = useState("");
-
   const [koreanTime, setKoreanTime] = useState("");
   const [usTime, setUsTime] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
     const updateTime = () => {
@@ -74,34 +71,34 @@ function Header() {
   }, [lastScrollTop]);
 
   return (
-    <header
-      className={`fixed w-full p-4 transition-all duration-500 ${
-        isScrolled ? "-translate-y-full" : "translate-y-0"
-      }`}
-    >
-      <div className="grid grid-cols-3 items-center">
-        <div
-          className={`flex flex-col text-lg md:text-2xl ${regular_font.className} text-white`}
-        >
-          <div className="text-lg md:text-xl">SEL {koreanTime}</div>
-          <div className="text-lg md:text-xl">NY {usTime}</div>
-        </div>
-        <Logo isScrolled={isScrolled} />
-        {/* <div
-        className="flex justify-center items-center cursor-pointer"
-        onClick={() => {
-          alert("Coming Soon!");
-        }}
+    <>
+      <header
+        className={`fixed w-full p-4 transition-all duration-500 ${
+          isScrolled ? "-translate-y-full" : "translate-y-0"
+        }`}
       >
-        {isLogin ? (
-          <AddIcon className="w-10 h-10 bg-[#FF204E] rounded-xl" />
-        ) : (
-          <div></div>
-        )}
-      </div> */}
-        <MenuSection isLogin={isLogin} setIsLogin={setIsLogin} />
-      </div>
-    </header>
+        <div className="grid grid-cols-3 items-center">
+          <div
+            className={`flex flex-col text-lg md:text-2xl ${regular_font.className} text-white`}
+          >
+            <div className="text-lg md:text-xl">SEL {koreanTime}</div>
+            <div className="text-lg md:text-xl">NY {usTime}</div>
+          </div>
+          <Logo isScrolled={isScrolled} />
+          <MenuSection
+            isLogin={isLogin}
+            setIsLogin={setIsLogin}
+            isSearchOpen={isSearchOpen}
+            setIsSearchOpen={setIsSearchOpen}
+          />
+        </div>
+      </header>
+      <SearchLayer
+        isOpen={isSearchOpen}
+        setIsOpen={setIsSearchOpen}
+        headerHeight={isScrolled ? 0 : 80}
+      />
+    </>
   );
 }
 
@@ -122,17 +119,21 @@ function Logo({ isScrolled }: { isScrolled: boolean }) {
 function MenuSection({
   isLogin,
   setIsLogin,
+  isSearchOpen,
+  setIsSearchOpen,
 }: {
   isLogin: boolean;
   setIsLogin: Dispatch<SetStateAction<boolean>>;
+  isSearchOpen: boolean;
+  setIsSearchOpen: Dispatch<SetStateAction<boolean>>;
 }) {
   const pathname = usePathname();
   const cleanedPath = pathname.replace(/^\//, "");
   const [currentPath, setCurrentPath] = useState(cleanedPath);
 
   return (
-    <nav className="w-full justify-end hidden md:block text-white">
-      <ul className="flex flex-row gap-3 justify-end pr-1">
+    <nav className="w-full justify-end hidden md:block text-white relative">
+      <ul className="flex flex-row gap-3 justify-end pr-1 items-center">
         {headers.map((header, index) => {
           if (header === "login") {
             return (
@@ -163,8 +164,9 @@ function MenuSection({
               <div
                 key={index}
                 className={`text-md cursor-pointer ${regular_font.className}`}
+                onClick={() => setIsSearchOpen(!isSearchOpen)}
               >
-                {header.toUpperCase()}
+                SEARCH
               </div>
             );
           }
@@ -194,6 +196,136 @@ function MenuSection({
         })}
       </ul>
     </nav>
+  );
+}
+
+function SearchLayer({
+  isOpen,
+  setIsOpen,
+  headerHeight,
+}: {
+  isOpen: boolean;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
+  headerHeight: number;
+}) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
+
+  const handleSearch = async () => {
+    if (searchQuery.trim() === "") return;
+
+    try {
+      const response = await fetch(
+        `http://0.0.0.0:8080/search?name=${encodeURIComponent(searchQuery)}`
+      );
+      const data = await response.json();
+      console.log(data);
+      console.log(data.status_code);
+      if (data.status_code === 200) {
+        // router.push(`/artists?name=${encodeURIComponent(data.data[0].name)}`);
+        alert("Matching artist found");
+        setIsOpen(false);
+      } else {
+        alert("No matching artist found");
+      }
+    } catch (error) {
+      console.error("Search error:", error);
+      alert("An error occurred while searching");
+    }
+  };
+
+  return (
+    <div
+      className={`search_layer ${isOpen ? "open" : ""}`}
+      style={{
+        display: isOpen ? "block" : "none",
+        position: "fixed",
+        top: `${headerHeight}px`,
+        left: 0,
+        width: "100%",
+        height: `${headerHeight * 3}px`,
+        backgroundColor: "rgba(0, 0, 0, 0.75)",
+        zIndex: 999,
+        overflow: "auto",
+      }}
+    >
+      <div
+        className="cont_inner"
+        style={{
+          padding: "40px 20px",
+          maxWidth: "800px",
+          margin: "0 auto",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          height: "100%",
+        }}
+      >
+        <div className="search_box">
+          <form
+            id="headerSearchForm"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSearch();
+            }}
+          >
+            <div
+              className="inputbox search"
+              style={{ display: "flex", alignItems: "center" }}
+            >
+              <input
+                type="search"
+                className="inp"
+                id="headerSearch"
+                name="name"
+                placeholder="검색어를 입력해주세요."
+                title="검색어 입력"
+                autoComplete="off"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "20px",
+                  fontSize: "24px",
+                  border: "none",
+                  borderBottom: "2px solid black",
+                  background: "transparent",
+                }}
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  className="btn_ico del"
+                  onClick={() => setSearchQuery("")}
+                  style={{ marginLeft: "20px", cursor: "pointer" }}
+                >
+                  <CloseIcon style={{ fontSize: "30px" }} />
+                </button>
+              )}
+              <button
+                type="submit"
+                className="btn_ico search"
+                style={{ marginLeft: "20px", cursor: "pointer" }}
+              >
+                <SearchIcon style={{ fontSize: "30px" }} />
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div
+        className="sl_bg"
+        onClick={() => setIsOpen(false)}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          zIndex: -1,
+        }}
+      ></div>
+    </div>
   );
 }
 
