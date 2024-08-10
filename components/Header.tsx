@@ -240,11 +240,11 @@ function SearchLayer({
       style={{
         display: isOpen ? "block" : "none",
         position: "fixed",
-        top: `${headerHeight}px`,
+        top: 0,
         left: 0,
         width: "100%",
-        height: `${headerHeight * 3}px`,
-        backgroundColor: "rgba(0, 0, 0, 0.75)",
+        height: `${headerHeight * 2.5}px`,
+        backgroundColor: "rgba(0, 0, 0, 1)",
         zIndex: 999,
         overflow: "auto",
       }}
@@ -257,7 +257,7 @@ function SearchLayer({
           margin: "0 auto",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
+          justifyContent: "flex-end",
           height: "100%",
         }}
       >
