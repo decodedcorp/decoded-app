@@ -371,24 +371,25 @@ function RequestModal() {
     >
       <div className="flex flex-col items-center w-full">
         <div className="flex flex-col text-center mb-5">
-          <h2 className={`${bold_font.className} text-lg`}>아이템 요청</h2>
-          <h3 className={`${regular_font.className} text-sm mt-2`}>
-            찾고자 하는 아이템의 위치를 찍어주세요
-          </h3>
+          <h2 className={`${bold_font.className} text-lg`}>
+            아이템 정보 요청하기
+          </h2>
         </div>
         <div className="flex flex-col items-center">
-          <div className="mb-4">
-            <label htmlFor="imageUpload" className="btn cursor-pointer">
-              이미지 선택
-            </label>
-            <input
-              type="file"
-              id="imageUpload"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-            />
-          </div>
+          {selectedImage && (
+            <div className="mb-4">
+              <label htmlFor="imageUpload" className="btn cursor-pointer">
+                이미지 선택
+              </label>
+              <input
+                type="file"
+                id="imageUpload"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+            </div>
+          )}
           <div className="relative w-[500px] h-[500px] flex items-center justify-center mb-4">
             {selectedImage ? (
               <Image
@@ -399,7 +400,18 @@ function RequestModal() {
                 className="max-w-full max-h-full object-contain"
               />
             ) : (
-              <span className="text-gray-500">이미지를 선택하세요</span>
+              <div>
+                <label htmlFor="imageUpload" className="btn cursor-pointer">
+                  이미지 선택
+                </label>
+                <input
+                  type="file"
+                  id="imageUpload"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+              </div>
             )}
           </div>
           <div className="flex flex-1 mt-4 justify-center items-center">

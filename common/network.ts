@@ -22,7 +22,7 @@ export class NetworkManager {
     return response.data;
   }
 
-  public static async login(docId: string) {
+  public static async handleLogin(docId: string) {
     try {
       const response = await axios.get(
         `http://localhost:8080/user/login?doc_id=${docId}`

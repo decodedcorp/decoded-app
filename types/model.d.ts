@@ -253,6 +253,7 @@ export interface MainImage {
  * @param createdAt Optional creation date of the article.
  * @param imageUrl Optional URL of an image associated with the article.
  * @param summary Optional summary of the article.
+ * @param source Optional source of the article.
  * @param tags Optional record of tags related to the article, with string keys and values.
  */
 export interface ArticleInfo {

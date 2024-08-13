@@ -33,7 +33,9 @@ export const LoginModal = ({
       if (sub && iss && aud) {
         let docId = sha256(sub + iss + aud);
         try {
-          const res = await NetworkManager.login(docId);
+          const res = await NetworkManager.handleLogin(docId);
+          console.log(res);
+          return;
           const address = jwtToAddress(token, res.data.salt);
           setIsLogin(true);
           window.sessionStorage.setItem("USER_DOC_ID", docId);
