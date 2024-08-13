@@ -1,24 +1,28 @@
 "use client";
-import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
+import { useEffect, useState, useMemo } from "react";
 import { FirebaseHelper } from "../../common/firebase";
-import { main_font, secondary_font } from "@/components/helpers/util";
+import { bold_font, regular_font } from "@/components/helpers/util";
 import {
   ImageInfo,
   BrandInfo,
+  ArticleInfo,
   ArtistInfo,
   ItemInfo,
-  MainImageInfo,
+  MainImage,
   TaggedItem,
+  Position,
+  FeaturedInfo,
 } from "@/types/model";
+import Carousel from "@/components/ui/carousel";
 import ProgressBar from "@/components/ui/progress-bar";
-import Pin from "@/components/ui/pin";
+import { Button } from "@mui/material";
+import { MockCelebrities } from "@/components/helpers/mock";
 
 function Home() {
-  const [mainImageInfoList, setMainImageInfoList] = useState<
-    MainImageInfo[] | null
-  >(null);
+  const [mainImages, setMainImages] = useState<MainImage[] | null>(null);
+
   useEffect(() => {
     const fetchAllImages = async () => {
       const storageItems = await FirebaseHelper.listAllStorageItems("images");
@@ -51,7 +55,7 @@ function Home() {
                   (artist): artist is ArtistInfo => artist !== undefined
                 );
               }
-              var itemInfoList = new Map<ItemInfo, BrandInfo[]>();
+              var itemInfoList = new Map<ItemInfo, [Position, BrandInfo[]]>();
               if (imageInfo.taggedItem) {
                 const itemPromises = imageInfo.taggedItem.map(async (item) => {
                   const taggedItem = item as TaggedItem;
@@ -76,22 +80,21 @@ function Home() {
                         (brand): brand is BrandInfo => brand !== undefined
                       );
                     }
-                    itemInfoList.set(itemInfo, brandInfo);
+                    itemInfoList.set(itemInfo, [taggedItem.pos, brandInfo]);
                   }
                 });
 
                 await Promise.all(itemPromises);
               }
-              let mainImageInfo: MainImageInfo = {
+              let mainImage: MainImage = {
                 imageUrl: url,
                 docId: imageDocId,
                 title: imageInfo.title,
                 itemInfoList,
                 artistInfoList,
                 description: imageInfo.description,
-                hyped: imageInfo.hyped,
               };
-              return mainImageInfo;
+              return mainImage;
             }
           } catch (error) {
             console.error("Error processing item:", error);
@@ -100,227 +103,323 @@ function Home() {
         })
       );
       let filtered = images.filter(
-        (image): image is MainImageInfo => image !== undefined
+        (image): image is MainImage => image !== undefined
       );
-      setMainImageInfoList(filtered);
+      setMainImages(filtered);
     };
     fetchAllImages();
   }, []);
+
   return (
-    <div>
-      <MainView mainImageInfoList={mainImageInfoList} />
-      <p className={`${secondary_font.className} text-center text-xl`}>
-        More to explore
-      </p>
-      <PinView mainImageInfoList={mainImageInfoList} />
+    <div className="flex flex-col">
+      <FeaturedView />
+      <ImageSelectView images={mainImages} />
+      <RequestSection />
     </div>
   );
 }
 
-function MainView({
-  mainImageInfoList,
-}: {
-  mainImageInfoList: MainImageInfo[] | null;
-}) {
-  const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [currentDateTime, setCurrentDateTime] = useState("");
+function FeaturedView() {
+  const [featured, setFeatured] = useState<FeaturedInfo[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const slideDuration = 8000;
 
   useEffect(() => {
-    setCurrentDateTime(new Date().toLocaleTimeString());
-    const timerId = setInterval(() => {
-      setCurrentDateTime(new Date().toLocaleTimeString());
-    }, 1000);
-
-    return () => clearInterval(timerId);
+    const fetchFeatured = async () => {
+      const docs = await FirebaseHelper.docs("featured");
+      const featuredInfoList: FeaturedInfo[] = [];
+      docs.forEach((doc) => {
+        const featuredData = doc.data() as FeaturedInfo;
+        featuredInfoList.push(featuredData);
+      });
+      setFeatured(featuredInfoList);
+    };
+    fetchFeatured();
   }, []);
 
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 mb-10">
-      <div className="items-start ml-2">
-        <div className="sticky flex flex-col mb-5 lg:mb-0 lg:w-full top-2 lg:top-5 bg-white z-10">
-          <h1 className={`${main_font.className} text-6xl lg:text-7xl w-[60%]`}>
-            TODAY
-          </h1>
-          <h2 className={`${main_font.className} text-6xl lg:text-7xl`}>
-            {currentDateTime}
-          </h2>
-        </div>
-        <ImageDescriptionView
-          mainImageInfoList={mainImageInfoList}
-          currentIndex={currentIndex}
-        />
-      </div>
-      <ImageCarouselView
-        mainImageInfoList={mainImageInfoList?.slice(0, 10)}
-        currentIndex={currentIndex}
-        setCurrentIndex={setCurrentIndex}
-      />
-    </div>
-  );
-}
+  useEffect(() => {
+    if (featured.length === 0) return;
+    const timer = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % featured.length);
+    }, slideDuration);
 
-function ImageDescriptionView({
-  mainImageInfoList,
-  currentIndex,
-}: {
-  mainImageInfoList: MainImageInfo[] | null;
-  currentIndex: number;
-}) {
-  return mainImageInfoList ? (
-    <div className="flex flex-col mt-5 lg:mt-10 p-10">
-      <h2 className={`${main_font.className} text-4xl`}>
-        {mainImageInfoList[currentIndex]?.title}
-      </h2>
-      <h3 className={`${main_font.className} text-md mt-5`}>
-        {mainImageInfoList[currentIndex]?.description}
-      </h3>
-      <ItemDetailView
-        mainImageInfoList={mainImageInfoList}
-        currentIndex={currentIndex}
-      />
-    </div>
-  ) : (
-    <h1
-      className={`${main_font.className} text-4xl md:text-5xl loading-text bg-red-500`}
-    >
-      Loading
-    </h1>
-  );
-}
+    return () => clearInterval(timer);
+  }, [featured]);
 
-function ItemDetailView({
-  mainImageInfoList,
-  currentIndex,
-}: {
-  mainImageInfoList: MainImageInfo[] | null;
-  currentIndex: number;
-}) {
+  if (featured.length === 0) return null;
+
   return (
-    mainImageInfoList && (
-      <div className="grid grid-cols-2 mt-5">
-        {Array.from(
-          mainImageInfoList[currentIndex]?.itemInfoList.entries()
-        ).map(([item, brands], index) => (
+    <div className="w-full h-[100vh] relative overflow-hidden">
+      <div className="flex h-full">
+        {featured.map((f, index) => (
           <div
             key={index}
-            className="flex flex-col lg:flex-row items-center mt-5 "
+            className="w-full h-full flex-shrink-0 transition-transform duration-1000 ease-in-out absolute"
+            style={{
+              transform: `translateX(${(index - currentIndex) * 100}%)`,
+              zIndex: index === currentIndex ? 1 : 0,
+            }}
           >
-            <div className="w-52 h-32 relative rounded-lg">
-              <Image
-                src={item.imageUrl ?? ""}
-                alt={item.name ?? ""}
-                fill={true}
-                style={{ objectFit: "cover" }}
-                className="rounded-lg"
+            <Image
+              src={f.imageUrl}
+              alt={f.title}
+              fill={true}
+              style={{ objectFit: "cover" }}
+              className="border border-black"
+            />
+            <div className="flex flex-col absolute inset-0 justify-end pb-40 pl-10 md:pl-20 bg-gradient-to-t from-black/70 to-transparent cursor-pointer">
+              <h2
+                className={`text-white text-4xl md:text-7xl font-bold ${bold_font.className} hover:underline w-[80%] lg:w-[70%]`}
+              >
+                {f.title}
+              </h2>
+              <ProgressBar
+                duration={slideDuration}
+                currentIndex={currentIndex}
+                setCurrentIndex={setCurrentIndex}
+                totalItems={featured.length}
               />
             </div>
-            <div className="flex flex-col m-5 w-full lg:block items-center">
-              <div className={`flex ${secondary_font.className} text-xs`}>
-                {brands && brands.length > 0 && (
-                  <div className="flex items-center space-x-2 w-full justify-center lg:justify-start">
-                    <Image
-                      src={brands[0].logoImageUrl ?? ""}
-                      alt={brands[0].name}
-                      className="rounded-full w-6 h-6 border border-black-opacity-50"
-                      width={100}
-                      height={100}
-                    />
-                    <div className="rounded-lg p-1 text-md">
-                      {brands[0].name.replace(/_/g, " ").toUpperCase()}
-                    </div>
-                  </div>
-                )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ImageSelectView({ images }: { images: MainImage[] | null }) {
+  const [currentCelebrity, setCurrentCelebrity] = useState("");
+  const celebrities = useMemo(() => MockCelebrities, []);
+
+  useEffect(() => {
+    const changeCelebrity = () => {
+      const randomIndex = Math.floor(Math.random() * celebrities.length);
+      setCurrentCelebrity(celebrities[randomIndex]);
+    };
+
+    changeCelebrity();
+    const intervalId = setInterval(changeCelebrity, 2000);
+
+    return () => clearInterval(intervalId);
+  }, [celebrities]);
+
+  return (
+    <div className="flex flex-col p-20 w-full mt-20">
+      <h2
+        className={`flex ${bold_font.className} mb-10 justify-center text-4xl`}
+      >
+        <span className="relative inline-block w-[200px] h-12 border-b border-[#373737]">
+          <span
+            key={currentCelebrity}
+            className="absolute w-full text-center text-blue-500 transition-all duration-300 ease-in-out animate-slide-up"
+          >
+            {currentCelebrity}
+          </span>
+        </span>
+        의 아이템 둘러보기
+      </h2>
+      <div className="mt-10">
+        <Carousel images={images} />
+      </div>
+    </div>
+  );
+}
+
+function NewsSection() {
+  const [latestArticles, setLatestArticles] = useState<ArticleInfo[]>([]);
+
+  useEffect(() => {
+    const fetchLatestArticles = async () => {
+      const docs = await FirebaseHelper.docs("articles");
+      const articleInfoList: ArticleInfo[] = [];
+      docs.forEach((doc) => {
+        const newsData = doc.data() as ArticleInfo;
+        if (newsData.src) {
+          articleInfoList.push(newsData);
+        }
+      });
+      console.log("Fetched articles data:", articleInfoList);
+      const sortedArticles = articleInfoList.sort(
+        (a, b) =>
+          new Date(b.createdAt ?? "").getTime() -
+          new Date(a.createdAt ?? "").getTime()
+      );
+
+      setLatestArticles(sortedArticles.slice(0, 4));
+    };
+
+    fetchLatestArticles();
+  }, [setLatestArticles]);
+
+  const [expandedArticleIndex, setExpandedArticleIndex] = useState<
+    number | null
+  >(null);
+
+  const handleReadMoreClick = (index: number) => {
+    setExpandedArticleIndex(index === expandedArticleIndex ? null : index);
+  };
+
+  return (
+    <div className="flex flex-col w-full border-b border-black">
+      <div className="p-10 grid grid-cols-1 md:grid-cols-3 gap-4">
+        {latestArticles.map((article, index) => (
+          <div key={index} className="flex flex-col p-4 border border-black">
+            <Link
+              href={article.src as string}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Image
+                src={article.imageUrl ?? ""}
+                alt={article.title}
+                width={375}
+                height={250}
+                className="border border-black"
+              />
+            </Link>
+            <div className="flex flex-col h-full justify-between">
+              <div className="flex flex-col py-2">
+                <p className="text-[8px] text-white bg-black rounded-md w-fit p-1">
+                  HYPEBEAST
+                </p>
+                <a
+                  href={article.src as string}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-lg font-bold py-3"
+                >
+                  {article.title}
+                </a>
               </div>
+              {expandedArticleIndex === index && (
+                <p className="mt-2 text-gray-700">{article.summary}</p>
+              )}
               <button
-                className={`${main_font.className} mt-5 bg-[#FF204E] hover:bg-black text-white font-bold rounded w-full h-8 text-sm hidden lg:block`}
-                onClick={() =>
-                  (window.location.href = item.affiliateUrl ?? "#")
-                }
+                onClick={() => handleReadMoreClick(index)}
+                className="mt-4 text-blue-500 hover:underline"
               >
-                구매하기
+                {expandedArticleIndex === index
+                  ? "Hide Summary"
+                  : "Open Summary"}
               </button>
             </div>
           </div>
         ))}
       </div>
-    )
+      <div className="flex p-10">
+        <Link
+          href="/news"
+          className="text-black border border-black w-full rounded-lg text-center p-2"
+        >
+          More NEWS
+        </Link>
+      </div>
+    </div>
   );
 }
 
-function ImageCarouselView({
-  mainImageInfoList,
-  currentIndex,
-  setCurrentIndex,
-}: {
-  mainImageInfoList: MainImageInfo[] | undefined;
-  currentIndex: number;
-  setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
-}) {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (mainImageInfoList && mainImageInfoList.length > 0) {
-        setCurrentIndex(
-          (prevIndex) => (prevIndex + 1) % mainImageInfoList.length
-        );
-      }
-    }, 10000);
-
-    return () => clearTimeout(timer);
-  }, [currentIndex, mainImageInfoList?.length]);
+function RequestSection() {
+  const handleRequest = () => {
+    const userDocId = window.sessionStorage.getItem("USER_DOC_ID");
+    if (!userDocId) {
+      alert("로그인 후 이용해주세요");
+      return;
+    }
+    (document.getElementById("my_modal_1") as HTMLDialogElement)?.showModal();
+  };
 
   return (
-    mainImageInfoList && (
-      <div className="flex flex-col relative carousel">
-        <div
-          key={mainImageInfoList[currentIndex]?.docId}
-          className="carousel-item w-full relative aspect-w-3 aspect-h-4"
+    <div
+      className={`flex flex-col w-full text-2xl justify-center ${regular_font.className} my-20`}
+    >
+      <div
+        className={`flex flex-col p-20 items-center justify-center bg-[#212124] opacity-80`}
+      >
+        좋아하는 셀럽의 아이템이 궁금하다면?
+        <Button
+          style={{
+            color: "white",
+            border: "1px solid white",
+            width: "200px",
+            height: "40px",
+            marginTop: "40px",
+          }}
+          onClick={() => handleRequest()}
         >
-          <ProgressBar
-            duration={5000}
-            currentIndex={currentIndex}
-            totalItems={mainImageInfoList.length}
-          />
-          <Link
-            href={`images?imageId=${
-              mainImageInfoList[currentIndex]?.docId
-            }&imageUrl=${encodeURIComponent(
-              mainImageInfoList[currentIndex]?.imageUrl
-            )}`}
-            prefetch={false}
-          >
-            <Image
-              alt="Image"
-              className="w-full h-auto"
-              src={mainImageInfoList[currentIndex]?.imageUrl}
-              quality={80}
-              fill={true}
-              style={{ objectFit: "cover" }}
-              sizes="100vw"
-              placeholder="blur"
-              blurDataURL="data:image/jpeg;base64,..."
+          요청하기
+        </Button>
+      </div>
+      <RequestModal />
+    </div>
+  );
+}
+
+function RequestModal() {
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setSelectedImage(event.target.files[0]);
+    }
+  };
+
+  return (
+    <dialog
+      id="my_modal_1"
+      className="modal flex flex-col w-[50vw] h-[90vh] p-4 rounded-xl left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] overflow-y-scroll bg-[#101011]"
+      onClose={() => setSelectedImage(null)}
+    >
+      <div className="flex flex-col items-center w-full">
+        <div className="flex flex-col text-center mb-5">
+          <h2 className={`${bold_font.className} text-lg`}>아이템 요청</h2>
+          <h3 className={`${regular_font.className} text-sm mt-2`}>
+            찾고자 하는 아이템의 위치를 찍어주세요
+          </h3>
+        </div>
+        <div className="flex flex-col items-center">
+          <div className="mb-4">
+            <label htmlFor="imageUpload" className="btn cursor-pointer">
+              이미지 선택
+            </label>
+            <input
+              type="file"
+              id="imageUpload"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
             />
-          </Link>
+          </div>
+          <div className="relative w-[500px] h-[500px] flex items-center justify-center mb-4">
+            {selectedImage ? (
+              <Image
+                src={URL.createObjectURL(selectedImage)}
+                fill={true}
+                style={{ objectFit: "contain" }}
+                alt="업로드된 이미지"
+                className="max-w-full max-h-full object-contain"
+              />
+            ) : (
+              <span className="text-gray-500">이미지를 선택하세요</span>
+            )}
+          </div>
+          <div className="flex flex-1 mt-4 justify-center items-center">
+            {selectedImage && (
+              <button className="btn w-full ml-4">업로드</button>
+            )}
+            <button
+              className="btn w-full ml-4"
+              onClick={() =>
+                (
+                  document.getElementById("my_modal_1") as HTMLDialogElement
+                )?.close()
+              }
+            >
+              취소
+            </button>
+          </div>
         </div>
       </div>
-    )
-  );
-}
-
-function PinView({
-  mainImageInfoList,
-}: {
-  mainImageInfoList: MainImageInfo[] | null;
-}) {
-  console.log(mainImageInfoList);
-  return (
-    mainImageInfoList && (
-      <div className="grid grid-cols-1 lg:grid-cols-3 p-10 gap-10 md:gap-32 lg:gap-16 w-full justify-center items-center md:p-32 lg:p-12">
-        {mainImageInfoList.map((image, index) => (
-          <Pin key={index} image={image} />
-        ))}
-      </div>
-    )
+    </dialog>
   );
 }
 

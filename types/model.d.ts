@@ -236,14 +236,13 @@ export interface BrandInfo {
   tags?: Record<string, string[]>;
 }
 
-export interface MainImageInfo {
+export interface MainImage {
   imageUrl: string;
   docId: string;
-  hyped: number;
   title?: string;
   tags?: string[];
   description?: string;
-  itemInfoList: Map<ItemInfo, BrandInfo[]>;
+  itemInfoList: Map<ItemInfo, [Position, BrandInfo[]]>;
   artistInfoList?: ArtistInfo[];
 }
 
@@ -258,6 +257,7 @@ export interface MainImageInfo {
  */
 export interface ArticleInfo {
   title: string;
+  source?: string;
   src?: string | string[];
   createdAt?: string;
   imageUrl?: string;
@@ -295,4 +295,51 @@ interface ColorInfo {
    * @example ["#FFFFFF", "#000000"]
    */
   style?: string[];
+}
+
+interface FeaturedInfo {
+  imageUrl: string;
+  title: string;
+  description: string;
+  category: string;
+  images: string[];
+}
+
+interface DetailPageState {
+  /**
+   * Image info
+   */
+  img?: ImageInfo;
+  /**
+   * Hover items
+   */
+  itemList?: HoverItem[];
+  /**
+   * Brand names
+   */
+  brandList?: string[];
+  /**
+   * Brand image list
+   */
+  brandImgList?: Map<string, string>;
+  /**
+   * Artist names
+   */
+  artistList?: string[];
+  /**
+   * [docId, imageUrl]
+   */
+  artistImgList?: [string, string][];
+  /**
+   * Artist articles
+   */
+  artistArticleList?: ArticleInfo[];
+  /**
+   * Artist items
+   */
+  artistItemList?: ItemInfo[];
+  /**
+   * Extracted color info from image
+   */
+  colorInfo?: ColorInfo;
 }
