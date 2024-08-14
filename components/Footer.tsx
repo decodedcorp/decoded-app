@@ -10,10 +10,10 @@ function Footer() {
 
   return (
     <footer className="footer p-20 mt-20 border-t-2 border-gray-500/50">
-      <div className="flex flex-col md:flex-row w-full">
+      <div className="flex flex-col lg:flex-row w-full">
         <Image src={white_logo} alt="logo" width={200} height={200} />
         <div
-          className={`flex flex-col ${regular_font.className} mt-10 md:mt-0 md:mx-32`}
+          className={`flex flex-col ${regular_font.className} mt-10 lg:mt-0 lg:mx-32`}
         >
           <h2 className="text-lg">디코디드(주)</h2>
           <div className="flex flex-col mt-4">
@@ -32,7 +32,7 @@ function Footer() {
             </h3>
           </div>
         </div>
-        <div className={`flex-col hidden md:block ${regular_font.className}`}>
+        <div className={`flex-col hidden lg:block ${regular_font.className}`}>
           <p className={`text-lg`}>
             뉴스레터를 구독해 최신 뉴스를 놓치지 마세요.
           </p>

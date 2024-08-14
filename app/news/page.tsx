@@ -59,21 +59,23 @@ function NewsList() {
 
   return articleInfoList ? (
     <div className="flex flex-col">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-2 lg:gap-8 p-5 lg:p-20 w-full mt-20">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-8 p-5 lg:p-20 w-full mt-20">
         {currentItems?.map((news, index) => (
           <Link key={index} href={news.src as string}>
             <div
-              className="news-item"
+              className="relative news-item w-full h-full"
               onMouseOver={() => handleMouseOver(index)}
               onMouseOut={handleMouseOut}
             >
-              <Image
-                src={(news.imageUrl as string) ?? ""}
-                alt="Album"
-                width={300}
-                height={300}
-                style={{ objectFit: "cover" }}
-              />
+              <div className="relative w-full md:w-[300px] h-[300px]">
+                <Image
+                  src={(news.imageUrl as string) ?? ""}
+                  alt="Album"
+                  fill={true}
+                  style={{ objectFit: "cover" }}
+                />
+              </div>
+
               <div className="text-lg w-full mt-2">
                 {news.source && (
                   <h2 className={`${bold_font.className} text-sm`}>

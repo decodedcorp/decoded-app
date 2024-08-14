@@ -19,6 +19,7 @@ import Carousel from "@/components/ui/carousel";
 import ProgressBar from "@/components/ui/progress-bar";
 import { Button } from "@mui/material";
 import { MockCelebrities } from "@/components/helpers/mock";
+import { LoadingView } from "@/components/ui/loading";
 
 function Home() {
   const [mainImages, setMainImages] = useState<MainImage[] | null>(null);
@@ -111,10 +112,16 @@ function Home() {
   }, []);
 
   return (
-    <div className="flex flex-col">
-      <FeaturedView />
-      <ImageSelectView images={mainImages} />
-      <RequestSection />
+    <div className="flex flex-col min-h-[100vh]">
+      {mainImages ? (
+        <>
+          <FeaturedView />
+          <ImageSelectView images={mainImages} />
+          <RequestSection />
+        </>
+      ) : (
+        <LoadingView />
+      )}
     </div>
   );
 }
