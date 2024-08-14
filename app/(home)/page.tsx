@@ -322,7 +322,7 @@ function RequestSection() {
   const handleRequest = () => {
     const userDocId = window.sessionStorage.getItem("USER_DOC_ID");
     if (!userDocId) {
-      alert("로그인 후 이용해주세요");
+      alert("WIP");
       return;
     }
     (document.getElementById("my_modal_1") as HTMLDialogElement)?.showModal();

@@ -50,6 +50,9 @@ function Footer() {
                 height: "40px",
                 marginLeft: "10px",
               }}
+              onClick={() => {
+                alert("WIP");
+              }}
             >
               구독하기
             </Button>

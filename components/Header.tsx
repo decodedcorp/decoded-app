@@ -4,13 +4,18 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, Dispatch, SetStateAction, useEffect } from "react";
-import { bold_font, regular_font } from "@/components/helpers/util";
+import {
+  bold_font,
+  regular_font,
+  semi_bold_font,
+} from "@/components/helpers/util";
 import { LoginModal } from "./ui/modal";
 import white_logo from "@/assets/white_logo.png";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
+import MenuIcon from "@mui/icons-material/Menu";
 
-const headers = ["home", "news", "login", "search"];
+const headers = ["home", "news", "search"];
 
 function Header() {
   const [isLogin, setIsLogin] = useState(false);
@@ -19,6 +24,19 @@ function Header() {
   const [koreanTime, setKoreanTime] = useState("");
   const [usTime, setUsTime] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    if (isSearchOpen || isSidebarOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isSearchOpen, isSidebarOpen]);
 
   useEffect(() => {
     const updateTime = () => {
@@ -90,14 +108,22 @@ function Header() {
             setIsLogin={setIsLogin}
             isSearchOpen={isSearchOpen}
             setIsSearchOpen={setIsSearchOpen}
+            isSidebarOpen={isSidebarOpen}
+            setIsSidebarOpen={setIsSidebarOpen}
           />
         </div>
       </header>
-      <SearchLayer
+      <SearchBar
         isOpen={isSearchOpen}
         setIsOpen={setIsSearchOpen}
-        headerHeight={isScrolled ? 0 : 80}
+        isScrolled={isScrolled}
       />
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={() => setIsSidebarOpen(false)}
+        ></div>
+      )}
     </>
   );
 }
@@ -121,95 +147,156 @@ function MenuSection({
   setIsLogin,
   isSearchOpen,
   setIsSearchOpen,
+  isSidebarOpen,
+  setIsSidebarOpen,
 }: {
   isLogin: boolean;
   setIsLogin: Dispatch<SetStateAction<boolean>>;
   isSearchOpen: boolean;
+  isSidebarOpen: boolean;
   setIsSearchOpen: Dispatch<SetStateAction<boolean>>;
+  setIsSidebarOpen: Dispatch<SetStateAction<boolean>>;
 }) {
   const pathname = usePathname();
   const cleanedPath = pathname.replace(/^\//, "");
   const [currentPath, setCurrentPath] = useState(cleanedPath);
 
   return (
-    <nav className="w-full justify-end hidden md:block text-white relative">
-      <ul className="flex flex-row gap-3 justify-end pr-1 items-center">
-        {headers.map((header, index) => {
-          if (header === "login") {
+    <>
+      <nav className="w-full justify-end text-white relative">
+        <ul className="hidden md:flex flex-row gap-3 justify-end pr-1 items-center text-white">
+          {headers.map((header, index) => {
+            if (header === "login") {
+              return (
+                <div
+                  key={index}
+                  className={`text-md cursor-pointer ${regular_font.className}`}
+                  onClick={() =>
+                    (
+                      document.getElementById("my_modal_4") as HTMLDialogElement
+                    )?.showModal()
+                  }
+                >
+                  {isLogin ? (
+                    <div
+                      className="cursor-pointer"
+                      onClick={() => setIsLogin(false)}
+                    >
+                      LOGOUT
+                    </div>
+                  ) : (
+                    header.toUpperCase()
+                  )}
+                  <LoginModal setIsLogin={setIsLogin} />
+                </div>
+              );
+            } else if (header === "search") {
+              return (
+                <div
+                  key={index}
+                  className={`text-md cursor-pointer ${regular_font.className}`}
+                  onClick={() => setIsSearchOpen(!isSearchOpen)}
+                >
+                  SEARCH
+                </div>
+              );
+            }
             return (
-              <div
+              <li
                 key={index}
-                className={`text-md cursor-pointer ${regular_font.className}`}
-                onClick={() =>
-                  (
-                    document.getElementById("my_modal_4") as HTMLDialogElement
-                  )?.showModal()
-                }
-              >
-                {isLogin ? (
-                  <div
-                    className="cursor-pointer"
-                    onClick={() => setIsLogin(false)}
-                  >
-                    LOGOUT
-                  </div>
-                ) : (
-                  header.toUpperCase()
-                )}
-                <LoginModal setIsLogin={setIsLogin} />
-              </div>
-            );
-          } else if (header === "search") {
-            return (
-              <div
-                key={index}
-                className={`text-md cursor-pointer ${regular_font.className}`}
-                onClick={() => setIsSearchOpen(!isSearchOpen)}
-              >
-                SEARCH
-              </div>
-            );
-          }
-          return (
-            <li
-              key={index}
-              className={`list-none transition-all duration-100 ease-in-out hover:scale-100 ${
-                header === "home"
-                  ? pathname === "/"
+                className={`list-none transition-all duration-100 ease-in-out hover:scale-100 ${
+                  header === "home"
+                    ? pathname === "/"
+                      ? "border-b-2 border-[#ffffff]"
+                      : ""
+                    : currentPath === header
                     ? "border-b-2 border-[#ffffff]"
                     : ""
-                  : currentPath === header
-                  ? "border-b-2 border-[#ffffff]"
-                  : ""
-              }`}
-            >
-              <Link
-                href={header === "home" ? "/" : `/${header}`}
-                prefetch={false}
-                className={`${regular_font.className} text-md`}
-                onClick={() => setCurrentPath(header)}
+                }`}
               >
-                {header.toUpperCase()}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
+                <Link
+                  href={header === "home" ? "/" : `/${header}`}
+                  prefetch={false}
+                  className={`${regular_font.className} text-md`}
+                  onClick={() => setCurrentPath(header)}
+                >
+                  {header.toUpperCase()}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+        {/* 모바일 메뉴 */}
+        <div className="flex md:hidden justify-end items-center gap-4 text-white">
+          <button onClick={() => setIsSidebarOpen(true)}>
+            <MenuIcon className="text-2xl" />
+          </button>
+          <button onClick={() => setIsSearchOpen(!isSearchOpen)}>
+            <SearchIcon className="text-2xl" />
+          </button>
+        </div>
+      </nav>
+      <Sidebar
+        isSidebarOpen={isSidebarOpen}
+        setIsSidebarOpen={setIsSidebarOpen}
+        setCurrentPath={setCurrentPath}
+      />
+    </>
   );
 }
 
-function SearchLayer({
+function Sidebar({
+  isSidebarOpen,
+  setIsSidebarOpen,
+  setCurrentPath,
+}: {
+  isSidebarOpen: boolean;
+  setIsSidebarOpen: Dispatch<SetStateAction<boolean>>;
+  setCurrentPath: Dispatch<SetStateAction<string>>;
+}) {
+  return (
+    <div
+      className={`fixed top-0 right-0 h-[100vh] w-full bg-black/50 backdrop-blur-lg text-white transform transition-transform duration-300 ease-in-out ${
+        isSidebarOpen ? "translate-x-0" : "translate-x-full"
+      } z-50`}
+    >
+      <div className="flex justify-end p-4">
+        <button onClick={() => setIsSidebarOpen(false)}>
+          <CloseIcon className="text-2xl" />
+        </button>
+      </div>
+      <ul className="flex flex-col gap-4 p-4">
+        {headers.map((header, index) => (
+          <li
+            key={index}
+            className={`${regular_font.className} text-4xl border-b border-white`}
+          >
+            <Link
+              href={header === "home" ? "/" : `/${header}`}
+              onClick={() => {
+                setCurrentPath(header);
+                setIsSidebarOpen(false);
+              }}
+            >
+              {header.toUpperCase()}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function SearchBar({
   isOpen,
   setIsOpen,
-  headerHeight,
+  isScrolled,
 }: {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
-  headerHeight: number;
+  isScrolled: boolean;
 }) {
   const [searchQuery, setSearchQuery] = useState("");
-  const router = useRouter();
 
   const handleSearch = async () => {
     if (searchQuery.trim() === "") return;
@@ -236,95 +323,52 @@ function SearchLayer({
 
   return (
     <div
-      className={`search_layer ${isOpen ? "open" : ""}`}
-      style={{
-        display: isOpen ? "block" : "none",
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: `${headerHeight * 2.5}px`,
-        backgroundColor: "rgba(0, 0, 0, 1)",
-        zIndex: 999,
-        overflow: "auto",
-      }}
+      className={`fixed w-full justify-center bg-black z-50 ${
+        semi_bold_font.className
+      } border-b border-gray-400/50 transition-all duration-300 ease-in-out h-60 ${
+        isOpen
+          ? "opacity-100 translate-y-0"
+          : "opacity-0 -translate-y-full pointer-events-none"
+      }`}
     >
-      <div
-        className="cont_inner"
-        style={{
-          padding: "40px 20px",
-          maxWidth: "800px",
-          margin: "0 auto",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "flex-end",
-          height: "100%",
-        }}
-      >
-        <div className="search_box">
+      <div className="mx-2 p-10 w-full h-full flex flex-col justify-end items-center">
+        <div className="w-full">
           <form
             id="headerSearchForm"
             onSubmit={(e) => {
               e.preventDefault();
               handleSearch();
             }}
+            className="flex justify-center"
           >
-            <div
-              className="inputbox search"
-              style={{ display: "flex", alignItems: "center" }}
-            >
+            <div className="flex w-full md:w-[50%] border-b-2 border-white/50 mb-5">
               <input
-                type="search"
-                className="inp"
+                type="text"
+                className="w-full py-2 text-xl bg-transparent focus:outline-none text-white "
                 id="headerSearch"
                 name="name"
-                placeholder="검색어를 입력해주세요."
+                placeholder="검색어를 입력해주세요"
                 title="검색어 입력"
                 autoComplete="off"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "20px",
-                  fontSize: "24px",
-                  border: "none",
-                  borderBottom: "2px solid black",
-                  background: "transparent",
-                }}
               />
               {searchQuery && (
                 <button
                   type="button"
-                  className="btn_ico del"
+                  className="btn_ico del ml-5 cursor-pointer text-white"
                   onClick={() => setSearchQuery("")}
-                  style={{ marginLeft: "20px", cursor: "pointer" }}
                 >
-                  <CloseIcon style={{ fontSize: "30px" }} />
+                  <CloseIcon className="text-xl md:text-2xl" />
                 </button>
               )}
-              <button
-                type="submit"
-                className="btn_ico search"
-                style={{ marginLeft: "20px", cursor: "pointer" }}
-              >
-                <SearchIcon style={{ fontSize: "30px" }} />
+              <button type="submit" className="ml-5 cursor-pointer text-white">
+                <SearchIcon className="text-xl md:text-2xl" />
               </button>
             </div>
           </form>
         </div>
       </div>
-      <div
-        className="sl_bg"
-        onClick={() => setIsOpen(false)}
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          zIndex: -1,
-        }}
-      ></div>
     </div>
   );
 }
