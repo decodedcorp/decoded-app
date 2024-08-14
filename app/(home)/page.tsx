@@ -136,7 +136,8 @@ function FeaturedView() {
       const docs = await FirebaseHelper.docs("featured");
       const featuredInfoList: FeaturedInfo[] = [];
       docs.forEach((doc) => {
-        const featuredData = doc.data() as FeaturedInfo;
+        var featuredData = doc.data() as FeaturedInfo;
+        featuredData.docId = doc.id;
         featuredInfoList.push(featuredData);
       });
       setFeatured(featuredInfoList);
@@ -173,13 +174,18 @@ function FeaturedView() {
               fill={true}
               style={{ objectFit: "cover" }}
               className="border border-black"
+              priority
             />
             <div className="flex flex-col absolute inset-0 justify-end pb-40 pl-10 md:pl-20 bg-gradient-to-t from-black/70 to-transparent cursor-pointer">
-              <h2
-                className={`text-white text-4xl md:text-7xl font-bold ${bold_font.className} hover:underline w-[80%] lg:w-[70%]`}
+              <Link
+                href={`/images?imageId=${f.docId}&imageUrl=${f.imageUrl}&isFeatured=yes`}
               >
-                {f.title}
-              </h2>
+                <h2
+                  className={`text-white text-4xl md:text-7xl font-bold ${bold_font.className} hover:underline w-[80%] lg:w-[70%]`}
+                >
+                  {f.title}
+                </h2>
+              </Link>
               <ProgressBar
                 duration={slideDuration}
                 currentIndex={currentIndex}

@@ -64,12 +64,12 @@ const Carousel = ({ images }: { images: MainImage[] | null }) => {
               <Link
                 href={`images?imageId=${
                   image.docId
-                }&imageUrl=${encodeURIComponent(image.imageUrl)}`}
+                }&imageUrl=${encodeURIComponent(image.imageUrl)}&isFeatured=no`}
                 className="embla__slide relative w-80 md:w-96 h-[500px]"
                 key={index}
               >
                 <div
-                  className="flex flex-row w-full h-full"
+                  className="relative flex flex-row w-full h-full"
                   onMouseEnter={() => setHoveredImageIndex(index)}
                   onMouseLeave={() => setHoveredImageIndex(null)}
                 >
@@ -78,6 +78,7 @@ const Carousel = ({ images }: { images: MainImage[] | null }) => {
                     alt="carousel image"
                     fill={true}
                     style={{ objectFit: "cover" }}
+                    loading="lazy"
                   />
                   {hoveredImageIndex === index && (
                     <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">

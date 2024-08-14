@@ -113,11 +113,7 @@ function Header() {
           />
         </div>
       </header>
-      <SearchBar
-        isOpen={isSearchOpen}
-        setIsOpen={setIsSearchOpen}
-        isScrolled={isScrolled}
-      />
+      <SearchBar isOpen={isSearchOpen} setIsOpen={setIsSearchOpen} />
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40"
@@ -137,7 +133,15 @@ function Logo({ isScrolled }: { isScrolled: boolean }) {
         isScrolled ? "opacity-0" : "opacity-100"
       }`}
     >
-      <Image src={white_logo} alt="logo" width={200} height={200} />
+      <div className="relative w-[200px] h-[50px]">
+        <Image
+          src={white_logo}
+          alt="logo"
+          fill
+          style={{ objectFit: "contain" }}
+          priority
+        />
+      </div>
     </Link>
   );
 }
@@ -290,11 +294,9 @@ function Sidebar({
 function SearchBar({
   isOpen,
   setIsOpen,
-  isScrolled,
 }: {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
-  isScrolled: boolean;
 }) {
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -334,7 +336,6 @@ function SearchBar({
       <div className="mx-2 p-10 w-full h-full flex flex-col justify-end items-center">
         <div className="w-full">
           <form
-            id="headerSearchForm"
             onSubmit={(e) => {
               e.preventDefault();
               handleSearch();
@@ -345,7 +346,6 @@ function SearchBar({
               <input
                 type="text"
                 className="w-full py-2 text-xl bg-transparent focus:outline-none text-white "
-                id="headerSearch"
                 name="name"
                 placeholder="검색어를 입력해주세요"
                 title="검색어 입력"

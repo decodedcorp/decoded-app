@@ -299,6 +299,7 @@ interface ColorInfo {
 }
 
 interface FeaturedInfo {
+  docId: string;
   imageUrl: string;
   title: string;
   description: string;

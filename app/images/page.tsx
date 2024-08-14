@@ -22,11 +22,12 @@ import {
 
 function DetailPage() {
   const searchParams = useSearchParams();
-  const imageId = searchParams.get("imageId") ?? "";
-  const imageUrl = searchParams.get("imageUrl") ?? "";
+  const imageId = searchParams.get("imageId");
+  const imageUrl = searchParams.get("imageUrl");
+  const isFeatured = searchParams.get("isFeatured");
   const [artistDocId, setArtistDocId] = useState<string | null>(null);
-
-  if (!imageId || !imageUrl) {
+  console.log(isFeatured);
+  if (!imageId || !imageUrl || !isFeatured) {
     notFound();
   }
   // Detail page state
@@ -134,9 +135,31 @@ function DetailPage() {
     fetchData();
   }, [imageId]);
 
+  return isFeatured === "yes" ? (
+    <MultiImageView />
+  ) : (
+    <SingleImageView detailPageState={detailPageState} imageUrl={imageUrl} />
+  );
+}
+
+function MultiImageView() {
+  return (
+    <div className="flex flex-col min-h-screen justify-center items-center">
+      Featured
+    </div>
+  );
+}
+
+function SingleImageView({
+  detailPageState,
+  imageUrl,
+}: {
+  detailPageState: DetailPageState;
+  imageUrl: string;
+}) {
   return (
     <div className="flex-col justify-center text-center items-center">
-      <div className="flex flex-col my-40">
+      <div className="flex flex-col my-40 p-4 md:p-0">
         {detailPageState.img ? (
           <DetailView detailPageState={detailPageState} imageUrl={imageUrl} />
         ) : (
@@ -240,7 +263,7 @@ function ImageView({
   };
 
   return (
-    <div className="flex flex-col md:flex-row justify-center px-2 md:px-20 md:mt-10">
+    <div className="flex flex-col md:flex-row justify-center px-2 md:px-20 mt-10">
       <div className="w-full">
         <div className="relative w-full aspect-w-3 aspect-h-4">
           <Image
