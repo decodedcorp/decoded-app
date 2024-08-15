@@ -14,7 +14,7 @@ import white_logo from "@/assets/white_logo.png";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
-
+import sha256 from "js-sha256";
 const headers = ["home", "news", "search"];
 
 function Header() {
@@ -299,7 +299,7 @@ function SearchBar({
   setIsOpen: Dispatch<SetStateAction<boolean>>;
 }) {
   const [searchQuery, setSearchQuery] = useState("");
-
+  const router = useRouter();
   const handleSearch = async () => {
     if (searchQuery.trim() === "") return;
 
@@ -308,14 +308,12 @@ function SearchBar({
         `http://0.0.0.0:8080/search?name=${encodeURIComponent(searchQuery)}`
       );
       const data = await response.json();
-      console.log(data);
-      console.log(data.status_code);
       if (data.status_code === 200) {
-        // router.push(`/artists?name=${encodeURIComponent(data.data[0].name)}`);
+        router.push(`/artists?name=${data.name}`);
         alert("Matching artist found");
         setIsOpen(false);
       } else {
-        alert("No matching artist found");
+        alert("베타버전에서는 블랙핑크 뉴진스 맴버들 정보만 제공중입니다.");
       }
     } catch (error) {
       console.error("Search error:", error);
