@@ -13,6 +13,7 @@ import { useSearchParams, notFound } from "next/navigation";
 import Link from "next/link";
 import {
   ImageInfo,
+  FeaturedInfo,
   ArtistInfo,
   BrandInfo,
   HoverItem,
@@ -26,15 +27,105 @@ function DetailPage() {
   const imageUrl = searchParams.get("imageUrl");
   const isFeatured = searchParams.get("isFeatured");
   const [artistDocId, setArtistDocId] = useState<string | null>(null);
-  console.log(isFeatured);
+
   if (!imageId || !imageUrl || !isFeatured) {
     notFound();
   }
-  // Detail page state
-  let [detailPageState, setDetailPageState] = useState<DetailPageState>({});
+  const isFeaturedBool = isFeatured === "yes";
+
+  return isFeaturedBool ? (
+    <MultiImageView imageId={imageId} />
+  ) : (
+    <SingleImageView
+      imageId={imageId}
+      imageUrl={imageUrl}
+      isFeatured={isFeaturedBool}
+    />
+  );
+}
+
+function MultiImageView({ imageId }: { imageId: string }) {
+  const [title, setTitle] = useState<string | null>(null);
+  const [description, setDescription] = useState<string | null>(null);
+  const [featuredImgs, setFeaturedImgs] = useState<
+    { imageUrl: string; imgInfo: ImageInfo; imageDocId: string }[] | null
+  >(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchFeaturedImage = async () => {
+      const imgDocId = decodeURIComponent(imageId);
+      if (!(await FirebaseHelper.docExists("featured", imgDocId))) {
+        return;
+      }
+      const img = (
+        await FirebaseHelper.doc("featured", imgDocId)
+      ).data() as FeaturedInfo;
+      let featuredImgs = await Promise.all(
+        img.images.map(async (imageDocId) => {
+          const imgRef = await FirebaseHelper.doc("images", imageDocId);
+          const ref = FirebaseHelper.storageRef(`images/${imageDocId}`);
+          const url = await FirebaseHelper.downloadUrl(ref);
+          return {
+            imageUrl: url,
+            imageDocId: imageDocId,
+            imgInfo: imgRef.data() as ImageInfo,
+          };
+        })
+      );
+      setTitle(img.title);
+      setDescription(img.description);
+      setFeaturedImgs(featuredImgs);
+    };
+    fetchFeaturedImage();
+  }, [imageId]);
+  return featuredImgs ? (
+    <div className="flex flex-col justify-center items-center my-32 p-2">
+      <div className="flex flex-col items-center p-10">
+        <h1
+          className={`${bold_font.className} text-3xl md:text-5xl font-bold text-white mb-5`}
+        >
+          {title}
+        </h1>
+        <h2
+          className={`${regular_font.className} text-md md:text-lg text-white px-5`}
+        >
+          {description}
+        </h2>
+      </div>
+      {featuredImgs.map((image, index) => (
+        <div key={index} className="flex flex-col w-full mt-10 p-5 text-center">
+          <p
+            className={`${regular_font.className} text-lg md:text-4xl text-white mb-5 font-bold`}
+          >
+            {index + 1}
+          </p>
+          <SingleImageView
+            imageId={image.imageDocId}
+            imageUrl={image.imageUrl}
+            isFeatured={true}
+          />
+        </div>
+      ))}
+    </div>
+  ) : (
+    <LoadingView />
+  );
+}
+
+function SingleImageView({
+  imageId,
+  imageUrl,
+  isFeatured,
+}: {
+  imageId: string;
+  imageUrl: string;
+  isFeatured: boolean;
+}) {
+  let [detailPageState, setDetailPageState] = useState<DetailPageState | null>(
+    null
+  );
+  useEffect(() => {
+    const fetch = async () => {
       const imgDocId = decodeURIComponent(imageId);
       if (!(await FirebaseHelper.docExists("images", imgDocId))) {
         return;
@@ -48,7 +139,7 @@ function DetailPage() {
       var brandList: string[] = [];
       const brandLogo: Map<string, string> = new Map();
       var artistList: string[] = [];
-      var artistArticleList: ArticleInfo[] = [];
+      var artistArticleList: ArticleInfo[] | undefined = undefined;
       var artistImgList: [string, string][] = [];
       const colorInfo = img.colorInfo;
 
@@ -73,7 +164,7 @@ function DetailPage() {
         });
       }
       // Update image related artist stuff if any
-      if (imgArtistTags) {
+      if (imgArtistTags && !isFeatured) {
         const artistInfoList = await Promise.all(
           imgArtistTags.map(async (artistDocId) => {
             return (
@@ -132,56 +223,43 @@ function DetailPage() {
         colorInfo: colorInfo,
       });
     };
-    fetchData();
-  }, [imageId]);
+    fetch();
+  }, [imageId, isFeatured]);
 
-  return isFeatured === "yes" ? (
-    <MultiImageView />
-  ) : (
-    <SingleImageView detailPageState={detailPageState} imageUrl={imageUrl} />
-  );
-}
-
-function MultiImageView() {
-  return (
-    <div className="flex flex-col min-h-screen justify-center items-center">
-      Featured
-    </div>
-  );
-}
-
-function SingleImageView({
-  detailPageState,
-  imageUrl,
-}: {
-  detailPageState: DetailPageState;
-  imageUrl: string;
-}) {
-  return (
+  return detailPageState ? (
     <div className="flex-col justify-center text-center items-center">
-      <div className="flex flex-col my-40 p-4 md:p-0">
-        {detailPageState.img ? (
-          <DetailView detailPageState={detailPageState} imageUrl={imageUrl} />
-        ) : (
-          <LoadingView />
-        )}
+      <div
+        className={`flex flex-col p-4 md:p-0 ${isFeatured ? "mt-0" : "mt-40"}`}
+      >
+        <DetailView
+          detailPageState={detailPageState}
+          imageUrl={imageUrl}
+          isFeatured={isFeatured}
+        />
       </div>
       <MoreToExploreView detailPageState={detailPageState} />
       <ArtistArticleView detailPageState={detailPageState} />
     </div>
+  ) : (
+    <LoadingView />
   );
 }
 
 function DetailView({
   detailPageState,
   imageUrl,
+  isFeatured,
 }: {
   detailPageState: DetailPageState;
   imageUrl: string;
+  isFeatured: boolean;
 }) {
   return (
-    <div className="flex flex-col w-full">
-      <DescriptionView detailPageState={detailPageState} />
+    <div className={"flex flex-col w-full"}>
+      <DescriptionView
+        detailPageState={detailPageState}
+        isFeatured={isFeatured}
+      />
       <ImageView detailPageState={detailPageState} imageUrl={imageUrl} />
     </div>
   );
@@ -189,12 +267,18 @@ function DetailView({
 
 function DescriptionView({
   detailPageState,
+  isFeatured,
 }: {
   detailPageState: DetailPageState;
+  isFeatured: boolean;
 }) {
   return (
-    <div className="flex flex-col">
-      <h2 className={`${bold_font.className} text-4xl font-bold mb-4`}>
+    <div className={"flex flex-col"}>
+      <h2
+        className={`${bold_font.className} text-4xl font-bold mb-4 ${
+          isFeatured ? "hidden" : "block"
+        }`}
+      >
         {detailPageState.img?.title}
       </h2>
       <p
@@ -202,7 +286,11 @@ function DescriptionView({
       >
         {detailPageState.img?.description}
       </p>
-      <div className="flex flex-col items-center mt-10">
+      <div
+        className={`flex flex-col items-center mt-10 ${
+          isFeatured ? "hidden" : "block"
+        }`}
+      >
         <p className={`${semi_bold_font.className} text-lg md:text-2xl`}>
           ARTIST:
         </p>
@@ -263,8 +351,8 @@ function ImageView({
   };
 
   return (
-    <div className="flex flex-col md:flex-row justify-center px-2 md:px-20 mt-10">
-      <div className="w-full">
+    <div className="flex flex-col w-[100vw] md:flex-row justify-center px-2 md:px-20 mt-10">
+      <div className="w-full ">
         <div className="relative w-full aspect-w-3 aspect-h-4">
           <Image
             src={imageUrl}
@@ -454,6 +542,7 @@ function MoreToExploreView({
                     fill={true}
                     style={{ objectFit: "cover" }}
                     className="more-tagged rounded-md"
+                    loading="lazy"
                   />
                   {hoveredImageIndex === index && (
                     <div className="absolute inset-0 bg-[#101011] bg-opacity-50 flex items-center justify-center">
@@ -543,6 +632,7 @@ function ArtistArticleView({
                   fill={true}
                   style={{ objectFit: "cover" }}
                   className="rounded-md hover:scale-105 transition-all duration-300"
+                  loading="lazy"
                 />
               </Link>
               <div className="flex flex-col w-full text-left p-2">
