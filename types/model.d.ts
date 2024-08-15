@@ -343,3 +343,14 @@ interface DetailPageState {
    */
   colorInfo?: ColorInfo;
 }
+
+interface ArtistPageState {
+  artist?: ArtistInfo;
+  brandList?: string[];
+  brandImgList?: Map<string, string>;
+  /**
+   * [docId, imageUrl]
+   */
+  artistImgList?: [string, string][];
+  artistArticleList?: ArticleInfo[];
+}
