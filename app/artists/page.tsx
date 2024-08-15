@@ -1,302 +1,308 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import Image from "next/image";
+import React, { useState, useEffect } from "react";
+import {
+  bold_font,
+  regular_font,
+  semi_bold_font,
+} from "@/components/helpers/util";
+import { LoadingView } from "@/components/ui/loading";
 import { FirebaseHelper } from "@/common/firebase";
-import { ArtistInfo, ItemInfo, ImageInfo } from "@/types/model";
+import { useSearchParams, notFound } from "next/navigation";
+import Link from "next/link";
+import {
+  ArtistInfo,
+  BrandInfo,
+  ArticleInfo,
+  ArtistPageState,
+} from "@/types/model";
 import { sha256 } from "js-sha256";
-
-interface ItemInfoWithImage {
-  id: string;
-  imageUrl: string;
-  name: string;
-}
-
-interface BrandInfo {
-  id: string;
-  name: string;
-  logoImageUrl: string;
-}
-
-interface ImageInfoWithUrl extends ImageInfo {
-  imageUrl: string;
-}
 
 function ArtistPage() {
   const searchParams = useSearchParams();
-  const encode = searchParams.get("name") ?? "";
-  const [artistName, setArtistName] = useState<string | null>(null);
-  const [artistInfo, setArtistInfo] = useState<ArtistInfo | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [imageInfo, setImageInfo] = useState<ImageInfoWithUrl[]>([]);
-  const [itemInfo, setItemInfo] = useState<ItemInfoWithImage[]>([]);
-  const [brandInfo, setBrandInfo] = useState<BrandInfo[]>([]);
-  const [notFound, setNotFound] = useState(false);
+  const [artistName] = useState<string>(searchParams.get("name") ?? "");
+
+  if (!artistName) {
+    notFound();
+  }
+  // Artist page state
+  let [artistPageState, setArtistPageState] = useState<ArtistPageState>({});
 
   useEffect(() => {
-    if (!encode) {
-      setNotFound(true);
-      setIsLoading(false);
-      return;
-    }
-    setArtistName(decodeURIComponent(encode));
-  }, [encode]);
-
-  useEffect(() => {
-    const fetchArtistInfo = async () => {
-      if (!artistName) return;
-      setIsLoading(true);
+    const fetchData = async () => {
       const artistDocId = sha256(artistName);
-      const artistDoc = await FirebaseHelper.doc("artists", artistDocId);
-      if (artistDoc.exists()) {
-        const artist = artistDoc.data() as ArtistInfo;
-        setArtistInfo(artist);
-
-        // 콘솔에 artist.tags?.items 출력
-        console.log("artist.tags?.images:", artist.tags?.images);
-
-        if (artist.tags?.images) {
-          const imageDetails = await Promise.all(
-            artist.tags.images.map(async (imageId) => {
-              try {
-                const imageDoc = await FirebaseHelper.doc("images", imageId);
-                if (imageDoc.exists()) {
-                  const imageData = imageDoc.data() as ImageInfo;
-                  const storageRef = FirebaseHelper.storageRef(
-                    `images/${imageId}`
-                  );
-                  const imageUrl = await FirebaseHelper.downloadUrl(storageRef);
-                  if (imageData && imageUrl) {
-                    console.log(`Image data for ID ${imageId}:`, imageData); // imageData 콘솔 출력
-                    return {
-                      ...imageData,
-                      imageUrl,
-                    };
-                  } else {
-                    console.log(`No data or URL for image ID: ${imageId}`);
-                    return null;
-                  }
-                } else {
-                  console.log(`No such document for image ID: ${imageId}`);
-                  return null;
-                }
-              } catch (error) {
-                console.error(`Error fetching image ID ${imageId}:`, error);
-                return null;
-              }
-            })
-          );
-          setImageInfo(
-            imageDetails.filter((image) => image !== null) as ImageInfoWithUrl[]
-          );
-        }
-
-        // Fetch item info
-        if (artist.tags?.items) {
-          const itemDetails = await Promise.all(
-            artist.tags.items.map(async (itemId) => {
-              try {
-                const itemDoc = await FirebaseHelper.doc("items", itemId);
-                if (itemDoc.exists()) {
-                  const itemData = itemDoc.data();
-                  const storageRef = FirebaseHelper.storageRef(
-                    `items/${itemId}`
-                  );
-                  const imageUrl = await FirebaseHelper.downloadUrl(storageRef);
-                  return {
-                    id: itemId,
-                    imageUrl,
-                    name: itemData.name,
-                  };
-                } else {
-                  console.log(`No such document for item ID: ${itemId}`);
-                  return null;
-                }
-              } catch (error) {
-                console.error(`Error fetching item ID ${itemId}:`, error);
-                return null;
-              }
-            })
-          );
-          setItemInfo(
-            itemDetails.filter((item) => item !== null) as ItemInfoWithImage[]
-          );
-        }
-
-        // Fetch brand info
-        if (artist.tags?.brands) {
-          const brandDetails = await Promise.all(
-            artist.tags.brands.map(async (brandId) => {
-              try {
-                const brandDoc = await FirebaseHelper.doc("brands", brandId);
-                if (brandDoc.exists()) {
-                  const brandData = brandDoc.data();
-                  if (brandData) {
-                    console.log("brand.data():", brandData);
-                    const storageRef = FirebaseHelper.storageRef(
-                      `brands/${brandId}`
-                    );
-                    try {
-                      const logoImageUrl = await FirebaseHelper.downloadUrl(
-                        storageRef
-                      );
-                      return {
-                        id: brandId,
-                        name: brandData.name,
-                        logoImageUrl,
-                      };
-                    } catch (error) {
-                      console.error(
-                        `Error fetching logo URL for brand ID ${brandId}:`,
-                        error
-                      );
-                      return {
-                        id: brandId,
-                        name: brandData.name,
-                        logoImageUrl: null, // 로고 이미지가 없는 경우 null로 설정
-                      };
-                    }
-                  } else {
-                    console.log(`No data for brand ID: ${brandId}`);
-                    return null;
-                  }
-                } else {
-                  console.log(`No such document for brand ID: ${brandId}`);
-                  return null;
-                }
-              } catch (error) {
-                console.error(`Error fetching brand ID ${brandId}:`, error);
-                return null;
-              }
-            })
-          );
-          setBrandInfo(
-            brandDetails.filter((brand) => brand !== null) as BrandInfo[]
-          );
-          console.log(
-            "Updated brandInfo:",
-            brandDetails.filter((brand) => brand !== null)
-          );
-        }
-      } else {
-        setNotFound(true);
+      if (!(await FirebaseHelper.docExists("artists", artistDocId))) {
+        return console.log("Artist not found", artistDocId);
       }
-      setIsLoading(false);
+      const artist = (
+        await FirebaseHelper.doc("artists", artistDocId)
+      ).data() as ArtistInfo;
+      var brandList: string[] = [];
+      const brandLogo: Map<string, string> = new Map();
+      var artistList: string[] = [];
+      var artistArticleList: ArticleInfo[] = [];
+      var artistImgList: [string, string][] = [];
+
+      // Image artist tags
+      const imgArtistTags = artist.tags?.images;
+      const brandTags = artist.tags?.brands;
+      brandList = Array.from(new Set(artist.tags?.brands || []));
+
+      if (brandTags) {
+        const brandInfoList = await Promise.all(
+          brandTags.map(async (brandDocId) => {
+            return (
+              await FirebaseHelper.doc("brands", brandDocId)
+            ).data() as BrandInfo;
+          })
+        );
+        brandInfoList.map((brand) => {
+          brandLogo.set(brand.name, brand.logoImageUrl ?? "");
+        });
+      }
+      // Update image related artist stuff if any
+      if (imgArtistTags) {
+        const artistArticleDocIdList = artist.tags?.articles;
+        const artistImgDocIdList = artist.tags?.images;
+        console.log("img", artistImgDocIdList);
+        console.log("article", artistArticleDocIdList);
+        if (artistArticleDocIdList) {
+          const articles = await Promise.all(
+            artistArticleDocIdList.map(async (articleDocId) => {
+              return (
+                await FirebaseHelper.doc("articles", articleDocId)
+              ).data() as ArticleInfo;
+            })
+          );
+          artistArticleList = articles;
+        }
+        if (artistImgDocIdList) {
+          const images = await FirebaseHelper.listAllStorageItems("images");
+          // Since item_doc_id is stored as custom metadata, logic is a bit complicated.
+          // After changing item_doc_id as file name, it would be simpler
+          await Promise.all(
+            images.items.map(async (image) => {
+              const metadata = await FirebaseHelper.metadata(image);
+              const docId = metadata?.customMetadata?.id;
+              if (docId && artistImgDocIdList.includes(docId)) {
+                const imageUrl = await FirebaseHelper.downloadUrl(image);
+                artistImgList.push([docId, imageUrl]);
+              }
+            })
+          );
+        }
+        setArtistPageState({
+          artist: artist,
+          brandList: brandList,
+          brandImgList: brandLogo,
+          artistImgList: artistImgList,
+          artistArticleList: artistArticleList,
+        });
+      }
+    };
+    fetchData();
+  }, [artistName]);
+  console.log(artistPageState);
+  return (
+    <div className="flex-col justify-center text-center items-center">
+      <MoreToExploreView artistPageState={artistPageState} />
+      <ArtistArticleView artistPageState={artistPageState} />
+    </div>
+  );
+}
+
+function MoreToExploreView({
+  artistPageState,
+}: {
+  artistPageState: ArtistPageState;
+}) {
+  const [hoveredImageIndex, setHoveredImageIndex] = useState<number | null>(
+    null
+  );
+  const [itemsPerPage, setItemsPerPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        // md 브레이크포인트
+        setItemsPerPage(3);
+      } else {
+        setItemsPerPage(1);
+      }
     };
 
-    fetchArtistInfo();
-  }, [artistName]);
+    handleResize(); // 초기 설정
+    window.addEventListener("resize", handleResize);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (notFound) {
-    return <div>Artist not found</div>;
-  }
-
-  if (!artistInfo) {
-    return <div>Artist not found</div>;
-  }
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  const totalPages = Math.ceil(
+    (artistPageState.artistImgList?.length || 0) / itemsPerPage
+  );
+  console.log(totalPages);
+  const currentItems = artistPageState.artistImgList?.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
-    <div className="p-4">
-      <h1 className="text-3xl font-bold mb-4">{artistName}</h1>{" "}
-      {/* 쿼리 매개변수로 받은 아티스트 이름을 표시 */}
-      <h1 className="text-3xl font-bold mb-4">
-        {artistInfo.name["en"]} ({artistInfo.name["ko"]})
-      </h1>
-      {artistInfo.also_known_as && (
-        <p className="mb-4">
-          Also known as: {artistInfo.also_known_as.join(", ")}
-        </p>
-      )}
-      {artistInfo.group && <p className="mb-4">Group: {artistInfo.group}</p>}
-      {artistInfo.sns && (
-        <div className="mb-4">
-          <h2 className="text-2xl font-semibold mb-2">Social Media</h2>
-          <div className="flex space-x-4">
-            {artistInfo.sns["instagram"] && (
-              <a
-                href={artistInfo.sns["instagram"]}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-pink-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-pink-600 transition"
-              >
-                Instagram
-              </a>
-            )}
-            {artistInfo.sns["youtube"] && (
-              <a
-                href={artistInfo.sns["youtube"]}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-red-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-600 transition"
-              >
-                YouTube
-              </a>
-            )}
-            {/* 다른 SNS 플랫폼도 추가 가능 */}
-          </div>
-        </div>
-      )}
-      {imageInfo.length > 0 && (
-        <div className="mb-4">
-          <h2 className="text-2xl font-semibold mb-2">Images</h2>
-          <ul className="grid grid-cols-3 gap-4">
-            {imageInfo.map((image) => (
-              <li key={image.id}>
-                <h3 className="text-xl font-semibold mb-2">{image.title}</h3>
-                <img
-                  src={image.imageUrl}
-                  alt={`Image ${image.id}`}
-                  className="w-full h-auto rounded-lg shadow-md"
-                  onError={() =>
-                    console.log(`Image URL missing for ID ${image.id}`)
-                  } // 이미지 URL이 없는 경우 콘솔에 출력
-                />
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {itemInfo.length > 0 && (
-        <div className="mb-4">
-          <h2 className="text-2xl font-semibold mb-2">착용한 아이템</h2>
-          <ul className="grid grid-cols-3 gap-4">
-            {itemInfo.map((item) => (
-              <li key={item.id}>
-                <h3 className="text-xl font-semibold mb-2">{item.name}</h3>
-                <img
-                  src={item.imageUrl}
-                  alt={`Item ${item.id}`}
-                  className="w-full h-auto rounded-lg shadow-md"
-                />
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {brandInfo.length > 0 && (
-        <div className="mb-4">
-          <h2 className="text-2xl font-semibold mb-2">Brands</h2>
-          <ul className="grid grid-cols-3 gap-4">
-            {brandInfo.map((brand) => (
-              <li key={brand.id}>
-                <div className="flex items-center space-x-4">
-                  <img
-                    src={brand.logoImageUrl}
-                    alt={brand.name}
-                    className="w-16 h-16 rounded-lg shadow-md"
+    <div className="w-full text-center">
+      {artistPageState.artistImgList &&
+        artistPageState.artistImgList.length > 0 && (
+          <div className="items-center justify-center">
+            <h2
+              className={`${regular_font.className} text-4xl mb-6 mt-16 md:mt-32 text-left px-4 md:px-20`}
+            >
+              {artistPageState.artist?.name.toUpperCase()}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 items-stretch place-items-stretch my-10 px-20">
+              {currentItems?.map((image, index) => (
+                <Link
+                  key={index}
+                  href={`?imageId=${image[0]}&imageUrl=${encodeURIComponent(
+                    image[1]
+                  )}`}
+                  prefetch={true}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="relative w-full h-[300px] md:h-[600px] aspect-w-3 aspect-h-4"
+                  onMouseOver={() => setHoveredImageIndex(index)}
+                  onMouseOut={() => setHoveredImageIndex(null)}
+                >
+                  <Image
+                    src={image[1]}
+                    alt="Artist Image"
+                    fill={true}
+                    style={{ objectFit: "cover" }}
+                    className="more-tagged rounded-md"
                   />
-                  <span className="text-xl font-semibold">{brand.name}</span>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+                  {hoveredImageIndex === index && (
+                    <div className="absolute inset-0 bg-[#101011] bg-opacity-50 flex items-center justify-center">
+                      <p
+                        className={`${regular_font.className} px-4 py-2 bg-white text-black rounded-md hover:bg-gray-200 transition-colors text-sm md:text-md`}
+                      >
+                        아이템 둘러보기
+                      </p>
+                    </div>
+                  )}
+                </Link>
+              ))}
+            </div>
+            {totalPages > 1 && (
+              <div className="flex justify-center space-x-2 mt-5">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <button
+                      key={page}
+                      onClick={() => {
+                        setCurrentPage(page);
+                      }}
+                      className={`text-md md:text-lg px-3 py-1 rounded ${
+                        currentPage === page ? "text-white" : "text-gray-500"
+                      }`}
+                    >
+                      •
+                    </button>
+                  )
+                )}
+              </div>
+            )}
+          </div>
+        )}
     </div>
+  );
+}
+
+function ArtistArticleView({
+  artistPageState,
+}: {
+  artistPageState: ArtistPageState;
+}) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(1);
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setItemsPerPage(3);
+      } else {
+        setItemsPerPage(1);
+      }
+    };
+
+    handleResize(); // 초기 설정
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  const totalPages = Math.ceil(
+    (artistPageState.artistArticleList?.length || 0) / itemsPerPage
+  );
+  const currentItems = artistPageState.artistArticleList?.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+  return (
+    artistPageState.artistArticleList && (
+      <div className="flex flex-col mt-10 justify-center">
+        <h2 className={`${regular_font.className} text-xl mb-10`}>Articles</h2>
+        <div className="grid grid-cols-1 items-center justify-center lg:grid-cols-3 p-10">
+          {currentItems?.map((article, index) => (
+            <div
+              key={index}
+              className="flex flex-col items-center justify-center"
+            >
+              <Link
+                key={index}
+                href={(article.src as string) ?? ""}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative flex flex-col w-[400px] h-[400px] justify-center items-center"
+              >
+                <Image
+                  src={article.imageUrl ?? ""}
+                  alt={article.title ?? ""}
+                  fill={true}
+                  style={{ objectFit: "cover" }}
+                  className="rounded-md hover:scale-105 transition-all duration-300"
+                />
+              </Link>
+              <div className="flex flex-col w-full text-left p-2">
+                {article.source && (
+                  <p
+                    className={`${bold_font.className} text-sm text-white mt-5`}
+                  >
+                    {article.source.toUpperCase()}
+                  </p>
+                )}
+                <p
+                  className={`${regular_font.className} text-md text-white hover:underline cursor-pointer mt-2 `}
+                >
+                  {article.title}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+        {totalPages > 1 && (
+          <div className="flex justify-center space-x-2 mt-5">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => {
+                  setCurrentPage(page);
+                }}
+                className={`text-md md:text-lg px-3 py-1 rounded ${
+                  currentPage === page ? "text-white" : "text-gray-500"
+                }`}
+              >
+                •
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    )
   );
 }
 
