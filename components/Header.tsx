@@ -15,6 +15,9 @@ import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
 import sha256 from "js-sha256";
+import { FirebaseHelper } from "@/common/firebase";
+import { ArtistInfo } from "@/types/model";
+
 const headers = ["home", "news", "search"];
 
 function Header() {
@@ -304,20 +307,31 @@ function SearchBar({
     if (searchQuery.trim() === "") return;
 
     try {
-      const response = await fetch(
-        `http://0.0.0.0:8080/search?name=${encodeURIComponent(searchQuery)}`
-      );
-      const data = await response.json();
-      if (data.status_code === 200) {
-        router.push(`/artists?name=${data.name}`);
-        alert("Matching artist found");
+      const artistsSnapshot = await FirebaseHelper.docs("artists");
+      let matchingArtist: ArtistInfo | null = null;
+
+      artistsSnapshot.forEach((doc) => {
+        const artist = doc.data() as ArtistInfo;
+        if (
+          artist.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          artist.also_known_as?.some((aka) =>
+            aka.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+        ) {
+          matchingArtist = artist;
+          return true; // 첫 번째 일치하는 아티스트를 찾으면 루프 종료
+        }
+      });
+
+      if (matchingArtist) {
+        router.push(`/artists?name=${encodeURIComponent(matchingArtist.name)}`);
         setIsOpen(false);
       } else {
         alert("베타버전에서는 블랙핑크 뉴진스 맴버들 정보만 제공중입니다.");
       }
     } catch (error) {
       console.error("Search error:", error);
-      alert("An error occurred while searching");
+      alert("검색 중 오류가 발생했습니다.");
     }
   };
 
