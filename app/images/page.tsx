@@ -515,20 +515,20 @@ function MoreToExploreView({
   );
 
   return (
-    <div className="w-full text-center">
+    <div className="w-full text-center mt-44">
       {detailPageState.artistImgList &&
         detailPageState.artistImgList.length > 0 && (
-          <div className="items-center justify-center">
+          <div className="items-center justify-center mt-10">
             <h2 className={`${regular_font.className} text-xl`}>
               More to explore
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 items-stretch place-items-stretch my-10 px-20">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 items-stretch place-items-stretch my-10 px-10">
               {currentItems?.map((image, index) => (
                 <Link
                   key={index}
                   href={`?imageId=${image[0]}&imageUrl=${encodeURIComponent(
                     image[1]
-                  )}`}
+                  )}&isFeatured=false`}
                   prefetch={false}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -545,9 +545,14 @@ function MoreToExploreView({
                     loading="lazy"
                   />
                   {hoveredImageIndex === index && (
-                    <div className="absolute inset-0 bg-[#101011] bg-opacity-50 flex items-center justify-center">
+                    <div className="flex flex-col absolute inset-0 bg-black bg-opacity-50 items-center justify-center transition-opacity duration-300 ease-in-out">
+                      <h3
+                        className={`${bold_font.className} text-white text-lg mb-2 p-5`}
+                      >
+                        {detailPageState.img?.title}
+                      </h3>
                       <p
-                        className={`${regular_font.className} px-4 py-2 bg-white text-black rounded-md hover:bg-gray-200 transition-colors text-sm md:text-md`}
+                        className={`${regular_font.className} px-4 py-2 bg-white text-black rounded-md hover:bg-gray-200 transition-colors text-sm`}
                       >
                         아이템 둘러보기
                       </p>
@@ -612,19 +617,21 @@ function ArtistArticleView({
   return (
     detailPageState.artistArticleList && (
       <div className="flex flex-col mt-10 justify-center">
-        <h2 className={`${regular_font.className} text-xl mb-10`}>Articles</h2>
-        <div className="grid grid-cols-1 items-center justify-center lg:grid-cols-3 p-10">
+        <h2 className={`${regular_font.className} text-xl`}>
+          Related Articles
+        </h2>
+        <div className="grid grid-cols-1 items-center justify-center lg:grid-cols-3 p-10 gap-4">
           {currentItems?.map((article, index) => (
             <div
               key={index}
-              className="flex flex-col items-center justify-center"
+              className="flex flex-col items-center justify-center w-full"
             >
               <Link
                 key={index}
                 href={(article.src as string) ?? ""}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="relative flex flex-col w-[400px] h-[400px] justify-center items-center"
+                className="relative flex flex-col w-full h-[400px] justify-center items-center"
               >
                 <Image
                   src={article.imageUrl ?? ""}
@@ -635,7 +642,7 @@ function ArtistArticleView({
                   loading="lazy"
                 />
               </Link>
-              <div className="flex flex-col w-full text-left p-2">
+              <div className="flex flex-col w-full text-left">
                 {article.source && (
                   <p
                     className={`${bold_font.className} text-sm text-white mt-5`}
@@ -644,7 +651,7 @@ function ArtistArticleView({
                   </p>
                 )}
                 <p
-                  className={`${regular_font.className} text-md text-white hover:underline cursor-pointer mt-2 `}
+                  className={`${regular_font.className} text-sm text-white hover:underline cursor-pointer mt-2 `}
                 >
                   {article.title}
                 </p>

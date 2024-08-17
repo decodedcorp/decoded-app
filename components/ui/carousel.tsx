@@ -5,7 +5,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import EmblaCarousel, { EmblaCarouselType } from "embla-carousel";
 import Autoplay from "embla-carousel-autoplay";
 import Link from "next/link";
-import { regular_font } from "@/components/helpers/util";
+import { bold_font, regular_font } from "@/components/helpers/util";
 
 const Carousel = ({ images }: { images: MainImage[] | null }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -59,7 +59,7 @@ const Carousel = ({ images }: { images: MainImage[] | null }) => {
       </button>
       <div className="embla overflow-hidden max-w-full" ref={emblaRef}>
         <div className="embla__container flex">
-          {images?.slice(0, 10).map((image, index) => (
+          {images?.slice(0, 20).map((image, index) => (
             <div key={index} className="flex flex-col md:flex-row items-center">
               <Link
                 href={`images?imageId=${
@@ -81,7 +81,12 @@ const Carousel = ({ images }: { images: MainImage[] | null }) => {
                     loading="lazy"
                   />
                   {hoveredImageIndex === index && (
-                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                    <div className="flex flex-col absolute inset-0 bg-black bg-opacity-50 items-center justify-center transition-opacity duration-300 ease-in-out">
+                      <h3
+                        className={`${bold_font.className} text-white text-lg mb-2 p-5`}
+                      >
+                        {image.title}
+                      </h3>
                       <p
                         className={`${regular_font.className} px-4 py-2 bg-white text-black rounded-md hover:bg-gray-200 transition-colors text-sm`}
                       >
