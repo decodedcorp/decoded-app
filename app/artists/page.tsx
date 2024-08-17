@@ -52,13 +52,16 @@ function ArtistPage() {
       if (brandTags) {
         const brandInfoList = await Promise.all(
           brandTags.map(async (brandDocId) => {
+            console.log(brandDocId, "brandDocID");
             return (
               await FirebaseHelper.doc("brands", brandDocId)
             ).data() as BrandInfo;
           })
         );
+        console.log(brandInfoList, "brandInfoList");
         brandInfoList.map((brand) => {
-          brandLogo.set(brand.name, brand.logoImageUrl ?? "");
+          console.log(brand.name, "brand.name");
+          brandLogo.set(brand.name ?? "", brand.logoImageUrl ?? "");
         });
       }
       // Update image related artist stuff if any
@@ -145,17 +148,36 @@ function MoreToExploreView({
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+  console.log(artistPageState.artist?.profileImgUrl, "img");
 
   return (
     <div className="w-full text-center">
       {artistPageState.artistImgList &&
         artistPageState.artistImgList.length > 0 && (
           <div className="items-center justify-center">
-            <h2
-              className={`${regular_font.className} text-4xl mb-6 mt-16 md:mt-32 text-left px-4 md:px-20`}
-            >
-              {artistPageState.artist?.name.toUpperCase()}
-            </h2>
+            <div className="flex items-center mb-6 mt-16 md:mt-32 px-4 md:px-20">
+              {artistPageState.artist?.profileImgUrl && (
+                <Image
+                  src={artistPageState.artist.profileImgUrl}
+                  alt={`${artistPageState.artist?.name} profile`}
+                  width={100}
+                  height={100}
+                  className="object-cover"
+                />
+              )}
+              <div className="flex flex-col text-left px-4 md:px-20">
+                <h2 className={`${regular_font.className} text-4xl mb-2`}>
+                  {artistPageState.artist?.name.toUpperCase()}
+                </h2>
+                {artistPageState.artist?.category && (
+                  <p
+                    className={`${regular_font.className} text-lg text-gray-400`}
+                  >
+                    {artistPageState.artist.category.join(", ")}
+                  </p>
+                )}
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 items-stretch place-items-stretch my-10 px-20">
               {currentItems?.map((image, index) => (
                 <Link

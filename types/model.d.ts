@@ -94,6 +94,10 @@ export interface ArtistInfo {
    * @example { "brands": [${doc_id}], "images": ["${doc_id}"] }
    */
   tags?: Record<string, string[]>;
+  /**
+   * @example "https://example.com/image.jpg"
+   */
+  profileImgUrl?: string;
 }
 
 export interface GroupInfo {
@@ -355,4 +359,8 @@ interface ArtistPageState {
    */
   artistImgList?: [string, string][];
   artistArticleList?: ArticleInfo[];
+  /**
+   * [docId, imageUrl]
+   */
+  artistProfileImgUrl?: string;
 }
