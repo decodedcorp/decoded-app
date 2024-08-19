@@ -77,15 +77,15 @@ export interface ArtistInfo {
   /**
    * @example "https://example.com/image.jpg"
    */
-  profileImageUrl?: string;
+  profileImgUrl?: string;
   /**
    * @example ["Jenni", "JenDeuk", "제니"]
    */
   also_known_as?: string[];
   /**
-   * @example "Black Pink"
+   * @example "{kr:블랙핑크, en:Black Pink}"
    */
-  group?: string;
+  group?: Record<string, string>;
   /**
    * @example { "instagram": "https://www.instagram.com/jennie/", "twitter": "https://twitter.com/jennie" }
    */
@@ -97,7 +97,6 @@ export interface ArtistInfo {
   /**
    * @example "https://example.com/image.jpg"
    */
-  profileImgUrl?: string;
 }
 
 export interface GroupInfo {

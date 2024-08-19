@@ -303,36 +303,12 @@ function SearchBar({
 }) {
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
-  const handleSearch = async () => {
+  const handleSearch = () => {
     if (searchQuery.trim() === "") return;
 
-    try {
-      const artistsSnapshot = await FirebaseHelper.docs("artists");
-      let matchingArtist: ArtistInfo | null = null;
-
-      artistsSnapshot.forEach((doc) => {
-        const artist = doc.data() as ArtistInfo;
-        if (
-          artist.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          artist.also_known_as?.some((aka) =>
-            aka.toLowerCase().includes(searchQuery.toLowerCase())
-          )
-        ) {
-          matchingArtist = artist;
-          return true; // 첫 번째 일치하는 아티스트를 찾으면 루프 종료
-        }
-      });
-
-      if (matchingArtist) {
-        router.push(`/artists?name=${encodeURIComponent(matchingArtist.name)}`);
-        setIsOpen(false);
-      } else {
-        alert("베타버전에서는 블랙핑크 뉴진스 맴버들 정보만 제공중입니다.");
-      }
-    } catch (error) {
-      console.error("Search error:", error);
-      alert("검색 중 오류가 발생했습니다.");
-    }
+    // 검색어를 인코딩하여 search 페이지로 이동
+    router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+    setIsOpen(false);
   };
 
   return (
