@@ -28,7 +28,17 @@ function SearchPage() {
 
       artistsSnapshot.forEach((doc) => {
         const artist = doc.data() as ArtistInfo;
-        if (artist.name.toLowerCase().includes(query.toLowerCase())) {
+        const searchableFields = [
+          artist.name,
+          ...(artist.also_known_as || []),
+          ...Object.values(artist.group || {}),
+        ]
+          .filter(Boolean)
+          .map((field) => field.toLowerCase());
+
+        if (
+          searchableFields.some((field) => field.includes(query.toLowerCase()))
+        ) {
           artistResults.push(artist);
         }
       });
