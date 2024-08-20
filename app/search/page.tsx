@@ -57,14 +57,16 @@ function SearchPage() {
   }, [query]);
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 mt-20">
       <h1 className={`${semi_bold_font.className} text-3xl mb-8`}>
         Search Results for "{query}"
       </h1>
       {searchResults.length === 0 &&
       articleResults.length === 0 &&
       brandResults.length === 0 ? (
-        <p className={`${regular_font.className} text-xl`}>No results found.</p>
+        <p className={`${regular_font.className} text-xl`}>
+          현재 검색 결과가 없습니다.
+        </p>
       ) : (
         <>
           {/* Artists Section */}
