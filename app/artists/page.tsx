@@ -27,7 +27,9 @@ function ArtistPage() {
     notFound();
   }
   // Artist page state
-  let [artistPageState, setArtistPageState] = useState<ArtistPageState>({});
+  let [artistPageState, setArtistPageState] = useState<ArtistPageState | null>(
+    null
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -106,12 +108,14 @@ function ArtistPage() {
     };
     fetchData();
   }, [artistName]);
-  console.log(artistPageState);
-  return (
-    <div className="flex-col justify-center text-center items-center">
+
+  return artistPageState ? (
+    <div className="flex-col justify-center text-center items-center min-h-screen">
       <MoreToExploreView artistPageState={artistPageState} />
       <ArtistArticleView artistPageState={artistPageState} />
     </div>
+  ) : (
+    <LoadingView />
   );
 }
 
@@ -151,40 +155,39 @@ function MoreToExploreView({
   console.log(artistPageState.artist?.profileImgUrl, "img");
 
   return (
-    <div className="w-full text-center">
+    <div className="w-full text-center mt-40">
       {artistPageState.artistImgList &&
         artistPageState.artistImgList.length > 0 && (
           <div className="items-center justify-center">
-            <div className="flex items-center mb-6 mt-16 md:mt-32 px-4 md:px-20">
+            <div className="flex flex-col items-center mb-6 mt-16 md:mt-32 px-4 md:px-20">
               {artistPageState.artist?.profileImgUrl && (
                 <Image
                   src={artistPageState.artist.profileImgUrl}
                   alt={`${artistPageState.artist?.name} profile`}
                   width={100}
                   height={100}
-                  className="object-cover"
+                  className="object-cover rounded-full"
                 />
               )}
-              <div className="flex flex-col text-left px-4 md:px-20">
-                <h2 className={`${regular_font.className} text-4xl mb-2`}>
+              <div className="flex flex-col text-left px-4 md:px-10 mt-2">
+                <a
+                  className={`${bold_font.className} text-4xl mb-2 hover:underline`}
+                  href={
+                    artistPageState.artist?.sns?.instagram ??
+                    artistPageState.artist?.sns?.youtube
+                  }
+                >
                   {artistPageState.artist?.name.toUpperCase()}
-                </h2>
-                {artistPageState.artist?.category && (
-                  <p
-                    className={`${regular_font.className} text-lg text-gray-400`}
-                  >
-                    {artistPageState.artist.category.join(", ")}
-                  </p>
-                )}
+                </a>
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 items-stretch place-items-stretch my-10 px-20">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 items-stretch place-items-stretch my-20 px-20">
               {currentItems?.map((image, index) => (
                 <Link
                   key={index}
-                  href={`?imageId=${image[0]}&imageUrl=${encodeURIComponent(
-                    image[1]
-                  )}`}
+                  href={`/images?imageId=${
+                    image[0]
+                  }&imageUrl=${encodeURIComponent(image[1])}`}
                   prefetch={true}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -212,7 +215,7 @@ function MoreToExploreView({
               ))}
             </div>
             {totalPages > 1 && (
-              <div className="flex justify-center space-x-2 mt-5">
+              <div className="flex justify-center space-x-2">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                   (page) => (
                     <button
@@ -242,21 +245,8 @@ function ArtistArticleView({
   artistPageState: ArtistPageState;
 }) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(1);
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 768) {
-        setItemsPerPage(3);
-      } else {
-        setItemsPerPage(1);
-      }
-    };
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
-    handleResize(); // 초기 설정
-    window.addEventListener("resize", handleResize);
-
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
   const totalPages = Math.ceil(
     (artistPageState.artistArticleList?.length || 0) / itemsPerPage
   );
@@ -266,46 +256,30 @@ function ArtistArticleView({
   );
   return (
     artistPageState.artistArticleList && (
-      <div className="flex flex-col mt-10 justify-center">
-        <h2 className={`${regular_font.className} text-xl mb-10`}>Articles</h2>
-        <div className="grid grid-cols-1 items-center justify-center lg:grid-cols-3 p-10">
+      <div className="flex flex-col mt-20 justify-center">
+        <h2 className={`${bold_font.className} text-6xl mb-10`}>ARTICLES</h2>
+        <ul className="list-disc list-inside space-y-4 px-4 md:px-10 text-4xl mt-10">
           {currentItems?.map((article, index) => (
-            <div
-              key={index}
-              className="flex flex-col items-center justify-center"
-            >
+            <li key={index} className="text-left">
               <Link
-                key={index}
                 href={(article.src as string) ?? ""}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="relative flex flex-col w-[400px] h-[400px] justify-center items-center"
               >
-                <Image
-                  src={article.imageUrl ?? ""}
-                  alt={article.title ?? ""}
-                  fill={true}
-                  style={{ objectFit: "cover" }}
-                  className="rounded-md hover:scale-105 transition-all duration-300"
-                />
-              </Link>
-              <div className="flex flex-col w-full text-left p-2">
-                {article.source && (
-                  <p
-                    className={`${bold_font.className} text-sm text-white mt-5`}
-                  >
-                    {article.source.toUpperCase()}
-                  </p>
-                )}
-                <p
-                  className={`${regular_font.className} text-md text-white hover:underline cursor-pointer mt-2 `}
+                <span
+                  className={`${regular_font.className} text-md text-white ml-2 hover:underline`}
                 >
                   {article.title}
-                </p>
-              </div>
-            </div>
+                </span>
+                <span
+                  className={`${bold_font.className} text-sm text-orange-400`}
+                >
+                  {article.source?.toUpperCase()}
+                </span>
+              </Link>
+            </li>
           ))}
-        </div>
+        </ul>
         {totalPages > 1 && (
           <div className="flex justify-center space-x-2 mt-5">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (

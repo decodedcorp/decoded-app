@@ -21,7 +21,7 @@ const Carousel = ({ images }: { images: MainImage[] | null }) => {
         stopOnMouseEnter: true,
         stopOnInteraction: false,
       }),
-    ]
+    ],
   );
   const selectedScrollSnap = useCallback((emblaApi: EmblaCarouselType) => {
     setSelectedIndex(emblaApi.selectedScrollSnap());
@@ -40,7 +40,7 @@ const Carousel = ({ images }: { images: MainImage[] | null }) => {
   };
 
   const [hoveredImageIndex, setHoveredImageIndex] = useState<number | null>(
-    null
+    null,
   );
 
   return (
@@ -64,7 +64,7 @@ const Carousel = ({ images }: { images: MainImage[] | null }) => {
               <Link
                 href={`images?imageId=${
                   image.docId
-                }&imageUrl=${encodeURIComponent(image.imageUrl)}&isFeatured=no`}
+                }&imageUrl=${encodeURIComponent(image.imageUrl)}`}
                 className="embla__slide relative w-80 md:w-96 h-[500px]"
                 key={index}
               >

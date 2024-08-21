@@ -28,10 +28,10 @@ function DetailPage() {
   const isFeatured = searchParams.get("isFeatured");
   const [artistDocId, setArtistDocId] = useState<string | null>(null);
 
-  if (!imageId || !imageUrl || !isFeatured) {
+  if (!imageId || !imageUrl) {
     notFound();
   }
-  const isFeaturedBool = isFeatured === "yes";
+  const isFeaturedBool = isFeatured ? true : false;
 
   return isFeaturedBool ? (
     <MultiImageView imageId={imageId} />
@@ -137,6 +137,7 @@ function SingleImageView({
         imgDocId
       );
       var brandList: string[] = [];
+      var brandUrlList: Map<string, string> = new Map();
       const brandLogo: Map<string, string> = new Map();
       var artistList: string[] = [];
       var artistArticleList: ArticleInfo[] | undefined = undefined;
@@ -148,7 +149,15 @@ function SingleImageView({
       const brandTags = img.tags?.brands;
 
       brandList = Array.from(
-        new Set(itemList.map((item) => item.info.brands || []).flat())
+        new Set(
+          itemList
+            .map((item) =>
+              (item.info.brands || []).map((brand) =>
+                brand.toLowerCase().replace(/\s/g, "_")
+              )
+            )
+            .flat()
+        )
       );
 
       if (brandTags) {
@@ -161,6 +170,11 @@ function SingleImageView({
         );
         brandInfoList.map((brand) => {
           brandLogo.set(brand.name, brand.logoImageUrl ?? "");
+          // key is brand name in lowercase with spaces replaced with underscores
+          brandUrlList.set(
+            brand.name.toLowerCase().replace(/\s/g, "_"),
+            brand.sns?.["instagram"] ?? brand.websiteUrl ?? ""
+          );
         });
       }
       // Update image related artist stuff if any
@@ -215,7 +229,7 @@ function SingleImageView({
       setDetailPageState({
         img: img,
         itemList: itemList,
-        brandList: brandList,
+        brandUrlList: brandUrlList,
         brandImgList: brandLogo,
         artistImgList: artistImgList,
         artistList: artistList,
@@ -298,7 +312,7 @@ function DescriptionView({
           <Link
             key={index}
             href={`/artists?name=${encodeURIComponent(name)}`}
-            className={`${semi_bold_font.className} text-md font-bold mx-2`}
+            className={`${semi_bold_font.className} text-xl font-bold mx-2`}
           >
             <p className="underline">{name.toUpperCase()}</p>
           </Link>
@@ -351,8 +365,8 @@ function ImageView({
   };
 
   return (
-    <div className="flex flex-col w-[100vw] md:flex-row justify-center px-2 md:px-20 mt-10">
-      <div className="w-full ">
+    <div className="flex flex-col w-full md:flex-row justify-center px-2 md:px-20 mt-10">
+      <div className="w-full">
         <div className="relative w-full aspect-w-3 aspect-h-4">
           <Image
             src={imageUrl}
@@ -420,15 +434,22 @@ function ImageView({
                   height={25}
                   className="rounded-full"
                 />
-                <p className={`${semi_bold_font.className} text-md ml-2`}>
-                  {item.info.brands?.[0].toUpperCase()}
-                </p>
+                <a
+                  className={`${regular_font.className} text-xl ml-2 hover:underline hover:cursor-pointer`}
+                  href={
+                    detailPageState.brandUrlList?.get(
+                      item.info.brands?.[0] ?? ""
+                    ) ?? ""
+                  }
+                >
+                  {item.info.brands?.[0].replace(/_/g, " ").toUpperCase()}
+                </a>
               </div>
               <div className="flex justify-center items-center mt-2 md:mt-20">
-                <div className="relative group w-[200px] md:w-[400px] h-[200px] md:h-[400px]">
+                <div className="relative group w-[100vw] md:w-[400px] h-[100vh] md:h-[600px]">
                   <Link
                     href={item.info.affiliateUrl ?? ""}
-                    className="block w-full h-full hover:scale-105 transition-all duration-300"
+                    className="block w-full h-full"
                     onMouseOver={() => handleCurrentIndex(index)}
                   >
                     <div className="relative w-full h-full">
@@ -528,7 +549,7 @@ function MoreToExploreView({
                   key={index}
                   href={`?imageId=${image[0]}&imageUrl=${encodeURIComponent(
                     image[1]
-                  )}&isFeatured=false`}
+                  )}`}
                   prefetch={false}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -596,7 +617,7 @@ function ArtistArticleView({
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768) {
-        setItemsPerPage(3);
+        setItemsPerPage(1);
       } else {
         setItemsPerPage(1);
       }
@@ -620,7 +641,7 @@ function ArtistArticleView({
         <h2 className={`${regular_font.className} text-xl`}>
           Related Articles
         </h2>
-        <div className="grid grid-cols-1 items-center justify-center lg:grid-cols-3 p-10 gap-4">
+        <div className="grid grid-cols-1 items-center justify-center p-10 gap-4">
           {currentItems?.map((article, index) => (
             <div
               key={index}
@@ -631,31 +652,22 @@ function ArtistArticleView({
                 href={(article.src as string) ?? ""}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="relative flex flex-col w-full h-[400px] justify-center items-center"
+                className="relative flex flex-col w-full h-[90vh] justify-center items-center"
               >
                 <Image
                   src={article.imageUrl ?? ""}
                   alt={article.title ?? ""}
                   fill={true}
                   style={{ objectFit: "cover" }}
-                  className="rounded-md hover:scale-105 transition-all duration-300"
+                  className="rounded-md"
                   loading="lazy"
                 />
               </Link>
-              <div className="flex flex-col w-full text-left">
-                {article.source && (
-                  <p
-                    className={`${bold_font.className} text-sm text-white mt-5`}
-                  >
-                    {article.source.toUpperCase()}
-                  </p>
-                )}
-                <p
-                  className={`${regular_font.className} text-sm text-white hover:underline cursor-pointer mt-2 `}
-                >
-                  {article.title}
-                </p>
-              </div>
+              <p
+                className={`${semi_bold_font.className} text-2xl text-white hover:underline cursor-pointer mt-10 `}
+              >
+                {article.title}
+              </p>
             </div>
           ))}
         </div>

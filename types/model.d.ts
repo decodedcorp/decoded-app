@@ -322,7 +322,7 @@ interface DetailPageState {
   /**
    * Brand names
    */
-  brandList?: string[];
+  brandUrlList?: Map<string, string>;
   /**
    * Brand image list
    */

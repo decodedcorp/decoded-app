@@ -4,21 +4,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, Dispatch, SetStateAction, useEffect } from "react";
-import {
-  bold_font,
-  regular_font,
-  semi_bold_font,
-} from "@/components/helpers/util";
+import { regular_font, semi_bold_font } from "@/components/helpers/util";
 import { LoginModal } from "./ui/modal";
 import white_logo from "@/assets/white_logo.png";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
-import sha256 from "js-sha256";
-import { FirebaseHelper } from "@/common/firebase";
-import { ArtistInfo } from "@/types/model";
 
-const headers = ["home", "news", "search"];
+const headers = ["home", "search"];
 
 function Header() {
   const [isLogin, setIsLogin] = useState(false);
@@ -217,8 +210,8 @@ function MenuSection({
                       ? "border-b-2 border-[#ffffff]"
                       : ""
                     : currentPath === header
-                    ? "border-b-2 border-[#ffffff]"
-                    : ""
+                      ? "border-b-2 border-[#ffffff]"
+                      : ""
                 }`}
               >
                 <Link
