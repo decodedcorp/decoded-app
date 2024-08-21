@@ -70,7 +70,7 @@ function MultiImageView({ imageId }: { imageId: string }) {
             imageDocId: imageDocId,
             imgInfo: imgRef.data() as ImageInfo,
           };
-        })
+        }),
       );
       setTitle(img.title);
       setDescription(img.description);
@@ -122,7 +122,7 @@ function SingleImageView({
   isFeatured: boolean;
 }) {
   let [detailPageState, setDetailPageState] = useState<DetailPageState | null>(
-    null
+    null,
   );
   useEffect(() => {
     const fetch = async () => {
@@ -133,9 +133,8 @@ function SingleImageView({
       const img = (
         await FirebaseHelper.doc("images", imgDocId)
       ).data() as ImageInfo;
-      const itemList: HoverItem[] = await FirebaseHelper.getHoverItems(
-        imgDocId
-      );
+      const itemList: HoverItem[] =
+        await FirebaseHelper.getHoverItems(imgDocId);
       var brandList: string[] = [];
       var brandUrlList: Map<string, string> = new Map();
       const brandLogo: Map<string, string> = new Map();
@@ -153,11 +152,11 @@ function SingleImageView({
           itemList
             .map((item) =>
               (item.info.brands || []).map((brand) =>
-                brand.toLowerCase().replace(/\s/g, "_")
-              )
+                brand.toLowerCase().replace(/\s/g, "_"),
+              ),
             )
-            .flat()
-        )
+            .flat(),
+        ),
       );
 
       if (brandTags) {
@@ -166,14 +165,14 @@ function SingleImageView({
             return (
               await FirebaseHelper.doc("brands", brandDocId)
             ).data() as BrandInfo;
-          })
+          }),
         );
         brandInfoList.map((brand) => {
           brandLogo.set(brand.name, brand.logoImageUrl ?? "");
           // key is brand name in lowercase with spaces replaced with underscores
           brandUrlList.set(
             brand.name.toLowerCase().replace(/\s/g, "_"),
-            brand.sns?.["instagram"] ?? brand.websiteUrl ?? ""
+            brand.sns?.["instagram"] ?? brand.websiteUrl ?? "",
           );
         });
       }
@@ -184,7 +183,7 @@ function SingleImageView({
             return (
               await FirebaseHelper.doc("artists", artistDocId)
             ).data() as ArtistInfo;
-          })
+          }),
         );
         await Promise.all(
           artistInfoList.map(async (a) => {
@@ -200,7 +199,7 @@ function SingleImageView({
                   return (
                     await FirebaseHelper.doc("articles", articleDocId)
                   ).data() as ArticleInfo;
-                })
+                }),
               );
               artistArticleList = articles;
             }
@@ -220,10 +219,10 @@ function SingleImageView({
                     const imageUrl = await FirebaseHelper.downloadUrl(image);
                     artistImgList.push([docId, imageUrl]);
                   }
-                })
+                }),
               );
             }
-          })
+          }),
         );
       }
       setDetailPageState({
@@ -318,25 +317,6 @@ function DescriptionView({
           </Link>
         ))}
       </div>
-      {/* List all colors */}
-      {/* {detailPageState.colorInfo?.style?.length && (
-        <div className="items-center justify-center my-5">
-          <p
-            className={`${semi_bold_font.className} text-lg md:text-2xl`}
-          >
-            STYLE COLORS:{" "}
-          </p>
-          <div className="flex flex-row w-full justify-center">
-            {detailPageState?.colorInfo?.style?.map((color) => (
-              <div
-                key={color}
-                className="w-10 h-10 rounded-full m-2"
-                style={{ backgroundColor: color }}
-              ></div>
-            ))}
-          </div>
-        </div>
-      )} */}
     </div>
   );
 }
@@ -352,11 +332,11 @@ function ImageView({
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 1;
   const totalPages = Math.ceil(
-    (detailPageState.itemList?.length || 0) / itemsPerPage
+    (detailPageState.itemList?.length || 0) / itemsPerPage,
   );
   const currentItems = detailPageState.itemList?.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   const handleCurrentIndex = (index: number) => {
@@ -426,7 +406,7 @@ function ImageView({
                 <Image
                   src={
                     detailPageState.brandImgList?.get(
-                      item.info.brands?.[0] ?? ""
+                      item.info.brands?.[0] ?? "",
                     ) ?? ""
                   }
                   alt={item.info.brands?.[0] ?? ""}
@@ -438,7 +418,7 @@ function ImageView({
                   className={`${regular_font.className} text-xl ml-2 hover:underline hover:cursor-pointer`}
                   href={
                     detailPageState.brandUrlList?.get(
-                      item.info.brands?.[0] ?? ""
+                      item.info.brands?.[0] ?? "",
                     ) ?? ""
                   }
                 >
@@ -507,7 +487,7 @@ function MoreToExploreView({
   detailPageState: DetailPageState;
 }) {
   const [hoveredImageIndex, setHoveredImageIndex] = useState<number | null>(
-    null
+    null,
   );
   const [itemsPerPage, setItemsPerPage] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
@@ -527,12 +507,12 @@ function MoreToExploreView({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
   const totalPages = Math.ceil(
-    (detailPageState.artistImgList?.length || 0) / itemsPerPage
+    (detailPageState.artistImgList?.length || 0) / itemsPerPage,
   );
   console.log(totalPages);
   const currentItems = detailPageState.artistImgList?.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   return (
@@ -548,7 +528,7 @@ function MoreToExploreView({
                 <Link
                   key={index}
                   href={`?imageId=${image[0]}&imageUrl=${encodeURIComponent(
-                    image[1]
+                    image[1],
                   )}`}
                   prefetch={false}
                   target="_blank"
@@ -597,7 +577,7 @@ function MoreToExploreView({
                     >
                       •
                     </button>
-                  )
+                  ),
                 )}
               </div>
             )}
@@ -629,11 +609,11 @@ function ArtistArticleView({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
   const totalPages = Math.ceil(
-    (detailPageState.artistArticleList?.length || 0) / itemsPerPage
+    (detailPageState.artistArticleList?.length || 0) / itemsPerPage,
   );
   const currentItems = detailPageState.artistArticleList?.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
   return (
     detailPageState.artistArticleList && (
