@@ -26,7 +26,6 @@ function DetailPage() {
   const imageId = searchParams.get("imageId");
   const imageUrl = searchParams.get("imageUrl");
   const isFeatured = searchParams.get("isFeatured");
-  const [artistDocId, setArtistDocId] = useState<string | null>(null);
 
   if (!imageId || !imageUrl) {
     notFound();
@@ -50,9 +49,14 @@ function MultiImageView({ imageId }: { imageId: string }) {
   const [featuredImgs, setFeaturedImgs] = useState<
     { imageUrl: string; imgInfo: ImageInfo; imageDocId: string }[] | null
   >(null);
-
+  const [artistArticleList, setArtistArticleList] = useState<ArticleInfo[] | undefined>(undefined);
+  const [artistImgList, setArtistImgList] = useState<[string, string][]>([]);
+  
   useEffect(() => {
     const fetchFeaturedImage = async () => {
+      var artistArticleList: ArticleInfo[] | undefined = undefined;
+      var artistImgList: [string, string][] = [];
+      var filter: string[] = [];
       const imgDocId = decodeURIComponent(imageId);
       if (!(await FirebaseHelper.docExists("featured", imgDocId))) {
         return;
@@ -62,24 +66,77 @@ function MultiImageView({ imageId }: { imageId: string }) {
       ).data() as FeaturedInfo;
       let featuredImgs = await Promise.all(
         img.images.map(async (imageDocId) => {
+          filter.push(imageDocId);
           const imgRef = await FirebaseHelper.doc("images", imageDocId);
+          const imgInfo = imgRef.data() as ImageInfo;
           const ref = FirebaseHelper.storageRef(`images/${imageDocId}`);
           const url = await FirebaseHelper.downloadUrl(ref);
+          const artistTags = imgInfo.tags?.artists;
+          // TODO: Make it simple
+          if (artistTags) {
+            const artistInfoList = await Promise.all(
+              artistTags.map(async (artistDocId) => {
+                return (
+                  await FirebaseHelper.doc("artists", artistDocId)
+                ).data() as ArtistInfo;
+              }),
+            );
+            await Promise.all(
+              artistInfoList.map(async (a) => {
+                const artistArticleDocIdList = a.tags?.articles;
+                const artistImgDocIdList = a.tags?.images;
+    
+                if (artistArticleDocIdList) {
+                  const articles = await Promise.all(
+                    artistArticleDocIdList.map(async (articleDocId) => {
+                      return (
+                        await FirebaseHelper.doc("articles", articleDocId)
+                      ).data() as ArticleInfo;
+                    }),
+                  );
+                  artistArticleList = articles;
+                }
+                if (artistImgDocIdList) {
+                  const images = await FirebaseHelper.listAllStorageItems("images");
+                  // Since item_doc_id is stored as custom metadata, logic is a bit complicated.
+                  // After changing item_doc_id as file name, it would be simpler
+                  await Promise.all(
+                    images.items.map(async (image) => {
+                      const metadata = await FirebaseHelper.metadata(image);
+                      const docId = metadata?.customMetadata?.id;
+                      if (docId && artistImgDocIdList.includes(docId)) {
+                        // Skip if it's the same image
+                        if (docId === imgDocId) {
+                          return;
+                        }
+                        const imageUrl = await FirebaseHelper.downloadUrl(image);
+                        artistImgList.push([docId, imageUrl]);
+                      }
+                    }),
+                  );
+                }
+              }),
+            );
+          }
           return {
             imageUrl: url,
             imageDocId: imageDocId,
-            imgInfo: imgRef.data() as ImageInfo,
+            imgInfo: imgInfo,
+            artistArticleList: artistArticleList,
+            artistImgList: artistImgList,
           };
         }),
       );
       setTitle(img.title);
       setDescription(img.description);
+      setArtistArticleList(artistArticleList);
+      setArtistImgList(artistImgList.filter(([id, _]) => !filter.includes(id)));
       setFeaturedImgs(featuredImgs);
     };
     fetchFeaturedImage();
   }, [imageId]);
   return featuredImgs ? (
-    <div className="flex flex-col justify-center items-center my-32 p-2">
+    <div className="flex flex-col justify-center items-center my-32 p-2 w-full">
       <div className="flex flex-col items-center p-10">
         <h1
           className={`${bold_font.className} text-3xl md:text-5xl font-bold text-white mb-5`}
@@ -106,6 +163,8 @@ function MultiImageView({ imageId }: { imageId: string }) {
           />
         </div>
       ))}
+      <MoreToExploreView imgList={artistImgList} />
+      <ArtistArticleView articleList={artistArticleList} />
     </div>
   ) : (
     <LoadingView />
@@ -250,8 +309,8 @@ function SingleImageView({
           isFeatured={isFeatured}
         />
       </div>
-      <MoreToExploreView detailPageState={detailPageState} />
-      <ArtistArticleView detailPageState={detailPageState} />
+      <MoreToExploreView imgList={detailPageState.artistImgList} />
+      <ArtistArticleView articleList={detailPageState.artistArticleList} />
     </div>
   ) : (
     <LoadingView />
@@ -482,9 +541,9 @@ function ImageView({
 }
 
 function MoreToExploreView({
-  detailPageState,
+  imgList,
 }: {
-  detailPageState: DetailPageState;
+  imgList: [string, string][] | undefined;
 }) {
   const [hoveredImageIndex, setHoveredImageIndex] = useState<number | null>(
     null,
@@ -507,18 +566,18 @@ function MoreToExploreView({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
   const totalPages = Math.ceil(
-    (detailPageState.artistImgList?.length || 0) / itemsPerPage,
+    (imgList?.length || 0) / itemsPerPage,
   );
   console.log(totalPages);
-  const currentItems = detailPageState.artistImgList?.slice(
+  const currentItems = imgList?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   );
 
   return (
-    <div className="w-full text-center mt-44">
-      {detailPageState.artistImgList &&
-        detailPageState.artistImgList.length > 0 && (
+    <div className="w-full text-center mt-20">
+      {imgList &&
+        imgList.length > 0 && (
           <div className="items-center justify-center mt-10">
             <h2 className={`${regular_font.className} text-xl`}>
               More to explore
@@ -547,11 +606,6 @@ function MoreToExploreView({
                   />
                   {hoveredImageIndex === index && (
                     <div className="flex flex-col absolute inset-0 bg-black bg-opacity-50 items-center justify-center transition-opacity duration-300 ease-in-out">
-                      <h3
-                        className={`${bold_font.className} text-white text-lg mb-2 p-5`}
-                      >
-                        {detailPageState.img?.title}
-                      </h3>
                       <p
                         className={`${regular_font.className} px-4 py-2 bg-white text-black rounded-md hover:bg-gray-200 transition-colors text-sm`}
                       >
@@ -588,9 +642,9 @@ function MoreToExploreView({
 }
 
 function ArtistArticleView({
-  detailPageState,
+  articleList,
 }: {
-  detailPageState: DetailPageState;
+  articleList: ArticleInfo[] | undefined;
 }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(1);
@@ -609,16 +663,16 @@ function ArtistArticleView({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
   const totalPages = Math.ceil(
-    (detailPageState.artistArticleList?.length || 0) / itemsPerPage,
+    (articleList?.length || 0) / itemsPerPage,
   );
-  const currentItems = detailPageState.artistArticleList?.slice(
+  const currentItems = articleList?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   );
   return (
-    detailPageState.artistArticleList && (
-      <div className="flex flex-col mt-10 justify-center">
-        <h2 className={`${regular_font.className} text-xl`}>
+    articleList && (
+      <div className="flex flex-col mt-10 justify-center w-full">
+        <h2 className={`${regular_font.className} text-xl text-center`}>
           Related Articles
         </h2>
         <div className="grid grid-cols-1 items-center justify-center p-10 gap-4">
