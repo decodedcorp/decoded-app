@@ -67,9 +67,9 @@ function SearchPage() {
   }, [query]);
 
   return (
-    <div className="container mx-auto px-4 py-8 mt-20">
-      <h1 className={`${semi_bold_font.className} text-3xl mb-8`}>
-        Search Results for "{query}"
+    <div className="mx-auto px-4 py-8 mt-20">
+      <h1 className={`${semi_bold_font.className} text-3xl md:text-5xl mb-8`}>
+        "{query}" 검색 결과
       </h1>
       {searchResults.length === 0 &&
       articleResults.length === 0 &&
@@ -81,7 +81,7 @@ function SearchPage() {
         <>
           {/* Artists Section */}
           {searchResults.length > 0 && (
-            <div className="mb-12">
+            <div className="my-10">
               <h2 className={`${semi_bold_font.className} text-2xl mb-6`}>
                 Artists
               </h2>
@@ -92,29 +92,14 @@ function SearchPage() {
                     key={index}
                     className="block"
                   >
-                    <div className="bg-gray-800 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                      <div className="relative w-full pb-[100%]">
-                        <Image
-                          src={artist.profileImgUrl || "/placeholder.jpg"}
-                          alt={artist.name}
-                          fill
-                          style={{ objectFit: "cover" }}
-                        />
-                      </div>
-                      <div className="p-3">
-                        <h2
-                          className={`${semi_bold_font.className} text-sm mb-1 truncate`}
-                        >
-                          {artist.name}
-                        </h2>
-                        {artist.group && (
-                          <p
-                            className={`${regular_font.className} text-gray-400 text-xs truncate`}
-                          >
-                            {Object.values(artist.group).join(", ")}
-                          </p>
-                        )}
-                      </div>
+                    <div className="relative w-[200px] h-[200px] hover:scale-105 transition-all duration-300">
+                      <Image
+                        src={artist.profileImgUrl || "/placeholder.jpg"}
+                        alt={artist.name}
+                        fill
+                        style={{ objectFit: "cover" }}
+                        className="rounded-full"
+                      />
                     </div>
                   </Link>
                 ))}
@@ -180,19 +165,19 @@ function SearchPage() {
                         />
                       </div>
                     )}
-                    <div className="p-4">
+                    <div className="p-2">
+                      {article.source && (
+                          <p
+                            className={`${regular_font.className} text-gray-400 text-sm w-fit`}
+                          >
+                            {article.source.toUpperCase()}
+                        </p>
+                      )}
                       <h3
-                        className={`${semi_bold_font.className} text-lg mb-2 line-clamp-2`}
+                        className={`${semi_bold_font.className} text-lg mt-2 line-clamp-2`}
                       >
                         {article.title}
                       </h3>
-                      {article.source && (
-                        <p
-                          className={`${regular_font.className} text-gray-400 text-sm`}
-                        >
-                          Source: {article.source}
-                        </p>
-                      )}
                     </div>
                   </div>
                 ))}
