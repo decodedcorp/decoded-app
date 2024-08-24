@@ -5,7 +5,6 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, Dispatch, SetStateAction, useEffect } from "react";
 import { regular_font, semi_bold_font } from "@/components/helpers/util";
-import { LoginModal } from "./ui/modal";
 import white_logo from "@/assets/white_logo.png";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
@@ -14,7 +13,6 @@ import MenuIcon from "@mui/icons-material/Menu";
 const headers = ["home", "search"];
 
 function Header() {
-  const [isLogin, setIsLogin] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [lastScrollTop, setLastScrollTop] = useState(0);
   const [koreanTime, setKoreanTime] = useState("");
@@ -100,8 +98,6 @@ function Header() {
           </div>
           <Logo isScrolled={isScrolled} />
           <MenuSection
-            isLogin={isLogin}
-            setIsLogin={setIsLogin}
             isSearchOpen={isSearchOpen}
             setIsSearchOpen={setIsSearchOpen}
             isSidebarOpen={isSidebarOpen}
@@ -143,15 +139,11 @@ function Logo({ isScrolled }: { isScrolled: boolean }) {
 }
 
 function MenuSection({
-  isLogin,
-  setIsLogin,
   isSearchOpen,
   setIsSearchOpen,
   isSidebarOpen,
   setIsSidebarOpen,
 }: {
-  isLogin: boolean;
-  setIsLogin: Dispatch<SetStateAction<boolean>>;
   isSearchOpen: boolean;
   isSidebarOpen: boolean;
   setIsSearchOpen: Dispatch<SetStateAction<boolean>>;
@@ -166,31 +158,7 @@ function MenuSection({
       <nav className="w-full justify-end text-white relative">
         <ul className="hidden md:flex flex-row gap-3 justify-end pr-1 items-center text-white">
           {headers.map((header, index) => {
-            if (header === "login") {
-              return (
-                <div
-                  key={index}
-                  className={`text-md cursor-pointer ${regular_font.className}`}
-                  onClick={() =>
-                    (
-                      document.getElementById("my_modal_4") as HTMLDialogElement
-                    )?.showModal()
-                  }
-                >
-                  {isLogin ? (
-                    <div
-                      className="cursor-pointer"
-                      onClick={() => setIsLogin(false)}
-                    >
-                      LOGOUT
-                    </div>
-                  ) : (
-                    header.toUpperCase()
-                  )}
-                  <LoginModal setIsLogin={setIsLogin} />
-                </div>
-              );
-            } else if (header === "search") {
+            if (header === "search") {
               return (
                 <div
                   key={index}
@@ -210,8 +178,8 @@ function MenuSection({
                       ? "border-b-2 border-[#ffffff]"
                       : ""
                     : currentPath === header
-                      ? "border-b-2 border-[#ffffff]"
-                      : ""
+                    ? "border-b-2 border-[#ffffff]"
+                    : ""
                 }`}
               >
                 <Link
