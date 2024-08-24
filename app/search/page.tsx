@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { FirebaseHelper } from "@/common/firebase";
-import { ArtistInfo, ArticleInfo, BrandInfo } from "@/types/model";
+import { ArtistInfo } from "@/types/model";
 import { regular_font, semi_bold_font } from "@/components/helpers/util";
 
 function SearchPage() {
