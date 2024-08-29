@@ -53,7 +53,7 @@ function Home() {
                 });
                 const res = await Promise.all(artistPromises);
                 artistInfoList = res.filter(
-                  (artist): artist is ArtistInfo => artist !== undefined,
+                  (artist): artist is ArtistInfo => artist !== undefined
                 );
               }
               var itemInfoList = new Map<ItemInfo, [Position, BrandInfo[]]>();
@@ -62,7 +62,7 @@ function Home() {
                   const taggedItem = item as TaggedItem;
                   const itemDoc = await FirebaseHelper.doc(
                     "items",
-                    taggedItem.id,
+                    taggedItem.id
                   );
                   if (itemDoc.exists()) {
                     const itemInfo = itemDoc.data() as ItemInfo;
@@ -78,7 +78,7 @@ function Home() {
                       });
                       const res = await Promise.all(brandPromises);
                       brandInfo = res.filter(
-                        (brand): brand is BrandInfo => brand !== undefined,
+                        (brand): brand is BrandInfo => brand !== undefined
                       );
                     }
                     itemInfoList.set(itemInfo, [taggedItem.pos, brandInfo]);
@@ -101,10 +101,10 @@ function Home() {
             console.error("Error processing item:", error);
             return;
           }
-        }),
+        })
       );
       let filtered = images.filter(
-        (image): image is MainImage => image !== undefined,
+        (image): image is MainImage => image !== undefined
       );
       setMainImages(filtered);
     };
@@ -255,7 +255,7 @@ function NewsSection() {
       const sortedArticles = articleInfoList.sort(
         (a, b) =>
           new Date(b.createdAt ?? "").getTime() -
-          new Date(a.createdAt ?? "").getTime(),
+          new Date(a.createdAt ?? "").getTime()
       );
 
       setLatestArticles(sortedArticles.slice(0, 4));
@@ -335,7 +335,7 @@ function RequestSection() {
   const handleRequest = () => {
     const userDocId = window.sessionStorage.getItem("USER_DOC_ID");
     if (!userDocId) {
-      alert("WIP");
+      alert("해당기능은 준비중입니다.");
       return;
     }
     (document.getElementById("my_modal_1") as HTMLDialogElement)?.showModal();

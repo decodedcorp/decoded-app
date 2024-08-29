@@ -106,13 +106,11 @@ export class FirebaseHelper {
         email,
         password
       );
-      console.log(userCredential.user.uid);
       if (userCredential.user.uid === process.env.NEXT_PUBLIC_ADMIN_UID) {
         return true;
       }
       return false;
     } catch (error) {
-      console.log("Error on login!", error);
       return false;
     }
   }
@@ -224,11 +222,9 @@ export class FirebaseHelper {
           ) as HoverItem[];
           return res;
         } catch (error) {
-          console.log(error);
           return [];
         }
       } else {
-        console.log("No such document!");
         return [];
       }
     } catch (error) {

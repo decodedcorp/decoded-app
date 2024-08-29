@@ -575,7 +575,6 @@ function MoreToExploreView({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
   const totalPages = Math.ceil((imgList?.length || 0) / itemsPerPage);
-  console.log(totalPages);
   const currentItems = imgList?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage

@@ -53,7 +53,6 @@ function SearchPage() {
       brandsSnapshot.forEach((doc) => {
         const brand = doc.data() as BrandInfo;
         if (brand.name.toLowerCase().includes(query.toLowerCase())) {
-          console.log(brand, "brand");
           brandResults.push(brand);
         }
       });

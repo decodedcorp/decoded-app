@@ -34,9 +34,6 @@ function ArtistPage() {
   useEffect(() => {
     const fetchData = async () => {
       const artistDocId = sha256(artistName);
-      if (!(await FirebaseHelper.docExists("artists", artistDocId))) {
-        return console.log("Artist not found", artistDocId);
-      }
       const artist = (
         await FirebaseHelper.doc("artists", artistDocId)
       ).data() as ArtistInfo;
@@ -54,15 +51,12 @@ function ArtistPage() {
       if (brandTags) {
         const brandInfoList = await Promise.all(
           brandTags.map(async (brandDocId) => {
-            console.log(brandDocId, "brandDocID");
             return (
               await FirebaseHelper.doc("brands", brandDocId)
             ).data() as BrandInfo;
           })
         );
-        console.log(brandInfoList, "brandInfoList");
         brandInfoList.map((brand) => {
-          console.log(brand.name, "brand.name");
           brandLogo.set(brand.name ?? "", brand.logoImageUrl ?? "");
         });
       }
@@ -70,8 +64,6 @@ function ArtistPage() {
       if (imgArtistTags) {
         const artistArticleDocIdList = artist.tags?.articles;
         const artistImgDocIdList = artist.tags?.images;
-        console.log("img", artistImgDocIdList);
-        console.log("article", artistArticleDocIdList);
         if (artistArticleDocIdList) {
           const articles = await Promise.all(
             artistArticleDocIdList.map(async (articleDocId) => {
@@ -147,12 +139,10 @@ function MoreToExploreView({
   const totalPages = Math.ceil(
     (artistPageState.artistImgList?.length || 0) / itemsPerPage
   );
-  console.log(totalPages);
   const currentItems = artistPageState.artistImgList?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-  console.log(artistPageState.artist?.profileImgUrl, "img");
 
   return (
     <div className="w-full text-center mt-40">
