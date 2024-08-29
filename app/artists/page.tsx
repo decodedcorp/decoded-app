@@ -161,15 +161,16 @@ function MoreToExploreView({
           <div className="items-center justify-center">
             <div className="flex flex-col items-center mb-6 mt-16 md:mt-32 px-4 md:px-20">
               {artistPageState.artist?.profileImgUrl && (
-                <Image
-                  src={artistPageState.artist.profileImgUrl}
-                  alt={`${artistPageState.artist?.name} profile`}
-                  width={100}
-                  height={100}
-                  className="object-cover rounded-full"
-                />
+                <div className="relative w-[150px] h-[150px] rounded-full overflow-hidden">
+                  <Image
+                    src={artistPageState.artist.profileImgUrl}
+                    alt={`${artistPageState.artist?.name} profile`}
+                    fill={true}
+                    style={{ objectFit: "cover" }}
+                  />
+                </div>
               )}
-              <div className="flex flex-col text-left px-4 md:px-10 mt-2">
+              <div className="flex flex-col text-left px-4 md:px-10 mt-8">
                 <a
                   className={`${bold_font.className} text-2xl mb-2 hover:underline`}
                   href={
