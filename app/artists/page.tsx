@@ -258,7 +258,7 @@ function ArtistArticleView({
     artistPageState.artistArticleList && (
       <div className="flex flex-col mt-20 justify-center">
         <h2 className={`${bold_font.className} text-6xl mb-10`}>ARTICLES</h2>
-        <ul className="list-disc list-inside space-y-4 px-4 md:px-10 text-4xl mt-10">
+        <ul className="list-disc list-inside space-y-4 px-4 md:px-10 text-3xl mt-10">
           {currentItems?.map((article, index) => (
             <li key={index} className="text-left">
               <Link
@@ -270,7 +270,7 @@ function ArtistArticleView({
                   className={`${regular_font.className} text-md text-white ml-2 hover:underline`}
                 >
                   {article.title}
-                </span>
+                </span>{" "}
                 <span
                   className={`${bold_font.className} text-sm text-orange-400`}
                 >
@@ -289,7 +289,7 @@ function ArtistArticleView({
                   setCurrentPage(page);
                 }}
                 className={`text-md md:text-lg px-3 py-1 rounded ${
-                  currentPage === page ? "text-white" : "text-gray-500"
+                  currentPage === page ? "text-white" : "text-gray-100"
                 }`}
               >
                 •
