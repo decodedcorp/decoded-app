@@ -25,7 +25,7 @@ function Footer() {
               2024-서울강남-0000
             </h3>
             <h3 className="text-sm mt-2">
-              이메일 : decoded.eth | 전화번호 : 02-1234-5678
+              이메일 : decodedapp@gmail.com | 전화번호 : 02-1234-5678
             </h3>
             <h3 className="text-sm mt-4">
               2024 Decoded Limited. All Rights Reserved.
