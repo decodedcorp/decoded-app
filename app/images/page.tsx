@@ -49,9 +49,11 @@ function MultiImageView({ imageId }: { imageId: string }) {
   const [featuredImgs, setFeaturedImgs] = useState<
     { imageUrl: string; imgInfo: ImageInfo; imageDocId: string }[] | null
   >(null);
-  const [artistArticleList, setArtistArticleList] = useState<ArticleInfo[] | undefined>(undefined);
+  const [artistArticleList, setArtistArticleList] = useState<
+    ArticleInfo[] | undefined
+  >(undefined);
   const [artistImgList, setArtistImgList] = useState<[string, string][]>([]);
-  
+
   useEffect(() => {
     const fetchFeaturedImage = async () => {
       var artistArticleList: ArticleInfo[] | undefined = undefined;
@@ -79,25 +81,27 @@ function MultiImageView({ imageId }: { imageId: string }) {
                 return (
                   await FirebaseHelper.doc("artists", artistDocId)
                 ).data() as ArtistInfo;
-              }),
+              })
             );
             await Promise.all(
               artistInfoList.map(async (a) => {
                 const artistArticleDocIdList = a.tags?.articles;
                 const artistImgDocIdList = a.tags?.images;
-    
+
                 if (artistArticleDocIdList) {
                   const articles = await Promise.all(
                     artistArticleDocIdList.map(async (articleDocId) => {
                       return (
                         await FirebaseHelper.doc("articles", articleDocId)
                       ).data() as ArticleInfo;
-                    }),
+                    })
                   );
                   artistArticleList = articles;
                 }
                 if (artistImgDocIdList) {
-                  const images = await FirebaseHelper.listAllStorageItems("images");
+                  const images = await FirebaseHelper.listAllStorageItems(
+                    "images"
+                  );
                   // Since item_doc_id is stored as custom metadata, logic is a bit complicated.
                   // After changing item_doc_id as file name, it would be simpler
                   await Promise.all(
@@ -109,13 +113,17 @@ function MultiImageView({ imageId }: { imageId: string }) {
                         if (docId === imgDocId) {
                           return;
                         }
-                        const imageUrl = await FirebaseHelper.downloadUrl(image);
-                        artistImgList.push([docId, imageUrl]);
+                        const imageUrl = await FirebaseHelper.downloadUrl(
+                          image
+                        );
+                        if (!artistImgList.some(([id, _]) => id === docId)) {
+                          artistImgList.push([docId, imageUrl]);
+                        }
                       }
-                    }),
+                    })
                   );
                 }
-              }),
+              })
             );
           }
           return {
@@ -125,7 +133,7 @@ function MultiImageView({ imageId }: { imageId: string }) {
             artistArticleList: artistArticleList,
             artistImgList: artistImgList,
           };
-        }),
+        })
       );
       setTitle(img.title);
       setDescription(img.description);
@@ -181,7 +189,7 @@ function SingleImageView({
   isFeatured: boolean;
 }) {
   let [detailPageState, setDetailPageState] = useState<DetailPageState | null>(
-    null,
+    null
   );
   useEffect(() => {
     const fetch = async () => {
@@ -192,8 +200,9 @@ function SingleImageView({
       const img = (
         await FirebaseHelper.doc("images", imgDocId)
       ).data() as ImageInfo;
-      const itemList: HoverItem[] =
-        await FirebaseHelper.getHoverItems(imgDocId);
+      const itemList: HoverItem[] = await FirebaseHelper.getHoverItems(
+        imgDocId
+      );
       var brandList: string[] = [];
       var brandUrlList: Map<string, string> = new Map();
       const brandLogo: Map<string, string> = new Map();
@@ -211,11 +220,11 @@ function SingleImageView({
           itemList
             .map((item) =>
               (item.info.brands || []).map((brand) =>
-                brand.toLowerCase().replace(/\s/g, "_"),
-              ),
+                brand.toLowerCase().replace(/\s/g, "_")
+              )
             )
-            .flat(),
-        ),
+            .flat()
+        )
       );
 
       if (brandTags) {
@@ -224,14 +233,14 @@ function SingleImageView({
             return (
               await FirebaseHelper.doc("brands", brandDocId)
             ).data() as BrandInfo;
-          }),
+          })
         );
         brandInfoList.map((brand) => {
           brandLogo.set(brand.name, brand.logoImageUrl ?? "");
           // key is brand name in lowercase with spaces replaced with underscores
           brandUrlList.set(
             brand.name.toLowerCase().replace(/\s/g, "_"),
-            brand.sns?.["instagram"] ?? brand.websiteUrl ?? "",
+            brand.sns?.["instagram"] ?? brand.websiteUrl ?? ""
           );
         });
       }
@@ -242,7 +251,7 @@ function SingleImageView({
             return (
               await FirebaseHelper.doc("artists", artistDocId)
             ).data() as ArtistInfo;
-          }),
+          })
         );
         await Promise.all(
           artistInfoList.map(async (a) => {
@@ -258,7 +267,7 @@ function SingleImageView({
                   return (
                     await FirebaseHelper.doc("articles", articleDocId)
                   ).data() as ArticleInfo;
-                }),
+                })
               );
               artistArticleList = articles;
             }
@@ -278,10 +287,10 @@ function SingleImageView({
                     const imageUrl = await FirebaseHelper.downloadUrl(image);
                     artistImgList.push([docId, imageUrl]);
                   }
-                }),
+                })
               );
             }
-          }),
+          })
         );
       }
       setDetailPageState({
@@ -391,11 +400,11 @@ function ImageView({
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 1;
   const totalPages = Math.ceil(
-    (detailPageState.itemList?.length || 0) / itemsPerPage,
+    (detailPageState.itemList?.length || 0) / itemsPerPage
   );
   const currentItems = detailPageState.itemList?.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
+    currentPage * itemsPerPage
   );
 
   const handleCurrentIndex = (index: number) => {
@@ -465,7 +474,7 @@ function ImageView({
                 <Image
                   src={
                     detailPageState.brandImgList?.get(
-                      item.info.brands?.[0] ?? "",
+                      item.info.brands?.[0] ?? ""
                     ) ?? ""
                   }
                   alt={item.info.brands?.[0] ?? ""}
@@ -477,7 +486,7 @@ function ImageView({
                   className={`${regular_font.className} text-xl ml-2 hover:underline hover:cursor-pointer`}
                   href={
                     detailPageState.brandUrlList?.get(
-                      item.info.brands?.[0] ?? "",
+                      item.info.brands?.[0] ?? ""
                     ) ?? ""
                   }
                 >
@@ -546,7 +555,7 @@ function MoreToExploreView({
   imgList: [string, string][] | undefined;
 }) {
   const [hoveredImageIndex, setHoveredImageIndex] = useState<number | null>(
-    null,
+    null
   );
   const [itemsPerPage, setItemsPerPage] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
@@ -565,78 +574,75 @@ function MoreToExploreView({
 
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-  const totalPages = Math.ceil(
-    (imgList?.length || 0) / itemsPerPage,
-  );
+  const totalPages = Math.ceil((imgList?.length || 0) / itemsPerPage);
   console.log(totalPages);
   const currentItems = imgList?.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
+    currentPage * itemsPerPage
   );
 
   return (
     <div className="w-full text-center mt-20">
-      {imgList &&
-        imgList.length > 0 && (
-          <div className="items-center justify-center mt-10">
-            <h2 className={`${regular_font.className} text-xl`}>
-              More to explore
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 items-stretch place-items-stretch my-10 px-10">
-              {currentItems?.map((image, index) => (
-                <Link
-                  key={index}
-                  href={`?imageId=${image[0]}&imageUrl=${encodeURIComponent(
-                    image[1],
-                  )}`}
-                  prefetch={false}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="relative w-full h-[300px] md:h-[600px] aspect-w-3 aspect-h-4"
-                  onMouseOver={() => setHoveredImageIndex(index)}
-                  onMouseOut={() => setHoveredImageIndex(null)}
-                >
-                  <Image
-                    src={image[1]}
-                    alt="Artist Image"
-                    fill={true}
-                    style={{ objectFit: "cover" }}
-                    className="more-tagged rounded-md"
-                    loading="lazy"
-                  />
-                  {hoveredImageIndex === index && (
-                    <div className="flex flex-col absolute inset-0 bg-black bg-opacity-50 items-center justify-center transition-opacity duration-300 ease-in-out">
-                      <p
-                        className={`${regular_font.className} px-4 py-2 bg-white text-black rounded-md hover:bg-gray-200 transition-colors text-sm`}
-                      >
-                        아이템 둘러보기
-                      </p>
-                    </div>
-                  )}
-                </Link>
-              ))}
-            </div>
-            {totalPages > 1 && (
-              <div className="flex justify-center space-x-2 mt-5">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => (
-                    <button
-                      key={page}
-                      onClick={() => {
-                        setCurrentPage(page);
-                      }}
-                      className={`text-md md:text-lg px-3 py-1 rounded ${
-                        currentPage === page ? "text-white" : "text-gray-500"
-                      }`}
+      {imgList && imgList.length > 0 && (
+        <div className="items-center justify-center mt-10">
+          <h2 className={`${regular_font.className} text-xl`}>
+            More to explore
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 items-stretch place-items-stretch my-10 px-10">
+            {currentItems?.map((image, index) => (
+              <Link
+                key={index}
+                href={`?imageId=${image[0]}&imageUrl=${encodeURIComponent(
+                  image[1]
+                )}`}
+                prefetch={false}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative w-full h-[300px] md:h-[600px] aspect-w-3 aspect-h-4"
+                onMouseOver={() => setHoveredImageIndex(index)}
+                onMouseOut={() => setHoveredImageIndex(null)}
+              >
+                <Image
+                  src={image[1]}
+                  alt="Artist Image"
+                  fill={true}
+                  style={{ objectFit: "cover" }}
+                  className="more-tagged rounded-md"
+                  loading="lazy"
+                />
+                {hoveredImageIndex === index && (
+                  <div className="flex flex-col absolute inset-0 bg-black bg-opacity-50 items-center justify-center transition-opacity duration-300 ease-in-out">
+                    <p
+                      className={`${regular_font.className} px-4 py-2 bg-white text-black rounded-md hover:bg-gray-200 transition-colors text-sm`}
                     >
-                      •
-                    </button>
-                  ),
+                      아이템 둘러보기
+                    </p>
+                  </div>
                 )}
-              </div>
-            )}
+              </Link>
+            ))}
           </div>
-        )}
+          {totalPages > 1 && (
+            <div className="flex justify-center space-x-2 mt-5">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => {
+                      setCurrentPage(page);
+                    }}
+                    className={`text-md md:text-lg px-3 py-1 rounded ${
+                      currentPage === page ? "text-white" : "text-gray-500"
+                    }`}
+                  >
+                    •
+                  </button>
+                )
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -662,12 +668,10 @@ function ArtistArticleView({
 
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-  const totalPages = Math.ceil(
-    (articleList?.length || 0) / itemsPerPage,
-  );
+  const totalPages = Math.ceil((articleList?.length || 0) / itemsPerPage);
   const currentItems = articleList?.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
+    currentPage * itemsPerPage
   );
   return (
     articleList && (
