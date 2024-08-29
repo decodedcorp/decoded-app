@@ -91,10 +91,10 @@ function Header() {
       >
         <div className="grid grid-cols-3 items-center">
           <div
-            className={`flex flex-col text-lg md:text-2xl ${regular_font.className} text-white`}
+            className={`flex flex-col text-sm md:text-2xl ${regular_font.className} text-white`}
           >
-            <div className="text-lg md:text-xl">SEL {koreanTime}</div>
-            <div className="text-lg md:text-xl">NY {usTime}</div>
+            <div>SEL {koreanTime}</div>
+            <div>NY {usTime}</div>
           </div>
           <Logo isScrolled={isScrolled} />
           <MenuSection
@@ -196,62 +196,12 @@ function MenuSection({
         </ul>
         {/* 모바일 메뉴 */}
         <div className="flex md:hidden justify-end items-center gap-4 text-white">
-          <button onClick={() => setIsSidebarOpen(true)}>
-            <MenuIcon className="text-2xl" />
-          </button>
           <button onClick={() => setIsSearchOpen(!isSearchOpen)}>
             <SearchIcon className="text-2xl" />
           </button>
         </div>
       </nav>
-      <Sidebar
-        isSidebarOpen={isSidebarOpen}
-        setIsSidebarOpen={setIsSidebarOpen}
-        setCurrentPath={setCurrentPath}
-      />
     </>
-  );
-}
-
-function Sidebar({
-  isSidebarOpen,
-  setIsSidebarOpen,
-  setCurrentPath,
-}: {
-  isSidebarOpen: boolean;
-  setIsSidebarOpen: Dispatch<SetStateAction<boolean>>;
-  setCurrentPath: Dispatch<SetStateAction<string>>;
-}) {
-  return (
-    <div
-      className={`fixed top-0 right-0 h-[100vh] w-full bg-black/50 backdrop-blur-lg text-white transform transition-transform duration-300 ease-in-out ${
-        isSidebarOpen ? "translate-x-0" : "translate-x-full"
-      } z-50`}
-    >
-      <div className="flex justify-end p-4">
-        <button onClick={() => setIsSidebarOpen(false)}>
-          <CloseIcon className="text-2xl" />
-        </button>
-      </div>
-      <ul className="flex flex-col gap-4 p-4">
-        {headers.map((header, index) => (
-          <li
-            key={index}
-            className={`${regular_font.className} text-4xl border-b border-white`}
-          >
-            <Link
-              href={header === "home" ? "/" : `/${header}`}
-              onClick={() => {
-                setCurrentPath(header);
-                setIsSidebarOpen(false);
-              }}
-            >
-              {header.toUpperCase()}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
   );
 }
 
