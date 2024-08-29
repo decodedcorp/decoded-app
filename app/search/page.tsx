@@ -151,9 +151,12 @@ function SearchPage() {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {articleResults.map((article, index) => (
-                  <div
+                  <Link
                     key={index}
-                    className="bg-gray-800 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                    href={article.src as string}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block bg-gray-800 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
                   >
                     {article.imageUrl && (
                       <div className="relative w-full pb-[56.25%]">
@@ -167,10 +170,10 @@ function SearchPage() {
                     )}
                     <div className="p-2">
                       {article.source && (
-                          <p
-                            className={`${regular_font.className} text-gray-400 text-sm w-fit`}
-                          >
-                            {article.source.toUpperCase()}
+                        <p
+                          className={`${regular_font.className} text-gray-400 text-sm w-fit`}
+                        >
+                          {article.source.toUpperCase()}
                         </p>
                       )}
                       <h3
@@ -179,7 +182,7 @@ function SearchPage() {
                         {article.title}
                       </h3>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
