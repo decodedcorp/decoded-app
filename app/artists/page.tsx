@@ -171,7 +171,7 @@ function MoreToExploreView({
               )}
               <div className="flex flex-col text-left px-4 md:px-10 mt-2">
                 <a
-                  className={`${bold_font.className} text-4xl mb-2 hover:underline`}
+                  className={`${bold_font.className} text-2xl mb-2 hover:underline`}
                   href={
                     artistPageState.artist?.sns?.instagram ??
                     artistPageState.artist?.sns?.youtube
@@ -281,7 +281,7 @@ function ArtistArticleView({
           ))}
         </ul>
         {totalPages > 1 && (
-          <div className="flex justify-center space-x-2 mt-5">
+          <div className="flex justify-center space-x-2 mt-10">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <button
                 key={page}
