@@ -372,7 +372,7 @@ function DescriptionView({
         {detailPageState.img?.title}
       </h2>
       <p
-        className={`${regular_font.className} text-lg md:text-md px-2 md:px-32 mt-2`}
+        className={`${regular_font.className} text-lg md:text-md px-2 md:px-52 mt-2`}
       >
         {detailPageState.img?.description}
       </p>
@@ -390,7 +390,7 @@ function ImageView({
   const [currentIndex, setCurrentIndex] = useState<number>(0);
 
   return (
-    <div className="flex flex-col w-full md:flex-row justify-center px-2 md:px-20 mt-10">
+    <div className="flex flex-col w-full md:flex-row justify-center px-2 mt-20">
       <div className="w-full justify-center md:px-52">
         <div className="relative w-full aspect-w-3 aspect-h-4">
           <Image
@@ -491,7 +491,7 @@ function MoreToExploreView({
           <h2 className={`${regular_font.className} text-xl`}>
             More to explore
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 items-stretch place-items-stretch my-10 px-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 items-stretch place-items-stretch my-10 px-7">
             {currentItems?.map((image, index) => (
               <Link
                 key={index}
@@ -582,7 +582,7 @@ function ArtistArticleView({
         <h2 className={`${regular_font.className} text-xl text-center`}>
           Related Articles
         </h2>
-        <div className="grid grid-cols-1 items-center justify-center p-10 gap-4">
+        <div className="grid grid-cols-1 items-center justify-center p-7 gap-4">
           {currentItems?.map((article, index) => (
             <div
               key={index}
