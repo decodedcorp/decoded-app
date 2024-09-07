@@ -20,6 +20,7 @@ import {
   ArticleInfo,
   DetailPageState,
 } from "@/types/model";
+import AddIcon from "@mui/icons-material/Add";
 
 function DetailPage() {
   const searchParams = useSearchParams();
@@ -200,9 +201,17 @@ function SingleImageView({
       const img = (
         await FirebaseHelper.doc("images", imgDocId)
       ).data() as ImageInfo;
-      const itemList: HoverItem[] = await FirebaseHelper.getHoverItems(
-        imgDocId
-      );
+      var itemList: HoverItem[] = await FirebaseHelper.getHoverItems(imgDocId);
+      itemList = itemList.sort((a, b) => {
+        const topA = parseInt(a.pos.top || "0%");
+        const topB = parseInt(b.pos.top || "0%");
+        if (topA !== topB) {
+          return topA - topB;
+        }
+        const leftA = parseInt(a.pos.left || "0%");
+        const leftB = parseInt(b.pos.left || "0%");
+        return leftA - leftB;
+      });
       var brandList: string[] = [];
       var brandUrlList: Map<string, string> = new Map();
       const brandLogo: Map<string, string> = new Map();
@@ -396,21 +405,7 @@ function ImageView({
   detailPageState: DetailPageState;
   imageUrl: string;
 }) {
-  const [currentIndex, setCurrentIndex] = useState<number | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 1;
-  const totalPages = Math.ceil(
-    (detailPageState.itemList?.length || 0) / itemsPerPage
-  );
-  const currentItems = detailPageState.itemList?.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  const handleCurrentIndex = (index: number) => {
-    const curr = itemsPerPage * (currentPage - 1) + index;
-    setCurrentIndex(curr);
-  };
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
 
   return (
     <div className="flex flex-col w-full md:flex-row justify-center px-2 md:px-20 mt-10">
@@ -424,52 +419,40 @@ function ImageView({
           />
           <div className="w-full">
             {detailPageState.img &&
-              detailPageState.itemList
-                ?.sort((a, b) => {
-                  // top 값 비교
-                  const topA = parseInt(a.pos.top || "0%");
-                  const topB = parseInt(b.pos.top || "0%");
-                  if (topA !== topB) {
-                    return topA - topB;
-                  }
-                  // top 값이 같을 경우 left 값 비교
-                  const leftA = parseInt(a.pos.left || "0%");
-                  const leftB = parseInt(b.pos.left || "0%");
-                  return leftA - leftB;
-                })
-                .map((item, index) => (
-                  <a
-                    key={item.info.name}
-                    href={item.info?.affiliateUrl ?? ""}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      position: "absolute",
-                      top: item.pos.top,
-                      left: item.pos.left,
-                      cursor: "pointer",
-                    }}
-                    className="point"
+              detailPageState.itemList?.map((item, index) => (
+                <a
+                  key={item.info.name}
+                  href={item.info?.affiliateUrl ?? ""}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    position: "absolute",
+                    top: item.pos.top,
+                    left: item.pos.left,
+                    cursor: "pointer",
+                  }}
+                  className="point"
+                >
+                  <div
+                    className="bg-red-500 w-5 h-5 flex justify-center items-center"
+                    onMouseOver={() => setCurrentIndex(index)}
                   >
-                    <div
-                      style={{
-                        width: "20px",
-                        height: "20px",
-                        borderRadius: "50%",
-                        backgroundColor:
-                          currentIndex === index ? "red" : "transparent",
-                        boxShadow: "0 0 2px 2px rgba(0, 0, 0, 0.2)",
-                      }}
-                    ></div>
-                  </a>
-                ))}
+                    <AddIcon style={{ width: "15px", height: "15px" }} />
+                  </div>
+                </a>
+              ))}
           </div>
         </div>
       </div>
       <div className="flex flex-col w-full justify-between mt-10">
         <div className="flex w-full justify-center">
-          {currentItems?.map((item, index) => (
-            <div key={index} className="justify-center w-full">
+          {detailPageState.itemList?.map((item, index) => (
+            <div
+              key={index}
+              className={`justify-center w-full ${
+                currentIndex === index ? "block" : "hidden"
+              }`}
+            >
               <div className="flex items-center justify-center">
                 <Image
                   src={
@@ -498,7 +481,6 @@ function ImageView({
                   <Link
                     href={item.info.affiliateUrl ?? ""}
                     className="block w-full h-full"
-                    onMouseOver={() => handleCurrentIndex(index)}
                   >
                     <div className="relative w-full h-full">
                       <Image
@@ -526,24 +508,6 @@ function ImageView({
             </div>
           ))}
         </div>
-        {totalPages > 1 && (
-          <div className="flex justify-center space-x-2 mt-5 md:mt-0">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => {
-                  setCurrentPage(page);
-                  setCurrentIndex(page - 1);
-                }}
-                className={`text-md md:text-lg px-3 py-1 rounded ${
-                  currentPage === page ? "text-white" : "text-gray-500"
-                }`}
-              >
-                {page}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );
@@ -562,7 +526,6 @@ function MoreToExploreView({
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768) {
-        // md 브레이크포인트
         setItemsPerPage(3);
       } else {
         setItemsPerPage(1);
