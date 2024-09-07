@@ -376,24 +376,6 @@ function DescriptionView({
       >
         {detailPageState.img?.description}
       </p>
-      <div
-        className={`flex flex-col items-center mt-10 ${
-          isFeatured ? "hidden" : "block"
-        }`}
-      >
-        <p className={`${semi_bold_font.className} text-lg md:text-2xl`}>
-          ARTIST:
-        </p>
-        {detailPageState.artistList?.map((name, index) => (
-          <Link
-            key={index}
-            href={`/artists?name=${encodeURIComponent(name)}`}
-            className={`${semi_bold_font.className} text-xl font-bold mx-2`}
-          >
-            <p className="underline">{name.toUpperCase()}</p>
-          </Link>
-        ))}
-      </div>
     </div>
   );
 }
@@ -409,7 +391,7 @@ function ImageView({
 
   return (
     <div className="flex flex-col w-full md:flex-row justify-center px-2 md:px-20 mt-10">
-      <div className="w-full">
+      <div className="w-full justify-center md:px-52">
         <div className="relative w-full aspect-w-3 aspect-h-4">
           <Image
             src={imageUrl}
@@ -434,79 +416,38 @@ function ImageView({
                   className="point"
                 >
                   <div
-                    className="bg-red-500 w-5 h-5 flex justify-center items-center"
+                    className="relative bg-red-500 w-3 h-3 flex justify-center items-center group"
                     onMouseOver={() => setCurrentIndex(index)}
                   >
                     <AddIcon style={{ width: "15px", height: "15px" }} />
+                    <div className="absolute hidden group-hover:block bg-white text-black p-2 rounded-md shadow-lg z-10 w-64 left-full ml-2 top-1/2 -translate-y-1/2">
+                      <div className="flex">
+                        <div className="relative w-[100px] h-[100px]">
+                          <Image
+                            src={item.info.imageUrl ?? ""}
+                            alt={item.info.name}
+                            fill={true}
+                            style={{ objectFit: "contain" }}
+                          />
+                        </div>
+                        <div className="flex flex-col text-black p-2 w-48 mb-2 text-center items-center justify-center">
+                          <p
+                            className={`${semi_bold_font.className} text-sm mb-1`}
+                          >
+                            {item.info.name}
+                          </p>
+                          <p className={`${regular_font.className} text-xs`}>
+                            {item.info.brands?.[0]
+                              .replace(/_/g, " ")
+                              .toUpperCase()}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </a>
               ))}
           </div>
-        </div>
-      </div>
-      <div className="flex flex-col w-full justify-between mt-10">
-        <div className="flex w-full justify-center">
-          {detailPageState.itemList?.map((item, index) => (
-            <div
-              key={index}
-              className={`justify-center w-full ${
-                currentIndex === index ? "block" : "hidden"
-              }`}
-            >
-              <div className="flex items-center justify-center">
-                <Image
-                  src={
-                    detailPageState.brandImgList?.get(
-                      item.info.brands?.[0] ?? ""
-                    ) ?? ""
-                  }
-                  alt={item.info.brands?.[0] ?? ""}
-                  width={25}
-                  height={25}
-                  className="rounded-full"
-                />
-                <a
-                  className={`${regular_font.className} text-xl ml-2 hover:underline hover:cursor-pointer`}
-                  href={
-                    detailPageState.brandUrlList?.get(
-                      item.info.brands?.[0] ?? ""
-                    ) ?? ""
-                  }
-                >
-                  {item.info.brands?.[0].replace(/_/g, " ").toUpperCase()}
-                </a>
-              </div>
-              <div className="flex justify-center items-center mt-2 md:mt-20">
-                <div className="relative group w-[100vw] md:w-[400px] h-[100vh] md:h-[600px]">
-                  <Link
-                    href={item.info.affiliateUrl ?? ""}
-                    className="block w-full h-full"
-                  >
-                    <div className="relative w-full h-full">
-                      <Image
-                        src={item.info.imageUrl ?? ""}
-                        alt={item.info.name}
-                        fill={true}
-                        style={{ objectFit: "cover" }}
-                      />
-                      <div className="flex flex-col absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 items-center justify-center">
-                        <p
-                          className={`${regular_font.className} text-sm md:text-md p-2 text-white text-center`}
-                        >
-                          {item.info.name}
-                        </p>
-                        <p
-                          className={`${regular_font.className} text-sm md:text-md p-2 text-white text-center`}
-                        >
-                          {item.info.price}
-                        </p>
-                      </div>
-                    </div>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
     </div>
