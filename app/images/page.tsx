@@ -21,6 +21,8 @@ import {
   DetailPageState,
 } from "@/types/model";
 import AddIcon from "@mui/icons-material/Add";
+import ImageList from "@mui/material/ImageList";
+import ImageListItem from "@mui/material/ImageListItem";
 
 function DetailPage() {
   const searchParams = useSearchParams();
@@ -345,7 +347,7 @@ function DetailView({
   isFeatured: boolean;
 }) {
   return (
-    <div className={"flex flex-col w-full"}>
+    <div className={"flex flex-col"}>
       <DescriptionView
         detailPageState={detailPageState}
         isFeatured={isFeatured}
@@ -363,17 +365,15 @@ function DescriptionView({
   isFeatured: boolean;
 }) {
   return (
-    <div className={"flex flex-col"}>
+    <div className="flex flex-col w-full px-2 md:px-40 lg:px-72">
       <h2
-        className={`${bold_font.className} text-4xl font-bold mb-4 ${
+        className={`${bold_font.className} text-2xl font-bold mb-4 ${
           isFeatured ? "hidden" : "block"
         }`}
       >
         {detailPageState.img?.title}
       </h2>
-      <p
-        className={`${regular_font.className} text-lg md:text-md px-2 md:px-52 mt-2`}
-      >
+      <p className={`${regular_font.className} text-xs mt-2`}>
         {detailPageState.img?.description}
       </p>
     </div>
@@ -388,11 +388,16 @@ function ImageView({
   imageUrl: string;
 }) {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [isTouch, setIsTouch] = useState<boolean>(false);
+  const [hoveredItem, setHoveredItem] = useState<number | null>(null);
 
   return (
-    <div className="flex flex-col w-full md:flex-row justify-center px-2 mt-20">
-      <div className="w-full justify-center md:px-52">
-        <div className="relative w-full aspect-w-3 aspect-h-4">
+    <div className="flex flex-col w-full md:flex-row justify-center px-2 md:px-72 lg:px-96 mt-10">
+      <div className="w-full justify-center">
+        <div
+          className="relative w-full aspect-w-3 aspect-h-4"
+          onClick={() => setIsTouch(!isTouch)}
+        >
           <Image
             src={imageUrl}
             alt="Featured fashion"
@@ -415,22 +420,55 @@ function ImageView({
                   }}
                   className="point"
                 >
-                  <div
-                    className="relative bg-red-500 w-3 h-3 flex justify-center items-center group"
-                    onMouseOver={() => setCurrentIndex(index)}
-                  >
+                  <div className="relative bg-red-500 w-3 h-3 flex justify-center items-center group">
                     <AddIcon style={{ width: "15px", height: "15px" }} />
-                    <div className="absolute hidden group-hover:block bg-white text-black p-2 rounded-md shadow-lg z-10 w-64 left-full ml-2 top-1/2 -translate-y-1/2">
+                    <div className="absolute bg-white text-black p-2 rounded-md shadow-lg z-10 w-64 left-full ml-2 top-1/2 -translate-y-1/2 hidden md:group-hover:block md:hidden">
                       <div className="flex">
                         <div className="relative w-[100px] h-[100px]">
                           <Image
                             src={item.info.imageUrl ?? ""}
                             alt={item.info.name}
                             fill={true}
-                            style={{ objectFit: "contain" }}
+                            className="object-contain"
                           />
                         </div>
                         <div className="flex flex-col text-black p-2 w-48 mb-2 text-center items-center justify-center">
+                          <p
+                            className={`${semi_bold_font.className} text-sm mb-1`}
+                          >
+                            {item.info.name}
+                          </p>
+                          <p className={`${regular_font.className} text-xs`}>
+                            {item.info.brands?.[0]
+                              .replace(/_/g, " ")
+                              .toUpperCase()}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className={`absolute border border-black backdrop-blur-sm text-black p-2 rounded-md shadow-lg w-52 left-0 md:hidden 
+                        transition-all duration-300 ease-out
+                        ${
+                          isTouch
+                            ? "opacity-100 translate-y-0"
+                            : "opacity-0 translate-y-2 pointer-events-none"
+                        }
+                        ${hoveredItem === index ? "z-50" : "z-10"}
+                        ${hoveredItem === index ? "bg-white" : "bg-white/60"}`}
+                      onMouseEnter={() => setHoveredItem(index)}
+                      onMouseLeave={() => setHoveredItem(null)}
+                    >
+                      <div className="flex justify-center items-center">
+                        <div className="relative w-[50px] h-[50px]">
+                          <Image
+                            src={item.info.imageUrl ?? ""}
+                            alt={item.info.name}
+                            fill={true}
+                            className="object-contain"
+                          />
+                        </div>
+                        <div className="flex flex-col text-black w-48 text-center items-center justify-center">
                           <p
                             className={`${semi_bold_font.className} text-sm mb-1`}
                           >
@@ -469,7 +507,7 @@ function MoreToExploreView({
       if (window.innerWidth >= 768) {
         setItemsPerPage(3);
       } else {
-        setItemsPerPage(1);
+        setItemsPerPage(4);
       }
     };
 
@@ -491,7 +529,7 @@ function MoreToExploreView({
           <h2 className={`${regular_font.className} text-xl`}>
             More to explore
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 items-stretch place-items-stretch my-10 px-7">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 items-stretch place-items-stretch my-10 px-7">
             {currentItems?.map((image, index) => (
               <Link
                 key={index}
@@ -600,7 +638,6 @@ function ArtistArticleView({
                   alt={article.title ?? ""}
                   fill={true}
                   style={{ objectFit: "cover" }}
-                  className="rounded-md"
                   loading="lazy"
                 />
               </Link>

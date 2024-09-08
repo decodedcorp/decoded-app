@@ -217,19 +217,11 @@ function ImageSelectView({ images }: { images: MainImage[] | null }) {
   }, [celebrities]);
 
   return (
-    <div className="flex flex-col p-20 w-full mt-20">
+    <div className="flex flex-col md:p-20 w-full mt-20">
       <h2
-        className={`flex ${bold_font.className} mb-10 justify-center text-4xl`}
+        className={`flex ${bold_font.className} mb-10 justify-center text-xl md:text-4xl`}
       >
-        <span className="relative inline-block w-[200px] h-12 border-b border-[#373737]">
-          <span
-            key={currentCelebrity}
-            className="absolute w-full text-center text-blue-500 transition-all duration-300 ease-in-out animate-slide-up"
-          >
-            {currentCelebrity}
-          </span>
-        </span>
-        의 아이템 둘러보기
+        아이템 둘러보기
       </h2>
       <div className="mt-10">
         <Carousel images={images} />
@@ -343,7 +335,7 @@ function RequestSection() {
 
   return (
     <div
-      className={`flex flex-col w-full text-2xl justify-center ${regular_font.className} my-20`}
+      className={`flex flex-col w-full text-xl md:text-2xl justify-center ${regular_font.className} my-20`}
     >
       <div
         className={`flex flex-col p-20 items-center justify-center bg-[#212124] opacity-80`}
