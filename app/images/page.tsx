@@ -147,7 +147,7 @@ function MultiImageView({ imageId }: { imageId: string }) {
     fetchFeaturedImage();
   }, [imageId]);
   return featuredImgs ? (
-    <div className="flex flex-col justify-center items-center my-32 p-2 w-full">
+    <div className="flex flex-col justify-center items-center my-32 p-2 w-full overflow-x-hidden">
       <div className="flex flex-col items-center p-10">
         <h1
           className={`${bold_font.className} text-3xl md:text-5xl font-bold text-white mb-5`}
@@ -319,7 +319,7 @@ function SingleImageView({
   }, [imageId, isFeatured]);
 
   return detailPageState ? (
-    <div className="flex-col justify-center text-center items-center">
+    <div className="flex-col justify-center text-center items-center overflow-x-hidden">
       <div
         className={`flex flex-col p-4 md:p-0 ${isFeatured ? "mt-0" : "mt-40"}`}
       >
@@ -347,7 +347,7 @@ function DetailView({
   isFeatured: boolean;
 }) {
   return (
-    <div className={"flex flex-col"}>
+    <div className="flex flex-col">
       <DescriptionView
         detailPageState={detailPageState}
         isFeatured={isFeatured}
@@ -448,7 +448,7 @@ function ImageView({
                     </div>
                     <div
                       className={`absolute border border-black backdrop-blur-sm text-black p-2 rounded-md shadow-lg w-52 left-0 md:hidden 
-                        transition-all duration-300 ease-out
+                        transition-all duration-300 ease-out overflow-x-hidden
                         ${
                           isTouch
                             ? "opacity-100 translate-y-0"
