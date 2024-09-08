@@ -468,9 +468,9 @@ function ImageView({
                             className="object-contain"
                           />
                         </div>
-                        <div className="flex flex-col text-black w-48 text-center items-center justify-center">
+                        <div className="flex flex-col text-black w-48 text-center items-center justify-center ml-2">
                           <p
-                            className={`${semi_bold_font.className} text-sm mb-1`}
+                            className={`${semi_bold_font.className} text-xs mb-1`}
                           >
                             {item.info.name}
                           </p>
