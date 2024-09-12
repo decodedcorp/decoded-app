@@ -209,7 +209,7 @@ function PinView({ images }: { images: MainImage[] | null }) {
       >
         아이템 둘러보기
       </h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 p-10 gap-10 w-full justify-start items-center">
+      <div className="grid grid-cols-2 md:grid-cols-3 p-2 gap-2 md:p-10 md:gap-10 w-full justify-start items-center">
         {images?.map((image, index) => (
           <Pin key={index} image={image} />
         ))}
