@@ -28,10 +28,13 @@ function Pin({ image }: { image: MainImage }) {
           {image.artistInfoList?.map((artist, index) => {
             return (
               <div className="pb-1 justify-between" key={index}>
-                <div className="flex flex-row items-center">
+                <Link
+                  href={`/artists?name=${artist.name}`}
+                  className="flex flex-row items-center hover:underline"
+                >
                   {/* <div className="rounded-xl w-5 h-5 bg-gray-400 mr-2"></div> */}
                   {artist.name.toUpperCase()}
-                </div>
+                </Link>
               </div>
             );
           })}
