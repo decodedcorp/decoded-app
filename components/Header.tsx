@@ -91,10 +91,10 @@ function Header() {
       >
         <div className="grid grid-cols-3 items-center">
           <div
-            className={`flex flex-col text-sm md:text-2xl ${regular_font.className} text-white`}
+            className={`flex flex-col text-sm md:text-lg ${regular_font.className} text-white`}
           >
-            <div>SEL {koreanTime}</div>
-            <div>NY {usTime}</div>
+            <div className="hidden md:block">SEL {koreanTime}</div>
+            <div className="hidden md:block">NY {usTime}</div>
           </div>
           <Logo isScrolled={isScrolled} />
           <MenuSection

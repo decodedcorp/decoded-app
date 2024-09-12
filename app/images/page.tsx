@@ -20,6 +20,9 @@ import {
   ArticleInfo,
   DetailPageState,
 } from "@/types/model";
+import AddIcon from "@mui/icons-material/Add";
+import ImageList from "@mui/material/ImageList";
+import ImageListItem from "@mui/material/ImageListItem";
 
 function DetailPage() {
   const searchParams = useSearchParams();
@@ -144,7 +147,7 @@ function MultiImageView({ imageId }: { imageId: string }) {
     fetchFeaturedImage();
   }, [imageId]);
   return featuredImgs ? (
-    <div className="flex flex-col justify-center items-center my-32 p-2 w-full">
+    <div className="flex flex-col justify-center items-center my-32 p-2 w-full overflow-x-hidden">
       <div className="flex flex-col items-center p-10">
         <h1
           className={`${bold_font.className} text-3xl md:text-5xl font-bold text-white mb-5`}
@@ -200,9 +203,17 @@ function SingleImageView({
       const img = (
         await FirebaseHelper.doc("images", imgDocId)
       ).data() as ImageInfo;
-      const itemList: HoverItem[] = await FirebaseHelper.getHoverItems(
-        imgDocId
-      );
+      var itemList: HoverItem[] = await FirebaseHelper.getHoverItems(imgDocId);
+      itemList = itemList.sort((a, b) => {
+        const topA = parseInt(a.pos.top || "0%");
+        const topB = parseInt(b.pos.top || "0%");
+        if (topA !== topB) {
+          return topA - topB;
+        }
+        const leftA = parseInt(a.pos.left || "0%");
+        const leftB = parseInt(b.pos.left || "0%");
+        return leftA - leftB;
+      });
       var brandList: string[] = [];
       var brandUrlList: Map<string, string> = new Map();
       const brandLogo: Map<string, string> = new Map();
@@ -308,7 +319,7 @@ function SingleImageView({
   }, [imageId, isFeatured]);
 
   return detailPageState ? (
-    <div className="flex-col justify-center text-center items-center">
+    <div className="flex-col justify-center text-center items-center overflow-x-hidden">
       <div
         className={`flex flex-col p-4 md:p-0 ${isFeatured ? "mt-0" : "mt-40"}`}
       >
@@ -336,7 +347,7 @@ function DetailView({
   isFeatured: boolean;
 }) {
   return (
-    <div className={"flex flex-col w-full"}>
+    <div className="flex flex-col items-center">
       <DescriptionView
         detailPageState={detailPageState}
         isFeatured={isFeatured}
@@ -354,37 +365,17 @@ function DescriptionView({
   isFeatured: boolean;
 }) {
   return (
-    <div className={"flex flex-col"}>
+    <div className="flex flex-col w-full px-2 md:px-40 lg:px-72">
       <h2
-        className={`${bold_font.className} text-4xl font-bold mb-4 ${
+        className={`${bold_font.className} text-2xl font-bold mb-4 ${
           isFeatured ? "hidden" : "block"
         }`}
       >
         {detailPageState.img?.title}
       </h2>
-      <p
-        className={`${regular_font.className} text-lg md:text-md px-2 md:px-32 mt-2`}
-      >
+      <p className={`${regular_font.className} text-xs mt-2`}>
         {detailPageState.img?.description}
       </p>
-      <div
-        className={`flex flex-col items-center mt-10 ${
-          isFeatured ? "hidden" : "block"
-        }`}
-      >
-        <p className={`${semi_bold_font.className} text-lg md:text-2xl`}>
-          ARTIST:
-        </p>
-        {detailPageState.artistList?.map((name, index) => (
-          <Link
-            key={index}
-            href={`/artists?name=${encodeURIComponent(name)}`}
-            className={`${semi_bold_font.className} text-xl font-bold mx-2`}
-          >
-            <p className="underline">{name.toUpperCase()}</p>
-          </Link>
-        ))}
-      </div>
     </div>
   );
 }
@@ -397,153 +388,166 @@ function ImageView({
   imageUrl: string;
 }) {
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 1;
-  const totalPages = Math.ceil(
-    (detailPageState.itemList?.length || 0) / itemsPerPage
-  );
-  const currentItems = detailPageState.itemList?.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  const handleCurrentIndex = (index: number) => {
-    const curr = itemsPerPage * (currentPage - 1) + index;
-    setCurrentIndex(curr);
-  };
+  const [isTouch, setIsTouch] = useState<boolean>(false);
+  const [hoveredItem, setHoveredItem] = useState<number | null>(null);
 
   return (
-    <div className="flex flex-col w-full md:flex-row justify-center px-2 md:px-20 mt-10">
-      <div className="w-full">
-        <div className="relative w-full aspect-w-3 aspect-h-4">
+    <div className="flex flex-row w-full md:w-[1000px] md:flex-row justify-center mt-10 border border-white/10 rounded-xl">
+      <div className="flex flex-col w-full justify-center min-w-[500px]">
+        <div
+          className="relative aspect-w-3 aspect-h-4"
+          onClick={() => setIsTouch(!isTouch)}
+        >
           <Image
             src={imageUrl}
             alt="Featured fashion"
             fill={true}
             style={{ objectFit: "cover" }}
+            className="rounded-xl"
           />
           <div className="w-full">
             {detailPageState.img &&
-              detailPageState.itemList
-                ?.sort((a, b) => {
-                  // top 값 비교
-                  const topA = parseInt(a.pos.top || "0%");
-                  const topB = parseInt(b.pos.top || "0%");
-                  if (topA !== topB) {
-                    return topA - topB;
-                  }
-                  // top 값이 같을 경우 left 값 비교
-                  const leftA = parseInt(a.pos.left || "0%");
-                  const leftB = parseInt(b.pos.left || "0%");
-                  return leftA - leftB;
-                })
-                .map((item, index) => (
-                  <a
-                    key={item.info.name}
-                    href={item.info?.affiliateUrl ?? ""}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      position: "absolute",
-                      top: item.pos.top,
-                      left: item.pos.left,
-                      cursor: "pointer",
-                    }}
-                    className="point"
-                  >
+              detailPageState.itemList?.map((item, index) => (
+                <a
+                  key={item.info.name}
+                  href={item.info?.affiliateUrl ?? ""}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    position: "absolute",
+                    top: item.pos.top,
+                    left: item.pos.left,
+                    cursor: "pointer",
+                  }}
+                  className="point"
+                >
+                  <div className="relative bg-red-500 w-3 h-3 flex justify-center items-center group">
+                    <AddIcon style={{ width: "15px", height: "15px" }} />
+                    <div className="absolute bg-white text-black p-2 rounded-md shadow-lg z-10 w-64 left-full ml-2 top-1/2 -translate-y-1/2 hidden md:group-hover:block md:hidden">
+                      <div className="flex">
+                        <div className="relative w-[100px] h-[100px]">
+                          <Image
+                            src={item.info.imageUrl ?? ""}
+                            alt={item.info.name}
+                            fill={true}
+                            className="object-contain"
+                          />
+                        </div>
+                        <div className="flex flex-col text-black p-2 w-48 mb-2 text-center items-center justify-center">
+                          <p
+                            className={`${semi_bold_font.className} text-sm mb-1`}
+                          >
+                            {item.info.name}
+                          </p>
+                          <p className={`${regular_font.className} text-xs`}>
+                            {item.info.brands?.[0]
+                              .replace(/_/g, " ")
+                              .toUpperCase()}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Popup when hovering over the item */}
                     <div
-                      style={{
-                        width: "20px",
-                        height: "20px",
-                        borderRadius: "50%",
-                        backgroundColor:
-                          currentIndex === index ? "red" : "transparent",
-                        boxShadow: "0 0 2px 2px rgba(0, 0, 0, 0.2)",
-                      }}
-                    ></div>
-                  </a>
-                ))}
+                      className={`absolute bg-white text-black p-2 rounded-md shadow-lg z-10 w-64 left-full ml-2 top-1/2 -translate-y-1/2
+                      ${currentIndex === index ? "block" : "hidden"}
+                      `}
+                    >
+                      <div className="flex">
+                        <div className="relative w-[100px] h-[100px]">
+                          <Image
+                            src={item.info.imageUrl ?? ""}
+                            alt={item.info.name}
+                            fill={true}
+                            className="object-contain"
+                          />
+                        </div>
+                        <div className="flex flex-col text-black p-2 w-48 mb-2 text-center items-center justify-center">
+                          <p
+                            className={`${semi_bold_font.className} text-sm mb-1`}
+                          >
+                            {item.info.name}
+                          </p>
+                          <p className={`${regular_font.className} text-xs`}>
+                            {item.info.brands?.[0]
+                              .replace(/_/g, " ")
+                              .toUpperCase()}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Popup on mobile */}
+                    <div
+                      className={`absolute border border-black backdrop-blur-sm text-black p-2 rounded-md shadow-lg w-52 left-0 md:hidden 
+                        transition-all duration-300 ease-out overflow-x-hidden
+                        ${
+                          isTouch
+                            ? "opacity-100 translate-y-0"
+                            : "opacity-0 translate-y-2 pointer-events-none"
+                        }
+                        ${hoveredItem === index ? "z-50" : "z-10"}
+                        ${hoveredItem === index ? "bg-white" : "bg-white/60"}`}
+                      onMouseEnter={() => setHoveredItem(index)}
+                      onMouseLeave={() => setHoveredItem(null)}
+                    >
+                      <div className="flex justify-center items-center">
+                        <div className="relative w-[50px] h-[50px]">
+                          <Image
+                            src={item.info.imageUrl ?? ""}
+                            alt={item.info.name}
+                            fill={true}
+                            className="object-contain"
+                          />
+                        </div>
+                        <div className="flex flex-col text-black w-48 text-center items-center justify-center ml-2">
+                          <p
+                            className={`${semi_bold_font.className} text-xs mb-1`}
+                          >
+                            {item.info.name}
+                          </p>
+                          <p className={`${regular_font.className} text-xs`}>
+                            {item.info.brands?.[0]
+                              .replace(/_/g, " ")
+                              .toUpperCase()}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              ))}
           </div>
         </div>
       </div>
-      <div className="flex flex-col w-full justify-between mt-10">
-        <div className="flex w-full justify-center">
-          {currentItems?.map((item, index) => (
-            <div key={index} className="justify-center w-full">
-              <div className="flex items-center justify-center">
-                <Image
-                  src={
-                    detailPageState.brandImgList?.get(
-                      item.info.brands?.[0] ?? ""
-                    ) ?? ""
-                  }
-                  alt={item.info.brands?.[0] ?? ""}
-                  width={25}
-                  height={25}
-                  className="rounded-full"
-                />
-                <a
-                  className={`${regular_font.className} text-xl ml-2 hover:underline hover:cursor-pointer`}
-                  href={
-                    detailPageState.brandUrlList?.get(
-                      item.info.brands?.[0] ?? ""
-                    ) ?? ""
-                  }
-                >
-                  {item.info.brands?.[0].replace(/_/g, " ").toUpperCase()}
-                </a>
+      <div className="flex-col w-full overflow-y-auto hidden lg:block">
+        {detailPageState.itemList?.map((item, index) => (
+          <Link
+            href={item.info.affiliateUrl ?? "#"}
+            className="p-2 m-2 border-b border-white/10 flex flex-row items-center hover:bg-white/10"
+            key={index}
+            onMouseOver={() => setCurrentIndex(index)}
+            onMouseOut={() => setCurrentIndex(null)}
+          >
+            <div className="w-16 h-20 relative ml-4 ">
+              <Image
+                src={item.info.imageUrl ?? ""}
+                alt={item.info.name}
+                fill={true}
+                style={{ objectFit: "contain" }}
+              />
+            </div>
+            <div className="flex flex-col w-full text-center overflow-clip">
+              <div className="text-sm">
+                {item.info.brands?.[0].replace(/_/g, " ").toUpperCase()}
               </div>
-              <div className="flex justify-center items-center mt-2 md:mt-20">
-                <div className="relative group w-[100vw] md:w-[400px] h-[100vh] md:h-[600px]">
-                  <Link
-                    href={item.info.affiliateUrl ?? ""}
-                    className="block w-full h-full"
-                    onMouseOver={() => handleCurrentIndex(index)}
-                  >
-                    <div className="relative w-full h-full">
-                      <Image
-                        src={item.info.imageUrl ?? ""}
-                        alt={item.info.name}
-                        fill={true}
-                        style={{ objectFit: "cover" }}
-                      />
-                      <div className="flex flex-col absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 items-center justify-center">
-                        <p
-                          className={`${regular_font.className} text-sm md:text-md p-2 text-white text-center`}
-                        >
-                          {item.info.name}
-                        </p>
-                        <p
-                          className={`${regular_font.className} text-sm md:text-md p-2 text-white text-center`}
-                        >
-                          {item.info.price}
-                        </p>
-                      </div>
-                    </div>
-                  </Link>
-                </div>
+              <div
+                className={`text-center text-sm ${semi_bold_font.className}`}
+              >
+                {item.info.name}
               </div>
             </div>
-          ))}
-        </div>
-        {totalPages > 1 && (
-          <div className="flex justify-center space-x-2 mt-5 md:mt-0">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => {
-                  setCurrentPage(page);
-                  setCurrentIndex(page - 1);
-                }}
-                className={`text-md md:text-lg px-3 py-1 rounded ${
-                  currentPage === page ? "text-white" : "text-gray-500"
-                }`}
-              >
-                {page}
-              </button>
-            ))}
-          </div>
-        )}
+          </Link>
+        ))}
       </div>
     </div>
   );
@@ -562,10 +566,9 @@ function MoreToExploreView({
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768) {
-        // md 브레이크포인트
         setItemsPerPage(3);
       } else {
-        setItemsPerPage(1);
+        setItemsPerPage(4);
       }
     };
 
@@ -587,7 +590,7 @@ function MoreToExploreView({
           <h2 className={`${regular_font.className} text-xl`}>
             More to explore
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 items-stretch place-items-stretch my-10 px-10">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 items-stretch place-items-stretch my-10 px-7">
             {currentItems?.map((image, index) => (
               <Link
                 key={index}
@@ -678,7 +681,7 @@ function ArtistArticleView({
         <h2 className={`${regular_font.className} text-xl text-center`}>
           Related Articles
         </h2>
-        <div className="grid grid-cols-1 items-center justify-center p-10 gap-4">
+        <div className="grid grid-cols-1 items-center justify-center p-7 gap-4">
           {currentItems?.map((article, index) => (
             <div
               key={index}
@@ -696,7 +699,6 @@ function ArtistArticleView({
                   alt={article.title ?? ""}
                   fill={true}
                   style={{ objectFit: "cover" }}
-                  className="rounded-md"
                   loading="lazy"
                 />
               </Link>

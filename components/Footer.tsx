@@ -9,7 +9,7 @@ function Footer() {
   const [isType, setIsType] = useState<boolean>(false);
 
   return (
-    <footer className="footer p-20 mt-20 border-t-2 border-gray-500/50">
+    <footer className="footer p-10 mt-10 border-t-2 border-gray-500/50">
       <div className="flex flex-col lg:flex-row w-full">
         <Image src={white_logo} alt="logo" width={200} height={200} />
         <div
