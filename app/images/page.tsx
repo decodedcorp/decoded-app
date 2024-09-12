@@ -347,7 +347,7 @@ function DetailView({
   isFeatured: boolean;
 }) {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col items-center">
       <DescriptionView
         detailPageState={detailPageState}
         isFeatured={isFeatured}
@@ -387,15 +387,15 @@ function ImageView({
   detailPageState: DetailPageState;
   imageUrl: string;
 }) {
-  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [currentIndex, setCurrentIndex] = useState<number | null>(null);
   const [isTouch, setIsTouch] = useState<boolean>(false);
   const [hoveredItem, setHoveredItem] = useState<number | null>(null);
 
   return (
-    <div className="flex flex-col w-full md:flex-row justify-center px-2 md:px-72 lg:px-96 mt-10">
-      <div className="w-full justify-center">
+    <div className="flex flex-row w-full md:w-[1000px] md:flex-row justify-center mt-10 border border-white/10 rounded-xl">
+      <div className="flex flex-col w-full justify-center min-w-[500px]">
         <div
-          className="relative w-full aspect-w-3 aspect-h-4"
+          className="relative aspect-w-3 aspect-h-4"
           onClick={() => setIsTouch(!isTouch)}
         >
           <Image
@@ -403,6 +403,7 @@ function ImageView({
             alt="Featured fashion"
             fill={true}
             style={{ objectFit: "cover" }}
+            className="rounded-xl"
           />
           <div className="w-full">
             {detailPageState.img &&
@@ -446,6 +447,36 @@ function ImageView({
                         </div>
                       </div>
                     </div>
+                    {/* Popup when hovering over the item */}
+                    <div
+                      className={`absolute bg-white text-black p-2 rounded-md shadow-lg z-10 w-64 left-full ml-2 top-1/2 -translate-y-1/2
+                      ${currentIndex === index ? "block" : "hidden"}
+                      `}
+                    >
+                      <div className="flex">
+                        <div className="relative w-[100px] h-[100px]">
+                          <Image
+                            src={item.info.imageUrl ?? ""}
+                            alt={item.info.name}
+                            fill={true}
+                            className="object-contain"
+                          />
+                        </div>
+                        <div className="flex flex-col text-black p-2 w-48 mb-2 text-center items-center justify-center">
+                          <p
+                            className={`${semi_bold_font.className} text-sm mb-1`}
+                          >
+                            {item.info.name}
+                          </p>
+                          <p className={`${regular_font.className} text-xs`}>
+                            {item.info.brands?.[0]
+                              .replace(/_/g, " ")
+                              .toUpperCase()}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Popup on mobile */}
                     <div
                       className={`absolute border border-black backdrop-blur-sm text-black p-2 rounded-md shadow-lg w-52 left-0 md:hidden 
                         transition-all duration-300 ease-out overflow-x-hidden
@@ -487,6 +518,36 @@ function ImageView({
               ))}
           </div>
         </div>
+      </div>
+      <div className="flex-col w-full overflow-y-auto hidden lg:block">
+        {detailPageState.itemList?.map((item, index) => (
+          <Link
+            href={item.info.affiliateUrl ?? "#"}
+            className="p-2 m-2 border-b border-white/10 flex flex-row items-center hover:bg-white/10"
+            key={index}
+            onMouseOver={() => setCurrentIndex(index)}
+            onMouseOut={() => setCurrentIndex(null)}
+          >
+            <div className="w-16 h-20 relative ml-4 ">
+              <Image
+                src={item.info.imageUrl ?? ""}
+                alt={item.info.name}
+                fill={true}
+                style={{ objectFit: "contain" }}
+              />
+            </div>
+            <div className="flex flex-col w-full text-center overflow-clip">
+              <div className="text-sm">
+                {item.info.brands?.[0].replace(/_/g, " ").toUpperCase()}
+              </div>
+              <div
+                className={`text-center text-sm ${semi_bold_font.className}`}
+              >
+                {item.info.name}
+              </div>
+            </div>
+          </Link>
+        ))}
       </div>
     </div>
   );

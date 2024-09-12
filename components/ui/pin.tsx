@@ -6,7 +6,7 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
 function Pin({ image }: { image: MainImage }) {
   return (
-    <div className="flex flex-col w-full h-auto rounded-lg shadow-xl">
+    <div className="flex flex-col w-full h-[600px] md:h-[800px] rounded-lg border border-white/10">
       <Link
         href={`images?imageId=${image.docId}&imageUrl=${encodeURIComponent(
           image.imageUrl
@@ -20,6 +20,7 @@ function Pin({ image }: { image: MainImage }) {
           style={{
             objectFit: "cover",
           }}
+          className="rounded-lg"
         />
       </Link>
       <div className="flex flex-row justify-between items-center z-10 shadow-lg p-4">
@@ -45,15 +46,16 @@ function Pin({ image }: { image: MainImage }) {
             return (
               <Link
                 href={item?.affiliateUrl ?? "#"}
-                className="p-2 m-2 border-b-2 border-opacity-50 flex flex-row"
+                className="p-2 m-2 border-b border-white/10 flex flex-row"
                 key={index}
               >
-                <div className="w-16 h-20 relative border border-black rounded-md">
+                <div className="w-16 h-20 relative border border-black rounded-lg">
                   <Image
                     src={item.imageUrl ?? ""}
                     alt={item.name}
                     fill={true}
                     style={{ objectFit: "contain" }}
+                    className="rounded-lg"
                   />
                 </div>
                 <div className="flex flex-col ml-4 overflow-clip">

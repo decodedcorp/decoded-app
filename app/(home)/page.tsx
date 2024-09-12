@@ -20,6 +20,7 @@ import ProgressBar from "@/components/ui/progress-bar";
 import { Button } from "@mui/material";
 import { MockCelebrities } from "@/components/helpers/mock";
 import { LoadingView } from "@/components/ui/loading";
+import Pin from "@/components/ui/pin";
 
 function Home() {
   const [mainImages, setMainImages] = useState<MainImage[] | null>(null);
@@ -116,7 +117,7 @@ function Home() {
       {mainImages ? (
         <>
           <FeaturedView />
-          <ImageSelectView images={mainImages} />
+          <PinView images={mainImages} />
           <RequestSection />
         </>
       ) : (
@@ -194,6 +195,23 @@ function FeaturedView() {
               />
             </div>
           </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PinView({ images }: { images: MainImage[] | null }) {
+  return (
+    <div className="flex flex-col w-full mt-20">
+      <h2
+        className={`flex ${bold_font.className} mb-10 justify-center text-xl md:text-4xl`}
+      >
+        아이템 둘러보기
+      </h2>
+      <div className="grid grid-cols-2 md:grid-cols-3 p-10 gap-10 md:gap-32 w-full justify-start items-center">
+        {images?.map((image, index) => (
+          <Pin key={index} image={image} />
         ))}
       </div>
     </div>
