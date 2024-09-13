@@ -119,7 +119,7 @@ function Home() {
         <>
           <FeaturedView />
           <PinView images={mainImages} />
-          <RequestSection />
+          {/* <RequestSection /> */}
         </>
       ) : (
         <LoadingView />
