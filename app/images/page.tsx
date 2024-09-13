@@ -20,6 +20,8 @@ import {
   ArticleInfo,
   DetailPageState,
 } from "@/types/model";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import AddIcon from "@mui/icons-material/Add";
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
@@ -681,7 +683,7 @@ function ArtistArticleView({
         <h2 className={`${regular_font.className} text-xl text-center`}>
           Related Articles
         </h2>
-        <div className="grid grid-cols-1 items-center justify-center p-7 gap-4">
+        <div className="grid grid-cols-1 items-center justify-center p-4 md:p-20 gap-4">
           {currentItems?.map((article, index) => (
             <div
               key={index}

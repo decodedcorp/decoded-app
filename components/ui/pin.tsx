@@ -6,12 +6,12 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
 function Pin({ image }: { image: MainImage }) {
   return (
-    <div className="flex flex-col w-full h-[600px] md:h-[800px] rounded-lg border border-white/10">
+    <div className="flex flex-col w-full rounded-lg border border-white/10">
       <Link
         href={`images?imageId=${image.docId}&imageUrl=${encodeURIComponent(
           image.imageUrl
         )}`}
-        className="w-full h-96 relative overflow-hidden aspect-w-3 aspect-h-4"
+        className="relative overflow-hidden aspect-w-3 aspect-h-4"
       >
         <Image
           src={image.imageUrl ?? ""}
