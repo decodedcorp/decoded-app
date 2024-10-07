@@ -9,14 +9,13 @@ import white_logo from "@/assets/white_logo.png";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
+import PersonIcon from "@mui/icons-material/Person";
 
-const headers = ["home", "search"];
+const headers = ["home", "artist", "brand", "explore"];
 
 function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [lastScrollTop, setLastScrollTop] = useState(0);
-  const [koreanTime, setKoreanTime] = useState("");
-  const [usTime, setUsTime] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -31,37 +30,6 @@ function Header() {
       document.body.style.overflow = "unset";
     };
   }, [isSearchOpen, isSidebarOpen]);
-
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-
-      // 한국 시간 포맷팅
-      const koreanFormatter = new Intl.DateTimeFormat("ko-KR", {
-        timeZone: "Asia/Seoul",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false,
-      });
-      setKoreanTime(koreanFormatter.format(now));
-
-      // 미국 (뉴욕) 시간 포맷팅
-      const usFormatter = new Intl.DateTimeFormat("en-US", {
-        timeZone: "America/New_York",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false,
-      });
-      setUsTime(usFormatter.format(now));
-    };
-
-    updateTime(); // 초기 시간 설정
-    const timerId = setInterval(updateTime, 1000);
-
-    return () => clearInterval(timerId);
-  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -85,17 +53,11 @@ function Header() {
   return (
     <>
       <header
-        className={`fixed w-full p-4 transition-all duration-500 ${
+        className={`fixed w-full bg-[#242424] p-4 transition-all duration-500 ${
           isScrolled ? "-translate-y-full" : "translate-y-0"
         }`}
       >
-        <div className="grid grid-cols-3 items-center">
-          <div
-            className={`flex flex-col text-sm md:text-lg ${regular_font.className} text-white`}
-          >
-            <div className="hidden md:block">SEL {koreanTime}</div>
-            <div className="hidden md:block">NY {usTime}</div>
-          </div>
+        <div className="grid grid-cols-3 items-center w-full p-2">
           <Logo isScrolled={isScrolled} />
           <MenuSection
             isSearchOpen={isSearchOpen}
@@ -103,6 +65,19 @@ function Header() {
             isSidebarOpen={isSidebarOpen}
             setIsSidebarOpen={setIsSidebarOpen}
           />
+          <div className="flex w-full justify-end">
+            {!isSearchOpen ? (
+              <SearchIcon
+                className="cursor-pointer"
+                onClick={() => {
+                  setIsSearchOpen(!isSearchOpen);
+                }}
+              />
+            ) : (
+              <CloseIcon onClick={() => setIsSearchOpen(!isSearchOpen)} />
+            )}
+            <PersonIcon className="ml-4 cursor-pointer" />
+          </div>
         </div>
       </header>
       <SearchBar isOpen={isSearchOpen} setIsOpen={setIsSearchOpen} />
@@ -121,11 +96,11 @@ function Logo({ isScrolled }: { isScrolled: boolean }) {
     <Link
       href="/"
       prefetch={false}
-      className={`flex w-full justify-center transition-all duration-300 ${
+      className={`flex w-full transition-all duration-300 ${
         isScrolled ? "opacity-0" : "opacity-100"
       }`}
     >
-      <div className="relative w-[200px] h-[50px]">
+      <div className="relative w-[150px] h-[30px]">
         <Image
           src={white_logo}
           alt="logo"
@@ -155,37 +130,26 @@ function MenuSection({
 
   return (
     <>
-      <nav className="w-full justify-end text-white relative">
-        <ul className="hidden md:flex flex-row gap-3 justify-end pr-1 items-center text-white">
+      <nav className="flex justify-center w-full text-white">
+        <ul className="hidden md:flex flex-row gap-5 justify-end pr-1 items-center">
           {headers.map((header, index) => {
-            if (header === "search") {
-              return (
-                <div
-                  key={index}
-                  className={`text-md cursor-pointer ${regular_font.className}`}
-                  onClick={() => setIsSearchOpen(!isSearchOpen)}
-                >
-                  SEARCH
-                </div>
-              );
-            }
             return (
               <li
                 key={index}
                 className={`list-none transition-all duration-100 ease-in-out hover:scale-100 ${
                   header === "home"
                     ? pathname === "/"
-                      ? "border-b-2 border-[#ffffff]"
-                      : ""
+                      ? "text-white"
+                      : "text-white/50"
                     : currentPath === header
-                    ? "border-b-2 border-[#ffffff]"
-                    : ""
+                      ? "text-white"
+                      : "text-white/50"
                 }`}
               >
                 <Link
                   href={header === "home" ? "/" : `/${header}`}
                   prefetch={false}
-                  className={`${regular_font.className} text-md`}
+                  className={`${semi_bold_font.className} text-lg`}
                   onClick={() => setCurrentPath(header)}
                 >
                   {header.toUpperCase()}
@@ -213,26 +177,40 @@ function SearchBar({
   setIsOpen: Dispatch<SetStateAction<boolean>>;
 }) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [keywords, setKeywords] = useState<String[] | null>(null);
   const router = useRouter();
   const handleSearch = () => {
     if (searchQuery.trim() === "") return;
 
-    // 검색어를 인코딩하여 search 페이지로 이동
     router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
     setIsOpen(false);
   };
 
+  useEffect(() => {
+    // TODO: Replace mock
+    setKeywords([
+      "제니가 착용했던 아이템들",
+      "로제",
+      "다니엘",
+      "민지",
+      "리사가 착용했던 루이비통",
+      "민지가 착용했던 스투시",
+      "래퍼들이 착용한 시계 아이템들",
+    ]);
+  }, []);
+
   return (
     <div
-      className={`fixed w-full justify-center bg-black z-50 ${
+      className={`fixed w-full justify-center bg-[#242424] z-50 mt-10 ${
         semi_bold_font.className
-      } border-b border-gray-400/50 transition-all duration-300 ease-in-out h-60 ${
+      } border-b border-gray-400/50 transition-all duration-300 ease-in-out h-96 ${
         isOpen
           ? "opacity-100 translate-y-0"
           : "opacity-0 -translate-y-full pointer-events-none"
       }`}
     >
-      <div className="mx-2 p-10 w-full h-full flex flex-col justify-end items-center">
+      <div className="mx-2 p-10 w-full h-full flex flex-col justify-center items-center">
+        {/* Search Bar */}
         <div className="w-full">
           <form
             onSubmit={(e) => {
@@ -246,7 +224,7 @@ function SearchBar({
                 type="text"
                 className="w-full py-2 text-xl bg-transparent focus:outline-none text-white "
                 name="name"
-                placeholder="검색어를 입력해주세요"
+                placeholder="아티스트, 브랜드로 검색해보세요"
                 title="검색어 입력"
                 autoComplete="off"
                 value={searchQuery}
@@ -266,6 +244,21 @@ function SearchBar({
               </button>
             </div>
           </form>
+        </div>
+        {/* Keywords */}
+        <div
+          className={`${semi_bold_font.className} flex flex-wrap w-full md:w-[70%] justify-center mt-5`}
+        >
+          {keywords?.map((keyword, index) => {
+            return (
+              <div
+                key={index}
+                className="w-fit rounded-2xl border-2 border-white/50 m-2 p-2"
+              >
+                {keyword}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
