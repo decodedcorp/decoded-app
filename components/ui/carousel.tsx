@@ -21,7 +21,7 @@ const Carousel = ({ images }: { images: MainImage[] | null }) => {
         stopOnMouseEnter: true,
         stopOnInteraction: false,
       }),
-    ],
+    ]
   );
   const selectedScrollSnap = useCallback((emblaApi: EmblaCarouselType) => {
     setSelectedIndex(emblaApi.selectedScrollSnap());
@@ -40,7 +40,7 @@ const Carousel = ({ images }: { images: MainImage[] | null }) => {
   };
 
   const [hoveredImageIndex, setHoveredImageIndex] = useState<number | null>(
-    null,
+    null
   );
 
   return (

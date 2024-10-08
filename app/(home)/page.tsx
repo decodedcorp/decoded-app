@@ -2,6 +2,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState, useMemo } from "react";
+import useEmblaCarousel from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay";
 import { FirebaseHelper } from "../../common/firebase";
 import { bold_font, regular_font } from "@/components/helpers/util";
 import {
@@ -18,6 +20,7 @@ import {
 import Carousel from "@/components/ui/carousel";
 import ProgressBar from "@/components/ui/progress-bar";
 import { Button, ImageList, ImageListItem } from "@mui/material";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { useTheme, useMediaQuery } from "@mui/material";
 import { MockCelebrities } from "@/components/helpers/mock";
 import { LoadingView } from "@/components/ui/loading";
@@ -118,7 +121,7 @@ function Home() {
       {mainImages ? (
         <>
           <FeaturedView />
-          <PinView images={mainImages} />
+          {/* <PinView images={mainImages} /> */}
           {/* <RequestSection /> */}
         </>
       ) : (
@@ -131,7 +134,43 @@ function Home() {
 function FeaturedView() {
   const [featured, setFeatured] = useState<FeaturedInfo[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const slideDuration = 8000;
+  console.log("currentIndex", currentIndex);
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    {
+      loop: true,
+      containScroll: "keepSnaps",
+      dragFree: false,
+    },
+    [
+      Autoplay({
+        delay: 5000,
+        stopOnMouseEnter: true,
+        stopOnInteraction: false,
+      }),
+    ]
+  );
+
+  useEffect(() => {
+    if (emblaApi) {
+      emblaApi.on("select", () => {
+        setCurrentIndex(emblaApi.selectedScrollSnap());
+      });
+    }
+  }, [emblaApi]);
+
+  const handlePrev = () => {
+    if (emblaApi) {
+      emblaApi.scrollPrev();
+      setCurrentIndex(emblaApi.selectedScrollSnap());
+    }
+  };
+
+  const handleNext = () => {
+    if (emblaApi) {
+      emblaApi.scrollNext();
+      setCurrentIndex(emblaApi.selectedScrollSnap());
+    }
+  };
 
   useEffect(() => {
     const fetchFeatured = async () => {
@@ -141,72 +180,72 @@ function FeaturedView() {
         var featuredData = doc.data() as FeaturedInfo;
         featuredData.docId = doc.id;
         featuredInfoList.push(featuredData);
+        featuredInfoList.push(featuredData);
       });
       setFeatured(featuredInfoList);
     };
     fetchFeatured();
   }, []);
 
-  useEffect(() => {
-    if (featured.length === 0) return;
-    const timer = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % featured.length);
-    }, slideDuration);
-
-    return () => clearInterval(timer);
-  }, [featured]);
-
   if (featured.length === 0) return null;
 
   return (
-    <div className="w-full h-[100vh] relative overflow-hidden">
-      <div className="flex h-full">
-        {featured.map((f, index) => (
+    <div className="overflow-hidden max-w-full" ref={emblaRef}>
+      <div className="flex">
+        {featured?.map((f, index) => (
           <div
             key={index}
-            className="w-full h-full flex-shrink-0 transition-transform duration-1000 ease-in-out absolute"
-            style={{
-              transform: `translateX(${(index - currentIndex) * 100}%)`,
-              zIndex: index === currentIndex ? 1 : 0,
-            }}
+            className={`flex flex-col md:flex-row items-center p-2 md:p-10 ${
+              index === currentIndex ? "opacity-100" : "opacity-20"
+            }`}
           >
-            <Image
-              src={f.imageUrl}
-              alt={f.title}
-              fill={true}
-              style={{ objectFit: "cover" }}
-              className="border border-black"
-              priority
-            />
-            <div className="flex flex-col absolute inset-0 justify-end pb-40 pl-10 md:pl-20 bg-gradient-to-t from-black/70 to-transparent cursor-pointer">
+            <div className="relative w-[80vw]">
+              <div className="aspect-w-16 aspect-h-9">
+                <Image
+                  src={f.imageUrl}
+                  alt="carousel image"
+                  fill={true}
+                  style={{ objectFit: "cover" }}
+                  loading="lazy"
+                />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-70"></div>
               <Link
                 href={`/images?imageId=${f.docId}&imageUrl=${f.imageUrl}&isFeatured=yes`}
+                className="absolute inset-x-0 bottom-0 p-4 text-white z-10 text-center hover:underline"
               >
-                <h2
-                  className={`text-white text-4xl md:text-7xl font-bold ${bold_font.className} hover:underline w-[80%] lg:w-[70%]`}
-                >
-                  {f.title}
-                </h2>
+                <h1 className="text-xl font-bold mb-2">
+                  {f.category.toUpperCase()}
+                </h1>
+                <h2 className="text-4xl font-bold mb-10">{f.title}</h2>
               </Link>
-              <ProgressBar
-                duration={slideDuration}
-                currentIndex={currentIndex}
-                setCurrentIndex={setCurrentIndex}
-                totalItems={featured.length}
-              />
             </div>
           </div>
         ))}
       </div>
+      {/* <div className="absolute">
+        <button
+          onClick={handlePrev}
+          className="absolute left-10 top-1/2 transform -translate-y-1/2 z-50 flex h-16 w-16 items-center justify-center text-white/50 font-bold"
+        >
+          <ArrowBackIosIcon fontSize="large" />
+        </button>
+        <button
+          onClick={handleNext}
+          className="absolute right-10 top-1/2 transform -translate-y-1/2 z-50 flex h-16 w-16 items-center justify-center text-white/50 font-bold"
+        >
+          <ArrowBackIosIcon fontSize="large" className="rotate-180" />
+        </button>
+      </div> */}
     </div>
   );
 }
 
 function PinView({ images }: { images: MainImage[] | null }) {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'lg'));
-  
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "lg"));
+
   const getCols = () => {
     if (isMobile) return 2;
     if (isTablet) return 4;
@@ -220,13 +259,18 @@ function PinView({ images }: { images: MainImage[] | null }) {
       >
         스타일 둘러보기
       </h2>
-      <ImageList variant="masonry" cols={getCols()} gap={20} className="p-2 mt-10">
+      <ImageList
+        variant="masonry"
+        cols={getCols()}
+        gap={20}
+        className="p-2 mt-10"
+      >
         <div>
-        {images?.map((image, index) => (
-          <ImageListItem key={index}>
-            <Pin image={image} />
-          </ImageListItem>
-        ))}
+          {images?.map((image, index) => (
+            <ImageListItem key={index}>
+              <Pin image={image} />
+            </ImageListItem>
+          ))}
         </div>
       </ImageList>
     </div>
