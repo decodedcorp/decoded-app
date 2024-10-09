@@ -39,107 +39,99 @@ import Pin from "@/components/ui/pin";
 function Home() {
   const [mainImages, setMainImages] = useState<MainImage[] | null>(null);
 
-  useEffect(() => {
-    const fetchAllImages = async () => {
-      const storageItems = await FirebaseHelper.listAllStorageItems("images");
-      const imageStorage = storageItems.items;
-      const images = await Promise.all(
-        imageStorage.map(async (image) => {
-          try {
-            const [metadata, url] = await Promise.all([
-              FirebaseHelper.metadata(image),
-              FirebaseHelper.downloadUrl(image),
-            ]);
-            const imageDocId = metadata.customMetadata?.id;
-            if (!imageDocId) {
-              return;
-            }
-            const imageDoc = await FirebaseHelper.doc("images", imageDocId);
-            if (imageDoc.exists()) {
-              const imageInfo = imageDoc.data() as ImageInfo;
-              var artistInfoList: ArtistInfo[] | undefined;
-              var artistsTags = imageInfo.tags?.["artists"];
-              if (artistsTags) {
-                const artistPromises = artistsTags.map(async (artist) => {
-                  const artistDoc = await FirebaseHelper.doc("artists", artist);
-                  if (artistDoc.exists()) {
-                    return artistDoc.data() as ArtistInfo;
-                  }
-                });
-                const res = await Promise.all(artistPromises);
-                artistInfoList = res.filter(
-                  (artist): artist is ArtistInfo => artist !== undefined
-                );
-              }
-              var itemInfoList = new Map<ItemInfo, [Position, BrandInfo[]]>();
-              if (imageInfo.taggedItem) {
-                const itemPromises = imageInfo.taggedItem.map(async (item) => {
-                  const taggedItem = item as TaggedItem;
-                  const itemDoc = await FirebaseHelper.doc(
-                    "items",
-                    taggedItem.id
-                  );
-                  if (itemDoc.exists()) {
-                    const itemInfo = itemDoc.data() as ItemInfo;
-                    let brandInfo: BrandInfo[] = [];
-                    const brandTags = itemInfo.tags?.["brands"];
-                    if (brandTags) {
-                      const brandPromises = brandTags.map(async (b) => {
-                        const doc = await FirebaseHelper.doc("brands", b);
-                        if (doc.exists()) {
-                          return doc.data() as BrandInfo;
-                        }
-                        return undefined;
-                      });
-                      const res = await Promise.all(brandPromises);
-                      brandInfo = res.filter(
-                        (brand): brand is BrandInfo => brand !== undefined
-                      );
-                    }
-                    itemInfoList.set(itemInfo, [taggedItem.pos, brandInfo]);
-                  }
-                });
+  // useEffect(() => {
+  //   const fetchAllImages = async () => {
+  //     const storageItems = await FirebaseHelper.listAllStorageItems("images");
+  //     const imageStorage = storageItems.items;
+  //     const images = await Promise.all(
+  //       imageStorage.map(async (image) => {
+  //         try {
+  //           const [metadata, url] = await Promise.all([
+  //             FirebaseHelper.metadata(image),
+  //             FirebaseHelper.downloadUrl(image),
+  //           ]);
+  //           const imageDocId = metadata.customMetadata?.id;
+  //           if (!imageDocId) {
+  //             return;
+  //           }
+  //           const imageDoc = await FirebaseHelper.doc("images", imageDocId);
+  //           if (imageDoc.exists()) {
+  //             const imageInfo = imageDoc.data() as ImageInfo;
+  //             var artistInfoList: ArtistInfo[] | undefined;
+  //             var artistsTags = imageInfo.tags?.["artists"];
+  //             if (artistsTags) {
+  //               const artistPromises = artistsTags.map(async (artist) => {
+  //                 const artistDoc = await FirebaseHelper.doc("artists", artist);
+  //                 if (artistDoc.exists()) {
+  //                   return artistDoc.data() as ArtistInfo;
+  //                 }
+  //               });
+  //               const res = await Promise.all(artistPromises);
+  //               artistInfoList = res.filter(
+  //                 (artist): artist is ArtistInfo => artist !== undefined
+  //               );
+  //             }
+  //             var itemInfoList = new Map<ItemInfo, [Position, BrandInfo[]]>();
+  //             if (imageInfo.taggedItem) {
+  //               const itemPromises = imageInfo.taggedItem.map(async (item) => {
+  //                 const taggedItem = item as TaggedItem;
+  //                 const itemDoc = await FirebaseHelper.doc(
+  //                   "items",
+  //                   taggedItem.id
+  //                 );
+  //                 if (itemDoc.exists()) {
+  //                   const itemInfo = itemDoc.data() as ItemInfo;
+  //                   let brandInfo: BrandInfo[] = [];
+  //                   const brandTags = itemInfo.tags?.["brands"];
+  //                   if (brandTags) {
+  //                     const brandPromises = brandTags.map(async (b) => {
+  //                       const doc = await FirebaseHelper.doc("brands", b);
+  //                       if (doc.exists()) {
+  //                         return doc.data() as BrandInfo;
+  //                       }
+  //                       return undefined;
+  //                     });
+  //                     const res = await Promise.all(brandPromises);
+  //                     brandInfo = res.filter(
+  //                       (brand): brand is BrandInfo => brand !== undefined
+  //                     );
+  //                   }
+  //                   itemInfoList.set(itemInfo, [taggedItem.pos, brandInfo]);
+  //                 }
+  //               });
 
-                await Promise.all(itemPromises);
-              }
-              let mainImage: MainImage = {
-                imageUrl: url,
-                docId: imageDocId,
-                title: imageInfo.title,
-                itemInfoList,
-                artistInfoList,
-                description: imageInfo.description,
-              };
-              return mainImage;
-            }
-          } catch (error) {
-            console.error("Error processing item:", error);
-            return;
-          }
-        })
-      );
-      let filtered = images.filter(
-        (image): image is MainImage => image !== undefined
-      );
-      setMainImages(filtered);
-    };
-    fetchAllImages();
-  }, []);
+  //               await Promise.all(itemPromises);
+  //             }
+  //             let mainImage: MainImage = {
+  //               imageUrl: url,
+  //               docId: imageDocId,
+  //               title: imageInfo.title,
+  //               itemInfoList,
+  //               artistInfoList,
+  //               description: imageInfo.description,
+  //             };
+  //             return mainImage;
+  //           }
+  //         } catch (error) {
+  //           console.error("Error processing item:", error);
+  //           return;
+  //         }
+  //       })
+  //     );
+  //     let filtered = images.filter(
+  //       (image): image is MainImage => image !== undefined
+  //     );
+  //     setMainImages(filtered);
+  //   };
+  //   fetchAllImages();
+  // }, []);
 
   return (
     <div className="flex flex-col min-h-[100vh]">
-      {mainImages ? (
-        <>
-          <FeaturedView />
-          <PickView />
-          {/* <PinView images={mainImages} /> */}
-          {/* <RequestSection /> */}
-          <DiscoverView />
-          <TrendingNowView />
-        </>
-      ) : (
-        <LoadingView />
-      )}
+      <FeaturedView />
+      <PickView />
+      <DiscoverView />
+      <TrendingNowView />
     </div>
   );
 }
@@ -267,13 +259,11 @@ function PickView() {
   return (
     <div className="flex flex-col w-full mt-20">
       <div className="flex flex-col w-full px-20">
-        <h2
-          className={`flex ${bold_font.className} justify-start text-xl md:text-3xl`}
-        >
+        <h2 className={`${bold_font.className} text-xl md:text-3xl`}>
           DECODED'S PICK
         </h2>
         <h3
-          className={`flex ${regular_font.className} mt-2 justify-start text-md md:text-xl text-white/80`}
+          className={`${regular_font.className} mt-2 text-md md:text-xl text-white/80`}
         >
           디코디드가 선택한 스타일을 확인하세요
         </h3>
@@ -283,29 +273,26 @@ function PickView() {
         {picks.map((pick, index) => {
           const isOdd = index % 2 !== 0;
           return (
-            <>
-              {index == 2 && <SpotlightView />}
-              <div
-                key={index}
-                className="flex flex-col md:flex-row w-full mt-10 justify-center px-20"
-              >
+            <div key={index}>
+              {index === 2 && <SpotlightView />}
+              <div className="flex flex-col lg:flex-row w-full mt-10 justify-center px-20">
                 <div
-                  className={`flex flex-col md:flex-row w-full max-h-[1165px] md:space-x-6 ${
+                  className={`flex flex-col md:flex-row w-full min-w-[1300px] ${
                     isOdd ? "md:flex-row-reverse" : ""
                   }`}
                 >
                   {/* Image */}
                   <div
-                    className={`w-full max-w-[874px] max-h-[1312px] ${
-                      isOdd ? "md:ml-6" : ""
+                    className={`w-full md:w-1/2 ${
+                      isOdd ? "md:ml-6" : "md:mr-6"
                     }`}
                   >
-                    <div className="w-full md:w-[90%] relative aspect-[3/4]">
+                    <div className="relative aspect-[3/4]">
                       <Image
                         src={pick.imageUrl}
                         alt={pick.title}
-                        fill={true}
-                        style={{ objectFit: "cover" }}
+                        fill
+                        className="object-cover"
                       />
                       {pick.items.map((item, itemIndex) => (
                         <Link
@@ -323,56 +310,63 @@ function PickView() {
                     </div>
                   </div>
                   {/* Description */}
-                  <div
-                    className={`w-full flex flex-col space-y-6 ${
-                      isOdd ? "md:mr-6" : ""
-                    }`}
-                  >
-                    <div className="flex flex-col w-full md:w-[20vw]">
-                      <h2 className="text-2xl font-bold mb-4">{pick.title}</h2>
-                      <p className="text-md text-white/80 mb-6">
-                        {pick.description}
-                      </p>
+                  <div className={`w-full md:w-1/2 flex flex-col space-y-6`}>
+                    <div className="flex flex-col">
+                      <div className="w-1/2">
+                        <h2 className={`${bold_font.className} text-2xl mb-4`}>
+                          {pick.title}
+                        </h2>
+                        <p className="text-md text-white/80 mb-6">
+                          {pick.description}
+                        </p>
+                      </div>
+                      <div className="flex items-center mb-6">
+                        <div className="flex items-center w-[30px] h-[30px] relative">
+                          <Image
+                            src={pick.imageUrl}
+                            alt={pick.title}
+                            fill={true}
+                            style={{ objectFit: "cover" }}
+                            className="rounded-full mr-3"
+                          />
+                        </div>
+                        <span className={`${regular_font.className} ml-4`}>
+                          {pick.artist}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex flex-col md:flex-row w-full justify-between">
+                    <div className="flex flex-wrap justify-between">
                       {pick.items.map((item, itemIndex) => (
                         <div
                           key={itemIndex}
-                          className={`flex items-center md:items-start md:flex-col ${
-                            itemIndex === 0 ? "mt-0" : "md:mt-40 ml-4"
+                          className={`w-1/2 md:w-[48%] mb-6 ${
+                            itemIndex === 0 ? "mt-0" : "md:mt-20"
                           }`}
                         >
                           <Link
                             href={item.affilateUrl}
-                            className="relative w-[75px] h-[75px] lg:w-[417px] lg:h-[556px] mb-2"
+                            className="block relative aspect-square mb-2 w-full aspect-[3/4] bg-white"
                           >
-                            <div className="w-full h-full relative bg-white aspect-[3/4]">
-                              <Image
-                                src={item.imageUrl}
-                                alt={item.name}
-                                fill={true}
-                                className="object-cover"
-                              />
-                            </div>
-                            <div
-                              className={`${bold_font.className} absolute top-2 left-2 bg-white/20 flex items-center justify-center text-black text-xl`}
-                            >
-                              {String.fromCharCode(65 + itemIndex)}
-                            </div>
+                            <Image
+                              src={item.imageUrl}
+                              alt={item.name}
+                              fill={true}
+                              style={{ objectFit: "cover" }}
+                            />
                           </Link>
-                          <div className="flex flex-col ml-4">
-                            <p className="text-sm text-white/80 hover:underline">
-                              {item.brand.name.replace("_", " ").toUpperCase()}
-                            </p>
-                            <h3 className="text-lg font-bold">{item.name}</h3>
-                          </div>
+                          <p className="text-sm text-white/80 hover:underline">
+                            {item.brand.name.replace("_", " ").toUpperCase()}
+                          </p>
+                          <h3 className={`${bold_font.className} text-lg`}>
+                            {item.name}
+                          </h3>
                         </div>
                       ))}
                     </div>
                   </div>
                 </div>
               </div>
-            </>
+            </div>
           );
         })}
       </div>
@@ -390,16 +384,82 @@ function SpotlightView() {
     fetchSpotlight();
   }, []);
 
+  if (!spotlight) return null;
+
   return (
     <div className="flex flex-col w-full mt-20 bg-[#171717] p-20">
-      <h2 className={`flex ${bold_font.className} mb-2 text-xl md:text-2xl`}>
+      <h2 className={`flex ${bold_font.className} mb-2 text-xl md:text-4xl`}>
         ARTIST SPOTLIGHT
       </h2>
       <h3
-        className={`flex ${regular_font.className} text-md md:text-xl text-white/80`}
+        className={`flex ${regular_font.className} text-md md:text-xl text-white/80 mb-10`}
       >
-        셀럽의 아이템을 확인해보세요
+        아티스트의 다양한 스타일을 확인해보세요
       </h3>
+
+      <div className="flex flex-col md:flex-row gap-6">
+        <Link
+          href={`/images?imageId=${
+            spotlight.images[0].id
+          }&imageUrl=${encodeURIComponent(spotlight.images[0].imageUrl)}`}
+          className="w-full md:w-1/2 md:h-1/2"
+        >
+          <Image
+            src={spotlight.images[0].imageUrl}
+            alt={spotlight.title}
+            width={800}
+            height={800}
+            className="object-cover w-full h-full"
+          />
+        </Link>
+        <div className="w-full md:w-1/2 flex flex-col justify-between">
+          <div>
+            <h2 className={`${bold_font.className} text-2xl md:text-3xl mb-4`}>
+              {spotlight.title}
+            </h2>
+            <p className="text-white/80 mb-6">{spotlight.description}</p>
+            <div className="flex items-center mb-6">
+              <Image
+                src={spotlight.profileImgUrl}
+                alt={spotlight.artist}
+                width={40}
+                height={40}
+                className="rounded-full mr-3"
+              />
+              <span className={`${regular_font.className}`}>
+                {spotlight.artist}
+              </span>
+            </div>
+          </div>
+          <div className="flex flex-col w-full">
+            <Link
+              href={`/search?keyword=${spotlight.artist}`}
+              className={`${bold_font.className} text-right mt-4 text-white/80 hover:text-white mb-4`}
+            >
+              VIEW MORE +
+            </Link>
+            <div className="flex gap-4 w-full">
+              {spotlight.images.slice(1, 3).map((image, index) => (
+                <Link
+                  key={index}
+                  href={`/images?imageId=${
+                    image.id
+                  }&imageUrl=${encodeURIComponent(image.imageUrl)}`}
+                  className="w-1/2 aspect-[3/4]"
+                >
+                  <Image
+                    src={image.imageUrl}
+                    alt={`${spotlight.title} ${index + 2}`}
+                    width={300}
+                    height={400}
+                    className="object-cover w-full h-full"
+                  />
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

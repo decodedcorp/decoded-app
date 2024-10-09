@@ -368,6 +368,7 @@ export interface PickInfo {
   imageUrl: string;
   title: string;
   description: string;
+  artist: string;
   items: {
     pos: Position;
     imageUrl: string;
@@ -381,7 +382,10 @@ export interface PickInfo {
 }
 
 export interface SpotlightInfo {
-  imageUrls: string[];
+  images: {
+    id: string;
+    imageUrl: string;
+  }[];
   title: string;
   description: string;
   artist: string;

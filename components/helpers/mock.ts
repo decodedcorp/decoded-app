@@ -19,6 +19,7 @@ export const mockPicks: PickInfo[] = [
     title: "로제, Shevoke 선글라스와 The Row 의상으로 완벽한 스타일링",
     description:
       "블랙핑크의 로제가 Shevoke 선글라스와 The Row의 상의, 팬츠, 벨트를 매치한 세련된 룩을 선보였다. 그녀는 또한 Pharrel Williams가 디자인한 Tiffany & Co.의 반지와 귀걸이로 포인트를 주었다. 로제의 스타일링은 심플하면서도 고급스러운 분위기를 자아내며 많은 팬들의 주목을 받았다. 이번 룩은 로제의 패션 감각을 다시 한번 입증하는 계기가 되었다.",
+    artist: "로제",
     items: [
       {
         pos: { left: "19.50%", top: "40.69%"},
@@ -52,6 +53,7 @@ export const mockPicks: PickInfo[] = [
     title: "블랙핑크 제니, 독특한 스트리트 패션으로 시선 강탈",
     description:
       "제니가 독특한 스트리트 패션으로 다시 한번 패션 아이콘임을 입증했습니다. 그녀는 요지 야마모토의 'unfinished effect high neck jumper'와 코페르니의 와이드 카고 팬츠를 매치하여 트렌디하면서도 개성 넘치는 룩을 완성했습니다. 또한, 미하라 야스히로의 로우 스니커즈를 신어 캐주얼함을 더하며, 그녀만의 스타일을 강조했습니다.",
+    artist: "제니",
     items: [
       {
         pos: { left: "47.25%", top: "98.75%"},
@@ -85,6 +87,7 @@ export const mockPicks: PickInfo[] = [
     title: "도쿄돔 공연 속 하니 룩",
     description:
       "하니는 도쿄돔 공연에서 여름 느낌이 물씬 나는 Saint James 브랜드의 네이비 색상 Naval II 3/4 Sleeve T-Shirt를 입고 등장해 눈길을 끌었다.",
+    artist: "하니",
     items: [
       {
         pos: { left: "39.46%", top: "32.35%"},
@@ -106,6 +109,7 @@ export const mockPicks: PickInfo[] = [
     title: "How Sweet 뮤비 속 민지",
     description:
       "뉴진스의 멤버 민지가 How Sweet 뮤직비디오 촬영 현장에서 독특한 스트릿 패션을 선보였습니다. 그녀는 The Great Alfred의 모자와 HERITAGEFLOSS의 상의를 착용하여 세련된 스타일을 완성했습니다.",
+    artist: "민지",
     items: [
       {
         pos: { left: "44.65%", top: "33.80%"},
@@ -136,15 +140,24 @@ export const mockPicks: PickInfo[] = [
 ]
 
 export const mockSpotlight: SpotlightInfo = {
-  imageUrls: [
-      "https://firebasestorage.googleapis.com/v0/b/tagged-d87d8.appspot.com/o/images%2F00e24a660cded53b3f39193853b26f6ac78c8b7934b9b7153b4833b9cd76eb55?alt=media&token=5df9a578-921a-4783-9f9d-1bf022f18d8a",
-      "https://firebasestorage.googleapis.com/v0/b/tagged-d87d8.appspot.com/o/images%2Fjennie_mihara_yasuhiro_gentle_monster_coperni_ys?alt=media&token=adc7b948-3758-44a9-9c6f-516ad4cb10c0",
-      "https://firebasestorage.googleapis.com/v0/b/tagged-d87d8.appspot.com/o/images%2Fad32534e7ef6efe6ec3866fe611e8720afebd3a5fe2d33c7c6607c27345ebe66?alt=media&token=03ece03b-acc1-45d1-9472-e0d98fbdb8e3",
+  images: [
+    {
+      id: "14c7bec5466a25f5add82b7a5115a15b8537470766de8db71bad6ea40386b57e",
+      imageUrl: "https://firebasestorage.googleapis.com/v0/b/tagged-d87d8.appspot.com/o/images%2Fjennie_mihara_yasuhiro_gentle_monster_coperni_ys?alt=media&token=adc7b948-3758-44a9-9c6f-516ad4cb10c0",
+    },
+    {
+      id: "8b572e838b8593fcbfad460aec44ce51c8a40e932ee402f68740e4a9e8335957",
+      imageUrl: "https://firebasestorage.googleapis.com/v0/b/tagged-d87d8.appspot.com/o/images%2Fjennie_airport_ck_gentle_monster_maison_marais_chanel?alt=media&token=380eb6fe-6c28-41a8-a6a2-e2c72aad33cb",
+    },
+    {
+      id: "fec109ec3cd354a9f28f9898df8e03563528850f71c0394b3dda6f8dc015a702",
+      imageUrl: "https://firebasestorage.googleapis.com/v0/b/tagged-d87d8.appspot.com/o/images%2Fjennie_chanel_jacquemus?alt=media&token=5e0a2683-3683-4761-924c-47bcd404eef9",
+    },
   ],
   title: "제니 x 젠틀몬스터 스타일",
   description: "제니가 젠틀몬스터의 오리지널 패션을 선보였습니다. 젠틀몬스터의 패션은 심플하면서도 고급스러운 분위기를 자아내며 많은 팬들의 주목을 받았다.",
   artist: "제니",
-  profileImgUrl: "https://firebasestorage.googleapis.com/v0/b/tagged-d87d8.appspot.com/o/images%2Fjennie_profile.jpg?alt=media&token=5df9a578-921a-4783-9f9d-1bf022f18d8a",
+  profileImgUrl: "https://firebasestorage.googleapis.com/v0/b/tagged-d87d8.appspot.com/o/artists%2Fjennie.jpeg?alt=media&token=2599768b-38b9-4c26-b04f-604b0a4166a5",
 };
 
 export const mockTrendingNow: TrendingNowInfo[] = [
