@@ -363,3 +363,41 @@ interface ArtistPageState {
    */
   artistProfileImgUrl?: string;
 }
+
+export interface PickInfo {
+  imageUrl: string;
+  title: string;
+  description: string;
+  items: {
+    pos: Position;
+    imageUrl: string;
+    name: string;
+    affilateUrl: string;
+    brand: {
+      logoUrl: string;
+      name: string;
+    };
+  }[];
+}
+
+export interface SpotlightInfo {
+  imageUrls: string[];
+  title: string;
+  description: string;
+  artist: string;
+  profileImgUrl: string;
+}
+
+export interface TrendingNowInfo {
+  name: string;
+  imageUrl: string;
+}
+
+export interface DiscoverInfo {
+  section: string;
+  items: {
+    name: string;
+    imageUrl: string;
+    brand: string;
+  }[];
+}
