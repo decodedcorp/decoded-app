@@ -1,4 +1,4 @@
-import { bold_font } from "../helpers/util";
+import { bold_font } from "../helpers/font";
 
 export function LoadingView() {
   return (

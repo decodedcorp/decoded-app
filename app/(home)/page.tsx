@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { FirebaseHelper } from "../../common/firebase";
-import { bold_font, regular_font } from "@/components/helpers/util";
+import { bold_font, regular_font } from "@/components/helpers/font";
 import {
   ImageInfo,
   BrandInfo,

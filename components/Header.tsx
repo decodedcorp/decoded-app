@@ -4,21 +4,37 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, Dispatch, SetStateAction, useEffect } from "react";
-import { regular_font, semi_bold_font } from "@/components/helpers/util";
+import {
+  bold_font,
+  regular_font,
+  semi_bold_font,
+} from "@/components/helpers/font";
 import white_logo from "@/assets/white_logo.png";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
 import PersonIcon from "@mui/icons-material/Person";
+import PlusIcon from "@mui/icons-material/Add";
+import MinusIcon from "@mui/icons-material/Remove";
 import { color } from "@/components/helpers/color";
+import { LoginModal } from "@/components/ui/modal";
 
-const headers = ["home", "artist", "brand", "explore"];
+const headers: Record<string, string[]> = {
+  home: [],
+  artist: ["kpop", "rapper", "actor", "model"],
+  brand: ["luxury", "streetwear"],
+  explore: [],
+};
 
 function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [lastScrollTop, setLastScrollTop] = useState(0);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isLogin, setIsLogin] = useState(false);
+  const pathname = usePathname();
+  const cleanedPath = pathname.replace(/^\//, "");
+  const [currentPath, setCurrentPath] = useState(cleanedPath);
 
   useEffect(() => {
     if (isSearchOpen || isSidebarOpen) {
@@ -73,10 +89,9 @@ function Header() {
           <div className={`${isScrolled ? "hidden" : ""}`}></div>
           <div className="flex w-full p-4 items-center">
             <MenuSection
-              isSearchOpen={isSearchOpen}
-              setIsSearchOpen={setIsSearchOpen}
-              isSidebarOpen={isSidebarOpen}
-              setIsSidebarOpen={setIsSidebarOpen}
+              pathname={pathname}
+              currentPath={currentPath}
+              setCurrentPath={setCurrentPath}
             />
             <div></div>
           </div>
@@ -84,6 +99,9 @@ function Header() {
             isScrolled={isScrolled}
             isSearchOpen={isSearchOpen}
             setIsSearchOpen={setIsSearchOpen}
+            isLogin={isLogin}
+            setIsLogin={setIsLogin}
+            setIsSidebarOpen={setIsSidebarOpen}
           />
         </div>
       </header>
@@ -93,10 +111,17 @@ function Header() {
         isScrolled={isScrolled}
       />
       {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
-          onClick={() => setIsSidebarOpen(false)}
-        ></div>
+        <>
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            onClick={() => setIsSidebarOpen(false)}
+          ></div>
+          <Sidebar
+            isSidebarOpen={isSidebarOpen}
+            setIsSidebarOpen={setIsSidebarOpen}
+            setCurrentPath={setCurrentPath}
+          />
+        </>
       )}
     </>
   );
@@ -131,25 +156,19 @@ function Logo({ isScrolled }: { isScrolled: boolean }) {
 }
 
 function MenuSection({
-  isSearchOpen,
-  setIsSearchOpen,
-  isSidebarOpen,
-  setIsSidebarOpen,
+  pathname,
+  currentPath,
+  setCurrentPath,
 }: {
-  isSearchOpen: boolean;
-  isSidebarOpen: boolean;
-  setIsSearchOpen: Dispatch<SetStateAction<boolean>>;
-  setIsSidebarOpen: Dispatch<SetStateAction<boolean>>;
+  pathname: string;
+  currentPath: string;
+  setCurrentPath: Dispatch<SetStateAction<string>>;
 }) {
-  const pathname = usePathname();
-  const cleanedPath = pathname.replace(/^\//, "");
-  const [currentPath, setCurrentPath] = useState(cleanedPath);
-
   return (
     <>
       <nav className="flex justify-center w-full">
         <ul className="flex gap-5 justify-end pr-1 items-center">
-          {headers.map((header, index) => {
+          {Object.keys(headers).map((header, index) => {
             return (
               <li
                 key={index}
@@ -184,10 +203,16 @@ function SearchLoginMenu({
   isScrolled,
   isSearchOpen,
   setIsSearchOpen,
+  isLogin,
+  setIsLogin,
+  setIsSidebarOpen,
 }: {
   isScrolled: boolean;
   isSearchOpen: boolean;
   setIsSearchOpen: Dispatch<SetStateAction<boolean>>;
+  isLogin: boolean;
+  setIsLogin: Dispatch<SetStateAction<boolean>>;
+  setIsSidebarOpen: Dispatch<SetStateAction<boolean>>;
 }) {
   return (
     <div className="flex w-full p-4 justify-end">
@@ -204,9 +229,17 @@ function SearchLoginMenu({
       )}
       <PersonIcon
         className="cursor-pointer text-white mr-4"
-        onClick={() => alert("Login not implemented yet")}
+        onClick={() =>
+          (
+            document.getElementById("login-modal") as HTMLDialogElement
+          )?.showModal()
+        }
       />
-      <MenuIcon className="cursor-pointer text-white" />
+      <LoginModal setIsLogin={setIsLogin} />
+      <MenuIcon
+        className="cursor-pointer text-white"
+        onClick={() => setIsSidebarOpen(true)}
+      />
     </div>
   );
 }
@@ -247,7 +280,7 @@ function SearchBar({
     <div
       className={`fixed w-full justify-center bg-[${
         color.palette.gray900
-      }] z-50 ${
+      }] z-10 ${
         semi_bold_font.className
       } border-b border-gray-400/50 transition-all duration-300 ease-in-out ${
         isScrolled ? "h-[250px] mt-16 md:mt-24" : "h-[400px] mt-8 md:mt-32"
@@ -315,6 +348,88 @@ function SearchBar({
           })}
         </div>
       </div>
+    </div>
+  );
+}
+
+function Sidebar({
+  isSidebarOpen,
+  setIsSidebarOpen,
+  setCurrentPath,
+}: {
+  isSidebarOpen: boolean;
+  setIsSidebarOpen: Dispatch<SetStateAction<boolean>>;
+  setCurrentPath: Dispatch<SetStateAction<string>>;
+}) {
+  const [isExpanded, setIsExpanded] = useState<{ [key: number]: boolean }>(
+    () => {
+      const initialState: { [key: number]: boolean } = {};
+      Object.keys(headers).forEach((_, index) => {
+        initialState[index] = true;
+      });
+      return initialState;
+    }
+  );
+
+  return (
+    <div
+      className={`fixed top-0 right-0 h-[100vh] bg-[${
+        color.palette.gray900
+      }] text-white transform transition-transform duration-300 ease-in-out ${
+        isSidebarOpen ? "translate-x-0" : "translate-x-full"
+      } z-50 w-full lg:w-[30%]`}
+    >
+      <div className="flex justify-end p-4">
+        <button onClick={() => setIsSidebarOpen(false)}>
+          <CloseIcon className="text-2xl" />
+        </button>
+      </div>
+      <ul className="flex flex-col gap-4 p-4">
+        {Object.keys(headers).map((header, index) => (
+          <li key={index} className={`${bold_font.className} text-4xl`}>
+            <div className="flex justify-between items-center">
+              <Link
+                href={header === "home" ? "/" : `/${header}`}
+                onClick={() => {
+                  setCurrentPath(header);
+                  setIsSidebarOpen(false);
+                }}
+              >
+                {header.toUpperCase()}
+              </Link>
+              {isExpanded[index] ? (
+                <MinusIcon
+                  className="text-2xl cursor-pointer"
+                  onClick={() =>
+                    setIsExpanded((prev) => ({ ...prev, [index]: false }))
+                  }
+                />
+              ) : (
+                <PlusIcon
+                  className="text-2xl cursor-pointer"
+                  onClick={() =>
+                    setIsExpanded((prev) => ({ ...prev, [index]: true }))
+                  }
+                />
+              )}
+            </div>
+            {isExpanded[index] && (
+              <div className="flex flex-col py-2">
+                {headers[header].map((subHeader, subIndex) => (
+                  <Link
+                    key={subIndex}
+                    href={`/search?query=${subHeader}`}
+                    prefetch={false}
+                    className="text-white/20 py-2 text-md md:text-xl hover:text-white"
+                  >
+                    {subHeader.toUpperCase()}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import white_logo from "@/assets/white_logo.png";
-import { regular_font } from "./helpers/util";
+import { regular_font } from "./helpers/font";
 import { Button } from "@mui/material";
 
 function Footer() {

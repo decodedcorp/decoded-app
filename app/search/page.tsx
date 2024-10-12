@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FirebaseHelper } from "@/common/firebase";
 import { ArtistInfo, ArticleInfo, BrandInfo } from "@/types/model";
-import { regular_font, semi_bold_font } from "@/components/helpers/util";
+import { regular_font, semi_bold_font } from "@/components/helpers/font";
 
 function SearchPage() {
   const searchParams = useSearchParams();
@@ -66,14 +66,14 @@ function SearchPage() {
   }, [query]);
 
   return (
-    <div className="mx-auto px-4 py-8 mt-20">
+    <div className="mx-auto px-4 py-8 mt-20 h-[100vh]">
       <h1 className={`${semi_bold_font.className} text-3xl md:text-5xl mb-8`}>
         "{query}" 검색 결과
       </h1>
       {searchResults.length === 0 &&
       articleResults.length === 0 &&
       brandResults.length === 0 ? (
-        <p className={`${regular_font.className} text-xl`}>
+        <p className={`${regular_font.className} text-xl mt-64`}>
           현재 검색 결과가 없습니다.
         </p>
       ) : (
