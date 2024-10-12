@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, Dispatch, SetStateAction, useEffect } from "react";
+import { useState, Dispatch, SetStateAction, useEffect, useMemo } from "react";
 import {
   bold_font,
   regular_font,
@@ -27,7 +27,6 @@ const headers: Record<string, string[]> = {
 };
 
 function Header() {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [lastScrollTop, setLastScrollTop] = useState(0);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -35,15 +34,11 @@ function Header() {
   const pathname = usePathname();
   const cleanedPath = pathname.replace(/^\//, "");
   const [currentPath, setCurrentPath] = useState(cleanedPath);
-  const [isHome, setIsHome] = useState(() => cleanedPath === "");
-
-  useEffect(() => {
-    setIsHome(pathname === "/");
-    if (pathname !== "/") {
-      setIsScrolled(true);
-    }
+  const { isHome, isScrolled: initialIsScrolled } = useMemo(() => {
+    const isHome = pathname === "/";
+    return { isHome, isScrolled: !isHome };
   }, [pathname]);
-
+  const [isScrolled, setIsScrolled] = useState(initialIsScrolled);
   useEffect(() => {
     if (isSearchOpen || isSidebarOpen) {
       document.body.style.overflow = "hidden";
@@ -57,7 +52,10 @@ function Header() {
   }, [isSearchOpen, isSidebarOpen]);
 
   useEffect(() => {
-    if (!isHome) return;
+    if (!isHome) {
+      setIsScrolled(true);
+      return;
+    }
     const SCROLL_THRESHOLD = 300;
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
@@ -148,7 +146,7 @@ function Logo({ isScrolled }: { isScrolled: boolean }) {
       <div
         className={`relative ${
           isScrolled
-            ? "w-[100px] h-[30px] md:w-[200px] md:h-[40px]"
+            ? "w-[100px] h-[20px] md:w-[200px] md:h-[30px]"
             : "w-[200px] h-[30px] md:w-[300px] md:h-[40px]"
         }`}
       >
