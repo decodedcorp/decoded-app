@@ -5,7 +5,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import EmblaCarousel, { EmblaCarouselType } from "embla-carousel";
 import Autoplay from "embla-carousel-autoplay";
 import Link from "next/link";
-import { bold_font, regular_font } from "@/components/helpers/util";
+import { bold_font, regular_font } from "@/components/helpers/font";
 
 const Carousel = ({ images }: { images: MainImage[] | null }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);

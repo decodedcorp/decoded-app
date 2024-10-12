@@ -35,6 +35,14 @@ function Header() {
   const pathname = usePathname();
   const cleanedPath = pathname.replace(/^\//, "");
   const [currentPath, setCurrentPath] = useState(cleanedPath);
+  const [isHome, setIsHome] = useState(() => cleanedPath === "");
+
+  useEffect(() => {
+    setIsHome(pathname === "/");
+    if (pathname !== "/") {
+      setIsScrolled(true);
+    }
+  }, [pathname]);
 
   useEffect(() => {
     if (isSearchOpen || isSidebarOpen) {
@@ -49,7 +57,8 @@ function Header() {
   }, [isSearchOpen, isSidebarOpen]);
 
   useEffect(() => {
-    const SCROLL_THRESHOLD = 200;
+    if (!isHome) return;
+    const SCROLL_THRESHOLD = 500;
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
       const isScrollingDown =

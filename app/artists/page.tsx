@@ -6,7 +6,7 @@ import {
   bold_font,
   regular_font,
   semi_bold_font,
-} from "@/components/helpers/util";
+} from "@/components/helpers/font";
 import { LoadingView } from "@/components/ui/loading";
 import { FirebaseHelper } from "@/common/firebase";
 import { useSearchParams, notFound } from "next/navigation";

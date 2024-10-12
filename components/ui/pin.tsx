@@ -1,7 +1,7 @@
 import { MainImage } from "@/types/model";
 import Link from "next/link";
 import Image from "next/image";
-import { bold_font, semi_bold_font } from "@/components/helpers/util";
+import { bold_font, semi_bold_font } from "@/components/helpers/font";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
 function Pin({ image }: { image: MainImage }) {
