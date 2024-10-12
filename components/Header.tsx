@@ -58,7 +58,7 @@ function Header() {
 
   useEffect(() => {
     if (!isHome) return;
-    const SCROLL_THRESHOLD = 500;
+    const SCROLL_THRESHOLD = 300;
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
       const isScrollingDown =
@@ -89,7 +89,7 @@ function Header() {
           <Logo isScrolled={isScrolled} />
         </div>
         {/* Header bottom */}
-        <div className="flex justify-center items-center w-full p-2 md:p-4 grid grid-cols-3">
+        <div className="flex justify-center items-center p-2 md:p-0 w-full grid grid-cols-3">
           {isScrolled && (
             <div className="flex">
               <Logo isScrolled={isScrolled} />
@@ -148,8 +148,8 @@ function Logo({ isScrolled }: { isScrolled: boolean }) {
       <div
         className={`relative ${
           isScrolled
-            ? "w-[100px] h-[30px] md:w-[200px] md:h-[50px]"
-            : "w-[200px] h-[30px] md:w-[400px] md:h-[50px]"
+            ? "w-[100px] h-[30px] md:w-[200px] md:h-[40px]"
+            : "w-[200px] h-[30px] md:w-[300px] md:h-[40px]"
         }`}
       >
         <Image

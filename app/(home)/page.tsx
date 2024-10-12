@@ -113,11 +113,11 @@ function FeaturedView() {
         {featured?.map((f, index) => (
           <div
             key={index}
-            className={`flex flex-col md:flex-row items-center p-2 md:p-4 ${
+            className={`flex flex-col md:flex-row items-center lg:p-4 ${
               index === currentIndex ? "opacity-100" : "opacity-20"
             }`}
           >
-            <div className="relative w-[100vw] md:w-[90vw] lg:w-[90vw]">
+            <div className="relative w-[100vw] md:w-[90vw]">
               <div className="aspect-w-3 aspect-h-4 lg:aspect-w-16 lg:aspect-h-9">
                 <Image
                   src={f.imageUrl}
