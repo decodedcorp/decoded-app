@@ -404,21 +404,23 @@ function Sidebar({
               >
                 {header.toUpperCase()}
               </Link>
-              {isExpanded[index] ? (
-                <MinusIcon
-                  className="text-2xl cursor-pointer"
-                  onClick={() =>
-                    setIsExpanded((prev) => ({ ...prev, [index]: false }))
-                  }
-                />
-              ) : (
-                <PlusIcon
-                  className="text-2xl cursor-pointer"
-                  onClick={() =>
-                    setIsExpanded((prev) => ({ ...prev, [index]: true }))
-                  }
-                />
-              )}
+              <div className={`${headers[header].length > 0 ? "" : "hidden"}`}>
+                {isExpanded[index] ? (
+                  <MinusIcon
+                    className="text-2xl cursor-pointer"
+                    onClick={() =>
+                      setIsExpanded((prev) => ({ ...prev, [index]: false }))
+                    }
+                  />
+                ) : (
+                  <PlusIcon
+                    className="text-2xl cursor-pointer"
+                    onClick={() =>
+                      setIsExpanded((prev) => ({ ...prev, [index]: true }))
+                    }
+                  />
+                )}
+              </div>
             </div>
             {isExpanded[index] && (
               <div className="flex flex-col py-2">
