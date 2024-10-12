@@ -39,93 +39,6 @@ import Pin from "@/components/ui/pin";
 function Home() {
   const [mainImages, setMainImages] = useState<MainImage[] | null>(null);
 
-  // useEffect(() => {
-  //   const fetchAllImages = async () => {
-  //     const storageItems = await FirebaseHelper.listAllStorageItems("images");
-  //     const imageStorage = storageItems.items;
-  //     const images = await Promise.all(
-  //       imageStorage.map(async (image) => {
-  //         try {
-  //           const [metadata, url] = await Promise.all([
-  //             FirebaseHelper.metadata(image),
-  //             FirebaseHelper.downloadUrl(image),
-  //           ]);
-  //           const imageDocId = metadata.customMetadata?.id;
-  //           if (!imageDocId) {
-  //             return;
-  //           }
-  //           const imageDoc = await FirebaseHelper.doc("images", imageDocId);
-  //           if (imageDoc.exists()) {
-  //             const imageInfo = imageDoc.data() as ImageInfo;
-  //             var artistInfoList: ArtistInfo[] | undefined;
-  //             var artistsTags = imageInfo.tags?.["artists"];
-  //             if (artistsTags) {
-  //               const artistPromises = artistsTags.map(async (artist) => {
-  //                 const artistDoc = await FirebaseHelper.doc("artists", artist);
-  //                 if (artistDoc.exists()) {
-  //                   return artistDoc.data() as ArtistInfo;
-  //                 }
-  //               });
-  //               const res = await Promise.all(artistPromises);
-  //               artistInfoList = res.filter(
-  //                 (artist): artist is ArtistInfo => artist !== undefined
-  //               );
-  //             }
-  //             var itemInfoList = new Map<ItemInfo, [Position, BrandInfo[]]>();
-  //             if (imageInfo.taggedItem) {
-  //               const itemPromises = imageInfo.taggedItem.map(async (item) => {
-  //                 const taggedItem = item as TaggedItem;
-  //                 const itemDoc = await FirebaseHelper.doc(
-  //                   "items",
-  //                   taggedItem.id
-  //                 );
-  //                 if (itemDoc.exists()) {
-  //                   const itemInfo = itemDoc.data() as ItemInfo;
-  //                   let brandInfo: BrandInfo[] = [];
-  //                   const brandTags = itemInfo.tags?.["brands"];
-  //                   if (brandTags) {
-  //                     const brandPromises = brandTags.map(async (b) => {
-  //                       const doc = await FirebaseHelper.doc("brands", b);
-  //                       if (doc.exists()) {
-  //                         return doc.data() as BrandInfo;
-  //                       }
-  //                       return undefined;
-  //                     });
-  //                     const res = await Promise.all(brandPromises);
-  //                     brandInfo = res.filter(
-  //                       (brand): brand is BrandInfo => brand !== undefined
-  //                     );
-  //                   }
-  //                   itemInfoList.set(itemInfo, [taggedItem.pos, brandInfo]);
-  //                 }
-  //               });
-
-  //               await Promise.all(itemPromises);
-  //             }
-  //             let mainImage: MainImage = {
-  //               imageUrl: url,
-  //               docId: imageDocId,
-  //               title: imageInfo.title,
-  //               itemInfoList,
-  //               artistInfoList,
-  //               description: imageInfo.description,
-  //             };
-  //             return mainImage;
-  //           }
-  //         } catch (error) {
-  //           console.error("Error processing item:", error);
-  //           return;
-  //         }
-  //       })
-  //     );
-  //     let filtered = images.filter(
-  //       (image): image is MainImage => image !== undefined
-  //     );
-  //     setMainImages(filtered);
-  //   };
-  //   fetchAllImages();
-  // }, []);
-
   return (
     <div className="flex flex-col min-h-[100vh]">
       <FeaturedView />
@@ -200,12 +113,12 @@ function FeaturedView() {
         {featured?.map((f, index) => (
           <div
             key={index}
-            className={`flex flex-col md:flex-row items-center p-2 md:p-10 ${
+            className={`flex flex-col md:flex-row items-center p-2 md:p-4 ${
               index === currentIndex ? "opacity-100" : "opacity-20"
             }`}
           >
-            <div className="relative w-[80vw]">
-              <div className="aspect-w-16 aspect-h-9">
+            <div className="relative w-[100vw] md:w-[90vw] lg:w-[90vw]">
+              <div className="aspect-w-3 aspect-h-4 lg:aspect-w-16 lg:aspect-h-9">
                 <Image
                   src={f.imageUrl}
                   alt="carousel image"
@@ -257,34 +170,34 @@ function PickView() {
   }, []);
 
   return (
-    <div className="flex flex-col w-full mt-20">
-      <div className="flex flex-col w-full px-20">
+    <div className="flex flex-col w-full mt-10 md:mt-20">
+      <div className="flex flex-col w-full px-4 md:px-20">
         <h2 className={`${bold_font.className} text-xl md:text-3xl`}>
           DECODED'S PICK
         </h2>
         <h3
-          className={`${regular_font.className} mt-2 text-md md:text-xl text-white/80`}
+          className={`${regular_font.className} mt-2 text-sm md:text-xl text-white/80`}
         >
           디코디드가 선택한 스타일을 확인하세요
         </h3>
       </div>
       {/* Main Pick View */}
-      <div className="flex flex-col w-full mt-10">
+      <div className="flex flex-col w-full mt-6 md:mt-10">
         {picks.map((pick, index) => {
           const isOdd = index % 2 !== 0;
           return (
             <div key={index}>
               {index === 2 && <SpotlightView />}
-              <div className="flex flex-col lg:flex-row w-full mt-10 justify-center px-20">
+              <div className="flex flex-col lg:flex-row w-full mt-6 md:mt-10 justify-center px-4 md:px-20">
                 <div
-                  className={`flex flex-col md:flex-row w-full min-w-[1300px] ${
+                  className={`flex flex-col md:flex-row w-full md:min-w-[1300px] ${
                     isOdd ? "md:flex-row-reverse" : ""
                   }`}
                 >
                   {/* Image */}
                   <div
                     className={`w-full md:w-1/2 ${
-                      isOdd ? "md:ml-6" : "md:mr-6"
+                      isOdd ? "md:ml-3 lg:ml-6" : "md:mr-3 lg:mr-6"
                     }`}
                   >
                     <div className="relative aspect-[3/4]">
@@ -298,7 +211,7 @@ function PickView() {
                         <Link
                           key={itemIndex}
                           href={item.affilateUrl}
-                          className="absolute bg-white/20 rounded-full w-8 h-8 flex items-center justify-center"
+                          className="absolute bg-white/20 rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center text-sm md:text-base"
                           style={{
                             top: `${item.pos.top}`,
                             left: `${item.pos.left}`,
@@ -310,27 +223,33 @@ function PickView() {
                     </div>
                   </div>
                   {/* Description */}
-                  <div className={`w-full md:w-1/2 flex flex-col space-y-6`}>
+                  <div
+                    className={`w-full md:w-1/2 flex flex-col space-y-4 md:space-y-6 mt-4 md:mt-0`}
+                  >
                     <div className="flex flex-col">
-                      <div className="w-1/2">
-                        <h2 className={`${bold_font.className} text-2xl mb-4`}>
+                      <div className="w-full md:w-1/2">
+                        <h2
+                          className={`${bold_font.className} text-xl md:text-2xl mb-2 md:mb-4`}
+                        >
                           {pick.title}
                         </h2>
-                        <p className="text-md text-white/80 mb-6">
+                        <p className="text-sm md:text-md text-white/80 mb-4 md:mb-6">
                           {pick.description}
                         </p>
                       </div>
-                      <div className="flex items-center mb-6">
-                        <div className="flex items-center w-[30px] h-[30px] relative">
+                      <div className="flex items-center mb-4 md:mb-6">
+                        <div className="flex items-center w-[24px] h-[24px] md:w-[30px] md:h-[30px] relative">
                           <Image
                             src={pick.imageUrl}
                             alt={pick.title}
                             fill={true}
                             style={{ objectFit: "cover" }}
-                            className="rounded-full mr-3"
+                            className="rounded-full mr-2 md:mr-3"
                           />
                         </div>
-                        <span className={`${regular_font.className} ml-4`}>
+                        <span
+                          className={`${regular_font.className} ml-2 md:ml-4 text-sm md:text-base`}
+                        >
                           {pick.artist}
                         </span>
                       </div>
@@ -339,7 +258,7 @@ function PickView() {
                       {pick.items.map((item, itemIndex) => (
                         <div
                           key={itemIndex}
-                          className={`w-1/2 md:w-[48%] mb-6 ${
+                          className={`w-[48%] md:w-[48%] mb-4 md:mb-6 ${
                             itemIndex === 0 ? "mt-0" : "md:mt-20"
                           }`}
                         >
@@ -354,10 +273,12 @@ function PickView() {
                               style={{ objectFit: "cover" }}
                             />
                           </Link>
-                          <p className="text-sm text-white/80 hover:underline">
+                          <p className="text-xs md:text-sm text-white/80 hover:underline">
                             {item.brand.name.replace("_", " ").toUpperCase()}
                           </p>
-                          <h3 className={`${bold_font.className} text-lg`}>
+                          <h3
+                            className={`${bold_font.className} text-sm md:text-lg`}
+                          >
                             {item.name}
                           </h3>
                         </div>
@@ -498,28 +419,31 @@ function DiscoverView() {
   }, []);
 
   return (
-    <div className="flex flex-col w-full mt-20 bg-[#F2F2F2] p-20">
-      <div className="flex w-full justify-between items-center">
-        <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full mt-10 md:mt-20 bg-[#F2F2F2] p-4 md:p-20">
+      <div className="flex flex-col md:flex-row w-full justify-between items-start md:items-center">
+        <div className="flex flex-col w-full mb-4 md:mb-0">
           <h2
             className={`flex ${bold_font.className} mb-2 text-xl md:text-2xl text-black`}
           >
             DISCOVER ITEMS
           </h2>
           <h3
-            className={`flex ${regular_font.className} text-md md:text-xl text-black/80`}
+            className={`flex ${regular_font.className} text-sm md:text-xl text-black/80`}
           >
             카테고리에 따른 다양한 아이템을 확인해보세요
           </h3>
         </div>
-        <div className="flex w-[20vw]">
+        <div className="flex flex-wrap md:flex-nowrap md:w-[20vw]">
           {sectionState &&
             sectionState.sections.map((section, index) => (
-              <div key={index} className={`flex flex-col w-full`}>
+              <div
+                key={index}
+                className={`flex flex-col mr-4 md:mr-0 md:w-full mb-2 md:mb-0`}
+              >
                 <p
                   className={`${
                     bold_font.className
-                  } text-lg text-black cursor-pointer ${
+                  } text-sm md:text-lg text-black cursor-pointer ${
                     sectionState.currentSection === section
                       ? "text-black"
                       : "text-black/50"
@@ -538,11 +462,11 @@ function DiscoverView() {
         </div>
       </div>
       {sectionState && items && (
-        <div className="flex w-full mt-10">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mt-6 md:mt-10">
           {items[sectionState.currentSection].map((item, index) => (
-            <div key={index} className="flex flex-col w-full">
+            <div key={index} className="flex flex-col">
               <div className="flex w-full">
-                <div className="relative w-[300px] h-[300px]">
+                <div className="relative w-full pb-[100%]">
                   <Image
                     src={item.imageUrl}
                     alt={item.name}
@@ -551,19 +475,25 @@ function DiscoverView() {
                   />
                 </div>
               </div>
-              <div className="flex flex-col w-full mt-4">
-                <h2 className={`${bold_font.className} text-lg text-black`}>
+              <div className="flex flex-col w-full mt-2 md:mt-4">
+                <h2
+                  className={`${bold_font.className} text-sm md:text-lg text-black`}
+                >
                   {item.brand.toUpperCase()}
                 </h2>
-                <h3 className={`${bold_font.className} text-lg text-black/50`}>
+                <h3
+                  className={`${bold_font.className} text-xs md:text-lg text-black/50`}
+                >
                   {item.name.toUpperCase()}
                 </h3>
               </div>
-              <div className="flex cursor-pointer mt-4 items-center">
-                <p className={`${bold_font.className} text-md text-black/50`}>
+              <div className="flex cursor-pointer mt-2 md:mt-4 items-center">
+                <p
+                  className={`${bold_font.className} text-xs md:text-md text-black/50`}
+                >
                   관련 스타일
                 </p>
-                <ChevronRightIcon className="w-6 h-6 text-black/50" />
+                <ChevronRightIcon className="w-4 h-4 md:w-6 md:h-6 text-black/50" />
               </div>
             </div>
           ))}
@@ -585,21 +515,21 @@ function TrendingNowView() {
   }, []);
 
   return (
-    <div className="flex flex-col w-full mt-20 p-20">
-      <h2 className={`flex ${bold_font.className} mb-2 text-xl md:text-2xl`}>
+    <div className="flex flex-col w-full mt-10 md:mt-20 p-4 md:p-20">
+      <h2 className={`flex ${bold_font.className} mb-2 text-lg md:text-2xl`}>
         TRENDING NOW
       </h2>
       <h3
-        className={`flex ${regular_font.className} text-md md:text-xl text-white/80`}
+        className={`flex ${regular_font.className} text-sm md:text-xl text-white/80`}
       >
         인기있는 키워드를 확인해보세요
       </h3>
-      <div className="flex flex-wrap w-[60vw] mt-10">
+      <div className="flex flex-wrap w-full md:w-[60vw] mt-6 md:mt-10">
         {trendingNow?.map((tag, index) => (
           <Link
             href={`/search?keyword=${tag.name}`}
             key={index}
-            className={`flex w-fit p-4 bg-transparent rounded-full border border-white/20 hover:bg-white/20 mt-4 mr-4`}
+            className={`flex w-fit p-2 md:p-4 bg-transparent rounded-full border border-white/20 hover:bg-white/20 mt-2 md:mt-4 mr-2 md:mr-4`}
           >
             {/* <Image
               src={tag.imageUrl}
@@ -608,7 +538,7 @@ function TrendingNowView() {
               height={20}
               className="rounded-full border border-white/20"
             /> */}
-            <h3 className={`${bold_font.className} text-lg`}>
+            <h3 className={`${bold_font.className} text-sm md:text-lg`}>
               {tag.name.toUpperCase()}
             </h3>
           </Link>
@@ -617,6 +547,7 @@ function TrendingNowView() {
     </div>
   );
 }
+
 function PinView({ images }: { images: MainImage[] | null }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));

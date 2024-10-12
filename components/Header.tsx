@@ -10,6 +10,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
 import PersonIcon from "@mui/icons-material/Person";
+import { color } from "@/components/helpers/color";
 
 const headers = ["home", "artist", "brand", "explore"];
 
@@ -32,13 +33,15 @@ function Header() {
   }, [isSearchOpen, isSidebarOpen]);
 
   useEffect(() => {
+    const SCROLL_THRESHOLD = 200;
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
-      const isScrollingDown = scrollPosition > lastScrollTop;
+      const isScrollingDown =
+        scrollPosition > lastScrollTop && scrollPosition > SCROLL_THRESHOLD;
 
       if (isScrollingDown) {
         setIsScrolled(true);
-      } else if (!isScrollingDown) {
+      } else if (scrollPosition <= SCROLL_THRESHOLD) {
         setIsScrolled(false);
       }
       setLastScrollTop(scrollPosition);
@@ -53,34 +56,42 @@ function Header() {
   return (
     <>
       <header
-        className={`fixed w-full bg-[#242424] p-4 transition-all duration-500 ${
-          isScrolled ? "-translate-y-full" : "translate-y-0"
-        }`}
+        className={`fixed w-full py-2 transition-all duration-300 bg-[${color.palette.gray900}]`}
+        style={{ borderBottom: `1px solid ${color.palette.gray800}` }}
       >
-        <div className="grid grid-cols-3 items-center w-full p-2">
+        {/* Header top */}
+        <div className={`${isScrolled ? "hidden" : ""}`}>
           <Logo isScrolled={isScrolled} />
-          <MenuSection
+        </div>
+        {/* Header bottom */}
+        <div className="flex justify-center items-center w-full p-2 md:p-4 grid grid-cols-3">
+          {isScrolled && (
+            <div className="flex">
+              <Logo isScrolled={isScrolled} />
+            </div>
+          )}
+          <div className={`${isScrolled ? "hidden" : ""}`}></div>
+          <div className="flex w-full p-4 items-center">
+            <MenuSection
+              isSearchOpen={isSearchOpen}
+              setIsSearchOpen={setIsSearchOpen}
+              isSidebarOpen={isSidebarOpen}
+              setIsSidebarOpen={setIsSidebarOpen}
+            />
+            <div></div>
+          </div>
+          <SearchLoginMenu
+            isScrolled={isScrolled}
             isSearchOpen={isSearchOpen}
             setIsSearchOpen={setIsSearchOpen}
-            isSidebarOpen={isSidebarOpen}
-            setIsSidebarOpen={setIsSidebarOpen}
           />
-          <div className="flex w-full justify-end">
-            {!isSearchOpen ? (
-              <SearchIcon
-                className="cursor-pointer"
-                onClick={() => {
-                  setIsSearchOpen(!isSearchOpen);
-                }}
-              />
-            ) : (
-              <CloseIcon onClick={() => setIsSearchOpen(!isSearchOpen)} />
-            )}
-            <PersonIcon className="ml-4 cursor-pointer" />
-          </div>
         </div>
       </header>
-      <SearchBar isOpen={isSearchOpen} setIsOpen={setIsSearchOpen} />
+      <SearchBar
+        isOpen={isSearchOpen}
+        setIsOpen={setIsSearchOpen}
+        isScrolled={isScrolled}
+      />
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40"
@@ -97,10 +108,16 @@ function Logo({ isScrolled }: { isScrolled: boolean }) {
       href="/"
       prefetch={false}
       className={`flex w-full transition-all duration-300 ${
-        isScrolled ? "opacity-0" : "opacity-100"
+        isScrolled ? "ml-4 justify-start " : "justify-center mt-4 md:p-8"
       }`}
     >
-      <div className="relative w-[150px] h-[30px]">
+      <div
+        className={`relative ${
+          isScrolled
+            ? "w-[100px] h-[30px] md:w-[200px] md:h-[50px]"
+            : "w-[200px] h-[30px] md:w-[400px] md:h-[50px]"
+        }`}
+      >
         <Image
           src={white_logo}
           alt="logo"
@@ -130,8 +147,8 @@ function MenuSection({
 
   return (
     <>
-      <nav className="flex justify-center w-full text-white">
-        <ul className="hidden md:flex flex-row gap-5 justify-end pr-1 items-center">
+      <nav className="flex justify-center w-full">
+        <ul className="flex gap-5 justify-end pr-1 items-center">
           {headers.map((header, index) => {
             return (
               <li
@@ -142,14 +159,14 @@ function MenuSection({
                       ? "text-white"
                       : "text-white/50"
                     : currentPath === header
-                      ? "text-white"
-                      : "text-white/50"
+                    ? "text-white"
+                    : "text-white/50"
                 }`}
               >
                 <Link
                   href={header === "home" ? "/" : `/${header}`}
                   prefetch={false}
-                  className={`${semi_bold_font.className} text-lg`}
+                  className={`${semi_bold_font.className} text-sm md:text-lg`}
                   onClick={() => setCurrentPath(header)}
                 >
                   {header.toUpperCase()}
@@ -158,23 +175,50 @@ function MenuSection({
             );
           })}
         </ul>
-        {/* 모바일 메뉴 */}
-        <div className="flex md:hidden justify-end items-center gap-4 text-white">
-          <button onClick={() => setIsSearchOpen(!isSearchOpen)}>
-            <SearchIcon className="text-2xl" />
-          </button>
-        </div>
       </nav>
     </>
+  );
+}
+
+function SearchLoginMenu({
+  isScrolled,
+  isSearchOpen,
+  setIsSearchOpen,
+}: {
+  isScrolled: boolean;
+  isSearchOpen: boolean;
+  setIsSearchOpen: Dispatch<SetStateAction<boolean>>;
+}) {
+  return (
+    <div className="flex w-full p-4 justify-end">
+      {!isSearchOpen ? (
+        <SearchIcon
+          className="cursor-pointer text-white mr-4"
+          onClick={() => setIsSearchOpen(!isSearchOpen)}
+        />
+      ) : (
+        <CloseIcon
+          className="cursor-pointer text-white mr-4"
+          onClick={() => setIsSearchOpen(!isSearchOpen)}
+        />
+      )}
+      <PersonIcon
+        className="cursor-pointer text-white mr-4"
+        onClick={() => alert("Login not implemented yet")}
+      />
+      <MenuIcon className="cursor-pointer text-white" />
+    </div>
   );
 }
 
 function SearchBar({
   isOpen,
   setIsOpen,
+  isScrolled,
 }: {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
+  isScrolled: boolean;
 }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [keywords, setKeywords] = useState<String[] | null>(null);
@@ -201,15 +245,19 @@ function SearchBar({
 
   return (
     <div
-      className={`fixed w-full justify-center bg-[#242424] z-50 mt-10 ${
+      className={`fixed w-full justify-center bg-[${
+        color.palette.gray900
+      }] z-50 ${
         semi_bold_font.className
-      } border-b border-gray-400/50 transition-all duration-300 ease-in-out h-96 ${
+      } border-b border-gray-400/50 transition-all duration-300 ease-in-out ${
+        isScrolled ? "h-[250px] mt-16 md:mt-24" : "h-[400px] mt-8 md:mt-32"
+      } ${
         isOpen
           ? "opacity-100 translate-y-0"
           : "opacity-0 -translate-y-full pointer-events-none"
       }`}
     >
-      <div className="mx-2 p-10 w-full h-full flex flex-col justify-center items-center">
+      <div className="flex flex-col h-full justify-center items-center">
         {/* Search Bar */}
         <div className="w-full">
           <form
@@ -219,10 +267,14 @@ function SearchBar({
             }}
             className="flex justify-center"
           >
-            <div className="flex w-full md:w-[50%] border-b-2 border-white/50 mb-5">
+            <div
+              className={`flex w-[80%] md:w-[50%] border-b-2 border-white/50 ${
+                isScrolled ? "mt-10" : "mt-20"
+              }`}
+            >
               <input
                 type="text"
-                className="w-full py-2 text-xl bg-transparent focus:outline-none text-white "
+                className="w-full py-2 text-base md:text-xl bg-transparent focus:outline-none text-white "
                 name="name"
                 placeholder="아티스트, 브랜드로 검색해보세요"
                 title="검색어 입력"
@@ -251,12 +303,14 @@ function SearchBar({
         >
           {keywords?.map((keyword, index) => {
             return (
-              <div
+              <Link
                 key={index}
-                className="w-fit rounded-2xl border-2 border-white/50 m-2 p-2"
+                href={`/search?query=${keyword}`}
+                prefetch={false}
+                className="w-fit rounded-2xl border-2 border-white/50 m-2 p-2 text-sm md:text-base"
               >
                 {keyword}
-              </div>
+              </Link>
             );
           })}
         </div>
