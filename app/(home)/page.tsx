@@ -52,7 +52,6 @@ function Home() {
 function FeaturedView() {
   const [featured, setFeatured] = useState<FeaturedInfo[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  console.log("currentIndex", currentIndex);
   const [emblaRef, emblaApi] = useEmblaCarousel(
     {
       loop: true,
