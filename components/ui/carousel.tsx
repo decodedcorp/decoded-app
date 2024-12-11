@@ -1,18 +1,18 @@
-import Image from "next/image";
-import { useState, useCallback, useEffect } from "react";
-import { MainImage } from "@/types/model";
-import useEmblaCarousel from "embla-carousel-react";
-import EmblaCarousel, { EmblaCarouselType } from "embla-carousel";
-import Autoplay from "embla-carousel-autoplay";
-import Link from "next/link";
-import { bold_font, regular_font } from "@/components/helpers/font";
+import Image from 'next/image';
+import { useState, useCallback, useEffect } from 'react';
+import { MainImage } from '@/types/model';
+import useEmblaCarousel from 'embla-carousel-react';
+import EmblaCarousel, { EmblaCarouselType } from 'embla-carousel';
+import Autoplay from 'embla-carousel-autoplay';
+import Link from 'next/link';
+import { pretendard } from '@/lib/constants/fonts';
 
 const Carousel = ({ images }: { images: MainImage[] | null }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [emblaRef, emblaApi] = useEmblaCarousel(
     {
       loop: true,
-      containScroll: "keepSnaps",
+      containScroll: 'keepSnaps',
       dragFree: true,
     },
     [
@@ -28,7 +28,7 @@ const Carousel = ({ images }: { images: MainImage[] | null }) => {
   }, []);
 
   useEffect(() => {
-    if (emblaApi) emblaApi.on("slidesInView", selectedScrollSnap);
+    if (emblaApi) emblaApi.on('slidesInView', selectedScrollSnap);
   }, [emblaApi, selectedScrollSnap]);
 
   const handlePrev = () => {
@@ -77,18 +77,18 @@ const Carousel = ({ images }: { images: MainImage[] | null }) => {
                     src={image.imageUrl}
                     alt="carousel image"
                     fill={true}
-                    style={{ objectFit: "cover" }}
+                    style={{ objectFit: 'cover' }}
                     loading="lazy"
                   />
                   {hoveredImageIndex === index && (
                     <div className="flex flex-col absolute inset-0 bg-black bg-opacity-50 items-center justify-center transition-opacity duration-300 ease-in-out">
                       <h3
-                        className={`${bold_font.className} text-white text-lg mb-2 p-5`}
+                        className={`${pretendard.bold.className} text-white text-lg mb-2 p-5`}
                       >
                         {image.title}
                       </h3>
                       <p
-                        className={`${regular_font.className} px-4 py-2 bg-white text-black rounded-md hover:bg-gray-200 transition-colors text-sm`}
+                        className={`${pretendard.regular.className} px-4 py-2 bg-white text-black rounded-md hover:bg-gray-200 transition-colors text-sm`}
                       >
                         아이템 둘러보기
                       </p>
