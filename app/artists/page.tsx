@@ -3,11 +3,11 @@
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import {
-  bold_font,
-  regular_font,
-  semi_bold_font,
-} from "@/components/helpers/font";
-import { LoadingView } from "@/components/ui/loading";
+  pretendardBold,
+  pretendardRegular,
+  pretendardSemiBold,
+} from "@/lib/constants/fonts";
+import { LoadingView } from "@/components/ui/Loading";
 import { FirebaseHelper } from "@/common/firebase";
 import { useSearchParams, notFound } from "next/navigation";
 import Link from "next/link";
@@ -37,11 +37,11 @@ function ArtistPage() {
       const artist = (
         await FirebaseHelper.doc("artists", artistDocId)
       ).data() as ArtistInfo;
-      var brandList: string[] = [];
+      let brandList: string[] = [];
       const brandLogo: Map<string, string> = new Map();
-      var artistList: string[] = [];
-      var artistArticleList: ArticleInfo[] = [];
-      var artistImgList: [string, string][] = [];
+      let artistList: string[] = [];
+      let artistArticleList: ArticleInfo[] = [];
+      let artistImgList: [string, string][] = [];
 
       // Image artist tags
       const imgArtistTags = artist.tags?.images;
@@ -162,7 +162,7 @@ function MoreToExploreView({
               )}
               <div className="flex flex-col text-left px-4 md:px-10 mt-8">
                 <a
-                  className={`${bold_font.className} text-2xl mb-2 hover:underline`}
+                  className={`${pretendardBold.className} text-2xl mb-2 hover:underline`}
                   href={
                     artistPageState.artist?.sns?.instagram ??
                     artistPageState.artist?.sns?.youtube
@@ -196,7 +196,7 @@ function MoreToExploreView({
                   {hoveredImageIndex === index && (
                     <div className="absolute inset-0 bg-[#101011] bg-opacity-50 flex items-center justify-center">
                       <p
-                        className={`${regular_font.className} px-4 py-2 bg-white text-black rounded-md hover:bg-gray-200 transition-colors text-sm md:text-md`}
+                        className={`${pretendardRegular.className} px-4 py-2 bg-white text-black rounded-md hover:bg-gray-200 transition-colors text-sm md:text-md`}
                       >
                         아이템 둘러보기
                       </p>
@@ -248,7 +248,7 @@ function ArtistArticleView({
   return (
     artistPageState.artistArticleList && (
       <div className="flex flex-col mt-20 justify-center">
-        <h2 className={`${bold_font.className} text-6xl mb-10`}>ARTICLES</h2>
+        <h2 className={`${pretendardBold.className} text-6xl mb-10`}>ARTICLES</h2>
         <ul className="list-disc list-inside space-y-4 px-4 md:px-10 text-3xl mt-10">
           {currentItems?.map((article, index) => (
             <li key={index} className="text-left">
@@ -258,12 +258,12 @@ function ArtistArticleView({
                 rel="noopener noreferrer"
               >
                 <span
-                  className={`${regular_font.className} text-md text-white ml-2 hover:underline`}
+                  className={`${pretendardRegular.className} text-md text-white ml-2 hover:underline`}
                 >
                   {article.title}
                 </span>{" "}
                 <span
-                  className={`${bold_font.className} text-sm text-orange-400`}
+                  className={`${pretendardBold.className} text-sm text-orange-400`}
                 >
                   {article.source?.toUpperCase()}
                 </span>
