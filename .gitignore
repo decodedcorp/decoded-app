@@ -32,8 +32,14 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# cursor
+.cursorrules
+
+# public
 public
 
+# env
 .env.local
 
+# src-tauri
 src-tauri

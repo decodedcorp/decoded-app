@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
-import white_logo from "@/assets/white_logo.png";
-import { regular_font } from "./helpers/font";
+import white_logo from '@/public/brandings/logos/logo_white.png';
+import { pretendardRegular} from '@/lib/constants/fonts';
 import { Button } from "@mui/material";
 
 function Footer() {
@@ -13,7 +13,7 @@ function Footer() {
       <div className="flex flex-col lg:flex-row w-full">
         <Image src={white_logo} alt="logo" width={200} height={200} />
         <div
-          className={`flex flex-col ${regular_font.className} mt-10 lg:mt-0 lg:mx-32`}
+          className={`flex flex-col ${pretendardRegular.className} mt-10 lg:mt-0 lg:mx-32`}
         >
           <h2 className="text-lg">디코디드(주)</h2>
           <div className="flex flex-col mt-4">
@@ -32,7 +32,7 @@ function Footer() {
             </h3>
           </div>
         </div>
-        <div className={`flex-col hidden lg:block ${regular_font.className}`}>
+        <div className={`flex-col hidden lg:block ${pretendardRegular.className}`}>
           <p className={`text-lg`}>
             뉴스레터를 구독해 최신 뉴스를 놓치지 마세요.
           </p>
