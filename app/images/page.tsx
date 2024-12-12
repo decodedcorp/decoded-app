@@ -2,12 +2,8 @@
 
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
-import {
-  bold_font,
-  regular_font,
-  semi_bold_font,
-} from "@/components/helpers/font";
-import { LoadingView } from "@/components/ui/loading";
+import { pretendardBold, pretendardRegular, pretendardSemiBold } from '@/lib/constants/fonts'
+import { LoadingView } from "@/components/ui/Loading";
 import { FirebaseHelper } from "@/common/firebase";
 import { useSearchParams, notFound } from "next/navigation";
 import Link from "next/link";
@@ -152,12 +148,12 @@ function MultiImageView({ imageId }: { imageId: string }) {
     <div className="flex flex-col justify-center items-center my-32 p-2 w-full overflow-x-hidden">
       <div className="flex flex-col items-center p-10">
         <h1
-          className={`${bold_font.className} text-3xl md:text-5xl font-bold text-white mb-5`}
+          className={`${pretendardBold.className} text-3xl md:text-5xl font-bold text-white mb-5`}
         >
           {title}
         </h1>
         <h2
-          className={`${regular_font.className} text-md md:text-lg text-white px-5`}
+          className={`${pretendardRegular.className} text-md md:text-lg text-white px-5`}
         >
           {description}
         </h2>
@@ -165,7 +161,7 @@ function MultiImageView({ imageId }: { imageId: string }) {
       {featuredImgs.map((image, index) => (
         <div key={index} className="flex flex-col w-full mt-10 p-5 text-center">
           <p
-            className={`${regular_font.className} text-lg md:text-4xl text-white mb-5 font-bold`}
+            className={`${pretendardBold.className} text-lg md:text-4xl text-white mb-5 font-bold`}
           >
             {index + 1}
           </p>
@@ -369,13 +365,13 @@ function DescriptionView({
   return (
     <div className="flex flex-col w-full px-2 md:px-40 lg:px-72">
       <h2
-        className={`${bold_font.className} text-2xl font-bold mb-4 ${
+        className={`${pretendardBold.className} text-2xl font-bold mb-4 ${
           isFeatured ? "hidden" : "block"
         }`}
       >
         {detailPageState.img?.title}
       </h2>
-      <p className={`${regular_font.className} text-xs mt-2`}>
+      <p className={`${pretendardRegular.className} text-xs mt-2`}>
         {detailPageState.img?.description}
       </p>
     </div>
@@ -437,11 +433,11 @@ function ImageView({
                         </div>
                         <div className="flex flex-col text-black p-2 w-48 mb-2 text-center items-center justify-center">
                           <p
-                            className={`${semi_bold_font.className} text-sm mb-1`}
+                            className={`${pretendardSemiBold.className} text-sm mb-1`}
                           >
                             {item.info.name}
                           </p>
-                          <p className={`${regular_font.className} text-xs`}>
+                          <p className={`${pretendardRegular.className} text-xs`}>
                             {item.info.brands?.[0]
                               .replace(/_/g, " ")
                               .toUpperCase()}
@@ -466,11 +462,11 @@ function ImageView({
                         </div>
                         <div className="flex flex-col text-black p-2 w-48 mb-2 text-center items-center justify-center">
                           <p
-                            className={`${semi_bold_font.className} text-sm mb-1`}
+                            className={`${pretendardSemiBold.className} text-sm mb-1`}
                           >
                             {item.info.name}
                           </p>
-                          <p className={`${regular_font.className} text-xs`}>
+                          <p className={`${pretendardRegular.className} text-xs`}>
                             {item.info.brands?.[0]
                               .replace(/_/g, " ")
                               .toUpperCase()}
@@ -503,11 +499,11 @@ function ImageView({
                         </div>
                         <div className="flex flex-col text-black w-48 text-center items-center justify-center ml-2">
                           <p
-                            className={`${semi_bold_font.className} text-xs mb-1`}
+                            className={`${pretendardSemiBold.className} text-xs mb-1`}
                           >
                             {item.info.name}
                           </p>
-                          <p className={`${regular_font.className} text-xs`}>
+                          <p className={`${pretendardRegular.className} text-xs`}>
                             {item.info.brands?.[0]
                               .replace(/_/g, " ")
                               .toUpperCase()}
@@ -543,7 +539,7 @@ function ImageView({
                 {item.info.brands?.[0].replace(/_/g, " ").toUpperCase()}
               </div>
               <div
-                className={`text-center text-sm ${semi_bold_font.className}`}
+                className={`text-center text-sm ${pretendardSemiBold.className}`}
               >
                 {item.info.name}
               </div>
@@ -589,7 +585,7 @@ function MoreToExploreView({
     <div className="w-full text-center mt-20">
       {imgList && imgList.length > 0 && (
         <div className="items-center justify-center mt-10">
-          <h2 className={`${regular_font.className} text-xl`}>
+          <h2 className={`${pretendardRegular.className} text-xl`}>
             More to explore
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 items-stretch place-items-stretch my-10 px-7">
@@ -617,7 +613,7 @@ function MoreToExploreView({
                 {hoveredImageIndex === index && (
                   <div className="flex flex-col absolute inset-0 bg-black bg-opacity-50 items-center justify-center transition-opacity duration-300 ease-in-out">
                     <p
-                      className={`${regular_font.className} px-4 py-2 bg-white text-black rounded-md hover:bg-gray-200 transition-colors text-sm`}
+                      className={`${pretendardRegular.className} px-4 py-2 bg-white text-black rounded-md hover:bg-gray-200 transition-colors text-sm`}
                     >
                       아이템 둘러보기
                     </p>
@@ -680,7 +676,7 @@ function ArtistArticleView({
   return (
     articleList && (
       <div className="flex flex-col mt-10 justify-center w-full">
-        <h2 className={`${regular_font.className} text-xl text-center`}>
+        <h2 className={`${pretendardRegular.className} text-xl text-center`}>
           Related Articles
         </h2>
         <div className="grid grid-cols-1 items-center justify-center p-4 md:p-20 gap-4">
@@ -705,7 +701,7 @@ function ArtistArticleView({
                 />
               </Link>
               <p
-                className={`${semi_bold_font.className} text-2xl text-white hover:underline cursor-pointer mt-10 `}
+                className={`${pretendardSemiBold.className} text-2xl text-white hover:underline cursor-pointer mt-10 `}
               >
                 {article.title}
               </p>

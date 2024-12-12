@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
-import Image from "next/image";
-import Link from "next/link";
-import { FirebaseHelper } from "@/common/firebase";
-import { ArtistInfo, ArticleInfo, BrandInfo } from "@/types/model";
-import { regular_font, semi_bold_font } from "@/components/helpers/font";
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import Image from 'next/image';
+import Link from 'next/link';
+import { FirebaseHelper } from '@/common/firebase';
+import { ArtistInfo, ArticleInfo, BrandInfo } from '@/types/model';
+import { pretendardRegular, pretendardSemiBold } from '@/lib';
 
 function SearchPage() {
   const searchParams = useSearchParams();
-  const query = searchParams.get("q") || "";
+  const query = searchParams.get('q') || '';
   const [searchResults, setSearchResults] = useState<ArtistInfo[]>([]);
   const [articleResults, setArticleResults] = useState<ArticleInfo[]>([]);
   const [brandResults, setBrandResults] = useState<BrandInfo[]>([]);
@@ -19,9 +19,9 @@ function SearchPage() {
     const fetchSearchResults = async () => {
       if (!query) return;
 
-      const artistsSnapshot = await FirebaseHelper.docs("artists");
-      const articlesSnapshot = await FirebaseHelper.docs("articles");
-      const brandsSnapshot = await FirebaseHelper.docs("brands");
+      const artistsSnapshot = await FirebaseHelper.docs('artists');
+      const articlesSnapshot = await FirebaseHelper.docs('articles');
+      const brandsSnapshot = await FirebaseHelper.docs('brands');
       const artistResults: ArtistInfo[] = [];
       const articleResults: ArticleInfo[] = [];
       const brandResults: BrandInfo[] = [];
@@ -67,13 +67,13 @@ function SearchPage() {
 
   return (
     <div className="mx-auto px-4 py-8 mt-20 h-[100vh]">
-      <h1 className={`${semi_bold_font.className} text-3xl md:text-5xl mb-8`}>
+      <h1 className={`${pretendardSemiBold.className} text-3xl md:text-5xl mb-8`}>
         "{query}" 검색 결과
       </h1>
       {searchResults.length === 0 &&
       articleResults.length === 0 &&
       brandResults.length === 0 ? (
-        <p className={`${regular_font.className} text-xl mt-64`}>
+        <p className={`${pretendardRegular.className} text-xl mt-64`}>
           현재 검색 결과가 없습니다.
         </p>
       ) : (
@@ -81,7 +81,7 @@ function SearchPage() {
           {/* Artists Section */}
           {searchResults.length > 0 && (
             <div className="my-10">
-              <h2 className={`${semi_bold_font.className} text-2xl mb-6`}>
+              <h2 className={`${pretendardSemiBold.className} text-2xl mb-6`}>
                 Artists
               </h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
@@ -93,10 +93,10 @@ function SearchPage() {
                   >
                     <div className="relative w-[200px] h-[200px] hover:scale-105 transition-all duration-300">
                       <Image
-                        src={artist.profileImgUrl || "/placeholder.jpg"}
+                        src={artist.profileImgUrl || '/placeholder.jpg'}
                         alt={artist.name}
                         fill
-                        style={{ objectFit: "cover" }}
+                        style={{ objectFit: 'cover' }}
                         className="rounded-full"
                       />
                     </div>
@@ -109,7 +109,7 @@ function SearchPage() {
           {/* Brands Section */}
           {brandResults.length > 0 && (
             <div className="mb-12">
-              <h2 className={`${semi_bold_font.className} text-2xl mb-6`}>
+              <h2 className={`${pretendardSemiBold.className} text-2xl mb-6`}>
                 Brands
               </h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
@@ -122,15 +122,15 @@ function SearchPage() {
                     <div className="bg-gray-800 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
                       <div className="relative w-full pb-[100%]">
                         <Image
-                          src={brand.logoImageUrl || "/placeholder.jpg"}
+                          src={brand.logoImageUrl || '/placeholder.jpg'}
                           alt={brand.name}
                           fill
-                          style={{ objectFit: "contain" }}
+                          style={{ objectFit: 'contain' }}
                         />
                       </div>
                       <div className="p-3">
                         <h2
-                          className={`${semi_bold_font.className} text-sm mb-1 truncate`}
+                          className={`${pretendardSemiBold.className} text-sm mb-1 truncate`}
                         >
                           {brand.name}
                         </h2>
@@ -145,7 +145,7 @@ function SearchPage() {
           {/* Articles Section */}
           {articleResults.length > 0 && (
             <div>
-              <h2 className={`${semi_bold_font.className} text-2xl mb-6`}>
+              <h2 className={`${pretendardSemiBold.className} text-2xl mb-6`}>
                 Articles
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -163,20 +163,20 @@ function SearchPage() {
                           src={article.imageUrl}
                           alt={article.title}
                           fill
-                          style={{ objectFit: "cover" }}
+                          style={{ objectFit: 'cover' }}
                         />
                       </div>
                     )}
                     <div className="p-2">
                       {article.source && (
                         <p
-                          className={`${regular_font.className} text-gray-400 text-sm w-fit`}
+                          className={`${pretendardRegular.className} text-gray-400 text-sm w-fit`}
                         >
                           {article.source.toUpperCase()}
                         </p>
                       )}
                       <h3
-                        className={`${semi_bold_font.className} text-lg mt-2 line-clamp-2`}
+                        className={`${pretendardSemiBold.className} text-lg mt-2 line-clamp-2`}
                       >
                         {article.title}
                       </h3>
