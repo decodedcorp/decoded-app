@@ -17,7 +17,7 @@ interface MenuSectionProps {
 
 function MenuSection({ pathname, isScrolled }: MenuSectionProps) {
   return (
-    <nav className="flex justify-center w-full">
+    <div className="flex justify-center w-full">
       <ul className={`flex items-center ${isScrolled ? 'gap-14' : 'gap-5'}`}>
         {Object.keys(headers).map((header) => (
           <li
@@ -42,7 +42,7 @@ function MenuSection({ pathname, isScrolled }: MenuSectionProps) {
           </li>
         ))}
       </ul>
-    </nav>
+    </div>
   );
 }
 

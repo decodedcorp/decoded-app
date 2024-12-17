@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { FirebaseHelper } from '@/common/firebase';
 import { ArtistInfo, ArticleInfo, BrandInfo } from '@/types/model';
-import { pretendardRegular, pretendardSemiBold } from '@/lib';
+import { pretendardRegular, pretendardSemiBold } from '@/lib/constants/fonts';
 
 function SearchPage() {
   const searchParams = useSearchParams();
@@ -66,8 +66,10 @@ function SearchPage() {
   }, [query]);
 
   return (
-    <div className="mx-auto px-4 py-8 mt-20 h-[100vh]">
-      <h1 className={`${pretendardSemiBold.className} text-3xl md:text-5xl mb-8`}>
+    <div className="mx-auto px-4 py-8 mt-20 h-[100vh] z-content relative">
+      <h1
+        className={`${pretendardSemiBold.className} text-3xl md:text-5xl mb-8`}
+      >
         "{query}" 검색 결과
       </h1>
       {searchResults.length === 0 &&

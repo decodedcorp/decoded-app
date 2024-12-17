@@ -1,23 +1,30 @@
 'use client';
 
 import SearchBar from '@/components/Header/search/SearchBar';
+import { ModalOverlay } from './ModalOverlay';
 
 interface SearchModalProps {
   isOpen: boolean;
   onClose: () => void;
   isScrolled: boolean;
+  isClosing: boolean;
 }
 
 export function SearchModal({
   isOpen,
   onClose,
   isScrolled,
+  isClosing,
 }: SearchModalProps) {
-  if (!isOpen) return null;
+  if (!isOpen && !isClosing) return null;
 
   return (
-    <div className="fixed inset-0 z-50">
-      <SearchBar isOpen={isOpen} setIsOpen={onClose} isScrolled={isScrolled} />
-    </div>
+    <ModalOverlay onClose={onClose} isClosing={isClosing}>
+      <SearchBar
+        isOpen={!isClosing}
+        setIsOpen={onClose}
+        isScrolled={isScrolled}
+      />
+    </ModalOverlay>
   );
-} 
+}

@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import React, { useState, useEffect } from "react";
+import Image from 'next/image';
+import React, { useState, useEffect } from 'react';
 import {
-  bold_font,
-  regular_font,
-  semi_bold_font,
-} from "@/components/helpers/font";
-import { LoadingView } from "@/components/ui/Loading";
-import { FirebaseHelper } from "@/common/firebase";
-import { useSearchParams, notFound } from "next/navigation";
-import Link from "next/link";
+  pretendardBold,
+  pretendardRegular,
+  pretendardSemiBold,
+} from '@/lib/constants/fonts';
+import { LoadingView } from '@/components/ui/Loading';
+import { FirebaseHelper } from '@/common/firebase';
+import { useSearchParams, notFound } from 'next/navigation';
+import Link from 'next/link';
 import {
   ImageInfo,
   FeaturedInfo,
@@ -19,18 +19,18 @@ import {
   HoverItem,
   ArticleInfo,
   DetailPageState,
-} from "@/types/model";
-import { useTheme } from "@mui/material/styles";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import AddIcon from "@mui/icons-material/Add";
-import ImageList from "@mui/material/ImageList";
-import ImageListItem from "@mui/material/ImageListItem";
+} from '@/types/model';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import AddIcon from '@mui/icons-material/Add';
+import ImageList from '@mui/material/ImageList';
+import ImageListItem from '@mui/material/ImageListItem';
 
 function DetailPage() {
   const searchParams = useSearchParams();
-  const imageId = searchParams.get("imageId");
-  const imageUrl = searchParams.get("imageUrl");
-  const isFeatured = searchParams.get("isFeatured");
+  const imageId = searchParams.get('imageId');
+  const imageUrl = searchParams.get('imageUrl');
+  const isFeatured = searchParams.get('isFeatured');
 
   if (!imageId || !imageUrl) {
     notFound();
@@ -65,16 +65,16 @@ function MultiImageView({ imageId }: { imageId: string }) {
       var artistImgList: [string, string][] = [];
       var filter: string[] = [];
       const imgDocId = decodeURIComponent(imageId);
-      if (!(await FirebaseHelper.docExists("featured", imgDocId))) {
+      if (!(await FirebaseHelper.docExists('featured', imgDocId))) {
         return;
       }
       const img = (
-        await FirebaseHelper.doc("featured", imgDocId)
+        await FirebaseHelper.doc('featured', imgDocId)
       ).data() as FeaturedInfo;
       let featuredImgs = await Promise.all(
         img.images.map(async (imageDocId) => {
           filter.push(imageDocId);
-          const imgRef = await FirebaseHelper.doc("images", imageDocId);
+          const imgRef = await FirebaseHelper.doc('images', imageDocId);
           const imgInfo = imgRef.data() as ImageInfo;
           const ref = FirebaseHelper.storageRef(`images/${imageDocId}`);
           const url = await FirebaseHelper.downloadUrl(ref);
@@ -84,7 +84,7 @@ function MultiImageView({ imageId }: { imageId: string }) {
             const artistInfoList = await Promise.all(
               artistTags.map(async (artistDocId) => {
                 return (
-                  await FirebaseHelper.doc("artists", artistDocId)
+                  await FirebaseHelper.doc('artists', artistDocId)
                 ).data() as ArtistInfo;
               })
             );
@@ -97,7 +97,7 @@ function MultiImageView({ imageId }: { imageId: string }) {
                   const articles = await Promise.all(
                     artistArticleDocIdList.map(async (articleDocId) => {
                       return (
-                        await FirebaseHelper.doc("articles", articleDocId)
+                        await FirebaseHelper.doc('articles', articleDocId)
                       ).data() as ArticleInfo;
                     })
                   );
@@ -105,7 +105,7 @@ function MultiImageView({ imageId }: { imageId: string }) {
                 }
                 if (artistImgDocIdList) {
                   const images = await FirebaseHelper.listAllStorageItems(
-                    "images"
+                    'images'
                   );
                   // Since item_doc_id is stored as custom metadata, logic is a bit complicated.
                   // After changing item_doc_id as file name, it would be simpler
@@ -152,12 +152,12 @@ function MultiImageView({ imageId }: { imageId: string }) {
     <div className="flex flex-col justify-center items-center my-32 p-2 w-full overflow-x-hidden">
       <div className="flex flex-col items-center p-10">
         <h1
-          className={`${bold_font.className} text-3xl md:text-5xl font-bold text-white mb-5`}
+          className={`${pretendardBold.className} text-3xl md:text-5xl font-bold text-white mb-5`}
         >
           {title}
         </h1>
         <h2
-          className={`${regular_font.className} text-md md:text-lg text-white px-5`}
+          className={`${pretendardRegular.className} text-md md:text-lg text-white px-5`}
         >
           {description}
         </h2>
@@ -165,7 +165,7 @@ function MultiImageView({ imageId }: { imageId: string }) {
       {featuredImgs.map((image, index) => (
         <div key={index} className="flex flex-col w-full mt-10 p-5 text-center">
           <p
-            className={`${regular_font.className} text-lg md:text-4xl text-white mb-5 font-bold`}
+            className={`${pretendardBold.className} text-lg md:text-4xl text-white mb-5 font-bold`}
           >
             {index + 1}
           </p>
@@ -199,21 +199,21 @@ function SingleImageView({
   useEffect(() => {
     const fetch = async () => {
       const imgDocId = decodeURIComponent(imageId);
-      if (!(await FirebaseHelper.docExists("images", imgDocId))) {
+      if (!(await FirebaseHelper.docExists('images', imgDocId))) {
         return;
       }
       const img = (
-        await FirebaseHelper.doc("images", imgDocId)
+        await FirebaseHelper.doc('images', imgDocId)
       ).data() as ImageInfo;
       var itemList: HoverItem[] = await FirebaseHelper.getHoverItems(imgDocId);
       itemList = itemList.sort((a, b) => {
-        const topA = parseInt(a.pos.top || "0%");
-        const topB = parseInt(b.pos.top || "0%");
+        const topA = parseInt(a.pos.top || '0%');
+        const topB = parseInt(b.pos.top || '0%');
         if (topA !== topB) {
           return topA - topB;
         }
-        const leftA = parseInt(a.pos.left || "0%");
-        const leftB = parseInt(b.pos.left || "0%");
+        const leftA = parseInt(a.pos.left || '0%');
+        const leftB = parseInt(b.pos.left || '0%');
         return leftA - leftB;
       });
       var brandList: string[] = [];
@@ -233,7 +233,7 @@ function SingleImageView({
           itemList
             .map((item) =>
               (item.info.brands || []).map((brand) =>
-                brand.toLowerCase().replace(/\s/g, "_")
+                brand.toLowerCase().replace(/\s/g, '_')
               )
             )
             .flat()
@@ -244,16 +244,16 @@ function SingleImageView({
         const brandInfoList = await Promise.all(
           brandTags.map(async (brandDocId) => {
             return (
-              await FirebaseHelper.doc("brands", brandDocId)
+              await FirebaseHelper.doc('brands', brandDocId)
             ).data() as BrandInfo;
           })
         );
         brandInfoList.map((brand) => {
-          brandLogo.set(brand.name, brand.logoImageUrl ?? "");
+          brandLogo.set(brand.name, brand.logoImageUrl ?? '');
           // key is brand name in lowercase with spaces replaced with underscores
           brandUrlList.set(
-            brand.name.toLowerCase().replace(/\s/g, "_"),
-            brand.sns?.["instagram"] ?? brand.websiteUrl ?? ""
+            brand.name.toLowerCase().replace(/\s/g, '_'),
+            brand.sns?.['instagram'] ?? brand.websiteUrl ?? ''
           );
         });
       }
@@ -262,7 +262,7 @@ function SingleImageView({
         const artistInfoList = await Promise.all(
           imgArtistTags.map(async (artistDocId) => {
             return (
-              await FirebaseHelper.doc("artists", artistDocId)
+              await FirebaseHelper.doc('artists', artistDocId)
             ).data() as ArtistInfo;
           })
         );
@@ -278,14 +278,14 @@ function SingleImageView({
               const articles = await Promise.all(
                 artistArticleDocIdList.map(async (articleDocId) => {
                   return (
-                    await FirebaseHelper.doc("articles", articleDocId)
+                    await FirebaseHelper.doc('articles', articleDocId)
                   ).data() as ArticleInfo;
                 })
               );
               artistArticleList = articles;
             }
             if (artistImgDocIdList) {
-              const images = await FirebaseHelper.listAllStorageItems("images");
+              const images = await FirebaseHelper.listAllStorageItems('images');
               // Since item_doc_id is stored as custom metadata, logic is a bit complicated.
               // After changing item_doc_id as file name, it would be simpler
               await Promise.all(
@@ -323,7 +323,7 @@ function SingleImageView({
   return detailPageState ? (
     <div className="flex-col justify-center text-center items-center overflow-x-hidden">
       <div
-        className={`flex flex-col p-4 md:p-0 ${isFeatured ? "mt-0" : "mt-40"}`}
+        className={`flex flex-col p-4 md:p-0 ${isFeatured ? 'mt-0' : 'mt-40'}`}
       >
         <DetailView
           detailPageState={detailPageState}
@@ -369,13 +369,13 @@ function DescriptionView({
   return (
     <div className="flex flex-col w-full px-2 md:px-40 lg:px-72">
       <h2
-        className={`${bold_font.className} text-2xl font-bold mb-4 ${
-          isFeatured ? "hidden" : "block"
+        className={`${pretendardBold.className} text-2xl font-bold mb-4 ${
+          isFeatured ? 'hidden' : 'block'
         }`}
       >
         {detailPageState.img?.title}
       </h2>
-      <p className={`${regular_font.className} text-xs mt-2`}>
+      <p className={`${pretendardRegular.className} text-xs mt-2`}>
         {detailPageState.img?.description}
       </p>
     </div>
@@ -404,7 +404,7 @@ function ImageView({
             src={imageUrl}
             alt="Featured fashion"
             fill={true}
-            style={{ objectFit: "cover" }}
+            style={{ objectFit: 'cover' }}
             className="rounded-xl"
           />
           <div className="w-full">
@@ -412,24 +412,24 @@ function ImageView({
               detailPageState.itemList?.map((item, index) => (
                 <a
                   key={item.info.name}
-                  href={item.info?.affiliateUrl ?? ""}
+                  href={item.info?.affiliateUrl ?? ''}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
-                    position: "absolute",
+                    position: 'absolute',
                     top: item.pos.top,
                     left: item.pos.left,
-                    cursor: "pointer",
+                    cursor: 'pointer',
                   }}
                   className="point"
                 >
                   <div className="relative bg-red-500 w-3 h-3 flex justify-center items-center group">
-                    <AddIcon style={{ width: "15px", height: "15px" }} />
+                    <AddIcon style={{ width: '15px', height: '15px' }} />
                     <div className="absolute bg-white text-black p-2 rounded-md shadow-lg z-10 w-64 left-full ml-2 top-1/2 -translate-y-1/2 hidden md:group-hover:block md:hidden">
                       <div className="flex">
                         <div className="relative w-[100px] h-[100px]">
                           <Image
-                            src={item.info.imageUrl ?? ""}
+                            src={item.info.imageUrl ?? ''}
                             alt={item.info.name}
                             fill={true}
                             className="object-contain"
@@ -437,13 +437,13 @@ function ImageView({
                         </div>
                         <div className="flex flex-col text-black p-2 w-48 mb-2 text-center items-center justify-center">
                           <p
-                            className={`${semi_bold_font.className} text-sm mb-1`}
+                            className={`${pretendardSemiBold.className} text-sm mb-1`}
                           >
                             {item.info.name}
                           </p>
-                          <p className={`${regular_font.className} text-xs`}>
+                          <p className={`${pretendardRegular.className} text-xs`}>
                             {item.info.brands?.[0]
-                              .replace(/_/g, " ")
+                              .replace(/_/g, ' ')
                               .toUpperCase()}
                           </p>
                         </div>
@@ -452,13 +452,13 @@ function ImageView({
                     {/* Popup when hovering over the item */}
                     <div
                       className={`absolute bg-white text-black p-2 rounded-md shadow-lg z-10 w-64 left-full ml-2 top-1/2 -translate-y-1/2
-                      ${currentIndex === index ? "block" : "hidden"}
+                      ${currentIndex === index ? 'block' : 'hidden'}
                       `}
                     >
                       <div className="flex">
                         <div className="relative w-[100px] h-[100px]">
                           <Image
-                            src={item.info.imageUrl ?? ""}
+                            src={item.info.imageUrl ?? ''}
                             alt={item.info.name}
                             fill={true}
                             className="object-contain"
@@ -466,13 +466,13 @@ function ImageView({
                         </div>
                         <div className="flex flex-col text-black p-2 w-48 mb-2 text-center items-center justify-center">
                           <p
-                            className={`${semi_bold_font.className} text-sm mb-1`}
+                            className={`${pretendardSemiBold.className} text-sm mb-1`}
                           >
                             {item.info.name}
                           </p>
-                          <p className={`${regular_font.className} text-xs`}>
+                          <p className={`${pretendardRegular.className} text-xs`}>
                             {item.info.brands?.[0]
-                              .replace(/_/g, " ")
+                              .replace(/_/g, ' ')
                               .toUpperCase()}
                           </p>
                         </div>
@@ -484,18 +484,18 @@ function ImageView({
                         transition-all duration-300 ease-out overflow-x-hidden
                         ${
                           isTouch
-                            ? "opacity-100 translate-y-0"
-                            : "opacity-0 translate-y-2 pointer-events-none"
+                            ? 'opacity-100 translate-y-0'
+                            : 'opacity-0 translate-y-2 pointer-events-none'
                         }
-                        ${hoveredItem === index ? "z-50" : "z-10"}
-                        ${hoveredItem === index ? "bg-white" : "bg-white/60"}`}
+                        ${hoveredItem === index ? 'z-50' : 'z-10'}
+                        ${hoveredItem === index ? 'bg-white' : 'bg-white/60'}`}
                       onMouseEnter={() => setHoveredItem(index)}
                       onMouseLeave={() => setHoveredItem(null)}
                     >
                       <div className="flex justify-center items-center">
                         <div className="relative w-[50px] h-[50px]">
                           <Image
-                            src={item.info.imageUrl ?? ""}
+                            src={item.info.imageUrl ?? ''}
                             alt={item.info.name}
                             fill={true}
                             className="object-contain"
@@ -503,13 +503,15 @@ function ImageView({
                         </div>
                         <div className="flex flex-col text-black w-48 text-center items-center justify-center ml-2">
                           <p
-                            className={`${semi_bold_font.className} text-xs mb-1`}
+                            className={`${pretendardSemiBold.className} text-xs mb-1`}
                           >
                             {item.info.name}
                           </p>
-                          <p className={`${regular_font.className} text-xs`}>
+                          <p
+                            className={`${pretendardRegular.className} text-xs`}
+                          >
                             {item.info.brands?.[0]
-                              .replace(/_/g, " ")
+                              .replace(/_/g, ' ')
                               .toUpperCase()}
                           </p>
                         </div>
@@ -524,7 +526,7 @@ function ImageView({
       <div className="flex-col w-full overflow-y-auto hidden lg:block">
         {detailPageState.itemList?.map((item, index) => (
           <Link
-            href={item.info.affiliateUrl ?? "#"}
+            href={item.info.affiliateUrl ?? '#'}
             className="p-2 m-2 border-b border-white/10 flex flex-row items-center hover:bg-white/10"
             key={index}
             onMouseOver={() => setCurrentIndex(index)}
@@ -532,18 +534,18 @@ function ImageView({
           >
             <div className="w-16 h-20 relative ml-4 ">
               <Image
-                src={item.info.imageUrl ?? ""}
+                src={item.info.imageUrl ?? ''}
                 alt={item.info.name}
                 fill={true}
-                style={{ objectFit: "contain" }}
+                style={{ objectFit: 'contain' }}
               />
             </div>
             <div className="flex flex-col w-full text-center overflow-clip">
               <div className="text-sm">
-                {item.info.brands?.[0].replace(/_/g, " ").toUpperCase()}
+                {item.info.brands?.[0].replace(/_/g, ' ').toUpperCase()}
               </div>
               <div
-                className={`text-center text-sm ${semi_bold_font.className}`}
+                className={`text-center text-sm ${pretendardSemiBold.className}`}
               >
                 {item.info.name}
               </div>
@@ -575,9 +577,9 @@ function MoreToExploreView({
     };
 
     handleResize(); // 초기 설정
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
 
-    return () => window.removeEventListener("resize", handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
   const totalPages = Math.ceil((imgList?.length || 0) / itemsPerPage);
   const currentItems = imgList?.slice(
@@ -589,7 +591,7 @@ function MoreToExploreView({
     <div className="w-full text-center mt-20">
       {imgList && imgList.length > 0 && (
         <div className="items-center justify-center mt-10">
-          <h2 className={`${regular_font.className} text-xl`}>
+          <h2 className={`${pretendardRegular.className} text-xl`}>
             More to explore
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 items-stretch place-items-stretch my-10 px-7">
@@ -610,14 +612,14 @@ function MoreToExploreView({
                   src={image[1]}
                   alt="Artist Image"
                   fill={true}
-                  style={{ objectFit: "cover" }}
+                  style={{ objectFit: 'cover' }}
                   className="more-tagged rounded-md"
                   loading="lazy"
                 />
                 {hoveredImageIndex === index && (
                   <div className="flex flex-col absolute inset-0 bg-black bg-opacity-50 items-center justify-center transition-opacity duration-300 ease-in-out">
                     <p
-                      className={`${regular_font.className} px-4 py-2 bg-white text-black rounded-md hover:bg-gray-200 transition-colors text-sm`}
+                      className={`${pretendardRegular.className} px-4 py-2 bg-white text-black rounded-md hover:bg-gray-200 transition-colors text-sm`}
                     >
                       아이템 둘러보기
                     </p>
@@ -636,7 +638,7 @@ function MoreToExploreView({
                       setCurrentPage(page);
                     }}
                     className={`text-md md:text-lg px-3 py-1 rounded ${
-                      currentPage === page ? "text-white" : "text-gray-500"
+                      currentPage === page ? 'text-white' : 'text-gray-500'
                     }`}
                   >
                     •
@@ -668,9 +670,9 @@ function ArtistArticleView({
     };
 
     handleResize(); // 초기 설정
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
 
-    return () => window.removeEventListener("resize", handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
   const totalPages = Math.ceil((articleList?.length || 0) / itemsPerPage);
   const currentItems = articleList?.slice(
@@ -680,7 +682,7 @@ function ArtistArticleView({
   return (
     articleList && (
       <div className="flex flex-col mt-10 justify-center w-full">
-        <h2 className={`${regular_font.className} text-xl text-center`}>
+        <h2 className={`${pretendardRegular.className} text-xl text-center`}>
           Related Articles
         </h2>
         <div className="grid grid-cols-1 items-center justify-center p-4 md:p-20 gap-4">
@@ -691,21 +693,21 @@ function ArtistArticleView({
             >
               <Link
                 key={index}
-                href={(article.src as string) ?? ""}
+                href={(article.src as string) ?? ''}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="relative flex flex-col w-full h-[90vh] justify-center items-center"
               >
                 <Image
-                  src={article.imageUrl ?? ""}
-                  alt={article.title ?? ""}
+                  src={article.imageUrl ?? ''}
+                  alt={article.title ?? ''}
                   fill={true}
-                  style={{ objectFit: "cover" }}
+                  style={{ objectFit: 'cover' }}
                   loading="lazy"
                 />
               </Link>
               <p
-                className={`${semi_bold_font.className} text-2xl text-white hover:underline cursor-pointer mt-10 `}
+                className={`${pretendardSemiBold.className} text-2xl text-white hover:underline cursor-pointer mt-10 `}
               >
                 {article.title}
               </p>
@@ -721,7 +723,7 @@ function ArtistArticleView({
                   setCurrentPage(page);
                 }}
                 className={`text-md md:text-lg px-3 py-1 rounded ${
-                  currentPage === page ? "text-white" : "text-gray-500"
+                  currentPage === page ? 'text-white' : 'text-gray-500'
                 }`}
               >
                 •

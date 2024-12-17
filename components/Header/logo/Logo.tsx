@@ -7,10 +7,10 @@ import white_logo from '@/public/brandings/logos/logo_white.png';
 function Logo({ isScrolled }: { isScrolled: boolean }) {
   return (
     <div className={`
-      w-full animate-fade-in
+      animate-fade-in
       transition-all duration-default ease-default
       ${isScrolled
-        ? 'text-left pl-16 mt-4'
+        ? 'text-left pl-8'
         : 'text-center mt-8 md:p-2'}
     `}>
       <Link

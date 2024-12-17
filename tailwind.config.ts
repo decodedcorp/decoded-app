@@ -117,6 +117,26 @@ const config: Config = {
         desktop: '1024px',
         wide: '1440px',
       },
+      // Z-Index Layer System
+      zIndex: {
+        // Base Layers (0-9)
+        base: '0',
+        content: '1',
+        
+        // Overlay Layers (10-19)
+        overlay: '10',
+        modalOverlay: '11',
+        
+        // Content Layers (20-29)
+        modalContent: '20',
+        
+        // Navigation & Header Layers (30-39)
+        header: '30',
+        navigation: '31',
+        
+        // Maximum Layer
+        max: '999',
+      },
     },
   },
   plugins: [

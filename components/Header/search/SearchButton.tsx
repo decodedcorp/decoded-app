@@ -3,13 +3,12 @@
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 
-function SearchButton({
-  isSearchOpen,
-  toggleSearch,
-}: {
+interface SearchButtonProps {
   isSearchOpen: boolean;
   toggleSearch: () => void;
-}) {
+}
+
+function SearchButton({ isSearchOpen, toggleSearch }: SearchButtonProps) {
   return (
     <>
       {isSearchOpen ? (

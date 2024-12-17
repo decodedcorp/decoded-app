@@ -1,6 +1,6 @@
 import '../styles/globals.css';
 import type { Metadata } from 'next';
-import Header from '@/components/Header/index';
+import { HeaderLayout } from '@/components/Header/HeaderLayout';
 import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
@@ -16,8 +16,8 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
-        <Header />
-        <main>{children}</main>
+        <HeaderLayout />
+        <main className="min-h-screen">{children}</main>
         <Footer />
       </body>
     </html>

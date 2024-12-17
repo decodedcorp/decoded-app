@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { Dispatch, SetStateAction, useState } from "react";
-import Link from "next/link";
-import { pretendardBold } from "@/lib/constants/fonts";
-import CloseIcon from "@mui/icons-material/Close";
-import PlusIcon from "@mui/icons-material/Add";
-import MinusIcon from "@mui/icons-material/Remove";
+import { Dispatch, SetStateAction, useState } from 'react';
+import Link from 'next/link';
+import { pretendardBold } from '@/lib/constants/fonts';
+import CloseIcon from '@mui/icons-material/Close';
+import PlusIcon from '@mui/icons-material/Add';
+import MinusIcon from '@mui/icons-material/Remove';
 
 const headers: Record<string, string[]> = {
   home: [],
-  artist: ["kpop", "rapper", "actor", "model"],
-  brand: ["luxury", "streetwear"],
+  artist: ['kpop', 'rapper', 'actor', 'model'],
+  brand: ['luxury', 'streetwear'],
   explore: [],
 };
 
@@ -20,10 +20,12 @@ interface SidebarProps {
 }
 
 function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProps) {
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(
+    new Set()
+  );
 
   const toggleSection = (header: string) => {
-    setExpandedSections(prev => {
+    setExpandedSections((prev) => {
       const next = new Set(prev);
       if (next.has(header)) {
         next.delete(header);
@@ -35,11 +37,7 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProps) {
   };
 
   return (
-    <div
-      className={`fixed top-0 right-0 h-screen bg-gray-900 text-white transform transition-transform duration-300 ease-in-out ${
-        isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
-      } z-50 w-full lg:w-[30%]`}
-    >
+    <div className="h-full w-full bg-gray-900 text-white overflow-y-auto">
       <div className="flex justify-end p-4">
         <button onClick={() => setIsSidebarOpen(false)}>
           <CloseIcon className="text-2xl" />
