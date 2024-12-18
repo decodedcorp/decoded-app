@@ -8,40 +8,28 @@
   --footer-text-color: #ffffff;
 }
 
-html,
-body {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
+html {
+  height: 100%;
 }
 
 body {
   color: var(--text-color);
   background-color: var(--main-background-color);
   min-height: 100vh;
-  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 main {
   flex: 1 0 auto;
-}
-
-
-/* header {
-  position: fixed;
-  top: 0;
   width: 100%;
-  z-index: 30;
-  transition: all 0.5s ease-in-out;
 }
-*/
 
 footer {
   flex-shrink: 0;
   color: var(--footer-text-color);
   padding: 20px;
-  margin-top: auto;
-} 
+}
 
 @keyframes scale-up {
   from {
@@ -63,9 +51,8 @@ footer {
 
 .point-animation {
   animation: scale-up 0.5s ease-in-out infinite alternate;
-  transform-origin: center; 
+  transform-origin: center;
 }
-
 
 @keyframes dots {
   0% {
@@ -81,9 +68,8 @@ footer {
 
 .loading-text::after {
   animation: dots 1.5s infinite;
-  content: "...";
+  content: '...';
 }
-
 
 .shadow-custom {
   box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1),
@@ -104,7 +90,6 @@ footer {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   filter: brightness(1.1);
 }
-
 
 @keyframes slide-up {
   0% {

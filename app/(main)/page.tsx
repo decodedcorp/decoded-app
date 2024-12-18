@@ -1,4 +1,3 @@
-// app/(main)/page.tsx
 'use client';
 
 import { HeroCarousel } from './components/sections/hero-carousel';
