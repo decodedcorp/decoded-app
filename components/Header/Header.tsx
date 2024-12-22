@@ -12,7 +12,13 @@ interface HeaderProps {
   onSidebarOpen: () => void;
 }
 
-function Header({ isScrolled, isSearchOpen, onSearchToggle, onLoginClick, onSidebarOpen }: HeaderProps) {
+function Header({
+  isScrolled,
+  isSearchOpen,
+  onSearchToggle,
+  onLoginClick,
+  onSidebarOpen,
+}: HeaderProps) {
   return (
     <header
       className={cn(
@@ -20,13 +26,13 @@ function Header({ isScrolled, isSearchOpen, onSearchToggle, onLoginClick, onSide
         'z-header',
         'bg-mainBackground border-b border-gray-800',
         'transition-all duration-default ease-default animate-fade-in will-change-transform',
-        isScrolled 
+        isScrolled
           ? 'flex items-center gap-4 h-header-mobile md:h-header-desktop'
           : 'flex-col items-center justify-center h-[100px] md:h-[140px]'
       )}
     >
       <Logo isScrolled={isScrolled} />
-      <Nav 
+      <Nav
         isScrolled={isScrolled}
         isSearchOpen={isSearchOpen}
         onSearchToggle={onSearchToggle}

@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ContentSection } from '../common/content-section';
-import { PickInfo } from '@/types/model';
+import { PickInfo } from '@/types/model.d';
 
 interface MainLeftGridProps {
   pick: PickInfo;

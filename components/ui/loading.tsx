@@ -1,6 +1,6 @@
 import { pretendardBold } from "@/lib/constants/fonts";
 
-export function LoadingView() {
+export default function LoadingView() {
   return (
     <div className="flex justify-center items-center h-[100vh]">
       <h1

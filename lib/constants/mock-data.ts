@@ -4,7 +4,7 @@ import {
   PickInfo,
   TrendingNowInfo,
   DiscoverInfo,
-} from '@/types/model';
+} from '@/types/model.d';
 
 export const InstaMockUrls = [
   'https://www.instagram.com/p/C63AnxsvJ3P',
