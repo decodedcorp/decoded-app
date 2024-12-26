@@ -3,9 +3,9 @@
 import Logo from './logo/Logo';
 import Nav from './nav/Nav';
 import { cn } from '@/lib/utils';
+import { useState, useEffect } from 'react';
 
 interface HeaderProps {
-  isScrolled: boolean;
   isSearchOpen: boolean;
   onSearchToggle: () => void;
   onLoginClick: () => void;
@@ -13,32 +13,42 @@ interface HeaderProps {
 }
 
 function Header({
-  isScrolled,
   isSearchOpen,
   onSearchToggle,
   onLoginClick,
   onSidebarOpen,
 }: HeaderProps) {
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 0);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <header
       className={cn(
         'fixed top-0 w-full',
         'z-header',
-        'bg-mainBackground border-b border-gray-800',
-        'transition-all duration-default ease-default animate-fade-in will-change-transform',
-        isScrolled
-          ? 'flex items-center gap-4 h-header-mobile md:h-header-desktop'
-          : 'flex-col items-center justify-center h-[100px] md:h-[140px]'
+        'bg-[#070707]',
+        'flex justify-center',
+        'animate-fade-in',
+        isScrolled && 'border-b border-gray-800'
       )}
     >
-      <Logo isScrolled={isScrolled} />
-      <Nav
-        isScrolled={isScrolled}
-        isSearchOpen={isSearchOpen}
-        onSearchToggle={onSearchToggle}
-        onLoginClick={onLoginClick}
-        onSidebarOpen={onSidebarOpen}
-      />
+      <div className="w-full max-w-[1728px] h-header-mobile md:h-header-desktop flex items-center gap-4 px-11">
+        <Logo isScrolled={true} />
+        <Nav
+          isSearchOpen={isSearchOpen}
+          onSearchToggle={onSearchToggle}
+          onLoginClick={onLoginClick}
+          onSidebarOpen={onSidebarOpen}
+        />
+      </div>
     </header>
   );
 }

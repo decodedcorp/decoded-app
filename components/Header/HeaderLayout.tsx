@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
-import useScroll from '@/lib/hooks/useScroll';
 import useModalClose from '@/lib/hooks/useModalClose';
 import Header from './Header';
 import { SearchModal, LoginModal } from '@/components/ui/modal';
@@ -13,12 +12,6 @@ export function HeaderLayout() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const pathname = usePathname();
-  const isHome = pathname === '/';
-  const isScrolled = useScroll({
-    threshold: 300,
-    throttleMs: 200,
-    isHome,
-  });
 
   const { isClosing: isSearchClosing, handleClose: handleSearchClose } = useModalClose({
     onClose: () => setIsSearchOpen(false)
@@ -43,7 +36,6 @@ export function HeaderLayout() {
   return (
     <>
       <Header
-        isScrolled={isScrolled}
         isSearchOpen={isSearchOpen}
         onSearchToggle={handleSearchToggle}
         onLoginClick={() => {
@@ -58,7 +50,6 @@ export function HeaderLayout() {
       <SearchModal
         isOpen={isSearchOpen}
         onClose={handleSearchClose}
-        isScrolled={isScrolled}
         isClosing={isSearchClosing}
       />
       <LoginModal
