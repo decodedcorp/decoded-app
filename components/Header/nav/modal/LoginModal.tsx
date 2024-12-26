@@ -5,7 +5,6 @@ import { AccountSection } from './sections/AccountSection';
 import { StatsSection } from './sections/StatsSection';
 import { PointSection } from './sections/PointSection';
 import { ModalNav } from './sections/ModalNav';
-import { cn } from '@/lib/utils';
 
 interface LoginModalProps {
   isOpen: boolean;
