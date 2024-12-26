@@ -19,9 +19,13 @@ export default function DetailPage() {
   if (!featuredImgs) return <LoadingView />;
 
   return (
-    <div className="flex flex-col justify-center items-center my-32 p-2 w-full overflow-x-hidden">
+    <div className="flex flex-col items-center my-32 w-full">
       <Header title={title} description={description} />
-      <ImageSection featuredImage={featuredImgs[2]} />
+      <div className="flex justify-center w-full">
+        <div className="flex w-full max-w-[1280px] justify-center">
+          <ImageSection featuredImage={featuredImgs[2]} />
+        </div>
+      </div>
     </div>
   );
 }

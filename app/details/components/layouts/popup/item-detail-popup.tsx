@@ -7,7 +7,12 @@ interface ItemDetailPopupProps {
   position?: 'left' | 'right';
 }
 
+/**
+ * @deprecated This component is temporarily disabled but kept for future use
+ */
 export function ItemDetailPopup({ item, isVisible, position = 'right' }: ItemDetailPopupProps) {
+  if (!isVisible) return null;
+  
   return (
     <div 
       className={`absolute ${position === 'right' ? 'left-full' : 'right-full'} top-1/2 -translate-y-1/2 ${position === 'right' ? 'ml-2' : 'mr-2'} 

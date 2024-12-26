@@ -99,6 +99,7 @@ const config: Config = {
         mainBackground: 'var(--main-background-color)',
         textColor: 'var(--text-color)',
         footerText: 'var(--footer-text-color)',
+        primary: '#eafd67',
       },
       // Background Images
       backgroundImage: {

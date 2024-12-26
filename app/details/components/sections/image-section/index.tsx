@@ -7,18 +7,23 @@ interface ImageSectionProps {
     imageUrl: string;
     imageDocId: string;
   };
+  isItemDetail?: boolean;
 }
 
-export default function ImageSection({ featuredImage }: ImageSectionProps) {
+export default function ImageSection({ 
+  featuredImage, 
+  isItemDetail = false 
+}: ImageSectionProps) {
   const detailPageState = useSingleImageData(featuredImage.imageDocId, true);
 
   if (!detailPageState) return <LoadingView />;
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex justify-center">
       <ImageView
         detailPageState={detailPageState}
         imageUrl={featuredImage.imageUrl}
+        isItemDetail={isItemDetail}
       />
     </div>
   );

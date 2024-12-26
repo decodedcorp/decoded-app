@@ -1,23 +1,28 @@
 'use client';
 
-import { useState, useCallback, memo } from 'react';
 import { DetailPageState } from '@/types/model.d';
-import { ImagePopup } from '../popup/popup';
-import { ImageList } from '../list';
 import { MainImage } from './main-image';
+import { ImageList } from '../list';
+import { useState, useCallback } from 'react';
+import { ImagePopup } from '../popup/popup';
 
-interface ImageViewProps {
+export interface ImageViewProps {
   detailPageState: DetailPageState;
   imageUrl: string;
+  isItemDetail?: boolean;
 }
 
-function ImageViewComponent({ detailPageState, imageUrl }: ImageViewProps) {
+export function ImageView({ 
+  detailPageState, 
+  imageUrl,
+  isItemDetail = false 
+}: ImageViewProps) {
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
   const [isTouch, setIsTouch] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<number | null>(null);
 
   const handleTouch = useCallback(() => {
-    setIsTouch(prev => !prev);
+    setIsTouch((prev) => !prev);
   }, []);
 
   const handleSetCurrentIndex = useCallback((index: number | null) => {
@@ -28,23 +33,41 @@ function ImageViewComponent({ detailPageState, imageUrl }: ImageViewProps) {
     setHoveredItem(index);
   }, []);
 
-  return (
-    <section className="flex flex-row w-[1000px] mx-auto">
-      <div className="w-[650px]">
-        <MainImage
-          imageUrl={imageUrl}
-          onTouch={handleTouch}
-        >
-          <ImagePopup
+  if (isItemDetail) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-neutral-800">
+        <div className="relative w-full h-full">
+          <MainImage
+            imageUrl={imageUrl}
             detailPageState={detailPageState}
-            currentIndex={currentIndex}
-            isTouch={isTouch}
-            hoveredItem={hoveredItem}
-            setHoveredItem={handleSetHoveredItem}
+            isItemDetail={true}
           />
-        </MainImage>
+        </div>
       </div>
-      <div className="w-[320px] ml-[30px]">
+    );
+  }
+
+  return (
+    <section className="flex flex-row w-full justify-center mx-auto gap-[30px]">
+      <div className="w-[569px] shrink-0">
+        <div className="relative" onClick={handleTouch}>
+          <MainImage
+            imageUrl={imageUrl}
+            detailPageState={detailPageState}
+            isItemDetail={false}
+          />
+          <div className="absolute inset-0 z-10">
+            <ImagePopup
+              detailPageState={detailPageState}
+              currentIndex={currentIndex}
+              isTouch={isTouch}
+              hoveredItem={hoveredItem}
+              setHoveredItem={handleSetHoveredItem}
+            />
+          </div>
+        </div>
+      </div>
+      <div className="w-[388px] shrink-0">
         <ImageList
           detailPageState={detailPageState}
           currentIndex={currentIndex}
@@ -54,5 +77,3 @@ function ImageViewComponent({ detailPageState, imageUrl }: ImageViewProps) {
     </section>
   );
 }
-
-export const ImageView = memo(ImageViewComponent);

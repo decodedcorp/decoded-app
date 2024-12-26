@@ -10,6 +10,7 @@ interface ListItemsProps {
   setCurrentIndex: (index: number | null) => void;
   hoveredItem: number | null;
   setHoveredItem: (index: number | null) => void;
+  onItemClick: (item: HoverItem) => void;
 }
 
 export function ListItems({
@@ -18,16 +19,15 @@ export function ListItems({
   setCurrentIndex,
   hoveredItem,
   setHoveredItem,
+  onItemClick,
 }: ListItemsProps) {
   const handleMouseEnter = useCallback((index: number) => {
-    setCurrentIndex(index);
     setHoveredItem(index);
-  }, [setCurrentIndex, setHoveredItem]);
+  }, [setHoveredItem]);
 
   const handleMouseLeave = useCallback(() => {
-    setCurrentIndex(null);
     setHoveredItem(null);
-  }, [setCurrentIndex, setHoveredItem]);
+  }, [setHoveredItem]);
 
   if (!items || items.length === 0) {
     return null;
@@ -39,7 +39,7 @@ export function ListItems({
         {items.map((item, index) => {
           if (!item || !item.info) return null;
 
-          const isActive = currentIndex === index || hoveredItem === index;
+          const isActive = hoveredItem === index;
           const hasImage = Boolean(item.info.imageUrl);
 
           return (
@@ -48,6 +48,7 @@ export function ListItems({
               className={hasImage ? "hover:bg-white/5 transition-colors cursor-pointer relative group" : ""}
               onMouseEnter={hasImage ? () => handleMouseEnter(index) : undefined}
               onMouseLeave={hasImage ? handleMouseLeave : undefined}
+              onClick={hasImage ? () => onItemClick(item) : undefined}
             >
               <div className="flex items-center gap-3">
                 {hasImage ? (

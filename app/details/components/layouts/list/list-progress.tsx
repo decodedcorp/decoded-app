@@ -1,25 +1,42 @@
 interface ListProgressProps {
-  total: number;
-  current: number;
+  value?: number;
+  total?: number;
+  current?: number;
 }
 
-export function ListProgress({ total, current }: ListProgressProps) {
-  const progress = total > 0 ? (current / total) * 100 : 0;
+export function ListProgress({ value, total, current }: ListProgressProps) {
+  {
+    /* Progress 70% to Decoded */
+  }
+  const progress: number = 50;
+  const totalBars: number = 140;
+  const displayedBars: number = Math.round((progress / 100) * totalBars);
 
   return (
-    <div className="px-4 py-4 border-t border-white/10">
-      <div className="flex justify-between items-center mb-2">
-        <div className="text-xs text-white/60">Progress</div>
-        <div className="text-xs text-white/60">
-          {current} to Decoded
-        </div>
+    <div className="py-4 border-t border-white/10">
+      <div className="flex flex-col gap-1">
+        <span className="text-neutral-400 font-mono text-sm">Progress</span>
+        <span className="text-primary text-xl font-mono tracking-wider">
+          {progress}% to Decoded
+        </span>
       </div>
-      <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
-        <div
-          className="h-full bg-white/80 transition-all duration-300 ease-out rounded-full"
-          style={{ width: `${progress}%` }}
-        />
+
+      <div className="w-full overflow-hidden mt-2">
+        <div className="flex h-[12px] gap-[1px]">
+          {Array.from({ length: totalBars }, (_, index) => {
+            const isActive = index < displayedBars;
+            return (
+              <div
+                key={index}
+                className={`
+                  h-full w-[2px] shrink-0
+                  ${isActive ? 'bg-primary' : 'bg-neutral-800'}
+                `}
+              />
+            );
+          })}
+        </div>
       </div>
     </div>
   );
-} 
+}

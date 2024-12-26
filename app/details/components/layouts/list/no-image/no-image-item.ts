@@ -1,15 +1,21 @@
-import { HoverItem } from './types';
+import { HoverItem } from '@/types/model.d';
 
 export function createNoImageItem(): HoverItem {
   return {
     id: 'no-image',
     info: {
+      name: 'No Information Item',
       category: 'CLOTHING',
       description: 'No information available',
-      point: 100,
+      brands: [],
+      imageUrl: '',
+      affiliateUrl: '',
+      price: ['', ''],
+      hyped: 0,
     },
-    brands: [],
-    images: [],
-    pos: { x: 0, y: 0 },
+    pos: {
+      top: '0',
+      left: '0',
+    }
   };
 } 

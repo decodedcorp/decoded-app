@@ -3,7 +3,7 @@ import { ItemButtonProps } from '@/types/button.d';
 
 export function InfoButton({ item, className }: ItemButtonProps) {
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative transition-transform duration-200 hover:scale-110 active:scale-95 ${className}`}>
       <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white/80 border border-white/50 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2 whitespace-nowrap">
         {item.info.imageUrl && (
           <div className="relative w-3.5 h-3.5 rounded-full overflow-hidden">

@@ -2,7 +2,7 @@ import { NoImageListItemProps } from './types';
 
 export function NoImageListItem({ item }: NoImageListItemProps) {
   return (
-    <div className="flex w-full gap-3">
+    <div className="flex w-full gap-3 mb-3">
       {/* Image area */}
       <div className="w-[90px] h-[90px] bg-white/5 flex items-center justify-center shrink-0">
         <span className="text-xs text-white/40">NO IMAGE</span>

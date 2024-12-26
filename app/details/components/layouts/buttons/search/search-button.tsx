@@ -4,7 +4,7 @@ import { BaseButtonProps } from '@/types/button.d';
 
 export function SearchButton({ className }: BaseButtonProps) {
   return (
-    <div className={`absolute top-5 flex flex-col items-center gap-1 ${className}`}>
+    <div className={`absolute top-5 flex flex-col items-center gap-1 transition-transform duration-200 hover:scale-110 active:scale-95 ${className}`}>
       <div className="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-2 whitespace-nowrap">
         <SearchIcon className="w-4 h-4 text-white/80" />
       </div>
