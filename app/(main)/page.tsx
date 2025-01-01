@@ -1,14 +1,14 @@
 'use client';
 
-import { HeroCarousel } from './components/sections/hero-carousel';
+import { Hero } from './components/layouts/hero';
 import { DirectorPicks } from './components/sections/director-pick';
 import { DiscoverSection } from './components/sections/discover';
 import { TrendingKeywords } from './components/sections/trending';
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-[100vh]">
-      <HeroCarousel />
+    <div className="flex flex-col">
+      <Hero />
       <DirectorPicks />
       <DiscoverSection />
       <TrendingKeywords />

@@ -1,6 +1,5 @@
 import { ItemButtonProps } from '@/types/button.d';
-import { SearchButton } from '../search/search-button';
-import { InfoButton } from '../info/info-button';
+import { InfoButton } from './info-button';
 
 interface ItemButtonContainerProps extends ItemButtonProps {
   variant?: 'default' | 'search';
@@ -14,11 +13,7 @@ export function ItemButton({
 }: ItemButtonContainerProps) {
   return (
     <div className={`relative ${className}`}>
-      {variant === 'search' ? (
-        <SearchButton />
-      ) : (
-        <InfoButton item={item} isActive={isActive} />
-      )}
+      <InfoButton item={item} isActive={isActive} />
     </div>
   );
 }

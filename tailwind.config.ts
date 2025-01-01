@@ -26,8 +26,8 @@ const config: Config = {
       // Custom Keyframes
       keyframes: {
         fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
+          '0%': { opacity: '0', transform: 'scale(0.95)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
         },
         slideUp: {
           '0%': { transform: 'translateY(20px)', opacity: '0' },
@@ -37,12 +37,22 @@ const config: Config = {
           '0%': { transform: 'translateY(-20px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
         },
+        float: {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        rotate: {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
       },
       // Custom Animations
       animation: {
-        'fade-in': 'fadeIn 300ms ease-out',
+        'fadeIn': 'fadeIn 0.5s ease-out',
         'slide-up': 'slideUp 500ms ease-out',
         'slide-down': 'slideDown 500ms ease-out',
+        'float': 'float 5s ease-in-out infinite',
+        'rotate': 'rotate 10s linear infinite',
       },
       // Spacing & Layout
       spacing: {
@@ -99,7 +109,7 @@ const config: Config = {
         mainBackground: 'var(--main-background-color)',
         textColor: 'var(--text-color)',
         footerText: 'var(--footer-text-color)',
-        primary: '#eafd67',
+        primary: '#EAFD66',
       },
       // Background Images
       backgroundImage: {
@@ -137,6 +147,10 @@ const config: Config = {
         
         // Maximum Layer
         max: '999',
+      },
+      // Grid Templates
+      gridTemplateColumns: {
+        custom: 'repeat(10, minmax(0, 1fr))', // 10열 그리드
       },
     },
   },

@@ -12,10 +12,10 @@ export interface ImageViewProps {
   isItemDetail?: boolean;
 }
 
-export function ImageView({ 
-  detailPageState, 
+export function ImageView({
+  detailPageState,
   imageUrl,
-  isItemDetail = false 
+  isItemDetail = false,
 }: ImageViewProps) {
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
   const [isTouch, setIsTouch] = useState(false);

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { FirebaseHelper } from "@/common/firebase";
-import { FeaturedInfo } from "@/types/model";
+import { FeaturedInfo } from "@/types/model.d";
 import { HeroBanner } from "../../layouts/hero-banner";
 
 export function HeroCarousel() {
