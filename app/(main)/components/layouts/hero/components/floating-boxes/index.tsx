@@ -1,72 +1,52 @@
 import { useEffect, useState } from 'react';
 import { BoxPosition } from './types';
-import { BOX_CONTENTS, BOX_POSITION_SETS } from './constants';
-import { FloatingBox } from './floating-box';
+import { BOX_POSITION_SETS } from './constants';
+import { SpotlightMask } from './spotlight-mask';
+import { BoxContainer } from './box-container';
 
-export function FloatingBoxes() {
+interface FloatingBoxesProps {
+  onPositionsChange?: (positions: BoxPosition) => void;
+  onHoverChange?: (isHovered: boolean, x?: number, y?: number, isLarge?: boolean) => void;
+}
+
+export function FloatingBoxes({ onPositionsChange, onHoverChange }: FloatingBoxesProps) {
   const [positions, setPositions] = useState<BoxPosition>(BOX_POSITION_SETS[0]);
 
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * BOX_POSITION_SETS.length);
-    setPositions(BOX_POSITION_SETS[randomIndex]);
-  }, []);
+    const newPositions = BOX_POSITION_SETS[randomIndex];
+    setPositions(newPositions);
+    onPositionsChange?.(newPositions);
+  }, [onPositionsChange]);
 
   // 왼쪽과 오른쪽 각각의 박스 개수를 계산
   const leftBoxCount = (positions.LEFT_TOP ? 1 : 0) + (positions.LEFT_BOTTOM ? 1 : 0);
   const rightBoxCount = (positions.RIGHT_TOP ? 1 : 0) + (positions.RIGHT_BOTTOM ? 1 : 0);
 
+  const handleBoxHover = (isHovered: boolean, event?: React.MouseEvent, isLarge?: boolean) => {
+    if (event) {
+      const rect = (event.target as HTMLElement).getBoundingClientRect();
+      const centerX = rect.left + (rect.width / 2);
+      const centerY = rect.top + (rect.height / 2);
+      onHoverChange?.(isHovered, centerX, centerY, isLarge);
+    } else {
+      onHoverChange?.(isHovered);
+    }
+  };
+
   return (
-    <div className="absolute inset-0 pointer-events-none z-20">
-      {positions.LEFT_TOP && (
-        <div
-          className="absolute"
-          style={{
-            top: `${positions.LEFT_TOP.top}%`,
-            left: `${positions.LEFT_TOP.left}%`,
-          }}
-        >
-          <FloatingBox 
-            content={BOX_CONTENTS.LEFT_TOP} 
-            isLarge={leftBoxCount === 1 && rightBoxCount === 2}
-          />
-        </div>
-      )}
-      {positions.LEFT_BOTTOM && (
-        <div
-          className="absolute"
-          style={{
-            top: `${positions.LEFT_BOTTOM.top}%`,
-            left: `${positions.LEFT_BOTTOM.left}%`,
-          }}
-        >
-          <FloatingBox content={BOX_CONTENTS.LEFT_BOTTOM} />
-        </div>
-      )}
-      {positions.RIGHT_TOP && (
-        <div
-          className="absolute"
-          style={{
-            top: `${positions.RIGHT_TOP.top}%`,
-            right: `${positions.RIGHT_TOP.right}%`,
-          }}
-        >
-          <FloatingBox 
-            content={BOX_CONTENTS.RIGHT_TOP}
-            isLarge={rightBoxCount === 1 && leftBoxCount === 2}
-          />
-        </div>
-      )}
-      {positions.RIGHT_BOTTOM && (
-        <div
-          className="absolute"
-          style={{
-            top: `${positions.RIGHT_BOTTOM.top}%`,
-            right: `${positions.RIGHT_BOTTOM.right}%`,
-          }}
-        >
-          <FloatingBox content={BOX_CONTENTS.RIGHT_BOTTOM} />
-        </div>
-      )}
+    <div className="absolute inset-0 z-20 pointer-events-auto">
+      <SpotlightMask
+        positions={positions}
+        leftBoxCount={leftBoxCount}
+        rightBoxCount={rightBoxCount}
+      />
+      <BoxContainer
+        positions={positions}
+        leftBoxCount={leftBoxCount}
+        rightBoxCount={rightBoxCount}
+        onBoxHover={handleBoxHover}
+      />
     </div>
   );
 }

@@ -18,11 +18,19 @@ const ScrollIndicator = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const handleClick = () => {
+    window.scrollTo({
+      top: window.innerHeight,
+      behavior: 'smooth'
+    });
+  };
+
   return (
     <div
-      className={`absolute bottom-4 left-1/2 transform -translate-x-1/2 transition-opacity duration-slow ${
+      className={`absolute bottom-4 left-1/2 transform -translate-x-1/2 transition-opacity duration-slow cursor-pointer ${
         isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}
+      onClick={handleClick}
     >
       <div className="flex flex-col items-center justify-center animate-float">
         <span className="text-neutral-400 text-lg font-medium">

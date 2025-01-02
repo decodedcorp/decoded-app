@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { CELL_SIZE, GAP_SIZE, GRID_COLS } from './constants';
+import { GridCell } from './components/grid/grid-cell';
+import { debounce } from './utils/debounce';
 
 interface GridBackgroundProps {
   onGridSizeChange?: (size: { cols: number; rows: number }) => void;
@@ -11,7 +13,6 @@ export function GridBackground({ onGridSizeChange }: GridBackgroundProps) {
     cols: GRID_COLS,
     rows: 13,
   });
-  const [transparentPixels, setTransparentPixels] = useState<number[]>([]);
 
   useEffect(() => {
     function updateGridSize() {
@@ -28,26 +29,6 @@ export function GridBackground({ onGridSizeChange }: GridBackgroundProps) {
 
       setGridDimensions({ cols, rows });
       onGridSizeChange?.({ cols, rows });
-
-      // 화면 크기에 따라 투명하게 할 픽셀 결정
-      const pixels = [];
-      if (width <= 479) {
-        // 모바일용 패턴
-        for (let i = 0; i < cols * rows; i += 3) {
-          pixels.push(i);
-        }
-      } else if (width <= 991) {
-        // 태블릿용 패턴
-        for (let i = 0; i < cols * rows; i += 4) {
-          pixels.push(i);
-        }
-      } else {
-        // 데스크톱용 패턴
-        for (let i = 0; i < cols * rows; i += 5) {
-          pixels.push(i);
-        }
-      }
-      setTransparentPixels(pixels);
     }
 
     updateGridSize();
@@ -57,45 +38,21 @@ export function GridBackground({ onGridSizeChange }: GridBackgroundProps) {
   }, [onGridSizeChange]);
 
   return (
-    <div
-      ref={containerRef}
-      className="absolute inset-0 overflow-hidden"
-      style={{
-        backgroundImage: `
-          linear-gradient(to right, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-          linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 1px, transparent 1px)
-        `,
-        backgroundSize: `${CELL_SIZE}px ${CELL_SIZE}px`,
-      }}
-    >
-      {Array.from({ length: gridDimensions.cols * gridDimensions.rows }).map(
-        (_, index) => (
-          <div
-            key={index}
-            className="absolute transition-opacity duration-300"
-            style={{
-              opacity: transparentPixels.includes(index) ? 0 : 1,
-              width: CELL_SIZE,
-              height: CELL_SIZE,
-              left: (index % gridDimensions.cols) * CELL_SIZE,
-              top: Math.floor(index / gridDimensions.cols) * CELL_SIZE,
-            }}
-          />
-        )
-      )}
+    <div ref={containerRef} className="absolute inset-0 overflow-hidden">
+      <div
+        className="grid"
+        style={{
+          gridTemplateColumns: `repeat(${gridDimensions.cols}, ${CELL_SIZE}px)`,
+          gridTemplateRows: `repeat(${gridDimensions.rows}, ${CELL_SIZE}px)`,
+          gap: GAP_SIZE,
+        }}
+      >
+        {Array.from({ length: gridDimensions.cols * gridDimensions.rows }).map(
+          (_, index) => (
+            <GridCell key={index} className="transition-colors duration-300" />
+          )
+        )}
+      </div>
     </div>
   );
-}
-
-// 디바운스 유틸리티 함수
-function debounce(func: Function, wait: number) {
-  let timeout: NodeJS.Timeout;
-  return function executedFunction(...args: any[]) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
 }
