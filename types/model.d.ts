@@ -406,6 +406,11 @@ export interface DiscoverInfo {
   }[];
 }
 
+export interface LinkInfo {
+  url: string;
+  label?: string;
+}
+
 interface Point {
   x: number;
   y: number;
@@ -427,4 +432,68 @@ interface RequestedItem {
   productType?: string;
   position: Position;
   context?: string;
+}
+
+interface ItemMetadata {
+  name?: string;
+  description?: string;
+  brand?: string;
+  designedBy?: string;
+  material?: string;
+  color?: string;
+  itemClass?: string;
+  itemSubClass?: string;
+  category?: string;
+  subCategory?: string;
+  productType?: string;
+}
+
+interface LinkInfoWithProvider {
+  provider: string;
+  url: string;
+  label: string;
+}
+
+interface ItemDocument {
+  Id: string;
+  requester: string;
+  requestedAt: string;
+  linkInfo?: LinkInfoWithProvider[];
+  metadata: ItemMetadata;
+  imgUrl: string;
+  like: number;
+}
+
+interface ItemDocumentWithBrandInfo {
+  item: ItemDocument;
+  brandName: string;
+  brandLogoImageUrl: string;
+}
+
+interface Item {
+  category: string;
+  isDecoded: boolean;
+  item: ItemDocumentWithBrandInfo;
+  position: {
+    top: string;
+    left: string;
+  };
+}
+
+interface ImageDocument {
+  docId: string;
+  decodedNum: Number;
+  description: string;
+  imgUrl: string;
+  items: Record<string, Item[]>;
+  like: Number;
+  source?: string;
+  style: string[];
+  title: string;
+  uploadBy: string;
+}
+
+interface ProvideData {
+  provider?: string;
+  links?: string[];
 }
