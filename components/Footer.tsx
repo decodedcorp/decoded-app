@@ -1,8 +1,7 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
-import white_logo from '@/public/brandings/logos/logo_white.png';
-import { pretendardRegular} from '@/lib/constants/fonts';
+import { pretendardRegular } from "@/lib/constants/fonts";
 import { Button } from "@mui/material";
 
 function Footer() {
@@ -11,7 +10,6 @@ function Footer() {
   return (
     <footer className="footer p-10 mt-10 border-t-2 border-gray-500/50">
       <div className="flex flex-col lg:flex-row w-full">
-        <Image src={white_logo} alt="logo" width={200} height={200} />
         <div
           className={`flex flex-col ${pretendardRegular.className} mt-10 lg:mt-0 lg:mx-32`}
         >
@@ -32,7 +30,9 @@ function Footer() {
             </h3>
           </div>
         </div>
-        <div className={`flex-col hidden lg:block ${pretendardRegular.className}`}>
+        <div
+          className={`flex-col hidden lg:block ${pretendardRegular.className}`}
+        >
           <p className={`text-lg`}>
             뉴스레터를 구독해 최신 뉴스를 놓치지 마세요.
           </p>
