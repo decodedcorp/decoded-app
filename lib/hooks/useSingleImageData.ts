@@ -1,121 +1,90 @@
 import { useState, useEffect } from 'react';
-import { FirebaseHelper } from '@/common/firebase';
-import { DetailPageState } from '@/types/model.d';
-import { ImageInfo, BrandInfo, ArtistInfo, ArticleInfo } from '@/types/model.d';
+import { imagesAPI } from '@/lib/api/images';
+import {
+  DetailPageState,
+  HoverItem,
+  ImagePosition,
+  ItemInfo,
+} from '@/types/model';
+
+export interface ImageDetail {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  updateAt: Date;
+  hyped: number;
+  items: {
+    position: ImagePosition;
+    identity: {
+      id: string;
+      name: string;
+      category: string;
+      profileImageUrl?: string;
+    };
+    category: {
+      itemClass: string;
+      itemSubClass: string;
+      category?: string;
+      subCategory?: string;
+      productType: string;
+    };
+  }[];
+}
 
 export function useSingleImageData(imageId: string, isFeatured: boolean) {
   const [detailPageState, setDetailPageState] =
     useState<DetailPageState | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     async function fetchImageData() {
-      const imgDocId = decodeURIComponent(imageId);
-      if (!(await FirebaseHelper.docExists('images', imgDocId))) return;
+      try {
+        setLoading(true);
+        const imageData = await imagesAPI.getImageDetail(imageId);
 
-      const img = (
-        await FirebaseHelper.doc('images', imgDocId)
-      ).data() as ImageInfo;
-      const itemList = (await FirebaseHelper.getHoverItems(imgDocId)).sort(
-        (a, b) => {
-          const topA = parseInt(a.pos.top || '0%');
-          const topB = parseInt(b.pos.top || '0%');
-          return topA !== topB
-            ? topA - topB
-            : parseInt(a.pos.left || '0%') - parseInt(b.pos.left || '0%');
-        }
-      );
-
-      const normalizeBrand = (brand: string) => brand.toLowerCase().replace(/\s/g, '_');
-      
-      const brandList = Array.from(
-        new Set(
-          itemList.flatMap(item => (item.info.brands ?? []).map(normalizeBrand))
-        )
-      );
-
-      const brandUrlList = new Map<string, string>();
-      const brandLogo = new Map<string, string>();
-      let artistList: string[] = [];
-      let artistArticleList: ArticleInfo[] | undefined;
-      let artistImgList: [string, string][] = [];
-
-      if (img.tags?.brands) {
-        const brandInfoList = await Promise.all(
-          img.tags.brands.map(
-            async (brandDocId) =>
-              (
-                await FirebaseHelper.doc('brands', brandDocId)
-              ).data() as BrandInfo
-          )
-        );
-
-        brandInfoList.forEach((brand) => {
-          brandLogo.set(brand.name, brand.logoImageUrl ?? '');
-          brandUrlList.set(
-            brand.name.toLowerCase().replace(/\s/g, '_'),
-            brand.sns?.['instagram'] ?? brand.websiteUrl ?? ''
-          );
+        // API 응답을 DetailPageState 형식으로 변환
+        setDetailPageState({
+          img: {
+            title: imageData.title,
+            description: imageData.description,
+            imageUrl: imageData.imageUrl,
+            updateAt: new Date(),
+            hyped: 0,
+          },
+          itemList: imageData.items.map(
+            (item): HoverItem => ({
+              pos: item.position,
+              info: {
+                identity: item.identity,
+                category: `${item.category.itemClass}/${
+                  item.category.itemSubClass
+                }/${item.category.category || ''}/${
+                  item.category.subCategory || ''
+                }/${item.category.productType}`,
+              },
+            })
+          ),
+          brandUrlList: new Map(),
+          brandImgList: new Map(),
+          artistImgList: [],
+          artistList: [],
+          artistArticleList: [],
         });
-      }
-
-      if (img.tags?.artists && !isFeatured) {
-        const artistInfoList = await Promise.all(
-          img.tags.artists.map(
-            async (artistDocId) =>
-              (
-                await FirebaseHelper.doc('artists', artistDocId)
-              ).data() as ArtistInfo
-          )
+      } catch (err) {
+        setError(
+          err instanceof Error ? err : new Error('Failed to fetch image data')
         );
-
-        for (const artist of artistInfoList) {
-          artistList.push(artist.name);
-
-          if (artist.tags?.articles) {
-            artistArticleList = await Promise.all(
-              artist.tags.articles.map(
-                async (articleDocId) =>
-                  (
-                    await FirebaseHelper.doc('articles', articleDocId)
-                  ).data() as ArticleInfo
-              )
-            );
-          }
-
-          if (artist.tags?.images) {
-            const images = await FirebaseHelper.listAllStorageItems('images');
-            await Promise.all(
-              images.items.map(async (image) => {
-                const metadata = await FirebaseHelper.metadata(image);
-                const docId = metadata?.customMetadata?.id;
-                if (
-                  docId &&
-                  artist.tags?.images?.includes(docId) &&
-                  docId !== imgDocId
-                ) {
-                  const imageUrl = await FirebaseHelper.downloadUrl(image);
-                  artistImgList.push([docId, imageUrl]);
-                }
-              })
-            );
-          }
-        }
+      } finally {
+        setLoading(false);
       }
-
-      setDetailPageState({
-        img,
-        itemList,
-        brandUrlList,
-        brandImgList: brandLogo,
-        artistImgList,
-        artistList,
-        artistArticleList,
-        colorInfo: img.colorInfo,
-      });
     }
 
-    fetchImageData();
+    if (imageId) {
+      fetchImageData();
+    }
   }, [imageId, isFeatured]);
 
-  return detailPageState;
+  return { detailPageState, loading, error };
 }

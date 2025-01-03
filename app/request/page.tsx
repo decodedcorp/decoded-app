@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { networkManager } from "@/common/network";
-import { arrayBufferToBase64 } from "@/common/util";
-import React, { useState, useEffect, useRef } from "react";
-import { Position, Point, RequestedItem, RequestImage } from "@/types/model";
-import Image from "next/image";
+import { networkManager } from '@/common/network';
+import { arrayBufferToBase64 } from '@/common/util';
+import React, { useState, useEffect, useRef } from 'react';
+import { Position, Point, RequestedItem, RequestImage } from '@/types/model';
+import Image from 'next/image';
 
 const RequestSection = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -39,7 +39,7 @@ const RequestSection = () => {
 
   const handleSubmit = async () => {
     if (!imageFile) {
-      alert("Please select a celebrity and upload an image");
+      alert('Please select a celebrity and upload an image');
       return;
     }
     const items: RequestedItem[] = [];
@@ -54,9 +54,9 @@ const RequestSection = () => {
     }
     const buffer = await imageFile?.arrayBuffer();
     const base64Image = arrayBufferToBase64(buffer);
-    const requestBy = window.sessionStorage.getItem("USER_DOC_ID");
+    const requestBy = window.sessionStorage.getItem('USER_DOC_ID');
     if (!requestBy) {
-      alert("로그인이 필요합니다.");
+      alert('로그인이 필요합니다.');
       return;
     }
     const requestImage: RequestImage = {
@@ -66,15 +66,15 @@ const RequestSection = () => {
       metadata: {},
     };
     networkManager
-      .request("image/request", "POST", requestImage)
+      .request('image/request', 'POST', requestImage)
       .then(() => {
-        alert("요청이 완료되었습니다.");
+        alert('요청이 완료되었습니다.');
         defaultState();
       })
       .catch((error) => {
         const errorMessage =
-          error.response?.data?.description || "요청 중 오류가 발생했습니다.";
-        console.error("요청 실패:", errorMessage);
+          error.response?.data?.description || '요청 중 오류가 발생했습니다.';
+        console.error('요청 실패:', errorMessage);
         alert(errorMessage);
       });
   };
@@ -89,8 +89,8 @@ const RequestSection = () => {
         transition-all duration-200
         ${
           isStepComplete
-            ? "bg-[#1A1A1A] text-gray-400 hover:bg-black/50"
-            : "bg-[#1A1A1A] text-gray-400 cursor-not-allowed"
+            ? 'bg-[#1A1A1A] text-gray-400 hover:bg-black/50'
+            : 'bg-[#1A1A1A] text-gray-400 cursor-not-allowed'
         }
       `}
     >
@@ -143,10 +143,10 @@ const RequestSection = () => {
                     w-5 h-5 rounded-full 
                     ${
                       index + 1 < currentStep
-                        ? "bg-[#EAFD66]" // 완료된 스텝
+                        ? 'bg-[#EAFD66]' // 완료된 스텝
                         : index + 1 === currentStep
-                        ? "bg-[#EAFD66]" // 현재 스텝
-                        : "border-[2.5px] border-[#333333] bg-transparent" // 미완료 스텝
+                        ? 'bg-[#EAFD66]' // 현재 스텝
+                        : 'border-[2.5px] border-[#333333] bg-transparent' // 미완료 스텝
                     }
                   `}
                 />
@@ -165,9 +165,9 @@ const RequestSection = () => {
     const handleDrag = (e: React.DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      if (e.type === "dragenter" || e.type === "dragover") {
+      if (e.type === 'dragenter' || e.type === 'dragover') {
         setDragActive(true);
-      } else if (e.type === "dragleave") {
+      } else if (e.type === 'dragleave') {
         setDragActive(false);
       }
     };
@@ -210,8 +210,8 @@ const RequestSection = () => {
                 transition-all
                 ${
                   dragActive
-                    ? "border-yellow-400 bg-[#1A1A1A]"
-                    : "border-gray-700 bg-[#1A1A1A]"
+                    ? 'border-yellow-400 bg-[#1A1A1A]'
+                    : 'border-gray-700 bg-[#1A1A1A]'
                 }
               `}
               onDragEnter={handleDrag}
@@ -235,7 +235,7 @@ const RequestSection = () => {
                 <div className="mb-4">
                   <svg
                     className={`w-12 h-12 mb-3 ${
-                      dragActive ? "text-yellow-400" : "text-gray-400"
+                      dragActive ? 'text-yellow-400' : 'text-gray-400'
                     }`}
                     fill="none"
                     stroke="currentColor"
@@ -252,12 +252,12 @@ const RequestSection = () => {
 
                 <p
                   className={`mb-2 text-lg ${
-                    dragActive ? "text-yellow-600" : "text-gray-600"
+                    dragActive ? 'text-yellow-600' : 'text-gray-600'
                   }`}
                 >
                   {dragActive
-                    ? "여기에 놓아주세요!"
-                    : "이미지를 드래그하여 업로드하거나"}
+                    ? '여기에 놓아주세요!'
+                    : '이미지를 드래그하여 업로드하거나'}
                 </p>
 
                 <button
@@ -492,7 +492,7 @@ const RequestSection = () => {
                     <div className="p-3">
                       <textarea
                         rows={2}
-                        value={point.context || ""}
+                        value={point.context || ''}
                         onChange={(e) =>
                           updatePointContext(index, e.target.value)
                         }
@@ -541,8 +541,8 @@ const RequestSection = () => {
                   transition-all duration-200
                   ${
                     isStepComplete
-                      ? "bg-[#1A1A1A] text-[#EAFD66] hover:bg-black/50"
-                      : "bg-[#1A1A1A] text-gray-400 cursor-not-allowed"
+                      ? 'bg-[#1A1A1A] text-[#EAFD66] hover:bg-black/50'
+                      : 'bg-[#1A1A1A] text-gray-400 cursor-not-allowed'
                   }
                 `}
               >

@@ -1,8 +1,8 @@
-"use client";
-import { useState } from "react";
-import Image from "next/image";
-import { pretendardRegular } from "@/lib/constants/fonts";
-import { Button } from "@mui/material";
+'use client';
+import { useState } from 'react';
+import Image from 'next/image';
+import { pretendardRegular } from '@/lib/constants/fonts';
+import { Button } from '@mui/material';
 
 function Footer() {
   const [isType, setIsType] = useState<boolean>(false);
@@ -44,14 +44,14 @@ function Footer() {
             />
             <Button
               style={{
-                color: "white",
-                border: "1px solid white",
-                width: "100px",
-                height: "40px",
-                marginLeft: "10px",
+                color: 'white',
+                border: '1px solid white',
+                width: '100px',
+                height: '40px',
+                marginLeft: '10px',
               }}
               onClick={() => {
-                alert("WIP");
+                alert('WIP');
               }}
             >
               구독하기

@@ -1,6 +1,5 @@
 'use client';
 
-import Logo from './logo/Logo';
 import Nav from './nav/Nav';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
@@ -41,7 +40,6 @@ function Header({
       )}
     >
       <div className="w-full max-w-[1728px] h-header-mobile md:h-header-desktop flex items-center gap-4 px-11">
-        <Logo isScrolled={true} />
         <Nav
           isSearchOpen={isSearchOpen}
           onSearchToggle={onSearchToggle}

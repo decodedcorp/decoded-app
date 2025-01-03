@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { pretendardRegular } from '@/lib/constants/fonts';
 import { Search } from 'lucide-react';
 
-export function SearchBar() {
+export function SearchBar({ onSearch }: { onSearch: (query: string) => void }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -30,9 +30,9 @@ export function SearchBar() {
           placeholder="아티스트, 브랜드로 검색해보세요"
           className={cn(
             pretendardRegular.className,
-            "w-full bg-[#222222] rounded-xl pl-10 pr-4 py-2.5 text-sm",
-            "text-white placeholder-white/40",
-            "focus:outline-none focus:ring-1 focus:ring-white/20"
+            'w-full bg-[#222222] rounded-xl pl-10 pr-4 py-2.5 text-sm',
+            'text-white placeholder-white/40',
+            'focus:outline-none focus:ring-1 focus:ring-white/20'
           )}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -43,4 +43,4 @@ export function SearchBar() {
       <SearchModal isOpen={isModalOpen} />
     </div>
   );
-} 
+}

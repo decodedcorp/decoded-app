@@ -1,6 +1,6 @@
 'use client';
 
-import { DetailPageState } from '@/types/model.d';
+import { DetailPageState, HoverItem } from '@/types/model.d';
 import { MainImage } from './main-image';
 import { ImageList } from '../list';
 import { useState, useCallback } from 'react';
@@ -9,13 +9,11 @@ import { ImagePopup } from '../popup/popup';
 export interface ImageViewProps {
   detailPageState: DetailPageState;
   imageUrl: string;
-  isItemDetail?: boolean;
 }
 
 export function ImageView({
   detailPageState,
   imageUrl,
-  isItemDetail = false,
 }: ImageViewProps) {
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
   const [isTouch, setIsTouch] = useState(false);
@@ -33,19 +31,16 @@ export function ImageView({
     setHoveredItem(index);
   }, []);
 
-  if (isItemDetail) {
-    return (
-      <div className="w-full h-full flex items-center justify-center bg-neutral-800">
-        <div className="relative w-full h-full">
-          <MainImage
-            imageUrl={imageUrl}
-            detailPageState={detailPageState}
-            isItemDetail={true}
-          />
-        </div>
-      </div>
-    );
+  if (!detailPageState.img) {
+    return null;
   }
+
+  const itemList = detailPageState.itemList ?? [];
+  const brandUrlList = detailPageState.brandUrlList ?? new Map();
+  const brandImgList = detailPageState.brandImgList ?? new Map();
+  const artistImgList = detailPageState.artistImgList ?? [];
+  const artistList = detailPageState.artistList ?? [];
+  const artistArticleList = detailPageState.artistArticleList ?? [];
 
   return (
     <section className="flex flex-row w-full justify-center mx-auto gap-[30px]">
@@ -53,12 +48,27 @@ export function ImageView({
         <div className="relative" onClick={handleTouch}>
           <MainImage
             imageUrl={imageUrl}
-            detailPageState={detailPageState}
-            isItemDetail={false}
+            detailPageState={{
+              img: detailPageState.img,
+              itemList,
+              brandUrlList,
+              brandImgList,
+              artistImgList,
+              artistList,
+              artistArticleList
+            }}
           />
           <div className="absolute inset-0 z-10">
             <ImagePopup
-              detailPageState={detailPageState}
+              detailPageState={{
+                img: detailPageState.img,
+                itemList,
+                brandUrlList,
+                brandImgList,
+                artistImgList,
+                artistList,
+                artistArticleList
+              }}
               currentIndex={currentIndex}
               isTouch={isTouch}
               hoveredItem={hoveredItem}
@@ -69,7 +79,15 @@ export function ImageView({
       </div>
       <div className="w-[388px] shrink-0">
         <ImageList
-          detailPageState={detailPageState}
+          detailPageState={{
+            img: detailPageState.img,
+            itemList,
+            brandUrlList,
+            brandImgList,
+            artistImgList,
+            artistList,
+            artistArticleList
+          }}
           currentIndex={currentIndex}
           setCurrentIndex={handleSetCurrentIndex}
         />

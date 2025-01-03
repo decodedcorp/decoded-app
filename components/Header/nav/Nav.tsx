@@ -1,8 +1,9 @@
 'use client';
 
+import Logo from '@/app/components/ui/Logo';
 import { SearchBar } from '../search/SearchBar';
 import { LoginButton } from './LoginButton';
-import { cn } from '@/lib/utils';
+import { Button } from '@/app/components/ui/button';
 import Link from 'next/link';
 
 interface NavProps {
@@ -19,28 +20,28 @@ function Nav({
   onSidebarOpen,
 }: NavProps) {
   return (
-    <nav className="w-full flex items-center justify-between px-8">
-      <SearchBar onSearch={(query) => console.log(query)} />
+    <nav className="w-full h-16 px-8">
+      <div className="h-full grid grid-cols-[240px_1fr_240px] items-center gap-8">
+        {/* 로고 영역 */}
+        <div className="flex items-center">
+          <Logo width={200} height={48} />
+        </div>
 
-      {/* 오른쪽 버튼 */}
-      <Link href={'/request'} className="flex items-center gap-4">
-        <button
-          className={cn(
-            'rounded-xl px-7 h-10',
-            'bg-[#EAFD66]/90',
-            'border-2 border-[#EAFD66]/20',
-            'text-black font-semibold',
-            'hover:bg-[#EAFD66]',
-            'hover:border-[#EAFD66]/40 hover:scale-105',
-            'transition-all duration-200 ease-out',
-            'shadow-lg shadow-[#EAFD66]/20',
-            'text-[15px] tracking-wide'
-          )}
-        >
-          요청하기
-        </button>
-        <LoginButton />
-      </Link>
+        {/* 검색바 영역 */}
+        <div className="flex justify-center">
+          <div className="w-full max-w-2xl">
+            <SearchBar onSearch={(query) => console.log(query)} />
+          </div>
+        </div>
+
+        {/* 버튼 영역 */}
+        <div className="flex items-center justify-end gap-4">
+          <Link href="/request">
+            <Button variant="primary">요청하기</Button>
+          </Link>
+          <LoginButton />
+        </div>
+      </div>
     </nav>
   );
 }

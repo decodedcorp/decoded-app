@@ -1,12 +1,64 @@
-import Link from 'next/link';
+'use client';
 
-const FEATURED_IMAGE = {
-  id: 'cb5XDDVnqdOSG3Hem7gP',
-  url: 'https://firebasestorage.googleapis.com/v0/b/tagged-d87d8.appspot.com/o/featured%2Fnew_jeans_how_sweet_featured.webp?alt=media&token=581967a4-5790-40b7-9463-79f35ae2e4d7'
-};
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { networkManager } from '@/lib/network/network';
+
+interface FeaturedImage {
+  id: string;
+  imageUrl: string;
+  title?: string;
+  description?: string;
+}
 
 export function HeroContent() {
-  const detailsUrl = `/details?imageId=${FEATURED_IMAGE.id}&imageUrl=${encodeURIComponent(FEATURED_IMAGE.url)}&isFeatured=yes`;
+  const [featuredImage, setFeaturedImage] = useState<FeaturedImage | null>(
+    null
+  );
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchFeaturedImage() {
+      try {
+        const response = await networkManager.request(
+          'images/featured/main',
+          'GET',
+          null
+        );
+        setFeaturedImage({
+          id: response.data.id,
+          imageUrl: response.data.imageUrl,
+          title: response.data.title,
+          description: response.data.description,
+        });
+      } catch (error) {
+        console.error('Failed to fetch featured image:', error);
+        // 폴백 이미지 사용
+        setFeaturedImage({
+          id: 'default',
+          imageUrl: '/images/fallback-featured.webp',
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchFeaturedImage();
+  }, []);
+
+  const detailsUrl = featuredImage
+    ? `/details?imageId=${featuredImage.id}&imageUrl=${encodeURIComponent(
+        featuredImage.imageUrl
+      )}&isFeatured=yes`
+    : '#';
+
+  if (loading) {
+    return (
+      <div className="w-full h-[300px] flex items-center justify-center">
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <div className="w-full flex flex-col items-center justify-center gap-6 px-4">

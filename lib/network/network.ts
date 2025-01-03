@@ -62,7 +62,7 @@ export class NetworkManager {
     try {
       const convertedData = convertKeysToSnakeCase(data);
       console.log(convertedData);
-      const url = `${this.config.db}/api/${path}`;
+      const url = `${this.config.db}/api${path}`;
       const res = await axios.request({
         url,
         method,

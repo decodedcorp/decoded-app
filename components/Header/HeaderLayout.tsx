@@ -13,17 +13,20 @@ export function HeaderLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const pathname = usePathname();
 
-  const { isClosing: isSearchClosing, handleClose: handleSearchClose } = useModalClose({
-    onClose: () => setIsSearchOpen(false)
-  });
+  const { isClosing: isSearchClosing, handleClose: handleSearchClose } =
+    useModalClose({
+      onClose: () => setIsSearchOpen(false),
+    });
 
-  const { isClosing: isLoginClosing, handleClose: handleLoginClose } = useModalClose({
-    onClose: () => setIsLoginOpen(false)
-  });
+  const { isClosing: isLoginClosing, handleClose: handleLoginClose } =
+    useModalClose({
+      onClose: () => setIsLoginOpen(false),
+    });
 
-  const { isClosing: isSidebarClosing, handleClose: handleSidebarClose } = useModalClose({
-    onClose: () => setIsSidebarOpen(false)
-  });
+  const { isClosing: isSidebarClosing, handleClose: handleSidebarClose } =
+    useModalClose({
+      onClose: () => setIsSidebarOpen(false),
+    });
 
   const handleSearchToggle = useCallback(() => {
     if (isSearchOpen) {
@@ -51,6 +54,7 @@ export function HeaderLayout() {
         isOpen={isSearchOpen}
         onClose={handleSearchClose}
         isClosing={isSearchClosing}
+        isScrolled={false}
       />
       <LoginModal
         isOpen={isLoginOpen}

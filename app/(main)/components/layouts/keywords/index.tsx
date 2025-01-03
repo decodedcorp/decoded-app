@@ -41,11 +41,7 @@ export function KeywordList({ tags }: KeywordListProps) {
   return (
     <div className="flex flex-wrap w-full md:w-[60vw] mt-6 md:mt-10">
       {tags?.map((tag, index) => (
-        <KeywordTag 
-          key={index}
-          name={tag.name}
-          imageUrl={tag.imageUrl}
-        />
+        <KeywordTag key={index} name={tag.name} />
       ))}
     </div>
   );
