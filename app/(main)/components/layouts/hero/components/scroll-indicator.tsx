@@ -33,20 +33,20 @@ const ScrollIndicator = () => {
       onClick={handleClick}
     >
       <div className="flex flex-col items-center justify-center animate-float">
-        <span className="text-neutral-400 text-lg font-medium">
-          Scroll to learn more
+        <span className="text-sm font-medium text-primary">
+          스크롤 내리기
         </span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="32"
-          height="32"
+          width="26"
+          height="26"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
           strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="text-neutral-400 animate-float"
+          className="animate-float text-primary"
         >
           <polyline points="6 9 12 15 18 9"></polyline>
         </svg>

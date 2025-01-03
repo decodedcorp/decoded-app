@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
 import { BoxContent } from './types';
 import { PointIcon } from '@/components/ui/icons/point-icon';
+import { useState } from 'react';
 
 interface FloatingBoxProps {
   content: BoxContent;
@@ -13,15 +14,25 @@ export function FloatingBox({
   isLarge = false,
   onHover,
 }: FloatingBoxProps) {
+  const [isHovered, setIsHovered] = useState(false);
   const size = isLarge ? 264 : 132;
   const iconSize = isLarge ? 96 : 48;
+
+  const handleMouseEnter = (e: React.MouseEvent) => {
+    setIsHovered(true);
+    onHover?.(true, e);
+  };
+
+  const handleMouseLeave = (e: React.MouseEvent) => {
+    setIsHovered(false);
+    onHover?.(false, e);
+  };
 
   return (
     <div className="flex flex-col items-center">
       <div
         className={cn(
-          'border border-white/20',
-          'rounded-lg',
+          'relative rounded-lg',
           'transition-all duration-300',
           'hover:border-primary group',
           'active:border-primary',
@@ -34,10 +45,23 @@ export function FloatingBox({
           width: size,
           height: size,
         }}
-        onMouseEnter={(e) => onHover?.(true, e)}
-        onMouseLeave={(e) => onHover?.(false, e)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
-        <div className="flex flex-col items-center gap-2">
+        <div
+          className={cn(
+            'absolute inset-0 rounded-lg',
+            'transition-all duration-300',
+            isHovered
+              ? [
+                  'border-[1px] border-[#EAFD66]',
+                  'shadow-[0_0_10px_#EAFD66,inset_0_0_10px_#EAFD66]',
+                  'animate-pulse-subtle',
+                ]
+              : 'border border-white/20'
+          )}
+        />
+        <div className="flex flex-col items-center gap-2 z-10">
           <PointIcon
             className={cn(
               'text-white/50 transition-colors duration-300 group-hover:text-primary',

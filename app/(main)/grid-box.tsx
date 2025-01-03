@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { cn } from '@/lib/utils';
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 
 interface Box {
   id: number;
@@ -19,12 +19,12 @@ export function GridBackground() {
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      document.documentElement.style.setProperty("--mouse-x", `${e.clientX}px`);
-      document.documentElement.style.setProperty("--mouse-y", `${e.clientY}px`);
+      document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
+      document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
   useEffect(() => {
@@ -42,10 +42,10 @@ export function GridBackground() {
       // 랜덤하게 박스 크기 타입 선택
       const sizeType =
         Math.random() < 0.3
-          ? "large"
+          ? 'large'
           : Math.random() < 0.6
-          ? "medium"
-          : "small";
+          ? 'medium'
+          : 'small';
 
       const sizeRange = sizes[sizeType];
       const size =
@@ -73,10 +73,10 @@ export function GridBackground() {
       {/* 기본 그리드 배경 */}
       <div
         className={cn(
-          "absolute inset-0",
-          "bg-[linear-gradient(to_right,#232323_1px,transparent_1px),linear-gradient(to_bottom,#232323_1px,transparent_1px)]",
-          "bg-[size:4rem_4rem]",
-          "[mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000,transparent)]"
+          'absolute inset-0',
+          'bg-[linear-gradient(to_right,#232323_1px,transparent_1px),linear-gradient(to_bottom,#232323_1px,transparent_1px)]',
+          'bg-[size:4rem_4rem]',
+          '[mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000,transparent)]'
         )}
       />
 
@@ -84,12 +84,12 @@ export function GridBackground() {
       {hoveredId !== null && (
         <div
           className={cn(
-            "absolute inset-0 z-[1]", // z-index 추가
-            "pointer-events-none", // 마우스 이벤트 방지
-            "bg-[linear-gradient(to_right,#EAFD6630_1px,transparent_1px),linear-gradient(to_bottom,#EAFD6630_1px,transparent_1px)]",
-            "bg-[size:4rem_4rem]",
-            "transition-opacity duration-300",
-            "animate-grid-flash"
+            'absolute inset-0 z-[1]', // z-index 추가
+            'pointer-events-none', // 마우스 이벤트 방지
+            'bg-[linear-gradient(to_right,#EAFD6630_1px,transparent_1px),linear-gradient(to_bottom,#EAFD6630_1px,transparent_1px)]',
+            'bg-[size:4rem_4rem]',
+            'transition-opacity duration-300',
+            'animate-grid-flash'
           )}
           style={{
             maskImage: `radial-gradient(circle 20rem at ${mousePos.x}px ${mousePos.y}px, black, transparent)`,
@@ -107,7 +107,7 @@ export function GridBackground() {
           transition={{
             duration: 0.7,
             delay: box.id * 0.1,
-            ease: "easeOut",
+            ease: 'easeOut',
           }}
           style={{
             left: `${box.x}%`,
@@ -117,12 +117,12 @@ export function GridBackground() {
             transform: `translate(-50%, -50%) rotate(${box.rotation}deg)`,
           }}
           className={cn(
-            "absolute",
-            "rounded-2xl",
-            "bg-zinc-900/50 backdrop-blur-sm",
-            "cursor-pointer",
-            "transition-all duration-300",
-            hoveredId === box.id && "z-10"
+            'absolute',
+            'rounded-2xl',
+            'bg-zinc-900/50 backdrop-blur-sm',
+            'cursor-pointer',
+            'transition-all duration-300',
+            hoveredId === box.id && 'z-10'
           )}
           onMouseEnter={() => setHoveredId(box.id)}
           onMouseLeave={() => setHoveredId(null)}
@@ -130,34 +130,34 @@ export function GridBackground() {
           {/* 네온 테두리 효과 */}
           <div
             className={cn(
-              "absolute inset-0 rounded-2xl",
-              "transition-all duration-300",
+              'absolute inset-0 rounded-2xl',
+              'transition-all duration-300',
               hoveredId === box.id
                 ? [
-                    "border-[1px] border-[#EAFD66]",
-                    "shadow-[0_0_10px_#EAFD66,inset_0_0_10px_#EAFD66]",
-                    "animate-pulse-subtle",
+                    'border-[1px] border-[#EAFD66]',
+                    'shadow-[0_0_10px_#EAFD66,inset_0_0_10px_#EAFD66]',
+                    'animate-pulse-subtle',
                   ]
-                : "border border-zinc-800/50"
+                : 'border border-zinc-800/50'
             )}
           />
 
           {/* 물음표 아이콘 */}
           <div
             className={cn(
-              "absolute inset-0",
-              "flex items-center justify-center",
-              "transition-all duration-300",
+              'absolute inset-0',
+              'flex items-center justify-center',
+              'transition-all duration-300',
               hoveredId === box.id
-                ? ["text-[#EAFD66]", "text-shadow-neon", "animate-pulse-subtle"]
-                : "text-zinc-700",
+                ? ['text-[#EAFD66]', 'text-shadow-neon', 'animate-pulse-subtle']
+                : 'text-zinc-700',
               // 박스 크기에 따른 물음표 크기 조정
               box.size < 90
-                ? "text-xl"
+                ? 'text-xl'
                 : box.size < 140
-                ? "text-2xl"
-                : "text-3xl",
-              "font-bold"
+                ? 'text-2xl'
+                : 'text-3xl',
+              'font-bold'
             )}
           >
             ?

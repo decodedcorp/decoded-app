@@ -26,13 +26,8 @@ const config: Config = {
       // Custom Keyframes
       keyframes: {
         fadeIn: {
-<<<<<<< HEAD
           '0%': { opacity: '0', transform: 'scale(0.95)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
-=======
-          "0%": { opacity: "0" },
-          "100%": { opacity: "1" },
->>>>>>> feature/request-page
         },
         slideUp: {
           "0%": { transform: "translateY(20px)", opacity: "0" },
@@ -52,7 +47,7 @@ const config: Config = {
         },
         float: {
           "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-10px)" },
+          "50%": { transform: "translateY(-5px)" },
         },
         rotate: {
           "0%": { transform: "rotate(0deg)" },
@@ -61,19 +56,11 @@ const config: Config = {
       },
       // Custom Animations
       animation: {
-<<<<<<< HEAD
         'fadeIn': 'fadeIn 0.5s ease-out',
         'slide-up': 'slideUp 500ms ease-out',
         'slide-down': 'slideDown 500ms ease-out',
         'float': 'float 5s ease-in-out infinite',
         'rotate': 'rotate 10s linear infinite',
-=======
-        "fade-in": "fadeIn 300ms ease-out",
-        "slide-up": "slideUp 500ms ease-out",
-        "slide-down": "slideDown 500ms ease-out",
-        "grid-flash": "grid-flash 2s ease-in-out infinite",
-        "pulse-subtle": "pulse-subtle 2s ease-in-out infinite",
->>>>>>> feature/request-page
       },
       // Spacing & Layout
       spacing: {
@@ -127,17 +114,10 @@ const config: Config = {
           200: colors.gray[200],
           100: colors.gray[100],
         },
-<<<<<<< HEAD
         mainBackground: 'var(--main-background-color)',
         textColor: 'var(--text-color)',
         footerText: 'var(--footer-text-color)',
         primary: '#EAFD66',
-=======
-        mainBackground: "var(--main-background-color)",
-        textColor: "var(--text-color)",
-        footerText: "var(--footer-text-color)",
-        primary: "#eafd67",
->>>>>>> feature/request-page
       },
       // Background Images
       backgroundImage: {

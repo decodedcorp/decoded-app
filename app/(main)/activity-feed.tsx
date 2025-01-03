@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
-import { Coins, Link } from "lucide-react";
-import { useState, useEffect } from "react";
+import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Coins, Link } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 interface Activity {
   id: number;
@@ -17,19 +17,19 @@ interface Activity {
 const SAMPLE_ACTIVITIES: Activity[] = [
   {
     id: 1,
-    creator: "패션블로거 미나",
-    category: "패션/의류",
-    reward: "12.5",
-    time: "방금 전",
-    profileImage: "/images/profiles/1.jpg",
+    creator: '패션블로거 미나',
+    category: '패션/의류',
+    reward: '12.5',
+    time: '방금 전',
+    profileImage: '/images/profiles/1.jpg',
   },
   {
     id: 2,
-    creator: "뷰티크리에이터 소희",
-    category: "뷰티",
-    reward: "12.5",
-    time: "2분 전",
-    profileImage: "/images/profiles/2.jpg",
+    creator: '뷰티크리에이터 소희',
+    category: '뷰티',
+    reward: '12.5',
+    time: '2분 전',
+    profileImage: '/images/profiles/2.jpg',
   },
 ];
 
@@ -70,16 +70,16 @@ export function ActivityFeed() {
   return (
     <div
       className={cn(
-        "relative h-[600px] overflow-hidden rounded-2xl",
-        "border border-zinc-800/50",
-        "bg-zinc-900/30 backdrop-blur-sm"
+        'relative h-[600px] overflow-hidden rounded-2xl',
+        'border border-zinc-800/50',
+        'bg-zinc-900/30 backdrop-blur-sm'
       )}
     >
       {/* 그라데이션 오버레이 */}
       <div
         className={cn(
-          "absolute inset-0 z-20 pointer-events-none",
-          "bg-gradient-to-b from-zinc-900 via-transparent to-zinc-900"
+          'absolute inset-0 z-20 pointer-events-none',
+          'bg-gradient-to-b from-zinc-900 via-transparent to-zinc-900'
         )}
       />
 
@@ -107,17 +107,17 @@ export function ActivityFeed() {
       {/* 상단 헤더 */}
       <div
         className={cn(
-          "absolute top-0 inset-x-0 z-30",
-          "p-4 border-b border-zinc-800/50",
-          "bg-zinc-900/50 backdrop-blur-sm"
+          'absolute top-0 inset-x-0 z-30',
+          'p-4 border-b border-zinc-800/50',
+          'bg-zinc-900/50 backdrop-blur-sm'
         )}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div
               className={cn(
-                "w-2 h-2 rounded-full",
-                "bg-[#EAFD66] animate-pulse"
+                'w-2 h-2 rounded-full',
+                'bg-[#EAFD66] animate-pulse'
               )}
             />
             <span className="text-sm font-medium text-zinc-400">
@@ -144,18 +144,18 @@ function ActivityCard({
   return (
     <div
       className={cn(
-        "bg-zinc-800/30 backdrop-blur-sm",
-        "border border-zinc-700/30 rounded-xl",
-        "p-4 transition-all duration-300",
-        "hover:bg-zinc-700/30 hover:border-zinc-600/30"
+        'bg-zinc-800/30 backdrop-blur-sm',
+        'border border-zinc-700/30 rounded-xl',
+        'p-4 transition-all duration-300',
+        'hover:bg-zinc-700/30 hover:border-zinc-600/30'
       )}
     >
       <div className="flex items-center gap-4">
         {/* 프로필 이미지 */}
         <div
           className={cn(
-            "w-10 h-10 rounded-full overflow-hidden",
-            "border-2 border-[#EAFD66]/20"
+            'w-10 h-10 rounded-full overflow-hidden',
+            'border-2 border-[#EAFD66]/20'
           )}
         >
           <img
@@ -179,8 +179,8 @@ function ActivityCard({
         {/* 보상 금액 */}
         <div
           className={cn(
-            "flex items-center gap-1.5 px-3 py-1.5",
-            "bg-[#EAFD66]/10 rounded-lg"
+            'flex items-center gap-1.5 px-3 py-1.5',
+            'bg-[#EAFD66]/10 rounded-lg'
           )}
         >
           <Coins className="w-4 h-4 text-[#EAFD66]" />

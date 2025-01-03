@@ -68,13 +68,13 @@ export function HeroContent() {
         <span>Request</span>
       </div>
       <h1 className="text-4xl md:text-5xl font-bold text-foreground whitespace-pre-line text-center max-w-3xl">
-        {'미디어속에 나온 제품을\n여기에서 찾아보세요'}
+        {'찾고싶은 제품을\n지금 바로 요청해보세요'}
       </h1>
       <Link
-        href={detailsUrl}
+        href="/request"
         className="inline-flex h-11 items-center justify-center rounded-none px-8 py-3 bg-primary font-mono font-bold text-black hover:bg-primary/90 transition-colors"
       >
-        ITEM REQUEST
+        요청하기
       </Link>
     </div>
   );
