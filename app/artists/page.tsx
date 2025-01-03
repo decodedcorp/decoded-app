@@ -8,7 +8,7 @@ import {
   pretendardSemiBold,
 } from "@/lib/constants/fonts";
 import { LoadingView } from "@/components/ui/Loading";
-import { FirebaseHelper } from "@/common/firebase";
+import { FirebaseHelper } from "@/common/fireabse";
 import { useSearchParams, notFound } from "next/navigation";
 import Link from "next/link";
 import {
@@ -248,7 +248,9 @@ function ArtistArticleView({
   return (
     artistPageState.artistArticleList && (
       <div className="flex flex-col mt-20 justify-center">
-        <h2 className={`${pretendardBold.className} text-6xl mb-10`}>ARTICLES</h2>
+        <h2 className={`${pretendardBold.className} text-6xl mb-10`}>
+          ARTICLES
+        </h2>
         <ul className="list-disc list-inside space-y-4 px-4 md:px-10 text-3xl mt-10">
           {currentItems?.map((article, index) => (
             <li key={index} className="text-left">

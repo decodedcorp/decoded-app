@@ -43,17 +43,6 @@ export class FirebaseHelper {
   app: FirebaseApp;
   config: FirebaseOptions;
   private constructor() {
-    if (
-      process.env.NEXT_PUBLIC_FIREBASE_API_KEY === undefined ||
-      process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN === undefined ||
-      process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID === undefined ||
-      process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET === undefined ||
-      process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID === undefined ||
-      process.env.NEXT_PUBLIC_FIREBASE_APP_ID === undefined ||
-      process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID === undefined
-    ) {
-      throw new Error("Environment variable is undefined");
-    }
     this.config = {
       apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
       authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,

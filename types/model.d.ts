@@ -405,3 +405,26 @@ export interface DiscoverInfo {
     brand: string;
   }[];
 }
+
+interface Point {
+  x: number;
+  y: number;
+  context?: string;
+}
+
+interface RequestImage {
+  requestedItems: RequestedItem[];
+  requestBy: string;
+  imageFile?: string;
+  metadata: Record<string, string>;
+}
+
+interface RequestedItem {
+  itemClass?: string;
+  itemSubClass?: string;
+  category?: string;
+  subCategory?: string;
+  productType?: string;
+  position: Position;
+  context?: string;
+}
