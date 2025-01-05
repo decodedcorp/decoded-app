@@ -1,8 +1,8 @@
-import { MainImage } from "@/types/model";
-import Link from "next/link";
-import Image from "next/image";
-import { bold_font, semi_bold_font } from "@/components/helpers/font";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import { MainImage } from '@/types/model.d';
+import Link from 'next/link';
+import Image from 'next/image';
+import { pretendardBold, pretendardSemiBold } from '@/lib/constants/fonts';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 
 function Pin({ image }: { image: MainImage }) {
   return (
@@ -14,17 +14,17 @@ function Pin({ image }: { image: MainImage }) {
         className="relative overflow-hidden aspect-w-3 aspect-h-4"
       >
         <Image
-          src={image.imageUrl ?? ""}
-          alt={image.title ?? ""}
+          src={image.imageUrl ?? ''}
+          alt={image.title ?? ''}
           fill={true}
           style={{
-            objectFit: "cover",
+            objectFit: 'cover',
           }}
           className="rounded-lg"
         />
       </Link>
       <div className="flex flex-row justify-between items-center z-10 shadow-lg p-4">
-        <div className={`${bold_font.className}`}>
+        <div className={`${pretendardBold.className}`}>
           {image.artistInfoList?.map((artist, index) => {
             return (
               <div className="pb-1 justify-between" key={index}>
@@ -42,31 +42,31 @@ function Pin({ image }: { image: MainImage }) {
         <FavoriteBorderIcon className="w-4 h-4" />
       </div>
       <div
-        className={`flex flex-col w-full ${bold_font.className} max-h-72 overflow-y-auto`}
+        className={`flex flex-col w-full ${pretendardBold.className} max-h-72 overflow-y-auto`}
       >
         {Array.from(image.itemInfoList.entries()).map(
           ([item, [pos, brand]], index) => {
             return (
               <Link
-                href={item?.affiliateUrl ?? "#"}
+                href={item?.affiliateUrl ?? '#'}
                 className="p-2 m-2 border-b border-white/10 flex flex-row"
                 key={index}
               >
                 <div className="w-16 h-20 relative border border-black rounded-lg">
                   <Image
-                    src={item.imageUrl ?? ""}
+                    src={item.imageUrl ?? ''}
                     alt={item.name}
                     fill={true}
-                    style={{ objectFit: "contain" }}
+                    style={{ objectFit: 'contain' }}
                     className="rounded-lg"
                   />
                 </div>
                 <div className="flex flex-col ml-4 overflow-clip">
                   <div className="text-sm">
-                    {brand[0]?.name.replace(/_/g, " ").toUpperCase()}
+                    {brand[0]?.name.replace(/_/g, ' ').toUpperCase()}
                   </div>
                   <div
-                    className={`flex flex-row text-sm ${semi_bold_font.className} w-full justify-between`}
+                    className={`flex flex-row text-sm ${pretendardSemiBold.className} w-full justify-between`}
                   >
                     {item.name}
                   </div>

@@ -1,9 +1,8 @@
-"use client";
-import { useState } from "react";
-import Image from "next/image";
-import white_logo from "@/assets/white_logo.png";
-import { regular_font } from "./helpers/font";
-import { Button } from "@mui/material";
+'use client';
+import { useState } from 'react';
+import Image from 'next/image';
+import { pretendardRegular } from '@/lib/constants/fonts';
+import { Button } from '@mui/material';
 
 function Footer() {
   const [isType, setIsType] = useState<boolean>(false);
@@ -11,9 +10,8 @@ function Footer() {
   return (
     <footer className="footer p-10 mt-10 border-t-2 border-gray-500/50">
       <div className="flex flex-col lg:flex-row w-full">
-        <Image src={white_logo} alt="logo" width={200} height={200} />
         <div
-          className={`flex flex-col ${regular_font.className} mt-10 lg:mt-0 lg:mx-32`}
+          className={`flex flex-col ${pretendardRegular.className} mt-10 lg:mt-0 lg:mx-32`}
         >
           <h2 className="text-lg">디코디드(주)</h2>
           <div className="flex flex-col mt-4">
@@ -32,7 +30,9 @@ function Footer() {
             </h3>
           </div>
         </div>
-        <div className={`flex-col hidden lg:block ${regular_font.className}`}>
+        <div
+          className={`flex-col hidden lg:block ${pretendardRegular.className}`}
+        >
           <p className={`text-lg`}>
             뉴스레터를 구독해 최신 뉴스를 놓치지 마세요.
           </p>
@@ -44,14 +44,14 @@ function Footer() {
             />
             <Button
               style={{
-                color: "white",
-                border: "1px solid white",
-                width: "100px",
-                height: "40px",
-                marginLeft: "10px",
+                color: 'white',
+                border: '1px solid white',
+                width: '100px',
+                height: '40px',
+                marginLeft: '10px',
               }}
               onClick={() => {
-                alert("WIP");
+                alert('WIP');
               }}
             >
               구독하기
