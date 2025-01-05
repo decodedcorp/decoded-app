@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { provideAPI } from '@/lib/api/provide';
-import { DetailPageState, ItemDocument } from '@/types/model';
+import { imagesAPI } from '@/lib/api/endpoints/images';
+import { DetailPageState, ItemDocument } from '@/lib/api/types/image';
 
 interface UseDetailPageDataReturn {
   detailPageState: DetailPageState | null;
@@ -19,7 +19,7 @@ export function useDetailPageData(imageId: string): UseDetailPageDataReturn {
   const fetchDetailPageState = async () => {
     try {
       setIsLoading(true);
-      const response = await provideAPI.getDetailPageState(imageId);
+      const response = await imagesAPI.getImageDetail(imageId);
       setDetailPageState(response.data);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to fetch detail page state'));
@@ -28,7 +28,7 @@ export function useDetailPageData(imageId: string): UseDetailPageDataReturn {
 
   const fetchItems = async () => {
     try {
-      const response = await provideAPI.getImageItems(imageId);
+      const response = await imagesAPI.getImageItems(imageId);
       setItems(response.data);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to fetch items'));

@@ -1,7 +1,7 @@
 'use client';
 
 import Nav from './nav/Nav';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/style';
 import { useState, useEffect } from 'react';
 
 interface HeaderProps {

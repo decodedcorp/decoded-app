@@ -1,9 +1,9 @@
 'use client';
 
-import Logo from '@/app/components/ui/Logo';
+import Logo from '@/components/logo/Logo';
 import { SearchBar } from '../search/SearchBar';
 import { LoginButton } from './LoginButton';
-import { Button } from '@/app/components/ui/button';
+import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 interface NavProps {
@@ -24,7 +24,7 @@ function Nav({
       <div className="h-full grid grid-cols-[240px_1fr_240px] items-center gap-8">
         {/* 로고 영역 */}
         <div className="flex items-center">
-          <Logo width={200} height={48} />
+          <Logo isScrolled={true} />
         </div>
 
         {/* 검색바 영역 */}
@@ -37,7 +37,7 @@ function Nav({
         {/* 버튼 영역 */}
         <div className="flex items-center justify-end gap-4">
           <Link href="/request">
-            <Button variant="primary">요청하기</Button>
+            <Button variant="default">요청하기</Button>
           </Link>
           <LoginButton />
         </div>

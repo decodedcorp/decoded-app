@@ -16,13 +16,15 @@ export interface ImagePosition {
 }
 
 export interface RequestedItem {
-  position?: ImagePosition;
-  itemClass?: string;
-  itemSubClass?: string;
-  category?: string;
-  subCategory?: string;
-  productType?: string;
-  context?: string;
+  position: {
+    top: string;
+    left: string;
+  };
+  imageId: string;
+  originalPosition: {
+    top: string;
+    left: string;
+  };
 }
 
 export interface ImageRequest {
@@ -102,6 +104,22 @@ export interface ImageInfo {
    */
   source?: string;
   imageUrl: string;
+  items?: {
+    position: Position;
+    identity: {
+      id: string;
+      name: string;
+      category: string;
+      profileImageUrl?: string;
+    };
+    category: {
+      itemClass: string;
+      itemSubClass: string;
+      category?: string;
+      subCategory?: string;
+      productType: string;
+    };
+  }[];
 }
 
 /**
@@ -182,14 +200,30 @@ export interface TaggedItem {
  * @param info The information of the hover item of type `ItemInfo`
  */
 export interface HoverItem {
-  /**
-   * @example { "top": "100%", "left": "100%" }
-   */
   pos: Position;
-  /**
-   * @example "ItemInfo {...}"
-   */
-  info: ItemInfo;
+  info: {
+    item: {
+      item: {
+        _id: string;
+        metadata: {
+          name: string | null;
+          description: string | null;
+          brand: string | null;
+          designed_by: string | null;
+          material: string | null;
+          color: string | null;
+          item_class: string;
+          item_sub_class: string;
+          category: string;
+          sub_category: string;
+          product_type: string;
+        };
+        img_url: string | null;
+      };
+      brand_name: string | null;
+      brand_logo_image_url: string | null;
+    };
+  };
 }
 
 /**
@@ -424,31 +458,40 @@ export interface LinkInfoWithProvider {
 
 export interface ItemMetadata {
   name?: string;
-  description?: string;
-  brand?: string;
-  designedBy?: string;
-  material?: string;
-  color?: string;
-  itemClass?: string;
-  itemSubClass?: string;
   category?: string;
-  subCategory?: string;
-  productType?: string;
+  description?: string;
+}
+
+export interface ItemData {
+  imgUrl?: string;
+  metadata?: ItemMetadata;
+}
+
+export interface Item extends ItemData {
+  Id: string;
+  requester: string;
+  requestedAt: string;
+  like: number;
+}
+
+export interface HoverItem extends ItemData {
+  imageDocId: string;
+  metadata?: ItemMetadata;
+  imgUrl?: string;
 }
 
 export interface ItemDocument {
   Id: string;
   requester: string;
   requestedAt: string;
-  linkInfo?: LinkInfoWithProvider[];
-  metadata: ItemMetadata;
-  imgUrl: string;
+  imgUrl?: string;
   like: number;
+  metadata?: ItemMetadata;
 }
 
 export interface ProvideData {
+  links: string[];
   provider?: string;
-  links?: string[];
 }
 
 export interface ProvideInfo<T> {
@@ -485,4 +528,254 @@ export interface RequestImage {
   requestBy: string;
   imageFile?: string;
   metadata: Record<string, string>;
+}
+
+export interface ApiDetailPageState {
+  title: string | null;
+  description: string;
+  like: number;
+  style: string | null;
+  img_url: string;
+  source: string | null;
+  upload_by: string;
+  doc_id: string;
+  decoded_percent: number;
+  items: {
+    [key: string]: {
+      is_decoded: boolean;
+      position: {
+        top: string;
+        left: string;
+      };
+      item: {
+        item: {
+          _id: string;
+          requester: string;
+          requested_at: string;
+          link_info: any;
+          metadata: {
+            name: string | null;
+            description: string | null;
+            brand: string | null;
+            designed_by: string | null;
+            material: string | null;
+            color: string | null;
+            item_class: string;
+            item_sub_class: string;
+            category: string;
+            sub_category: string;
+            product_type: string;
+          };
+          img_url: string | null;
+          like: number;
+        };
+        brand_name: string | null;
+        brand_logo_image_url: string | null;
+      };
+    }[];
+  };
+}
+
+// Base interfaces
+export interface Position {
+  top?: string;
+  left?: string;
+}
+
+export interface Point {
+  x: number;
+  y: number;
+  context?: string;
+}
+
+export interface LinkInfo {
+  url: string;
+  label?: string;
+}
+
+export interface LinkInfoWithProvider {
+  provider: string;
+  value: string;
+  label: string;
+}
+
+// Identity related interfaces
+export interface IdentityInfo {
+  name: Record<string, string>;
+  category: string;
+  profileImageUrl?: string;
+  linkInfo?: LinkInfo[];
+}
+
+export interface IdentityDocument {
+  id: string;
+  name: Record<string, string>;
+  category: string;
+  profileImageUrl: string;
+}
+
+// Brand related interfaces
+export interface BrandInfo {
+  name: Record<string, string>;
+  logoImageUrl?: string;
+  linkInfo?: LinkInfo[];
+}
+
+export interface BrandData {
+  en: string;
+  ko: string;
+  docId: string;
+  logoImageUrl: string;
+}
+
+// Item related interfaces
+export interface ItemMetadata {
+  name?: string;
+  description?: string;
+  brand?: string;
+  designedBy?: string;
+  material?: string;
+  color?: string;
+  itemClass?: string;
+  itemSubClass?: string;
+  category?: string;
+  subCategory?: string;
+  productType?: string;
+}
+
+export interface ItemDocument {
+  Id: string;
+  requester: string;
+  requestedAt: string;
+  linkInfo?: LinkInfoWithProvider[];
+  metadata: ItemMetadata;
+  imgUrl: string;
+  like: number;
+}
+
+export interface ItemDocumentWithBrandInfo {
+  item: ItemDocument;
+  brandName: string;
+  brandLogoImageUrl: string;
+}
+
+export interface Item {
+  category: string;
+  isDecoded: boolean;
+  item: ItemDocumentWithBrandInfo;
+  position: Position;
+}
+
+// Request related interfaces
+export interface RequestedItem {
+  itemClass?: string;
+  itemSubClass?: string;
+  category?: string;
+  subCategory?: string;
+  productType?: string;
+  position: Position;
+  context?: string;
+}
+
+export interface RequestImage {
+  requestedItems: RequestedItem[];
+  requestBy: string;
+  imageFile: string;
+  metadata: Record<string, string>;
+}
+
+// Image related interfaces
+export interface ImageDocument {
+  docId: string;
+  decodedNum: number;
+  description: string;
+  imgUrl: string;
+  items: Record<string, Item[]>;
+  like: number;
+  source?: string;
+  style: string[];
+  title: string;
+  uploadBy: string;
+}
+
+// Category related interfaces
+export interface Category<T = Category> {
+  name: string;
+  children?: T[];
+  is_leaf: boolean;
+  instances?: string[];
+}
+
+export interface CategoryDoc {
+  item_class: string;
+  depth: number;
+  inner?: Category[];
+}
+
+// Provide related interfaces
+export interface ProvideData {
+  provider?: string;
+  links?: string[];
+}
+
+export interface ProvideInfo<T> {
+  who: string;
+  value: T;
+  provideStatus: ProvideStatus;
+}
+
+export interface ProvideItemInfo {
+  brand?: string;
+  links?: ProvideInfo<string>[];
+}
+
+export interface ProvidedItemDetail {
+  itemDocId: string;
+  position: Position;
+  provideItemInfo: ProvideItemInfo;
+}
+
+export interface HasFields {
+  hasImage?: boolean;
+  hasBrand?: boolean;
+  hasName?: boolean;
+  hasMaterial?: boolean;
+  hasDesignedBy?: boolean;
+  hasColor?: boolean;
+  hasDescription?: boolean;
+}
+
+export interface AdditionalMetadata {
+  name?: string;
+  material?: string;
+  designedBy?: string;
+  color?: string;
+  brand?: string;
+  description?: string;
+}
+
+export interface ConfirmItemInfo {
+  base64Image?: string;
+  approveUrls?: LinkInfo[];
+  rejectUrls?: string[];
+  additionalMetadata?: AdditionalMetadata;
+}
+
+export interface ProvideItemInfoWithMetadata {
+  itemDocId: string;
+  hasFields: HasFields;
+  unconfirmedLinks?: string[];
+}
+
+export interface ItemRequest {
+  imageDocId: string | null;
+  imageUrl: string | null;
+  isRequested: boolean;
+  items: ProvidedItemDetail[] | null;
+}
+
+export enum ProvideStatus {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED'
 }

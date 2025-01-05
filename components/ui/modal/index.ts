@@ -1,3 +1,3 @@
 export { SearchModal } from './SearchModal';
 export { LoginModal } from './LoginModal';
-export { RequestModal } from './RequestModal'; 
+export { AddItemModal } from './add-item-modal'; 

@@ -5,10 +5,7 @@ import { MetricsSection } from './components/sections/metric';
 import { DiscoverSection } from './components/sections/discover';
 import { PremiumSpotSection } from './components/sections/premium-spot';
 import { TrendingSection } from './components/trending';
-import { GridBackground } from './grid-box';
-import { cn } from '@/lib/utils';
 
-import Link from 'next/link';
 import { Hero } from './components/layouts/hero';
 
 export default function Home() {

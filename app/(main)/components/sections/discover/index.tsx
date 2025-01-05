@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
-import Image from "next/image";
-import { Search, Share2, Sparkles } from "lucide-react";
-import ActivityFeed from "@/app/(main)/activity-feed";
+import { cn } from '@/lib/utils/style';
+import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { Search, Share2, Sparkles } from 'lucide-react';
+import { ActivityFeed } from '@/app/(main)/activity-feed';
 
 export function DiscoverSection() {
   return (
     <section className="container mx-auto px-4">
       <div
         className={cn(
-          "relative rounded-3xl overflow-hidden",
-          "border border-zinc-800/50"
+          'relative rounded-3xl overflow-hidden',
+          'border border-zinc-800/50'
         )}
       >
         {/* 콘텐츠 */}
@@ -24,9 +24,9 @@ export function DiscoverSection() {
                 <div className="flex items-center gap-2">
                   <span
                     className={cn(
-                      "px-2 py-1 rounded-lg text-sm",
-                      "bg-[#EAFD66]/10 text-[#EAFD66]",
-                      "font-medium"
+                      'px-2 py-1 rounded-lg text-sm',
+                      'bg-[#EAFD66]/10 text-[#EAFD66]',
+                      'font-medium'
                     )}
                   >
                     For Creators
@@ -34,9 +34,9 @@ export function DiscoverSection() {
                 </div>
                 <h2
                   className={cn(
-                    "text-3xl md:text-4xl font-bold",
-                    "bg-gradient-to-r from-[#EAFD66] to-[#EAFD66]/70",
-                    "bg-clip-text text-transparent"
+                    'text-3xl md:text-4xl font-bold',
+                    'bg-gradient-to-r from-[#EAFD66] to-[#EAFD66]/70',
+                    'bg-clip-text text-transparent'
                   )}
                 >
                   여러분의 링크로
@@ -74,32 +74,12 @@ export function DiscoverSection() {
             <div className="flex flex-wrap gap-4">
               <button
                 className={cn(
-                  "group flex items-center gap-2",
-                  "bg-[#EAFD66] text-black",
-                  "px-6 py-3 rounded-xl",
-                  "font-semibold tracking-wide",
-                  "hover:bg-[#EAFD66]/90",
-                  "transition-all duration-200",
-                  "shadow-lg shadow-[#EAFD66]/20"
-                )}
-              >
-                <span>정보 제공하기</span>
-                <Share2
-                  className={cn(
-                    "w-4 h-4",
-                    "transform group-hover:translate-x-0.5",
-                    "transition-transform duration-200"
-                  )}
-                />
-              </button>
-              <button
-                className={cn(
-                  "bg-white/5 text-white",
-                  "px-6 py-3 rounded-xl",
-                  "font-semibold tracking-wide",
-                  "hover:bg-white/10",
-                  "transition-all duration-200",
-                  "border border-white/10"
+                  'bg-white/5 text-white',
+                  'px-6 py-3 rounded-xl',
+                  'font-semibold tracking-wide',
+                  'hover:bg-white/10',
+                  'transition-all duration-200',
+                  'border border-white/10'
                 )}
               >
                 자세히 알아보기
@@ -117,8 +97,8 @@ export function DiscoverSection() {
         <div className="absolute inset-0 bg-grid-pattern opacity-10" />
         <div
           className={cn(
-            "absolute top-0 right-0 w-1/2 h-full",
-            "bg-gradient-to-l from-[#EAFD66]/5 to-transparent"
+            'absolute top-0 right-0 w-1/2 h-full',
+            'bg-gradient-to-l from-[#EAFD66]/5 to-transparent'
           )}
         />
       </div>
@@ -137,10 +117,10 @@ function FeatureItem({ icon, title, description }: FeatureItemProps) {
     <div className="flex items-start gap-4">
       <div
         className={cn(
-          "flex-shrink-0",
-          "w-10 h-10 rounded-xl",
-          "bg-[#EAFD66]/10 text-[#EAFD66]",
-          "flex items-center justify-center"
+          'flex-shrink-0',
+          'w-10 h-10 rounded-xl',
+          'bg-[#EAFD66]/10 text-[#EAFD66]',
+          'flex items-center justify-center'
         )}
       >
         {icon}
@@ -169,9 +149,9 @@ function ImageCard({ src, alt, tags, likes, className }: ImageCardProps) {
       viewport={{ once: true }}
       transition={{ duration: 0.7 }}
       className={cn(
-        "group relative rounded-2xl overflow-hidden",
-        "bg-zinc-900 shadow-xl",
-        "aspect-[3/4]",
+        'group relative rounded-2xl overflow-hidden',
+        'bg-zinc-900 shadow-xl',
+        'aspect-[3/4]',
         className
       )}
     >
@@ -181,15 +161,15 @@ function ImageCard({ src, alt, tags, likes, className }: ImageCardProps) {
       <Image src={src} alt={alt} fill className="object-cover" />
 
       {/* 태그와 좋아요 */}
-      <div className={cn("absolute inset-x-0 bottom-0", "p-4 space-y-3")}>
+      <div className={cn('absolute inset-x-0 bottom-0', 'p-4 space-y-3')}>
         <div className="flex flex-wrap gap-2">
           {tags.map((tag) => (
             <span
               key={tag}
               className={cn(
-                "px-2 py-1 rounded-lg",
-                "text-xs font-medium",
-                "bg-white/10 text-white/80"
+                'px-2 py-1 rounded-lg',
+                'text-xs font-medium',
+                'bg-white/10 text-white/80'
               )}
             >
               {tag}
@@ -205,18 +185,18 @@ function ImageCard({ src, alt, tags, likes, className }: ImageCardProps) {
       {/* 호버 효과 */}
       <div
         className={cn(
-          "absolute inset-0",
-          "flex items-end p-4",
-          "opacity-0 group-hover:opacity-100",
-          "transition-opacity duration-300",
-          "bg-gradient-to-t from-black/90 via-black/50 to-transparent"
+          'absolute inset-0',
+          'flex items-end p-4',
+          'opacity-0 group-hover:opacity-100',
+          'transition-opacity duration-300',
+          'bg-gradient-to-t from-black/90 via-black/50 to-transparent'
         )}
       >
         <button
           className={cn(
-            "w-full px-4 py-2 rounded-xl",
-            "bg-[#EAFD66] text-black",
-            "font-medium text-sm"
+            'w-full px-4 py-2 rounded-xl',
+            'bg-[#EAFD66] text-black',
+            'font-medium text-sm'
           )}
         >
           정보 제공하기

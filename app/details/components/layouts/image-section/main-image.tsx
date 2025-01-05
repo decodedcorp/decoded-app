@@ -1,5 +1,6 @@
 import { DetailPageState } from '@/types/model.d';
 import Image from 'next/image';
+import { AddItemButton } from './add-item-button';
 
 interface MainImageProps {
   imageUrl: string;
@@ -12,6 +13,16 @@ export function MainImage({
   detailPageState,
   isItemDetail = false,
 }: MainImageProps) {
+  const imageDocId = detailPageState.itemList?.[0]?.imageDocId;
+  const requestUrl = imageDocId ? `/request?imageId=${imageDocId}` : '/request';
+
+  const itemPositions = Object.values(detailPageState.img?.items || {})
+    .flat()
+    .map(item => ({
+      top: item.position?.top || "0",
+      left: item.position?.left || "0"
+    }));
+
   return (
     <div className="relative">
       <div
@@ -29,10 +40,13 @@ export function MainImage({
         />
       </div>
       {!isItemDetail && (
-        <div className="absolute bottom-4 right-4">
-          <button className="bg-white px-4 py-2 rounded-md hover:bg-white/90 text-black text-sm font-medium transition-colors">
-            아이템 추가 요청하기
-          </button>
+        <div className="absolute top-4 right-4 z-20">
+          <AddItemButton 
+            requestUrl={requestUrl}
+            imageId={imageDocId || ''}
+            imageUrl={imageUrl}
+            itemPositions={itemPositions}
+          />
         </div>
       )}
     </div>

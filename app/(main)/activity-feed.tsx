@@ -1,71 +1,92 @@
 'use client';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/style';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Coins, Link } from 'lucide-react';
+import { Coins, Link, Search } from 'lucide-react';
 import { useState, useEffect } from 'react';
-
+import { networkManager } from '@/lib/network/network';
+import { ImageDocument } from '@/types/model';
+import { camelToSnake } from '@/lib/utils/string';
 interface Activity {
-  id: number;
-  creator: string;
-  category: string;
-  reward: string;
-  time: string;
-  profileImage: string;
+  type: 'request_image';
+  data: {
+    image_url: string;
+    image_doc_id: string;
+    item_len: number;
+  };
+  timestamp: string;
 }
-
-const SAMPLE_ACTIVITIES: Activity[] = [
-  {
-    id: 1,
-    creator: '패션블로거 미나',
-    category: '패션/의류',
-    reward: '12.5',
-    time: '방금 전',
-    profileImage: '/images/profiles/1.jpg',
-  },
-  {
-    id: 2,
-    creator: '뷰티크리에이터 소희',
-    category: '뷰티',
-    reward: '12.5',
-    time: '2분 전',
-    profileImage: '/images/profiles/2.jpg',
-  },
-];
 
 export function ActivityFeed() {
   const [activities, setActivities] = useState<Activity[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // 초기 활동 목록 설정 (최대 8개)
-    setActivities(
-      Array(8)
-        .fill(null)
-        .map((_, index) => ({
-          ...SAMPLE_ACTIVITIES[index % 2],
-          id: Date.now() - (8 - index) * 1000, // 고유 ID 생성
-        }))
-    );
+    async function fetchInitialActivities() {
+      try {
+        const response = await networkManager.request('images', 'GET');
 
-    // 3초마다 새로운 활동 추가
-    const interval = setInterval(() => {
-      setActivities((prev) => {
-        const newActivity = {
-          ...SAMPLE_ACTIVITIES[currentIndex % 2],
-          id: Date.now(),
-        };
+        if (!response.data?.images || !Array.isArray(response.data.images)) {
+          console.error('Invalid response format:', response);
+          return;
+        }
 
-        // 새 활동을 맨 앞에 추가하고 마지막 항목 제거
-        const updated = [newActivity, ...prev.slice(0, -1)];
-        return updated;
-      });
+        const initialActivities = camelToSnake(response.data.images).map(
+          (image: ImageDocument) => ({
+            type: 'request_image' as const,
+            data: {
+              image_url: image.imgUrl,
+              image_doc_id: image.docId,
+              item_len: Object.values(image.items).reduce(
+                (sum, items) => sum + items.length,
+                0
+              ),
+            },
+            timestamp: image.uploadBy || new Date().toISOString(),
+          })
+        );
 
-      setCurrentIndex((prev) => prev + 1);
-    }, 3000);
+        if (initialActivities.length > 0) {
+          setActivities(initialActivities);
+        }
+      } catch (error) {
+        console.error('Failed to fetch initial activities:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
 
-    return () => clearInterval(interval);
-  }, [currentIndex]);
+    fetchInitialActivities();
+  }, []);
+
+  useEffect(() => {
+    const ws = new WebSocket('ws://dev.decoded.style/subscribe/decoded/events');
+
+    ws.onopen = () => {
+      console.log('WebSocket Connected');
+    }; // isLoading은 초기 데이터 로딩에만 사용
+
+    ws.onmessage = (event) => {
+      try {
+        const newActivity = JSON.parse(event.data) as Activity;
+        setActivities((prev) => [newActivity, ...prev.slice(0, 7)]);
+      } catch (error) {
+        console.error('Failed to parse WebSocket message:', error);
+      }
+    };
+
+    ws.onclose = () => {
+      console.log('WebSocket Disconnected');
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket Error:', error);
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, []);
 
   return (
     <div
@@ -84,11 +105,11 @@ export function ActivityFeed() {
       />
 
       {/* 활동 피드 */}
-      <div className="relative p-4 space-y-4">
+      <div className="relative p-4 space-y-4 mt-14">
         <AnimatePresence initial={false}>
           {activities.map((activity) => (
             <motion.div
-              key={activity.id}
+              key={activity.timestamp}
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, height: 0 }}
@@ -98,7 +119,7 @@ export function ActivityFeed() {
                 y: { duration: 0.3 },
               }}
             >
-              <ActivityCard {...activity} />
+              <ActivityCard activity={activity} />
             </motion.div>
           ))}
         </AnimatePresence>
@@ -117,16 +138,17 @@ export function ActivityFeed() {
             <div
               className={cn(
                 'w-2 h-2 rounded-full',
-                'bg-[#EAFD66] animate-pulse'
+                'bg-[#EAFD66]',
+                !isLoading && 'animate-pulse'
               )}
             />
             <span className="text-sm font-medium text-zinc-400">
-              실시간 활동
+              {isLoading ? '연결 중...' : '실시간 요청'}
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm text-zinc-400">
-            <Link className="w-4 h-4" />
-            <span>2.3K 링크 공유됨</span>
+            <Search className="w-4 h-4" />
+            <span>{activities.length} 검색 요청</span>
           </div>
         </div>
       </div>
@@ -134,13 +156,9 @@ export function ActivityFeed() {
   );
 }
 
-function ActivityCard({
-  creator,
-  category,
-  reward,
-  time,
-  profileImage,
-}: Activity) {
+function ActivityCard({ activity }: { activity: Activity }) {
+  const { data, timestamp } = activity;
+
   return (
     <div
       className={cn(
@@ -150,41 +168,64 @@ function ActivityCard({
         'hover:bg-zinc-700/30 hover:border-zinc-600/30'
       )}
     >
-      <div className="flex items-center gap-4">
-        {/* 프로필 이미지 */}
+      <div className="flex gap-4">
+        {/* 요청 이미지 */}
         <div
           className={cn(
-            'w-10 h-10 rounded-full overflow-hidden',
-            'border-2 border-[#EAFD66]/20'
+            'w-16 h-16 rounded-lg overflow-hidden',
+            'border border-zinc-700/50'
           )}
         >
           <img
-            src={profileImage}
-            alt={creator}
+            src={data.image_url}
+            alt={`Image ${data.image_doc_id}`}
             className="w-full h-full object-cover"
           />
         </div>
 
-        {/* 활동 정보 */}
-        <div className="flex-1 min-w-0">
-          <p className="text-sm text-white leading-snug">
-            <span className="font-medium">{creator}</span>님이
-            <span className="text-[#EAFD66]"> {category}</span> 카테고리에
-            <br />
-            링크를 제공했습니다
-          </p>
-          <p className="text-xs text-zinc-400 mt-1">{time}</p>
-        </div>
+        {/* 요청 정보 */}
+        <div className="flex-1">
+          <div className="flex items-center justify-between h-full">
+            <div className="space-y-1">
+              <p className="text-sm text-white leading-snug">
+                <span
+                  className={data.item_len ? 'text-[#EAFD66]' : 'text-blue-400'}
+                >
+                  {data.item_len}
+                </span>
+                개의 아이템이 요청되었습니다
+              </p>
+            </div>
 
-        {/* 보상 금액 */}
-        <div
-          className={cn(
-            'flex items-center gap-1.5 px-3 py-1.5',
-            'bg-[#EAFD66]/10 rounded-lg'
-          )}
-        >
-          <Coins className="w-4 h-4 text-[#EAFD66]" />
-          <span className="text-[#EAFD66] font-medium">${reward}</span>
+            <button
+              className={cn(
+                'px-3 py-1.5 rounded-lg text-sm font-medium',
+                'border border-[#EAFD66]/20',
+                'bg-[#EAFD66]/10 text-[#EAFD66]',
+                'hover:bg-[#EAFD66]/20 transition-colors',
+                'flex items-center gap-1'
+              )}
+              onClick={() => {
+                // TODO: 제공 기능 구현
+                console.log('Provide items for:', data.image_doc_id);
+              }}
+            >
+              <span>제공하기</span>
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M14 5l7 7m0 0l-7 7m7-7H3"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>

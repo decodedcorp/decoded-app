@@ -1,7 +1,7 @@
 'use client';
 
 import { LoginModal } from './modal/LoginModal';
-import { Button } from '@/app/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { useRef, useState, useEffect } from 'react';
 import { useAuth } from '@/lib/hooks/useAuth';
 
@@ -28,12 +28,12 @@ export function LoginButton() {
   return (
     <div ref={loginButtonRef} className="relative flex items-center gap-3">
       {isLogin && (
-        <Button variant="primary" onClick={() => setIsLoginModalOpen(true)}>
+        <Button variant="default" onClick={() => setIsLoginModalOpen(true)}>
           MY PAGE
         </Button>
       )}
       <Button
-        variant={isLogin ? 'secondary' : 'primary'}
+        variant={isLogin ? "secondary" : "default"}
         onClick={() => setIsLoginModalOpen(true)}
       >
         {isLogin ? 'MY ACCOUNT' : 'LOGIN'}

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { networkManager } from '@/common/network';
+import { networkManager } from '@/lib/network/network';
 import { jwtDecode } from 'jwt-decode';
 import { jwtToAddress } from '@mysten/zklogin';
 import { usePathname } from 'next/navigation';
-import { hash } from '@/common/util';
+import { hash } from '@/lib/utils/string';
 
 export function useAuth() {
   const [isLogin, setIsLogin] = useState(false);
@@ -54,7 +54,8 @@ export function useAuth() {
   }, [pathName]);
 
   const handleGoogleLogin = async () => {
-    const { sk, randomness, exp, url } = await networkManager.openIdConnectUrl();
+    const { sk, randomness, exp, url } =
+      await networkManager.openIdConnectUrl();
     window.sessionStorage.setItem('EPK_SECRET', sk);
     window.sessionStorage.setItem('RANDOMNESS', randomness);
     window.sessionStorage.setItem('EXPIRED_AT', exp.toString());
@@ -70,6 +71,6 @@ export function useAuth() {
   return {
     isLogin,
     handleGoogleLogin,
-    handleDisconnect
+    handleDisconnect,
   };
-} 
+}

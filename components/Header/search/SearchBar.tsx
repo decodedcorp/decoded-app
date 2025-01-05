@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { SearchModal } from './SearchModal';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/style';
 import { pretendardRegular } from '@/lib/constants/fonts';
 import { Search } from 'lucide-react';
 

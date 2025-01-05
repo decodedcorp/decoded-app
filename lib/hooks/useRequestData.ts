@@ -1,158 +1,52 @@
-import { useState, useEffect, useCallback } from 'react';
-import { requestAPI } from '@/lib/api/request';
-import { ImageRequest, RequestImage, Point, RequestedItem } from '@/types/model';
-import { arrayBufferToBase64 } from '@/common/util';
-
-// Error messages as constants
-const ERROR_MESSAGES = {
-  FETCH_FAILED: 'Failed to fetch request data',
-  CREATE_FAILED: 'Failed to create request',
-  UPDATE_FAILED: 'Failed to update request',
-  LOGIN_REQUIRED: '로그인이 필요합니다.',
-} as const;
-
-interface RequestLoadingState {
-  isFetching: boolean;
-  isCreating: boolean;
-  isUpdating: boolean;
-}
+import { useState, useCallback } from 'react';
+import { requestAPI, RequestImage } from '@/lib/api/endpoints/request';
 
 interface UseRequestDataReturn {
-  requestData: ImageRequest | null;
-  loadingState: RequestLoadingState;
+  isLoading: boolean;
   error: Error | null;
-  createRequest: (
-    imageFile: File, 
-    points: Point[], 
-    options?: { 
-      onSuccess?: () => void;
-      onError?: (error: Error) => void;
-    }
-  ) => Promise<void>;
-  updateRequest: (
-    imageId: string, 
-    data: Partial<RequestImage>,
-    options?: {
-      onSuccess?: () => void;
-      onError?: (error: Error) => void;
-    }
-  ) => Promise<void>;
-  resetError: () => void;
+  createRequest: (requestData: RequestImage) => Promise<void>;
+  requests: RequestImage[];
+  currentRequest: RequestImage | null;
+  refreshRequests: () => Promise<void>;
 }
 
-export function useRequestData(imageId?: string): UseRequestDataReturn {
-  const [loadingState, setLoadingState] = useState<RequestLoadingState>({
-    isFetching: false,
-    isCreating: false,
-    isUpdating: false,
-  });
+export function useRequestData(): UseRequestDataReturn {
+  const [requests, setRequests] = useState<RequestImage[]>([]);
+  const [currentRequest, setCurrentRequest] = useState<RequestImage | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-  const [requestData, setRequestData] = useState<ImageRequest | null>(null);
 
-  const resetError = useCallback(() => {
-    setError(null);
+  const createRequest = useCallback(async (requestData: RequestImage) => {
+    try {
+      setIsLoading(true);
+      await requestAPI.createImageRequest(requestData);
+      await refreshRequests();
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to create request'));
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const updateLoadingState = useCallback((key: keyof RequestLoadingState, value: boolean) => {
-    setLoadingState(prev => ({ ...prev, [key]: value }));
+  const refreshRequests = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const response = await requestAPI.getImageRequests();
+      setRequests(response.data);
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to fetch requests'));
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
-
-  useEffect(() => {
-    async function fetchRequestData() {
-      if (!imageId) return;
-      
-      try {
-        updateLoadingState('isFetching', true);
-        const data = await requestAPI.getImageRequest(imageId);
-        setRequestData(data);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error(ERROR_MESSAGES.FETCH_FAILED));
-      } finally {
-        updateLoadingState('isFetching', false);
-      }
-    }
-
-    fetchRequestData();
-  }, [imageId, updateLoadingState]);
-
-  const createRequest = useCallback(async (
-    imageFile: File, 
-    points: Point[],
-    options?: {
-      onSuccess?: () => void;
-      onError?: (error: Error) => void;
-    }
-  ) => {
-    try {
-      updateLoadingState('isCreating', true);
-      
-      // Convert points to RequestedItems
-      const items: RequestedItem[] = points.map(point => ({
-        position: {
-          top: point.y.toString(),
-          left: point.x.toString(),
-        },
-        context: point.context,
-      }));
-
-      // Convert image file to base64
-      const buffer = await imageFile.arrayBuffer();
-      const base64Image = arrayBufferToBase64(buffer);
-
-      // Get requester ID
-      const requestBy = sessionStorage.getItem('USER_DOC_ID');
-      if (!requestBy) {
-        throw new Error(ERROR_MESSAGES.LOGIN_REQUIRED);
-      }
-
-      // Create request data
-      const requestImage: RequestImage = {
-        requestedItems: items,
-        requestBy,
-        imageFile: base64Image,
-        metadata: {},
-      };
-
-      await requestAPI.createImageRequest(requestImage);
-      options?.onSuccess?.();
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error(ERROR_MESSAGES.CREATE_FAILED);
-      setError(error);
-      options?.onError?.(error);
-      throw error;
-    } finally {
-      updateLoadingState('isCreating', false);
-    }
-  }, [updateLoadingState]);
-
-  const updateRequest = useCallback(async (
-    imageId: string, 
-    data: Partial<RequestImage>,
-    options?: {
-      onSuccess?: () => void;
-      onError?: (error: Error) => void;
-    }
-  ) => {
-    try {
-      updateLoadingState('isUpdating', true);
-      await requestAPI.updateImageRequest(imageId, data);
-      options?.onSuccess?.();
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error(ERROR_MESSAGES.UPDATE_FAILED);
-      setError(error);
-      options?.onError?.(error);
-      throw error;
-    } finally {
-      updateLoadingState('isUpdating', false);
-    }
-  }, [updateLoadingState]);
 
   return {
-    requestData,
-    loadingState,
+    isLoading,
     error,
     createRequest,
-    updateRequest,
-    resetError
+    requests,
+    currentRequest,
+    refreshRequests
   };
 } 

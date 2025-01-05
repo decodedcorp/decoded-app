@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/style';
 import { pretendardMedium, pretendardRegular } from '@/lib/constants/fonts';
 
 interface SearchResult {

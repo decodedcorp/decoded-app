@@ -1,59 +1,12 @@
-import { cn } from "@/lib/utils";
-import { useEffect, useRef, useState } from "react";
-import { useInView, useMotionValue, useSpring } from "framer-motion";
+import { cn } from '@/lib/utils/style';
+import { useEffect, useRef, useState } from 'react';
+import { useInView, useMotionValue, useSpring } from 'framer-motion';
+import { networkManager } from '@/lib/network/network';
 
 interface MetricItemProps {
   label: string;
   value: number;
   suffix?: string;
-}
-
-interface MockMetrics {
-  totalRequests: number;
-  todayRequests: number;
-  successRate: number;
-  responseTime: number;
-}
-
-export function useMockMetrics() {
-  const [metrics, setMetrics] = useState<MockMetrics>({
-    totalRequests: 1234,
-    todayRequests: 56,
-    successRate: 98,
-    responseTime: 24,
-  });
-
-  useEffect(() => {
-    // 랜덤한 시간 간격으로 업데이트 (3-7초)
-    const getRandomInterval = () =>
-      Math.floor(Math.random() * (7000 - 3000) + 3000);
-
-    const updateMetrics = () => {
-      setMetrics((prev) => ({
-        ...prev,
-        // 누적 요청 수: 1-3개씩 증가
-        totalRequests: prev.totalRequests + Math.floor(Math.random() * 3) + 1,
-        // 금일 요청 수: 50% 확률로 1개씩 증가
-        todayRequests: prev.todayRequests + (Math.random() > 0.5 ? 1 : 0),
-      }));
-    };
-
-    // 초기 인터벌 설정
-    let intervalId = setInterval(updateMetrics, getRandomInterval());
-
-    // 주기적으로 인터벌 시간 변경
-    const intervalUpdateId = setInterval(() => {
-      clearInterval(intervalId);
-      intervalId = setInterval(updateMetrics, getRandomInterval());
-    }, 10000);
-
-    return () => {
-      clearInterval(intervalId);
-      clearInterval(intervalUpdateId);
-    };
-  }, []);
-
-  return metrics;
 }
 
 interface CounterProps {
@@ -79,7 +32,7 @@ export function Counter({ from = 0, to, className }: CounterProps) {
   }, [isInView, to, count]);
 
   useEffect(() => {
-    return rounded.on("change", (latest) => {
+    return rounded.on('change', (latest) => {
       if (ref.current) {
         ref.current.textContent = Math.round(latest).toString();
       }
@@ -89,7 +42,7 @@ export function Counter({ from = 0, to, className }: CounterProps) {
   return <span ref={ref} className={className} />;
 }
 
-function MetricItem({ label, value, suffix = "" }: MetricItemProps) {
+function MetricItem({ label, value, suffix = '' }: MetricItemProps) {
   return (
     <div className="text-center px-4">
       <div className="flex items-baseline justify-center gap-1">
@@ -97,9 +50,9 @@ function MetricItem({ label, value, suffix = "" }: MetricItemProps) {
           from={0}
           to={value}
           className={cn(
-            "text-3xl md:text-4xl font-bold",
-            "bg-gradient-to-b from-[#EAFD66] to-[#EAFD66]/70",
-            "bg-clip-text text-transparent"
+            'text-3xl md:text-4xl font-bold',
+            'bg-gradient-to-b from-[#EAFD66] to-[#EAFD66]/70',
+            'bg-clip-text text-transparent'
           )}
         />
         {suffix && <span className="text-xl text-[#EAFD66]/70">{suffix}</span>}
@@ -109,42 +62,87 @@ function MetricItem({ label, value, suffix = "" }: MetricItemProps) {
   );
 }
 
+interface Metrics {
+  hourly: {
+    provides_by_item: Record<string, any>;
+    requests_by_endpoint: {
+      items: number;
+      images: number;
+    };
+    timestamp: string;
+    total_provides: number;
+    total_requests: number;
+  };
+  daily: {
+    provides_by_item: Record<string, any>;
+    requests_by_endpoint: {
+      items: number;
+      images: number;
+    };
+    timestamp: string;
+    total_provides: number;
+    total_requests: number;
+  };
+}
+
 export function MetricsSection() {
-  const metrics = useMockMetrics();
+  const [metrics, setMetrics] = useState<Metrics | null>(null);
+
+  const fetchMetrics = async () => {
+    try {
+      const response = await networkManager.request('metrics/decoded', 'GET');
+      setMetrics(response.data);
+    } catch (error) {
+      console.error('Failed to fetch metrics:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchMetrics();
+    const interval = setInterval(fetchMetrics, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // 메트릭 계산
+  const calculatedMetrics = {
+    totalRequests: metrics?.daily.total_requests ?? 0,
+    todayRequests: metrics?.hourly.total_requests ?? 0,
+    successRate: metrics
+      ? Math.round(
+          (metrics.daily.total_provides / metrics.daily.total_requests) * 100
+        ) || 0
+      : 0,
+    responseTime: 24, // 고정값 또는 별도 계산 필요
+  };
 
   return (
     <section
       className={cn(
-        "container mx-auto px-4 py-16",
-        "border-y border-zinc-800",
-        "bg-zinc-900/30"
+        'container mx-auto px-4 py-16',
+        'border-y border-zinc-800',
+        'bg-zinc-900/30'
       )}
     >
       <div
         className={cn(
-          "grid grid-cols-2 md:grid-cols-4 gap-8",
-          "max-w-4xl mx-auto"
+          'grid grid-cols-2 md:grid-cols-3 gap-8',
+          'max-w-4xl mx-auto'
         )}
       >
         <MetricItem
           label="누적 요청 수"
-          value={metrics.totalRequests}
+          value={calculatedMetrics.totalRequests}
           suffix="건"
         />
         <MetricItem
           label="금일 요청 수"
-          value={metrics.todayRequests}
+          value={calculatedMetrics.todayRequests}
           suffix="건"
         />
         <MetricItem
-          label="제품 제공률"
-          value={metrics.successRate}
-          suffix="%"
-        />
-        <MetricItem
-          label="평균 응답시간"
-          value={metrics.responseTime}
-          suffix="시간"
+          label="이미지 요청 수"
+          value={metrics?.daily.requests_by_endpoint.images ?? 0}
+          suffix="건"
         />
       </div>
     </section>

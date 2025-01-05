@@ -1,4 +1,4 @@
-import { convertKeysToSnakeCase } from '@/lib/utils/utils';
+import { convertKeysToSnakeCase } from '@/lib/utils/object';
 import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import { generateRandomness, generateNonce } from '@mysten/zklogin';
 import { SuiClient, getFullnodeUrl } from '@mysten/sui/client';
@@ -12,9 +12,9 @@ export class NetworkManager {
   private static instance: NetworkManager;
   private readonly config: {
     /**
-     * @property {string} db - Database endpoint root URL
+     * @property {string} service - service endpoint root URL
      */
-    db: string;
+    service: string;
     /**
      * @property {string} auth_client_id - Google auth client ID
      */
@@ -26,24 +26,24 @@ export class NetworkManager {
   };
 
   private constructor() {
-    const is_prod = process.env.NODE_ENV === 'production';
+    const is_prod = process.env.NODE_ENV === "production";
     if (is_prod) {
       if (process.env.NEXT_PUBLIC_DB_ENDPOINT === undefined) {
-        throw new Error('Environment variable is undefined');
+        throw new Error("Environment variable is undefined");
       }
     } else {
       if (process.env.NEXT_PUBLIC_LOCAL_DB_ENDPOINT === undefined) {
-        throw new Error('Environment variable is undefined');
+        throw new Error("Environment variable is undefined");
       }
     }
     if (
       process.env.NEXT_PUBLIC_AUTH_CLIENT_ID === undefined ||
       process.env.NEXT_PUBLIC_REDIRECT_URI === undefined
     ) {
-      throw new Error('Environment variable is undefined');
+      throw new Error("Environment variable is undefined");
     }
     this.config = {
-      db: is_prod
+      service: is_prod
         ? process.env.NEXT_PUBLIC_DB_ENDPOINT!
         : process.env.NEXT_PUBLIC_LOCAL_DB_ENDPOINT!,
       auth_client_id: process.env.NEXT_PUBLIC_AUTH_CLIENT_ID!,
@@ -61,8 +61,7 @@ export class NetworkManager {
   public async request(path: string, method: string, data: any = null) {
     try {
       const convertedData = convertKeysToSnakeCase(data);
-      console.log(convertedData);
-      const url = `${this.config.db}/api${path}`;
+      const url = `${this.config.service}/${path}`;
       const res = await axios.request({
         url,
         method,
@@ -70,11 +69,12 @@ export class NetworkManager {
         headers: {
           'Content-Type': 'application/json',
         },
+        maxRedirects: 0,
       });
+      
       return res.data;
     } catch (e) {
-      console.error('Request error details:', e);
-      throw new Error('Error on request => ' + e);
+      throw e;
     }
   }
 
@@ -87,7 +87,7 @@ export class NetworkManager {
     try {
       const epk = Ed25519Keypair.generate();
       const randomness = generateRandomness();
-      const rpcUrl = getFullnodeUrl('devnet');
+      const rpcUrl = getFullnodeUrl("devnet");
       const suiClient = new SuiClient({
         url: rpcUrl,
       });
@@ -98,8 +98,8 @@ export class NetworkManager {
       const params = new URLSearchParams({
         client_id: this.config.auth_client_id,
         redirect_uri: this.config.redirect_uri,
-        response_type: 'id_token',
-        scope: 'openid',
+        response_type: "id_token",
+        scope: "openid",
         nonce: nonce,
       });
       const url = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
@@ -110,7 +110,7 @@ export class NetworkManager {
         url: url,
       };
     } catch (err) {
-      throw new Error('Error on fetching nonce => ' + err);
+      throw new Error("Error on fetching nonce => " + err);
     }
   }
 }
