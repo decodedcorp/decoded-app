@@ -6,7 +6,7 @@ import { Coins, Link, Search } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { networkManager } from '@/lib/network/network';
 import { ImageDocument } from '@/types/model';
-import { camelToSnake } from '@/lib/utils/string';
+import { convertKeysToCamelCase } from '@/lib/utils/string';
 interface Activity {
   type: 'request_image';
   data: {
@@ -31,7 +31,7 @@ export function ActivityFeed() {
           return;
         }
 
-        const initialActivities = camelToSnake(response.data.images).map(
+        const initialActivities = convertKeysToCamelCase(response.data.images).map(
           (image: ImageDocument) => ({
             type: 'request_image' as const,
             data: {

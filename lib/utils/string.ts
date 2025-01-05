@@ -11,3 +11,16 @@ export const snakeToCamel = (str: string): string => {
 export const hash = (str: string) => {
   return sha256(str).toString();
 };
+
+export const convertKeysToCamelCase = (obj: any): any => {
+  if (Array.isArray(obj)) {
+    return obj.map((v) => convertKeysToCamelCase(v));
+  } else if (obj !== null && obj.constructor === Object) {
+    return Object.keys(obj).reduce((result, key) => {
+      const newKey = snakeToCamel(key);
+      result[newKey] = convertKeysToCamelCase(obj[key]);
+      return result;
+    }, {} as any);
+  }
+  return obj;
+};
