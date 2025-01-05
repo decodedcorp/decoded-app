@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { useInView, useMotionValue, useSpring } from "framer-motion";
+import { networkManager } from "@/common/network";
 
 interface MetricItemProps {
   label: string;
@@ -111,6 +112,16 @@ function MetricItem({ label, value, suffix = "" }: MetricItemProps) {
 
 export function MetricsSection() {
   const metrics = useMockMetrics();
+
+  const fetchMetrics = async () => {
+    const response = await networkManager.request("metrics/decoded", "GET");
+    console.log(response.data);
+  };
+
+  useEffect(() => {
+    const interval = setInterval(fetchMetrics, 10000); // Request every 10 seconds
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <section
