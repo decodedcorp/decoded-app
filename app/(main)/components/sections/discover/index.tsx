@@ -74,26 +74,6 @@ export function DiscoverSection() {
             <div className="flex flex-wrap gap-4">
               <button
                 className={cn(
-                  "group flex items-center gap-2",
-                  "bg-[#EAFD66] text-black",
-                  "px-6 py-3 rounded-xl",
-                  "font-semibold tracking-wide",
-                  "hover:bg-[#EAFD66]/90",
-                  "transition-all duration-200",
-                  "shadow-lg shadow-[#EAFD66]/20"
-                )}
-              >
-                <span>정보 제공하기</span>
-                <Share2
-                  className={cn(
-                    "w-4 h-4",
-                    "transform group-hover:translate-x-0.5",
-                    "transition-transform duration-200"
-                  )}
-                />
-              </button>
-              <button
-                className={cn(
                   "bg-white/5 text-white",
                   "px-6 py-3 rounded-xl",
                   "font-semibold tracking-wide",

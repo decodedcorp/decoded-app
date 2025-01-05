@@ -1,11 +1,44 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Link, Eye, Sparkles } from "lucide-react";
 import Image from "next/image";
+import { networkManager } from "@/common/network";
+
+// DO-NOT-DELETE: For future use
+// interface TrendingItem {
+//     id: string;
+//     image: string;
+//     title: string;
+//     category: string;
+//     views: number;
+//     requestCount: number;
+//     exposureRate: string;
+//   }
 
 export function PremiumSpotSection() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchTrendingItems() {
+      try {
+        const res = await networkManager.request(
+          "metrics/trending/items",
+          "GET"
+        );
+        console.log("Trending items:", res.data);
+      } catch (error) {
+        console.error("Error fetching trending items:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchTrendingItems();
+  }, []);
+
   return (
     <section className="container mx-auto px-4">
       <div
