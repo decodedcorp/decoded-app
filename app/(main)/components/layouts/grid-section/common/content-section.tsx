@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { ItemsGrid } from './items-grid';
-import { PickInfo } from '@/types/model';
+import { PickInfo } from '@/types/model.d';
 
 interface ContentSectionProps {
   pick: PickInfo;

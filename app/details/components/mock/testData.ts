@@ -1,4 +1,4 @@
-import { ApiDetailPageState } from '@/types/model';
+import { ApiDetailPageState } from '@/types/model.d';
 
 // 일반인 이미지 (트랙 자켓과 바지)
 export const TEST_DATA: ApiDetailPageState = {

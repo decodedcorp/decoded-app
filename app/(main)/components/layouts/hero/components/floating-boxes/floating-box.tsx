@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ImagePlaceholder } from '@/components/ui/icons/image-placeholder';
 import ItemDetail from '@/app/details/components/layouts/list/item-detail';
-import { HoverItem } from '@/types/model';
+import { HoverItem } from '@/types/model.d';
 
 interface ImageInfo {
   doc_id: string;

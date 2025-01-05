@@ -1,9 +1,11 @@
 import { networkManager } from '@/lib/network/network';
 import type { APIResponse } from '../types/request';
-import type { ItemDetailResponse } from '../types/item';
+import type { ItemDetailResponse } from '@/types/item';
 
 export const itemsAPI = {
-  getItemDetail: async (itemId: string): Promise<APIResponse<ItemDetailResponse>> => {
+  getItemDetail: async (
+    itemId: string
+  ): Promise<APIResponse<ItemDetailResponse>> => {
     try {
       const response = await networkManager.request(
         `item/${itemId}`,
@@ -15,4 +17,4 @@ export const itemsAPI = {
       throw error;
     }
   },
-}; 
+};

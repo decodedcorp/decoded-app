@@ -1,4 +1,4 @@
-import { DetailPageState } from '@/types/model';
+import { DetailPageState } from '@/types/model.d';
 import { ImageView } from '../../layouts/image-section/view';
 
 interface ImageSectionProps {

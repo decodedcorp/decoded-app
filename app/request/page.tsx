@@ -3,7 +3,7 @@
 import { networkManager } from '@/lib/network/network';
 import { arrayBufferToBase64 } from '@/lib/utils/format';
 import React, { useState, useEffect } from 'react';
-import { Point, RequestedItem, RequestImage } from '@/types/model';
+import { Point, RequestedItem, RequestImage } from '@/types/model.d';
 import { StepIndicator } from './components/indicator/step-indicator';
 import { NavigationButtons } from './components/navigation/buttons';
 import { Step1 } from './components/steps/step1';
@@ -48,7 +48,12 @@ export default function RequestSection() {
     const items: RequestedItem[] = [];
     for (const point of points) {
       items.push({
+        imageId: 'temp-id',
         position: {
+          top: point.y.toString(),
+          left: point.x.toString(),
+        },
+        originalPosition: {
           top: point.y.toString(),
           left: point.x.toString(),
         },

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { HoverItem, ItemDocument, ProvideData } from '@/types/model';
+import { HoverItem, ItemDocument, ProvideData } from '@/types/model.d';
 import { networkManager } from '@/lib/network/network';
 import HeaderSection from './header-section';
 import ItemInfoSection from './item-info-section';

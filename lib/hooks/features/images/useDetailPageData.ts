@@ -43,15 +43,9 @@ export function useDetailPageData(imageId: string): UseDetailPageDataReturn {
   };
 
   useEffect(() => {
-    if (!imageId) return;
-
-    const fetchData = async () => {
-      await fetchDetailPageState();
-      await fetchItems();
-    };
-
-    fetchData();
-  }, [imageId]);
+    fetchDetailPageState()
+    fetchItems()
+  }, [fetchDetailPageState, fetchItems])
 
   return {
     detailPageState,

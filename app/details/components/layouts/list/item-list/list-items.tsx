@@ -43,10 +43,11 @@ export function ListItems({
           if (!item || !item.info) return null;
 
           const isActive = hoveredItem === index;
+          const uniqueKey = `${item.imageDocId}-${item.info.item.item._id}-${index}`;
 
           return (
             <div
-              key={`${item.info?.item?.item?.metadata?.name || index}-${index}`}
+              key={uniqueKey}
               className={`
                 relative w-full group h-[80px] rounded-xl bg-[#1A1A1A] hover:bg-[#242424] transition-colors cursor-pointer
               `}

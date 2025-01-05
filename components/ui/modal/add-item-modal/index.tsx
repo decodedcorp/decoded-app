@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Point, RequestedItem } from '@/types/model';
+import { Point, RequestedItem } from '@/types/model.d';
 import { networkManager } from '@/lib/network/network';
 import { AddItemModalProps } from './types';
 import { ImageArea } from './components/image-area';

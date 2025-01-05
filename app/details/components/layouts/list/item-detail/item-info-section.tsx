@@ -1,4 +1,4 @@
-import { ItemDocument } from '@/types/model';
+import { ItemDocument } from '@/types/model.d';
 import { ImagePlaceholder } from '@/components/ui/icons/image-placeholder';
 
 interface ItemInfoSectionProps {

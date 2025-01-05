@@ -1,4 +1,4 @@
-import { ItemDocument } from '@/types/model';
+import { ItemDocument } from '@/types/model.d';
 import EmptyState from './components/empty-state';
 import { useState } from 'react';
 import { LinkItem } from './components/link-item';

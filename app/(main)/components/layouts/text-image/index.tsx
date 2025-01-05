@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { SpotlightInfo } from "@/types/model";
+import { SpotlightInfo } from "@/types/model.d";
 import { pretendardBold, pretendardRegular } from '@/lib/constants/fonts';
 
 interface SpotlightLayoutProps {

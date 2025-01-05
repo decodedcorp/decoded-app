@@ -514,7 +514,7 @@ export interface ProvidedItemDetail {
 export enum ProvideStatus {
   PENDING = 'PENDING',
   APPROVED = 'APPROVED',
-  REJECTED = 'REJECTED'
+  REJECTED = 'REJECTED',
 }
 
 export interface Point {
@@ -777,5 +777,10 @@ export interface ItemRequest {
 export enum ProvideStatus {
   PENDING = 'PENDING',
   APPROVED = 'APPROVED',
-  REJECTED = 'REJECTED'
+  REJECTED = 'REJECTED',
+}
+
+interface ItemInfo {
+  url: string;
+  affiliateUrl?: string;
 }

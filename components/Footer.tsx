@@ -2,8 +2,8 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { pretendardRegular } from '@/lib/constants/fonts';
-import { Button } from '@mui/material';
-
+import { cn } from '@/lib/utils/style';
+import { Button } from '@/components/ui/button';
 function Footer() {
   const [isType, setIsType] = useState<boolean>(false);
 

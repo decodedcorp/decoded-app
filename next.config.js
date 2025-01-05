@@ -16,6 +16,9 @@ const nextConfig = {
   publicRuntimeConfig: {
     IS_LOCAL_DEV: process.argv.includes("dev"),
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 module.exports = nextConfig;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Point } from '@/types/model';
+import { Point } from '@/types/model.d';
 import { ImageMarker } from '@/components/ui/image-marker';
 import { useImageMarker } from '@/lib/hooks/useImageMarker';
 

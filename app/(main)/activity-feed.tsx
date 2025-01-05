@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Coins, Link, Search } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { networkManager } from '@/lib/network/network';
-import { ImageDocument } from '@/types/model';
+import { ImageDocument } from '@/types/model.d';
 import { convertKeysToCamelCase } from '@/lib/utils/string';
 interface Activity {
   type: 'request_image';
@@ -31,20 +31,20 @@ export function ActivityFeed() {
           return;
         }
 
-        const initialActivities = convertKeysToCamelCase(response.data.images).map(
-          (image: ImageDocument) => ({
-            type: 'request_image' as const,
-            data: {
-              image_url: image.imgUrl,
-              image_doc_id: image.docId,
-              item_len: Object.values(image.items).reduce(
-                (sum, items) => sum + items.length,
-                0
-              ),
-            },
-            timestamp: image.uploadBy || new Date().toISOString(),
-          })
-        );
+        const initialActivities = convertKeysToCamelCase(
+          response.data.images
+        ).map((image: ImageDocument) => ({
+          type: 'request_image' as const,
+          data: {
+            image_url: image.imgUrl,
+            image_doc_id: image.docId,
+            item_len: Object.values(image.items).reduce(
+              (sum, items) => sum + items.length,
+              0
+            ),
+          },
+          timestamp: image.uploadBy || new Date().toISOString(),
+        }));
 
         if (initialActivities.length > 0) {
           setActivities(initialActivities);

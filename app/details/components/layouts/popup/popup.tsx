@@ -24,28 +24,31 @@ export function ImagePopup({
     <div className="w-full">
       {/* 기존 아이템 버튼 */}
       {detailPageState.img &&
-        detailPageState.itemList?.map((item, index) => (
-          <div
-            key={`item-${index}`}
-            style={{
-              position: 'absolute',
-              top: `${item.pos.top}%`,
-              left: `${item.pos.left}%`,
-              transform: 'translate(-50%, -50%)',
-            }}
-            className={`point cursor-pointer ${
-              currentIndex === index ? 'z-50' : 'z-10'
-            }`}
-            onMouseEnter={() => setHoveredItem(index)}
-            onMouseLeave={() => setHoveredItem(null)}
-            onClick={() => onItemClick?.(item)}
-          >
-            <ItemButton
-              item={item}
-              isActive={currentIndex === index || hoveredItem === index}
-            />
-          </div>
-        ))}
+        detailPageState.itemList?.map((item, index) => {
+          const uniqueKey = `${item.imageDocId}-${item.info.item.item._id}-${index}`;
+          return (
+            <div
+              key={uniqueKey}
+              style={{
+                position: 'absolute',
+                top: `${item.pos.top}%`,
+                left: `${item.pos.left}%`,
+                transform: 'translate(-50%, -50%)',
+              }}
+              className={`point cursor-pointer ${
+                currentIndex === index ? 'z-50' : 'z-10'
+              }`}
+              onMouseEnter={() => setHoveredItem(index)}
+              onMouseLeave={() => setHoveredItem(null)}
+              onClick={() => onItemClick?.(item)}
+            >
+              <ItemButton
+                item={item}
+                isActive={currentIndex === index || hoveredItem === index}
+              />
+            </div>
+          );
+        })}
     </div>
   );
 }

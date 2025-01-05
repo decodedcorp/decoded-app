@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation';
 import useModalClose from '@/lib/hooks/useModalClose';
 import Header from './Header';
 import { SearchModal, LoginModal } from '@/components/ui/modal';
-import { SidebarDrawer } from '@/components/ui/drawer';
 
 export function HeaderLayout() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -60,12 +59,7 @@ export function HeaderLayout() {
         isOpen={isLoginOpen}
         onClose={handleLoginClose}
         isClosing={isLoginClosing}
-      />
-      <SidebarDrawer
-        isOpen={isSidebarOpen}
-        onClose={handleSidebarClose}
-        isClosing={isSidebarClosing}
-      />
+      ></LoginModal>
     </>
   );
 }

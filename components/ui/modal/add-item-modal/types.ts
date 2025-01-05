@@ -1,4 +1,4 @@
-import { Point as BasePoint } from "@/types/model";
+import { Point as BasePoint } from "@/types/model.d";
 
 export interface AddItemModalProps {
   isOpen: boolean;

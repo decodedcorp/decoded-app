@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { pretendardBold } from '@/lib/constants/fonts';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { ChevronRight } from 'lucide-react';
 
 interface ItemsGalleryProps {
   items: Array<{
@@ -78,7 +78,7 @@ function RelatedStyles() {
       <p className={`${pretendardBold.className} text-xs md:text-md text-black/50`}>
         관련 스타일
       </p>
-      <ChevronRightIcon className="w-4 h-4 md:w-6 md:h-6 text-black/50" />
+      <ChevronRight className="w-5 h-5" />
     </div>
   );
 }

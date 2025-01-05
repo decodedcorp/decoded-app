@@ -1,4 +1,8 @@
-import { ApiDetailPageState, DetailPageState, HoverItem } from '@/types/model';
+import {
+  ApiDetailPageState,
+  DetailPageState,
+  HoverItem,
+} from '@/types/model.d';
 
 function createDefaultMetadata() {
   return {
@@ -16,7 +20,11 @@ function createDefaultMetadata() {
   };
 }
 
-function transformToHoverItem(item: any, docId: string, category: string): HoverItem {
+function transformToHoverItem(
+  item: any,
+  docId: string,
+  category: string
+): HoverItem {
   return {
     imageDocId: docId,
     pos: item.position || { top: '0', left: '0' },
@@ -25,12 +33,12 @@ function transformToHoverItem(item: any, docId: string, category: string): Hover
         item: {
           _id: item.item?.item?._id || '',
           metadata: item.item?.item?.metadata || createDefaultMetadata(),
-          img_url: item.item?.item?.img_url || null
+          img_url: item.item?.item?.img_url || null,
         },
         brand_name: item.item?.brand_name || null,
-        brand_logo_image_url: item.item?.brand_logo_image_url || null
-      }
-    }
+        brand_logo_image_url: item.item?.brand_logo_image_url || null,
+      },
+    },
   };
 }
 
@@ -41,15 +49,15 @@ function transformToImageItem(item: any, category: string) {
       id: item.item?.item?._id || '',
       name: item.item?.item?.metadata?.name || category,
       category: item.item?.item?.metadata?.category || '',
-      profileImageUrl: item.item?.brand_logo_image_url || undefined
+      profileImageUrl: item.item?.brand_logo_image_url || undefined,
     },
     category: {
       itemClass: item.item?.item?.metadata?.item_class || '',
       itemSubClass: item.item?.item?.metadata?.item_sub_class || '',
       category: item.item?.item?.metadata?.category,
       subCategory: item.item?.item?.metadata?.sub_category,
-      productType: item.item?.item?.metadata?.product_type || ''
-    }
+      productType: item.item?.item?.metadata?.product_type || '',
+    },
   };
 }
 
@@ -57,7 +65,7 @@ function collectBrandInfo(items: any[]) {
   const brandUrlList = new Map<string, string>();
   const brandImgList = new Map<string, string>();
 
-  items.forEach(item => {
+  items.forEach((item) => {
     if (item.item?.brand_name && item.item?.brand_logo_image_url) {
       brandUrlList.set(item.item.brand_name, '#');
       brandImgList.set(item.item.brand_name, item.item.brand_logo_image_url);
@@ -67,17 +75,20 @@ function collectBrandInfo(items: any[]) {
   return { brandUrlList, brandImgList };
 }
 
-export function transformToDetailPageState(data: ApiDetailPageState): DetailPageState {
+export function transformToDetailPageState(
+  data: ApiDetailPageState
+): DetailPageState {
   if (!data) {
     throw new Error('No data provided for transformation');
   }
 
   // Transform items
-  const itemList: HoverItem[] = data.items 
-    ? Object.entries(data.items)
-        .flatMap(([category, items]) => 
-          items.map(item => transformToHoverItem(item, data.doc_id || '', category))
+  const itemList: HoverItem[] = data.items
+    ? Object.entries(data.items).flatMap(([category, items]) =>
+        items.map((item) =>
+          transformToHoverItem(item, data.doc_id || '', category)
         )
+      )
     : [];
 
   // Collect brand information
@@ -92,18 +103,17 @@ export function transformToDetailPageState(data: ApiDetailPageState): DetailPage
       imageUrl: data.img_url || '',
       updateAt: new Date(),
       hyped: data.like || 0,
-      items: data.items 
-        ? Object.entries(data.items)
-            .flatMap(([category, items]) => 
-              items.map(item => transformToImageItem(item, category))
-            )
-        : []
+      items: data.items
+        ? Object.entries(data.items).flatMap(([category, items]) =>
+            items.map((item) => transformToImageItem(item, category))
+          )
+        : [],
     },
     itemList,
     brandUrlList,
     brandImgList,
     artistImgList: [],
     artistList: [],
-    artistArticleList: []
+    artistArticleList: [],
   };
-} 
+}

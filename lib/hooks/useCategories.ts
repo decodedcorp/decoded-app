@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { HoverItem } from '@/types/model';
+import { HoverItem } from '@/types/model.d';
 
 export type Category = 'FASHION' | 'INTERIOR';
 

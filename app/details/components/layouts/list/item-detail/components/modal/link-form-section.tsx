@@ -1,4 +1,4 @@
-import { ProvideData } from '@/types/model';
+import { ProvideData } from '@/types/model.d';
 import useModalClose from '@/lib/hooks/useModalClose';
 
 interface LinkFormSectionProps {

@@ -4,7 +4,7 @@ import { DetailPageState, HoverItem } from '@/types/model.d';
 import { MainImage } from './main-image';
 import { ListItems } from '../../layouts/list/item-list/list-items';
 import { ListHeader } from '../../layouts/list/item-list/list-header';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { ImagePopup } from '../popup/popup';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCategories } from '@/lib/hooks/useCategories';
@@ -24,7 +24,10 @@ export function ImageView({ detailPageState, imageUrl }: ImageViewProps) {
   const [selectedItem, setSelectedItem] = useState<HoverItem | null>(null);
   const [isDetailVisible, setIsDetailVisible] = useState(false);
 
-  const itemList = detailPageState.itemList ?? [];
+  const itemList = useMemo(() => {
+    return detailPageState.itemList ?? [];
+  }, [detailPageState.itemList]);
+
   const {
     activeCategory,
     setActiveCategory,
@@ -38,7 +41,7 @@ export function ImageView({ detailPageState, imageUrl }: ImageViewProps) {
     const showList = searchParams.get('showList') === 'true';
 
     if (itemId && showList) {
-      const item = itemList.find(item => item.info.item.item._id === itemId);
+      const item = itemList.find((item) => item.info.item.item._id === itemId);
       if (item) {
         setSelectedItem(item);
         setIsDetailVisible(true);
@@ -58,11 +61,16 @@ export function ImageView({ detailPageState, imageUrl }: ImageViewProps) {
     setHoveredItem(index);
   }, []);
 
-  const handleItemClick = useCallback((item: HoverItem) => {
-    router.push(`/details?imageId=${item.imageDocId}&itemId=${item.info.item.item._id}&showList=true`);
-    setSelectedItem(item);
-    setIsDetailVisible(true);
-  }, [router]);
+  const handleItemClick = useCallback(
+    (item: HoverItem) => {
+      router.push(
+        `/details?imageId=${item.imageDocId}&itemId=${item.info.item.item._id}&showList=true`
+      );
+      setSelectedItem(item);
+      setIsDetailVisible(true);
+    },
+    [router]
+  );
 
   const handleBack = useCallback(() => {
     const currentImageId = searchParams.get('imageId');

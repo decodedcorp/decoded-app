@@ -4,6 +4,7 @@ import React from 'react';
 import { cn } from '@/lib/utils/style';
 import { pretendardBold, pretendardMedium, pretendardRegular } from '@/lib/constants/fonts';
 import { useAuth } from '@/lib/hooks/useAuth';
+import Image from "next/image"
 
 interface AccountSectionProps {
   email?: string;
@@ -42,10 +43,12 @@ export function AccountSection({ email, onClose }: AccountSectionProps) {
             className="w-full flex items-center justify-between group hover:opacity-80 transition-opacity"
           >
             <div className="flex items-center gap-2">
-              <img 
+              <Image 
                 src="/icons/auth/google-icon.svg" 
                 alt="Google" 
-                className="w-5 h-5" 
+                width={20}
+                height={20}
+                className="rounded-full"
               />
               {isLogin ? (
                 <span className={cn(pretendardRegular.className, "text-sm text-white/80")}>

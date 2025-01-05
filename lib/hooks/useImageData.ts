@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { imagesAPI } from '@/lib/api/images';
-import type { ImageData } from '@/lib/api/images';
+import { imagesAPI } from '@/lib/api/endpoints/images';
+import type { ImageData } from '@/lib/api/types/image';
 
 interface UseImageDataReturn {
   images: ImageData[];
@@ -30,7 +30,9 @@ export function useImageData(initialImageId?: string): UseImageDataReturn {
       const response = await imagesAPI.getImages();
       setImages(response.data.images);
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to fetch images'));
+      setError(
+        err instanceof Error ? err : new Error('Failed to fetch images')
+      );
     } finally {
       setIsLoading(false);
     }
@@ -58,32 +60,37 @@ export function useImageData(initialImageId?: string): UseImageDataReturn {
     }
   }, [initialImageId, fetchCurrentImage]);
 
-  const updateItem = useCallback(async (
-    imageId: string,
-    itemId: string,
-    data: {
-      links?: string[];
-      provider?: string;
-    }
-  ) => {
-    try {
-      setIsLoading(true);
-      await imagesAPI.updateImageItem(imageId, itemId, data);
-      
-      // Refresh the current image if it's the one being updated
-      if (currentImage?.doc_id === imageId) {
-        await fetchCurrentImage(imageId);
+  const updateItem = useCallback(
+    async (
+      imageId: string,
+      itemId: string,
+      data: {
+        links?: string[];
+        provider?: string;
       }
-      
-      // Update the image in the list
-      await fetchImages();
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to update item'));
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [currentImage, fetchCurrentImage, fetchImages]);
+    ) => {
+      try {
+        setIsLoading(true);
+        await imagesAPI.updateImageItem(imageId, itemId, data);
+
+        // Refresh the current image if it's the one being updated
+        if (currentImage?.doc_id === imageId) {
+          await fetchCurrentImage(imageId);
+        }
+
+        // Update the image in the list
+        await fetchImages();
+      } catch (err) {
+        setError(
+          err instanceof Error ? err : new Error('Failed to update item')
+        );
+        throw err;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [currentImage, fetchCurrentImage, fetchImages]
+  );
 
   const refreshImages = useCallback(async () => {
     await fetchImages();
@@ -95,6 +102,6 @@ export function useImageData(initialImageId?: string): UseImageDataReturn {
     isLoading,
     error,
     refreshImages,
-    updateItem
+    updateItem,
   };
-} 
+}

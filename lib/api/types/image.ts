@@ -59,4 +59,4 @@ export interface ItemDocument {
   item: ImageItem;
   brand_name: string | null;
   brand_logo_image_url: string | null;
-} 
+}
