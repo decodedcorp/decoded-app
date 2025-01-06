@@ -74,7 +74,7 @@ export default function RequestSection() {
       metadata: {},
     };
     networkManager
-      .request("image/request", "POST", requestImage)
+      .request("request/image", "POST", requestImage)
       .then(() => {
         alert("요청이 완료되었습니다.");
         defaultState();
