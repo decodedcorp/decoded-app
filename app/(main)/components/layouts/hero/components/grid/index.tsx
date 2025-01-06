@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
-import { CELL_SIZE, GAP_SIZE, GRID_COLS } from './constants';
-import { GridCell } from './grid-cell';
-import { debounce } from '../../utils/debounce';
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { CELL_SIZE, GAP_SIZE, GRID_COLS } from "./constants";
+import { GridCell } from "./grid-cell";
+import { debounce } from "../../utils/debounce";
 
 interface GridBackgroundProps {
   onGridSizeChange?: (size: { cols: number; rows: number }) => void;
@@ -9,7 +11,11 @@ interface GridBackgroundProps {
   highlightArea?: { x: number; y: number; radius: number };
 }
 
-export function GridBackground({ onGridSizeChange, isHighlighted, highlightArea }: GridBackgroundProps) {
+export function GridBackground({
+  onGridSizeChange,
+  isHighlighted,
+  highlightArea,
+}: GridBackgroundProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [gridDimensions, setGridDimensions] = useState({
     cols: GRID_COLS,
@@ -47,8 +53,8 @@ export function GridBackground({ onGridSizeChange, isHighlighted, highlightArea 
 
     updateGridSize();
     const debouncedResize = debounce(updateGridSize, 100);
-    window.addEventListener('resize', debouncedResize);
-    return () => window.removeEventListener('resize', debouncedResize);
+    window.addEventListener("resize", debouncedResize);
+    return () => window.removeEventListener("resize", debouncedResize);
   }, [onGridSizeChange]);
 
   return (
@@ -65,15 +71,15 @@ export function GridBackground({ onGridSizeChange, isHighlighted, highlightArea 
           (_, index) => {
             const row = Math.floor(index / gridDimensions.cols);
             const col = index % gridDimensions.cols;
-            
+
             let shouldHighlight = false;
             let opacity = 0;
             if (isHighlighted && highlightArea && containerRef.current) {
               const rect = containerRef.current.getBoundingClientRect();
               // 그리드 셀의 중앙 위치 계산
-              const cellCenterX = rect.left + (col * CELL_SIZE) + (CELL_SIZE / 2);
-              const cellCenterY = rect.top + (row * CELL_SIZE) + (CELL_SIZE / 2);
-              
+              const cellCenterX = rect.left + col * CELL_SIZE + CELL_SIZE / 2;
+              const cellCenterY = rect.top + row * CELL_SIZE + CELL_SIZE / 2;
+
               const dx = cellCenterX - highlightArea.x;
               const dy = cellCenterY - highlightArea.y;
               const distance = calculateSquareDistance(dx, dy);
@@ -82,8 +88,8 @@ export function GridBackground({ onGridSizeChange, isHighlighted, highlightArea 
             }
 
             return (
-              <GridCell 
-                key={index} 
+              <GridCell
+                key={index}
                 className="transition-colors duration-300"
                 isHighlighted={shouldHighlight}
                 opacity={opacity}

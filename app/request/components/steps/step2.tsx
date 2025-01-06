@@ -1,7 +1,8 @@
-import React from 'react';
-import { Point } from '@/types/model.d';
-import { ImageMarker } from '@/components/ui/image-marker';
-import { useImageMarker } from '@/lib/hooks/useImageMarker';
+"use client";
+
+import { Point } from "@/types/model.d";
+import { ImageMarker } from "@/components/ui/image-marker";
+import { useImageMarker } from "@/lib/hooks/useImageMarker";
 
 interface Step2Props {
   selectedImage: string | null;
@@ -69,4 +70,4 @@ export function Step2({ selectedImage, points, setPoints }: Step2Props) {
       </div>
     </div>
   );
-} 
+}

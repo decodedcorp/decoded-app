@@ -1,11 +1,9 @@
-import { cn } from '@/lib/utils/style';
-import { BoxContent } from './types';
-import { useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { ImagePlaceholder } from '@/components/ui/icons/image-placeholder';
-import ItemDetail from '@/app/details/components/layouts/list/item-detail';
-import { HoverItem } from '@/types/model.d';
+import { cn } from "@/lib/utils/style";
+import { BoxContent } from "./types";
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { ImagePlaceholder } from "@/components/ui/icons/image-placeholder";
 
 interface ImageInfo {
   doc_id: string;
@@ -55,10 +53,10 @@ function BoxImage({ image, isLarge }: { image: ImageInfo; isLarge: boolean }) {
     <div className="absolute inset-0 w-full h-full">
       <Image
         src={image.img_url!}
-        alt={image.title || ''}
+        alt={image.title || ""}
         fill
         className="object-fill w-full h-full"
-        sizes={isLarge ? '264px' : '132px'}
+        sizes={isLarge ? "264px" : "132px"}
         priority
       />
     </div>
@@ -69,8 +67,8 @@ function BoxOverlay({ isHovered }: { isHovered: boolean }) {
   return (
     <div
       className={cn(
-        'absolute inset-0 transition-opacity duration-200',
-        isHovered ? 'bg-black/0' : 'bg-black/40'
+        "absolute inset-0 transition-opacity duration-200",
+        isHovered ? "bg-black/0" : "bg-black/40"
       )}
     />
   );
@@ -80,15 +78,15 @@ function BoxBorder({ isHovered }: { isHovered: boolean }) {
   return (
     <div
       className={cn(
-        'absolute inset-0 rounded-lg',
-        'transition-all duration-300',
+        "absolute inset-0 rounded-lg",
+        "transition-all duration-300",
         isHovered
           ? [
-              'border-[1px] border-[#EAFD66]',
-              'shadow-[0_0_10px_#EAFD66,inset_0_0_10px_#EAFD66]',
-              'animate-pulse-subtle',
+              "border-[1px] border-[#EAFD66]",
+              "shadow-[0_0_10px_#EAFD66,inset_0_0_10px_#EAFD66]",
+              "animate-pulse-subtle",
             ]
-          : 'border border-white/20'
+          : "border border-white/20"
       )}
     />
   );
@@ -106,12 +104,12 @@ function BoxImageInfo({
   return (
     <div
       className={cn(
-        'absolute bottom-0 left-0 right-0 p-2 bg-black/80 text-white',
-        'transition-transform duration-200',
-        isHovered ? 'translate-y-0' : 'translate-y-full'
+        "absolute bottom-0 left-0 right-0 p-2 bg-black/80 text-white",
+        "transition-transform duration-200",
+        isHovered ? "translate-y-0" : "translate-y-full"
       )}
     >
-      <p className="text-xs truncate">{image.title || '제목 없음'}</p>
+      <p className="text-xs truncate">{image.title || "제목 없음"}</p>
       {isLarge && image.style && (
         <p className="text-xs text-primary mt-1">{image.style}</p>
       )}
@@ -149,15 +147,15 @@ export function FloatingBox({
   return (
     <div
       className={cn(
-        'relative rounded-lg overflow-hidden',
-        'transition-all duration-300',
-        'hover:border-primary group',
-        'active:border-primary',
-        'bg-white/[0.03] backdrop-blur-sm',
-        'flex items-center justify-center',
-        'cursor-pointer',
-        'z-30',
-        isLarge && '-translate-y-6'
+        "relative rounded-lg overflow-hidden",
+        "transition-all duration-300",
+        "hover:border-primary group",
+        "active:border-primary",
+        "bg-white/[0.03] backdrop-blur-sm",
+        "flex items-center justify-center",
+        "cursor-pointer",
+        "z-30",
+        isLarge && "-translate-y-6"
       )}
       style={{
         width,
@@ -180,11 +178,7 @@ export function FloatingBox({
           )}
           <BoxOverlay isHovered={isHovered} />
           <BoxBorder isHovered={isHovered} />
-          <BoxImageInfo
-            image={image}
-            isLarge={isLarge}
-            isHovered={isHovered}
-          />
+          <BoxImageInfo image={image} isLarge={isLarge} isHovered={isHovered} />
         </Link>
       ) : (
         <>

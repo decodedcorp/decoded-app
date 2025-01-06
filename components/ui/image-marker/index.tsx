@@ -1,6 +1,8 @@
-import React, { useRef } from 'react';
-import Image from 'next/image';
-import { Point, useImageMarker } from '@/lib/hooks/useImageMarker';
+"use client";
+
+import React, { useRef } from "react";
+import Image from "next/image";
+import { Point, useImageMarker } from "@/lib/hooks/useImageMarker";
 
 interface ImageMarkerProps {
   imageUrl: string;
@@ -29,7 +31,11 @@ export function ImageMarker({
 
   const handleImageClick = (e: React.MouseEvent) => {
     if (!imageRef.current) return;
-    const { x, y } = calculatePointPosition(imageRef.current, e.clientX, e.clientY);
+    const { x, y } = calculatePointPosition(
+      imageRef.current,
+      e.clientX,
+      e.clientY
+    );
     onPointsChange([...points, { x, y }]);
   };
 
@@ -123,7 +129,7 @@ export function ImageMarker({
                 <div className="p-3">
                   <textarea
                     rows={2}
-                    value={point.context || ''}
+                    value={point.context || ""}
                     onChange={(e) =>
                       onPointContextChange(index, e.target.value)
                     }
@@ -138,4 +144,4 @@ export function ImageMarker({
       )}
     </div>
   );
-} 
+}

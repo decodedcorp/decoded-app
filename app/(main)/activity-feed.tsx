@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils/style";
 import { motion, AnimatePresence } from "framer-motion";
-import { Coins, Link, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useState, useEffect } from "react";
 import { networkManager } from "@/lib/network/network";
 import { ImageDocument } from "@/types/model.d";
@@ -66,7 +66,7 @@ export function ActivityFeed() {
 
     ws.onopen = () => {
       console.log("WebSocket Connected");
-    }; // isLoading은 초기 데이터 로딩에만 사용
+    };
 
     ws.onmessage = (event) => {
       try {

@@ -1,8 +1,10 @@
-import { convertKeysToSnakeCase } from '@/lib/utils/object';
-import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
-import { generateRandomness, generateNonce } from '@mysten/zklogin';
-import { SuiClient, getFullnodeUrl } from '@mysten/sui/client';
-import axios from 'axios';
+"use client";
+
+import { convertKeysToSnakeCase } from "@/lib/utils/object";
+import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
+import { generateRandomness, generateNonce } from "@mysten/zklogin";
+import { SuiClient, getFullnodeUrl } from "@mysten/sui/client";
+import axios from "axios";
 
 /**
  * @class NetworkManager
@@ -26,28 +28,33 @@ export class NetworkManager {
   };
 
   private constructor() {
-    const is_prod = process.env.NODE_ENV === "production";
-    if (is_prod) {
-      if (process.env.NEXT_PUBLIC_DB_ENDPOINT === undefined) {
-        throw new Error("Environment variable is undefined");
-      }
-    } else {
-      if (process.env.NEXT_PUBLIC_LOCAL_DB_ENDPOINT === undefined) {
-        throw new Error("Environment variable is undefined");
+    // 환경 변수 체크 로직 개선
+    const serviceEndpoint = process.env.NEXT_PUBLIC_SERVICE_ENDPOINT;
+    const authClientId = process.env.NEXT_PUBLIC_AUTH_CLIENT_ID;
+    const redirectUri = process.env.NEXT_PUBLIC_REDIRECT_URI;
+
+    // 필수 환경 변수 누락 시 에러 메시지 상세화
+    const missingVars = [];
+    if (!serviceEndpoint) missingVars.push("NEXT_PUBLIC_SERVICE_ENDPOINT");
+    if (!authClientId) missingVars.push("NEXT_PUBLIC_AUTH_CLIENT_ID");
+    if (!redirectUri) missingVars.push("NEXT_PUBLIC_REDIRECT_URI");
+
+    if (missingVars.length > 0) {
+      console.error(`Missing environment variables: ${missingVars.join(", ")}`);
+      // 개발 환경에서만 에러 throw
+      if (process.env.NODE_ENV === "development") {
+        throw new Error(
+          `Required environment variables are missing: ${missingVars.join(
+            ", "
+          )}`
+        );
       }
     }
-    if (
-      process.env.NEXT_PUBLIC_AUTH_CLIENT_ID === undefined ||
-      process.env.NEXT_PUBLIC_REDIRECT_URI === undefined
-    ) {
-      throw new Error("Environment variable is undefined");
-    }
+
     this.config = {
-      service: is_prod
-        ? process.env.NEXT_PUBLIC_DB_ENDPOINT!
-        : process.env.NEXT_PUBLIC_LOCAL_DB_ENDPOINT!,
-      auth_client_id: process.env.NEXT_PUBLIC_AUTH_CLIENT_ID!,
-      redirect_uri: process.env.NEXT_PUBLIC_REDIRECT_URI!,
+      service: serviceEndpoint || "", // fallback 값 제공
+      auth_client_id: authClientId || "",
+      redirect_uri: redirectUri || "",
     };
   }
 
@@ -67,11 +74,11 @@ export class NetworkManager {
         method,
         data: convertedData,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         maxRedirects: 0,
       });
-      
+
       return res.data;
     } catch (e) {
       throw e;

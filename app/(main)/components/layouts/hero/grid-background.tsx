@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
-import { CELL_SIZE, GAP_SIZE, GRID_COLS } from './constants';
-import { GridCell } from './components/grid/grid-cell';
-import { debounce } from './utils/debounce';
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { CELL_SIZE, GAP_SIZE, GRID_COLS } from "./constants";
+import { GridCell } from "./components/grid/grid-cell";
+import { debounce } from "./utils/debounce";
 
 interface GridBackgroundProps {
   onGridSizeChange?: (size: { cols: number; rows: number }) => void;
@@ -33,8 +35,8 @@ export function GridBackground({ onGridSizeChange }: GridBackgroundProps) {
 
     updateGridSize();
     const debouncedResize = debounce(updateGridSize, 100);
-    window.addEventListener('resize', debouncedResize);
-    return () => window.removeEventListener('resize', debouncedResize);
+    window.addEventListener("resize", debouncedResize);
+    return () => window.removeEventListener("resize", debouncedResize);
   }, [onGridSizeChange]);
 
   return (

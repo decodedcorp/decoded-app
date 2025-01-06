@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface NavigationButtonProps {
   currentStep: number;
   totalSteps: number;
@@ -9,7 +7,13 @@ interface NavigationButtonProps {
   onSubmit: () => void;
 }
 
-export function NextButton({ isStepComplete, onNext }: { isStepComplete: boolean; onNext: () => void }) {
+export function NextButton({
+  isStepComplete,
+  onNext,
+}: {
+  isStepComplete: boolean;
+  onNext: () => void;
+}) {
   return (
     <button
       onClick={onNext}
@@ -19,8 +23,8 @@ export function NextButton({ isStepComplete, onNext }: { isStepComplete: boolean
         transition-all duration-200
         ${
           isStepComplete
-            ? 'bg-[#1A1A1A] text-gray-400 hover:bg-black/50'
-            : 'bg-[#1A1A1A] text-gray-400 cursor-not-allowed'
+            ? "bg-[#1A1A1A] text-gray-400 hover:bg-black/50"
+            : "bg-[#1A1A1A] text-gray-400 cursor-not-allowed"
         }
       `}
     >
@@ -65,8 +69,8 @@ export function NavigationButtons({
                 transition-all duration-200
                 ${
                   isStepComplete
-                    ? 'bg-[#1A1A1A] text-[#EAFD66] hover:bg-black/50'
-                    : 'bg-[#1A1A1A] text-gray-400 cursor-not-allowed'
+                    ? "bg-[#1A1A1A] text-[#EAFD66] hover:bg-black/50"
+                    : "bg-[#1A1A1A] text-gray-400 cursor-not-allowed"
                 }
               `}
             >
@@ -77,4 +81,4 @@ export function NavigationButtons({
       </div>
     </div>
   );
-} 
+}

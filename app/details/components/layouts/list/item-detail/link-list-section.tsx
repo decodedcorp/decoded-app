@@ -1,9 +1,11 @@
-import { ItemDocument } from '@/types/model.d';
-import EmptyState from './components/empty-state';
-import { useState } from 'react';
-import { LinkItem } from './components/link-item';
-import { TabButton } from './components/tab-button';
-import { FilterButton } from './components/filter-button';
+"use client";
+
+import { ItemDocument } from "@/types/model.d";
+import EmptyState from "./components/empty-state";
+import { useState } from "react";
+import { LinkItem } from "./components/link-item";
+import { TabButton } from "./components/tab-button";
+import { FilterButton } from "./components/filter-button";
 
 interface Link {
   label: string;
@@ -15,17 +17,17 @@ interface LinkListSectionProps {
 }
 
 export default function LinkListSection({ item }: LinkListSectionProps) {
-  const [activeTab, setActiveTab] = useState<'sale' | 'reference'>('sale');
-  const [activeFilter, setActiveFilter] = useState('all');
+  const [activeTab, setActiveTab] = useState<"sale" | "reference">("sale");
+  const [activeFilter, setActiveFilter] = useState("all");
 
   const links = item.linkInfo || [];
-  const saleLinks = links.filter((link) => link.label === 'sale');
-  const referenceLinks = links.filter((link) => link.label !== 'sale');
+  const saleLinks = links.filter((link) => link.label === "sale");
+  const referenceLinks = links.filter((link) => link.label !== "sale");
   const saleCount = saleLinks.length;
   const referenceCount = referenceLinks.length;
 
   const filteredReferenceLinks =
-    activeFilter === 'all'
+    activeFilter === "all"
       ? referenceLinks
       : referenceLinks.filter((link) => link.label === activeFilter);
 
@@ -39,21 +41,21 @@ export default function LinkListSection({ item }: LinkListSectionProps) {
       <div className="relative">
         <div className="flex justify-center w-full border-b border-gray-800">
           <TabButton
-            isActive={activeTab === 'sale'}
-            onClick={() => setActiveTab('sale')}
+            isActive={activeTab === "sale"}
+            onClick={() => setActiveTab("sale")}
           >
             <span>판매링크</span>
             <span
               className={
-                activeTab === 'sale' ? 'text-[#EAFD66]' : 'text-gray-500'
+                activeTab === "sale" ? "text-[#EAFD66]" : "text-gray-500"
               }
             >
               {saleCount}
             </span>
           </TabButton>
           <TabButton
-            isActive={activeTab === 'reference'}
-            onClick={() => setActiveTab('reference')}
+            isActive={activeTab === "reference"}
+            onClick={() => setActiveTab("reference")}
           >
             <span>관련링크</span>
             <span>{referenceCount}</span>
@@ -66,9 +68,9 @@ export default function LinkListSection({ item }: LinkListSectionProps) {
             className={`
               absolute h-[2px] bg-white transition-all duration-300 ease-in-out
               ${
-                activeTab === 'sale'
-                  ? 'left-1/4 -translate-x-1/2 w-1/2'
-                  : 'left-3/4 -translate-x-1/2 w-1/2'
+                activeTab === "sale"
+                  ? "left-1/4 -translate-x-1/2 w-1/2"
+                  : "left-3/4 -translate-x-1/2 w-1/2"
               }
             `}
           />
@@ -77,7 +79,7 @@ export default function LinkListSection({ item }: LinkListSectionProps) {
 
       {/* 링크 목록 */}
       <div>
-        {activeTab === 'sale' ? (
+        {activeTab === "sale" ? (
           <div className="space-y-2 p-4">
             {saleCount > 0 ? (
               saleLinks.map((link, index) => (
@@ -99,8 +101,8 @@ export default function LinkListSection({ item }: LinkListSectionProps) {
                 <div className="flex gap-2 overflow-x-auto pb-2">
                   <FilterButton
                     label="All"
-                    isActive={activeFilter === 'all'}
-                    onClick={() => setActiveFilter('all')}
+                    isActive={activeFilter === "all"}
+                    onClick={() => setActiveFilter("all")}
                   />
                   {uniqueLabels.map((label) => (
                     <FilterButton

@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { networkManager } from '@/lib/network/network';
-import { arrayBufferToBase64 } from '@/lib/utils/format';
-import React, { useState, useEffect } from 'react';
-import { Point, RequestedItem, RequestImage } from '@/types/model.d';
-import { StepIndicator } from './components/indicator/step-indicator';
-import { NavigationButtons } from './components/navigation/buttons';
-import { Step1 } from './components/steps/step1';
-import { Step2 } from './components/steps/step2';
+import { networkManager } from "@/lib/network/network";
+import { arrayBufferToBase64 } from "@/lib/utils/format";
+import React, { useState, useEffect } from "react";
+import { Point, RequestedItem, RequestImage } from "@/types/model.d";
+import { StepIndicator } from "./components/indicator/step-indicator";
+import { NavigationButtons } from "./components/navigation/buttons";
+import { Step1 } from "./components/steps/step1";
+import { Step2 } from "./components/steps/step2";
 
 export default function RequestSection() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -42,13 +42,13 @@ export default function RequestSection() {
 
   const handleSubmit = async () => {
     if (!imageFile) {
-      alert('Please select a celebrity and upload an image');
+      alert("Please select a celebrity and upload an image");
       return;
     }
     const items: RequestedItem[] = [];
     for (const point of points) {
       items.push({
-        imageId: 'temp-id',
+        imageId: "temp-id",
         position: {
           top: point.y.toString(),
           left: point.x.toString(),
@@ -62,9 +62,9 @@ export default function RequestSection() {
     }
     const buffer = await imageFile?.arrayBuffer();
     const base64Image = arrayBufferToBase64(buffer);
-    const requestBy = window.sessionStorage.getItem('USER_DOC_ID');
+    const requestBy = window.sessionStorage.getItem("USER_DOC_ID");
     if (!requestBy) {
-      alert('로그인이 필요합니다.');
+      alert("로그인이 필요합니다.");
       return;
     }
     const requestImage: RequestImage = {
@@ -74,15 +74,15 @@ export default function RequestSection() {
       metadata: {},
     };
     networkManager
-      .request('image/request', 'POST', requestImage)
+      .request("image/request", "POST", requestImage)
       .then(() => {
-        alert('요청이 완료되었습니다.');
+        alert("요청이 완료되었습니다.");
         defaultState();
       })
       .catch((error) => {
         const errorMessage =
-          error.response?.data?.description || '요청 중 오류가 발생했습니다.';
-        console.error('요청 실패:', errorMessage);
+          error.response?.data?.description || "요청 중 오류가 발생했습니다.";
+        console.error("요청 실패:", errorMessage);
         alert(errorMessage);
       });
   };

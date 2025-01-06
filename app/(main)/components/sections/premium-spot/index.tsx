@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { cn } from '@/lib/utils/style';
-import { motion } from 'framer-motion';
-import { ArrowUpRight, Link, Eye, Sparkles } from 'lucide-react';
-import Image from 'next/image';
-import { networkManager } from '@/lib/network/network';
+import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils/style";
+import { motion } from "framer-motion";
+import { ArrowUpRight, Link, Eye, Sparkles } from "lucide-react";
+import Image from "next/image";
+import { networkManager } from "@/lib/network/network";
 
 // DO-NOT-DELETE: For future use
 // interface TrendingItem {
@@ -25,12 +25,12 @@ export function PremiumSpotSection() {
     async function fetchTrendingItems() {
       try {
         const res = await networkManager.request(
-          'metrics/trending/items',
-          'GET'
+          "metrics/trending/items",
+          "GET"
         );
-        console.log('Trending items:', res.data);
+        console.log("Trending items:", res.data);
       } catch (error) {
-        console.error('Error fetching trending items:', error);
+        console.error("Error fetching trending items:", error);
       } finally {
         setIsLoading(false);
       }
@@ -43,8 +43,8 @@ export function PremiumSpotSection() {
     <section className="container mx-auto px-4">
       <div
         className={cn(
-          'relative rounded-3xl overflow-hidden',
-          'border border-zinc-800/50'
+          "relative rounded-3xl overflow-hidden",
+          "border border-zinc-800/50"
         )}
       >
         <div className="relative z-10 p-8 md:p-12 space-y-12">
@@ -52,9 +52,9 @@ export function PremiumSpotSection() {
           <div className="max-w-2xl space-y-4">
             <h2
               className={cn(
-                'text-3xl md:text-4xl font-bold',
-                'bg-gradient-to-r from-[#EAFD66] to-[#EAFD66]/70',
-                'bg-clip-text text-transparent'
+                "text-3xl md:text-4xl font-bold",
+                "bg-gradient-to-r from-[#EAFD66] to-[#EAFD66]/70",
+                "bg-clip-text text-transparent"
               )}
             >
               인기 아이템의
@@ -70,7 +70,7 @@ export function PremiumSpotSection() {
           {/* 인기 아이템 그리드 */}
           <div className="grid md:grid-cols-3 gap-6">
             <ItemSpotCard
-              image="/images/items/1.jpg"
+              image="https://placehold.co/400x300"
               title="블랙 크롭 자켓"
               category="패션/의류"
               views={1240}
@@ -78,7 +78,7 @@ export function PremiumSpotSection() {
               exposureRate="320%"
             />
             <ItemSpotCard
-              image="/images/items/2.jpg"
+              image="https://placehold.co/400x300"
               title="화이트 스니커즈"
               category="신발"
               views={980}
@@ -87,7 +87,7 @@ export function PremiumSpotSection() {
               featured
             />
             <ItemSpotCard
-              image="/images/items/3.jpg"
+              image="https://placehold.co/400x300"
               title="브라운 크로스백"
               category="가방"
               views={850}
@@ -100,21 +100,21 @@ export function PremiumSpotSection() {
           <div className="flex flex-wrap gap-4">
             <button
               className={cn(
-                'group flex items-center gap-2',
-                'bg-[#EAFD66] text-black',
-                'px-6 py-3 rounded-xl',
-                'font-semibold tracking-wide',
-                'hover:bg-[#EAFD66]/90',
-                'transition-all duration-200',
-                'shadow-lg shadow-[#EAFD66]/20'
+                "group flex items-center gap-2",
+                "bg-[#EAFD66] text-black",
+                "px-6 py-3 rounded-xl",
+                "font-semibold tracking-wide",
+                "hover:bg-[#EAFD66]/90",
+                "transition-all duration-200",
+                "shadow-lg shadow-[#EAFD66]/20"
               )}
             >
               <span>인기 아이템 더보기</span>
               <ArrowUpRight
                 className={cn(
-                  'w-4 h-4',
-                  'transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5',
-                  'transition-transform duration-200'
+                  "w-4 h-4",
+                  "transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5",
+                  "transition-transform duration-200"
                 )}
               />
             </button>
@@ -154,12 +154,12 @@ function ItemSpotCard({
       viewport={{ once: true }}
       transition={{ duration: 0.5 }}
       className={cn(
-        'group relative',
-        'rounded-2xl overflow-hidden',
-        'border border-zinc-800/50',
-        'hover:border-[#EAFD66]/20',
-        'transition-all duration-300',
-        featured && 'ring-2 ring-[#EAFD66]/30'
+        "group relative",
+        "rounded-2xl overflow-hidden",
+        "border border-zinc-800/50",
+        "hover:border-[#EAFD66]/20",
+        "transition-all duration-300",
+        featured && "ring-2 ring-[#EAFD66]/30"
       )}
     >
       {/* 이미지 */}
@@ -168,11 +168,11 @@ function ItemSpotCard({
         {featured && (
           <div
             className={cn(
-              'absolute top-3 right-3',
-              'px-2 py-1 rounded-full',
-              'bg-[#EAFD66] text-black',
-              'text-xs font-medium',
-              'flex items-center gap-1'
+              "absolute top-3 right-3",
+              "px-2 py-1 rounded-full",
+              "bg-[#EAFD66] text-black",
+              "text-xs font-medium",
+              "flex items-center gap-1"
             )}
           >
             <Sparkles className="w-3 h-3" />
@@ -210,11 +210,11 @@ function ItemSpotCard({
         {/* 링크 제공 버튼 */}
         <button
           className={cn(
-            'w-full flex items-center justify-center gap-2',
-            'py-2 rounded-lg',
-            'bg-zinc-800/50 hover:bg-zinc-700/50',
-            'text-sm font-medium text-white',
-            'transition-colors duration-200'
+            "w-full flex items-center justify-center gap-2",
+            "py-2 rounded-lg",
+            "bg-zinc-800/50 hover:bg-zinc-700/50",
+            "text-sm font-medium text-white",
+            "transition-colors duration-200"
           )}
         >
           <Link className="w-4 h-4" />

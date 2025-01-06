@@ -54,7 +54,7 @@ export function TrendingSection() {
             <TrendingCard
               key={i}
               rank={i + 1}
-              image="/images/sample.jpg"
+              image="https://placehold.co/400x300"
               title="트렌딩 아이템 이름"
               brand="브랜드명"
               likes={1234}

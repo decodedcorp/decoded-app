@@ -33,7 +33,7 @@ export function LoginButton() {
         </Button>
       )}
       <Button
-        variant={isLogin ? "secondary" : "default"}
+        variant={isLogin ? "ghost" : "default"}
         onClick={() => setIsLoginModalOpen(true)}
       >
         {isLogin ? 'MY ACCOUNT' : 'LOGIN'}

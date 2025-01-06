@@ -1,6 +1,8 @@
-import Image from 'next/image';
-import { pretendardBold } from '@/lib/constants/fonts';
-import { ChevronRight } from 'lucide-react';
+"use client";
+
+import Image from "next/image";
+import { pretendardBold } from "@/lib/constants/fonts";
+import { ChevronRight } from "lucide-react";
 
 interface ItemsGalleryProps {
   items: Array<{
@@ -52,7 +54,7 @@ function ImageContainer({
           src={imageUrl}
           alt={name}
           fill={true}
-          style={{ objectFit: 'cover' }}
+          style={{ objectFit: "cover" }}
         />
       </div>
     </div>
@@ -62,10 +64,14 @@ function ImageContainer({
 function ItemInfo({ brand, name }: { brand: string; name: string }) {
   return (
     <div className="flex flex-col w-full mt-2 md:mt-4">
-      <h2 className={`${pretendardBold.className} text-sm md:text-lg text-black`}>
+      <h2
+        className={`${pretendardBold.className} text-sm md:text-lg text-black`}
+      >
         {brand.toUpperCase()}
       </h2>
-      <h3 className={`${pretendardBold.className} text-xs md:text-lg text-black/50`}>
+      <h3
+        className={`${pretendardBold.className} text-xs md:text-lg text-black/50`}
+      >
         {name.toUpperCase()}
       </h3>
     </div>
@@ -75,7 +81,9 @@ function ItemInfo({ brand, name }: { brand: string; name: string }) {
 function RelatedStyles() {
   return (
     <div className="flex cursor-pointer mt-2 md:mt-4 items-center">
-      <p className={`${pretendardBold.className} text-xs md:text-md text-black/50`}>
+      <p
+        className={`${pretendardBold.className} text-xs md:text-md text-black/50`}
+      >
         관련 스타일
       </p>
       <ChevronRight className="w-5 h-5" />

@@ -1,8 +1,10 @@
-import { HoverItem } from '@/types/model.d';
-import { ListItemImage } from './list-item-image';
-import { ListItemInfo } from './list-item-info';
-import { useCallback } from 'react';
-import { ChevronRight } from 'lucide-react';
+"use client";
+
+import { HoverItem } from "@/types/model.d";
+import { ListItemImage } from "./list-item-image";
+import { ListItemInfo } from "./list-item-info";
+import { useCallback } from "react";
+import { ChevronRight } from "lucide-react";
 
 interface ListItemsProps {
   items: HoverItem[];

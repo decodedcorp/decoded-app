@@ -1,5 +1,7 @@
-import { Search as SearchIcon, Plus as AddIcon } from 'lucide-react';
-import { BaseButtonProps } from '@/types/button.d';
+"use client";
+
+import { Search as SearchIcon, Plus as AddIcon } from "lucide-react";
+import { BaseButtonProps } from "@/types/button.d";
 
 export function SearchButton({ className }: BaseButtonProps) {
   return (

@@ -1,7 +1,9 @@
-import Image from 'next/image';
-import { ImageAreaProps } from '../types';
-import { Caution } from './caution';
-import { useState } from 'react';
+"use client";
+
+import Image from "next/image";
+import { ImageAreaProps } from "../types";
+import { Caution } from "./caution";
+import { useState } from "react";
 
 export function ImageArea({
   handleImageClick,
@@ -23,9 +25,9 @@ export function ImageArea({
       <div
         className="relative w-full overflow-hidden mx-auto bg-gray-900 rounded-lg"
         style={{
-          aspectRatio: '3/4',
-          width: '100%',
-          maxWidth: '380px',
+          aspectRatio: "3/4",
+          width: "100%",
+          maxWidth: "380px",
         }}
       >
         <div

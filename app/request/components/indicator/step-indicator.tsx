@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface StepIndicatorProps {
   currentStep: number;
   totalSteps: number;
@@ -41,10 +39,10 @@ export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
                     w-5 h-5 rounded-full 
                     ${
                       index + 1 < currentStep
-                        ? 'bg-[#EAFD66]' // 완료된 스텝
+                        ? "bg-[#EAFD66]" // 완료된 스텝
                         : index + 1 === currentStep
-                        ? 'bg-[#EAFD66]' // 현재 스텝
-                        : 'border-[2.5px] border-[#333333] bg-transparent' // 미완료 스텝
+                        ? "bg-[#EAFD66]" // 현재 스텝
+                        : "border-[2.5px] border-[#333333] bg-transparent" // 미완료 스텝
                     }
                   `}
                 />
@@ -55,4 +53,4 @@ export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
       </div>
     </div>
   );
-} 
+}

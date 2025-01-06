@@ -1,5 +1,3 @@
-import { ChevronDown } from "lucide-react";
-
 import { MetricsSection } from "./components/sections/metric";
 import { DiscoverSection } from "./components/sections/discover";
 import { PremiumSpotSection } from "./components/sections/premium-spot";

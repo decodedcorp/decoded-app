@@ -1,5 +1,7 @@
-import React, { useRef, useState } from 'react';
-import Image from 'next/image';
+"use client";
+
+import { useRef, useState } from "react";
+import Image from "next/image";
 
 interface Step1Props {
   selectedImage: string | null;
@@ -7,16 +9,20 @@ interface Step1Props {
   setImageFile: (file: File | null) => void;
 }
 
-export function Step1({ selectedImage, setSelectedImage, setImageFile }: Step1Props) {
+export function Step1({
+  selectedImage,
+  setSelectedImage,
+  setImageFile,
+}: Step1Props) {
   const [dragActive, setDragActive] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
+    if (e.type === "dragenter" || e.type === "dragover") {
       setDragActive(true);
-    } else if (e.type === 'dragleave') {
+    } else if (e.type === "dragleave") {
       setDragActive(false);
     }
   };
@@ -59,8 +65,8 @@ export function Step1({ selectedImage, setSelectedImage, setImageFile }: Step1Pr
               transition-all
               ${
                 dragActive
-                  ? 'border-yellow-400 bg-[#1A1A1A]'
-                  : 'border-gray-700 bg-[#1A1A1A]'
+                  ? "border-yellow-400 bg-[#1A1A1A]"
+                  : "border-gray-700 bg-[#1A1A1A]"
               }
             `}
             onDragEnter={handleDrag}
@@ -84,7 +90,7 @@ export function Step1({ selectedImage, setSelectedImage, setImageFile }: Step1Pr
               <div className="mb-4">
                 <svg
                   className={`w-12 h-12 mb-3 ${
-                    dragActive ? 'text-yellow-400' : 'text-gray-400'
+                    dragActive ? "text-yellow-400" : "text-gray-400"
                   }`}
                   fill="none"
                   stroke="currentColor"
@@ -101,12 +107,12 @@ export function Step1({ selectedImage, setSelectedImage, setImageFile }: Step1Pr
 
               <p
                 className={`mb-2 text-lg ${
-                  dragActive ? 'text-yellow-600' : 'text-gray-600'
+                  dragActive ? "text-yellow-600" : "text-gray-600"
                 }`}
               >
                 {dragActive
-                  ? '여기에 놓아주세요!'
-                  : '이미지를 드래그하여 업로드하거나'}
+                  ? "여기에 놓아주세요!"
+                  : "이미지를 드래그하여 업로드하거나"}
               </p>
 
               <button
@@ -191,4 +197,4 @@ export function Step1({ selectedImage, setSelectedImage, setImageFile }: Step1Pr
       </div>
     </div>
   );
-} 
+}
