@@ -1,12 +1,11 @@
-'use client';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown } from "lucide-react";
 
-import { MetricsSection } from './components/sections/metric';
-import { DiscoverSection } from './components/sections/discover';
-import { PremiumSpotSection } from './components/sections/premium-spot';
-import { TrendingSection } from './components/trending';
+import { MetricsSection } from "./components/sections/metric";
+import { DiscoverSection } from "./components/sections/discover";
+import { PremiumSpotSection } from "./components/sections/premium-spot";
+import { TrendingSection } from "./components/trending";
 
-import { Hero } from './components/layouts/hero';
+import { Hero } from "./components/layouts/hero";
 
 export default function Home() {
   return (

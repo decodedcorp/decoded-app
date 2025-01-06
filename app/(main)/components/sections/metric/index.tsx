@@ -1,7 +1,9 @@
-import { cn } from '@/lib/utils/style';
-import { useEffect, useRef, useState } from 'react';
-import { useInView, useMotionValue, useSpring } from 'framer-motion';
-import { networkManager } from '@/lib/network/network';
+"use client";
+
+import { cn } from "@/lib/utils/style";
+import { useEffect, useRef, useState } from "react";
+import { useInView, useMotionValue, useSpring } from "framer-motion";
+import { networkManager } from "@/lib/network/network";
 
 interface MetricItemProps {
   label: string;
@@ -32,7 +34,7 @@ export function Counter({ from = 0, to, className }: CounterProps) {
   }, [isInView, to, count]);
 
   useEffect(() => {
-    return rounded.on('change', (latest) => {
+    return rounded.on("change", (latest) => {
       if (ref.current) {
         ref.current.textContent = Math.round(latest).toString();
       }
@@ -42,7 +44,7 @@ export function Counter({ from = 0, to, className }: CounterProps) {
   return <span ref={ref} className={className} />;
 }
 
-function MetricItem({ label, value, suffix = '' }: MetricItemProps) {
+function MetricItem({ label, value, suffix = "" }: MetricItemProps) {
   return (
     <div className="text-center px-4">
       <div className="flex items-baseline justify-center gap-1">
@@ -50,9 +52,9 @@ function MetricItem({ label, value, suffix = '' }: MetricItemProps) {
           from={0}
           to={value}
           className={cn(
-            'text-3xl md:text-4xl font-bold',
-            'bg-gradient-to-b from-[#EAFD66] to-[#EAFD66]/70',
-            'bg-clip-text text-transparent'
+            "text-3xl md:text-4xl font-bold",
+            "bg-gradient-to-b from-[#EAFD66] to-[#EAFD66]/70",
+            "bg-clip-text text-transparent"
           )}
         />
         {suffix && <span className="text-xl text-[#EAFD66]/70">{suffix}</span>}
@@ -90,10 +92,10 @@ export function MetricsSection() {
 
   const fetchMetrics = async () => {
     try {
-      const response = await networkManager.request('metrics/decoded', 'GET');
+      const response = await networkManager.request("metrics/decoded", "GET");
       setMetrics(response.data);
     } catch (error) {
-      console.error('Failed to fetch metrics:', error);
+      console.error("Failed to fetch metrics:", error);
     }
   };
 
@@ -118,15 +120,15 @@ export function MetricsSection() {
   return (
     <section
       className={cn(
-        'container mx-auto px-4 py-16',
-        'border-y border-zinc-800',
-        'bg-zinc-900/30'
+        "container mx-auto px-4 py-16",
+        "border-y border-zinc-800",
+        "bg-zinc-900/30"
       )}
     >
       <div
         className={cn(
-          'grid grid-cols-2 md:grid-cols-3 gap-8',
-          'max-w-4xl mx-auto'
+          "grid grid-cols-2 md:grid-cols-3 gap-8",
+          "max-w-4xl mx-auto"
         )}
       >
         <MetricItem

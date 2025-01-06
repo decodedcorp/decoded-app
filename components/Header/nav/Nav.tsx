@@ -1,10 +1,8 @@
-'use client';
-
-import Logo from '@/components/logo/Logo';
-import { SearchBar } from '../search/SearchBar';
-import { LoginButton } from './LoginButton';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import Logo from "@/components/logo/Logo";
+import { SearchBar } from "../search/SearchBar";
+import { LoginButton } from "./LoginButton";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 interface NavProps {
   isSearchOpen: boolean;

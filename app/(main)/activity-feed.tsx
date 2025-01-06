@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { cn } from '@/lib/utils/style';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Coins, Link, Search } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { networkManager } from '@/lib/network/network';
-import { ImageDocument } from '@/types/model.d';
-import { convertKeysToCamelCase } from '@/lib/utils/string';
+import { cn } from "@/lib/utils/style";
+import { motion, AnimatePresence } from "framer-motion";
+import { Coins, Link, Search } from "lucide-react";
+import { useState, useEffect } from "react";
+import { networkManager } from "@/lib/network/network";
+import { ImageDocument } from "@/types/model.d";
+import { convertKeysToCamelCase } from "@/lib/utils/string";
 interface Activity {
-  type: 'request_image';
+  type: "request_image";
   data: {
     image_url: string;
     image_doc_id: string;
@@ -24,17 +24,17 @@ export function ActivityFeed() {
   useEffect(() => {
     async function fetchInitialActivities() {
       try {
-        const response = await networkManager.request('images', 'GET');
+        const response = await networkManager.request("images", "GET");
 
         if (!response.data?.images || !Array.isArray(response.data.images)) {
-          console.error('Invalid response format:', response);
+          console.error("Invalid response format:", response);
           return;
         }
 
         const initialActivities = convertKeysToCamelCase(
           response.data.images
         ).map((image: ImageDocument) => ({
-          type: 'request_image' as const,
+          type: "request_image" as const,
           data: {
             image_url: image.imgUrl,
             image_doc_id: image.docId,
@@ -50,7 +50,7 @@ export function ActivityFeed() {
           setActivities(initialActivities);
         }
       } catch (error) {
-        console.error('Failed to fetch initial activities:', error);
+        console.error("Failed to fetch initial activities:", error);
       } finally {
         setIsLoading(false);
       }
@@ -60,10 +60,12 @@ export function ActivityFeed() {
   }, []);
 
   useEffect(() => {
-    const ws = new WebSocket('ws://dev.decoded.style/subscribe/decoded/events');
+    const ws = new WebSocket(
+      `${process.env.NEXT_PUBLIC_WS_URL}/subscribe/decoded/events`
+    );
 
     ws.onopen = () => {
-      console.log('WebSocket Connected');
+      console.log("WebSocket Connected");
     }; // isLoading은 초기 데이터 로딩에만 사용
 
     ws.onmessage = (event) => {
@@ -71,16 +73,16 @@ export function ActivityFeed() {
         const newActivity = JSON.parse(event.data) as Activity;
         setActivities((prev) => [newActivity, ...prev.slice(0, 7)]);
       } catch (error) {
-        console.error('Failed to parse WebSocket message:', error);
+        console.error("Failed to parse WebSocket message:", error);
       }
     };
 
     ws.onclose = () => {
-      console.log('WebSocket Disconnected');
+      console.log("WebSocket Disconnected");
     };
 
     ws.onerror = (error) => {
-      console.error('WebSocket Error:', error);
+      console.error("WebSocket Error:", error);
     };
 
     return () => {
@@ -91,16 +93,16 @@ export function ActivityFeed() {
   return (
     <div
       className={cn(
-        'relative h-[600px] overflow-hidden rounded-2xl',
-        'border border-zinc-800/50',
-        'bg-zinc-900/30 backdrop-blur-sm'
+        "relative h-[600px] overflow-hidden rounded-2xl",
+        "border border-zinc-800/50",
+        "bg-zinc-900/30 backdrop-blur-sm"
       )}
     >
       {/* 그라데이션 오버레이 */}
       <div
         className={cn(
-          'absolute inset-0 z-20 pointer-events-none',
-          'bg-gradient-to-b from-zinc-900 via-transparent to-zinc-900'
+          "absolute inset-0 z-20 pointer-events-none",
+          "bg-gradient-to-b from-zinc-900 via-transparent to-zinc-900"
         )}
       />
 
@@ -128,22 +130,22 @@ export function ActivityFeed() {
       {/* 상단 헤더 */}
       <div
         className={cn(
-          'absolute top-0 inset-x-0 z-30',
-          'p-4 border-b border-zinc-800/50',
-          'bg-zinc-900/50 backdrop-blur-sm'
+          "absolute top-0 inset-x-0 z-30",
+          "p-4 border-b border-zinc-800/50",
+          "bg-zinc-900/50 backdrop-blur-sm"
         )}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div
               className={cn(
-                'w-2 h-2 rounded-full',
-                'bg-[#EAFD66]',
-                !isLoading && 'animate-pulse'
+                "w-2 h-2 rounded-full",
+                "bg-[#EAFD66]",
+                !isLoading && "animate-pulse"
               )}
             />
             <span className="text-sm font-medium text-zinc-400">
-              {isLoading ? '연결 중...' : '실시간 요청'}
+              {isLoading ? "연결 중..." : "실시간 요청"}
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm text-zinc-400">
@@ -162,18 +164,18 @@ function ActivityCard({ activity }: { activity: Activity }) {
   return (
     <div
       className={cn(
-        'bg-zinc-800/30 backdrop-blur-sm',
-        'border border-zinc-700/30 rounded-xl',
-        'p-4 transition-all duration-300',
-        'hover:bg-zinc-700/30 hover:border-zinc-600/30'
+        "bg-zinc-800/30 backdrop-blur-sm",
+        "border border-zinc-700/30 rounded-xl",
+        "p-4 transition-all duration-300",
+        "hover:bg-zinc-700/30 hover:border-zinc-600/30"
       )}
     >
       <div className="flex gap-4">
         {/* 요청 이미지 */}
         <div
           className={cn(
-            'w-16 h-16 rounded-lg overflow-hidden',
-            'border border-zinc-700/50'
+            "w-16 h-16 rounded-lg overflow-hidden",
+            "border border-zinc-700/50"
           )}
         >
           <img
@@ -189,7 +191,7 @@ function ActivityCard({ activity }: { activity: Activity }) {
             <div className="space-y-1">
               <p className="text-sm text-white leading-snug">
                 <span
-                  className={data.item_len ? 'text-[#EAFD66]' : 'text-blue-400'}
+                  className={data.item_len ? "text-[#EAFD66]" : "text-blue-400"}
                 >
                   {data.item_len}
                 </span>
@@ -199,15 +201,15 @@ function ActivityCard({ activity }: { activity: Activity }) {
 
             <button
               className={cn(
-                'px-3 py-1.5 rounded-lg text-sm font-medium',
-                'border border-[#EAFD66]/20',
-                'bg-[#EAFD66]/10 text-[#EAFD66]',
-                'hover:bg-[#EAFD66]/20 transition-colors',
-                'flex items-center gap-1'
+                "px-3 py-1.5 rounded-lg text-sm font-medium",
+                "border border-[#EAFD66]/20",
+                "bg-[#EAFD66]/10 text-[#EAFD66]",
+                "hover:bg-[#EAFD66]/20 transition-colors",
+                "flex items-center gap-1"
               )}
               onClick={() => {
                 // TODO: 제공 기능 구현
-                console.log('Provide items for:', data.image_doc_id);
+                console.log("Provide items for:", data.image_doc_id);
               }}
             >
               <span>제공하기</span>

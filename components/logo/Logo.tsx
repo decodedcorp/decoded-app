@@ -1,7 +1,5 @@
-"use client";
-
 import Link from "next/link";
-import { cn } from '@/lib/utils/style';
+import { cn } from "@/lib/utils/style";
 
 function Logo({ isScrolled }: { isScrolled: boolean }) {
   return (
@@ -37,9 +35,9 @@ function Logo({ isScrolled }: { isScrolled: boolean }) {
             fill="#EAFD66"
             filter="url(#glow)"
             style={{
-              fontFamily: 'Syncopate, sans-serif',
-              fontSize: '52px',
-              fontWeight: 'bold',
+              fontFamily: "Syncopate, sans-serif",
+              fontSize: "52px",
+              fontWeight: "bold",
             }}
           >
             DEC
@@ -59,9 +57,9 @@ function Logo({ isScrolled }: { isScrolled: boolean }) {
             strokeWidth="0.5"
             opacity="0.3"
             style={{
-              fontFamily: 'Orbitron, sans-serif',
-              fontSize: '56px',
-              fontWeight: 'bold',
+              fontFamily: "Orbitron, sans-serif",
+              fontSize: "56px",
+              fontWeight: "bold",
             }}
           >
             DECODED
