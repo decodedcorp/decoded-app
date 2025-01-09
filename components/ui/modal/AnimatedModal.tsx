@@ -1,6 +1,6 @@
 'use client';
 
-import useModalClose from '@/lib/hooks/useModalClose';
+import useModalClose from '@/lib/hooks/common/useModalClose';
 
 interface AnimatedModalProps {
   isOpen: boolean;

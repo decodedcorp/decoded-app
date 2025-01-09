@@ -3,7 +3,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils/style';
 import { pretendardBold, pretendardMedium, pretendardRegular } from '@/lib/constants/fonts';
-import { useAuth } from '@/lib/hooks/useAuth';
+import { useAuth } from '@/lib/hooks/features/auth/useAuth';
 import Image from "next/image"
 
 interface AccountSectionProps {
@@ -12,9 +12,11 @@ interface AccountSectionProps {
 }
 
 export function AccountSection({ email, onClose }: AccountSectionProps) {
-  const { isLogin, handleGoogleLogin, handleDisconnect } = useAuth();
+  const { isLogin, isInitialized, handleGoogleLogin, handleDisconnect } = useAuth();
 
   const handleAuth = async () => {
+    if (!isInitialized) return;
+    
     if (isLogin) {
       handleDisconnect();
     } else {
@@ -22,6 +24,20 @@ export function AccountSection({ email, onClose }: AccountSectionProps) {
     }
     onClose?.();
   };
+
+  // 초기화되지 않은 상태에서는 로딩 상태를 보여줍니다
+  if (!isInitialized) {
+    return (
+      <div className="px-6 pt-6 pb-8">
+        <div className="bg-[#222222] rounded-xl p-6">
+          <div className={cn(pretendardBold.className, "text-base mb-6")}>계정</div>
+          <div className="flex items-center justify-center p-4">
+            <div className="text-sm text-white/60">Loading...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-6 pt-6 pb-8">

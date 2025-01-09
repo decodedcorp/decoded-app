@@ -1,7 +1,7 @@
 "use client";
 
 import { networkManager } from "@/lib/network/network";
-import { arrayBufferToBase64 } from "@/lib/utils/format";
+import { arrayBufferToBase64 } from "@/lib/utils/string/format";
 import React, { useState, useEffect } from "react";
 import { Point, RequestedItem, RequestImage } from "@/types/model.d";
 import { StepIndicator } from "./components/indicator/step-indicator";
@@ -73,16 +73,27 @@ export default function RequestSection() {
       imageFile: base64Image,
       metadata: {},
     };
+    console.log('=== Sending Image Request ===');
+    console.log('Request data:', {
+      items: items,
+      requestBy: requestBy,
+      hasImage: !!base64Image,
+      metadata: {}
+    });
     networkManager
       .request("request/image", "POST", requestImage)
-      .then(() => {
+      .then((response) => {
+        console.log('Request successful:', response);
         alert("요청이 완료되었습니다.");
         defaultState();
       })
       .catch((error) => {
         const errorMessage =
           error.response?.data?.description || "요청 중 오류가 발생했습니다.";
-        console.error("요청 실패:", errorMessage);
+        console.error('Request failed:', {
+          error: errorMessage,
+          details: error.response?.data
+        });
         alert(errorMessage);
       });
   };

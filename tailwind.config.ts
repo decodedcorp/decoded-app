@@ -144,6 +144,7 @@ const config: Config = {
 
         // Overlay Layers (10-19)
         overlay: "10",
+        heroContent: "15",
         modalOverlay: "11",
 
         // Content Layers (20-29)

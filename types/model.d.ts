@@ -103,23 +103,11 @@ export interface ImageInfo {
    * @example "Source url"
    */
   source?: string;
+  /**
+   * @example "https://example.com/image.jpg"
+   */
   imageUrl: string;
-  items?: {
-    position: Position;
-    identity: {
-      id: string;
-      name: string;
-      category: string;
-      profileImageUrl?: string;
-    };
-    category: {
-      itemClass: string;
-      itemSubClass: string;
-      category?: string;
-      subCategory?: string;
-      productType: string;
-    };
-  }[];
+  items?: Record<string, any[]>;
 }
 
 /**

@@ -1,9 +1,9 @@
-import { MetricsSection } from "./components/sections/metric";
-import { DiscoverSection } from "./components/sections/discover";
-import { PremiumSpotSection } from "./components/sections/premium-spot";
-import { TrendingSection } from "./components/trending";
+import { MetricsSection } from './sections/metric';
+import { DiscoverSection } from './sections/discover';
+import { PremiumSpotSection } from './sections/premium-spot';
+import { TrendingSection } from './sections/trending';
 
-import { Hero } from "./components/layouts/hero";
+import { Hero } from './sections/hero';
 
 export default function Home() {
   return (

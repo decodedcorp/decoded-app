@@ -37,7 +37,7 @@ export interface DecodedItem {
 
 export interface ImageData {
   title: string | null;
-  description: string;
+  description: string | null;
   like: number;
   style: string | null;
   img_url: string;
@@ -45,9 +45,33 @@ export interface ImageData {
   upload_by: string;
   doc_id: string;
   decoded_percent: number;
-  items: {
-    [key: string]: DecodedItem[];
+  items?: Record<string, DecodedItem[]>;
+  img?: {
+    title?: string;
+    description?: string;
+    items?: Record<string, DecodedItem[]>;
   };
+  itemList?: Array<{
+    imageDocId: string;
+    info: {
+      item: {
+        item: {
+          _id: string;
+          name: string;
+          description?: string;
+          img_url?: string;
+          price?: number;
+          metadata?: ImageMetadata;
+        };
+        brand_name?: string;
+        brand_logo_image_url?: string | null;
+      };
+    };
+    pos: {
+      top: number;
+      left: number;
+    };
+  }>;
 }
 
 export interface DetailPageState extends ImageData {

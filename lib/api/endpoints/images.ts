@@ -6,6 +6,10 @@ import type {
 } from '../types/image';
 import type { APIResponse } from '../types/request';
 
+interface ImageDetailResponse {
+  image: ImageData;
+}
+
 export const imagesAPI = {
   // Get images list
   getImages: async (): Promise<APIResponse<{ images: ImageData[]; maybe_next_id: string | null }>> => {
@@ -21,29 +25,23 @@ export const imagesAPI = {
   },
 
   // Get single image detail
-  getImageDetail: async (imageId: string): Promise<APIResponse<DetailPageState>> => {
+  getImageDetail: async (imageId: string): Promise<APIResponse<ImageDetailResponse>> => {
     try {
-      // 전체 이미지 목록을 가져와서 해당 이미지를 찾습니다
       const response = await networkManager.request(
-        'images',
+        `image/${imageId}`,
         'GET'
       );
       
-      if (!response.data?.images) {
+      if (!response.data) {
         throw new Error('Invalid API response structure');
       }
 
-      const image = response.data.images.find((img: ImageData) => img.doc_id === imageId);
-      if (!image) {
-        throw new Error('Image not found');
-      }
-
-      return {
-        status_code: response.status_code,
-        description: response.description,
-        data: image
-      };
+      return response;
     } catch (error) {
+      console.error('Error fetching image detail:', {
+        error,
+        imageId
+      });
       throw error;
     }
   },
@@ -52,7 +50,7 @@ export const imagesAPI = {
   getImageItems: async (imageId: string): Promise<APIResponse<ItemDocument[]>> => {
     try {
       const response = await networkManager.request(
-        `images/${imageId}/items`,
+        `image/${imageId}/items`,
         'GET'
       );
       return response;
@@ -72,7 +70,7 @@ export const imagesAPI = {
   ): Promise<APIResponse<void>> => {
     try {
       const response = await networkManager.request(
-        `images/${imageId}/items/${itemId}`,
+        `image/${imageId}/items/${itemId}`,
         'PUT',
         data
       );
@@ -86,7 +84,7 @@ export const imagesAPI = {
   getFeaturedImages: async (): Promise<APIResponse<ImageData[]>> => {
     try {
       const response = await networkManager.request(
-        'images/featured',
+        'image/featured',
         'GET'
       );
       return response;
