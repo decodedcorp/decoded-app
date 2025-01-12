@@ -1,6 +1,6 @@
-import { HoverItem } from "@/types/model.d";
-import Image from "next/image";
-import { ImagePlaceholder } from "@/components/ui/icons/image-placeholder";
+import { HoverItem } from '@/types/model.d';
+import Image from 'next/image';
+import { ImagePlaceholder } from '@/components/ui/icons/image-placeholder';
 
 interface ListItemImageProps {
   item: HoverItem;
@@ -15,17 +15,17 @@ export function ListItemImage({ item, isActive }: ListItemImageProps) {
       {imgUrl ? (
         <Image
           src={imgUrl}
-          alt={item.info?.item?.item?.metadata?.name || "아이템 이미지"}
+          alt={item.info?.item?.item?.metadata?.name || '아이템 이미지'}
           width={64}
           height={64}
           className={`
             w-full h-full object-cover transition-opacity duration-200
-            ${isActive ? "opacity-100" : "opacity-80"}
+            ${isActive ? 'opacity-100' : 'opacity-80'}
           `}
         />
       ) : (
         <div className="w-full h-full bg-[#1A1A1A]/[0.5] flex items-center justify-center">
-          <ImagePlaceholder />
+          <ImagePlaceholder width={32} height={32} />
         </div>
       )}
     </div>

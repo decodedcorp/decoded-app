@@ -27,19 +27,19 @@ const ScrollIndicator = () => {
 
   return (
     <div
-      className={`absolute bottom-4 left-1/2 transform -translate-x-1/2 transition-opacity duration-slow cursor-pointer ${
+      className={`absolute bottom-4 left-1/2 transform -translate-x-1/2 transition-opacity duration-slow cursor-pointer z-[5] ${
         isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}
       onClick={handleClick}
     >
-      <div className="flex flex-col items-center justify-center animate-float">
+      <div className="flex flex-col items-center justify-center animate-float w-24 h-24">
         <span className="text-sm font-medium text-primary">
           스크롤 내리기
         </span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="26"
-          height="26"
+          width="20"
+          height="20"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"

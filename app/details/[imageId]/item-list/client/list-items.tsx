@@ -51,7 +51,7 @@ export function ListItems({
             <div
               key={uniqueKey}
               className={`
-                relative w-full group h-[80px] rounded-xl bg-[#1A1A1A] hover:bg-[#242424] transition-colors cursor-pointer
+                relative w-full group h-[80px] rounded-xl bg-[#242424] hover:bg-[#2A2A2A] transition-colors cursor-pointer
               `}
               onMouseEnter={() => handleMouseEnter(index)}
               onMouseLeave={handleMouseLeave}

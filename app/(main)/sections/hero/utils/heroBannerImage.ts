@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
-import { imagesAPI } from "@/lib/api/endpoints/images";
-import { ImageData, DecodedItem, ImageMetadata } from "@/lib/api/types/image";
+import { imagesAPI } from "@/lib/api/client/images";
+import { ImageData, ImageMetadata, ImageItem } from "@/lib/api/types/image";
+import type { RandomImageResource } from "@/lib/api/client/images";
 
 // Types
 interface MainImage {
@@ -20,15 +21,7 @@ interface ItemImage {
     left: string;
   };
   item: {
-    item: {
-      _id: string;
-      metadata: ImageMetadata;
-      img_url: string | null;
-      requester: string;
-      requested_at: string;
-      link_info: any;
-      like: number;
-    };
+    item: ImageItem;
     brand_name: string | null;
     brand_logo_image_url: string | null;
   };
@@ -53,81 +46,8 @@ export function isEmptyBannerState(
   return loading || !image;
 }
 
-function processImage(image: ImageData): ProcessedImage | null {
+function processRandomImage(image: RandomImageResource): ProcessedImage | null {
   if (!image.img_url) return null;
-
-  // Try both image.items and image.img.items
-  const rawItems = image.items || image.img?.items || {};
-
-  // Helper function to safely convert a value to DecodedItem[]
-  function toDecodedItems(value: unknown): DecodedItem[] {
-    if (Array.isArray(value)) {
-      return value;
-    }
-    if (typeof value === 'object' && value !== null) {
-      // Handle nested objects (like left/right grouping)
-      const nestedValues = Object.values(value);
-      if (nestedValues.length > 0) {
-        return nestedValues.flatMap(v => {
-          if (Array.isArray(v)) return v;
-          if (typeof v === 'object' && v !== null) return [v];
-          return [];
-        });
-      }
-      return [value as DecodedItem];
-    }
-    return [];
-  }
-
-  // Flatten and process all items
-  const allItems = Object.entries(rawItems).flatMap(([_, value]) => toDecodedItems(value));
-
-  const decodedItems = allItems
-    .filter((item) => {
-      try {
-        // Basic structure check
-        if (!item || typeof item !== 'object') {
-          return false;
-        }
-
-        // Check if item is decoded
-        if (!item.is_decoded) {
-          return false;
-        }
-
-        // Check if item has the required properties and valid data
-        const hasRequiredProps = 
-          item.item?.item?._id &&
-          item.item?.item?.img_url &&
-          item.item?.item?.metadata?.name &&
-          item.position?.top &&
-          item.position?.left;
-
-        return hasRequiredProps;
-      } catch (error) {
-        return false;
-      }
-    })
-    .map((item) => ({
-      doc_id: image.doc_id,
-      img_url: item.item.item.img_url,
-      title: item.item.item.metadata.name,
-      style: null,
-      position: item.position,
-      item: {
-        item: {
-          _id: item.item.item._id,
-          metadata: item.item.item.metadata,
-          img_url: item.item.item.img_url,
-          requester: item.item.item.requester,
-          requested_at: item.item.item.requested_at,
-          link_info: item.item.item.link_info,
-          like: item.item.item.like,
-        },
-        brand_name: item.item.brand_name,
-        brand_logo_image_url: item.item.brand_logo_image_url,
-      },
-    }));
 
   return {
     mainImage: {
@@ -136,7 +56,7 @@ function processImage(image: ImageData): ProcessedImage | null {
       title: image.title,
       style: image.style,
     },
-    itemImages: decodedItems,
+    itemImages: [],
   };
 }
 
@@ -149,16 +69,18 @@ export function useHeroBannerImage(): HeroBannerState {
     try {
       setLoading(true);
       setError(null);
-      const response = await imagesAPI.getImages();
-      const images = response.data.images;
+      
+      const response = await imagesAPI.getRandomResources(1);
+      const { label, resources } = response.data;
 
-      if (!images?.length) {
+      if (label !== 'image' || !resources.length) {
         setProcessedImage(null);
         return;
       }
 
+      const images = resources as RandomImageResource[];
       const validImages = images
-        .map(processImage)
+        .map(processRandomImage)
         .filter((img): img is ProcessedImage => img !== null);
 
       if (!validImages.length) {
@@ -166,6 +88,7 @@ export function useHeroBannerImage(): HeroBannerState {
       }
 
       const randomImage = validImages[Math.floor(Math.random() * validImages.length)];
+      
       setProcessedImage(randomImage);
     } catch (error) {
       console.error("Failed to fetch images:", error);

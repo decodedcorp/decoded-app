@@ -1,124 +1,65 @@
-import { headers } from 'next/headers';
-import type { DetailPageState, ImageData, DecodedItem } from '../types/image';
+import type { RandomImageResource, RandomItemResource } from '../client/images';
 import type { APIResponse } from '../types/request';
+import { cookies } from 'next/headers';
 
-const API_ENDPOINT = process.env.NEXT_PUBLIC_SERVICE_ENDPOINT;
+const SERVICE_ENDPOINT = process.env.NEXT_PUBLIC_SERVICE_ENDPOINT;
 
-if (!API_ENDPOINT) {
-  throw new Error('NEXT_PUBLIC_SERVICE_ENDPOINT is not defined');
-}
+export async function getRandomResources(): Promise<APIResponse<{
+  label: 'image' | 'item';
+  resources: (RandomImageResource | RandomItemResource)[];
+}>> {
+  if (!SERVICE_ENDPOINT) {
+    throw new Error('SERVICE_ENDPOINT is not defined');
+  }
 
-function transformImageData(rawImage: any): DetailPageState {
-  // API 응답을 DetailPageState 형식으로 변환
-  const itemList = Object.entries(rawImage.img?.items || {}).flatMap(([key, items]: [string, any]) => {
-    if (!Array.isArray(items)) return [];
-    
-    return items.map((item: any) => ({
-      imageDocId: rawImage.doc_id,
-      info: {
-        item: {
-          item: {
-            _id: item.item.item._id,
-            name: item.item.item.metadata?.name || '',
-            description: item.item.item.metadata?.description,
-            img_url: item.item.item.img_url,
-            price: item.item.item.price,
-            metadata: item.item.item.metadata,
-          },
-          brand_name: item.item.brand_name,
-          brand_logo_image_url: item.item.brand_logo_image_url,
-        },
-      },
-      pos: {
-        top: parseFloat(item.position?.top || '0'),
-        left: parseFloat(item.position?.left || '0'),
-      },
-    }));
-  });
-
-  return {
-    title: rawImage.title || null,
-    description: rawImage.description || null,
-    like: rawImage.like || 0,
-    style: rawImage.style || null,
-    img_url: rawImage.img_url,
-    source: rawImage.source || null,
-    upload_by: rawImage.upload_by || '',
-    doc_id: rawImage.doc_id,
-    decoded_percent: rawImage.decoded_percent || 0,
-    img: {
-      title: rawImage.img?.title,
-      description: rawImage.img?.description,
-      items: rawImage.img?.items || {},
-    },
-    itemList,
-  };
-}
-
-export async function getImageDetail(imageId: string): Promise<APIResponse<DetailPageState>> {
   try {
-    console.log('Fetching images list for:', { imageId });
+    // 쿠키에서 액세스 토큰 가져오기
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get('access_token')?.value;
 
-    // 1. 먼저 이미지 목록을 가져옵니다
-    const response = await fetch(`${API_ENDPOINT}/images`, {
+    const requestUrl = `${SERVICE_ENDPOINT}/random?limit=10`;
+
+    const response = await fetch(requestUrl, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
+        ...(accessToken && { 'Authorization': `Bearer ${accessToken}` }),
       },
-      cache: 'no-store'
+      next: { 
+        revalidate: 60 // 1분마다 재검증
+      }
     });
 
     if (!response.ok) {
-      const errorDetails = {
+      const responseText = await response.text();
+      console.error('Failed to fetch random resources:', {
         status: response.status,
         statusText: response.statusText,
         url: response.url,
-      };
-      console.error('API Error (images list):', JSON.stringify(errorDetails, null, 2));
-      throw new Error(`Failed to fetch images list: ${response.status} ${response.statusText}`);
+        responseBody: responseText
+      });
+      throw new Error(`Failed to fetch random resources: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
     
-    // 2. 응답에서 해당 이미지를 찾습니다
-    const rawImage = data.data?.images?.find((img: any) => img.doc_id === imageId);
-
-    if (!rawImage) {
-      console.error('Image not found in response:', {
-        imageId,
-        totalImages: data.data?.images?.length || 0
-      });
-      return {
-        status_code: 404,
-        description: 'Image not found',
-        data: null as unknown as DetailPageState
-      };
+    if (!data.data?.resources) {
+      console.error('Invalid API response structure:', data);
+      throw new Error('Invalid API response structure');
     }
 
-    // 3. 이미지 데이터를 DetailPageState 형식으로 변환
-    const transformedImage = transformImageData(rawImage);
-
-    return {
-      status_code: 200,
-      description: 'Success',
-      data: transformedImage
-    };
-
+    return data;
   } catch (error) {
-    console.error('Error fetching image detail:', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      imageId,
-      stack: error instanceof Error ? error.stack : undefined
-    });
-    
-    const errorMessage = error instanceof Error 
-      ? error.message 
-      : 'An unexpected error occurred while fetching image details';
-    
+    console.error('Error in getRandomResources:', error);
+    // 에러가 발생하면 빈 리소스 배열 반환
     return {
-      status_code: 500,
-      description: errorMessage,
-      data: null as unknown as DetailPageState
+      status: 500,
+      message: error instanceof Error ? error.message : 'Unknown error',
+      data: {
+        label: 'image',
+        resources: []
+      }
     };
   }
 } 

@@ -3,17 +3,20 @@ import { DiscoverSection } from './sections/discover';
 import { PremiumSpotSection } from './sections/premium-spot';
 import { TrendingSection } from './sections/trending';
 
-import { Hero } from './sections/hero';
+import { HeroSection } from './sections/hero';
+
+// 동적 렌더링 설정
+export const dynamic = 'force-dynamic';
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-[100vh] bg-black text-white">
-      <Hero />
-      <div className="space-y-24 py-16">
+      <HeroSection />
+      <div className="space-y-24 pt-16">
         <MetricsSection />
         <DiscoverSection />
         <PremiumSpotSection />
-        <TrendingSection />
+        {/* <TrendingSection /> */}
       </div>
     </div>
   );

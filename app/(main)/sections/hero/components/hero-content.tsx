@@ -5,11 +5,6 @@ import Link from 'next/link';
 export function HeroContent() {
   return (
     <div className="w-full flex flex-col items-center justify-center gap-6 px-4">
-      <div className="flex items-center justify-center space-x-4 font-mono text-xl text-primary">
-        <span>Decoding</span>
-        <span>&</span>
-        <span>Request</span>
-      </div>
       <h1 className="text-4xl md:text-5xl font-bold text-foreground whitespace-pre-line text-center max-w-3xl">
         {'찾고싶은 제품을\n지금 바로 요청해보세요'}
       </h1>

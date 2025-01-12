@@ -25,16 +25,19 @@ export function MainImage({
 
   return (
     <div className="relative">
-      <div
-        className={`relative ${
-          isItemDetail ? 'w-full h-full' : 'w-full max-w-screen-xl aspect-[3/4]'
-        }`}
-      >
+      <div className={`relative ${isItemDetail ? 'w-full h-full' : 'w-[569px]'} bg-gray-800/50`}>
         <Image
           src={imageUrl}
           alt={detailPageState.img?.title || ''}
-          fill
-          className={`${isItemDetail ? 'object-contain' : 'object-cover'}`}
+          width={569}
+          height={569}
+          style={{ 
+            width: '100%', 
+            height: 'auto', 
+            maxHeight: 'calc(100vh - 4rem)',
+            aspectRatio: '1'
+          }}
+          className={`${isItemDetail ? 'object-contain' : 'object-contain'} max-h-[calc(100vh-4rem)]`}
           sizes={isItemDetail ? '40vw' : '(max-width: 768px) 100vw, 50vw'}
           priority={!isItemDetail}
         />

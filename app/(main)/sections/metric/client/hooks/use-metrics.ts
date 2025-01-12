@@ -4,50 +4,24 @@ import { useEffect, useRef, useState } from 'react';
 import { networkManager } from '@/lib/network/network';
 
 interface Metrics {
-  hourly: {
-    provides_by_item: Record<string, any>;
-    requests_by_endpoint: {
-      items: number;
-      images: number;
-    };
-    timestamp: string;
-    total_provides: number;
-    total_requests: number;
+  total_requests: number;
+  total_provides: number;
+  requests_by_endpoint: {
+    items: number;
+    images: number;
   };
-  daily: {
-    provides_by_item: Record<string, any>;
-    requests_by_endpoint: {
-      items: number;
-      images: number;
-    };
-    timestamp: string;
-    total_provides: number;
-    total_requests: number;
-  };
+  timestamp: string;
 }
 
 export function useMetrics() {
   const [metrics, setMetrics] = useState<Metrics>({
-    hourly: {
-      provides_by_item: {},
-      requests_by_endpoint: {
-        items: 0,
-        images: 0,
-      },
-      timestamp: new Date().toISOString(),
-      total_provides: 0,
-      total_requests: 0,
+    total_requests: 0,
+    total_provides: 0,
+    requests_by_endpoint: {
+      items: 0,
+      images: 0,
     },
-    daily: {
-      provides_by_item: {},
-      requests_by_endpoint: {
-        items: 0,
-        images: 0,
-      },
-      timestamp: new Date().toISOString(),
-      total_provides: 0,
-      total_requests: 0,
-    },
+    timestamp: new Date().toISOString(),
   });
   const [isLoading, setIsLoading] = useState(true);
   const retryCount = useRef(0);
@@ -57,23 +31,16 @@ export function useMetrics() {
       setIsLoading(true);
       const response = await networkManager.request('metrics/decoded', 'GET');
 
-      if (response.data?.hourly && response.data?.daily) {
+      if (response.data?.all_time) {
         const hasChanged =
-          response.data.hourly.timestamp !== metrics.hourly.timestamp ||
-          response.data.daily.timestamp !== metrics.daily.timestamp ||
-          response.data.hourly.total_requests !==
-            metrics.hourly.total_requests ||
-          response.data.hourly.total_provides !==
-            metrics.hourly.total_provides ||
-          response.data.daily.total_requests !== metrics.daily.total_requests ||
-          response.data.daily.total_provides !== metrics.daily.total_provides ||
-          JSON.stringify(response.data.hourly.requests_by_endpoint) !==
-            JSON.stringify(metrics.hourly.requests_by_endpoint) ||
-          JSON.stringify(response.data.daily.requests_by_endpoint) !==
-            JSON.stringify(metrics.daily.requests_by_endpoint);
+          response.data.all_time.timestamp !== metrics.timestamp ||
+          response.data.all_time.total_requests !== metrics.total_requests ||
+          response.data.all_time.total_provides !== metrics.total_provides ||
+          JSON.stringify(response.data.all_time.requests_by_endpoint) !==
+            JSON.stringify(metrics.requests_by_endpoint);
 
         if (hasChanged) {
-          setMetrics(response.data);
+          setMetrics(response.data.all_time);
         }
       }
 

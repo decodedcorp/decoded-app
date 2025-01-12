@@ -1,27 +1,61 @@
 'use client';
 
 import { networkManager } from '@/lib/network/network';
-import type { 
-  ImageData, 
-  DetailPageState, 
-  ItemDocument 
-} from '../types/image';
+import type { ImageData, DetailPageState, ItemDocument } from '../types/image';
 import type { APIResponse } from '../types/request';
 
-export const imagesAPI = {
-  // Get images list
-  getImages: async (): Promise<APIResponse<{ images: ImageData[]; maybe_next_id: string | null }>> => {
-    try {
-      const response = await networkManager.request(
-        'images',
-        'GET'
-      );
-      return response;
-    } catch (error) {
-      throw error;
-    }
-  },
+export interface ItemMetadata {
+  name: string | null;
+  description: string | null;
+  brand: string | null;
+  designed_by: string | null;
+  material: string | null;
+  color: string | null;
+  item_class: string;
+  item_sub_class: string;
+  category: string;
+  sub_category: string;
+  product_type: string;
+}
 
+export interface LinkInfo {
+  url: string;
+  label: string | null;
+  date: string;
+  provider: string;
+  og_metadata: any | null;
+  link_metadata: any | null;
+}
+
+export interface RandomItemResource {
+  _id: string;
+  requester: string;
+  requested_at: string;
+  link_info: LinkInfo[] | null;
+  metadata: ItemMetadata;
+  img_url: string | null;
+  like: number;
+}
+
+export interface RandomImageResource extends ImageData {
+  _id: any;
+  requested_items: {
+    [key: string]: Array<{
+      item_doc_id: string;
+      position: {
+        top: string;
+        left: string;
+      };
+    }>;
+  };
+}
+
+export interface RandomResourcesResponse {
+  label: 'image' | 'item';
+  resources: RandomImageResource[] | RandomItemResource[];
+}
+
+export const imagesAPI = {
   // Get image items
   getImageItems: async (imageId: string): Promise<APIResponse<ItemDocument[]>> => {
     try {
@@ -67,5 +101,15 @@ export const imagesAPI = {
     } catch (error) {
       throw error;
     }
-  }
-}; 
+  },
+
+  // Get random resources (images or items)
+  getRandomResources: async (limit: number = 10): Promise<APIResponse<RandomResourcesResponse>> => {
+    try {
+      const response = await networkManager.request(`random?limit=${limit}`, 'GET');
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
+};

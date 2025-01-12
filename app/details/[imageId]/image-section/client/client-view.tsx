@@ -41,16 +41,27 @@ export function ClientImageView({
 
   useEffect(() => {
     const itemId = searchParams.get('itemId');
-    const showList = searchParams.get('showList') === 'true';
-
-    if (itemId && showList) {
+    
+    if (itemId) {
       const item = itemList.find((item) => item.info.item.item._id === itemId);
       if (item) {
         setSelectedItem(item);
         setIsDetailVisible(true);
       }
     }
-  }, [searchParams, itemList]);
+
+    // 브라우저 네비게이션 처리
+    const handlePopState = () => {
+      const itemId = new URL(window.location.href).searchParams.get('itemId');
+      if (!itemId) {
+        setSelectedItem(null);
+        setIsDetailVisible(false);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [itemList, searchParams]);
 
   const handleTouch = useCallback(() => {
     setIsTouch((prev) => !prev);
@@ -64,29 +75,29 @@ export function ClientImageView({
     setHoveredItem(index);
   }, []);
 
-  const handleItemClick = useCallback(
-    (item: HoverItem) => {
-      router.push(
-        `/details?imageId=${item.imageDocId}&itemId=${item.info.item.item._id}&showList=true`
-      );
-      setSelectedItem(item);
-      setIsDetailVisible(true);
-    },
-    [router]
-  );
-
-  const handleBack = useCallback(() => {
-    const currentImageId = searchParams.get('imageId');
-    if (currentImageId) {
-      router.push(`/details?imageId=${currentImageId}`);
-    }
-    setIsDetailVisible(false);
+  const handleItemClick = useCallback((item: HoverItem) => {
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set('itemId', item.info.item.item._id);
+    router.push(`?${newSearchParams.toString()}`);
+    setSelectedItem(item);
+    setIsDetailVisible(true);
   }, [router, searchParams]);
 
+  const handleBack = useCallback(() => {
+    const pathname = window.location.pathname;
+    const matches = pathname.match(/\/details\/([^/]+)/);
+    
+    if (matches) {
+      const [, imageId] = matches;
+      window.history.pushState({}, '', `/details/${imageId}`);
+    }
+    setIsDetailVisible(false);
+  }, []);
+
   return (
-    <section className="flex flex-row w-full h-full justify-center mx-auto gap-[30px]">
-      <div className="w-[569px] shrink-0">
-        <div className="relative" onClick={handleTouch}>
+    <section className="flex flex-row justify-center gap-[30px] bg-gray-900 p-4 rounded-lg border border-gray-800 shadow-[0_0_15px_rgba(0,0,0,0.5)] ring-1 ring-gray-800/30 max-h-[calc(100vh-2rem)]">
+      <div className="shrink-0 flex items-center">
+        <div className="relative w-full" onClick={handleTouch}>
           <MainImage imageUrl={imageUrl} detailPageState={detailPageState} />
           <div className="absolute inset-0 z-10">
             <ImagePopup
@@ -100,7 +111,7 @@ export function ClientImageView({
           </div>
         </div>
       </div>
-      <div className="w-[388px] h-full shrink-0">
+      <div className="w-[388px] shrink-0">
         <div className="relative h-full overflow-hidden">
           <div
             className={`absolute inset-0 flex flex-col transition-transform duration-300 ease-in-out ${
@@ -127,7 +138,7 @@ export function ClientImageView({
           </div>
 
           <div
-            className={`absolute inset-0 flex flex-col transition-transform duration-300 ease-in-out ${
+            className={`absolute inset-0 flex flex-col transition-transform duration-500 ease-in-out ${
               isDetailVisible ? 'translate-x-0' : 'translate-x-full'
             }`}
           >

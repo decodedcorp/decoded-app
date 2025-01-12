@@ -2,28 +2,16 @@ import { networkManager } from '@/lib/network/network';
 import type { 
   ImageData, 
   DetailPageState, 
-  ItemDocument 
+  ItemDocument
 } from '../types/image';
 import type { APIResponse } from '../types/request';
+import type { APIImageResponse } from '@/app/(main)/sections/discover/client/activity-feed/types/image';
 
 interface ImageDetailResponse {
   image: ImageData;
 }
 
 export const imagesAPI = {
-  // Get images list
-  getImages: async (): Promise<APIResponse<{ images: ImageData[]; maybe_next_id: string | null }>> => {
-    try {
-      const response = await networkManager.request(
-        'images',
-        'GET'
-      );
-      return response;
-    } catch (error) {
-      throw error;
-    }
-  },
-
   // Get single image detail
   getImageDetail: async (imageId: string): Promise<APIResponse<ImageDetailResponse>> => {
     try {
@@ -85,6 +73,19 @@ export const imagesAPI = {
     try {
       const response = await networkManager.request(
         'image/featured',
+        'GET'
+      );
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Get all images
+  getImages: async (): Promise<APIImageResponse> => {
+    try {
+      const response = await networkManager.request<APIImageResponse>(
+        'image',
         'GET'
       );
       return response;

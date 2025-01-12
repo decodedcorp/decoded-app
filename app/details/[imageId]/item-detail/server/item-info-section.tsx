@@ -24,7 +24,7 @@ export default function ItemInfoSection({
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <ImagePlaceholder className="w-12 h-12 text-gray-600" />
+            <ImagePlaceholder width={48} height={48} className="text-gray-600" />
           </div>
         )}
       </div>

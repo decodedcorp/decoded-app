@@ -1,3 +1,5 @@
+import { ImageData } from './image';
+
 export interface RequestedItem {
   position: {
     top: string;
@@ -14,7 +16,9 @@ export interface RequestImage {
 }
 
 export interface APIResponse<T> {
-  status_code: number;
-  description: string;
-  data: T;
+  status: number;
+  message?: string;
+  data: {
+    images?: ImageData[];
+  } & T;
 } 

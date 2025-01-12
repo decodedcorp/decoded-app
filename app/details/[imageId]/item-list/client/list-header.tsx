@@ -39,6 +39,12 @@ export function ListHeader({
 
   return (
     <div className="flex flex-col mb-6">
+      <div className="mb-6">
+        <span className={`text-3xl font-bold`}>
+          {/* 제목 : 데이터 변경 */}
+          Balenciaga for Men | Designer Fashion
+        </span>
+      </div>
       <div className="flex items-center h-[40px] border-b border-white/10">
         {categories.map((category) => (
           <button

@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 :root {
   --main-background-color: #070707;
   --text-color: #ffffff;
@@ -112,4 +127,29 @@ footer {
 
 .animate-slide-up {
   animation: slide-up 2s ease-in-out;
+}
+
+.blur-background {
+  backdrop-filter: blur(150px);
+  -webkit-backdrop-filter: blur(70px);
+}
+
+.glass-background {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+@keyframes floating {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(var(--float-offset, 8px));
+  }
+}
+
+.floating {
+  animation: floating var(--float-duration, 4s) ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
 }

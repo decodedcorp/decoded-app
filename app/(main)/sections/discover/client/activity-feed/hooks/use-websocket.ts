@@ -1,168 +1,159 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Activity, WebSocketMessage } from '../types';
+import { networkManager } from '@/lib/network/network';
 
-const WS_URL = process.env.NEXT_PUBLIC_WS_URL + '/subscribe/decoded/events';
-const RECONNECT_DELAY = 3000;
+export interface WebSocketMessage {
+  type: 'request';
+  data: {
+    image_url: string;
+    image_doc_id: string;
+    item_len: number;
+  };
+  timestamp?: string;
+}
 
-export function useWebSocket(onNewActivity: (activity: Activity) => void) {
+interface UseWebSocketOptions {
+  onMessage: (message: WebSocketMessage) => void;
+}
+
+export function useWebSocket({ onMessage }: UseWebSocketOptions) {
   const [isConnected, setIsConnected] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<
+    'connecting' | 'connected' | 'disconnected'
+  >('disconnected');
 
-  const handleMessage = useCallback((event: MessageEvent) => {
-    try {      
-      const parsedData = JSON.parse(event.data) as WebSocketMessage;
-      console.log('Received WebSocket message:', parsedData);
+  const connect = useCallback(async () => {
+    setConnectionStatus('connecting');
+    const wsUrl = process.env.NEXT_PUBLIC_WS_URL;
+    const tokenId = localStorage.getItem('token_id');
+    const token = localStorage.getItem('token');
+    let tempToken = localStorage.getItem('temp_token');
 
-      // Ignore system messages
-      if (
-        parsedData.type === 'ping' ||
-        parsedData.type === 'pong' ||
-        parsedData.action === 'built' ||
-        parsedData.action === 'sync' ||
-        parsedData.action === 'reload'
-      ) {
-        console.log('Ignoring system message:', parsedData.type || parsedData.action);
-        return;
-      }
-
-      // Handle new image request
-      if (parsedData.event === 'request' && parsedData.data) {
-        console.log('Processing image request:', parsedData.data);
-        
-        if (!parsedData.data.img_url || !parsedData.data.doc_id) {
-          console.warn('Missing required fields in image request:', parsedData.data);
-          return;
-        }
-
-        const newActivity: Activity = {
-          id: `${parsedData.data.doc_id}_${Date.now()}`,
-          type: 'request_image',
-          data: {
-            image_url: parsedData.data.img_url,
-            image_doc_id: parsedData.data.doc_id,
-            item_len: parsedData.data.items 
-              ? Object.values(parsedData.data.items).reduce(
-                  (sum: number, items: any) => 
-                    sum + (Array.isArray(items) ? items.length : 0),
-                  0
-                )
-              : 0,
-          },
-          timestamp: parsedData.timestamp || new Date().toISOString(),
-        };
-
-        console.log('Created new activity:', newActivity);
-        onNewActivity(newActivity);
-      } else {
-        console.log('Unhandled message type:', parsedData.event);
-      }
-    } catch (error) {
-      console.error('Error processing message:', error);
+    if (!wsUrl) {
+      console.error('WebSocket URL is not configured');
+      return () => {};
     }
-  }, [onNewActivity]);
 
-  useEffect(() => {
-    let ws: WebSocket | null = null;
-    let reconnectTimer: NodeJS.Timeout;
-    let isUnmounted = false;
-
-    function connect() {
+    // 항상 새로운 임시 토큰을 요청
+    if (!tokenId) {
       try {
-        ws = new WebSocket(WS_URL);
-
-        // Add test function to window object for browser console testing
-        (window as any).testWebSocket = function(imageUrl = "https://example.com/test.jpg") {
-          if (!ws || ws.readyState !== WebSocket.OPEN) {
-            console.error("WebSocket is not connected!");
-            return;
-          }
-
-          const testMessage = {
-            event: "request",
-            data: {
-              doc_id: `test_${Date.now()}`,
-              img_url: imageUrl,
-              items: {
-                category1: ["item1", "item2"],
-                category2: ["item3"]
-              }
-            },
-            timestamp: new Date().toISOString()
-          };
-
-          console.log("Sending test message:", testMessage);
-          ws.send(JSON.stringify(testMessage));
-        };
-
-        ws.onopen = () => {
-          setIsConnected(true);
-          console.log("WebSocket connected! You can now use window.testWebSocket() to send test messages");
-        };
-
-        ws.onmessage = (event) => {
-          console.log('=== WebSocket Message Received ===');
-          console.log('Raw message:', event.data);
-          try {
-            const parsed = JSON.parse(event.data);
-            console.log('Parsed message:', {
-              event: parsed.event,
-              data: parsed.data,
-              timestamp: parsed.timestamp,
-              type: parsed.type,
-              action: parsed.action
-            });
-            if (parsed.event === 'request') {
-              console.log('Request event details:', {
-                doc_id: parsed.data?.doc_id,
-                img_url: parsed.data?.img_url,
-                items: parsed.data?.items
-              });
-            }
-          } catch (e) {
-            console.error('Parse error:', e);
-          }
-          handleMessage(event);
-        };
-
-        ws.onclose = () => {
-          setIsConnected(false);
-          if (!isUnmounted) {
-            reconnectTimer = setTimeout(connect, RECONNECT_DELAY);
-          }
-        };
-
-        ws.onerror = (error) => {
-          console.error('WebSocket error:', error);
-          setIsConnected(false);
-        };
-
+        console.log('[WebSocket] Requesting new temporary token');
+        // 기존 임시 토큰 제거
+        localStorage.removeItem('temp_token');
+        tempToken = await networkManager.getTempToken();
+        localStorage.setItem('temp_token', tempToken);
       } catch (error) {
-        console.error('Connection establishment failed:', error);
-        if (!isUnmounted) {
-          reconnectTimer = setTimeout(connect, RECONNECT_DELAY);
-        }
+        console.error('[WebSocket] Failed to get temporary token:', error);
+        setIsConnected(false);
+        return () => {};
       }
     }
 
-    connect();
+    // HTTP/HTTPS를 WS/WSS로 변환
+    const wsEndpoint = wsUrl
+      .replace('http://', 'ws://')
+      .replace('https://', 'wss://');
 
-    return () => {
-      isUnmounted = true;
-      clearTimeout(reconnectTimer);
-      
-      if (ws) {
-        ws.onopen = null;
-        ws.onmessage = null;
-        ws.onclose = null;
-        ws.onerror = null;
-        
+    try {
+      const wsUrl = `${wsEndpoint}/subscribe/decoded/events?token=${encodeURIComponent(
+        tempToken!
+      )}`;
+
+      console.log('[WebSocket] Attempting connection with token');
+
+      const ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        console.log('[WebSocket] Connected successfully');
+        setIsConnected(true);
+        setConnectionStatus('connected');
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data) as WebSocketMessage;
+          onMessage(message);
+        } catch (error) {
+          console.error('[WebSocket] Message parsing error:', error);
+        }
+      };
+
+      ws.onclose = (event) => {
+        console.log('[WebSocket] Connection closed:', {
+          code: event.code,
+          reason: event.reason,
+          wasClean: event.wasClean,
+          timestamp: new Date().toISOString(),
+        });
+
+        setIsConnected(false);
+        setConnectionStatus('disconnected');
+
+        // Handle specific close codes
+        switch (event.code) {
+          case 1000:
+            console.log('[WebSocket] Normal closure');
+            break;
+          case 1006:
+            console.log(
+              '[WebSocket] Abnormal closure - will attempt reconnect with new token'
+            );
+            // 임시 토큰 제거 후 재연결 시도
+            localStorage.removeItem('temp_token');
+            setTimeout(() => connect(), 3000);
+            break;
+          case 4001:
+            console.error(
+              '[WebSocket] Authentication failed - will attempt with new token'
+            );
+            localStorage.removeItem('temp_token');
+            setTimeout(() => connect(), 3000);
+            break;
+          default:
+            console.log('[WebSocket] Unexpected close code:', event.code);
+            setTimeout(() => connect(), 3000);
+        }
+      };
+
+      ws.onerror = (error) => {
+        console.error('[WebSocket] Error occurred:', {
+          error,
+          readyState: ws.readyState,
+          timestamp: new Date().toISOString(),
+        });
+        setIsConnected(false);
+        setConnectionStatus('disconnected');
+      };
+
+      return () => {
         if (ws.readyState === WebSocket.OPEN) {
           ws.close(1000, 'Component unmounted');
         }
+      };
+    } catch (error) {
+      console.error('Failed to create WebSocket connection:', error);
+      return () => {};
+    }
+  }, [onMessage]);
+
+  useEffect(() => {
+    let cleanup: (() => void) | undefined;
+
+    // IIFE to handle async connect
+    (async () => {
+      cleanup = await connect();
+    })();
+
+    return () => {
+      if (cleanup) {
+        cleanup();
       }
     };
-  }, [handleMessage]);
+  }, [connect]);
 
-  return { isConnected };
-} 
+  return {
+    isConnected,
+    connectionStatus,
+  };
+}

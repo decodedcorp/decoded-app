@@ -47,13 +47,13 @@ export default function DetailPageContent({
   }
 
   return (
-    <div className="flex flex-col items-center my-32 w-full">
+    <div className="flex flex-col items-center my-5 w-full">
       <Header
         title={initialData.img.title || undefined}
         description={initialData.img.description || undefined}
       />
       <div className="flex justify-center w-full">
-        <div className="flex w-full max-w-[1280px] justify-center">
+        <div className="flex justify-center">
           <ImageSection
             detailPageState={initialData}
             imageUrl={initialData.img.imageUrl}

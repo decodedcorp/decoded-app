@@ -1,11 +1,34 @@
 import { ImageMetadata } from '@/lib/api/types/image';
 
-export type BoxPosition = {
-  LEFT_TOP?: { top: number; left: number };
-  LEFT_BOTTOM?: { top: number; left: number };
-  RIGHT_TOP?: { top: number; right: number };
-  RIGHT_BOTTOM?: { top: number; right: number };
-};
+export type BoxSizeMode = 'LARGE' | 'SMALL';
+
+export interface BoxPosition {
+  LEFT_BOTTOM?: {
+    top: number;
+    left: number;
+  };
+  RIGHT_TOP?: {
+    top: number;
+    right: number;
+  };
+  RIGHT_BOTTOM?: {
+    top: number;
+    right: number;
+  };
+}
+
+export interface BoxNumberPosition {
+  BOX_1?: boolean;
+  BOX_2?: boolean;
+  BOX_3?: boolean;
+  BOX_4?: boolean;
+  BOX_5?: boolean;
+  BOX_6?: boolean;
+  BOX_7?: boolean;
+  BOX_8?: boolean;
+  BOX_9?: boolean;
+  BOX_10?: boolean;
+}
 
 export interface ImageInfo {
   doc_id: string;

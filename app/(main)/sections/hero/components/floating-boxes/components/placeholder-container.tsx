@@ -1,5 +1,6 @@
 import { BoxPosition } from '../../../utils/types';
 import { FloatingBox } from '../floating-box';
+import type { RandomImageResource } from '@/lib/api/client/images';
 
 interface PlaceholderContainerProps {
   positions: BoxPosition;
@@ -11,6 +12,20 @@ interface PlaceholderContainerProps {
     isLarge?: boolean
   ) => void;
 }
+
+const PLACEHOLDER_RESOURCE: RandomImageResource = {
+  _id: 'placeholder',
+  title: 'Placeholder',
+  img_url: '',
+  description: null,
+  like: 0,
+  style: null,
+  source: null,
+  upload_by: 'system',
+  doc_id: 'placeholder',
+  decoded_percent: 0,
+  requested_items: {},
+};
 
 export function PlaceholderContainer({
   positions,
@@ -29,6 +44,10 @@ export function PlaceholderContainer({
           }}
         >
           <FloatingBox
+            resource={PLACEHOLDER_RESOURCE}
+            initialDelay={0}
+            depthLevel={2}
+            position={{ x: 0, y: 0 }}
             onHover={(isHovered, event) =>
               onBoxHover?.(isHovered, event, false)
             }
@@ -44,7 +63,10 @@ export function PlaceholderContainer({
           }}
         >
           <FloatingBox
-            isLarge={rightBoxCount === 1 && leftBoxCount === 2}
+            resource={PLACEHOLDER_RESOURCE}
+            initialDelay={0}
+            depthLevel={rightBoxCount === 1 && leftBoxCount === 2 ? 1 : 2}
+            position={{ x: 0, y: 0 }}
             onHover={(isHovered, event) =>
               onBoxHover?.(
                 isHovered,
@@ -64,6 +86,10 @@ export function PlaceholderContainer({
           }}
         >
           <FloatingBox
+            resource={PLACEHOLDER_RESOURCE}
+            initialDelay={0}
+            depthLevel={2}
+            position={{ x: 0, y: 0 }}
             onHover={(isHovered, event) =>
               onBoxHover?.(isHovered, event, false)
             }

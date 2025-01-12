@@ -10,7 +10,7 @@ export interface Activity {
 }
 
 export interface WebSocketMessage {
-  event: string;
+  event?: string;
   data?: {
     doc_id?: string;
     img_url?: string;
@@ -23,4 +23,6 @@ export interface WebSocketMessage {
   type?: string;
   action?: string;
   channel?: string;
+  status?: 'success' | 'error';
+  message?: string;
 } 

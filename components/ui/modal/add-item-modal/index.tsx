@@ -40,24 +40,6 @@ export function AddItemModal({
     };
   }, [isOpen]);
 
-  useEffect(() => {
-    const fetchCelebs = async () => {
-      try {
-        const res = await networkManager.request('identities', 'GET', null);
-        const identities = res.data.identities.map((celeb: any) => ({
-          name: celeb.name,
-          category: celeb.category,
-          id: celeb._id,
-          profileImageUrl: celeb.profile_image_url,
-        }));
-      } catch (error) {
-        console.error('Failed to fetch identities:', error);
-      }
-    };
-
-    fetchCelebs();
-  }, []);
-
   const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;

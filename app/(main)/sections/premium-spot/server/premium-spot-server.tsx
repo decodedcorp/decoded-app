@@ -1,14 +1,30 @@
-import { cn } from "@/lib/utils/style";
-import { ArrowUpRight } from "lucide-react";
-import { PremiumSpotClient } from "../client/premium-spot-client";
+'use client';
+
+import { cn } from '@/lib/utils/style';
+import { PremiumSpotClient } from '../client/premium-spot-client';
+import { Period, PeriodSelector } from '../components/period-selector';
+import { useState, useEffect } from 'react';
+import { useAvailablePeriods } from '../client/hooks/use-available-periods';
 
 export function PremiumSpotServer() {
+  const [period, setPeriod] = useState<Period>('weekly');
+  const { availablePeriods, isLoading } = useAvailablePeriods();
+
+  useEffect(() => {
+    if (!isLoading && availablePeriods.length > 0) {
+      // If daily is available, use it, otherwise keep weekly as default
+      if (availablePeriods.includes('daily')) {
+        setPeriod('daily');
+      }
+    }
+  }, [isLoading, availablePeriods]);
+
   return (
     <section className="container mx-auto px-4">
       <div
         className={cn(
-          "relative rounded-3xl overflow-hidden",
-          "border border-zinc-800/50"
+          'relative rounded-3xl overflow-hidden',
+          'border border-zinc-800/50'
         )}
       >
         <div className="relative z-10 p-8 md:p-12 space-y-12">
@@ -16,9 +32,9 @@ export function PremiumSpotServer() {
           <div className="max-w-2xl space-y-4">
             <h2
               className={cn(
-                "text-3xl md:text-4xl font-bold",
-                "bg-gradient-to-r from-[#EAFD66] to-[#EAFD66]/70",
-                "bg-clip-text text-transparent"
+                'text-3xl md:text-4xl font-bold',
+                'bg-gradient-to-r from-[#EAFD66] to-[#EAFD66]/70',
+                'bg-clip-text text-transparent'
               )}
             >
               인기 아이템의
@@ -30,33 +46,17 @@ export function PremiumSpotServer() {
               <br />더 높은 노출 기회를 얻으세요
             </p>
           </div>
+          {/* Period Selector */}
+          {!isLoading && (
+            <PeriodSelector
+              period={period}
+              onPeriodChange={setPeriod}
+              availablePeriods={availablePeriods}
+            />
+          )}
 
           {/* 인기 아이템 그리드 */}
-          <PremiumSpotClient />
-
-          {/* CTA 버튼 */}
-          <div className="flex flex-wrap gap-4">
-            <button
-              className={cn(
-                "group flex items-center gap-2",
-                "bg-[#EAFD66] text-black",
-                "px-6 py-3 rounded-xl",
-                "font-semibold tracking-wide",
-                "hover:bg-[#EAFD66]/90",
-                "transition-all duration-200",
-                "shadow-lg shadow-[#EAFD66]/20"
-              )}
-            >
-              <span>인기 아이템 더보기</span>
-              <ArrowUpRight
-                className={cn(
-                  "w-4 h-4",
-                  "transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5",
-                  "transition-transform duration-200"
-                )}
-              />
-            </button>
-          </div>
+          <PremiumSpotClient period={period} onPeriodChange={setPeriod} />
         </div>
 
         {/* 배경 효과 */}
@@ -64,4 +64,4 @@ export function PremiumSpotServer() {
       </div>
     </section>
   );
-} 
+}
