@@ -31,7 +31,9 @@ export function ItemImage({
       <div className={containerClasses}>
         <div className="w-full h-full flex items-center justify-center">
           <ImagePlaceholder
-            className={cn("w-12 h-12 text-gray-600", placeholderClassName)}
+            width={12}
+            height={12}
+            className={cn("text-gray-600", placeholderClassName)}
           />
         </div>
       </div>

@@ -2,7 +2,7 @@
 
 import React, { useRef } from "react";
 import Image from "next/image";
-import { Point, useImageMarker } from "@/lib/hooks/useImageMarker";
+import { Point, useImageMarker } from "@/lib/hooks/features/images/useImageMarker";
 
 interface ImageMarkerProps {
   imageUrl: string;

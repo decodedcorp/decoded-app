@@ -18,7 +18,7 @@ export const requestAPI = {
 
   // Get image request list
   getImageRequests: async (): Promise<APIResponse<RequestImage[]>> => {
-    try {
+    try { 
       const response = await networkManager.request(
         'image/requests',
         'GET'

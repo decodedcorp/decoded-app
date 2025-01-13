@@ -1,9 +1,9 @@
 // app/(main)/components/ui/modals/request-modal/index.tsx
-"use client";
+'use client';
 
-import { useState } from "react";
-import Image from "next/image";
-import { pretendardBold } from "@/lib/constants/fonts";
+import { useState } from 'react';
+import Image from 'next/image';
+import { pretendardBold } from '@/lib/constants/fonts';
 
 export function RequestModal() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -25,7 +25,9 @@ export function RequestModal() {
           hasImage={!!selectedImage}
           onClose={() => {
             setSelectedImage(null);
-            (document.getElementById("my_modal_1") as HTMLDialogElement)?.close();
+            (
+              document.getElementById('my_modal_1') as HTMLDialogElement
+            )?.close();
           }}
         />
       </div>
@@ -48,7 +50,10 @@ interface ImageUploadSectionProps {
   onImageChange: (file: File | null) => void;
 }
 
-function ImageUploadSection({ selectedImage, onImageChange }: ImageUploadSectionProps) {
+function ImageUploadSection({
+  selectedImage,
+  onImageChange,
+}: ImageUploadSectionProps) {
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       onImageChange(event.target.files[0]);
@@ -76,7 +81,7 @@ function ImageUploadSection({ selectedImage, onImageChange }: ImageUploadSection
           <Image
             src={URL.createObjectURL(selectedImage)}
             fill={true}
-            style={{ objectFit: "contain" }}
+            style={{ objectFit: 'contain' }}
             alt="업로드된 이미지"
             className="max-w-full max-h-full object-contain"
           />
@@ -117,13 +122,8 @@ interface ActionButtonsProps {
 function ActionButtons({ hasImage, onClose }: ActionButtonsProps) {
   return (
     <div className="flex flex-1 mt-4 justify-center items-center">
-      {hasImage && (
-        <button className="btn w-full ml-4">업로드</button>
-      )}
-      <button
-        className="btn w-full ml-4"
-        onClick={onClose}
-      >
+      {hasImage && <button className="btn w-full ml-4">업로드</button>}
+      <button className="btn w-full ml-4" onClick={onClose}>
         취소
       </button>
     </div>

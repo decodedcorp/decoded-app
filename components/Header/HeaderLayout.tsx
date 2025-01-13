@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
-import useModalClose from '@/lib/hooks/useModalClose';
+import useModalClose from '@/lib/hooks/common/useModalClose';
 import Header from './Header';
 import { SearchModal, LoginModal } from '@/components/ui/modal';
 

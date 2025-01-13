@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useRef } from "react";
-import { Point, RequestedItem } from "@/types/model.d";
-import { networkManager } from "@/lib/network/network";
-import { AddItemModalProps } from "./types";
-import { ImageArea } from "./components/image-area";
-import { MarkersArea } from "./components/markers-area";
-import { RequestButton } from "./components/request-button";
-import { ScrollIndicator } from "./components/scroll-indicator";
-import useModalClose from "@/lib/hooks/useModalClose";
+import { useState, useEffect, useRef } from 'react';
+import { Point, RequestedItem } from '@/types/model.d';
+import { networkManager } from '@/lib/network/network';
+import { AddItemModalProps } from './types';
+import { ImageArea } from './components/image-area';
+import { MarkersArea } from './components/markers-area';
+import { RequestButton } from './components/request-button';
+import { ScrollIndicator } from './components/scroll-indicator';
+import useModalClose from '@/lib/hooks/common/useModalClose';
 
 export function AddItemModal({
   isOpen,
@@ -33,30 +33,12 @@ export function AddItemModal({
 
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = "hidden";
+      document.body.style.overflow = 'hidden';
     }
     return () => {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = 'unset';
     };
   }, [isOpen]);
-
-  useEffect(() => {
-    const fetchCelebs = async () => {
-      try {
-        const res = await networkManager.request("identities", "GET", null);
-        const identities = res.data.identities.map((celeb: any) => ({
-          name: celeb.name,
-          category: celeb.category,
-          id: celeb._id,
-          profileImageUrl: celeb.profile_image_url,
-        }));
-      } catch (error) {
-        console.error("Failed to fetch identities:", error);
-      }
-    };
-
-    fetchCelebs();
-  }, []);
 
   const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -67,8 +49,8 @@ export function AddItemModal({
   };
 
   const handleAdd = async (points: Point[]) => {
-    if (sessionStorage.getItem("USER_DOC_ID") === null) {
-      alert("로그인이 필요합니다");
+    if (sessionStorage.getItem('USER_DOC_ID') === null) {
+      alert('로그인이 필요합니다');
       return;
     }
 
@@ -82,21 +64,21 @@ export function AddItemModal({
     }));
 
     const requestAddItem = {
-      requestBy: sessionStorage.getItem("USER_DOC_ID"),
+      requestBy: sessionStorage.getItem('USER_DOC_ID'),
       items,
     };
 
     try {
       await networkManager.request(
         `request/image/${imageId}/add/item`,
-        "POST",
+        'POST',
         requestAddItem
       );
-      alert("요청이 완료되었습니다.");
+      alert('요청이 완료되었습니다.');
       setNewMarkers([]);
       handleClose();
     } catch (error: any) {
-      alert(error.response?.data?.description || "요청중 오류가 발생했습니다.");
+      alert(error.response?.data?.description || '요청중 오류가 발생했습니다.');
     }
   };
 
@@ -106,7 +88,7 @@ export function AddItemModal({
     <div
       onClick={handleOverlayClick}
       className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50
-        ${isClosing ? "animate-fade-out" : "animate-fade-in"}`}
+        ${isClosing ? 'animate-fade-out' : 'animate-fade-in'}`}
     >
       <div
         ref={modalRef}

@@ -3,7 +3,7 @@
 import { LoginModal } from './modal/LoginModal';
 import { Button } from '@/components/ui/button';
 import { useRef, useState, useEffect } from 'react';
-import { useAuth } from '@/lib/hooks/useAuth';
+import { useAuth } from '@/lib/hooks/features/auth/useAuth';
 
 export function LoginButton() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -27,13 +27,8 @@ export function LoginButton() {
 
   return (
     <div ref={loginButtonRef} className="relative flex items-center gap-3">
-      {isLogin && (
-        <Button variant="default" onClick={() => setIsLoginModalOpen(true)}>
-          MY PAGE
-        </Button>
-      )}
       <Button
-        variant={isLogin ? "ghost" : "default"}
+        variant={isLogin ? 'default' : 'default'}
         onClick={() => setIsLoginModalOpen(true)}
       >
         {isLogin ? 'MY ACCOUNT' : 'LOGIN'}

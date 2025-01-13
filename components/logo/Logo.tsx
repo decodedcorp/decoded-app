@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { cn } from "@/lib/utils/style";
+import { cn } from "@/lib/utils/style/index";
 
 function Logo({ isScrolled }: { isScrolled: boolean }) {
   return (

@@ -8,7 +8,7 @@ function Footer() {
   const [isType, setIsType] = useState<boolean>(false);
 
   return (
-    <footer className="footer p-10 mt-10 border-t-2 border-gray-500/50">
+    <footer className="footer p-10 border-t-2 border-gray-500/50">
       <div className="flex flex-col lg:flex-row w-full">
         <div
           className={`flex flex-col ${pretendardRegular.className} mt-10 lg:mt-0 lg:mx-32`}

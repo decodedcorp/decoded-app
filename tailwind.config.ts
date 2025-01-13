@@ -47,7 +47,7 @@ const config: Config = {
         },
         float: {
           "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-5px)" },
+          "50%": { transform: "translateY(-4px)" },
         },
         rotate: {
           "0%": { transform: "rotate(0deg)" },
@@ -59,7 +59,7 @@ const config: Config = {
         'fadeIn': 'fadeIn 0.5s ease-out',
         'slide-up': 'slideUp 500ms ease-out',
         'slide-down': 'slideDown 500ms ease-out',
-        'float': 'float 5s ease-in-out infinite',
+        'float': 'float 1s cubic-bezier(0.37, 0, 0.63, 1) infinite',
         'rotate': 'rotate 10s linear infinite',
       },
       // Spacing & Layout
@@ -144,6 +144,7 @@ const config: Config = {
 
         // Overlay Layers (10-19)
         overlay: "10",
+        heroContent: "15",
         modalOverlay: "11",
 
         // Content Layers (20-29)
@@ -160,11 +161,21 @@ const config: Config = {
       gridTemplateColumns: {
         custom: 'repeat(10, minmax(0, 1fr))', // 10열 그리드
       },
+      perspective: {
+        '1000': '1000px',
+      },
+      rotate: {
+        'y-3': 'rotateY(3deg)',
+        'y-5': 'rotateY(5deg)',
+        'x-3': 'rotateX(3deg)',
+        'x-5': 'rotateX(5deg)',
+      },
     },
   },
   plugins: [
     require("tailwindcss-animate"),
     require("@tailwindcss/aspect-ratio"),
+    require('tailwindcss-filters'),
     require("daisyui"),
     function ({ addUtilities }: { addUtilities: any }) {
       const newUtilities = {
