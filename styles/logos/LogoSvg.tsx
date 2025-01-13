@@ -2,7 +2,7 @@ interface LogoSvgProps {
   fontSize?: number;
 }
 
-export default function LogoSvg({ fontSize = 42 }: LogoSvgProps) {
+export default function LogoSvg({ fontSize = 32 }: LogoSvgProps) {
   const textWidth = fontSize * 6;
   const textHeight = fontSize * 1.2;
 

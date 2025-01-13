@@ -1,6 +1,5 @@
 import Link from 'next/link';
-import { cn } from '@/lib/utils/style/index';
-import LogoSvg from '@/public/brandings/logos/LogoSvg';
+import LogoSvg from '@/styles/logos/LogoSvg';
 
 function Logo() {
   return (
