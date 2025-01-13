@@ -1,7 +1,9 @@
-"use client";
+'use client';
 
-import { MetricItem } from "./metric-item";
-import { useMetrics } from "./hooks/use-metrics";
+import { MetricItem } from './metric-item';
+import { useMetrics } from './hooks/use-metrics';
+import { pretendardExtraBold } from '@/lib/constants/fonts';
+import { cn } from '@/lib/utils/style';
 
 export function MetricsClient() {
   const { metrics, isLoading } = useMetrics();
@@ -21,7 +23,12 @@ export function MetricsClient() {
               <span className="text-sm tracking-wider">REAL-TIME</span>
             </div>
 
-            <h1 className="text-5xl lg:text-7xl font-serif text-gray-400 leading-tight tracking-wide">
+            <h1
+              className={cn(
+                pretendardExtraBold.className,
+                'text-5xl lg:text-7xl text-gray-400 leading-tight tracking-wide'
+              )}
+            >
               Metrics
             </h1>
           </div>

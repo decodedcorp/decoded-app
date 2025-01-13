@@ -136,6 +136,9 @@ export function useActivityFeed(): ActivityFeedReturn {
           .slice(-VISIBLE_ACTIVITIES_LIMIT) // 마지막 LIMIT개 가져오기
           .map(transformImageItemToActivity);
 
+        console.log(initialActivities);
+        console.log(images);
+        
         setState((prev) => ({
           ...prev,
           activities: initialActivities,
