@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { Activity } from '../types';
+import { Activity } from '../utils/types';
 
 interface UseActivityAnimationProps {
   activities: Activity[];

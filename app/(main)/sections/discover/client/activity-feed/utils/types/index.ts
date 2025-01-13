@@ -1,12 +1,12 @@
 export interface Activity {
   id: string;
-  type: 'request_image';
+  type: 'confirm_request_image';
   data: {
     image_url: string;
     image_doc_id: string;
     item_len: number;
+    at: string;
   };
-  timestamp: string;
 }
 
 export interface WebSocketMessage {

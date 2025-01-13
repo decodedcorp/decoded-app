@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useEffect, useRef } from 'react';
-import { useInView, useMotionValue, useSpring } from 'framer-motion';
+import { useEffect, useRef } from "react";
+import { useInView, useMotionValue, useSpring } from "framer-motion";
 
 interface CounterProps {
   from?: number;
@@ -26,7 +26,7 @@ export function Counter({ from = 0, to, className }: CounterProps) {
   }, [isInView, to, count]);
 
   useEffect(() => {
-    return rounded.on('change', (latest) => {
+    return rounded.on("change", (latest) => {
       if (ref.current) {
         ref.current.textContent = Math.round(latest).toString();
       }

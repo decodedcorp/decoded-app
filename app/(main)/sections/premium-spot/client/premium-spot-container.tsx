@@ -2,22 +2,24 @@
 
 import { cn } from '@/lib/utils/style';
 import { PremiumSpotClient } from '../client/premium-spot-client';
-import { Period, PeriodSelector } from '../components/period-selector';
+import { PeriodSelector } from '../components/period-selector';
+import { Period } from '../types';
 import { useState, useEffect } from 'react';
 import { useAvailablePeriods } from '../client/hooks/use-available-periods';
 
-export function PremiumSpotServer() {
-  const [period, setPeriod] = useState<Period>('weekly');
+export function PremiumSpotContainer() {
+  const [period, setPeriod] = useState<Period | null>(null);
   const { availablePeriods, isLoading } = useAvailablePeriods();
 
   useEffect(() => {
-    if (!isLoading && availablePeriods.length > 0) {
-      // If daily is available, use it, otherwise keep weekly as default
-      if (availablePeriods.includes('daily')) {
-        setPeriod('daily');
-      }
+    if (!isLoading && availablePeriods.length > 0 && !period) {
+      setPeriod(availablePeriods[0]);
     }
-  }, [isLoading, availablePeriods]);
+  }, [isLoading, availablePeriods, period]);
+
+  const handlePeriodChange = (newPeriod: Period) => {
+    setPeriod(newPeriod);
+  };
 
   return (
     <section className="container mx-auto px-4">
@@ -28,7 +30,6 @@ export function PremiumSpotServer() {
         )}
       >
         <div className="relative z-10 p-8 md:p-12 space-y-12">
-          {/* 헤더 */}
           <div className="max-w-2xl space-y-4">
             <h2
               className={cn(
@@ -46,20 +47,18 @@ export function PremiumSpotServer() {
               <br />더 높은 노출 기회를 얻으세요
             </p>
           </div>
-          {/* Period Selector */}
-          {!isLoading && (
+
+          {!isLoading && availablePeriods.length > 0 && (
             <PeriodSelector
-              period={period}
-              onPeriodChange={setPeriod}
+              period={period || availablePeriods[0]}
+              onPeriodChange={handlePeriodChange}
               availablePeriods={availablePeriods}
             />
           )}
 
-          {/* 인기 아이템 그리드 */}
-          <PremiumSpotClient period={period} onPeriodChange={setPeriod} />
+          {period && <PremiumSpotClient key={period} period={period} />}
         </div>
 
-        {/* 배경 효과 */}
         <div className="absolute inset-0 bg-grid-pattern opacity-5" />
       </div>
     </section>

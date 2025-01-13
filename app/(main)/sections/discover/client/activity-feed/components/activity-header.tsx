@@ -5,6 +5,7 @@ import { Search } from 'lucide-react';
 
 interface ActivityHeaderProps {
   isLoading: boolean;
+  isConnected: boolean;
   activityCount: number;
 }
 

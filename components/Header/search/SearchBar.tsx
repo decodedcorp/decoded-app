@@ -40,7 +40,7 @@ export function SearchBar({ onSearch }: { onSearch: (query: string) => void }) {
           onBlur={handleBlur}
         />
       </div>
-      <SearchModal isOpen={isModalOpen} />
+      {/* <SearchModal isOpen={isModalOpen} /> */}
     </div>
   );
 }

@@ -66,6 +66,7 @@ export interface ImageItem {
   image_doc_id: string;
   image_url: string;
   items: number;
+  at: string;
 }
 
 export interface ImagesResponse {

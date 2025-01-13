@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils/style';
 import { DiscoverTitle } from './discover-title';
 import { FeatureList } from '../../client/feature-list';
 import { DiscoverCTA } from '../../client/discover-cta';
-import { ActivityFeed } from '../../client/activity-feed';
+import { ActivityFeedWrapper } from '../../client/components/activity-feed-wrapper';
 
 export function DiscoverContent() {
   return (
@@ -16,8 +16,8 @@ export function DiscoverContent() {
 
       {/* 오른쪽: 이미지 영역 */}
       <div className="relative aspect-square md:aspect-auto">
-        <ActivityFeed />
+        <ActivityFeedWrapper />
       </div>
     </div>
   );
-} 
+}

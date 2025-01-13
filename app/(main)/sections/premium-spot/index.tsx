@@ -1,5 +1,5 @@
-import { PremiumSpotServer } from "./server/premium-spot-server";
+import { PremiumSpotContainer } from './client/premium-spot-container';
 
-export function PremiumSpotSection() {
-  return <PremiumSpotServer />;
+export function PremiumSpot() {
+  return <PremiumSpotContainer />;
 }
