@@ -2,7 +2,7 @@ import { AccountSection } from './sections/AccountSection';
 import { StatsSection } from './sections/StatsSection';
 import { PointSection } from './sections/PointSection';
 import { ModalNav } from './sections/ModalNav';
-import Logo from '@/components/logo/Logo';
+import Logo from '@/styles/logos/LogoSvg';
 
 interface LoginModalProps {
   isOpen: boolean;

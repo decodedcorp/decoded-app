@@ -1,4 +1,4 @@
-import Logo from '@/components/logo/Logo';
+import Logo from '@/styles/logos/LogoSvg';
 import { SearchBar } from '../search/SearchBar';
 import { LoginButton } from './LoginButton';
 import { Button } from '@/components/ui/button';
