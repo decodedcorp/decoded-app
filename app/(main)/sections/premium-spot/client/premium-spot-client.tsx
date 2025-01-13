@@ -1,26 +1,23 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ItemSpotCard } from '../components/item-spot-card';
 import { useTrendingItems } from './hooks/use-trending-items';
 import { cn } from '@/lib/utils/style';
 import { ArrowUpRight, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Period } from '../components/period-selector';
+import { PremiumSpotClientProps, TrendingItem } from '../types';
 
-interface PremiumSpotClientProps {
-  period: Period;
-  onPeriodChange: (period: Period) => void;
-}
-
-export function PremiumSpotClient({
-  period,
-  onPeriodChange,
-}: PremiumSpotClientProps) {
+export function PremiumSpotClient({ period }: PremiumSpotClientProps) {
   const { items, isLoading, error } = useTrendingItems(period);
   const [showAll, setShowAll] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const originalScrollPosition = useRef(0);
+
+  // period가 변경될 때마다 showAll 상태 초기화
+  useEffect(() => {
+    setShowAll(false);
+  }, [period]);
 
   const handleToggleShowAll = () => {
     if (showAll) {
@@ -34,7 +31,9 @@ export function PremiumSpotClient({
       // 더보기: 현재 스크롤 위치 저장 후 새로운 아이템이 보이도록 스크롤
       originalScrollPosition.current = window.scrollY;
       setShowAll(true);
-      setTimeout(() => {
+
+      // DOM 업데이트 후 스크롤 위치 조정
+      requestAnimationFrame(() => {
         const lastVisibleItem = containerRef.current?.querySelector(
           '.grid > :nth-child(3)'
         );
@@ -46,7 +45,7 @@ export function PremiumSpotClient({
             behavior: 'smooth',
           });
         }
-      }, 100);
+      });
     }
   };
 
@@ -66,13 +65,12 @@ export function PremiumSpotClient({
     );
   }
 
-  const displayedItems = showAll ? items : items?.slice(0, 3);
-  const hasMoreItems = items && items.length >= 4;
+  const visibleItems = showAll ? items : items.slice(0, 3);
 
   return (
-    <div ref={containerRef} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {displayedItems?.map((item) => (
+    <div className="space-y-6">
+      <div ref={containerRef} className="grid md:grid-cols-3 gap-6">
+        {visibleItems.map((item: TrendingItem) => (
           <ItemSpotCard
             key={item.id}
             image={item.image}
@@ -80,9 +78,8 @@ export function PremiumSpotClient({
             brand={item.brand}
             views={item.views}
             requestCount={item.requestCount}
-            exposureRate={`${item.exposureRate.toFixed(1)}%`}
+            exposureRate={item.exposureRate.toString()}
             trendingScore={item.trendingScore}
-            // featured: item.trending_score > 30 인기 아이템,
             featured={item.featured}
             imageDocId={item.imageDocId}
             itemDocId={item.itemDocId}
@@ -90,37 +87,18 @@ export function PremiumSpotClient({
         ))}
       </div>
 
-      {hasMoreItems && (
-        <div className="flex">
+      {items.length > 3 && (
+        <div className="flex justify-center">
           <Button
             onClick={handleToggleShowAll}
-            className={cn(
-              'group flex items-center gap-2',
-              'bg-[#EAFD66] text-black',
-              'px-6 py-6 rounded-xl',
-              'font-semibold tracking-wide',
-              'hover:bg-[#EAFD66]/90',
-              'transition-all duration-200',
-              'shadow-lg shadow-[#EAFD66]/20'
-            )}
+            variant="ghost"
+            className="group px-4 py-2"
           >
-            <span>{showAll ? '접기' : '인기 아이템 더보기'}</span>
+            {showAll ? '접기' : '더보기'}
             {showAll ? (
-              <ChevronUp
-                className={cn(
-                  'w-4 h-4',
-                  'transform group-hover:-translate-y-0.5',
-                  'transition-transform duration-200'
-                )}
-              />
+              <ChevronUp className="ml-2 w-4 h-4 transform group-hover:-translate-y-0.5 transition-transform duration-200" />
             ) : (
-              <ArrowUpRight
-                className={cn(
-                  'w-4 h-4',
-                  'transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5',
-                  'transition-transform duration-200'
-                )}
-              />
+              <ArrowUpRight className="ml-2 w-4 h-4 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200" />
             )}
           </Button>
         </div>

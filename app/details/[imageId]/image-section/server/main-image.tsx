@@ -18,33 +18,39 @@ export function MainImage({
 
   const itemPositions = Object.values(detailPageState.img?.items || {})
     .flat()
-    .map(item => ({
-      top: item.position?.top || "0",
-      left: item.position?.left || "0"
+    .map((item) => ({
+      top: item.position?.top || '0',
+      left: item.position?.left || '0',
     }));
 
   return (
     <div className="relative">
-      <div className={`relative ${isItemDetail ? 'w-full h-full' : 'w-[569px]'} bg-gray-800/50`}>
+      <div
+        className={`relative ${
+          isItemDetail ? 'w-full h-full' : 'w-[569px]'
+        } bg-gray-800/50`}
+      >
         <Image
           src={imageUrl}
           alt={detailPageState.img?.title || ''}
-          width={569}
-          height={569}
-          style={{ 
-            width: '100%', 
-            height: 'auto', 
-            maxHeight: 'calc(100vh - 4rem)',
-            aspectRatio: '1'
+          width={1}
+          height={1}
+          style={{
+            width: '100%',
+            height: '100%',
+            maxHeight: 'calc(100vh - 10rem)',
+            aspectRatio: '3/4',
           }}
-          className={`${isItemDetail ? 'object-contain' : 'object-contain'} max-h-[calc(100vh-4rem)]`}
+          className={`${
+            isItemDetail ? 'object-contain' : 'object-contain'
+          } max-h-[calc(100vh-4rem)]`}
           sizes={isItemDetail ? '40vw' : '(max-width: 768px) 100vw, 50vw'}
           priority={!isItemDetail}
         />
       </div>
       {!isItemDetail && (
         <div className="absolute top-4 right-4 z-20">
-          <AddItemButton 
+          <AddItemButton
             requestUrl={requestUrl}
             imageId={imageDocId || ''}
             imageUrl={imageUrl}

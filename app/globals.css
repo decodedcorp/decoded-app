@@ -40,4 +40,12 @@
 
 .floating-box:hover {
   animation-play-state: paused;
+}
+
+button {
+  outline: none !important;
+}
+
+*:focus {
+  outline: none !important;
 } 

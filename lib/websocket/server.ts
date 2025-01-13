@@ -1,178 +1,79 @@
-import { WebSocketServer } from 'ws';
-import { IncomingMessage } from 'http';
-import WebSocket from 'ws';
+import { AuthenticatedWebSocket, WebSocketMessage } from './types';
+import { TokenManager } from './token';
 
-interface WebSocketMessage {
-  type: string;
-  event?: string;
-  data?: any;
-  timestamp?: string;
-}
-
-interface AuthenticatedWebSocket extends WebSocket {
-  isAlive: boolean;
-  userId?: string;
-  isAuthenticated: boolean;
-}
-
-const HEARTBEAT_INTERVAL = 30000;
-
-export class WebSocketHandler {
-  private wss: WebSocketServer;
+export class WebSocketServer {
   private clients: Set<AuthenticatedWebSocket>;
 
-  constructor(port: number) {
-    this.wss = new WebSocketServer({ port });
+  constructor() {
     this.clients = new Set();
-    this.setupWebSocketServer();
-    this.startHeartbeat();
   }
 
-  private setupWebSocketServer() {
-    this.wss.on('connection', (ws: AuthenticatedWebSocket, req: IncomingMessage) => {
-      // 초기 연결 설정
-      ws.isAlive = true;
-      ws.isAuthenticated = false;
-      this.clients.add(ws);
+  public async connect() {
+    try {
+      const token = await TokenManager.getTempToken();
+      const wsUrl = process.env.NEXT_PUBLIC_WS_URL;
 
-      // URL에서 토큰 추출
-      const url = new URL(req.url || '', 'ws://localhost');
-      const token = url.searchParams.get('token');
-
-      if (token) {
-        // 실제로는 토큰을 검증하고 userId를 추출해야 함
-        const userId = 'temp';
-        ws.userId = userId;
-        ws.isAuthenticated = true;
-
-        // 인증 성공 메시지 전송
-        ws.send(JSON.stringify({
-          type: 'auth',
-          status: 'success',
-          timestamp: new Date().toISOString()
-        }));
+      if (!wsUrl) {
+        throw new Error('WebSocket URL is not configured');
       }
 
-      // 메시지 핸들링 설정
-      ws.on('message', (data: string) => this.handleMessage(ws, data));
-      ws.on('pong', () => { ws.isAlive = true; });
-      ws.on('close', () => this.handleClose(ws));
-      ws.on('error', () => this.handleError(ws));
+      const wsEndpoint = wsUrl.replace(/^http/, 'ws');
+      const fullWsUrl = `${wsEndpoint}/subscribe/decoded/events?token=${encodeURIComponent(
+        token
+      )}`;
 
-      // 인증되지 않은 경우에만 타임아웃 설정
-      if (!ws.isAuthenticated) {
-        const authTimeout = setTimeout(() => {
-          if (!ws.isAuthenticated) {
-            ws.close(4001, 'Authentication timeout');
-          }
-        }, 5000);
-
-        // 연결이 닫히면 타임아웃 제거
-        ws.on('close', () => clearTimeout(authTimeout));
-      }
-    });
+      const ws = new WebSocket(fullWsUrl);
+      this.handleConnection(ws as AuthenticatedWebSocket);
+    } catch (error) {
+      console.error('[WebSocket] Connection failed:', error);
+      throw error;
+    }
   }
 
-  private handleMessage(ws: AuthenticatedWebSocket, data: string) {
+  private handleConnection(ws: AuthenticatedWebSocket) {
+    this.clients.add(ws);
+    console.log('[WebSocket] New client connected');
+
+    ws.addEventListener('message', (event) =>
+      this.handleMessage(ws, event.data)
+    );
+    ws.addEventListener('close', () => this.handleClose(ws));
+    ws.addEventListener('error', (error) => this.handleError(ws, error));
+  }
+
+  private async handleMessage(ws: AuthenticatedWebSocket, data: string) {
     try {
       const message: WebSocketMessage = JSON.parse(data);
-
-      // 인증 메시지 처리
-      if (message.type === 'auth') {
-        this.handleAuth(ws, message);
-        return;
-      }
-
-      // 인증되지 않은 클라이언트의 다른 메시지는 무시
-      if (!ws.isAuthenticated) {
-        ws.close(4001, 'Not authenticated');
-        return;
-      }
-
-      // 인증된 클라이언트의 ping 메시지 처리
-      if (message.type === 'ping') {
-        ws.send(JSON.stringify({ 
-          type: 'pong', 
-          timestamp: new Date().toISOString() 
-        }));
-        return;
-      }
-
-    } catch {
-
+      await this.broadcastMessage(message);
+    } catch (error) {
+      console.error('[WebSocket] Message handling error:', error);
     }
   }
 
-  private handleAuth(ws: AuthenticatedWebSocket, message: WebSocketMessage) {
-    const token = message.data?.token;
-    const userId = message.data?.userId;
+  private async broadcastMessage(message: WebSocketMessage) {
+    const messageString = JSON.stringify(message);
+    const failedClients = new Set<AuthenticatedWebSocket>();
 
-    if (!token || !userId) {
-      ws.close(4001, 'Invalid authentication data');
-      return;
+    for (const client of Array.from(this.clients)) {
+      if (client.readyState === WebSocket.OPEN) {
+        try {
+          await client.send(messageString);
+        } catch (error) {
+          console.error('[WebSocket] Broadcast error:', error);
+          failedClients.add(client);
+        }
+      }
     }
 
-    // 여기서는 토큰과 userId가 제공되었다는 것만으로 인증 성공으로 처리
-    // 실제로는 토큰 검증 로직이 필요할 수 있음
-    ws.userId = userId;
-    ws.isAuthenticated = true;
-
-    // 인증 성공 메시지 전송
-    ws.send(JSON.stringify({
-      type: 'auth',
-      status: 'success',
-      timestamp: new Date().toISOString()
-    }));
+    failedClients.forEach((client) => this.clients.delete(client));
   }
 
   private handleClose(ws: AuthenticatedWebSocket) {
     this.clients.delete(ws);
+    console.log('[WebSocket] Client disconnected');
   }
 
-  private handleError(ws: AuthenticatedWebSocket) {
-    this.clients.delete(ws);
+  private handleError(ws: AuthenticatedWebSocket, error: Event) {
+    console.error('[WebSocket] Client error:', error);
   }
-
-  private startHeartbeat() {
-    setInterval(() => {
-      this.clients.forEach(ws => {
-        if (!ws.isAlive) {
-          ws.terminate();
-          this.clients.delete(ws);
-          return;
-        }
-
-        ws.isAlive = false;
-        ws.ping();
-      });
-    }, HEARTBEAT_INTERVAL);
-  }
-
-  // Method to broadcast message to all authenticated clients
-  public broadcast(message: WebSocketMessage) {
-    const messageString = JSON.stringify({
-      ...message,
-      timestamp: new Date().toISOString()
-    });
-
-    this.clients.forEach(client => {
-      if (client.isAuthenticated && client.readyState === WebSocket.OPEN) {
-        client.send(messageString);
-      }
-    });
-  }
-
-  // Method to send message to specific authenticated user
-  public sendToUser(userId: string, message: WebSocketMessage) {
-    const messageString = JSON.stringify({
-      ...message,
-      timestamp: new Date().toISOString()
-    });
-
-    this.clients.forEach(client => {
-      if (client.isAuthenticated && client.userId === userId && client.readyState === WebSocket.OPEN) {
-        client.send(messageString);
-      }
-    });
-  }
-} 
+}

@@ -4,26 +4,19 @@ import { cn } from '@/lib/utils/style';
 import { ActivityCard } from './components/activity-card';
 import { ActivityHeader } from './components/activity-header';
 import { useActivityFeed } from './hooks/use-activity-feed';
-import { useActivityFeedAnimation } from './hooks/use-activity-feed-animation';
-import { Activity } from './types/activity';
+import { Activity } from './utils/types';
+import { AnimatePresence, motion } from 'framer-motion';
 
-export function ActivityFeed() {
+export default function ActivityFeed() {
   const {
     activities,
     isLoading,
+    isConnected,
     totalActivities,
     hasMoreActivities,
     onAnimationComplete,
     feedRef,
   } = useActivityFeed();
-
-  // 애니메이션 훅 사용
-  useActivityFeedAnimation({
-    feedRef,
-    hasMoreActivities,
-    activities,
-    onAnimationComplete,
-  });
 
   return (
     <div
@@ -33,7 +26,6 @@ export function ActivityFeed() {
         'bg-zinc-900/30 backdrop-blur-sm'
       )}
     >
-      {/* 그라데이션 오버레이 */}
       <div
         className={cn(
           'absolute inset-0 z-20 pointer-events-none',
@@ -41,22 +33,41 @@ export function ActivityFeed() {
         )}
       />
 
-      {/* 상단 헤더 */}
-      <ActivityHeader isLoading={isLoading} activityCount={totalActivities} />
+      <ActivityHeader
+        isLoading={isLoading}
+        isConnected={isConnected}
+        activityCount={totalActivities}
+      />
 
-      {/* 활동 피드 */}
       <div
         ref={feedRef}
-        className="relative px-4 py-4 space-y-1.5 overflow-hidden"
+        className="relative px-4 space-y-1.5 overflow-hidden mt-14"
       >
-        {activities.map((activity) => (
-          <div key={activity.id} className="relative">
-            <ActivityCard activity={activity} />
-          </div>
-        ))}
+        <AnimatePresence initial={false}>
+          {activities.map((activity) => (
+            <motion.div
+              key={activity.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{
+                type: 'spring',
+                stiffness: 500,
+                damping: 30,
+                opacity: { duration: 0.2 },
+              }}
+              className="transform-gpu"
+              onAnimationComplete={() => {
+                if (activity === activities[activities.length - 1]) {
+                  onAnimationComplete();
+                }
+              }}
+            >
+              <ActivityCard activity={activity} />
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
     </div>
   );
 }
-
-export default ActivityFeed;

@@ -1,10 +1,7 @@
-'use client';
-
 import { cn } from '@/lib/utils/style';
 import { Link as LinkIcon, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { ImagePlaceholder } from '@/components/ui/icons/image-placeholder';
 
 interface ItemSpotCardProps {
@@ -33,11 +30,7 @@ export function ItemSpotCard({
   itemDocId,
 }: ItemSpotCardProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5 }}
+    <div
       className={cn(
         'group relative',
         'rounded-2xl overflow-hidden',
@@ -106,7 +99,9 @@ export function ItemSpotCard({
             <p className="text-zinc-500 text-xs">요청</p>
           </div>
           <div>
-            <p className="text-[#EAFD66] font-medium">{exposureRate}</p>
+            <p className="text-[#EAFD66] font-medium">
+              {parseFloat(exposureRate).toFixed(1)}%
+            </p>
             <p className="text-zinc-500 text-xs">노출률</p>
           </div>
         </div>
@@ -126,6 +121,6 @@ export function ItemSpotCard({
           <span>링크 제공하기</span>
         </Link>
       </div>
-    </motion.div>
+    </div>
   );
 }

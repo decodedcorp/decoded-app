@@ -12,6 +12,7 @@ export function DiscoverServer() {
       >
         <DiscoverContent />
 
+
         {/* 배경 효과 */}
         <div className="absolute inset-0 bg-grid-pattern opacity-10" />
         <div

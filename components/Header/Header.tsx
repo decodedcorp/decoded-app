@@ -39,7 +39,7 @@ function Header({
         isScrolled && 'border-b border-gray-800'
       )}
     >
-      <div className="w-full max-w-[1728px] h-header-mobile md:h-header-desktop flex items-center gap-4 px-11">
+      <div className="w-full max-w-[1728px] h-header-mobile md:h-header-desktop flex items-center gap-4">
         <Nav
           isSearchOpen={isSearchOpen}
           onSearchToggle={onSearchToggle}

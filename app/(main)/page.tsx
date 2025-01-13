@@ -1,6 +1,6 @@
 import { MetricsSection } from './sections/metric';
 import { DiscoverSection } from './sections/discover';
-import { PremiumSpotSection } from './sections/premium-spot';
+import { PremiumSpot } from './sections/premium-spot';
 import { TrendingSection } from './sections/trending';
 
 import { HeroSection } from './sections/hero';
@@ -15,7 +15,7 @@ export default function Home() {
       <div className="space-y-24 pt-16">
         <MetricsSection />
         <DiscoverSection />
-        <PremiumSpotSection />
+        <PremiumSpot />
         {/* <TrendingSection /> */}
       </div>
     </div>

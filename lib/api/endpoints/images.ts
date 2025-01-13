@@ -5,7 +5,7 @@ import type {
   ItemDocument
 } from '../types/image';
 import type { APIResponse } from '../types/request';
-import type { APIImageResponse } from '@/app/(main)/sections/discover/client/activity-feed/types/image';
+import type { APIImageResponse } from '@/app/(main)/sections/discover/client/activity-feed/utils/types/image';
 
 interface ImageDetailResponse {
   image: ImageData;

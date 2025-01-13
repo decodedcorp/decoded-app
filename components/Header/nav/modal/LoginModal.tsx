@@ -1,8 +1,8 @@
-import { AccountSection } from "./sections/AccountSection";
-import { StatsSection } from "./sections/StatsSection";
-import { PointSection } from "./sections/PointSection";
-import { ModalNav } from "./sections/ModalNav";
-import Logo from "@/components/logo/Logo";
+import { AccountSection } from './sections/AccountSection';
+import { StatsSection } from './sections/StatsSection';
+import { PointSection } from './sections/PointSection';
+import { ModalNav } from './sections/ModalNav';
+import Logo from '@/components/logo/Logo';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -16,7 +16,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
     <div className="absolute right-0 top-[calc(100%+12px)] w-[400px] bg-[#171717] rounded-xl overflow-hidden">
       <div className="flex items-center bg-[#494E29] p-4 relative">
         <div className="flex-1 flex items-center justify-center">
-          <Logo isScrolled={true} />
+          <Logo />
         </div>
         <button
           onClick={onClose}

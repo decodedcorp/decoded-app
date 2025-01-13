@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
-import { networkManager } from '@/lib/network/network';
+import { useEffect, useRef, useState } from "react";
+import { networkManager } from "@/lib/network/network";
 
-interface Metrics {
+interface MetricData {
   total_requests: number;
   total_provides: number;
   requests_by_endpoint: {
@@ -13,15 +13,25 @@ interface Metrics {
   timestamp: string;
 }
 
+interface Metrics {
+  all_time: MetricData;
+  daily: MetricData;
+}
+
+const initialMetricData: MetricData = {
+  total_requests: 0,
+  total_provides: 0,
+  requests_by_endpoint: {
+    items: 0,
+    images: 0,
+  },
+  timestamp: new Date().toISOString(),
+};
+
 export function useMetrics() {
   const [metrics, setMetrics] = useState<Metrics>({
-    total_requests: 0,
-    total_provides: 0,
-    requests_by_endpoint: {
-      items: 0,
-      images: 0,
-    },
-    timestamp: new Date().toISOString(),
+    all_time: initialMetricData,
+    daily: initialMetricData,
   });
   const [isLoading, setIsLoading] = useState(true);
   const retryCount = useRef(0);
@@ -29,28 +39,31 @@ export function useMetrics() {
   const fetchMetrics = async () => {
     try {
       setIsLoading(true);
-      const response = await networkManager.request('metrics/decoded', 'GET');
-
-      if (response.data?.all_time) {
+      const response = await networkManager.request("metrics/decoded", "GET");
+      console.log(response.data);
+      if (response.data) {
         const hasChanged =
-          response.data.all_time.timestamp !== metrics.timestamp ||
-          response.data.all_time.total_requests !== metrics.total_requests ||
-          response.data.all_time.total_provides !== metrics.total_provides ||
+          response.data.all_time.timestamp !== metrics.all_time.timestamp ||
+          response.data.all_time.total_requests !==
+            metrics.all_time.total_requests ||
+          response.data.all_time.total_provides !==
+            metrics.all_time.total_provides ||
           JSON.stringify(response.data.all_time.requests_by_endpoint) !==
-            JSON.stringify(metrics.requests_by_endpoint);
+            JSON.stringify(metrics.all_time.requests_by_endpoint) ||
+          response.data.daily.timestamp !== metrics.daily.timestamp;
 
         if (hasChanged) {
-          setMetrics(response.data.all_time);
+          setMetrics(response.data);
         }
       }
 
       retryCount.current = 0;
     } catch (error) {
-      console.error('Failed to fetch metrics:', {
+      console.error("Failed to fetch metrics:", {
         timestamp: new Date().toISOString(),
         error,
         retryCount: retryCount.current,
-        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+        errorMessage: error instanceof Error ? error.message : "Unknown error",
       });
 
       if (retryCount.current < 3) {
