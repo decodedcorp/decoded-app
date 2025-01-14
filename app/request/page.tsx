@@ -129,13 +129,10 @@ export default function RequestSection() {
         </div>
 
         <div className="sticky bottom-0">
-          <div className="bg-black/90 backdrop-blur-md border-t border-gray-900 mx-6 rounded-t-lg">
+          <div className="bg-black/90 backdrop-blur-md mx-6 rounded-t-lg">
             <div className="px-6 py-4 flex justify-between items-center">
               <div className="flex-1">
                 {currentStep > 1 && <PrevButton onPrev={onPrev} />}
-              </div>
-              <div className="flex-1 text-center text-sm text-gray-500">
-                {currentStep} / {totalSteps}
               </div>
               <div className="flex-1 flex justify-end">
                 {currentStep < totalSteps && (

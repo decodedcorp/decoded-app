@@ -2,7 +2,10 @@
 
 import React, { useRef } from "react";
 import Image from "next/image";
-import { Point, useImageMarker } from "@/lib/hooks/features/images/useImageMarker";
+import {
+  Point,
+  useImageMarker,
+} from "@/lib/hooks/features/images/useImageMarker";
 
 interface ImageMarkerProps {
   imageUrl: string;
@@ -12,6 +15,7 @@ interface ImageMarkerProps {
   onPointRemove?: (index: number) => void;
   showPointList?: boolean;
   className?: string;
+  onPointSelect?: (point: Point) => void;
 }
 
 export function ImageMarker({
@@ -22,6 +26,7 @@ export function ImageMarker({
   onPointRemove,
   showPointList = true,
   className,
+  onPointSelect,
 }: ImageMarkerProps) {
   const imageRef = useRef<HTMLDivElement>(null);
   const { calculatePointPosition } = useImageMarker({
@@ -47,11 +52,15 @@ export function ImageMarker({
     }
   };
 
+  const handlePointClick = (point: Point) => {
+    onPointSelect?.(point);
+  };
+
   return (
     <div className="space-y-6">
       <div
         ref={imageRef}
-        className={`relative aspect-[3/4] rounded-lg overflow-hidden cursor-crosshair ${className}`}
+        className={`relative w-full aspect-[4/5] rounded-lg overflow-hidden cursor-crosshair ${className}`}
         onClick={handleImageClick}
       >
         <Image

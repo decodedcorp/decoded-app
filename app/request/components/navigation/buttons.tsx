@@ -55,7 +55,7 @@ export function NavigationButtons({
   onSubmit,
 }: NavigationButtonProps) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-md border-t border-gray-900">
+    <div className="fixed bottom-0 left-0 right-0 bg-black/90">
       <div className="max-w-4xl mx-auto">
         <div className="px-6 py-4 flex justify-between items-center">
           <div className="flex-1">
