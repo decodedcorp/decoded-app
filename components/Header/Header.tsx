@@ -35,7 +35,7 @@ function Header({
         'z-header',
         'flex justify-center',
         'animate-fade-in',
-        isScrolled ? 'bg-black/5 backdrop-blur-[10px]' : 'bg-black/1 backdrop-blur-[0px]'
+        isScrolled ? 'bg-black/5 backdrop-blur-[10px]' : 'bg-black/1 backdrop-blur-[0px]',
       )}
       style={{
         transform: `translateZ(0)`,
