@@ -4,12 +4,12 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 
 interface UseModalCloseProps {
   onClose: () => void;
-  duration?: number;
+  isOpen?: boolean;
 }
 
-function useModalClose<T extends HTMLElement = HTMLDivElement>({ 
-  onClose, 
-  duration = 300 
+function useModalClose<T extends HTMLElement = HTMLDivElement>({
+  onClose,
+  isOpen = true,
 }: UseModalCloseProps) {
   const [isClosing, setIsClosing] = useState(false);
   const modalRef = useRef<T>(null);
@@ -19,12 +19,17 @@ function useModalClose<T extends HTMLElement = HTMLDivElement>({
     setTimeout(() => {
       onClose();
       setIsClosing(false);
-    }, duration);
-  }, [onClose, duration]);
+    });
+  }, [onClose]);
 
   useEffect(() => {
+    if (!isOpen) return;
+
     const handleClickOutside = (event: MouseEvent) => {
-      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
+      ) {
         handleClose();
       }
     };
@@ -35,14 +40,16 @@ function useModalClose<T extends HTMLElement = HTMLDivElement>({
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscKey);
-    
+    setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEscKey);
+    }, 0);
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEscKey);
     };
-  }, [handleClose]);
+  }, [isOpen, handleClose]);
 
   return {
     isClosing,

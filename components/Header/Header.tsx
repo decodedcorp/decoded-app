@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import Nav from "./nav/Nav";
-import { cn } from "@/lib/utils/style";
-import { useState, useEffect } from "react";
+import Nav from './nav/Nav';
+import { cn } from '@/lib/utils/style';
+import { useState, useEffect } from 'react';
 
 interface HeaderProps {
   isSearchOpen: boolean;
@@ -24,18 +24,24 @@ function Header({
       setIsScrolled(window.scrollY > 0);
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
     <header
       className={cn(
-        "fixed top-0 w-full",
-        "z-header",
-        "flex justify-center",
-        "animate-fade-in"
+        'fixed top-0 w-full',
+        'z-header',
+        'flex justify-center',
+        'animate-fade-in',
+        isScrolled
+          ? 'bg-black/90 border-b border-gray-800'
+          : 'bg-black/5 backdrop-blur-[2px]'
       )}
+      style={{
+        transform: `translateZ(0)`,
+      }}
     >
       <div className="w-full max-w-[1728px] h-header-mobile md:h-header-desktop flex items-center gap-4">
         <Nav

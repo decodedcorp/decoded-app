@@ -30,9 +30,9 @@ export default function Logo({ className }: LogoSvgProps) {
         fill="#EAFD66"
         filter="url(#glow)"
         style={{
-          fontFamily: "Syncopate, sans-serif",
-          fontSize: "28px",
-          fontWeight: "bold",
+          fontFamily: 'Syncopate, sans-serif',
+          fontSize: '25px',
+          fontWeight: 'bold',
         }}
         textAnchor="middle"
         dominantBaseline="middle"
@@ -52,9 +52,9 @@ export default function Logo({ className }: LogoSvgProps) {
         strokeWidth="0.5"
         opacity="0.3"
         style={{
-          fontFamily: "Orbitron, sans-serif",
-          fontSize: "28px",
-          fontWeight: "bold",
+          fontFamily: 'Orbitron, sans-serif',
+          fontSize: '28px',
+          fontWeight: 'bold',
         }}
         textAnchor="middle"
         dominantBaseline="middle"

@@ -1,14 +1,15 @@
-"use client";
+'use client';
 
-import React from "react";
-import { cn } from "@/lib/utils/style";
+import React from 'react';
+import { cn } from '@/lib/utils/style';
 import {
   pretendardBold,
   pretendardMedium,
   pretendardRegular,
-} from "@/lib/constants/fonts";
-import { useAuth } from "@/lib/hooks/features/auth/useAuth";
-import Image from "next/image";
+} from '@/lib/constants/fonts';
+import { useAuth } from '@/lib/hooks/features/auth/useAuth';
+import Image from 'next/image';
+import { GoogleIcon } from '@/styles/icons/auth/google-icon';
 
 interface AccountSectionProps {
   onClose?: () => void;
@@ -47,7 +48,7 @@ export function AccountSection({ onClose }: AccountSectionProps) {
                 <div
                   key={i}
                   className={`aspect-square rounded-sm ${
-                    Math.random() > 0.5 ? "bg-[#EAFD66]/20" : "bg-white/5"
+                    Math.random() > 0.5 ? 'bg-[#EAFD66]/20' : 'bg-white/5'
                   }`}
                 />
               ))}
@@ -80,14 +81,7 @@ export function AccountSection({ onClose }: AccountSectionProps) {
             flex items-center justify-center gap-3
             shadow-lg shadow-black/5"
         >
-          <div className="w-5 h-5 relative">
-            <Image
-              src="/icons/google.svg"
-              alt="Google"
-              fill
-              className="object-contain"
-            />
-          </div>
+          <GoogleIcon />
           <span className="font-medium">Google로 계속하기</span>
         </button>
       )}
