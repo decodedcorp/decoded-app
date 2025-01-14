@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { LoginModal } from './modal/LoginModal';
-import { Button } from '@/components/ui/button';
-import { useRef, useState, useEffect } from 'react';
-import { useAuth } from '@/lib/hooks/features/auth/useAuth';
+import { LoginModal } from "./modal/LoginModal";
+import { Button } from "@/components/ui/button";
+import { useRef, useState, useEffect } from "react";
+import { useAuth } from "@/lib/hooks/features/auth/useAuth";
 
 export function LoginButton() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -21,18 +21,18 @@ export function LoginButton() {
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
     <div ref={loginButtonRef} className="relative flex items-center gap-3">
-      <Button
-        variant={isLogin ? 'default' : 'default'}
+      <span
+        className="text-xs md:text-sm text-gray-600 hover:text-[#EAFD66] transition-colors duration-200 cursor-pointer"
         onClick={() => setIsLoginModalOpen(true)}
       >
-        {isLogin ? 'MY ACCOUNT' : 'LOGIN'}
-      </Button>
+        {isLogin ? "마이페이지" : "로그인"}
+      </span>
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}

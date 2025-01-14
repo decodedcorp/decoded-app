@@ -26,8 +26,8 @@ const config: Config = {
       // Custom Keyframes
       keyframes: {
         fadeIn: {
-          '0%': { opacity: '0', transform: 'scale(0.95)' },
-          '100%': { opacity: '1', transform: 'scale(1)' },
+          "0%": { opacity: "0", transform: "scale(0.95)" },
+          "100%": { opacity: "1", transform: "scale(1)" },
         },
         slideUp: {
           "0%": { transform: "translateY(20px)", opacity: "0" },
@@ -56,11 +56,12 @@ const config: Config = {
       },
       // Custom Animations
       animation: {
-        'fadeIn': 'fadeIn 0.5s ease-out',
-        'slide-up': 'slideUp 500ms ease-out',
-        'slide-down': 'slideDown 500ms ease-out',
-        'float': 'float 1s cubic-bezier(0.37, 0, 0.63, 1) infinite',
-        'rotate': 'rotate 10s linear infinite',
+        fadeIn: "fadeIn 0.5s ease-out",
+        "slide-up": "slideUp 500ms ease-out",
+        "slide-down": "slideDown 500ms ease-out",
+        float: "float 1s cubic-bezier(0.37, 0, 0.63, 1) infinite",
+        rotate: "rotate 10s linear infinite",
+        "pulse-slow": "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
       // Spacing & Layout
       spacing: {
@@ -114,10 +115,10 @@ const config: Config = {
           200: colors.gray[200],
           100: colors.gray[100],
         },
-        mainBackground: 'var(--main-background-color)',
-        textColor: 'var(--text-color)',
-        footerText: 'var(--footer-text-color)',
-        primary: '#EAFD66',
+        mainBackground: "var(--main-background-color)",
+        textColor: "var(--text-color)",
+        footerText: "var(--footer-text-color)",
+        primary: "#EAFD66",
       },
       // Background Images
       backgroundImage: {
@@ -159,23 +160,23 @@ const config: Config = {
       },
       // Grid Templates
       gridTemplateColumns: {
-        custom: 'repeat(10, minmax(0, 1fr))', // 10열 그리드
+        custom: "repeat(10, minmax(0, 1fr))", // 10열 그리드
       },
       perspective: {
-        '1000': '1000px',
+        "1000": "1000px",
       },
       rotate: {
-        'y-3': 'rotateY(3deg)',
-        'y-5': 'rotateY(5deg)',
-        'x-3': 'rotateX(3deg)',
-        'x-5': 'rotateX(5deg)',
+        "y-3": "rotateY(3deg)",
+        "y-5": "rotateY(5deg)",
+        "x-3": "rotateX(3deg)",
+        "x-5": "rotateX(5deg)",
       },
     },
   },
   plugins: [
     require("tailwindcss-animate"),
     require("@tailwindcss/aspect-ratio"),
-    require('tailwindcss-filters'),
+    require("tailwindcss-filters"),
     require("daisyui"),
     function ({ addUtilities }: { addUtilities: any }) {
       const newUtilities = {

@@ -5,7 +5,11 @@ import { arrayBufferToBase64 } from "@/lib/utils/string/format";
 import React, { useState, useEffect } from "react";
 import { Point, RequestedItem, RequestImage } from "@/types/model.d";
 import { StepIndicator } from "./components/indicator/step-indicator";
-import { NavigationButtons } from "./components/navigation/buttons";
+import {
+  NavigationButtons,
+  PrevButton,
+  NextButton,
+} from "./components/navigation/buttons";
 import { Step1 } from "./components/steps/step1";
 import { Step2 } from "./components/steps/step2";
 
@@ -73,61 +77,92 @@ export default function RequestSection() {
       imageFile: base64Image,
       metadata: {},
     };
-    console.log('=== Sending Image Request ===');
-    console.log('Request data:', {
+    console.log("=== Sending Image Request ===");
+    console.log("Request data:", {
       items: items,
       requestBy: requestBy,
       hasImage: !!base64Image,
-      metadata: {}
+      metadata: {},
     });
     networkManager
       .request("request/image", "POST", requestImage)
       .then((response) => {
-        console.log('Request successful:', response);
+        console.log("Request successful:", response);
         alert("요청이 완료되었습니다.");
         defaultState();
       })
       .catch((error) => {
         const errorMessage =
           error.response?.data?.description || "요청 중 오류가 발생했습니다.";
-        console.error('Request failed:', {
+        console.error("Request failed:", {
           error: errorMessage,
-          details: error.response?.data
+          details: error.response?.data,
         });
         alert(errorMessage);
       });
   };
 
+  const onNext = () => setCurrentStep((prev) => prev + 1);
+  const onPrev = () => setCurrentStep((prev) => prev - 1);
+
   return (
-    <div className="relative mt-20 min-h-screen">
-      <div className="max-w-4xl mx-auto p-6 pb-24">
-        <StepIndicator currentStep={currentStep} totalSteps={totalSteps} />
-        <div className="mt-8">
-          {currentStep === 1 && (
-            <Step1
-              selectedImage={selectedImage}
-              setSelectedImage={setSelectedImage}
-              setImageFile={setImageFile}
-            />
-          )}
-          {currentStep === 2 && (
-            <Step2
-              selectedImage={selectedImage}
-              points={points}
-              setPoints={setPoints}
-            />
-          )}
+    <div className="pt-20 min-h-[calc(100vh-5rem)] bg-black">
+      <div className="max-w-4xl mx-auto relative">
+        <div className="p-6 pb-24">
+          <StepIndicator currentStep={currentStep} totalSteps={totalSteps} />
+          <div className="mt-4">
+            {currentStep === 1 && (
+              <Step1
+                selectedImage={selectedImage}
+                setSelectedImage={setSelectedImage}
+                setImageFile={setImageFile}
+              />
+            )}
+            {currentStep === 2 && (
+              <Step2
+                selectedImage={selectedImage}
+                points={points}
+                setPoints={setPoints}
+              />
+            )}
+          </div>
+        </div>
+
+        <div className="sticky bottom-0">
+          <div className="bg-black/90 backdrop-blur-md border-t border-gray-900 mx-6 rounded-t-lg">
+            <div className="px-6 py-4 flex justify-between items-center">
+              <div className="flex-1">
+                {currentStep > 1 && <PrevButton onPrev={onPrev} />}
+              </div>
+              <div className="flex-1 text-center text-sm text-gray-500">
+                {currentStep} / {totalSteps}
+              </div>
+              <div className="flex-1 flex justify-end">
+                {currentStep < totalSteps && (
+                  <NextButton isStepComplete={isStepComplete} onNext={onNext} />
+                )}
+                {currentStep === totalSteps && (
+                  <button
+                    onClick={handleSubmit}
+                    disabled={!isStepComplete}
+                    className={`
+                      px-6 py-2.5 rounded-lg text-sm font-medium
+                      transition-all duration-200
+                      ${
+                        isStepComplete
+                          ? "bg-[#EAFD66] text-black hover:bg-[#EAFD66]/90"
+                          : "bg-gray-900 text-gray-600 border border-gray-800 cursor-not-allowed"
+                      }
+                    `}
+                  >
+                    완료
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      <NavigationButtons
-        currentStep={currentStep}
-        totalSteps={totalSteps}
-        isStepComplete={isStepComplete}
-        onNext={() => setCurrentStep((prev) => prev + 1)}
-        onPrev={() => setCurrentStep((prev) => prev - 1)}
-        onSubmit={handleSubmit}
-      />
     </div>
   );
 }

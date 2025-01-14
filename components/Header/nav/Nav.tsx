@@ -1,8 +1,8 @@
-import Logo from '@/styles/logos/LogoSvg';
-import { SearchBar } from '../search/SearchBar';
-import { LoginButton } from './LoginButton';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import Logo from "@/styles/logos/LogoSvg";
+import { SearchBar } from "../search/SearchBar";
+import { LoginButton } from "./LoginButton";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 interface NavProps {
   isSearchOpen: boolean;
@@ -19,12 +19,12 @@ function Nav({
 }: NavProps) {
   return (
     <nav className="w-full h-16">
-      <div className="h-full px-4 mx-auto container">
+      <div className="h-full mx-auto container">
         <div className="h-full grid grid-cols-[240px_1fr_240px] items-center gap-8">
           {/* 로고 영역 */}
-          <div className="flex items-center">
+          <Link href="/" className="flex items-center">
             <Logo />
-          </div>
+          </Link>
 
           {/* 검색바 영역 */}
           <div className="flex justify-center">
@@ -35,8 +35,11 @@ function Nav({
 
           {/* 버튼 영역 */}
           <div className="flex items-center justify-end gap-4">
-            <Link href="/request">
-              <Button variant="default">요청하기</Button>
+            <Link
+              href="/request"
+              className="text-xs md:text-sm text-gray-600 hover:text-[#EAFD66] transition-colors duration-200"
+            >
+              요청하기
             </Link>
             <LoginButton />
           </div>

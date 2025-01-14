@@ -46,20 +46,20 @@ export function Step1({
   return (
     <div className="space-y-8">
       <div className="max-w-md mx-auto text-center">
-        <h2 className="text-3xl font-bold mb-2 text-gray-400">
+        <h2 className="text-lg md:text-xl font-bold mb-2 text-gray-400">
           사진을 업로드해주세요
         </h2>
-        <p className="text-gray-500">
+        <p className="text-xs md:text-sm text-gray-500">
           아이템 식별에 도움이 될 만한 선명한 사진을 올려주세요
         </p>
       </div>
 
-      <div className="max-w-md mx-auto space-y-6">
+      <div className="max-w-sm mx-auto space-y-6">
         {!selectedImage ? (
           <div
             className={`
               relative
-              aspect-[3/4]
+              aspect-[4/5]
               rounded-lg
               border-gray-700
               transition-all
@@ -163,12 +163,12 @@ export function Step1({
       </div>
 
       {/* Help Section */}
-      <div className="max-w-md mx-auto">
-        <div className="bg-[#1A1A1A] rounded-lg p-4">
-          <div className="flex">
+      <div className="max-w-sm mx-auto">
+        <div className="bg-[#1A1A1A] rounded-lg p-3">
+          <div className="flex items-start space-x-2">
             <div className="flex-shrink-0">
               <svg
-                className="h-5 w-5 text-yellow-400"
+                className="h-4 w-4 text-yellow-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -182,10 +182,10 @@ export function Step1({
               </svg>
             </div>
 
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-yellow-800">업로드 팁</h3>
-              <div className="mt-2 text-sm text-yellow-700">
-                <ul className="list-disc pl-5 space-y-1">
+            <div>
+              <h3 className="text-xs font-medium text-gray-400">업로드 팁</h3>
+              <div className="mt-1">
+                <ul className="text-xs text-gray-500 space-y-1 list-disc pl-4">
                   <li>선명하고 깨끗한 사진일수록 아이템 식별이 쉬워요</li>
                   <li>가능한 전신 사진을 올려주시면 좋아요</li>
                   <li>컨텍스트 정보는 아이템을 찾는데 큰 도움이 됩니다</li>
