@@ -22,7 +22,6 @@ export function AddItemModal({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { modalRef, isClosing, handleClose } = useModalClose({
     onClose,
-    duration: 150,
   });
 
   const handleOverlayClick = (e: React.MouseEvent) => {

@@ -16,7 +16,6 @@ export default function LinkFormSection({
 }: LinkFormSectionProps) {
   const { handleClose, isClosing, modalRef } = useModalClose({
     onClose,
-    duration: 300,
   });
 
   if (!showLinkForm) return null;
