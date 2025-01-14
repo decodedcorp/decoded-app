@@ -19,12 +19,12 @@ export function NextButton({
       onClick={onNext}
       disabled={!isStepComplete}
       className={`
-        px-6 py-2.5 rounded-lg text-sm font-medium
+        px-8 py-3 rounded-xl text-sm font-medium
         transition-all duration-200 
         ${
           isStepComplete
-            ? "bg-[#EAFD66]/10 text-[#EAFD66] hover:bg-[#EAFD66]/20 border border-[#EAFD66]/30"
-            : "bg-gray-900 text-gray-600 border border-gray-800 cursor-not-allowed"
+            ? "bg-gradient-to-r from-[#EAFD66] to-[#EAFD66]/80 text-black hover:opacity-90"
+            : "bg-gray-900/50 text-gray-600 cursor-not-allowed"
         }
       `}
     >
@@ -37,9 +37,8 @@ export function PrevButton({ onPrev }: { onPrev: () => void }) {
   return (
     <button
       onClick={onPrev}
-      className="px-6 py-2.5 rounded-lg text-sm font-medium 
-        text-gray-400 bg-gray-900 border border-gray-800
-        hover:bg-gray-800 transition-all duration-200"
+      className="px-8 py-3 rounded-xl text-sm font-medium 
+        text-gray-300 hover:text-white transition-colors"
     >
       이전
     </button>

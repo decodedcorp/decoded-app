@@ -27,10 +27,10 @@ export function Step1({
         이미지를 업로드해주세요
       </h2>
 
-      <div className="flex gap-6 h-[400px]">
+      <div className="flex gap-6 h-[427px]">
         {/* 이미지 영역 */}
         <div className="w-[320px] flex-shrink-0">
-          <div className="relative h-full rounded-lg overflow-hidden">
+          <div className="relative aspect-[3/4] rounded-lg overflow-hidden">
             {selectedImage ? (
               <Image
                 src={selectedImage}

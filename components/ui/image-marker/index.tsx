@@ -60,7 +60,7 @@ export function ImageMarker({
     <div className="space-y-6">
       <div
         ref={imageRef}
-        className={`relative w-full aspect-[4/5] rounded-lg overflow-hidden cursor-crosshair ${className}`}
+        className={`relative w-full aspect-[3/4] rounded-lg overflow-hidden cursor-crosshair ${className}`}
         onClick={handleImageClick}
       >
         <Image

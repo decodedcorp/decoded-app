@@ -87,7 +87,7 @@ export function Step2({ selectedImage, points, setPoints }: Step2Props) {
         궁금한 아이템을 선택해주세요
       </h2>
 
-      <div className="flex gap-6 h-[400px]">
+      <div className="flex gap-6 h-[427px]">
         <div className="w-[320px] flex-shrink-0">
           {selectedImage && (
             <div className="relative h-full rounded-lg overflow-hidden">

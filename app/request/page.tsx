@@ -66,28 +66,20 @@ export default function RequestSection() {
     }
     const buffer = await imageFile?.arrayBuffer();
     const base64Image = arrayBufferToBase64(buffer);
-    const requestBy = window.sessionStorage.getItem("USER_DOC_ID");
-    if (!requestBy) {
+    const userDocId = window.sessionStorage.getItem("USER_DOC_ID");
+    if (!userDocId) {
       alert("로그인이 필요합니다.");
       return;
     }
     const requestImage: RequestImage = {
       requestedItems: items,
-      requestBy: requestBy,
+      requestBy: userDocId,
       imageFile: base64Image,
       metadata: {},
     };
-    console.log("=== Sending Image Request ===");
-    console.log("Request data:", {
-      items: items,
-      requestBy: requestBy,
-      hasImage: !!base64Image,
-      metadata: {},
-    });
     networkManager
-      .request("request/image", "POST", requestImage)
-      .then((response) => {
-        console.log("Request successful:", response);
+      .request(`user/${userDocId}/image/request`, "POST", requestImage)
+      .then((_) => {
         alert("요청이 완료되었습니다.");
         defaultState();
       })
@@ -107,10 +99,13 @@ export default function RequestSection() {
 
   return (
     <div className="pt-20 min-h-[calc(100vh-5rem)] bg-black">
-      <div className="max-w-4xl mx-auto relative">
-        <div className="p-6 pb-24">
+      <div className="max-w-4xl mx-auto">
+        <div className="pt-12 pb-4 px-6">
           <StepIndicator currentStep={currentStep} totalSteps={totalSteps} />
-          <div className="mt-4">
+        </div>
+
+        <div className="flex items-center justify-center min-h-[calc(100vh-20rem)]">
+          <div className="w-full px-6 -mt-8">
             {currentStep === 1 && (
               <Step1
                 selectedImage={selectedImage}
@@ -129,32 +124,37 @@ export default function RequestSection() {
         </div>
 
         <div className="sticky bottom-0">
-          <div className="bg-black/90 backdrop-blur-md mx-6 rounded-t-lg">
-            <div className="px-6 py-4 flex justify-between items-center">
-              <div className="flex-1">
-                {currentStep > 1 && <PrevButton onPrev={onPrev} />}
-              </div>
-              <div className="flex-1 flex justify-end">
-                {currentStep < totalSteps && (
-                  <NextButton isStepComplete={isStepComplete} onNext={onNext} />
-                )}
-                {currentStep === totalSteps && (
-                  <button
-                    onClick={handleSubmit}
-                    disabled={!isStepComplete}
-                    className={`
-                      px-6 py-2.5 rounded-lg text-sm font-medium
-                      transition-all duration-200
-                      ${
-                        isStepComplete
-                          ? "bg-[#EAFD66] text-black hover:bg-[#EAFD66]/90"
-                          : "bg-gray-900 text-gray-600 border border-gray-800 cursor-not-allowed"
-                      }
-                    `}
-                  >
-                    완료
-                  </button>
-                )}
+          <div className="bg-gradient-to-t from-black via-black/95 to-transparent pt-10">
+            <div className="max-w-4xl mx-auto">
+              <div className="px-6 py-6 flex justify-between items-center">
+                <div className="flex-1">
+                  {currentStep > 1 && <PrevButton onPrev={onPrev} />}
+                </div>
+                <div className="flex-1 flex justify-end">
+                  {currentStep < totalSteps && (
+                    <NextButton
+                      isStepComplete={isStepComplete}
+                      onNext={onNext}
+                    />
+                  )}
+                  {currentStep === totalSteps && (
+                    <button
+                      onClick={handleSubmit}
+                      disabled={!isStepComplete}
+                      className={`
+                        px-8 py-3 rounded-xl text-sm font-medium
+                        transition-all duration-200
+                        ${
+                          isStepComplete
+                            ? "bg-gradient-to-r from-[#EAFD66] to-[#EAFD66]/80 text-black hover:opacity-90"
+                            : "bg-gray-900/50 text-gray-600 cursor-not-allowed"
+                        }
+                      `}
+                    >
+                      완료
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
