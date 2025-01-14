@@ -1,96 +1,96 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { cn } from '@/lib/utils/style';
-import { pretendardBold, pretendardMedium, pretendardRegular } from '@/lib/constants/fonts';
-import { useAuth } from '@/lib/hooks/features/auth/useAuth';
-import Image from "next/image"
+import React from "react";
+import { cn } from "@/lib/utils/style";
+import {
+  pretendardBold,
+  pretendardMedium,
+  pretendardRegular,
+} from "@/lib/constants/fonts";
+import { useAuth } from "@/lib/hooks/features/auth/useAuth";
+import Image from "next/image";
 
 interface AccountSectionProps {
-  email?: string;
   onClose?: () => void;
 }
 
-export function AccountSection({ email, onClose }: AccountSectionProps) {
-  const { isLogin, isInitialized, handleGoogleLogin, handleDisconnect } = useAuth();
-
-  const handleAuth = async () => {
-    if (!isInitialized) return;
-    
-    if (isLogin) {
-      handleDisconnect();
-    } else {
-      handleGoogleLogin();
-    }
-    onClose?.();
-  };
-
-  // 초기화되지 않은 상태에서는 로딩 상태를 보여줍니다
-  if (!isInitialized) {
-    return (
-      <div className="px-6 pt-6 pb-8">
-        <div className="bg-[#222222] rounded-xl p-6">
-          <div className={cn(pretendardBold.className, "text-base mb-6")}>계정</div>
-          <div className="flex items-center justify-center p-4">
-            <div className="text-sm text-white/60">Loading...</div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+export function AccountSection({ onClose }: AccountSectionProps) {
+  const { isLogin, handleGoogleLogin, handleDisconnect } = useAuth();
 
   return (
-    <div className="px-6 pt-6 pb-8">
-      <div className="bg-[#222222] rounded-xl p-6">
-        <div className={cn(pretendardBold.className, "text-base mb-6")}>계정</div>
-        <div className="relative mb-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-white/10"></div>
-          </div>
-          <div className="relative flex justify-start">
-            <span className={cn(pretendardMedium.className, "bg-[#222222] pr-4 text-sm text-white/60")}>
-              {isLogin ? 'CURRENT' : 'LOGIN WITH'}
-            </span>
-          </div>
-        </div>
-        <div className="bg-[#151515] rounded-xl p-4">
-          <button 
-            onClick={handleAuth}
-            className="w-full flex items-center justify-between group hover:opacity-80 transition-opacity"
-          >
-            <div className="flex items-center gap-2">
-              <Image 
-                src="/icons/auth/google-icon.svg" 
-                alt="Google" 
-                width={20}
-                height={20}
-                className="rounded-full"
-              />
-              {isLogin ? (
-                <span className={cn(pretendardRegular.className, "text-sm text-white/80")}>
-                  {email || 'krty98000@gmail.com'}
-                </span>
-              ) : (
-                <span className={cn(pretendardRegular.className, "text-sm text-white/80")}>
-                  Google로 로그인
-                </span>
-              )}
+    <div className="space-y-6">
+      {isLogin ? (
+        <>
+          {/* Stats Grid */}
+          <div className="grid grid-cols-3 gap-3">
+            <div className="bg-black/20 rounded-xl p-4 text-center">
+              <div className="text-[#EAFD66] text-xl font-bold">2,400</div>
+              <div className="text-xs text-gray-400 mt-1">포인트</div>
             </div>
-            {isLogin && (
-              <div className="text-white/60 w-[18px] h-[18px] flex items-center justify-center">
-                <img 
-                  src="/icons/nav/logout.svg" 
-                  alt="Logout" 
-                  width={18}
-                  height={18}
-                  style={{ filter: 'brightness(0) invert(1)', opacity: 0.6 }}
-                  className="group-hover:opacity-100 transition-opacity"
+            <div className="bg-black/20 rounded-xl p-4 text-center">
+              <div className="text-[#EAFD66] text-xl font-bold">5</div>
+              <div className="text-xs text-gray-400 mt-1">활동권</div>
+            </div>
+            <div className="bg-black/20 rounded-xl p-4 text-center">
+              <div className="text-[#EAFD66] text-xl font-bold">Lv.3</div>
+              <div className="text-xs text-gray-400 mt-1">기여도</div>
+            </div>
+          </div>
+
+          {/* Contribution Graph */}
+          <div className="bg-black/20 rounded-xl p-4">
+            <h3 className="text-sm font-medium text-gray-400 mb-3">
+              활동 그래프
+            </h3>
+            <div className="grid grid-cols-7 gap-1.5">
+              {[...Array(28)].map((_, i) => (
+                <div
+                  key={i}
+                  className={`aspect-square rounded-sm ${
+                    Math.random() > 0.5 ? "bg-[#EAFD66]/20" : "bg-white/5"
+                  }`}
                 />
-              </div>
-            )}
+              ))}
+            </div>
+          </div>
+
+          {/* Logout Button */}
+          <button
+            onClick={() => {
+              handleDisconnect();
+              onClose?.();
+            }}
+            className="w-full px-6 py-4 rounded-xl text-sm font-medium
+              bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white
+              transition-all duration-200 ease-out"
+          >
+            로그아웃하기
           </button>
-        </div>
-      </div>
+        </>
+      ) : (
+        <button
+          onClick={() => {
+            handleGoogleLogin();
+            onClose?.();
+          }}
+          className="w-full px-6 py-4 rounded-xl text-sm font-medium
+            bg-gradient-to-r from-white to-gray-100 text-gray-900 
+            hover:from-gray-50 hover:to-gray-100
+            transition-all duration-200 ease-out
+            flex items-center justify-center gap-3
+            shadow-lg shadow-black/5"
+        >
+          <div className="w-5 h-5 relative">
+            <Image
+              src="/icons/google.svg"
+              alt="Google"
+              fill
+              className="object-contain"
+            />
+          </div>
+          <span className="font-medium">Google로 계속하기</span>
+        </button>
+      )}
     </div>
   );
-} 
+}

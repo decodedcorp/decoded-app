@@ -1,13 +1,14 @@
 interface LogoSvgProps {
-  fontSize?: number;
+  className?: string;
 }
 
-export default function LogoSvg({ fontSize = 28 }: LogoSvgProps) {
-  const textWidth = fontSize * 6;
-  const textHeight = fontSize * 1.2;
+export default function Logo({ className }: LogoSvgProps) {
+  const textWidth = 28 * 6;
+  const textHeight = 28 * 1.2;
 
   return (
     <svg
+      className={className}
       xmlns="http://www.w3.org/2000/svg"
       width={textWidth}
       height={textHeight}
@@ -30,7 +31,7 @@ export default function LogoSvg({ fontSize = 28 }: LogoSvgProps) {
         filter="url(#glow)"
         style={{
           fontFamily: "Syncopate, sans-serif",
-          fontSize: `${fontSize}px`,
+          fontSize: "28px",
           fontWeight: "bold",
         }}
         textAnchor="middle"
@@ -52,7 +53,7 @@ export default function LogoSvg({ fontSize = 28 }: LogoSvgProps) {
         opacity="0.3"
         style={{
           fontFamily: "Orbitron, sans-serif",
-          fontSize: `${fontSize * 1.1}px`,
+          fontSize: "28px",
           fontWeight: "bold",
         }}
         textAnchor="middle"
