@@ -27,7 +27,7 @@ const ScrollIndicator = () => {
 
   return (
     <div
-      className={`absolute bottom-4 left-1/2 transform -translate-x-1/2 transition-opacity duration-slow cursor-pointer z-[5] ${
+      className={`absolute bottom-2 left-1/2 transform -translate-x-1/2 transition-opacity duration-slow cursor-pointer z-[5] ${
         isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
       }`}
       onClick={handleClick}

@@ -13,10 +13,10 @@ export default function Home() {
     <div className="flex flex-col min-h-[100vh] bg-black text-white">
       <HeroSection />
       <div className="space-y-24 pt-16">
-        <MetricsSection />
+        {/* <MetricsSection /> */}
         <DiscoverSection />
         <PremiumSpot />
-        {/* <TrendingSection /> */}
+        <TrendingSection />
       </div>
     </div>
   );

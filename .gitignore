@@ -39,7 +39,10 @@ next-env.d.ts
 public
 
 # env
+.env
 .env.local
+.env.*.local
+.env.production
 
 # src-tauri
 src-tauri

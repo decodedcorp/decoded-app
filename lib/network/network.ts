@@ -28,31 +28,26 @@ export class NetworkManager {
   };
 
   private constructor() {
-    // 환경 변수 체크 로직 개선
-    const serviceEndpoint = process.env.NEXT_PUBLIC_SERVICE_ENDPOINT;
+    // API URL 설정을 콘솔에 출력하여 디버깅
+    console.log('Current NODE_ENV:', process.env.NODE_ENV);
+    
+    const API_URL = process.env.NODE_ENV === 'production'
+      ? process.env.NEXT_PUBLIC_DB_ENDPOINT      // https://api.decoded.style
+      : process.env.NEXT_PUBLIC_LOCAL_DB_ENDPOINT; // https://dev.decoded.style
+    
+    console.log('Selected API_URL:', API_URL);
+
     const authClientId = process.env.NEXT_PUBLIC_AUTH_CLIENT_ID;
-    const redirectUri = process.env.NEXT_PUBLIC_REDIRECT_URI;
+    const redirectUri = process.env.NODE_ENV === 'production'
+      ? 'https://decoded.style'
+      : process.env.NEXT_PUBLIC_REDIRECT_URI;
 
-    // 필수 환경 변수 누락 시 에러 메시지 상세화
-    const missingVars = [];
-    if (!serviceEndpoint) missingVars.push('NEXT_PUBLIC_SERVICE_ENDPOINT');
-    if (!authClientId) missingVars.push('NEXT_PUBLIC_AUTH_CLIENT_ID');
-    if (!redirectUri) missingVars.push('NEXT_PUBLIC_REDIRECT_URI');
-
-    if (missingVars.length > 0) {
-      console.error(`Missing environment variables: ${missingVars.join(', ')}`);
-      // 개발 환경에서만 에러 throw
-      if (process.env.NODE_ENV === 'development') {
-        throw new Error(
-          `Required environment variables are missing: ${missingVars.join(
-            ', '
-          )}`
-        );
-      }
+    if (!API_URL) {
+      throw new Error('Missing API_URL configuration');
     }
 
     this.config = {
-      service: serviceEndpoint || '', // fallback 값 제공
+      service: API_URL,
       auth_client_id: authClientId || '',
       redirect_uri: redirectUri || '',
     };
@@ -79,28 +74,27 @@ export class NetworkManager {
         const convertedData = convertKeysToSnakeCase(data);
         const url = `${this.config.service}/${path}`;
   
+        const storedToken = accessToken || window.sessionStorage.getItem('ACCESS_TOKEN');
+        
+        const headers = {
+          'Content-Type': 'application/json',
+          ...(storedToken && { Authorization: `Bearer ${storedToken}` }),
+        };
+
         const res = await axios.request<T>({
           url,
           method,
           data: convertedData,
-          headers: {
-            'Content-Type': 'application/json',
-            ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
-          },
+          headers,
           maxRedirects: 0,
           validateStatus: (status) => true,
           timeout: 10000,
         });
   
-        if (res.status === 401 && accessToken) {
-          console.warn('[401 Unauthorized] Access token expired');
-          if (attempt < retries) {
-            await this.refreshAccessToken();
-            const newAccessToken = localStorage.getItem('access_token');
-            if (newAccessToken) {
-              return this.request(path, method, data, retries - attempt, newAccessToken);
-            }
-          }
+        if (res.status === 401 && storedToken) {
+          window.sessionStorage.clear();
+          window.location.href = '/';
+          throw new Error('Token expired');
         }
   
         if (!res.data) {
@@ -112,21 +106,9 @@ export class NetworkManager {
         attempt++;
   
         if (axios.isAxiosError(e)) {
-          // CORS 에러 체크
           if (e.code === 'ERR_NETWORK') {
-            console.error('[CORS Error] 서버 접근이 차단되었습니다', {
-              status: e.response?.status,
-              message: e.message,
-              attempt,
-            });
             throw new Error('서버 접근이 차단되었습니다. 관리자에게 문의하세요.');
           }
-
-          console.error('[Network Error]', {
-            status: e.response?.status,
-            message: e.message,
-            attempt,
-          });
 
           if (
             e.code === 'ECONNABORTED' ||
@@ -139,8 +121,6 @@ export class NetworkManager {
               continue;
             }
           }
-        } else {
-          console.error('[Unexpected Error]', e);
         }
   
         if (attempt === retries) {
@@ -152,35 +132,6 @@ export class NetworkManager {
     throw new Error('모든 재시도 실패');
   }
   
-  /**
-   * @method refreshAccessToken
-   * @description 리프레시 토큰을 사용해 새로운 엑세스 토큰을 요청
-   */
-  private async refreshAccessToken(): Promise<void> {
-    try {
-      const refreshToken = localStorage.getItem('refresh_token');
-      if (!refreshToken) {
-        throw new Error('리프레시 토큰이 없습니다');
-      }
-  
-      const url = `${this.config.service}/auth/refresh`;
-      const res = await axios.post(url, { refresh_token: refreshToken });
-  
-      if (res.status === 200 && res.data.access_token) {
-        localStorage.setItem('access_token', res.data.access_token);
-        console.log('엑세스 토큰 갱신 성공');
-      } else {
-        throw new Error('엑세스 토큰 갱신 실패');
-      }
-    } catch (err) {
-      console.error('[Token Refresh Error]', err);
-      // 로그아웃 처리 또는 사용자에게 재로그인 요청
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      window.location.href = '/login'; // 로그인 페이지로 리다이렉트
-    }
-  }
-
   public async openIdConnectUrl(): Promise<{
     sk: string;
     randomness: string;

@@ -1,8 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useMemo } from "react";
+import { DetailPageState } from '@/types/model.d';
+import { useState, useMemo } from 'react';
 
-type Category = "FASHION" | "INTERIOR";
+type Category = 'FASHION' | 'INTERIOR';
 
 interface ListHeaderProps {
   onCategoryChange?: (category: Category) => void;
@@ -10,15 +11,17 @@ interface ListHeaderProps {
   itemList?: Array<{
     info?: { item?: { item?: { metadata?: { item_class?: string } } } };
   }>;
+  detailPageState: DetailPageState;
 }
 
 export function ListHeader({
+  detailPageState,
   onCategoryChange,
   availableCategories = [],
   itemList = [],
 }: ListHeaderProps) {
   const [activeCategory, setActiveCategory] = useState<Category>(
-    availableCategories[0] || "FASHION"
+    availableCategories[0] || 'FASHION'
   );
 
   const categories = useMemo(() => {
@@ -40,10 +43,11 @@ export function ListHeader({
   return (
     <div className="flex flex-col mb-6">
       <div className="mb-6">
-        <span className={`text-3xl font-bold`}>
-          {/* 제목 : 데이터 변경 */}
-          Balenciaga for Men | Designer Fashion
-        </span>
+        {detailPageState.img?.title && (
+          <span className="text-3xl font-bold">
+            {detailPageState.img.title}
+          </span>
+        )}
       </div>
       <div className="flex items-center h-[40px] border-b border-white/10">
         {categories.map((category) => (
@@ -53,16 +57,16 @@ export function ListHeader({
             className={`px-3 h-full text-xs font-medium transition-colors relative flex items-center gap-1.5
               ${
                 activeCategory === category
-                  ? "text-white after:absolute after:bottom-[-1px] after:left-0 after:w-full after:h-[1px] after:bg-white"
-                  : "text-white/40 hover:text-white/60"
+                  ? 'text-white after:absolute after:bottom-[-1px] after:left-0 after:w-full after:h-[1px] after:bg-white'
+                  : 'text-white/40 hover:text-white/60'
               }`}
           >
             {category}
             <span
               className={`inline-flex items-center justify-center w-[18px] h-[18px] rounded-full text-[10px] ${
                 activeCategory === category
-                  ? "bg-primary text-black"
-                  : "bg-white/10 text-white/60"
+                  ? 'bg-primary text-black'
+                  : 'bg-white/10 text-white/60'
               }`}
             >
               {getCategoryCount(category)}

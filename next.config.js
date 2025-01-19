@@ -46,6 +46,14 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'https://dev.decoded.style/:path*',
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;

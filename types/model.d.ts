@@ -207,6 +207,8 @@ export interface HoverItem {
           product_type: string;
         };
         img_url: string | null;
+        created_at?: string;
+        updated_at?: string;
       };
       brand_name: string | null;
       brand_logo_image_url: string | null;
@@ -343,6 +345,10 @@ interface DetailPageState {
    */
   img?: ImageInfo;
   /**
+   * Image url
+   */
+  imageUrl?: string;
+  /**
    * Hover items
    */
   itemList?: HoverItem[];
@@ -468,13 +474,56 @@ export interface HoverItem extends ItemData {
   imgUrl?: string;
 }
 
-export interface ItemDocument {
-  Id: string;
-  requester: string;
-  requestedAt: string;
+interface DetailItemDocument {
+  _id: string;
+  title: string;
+  description?: string;
+  imageUrl: string;
+  createdAt: string;
+  updatedAt: string;
+  metadata: {
+    name: string | null;
+    description: string | null;
+    brand: string | null;
+    designedBy: string | null;
+    material: string | null;
+    color: string | null;
+    itemClass: string;
+    itemSubClass: string;
+    category: string;
+    subCategory: string;
+    productType: string;
+  };
+  links: Array<{
+    label: string;
+    value: string;
+  }>;
+}
+
+interface ItemDocument {
+  _id: string;
   imgUrl?: string;
-  like: number;
-  metadata?: ItemMetadata;
+  metadata: {
+    name: string | null;
+    description: string | null;
+    brand: string | null;
+    designedBy: string | null;
+    material: string | null;
+    color: string | null;
+    itemClass: string;
+    itemSubClass: string;
+    category: string;
+    subCategory: string;
+    productType: string;
+  };
+  links?: Array<{
+    label: string;
+    value: string;
+  }>;
+  Id?: string;
+  requester?: string;
+  requestedAt?: string;
+  like?: number;
 }
 
 export interface ProvideData {
@@ -632,6 +681,7 @@ export interface ItemMetadata {
 }
 
 export interface ItemDocument {
+  _id: string;
   Id: string;
   requester: string;
   requestedAt: string;

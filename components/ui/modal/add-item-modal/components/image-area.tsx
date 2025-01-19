@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ImageAreaProps } from "../types";
 import { Caution } from "./caution";
 import { useState } from "react";
+import { ImageNewMarker } from "../../../image-marker/image-new-marker";
 
 export function ImageArea({
   handleImageClick,
@@ -73,19 +74,12 @@ export function ImageArea({
 
           {/* 새로운 마커들 */}
           {newMarkers.map((marker, idx) => (
-            <div
+            <ImageNewMarker
               key={`new-${idx}`}
+              x={marker.x}
+              y={marker.y}
               onClick={(e) => handleMarkerClick(e, idx)}
-              className="absolute w-4 h-4 -translate-x-1/2 -translate-y-1/2 cursor-pointer 
-                hover:scale-125 transition-transform"
-              style={{
-                top: `${marker.y}%`,
-                left: `${marker.x}%`,
-              }}
-            >
-              <div className="absolute inset-0 border-2 border-yellow-400 rounded-full animate-pulse"></div>
-              <div className="absolute inset-[2px] bg-yellow-400/30 rounded-full backdrop-blur-sm"></div>
-            </div>
+            />
           ))}
         </div>
       </div>

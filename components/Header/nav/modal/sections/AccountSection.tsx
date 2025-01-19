@@ -1,14 +1,7 @@
 'use client';
 
 import React from 'react';
-import { cn } from '@/lib/utils/style';
-import {
-  pretendardBold,
-  pretendardMedium,
-  pretendardRegular,
-} from '@/lib/constants/fonts';
 import { useAuth } from '@/lib/hooks/features/auth/useAuth';
-import Image from 'next/image';
 import { GoogleIcon } from '@/styles/icons/auth/google-icon';
 
 interface AccountSectionProps {

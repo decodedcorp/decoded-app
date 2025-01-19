@@ -73,17 +73,21 @@ export function ImageMarker({
         {points.map((point, index) => (
           <div
             key={index}
-            className="absolute w-6 h-6 -ml-3 -mt-3 group"
+            className="absolute -translate-x-1/2 -translate-y-1/2 group"
             style={{ left: `${point.x}%`, top: `${point.y}%` }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handlePointClick(point);
+            }}
           >
-            <div className="relative">
-              <div className="absolute w-4 h-4 animate-ping rounded-full bg-[#EAFD66] opacity-75"></div>
-              <div className="relative w-4 h-4 rounded-full bg-[#EAFD66] flex items-center justify-center">
-                <span className="text-xs text-black font-bold">
+            <div className="relative w-4 h-4 hover:scale-125 transition-transform">
+              <div className="absolute inset-0 border-2 border-yellow-400 rounded-full animate-pulse"></div>
+              <div className="absolute inset-[2px] bg-yellow-400/30 rounded-full backdrop-blur-sm flex items-center justify-center">
+                <span className="text-xs text-white font-semibold leading-none translate-y-[0.5px]">
                   {index + 1}
                 </span>
               </div>
-
+              
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -109,7 +113,7 @@ export function ImageMarker({
               <div className="p-3 flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <span className="w-4 h-4 rounded-full bg-[#EAFD66] flex items-center justify-center">
-                    <span className="text-xs text-black font-bold rounded-full p-1">
+                    <span className="text-xs text-back font-bold rounded-full p-1">
                       {index + 1}
                     </span>
                   </span>

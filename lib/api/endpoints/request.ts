@@ -3,10 +3,13 @@ import type { RequestImage, APIResponse } from '../types/request';
 
 export const requestAPI = {
   // Create image request
-  createImageRequest: async (requestData: RequestImage): Promise<APIResponse<void>> => {
+  createImageRequest: async (
+    userId: string,
+    requestData: RequestImage
+  ): Promise<APIResponse<void>> => {
     try {
       const response = await networkManager.request(
-        'image/request',
+        `user/${userId}/image/request`,
         'POST',
         requestData
       );
@@ -16,12 +19,17 @@ export const requestAPI = {
     }
   },
 
-  // Get image request list
-  getImageRequests: async (): Promise<APIResponse<RequestImage[]>> => {
-    try { 
+  // Add request to existing image
+  addImageRequest: async (
+    userId: string,
+    imageId: string,
+    requestData: RequestImage
+  ): Promise<APIResponse<void>> => {
+    try {
       const response = await networkManager.request(
-        'image/requests',
-        'GET'
+        `user/${userId}/image/${imageId}/request/add`,
+        'POST',
+        requestData
       );
       return response;
     } catch (error) {
@@ -29,11 +37,11 @@ export const requestAPI = {
     }
   },
 
-  // Get single image request
-  getImageRequest: async (requestId: string): Promise<APIResponse<RequestImage>> => {
+  // Get image request list for user
+  getImageRequests: async (userId: string): Promise<APIResponse<RequestImage[]>> => {
     try {
       const response = await networkManager.request(
-        `image/request/${requestId}`,
+        `user/${userId}/requests`,
         'GET'
       );
       return response;

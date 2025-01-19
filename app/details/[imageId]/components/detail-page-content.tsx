@@ -47,7 +47,7 @@ export default function DetailPageContent({
   }
 
   return (
-    <div className="flex flex-col items-center my-5 w-full">
+    <div className="flex flex-col items-center w-full pt-16 sm:pt-20">
       <Header
         title={initialData.img.title || undefined}
         description={initialData.img.description || undefined}
@@ -62,4 +62,4 @@ export default function DetailPageContent({
       </div>
     </div>
   );
-} 
+}
