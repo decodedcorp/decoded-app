@@ -3,6 +3,13 @@ interface StepIndicatorProps {
   totalSteps: number;
 }
 
+// 스텝별 텍스트 정의
+const STEP_MESSAGES = {
+  1: "이미지를 업로드해주세요",
+  2: "궁금한 아이템을 선택해주세요",
+  3: "사진에 대한 더 많은 정보를 알려주세요"
+} as const;
+
 export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
   return (
     <div className="w-full mb-8">
@@ -40,10 +47,10 @@ export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
                     transition-all duration-300 text-[10px]
                     ${
                       index + 1 < currentStep
-                        ? "bg-[#EAFD66] text-black"
+                        ? 'bg-[#EAFD66] text-black'
                         : index + 1 === currentStep
-                        ? "bg-[#EAFD66] text-black ring-2 ring-[#EAFD66]/30"
-                        : "border-[1.5px] border-gray-800 bg-gray-900"
+                        ? 'bg-[#EAFD66] text-black ring-2 ring-[#EAFD66]/30'
+                        : 'border-[1.5px] border-gray-800 bg-gray-900'
                     }
                   `}
                 >
@@ -55,6 +62,9 @@ export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
             ))}
           </div>
         </div>
+        <h2 className="mt-6 text-lg md:text-xl font-bold text-gray-400 text-center">
+          {STEP_MESSAGES[currentStep as keyof typeof STEP_MESSAGES]}
+        </h2>
       </div>
     </div>
   );

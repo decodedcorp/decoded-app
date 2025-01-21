@@ -23,8 +23,8 @@ export function NextButton({
         transition-all duration-200 
         ${
           isStepComplete
-            ? "bg-gradient-to-r from-[#EAFD66] to-[#EAFD66]/80 text-black hover:opacity-90"
-            : "bg-gray-900/50 text-gray-600 cursor-not-allowed"
+            ? 'bg-gradient-to-r from-[#EAFD66] to-[#EAFD66]/80 text-black hover:opacity-90'
+            : 'bg-gray-900/50 text-gray-600 cursor-not-allowed'
         }
       `}
     >
@@ -76,8 +76,8 @@ export function NavigationButtons({
                   transition-all duration-200
                   ${
                     isStepComplete
-                      ? "bg-[#EAFD66] text-black hover:bg-[#EAFD66]/90"
-                      : "bg-gray-900 text-gray-600 border border-gray-800 cursor-not-allowed"
+                      ? 'bg-[#EAFD66] text-black hover:bg-[#EAFD66]/90'
+                      : 'bg-gray-900 text-gray-600 border border-gray-800 cursor-not-allowed'
                   }
                 `}
               >

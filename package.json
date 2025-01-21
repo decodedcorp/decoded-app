@@ -16,9 +16,12 @@
     "@mysten/sui": "^1.12.0",
     "@mysten/zklogin": "^0.7.22",
     "@radix-ui/react-dialog": "^1.1.4",
+    "@radix-ui/react-label": "^2.1.1",
+    "@radix-ui/react-radio-group": "^1.2.2",
     "@radix-ui/react-slot": "^1.1.1",
     "@radix-ui/react-tabs": "^1.1.2",
     "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@tanstack/react-query": "^5.64.2",
     "@tanstack/react-virtual": "^3.11.2",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/lodash.add": "^3.7.9",
@@ -39,6 +42,7 @@
     "lodash": "^4.17.21",
     "lucide-react": "^0.469.0",
     "next": "^15.1.3",
+    "nuqs": "^2.3.1",
     "react": "^18",
     "react-dom": "^18",
     "tailwind-merge": "^2.6.0",
@@ -48,6 +52,7 @@
     "ws": "^8.18.0"
   },
   "devDependencies": {
+    "@shadcn/ui": "^0.0.4",
     "@svgr/webpack": "^8.1.0",
     "@tauri-apps/cli": "^1.5.14",
     "@testing-library/jest-dom": "^6.4.5",

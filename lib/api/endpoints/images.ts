@@ -28,7 +28,9 @@ export const imagesAPI = {
     } catch (error) {
       console.error('Error fetching image detail:', {
         error,
-        imageId
+        imageId,
+        stack: error instanceof Error ? error.stack : undefined,
+        message: error instanceof Error ? error.message : 'Unknown error'
       });
       throw error;
     }
