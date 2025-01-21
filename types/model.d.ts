@@ -340,6 +340,7 @@ interface FeaturedInfo {
 }
 
 interface DetailPageState {
+  detailPageState: any;
   /**
    * Image info
    */

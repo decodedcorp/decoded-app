@@ -22,7 +22,7 @@ export function NavigationFooter({
 }: NavigationFooterProps) {
   return (
     <div className="sticky bottom-0">
-      <div className="bg-gradient-to-t from-black via-black/95 to-transparent pt-10">
+      <div className="bg-gradient-to-t from-black via-black/30 to-transparent pt-10">
         <div className="max-w-4xl mx-auto">
           <div className="px-6 py-6 flex justify-between items-center">
             <div className="flex-1">

@@ -2,7 +2,7 @@ import { RequestForm } from "./components/request-form";
 
 export default function RequestPage() {
   return (
-    <div className="pt-18 sm:pt-24 min-h-[calc(100vh-5rem)] bg-black">
+    <div className="pt-18 sm:pt-24 bg-black">
       <div className="max-w-4xl mx-auto">
         <RequestForm />
       </div>

@@ -16,9 +16,7 @@ export interface RequestImage {
 }
 
 export interface APIResponse<T> {
-  status: number;
-  message?: string;
-  data: {
-    images?: ImageData[];
-  } & T;
+  status_code: number;
+  description: string;
+  data: T;
 } 

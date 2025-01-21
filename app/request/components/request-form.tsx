@@ -70,71 +70,69 @@ export function RequestForm() {
     setPoints(newPoints);
   };
 
+  const imageContainerProps = {
+    step: currentStep,
+    selectedImage: selectedImage,
+    imageFile: imageFile,
+    points: points,
+    onImageSelect: handleImageSelect,
+    onPointsChange: setPoints,
+    onPointContextChange: handleUpdateContext,
+    onPointSelect: setSelectedPoint,
+  };
+
+  const markerStepProps = {
+    points: points,
+    selectedPoint: selectedPoint,
+    onSelect: (point: Point | null) => setSelectedPoint(point ? points.indexOf(point) : null),
+    onUpdateContext: (point: Point, context: string) => handleUpdateContext(points.indexOf(point), context),
+  };
+
   return (
     <>
       <StepIndicator currentStep={currentStep} totalSteps={totalSteps} />
 
       <div
         className={cn(
-          'flex',
+          'grid',
           'transition-all duration-200 ease-in-out',
+          'gap-4 sm:gap-6',
+          'px-4 sm:px-6',
+          'min-h-[30rem] max-h-[45rem]',
+          'w-full max-w-[56rem]',
+          'mx-auto',
           currentStep === 1
-            ? 'items-center justify-center h-[calc(100vh-20rem)]'
-            : 'gap-6 px-6 h-[calc(100vh-20rem)]'
+            ? 'grid-cols-1 place-items-center'
+            : 'grid-cols-1 sm:grid-cols-[minmax(0,24rem)_minmax(0,28rem)] items-start justify-center'
         )}
       >
         <div
           className={cn(
-            'h-full flex items-center transition-all duration-300 ease-in-out',
-            currentStep === 1 ? 'w-full justify-center' : 'w-2/3 justify-center'
+            'transition-all duration-300 ease-in-out w-full h-full',
+            currentStep === 1
+              ? 'flex items-center justify-center'
+              : 'flex items-start justify-center'
           )}
         >
-          <ImageContainer
-            step={currentStep}
-            selectedImage={selectedImage}
-            imageFile={imageFile}
-            points={points}
-            onImageSelect={handleImageSelect}
-            onPointsChange={setPoints}
-            onPointContextChange={(pointIndex, context) => {
-              const newPoints = [...points];
-              newPoints[pointIndex].context = context;
-              setPoints(newPoints);
-            }}
-            onPointSelect={(pointIndex) => {
-              setSelectedPoint(pointIndex);
-            }}
-          />
+          <div
+            className={cn(
+              'w-full h-full',
+              currentStep === 1 ? 'max-w-[32rem]' : ''
+            )}
+          >
+            <ImageContainer {...imageContainerProps} />
+          </div>
         </div>
 
         {currentStep === 2 && (
-          // TODO: fix this animation
-          <div className="w-full h-full py-7 transition-all duration-200 ease-linear animate-in slide-in-from-left">
-            <div className="h-full">
-              <MarkerStepSidebar
-                points={points}
-                selectedPoint={selectedPoint}
-                onSelect={(point) =>
-                  setSelectedPoint(point ? points.indexOf(point) : null)
-                }
-                onUpdateContext={(point, context) =>
-                  handleUpdateContext(points.indexOf(point), context)
-                }
-              />
-            </div>
+          <div className="w-full h-full overflow-y-auto">
+            <MarkerStepSidebar {...markerStepProps} />
           </div>
         )}
 
         {currentStep === 3 && (
-          // TODO: fix this animation
-          <div className="w-full h-full py-7 transition-all duration-200 ease-linear animate-in slide-in-from-left">
-            <div className="h-full">
-              <ContextStepSidebar
-                onAnswerChange={(answer) => {
-                  console.log(answer);
-                }}
-              />
-            </div>
+          <div className="w-full h-full overflow-y-auto">
+            <ContextStepSidebar />
           </div>
         )}
       </div>

@@ -1,8 +1,9 @@
 import { EmptyState } from './components/empty-state';
 import { HelpSection } from './components/help-section';
-import { InfoSection } from './components/info-section';
+import { InfoSection } from './components/upload-info-section';
 import { Point } from '@/types/model.d';
 import { MarkerList } from './components/marker-list';
+import { MarkerHeader } from './components/marker-header';
 
 interface MarkerStepSidebarProps {
   points: Point[];
@@ -18,31 +19,27 @@ export function MarkerStepSidebar({
   onUpdateContext,
 }: MarkerStepSidebarProps) {
   return (
-    <div className="w-full flex flex-col h-full">
-      <div className="flex flex-col h-full">
-        <div className="bg-[#1A1A1A] rounded-lg divide-y divide-gray-800 mb-4 flex-shrink-0">
-          <InfoSection />
-          <HelpSection />
-        </div>
+    <div className="w-full h-full flex flex-col">
+      <div className="bg-[#1A1A1A] rounded-lg divide-y divide-gray-800 mb-4 flex-shrink-0">
+        <InfoSection />
+        <HelpSection />
+      </div>
 
-        <div className="flex-1 overflow-hidden flex flex-col bg-[#1A1A1A] rounded-lg">
-          {points.length > 0 ? (
-            <div className="h-full overflow-y-auto">
-              <MarkerList
-                points={points}
-                selectedPoint={
-                  selectedPoint !== null ? points[selectedPoint] : null
-                }
-                onSelect={onSelect}
-                onUpdateContext={onUpdateContext}
-              />
-            </div>
-          ) : (
-            <div className="h-full flex-grow">
-              <EmptyState />
-            </div>
-          )}
-        </div>
+      <div className="flex-1 bg-[#1A1A1A] rounded-lg">
+        {points.length > 0 ? (
+          <div className="h-[280px] overflow-y-auto px-4 py-2">
+            <MarkerList
+              points={points}
+              selectedPoint={
+                selectedPoint !== null ? points[selectedPoint] : null
+              }
+              onSelect={onSelect}
+              onUpdateContext={onUpdateContext}
+            />
+          </div>
+        ) : (
+          <EmptyState />
+        )}
       </div>
     </div>
   );

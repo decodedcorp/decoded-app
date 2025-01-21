@@ -1,7 +1,9 @@
+'use client';
+
 import { cn } from '@/lib/utils/style';
 import { Link as LinkIcon, Sparkles } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
+import { useNavigateToDetail } from '@/lib/hooks/common/useNavigateToDetail';
 import { ImagePlaceholder } from '@/components/ui/icons/image-placeholder';
 
 interface ItemSpotCardProps {
@@ -29,6 +31,8 @@ export function ItemSpotCard({
   imageDocId,
   itemDocId,
 }: ItemSpotCardProps) {
+  const navigateToDetail = useNavigateToDetail();
+
   return (
     <div
       className={cn(
@@ -107,19 +111,13 @@ export function ItemSpotCard({
         </div>
 
         {/* 링크 제공 버튼 */}
-        <Link
-          href={`/details/${imageDocId}?itemId=${itemDocId}`}
-          className={cn(
-            'w-full flex items-center justify-center gap-2',
-            'py-2 rounded-lg',
-            'bg-zinc-800/50 hover:bg-zinc-700/50',
-            'text-sm font-medium text-white',
-            'transition-colors duration-200'
-          )}
+        <button
+          onClick={() => navigateToDetail(itemDocId, { imageId: imageDocId })}
+          className="flex items-center justify-center w-full gap-2 text-sm text-zinc-400 hover:text-[#EAFD66] transition-colors"
         >
           <LinkIcon className="w-4 h-4" />
           <span>링크 제공하기</span>
-        </Link>
+        </button>
       </div>
     </div>
   );

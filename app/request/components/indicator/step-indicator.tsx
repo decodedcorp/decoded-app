@@ -12,7 +12,7 @@ const STEP_MESSAGES = {
 
 export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
   return (
-    <div className="w-full mb-2">
+    <div className="w-full mb-8">
       <div className="relative pt-1">
         {/* 프로그레스 바 컨테이너 - 너비 조정 */}
         <div className="max-w-[160px] mx-auto relative">

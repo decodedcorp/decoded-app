@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { ImageAreaProps } from "../types";
-import { Caution } from "./caution";
-import { useState } from "react";
-import { ImageNewMarker } from "../../../image-marker/image-new-marker";
+import Image from 'next/image';
+import { ImageAreaProps } from '../types';
+import { Caution } from './caution';
+import { useState } from 'react';
+import { ImageNewMarker } from '../../../image-marker/image-new-marker';
 
 export function ImageArea({
   handleImageClick,
@@ -26,62 +26,50 @@ export function ImageArea({
       <div
         className="relative w-full overflow-hidden mx-auto bg-gray-900 rounded-lg"
         style={{
-          aspectRatio: "3/4",
-          width: "100%",
-          maxWidth: "380px",
+          aspectRatio: '3/4',
+          width: '100%',
         }}
+        onClick={handleImageClick}
       >
-        <div
-          className="absolute inset-0 cursor-crosshair"
-          onClick={handleImageClick}
-        >
-          {imageUrl && (
-            <Image
-              src={imageUrl}
-              alt="Item image"
-              fill
-              className="object-cover"
-              sizes="(max-width: 380px) 100vw, 380px"
-              onError={() => setImageError(true)}
-              priority
-            />
-          )}
+        {imageUrl && !imageError ? (
+          <Image
+            src={imageUrl}
+            alt="Item Image"
+            fill
+            className="object-cover"
+            onError={() => {
+              console.error('Failed to load image:', imageUrl);
+              setImageError(true);
+            }}
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center text-gray-500">
+            {imageError ? 'Failed to load image' : 'No image available'}
+          </div>
+        )}
 
-          {imageError && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-xs text-gray-400">
-                이미지를 불러올 수 없습니다
-              </span>
-            </div>
-          )}
+        {/* Existing markers */}
+        {itemPositions.map((position, index) => (
+          <div
+            key={`existing-marker-${index}`}
+            className="absolute w-4 h-4 -translate-x-1/2 -translate-y-1/2"
+            style={{
+              left: `${position.x}%`,
+              top: `${position.y}%`,
+            }}
+          >
+            <div className="w-full h-full rounded-full border-2 border-black/50 bg-white/50 cursor-not-allowed" />
+          </div>
+        ))}
 
-          <div className="absolute inset-0 bg-black/10" />
-
-          {/* 기존 마커들 */}
-          {itemPositions.map((position, idx) => (
-            <div
-              key={`existing-${idx}`}
-              className="absolute w-4 h-4 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-              style={{
-                top: `${position.top}%`,
-                left: `${position.left}%`,
-              }}
-            >
-              <div className="absolute inset-0 border border-gray-400/30 rounded-full"></div>
-              <div className="absolute inset-[2px] bg-gray-400/50 rounded-full backdrop-blur-sm"></div>
-            </div>
-          ))}
-
-          {/* 새로운 마커들 */}
-          {newMarkers.map((marker, idx) => (
-            <ImageNewMarker
-              key={`new-${idx}`}
-              x={marker.x}
-              y={marker.y}
-              onClick={(e) => handleMarkerClick(e, idx)}
-            />
-          ))}
-        </div>
+        {/* New markers */}
+        {newMarkers.map((marker, index) => (
+          <ImageNewMarker
+            key={`new-marker-${index}`}
+            position={marker}
+            onClick={(e) => handleMarkerClick(e, index)}
+          />
+        ))}
       </div>
       <p className="text-xs text-gray-500 text-center">
         이미지를 클릭하여 아이템 위치를 지정해주세요

@@ -105,19 +105,21 @@ export function transformToDetailPageState(
   }
 
   return {
-    img: {
-      title: data.title || '',
-      description: data.description || '',
-      imageUrl: data.img_url || '',
-      updateAt: new Date(),
-      hyped: data.like || 0,
-      items: transformedItems,
-    },
-    itemList,
-    brandUrlList,
-    brandImgList,
-    artistImgList: [],
-    artistList: [],
-    artistArticleList: [],
+    detailPageState: {
+      img: {
+        title: data.title || '',
+        description: data.description || '',
+        imageUrl: data.img_url || '',
+        updateAt: new Date(),
+        hyped: data.like || 0,
+        items: transformedItems,
+      },
+      itemList,
+      brandUrlList,
+      brandImgList,
+      artistImgList: [],
+      artistList: [],
+      artistArticleList: [],
+    }
   };
 }
