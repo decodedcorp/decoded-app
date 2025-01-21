@@ -1,8 +1,6 @@
 import type { DecodedItem } from '@/lib/api/types/image';
 
-const API_URL = process.env.NODE_ENV === 'production'
-  ? process.env.NEXT_PUBLIC_DB_ENDPOINT
-  : process.env.NEXT_PUBLIC_LOCAL_DB_ENDPOINT;
+const API_URL = process.env.NEXT_PUBLIC_LOCAL_DB_ENDPOINT;
 
 interface ImageResponse {
   status_code: number;
