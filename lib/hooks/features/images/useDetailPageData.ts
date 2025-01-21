@@ -47,13 +47,7 @@ function transformToDetailPageState(data: any): DetailPageState {
     upload_by: data.upload_by || '',
     doc_id: data.doc_id || '',
     decoded_percent: data.decoded_percent || 0,
-    img: {
-      title: data.title,
-      description: data.description,
-      items: data.img?.items || {},
-    },
     items: data.img?.items || {},
-    itemList,
   };
 }
 

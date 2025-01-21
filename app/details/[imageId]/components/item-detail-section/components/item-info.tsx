@@ -9,13 +9,18 @@ export function ItemInfo({ data }: ItemInfoProps) {
   return (
     <>
       <div className="w-[6rem] h-[6rem] bg-white mb-3 border border-neutral-800 rounded-lg overflow-hidden">
-        <Image
-          src={data.img_url}
-          alt={data.metadata.name || ''}
-          width={240}
-          height={240}
-          className="w-full h-full object-contain"
-        />
+        {data.img_url ? (
+          <Image
+            src={data.img_url}
+            alt={data.metadata.name || ''}
+            width={240}
+            height={240}
+            className="w-full h-full object-contain"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-neutral-400">
+          </div>
+        )}
       </div>
 
       <div className="text-neutral-500 text-sm mb-1.5">

@@ -13,11 +13,16 @@ interface PlaceholderContainerProps {
   ) => void;
 }
 
+interface PlaceholderType {
+  description: string | null;
+  // ... other fields
+}
+
 const PLACEHOLDER_RESOURCE: RandomImageResource = {
   _id: 'placeholder',
   title: 'Placeholder',
   img_url: '',
-  description: null,
+  description: '',
   like: 0,
   style: null,
   source: null,
@@ -25,6 +30,7 @@ const PLACEHOLDER_RESOURCE: RandomImageResource = {
   doc_id: 'placeholder',
   decoded_percent: 0,
   requested_items: {},
+  items: {},
 };
 
 export function PlaceholderContainer({

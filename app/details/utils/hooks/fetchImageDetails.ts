@@ -1,30 +1,16 @@
-import type { DecodedItem } from '@/lib/api/types/image';
+import { ApiResponse } from '@/lib/api/types/response';
+import { ImageDetails, DecodedItem, ProcessedImageData } from '@/lib/api/types/image';
 
-const API_URL = process.env.NEXT_PUBLIC_LOCAL_DB_ENDPOINT;
-
-interface ImageResponse {
-  status_code: number;
-  description: string;
-  data: {
-    image: {
-      title: string | null;
-      description: string;
-      like: number;
-      style: string | null;
-      img_url: string;
-      source: string | null;
-      upload_by: string;
-      doc_id: string;
-      decoded_percent: number;
-      items: {
-        [key: string]: DecodedItem[];
-      };
-    };
-  };
-}
-
-export async function getImageDetails(imageId: string) {
+export async function getImageDetails(imageId: string): Promise<ProcessedImageData | null> {
   try {
+    const API_URL = process.env.NODE_ENV === 'production'
+      ? process.env.NEXT_PUBLIC_DB_ENDPOINT
+      : process.env.NEXT_PUBLIC_LOCAL_DB_ENDPOINT;
+
+    if (!API_URL) {
+      throw new Error('Missing API_URL configuration');
+    }
+
     const response = await fetch(`${API_URL}/image/${imageId}`, {
       method: 'GET',
       headers: {
@@ -33,23 +19,27 @@ export async function getImageDetails(imageId: string) {
       next: { revalidate: 60 },
     });
 
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image details: ${response.statusText}`);
+    }
 
-    const { data: { image } } = await response.json();
-    const firstCategory = Object.keys(image.items)[0];
+    const result = await response.json() as ApiResponse<ImageDetails>;
+    
+    if (result.status_code === 200 && result.data?.image) {
+      const imageData = result.data.image;
+      return {
+        ...imageData,
+        items: Object.values(imageData.items || {})
+          .flat()
+          .filter((item): item is DecodedItem => {
+            return Boolean(item?.item?.item);
+          })
+      };
+    }
 
-    return {
-      items: image.items[firstCategory],
-      img_url: image.img_url,
-      title: image.title,
-      description: image.description,
-      like: image.like,
-      doc_id: image.doc_id,
-      style: image.style,
-      decoded_percent: image.decoded_percent
-    };
+    throw new Error('Invalid response structure');
   } catch (error) {
-    console.error('Error in getImageDetails:', error);
-    throw new Error('Failed to fetch image details');
+    console.error('Error fetching image details:', error);
+    return null;
   }
 }

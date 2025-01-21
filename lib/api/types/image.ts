@@ -87,7 +87,7 @@ export interface ImageItem {
 
 export interface ImageData {
   title: string | null;
-  description: string | null;
+  description: string;
   like: number;
   style: string | null;
   img_url: string;
@@ -95,33 +95,9 @@ export interface ImageData {
   upload_by: string;
   doc_id: string;
   decoded_percent: number;
-  items?: Record<string, DecodedItem[]>;
-  img?: {
-    title?: string;
-    description?: string;
-    items?: Record<string, DecodedItem[]>;
+  items: {
+    [key: string]: DecodedItem[];
   };
-  itemList?: Array<{
-    imageDocId: string;
-    info: {
-      item: {
-        item: {
-          _id: string;
-          name: string;
-          description?: string;
-          img_url?: string;
-          price?: number;
-          metadata?: ImageMetadata;
-        };
-        brand_name?: string;
-        brand_logo_image_url?: string | null;
-      };
-    };
-    pos: {
-      top: number;
-      left: number;
-    };
-  }>;
 }
 
 export interface DetailPageState extends ImageData {
@@ -176,5 +152,24 @@ export interface ItemDetailResponse {
       like: number;
     };
     next_id: string | null;
+  };
+}
+
+export interface ProcessedImageData extends Omit<ImageDetails, 'items'> {
+  items: DecodedItem[];
+  doc_id: string;
+  img_url: string;
+  title: string | null;
+  description: string;
+  like: number;
+  style: string | null;
+  decoded_percent: number;
+}
+
+export interface ImageApiResponse {
+  status_code: number;
+  description: string;
+  data: {
+    image: ImageDetails;
   };
 }
