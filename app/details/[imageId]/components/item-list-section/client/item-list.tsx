@@ -2,13 +2,15 @@
 
 import { ItemRow } from './item-row';
 
-export interface ItemListSectionProps {
-  items: {
-    id: string;
-    category: string;
-    subCategory: string;
-    imageUrl?: string;
-  }[];
+interface ProcessedItem {
+  category: string;
+  subCategory: string;
+  imageUrl: string;
+  id: string;
+}
+
+interface ItemListSectionProps {
+  items: ProcessedItem[];
 }
 
 export function ItemListSection({ items }: ItemListSectionProps) {

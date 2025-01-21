@@ -22,11 +22,11 @@ export default function Error({ error, reset }: ErrorComponentProps) {
   );
 }
 
-export function ErrorDisplay({
-  message = 'Failed to load image details',
-}: {
+interface ErrorProps {
   message?: string;
-}) {
+}
+
+export function ErrorDisplay({ message = '데이터를 불러오는데 실패했습니다' }: ErrorProps) {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <h1 className="text-2xl font-bold text-red-500 mb-4">Error</h1>

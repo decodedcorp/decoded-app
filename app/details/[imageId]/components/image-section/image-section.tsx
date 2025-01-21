@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { ItemButton } from '@/components/ui/item-marker';
 import { useNavigateToDetail } from '@/lib/hooks/common/useNavigateToDetail';
+import { ProcessedImageData } from '@/lib/api/types/image';
 
 interface ItemData {
   _id: string;
@@ -42,12 +43,7 @@ interface DecodedItem {
 }
 
 interface ImageSectionProps {
-  imageData: {
-    img_url: string;
-    items: {
-      [category: string]: Array<DecodedItem>;
-    };
-  };
+  imageData: ProcessedImageData;
   selectedItemId?: string;
 }
 
