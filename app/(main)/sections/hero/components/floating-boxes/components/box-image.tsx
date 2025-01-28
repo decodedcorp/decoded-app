@@ -19,7 +19,7 @@ export function BoxImage({ image, isLarge, isHovered }: BoxImageProps) {
         alt={image.title || ''}
         fill
         className={cn(
-          "object-fill w-full h-full",
+          "object-cover w-full h-full",
           "transition-all duration-&lsqb;1200ms&rsqb; ease-&lsqb;cubic-bezier(0.4,0,0.2,1)&rsqb; will-change-[filter,opacity]"
         )}
         style={{

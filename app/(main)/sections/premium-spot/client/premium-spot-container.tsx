@@ -34,17 +34,12 @@ export function PremiumSpotContainer() {
             <h2
               className={cn(
                 'text-3xl md:text-4xl font-bold',
-                'bg-gradient-to-r from-[#EAFD66] to-[#EAFD66]/70',
-                'bg-clip-text text-transparent'
               )}
             >
-              인기 아이템의
-              <br />
-              링크를 제공해보세요
+              인기 아이템의 링크를 제공해보세요
             </h2>
             <p className="text-zinc-400 text-lg leading-relaxed">
-              많은 사람들이 찾는 아이템에 링크를 제공하고
-              <br />더 높은 노출 기회를 얻으세요
+              많은 사람들이 찾는 아이템에 링크를 제공하고 더 높은 노출 기회를 얻으세요
             </p>
           </div>
 

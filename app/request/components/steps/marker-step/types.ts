@@ -10,5 +10,5 @@ export interface MarkerListProps {
   points: Point[];
   selectedPoint: Point | null;
   onSelect: (point: Point | null) => void;
-  onUpdateContext: (point: Point, context: string) => void;
+  onUpdateContext: (point: Point, context: string | null) => void;
 } 

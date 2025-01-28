@@ -21,10 +21,6 @@ export function RequestButton({
           top: marker.y.toString(),
           left: marker.x.toString(),
         },
-        originalPosition: {
-          top: marker.y.toString(),
-          left: marker.x.toString(),
-        },
         context: marker.context || ''
       }))
     };
@@ -33,7 +29,7 @@ export function RequestButton({
     console.log('Request Data:', requestAddItem);
 
     networkManager
-      .request(`request/image/${image.docId}/add/item`, "POST", requestAddItem)
+      .request(`user/${sessionStorage.getItem('USER_DOC_ID')}/image/${image.docId}/request/add`, "POST", requestAddItem)
       .then((response) => {
         console.log('Response:', response);
         if (response?.status === 200 || response?.status_code === 200) {

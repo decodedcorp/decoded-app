@@ -15,7 +15,7 @@ export function ItemInfo({ data }: ItemInfoProps) {
             alt={data.metadata.name || ''}
             width={240}
             height={240}
-            className="w-full h-full object-contain"
+            className="w-full h-full object-cover"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-neutral-400">

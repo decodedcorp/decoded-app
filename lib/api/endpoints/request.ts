@@ -5,13 +5,13 @@ export const requestAPI = {
   // Create image request
   createImageRequest: async (
     userId: string,
-    requestData: RequestImage
+    data: RequestImage
   ): Promise<APIResponse<void>> => {
     try {
       const response = await networkManager.request(
         `user/${userId}/image/request`,
         'POST',
-        requestData
+        data
       );
       return response;
     } catch (error) {

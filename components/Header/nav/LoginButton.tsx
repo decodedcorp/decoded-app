@@ -50,7 +50,7 @@ export function LoginButton() {
       >
         {buttonText}
       </span>
-      {isInitialized && !isLoading && (
+      {!isLoading && (
         <LoginModal
           isOpen={isLoginModalOpen}
           onClose={() => setIsLoginModalOpen(false)}

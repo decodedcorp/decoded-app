@@ -50,6 +50,7 @@ export function DetailSlideSection() {
                 requester: data.data.docs.requester,
                 requested_at: data.data.docs.requested_at,
                 link_info: data.data.docs.link_info ?? [],
+                status: data.data.docs.status as 'pending' | 'confirm',
                 metadata: {
                   ...data.data.docs.metadata,
                   category: data.data.docs.metadata.category ?? 'Unknown',

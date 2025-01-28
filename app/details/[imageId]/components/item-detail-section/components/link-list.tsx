@@ -7,11 +7,12 @@ import type { LinkInfo } from '../types';
 interface LinkListProps {
   links?: LinkInfo[];
   activeTab: 'sale' | 'related';
+  status: 'pending' | 'confirm';
 }
 
-export function LinkList({ links, activeTab }: LinkListProps) {
-  const filteredLinks = links?.filter((link) =>
-    activeTab === 'sale' ? !link.label : link.label
+export function LinkList({ links, activeTab, status = 'confirm' }: LinkListProps) {
+  const filteredLinks = links?.filter(
+    (link) => (activeTab === 'sale' ? !link.label : link.label) && status !== 'confirm'
   );
 
   return (

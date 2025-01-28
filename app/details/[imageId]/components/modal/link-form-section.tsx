@@ -27,7 +27,7 @@ export default function LinkFormSection({
 
   return (
     <div
-      className={`fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 
+      className={`fixed inset-0 flex items-center justify-center p-4 z-50 
         transition-opacity duration-300 ${
           isClosing ? 'opacity-0' : 'opacity-100'
         }`}

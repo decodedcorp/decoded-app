@@ -5,7 +5,7 @@ import { ErrorDisplay } from './components/error';
 import { getImageDetails } from '@/app/details/utils/hooks/fetchImageDetails';
 import { ImageSection } from './components/image-section/image-section';
 import { DetailsList } from './components/item-list-section/server/details-list';
-import { StylingSection } from './components/style-guide/styling-section';
+import { RelatedStylingSection } from './components/related-styling/related-style';
 import { ImageDetails, DecodedItem } from '@/lib/api/types/image';
 
 // 타입 정의
@@ -16,8 +16,13 @@ interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
+
 interface ProcessedImageData extends Omit<ImageDetails, 'items'> {
   items: DecodedItem[];
+}
+
+interface imagesMetadata {
+  [key: string]: string;
 }
 
 // 서버 컴포넌트
@@ -49,7 +54,7 @@ export default async function DetailPage({
         .flat()
         .filter((item): item is DecodedItem => {
           return Boolean(item?.item?.item);
-        })
+        }),
     };
 
     if (!processedImageData.items.length) {
@@ -73,7 +78,7 @@ export default async function DetailPage({
                 />
               </div>
             </div>
-            <StylingSection />
+            {/* <RelatedStylingSection imageId={imageData.doc_id} /> */}
           </Suspense>
         </div>
       </div>

@@ -13,44 +13,45 @@ import axios from 'axios';
 export class NetworkManager {
   private static instance: NetworkManager;
   private readonly config: {
-    /**
-     * @property {string} service - service endpoint root URL
-     */
-    service: string;
-    /**
-     * @property {string} auth_client_id - Google auth client ID
-     */
-    auth_client_id: string;
-    /**
-     * @property {string} redirect_uri - Google redirect URI
-     */
-    redirect_uri: string;
+    service: string; // API endpoint URL
+    auth_client_id: string; // Google Auth Client ID
+    redirect_uri: string; // Google Redirect URI
   };
 
   private constructor() {
-    // API URL 설정을 콘솔에 출력하여 디버깅
+    console.log('[NetworkManager] Initializing...');
     console.log('Current NODE_ENV:', process.env.NODE_ENV);
-    
-    const API_URL = process.env.NODE_ENV === 'production'
-      ? process.env.NEXT_PUBLIC_DB_ENDPOINT      // https://api.decoded.style
-      : process.env.NEXT_PUBLIC_LOCAL_DB_ENDPOINT; // https://dev.decoded.style
-    
-    console.log('Selected API_URL:', API_URL);
 
-    const authClientId = process.env.NEXT_PUBLIC_AUTH_CLIENT_ID;
-    const redirectUri = process.env.NODE_ENV === 'production'
-      ? 'https://decoded.style'
-      : process.env.NEXT_PUBLIC_REDIRECT_URI;
+    const API_URL =
+      process.env.NODE_ENV === 'production'
+        ? process.env.NEXT_PUBLIC_DB_ENDPOINT
+        : process.env.NEXT_PUBLIC_LOCAL_DB_ENDPOINT;
+
+    const authClientId = process.env.NEXT_PUBLIC_AUTH_CLIENT_ID || '';
+    const redirectUri =
+      process.env.NODE_ENV === 'production'
+        ? 'https://decoded.style'
+        : process.env.NEXT_PUBLIC_REDIRECT_URI || '';
 
     if (!API_URL) {
-      throw new Error('Missing API_URL configuration');
+      throw new Error('[NetworkManager] Missing API_URL configuration');
+    }
+
+    if (!authClientId) {
+      throw new Error('[NetworkManager] Missing AUTH_CLIENT_ID configuration');
+    }
+
+    if (!redirectUri) {
+      throw new Error('[NetworkManager] Missing REDIRECT_URI configuration');
     }
 
     this.config = {
       service: API_URL,
-      auth_client_id: authClientId || '',
-      redirect_uri: redirectUri || '',
+      auth_client_id: authClientId,
+      redirect_uri: redirectUri,
     };
+
+    console.log('[NetworkManager] Initialized with config:', this.config);
   }
 
   public static getInstance(): NetworkManager {
@@ -62,76 +63,95 @@ export class NetworkManager {
 
   public async request<T = any>(
     path: string,
-    method: string,
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
     data: any = null,
     retries = 3,
     accessToken?: string
   ): Promise<T> {
     let attempt = 0;
-  
+
     while (attempt < retries) {
       try {
-        const convertedData = convertKeysToSnakeCase(data);
         const url = `${this.config.service}/${path}`;
-  
-        const storedToken = accessToken || window.sessionStorage.getItem('ACCESS_TOKEN');
-        
-        const headers = {
-          'Content-Type': 'application/json',
+        const storedToken =
+          accessToken || window.sessionStorage.getItem('ACCESS_TOKEN');
+
+        const headers: Record<string, string> = {
           ...(storedToken && { Authorization: `Bearer ${storedToken}` }),
         };
 
-        const res = await axios.request<T>({
+        // FormData인 경우 Content-Type을 설정하지 않음 (브라우저가 자동으로 설정)
+        if (!(data instanceof FormData)) {
+          headers['Content-Type'] = 'application/json';
+          data = convertKeysToSnakeCase(data);
+        }
+
+        console.log(`[NetworkManager] Sending request to: ${url}`);
+        console.log('[NetworkManager] Request method:', method);
+        console.log('[NetworkManager] Request data:', data);
+        console.log('[NetworkManager] Request headers:', headers);
+
+        const response = await axios.request<T>({
           url,
           method,
-          data: convertedData,
+          data,
           headers,
           maxRedirects: 0,
-          validateStatus: (status) => true,
+          validateStatus: (status) => status >= 200 && status < 300,
           timeout: 10000,
         });
-  
-        if (res.status === 401 && storedToken) {
-          window.sessionStorage.clear();
-          window.location.href = '/';
-          throw new Error('Token expired');
-        }
-  
-        if (!res.data) {
-          throw new Error('응답 데이터가 비어있습니다');
-        }
-  
-        return res.data;
-      } catch (e) {
+
+        console.log('[NetworkManager] Response received:', response.data);
+
+        return response.data;
+      } catch (error) {
         attempt++;
-  
-        if (axios.isAxiosError(e)) {
-          if (e.code === 'ERR_NETWORK') {
-            throw new Error('서버 접근이 차단되었습니다. 관리자에게 문의하세요.');
+
+        if (axios.isAxiosError(error)) {
+          console.error('[NetworkManager] Axios error:', error.message);
+          console.error('[NetworkManager] Axios error details:', {
+            url: `${this.config.service}/${path}`,
+            method,
+            data,
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${window.sessionStorage.getItem(
+                'ACCESS_TOKEN'
+              )}`,
+            },
+          });
+
+          if (error.code === 'ERR_NETWORK') {
+            throw new Error(
+              '[NetworkManager] Network error. Check your connection.'
+            );
           }
 
           if (
-            e.code === 'ECONNABORTED' ||
-            e.code === 'ETIMEDOUT' ||
-            !e.response
+            error.code === 'ECONNABORTED' ||
+            error.code === 'ETIMEDOUT' ||
+            !error.response
           ) {
             if (attempt < retries) {
               const delay = Math.min(1000 * Math.pow(2, attempt), 10000);
+              console.warn(`[NetworkManager] Retrying in ${delay}ms...`);
               await new Promise((resolve) => setTimeout(resolve, delay));
               continue;
             }
           }
         }
-  
-        if (attempt === retries) {
-          throw e;
-        }
+
+        console.error(
+          `[NetworkManager] Request failed after ${attempt} attempts`,
+          error
+        );
+        throw error;
       }
     }
-  
-    throw new Error('모든 재시도 실패');
+
+    throw new Error('[NetworkManager] All retry attempts failed.');
   }
-  
+
   public async openIdConnectUrl(): Promise<{
     sk: string;
     randomness: string;
@@ -139,57 +159,67 @@ export class NetworkManager {
     url: string;
   }> {
     try {
+      console.log('[NetworkManager] Generating OpenID Connect URL...');
       const epk = Ed25519Keypair.generate();
       const randomness = generateRandomness();
       const rpcUrl = getFullnodeUrl('devnet');
-      const suiClient = new SuiClient({
-        url: rpcUrl,
-      });
+      const suiClient = new SuiClient({ url: rpcUrl });
       const suiSysState = await suiClient.getLatestSuiSystemState();
       const currentEpoch = suiSysState.epoch;
-      let maxEpoch: number = parseInt(currentEpoch) + 10;
+      const maxEpoch = parseInt(currentEpoch) + 10;
+
       const nonce = generateNonce(epk.getPublicKey(), maxEpoch, randomness);
+
       const params = new URLSearchParams({
         client_id: this.config.auth_client_id,
         redirect_uri: this.config.redirect_uri,
         response_type: 'id_token',
-        scope: 'openid',
-        nonce: nonce,
+        scope: [
+          'openid',
+          'https://www.googleapis.com/auth/userinfo.email',
+          'https://www.googleapis.com/auth/userinfo.profile',
+        ].join(' '),
+        nonce,
       });
+
       const url = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
+      console.log('[NetworkManager] Generated OpenID Connect URL:', url);
+
       return {
         sk: epk.getSecretKey(),
-        randomness: randomness,
+        randomness,
         exp: maxEpoch,
-        url: url,
+        url,
       };
-    } catch (err) {
-      throw new Error('Error on fetching nonce => ' + err);
+    } catch (error) {
+      console.error(
+        '[NetworkManager] Error generating OpenID Connect URL:',
+        error
+      );
+      throw new Error('Failed to generate OpenID Connect URL');
     }
   }
 
-  /**
-   * @method getTempToken
-   * @description 임시 토큰을 가져오는 메서드
-   * @returns {Promise<string>} 임시 토큰
-   */
   public async getTempToken(): Promise<string> {
     try {
+      console.log('[NetworkManager] Requesting temporary token...');
       const response = await this.request<{
         status_code: number;
         data?: {
           access_token: string;
         };
-      }>('temp-token', 'GET', null, 3);
+      }>('temp-token', 'POST', {});
+
+      console.log('[NetworkManager] Temporary token response:', response);
 
       if (response.status_code !== 200 || !response.data?.access_token) {
-        throw new Error('Failed to get temporary token');
+        throw new Error('[NetworkManager] Failed to fetch temporary token.');
       }
 
       return response.data.access_token;
     } catch (error) {
-      console.error('[Temp Token Error]', error);
-      throw new Error('임시 토큰 발급에 실패했습니다');
+      console.error('[NetworkManager] Temporary token error:', error);
+      throw error;
     }
   }
 }

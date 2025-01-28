@@ -9,7 +9,7 @@ interface NavigationFooterProps {
   isStepComplete: boolean;
   onNext: () => void;
   onPrev: () => void;
-  onSubmit: () => void;
+  onSubmit: () => Promise<void>;
 }
 
 export function NavigationFooter({
@@ -34,7 +34,11 @@ export function NavigationFooter({
               )}
               {currentStep === totalSteps && (
                 <button
-                  onClick={onSubmit}
+                  onClick={() => {
+                    onSubmit().catch(error => {
+                      console.error('Submit failed:', error);
+                    });
+                  }}
                   disabled={!isStepComplete}
                   className={`
                     px-8 py-3 rounded-xl text-sm font-medium

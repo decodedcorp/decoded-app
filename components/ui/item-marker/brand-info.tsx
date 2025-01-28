@@ -29,7 +29,7 @@ export function BrandInfo({
           src={brandLogoUrl}
           alt={brandName}
           fill
-          className="object-contain"
+          className="object-cover"
         />
       </div>
       <span className="text-[10px] font-medium text-black whitespace-nowrap">

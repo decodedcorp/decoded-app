@@ -16,14 +16,15 @@ export interface ImagePosition {
 }
 
 export interface RequestedItem {
+  item_class: string;
+  item_sub_class: string;
+  category: string;
+  sub_category: string;
+  product_type: string;
+  context?: string;
   position: {
-    top: string;
     left: string;
-  };
-  imageId: string;
-  originalPosition: {
     top: string;
-    left: string;
   };
 }
 
@@ -562,10 +563,18 @@ export interface Point {
 }
 
 export interface RequestImage {
-  requestedItems: RequestedItem[];
+  requestedItems: Array<{
+    context?: string | null;
+    position: {
+      left: string;
+      top: string;
+    };
+  }>;
   requestBy: string;
-  imageFile?: string;
-  metadata: Record<string, string>;
+  imageFile: string;
+  context?: string | null;
+  source?: string | null;
+  metadata?: Record<string, string | null>;
 }
 
 export interface ApiDetailPageState {
@@ -707,20 +716,25 @@ export interface Item {
 
 // Request related interfaces
 export interface RequestedItem {
-  itemClass?: string;
-  itemSubClass?: string;
-  category?: string;
-  subCategory?: string;
-  productType?: string;
-  position: Position;
-  context?: string;
+  item_class: string;
+  item_sub_class: string;
+  category: string;
+  sub_category: string;
+  product_type: string;
+  context: string;
+  position: {
+    left: string;
+    top: string;
+  };
 }
 
 export interface RequestImage {
   requestedItems: RequestedItem[];
   requestBy: string;
   imageFile: string;
-  metadata: Record<string, string>;
+  context?: string | null;
+  source?: string | null;
+  metadata?: Record<string, string | null>;
 }
 
 // Image related interfaces
