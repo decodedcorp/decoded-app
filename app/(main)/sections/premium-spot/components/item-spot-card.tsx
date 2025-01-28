@@ -83,7 +83,7 @@ export function ItemSpotCard({
       </div>
 
       {/* 콘텐츠 */}
-      <div className="p-5 space-y-4">
+      <div className={cn('bg-zinc-900 p-5 space-y-4', featured && 'bg-[#EAFD66]/10')}>
         {/* 아이템 정보 */}
         <div>
           <h3 className="font-medium text-white">{title}</h3>

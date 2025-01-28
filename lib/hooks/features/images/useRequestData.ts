@@ -1,79 +1,53 @@
 import { useState, useCallback } from 'react';
 import { requestAPI } from '@/lib/api/endpoints/request';
-import type { RequestImage } from '@/lib/api/types/request';
+import type { RequestImage, APIResponse } from '@/lib/api/types/request';
 
 interface UseRequestDataReturn {
   isLoading: boolean;
   error: Error | null;
-  createRequest: (requestData: RequestData) => Promise<void>;
+  createRequest: (data: RequestImage, userDocId: string) => Promise<APIResponse<void>>;
   requests: RequestImage[];
   currentRequest: RequestImage | null;
   refreshRequests: () => Promise<void>;
 }
 
-interface RequestData {
-  requested_items: Array<{
-    item_class: string;
-    item_sub_class: string;
-    category: string;
-    sub_category: string;
-    product_type: string;
-    context: string;
-    position: {
-      left: string;
-      top: string;
-    };
-  }>;
-  request_by: string;
-  image_file: string;
-  metadata: {
-    additionalProp1?: string;
-    additionalProp2?: string;
-  };
-}
 
-export function useRequestData(userId: string): UseRequestDataReturn {
+export function useRequestData(initialData: any): UseRequestDataReturn {
   const [requests, setRequests] = useState<RequestImage[]>([]);
-  const [currentRequest, setCurrentRequest] = useState<RequestImage | null>(
-    null
-  );
+  const [currentRequest, setCurrentRequest] = useState<RequestImage | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const createRequest = useCallback(async (requestData: RequestData) => {
+  const createRequest = async (data: RequestImage, userDocId: string): Promise<APIResponse<void>> => {
     try {
-      setIsLoading(true);
-      const formattedData: RequestImage = {
-        requestedItems: requestData.requested_items,
-        requestBy: requestData.request_by,
-        imageFile: requestData.image_file,
-        metadata: requestData.metadata
-      };
-      await requestAPI.createImageRequest(userId, formattedData);
-      await refreshRequests();
-    } catch (err) {
-      setError(
-        err instanceof Error ? err : new Error('Failed to create request')
-      );
-      throw err;
-    } finally {
-      setIsLoading(false);
+      console.log('=== Create Request Debug ===');
+      console.log('User Doc ID:', userDocId);
+      console.log('Request Data:', data);
+
+      return await requestAPI.createImageRequest(userDocId, data);
+    } catch (error) {
+      console.error('Request Error Details:', error);
+      throw error;
     }
-  }, [userId]);
+  };
 
   const refreshRequests = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await requestAPI.getImageRequests(userId);
+      console.log('=== Refresh Requests Debug ===');
+      console.log('Fetching requests for user:', initialData.userId);
+      
+      const response = await requestAPI.getImageRequests(initialData.userId);
+      console.log('Refresh Response:', response);
+      
       setRequests(response.data);
     } catch (err) {
-      setError(
-        err instanceof Error ? err : new Error('Failed to fetch requests')
-      );
+      console.error('Refresh Error:', err);
+      setError(err instanceof Error ? err : new Error('Failed to fetch requests'));
     } finally {
       setIsLoading(false);
     }
-  }, [userId]);
+  }, [initialData.userId]);
 
   return {
     isLoading,

@@ -7,13 +7,14 @@ interface LinkTabsProps {
   onTabChange: (tab: 'sale' | 'related') => void;
   saleCount?: number;
   relatedCount?: number;
+  status?: 'pending' | 'confirm';
 }
 
 export function LinkTabs({ 
   activeTab, 
   onTabChange, 
   saleCount = 0, 
-  relatedCount = 0 
+  relatedCount = 0,
 }: LinkTabsProps) {
   return (
     <div className="flex mb-6 border-b border-neutral-800">

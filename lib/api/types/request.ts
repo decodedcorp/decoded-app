@@ -1,18 +1,23 @@
-import { ImageData } from './image';
-
 export interface RequestedItem {
   position: {
     top: string;
     left: string;
   };
-  context?: string;
+  context?: string | null;
 }
 
 export interface RequestImage {
-  requestedItems: RequestedItem[];
-  requestBy: string;
+  requestedItems: Array<{
+    context?: string | null;
+    position: {
+      left: string;
+      top: string;
+    };
+  }>;
   imageFile: string;
-  metadata: Record<string, any>;
+  requestBy: string;
+  context?: string | null;
+  source?: string | null;
 }
 
 export interface APIResponse<T> {

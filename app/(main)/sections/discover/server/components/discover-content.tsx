@@ -8,7 +8,7 @@ export function DiscoverContent() {
   return (
     <div className="relative z-10 grid md:grid-cols-2 gap-8 p-8 md:p-12">
       {/* 왼쪽: 텍스트 영역 */}
-      <div className="space-y-8">
+      <div className="flex flex-col gap-10">
         <DiscoverTitle />
         <FeatureList />
         <DiscoverCTA />

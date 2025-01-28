@@ -59,6 +59,10 @@ export interface ImageDetails {
   items: {
     [key: string]: DecodedItem[];
   };
+  metadata: {
+    artistId: string;
+    artistName: string;
+  };
 }
 
 export interface ImageMetadata {

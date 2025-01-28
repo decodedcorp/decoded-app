@@ -11,7 +11,7 @@ interface MarkerStepSidebarProps {
   points: Point[];
   selectedPoint: number | null;
   onSelect: (point: Point | null) => void;
-  onUpdateContext: (point: Point, context: string) => void;
+  onUpdateContext: (point: Point, context: string | null) => void;
 }
 
 export function MarkerStepSidebar({
@@ -40,7 +40,9 @@ export function MarkerStepSidebar({
             />
           </div>
         ) : (
-          <EmptyState />
+          <div className="h-[280px] overflow-y-auto px-4 py-2">
+            <EmptyState />
+          </div>
         )}
       </div>
     </div>

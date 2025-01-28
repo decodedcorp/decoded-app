@@ -63,9 +63,12 @@ export function AccountSection({ onClose }: AccountSectionProps) {
         </>
       ) : (
         <button
-          onClick={() => {
-            handleGoogleLogin();
-            onClose?.();
+          onClick={async () => {
+            try {
+              await handleGoogleLogin();
+            } catch (error) {
+              console.error('Login failed:', error);
+            }
           }}
           className="w-full px-6 py-4 rounded-xl text-sm font-medium
             bg-gradient-to-r from-white to-gray-100 text-gray-900 

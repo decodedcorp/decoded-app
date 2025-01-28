@@ -14,7 +14,7 @@ interface ImageContainerProps {
   points: Point[];
   onImageSelect: (image: string, file: File) => void;
   onPointsChange: (points: Point[]) => void;
-  onPointContextChange?: (pointIndex: number, context: string) => void;
+  onPointContextChange?: (point: Point, context: string | null) => void;
   onPointSelect?: (pointIndex: number | null) => void;
   children?: React.ReactNode;
 }
@@ -76,7 +76,7 @@ export function ImageContainer({
                 src={selectedImage}
                 alt="Selected image"
                 fill
-                className="object-fit"
+                className="object-cover"
               />
             ) : (
               <UploadGuide />
@@ -84,14 +84,29 @@ export function ImageContainer({
           </label>
         ) : step === 3 ? (
           selectedImage && (
-            <div className={cn('relative aspect-[3/4]', 'w-full')}>
-              <Image
-                src={selectedImage}
-                alt="Selected image"
-                fill
-                className="object-fit"
-              />
-            </div>
+            <ImageMarker
+              imageUrl={selectedImage}
+              points={points}
+              onPointsChange={onPointsChange}
+              onPointContextChange={(index, context) => {
+                if (
+                  onPointContextChange &&
+                  index >= 0 &&
+                  index < points.length
+                ) {
+                  onPointContextChange(points[index], context);
+                }
+              }}
+              onPointSelect={
+                onPointSelect &&
+                ((point) => {
+                  const index = points.indexOf(point);
+                  onPointSelect(index >= 0 ? index : null);
+                })
+              }
+              showPointList={false}
+              className="w-full pointer-events-none"
+            />
           )
         ) : (
           selectedImage && (
@@ -99,8 +114,22 @@ export function ImageContainer({
               imageUrl={selectedImage}
               points={points}
               onPointsChange={onPointsChange}
-              onPointContextChange={onPointContextChange}
-              onPointSelect={(point) => onPointSelect?.(points.indexOf(point))}
+              onPointContextChange={(index, context) => {
+                if (
+                  onPointContextChange &&
+                  index >= 0 &&
+                  index < points.length
+                ) {
+                  onPointContextChange(points[index], context);
+                }
+              }}
+              onPointSelect={
+                onPointSelect &&
+                ((point) => {
+                  const index = points.indexOf(point);
+                  onPointSelect(index >= 0 ? index : null);
+                })
+              }
               showPointList={false}
               className="w-full"
             />

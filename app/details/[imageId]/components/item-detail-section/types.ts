@@ -12,6 +12,7 @@ export interface ItemDetailData {
   requester: string;
   requested_at: string;
   link_info: LinkInfo[];
+  status: 'pending' | 'confirm';
   metadata: {
     name: string | null;
     description: string | null;

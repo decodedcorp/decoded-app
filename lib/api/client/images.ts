@@ -55,6 +55,7 @@ export interface RandomResourcesResponse {
   resources: RandomImageResource[] | RandomItemResource[];
 }
 
+
 export const imagesAPI = {
   // Get image items
   getImageItems: async (imageId: string): Promise<APIResponse<ItemDocument[]>> => {
@@ -107,6 +108,24 @@ export const imagesAPI = {
   getRandomResources: async (limit: number = 10): Promise<APIResponse<RandomResourcesResponse>> => {
     try {
       const response = await networkManager.request(`random?limit=${limit}`, 'GET');
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  getNewalImages: async (): Promise<APIResponse<ImageData[]>> => {
+    try {
+      const response = await networkManager.request('image', 'GET');
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  getArtistImages: async (imageId: string, artistId: string): Promise<APIResponse<ImageData[]>> => {
+    try {
+      const response = await networkManager.request(`image/${imageId}/artist/${artistId}`, 'GET');
       return response;
     } catch (error) {
       throw error;

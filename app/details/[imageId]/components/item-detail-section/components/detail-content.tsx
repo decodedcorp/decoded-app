@@ -19,17 +19,17 @@ export function DetailContent({
     <div className="w-full">
       <div className="flex flex-col items-center pb-6">
         <ItemInfo data={data} />
-        <ItemActions like={data.like} />
+        <ItemActions likeCount={data.like} itemId={data.id} />
       </div>
 
       <div className="px-4">
         <LinkTabs
           activeTab={activeTab}
           onTabChange={onTabChange}
-          saleCount={data.link_info?.filter((link) => !link.label).length}
-          relatedCount={data.link_info?.filter((link) => link.label).length}
+          saleCount={data.link_info?.filter((link) => (link.label)).length}
+          relatedCount={data.link_info?.filter( (link) => (link.label && status !== 'confirm')).length}
         />
-        <LinkList links={data.link_info} activeTab={activeTab} />
+        <LinkList links={data.link_info} activeTab={activeTab} status={data.status} />
       </div>
     </div>
   );

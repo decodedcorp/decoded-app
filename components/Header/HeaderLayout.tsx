@@ -49,17 +49,6 @@ export function HeaderLayout() {
         }}
         onSidebarOpen={() => setIsSidebarOpen(true)}
       />
-      <SearchModal
-        isOpen={isSearchOpen}
-        onClose={handleSearchClose}
-        isClosing={isSearchClosing}
-        isScrolled={false}
-      />
-      <LoginModal
-        isOpen={isLoginOpen}
-        onClose={handleLoginClose}
-        isClosing={isLoginClosing}
-      ></LoginModal>
     </>
   );
 }
