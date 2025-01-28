@@ -131,6 +131,7 @@ export interface ItemDetailResponse {
       _id: string;
       requester: string;
       requested_at: string;
+      status: 'pending' | 'confirm';
       link_info: Array<{
         url: string;
         label: string | null;
