@@ -1,13 +1,15 @@
-'use client';
+"use client";
 
-import { cn } from '@/lib/utils/style';
-import { PremiumSpotClient } from '../client/premium-spot-client';
-import { PeriodSelector } from '../components/period-selector';
-import { Period } from '../types';
-import { useState, useEffect } from 'react';
-import { useAvailablePeriods } from '../client/hooks/use-available-periods';
+import { cn } from "@/lib/utils/style";
+import { PremiumSpotClient } from "../client/premium-spot-client";
+import { PeriodSelector } from "../components/period-selector";
+import { Period } from "../types";
+import { useState, useEffect } from "react";
+import { useAvailablePeriods } from "../client/hooks/use-available-periods";
+import { useLocaleContext } from "@/lib/contexts/locale-context";
 
 export function PremiumSpotContainer() {
+  const { t } = useLocaleContext();
   const [period, setPeriod] = useState<Period | null>(null);
   const { availablePeriods, isLoading } = useAvailablePeriods();
 
@@ -25,21 +27,17 @@ export function PremiumSpotContainer() {
     <section className="container mx-auto px-4">
       <div
         className={cn(
-          'relative rounded-3xl overflow-hidden',
-          'border border-zinc-800/50'
+          "relative rounded-3xl overflow-hidden",
+          "border border-zinc-800/50"
         )}
       >
         <div className="relative z-10 p-8 md:p-12 space-y-12">
           <div className="max-w-2xl space-y-4">
-            <h2
-              className={cn(
-                'text-3xl md:text-4xl font-bold',
-              )}
-            >
-              인기 아이템의 링크를 제공해보세요
+            <h2 className={cn("text-3xl md:text-4xl font-bold")}>
+              {t.home.premiumSpot.title}
             </h2>
             <p className="text-zinc-400 text-lg leading-relaxed">
-              많은 사람들이 찾는 아이템에 링크를 제공하고 더 높은 노출 기회를 얻으세요
+              {t.home.premiumSpot.description}
             </p>
           </div>
 

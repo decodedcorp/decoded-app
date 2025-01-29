@@ -1,24 +1,28 @@
-import { getRandomResources } from '@/lib/api/server/images';
-import { FloatingBoxes as FloatingBoxesClient } from './components/floating-boxes';
-import { HeroContent } from './components/hero-content';
-import ScrollIndicator from './components/scroll-indicator';
-import type { BoxSizeMode } from './utils/types';
-import { Suspense } from 'react';
-import type { RandomImageResource, RandomItemResource } from '@/lib/api/client/images';
-
+import { getRandomResources } from "@/lib/api/server/images";
+import { FloatingBoxes as FloatingBoxesClient } from "./components/floating-boxes";
+import { HeroContent } from "./components/hero-content";
+import ScrollIndicator from "./components/scroll-indicator";
+import type { BoxSizeMode } from "./utils/types";
+import { Suspense } from "react";
+import type {
+  RandomImageResource,
+  RandomItemResource,
+} from "@/lib/api/client/images";
+import { Locale } from "@/lib/lang/locales";
 interface HeroSectionProps {
   sizeMode?: BoxSizeMode;
+  locale?: Locale;
 }
 
-export async function HeroSection({ sizeMode = 'LARGE' }: HeroSectionProps) {
+export async function HeroSection({ sizeMode = "LARGE" }: HeroSectionProps) {
   let resources: (RandomImageResource | RandomItemResource)[] = [];
-  
+
   try {
     // 서버 사이드에서 데이터 fetching
     const response = await getRandomResources();
     resources = response.data?.resources?.slice(0, 10) ?? [];
   } catch (error) {
-    console.error('Failed to load random resources:', error);
+    console.error("Failed to load random resources:", error);
     // 에러가 발생해도 UI는 렌더링
   }
 
@@ -34,11 +38,11 @@ export async function HeroSection({ sizeMode = 'LARGE' }: HeroSectionProps) {
           <div className="absolute inset-0 backdrop-blur-[40px] opacity-30" />
           {/* Front Layer - Light Blur */}
           <div className="absolute inset-0 backdrop-blur-[20px] opacity-20" />
-          
+
           {/* Floating Boxes */}
           <div className="relative w-full h-full flex items-center justify-center">
             <Suspense fallback={null}>
-              <FloatingBoxesClient 
+              <FloatingBoxesClient
                 sizeMode={sizeMode}
                 initialResources={resources}
               />

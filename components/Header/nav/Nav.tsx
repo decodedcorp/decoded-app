@@ -1,9 +1,11 @@
+"use client";
+
 import Logo from "@/styles/logos/LogoSvg";
 import { SearchBar } from "../search/SearchBar";
 import { LoginButton } from "./LoginButton";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-
+import { useLocaleContext } from "@/lib/contexts/locale-context";
 interface NavProps {
   isSearchOpen: boolean;
   onSearchToggle: () => void;
@@ -17,6 +19,7 @@ function Nav({
   onLoginClick,
   onSidebarOpen,
 }: NavProps) {
+  const { t } = useLocaleContext();
   return (
     <nav className="w-full h-16">
       <div className="h-full mx-auto container">
@@ -39,7 +42,7 @@ function Nav({
               href="/request"
               className="text-xs md:text-sm text-gray-600 hover:text-[#EAFD66] transition-colors duration-200"
             >
-              요청하기
+              {t.header.nav.request}
             </Link>
             <LoginButton />
           </div>

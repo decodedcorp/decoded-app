@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLocaleContext } from "@/lib/contexts/locale-context";
 
 const ScrollIndicator = () => {
+  const { t } = useLocaleContext();
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
@@ -33,7 +35,9 @@ const ScrollIndicator = () => {
       onClick={handleClick}
     >
       <div className="flex flex-col items-center justify-center animate-float w-24 h-24">
-        <span className="text-sm font-medium text-gray-600">스크롤 내리기</span>
+        <span className="text-sm font-medium text-gray-600">
+          {t.home.scrollIndicator}
+        </span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="20"

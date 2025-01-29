@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { langMap, Locale } from "@/lib/locales";
+import { langMap, Locale } from "@/lib/lang/locales";
 
 export function useLocale() {
   const params = useParams();

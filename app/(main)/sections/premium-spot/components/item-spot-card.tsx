@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { cn } from '@/lib/utils/style';
-import { Link as LinkIcon, Sparkles } from 'lucide-react';
-import Image from 'next/image';
-import { useNavigateToDetail } from '@/lib/hooks/common/useNavigateToDetail';
-import { ImagePlaceholder } from '@/components/ui/icons/image-placeholder';
-
+import { cn } from "@/lib/utils/style";
+import { Link as LinkIcon, Sparkles } from "lucide-react";
+import Image from "next/image";
+import { useNavigateToDetail } from "@/lib/hooks/common/useNavigateToDetail";
+import { ImagePlaceholder } from "@/components/ui/icons/image-placeholder";
+import { useLocaleContext } from "@/lib/contexts/locale-context";
 interface ItemSpotCardProps {
   image: string | null;
   title: string;
@@ -31,17 +31,18 @@ export function ItemSpotCard({
   imageDocId,
   itemDocId,
 }: ItemSpotCardProps) {
+  const { t } = useLocaleContext();
   const navigateToDetail = useNavigateToDetail();
 
   return (
     <div
       className={cn(
-        'group relative',
-        'rounded-2xl overflow-hidden',
-        'border border-zinc-800/50',
-        'hover:border-[#EAFD66]/20',
-        'transition-all duration-300',
-        featured && 'ring-2 ring-[#EAFD66]'
+        "group relative",
+        "rounded-2xl overflow-hidden",
+        "border border-zinc-800/50",
+        "hover:border-[#EAFD66]/20",
+        "transition-all duration-300",
+        featured && "ring-2 ring-[#EAFD66]"
       )}
     >
       {/* 이미지 */}
@@ -52,9 +53,9 @@ export function ItemSpotCard({
             alt={title}
             fill
             className={cn(
-              'object-cover',
-              'transform group-hover:scale-110',
-              'transition-transform duration-700 ease-in-out'
+              "object-cover",
+              "transform group-hover:scale-110",
+              "transition-transform duration-700 ease-in-out"
             )}
           />
         ) : (
@@ -69,25 +70,32 @@ export function ItemSpotCard({
         {featured && (
           <div
             className={cn(
-              'absolute top-3 right-3 z-10',
-              'px-2 py-1 rounded-full',
-              'bg-[#EAFD66] text-black',
-              'text-xs font-medium',
-              'flex items-center gap-1'
+              "absolute top-3 right-3 z-10",
+              "px-2 py-1 rounded-full",
+              "bg-[#EAFD66] text-black",
+              "text-xs font-medium",
+              "flex items-center gap-1"
             )}
           >
             <Sparkles className="w-3 h-3" />
-            <span>인기</span>
+            <span>{t.common.terminology.trending}</span>
           </div>
         )}
       </div>
 
       {/* 콘텐츠 */}
-      <div className={cn('bg-zinc-900 p-5 space-y-4', featured && 'bg-[#EAFD66]/10')}>
+      <div
+        className={cn(
+          "bg-zinc-900 p-5 space-y-4",
+          featured && "bg-[#EAFD66]/10"
+        )}
+      >
         {/* 아이템 정보 */}
         <div>
           <h3 className="font-medium text-white">{title}</h3>
-          <p className="text-sm text-zinc-400">{brand || '브랜드 정보 없음'}</p>
+          <p className="text-sm text-zinc-400">
+            {brand || t.common.errors.brandNotFound}
+          </p>
         </div>
 
         {/* 통계 */}
@@ -96,17 +104,22 @@ export function ItemSpotCard({
             <p className="text-[#EAFD66] font-medium">
               {views.toLocaleString()}
             </p>
-            <p className="text-zinc-500 text-xs">조회</p>
+            <p className="text-zinc-500 text-xs">
+              {t.common.terminology.viewCount}
+            </p>
           </div>
           <div>
             <p className="text-[#EAFD66] font-medium">{requestCount}</p>
-            <p className="text-zinc-500 text-xs">요청</p>
+            {/* Should change to `provide count` */}
+            <p className="text-zinc-500 text-xs">{t.common.actions.provide}</p>
           </div>
           <div>
             <p className="text-[#EAFD66] font-medium">
               {parseFloat(exposureRate).toFixed(1)}%
             </p>
-            <p className="text-zinc-500 text-xs">노출률</p>
+            <p className="text-zinc-500 text-xs">
+              {t.common.terminology.exposureRate}
+            </p>
           </div>
         </div>
 

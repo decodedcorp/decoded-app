@@ -36,7 +36,7 @@ const commonMetadata = {
     canonical: SITE_URL,
     languages: {
       ko: `${SITE_URL}`,
-      "en-US": `${SITE_URL}/en`,
+      en: `${SITE_URL}`,
     },
   },
 };
@@ -122,9 +122,6 @@ export const enMetadata: Metadata = {
     images: ["/og-image.png"],
   },
 } as const;
-
-// Default is Korean
-export const defaultMetadata = koMetadata;
 
 // Generate metadata for detail page
 export function generateDetailMetadata(

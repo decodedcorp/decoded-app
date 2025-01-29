@@ -2,26 +2,26 @@
 
 import { cn } from "@/lib/utils/style";
 import { useState } from "react";
-
-const CATEGORIES = ["전체", "패션", "뷰티", "테크", "라이프"] as const;
-
-export type Category = (typeof CATEGORIES)[number];
+import { useLocaleContext } from "@/lib/contexts/locale-context";
 
 interface CategoryFilterProps {
-  onCategoryChange: (category: Category) => void;
+  onCategoryChange: (category: string) => void;
 }
 
 export function CategoryFilter({ onCategoryChange }: CategoryFilterProps) {
-  const [activeCategory, setActiveCategory] = useState<Category>("전체");
-
-  const handleCategoryChange = (category: Category) => {
+  const { t } = useLocaleContext();
+  const [activeCategory, setActiveCategory] = useState<TrendingCategory>(
+    t.home.trending.categories[0]
+  );
+  type TrendingCategory = (typeof t.home.trending.categories)[number];
+  const handleCategoryChange = (category: TrendingCategory) => {
     setActiveCategory(category);
     onCategoryChange(category);
   };
 
   return (
     <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0">
-      {CATEGORIES.map((category) => (
+      {t.home.trending.categories.map((category) => (
         <button
           key={category}
           onClick={() => handleCategoryChange(category)}
@@ -38,4 +38,4 @@ export function CategoryFilter({ onCategoryChange }: CategoryFilterProps) {
       ))}
     </div>
   );
-} 
+}

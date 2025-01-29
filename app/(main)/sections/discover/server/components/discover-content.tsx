@@ -1,8 +1,9 @@
-import { cn } from '@/lib/utils/style';
-import { DiscoverTitle } from './discover-title';
-import { FeatureList } from '../../client/feature-list';
-import { DiscoverCTA } from '../../client/discover-cta';
-import { ActivityFeedWrapper } from '../../client/components/activity-feed-wrapper';
+import { cn } from "@/lib/utils/style";
+import { DiscoverTitle } from "./discover-title";
+import { FeatureList } from "../../client/feature-list";
+import { DiscoverCTA } from "../../client/discover-cta";
+import { ActivityFeedWrapper } from "../../client/components/activity-feed-wrapper";
+import { getLocale } from "@/lib/lang/server/get-locale";
 
 export function DiscoverContent() {
   return (

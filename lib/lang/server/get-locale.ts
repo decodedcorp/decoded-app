@@ -3,9 +3,8 @@ import { langMap, Locale } from "../locales";
 
 export async function getLocale() {
   const headersList = await headers();
-  const pathname = headersList.get("x-pathname") || "";
-  const locale = pathname.startsWith("/en") ? "en" : "ko";
-  const t = langMap[locale as Locale];
+  const locale = (headersList.get("x-locale") || "en") as Locale;
+  const t = langMap[locale];
 
   return {
     t,

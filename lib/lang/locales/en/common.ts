@@ -1,0 +1,50 @@
+export const common = {
+  actions: {
+    next: "Next",
+    prev: "Previous",
+    submit: "Submit",
+    cancel: "Cancel",
+    confirm: "Confirm",
+    complete: "Complete",
+    more: "More",
+    less: "Less",
+    save: "Save",
+    edit: "Edit",
+    delete: "Delete",
+    provide: "Provide",
+    request: "Request",
+    linkProvide: "Provide Link",
+  },
+  status: {
+    loading: "Loading...",
+    success: "Success",
+    error: "Error",
+    empty: "No items found",
+  },
+  validation: {
+    required: "This field is required",
+    invalid: "Invalid input",
+    minLength: "Must be at least {{count}} characters",
+    maxLength: "Must be less than {{count}} characters",
+  },
+  time: {
+    now: "Just now",
+    minutesAgo: "{{count}} minutes ago",
+    hoursAgo: "{{count}} hours ago",
+    daysAgo: "{{count}} days ago",
+  },
+  share: {
+    title: "Share",
+    copyLink: "Copy Link",
+    copied: "Copied!",
+  },
+  errors: {
+    dataFetchFailed: "Failed to fetch data",
+    brandNotFound: "Brand information not found",
+  },
+  terminology: {
+    trending: "Trending",
+    exposureRate: "Exposure Rate",
+    viewCount: "View Count",
+  },
+} as const;
