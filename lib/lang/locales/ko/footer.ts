@@ -24,8 +24,8 @@ export const footer = {
       contact: "이메일: decodedapp@gmail.com | 전화번호: 02-1234-5678",
     },
     links: {
-      privacy: "개인정보처리방침",
-      terms: "이용약관",
+      privacy: "개인정보 처리방침",
+      terms: "서비스 이용약관",
     },
     copyright: "© 2024 Decoded Limited. All Rights Reserved.",
   },

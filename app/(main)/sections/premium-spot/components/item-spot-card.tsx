@@ -111,7 +111,9 @@ export function ItemSpotCard({
           <div>
             <p className="text-[#EAFD66] font-medium">{requestCount}</p>
             {/* Should change to `provide count` */}
-            <p className="text-zinc-500 text-xs">{t.common.actions.provide}</p>
+            <p className="text-zinc-500 text-xs">
+              {t.common.terminology.provide}
+            </p>
           </div>
           <div>
             <p className="text-[#EAFD66] font-medium">
@@ -129,7 +131,7 @@ export function ItemSpotCard({
           className="flex items-center justify-center w-full gap-2 text-sm text-zinc-400 hover:text-[#EAFD66] transition-colors"
         >
           <LinkIcon className="w-4 h-4" />
-          <span>링크 제공하기</span>
+          <span>{t.common.actions.provideLink}</span>
         </button>
       </div>
     </div>

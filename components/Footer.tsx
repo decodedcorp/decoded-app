@@ -93,10 +93,16 @@ function Footer() {
               <p>{t.footer.legal.businessInfo.contact}</p>
             </div>
             <div className="flex space-x-6">
-              <Link href="#" className="hover:text-[#EAFD66] transition-colors">
+              <Link
+                href="/privacy-policy"
+                className="hover:text-[#EAFD66] transition-colors"
+              >
                 {t.footer.legal.links.privacy}
               </Link>
-              <Link href="#" className="hover:text-[#EAFD66] transition-colors">
+              <Link
+                href="/terms-of-service"
+                className="hover:text-[#EAFD66] transition-colors"
+              >
                 {t.footer.legal.links.terms}
               </Link>
             </div>

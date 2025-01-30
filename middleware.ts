@@ -9,7 +9,7 @@ export function middleware(request: NextRequest) {
   let geoData;
   if (process.env.NODE_ENV === "development") {
     geoData = {
-      country: "US",
+      country: "KR",
     };
   } else {
     geoData = geolocation(request);

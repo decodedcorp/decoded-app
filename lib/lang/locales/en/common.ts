@@ -13,7 +13,7 @@ export const common = {
     delete: "Delete",
     provide: "Provide",
     request: "Request",
-    linkProvide: "Provide Link",
+    provideLink: "Provide Link",
     addItem: "Add Item",
     addLink: "Add Link",
     login: {
@@ -25,6 +25,7 @@ export const common = {
   },
   placeHolder: {
     description: "Enter description",
+    directInput: "Enter direct input",
   },
   status: {
     loading: "Loading",
@@ -56,8 +57,11 @@ export const common = {
     unknownError: "An unknown error occurred. Please try again later.",
     invalidFileType: "Unsupported file type",
     fileSizeExceeded: "File size must be less than {{count}}MB",
+    contextOptionFetchFailed: "Failed to fetch options",
   },
   terminology: {
+    request: "Request",
+    provide: "Provide",
     trending: "Trending",
     exposureRate: "Exposure Rate",
     viewCount: "View Count",

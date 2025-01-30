@@ -10,7 +10,7 @@ export const common = {
     less: "접기",
     provide: "제공하기",
     request: "요청하기",
-    linkProvide: "링크 제공하기",
+    provideLink: "링크 제공하기",
     addItem: "아이템 추가",
     addLink: "링크 추가",
     login: {
@@ -22,6 +22,7 @@ export const common = {
   },
   placeHolder: {
     description: "설명을 입력해주세요",
+    directInput: "직접 입력해주세요",
   },
   status: {
     loading: "로딩중",
@@ -50,10 +51,13 @@ export const common = {
     unknownError: "알 수 없는 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
     invalidFileType: "지원하지 않는 파일 형식입니다.",
     fileSizeExceeded: "파일 크기는 {{count}}MB 이하여야 합니다.",
+    contextOptionFetchFailed: "옵션을 불러오는데 실패했습니다.",
   },
   terminology: {
     trending: "인기",
     exposureRate: "노출률",
     viewCount: "조회수",
+    request: "요청",
+    provide: "제공",
   },
 } as const;

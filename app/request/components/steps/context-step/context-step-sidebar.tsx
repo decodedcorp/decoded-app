@@ -23,16 +23,6 @@ export interface ContextStepSidebarProps {
   onSubmit: () => Promise<void>;
 }
 
-// context 옵션 매핑
-const contextLabelMap: Record<string, string> = {
-  airport: "공항",
-  concert: "콘서트장",
-  event: "행사장",
-  casual: "캐주얼",
-  studio: "스튜디오",
-  other: "기타",
-};
-
 export function ContextStepSidebar({
   onAnswerChange,
   onSubmit,
@@ -43,6 +33,16 @@ export function ContextStepSidebar({
   const [locationOptions, setLocationOptions] = useState<
     Array<{ value: string; label: string }>
   >([]);
+
+  // context 옵션 매핑
+  const contextLabelMap: Record<string, string> = {
+    airport: t.request.steps.context.questions.location.options.airport,
+    concert: t.request.steps.context.questions.location.options.concert,
+    event: t.request.steps.context.questions.location.options.event,
+    casual: t.request.steps.context.questions.location.options.casual,
+    studio: t.request.steps.context.questions.location.options.studio,
+    other: t.request.steps.context.questions.location.options.other,
+  };
 
   const [error, setError] = useState<string | null>(null);
 
@@ -58,7 +58,7 @@ export function ContextStepSidebar({
         setError(null);
       } catch (error) {
         console.error("Failed to fetch context options:", error);
-        setError("옵션을 불러오는데 실패했습니다");
+        setError(t.common.errors.contextOptionFetchFailed);
         // 기본 옵션 설정
         setLocationOptions(
           Object.entries(contextLabelMap).map(([value, label]) => ({
@@ -82,10 +82,22 @@ export function ContextStepSidebar({
       id: "source",
       text: t.request.steps.context.questions.source.title,
       options: [
-        { value: "sns", label: "SNS에서 가져옴 (예: 인스타그램, 트위터)" },
-        { value: "personal", label: "개인적으로 촬영한 사진" },
-        { value: "news", label: "뉴스나 블로그에서 가져옴" },
-        { value: "other", label: "기타" },
+        {
+          value: "sns",
+          label: t.request.steps.context.questions.source.options.sns,
+        },
+        {
+          value: "personal",
+          label: t.request.steps.context.questions.source.options.personal,
+        },
+        {
+          value: "news",
+          label: t.request.steps.context.questions.source.options.news,
+        },
+        {
+          value: "other",
+          label: t.request.steps.context.questions.source.options.other,
+        },
       ],
     },
   ];
@@ -198,7 +210,7 @@ export function ContextStepSidebar({
                           </div>
                           {currentAnswer === option.value && (
                             <Input
-                              placeholder="직접 입력해주세요"
+                              placeholder={t.common.placeHolder.directInput}
                               value={currentOtherAnswer ?? ""}
                               onChange={(e) =>
                                 handleAnswerChange(

@@ -12,6 +12,10 @@ import { provide as koProvide } from "./ko/provide";
 import { provide as enProvide } from "./en/provide";
 import { mypage as koMypage } from "./ko/mypage";
 import { mypage as enMypage } from "./en/mypage";
+import { privacyPolicy as koPrivacyPolicy } from "./ko/privacy-policy";
+import { privacyPolicy as enPrivacyPolicy } from "./en/privacy-policy";
+import { termsOfService as koTermsOfService } from "./ko/terms-of-service";
+import { termsOfService as enTermsOfService } from "./en/terms-of-service";
 
 export const langMap = {
   ko: {
@@ -22,6 +26,8 @@ export const langMap = {
     request: koRequest,
     provide: koProvide,
     mypage: koMypage,
+    privacyPolicy: koPrivacyPolicy,
+    termsOfService: koTermsOfService,
   },
   en: {
     home: enHome,
@@ -31,6 +37,8 @@ export const langMap = {
     request: enRequest,
     provide: enProvide,
     mypage: enMypage,
+    privacyPolicy: enPrivacyPolicy,
+    termsOfService: enTermsOfService,
   },
 } as const;
 
