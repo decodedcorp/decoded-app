@@ -2960,6 +2960,11 @@
   resolved "https://registry.yarnpkg.com/@vercel/edge/-/edge-1.2.1.tgz#d74298f01912ea2940546f4b7639dc8619f4c89e"
   integrity sha512-1++yncEyIAi68D3UEOlytYb1IUcIulMWdoSzX2h9LuSeeyR7JtaIgR8DcTQ6+DmYOQn+5MCh6LY+UmK6QBByNA==
 
+"@vercel/functions@^1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@vercel/functions/-/functions-1.6.0.tgz#97c29d5aff62894dc5a5ba5525bcee8bbbf28b82"
+  integrity sha512-R6FKQrYT5MZs5IE1SqeCJWxMuBdHawFcCZboKKw8p7s+6/mcd55Gx6tWmyKnQTyrSEA04NH73Tc9CbqpEle8RA==
+
 acorn-jsx@^5.3.2:
   version "5.3.2"
   resolved "https://registry.npmjs.org/acorn-jsx/-/acorn-jsx-5.3.2.tgz"
