@@ -58,6 +58,7 @@ export const common = {
     invalidFileType: "Unsupported file type",
     fileSizeExceeded: "File size must be less than {{count}}MB",
     contextOptionFetchFailed: "Failed to fetch options",
+    noItems: "No items found",
   },
   terminology: {
     request: "Request",

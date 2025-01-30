@@ -45,6 +45,7 @@ export const common = {
     daysAgo: "{{count}}일 전",
   },
   errors: {
+    noItems: "상품 정보를 찾을 수 없습니다",
     dataFetchFailed: "데이터를 불러오는데 실패했습니다.",
     brandNotFound: "브랜드 정보를 찾을 수 없습니다.",
     loginRequired: "로그인이 필요한 서비스입니다.",
