@@ -1,14 +1,16 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { useAuth } from '@/lib/hooks/features/auth/useAuth';
-import { GoogleIcon } from '@/styles/icons/auth/google-icon';
+import React from "react";
+import { useAuth } from "@/lib/hooks/features/auth/useAuth";
+import { GoogleIcon } from "@/styles/icons/auth/google-icon";
+import { useLocaleContext } from "@/lib/contexts/locale-context";
 
 interface AccountSectionProps {
   onClose?: () => void;
 }
 
 export function AccountSection({ onClose }: AccountSectionProps) {
+  const { t } = useLocaleContext();
   const { isLogin, handleGoogleLogin, handleDisconnect } = useAuth();
 
   return (
@@ -41,7 +43,7 @@ export function AccountSection({ onClose }: AccountSectionProps) {
                 <div
                   key={i}
                   className={`aspect-square rounded-sm ${
-                    Math.random() > 0.5 ? 'bg-[#EAFD66]/20' : 'bg-white/5'
+                    Math.random() > 0.5 ? "bg-[#EAFD66]/20" : "bg-white/5"
                   }`}
                 />
               ))}
@@ -67,7 +69,7 @@ export function AccountSection({ onClose }: AccountSectionProps) {
             try {
               await handleGoogleLogin();
             } catch (error) {
-              console.error('Login failed:', error);
+              console.error("Login failed:", error);
             }
           }}
           className="w-full px-6 py-4 rounded-xl text-sm font-medium
@@ -78,7 +80,7 @@ export function AccountSection({ onClose }: AccountSectionProps) {
             shadow-lg shadow-black/5"
         >
           <GoogleIcon />
-          <span className="font-medium">Google로 계속하기</span>
+          <span className="font-medium">{t.common.actions.login.google}</span>
         </button>
       )}
     </div>

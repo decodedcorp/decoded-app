@@ -4,17 +4,28 @@ import { cn } from "@/lib/utils/style";
 import { useState } from "react";
 import { useLocaleContext } from "@/lib/contexts/locale-context";
 
+// TODO: Remove me
+export type Category =
+  | "전체"
+  | "패션"
+  | "뷰티"
+  | "테크"
+  | "라이프"
+  | "All"
+  | "Fashion"
+  | "Beauty"
+  | "Tech"
+  | "Life";
 interface CategoryFilterProps {
-  onCategoryChange: (category: string) => void;
+  onCategoryChange: (category: Category) => void;
 }
 
 export function CategoryFilter({ onCategoryChange }: CategoryFilterProps) {
-  const { t } = useLocaleContext();
-  const [activeCategory, setActiveCategory] = useState<TrendingCategory>(
+  const { locale, t } = useLocaleContext();
+  const [activeCategory, setActiveCategory] = useState<Category>(
     t.home.trending.categories[0]
   );
-  type TrendingCategory = (typeof t.home.trending.categories)[number];
-  const handleCategoryChange = (category: TrendingCategory) => {
+  const handleCategoryChange = (category: Category) => {
     setActiveCategory(category);
     onCategoryChange(category);
   };

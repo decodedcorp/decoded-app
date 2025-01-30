@@ -1,20 +1,21 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
-import { Heart } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import LinkFormSection from '../../modal/link-form-section';
-import { ProvideData } from '@/types/model.d';
-import { useParams } from 'next/navigation';
-import { networkManager } from '@/lib/network/network';
-import { useIsLike } from '@/app/details/utils/hooks/isLike';
-
+import { Button } from "@/components/ui/button";
+import { Heart } from "lucide-react";
+import { useState, useEffect } from "react";
+import LinkFormSection from "../../modal/link-form-section";
+import { ProvideData } from "@/types/model.d";
+import { useParams } from "next/navigation";
+import { networkManager } from "@/lib/network/network";
+import { useIsLike } from "@/app/details/utils/hooks/isLike";
+import { useLocaleContext } from "@/lib/contexts/locale-context";
 interface ItemActionsProps {
   itemId: string;
   likeCount: number;
 }
 
 export function ItemActions({ itemId, likeCount }: ItemActionsProps) {
+  const { t } = useLocaleContext();
   const [showLinkForm, setShowLinkForm] = useState(false);
   const [provideData, setProvideData] = useState<ProvideData>({ links: [] });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,22 +27,23 @@ export function ItemActions({ itemId, likeCount }: ItemActionsProps) {
   const imageId = params.imageId as string;
 
   useEffect(() => {
-    const storedUserId = sessionStorage.getItem('USER_DOC_ID');
+    const storedUserId = sessionStorage.getItem("USER_DOC_ID");
     setUserId(storedUserId);
 
     if (storedUserId && itemId) {
-      checkInitialLikeStatus('items', itemId, storedUserId)
-        .then((likeStatus) => {
+      checkInitialLikeStatus("items", itemId, storedUserId).then(
+        (likeStatus) => {
           setIsLiked(likeStatus);
-        });
+        }
+      );
     }
   }, [itemId, checkInitialLikeStatus]);
 
   const handleLikeClick = async () => {
     if (!userId) return;
 
-    const newLikeStatus = await toggleLike('item', itemId, userId, isLiked);
-    setIsLiked(newLikeStatus => !newLikeStatus);
+    const newLikeStatus = await toggleLike("item", itemId, userId, isLiked);
+    setIsLiked((newLikeStatus) => !newLikeStatus);
   };
 
   const handleSubmit = async () => {
@@ -52,15 +54,15 @@ export function ItemActions({ itemId, likeCount }: ItemActionsProps) {
     try {
       setIsSubmitting(true);
       const path = `user/${userId}/image/${imageId}/provide/item/${itemId}`;
-      const response = await networkManager.request(path, 'POST', {
+      const response = await networkManager.request(path, "POST", {
         provider: userId,
         links: provideData.links,
       });
 
-      console.log('Response:', response);
+      console.log("Response:", response);
       setShowLinkForm(false);
     } catch (error) {
-      console.error('Error details:', error);
+      console.error("Error details:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -75,16 +77,20 @@ export function ItemActions({ itemId, likeCount }: ItemActionsProps) {
           onClick={() => setShowLinkForm(true)}
           disabled={isSubmitting}
         >
-          아이템 정보 제공
+          {t.common.actions.addLink}
         </Button>
 
         <Button
           variant="ghost"
           size="icon"
           onClick={handleLikeClick}
-          className={isLiked ? 'text-red-500 hover:text-red-600' : 'text-gray-500 hover:text-gray-600'}
+          className={
+            isLiked
+              ? "text-red-500 hover:text-red-600"
+              : "text-gray-500 hover:text-gray-600"
+          }
         >
-          <Heart className={isLiked ? 'fill-current' : ''} />
+          <Heart className={isLiked ? "fill-current" : ""} />
         </Button>
       </div>
 

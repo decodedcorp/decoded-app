@@ -1,6 +1,12 @@
-import { Metadata } from "next";
+import { Metadata, Viewport } from "next";
 
 const SITE_URL = "https://decoded.style";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
 
 const commonMetadata = {
   metadataBase: new URL(SITE_URL),
@@ -11,11 +17,6 @@ const commonMetadata = {
     email: false,
     address: false,
     telephone: false,
-  },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
   },
   robots: {
     index: true,

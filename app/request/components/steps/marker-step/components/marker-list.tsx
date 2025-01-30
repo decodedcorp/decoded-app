@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { Point } from '@/types/model.d';
-import { MarkerHeader } from './marker-header';
-import { X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-
+import { Point } from "@/types/model.d";
+import { MarkerHeader } from "./marker-header";
+import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useLocaleContext } from "@/lib/contexts/locale-context";
 interface MarkerListProps {
   points: Point[];
   selectedPoint: Point | null;
@@ -23,6 +23,8 @@ export function MarkerList({
     return p1.x === p2.x && p1.y === p2.y;
   };
 
+  const { t } = useLocaleContext();
+
   return (
     <div className="bg-[#1A1A1A] rounded-lg flex flex-col h-full">
       <MarkerHeader />
@@ -35,8 +37,8 @@ export function MarkerList({
                   className={`w-full p-2.5 rounded-lg text-left text-xs transition-colors cursor-pointer
                     ${
                       isPointSelected(point, selectedPoint)
-                        ? 'bg-[#EAFD66]/10 border border-[#EAFD66]/30'
-                        : 'bg-gray-900/60 hover:bg-gray-900'
+                        ? "bg-[#EAFD66]/10 border border-[#EAFD66]/30"
+                        : "bg-gray-900/60 hover:bg-gray-900"
                     }`}
                 >
                   <div className="flex items-center gap-3">
@@ -45,14 +47,16 @@ export function MarkerList({
                     </span>
                     <div className="flex-1 flex items-center gap-2">
                       <input
-                        value={point.context || ''}
-                        onChange={(e) => onUpdateContext(point, e.target.value || null)}
+                        value={point.context || ""}
+                        onChange={(e) =>
+                          onUpdateContext(point, e.target.value || null)
+                        }
                         onClick={(e) => {
                           e.stopPropagation();
                           onSelect(point);
                         }}
                         onFocus={() => onSelect(point)}
-                        placeholder="설명을 입력해주세요"
+                        placeholder={t.common.placeHolder.description}
                         className="flex-1 bg-transparent text-gray-400 outline-none placeholder:text-gray-600"
                       />
                       <Button

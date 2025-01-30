@@ -1,5 +1,10 @@
 export const request = {
   steps: {
+    messages: {
+      upload: "Upload an image",
+      marker: "Select items",
+      context: "Provide more context",
+    },
     upload: {
       title: "Upload Image",
       description: "Upload an image containing items you want to find",
@@ -38,9 +43,10 @@ export const request = {
         },
       },
       marker: {
+        title: "Selected Items",
         placeholder: "Enter description",
         list: {
-          title: "Selected Items",
+          title: "Display items on the image",
         },
       },
     },

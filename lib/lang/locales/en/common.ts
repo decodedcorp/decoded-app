@@ -14,9 +14,20 @@ export const common = {
     provide: "Provide",
     request: "Request",
     linkProvide: "Provide Link",
+    addItem: "Add Item",
+    addLink: "Add Link",
+    login: {
+      google: "Continue with Google",
+      facebook: "Continue with Facebook",
+      apple: "Continue with Apple",
+    },
+    logout: "Disconnect",
+  },
+  placeHolder: {
+    description: "Enter description",
   },
   status: {
-    loading: "Loading...",
+    loading: "Loading",
     success: "Success",
     error: "Error",
     empty: "No items found",
@@ -41,6 +52,10 @@ export const common = {
   errors: {
     dataFetchFailed: "Failed to fetch data",
     brandNotFound: "Brand information not found",
+    loginRequired: "Login is required",
+    unknownError: "An unknown error occurred. Please try again later.",
+    invalidFileType: "Unsupported file type",
+    fileSizeExceeded: "File size must be less than {{count}}MB",
   },
   terminology: {
     trending: "Trending",

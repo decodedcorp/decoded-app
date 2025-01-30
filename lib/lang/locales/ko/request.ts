@@ -1,5 +1,10 @@
 export const request = {
   steps: {
+    messages: {
+      upload: "이미지를 업로드해주세요",
+      marker: "찾고 싶은 아이템을 선택해주세요",
+      context: "사진에 대한 더 많은 정보를 알려주세요",
+    },
     upload: {
       title: "이미지 업로드",
       description: "찾고 싶은 아이템이 있는 이미지를 업로드해주세요",
@@ -34,9 +39,10 @@ export const request = {
         },
       },
       marker: {
+        title: "선택한 아이템 목록",
         placeholder: "설명을 입력해주세요",
         list: {
-          title: "선택한 아이템 목록",
+          title: "이미지 위에 위치를 표시해주세요",
         },
       },
     },

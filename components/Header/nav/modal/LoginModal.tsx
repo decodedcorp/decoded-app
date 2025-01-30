@@ -1,3 +1,4 @@
+import { useLocaleContext } from "@/lib/contexts/locale-context";
 import { AccountSection } from "./sections/AccountSection";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
@@ -7,6 +8,7 @@ interface LoginModalProps {
 }
 
 export function LoginModal({ isOpen, onClose }: LoginModalProps) {
+  const { t } = useLocaleContext();
   if (!isOpen) return null;
 
   return (
@@ -47,25 +49,36 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 <Tabs defaultValue="home">
                   <div className="px-6">
                     <TabsContent value="home" className="min-h-[200px]">
-                      <h2 className="text-lg font-bold text-white mb-4">홈</h2>
+                      <h2 className="text-lg font-bold text-white mb-4">
+                        {t.mypage.tabs.home}
+                      </h2>
                       <AccountSection onClose={onClose} />
                     </TabsContent>
                     <TabsContent value="requests" className="min-h-[200px]">
-                      <h2 className="text-lg font-bold text-white mb-4">요청</h2>
+                      <h2 className="text-lg font-bold text-white mb-4">
+                        {t.mypage.tabs.request}
+                      </h2>
                       {/* 요청 탭 내용 */}
                     </TabsContent>
                     <TabsContent value="offers" className="min-h-[200px]">
-                      <h2 className="text-lg font-bold text-white mb-4">제공</h2>
+                      <h2 className="text-lg font-bold text-white mb-4">
+                        {t.mypage.tabs.provide}
+                      </h2>
                       {/* 제공 탭 내용 */}
                     </TabsContent>
                     <TabsContent value="likes" className="min-h-[200px]">
                       <h2 className="text-lg font-bold text-white mb-4">
-                        좋아요
+                        {t.mypage.tabs.like}
                       </h2>
                       {/* 좋아요 탭 내용 */}
                     </TabsContent>
-                    <TabsContent value="notifications" className="min-h-[200px]">
-                      <h2 className="text-lg font-bold text-white mb-4">알림</h2>
+                    <TabsContent
+                      value="notifications"
+                      className="min-h-[200px]"
+                    >
+                      <h2 className="text-lg font-bold text-white mb-4">
+                        {t.mypage.tabs.notification}
+                      </h2>
                       {/* 알림 탭 내용 */}
                     </TabsContent>
                   </div>
@@ -78,31 +91,31 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
                           value="home"
                           className="flex-1 rounded-lg text-xs font-medium data-[state=active]:bg-[#EAFD66]/10 data-[state=active]:text-[#EAFD66] text-gray-400"
                         >
-                          홈
+                          {t.mypage.tabs.home}
                         </TabsTrigger>
                         <TabsTrigger
                           value="requests"
                           className="flex-1 rounded-lg text-xs font-medium data-[state=active]:bg-[#EAFD66]/10 data-[state=active]:text-[#EAFD66] text-gray-400"
                         >
-                          요청
+                          {t.mypage.tabs.request}
                         </TabsTrigger>
                         <TabsTrigger
                           value="offers"
                           className="flex-1 rounded-lg text-xs font-medium data-[state=active]:bg-[#EAFD66]/10 data-[state=active]:text-[#EAFD66] text-gray-400"
                         >
-                          제공
+                          {t.mypage.tabs.provide}
                         </TabsTrigger>
                         <TabsTrigger
                           value="likes"
                           className="flex-1 rounded-lg text-xs font-medium data-[state=active]:bg-[#EAFD66]/10 data-[state=active]:text-[#EAFD66] text-gray-400"
                         >
-                          좋아요
+                          {t.mypage.tabs.like}
                         </TabsTrigger>
                         <TabsTrigger
                           value="notifications"
                           className="flex-1 rounded-lg text-xs font-medium data-[state=active]:bg-[#EAFD66]/10 data-[state=active]:text-[#EAFD66] text-gray-400"
                         >
-                          알림
+                          {t.mypage.tabs.notification}
                         </TabsTrigger>
                       </TabsList>
                     </div>

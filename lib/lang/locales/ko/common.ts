@@ -8,12 +8,23 @@ export const common = {
     complete: "완료",
     more: "더보기",
     less: "접기",
-    loading: "로딩 중...",
     provide: "제공하기",
     request: "요청하기",
     linkProvide: "링크 제공하기",
+    addItem: "아이템 추가",
+    addLink: "링크 추가",
+    login: {
+      google: "Google로 계속하기",
+      facebook: "Facebook으로 계속하기",
+      apple: "Apple로 계속하기",
+    },
+    logout: "로그아웃",
+  },
+  placeHolder: {
+    description: "설명을 입력해주세요",
   },
   status: {
+    loading: "로딩중",
     success: "성공",
     error: "오류",
     warning: "경고",
@@ -35,6 +46,10 @@ export const common = {
   errors: {
     dataFetchFailed: "데이터를 불러오는데 실패했습니다.",
     brandNotFound: "브랜드 정보를 찾을 수 없습니다.",
+    loginRequired: "로그인이 필요한 서비스입니다.",
+    unknownError: "알 수 없는 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+    invalidFileType: "지원하지 않는 파일 형식입니다.",
+    fileSizeExceeded: "파일 크기는 {{count}}MB 이하여야 합니다.",
   },
   terminology: {
     trending: "인기",

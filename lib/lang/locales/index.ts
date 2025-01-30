@@ -8,6 +8,10 @@ import { common as koCommon } from "./ko/common";
 import { common as enCommon } from "./en/common";
 import { request as koRequest } from "./ko/request";
 import { request as enRequest } from "./en/request";
+import { provide as koProvide } from "./ko/provide";
+import { provide as enProvide } from "./en/provide";
+import { mypage as koMypage } from "./ko/mypage";
+import { mypage as enMypage } from "./en/mypage";
 
 export const langMap = {
   ko: {
@@ -16,6 +20,8 @@ export const langMap = {
     footer: koFooter,
     common: koCommon,
     request: koRequest,
+    provide: koProvide,
+    mypage: koMypage,
   },
   en: {
     home: enHome,
@@ -23,6 +29,8 @@ export const langMap = {
     footer: enFooter,
     common: enCommon,
     request: enRequest,
+    provide: enProvide,
+    mypage: enMypage,
   },
 } as const;
 

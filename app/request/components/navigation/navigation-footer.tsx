@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocaleContext } from "@/lib/contexts/locale-context";
 import { NextButton } from "./buttons";
 import { PrevButton } from "./buttons";
 
@@ -20,6 +21,7 @@ export function NavigationFooter({
   onPrev,
   onSubmit,
 }: NavigationFooterProps) {
+  const { t } = useLocaleContext();
   return (
     <div className="sticky bottom-0">
       <div className="bg-gradient-to-t from-black via-black/30 to-transparent pt-10">
@@ -35,8 +37,8 @@ export function NavigationFooter({
               {currentStep === totalSteps && (
                 <button
                   onClick={() => {
-                    onSubmit().catch(error => {
-                      console.error('Submit failed:', error);
+                    onSubmit().catch((error) => {
+                      console.error("Submit failed:", error);
                     });
                   }}
                   disabled={!isStepComplete}
@@ -50,7 +52,7 @@ export function NavigationFooter({
                     }
                   `}
                 >
-                  완료
+                  {t.common.actions.submit}
                 </button>
               )}
             </div>
@@ -59,4 +61,4 @@ export function NavigationFooter({
       </div>
     </div>
   );
-} 
+}
