@@ -3,12 +3,14 @@
 import { cn } from "@/lib/utils/style";
 import { TrendingCard } from "../components/trending-card";
 import type { Category } from "./trending-client";
-
+import { useLocaleContext } from "@/lib/contexts/locale-context";
 interface TrendingGridProps {
   category: Category;
 }
 
 export function TrendingGrid({ category }: TrendingGridProps) {
+  const { t } = useLocaleContext();
+
   return (
     <>
       {/* 트렌딩 아이템 그리드 */}
@@ -41,10 +43,10 @@ export function TrendingGrid({ category }: TrendingGridProps) {
               "transition-colors duration-200"
             )}
           >
-            더 많은 트렌딩 아이템 보기
+            {t.common.actions.more}
           </span>
         </button>
       </div>
     </>
   );
-} 
+}

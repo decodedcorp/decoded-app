@@ -1,11 +1,14 @@
 "use client";
+
 import { useState } from "react";
 import { pretendardRegular, pretendardMedium } from "@/lib/constants/fonts";
 import { cn } from "@/lib/utils/style";
 import { Github, Mail, Twitter } from "lucide-react";
 import Link from "next/link";
+import { useLocaleContext } from "@/lib/contexts/locale-context";
 
 function Footer() {
+  const { t } = useLocaleContext();
   return (
     <footer className="border-t border-white/5 bg-black/30 backdrop-blur-lg mt-10">
       <div className="mx-auto max-w-7xl px-6 py-12 md:py-16">
@@ -22,8 +25,7 @@ function Footer() {
               DECODED
             </h2>
             <p className="text-zinc-400 text-sm leading-relaxed max-w-xs">
-              실시간 아이템 검색 플랫폼을 통해 새로운 커뮤니티 경험을
-              제공합니다.
+              {t.footer.company.description}
             </p>
           </div>
 
@@ -32,10 +34,10 @@ function Footer() {
             <h3
               className={cn(pretendardMedium.className, "text-white text-sm")}
             >
-              Quick Links
+              {t.footer.quickLinks.title}
             </h3>
             <nav className="flex flex-col space-y-3">
-              {["About", "Features", "Community", "Support"].map((item) => (
+              {Object.values(t.footer.quickLinks.items).map((item) => (
                 <Link
                   key={item}
                   href="#"
@@ -86,25 +88,20 @@ function Footer() {
         >
           <div className="flex flex-col md:flex-row md:justify-between gap-4">
             <div className="space-y-2">
-              <p>서울시 강남구 도산대로 156(논현동) | 대표자: 디코디드</p>
-              <p>
-                사업자등록번호: 123-45-67890 | 통신판매업신고번호:
-                2024-서울강남-0000
-              </p>
-              <p>이메일: decodedapp@gmail.com | 전화번호: 02-1234-5678</p>
+              <p>{t.footer.legal.businessInfo.address}</p>
+              <p>{t.footer.legal.businessInfo.registration}</p>
+              <p>{t.footer.legal.businessInfo.contact}</p>
             </div>
             <div className="flex space-x-6">
               <Link href="#" className="hover:text-[#EAFD66] transition-colors">
-                Privacy Policy
+                {t.footer.legal.links.privacy}
               </Link>
               <Link href="#" className="hover:text-[#EAFD66] transition-colors">
-                Terms of Service
+                {t.footer.legal.links.terms}
               </Link>
             </div>
           </div>
-          <p className="text-center md:text-left">
-            © 2024 Decoded Limited. All Rights Reserved.
-          </p>
+          <p className="text-center md:text-left">{t.footer.legal.copyright}</p>
         </div>
       </div>
     </footer>

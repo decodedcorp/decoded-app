@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { convertKeysToSnakeCase } from '@/lib/utils/object/object';
-import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
-import { generateRandomness, generateNonce } from '@mysten/zklogin';
-import { SuiClient, getFullnodeUrl } from '@mysten/sui/client';
-import axios from 'axios';
+import { convertKeysToSnakeCase } from "@/lib/utils/object/object";
+import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
+import { generateRandomness, generateNonce } from "@mysten/zklogin";
+import { SuiClient, getFullnodeUrl } from "@mysten/sui/client";
+import axios from "axios";
 
 /**
  * @class NetworkManager
@@ -19,39 +19,34 @@ export class NetworkManager {
   };
 
   private constructor() {
-    console.log('[NetworkManager] Initializing...');
-    console.log('Current NODE_ENV:', process.env.NODE_ENV);
-
-    const API_URL =
-      process.env.NODE_ENV === 'production'
-        ? process.env.NEXT_PUBLIC_DB_ENDPOINT
-        : process.env.NEXT_PUBLIC_LOCAL_DB_ENDPOINT;
-
-    const authClientId = process.env.NEXT_PUBLIC_AUTH_CLIENT_ID || '';
+    const SERVICE_ENDPOINT = process.env.NEXT_PUBLIC_SERVICE_ENDPOINT;
+    const authClientId = process.env.NEXT_PUBLIC_AUTH_CLIENT_ID || "";
     const redirectUri =
-      process.env.NODE_ENV === 'production'
-        ? 'https://decoded.style'
-        : process.env.NEXT_PUBLIC_REDIRECT_URI || '';
+      process.env.NODE_ENV === "production"
+        ? "https://decoded.style"
+        : process.env.NEXT_PUBLIC_REDIRECT_URI || "";
 
-    if (!API_URL) {
-      throw new Error('[NetworkManager] Missing API_URL configuration');
+    if (!SERVICE_ENDPOINT) {
+      throw new Error(
+        "[NetworkManager] Missing `SERVICE_ENDPOINT` configuration"
+      );
     }
 
     if (!authClientId) {
-      throw new Error('[NetworkManager] Missing AUTH_CLIENT_ID configuration');
+      throw new Error("[NetworkManager] Missing AUTH_CLIENT_ID configuration");
     }
 
     if (!redirectUri) {
-      throw new Error('[NetworkManager] Missing REDIRECT_URI configuration');
+      throw new Error("[NetworkManager] Missing REDIRECT_URI configuration");
     }
 
     this.config = {
-      service: API_URL,
+      service: SERVICE_ENDPOINT,
       auth_client_id: authClientId,
       redirect_uri: redirectUri,
     };
 
-    console.log('[NetworkManager] Initialized with config:', this.config);
+    console.log("[NetworkManager] Initialized with config:", this.config);
   }
 
   public static getInstance(): NetworkManager {
@@ -63,7 +58,7 @@ export class NetworkManager {
 
   public async request<T = any>(
     path: string,
-    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+    method: "GET" | "POST" | "PUT" | "DELETE",
     data: any = null,
     retries = 3,
     accessToken?: string
@@ -74,7 +69,7 @@ export class NetworkManager {
       try {
         const url = `${this.config.service}/${path}`;
         const storedToken =
-          accessToken || window.sessionStorage.getItem('ACCESS_TOKEN');
+          accessToken || window.sessionStorage.getItem("ACCESS_TOKEN");
 
         const headers: Record<string, string> = {
           ...(storedToken && { Authorization: `Bearer ${storedToken}` }),
@@ -82,14 +77,14 @@ export class NetworkManager {
 
         // FormData인 경우 Content-Type을 설정하지 않음 (브라우저가 자동으로 설정)
         if (!(data instanceof FormData)) {
-          headers['Content-Type'] = 'application/json';
+          headers["Content-Type"] = "application/json";
           data = convertKeysToSnakeCase(data);
         }
 
         console.log(`[NetworkManager] Sending request to: ${url}`);
-        console.log('[NetworkManager] Request method:', method);
-        console.log('[NetworkManager] Request data:', data);
-        console.log('[NetworkManager] Request headers:', headers);
+        console.log("[NetworkManager] Request method:", method);
+        console.log("[NetworkManager] Request data:", data);
+        console.log("[NetworkManager] Request headers:", headers);
 
         const response = await axios.request<T>({
           url,
@@ -101,35 +96,35 @@ export class NetworkManager {
           timeout: 10000,
         });
 
-        console.log('[NetworkManager] Response received:', response.data);
+        console.log("[NetworkManager] Response received:", response.data);
 
         return response.data;
       } catch (error) {
         attempt++;
 
         if (axios.isAxiosError(error)) {
-          console.error('[NetworkManager] Axios error:', error.message);
-          console.error('[NetworkManager] Axios error details:', {
+          console.error("[NetworkManager] Axios error:", error.message);
+          console.error("[NetworkManager] Axios error details:", {
             url: `${this.config.service}/${path}`,
             method,
             data,
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
               Authorization: `Bearer ${window.sessionStorage.getItem(
-                'ACCESS_TOKEN'
+                "ACCESS_TOKEN"
               )}`,
             },
           });
 
-          if (error.code === 'ERR_NETWORK') {
+          if (error.code === "ERR_NETWORK") {
             throw new Error(
-              '[NetworkManager] Network error. Check your connection.'
+              "[NetworkManager] Network error. Check your connection."
             );
           }
 
           if (
-            error.code === 'ECONNABORTED' ||
-            error.code === 'ETIMEDOUT' ||
+            error.code === "ECONNABORTED" ||
+            error.code === "ETIMEDOUT" ||
             !error.response
           ) {
             if (attempt < retries) {
@@ -149,7 +144,7 @@ export class NetworkManager {
       }
     }
 
-    throw new Error('[NetworkManager] All retry attempts failed.');
+    throw new Error("[NetworkManager] All retry attempts failed.");
   }
 
   public async openIdConnectUrl(): Promise<{
@@ -159,10 +154,10 @@ export class NetworkManager {
     url: string;
   }> {
     try {
-      console.log('[NetworkManager] Generating OpenID Connect URL...');
+      console.log("[NetworkManager] Generating OpenID Connect URL...");
       const epk = Ed25519Keypair.generate();
       const randomness = generateRandomness();
-      const rpcUrl = getFullnodeUrl('devnet');
+      const rpcUrl = getFullnodeUrl("devnet");
       const suiClient = new SuiClient({ url: rpcUrl });
       const suiSysState = await suiClient.getLatestSuiSystemState();
       const currentEpoch = suiSysState.epoch;
@@ -173,17 +168,17 @@ export class NetworkManager {
       const params = new URLSearchParams({
         client_id: this.config.auth_client_id,
         redirect_uri: this.config.redirect_uri,
-        response_type: 'id_token',
+        response_type: "id_token",
         scope: [
-          'openid',
-          'https://www.googleapis.com/auth/userinfo.email',
-          'https://www.googleapis.com/auth/userinfo.profile',
-        ].join(' '),
+          "openid",
+          "https://www.googleapis.com/auth/userinfo.email",
+          "https://www.googleapis.com/auth/userinfo.profile",
+        ].join(" "),
         nonce,
       });
 
       const url = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
-      console.log('[NetworkManager] Generated OpenID Connect URL:', url);
+      console.log("[NetworkManager] Generated OpenID Connect URL:", url);
 
       return {
         sk: epk.getSecretKey(),
@@ -193,32 +188,32 @@ export class NetworkManager {
       };
     } catch (error) {
       console.error(
-        '[NetworkManager] Error generating OpenID Connect URL:',
+        "[NetworkManager] Error generating OpenID Connect URL:",
         error
       );
-      throw new Error('Failed to generate OpenID Connect URL');
+      throw new Error("Failed to generate OpenID Connect URL");
     }
   }
 
   public async getTempToken(): Promise<string> {
     try {
-      console.log('[NetworkManager] Requesting temporary token...');
+      console.log("[NetworkManager] Requesting temporary token...");
       const response = await this.request<{
         status_code: number;
         data?: {
           access_token: string;
         };
-      }>('temp-token', 'POST', {});
+      }>("temp-token", "POST", {});
 
-      console.log('[NetworkManager] Temporary token response:', response);
+      console.log("[NetworkManager] Temporary token response:", response);
 
       if (response.status_code !== 200 || !response.data?.access_token) {
-        throw new Error('[NetworkManager] Failed to fetch temporary token.');
+        throw new Error("[NetworkManager] Failed to fetch temporary token.");
       }
 
       return response.data.access_token;
     } catch (error) {
-      console.error('[NetworkManager] Temporary token error:', error);
+      console.error("[NetworkManager] Temporary token error:", error);
       throw error;
     }
   }

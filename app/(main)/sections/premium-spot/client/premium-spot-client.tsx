@@ -1,14 +1,16 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
-import { ItemSpotCard } from '../components/item-spot-card';
-import { useTrendingItems } from './hooks/use-trending-items';
-import { cn } from '@/lib/utils/style';
-import { ArrowUpRight, ChevronUp } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { PremiumSpotClientProps, TrendingItem } from '../types';
+import { useState, useRef, useEffect } from "react";
+import { ItemSpotCard } from "../components/item-spot-card";
+import { useTrendingItems } from "./hooks/use-trending-items";
+import { cn } from "@/lib/utils/style";
+import { ArrowUpRight, ChevronUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { PremiumSpotClientProps, TrendingItem } from "../types";
+import { useLocaleContext } from "@/lib/contexts/locale-context";
 
 export function PremiumSpotClient({ period }: PremiumSpotClientProps) {
+  const { t } = useLocaleContext();
   const { items, isLoading, error } = useTrendingItems(period);
   const [showAll, setShowAll] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -25,7 +27,7 @@ export function PremiumSpotClient({ period }: PremiumSpotClientProps) {
       setShowAll(false);
       window.scrollTo({
         top: originalScrollPosition.current,
-        behavior: 'smooth',
+        behavior: "smooth",
       });
     } else {
       // 더보기: 현재 스크롤 위치 저장 후 새로운 아이템이 보이도록 스크롤
@@ -35,14 +37,14 @@ export function PremiumSpotClient({ period }: PremiumSpotClientProps) {
       // DOM 업데이트 후 스크롤 위치 조정
       requestAnimationFrame(() => {
         const lastVisibleItem = containerRef.current?.querySelector(
-          '.grid > :nth-child(3)'
+          ".grid > :nth-child(3)"
         );
         if (lastVisibleItem) {
           const rect = lastVisibleItem.getBoundingClientRect();
           const absoluteBottom = window.scrollY + rect.bottom;
           window.scrollTo({
             top: absoluteBottom - window.innerHeight / 3,
-            behavior: 'smooth',
+            behavior: "smooth",
           });
         }
       });
@@ -61,7 +63,7 @@ export function PremiumSpotClient({ period }: PremiumSpotClientProps) {
 
   if (error) {
     return (
-      <div className="text-red-500">데이터를 불러오는데 실패했습니다.</div>
+      <div className="text-red-500">{t.common.errors.dataFetchFailed}</div>
     );
   }
 
@@ -94,7 +96,7 @@ export function PremiumSpotClient({ period }: PremiumSpotClientProps) {
             variant="ghost"
             className="group px-4 py-2"
           >
-            {showAll ? '접기' : '더보기'}
+            {showAll ? t.common.actions.less : t.common.actions.more}
             {showAll ? (
               <ChevronUp className="ml-2 w-4 h-4 transform group-hover:-translate-y-0.5 transition-transform duration-200" />
             ) : (

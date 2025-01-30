@@ -1,6 +1,6 @@
 import { ModalOverlay } from "./ModalOverlay";
 import { pretendardBold } from "@/lib/constants/fonts";
-
+import { useLocaleContext } from "@/lib/contexts/locale-context";
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -8,6 +8,7 @@ interface LoginModalProps {
 }
 
 export function LoginModal({ isOpen, onClose, isClosing }: LoginModalProps) {
+  const { t } = useLocaleContext();
   if (!isOpen && !isClosing) return null;
 
   return (

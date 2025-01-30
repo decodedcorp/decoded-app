@@ -1,13 +1,14 @@
-'use client';
+"use client";
 
-import { Input } from '@/components/ui/input';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import { useState, useEffect } from 'react';
-import { InfoSection } from '../marker-step/components/context-info-section';
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils/style';
-import { getImageContextOptions } from '@/app/request/api/context';
+import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { useState, useEffect } from "react";
+import { InfoSection } from "../marker-step/components/context-info-section";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils/style";
+import { getImageContextOptions } from "@/app/request/api/context";
+import { useLocaleContext } from "@/lib/contexts/locale-context";
 
 export interface ContextAnswer {
   location?: string;
@@ -24,18 +25,19 @@ export interface ContextStepSidebarProps {
 
 // context 옵션 매핑
 const contextLabelMap: Record<string, string> = {
-  airport: '공항',
-  concert: '콘서트장',
-  event: '행사장',
-  casual: '캐주얼',
-  studio: '스튜디오',
-  other: '기타',
+  airport: "공항",
+  concert: "콘서트장",
+  event: "행사장",
+  casual: "캐주얼",
+  studio: "스튜디오",
+  other: "기타",
 };
 
 export function ContextStepSidebar({
   onAnswerChange,
   onSubmit,
 }: ContextStepSidebarProps) {
+  const { t } = useLocaleContext();
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Partial<ContextAnswer>>({});
   const [locationOptions, setLocationOptions] = useState<
@@ -55,8 +57,8 @@ export function ContextStepSidebar({
         setLocationOptions(formattedOptions);
         setError(null);
       } catch (error) {
-        console.error('Failed to fetch context options:', error);
-        setError('옵션을 불러오는데 실패했습니다');
+        console.error("Failed to fetch context options:", error);
+        setError("옵션을 불러오는데 실패했습니다");
         // 기본 옵션 설정
         setLocationOptions(
           Object.entries(contextLabelMap).map(([value, label]) => ({
@@ -72,18 +74,18 @@ export function ContextStepSidebar({
 
   const questions = [
     {
-      id: 'location',
-      text: 'Q. 이 사진은 어디에서 촬영되었나요?',
+      id: "location",
+      text: t.request.steps.context.questions.location.title,
       options: locationOptions,
     },
     {
-      id: 'source',
-      text: 'Q. 이 사진의 출처는 무엇인가요?',
+      id: "source",
+      text: t.request.steps.context.questions.source.title,
       options: [
-        { value: 'sns', label: 'SNS에서 가져옴 (예: 인스타그램, 트위터)' },
-        { value: 'personal', label: '개인적으로 촬영한 사진' },
-        { value: 'news', label: '뉴스나 블로그에서 가져옴' },
-        { value: 'other', label: '기타' },
+        { value: "sns", label: "SNS에서 가져옴 (예: 인스타그램, 트위터)" },
+        { value: "personal", label: "개인적으로 촬영한 사진" },
+        { value: "news", label: "뉴스나 블로그에서 가져옴" },
+        { value: "other", label: "기타" },
       ],
     },
   ];
@@ -96,13 +98,13 @@ export function ContextStepSidebar({
     const newAnswers = {
       ...answers,
       [questionId]: value,
-      [`${questionId}Other`]: otherValue || '',
+      [`${questionId}Other`]: otherValue || "",
     };
 
     setAnswers(newAnswers);
 
     // source의 경우 입력값이 있을 때만 다음으로 진행
-    if (questionId === 'source') {
+    if (questionId === "source") {
       if (currentStep < questions.length - 1) {
         setCurrentStep((prev) => prev + 1);
       }
@@ -157,10 +159,10 @@ export function ContextStepSidebar({
             </h3>
 
             <div className="py-2 max-h-[280px] overflow-x-hidden overflow-y-auto">
-              {currentQuestion.id === 'source' ? (
+              {currentQuestion.id === "source" ? (
                 <div className="py-2 max-h-[350px] overflow-y-auto">
                   <RadioGroup
-                    value={currentAnswer || ''}
+                    value={currentAnswer || ""}
                     onValueChange={(value) =>
                       handleAnswerChange(
                         currentQuestion.id as keyof ContextAnswer,
@@ -175,8 +177,8 @@ export function ContextStepSidebar({
                           className={`flex flex-col space-y-2 p-3 rounded-lg transition-all
                             ${
                               currentAnswer === option.value
-                                ? 'bg-gray-800/90'
-                                : 'hover:bg-gray-800/50'
+                                ? "bg-gray-800/90"
+                                : "hover:bg-gray-800/50"
                             }`}
                           whileHover={{ scale: 1.01, y: -1 }}
                           whileTap={{ scale: 0.99 }}
@@ -197,7 +199,7 @@ export function ContextStepSidebar({
                           {currentAnswer === option.value && (
                             <Input
                               placeholder="직접 입력해주세요"
-                              value={currentOtherAnswer ?? ''}
+                              value={currentOtherAnswer ?? ""}
                               onChange={(e) =>
                                 handleAnswerChange(
                                   currentQuestion.id as keyof ContextAnswer,
@@ -207,7 +209,7 @@ export function ContextStepSidebar({
                               }
                               onKeyDown={(e) => {
                                 if (
-                                  e.key === 'Enter' &&
+                                  e.key === "Enter" &&
                                   e.currentTarget.value
                                 ) {
                                   handleOtherInputComplete();
@@ -225,7 +227,7 @@ export function ContextStepSidebar({
               ) : (
                 <RadioGroup
                   value={
-                    answers[currentQuestion.id as keyof ContextAnswer] || ''
+                    answers[currentQuestion.id as keyof ContextAnswer] || ""
                   }
                   onValueChange={(value) =>
                     handleAnswerChange(
@@ -242,8 +244,8 @@ export function ContextStepSidebar({
                             answers[
                               currentQuestion.id as keyof ContextAnswer
                             ] === option.value
-                              ? 'bg-gray-800/90'
-                              : 'hover:bg-gray-800/50'
+                              ? "bg-gray-800/90"
+                              : "hover:bg-gray-800/50"
                           }`}
                         whileHover={{ scale: 1.01, y: -1 }}
                         whileTap={{ scale: 0.99 }}
@@ -257,15 +259,15 @@ export function ContextStepSidebar({
                           htmlFor={`${currentQuestion.id}-${option.value}`}
                           className="flex-1 cursor-pointer text-sm leading-relaxed"
                         >
-                          {option.value === 'other' ? (
-                            currentAnswer === 'other' ? (
+                          {option.value === "other" ? (
+                            currentAnswer === "other" ? (
                               <Input
                                 placeholder="직접 입력해주세요"
-                                value={currentOtherAnswer ?? ''}
+                                value={currentOtherAnswer ?? ""}
                                 onChange={(e) =>
                                   handleAnswerChange(
                                     currentQuestion.id as keyof ContextAnswer,
-                                    'other',
+                                    "other",
                                     e.target.value
                                   )
                                 }
@@ -273,7 +275,7 @@ export function ContextStepSidebar({
                                 autoFocus
                               />
                             ) : (
-                              '기타'
+                              "기타"
                             )
                           ) : (
                             option.label
@@ -311,7 +313,7 @@ export function ContextStepSidebar({
                   d="M15 19l-7-7 7-7"
                 />
               </svg>
-              <span>이전</span>
+              <span>{t.common.actions.prev}</span>
             </motion.button>
 
             <motion.button
@@ -326,14 +328,16 @@ export function ContextStepSidebar({
               whileTap={{ scale: 0.98 }}
             >
               <span>
-                {currentStep === questions.length - 1 ? '' : '넘기기'}
+                {currentStep === questions.length - 1
+                  ? ""
+                  : t.common.actions.next}
               </span>
               <svg
                 className={cn(
                   questions.length - 1 === currentStep
-                    ? 'hidden'
-                    : 'text-gray-400',
-                  'w-4 h-4'
+                    ? "hidden"
+                    : "text-gray-400",
+                  "w-4 h-4"
                 )}
                 fill="none"
                 viewBox="0 0 24 24"

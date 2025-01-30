@@ -1,7 +1,8 @@
-'use client';
+"use client";
 
-import { cn } from '@/lib/utils/style';
-import { Search, Share2, Sparkles } from 'lucide-react';
+import { cn } from "@/lib/utils/style";
+import { Search, Share2, Sparkles } from "lucide-react";
+import { useLocaleContext } from "@/lib/contexts/locale-context";
 
 interface FeatureItemProps {
   icon: React.ReactNode;
@@ -14,10 +15,10 @@ function FeatureItem({ icon, title, description }: FeatureItemProps) {
     <div className="flex items-start gap-4">
       <div
         className={cn(
-          'flex-shrink-0',
-          'w-10 h-10 rounded-xl',
-          'bg-[#EAFD66]/10 text-[#EAFD66]',
-          'flex items-center justify-center'
+          "flex-shrink-0",
+          "w-10 h-10 rounded-xl",
+          "bg-[#EAFD66]/10 text-[#EAFD66]",
+          "flex items-center justify-center"
         )}
       >
         {icon}
@@ -31,23 +32,24 @@ function FeatureItem({ icon, title, description }: FeatureItemProps) {
 }
 
 export function FeatureList() {
+  const { t } = useLocaleContext();
   return (
     <div className="space-y-4">
       <FeatureItem
         icon={<Search className="w-5 h-5" />}
-        title="이미지로 검색"
-        description="찾고 싶은 제품이 있는 이미지를 공유하세요"
+        title={t.home.featureList.search.title}
+        description={t.home.featureList.search.description}
       />
       <FeatureItem
         icon={<Share2 className="w-5 h-5" />}
-        title="정보 공유"
-        description="다른 사용자들과 함께 제품 정보를 공유하세요"
+        title={t.home.featureList.share.title}
+        description={t.home.featureList.share.description}
       />
       <FeatureItem
         icon={<Sparkles className="w-5 h-5" />}
-        title="포인트 획득"
-        description="정확한 정보 제공으로 포인트를 획득하세요"
+        title={t.home.featureList.point.title}
+        description={t.home.featureList.point.description}
       />
     </div>
   );
-} 
+}

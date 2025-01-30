@@ -1,11 +1,12 @@
-'use client';
+"use client";
 
-import { Heart } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
-import { cn } from '@/lib/utils/style';
-import { AddItemModal } from '@/components/ui/modal/add-item-modal';
-import { useRequireAuth } from '@/lib/hooks/auth/use-require-auth';
+import { Heart } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import { cn } from "@/lib/utils/style";
+import { AddItemModal } from "@/components/ui/modal/add-item-modal";
+import { useRequireAuth } from "@/lib/hooks/auth/use-require-auth";
+import { useLocaleContext } from "@/lib/contexts/locale-context";
 
 interface ItemActionsProps {
   likeCount: number;
@@ -20,6 +21,7 @@ export function ItemActions({
   isLoading,
   onLike,
 }: ItemActionsProps) {
+  const { t } = useLocaleContext();
   const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
   const { checkAuth } = useRequireAuth();
   const params = useParams();
@@ -40,14 +42,14 @@ export function ItemActions({
             onClick={handleLike}
             disabled={isLoading}
             className={cn(
-              'text-neutral-400 hover:text-white transition-colors',
-              isLiked && 'text-red-500 hover:text-red-400',
-              isLoading && 'opacity-50 cursor-not-allowed'
+              "text-neutral-400 hover:text-white transition-colors",
+              isLiked && "text-red-500 hover:text-red-400",
+              isLoading && "opacity-50 cursor-not-allowed"
             )}
           >
             <Heart
               className="w-4 h-4"
-              fill={isLiked ? 'currentColor' : 'none'}
+              fill={isLiked ? "currentColor" : "none"}
             />
           </button>
           <span className="text-xs text-neutral-400">{likeCount}</span>
@@ -56,7 +58,7 @@ export function ItemActions({
           onClick={() => setIsAddItemModalOpen(true)}
           className="px-4 py-2 rounded text-xs font-medium bg-neutral-800 text-white hover:bg-neutral-700 transition-colors"
         >
-          아이템 추가
+          {t.common.actions.addItem}
         </button>
       </div>
 
@@ -66,7 +68,7 @@ export function ItemActions({
           onClose={() => setIsAddItemModalOpen(false)}
           imageId={imageId}
           requestUrl={`user/${sessionStorage.getItem(
-            'USER_DOC_ID'
+            "USER_DOC_ID"
           )}/image/${imageId}/request/add`}
         />
       )}

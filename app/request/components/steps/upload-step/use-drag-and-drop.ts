@@ -1,6 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useCallback } from 'react';
+import { useLocaleContext } from "@/lib/contexts/locale-context";
+import { useState, useCallback } from "react";
 
 interface UseDragAndDropProps {
   onFileSelect: (file: File) => void;
@@ -18,20 +19,26 @@ interface UseDragAndDropReturn {
 
 export function useDragAndDrop({
   onFileSelect,
-  acceptedFileTypes = ['image/jpeg', 'image/jpg', 'image/png'],
+  acceptedFileTypes = ["image/jpeg", "image/jpg", "image/png"],
   maxSizeInMB = 5,
 }: UseDragAndDropProps): UseDragAndDropReturn {
+  const { t } = useLocaleContext();
   const [isDragging, setIsDragging] = useState(false);
 
   const validateFile = useCallback(
     (file: File): boolean => {
       if (!acceptedFileTypes.includes(file.type)) {
-        alert('지원하지 않는 파일 형식입니다.');
+        alert(t.common.errors.invalidFileType);
         return false;
       }
 
       if (file.size > maxSizeInMB * 1024 * 1024) {
-        alert(`파일 크기는 ${maxSizeInMB}MB 이하여야 합니다.`);
+        alert(
+          t.common.errors.fileSizeExceeded.replace(
+            "{{count}}",
+            maxSizeInMB.toString()
+          )
+        );
         return false;
       }
 

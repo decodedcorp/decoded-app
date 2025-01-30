@@ -1,3 +1,5 @@
+import { useLocaleContext } from "@/lib/contexts/locale-context";
+
 interface NavigationButtonProps {
   currentStep: number;
   totalSteps: number;
@@ -14,6 +16,7 @@ export function NextButton({
   isStepComplete: boolean;
   onNext: () => void;
 }) {
+  const { t } = useLocaleContext();
   return (
     <button
       onClick={onNext}
@@ -23,24 +26,25 @@ export function NextButton({
         transition-all duration-200 
         ${
           isStepComplete
-            ? 'bg-gradient-to-r from-[#EAFD66] to-[#EAFD66]/80 text-black hover:opacity-90'
-            : 'bg-gray-900/50 text-gray-600 cursor-not-allowed'
+            ? "bg-gradient-to-r from-[#EAFD66] to-[#EAFD66]/80 text-black hover:opacity-90"
+            : "bg-gray-900/50 text-gray-600 cursor-not-allowed"
         }
       `}
     >
-      다음
+      {t.common.actions.next}
     </button>
   );
 }
 
 export function PrevButton({ onPrev }: { onPrev: () => void }) {
+  const { t } = useLocaleContext();
   return (
     <button
       onClick={onPrev}
       className="px-8 py-3 rounded-xl text-sm font-medium 
         text-gray-300 hover:text-white transition-colors"
     >
-      이전
+      {t.common.actions.prev}
     </button>
   );
 }
@@ -53,6 +57,7 @@ export function NavigationButtons({
   onPrev,
   onSubmit,
 }: NavigationButtonProps) {
+  const { t } = useLocaleContext();
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-black/90">
       <div className="max-w-4xl mx-auto">
@@ -76,12 +81,12 @@ export function NavigationButtons({
                   transition-all duration-200
                   ${
                     isStepComplete
-                      ? 'bg-[#EAFD66] text-black hover:bg-[#EAFD66]/90'
-                      : 'bg-gray-900 text-gray-600 border border-gray-800 cursor-not-allowed'
+                      ? "bg-[#EAFD66] text-black hover:bg-[#EAFD66]/90"
+                      : "bg-gray-900 text-gray-600 border border-gray-800 cursor-not-allowed"
                   }
                 `}
               >
-                완료
+                {t.common.actions.submit}
               </button>
             )}
           </div>

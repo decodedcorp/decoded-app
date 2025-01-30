@@ -1,28 +1,31 @@
-import { cn } from '@/lib/utils/style';
-import { Activity } from '../utils/types';
-import { ProvideButton } from './provide-button';
-import { getRelativeTime } from '../utils/time';
+import { cn } from "@/lib/utils/style";
+import { Activity } from "../utils/types";
+import { ProvideButton } from "./provide-button";
+import { getRelativeTime } from "../utils/time";
+import { useLocaleContext } from "@/lib/contexts/locale-context";
 
 interface ActivityCardProps {
   activity: Activity;
 }
 
 export function ActivityCard({ activity: { data } }: ActivityCardProps) {
+  const { t } = useLocaleContext();
+
   return (
     <div
       className={cn(
-        'flex gap-4 p-3 rounded-xl transition-all duration-200',
-        'hover:bg-white/5',
-        'border border-transparent',
-        'hover:border-zinc-700/50'
+        "flex gap-4 p-3 rounded-xl transition-all duration-200",
+        "hover:bg-white/5",
+        "border border-transparent",
+        "hover:border-zinc-700/50"
       )}
     >
       {/* 요청 이미지 */}
       <div
         className={cn(
-          'w-16 h-16 rounded-xl overflow-hidden',
-          'border border-zinc-700/50',
-          'bg-zinc-900/50'
+          "w-16 h-16 rounded-xl overflow-hidden",
+          "border border-zinc-700/50",
+          "bg-zinc-900/50"
         )}
       >
         <img
@@ -41,10 +44,12 @@ export function ActivityCard({ activity: { data } }: ActivityCardProps) {
               <span className="text-[#EAFD66] font-medium">
                 {data.item_len}
               </span>
-              <span className="ml-1">개의 아이템이 요청되었습니다</span>
+              <span className="ml-1">
+                {t.home.discover.activityCard.itemCount}
+              </span>
             </p>
             <p className="text-xs text-zinc-500">
-              {data.at ? getRelativeTime(data.at) : '알 수 없음'}
+              {data.at ? getRelativeTime(data.at) : "알 수 없음"}
             </p>
           </div>
 

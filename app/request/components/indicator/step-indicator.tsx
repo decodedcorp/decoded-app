@@ -1,16 +1,17 @@
+import { useLocaleContext } from "@/lib/contexts/locale-context";
+
 interface StepIndicatorProps {
   currentStep: number;
   totalSteps: number;
 }
 
-// 스텝별 텍스트 정의
-const STEP_MESSAGES = {
-  1: "이미지를 업로드해주세요",
-  2: "궁금한 아이템을 선택해주세요",
-  3: "사진에 대한 더 많은 정보를 알려주세요"
-} as const;
-
 export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
+  const { t } = useLocaleContext();
+  const STEP_MESSAGES = {
+    1: t.request.steps.messages.upload,
+    2: t.request.steps.messages.marker,
+    3: t.request.steps.messages.context,
+  };
   return (
     <div className="w-full mb-8">
       <div className="relative pt-1">
@@ -47,10 +48,10 @@ export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
                     transition-all duration-300 text-[10px]
                     ${
                       index + 1 < currentStep
-                        ? 'bg-[#EAFD66] text-black'
+                        ? "bg-[#EAFD66] text-black"
                         : index + 1 === currentStep
-                        ? 'bg-[#EAFD66] text-black ring-2 ring-[#EAFD66]/30'
-                        : 'border-[1.5px] border-gray-800 bg-gray-900'
+                        ? "bg-[#EAFD66] text-black ring-2 ring-[#EAFD66]/30"
+                        : "border-[1.5px] border-gray-800 bg-gray-900"
                     }
                   `}
                 >

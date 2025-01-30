@@ -1,4 +1,7 @@
+import { useLocaleContext } from "@/lib/contexts/locale-context";
+
 export function UploadGuide() {
+  const { t } = useLocaleContext();
   return (
     <div className="h-full bg-[#1A1A1A] flex flex-col items-center justify-center p-8">
       <div className="w-full max-w-[280px] mx-auto">
@@ -18,10 +21,10 @@ export function UploadGuide() {
             />
           </svg>
           <p className="text-sm font-medium text-gray-400 mb-2">
-            이미지를 업로드해주세요
+            {t.request.steps.upload.title}
           </p>
           <p className="text-xs text-gray-500">
-            클릭하여 이미지를 선택하거나 드래그앤드롭 하세요
+            {t.request.steps.upload.description}
           </p>
         </div>
 
@@ -32,10 +35,10 @@ export function UploadGuide() {
             </span>
             <div className="space-y-1.5">
               <h3 className="text-xs font-medium text-gray-400">
-                필수 입력사항
+                {t.request.steps.upload.guide.required.title}
               </h3>
               <p className="text-xs text-gray-500 leading-relaxed">
-                아이템을 찾고 싶은 이미지를 업로드해주세요
+                {t.request.steps.upload.guide.required.description}
               </p>
             </div>
           </div>
@@ -46,11 +49,12 @@ export function UploadGuide() {
             </span>
             <div className="space-y-1.5">
               <h3 className="text-xs font-medium text-gray-400">
-                도움말
+                {t.request.steps.upload.guide.help.title}
               </h3>
               <ul className="text-xs space-y-1.5 text-gray-500">
-                <li>• 최대 5MB까지 업로드 가능</li>
-                <li>• jpg, jpeg, png 형식만 가능</li>
+                {t.request.steps.upload.guide.help.items.map((item) => (
+                  <li key={item}>• {item}</li>
+                ))}
               </ul>
             </div>
           </div>

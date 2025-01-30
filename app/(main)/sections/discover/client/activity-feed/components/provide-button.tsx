@@ -1,28 +1,30 @@
-'use client';
+"use client";
 
-import { cn } from '@/lib/utils/style';
-
+import { cn } from "@/lib/utils/style";
+import { useLocaleContext } from "@/lib/contexts/locale-context";
 interface ProvideButtonProps {
   imageDocId: string;
 }
 
 export function ProvideButton({ imageDocId }: ProvideButtonProps) {
+  const { t } = useLocaleContext();
+
   return (
     <button
       className={cn(
-        'px-3 py-1.5 rounded-lg text-sm font-medium',
-        'border border-[#EAFD66]/20',
-        'bg-[#EAFD66]/10 text-[#EAFD66]',
-        'hover:bg-[#EAFD66]/20 transition-all duration-200',
-        'flex items-center gap-1.5',
-        'group'
+        "px-3 py-1.5 rounded-lg text-sm font-medium",
+        "border border-[#EAFD66]/20",
+        "bg-[#EAFD66]/10 text-[#EAFD66]",
+        "hover:bg-[#EAFD66]/20 transition-all duration-200",
+        "flex items-center gap-1.5",
+        "group"
       )}
       onClick={() => {
         // TODO: 제공 기능 구현
-        console.log('Provide items for:', imageDocId);
+        console.log("Provide items for:", imageDocId);
       }}
     >
-      <span>제공하기</span>
+      <span>{t.common.actions.provide}</span>
       <svg
         className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5"
         fill="none"
@@ -38,4 +40,4 @@ export function ProvideButton({ imageDocId }: ProvideButtonProps) {
       </svg>
     </button>
   );
-} 
+}
