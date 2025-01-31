@@ -16,6 +16,8 @@ import { privacyPolicy as koPrivacyPolicy } from "./ko/privacy-policy";
 import { privacyPolicy as enPrivacyPolicy } from "./en/privacy-policy";
 import { termsOfService as koTermsOfService } from "./ko/terms-of-service";
 import { termsOfService as enTermsOfService } from "./en/terms-of-service";
+import { search as koSearch } from "./ko/search";
+import { search as enSearch } from "./en/search";
 
 export const langMap = {
   ko: {
@@ -28,6 +30,7 @@ export const langMap = {
     mypage: koMypage,
     privacyPolicy: koPrivacyPolicy,
     termsOfService: koTermsOfService,
+    search: koSearch,
   },
   en: {
     home: enHome,
@@ -39,6 +42,7 @@ export const langMap = {
     mypage: enMypage,
     privacyPolicy: enPrivacyPolicy,
     termsOfService: enTermsOfService,
+    search: enSearch,
   },
 } as const;
 

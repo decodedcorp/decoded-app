@@ -61,6 +61,7 @@ export class NetworkManager {
     method: "GET" | "POST" | "PUT" | "DELETE",
     data: any = null,
     retries = 3,
+    // TODO: DELETE ME
     accessToken?: string
   ): Promise<T> {
     let attempt = 0;
