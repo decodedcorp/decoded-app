@@ -9,6 +9,17 @@ export const mypage = {
   },
   home: {
     empty: "아직 활동 내역이 없습니다",
+    activity: {
+      points: "포인트",
+      activityCounts: "활동권",
+    },
+    metricSections: {
+      total: "전체",
+      requests: "요청",
+      provides: "제공",
+      pending: "진행중",
+      completed: "완료",
+    },
     points: {
       title: "포인트",
       earned: "획득한 포인트",
@@ -54,6 +65,12 @@ export const mypage = {
     },
   },
   notification: {
+    messages: {
+      item_provided: "아이템 제공",
+      point_received: "포인트 획득",
+      system_notice: "시스템 알림",
+      request_approved: "요청 승인",
+    },
     profile: {
       title: "프로필 설정",
       name: "이름",

@@ -46,7 +46,7 @@ export function ModalNav() {
     <div className="flex items-center justify-between px-8 py-4 border-t border-white/10">
       <NavItem
         icon="/icons/nav/home.svg"
-        label={t.header.modal.tabs.home}
+        label={t.mypage.tabs.home}
         isActive={true}
       />
       <NavItem icon="/icons/nav/request.svg" label={t.mypage.tabs.request} />

@@ -9,6 +9,17 @@ export const mypage = {
   },
   home: {
     empty: "No activity yet",
+    activity: {
+      points: "Points",
+      activityCounts: "Activity Counts",
+    },
+    metricSections: {
+      total: "Total",
+      pending: "Pending",
+      completed: "Completed",
+      requests: "Requests",
+      provides: "Provides",
+    },
     points: {
       title: "Points",
       earned: "Points Earned",
@@ -54,6 +65,12 @@ export const mypage = {
     },
   },
   notification: {
+    messages: {
+      item_provided: "Item Provided",
+      point_received: "Point Received",
+      system_notice: "System Notice",
+      request_approved: "Request Approved",
+    },
     profile: {
       title: "Profile Settings",
       name: "Name",
