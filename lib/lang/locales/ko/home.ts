@@ -35,9 +35,8 @@ export const home = {
     },
   },
   trending: {
-    categories: ["전체", "패션", "뷰티", "테크", "라이프"],
     title: "트렌딩 나우",
-    description: "지금 가장 인기 있는 아이템을 확인하세요",
+    description: "지금 가장 인기 있는 이미지를 확인하세요",
   },
   premiumSpot: {
     title: "인기 아이템의 링크를 제공해보세요",

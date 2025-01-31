@@ -10,7 +10,7 @@ export function DetailHeader({ onClose }: DetailHeaderProps) {
   return (
     <button
       onClick={onClose}
-      className="absolute left-4 z-10 text-white"
+      className="absolute left-2 z-10 text-white"
     >
       <ChevronLeft className="w-6 h-6" />
     </button>

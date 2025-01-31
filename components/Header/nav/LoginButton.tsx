@@ -1,6 +1,6 @@
 "use client";
 
-import { LoginModal } from "./modal/LoginModal";
+import { MypageModal } from "./modal/LoginModal";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/hooks/features/auth/useAuth";
 import useModalClose from "@/lib/hooks/common/useModalClose";
@@ -49,7 +49,7 @@ export function LoginButton() {
         {buttonText}
       </span>
       {!isLoading && (
-        <LoginModal
+        <MypageModal
           isOpen={isLoginModalOpen}
           onClose={() => setIsLoginModalOpen(false)}
         />

@@ -1,75 +1,143 @@
 "use client";
 
-import React from "react";
 import { useAuth } from "@/lib/hooks/features/auth/useAuth";
 import { GoogleIcon } from "@/styles/icons/auth/google-icon";
 import { useLocaleContext } from "@/lib/contexts/locale-context";
 
-interface AccountSectionProps {
-  onClose?: () => void;
+interface AccountData {
+  points: number;
+  active_ticket_num: number;
+  request_num: number;
+  provide_num: number;
+  pending_num: number;
 }
 
-export function AccountSection({ onClose }: AccountSectionProps) {
+export function AccountSection({
+  data,
+  isLoading,
+}: {
+  data: AccountData;
+  isLoading: boolean;
+}) {
   const { t } = useLocaleContext();
   const { isLogin, handleGoogleLogin, handleDisconnect } = useAuth();
+  const userEmail = window.sessionStorage.getItem("USER_EMAIL");
+
+  console.log(isLoading);
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-[#EAFD66] border-r-2" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {isLogin ? (
-        <>
-          {/* Stats Grid */}
-          <div className="grid grid-cols-3 gap-3">
-            <div className="bg-black/20 rounded-xl p-4 text-center">
-              <div className="text-[#EAFD66] text-xl font-bold">2,400</div>
-              <div className="text-xs text-gray-400 mt-1">포인트</div>
-            </div>
-            <div className="bg-black/20 rounded-xl p-4 text-center">
-              <div className="text-[#EAFD66] text-xl font-bold">5</div>
-              <div className="text-xs text-gray-400 mt-1">활동권</div>
-            </div>
-            <div className="bg-black/20 rounded-xl p-4 text-center">
-              <div className="text-[#EAFD66] text-xl font-bold">Lv.3</div>
-              <div className="text-xs text-gray-400 mt-1">기여도</div>
-            </div>
-          </div>
-
-          {/* Contribution Graph */}
-          <div className="bg-black/20 rounded-xl p-4">
-            <h3 className="text-sm font-medium text-gray-400 mb-3">
-              활동 그래프
-            </h3>
-            <div className="grid grid-cols-7 gap-1.5">
-              {[...Array(28)].map((_, i) => (
-                <div
-                  key={i}
-                  className={`aspect-square rounded-sm ${
-                    Math.random() > 0.5 ? "bg-[#EAFD66]/20" : "bg-white/5"
-                  }`}
-                />
-              ))}
+      {isLogin && data ? (
+        <div className="space-y-6">
+          {/* Current Account Section */}
+          <div className="space-y-2">
+            <div className="text-gray-400 text-sm">CURRENT</div>
+            <div className="bg-[#1A1A1A] rounded-xl p-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <GoogleIcon />
+                <span className="text-white">{userEmail}</span>
+              </div>
+              <button onClick={handleDisconnect}>
+                <svg
+                  className="w-5 h-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                  />
+                </svg>
+              </button>
             </div>
           </div>
 
-          {/* Logout Button */}
-          <button
-            onClick={() => {
-              handleDisconnect();
-              onClose?.();
-            }}
-            className="w-full px-6 py-4 rounded-xl text-sm font-medium
-              bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white
-              transition-all duration-200 ease-out"
-          >
-            로그아웃하기
-          </button>
-        </>
+          {/* My Page Section */}
+          <div className="space-y-4">
+            <div className="text-gray-400 text-sm">MY PAGE</div>
+
+            {/* Points and Tickets */}
+            <div className="bg-[#1A1A1A] rounded-xl p-4 space-y-4">
+              <div className="flex justify-between items-center">
+                <div className="text-gray-400">
+                  {t.mypage.home.activity.points}
+                </div>
+                <div className="text-[#EAFD66] text-2xl font-bold">
+                  {data.points}P
+                </div>
+              </div>
+              <div className="flex justify-between items-center">
+                <div className="text-gray-400">
+                  {t.mypage.home.activity.activityCounts}
+                </div>
+                <div className="text-[#EAFD66] text-2xl font-bold">
+                  {data.active_ticket_num}
+                </div>
+              </div>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-5 gap-2 bg-[#1A1A1A] rounded-xl p-4">
+              <div className="text-center">
+                <div className="text-[#EAFD66] text-lg font-bold">
+                  {data.provide_num}
+                </div>
+                <div className="text-xs text-gray-400">
+                  {t.mypage.home.metricSections.total}
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-[#EAFD66] text-lg font-bold">
+                  {data.request_num}
+                </div>
+                <div className="text-xs text-gray-400">
+                  {t.mypage.home.metricSections.requests}
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-[#EAFD66] text-lg font-bold">
+                  {data.provide_num}
+                </div>
+                <div className="text-xs text-gray-400">
+                  {t.mypage.home.metricSections.provides}
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-[#EAFD66] text-lg font-bold">
+                  {data.pending_num}
+                </div>
+                <div className="text-xs text-gray-400">
+                  {t.mypage.home.metricSections.pending}
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-[#EAFD66] text-lg font-bold">
+                  {data.provide_num}
+                </div>
+                <div className="text-xs text-gray-400">
+                  {t.mypage.home.metricSections.completed}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       ) : (
         <button
           onClick={async () => {
             try {
               await handleGoogleLogin();
             } catch (error) {
-              console.error("Login failed:", error);
+              console.error("로그인 실패:", error);
             }
           }}
           className="w-full px-6 py-4 rounded-xl text-sm font-medium

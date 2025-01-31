@@ -33,8 +33,8 @@ export function AddItemModal({
 
       try {
         const response = await imagesAPI.getImageDetail(imageId);
-        if (response.status_code === 200 && response.data.image) {
-          setImageData(response.data.image);
+        if (response.status_code === 200 && response.data?.images?.[0]) {
+          setImageData(response.data.images[0] as unknown as ImageData);
           setIsLoading(false);
         } else {
           console.error('Invalid API response:', response);

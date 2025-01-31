@@ -35,9 +35,8 @@ export const home = {
     },
   },
   trending: {
-    categories: ["All", "Fashion", "Beauty", "Tech", "Life"],
     title: "Trending Now",
-    description: "Check out the most popular items right now",
+    description: "Check out the most popular images right now",
   },
   premiumSpot: {
     title: "Provide Links for Popular Items",

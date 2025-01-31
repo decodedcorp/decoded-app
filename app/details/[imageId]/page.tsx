@@ -105,8 +105,8 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
         <div className="min-h-screen pt-18 sm:pt-24 bg-black">
           <div className="max-w-4xl mx-auto px-4 space-y-16">
             <Suspense fallback={<LoadingDisplay />}>
-              <div className="bg-[#1A1A1A] rounded-2xl p-6">
-                <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,24rem)_minmax(0,28rem)] gap-6 items-start justify-center">
+              <div className="bg-[#1A1A1A] rounded-2xl p-4">
+                <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,30rem)_minmax(0,36rem)] gap-6 items-start justify-center">
                   <ImageSection
                     imageData={processedImageData}
                     selectedItemId={selectedItemId}
@@ -117,7 +117,10 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
                   />
                 </div>
               </div>
-              {/* <RelatedStylingSection imageId={imageData.doc_id} /> */}
+              <RelatedStylingSection 
+                imageId={imageData.doc_id} 
+                selectedItemId={selectedItemId}
+              />
             </Suspense>
           </div>
         </div>

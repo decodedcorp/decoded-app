@@ -56,8 +56,8 @@ export function ImageSection({ imageData, selectedItemId }: ImageSectionProps) {
 
   return (
     <div className="w-full h-full">
-      <div className="bg-[#1A1A1A] rounded-lg overflow-hidden">
-        <div className="relative aspect-[3/4] w-full">
+      <div className="bg-[#1A1A1A] rounded-lg overflow-auto flex justify-center items-center">
+        <div className="relative aspect-[3/4] min-w-[30rem]">
           <Image
             src={imageData.img_url}
             alt="Detail image"

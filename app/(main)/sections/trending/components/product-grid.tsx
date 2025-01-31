@@ -1,52 +1,125 @@
 "use client";
 
 import { cn } from "@/lib/utils/style";
-import { TrendingCard } from "./trending-card";
-import type { Category } from "./category-filter";
+import { ProductCard } from "./product-card";
 import { useLocaleContext } from "@/lib/contexts/locale-context";
-interface ProductGridProps {
-  category: Category;
+import { useTrendingImages } from "@/lib/hooks/use-trending-images";
+import { useState } from "react";
+import type { TrendingImage } from "@/lib/api/types/trending";
+import { Button } from "@/components/ui/button";
+
+interface TrendingResponse {
+  status_code: number;
+  description: string;
+  data: TrendingImage[];
 }
 
-export function ProductGrid({ category }: ProductGridProps) {
-  const { t } = useLocaleContext();
+type PeriodType = 'daily' | 'weekly' | 'monthly';
 
-  return (
-    <>
-      {/* 트렌딩 아이템 그리드 */}
+const ITEMS_PER_PAGE = 4;
+
+const PERIOD_OPTIONS: { label: string; value: PeriodType }[] = [
+  { label: '일간', value: 'daily' },
+  { label: '주간', value: 'weekly' },
+  { label: '월간', value: 'monthly' },
+];
+
+export function ProductGrid() {
+  const { t } = useLocaleContext();
+  const [period, setPeriod] = useState<PeriodType>('daily');
+  const { data, isLoading } = useTrendingImages({
+    limit: 8,
+    period
+  });
+  const [showAll, setShowAll] = useState(false);
+
+  const trendingImages = (data as TrendingResponse | undefined)?.data ?? [];
+  const displayedItems = showAll 
+    ? trendingImages 
+    : trendingImages.slice(0, ITEMS_PER_PAGE);
+
+  if (isLoading) {
+    return (
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <TrendingCard
-            key={i}
-            rank={i + 1}
-            image={`https://placehold.co/400x300?text=${i + 1}`}
-            title="트렌딩 아이템 이름"
-            brand="브랜드명"
-            likes={1234}
+        {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+          <div 
+            key={i} 
+            className="aspect-[3/4] w-full rounded-xl bg-zinc-800/50 animate-pulse"
           />
         ))}
       </div>
+    );
+  }
 
-      {/* "더보기" 버튼 */}
-      <div className="flex justify-center">
-        <button
-          className={cn(
-            "group px-6 py-3 rounded-xl",
-            "border border-zinc-800",
-            "hover:border-[#EAFD66]/20",
-            "transition-colors duration-200"
-          )}
-        >
-          <span
+  if (!trendingImages.length) {
+    return (
+      <div className="flex justify-center items-center h-48 text-zinc-400">
+        데이터가 없습니다
+      </div>
+    );
+  }
+
+  console.log('Trending Images:', trendingImages); // 데이터 확인용 로그
+
+  return (
+    <div className="space-y-6">
+      {/* Period Filter */}
+      <div className="flex items-center justify-end gap-2">
+        {PERIOD_OPTIONS.map((option) => (
+          <button
+            key={option.value}
+            onClick={() => setPeriod(option.value)}
             className={cn(
-              "text-zinc-400 group-hover:text-white",
-              "transition-colors duration-200"
+              "px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+              period === option.value
+                ? "text-[#EAFD66]"
+                : "text-zinc-400 hover:text-white"
             )}
           >
-            {t.common.actions.more}
-          </span>
-        </button>
+            {option.label}
+          </button>
+        ))}
       </div>
-    </>
+
+      {/* Content */}
+      <div>
+        {!trendingImages.length ? (
+          <div className="flex justify-center items-center h-48 text-zinc-400">
+            데이터가 없습니다
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {displayedItems.map((item: TrendingImage, index: number) => (
+                <ProductCard
+                  key={item.image._id}
+                  rank={index + 1}
+                  image={item.image.img_url}
+                  title={item.image.title || '제목 없음'}
+                  brand={item.image.upload_by}
+                  likes={item.image.like}
+                  imageId={item.image._id}
+                  requestedItems={item.image.requested_items}
+                />
+              ))}
+            </div>
+
+            {trendingImages.length > ITEMS_PER_PAGE && (
+              <div className="flex justify-center mt-8">
+                <div className="w-40">
+                  <Button
+                    onClick={() => setShowAll(!showAll)}
+                    className="w-full px-4 py-2 text-sm text-zinc-400 hover:text-[#EAFD66] transition-colors border border-zinc-800 rounded-lg hover:border-[#EAFD66]/20"
+                    variant="ghost"
+                  >
+                    {showAll ? t.common.actions.less : t.common.actions.more}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
   );
 }

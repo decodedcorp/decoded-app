@@ -60,8 +60,7 @@ export interface ImageDetails {
     [key: string]: DecodedItem[];
   };
   metadata: {
-    artistId: string;
-    artistName: string;
+    [key: string]: string;
   };
 }
 
@@ -98,7 +97,7 @@ export interface ImageData {
   source: string | null;
   upload_by: string;
   doc_id: string;
-  decoded_percent: number;
+  decoded_percent: number;  
   items: {
     [key: string]: DecodedItem[];
   };
@@ -118,46 +117,42 @@ export interface ItemDocument {
     product_type: string;
     category: string;
     sub_category: string;
+    brand?: string;
   };
   img_url: string;
   like: number;
 }
 
 export interface ItemDetailResponse {
-  status_code: number;
-  description: string;
-  data: {
-    docs: {
-      _id: string;
-      requester: string;
-      requested_at: string;
-      status: 'pending' | 'confirm';
-      link_info: Array<{
-        url: string;
-        label: string | null;
-        date: string;
-        provider: string;
-        og_metadata: null;
-        link_metadata: null;
-      }> | null;
-      metadata: {
-        name: string | null;
-        description: string | null;
-        brand: string | null;
-        designed_by: string | null;
-        material: string | null;
-        color: string | null;
-        item_class: string;
-        item_sub_class: string;
-        category: string | null;
-        sub_category: string | null;
-        product_type: string;
-      };
-      img_url: string;
-      like: number;
+  docs: {
+    _id: string;
+    requester: string;
+    requested_at: string;
+    link_info: Array<{
+      url: string;
+      label: string | null;
+      date: string;
+      provider: string;
+      og_metadata: null;
+      link_metadata: null;
+    }>;
+    metadata: {
+      name: string | null;
+      description: string | null;
+      brand: string | null;
+      designed_by: string | null;
+      material: string | null;
+      color: string | null;
+      item_class: string;
+      item_sub_class: string;
+      category: string;
+      sub_category: string;
+      product_type: string;
     };
-    next_id: string | null;
+    img_url: string;
+    like: number;
   };
+  next_id: string | null;
 }
 
 export interface ProcessedImageData extends Omit<ImageDetails, 'items'> {

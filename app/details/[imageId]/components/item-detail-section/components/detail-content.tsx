@@ -15,21 +15,32 @@ export function DetailContent({
   activeTab,
   onTabChange,
 }: DetailContentProps) {
+  // Filter confirmed links
+  const confirmedLinks = data.docs.link_info?.filter(link => link.status === 'confirmed') || [];
+  
+  // Count sale and related links from confirmed links only
+  const saleCount = confirmedLinks.filter(link => link.label === 'sale').length;
+  const relatedCount = confirmedLinks.filter(link => !link.label).length;
+
   return (
-    <div className="w-full">
-      <div className="flex flex-col items-center pb-6">
+    <div className="w-full grid grid-rows-[0.5fr_auto] gap-2">
+      <div className="flex flex-col items-center">
         <ItemInfo data={data} />
-        <ItemActions likeCount={data.like} itemId={data.id} />
+        <ItemActions likeCount={data.docs.like} itemId={data.docs._id} />
       </div>
 
-      <div className="px-4">
+      <div>
         <LinkTabs
           activeTab={activeTab}
           onTabChange={onTabChange}
-          saleCount={data.link_info?.filter((link) => (link.label)).length}
-          relatedCount={data.link_info?.filter( (link) => (link.label && status !== 'confirm')).length}
+          saleCount={saleCount}
+          relatedCount={relatedCount}
         />
-        <LinkList links={data.link_info} activeTab={activeTab} status={data.status} />
+        <LinkList 
+          links={data.docs.link_info}
+          activeTab={activeTab}
+          status="pending"
+        />
       </div>
     </div>
   );

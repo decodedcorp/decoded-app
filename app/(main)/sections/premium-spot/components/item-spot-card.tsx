@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useNavigateToDetail } from "@/lib/hooks/common/useNavigateToDetail";
 import { ImagePlaceholder } from "@/components/ui/icons/image-placeholder";
 import { useLocaleContext } from "@/lib/contexts/locale-context";
+
 interface ItemSpotCardProps {
   image: string | null;
   title: string;
@@ -17,6 +18,7 @@ interface ItemSpotCardProps {
   featured?: boolean;
   imageDocId: string;
   itemDocId: string;
+  onViewMore?: () => void;
 }
 
 export function ItemSpotCard({
@@ -30,6 +32,7 @@ export function ItemSpotCard({
   featured,
   imageDocId,
   itemDocId,
+  onViewMore,
 }: ItemSpotCardProps) {
   const { t } = useLocaleContext();
   const navigateToDetail = useNavigateToDetail();
@@ -38,6 +41,9 @@ export function ItemSpotCard({
     <div
       className={cn(
         "group relative",
+        "w-full",
+        "h-full",
+        "flex flex-col",
         "rounded-2xl overflow-hidden",
         "border border-zinc-800/50",
         "hover:border-[#EAFD66]/20",
@@ -46,12 +52,13 @@ export function ItemSpotCard({
       )}
     >
       {/* 이미지 */}
-      <div className="relative aspect-[4/3] bg-zinc-900 overflow-hidden">
+      <div className="relative w-full aspect-[4/3] bg-zinc-900 overflow-hidden shrink-0">
         {image ? (
           <Image
             src={image}
             alt={title}
             fill
+            sizes="(max-width: 640px) 100vw, 280px"
             className={cn(
               "object-cover",
               "transform group-hover:scale-110",
@@ -86,21 +93,22 @@ export function ItemSpotCard({
       {/* 콘텐츠 */}
       <div
         className={cn(
-          "bg-zinc-900 p-5 space-y-4",
+          "flex-1 flex flex-col",
+          "bg-zinc-900 p-5",
           featured && "bg-[#EAFD66]/10"
         )}
       >
         {/* 아이템 정보 */}
-        <div>
-          <h3 className="font-medium text-white">{title}</h3>
-          <p className="text-sm text-zinc-400">
+        <div className="mb-4">
+          <h3 className="font-medium text-white line-clamp-1">{title}</h3>
+          <p className="text-sm text-zinc-400 line-clamp-1">
             {brand || t.common.errors.brandNotFound}
           </p>
         </div>
 
         {/* 통계 */}
-        <div className="grid grid-cols-3 gap-2 text-center text-sm">
-          <div>
+        <div className="grid grid-cols-3 gap-2 text-center text-sm mb-4">
+          <div className="flex flex-col items-center">
             <p className="text-[#EAFD66] font-medium">
               {views.toLocaleString()}
             </p>
@@ -108,14 +116,13 @@ export function ItemSpotCard({
               {t.common.terminology.viewCount}
             </p>
           </div>
-          <div>
+          <div className="flex flex-col items-center">
             <p className="text-[#EAFD66] font-medium">{requestCount}</p>
-            {/* Should change to `provide count` */}
             <p className="text-zinc-500 text-xs">
               {t.common.terminology.provide}
             </p>
           </div>
-          <div>
+          <div className="flex flex-col items-center">
             <p className="text-[#EAFD66] font-medium">
               {parseFloat(exposureRate).toFixed(1)}%
             </p>
@@ -125,14 +132,27 @@ export function ItemSpotCard({
           </div>
         </div>
 
-        {/* 링크 제공 버튼 */}
-        <button
-          onClick={() => navigateToDetail(itemDocId, { imageId: imageDocId })}
-          className="flex items-center justify-center w-full gap-2 text-sm text-zinc-400 hover:text-[#EAFD66] transition-colors"
-        >
-          <LinkIcon className="w-4 h-4" />
-          <span>{t.common.actions.provideLink}</span>
-        </button>
+        {/* 버튼 그룹 */}
+        <div className="mt-auto flex flex-col gap-2">
+          {/* 링크 제공 버튼 */}
+          <button
+            onClick={() => navigateToDetail(itemDocId, { imageId: imageDocId })}
+            className="flex items-center justify-center w-full gap-2 text-sm text-zinc-400 hover:text-[#EAFD66] transition-colors"
+          >
+            <LinkIcon className="w-4 h-4" />
+            <span>{t.common.actions.provideLink}</span>
+          </button>
+
+          {/* 더보기 버튼 */}
+          {/* {onViewMore && (
+            <button
+              onClick={onViewMore}
+              className="w-full px-4 py-2 text-sm text-zinc-400 hover:text-[#EAFD66] transition-colors border border-zinc-800 rounded-lg hover:border-[#EAFD66]/20"
+            >
+              {t.common.actions.more}
+            </button>
+          )} */}
+        </div>
       </div>
     </div>
   );

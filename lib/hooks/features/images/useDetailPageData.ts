@@ -61,7 +61,7 @@ export function useDetailPageData(imageId: string): UseDetailPageDataReturn {
     try {
       const response = await imagesAPI.getImageDetail(imageId);
       if (response.data) {
-        const transformedData = transformToDetailPageState(response.data.image);
+        const transformedData = transformToDetailPageState(response.data.images[0]);
         setDetailPageState(transformedData);
       }
       return true;
@@ -74,7 +74,7 @@ export function useDetailPageData(imageId: string): UseDetailPageDataReturn {
   const fetchItems = useCallback(async () => {
     try {
       const response = await imagesAPI.getImageItems(imageId);
-      setItems(response.data);
+      setItems(response.data.images[0] || []);
       return true;
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to fetch items'));

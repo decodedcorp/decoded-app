@@ -70,7 +70,7 @@ export function ItemActions({ itemId, likeCount }: ItemActionsProps) {
 
   return (
     <>
-      <div className="flex items-center gap-2 mb-10">
+      <div className="flex items-center gap-2">
         <Button
           variant="outline"
           className="px-5 py-2 rounded-full border-neutral-600 text-xs"

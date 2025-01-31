@@ -2,7 +2,14 @@
 
 import { networkManager } from '@/lib/network/network';
 import type { ImageData, DetailPageState, ItemDocument } from '../types/image';
-import type { APIResponse } from '../types/request';
+import type { 
+  RelatedImage, 
+  TrendingImagesResponse,
+  ArtistImagesResponse,
+  BrandImagesResponse,
+  APIResponse,
+  ItemDetailResponse
+} from '@/app/details/[imageId]/components/related-styling/types';
 
 export interface ItemMetadata {
   name: string | null;
@@ -114,7 +121,7 @@ export const imagesAPI = {
     }
   },
 
-  getNewalImages: async (): Promise<APIResponse<ImageData[]>> => {
+  getNewalImages: async (): Promise<APIResponse<TrendingImagesResponse>> => {
     try {
       const response = await networkManager.request('image', 'GET');
       return response;
@@ -123,9 +130,30 @@ export const imagesAPI = {
     }
   },
 
-  getArtistImages: async (imageId: string, artistId: string): Promise<APIResponse<ImageData[]>> => {
+  getArtistImages: async (imageId: string, artistId: string): Promise<APIResponse<ArtistImagesResponse>> => {
     try {
       const response = await networkManager.request(`image/${imageId}/artist/${artistId}`, 'GET');
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  getBrandImages: async (brandId: string): Promise<APIResponse<BrandImagesResponse>> => {
+    try {
+      const response = await networkManager.request(`item/related/${brandId}`, 'GET');
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  getItemDetail: async (itemId: string): Promise<APIResponse<ItemDetailResponse>> => {
+    try {
+      const response = await networkManager.request(
+        `item/${itemId}`,
+        'GET'
+      );
       return response;
     } catch (error) {
       throw error;
