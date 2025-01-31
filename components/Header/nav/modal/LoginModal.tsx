@@ -37,7 +37,6 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
   const { t } = useLocaleContext();
 
   const fetchTabData = useCallback(async (tab: keyof TabData) => {
-    // 현재 탭의 데이터 상태를 즉시 확인
     const currentTabData = await new Promise((resolve) => {
       setTabData((prev) => {
         resolve(prev[tab]);
@@ -45,7 +44,6 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
       });
     });
 
-    // 이미 데이터가 있으면 리턴
     if (currentTabData !== null) {
       console.log("Already Fetched");
       return;
@@ -73,15 +71,15 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
           }));
         }
 
-        if (itemsResponse.status_code === 200) {
-          setTabData((prev) => ({
-            ...prev,
-            likes: {
-              ...prev.likes,
-              items: itemsResponse.data,
-            },
-          }));
-        }
+        // if (itemsResponse.status_code === 200) {
+        //   setTabData((prev) => ({
+        //     ...prev,
+        //     likes: {
+        //       ...prev.likes,
+        //       items: itemsResponse.data,
+        //     },
+        //   }));
+        // }
       } catch (error) {
         console.error(`${tab} 데이터 로딩 실패:`, error);
       } finally {

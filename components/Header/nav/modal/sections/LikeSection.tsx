@@ -113,7 +113,7 @@ export function LikeSection({
           ))}
 
         {(activeCategory === "all" || activeCategory === "items") &&
-          (data.items.likes as LikedItem[])?.map((item) => (
+          (data.items?.likes as LikedItem[])?.map((item) => (
             <div
               key={item.item_doc_id}
               className="bg-[#1A1A1A] rounded-lg p-3 flex flex-col gap-2"

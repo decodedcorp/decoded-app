@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils/style";
 import { pretendardRegular } from "@/lib/constants/fonts";
 import { Search } from "lucide-react";
 import { useLocaleContext } from "@/lib/contexts/locale-context";
+import { useSearchHistory } from "@/lib/hooks/common/useSearchHistory";
 
 export function SearchBar({ onSearch }: { onSearch: (query: string) => void }) {
   const { t } = useLocaleContext();
@@ -14,6 +15,7 @@ export function SearchBar({ onSearch }: { onSearch: (query: string) => void }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const modalRef = useRef<HTMLDivElement>(null);
+  const { addToHistory } = useSearchHistory();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -31,9 +33,10 @@ export function SearchBar({ onSearch }: { onSearch: (query: string) => void }) {
     };
   }, []);
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
+      await addToHistory(searchQuery);
       router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
       setIsModalOpen(false);
     }
