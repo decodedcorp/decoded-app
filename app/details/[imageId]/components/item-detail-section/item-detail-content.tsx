@@ -3,6 +3,7 @@
 import Image from 'next/image';
 
 interface ItemDetailData {
+  docs: {
   id: string;
   requester: string;
   requested_at: string;
@@ -26,9 +27,13 @@ interface ItemDetailData {
     category: string;
     sub_category: string;
     product_type: string;
+    };
   };
   img_url: string;
   like: number;
+  metadata: {
+    brand: string;
+  };
 }
 
 interface ItemDetailContentProps {
@@ -45,15 +50,15 @@ export function ItemDetailContent({ data }: ItemDetailContentProps) {
         <div className="w-20 h-20 rounded-md overflow-hidden bg-neutral-800 flex-shrink-0">
           <Image
             src={data.img_url || ''}
-            alt={data.metadata.name || ''}
+            alt={data.docs.metadata.name || ''}
             width={80}
             height={80}
             className="w-full h-full object-cover"
           />
         </div>
         <div className="flex-1 space-y-1">
-          <h3 className="text-sm text-neutral-200 font-medium">{data.metadata.name}</h3>
-          <p className="text-xs text-neutral-400">{data.metadata.product_type}</p>
+          <h3 className="text-sm text-neutral-200 font-medium">{data.docs.metadata.name}</h3>
+          <p className="text-xs text-neutral-400">{data.docs.metadata.product_type}</p>
         </div>
       </div>
 
@@ -61,18 +66,18 @@ export function ItemDetailContent({ data }: ItemDetailContentProps) {
       <div className="space-y-2">
         <div className="flex justify-between text-xs">
           <span className="text-neutral-500">카테고리</span>
-          <span className="text-neutral-300">{data.metadata.category}</span>
+          <span className="text-neutral-300">{data.docs.metadata.category}</span>
         </div>
         <div className="flex justify-between text-xs">
           <span className="text-neutral-500">서브카테고리</span>
-          <span className="text-neutral-300">{data.metadata.sub_category}</span>
+          <span className="text-neutral-300">{data.docs.metadata.sub_category}</span>
         </div>
       </div>
 
       {/* 링크 정보 */}
-      {data.link_info?.[0] && (
+      {data.docs.link_info?.[0] && (
         <a
-          href={data.link_info[0].url}
+          href={data.docs.link_info[0].url}
           target="_blank"
           rel="noopener noreferrer"
           className="block w-full px-4 py-2.5 text-xs text-neutral-400 border border-neutral-700 rounded-md hover:bg-neutral-800 transition-colors text-center"

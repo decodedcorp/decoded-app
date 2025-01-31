@@ -7,17 +7,21 @@ import type { LinkInfo } from '../types';
 interface LinkListProps {
   links?: LinkInfo[];
   activeTab: 'sale' | 'related';
-  status: 'pending' | 'confirm';
+  status: 'pending' | 'confirmed';
 }
 
-export function LinkList({ links, activeTab, status = 'confirm' }: LinkListProps) {
-  const filteredLinks = links?.filter(
-    (link) => (activeTab === 'sale' ? !link.label : link.label) && status !== 'confirm'
+export function LinkList({ links, activeTab, status }: LinkListProps) {
+  // First filter confirmed links only
+  const confirmedLinks = links?.filter(link => link.status === 'confirmed') || [];
+  
+  // Then filter by tab type
+  const filteredLinks = confirmedLinks.filter(
+    link => activeTab === 'sale' ? link.label === 'sale' : !link.label
   );
 
   return (
     <div className="space-y-4">
-      {filteredLinks?.map((link, index) => (
+      {filteredLinks.map((link, index) => (
         <a
           key={index}
           href={link.url}

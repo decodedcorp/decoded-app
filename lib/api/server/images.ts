@@ -4,12 +4,14 @@ import { cookies } from 'next/headers';
 
 const SERVICE_ENDPOINT = process.env.NEXT_PUBLIC_SERVICE_ENDPOINT;
 
-export async function getRandomResources(): Promise<
-  APIResponse<{
+export async function getRandomResources(): Promise<{
+  status_code: number;
+  description: string;
+  data: {
     label: 'image' | 'item';
     resources: (RandomImageResource | RandomItemResource)[];
-  }>
-> {
+  };
+}> {
   if (!SERVICE_ENDPOINT) {
     throw new Error('SERVICE_ENDPOINT is not defined');
   }

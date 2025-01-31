@@ -23,5 +23,8 @@ export interface RequestImage {
 export interface APIResponse<T> {
   status_code: number;
   description: string;
-  data: T;
+  data: {
+    images: T[];
+    maybe_next_id: string | null;
+  };
 } 

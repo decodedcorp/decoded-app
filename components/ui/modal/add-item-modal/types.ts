@@ -17,7 +17,8 @@ export interface APIResponse<T> {
 
 // 이미지 상세 정보 응답 타입
 export interface ImageDetailResponse {
-  image: ImageData;
+  images: ImageData[];
+  maybe_next_id: string | null;
 }
 
 // 모달 Props 타입

@@ -3,14 +3,52 @@
 import { useSearchParams, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils/style';
 import { useItemDetail } from '@/app/details/utils/hooks/use-item-detail';
-import type { ItemDetailData } from '../item-detail-section/types';
 import { useState } from 'react';
 import { DetailHeader } from './components/detail-header';
 import { DetailContent } from './components/detail-content';
 import { DetailError } from './components/detail-error';
 import { DetailLoading } from './components/detail-loading';
+import { ItemDetailData, ItemDetailResponse, LinkInfo } from './types';
 
 type TabType = 'sale' | 'related';
+
+interface ApiResponse {
+  data: {
+    docs: {
+      _id: string;
+      requester: string;
+      requested_at: string;
+      link_info: {
+        url: string;
+        label: string | null;
+        date: string;
+        provider: string;
+        og_metadata: null;
+        link_metadata: null;
+        status?: 'pending' | 'confirm';
+      }[] | null;
+      metadata: {
+        name: string;
+        description: string;
+        brand: string;
+        designed_by: string;
+        material: string;
+        color: string;
+        item_class: string;
+        item_sub_class: string;
+        category?: string;
+        sub_category?: string;
+        product_type: string;
+      };
+      img_url: string;
+      like: number;
+    };
+    metadata?: {
+      brand: string;
+    };
+    next_id: string | null;
+  };
+}
 
 export function DetailSlideSection() {
   const searchParams = useSearchParams();
@@ -19,6 +57,9 @@ export function DetailSlideSection() {
   const { data, isLoading, error } = useItemDetail(selectedId);
   const [activeTab, setActiveTab] = useState<TabType>('sale');
 
+  // Ensure data is of type ItemDetailResponse | null
+  const apiResponse: ItemDetailResponse | null = data ? (data as unknown as ItemDetailResponse) : null;
+
   const handleClose = () => {
     const params = new URLSearchParams(searchParams);
     params.delete('selectedItem');
@@ -26,6 +67,41 @@ export function DetailSlideSection() {
   };
 
   if (!selectedId) return null;
+
+  const transformedData: ItemDetailData | null = apiResponse ? {
+    docs: {
+      _id: apiResponse.data.docs._id,
+      requester: apiResponse.data.docs.requester,
+      requested_at: apiResponse.data.docs.requested_at,
+      link_info: apiResponse.data.docs.link_info?.map(link => ({
+        url: link.url,
+        label: link.label,
+        date: link.date,
+        provider: link.provider,
+        og_metadata: link.og_metadata,
+        link_metadata: link.link_metadata,
+        status: (link as LinkInfo).status || 'pending'
+      })) || [],
+      metadata: {
+        name: apiResponse.data.docs.metadata.name,
+        description: apiResponse.data.docs.metadata.description,
+        brand: apiResponse.data.docs.metadata.brand,
+        designed_by: apiResponse.data.docs.metadata.designed_by,
+        material: apiResponse.data.docs.metadata.material,
+        color: apiResponse.data.docs.metadata.color,
+        item_class: apiResponse.data.docs.metadata.item_class,
+        item_sub_class: apiResponse.data.docs.metadata.item_sub_class,
+        category: apiResponse.data.docs.metadata.category || '',
+        sub_category: apiResponse.data.docs.metadata.sub_category || '',
+        product_type: apiResponse.data.docs.metadata.product_type
+      },
+      img_url: apiResponse.data.docs.img_url,
+      like: apiResponse.data.docs.like
+    },
+    metadata: {
+      brand: apiResponse.data.metadata?.brand || ''
+    }
+  } : null;
 
   return (
     <div
@@ -43,22 +119,9 @@ export function DetailSlideSection() {
             <DetailError />
           ) : isLoading ? (
             <DetailLoading />
-          ) : data ? (
+          ) : transformedData ? (
             <DetailContent
-              data={{
-                id: data.data.docs._id,
-                requester: data.data.docs.requester,
-                requested_at: data.data.docs.requested_at,
-                link_info: data.data.docs.link_info ?? [],
-                status: data.data.docs.status as 'pending' | 'confirm',
-                metadata: {
-                  ...data.data.docs.metadata,
-                  category: data.data.docs.metadata.category ?? 'Unknown',
-                  sub_category: data.data.docs.metadata.sub_category ?? 'Unknown'
-                },
-                img_url: data.data.docs.img_url,
-                like: data.data.docs.like
-              }}
+              data={transformedData}
               activeTab={activeTab}
               onTabChange={setActiveTab}
             />
