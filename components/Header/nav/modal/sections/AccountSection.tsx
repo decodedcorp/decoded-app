@@ -23,7 +23,6 @@ export function AccountSection({
   const { isLogin, handleGoogleLogin, handleDisconnect } = useAuth();
   const userEmail = window.sessionStorage.getItem("USER_EMAIL");
 
-  if (!data) return null;
   console.log(isLoading);
   if (isLoading) {
     return (
@@ -35,7 +34,7 @@ export function AccountSection({
 
   return (
     <div className="space-y-6">
-      {isLogin ? (
+      {isLogin && data ? (
         <div className="space-y-6">
           {/* Current Account Section */}
           <div className="space-y-2">
