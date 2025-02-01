@@ -172,7 +172,7 @@ export function useAuth() {
 
         console.log("[Login] Login successful, user session updated.");
         setIsLogin(true);
-        window.history.replaceState(null, "", "/");
+        window.history.replaceState(null, "", window.location.pathname);
       } catch (err: any) {
         console.error("[Login] Login failed:", err.message);
         window.sessionStorage.clear();

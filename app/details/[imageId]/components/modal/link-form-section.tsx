@@ -1,5 +1,13 @@
+'use client';
+
 import { ProvideData } from '@/types/model.d';
 import useModalClose from '@/lib/hooks/common/useModalClose';
+import {
+  StatusModal,
+  StatusType,
+  StatusMessageKey,
+} from '@/components/ui/modal/status-modal';
+import { useState, useEffect } from 'react';
 
 interface LinkFormSectionProps {
   showLinkForm: boolean;
@@ -14,16 +22,54 @@ export default function LinkFormSection({
   onSubmit,
   onProvideDataChange,
 }: LinkFormSectionProps) {
+  const [modalConfig, setModalConfig] = useState<{
+    type: StatusType;
+    messageKey?: StatusMessageKey;
+    isOpen: boolean;
+    onClose: () => void;
+  }>({
+    type: 'warning',
+    messageKey: 'login',
+    isOpen: false,
+    onClose: () => setModalConfig((prev) => ({ ...prev, isOpen: false })),
+  });
+
   const { handleClose, isClosing, modalRef } = useModalClose({
     onClose,
   });
 
-  if (!showLinkForm) return null;
+  useEffect(() => {
+    if (window.sessionStorage.getItem('USER_DOC_ID') === null) {
+      setModalConfig({
+        type: 'warning',
+        messageKey: 'login',
+        isOpen: true,
+        onClose: () => setModalConfig((prev) => ({ ...prev, isOpen: false })),
+      });
+      return;
+    }
+
+    if (!showLinkForm) {
+      setModalConfig({
+        type: 'error',
+        isOpen: true,
+        onClose: () => setModalConfig((prev) => ({ ...prev, isOpen: false })),
+      });
+      return;
+    }
+  }, [showLinkForm]);
 
   const handleSubmit = () => {
     onSubmit();
     handleClose();
+    setModalConfig({
+      type: 'success',
+      isOpen: true,
+      onClose: () => setModalConfig((prev) => ({ ...prev, isOpen: false })),
+    });
   };
+
+  if (!showLinkForm) return null;
 
   return (
     <div

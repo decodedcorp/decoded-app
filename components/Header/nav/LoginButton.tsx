@@ -1,6 +1,6 @@
 "use client";
 
-import { MypageModal } from "./modal/LoginModal";
+import { MypageModal } from "./modal/MypageModal";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/hooks/features/auth/useAuth";
 import useModalClose from "@/lib/hooks/common/useModalClose";

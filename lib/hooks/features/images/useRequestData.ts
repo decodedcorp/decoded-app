@@ -40,7 +40,7 @@ export function useRequestData(initialData: any): UseRequestDataReturn {
       const response = await requestAPI.getImageRequests(initialData.userId);
       console.log('Refresh Response:', response);
       
-      setRequests(response.data.images[0] || []);
+      setRequests(response.data || []);
     } catch (err) {
       console.error('Refresh Error:', err);
       setError(err instanceof Error ? err : new Error('Failed to fetch requests'));

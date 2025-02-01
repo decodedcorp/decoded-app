@@ -58,7 +58,7 @@ export class NetworkManager {
 
   public async request<T = any>(
     path: string,
-    method: "GET" | "POST" | "PUT" | "DELETE",
+    method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
     data: any = null,
     retries = 3,
     // TODO: DELETE ME

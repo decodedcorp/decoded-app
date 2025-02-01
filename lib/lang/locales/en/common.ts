@@ -31,7 +31,52 @@ export const common = {
     loading: "Loading",
     success: "Success",
     error: "Error",
+    warning: "Warning",
     empty: "No items found",
+    messages: {
+      success: {
+        request: {
+          title: "Request Success",
+          message: "Your request has been completed successfully.",
+        },
+        provide: {
+          title: "Provide Success",
+          message: "Your provision has been completed successfully.",
+        },
+        save: {
+          title: "Save Success",
+          message: "Successfully saved.",
+        },
+      },
+      error: {
+        default: {
+          title: "Error Occurred",
+          message: "An error occurred. Please try again.",
+        },
+        request: {
+          title: "Request Failed",
+          message: "Failed to process your request. Please try again.",
+        },
+        provide: {
+          title: "Provide Failed",
+          message: "Failed to process your provision. Please try again.",
+        },
+      },
+      warning: {
+        unsavedChanges: {
+          title: "Unsaved Changes",
+          message: "You have unsaved changes. Do you want to leave?",
+        },
+        delete: {
+          title: "Confirm Delete",
+          message: "Are you sure you want to delete?",
+        },
+        login: {
+          title: "Login Required",
+          message: "Login is required for this service.",
+        },
+      },
+    },
   },
   validation: {
     required: "This field is required",

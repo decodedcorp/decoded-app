@@ -48,6 +48,8 @@ function transformToDetailPageState(data: any): DetailPageState {
     doc_id: data.doc_id || '',
     decoded_percent: data.decoded_percent || 0,
     items: data.img?.items || {},
+    context: data.context || {},
+    metadata: data.metadata || {},
   };
 }
 
