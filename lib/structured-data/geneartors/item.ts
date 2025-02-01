@@ -6,7 +6,7 @@ export function generateItemSchema(
   artistName: string
 ): ItemSchema | null {
   if (!item?.item?.item) return null;
-  const { metadata, img_url, link_info } = item.item.item;
+  const { metadata, img_url } = item.item.item;
   const { brand_name, brand_logo_image_url } = item.item;
 
   return {
@@ -36,13 +36,6 @@ export function generateItemSchema(
       "@context": "https://schema.org",
       "@type": "Person",
       name: artistName,
-    },
-    sameAs:
-      link_info?.map((link) => ({
-        "@context": "https://schema.org",
-        "@type": "URL",
-        url: link.url,
-        category: link.label || "관련 정보",
-      })) || [],
+    }
   };
 }
