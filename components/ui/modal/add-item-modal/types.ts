@@ -1,5 +1,6 @@
 import { Point as BasePoint } from "@/types/model.d";
-import { DecodedItem, ImageData } from '@/lib/api/types/image';
+import { DecodedItem } from '@/lib/api/types/image';
+import type { APIResponse } from '@/lib/api/types/request';
 
 // 확장된 Point 타입
 export interface Point extends BasePoint {
@@ -8,17 +9,25 @@ export interface Point extends BasePoint {
   context?: string;
 }
 
-// API 응답 타입
-export interface APIResponse<T> {
-  status_code: number;
+// 이미지 데이터 타입
+export interface ImageData {
+  context?: string | null;
+  decoded_percent: number;
   description: string;
-  data: T;
+  doc_id: string;
+  img_url: string;
+  items: DecodedItem[];
+  like: number;
+  metadata: Record<string, string>;
+  source: string | null;
+  style: string | null;
+  title: string | null;
+  upload_by: string;
 }
 
 // 이미지 상세 정보 응답 타입
 export interface ImageDetailResponse {
-  images: ImageData[];
-  maybe_next_id: string | null;
+  image: ImageData;
 }
 
 // 모달 Props 타입
