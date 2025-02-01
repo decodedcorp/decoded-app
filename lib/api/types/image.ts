@@ -44,9 +44,10 @@ export interface DecodedItem {
   };
   item: {
     item: {
-      id: string;
-      name?: string;
-      description?: string;
+      _id: string;
+      metadata: ItemMetadata;
+      img_url: string | null;
+      like?: number;
     };
     brand_name: string | null;
     brand_logo_image_url: string | null;

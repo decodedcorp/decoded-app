@@ -48,6 +48,8 @@ function transformToDetailPageState(data: any): DetailPageState {
     doc_id: data.doc_id || '',
     decoded_percent: data.decoded_percent || 0,
     items: data.img?.items || {},
+    context: data.context || {},
+    metadata: data.metadata || {},
   };
 }
 
@@ -61,7 +63,7 @@ export function useDetailPageData(imageId: string): UseDetailPageDataReturn {
     try {
       const response = await imagesAPI.getImageDetail(imageId);
       if (response.data) {
-        const transformedData = transformToDetailPageState(response.data.images[0]);
+        const transformedData = transformToDetailPageState(response.data.image);
         setDetailPageState(transformedData);
       }
       return true;
@@ -74,7 +76,7 @@ export function useDetailPageData(imageId: string): UseDetailPageDataReturn {
   const fetchItems = useCallback(async () => {
     try {
       const response = await imagesAPI.getImageItems(imageId);
-      setItems(response.data.images[0] || []);
+      setItems(response.data || []);
       return true;
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to fetch items'));

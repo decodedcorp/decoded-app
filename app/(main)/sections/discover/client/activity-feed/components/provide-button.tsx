@@ -2,12 +2,15 @@
 
 import { cn } from "@/lib/utils/style";
 import { useLocaleContext } from "@/lib/contexts/locale-context";
+import { useRouter } from "next/navigation";
+
 interface ProvideButtonProps {
   imageDocId: string;
 }
 
 export function ProvideButton({ imageDocId }: ProvideButtonProps) {
   const { t } = useLocaleContext();
+  const router = useRouter();
 
   return (
     <button
@@ -20,8 +23,7 @@ export function ProvideButton({ imageDocId }: ProvideButtonProps) {
         "group"
       )}
       onClick={() => {
-        // TODO: 제공 기능 구현
-        console.log("Provide items for:", imageDocId);
+        router.push(`/details/${imageDocId}`);
       }}
     >
       <span>{t.common.actions.provide}</span>

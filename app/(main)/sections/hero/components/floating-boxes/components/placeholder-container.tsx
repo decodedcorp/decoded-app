@@ -30,7 +30,9 @@ const PLACEHOLDER_RESOURCE: RandomImageResource = {
   doc_id: 'placeholder',
   decoded_percent: 0,
   requested_items: {},
-  items: {},
+  items: [],
+  context: null,
+  metadata: {},
 };
 
 export function PlaceholderContainer({
