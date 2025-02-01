@@ -15,13 +15,19 @@ export const imagesAPI = {
   // Get single image detail
   getImageDetail: async (imageId: string): Promise<APIResponse<ImageDetailResponse>> => {
     try {
-      const response = await networkManager.request(
+      const response = await networkManager.request<APIResponse<ImageDetailResponse>>(
         `image/${imageId}`,
         'GET'
       );
       
-      if (!response.data) {
+      console.log('Raw API response:', response); // 디버깅용 로그
+
+      if (!response || !response.data) {
         throw new Error('Invalid API response structure');
+      }
+
+      if (!response.data.image) {
+        throw new Error('No image data in response');
       }
 
       return response;

@@ -10,10 +10,11 @@ import { ScrollIndicator } from './components/scroll-indicator';
 import {
   Point,
   AddItemModalProps,
-  APIResponse,
   ImageDetailResponse,
+  ImageData,
 } from './types';
-import { DecodedItem, ImageData } from '@/lib/api/types/image';
+import type { APIResponse } from '@/lib/api/types/request';
+import type { DecodedItem } from '@/lib/api/types/image';
 
 export function AddItemModal({
   isOpen,
@@ -30,18 +31,45 @@ export function AddItemModal({
   useEffect(() => {
     const fetchImageData = async () => {
       if (!isOpen || !imageId) return;
-
+      
+      setIsLoading(true);
       try {
         const response = await imagesAPI.getImageDetail(imageId);
-        if (response.status_code === 200 && response.data?.images?.[0]) {
-          setImageData(response.data.images[0] as unknown as ImageData);
-          setIsLoading(false);
-        } else {
-          console.error('Invalid API response:', response);
-          setIsLoading(false);
+        console.log('Raw API Response:', response); // 디버깅용 로그
+        
+        if (!response || !response.data) {
+          console.error('No response or data:', response);
+          return;
         }
+
+        const { image } = response.data;
+        if (!image) {
+          console.error('No image in response data:', response.data);
+          return;
+        }
+
+        console.log('Raw image data:', image); // 디버깅용 로그
+
+        // items 객체를 배열로 변환
+        const itemsArray = Object.values(image.items).flat();
+
+        const processedImage: ImageData = {
+          ...image,
+          items: itemsArray
+        };
+
+        console.log('Processed image data:', processedImage); // 디버깅용 로그
+        console.log('Processed items:', itemsArray); // 디버깅용 로그
+        
+        setImageData(processedImage);
+        
+        // 아이템 위치 로깅
+        const positions = formatItemPositions(itemsArray);
+        console.log('Formatted item positions:', positions); // 디버깅용 로그
+        
       } catch (error) {
         console.error('API Error:', error);
+      } finally {
         setIsLoading(false);
       }
     };
@@ -75,16 +103,15 @@ export function AddItemModal({
     }
   };
 
-  const formatItemPositions = (
-    items: Record<string, DecodedItem[]>
-  ): Point[] => {
-    if (!items) return [];
+  const formatItemPositions = (items: DecodedItem[]): Point[] => {
+    if (!items || !Array.isArray(items)) return [];
 
-    const allItems = Object.values(items).flat();
-    return allItems.map((item) => ({
-      x: parseFloat(item.position.left),
-      y: parseFloat(item.position.top),
-    }));
+    return items
+      .filter(item => item && item.position)
+      .map(item => ({
+        x: parseFloat(item.position.left),
+        y: parseFloat(item.position.top),
+      }));
   };
 
   const itemPositions = imageData?.items
@@ -93,6 +120,7 @@ export function AddItemModal({
 
   console.log('Current Image Data:', imageData);
   console.log('Item Positions:', itemPositions);
+  console.log('New Markers:', newMarkers);
 
   if (!isOpen) return null;
 
@@ -137,13 +165,17 @@ export function AddItemModal({
           <div className="p-5 space-y-4 flex flex-col min-h-full">
             {isLoading ? (
               <div className="flex items-center justify-center h-48">
-                <div className="text-gray-400">Loading...</div>
+                <div className="text-gray-400">이미지를 불러오는 중...</div>
+              </div>
+            ) : !imageData?.img_url ? (
+              <div className="flex items-center justify-center h-48">
+                <div className="text-gray-400">이미지를 찾을 수 없습니다</div>
               </div>
             ) : (
               <>
                 <ImageArea
                   handleImageClick={handleImageClick}
-                  imageUrl={imageData?.img_url}
+                  imageUrl={imageData.img_url}
                   itemPositions={itemPositions}
                   newMarkers={newMarkers}
                   setNewMarkers={setNewMarkers}

@@ -38,30 +38,34 @@ export interface Item {
 
 export interface DecodedItem {
   is_decoded: boolean;
-  position: Position;
+  position: {
+    top: string;
+    left: string;
+  };
   item: {
-    item: Item;
+    item: {
+      id: string;
+      name?: string;
+      description?: string;
+    };
     brand_name: string | null;
     brand_logo_image_url: string | null;
   };
 }
 
 export interface ImageDetails {
-  title: string | null;
-  description: string;
-  like: number;
-  style: string | null;
-  img_url: string;
-  source: string | null;
-  upload_by: string;
-  doc_id: string;
+  context: string | null;
   decoded_percent: number;
-  items: {
-    [key: string]: DecodedItem[];
-  };
-  metadata: {
-    [key: string]: string;
-  };
+  description: string;
+  doc_id: string;
+  img_url: string;
+  items: Record<string, DecodedItem[]>;
+  like: number;
+  metadata: Record<string, string>;
+  source: string | null;
+  style: string | null;
+  title: string | null;
+  upload_by: string;
 }
 
 export interface ImageMetadata {
@@ -88,19 +92,8 @@ export interface ImageItem {
   like: number;
 }
 
-export interface ImageData {
-  title: string | null;
-  description: string;
-  like: number;
-  style: string | null;
-  img_url: string;
-  source: string | null;
-  upload_by: string;
-  doc_id: string;
-  decoded_percent: number;  
-  items: {
-    [key: string]: DecodedItem[];
-  };
+export interface ImageData extends Omit<ImageDetails, 'items'> {
+  items: DecodedItem[];
 }
 
 export interface DetailPageState extends ImageData {
