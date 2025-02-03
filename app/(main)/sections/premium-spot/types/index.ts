@@ -1,5 +1,3 @@
-export type Period = 'daily' | 'weekly' | 'monthly' | 'yearly';
-
 export interface ItemMetadata {
   name: string | null;
   description: string | null;
@@ -55,16 +53,6 @@ export interface TrendingItem {
   featured: boolean;
   imageDocId: string;
   itemDocId: string;
-}
-
-export interface PeriodSelectorProps {
-  period: Period;
-  onPeriodChange: (period: Period) => void;
-  availablePeriods: Period[];
-}
-
-export interface PremiumSpotClientProps {
-  period: Period;
 }
 
 export interface ItemSpotCardProps {

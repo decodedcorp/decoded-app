@@ -110,21 +110,21 @@ export function ItemSpotCard({
         <div className="grid grid-cols-3 gap-2 text-center text-sm mb-4">
           <div className="flex flex-col items-center">
             <p className="text-[#EAFD66] font-medium">
-              {views.toLocaleString()}
+              {(views || 0).toLocaleString()}
             </p>
             <p className="text-zinc-500 text-xs">
               {t.common.terminology.viewCount}
             </p>
           </div>
           <div className="flex flex-col items-center">
-            <p className="text-[#EAFD66] font-medium">{requestCount}</p>
+            <p className="text-[#EAFD66] font-medium">{requestCount || 0}</p>
             <p className="text-zinc-500 text-xs">
               {t.common.terminology.provide}
             </p>
           </div>
           <div className="flex flex-col items-center">
             <p className="text-[#EAFD66] font-medium">
-              {parseFloat(exposureRate).toFixed(1)}%
+              {Number(exposureRate || 0).toFixed(1)}%
             </p>
             <p className="text-zinc-500 text-xs">
               {t.common.terminology.exposureRate}

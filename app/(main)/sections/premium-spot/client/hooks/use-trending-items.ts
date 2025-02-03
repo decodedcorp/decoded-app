@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Period, ApiResponse, TrendingItem } from '../../types';
+import { ApiResponse, TrendingItem } from '../../types';
 import { networkManager } from '@/lib/network/network';
 
 function mapResponseToTrendingItems(response: ApiResponse): TrendingItem[] {
@@ -20,7 +20,7 @@ function mapResponseToTrendingItems(response: ApiResponse): TrendingItem[] {
   }));
 }
 
-export function useTrendingItems(period: Period) {
+export function useTrendingItems() {
   const [items, setItems] = useState<TrendingItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -34,7 +34,7 @@ export function useTrendingItems(period: Period) {
         setError(null);
 
         const response = await networkManager.request<ApiResponse>(
-          `metrics/trending/items?limit=9&period=${period}`,
+          'metrics/trending/items?limit=9',
           'GET'
         );
 
@@ -44,8 +44,7 @@ export function useTrendingItems(period: Period) {
         setItems(transformedItems);
       } catch (err) {
         if (!isMounted) return;
-
-        console.error(`Error fetching items for period ${period}:`, err);
+        console.error('Error fetching items:', err);
         setError(
           err instanceof Error ? err : new Error('Failed to fetch items')
         );
@@ -61,7 +60,7 @@ export function useTrendingItems(period: Period) {
     return () => {
       isMounted = false;
     };
-  }, [period]);
+  }, []);
 
   return { items, isLoading, error };
 }
