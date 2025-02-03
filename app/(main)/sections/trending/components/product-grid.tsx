@@ -40,7 +40,7 @@ export function ProductGrid() {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
           <div 
             key={i} 
@@ -63,23 +63,6 @@ export function ProductGrid() {
 
   return (
     <div className="space-y-6">
-      {/* Period Filter */}
-      <div className="flex items-center justify-end gap-2">
-        {PERIOD_OPTIONS.map((option) => (
-          <button
-            key={option.value}
-            onClick={() => setPeriod(option.value)}
-            className={cn(
-              "px-4 py-2 rounded-lg text-sm font-medium transition-colors",
-              period === option.value
-                ? "text-[#EAFD66]"
-                : "text-zinc-400 hover:text-white"
-            )}
-          >
-            {option.label}
-          </button>
-        ))}
-      </div>
 
       {/* Content */}
       <div>
