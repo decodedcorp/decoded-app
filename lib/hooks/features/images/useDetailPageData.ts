@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { imagesAPI } from '@/lib/api/endpoints/images';
-import type { DetailPageState, ItemDocument } from '@/lib/api/types/image';
+import type { DetailPageState, ItemDocument } from '@/lib/api/_types/image';
 
 interface UseDetailPageDataReturn {
   detailPageState: DetailPageState | null;

@@ -1,30 +1,21 @@
-import { getRandomResources } from "@/lib/api/server/images";
-import { FloatingBoxes as FloatingBoxesClient } from "./components/floating-boxes";
+'use client';
+
+import { FloatingBoxes } from "./components/floating-boxes";
 import { HeroContent } from "./components/hero-content";
 import ScrollIndicator from "./components/scroll-indicator";
 import type { BoxSizeMode } from "./utils/types";
 import { Suspense } from "react";
-import type {
-  RandomImageResource,
-  RandomItemResource,
-} from "@/lib/api/client/images";
+import { useRandomResources } from "./hooks/use-random-resources";
 import { Locale } from "@/lib/lang/locales";
+import type { ItemDoc, ImageDoc } from "@/lib/api/types";
+
 interface HeroSectionProps {
   sizeMode?: BoxSizeMode;
   locale?: Locale;
 }
 
-export async function HeroSection({ sizeMode = "LARGE" }: HeroSectionProps) {
-  let resources: (RandomImageResource | RandomItemResource)[] = [];
-
-  try {
-    // 서버 사이드에서 데이터 fetching
-    const response = await getRandomResources();
-    resources = response?.data?.resources ?? [];
-  } catch (error) {
-    console.error("Failed to load random resources:", error);
-    // 에러가 발생해도 UI는 렌더링
-  }
+export function HeroSection({ sizeMode = "LARGE" }: HeroSectionProps) {
+  const { data: resources = [] as Array<ItemDoc | ImageDoc> } = useRandomResources();
 
   return (
     <section className="relative w-full h-screen overflow-hidden isolate">
@@ -42,7 +33,7 @@ export async function HeroSection({ sizeMode = "LARGE" }: HeroSectionProps) {
           {/* Floating Boxes */}
           <div className="relative w-full h-full flex items-center justify-center">
             <Suspense fallback={null}>
-              <FloatingBoxesClient
+              <FloatingBoxes
                 sizeMode={sizeMode}
                 initialResources={resources}
               />

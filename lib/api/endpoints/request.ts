@@ -1,5 +1,5 @@
 import { networkManager } from '@/lib/network/network';
-import type { RequestImage, APIResponse } from '../types/request';
+import type { RequestImage, APIResponse } from '../_types/request';
 
 export const requestAPI = {
   // Create image request

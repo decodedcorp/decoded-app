@@ -1,5 +1,5 @@
 import { networkManager } from '@/lib/network/network';
-import type { APIResponse } from '../types/request';
+import type { APIResponse } from '../_types/request';
 import type { ItemDetailResponse } from '@/types/item';
 
 export const itemsAPI = {

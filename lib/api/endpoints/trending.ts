@@ -1,6 +1,6 @@
 import { networkManager } from '@/lib/network/network';
-import type { APIResponse } from '../types/request';
-import type { GetTrendingImagesParams, TrendingImagesResponse } from '../types/trending';
+import type { APIResponse } from '../_types/request';
+import type { GetTrendingImagesParams, TrendingImagesResponse } from '../_types/trending';
 
 export const trendingAPI = {
   getTrendingImages: async (params: GetTrendingImagesParams): Promise<APIResponse<TrendingImagesResponse>> => {

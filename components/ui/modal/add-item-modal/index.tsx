@@ -13,8 +13,8 @@ import {
   ImageDetailResponse,
   ImageData,
 } from './types';
-import type { APIResponse } from '@/lib/api/types/request';
-import type { DecodedItem } from '@/lib/api/types/image';
+import type { APIResponse } from '@/lib/api/_types/request';
+import type { DecodedItem } from '@/lib/api/_types/image';
 
 export function AddItemModal({
   isOpen,

@@ -5,7 +5,7 @@ import { ProductCard } from "./product-card";
 import { useLocaleContext } from "@/lib/contexts/locale-context";
 import { useTrendingImages } from "@/lib/hooks/use-trending-images";
 import { useState } from "react";
-import type { TrendingImage } from "@/lib/api/types/trending";
+import type { TrendingImage } from "@/lib/api/_types/trending";
 import { Button } from "@/components/ui/button";
 
 interface TrendingResponse {

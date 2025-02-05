@@ -1,6 +1,6 @@
 {
   "name": "decoded-app",
-  "version": "0.7.0",
+  "version": "0.7.5",
   "private": true,
   "type": "commonjs",
   "license": "UNLICENSED",
@@ -11,7 +11,7 @@
     "lint": "next lint",
     "test": "jest",
     "tauri": "tauri",
-    "generate-types": "openapi --input https://dev.decoded.style/openapi.json --output src/api-types --client axios"
+    "generate-types": "openapi --input https://dev.decoded.style/openapi.json --output lib/api/types --client axios"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

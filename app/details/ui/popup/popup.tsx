@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils/style';
-import { ImageDetails } from '@/lib/api/types/image';
+import { ImageDetails } from '@/lib/api/_types/image';
 
 interface ImagePopupProps {
   imageData: ImageDetails;

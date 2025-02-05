@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { ItemButton } from '@/components/ui/item-marker';
 import { useNavigateToDetail } from '@/lib/hooks/common/useNavigateToDetail';
-import { ProcessedImageData } from '@/lib/api/types/image';
+import { ProcessedImageData } from '@/lib/api/_types/image';
 
 interface ItemData {
   _id: string;

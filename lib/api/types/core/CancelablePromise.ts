@@ -22,7 +22,6 @@ export interface OnCancel {
     (cancelHandler: () => void): void;
 }
 
-// @ts-ignore
 export class CancelablePromise<T> implements Promise<T> {
     #isResolved: boolean;
     #isRejected: boolean;

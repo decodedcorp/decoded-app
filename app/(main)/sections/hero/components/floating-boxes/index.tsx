@@ -2,12 +2,12 @@
 
 import { BoxSizeMode } from '../../utils/types';
 import { BoxContainer } from './box-container';
-import type { RandomImageResource, RandomItemResource } from '@/lib/api/client/images';
+import type { ItemDoc, ImageDoc } from '@/lib/api/types';
 
 interface FloatingBoxesProps {
   sizeMode: BoxSizeMode;
   onHoverChange?: () => void;
-  initialResources: (RandomImageResource | RandomItemResource)[];
+  initialResources: Array<ItemDoc | ImageDoc>;
 }
 
 export function FloatingBoxes({ sizeMode, onHoverChange, initialResources }: FloatingBoxesProps) {

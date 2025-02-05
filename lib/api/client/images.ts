@@ -1,7 +1,7 @@
 'use client';
 
 import { networkManager } from '@/lib/network/network';
-import type { ImageData, DetailPageState, ItemDocument } from '../types/image';
+import type { ImageData, DetailPageState, ItemDocument } from '../_types/image';
 import type { 
   RelatedImage, 
   TrendingImagesResponse,

@@ -6,7 +6,7 @@ import { getImageDetails } from "@/app/details/utils/hooks/fetchImageDetails";
 import { ImageSection } from "./components/image-section/image-section";
 import { DetailsList } from "./components/item-list-section/server/details-list";
 import { RelatedStylingSection } from "./components/related-styling/related-style";
-import { ImageDetails, DecodedItem } from "@/lib/api/types/image";
+import { ImageDetails, DecodedItem } from "@/lib/api/_types/image";
 import { generateItemSchema } from "@/lib/structured-data/geneartors/item";
 
 // 타입 정의

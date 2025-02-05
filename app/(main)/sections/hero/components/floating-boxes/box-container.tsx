@@ -2,18 +2,18 @@
 
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { FloatingBox } from './floating-box';
-import type { RandomImageResource, RandomItemResource } from '@/lib/api/client/images';
-import { BoxSizeMode } from '../../utils/types';
+import type { ItemDoc, ImageDoc } from '@/lib/api/types';
+import type { BoxSizeMode } from '../../utils/types';
 import gsap from 'gsap';
 
 interface BoxContainerProps {
   sizeMode: BoxSizeMode;
   onBoxHover?: () => void;
-  resources: (RandomImageResource | RandomItemResource)[];
+  resources: Array<ItemDoc | ImageDoc>;
 }
 
 interface BoxData {
-  resource: RandomImageResource | RandomItemResource;
+  resource: ItemDoc | ImageDoc;
   position: { x: number; y: number };
 }
 
@@ -39,7 +39,7 @@ const generatePositions = (count: number) => {
 
   const usedAreas = new Set<number>();
   
-  return (resource: RandomImageResource | RandomItemResource, index: number) => {
+  return (resource: ItemDoc | ImageDoc, index: number) => {
     const availableAreas = areas
       .map((_, areaIndex) => areaIndex)
       .filter(areaIndex => !usedAreas.has(areaIndex) || areaIndex === areas.length - 1);
