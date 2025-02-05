@@ -10,7 +10,7 @@ import { useLocaleContext } from "@/lib/contexts/locale-context";
 function Footer() {
   const { t } = useLocaleContext();
   return (
-    <footer className="border-t border-white/5 bg-black/30 backdrop-blur-lg mt-10">
+    <footer className="border-t border-white/5 bg-black/30 backdrop-blur-lg">
       <div className="mx-auto max-w-7xl px-6 py-12 md:py-16">
         {/* Top Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
