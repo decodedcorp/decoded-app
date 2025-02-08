@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { trendingAPI } from '@/lib/api/endpoints/trending';
-import type { GetTrendingImagesParams } from '@/lib/api/types/trending';
+import type { GetTrendingImagesParams } from '@/lib/api/_types/trending';
 
 export function useTrendingImages(params: GetTrendingImagesParams = {}) {
   return useQuery({

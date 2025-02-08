@@ -1,5 +1,5 @@
 import { ItemSchema } from "../types/schema";
-import { DecodedItem } from "@/lib/api/types/image";
+import { DecodedItem } from "@/lib/api/_types/image";
 
 export function generateItemSchema(
   item: DecodedItem,

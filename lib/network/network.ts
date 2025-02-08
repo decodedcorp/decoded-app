@@ -168,7 +168,7 @@ export class NetworkManager {
 
       const params = new URLSearchParams({
         client_id: this.config.auth_client_id,
-        redirect_uri: this.config.redirect_uri,
+        redirect_uri: `${window.location.origin}/auth/callback`,
         response_type: "id_token",
         scope: [
           "openid",

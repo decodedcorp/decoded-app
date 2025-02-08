@@ -15,7 +15,7 @@ import {
   ItemDetailResponse
 } from './types';
 
-const MIN_IMAGES_TO_SHOW = 2;
+const MIN_IMAGES_TO_SHOW = 1;
 
 export function RelatedStylingSection({ 
   imageId, 
@@ -39,48 +39,53 @@ export function RelatedStylingSection({
   const { data: relatedData, isLoading, error } = useQuery({
     queryKey: ['relatedImages', imageId, artistId, selectedItemId],
     queryFn: async (): Promise<RelatedImagesData> => {
+      console.log('Fetching related images with:', {
+        imageId,
+        artistId,
+        selectedItemId
+      });
+
       try {
         const [artistResponse, brandResponse, trendingResponse] = await Promise.all([
           artistId 
-            ? imagesAPI.getArtistImages(imageId, artistId) as Promise<APIResponse<ArtistImagesResponse>>
+            ? imagesAPI.getArtistImages(imageId, artistId).then(response => {
+                console.log('Artist Images Response:', response);
+                return response;
+              })
             : Promise.resolve({ data: { images: [] }, status_code: 200, description: 'success' }),
           selectedItemId 
             ? imagesAPI.getItemDetail(selectedItemId).then(async response => {
+                console.log('Item Detail Response:', response);
                 const itemData = response.data.docs;
-                console.log('Item Detail Data:', itemData);
                 const brandId = itemData?.metadata?.brand;
-                console.log('Using Brand ID:', brandId || imageId);
+                
+                console.log('Brand ID from Item:', {
+                  selectedItemId,
+                  brandId: brandId || 'Not found, using imageId as fallback'
+                });
                 
                 if (brandId) {
-                  try {
-                    const brandResponse = await imagesAPI.getBrandImages(brandId);
-                    console.log('Brand Response:', brandResponse);
-                    return brandResponse;
-                  } catch (error) {
-                    console.error('Error fetching brand images:', error);
-                    return {
-                      status_code: 200,
-                      description: 'success',
-                      data: { items: [] }
-                    };
-                  }
+                  const brandResponse = await imagesAPI.getBrandImages(brandId);
+                  console.log('Brand Images by Item Brand:', brandResponse);
+                  return brandResponse;
                 }
                 return {
                   status_code: 200,
                   description: 'success',
                   data: { items: [] }
                 };
-              }) as Promise<APIResponse<BrandImagesResponse>>
+              })
             : imagesAPI.getBrandImages(imageId).then(response => {
-                console.log('Default Brand Response:', response);
+                console.log('Brand Images by ImageId:', response);
                 return response;
-              }) as Promise<APIResponse<BrandImagesResponse>>,
-          imagesAPI.getNewalImages() as Promise<APIResponse<TrendingImagesResponse>>
+              }),
+          imagesAPI.getNewalImages().then(response => {
+            console.log('Trending Images Response:', response);
+            return response;
+          })
         ]);
 
-        console.log('Brand Images Response:', brandResponse);
-
-        return {
+        const result = {
           artistImages: artistResponse.data.images || [],
           brandImages: (brandResponse.data.items || []).map(item => ({
             image_doc_id: item._id,
@@ -88,6 +93,14 @@ export function RelatedStylingSection({
           })),
           trendingImages: trendingResponse.data.images || []
         };
+
+        console.log('Final processed data:', {
+          artistImagesCount: result.artistImages.length,
+          brandImagesCount: result.brandImages.length,
+          trendingImagesCount: result.trendingImages.length
+        });
+
+        return result;
       } catch (error) {
         console.error('Failed to fetch related images:', error);
         throw error;
@@ -128,14 +141,14 @@ export function RelatedStylingSection({
 
   return (
     <div className="space-y-16">
-      {relatedData.artistImages.length >= MIN_IMAGES_TO_SHOW && (
+      {relatedData.artistImages.length > 0 && (
         <RelatedSection
           images={relatedData.artistImages}
           isLoading={false}
         />
       )}
 
-      {relatedData.brandImages.length >= MIN_IMAGES_TO_SHOW && (
+      {relatedData.brandImages.length > 0 && (
         <RelatedSection
           images={relatedData.brandImages}
           isLoading={false}
@@ -145,7 +158,7 @@ export function RelatedStylingSection({
       {showTrending && 
        !relatedData.artistImages.length && 
        !relatedData.brandImages.length && 
-       relatedData.trendingImages.length >= MIN_IMAGES_TO_SHOW && (
+       relatedData.trendingImages.length > 0 && (
         <RelatedSection
           images={relatedData.trendingImages}
           isLoading={false}

@@ -4,10 +4,10 @@ import { useEffect, useRef, memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import gsap from 'gsap';
-import type { RandomImageResource, RandomItemResource } from '@/lib/api/client/images';
+import type { ItemDoc, ImageDoc } from '@/lib/api/types';
 
 interface FloatingBoxProps {
-  resource: RandomImageResource | RandomItemResource;
+  resource: ItemDoc | ImageDoc;
   initialDelay: number;
   depthLevel: number;
   position: { x: number; y: number };
@@ -125,12 +125,12 @@ function FloatingBoxComponent({
   }, [depthEffect, initialDelay, onHover, position]);
 
   const href = isImage
-    ? `/details/${(resource as RandomImageResource)._id}`
+    ? `/details/${resource._id}`
     : '#';
 
   const title = isImage
-    ? (resource as RandomImageResource).title
-    : (resource as RandomItemResource).metadata?.name;
+    ? resource.title
+    : resource.metadata?.name;
 
   const boxSize = isImage ? {
     width: '128px',

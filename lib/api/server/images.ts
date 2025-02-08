@@ -1,5 +1,5 @@
 import type { RandomImageResource, RandomItemResource } from '../client/images';
-import type { APIResponse } from '../types/request';
+import type { APIResponse } from '../_types/request';
 import { cookies } from 'next/headers';
 
 const SERVICE_ENDPOINT = process.env.NEXT_PUBLIC_SERVICE_ENDPOINT;

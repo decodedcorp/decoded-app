@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { imagesAPI } from "@/lib/api/client/images";
-import { ImageData, ImageMetadata, ImageItem } from "@/lib/api/types/image";
+import { ImageData, ImageMetadata, ImageItem } from "@/lib/api/_types/image";
 import type { RandomImageResource } from "@/lib/api/client/images";
 
 // Types

@@ -1,6 +1,6 @@
 import { BoxPosition } from '../../../utils/types';
 import { FloatingBox } from '../floating-box';
-import type { RandomImageResource } from '@/lib/api/client/images';
+import type { ImageDoc } from '@/lib/api/types';
 
 interface PlaceholderContainerProps {
   positions: BoxPosition;
@@ -13,12 +13,7 @@ interface PlaceholderContainerProps {
   ) => void;
 }
 
-interface PlaceholderType {
-  description: string | null;
-  // ... other fields
-}
-
-const PLACEHOLDER_RESOURCE: RandomImageResource = {
+const PLACEHOLDER_RESOURCE: ImageDoc = {
   _id: 'placeholder',
   title: 'Placeholder',
   img_url: '',
@@ -27,12 +22,7 @@ const PLACEHOLDER_RESOURCE: RandomImageResource = {
   style: null,
   source: null,
   upload_by: 'system',
-  doc_id: 'placeholder',
-  decoded_percent: 0,
   requested_items: {},
-  items: [],
-  context: null,
-  metadata: {},
 };
 
 export function PlaceholderContainer({

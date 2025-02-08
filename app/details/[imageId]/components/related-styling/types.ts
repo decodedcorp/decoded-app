@@ -61,4 +61,4 @@ export interface RelatedSectionProps {
   error?: Error | null;
 }
 
-export type { ItemDetailResponse } from '@/lib/api/types/image'; 
+export type { ItemDetailResponse } from '@/lib/api/_types/image'; 

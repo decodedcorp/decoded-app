@@ -66,6 +66,7 @@ export function MarkerList({
                         onClick={(e) => {
                           e.stopPropagation();
                           onUpdateContext(point, null);
+                          
                         }}
                       >
                         <X className="h-3 w-3" />

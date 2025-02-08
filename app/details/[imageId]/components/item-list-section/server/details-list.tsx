@@ -1,6 +1,6 @@
 'use client';
 
-import { ProcessedImageData, DecodedItem } from '@/lib/api/types/image';
+import { ProcessedImageData, DecodedItem } from '@/lib/api/_types/image';
 import { ItemListSection } from '../client/item-list';
 import { getCategoryInfo } from '../../../../utils/hooks/category';
 import { ItemActionsWrapper } from '../client/item-actions-wrapper';

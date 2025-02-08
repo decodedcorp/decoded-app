@@ -1,4 +1,4 @@
-import { ImageMetadata } from '@/lib/api/types/image';
+import { ImageMetadata } from '@/lib/api/_types/image';
 
 export type BoxSizeMode = 'LARGE' | 'SMALL';
 

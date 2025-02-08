@@ -1,9 +1,9 @@
-import { ApiResponse } from "@/lib/api/types/response";
+import { ApiResponse } from "@/lib/api/_types/response";
 import {
   ImageDetails,
   DecodedItem,
   ProcessedImageData,
-} from "@/lib/api/types/image";
+} from "@/lib/api/_types/image";
 
 export async function getImageDetails(
   imageId: string

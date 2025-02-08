@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { networkManager } from '@/lib/network/network';
-import type { ItemDetailResponse } from '@/lib/api/types/image';
+import type { ItemDetailResponse } from '@/lib/api/_types/image';
 
 async function fetchItemDetail(itemId: string): Promise<ItemDetailResponse> {
   try {

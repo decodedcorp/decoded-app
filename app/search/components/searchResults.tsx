@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { networkManager } from "@/lib/network/network";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { cn } from "@/lib/utils/style";
-import { Heart, TrendingUp } from "lucide-react";
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { networkManager } from '@/lib/network/network';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils/style';
+import { Heart, TrendingUp } from 'lucide-react';
 
 interface SearchResult {
   related_images?: {
@@ -51,7 +51,7 @@ interface SearchResult {
 
 function ImageCard({ image, onHover, hoveredId }: any) {
   if (image.img_url === undefined) {
-    console.log("UNDEFINED", image);
+    console.log('UNDEFINED', image);
   }
   const router = useRouter();
   const markers = image.requested_items
@@ -80,28 +80,28 @@ function ImageCard({ image, onHover, hoveredId }: any) {
     >
       <div
         className={cn(
-          "relative aspect-[3/4] rounded-xl overflow-hidden",
-          "bg-zinc-900"
+          'relative aspect-[3/4] rounded-xl overflow-hidden',
+          'bg-zinc-900'
         )}
       >
         <Image
           src={image.img_url}
-          alt={image.title || "이미지"}
+          alt={image.title || '이미지'}
           fill
           className={cn(
-            "object-cover",
-            "group-hover:scale-105",
-            "transition-transform duration-300"
+            'object-cover',
+            'group-hover:scale-105',
+            'transition-transform duration-300'
           )}
         />
 
         {/* 호버 오버레이 */}
         <div
           className={cn(
-            "absolute inset-0",
-            "bg-gradient-to-t from-black/80 via-black/20 to-transparent",
-            "opacity-0 group-hover:opacity-100",
-            "transition-opacity duration-300"
+            'absolute inset-0',
+            'bg-gradient-to-t from-black/80 via-black/20 to-transparent',
+            'opacity-0 group-hover:opacity-100',
+            'transition-opacity duration-300'
           )}
         />
 
@@ -114,13 +114,13 @@ function ImageCard({ image, onHover, hoveredId }: any) {
               style={{
                 top: `${marker.position.top}%`,
                 left: `${marker.position.left}%`,
-                width: "20px",
-                height: "20px",
-                transform: "translate(-50%, -50%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
+                width: '20px',
+                height: '20px',
+                transform: 'translate(-50%, -50%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
               }}
               onClick={(e) => handleMarkerClick(e, marker.item_doc_id)}
             >
@@ -134,7 +134,7 @@ function ImageCard({ image, onHover, hoveredId }: any) {
         {/* 하단 정보 */}
         <div className="absolute bottom-0 left-0 right-0 p-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <h3 className="text-sm font-medium line-clamp-1">
-            {image.title || "제목 없음"}
+            {image.title || '제목 없음'}
           </h3>
           <div className="flex items-center gap-4 mt-2">
             <div className="flex items-center gap-1 text-white/60">
@@ -153,10 +153,13 @@ function ImageCard({ image, onHover, hoveredId }: any) {
 
 export function SearchResults() {
   const searchParams = useSearchParams();
-  const query = searchParams.get("q");
+  const query = searchParams.get('q');
   const [result, setResult] = useState<SearchResult>();
   const [isLoading, setIsLoading] = useState(true);
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [hoveredSearchId, setHoveredSearchId] = useState<string | null>(null);
+  const [hoveredTrendingId, setHoveredTrendingId] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -166,14 +169,14 @@ export function SearchResults() {
       try {
         const response = await networkManager.request(
           `search?query=${encodeURIComponent(query)}`,
-          "GET"
+          'GET'
         );
 
         if (response.status_code === 200) {
           setResult(response.data);
         }
       } catch (error) {
-        console.error("검색 결과 로딩 실패:", error);
+        console.error('검색 결과 로딩 실패:', error);
       } finally {
         setIsLoading(false);
       }
@@ -206,13 +209,13 @@ export function SearchResults() {
               {result.related_images.length}개의 결과
             </span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-4 gap-6">
             {result.related_images.map((image) => (
               <ImageCard
                 key={image._id}
                 image={image}
-                onHover={setHoveredId}
-                hoveredId={hoveredId}
+                onHover={setHoveredSearchId}
+                hoveredId={hoveredSearchId}
               />
             ))}
           </div>
@@ -226,13 +229,13 @@ export function SearchResults() {
             <TrendingUp className="w-5 h-5 text-[#EAFD66]" />
             <h2 className="text-lg font-medium text-white">트렌딩 나우</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
             {result.trending_images.map((image) => (
               <ImageCard
                 key={image.image._id}
                 image={image.image}
-                onHover={setHoveredId}
-                hoveredId={hoveredId}
+                onHover={setHoveredTrendingId}
+                hoveredId={hoveredTrendingId}
               />
             ))}
           </div>

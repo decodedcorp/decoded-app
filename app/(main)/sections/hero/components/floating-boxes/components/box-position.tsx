@@ -1,12 +1,12 @@
 import { FloatingBox } from '../floating-box';
-import type { RandomImageResource, RandomItemResource } from '@/lib/api/client/images';
+import type { ImageDoc } from '@/lib/api/types';
 
 interface BoxPositionProps {
   top: number;
   left?: number;
   right?: number;
   isLarge?: boolean;
-  image?: RandomImageResource | RandomItemResource;
+  image?: ImageDoc;
   onHover?: (
     isHovered: boolean,
     event?: React.MouseEvent,

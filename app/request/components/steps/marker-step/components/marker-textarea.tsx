@@ -3,7 +3,7 @@
 import { Point } from '@/types/model.d';
 import { Input } from '@/components/ui/input';
 import { useEffect, useRef } from 'react';
-
+import { useLocaleContext } from '@/lib/contexts/locale-context';
 interface MarkerInputProps {
   point: Point;
   onUpdateContext: (point: Point, context: string) => void;
@@ -12,7 +12,7 @@ interface MarkerInputProps {
 
 export function MarkerInput({ point, onUpdateContext, onSelect }: MarkerInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-
+  const { t } = useLocaleContext();
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
@@ -22,7 +22,7 @@ export function MarkerInput({ point, onUpdateContext, onSelect }: MarkerInputPro
       <Input
         ref={inputRef}
         defaultValue={point.context}
-        placeholder="설명을 입력해주세요"
+        placeholder={t.common.placeHolder.description}
         className="w-full bg-gray-900/60 border-gray-800 text-xs"
         onBlur={(e) => {
           onUpdateContext(point, e.target.value);

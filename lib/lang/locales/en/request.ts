@@ -54,6 +54,11 @@ export const request = {
       title: "Additional Information",
       description: "Provide more context about the image",
       guide: {
+        required: {
+          title: "Required",
+          description:
+            "Please provide additional information to help provide better context for the image",
+        },
         optional: {
           title: "Optional",
           description:
@@ -69,7 +74,6 @@ export const request = {
             event: "Event",
             casual: "Casual",
             studio: "Studio",
-            other: "Direct Input",
           },
         },
         source: {
@@ -79,7 +83,6 @@ export const request = {
             sns: "SNS (e.g. Instagram, Twitter)",
             personal: "Personal",
             news: "News or Blog",
-            other: "Direct Input",
           },
         },
       },

@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { requestAPI } from '@/lib/api/endpoints/request';
-import type { RequestImage, APIResponse } from '@/lib/api/types/request';
+import type { RequestImage, APIResponse } from '@/lib/api/_types/request';
 
 interface UseRequestDataReturn {
   isLoading: boolean;

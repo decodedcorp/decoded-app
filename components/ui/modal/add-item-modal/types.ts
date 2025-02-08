@@ -1,6 +1,6 @@
 import { Point as BasePoint } from "@/types/model.d";
-import { DecodedItem } from '@/lib/api/types/image';
-import type { APIResponse } from '@/lib/api/types/request';
+import { DecodedItem } from '@/lib/api/_types/image';
+import type { APIResponse } from '@/lib/api/_types/request';
 
 // 확장된 Point 타입
 export interface Point extends BasePoint {

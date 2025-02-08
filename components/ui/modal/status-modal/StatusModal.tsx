@@ -2,19 +2,9 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { cn } from '@/lib/utils/style';
-import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { useLocaleContext } from '@/lib/contexts/locale-context';
-
-export type StatusType = 'success' | 'error' | 'warning';
-
-export type StatusMessageKey = 
-  | 'request'
-  | 'provide'
-  | 'save'
-  | 'default'
-  | 'unsavedChanges'
-  | 'delete'
-  | 'login';
+import type { StatusType, StatusMessageKey } from './utils/types';
+import { statusConfig, ANIMATION_DURATION, buttonStyles } from './utils/config';
 
 interface StatusModalProps {
   isOpen: boolean;
@@ -24,24 +14,6 @@ interface StatusModalProps {
   title?: string;
   message?: string;
 }
-
-const statusConfig = {
-  success: {
-    icon: CheckCircle,
-    className: 'text-[#EAFD66]',
-    bgClassName: 'bg-[#1f210e]',
-  },
-  error: {
-    icon: XCircle,
-    className: 'text-red-500',
-    bgClassName: 'bg-red-500/10',
-  },
-  warning: {
-    icon: AlertCircle,
-    className: 'text-yellow-500',
-    bgClassName: 'bg-yellow-500/10',
-  },
-} as const;
 
 export function StatusModal({
   isOpen,
@@ -70,7 +42,7 @@ export function StatusModal({
     setIsClosing(true);
     const timer = setTimeout(() => {
       onClose();
-    }, 300);
+    }, ANIMATION_DURATION);
     return () => clearTimeout(timer);
   }, [onClose]);
 
@@ -80,7 +52,6 @@ export function StatusModal({
     }
   }, [isOpen]);
 
-  // ESC 키 핸들러
   useEffect(() => {
     const handleEscKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && isOpen) {
@@ -88,12 +59,6 @@ export function StatusModal({
       }
     };
 
-    window.addEventListener('keydown', handleEscKey);
-    return () => window.removeEventListener('keydown', handleEscKey);
-  }, [isOpen, handleClose]);
-
-  // 외부 클릭 핸들러
-  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         modalRef.current &&
@@ -104,8 +69,13 @@ export function StatusModal({
       }
     };
 
+    window.addEventListener('keydown', handleEscKey);
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    
+    return () => {
+      window.removeEventListener('keydown', handleEscKey);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, [isOpen, handleClose]);
 
   if (!isOpen) return null;
@@ -136,11 +106,8 @@ export function StatusModal({
           <button
             onClick={handleClose}
             className={cn(
-              'rounded-lg px-3 py-1.5 text-xs font-medium',
-              'transform transition-colors duration-200',
-              type === 'success' && 'bg-[#EAFD66] text-black hover:bg-[#d9ec55]',
-              type === 'error' && 'bg-red-500/20 text-red-500 hover:bg-red-500/30',
-              type === 'warning' && 'bg-yellow-500/20 text-yellow-500 hover:bg-yellow-500/30'
+              buttonStyles.base,
+              buttonStyles[type]
             )}
           >
             {t.common.actions.confirm}
