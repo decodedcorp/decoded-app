@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import React, { useRef } from "react";
-import Image from "next/image";
+import React, { useRef } from 'react';
+import Image from 'next/image';
 import {
   Point,
   useImageMarker,
-} from "@/lib/hooks/features/images/useImageMarker";
+} from '@/lib/hooks/features/images/useImageMarker';
 
 interface ImageMarkerProps {
   imageUrl: string;
@@ -77,27 +77,16 @@ export function ImageMarker({
             style={{ left: `${point.x}%`, top: `${point.y}%` }}
             onClick={(e) => {
               e.stopPropagation();
-              handlePointClick(point);
+              handleRemovePoint(index);
             }}
           >
             <div className="relative w-4 h-4 hover:scale-125 transition-transform">
               <div className="absolute inset-0 border-2 border-yellow-400 rounded-full animate-pulse"></div>
-              <div className="absolute inset-[2px] bg-yellow-400/30 rounded-full backdrop-blur-sm flex items-center justify-center">
+              <div className="absolute inset-[2px] bg-yellow-400/30 rounded-full backdrop-blur-sm flex items-center justify-center cursor-pointer">
                 <span className="text-xs text-white font-semibold leading-none translate-y-[0.5px]">
                   {index + 1}
                 </span>
               </div>
-              
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleRemovePoint(index);
-                }}
-                className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 rounded-full text-white 
-                  flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                ×
-              </button>
             </div>
           </div>
         ))}
@@ -142,7 +131,7 @@ export function ImageMarker({
                 <div className="p-3">
                   <textarea
                     rows={2}
-                    value={point.context || ""}
+                    value={point.context || ''}
                     onChange={(e) =>
                       onPointContextChange(index, e.target.value)
                     }

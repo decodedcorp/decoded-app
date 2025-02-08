@@ -5,14 +5,14 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { cn } from "@/lib/utils/style";
 import { AddItemModal } from "@/components/ui/modal/add-item-modal";
-import { useRequireAuth } from "@/lib/hooks/auth/use-require-auth";
+import { useProtectedAction } from "@/lib/hooks/auth/use-protected-action"; 
 import { useLocaleContext } from "@/lib/contexts/locale-context";
 
 interface ItemActionsProps {
   likeCount: number;
   isLiked: boolean;
   isLoading: boolean;
-  onLike: () => Promise<void>;
+  onLike: (userId: string) => Promise<void>;
 }
 
 export function ItemActions({
@@ -23,16 +23,14 @@ export function ItemActions({
 }: ItemActionsProps) {
   const { t } = useLocaleContext();
   const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
-  const { checkAuth } = useRequireAuth();
+  const { withAuth } = useProtectedAction();
   const params = useParams();
   const imageId = params.imageId as string;
 
-  const handleLike = async () => {
-    checkAuth(async () => {
-      if (isLoading) return;
-      await onLike();
-    });
-  };
+  const handleLike = withAuth(async (userId) => {
+    if (isLoading) return;
+    await onLike(userId);
+  });
 
   return (
     <>

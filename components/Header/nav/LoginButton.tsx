@@ -11,7 +11,7 @@ export function LoginButton() {
   const { t } = useLocaleContext();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isFirstRender, setIsFirstRender] = useState(true);
-  const { isLogin, isInitialized, isLoading } = useAuth();
+  const { isLogin, isInitialized, isLoading, checkLoginStatus } = useAuth();
 
   const { modalRef } = useModalClose({
     onClose: () => setIsLoginModalOpen(false),
@@ -26,6 +26,35 @@ export function LoginButton() {
     return () => clearTimeout(timer);
   }, []);
 
+  // 주기적으로 로그인 상태 체크
+  useEffect(() => {
+    // 초기 체크
+    checkLoginStatus();
+
+    // 1초마다 체크
+    const intervalId = setInterval(checkLoginStatus, 1000);
+
+    // 메시지 이벤트 리스너
+    const handleMessage = (event: MessageEvent) => {
+      if (event.origin === window.location.origin && event.data?.id_token) {
+        console.log("Token received, closing modal");
+        setIsLoginModalOpen(false);
+      }
+    };
+    
+    window.addEventListener('message', handleMessage);
+
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener('message', handleMessage);
+    };
+  }, [checkLoginStatus]);
+
+  const handleDisconnect = () => {
+    handleDisconnect();
+    setIsLoginModalOpen(false);  // 모달 닫기 추가
+  };
+
   // 로딩 상태에 따른 텍스트 표시
   const buttonText = (() => {
     if (!isInitialized) return t.header.nav.login.button.text;
@@ -38,7 +67,7 @@ export function LoginButton() {
     <div ref={modalRef} className="relative flex items-center gap-3">
       <span
         className={cn("text-xs md:text-sm", "cursor-pointer", {
-          "transition-all duration-200": !isFirstRender, // 첫 렌더링 이후에만 트랜지션 적용
+          "transition-all duration-200": !isFirstRender,
           "text-[#EAFD66]": isLoginModalOpen,
           "text-gray-600 hover:text-[#EAFD66]": !isLoginModalOpen,
           "animate-pulse": isLoading,

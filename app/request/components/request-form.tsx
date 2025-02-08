@@ -8,7 +8,6 @@ import { ImageContainer } from './common/image-container';
 import { cn } from '@/lib/utils/style';
 import { MarkerStepSidebar } from './steps/marker-step/marker-step-sidebar';
 import { ContextStepSidebar } from './steps/context-step/context-step-sidebar';
-import type { ContextAnswer } from './steps/context-step/context-step-sidebar';
 import { useRequestData } from '@/lib/hooks/features/images/useRequestData';
 import { useRouter } from 'next/navigation';
 import { arrayBufferToBase64 } from '@/lib/utils/string/format';
@@ -18,11 +17,18 @@ import {
   StatusType,
   StatusMessageKey,
 } from '@/components/ui/modal/status-modal';
+import { useProtectedAction } from '@/lib/hooks/auth/use-protected-action';
+
+interface ContextAnswer {
+  location: string;
+  source?: string;
+}
 
 export function RequestForm() {
   const { t } = useLocaleContext();
   const router = useRouter();
   const { createRequest } = useRequestData('');
+  const { withAuth } = useProtectedAction();
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 3;
   const [isStepComplete, setIsStepComplete] = useState(false);
@@ -30,9 +36,7 @@ export function RequestForm() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [points, setPoints] = useState<Point[]>([]);
   const [selectedPoint, setSelectedPoint] = useState<number | null>(null);
-  const [contextAnswers, setContextAnswers] = useState<ContextAnswer | null>(
-    null
-  );
+  const [contextAnswers, setContextAnswers] = useState<ContextAnswer | null>(null);
   const [modalConfig, setModalConfig] = useState<{
     type: StatusType;
     isOpen: boolean;
@@ -53,35 +57,16 @@ export function RequestForm() {
         setIsStepComplete(points.length > 0);
         break;
       case 3:
-        setIsStepComplete(points.length > 0);
+        setIsStepComplete(!!contextAnswers?.location);
         break;
       default:
         setIsStepComplete(false);
     }
-  }, [currentStep, selectedImage, points]);
+  }, [currentStep, selectedImage, points, contextAnswers?.location]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = withAuth(async (userId) => {
     try {
-      const userDocId = sessionStorage.getItem('USER_DOC_ID');
-      const token = sessionStorage.getItem('ACCESS_TOKEN');
-
-      if (!userDocId) {
-        console.log('=== Auth Check Failed ===');
-        console.log('User Doc ID:', userDocId);
-        setModalConfig({
-          type: 'warning',
-          messageKey: 'login',
-          isOpen: true,
-          onClose: () => setModalConfig((prev) => ({ ...prev, isOpen: false })),
-        });
-        return;
-      }
-
       if (!imageFile || points.length === 0 || !contextAnswers) {
-        console.log('=== Validation Failed ===');
-        console.log('Image File exists:', !!imageFile);
-        console.log('Points:', points.length);
-        console.log('Context Answers:', !!contextAnswers);
         setModalConfig({
           type: 'error',
           isOpen: true,
@@ -107,13 +92,13 @@ export function RequestForm() {
             top: `${point.y}`,
           },
         })),
-        requestBy: userDocId,
-        context: contextAnswers?.location || null,
-        source: contextAnswers?.sourceOther || contextAnswers?.source || null,
+        requestBy: userId,
+        context: contextAnswers.location,
+        source: contextAnswers?.source || null,
         metadata: {},
       };
 
-      const response = await createRequest(requestData, userDocId);
+      const response = await createRequest(requestData, userId);
       console.log('=== Request Created ===');
       console.log('Response:', response);
       setModalConfig({
@@ -131,10 +116,17 @@ export function RequestForm() {
         onClose: () => setModalConfig((prev) => ({ ...prev, isOpen: false })),
       });
     }
-  };
+  });
 
   const onNext = () => setCurrentStep((prev) => prev + 1);
-  const onPrev = () => setCurrentStep((prev) => prev - 1);
+  const onPrev = () => {
+    if (currentStep > 1) {
+      setCurrentStep((prev) => prev - 1);
+      if (currentStep === 3) {
+        setContextAnswers(null);
+      }
+    }
+  };
 
   const handleImageSelect = (image: string, file: File) => {
     setSelectedImage(image);
@@ -159,6 +151,7 @@ export function RequestForm() {
     onPointsChange: setPoints,
     onPointContextChange: handleUpdateContext,
     onPointSelect: setSelectedPoint,
+    contextAnswers,
   };
 
   const markerStepProps = {

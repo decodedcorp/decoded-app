@@ -17,12 +17,12 @@ export interface Response_RandomResources {
 export const imagesService = {
   // 이미지 상세 정보 조회
   getImageDetail: (imageId: string) =>
-    apiClient.get<Response_GetDocumentResponse_>(`/image/${imageId}`),
+    apiClient.get<Response_GetDocumentResponse_>(`image/${imageId}`),
 
   // 이미지 목록 조회 (페이지네이션)
   getImages: (options?: { limit?: number; next_id?: string }) =>
     apiClient.get<Response_GetDocumentResponse_>(
-      `/images${buildQueryString(options || {})}`
+      `images${buildQueryString(options || {})}`
     ),
 
   // 랜덤 이미지/아이템 리소스 조회
@@ -31,7 +31,12 @@ export const imagesService = {
       `random${buildQueryString(options)}`
     ),
 
-  // 이미지 업로드
-  uploadImage: (data: ImageBase_Input) =>
-    apiClient.post<Response_GetDocumentResponse_>('/image/upload', data),
+  // 유저의 이미지 목록 조회
+  getUserImages: (
+    userId: string,
+    options?: { limit?: number; next_id?: string }
+  ) =>
+    apiClient.get<Response_GetDocumentResponse_>(
+      `users/${userId}/images${buildQueryString(options || {})}`
+    ),
 };

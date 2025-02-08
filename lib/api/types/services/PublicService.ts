@@ -138,6 +138,30 @@ export class PublicService {
         });
     }
     /**
+     * Get Explore Images
+     * Get explore images
+     * @param of of which image to get
+     * @param userDocId The id of the user document
+     * @returns Response Explored images retrieved
+     * @throws ApiError
+     */
+    public static getExploreImagesImageExploreGet(
+        of: string = 'identity',
+        userDocId?: string,
+    ): CancelablePromise<Response> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/image/explore',
+            query: {
+                'of': of,
+                'user_doc_id': userDocId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
      * Get All Image Documents With Pagination
      * Get all image documents with pagination. If `next_id` is provided, it will return the next page of documents.
      * @param nextId The id of the next image document

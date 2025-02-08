@@ -14,22 +14,13 @@ interface TrendingResponse {
   data: TrendingImage[];
 }
 
-type PeriodType = 'daily' | 'weekly' | 'monthly';
+const ITEMS_PER_PAGE = 4;
 
-const ITEMS_PER_PAGE = 6;
-
-const PERIOD_OPTIONS: { label: string; value: PeriodType }[] = [
-  { label: '일간', value: 'daily' },
-  { label: '주간', value: 'weekly' },
-  { label: '월간', value: 'monthly' },
-];
 
 export function ProductGrid() {
   const { t } = useLocaleContext();
-  const [period, setPeriod] = useState<PeriodType>('daily');
   const { data, isLoading } = useTrendingImages({
     limit: 8,
-    period
   });
   const [showAll, setShowAll] = useState(false);
 
@@ -72,7 +63,7 @@ export function ProductGrid() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {displayedItems.map((item: TrendingImage, index: number) => (
                 <ProductCard
                   key={item.image._id}

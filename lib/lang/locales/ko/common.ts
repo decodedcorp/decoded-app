@@ -77,7 +77,7 @@ export const common = {
     },
   },
   validation: {
-    required: '필수 입력 항목입니다',
+    required: '필수 입력항목',
     invalid: '잘못된 입력입니다',
     minLength: '최소 {{count}}자 이상 입력해주세요',
     maxLength: '최대 {{count}}자까지 입력 가능합니다',

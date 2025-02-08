@@ -1,6 +1,6 @@
 import { useLocaleContext } from "@/lib/contexts/locale-context";
 
-export function InfoSection() {
+export function InfoSection({ required }: { required: boolean }) {
   const { t } = useLocaleContext();
 
   return (
@@ -10,12 +10,16 @@ export function InfoSection() {
           !
         </span>
         <h3 className="text-xs font-medium text-gray-400">
-          {t.request.steps.context.guide.optional.title}
+          {required
+            ? t.request.steps.context.guide.required.title
+            : t.request.steps.context.guide.optional.title}
         </h3>
       </div>
       <div className="ml-7">
         <p className="text-xs text-gray-500">
-          {t.request.steps.context.guide.optional.description}
+          {required
+            ? t.request.steps.context.guide.required.description
+            : t.request.steps.context.guide.optional.description}
         </p>
       </div>
     </div>
