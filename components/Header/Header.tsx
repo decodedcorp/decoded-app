@@ -33,22 +33,16 @@ function Header({
       className={cn(
         'fixed top-0 w-full',
         'z-header',
-        'flex justify-center',
         'animate-fade-in',
-        isScrolled ? 'bg-black/5 backdrop-blur-[10px]' : 'bg-black/1 backdrop-blur-[0px]',
+        isScrolled ? 'bg-black/5 backdrop-blur-[10px]' : 'bg-transparent'
       )}
-      style={{
-        transform: `translateZ(0)`,
-      }}
     >
-      <div className="w-full max-w-[1728px] h-header-mobile md:h-header-desktop flex items-center gap-4">
-        <Nav
-          isSearchOpen={isSearchOpen}
-          onSearchToggle={onSearchToggle}
-          onLoginClick={onLoginClick}
-          onSidebarOpen={onSidebarOpen}
-        />
-      </div>
+      <Nav
+        isSearchOpen={isSearchOpen}
+        onSearchToggle={onSearchToggle}
+        onLoginClick={onLoginClick}
+        onSidebarOpen={onSidebarOpen}
+      />
     </header>
   );
 }

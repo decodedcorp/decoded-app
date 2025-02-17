@@ -3,7 +3,9 @@
 import { ProductGrid } from './components/product-grid';
 import { TrendingHeader } from './server/header';
 
-export function TrendingSection() {
+
+
+export function TrendingSection({ slideCount }: { slideCount: number }) {
   return (
     <section className="container mx-auto px-4">
       <div className="space-y-8">
@@ -11,7 +13,7 @@ export function TrendingSection() {
         <TrendingHeader />
         
         {/* 상품 그리드 */}
-        <ProductGrid />
+        <ProductGrid slideCount={slideCount} />
       </div>
     </section>
   );

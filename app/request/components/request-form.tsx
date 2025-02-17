@@ -36,7 +36,9 @@ export function RequestForm() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [points, setPoints] = useState<Point[]>([]);
   const [selectedPoint, setSelectedPoint] = useState<number | null>(null);
-  const [contextAnswers, setContextAnswers] = useState<ContextAnswer | null>(null);
+  const [contextAnswers, setContextAnswers] = useState<ContextAnswer | null>(
+    null
+  );
   const [modalConfig, setModalConfig] = useState<{
     type: StatusType;
     isOpen: boolean;
@@ -106,7 +108,6 @@ export function RequestForm() {
         isOpen: true,
         onClose: () => setModalConfig((prev) => ({ ...prev, isOpen: false })),
       });
-      router.push(`/`);
     } catch (error) {
       console.error('=== Submit Error ===');
       console.error('Error:', error);
@@ -118,7 +119,12 @@ export function RequestForm() {
     }
   });
 
-  const onNext = () => setCurrentStep((prev) => prev + 1);
+  const onNext = () => {
+    if (currentStep === 2) {
+      setSelectedPoint(null);
+    }
+    setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
+  };
   const onPrev = () => {
     if (currentStep > 1) {
       setCurrentStep((prev) => prev - 1);
@@ -168,50 +174,26 @@ export function RequestForm() {
 
       <div
         className={cn(
-          'grid',
-          'transition-all duration-200 ease-in-out',
-          'gap-4 sm:gap-6',
-          'px-4 sm:px-6',
-          'min-h-[30rem] max-h-[45rem]',
+          'relative',
           'w-full max-w-[56rem]',
-          'mx-auto',
-          currentStep === 1
-            ? 'grid-cols-1 place-items-center'
-            : 'grid-cols-1 sm:grid-cols-[minmax(0,24rem)_minmax(0,28rem)] items-start justify-center'
+          'mx-auto px-4 sm:px-6',
+          'min-h-[30rem] max-h-[45rem]',
+          'flex items-center justify-center'
         )}
       >
-        <div
-          className={cn(
-            'transition-all duration-300 ease-in-out w-full h-full',
-            currentStep === 1
-              ? 'flex items-center justify-center'
-              : 'flex items-start justify-center'
+
+        {currentStep === 2 && <MarkerStepSidebar {...markerStepProps} />}
+        
+        <div className="relative w-full max-w-[40rem]">
+          <ImageContainer {...imageContainerProps} />
+          {currentStep === 3 && (
+            <div className="absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2">
+              <ContextStepSidebar
+                onAnswerChange={(answer) => setContextAnswers(answer)}
+              />
+            </div>
           )}
-        >
-          <div
-            className={cn(
-              'w-full h-full',
-              currentStep === 1 ? 'max-w-[32rem]' : ''
-            )}
-          >
-            <ImageContainer {...imageContainerProps} />
-          </div>
         </div>
-
-        {currentStep === 2 && (
-          <div className="w-full h-full">
-            <MarkerStepSidebar {...markerStepProps} />
-          </div>
-        )}
-
-        {currentStep === 3 && (
-          <div className="w-full h-full">
-            <ContextStepSidebar
-              onAnswerChange={(answer) => setContextAnswers(answer)}
-              onSubmit={() => handleSubmit()}
-            />
-          </div>
-        )}
       </div>
 
       <NavigationFooter

@@ -40,7 +40,7 @@ export function RelatedSection({  images, isLoading }: RelatedSectionProps) {
           {images.map((image) => (
             <div
               key={image.image_doc_id}
-              className="flex-none w-[calc(25%-18px)] aspect-[3/4] snap-start cursor-pointer"
+              className="flex-none w-[calc(25%-18px)] aspect-[4/5] snap-start cursor-pointer"
               onClick={() => handleImageClick(image.image_doc_id)}
             >
               <img

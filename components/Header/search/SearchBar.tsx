@@ -43,7 +43,10 @@ export function SearchBar({ onSearch }: { onSearch: (query: string) => void }) {
   };
 
   return (
-    <div className="relative w-full max-w-[460px] mx-auto" ref={modalRef}>
+    <div
+      className="relative w-full lg:max-w-[460px] md:max-w-3xl sm:max-w-full mx-auto"
+      ref={modalRef}
+    >
       <form onSubmit={handleSearch}>
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />

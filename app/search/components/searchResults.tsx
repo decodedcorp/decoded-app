@@ -80,7 +80,7 @@ function ImageCard({ image, onHover, hoveredId }: any) {
     >
       <div
         className={cn(
-          'relative aspect-[3/4] rounded-xl overflow-hidden',
+          'relative aspect-[4/5] rounded-xl overflow-hidden',
           'bg-zinc-900'
         )}
       >
@@ -191,7 +191,7 @@ export function SearchResults() {
         {[...Array(6)].map((_, i) => (
           <div
             key={i}
-            className="aspect-[3/4] rounded-xl bg-zinc-800/50 animate-pulse"
+            className="aspect-[4/5] rounded-xl bg-zinc-800/50 animate-pulse"
           />
         ))}
       </div>

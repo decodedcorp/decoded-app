@@ -35,8 +35,8 @@ export const home = {
     },
   },
   trending: {
-    title: "Trending Now",
-    description: "Check out the most popular images right now",
+    title: "DECODED SELECTED",
+    description: "Check out decoded's picks",
   },
   premiumSpot: {
     title: "Provide Links for Popular Items",

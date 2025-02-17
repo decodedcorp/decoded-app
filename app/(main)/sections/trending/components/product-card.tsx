@@ -63,25 +63,11 @@ export function ProductCard({
       {/* 이미지 컨테이너 */}
       <div
         className={cn(
-          'relative aspect-[3/4] rounded-xl overflow-hidden',
+          'relative aspect-[4/5] rounded-xl overflow-hidden',
           'bg-zinc-900',
           'mb-3'
         )}
       >
-        {/* 순위 뱃지 */}
-        <div
-          className={cn(
-            'absolute top-3 left-3 z-10',
-            'w-8 h-8 rounded-lg',
-            'bg-black/80 backdrop-blur-sm',
-            'flex items-center justify-center',
-            'text-sm font-bold',
-            rank <= 3 ? 'text-[#EAFD66]' : 'text-white'
-          )}
-        >
-          {rank}
-        </div>
-
         {/* 이미지 */}
         <Image
           src={image}

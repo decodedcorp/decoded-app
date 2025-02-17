@@ -13,6 +13,7 @@ interface StatusModalProps {
   messageKey?: StatusMessageKey;
   title?: string;
   message?: string;
+  onFeedbackSubmit?: (feedback: string) => void;
 }
 
 export function StatusModal({
@@ -22,9 +23,11 @@ export function StatusModal({
   messageKey,
   title: customTitle,
   message: customMessage,
+  onFeedbackSubmit,
 }: StatusModalProps) {
   const { t } = useLocaleContext();
   const [isClosing, setIsClosing] = useState(false);
+  const [feedback, setFeedback] = useState('');
   const modalRef = useRef<HTMLDivElement>(null);
   const { icon: Icon, className, bgClassName } = statusConfig[type];
 
@@ -42,9 +45,17 @@ export function StatusModal({
     setIsClosing(true);
     const timer = setTimeout(() => {
       onClose();
+      setFeedback('');
     }, ANIMATION_DURATION);
     return () => clearTimeout(timer);
   }, [onClose]);
+
+  const handleSubmit = () => {
+    if (feedback.trim() && onFeedbackSubmit) {
+      onFeedbackSubmit(feedback);
+    }
+    handleClose();
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -100,17 +111,35 @@ export function StatusModal({
               {title}
             </h3>
             <p className="mt-1 text-sm text-gray-300 break-words">{message}</p>
+            
+            {type === 'error' && (
+              <div className="mt-3">
+                <textarea
+                  value={feedback}
+                  onChange={(e) => setFeedback(e.target.value)}
+                  placeholder="문제 상황에 대해 자세히 알려주세요"
+                  className={cn(
+                    'w-full px-3 py-2 text-sm rounded-lg',
+                    'bg-black/20 border border-white/10',
+                    'placeholder-gray-500 text-gray-300',
+                    'focus:outline-none focus:border-white/20',
+                    'resize-none'
+                  )}
+                  rows={3}
+                />
+              </div>
+            )}
           </div>
         </div>
         <div className="mt-4 flex justify-end">
           <button
-            onClick={handleClose}
+            onClick={type === 'error' ? handleSubmit : handleClose}
             className={cn(
               buttonStyles.base,
               buttonStyles[type]
             )}
           >
-            {t.common.actions.confirm}
+            {type === 'error' ? '피드백 보내기' : t.common.actions.confirm}
           </button>
         </div>
       </div>

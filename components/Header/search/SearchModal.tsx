@@ -108,11 +108,13 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
             </span>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            {trendingKeywords.map((keyword, index) => (
-              <Link
-                href={`/search?q=${encodeURIComponent(keyword)}`}
-                key={index}
-                className="group flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-all"
+            {trendingKeywords
+              .slice(0, 4)
+              .map((keyword, index) => (
+                <Link
+                  href={`/search?q=${encodeURIComponent(keyword)}`}
+                  key={index}
+                  className="group flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-all"
               >
                 <span
                   className={cn(
@@ -140,7 +142,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
       {/* 닫기 버튼 */}
       <button
         onClick={onClose}
-        className="absolute right-6 top-6 text-white/40 hover:text-white/60 transition-colors"
+        className="absolute right-5 top-3 text-white/40 hover:text-white/60 transition-colors"
       >
         <X className="w-5 h-5" />
       </button>

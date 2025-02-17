@@ -1,11 +1,9 @@
 'use client';
 
-import { EmptyState } from './components/empty-state';
-import { HelpSection } from './components/help-section';
-import { InfoSection } from './components/upload-info-section';
 import { Point } from '@/types/model.d';
-import { MarkerList } from './components/marker-list';
-import { MarkerHeader } from './components/marker-header';
+import { MousePointerClick, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useLocaleContext } from '@/lib/contexts/locale-context';
 
 interface MarkerStepSidebarProps {
   points: Point[];
@@ -20,30 +18,62 @@ export function MarkerStepSidebar({
   onSelect,
   onUpdateContext,
 }: MarkerStepSidebarProps) {
-  return (
-    <div className="w-full h-full flex flex-col">
-      <div className="bg-[#1A1A1A] rounded-lg divide-y divide-gray-800 mb-4 flex-shrink-0">
-        <InfoSection />
-        <HelpSection />
-      </div>
+  const { t } = useLocaleContext();
+  const [isVisible, setIsVisible] = useState(true);
+  
+  useEffect(() => {
+    const hasSeenGuide = localStorage.getItem('hasSeenMarkerGuide');
+    if (hasSeenGuide) {
+      setIsVisible(false);
+    }
+  }, []);
 
-      <div className="flex-1 bg-[#1A1A1A] rounded-lg">
-        {points.length > 0 ? (
-          <div className="h-[280px] overflow-y-auto px-4 py-2">
-            <MarkerList
-              points={points}
-              selectedPoint={
-                selectedPoint !== null ? points[selectedPoint] : null
-              }
-              onSelect={onSelect}
-              onUpdateContext={onUpdateContext}
-            />
+  if (!isVisible) return null;
+
+  return (
+    <div className="absolute top-0 left-1/2 -translate-x-1/2 z-50">
+      <div className="w-[24rem] bg-[#1A1A1A]/95 backdrop-blur-sm rounded-lg border border-zinc-800/50">
+        <div className="flex justify-end p-1">
+          <button
+            onClick={() => setIsVisible(false)}
+            className="p-1 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-zinc-300"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        
+        <div className="px-4 pb-3">
+          <div className="flex items-start gap-3">
+            <div className="p-1.5 rounded-lg bg-[#EAFD66]/10 shrink-0">
+              <MousePointerClick className="w-4 h-4 text-[#EAFD66]" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium text-white">
+                {t.request.steps.marker.guide.required.title}
+              </h3>
+              <div className="text-xs text-zinc-400 space-y-1">
+                {t.request.steps.marker.guide.required.description.map((desc, index) => (
+                  <div key={index} className="flex items-start gap-2">
+                    <span className="text-[#EAFD66]">•</span>
+                    <p>{desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-        ) : (
-          <div className="h-[280px] overflow-y-auto px-4 py-2">
-            <EmptyState />
-          </div>
-        )}
+        </div>
+
+        <div className="px-4 pb-3 text-center border-t border-zinc-800/50">
+          <button
+            onClick={() => {
+              localStorage.setItem('hasSeenMarkerGuide', new Date().toISOString());
+              setIsVisible(false);
+            }}
+            className="text-xs text-zinc-500 hover:text-zinc-400 py-2"
+          >
+            오늘 하루 보지 않기
+          </button>
+        </div>
       </div>
     </div>
   );

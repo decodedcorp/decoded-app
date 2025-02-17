@@ -35,8 +35,8 @@ export const home = {
     },
   },
   trending: {
-    title: "트렌딩 나우",
-    description: "지금 가장 인기 있는 이미지를 확인하세요",
+    title: "DECODED SELECTED",
+    description: "디코디드의 선택을 확인해보세요",
   },
   premiumSpot: {
     title: "인기 아이템의 링크를 제공해보세요",

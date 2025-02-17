@@ -20,9 +20,10 @@ export interface ExploreResponse {
   data: ExploreKeyword[];
 }
 
-export const getExploreImages = async (of: 'identity' | 'brands') => {
+export const getExploreImages = async (of: 'identity' | 'brand') => {
   const response = await apiClient.get<ExploreResponse>(
     `/image/explore?of=${of}`
   );
+  console.log(response.data);
   return response.data;
 };

@@ -21,6 +21,7 @@ interface ImageContainerProps {
   onPointSelect?: (pointIndex: number | null) => void;
   children?: React.ReactNode;
   contextAnswers?: ContextAnswer | null;
+  selectedPoint?: number | null;
 }
 
 export function ImageContainer({
@@ -33,6 +34,7 @@ export function ImageContainer({
   onPointContextChange,
   onPointSelect,
   contextAnswers,
+  selectedPoint,
 }: ImageContainerProps) {
   const { t } = useLocaleContext();
 
@@ -64,7 +66,7 @@ export function ImageContainer({
           className={cn(
             'relative rounded-lg overflow-hidden',
             'w-full',
-            step === 1 && 'aspect-[3/4]'
+            step === 1 && 'aspect-[4/5]'
           )}
         >
           {step === 1 ? (
@@ -97,31 +99,42 @@ export function ImageContainer({
               )}
             </label>
           ) : step === 3 ? (
-            selectedImage && (
-              <ImageMarker
-                imageUrl={selectedImage}
-                points={points}
-                onPointsChange={onPointsChange}
-                onPointContextChange={(index, context) => {
-                  if (
-                    onPointContextChange &&
-                    index >= 0 &&
-                    index < points.length
-                  ) {
-                    onPointContextChange(points[index], context);
-                  }
-                }}
-                onPointSelect={
-                  onPointSelect &&
-                  ((point) => {
-                    const index = points.indexOf(point);
-                    onPointSelect(index >= 0 ? index : null);
-                  })
-                }
-                showPointList={false}
-                className="w-full pointer-events-none"
-              />
-            )
+            <>
+              {selectedImage && (
+                <ImageMarker
+                  imageUrl={selectedImage}
+                  points={points}
+                  onPointsChange={onPointsChange}
+                  selectedPointIndex={null}
+                  className="w-full pointer-events-none"
+                  disableEditing={true}
+                />
+              )}
+              {contextAnswers?.location && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="absolute top-3 right-3 bg-gray-900/80 backdrop-blur-sm px-3 py-1.5 rounded-full z-10"
+                >
+                  <div className="flex items-center gap-2 text-sm text-gray-200">
+                    <svg 
+                      className="w-4 h-4" 
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth={2} 
+                        d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
+                      />
+                    </svg>
+                    <span className="leading-none pt-[2px]">{getLocationLabel(contextAnswers.location)}</span>
+                  </div>
+                </motion.div>
+              )}
+            </>
           ) : (
             selectedImage && (
               <ImageMarker
@@ -129,54 +142,17 @@ export function ImageContainer({
                 points={points}
                 onPointsChange={onPointsChange}
                 onPointContextChange={(index, context) => {
-                  if (
-                    onPointContextChange &&
-                    index >= 0 &&
-                    index < points.length
-                  ) {
+                  if (onPointContextChange && index >= 0 && index < points.length) {
                     onPointContextChange(points[index], context);
                   }
                 }}
-                onPointSelect={
-                  onPointSelect &&
-                  ((point) => {
-                    const index = points.indexOf(point);
-                    onPointSelect(index >= 0 ? index : null);
-                  })
-                }
-                showPointList={false}
+                selectedPointIndex={selectedPoint}
                 className="w-full"
               />
             )
           )}
         </div>
       </div>
-      
-      {/* Location indicator */}
-      {contextAnswers?.location && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="absolute top-3 right-3 bg-gray-900/80 backdrop-blur-sm px-3 py-1.5 rounded-full"
-        >
-          <div className="flex items-center gap-2 text-sm text-gray-200">
-            <svg 
-              className="w-4 h-4" 
-              fill="none" 
-              viewBox="0 0 24 24" 
-              stroke="currentColor"
-            >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
-              />
-            </svg>
-            <span className="leading-none pt-[2px]">{getLocationLabel(contextAnswers.location)}</span>
-          </div>
-        </motion.div>
-      )}
     </div>
   );
 }

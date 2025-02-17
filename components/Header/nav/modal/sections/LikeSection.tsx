@@ -100,7 +100,7 @@ export function LikeSection({
             <Link
               href={`/details/${image.image_doc_id}`}
               key={image.image_doc_id}
-              className="relative aspect-[3/4] rounded-lg overflow-hidden group"
+              className="relative aspect-[4/5] rounded-lg overflow-hidden group"
             >
               <Image
                 src={image.image_url}
@@ -118,7 +118,7 @@ export function LikeSection({
               key={item.item_doc_id}
               className="bg-[#1A1A1A] rounded-lg p-3 flex flex-col gap-2"
             >
-              <div className="relative aspect-[3/4] rounded-md overflow-hidden">
+              <div className="relative aspect-[4/5] rounded-md overflow-hidden">
                 {item.image_url ? (
                   <Image
                     src={item.image_url}
