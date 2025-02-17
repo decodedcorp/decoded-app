@@ -31,7 +31,7 @@ export function TrendingCard({
       {/* 이미지 컨테이너 */}
       <div
         className={cn(
-          'relative aspect-[3/4] rounded-xl overflow-hidden',
+          'relative aspect-[4/5] rounded-xl overflow-hidden',
           'bg-zinc-900',
           'mb-3'
         )}

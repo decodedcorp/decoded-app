@@ -3,7 +3,7 @@ import {
   getExploreImages,
 } from '@/lib/api/requests/explore';
 
-export const useExplore = (of: 'identity' | 'brands') => {
+export const useExplore = (of: 'identity' | 'brand') => {
   const { data } = useQuery({
     queryKey: ['explore', of],
     queryFn: async () => {

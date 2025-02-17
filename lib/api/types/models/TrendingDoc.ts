@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { RedisGetTrendingResult } from './RedisGetTrendingResult';
 /**
  * Document for `trending` collection
  */
@@ -11,8 +12,8 @@ export type TrendingDoc = {
      */
     _id?: (string | null);
     timestamp?: string;
-    images?: Array<Record<string, any>>;
-    items?: Array<Record<string, any>>;
-    keywords?: Array<Record<string, any>>;
+    images?: Array<RedisGetTrendingResult>;
+    items?: Array<RedisGetTrendingResult>;
+    keywords?: Array<RedisGetTrendingResult>;
 };
 

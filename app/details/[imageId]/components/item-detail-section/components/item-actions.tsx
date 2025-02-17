@@ -9,6 +9,7 @@ import { useParams } from "next/navigation";
 import { networkManager } from "@/lib/network/network";
 import { useIsLike } from "@/app/details/utils/hooks/isLike";
 import { useLocaleContext } from "@/lib/contexts/locale-context";
+
 interface ItemActionsProps {
   itemId: string;
   likeCount: number;

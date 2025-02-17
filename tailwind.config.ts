@@ -171,6 +171,24 @@ const config: Config = {
         "x-3": "rotateX(3deg)",
         "x-5": "rotateX(5deg)",
       },
+      container: {
+        center: true,
+        padding: {
+          DEFAULT: '0.5rem',    // 8px
+          sm: '1rem',          // 16px
+          md: '1.5rem',        // 24px
+          lg: '2rem',          // 32px
+          xl: '2.5rem',        // 40px
+          '2xl': '3rem',       // 48px
+        },
+        screens: {
+          sm: '640px',
+          md: '768px',
+          lg: '1024px',
+          xl: '1280px',
+          '2xl': '1536px',
+        },
+      },
     },
   },
   plugins: [

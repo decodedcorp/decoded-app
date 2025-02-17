@@ -1,24 +1,26 @@
 import { useLocaleContext } from "@/lib/contexts/locale-context";
+import { MousePointerClick } from "lucide-react";
 
 export function InfoSection() {
   const { t } = useLocaleContext();
+  
   return (
-    <div className="p-4">
-      <div className="flex items-center gap-2 mb-2">
-        <span className="w-5 h-5 rounded-full bg-[#EAFD66]/10 border border-[#EAFD66]/30 text-[#EAFD66] flex items-center justify-center text-xs">
-          !
-        </span>
-        <h3 className="text-xs font-medium text-gray-400">
-          {t.common.validation.required}
+    <div className="space-y-3">
+      <div className="flex items-center gap-2">
+        <div className="p-1.5 rounded-lg bg-[#EAFD66]/10">
+          <MousePointerClick className="w-4 h-4 text-[#EAFD66]" />
+        </div>
+        <h3 className="text-sm font-medium text-white">
+          {t.request.steps.marker.guide.required.title}
         </h3>
       </div>
-      <div className="ml-7">
-        <p className="text-xs text-gray-500">
-          {t.request.steps.marker.guide.required.description[0]}
-        </p>
-        <p className="text-xs text-gray-500 mt-1">
-          {t.request.steps.marker.guide.required.description[1]}
-        </p>
+      <div className="text-xs text-zinc-400 space-y-1.5">
+        {t.request.steps.marker.guide.required.description.map((desc, index) => (
+          <div key={index} className="flex items-start gap-2">
+            <span className="text-[#EAFD66]">•</span>
+            <p>{desc}</p>
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -21,6 +21,7 @@ interface ImageContainerProps {
   onPointSelect?: (pointIndex: number | null) => void;
   children?: React.ReactNode;
   contextAnswers?: ContextAnswer | null;
+  selectedPoint?: number | null;
 }
 
 export function ImageContainer({
@@ -33,6 +34,7 @@ export function ImageContainer({
   onPointContextChange,
   onPointSelect,
   contextAnswers,
+  selectedPoint,
 }: ImageContainerProps) {
   const { t } = useLocaleContext();
 
@@ -64,7 +66,7 @@ export function ImageContainer({
           className={cn(
             'relative rounded-lg overflow-hidden',
             'w-full',
-            step === 1 && 'aspect-[3/4]'
+            step === 1 && 'aspect-[4/5]'
           )}
         >
           {step === 1 ? (
@@ -102,24 +104,9 @@ export function ImageContainer({
                 imageUrl={selectedImage}
                 points={points}
                 onPointsChange={onPointsChange}
-                onPointContextChange={(index, context) => {
-                  if (
-                    onPointContextChange &&
-                    index >= 0 &&
-                    index < points.length
-                  ) {
-                    onPointContextChange(points[index], context);
-                  }
-                }}
-                onPointSelect={
-                  onPointSelect &&
-                  ((point) => {
-                    const index = points.indexOf(point);
-                    onPointSelect(index >= 0 ? index : null);
-                  })
-                }
-                showPointList={false}
+                selectedPointIndex={null}
                 className="w-full pointer-events-none"
+                disableEditing={true}
               />
             )
           ) : (
@@ -129,22 +116,11 @@ export function ImageContainer({
                 points={points}
                 onPointsChange={onPointsChange}
                 onPointContextChange={(index, context) => {
-                  if (
-                    onPointContextChange &&
-                    index >= 0 &&
-                    index < points.length
-                  ) {
+                  if (onPointContextChange && index >= 0 && index < points.length) {
                     onPointContextChange(points[index], context);
                   }
                 }}
-                onPointSelect={
-                  onPointSelect &&
-                  ((point) => {
-                    const index = points.indexOf(point);
-                    onPointSelect(index >= 0 ? index : null);
-                  })
-                }
-                showPointList={false}
+                selectedPointIndex={selectedPoint}
                 className="w-full"
               />
             )
@@ -157,7 +133,7 @@ export function ImageContainer({
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="absolute top-3 right-3 bg-gray-900/80 backdrop-blur-sm px-3 py-1.5 rounded-full"
+          className="absolute top-3 right-36 bg-gray-900/80 backdrop-blur-sm px-3 py-1.5 rounded-full"
         >
           <div className="flex items-center gap-2 text-sm text-gray-200">
             <svg 

@@ -127,7 +127,7 @@ export function RelatedStylingSection({
           <div className="h-8 bg-gray-700 rounded w-1/4"></div>
           <div className="flex gap-4 overflow-x-auto">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="flex-none w-72 aspect-[3/4] bg-gray-700 rounded"></div>
+              <div key={i} className="flex-none w-72 aspect-[4/5] bg-gray-700 rounded"></div>
             ))}
           </div>
         </div>

@@ -1,16 +1,20 @@
 'use client';
 
-import { itemsAPI } from '@/lib/api/endpoints/items';
+import { imagesService } from '@/lib/api/requests/images';
 import { useQuery } from '@tanstack/react-query';
+import type { ImageDetailResponse } from '@/components/ui/modal/add-item-modal/types';
+import type { APIResponse } from '@/app/details/[imageId]/components/related-styling/types';
 
 export function useImageDetails(itemId: string) {
-  return useQuery({
+  return useQuery<APIResponse<ImageDetailResponse>>({
     queryKey: ['imageItem', itemId],
     queryFn: async () => {
-      if (!itemId) return null;
-      const response = await itemsAPI.getItemDetail(itemId);
-      return response.data;
+      if (!itemId) throw new Error('Item ID is required');
+      const response = await imagesService.getImageDetail(itemId);
+      return response as APIResponse<ImageDetailResponse>;
     },
-    enabled: !!itemId,
+    enabled: Boolean(itemId),
+    retry: 2,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }

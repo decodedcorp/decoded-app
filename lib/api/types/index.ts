@@ -33,6 +33,7 @@ export { NotificationType } from './models/NotificationType';
 export type { OGMetadata } from './models/OGMetadata';
 export type { Position } from './models/Position';
 export type { ProvideItem } from './models/ProvideItem';
+export type { RedisGetTrendingResult } from './models/RedisGetTrendingResult';
 export type { RequestAddItem } from './models/RequestAddItem';
 export type { RequestDoc } from './models/RequestDoc';
 export type { RequestedItem } from './models/RequestedItem';

@@ -17,7 +17,7 @@ export function RelatedImageGrid({ images }: RelatedImageGridProps) {
         <div
           key={image.image_doc_id}
           onClick={() => navigateToDetail(image.image_doc_id)}
-          className="aspect-[3/4] bg-gray-800 rounded-lg overflow-hidden cursor-pointer"
+          className="aspect-[4/5] bg-gray-800 rounded-lg overflow-hidden cursor-pointer"
         >
           <Image
             src={image.image_url}

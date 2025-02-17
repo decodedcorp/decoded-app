@@ -8,6 +8,7 @@ import { DetailsList } from "./components/item-list-section/server/details-list"
 import { RelatedStylingSection } from "./components/related-styling/related-style";
 import { ImageDetails, DecodedItem } from "@/lib/api/_types/image";
 import { generateItemSchema } from "@/lib/structured-data/geneartors/item";
+import { MobileDetailsList } from "./components/item-list-section/mobile/mobile-details-list";
 
 // 타입 정의
 interface PageProps {
@@ -102,19 +103,23 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
             }}
           />
         )}
-        <div className="min-h-screen pt-18 sm:pt-24 bg-black">
-          <div className="max-w-4xl mx-auto px-4 space-y-16">
+        <div className="min-h-screen pt-16 sm:pt-24 bg-black">
+          <div className="max-w-4xl mx-auto px-4 space-y-8 sm:space-y-16">
             <Suspense fallback={<LoadingDisplay />}>
-              <div className="bg-[#1A1A1A] rounded-2xl p-4">
-                <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,30rem)_minmax(0,36rem)] gap-6 items-start justify-center">
-                  <ImageSection
-                    imageData={processedImageData}
-                    selectedItemId={selectedItemId}
-                  />
-                  <DetailsList
-                    imageData={processedImageData}
-                    selectedItemId={selectedItemId}
-                  />
+              <div className="bg-[#1A1A1A] rounded-2xl p-4 sm:p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] items-start justify-center gap-6">
+                  <div className="w-full max-w-2xl mx-auto lg:max-w-none">
+                    <ImageSection
+                      imageData={processedImageData}
+                      selectedItemId={selectedItemId}
+                    />
+                  </div>
+                  <div className="hidden lg:block">
+                    <DetailsList
+                      imageData={processedImageData}
+                      selectedItemId={selectedItemId}
+                    />
+                  </div>
                 </div>
               </div>
               <RelatedStylingSection 
@@ -123,6 +128,12 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
               />
             </Suspense>
           </div>
+        </div>
+        <div className="lg:hidden">
+          <MobileDetailsList
+            imageData={processedImageData}
+            selectedItemId={selectedItemId}
+          />
         </div>
       </>
     );

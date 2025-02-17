@@ -6,7 +6,7 @@ export interface Response_TrendingKeywords {
   status_code: number;
   description: string;
   data: string[];
-}
+} 
 
 export const metricsService = {
   // 트렌딩 아이템 조회
