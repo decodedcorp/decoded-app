@@ -36,6 +36,13 @@ function normalizeError(error: any): ErrorResponse {
         message: ERROR_MESSAGES.SERVER_ERROR,
         url: error.config?.url
       };
+    case 409:
+      return {
+        code: 'DUPLICATE_REQUEST',
+        status,
+        message: ERROR_MESSAGES.DUPLICATE_REQUEST,
+        url: error.config?.url
+      };
     default:
       return {
         code: 'UNKNOWN_ERROR',

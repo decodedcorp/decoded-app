@@ -114,7 +114,7 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
                       selectedItemId={selectedItemId}
                     />
                   </div>
-                  <div className="hidden lg:block">
+                  <div className="hidden lg:block h-[37rem]">
                     <DetailsList
                       imageData={processedImageData}
                       selectedItemId={selectedItemId}

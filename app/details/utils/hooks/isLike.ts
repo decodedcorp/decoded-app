@@ -1,4 +1,7 @@
+'use client';
+
 import { networkManager } from '@/lib/network/network';
+import { useCallback } from 'react';
 
 type DocType = 'image' | 'item' | 'images' | 'items';
 
@@ -12,8 +15,11 @@ interface LikeResponse {
 
 // optimistic ui
 export function useIsLike() {
-
-  async function checkInitialLikeStatus(docType: DocType, docId: string, userId: string): Promise<boolean> {
+  const checkInitialLikeStatus = useCallback(async (
+    docType: DocType, 
+    docId: string, 
+    userId: string
+  ): Promise<boolean> => {
     try {
       const response = await networkManager.request<LikeResponse>(
         `user/${userId}/islike?doc_type=${docType}&doc_id=${docId}`,
@@ -24,9 +30,14 @@ export function useIsLike() {
       console.error('Error fetching like status:', error);
       return false;
     }
-  }
+  }, []); // 의존성 없음
 
-  async function toggleLike(docType: DocType, docId: string, userId: string, currentLikeStatus: boolean): Promise<boolean> {
+  const toggleLike = useCallback(async (
+    docType: DocType, 
+    docId: string, 
+    userId: string, 
+    currentLikeStatus: boolean
+  ): Promise<boolean> => {
     try {
       const action = currentLikeStatus ? 'unlike' : 'like';
       const response = await networkManager.request<LikeResponse>(
@@ -34,15 +45,12 @@ export function useIsLike() {
         'POST'
       );
       
-      // API 응답 구조 확인 및 안전한 처리
-      if (response?.data?.is_like !== undefined) {
-      return response.data.is_like;
-      }
-      return currentLikeStatus; 
+      return response?.data?.is_like ?? !currentLikeStatus;
     } catch (error) {
+      console.error('Error toggling like status:', error);
       return currentLikeStatus;
     }
-  }
+  }, []); // 의존성 없음
 
   return {
     checkInitialLikeStatus,

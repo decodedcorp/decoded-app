@@ -7,11 +7,18 @@ import { useState, useEffect, useCallback } from 'react';
 interface ItemActionsWrapperProps {
   initialLikeCount: number;
   imageId: string;
+  render?: (props: {
+    likeCount: number;
+    isLiked: boolean;
+    isLoading: boolean;
+    onLike: () => void;
+  }) => React.ReactNode;
 }
 
 export function ItemActionsWrapper({
   initialLikeCount,
   imageId,
+  render,
 }: ItemActionsWrapperProps) {
   const [userId, setUserId] = useState<string | null>(null);
   const {
@@ -71,6 +78,15 @@ export function ItemActionsWrapper({
       setIsLoading(false);
     }
   }, [imageId, userId, isLiked, toggleLikeStatus]);
+
+  if (render) {
+    return render({
+      likeCount,
+      isLiked,
+      isLoading,
+      onLike: handleLike,
+    });
+  }
 
   return (
     <ItemActions

@@ -30,5 +30,4 @@ export interface TrendingImagesResponse {
 export interface GetTrendingImagesParams {
   min?: number;
   limit?: number;
-  period?: 'daily' | 'weekly' | 'monthly';
 } 

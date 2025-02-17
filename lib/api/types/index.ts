@@ -39,6 +39,7 @@ export type { RequestDoc } from './models/RequestDoc';
 export type { RequestedItem } from './models/RequestedItem';
 export type { RequestIdentity } from './models/RequestIdentity';
 export type { RequestImage } from './models/RequestImage';
+export { RequestProvideStatus } from './models/RequestProvideStatus';
 export type { Response } from './models/Response';
 export type { Response_GetDocumentResponse_ } from './models/Response_GetDocumentResponse_';
 export type { ReviewLinkMetadata } from './models/ReviewLinkMetadata';

@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { Point, useImageMarker } from '@/lib/hooks/features/images/useImageMarker';
 import { X, Trash2 } from 'lucide-react';
+import { cn } from '@/lib/utils/style';
 
 interface ImageMarkerProps {
   imageUrl: string;
@@ -29,6 +30,7 @@ export function ImageMarker({
   const imageRef = useRef<HTMLDivElement>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editingPoint, setEditingPoint] = useState<Point | null>(null);
+  const [showWarning, setShowWarning] = useState(false);
   
   const { calculatePointPosition } = useImageMarker({
     initialPoints: points,
@@ -42,42 +44,102 @@ export function ImageMarker({
     }
   }, [selectedPointIndex]);
 
-  const handleImageClick = (e: React.MouseEvent) => {
-    if (!imageRef.current || points.length > 0) return;
-    const { x, y } = calculatePointPosition(
-      imageRef.current,
-      e.clientX,
-      e.clientY
-    );
-    onPointsChange([{ x, y }]);
-    setIsEditing(true);
-  };
 
-  const handleRemovePoint = () => {
-    if (onPointRemove) {
-      onPointRemove(0);
-    } else {
-      onPointsChange([]);
-    }
-    setIsEditing(false);
-  };
-
-  const handleCloseEdit = (e: React.MouseEvent) => {
+  const handleDeleteClick = useCallback((e: React.MouseEvent, index: number) => {
+    e.preventDefault();
     e.stopPropagation();
+    
+    // onPointRemove가 있으면 그것을 사용하고, 없으면 onPointsChange 사용
+    if (onPointRemove) {
+      onPointRemove(index);
+    } else {
+      const newPoints = [...points];
+      newPoints.splice(index, 1);
+      onPointsChange(newPoints);
+    }
+    
+    // UI 상태 초기화
     setIsEditing(false);
-  };
+    setEditingPoint(null);
+  }, [points, onPointsChange, onPointRemove]);
 
-  const handlePointClick = (point: Point, index: number) => {
+  const handleCloseClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // 편집 모드만 종료
+    setIsEditing(false);
+    setEditingPoint(null);
+  }, []);
+
+  const handleImageClick = useCallback((e: React.MouseEvent) => {
     if (disableEditing) return;
+    
+    const rect = imageRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+    if (points.length > 0) {
+      setShowWarning(true);
+      setTimeout(() => setShowWarning(false), 2000);
+      return;
+    }
+
+    const newPoint = { x, y, context: '' };
+    onPointsChange([...points, newPoint]);
     setIsEditing(true);
-    setEditingPoint(point);
-  };
+    setEditingPoint(newPoint);
+  }, [points, onPointsChange, disableEditing]);
 
   return (
-    <div className="relative w-full aspect-[4/5] rounded-lg overflow-hidden cursor-crosshair">
+    <div className={cn("relative w-full aspect-[4/5] rounded-lg overflow-hidden cursor-crosshair", className)}>
+      {showWarning && (
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 animate-fade-in w-full">
+          <div className="flex items-center gap-2 bg-black/90 text-[#EAFD66] px-4 py-2.5 rounded-lg text-sm backdrop-blur-sm border border-[#EAFD66]/20">
+            <svg
+              className="w-4 h-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+            <span>아이템은 하나만 지정할 수 있습니다</span>
+          </div>
+        </div>
+      )}
+      
+      {points.length === 0 && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+          <div className="flex items-center gap-2 bg-black/80 text-zinc-300 px-4 py-2.5 rounded-lg text-sm backdrop-blur-sm border border-zinc-800/50">
+            <svg
+              className="w-4 h-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"
+              />
+            </svg>
+            <span>이미지를 클릭하여 아이템 위치를 지정해주세요</span>
+          </div>
+        </div>
+      )}
+
       <div
         ref={imageRef}
-        className={`relative w-full h-full ${className}`}
+        className="relative w-full h-full"
         onClick={handleImageClick}
       >
         <Image
@@ -89,58 +151,15 @@ export function ImageMarker({
 
         {points.map((point, index) => (
           <div
-            key={index}
+            key={`marker-${index}-${point.x}-${point.y}`}
             className="absolute -translate-x-1/2 -translate-y-1/2 group"
             style={{ left: `${point.x}%`, top: `${point.y}%` }}
+            onClick={(e) => handleDeleteClick(e, index)}
           >
-            <div 
-              className="relative w-4 h-4 hover:scale-125 transition-transform"
-              onClick={(e) => {
-                e.stopPropagation();
-                handlePointClick(point, index);
-              }}
-            >
-              <div className="absolute inset-0 border-2 border-[#EAFD66] rounded-full animate-pulse"></div>
-              <div className="absolute inset-[2px] bg-[#EAFD66]/30 rounded-full backdrop-blur-sm flex items-center justify-center cursor-pointer">
-                <span className="text-xs text-white font-semibold leading-none translate-y-[0.5px]">
-                  1
-                </span>
-              </div>
+            <div className="relative w-4 h-4 hover:scale-125 transition-transform">
+              <div className="absolute inset-0 border-2 border-[#EAFD66] rounded-full animate-pulse" />
+              <div className="absolute inset-[2px] bg-[#EAFD66]/30 rounded-full backdrop-blur-sm" />
             </div>
-
-            {isEditing && editingPoint === point && (
-              <div 
-                className="absolute top-6 left-1/2 -translate-x-1/2 w-48 bg-[#1A1A1A]/95 backdrop-blur-sm rounded-lg border border-zinc-800/50 p-2 z-10"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-xs text-zinc-400">아이템 설명</span>
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={handleRemovePoint}
-                      className="p-1 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-red-400"
-                      title="마커 삭제"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </button>
-                    <button
-                      onClick={handleCloseEdit}
-                      className="p-1 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-zinc-300"
-                      title="닫기"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </div>
-                </div>
-                <textarea
-                  rows={2}
-                  value={point.context || ''}
-                  onChange={(e) => onPointContextChange?.(index, e.target.value)}
-                  className="w-full text-xs p-1.5 rounded-md bg-zinc-900/50 text-zinc-300 border border-zinc-800 resize-none"
-                  placeholder="아이템 설명 입력 (선택사항)"
-                />
-              </div>
-            )}
           </div>
         ))}
       </div>

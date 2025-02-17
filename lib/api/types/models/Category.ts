@@ -4,7 +4,7 @@
 /* eslint-disable */
 export type Category = {
     name: string;
-    children?: null;
+    children?: (Array<Category> | null);
     is_leaf?: boolean;
     instances?: (Array<string> | null);
 };

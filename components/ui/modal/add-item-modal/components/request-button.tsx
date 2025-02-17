@@ -2,8 +2,9 @@
 
 import { RequestButtonProps } from '../types';
 import { networkManager } from '@/lib/network/network';
-import { StatusModal, StatusType, StatusMessageKey } from '@/components/ui/modal/status-modal';
-import { useState } from 'react';
+import { useStatusStore } from '@/components/ui/modal/status-modal/utils/store';
+import { handleApiError } from '@/lib/api/core/error-handler';
+import { AxiosError } from 'axios';
 
 export function RequestButton({
   newMarkers,
@@ -11,24 +12,13 @@ export function RequestButton({
   image,
   onClose,
 }: RequestButtonProps) {
-  const [modalConfig, setModalConfig] = useState<{
-    type: StatusType;
-    messageKey?: StatusMessageKey;
-    isOpen: boolean;
-    onClose: () => void;
-  }>({
-    type: 'warning',
-    isOpen: false,
-    onClose: () => setModalConfig((prev) => ({ ...prev, isOpen: false })),
-  });
+  const setStatus = useStatusStore((state) => state.setStatus);
 
-  const handleRequest = () => {
+  const handleRequest = async () => {
     if (sessionStorage.getItem('USER_DOC_ID') === null) {
-      setModalConfig({
+      setStatus({
         type: 'warning',
         messageKey: 'login',
-        isOpen: true,
-        onClose: () => setModalConfig((prev) => ({ ...prev, isOpen: false })),
       });
       return;
     }
@@ -44,41 +34,27 @@ export function RequestButton({
       })),
     };
 
-    console.log('Request URL:', `request/image/${image.docId}/add/item`);
-    console.log('Request Data:', requestAddItem);
-
-    networkManager
-      .request(
+    try {
+      await networkManager.request(
         `user/${sessionStorage.getItem('USER_DOC_ID')}/image/${
           image.docId
         }/request/add`,
         'POST',
         requestAddItem
-      )
-      .then((response) => {
-        console.log('Response:', response);
-        if (response?.status === 200 || response?.status_code === 200) {
-          handleAdd([]);
-          alert('요청이 완료되었습니다.');
-          onClose?.();
-        } else {
-          throw new Error('Invalid response status');
-        }
-      })
-      .catch((error) => {
-        console.error('Error details:', {
-          status: error.response?.status,
-          data: error.response?.data,
-          message: error.message,
-          url: error.config?.url,
-        });
-        setModalConfig({
-          type: 'error',
-          messageKey: 'request',
-          isOpen: true,
-          onClose: () => setModalConfig((prev) => ({ ...prev, isOpen: false })),
-        });
+      );
+
+      handleAdd([]);
+      setStatus({
+        type: 'success',
+        messageKey: 'request',
       });
+      onClose?.();
+    } catch (error: any) {
+      setStatus({
+        type: 'warning',
+        messageKey: 'duplicate',
+      });
+    }
   };
 
   return (
@@ -87,25 +63,19 @@ export function RequestButton({
         <button
           onClick={handleRequest}
           className={`
-                w-full px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-200
-                bg-gray-400/10 text-gray-400 hover:bg-[#EAFD66]
-                ${
-                  newMarkers.length === 0
-                    ? 'cursor-not-allowed opacity-50'
-                    : 'hover:text-gray-900'
-                }
-              `}
+            w-full px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-200
+            bg-gray-400/10 text-gray-400 hover:bg-[#EAFD66]
+            ${
+              newMarkers.length === 0
+                ? 'cursor-not-allowed opacity-50'
+                : 'hover:text-gray-900'
+            }
+          `}
           disabled={newMarkers.length === 0}
         >
-          요청하기 {newMarkers.length > 0 && `(${newMarkers.length})`}
+          요청하기
         </button>
       </div>
-      <StatusModal
-        isOpen={modalConfig.isOpen}
-        onClose={modalConfig.onClose}
-        type={modalConfig.type}
-        messageKey={modalConfig.messageKey}
-      />
     </div>
   );
 }

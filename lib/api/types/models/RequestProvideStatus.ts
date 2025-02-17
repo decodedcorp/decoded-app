@@ -2,9 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type LinkInfo = {
-    value: string;
-    label?: (string | null);
-    date?: string;
-};
-
+export enum RequestProvideStatus {
+    PENDING = 'pending',
+    CONFIRMED = 'confirmed',
+    REJECTED = 'rejected',
+}

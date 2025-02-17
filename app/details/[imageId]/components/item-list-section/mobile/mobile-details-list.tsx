@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useCallback, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils/style';
 import { DetailsList } from '../server/details-list';
@@ -15,32 +15,41 @@ interface MobileDetailsListProps {
 
 export function MobileDetailsList({ imageData, selectedItemId }: MobileDetailsListProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeMarker, setActiveMarker] = useState<string | undefined>(undefined);
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // 선택된 아이템이 변경되면 패널 열기
+  // selectedItemId가 변경될 때 isOpen 상태 업데이트
   useEffect(() => {
-    if (selectedItemId) {
-      setIsOpen(true);
-      setActiveMarker(selectedItemId);
-    }
+    setIsOpen(!!selectedItemId);
   }, [selectedItemId]);
 
-  // 패널이 닫힐 때 URL 초기화
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setIsOpen(false);
-    // URL에서 selectedItem 파라미터 제거
-    const newSearchParams = new URLSearchParams(searchParams.toString());
-    newSearchParams.delete('selectedItem');
-    router.replace(`?${newSearchParams.toString()}`);
-  };
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('selectedItem');
+    const pathname = window.location.pathname;
+    router.push(pathname + (params.toString() ? `?${params.toString()}` : ''));
+  }, [searchParams, router]);
 
+  const handleDragEnd = useCallback((_: any, info: PanInfo) => {
+    if (info.velocity.y > 300 || info.offset.y > 200) {
+      handleClose();
+    }
+  }, [handleClose]);
+
+  // 애니메이션 설정 메모이제이션
+  const animationConfig = useMemo(() => ({
+    initial: { y: '100%' },
+    animate: { y: 0 },
+    exit: { y: '100%' },
+    transition: { type: 'spring', damping: 25, stiffness: 200 }
+  }), []);
+
+  // 패널이 열려있을 때만 DetailsList 렌더링
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       {isOpen && (
         <>
-          {/* 오버레이 */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -49,40 +58,29 @@ export function MobileDetailsList({ imageData, selectedItemId }: MobileDetailsLi
             className="fixed inset-0 bg-black/60 z-40"
           />
           
-          {/* 슬라이드업 패널 */}
           <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            {...animationConfig}
+            drag="y"
+            dragConstraints={{ top: 0 }}
+            dragElastic={0.2}
+            onDragEnd={handleDragEnd}
             className={cn(
               'fixed bottom-0 left-0 right-0 z-50',
               'bg-[#1A1A1A] rounded-t-2xl',
-              'h-[90vh] overflow-y-auto', // 높이 조정
-              'pb-safe' // iOS safe area 대응
+              'h-[85vh] max-h-[85vh]',
+              'flex flex-col',
+              'pb-safe'
             )}
           >
             {/* 드래그 핸들 */}
-            <div className="w-full flex justify-center py-2">
+            <div className="w-full flex justify-center py-6 flex-shrink-0">
               <div className="w-12 h-1 rounded-full bg-white/20" />
             </div>
-
-            {/* 헤더 */}
-            <div className="sticky top-0 flex items-center justify-between px-4 py-3 border-b border-white/10 bg-[#1A1A1A]">
-              <h3 className="text-base font-medium text-white">아이템 정보</h3>
-              <button
-                onClick={handleClose}
-                className="p-2 rounded-full hover:bg-white/10 transition-colors"
-              >
-                <X className="w-5 h-5 text-white/60" />
-              </button>
-            </div>
-
             {/* 컨텐츠 */}
-            <div className="p-4 h-full">
+            <div className="flex-1 overflow-y-auto overscroll-contain px-4">
               <DetailsList
                 imageData={imageData}
-                selectedItemId={activeMarker}
+                selectedItemId={selectedItemId}
               />
             </div>
           </motion.div>

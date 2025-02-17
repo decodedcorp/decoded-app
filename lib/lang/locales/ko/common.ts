@@ -73,6 +73,10 @@ export const common = {
           title: '로그인 필요',
           message: '로그인이 필요한 서비스입니다.',
         },
+        duplicate: {
+          title: '중복 요청',
+          message: '이미 요청한 아이템입니다.',
+        },
       },
     },
   },

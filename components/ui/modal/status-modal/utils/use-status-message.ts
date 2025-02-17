@@ -5,6 +5,7 @@ import type { StatusMessageKey } from './types';
 interface UseStatusMessageConfig {
   defaultSuccessKey?: StatusMessageKey;
   defaultErrorKey?: StatusMessageKey;
+  defaultWarningKey?: StatusMessageKey;
 }
 
 export function useStatusMessage(config: UseStatusMessageConfig = {}) {

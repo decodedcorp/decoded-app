@@ -8,7 +8,6 @@ export const trendingAPI = {
       const queryParams = new URLSearchParams({
         min: (params.min ?? 1).toString(),
         limit: (params.limit ?? 10).toString(),
-        period: params.period ?? 'daily'
       });
 
       const response = await networkManager.request(
