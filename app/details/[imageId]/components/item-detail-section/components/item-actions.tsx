@@ -9,6 +9,7 @@ import { useParams } from "next/navigation";
 import { networkManager } from "@/lib/network/network";
 import { useIsLike } from "@/app/details/utils/hooks/isLike";
 import { useLocaleContext } from "@/lib/contexts/locale-context";
+import { useStatusStore } from '@/components/ui/modal/status-modal/utils/store';
 
 interface ItemActionsProps {
   itemId: string;
@@ -23,47 +24,73 @@ export function ItemActions({ itemId, likeCount }: ItemActionsProps) {
   const [userId, setUserId] = useState<string | null>(null);
   const [isLiked, setIsLiked] = useState(false);
   const { checkInitialLikeStatus, toggleLike } = useIsLike();
+  const setStatus = useStatusStore((state) => state.setStatus);
 
   const params = useParams();
   const imageId = params.imageId as string;
 
   useEffect(() => {
     const storedUserId = sessionStorage.getItem("USER_DOC_ID");
-    setUserId(storedUserId);
+    if (!storedUserId || !itemId) return;
 
-    if (storedUserId && itemId) {
-      checkInitialLikeStatus("items", itemId, storedUserId).then(
-        (likeStatus) => {
+    let isSubscribed = true;
+
+    setUserId(storedUserId);
+    
+    const checkLikeStatus = async () => {
+      try {
+        const likeStatus = await checkInitialLikeStatus("items", itemId, storedUserId);
+        if (isSubscribed) {
           setIsLiked(likeStatus);
         }
-      );
-    }
-  }, [itemId, checkInitialLikeStatus]);
+      } catch (error) {
+        console.error("Error checking like status:", error);
+      }
+    };
+    
+    checkLikeStatus();
+
+    return () => {
+      isSubscribed = false;
+    };
+  }, []);
 
   const handleLikeClick = async () => {
     if (!userId) return;
 
-    const newLikeStatus = await toggleLike("item", itemId, userId, isLiked);
-    setIsLiked((newLikeStatus) => !newLikeStatus);
+    try {
+      const newLikeStatus = await toggleLike("item", itemId, userId, isLiked);
+      setIsLiked(newLikeStatus);
+    } catch (error) {
+      console.error("Error toggling like:", error);
+    }
   };
 
   const handleSubmit = async () => {
-    if (!userId || !provideData.links[0]) {
-      return;
-    }
+    if (!userId || !provideData.links[0]) return;
 
     try {
       setIsSubmitting(true);
       const path = `user/${userId}/image/${imageId}/provide/item/${itemId}`;
+      
       const response = await networkManager.request(path, "POST", {
         provider: userId,
-        links: provideData.links,
+        link: provideData.links[0]
       });
-
-      console.log("Response:", response);
+      
       setShowLinkForm(false);
+      setProvideData({ links: [] });
+      
+      setStatus({
+        type: 'success',
+        messageKey: 'provide',
+      });
     } catch (error) {
-      console.error("Error details:", error);
+      console.error("Error submitting link:", error);
+      setStatus({
+        type: 'warning',
+        messageKey: 'duplicate',
+      });
     } finally {
       setIsSubmitting(false);
     }

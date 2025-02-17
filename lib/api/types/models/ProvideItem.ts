@@ -7,11 +7,11 @@
  * Schema for providing items
  *
  * ## Fields
- * - `brand`: Id of brand doc
- * - `sale_url`: Sale url of the item
+ * - `provider`: Provider of the item
+ * - `link`: Sale url of the item
  */
 export type ProvideItem = {
     provider: string;
-    links?: (Array<string> | null);
+    link: string;
 };
 

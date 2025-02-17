@@ -181,8 +181,6 @@ export function RequestForm() {
           'flex items-center justify-center'
         )}
       >
-
-        {currentStep === 2 && <MarkerStepSidebar {...markerStepProps} />}
         
         <div className="relative w-full max-w-[40rem]">
           <ImageContainer {...imageContainerProps} />

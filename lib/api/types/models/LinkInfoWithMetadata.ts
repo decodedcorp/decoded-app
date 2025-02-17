@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { OGMetadata } from './OGMetadata';
+import type { RequestProvideStatus } from './RequestProvideStatus';
 import type { ReviewLinkMetadata } from './ReviewLinkMetadata';
 import type { SaleLinkMetadata } from './SaleLinkMetadata';
 /**
@@ -13,12 +14,12 @@ import type { SaleLinkMetadata } from './SaleLinkMetadata';
  * :field status: Status of the provided link
  */
 export type LinkInfoWithMetadata = {
-    url: string;
+    value: string;
     label?: (string | null);
     date?: string;
     provider: string;
     og_metadata?: (OGMetadata | null);
     link_metadata?: (SaleLinkMetadata | ReviewLinkMetadata | null);
-    status?: string;
+    status?: RequestProvideStatus;
 };
 

@@ -78,61 +78,61 @@ export function ContextStepSidebar({
   };
 
   return (
-    <div className="h-full flex items-center justify-center pointer-events-auto">
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-auto w-full h-full">
       <AnimatePresence mode="wait">
         <motion.div 
           key={step}
-          className="w-[24rem] bg-[#1A1A1A]/95 backdrop-blur-sm rounded-lg border border-zinc-800/50"
+          className="w-[28rem] bg-[#1A1A1A]/95 backdrop-blur-sm rounded-lg border border-zinc-800/50"
           initial={{ opacity: 0, x: step === 'location' ? -20 : 20 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: step === 'location' ? 20 : -20 }}
           transition={{ duration: 0.2 }}
         >
-          <div className="px-4 py-3">
-            <div className="flex items-start justify-between gap-3 mb-4">
-              <div className="flex items-start gap-3">
-                <div className="p-1.5 rounded-lg bg-[#EAFD66]/10 shrink-0">
-                  <MapPin className="w-4 h-4 text-[#EAFD66]" />
+          <div className="p-6 w-[28rem] h-[36rem]">
+            <div className="flex justify-between mb-8">
+              <div className="flex gap-4 flex-1">
+                <div className="p-2 rounded-lg bg-[#EAFD66]/10 shrink-0 mt-0.5">
+                  <MapPin className="w-5 h-5 text-[#EAFD66]" />
                 </div>
-                <div className="space-y-1.5">
-                  <h3 className="text-sm font-medium text-white">
+                <div className="flex-col justify-center items-center">
+                  <h3 className="text-white leading-none mt-3">
                     {step === 'location' 
                       ? t.request.steps.context.questions.location.title
                       : t.request.steps.context.questions.source.title
                     }
                   </h3>
-                  <p className="text-xs text-zinc-400">
+                  {/* <p className="text-sm text-zinc-400 mt-1">
                     {step === 'location'
                       ? t.request.steps.context.guide.required.description
                       : t.request.steps.context.guide.optional.description
                     }
-                  </p>
+                  </p> */}
                 </div>
               </div>
               {step === 'source' && (
                 <button
                   onClick={() => setStep('location')}
-                  className="p-1.5 rounded-lg hover:bg-zinc-800/50 text-zinc-400 hover:text-zinc-300"
+                  className="p-2 rounded-lg hover:bg-zinc-800/50 text-zinc-400 hover:text-zinc-300 shrink-0"
                 >
-                  <ArrowLeft className="w-4 h-4" />
+                  <ArrowLeft className="w-5 h-5" />
                 </button>
               )}
             </div>
 
             {step === 'location' ? (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {locationOptions.map((option) => (
                   <motion.div
                     key={option.value}
                     onClick={() => handleLocationClick(option.value)}
-                    className={`flex items-center space-x-3 p-2 rounded-lg transition-all cursor-pointer
+                    className={`flex items-center space-x-4 p-3 rounded-lg transition-all cursor-pointer
                       ${answers.location === option.value ? 'bg-zinc-800/90' : 'hover:bg-zinc-800/50'}`}
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
                   >
-                    <div className="w-4 h-4 rounded-full border border-zinc-600 flex items-center justify-center">
+                    <div className="w-5 h-5 rounded-full border border-zinc-600 flex items-center justify-center">
                       {answers.location === option.value && (
-                        <div className="w-2 h-2 rounded-full bg-[#EAFD66]" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-[#EAFD66]" />
                       )}
                     </div>
                     <Label className="flex-1 cursor-pointer text-sm text-zinc-300">
@@ -142,11 +142,11 @@ export function ContextStepSidebar({
                 ))}
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {sourceOptions.map((option) => (
                   <motion.div
                     key={option.value}
-                    className={`flex items-center space-x-3 p-2 rounded-lg transition-all cursor-pointer
+                    className={`flex items-center space-x-4 p-3 rounded-lg transition-all cursor-pointer
                       ${editingSourceId === option.value ? 'bg-zinc-800/90' : 'hover:bg-zinc-800/50'}`}
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
@@ -157,17 +157,17 @@ export function ContextStepSidebar({
                         onChange={handleSourceInputChange}
                         onBlur={handleSourceInputBlur}
                         placeholder={t.request.steps.context.questions.source.placeholder}
-                        className="bg-zinc-800/50 border-zinc-700 text-sm"
+                        className="bg-zinc-800/50 border-zinc-700 text-sm py-2.5"
                         autoFocus
                       />
                     ) : (
                       <div 
-                        className="flex items-center space-x-3 w-full"
+                        className="flex items-center space-x-4 w-full"
                         onClick={() => handleSourceOptionSelect(option.value)}
                       >
-                        <div className="w-4 h-4 rounded-full border border-zinc-600 flex items-center justify-center">
+                        <div className="w-5 h-5 rounded-full border border-zinc-600 flex items-center justify-center">
                           {answers.source === option.value && (
-                            <div className="w-2 h-2 rounded-full bg-[#EAFD66]" />
+                            <div className="w-2.5 h-2.5 rounded-full bg-[#EAFD66]" />
                           )}
                         </div>
                         <Label className="flex-1 cursor-pointer text-sm text-zinc-300">

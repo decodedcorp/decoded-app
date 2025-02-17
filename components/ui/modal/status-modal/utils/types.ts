@@ -7,7 +7,9 @@ export type StatusMessageKey =
   | 'default'
   | 'unsavedChanges'
   | 'delete'
-  | 'login';
+  | 'login'
+  | 'duplicate';
+  
 
 export interface StatusConfig {
   type: StatusType;

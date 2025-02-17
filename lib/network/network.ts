@@ -61,32 +61,23 @@ export class NetworkManager {
     method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
     data: any = null,
     retries = 3,
-    // TODO: DELETE ME
     accessToken?: string
   ): Promise<T> {
-    let attempt = 0;
+    try {
+      const url = `${this.config.service}/${path}`;
+      const storedToken =
+        accessToken || window.sessionStorage.getItem("ACCESS_TOKEN");
 
-    while (attempt < retries) {
+      const headers: Record<string, string> = {
+        ...(storedToken && { Authorization: `Bearer ${storedToken}` }),
+      };
+
+      if (!(data instanceof FormData)) {
+        headers["Content-Type"] = "application/json";
+        data = convertKeysToSnakeCase(data);
+      }
+
       try {
-        const url = `${this.config.service}/${path}`;
-        const storedToken =
-          accessToken || window.sessionStorage.getItem("ACCESS_TOKEN");
-
-        const headers: Record<string, string> = {
-          ...(storedToken && { Authorization: `Bearer ${storedToken}` }),
-        };
-
-        // FormData인 경우 Content-Type을 설정하지 않음 (브라우저가 자동으로 설정)
-        if (!(data instanceof FormData)) {
-          headers["Content-Type"] = "application/json";
-          data = convertKeysToSnakeCase(data);
-        }
-
-        console.log(`[NetworkManager] Sending request to: ${url}`);
-        console.log("[NetworkManager] Request method:", method);
-        console.log("[NetworkManager] Request data:", data);
-        console.log("[NetworkManager] Request headers:", headers);
-
         const response = await axios.request<T>({
           url,
           method,
@@ -97,55 +88,36 @@ export class NetworkManager {
           timeout: 10000,
         });
 
-        console.log("[NetworkManager] Response received:", response.data);
-
         return response.data;
-      } catch (error) {
-        attempt++;
-
-        if (axios.isAxiosError(error)) {
-          console.error("[NetworkManager] Axios error:", error.message);
-          console.error("[NetworkManager] Axios error details:", {
-            url: `${this.config.service}/${path}`,
-            method,
-            data,
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${window.sessionStorage.getItem(
-                "ACCESS_TOKEN"
-              )}`,
-            },
-          });
-
-          if (error.code === "ERR_NETWORK") {
-            throw new Error(
-              "[NetworkManager] Network error. Check your connection."
-            );
-          }
-
-          if (
-            error.code === "ECONNABORTED" ||
-            error.code === "ETIMEDOUT" ||
-            !error.response
-          ) {
-            if (attempt < retries) {
-              const delay = Math.min(1000 * Math.pow(2, attempt), 10000);
-              console.warn(`[NetworkManager] Retrying in ${delay}ms...`);
-              await new Promise((resolve) => setTimeout(resolve, delay));
-              continue;
-            }
-          }
+      } catch (error: any) {
+        // 에러 응답 문자열에서 409 확인
+        const errorString = error.toString();
+        
+        // net::ERR_FAILED 409 (Conflict) 패턴 확인
+        if (errorString.match(/ERR_FAILED.*409|409.*Conflict/i)) {
+          throw {
+            status: 409,
+            message: '이미 요청한 아이템입니다.',
+          };
         }
 
-        console.error(
-          `[NetworkManager] Request failed after ${attempt} attempts`,
-          error
-        );
+        // 일반적인 에러 처리
+        throw {
+          status: error.response?.status || 500,
+          message: error.response?.data?.message || error.message
+        };
+      }
+    } catch (error: any) {
+      // 이미 409로 처리된 에러는 그대로 전달
+      if (error.status === 409) {
         throw error;
       }
-    }
 
-    throw new Error("[NetworkManager] All retry attempts failed.");
+      throw {
+        status: 500,
+        message: error.message || "[NetworkManager] Request failed"
+      };
+    }
   }
 
   public async openIdConnectUrl(): Promise<{

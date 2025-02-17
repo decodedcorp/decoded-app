@@ -63,17 +63,6 @@ export function MarkerStepSidebar({
           </div>
         </div>
 
-        <div className="px-4 pb-3 text-center border-t border-zinc-800/50">
-          <button
-            onClick={() => {
-              localStorage.setItem('hasSeenMarkerGuide', new Date().toISOString());
-              setIsVisible(false);
-            }}
-            className="text-xs text-zinc-500 hover:text-zinc-400 py-2"
-          >
-            오늘 하루 보지 않기
-          </button>
-        </div>
       </div>
     </div>
   );

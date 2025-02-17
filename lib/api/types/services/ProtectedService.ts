@@ -261,6 +261,57 @@ export class ProtectedService {
         });
     }
     /**
+     * Get Is Request
+     * @param userDocId The id of the user
+     * @param imageDocId The id of the image
+     * @returns Response Successful Response
+     * @throws ApiError
+     */
+    public static getIsRequestUserUserDocIdIsRequestImageDocIdGet(
+        userDocId: string,
+        imageDocId: string,
+    ): CancelablePromise<Response> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/user/{user_doc_id}/is-request/{image_doc_id}',
+            path: {
+                'user_doc_id': userDocId,
+                'image_doc_id': imageDocId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Get Is Provide
+     * @param userDocId The id of the user
+     * @param imageDocId The id of the image
+     * @param itemDocId The id of the item
+     * @returns Response Successful Response
+     * @throws ApiError
+     */
+    public static getIsProvideUserUserDocIdIsProvideGet(
+        userDocId: string,
+        imageDocId: string,
+        itemDocId: string,
+    ): CancelablePromise<Response> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/user/{user_doc_id}/is-provide',
+            path: {
+                'user_doc_id': userDocId,
+            },
+            query: {
+                'image_doc_id': imageDocId,
+                'item_doc_id': itemDocId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
      * Set Aka
      * @param userDocId The id of the user
      * @param aka The alias of the user

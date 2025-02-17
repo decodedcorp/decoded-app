@@ -31,7 +31,9 @@ export function DetailsList({ imageData, selectedItemId }: DetailsListProps) {
 
       const categories = getCategoryInfo(metadata);
       const category = categories.find((cat) => cat.depth === 3)?.displayName;
-      const subCategory = categories.find((cat) => cat.depth === 4)?.displayName;
+      const subCategory = categories.find(
+        (cat) => cat.depth === 4
+      )?.displayName;
 
       if (!category || !subCategory || !item?.item?.item?._id) {
         console.log('Missing required fields for item:', {
@@ -58,33 +60,34 @@ export function DetailsList({ imageData, selectedItemId }: DetailsListProps) {
       .find((cat) => cat?.depth === 1)?.displayName || 'FASHION';
 
   return (
-    <div className="w-full h-full flex flex-col relative">
+    <div className="w-full h-full flex flex-col justify-between relative">
       <div className="w-full h-full flex flex-col">
         {imageData.title && (
-          <div className="px-3 py-2.5 border-b border-neutral-800">
+          <div className="flex-shrink-0 px-3 py-2.5 border-b border-neutral-800">
             <h1 className="text-sm text-neutral-300 font-medium truncate">
               {imageData.title}
             </h1>
           </div>
         )}
+        <div>
+          <div className="flex-shrink-0 px-3 py-2.5 border-b border-neutral-800">
+            <h2 className="text-sm font-medium text-neutral-400">
+              {topLevelCategory}
+            </h2>
+          </div>
 
-        <div className="px-3 py-2.5 border-b border-neutral-800">
-          <h2 className="text-sm font-medium text-neutral-400">
-            {topLevelCategory}
-          </h2>
+          <div className="flex-1 min-h-0 overflow-y-auto">
+            {processedItems.length > 0 ? (
+              <ItemListSection items={processedItems} />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <p className="text-neutral-400">No items available</p>
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="flex-1 min-h-0 overflow-y-auto">
-          {processedItems.length > 0 ? (
-            <ItemListSection items={processedItems} />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <p className="text-neutral-400">No items available</p>
-            </div>
-          )}
-        </div>
-
-        <div className="px-4 pt-3 border-t border-neutral-800">
+        <div className="flex-shrink-0 mt-auto px-4 pt-3 border-t border-neutral-800">
           <ItemActionsWrapper
             initialLikeCount={imageData.like || 0}
             imageId={imageData.doc_id}

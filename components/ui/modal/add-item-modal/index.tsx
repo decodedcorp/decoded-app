@@ -4,17 +4,11 @@ import { useState, useEffect, useRef } from 'react';
 import { imagesAPI } from '@/lib/api/endpoints/images';
 import useModalClose from '@/lib/hooks/common/useModalClose';
 import { ImageArea } from './components/image-area';
-import { MarkersArea } from './components/markers-area';
 import { RequestButton } from './components/request-button';
-import { ScrollIndicator } from './components/scroll-indicator';
-import {
-  Point,
-  AddItemModalProps,
-  ImageDetailResponse,
-  ImageData,
-} from './types';
-import type { APIResponse } from '@/lib/api/_types/request';
+import { Point, AddItemModalProps, ImageData } from './types';
 import type { DecodedItem } from '@/lib/api/_types/image';
+import { cn } from '@/lib/utils/style';
+import { X } from 'lucide-react';
 
 export function AddItemModal({
   isOpen,
@@ -23,7 +17,6 @@ export function AddItemModal({
   requestUrl,
 }: AddItemModalProps) {
   const [newMarkers, setNewMarkers] = useState<Point[]>([]);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { modalRef, isClosing, handleClose } = useModalClose({ onClose });
   const [imageData, setImageData] = useState<ImageData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -35,38 +28,15 @@ export function AddItemModal({
       setIsLoading(true);
       try {
         const response = await imagesAPI.getImageDetail(imageId);
-        console.log('Raw API Response:', response); // 디버깅용 로그
-        
-        if (!response || !response.data) {
-          console.error('No response or data:', response);
-          return;
-        }
+        if (!response?.data?.image) return;
 
-        const { image } = response.data;
-        if (!image) {
-          console.error('No image in response data:', response.data);
-          return;
-        }
-
-        console.log('Raw image data:', image); // 디버깅용 로그
-
-        // items 객체를 배열로 변환
-        const itemsArray = Object.values(image.items).flat();
-
+        const itemsArray = Object.values(response.data.image.items).flat();
         const processedImage: ImageData = {
-          ...image,
+          ...response.data.image,
           items: itemsArray
         };
-
-        console.log('Processed image data:', processedImage); // 디버깅용 로그
-        console.log('Processed items:', itemsArray); // 디버깅용 로그
         
         setImageData(processedImage);
-        
-        // 아이템 위치 로깅
-        const positions = formatItemPositions(itemsArray);
-        console.log('Formatted item positions:', positions); // 디버깅용 로그
-        
       } catch (error) {
         console.error('API Error:', error);
       } finally {
@@ -82,16 +52,16 @@ export function AddItemModal({
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
 
-    // 기존 마커 근처 클릭 방지 (5% 반경 내)
     const isNearExistingMarker = itemPositions.some((pos) => {
       const distance = Math.sqrt(
         Math.pow(pos.x - x, 2) + Math.pow(pos.y - y, 2)
       );
-      return distance < 5; // 5% 반경 내 클릭 방지
+      return distance < 5;
     });
 
     if (!isNearExistingMarker) {
-      setNewMarkers((prev) => [...prev, { x, y }]);
+      const newPoint = { x, y, context: '' };
+      setNewMarkers((prev) => [...prev, newPoint]);
     }
   };
 
@@ -105,7 +75,6 @@ export function AddItemModal({
 
   const formatItemPositions = (items: DecodedItem[]): Point[] => {
     if (!items || !Array.isArray(items)) return [];
-
     return items
       .filter(item => item && item.position)
       .map(item => ({
@@ -118,84 +87,68 @@ export function AddItemModal({
     ? formatItemPositions(imageData.items)
     : [];
 
-  console.log('Current Image Data:', imageData);
-  console.log('Item Positions:', itemPositions);
-  console.log('New Markers:', newMarkers);
-
   if (!isOpen) return null;
 
   return (
-    <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50
-        ${isClosing ? 'animate-fade-out' : 'animate-fade-in'}`}
-    >
+    <div className={cn(
+      "fixed inset-0 z-50 flex items-center justify-center",
+      "bg-black/80 backdrop-blur-sm",
+      isClosing ? 'animate-fade-out' : 'animate-fade-in'
+    )}>
       <div
         ref={modalRef}
-        className="relative w-[420px] max-h-[80vh] bg-[#1A1A1A] rounded-xl flex flex-col"
+        className={cn(
+          "relative w-[90vw] max-w-[420px] bg-[#1A1A1A] rounded-2xl",
+          "flex flex-col shadow-xl",
+          "border border-white/5"
+        )}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex-shrink-0 flex items-center justify-between px-5 py-3 border-b border-gray-800">
-          <h2 className="text-base font-medium text-gray-400">
-            아이템 정보 요청
-          </h2>
+        {/* 헤더 */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
+          <h2 className="text-base font-medium text-white">아이템 정보 요청</h2>
           <button
             onClick={handleClose}
-            className="p-1 rounded-full hover:bg-gray-800 transition-colors"
+            className={cn(
+              "p-2 rounded-full text-white/60 hover:text-white",
+              "hover:bg-white/5 transition-colors"
+            )}
           >
-            <svg
-              className="w-4 h-4 text-gray-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div
-          ref={scrollContainerRef}
-          className="relative flex-1 overflow-y-auto min-h-0"
-        >
-          <div className="p-5 space-y-4 flex flex-col min-h-full">
+        {/* 컨텐츠 */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="p-6 space-y-6">
             {isLoading ? (
               <div className="flex items-center justify-center h-48">
-                <div className="text-gray-400">이미지를 불러오는 중...</div>
+                <div className="text-white/40">이미지를 불러오는 중...</div>
               </div>
             ) : !imageData?.img_url ? (
               <div className="flex items-center justify-center h-48">
-                <div className="text-gray-400">이미지를 찾을 수 없습니다</div>
+                <div className="text-white/40">이미지를 찾을 수 없습니다</div>
               </div>
             ) : (
-              <>
-                <ImageArea
-                  handleImageClick={handleImageClick}
-                  imageUrl={imageData.img_url}
-                  itemPositions={itemPositions}
-                  newMarkers={newMarkers}
-                  setNewMarkers={setNewMarkers}
-                />
-                {/* <MarkersArea
-                  newMarkers={newMarkers}
-                  setNewMarkers={setNewMarkers}
-                /> */}
-                <div className="flex-shrink-0 pt-4 border-t border-gray-800">
-                  <RequestButton
-                    newMarkers={newMarkers}
-                    handleAdd={handleAdd}
-                    image={{ docId: imageId }}
-                    onClose={handleClose}
-                  />
-                </div>
-              </>
+              <ImageArea
+                handleImageClick={handleImageClick}
+                imageUrl={imageData.img_url}
+                itemPositions={itemPositions}
+                newMarkers={newMarkers}
+                setNewMarkers={setNewMarkers}
+              />
             )}
           </div>
-          <ScrollIndicator containerRef={scrollContainerRef} />
+        </div>
+
+        {/* 하단 버튼 */}
+        <div className="flex-shrink-0 p-6 pt-0">
+          <RequestButton
+            newMarkers={newMarkers}
+            handleAdd={handleAdd}
+            image={{ docId: imageId }}
+            onClose={handleClose}
+          />
         </div>
       </div>
     </div>
