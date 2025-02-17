@@ -45,11 +45,17 @@ export function ContextStepSidebar({
     { value: 'news', label: t.request.steps.context.questions.source.options.news },
   ];
 
-  const handleAnswerChange = (value: string) => {
-    const newAnswers = { ...answers, location: value };
-    setAnswers(newAnswers);
-    onAnswerChange(newAnswers);
-    setStep('source');
+  const handleLocationClick = (value: string) => {
+    if (value === answers.location) {
+      const newAnswers = { ...answers, location: '' };
+      setAnswers(newAnswers);
+      onAnswerChange(newAnswers);
+    } else {
+      const newAnswers = { ...answers, location: value };
+      setAnswers(newAnswers);
+      onAnswerChange(newAnswers);
+      setStep('source');
+    }
   };
 
   const handleSourceOptionSelect = (value: string) => {
@@ -114,39 +120,33 @@ export function ContextStepSidebar({
             </div>
 
             {step === 'location' ? (
-              <RadioGroup
-                value={answers.location || ''}
-                onValueChange={handleAnswerChange}
-                className="space-y-2"
-              >
+              <div className="space-y-2">
                 {locationOptions.map((option) => (
                   <motion.div
                     key={option.value}
-                    className={`flex items-center space-x-3 p-2 rounded-lg transition-all
+                    onClick={() => handleLocationClick(option.value)}
+                    className={`flex items-center space-x-3 p-2 rounded-lg transition-all cursor-pointer
                       ${answers.location === option.value ? 'bg-zinc-800/90' : 'hover:bg-zinc-800/50'}`}
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
                   >
-                    <RadioGroupItem
-                      value={option.value}
-                      id={option.value}
-                      className="w-4 h-4"
-                    />
-                    <Label
-                      htmlFor={option.value}
-                      className="flex-1 cursor-pointer text-sm text-zinc-300"
-                    >
+                    <div className="w-4 h-4 rounded-full border border-zinc-600 flex items-center justify-center">
+                      {answers.location === option.value && (
+                        <div className="w-2 h-2 rounded-full bg-[#EAFD66]" />
+                      )}
+                    </div>
+                    <Label className="flex-1 cursor-pointer text-sm text-zinc-300">
                       {option.label}
                     </Label>
                   </motion.div>
                 ))}
-              </RadioGroup>
+              </div>
             ) : (
               <div className="space-y-2">
                 {sourceOptions.map((option) => (
                   <motion.div
                     key={option.value}
-                    className={`p-2 rounded-lg transition-all
+                    className={`flex items-center space-x-3 p-2 rounded-lg transition-all cursor-pointer
                       ${editingSourceId === option.value ? 'bg-zinc-800/90' : 'hover:bg-zinc-800/50'}`}
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
@@ -161,27 +161,19 @@ export function ContextStepSidebar({
                         autoFocus
                       />
                     ) : (
-                      <RadioGroup
-                        value={answers.source || ''}
-                        onValueChange={handleSourceOptionSelect}
+                      <div 
+                        className="flex items-center space-x-3 w-full"
+                        onClick={() => handleSourceOptionSelect(option.value)}
                       >
-                        <div 
-                          className="flex items-center space-x-3 cursor-pointer"
-                          onClick={() => handleSourceOptionSelect(option.value)}
-                        >
-                          <RadioGroupItem
-                            value={option.value}
-                            id={`source-${option.value}`}
-                            className="w-4 h-4"
-                          />
-                          <Label
-                            htmlFor={`source-${option.value}`}
-                            className="flex-1 cursor-pointer text-sm text-zinc-300"
-                          >
-                            {option.label}
-                          </Label>
+                        <div className="w-4 h-4 rounded-full border border-zinc-600 flex items-center justify-center">
+                          {answers.source === option.value && (
+                            <div className="w-2 h-2 rounded-full bg-[#EAFD66]" />
+                          )}
                         </div>
-                      </RadioGroup>
+                        <Label className="flex-1 cursor-pointer text-sm text-zinc-300">
+                          {option.label}
+                        </Label>
+                      </div>
                     )}
                   </motion.div>
                 ))}

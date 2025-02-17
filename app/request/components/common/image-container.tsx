@@ -99,16 +99,42 @@ export function ImageContainer({
               )}
             </label>
           ) : step === 3 ? (
-            selectedImage && (
-              <ImageMarker
-                imageUrl={selectedImage}
-                points={points}
-                onPointsChange={onPointsChange}
-                selectedPointIndex={null}
-                className="w-full pointer-events-none"
-                disableEditing={true}
-              />
-            )
+            <>
+              {selectedImage && (
+                <ImageMarker
+                  imageUrl={selectedImage}
+                  points={points}
+                  onPointsChange={onPointsChange}
+                  selectedPointIndex={null}
+                  className="w-full pointer-events-none"
+                  disableEditing={true}
+                />
+              )}
+              {contextAnswers?.location && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="absolute top-3 right-3 bg-gray-900/80 backdrop-blur-sm px-3 py-1.5 rounded-full z-10"
+                >
+                  <div className="flex items-center gap-2 text-sm text-gray-200">
+                    <svg 
+                      className="w-4 h-4" 
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth={2} 
+                        d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
+                      />
+                    </svg>
+                    <span className="leading-none pt-[2px]">{getLocationLabel(contextAnswers.location)}</span>
+                  </div>
+                </motion.div>
+              )}
+            </>
           ) : (
             selectedImage && (
               <ImageMarker
@@ -127,32 +153,6 @@ export function ImageContainer({
           )}
         </div>
       </div>
-      
-      {/* Location indicator */}
-      {contextAnswers?.location && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="absolute top-3 right-36 bg-gray-900/80 backdrop-blur-sm px-3 py-1.5 rounded-full"
-        >
-          <div className="flex items-center gap-2 text-sm text-gray-200">
-            <svg 
-              className="w-4 h-4" 
-              fill="none" 
-              viewBox="0 0 24 24" 
-              stroke="currentColor"
-            >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
-              />
-            </svg>
-            <span className="leading-none pt-[2px]">{getLocationLabel(contextAnswers.location)}</span>
-          </div>
-        </motion.div>
-      )}
     </div>
   );
 }
