@@ -14,6 +14,8 @@ interface StatusModalProps {
   title?: string;
   message?: string;
   onFeedbackSubmit?: (feedback: string) => void;
+  isLoading?: boolean;
+  onLoginRequired?: () => void;
 }
 
 export function StatusModal({
@@ -24,6 +26,8 @@ export function StatusModal({
   title: customTitle,
   message: customMessage,
   onFeedbackSubmit,
+  isLoading = false,
+  onLoginRequired,
 }: StatusModalProps) {
   const { t } = useLocaleContext();
   const [isClosing, setIsClosing] = useState(false);
@@ -31,10 +35,10 @@ export function StatusModal({
   const modalRef = useRef<HTMLDivElement>(null);
   const { icon: Icon, className, bgClassName } = statusConfig[type];
 
-  const { title, message } = messageKey
+  const { title, message } = messageKey && type !== 'loading'
     ? {
-        title: (t.common.status.messages[type] as any)[messageKey]?.title ?? t.common.status[type],
-        message: (t.common.status.messages[type] as any)[messageKey]?.message ?? '',
+        title: (t.common.status.messages[type as keyof typeof t.common.status.messages] as any)?.[messageKey]?.title ?? t.common.status[type],
+        message: (t.common.status.messages[type as keyof typeof t.common.status.messages] as any)?.[messageKey]?.message ?? '',
       }
     : {
         title: customTitle ?? t.common.status[type],
@@ -46,9 +50,12 @@ export function StatusModal({
     const timer = setTimeout(() => {
       onClose();
       setFeedback('');
+      if (type === 'warning' && messageKey === 'login' && onLoginRequired) {
+        onLoginRequired();
+      }
     }, ANIMATION_DURATION);
     return () => clearTimeout(timer);
-  }, [onClose]);
+  }, [onClose, type, messageKey, onLoginRequired]);
 
   const handleSubmit = () => {
     if (feedback.trim() && onFeedbackSubmit) {
@@ -105,31 +112,34 @@ export function StatusModal({
         )}
       >
         <div className="flex items-start space-x-3">
-          <Icon className={cn('h-5 w-5 shrink-0', className)} />
-          <div className="flex-1 min-w-0">
-            <h3 className={cn('text-sm font-medium text-white', className)}>
-              {title}
-            </h3>
-            <p className="mt-1 text-sm text-gray-300 break-words">{message}</p>
-            
-            {type === 'error' && (
-              <div className="mt-3">
-                <textarea
-                  value={feedback}
-                  onChange={(e) => setFeedback(e.target.value)}
-                  placeholder="문제 상황에 대해 자세히 알려주세요"
-                  className={cn(
-                    'w-full px-3 py-2 text-sm rounded-lg',
-                    'bg-black/20 border border-white/10',
-                    'placeholder-gray-500 text-gray-300',
-                    'focus:outline-none focus:border-white/20',
-                    'resize-none'
-                  )}
-                  rows={3}
-                />
+          {type === 'loading' ? (
+            <>
+              <div className="animate-spin h-5 w-5 shrink-0">
+                <svg className="text-[#EAFD66]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
               </div>
-            )}
-          </div>
+              <div className="flex-1 min-w-0">
+                <h3 className={cn('text-sm font-medium text-white', className)}>
+                  {title}
+                </h3>
+                <p className="mt-1 text-sm text-gray-300 break-words">
+                  잠시만 기다려주세요...
+                </p>
+              </div>
+            </>
+          ) : (
+            <>
+              <Icon className={cn('h-5 w-5 shrink-0', className)} />
+              <div className="flex-1 min-w-0">
+                <h3 className={cn('text-sm font-medium text-white', className)}>
+                  {title}
+                </h3>
+                <p className="mt-1 text-sm text-gray-300 break-words">{message}</p>
+              </div>
+            </>
+          )}
         </div>
         <div className="mt-4 flex justify-end">
           <button

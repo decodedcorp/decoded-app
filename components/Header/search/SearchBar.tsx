@@ -69,6 +69,7 @@ export function SearchBar({ onSearch }: { onSearch: (query: string) => void }) {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         searchQuery={searchQuery}
+        onSearchReset={() => setSearchQuery("")}
       />
     </div>
   );

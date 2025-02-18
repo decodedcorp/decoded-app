@@ -43,61 +43,67 @@ export default function ModalTestPage() {
         
         <div className="grid grid-cols-2 gap-4">
           <button
-            onClick={() =>
-              showModal({
-                type: 'success',
-                messageKey: 'request',
-              })
-            }
+            onClick={() => {
+              showModal({ type: 'loading' });
+              setTimeout(() => {
+                showModal({
+                  type: 'success',
+                  messageKey: 'request',
+                });
+              }, 1000);
+            }}
             className="rounded-md bg-green-500 px-4 py-2 text-white hover:bg-green-600"
           >
             요청 성공 모달
           </button>
           
           <button
-            onClick={() =>
-              showModal({
-                type: 'success',
-                messageKey: 'provide',
-              })
-            }
+            onClick={() => {
+              showModal({ type: 'loading' });
+              setTimeout(() => {
+                showModal({
+                  type: 'success',
+                  messageKey: 'provide',
+                });
+              }, 1000);
+            }}
             className="rounded-md bg-green-500 px-4 py-2 text-white hover:bg-green-600"
           >
             제공 성공 모달
           </button>
           
           <button
-            onClick={() =>
+            onClick={() => {
               showModal({
                 type: 'error',
                 messageKey: 'request',
-              })
-            }
+              });
+            }}
             className="rounded-md bg-red-500 px-4 py-2 text-white hover:bg-red-600"
           >
             에러 모달
           </button>
           
           <button
-            onClick={() =>
+            onClick={() => {
               showModal({
                 type: 'warning',
                 messageKey: 'login',
-              })
-            }
+              });
+            }}
             className="rounded-md bg-yellow-500 px-4 py-2 text-white hover:bg-yellow-600"
           >
             로그인 경고 모달
           </button>
 
           <button
-            onClick={() =>
+            onClick={() => {
               showModal({
                 type: 'success',
                 title: '커스텀 성공',
                 message: '직접 작성한 메시지입니다.',
-              })
-            }
+              });
+            }}
             className="rounded-md bg-green-500 px-4 py-2 text-white hover:bg-green-600"
           >
             커스텀 메시지 모달

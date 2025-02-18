@@ -6,14 +6,23 @@ import { LocaleContext } from "@/lib/contexts/locale-context";
 import { langMap, Locale } from "@/lib/lang/locales";
 import { StatusModal } from '@/components/ui/modal/status-modal';
 import { useStatusStore } from '@/components/ui/modal/status-modal/utils/store';
+import { useLoginModalStore } from '@/components/auth/login-modal/store';
 
 function GlobalStatusModal() {
   const { isOpen, type, messageKey, title, message, closeStatus } = useStatusStore();
+  const { openLoginModal } = useLoginModalStore();
+
+  const handleStatusClose = () => {
+    closeStatus();
+    if (type === 'warning' && messageKey === 'login') {
+      openLoginModal();
+    }
+  };
 
   return (
     <StatusModal
       isOpen={isOpen}
-      onClose={closeStatus}
+      onClose={handleStatusClose}
       type={type}
       messageKey={messageKey}
       title={title}

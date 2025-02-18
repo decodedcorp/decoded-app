@@ -18,6 +18,7 @@ import {
   StatusMessageKey,
 } from '@/components/ui/modal/status-modal';
 import { useProtectedAction } from '@/lib/hooks/auth/use-protected-action';
+import { useStatusMessage } from '@/components/ui/modal/status-modal/utils/use-status-message';
 
 interface ContextAnswer {
   location: string;
@@ -49,6 +50,7 @@ export function RequestForm() {
     isOpen: false,
     onClose: () => setModalConfig((prev) => ({ ...prev, isOpen: false })),
   });
+  const { showLoadingStatus } = useStatusMessage();
 
   useEffect(() => {
     switch (currentStep) {
@@ -67,55 +69,44 @@ export function RequestForm() {
   }, [currentStep, selectedImage, points, contextAnswers?.location]);
 
   const handleSubmit = withAuth(async (userId) => {
-    try {
-      if (!imageFile || points.length === 0 || !contextAnswers) {
-        setModalConfig({
-          type: 'error',
-          isOpen: true,
-          onClose: () => setModalConfig((prev) => ({ ...prev, isOpen: false })),
-        });
-        return;
-      }
-
-      const buffer = await imageFile?.arrayBuffer();
-      const base64Image = arrayBufferToBase64(buffer);
-
-      const requestData: RequestImage = {
-        imageFile: base64Image,
-        requestedItems: points.map((point) => ({
-          item_class: null,
-          item_sub_class: null,
-          category: null,
-          sub_category: null,
-          product_type: null,
-          context: point.context || null,
-          position: {
-            left: `${point.x}`,
-            top: `${point.y}`,
-          },
-        })),
-        requestBy: userId,
-        context: contextAnswers.location,
-        source: contextAnswers?.source || null,
-        metadata: {},
-      };
-
-      const response = await createRequest(requestData, userId);
-      console.log('=== Request Created ===');
-      console.log('Response:', response);
-      setModalConfig({
-        type: 'success',
-        isOpen: true,
-        onClose: () => setModalConfig((prev) => ({ ...prev, isOpen: false })),
-      });
-    } catch (error) {
-      console.error('=== Submit Error ===');
-      console.error('Error:', error);
+    if (!imageFile || points.length === 0 || !contextAnswers) {
       setModalConfig({
         type: 'error',
         isOpen: true,
         onClose: () => setModalConfig((prev) => ({ ...prev, isOpen: false })),
       });
+      return;
+    }
+
+    const buffer = await imageFile?.arrayBuffer();
+    const base64Image = arrayBufferToBase64(buffer);
+
+    const requestData: RequestImage = {
+      imageFile: base64Image,
+      requestedItems: points.map((point) => ({
+        item_class: null,
+        item_sub_class: null,
+        category: null,
+        sub_category: null,
+        product_type: null,
+        context: point.context || null,
+        position: {
+          left: `${point.x}`,
+          top: `${point.y}`,
+        },
+      })),
+      requestBy: userId,
+      context: contextAnswers.location,
+      source: contextAnswers?.source || null,
+      metadata: {},
+    };
+
+    try {
+      await createRequest(requestData, userId);
+      router.push('/');  // 성공 후 마이페이지로 이동
+    } catch (error) {
+      console.error('=== Submit Error ===');
+      console.error('Error:', error);
     }
   });
 

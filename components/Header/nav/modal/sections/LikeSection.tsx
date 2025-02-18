@@ -20,8 +20,14 @@ interface LikedItem {
 }
 
 interface LikesData {
-  images: { likes: LikedImage[] | null; next_id: string | null };
-  items: { likes: LikedItem[] | null; next_id: string | null };
+  images: {
+    likes: LikedImage[];
+    next_id: string | null;
+  };
+  items: {
+    likes: LikedItem[];
+    next_id: string | null;
+  };
 }
 
 type LikeCategory = "all" | "images" | "items";
@@ -45,9 +51,9 @@ export function LikeSection({
       </div>
     );
   }
-  console.log(data);
-  const hasNoLikes =
-    !data?.images?.likes?.length && !data?.items?.likes?.length;
+
+  const hasNoLikes = 
+    (!data.images?.likes?.length && !data.items?.likes?.length);
 
   if (hasNoLikes) {
     return (
@@ -94,9 +100,10 @@ export function LikeSection({
       </div>
 
       {/* 좋아요 목록 */}
-      <div className="grid grid-cols-2 gap-2 max-h-[500px] overflow-y-auto p-0.5">
+      <div className="grid grid-cols-2 gap-2 max-h-[400px] overflow-y-auto p-0.5">
+        {/* 이미지 목록 */}
         {(activeCategory === "all" || activeCategory === "images") &&
-          (data.images.likes as LikedImage[])?.map((image) => (
+          data.images?.likes?.map((image) => (
             <Link
               href={`/details/${image.image_doc_id}`}
               key={image.image_doc_id}
@@ -112,8 +119,9 @@ export function LikeSection({
             </Link>
           ))}
 
+        {/* 아이템 목록 */}
         {(activeCategory === "all" || activeCategory === "items") &&
-          (data.items?.likes as LikedItem[])?.map((item) => (
+          data.items?.likes?.map((item) => (
             <div
               key={item.item_doc_id}
               className="bg-[#1A1A1A] rounded-lg p-3 flex flex-col gap-2"

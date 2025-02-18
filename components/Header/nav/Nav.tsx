@@ -6,7 +6,7 @@ import { LoginButton } from './LoginButton';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useLocaleContext } from '@/lib/contexts/locale-context';
-import { Menu, User, Search } from 'lucide-react';
+import { Menu, User, Search, PlusCircle } from 'lucide-react';
 import { cn } from '@/lib/utils/style';
 import { useState } from 'react';
 import { MypageModal } from './modal/MypageModal';
@@ -38,6 +38,12 @@ function Nav({
             </Link>
 
             <div className="flex items-center gap-3">
+              <Link
+                href="/request"
+                className="p-2 text-gray-400 hover:text-[#EAFD66] transition-colors duration-200"
+              >
+                <PlusCircle className="w-5 h-5" />
+              </Link>
               <button
                 onClick={onSearchToggle}
                 className={cn(

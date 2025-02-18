@@ -117,7 +117,7 @@ export interface ItemDocument {
   like: number;
 }
 
-export interface ItemDetailResponse {
+export interface ItemDetailResponse  {
   docs: {
     _id: string;
     requester: string;

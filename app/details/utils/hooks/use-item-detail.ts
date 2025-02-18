@@ -10,6 +10,11 @@ async function fetchItemDetail(itemId: string): Promise<ItemDetailResponse> {
       `item/${itemId}`,
       'GET'
     );
+    
+    if (!response) {
+      throw new Error('No response received from the server');
+    }
+
     return response;
   } catch (error) {
     console.error('Error fetching item detail:', error);

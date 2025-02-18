@@ -16,7 +16,7 @@ interface ProvideItem {
 interface Provide {
   image_doc_id: string;
   image_url: string;
-  items: ProvideItem[];
+  items: ProvideItem[] | null;
 }
 
 interface ProvidesData {
@@ -113,14 +113,14 @@ export function ProvideSection({
               <div className="flex-1">
                 <div className="text-sm text-gray-400 mb-1">원본 이미지</div>
                 <div className="text-xs text-gray-500">
-                  {provide.items.length}개의 아이템 제공
+                  제공된 이미지
                 </div>
               </div>
             </Link>
 
             {/* 제공한 아이템 목록 */}
             <div className="space-y-2">
-              {provide.items.map((item) => (
+              {provide.items?.map((item) => (
                 <div
                   key={item.item_doc_id}
                   className="flex gap-3 p-2 rounded-lg bg-black/20"

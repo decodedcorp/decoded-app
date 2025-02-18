@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { requestAPI } from '@/lib/api/endpoints/request';
 import type { RequestImage, APIResponse } from '@/lib/api/_types/request';
+import { useStatusMessage } from '@/components/ui/modal/status-modal/utils/use-status-message';
 
 interface UseRequestDataReturn {
   isLoading: boolean;
@@ -11,12 +12,12 @@ interface UseRequestDataReturn {
   refreshRequests: () => Promise<void>;
 }
 
-
 export function useRequestData(initialData: any): UseRequestDataReturn {
   const [requests, setRequests] = useState<RequestImage[]>([]);
   const [currentRequest, setCurrentRequest] = useState<RequestImage | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const { showLoadingStatus } = useStatusMessage();
 
   const createRequest = async (data: RequestImage, userDocId: string): Promise<APIResponse<void>> => {
     try {
@@ -24,7 +25,10 @@ export function useRequestData(initialData: any): UseRequestDataReturn {
       console.log('User Doc ID:', userDocId);
       console.log('Request Data:', data);
 
-      return await requestAPI.createImageRequest(userDocId, data);
+      return await showLoadingStatus(
+        requestAPI.createImageRequest(userDocId, data),
+        { type: 'success', messageKey: 'request' }
+      );
     } catch (error) {
       console.error('Request Error Details:', error);
       throw error;

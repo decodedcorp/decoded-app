@@ -3,8 +3,7 @@
 import { RequestButtonProps } from '../types';
 import { networkManager } from '@/lib/network/network';
 import { useStatusStore } from '@/components/ui/modal/status-modal/utils/store';
-import { handleApiError } from '@/lib/api/core/error-handler';
-import { AxiosError } from 'axios';
+import { useStatusMessage } from '@/components/ui/modal/status-modal/utils/use-status-message';
 
 export function RequestButton({
   newMarkers,
@@ -13,6 +12,7 @@ export function RequestButton({
   onClose,
 }: RequestButtonProps) {
   const setStatus = useStatusStore((state) => state.setStatus);
+  const { showLoadingStatus } = useStatusMessage();
 
   const handleRequest = async () => {
     if (sessionStorage.getItem('USER_DOC_ID') === null) {
@@ -35,7 +35,9 @@ export function RequestButton({
     };
 
     try {
-      await networkManager.request(
+      setStatus({ type: 'loading', messageKey: 'request' });
+      
+      const result = await networkManager.request(
         `user/${sessionStorage.getItem('USER_DOC_ID')}/image/${
           image.docId
         }/request/add`,
@@ -43,6 +45,17 @@ export function RequestButton({
         requestAddItem
       );
 
+      // undefined는 409 상황
+      if (result === undefined) {
+        setStatus({
+          type: 'warning',
+          messageKey: 'duplicate',
+          message: '이미 요청한 아이템입니다.',
+        });
+        return;
+      }
+
+      // 성공 처리
       handleAdd([]);
       setStatus({
         type: 'success',
@@ -50,9 +63,11 @@ export function RequestButton({
       });
       onClose?.();
     } catch (error: any) {
+      // 기타 에러 처리
       setStatus({
-        type: 'warning',
-        messageKey: 'duplicate',
+        type: 'error',
+        messageKey: 'request',
+        message: error.message || '요청 처리 중 오류가 발생했습니다.',
       });
     }
   };
