@@ -1,9 +1,5 @@
 import { networkManager } from '@/lib/network/network';
-import type { 
-  ImageData, 
-  DetailPageState, 
-  ItemDocument
-} from '../_types/image';
+import type { ImageData, DetailPageState, ItemDocument } from '../_types/image';
 import type { APIResponse } from '../_types/request';
 import type { APIImageResponse } from '@/app/(main)/sections/discover/client/activity-feed/utils/types/image';
 
@@ -13,13 +9,14 @@ interface ImageDetailResponse {
 
 export const imagesAPI = {
   // Get single image detail
-  getImageDetail: async (imageId: string): Promise<APIResponse<ImageDetailResponse>> => {
+  getImageDetail: async (
+    imageId: string
+  ): Promise<APIResponse<ImageDetailResponse>> => {
     try {
-      const response = await networkManager.request<APIResponse<ImageDetailResponse>>(
-        `image/${imageId}`,
-        'GET'
-      );
-      
+      const response = await networkManager.request<
+        APIResponse<ImageDetailResponse>
+      >(`image/${imageId}`, 'GET');
+
       console.log('Raw API response:', response); // 디버깅용 로그
 
       if (!response || !response.data) {
@@ -36,14 +33,16 @@ export const imagesAPI = {
         error,
         imageId,
         stack: error instanceof Error ? error.stack : undefined,
-        message: error instanceof Error ? error.message : 'Unknown error'
+        message: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
   },
 
   // Get image items
-  getImageItems: async (imageId: string): Promise<APIResponse<ItemDocument[]>> => {
+  getImageItems: async (
+    imageId: string
+  ): Promise<APIResponse<ItemDocument[]>> => {
     try {
       const response = await networkManager.request(
         `image/${imageId}/items`,
@@ -79,10 +78,7 @@ export const imagesAPI = {
   // Get featured images
   getFeaturedImages: async (): Promise<APIResponse<ImageData[]>> => {
     try {
-      const response = await networkManager.request(
-        'image/featured',
-        'GET'
-      );
+      const response = await networkManager.request('image/featured', 'GET');
       return response;
     } catch (error) {
       throw error;
@@ -96,9 +92,12 @@ export const imagesAPI = {
         'image',
         'GET'
       );
+      if (!response) {
+        throw new Error('No response received from the server');
+      }
       return response;
     } catch (error) {
       throw error;
     }
-  }
-}; 
+  },
+};

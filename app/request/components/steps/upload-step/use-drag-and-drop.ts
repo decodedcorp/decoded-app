@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useLocaleContext } from "@/lib/contexts/locale-context";
-import { useState, useCallback } from "react";
+import { useLocaleContext } from '@/lib/contexts/locale-context';
+import { useState, useCallback } from 'react';
 
 interface UseDragAndDropProps {
   onFileSelect: (file: File) => void;
@@ -19,7 +19,7 @@ interface UseDragAndDropReturn {
 
 export function useDragAndDrop({
   onFileSelect,
-  acceptedFileTypes = ["image/jpeg", "image/jpg", "image/png"],
+  acceptedFileTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
   maxSizeInMB = 5,
 }: UseDragAndDropProps): UseDragAndDropReturn {
   const { t } = useLocaleContext();
@@ -35,7 +35,7 @@ export function useDragAndDrop({
       if (file.size > maxSizeInMB * 1024 * 1024) {
         alert(
           t.common.errors.fileSizeExceeded.replace(
-            "{{count}}",
+            '{{count}}',
             maxSizeInMB.toString()
           )
         );

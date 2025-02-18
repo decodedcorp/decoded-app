@@ -48,6 +48,10 @@ export const common = {
           message: "Successfully saved.",
         },
       },
+      loading: {
+        title: "Loading",
+        message: "Please wait a moment.",
+      },
       error: {
         default: {
           title: "Error Occurred",

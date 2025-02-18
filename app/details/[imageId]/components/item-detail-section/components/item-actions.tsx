@@ -71,25 +71,45 @@ export function ItemActions({ itemId, likeCount }: ItemActionsProps) {
 
     try {
       setIsSubmitting(true);
-      const path = `user/${userId}/image/${imageId}/provide/item/${itemId}`;
+      setStatus({ type: 'loading', messageKey: 'provide' });
       
-      const response = await networkManager.request(path, "POST", {
+      const path = `user/${userId}/image/${imageId}/provide/item/${itemId}`;
+      const result = await networkManager.request(path, "POST", {
         provider: userId,
         link: provideData.links[0]
       });
       
+      if (result === undefined) {
+        setStatus({
+          type: 'warning',
+          messageKey: 'duplicate',
+          message: '이미 제공한 링크입니다.',
+        });
+        return;
+      }
+
       setShowLinkForm(false);
       setProvideData({ links: [] });
-      
       setStatus({
         type: 'success',
         messageKey: 'provide',
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting link:", error);
+      
+      if (error.message === 'Network Error') {
+        setStatus({
+          type: 'warning',
+          messageKey: 'duplicate',
+          message: '이미 제공한 링크입니다.',
+        });
+        return;
+      }
+
       setStatus({
-        type: 'warning',
-        messageKey: 'duplicate',
+        type: 'error',
+        messageKey: 'provide',
+        message: error.message || '링크 제공 중 오류가 발생했습니다.',
       });
     } finally {
       setIsSubmitting(false);

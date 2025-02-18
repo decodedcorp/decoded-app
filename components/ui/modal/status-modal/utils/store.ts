@@ -7,6 +7,9 @@ export const useStatusStore = create<StatusStore>((set) => ({
   messageKey: undefined,
   title: undefined,
   message: undefined,
+  isLoading: false,
   setStatus: (config: StatusConfig) => set({ ...config, isOpen: true }),
   closeStatus: () => set({ isOpen: false }),
+  startLoading: () => set({ isOpen: true, type: 'loading' }),
+  finishLoading: (config: StatusConfig) => set({ ...config, isOpen: true }),
 })); 

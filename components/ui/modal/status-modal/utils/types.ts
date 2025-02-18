@@ -1,4 +1,4 @@
-export type StatusType = 'success' | 'error' | 'warning';
+export type StatusType = 'success' | 'error' | 'warning' | 'loading';
 
 export type StatusMessageKey = 
   | 'request'
@@ -9,13 +9,13 @@ export type StatusMessageKey =
   | 'delete'
   | 'login'
   | 'duplicate';
-  
 
 export interface StatusConfig {
   type: StatusType;
   messageKey?: StatusMessageKey;
   title?: string;
   message?: string;
+  isLoading?: boolean;
 }
 
 export interface StatusStore {
@@ -24,6 +24,7 @@ export interface StatusStore {
   messageKey?: StatusMessageKey;
   title?: string;
   message?: string;
+  isLoading?: boolean;
   setStatus: (config: StatusConfig) => void;
   closeStatus: () => void;
 } 

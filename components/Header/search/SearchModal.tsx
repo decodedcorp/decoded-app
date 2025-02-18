@@ -19,9 +19,10 @@ interface SearchModalProps {
   results?: SearchResult[];
   onClose: () => void;
   searchQuery: string;
+  onSearchReset: () => void;
 }
 
-export function SearchModal({ isOpen, onClose }: SearchModalProps) {
+export function SearchModal({ isOpen, onClose, onSearchReset }: SearchModalProps) {
   const { history, clearHistory } = useSearchHistory();
   const [trendingKeywords, setTrendingKeywords] = useState<string[]>([]);
   console.log(history);
@@ -44,6 +45,11 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
       fetchTrendingKeywords();
     }
   }, [isOpen]);
+
+  const handleSearchClick = () => {
+    onSearchReset();
+    onClose();
+  };
 
   if (!isOpen) return null;
 
@@ -77,6 +83,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                 <Link
                   key={item.timestamp}
                   href={`/search?q=${encodeURIComponent(item.keyword)}`}
+                  onClick={handleSearchClick}
                   className="group flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-all"
                 >
                   <Search className="w-4 h-4 text-white/20 group-hover:text-white/40 transition-colors" />
@@ -113,28 +120,29 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
               .map((keyword, index) => (
                 <Link
                   href={`/search?q=${encodeURIComponent(keyword)}`}
+                  onClick={handleSearchClick}
                   key={index}
                   className="group flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-all"
-              >
-                <span
-                  className={cn(
-                    pretendardMedium.className,
-                    "text-lg min-w-[24px]",
-                    index < 3 ? "text-[#EAFD66]" : "text-white/20"
-                  )}
                 >
-                  {index + 1}
-                </span>
-                <span
-                  className={cn(
-                    pretendardRegular.className,
-                    "text-sm text-white/60 group-hover:text-white/80 transition-colors"
-                  )}
-                >
-                  {keyword}
-                </span>
-              </Link>
-            ))}
+                  <span
+                    className={cn(
+                      pretendardMedium.className,
+                      "text-lg min-w-[24px]",
+                      index < 3 ? "text-[#EAFD66]" : "text-white/20"
+                    )}
+                  >
+                    {index + 1}
+                  </span>
+                  <span
+                    className={cn(
+                      pretendardRegular.className,
+                      "text-sm text-white/60 group-hover:text-white/80 transition-colors"
+                    )}
+                  >
+                    {keyword}
+                  </span>
+                </Link>
+              ))}
           </div>
         </div>
       </div>

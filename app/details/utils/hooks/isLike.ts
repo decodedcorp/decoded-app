@@ -25,7 +25,7 @@ export function useIsLike() {
         `user/${userId}/islike?doc_type=${docType}&doc_id=${docId}`,
         'GET'
       );
-      return response.data.is_like;
+      return response?.data.is_like ?? false;
     } catch (error) {
       console.error('Error fetching like status:', error);
       return false;

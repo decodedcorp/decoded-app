@@ -156,9 +156,15 @@ export function useAuth() {
 
         console.log('[Login] Backend response:', loginRes);
 
+        if (!loginRes) {
+          throw new Error('No response received from the server');
+        }
+
         if (loginRes.status_code !== 200 || !loginRes.data) {
           throw new Error('[Login] Backend login failed');
         }
+
+        
 
         // 백엔드 응답 데이터 저장
         const { salt, doc_id, access_token } = loginRes.data;
@@ -255,6 +261,10 @@ export function useAuth() {
               tracking: false,
             },
           });
+
+          if (!loginRes) {
+            throw new Error('[Login] Backend login failed');
+          }
 
           if (loginRes.status_code !== 200 || !loginRes.data) {
             throw new Error('[Login] Backend login failed');

@@ -62,7 +62,7 @@ export class NetworkManager {
     data: any = null,
     retries = 3,
     accessToken?: string
-  ): Promise<T> {
+  ): Promise<T | undefined> {
     try {
       const url = `${this.config.service}/${path}`;
       const storedToken =
@@ -84,38 +84,46 @@ export class NetworkManager {
           data,
           headers,
           maxRedirects: 0,
-          validateStatus: (status) => status >= 200 && status < 300,
+          validateStatus: (status) => status < 500,
           timeout: 10000,
         });
 
-        return response.data;
-      } catch (error: any) {
-        // 에러 응답 문자열에서 409 확인
-        const errorString = error.toString();
-        
-        // net::ERR_FAILED 409 (Conflict) 패턴 확인
-        if (errorString.match(/ERR_FAILED.*409|409.*Conflict/i)) {
-          throw {
-            status: 409,
-            message: '이미 요청한 아이템입니다.',
-          };
+        // 409 Conflict 처리
+        if (response.status === 409) {
+          console.log('[NetworkManager] Conflict response:', { path, method });
+          return undefined;
         }
 
-        // 일반적인 에러 처리
-        throw {
-          status: error.response?.status || 500,
-          message: error.response?.data?.message || error.message
-        };
+        return response.data;
+      } catch (error: any) {
+        // CORS 또는 네트워크 에러인 경우 409 확인
+        if (error.message === 'Network Error' && 
+            (path.includes('/request/add') || path.includes('/provide/item/'))) {
+          console.log('[NetworkManager] Possible conflict detected from network error');
+          return undefined;
+        }
+
+        throw error;
       }
     } catch (error: any) {
-      // 이미 409로 처리된 에러는 그대로 전달
-      if (error.status === 409) {
-        throw error;
+      console.error('[NetworkManager] Request error:', { 
+        path, 
+        method,
+        error: {
+          message: error.message,
+          status: error.response?.status,
+          data: error.response?.data
+        }
+      });
+
+      // 명시적인 409 응답
+      if (error.response?.status === 409) {
+        return undefined;
       }
 
       throw {
-        status: 500,
-        message: error.message || "[NetworkManager] Request failed"
+        status: error.response?.status || 500,
+        message: error.response?.data?.message || error.message || "Request failed"
       };
     }
   }
@@ -180,7 +188,7 @@ export class NetworkManager {
 
       console.log("[NetworkManager] Temporary token response:", response);
 
-      if (response.status_code !== 200 || !response.data?.access_token) {
+      if (!response || response.status_code !== 200 || !response.data?.access_token) {
         throw new Error("[NetworkManager] Failed to fetch temporary token.");
       }
 

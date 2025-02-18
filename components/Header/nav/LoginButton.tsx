@@ -6,15 +6,16 @@ import { useAuth } from "@/lib/hooks/features/auth/useAuth";
 import useModalClose from "@/lib/hooks/common/useModalClose";
 import { cn } from "@/lib/utils/style";
 import { useLocaleContext } from "@/lib/contexts/locale-context";
+import { useLoginModalStore } from "@/components/auth/login-modal/store";
 
 export function LoginButton() {
   const { t } = useLocaleContext();
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isFirstRender, setIsFirstRender] = useState(true);
   const { isLogin, isInitialized, isLoading, checkLoginStatus } = useAuth();
+  const { isOpen: isLoginModalOpen, openLoginModal, closeLoginModal } = useLoginModalStore();
 
   const { modalRef } = useModalClose({
-    onClose: () => setIsLoginModalOpen(false),
+    onClose: closeLoginModal,
     isOpen: isLoginModalOpen,
   });
 
@@ -38,7 +39,7 @@ export function LoginButton() {
     const handleMessage = (event: MessageEvent) => {
       if (event.origin === window.location.origin && event.data?.id_token) {
         console.log("Token received, closing modal");
-        setIsLoginModalOpen(false);
+        closeLoginModal();
       }
     };
     
@@ -48,11 +49,11 @@ export function LoginButton() {
       clearInterval(intervalId);
       window.removeEventListener('message', handleMessage);
     };
-  }, [checkLoginStatus]);
+  }, [checkLoginStatus, closeLoginModal]);
 
   const handleDisconnect = () => {
     handleDisconnect();
-    setIsLoginModalOpen(false);  // 모달 닫기 추가
+    closeLoginModal();  // 모달 닫기 추가
   };
 
   // 로딩 상태에 따른 텍스트 표시
@@ -73,14 +74,14 @@ export function LoginButton() {
           "animate-pulse": isLoading,
           "opacity-70": !isInitialized,
         })}
-        onClick={() => !isLoading && setIsLoginModalOpen(true)}
+        onClick={() => !isLoading && openLoginModal()}
       >
         {buttonText}
       </span>
       {!isLoading && (
         <MypageModal
           isOpen={isLoginModalOpen}
-          onClose={() => setIsLoginModalOpen(false)}
+          onClose={closeLoginModal}
         />
       )}
     </div>

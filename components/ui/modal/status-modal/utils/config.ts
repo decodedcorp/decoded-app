@@ -1,8 +1,8 @@
-import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { CheckCircle, XCircle, AlertCircle, Loader2 } from 'lucide-react';
 import type { StatusType } from './types';
 
 interface StatusStyleConfig {
-  icon: typeof CheckCircle | typeof XCircle | typeof AlertCircle;
+  icon: typeof CheckCircle | typeof XCircle | typeof AlertCircle | typeof Loader2;
   className: string;
   bgClassName: string;
 }
@@ -23,6 +23,11 @@ export const statusConfig: Record<StatusType, StatusStyleConfig> = {
     className: 'text-yellow-500',
     bgClassName: 'bg-yellow-500/10',
   },
+  loading: {
+    icon: Loader2,
+    className: 'text-gray-500',
+    bgClassName: 'bg-gray-500/10',
+  },
 } as const;
 
 export const ANIMATION_DURATION = 300;
@@ -32,4 +37,5 @@ export const buttonStyles = {
   success: 'bg-[#EAFD66] text-black hover:bg-[#d9ec55]',
   error: 'bg-red-500/20 text-red-500 hover:bg-red-500/30',
   warning: 'bg-yellow-500/20 text-yellow-500 hover:bg-yellow-500/30',
+  loading: 'bg-gray-500/20 text-gray-500 hover:bg-gray-500/30',
 } as const; 
