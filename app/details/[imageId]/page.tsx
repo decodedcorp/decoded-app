@@ -9,6 +9,7 @@ import { RelatedStylingSection } from "./components/related-styling/related-styl
 import { ImageDetails, DecodedItem } from "@/lib/api/_types/image";
 import { generateItemSchema } from "@/lib/structured-data/geneartors/item";
 import { MobileDetailsList } from "./components/item-list-section/mobile/mobile-details-list";
+import { MobileActions } from "./components/item-list-section/mobile/mobile-actions";
 
 // 타입 정의
 interface PageProps {
@@ -42,9 +43,12 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
     const imageData = await getImageDetails(imageId);
 
     if (!imageData) {
-      console.error(`No image data found for ID: ${imageId}`);
       return notFound();
     }
+
+    // metadata에서 첫 번째 키를 아티스트 ID로 사용
+    const metadataKeys = Object.keys(imageData.metadata || {});
+    const potentialArtistId = metadataKeys.length > 0 ? metadataKeys[0] : undefined;
 
     const processedImageData: ProcessedImageData = {
       ...imageData,
@@ -56,7 +60,6 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
     };
 
     if (!processedImageData.items.length) {
-      console.error("No valid items found in image data");
       // TODO: Support `en` locale
       return <ErrorDisplay message={"상품 정보를 찾을 수 없습니다"} />;
     }
@@ -104,17 +107,19 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
           />
         )}
         <div className="min-h-screen pt-16 sm:pt-24 bg-black">
-          <div className="max-w-4xl mx-auto px-4 space-y-8 sm:space-y-16">
+          <div className="w-full sm:max-w-5xl mx-auto px-0 sm:px-4 mb-0 sm:mb-8 lg:mb-16">
             <Suspense fallback={<LoadingDisplay />}>
-              <div className="bg-[#1A1A1A] rounded-2xl p-4 sm:p-6">
-                <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] items-start justify-center gap-6">
-                  <div className="w-full max-w-2xl mx-auto lg:max-w-none">
-                    <ImageSection
-                      imageData={processedImageData}
-                      selectedItemId={selectedItemId}
-                    />
+              <div className="bg-transparent sm:bg-transparent lg:bg-[#1A1A1A] sm:rounded-2xl p-0 sm:p-4 lg:p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-[minmax(350px,1.3fr)_minmax(0,1fr)] items-start justify-center gap-6">
+                  <div className="w-screen sm:w-full max-w-none sm:max-w-lg mx-auto lg:mx-0">
+                    <div className="aspect-[4/5] w-full overflow-hidden rounded-none sm:rounded-lg">
+                      <ImageSection
+                        imageData={processedImageData}
+                        selectedItemId={selectedItemId}
+                      />
+                    </div>
                   </div>
-                  <div className="hidden lg:block h-[37rem]">
+                  <div className="hidden lg:block h-full">
                     <DetailsList
                       imageData={processedImageData}
                       selectedItemId={selectedItemId}
@@ -122,9 +127,15 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
                   </div>
                 </div>
               </div>
+            </Suspense>
+          </div>
+          <div className="w-full">
+            <Suspense fallback={<div className="h-20"></div>}>
               <RelatedStylingSection 
                 imageId={imageData.doc_id} 
                 selectedItemId={selectedItemId}
+                artistId={potentialArtistId}
+                artistName={Object.values(imageData.metadata)[0] || undefined}
               />
             </Suspense>
           </div>
@@ -134,12 +145,17 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
             imageData={processedImageData}
             selectedItemId={selectedItemId}
           />
+          
+          <MobileActions 
+            initialLikeCount={imageData.like}
+            imageId={imageData.doc_id}
+            isFixed={true}
+          />
         </div>
       </>
     );
   } catch (error) {
     // TODO: Support `en` locale
-    console.error("Error in DetailsPage:", error);
     return <ErrorDisplay message={"페이지를 불러오는데 실패했습니다"} />;
   }
 }

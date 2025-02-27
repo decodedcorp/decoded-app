@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useStatusStore } from './store';
 import type { StatusMessageKey, StatusType, StatusConfig } from './types';
+import { isUserFacingError } from '@/lib/utils/error/error-categories';
 
 interface UseStatusMessageConfig {
   defaultSuccessKey?: StatusMessageKey;
@@ -55,26 +56,29 @@ export function useStatusMessage(config: UseStatusMessageConfig = {}) {
     successConfig: StatusConfig
   ): Promise<T> => {
     setStatus({ type: 'loading', messageKey: 'default', isLoading: true });
+    
     try {
       const result = await promise;
       setStatus({ ...successConfig, type: 'success', isLoading: false });
       return result;
     } catch (error: any) {
-      if (error.status === 409 || error.isConflict) {
-        setStatus({ 
-          type: 'warning',
-          messageKey: 'duplicate',
-          isLoading: false
-        });
-        return Promise.reject(error);
+      // 사용자 대상 에러만 모달로 표시
+      if (isUserFacingError(error.status)) {
+        if (error.status === 409) {
+          setStatus({ 
+            type: 'warning',
+            messageKey: 'duplicate',
+            isLoading: false
+          });
+        } else {
+          setStatus({ 
+            type: 'error',
+            messageKey: 'request',
+            message: error.message,
+            isLoading: false
+          });
+        }
       }
-      
-      setStatus({ 
-        type: 'error',
-        messageKey: 'request',
-        message: error.message || 'An unknown error occurred',
-        isLoading: false
-      });
       
       throw error;
     }

@@ -2,8 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type RequestIdentity = {
+export type Badge = {
     name: string;
-    category: string;
+    field: string;
+    description: string;
+    date?: string;
 };
 

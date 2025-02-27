@@ -58,6 +58,10 @@ export const authService = {
 
   async getTempToken(): Promise<string> {
     const response = await apiClient.post<TempTokenResponse>('temp-token');
+    
+    if (!response) {
+      throw new Error('No response from server');
+    }
 
     if (response.status_code !== 200 || !response.data?.access_token) {
       throw new Error('Failed to fetch temporary token');

@@ -2,9 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { IdentityBase } from './IdentityBase';
+import type { LinkInfo } from './LinkInfo';
 export type UploadIdentity = {
-    identity_info: IdentityBase;
     image_file: string;
+    name: Record<string, string>;
+    category: string;
+    links?: (Array<LinkInfo> | null);
 };
 

@@ -69,20 +69,33 @@ export function ProvideSection({
   }
 
   return (
-    <div className="space-y-4">
+    <div 
+      className="space-y-4 relative z-10"
+      onClick={(e) => e.stopPropagation()}
+      onTouchStart={(e) => e.stopPropagation()}
+      onTouchMove={(e) => e.stopPropagation()}
+      onTouchEnd={(e) => e.stopPropagation()}
+      style={{ pointerEvents: 'auto' }}
+    >
       {/* 상태 필터 */}
-      <div className="flex gap-2 overflow-x-auto pb-2">
+      <div className="flex gap-2 overflow-x-auto pb-2 relative z-20">
         {Object.entries(t.mypage.provide.status).map(([key, label]) => (
           <button
             key={key}
-            onClick={() => setActiveStatus(key)}
+            onClick={(e) => {
+              console.log('버튼 클릭됨!!!', key); // 디버깅용 로그
+              e.stopPropagation();
+              setActiveStatus(key);
+            }}
             className={cn(
               "px-3 py-1.5 rounded-lg text-sm whitespace-nowrap",
               "transition-colors duration-200",
+              "relative z-30", // z-index 추가
               key === activeStatus
                 ? "bg-[#EAFD66]/10 text-[#EAFD66]"
                 : "bg-[#1A1A1A] text-gray-400 hover:bg-[#1A1A1A]/80"
             )}
+            style={{ pointerEvents: 'auto', touchAction: 'manipulation' }}
           >
             {label}
           </button>

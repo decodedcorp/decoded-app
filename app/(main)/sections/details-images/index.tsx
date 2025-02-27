@@ -5,6 +5,7 @@ import { ImageDetailResponse } from '@/components/ui/modal/add-item-modal/types'
 import type { Response_GetDocumentResponse_ } from '@/lib/api/types/models/Response_GetDocumentResponse_';
 import { UseQueryResult } from '@tanstack/react-query';
 import Image from 'next/image';
+import { SectionHeader } from '@/components/ui/section-header';
 
 interface DetailSection {
   title: string;
@@ -38,8 +39,8 @@ function DetailCard({ detail, mainImage, subImages }: DetailCardProps) {
             className="object-cover"
           />
         ) : (
-          <div className="w-full h-full bg-zinc-800 flex items-center justify-center">
-            <span className="text-sm text-zinc-500">이미지 없음</span>
+          <div className="w-full h-full bg-white flex items-center justify-center">
+            <span className="text-sm text-zinc-500"></span>
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
@@ -67,18 +68,23 @@ function DetailCard({ detail, mainImage, subImages }: DetailCardProps) {
                   />
                 </div>
               ) : (
-                <div className="w-14 h-14 rounded-lg bg-zinc-800 flex-shrink-0 flex items-center justify-center">
-                  <span className="text-xs text-zinc-500">No Image</span>
+                <div className="w-14 h-14 rounded-lg bg-white flex-shrink-0 flex items-center justify-center">
+                  {/* 텍스트 제거 */}
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <h4 className="text-sm text-white mb-1 truncate">
-                  {item.title || (
-                    <>
-                      {item.category} {item.subCategory && `• ${item.subCategory}`}
-                    </>
-                  )}
-                </h4>
+                {item.title ? (
+                  <h4 className="text-sm text-white mb-1 truncate">{item.title}</h4>
+                ) : (
+                  <div className="space-y-0.5">
+                    {item.category && (
+                      <p className="text-sm text-white truncate">{item.category}</p>
+                    )}
+                    {item.subCategory && (
+                      <p className="text-xs text-zinc-400 truncate">{item.subCategory}</p>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -131,13 +137,13 @@ export default function DetailsImagesSection({
     if (!imageData) return null;
     
     return {
-      title: imageData.image.title || '이미지 정보',
-      description: imageData.image.description || '상세 설명이 없습니다',
+      title: imageData.image.title || 'indentity',
+      description: imageData.image.description || 'kpop',
       mainImage: imageData.image.img_url,
       items: Object.values(imageData.image.items || {})
         .flat()
         .map((item) => ({
-          title: item.item.item.metadata?.name || '아이템명 없음',
+          title: item.item.item.metadata?.name || '',
           imageUrl: item.item.item.img_url || '',
           docId: item.item.item._id,
           category: item.item.item.metadata?.category || '',
@@ -149,10 +155,7 @@ export default function DetailsImagesSection({
   return (
     <section className="container mx-auto px-4 py-8">
       <div className="space-y-6">
-        <div className="space-y-2">
-          <h2 className="text-xl font-bold text-white">상품 상세</h2>
-          <p className="text-sm text-zinc-400">상품의 상세 정보를 확인하세요</p>
-        </div>
+        <SectionHeader title="Look Closeup" />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {detailSections.map((detail, index) => (

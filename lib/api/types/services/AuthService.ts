@@ -11,18 +11,21 @@ export class AuthService {
     /**
      * Login
      * @param requestBody
+     * @param type The type of the user
      * @param session
      * @returns Response Successful Response
      * @throws ApiError
      */
     public static loginUserLoginPost(
         requestBody: LoginRequest,
+        type: string = 'user',
         session?: any,
     ): CancelablePromise<Response> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/user/login',
             query: {
+                'type': type,
                 'session': session,
             },
             body: requestBody,

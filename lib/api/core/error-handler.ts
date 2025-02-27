@@ -1,5 +1,7 @@
 import { useStatusStore } from '@/components/ui/modal/status-modal/utils/store';
 import { ERROR_CODES, ERROR_MESSAGES, ErrorCode, type ErrorResponse } from './error-codes';
+import { isUserFacingError, shouldShowErrorPage, getErrorRedirectPath } from '@/lib/utils/error/error-categories';
+import { useRouter } from 'next/navigation';
 
 function normalizeError(error: any): ErrorResponse {
   // 네트워크 에러
@@ -62,25 +64,33 @@ function getStatusType(errorCode: ErrorCode) {
   }
 }
 
-export const handleApiError = (error: any) => {
+export const handleApiError = (error: any, router?: any) => {
   const normalizedError = normalizeError(error);
+  const status = normalizedError.status;
+
+  // 시스템 에러는 에러 페이지로 리다이렉트
+  if (shouldShowErrorPage(status) && router) {
+    router.push(getErrorRedirectPath(status));
+    return;
+  }
+
+  // 사용자 대상 에러는 모달로 표시
+  if (isUserFacingError(status)) {
+    useStatusStore.setState({
+      isOpen: true,
+      type: getStatusType(normalizedError.code),
+      messageKey: 'request',
+      message: normalizedError.message
+    });
+  }
 
   // 인증 에러 처리
   if (normalizedError.code === 'UNAUTHORIZED') {
     window.sessionStorage.removeItem('ACCESS_TOKEN');
   }
 
-  // 즉시 상태 업데이트
-  useStatusStore.setState({
-    isOpen: true,
-    type: getStatusType(normalizedError.code),
-    messageKey: 'request',
-    message: normalizedError.message
-  });
-
   // 에러 로깅
   console.error('API Error:', normalizedError);
 
-  // 에러 전파
   throw normalizedError;
 };

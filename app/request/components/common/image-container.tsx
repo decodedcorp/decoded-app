@@ -209,9 +209,10 @@ export function ImageContainer({
       <div className={cn('flex-shrink-0', 'w-full', 'max-w-[28rem]', 'mx-auto')}>
         <div
           className={cn(
-            'relative rounded-lg overflow-hidden',
-            'w-full',
-            step === 1 && 'aspect-[4/5]'
+            'relative w-full', 
+            'aspect-[4/5]',
+            'max-h-[70vh]',
+            'overflow-hidden rounded-lg'
           )}
         >
           {step === 1 ? (

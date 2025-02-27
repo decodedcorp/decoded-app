@@ -15,5 +15,6 @@ import type { InitialRequestedItem } from './InitialRequestedItem';
 export type UploadImage = {
     image_base: ImageBase_Input;
     items_with_identity: Record<string, Array<InitialRequestedItem>>;
+    identity_name?: (string | null);
 };
 

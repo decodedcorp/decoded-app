@@ -10,7 +10,7 @@ export type BrandDoc = {
     _id?: (string | null);
     name: Record<string, string>;
     logo_image_url?: (string | null);
-    link_info?: (Array<LinkInfo> | null);
+    links?: (Array<LinkInfo> | null);
     created_at?: string;
 };
 

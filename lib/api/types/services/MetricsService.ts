@@ -7,6 +7,17 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 export class MetricsService {
     /**
+     * Get Daily Metrics
+     * @returns any Get daily metrics
+     * @throws ApiError
+     */
+    public static getDailyMetricsDailyMetricsGet(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/daily/metrics',
+        });
+    }
+    /**
      * Get Random Resources
      * @param type Type of random resources
      * @param limit Limit of random resources

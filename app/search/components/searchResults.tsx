@@ -49,7 +49,7 @@ interface SearchResult {
   next_id?: string;
 }
 
-function ImageCard({ image, onHover, hoveredId }: any) {
+export function ImageCard({ image, onHover, hoveredId }: any) {
   if (image.img_url === undefined) {
     console.log('UNDEFINED', image);
   }
@@ -216,26 +216,6 @@ export function SearchResults() {
                 image={image}
                 onHover={setHoveredSearchId}
                 hoveredId={hoveredSearchId}
-              />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* 트렌딩 섹션 */}
-      {result?.trending_images && result.trending_images.length > 0 && (
-        <section>
-          <div className="flex items-center gap-2 mb-6">
-            <TrendingUp className="w-5 h-5 text-[#EAFD66]" />
-            <h2 className="text-lg font-medium text-white">트렌딩 나우</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
-            {result.trending_images.map((image) => (
-              <ImageCard
-                key={image.image._id}
-                image={image.image}
-                onHover={setHoveredTrendingId}
-                hoveredId={hoveredTrendingId}
               />
             ))}
           </div>

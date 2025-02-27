@@ -11,7 +11,7 @@ export type IdentityDoc = {
     name: Record<string, string>;
     category?: (string | null);
     profile_image_url?: (string | null);
-    link_info?: (Array<LinkInfo> | null);
+    links?: (Array<LinkInfo> | null);
     created_at?: string;
 };
 

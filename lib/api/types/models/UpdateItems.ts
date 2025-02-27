@@ -7,5 +7,6 @@ export type UpdateItems = {
     request_by: string;
     request_doc_id: string;
     items: Record<string, Array<InitialRequestedItem>>;
+    identity_name?: (string | null);
 };
 

@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { Badge } from './Badge';
 import type { UserAgreement } from './UserAgreement';
 import type { UserGrade } from './UserGrade';
 import type { UserRole } from './UserRole';
@@ -28,6 +29,7 @@ export type UserDoc = {
     grade?: UserGrade;
     status?: UserStatus;
     agreement?: UserAgreement;
+    badges?: (Array<Badge> | null);
     created_at?: string;
     last_login?: string;
 };

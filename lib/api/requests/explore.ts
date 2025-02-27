@@ -24,6 +24,13 @@ export const getExploreImages = async (of: 'identity' | 'brand') => {
   const response = await apiClient.get<ExploreResponse>(
     `/image/explore?of=${of}`
   );
-  console.log(response.data);
+  if (!response) {
+    throw new Error('No response from server');
+  }
+
+  if (response.status_code !== 200) {
+    throw new Error('Failed to fetch explore images');
+  }
+
   return response.data;
 };

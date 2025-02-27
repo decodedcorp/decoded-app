@@ -6,6 +6,9 @@ export function useTrendingKeywords() {
     queryKey: ['trending-keywords'],
     queryFn: async () => {
       const response = await metricsService.getTrendingKeywords(10);
+      if (!response) {
+        throw new Error('Failed to fetch trending keywords');
+      }
       return response;
     }
   });

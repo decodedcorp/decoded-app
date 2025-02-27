@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { ConfirmItemInfo } from '../models/ConfirmItemInfo';
-import type { RequestIdentity } from '../models/RequestIdentity';
 import type { Response } from '../models/Response';
 import type { UpdateItems } from '../models/UpdateItems';
 import type { UploadBrand } from '../models/UploadBrand';
@@ -102,17 +101,17 @@ export class AdminService {
         });
     }
     /**
-     * Get Provided Items
+     * Get Pending Items
      * @param nextId Next id to fetch
      * @returns Response Get list of items of which the links are not confirmed
      * @throws ApiError
      */
-    public static getProvidedItemsAdminUserDocIdItemProvidedGet(
+    public static getPendingItemsAdminUserDocIdItemPendingItemsGet(
         nextId?: (string | null),
     ): CancelablePromise<Response> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/admin/{user_doc_id}/item/provided',
+            url: '/admin/{user_doc_id}/item/pending-items',
             query: {
                 'next_id': nextId,
             },
@@ -123,8 +122,6 @@ export class AdminService {
     }
     /**
      * Get Request Documents
-     * ## PRIVILIGED ENDPOINT
-     *
      * Get all request documents. Path of `user_doc_id` should be `admin`
      * @param docType Type of the requested document that is either 'identity' | 'image' | 'brand'
      * @param nextId The next id to query from
@@ -173,68 +170,20 @@ export class AdminService {
         });
     }
     /**
-     * Request Brand Document
-     * @param name Name of the brand
-     * @returns Response Request of brand created
-     * @throws ApiError
-     */
-    public static requestBrandDocumentAdminUserDocIdBrandRequestPost(
-        name: string,
-    ): CancelablePromise<Response> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/admin/{user_doc_id}/brand/request',
-            query: {
-                'name': name,
-            },
-            errors: {
-                422: `Validation Error`,
-            },
-        });
-    }
-    /**
      * Upload Brand Document
-     * @param requestDocId The id of the request document
+     * Upload brand document
      * @param requestBody
      * @param session
      * @returns Response Upload brand document successfully
      * @throws ApiError
      */
-    public static uploadBrandDocumentAdminUserDocIdBrandUploadRequestDocIdPost(
-        requestDocId: string,
+    public static uploadBrandDocumentAdminUserDocIdBrandUploadPost(
         requestBody: UploadBrand,
         session?: any,
     ): CancelablePromise<Response> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/admin/{user_doc_id}/brand/upload/{request_doc_id}',
-            path: {
-                'request_doc_id': requestDocId,
-            },
-            query: {
-                'session': session,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                422: `Validation Error`,
-            },
-        });
-    }
-    /**
-     * Request Identity
-     * @param requestBody
-     * @param session
-     * @returns Response Request of identity created
-     * @throws ApiError
-     */
-    public static requestIdentityAdminUserDocIdIdentityRequestPost(
-        requestBody: RequestIdentity,
-        session?: any,
-    ): CancelablePromise<Response> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/admin/{user_doc_id}/identity/request',
+            url: '/admin/{user_doc_id}/brand/upload',
             query: {
                 'session': session,
             },
@@ -247,23 +196,19 @@ export class AdminService {
     }
     /**
      * Upload Identity
-     * @param requestDocId The id of the request document
+     * Upload identity document
      * @param requestBody
      * @param session
      * @returns Response Identity document created
      * @throws ApiError
      */
-    public static uploadIdentityAdminUserDocIdIdentityUploadRequestDocIdPost(
-        requestDocId: string,
+    public static uploadIdentityAdminUserDocIdIdentityUploadPost(
         requestBody: UploadIdentity,
         session?: any,
     ): CancelablePromise<Response> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/admin/{user_doc_id}/identity/upload/{request_doc_id}',
-            path: {
-                'request_doc_id': requestDocId,
-            },
+            url: '/admin/{user_doc_id}/identity/upload',
             query: {
                 'session': session,
             },

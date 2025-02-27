@@ -21,19 +21,18 @@ export default function Home() {
       <div className="flex flex-col min-h-[100vh] bg-black text-white">
         <HeroSection />
         <div className="space-y-24 py-16">
-          {/* Web Socket Action Feed <DiscoverSection /> */}
+          {/* 모든 섹션이 동일한 스타일의 헤더를 사용 */}
           <Explore position="left-main" of="identity" />
-          <TrendingKeywordsSection />
           <TrendingSection slideCount={0} />
-          {/* Trending Items <PremiumSpot /> */}
           <DetailsImagesSection
-            imageId={['67766611b44be093e37e3446', '6776777eda015f1e34b31487']}
+            imageId={['67a761e0a89f4a060f0ddc35', '6797cfec98846810d2becd8b']}
           />
-          <Explore position="right-main" of="brand" />
+          <Explore position="right-main" of="identity" />
           <DetailsImagesSection
             imageId={['67a761e0a89f4a060f0ddc35', '6797cfec98846810d2becd8b']}
           />
           <TrendingSection slideCount={5} />
+          <TrendingKeywordsSection />
         </div>
       </div>
     </>

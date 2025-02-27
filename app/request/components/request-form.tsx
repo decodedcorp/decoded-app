@@ -160,20 +160,26 @@ export function RequestForm() {
   };
 
   return (
-    <>
+    <div className="pt-safe-top pb-safe-bottom px-safe-left px-safe-right">
       <StepIndicator currentStep={currentStep} totalSteps={totalSteps} />
 
       <div
         className={cn(
           'relative',
-          'w-full max-w-[56rem]',
+          'w-full max-w-[42rem]',
           'mx-auto px-4 sm:px-6',
-          'min-h-[30rem] max-h-[45rem]',
-          'flex items-center justify-center'
+          'min-h-[20rem]', 
+          'max-h-[calc(100vh-12rem)] sm:max-h-[50rem]',
+          'flex items-center justify-center',
+          'py-2 sm:py-3'
         )}
       >
         
-        <div className="relative w-full max-w-[40rem]">
+        <div className={cn(
+          "relative w-full",
+          "max-w-[100%] xs:max-w-[90%] sm:max-w-[28rem] md:max-w-[32rem]",
+          "my-2 sm:my-3"
+        )}>
           <ImageContainer {...imageContainerProps} />
           {currentStep === 3 && (
             <div className="absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2">
@@ -192,6 +198,7 @@ export function RequestForm() {
         onNext={onNext}
         onPrev={onPrev}
         onSubmit={handleSubmit}
+        className="mt-4 sm:mt-5"
       />
 
       <StatusModal
@@ -200,6 +207,6 @@ export function RequestForm() {
         type={modalConfig.type}
         messageKey={modalConfig.messageKey}
       />
-    </>
+    </div>
   );
 }
