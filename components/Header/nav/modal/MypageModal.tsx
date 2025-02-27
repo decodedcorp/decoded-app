@@ -137,14 +137,16 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-end pt-20 px-4">
+    <div className="fixed inset-0 z-50 flex items-start justify-end">
       <div
         className="fixed inset-0 bg-black/40 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative w-[400px]">
-        <div className="animate-in slide-in-from-right duration-200">
-          <div className="bg-gradient-to-b from-[#1A1A1A] to-black/95 rounded-2xl overflow-hidden shadow-2xl border border-white/5 h-[calc(100vh-400px)] flex flex-col">
+      <div className="relative w-full sm:w-[400px] h-full">
+        <div className="animate-in slide-in-from-right duration-200 h-full">
+          <div className="bg-gradient-to-b from-[#1A1A1A] to-black/95 rounded-t-2xl sm:rounded-2xl overflow-hidden shadow-2xl border border-white/5 flex flex-col
+               h-[calc(100vh-64px)] 
+               mt-[64px]">
             <Tabs
               defaultValue="home"
               className="h-full flex flex-col"

@@ -88,7 +88,10 @@ export function RequestSection({
         {Object.entries(t.mypage.request.filter).map(([key, label]) => (
           <button
             key={key}
-            onClick={() => setActiveFilter(key)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setActiveFilter(key);
+            }}
             className={cn(
               "px-3 py-1.5 rounded-lg text-sm whitespace-nowrap",
               "transition-colors duration-200",

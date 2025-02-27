@@ -2,8 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { BrandBase } from './BrandBase';
-import type { IdentityBase } from './IdentityBase';
+import type { Collection } from './Collection';
 import type { ImageBase_Output } from './ImageBase_Output';
 export type RequestDoc = {
     /**
@@ -11,8 +10,8 @@ export type RequestDoc = {
      */
     _id?: (string | null);
     request_by?: (string | null);
-    doc_type: string;
-    doc: (IdentityBase | ImageBase_Output | BrandBase);
+    collection: Collection;
+    doc: ImageBase_Output;
     metadata?: (Record<string, any> | null);
     requested_at: string;
 };

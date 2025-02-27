@@ -8,8 +8,17 @@ import type { Response_RandomResources } from '@/lib/api/requests/images';
 export function useRandomResources(limit: number = 10) {
   return useQuery<Response_RandomResources, Error, ImageDoc[]>({
     queryKey: ['random-resources', limit],
-    queryFn: () => imagesService.getRandomResources({ type: 'image', limit }),
+    queryFn: async () => {
+      const response = await imagesService.getRandomResources({ type: 'image', limit });
+      if (!response) {
+        throw new Error('Failed to fetch random resources');
+      }
+      return response;
+    },
     select: (response) => {
+      if (!response) {
+        throw new Error('No response from server');
+      }
       return response.data?.resources ?? [];
     },
     staleTime: 30 * 1000,

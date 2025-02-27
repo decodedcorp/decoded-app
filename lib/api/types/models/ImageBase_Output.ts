@@ -12,7 +12,6 @@ import type { InitialRequestedItem } from './InitialRequestedItem';
  * - description: Description of the image(e.g "This image is about ..")
  * - like: Number of likes
  * - style: Style of the image(e.g "grunge", "bohemian")
- * - tagged: Tagged items in the image mapped by `${identity_doc_id}`
  * - img_url: URL of the image
  * - source: Source of the image(e.g "vogue")
  * - upload_by: Uploader's doc_id(Mostly `user`)

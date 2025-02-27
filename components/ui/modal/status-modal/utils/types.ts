@@ -16,6 +16,8 @@ export interface StatusConfig {
   title?: string;
   message?: string;
   isLoading?: boolean;
+  isOpen?: boolean;
+  onLoginRequired?: () => void;
 }
 
 export interface StatusStore {

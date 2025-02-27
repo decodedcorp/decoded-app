@@ -27,6 +27,15 @@ export default async function RootLayout({
 
   return (
     <html lang={locale}>
+      <head>
+        <link 
+          rel="preload" 
+          href="/fonts/Pretendard-Regular.otf" 
+          as="font" 
+          type="font/otf" 
+          crossOrigin="anonymous" 
+        />
+      </head>
       <body className="flex flex-col min-h-screen">
         <GoogleRedirectHandler />
         <Providers locale={locale as Locale}>

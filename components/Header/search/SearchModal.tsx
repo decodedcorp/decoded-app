@@ -25,9 +25,13 @@ interface SearchModalProps {
 export function SearchModal({ isOpen, onClose, onSearchReset }: SearchModalProps) {
   const { history, clearHistory } = useSearchHistory();
   const [trendingKeywords, setTrendingKeywords] = useState<string[]>([]);
-  console.log(history);
+  
   useEffect(() => {
+    let isCached = false;
+    
     const fetchTrendingKeywords = async () => {
+      if (trendingKeywords.length > 0 || !isOpen) return;
+      
       try {
         const response = await networkManager.request(
           "metrics/trending/keywords",
@@ -35,16 +39,17 @@ export function SearchModal({ isOpen, onClose, onSearchReset }: SearchModalProps
         );
         if (response.status_code === 200) {
           setTrendingKeywords(response.data);
+          isCached = true;
         }
       } catch (error) {
         console.error("Failed to fetch trending keywords:", error);
       }
     };
 
-    if (isOpen) {
+    if (isOpen && !isCached) {
       fetchTrendingKeywords();
     }
-  }, [isOpen]);
+  }, [isOpen, trendingKeywords.length]);
 
   const handleSearchClick = () => {
     onSearchReset();

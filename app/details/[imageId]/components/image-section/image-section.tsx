@@ -61,51 +61,49 @@ export function ImageSection({ imageData, selectedItemId }: ImageSectionProps) {
   const allItems = Object.values(imageData.items).flat();
 
   return (
-    <div className="w-full h-full">
-      <div className="bg-[#1A1A1A] rounded-lg overflow-auto flex justify-center items-center">
-        <div className="relative aspect-[4/5] min-w-[30rem]">
-          <Image
-            src={imageData.img_url}
-            alt="Detail image"
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 50vw"
-            priority={true}
-          />
-          {allItems.map((decodedItem, index) => {
-            const top = parseFloat(decodedItem.position.top);
-            const left = parseFloat(decodedItem.position.left);
+    <div className="relative w-full h-full">
+      {/* 이미지 컨테이너 */}
+      <div className="relative w-full h-full sm:aspect-[4/5] sm:overflow-hidden sm:rounded-lg">
+        <Image
+          src={imageData.img_url}
+          alt={Object.values(imageData.metadata)[0] || "이미지"}
+          fill
+          className="object-cover sm:object-contain w-full h-full"
+          priority
+        />
+        {allItems.map((decodedItem, index) => {
+          const top = parseFloat(decodedItem.position.top);
+          const left = parseFloat(decodedItem.position.left);
 
-            return (
-              <div
-                key={decodedItem.item.item._id || index}
-                className="absolute -translate-x-1/2 -translate-y-1/2"
-                style={{
-                  top: `${top}%`,
-                  left: `${left}%`,
+          return (
+            <div
+              key={decodedItem.item.item._id || index}
+              className="absolute -translate-x-1/2 -translate-y-1/2"
+              style={{
+                top: `${top}%`,
+                left: `${left}%`,
+              }}
+            >
+              <ItemButton
+                item={{
+                  pos: {
+                    top: decodedItem.position.top,
+                    left: decodedItem.position.left,
+                  },
+                  info: {
+                    item: {
+                      item: decodedItem.item.item,
+                      brand_name: decodedItem.item.brand_name,
+                      brand_logo_image_url: decodedItem.item.brand_logo_image_url,
+                    },
+                  },
+                  imageDocId: decodedItem.item.item._id,
                 }}
-              >
-                <ItemButton
-                  item={{
-                    pos: {
-                      top: decodedItem.position.top,
-                      left: decodedItem.position.left,
-                    },
-                    info: {
-                      item: {
-                        item: decodedItem.item.item,
-                        brand_name: decodedItem.item.brand_name,
-                        brand_logo_image_url: decodedItem.item.brand_logo_image_url,
-                      },
-                    },
-                    imageDocId: decodedItem.item.item._id,
-                  }}
-                  isActive={decodedItem.item.item._id === selectedItemId}
-                />
-              </div>
-            );
-          })}
-        </div>
+                isActive={decodedItem.item.item._id === selectedItemId}
+              />
+            </div>
+          );
+        })}
       </div>
 
       {/* 모바일 액션 버튼 섹션 */}

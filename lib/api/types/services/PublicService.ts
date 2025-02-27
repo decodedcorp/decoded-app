@@ -141,12 +141,16 @@ export class PublicService {
      * Get Explore Images
      * Get explore images
      * @param of of which image to get
+     * @param min The minimum number of images to return
+     * @param max The maximum number of images to return
      * @param userDocId The id of the user document
      * @returns Response Explored images retrieved
      * @throws ApiError
      */
     public static getExploreImagesImageExploreGet(
         of: string = 'identity',
+        min: number = 1,
+        max: number = 5,
         userDocId?: string,
     ): CancelablePromise<Response> {
         return __request(OpenAPI, {
@@ -154,6 +158,8 @@ export class PublicService {
             url: '/image/explore',
             query: {
                 'of': of,
+                'min': min,
+                'max': max,
                 'user_doc_id': userDocId,
             },
             errors: {

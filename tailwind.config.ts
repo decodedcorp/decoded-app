@@ -128,7 +128,7 @@ const config: Config = {
       },
       // Font Family
       fontFamily: {
-        sans: ["var(--font-balenciaga)"],
+        sans: ["var(--font-balenciaga)", "-apple-system", "BlinkMacSystemFont", "system-ui", "Roboto", "Helvetica Neue", "Arial", "sans-serif"],
       },
       // Screen Breakpoints
       screens: {

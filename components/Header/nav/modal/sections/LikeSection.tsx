@@ -79,13 +79,22 @@ export function LikeSection({
   }
 
   return (
-    <div className="space-y-4">
+    <div 
+      className="space-y-4"
+      onClick={(e) => e.stopPropagation()}
+      onTouchStart={(e) => e.stopPropagation()}
+      onTouchMove={(e) => e.stopPropagation()}
+      onTouchEnd={(e) => e.stopPropagation()}
+    >
       {/* 카테고리 필터 */}
       <div className="flex gap-2 overflow-x-auto pb-2">
         {Object.entries(t.mypage.like.categories).map(([key, label]) => (
           <button
             key={key}
-            onClick={() => setActiveCategory(key as LikeCategory)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setActiveCategory(key as LikeCategory);
+            }}
             className={cn(
               "px-3 py-1.5 rounded-lg text-sm whitespace-nowrap",
               "transition-colors duration-200",

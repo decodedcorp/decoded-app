@@ -2,9 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { BrandBase } from './BrandBase';
+import type { LinkInfo } from './LinkInfo';
 export type UploadBrand = {
-    brand_info: BrandBase;
+    name: Record<string, string>;
     image_file: string;
+    links?: (Array<LinkInfo> | null);
 };
 

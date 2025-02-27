@@ -42,6 +42,9 @@
 
 html {
   height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 body {
@@ -50,6 +53,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  font-family: Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif !important;
 }
 
 main {
@@ -184,4 +188,19 @@ footer {
   .touch-target {
     @apply min-h-[44px] min-w-[44px];  /* Apple의 권장 터치 타겟 크기 */
   }
+}
+
+/* 한글 특수 요소에 대한 추가 지정 */
+:lang(ko) {
+  font-family: Pretendard, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+}
+
+/* Safari 폰트 호환성 */
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/Pretendard-Regular.woff2') format('woff2'),
+       url('/fonts/Pretendard-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }

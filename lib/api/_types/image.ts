@@ -67,6 +67,8 @@ export interface ImageDetails {
   style: string | null;
   title: string | null;
   upload_by: string;
+  artist_id?: string;
+  artist_name?: string;
 }
 
 export interface ImageMetadata {
