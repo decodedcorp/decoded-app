@@ -84,6 +84,7 @@ function ImageUploadSection({
             style={{ objectFit: 'contain' }}
             alt="업로드된 이미지"
             className="max-w-full max-h-full object-cover"
+            unoptimized
           />
         ) : (
           <ImageUploadButton onImageUpload={handleImageUpload} />

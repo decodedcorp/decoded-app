@@ -147,6 +147,7 @@ export function ImageMarker({
           alt="Marked image"
           fill
           className="object-cover"
+          unoptimized
         />
 
         {points.map((point, index) => (

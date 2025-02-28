@@ -63,6 +63,7 @@ export function ArtistHeader({ artistId, artistName }: ArtistHeaderProps) {
               width={48}
               height={48}
               className="object-cover"
+              unoptimized
             />
           </div>
         ) : (

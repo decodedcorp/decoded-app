@@ -28,6 +28,7 @@ export function BoxImage({ image, isLarge, isHovered }: BoxImageProps) {
         }}
         sizes={isLarge ? '264px' : '132px'}
         priority
+        unoptimized
       />
     </div>
   );

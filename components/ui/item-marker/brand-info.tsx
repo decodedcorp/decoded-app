@@ -30,6 +30,7 @@ export function BrandInfo({
           alt={brandName}
           fill
           className="object-cover"
+          unoptimized
         />
       </div>
       <span className="text-[10px] font-medium text-black whitespace-nowrap">

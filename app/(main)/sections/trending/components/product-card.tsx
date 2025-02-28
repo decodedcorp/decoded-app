@@ -73,6 +73,7 @@ export function ProductCard({
           src={image}
           alt={title}
           fill
+          unoptimized
           className={cn(
             'object-cover',
             'group-hover:scale-105',

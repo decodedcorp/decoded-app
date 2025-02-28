@@ -121,6 +121,7 @@ export function ProvideSection({
                   width={80}
                   height={80}
                   className="w-full h-full object-cover"
+                  unoptimized
                 />
               </div>
               <div className="flex-1">
@@ -145,6 +146,7 @@ export function ProvideSection({
                       width={48}
                       height={48}
                       className="w-full h-full object-cover"
+                      unoptimized
                     />
                   </div>
                   <div className="flex-1">

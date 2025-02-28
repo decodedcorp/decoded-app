@@ -95,6 +95,7 @@ export function RelatedSection({
               loading="lazy"
               width={200}
               height={250}
+              unoptimized
             />
           </motion.div>
         ))}

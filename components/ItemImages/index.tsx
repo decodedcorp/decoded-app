@@ -70,6 +70,7 @@ export function ItemImage({
             "group-hover:opacity-75",
             imageClassName
           )}
+          unoptimized
         />
       </div>
     );
@@ -98,6 +99,7 @@ export function ItemImage({
           setImageError(true);
           onError?.();
         }}
+        unoptimized
       />
     </div>
   );

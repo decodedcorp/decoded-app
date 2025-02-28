@@ -88,6 +88,7 @@ export function ImageCard({ image, onHover, hoveredId }: any) {
           src={image.img_url}
           alt={image.title || '이미지'}
           fill
+          unoptimized
           className={cn(
             'object-cover',
             'group-hover:scale-105',
