@@ -319,7 +319,7 @@ export function ImageContainer({
                   <input
                     type="file"
                     className="hidden"
-                    accept="image/jpeg,image/jpg,image/png"
+                    accept="image/jpeg,image/jpg,image/png,image/webp"
                     onChange={handleFileSelect}
                   />
                   {selectedImage ? (
@@ -329,6 +329,7 @@ export function ImageContainer({
                         alt="Selected image"
                         fill
                         className="object-cover"
+                        unoptimized
                       />
                       <button
                         onClick={(e) => {

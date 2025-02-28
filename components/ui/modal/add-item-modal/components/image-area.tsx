@@ -88,6 +88,7 @@ export function ImageArea({
             fill
             className="object-cover"
             onError={() => setImageError(true)}
+            unoptimized
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-gray-500">

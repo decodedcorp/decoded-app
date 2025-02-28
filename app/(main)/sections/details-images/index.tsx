@@ -37,6 +37,7 @@ function DetailCard({ detail, mainImage, subImages }: DetailCardProps) {
             alt={detail.title}
             fill
             className="object-cover"
+            unoptimized
           />
         ) : (
           <div className="w-full h-full bg-white flex items-center justify-center">
@@ -65,6 +66,7 @@ function DetailCard({ detail, mainImage, subImages }: DetailCardProps) {
                     alt={item.title || '아이템 이미지'}
                     fill
                     className="object-cover"
+                    unoptimized
                   />
                 </div>
               ) : (

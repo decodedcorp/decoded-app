@@ -70,6 +70,7 @@ export function ImageSection({ imageData, selectedItemId }: ImageSectionProps) {
           fill
           className="object-cover sm:object-contain w-full h-full"
           priority
+          unoptimized
         />
         {allItems.map((decodedItem, index) => {
           const top = parseFloat(decodedItem.position.top);

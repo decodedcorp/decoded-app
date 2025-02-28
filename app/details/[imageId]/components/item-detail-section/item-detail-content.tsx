@@ -54,6 +54,7 @@ export function ItemDetailContent({ data }: ItemDetailContentProps) {
             width={80}
             height={80}
             className="w-full h-full object-cover"
+            unoptimized
           />
         </div>
         <div className="flex-1 space-y-1">

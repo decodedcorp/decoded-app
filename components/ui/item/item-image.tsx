@@ -49,6 +49,7 @@ export function ItemImage({
           width={width}
           height={height}
           className={cn("w-full h-full object-cover", imageClassName)}
+          unoptimized
         />
       </div>
     );

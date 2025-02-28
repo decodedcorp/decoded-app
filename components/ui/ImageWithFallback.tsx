@@ -27,6 +27,7 @@ export function ImageWithFallback({
         console.error('Image load error:', src);
         setError(true);
       }}
+      unoptimized
     />
   );
 } 

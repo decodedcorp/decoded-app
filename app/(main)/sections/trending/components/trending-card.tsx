@@ -60,6 +60,7 @@ export function TrendingCard({
             'group-hover:scale-105',
             'transition-transform duration-300'
           )}
+          unoptimized
         />
 
         {/* 호버 오버레이 */}

@@ -16,6 +16,7 @@ export function ItemInfo({ data }: ItemInfoProps) {
             width={240}
             height={240}
             className="w-full h-full object-cover"
+            unoptimized
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-neutral-400">

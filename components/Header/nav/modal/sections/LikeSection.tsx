@@ -123,6 +123,7 @@ export function LikeSection({
                 alt="Liked image"
                 fill
                 className="object-cover"
+                unoptimized
               />
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
             </Link>
@@ -142,6 +143,7 @@ export function LikeSection({
                     alt={item.name || "Item image"}
                     fill
                     className="object-cover"
+                    unoptimized
                   />
                 ) : (
                   <div className="w-full h-full bg-black/20 flex items-center justify-center">

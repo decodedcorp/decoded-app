@@ -32,6 +32,7 @@ export function RelatedImageGrid({ images }: RelatedImageGridProps) {
               width={300}
               height={400}
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+              unoptimized
             />
           </div>
         );
