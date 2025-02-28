@@ -25,11 +25,11 @@ export default function Home() {
           <Explore position="left-main" of="identity" />
           <TrendingSection slideCount={0} />
           <DetailsImagesSection
-            imageId={['67a761e0a89f4a060f0ddc35', '6797cfec98846810d2becd8b']}
+            imageId={['67c17e50b354be5440d43c95', '67c18108c7937762aa70a9c6']}
           />
           <Explore position="right-main" of="identity" />
           <DetailsImagesSection
-            imageId={['67a761e0a89f4a060f0ddc35', '6797cfec98846810d2becd8b']}
+            imageId={['67c1810bb354be5440d43c97', '67c1810dcc6fdfb496f82693']}
           />
           <TrendingSection slideCount={5} />
           <TrendingKeywordsSection />
