@@ -68,7 +68,7 @@ export const koMetadata: Metadata = {
     siteName: 'DECODED',
     images: [
       {
-        url: '/og-image.png',
+        url: '/og-image.jpg',
         width: 1200,
         height: 630,
         alt: 'DECODED 메인 이미지',
@@ -79,7 +79,7 @@ export const koMetadata: Metadata = {
     card: 'summary_large_image',
     title: 'DECODED - 패션 아이템 검색 플랫폼',
     description: '궁금한 패션 아이템을 찾고 공유하세요',
-    images: ['/og-image.png'],
+    images: ['/og-image.jpg'],
   },
 } as const;
 
@@ -109,7 +109,7 @@ export const enMetadata: Metadata = {
     siteName: 'DECODED',
     images: [
       {
-        url: '/og-image.png',
+        url: '/og-image.jpg',
         width: 1200,
         height: 630,
         alt: 'DECODED Main Image',
@@ -120,7 +120,7 @@ export const enMetadata: Metadata = {
     card: 'summary_large_image',
     title: 'DECODED - Fashion Item Search Platform',
     description: 'Discover and share fashion items',
-    images: ['/og-image.png'],
+    images: ['/og-image.jpg'],
   },
 } as const;
 
@@ -135,7 +135,7 @@ export function generateDetailMetadata(
   const description =
     data?.description ||
     (locale === 'ko' ? '상품 상세 정보' : 'Product Details');
-  const imageUrl = data?.imageUrl || '/og-image.png';
+  const imageUrl = data?.imageUrl || '/og-image.jpg';
 
   return {
     ...baseMetadata,
