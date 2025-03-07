@@ -20,7 +20,8 @@ export function ItemButton({
   const params = useParams();
   const navigateToDetail = useNavigateToDetail();
   const buttonRef = useRef<HTMLDivElement>(null);
-  const [brandInfoPosition, setBrandInfoPosition] = useState<'top' | 'bottom' | 'left' | 'right'>('top');
+  const [isHovered, setIsHovered] = useState(false);
+  const [infoPosition, setInfoPosition] = useState<'default' | 'top' | 'bottom' | 'left' | 'right' | 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left'>('default');
 
   const handleClick = () => {
     navigateToDetail(item.info.item.item._id, { 
@@ -29,49 +30,61 @@ export function ItemButton({
   };
 
   useEffect(() => {
-    const checkPosition = () => {
+    const updatePosition = () => {
       if (!buttonRef.current) return;
-      
+
       const rect = buttonRef.current.getBoundingClientRect();
-      const parentRect = buttonRef.current.parentElement?.getBoundingClientRect();
+      const parentRect = buttonRef.current.parentElement?.parentElement?.getBoundingClientRect();
       
       if (!parentRect) return;
 
-      // 버튼이 부모 컨테이너의 경계에 얼마나 가까운지 계산
-      const topSpace = rect.top - parentRect.top;
-      const bottomSpace = parentRect.bottom - rect.bottom;
-      const leftSpace = rect.left - parentRect.left;
-      const rightSpace = parentRect.right - rect.right;
+      const relativeTop = ((rect.top - parentRect.top) / parentRect.height) * 100;
+      const relativeLeft = ((rect.left - parentRect.left) / parentRect.width) * 100;
 
-      // 여백이 부족한 방향 확인 (예: 20px 기준)
-      const MARGIN = 20;
-      
-      if (topSpace < MARGIN) {
-        setBrandInfoPosition('bottom');
-      } else if (bottomSpace < MARGIN) {
-        setBrandInfoPosition('top');
-      } else if (leftSpace < MARGIN) {
-        setBrandInfoPosition('right');
-      } else if (rightSpace < MARGIN) {
-        setBrandInfoPosition('left');
+      const EDGE_THRESHOLD = 15;
+
+      // 모서리 케이스 먼저 체크
+      if (relativeTop < EDGE_THRESHOLD && relativeLeft < EDGE_THRESHOLD) {
+        setInfoPosition('bottom-right');  // 좌상단 모서리
+      } else if (relativeTop < EDGE_THRESHOLD && relativeLeft > (100 - EDGE_THRESHOLD)) {
+        setInfoPosition('bottom-left');   // 우상단 모서리
+      } else if (relativeTop > (100 - EDGE_THRESHOLD) && relativeLeft < EDGE_THRESHOLD) {
+        setInfoPosition('top-right');     // 좌하단 모서리
+      } else if (relativeTop > (100 - EDGE_THRESHOLD) && relativeLeft > (100 - EDGE_THRESHOLD)) {
+        setInfoPosition('top-left');      // 우하단 모서리
+      }
+      // 일반 경계 케이스
+      else if (relativeTop < EDGE_THRESHOLD) {
+        setInfoPosition('bottom');
+      } else if (relativeTop > (100 - EDGE_THRESHOLD)) {
+        setInfoPosition('top');
+      } else if (relativeLeft < EDGE_THRESHOLD) {
+        setInfoPosition('right');
+      } else if (relativeLeft > (100 - EDGE_THRESHOLD)) {
+        setInfoPosition('left');
       } else {
-        setBrandInfoPosition('top'); // 기본값
+        setInfoPosition('default');
       }
     };
 
-    checkPosition();
-    window.addEventListener('resize', checkPosition);
-    return () => window.removeEventListener('resize', checkPosition);
+    updatePosition();
   }, []);
 
   return (
-    <div ref={buttonRef} className={`relative ${className}`}>
-      <BrandInfo
-        brandName={item.info.item.brand_name}
-        brandLogoUrl={item.info.item.brand_logo_image_url}
-        isActive={isActive}
-        position={brandInfoPosition}
-      />
+    <div 
+      ref={buttonRef} 
+      className="relative"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {isHovered && (
+        <BrandInfo
+          brandName="Nike"
+          brandLogoUrl="https://www.nike.com/favicon.ico"
+          isActive={isActive}
+          position={infoPosition}
+        />
+      )}
       <InfoButton 
         item={item} 
         isActive={isActive} 

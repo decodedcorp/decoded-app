@@ -62,7 +62,6 @@ export function ImageSection({ imageData, selectedItemId }: ImageSectionProps) {
 
   return (
     <div className="relative w-full h-full">
-      {/* 이미지 컨테이너 */}
       <div className="relative w-full h-full aspect-[4/5] overflow-hidden rounded-lg">
         <Image
           src={imageData.img_url}
@@ -72,7 +71,8 @@ export function ImageSection({ imageData, selectedItemId }: ImageSectionProps) {
           priority
           unoptimized
         />
-        {allItems.map((decodedItem, index) => {
+        
+        {allItems?.map((decodedItem, index) => {
           const top = parseFloat(decodedItem.position.top);
           const left = parseFloat(decodedItem.position.left);
 
