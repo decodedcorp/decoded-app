@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
-import { X } from 'lucide-react';
 import { cn } from '@/lib/utils/style';
 import { DetailsList } from '../server/details-list';
 import { ProcessedImageData } from '@/lib/api/_types/image';
@@ -32,7 +31,7 @@ export function MobileDetailsList({ imageData, selectedItemId }: MobileDetailsLi
   }, [searchParams, router]);
 
   const handleDragEnd = useCallback((_: any, info: PanInfo) => {
-    if (info.velocity.y > 300 || info.offset.y > 200) {
+    if (info.velocity.y > 200 || info.offset.y > 100) {
       handleClose();
     }
   }, [handleClose]);
@@ -42,7 +41,12 @@ export function MobileDetailsList({ imageData, selectedItemId }: MobileDetailsLi
     initial: { y: '100%' },
     animate: { y: 0 },
     exit: { y: '100%' },
-    transition: { type: 'spring', damping: 25, stiffness: 200 }
+    transition: { 
+      type: 'spring',
+      damping: 40,
+      stiffness: 300,
+      mass: 0.8
+    }
   }), []);
 
   // 패널이 열려있을 때만 DetailsList 렌더링
@@ -54,6 +58,7 @@ export function MobileDetailsList({ imageData, selectedItemId }: MobileDetailsLi
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
             onClick={handleClose}
             className="fixed inset-0 bg-black/60 z-40"
           />
@@ -62,7 +67,8 @@ export function MobileDetailsList({ imageData, selectedItemId }: MobileDetailsLi
             {...animationConfig}
             drag="y"
             dragConstraints={{ top: 0 }}
-            dragElastic={0.2}
+            dragElastic={0.1}
+            dragMomentum={false}
             onDragEnd={handleDragEnd}
             className={cn(
               'fixed bottom-0 left-0 right-0 z-50',
@@ -73,7 +79,10 @@ export function MobileDetailsList({ imageData, selectedItemId }: MobileDetailsLi
             )}
           >
             {/* 드래그 핸들 */}
-            <div className="w-full flex justify-center py-6 flex-shrink-0">
+            <div 
+              className="w-full flex justify-center py-6 flex-shrink-0 cursor-pointer" 
+              onClick={handleClose}
+            >
               <div className="w-12 h-1 rounded-full bg-white/20" />
             </div>
             {/* 컨텐츠 */}

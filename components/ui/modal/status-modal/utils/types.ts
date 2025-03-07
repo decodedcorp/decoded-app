@@ -8,7 +8,11 @@ export type StatusMessageKey =
   | 'unsavedChanges'
   | 'delete'
   | 'login'
-  | 'duplicate';
+  | 'duplicate'
+  | 'empty_links'
+  | 'submitting'
+  | 'link_added'
+  | 'link_error';
 
 export interface StatusConfig {
   type: StatusType;

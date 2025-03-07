@@ -73,14 +73,14 @@ export function DetailSlideSection() {
       _id: apiResponse.data.docs._id,
       requester: apiResponse.data.docs.requester,
       requested_at: apiResponse.data.docs.requested_at,
-      link_info: apiResponse.data.docs.link_info?.map(link => ({
-        url: link.url,
+      links: apiResponse.data.docs.links?.map(link => ({
+        value: link.value,
         label: link.label,
         date: link.date,
         provider: link.provider,
         og_metadata: link.og_metadata,
         link_metadata: link.link_metadata,
-        status: (link as LinkInfo).status || 'pending'
+        status: link.status || 'pending'
       })) || [],
       metadata: {
         name: apiResponse.data.docs.metadata.name,

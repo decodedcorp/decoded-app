@@ -1,3 +1,5 @@
+"use client";
+
 import { OpenAPI } from './types/core/OpenAPI';
 import { request } from './types/core/request';
 import type { ApiRequestOptions } from './types/core/ApiRequestOptions';
@@ -9,8 +11,13 @@ OpenAPI.BASE = API_CONFIG.BASE_URL;
 OpenAPI.WITH_CREDENTIALS = false;
 OpenAPI.CREDENTIALS = 'same-origin';
 
+// 환경에 따라 서비스 엔드포인트 결정
+const SERVICE_ENDPOINT = process.env.NODE_ENV === "development"
+  ? process.env.NEXT_PUBLIC_LOCAL_SERVICE_ENDPOINT
+  : process.env.NEXT_PUBLIC_SERVICE_ENDPOINT;
+
 // 환경 설정 검증
-if (!process.env.NEXT_PUBLIC_SERVICE_ENDPOINT) {
+if (!SERVICE_ENDPOINT) {
   throw new Error('Missing `SERVICE_ENDPOINT` configuration');
 }
 

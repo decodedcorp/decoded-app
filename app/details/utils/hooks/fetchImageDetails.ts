@@ -8,8 +8,10 @@ import {
 export async function getImageDetails(
   imageId: string
 ): Promise<ProcessedImageData | null> {
-  try {
-    const SERVICE_ENDPOINT = process.env.NEXT_PUBLIC_SERVICE_ENDPOINT;
+  try { 
+    const SERVICE_ENDPOINT = process.env.NODE_ENV === "development"
+      ? process.env.NEXT_PUBLIC_LOCAL_SERVICE_ENDPOINT
+      : process.env.NEXT_PUBLIC_SERVICE_ENDPOINT;
 
     if (!SERVICE_ENDPOINT) {
       throw new Error("Missing `SERVICE_ENDPOINT` configuration");

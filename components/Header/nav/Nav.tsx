@@ -40,7 +40,7 @@ function Nav({
             <div className="flex items-center gap-3">
               <Link
                 href="/request"
-                className="p-2 text-gray-400 hover:text-[#EAFD66] transition-colors duration-200"
+                className="p-2 text-gray-400 hover:text-[#EAFD66]"
               >
                 <PlusCircle className="w-5 h-5" />
               </Link>

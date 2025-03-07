@@ -1,5 +1,5 @@
 export interface LinkInfo {
-  url: string;
+  value: string;
   label: string | null;
   date: string;
   provider: string;
@@ -19,7 +19,7 @@ export interface ItemDetailData {
     _id: string;
     requester: string;
     requested_at: string;
-    link_info: LinkInfo[];
+    links: LinkInfo[];
     metadata: {
       name: string | null;
       description: string | null;
@@ -49,7 +49,7 @@ export interface ItemDetailResponse {
       _id: string;
       requester: string;
       requested_at: string;
-      link_info: LinkInfo[];
+      links: LinkInfo[];
       metadata: {
         name: string | null;
         description: string | null;

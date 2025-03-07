@@ -107,11 +107,11 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
           />
         )}
         <div className="min-h-screen pt-16 sm:pt-24 bg-black">
-          <div className="w-full sm:max-w-5xl mx-auto px-0 sm:px-4 mb-0 sm:mb-8 lg:mb-16">
+          <div className="w-full sm:max-w-[960px] mx-auto px-0 sm:px-4 mb-0 sm:mb-8 lg:mb-16">
             <Suspense fallback={<LoadingDisplay />}>
               <div className="bg-transparent sm:bg-transparent lg:bg-[#1A1A1A] sm:rounded-2xl p-0 sm:p-4 lg:p-6">
-                <div className="grid grid-cols-1 lg:grid-cols-[minmax(350px,1.3fr)_minmax(0,1fr)] items-start justify-center gap-6">
-                  <div className="w-screen sm:w-full max-w-none sm:max-w-lg mx-auto lg:mx-0">
+                <div className="grid grid-cols-1 lg:grid-cols-[minmax(350px,500px)_minmax(350px,1fr)] items-start justify-center gap-6">
+                  <div className="w-screen sm:w-full max-w-[500px] mx-auto lg:mx-0">
                     <div className="aspect-[4/5] w-full overflow-hidden rounded-none sm:rounded-lg">
                       <ImageSection
                         imageData={processedImageData}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils/style';
 import { ChevronRight, Compass } from 'lucide-react';
@@ -11,6 +11,8 @@ import 'swiper/css';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { ExploreKeyword } from '@/lib/api/requests/explore';
+import { SWIPER_DEFAULT_CONFIG, SWIPER_BREAKPOINTS } from './config/swiper.config';
+import { MemoizedSwiperSlide } from './components/swiper-slide';
 
 // Add this interface at the top of the file
 interface ExploreResponse {
@@ -28,6 +30,9 @@ function Explore({ position, of }: ExploreProps) {
     images: ExploreResponse;
   };
   const [activeCategory, setActiveCategory] = useState('');
+  const [activeIndices, setActiveIndices] = useState<number[]>([]);
+  const desktopSwiperRef = useRef<any>(null);
+  const mobileSwiperRef = useRef<any>(null);
 
   const categories = useMemo(() => data?.explore_images || [], [data]);
 
@@ -40,9 +45,79 @@ function Explore({ position, of }: ExploreProps) {
   const currentImages =
     categories?.find((cat) => cat.keyword === activeCategory)?.images || [];
 
-  const handleImageClick = (imageDocId: string) => {
+  useEffect(() => {
+    console.log('Current images:', currentImages);
+  }, [currentImages]);
+
+  const handleSlideClick = useCallback((imageDocId: string, index: number) => {
+    if (!desktopSwiperRef.current?.swiper) return;
+
+    const swiper = desktopSwiperRef.current.swiper;
+    const isTransitioning = swiper.isAnimating;
+    const slidesPerView = swiper.params.slidesPerView;
+    const visibleSlides = [];
+    
+    // 현재 보이는 슬라이드들의 인덱스를 계산
+    for (let i = 0; i < slidesPerView; i++) {
+      const slideIndex = (swiper.realIndex + i) % currentImages.length;
+      visibleSlides.push(slideIndex);
+    }
+    
+    // 전환 중이면 클릭 무시
+    if (isTransitioning) return;
+    
+    // 보이는 슬라이드가 아니면 슬라이드 이동만
+    if (!visibleSlides.includes(index)) {
+      swiper.slideToLoop(index);
+      return;
+    }
+    
+    // 보이는 슬라이드일 때만 디테일 페이지로 이동
     router.push(`/details/${imageDocId}`);
+  }, [currentImages.length, router]);
+
+  // 이전 슬라이드로 이동
+  const goPrev = (isMobile: boolean = false) => {
+    const swiper = isMobile ? mobileSwiperRef.current?.swiper : desktopSwiperRef.current?.swiper;
+    if (swiper) {
+      swiper.slidePrev();
+    }
   };
+
+  // 다음 슬라이드로 이동
+  const goNext = (isMobile: boolean = false) => {
+    const swiper = isMobile ? mobileSwiperRef.current?.swiper : desktopSwiperRef.current?.swiper;
+    if (swiper) {
+      swiper.slideNext();
+    }
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        goPrev();
+      } else if (e.key === 'ArrowRight') {
+        goNext();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Swiper의 slide 변경 이벤트를 감지하여 현재 보이는 슬라이드들을 추적
+  const handleSlideChange = useCallback((swiper: any) => {
+    const visibleSlides = [];
+    const slidesPerView = swiper.params.slidesPerView;
+    
+    // 현재 보이는 슬라이드들의 인덱스를 계산
+    for (let i = 0; i < slidesPerView; i++) {
+      const slideIndex = (swiper.realIndex + i) % currentImages.length;
+      visibleSlides.push(slideIndex);
+    }
+    
+    setActiveIndices(visibleSlides);
+  }, [currentImages.length]);
 
   if (!categories?.find((cat) => cat.keyword === activeCategory)) return null;
 
@@ -130,75 +205,68 @@ function Explore({ position, of }: ExploreProps) {
             {/* 이미지 슬라이더 영역 */}
             <div
               className={cn(
-                'overflow-hidden',
+                'overflow-hidden relative',
                 position === 'right-main'
                   ? 'col-start-1 col-span-1 order-1 lg:pr-2'
                   : 'col-start-2 col-span-1 order-2 lg:pl-2'
               )}
             >
+              {/* 왼쪽 화살표 인디케이터 */}
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
+                <ChevronRight className="w-6 h-6 text-white/20 rotate-180" />
+              </div>
+              
+              {/* 왼쪽 클릭 영역 */}
+              <button
+                onClick={() => goPrev()}
+                className="absolute left-0 top-0 bottom-0 w-20 z-20 bg-transparent cursor-pointer"
+                aria-label="Previous slide"
+              />
+              
               <Swiper
+                ref={desktopSwiperRef}
+                {...SWIPER_DEFAULT_CONFIG}
                 modules={[Autoplay]}
-                slidesPerView={1.2}
-                spaceBetween={-20}
-                loop={true}
-                autoplay={{
-                  delay: 3000,
-                  disableOnInteraction: false,
-                  pauseOnMouseEnter: true,
-                }}
+                onSlideChange={(swiper) => handleSlideChange(swiper)}
                 breakpoints={{
-                  640: { slidesPerView: 1, spaceBetween: 10 },
-                  768: { slidesPerView: 1, spaceBetween: 10 },
-                  1024: { slidesPerView: 1.2, spaceBetween: -140 },
-                  1280: { slidesPerView: 1.4, spaceBetween: -120 },
-                  1440: { slidesPerView: 1.6, spaceBetween: -140 },
-                  1600: { slidesPerView: 1.8, spaceBetween: -140 },
-                  1920: { slidesPerView: 2, spaceBetween: -160 },
+                  ...SWIPER_BREAKPOINTS,
+                  1536: { // 2xl
+                    slidesPerView: 3,
+                    spaceBetween: 24,
+                  },
+                  1920: { // 3xl
+                    slidesPerView: 3,
+                    spaceBetween: 32,
+                  }
                 }}
                 className="w-full"
+                watchSlidesProgress={true}
+                preventInteractionOnTransition={true}
+                allowTouchMove={true}
               >
                 {currentImages.map((image, index) => (
-                  <SwiperSlide
-                    key={image.image_doc_id}
-                    onClick={() => handleImageClick(image.image_doc_id)}
-                  >
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.98 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.4 }}
-                      className="h-full"
-                    >
-                      <div className="aspect-[4/5] w-full bg-zinc-900 rounded-2xl overflow-hidden group relative cursor-pointer max-w-[420px]">
-                        <Image
-                          src={image.image_url}
-                          alt={`Image ${index + 1}`}
-                          fill
-                          className="object-cover transition-transform duration-500 group-hover:scale-105"
-                          priority={index < 3}
-                          unoptimized
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        {image.positions.map((position, idx) => (
-                          <div
-                            key={`${image.image_doc_id}-${idx}`}
-                            className="absolute z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                            style={{
-                              top: `${position.top}%`,
-                              left: `${position.left}%`,
-                              transform: 'translate(-50%, -50%)',
-                            }}
-                          >
-                            <div className="relative w-5 h-5 flex items-center justify-center">
-                              <div className="absolute w-2 h-2 rounded-full bg-[#EAFD66]" />
-                              <div className="absolute w-5 h-5 rounded-full border-2 border-[#EAFD66] animate-ping opacity-75" />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </motion.div>
+                  <SwiperSlide key={image.image_doc_id}>
+                    <MemoizedSwiperSlide
+                      image={image}
+                      index={index}
+                      onClick={handleSlideClick}
+                      isActive={activeIndices.includes(index)}
+                    />
                   </SwiperSlide>
                 ))}
               </Swiper>
+
+              {/* 오른쪽 화살표 인디케이터 */}
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
+                <ChevronRight className="w-6 h-6 text-white/20" />
+              </div>
+
+              {/* 오른쪽 클릭 영역 */}
+              <button
+                onClick={() => goNext()}
+                className="absolute right-0 top-0 bottom-0 w-20 z-20 bg-transparent cursor-pointer"
+                aria-label="Next slide"
+              />
             </div>
           </div>
         </div>
@@ -259,42 +327,41 @@ function Explore({ position, of }: ExploreProps) {
                   480: { slidesPerView: 1.3, spaceBetween: 12 },
                   640: { slidesPerView: 1.8, spaceBetween: 16 },
                 }}
-                className="w-full"
+                className="w-full relative"
+                ref={mobileSwiperRef}
+                onSlideChange={(swiper) => handleSlideChange(swiper)}
+                watchSlidesProgress={true}
+                preventInteractionOnTransition={true}
+                allowTouchMove={true}
               >
+                {/* 모바일 왼쪽 화살표 인디케이터 */}
+                <button
+                  onClick={() => goPrev(true)}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 z-20 bg-transparent cursor-pointer"
+                  aria-label="Previous slide"
+                >
+                  <ChevronRight className="w-4 h-4 text-white/20 rotate-180" />
+                </button>
+
                 {category.images.map((image, index) => (
-                  <SwiperSlide
-                    key={image.image_doc_id}
-                    onClick={() => handleImageClick(image.image_doc_id)}
-                  >
-                    <div className="aspect-[4/5] w-full h-full bg-zinc-900 rounded-2xl overflow-hidden group relative max-h-[500px]">
-                      <Image
-                        src={image.image_url}
-                        alt={`Image ${index + 1}`}
-                        fill
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
-                        sizes="(max-width: 640px) 90vw, (max-width: 768px) 60vw, 40vw"
-                        unoptimized
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      {image.positions.map((position, idx) => (
-                        <div
-                          key={`${image.image_doc_id}-${idx}`}
-                          className="absolute z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                          style={{
-                            top: `${position.top}%`,
-                            left: `${position.left}%`,
-                            transform: 'translate(-50%, -50%)',
-                          }}
-                        >
-                          <div className="relative w-5 h-5 flex items-center justify-center">
-                            <div className="absolute w-2 h-2 rounded-full bg-[#EAFD66]" />
-                            <div className="absolute w-5 h-5 rounded-full border-2 border-[#EAFD66] animate-ping opacity-75" />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                  <SwiperSlide key={image.image_doc_id}>
+                    <MemoizedSwiperSlide
+                      image={image}
+                      index={index}
+                      onClick={handleSlideClick}
+                      isActive={activeIndices.includes(index)}
+                    />
                   </SwiperSlide>
                 ))}
+
+                {/* 모바일 오른쪽 화살표 인디케이터 */}
+                <button
+                  onClick={() => goNext(true)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 z-20 bg-transparent cursor-pointer"
+                  aria-label="Next slide"
+                >
+                  <ChevronRight className="w-4 h-4 text-white/20" />
+                </button>
               </Swiper>
             </div>
           ))}

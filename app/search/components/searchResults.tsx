@@ -188,7 +188,7 @@ export function SearchResults() {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
         {[...Array(6)].map((_, i) => (
           <div
             key={i}
@@ -210,7 +210,7 @@ export function SearchResults() {
               {result.related_images.length}개의 결과
             </span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {result.related_images.map((image) => (
               <ImageCard
                 key={image._id}

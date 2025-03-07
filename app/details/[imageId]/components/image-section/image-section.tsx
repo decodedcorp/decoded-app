@@ -63,12 +63,12 @@ export function ImageSection({ imageData, selectedItemId }: ImageSectionProps) {
   return (
     <div className="relative w-full h-full">
       {/* 이미지 컨테이너 */}
-      <div className="relative w-full h-full sm:aspect-[4/5] sm:overflow-hidden sm:rounded-lg">
+      <div className="relative w-full h-full aspect-[4/5] overflow-hidden rounded-lg">
         <Image
           src={imageData.img_url}
           alt={Object.values(imageData.metadata)[0] || "이미지"}
           fill
-          className="object-cover sm:object-contain w-full h-full"
+          className="object-cover sm:object-cover w-full h-full"
           priority
           unoptimized
         />

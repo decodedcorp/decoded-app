@@ -43,7 +43,7 @@ export function SearchTrendingSection({ trending_images }: SearchTrendingSection
           <TrendingUp className="w-5 h-5 text-[#EAFD66]" />
           <h2 className="text-lg font-medium text-white">트렌딩 나우</h2>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-4 md:gap-6">
           {trending_images.map((image) => (
             <ImageCard
               key={image.image._id}

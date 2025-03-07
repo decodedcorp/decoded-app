@@ -99,16 +99,26 @@ export function StatusModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed right-4 top-20 z-[100]">
+    <div className={cn(
+      'fixed z-[100]',
+      'top-4 md:top-20',
+      'left-0 right-0 md:left-auto',
+      'md:right-4',
+      'px-4 md:p-0',
+      'flex md:block justify-center',
+    )}>
       <div
         ref={modalRef}
         className={cn(
-          'w-80 rounded-xl p-4 shadow-lg border border-white/5',
+          'w-full md:w-80',
+          'max-w-sm',
+          'p-4 shadow-lg border border-white/5',
           'transform transition-all duration-300',
+          'rounded-xl',
           bgClassName,
           isClosing
-            ? 'translate-x-2 opacity-0'
-            : 'translate-x-0 opacity-100'
+            ? 'md:translate-x-2 -translate-y-full md:translate-y-0 opacity-0'
+            : 'md:translate-x-0 translate-y-0 opacity-100'
         )}
       >
         <div className="flex items-start space-x-3">

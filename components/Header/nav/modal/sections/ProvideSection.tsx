@@ -28,12 +28,19 @@ interface ProvidesData {
 export function ProvideSection({
   data,
   isLoading,
+  onClose,
 }: {
   data: ProvidesData;
   isLoading: boolean;
+  onClose: () => void;
 }) {
   const { t } = useLocaleContext();
   const [activeStatus, setActiveStatus] = useState<string>("active");
+
+  // 페이지 이동 시 모달 닫기
+  const handleNavigate = (e: React.MouseEvent) => {
+    onClose();
+  };
 
   if (!data) return null;
 
@@ -70,98 +77,101 @@ export function ProvideSection({
 
   return (
     <div 
-      className="space-y-4 relative z-10"
+      className="h-full flex flex-col"
       onClick={(e) => e.stopPropagation()}
       onTouchStart={(e) => e.stopPropagation()}
       onTouchMove={(e) => e.stopPropagation()}
       onTouchEnd={(e) => e.stopPropagation()}
       style={{ pointerEvents: 'auto' }}
     >
-      {/* 상태 필터 */}
-      <div className="flex gap-2 overflow-x-auto pb-2 relative z-20">
-        {Object.entries(t.mypage.provide.status).map(([key, label]) => (
-          <button
-            key={key}
-            onClick={(e) => {
-              console.log('버튼 클릭됨!!!', key); // 디버깅용 로그
-              e.stopPropagation();
-              setActiveStatus(key);
-            }}
-            className={cn(
-              "px-3 py-1.5 rounded-lg text-sm whitespace-nowrap",
-              "transition-colors duration-200",
-              "relative z-30", // z-index 추가
-              key === activeStatus
-                ? "bg-[#EAFD66]/10 text-[#EAFD66]"
-                : "bg-[#1A1A1A] text-gray-400 hover:bg-[#1A1A1A]/80"
-            )}
-            style={{ pointerEvents: 'auto', touchAction: 'manipulation' }}
-          >
-            {label}
-          </button>
-        ))}
+      {/* 상태 필터 - 고정 */}
+      <div className="flex-shrink-0 px-4 py-3 border-b border-white/5">
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          {Object.entries(t.mypage.provide.status).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveStatus(key);
+              }}
+              className={cn(
+                "px-4 py-2 rounded-lg text-sm whitespace-nowrap",
+                "transition-colors duration-200",
+                key === activeStatus
+                  ? "bg-[#EAFD66]/10 text-[#EAFD66]"
+                  : "bg-[#1A1A1A] text-gray-400 hover:bg-[#1A1A1A]/80"
+              )}
+              style={{ pointerEvents: 'auto', touchAction: 'manipulation' }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* 제공 목록 */}
-      <div className="space-y-2 max-h-[500px] overflow-y-auto">
-        {data.provides.map((provide) => (
-          <div
-            key={provide.image_doc_id}
-            className="bg-[#1A1A1A] rounded-xl p-4"
-          >
-            {/* 원본 이미지 */}
-            <Link
-              href={`/details/${provide.image_doc_id}`}
-              className="flex gap-4 mb-3"
+      {/* 제공 목록 - 스크롤 가능 */}
+      <div className="flex-1 overflow-y-auto px-4 py-3">
+        <div className="space-y-2">
+          {data.provides.map((provide) => (
+            <div
+              key={provide.image_doc_id}
+              className="bg-[#1A1A1A] rounded-xl p-4"
             >
-              <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                <Image
-                  src={provide.image_url}
-                  alt="Original image"
-                  width={80}
-                  height={80}
-                  className="w-full h-full object-cover"
-                  unoptimized
-                />
-              </div>
-              <div className="flex-1">
-                <div className="text-sm text-gray-400 mb-1">원본 이미지</div>
-                <div className="text-xs text-gray-500">
-                  제공된 이미지
+              {/* 원본 이미지 */}
+              <Link
+                href={`/details/${provide.image_doc_id}`}
+                className="flex gap-4 mb-3"
+                onClick={handleNavigate}
+              >
+                <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                  <Image
+                    src={provide.image_url}
+                    alt="Original image"
+                    width={80}
+                    height={80}
+                    className="w-full h-full object-cover"
+                    unoptimized
+                  />
                 </div>
-              </div>
-            </Link>
+                <div className="flex-1">
+                  <div className="text-sm text-gray-400 mb-1">원본 이미지</div>
+                  <div className="text-xs text-gray-500">
+                    제공된 이미지
+                  </div>
+                </div>
+              </Link>
 
-            {/* 제공한 아이템 목록 */}
-            <div className="space-y-2">
-              {provide.items?.map((item) => (
-                <div
-                  key={item.item_doc_id}
-                  className="flex gap-3 p-2 rounded-lg bg-black/20"
-                >
-                  <div className="w-12 h-12 rounded-md overflow-hidden flex-shrink-0">
-                    <Image
-                      src={item.item_image_url}
-                      alt="Item image"
-                      width={48}
-                      height={48}
-                      className="w-full h-full object-cover"
-                      unoptimized
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-sm text-white">
-                      {item.label || "제공된 아이템"}
+              {/* 제공한 아이템 목록 */}
+              <div className="space-y-2">
+                {provide.items?.map((item) => (
+                  <div
+                    key={item.item_doc_id}
+                    className="flex gap-3 p-2 rounded-lg bg-black/20"
+                  >
+                    <div className="w-12 h-12 rounded-md overflow-hidden flex-shrink-0">
+                      <Image
+                        src={item.item_image_url}
+                        alt="Item image"
+                        width={48}
+                        height={48}
+                        className="w-full h-full object-cover"
+                        unoptimized
+                      />
                     </div>
-                    <div className="text-xs text-gray-400 mt-0.5">
-                      {item.item_doc_id}
+                    <div className="flex-1">
+                      <div className="text-sm text-white">
+                        {item.label || "제공된 아이템"}
+                      </div>
+                      <div className="text-xs text-gray-400 mt-0.5">
+                        {item.item_doc_id}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
