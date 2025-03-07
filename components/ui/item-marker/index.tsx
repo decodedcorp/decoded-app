@@ -79,8 +79,8 @@ export function ItemButton({
     >
       {isHovered && (
         <BrandInfo
-          brandName="Nike"
-          brandLogoUrl="https://www.nike.com/favicon.ico"
+          brandName={item.info.item.brand_name}
+          brandLogoUrl={item.info.item.brand_logo_image_url}
           isActive={isActive}
           position={infoPosition}
         />
