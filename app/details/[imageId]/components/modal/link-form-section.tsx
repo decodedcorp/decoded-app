@@ -34,9 +34,17 @@ export default function LinkFormSection({
     onClose: () => setModalConfig((prev) => ({ ...prev, isOpen: false })),
   });
 
+  const [link, setLink] = useState('');
   const { handleClose, isClosing, modalRef } = useModalClose({
     onClose,
   });
+
+  useEffect(() => {
+    if (!showLinkForm) {
+      setLink('');
+      onProvideDataChange({ links: [] });
+    }
+  }, [showLinkForm, onProvideDataChange]);
 
   useEffect(() => {
     if (window.sessionStorage.getItem('USER_DOC_ID') === null) {
@@ -62,10 +70,13 @@ export default function LinkFormSection({
   const handleSubmit = () => {
     onSubmit();
     handleClose();
-    setModalConfig({
-      type: 'success',
-      isOpen: true,
-      onClose: () => setModalConfig((prev) => ({ ...prev, isOpen: false })),
+  };
+
+  const handleLinkChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const url = e.target.value;
+    setLink(url);
+    onProvideDataChange({
+      links: [url],
     });
   };
 
@@ -89,29 +100,31 @@ export default function LinkFormSection({
         <input
           type="url"
           placeholder="아이템과 관련된 링크를 입력하세요"
+          value={link}
           className="w-full px-4 py-3 bg-[#1A1A1A] rounded-lg border border-white/5 
                   text-white placeholder-gray-500 focus:border-[#EAFD66] 
                   focus:ring-1 focus:ring-[#EAFD66] transition-colors outline-none
                   hover:border-white/10"
-          onChange={(e) => {
-            const url = e.target.value;
-            onProvideDataChange({
-              links: [url],
-            });
-          }}
+          onChange={handleLinkChange}
         />
         <div className="flex gap-2 pt-4">
           <button
             onClick={handleClose}
-            className="flex-1 px-6 py-3 bg-[#1A1A1A] text-white rounded-lg font-medium
-                      hover:bg-[#222222] transition-colors"
+            className="flex-1 px-6 py-3 border border-gray-600 text-gray-300 rounded-lg font-medium
+                      hover:border-gray-400 hover:text-white transition-colors"
           >
             취소
           </button>
           <button
             onClick={handleSubmit}
-            className="flex-1 px-6 py-3 bg-[#EAFD66] text-black rounded-lg font-medium
-                      hover:bg-[#d9ec55] transition-colors"
+            disabled={!link.trim()}
+            className={`
+              flex-1 px-6 py-3 rounded-lg font-medium transition-colors
+              ${link.trim() 
+                ? 'bg-[#EAFD66] text-black hover:bg-[#d9ec55] shadow-lg' 
+                : 'bg-[#1A1A1A] text-gray-500 cursor-not-allowed'
+              }
+            `}
           >
             제출하기
           </button>

@@ -6,11 +6,14 @@ import type { Response_GetDocumentResponse_ } from '@/lib/api/types/models/Respo
 import { UseQueryResult } from '@tanstack/react-query';
 import Image from 'next/image';
 import { SectionHeader } from '@/components/ui/section-header';
+import { useRouter } from 'next/navigation';
 
 interface DetailSection {
   title: string;
   description: string;
   mainImage: string;
+  profileImage?: string;
+  identityName?: string;
   items: Array<{
     title: string;
     imageUrl: string;
@@ -27,6 +30,8 @@ interface DetailCardProps {
 }
 
 function DetailCard({ detail, mainImage, subImages }: DetailCardProps) {
+  const router = useRouter();
+
   return (
     <div className="flex flex-col md:flex-row bg-zinc-900/50 rounded-xl overflow-hidden">
       {/* 메인 이미지 */}
@@ -46,8 +51,27 @@ function DetailCard({ detail, mainImage, subImages }: DetailCardProps) {
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
         <div className="absolute bottom-4 left-4 right-4">
-          <h3 className="text-lg font-bold text-white mb-1">{detail.title}</h3>
-          <p className="text-xs text-zinc-300">{detail.description}</p>
+          <div className="flex items-center gap-3 mb-2">
+            {detail.profileImage && (
+              <div className="relative w-8 h-8 flex-shrink-0">
+                <Image
+                  src={detail.profileImage}
+                  alt={detail.identityName || ''}
+                  fill
+                  className="rounded-full object-cover"
+                  unoptimized
+                />
+              </div>
+            )}
+            <div className="flex flex-col">
+              <h3 className="text-lg font-bold text-white leading-tight">
+                {detail.identityName || 'Unknown'}
+              </h3>
+              {detail.description && (
+                <p className="text-xs text-zinc-300">{detail.description}</p>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -57,7 +81,8 @@ function DetailCard({ detail, mainImage, subImages }: DetailCardProps) {
           {detail.items.map((item, index) => (
             <div
               key={item.docId}
-              className="flex items-center gap-4 p-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 transition-colors"
+              onClick={() => router.push(`/details/${detail.mainImage.split('/').pop()?.split('.')[0]}?selectedItem=${item.docId}`)}
+              className="flex items-center gap-4 p-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 transition-colors cursor-pointer"
             >
               {subImages[index] ? (
                 <div className="w-14 h-14 rounded-lg bg-zinc-800 flex-shrink-0 relative overflow-hidden">
@@ -138,10 +163,16 @@ export default function DetailsImagesSection({
     const imageData = detail.data?.data as ImageDetailResponse;
     if (!imageData) return null;
     
+    const firstItemKey = Object.keys(imageData.image.items || {})[0];
+    const identityName = imageData.image.metadata?.[firstItemKey] || '';
+    const profileImageUrl = imageData.image.metadata?.profile_image_url || '';
+    
     return {
-      title: imageData.image.title || 'indentity',
-      description: imageData.image.description || 'kpop',
+      title: imageData.image.title || '',
+      description: imageData.image.description || '',
       mainImage: imageData.image.img_url,
+      profileImage: profileImageUrl,
+      identityName: identityName,
       items: Object.values(imageData.image.items || {})
         .flat()
         .map((item) => ({

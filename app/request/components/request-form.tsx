@@ -103,7 +103,7 @@ export function RequestForm() {
 
     try {
       await createRequest(requestData, userId);
-      router.push('/');  // 성공 후 마이페이지로 이동
+      router.push('/'); // 성공 후 마이페이지로 이동
     } catch (error) {
       console.error('=== Submit Error ===');
       console.error('Error:', error);
@@ -161,25 +161,24 @@ export function RequestForm() {
 
   return (
     <div className="pt-safe-top pb-safe-bottom px-safe-left px-safe-right">
-      <StepIndicator currentStep={currentStep} totalSteps={totalSteps} />
-
       <div
         className={cn(
           'relative',
           'w-full max-w-[42rem]',
           'mx-auto px-4 sm:px-6',
-          'min-h-[20rem]', 
+          'min-h-[20rem]',
           'max-h-[calc(100vh-12rem)] sm:max-h-[50rem]',
           'flex items-center justify-center',
           'py-2 sm:py-3'
         )}
       >
-        
-        <div className={cn(
-          "relative w-full",
-          "max-w-[100%] xs:max-w-[90%] sm:max-w-[28rem] md:max-w-[32rem]",
-          "my-2 sm:my-3"
-        )}>
+        <div
+          className={cn(
+            'relative w-full',
+            'max-w-[100%] xs:max-w-[90%] sm:max-w-[28rem] md:max-w-[32rem]',
+            'my-2 sm:my-3'
+          )}
+        >
           <ImageContainer {...imageContainerProps} />
           {currentStep === 3 && (
             <div className="absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2">

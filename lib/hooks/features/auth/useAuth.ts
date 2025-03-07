@@ -7,6 +7,7 @@ import { jwtToAddress } from '@mysten/zklogin';
 import { usePathname } from 'next/navigation';
 import { hash } from '@/lib/utils/string/string';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
+import { useLoginModalStore } from '@/components/auth/login-modal/store';
 
 // Google OAuth JWT 타입
 interface GoogleJWT {
@@ -85,6 +86,7 @@ export function useAuth() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const pathName = usePathname();
+  const closeLoginModal = useLoginModalStore((state) => state.closeLoginModal);
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -173,11 +175,14 @@ export function useAuth() {
         window.sessionStorage.setItem('ACCESS_TOKEN', access_token);
         window.sessionStorage.setItem('USER_DOC_ID', doc_id);
         window.sessionStorage.setItem('SUI_ACCOUNT', sui_acc);
-
         window.sessionStorage.setItem('USER_EMAIL', email);
 
+        // 상태 업데이트 전에 약간의 지연을 줌
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         console.log('[Login] Login successful, user session updated.');
         setIsLogin(true);
+        closeLoginModal();
         window.history.replaceState(null, '', window.location.pathname);
       } catch (err: any) {
         console.error('[Login] Login failed:', err.message);
@@ -189,20 +194,26 @@ export function useAuth() {
     };
 
     login(token);
-  }, [pathName, isInitialized]);
+  }, [pathName, isInitialized, closeLoginModal]);
 
   const handleGoogleLogin = async () => {
     if (!isInitialized || typeof window === 'undefined') return;
 
     try {
+      console.log('[Login Start] Initiating Google login process...');
       console.log('Fetching Google OpenID Connect URL...');
       const { sk, randomness, exp, url } =
         await networkManager.openIdConnectUrl();
+
+      console.log('[Login] Received OpenID Connect URL:', url);
+      console.log('[Login] Setting session storage items...');
 
       // OAuth 세션 정보 저장
       window.sessionStorage.setItem('EPK_SECRET', sk);
       window.sessionStorage.setItem('RANDOMNESS', randomness);
       window.sessionStorage.setItem('EXPIRED_AT', exp.toString());
+
+      console.log('[Login] Opening popup window...');
 
       // 팝업 창 설정
       const width = 500;
@@ -222,16 +233,24 @@ export function useAuth() {
 
       // 팝업 창에서 메시지를 받을 리스너
       const messageListener = async (event: MessageEvent) => {
-        if (event.origin !== window.location.origin) return;
+        if (event.origin !== window.location.origin) {
+          console.log('[Login] Message from different origin:', event.origin);
+          return;
+        }
 
         const { id_token } = event.data;
-        if (!id_token) return;
+        if (!id_token) {
+          console.log('[Login] No id_token in message data:', event.data);
+          return;
+        }
 
-        console.log('[Login] Received ID Token from popup:', id_token);
+        console.log('[Login] Received ID Token from popup');
         window.removeEventListener('message', messageListener);
         
         try {
+          console.log('[Login] Verifying Google token...');
           const isGoogleTokenValid = await verifyGoogleToken(id_token);
+          console.log('[Login] Google token validation result:', isGoogleTokenValid);
           if (!isGoogleTokenValid) throw new Error('[Login] Invalid Google token');
 
           const decodedGoogle = jwtDecode<GoogleJWT>(id_token);
@@ -279,6 +298,7 @@ export function useAuth() {
           window.sessionStorage.setItem('USER_EMAIL', email);
 
           setIsLogin(true);
+          closeLoginModal();
           popup.close();
         } catch (error) {
           console.error('Login process failed:', error);

@@ -28,12 +28,19 @@ interface RequestsData {
 export function RequestSection({
   data,
   isLoading,
+  onClose,
 }: {
   data: RequestsData;
   isLoading: boolean;
+  onClose: () => void;
 }) {
   const { t } = useLocaleContext();
   const [activeFilter, setActiveFilter] = useState<string>("all");
+
+  // 페이지 이동 시 모달 닫기
+  const handleNavigate = (e: React.MouseEvent) => {
+    onClose();
+  };
 
   if (!data) return null;
 
@@ -82,89 +89,94 @@ export function RequestSection({
   });
 
   return (
-    <div className="space-y-4">
-      {/* 필터 */}
-      <div className="flex gap-2 overflow-x-auto pb-2">
-        {Object.entries(t.mypage.request.filter).map(([key, label]) => (
-          <button
-            key={key}
-            onClick={(e) => {
-              e.stopPropagation();
-              setActiveFilter(key);
-            }}
-            className={cn(
-              "px-3 py-1.5 rounded-lg text-sm whitespace-nowrap",
-              "transition-colors duration-200",
-              key === activeFilter
-                ? "bg-[#EAFD66]/10 text-[#EAFD66]"
-                : "bg-[#1A1A1A] text-gray-400 hover:bg-[#1A1A1A]/80"
-            )}
-          >
-            {label}
-          </button>
-        ))}
+    <div className="h-full flex flex-col">
+      {/* 필터 - 고정 */}
+      <div className="flex-shrink-0 px-4 py-3 border-b border-white/5">
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          {Object.entries(t.mypage.request.filter).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveFilter(key);
+              }}
+              className={cn(
+                "px-4 py-2 rounded-lg text-sm whitespace-nowrap",
+                "transition-colors duration-200",
+                key === activeFilter
+                  ? "bg-[#EAFD66]/10 text-[#EAFD66]"
+                  : "bg-[#1A1A1A] text-gray-400 hover:bg-[#1A1A1A]/80"
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* 요청 목록 */}
-      <div className="space-y-2 max-h-[500px] overflow-y-auto">
-        {filteredRequests.map((request) => {
-          const status = getRequestStatus(request);
-          return (
-            <Link
-              key={request.image_doc_id}
-              href={`/details/${request.image_doc_id}`}
-              className="bg-[#1A1A1A] rounded-xl p-4 flex gap-4"
-            >
-              {/* 이미지 */}
-              <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                <Image
-                  src={request.image_url}
-                  alt="Request image"
-                  width={80}
-                  height={80}
-                  className="w-full h-full object-cover"
-                  unoptimized
-                />
-              </div>
+      {/* 요청 목록 - 스크롤 가능 */}
+      <div className="flex-1 overflow-y-auto px-4 py-3">
+        <div className="space-y-2">
+          {filteredRequests.map((request) => {
+            const status = getRequestStatus(request);
+            return (
+              <Link
+                key={request.image_doc_id}
+                href={`/details/${request.image_doc_id}`}
+                className="bg-[#1A1A1A] rounded-xl p-4 flex gap-4"
+                onClick={handleNavigate}
+              >
+                {/* 이미지 */}
+                <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                  <Image
+                    src={request.image_url}
+                    alt="Request image"
+                    width={80}
+                    height={80}
+                    className="w-full h-full object-cover"
+                    unoptimized
+                  />
+                </div>
 
-              {/* 정보 */}
-              <div className="flex-1 flex flex-col justify-between">
-                <div className="flex justify-between items-start">
-                  <div className="space-y-1">
-                    <div className="flex gap-1.5">
-                      {request.items.map((item, index) => (
-                        <span
-                          key={index}
-                          className={cn(
-                            "text-xs px-2 py-0.5 rounded-full",
-                            item.is_provided
-                              ? "bg-[#EAFD66]/10 text-[#EAFD66]"
-                              : "bg-gray-500/10 text-gray-400"
-                          )}
-                        >
-                          {item.category || "기타"}
-                        </span>
-                      ))}
+                {/* 정보 */}
+                <div className="flex-1 flex flex-col justify-between">
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-1">
+                      <div className="flex gap-1.5">
+                        {request.items.map((item, index) => (
+                          <span
+                            key={index}
+                            className={cn(
+                              "text-xs px-2 py-0.5 rounded-full",
+                              item.is_provided
+                                ? "bg-[#EAFD66]/10 text-[#EAFD66]"
+                                : "bg-gray-500/10 text-gray-400"
+                            )}
+                          >
+                            {item.category || "기타"}
+                          </span>
+                        ))}
+                      </div>
                     </div>
+                    <span
+                      className={cn("text-xs px-2 py-1 rounded-full", {
+                        "bg-yellow-500/10 text-yellow-500": status === "pending",
+                        "bg-blue-500/10 text-blue-500": status === "inProgress",
+                        "bg-green-500/10 text-green-500": status === "completed",
+                      })}
+                    >
+                      {t.mypage.request.status[status]}
+                    </span>
                   </div>
-                  <span
-                    className={cn("text-xs px-2 py-1 rounded-full", {
-                      "bg-yellow-500/10 text-yellow-500": status === "pending",
-                      "bg-blue-500/10 text-blue-500": status === "inProgress",
-                      "bg-green-500/10 text-green-500": status === "completed",
-                    })}
-                  >
-                    {t.mypage.request.status[status]}
-                  </span>
-                </div>
 
-                <div className="text-xs text-gray-400">
-                  {request.provided_num}/{request.items.length} 제공됨
+                  <div className="text-xs text-gray-400">
+                    {request.provided_num}/{request.items.length} 제공됨
+                  </div>
                 </div>
-              </div>
-            </Link>
-          );
-        })}
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

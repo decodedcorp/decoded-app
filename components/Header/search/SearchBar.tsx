@@ -14,24 +14,42 @@ export function SearchBar({ onSearch }: { onSearch: (query: string) => void }) {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const modalRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const { addToHistory } = useSearchHistory();
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        modalRef.current &&
-        !modalRef.current.contains(event.target as Node)
-      ) {
+    function handleClickOutside(event: MouseEvent | TouchEvent) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsModalOpen(false);
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside);
+    if (isModalOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("touchstart", handleClickOutside);
+    }
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
     };
-  }, []);
+  }, [isModalOpen]);
+
+  useEffect(() => {
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsModalOpen(false);
+      }
+    }
+
+    if (isModalOpen) {
+      document.addEventListener("keydown", handleEscape);
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isModalOpen]);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,7 +63,7 @@ export function SearchBar({ onSearch }: { onSearch: (query: string) => void }) {
   return (
     <div
       className="relative w-full lg:max-w-[460px] md:max-w-3xl sm:max-w-full mx-auto"
-      ref={modalRef}
+      ref={containerRef}
     >
       <form onSubmit={handleSearch}>
         <div className="relative">

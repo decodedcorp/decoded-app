@@ -27,10 +27,18 @@ export default function Home() {
           <DetailsImagesSection
             imageId={['67c17e50b354be5440d43c95', '67c18108c7937762aa70a9c6']}
           />
+          {/* dev
+          <DetailsImagesSection
+            imageId={['677ba9a162743947bb167e1a', '67b5ac792e8764aebffe0ffc']}
+          /> */}
           <Explore position="right-main" of="identity" />
           <DetailsImagesSection
-            imageId={['67c1810bb354be5440d43c97', '67c1810dcc6fdfb496f82693']}
+            imageId={['67c1913585e28126df021377', '67c197aa3c682a3df3d2eeb0']}
           />
+          {/* dev
+          <DetailsImagesSection
+            imageId={['677ba9a162743947bb167e1a', '67b5ac792e8764aebffe0ffc']}
+          /> */}
           <TrendingSection slideCount={5} />
           <TrendingKeywordsSection />
         </div>

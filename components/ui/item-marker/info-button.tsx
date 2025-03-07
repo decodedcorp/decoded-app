@@ -15,11 +15,13 @@ export function InfoButton({ item, isActive, onClick }: InfoButtonProps) {
       onClick={onClick}
       className={`relative transition-transform duration-200 hover:scale-110 active:scale-95`}
     >
-      <div className="w-6 h-6 cursor-pointer">
-        <div className="absolute inset-0 border-2 border-gray-700 rounded-full animate-ping"></div>
-        <div className="relative w-full h-full">
-          <div className="absolute inset-0 bg-white/50 backdrop-blur-sm rounded-full border-2 border-gray-700/50"></div>
-          <div className="absolute inset-[4px] bg-white rounded-full shadow-lg"></div>
+      <div className="relative">
+        <div className="w-3 h-3 cursor-pointer">
+          <div className="absolute inset-0 border-2 border-[#EAFD66]/40 rounded-full animate-ping"></div>
+          <div className="relative w-full h-full">
+            <div className="absolute inset-0 bg-[#EAFD66]/30 backdrop-blur-sm rounded-full border-2 border-[#EAFD66]/50"></div>
+            <div className="absolute inset-[2px] bg-[#EAFD66] rounded-full shadow-lg"></div>
+          </div>
         </div>
       </div>
     </button>

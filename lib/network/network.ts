@@ -19,7 +19,18 @@ export class NetworkManager {
   };
 
   private constructor() {
-    const SERVICE_ENDPOINT = process.env.NEXT_PUBLIC_SERVICE_ENDPOINT;
+    // 환경 변수 디버깅을 위한 로그 추가
+    console.log("[NetworkManager] Environment variables:", { 
+      NODE_ENV: process.env.NODE_ENV,
+      LOCAL_SERVICE_ENDPOINT: process.env.NEXT_PUBLIC_LOCAL_SERVICE_ENDPOINT,
+      SERVICE_ENDPOINT: process.env.NEXT_PUBLIC_SERVICE_ENDPOINT
+    });
+
+    // 개발 환경에서는 LOCAL 엔드포인트, 다른 환경에서는 프로덕션 엔드포인트 사용
+    const SERVICE_ENDPOINT = process.env.NODE_ENV === "development"
+      ? process.env.NEXT_PUBLIC_LOCAL_SERVICE_ENDPOINT
+      : process.env.NEXT_PUBLIC_SERVICE_ENDPOINT;
+    
     const authClientId = process.env.NEXT_PUBLIC_AUTH_CLIENT_ID || "";
     const redirectUri =
       process.env.NODE_ENV === "production"
@@ -64,12 +75,27 @@ export class NetworkManager {
     accessToken?: string
   ): Promise<T | undefined> {
     try {
-      const url = `${this.config.service}/${path}`;
-      const storedToken =
-        accessToken || window.sessionStorage.getItem("ACCESS_TOKEN");
+      // 경로에서 앞뒤 슬래시 처리
+      const cleanPath = path.startsWith('/') ? path.substring(1) : path;
+      const url = `${this.config.service}/${cleanPath}`;
+      
+      console.log(`[NetworkManager] Making ${method} request to: ${url}`);
+      
+      // 브라우저 환경에서만 세션 스토리지 접근
+      const storedToken = typeof window !== 'undefined' 
+        ? (accessToken || window.sessionStorage.getItem("ACCESS_TOKEN"))
+        : accessToken;
 
+      console.log(`[NetworkManager] Using token: ${storedToken ? "YES" : "NO"}`);
+      
+      // CORS 헤더 추가
       const headers: Record<string, string> = {
         ...(storedToken && { Authorization: `Bearer ${storedToken}` }),
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       };
 
       if (!(data instanceof FormData)) {
@@ -86,7 +112,11 @@ export class NetworkManager {
           maxRedirects: 0,
           validateStatus: (status) => status < 500,
           timeout: 10000,
+          // CORS 이슈 방지를 위한 설정 추가
+          withCredentials: false
         });
+
+        console.log(`[NetworkManager] Response status: ${response.status}`);
 
         // 409 Conflict 처리
         if (response.status === 409) {
@@ -96,6 +126,16 @@ export class NetworkManager {
 
         return response.data;
       } catch (error: any) {
+        // 자세한 오류 로깅 추가
+        console.error('[NetworkManager] Request failed:', { 
+          url,
+          method,
+          errorMessage: error.message,
+          errorCode: error.code,
+          responseStatus: error.response?.status,
+          responseData: error.response?.data
+        });
+
         // CORS 또는 네트워크 에러인 경우 409 확인
         if (error.message === 'Network Error' && 
             (path.includes('/request/add') || path.includes('/provide/item/'))) {

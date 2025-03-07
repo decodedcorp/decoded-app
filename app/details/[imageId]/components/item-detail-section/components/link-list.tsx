@@ -24,7 +24,7 @@ export function LinkList({ links, activeTab, status }: LinkListProps) {
       {filteredLinks.map((link, index) => (
         <a
           key={index}
-          href={link.url}
+          href={link.value}
           target="_blank"
           rel="noopener noreferrer"
           className="group flex justify-between items-center hover:bg-neutral-900 transition-colors"
@@ -33,7 +33,7 @@ export function LinkList({ links, activeTab, status }: LinkListProps) {
             {activeTab === 'sale' && (
               <div className="text-primary text-[11px] font-medium">SALE</div>
             )}
-            <div className="text-white text-xs">{formatUrl(link.url)}</div>
+            <div className="text-white text-xs">{formatUrl(link.value)}</div>
             <div className="text-neutral-600 text-[11px]">
               {activeTab === 'sale' ? '구매하기' : link.label || '관련정보'}
             </div>
