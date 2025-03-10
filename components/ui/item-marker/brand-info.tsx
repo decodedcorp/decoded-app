@@ -13,6 +13,9 @@ export function BrandInfo({
   isActive,
   position = 'default'
 }: BrandInfoProps) {
+  // 브랜드 정보가 없으면 렌더링하지 않음
+  if (!brandName) return null;
+
   const positionClasses = {
     'default': 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom',
     'top': 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom',

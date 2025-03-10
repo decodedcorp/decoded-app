@@ -71,17 +71,39 @@ export function ItemActions({ itemId, imageId, likeCount }: ItemActionsProps) {
       return;
     }
 
+    if (!userId || !provideData.links[0]) {
+      console.error('Invalid data:', { userId, link: provideData.links[0] });
+      setStatus({
+        type: 'error',
+        message: '유효하지 않은 데이터입니다.',
+      });
+      return;
+    }
+
+    // URL 유효성 검사
+    try {
+      new URL(provideData.links[0].trim());
+    } catch (e) {
+      setStatus({
+        type: 'error',
+        message: '유효하지 않은 URL입니다.',
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       setStatus({ type: 'loading', messageKey: 'submitting' });
 
       const requestData = {
-        links: provideData.links.map((url) => ({
-          url: url.trim(),
-          label: null,
-          date: new Date().toISOString(),
-        })),
+        provider: userId,
+        link: provideData.links[0].trim()
       };
+
+      console.log('Request Data:', JSON.stringify(requestData, null, 2));
+      console.log('User ID:', userId);
+      console.log('Image ID:', imageId);
+      console.log('Item ID:', itemId);
 
       const result = await networkManager.request(
         `user/${userId}/image/${imageId}/provide/item/${itemId}`,
@@ -108,6 +130,11 @@ export function ItemActions({ itemId, imageId, likeCount }: ItemActionsProps) {
       setProvideData({ links: [] });
     } catch (error: any) {
       console.error('Link submission error:', error);
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
       setStatus({
         type: 'error',
         messageKey: 'link_error',
