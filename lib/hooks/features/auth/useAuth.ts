@@ -8,6 +8,7 @@ import { usePathname } from 'next/navigation';
 import { hash } from '@/lib/utils/string/string';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
 import { useLoginModalStore } from '@/components/auth/login-modal/store';
+import { executeAuthCallback } from '@/lib/hooks/auth/use-protected-action';
 
 // Google OAuth JWT 타입
 interface GoogleJWT {
@@ -183,6 +184,10 @@ export function useAuth() {
         console.log('[Login] Login successful, user session updated.');
         setIsLogin(true);
         closeLoginModal();
+        
+        // 로그인 성공 후 대기 중인 인증 콜백 실행
+        executeAuthCallback();
+        
         window.history.replaceState(null, '', window.location.pathname);
       } catch (err: any) {
         console.error('[Login] Login failed:', err.message);
@@ -196,10 +201,74 @@ export function useAuth() {
     login(token);
   }, [pathName, isInitialized, closeLoginModal]);
 
-  const handleGoogleLogin = async () => {
+  const handleGoogleLogin = async (providedToken?: string) => {
     if (!isInitialized || typeof window === 'undefined') return;
 
     try {
+      // 직접 제공된 토큰이 있는 경우 (모바일 리다이렉트 처리)
+      if (providedToken) {
+        console.log('[Login] Processing provided token...');
+        setIsLoading(true);
+        
+        try {
+          console.log('[Login] Verifying Google token...');
+          const isGoogleTokenValid = await verifyGoogleToken(providedToken);
+          if (!isGoogleTokenValid) throw new Error('[Login] Invalid Google token');
+
+          const decodedGoogle = jwtDecode<GoogleJWT>(providedToken);
+          const { sub, iss, aud, email, given_name } = decodedGoogle;
+          
+          if (!sub || !iss || !aud) {
+            throw new Error('[Login] Missing required fields in decoded token');
+          }
+
+          const hashInput = `${sub}${iss}${aud}`;
+          const hashedToken = hash(hashInput);
+          
+          const loginRes = await networkManager.request<{
+            status_code: number;
+            data: {
+              salt: string;
+              doc_id: string;
+              access_token: string;
+            };
+          }>('user/login', 'POST', {
+            token: hashedToken,
+            email,
+            aka: given_name,
+            agreement: {
+              marketing: false,
+              notification: false,
+              tracking: false,
+            },
+          });
+
+          if (!loginRes || loginRes.status_code !== 200 || !loginRes.data) {
+            throw new Error('[Login] Backend login failed');
+          }
+
+          const { salt, doc_id, access_token } = loginRes.data;
+          const sui_acc = jwtToAddress(providedToken, salt);
+
+          window.sessionStorage.setItem('ACCESS_TOKEN', access_token);
+          window.sessionStorage.setItem('USER_DOC_ID', doc_id);
+          window.sessionStorage.setItem('SUI_ACCOUNT', sui_acc);
+          window.sessionStorage.setItem('USER_EMAIL', email);
+
+          setIsLogin(true);
+          closeLoginModal();
+        } catch (error) {
+          console.error('Login process failed:', error);
+          window.sessionStorage.clear();
+          setIsLogin(false);
+        } finally {
+          setIsLoading(false);
+        }
+        
+        return;
+      }
+      
+      // 일반적인 로그인 플로우 (팝업 사용)
       console.log('[Login Start] Initiating Google login process...');
       console.log('Fetching Google OpenID Connect URL...');
       const { sk, randomness, exp, url } =

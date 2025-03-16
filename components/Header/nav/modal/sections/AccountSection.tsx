@@ -34,6 +34,16 @@ export function AccountSection({
     );
   }
 
+  // 로그아웃 핸들러 - 로그아웃 후 모달 닫기 처리
+  const handleLogout = () => {
+    handleDisconnect();
+    
+    // 로그아웃 후 약간의 지연을 두고 모달 닫기
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
+
   return (
     <div className="h-full flex flex-col">
       {isLogin && data ? (
@@ -44,7 +54,11 @@ export function AccountSection({
               <GoogleIcon />
               <span className="text-white">{userEmail}</span>
             </div>
-            <button onClick={handleDisconnect}>
+            <button 
+              onClick={handleLogout} 
+              className="hover:text-gray-200 transition-colors"
+              aria-label="로그아웃"
+            >
               <svg
                 className="w-5 h-5 text-gray-400"
                 fill="none"
@@ -150,6 +164,12 @@ export function AccountSection({
             onClick={async () => {
               try {
                 await handleGoogleLogin();
+                
+                // 로그인 성공 후 모달 닫기
+                // 약간의 지연을 주어 로그인 상태가 반영되도록 함
+                setTimeout(() => {
+                  onClose();
+                }, 500);
               } catch (error) {
                 console.error('로그인 실패:', error);
               }

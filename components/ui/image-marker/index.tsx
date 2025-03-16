@@ -94,7 +94,7 @@ export function ImageMarker({
   }, [points, onPointsChange, disableEditing]);
 
   return (
-    <div className={cn("relative w-full aspect-[4/5] rounded-lg overflow-hidden cursor-crosshair", className)}>
+    <div className={cn("relative w-full aspect-[4/5] overflow-hidden cursor-crosshair", className)}>
       {showWarning && (
         <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 animate-fade-in w-full">
           <div className="flex items-center gap-2 bg-black/90 text-[#EAFD66] px-4 py-2.5 rounded-lg text-sm backdrop-blur-sm border border-[#EAFD66]/20">

@@ -68,7 +68,7 @@ export const koMetadata: Metadata = {
     siteName: 'DECODED',
     images: [
       {
-        url: '/og-image.jpg',
+        url: `${SITE_URL}/og-image.jpg`,
         width: 1200,
         height: 630,
         alt: 'DECODED 메인 이미지',
@@ -79,18 +79,18 @@ export const koMetadata: Metadata = {
     card: 'summary_large_image',
     title: 'DECODED - 패션 아이템 검색 플랫폼',
     description: '궁금한 패션 아이템을 찾고 공유하세요',
-    images: ['/og-image.jpg'],
+    images: [`${SITE_URL}/og-image.jpg`],
   },
 } as const;
 
 export const enMetadata: Metadata = {
   ...commonMetadata,
   title: {
-    default: 'DECODED - Fashion Item Search Platform',
+    default: 'DECODED - Item Search Platform',
     template: '%s | DECODED',
   },
   description:
-    'Discover and share fashion items. Get real-time information about items you are interested in.',
+    'Discover and share items. Get real-time information about items you are interested in.',
   keywords: [
     'fashion',
     'style',
@@ -104,12 +104,12 @@ export const enMetadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: `${SITE_URL}/en`,
-    title: 'DECODED - Fashion Item Search Platform',
-    description: 'Discover and share fashion items',
+    title: 'DECODED - Item Search Platform',
+    description: 'Discover and share items',
     siteName: 'DECODED',
     images: [
       {
-        url: '/og-image.jpg',
+        url: `${SITE_URL}/og-image.jpg`,
         width: 1200,
         height: 630,
         alt: 'DECODED Main Image',
@@ -118,9 +118,9 @@ export const enMetadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'DECODED - Fashion Item Search Platform',
-    description: 'Discover and share fashion items',
-    images: ['/og-image.jpg'],
+    title: 'DECODED - Item Search Platform',
+    description: 'Discover and share items',
+    images: [`${SITE_URL}/og-image.jpg`],
   },
 } as const;
 

@@ -39,15 +39,10 @@ export const useStatusStore = create<StatusStore>((set) => ({
       onLoginRequired: undefined,
     });
     
-    // 모달이 닫힌 후 콜백 실행
+    // 모달이 닫힌 후 콜백 실행 (마이페이지 모달 열기 이벤트는 제거)
     if (store.type === 'warning' && store.messageKey === 'login' && loginCallback) {
       setTimeout(() => {
         console.log('로그인 콜백 실행');
-        
-        // 여기에서 마이페이지 모달 열기 이벤트 발생
-        const event = new CustomEvent('OPEN_MYPAGE_MODAL');
-        window.dispatchEvent(event);
-        
         loginCallback();
       }, 300);
     }

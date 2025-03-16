@@ -9,7 +9,8 @@ import { useLocaleContext } from '@/lib/contexts/locale-context';
 import { Menu, User, Search, PlusCircle } from 'lucide-react';
 import { cn } from '@/lib/utils/style';
 import { useState } from 'react';
-import { MypageModal } from './modal/MypageModal';
+import { useRequestModal } from '@/components/modals/request/hooks/use-request-modal';
+import { useLoginModalStore } from '@/components/auth/login-modal/store';
 
 interface NavProps {
   isSearchOpen: boolean;
@@ -25,7 +26,15 @@ function Nav({
   onSidebarOpen,
 }: NavProps) {
   const { t } = useLocaleContext();
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isIconLoginModalOpen, setIconLoginModalOpen] = useState(false);
+  const { onOpen: openRequestModal, RequestModal } = useRequestModal();
+  
+  // 로그인 모달 스토어 사용 - LoginButton 컴포넌트와 같은 스토어 공유
+  const { 
+    isOpen: isLoginModalOpen, 
+    openLoginModal, 
+    closeLoginModal 
+  } = useLoginModalStore();
 
   return (
     <nav className="w-full h-16 px-2 lg:px-16 flex items-center justify-center">
@@ -38,12 +47,12 @@ function Nav({
             </Link>
 
             <div className="flex items-center gap-3">
-              <Link
-                href="/request"
+              <button
+                onClick={openRequestModal}
                 className="p-2 text-gray-400 hover:text-[#EAFD66]"
               >
                 <PlusCircle className="w-5 h-5" />
-              </Link>
+              </button>
               <button
                 onClick={onSearchToggle}
                 className={cn(
@@ -58,10 +67,12 @@ function Nav({
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setIsLoginModalOpen(true)}
+                onClick={() => {
+                  console.log('User icon clicked, opening login modal');
+                  openLoginModal();
+                }}
                 className={cn(
                   'transition-colors duration-200',
-
                   isLoginModalOpen
                     ? 'text-[#EAFD66] '
                     : 'text-gray-400 hover:text-[#EAFD66]'
@@ -99,24 +110,22 @@ function Nav({
           </div>
 
           <div className="flex items-center justify-end gap-6">
-            <Link
-              href="/request"
+            <button
+              onClick={openRequestModal}
               className={cn(
                 'text-sm text-gray-400 hover:text-[#EAFD66]',
                 'transition-colors duration-200'
               )}
             >
               {t.header.nav.request}
-            </Link>
+            </button>
             <LoginButton />
           </div>
         </div>
       </div>
 
-      <MypageModal
-        isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-      />
+      {/* 요청 모달 렌더링 */}
+      {RequestModal}
     </nav>
   );
 }

@@ -88,6 +88,20 @@ export const request = {
       },
     },
   },
+  modal: {
+    confirmClose: {
+      title: "Cancel Operation",
+      message: "Your current progress will be lost. Are you sure you want to close?",
+      confirm: "Close",
+      cancel: "Continue Working"
+    },
+    confirmExitCropper: {
+      title: "Cancel Editing",
+      message: "Your edits will not be saved. Are you sure you want to cancel editing?",
+      confirm: "Cancel Editing",
+      cancel: "Continue Editing"
+    }
+  },
   validation: {
     login: "Login required",
     image: "Please upload an image",

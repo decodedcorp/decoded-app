@@ -100,7 +100,7 @@ export function StatusModal({
 
   return (
     <div className={cn(
-      'fixed z-[100]',
+      'fixed z-[1000000]',
       'top-4 md:top-20',
       'left-0 right-0 md:left-auto',
       'md:right-4',
@@ -112,7 +112,7 @@ export function StatusModal({
         className={cn(
           'w-full md:w-80',
           'max-w-sm',
-          'p-4 shadow-lg border border-white/5',
+          'p-4 shadow-lg border-2 border-white/20',
           'transform transition-all duration-300',
           'rounded-xl',
           bgClassName,
@@ -120,6 +120,7 @@ export function StatusModal({
             ? 'md:translate-x-2 -translate-y-full md:translate-y-0 opacity-0'
             : 'md:translate-x-0 translate-y-0 opacity-100'
         )}
+        style={{ backgroundColor: 'rgba(0, 0, 0, 1)' }}
       >
         <div className="flex items-start space-x-3">
           {type === 'loading' ? (

@@ -16,7 +16,7 @@ export function useInfiniteScroll({
   isLoading = false,
   onLoadMore,
   threshold = 0.1,
-  debounceTime = 200,
+  debounceTime = 500,
 }: UseInfiniteScrollOptions) {
   // IntersectionObserver 설정
   const { ref, inView } = useInView({

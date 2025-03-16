@@ -15,7 +15,10 @@ function GlobalStatusModal() {
   const handleStatusClose = () => {
     closeStatus();
     if (type === 'warning' && messageKey === 'login') {
-      openLoginModal();
+      console.log('[GlobalStatusModal] Login warning closed, opening login modal');
+      setTimeout(() => {
+        openLoginModal();
+      }, 300);
     }
   };
 
