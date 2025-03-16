@@ -12,6 +12,21 @@ const MIN_IMAGES_TO_SHOW = 1;
 const MIN_IMAGES_PER_SECTION = 4;
 const INITIAL_VISIBLE_IMAGES = 12; // 초기에 표시할 이미지 수
 
+// 이미지 배열에서 중복을 제거하는 헬퍼 함수
+const deduplicateImages = <T extends Record<string, any>>(
+  images: T[],
+  idField: keyof T = 'doc_id' as keyof T
+): T[] => {
+  const uniqueIds = new Set<string>();
+  return images.filter(img => {
+    const id = img[idField];
+    if (!id) return true; // ID가 없는 경우는 유지
+    const isDuplicate = uniqueIds.has(id as string);
+    if (!isDuplicate) uniqueIds.add(id as string);
+    return !isDuplicate;
+  });
+};
+
 export function RelatedStylingClient({
   imageId,
   selectedItemId,
@@ -68,9 +83,15 @@ export function RelatedStylingClient({
   }
 
   // 모든 페이지의 이미지 데이터 병합
-  const allArtistImages = relatedData?.pages.flatMap((page) => page.artistImages) || [];
-  const allBrandImages = relatedData?.pages.flatMap((page) => page.brandImages) || [];
-  const allTrendingImages = relatedData?.pages.flatMap((page) => page.trendingImages) || [];
+  const allArtistImages = deduplicateImages(
+    relatedData?.pages.flatMap((page) => page.artistImages) || []
+  );
+  const allBrandImages = deduplicateImages(
+    relatedData?.pages.flatMap((page) => page.brandImages) || []
+  );
+  const allTrendingImages = deduplicateImages(
+    relatedData?.pages.flatMap((page) => page.trendingImages) || []
+  );
 
   // 각 섹션의 조건 설정
   const hasArtistImages = allArtistImages.length > 0;

@@ -83,6 +83,20 @@ export const request = {
       },
     },
   },
+  modal: {
+    confirmClose: {
+      title: '작업 취소',
+      message: '작업 중인 내용이 사라집니다. 정말 닫으시겠습니까?',
+      confirm: '닫기',
+      cancel: '계속 작업하기'
+    },
+    confirmExitCropper: {
+      title: '편집 취소',
+      message: '편집 내용이 저장되지 않습니다. 편집을 취소하시겠습니까?',
+      confirm: '취소하기',
+      cancel: '계속 편집하기'
+    }
+  },
   validation: {
     login: '로그인이 필요합니다',
     image: '이미지를 업로드해주세요',

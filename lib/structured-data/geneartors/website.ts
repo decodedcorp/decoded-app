@@ -9,8 +9,8 @@ const websiteContent = {
     description: "궁금한 패션 아이템을 찾고 공유하세요",
   },
   en: {
-    name: "DECODED - Fashion Item Search Platform",
-    description: "Discover and share fashion items",
+    name: "DECODED - Item Search Platform",
+    description: "Discover and share items",
   },
 } as const;
 

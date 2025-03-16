@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils/style";
 import { AddItemModal } from "@/components/ui/modal/add-item-modal";
 import { useProtectedAction } from "@/lib/hooks/auth/use-protected-action"; 
 import { useLocaleContext } from "@/lib/contexts/locale-context";
+import { ShareButtons } from "@/components/ui/share-buttons";
 
 interface ItemActionsProps {
   likeCount: number;
@@ -26,6 +27,9 @@ export function ItemActions({
   const { withAuth } = useProtectedAction();
   const params = useParams();
   const imageId = params.imageId as string;
+  
+  // 직접 Cloudflare R2 이미지 URL 생성 (OG 이미지용)
+  const directImageUrl = `https://pub-65bb4012fb354951a2c6139a4b49b717.r2.dev/images/${imageId}.webp`;
 
   const handleLike = withAuth(async (userId) => {
     if (isLoading) return;
@@ -35,22 +39,32 @@ export function ItemActions({
   return (
     <>
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleLike}
-            disabled={isLoading}
-            className={cn(
-              "text-neutral-400 hover:text-white transition-colors",
-              isLiked && "text-red-500 hover:text-red-400",
-              isLoading && "opacity-50 cursor-not-allowed"
-            )}
-          >
-            <Heart
-              className="w-4 h-4"
-              fill={isLiked ? "currentColor" : "none"}
-            />
-          </button>
-          <span className="text-xs text-neutral-400">{likeCount}</span>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleLike}
+              disabled={isLoading}
+              className={cn(
+                "text-neutral-400 hover:text-white transition-colors",
+                isLiked && "text-red-500 hover:text-red-400",
+                isLoading && "opacity-50 cursor-not-allowed"
+              )}
+            >
+              <Heart
+                className="w-4 h-4"
+                fill={isLiked ? "currentColor" : "none"}
+              />
+            </button>
+            <span className="text-xs text-neutral-400">{likeCount}</span>
+          </div>
+          
+          <ShareButtons 
+            title="이미지 공유하기"
+            description="이 스타일을 친구들과 공유해보세요!"
+            className="text-neutral-400 hover:text-white transition-colors"
+            buttonVariant="ghost"
+            thumbnailUrl={directImageUrl}
+          />
         </div>
         <button
           onClick={() => setIsAddItemModalOpen(true)}
