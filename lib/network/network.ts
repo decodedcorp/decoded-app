@@ -88,8 +88,9 @@ export class NetworkManager {
           headers.Authorization = `Bearer ${accessToken}`;
         }
 
-        // Construct the full URL
-        const url = `${this.config.service}${path}`;
+        // Construct the full URL - 경로가 /로 시작하는지 확인하고 정규화
+        const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+        const url = `${this.config.service}${normalizedPath}`;
         
         if (isDevMode && retry === 0) {
           const sensitiveDataPlaceholder = data ? "(data)" : "no data";

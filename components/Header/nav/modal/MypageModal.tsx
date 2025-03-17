@@ -45,6 +45,10 @@ function useModalController({ isOpen, onClose }: { isOpen: boolean; onClose: () 
       const now = Date.now();
       if (now - lastActionTimeRef.current > 100) {
         // 외부에서 강제로 닫힘 감지
+        if (typeof document !== 'undefined') {
+          // 스크롤 복원 (강제 닫힘 시에도 항상 적용)
+          document.body.style.overflow = '';
+        }
       }
     }
     prevIsOpenRef.current = isOpen;
@@ -79,10 +83,26 @@ function useModalController({ isOpen, onClose }: { isOpen: boolean; onClose: () 
           document.body.style.overflow = '';
         }
       }, 300);
+      
+      // 항상 스크롤을 복원하기 위한 즉시 실행
+      if (typeof document !== 'undefined') {
+        document.body.style.overflow = '';
+      }
+      
       return () => clearTimeout(closeTimer);
     }
   }, [isOpen]);
 
+  // 모달 효과에서 제거하지 못한 overflow 설정을 정리하는 클린업 함수
+  useEffect(() => {
+    return () => {
+      // 컴포넌트 언마운트 시 항상 스크롤 복원
+      if (typeof document !== 'undefined') {
+        document.body.style.overflow = '';
+      }
+    };
+  }, []);
+  
   // 전역 이벤트 핸들러 예외 처리 - useModalClose 대응
   useEffect(() => {
     if (isOpen && isVisible) {

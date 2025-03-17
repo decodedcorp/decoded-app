@@ -186,7 +186,7 @@ export default function DetailsImagesSection({
   }).filter(Boolean) as DetailSection[];
 
   return (
-    <section className="container mx-auto px-4 py-8">
+    <section className="container mx-auto px-4 sm:px-4 lg:px-6 py-8">
       <div className="space-y-6">
         <SectionHeader title="Look Closeup" />
 

@@ -20,7 +20,7 @@ export default function Home() {
       />
       <div className="flex flex-col min-h-[100vh] bg-black text-white">
         <HeroSection />
-        <div className="space-y-24 py-16">
+        <div className="space-y-24 py-16 px-2 max-w-[95%] mx-auto">
           {/* 모든 섹션이 동일한 스타일의 헤더를 사용 */}
           <Explore position="left-main" of="identity" />
           <TrendingSection slideCount={0} />

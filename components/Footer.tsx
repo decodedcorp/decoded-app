@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils/style';
 import { Github, Mail, Twitter, ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
 import { useLocaleContext } from '@/lib/contexts/locale-context';
+import LogoPng from '@/styles/logos/LogoPng';
 
 function Footer() {
   const { t } = useLocaleContext();
@@ -18,14 +19,13 @@ function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-6 sm:mb-8">
           {/* Company Info */}
           <div className="space-y-2 col-span-2 md:col-span-1">
-            <h2
-              className={cn(
-                pretendardMedium.className,
-                'text-[#EAFD66] text-base sm:text-lg lg:text-xl'
-              )}
-            >
-              DECODED
-            </h2>
+            <Link href="/">
+              <LogoPng 
+                width={120}
+                height={28} 
+                className="object-contain mb-2" 
+              />
+            </Link>
             <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed max-w-md">
               {t.footer.company.description}
             </p>

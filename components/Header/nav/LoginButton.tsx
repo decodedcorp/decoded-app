@@ -102,9 +102,28 @@ export function LoginButton() {
   useEffect(() => {
     // 초기 체크
     checkLoginStatus();
+    
+    // 디버깅을 위해 세션 스토리지 값 확인
+    console.log('[LoginButton] Session storage status:', {
+      USER_DOC_ID: !!window.sessionStorage.getItem('USER_DOC_ID'),
+      SUI_ACCOUNT: !!window.sessionStorage.getItem('SUI_ACCOUNT'),
+      ACCESS_TOKEN: !!window.sessionStorage.getItem('ACCESS_TOKEN'),
+      isLogin
+    });
 
     // 1초마다 체크
-    const intervalId = setInterval(checkLoginStatus, 1000);
+    const intervalId = setInterval(() => {
+      checkLoginStatus();
+      // 세션 스토리지 변경 감지를 위한 로그 (30초마다)
+      if (Date.now() % 30000 < 1000) {
+        console.log('[LoginButton] Periodic session check:', {
+          USER_DOC_ID: !!window.sessionStorage.getItem('USER_DOC_ID'),
+          SUI_ACCOUNT: !!window.sessionStorage.getItem('SUI_ACCOUNT'),
+          ACCESS_TOKEN: !!window.sessionStorage.getItem('ACCESS_TOKEN'),
+          isLogin
+        });
+      }
+    }, 1000);
 
     // 메시지 이벤트 리스너
     const handleMessage = (event: MessageEvent) => {
@@ -259,6 +278,13 @@ export function LoginButton() {
       }
     }
     
+    // 이미 로그인한 상태라면 바로 모달 열기
+    if (isLogin) {
+      console.log('로그인 상태, 마이페이지 모달 열기');
+      openLoginModal();
+      return;
+    }
+    
     console.log('로그인 버튼 클릭, 모달 열기');
     
     // 모달 열기 전에 항상 닫기를 먼저 실행해 상태 초기화
@@ -276,34 +302,16 @@ export function LoginButton() {
       <button
         onClick={handleOpenModal}
         className={cn(
-          "relative flex items-center rounded-full transition-colors",
+          "relative flex items-center transition-colors px-2 py-1.5",
           "hover:text-white text-gray-300 dark:text-gray-400 dark:hover:text-white",
           {
-            "bg-[#EAFD66]/10 hover:bg-[#EAFD66]/20 text-[#EAFD66]": isLogin,
+            "text-[#EAFD66] hover:text-[#EAFD66]/90": isLogin,
           }
         )}
         data-modal-trigger="true"
         data-no-close-on-click="true"
       >
-        <span className="sr-only">{buttonText}</span>
-        
-        {isLogin ? (
-          <div className="flex items-center justify-center gap-2 px-2 py-1.5">
-            <span className="text-xs font-medium">{buttonText}</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-          </div>
-        ) : (
-          <div className="flex items-center justify-center gap-2 px-2 py-1.5">
-            <span className="text-xs font-medium">{buttonText}</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-          </div>
-        )}
+        <span className="text-sm font-medium">{buttonText}</span>
       </button>
       
       {/* 포털 사용하여 모달 렌더링 - body 최상위에 렌더링되도록 함 */}

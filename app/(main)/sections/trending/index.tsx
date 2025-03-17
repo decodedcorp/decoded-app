@@ -8,7 +8,7 @@ export function TrendingSection({ slideCount }: { slideCount: number }) {
   const { t } = useLocaleContext();
 
   return (
-    <section className="container mx-auto px-4">
+    <section className="container mx-auto px-4 sm:px-4 lg:px-6">
       <div className="space-y-8">
         {/* 헤더 */}
         <SectionHeader title={t.home.trending.title} />

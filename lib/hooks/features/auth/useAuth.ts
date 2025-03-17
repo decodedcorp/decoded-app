@@ -116,6 +116,14 @@ export function useAuth() {
     const userDocId = window.sessionStorage.getItem('USER_DOC_ID');
     const suiAccount = window.sessionStorage.getItem('SUI_ACCOUNT');
     const accessToken = window.sessionStorage.getItem('ACCESS_TOKEN');
+    const userNickname = window.sessionStorage.getItem('USER_NICKNAME');
+
+    console.log('[Auth] Initial session check:', {
+      hasUserDocId: !!userDocId,
+      hasSuiAccount: !!suiAccount,
+      hasAccessToken: !!accessToken,
+      hasUserNickname: !!userNickname
+    });
 
     setIsLogin(!!(userDocId && suiAccount && accessToken));
     setIsInitialized(true);
@@ -164,7 +172,7 @@ export function useAuth() {
             doc_id: string;
             access_token: string;
           };
-        }>('user/login', 'POST', {
+        }>('/user/login', 'POST', {
           token: hashedToken,
           email,
           aka: given_name,
@@ -191,10 +199,24 @@ export function useAuth() {
         const { salt, doc_id, access_token } = loginRes.data;
         const sui_acc = jwtToAddress(token, salt);
 
+        console.log('[Login] Saving user session data...', {
+          doc_id,
+          sui_account: sui_acc.substring(0, 10) + '...',
+          has_access_token: !!access_token
+        });
+
         window.sessionStorage.setItem('ACCESS_TOKEN', access_token);
         window.sessionStorage.setItem('USER_DOC_ID', doc_id);
         window.sessionStorage.setItem('SUI_ACCOUNT', sui_acc);
         window.sessionStorage.setItem('USER_EMAIL', email);
+        window.sessionStorage.setItem('USER_NICKNAME', given_name);
+
+        console.log('[Login] Checking if data was saved:', {
+          doc_id_saved: !!window.sessionStorage.getItem('USER_DOC_ID'),
+          sui_account_saved: !!window.sessionStorage.getItem('SUI_ACCOUNT'),
+          access_token_saved: !!window.sessionStorage.getItem('ACCESS_TOKEN'),
+          nickname_saved: !!window.sessionStorage.getItem('USER_NICKNAME')
+        });
 
         // 상태 업데이트 전에 약간의 지연을 줌
         await new Promise(resolve => setTimeout(resolve, 100));
@@ -267,7 +289,7 @@ export function useAuth() {
               doc_id: string;
               access_token: string;
             };
-          }>('user/login', 'POST', {
+          }>('/user/login', 'POST', {
             token: hashedToken,
             email,
             aka: given_name,
@@ -285,10 +307,24 @@ export function useAuth() {
           const { salt, doc_id, access_token } = loginRes.data;
           const sui_acc = jwtToAddress(providedToken, salt);
 
+          console.log('[Login] Saving user session data...', {
+            doc_id,
+            sui_account: sui_acc.substring(0, 10) + '...',
+            has_access_token: !!access_token
+          });
+
           window.sessionStorage.setItem('ACCESS_TOKEN', access_token);
           window.sessionStorage.setItem('USER_DOC_ID', doc_id);
           window.sessionStorage.setItem('SUI_ACCOUNT', sui_acc);
           window.sessionStorage.setItem('USER_EMAIL', email);
+          window.sessionStorage.setItem('USER_NICKNAME', given_name);
+
+          console.log('[Login] Checking if data was saved:', {
+            doc_id_saved: !!window.sessionStorage.getItem('USER_DOC_ID'),
+            sui_account_saved: !!window.sessionStorage.getItem('SUI_ACCOUNT'),
+            access_token_saved: !!window.sessionStorage.getItem('ACCESS_TOKEN'),
+            nickname_saved: !!window.sessionStorage.getItem('USER_NICKNAME')
+          });
 
           setIsLogin(true);
           closeLoginModal();
@@ -448,7 +484,7 @@ export function useAuth() {
                   doc_id: string;
                   access_token: string;
                 };
-              }>('user/login', 'POST', {
+              }>('/user/login', 'POST', {
                 token: hashedToken,
                 email,
                 aka: given_name,
@@ -470,10 +506,24 @@ export function useAuth() {
               const { salt, doc_id, access_token } = loginRes.data;
               const sui_acc = jwtToAddress(id_token, salt);
 
+              console.log('[Login] Saving user session data...', {
+                doc_id,
+                sui_account: sui_acc.substring(0, 10) + '...',
+                has_access_token: !!access_token
+              });
+
               window.sessionStorage.setItem('ACCESS_TOKEN', access_token);
               window.sessionStorage.setItem('USER_DOC_ID', doc_id);
               window.sessionStorage.setItem('SUI_ACCOUNT', sui_acc);
               window.sessionStorage.setItem('USER_EMAIL', email);
+              window.sessionStorage.setItem('USER_NICKNAME', given_name);
+
+              console.log('[Login] Checking if data was saved:', {
+                doc_id_saved: !!window.sessionStorage.getItem('USER_DOC_ID'),
+                sui_account_saved: !!window.sessionStorage.getItem('SUI_ACCOUNT'),
+                access_token_saved: !!window.sessionStorage.getItem('ACCESS_TOKEN'),
+                nickname_saved: !!window.sessionStorage.getItem('USER_NICKNAME')
+              });
 
               setIsLogin(true);
               closeLoginModal();
@@ -510,6 +560,15 @@ export function useAuth() {
     if (!isInitialized || typeof window === 'undefined') return;
 
     console.log('Logging out...');
+    // 로그아웃 전 세션 정보 로깅
+    const sessionInfo = {
+      USER_DOC_ID: window.sessionStorage.getItem('USER_DOC_ID'),
+      SUI_ACCOUNT: window.sessionStorage.getItem('SUI_ACCOUNT')?.substring(0, 10) + '...',
+      USER_EMAIL: window.sessionStorage.getItem('USER_EMAIL'),
+      USER_NICKNAME: window.sessionStorage.getItem('USER_NICKNAME')
+    };
+    console.log('Clearing session data:', sessionInfo);
+    
     window.sessionStorage.clear();
     setIsLogin(false);
   };
@@ -520,6 +579,19 @@ export function useAuth() {
     const userDocId = window.sessionStorage.getItem('USER_DOC_ID');
     const suiAccount = window.sessionStorage.getItem('SUI_ACCOUNT');
     const accessToken = window.sessionStorage.getItem('ACCESS_TOKEN');
+    const userNickname = window.sessionStorage.getItem('USER_NICKNAME');
+
+    // 10초마다 로깅 (너무 많은 로그를 방지하기 위해)
+    if (Date.now() % 10000 < 1000) {
+      console.log('[Auth] Checking login status:', {
+        hasUserDocId: !!userDocId,
+        hasSuiAccount: !!suiAccount,
+        hasAccessToken: !!accessToken,
+        hasUserNickname: !!userNickname,
+        prev_isLogin: isLogin,
+        new_isLogin: !!(userDocId && suiAccount && accessToken)
+      });
+    }
 
     setIsLogin(!!(userDocId && suiAccount && accessToken));
   };

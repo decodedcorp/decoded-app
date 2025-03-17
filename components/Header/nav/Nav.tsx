@@ -1,6 +1,6 @@
 'use client';
 
-import Logo from '@/styles/logos/LogoSvg';
+import LogoPng from '@/styles/logos/LogoPng';
 import { SearchBar } from '../search/SearchBar';
 import { LoginButton } from './LoginButton';
 import { Button } from '@/components/ui/button';
@@ -43,7 +43,12 @@ function Nav({
         <div className="lg:hidden h-full flex flex-col">
           <div className="h-16 flex items-center justify-between">
             <Link href="/" className="flex items-center">
-              <Logo className="h-8 w-auto" />
+              <LogoPng 
+                width={130}
+                height={30} 
+                priority={true} 
+                className="object-contain my-auto" 
+              />
             </Link>
 
             <div className="flex items-center gap-3">
@@ -115,7 +120,12 @@ function Nav({
         {/* 데스크톱 뷰 (lg) */}
         <div className="hidden lg:grid h-full grid-cols-[240px_1fr_240px] items-center gap-8">
           <Link href="/" className="flex items-center">
-            <Logo className="h-8 w-auto" />
+            <LogoPng 
+              width={130} 
+              height={30} 
+              priority={true} 
+              className="object-contain my-auto" 
+            />
           </Link>
 
           <div className="flex justify-center">

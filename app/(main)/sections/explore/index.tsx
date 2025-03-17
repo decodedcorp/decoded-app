@@ -122,7 +122,7 @@ function Explore({ position, of }: ExploreProps) {
   if (!categories?.find((cat) => cat.keyword === activeCategory)) return null;
 
   return (
-    <section className="container mx-auto px-4 sm:px-6 py-10 md:py-14 lg:py-16 relative">
+    <section className="container mx-auto px-4 sm:px-4 lg:px-6 py-10 md:py-14 lg:py-16 relative">
       {/* Subtle background effect */}
       <div className="absolute inset-0 bg-gradient-radial from-[#EAFD66]/5 to-transparent opacity-20 pointer-events-none rounded-3xl" />
 

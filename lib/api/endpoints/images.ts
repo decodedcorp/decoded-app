@@ -78,7 +78,7 @@ export const imagesAPI = {
   // Get featured images
   getFeaturedImages: async (): Promise<APIResponse<ImageData[]>> => {
     try {
-      const response = await networkManager.request('image/featured', 'GET');
+      const response = await networkManager.request('/image/featured', 'GET');
       return response;
     } catch (error) {
       throw error;
