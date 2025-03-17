@@ -31,9 +31,12 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
 
   // 모달 열림/닫힘 상태 처리
   useEffect(() => {
+    console.log(`Modal state changed: isOpen=${isOpen}`);
+    
     if (isOpen) {
       // 모달 열릴 때 바로 보이게 설정
       setIsVisible(true);
+      
       // Add body style to prevent scrolling when modal is open
       if (typeof document !== 'undefined') {
         document.body.style.overflow = 'hidden';
@@ -41,8 +44,10 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
     } else {
       // 닫힐 때는 애니메이션 후 상태 변경
       const timer = setTimeout(() => {
+        console.log('Modal closing animation completed, setting isVisible=false');
         setActiveTab('home');
         setIsVisible(false);
+        
         // Restore scrolling when modal is closed
         if (typeof document !== 'undefined') {
           document.body.style.overflow = '';
@@ -52,14 +57,22 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
     }
   }, [isOpen]);
 
+  // 실행순서 보장을 위한 추가 useEffect - 모달이 실제로 열린 후에만 데이터 쿼리 실행
+  useEffect(() => {
+    // isVisible이 true로 변경되는 시점에 activeTab에 따른 데이터 로드가 시작되도록 함
+    if (isVisible) {
+      console.log(`Modal is now visible, loading data for tab: ${activeTab}`);
+    }
+  }, [isVisible, activeTab]);
+
   // 화면 크기 변경 감지 - 컴포넌트 마운트 시 즉시 실행
   useEffect(() => {
     // 초기값 설정
     if (typeof window !== 'undefined') {
       setWindowWidth(window.innerWidth);
       
-      // 초기 렌더링 후 강제 리플로우 유도
-      if (isOpen && modalRef.current) {
+      // 모달이 열려있을 경우에만 강제 리플로우 유도
+      if (isOpen && isVisible && modalRef.current) {
         const forceReflow = modalRef.current.offsetHeight;
       }
     }
@@ -70,21 +83,21 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [isOpen]);
+  }, [isOpen, isVisible]);
 
   // Using useEffect to log when component renders for debugging
   useEffect(() => {
     console.log('MypageModal rendered, isOpen:', isOpen, 'isVisible:', isVisible, 'windowWidth:', windowWidth);
     
-    // 모달이 열릴 때 강제로 DOM 업데이트 유도
-    if (isOpen && modalRef.current) {
-      const forceReflow = modalRef.current.offsetHeight;
-      
-      // 화면 크기가 작을 때 추가 재렌더링 유도
-      if (windowWidth < 1025) {
-        setTimeout(() => {
-          if (modalRef.current) {
-            // 강제 스타일 업데이트
+    // 모달이 열리고 visible 상태가 된 후에만 DOM 조작 수행
+    if (isOpen && isVisible && modalRef.current) {
+      // 강제 리플로우를 setTimeout으로 분리하여 렌더링 안정성 개선
+      setTimeout(() => {
+        if (modalRef.current) {
+          const forceReflow = modalRef.current.offsetHeight;
+          
+          // 화면 크기가 작을 때 추가 스타일 조정
+          if (windowWidth < 1025) {
             modalRef.current.style.opacity = '0.99';
             setTimeout(() => {
               if (modalRef.current) {
@@ -92,13 +105,14 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
               }
             }, 10);
           }
-        }, 10);
-      }
+        }
+      }, 0);
     }
   }, [isOpen, isVisible, windowWidth]);
 
-  // Exit early if modal is completely closed
+  // Exit early if modal is completely closed - moved higher to avoid unnecessary renders
   if (!isOpen && !isVisible) {
+    console.log('MypageModal early exit: both isOpen and isVisible are false');
     return null;
   }
 

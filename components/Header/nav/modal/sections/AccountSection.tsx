@@ -163,15 +163,24 @@ export function AccountSection({
           <button
             onClick={async () => {
               try {
+                console.log('[AccountSection] Login button clicked, closing modal');
+                
+                // First close the modal to ensure it doesn't interfere with the login popup
+                onClose();
+                
+                // Make sure the modal is completely closed before attempting login
+                // This is crucial to prevent race conditions
+                console.log('[AccountSection] Waiting for modal to close completely...');
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                console.log('[AccountSection] Modal closed, attempting Google login');
+                
+                // Now attempt to login
                 await handleGoogleLogin();
                 
-                // 로그인 성공 후 모달 닫기
-                // 약간의 지연을 주어 로그인 상태가 반영되도록 함
-                setTimeout(() => {
-                  onClose();
-                }, 500);
+                console.log('[AccountSection] Login process initiated');
               } catch (error) {
-                console.error('로그인 실패:', error);
+                console.error('[AccountSection] Login failed:', error);
               }
             }}
             className="w-full px-6 py-4 rounded-xl text-sm font-medium

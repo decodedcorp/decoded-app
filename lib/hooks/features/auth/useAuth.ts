@@ -82,6 +82,13 @@ function verifyJWT(token: string): boolean {
   }
 }
 
+// Add a declaration for the window property at the top of the file
+declare global {
+  interface Window {
+    _loadingResetTimeout?: NodeJS.Timeout;
+  }
+}
+
 export function useAuth() {
   const [isLogin, setIsLogin] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -204,6 +211,11 @@ export function useAuth() {
   const handleGoogleLogin = async (providedToken?: string) => {
     if (!isInitialized || typeof window === 'undefined') return;
 
+    // Reset any existing loading timeouts
+    if (window._loadingResetTimeout) {
+      clearTimeout(window._loadingResetTimeout);
+    }
+
     try {
       // 직접 제공된 토큰이 있는 경우 (모바일 리다이렉트 처리)
       if (providedToken) {
@@ -266,119 +278,165 @@ export function useAuth() {
         }
         
         return;
-      }
-      
-      // 일반적인 로그인 플로우 (팝업 사용)
-      console.log('[Login Start] Initiating Google login process...');
-      console.log('Fetching Google OpenID Connect URL...');
-      const { sk, randomness, exp, url } =
-        await networkManager.openIdConnectUrl();
-
-      console.log('[Login] Received OpenID Connect URL:', url);
-      console.log('[Login] Setting session storage items...');
-
-      // OAuth 세션 정보 저장
-      window.sessionStorage.setItem('EPK_SECRET', sk);
-      window.sessionStorage.setItem('RANDOMNESS', randomness);
-      window.sessionStorage.setItem('EXPIRED_AT', exp.toString());
-
-      console.log('[Login] Opening popup window...');
-
-      // 팝업 창 설정
-      const width = 500;
-      const height = 600;
-      const left = window.screenX + (window.outerWidth - width) / 2;
-      const top = window.screenY + (window.outerHeight - height) / 2;
-
-      const popup = window.open(
-        url,
-        'google-login',
-        `width=${width},height=${height},left=${left},top=${top},scrollbars=yes`
-      );
-
-      if (!popup) {
-        throw new Error('팝업이 차단되었습니다. 팝업 차단을 해제해주세요.');
-      }
-
-      // 팝업 창에서 메시지를 받을 리스너
-      const messageListener = async (event: MessageEvent) => {
-        if (event.origin !== window.location.origin) {
-          console.log('[Login] Message from different origin:', event.origin);
-          return;
-        }
-
-        const { id_token } = event.data;
-        if (!id_token) {
-          console.log('[Login] No id_token in message data:', event.data);
-          return;
-        }
-
-        console.log('[Login] Received ID Token from popup');
-        window.removeEventListener('message', messageListener);
+      } else {
+        // No provided token - initiate OAuth flow
+        console.log('[Login Start] Initiating Google login process...');
+        setIsLoading(true);
+        
+        // Safety timeout to reset loading state if login flow doesn't complete
+        window._loadingResetTimeout = setTimeout(() => {
+          console.log('[Login] Safety timeout triggered - resetting loading state');
+          setIsLoading(false);
+        }, 30000); // 30 seconds timeout
         
         try {
-          console.log('[Login] Verifying Google token...');
-          const isGoogleTokenValid = await verifyGoogleToken(id_token);
-          console.log('[Login] Google token validation result:', isGoogleTokenValid);
-          if (!isGoogleTokenValid) throw new Error('[Login] Invalid Google token');
+          console.log('Fetching Google OpenID Connect URL...');
+          const { url: oauthUrl } = await networkManager.openIdConnectUrl();
+          console.log('[Login] Received OpenID Connect URL:', oauthUrl);
 
-          const decodedGoogle = jwtDecode<GoogleJWT>(id_token);
-          const { sub, iss, aud, email, given_name } = decodedGoogle;
+          // 세션 스토리지에 oauthUrl 저장 (필요한 경우 재사용)
+          console.log('[Login] Setting session storage items...');
+          sessionStorage.setItem('OAUTH_URL', oauthUrl);
+          sessionStorage.setItem('LOGIN_ATTEMPT_TIME', Date.now().toString());
           
-          if (!sub || !iss || !aud) {
-            throw new Error('[Login] Missing required fields in decoded token');
-          }
-
-          const hashInput = `${sub}${iss}${aud}`;
-          const hashedToken = hash(hashInput);
+          // Wait a moment to ensure any modal transitions are complete
+          await new Promise(resolve => setTimeout(resolve, 50));
           
-          const loginRes = await networkManager.request<{
-            status_code: number;
-            data: {
-              salt: string;
-              doc_id: string;
-              access_token: string;
-            };
-          }>('user/login', 'POST', {
-            token: hashedToken,
-            email,
-            aka: given_name,
-            agreement: {
-              marketing: false,
-              notification: false,
-              tracking: false,
-            },
-          });
-
-          if (!loginRes) {
-            throw new Error('[Login] Backend login failed');
+          console.log('[Login] Opening popup window...');
+          // Create popup with specific dimensions
+          const width = 500;
+          const height = 600;
+          const left = window.screenX + (window.outerWidth - width) / 2;
+          const top = window.screenY + (window.outerHeight - height) / 2;
+          
+          // Track popup status
+          let popupClosed = false;
+          
+          // Try to open the popup with specific dimensions and position
+          const popup = window.open(
+            oauthUrl,
+            'googleLoginPopup',
+            `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes,status=yes`
+          );
+          
+          if (!popup) {
+            console.error('[Login] Failed to open popup window. It might have been blocked by the browser.');
+            setIsLoading(false);
+            return;
           }
+          
+          // Check if popup was closed
+          const popupCheckInterval = setInterval(() => {
+            if (popup.closed) {
+              clearInterval(popupCheckInterval);
+              if (!popupClosed) {
+                console.log('[Login] Popup was closed by user without completing login');
+                setIsLoading(false);
+                popupClosed = true;
+                
+                // Clear safety timeout
+                if (window._loadingResetTimeout) {
+                  clearTimeout(window._loadingResetTimeout);
+                }
+              }
+            }
+          }, 500);
+          
+          // 팝업 창에서 메시지를 받을 리스너
+          const messageListener = async (event: MessageEvent) => {
+            if (event.origin !== window.location.origin) {
+              console.log('[Login] Message from different origin:', event.origin);
+              return;
+            }
 
-          if (loginRes.status_code !== 200 || !loginRes.data) {
-            throw new Error('[Login] Backend login failed');
-          }
+            const { id_token } = event.data;
+            if (!id_token) {
+              console.log('[Login] No id_token in message data:', event.data);
+              return;
+            }
 
-          const { salt, doc_id, access_token } = loginRes.data;
-          const sui_acc = jwtToAddress(id_token, salt);
+            console.log('[Login] Received ID Token from popup');
+            window.removeEventListener('message', messageListener);
+            
+            try {
+              console.log('[Login] Verifying Google token...');
+              const isGoogleTokenValid = await verifyGoogleToken(id_token);
+              console.log('[Login] Google token validation result:', isGoogleTokenValid);
+              if (!isGoogleTokenValid) throw new Error('[Login] Invalid Google token');
 
-          window.sessionStorage.setItem('ACCESS_TOKEN', access_token);
-          window.sessionStorage.setItem('USER_DOC_ID', doc_id);
-          window.sessionStorage.setItem('SUI_ACCOUNT', sui_acc);
-          window.sessionStorage.setItem('USER_EMAIL', email);
+              const decodedGoogle = jwtDecode<GoogleJWT>(id_token);
+              const { sub, iss, aud, email, given_name } = decodedGoogle;
+              
+              if (!sub || !iss || !aud) {
+                throw new Error('[Login] Missing required fields in decoded token');
+              }
 
-          setIsLogin(true);
-          closeLoginModal();
-          popup.close();
+              const hashInput = `${sub}${iss}${aud}`;
+              const hashedToken = hash(hashInput);
+              
+              const loginRes = await networkManager.request<{
+                status_code: number;
+                data: {
+                  salt: string;
+                  doc_id: string;
+                  access_token: string;
+                };
+              }>('user/login', 'POST', {
+                token: hashedToken,
+                email,
+                aka: given_name,
+                agreement: {
+                  marketing: false,
+                  notification: false,
+                  tracking: false,
+                },
+              });
+
+              if (!loginRes) {
+                throw new Error('[Login] Backend login failed');
+              }
+
+              if (loginRes.status_code !== 200 || !loginRes.data) {
+                throw new Error('[Login] Backend login failed');
+              }
+
+              const { salt, doc_id, access_token } = loginRes.data;
+              const sui_acc = jwtToAddress(id_token, salt);
+
+              window.sessionStorage.setItem('ACCESS_TOKEN', access_token);
+              window.sessionStorage.setItem('USER_DOC_ID', doc_id);
+              window.sessionStorage.setItem('SUI_ACCOUNT', sui_acc);
+              window.sessionStorage.setItem('USER_EMAIL', email);
+
+              setIsLogin(true);
+              closeLoginModal();
+              popup.close();
+            } catch (error) {
+              console.error('Login process failed:', error);
+              window.sessionStorage.clear();
+              setIsLogin(false);
+            }
+          };
+
+          window.addEventListener('message', messageListener);
         } catch (error) {
-          console.error('Login process failed:', error);
-          window.sessionStorage.clear();
-          setIsLogin(false);
+          console.error('[Login] Error initiating OAuth flow:', error);
+          setIsLoading(false);
+          
+          // Clear safety timeout
+          if (window._loadingResetTimeout) {
+            clearTimeout(window._loadingResetTimeout);
+          }
         }
-      };
-
-      window.addEventListener('message', messageListener);
+      }
     } catch (error: any) {
       console.error('Google login error:', error.message);
+      setIsLoading(false);
+      
+      // Clear safety timeout
+      if (window._loadingResetTimeout) {
+        clearTimeout(window._loadingResetTimeout);
+      }
     }
   };
   const handleDisconnect = () => {
