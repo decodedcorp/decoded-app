@@ -35,8 +35,6 @@ next-env.d.ts
 # cursor
 .cursorrules
 
-# public
-public
 
 # env
 .env

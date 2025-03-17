@@ -32,7 +32,7 @@ export function useSearchHistory() {
   //   if (!isLogin) return [];
 
   //   try {
-  //     const response = await networkManager.request("search/history", "GET");
+  //     const response = await networkManager.request("/search/history", "GET");
   //     return response.data.history;
   //   } catch (error) {
   //     console.error("Failed to fetch search history:", error);

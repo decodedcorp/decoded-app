@@ -68,10 +68,10 @@ export const koMetadata: Metadata = {
     siteName: 'DECODED',
     images: [
       {
-        url: `${SITE_URL}/og-image.jpg`,
-        width: 1200,
-        height: 630,
-        alt: 'DECODED 메인 이미지',
+        url: `${SITE_URL}/images/decoded.png`,
+        width: 600,
+        height: 140,
+        alt: 'DECODED 로고 이미지',
       },
     ],
   },
@@ -79,23 +79,23 @@ export const koMetadata: Metadata = {
     card: 'summary_large_image',
     title: 'DECODED - 패션 아이템 검색 플랫폼',
     description: '궁금한 패션 아이템을 찾고 공유하세요',
-    images: [`${SITE_URL}/og-image.jpg`],
+    images: [`${SITE_URL}/images/decoded.png`],
   },
 } as const;
 
 export const enMetadata: Metadata = {
   ...commonMetadata,
   title: {
-    default: 'DECODED - Item Search Platform',
+    default: 'DECODED - Fashion Item Search Platform',
     template: '%s | DECODED',
   },
   description:
-    'Discover and share items. Get real-time information about items you are interested in.',
+    'Find and share fashion items you\'re curious about. Request items in real-time and get information.',
   keywords: [
     'fashion',
     'style',
     'item search',
-    'fashion info',
+    'fashion information',
     'style sharing',
     'fashion community',
     'K-fashion',
@@ -103,24 +103,24 @@ export const enMetadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: `${SITE_URL}/en`,
-    title: 'DECODED - Item Search Platform',
-    description: 'Discover and share items',
+    url: SITE_URL,
+    title: 'DECODED - Fashion Item Search Platform',
+    description: 'Find and share fashion items you\'re curious about',
     siteName: 'DECODED',
     images: [
       {
-        url: `${SITE_URL}/og-image.jpg`,
-        width: 1200,
-        height: 630,
-        alt: 'DECODED Main Image',
+        url: `${SITE_URL}/images/decoded.png`,
+        width: 600,
+        height: 140,
+        alt: 'DECODED Logo Image',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'DECODED - Item Search Platform',
-    description: 'Discover and share items',
-    images: [`${SITE_URL}/og-image.jpg`],
+    title: 'DECODED - Fashion Item Search Platform',
+    description: 'Find and share fashion items you\'re curious about',
+    images: [`${SITE_URL}/images/decoded.png`],
   },
 } as const;
 
@@ -135,7 +135,7 @@ export function generateDetailMetadata(
   const description =
     data?.description ||
     (locale === 'ko' ? '상품 상세 정보' : 'Product Details');
-  const imageUrl = data?.imageUrl || '/og-image.jpg';
+  const imageUrl = data?.imageUrl || '/images/decoded.png';
 
   return {
     ...baseMetadata,
@@ -145,7 +145,7 @@ export function generateDetailMetadata(
       ...baseMetadata.openGraph,
       title: `${title} | DECODED`,
       description,
-      images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
+      images: [{ url: imageUrl, width: 600, height: 140, alt: title }],
     },
     twitter: {
       ...baseMetadata.twitter,

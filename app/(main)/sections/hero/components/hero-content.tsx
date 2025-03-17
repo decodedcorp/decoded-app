@@ -9,7 +9,7 @@ export function HeroContent() {
   const { onOpen: openRequestModal, RequestModal } = useRequestModal();
   
   return (
-    <div className="w-full flex flex-col items-center justify-center gap-6 px-4">
+    <div className="w-full flex flex-col items-center justify-center gap-6 px-4 sm:px-4 lg:px-6">
       <h1 className="text-2xl md:text-5xl font-bold text-foreground whitespace-pre-line text-center max-w-3xl">
         {t.home.hero.title}
       </h1>

@@ -5,8 +5,8 @@ export function TrendingKeywordsSection() {
   return (
     <section
       className="
-      container
-      px-4
+      container mx-auto
+      px-4 sm:px-4 lg:px-6
       space-y-4
       rounded-2xl 
       backdrop-blur-sm 

@@ -19,7 +19,7 @@ export function TrendingKeywordsList() {
       {response?.data?.map((keyword: string, index) => (
         <Badge 
           key={index} 
-          variant="secondary"
+          variant="default"
           onClick={() => handleKeywordClick(keyword)}
         >
           {keyword}

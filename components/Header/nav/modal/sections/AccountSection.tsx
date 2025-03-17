@@ -4,6 +4,7 @@ import { useAuth } from '@/lib/hooks/features/auth/useAuth';
 import { GoogleIcon } from '@/styles/icons/auth/google-icon';
 import { useLocaleContext } from '@/lib/contexts/locale-context';
 import { CustomTooltip } from "@/components/ui/custom-tooltip";
+import { useEffect } from 'react';
 
 interface AccountData {
   points: number;
@@ -25,6 +26,24 @@ export function AccountSection({
   const { t } = useLocaleContext();
   const { isLogin, handleGoogleLogin, handleDisconnect } = useAuth();
   const userEmail = window.sessionStorage.getItem('USER_EMAIL');
+  
+  // 개발 환경에서만 데이터 로깅
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[AccountSection] 렌더링:', { 
+        isLoading, 
+        isLogin, 
+        data,
+        sessionData: {
+          USER_DOC_ID: window.sessionStorage.getItem('USER_DOC_ID'),
+          USER_EMAIL: window.sessionStorage.getItem('USER_EMAIL'),
+          USER_NICKNAME: window.sessionStorage.getItem('USER_NICKNAME'),
+          SUI_ACCOUNT: !!window.sessionStorage.getItem('SUI_ACCOUNT'),
+          ACCESS_TOKEN: !!window.sessionStorage.getItem('ACCESS_TOKEN')
+        }
+      });
+    }
+  }, [isLoading, isLogin, data]);
 
   if (isLoading) {
     return (
@@ -44,9 +63,18 @@ export function AccountSection({
     }, 300);
   };
 
+  // 데이터가 있는지 확인
+  const hasData = data && (
+    data.points > 0 || 
+    data.active_ticket_num > 0 || 
+    data.request_num > 0 || 
+    data.provide_num > 0 || 
+    data.pending_num > 0
+  );
+
   return (
     <div className="h-full flex flex-col">
-      {isLogin && data ? (
+      {isLogin ? (
         <div className="flex-1 flex flex-col gap-4 p-4">
           {/* Current Account Section */}
           <div className="bg-[#1A1A1A] rounded-xl p-4 flex items-center justify-between">
@@ -98,7 +126,7 @@ export function AccountSection({
                 </CustomTooltip>
               </div>
               <div className="text-[#EAFD66] text-2xl font-bold">
-                {data.points}P
+                {data?.points || 0}P
               </div>
             </div>
 
@@ -123,7 +151,7 @@ export function AccountSection({
                 </CustomTooltip>
               </div>
               <div className="text-[#EAFD66] text-2xl font-bold">
-                {data.active_ticket_num}
+                {data?.active_ticket_num || 0}
               </div>
             </div>
           </div>
@@ -133,7 +161,7 @@ export function AccountSection({
             <div className="grid grid-cols-3 gap-4">
               <div className="text-center">
                 <div className="text-[#EAFD66] text-xl font-bold">
-                  {data.provide_num}
+                  {data?.provide_num || 0}
                 </div>
                 <div className="text-xs text-gray-400 mt-1">
                   {t.mypage.home.metricSections.provides}
@@ -141,7 +169,7 @@ export function AccountSection({
               </div>
               <div className="text-center">
                 <div className="text-[#EAFD66] text-xl font-bold">
-                  {data.request_num}
+                  {data?.request_num || 0}
                 </div>
                 <div className="text-xs text-gray-400 mt-1">
                   {t.mypage.home.metricSections.requests}
@@ -149,7 +177,7 @@ export function AccountSection({
               </div>
               <div className="text-center">
                 <div className="text-[#EAFD66] text-xl font-bold">
-                  {data.pending_num}
+                  {data?.pending_num || 0}
                 </div>
                 <div className="text-xs text-gray-400 mt-1">
                   {t.mypage.home.metricSections.pending}
@@ -177,7 +205,7 @@ export function AccountSection({
                     console.log('[AccountSection] 최근 로그인 버튼 클릭 감지, 중복 클릭 무시');
                   }
                   return;
-                }
+              }
               }
               
               // 현재 클릭 시간 기록

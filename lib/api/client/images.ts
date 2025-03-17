@@ -123,7 +123,7 @@ export const imagesAPI = {
 
   getNewalImages: async (): Promise<APIResponse<TrendingImagesResponse>> => {
     try {
-      const response = await networkManager.request('image', 'GET');
+      const response = await networkManager.request('/image', 'GET');
       return response;
     } catch (error) {
       throw error;
