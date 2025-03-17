@@ -165,29 +165,46 @@ export function AccountSection({
               e.preventDefault();
               e.stopPropagation();
               
-              // 클릭 이벤트 발생 시간 기록 (중복 클릭 방지용)
+              // 중복 클릭 방지
               const clickTime = Date.now();
+              const lastClickTime = sessionStorage.getItem('LOGIN_BUTTON_CLICK_TIME');
+              
+              if (lastClickTime) {
+                const timeDiff = clickTime - parseInt(lastClickTime, 10);
+                if (timeDiff < 2000) {  // 3초에서 2초로 축소
+                  const isDevMode = process.env.NODE_ENV === 'development';
+                  if (isDevMode) {
+                    console.log('[AccountSection] 최근 로그인 버튼 클릭 감지, 중복 클릭 무시');
+                  }
+                  return;
+                }
+              }
+              
+              // 현재 클릭 시간 기록
               sessionStorage.setItem('LOGIN_BUTTON_CLICK_TIME', clickTime.toString());
               
               try {
-                console.log('[AccountSection] 로그인 버튼 클릭, 모달 닫기');
+                const isDevMode = process.env.NODE_ENV === 'development';
+                if (isDevMode) {
+                  console.log('[AccountSection] 로그인 버튼 클릭, 의도적으로 모달 닫기 시작');
+                }
                 
-                // 모달을 먼저 닫아 로그인 팝업과의 간섭 방지
+                // 모달을 즉시 닫고 로그인 프로세스 시작 - 대기 시간 제거
                 onClose();
                 
-                // 모달이 완전히 닫힐 때까지 충분히 기다림
-                console.log('[AccountSection] 모달이 완전히 닫힐 때까지 대기 중...');
-                await new Promise(resolve => setTimeout(resolve, 500)); // 시간 증가
+                // 로그인 시작 - 대기 시간을 20ms로 최소화 (이벤트 버블링 방지 위한 최소값)
+                await new Promise(resolve => setTimeout(resolve, 20));
                 
-                console.log('[AccountSection] 모달 닫힘 완료, 구글 로그인 시도');
+                if (isDevMode) {
+                  console.log('[AccountSection] 구글 로그인 시도 시작');
+                }
                 
-                // 이제 로그인 시도
+                // 로그인 시도
                 await handleGoogleLogin();
                 
-                console.log('[AccountSection] 로그인 프로세스 시작됨');
-                
-                // 로그인 시도 후 상태 업데이트를 위한 짧은 지연
-                await new Promise(resolve => setTimeout(resolve, 200));
+                if (isDevMode) {
+                  console.log('[AccountSection] 로그인 프로세스 시작됨');
+                }
               } catch (error) {
                 console.error('[AccountSection] 로그인 실패:', error);
                 
@@ -206,8 +223,7 @@ export function AccountSection({
               const lastClickTime = sessionStorage.getItem('LOGIN_BUTTON_CLICK_TIME');
               if (lastClickTime) {
                 const timeDiff = Date.now() - parseInt(lastClickTime, 10);
-                // 2초 이내 클릭은 비활성화
-                return timeDiff < 2000;
+                return timeDiff < 2000; // 3초에서 2초로 축소
               }
               return false;
             })()}

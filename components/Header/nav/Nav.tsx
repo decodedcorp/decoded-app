@@ -68,7 +68,22 @@ function Nav({
                 variant="ghost"
                 size="icon"
                 onClick={() => {
-                  console.log('User icon clicked, opening login modal');
+                  // 최근 모달 상태 변경이 있었는지 확인
+                  const lastModalToggle = sessionStorage.getItem('LAST_MODAL_TOGGLE');
+                  const now = Date.now();
+                  
+                  if (lastModalToggle) {
+                    const lastToggleTime = parseInt(lastModalToggle, 10);
+                    // 마지막 토글 후 800ms 이내의 클릭은 무시
+                    if (now - lastToggleTime < 800) {
+                      console.log('[Nav] 모달 상태 최근 변경됨, User 아이콘 클릭 무시');
+                      return;
+                    }
+                  }
+                  
+                  console.log('[Nav] User 아이콘 클릭, 로그인 모달 열기');
+                  // 모달 토글 시간 기록
+                  sessionStorage.setItem('LAST_MODAL_TOGGLE', now.toString());
                   openLoginModal();
                 }}
                 className={cn(

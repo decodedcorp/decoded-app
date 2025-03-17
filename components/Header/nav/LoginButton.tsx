@@ -23,7 +23,14 @@ export function LoginButton() {
 
   // Debug logging
   useEffect(() => {
-    console.log('LoginButton rendered, isLoginModalOpen:', isLoginModalOpen);
+    console.log('[LoginButton] 렌더링됨, 로그인모달상태:', isLoginModalOpen);
+    
+    // 모달 상태 변경 감지
+    return () => {
+      if (isLoginModalOpen) {
+        console.log('[LoginButton] 언마운트 시점에 모달이 열려있었음');
+      }
+    };
   }, [isLoginModalOpen]);
 
   // 모바일 환경 감지
@@ -63,6 +70,25 @@ export function LoginButton() {
     onClose: closeLoginModal,
     isOpen: isLoginModalOpen,
   });
+
+  // MypageModal 포털 타겟 참조
+  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
+  
+  // PortalTarget 설정
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      // 기존 포털 타겟이 있으면 사용, 없으면 생성
+      let target = document.getElementById('mypage-modal-portal');
+      if (!target) {
+        target = document.createElement('div');
+        target.id = 'mypage-modal-portal';
+        target.setAttribute('data-modal-container', 'true');
+        target.setAttribute('data-no-close-on-click', 'true');
+        document.body.appendChild(target);
+      }
+      setPortalTarget(target);
+    }
+  }, []);
 
   // 첫 렌더링 이후 트랜지션 활성화
   useEffect(() => {
@@ -247,41 +273,67 @@ export function LoginButton() {
 
   return (
     <>
-      <div ref={modalRef} className="relative flex items-center gap-3">
-        <span
-          className={cn('text-xs md:text-sm', 'cursor-pointer', {
-            'transition-all duration-200': !isFirstRender,
-            'text-[#EAFD66]': isLoginModalOpen,
-            'text-gray-600 hover:text-[#EAFD66]': !isLoginModalOpen,
-            'animate-pulse': isLoading,
-            'opacity-70': !isInitialized,
-          })}
-          onClick={handleOpenModal}
-          onKeyDown={(e) => {
-            // Enter 키나 Space 키를 누르면 모달 열기
-            if (e.key === 'Enter' || e.key === ' ') {
-              handleOpenModal();
-            }
-          }}
-          role="button"
-          tabIndex={0}
-        >
-          {buttonText}
-        </span>
-      </div>
-      
-      {/* 
-        모달을 루트 레벨에서 렌더링하여 포지셔닝 문제 해결
-        DOM을 직접 제어하는 것과 유사한 방식으로 구현
+      <button
+        onClick={handleOpenModal}
+        className={cn(
+          "relative flex items-center rounded-full transition-colors",
+          "hover:text-white text-gray-300 dark:text-gray-400 dark:hover:text-white",
+          {
+            "bg-[#EAFD66]/10 hover:bg-[#EAFD66]/20 text-[#EAFD66]": isLogin,
+          }
+        )}
+        data-modal-trigger="true"
+        data-no-close-on-click="true"
+      >
+        <span className="sr-only">{buttonText}</span>
         
-        isOpen 상태를 직접 모달에 전달하여 모달 표시 상태를 명확히 함
-      */}
-      {typeof document !== 'undefined' && createPortal(
-        <MypageModal 
-          isOpen={isLoginModalOpen} 
-          onClose={closeLoginModal} 
-        />,
-        document.body
+        {isLogin ? (
+          <div className="flex items-center justify-center gap-2 px-2 py-1.5">
+            <span className="text-xs font-medium">{buttonText}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center gap-2 px-2 py-1.5">
+            <span className="text-xs font-medium">{buttonText}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+        )}
+      </button>
+      
+      {/* 포털 사용하여 모달 렌더링 - body 최상위에 렌더링되도록 함 */}
+      {portalTarget && isLoginModalOpen && createPortal(
+        <div 
+          ref={modalRef as React.RefObject<HTMLDivElement>}
+          className="login-modal-container" 
+          data-modal-container="true"
+          data-no-close-on-click="true"
+          style={{ 
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 100010, // 최상위 z-index로 설정
+            pointerEvents: 'auto'
+          }}
+          onClick={(e) => {
+            // 이벤트 전파를 중단하지 않음 - 마킹만 해주기
+            console.log('Login modal container clicked, marking event');
+            // data-no-close-on-click 속성으로 마킹되어 있으므로 이벤트 전파를 중단할 필요 없음
+          }}
+        >
+          <MypageModal 
+            isOpen={isLoginModalOpen} 
+            onClose={closeLoginModal} 
+          />
+        </div>,
+        portalTarget
       )}
     </>
   );
