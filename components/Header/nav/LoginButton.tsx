@@ -84,21 +84,27 @@ export function LoginButton() {
     const handleMessage = (event: MessageEvent) => {
       if (event.origin === window.location.origin && event.data?.id_token) {
         console.log('Token received, closing modal');
+        
+        // Make sure to close the modal first before any other operations
         closeLoginModal();
         
-        // 로그인 완료 후 대기 중인 콜백 실행 - 시간 조정 및 로그 추가
-        setTimeout(() => {
-          console.log('Running auth callback for popup login');
-          executeAuthCallback();
-          
-          // 콜백 실행 후 로그인 상태 확인하여 마이페이지 모달 표시
-          setTimeout(() => {
-            if (window.sessionStorage.getItem('USER_DOC_ID')) {
-              console.log('Popup login successful, reopening mypage modal');
-              openLoginModal();
-            }
-          }, 300);
-        }, 500);
+        // Add a small delay before processing the token
+        setTimeout(async () => {
+          try {
+            // Process the login directly using the token
+            await handleGoogleLogin(event.data.id_token);
+            
+            console.log('Login successful via popup');
+            
+            // Run any pending auth callbacks after login is confirmed
+            setTimeout(() => {
+              console.log('Running auth callback for popup login');
+              executeAuthCallback();
+            }, 300);
+          } catch (error) {
+            console.error('Failed to process login token:', error);
+          }
+        }, 200);
       }
     };
 
@@ -117,7 +123,7 @@ export function LoginButton() {
       window.removeEventListener('message', handleMessage);
       window.removeEventListener('OPEN_MYPAGE_MODAL', handleOpenMypage);
     };
-  }, [checkLoginStatus, closeLoginModal, openLoginModal]);
+  }, [checkLoginStatus, closeLoginModal, openLoginModal, handleGoogleLogin, executeAuthCallback]);
 
   // 모바일 로그인 리다이렉트 처리
   useEffect(() => {
@@ -137,36 +143,40 @@ export function LoginButton() {
         // 먼저 모달 닫기 (순서 변경)
         closeLoginModal();
         
-        // 메인 창에서 토큰 처리
-        setTimeout(() => {
-          handleGoogleLogin(tempToken);
-          
-          // 처리 후 토큰 삭제
-          localStorage.removeItem('TEMP_ID_TOKEN');
-          localStorage.removeItem('LOGIN_TIMESTAMP');
-          
-          // 로그인 완료 후 대기 중인 콜백 실행 - 타이밍 조정 및 콘솔 로그 추가
-          setTimeout(() => {
-            console.log('Running auth callback for mobile login');
-            executeAuthCallback();
+        // 메인 창에서 토큰 처리 - async/await 패턴으로 변경
+        const processToken = async () => {
+          try {
+            // 토큰 처리 직접 수행
+            await handleGoogleLogin(tempToken);
+            console.log('Mobile login successful');
             
-            // 모바일 환경에서는 타이밍 문제로 인해 콜백이 실행되지 않을 수 있으므로
-            // 마이페이지 모달을 직접 다시 열어줌
+            // 처리 후 토큰 삭제
+            localStorage.removeItem('TEMP_ID_TOKEN');
+            localStorage.removeItem('LOGIN_TIMESTAMP');
+            
+            // 로그인 성공 후 콜백 실행
             setTimeout(() => {
-              if (window.sessionStorage.getItem('USER_DOC_ID')) {
-                console.log('Mobile login successful, reopening mypage modal');
-                openLoginModal();
-              }
+              console.log('Running auth callback for mobile login');
+              executeAuthCallback();
             }, 300);
-          }, 800); // 시간 증가
-        }, 300); // 시간 증가
+          } catch (error) {
+            console.error('Mobile login processing failed:', error);
+            localStorage.removeItem('TEMP_ID_TOKEN');
+            localStorage.removeItem('LOGIN_TIMESTAMP');
+          }
+        };
+        
+        // 약간의 지연 후 실행
+        setTimeout(() => {
+          processToken();
+        }, 200);
       } else {
         // 오래된 토큰 삭제
         localStorage.removeItem('TEMP_ID_TOKEN');
         localStorage.removeItem('LOGIN_TIMESTAMP');
       }
     }
-  }, [isInitialized, handleGoogleLogin, closeLoginModal, openLoginModal]);
+  }, [isInitialized, handleGoogleLogin, closeLoginModal]);
 
   // 로그아웃 핸들러 수정 - 중복 호출 문제 수정
   const handleUserDisconnect = () => {
@@ -185,17 +195,33 @@ export function LoginButton() {
 
   // 모달 열기 핸들러 - 모바일에서는 좀 더 신경써서 처리
   const handleOpenModal = () => {
-    if (isLoading) return;
-    
-    if (isMobile) {
-      console.log('Opening login modal on mobile');
-      // 모바일에서는 약간의 지연을 주어 더 안정적으로 열림
-      setTimeout(() => {
-        openLoginModal();
-      }, 50);
-    } else {
-      openLoginModal();
+    if (isLoading) {
+      console.log('Login button clicked while loading, ignoring');
+      return;
     }
+    
+    // If a login attempt is already in progress, don't open the modal
+    if (typeof window !== 'undefined' && sessionStorage.getItem('LOGIN_ATTEMPT_TIME')) {
+      const attemptTime = parseInt(sessionStorage.getItem('LOGIN_ATTEMPT_TIME') || '0', 10);
+      const now = Date.now();
+      
+      // If there was a login attempt in the last 5 seconds, ignore this click
+      if (now - attemptTime < 5000) {
+        console.log('Recent login attempt detected, ignoring duplicate click');
+        return;
+      }
+    }
+    
+    console.log('Login button clicked, opening modal');
+    
+    // Always close the modal first to ensure a clean state
+    closeLoginModal();
+    
+    // Short delay to ensure any previous modal is fully closed
+    setTimeout(() => {
+      console.log(`Opening login modal on ${isMobile ? 'mobile' : 'desktop'}`);
+      openLoginModal();
+    }, isMobile ? 100 : 50);
   };
 
   return (
