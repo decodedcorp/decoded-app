@@ -225,6 +225,18 @@ export function useAuth() {
     // Reset any existing loading timeouts
     if (window._loadingResetTimeout) {
       clearTimeout(window._loadingResetTimeout);
+      window._loadingResetTimeout = undefined;
+    }
+    
+    // 최근 로그인 시도 확인 및 중복 방지
+    const now = Date.now();
+    const lastLoginAttempt = sessionStorage.getItem('LOGIN_ATTEMPT_TIME');
+    if (lastLoginAttempt) {
+      const attemptTime = parseInt(lastLoginAttempt, 10);
+      if (now - attemptTime < 3000) { // 3초 이내 중복 시도 방지
+        console.log('[Auth] 최근에 로그인이 시도됨, 중복 요청 무시');
+        return;
+      }
     }
 
     try {
@@ -291,29 +303,61 @@ export function useAuth() {
         return;
       } else {
         // No provided token - initiate OAuth flow
-        console.log('[Login Start] Initiating Google login process...');
+        const isDevMode = process.env.NODE_ENV === 'development';
+        if (isDevMode) {
+          console.log('[Auth] 구글 로그인 프로세스 시작...');
+        }
         setIsLoading(true);
+        
+        // 현재 시간 기록
+        sessionStorage.setItem('LOGIN_ATTEMPT_TIME', now.toString());
         
         // Safety timeout to reset loading state if login flow doesn't complete
         window._loadingResetTimeout = setTimeout(() => {
-          console.log('[Login] Safety timeout triggered - resetting loading state');
+          if (isDevMode) {
+            console.log('[Auth] 안전 타임아웃 작동 - 로딩 상태 초기화');
+          }
           setIsLoading(false);
-        }, 30000); // 30 seconds timeout
-        
-        try {
-          console.log('Fetching Google OpenID Connect URL...');
-          const { url: oauthUrl } = await networkManager.openIdConnectUrl();
-          console.log('[Login] Received OpenID Connect URL:', oauthUrl);
+          // 시간 초과된 로그인 시도 표시 초기화
+          sessionStorage.removeItem('LOGIN_ATTEMPT_TIME');
+        }, 30000); // 30초 타임아웃
 
-          // 세션 스토리지에 oauthUrl 저장 (필요한 경우 재사용)
-          console.log('[Login] Setting session storage items...');
-          sessionStorage.setItem('OAUTH_URL', oauthUrl);
-          sessionStorage.setItem('LOGIN_ATTEMPT_TIME', Date.now().toString());
+        try {
+          if (isDevMode) {
+            console.log('[Auth] 구글 OpenID Connect URL 가져오는 중...');
+          }
+          const { url: oauthUrl } = await networkManager.openIdConnectUrl();
           
-          // Wait a moment to ensure any modal transitions are complete
+          // 딜레이 시간 단축 - 300ms에서 50ms로 감소
           await new Promise(resolve => setTimeout(resolve, 50));
           
-          console.log('[Login] Opening popup window...');
+          if (isDevMode) {
+            console.log('[Auth] 구글 로그인 URL 획득:', oauthUrl.substring(0, 60) + '...');
+            console.log('[Auth] 세션 스토리지에 로그인 관련 정보 저장...');
+          }
+          
+          // 세션 스토리지에 oauthUrl 저장 (필요한 경우 재사용)
+          sessionStorage.setItem('OAUTH_URL', oauthUrl);
+          
+          // 현재 모달 상태 확인 (개발 모드에서만)
+          if (isDevMode) {
+            const modalToggleTime = sessionStorage.getItem('LAST_MODAL_TOGGLE');
+            if (modalToggleTime) {
+              const toggleTime = parseInt(modalToggleTime, 10);
+              console.log('[Auth] 마지막 모달 토글과의 시간차:', now - toggleTime, 'ms');
+            }
+          }
+          
+          // 딜레이 시간 단축 - 200ms에서 50ms로 감소
+          if (isDevMode) {
+            console.log('[Auth] 팝업 열기 전 최소 대기...');
+          }
+          await new Promise(resolve => setTimeout(resolve, 50));
+          
+          if (isDevMode) {
+            console.log('[Auth] 구글 로그인 팝업 열기 시도...');
+          }
+          
           // Create popup with specific dimensions
           const width = 500;
           const height = 600;
@@ -331,9 +375,15 @@ export function useAuth() {
           );
           
           if (!popup) {
-            console.error('[Login] Failed to open popup window. It might have been blocked by the browser.');
+            console.error('[Auth] 팝업 창을 열지 못했습니다. 브라우저에서 차단되었을 수 있습니다.');
             setIsLoading(false);
+            // 실패한 로그인 시도 표시 초기화
+            sessionStorage.removeItem('LOGIN_ATTEMPT_TIME');
             return;
+          }
+          
+          if (isDevMode) {
+            console.log('[Auth] 팝업 창이 성공적으로 열렸습니다.');
           }
           
           // Check if popup was closed
@@ -341,13 +391,19 @@ export function useAuth() {
             if (popup.closed) {
               clearInterval(popupCheckInterval);
               if (!popupClosed) {
-                console.log('[Login] Popup was closed by user without completing login');
+                if (isDevMode) {
+                  console.log('[Auth] 사용자가 로그인을 완료하지 않고 팝업을 닫았습니다.');
+                }
                 setIsLoading(false);
                 popupClosed = true;
+                
+                // 실패한 로그인 시도 표시 초기화
+                sessionStorage.removeItem('LOGIN_ATTEMPT_TIME');
                 
                 // Clear safety timeout
                 if (window._loadingResetTimeout) {
                   clearTimeout(window._loadingResetTimeout);
+                  window._loadingResetTimeout = undefined;
                 }
               }
             }

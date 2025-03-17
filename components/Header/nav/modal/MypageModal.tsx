@@ -11,62 +11,55 @@ import { useMyPageQuery } from '@/lib/hooks/common/useMyPageQueries';
 import type { LikeData, ProvideData, RequestData, AccountData, TabType } from '@/components/Header/nav/modal/types/mypage';
 import { cn } from '@/lib/utils/style';
 
-interface MypageModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export function MypageModal({ isOpen, onClose }: MypageModalProps) {
-  const [activeTab, setActiveTab] = useState<TabType>('home');
-  const { t } = useLocaleContext();
-  const modalRef = useRef<HTMLDivElement>(null);
-  const [windowWidth, setWindowWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 0);
+// 모달 컨트롤러 커스텀 훅
+function useModalController({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [isProtectionActive, setIsProtectionActive] = useState<boolean>(false);
   const lastActionTimeRef = useRef<number>(0);
-  
-  const { 
-    data: tabData,
-    isLoading,
-    error 
-  } = useMyPageQuery(activeTab, isOpen);
+  const prevIsOpenRef = useRef<boolean>(false);
 
   const handleClose = useCallback((e?: React.MouseEvent) => {
     if (e) {
-      e.stopPropagation();
+      e.preventDefault(); // 브라우저 기본 동작 방지
+      e.stopPropagation(); // 이벤트 전파 중단
     }
     
     const now = Date.now();
     
     if (isProtectionActive) {
-      console.log('모달 보호 기간 활성화 중, 닫기 무시');
       return;
     }
     
     if (now - lastActionTimeRef.current < 300) {
-      console.log('액션 간격이 너무 짧음, 닫기 무시');
       return;
     }
     
     lastActionTimeRef.current = now;
     
-    console.log('모달 닫기 실행');
     onClose();
   }, [onClose, isProtectionActive]);
 
+  // 외부에서 강제로 닫힘 감지
   useEffect(() => {
-    console.log(`모달 상태 변경: isOpen=${isOpen}`);
-    
+    if (prevIsOpenRef.current && !isOpen) {
+      const now = Date.now();
+      if (now - lastActionTimeRef.current > 100) {
+        // 외부에서 강제로 닫힘 감지
+      }
+    }
+    prevIsOpenRef.current = isOpen;
+  }, [isOpen, isProtectionActive]);
+
+  // 모달 상태 관리
+  useEffect(() => {
     const now = Date.now();
     lastActionTimeRef.current = now;
     
     if (isOpen) {
       setIsVisible(true);
-      
       setIsProtectionActive(true);
       
       const protectionTimer = setTimeout(() => {
-        console.log('모달 보호 기간 종료');
         setIsProtectionActive(false);
       }, 800);
       
@@ -79,8 +72,6 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
       setIsProtectionActive(true);
       
       const closeTimer = setTimeout(() => {
-        console.log('모달 닫기 애니메이션 완료, isVisible=false로 설정');
-        setActiveTab('home');
         setIsVisible(false);
         setIsProtectionActive(false);
         
@@ -92,33 +83,99 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
     }
   }, [isOpen]);
 
+  // 전역 이벤트 핸들러 예외 처리 - useModalClose 대응
   useEffect(() => {
-    console.log(`Modal is now visible, loading data for tab: ${activeTab}`);
-  }, [isVisible, activeTab]);
+    if (isOpen && isVisible) {
+      // 모달 내부 클릭을 감지하고 처리하는 핸들러
+      const handleGlobalClick = (e: MouseEvent) => {
+        // 모달 패널 내부 클릭인지 확인
+        const modalPanel = document.getElementById('mypage-modal-panel');
+        if (modalPanel && (modalPanel === e.target || modalPanel.contains(e.target as Node))) {
+          // 이벤트를 취소하지 않고 사용자 정의 플래그만 설정 - 다른 핸들러가 실행되도록 허용
+          (e as any).__handled = true;
+        }
+      };
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setWindowWidth(window.innerWidth);
+      // 캡처 단계에서 이벤트 리스너 추가 (가장 먼저 실행되도록)
+      document.addEventListener('click', handleGlobalClick, { capture: true });
       
-      if (isOpen && isVisible && modalRef.current) {
-        const forceReflow = modalRef.current.offsetHeight;
-      }
+      return () => {
+        document.removeEventListener('click', handleGlobalClick, { capture: true });
+      };
     }
-
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
   }, [isOpen, isVisible]);
 
+  return {
+    isVisible,
+    isProtectionActive,
+    handleClose
+  };
+}
+
+// 반응형 스타일 관리 커스텀 훅
+function useResponsiveModalStyles() {
+  const [windowWidth, setWindowWidth] = useState<number>(
+    typeof window !== 'undefined' ? window.innerWidth : 0
+  );
+  
   useEffect(() => {
-    console.log('MypageModal rendered, isOpen:', isOpen, 'isVisible:', isVisible, 'windowWidth:', windowWidth);
+    const handleResize = () => setWindowWidth(window.innerWidth);
     
+    if (typeof window !== 'undefined') {
+      setWindowWidth(window.innerWidth);
+      window.addEventListener('resize', handleResize);
+    }
+    
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  const isMobile = windowWidth < 768;
+  const isTablet = windowWidth >= 768 && windowWidth <= 1025;
+  const isDesktop = windowWidth > 1025;
+  
+  return {
+    windowWidth,
+    isMobile,
+    isTablet,
+    isDesktop,
+    styles: {
+      width: isMobile ? '100%' : isTablet ? '420px' : '360px',
+      height: isMobile ? '100%' : isTablet ? '75vh' : '65vh',
+      marginTop: isMobile ? '0' : '48px',
+      borderRadius: isMobile ? '0' : '16px',
+      minWidth: isMobile ? '100%' : '350px',
+      minHeight: isMobile ? '100%' : '500px',
+    }
+  };
+}
+
+interface MypageModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export function MypageModal({ isOpen, onClose }: MypageModalProps) {
+  const [activeTab, setActiveTab] = useState<TabType>('home');
+  const { t } = useLocaleContext();
+  const modalRef = useRef<HTMLDivElement>(null);
+  
+  // 커스텀 훅 사용
+  const { isVisible, isProtectionActive, handleClose } = useModalController({ isOpen, onClose });
+  const { windowWidth, isMobile, styles } = useResponsiveModalStyles();
+  
+  // 탭 데이터 로딩
+  const { 
+    data: tabData,
+    isLoading,
+    error 
+  } = useMyPageQuery(activeTab, isOpen);
+
+  // 렌더링 최적화를 위한 포스 리플로우
+  useEffect(() => {
     if (isOpen && isVisible && modalRef.current) {
       setTimeout(() => {
         if (modalRef.current) {
+          // 포스 리플로우
           const forceReflow = modalRef.current.offsetHeight;
           
           if (windowWidth < 1025) {
@@ -134,65 +191,52 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
     }
   }, [isOpen, isVisible, windowWidth]);
 
+  // 모달 외부 클릭 핸들러
+  const handleBackgroundClick = useCallback((e: React.MouseEvent) => {
+    // 배경 클릭 이벤트만 처리 (실제로 모달 외부 영역을 클릭한 경우만)
+    if (e.target === e.currentTarget) {
+      handleClose(e);
+    }
+    // 더 이상 e.stopPropagation()을 호출하지 않음 - 이벤트가 내부 컴포넌트로 전달될 수 있도록 함
+  }, [handleClose]);
+  
+  // 모달이 보이지 않고 열려있지 않으면 아무것도 렌더링하지 않음
   if (!isOpen && !isVisible) {
-    console.log('MypageModal early exit: both isOpen and isVisible are false');
     return null;
-  }
-
-  const isMobile = windowWidth < 768;
-  const isTablet = windowWidth >= 768 && windowWidth <= 1025;
-  const isDesktop = windowWidth > 1025;
-  
-  let modalWidth, modalHeight, modalMarginTop, modalBorderRadius;
-  
-  if (isMobile) {
-    modalWidth = '100%';
-    modalHeight = '100%';
-    modalMarginTop = '0';
-    modalBorderRadius = '0';
-  } else if (isTablet) {
-    modalWidth = '420px';
-    modalHeight = '75vh';
-    modalMarginTop = '48px';
-    modalBorderRadius = '16px';
-  } else {
-    modalWidth = '360px';
-    modalHeight = '65vh';
-    modalMarginTop = '48px';
-    modalBorderRadius = '16px';
   }
   
   return (
-    <div className="mypage-modal-root" style={{ 
-      position: 'fixed', 
-      top: 0, 
-      left: 0, 
-      right: 0,
-      bottom: 0, 
-      pointerEvents: isOpen ? 'auto' : 'none', 
-      zIndex: 100000,
-      display: 'block',
-    }}>
+    <div 
+      className="mypage-modal-root" 
+      style={{ 
+        position: 'fixed', 
+        top: 0, 
+        left: 0, 
+        right: 0,
+        bottom: 0, 
+        pointerEvents: isOpen ? 'auto' : 'none', 
+        zIndex: 100000
+      }}
+      onClick={handleBackgroundClick}
+    >
+      {/* 배경 오버레이 - 이제 이벤트 핸들러 제거 */}
       <div 
         className={cn(
           "fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300",
           isOpen ? "opacity-100" : "opacity-0"
         )}
-        style={{ pointerEvents: isOpen ? 'auto' : 'none' }}
-        onClick={(e) => {
-          if (isProtectionActive || !isOpen) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('배경 클릭 무시 (보호 기간 또는 닫는 중)');
-            return;
-          }
-          handleClose(e);
+        style={{ 
+          pointerEvents: 'none', // 이벤트를 항상 통과시킴
+          zIndex: 100000 
         }}
       />
       
+      {/* 모달 패널 */}
       <div 
         ref={modalRef}
         id="mypage-modal-panel"
+        data-modal-container="true"
+        data-no-close-on-click="true"
         className={cn(
           "fixed top-0 right-0 bottom-0 flex flex-col overflow-hidden",
           "border border-white/5 shadow-lg",
@@ -206,13 +250,13 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
         style={{ 
           pointerEvents: isOpen ? 'auto' : 'none', 
           zIndex: 100001,
-          width: modalWidth,
-          height: modalHeight,
-          minWidth: isMobile ? '100%' : '350px',
-          minHeight: isMobile ? '100%' : '500px',
-          marginTop: modalMarginTop,
-          borderTopLeftRadius: modalBorderRadius,
-          borderBottomLeftRadius: modalBorderRadius,
+          width: styles.width,
+          height: styles.height,
+          minWidth: styles.minWidth,
+          minHeight: styles.minHeight,
+          marginTop: styles.marginTop,
+          borderTopLeftRadius: styles.borderRadius,
+          borderBottomLeftRadius: styles.borderRadius,
           willChange: 'transform',
           transformOrigin: 'right center',
         }}
@@ -222,15 +266,19 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
           className="h-full flex flex-col"
           onValueChange={(value) => setActiveTab(value as TabType)}
         >
-          <div className="border-b border-white/5 flex-shrink-0">
+          {/* 헤더 영역 */}
+          <div 
+            className="border-b border-white/5 flex-shrink-0"
+          >
             <div className="px-4 py-3 flex items-center justify-between">
               <h2 className="text-lg font-bold text-white">
                 {t.mypage.tabs[activeTab]}
               </h2>
               <button
                 onClick={(e) => {
+                  // 닫기 버튼은 이벤트 전파를 중단해서 패널 클릭 핸들러가 실행되지 않도록 함
                   e.stopPropagation();
-                  handleClose();
+                  handleClose(e);
                 }}
                 className="rounded-full p-2 hover:bg-white/5 transition-colors"
                 disabled={isProtectionActive}
@@ -252,39 +300,49 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto">
+          {/* 콘텐츠 영역 */}
+          <div 
+            className="flex-1 overflow-y-auto"
+            data-no-close-on-click="true"
+          >
             <TabsContent value="home" className="h-full m-0 data-[state=active]:flex data-[state=active]:flex-col">
               <AccountSection 
                 data={tabData as AccountData} 
                 isLoading={isLoading}
-                onClose={onClose}
+                onClose={handleClose}
               />
             </TabsContent>
             <TabsContent value="request" className="h-full m-0 data-[state=active]:flex data-[state=active]:flex-col">
               <RequestSection 
                 data={tabData as RequestData} 
                 isLoading={isLoading}
-                onClose={onClose}
+                onClose={handleClose}
               />
             </TabsContent>
             <TabsContent value="provide" className="h-full m-0 data-[state=active]:flex data-[state=active]:flex-col">
               <ProvideSection 
                 data={tabData as ProvideData} 
                 isLoading={isLoading}
-                onClose={onClose}
+                onClose={handleClose}
               />
             </TabsContent>
             <TabsContent value="like" className="h-full m-0 data-[state=active]:flex data-[state=active]:flex-col">
               <LikeSection 
                 data={tabData as LikeData} 
                 isLoading={isLoading}
-                onClose={onClose}
+                onClose={handleClose}
               />
             </TabsContent>
           </div>
 
-          <div className="border-t border-white/5 p-3 flex-shrink-0">
-            <TabsList className="w-full h-10 bg-black/20 p-1 rounded-xl">
+          {/* 탭 네비게이션 */}
+          <div 
+            className="border-t border-white/5 p-3 flex-shrink-0"
+            data-no-close-on-click="true"
+          >
+            <TabsList 
+              className="w-full h-10 bg-black/20 p-1 rounded-xl"
+            >
               {(['home', 'request', 'provide', 'like'] as const).map((tab) => (
                 <TabsTrigger
                   key={tab}

@@ -26,10 +26,28 @@ function useModalClose<T extends HTMLElement = HTMLDivElement>({
     if (!isOpen) return;
 
     const handleClickOutside = (event: MouseEvent) => {
+      // Skip click handling if the event has been marked as handled
+      if ((event as any).__handled) {
+        console.log('[useModalClose] Event already handled, ignoring');
+        return;
+      }
+
+      // Check for special data attributes that indicate elements that shouldn't trigger a close
+      const targetElement = event.target as HTMLElement;
+      const isNoCloseElement = targetElement.closest('[data-no-close-on-click="true"]');
+      const isModalContainer = targetElement.closest('[data-modal-container="true"]');
+      
+      if (isNoCloseElement || isModalContainer) {
+        console.log('[useModalClose] Click detected on protected element, not closing');
+        (event as any).__handled = true;
+        return;
+      }
+      
       if (
         modalRef.current &&
         !modalRef.current.contains(event.target as Node)
       ) {
+        console.log('[useModalClose] Click outside modal detected, closing');
         handleClose();
       }
     };
