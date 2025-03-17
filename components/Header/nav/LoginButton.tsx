@@ -193,35 +193,56 @@ export function LoginButton() {
     return t.header.nav.login.button.text;
   })();
 
-  // 모달 열기 핸들러 - 모바일에서는 좀 더 신경써서 처리
-  const handleOpenModal = () => {
+  // 모달 열기 핸들러 - 이벤트 버블링 방지 및 중복 클릭 보호 로직 강화
+  const handleOpenModal = (e?: React.MouseEvent) => {
+    // 이벤트 객체가 있으면 이벤트 전파 중지
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
     if (isLoading) {
-      console.log('Login button clicked while loading, ignoring');
+      console.log('로그인 진행 중, 클릭 무시');
       return;
     }
     
-    // If a login attempt is already in progress, don't open the modal
-    if (typeof window !== 'undefined' && sessionStorage.getItem('LOGIN_ATTEMPT_TIME')) {
-      const attemptTime = parseInt(sessionStorage.getItem('LOGIN_ATTEMPT_TIME') || '0', 10);
-      const now = Date.now();
-      
-      // If there was a login attempt in the last 5 seconds, ignore this click
-      if (now - attemptTime < 5000) {
-        console.log('Recent login attempt detected, ignoring duplicate click');
+    // 최근에 모달 상태가 변경된 경우 중복 실행 방지
+    const lastModalToggle = sessionStorage.getItem('LAST_MODAL_TOGGLE');
+    const now = Date.now();
+    
+    if (lastModalToggle) {
+      const lastToggleTime = parseInt(lastModalToggle, 10);
+      // 마지막 토글 후 800ms 이내의 클릭은 무시
+      if (now - lastToggleTime < 800) {
+        console.log('모달 상태 최근 변경됨, 중복 클릭 무시');
         return;
       }
     }
     
-    console.log('Login button clicked, opening modal');
+    // 모달 토글 시간 기록
+    sessionStorage.setItem('LAST_MODAL_TOGGLE', now.toString());
     
-    // Always close the modal first to ensure a clean state
+    // If a login attempt is already in progress, don't open the modal
+    if (typeof window !== 'undefined' && sessionStorage.getItem('LOGIN_ATTEMPT_TIME')) {
+      const attemptTime = parseInt(sessionStorage.getItem('LOGIN_ATTEMPT_TIME') || '0', 10);
+      
+      // If there was a login attempt in the last 5 seconds, ignore this click
+      if (now - attemptTime < 5000) {
+        console.log('최근 로그인 시도 감지, 중복 클릭 무시');
+        return;
+      }
+    }
+    
+    console.log('로그인 버튼 클릭, 모달 열기');
+    
+    // 모달 열기 전에 항상 닫기를 먼저 실행해 상태 초기화
     closeLoginModal();
     
-    // Short delay to ensure any previous modal is fully closed
+    // 약간의 지연 후 모달 열기 (이전 모달이 완전히 닫힌 후)
     setTimeout(() => {
-      console.log(`Opening login modal on ${isMobile ? 'mobile' : 'desktop'}`);
+      console.log(`${isMobile ? '모바일' : '데스크톱'}에서 로그인 모달 열기`);
       openLoginModal();
-    }, isMobile ? 100 : 50);
+    }, isMobile ? 150 : 100);
   };
 
   return (
@@ -236,6 +257,14 @@ export function LoginButton() {
             'opacity-70': !isInitialized,
           })}
           onClick={handleOpenModal}
+          onKeyDown={(e) => {
+            // Enter 키나 Space 키를 누르면 모달 열기
+            if (e.key === 'Enter' || e.key === ' ') {
+              handleOpenModal();
+            }
+          }}
+          role="button"
+          tabIndex={0}
         >
           {buttonText}
         </span>
@@ -257,3 +286,4 @@ export function LoginButton() {
     </>
   );
 }
+

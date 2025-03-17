@@ -161,26 +161,38 @@ export function AccountSection({
       ) : (
         <div className="flex-1 flex items-center justify-center p-4">
           <button
-            onClick={async () => {
+            onClick={async (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              
+              // 클릭 이벤트 발생 시간 기록 (중복 클릭 방지용)
+              const clickTime = Date.now();
+              sessionStorage.setItem('LOGIN_BUTTON_CLICK_TIME', clickTime.toString());
+              
               try {
-                console.log('[AccountSection] Login button clicked, closing modal');
+                console.log('[AccountSection] 로그인 버튼 클릭, 모달 닫기');
                 
-                // First close the modal to ensure it doesn't interfere with the login popup
+                // 모달을 먼저 닫아 로그인 팝업과의 간섭 방지
                 onClose();
                 
-                // Make sure the modal is completely closed before attempting login
-                // This is crucial to prevent race conditions
-                console.log('[AccountSection] Waiting for modal to close completely...');
-                await new Promise(resolve => setTimeout(resolve, 300));
+                // 모달이 완전히 닫힐 때까지 충분히 기다림
+                console.log('[AccountSection] 모달이 완전히 닫힐 때까지 대기 중...');
+                await new Promise(resolve => setTimeout(resolve, 500)); // 시간 증가
                 
-                console.log('[AccountSection] Modal closed, attempting Google login');
+                console.log('[AccountSection] 모달 닫힘 완료, 구글 로그인 시도');
                 
-                // Now attempt to login
+                // 이제 로그인 시도
                 await handleGoogleLogin();
                 
-                console.log('[AccountSection] Login process initiated');
+                console.log('[AccountSection] 로그인 프로세스 시작됨');
+                
+                // 로그인 시도 후 상태 업데이트를 위한 짧은 지연
+                await new Promise(resolve => setTimeout(resolve, 200));
               } catch (error) {
-                console.error('[AccountSection] Login failed:', error);
+                console.error('[AccountSection] 로그인 실패:', error);
+                
+                // 에러 발생 시 타임스탬프 삭제하여 재시도 가능하게 함
+                sessionStorage.removeItem('LOGIN_BUTTON_CLICK_TIME');
               }
             }}
             className="w-full px-6 py-4 rounded-xl text-sm font-medium
@@ -189,6 +201,16 @@ export function AccountSection({
               transition-all duration-200 ease-out
               flex items-center justify-center gap-3
               shadow-lg shadow-black/5"
+            // disabled 상태 추가 - 최근 클릭이 있었으면 비활성화
+            disabled={(() => {
+              const lastClickTime = sessionStorage.getItem('LOGIN_BUTTON_CLICK_TIME');
+              if (lastClickTime) {
+                const timeDiff = Date.now() - parseInt(lastClickTime, 10);
+                // 2초 이내 클릭은 비활성화
+                return timeDiff < 2000;
+              }
+              return false;
+            })()}
           >
             <GoogleIcon />
             <span className="font-medium">{t.common.actions.login.google}</span>
