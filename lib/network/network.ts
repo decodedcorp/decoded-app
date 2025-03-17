@@ -110,6 +110,11 @@ export class NetworkManager {
         retry++;
 
         if (retry > retries) {
+          // 명시적인 409 응답
+          if (error.response?.status === 409) {
+            return undefined;
+          }
+
           if (axios.isAxiosError(error)) {
             // Handle specific HTTP errors
             if (error.response) {
@@ -147,20 +152,13 @@ export class NetworkManager {
             return undefined;
           }
 
-          throw error;
+          throw {
+            status: error.response?.status || 500,
+            message: error.response?.data?.message || error.message || "Request failed"
+          };
         }
       }
     }
-
-    // 명시적인 409 응답
-    if (error.response?.status === 409) {
-      return undefined;
-    }
-
-    throw {
-      status: error.response?.status || 500,
-      message: error.response?.data?.message || error.message || "Request failed"
-    };
   }
 
   public async openIdConnectUrl(): Promise<{
