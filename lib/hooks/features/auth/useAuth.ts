@@ -102,6 +102,17 @@ export function useAuth() {
       return;
     }
 
+    // 앱 시작 시 임시 로그인 데이터 정리
+    sessionStorage.removeItem('LOGIN_ATTEMPT_TIME');
+    sessionStorage.removeItem('LAST_MODAL_TOGGLE');
+    sessionStorage.removeItem('LOGIN_BUTTON_CLICK_TIME');
+    
+    // 오래된 타임아웃 핸들러가 있다면 제거
+    if (window._loadingResetTimeout) {
+      clearTimeout(window._loadingResetTimeout);
+      window._loadingResetTimeout = undefined;
+    }
+
     const userDocId = window.sessionStorage.getItem('USER_DOC_ID');
     const suiAccount = window.sessionStorage.getItem('SUI_ACCOUNT');
     const accessToken = window.sessionStorage.getItem('ACCESS_TOKEN');

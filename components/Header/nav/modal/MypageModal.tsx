@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocaleContext } from '@/lib/contexts/locale-context';
 import { AccountSection } from './sections/AccountSection';
 import { RequestSection } from './sections/RequestSection';
@@ -22,6 +22,8 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const [windowWidth, setWindowWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 0);
   const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [isProtectionActive, setIsProtectionActive] = useState<boolean>(false);
+  const lastActionTimeRef = useRef<number>(0);
   
   const { 
     data: tabData,
@@ -29,49 +31,75 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
     error 
   } = useMyPageQuery(activeTab, isOpen);
 
-  // 모달 열림/닫힘 상태 처리
+  const handleClose = useCallback((e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    
+    const now = Date.now();
+    
+    if (isProtectionActive) {
+      console.log('모달 보호 기간 활성화 중, 닫기 무시');
+      return;
+    }
+    
+    if (now - lastActionTimeRef.current < 300) {
+      console.log('액션 간격이 너무 짧음, 닫기 무시');
+      return;
+    }
+    
+    lastActionTimeRef.current = now;
+    
+    console.log('모달 닫기 실행');
+    onClose();
+  }, [onClose, isProtectionActive]);
+
   useEffect(() => {
-    console.log(`Modal state changed: isOpen=${isOpen}`);
+    console.log(`모달 상태 변경: isOpen=${isOpen}`);
+    
+    const now = Date.now();
+    lastActionTimeRef.current = now;
     
     if (isOpen) {
-      // 모달 열릴 때 바로 보이게 설정
       setIsVisible(true);
       
-      // Add body style to prevent scrolling when modal is open
+      setIsProtectionActive(true);
+      
+      const protectionTimer = setTimeout(() => {
+        console.log('모달 보호 기간 종료');
+        setIsProtectionActive(false);
+      }, 800);
+      
       if (typeof document !== 'undefined') {
         document.body.style.overflow = 'hidden';
       }
+      
+      return () => clearTimeout(protectionTimer);
     } else {
-      // 닫힐 때는 애니메이션 후 상태 변경
-      const timer = setTimeout(() => {
-        console.log('Modal closing animation completed, setting isVisible=false');
+      setIsProtectionActive(true);
+      
+      const closeTimer = setTimeout(() => {
+        console.log('모달 닫기 애니메이션 완료, isVisible=false로 설정');
         setActiveTab('home');
         setIsVisible(false);
+        setIsProtectionActive(false);
         
-        // Restore scrolling when modal is closed
         if (typeof document !== 'undefined') {
           document.body.style.overflow = '';
         }
       }, 300);
-      return () => clearTimeout(timer);
+      return () => clearTimeout(closeTimer);
     }
   }, [isOpen]);
 
-  // 실행순서 보장을 위한 추가 useEffect - 모달이 실제로 열린 후에만 데이터 쿼리 실행
   useEffect(() => {
-    // isVisible이 true로 변경되는 시점에 activeTab에 따른 데이터 로드가 시작되도록 함
-    if (isVisible) {
-      console.log(`Modal is now visible, loading data for tab: ${activeTab}`);
-    }
+    console.log(`Modal is now visible, loading data for tab: ${activeTab}`);
   }, [isVisible, activeTab]);
 
-  // 화면 크기 변경 감지 - 컴포넌트 마운트 시 즉시 실행
   useEffect(() => {
-    // 초기값 설정
     if (typeof window !== 'undefined') {
       setWindowWidth(window.innerWidth);
       
-      // 모달이 열려있을 경우에만 강제 리플로우 유도
       if (isOpen && isVisible && modalRef.current) {
         const forceReflow = modalRef.current.offsetHeight;
       }
@@ -85,18 +113,14 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
     return () => window.removeEventListener('resize', handleResize);
   }, [isOpen, isVisible]);
 
-  // Using useEffect to log when component renders for debugging
   useEffect(() => {
     console.log('MypageModal rendered, isOpen:', isOpen, 'isVisible:', isVisible, 'windowWidth:', windowWidth);
     
-    // 모달이 열리고 visible 상태가 된 후에만 DOM 조작 수행
     if (isOpen && isVisible && modalRef.current) {
-      // 강제 리플로우를 setTimeout으로 분리하여 렌더링 안정성 개선
       setTimeout(() => {
         if (modalRef.current) {
           const forceReflow = modalRef.current.offsetHeight;
           
-          // 화면 크기가 작을 때 추가 스타일 조정
           if (windowWidth < 1025) {
             modalRef.current.style.opacity = '0.99';
             setTimeout(() => {
@@ -110,34 +134,28 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
     }
   }, [isOpen, isVisible, windowWidth]);
 
-  // Exit early if modal is completely closed - moved higher to avoid unnecessary renders
   if (!isOpen && !isVisible) {
     console.log('MypageModal early exit: both isOpen and isVisible are false');
     return null;
   }
 
-  // 화면 크기에 따른 스타일 결정
-  const isMobile = windowWidth < 768; // 모바일 기준을 768px 미만으로 조정
-  const isTablet = windowWidth >= 768 && windowWidth <= 1025; // 태블릿 중간 크기 범위 추가
+  const isMobile = windowWidth < 768;
+  const isTablet = windowWidth >= 768 && windowWidth <= 1025;
   const isDesktop = windowWidth > 1025;
   
-  // 모달 너비/높이 직접 계산 - 세 가지 크기로 세분화
   let modalWidth, modalHeight, modalMarginTop, modalBorderRadius;
   
   if (isMobile) {
-    // 모바일: 전체 화면
     modalWidth = '100%';
     modalHeight = '100%';
     modalMarginTop = '0';
     modalBorderRadius = '0';
   } else if (isTablet) {
-    // 태블릿: 중간 크기 (오른쪽 위치)
     modalWidth = '420px';
     modalHeight = '75vh';
     modalMarginTop = '48px';
     modalBorderRadius = '16px';
   } else {
-    // 데스크톱: 작은 사이드 패널
     modalWidth = '360px';
     modalHeight = '65vh';
     modalMarginTop = '48px';
@@ -145,7 +163,6 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
   }
   
   return (
-    // 전체 모달 컨테이너 - 반드시 표시
     <div className="mypage-modal-root" style={{ 
       position: 'fixed', 
       top: 0, 
@@ -153,20 +170,26 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
       right: 0,
       bottom: 0, 
       pointerEvents: isOpen ? 'auto' : 'none', 
-      zIndex: 100000, // zIndex 증가
-      display: 'block', // 항상 표시
+      zIndex: 100000,
+      display: 'block',
     }}>
-      {/* Backdrop overlay */}
       <div 
         className={cn(
           "fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300",
           isOpen ? "opacity-100" : "opacity-0"
         )}
         style={{ pointerEvents: isOpen ? 'auto' : 'none' }}
-        onClick={onClose}
+        onClick={(e) => {
+          if (isProtectionActive || !isOpen) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('배경 클릭 무시 (보호 기간 또는 닫는 중)');
+            return;
+          }
+          handleClose(e);
+        }}
       />
       
-      {/* Modal panel */}
       <div 
         ref={modalRef}
         id="mypage-modal-panel"
@@ -182,7 +205,7 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
         )}
         style={{ 
           pointerEvents: isOpen ? 'auto' : 'none', 
-          zIndex: 100001, // 배경보다 높은 zIndex
+          zIndex: 100001,
           width: modalWidth,
           height: modalHeight,
           minWidth: isMobile ? '100%' : '350px',
@@ -190,8 +213,8 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
           marginTop: modalMarginTop,
           borderTopLeftRadius: modalBorderRadius,
           borderBottomLeftRadius: modalBorderRadius,
-          willChange: 'transform', // 성능 최적화
-          transformOrigin: 'right center', // 오른쪽에서 변환 시작
+          willChange: 'transform',
+          transformOrigin: 'right center',
         }}
       >
         <Tabs
@@ -199,15 +222,18 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
           className="h-full flex flex-col"
           onValueChange={(value) => setActiveTab(value as TabType)}
         >
-          {/* 헤더 영역 */}
           <div className="border-b border-white/5 flex-shrink-0">
             <div className="px-4 py-3 flex items-center justify-between">
               <h2 className="text-lg font-bold text-white">
                 {t.mypage.tabs[activeTab]}
               </h2>
               <button
-                onClick={onClose}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleClose();
+                }}
                 className="rounded-full p-2 hover:bg-white/5 transition-colors"
+                disabled={isProtectionActive}
               >
                 <svg
                   className="w-5 h-5 text-gray-400"
@@ -226,7 +252,6 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
             </div>
           </div>
 
-          {/* 콘텐츠 영역 */}
           <div className="flex-1 overflow-y-auto">
             <TabsContent value="home" className="h-full m-0 data-[state=active]:flex data-[state=active]:flex-col">
               <AccountSection 
@@ -258,7 +283,6 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
             </TabsContent>
           </div>
 
-          {/* 하단 탭 네비게이션 */}
           <div className="border-t border-white/5 p-3 flex-shrink-0">
             <TabsList className="w-full h-10 bg-black/20 p-1 rounded-xl">
               {(['home', 'request', 'provide', 'like'] as const).map((tab) => (
