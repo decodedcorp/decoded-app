@@ -2,11 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Point, RequestedItem, RequestImage } from '@/types/model.d';
-import { StepIndicator } from './indicator/step-indicator';
-import { NavigationFooter } from './navigation/navigation-footer';
 import { ImageContainer, ImageContainerHandle } from './common/image-container';
 import { cn } from '@/lib/utils/style';
-import { MarkerStepSidebar } from './steps/marker-step/marker-step-sidebar';
 import {
   ContextStepSidebar,
   ContextAnswer,
@@ -25,6 +22,7 @@ import { useStatusMessage } from '@/components/ui/modal/status-modal/utils/use-s
 import { ArrowLeft, X, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { ConfirmModal } from './common/confirm-modal';
+import { RequestImage as APIRequestImage } from '@/lib/api/_types/request';
 // CSS는 globals.css에서 import
 
 // 간단한 모바일 환경 감지 훅
@@ -120,6 +118,70 @@ export function RequestFormModal({ isOpen, onClose }: RequestFormModalProps) {
     }
   }, [currentStep, selectedImage, points, contextAnswers?.location]);
 
+  const compressImage = async (imageFile: File, maxWidth = 800, maxHeight = 800, quality = 0.7): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          // 원본 이미지 크기
+          const originalWidth = img.width;
+          const originalHeight = img.height;
+          
+          // 새로운 크기 계산
+          let newWidth = originalWidth;
+          let newHeight = originalHeight;
+          
+          if (originalWidth > maxWidth || originalHeight > maxHeight) {
+            if (originalWidth / originalHeight > maxWidth / maxHeight) {
+              // 가로가 더 긴 경우
+              newWidth = maxWidth;
+              newHeight = Math.floor(originalHeight * (maxWidth / originalWidth));
+            } else {
+              // 세로가 더 긴 경우
+              newHeight = maxHeight;
+              newWidth = Math.floor(originalWidth * (maxHeight / originalHeight));
+            }
+          }
+          
+          // Canvas에 리사이징된 이미지 그리기
+          const canvas = document.createElement('canvas');
+          canvas.width = newWidth;
+          canvas.height = newHeight;
+          
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, newWidth, newHeight);
+          
+          // JPEG 형식으로 압축
+          const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+          
+          // 데이터 URL에서 base64 부분만 추출 ('data:image/jpeg;base64,' 제거)
+          const base64String = compressedBase64.split(',')[1];
+          
+          console.log('Image compressed:', {
+            originalSize: Math.floor((event.target?.result as string || '').length / 1024) + 'KB',
+            compressedSize: Math.floor(compressedBase64.length / 1024) + 'KB',
+            reduction: Math.floor((1 - (compressedBase64.length / ((event.target?.result as string) || '').length)) * 100) + '%'
+          });
+          
+          resolve(base64String);
+        };
+        
+        img.onerror = () => {
+          reject(new Error('Failed to load image'));
+        };
+        
+        img.src = event.target?.result as string;
+      };
+      
+      reader.onerror = () => {
+        reject(new Error('Failed to read file'));
+      };
+      
+      reader.readAsDataURL(imageFile);
+    });
+  };
+
   const handleSubmit = withAuth(async (userId) => {
     if (!imageFile || points.length === 0 || !contextAnswers) {
       setModalConfig({
@@ -130,33 +192,33 @@ export function RequestFormModal({ isOpen, onClose }: RequestFormModalProps) {
       return;
     }
 
-    const buffer = await imageFile?.arrayBuffer();
-    const base64Image = arrayBufferToBase64(buffer);
-
-    const requestData: RequestImage = {
-      imageFile: base64Image,
-      requestedItems: points.map((point) => ({
-        item_class: null,
-        item_sub_class: null,
-        category: null,
-        sub_category: null,
-        product_type: null,
-        context: point.context || null,
-        position: {
-          left: `${point.x}`,
-          top: `${point.y}`,
-        },
-      })),
-      requestBy: userId,
-      context: contextAnswers.location,
-      source: contextAnswers?.source || null,
-      metadata: {},
-    };
-
     try {
-      await createRequest(requestData, userId);
+      // 압축된 이미지 생성 (최대 600x600, 50% 품질로 더 강하게 압축)
+      const base64Image = await compressImage(imageFile, 600, 600, 0.5);
+      
+      // API 형식에 맞게 필드명 변경 (camelCase → snake_case)
+      const requestData = {
+        image_file: base64Image,
+        requested_items: points.map((point) => ({
+          item_class: null,
+          item_sub_class: null,
+          category: null,
+          sub_category: null,
+          product_type: null,
+          context: point.context || null,
+          position: {
+            left: `${point.x}%`,
+            top: `${point.y}%`,
+          },
+        })),
+        request_by: userId,
+        context: contextAnswers.location,
+        source: contextAnswers?.source || null,
+        metadata: {},
+      };
+
+      await createRequest(requestData as unknown as APIRequestImage, userId);
       onClose(); // Close the modal on success
-      // Optionally show success message or redirect
     } catch (error) {
       console.error('=== Submit Error ===');
       console.error('Error:', error);

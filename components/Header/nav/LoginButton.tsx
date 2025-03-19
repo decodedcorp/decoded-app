@@ -9,8 +9,9 @@ import { useLocaleContext } from '@/lib/contexts/locale-context';
 import { useLoginModalStore } from '@/components/auth/login-modal/store';
 import { executeAuthCallback } from '@/lib/hooks/auth/use-protected-action';
 import { createPortal } from 'react-dom';
+import React from 'react';
 
-export function LoginButton() {
+export const LoginButton = React.memo(function LoginButton() {
   const { t } = useLocaleContext();
   const [isFirstRender, setIsFirstRender] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
@@ -98,77 +99,20 @@ export function LoginButton() {
     return () => clearTimeout(timer);
   }, []);
 
-  // 주기적으로 로그인 상태 체크
+  // LoginButton.tsx에서 체크 로직 수정
+  const SESSION_CHECK_INTERVAL = 30000; // 30초로 늘림 (기존보다 훨씬 긴 간격)
+
   useEffect(() => {
-    // 초기 체크
-    checkLoginStatus();
+    // 초기 한 번만 체크
+    checkSessionStorage();
     
-    // 디버깅을 위해 세션 스토리지 값 확인
-    console.log('[LoginButton] Session storage status:', {
-      USER_DOC_ID: !!window.sessionStorage.getItem('USER_DOC_ID'),
-      SUI_ACCOUNT: !!window.sessionStorage.getItem('SUI_ACCOUNT'),
-      ACCESS_TOKEN: !!window.sessionStorage.getItem('ACCESS_TOKEN'),
-      isLogin
-    });
-
-    // 1초마다 체크
+    // 간격을 길게 설정하여 주기적 체크
     const intervalId = setInterval(() => {
-      checkLoginStatus();
-      // 세션 스토리지 변경 감지를 위한 로그 (30초마다)
-      if (Date.now() % 30000 < 1000) {
-        console.log('[LoginButton] Periodic session check:', {
-          USER_DOC_ID: !!window.sessionStorage.getItem('USER_DOC_ID'),
-          SUI_ACCOUNT: !!window.sessionStorage.getItem('SUI_ACCOUNT'),
-          ACCESS_TOKEN: !!window.sessionStorage.getItem('ACCESS_TOKEN'),
-          isLogin
-        });
-      }
-    }, 1000);
-
-    // 메시지 이벤트 리스너
-    const handleMessage = (event: MessageEvent) => {
-      if (event.origin === window.location.origin && event.data?.id_token) {
-        console.log('Token received, closing modal');
-        
-        // Make sure to close the modal first before any other operations
-        closeLoginModal();
-        
-        // Add a small delay before processing the token
-        setTimeout(async () => {
-          try {
-            // Process the login directly using the token
-            await handleGoogleLogin(event.data.id_token);
-            
-            console.log('Login successful via popup');
-            
-            // Run any pending auth callbacks after login is confirmed
-            setTimeout(() => {
-              console.log('Running auth callback for popup login');
-              executeAuthCallback();
-            }, 300);
-          } catch (error) {
-            console.error('Failed to process login token:', error);
-          }
-        }, 200);
-      }
-    };
-
-    // OPEN_MYPAGE_MODAL 이벤트 리스너 (이전 코드와의 호환성을 위해 유지)
-    // StatusStore에서 이 이벤트를 발생시키는 코드가 제거되었으므로,
-    // 이 리스너는 현재 사용되지 않지만 혹시 다른 곳에서 이벤트를 발생시키는 경우를 대비해 유지
-    const handleOpenMypage = () => {
-      openLoginModal();
-    };
-
-    window.addEventListener('message', handleMessage);
-    window.addEventListener('OPEN_MYPAGE_MODAL', handleOpenMypage);
-
-    return () => {
-      clearInterval(intervalId);
-      window.removeEventListener('message', handleMessage);
-      window.removeEventListener('OPEN_MYPAGE_MODAL', handleOpenMypage);
-    };
-  }, [checkLoginStatus, closeLoginModal, openLoginModal, handleGoogleLogin, executeAuthCallback]);
+      checkSessionStorage('periodic');
+    }, SESSION_CHECK_INTERVAL);
+    
+    return () => clearInterval(intervalId);
+  }, []);
 
   // 모바일 로그인 리다이렉트 처리
   useEffect(() => {
@@ -297,13 +241,27 @@ export function LoginButton() {
     }, isMobile ? 150 : 100);
   };
 
+  function checkSessionStorage(type?: string) {
+    // 개발 환경에서만 로그 기록 (또는 완전히 제거)
+    if (process.env.NODE_ENV === 'development' && type === 'periodic') {
+      console.log('[LoginButton] Periodic session check:', {
+        USER_DOC_ID: !!window.sessionStorage.getItem('USER_DOC_ID'),
+        SUI_ACCOUNT: !!window.sessionStorage.getItem('SUI_ACCOUNT'),
+        ACCESS_TOKEN: !!window.sessionStorage.getItem('ACCESS_TOKEN'),
+        isLogin: !!isLogin
+      });
+    }
+    
+    // 실제 검증 로직만 수행...
+  }
+
   return (
     <>
       <button
         onClick={handleOpenModal}
         className={cn(
           "relative flex items-center transition-colors px-2 py-1.5",
-          "hover:text-white text-gray-300 dark:text-gray-400 dark:hover:text-white",
+          "hover:text-[#EAFD66] text-gray-300 dark:text-gray-400 dark:hover:text-[#EAFD66]",
           {
             "text-[#EAFD66] hover:text-[#EAFD66]/90": isLogin,
           }
@@ -345,5 +303,5 @@ export function LoginButton() {
       )}
     </>
   );
-}
+});
 

@@ -60,7 +60,7 @@ async function verifyGoogleToken(token: string): Promise<boolean> {
   }
 }
 
-function verifyJWT(token: string): boolean {
+export function verifyJWT(token: string): boolean {
   try {
     const decoded = jwtDecode<{ exp: number; iss: string }>(token);
 
@@ -576,25 +576,86 @@ export function useAuth() {
   const checkLoginStatus = () => {
     if (!isInitialized || typeof window === 'undefined') return;
 
+    // 마지막 검증 시간 확인
+    const lastCheck = localStorage.getItem('LAST_TOKEN_CHECK');
+    const now = Date.now();
+    
+    // 5분(300000ms)에 한 번만 토큰 검증 실행
+    const shouldCheck = !lastCheck || (now - parseInt(lastCheck, 10)) > 300000;
+    
+    if (shouldCheck) {
+      localStorage.setItem('LAST_TOKEN_CHECK', now.toString());
+      
+      const userDocId = window.sessionStorage.getItem('USER_DOC_ID');
+      const suiAccount = window.sessionStorage.getItem('SUI_ACCOUNT');
+      const accessToken = window.sessionStorage.getItem('ACCESS_TOKEN');
+      
+      let isTokenValid = false;
+      if (accessToken) {
+        isTokenValid = verifyJWT(accessToken);
+        
+        if (!isTokenValid) {
+          console.warn('[Auth] Token validation failed - logging out');
+          window.sessionStorage.clear();
+          setIsLogin(false);
+          return;
+        }
+      }
+      
+      setIsLogin(!!(userDocId && suiAccount && accessToken && isTokenValid));
+    }
+  };
+
+  // 로그인 후 또는 페이지 로드 시 토큰 상태 확인을 위한 함수
+  const checkTokenStatus = () => {
+    const accessToken = window.sessionStorage.getItem('ACCESS_TOKEN');
     const userDocId = window.sessionStorage.getItem('USER_DOC_ID');
     const suiAccount = window.sessionStorage.getItem('SUI_ACCOUNT');
-    const accessToken = window.sessionStorage.getItem('ACCESS_TOKEN');
-    const userNickname = window.sessionStorage.getItem('USER_NICKNAME');
-
-    // 10초마다 로깅 (너무 많은 로그를 방지하기 위해)
-    if (Date.now() % 10000 < 1000) {
-      console.log('[Auth] Checking login status:', {
-        hasUserDocId: !!userDocId,
-        hasSuiAccount: !!suiAccount,
-        hasAccessToken: !!accessToken,
-        hasUserNickname: !!userNickname,
-        prev_isLogin: isLogin,
-        new_isLogin: !!(userDocId && suiAccount && accessToken)
-      });
+    
+    console.log('Token status check:', {
+      hasAccessToken: !!accessToken,
+      accessTokenLength: accessToken ? accessToken.length : 0,
+      hasUserDocId: !!userDocId,
+      hasSuiAccount: !!suiAccount,
+      isLoginState: !!(accessToken && userDocId && suiAccount)
+    });
+    
+    if (accessToken) {
+      // 토큰 구조 확인 (JWT는 일반적으로 header.payload.signature 형식)
+      const parts = accessToken.split('.');
+      if (parts.length !== 3) {
+        console.warn('Access token does not appear to be a valid JWT format');
+      }
+      
+      // 토큰 만료 확인 시도
+      try {
+        const payload = JSON.parse(atob(parts[1]));
+        const expTime = payload.exp;
+        const nowTime = Math.floor(Date.now() / 1000);
+        console.log('Token expiration:', {
+          expTime,
+          nowTime,
+          isExpired: expTime < nowTime,
+          timeRemaining: expTime - nowTime
+        });
+      } catch (e) {
+        console.error('Failed to parse token payload:', e);
+      }
     }
-
-    setIsLogin(!!(userDocId && suiAccount && accessToken));
   };
+
+  useEffect(() => {
+    const handleTokenExpired = () => {
+      console.log('[Auth] Token expired event received');
+      setIsLogin(false);
+    };
+    
+    window.addEventListener('auth:token-expired', handleTokenExpired);
+    
+    return () => {
+      window.removeEventListener('auth:token-expired', handleTokenExpired);
+    };
+  }, []);
 
   return {
     isLogin,
@@ -603,5 +664,6 @@ export function useAuth() {
     handleGoogleLogin,
     handleDisconnect,
     checkLoginStatus,
+    checkTokenStatus,
   };
 }
