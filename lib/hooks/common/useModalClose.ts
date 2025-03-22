@@ -2,6 +2,14 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 
+// 조건부 로깅 헬퍼 함수
+const isDev = process.env.NODE_ENV === 'development';
+const logDebug = (message: string) => {
+  if (isDev) {
+    console.log(message);
+  }
+};
+
 interface UseModalCloseProps {
   onClose: () => void;
   isOpen?: boolean;
@@ -28,7 +36,7 @@ function useModalClose<T extends HTMLElement = HTMLDivElement>({
     const handleClickOutside = (event: MouseEvent) => {
       // Skip click handling if the event has been marked as handled
       if ((event as any).__handled) {
-        console.log('[useModalClose] Event already handled, ignoring');
+        logDebug('[useModalClose] Event already handled, ignoring');
         return;
       }
 
@@ -38,7 +46,7 @@ function useModalClose<T extends HTMLElement = HTMLDivElement>({
       const isModalContainer = targetElement.closest('[data-modal-container="true"]');
       
       if (isNoCloseElement || isModalContainer) {
-        console.log('[useModalClose] Click detected on protected element, not closing');
+        logDebug('[useModalClose] Click detected on protected element, not closing');
         (event as any).__handled = true;
         return;
       }
@@ -47,7 +55,7 @@ function useModalClose<T extends HTMLElement = HTMLDivElement>({
         modalRef.current &&
         !modalRef.current.contains(event.target as Node)
       ) {
-        console.log('[useModalClose] Click outside modal detected, closing');
+        logDebug('[useModalClose] Click outside modal detected, closing');
         handleClose();
       }
     };

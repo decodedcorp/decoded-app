@@ -6,6 +6,13 @@ import { useLocaleContext } from '@/lib/contexts/locale-context';
 import { CustomTooltip } from "@/components/ui/custom-tooltip";
 import { useEffect } from 'react';
 
+// 조건부 로깅 - 에러 시에만 출력
+const logError = (message: string, error?: any) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.error(message, error);
+  }
+};
+
 interface AccountData {
   points: number;
   active_ticket_num: number;
@@ -18,33 +25,19 @@ export function AccountSection({
   data,
   isLoading,
   onClose,
+  onLogout,
+  onLoginSuccess,
 }: {
   data: AccountData;
   isLoading: boolean;
   onClose: () => void;
+  onLogout?: () => void;
+  onLoginSuccess?: () => void;
 }) {
   const { t } = useLocaleContext();
   const { isLogin, handleGoogleLogin, handleDisconnect } = useAuth();
   const userEmail = window.sessionStorage.getItem('USER_EMAIL');
   
-  // 개발 환경에서만 데이터 로깅
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[AccountSection] 렌더링:', { 
-        isLoading, 
-        isLogin, 
-        data,
-        sessionData: {
-          USER_DOC_ID: window.sessionStorage.getItem('USER_DOC_ID'),
-          USER_EMAIL: window.sessionStorage.getItem('USER_EMAIL'),
-          USER_NICKNAME: window.sessionStorage.getItem('USER_NICKNAME'),
-          SUI_ACCOUNT: !!window.sessionStorage.getItem('SUI_ACCOUNT'),
-          ACCESS_TOKEN: !!window.sessionStorage.getItem('ACCESS_TOKEN')
-        }
-      });
-    }
-  }, [isLoading, isLogin, data]);
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -53,14 +46,28 @@ export function AccountSection({
     );
   }
 
-  // 로그아웃 핸들러 - 로그아웃 후 모달 닫기 처리
+  // 로그아웃 핸들러 - 커스텀 핸들러 사용 또는 기본 로직 실행
   const handleLogout = () => {
-    handleDisconnect();
+    if (onLogout) {
+      // 부모 컴포넌트에서 전달된 로그아웃 핸들러 사용
+      onLogout();
+    } else {
+      // 기존 로그아웃 로직 사용
+      handleDisconnect();
+      
+      // 필요한 추가 정리 작업
+      window.sessionStorage.removeItem('USER_DOC_ID');
+      window.sessionStorage.removeItem('SUI_ACCOUNT');
+      window.sessionStorage.removeItem('ACCESS_TOKEN');
+      window.sessionStorage.removeItem('USER_EMAIL');
+      window.sessionStorage.removeItem('USER_NICKNAME');
+      
+      // 이벤트 발송
+      window.dispatchEvent(new CustomEvent('auth:state-changed'));
+    }
     
-    // 로그아웃 후 약간의 지연을 두고 모달 닫기
-    setTimeout(() => {
-      onClose();
-    }, 300);
+    // 항상 모달 닫기
+    onClose();
   };
 
   // 데이터가 있는지 확인
@@ -189,55 +196,31 @@ export function AccountSection({
       ) : (
         <div className="flex-1 flex items-center justify-center p-4">
           <button
-            onClick={async (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              
-              // 중복 클릭 방지
-              const clickTime = Date.now();
-              const lastClickTime = sessionStorage.getItem('LOGIN_BUTTON_CLICK_TIME');
-              
-              if (lastClickTime) {
-                const timeDiff = clickTime - parseInt(lastClickTime, 10);
-                if (timeDiff < 2000) {  // 3초에서 2초로 축소
-                  const isDevMode = process.env.NODE_ENV === 'development';
-                  if (isDevMode) {
-                    console.log('[AccountSection] 최근 로그인 버튼 클릭 감지, 중복 클릭 무시');
-                  }
-                  return;
-              }
-              }
-              
-              // 현재 클릭 시간 기록
-              sessionStorage.setItem('LOGIN_BUTTON_CLICK_TIME', clickTime.toString());
-              
+            onClick={(e) => {
+              // 가장 단순한 형태로 직접 로그인 호출
               try {
-                const isDevMode = process.env.NODE_ENV === 'development';
-                if (isDevMode) {
-                  console.log('[AccountSection] 로그인 버튼 클릭, 의도적으로 모달 닫기 시작');
-                }
+                // 로그인 시작 - 로딩 상태 설정을 위한 이벤트 발생
+                window.dispatchEvent(new CustomEvent('login:loading:start'));
                 
-                // 모달을 즉시 닫고 로그인 프로세스 시작 - 대기 시간 제거
-                onClose();
-                
-                // 로그인 시작 - 대기 시간을 20ms로 최소화 (이벤트 버블링 방지 위한 최소값)
-                await new Promise(resolve => setTimeout(resolve, 20));
-                
-                if (isDevMode) {
-                  console.log('[AccountSection] 구글 로그인 시도 시작');
-                }
-                
-                // 로그인 시도
-                await handleGoogleLogin();
-                
-                if (isDevMode) {
-                  console.log('[AccountSection] 로그인 프로세스 시작됨');
-                }
+                // 로그인 함수 직접 호출
+                handleGoogleLogin()
+                  .then(() => {
+                    // 로그인 성공 이벤트 발생 - 다른 컴포넌트가 이를 감지
+                    window.dispatchEvent(new CustomEvent('login:success'));
+                    
+                    // 약간의 지연 후 모달 닫기 (세션 스토리지 업데이트 대기)
+                    setTimeout(() => {
+                      onClose();
+                    }, 300);
+                  })
+                  .catch((error) => {
+                    // 로그인 실패 시 로딩 상태 종료
+                    window.dispatchEvent(new CustomEvent('login:loading:stop'));
+                    logError('[AccountSection] 로그인 후처리 중 오류:', error);
+                  });
               } catch (error) {
-                console.error('[AccountSection] 로그인 실패:', error);
-                
-                // 에러 발생 시 타임스탬프 삭제하여 재시도 가능하게 함
-                sessionStorage.removeItem('LOGIN_BUTTON_CLICK_TIME');
+                window.dispatchEvent(new CustomEvent('login:loading:stop'));
+                logError('[AccountSection] 로그인 시도 중 오류:', error);
               }
             }}
             className="w-full px-6 py-4 rounded-xl text-sm font-medium
@@ -246,15 +229,6 @@ export function AccountSection({
               transition-all duration-200 ease-out
               flex items-center justify-center gap-3
               shadow-lg shadow-black/5"
-            // disabled 상태 추가 - 최근 클릭이 있었으면 비활성화
-            disabled={(() => {
-              const lastClickTime = sessionStorage.getItem('LOGIN_BUTTON_CLICK_TIME');
-              if (lastClickTime) {
-                const timeDiff = Date.now() - parseInt(lastClickTime, 10);
-                return timeDiff < 2000; // 3초에서 2초로 축소
-              }
-              return false;
-            })()}
           >
             <GoogleIcon />
             <span className="font-medium">{t.common.actions.login.google}</span>

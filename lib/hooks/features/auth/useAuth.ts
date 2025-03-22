@@ -10,6 +10,23 @@ import { jwtVerify, createRemoteJWKSet } from 'jose';
 import { useLoginModalStore } from '@/components/auth/login-modal/store';
 import { executeAuthCallback } from '@/lib/hooks/auth/use-protected-action';
 
+// 조건부 로깅 헬퍼 함수
+const isDev = process.env.NODE_ENV === 'development';
+const logDebug = (message: string, data?: any) => {
+  if (isDev) {
+    console.log(message, data);
+  }
+};
+
+// 오류 로깅 - 항상 출력됨
+const logError = (message: string, error?: any) => {
+  if (error) {
+    console.error(message, error);
+  } else {
+    console.error(message);
+  }
+};
+
 // Google OAuth JWT 타입
 interface GoogleJWT {
   iss: string;
@@ -36,7 +53,7 @@ async function verifyGoogleToken(token: string): Promise<boolean> {
     });
 
     if (typeof payload.exp !== 'number') {
-      console.error('Invalid token: `exp` field is not a number.');
+      logError('Invalid token: `exp` field is not a number.');
       return false;
     }
 
@@ -44,18 +61,18 @@ async function verifyGoogleToken(token: string): Promise<boolean> {
     const ALLOWED_TIME_DRIFT = 5;
 
     if (payload.exp + ALLOWED_TIME_DRIFT < now) {
-      console.warn(`Token expired. Exp: ${payload.exp}, Now: ${now}`);
+      logDebug(`Token expired. Exp: ${payload.exp}, Now: ${now}`);
       return false;
     }
 
     if (!payload.sub) {
-      console.error('Invalid or missing sub field in token');
+      logError('Invalid or missing sub field in token');
       return false;
     }
 
     return true;
   } catch (err: any) {
-    console.error('Google token verification failed:', err.message);
+    logError('Google token verification failed:', err.message);
     return false;
   }
 }
@@ -66,18 +83,18 @@ export function verifyJWT(token: string): boolean {
 
     const now = Date.now() / 1000;
     if (decoded.exp < now) {
-      console.error('Backend token expired');
+      logError('Backend token expired');
       return false;
     }
 
     if (decoded.iss !== BACKEND_ISSUER) {
-      console.error('Invalid token issuer');
+      logError('Invalid token issuer');
       return false;
     }
 
     return true;
   } catch (err: any) {
-    console.error('JWT verification failed:', err.message);
+    logError('JWT verification failed:', err.message);
     return false;
   }
 }
@@ -118,7 +135,7 @@ export function useAuth() {
     const accessToken = window.sessionStorage.getItem('ACCESS_TOKEN');
     const userNickname = window.sessionStorage.getItem('USER_NICKNAME');
 
-    console.log('[Auth] Initial session check:', {
+    logDebug('[Auth] Initial session check:', {
       hasUserDocId: !!userDocId,
       hasSuiAccount: !!suiAccount,
       hasAccessToken: !!accessToken,
@@ -142,29 +159,29 @@ export function useAuth() {
     const login = async (token: string) => {
       setIsLoading(true);
       try {
-        console.log('[Login] Verifying Google token...');
+        logDebug('[Auth] Verifying Google token...');
         const isGoogleTokenValid = await verifyGoogleToken(token);
         if (!isGoogleTokenValid)
-          throw new Error('[Login] Invalid Google token');
+          throw new Error('[Auth] Invalid Google token');
 
         // JWT 디코딩
         const decodedGoogle = jwtDecode<GoogleJWT>(token);
-        console.log('[Login] Decoded Google token:', decodedGoogle);
+        logDebug('[Auth] Decoded Google token:', decodedGoogle);
 
         // 필요한 값 추출
         const { sub, iss, aud, email, given_name } = decodedGoogle;
         if (!sub || !iss || !aud) {
-          throw new Error('[Login] Missing required fields in decoded token');
+          throw new Error('[Auth] Missing required fields in decoded token');
         }
 
         // 해싱
         const hashInput = `${sub}${iss}${aud}`;
         const hashedToken = hash(hashInput);
-        console.log('[Hash Input]', hashInput);
-        console.log('[Hashed Token]', hashedToken);
+        logDebug('[Hash Input]', hashInput);
+        logDebug('[Hashed Token]', hashedToken);
 
         // 백엔드 요청
-        console.log('[Login] Requesting backend login...');
+        logDebug('[Auth] Requesting backend login...');
         const loginRes = await networkManager.request<{
           status_code: number;
           data: {
@@ -183,14 +200,14 @@ export function useAuth() {
           },
         });
 
-        console.log('[Login] Backend response:', loginRes);
+        logDebug('[Auth] Backend response:', loginRes);
 
         if (!loginRes) {
           throw new Error('No response received from the server');
         }
 
         if (loginRes.status_code !== 200 || !loginRes.data) {
-          throw new Error('[Login] Backend login failed');
+          throw new Error('[Auth] Backend login failed');
         }
 
         
@@ -199,7 +216,7 @@ export function useAuth() {
         const { salt, doc_id, access_token } = loginRes.data;
         const sui_acc = jwtToAddress(token, salt);
 
-        console.log('[Login] Saving user session data...', {
+        logDebug('[Auth] Saving user session data...', {
           doc_id,
           sui_account: sui_acc.substring(0, 10) + '...',
           has_access_token: !!access_token
@@ -211,7 +228,7 @@ export function useAuth() {
         window.sessionStorage.setItem('USER_EMAIL', email);
         window.sessionStorage.setItem('USER_NICKNAME', given_name);
 
-        console.log('[Login] Checking if data was saved:', {
+        logDebug('[Auth] Checking if data was saved:', {
           doc_id_saved: !!window.sessionStorage.getItem('USER_DOC_ID'),
           sui_account_saved: !!window.sessionStorage.getItem('SUI_ACCOUNT'),
           access_token_saved: !!window.sessionStorage.getItem('ACCESS_TOKEN'),
@@ -221,7 +238,7 @@ export function useAuth() {
         // 상태 업데이트 전에 약간의 지연을 줌
         await new Promise(resolve => setTimeout(resolve, 100));
         
-        console.log('[Login] Login successful, user session updated.');
+        logDebug('[Auth] Login successful, user session updated.');
         setIsLogin(true);
         closeLoginModal();
         
@@ -230,7 +247,7 @@ export function useAuth() {
         
         window.history.replaceState(null, '', window.location.pathname);
       } catch (err: any) {
-        console.error('[Login] Login failed:', err.message);
+        logError('[Auth] Login failed:', err.message);
         window.sessionStorage.clear();
         setIsLogin(false);
       } finally {
@@ -244,39 +261,28 @@ export function useAuth() {
   const handleGoogleLogin = async (providedToken?: string) => {
     if (!isInitialized || typeof window === 'undefined') return;
 
-    // Reset any existing loading timeouts
+    // 기존 타임아웃 초기화
     if (window._loadingResetTimeout) {
       clearTimeout(window._loadingResetTimeout);
       window._loadingResetTimeout = undefined;
     }
     
-    // 최근 로그인 시도 확인 및 중복 방지
-    const now = Date.now();
-    const lastLoginAttempt = sessionStorage.getItem('LOGIN_ATTEMPT_TIME');
-    if (lastLoginAttempt) {
-      const attemptTime = parseInt(lastLoginAttempt, 10);
-      if (now - attemptTime < 3000) { // 3초 이내 중복 시도 방지
-        console.log('[Auth] 최근에 로그인이 시도됨, 중복 요청 무시');
-        return;
-      }
-    }
-
     try {
       // 직접 제공된 토큰이 있는 경우 (모바일 리다이렉트 처리)
       if (providedToken) {
-        console.log('[Login] Processing provided token...');
+        logDebug('[Auth] Processing provided token...');
         setIsLoading(true);
         
         try {
-          console.log('[Login] Verifying Google token...');
+          logDebug('[Auth] Verifying Google token...');
           const isGoogleTokenValid = await verifyGoogleToken(providedToken);
-          if (!isGoogleTokenValid) throw new Error('[Login] Invalid Google token');
+          if (!isGoogleTokenValid) throw new Error('[Auth] Invalid Google token');
 
           const decodedGoogle = jwtDecode<GoogleJWT>(providedToken);
           const { sub, iss, aud, email, given_name } = decodedGoogle;
           
           if (!sub || !iss || !aud) {
-            throw new Error('[Login] Missing required fields in decoded token');
+            throw new Error('[Auth] Missing required fields in decoded token');
           }
 
           const hashInput = `${sub}${iss}${aud}`;
@@ -301,35 +307,23 @@ export function useAuth() {
           });
 
           if (!loginRes || loginRes.status_code !== 200 || !loginRes.data) {
-            throw new Error('[Login] Backend login failed');
+            throw new Error('[Auth] Backend login failed');
           }
 
           const { salt, doc_id, access_token } = loginRes.data;
           const sui_acc = jwtToAddress(providedToken, salt);
 
-          console.log('[Login] Saving user session data...', {
-            doc_id,
-            sui_account: sui_acc.substring(0, 10) + '...',
-            has_access_token: !!access_token
-          });
-
+          logDebug('[Auth] Saving user session data...');
           window.sessionStorage.setItem('ACCESS_TOKEN', access_token);
           window.sessionStorage.setItem('USER_DOC_ID', doc_id);
           window.sessionStorage.setItem('SUI_ACCOUNT', sui_acc);
           window.sessionStorage.setItem('USER_EMAIL', email);
           window.sessionStorage.setItem('USER_NICKNAME', given_name);
 
-          console.log('[Login] Checking if data was saved:', {
-            doc_id_saved: !!window.sessionStorage.getItem('USER_DOC_ID'),
-            sui_account_saved: !!window.sessionStorage.getItem('SUI_ACCOUNT'),
-            access_token_saved: !!window.sessionStorage.getItem('ACCESS_TOKEN'),
-            nickname_saved: !!window.sessionStorage.getItem('USER_NICKNAME')
-          });
-
           setIsLogin(true);
           closeLoginModal();
         } catch (error) {
-          console.error('Login process failed:', error);
+          logError('Login process failed:', error);
           window.sessionStorage.clear();
           setIsLogin(false);
         } finally {
@@ -338,72 +332,21 @@ export function useAuth() {
         
         return;
       } else {
-        // No provided token - initiate OAuth flow
-        const isDevMode = process.env.NODE_ENV === 'development';
-        if (isDevMode) {
-          console.log('[Auth] 구글 로그인 프로세스 시작...');
-        }
+        // 새로운 로그인 시도
+        logDebug('[Auth] Starting Google login process...');
         setIsLoading(true);
         
-        // 현재 시간 기록
-        sessionStorage.setItem('LOGIN_ATTEMPT_TIME', now.toString());
-        
-        // Safety timeout to reset loading state if login flow doesn't complete
-        window._loadingResetTimeout = setTimeout(() => {
-          if (isDevMode) {
-            console.log('[Auth] 안전 타임아웃 작동 - 로딩 상태 초기화');
-          }
-          setIsLoading(false);
-          // 시간 초과된 로그인 시도 표시 초기화
-          sessionStorage.removeItem('LOGIN_ATTEMPT_TIME');
-        }, 30000); // 30초 타임아웃
-
         try {
-          if (isDevMode) {
-            console.log('[Auth] 구글 OpenID Connect URL 가져오는 중...');
-          }
+          // OAuth URL 가져오기 - 오류 발생시 바로 캐치
           const { url: oauthUrl } = await networkManager.openIdConnectUrl();
           
-          // 딜레이 시간 단축 - 300ms에서 50ms로 감소
-          await new Promise(resolve => setTimeout(resolve, 50));
-          
-          if (isDevMode) {
-            console.log('[Auth] 구글 로그인 URL 획득:', oauthUrl.substring(0, 60) + '...');
-            console.log('[Auth] 세션 스토리지에 로그인 관련 정보 저장...');
-          }
-          
-          // 세션 스토리지에 oauthUrl 저장 (필요한 경우 재사용)
-          sessionStorage.setItem('OAUTH_URL', oauthUrl);
-          
-          // 현재 모달 상태 확인 (개발 모드에서만)
-          if (isDevMode) {
-            const modalToggleTime = sessionStorage.getItem('LAST_MODAL_TOGGLE');
-            if (modalToggleTime) {
-              const toggleTime = parseInt(modalToggleTime, 10);
-              console.log('[Auth] 마지막 모달 토글과의 시간차:', now - toggleTime, 'ms');
-            }
-          }
-          
-          // 딜레이 시간 단축 - 200ms에서 50ms로 감소
-          if (isDevMode) {
-            console.log('[Auth] 팝업 열기 전 최소 대기...');
-          }
-          await new Promise(resolve => setTimeout(resolve, 50));
-          
-          if (isDevMode) {
-            console.log('[Auth] 구글 로그인 팝업 열기 시도...');
-          }
-          
-          // Create popup with specific dimensions
+          // 최적화된 팝업 설정
           const width = 500;
           const height = 600;
           const left = window.screenX + (window.outerWidth - width) / 2;
           const top = window.screenY + (window.outerHeight - height) / 2;
           
-          // Track popup status
-          let popupClosed = false;
-          
-          // Try to open the popup with specific dimensions and position
+          // 팝업 열기 (지연 없이 바로 열기)
           const popup = window.open(
             oauthUrl,
             'googleLoginPopup',
@@ -411,67 +354,48 @@ export function useAuth() {
           );
           
           if (!popup) {
-            console.error('[Auth] 팝업 창을 열지 못했습니다. 브라우저에서 차단되었을 수 있습니다.');
+            // 팝업이 차단된 경우
+            logError('[Auth] 팝업을 열 수 없습니다. 브라우저 설정을 확인하세요.');
             setIsLoading(false);
-            // 실패한 로그인 시도 표시 초기화
-            sessionStorage.removeItem('LOGIN_ATTEMPT_TIME');
             return;
           }
           
-          if (isDevMode) {
-            console.log('[Auth] 팝업 창이 성공적으로 열렸습니다.');
-          }
+          logDebug('[Auth] Popup opened successfully');
           
-          // Check if popup was closed
+          // 팝업 닫힘 감지
           const popupCheckInterval = setInterval(() => {
             if (popup.closed) {
               clearInterval(popupCheckInterval);
-              if (!popupClosed) {
-                if (isDevMode) {
-                  console.log('[Auth] 사용자가 로그인을 완료하지 않고 팝업을 닫았습니다.');
-                }
-                setIsLoading(false);
-                popupClosed = true;
-                
-                // 실패한 로그인 시도 표시 초기화
-                sessionStorage.removeItem('LOGIN_ATTEMPT_TIME');
-                
-                // Clear safety timeout
-                if (window._loadingResetTimeout) {
-                  clearTimeout(window._loadingResetTimeout);
-                  window._loadingResetTimeout = undefined;
-                }
+              setIsLoading(false);
+              
+              // 안전을 위한 타임아웃 제거
+              if (window._loadingResetTimeout) {
+                clearTimeout(window._loadingResetTimeout);
+                window._loadingResetTimeout = undefined;
               }
             }
           }, 500);
           
-          // 팝업 창에서 메시지를 받을 리스너
+          // 메시지 이벤트 리스너
           const messageListener = async (event: MessageEvent) => {
-            if (event.origin !== window.location.origin) {
-              console.log('[Login] Message from different origin:', event.origin);
-              return;
-            }
+            if (event.origin !== window.location.origin) return;
 
             const { id_token } = event.data;
-            if (!id_token) {
-              console.log('[Login] No id_token in message data:', event.data);
-              return;
-            }
+            if (!id_token) return;
 
-            console.log('[Login] Received ID Token from popup');
+            logDebug('[Auth] Received token from popup');
             window.removeEventListener('message', messageListener);
             
             try {
-              console.log('[Login] Verifying Google token...');
+              // 토큰 검증
               const isGoogleTokenValid = await verifyGoogleToken(id_token);
-              console.log('[Login] Google token validation result:', isGoogleTokenValid);
-              if (!isGoogleTokenValid) throw new Error('[Login] Invalid Google token');
+              if (!isGoogleTokenValid) throw new Error('[Auth] Invalid Google token');
 
               const decodedGoogle = jwtDecode<GoogleJWT>(id_token);
               const { sub, iss, aud, email, given_name } = decodedGoogle;
               
               if (!sub || !iss || !aud) {
-                throw new Error('[Login] Missing required fields in decoded token');
+                throw new Error('[Auth] Missing required fields in decoded token');
               }
 
               const hashInput = `${sub}${iss}${aud}`;
@@ -495,71 +419,58 @@ export function useAuth() {
                 },
               });
 
-              if (!loginRes) {
-                throw new Error('[Login] Backend login failed');
-              }
-
-              if (loginRes.status_code !== 200 || !loginRes.data) {
-                throw new Error('[Login] Backend login failed');
+              if (!loginRes || loginRes.status_code !== 200 || !loginRes.data) {
+                throw new Error('[Auth] Backend login failed');
               }
 
               const { salt, doc_id, access_token } = loginRes.data;
               const sui_acc = jwtToAddress(id_token, salt);
 
-              console.log('[Login] Saving user session data...', {
-                doc_id,
-                sui_account: sui_acc.substring(0, 10) + '...',
-                has_access_token: !!access_token
-              });
-
+              logDebug('[Auth] Saving user session data...');
               window.sessionStorage.setItem('ACCESS_TOKEN', access_token);
               window.sessionStorage.setItem('USER_DOC_ID', doc_id);
               window.sessionStorage.setItem('SUI_ACCOUNT', sui_acc);
               window.sessionStorage.setItem('USER_EMAIL', email);
               window.sessionStorage.setItem('USER_NICKNAME', given_name);
 
-              console.log('[Login] Checking if data was saved:', {
-                doc_id_saved: !!window.sessionStorage.getItem('USER_DOC_ID'),
-                sui_account_saved: !!window.sessionStorage.getItem('SUI_ACCOUNT'),
-                access_token_saved: !!window.sessionStorage.getItem('ACCESS_TOKEN'),
-                nickname_saved: !!window.sessionStorage.getItem('USER_NICKNAME')
-              });
-
+              // 로그인 상태 업데이트
               setIsLogin(true);
               closeLoginModal();
+              
+              // 로그인 성공 이벤트 발생 (하나만 발생시켜서 중복 처리 방지)
+              window.dispatchEvent(new CustomEvent('login:success'));
+              
+              // 팝업 닫기
               popup.close();
             } catch (error) {
-              console.error('Login process failed:', error);
+              logError('Login process failed:', error);
               window.sessionStorage.clear();
               setIsLogin(false);
             }
           };
-
-          window.addEventListener('message', messageListener);
-        } catch (error) {
-          console.error('[Login] Error initiating OAuth flow:', error);
-          setIsLoading(false);
           
-          // Clear safety timeout
-          if (window._loadingResetTimeout) {
-            clearTimeout(window._loadingResetTimeout);
-          }
+          // 메시지 이벤트 리스너 등록
+          window.addEventListener('message', messageListener);
+          
+          // 안전을 위한 타임아웃 - 30초 후 자동 해제
+          window._loadingResetTimeout = setTimeout(() => {
+            setIsLoading(false);
+            logDebug('[Auth] Safety timeout activated - loading state reset');
+          }, 30000);
+        } catch (error) {
+          logError('[Auth] Error initiating OAuth flow:', error);
+          setIsLoading(false);
         }
       }
     } catch (error: any) {
-      console.error('Google login error:', error.message);
+      logError('Google login error:', error.message);
       setIsLoading(false);
-      
-      // Clear safety timeout
-      if (window._loadingResetTimeout) {
-        clearTimeout(window._loadingResetTimeout);
-      }
     }
   };
   const handleDisconnect = () => {
     if (!isInitialized || typeof window === 'undefined') return;
 
-    console.log('Logging out...');
+    logDebug('Logging out...');
     // 로그아웃 전 세션 정보 로깅
     const sessionInfo = {
       USER_DOC_ID: window.sessionStorage.getItem('USER_DOC_ID'),
@@ -567,7 +478,7 @@ export function useAuth() {
       USER_EMAIL: window.sessionStorage.getItem('USER_EMAIL'),
       USER_NICKNAME: window.sessionStorage.getItem('USER_NICKNAME')
     };
-    console.log('Clearing session data:', sessionInfo);
+    logDebug('Clearing session data:', sessionInfo);
     
     window.sessionStorage.clear();
     setIsLogin(false);
@@ -595,7 +506,7 @@ export function useAuth() {
         isTokenValid = verifyJWT(accessToken);
         
         if (!isTokenValid) {
-          console.warn('[Auth] Token validation failed - logging out');
+          logDebug('[Auth] Token validation failed - logging out');
           window.sessionStorage.clear();
           setIsLogin(false);
           return;
@@ -612,7 +523,7 @@ export function useAuth() {
     const userDocId = window.sessionStorage.getItem('USER_DOC_ID');
     const suiAccount = window.sessionStorage.getItem('SUI_ACCOUNT');
     
-    console.log('Token status check:', {
+    logDebug('Token status check:', {
       hasAccessToken: !!accessToken,
       accessTokenLength: accessToken ? accessToken.length : 0,
       hasUserDocId: !!userDocId,
@@ -624,7 +535,7 @@ export function useAuth() {
       // 토큰 구조 확인 (JWT는 일반적으로 header.payload.signature 형식)
       const parts = accessToken.split('.');
       if (parts.length !== 3) {
-        console.warn('Access token does not appear to be a valid JWT format');
+        logDebug('Access token does not appear to be a valid JWT format');
       }
       
       // 토큰 만료 확인 시도
@@ -632,21 +543,21 @@ export function useAuth() {
         const payload = JSON.parse(atob(parts[1]));
         const expTime = payload.exp;
         const nowTime = Math.floor(Date.now() / 1000);
-        console.log('Token expiration:', {
+        logDebug('Token expiration:', {
           expTime,
           nowTime,
           isExpired: expTime < nowTime,
           timeRemaining: expTime - nowTime
         });
       } catch (e) {
-        console.error('Failed to parse token payload:', e);
+        logError('Failed to parse token payload:', e);
       }
     }
   };
 
   useEffect(() => {
     const handleTokenExpired = () => {
-      console.log('[Auth] Token expired event received');
+      logDebug('[Auth] Token expired event received');
       setIsLogin(false);
     };
     

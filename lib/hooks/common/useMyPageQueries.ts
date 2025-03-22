@@ -4,6 +4,14 @@ import type { AccountData, RequestData, ProvideData, LikeData, TabType } from '@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/hooks/features/auth/useAuth';
 
+// 조건부 로깅 헬퍼 함수
+const isDev = process.env.NODE_ENV === 'development';
+const logDebug = (message: string, data?: any) => {
+  if (isDev) {
+    console.log(message, data);
+  }
+};
+
 interface ApiResponse<T> {
   status_code: number;
   data: T;
@@ -56,18 +64,18 @@ export function useMyPageQuery(tab: TabType, isOpen: boolean) {
   useEffect(() => {
     if (isInitialized) {
       const docId = sessionStorage.getItem('USER_DOC_ID');
-      console.log('[useMyPageQuery] 로그인 상태 변경 감지:', { 
+      logDebug('[useMyPageQuery] 로그인 상태 변경 감지:', { 
         isLogin, 
         docId,
         currentUserDocId: userDocId
       });
       
       if (isLogin && docId && docId !== userDocId) {
-        console.log('[useMyPageQuery] 새로운 사용자 ID 감지, 쿼리 무효화');
+        logDebug('[useMyPageQuery] 새로운 사용자 ID 감지, 쿼리 무효화');
         setUserDocId(docId);
         queryClient.invalidateQueries({ queryKey: ['mypage'] });
       } else if (!isLogin && userDocId) {
-        console.log('[useMyPageQuery] 로그아웃 감지, 사용자 ID 초기화');
+        logDebug('[useMyPageQuery] 로그아웃 감지, 사용자 ID 초기화');
         setUserDocId(null);
       }
     }
@@ -77,7 +85,7 @@ export function useMyPageQuery(tab: TabType, isOpen: boolean) {
   useEffect(() => {
     if (isOpen) {
       const docId = sessionStorage.getItem('USER_DOC_ID');
-      console.log('[useMyPageQuery] 모달 열림, 사용자 ID 확인:', { 
+      logDebug('[useMyPageQuery] 모달 열림, 사용자 ID 확인:', { 
         docId, 
         currentUserDocId: userDocId,
         sessionData: {
@@ -90,7 +98,7 @@ export function useMyPageQuery(tab: TabType, isOpen: boolean) {
       });
       
       if (docId !== userDocId) {
-        console.log('[useMyPageQuery] 사용자 ID 변경됨, 쿼리 무효화');
+        logDebug('[useMyPageQuery] 사용자 ID 변경됨, 쿼리 무효화');
         setUserDocId(docId);
         queryClient.invalidateQueries({ queryKey: ['mypage'] });
       }
@@ -100,10 +108,10 @@ export function useMyPageQuery(tab: TabType, isOpen: boolean) {
   return useQuery({
     queryKey: ['mypage', tab, userDocId],
     queryFn: async () => {
-      console.log('[useMyPageQuery] 데이터 fetching 시작:', { tab, userDocId });
+      logDebug('[useMyPageQuery] 데이터 fetching 시작:', { tab, userDocId });
       
       if (!userDocId) {
-        console.log('[useMyPageQuery] 사용자 ID 없음, 기본 데이터 반환');
+        logDebug('[useMyPageQuery] 사용자 ID 없음, 기본 데이터 반환');
         // 로그인 정보가 없는 경우 기본 데이터 반환
         if (tab === 'home') {
           return defaultAccountData;
@@ -126,11 +134,11 @@ export function useMyPageQuery(tab: TabType, isOpen: boolean) {
         like: `user/${userDocId}/mypage/likes`
       };
 
-      console.log(`[useMyPageQuery] API 엔드포인트 호출: ${endpoints[tab]}`);
+      logDebug(`[useMyPageQuery] API 엔드포인트 호출: ${endpoints[tab]}`);
       
       // 현재 액세스 토큰 확인
       const accessToken = typeof window !== 'undefined' ? window.sessionStorage.getItem('ACCESS_TOKEN') : null;
-      console.log(`[useMyPageQuery] 액세스 토큰 존재 여부: ${!!accessToken}`);
+      logDebug(`[useMyPageQuery] 액세스 토큰 존재 여부: ${!!accessToken}`);
 
       if (tab === 'like') {
         try {
@@ -139,7 +147,7 @@ export function useMyPageQuery(tab: TabType, isOpen: boolean) {
             networkManager.request<ApiResponse<LikeData['items']>>(`user/${userDocId}/mypage/likes/item`, 'GET', null, 3, accessToken || undefined),
           ]);
           
-          console.log('[useMyPageQuery] Like 데이터 응답:', { 
+          logDebug('[useMyPageQuery] Like 데이터 응답:', { 
             imagesResponse: !!imagesResponse, 
             itemsResponse: !!itemsResponse 
           });
@@ -148,69 +156,50 @@ export function useMyPageQuery(tab: TabType, isOpen: boolean) {
             return {
               images: imagesResponse.data,
               items: itemsResponse.data,
-            } as LikeData;
+            };
           }
           
-          console.log('[useMyPageQuery] Like 데이터 fetching 실패, 기본값 반환');
-          return defaultLikeData;
+          throw new Error('Failed to fetch like data');
         } catch (error) {
-          console.error('[useMyPageQuery] Like 데이터 fetching 오류:', error);
+          logDebug('[useMyPageQuery] Like 데이터 오류:', error);
           return defaultLikeData;
-        }
-      } else {
-        try {
-          // 액세스 토큰을 포함하여 요청
-          const response = await networkManager.request(
-            endpoints[tab],
-            'GET',
-            null,  // 데이터 없음
-            3,     // 재시도 횟수
-            accessToken || undefined  // 액세스 토큰
-          );
-          
-          console.log(`[useMyPageQuery] ${tab} 데이터 응답:`, response);
-          
-          if (response?.status_code === 200) {
-            console.log(`[useMyPageQuery] ${tab} 데이터 성공:`, response.data);
-            return response.data;
-          }
-          
-          console.log(`[useMyPageQuery] ${tab} 데이터 fetching 실패, 기본값 반환`);
-          
-          // 오류 발생 시 기본값 반환
-          if (tab === 'home') {
-            return defaultAccountData;
-          } else if (tab === 'request') {
-            return defaultRequestData;
-          } else if (tab === 'provide') {
-            return defaultProvideData;
-          }
-        } catch (error) {
-          console.error(`[useMyPageQuery] ${tab} 데이터 fetching 오류:`, error);
-          
-          // 네트워크 오류 세부 정보 확인
-          if (error && typeof error === 'object' && 'message' in error) {
-            console.error(`[useMyPageQuery] 오류 메시지:`, error.message);
-          }
-          
-          // 오류 발생 시 기본값 반환
-          if (tab === 'home') {
-            return defaultAccountData;
-          } else if (tab === 'request') {
-            return defaultRequestData;
-          } else if (tab === 'provide') {
-            return defaultProvideData;
-          }
         }
       }
       
-      console.error(`[useMyPageQuery] ${tab} 데이터 fetching 예외 발생`);
-      throw new Error(`Failed to fetch ${tab} data`);
+      try {
+        const response = await networkManager.request<ApiResponse<any>>(
+          endpoints[tab],
+          'GET',
+          null,
+          3,
+          accessToken || undefined
+        );
+
+        logDebug(`[useMyPageQuery] ${tab} 데이터 응답:`, response);
+        
+        if (response && response.status_code === 200) {
+          logDebug(`[useMyPageQuery] ${tab} 데이터 성공:`, response.data);
+          return response.data;
+        }
+        
+        throw new Error(`Failed to fetch ${tab} data`);
+      } catch (error) {
+        logDebug(`[useMyPageQuery] ${tab} 데이터 오류:`, error);
+        
+        // 타입에 따른 기본 데이터 반환
+        if (tab === 'home') {
+          return defaultAccountData;
+        } else if (tab === 'request') {
+          return defaultRequestData;
+        } else if (tab === 'provide') {
+          return defaultProvideData;
+        }
+        
+        throw error;
+      }
     },
-    enabled: isOpen,
-    staleTime: 5 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
+    enabled: isOpen && isInitialized,
+    staleTime: 1000 * 60 * 5, // 5분
+    gcTime: 1000 * 60 * 10,   // 10분
   });
 }

@@ -14,20 +14,31 @@ export const requestAPI = {
       throw new Error('Authentication token is missing');
     }
     
+    // 중요: request_by 필드가 사용자 ID(ObjectId 형식)로 설정되어 있는지 확인
+    const requestData = {
+      ...data,
+      request_by: userDocId  // 문자열 "string" 대신 실제 사용자 ID 사용
+    };
+    
+    // 다른 필드도 올바른 형식인지 확인
+    if (requestData.image_file === "string") {
+      requestData.image_file = "";
+    }
+    
     try {
       console.log('RequestAPI: Sending request to URL:', 
                  `/user/${userDocId}/image/request`);
       console.log('RequestAPI: Using token:', accessToken ? 'Yes (token exists)' : 'No (missing)');
       
       // 데이터 크기 계산 및 로깅 (디버깅용)
-      const dataSize = JSON.stringify(data).length;
+      const dataSize = JSON.stringify(requestData).length;
       console.log(`RequestAPI: Data size: ${Math.floor(dataSize / 1024)}KB`);
       
       // 토큰을 포함하여 요청
       const response = await networkManager.request<APIResponse<void>>(
         `/user/${userDocId}/image/request`,
         'POST',
-        data,
+        requestData,
         3, // 재시도 횟수
         accessToken // 액세스 토큰 추가
       );
@@ -50,7 +61,7 @@ export const requestAPI = {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${accessToken}`
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(requestData)
           });
           
           if (!fetchResponse.ok) {

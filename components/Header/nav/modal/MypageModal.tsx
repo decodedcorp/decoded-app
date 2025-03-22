@@ -3,13 +3,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocaleContext } from '@/lib/contexts/locale-context';
 import { AccountSection } from './sections/AccountSection';
-import { RequestSection } from './sections/RequestSection';
-import { ProvideSection } from './sections/ProvideSection';
-import { LikeSection } from './sections/LikeSection';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useMyPageQuery } from '@/lib/hooks/common/useMyPageQueries';
-import type { LikeData, ProvideData, RequestData, AccountData, TabType } from '@/components/Header/nav/modal/types/mypage';
+import type { AccountData, TabType } from '@/components/Header/nav/modal/types/mypage';
 import { cn } from '@/lib/utils/style';
+import { ArrowRight, X } from 'lucide-react';
 
 // 모달 컨트롤러 커스텀 훅
 function useModalController({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
@@ -172,10 +172,11 @@ function useResponsiveModalStyles() {
 interface MypageModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onLogout?: () => void;
+  onLoginSuccess?: () => void;
 }
 
-export function MypageModal({ isOpen, onClose }: MypageModalProps) {
-  const [activeTab, setActiveTab] = useState<TabType>('home');
+export function MypageModal({ isOpen, onClose, onLogout, onLoginSuccess }: MypageModalProps) {
   const { t } = useLocaleContext();
   const modalRef = useRef<HTMLDivElement>(null);
   
@@ -183,12 +184,12 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
   const { isVisible, isProtectionActive, handleClose } = useModalController({ isOpen, onClose });
   const { windowWidth, isMobile, styles } = useResponsiveModalStyles();
   
-  // 탭 데이터 로딩
+  // 탭 데이터 로딩 - 이제 'home' 탭만 로드합니다
   const { 
     data: tabData,
     isLoading,
     error 
-  } = useMyPageQuery(activeTab, isOpen);
+  } = useMyPageQuery('home', isOpen);
 
   // 렌더링 최적화를 위한 포스 리플로우
   useEffect(() => {
@@ -217,8 +218,14 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
     if (e.target === e.currentTarget) {
       handleClose(e);
     }
-    // 더 이상 e.stopPropagation()을 호출하지 않음 - 이벤트가 내부 컴포넌트로 전달될 수 있도록 함
   }, [handleClose]);
+  
+  // 마이페이지로 이동 핸들러
+  const handleGoToMypage = () => {
+    // 모달 닫고 페이지 이동
+    handleClose();
+    // 실제 구현 시에는 여기에 페이지 이동 로직 추가
+  };
   
   // 모달이 보이지 않고 열려있지 않으면 아무것도 렌더링하지 않음
   if (!isOpen && !isVisible) {
@@ -239,14 +246,14 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
       }}
       onClick={handleBackgroundClick}
     >
-      {/* 배경 오버레이 - 이제 이벤트 핸들러 제거 */}
+      {/* 배경 오버레이 */}
       <div 
         className={cn(
           "fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300",
           isOpen ? "opacity-100" : "opacity-0"
         )}
         style={{ 
-          pointerEvents: 'none', // 이벤트를 항상 통과시킴
+          pointerEvents: 'none',
           zIndex: 100000 
         }}
       />
@@ -281,100 +288,56 @@ export function MypageModal({ isOpen, onClose }: MypageModalProps) {
           transformOrigin: 'right center',
         }}
       >
-        <Tabs
-          defaultValue="home"
-          className="h-full flex flex-col"
-          onValueChange={(value) => setActiveTab(value as TabType)}
-        >
-          {/* 헤더 영역 */}
-          <div 
-            className="border-b border-white/5 flex-shrink-0"
-          >
-            <div className="px-4 py-3 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-white">
-                {t.mypage.tabs[activeTab]}
-              </h2>
-              <button
-                onClick={(e) => {
-                  // 닫기 버튼은 이벤트 전파를 중단해서 패널 클릭 핸들러가 실행되지 않도록 함
-                  e.stopPropagation();
-                  handleClose(e);
-                }}
-                className="rounded-full p-2 hover:bg-white/5 transition-colors"
-                disabled={isProtectionActive}
-              >
-                <svg
-                  className="w-5 h-5 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          {/* 콘텐츠 영역 */}
-          <div 
-            className="flex-1 overflow-y-auto"
-            data-no-close-on-click="true"
-          >
-            <TabsContent value="home" className="h-full m-0 data-[state=active]:flex data-[state=active]:flex-col">
-              <AccountSection 
-                data={tabData as AccountData} 
-                isLoading={isLoading}
-                onClose={handleClose}
-              />
-            </TabsContent>
-            <TabsContent value="request" className="h-full m-0 data-[state=active]:flex data-[state=active]:flex-col">
-              <RequestSection 
-                data={tabData as RequestData} 
-                isLoading={isLoading}
-                onClose={handleClose}
-              />
-            </TabsContent>
-            <TabsContent value="provide" className="h-full m-0 data-[state=active]:flex data-[state=active]:flex-col">
-              <ProvideSection 
-                data={tabData as ProvideData} 
-                isLoading={isLoading}
-                onClose={handleClose}
-              />
-            </TabsContent>
-            <TabsContent value="like" className="h-full m-0 data-[state=active]:flex data-[state=active]:flex-col">
-              <LikeSection 
-                data={tabData as LikeData} 
-                isLoading={isLoading}
-                onClose={handleClose}
-              />
-            </TabsContent>
-          </div>
-
-          {/* 탭 네비게이션 */}
-          <div 
-            className="border-t border-white/5 p-3 flex-shrink-0"
-            data-no-close-on-click="true"
-          >
-            <TabsList 
-              className="w-full h-10 bg-black/20 p-1 rounded-xl"
+        {/* 헤더 영역 */}
+        <div className="border-b border-white/5 flex-shrink-0">
+          <div className="px-4 py-3 flex items-center justify-between">
+            <h2 className="text-lg font-bold text-white">
+              {t.mypage.tabs.home}
+            </h2>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleClose(e);
+              }}
+              className="rounded-full p-2 hover:bg-white/5 transition-colors"
+              disabled={isProtectionActive}
             >
-              {(['home', 'request', 'provide', 'like'] as const).map((tab) => (
-                <TabsTrigger
-                  key={tab}
-                  value={tab}
-                  className="flex-1 rounded-lg text-xs font-medium data-[state=active]:bg-[#EAFD66]/10 data-[state=active]:text-[#EAFD66] text-gray-400"
-                >
-                  {t.mypage.tabs[tab]}
-                </TabsTrigger>
-              ))}
-            </TabsList>
+              <X className="w-5 h-5 text-gray-400" />
+            </button>
           </div>
-        </Tabs>
+        </div>
+
+        {/* 콘텐츠 영역 */}
+        <div className="flex-1 overflow-y-auto" data-no-close-on-click="true">
+          {/* 계정 정보 섹션 */}
+          <AccountSection 
+            data={tabData as AccountData} 
+            isLoading={isLoading}
+            onClose={handleClose}
+            onLogout={onLogout}
+            onLoginSuccess={onLoginSuccess}
+          />
+          
+          {/* 마이페이지 이동 버튼 */}
+          <div className="px-4 py-6">
+            <Link 
+              href="/mypage" 
+              onClick={handleGoToMypage}
+              className="w-full"
+            >
+              <Button 
+                variant="outline" 
+                className="w-full flex items-center justify-between bg-white/5 hover:bg-white/10 text-white border-white/10"
+              >
+                <span>마이페이지로 이동</span>
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+            <p className="text-xs text-gray-400 mt-2 text-center">
+              더 많은 기능을 마이페이지에서 이용하실 수 있습니다.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
