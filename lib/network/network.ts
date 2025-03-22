@@ -107,6 +107,17 @@ export class NetworkManager {
     const isDevMode = process.env.NODE_ENV === 'development';
     let retry = 0;
 
+    // 토큰이 제공되지 않았으면 세션 스토리지에서 자동으로 가져옴
+    if (!accessToken) {
+      const sessionToken = window.sessionStorage.getItem('ACCESS_TOKEN');
+      if (sessionToken) {
+        accessToken = sessionToken;
+        if (isDevMode) {
+          console.log('[NetworkManager] Using token from session storage');
+        }
+      }
+    }
+
     while (retry <= retries) {
       try {
         const headers: Record<string, string> = {
@@ -119,7 +130,7 @@ export class NetworkManager {
           // 디버깅용: 토큰 정보 출력 (실제 배포 환경에서는 제거해야 함)
           console.log('[NetworkManager] Using token:', accessToken.substring(0, 10) + '...');
         } else {
-          console.log('[NetworkManager] No access token provided');
+          console.log('[NetworkManager] No access token available in storage or provided');
         }
 
         // Construct the full URL
@@ -382,6 +393,26 @@ export class NetworkManager {
       console.error('[NetworkManager] Error getting temporary token:', error);
       throw error;
     }
+  }
+
+  /**
+   * 인증이 필요한 API 요청을 수행합니다. 내부적으로 토큰을 자동으로 검증합니다.
+   * @param path API 경로
+   * @param method HTTP 메서드
+   * @param data 요청 데이터 (선택사항)
+   * @param retries 재시도 횟수 (기본값: 3)
+   * @returns API 응답
+   */
+  public async requestWithAuth<T = any>(
+    path: string,
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
+    data: any = null,
+    retries = 3
+  ): Promise<T | undefined> {
+    return this.withTokenValidation(() => {
+      const accessToken = window.sessionStorage.getItem('ACCESS_TOKEN');
+      return this.request<T>(path, method, data, retries, accessToken || undefined);
+    });
   }
 }
 
