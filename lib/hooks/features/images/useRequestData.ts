@@ -23,10 +23,41 @@ export function useRequestData(initialData: any): UseRequestDataReturn {
     try {
       console.log('=== Create Request Debug ===');
       console.log('User Doc ID:', userDocId);
-      console.log('Request Data:', data);
+      
+      // 포지션 값 확인을 위한 로깅 추가
+      if (data.requestedItems && data.requestedItems.length > 0) {
+        console.log('Position values being sent:', 
+          data.requestedItems.map(item => ({
+            left: item.position?.left,
+            top: item.position?.top
+          }))
+        );
+      }
+      
+      // 이미지 데이터 길이 확인
+      console.log('Image data length:', data.image_file ? data.image_file.length : 'No image data');
+      
+      // API 요청 전 전체 데이터 검증
+      const validData = {
+        ...data,
+        // 포지션 값 검증 - % 기호가 있다면 제거 (API는 숫자 문자열 형태를 예상함)
+        requested_items: data.requestedItems?.map(item => ({
+          ...item,
+          position: {
+            left: typeof item.position?.left === 'string' 
+              ? item.position.left.replace('%', '') 
+              : String(item.position?.left || 0),
+            top: typeof item.position?.top === 'string' 
+              ? item.position.top.replace('%', '') 
+              : String(item.position?.top || 0)
+          }
+        }))
+      };
+      
+      console.log('Validated request data:', validData);
 
       return await showLoadingStatus(
-        requestAPI.createImageRequest(userDocId, data),
+        requestAPI.createImageRequest(userDocId, validData),
         { type: 'success', messageKey: 'request' }
       );
     } catch (error) {
