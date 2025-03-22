@@ -118,7 +118,8 @@ export function RequestFormModal({ isOpen, onClose }: RequestFormModalProps) {
     }
   }, [currentStep, selectedImage, points, contextAnswers?.location]);
 
-  const compressImage = async (imageFile: File, maxWidth = 800, maxHeight = 800, quality = 0.7): Promise<string> => {
+  // 개선된 이미지 압축 함수
+  const compressImage = async (imageFile: File, maxWidth = 1500, maxHeight = 1500, quality = 0.95): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -128,7 +129,7 @@ export function RequestFormModal({ isOpen, onClose }: RequestFormModalProps) {
           const originalWidth = img.width;
           const originalHeight = img.height;
           
-          // 새로운 크기 계산
+          // 새로운 크기 계산 - 너무 크지 않게 적절히 제한
           let newWidth = originalWidth;
           let newHeight = originalHeight;
           
@@ -152,29 +153,44 @@ export function RequestFormModal({ isOpen, onClose }: RequestFormModalProps) {
           const ctx = canvas.getContext('2d');
           ctx?.drawImage(img, 0, 0, newWidth, newHeight);
           
-          // JPEG 형식으로 압축
-          const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
-          
-          // 데이터 URL에서 base64 부분만 추출 ('data:image/jpeg;base64,' 제거)
-          const base64String = compressedBase64.split(',')[1];
-          
-          console.log('Image compressed:', {
-            originalSize: Math.floor((event.target?.result as string || '').length / 1024) + 'KB',
-            compressedSize: Math.floor(compressedBase64.length / 1024) + 'KB',
-            reduction: Math.floor((1 - (compressedBase64.length / ((event.target?.result as string) || '').length)) * 100) + '%'
-          });
-          
-          resolve(base64String);
+          try {
+            // 최적의 품질로 JPEG 형식으로 변환
+            // 1.0 대신 0.95 사용 - 완벽한 품질(1.0)이 때로는 오류 발생 가능
+            const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+            
+            // 포맷 검증 - 올바른 base64 문자열인지 확인
+            if (!compressedBase64 || !compressedBase64.startsWith('data:image/jpeg;base64,')) {
+              throw new Error('Invalid base64 format');
+            }
+            
+            // 데이터 URL에서 base64 부분만 추출 ('data:image/jpeg;base64,' 제거)
+            const base64String = compressedBase64.split(',')[1];
+            
+            // 결과 로깅
+            console.log('Image compression completed:', {
+              originalSize: originalWidth + 'x' + originalHeight,
+              newSize: newWidth + 'x' + newHeight,
+              quality: quality,
+              dataLength: base64String.length,
+            });
+            
+            resolve(base64String);
+          } catch (err) {
+            console.error('Canvas processing error:', err);
+            reject(err);
+          }
         };
         
-        img.onerror = () => {
+        img.onerror = (err) => {
+          console.error('Image loading error:', err);
           reject(new Error('Failed to load image'));
         };
         
         img.src = event.target?.result as string;
       };
       
-      reader.onerror = () => {
+      reader.onerror = (err) => {
+        console.error('File reading error:', err);
         reject(new Error('Failed to read file'));
       };
       
@@ -193,13 +209,21 @@ export function RequestFormModal({ isOpen, onClose }: RequestFormModalProps) {
     }
 
     try {
-      // 압축된 이미지 생성 (최대 600x600, 50% 품질로 더 강하게 압축)
-      const base64Image = await compressImage(imageFile, 600, 600, 0.5);
+      // 이미지 압축 - 품질 0.95로 약간 낮추어 안정성 확보
+      const base64Image = await compressImage(imageFile, 1200, 1200, 0.95);
       
-      // API 형식에 맞게 필드명 변경 (camelCase → snake_case)
-      const requestData = {
-        image_file: base64Image,
-        requested_items: points.map((point) => ({
+      // position 객체 명시적 생성 및 검증
+      const requestItems = points.map((point) => {
+        // 포지션 값에서 % 기호 제거 - API는 숫자 문자열 형태를 예상함
+        const leftPos = typeof point.x === 'number' 
+          ? String(point.x) 
+          : (point.x ? String(point.x).replace('%', '') : '0');
+        
+        const topPos = typeof point.y === 'number' 
+          ? String(point.y) 
+          : (point.y ? String(point.y).replace('%', '') : '0');
+        
+        return {
           item_class: null,
           item_sub_class: null,
           category: null,
@@ -207,21 +231,37 @@ export function RequestFormModal({ isOpen, onClose }: RequestFormModalProps) {
           product_type: null,
           context: point.context || null,
           position: {
-            left: `${point.x}%`,
-            top: `${point.y}%`,
+            left: leftPos,
+            top: topPos,
           },
-        })),
+        };
+      });
+      
+      // 요청 데이터 구성 - 속성명 수정 (requestedItems)
+      const requestData = {
+        image_file: base64Image,
+        requestedItems: requestItems, // 속성명 수정됨
         request_by: userId,
         context: contextAnswers.location,
         source: contextAnswers?.source || null,
         metadata: {},
       };
+      
+      // 포지션 값 디버깅
+      console.log('Final position values:', requestItems.map(item => item.position));
 
       await createRequest(requestData as unknown as APIRequestImage, userId);
       onClose(); // Close the modal on success
     } catch (error) {
       console.error('=== Submit Error ===');
       console.error('Error:', error);
+      
+      // 오류 메시지 표시
+      setModalConfig({
+        type: 'error',
+        isOpen: true,
+        onClose: () => setModalConfig((prev) => ({ ...prev, isOpen: false })),
+      });
     }
   });
 
