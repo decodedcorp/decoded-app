@@ -1,51 +1,57 @@
-import { ApiResponse } from "@/lib/api/_types/response";
-import {
-  ImageDetails,
-  DecodedItem,
-  ProcessedImageData,
-} from "@/lib/api/_types/image";
+import { transformToDetailPageState } from '@/lib/utils/object/transform';
+import type { DetailPageState } from '@/types/model.d';
 
-export async function getImageDetails(
-  imageId: string
-): Promise<ProcessedImageData | null> {
-  try { 
-    const SERVICE_ENDPOINT = process.env.NODE_ENV === "development"
-      ? process.env.NEXT_PUBLIC_LOCAL_SERVICE_ENDPOINT
-      : process.env.NEXT_PUBLIC_SERVICE_ENDPOINT;
-
-    if (!SERVICE_ENDPOINT) {
-      throw new Error("Missing `SERVICE_ENDPOINT` configuration");
-    }
-
-    const response = await fetch(`${SERVICE_ENDPOINT}/image/${imageId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      next: { revalidate: 60 },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch image details: ${response.statusText}`);
-    }
-
-    const result = (await response.json()) as ApiResponse<ImageDetails>;
-
-    if (result.status_code === 200 && result.data?.image) {
-      const imageData = result.data.image;
-      return {
-        ...imageData,
-        items: Object.values(imageData.items || {})
-          .flat()
-          .filter((item): item is DecodedItem => {
-            return Boolean(item?.item?.item);
-          }),
-      };
-    }
-
-    throw new Error("Invalid response structure");
-  } catch (error) {
-    console.error("Error fetching image details:", error);
-    return null;
-  }
+interface ImageResponse {
+  data: {
+    image: {
+      title: string | null;
+      description: string;
+      like: number;
+      style: string | null;
+      img_url: string;
+      source: string | null;
+      upload_by: string;
+      doc_id: string;
+      decoded_percent: number;
+      items: Record<string, any>;
+    };
+  };
 }
+
+export async function getImageDetails(imageId: string): Promise<DetailPageState> {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_SERVICE_ENDPOINT}/image/${imageId}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch image details');
+  }
+
+  const data = (await response.json()) as ImageResponse;
+
+  if (!data?.data?.image) {
+    throw new Error('Invalid API response structure');
+  }
+
+  const imageData = data.data.image;
+  const apiData = {
+    title: imageData.title || null,
+    description: imageData.description || '',
+    like: imageData.like || 0,
+    style: imageData.style || null,
+    img_url: imageData.img_url,
+    source: imageData.source || null,
+    upload_by: imageData.upload_by || '',
+    doc_id: imageData.doc_id || '',
+    decoded_percent: imageData.decoded_percent || 0,
+    items: imageData.items || {},
+  };
+
+  return transformToDetailPageState(apiData);
+} 
