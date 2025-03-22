@@ -14,8 +14,8 @@ export interface RequestImage {
       top: string;
     };
   }>;
-  imageFile: string;
-  requestBy: string;
+  image_file: string;
+  request_by: string;
   context?: string | null;
   source?: string | null;
 }

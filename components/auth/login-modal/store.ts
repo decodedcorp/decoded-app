@@ -1,5 +1,13 @@
 import { create } from 'zustand';
 
+// 조건부 로깅 헬퍼 함수
+const isDev = process.env.NODE_ENV === 'development';
+const logDebug = (message: string) => {
+  if (isDev) {
+    console.log(message);
+  }
+};
+
 interface LoginModalStore {
   isOpen: boolean;
   lastAction: number; // 마지막 액션 시간 추적
@@ -17,11 +25,11 @@ export const useLoginModalStore = create<LoginModalStore>((set, get) => ({
     
     // 이미 열려있거나 최근에 상태가 변경된 경우 무시
     if (state.isOpen || (now - state.lastAction < 500)) {
-      console.log('[LoginModalStore] 이미 열려있거나 최근에 상태 변경됨, 열기 요청 무시');
+      logDebug('[LoginModalStore] 이미 열려있거나 최근에 상태 변경됨, 열기 요청 무시');
       return;
     }
     
-    console.log('[LoginModalStore] 모달 열기');
+    logDebug('[LoginModalStore] 모달 열기');
     set({ isOpen: true, lastAction: now });
   },
   
@@ -31,11 +39,11 @@ export const useLoginModalStore = create<LoginModalStore>((set, get) => ({
     
     // 이미 닫혀있거나 최근에 상태가 변경된 경우 무시
     if (!state.isOpen || (now - state.lastAction < 500)) {
-      console.log('[LoginModalStore] 이미 닫혀있거나 최근에 상태 변경됨, 닫기 요청 무시');
+      logDebug('[LoginModalStore] 이미 닫혀있거나 최근에 상태 변경됨, 닫기 요청 무시');
       return;
     }
     
-    console.log('[LoginModalStore] 모달 닫기');
+    logDebug('[LoginModalStore] 모달 닫기');
     set({ isOpen: false, lastAction: now });
   },
 }));
