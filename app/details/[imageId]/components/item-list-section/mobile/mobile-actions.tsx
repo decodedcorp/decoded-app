@@ -13,18 +13,23 @@ interface MobileActionsProps {
   isFixed?: boolean;
 }
 
-export function MobileActions({ initialLikeCount, imageId, isFixed = false }: MobileActionsProps) {
+export function MobileActions({
+  initialLikeCount,
+  imageId,
+  isFixed = false,
+}: MobileActionsProps) {
   const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
-  
+
   // 직접 Cloudflare R2 이미지 URL 생성 (OG 이미지용)
   const directImageUrl = `https://pub-65bb4012fb354951a2c6139a4b49b717.r2.dev/images/${imageId}.webp`;
 
   return (
     <>
-      <div 
+      <div
         className={cn(
           "bg-[#1A1A1A] rounded-lg",
-          isFixed && "fixed bottom-0 left-0 right-0 z-20 border-t border-white/10"
+          isFixed &&
+            "fixed bottom-0 left-0 right-0 z-20 border-t border-white/10"
         )}
       >
         <div className="px-4 py-3 flex items-center justify-between">
@@ -45,20 +50,20 @@ export function MobileActions({ initialLikeCount, imageId, isFixed = false }: Mo
                   <Heart
                     className={cn(
                       "w-5 h-5",
-                      isLiked ? "fill-red-500 text-red-500" : "text-white/60"
+                      isLiked ? "fill-red-500 text-red-500" : "text-white/80/60"
                     )}
                   />
-                  <span className="text-sm text-white/60">{likeCount}</span>
+                  <span className="text-sm text-white/80/60">{likeCount}</span>
                 </button>
-                
-                <ShareButtons 
+
+                <ShareButtons
                   title="이미지 공유하기"
                   description="이 스타일을 친구들과 공유해보세요!"
                   className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors"
                   buttonVariant="ghost"
                   thumbnailUrl={directImageUrl}
                 />
-                
+
                 <button
                   onClick={() => setIsAddItemModalOpen(true)}
                   className={cn(
@@ -72,17 +77,20 @@ export function MobileActions({ initialLikeCount, imageId, isFixed = false }: Mo
             )}
           />
         </div>
-        {isFixed && <div className="h-safe-bottom" />} {/* iOS safe area 대응 */}
+        {isFixed && <div className="h-safe-bottom" />}{" "}
+        {/* iOS safe area 대응 */}
       </div>
-      
+
       {isAddItemModalOpen && (
         <AddItemModal
           isOpen={isAddItemModalOpen}
           onClose={() => setIsAddItemModalOpen(false)}
           imageId={imageId}
-          requestUrl={`user/${sessionStorage.getItem("USER_DOC_ID")}/image/${imageId}/request/add`}
+          requestUrl={`user/${sessionStorage.getItem(
+            "USER_DOC_ID"
+          )}/image/${imageId}/request/add`}
         />
       )}
-    </> 
+    </>
   );
-} 
+}

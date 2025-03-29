@@ -1,20 +1,3 @@
-/**
- * The ImageInfo interface defines the structure for image information.
- * @param title The title of the image.
- * @param updateAt The date of the last update.
- * @param hyped The number of hyped.
- * @param taggedItem Optional array of tagged items.
- * @param tags Optional record of tags related to the image, with string keys and values.
- * @param description Optional description of the image.
- * @param extractedColors Optional array of extracted colors.
- */
-
-// types/model.d.ts
-export interface ImagePosition {
-  left: string;
-  top: string;
-}
-
 export interface RequestedItem {
   item_class: string;
   item_sub_class: string;
@@ -34,29 +17,6 @@ export interface ImageRequest {
   style: string;
   imgUrl: string;
   requestedItems: RequestedItem[];
-}
-
-export interface ImageDetail {
-  id: string;
-  title: string;
-  description: string;
-  imageUrl: string;
-  items: {
-    position: ImagePosition;
-    identity: {
-      id: string;
-      name: string;
-      category: string;
-      profileImageUrl?: string;
-    };
-    category: {
-      itemClass: string;
-      itemSubClass: string;
-      category?: string;
-      subCategory?: string;
-      productType: string;
-    };
-  }[];
 }
 
 export interface ImageInfo {
@@ -533,29 +493,6 @@ export interface ProvideData {
   provider?: string;
 }
 
-export interface ProvideInfo<T> {
-  who: string;
-  value: T;
-  provideStatus: ProvideStatus;
-}
-
-export interface ProvideItemInfo {
-  brand?: string;
-  links?: ProvideInfo<string>[];
-}
-
-export interface ProvidedItemDetail {
-  itemDocId: string;
-  position: Position;
-  provideItemInfo: ProvideItemInfo;
-}
-
-export enum ProvideStatus {
-  PENDING = 'PENDING',
-  APPROVED = 'APPROVED',
-  REJECTED = 'REJECTED',
-}
-
 export interface Point {
   x: number;
   y: number;
@@ -763,74 +700,6 @@ export interface CategoryDoc {
   item_class: string;
   depth: number;
   inner?: Category[];
-}
-
-// Provide related interfaces
-export interface ProvideData {
-  provider?: string;
-  links?: string[];
-}
-
-export interface ProvideInfo<T> {
-  who: string;
-  value: T;
-  provideStatus: ProvideStatus;
-}
-
-export interface ProvideItemInfo {
-  brand?: string;
-  links?: ProvideInfo<string>[];
-}
-
-export interface ProvidedItemDetail {
-  itemDocId: string;
-  position: Position;
-  provideItemInfo: ProvideItemInfo;
-}
-
-export interface HasFields {
-  hasImage?: boolean;
-  hasBrand?: boolean;
-  hasName?: boolean;
-  hasMaterial?: boolean;
-  hasDesignedBy?: boolean;
-  hasColor?: boolean;
-  hasDescription?: boolean;
-}
-
-export interface AdditionalMetadata {
-  name?: string;
-  material?: string;
-  designedBy?: string;
-  color?: string;
-  brand?: string;
-  description?: string;
-}
-
-export interface ConfirmItemInfo {
-  base64Image?: string;
-  approveUrls?: LinkInfo[];
-  rejectUrls?: string[];
-  additionalMetadata?: AdditionalMetadata;
-}
-
-export interface ProvideItemInfoWithMetadata {
-  itemDocId: string;
-  hasFields: HasFields;
-  unconfirmedLinks?: string[];
-}
-
-export interface ItemRequest {
-  imageDocId: string | null;
-  imageUrl: string | null;
-  isRequested: boolean;
-  items: ProvidedItemDetail[] | null;
-}
-
-export enum ProvideStatus {
-  PENDING = 'PENDING',
-  APPROVED = 'APPROVED',
-  REJECTED = 'REJECTED',
 }
 
 interface ItemInfo {

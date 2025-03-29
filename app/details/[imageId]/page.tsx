@@ -80,7 +80,7 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
               image: imageData.img_url,
               description: `${
                 Object.values(imageData.metadata)[0]
-              }이(가) 착용한 패션 아이템`,
+              }이(가) 착용한 아이템`,
               numberOfItems: processedImageData.items.length,
               itemListElement: processedImageData.items.map((item, index) => ({
                 "@type": "ListItem",

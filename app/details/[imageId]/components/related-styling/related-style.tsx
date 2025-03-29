@@ -1,4 +1,4 @@
-import { RelatedStylingClient } from './client/related-styling-client';
+import { RelatedStylingClient } from "./client/related-styling-client";
 
 export function RelatedStylingSection({
   imageId,

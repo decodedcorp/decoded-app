@@ -7,9 +7,12 @@ interface UploadGuideProps {
   themeColor?: string;
 }
 
-export function UploadGuide({ onFileSelect, themeColor = '#EAFD66' }: UploadGuideProps = {}) {
+export function UploadGuide({
+  onFileSelect,
+  themeColor = "#EAFD66",
+}: UploadGuideProps = {}) {
   const { t } = useLocaleContext();
-  
+
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -17,7 +20,7 @@ export function UploadGuide({ onFileSelect, themeColor = '#EAFD66' }: UploadGuid
       onFileSelect();
     }
   };
-  
+
   return (
     <div className="h-full w-full flex flex-col items-center justify-center p-4 bg-[#1A1A1A]">
       <div className="w-full max-w-[240px] mx-auto text-center">
@@ -25,20 +28,21 @@ export function UploadGuide({ onFileSelect, themeColor = '#EAFD66' }: UploadGuid
           <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3">
             <ImageIcon className="w-8 h-8 text-gray-400" />
           </div>
-          
-          <h2 className="text-lg font-medium text-white mb-2">
-            {t.request.steps.upload.title || '새 게시물 만들기'}
+
+          <h2 className="text-lg font-medium text-white/80 mb-2">
+            {t.request.steps.upload.title || "새 게시물 만들기"}
           </h2>
           <p className="text-xs text-gray-400 mb-4">
-            {t.request.steps.upload.description || '사진을 끌어다 놓거나 클릭하여 업로드하세요'}
+            {t.request.steps.upload.description ||
+              "사진을 끌어다 놓거나 클릭하여 업로드하세요"}
           </p>
-          
-          <button 
+
+          <button
             onClick={handleClick}
             className="w-full py-2 px-3 text-[#1A1A1A] text-sm font-medium rounded-md flex items-center justify-center transition-colors hover:opacity-90"
-            style={{ 
+            style={{
               backgroundColor: themeColor,
-              borderColor: themeColor
+              borderColor: themeColor,
             }}
           >
             <UploadIcon className="w-4 h-4 mr-2" />

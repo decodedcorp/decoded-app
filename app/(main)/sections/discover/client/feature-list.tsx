@@ -24,7 +24,7 @@ function FeatureItem({ icon, title, description }: FeatureItemProps) {
         {icon}
       </div>
       <div className="space-y-1">
-        <h3 className="font-medium text-white">{title}</h3>
+        <h3 className="font-medium text-white/80">{title}</h3>
         <p className="text-sm text-zinc-400">{description}</p>
       </div>
     </div>

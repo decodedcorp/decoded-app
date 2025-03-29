@@ -59,8 +59,7 @@ export function LikeSection({
     );
   }
 
-  const hasNoLikes = 
-    (!data.images?.likes?.length && !data.items?.likes?.length);
+  const hasNoLikes = !data.images?.likes?.length && !data.items?.likes?.length;
 
   if (hasNoLikes) {
     return (
@@ -86,7 +85,7 @@ export function LikeSection({
   }
 
   return (
-    <div 
+    <div
       className="h-full flex flex-col"
       onClick={(e) => e.stopPropagation()}
       onTouchStart={(e) => e.stopPropagation()}
@@ -97,9 +96,9 @@ export function LikeSection({
       <div className="flex-shrink-0 px-4 py-3 border-b border-white/5">
         <div className="flex gap-2 overflow-x-auto pb-2">
           {[
-            { key: 'all', label: t.mypage.like.categories.all },
-            { key: 'images', label: t.mypage.like.categories.images },
-            { key: 'items', label: t.mypage.like.categories.items }
+            { key: "all", label: t.mypage.like.categories.all },
+            { key: "images", label: t.mypage.like.categories.images },
+            { key: "items", label: t.mypage.like.categories.items },
           ].map(({ key, label }) => (
             <button
               key={key}
@@ -182,7 +181,7 @@ export function LikeSection({
                   <div className="text-xs text-[#EAFD66]">
                     {item.item_category}
                   </div>
-                  <div className="text-sm text-white line-clamp-2">
+                  <div className="text-sm text-white/80 line-clamp-2">
                     {item.name || "이름 없음"}
                   </div>
                 </div>

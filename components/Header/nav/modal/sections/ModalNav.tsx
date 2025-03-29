@@ -18,7 +18,7 @@ function NavItem({ icon, label, isActive, onClick }: NavItemProps) {
       className={cn(
         "flex flex-col items-center gap-1",
         "text-xs",
-        isActive ? "text-[#D6F34C]" : "text-white/60"
+        isActive ? "text-[#D6F34C]" : "text-white/80/60"
       )}
     >
       <div className="w-[22px] h-[22px] flex items-center justify-center">

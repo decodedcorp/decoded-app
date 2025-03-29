@@ -25,6 +25,10 @@ const config: Config = {
       },
       // Custom Keyframes
       keyframes: {
+        marquee: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
         fadeIn: {
           "0%": { opacity: "0", transform: "scale(0.95)" },
           "100%": { opacity: "1", transform: "scale(1)" },
@@ -62,6 +66,7 @@ const config: Config = {
         float: "float 1s cubic-bezier(0.37, 0, 0.63, 1) infinite",
         rotate: "rotate 10s linear infinite",
         "pulse-slow": "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "marquee-infinite": "marquee 25s linear infinite",
       },
       // Spacing & Layout
       spacing: {
@@ -128,7 +133,16 @@ const config: Config = {
       },
       // Font Family
       fontFamily: {
-        sans: ["var(--font-balenciaga)", "-apple-system", "BlinkMacSystemFont", "system-ui", "Roboto", "Helvetica Neue", "Arial", "sans-serif"],
+        sans: [
+          "var(--font-balenciaga)",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "system-ui",
+          "Roboto",
+          "Helvetica Neue",
+          "Arial",
+          "sans-serif",
+        ],
       },
       // Screen Breakpoints
       screens: {
@@ -174,17 +188,17 @@ const config: Config = {
       container: {
         center: true,
         padding: {
-          DEFAULT: '1rem',
-          sm: '2rem',
-          lg: '1rem',
-          xl: '3rem',
+          DEFAULT: "1rem",
+          sm: "2rem",
+          lg: "1rem",
+          xl: "3rem",
         },
         screens: {
-          sm: '640px',
-          md: '768px',
-          lg: '1124px',
-          xl: '1380px',
-          '2xl': '1636px',
+          sm: "640px",
+          md: "768px",
+          lg: "1124px",
+          xl: "1380px",
+          "2xl": "1636px",
         },
       },
     },

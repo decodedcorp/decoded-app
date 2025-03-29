@@ -1,8 +1,12 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { cn } from '@/lib/utils/style';
-import { pretendardBold, pretendardMedium, pretendardRegular } from '@/lib/constants/fonts';
+import React from "react";
+import { cn } from "@/lib/utils/style";
+import {
+  pretendardBold,
+  pretendardMedium,
+  pretendardRegular,
+} from "@/lib/constants/fonts";
 
 interface StatItemProps {
   label: string;
@@ -12,8 +16,22 @@ interface StatItemProps {
 function StatItem({ label, value }: StatItemProps) {
   return (
     <div className="flex flex-col items-center">
-      <div className={cn(pretendardRegular.className, "text-sm text-white/60 mb-1")}>{label}</div>
-      <div className={cn(pretendardBold.className, "text-[#D6F34C] text-2xl font-medium")}>{value}</div>
+      <div
+        className={cn(
+          pretendardRegular.className,
+          "text-sm text-white/80/60 mb-1"
+        )}
+      >
+        {label}
+      </div>
+      <div
+        className={cn(
+          pretendardBold.className,
+          "text-[#D6F34C] text-2xl font-medium"
+        )}
+      >
+        {value}
+      </div>
     </div>
   );
 }
@@ -44,7 +62,14 @@ export function StatsSection({ stats }: StatsSectionProps) {
           <div className="w-full border-t border-white/10"></div>
         </div>
         <div className="relative flex justify-center">
-          <span className={cn(pretendardMedium.className, "bg-[#171717] px-6 text-sm text-white/60 z-10")}>MY PAGE</span>
+          <span
+            className={cn(
+              pretendardMedium.className,
+              "bg-[#171717] px-6 text-sm text-white/80/60 z-10"
+            )}
+          >
+            MY PAGE
+          </span>
         </div>
       </div>
       <div className="px-6 py-5 bg-[#1f210e] rounded-t-2xl mx-6">
@@ -57,4 +82,4 @@ export function StatsSection({ stats }: StatsSectionProps) {
       </div>
     </div>
   );
-} 
+}

@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useAuth } from '@/lib/hooks/features/auth/useAuth';
-import { GoogleIcon } from '@/styles/icons/auth/google-icon';
-import { useLocaleContext } from '@/lib/contexts/locale-context';
+import { useAuth } from "@/lib/hooks/features/auth/useAuth";
+import { GoogleIcon } from "@/styles/icons/auth/google-icon";
+import { useLocaleContext } from "@/lib/contexts/locale-context";
 import { CustomTooltip } from "@/components/ui/custom-tooltip";
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
 // 조건부 로깅 - 에러 시에만 출력
 const logError = (message: string, error?: any) => {
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === "development") {
     console.error(message, error);
   }
 };
@@ -36,8 +36,8 @@ export function AccountSection({
 }) {
   const { t } = useLocaleContext();
   const { isLogin, handleGoogleLogin, handleDisconnect } = useAuth();
-  const userEmail = window.sessionStorage.getItem('USER_EMAIL');
-  
+  const userEmail = window.sessionStorage.getItem("USER_EMAIL");
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -54,30 +54,30 @@ export function AccountSection({
     } else {
       // 기존 로그아웃 로직 사용
       handleDisconnect();
-      
+
       // 필요한 추가 정리 작업
-      window.sessionStorage.removeItem('USER_DOC_ID');
-      window.sessionStorage.removeItem('SUI_ACCOUNT');
-      window.sessionStorage.removeItem('ACCESS_TOKEN');
-      window.sessionStorage.removeItem('USER_EMAIL');
-      window.sessionStorage.removeItem('USER_NICKNAME');
-      
+      window.sessionStorage.removeItem("USER_DOC_ID");
+      window.sessionStorage.removeItem("SUI_ACCOUNT");
+      window.sessionStorage.removeItem("ACCESS_TOKEN");
+      window.sessionStorage.removeItem("USER_EMAIL");
+      window.sessionStorage.removeItem("USER_NICKNAME");
+
       // 이벤트 발송
-      window.dispatchEvent(new CustomEvent('auth:state-changed'));
+      window.dispatchEvent(new CustomEvent("auth:state-changed"));
     }
-    
+
     // 항상 모달 닫기
     onClose();
   };
 
   // 데이터가 있는지 확인
-  const hasData = data && (
-    data.points > 0 || 
-    data.active_ticket_num > 0 || 
-    data.request_num > 0 || 
-    data.provide_num > 0 || 
-    data.pending_num > 0
-  );
+  const hasData =
+    data &&
+    (data.points > 0 ||
+      data.active_ticket_num > 0 ||
+      data.request_num > 0 ||
+      data.provide_num > 0 ||
+      data.pending_num > 0);
 
   return (
     <div className="h-full flex flex-col">
@@ -87,10 +87,10 @@ export function AccountSection({
           <div className="bg-[#1A1A1A] rounded-xl p-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <GoogleIcon />
-              <span className="text-white">{userEmail}</span>
+              <span className="text-white/80">{userEmail}</span>
             </div>
-            <button 
-              onClick={handleLogout} 
+            <button
+              onClick={handleLogout}
               className="hover:text-gray-200 transition-colors"
               aria-label="로그아웃"
             >
@@ -117,17 +117,17 @@ export function AccountSection({
               <div className="text-gray-400 text-sm flex items-center gap-1">
                 {t.mypage.home.activity.points}
                 <CustomTooltip text="활동을 통해 획득한 포인트입니다.">
-                  <svg 
-                    className="w-4 h-4 text-gray-400 hover:text-gray-300 cursor-help" 
-                    fill="none" 
-                    stroke="currentColor" 
+                  <svg
+                    className="w-4 h-4 text-gray-400 hover:text-gray-300 cursor-help"
+                    fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth={2} 
-                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
                 </CustomTooltip>
@@ -142,17 +142,17 @@ export function AccountSection({
               <div className="text-gray-400 text-sm flex items-center gap-1">
                 {t.mypage.home.activity.activityCounts}
                 <CustomTooltip text="현재 진행 중인 활동권 수입니다.">
-                  <svg 
-                    className="w-4 h-4 text-gray-400 hover:text-gray-300 cursor-help" 
-                    fill="none" 
-                    stroke="currentColor" 
+                  <svg
+                    className="w-4 h-4 text-gray-400 hover:text-gray-300 cursor-help"
+                    fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth={2} 
-                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
                 </CustomTooltip>
@@ -200,14 +200,14 @@ export function AccountSection({
               // 가장 단순한 형태로 직접 로그인 호출
               try {
                 // 로그인 시작 - 로딩 상태 설정을 위한 이벤트 발생
-                window.dispatchEvent(new CustomEvent('login:loading:start'));
-                
+                window.dispatchEvent(new CustomEvent("login:loading:start"));
+
                 // 로그인 함수 직접 호출
                 handleGoogleLogin()
                   .then(() => {
                     // 로그인 성공 이벤트 발생 - 다른 컴포넌트가 이를 감지
-                    window.dispatchEvent(new CustomEvent('login:success'));
-                    
+                    window.dispatchEvent(new CustomEvent("login:success"));
+
                     // 약간의 지연 후 모달 닫기 (세션 스토리지 업데이트 대기)
                     setTimeout(() => {
                       onClose();
@@ -215,12 +215,12 @@ export function AccountSection({
                   })
                   .catch((error) => {
                     // 로그인 실패 시 로딩 상태 종료
-                    window.dispatchEvent(new CustomEvent('login:loading:stop'));
-                    logError('[AccountSection] 로그인 후처리 중 오류:', error);
+                    window.dispatchEvent(new CustomEvent("login:loading:stop"));
+                    logError("[AccountSection] 로그인 후처리 중 오류:", error);
                   });
               } catch (error) {
-                window.dispatchEvent(new CustomEvent('login:loading:stop'));
-                logError('[AccountSection] 로그인 시도 중 오류:', error);
+                window.dispatchEvent(new CustomEvent("login:loading:stop"));
+                logError("[AccountSection] 로그인 시도 중 오류:", error);
               }
             }}
             className="w-full px-6 py-4 rounded-xl text-sm font-medium

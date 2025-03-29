@@ -1,16 +1,15 @@
 import { WebsiteSchema } from "../types/schema";
-import { Locale } from "@/lib/lang/locales";
 
 const SITE_URL = "https://decoded.style";
 
 const websiteContent = {
   ko: {
-    name: "DECODED - 패션 아이템 검색 플랫폼",
-    description: "궁금한 패션 아이템을 찾고 공유하세요",
+    name: "DECODED - 아이템 검색 플랫폼",
+    description: "궁금한 아이템을 요청하고 공유하세요",
   },
   en: {
     name: "DECODED - Item Search Platform",
-    description: "Discover and share items",
+    description: "Request and share items you're curious about",
   },
 } as const;
 

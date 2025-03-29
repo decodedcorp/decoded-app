@@ -2,15 +2,18 @@ export const footer = {
   company: {
     title: "DECODED",
     description:
-      "실시간 아이템 검색 플랫폼을 통해 새로운 커뮤니티 경험을 제공합니다.",
+      "디코디드는 문화 취향을 공유하는 커뮤니티입니다. 요청과 공유를 통해 새로운 경험을 만들어갑니다.",
   },
   quickLinks: {
     title: "Quick Links",
     items: {
-      about: "소개",
-      features: "기능",
-      community: "커뮤니티",
-      support: "고객지원",
+      home: "Home",
+    },
+  },
+  communication: {
+    title: "Channel",
+    items: {
+      telegram: "Telegram",
     },
   },
   connect: {
@@ -24,9 +27,9 @@ export const footer = {
       contact: "이메일: decodedapp@gmail.com | 전화번호: 02-1234-5678",
     },
     links: {
-      privacy: "개인정보 처리방침",
-      terms: "서비스 이용약관",
+      privacy: "Privacy Policy",
+      terms: "Terms of Service",
     },
-    copyright: "© 2024 Decoded Limited. All Rights Reserved.",
+    copyright: "Copyright © Decoded. All Rights Reserved",
   },
 } as const;

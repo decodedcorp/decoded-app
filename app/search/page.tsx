@@ -1,43 +1,23 @@
-'use client';
+"use client";
 
-import { SearchResults } from "@/app/search/components/searchResults";
 import { SearchHeader } from "@/app/search/components/searchHeader";
-import { SearchTrendingSection } from "@/app/search/components/SearchTrendingSection";
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { networkManager } from '@/lib/network/network';
-
-interface SearchResponse {
-  trending_images: Array<{
-    image: {
-      _id: string;
-      img_url: string;
-      title: string | null;
-      upload_by: string;
-      requested_items: Record<
-        string,
-        Array<{
-          item_doc_id: string;
-          position: {
-            top: string;
-            left: string;
-          };
-        }>
-      >;
-      like: number;
-    };
-  }>;
-  related_images?: any[];
-}
+import { SearchResults } from "@/app/search/components/searchResults";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { networkManager } from "@/lib/network/network";
+import type { ImageDoc } from "@/lib/api/types";
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
-  const query = searchParams.get('q');
+  const query = searchParams.get("q");
   const [isLoading, setIsLoading] = useState(true);
-  const [trendingData, setTrendingData] = useState<SearchResponse | null>(null);
-  
+  const [searchImages, setSearchImages] = useState<ImageDoc[] | null>(null);
+  const [trendingImages, setTrendingImages] = useState<Set<ImageDoc> | null>(
+    null
+  );
+
   useEffect(() => {
-    const fetchSearchData = async () => {
+    const fetchData = async () => {
       if (!query) {
         setIsLoading(false);
         return;
@@ -45,36 +25,45 @@ export default function SearchPage() {
 
       setIsLoading(true);
       try {
-        const response = await networkManager.request(
-          `search?query=${encodeURIComponent(query)}`,
-          'GET'
-        );
+        const [searchResponse, trendingResponse] = await Promise.all([
+          networkManager.request(
+            `search?query=${encodeURIComponent(query)}`,
+            "GET"
+          ),
+          networkManager.request("metrics/trending/images", "GET"),
+        ]);
 
-        if (response.status_code === 200) {
-          setTrendingData(response.data);
+        if (searchResponse.status_code === 200) {
+          setSearchImages(searchResponse.data.related_images);
+        }
+        if (trendingResponse.status_code === 200) {
+          trendingResponse.data.forEach((data: any) => {
+            setTrendingImages((prev) => {
+              const newSet = new Set(prev);
+              newSet.add(data.image);
+              return newSet;
+            });
+          });
         }
       } catch (error) {
-        console.error('검색 결과 로딩 실패:', error);
+        console.error("데이터 로딩 실패:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchSearchData();
+    fetchData();
   }, [query]);
 
   return (
     <div className="min-h-screen bg-black pt-24">
-      {/* 일반 검색 결과 - 컨테이너 내부에 패딩 적용 */}
-      <div className="container mx-auto px-4">
-        <SearchHeader />
-        <SearchResults />
-      </div>
-      
       {/* 트렌딩 섹션 - 별도로 배치 (전체 너비) */}
       <div className="mt-12 w-full">
-        {!isLoading && trendingData?.trending_images && trendingData.trending_images.length > 0 && (
-          <SearchTrendingSection trending_images={trendingData.trending_images} />
+        {!isLoading && (
+          <SearchResults
+            searchImages={searchImages || []}
+            trendingImages={Array.from(trendingImages || [])}
+          />
         )}
       </div>
     </div>

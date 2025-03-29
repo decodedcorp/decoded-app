@@ -3,6 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { Badge } from "@/components/ui/badge";
 import { useTrendingKeywords } from './hooks/use-trending-keywords';
+import { motion } from 'framer-motion';
+import { pretendardSemiBold } from '@/lib/constants/fonts';
 
 export function TrendingKeywordsList() {
   const router = useRouter();
@@ -15,16 +17,18 @@ export function TrendingKeywordsList() {
   if (isLoading) return <div>키워드를 불러오는 중...</div>;
 
   return (
-    <div className="flex flex-wrap gap-3">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-8">
       {response?.data?.map((keyword: string, index) => (
-        <Badge 
-          key={index} 
-          variant="default"
+        <motion.span
+          key={index}
+          className={`${pretendardSemiBold.className} text-gray-600 text-[2.5rem] sm:text-[3rem] hover:text-[#EAFD66] transition-colors duration-200 cursor-pointer`}
           onClick={() => handleKeywordClick(keyword)}
+          whileHover={{ x: 20 }}
+          transition={{ type: "spring", stiffness: 300 }}
         >
-          {keyword}
-        </Badge>
+          {keyword.toUpperCase()}
+        </motion.span>
       ))}
     </div>
   );
-} 
+}

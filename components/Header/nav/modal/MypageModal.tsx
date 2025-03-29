@@ -1,43 +1,55 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useLocaleContext } from '@/lib/contexts/locale-context';
-import { AccountSection } from './sections/AccountSection';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { useMyPageQuery } from '@/lib/hooks/common/useMyPageQueries';
-import type { AccountData, TabType } from '@/components/Header/nav/modal/types/mypage';
-import { cn } from '@/lib/utils/style';
-import { ArrowRight, X } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useLocaleContext } from "@/lib/contexts/locale-context";
+import { AccountSection } from "./sections/AccountSection";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useMyPageQuery } from "@/lib/hooks/common/useMyPageQueries";
+import type {
+  AccountData,
+  TabType,
+} from "@/components/Header/nav/modal/types/mypage";
+import { cn } from "@/lib/utils/style";
+import { ArrowRight, X } from "lucide-react";
 
 // 모달 컨트롤러 커스텀 훅
-function useModalController({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+function useModalController({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [isProtectionActive, setIsProtectionActive] = useState<boolean>(false);
   const lastActionTimeRef = useRef<number>(0);
   const prevIsOpenRef = useRef<boolean>(false);
 
-  const handleClose = useCallback((e?: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault(); // 브라우저 기본 동작 방지
-      e.stopPropagation(); // 이벤트 전파 중단
-    }
-    
-    const now = Date.now();
-    
-    if (isProtectionActive) {
-      return;
-    }
-    
-    if (now - lastActionTimeRef.current < 300) {
-      return;
-    }
-    
-    lastActionTimeRef.current = now;
-    
-    onClose();
-  }, [onClose, isProtectionActive]);
+  const handleClose = useCallback(
+    (e?: React.MouseEvent) => {
+      if (e) {
+        e.preventDefault(); // 브라우저 기본 동작 방지
+        e.stopPropagation(); // 이벤트 전파 중단
+      }
+
+      const now = Date.now();
+
+      if (isProtectionActive) {
+        return;
+      }
+
+      if (now - lastActionTimeRef.current < 300) {
+        return;
+      }
+
+      lastActionTimeRef.current = now;
+
+      onClose();
+    },
+    [onClose, isProtectionActive]
+  );
 
   // 외부에서 강제로 닫힘 감지
   useEffect(() => {
@@ -45,9 +57,9 @@ function useModalController({ isOpen, onClose }: { isOpen: boolean; onClose: () 
       const now = Date.now();
       if (now - lastActionTimeRef.current > 100) {
         // 외부에서 강제로 닫힘 감지
-        if (typeof document !== 'undefined') {
+        if (typeof document !== "undefined") {
           // 스크롤 복원 (강제 닫힘 시에도 항상 적용)
-          document.body.style.overflow = '';
+          document.body.style.overflow = "";
         }
       }
     }
@@ -58,37 +70,37 @@ function useModalController({ isOpen, onClose }: { isOpen: boolean; onClose: () 
   useEffect(() => {
     const now = Date.now();
     lastActionTimeRef.current = now;
-    
+
     if (isOpen) {
       setIsVisible(true);
       setIsProtectionActive(true);
-      
+
       const protectionTimer = setTimeout(() => {
         setIsProtectionActive(false);
       }, 800);
-      
-      if (typeof document !== 'undefined') {
-        document.body.style.overflow = 'hidden';
+
+      if (typeof document !== "undefined") {
+        document.body.style.overflow = "hidden";
       }
-      
+
       return () => clearTimeout(protectionTimer);
     } else {
       setIsProtectionActive(true);
-      
+
       const closeTimer = setTimeout(() => {
         setIsVisible(false);
         setIsProtectionActive(false);
-        
-        if (typeof document !== 'undefined') {
-          document.body.style.overflow = '';
+
+        if (typeof document !== "undefined") {
+          document.body.style.overflow = "";
         }
       }, 300);
-      
+
       // 항상 스크롤을 복원하기 위한 즉시 실행
-      if (typeof document !== 'undefined') {
-        document.body.style.overflow = '';
+      if (typeof document !== "undefined") {
+        document.body.style.overflow = "";
       }
-      
+
       return () => clearTimeout(closeTimer);
     }
   }, [isOpen]);
@@ -97,30 +109,35 @@ function useModalController({ isOpen, onClose }: { isOpen: boolean; onClose: () 
   useEffect(() => {
     return () => {
       // 컴포넌트 언마운트 시 항상 스크롤 복원
-      if (typeof document !== 'undefined') {
-        document.body.style.overflow = '';
+      if (typeof document !== "undefined") {
+        document.body.style.overflow = "";
       }
     };
   }, []);
-  
+
   // 전역 이벤트 핸들러 예외 처리 - useModalClose 대응
   useEffect(() => {
     if (isOpen && isVisible) {
       // 모달 내부 클릭을 감지하고 처리하는 핸들러
       const handleGlobalClick = (e: MouseEvent) => {
         // 모달 패널 내부 클릭인지 확인
-        const modalPanel = document.getElementById('mypage-modal-panel');
-        if (modalPanel && (modalPanel === e.target || modalPanel.contains(e.target as Node))) {
+        const modalPanel = document.getElementById("mypage-modal-panel");
+        if (
+          modalPanel &&
+          (modalPanel === e.target || modalPanel.contains(e.target as Node))
+        ) {
           // 이벤트를 취소하지 않고 사용자 정의 플래그만 설정 - 다른 핸들러가 실행되도록 허용
           (e as any).__handled = true;
         }
       };
 
       // 캡처 단계에서 이벤트 리스너 추가 (가장 먼저 실행되도록)
-      document.addEventListener('click', handleGlobalClick, { capture: true });
-      
+      document.addEventListener("click", handleGlobalClick, { capture: true });
+
       return () => {
-        document.removeEventListener('click', handleGlobalClick, { capture: true });
+        document.removeEventListener("click", handleGlobalClick, {
+          capture: true,
+        });
       };
     }
   }, [isOpen, isVisible]);
@@ -128,44 +145,44 @@ function useModalController({ isOpen, onClose }: { isOpen: boolean; onClose: () 
   return {
     isVisible,
     isProtectionActive,
-    handleClose
+    handleClose,
   };
 }
 
 // 반응형 스타일 관리 커스텀 훅
 function useResponsiveModalStyles() {
   const [windowWidth, setWindowWidth] = useState<number>(
-    typeof window !== 'undefined' ? window.innerWidth : 0
+    typeof window !== "undefined" ? window.innerWidth : 0
   );
-  
+
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
-    
-    if (typeof window !== 'undefined') {
+
+    if (typeof window !== "undefined") {
       setWindowWidth(window.innerWidth);
-      window.addEventListener('resize', handleResize);
+      window.addEventListener("resize", handleResize);
     }
-    
-    return () => window.removeEventListener('resize', handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
-  
+
   const isMobile = windowWidth < 768;
   const isTablet = windowWidth >= 768 && windowWidth <= 1025;
   const isDesktop = windowWidth > 1025;
-  
+
   return {
     windowWidth,
     isMobile,
     isTablet,
     isDesktop,
     styles: {
-      width: isMobile ? '100%' : isTablet ? '420px' : '360px',
-      height: isMobile ? '100%' : isTablet ? '75vh' : '65vh',
-      marginTop: isMobile ? '0' : '48px',
-      borderRadius: isMobile ? '0' : '16px',
-      minWidth: isMobile ? '100%' : '350px',
-      minHeight: isMobile ? '100%' : '500px',
-    }
+      width: isMobile ? "100%" : isTablet ? "420px" : "360px",
+      height: isMobile ? "100%" : isTablet ? "75vh" : "65vh",
+      marginTop: isMobile ? "0" : "48px",
+      borderRadius: isMobile ? "0" : "16px",
+      minWidth: isMobile ? "100%" : "350px",
+      minHeight: isMobile ? "100%" : "500px",
+    },
   };
 }
 
@@ -176,20 +193,24 @@ interface MypageModalProps {
   onLoginSuccess?: () => void;
 }
 
-export function MypageModal({ isOpen, onClose, onLogout, onLoginSuccess }: MypageModalProps) {
+export function MypageModal({
+  isOpen,
+  onClose,
+  onLogout,
+  onLoginSuccess,
+}: MypageModalProps) {
   const { t } = useLocaleContext();
   const modalRef = useRef<HTMLDivElement>(null);
-  
+
   // 커스텀 훅 사용
-  const { isVisible, isProtectionActive, handleClose } = useModalController({ isOpen, onClose });
+  const { isVisible, isProtectionActive, handleClose } = useModalController({
+    isOpen,
+    onClose,
+  });
   const { windowWidth, isMobile, styles } = useResponsiveModalStyles();
-  
+
   // 탭 데이터 로딩 - 이제 'home' 탭만 로드합니다
-  const { 
-    data: tabData,
-    isLoading,
-    error 
-  } = useMyPageQuery('home', isOpen);
+  const { data: tabData, isLoading, error } = useMyPageQuery("home", isOpen);
 
   // 렌더링 최적화를 위한 포스 리플로우
   useEffect(() => {
@@ -198,12 +219,12 @@ export function MypageModal({ isOpen, onClose, onLogout, onLoginSuccess }: Mypag
         if (modalRef.current) {
           // 포스 리플로우
           const forceReflow = modalRef.current.offsetHeight;
-          
+
           if (windowWidth < 1025) {
-            modalRef.current.style.opacity = '0.99';
+            modalRef.current.style.opacity = "0.99";
             setTimeout(() => {
               if (modalRef.current) {
-                modalRef.current.style.opacity = '1';
+                modalRef.current.style.opacity = "1";
               }
             }, 10);
           }
@@ -213,53 +234,56 @@ export function MypageModal({ isOpen, onClose, onLogout, onLoginSuccess }: Mypag
   }, [isOpen, isVisible, windowWidth]);
 
   // 모달 외부 클릭 핸들러
-  const handleBackgroundClick = useCallback((e: React.MouseEvent) => {
-    // 배경 클릭 이벤트만 처리 (실제로 모달 외부 영역을 클릭한 경우만)
-    if (e.target === e.currentTarget) {
-      handleClose(e);
-    }
-  }, [handleClose]);
-  
+  const handleBackgroundClick = useCallback(
+    (e: React.MouseEvent) => {
+      // 배경 클릭 이벤트만 처리 (실제로 모달 외부 영역을 클릭한 경우만)
+      if (e.target === e.currentTarget) {
+        handleClose(e);
+      }
+    },
+    [handleClose]
+  );
+
   // 마이페이지로 이동 핸들러
   const handleGoToMypage = () => {
     // 모달 닫고 페이지 이동
     handleClose();
     // 실제 구현 시에는 여기에 페이지 이동 로직 추가
   };
-  
+
   // 모달이 보이지 않고 열려있지 않으면 아무것도 렌더링하지 않음
   if (!isOpen && !isVisible) {
     return null;
   }
-  
+
   return (
-    <div 
-      className="mypage-modal-root" 
-      style={{ 
-        position: 'fixed', 
-        top: 0, 
-        left: 0, 
+    <div
+      className="mypage-modal-root"
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
         right: 0,
-        bottom: 0, 
-        pointerEvents: isOpen ? 'auto' : 'none', 
-        zIndex: 100000
+        bottom: 0,
+        pointerEvents: isOpen ? "auto" : "none",
+        zIndex: 100000,
       }}
       onClick={handleBackgroundClick}
     >
       {/* 배경 오버레이 */}
-      <div 
+      <div
         className={cn(
           "fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300",
           isOpen ? "opacity-100" : "opacity-0"
         )}
-        style={{ 
-          pointerEvents: 'none',
-          zIndex: 100000 
+        style={{
+          pointerEvents: "none",
+          zIndex: 100000,
         }}
       />
-      
+
       {/* 모달 패널 */}
-      <div 
+      <div
         ref={modalRef}
         id="mypage-modal-panel"
         data-modal-container="true"
@@ -274,8 +298,8 @@ export function MypageModal({ isOpen, onClose, onLogout, onLoginSuccess }: Mypag
             "translate-x-full": !isOpen,
           }
         )}
-        style={{ 
-          pointerEvents: isOpen ? 'auto' : 'none', 
+        style={{
+          pointerEvents: isOpen ? "auto" : "none",
           zIndex: 100001,
           width: styles.width,
           height: styles.height,
@@ -284,14 +308,14 @@ export function MypageModal({ isOpen, onClose, onLogout, onLoginSuccess }: Mypag
           marginTop: styles.marginTop,
           borderTopLeftRadius: styles.borderRadius,
           borderBottomLeftRadius: styles.borderRadius,
-          willChange: 'transform',
-          transformOrigin: 'right center',
+          willChange: "transform",
+          transformOrigin: "right center",
         }}
       >
         {/* 헤더 영역 */}
         <div className="border-b border-white/5 flex-shrink-0">
           <div className="px-4 py-3 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-white">
+            <h2 className="text-lg font-bold text-white/80">
               {t.mypage.tabs.home}
             </h2>
             <button
@@ -310,24 +334,20 @@ export function MypageModal({ isOpen, onClose, onLogout, onLoginSuccess }: Mypag
         {/* 콘텐츠 영역 */}
         <div className="flex-1 overflow-y-auto" data-no-close-on-click="true">
           {/* 계정 정보 섹션 */}
-          <AccountSection 
-            data={tabData as AccountData} 
+          <AccountSection
+            data={tabData as AccountData}
             isLoading={isLoading}
             onClose={handleClose}
             onLogout={onLogout}
             onLoginSuccess={onLoginSuccess}
           />
-          
+
           {/* 마이페이지 이동 버튼 */}
           <div className="px-4 py-6">
-            <Link 
-              href="/mypage" 
-              onClick={handleGoToMypage}
-              className="w-full"
-            >
-              <Button 
-                variant="outline" 
-                className="w-full flex items-center justify-between bg-white/5 hover:bg-white/10 text-white border-white/10"
+            <Link href="/mypage" onClick={handleGoToMypage} className="w-full">
+              <Button
+                variant="outline"
+                className="w-full flex items-center justify-between bg-white/5 hover:bg-white/10 text-white/80 border-white/10"
               >
                 <span>마이페이지로 이동</span>
                 <ArrowRight className="ml-2 h-4 w-4" />

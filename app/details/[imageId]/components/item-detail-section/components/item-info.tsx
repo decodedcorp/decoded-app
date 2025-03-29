@@ -1,5 +1,5 @@
-import Image from 'next/image';
-import type { ItemDetailData } from '../types';
+import Image from "next/image";
+import type { ItemDetailData } from "../types";
 
 interface ItemInfoProps {
   data: ItemDetailData;
@@ -12,15 +12,14 @@ export function ItemInfo({ data }: ItemInfoProps) {
         {data.docs.img_url ? (
           <Image
             src={data.docs.img_url}
-            alt={data.docs.metadata.name || ''}
+            alt={data.docs.metadata.name || ""}
             width={240}
             height={240}
             className="w-full h-full object-cover"
             unoptimized
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-neutral-400">
-          </div>
+          <div className="w-full h-full flex items-center justify-center text-neutral-400"></div>
         )}
       </div>
 
@@ -28,13 +27,13 @@ export function ItemInfo({ data }: ItemInfoProps) {
         {data.docs.metadata.category}
       </div>
 
-      <div className="text-white text-xs font-bold mb-1.5">
-        {data.metadata?.brand || 'Unknown Brand'}
+      <div className="text-white/80 text-xs font-bold mb-1.5">
+        {data.metadata?.brand || "Unknown Brand"}
       </div>
 
-      <div className="text-white text-base mb-2">
+      <div className="text-white/80 text-base mb-2">
         {data.docs.metadata.name}
       </div>
     </>
   );
-} 
+}

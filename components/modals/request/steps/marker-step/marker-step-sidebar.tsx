@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { Point } from '@/types/model.d';
-import { MousePointerClick, X } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { useLocaleContext } from '@/lib/contexts/locale-context';
+import { Point } from "@/types/model.d";
+import { MousePointerClick, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useLocaleContext } from "@/lib/contexts/locale-context";
 
 interface MarkerStepSidebarProps {
   points: Point[];
@@ -20,9 +20,9 @@ export function MarkerStepSidebar({
 }: MarkerStepSidebarProps) {
   const { t } = useLocaleContext();
   const [isVisible, setIsVisible] = useState(true);
-  
+
   useEffect(() => {
-    const hasSeenGuide = localStorage.getItem('hasSeenMarkerGuide');
+    const hasSeenGuide = localStorage.getItem("hasSeenMarkerGuide");
     if (hasSeenGuide) {
       setIsVisible(false);
     }
@@ -41,28 +41,29 @@ export function MarkerStepSidebar({
             <X className="w-4 h-4" />
           </button>
         </div>
-        
+
         <div className="px-4 pb-3">
           <div className="flex items-start gap-3">
             <div className="p-1.5 rounded-lg bg-[#EAFD66]/10 shrink-0">
               <MousePointerClick className="w-4 h-4 text-[#EAFD66]" />
             </div>
             <div className="space-y-2">
-              <h3 className="text-sm font-medium text-white">
+              <h3 className="text-sm font-medium text-white/80">
                 {t.request.steps.marker.guide.required.title}
               </h3>
               <div className="text-xs text-zinc-400 space-y-1">
-                {t.request.steps.marker.guide.required.description.map((desc, index) => (
-                  <div key={index} className="flex items-start gap-2">
-                    <span className="text-[#EAFD66]">•</span>
-                    <p>{desc}</p>
-                  </div>
-                ))}
+                {t.request.steps.marker.guide.required.description.map(
+                  (desc, index) => (
+                    <div key={index} className="flex items-start gap-2">
+                      <span className="text-[#EAFD66]">•</span>
+                      <p>{desc}</p>
+                    </div>
+                  )
+                )}
               </div>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );
