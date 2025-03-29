@@ -18,6 +18,10 @@ export const home = {
       description: "정확한 정보 제공으로 포인트를 획득하세요",
     },
   },
+  curation: {
+    title: "큐레이션",
+    description: "디코디드 큐레이션 콘텐츠를 확인해보세요",
+  },
   discover: {
     title: "여러분의 링크로 홍보해보세요",
     description:
@@ -35,8 +39,12 @@ export const home = {
     },
   },
   trending: {
-    title: "DECODED SELECTED",
-    description: "디코디드의 선택을 확인해보세요",
+    title: "트렌딩 나우",
+    description: "실시간으로 업데이트되는 인기 스타일을 만나보세요",
+  },
+  explore: {
+    title: "스타일 탐색",
+    description: "다양한 카테고리의 스타일을 탐색해보세요",
   },
   premiumSpot: {
     title: "인기 아이템의 링크를 제공해보세요",

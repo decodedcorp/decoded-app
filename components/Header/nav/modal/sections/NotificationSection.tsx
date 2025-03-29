@@ -83,7 +83,7 @@ export function NotificationSection({
                   <div className="w-2 h-2 rounded-full bg-[#EAFD66]" />
                 )}
               </div>
-              <h3 className="text-sm font-medium text-white">
+              <h3 className="text-sm font-medium text-white/80">
                 {notification.title}
               </h3>
               {expandedId === notification.doc_id && (

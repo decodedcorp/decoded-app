@@ -1,15 +1,18 @@
-'use client';
+"use client";
 
-import { Heart } from 'lucide-react';
-import { cn } from '@/lib/utils/style';
-import { ItemActionsWrapper } from '../client/item-actions-wrapper';
+import { Heart } from "lucide-react";
+import { cn } from "@/lib/utils/style";
+import { ItemActionsWrapper } from "../client/item-actions-wrapper";
 
 interface MobileItemActionsProps {
   imageId: string;
   initialLikeCount: number;
 }
 
-export function MobileItemActions({ imageId, initialLikeCount }: MobileItemActionsProps) {
+export function MobileItemActions({
+  imageId,
+  initialLikeCount,
+}: MobileItemActionsProps) {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#1A1A1A] border-t border-white/10">
       <div className="px-4 py-3 flex items-center justify-between">
@@ -30,12 +33,12 @@ export function MobileItemActions({ imageId, initialLikeCount }: MobileItemActio
                 <Heart
                   className={cn(
                     "w-5 h-5",
-                    isLiked ? "fill-red-500 text-red-500" : "text-white/60"
+                    isLiked ? "fill-red-500 text-red-500" : "text-white/80/60"
                   )}
                 />
-                <span className="text-sm text-white/60">{likeCount}</span>
+                <span className="text-sm text-white/80/60">{likeCount}</span>
               </button>
-              
+
               <button
                 className={cn(
                   "px-6 py-2 rounded-full text-sm font-medium",
@@ -51,4 +54,4 @@ export function MobileItemActions({ imageId, initialLikeCount }: MobileItemActio
       <div className="h-safe-bottom" /> {/* iOS safe area 대응 */}
     </div>
   );
-} 
+}

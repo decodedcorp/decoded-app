@@ -18,6 +18,10 @@ export const home = {
       description: "Get points for providing accurate information",
     },
   },
+  curation: {
+    title: "Curations",
+    description: "Discover the latest fashion trends and styles",
+  },
   discover: {
     title: "Promote with Your Links",
     description:
@@ -35,8 +39,12 @@ export const home = {
     },
   },
   trending: {
-    title: "DECODED SELECTED",
-    description: "Check out decoded's picks",
+    title: "Trending Now",
+    description: "Discover the most popular styles and trends of the moment",
+  },
+  explore: {
+    title: "Style Explorer",
+    description: "Explore various styles from different categories",
   },
   premiumSpot: {
     title: "Provide Links for Popular Items",

@@ -18,9 +18,6 @@ export function SearchHeader() {
       transition={{ duration: 0.5 }}
       className="relative"
     >
-      {/* 배경 그라데이션 */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#EAFD66]/10 to-transparent rounded-2xl -z-10" />
-
       <div className=" py-8 space-y-4">
         {/* 검색 아이콘과 쿼리 */}
         <div className="flex items-center gap-3">
@@ -34,8 +31,8 @@ export function SearchHeader() {
             <Search className="w-5 h-5 text-[#EAFD66]" />
           </div>
           <div className="space-y-1">
-            <p className="text-sm text-white/60">검색어</p>
-            <h1 className="text-xl font-medium text-white">
+            <p className="text-sm text-white/80/60">검색어</p>
+            <h1 className="text-xl font-medium text-white/80">
               &quot;{query}&quot;
             </h1>
           </div>

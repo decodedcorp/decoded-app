@@ -1,50 +1,14 @@
 "use client";
 
-import Image from 'next/image';
-import { Heart } from 'lucide-react';
-import { ItemButton } from '@/components/ui/item-marker';
-import { useNavigateToDetail } from '@/lib/hooks/common/useNavigateToDetail';
-import { ProcessedImageData } from '@/lib/api/_types/image';
-import { cn } from '@/lib/utils/style';
-import { ItemActionsWrapper } from '../item-list-section/client/item-actions-wrapper';
-import { AddItemModal } from '@/components/ui/modal/add-item-modal';
-import { useState } from 'react';
-
-interface ItemData {
-  _id: string;
-  brand_name: string;
-  brand_logo_image_url: string;
-}
-
-interface DecodedItem {
-  is_decoded: boolean;
-  position: {
-    top: string;
-    left: string;
-  };
-  item: {
-    item: {
-      _id: string;
-      metadata: {
-        name: string | null;
-        description: string | null;
-        brand: string | null;
-        designed_by: string | null;
-        material: string | null;
-        color: string | null;
-        item_class: string;
-        item_sub_class: string;
-        category: string;
-        sub_category: string;
-        product_type: string;
-      };
-      img_url: string | null;
-      like: number;
-    };
-    brand_name: string | null;
-    brand_logo_image_url: string | null;
-  };
-}
+import Image from "next/image";
+import { Heart } from "lucide-react";
+import { ItemButton } from "@/components/ui/item-marker";
+import { useNavigateToDetail } from "@/lib/hooks/common/useNavigateToDetail";
+import { ProcessedImageData } from "@/lib/api/_types/image";
+import { cn } from "@/lib/utils/style";
+import { ItemActionsWrapper } from "../item-list-section/client/item-actions-wrapper";
+import { AddItemModal } from "@/components/ui/modal/add-item-modal";
+import { useState } from "react";
 
 interface ImageSectionProps {
   imageData: ProcessedImageData;
@@ -55,7 +19,7 @@ interface ImageSectionProps {
 export function ImageSection({ imageData, selectedItemId }: ImageSectionProps) {
   const navigateToDetail = useNavigateToDetail();
   const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
-  
+
   if (!imageData) return null;
 
   const allItems = Object.values(imageData.items).flat();
@@ -71,7 +35,7 @@ export function ImageSection({ imageData, selectedItemId }: ImageSectionProps) {
           priority
           unoptimized
         />
-        
+
         {allItems?.map((decodedItem, index) => {
           const top = parseFloat(decodedItem.position.top);
           const left = parseFloat(decodedItem.position.left);
@@ -95,7 +59,8 @@ export function ImageSection({ imageData, selectedItemId }: ImageSectionProps) {
                     item: {
                       item: decodedItem.item.item,
                       brand_name: decodedItem.item.brand_name,
-                      brand_logo_image_url: decodedItem.item.brand_logo_image_url,
+                      brand_logo_image_url:
+                        decodedItem.item.brand_logo_image_url,
                     },
                   },
                   imageDocId: decodedItem.item.item._id,
@@ -127,12 +92,12 @@ export function ImageSection({ imageData, selectedItemId }: ImageSectionProps) {
                   <Heart
                     className={cn(
                       "w-5 h-5",
-                      isLiked ? "fill-red-500 text-red-500" : "text-white/60"
+                      isLiked ? "fill-red-500 text-red-500" : "text-white/80/60"
                     )}
                   />
-                  <span className="text-sm text-white/60">{likeCount}</span>
+                  <span className="text-sm text-white/80/60">{likeCount}</span>
                 </button>
-                
+
                 <button
                   onClick={() => setIsAddItemModalOpen(true)}
                   className={cn(
@@ -154,7 +119,9 @@ export function ImageSection({ imageData, selectedItemId }: ImageSectionProps) {
           isOpen={isAddItemModalOpen}
           onClose={() => setIsAddItemModalOpen(false)}
           imageId={imageData.doc_id}
-          requestUrl={`user/${sessionStorage.getItem("USER_DOC_ID")}/image/${imageData.doc_id}/request/add`}
+          requestUrl={`user/${sessionStorage.getItem("USER_DOC_ID")}/image/${
+            imageData.doc_id
+          }/request/add`}
         />
       )}
     </div>

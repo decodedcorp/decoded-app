@@ -1,144 +1,191 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { pretendardRegular, pretendardMedium } from '@/lib/constants/fonts';
-import { cn } from '@/lib/utils/style';
-import { Github, Mail, Twitter, ChevronDown, ChevronUp } from 'lucide-react';
-import Link from 'next/link';
-import { useLocaleContext } from '@/lib/contexts/locale-context';
-import LogoPng from '@/styles/logos/LogoPng';
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { useLocaleContext } from "@/lib/contexts/locale-context";
+import LogoPng from "@/styles/logos/LogoPng";
+import {
+  pretendardBold,
+  pretendardRegular,
+  pretendardSemiBold,
+} from "@/lib/constants/fonts";
+import { cn } from "@/lib/utils/style";
 
 function Footer() {
   const { t } = useLocaleContext();
-  const [isLegalOpen, setIsLegalOpen] = useState(false);
+  const [isLogoVisible, setIsLogoVisible] = useState(false);
+  const logoRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsLogoVisible(true);
+          observer.disconnect(); // 한 번 나타나면 관찰 중단
+        }
+      },
+      {
+        threshold: 0.1, // 10% 정도 보이면 트리거
+        rootMargin: "50px", // 뷰포트 하단에서 50px 위에서 트리거
+      }
+    );
+
+    if (logoRef.current) {
+      observer.observe(logoRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  const legalLinks = [
+    { label: t.footer.legal.links.privacy, href: "/privacy-policy" },
+    { label: t.footer.legal.links.terms, href: "/terms-of-service" },
+  ];
+
+  // TODO: Add `request`
+  // TODO: Add `search`
+  const quickLinks = [{ label: t.footer.quickLinks.items.home, href: "/" }];
+
+  const supportLinks = [
+    {
+      label: t.footer.communication.items.telegram,
+      href: process.env.NEXT_PUBLIC_TELEGRAM_CHANNEL_URL,
+    },
+  ];
+
+  const socialLinks = ["Youtube", "Instagram", "Youtube", "Instagram"];
 
   return (
-    <footer className="w-full border-t border-white/5 bg-black/30 backdrop-blur-lg">
-      <div className="container mx-auto py-4 sm:py-8 lg:py-12 px-3 sm:px-4">
-        {/* Top Section */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-6 sm:mb-8">
-          {/* Company Info */}
-          <div className="space-y-2 col-span-2 md:col-span-1">
-            <Link href="/">
-              <LogoPng 
-                width={120}
-                height={28} 
-                className="object-contain mb-2" 
-              />
-            </Link>
-            <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed max-w-md">
-              {t.footer.company.description}
-            </p>
-          </div>
+    <footer className="w-full bg-black text-white/80 overflow-hidden">
+      <div className="mx-auto py-12">
+        {/* Top Section with Navigation */}
+        <div className="container mx-auto md:px-8">
+          <div className="flex flex-col sm:flex-row lg:justify-between gap-8 text-gray-600 mb-16 sm:mb-28">
+            {/* Description */}
+            <div className="w-full lg:max-w-xl">
+              <h3
+                className={`text-sm mb-4 text-gray-500 ${pretendardSemiBold.className}`}
+              >
+                ABOUT US
+              </h3>
+              <p className="text-xs sm:text-sm leading-relaxed">
+                {t.footer.company.description}
+              </p>
+            </div>
 
-          {/* Quick Links */}
-          <div className="space-y-2">
-            <h3
-              className={cn(
-                pretendardMedium.className,
-                'text-white text-sm sm:text-base'
-              )}
-            >
-              {t.footer.quickLinks.title}
-            </h3>
-            <nav className="grid grid-cols-2 md:flex md:flex-col gap-1 md:space-y-1.5">
-              {Object.values(t.footer.quickLinks.items).map((item) => (
-                <Link
-                  key={item}
-                  href="#"
-                  className="text-zinc-400 hover:text-[#EAFD66] text-xs sm:text-sm transition-colors"
+            {/* Navigation Links Grid */}
+            <div className="grid grid-cols-3 gap-8 lg:gap-16">
+              {/* Quick Links */}
+              <div className="flex flex-col">
+                <h3
+                  className={`text-sm mb-4 text-gray-500 ${pretendardSemiBold.className}`}
                 >
-                  {item}
-                </Link>
-              ))}
-            </nav>
-          </div>
+                  {t.footer.quickLinks.title}
+                </h3>
+                <div className="grid grid-cols-1 gap-y-2">
+                  {quickLinks.map((item) => (
+                    <Link
+                      key={item.label}
+                      href={item.href}
+                      className="text-xs sm:text-sm hover:text-[#EAFD66] transition-colors whitespace-nowrap"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
 
-          {/* Social & Contact */}
-          <div className="space-y-2">
-            <h3
-              className={cn(
-                pretendardMedium.className,
-                'text-white text-sm sm:text-base'
-              )}
-            >
-              Connect with us
-            </h3>
-            <div className="flex items-center -ml-1">
-              <Link
-                href="#"
-                className="text-zinc-400 hover:text-[#EAFD66] transition-colors p-1.5"
-              >
-                <Github className="w-4 h-4 sm:w-5 sm:h-5" />
-              </Link>
-              <Link
-                href="#"
-                className="text-zinc-400 hover:text-[#EAFD66] transition-colors p-1.5"
-              >
-                <Twitter className="w-4 h-4 sm:w-5 sm:h-5" />
-              </Link>
-              <Link
-                href="mailto:decodedapp@gmail.com"
-                className="text-zinc-400 hover:text-[#EAFD66] transition-colors p-1.5"
-              >
-                <Mail className="w-4 h-4 sm:w-5 sm:h-5" />
-              </Link>
+              {/* Support Link */}
+              <div className="flex flex-col">
+                <h3
+                  className={`text-sm mb-4 text-gray-500 ${pretendardSemiBold.className}`}
+                >
+                  {t.footer.communication.title}
+                </h3>
+                <div className="grid grid-cols-1 gap-y-2">
+                  {supportLinks.map((item) => (
+                    <Link
+                      key={item.label}
+                      href={item.href ?? ""}
+                      className="text-xs sm:text-sm hover:text-[#EAFD66] transition-colors whitespace-nowrap"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              {/* Legal Links */}
+              <div className="flex flex-col">
+                <h3
+                  className={`text-sm mb-4 text-gray-500 ${pretendardSemiBold.className}`}
+                >
+                  LEGAL
+                </h3>
+                <div className="grid grid-cols-1 gap-y-2">
+                  {legalLinks.map((item) => (
+                    <Link
+                      key={item.label}
+                      href={item.href}
+                      className="text-xs sm:text-sm hover:text-[#EAFD66] transition-colors whitespace-nowrap"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Bottom Section - 모바일에서 아코디언 형태 */}
+        {/* Stay in Touch Section */}
+        <div className="flex flex-col mb-16 justify-center">
+          <h3
+            className={`flex justify-center text-md mb-2 text-gray-600 ${pretendardSemiBold.className}`}
+          >
+            STAY IN TOUCH
+          </h3>
+          <div className="relative overflow-hidden text-gray-800">
+            <div
+              className={`flex whitespace-nowrap animate-marquee-infinite font-extrabold`}
+            >
+              {socialLinks.map((item, index) => (
+                <Link
+                  key={`first-${index}`}
+                  href="#"
+                  className="text-4xl md:text-6xl px-4 hover:text-[#EAFD66] transition-colors"
+                >
+                  {item}
+                </Link>
+              ))}
+              {socialLinks.map((item, index) => (
+                <Link
+                  key={`second-${index}`}
+                  href="#"
+                  className="text-4xl md:text-6xl px-4 hover:text-[#EAFD66] transition-colors"
+                >
+                  {item}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Logo Section */}
         <div
+          ref={logoRef}
           className={cn(
-            pretendardRegular.className,
-            'pt-4 border-t border-white/5 text-xs lg:text-sm text-zinc-500'
+            "mt-40 flex justify-center",
+            isLogoVisible
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-10"
           )}
         >
-          {/* 모바일용 아코디언 */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsLegalOpen(!isLegalOpen)}
-              className="w-full flex items-center justify-between py-2"
-            >
-              <span>법적 정보</span>
-              {isLegalOpen ? (
-                <ChevronUp className="w-4 h-4" />
-              ) : (
-                <ChevronDown className="w-4 h-4" />
-              )}
-            </button>
-
-            {isLegalOpen && (
-              <div className="space-y-2 py-2">
-                {/* <p className="text-xs">{t.footer.legal.businessInfo.registration}</p>
-                <p className="text-xs">{t.footer.legal.businessInfo.contact}</p> */}
-              </div>
-            )}
-          </div>
-
-          {/* 데스크톱용 정보 표시 */}
-          {/* <div className="hidden md:flex md:flex-col md:space-y-1 md:mb-2">
-            <p className="text-xs">{t.footer.legal.businessInfo.registration}</p>
-            <p className="text-xs">{t.footer.legal.businessInfo.contact}</p>
-          </div> */}
-
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-6 mt-2 md:mt-0">
-            <div className="flex items-center gap-4">
-              <Link
-                href="/privacy-policy"
-                className="text-xs hover:text-[#EAFD66] transition-colors"
-              >
-                {t.footer.legal.links.privacy}
-              </Link>
-              <Link
-                href="/terms-of-service"
-                className="text-xs hover:text-[#EAFD66] transition-colors"
-              >
-                {t.footer.legal.links.terms}
-              </Link>
-            </div>
-            <p className="text-xs mt-2 sm:mt-0">{t.footer.legal.copyright}</p>
-          </div>
+          <Link href="/">
+            <LogoPng width={1000} height={28} className="object-contain mb-2" />
+          </Link>
         </div>
       </div>
     </footer>

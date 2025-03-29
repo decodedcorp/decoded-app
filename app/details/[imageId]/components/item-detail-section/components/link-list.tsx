@@ -1,59 +1,59 @@
-'use client';
+"use client";
 
-import { formatUrl } from '../utils';
-import { 
-  ChevronRight, 
-  MoreVertical, 
-  Youtube, 
-  Play, 
+import { formatUrl } from "../utils";
+import {
+  ChevronRight,
+  MoreVertical,
+  Youtube,
+  Play,
   ShoppingBag,
-  Store 
-} from 'lucide-react';
-import type { LinkInfo } from '../types';
-import { useState } from 'react';
+  Store,
+} from "lucide-react";
+import type { LinkInfo } from "../types";
+import { useState } from "react";
 
 // Add Icons map to associate domains with their respective icons
 const domainIcons: Record<string, React.ReactNode> = {
-  'paramount.com': (
+  "paramount.com": (
     <div className="bg-blue-600 rounded-lg flex items-center justify-center w-10 h-10">
-      <Play className="w-6 h-6 text-white" />
+      <Play className="w-6 h-6 text-white/80" />
     </div>
   ),
-  'youtube.com': (
+  "youtube.com": (
     <div className="bg-red-600 rounded-lg flex items-center justify-center w-10 h-10">
-      <Youtube className="w-6 h-6 text-white" />
+      <Youtube className="w-6 h-6 text-white/80" />
     </div>
   ),
-  'talesofthetrip.com': (
+  "talesofthetrip.com": (
     <div className="bg-purple-600 rounded-lg flex items-center justify-center w-10 h-10">
-      <ShoppingBag className="w-6 h-6 text-white" />
+      <ShoppingBag className="w-6 h-6 text-white/80" />
     </div>
   ),
-  'comedycentral.com': (
+  "comedycentral.com": (
     <div className="bg-yellow-400 rounded-lg flex items-center justify-center w-10 h-10">
       <Store className="w-6 h-6 text-black" />
     </div>
   ),
   // Default icon for other domains
-  'default': (
-    <div className="w-10 h-10 rounded-lg bg-neutral-700 flex items-center justify-center text-white font-bold">
+  default: (
+    <div className="w-10 h-10 rounded-lg bg-neutral-700 flex items-center justify-center text-white/80 font-bold">
       L
     </div>
-  )
+  ),
 };
 
 // Helper function to get display name from URL
 function getDisplayName(url: string): string {
   const domain = formatUrl(url);
-  
+
   // Map of domains to display names
   const displayNames: Record<string, string> = {
-    'paramount.com': 'Stream Comedy Central Shows on Paramount+',
-    'talesofthetrip.com': 'Tales From The Trip Merch',
-    'comedycentral.com': 'Comedy Central Merch Store',
-    'youtube.com': 'Comedy Central YouTube'
+    "paramount.com": "Stream Comedy Central Shows on Paramount+",
+    "talesofthetrip.com": "Tales From The Trip Merch",
+    "comedycentral.com": "Comedy Central Merch Store",
+    "youtube.com": "Comedy Central YouTube",
   };
-  
+
   return displayNames[domain] || domain;
 }
 
@@ -65,21 +65,22 @@ function getIconForDomain(url: string): React.ReactNode {
 
 interface LinkListProps {
   links?: LinkInfo[];
-  activeTab: 'sale' | 'related';
-  status: 'pending' | 'confirmed';
+  activeTab: "sale" | "related";
+  status: "pending" | "confirmed";
 }
 
 export function LinkList({ links, activeTab, status }: LinkListProps) {
   // First filter confirmed links only
-  const confirmedLinks = links?.filter(link => link.status === 'confirmed') || [];
-  
+  const confirmedLinks =
+    links?.filter((link) => link.status === "confirmed") || [];
+
   // Then filter by tab type
-  const filteredLinks = confirmedLinks.filter(link => {
-    if (activeTab === 'sale') {
-      return link.label === 'sale';
+  const filteredLinks = confirmedLinks.filter((link) => {
+    if (activeTab === "sale") {
+      return link.label === "sale";
     } else {
       // related 탭에서는 related 라벨이 있거나 라벨이 null인 항목 표시
-      return link.label === 'related' || link.label === null;
+      return link.label === "related" || link.label === null;
     }
   });
 
@@ -91,9 +92,13 @@ export function LinkList({ links, activeTab, status }: LinkListProps) {
             <ChevronRight className="w-6 h-6 text-neutral-400" />
           </div>
           <p className="text-neutral-300 font-medium">
-            {activeTab === 'sale' ? '판매 링크가 없습니다' : '관련 링크가 없습니다'}
+            {activeTab === "sale"
+              ? "판매 링크가 없습니다"
+              : "관련 링크가 없습니다"}
           </p>
-          <p className="text-neutral-500 text-sm">이 아이템에 대한 추가 정보를 기다려주세요</p>
+          <p className="text-neutral-500 text-sm">
+            이 아이템에 대한 추가 정보를 기다려주세요
+          </p>
         </div>
       )}
       {filteredLinks.map((link, index) => (
@@ -106,17 +111,17 @@ export function LinkList({ links, activeTab, status }: LinkListProps) {
         >
           {/* Left: Icon */}
           {getIconForDomain(link.value)}
-          
+
           {/* Middle: Text content */}
           <div className="flex-1 mx-4 text-center">
-            <div className="text-white text-sm font-medium">
+            <div className="text-white/80 text-sm font-medium">
               {getDisplayName(link.value)}
             </div>
           </div>
-          
+
           {/* Right: Menu button */}
-          <button 
-            className="text-neutral-400 hover:text-white transition-colors"
+          <button
+            className="text-neutral-400 hover:text-white/80 transition-colors"
             onClick={(e) => {
               e.preventDefault();
               // Add menu functionality here

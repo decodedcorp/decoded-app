@@ -16,7 +16,7 @@ export default function Pagination({
           key={page}
           onClick={() => onPageChange(page)}
           className={`text-md md:text-lg px-3 py-1 rounded ${
-            currentPage === page ? 'text-white' : 'text-gray-500'
+            currentPage === page ? "text-white/80" : "text-gray-500"
           }`}
         >
           •

@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useQuery } from '@tanstack/react-query';
-import Image from 'next/image';
-import { identityService, IdentityDoc } from '@/lib/api/requests/identity';
+import { useQuery } from "@tanstack/react-query";
+import Image from "next/image";
+import { identityService, IdentityDoc } from "@/lib/api/requests/identity";
 
 interface ArtistHeaderProps {
   artistId: string;
@@ -15,13 +15,13 @@ export function ArtistHeader({ artistId, artistName }: ArtistHeaderProps) {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['artistIdentity', artistId],
+    queryKey: ["artistIdentity", artistId],
     queryFn: async () => {
       try {
         const response = await identityService.getIdentityInfo(artistId);
         return response;
       } catch (error) {
-        console.error('아티스트 정보 가져오기 오류:', error);
+        console.error("아티스트 정보 가져오기 오류:", error);
         throw error;
       }
     },
@@ -41,7 +41,7 @@ export function ArtistHeader({ artistId, artistName }: ArtistHeaderProps) {
   }
 
   if (error || (!artistInfo && !artistName)) {
-    console.error('아티스트 정보를 가져오는데 실패했습니다:', error);
+    console.error("아티스트 정보를 가져오는데 실패했습니다:", error);
     return null;
   }
 
@@ -50,7 +50,7 @@ export function ArtistHeader({ artistId, artistName }: ArtistHeaderProps) {
     artistInfo?.name?.ko ||
     artistInfo?.name?.en ||
     artistName ||
-    '알 수 없는 아티스트';
+    "알 수 없는 아티스트";
 
   return (
     <div className="flex items-center mb-6">
@@ -75,8 +75,8 @@ export function ArtistHeader({ artistId, artistName }: ArtistHeaderProps) {
         )}
 
         <div>
-          <h3 className="text-xl font-medium text-white">{displayName}</h3>
-          <p className="text-sm text-gray-400">{artistInfo?.category || ''}</p>
+          <h3 className="text-xl font-medium text-white/80">{displayName}</h3>
+          <p className="text-sm text-gray-400">{artistInfo?.category || ""}</p>
         </div>
       </div>
     </div>

@@ -9,7 +9,7 @@ export function DiscoverCTA() {
     <div className="flex flex-wrap gap-4">
       <button
         className={cn(
-          "bg-white/5 text-white",
+          "bg-white/5 text-white/80",
           "px-6 py-3 rounded-xl",
           "font-semibold tracking-wide",
           "hover:bg-white/10",

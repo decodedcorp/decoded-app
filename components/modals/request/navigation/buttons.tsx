@@ -42,7 +42,7 @@ export function PrevButton({ onPrev }: { onPrev: () => void }) {
     <button
       onClick={onPrev}
       className="px-8 py-3 rounded-xl text-sm font-medium 
-        text-gray-300 hover:text-white transition-colors"
+        text-gray-300 hover:text-white/80 transition-colors"
     >
       {t.common.actions.prev}
     </button>

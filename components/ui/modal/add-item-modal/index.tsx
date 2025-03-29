@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { imagesAPI } from '@/lib/api/endpoints/images';
-import useModalClose from '@/lib/hooks/common/useModalClose';
-import { ImageArea } from './components/image-area';
-import { RequestButton } from './components/request-button';
-import { Point, AddItemModalProps, ImageData } from './types';
-import type { DecodedItem } from '@/lib/api/_types/image';
-import { cn } from '@/lib/utils/style';
-import { X } from 'lucide-react';
+import { useState, useEffect, useRef } from "react";
+import { imagesAPI } from "@/lib/api/endpoints/images";
+import useModalClose from "@/lib/hooks/common/useModalClose";
+import { ImageArea } from "./components/image-area";
+import { RequestButton } from "./components/request-button";
+import { Point, AddItemModalProps, ImageData } from "./types";
+import type { DecodedItem } from "@/lib/api/_types/image";
+import { cn } from "@/lib/utils/style";
+import { X } from "lucide-react";
 
 export function AddItemModal({
   isOpen,
@@ -24,7 +24,7 @@ export function AddItemModal({
   useEffect(() => {
     const fetchImageData = async () => {
       if (!isOpen || !imageId) return;
-      
+
       setIsLoading(true);
       try {
         const response = await imagesAPI.getImageDetail(imageId);
@@ -33,12 +33,12 @@ export function AddItemModal({
         const itemsArray = Object.values(response.data.image.items).flat();
         const processedImage: ImageData = {
           ...response.data.image,
-          items: itemsArray
+          items: itemsArray,
         };
-        
+
         setImageData(processedImage);
       } catch (error) {
-        console.error('API Error:', error);
+        console.error("API Error:", error);
       } finally {
         setIsLoading(false);
       }
@@ -60,7 +60,7 @@ export function AddItemModal({
     });
 
     if (!isNearExistingMarker) {
-      const newPoint = { x, y, context: '' };
+      const newPoint = { x, y, context: "" };
       setNewMarkers((prev) => [...prev, newPoint]);
     }
   };
@@ -69,15 +69,15 @@ export function AddItemModal({
     try {
       handleClose();
     } catch (error) {
-      console.error('Failed to add markers:', error);
+      console.error("Failed to add markers:", error);
     }
   };
 
   const formatItemPositions = (items: DecodedItem[]): Point[] => {
     if (!items || !Array.isArray(items)) return [];
     return items
-      .filter(item => item && item.position)
-      .map(item => ({
+      .filter((item) => item && item.position)
+      .map((item) => ({
         x: parseFloat(item.position.left),
         y: parseFloat(item.position.top),
       }));
@@ -90,11 +90,13 @@ export function AddItemModal({
   if (!isOpen) return null;
 
   return (
-    <div className={cn(
-      "fixed inset-0 z-50 flex items-center justify-center",
-      "bg-black/80 backdrop-blur-sm",
-      isClosing ? 'animate-fade-out' : 'animate-fade-in'
-    )}>
+    <div
+      className={cn(
+        "fixed inset-0 z-50 flex items-center justify-center",
+        "bg-black/80 backdrop-blur-sm",
+        isClosing ? "animate-fade-out" : "animate-fade-in"
+      )}
+    >
       <div
         ref={modalRef}
         className={cn(
@@ -106,11 +108,13 @@ export function AddItemModal({
       >
         {/* 헤더 */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
-          <h2 className="text-base font-medium text-white">아이템 정보 요청</h2>
+          <h2 className="text-base font-medium text-white/80">
+            아이템 정보 요청
+          </h2>
           <button
             onClick={handleClose}
             className={cn(
-              "p-2 rounded-full text-white/60 hover:text-white",
+              "p-2 rounded-full text-white/80/60 hover:text-white/80",
               "hover:bg-white/5 transition-colors"
             )}
           >
@@ -123,11 +127,13 @@ export function AddItemModal({
           <div className="p-6 space-y-6">
             {isLoading ? (
               <div className="flex items-center justify-center h-48">
-                <div className="text-white/40">이미지를 불러오는 중...</div>
+                <div className="text-white/80/40">이미지를 불러오는 중...</div>
               </div>
             ) : !imageData?.img_url ? (
               <div className="flex items-center justify-center h-48">
-                <div className="text-white/40">이미지를 찾을 수 없습니다</div>
+                <div className="text-white/80/40">
+                  이미지를 찾을 수 없습니다
+                </div>
               </div>
             ) : (
               <ImageArea

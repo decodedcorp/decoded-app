@@ -10,7 +10,7 @@ function PrivacyPolicy() {
   const privacyPolicy = t.privacyPolicy;
 
   return (
-    <div className="min-h-screen bg-black text-white py-40">
+    <div className="min-h-screen bg-black text-white/80 py-40">
       <div className="max-w-3xl mx-auto px-4">
         <div className="space-y-12">
           {/* Header */}

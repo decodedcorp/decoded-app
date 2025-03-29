@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { ProvideData } from '@/types/model.d';
-import useModalClose from '@/lib/hooks/common/useModalClose';
+import { ProvideData } from "@/types/model.d";
+import useModalClose from "@/lib/hooks/common/useModalClose";
 import {
   StatusModal,
   StatusType,
   StatusMessageKey,
-} from '@/components/ui/modal/status-modal';
-import { useState, useEffect } from 'react';
+} from "@/components/ui/modal/status-modal";
+import { useState, useEffect } from "react";
 
 interface LinkFormSectionProps {
   showLinkForm: boolean;
@@ -28,29 +28,29 @@ export default function LinkFormSection({
     isOpen: boolean;
     onClose: () => void;
   }>({
-    type: 'warning',
-    messageKey: 'login',
+    type: "warning",
+    messageKey: "login",
     isOpen: false,
     onClose: () => setModalConfig((prev) => ({ ...prev, isOpen: false })),
   });
 
-  const [link, setLink] = useState('');
+  const [link, setLink] = useState("");
   const { handleClose, isClosing, modalRef } = useModalClose({
     onClose,
   });
 
   useEffect(() => {
     if (!showLinkForm) {
-      setLink('');
+      setLink("");
       onProvideDataChange({ links: [] });
     }
   }, [showLinkForm, onProvideDataChange]);
 
   useEffect(() => {
-    if (window.sessionStorage.getItem('USER_DOC_ID') === null) {
+    if (window.sessionStorage.getItem("USER_DOC_ID") === null) {
       setModalConfig({
-        type: 'warning',
-        messageKey: 'login',
+        type: "warning",
+        messageKey: "login",
         isOpen: true,
         onClose: () => setModalConfig((prev) => ({ ...prev, isOpen: false })),
       });
@@ -59,7 +59,7 @@ export default function LinkFormSection({
 
     if (!showLinkForm) {
       setModalConfig({
-        type: 'error',
+        type: "error",
         isOpen: true,
         onClose: () => setModalConfig((prev) => ({ ...prev, isOpen: false })),
       });
@@ -86,23 +86,25 @@ export default function LinkFormSection({
     <div
       className={`fixed inset-0 flex items-center justify-center p-4 z-50 
         transition-opacity duration-300 ${
-          isClosing ? 'opacity-0' : 'opacity-100'
+          isClosing ? "opacity-0" : "opacity-100"
         }`}
     >
       <div
         ref={modalRef}
         className={`bg-[#111111] p-6 rounded-lg w-full max-w-md space-y-4 
           transition-transform duration-300 ${
-            isClosing ? 'scale-95 opacity-0' : 'scale-100 opacity-100'
+            isClosing ? "scale-95 opacity-0" : "scale-100 opacity-100"
           }`}
       >
-        <h3 className="text-lg font-medium text-white mb-4">링크 제공하기</h3>
+        <h3 className="text-lg font-medium text-white/80 mb-4">
+          링크 제공하기
+        </h3>
         <input
           type="url"
           placeholder="아이템과 관련된 링크를 입력하세요"
           value={link}
           className="w-full px-4 py-3 bg-[#1A1A1A] rounded-lg border border-white/5 
-                  text-white placeholder-gray-500 focus:border-[#EAFD66] 
+                  text-white/80 placeholder-gray-500 focus:border-[#EAFD66] 
                   focus:ring-1 focus:ring-[#EAFD66] transition-colors outline-none
                   hover:border-white/10"
           onChange={handleLinkChange}
@@ -111,7 +113,7 @@ export default function LinkFormSection({
           <button
             onClick={handleClose}
             className="flex-1 px-6 py-3 border border-gray-600 text-gray-300 rounded-lg font-medium
-                      hover:border-gray-400 hover:text-white transition-colors"
+                      hover:border-gray-400 hover:text-white/80 transition-colors"
           >
             취소
           </button>
@@ -120,9 +122,10 @@ export default function LinkFormSection({
             disabled={!link.trim()}
             className={`
               flex-1 px-6 py-3 rounded-lg font-medium transition-colors
-              ${link.trim() 
-                ? 'bg-[#EAFD66] text-black hover:bg-[#d9ec55] shadow-lg' 
-                : 'bg-[#1A1A1A] text-gray-500 cursor-not-allowed'
+              ${
+                link.trim()
+                  ? "bg-[#EAFD66] text-black hover:bg-[#d9ec55] shadow-lg"
+                  : "bg-[#1A1A1A] text-gray-500 cursor-not-allowed"
               }
             `}
           >

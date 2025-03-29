@@ -76,13 +76,13 @@ export function ProvideSection({
   }
 
   return (
-    <div 
+    <div
       className="h-full flex flex-col"
       onClick={(e) => e.stopPropagation()}
       onTouchStart={(e) => e.stopPropagation()}
       onTouchMove={(e) => e.stopPropagation()}
       onTouchEnd={(e) => e.stopPropagation()}
-      style={{ pointerEvents: 'auto' }}
+      style={{ pointerEvents: "auto" }}
     >
       {/* 상태 필터 - 고정 */}
       <div className="flex-shrink-0 px-4 py-3 border-b border-white/5">
@@ -101,7 +101,7 @@ export function ProvideSection({
                   ? "bg-[#EAFD66]/10 text-[#EAFD66]"
                   : "bg-[#1A1A1A] text-gray-400 hover:bg-[#1A1A1A]/80"
               )}
-              style={{ pointerEvents: 'auto', touchAction: 'manipulation' }}
+              style={{ pointerEvents: "auto", touchAction: "manipulation" }}
             >
               {label}
             </button>
@@ -135,9 +135,7 @@ export function ProvideSection({
                 </div>
                 <div className="flex-1">
                   <div className="text-sm text-gray-400 mb-1">원본 이미지</div>
-                  <div className="text-xs text-gray-500">
-                    제공된 이미지
-                  </div>
+                  <div className="text-xs text-gray-500">제공된 이미지</div>
                 </div>
               </Link>
 
@@ -159,7 +157,7 @@ export function ProvideSection({
                       />
                     </div>
                     <div className="flex-1">
-                      <div className="text-sm text-white">
+                      <div className="text-sm text-white/80">
                         {item.label || "제공된 아이템"}
                       </div>
                       <div className="text-xs text-gray-400 mt-0.5">

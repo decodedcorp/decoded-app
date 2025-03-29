@@ -1,57 +1,83 @@
-'use client';
+"use client";
 
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { networkManager } from '@/lib/network/network';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils/style';
-import { Heart, TrendingUp } from 'lucide-react';
+import { Search, TrendingUp } from "lucide-react";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
+import { cn } from "@/lib/utils/style";
+import { Heart } from "lucide-react";
+import { useState } from "react";
+import type { ImageDoc } from "@/lib/api/types";
+import { pretendardBold, pretendardSemiBold } from "@/lib/constants/fonts";
 
-interface SearchResult {
-  related_images?: {
-    _id: string;
-    img_url: string;
-    title: string | null;
-    upload_by: string;
-    requested_items: Record<
-      string,
-      Array<{
-        item_doc_id: string;
-        position: {
-          top: string;
-          left: string;
-        };
-      }>
-    >;
-    like: number;
-  }[];
-  trending_images: {
-    image: {
-      _id: string;
-      img_url: string;
-      title: string | null;
-      upload_by: string;
-      requested_items: Record<
-        string,
-        Array<{
-          item_doc_id: string;
-          position: {
-            top: string;
-            left: string;
-          };
-        }>
-      >;
-      like: number;
-    };
-  }[];
-  next_id?: string;
+interface SearchTrendingSectionProps {
+  searchImages: ImageDoc[];
+  trendingImages: ImageDoc[];
 }
 
-export function ImageCard({ image, onHover, hoveredId }: any) {
+export function SearchResults({
+  searchImages,
+  trendingImages,
+}: SearchTrendingSectionProps) {
+  const [hoveredTrendingId, setHoveredTrendingId] = useState<string | null>(
+    null
+  );
+  const searchParams = useSearchParams();
+  const query = searchParams.get("q");
+
+  if (trendingImages.length === 0 && searchImages.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="container mx-auto w-full">
+      <div className="flex flex-col">
+        <div className="flex items-center gap-3 py-4">
+          <Search className="w-5 h-5 text-[#EAFD66]" />
+          <h1
+            className={`text-sm md:text-lg ${pretendardBold.className} text-gray-400`}
+          >
+            &quot;{query}&quot; 검색 결과
+          </h1>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-4 md:gap-6">
+          {searchImages.map((image) => (
+            <ImageCard
+              key={image._id}
+              image={image}
+              onHover={setHoveredTrendingId}
+              hoveredId={hoveredTrendingId}
+            />
+          ))}
+        </div>
+      </div>
+      <div className="py-12">
+        <div className="flex items-center gap-2 mb-6">
+          <TrendingUp className="w-5 h-5 text-[#EAFD66]" />
+          <h2
+            className={`text-sm md:text-lg ${pretendardBold.className} text-gray-400`}
+          >
+            트렌딩 나우
+          </h2>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-4 md:gap-6">
+          {trendingImages.map((image) => (
+            <ImageCard
+              key={image._id}
+              image={image}
+              onHover={setHoveredTrendingId}
+              hoveredId={hoveredTrendingId}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ImageCard({ image, onHover, hoveredId }: any) {
   if (image.img_url === undefined) {
-    console.log('UNDEFINED', image);
+    return null;
   }
   const router = useRouter();
   const markers = image.requested_items
@@ -80,29 +106,29 @@ export function ImageCard({ image, onHover, hoveredId }: any) {
     >
       <div
         className={cn(
-          'relative aspect-[4/5] rounded-xl overflow-hidden',
-          'bg-zinc-900'
+          "relative aspect-[4/5] rounded-xl overflow-hidden",
+          "bg-zinc-900"
         )}
       >
         <Image
           src={image.img_url}
-          alt={image.title || '이미지'}
+          alt={image.title || "이미지"}
           fill
           unoptimized
           className={cn(
-            'object-cover',
-            'group-hover:scale-105',
-            'transition-transform duration-300'
+            "object-cover",
+            "group-hover:scale-105",
+            "transition-transform duration-300"
           )}
         />
 
         {/* 호버 오버레이 */}
         <div
           className={cn(
-            'absolute inset-0',
-            'bg-gradient-to-t from-black/80 via-black/20 to-transparent',
-            'opacity-0 group-hover:opacity-100',
-            'transition-opacity duration-300'
+            "absolute inset-0",
+            "bg-gradient-to-t from-black/80 via-black/20 to-transparent",
+            "opacity-0 group-hover:opacity-100",
+            "transition-opacity duration-300"
           )}
         />
 
@@ -115,13 +141,13 @@ export function ImageCard({ image, onHover, hoveredId }: any) {
               style={{
                 top: `${marker.position.top}%`,
                 left: `${marker.position.left}%`,
-                width: '20px',
-                height: '20px',
-                transform: 'translate(-50%, -50%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
+                width: "20px",
+                height: "20px",
+                transform: "translate(-50%, -50%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
               }}
               onClick={(e) => handleMarkerClick(e, marker.item_doc_id)}
             >
@@ -133,103 +159,21 @@ export function ImageCard({ image, onHover, hoveredId }: any) {
           ))}
 
         {/* 하단 정보 */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="absolute bottom-0 left-0 right-0 p-4 text-white/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <h3 className="text-sm font-medium line-clamp-1">
-            {image.title || '제목 없음'}
+            {image.title || ""}
           </h3>
           <div className="flex items-center gap-4 mt-2">
-            <div className="flex items-center gap-1 text-white/60">
+            <div className="flex items-center gap-1 text-white/80/60">
               <Heart className="w-4 h-4" />
               <span className="text-xs">{image.like}</span>
             </div>
-            <span className="text-xs text-white/60">
+            <span className="text-xs text-white/80/60">
               {markers.length}개 아이템
             </span>
           </div>
         </div>
       </div>
     </motion.div>
-  );
-}
-
-export function SearchResults() {
-  const searchParams = useSearchParams();
-  const query = searchParams.get('q');
-  const [result, setResult] = useState<SearchResult>();
-  const [isLoading, setIsLoading] = useState(true);
-  const [hoveredSearchId, setHoveredSearchId] = useState<string | null>(null);
-  const [hoveredTrendingId, setHoveredTrendingId] = useState<string | null>(
-    null
-  );
-
-  useEffect(() => {
-    const fetchResults = async () => {
-      if (!query) return;
-
-      setIsLoading(true);
-      try {
-        const response = await networkManager.request(
-          `search?query=${encodeURIComponent(query)}`,
-          'GET'
-        );
-
-        if (response.status_code === 200) {
-          setResult(response.data);
-        }
-      } catch (error) {
-        console.error('검색 결과 로딩 실패:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchResults();
-  }, [query]);
-
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-        {[...Array(6)].map((_, i) => (
-          <div
-            key={i}
-            className="aspect-[4/5] rounded-xl bg-zinc-800/50 animate-pulse"
-          />
-        ))}
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-12">
-      {/* 검색 결과 섹션 */}
-      {result?.related_images && result.related_images.length > 0 && (
-        <section>
-          <div className="flex items-center gap-2 mb-6">
-            <h2 className="text-lg font-medium text-white">검색 결과</h2>
-            <span className="text-sm text-white/60">
-              {result.related_images.length}개의 결과
-            </span>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {result.related_images.map((image) => (
-              <ImageCard
-                key={image._id}
-                image={image}
-                onHover={setHoveredSearchId}
-                hoveredId={hoveredSearchId}
-              />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* 결과가 없는 경우 */}
-      {(!result?.related_images || result.related_images.length === 0) &&
-        (!result?.trending_images || result.trending_images.length === 0) && (
-          <div className="flex justify-center items-center h-48 text-white/60">
-            검색 결과가 없습니다
-          </div>
-        )}
-    </div>
   );
 }

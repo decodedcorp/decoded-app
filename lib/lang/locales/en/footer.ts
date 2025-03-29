@@ -2,15 +2,20 @@ export const footer = {
   company: {
     title: "DECODED",
     description:
-      "Providing a new community experience through real-time item search platform.",
+      "DECODED is a community where culture enthusiasts discover and share information about items. Through requests and shared knowledge, we create a new experience in community.",
   },
   quickLinks: {
     title: "Quick Links",
     items: {
-      about: "About",
-      features: "Features",
-      community: "Community",
-      support: "Support",
+      home: "Home",
+      privacy: "Privacy Policy",
+      terms: "Terms of Service",
+    },
+  },
+  communication: {
+    title: "Communication",
+    items: {
+      telegram: "Telegram",
     },
   },
   connect: {
