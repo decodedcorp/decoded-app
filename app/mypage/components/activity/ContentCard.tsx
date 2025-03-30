@@ -24,10 +24,9 @@ interface ContentCardProps {
   item: ContentItem;
   index: number;
   filterIcons: Record<TabType, JSX.Element>;
-  t: any;
 }
 
-export const ContentCard = ({ item, index, filterIcons, t }: ContentCardProps) => {
+export const ContentCard = ({ item, index, filterIcons }: ContentCardProps) => {
   // 라우터 추가
   const router = useRouter();
   
@@ -66,9 +65,9 @@ export const ContentCard = ({ item, index, filterIcons, t }: ContentCardProps) =
               {item.type === "request" ? filterIcons.request : 
                item.type === "provide" ? filterIcons.provide : 
                filterIcons.like}
-              {item.type === "request" ? t.mypage.tabs.request : 
-               item.type === "provide" ? t.mypage.tabs.provide : 
-               t.mypage.tabs.like}
+              {item.type === "request" ? "요청" : 
+               item.type === "provide" ? "제공" : 
+               "좋아요"}
             </span>
           </div>
           <div className="absolute top-2 right-2">

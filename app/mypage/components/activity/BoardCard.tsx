@@ -24,10 +24,9 @@ interface BoardCardProps {
   item: BoardItem;
   index: number;
   filterIcons: Record<TabType, JSX.Element>;
-  t: any;
 }
 
-export const BoardCard = ({ item, index, filterIcons, t }: BoardCardProps) => {
+export const BoardCard = ({ item, index, filterIcons }: BoardCardProps) => {
   const router = useRouter();
   
   // API 응답에 따라 타이틀과 ID 적절히 가져오기
@@ -55,9 +54,9 @@ export const BoardCard = ({ item, index, filterIcons, t }: BoardCardProps) => {
             {item.type === "board" ? filterIcons.board : 
              item.type === "comment" ? filterIcons.comment : 
              filterIcons.like}
-            {item.type === "board" ? t.mypage.tabs.board : 
-             item.type === "comment" ? t.mypage.tabs.comment : 
-             t.mypage.tabs.like}
+            {item.type === "board" ? "게시글" : 
+             item.type === "comment" ? "댓글" : 
+             "좋아요"}
           </span>
           <div className="flex-1 overflow-hidden">
             <h3 className="text-sm font-medium text-white truncate" title={title}>
@@ -74,7 +73,7 @@ export const BoardCard = ({ item, index, filterIcons, t }: BoardCardProps) => {
               </span>
               {item.commentCount !== undefined && (
                 <span className="text-xs text-white/70">
-                  {t.mypage.comments}: {item.commentCount}
+                  댓글: {item.commentCount}
                 </span>
               )}
             </div>

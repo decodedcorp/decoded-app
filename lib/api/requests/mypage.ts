@@ -33,6 +33,15 @@ export interface MypageLikeItemResponse {
   next_id: string | null;
 }
 
+// 마이페이지 홈 API 응답 타입
+export interface MypageHomeResponse {
+  points: number;
+  active_ticket_num: number;
+  request_num: number;
+  provide_num: number;
+  pending_num: number;
+}
+
 // API 응답 래퍼 타입
 export interface Response<T> {
   status_code: number;
@@ -41,6 +50,10 @@ export interface Response<T> {
 }
 
 export const mypageService = {
+  // 사용자 홈 정보 조회
+  getUserHome: (userId: string) =>
+    apiClient.get<Response<MypageHomeResponse>>(`user/${userId}/mypage/home`),
+
   // 사용자의 요청 목록 조회
   getUserRequests: (
     userId: string,

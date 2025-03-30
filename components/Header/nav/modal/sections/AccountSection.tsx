@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { useAccountData } from "@/lib/hooks/common/useAccountData";
 
 // 조건부 로깅 - 에러 시에만 출력
 const logError = (message: string, error?: any) => {
@@ -25,14 +26,12 @@ interface AccountData {
 }
 
 export function AccountSection({
-  data,
-  isLoading,
+  isOpen,
   onClose,
   onLogout,
   onLoginSuccess,
 }: {
-  data: AccountData;
-  isLoading: boolean;
+  isOpen: boolean;
   onClose: () => void;
   onLogout?: () => void;
   onLoginSuccess?: () => void;
@@ -40,6 +39,39 @@ export function AccountSection({
   const { t } = useLocaleContext();
   const { isLogin, handleGoogleLogin, handleDisconnect } = useAuth();
   const userEmail = window.sessionStorage.getItem("USER_EMAIL");
+  
+  // 기존의 data, isLoading props 대신 useAccountData 훅 사용
+  const { data, isLoading } = useAccountData(isOpen);
+
+  // 로그인 성공 이벤트 리스너 추가
+  useEffect(() => {
+    // 로그인 성공 시 호출될 핸들러
+    const handleLoginSuccess = () => {
+      logError("[AccountSection] 로그인 성공 이벤트 감지");
+      
+      // 지연 후 모달 닫기
+      setTimeout(() => {
+        onClose();
+        
+        // 모달이 닫힌 후 약간의 지연을 둔 뒤 페이지 리로딩
+        setTimeout(() => {
+          if (onLoginSuccess) {
+            onLoginSuccess();
+          }
+          // 페이지 리로딩
+          window.location.reload();
+        }, 300);
+      }, 300);
+    };
+
+    // 이벤트 리스너 등록
+    window.addEventListener("login:success", handleLoginSuccess);
+
+    // 컴포넌트 언마운트 시 이벤트 리스너 제거
+    return () => {
+      window.removeEventListener("login:success", handleLoginSuccess);
+    };
+  }, [onClose, onLoginSuccess]);
 
   // 모달 닫고 페이지 이동
   const handleGoToMypage = () => {
@@ -59,6 +91,12 @@ export function AccountSection({
     if (onLogout) {
       // 부모 컴포넌트에서 전달된 로그아웃 핸들러 사용
       onLogout();
+      // 모달 닫기
+      onClose();
+      // 페이지 리로딩 추가
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
     } else {
       // 기존 로그아웃 로직 사용
       handleDisconnect();
@@ -72,10 +110,15 @@ export function AccountSection({
 
       // 이벤트 발송
       window.dispatchEvent(new CustomEvent("auth:state-changed"));
+      
+      // 모달 닫기
+      onClose();
+      
+      // 페이지 리로딩 추가
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
     }
-
-    // 항상 모달 닫기
-    onClose();
   };
 
   // 데이터가 있는지 확인
@@ -223,17 +266,8 @@ export function AccountSection({
                 // 로그인 시작 - 로딩 상태 설정을 위한 이벤트 발생
                 window.dispatchEvent(new CustomEvent("login:loading:start"));
 
-                // 로그인 함수 직접 호출
+                // 로그인 함수 직접 호출 - 이제 성공 처리는 이벤트 리스너에서 담당
                 handleGoogleLogin()
-                  .then(() => {
-                    // 로그인 성공 이벤트 발생 - 다른 컴포넌트가 이를 감지
-                    window.dispatchEvent(new CustomEvent("login:success"));
-
-                    // 약간의 지연 후 모달 닫기 (세션 스토리지 업데이트 대기)
-                    setTimeout(() => {
-                      onClose();
-                    }, 300);
-                  })
                   .catch((error) => {
                     // 로그인 실패 시 로딩 상태 종료
                     window.dispatchEvent(new CustomEvent("login:loading:stop"));

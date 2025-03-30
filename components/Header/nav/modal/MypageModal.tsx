@@ -6,7 +6,7 @@ import { AccountSection } from "./sections/AccountSection";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { useMyPageQuery } from "@/lib/hooks/common/useMyPageQueries";
+import { useMyPageQuery } from "@/lib/hooks/common/useMyPageQuery";
 import type {
   AccountData,
   TabType,
@@ -328,8 +328,7 @@ export function MypageModal({
         <div className="flex-1 overflow-y-auto" data-no-close-on-click="true">
           {/* 계정 정보 섹션 */}
           <AccountSection
-            data={tabData as AccountData}
-            isLoading={isLoading}
+            isOpen={isOpen}
             onClose={handleClose}
             onLogout={onLogout}
             onLoginSuccess={onLoginSuccess}

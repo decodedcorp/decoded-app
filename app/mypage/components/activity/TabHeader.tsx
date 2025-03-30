@@ -7,17 +7,16 @@ interface TabHeaderProps {
   activeTab: TabType;
   handleTabChange: (tab: TabType) => void;
   filterIcons: Record<TabType, JSX.Element>;
-  t: any;
 }
 
-export const TabHeader = ({ activeTab, handleTabChange, filterIcons, t }: TabHeaderProps) => {
+export const TabHeader = ({ activeTab, handleTabChange, filterIcons }: TabHeaderProps) => {
   // 탭 메뉴를 동적으로 생성
   const tabsConfig = [
-    { id: 'like' as TabType, title: t.mypage.tabs.like, icon: filterIcons.like },
-    { id: 'request' as TabType, title: t.mypage.tabs.request, icon: filterIcons.request },
-    { id: 'provide' as TabType, title: t.mypage.tabs.provide, icon: filterIcons.provide },
-    { id: 'board' as TabType, title: t.mypage.tabs.board, icon: filterIcons.board },
-    { id: 'comment' as TabType, title: t.mypage.tabs.comment, icon: filterIcons.comment },
+    { id: 'like' as TabType, title: "좋아요", icon: filterIcons.like },
+    { id: 'request' as TabType, title: "요청", icon: filterIcons.request },
+    { id: 'provide' as TabType, title: "제공", icon: filterIcons.provide },
+    { id: 'board' as TabType, title: "게시글", icon: filterIcons.board },
+    { id: 'comment' as TabType, title: "댓글", icon: filterIcons.comment },
   ];
 
   return (

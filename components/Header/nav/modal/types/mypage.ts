@@ -53,4 +53,4 @@ export interface LikeData {
   };
 }
 
-export type TabType = 'home' | 'request' | 'provide' | 'like';
+export type TabType = 'home' | 'request' | 'provide' | 'like' | 'board' | 'comment';
