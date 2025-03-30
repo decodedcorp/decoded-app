@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
+import { Card } from "../../../components/ui/card";
 import { useLocaleContext } from "@/lib/contexts/locale-context";
 import { TabType } from "@/components/Header/nav/modal/types/mypage";
 

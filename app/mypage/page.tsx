@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { Suspense } from "react";
 import { MyPageClient } from "./components/MyPageClient";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "../../components/ui/skeleton";
 
 export const metadata: Metadata = {
   title: "마이페이지 | Decoded",

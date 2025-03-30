@@ -4,8 +4,8 @@ import { useAuth } from "@/lib/hooks/features/auth/useAuth";
 import { useState, useEffect } from "react";
 import { useMyPageQuery } from "@/lib/hooks/common/useMyPageQueries";
 import { AccountData } from "@/components/Header/nav/modal/types/mypage";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
+import { Skeleton } from "../../../components/ui/skeleton";
 import { useLocaleContext } from "@/lib/contexts/locale-context";
 
 export function ProfileSection() {
