@@ -1,8 +1,8 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { networkManager } from '@/lib/network/network';
 import type { AccountData, RequestData, ProvideData, LikeData, TabType } from '@/components/Header/nav/modal/types/mypage';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/hooks/features/auth/useAuth';
+import { mypageService } from '@/lib/api/requests/mypage';
 
 // 조건부 로깅 헬퍼 함수
 const isDev = process.env.NODE_ENV === 'development';
@@ -11,11 +11,6 @@ const logDebug = (message: string, data?: any) => {
     console.log(message, data);
   }
 };
-
-interface ApiResponse<T> {
-  status_code: number;
-  data: T;
-}
 
 // 기본 데이터 구조 정의
 const defaultAccountData: AccountData = {
@@ -121,68 +116,58 @@ export function useMyPageQuery(tab: TabType, isOpen: boolean) {
           return defaultRequestData;
         } else if (tab === 'provide') {
           return defaultProvideData;
+        } else if (tab === 'board' || tab === 'comment') {
+          return { items: [], next_id: null };
         }
         
         throw new Error('User ID not found');
       }
 
-      // 엔드포인트 경로 구성 시 앞에 슬래시(/)가 아닌 user 부터 시작해야 함
-      const endpoints = {
-        home: `user/${userDocId}/mypage/home`,
-        request: `user/${userDocId}/mypage/requests`,
-        provide: `user/${userDocId}/mypage/provides`,
-        like: `user/${userDocId}/mypage/likes`
-      };
-
-      logDebug(`[useMyPageQuery] API 엔드포인트 호출: ${endpoints[tab]}`);
-      
-      // 현재 액세스 토큰 확인
-      const accessToken = typeof window !== 'undefined' ? window.sessionStorage.getItem('ACCESS_TOKEN') : null;
-      logDebug(`[useMyPageQuery] 액세스 토큰 존재 여부: ${!!accessToken}`);
-
-      if (tab === 'like') {
-        try {
-          const [imagesResponse, itemsResponse] = await Promise.all([
-            networkManager.request<ApiResponse<LikeData['images']>>(`user/${userDocId}/mypage/likes/image`, 'GET', null, 3, accessToken || undefined),
-            networkManager.request<ApiResponse<LikeData['items']>>(`user/${userDocId}/mypage/likes/item`, 'GET', null, 3, accessToken || undefined),
-          ]);
-          
-          logDebug('[useMyPageQuery] Like 데이터 응답:', { 
-            imagesResponse: !!imagesResponse, 
-            itemsResponse: !!itemsResponse 
-          });
-          
-          if (imagesResponse?.status_code === 200 && itemsResponse?.status_code === 200) {
-            return {
-              images: imagesResponse.data,
-              items: itemsResponse.data,
-            };
-          }
-          
-          throw new Error('Failed to fetch like data');
-        } catch (error) {
-          logDebug('[useMyPageQuery] Like 데이터 오류:', error);
-          return defaultLikeData;
-        }
-      }
-      
       try {
-        const response = await networkManager.request<ApiResponse<any>>(
-          endpoints[tab],
-          'GET',
-          null,
-          3,
-          accessToken || undefined
-        );
-
-        logDebug(`[useMyPageQuery] ${tab} 데이터 응답:`, response);
+        logDebug(`[useMyPageQuery] ${tab} 데이터 요청 시작`);
         
-        if (response && response.status_code === 200) {
-          logDebug(`[useMyPageQuery] ${tab} 데이터 성공:`, response.data);
-          return response.data;
+        // mypageService 사용하여 데이터 가져오기
+        switch (tab) {
+          case 'home':
+            const homeResponse = await mypageService.getUserHome(userDocId);
+            return homeResponse?.data || defaultAccountData;
+            
+          case 'request':
+            const requestResponse = await mypageService.getUserRequests(userDocId);
+            return requestResponse?.data || defaultRequestData;
+            
+          case 'provide':
+            const provideResponse = await mypageService.getUserProvides(userDocId);
+            return provideResponse?.data || defaultProvideData;
+            
+          case 'like':
+            try {
+              const [imagesResponse, itemsResponse] = await Promise.all([
+                mypageService.getUserLikedImages(userDocId),
+                mypageService.getUserLikedItems(userDocId)
+              ]);
+              
+              if (imagesResponse && itemsResponse) {
+                return {
+                  images: imagesResponse.data,
+                  items: itemsResponse.data
+                };
+              }
+              
+              throw new Error('Failed to fetch like data');
+            } catch (error) {
+              logDebug('[useMyPageQuery] Like 데이터 오류:', error);
+              return defaultLikeData;
+            }
+            
+          case 'board':
+          case 'comment':
+            // 보드와 코멘트 API 서비스 호출이 필요한 경우 여기에 추가
+            return { items: [], next_id: null };
+            
+          default:
+            throw new Error(`Unknown tab type: ${tab}`);
         }
-        
-        throw new Error(`Failed to fetch ${tab} data`);
       } catch (error) {
         logDebug(`[useMyPageQuery] ${tab} 데이터 오류:`, error);
         
@@ -193,6 +178,10 @@ export function useMyPageQuery(tab: TabType, isOpen: boolean) {
           return defaultRequestData;
         } else if (tab === 'provide') {
           return defaultProvideData;
+        } else if (tab === 'like') {
+          return defaultLikeData;
+        } else if (tab === 'board' || tab === 'comment') {
+          return { items: [], next_id: null };
         }
         
         throw error;
@@ -202,4 +191,4 @@ export function useMyPageQuery(tab: TabType, isOpen: boolean) {
     staleTime: 1000 * 60 * 5, // 5분
     gcTime: 1000 * 60 * 10,   // 10분
   });
-}
+} 

@@ -4,7 +4,7 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { Card } from "../../../components/ui/card";
 import { useLocaleContext } from "@/lib/contexts/locale-context";
 import { TabType } from "@/components/Header/nav/modal/types/mypage";
-import { Heart, HelpCircle, CheckCircle, Bookmark } from "lucide-react";
+import { Heart, HelpCircle, CheckCircle, Bookmark, MessageSquareText } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { mypageService } from "@/lib/api/requests/mypage";
@@ -446,7 +446,9 @@ export function ActivityTabs() {
     home: 0, // home 탭은 현재 사용하지 않지만 타입 에러 방지를 위해 추가
     request: requestData.count,
     provide: provideData.count,
-    like: likeData.count
+    like: likeData.count,
+    board: 0,
+    comment: 0
   }), [requestData.count, provideData.count, likeData.count]);
 
   // 필터 아이콘 매핑
@@ -454,7 +456,9 @@ export function ActivityTabs() {
     home: <></>, // home 탭은 현재 사용하지 않지만 타입 에러 방지를 위해 추가
     request: <HelpCircle className="h-3 w-3 mr-1.5" />,
     provide: <CheckCircle className="h-3 w-3 mr-1.5" />,
-    like: <Heart className="h-3 w-3 mr-1.5" fill={activeFilter === "like" ? "currentColor" : "none"} />
+    like: <Heart className="h-3 w-3 mr-1.5" fill={activeFilter === "like" ? "currentColor" : "none"} />,
+    board: <MessageSquareText className="h-3 w-3 mr-1.5" />,
+    comment: <MessageSquareText className="h-3 w-3 mr-1.5" />
   }), [activeFilter]);
 
   // 로딩 상태 처리 (초기 로딩)
