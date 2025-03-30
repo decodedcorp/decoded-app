@@ -244,13 +244,6 @@ export function MypageModal({
     [handleClose]
   );
 
-  // 마이페이지로 이동 핸들러
-  const handleGoToMypage = () => {
-    // 모달 닫고 페이지 이동
-    handleClose();
-    // 실제 구현 시에는 여기에 페이지 이동 로직 추가
-  };
-
   // 모달이 보이지 않고 열려있지 않으면 아무것도 렌더링하지 않음
   if (!isOpen && !isVisible) {
     return null;
@@ -341,22 +334,6 @@ export function MypageModal({
             onLogout={onLogout}
             onLoginSuccess={onLoginSuccess}
           />
-
-          {/* 마이페이지 이동 버튼 */}
-          <div className="px-4 py-6">
-            <Link href="/mypage" onClick={handleGoToMypage} className="w-full">
-              <Button
-                variant="outline"
-                className="w-full flex items-center justify-between bg-white/5 hover:bg-white/10 text-white/80 border-white/10"
-              >
-                <span>마이페이지로 이동</span>
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-            <p className="text-xs text-gray-400 mt-2 text-center">
-              더 많은 기능을 마이페이지에서 이용하실 수 있습니다.
-            </p>
-          </div>
         </div>
       </div>
     </div>

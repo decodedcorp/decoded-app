@@ -7,16 +7,20 @@ import { AccountData } from "@/components/Header/nav/modal/types/mypage";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Skeleton } from "../../../components/ui/skeleton";
 import { useLocaleContext } from "@/lib/contexts/locale-context";
+import { Settings } from "lucide-react";
+import Link from "next/link";
 
 export function ProfileSection() {
   const { t } = useLocaleContext();
   const { isLogin, isInitialized } = useAuth();
-  const { data, isLoading } = useMyPageQuery("home", true) as { 
+  const { isLoading } = useMyPageQuery("home", true) as { 
     data?: AccountData, 
     isLoading: boolean 
   };
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [userNickname, setUserNickname] = useState<string | null>(null);
+  const [followingCount, setFollowingCount] = useState<number>(0);
+  const [followerCount, setFollowerCount] = useState<number>(0);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -24,6 +28,11 @@ export function ProfileSection() {
       const nickname = window.sessionStorage.getItem("USER_NICKNAME");
       setUserEmail(email);
       setUserNickname(nickname);
+      
+      // 팔로잉 및 팔로워 수를 API 또는 세션스토리지에서 가져오는 로직 추가 가능
+      // 여기에서는 하드코딩된 값 사용
+      setFollowingCount(2);
+      setFollowerCount(0);
     }
   }, [isLogin, isInitialized]);
 
@@ -33,7 +42,7 @@ export function ProfileSection() {
 
   if (!isLogin) {
     return (
-      <Card className="bg-[#1A1A1A] border-white/5">
+      <Card className="border-none shadow-none mb-8">
         <CardHeader>
           <CardTitle>{t.mypage.title}</CardTitle>
         </CardHeader>
@@ -46,8 +55,13 @@ export function ProfileSection() {
     );
   }
 
+  // 이니셜 생성 (닉네임의 첫 글자)
+  const getInitial = () => {
+    return userNickname ? userNickname.charAt(0).toUpperCase() : "U";
+  };
+
   return (
-    <Card className="bg-[#1A1A1A] border-white/5">
+    <Card className="border-none shadow-none mb-8">
       <CardHeader>
         <CardTitle>{t.mypage.title}</CardTitle>
       </CardHeader>
@@ -56,35 +70,27 @@ export function ProfileSection() {
           <ProfileSectionSkeleton />
         ) : (
           <div className="space-y-6">
-            <div className="space-y-2">
-              <h3 className="text-lg font-medium text-white/80">{userNickname || userEmail}</h3>
-              <p className="text-sm text-white/60">{userEmail}</p>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-black/20 p-4 rounded-lg">
-                <div className="text-sm text-white/60">{t.mypage.home.activity.points}</div>
-                <div className="text-2xl font-bold text-[#EAFD66]">{data?.points || 0}P</div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="h-16 w-16 rounded-full overflow-hidden border-2 border-white/20">
+                  <div className="bg-gradient-to-br from-purple-500 to-pink-500 h-full w-full flex items-center justify-center text-white text-xl font-semibold">
+                    {getInitial()}
+                  </div>
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold mb-1">{userNickname || userEmail}</h1>
+                  <div className="flex items-center space-x-2 text-white/60 text-sm">
+                    <span>팔로잉 {followingCount}명</span>
+                    <span>•</span>
+                    <span>팔로워 {followerCount}명</span>
+                  </div>
+                </div>
               </div>
-              <div className="bg-black/20 p-4 rounded-lg">
-                <div className="text-sm text-white/60">{t.mypage.home.activity.activityCounts}</div>
-                <div className="text-2xl font-bold text-[#EAFD66]">{data?.active_ticket_num || 0}</div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-4 bg-black/20 p-4 rounded-lg">
-              <div className="text-center">
-                <div className="text-xl font-bold text-[#EAFD66]">{data?.provide_num || 0}</div>
-                <div className="text-xs text-white/60">{t.mypage.home.metricSections.provides}</div>
-              </div>
-              <div className="text-center">
-                <div className="text-xl font-bold text-[#EAFD66]">{data?.request_num || 0}</div>
-                <div className="text-xs text-white/60">{t.mypage.home.metricSections.requests}</div>
-              </div>
-              <div className="text-center">
-                <div className="text-xl font-bold text-[#EAFD66]">{data?.pending_num || 0}</div>
-                <div className="text-xs text-white/60">{t.mypage.home.metricSections.pending}</div>
-              </div>
+              <Link href="/mypage/settings">
+                <button className="p-2 rounded-full hover:bg-white/10">
+                  <Settings className="h-5 w-5 text-white/60" />
+                </button>
+              </Link>
             </div>
           </div>
         )}
@@ -97,14 +103,13 @@ function ProfileSectionSkeleton() {
   return (
     <div className="space-y-4">
       <Skeleton className="h-6 w-32" />
-      <Skeleton className="h-4 w-48" />
-      
-      <div className="grid grid-cols-2 gap-4 mt-6">
-        <Skeleton className="h-20 w-full rounded-lg" />
-        <Skeleton className="h-20 w-full rounded-lg" />
+      <div className="flex items-center space-x-4 mt-4">
+        <Skeleton className="h-16 w-16 rounded-full" />
+        <div>
+          <Skeleton className="h-6 w-32 mb-1" />
+          <Skeleton className="h-4 w-48" />
+        </div>
       </div>
-      
-      <Skeleton className="h-20 w-full rounded-lg mt-6" />
     </div>
   );
 } 

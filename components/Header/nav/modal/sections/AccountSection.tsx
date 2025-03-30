@@ -5,6 +5,9 @@ import { GoogleIcon } from "@/styles/icons/auth/google-icon";
 import { useLocaleContext } from "@/lib/contexts/locale-context";
 import { CustomTooltip } from "@/components/ui/custom-tooltip";
 import { useEffect } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
 
 // 조건부 로깅 - 에러 시에만 출력
 const logError = (message: string, error?: any) => {
@@ -37,6 +40,11 @@ export function AccountSection({
   const { t } = useLocaleContext();
   const { isLogin, handleGoogleLogin, handleDisconnect } = useAuth();
   const userEmail = window.sessionStorage.getItem("USER_EMAIL");
+
+  // 모달 닫고 페이지 이동
+  const handleGoToMypage = () => {
+    onClose();
+  };
 
   if (isLoading) {
     return (
@@ -191,6 +199,19 @@ export function AccountSection({
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* 마이페이지 이동 버튼 */}
+          <div className="mt-2">
+            <Link href="/mypage" onClick={handleGoToMypage} className="w-full">
+              <Button
+                variant="outline"
+                className="w-full flex items-center justify-between bg-white/5 hover:bg-white/10 text-white/80 border-white/10"
+              >
+                <span>마이페이지로 이동</span>
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
           </div>
         </div>
       ) : (

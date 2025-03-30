@@ -28,7 +28,7 @@ interface CardHeaderProps extends HTMLAttributes<HTMLDivElement> {
 export function CardHeader({ className, children, ...props }: CardHeaderProps) {
   return (
     <div
-      className={cn("flex flex-col space-y-1.5 p-6", className)}
+      className={cn("flex flex-col space-y-1.5 pb-4", className)}
       {...props}
     >
       {children}
@@ -62,7 +62,7 @@ interface CardContentProps extends HTMLAttributes<HTMLDivElement> {
 
 export function CardContent({ className, children, ...props }: CardContentProps) {
   return (
-    <div className={cn("p-6 pt-0", className)} {...props}>
+    <div className={cn("", className)} {...props}>
       {children}
     </div>
   );
