@@ -11,6 +11,7 @@ import { mypageService } from "@/lib/api/requests/mypage";
 import { useAuth } from "@/lib/hooks/features/auth/useAuth";
 import { useInfiniteScroll } from "@/lib/hooks/scroll/use-infinite-scroll";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 // 콘텐츠 아이템 타입 정의
 interface ContentItem {
@@ -61,7 +62,6 @@ const ContentCard = ({ item, index, filterIcons, t }: ContentCardProps) => {
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3, delay: index * 0.05 }}
-      whileHover={{ y: -5, transition: { duration: 0.2 } }}
       onClick={handleCardClick}
       className="cursor-pointer"
     >
@@ -69,10 +69,13 @@ const ContentCard = ({ item, index, filterIcons, t }: ContentCardProps) => {
         <div className="relative">
           {/* 이미지 컨테이너에 4:5 비율 적용 */}
           <div className="relative aspect-[4/5] w-full overflow-hidden rounded-t-lg">
-            <img 
+            <Image 
               src={imageUrl} 
               alt={`이미지 ${index + 1}`} 
-              className="absolute inset-0 w-full h-full object-cover"
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover transition-transform duration-300 hover:scale-110"
+              unoptimized
             />
           </div>
           <div className="absolute top-2 left-2">
