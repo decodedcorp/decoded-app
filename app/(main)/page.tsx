@@ -31,7 +31,7 @@ export default function Home() {
           <DetailsImagesSection
             imageId={['677ba9a162743947bb167e1a', '67b5ac792e8764aebffe0ffc']}
           /> */}
-          <Explore position="right-main" of="identity" />
+          <Explore position="right-main" of="brand" />
           <DetailsImagesSection
             imageId={['67c1913585e28126df021377', '67c197aa3c682a3df3d2eeb0']}
           />

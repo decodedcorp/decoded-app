@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { BrandDoc } from './BrandDoc';
 import type { CategoryDoc } from './CategoryDoc';
+import type { CurationDoc } from './CurationDoc';
 import type { IdentityDoc } from './IdentityDoc';
 import type { ImageDoc } from './ImageDoc';
 import type { ItemDoc } from './ItemDoc';
@@ -15,11 +16,11 @@ import type { UserDoc } from './UserDoc';
 /**
  * General `GET` document response schema
  *
- * :field next_id: Id of the next page
  * :field docs: List of documents
+ * :field next_id: Id of the next page
  */
 export type GetDocumentResponse = {
-    docs?: (IdentityDoc | BrandDoc | ItemDoc | ImageDoc | UserDoc | RequestDoc | CategoryDoc | NotificationDoc | SystemConfigDoc | TrendingDoc | null);
+    docs?: (IdentityDoc | BrandDoc | ItemDoc | ImageDoc | UserDoc | RequestDoc | CategoryDoc | NotificationDoc | SystemConfigDoc | TrendingDoc | CurationDoc | null);
     next_id?: (string | null);
     metadata?: (Record<string, any> | null);
 };

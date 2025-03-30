@@ -2,8 +2,12 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ConfirmItemInfo } from '../models/ConfirmItemInfo';
+import type { AddCuration } from '../models/AddCuration';
+import type { ConfirmItemLink } from '../models/ConfirmItemLink';
 import type { Response } from '../models/Response';
+import type { UpdateCategory } from '../models/UpdateCategory';
+import type { UpdateContents } from '../models/UpdateContents';
+import type { UpdateItemMetadata } from '../models/UpdateItemMetadata';
 import type { UpdateItems } from '../models/UpdateItems';
 import type { UploadBrand } from '../models/UploadBrand';
 import type { UploadIdentity } from '../models/UploadIdentity';
@@ -81,7 +85,7 @@ export class AdminService {
      */
     public static confirmItemLinkAdminUserDocIdItemItemDocIdConfirmPost(
         itemDocId: string,
-        requestBody: ConfirmItemInfo,
+        requestBody: ConfirmItemLink,
         session?: any,
     ): CancelablePromise<Response> {
         return __request(OpenAPI, {
@@ -115,6 +119,35 @@ export class AdminService {
             query: {
                 'next_id': nextId,
             },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Update Item Metadata
+     * @param itemDocId Item doc id
+     * @param requestBody
+     * @param session
+     * @returns Response Update metadata of the item
+     * @throws ApiError
+     */
+    public static updateItemMetadataAdminUserDocIdItemItemDocIdUpdateMetadataPatch(
+        itemDocId: string,
+        requestBody: UpdateItemMetadata,
+        session?: any,
+    ): CancelablePromise<Response> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/admin/{user_doc_id}/item/{item_doc_id}/update-metadata',
+            path: {
+                'item_doc_id': itemDocId,
+            },
+            query: {
+                'session': session,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 422: `Validation Error`,
             },
@@ -220,20 +253,105 @@ export class AdminService {
         });
     }
     /**
-     * Add Item Class
-     * @param _new
-     * @returns Response Add a new item class
+     * Update Item Category
+     * @param requestBody
+     * @param session
+     * @returns Response Update a item category
      * @throws ApiError
      */
-    public static addItemClassAdminUserDocIdCategoryAddItemClassPost(
-        _new?: any,
+    public static updateItemCategoryAdminUserDocIdCategoryUpdatePut(
+        requestBody: UpdateCategory,
+        session?: any,
+    ): CancelablePromise<Response> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/admin/{user_doc_id}/category/update',
+            query: {
+                'session': session,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Add Curation
+     * @param requestBody
+     * @param session
+     * @returns Response Successful Response
+     * @throws ApiError
+     */
+    public static addCurationAdminUserDocIdCurationAddPost(
+        requestBody: AddCuration,
+        session?: any,
     ): CancelablePromise<Response> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/admin/{user_doc_id}/category/add/item-class',
+            url: '/admin/{user_doc_id}/curation/add',
             query: {
-                'new': _new,
+                'session': session,
             },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Update Contents
+     * Update featured content
+     * @param requestBody
+     * @param session
+     * @returns Response Successful Response
+     * @throws ApiError
+     */
+    public static updateContentsAdminUserDocIdCurationContentsPatch(
+        requestBody: UpdateContents,
+        session?: any,
+    ): CancelablePromise<Response> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/admin/{user_doc_id}/curation/contents',
+            query: {
+                'session': session,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Get System Config
+     * Get system configuration.
+     * @returns Response Successful Response
+     * @throws ApiError
+     */
+    public static getSystemConfigAdminUserDocIdSystemConfigsGet(): CancelablePromise<Response> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/admin/{user_doc_id}/system-configs',
+        });
+    }
+    /**
+     * Update System Config
+     * Update system configuration.
+     * @param requestBody
+     * @returns Response Successful Response
+     * @throws ApiError
+     */
+    public static updateSystemConfigAdminUserDocIdSystemConfigsUpdatePatch(
+        requestBody: Record<string, any>,
+    ): CancelablePromise<Response> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/admin/{user_doc_id}/system-configs/update',
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 422: `Validation Error`,
             },

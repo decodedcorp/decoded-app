@@ -321,7 +321,7 @@ export function MypageModal({ isOpen, onClose, onLogout, onLoginSuccess }: Mypag
           {/* 마이페이지 이동 버튼 */}
           <div className="px-4 py-6">
             <Link 
-              href="/mypage" 
+              href="/my-page" 
               onClick={handleGoToMypage}
               className="w-full"
             >

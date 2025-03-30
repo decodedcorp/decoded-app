@@ -42,24 +42,15 @@ export class PublicService {
         });
     }
     /**
-     * Get All Identity Documents With Pagination
-     * Get all identity documents with pagination. If `next_id` is provided, it will return the next page of documents.
-     * @param nextId The id of the next page
+     * Get All Identity Documents
+     * Get all identity documents
      * @returns Response All identity documents retrieved
      * @throws ApiError
      */
-    public static getAllIdentityDocumentsWithPaginationIdentityGet(
-        nextId?: (string | null),
-    ): CancelablePromise<Response> {
+    public static getAllIdentityDocumentsIdentityGet(): CancelablePromise<Response> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/identity',
-            query: {
-                'next_id': nextId,
-            },
-            errors: {
-                422: `Validation Error`,
-            },
         });
     }
     /**
@@ -84,24 +75,15 @@ export class PublicService {
         });
     }
     /**
-     * Get All Brand Documents With Pagination
-     * Get all brand documents with pagination. If `next_id` is provided, it will return the next page of documents.
-     * @param nextId Id of the next page
+     * Get All Brand Documents
+     * Get all brand documents
      * @returns Response_GetDocumentResponse_ All Brand documents retrieved
      * @throws ApiError
      */
-    public static getAllBrandDocumentsWithPaginationBrandGet(
-        nextId?: (string | null),
-    ): CancelablePromise<Response_GetDocumentResponse_> {
+    public static getAllBrandDocumentsBrandGet(): CancelablePromise<Response_GetDocumentResponse_> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/brand',
-            query: {
-                'next_id': nextId,
-            },
-            errors: {
-                422: `Validation Error`,
-            },
         });
     }
     /**
@@ -168,6 +150,17 @@ export class PublicService {
         });
     }
     /**
+     * Get Trending Images
+     * @returns Response Trending images retrieved
+     * @throws ApiError
+     */
+    public static getTrendingImagesImageTrendingGet(): CancelablePromise<Response> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/image/trending',
+        });
+    }
+    /**
      * Get All Image Documents With Pagination
      * Get all image documents with pagination. If `next_id` is provided, it will return the next page of documents.
      * @param nextId The id of the next image document
@@ -202,6 +195,29 @@ export class PublicService {
             url: '/image/{image_doc_id}',
             path: {
                 'image_doc_id': imageDocId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Get Selected Images
+     * @param min The minimum number of images to return
+     * @param max The maximum number of images to return
+     * @returns Response Get DECODED selected images
+     * @throws ApiError
+     */
+    public static getSelectedImagesImageSelectedImagesGet(
+        min: number = 1,
+        max: number = 5,
+    ): CancelablePromise<Response> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/image/selected-images',
+            query: {
+                'min': min,
+                'max': max,
             },
             errors: {
                 422: `Validation Error`,
@@ -308,26 +324,53 @@ export class PublicService {
      * @returns Response Get all categories
      * @throws ApiError
      */
-    public static getCategoriesCategoryAllGet(): CancelablePromise<Response> {
+    public static getCategoriesCategoryGet(): CancelablePromise<Response> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/category/all',
+            url: '/category',
         });
     }
     /**
      * Search
      * @param query
+     * @param nextId
      * @returns any Successful Response
      * @throws ApiError
      */
     public static searchSearchGet(
         query: string = '',
+        nextId?: string,
     ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/search',
             query: {
                 'query': query,
+                'next_id': nextId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Get Contents
+     * Get current featured content
+     * @param contentType Content type (main_page/detail_page)
+     * @param curationType Curation type (identity/brand/context)
+     * @returns Response Successful Response
+     * @throws ApiError
+     */
+    public static getContentsCurationContentsGet(
+        contentType: string,
+        curationType: string,
+    ): CancelablePromise<Response> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/curation/contents',
+            query: {
+                'content_type': contentType,
+                'curation_type': curationType,
             },
             errors: {
                 422: `Validation Error`,

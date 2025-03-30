@@ -60,9 +60,10 @@ export function useInfiniteScroll<T>({
   }, [fetchFunction, initialLimit]);
 
   // 더 불러오기 함수
-  const loadMore = useCallback(async () => {
-    if (isLoading || !hasMore) return;
-    await fetchData(nextId ?? undefined);
+  const loadMore = useCallback(async (overrideNextId?: string | null) => {
+    if (isLoading || (!hasMore && !overrideNextId)) return;
+    // 외부에서 전달받은 nextId 우선 사용
+    await fetchData(overrideNextId !== undefined ? overrideNextId || undefined : nextId || undefined);
   }, [fetchData, isLoading, hasMore, nextId]);
 
   // Intersection Observer 설정
@@ -96,7 +97,6 @@ export function useInfiniteScroll<T>({
   // 초기 데이터 로딩
   useEffect(() => {
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

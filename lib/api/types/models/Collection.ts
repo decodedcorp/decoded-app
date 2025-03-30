@@ -16,6 +16,7 @@ export enum Collection {
     USERS = 'users',
     ITEMS = 'items',
     NOTIFICATIONS = 'notifications',
+    CURATIONS = 'curations',
     CATEGORIES = 'categories',
     TRENDING = 'trending',
     CONFIGS = 'configs',
