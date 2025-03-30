@@ -1,7 +1,7 @@
-import { apiClient } from '../client';
-import type { ItemDoc, GetDocumentResponse } from '../types';
-import type { Response_GetDocumentResponse_ } from '../types/models/Response_GetDocumentResponse_';
-import buildQueryString from '../utils/url';
+import { apiClient } from "../client";
+import type { ItemDoc, GetDocumentResponse } from "../types";
+import type { Response_GetDocumentResponse_ } from "../types/models/Response_GetDocumentResponse_";
+import buildQueryString from "../utils/url";
 
 export const itemsService = {
   // 아이템 상세 정보 조회
@@ -14,7 +14,7 @@ export const itemsService = {
       `items${buildQueryString(options || {})}`
     ),
 
-  // 아이템 검색
+  // 아이템 정보 공유
   searchItems: (
     query: string,
     options?: { limit?: number; next_id?: string }
