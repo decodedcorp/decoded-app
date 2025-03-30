@@ -23,9 +23,8 @@ export const home = {
     description: "Discover the latest fashion trends and styles",
   },
   discover: {
-    title: "Promote with Your Links",
-    description:
-      "Share and promote your product links as a blogger, creator, or seller",
+    title: "DECODED(사진)",
+    description: "",
     cta: "Learn More",
     activityFeed: {
       loading: "Connecting...",

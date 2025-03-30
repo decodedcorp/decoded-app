@@ -23,9 +23,9 @@ export const home = {
     description: "디코디드 큐레이션 콘텐츠를 확인해보세요",
   },
   discover: {
-    title: "여러분의 링크로 홍보해보세요",
+    title: "DECODED::스타일",
     description:
-      "블로거, 크리에이터, 판매자님들의 제품 링크를 공유하고 홍보해보세요",
+      "디코디드 스타일 콘텐츠를 확인해보세요. 정보를 제공하면 포인트를 획득할 수 있습니다.",
     cta: "자세히 알아보기",
     activityFeed: {
       loading: "연결 중...",

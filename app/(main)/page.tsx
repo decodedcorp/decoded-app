@@ -19,29 +19,16 @@ export default function Home() {
           __html: JSON.stringify(generateWebsiteSchema()),
         }}
       />
-      <div className="flex flex-col min-h-[100vh] bg-black text-white/80">
+      <div className="flex flex-col min-h-[100vh] bg-black text-white/80 overflow-x-hidden">
         <HeroSection />
         <div className="space-y-24 py-16 px-2 max-w-[95%] mx-auto">
           {/* 모든 섹션이 동일한 스타일의 헤더를 사용 */}
           <Explore position="left-main" of="identity" />
           <TrendingSection slideCount={0} />
-          <CurationSection type="identity" />
-          <DetailsImagesSection
-            imageId={["67c17e50b354be5440d43c95", "67c18108c7937762aa70a9c6"]}
-          />
-          {/* dev
-          <DetailsImagesSection
-            imageId={['677ba9a162743947bb167e1a', '67b5ac792e8764aebffe0ffc']}
-          /> */}
-          <Explore position="right-main" of="identity" />
-          <DetailsImagesSection
-            imageId={["67c1913585e28126df021377", "67c197aa3c682a3df3d2eeb0"]}
-          />
-          {/* dev
-          <DetailsImagesSection
-            imageId={['677ba9a162743947bb167e1a', '67b5ac792e8764aebffe0ffc']}
-          /> */}
-          <TrendingSection slideCount={5} />
+          <CurationSection type="identity" variant="card" />
+          <DetailsImagesSection />
+          <CurationSection type="brand" variant="banner" />
+          <CurationSection type="context" variant="story" isRow={true} />
           <TrendingKeywordsSection />
         </div>
       </div>
