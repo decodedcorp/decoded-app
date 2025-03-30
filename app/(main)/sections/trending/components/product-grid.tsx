@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { cn } from '@/lib/utils/style';
-import { ProductCard } from './product-card';
-import { useLocaleContext } from '@/lib/contexts/locale-context';
-import { useTrendingImages } from '@/lib/hooks/use-trending-images';
-import { useState } from 'react';
-import type { TrendingImage } from '@/lib/api/_types/trending';
-import { Button } from '@/components/ui/button';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Pagination } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/pagination';
+import { cn } from "@/lib/utils/style";
+import { ProductCard } from "./product-card";
+import { useLocaleContext } from "@/lib/contexts/locale-context";
+import { useTrendingImages } from "@/lib/hooks/use-trending-images";
+import { useState } from "react";
+import type { TrendingImage } from "@/lib/api/_types/trending";
+import { Button } from "@/components/ui/button";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
 
 interface TrendingResponse {
   status_code: number;
@@ -29,7 +29,7 @@ export function ProductGrid({ slideCount }: ProductGridProps) {
   const { data, isLoading } = useTrendingImages({
     limit: 12,
   });
-  const [showAll, setShowAll] = useState(false);
+  const [showAll, setShowAll] = useState(true);
 
   const trendingImages = (data as TrendingResponse | undefined)?.data ?? [];
   const displayedItems = showAll
@@ -57,7 +57,7 @@ export function ProductGrid({ slideCount }: ProductGridProps) {
     );
   }
 
-  console.log('Trending Images:', trendingImages); // 데이터 확인용 로그
+  console.log("Trending Images:", trendingImages); // 데이터 확인용 로그
 
   return (
     <div className="space-y-6">
@@ -68,7 +68,7 @@ export function ProductGrid({ slideCount }: ProductGridProps) {
         autoplay={{
           delay: 2000,
           disableOnInteraction: false,
-          pauseOnMouseEnter: true
+          pauseOnMouseEnter: true,
         }}
         loop={true}
         breakpoints={{
@@ -91,7 +91,7 @@ export function ProductGrid({ slideCount }: ProductGridProps) {
           1280: {
             slidesPerView: 5,
             spaceBetween: 24,
-          }
+          },
         }}
         className="w-full px-4 md:px-8 lg:px-12"
       >
@@ -101,7 +101,7 @@ export function ProductGrid({ slideCount }: ProductGridProps) {
               <ProductCard
                 rank={index + 1}
                 image={item.image.img_url}
-                title={item.image.title || '제목 없음'}
+                title={item.image.title || "제목 없음"}
                 brand={item.image.upload_by}
                 likes={item.image.like}
                 imageId={item.image._id}

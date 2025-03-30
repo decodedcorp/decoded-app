@@ -41,14 +41,15 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
 
   try {
     const imageData = await getImageDetails(imageId);
-
+    console.log(imageData);
     if (!imageData) {
       return notFound();
     }
 
     // metadata에서 첫 번째 키를 아티스트 ID로 사용
     const metadataKeys = Object.keys(imageData.metadata || {});
-    const potentialArtistId = metadataKeys.length > 0 ? metadataKeys[0] : undefined;
+    const potentialArtistId =
+      metadataKeys.length > 0 ? metadataKeys[0] : undefined;
 
     const processedImageData: ProcessedImageData = {
       ...imageData,
@@ -131,8 +132,8 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
           </div>
           <div className="w-full">
             <Suspense fallback={<div className="h-20"></div>}>
-              <RelatedStylingSection 
-                imageId={imageData.doc_id} 
+              <RelatedStylingSection
+                imageId={imageData.doc_id}
                 selectedItemId={selectedItemId}
                 artistId={potentialArtistId}
                 artistName={Object.values(imageData.metadata)[0] || undefined}
@@ -145,8 +146,8 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
             imageData={processedImageData}
             selectedItemId={selectedItemId}
           />
-          
-          <MobileActions 
+
+          <MobileActions
             initialLikeCount={imageData.like}
             imageId={imageData.doc_id}
             isFixed={true}

@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
 import { FloatingBoxes } from "./components/floating-boxes";
 import { HeroContent } from "./components/hero-content";
 import ScrollIndicator from "./components/scroll-indicator";
 import type { BoxSizeMode } from "./utils/types";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { useRandomResources } from "../../../../lib/hooks/features/images/use-random-resources";
 import { Locale } from "@/lib/lang/locales";
 import type { ItemDoc, ImageDoc } from "@/lib/api/types";
@@ -15,7 +15,16 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ sizeMode = "LARGE" }: HeroSectionProps) {
-  const { data: resources = [] as Array<ItemDoc | ImageDoc> } = useRandomResources();
+  const { data: resources = [] as Array<ImageDoc> } = useRandomResources();
+
+  useEffect(() => {
+    if (resources.length >= 2) {
+      const shuffled = [...resources].sort(() => Math.random() - 0.5);
+      const selectedTwo = shuffled.slice(0, 2);
+      const selectedIds = selectedTwo.map((item) => item._id);
+      sessionStorage.setItem("selectedImageIds", JSON.stringify(selectedIds));
+    }
+  }, [resources]);
 
   return (
     <section className="relative w-full h-screen overflow-hidden isolate">
@@ -33,10 +42,7 @@ export function HeroSection({ sizeMode = "LARGE" }: HeroSectionProps) {
           {/* Floating Boxes */}
           <div className="relative w-full h-full flex items-center justify-center">
             <Suspense fallback={null}>
-              <FloatingBoxes
-                sizeMode={sizeMode}
-                initialResources={resources}
-              />
+              <FloatingBoxes sizeMode={sizeMode} initialResources={resources} />
             </Suspense>
           </div>
         </div>
