@@ -4,15 +4,9 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useLocaleContext } from "@/lib/contexts/locale-context";
 import { AccountSection } from "./sections/AccountSection";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useMyPageQuery } from "@/lib/hooks/common/useMyPageQuery";
-import type {
-  AccountData,
-  TabType,
-} from "@/components/Header/nav/modal/types/mypage";
 import { cn } from "@/lib/utils/style";
-import { ArrowRight, X } from "lucide-react";
+import LogoPng from "@/styles/logos/LogoPng";
 
 // 모달 컨트롤러 커스텀 훅
 function useModalController({
@@ -209,15 +203,11 @@ export function MypageModal({
   });
   const { windowWidth, isMobile, styles } = useResponsiveModalStyles();
 
-  // 탭 데이터 로딩 - 이제 'home' 탭만 로드합니다
-  const { data: tabData, isLoading, error } = useMyPageQuery("home", isOpen);
-
   // 렌더링 최적화를 위한 포스 리플로우
   useEffect(() => {
     if (isOpen && isVisible && modalRef.current) {
       setTimeout(() => {
         if (modalRef.current) {
-          // 포스 리플로우
           const forceReflow = modalRef.current.offsetHeight;
 
           if (windowWidth < 1025) {
@@ -266,7 +256,7 @@ export function MypageModal({
       {/* 배경 오버레이 */}
       <div
         className={cn(
-          "fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300",
+          "fixed inset-0 bg-black/85 backdrop-blur-md transition-opacity duration-300",
           isOpen ? "opacity-100" : "opacity-0"
         )}
         style={{
@@ -275,64 +265,64 @@ export function MypageModal({
         }}
       />
 
-      {/* 모달 패널 */}
+      {/* 모달 패널 - 패딩 및 레이아웃 재조정 */}
       <div
         ref={modalRef}
         id="mypage-modal-panel"
         data-modal-container="true"
         data-no-close-on-click="true"
         className={cn(
-          "fixed top-0 right-0 bottom-0 flex flex-col overflow-hidden",
-          "border border-white/5 shadow-lg",
-          "transition-transform duration-300 ease-out",
-          "bg-gradient-to-b from-[#1A1A1A] to-black/95",
+          "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2",
+          "flex flex-col",
+          "border border-white/10",
+          "transition-all duration-300 ease-out",
+          "rounded-2xl p-8",
+          "w-[90%] max-w-sm h-[550px]",
+          "shadow-2xl",
           {
-            "translate-x-0": isOpen,
-            "translate-x-full": !isOpen,
+            "opacity-100 scale-100": isOpen && isVisible,
+            "opacity-0 scale-95": !isOpen || !isVisible,
           }
         )}
         style={{
           pointerEvents: isOpen ? "auto" : "none",
           zIndex: 100001,
-          width: styles.width,
-          height: styles.height,
-          minWidth: styles.minWidth,
-          minHeight: styles.minHeight,
-          marginTop: styles.marginTop,
-          borderTopLeftRadius: styles.borderRadius,
-          borderBottomLeftRadius: styles.borderRadius,
-          willChange: "transform",
-          transformOrigin: "right center",
+          background: `
+            radial-gradient(ellipse at center, rgba(58, 39, 15, 0.4) 0%, rgba(0, 0, 0, 0.9) 70%),
+            rgba(10, 10, 10, 0.95)
+          `,
+          backdropFilter: "blur(10px)",
         }}
       >
-        {/* 헤더 영역 */}
-        <div className="border-b border-white/5 flex-shrink-0">
-          <div className="px-4 py-3 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-white/80">
-              {t.mypage.tabs.home}
-            </h2>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleClose(e);
-              }}
-              className="rounded-full p-2 hover:bg-white/5 transition-colors"
-              disabled={isProtectionActive}
-            >
-              <X className="w-5 h-5 text-gray-400" />
-            </button>
-          </div>
+        {/* 상단 섹션 (아이콘 + 제목) - 중앙 정렬, 적절한 마진 추가 */}
+        <div className="flex flex-col items-center flex-shrink-0 mt-32 mb-auto">
+          <LogoPng width={1000} height={28} className="object-contain mb-2" />
         </div>
 
-        {/* 콘텐츠 영역 */}
-        <div className="flex-1 overflow-y-auto" data-no-close-on-click="true">
-          {/* 계정 정보 섹션 */}
+        <div className="w-full flex-shrink-0 mb-auto">
           <AccountSection
             isOpen={isOpen}
             onClose={handleClose}
             onLogout={onLogout}
             onLoginSuccess={onLoginSuccess}
           />
+          <div className="text-center text-xs text-gray-400 space-x-4">
+            <Link
+              href="/terms-of-service"
+              className="hover:text-gray-200 transition-colors"
+            >
+              {/* t('termsOfService') */}
+              Terms of Service
+            </Link>
+            <span>|</span>
+            <Link
+              href="/privacy-policy"
+              className="hover:text-gray-200 transition-colors"
+            >
+              {/* t('privacyPolicy') */}
+              Privacy Policy
+            </Link>
+          </div>
         </div>
       </div>
     </div>

@@ -8,7 +8,9 @@ export const mypage = {
     notification: "Notification",
   },
   home: {
+    logout: "Login to view activity history",
     empty: "No activity yet",
+    settings: "Edit Profile",
     activity: {
       points: "Points",
       activityCounts: "Activity Counts",
