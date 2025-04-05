@@ -4,7 +4,8 @@ export const header = {
     request: "요청하기",
     login: {
       button: {
-        text: "로그인",
+        login: "로그인",
+        logout: "로그아웃",
         loading: "로그인 중...",
         myPage: "마이페이지",
       },

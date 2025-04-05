@@ -9,6 +9,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useAccountData } from "@/lib/hooks/common/useAccountData";
+import { pretendardBold, pretendardSemiBold } from "@/lib/constants/fonts";
 
 // 조건부 로깅 - 에러 시에만 출력
 const logError = (message: string, error?: any) => {
@@ -39,7 +40,7 @@ export function AccountSection({
   const { t } = useLocaleContext();
   const { isLogin, handleGoogleLogin, handleDisconnect } = useAuth();
   const userEmail = window.sessionStorage.getItem("USER_EMAIL");
-  
+
   // 기존의 data, isLoading props 대신 useAccountData 훅 사용
   const { data, isLoading } = useAccountData(isOpen);
 
@@ -48,11 +49,11 @@ export function AccountSection({
     // 로그인 성공 시 호출될 핸들러
     const handleLoginSuccess = () => {
       logError("[AccountSection] 로그인 성공 이벤트 감지");
-      
+
       // 지연 후 모달 닫기
       setTimeout(() => {
         onClose();
-        
+
         // 모달이 닫힌 후 약간의 지연을 둔 뒤 페이지 리로딩
         setTimeout(() => {
           if (onLoginSuccess) {
@@ -110,10 +111,10 @@ export function AccountSection({
 
       // 이벤트 발송
       window.dispatchEvent(new CustomEvent("auth:state-changed"));
-      
+
       // 모달 닫기
       onClose();
-      
+
       // 페이지 리로딩 추가
       setTimeout(() => {
         window.location.reload();
@@ -160,102 +161,6 @@ export function AccountSection({
               </svg>
             </button>
           </div>
-
-          {/* Stats Overview */}
-          <div className="grid grid-cols-2 gap-4">
-            {/* Points Card */}
-            <div className="bg-[#1A1A1A] rounded-xl p-4 space-y-2">
-              <div className="text-gray-400 text-sm flex items-center gap-1">
-                {t.mypage.home.activity.points}
-                <CustomTooltip text="활동을 통해 획득한 포인트입니다.">
-                  <svg
-                    className="w-4 h-4 text-gray-400 hover:text-gray-300 cursor-help"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </CustomTooltip>
-              </div>
-              <div className="text-[#EAFD66] text-2xl font-bold">
-                {data?.points || 0}P
-              </div>
-            </div>
-
-            {/* Activity Tickets Card */}
-            <div className="bg-[#1A1A1A] rounded-xl p-4 space-y-2">
-              <div className="text-gray-400 text-sm flex items-center gap-1">
-                {t.mypage.home.activity.activityCounts}
-                <CustomTooltip text="현재 진행 중인 활동권 수입니다.">
-                  <svg
-                    className="w-4 h-4 text-gray-400 hover:text-gray-300 cursor-help"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </CustomTooltip>
-              </div>
-              <div className="text-[#EAFD66] text-2xl font-bold">
-                {data?.active_ticket_num || 0}
-              </div>
-            </div>
-          </div>
-
-          {/* Activity Stats */}
-          <div className="bg-[#1A1A1A] rounded-xl p-4">
-            <div className="grid grid-cols-3 gap-4">
-              <div className="text-center">
-                <div className="text-[#EAFD66] text-xl font-bold">
-                  {data?.provide_num || 0}
-                </div>
-                <div className="text-xs text-gray-400 mt-1">
-                  {t.mypage.home.metricSections.provides}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-[#EAFD66] text-xl font-bold">
-                  {data?.request_num || 0}
-                </div>
-                <div className="text-xs text-gray-400 mt-1">
-                  {t.mypage.home.metricSections.requests}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-[#EAFD66] text-xl font-bold">
-                  {data?.pending_num || 0}
-                </div>
-                <div className="text-xs text-gray-400 mt-1">
-                  {t.mypage.home.metricSections.pending}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 마이페이지 이동 버튼 */}
-          <div className="mt-2">
-            <Link href="/mypage" onClick={handleGoToMypage} className="w-full">
-              <Button
-                variant="outline"
-                className="w-full flex items-center justify-between bg-white/5 hover:bg-white/10 text-white/80 border-white/10"
-              >
-                <span>마이페이지로 이동</span>
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
         </div>
       ) : (
         <div className="flex-1 flex items-center justify-center p-4">
@@ -267,26 +172,26 @@ export function AccountSection({
                 window.dispatchEvent(new CustomEvent("login:loading:start"));
 
                 // 로그인 함수 직접 호출 - 이제 성공 처리는 이벤트 리스너에서 담당
-                handleGoogleLogin()
-                  .catch((error) => {
-                    // 로그인 실패 시 로딩 상태 종료
-                    window.dispatchEvent(new CustomEvent("login:loading:stop"));
-                    logError("[AccountSection] 로그인 후처리 중 오류:", error);
-                  });
+                handleGoogleLogin().catch((error) => {
+                  // 로그인 실패 시 로딩 상태 종료
+                  window.dispatchEvent(new CustomEvent("login:loading:stop"));
+                  logError("[AccountSection] 로그인 후처리 중 오류:", error);
+                });
               } catch (error) {
                 window.dispatchEvent(new CustomEvent("login:loading:stop"));
                 logError("[AccountSection] 로그인 시도 중 오류:", error);
               }
             }}
             className="w-full px-6 py-4 rounded-xl text-sm font-medium
-              bg-gradient-to-r from-white to-gray-100 text-gray-900 
-              hover:from-gray-50 hover:to-gray-100
+              bg-black hover:bg-gray-900
               transition-all duration-200 ease-out
               flex items-center justify-center gap-3
               shadow-lg shadow-black/5"
           >
             <GoogleIcon />
-            <span className="font-medium">{t.common.actions.login.google}</span>
+            <span className={`${pretendardSemiBold.className} text-gray-400`}>
+              {t.common.actions.login.google}
+            </span>
           </button>
         </div>
       )}

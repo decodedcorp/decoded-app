@@ -8,7 +8,9 @@ export const mypage = {
     notification: "알림",
   },
   home: {
+    logout: "로그인 후 활동 내역을 확인할 수 있습니다.",
     empty: "아직 활동 내역이 없습니다",
+    settings: "프로필 설정",
     activity: {
       points: "포인트",
       activityCounts: "활동권",
