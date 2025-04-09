@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import LogoPng from '@/styles/logos/LogoPng';
-import { SearchBar } from '../search/SearchBar';
-import { LoginButton } from './LoginButton';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { useLocaleContext } from '@/lib/contexts/locale-context';
-import { Menu, User, Search, PlusCircle } from 'lucide-react';
-import { cn } from '@/lib/utils/style';
-import { useState } from 'react';
-import { useRequestModal } from '@/components/modals/request/hooks/use-request-modal';
-import { useLoginModalStore } from '@/components/auth/login-modal/store';
+import LogoPng from "@/styles/logos/LogoPng";
+import { SearchBar } from "../search/SearchBar";
+import { LoginButton } from "./LoginButton";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { useLocaleContext } from "@/lib/contexts/locale-context";
+import { Menu, User, Search, PlusCircle } from "lucide-react";
+import { cn } from "@/lib/utils/style";
+import { useState } from "react";
+import { useRequestModal } from "@/components/modals/request/hooks/use-request-modal";
+import { useLoginModalStore } from "@/components/auth/login-modal/store";
 
 interface NavProps {
   isSearchOpen: boolean;
@@ -28,12 +28,12 @@ function Nav({
   const { t } = useLocaleContext();
   const [isIconLoginModalOpen, setIconLoginModalOpen] = useState(false);
   const { onOpen: openRequestModal, RequestModal } = useRequestModal();
-  
+
   // 로그인 모달 스토어 사용 - LoginButton 컴포넌트와 같은 스토어 공유
-  const { 
-    isOpen: isLoginModalOpen, 
-    openLoginModal, 
-    closeLoginModal 
+  const {
+    isOpen: isLoginModalOpen,
+    openLoginModal,
+    closeLoginModal,
   } = useLoginModalStore();
 
   return (
@@ -43,11 +43,11 @@ function Nav({
         <div className="lg:hidden h-full flex flex-col">
           <div className="h-16 flex items-center justify-between">
             <Link href="/" className="flex items-center">
-              <LogoPng 
+              <LogoPng
                 width={130}
-                height={30} 
-                priority={true} 
-                className="object-contain my-auto" 
+                height={30}
+                priority={true}
+                className="object-contain my-auto"
               />
             </Link>
 
@@ -61,10 +61,10 @@ function Nav({
               <button
                 onClick={onSearchToggle}
                 className={cn(
-                  'p-2 rounded-full transition-colors duration-200',
+                  "p-2 rounded-full transition-colors duration-200",
                   isSearchOpen
-                    ? 'text-[#EAFD66] '
-                    : 'text-gray-400 hover:text-[#EAFD66]'
+                    ? "text-[#EAFD66] "
+                    : "text-gray-400 hover:text-[#EAFD66]"
                 )}
               >
                 <Search className="w-5 h-5" />
@@ -74,28 +74,31 @@ function Nav({
                 size="icon"
                 onClick={() => {
                   // 최근 모달 상태 변경이 있었는지 확인
-                  const lastModalToggle = sessionStorage.getItem('LAST_MODAL_TOGGLE');
+                  const lastModalToggle =
+                    sessionStorage.getItem("LAST_MODAL_TOGGLE");
                   const now = Date.now();
-                  
+
                   if (lastModalToggle) {
                     const lastToggleTime = parseInt(lastModalToggle, 10);
                     // 마지막 토글 후 800ms 이내의 클릭은 무시
                     if (now - lastToggleTime < 800) {
-                      console.log('[Nav] 모달 상태 최근 변경됨, User 아이콘 클릭 무시');
+                      console.log(
+                        "[Nav] 모달 상태 최근 변경됨, User 아이콘 클릭 무시"
+                      );
                       return;
                     }
                   }
-                  
-                  console.log('[Nav] User 아이콘 클릭, 로그인 모달 열기');
+
+                  console.log("[Nav] User 아이콘 클릭, 로그인 모달 열기");
                   // 모달 토글 시간 기록
-                  sessionStorage.setItem('LAST_MODAL_TOGGLE', now.toString());
+                  sessionStorage.setItem("LAST_MODAL_TOGGLE", now.toString());
                   openLoginModal();
                 }}
                 className={cn(
-                  'transition-colors duration-200',
+                  "transition-colors duration-200",
                   isLoginModalOpen
-                    ? 'text-[#EAFD66] '
-                    : 'text-gray-400 hover:text-[#EAFD66]'
+                    ? "text-[#EAFD66] "
+                    : "text-gray-400 hover:text-[#EAFD66]"
                 )}
               >
                 <User className="w-5 h-5" />
@@ -106,9 +109,9 @@ function Nav({
           {/* 모바일 검색바 - 슬라이드 애니메이션 */}
           <div
             className={cn(
-              'absolute top-16 left-0 right-0 z-20',
-              'transition-all duration-200 ease-in-out',
-              isSearchOpen ? 'h-16 opacity-100' : 'h-0 opacity-0'
+              "absolute top-16 left-0 right-0 z-20",
+              "transition-all duration-200 ease-in-out",
+              isSearchOpen ? "h-16 opacity-100" : "h-0 opacity-0"
             )}
           >
             <div className="px-4 py-3">
@@ -120,11 +123,11 @@ function Nav({
         {/* 데스크톱 뷰 (lg) */}
         <div className="hidden lg:grid h-full grid-cols-[240px_1fr_240px] items-center gap-8">
           <Link href="/" className="flex items-center">
-            <LogoPng 
-              width={130} 
-              height={30} 
-              priority={true} 
-              className="object-contain my-auto" 
+            <LogoPng
+              width={130}
+              height={30}
+              priority={true}
+              className="object-contain my-auto"
             />
           </Link>
 
@@ -138,8 +141,8 @@ function Nav({
             <button
               onClick={openRequestModal}
               className={cn(
-                'text-sm text-gray-400 hover:text-[#EAFD66]',
-                'transition-colors duration-200'
+                "text-sm text-gray-400 hover:text-[#EAFD66]",
+                "transition-colors duration-200"
               )}
             >
               {t.header.nav.request}

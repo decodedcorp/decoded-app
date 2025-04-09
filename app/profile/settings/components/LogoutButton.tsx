@@ -6,7 +6,6 @@ import { useLocaleContext } from "@/lib/contexts/locale-context";
 
 function handleLogout() {
   window.sessionStorage.removeItem("USER_DOC_ID");
-  window.sessionStorage.removeItem("SUI_ACCOUNT");
   window.sessionStorage.removeItem("ACCESS_TOKEN");
   window.sessionStorage.removeItem("USER_EMAIL");
   window.sessionStorage.removeItem("USER_NICKNAME");
