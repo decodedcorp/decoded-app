@@ -21,7 +21,7 @@ import { useStatusMessage } from "@/components/ui/modal/status-modal/utils/use-s
 import { ArrowLeft, X } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ConfirmModal } from "./common/confirm-modal";
-import { RequestImage as APIRequestImage } from "@/lib/api/_types/request";
+import { RequestImage } from "@/lib/api/_types/request";
 // CSS는 globals.css에서 import
 
 // 간단한 모바일 환경 감지 훅
@@ -117,12 +117,12 @@ export function RequestFormModal({ isOpen, onClose }: RequestFormModalProps) {
     }
   }, [currentStep, selectedImage, points, contextAnswers?.location]);
 
-  // 개선된 이미지 압축 함수
+  // 이미지 최적화 함수 - 높은 해상도와 품질을 유지하도록 개선
   const compressImage = async (
     imageFile: File,
-    maxWidth = 1500,
-    maxHeight = 1500,
-    quality = 0.95
+    maxWidth = 2500, // 최대 너비 증가
+    maxHeight = 3125, // 4:5 비율에 맞춘 최대 높이 (2500 * 5/4 = 3125)
+    quality = 1.0 // 최대 품질
   ): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -133,25 +133,45 @@ export function RequestFormModal({ isOpen, onClose }: RequestFormModalProps) {
           const originalWidth = img.width;
           const originalHeight = img.height;
 
-          // 새로운 크기 계산 - 너무 크지 않게 적절히 제한
+          // 4:5 비율 계산을 위한 값
+          const targetRatio = 4 / 5;
+
+          // 새로운 크기 계산 - 4:5 비율 유지하면서 해상도 최대화
           let newWidth = originalWidth;
           let newHeight = originalHeight;
+          
+          // 원본 비율
+          const originalRatio = originalWidth / originalHeight;
 
-          if (originalWidth > maxWidth || originalHeight > maxHeight) {
-            if (originalWidth / originalHeight > maxWidth / maxHeight) {
-              // 가로가 더 긴 경우
+          // 비율 맞추기
+          if (originalRatio > targetRatio) {
+            // 너무 넓은 이미지는 높이에 맞추고 잘라내기
+            newWidth = originalHeight * targetRatio;
+            newHeight = originalHeight;
+          } else if (originalRatio < targetRatio) {
+            // 너무 높은 이미지는 넓이에 맞추고 잘라내기
+            newWidth = originalWidth;
+            newHeight = originalWidth / targetRatio;
+          }
+
+          // 최대 크기 제한 (해상도가 너무 높지 않도록)
+          if (newWidth > maxWidth || newHeight > maxHeight) {
+            if (newWidth > maxWidth) {
+              const scale = maxWidth / newWidth;
               newWidth = maxWidth;
-              newHeight = Math.floor(
-                originalHeight * (maxWidth / originalWidth)
-              );
-            } else {
-              // 세로가 더 긴 경우
+              newHeight = newHeight * scale;
+            }
+            
+            if (newHeight > maxHeight) {
+              const scale = maxHeight / newHeight;
               newHeight = maxHeight;
-              newWidth = Math.floor(
-                originalWidth * (maxHeight / originalHeight)
-              );
+              newWidth = newWidth * scale;
             }
           }
+
+          // 정수로 반올림
+          newWidth = Math.round(newWidth);
+          newHeight = Math.round(newHeight);
 
           // Canvas에 리사이징된 이미지 그리기
           const canvas = document.createElement("canvas");
@@ -159,11 +179,32 @@ export function RequestFormModal({ isOpen, onClose }: RequestFormModalProps) {
           canvas.height = newHeight;
 
           const ctx = canvas.getContext("2d");
-          ctx?.drawImage(img, 0, 0, newWidth, newHeight);
+          
+          // 이미지가 4:5 비율에 맞게 중앙에 배치되도록 계산
+          let sx = 0;
+          let sy = 0;
+          let sWidth = originalWidth;
+          let sHeight = originalHeight;
+
+          if (originalRatio > targetRatio) {
+            // 원본이 더 넓은 경우 좌우 잘라내기
+            sx = (originalWidth - (originalHeight * targetRatio)) / 2;
+            sWidth = originalHeight * targetRatio;
+          } else if (originalRatio < targetRatio) {
+            // 원본이 더 높은 경우 상하 잘라내기
+            sy = (originalHeight - (originalWidth / targetRatio)) / 2;
+            sHeight = originalWidth / targetRatio;
+          }
+
+          // 이미지를 캔버스에 그릴 때 smoothing 품질 설정
+          if (ctx) {
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, newWidth, newHeight);
+          }
 
           try {
-            // 최적의 품질로 JPEG 형식으로 변환
-            // 1.0 대신 0.95 사용 - 완벽한 품질(1.0)이 때로는 오류 발생 가능
+            // 최대 품질로 JPEG 형식으로 변환
             const compressedBase64 = canvas.toDataURL("image/jpeg", quality);
 
             // 포맷 검증 - 올바른 base64 문자열인지 확인
@@ -178,9 +219,12 @@ export function RequestFormModal({ isOpen, onClose }: RequestFormModalProps) {
             const base64String = compressedBase64.split(",")[1];
 
             // 결과 로깅
-            console.log("Image compression completed:", {
+            console.log("Image processing completed:", {
               originalSize: originalWidth + "x" + originalHeight,
+              originalRatio: originalRatio.toFixed(2),
               newSize: newWidth + "x" + newHeight,
+              newRatio: (newWidth / newHeight).toFixed(2),
+              targetRatio: targetRatio.toFixed(2),
               quality: quality,
               dataLength: base64String.length,
             });
@@ -220,25 +264,14 @@ export function RequestFormModal({ isOpen, onClose }: RequestFormModalProps) {
     }
 
     try {
-      // 이미지 압축 - 품질 0.95로 약간 낮추어 안정성 확보
-      const base64Image = await compressImage(imageFile, 1200, 1200, 0.95);
+      // 이미지 압축 - 품질 1.0으로 최대 품질 유지
+      const base64Image = await compressImage(imageFile, 2500, 3125, 1.0);
 
       // position 객체 명시적 생성 및 검증
       const requestItems = points.map((point) => {
         // 포지션 값에서 % 기호 제거 - API는 숫자 문자열 형태를 예상함
-        const leftPos =
-          typeof point.x === "number"
-            ? String(point.x)
-            : point.x
-            ? String(point.x).replace("%", "")
-            : "0";
-
-        const topPos =
-          typeof point.y === "number"
-            ? String(point.y)
-            : point.y
-            ? String(point.y).replace("%", "")
-            : "0";
+        const leftPos = typeof point.x === "number" ? String(point.x) : point.x ? String(point.x).replace("%", "") : "0";
+        const topPos = typeof point.y === "number" ? String(point.y) : point.y ? String(point.y).replace("%", "") : "0";
 
         return {
           item_class: null,
@@ -254,10 +287,10 @@ export function RequestFormModal({ isOpen, onClose }: RequestFormModalProps) {
         };
       });
 
-      // 요청 데이터 구성 - 속성명 수정 (requestedItems)
+      // 요청 데이터 구성 - 속성명 수정 (requestedItems -> requested_items)
       const requestData = {
         image_file: base64Image,
-        requestedItems: requestItems, // 속성명 수정됨
+        requested_items: requestItems,
         request_by: userId,
         context: contextAnswers.location,
         source: contextAnswers?.source || null,
@@ -270,7 +303,7 @@ export function RequestFormModal({ isOpen, onClose }: RequestFormModalProps) {
         requestItems.map((item) => item.position)
       );
 
-      await createRequest(requestData as unknown as APIRequestImage, userId);
+      await createRequest(requestData as RequestImage, userId);
       onClose(); // Close the modal on success
     } catch (error) {
       console.error("=== Submit Error ===");
