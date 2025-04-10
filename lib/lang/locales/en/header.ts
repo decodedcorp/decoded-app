@@ -4,7 +4,8 @@ export const header = {
     request: "Request",
     login: {
       button: {
-        text: "Login",
+        login: "Login",
+        logout: "Logout",
         loading: "Logging in...",
         myPage: "My Page",
       },

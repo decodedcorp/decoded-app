@@ -22,6 +22,8 @@ export const common = {
       apple: "Continue with Apple",
     },
     logout: "Disconnect",
+    copySuccess: "Copied to clipboard successfully",
+    copyFailed: "Failed to copy to clipboard",
   },
   placeHolder: {
     description: "Enter description",

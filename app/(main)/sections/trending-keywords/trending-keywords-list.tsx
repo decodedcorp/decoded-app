@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
-import { useTrendingKeywords } from './hooks/use-trending-keywords';
-import { motion } from 'framer-motion';
-import { pretendardSemiBold } from '@/lib/constants/fonts';
+import { useTrendingKeywords } from "./hooks/use-trending-keywords";
+import { motion } from "framer-motion";
+import { pretendardBold, pretendardSemiBold } from "@/lib/constants/fonts";
 
 export function TrendingKeywordsList() {
   const router = useRouter();
@@ -13,7 +13,7 @@ export function TrendingKeywordsList() {
   const handleKeywordClick = (keyword: string) => {
     router.push(`/search?q=${encodeURIComponent(keyword)}`);
   };
-  
+
   if (isLoading) return <div>키워드를 불러오는 중...</div>;
 
   return (
@@ -21,7 +21,7 @@ export function TrendingKeywordsList() {
       {response?.data?.map((keyword: string, index) => (
         <motion.span
           key={index}
-          className={`${pretendardSemiBold.className} text-gray-600 text-[2.5rem] sm:text-[3rem] hover:text-[#EAFD66] transition-colors duration-200 cursor-pointer`}
+          className={`${pretendardBold.className} text-gray-600 text-[2.5rem] sm:text-[3rem] hover:text-[#EAFD66] transition-colors duration-200 cursor-pointer`}
           onClick={() => handleKeywordClick(keyword)}
           whileHover={{ x: 20 }}
           transition={{ type: "spring", stiffness: 300 }}
