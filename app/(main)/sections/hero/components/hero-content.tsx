@@ -6,7 +6,9 @@ import { useRequestModal } from "@/components/modals/request/hooks/use-request-m
 
 export function HeroContent() {
   const { t } = useLocaleContext();
-  const { onOpen: openRequestModal, RequestModal } = useRequestModal();
+  const { onOpen: openRequestModal, RequestModal } = useRequestModal({
+    isRequest: true,
+  });
 
   return (
     <div className="w-full flex flex-col items-center justify-center gap-6 px-4 sm:px-4 lg:px-6">
