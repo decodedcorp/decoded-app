@@ -8,7 +8,11 @@ import {
 } from "@/lib/hooks/auth/use-protected-action";
 import { useLoginModalStore } from "@/components/auth/login-modal/store";
 
-export const useRequestModal = () => {
+interface RequestModalProps {
+  isRequest?: boolean;
+}
+
+export const useRequestModal = ({ isRequest = true }: RequestModalProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const { checkAuth } = useProtectedAction();
   const { openLoginModal } = useLoginModalStore();
@@ -53,6 +57,12 @@ export const useRequestModal = () => {
     onOpen,
     onClose,
     isOpen,
-    RequestModal: <RequestFormModal isOpen={isOpen} onClose={onClose} />,
+    RequestModal: (
+      <RequestFormModal
+        isOpen={isOpen}
+        onClose={onClose}
+        isRequest={isRequest}
+      />
+    ),
   };
 };

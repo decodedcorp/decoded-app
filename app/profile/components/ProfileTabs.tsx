@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ActivityTabs } from "./ActivityTabs";
 import { StyleTab } from "./StyleTab";
@@ -36,7 +36,7 @@ export function ProfileTabs({ userDocId }: ProfileTabsProps) {
             />
           )}
         </button>
-        {/* <button
+        <button
           className={`px-4 py-2 text-sm ${
             pretendardSemiBold.className
           } relative ${
@@ -54,12 +54,13 @@ export function ProfileTabs({ userDocId }: ProfileTabsProps) {
               className="absolute bottom-0 left-0 right-0 h-1 bg-gray-400"
             />
           )}
-        </button> */}
+        </button>
       </div>
 
       {/* 탭 컨텐츠 */}
       <div className="mt-4">
-        <ActivityTabs userDocId={userDocId} />
+        {activeTab === "activity" && <ActivityTabs userDocId={userDocId} />}
+        {activeTab === "style" && <StyleTab userDocId={userDocId} />}
       </div>
     </div>
   );

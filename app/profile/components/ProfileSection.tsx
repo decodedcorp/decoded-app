@@ -59,39 +59,35 @@ export function ProfileSection({ userDocId }: ProfileSectionProps) {
   const [userNickname, setUserNickname] = useState<string | null>(null);
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [isOwner, setIsOwner] = useState(false);
   const [suiAccount, setSuiAccount] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState(false);
   const [open, setOpen] = useState(false);
-  const [isOwnProfile, setIsOwnProfile] = useState(false);
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
     const fetchUserData = async () => {
       if (typeof window === "undefined") return;
-
       const currentUserDocId = window.sessionStorage.getItem("USER_DOC_ID");
-
-      // 표시할 대상 userDocId 결정
-      const targetUserId = userDocId || currentUserDocId;
-
-      // 자신의 프로필인지 다른 사람의 프로필인지 확인
-      setIsOwnProfile(!userDocId || userDocId === currentUserDocId);
-      if (isOwnProfile) {
+      if (currentUserDocId === userDocId) {
+        setIsOwner(true);
+      }
+      if (isOwner) {
         setUserEmail(window.sessionStorage.getItem("USER_EMAIL"));
       }
 
-      if (!targetUserId) {
+      if (!userDocId) {
         console.error("User ID not found");
         return;
       }
 
       try {
         const response = await networkManager.request(
-          `/user/${targetUserId}/profile`,
+          `/user/${userDocId}/profile`,
           "GET",
           null
         );
-
+        console.log("response:", response);
         if (response && response.data) {
           const profileData = response.data;
           setUserNickname(profileData.aka);
@@ -102,16 +98,16 @@ export function ProfileSection({ userDocId }: ProfileSectionProps) {
         console.error("프로필 정보 가져오기 실패:", error);
       }
 
-      getUserStats(targetUserId);
+      getUserStats(userDocId);
     };
 
     if (isLogin || userDocId) {
       fetchUserData();
     }
-  }, [isLogin, isInitialized, userDocId, isOwnProfile]);
+  }, [isLogin, isInitialized, userDocId, isOwner]);
 
   const formatSuiAddress = (address: string | null) => {
-    if (!address) return "연결된 계정 없음";
+    if (!address) return "";
     if (address.length <= 12) return address;
     return `${address.substring(0, 6)}...${address.substring(
       address.length - 4
@@ -310,7 +306,7 @@ export function ProfileSection({ userDocId }: ProfileSectionProps) {
             </div> */}
           </div>
 
-          {isOwnProfile && (
+          {isOwner && (
             <div className="flex items-center space-x-2">
               {SettingsModal}
               <LogoutButton />

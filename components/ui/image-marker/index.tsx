@@ -1,12 +1,16 @@
-'use client';
+"use client";
 
-import React, { useRef, useState, useEffect, useCallback } from 'react';
-import Image from 'next/image';
-import { Point, useImageMarker } from '@/lib/hooks/features/images/useImageMarker';
-import { X, Trash2 } from 'lucide-react';
-import { cn } from '@/lib/utils/style';
+import React, { useRef, useState, useEffect, useCallback } from "react";
+import Image from "next/image";
+import {
+  Point,
+  useImageMarker,
+} from "@/lib/hooks/features/images/useImageMarker";
+import { X, Trash2 } from "lucide-react";
+import { cn } from "@/lib/utils/style";
 
 interface ImageMarkerProps {
+  isRequest: boolean;
   imageUrl: string;
   points: Point[];
   onPointsChange: (points: Point[]) => void;
@@ -18,6 +22,7 @@ interface ImageMarkerProps {
 }
 
 export function ImageMarker({
+  isRequest,
   imageUrl,
   points,
   onPointsChange,
@@ -31,7 +36,7 @@ export function ImageMarker({
   const [isEditing, setIsEditing] = useState(false);
   const [editingPoint, setEditingPoint] = useState<Point | null>(null);
   const [showWarning, setShowWarning] = useState(false);
-  
+
   const { calculatePointPosition } = useImageMarker({
     initialPoints: points,
     onChange: onPointsChange,
@@ -44,57 +49,68 @@ export function ImageMarker({
     }
   }, [selectedPointIndex]);
 
+  const handleDeleteClick = useCallback(
+    (e: React.MouseEvent, index: number) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-  const handleDeleteClick = useCallback((e: React.MouseEvent, index: number) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // onPointRemove가 있으면 그것을 사용하고, 없으면 onPointsChange 사용
-    if (onPointRemove) {
-      onPointRemove(index);
-    } else {
-      const newPoints = [...points];
-      newPoints.splice(index, 1);
-      onPointsChange(newPoints);
-    }
-    
-    // UI 상태 초기화
-    setIsEditing(false);
-    setEditingPoint(null);
-  }, [points, onPointsChange, onPointRemove]);
+      // onPointRemove가 있으면 그것을 사용하고, 없으면 onPointsChange 사용
+      if (onPointRemove) {
+        onPointRemove(index);
+      } else {
+        const newPoints = [...points];
+        newPoints.splice(index, 1);
+        onPointsChange(newPoints);
+      }
+
+      // UI 상태 초기화
+      setIsEditing(false);
+      setEditingPoint(null);
+    },
+    [points, onPointsChange, onPointRemove]
+  );
 
   const handleCloseClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     // 편집 모드만 종료
     setIsEditing(false);
     setEditingPoint(null);
   }, []);
 
-  const handleImageClick = useCallback((e: React.MouseEvent) => {
-    if (disableEditing) return;
-    
-    const rect = imageRef.current?.getBoundingClientRect();
-    if (!rect) return;
+  const handleImageClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (disableEditing) return;
 
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
+      const rect = imageRef.current?.getBoundingClientRect();
+      if (!rect) return;
 
-    if (points.length > 0) {
-      setShowWarning(true);
-      setTimeout(() => setShowWarning(false), 2000);
-      return;
-    }
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      if (isRequest) {
+        if (points.length > 0) {
+          setShowWarning(true);
+          setTimeout(() => setShowWarning(false), 2000);
+          return;
+        }
+      }
 
-    const newPoint = { x, y, context: '' };
-    onPointsChange([...points, newPoint]);
-    setIsEditing(true);
-    setEditingPoint(newPoint);
-  }, [points, onPointsChange, disableEditing]);
+      const newPoint = { x, y, context: "" };
+      onPointsChange([...points, newPoint]);
+      setIsEditing(true);
+      setEditingPoint(newPoint);
+    },
+    [points, onPointsChange, disableEditing]
+  );
 
   return (
-    <div className={cn("relative w-full aspect-[4/5] overflow-hidden cursor-crosshair", className)}>
+    <div
+      className={cn(
+        "relative w-full aspect-[4/5] overflow-hidden cursor-crosshair",
+        className
+      )}
+    >
       {showWarning && (
         <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 animate-fade-in w-full">
           <div className="flex items-center gap-2 bg-black/90 text-[#EAFD66] px-4 py-2.5 rounded-lg text-sm backdrop-blur-sm border border-[#EAFD66]/20">
@@ -115,7 +131,7 @@ export function ImageMarker({
           </div>
         </div>
       )}
-      
+
       {points.length === 0 && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
           <div className="flex items-center gap-2 bg-black/80 text-zinc-300 px-4 py-2.5 rounded-lg text-sm backdrop-blur-sm border border-zinc-800/50">
