@@ -27,7 +27,9 @@ function Nav({
 }: NavProps) {
   const { t } = useLocaleContext();
   const [isIconLoginModalOpen, setIconLoginModalOpen] = useState(false);
-  const { onOpen: openRequestModal, RequestModal } = useRequestModal();
+  const { onOpen: openRequestModal, RequestModal } = useRequestModal({
+    isRequest: true,
+  });
 
   // 로그인 모달 스토어 사용 - LoginButton 컴포넌트와 같은 스토어 공유
   const {

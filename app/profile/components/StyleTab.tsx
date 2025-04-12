@@ -20,9 +20,113 @@ interface UserStyle {
 }
 
 export function StyleTab({ userDocId }: StyleTabProps) {
+  const [isOwner, setIsOwner] = useState(false);
+  useEffect(() => {
+    const currentUserDocId = window.sessionStorage.getItem("USER_DOC_ID");
+    if (currentUserDocId === userDocId) {
+      setIsOwner(true);
+    }
+  }, [userDocId]);
+  if (isOwner) {
+    return <OwnerStyleTab userDocId={userDocId} />;
+  } else {
+    return <OtherUserStyleTab userDocId={userDocId} />;
+  }
+}
+
+function OtherUserStyleTab({ userDocId }: { userDocId: string }) {
   const [isLoading, setIsLoading] = useState(true);
   const [styles, setStyles] = useState<UserStyle[]>([]);
-  const { onOpen: openRequestModal, RequestModal } = useRequestModal();
+  const [selectedStyle, setSelectedStyle] = useState<UserStyle | null>(null);
+
+  useEffect(() => {
+    const fetchUserStyles = async () => {
+      try {
+        // 실제 구현에서는 API 호출로 대체해야 합니다
+        setTimeout(() => {
+          const userStyles: UserStyle[] = [];
+          setStyles(userStyles);
+          setIsLoading(false);
+        }, 1000);
+      } catch (error) {
+        console.error("사용자 스타일 데이터 로딩 오류:", error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserStyles();
+  }, [userDocId]);
+
+  const handleStyleClick = (style: UserStyle) => {
+    setSelectedStyle(style);
+    // 여기서 모달을 열거나 상세 페이지로 이동하는 로직을 추가할 수 있습니다
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-white/50" />
+      </div>
+    );
+  }
+
+  if (styles.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 space-y-6">
+        <div className="text-center space-y-2 max-w-md">
+          <h3 className="text-xl font-semibold text-white">
+            등록한 스타일이 없습니다
+          </h3>
+          <p className="text-white/60">
+            이 사용자는 아직 스타일을 등록하지 않았습니다.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-semibold text-white">스타일</h2>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {styles.map((style) => (
+          <Card
+            key={style.id}
+            className="bg-[#1A1A1A] border-white/5 overflow-hidden hover:shadow-lg transition-all duration-200 cursor-pointer"
+            onClick={() => handleStyleClick(style)}
+          >
+            <div className="relative aspect-[4/5] w-full overflow-hidden">
+              <Image
+                src={style.imageUrl}
+                alt={style.name}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover"
+                unoptimized
+              />
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                <h3 className="text-white font-medium">{style.name}</h3>
+                <p className="text-white/70 text-xs mt-1">
+                  {new Date(style.createdAt).toLocaleDateString("ko-KR")}
+                </p>
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function OwnerStyleTab({ userDocId }: { userDocId: string }) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [styles, setStyles] = useState<UserStyle[]>([]);
+  const { onOpen: openRequestModal, RequestModal } = useRequestModal({
+    isRequest: false,
+  });
 
   useEffect(() => {
     const fetchUserStyles = async () => {

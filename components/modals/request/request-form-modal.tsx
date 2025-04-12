@@ -49,10 +49,15 @@ function useIsMobile() {
 
 interface RequestFormModalProps {
   isOpen: boolean;
+  isRequest: boolean;
   onClose: () => void;
 }
 
-export function RequestFormModal({ isOpen, onClose }: RequestFormModalProps) {
+export function RequestFormModal({
+  isOpen,
+  onClose,
+  isRequest,
+}: RequestFormModalProps) {
   const { t } = useLocaleContext();
   const router = useRouter();
   const { createRequest } = useRequestData("");
@@ -452,6 +457,7 @@ export function RequestFormModal({ isOpen, onClose }: RequestFormModalProps) {
   }, []);
 
   const imageContainerProps = {
+    isRequest,
     step: currentStep,
     selectedImage: selectedImage,
     imageFile: imageFile,

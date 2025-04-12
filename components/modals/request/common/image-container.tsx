@@ -41,6 +41,7 @@ interface Area {
 }
 
 interface ImageContainerProps {
+  isRequest: boolean;
   step: number;
   selectedImage: string | null;
   imageFile: File | null;
@@ -149,6 +150,7 @@ export const ImageContainer = forwardRef<
 >(
   (
     {
+      isRequest,
       step,
       selectedImage,
       imageFile,
@@ -1290,6 +1292,7 @@ export const ImageContainer = forwardRef<
       return (
         <div className="relative w-full h-full max-h-full overflow-hidden flex items-center justify-center bg-[#232323]">
           <ImageMarker
+            isRequest={isRequest}
             imageUrl={selectedImage}
             points={points}
             onPointsChange={onPointsChange}
