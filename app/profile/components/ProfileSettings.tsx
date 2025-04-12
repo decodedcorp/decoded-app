@@ -27,18 +27,22 @@ interface AgreementsResponse {
 interface ProfileSettingsProps {
   userEmail: string | null;
   userNickname: string | null;
+  currentProfileImage: string | null;
   onClose: () => void;
 }
 
 export function ProfileSettings({
   userEmail,
   userNickname,
+  currentProfileImage,
   onClose,
 }: ProfileSettingsProps) {
   const { t } = useLocaleContext();
   const [nickname, setNickname] = useState(userNickname || "");
   const [isLoading, setIsLoading] = useState(false);
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [profileImage, setProfileImage] = useState<string | null>(
+    currentProfileImage
+  );
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [marketingConsent, setMarketingConsent] = useState<boolean>(false);
   const [isLoadingAgreements, setIsLoadingAgreements] = useState(true);
@@ -189,16 +193,6 @@ export function ProfileSettings({
         requestBody
       );
 
-      window.sessionStorage.setItem("USER_NICKNAME", nickname);
-      window.localStorage.setItem(
-        "MARKETING_CONSENT",
-        marketingConsent.toString()
-      );
-
-      if (profileImage) {
-        window.sessionStorage.setItem("USER_PROFILE_IMAGE", profileImage);
-      }
-
       toast.success("프로필이 업데이트되었습니다");
       onClose();
 
@@ -243,19 +237,6 @@ export function ProfileSettings({
                 <Camera className="h-8 w-8 text-white" />
               </div>
             </div>
-          )}
-
-          {profileImage && (
-            <button
-              type="button"
-              className="absolute -top-1 -right-1 h-6 w-6 rounded-full bg-red-500 flex items-center justify-center"
-              onClick={(e) => {
-                e.stopPropagation();
-                removeImage();
-              }}
-            >
-              <X className="h-4 w-4 text-white" />
-            </button>
           )}
         </div>
 

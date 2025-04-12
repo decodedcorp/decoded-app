@@ -210,6 +210,7 @@ export function ProfileSection({ userDocId }: ProfileSectionProps) {
         <ProfileSettings
           userEmail={userEmail}
           userNickname={userNickname}
+          currentProfileImage={profileImage}
           onClose={() => setOpen(false)}
         />
       </SheetContent>
@@ -232,6 +233,7 @@ export function ProfileSection({ userDocId }: ProfileSectionProps) {
         <ProfileSettings
           userEmail={userEmail}
           userNickname={userNickname}
+          currentProfileImage={profileImage}
           onClose={() => setOpen(false)}
         />
       </DialogContent>

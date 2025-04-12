@@ -7,14 +7,14 @@ export const metadata: Metadata = {
   description: "내 프로필과 활동 내역을 확인할 수 있습니다.",
 };
 
-interface ProfilePageProps {
-  params: {
-    userId: string;
-  };
-}
+type ProfilePageProps = Promise<{ userId: string }>;
 
-export default function ProfilePage({ params }: ProfilePageProps) {
-  const { userId } = params;
+export default async function ProfilePage({
+  params,
+}: {
+  params: ProfilePageProps;
+}) {
+  const { userId } = await params;
 
   return (
     <div className="container mx-auto px-4 py-8">
