@@ -24,6 +24,11 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ConfirmModal } from "./common/confirm-modal";
 import { RequestImage } from "@/lib/api/_types/request";
 import { motion } from "framer-motion";
+import { StylePointForm, StylePoint } from "./style-point-form";
+import { 
+  StyleContextSidebar, 
+  ContextAnswer as StyleContextAnswer 
+} from "./style-context-sidebar";
 // CSS는 globals.css에서 import
 
 // 간단한 모바일 환경 감지 훅
@@ -55,288 +60,13 @@ interface RequestFormModalProps {
   onClose: () => void;
 }
 
-// 기존 Point 인터페이스 확장 - context 제거
-interface StylePoint extends Point {
-  brand?: string;
-  price?: string;
-  // context는 제거
-}
-
-// 스타일 영감 링크 인터페이스 추가
-interface InspirationLink {
-  id: string;
-  category: string;
-  url: string;
-}
-
 // 확장된 ContextAnswer 인터페이스 정의
 interface ContextAnswer extends BaseContextAnswer {
-  inspirationLinks?: InspirationLink[];
-}
-
-// Style Form만을 위한 StyleContextSidebar 컴포넌트 추가
-function StyleContextSidebar({
-  onAnswerChange,
-  onSubmit,
-  isMobile = false,
-}: {
-  onAnswerChange: (answer: ContextAnswer) => void;
-  onSubmit?: () => void;
-  isMobile?: boolean;
-}) {
-  const { t } = useLocaleContext();
-  const [styleName, setStyleName] = useState("");
-  const [inspirationLinks, setInspirationLinks] = useState<InspirationLink[]>([]);
-  const [newCategory, setNewCategory] = useState("영상");
-  const [newUrl, setNewUrl] = useState("");
-  
-  // 모바일 시트 관련 상태 추가
-  const [sheetHeight, setSheetHeight] = useState<number>(isMobile ? 42 : 100);
-  const [isDragging, setIsDragging] = useState(false);
-  const [sheetPosition, setSheetPosition] = useState<"collapsed" | "middle" | "expanded">("middle");
-  
-  // 카테고리 옵션
-  const categoryOptions = ["영상", "글", "쇼핑몰", "음악", "영화", "기타"];
-
-  // 스타일 이름 변경 핸들러 - 즉시 반영되도록 수정
-  const handleStyleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newName = e.target.value;
-    setStyleName(newName);
-    
-    // 한글 입력을 위해 디바운스 없이 바로 업데이트
-    onAnswerChange({
-      location: newName,
-      inspirationLinks
-    });
-  };
-
-  const handleAddInspirationLink = () => {
-    if (newUrl.trim()) {
-      const newLinks = [
-        ...inspirationLinks,
-        {
-          id: String(inspirationLinks.length), // 인덱스 기반 ID 사용
-          category: newCategory,
-          url: newUrl.trim(),
-        },
-      ];
-      setInspirationLinks(newLinks);
-      setNewUrl("");
-      
-      // 링크 추가 후 부모에게 바로 알림
-      onAnswerChange({
-        location: styleName,
-        inspirationLinks: newLinks
-      });
-    }
-  };
-
-  const handleRemoveInspirationLink = (id: string) => {
-    const newLinks = inspirationLinks.filter(link => link.id !== id);
-    setInspirationLinks(newLinks);
-    
-    // 링크 삭제 후 부모에게 바로 알림
-    onAnswerChange({
-      location: styleName,
-      inspirationLinks: newLinks
-    });
-  };
-
-  // 모바일 시트 드래그 관련 핸들러 추가
-  const handleDrag = (info: any) => {
-    if (!isMobile) return;
-
-    const newHeight = Math.max(
-      20,
-      Math.min(90, sheetHeight - info.delta.y * 0.2)
-    );
-    setSheetHeight(newHeight);
-  };
-
-  const handleDragStart = () => setIsDragging(true);
-  const handleDragEnd = () => {
-    setIsDragging(false);
-
-    if (sheetHeight < 25) {
-      setSheetHeight(20);
-      setSheetPosition("collapsed");
-    } else if (sheetHeight > 60) {
-      setSheetHeight(80);
-      setSheetPosition("expanded");
-    } else {
-      setSheetHeight(42);
-      setSheetPosition("middle");
-    }
-  };
-
-  const toggleSheetHeight = () => {
-    if (sheetPosition !== "expanded") {
-      setSheetHeight(80);
-      setSheetPosition("expanded");
-    } else {
-      setSheetHeight(42);
-      setSheetPosition("middle");
-    }
-  };
-
-  const handleBackdropClick = () => {
-    if (sheetPosition === "expanded") {
-      setSheetHeight(42);
-      setSheetPosition("middle");
-    } else {
-      setSheetHeight(20);
-      setSheetPosition("collapsed");
-    }
-  };
-
-  return (
-    <>
-      {isMobile && (
-        <div
-          className="fixed top-16 inset-x-0 bottom-0 bg-black/30 z-30"
-          style={{
-            opacity: sheetPosition === "collapsed" ? 0 : 0.3,
-            transition: "opacity 0.3s ease",
-          }}
-          onClick={handleBackdropClick}
-        />
-      )}
-
-      <motion.div
-        className={cn(
-          "w-full h-full flex flex-col bg-[#1A1A1A]",
-          isMobile &&
-            "fixed bottom-0 left-0 right-0 rounded-t-2xl shadow-lg z-40"
-        )}
-        style={
-          isMobile
-            ? {
-                height: `${sheetHeight}vh`,
-                transition: isDragging
-                  ? "none"
-                  : "height 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-              }
-            : undefined
-        }
-        initial={isMobile ? { y: "100%" } : undefined}
-        animate={isMobile ? { y: 0 } : undefined}
-        transition={{ type: "spring", damping: 20, stiffness: 300 }}
-      >
-        {isMobile && (
-          <motion.div
-            className="h-10 w-full flex flex-col items-center justify-center cursor-grab active:cursor-grabbing py-3 bg-[#1A1A1A]"
-            drag="y"
-            dragConstraints={{ top: 0, bottom: 0 }}
-            dragElastic={0.1}
-            onDrag={handleDrag}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-            onTap={toggleSheetHeight}
-          >
-            <div className="w-14 h-1 bg-zinc-600 rounded-full mb-1"></div>
-            {sheetPosition !== "expanded" && (
-              <span className="text-xs text-zinc-500 mt-1">펼쳐서 보기</span>
-            )}
-          </motion.div>
-        )}
-        <div className="p-5 space-y-6">
-          <div className="space-y-3">
-            <label className="block text-sm font-medium text-white">
-              스타일 이름
-            </label>
-            <input
-              type="text"
-              value={styleName}
-              onChange={handleStyleNameChange}
-              placeholder="스타일의 이름을 입력하세요"
-              className="w-full px-3 py-2.5 bg-[#232323] border border-gray-700 rounded-md text-sm text-white focus:border-[#EAFD66] focus:outline-none focus:ring-1 focus:ring-[#EAFD66]"
-            />
-          </div>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                영감 링크 추가
-              </label>
-              
-              {/* 링크 입력 폼 */}
-              <div className="flex flex-col space-y-3">
-                <div className="grid grid-cols-4 gap-2">
-                  <select
-                    value={newCategory}
-                    onChange={(e) => setNewCategory(e.target.value)}
-                    className="col-span-1 px-3 py-2.5 bg-[#232323] border border-gray-700 rounded-md text-sm text-white focus:border-[#EAFD66] focus:outline-none focus:ring-1 focus:ring-[#EAFD66]"
-                  >
-                    {categoryOptions.map(option => (
-                      <option key={option} value={option}>{option}</option>
-                    ))}
-                  </select>
-                  <input
-                    type="text"
-                    value={newUrl}
-                    onChange={(e) => setNewUrl(e.target.value)}
-                    placeholder="URL을 입력하세요"
-                    className="col-span-3 px-3 py-2.5 bg-[#232323] border border-gray-700 rounded-md text-sm text-white focus:border-[#EAFD66] focus:outline-none focus:ring-1 focus:ring-[#EAFD66]"
-                  />
-                </div>
-                <button
-                  onClick={handleAddInspirationLink}
-                  disabled={!newUrl.trim()}
-                  className={cn(
-                    "w-full py-2.5 text-sm rounded-md transition-colors font-medium",
-                    newUrl.trim() 
-                      ? "bg-[#EAFD66] text-[#1A1A1A] hover:bg-[#EAFD66]/90" 
-                      : "bg-gray-700 text-gray-400 cursor-not-allowed"
-                  )}
-                >
-                  링크 추가
-                </button>
-              </div>
-            </div>
-            
-            {/* 추가된 링크 목록 */}
-            {inspirationLinks.length > 0 && (
-              <div className="mt-5">
-                <h3 className="text-sm font-medium text-white mb-3">추가된 영감 링크</h3>
-                <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
-                  {inspirationLinks.map(link => (
-                    <div 
-                      key={link.id} 
-                      className="flex items-center justify-between p-3 bg-[#232323] border border-gray-700 rounded-md hover:border-gray-600 transition-colors"
-                    >
-                      <div className="flex items-center space-x-2 max-w-[85%]">
-                        <span className="text-xs px-2 py-1 bg-[#2A2A2A] rounded text-[#EAFD66] whitespace-nowrap">
-                          {link.category}
-                        </span>
-                        <a 
-                          href={link.url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-sm text-blue-400 hover:text-blue-300 hover:underline truncate"
-                        >
-                          {link.url}
-                        </a>
-                      </div>
-                      <button
-                        onClick={(e) => {
-                          // 이벤트 전파 방지
-                          e.stopPropagation();
-                          handleRemoveInspirationLink(link.id);
-                        }}
-                        className="p-1 text-gray-400 hover:text-red-400 transition-colors"
-                      >
-                        <X size={16} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </motion.div>
-    </>
-  );
+  inspirationLinks?: Array<{
+    id: string;
+    category: string;
+    url: string;
+  }>;
 }
 
 export function RequestFormModal({
@@ -912,118 +642,6 @@ export function RequestFormModal({
     return "다음";
   };
 
-  // 여기서 StylePointForm 컴포넌트를 분리
-  function StylePointForm() {
-    const pointData = selectedPoint !== null ? points[selectedPoint] as StylePoint : null;
-    const [localBrand, setLocalBrand] = useState("");
-    const [localPrice, setLocalPrice] = useState("");
-    
-    // 선택된 점이 변경될 때마다 로컬 상태를 업데이트
-    useEffect(() => {
-      if (pointData) {
-        setLocalBrand(pointData.brand || "");
-        setLocalPrice(pointData.price || "");
-      }
-    }, [pointData]);
-    
-    const handleSave = () => {
-      if (selectedPoint !== null) {
-        const newPoints = [...points];
-        newPoints[selectedPoint] = {
-          ...newPoints[selectedPoint],
-          brand: localBrand,
-          price: localPrice
-        } as StylePoint;
-        setPoints(newPoints);
-        setSelectedPoint(null);
-      }
-    };
-    
-    if (!pointData) return null;
-    
-    return (
-      <Dialog 
-        open={selectedPoint !== null && currentStep === 2 && modalType === "style"} 
-        onOpenChange={(open) => {
-          // open이 false일 때만 처리하고, 아이템 정보 모달만 닫음
-          if (!open) {
-            setSelectedPoint(null);
-          }
-        }}
-      >
-        <DialogContent 
-          className="bg-[#1A1A1A] border border-gray-700 p-5 rounded-lg max-w-xs w-full shadow-xl"
-          onInteractOutside={(e) => {
-            e.preventDefault();
-            // 이벤트 전파 중단하여 부모 모달에 영향 없게 함
-            e.stopPropagation();
-          }}
-          onEscapeKeyDown={(e) => {
-            e.preventDefault();
-            // 이벤트 전파 중단하여 부모 모달에 영향 없게 함
-            e.stopPropagation();
-          }}
-          style={{ zIndex: 300000 }}
-        >
-          <div className="flex justify-between items-center mb-4">
-            <DialogTitle className="text-base font-medium text-white">아이템 정보</DialogTitle>
-            <button 
-              onClick={(e) => {
-                // 이벤트 전파 방지
-                e.stopPropagation();
-                setSelectedPoint(null);
-              }}
-              className="p-1.5 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
-            >
-              <X size={16} />
-            </button>
-          </div>
-          
-          <div className="space-y-5">
-            <div>
-              <label className="text-sm text-gray-300 block mb-1.5">브랜드</label>
-              <input
-                type="text"
-                value={localBrand}
-                onChange={(e) => setLocalBrand(e.target.value)}
-                placeholder="브랜드명"
-                className="w-full px-3 py-2.5 bg-[#232323] border border-gray-700 rounded-md text-sm text-white focus:border-[#EAFD66] focus:outline-none focus:ring-1 focus:ring-[#EAFD66]"
-              />
-            </div>
-            
-            <div>
-              <label className="text-sm text-gray-300 block mb-1.5">가격</label>
-              <input
-                type="text"
-                value={localPrice}
-                onChange={(e) => setLocalPrice(e.target.value)}
-                placeholder="가격"
-                className="w-full px-3 py-2.5 bg-[#232323] border border-gray-700 rounded-md text-sm text-white focus:border-[#EAFD66] focus:outline-none focus:ring-1 focus:ring-[#EAFD66]"
-              />
-            </div>
-            
-            <div className="flex space-x-3 mt-5">
-              <button
-                onClick={handleDeleteMarker}
-                className="flex items-center justify-center py-2.5 px-3 bg-red-600/20 text-red-400 hover:bg-red-600/30 border border-red-600/30 rounded-md text-sm font-medium transition-colors"
-              >
-                <Trash2 size={15} className="mr-1.5" />
-                마커 삭제
-              </button>
-              
-              <button
-                onClick={handleSave}
-                className="flex-1 py-2.5 bg-[#EAFD66] text-[#1A1A1A] rounded-md text-sm font-medium hover:bg-[#EAFD66]/90 transition-colors"
-              >
-                저장
-              </button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
-  }
-
   return (
     <>
       {/* Main Modal Content */}
@@ -1223,7 +841,13 @@ export function RequestFormModal({
                     {/* 모바일용 슬라이드 컨텍스트 사이드바 */}
                     {modalType === "style" ? (
                       <StyleContextSidebar
-                        onAnswerChange={(answer) => setContextAnswers(answer)}
+                        onAnswerChange={(answer) => {
+                          // StyleContextAnswer를 ContextAnswer로 변환
+                          setContextAnswers({
+                            location: answer.location || "스타일",
+                            inspirationLinks: answer.inspirationLinks
+                          });
+                        }}
                         onSubmit={handleSubmit}
                         isMobile={true}
                       />
@@ -1272,7 +896,13 @@ export function RequestFormModal({
                     <div className="h-full w-full bg-[#1A1A1A]">
                       {modalType === "style" ? (
                         <StyleContextSidebar
-                          onAnswerChange={(answer) => setContextAnswers(answer)}
+                          onAnswerChange={(answer) => {
+                            // StyleContextAnswer를 ContextAnswer로 변환
+                            setContextAnswers({
+                              location: answer.location || "스타일",
+                              inspirationLinks: answer.inspirationLinks
+                            });
+                          }}
                           onSubmit={handleSubmit}
                           isMobile={isMobile}
                         />
@@ -1336,7 +966,14 @@ export function RequestFormModal({
       </Dialog>
 
       {/* 스타일 아이템 정보 모달 - 스타일 모달에서만 표시 */}
-      {modalType === "style" && <StylePointForm />}
+      {modalType === "style" && <StylePointForm 
+        selectedPoint={selectedPoint}
+        points={points}
+        currentStep={currentStep}
+        setPoints={setPoints}
+        setSelectedPoint={setSelectedPoint}
+        handleDeleteMarker={handleDeleteMarker}
+      />}
 
       {/* StatusModal - Dialog 외부로 이동시켜 최상위 z-index 보장 */}
       <StatusModal
