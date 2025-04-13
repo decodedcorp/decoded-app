@@ -61,7 +61,9 @@ function processRandomImage(image: RandomImageResource): ProcessedImage | null {
 }
 
 export function useHeroBannerImage(): HeroBannerState {
-  const [processedImage, setProcessedImage] = useState<ProcessedImage | null>(null);
+  const [processedImage, setProcessedImage] = useState<ProcessedImage | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -69,11 +71,11 @@ export function useHeroBannerImage(): HeroBannerState {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await imagesAPI.getRandomResources(1);
       const { label, resources } = response.data;
 
-      if (label !== 'image' || !resources.length) {
+      if (label !== "image" || !resources.length) {
         setProcessedImage(null);
         return;
       }
@@ -87,12 +89,15 @@ export function useHeroBannerImage(): HeroBannerState {
         throw new Error("No valid images found");
       }
 
-      const randomImage = validImages[Math.floor(Math.random() * validImages.length)];
-      
+      const randomImage =
+        validImages[Math.floor(Math.random() * validImages.length)];
+
       setProcessedImage(randomImage);
     } catch (error) {
       console.error("Failed to fetch images:", error);
-      setError(error instanceof Error ? error : new Error("Failed to fetch images"));
+      setError(
+        error instanceof Error ? error : new Error("Failed to fetch images")
+      );
       setProcessedImage(null);
     } finally {
       setLoading(false);

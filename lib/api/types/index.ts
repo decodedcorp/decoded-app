@@ -18,7 +18,7 @@ export type { HTTPValidationError } from "./models/HTTPValidationError";
 export type { IdentityDoc } from "./models/IdentityDoc";
 export type { ImageBase_Input } from "./models/ImageBase_Input";
 export type { ImageBase_Output } from "./models/ImageBase_Output";
-export type { ImageDoc } from "./models/ImageDoc";
+export type { ImageDoc, HeroImageDoc } from "./models/ImageDoc";
 export type { InitialRequestedItem } from "./models/InitialRequestedItem";
 export type { ItemDoc } from "./models/ItemDoc";
 export type { ItemMetadata } from "./models/ItemMetadata";

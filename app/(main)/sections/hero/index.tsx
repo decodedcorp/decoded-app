@@ -7,7 +7,7 @@ import type { BoxSizeMode } from "./utils/types";
 import { Suspense, useEffect } from "react";
 import { useRandomResources } from "../../../../lib/hooks/features/images/use-random-resources";
 import { Locale } from "@/lib/lang/locales";
-import type { ItemDoc, ImageDoc } from "@/lib/api/types";
+import type { HeroImageDoc } from "@/lib/api/types";
 
 interface HeroSectionProps {
   sizeMode?: BoxSizeMode;
@@ -15,7 +15,7 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ sizeMode = "LARGE" }: HeroSectionProps) {
-  const { data: resources = [] as Array<ImageDoc> } = useRandomResources();
+  const { data: resources = [] as Array<HeroImageDoc> } = useRandomResources();
 
   useEffect(() => {
     if (resources.length >= 2) {

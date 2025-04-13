@@ -2,9 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { Position } from './Position';
+import type { Position } from "./Position";
 export type RequestedItem = {
-    item_doc_id: string;
-    position: Position;
+  item_doc_id: string;
+  position: Position;
 };
-

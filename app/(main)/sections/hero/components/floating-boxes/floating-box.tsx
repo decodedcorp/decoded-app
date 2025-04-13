@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useRef, memo } from "react";
+import { useEffect, useRef, memo, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import gsap from "gsap";
-import type { ItemDoc, ImageDoc } from "@/lib/api/types";
+import type { HeroImageDoc } from "@/lib/api/types";
 
 interface FloatingBoxProps {
-  resource: ItemDoc | ImageDoc;
+  resource: HeroImageDoc;
   initialDelay: number;
   depthLevel: number;
   position: { x: number; y: number };
@@ -24,14 +24,16 @@ function FloatingBoxComponent({
   const boxRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<gsap.core.Timeline>();
   const hoverTimelineRef = useRef<gsap.core.Timeline>();
-  const isImage = "requested_items" in resource;
+  const hasRequestedItems = Object.keys(resource.requested_items).length > 0;
 
-  // 깊이에 따른 효과 계산
-  const depthEffect = {
-    scale: 1 - (depthLevel - 1) * 0.15,
-    blur: Math.max(2, (depthLevel - 1) * 3),
-    opacity: 1 - (depthLevel - 1) * 0.15,
-  };
+  const depthEffect = useMemo(
+    () => ({
+      scale: 1 - (depthLevel - 1) * 0.15,
+      blur: Math.max(2, (depthLevel - 1) * 3),
+      opacity: 1 - (depthLevel - 1) * 0.15,
+    }),
+    [depthLevel]
+  );
 
   useEffect(() => {
     const element = boxRef.current;
@@ -123,19 +125,12 @@ function FloatingBoxComponent({
     };
   }, [depthEffect, initialDelay, onHover, position]);
 
-  const href = isImage ? `/details/${resource._id}` : "#";
+  const href = `/details/${resource._id}`;
 
-  const title = isImage ? resource.title : resource.metadata?.name;
-
-  const boxSize = isImage
-    ? {
-        width: "128px",
-        height: "192px",
-      }
-    : {
-        width: "96px",
-        height: "96px",
-      };
+  const boxSize = {
+    width: "128px",
+    height: "192px",
+  };
 
   return (
     <Link href={href} prefetch={false}>
@@ -146,7 +141,8 @@ function FloatingBoxComponent({
           rounded-lg overflow-hidden
           shadow-lg backdrop-blur-sm
           cursor-pointer
-          ${!isImage && !resource.img_url ? "bg-white/10" : ""}
+          group
+          ${!resource.img_url ? "bg-white/10" : ""}
         `}
         style={{
           ...boxSize,
@@ -159,17 +155,47 @@ function FloatingBoxComponent({
           <div className="relative w-full h-full">
             <Image
               src={resource.img_url}
-              alt={title || ""}
+              alt={""} // TODO
               fill
-              sizes={isImage ? "128px" : "96px"}
+              sizes={boxSize.width}
               className="object-cover"
               loading="eager"
               unoptimized
             />
+            {hasRequestedItems && (
+              <div className="absolute inset-0 transition-opacity duration-300 opacity-0 group-hover:opacity-100">
+                {Object.entries(resource.requested_items).map(([key, items]) =>
+                  items.map((item, index) => (
+                    <div
+                      key={`${key}-${index}`}
+                      className="absolute transition-all duration-300"
+                      style={{
+                        top: item.position.top,
+                        left: item.position.left,
+                      }}
+                    >
+                      {item.item_img_url && (
+                        <>
+                          <Image
+                            src={item.item_img_url}
+                            alt={item.item_doc_id}
+                            width={48}
+                            height={48}
+                            className="rounded-md shadow-lg opacity-0 group-hover:opacity-100 
+                          transition-all duration-300 hover:scale-110"
+                            unoptimized
+                          />
+                        </>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
           </div>
         ) : (
           <div className="w-full h-full flex items-center justify-center text-sm text-white/80/70">
-            {title}
+            {/* TODO */}
           </div>
         )}
       </div>
