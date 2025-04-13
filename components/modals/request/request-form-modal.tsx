@@ -318,7 +318,11 @@ function StyleContextSidebar({
                         </a>
                       </div>
                       <button
-                        onClick={() => handleRemoveInspirationLink(link.id)}
+                        onClick={(e) => {
+                          // 이벤트 전파 방지
+                          e.stopPropagation();
+                          handleRemoveInspirationLink(link.id);
+                        }}
                         className="p-1 text-gray-400 hover:text-red-400 transition-colors"
                       >
                         <X size={16} />
@@ -341,10 +345,10 @@ export function RequestFormModal({
   modalType = "request",
 }: RequestFormModalProps) {
   const { t } = useLocaleContext();
+  const isMobile = useIsMobile(); // 모바일 환경 감지
   const router = useRouter();
   const { createRequest } = useRequestData("");
   const { withAuth } = useProtectedAction();
-  const isMobile = useIsMobile(); // 모바일 환경 감지
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 3;
   const [isStepComplete, setIsStepComplete] = useState(false);
@@ -940,17 +944,35 @@ export function RequestFormModal({
     return (
       <Dialog 
         open={selectedPoint !== null && currentStep === 2 && modalType === "style"} 
-        onOpenChange={() => {}}
+        onOpenChange={(open) => {
+          // open이 false일 때만 처리하고, 아이템 정보 모달만 닫음
+          if (!open) {
+            setSelectedPoint(null);
+          }
+        }}
       >
         <DialogContent 
           className="bg-[#1A1A1A] border border-gray-700 p-5 rounded-lg max-w-xs w-full shadow-xl"
-          onInteractOutside={(e) => e.preventDefault()}
-          onEscapeKeyDown={(e) => e.preventDefault()}
+          onInteractOutside={(e) => {
+            e.preventDefault();
+            // 이벤트 전파 중단하여 부모 모달에 영향 없게 함
+            e.stopPropagation();
+          }}
+          onEscapeKeyDown={(e) => {
+            e.preventDefault();
+            // 이벤트 전파 중단하여 부모 모달에 영향 없게 함
+            e.stopPropagation();
+          }}
+          style={{ zIndex: 300000 }}
         >
           <div className="flex justify-between items-center mb-4">
             <DialogTitle className="text-base font-medium text-white">아이템 정보</DialogTitle>
             <button 
-              onClick={() => setSelectedPoint(null)}
+              onClick={(e) => {
+                // 이벤트 전파 방지
+                e.stopPropagation();
+                setSelectedPoint(null);
+              }}
               className="p-1.5 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
             >
               <X size={16} />
@@ -1007,7 +1029,12 @@ export function RequestFormModal({
       {/* Main Modal Content */}
       <Dialog
         open={isOpen}
-        onOpenChange={(open) => !open && handleModalClose()}
+        onOpenChange={(open) => {
+          // open이 false일 때(모달 닫기 시도) && 스타일 포인트 모달이 열려있지 않을 때만 처리
+          if (!open && selectedPoint === null) {
+            handleModalClose();
+          }
+        }}
       >
         <DialogContent
           className={cn(
@@ -1247,14 +1274,14 @@ export function RequestFormModal({
                         <StyleContextSidebar
                           onAnswerChange={(answer) => setContextAnswers(answer)}
                           onSubmit={handleSubmit}
-                          isMobile={false}
+                          isMobile={isMobile}
                         />
                       ) : (
                         <ContextStepSidebar
                           modalType="request"
                           onAnswerChange={(answer) => setContextAnswers(answer)}
                           onSubmit={handleSubmit}
-                          isMobile={false}
+                          isMobile={isMobile}
                         />
                       )}
                     </div>
