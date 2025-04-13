@@ -30,7 +30,6 @@ export function StyleContextSidebar({
   isMobile = false,
 }: StyleContextSidebarProps) {
   const [inspirationLinks, setInspirationLinks] = useState<InspirationLink[]>([]);
-  const [newCategory, setNewCategory] = useState("영상");
   const [newUrl, setNewUrl] = useState("");
   
   // 모바일 시트 관련 상태 추가
@@ -38,16 +37,13 @@ export function StyleContextSidebar({
   const [isDragging, setIsDragging] = useState(false);
   const [sheetPosition, setSheetPosition] = useState<"collapsed" | "middle" | "expanded">("middle");
   
-  // 카테고리 옵션
-  const categoryOptions = ["영상", "글", "쇼핑몰", "음악", "영화", "기타"];
-
   const handleAddInspirationLink = () => {
     if (newUrl.trim()) {
       const newLinks = [
         ...inspirationLinks,
         {
-          id: String(inspirationLinks.length), // 인덱스 기반 ID 사용
-          category: newCategory,
+          id: String(inspirationLinks.length),
+          category: "링크",
           url: newUrl.trim(),
         },
       ];
@@ -56,7 +52,7 @@ export function StyleContextSidebar({
       
       // 링크 추가 후 부모에게 바로 알림
       onAnswerChange({
-        location: "스타일", // 스타일 이름 필드를 없애고 기본값 설정
+        location: "스타일",
         inspirationLinks: newLinks
       });
     }
@@ -68,7 +64,7 @@ export function StyleContextSidebar({
     
     // 링크 삭제 후 부모에게 바로 알림
     onAnswerChange({
-      location: "스타일", // 스타일 이름 필드를 없애고 기본값 설정
+      location: "스타일",
       inspirationLinks: newLinks
     });
   };
@@ -179,24 +175,13 @@ export function StyleContextSidebar({
               
               {/* 링크 입력 폼 */}
               <div className="flex flex-col space-y-3">
-                <div className="grid grid-cols-4 gap-2">
-                  <select
-                    value={newCategory}
-                    onChange={(e) => setNewCategory(e.target.value)}
-                    className="col-span-1 px-3 py-2.5 bg-[#232323] border border-gray-700 rounded-md text-sm text-white focus:border-[#EAFD66] focus:outline-none focus:ring-1 focus:ring-[#EAFD66]"
-                  >
-                    {categoryOptions.map(option => (
-                      <option key={option} value={option}>{option}</option>
-                    ))}
-                  </select>
-                  <input
-                    type="text"
-                    value={newUrl}
-                    onChange={(e) => setNewUrl(e.target.value)}
-                    placeholder="URL을 입력하세요"
-                    className="col-span-3 px-3 py-2.5 bg-[#232323] border border-gray-700 rounded-md text-sm text-white focus:border-[#EAFD66] focus:outline-none focus:ring-1 focus:ring-[#EAFD66]"
-                  />
-                </div>
+                <input
+                  type="text"
+                  value={newUrl}
+                  onChange={(e) => setNewUrl(e.target.value)}
+                  placeholder="URL을 입력하세요"
+                  className="w-full px-3 py-2.5 bg-[#232323] border border-gray-700 rounded-md text-sm text-white focus:border-[#EAFD66] focus:outline-none focus:ring-1 focus:ring-[#EAFD66]"
+                />
                 <button
                   onClick={handleAddInspirationLink}
                   disabled={!newUrl.trim()}
@@ -222,10 +207,7 @@ export function StyleContextSidebar({
                       key={link.id} 
                       className="flex items-center justify-between p-3 bg-[#232323] border border-gray-700 rounded-md hover:border-gray-600 transition-colors"
                     >
-                      <div className="flex items-center space-x-2 max-w-[85%]">
-                        <span className="text-xs px-2 py-1 bg-[#2A2A2A] rounded text-[#EAFD66] whitespace-nowrap">
-                          {link.category}
-                        </span>
+                      <div className="flex items-center max-w-[90%]">
                         <a 
                           href={link.url} 
                           target="_blank" 
