@@ -9,10 +9,10 @@ import {
 import { useLoginModalStore } from "@/components/auth/login-modal/store";
 
 interface RequestModalProps {
-  isRequest?: boolean;
+  modalType?: "request" | "style";
 }
 
-export const useRequestModal = ({ isRequest = true }: RequestModalProps) => {
+export const useRequestModal = ({ modalType = "request" }: RequestModalProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const { checkAuth } = useProtectedAction();
   const { openLoginModal } = useLoginModalStore();
@@ -61,7 +61,7 @@ export const useRequestModal = ({ isRequest = true }: RequestModalProps) => {
       <RequestFormModal
         isOpen={isOpen}
         onClose={onClose}
-        isRequest={isRequest}
+        modalType={modalType}
       />
     ),
   };

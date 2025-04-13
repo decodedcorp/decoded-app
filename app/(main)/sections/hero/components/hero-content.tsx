@@ -7,7 +7,7 @@ import { useRequestModal } from "@/components/modals/request/hooks/use-request-m
 export function HeroContent() {
   const { t } = useLocaleContext();
   const { onOpen: openRequestModal, RequestModal } = useRequestModal({
-    isRequest: true,
+    modalType: "request",
   });
 
   return (

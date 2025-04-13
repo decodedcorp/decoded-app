@@ -18,6 +18,7 @@ export interface RequestImage {
   request_by: string;
   context?: string | null;
   source?: string | null;
+  metadata?: Record<string, any>;
 }
 
 export interface APIResponse<T> {

@@ -26,8 +26,7 @@ export const requestAPI = {
     }
     
     try {
-      // 수정된 URL: userDocId를 경로에서 제거하고 요청 본문에만 포함시킴
-      console.log('RequestAPI: Sending request to URL:', `/image/request`);
+      console.log('RequestAPI: Sending request to URL:', `/user/${userDocId}/image/request`);
       console.log('RequestAPI: Using token:', accessToken ? 'Yes (token exists)' : 'No (missing)');
       
       // 데이터 크기 계산 및 로깅 (디버깅용)
@@ -36,7 +35,7 @@ export const requestAPI = {
       
       // 토큰을 포함하여 요청 - URL 변경
       const response = await networkManager.request<APIResponse<void>>(
-        `/image/request`,
+        `/user/${userDocId}/image/request`,
         'POST',
         requestData,
         3, // 재시도 횟수

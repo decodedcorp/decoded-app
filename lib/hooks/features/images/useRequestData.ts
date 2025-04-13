@@ -38,9 +38,12 @@ export function useRequestData(initialData: any): UseRequestDataReturn {
       console.log('Image data length:', data.image_file ? data.image_file.length : 'No image data');
       
       // API 요청 전 전체 데이터 검증
-      const validData = {
-        ...data,
-        // 포지션 값 검증 - % 기호가 있다면 제거 (API는 숫자 문자열 형태를 예상함)
+      const preparedData = {
+        image_file: data.image_file,
+        request_by: userDocId,
+        context: data.context,
+        source: data.source,
+        metadata: data.metadata || {},
         requested_items: data.requestedItems?.map(item => ({
           ...item,
           position: {
@@ -54,10 +57,10 @@ export function useRequestData(initialData: any): UseRequestDataReturn {
         }))
       };
       
-      console.log('Validated request data:', validData);
+      console.log('Validated request data:', preparedData);
 
       return await showLoadingStatus(
-        requestAPI.createImageRequest(userDocId, validData),
+        requestAPI.createImageRequest(userDocId, preparedData as any),
         { type: 'success', messageKey: 'request' }
       );
     } catch (error) {

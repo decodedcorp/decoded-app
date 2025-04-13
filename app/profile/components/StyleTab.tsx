@@ -125,7 +125,7 @@ function OwnerStyleTab({ userDocId }: { userDocId: string }) {
   const [isLoading, setIsLoading] = useState(true);
   const [styles, setStyles] = useState<UserStyle[]>([]);
   const { onOpen: openRequestModal, RequestModal } = useRequestModal({
-    isRequest: false,
+    modalType: "style",
   });
 
   useEffect(() => {

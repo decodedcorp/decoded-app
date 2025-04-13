@@ -20,6 +20,7 @@ export interface ContextStepSidebarProps {
   username?: string;
   userImageUrl?: string;
   isMobile?: boolean;
+  modalType?: "request" | "style";
 }
 
 export function ContextStepSidebar({
@@ -28,6 +29,7 @@ export function ContextStepSidebar({
   username = "kiyorib",
   userImageUrl,
   isMobile = false,
+  modalType = "request",
 }: ContextStepSidebarProps) {
   const { t } = useLocaleContext();
 

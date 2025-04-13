@@ -4,7 +4,7 @@ export interface Point {
   x: number;
   y: number;
   context?: string;
-  brandName?: string;
+  brand?: string;
   price?: string;
 }
 

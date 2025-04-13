@@ -41,7 +41,7 @@ interface Area {
 }
 
 interface ImageContainerProps {
-  isRequest: boolean;
+  modalType: "request" | "style";
   step: number;
   selectedImage: string | null;
   imageFile: File | null;
@@ -150,7 +150,7 @@ export const ImageContainer = forwardRef<
 >(
   (
     {
-      isRequest,
+      modalType,
       step,
       selectedImage,
       imageFile,
@@ -1292,7 +1292,7 @@ export const ImageContainer = forwardRef<
       return (
         <div className="relative w-full h-full max-h-full overflow-hidden flex items-center justify-center bg-[#232323]">
           <ImageMarker
-            isRequest={isRequest}
+            modalType={modalType}
             imageUrl={selectedImage}
             points={points}
             onPointsChange={onPointsChange}
@@ -1305,6 +1305,12 @@ export const ImageContainer = forwardRef<
               const newPoints = points.filter((_, i) => i !== index);
               onPointsChange(newPoints);
             }}
+            onPointSelect={(index) => {
+              console.log("Image marker point selected:", index);
+              if (onPointSelect) {
+                onPointSelect(index);
+              }
+            }}
             selectedPointIndex={selectedPoint}
             className="max-w-full max-h-full object-contain"
           />
@@ -1316,6 +1322,8 @@ export const ImageContainer = forwardRef<
       onPointsChange,
       onPointContextChange,
       selectedPoint,
+      onPointSelect,
+      modalType
     ]);
 
     // 읽기 전용 마커 컴포넌트
