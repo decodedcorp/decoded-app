@@ -90,27 +90,10 @@ function StyleContextSidebar({
   const [newCategory, setNewCategory] = useState("영상");
   const [newUrl, setNewUrl] = useState("");
   
-  // 모바일 시트 상태 관리
+  // 모바일 시트 관련 상태 추가
   const [sheetHeight, setSheetHeight] = useState<number>(isMobile ? 42 : 100);
   const [isDragging, setIsDragging] = useState(false);
   const [sheetPosition, setSheetPosition] = useState<"collapsed" | "middle" | "expanded">("middle");
-  
-  // 초기 상태 설정
-  useEffect(() => {
-    if (isMobile) {
-      // 모바일에서는 처음에 expanded 상태로 시작
-      setSheetHeight(80);
-      setSheetPosition("expanded");
-    }
-  }, [isMobile]);
-  
-  // 모바일에서 키보드가 열릴 때 자동으로 expanded 상태로 변경
-  const handleFormElementFocus = () => {
-    if (isMobile) {
-      setSheetHeight(90);
-      setSheetPosition("expanded");
-    }
-  };
   
   // 카테고리 옵션
   const categoryOptions = ["영상", "글", "쇼핑몰", "음악", "영화", "기타"];
@@ -158,8 +141,8 @@ function StyleContextSidebar({
       inspirationLinks: newLinks
     });
   };
-  
-  // 모바일 시트 드래그 핸들러
+
+  // 모바일 시트 드래그 관련 핸들러 추가
   const handleDrag = (info: any) => {
     if (!isMobile) return;
 
@@ -218,7 +201,7 @@ function StyleContextSidebar({
           onClick={handleBackdropClick}
         />
       )}
-      
+
       <motion.div
         className={cn(
           "w-full h-full flex flex-col bg-[#1A1A1A]",
@@ -256,7 +239,7 @@ function StyleContextSidebar({
             )}
           </motion.div>
         )}
-        <div className="p-5 space-y-6 flex-1 overflow-y-auto">
+        <div className="p-5 space-y-6">
           <div className="space-y-3">
             <label className="block text-sm font-medium text-white">
               스타일 이름
@@ -266,7 +249,6 @@ function StyleContextSidebar({
               value={styleName}
               onChange={handleStyleNameChange}
               placeholder="스타일의 이름을 입력하세요"
-              onFocus={handleFormElementFocus}
               className="w-full px-3 py-2.5 bg-[#232323] border border-gray-700 rounded-md text-sm text-white focus:border-[#EAFD66] focus:outline-none focus:ring-1 focus:ring-[#EAFD66]"
             />
           </div>
@@ -283,7 +265,6 @@ function StyleContextSidebar({
                   <select
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value)}
-                    onFocus={handleFormElementFocus}
                     className="col-span-1 px-3 py-2.5 bg-[#232323] border border-gray-700 rounded-md text-sm text-white focus:border-[#EAFD66] focus:outline-none focus:ring-1 focus:ring-[#EAFD66]"
                   >
                     {categoryOptions.map(option => (
@@ -294,7 +275,6 @@ function StyleContextSidebar({
                     type="text"
                     value={newUrl}
                     onChange={(e) => setNewUrl(e.target.value)}
-                    onFocus={handleFormElementFocus}
                     placeholder="URL을 입력하세요"
                     className="col-span-3 px-3 py-2.5 bg-[#232323] border border-gray-700 rounded-md text-sm text-white focus:border-[#EAFD66] focus:outline-none focus:ring-1 focus:ring-[#EAFD66]"
                   />
@@ -1189,7 +1169,7 @@ export function RequestFormModal({
                             showCropper={false}
                             onCropperChange={() => {}}
                             onPointsChange={() => {}} // 읽기 전용
-                            onPointSelect={() => {}} // 읽기 전용으로 설정
+                            onPointSelect={() => {}} // 읽기 전용
                           />
                         </div>
                       )}
