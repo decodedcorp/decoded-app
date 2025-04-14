@@ -1373,8 +1373,8 @@ export const ImageContainer = forwardRef<
                 }}
               />
 
-              {/* 위치 정보 태그 */}
-              {contextAnswers?.location && (
+              {/* 위치 정보 태그 - request 모드에서만 표시 */}
+              {modalType === "request" && contextAnswers?.location && (
                 <div className="absolute top-3 right-3 z-10">
                   <div
                     className="px-3 py-1.5 bg-[#222]/80 backdrop-blur-sm rounded-full 
@@ -1414,7 +1414,7 @@ export const ImageContainer = forwardRef<
           </div>
         </div>
       );
-    }, [selectedImage, points, contextAnswers]);
+    }, [selectedImage, points, contextAnswers, modalType]);
 
     // 기본 이미지 표시 컴포넌트 - 마커 없이
     const BasicImageComponent = useCallback(() => {
