@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { ItemButtonProps } from '@/types/button.d';
 import { InfoButton } from './info-button';
@@ -21,11 +21,21 @@ export function ItemButton({
   const navigateToDetail = useNavigateToDetail();
   const buttonRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
-  const [infoPosition, setInfoPosition] = useState<'default' | 'top' | 'bottom' | 'left' | 'right' | 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left'>('default');
+  const [infoPosition, setInfoPosition] = useState<
+    | 'default'
+    | 'top'
+    | 'bottom'
+    | 'left'
+    | 'right'
+    | 'top-right'
+    | 'top-left'
+    | 'bottom-right'
+    | 'bottom-left'
+  >('default');
 
   const handleClick = () => {
-    navigateToDetail(item.info.item.item._id, { 
-      imageId: params.imageId as string 
+    navigateToDetail(item.info.item.item._id, {
+      imageId: params.imageId as string,
     });
   };
 
@@ -34,33 +44,45 @@ export function ItemButton({
       if (!buttonRef.current) return;
 
       const rect = buttonRef.current.getBoundingClientRect();
-      const parentRect = buttonRef.current.parentElement?.parentElement?.getBoundingClientRect();
-      
+      const parentRect =
+        buttonRef.current.parentElement?.parentElement?.getBoundingClientRect();
+
       if (!parentRect) return;
 
-      const relativeTop = ((rect.top - parentRect.top) / parentRect.height) * 100;
-      const relativeLeft = ((rect.left - parentRect.left) / parentRect.width) * 100;
+      const relativeTop =
+        ((rect.top - parentRect.top) / parentRect.height) * 100;
+      const relativeLeft =
+        ((rect.left - parentRect.left) / parentRect.width) * 100;
 
       const EDGE_THRESHOLD = 15;
 
       // 모서리 케이스 먼저 체크
       if (relativeTop < EDGE_THRESHOLD && relativeLeft < EDGE_THRESHOLD) {
-        setInfoPosition('bottom-right');  // 좌상단 모서리
-      } else if (relativeTop < EDGE_THRESHOLD && relativeLeft > (100 - EDGE_THRESHOLD)) {
-        setInfoPosition('bottom-left');   // 우상단 모서리
-      } else if (relativeTop > (100 - EDGE_THRESHOLD) && relativeLeft < EDGE_THRESHOLD) {
-        setInfoPosition('top-right');     // 좌하단 모서리
-      } else if (relativeTop > (100 - EDGE_THRESHOLD) && relativeLeft > (100 - EDGE_THRESHOLD)) {
-        setInfoPosition('top-left');      // 우하단 모서리
+        setInfoPosition('bottom-right'); // 좌상단 모서리
+      } else if (
+        relativeTop < EDGE_THRESHOLD &&
+        relativeLeft > 100 - EDGE_THRESHOLD
+      ) {
+        setInfoPosition('bottom-left'); // 우상단 모서리
+      } else if (
+        relativeTop > 100 - EDGE_THRESHOLD &&
+        relativeLeft < EDGE_THRESHOLD
+      ) {
+        setInfoPosition('top-right'); // 좌하단 모서리
+      } else if (
+        relativeTop > 100 - EDGE_THRESHOLD &&
+        relativeLeft > 100 - EDGE_THRESHOLD
+      ) {
+        setInfoPosition('top-left'); // 우하단 모서리
       }
       // 일반 경계 케이스
       else if (relativeTop < EDGE_THRESHOLD) {
         setInfoPosition('bottom');
-      } else if (relativeTop > (100 - EDGE_THRESHOLD)) {
+      } else if (relativeTop > 100 - EDGE_THRESHOLD) {
         setInfoPosition('top');
       } else if (relativeLeft < EDGE_THRESHOLD) {
         setInfoPosition('right');
-      } else if (relativeLeft > (100 - EDGE_THRESHOLD)) {
+      } else if (relativeLeft > 100 - EDGE_THRESHOLD) {
         setInfoPosition('left');
       } else {
         setInfoPosition('default');
@@ -71,25 +93,19 @@ export function ItemButton({
   }, []);
 
   return (
-    <div 
-      ref={buttonRef} 
+    <div
+      ref={buttonRef}
       className="relative"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {isHovered && (
-        <BrandInfo
-          brandName={item.info.item.brand_name}
-          brandLogoUrl={item.info.item.brand_logo_image_url}
-          isActive={isActive}
-          position={infoPosition}
-        />
-      )}
-      <InfoButton 
-        item={item} 
-        isActive={isActive} 
-        onClick={handleClick}
+      <BrandInfo
+        brandName={item.info.item.brand_name}
+        brandLogoUrl={item.info.item.brand_logo_image_url}
+        isActive={isActive}
+        position={infoPosition}
       />
+      <InfoButton item={item} isActive={isActive} onClick={handleClick} />
     </div>
   );
 }

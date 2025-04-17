@@ -126,4 +126,12 @@ button {
 
 *:focus {
   outline: none !important;
+}
+
+.masonry-column {
+  padding-left: 4px; /* 이 값은 gap 크기와 일치시켜야 합니다 */
+}
+
+.masonry-column:first-child {
+  padding-left: 0;
 } 
