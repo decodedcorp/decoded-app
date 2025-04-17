@@ -128,7 +128,15 @@ export function RequestFormModal({
         setIsStepComplete(!!selectedImage);
         break;
       case 2:
-        setIsStepComplete(points.length > 0);
+        if (modalType === "style") {
+          // style 모드에서는 모든 마커가 필수 정보(브랜드, 가격)를 가지고 있어야 함
+          const allPointsHaveInfo = points.length > 0 && 
+            points.every(point => point.brand && point.price);
+          setIsStepComplete(allPointsHaveInfo);
+        } else {
+          // request 모드에서는 마커만 있으면 됨
+          setIsStepComplete(points.length > 0);
+        }
         break;
       case 3:
         setIsStepComplete(!!contextAnswers?.location);
@@ -136,7 +144,7 @@ export function RequestFormModal({
       default:
         setIsStepComplete(false);
     }
-  }, [currentStep, selectedImage, points, contextAnswers?.location]);
+  }, [currentStep, selectedImage, points, contextAnswers?.location, modalType]);
 
   useEffect(() => {
     console.log("Selected point:", selectedPoint);
@@ -776,7 +784,7 @@ export function RequestFormModal({
                     </h3>
                     <p className="text-xs text-gray-400 mt-1">
                       {modalType === "style" 
-                        ? "이미지를 클릭하여 스타일의 특징적인 부분을 표시해주세요"
+                        ? "이미지에 마커를 추가하고 각 마커에 브랜드와 가격 정보를 입력해야 합니다"
                         : "이미지를 클릭하여 궁금한 아이템의 위치를 표시해주세요"}
                     </p>
                   </div>
