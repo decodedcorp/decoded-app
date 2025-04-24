@@ -64,6 +64,7 @@ interface ImageContainerProps {
     crop: { x: number; y: number };
   } | null;
   isCroppingRef?: React.MutableRefObject<boolean>;
+  renderPoint?: (point: Point, index: number) => React.ReactNode;
 }
 
 export interface ImageContainerHandle {
@@ -168,6 +169,7 @@ export const ImageContainer = forwardRef<
       themeColor = "#EAFD66",
       lastCropInfo = null,
       isCroppingRef,
+      renderPoint,
     },
     ref
   ) => {
@@ -965,7 +967,7 @@ export const ImageContainer = forwardRef<
                   aspectRatio: "4/5",
                 }}
               >
-                <img
+                <Image
                   src={selectedImage}
                   alt="Selected image"
                   className="object-contain max-h-full max-w-full"
@@ -1297,22 +1299,42 @@ export const ImageContainer = forwardRef<
             points={points}
             onPointsChange={onPointsChange}
             onPointContextChange={(index, context) => {
-              if (onPointContextChange && index >= 0 && index < points.length) {
-                onPointContextChange(points[index], context);
+              const point = points[index];
+              if (point && onPointContextChange) {
+                onPointContextChange(point, context);
               }
             }}
+            onPointSelect={onPointSelect}
             onPointRemove={(index) => {
               const newPoints = points.filter((_, i) => i !== index);
               onPointsChange(newPoints);
             }}
-            onPointSelect={(index) => {
-              console.log("Image marker point selected:", index);
-              if (onPointSelect) {
-                onPointSelect(index);
-              }
-            }}
             selectedPointIndex={selectedPoint}
-            className="max-w-full max-h-full object-contain"
+            renderPoint={(point, index) => (
+              <div
+                className={cn(
+                  "relative w-4 h-4 hover:scale-125 transition-transform animate-bounce",
+                  selectedPoint === index && "scale-125"
+                )}
+              >
+                <div
+                  className={cn(
+                    "absolute inset-0 border-2 rounded-full",
+                    selectedPoint === index
+                      ? "border-[#FFFFFF]"
+                      : "border-[#EAFD66]"
+                  )}
+                />
+                <div
+                  className={cn(
+                    "absolute inset-[2px] rounded-full backdrop-blur-sm",
+                    selectedPoint === index
+                      ? "bg-[#FFFFFF]/50"
+                      : "bg-[#EAFD66]/30"
+                  )}
+                />
+              </div>
+            )}
           />
         </div>
       );
@@ -1323,7 +1345,7 @@ export const ImageContainer = forwardRef<
       onPointContextChange,
       selectedPoint,
       onPointSelect,
-      modalType
+      modalType,
     ]);
 
     // 읽기 전용 마커 컴포넌트
@@ -1347,7 +1369,7 @@ export const ImageContainer = forwardRef<
             {/* 이미지 컨테이너 */}
             <div className="relative w-full h-full flex items-center justify-center">
               {/* Next.js Image를 img 태그로 대체 */}
-              <img
+              <Image
                 src={selectedImage}
                 alt="Image with markers"
                 loading="lazy"
@@ -1437,7 +1459,7 @@ export const ImageContainer = forwardRef<
             className="debug-image-container border border-gray-700 p-1 flex items-center justify-center"
             style={{ width: "90%", height: "90%", background: "#1A1A1A" }}
           >
-            <img
+            <Image
               src={selectedImage}
               alt="Image"
               className="max-w-full max-h-full object-contain"

@@ -19,11 +19,12 @@ import {
 } from "@/components/ui/modal/status-modal";
 import { useProtectedAction } from "@/lib/hooks/auth/use-protected-action";
 import { useStatusMessage } from "@/components/ui/modal/status-modal/utils/use-status-message";
-import { ArrowLeft, X, Trash2 } from "lucide-react";
+import { ArrowLeft, X, Trash2, Pencil, Check } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ConfirmModal } from "./common/confirm-modal";
 import { RequestImage } from "@/lib/api/_types/request";
 import { motion } from "framer-motion";
+import { networkManager } from "@/lib/network/network";
 // CSS는 globals.css에서 import
 
 // 간단한 모바일 환경 감지 훅
@@ -79,34 +80,41 @@ function StyleContextSidebar({
   onAnswerChange,
   onSubmit,
   isMobile = false,
+  points = [],
+  onPointUpdate,
 }: {
   onAnswerChange: (answer: ContextAnswer) => void;
   onSubmit?: () => void;
   isMobile?: boolean;
+  points?: StylePoint[];
+  onPointUpdate?: (index: number, point: StylePoint) => void;
 }) {
   const { t } = useLocaleContext();
   const [styleName, setStyleName] = useState("");
-  const [inspirationLinks, setInspirationLinks] = useState<InspirationLink[]>([]);
-  const [newCategory, setNewCategory] = useState("영상");
+  const [inspirationLinks, setInspirationLinks] = useState<InspirationLink[]>(
+    []
+  );
+  const [editingPoint, setEditingPoint] = useState<number | null>(null);
+  const [editBrand, setEditBrand] = useState("");
+  const [editPrice, setEditPrice] = useState("");
   const [newUrl, setNewUrl] = useState("");
-  
+
   // 모바일 시트 관련 상태 추가
   const [sheetHeight, setSheetHeight] = useState<number>(isMobile ? 42 : 100);
   const [isDragging, setIsDragging] = useState(false);
-  const [sheetPosition, setSheetPosition] = useState<"collapsed" | "middle" | "expanded">("middle");
-  
-  // 카테고리 옵션
-  const categoryOptions = ["영상", "글", "쇼핑몰", "음악", "영화", "기타"];
+  const [sheetPosition, setSheetPosition] = useState<
+    "collapsed" | "middle" | "expanded"
+  >("middle");
 
   // 스타일 이름 변경 핸들러 - 즉시 반영되도록 수정
   const handleStyleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value;
     setStyleName(newName);
-    
+
     // 한글 입력을 위해 디바운스 없이 바로 업데이트
     onAnswerChange({
       location: newName,
-      inspirationLinks
+      inspirationLinks,
     });
   };
 
@@ -116,29 +124,29 @@ function StyleContextSidebar({
         ...inspirationLinks,
         {
           id: String(inspirationLinks.length), // 인덱스 기반 ID 사용
-          category: newCategory,
+          category: "기타",
           url: newUrl.trim(),
         },
       ];
       setInspirationLinks(newLinks);
       setNewUrl("");
-      
+
       // 링크 추가 후 부모에게 바로 알림
       onAnswerChange({
         location: styleName,
-        inspirationLinks: newLinks
+        inspirationLinks: newLinks,
       });
     }
   };
 
   const handleRemoveInspirationLink = (id: string) => {
-    const newLinks = inspirationLinks.filter(link => link.id !== id);
+    const newLinks = inspirationLinks.filter((link) => link.id !== id);
     setInspirationLinks(newLinks);
-    
+
     // 링크 삭제 후 부모에게 바로 알림
     onAnswerChange({
       location: styleName,
-      inspirationLinks: newLinks
+      inspirationLinks: newLinks,
     });
   };
 
@@ -187,6 +195,27 @@ function StyleContextSidebar({
       setSheetHeight(20);
       setSheetPosition("collapsed");
     }
+  };
+
+  const handleEditStart = (index: number, point: StylePoint) => {
+    setEditingPoint(index);
+    setEditBrand(point.brand || "");
+    setEditPrice(point.price || "");
+  };
+
+  const handleEditSave = (index: number) => {
+    if (onPointUpdate) {
+      onPointUpdate(index, {
+        ...points[index],
+        brand: editBrand,
+        price: editPrice,
+      });
+    }
+    setEditingPoint(null);
+  };
+
+  const handleEditCancel = () => {
+    setEditingPoint(null);
   };
 
   return (
@@ -240,52 +269,126 @@ function StyleContextSidebar({
           </motion.div>
         )}
         <div className="p-5 space-y-6">
-          <div className="space-y-3">
-            <label className="block text-sm font-medium text-white">
-              스타일 이름
-            </label>
-            <input
-              type="text"
-              value={styleName}
-              onChange={handleStyleNameChange}
-              placeholder="스타일의 이름을 입력하세요"
-              className="w-full px-3 py-2.5 bg-[#232323] border border-gray-700 rounded-md text-sm text-white focus:border-[#EAFD66] focus:outline-none focus:ring-1 focus:ring-[#EAFD66]"
-            />
-          </div>
-          
+          {/* 마커 정보 표시 섹션 추가 */}
+          {points.length > 0 && (
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium text-white">마커 정보</h3>
+              <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-1">
+                {points.map((point, index) => (
+                  <div
+                    key={index}
+                    className="group relative p-3 bg-[#232323] border border-gray-700/50 rounded-lg hover:border-[#EAFD66]/20 hover:bg-[#232323]/80 transition-all duration-200"
+                  >
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center justify-between">
+                        <div className="w-5 h-5 flex items-center justify-center bg-[#EAFD66] text-[#1A1A1A] rounded-full text-[10px] font-bold">
+                          {index + 1}
+                        </div>
+                        {editingPoint === index ? (
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => handleEditSave(index)}
+                              className="p-1 hover:bg-white/5 rounded-full text-[#EAFD66] hover:text-[#EAFD66]/80 transition-all"
+                            >
+                              <Check size={12} />
+                            </button>
+                            <button
+                              onClick={handleEditCancel}
+                              className="p-1 hover:bg-white/5 rounded-full text-gray-400 hover:text-white/80 transition-all"
+                            >
+                              <X size={12} />
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => handleEditStart(index, point)}
+                            className="opacity-0 group-hover:opacity-100 p-1 hover:bg-white/5 rounded-full text-gray-400 hover:text-white/80 transition-all"
+                          >
+                            <Pencil size={12} />
+                          </button>
+                        )}
+                      </div>
+                      <div className="space-y-1.5">
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-[10px] text-gray-500">
+                            브랜드
+                          </span>
+                          {editingPoint === index ? (
+                            <input
+                              type="text"
+                              value={editBrand}
+                              onChange={(e) => setEditBrand(e.target.value)}
+                              className="w-full px-2 py-1 bg-[#2A2A2A] border border-gray-700 rounded text-sm text-white focus:border-[#EAFD66] focus:outline-none"
+                              placeholder="브랜드명"
+                            />
+                          ) : (
+                            <span className="text-sm text-white font-medium truncate">
+                              {point.brand || "미입력"}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-[10px] text-gray-500">
+                            가격
+                          </span>
+                          {editingPoint === index ? (
+                            <input
+                              type="text"
+                              value={editPrice}
+                              onChange={(e) => setEditPrice(e.target.value)}
+                              className="w-full px-2 py-1 bg-[#2A2A2A] border border-gray-700 rounded text-sm text-white focus:border-[#EAFD66] focus:outline-none"
+                              placeholder="가격"
+                            />
+                          ) : (
+                            <span className="text-sm text-white font-medium truncate">
+                              {point.price || "미입력"}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                영감 링크 추가
-              </label>
-              
+              <div className="flex items-center gap-2 mb-2">
+                <label className="block text-sm font-medium text-white">
+                  스타일 참고 링크
+                </label>
+                <div className="group relative">
+                  <div className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center cursor-help">
+                    <span className="text-[10px] font-medium text-gray-400">
+                      i
+                    </span>
+                  </div>
+                  <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 p-2 bg-[#232323] border border-gray-700 rounded-lg text-xs text-gray-300 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                    이 스타일을 만들 때 참고한 이미지나 영상의 링크를
+                    추가해주세요. 다른 사용자들이 스타일의 영감을 얻는데 도움이
+                    됩니다.
+                  </div>
+                </div>
+              </div>
+
               {/* 링크 입력 폼 */}
               <div className="flex flex-col space-y-3">
-                <div className="grid grid-cols-4 gap-2">
-                  <select
-                    value={newCategory}
-                    onChange={(e) => setNewCategory(e.target.value)}
-                    className="col-span-1 px-3 py-2.5 bg-[#232323] border border-gray-700 rounded-md text-sm text-white focus:border-[#EAFD66] focus:outline-none focus:ring-1 focus:ring-[#EAFD66]"
-                  >
-                    {categoryOptions.map(option => (
-                      <option key={option} value={option}>{option}</option>
-                    ))}
-                  </select>
-                  <input
-                    type="text"
-                    value={newUrl}
-                    onChange={(e) => setNewUrl(e.target.value)}
-                    placeholder="URL을 입력하세요"
-                    className="col-span-3 px-3 py-2.5 bg-[#232323] border border-gray-700 rounded-md text-sm text-white focus:border-[#EAFD66] focus:outline-none focus:ring-1 focus:ring-[#EAFD66]"
-                  />
-                </div>
+                <input
+                  type="text"
+                  value={newUrl}
+                  onChange={(e) => setNewUrl(e.target.value)}
+                  placeholder="URL을 입력하세요"
+                  className="w-full px-3 py-2.5 bg-[#232323] border border-gray-700 rounded-md text-sm text-white focus:border-[#EAFD66] focus:outline-none focus:ring-1 focus:ring-[#EAFD66]"
+                />
                 <button
                   onClick={handleAddInspirationLink}
                   disabled={!newUrl.trim()}
                   className={cn(
                     "w-full py-2.5 text-sm rounded-md transition-colors font-medium",
-                    newUrl.trim() 
-                      ? "bg-[#EAFD66] text-[#1A1A1A] hover:bg-[#EAFD66]/90" 
+                    newUrl.trim()
+                      ? "bg-[#EAFD66] text-[#1A1A1A] hover:bg-[#EAFD66]/90"
                       : "bg-gray-700 text-gray-400 cursor-not-allowed"
                   )}
                 >
@@ -293,24 +396,23 @@ function StyleContextSidebar({
                 </button>
               </div>
             </div>
-            
+
             {/* 추가된 링크 목록 */}
             {inspirationLinks.length > 0 && (
               <div className="mt-5">
-                <h3 className="text-sm font-medium text-white mb-3">추가된 영감 링크</h3>
+                <h3 className="text-sm font-medium text-white mb-3">
+                  추가된 영감 링크
+                </h3>
                 <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
-                  {inspirationLinks.map(link => (
-                    <div 
-                      key={link.id} 
+                  {inspirationLinks.map((link) => (
+                    <div
+                      key={link.id}
                       className="flex items-center justify-between p-3 bg-[#232323] border border-gray-700 rounded-md hover:border-gray-600 transition-colors"
                     >
                       <div className="flex items-center space-x-2 max-w-[85%]">
-                        <span className="text-xs px-2 py-1 bg-[#2A2A2A] rounded text-[#EAFD66] whitespace-nowrap">
-                          {link.category}
-                        </span>
-                        <a 
-                          href={link.url} 
-                          target="_blank" 
+                        <a
+                          href={link.url}
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="text-sm text-blue-400 hover:text-blue-300 hover:underline truncate"
                         >
@@ -398,22 +500,38 @@ export function RequestFormModal({
         setIsStepComplete(!!selectedImage);
         break;
       case 2:
+        // 스텝 2에서는 마커가 1개 이상 있으면 다음으로 넘어갈 수 있음
         setIsStepComplete(points.length > 0);
         break;
       case 3:
-        setIsStepComplete(!!contextAnswers?.location);
+        if (modalType === "style") {
+          // 스타일 모달의 스텝 3에서는 모든 마커에 브랜드와 가격 정보가 있어야 함
+          const isAllMarkersComplete = points.every(
+            (point) =>
+              point.brand &&
+              point.price &&
+              point.brand.trim() !== "" &&
+              point.price.trim() !== ""
+          );
+          setIsStepComplete(isAllMarkersComplete);
+        } else {
+          setIsStepComplete(!!contextAnswers?.location);
+        }
         break;
       default:
         setIsStepComplete(false);
     }
-  }, [currentStep, selectedImage, points, contextAnswers?.location]);
+  }, [currentStep, selectedImage, points, contextAnswers?.location, modalType]);
 
   useEffect(() => {
     console.log("Selected point:", selectedPoint);
     console.log("Current step:", currentStep);
     console.log("Modal type:", modalType);
     console.log("Points:", points);
-    console.log("Should show form:", currentStep === 2 && modalType === "style" && selectedPoint !== null);
+    console.log(
+      "Should show form:",
+      currentStep === 2 && modalType === "style" && selectedPoint !== null
+    );
   }, [selectedPoint, currentStep, modalType, points]);
 
   // 이미지 최적화 함수 - 높은 해상도와 품질을 유지하도록 개선
@@ -438,7 +556,7 @@ export function RequestFormModal({
           // 새로운 크기 계산 - 4:5 비율 유지하면서 해상도 최대화
           let newWidth = originalWidth;
           let newHeight = originalHeight;
-          
+
           // 원본 비율
           const originalRatio = originalWidth / originalHeight;
 
@@ -460,7 +578,7 @@ export function RequestFormModal({
               newWidth = maxWidth;
               newHeight = newHeight * scale;
             }
-            
+
             if (newHeight > maxHeight) {
               const scale = maxHeight / newHeight;
               newHeight = maxHeight;
@@ -478,7 +596,7 @@ export function RequestFormModal({
           canvas.height = newHeight;
 
           const ctx = canvas.getContext("2d");
-          
+
           // 이미지가 4:5 비율에 맞게 중앙에 배치되도록 계산
           let sx = 0;
           let sy = 0;
@@ -487,19 +605,29 @@ export function RequestFormModal({
 
           if (originalRatio > targetRatio) {
             // 원본이 더 넓은 경우 좌우 잘라내기
-            sx = (originalWidth - (originalHeight * targetRatio)) / 2;
+            sx = (originalWidth - originalHeight * targetRatio) / 2;
             sWidth = originalHeight * targetRatio;
           } else if (originalRatio < targetRatio) {
             // 원본이 더 높은 경우 상하 잘라내기
-            sy = (originalHeight - (originalWidth / targetRatio)) / 2;
+            sy = (originalHeight - originalWidth / targetRatio) / 2;
             sHeight = originalWidth / targetRatio;
           }
 
           // 이미지를 캔버스에 그릴 때 smoothing 품질 설정
           if (ctx) {
             ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = 'high';
-            ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, newWidth, newHeight);
+            ctx.imageSmoothingQuality = "high";
+            ctx.drawImage(
+              img,
+              sx,
+              sy,
+              sWidth,
+              sHeight,
+              0,
+              0,
+              newWidth,
+              newHeight
+            );
           }
 
           try {
@@ -567,41 +695,55 @@ export function RequestFormModal({
       setModalConfig({
         type: "loading",
         isOpen: true,
-        onClose: () => {}
+        onClose: () => {},
       });
-      
+
       // 공통 이미지 압축 로직
       const base64Image = await compressImage(imageFile, 2500, 3125, 1.0);
-      
+
       if (modalType === "style") {
         // 스타일 데이터 구성
-        const styleData = {
-          image_file: base64Image,
-          name: contextAnswers.location,
-          inspiration_links: contextAnswers.inspirationLinks || [],
-          user_id: userId,
-          style_points: points.map(point => ({
+        const body = {
+          base64_image: base64Image,
+          style_links:
+            contextAnswers.inspirationLinks?.map((link) => link.url) || [],
+          user_doc_id: userId,
+          points: points.map((point) => ({
             position: {
-              left: typeof point.x === "number" ? String(point.x) : point.x ? String(point.x).replace("%", "") : "0",
-              top: typeof point.y === "number" ? String(point.y) : point.y ? String(point.y).replace("%", "") : "0",
+              left:
+                typeof point.x === "number"
+                  ? String(point.x)
+                  : point.x
+                  ? String(point.x).replace("%", "")
+                  : "0",
+              top:
+                typeof point.y === "number"
+                  ? String(point.y)
+                  : point.y
+                  ? String(point.y).replace("%", "")
+                  : "0",
             },
             brand: point.brand || null,
             price: point.price || null,
           })),
         };
-        
+
         // 콘솔에 정보 출력
         console.log("====== STYLE 데이터 전송 ======");
-        console.log("스타일 이름:", styleData.name);
-        console.log("마커 개수:", styleData.style_points.length);
-        console.log("마커 정보:", styleData.style_points);
-        console.log("영감 링크 개수:", styleData.inspiration_links.length);
-        console.log("영감 링크:", styleData.inspiration_links);
+        console.log("마커 개수:", body.points.length);
+        console.log("마커 정보:", body.points);
+        console.log("영감 링크 개수:", body.style_links.length);
+        console.log("영감 링크:", body.style_links);
         console.log("============================");
-        
-        // API 호출을 대신하는 지연 (실제 환경에서는 API 호출로 대체)
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
+
+        const userDocId = sessionStorage.getItem("USER_DOC_ID")!;
+
+        await networkManager.request(
+          `user/${userDocId}/add-style`,
+          "POST",
+          body
+        );
+
         // 성공 메시지 표시
         setModalConfig({
           type: "success",
@@ -615,8 +757,18 @@ export function RequestFormModal({
         // request 모드: 기존 API 로직 유지
         const requestItems = points.map((point) => {
           // 포지션 값에서 % 기호 제거 - API는 숫자 문자열 형태를 예상함
-          const leftPos = typeof point.x === "number" ? String(point.x) : point.x ? String(point.x).replace("%", "") : "0";
-          const topPos = typeof point.y === "number" ? String(point.y) : point.y ? String(point.y).replace("%", "") : "0";
+          const leftPos =
+            typeof point.x === "number"
+              ? String(point.x)
+              : point.x
+              ? String(point.x).replace("%", "")
+              : "0";
+          const topPos =
+            typeof point.y === "number"
+              ? String(point.y)
+              : point.y
+              ? String(point.y).replace("%", "")
+              : "0";
 
           return {
             item_class: null,
@@ -631,7 +783,7 @@ export function RequestFormModal({
             },
           };
         });
-        
+
         // 요청 데이터 구성
         const requestData = {
           image_file: base64Image,
@@ -641,15 +793,15 @@ export function RequestFormModal({
           source: contextAnswers?.source || null,
           metadata: {},
         };
-        
+
         // 포지션 값 디버깅
         console.log(
           "Final position values:",
           requestItems.map((item) => item.position)
         );
-        
+
         await createRequest(requestData as unknown as RequestImage, userId);
-        
+
         // 성공 메시지 표시 및 모달 닫기
         setModalConfig({
           type: "success",
@@ -660,7 +812,7 @@ export function RequestFormModal({
           },
         });
       }
-      
+
       // 일정 시간 후 모달 닫기
       setTimeout(() => {
         setModalConfig((prev) => ({ ...prev, isOpen: false }));
@@ -680,6 +832,27 @@ export function RequestFormModal({
   });
 
   const onNext = () => {
+    if (currentStep === 3 && modalType === "style") {
+      // 스타일 모달의 스텝 3에서 마커 정보가 입력되지 않은 경우
+      const incompleteMarkers = points.filter(
+        (point) =>
+          !point.brand ||
+          !point.price ||
+          point.brand.trim() === "" ||
+          point.price.trim() === ""
+      );
+
+      if (incompleteMarkers.length > 0) {
+        setModalConfig({
+          type: "warning",
+          isOpen: true,
+          messageKey: "style.marker.incomplete",
+          onClose: () => setModalConfig((prev) => ({ ...prev, isOpen: false })),
+        });
+        return;
+      }
+    }
+
     if (currentStep === 2) {
       setSelectedPoint(null);
     }
@@ -821,7 +994,11 @@ export function RequestFormModal({
   }, []);
 
   const handleDeleteMarker = () => {
-    if (selectedPoint !== null && selectedPoint >= 0 && selectedPoint < points.length) {
+    if (
+      selectedPoint !== null &&
+      selectedPoint >= 0 &&
+      selectedPoint < points.length
+    ) {
       const newPoints = [...points];
       newPoints.splice(selectedPoint, 1);
       setPoints(newPoints);
@@ -837,12 +1014,13 @@ export function RequestFormModal({
     points: points,
     onImageSelect: handleImageSelect,
     onPointsChange: setPoints,
-    onPointContextChange: modalType === "style" 
-      ? undefined  // 스타일 모달에서는 context 변경 핸들러 제거
-      : handleUpdateContext,
+    onPointContextChange:
+      modalType === "style"
+        ? undefined // 스타일 모달에서는 context 변경 핸들러 제거
+        : handleUpdateContext,
     onPointSelect: (pointIndex: number | null) => {
       console.log("Point selected:", pointIndex);
-      
+
       // request 모달에서는 마커를 클릭하면 바로 삭제 (기존 방식과 일치)
       if (modalType === "request" && pointIndex !== null && currentStep === 2) {
         const newPoints = [...points];
@@ -867,6 +1045,115 @@ export function RequestFormModal({
       setPoints(newPoints);
       setSelectedPoint(null);
     },
+    renderPoint: (point: Point, index: number) => {
+      const isSelected = selectedPoint === index;
+      const isStylePoint = modalType === "style";
+      const stylePoint = point as StylePoint;
+      const isComplete =
+        isStylePoint &&
+        stylePoint.brand &&
+        stylePoint.price &&
+        stylePoint.brand.trim() !== "" &&
+        stylePoint.price.trim() !== "";
+
+      return (
+        <div
+          key={index}
+          className={cn(
+            "absolute -translate-x-1/2 -translate-y-1/2 transition-all duration-200",
+            isSelected ? "z-20" : "z-10"
+          )}
+          style={{
+            left: `${point.x}%`,
+            top: `${point.y}%`,
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            imageContainerProps.onPointSelect?.(index);
+          }}
+        >
+          <div
+            className={cn(
+              "relative flex items-center justify-center",
+              "transition-all duration-200 ease-out",
+              isSelected ? "scale-110" : "hover:scale-105"
+            )}
+          >
+            {/* 외부 링 - 완료된 마커용 */}
+            {isComplete && (
+              <div
+                className={cn(
+                  "absolute inset-0 rounded-full",
+                  "transition-all duration-200",
+                  isSelected
+                    ? "animate-ping opacity-20 scale-110"
+                    : "opacity-0",
+                  "bg-[#EAFD66]"
+                )}
+              />
+            )}
+
+            {/* 외부 링 - 미완료 마커용 */}
+            {!isComplete && (
+              <div
+                className={cn(
+                  "absolute inset-0 rounded-full",
+                  "transition-all duration-200",
+                  isSelected
+                    ? "animate-ping opacity-20 scale-110"
+                    : "opacity-0",
+                  "bg-white"
+                )}
+              />
+            )}
+
+            {/* 메인 마커 배경 */}
+            <div
+              className={cn(
+                "w-4 h-4 rounded-full shadow-sm",
+                "flex items-center justify-center",
+                "transition-all duration-200",
+                isComplete
+                  ? "bg-[#EAFD66] text-[#1A1A1A]"
+                  : cn("bg-white text-[#1A1A1A]", "hover:bg-white/90"),
+                isSelected &&
+                  "ring-1 ring-[#EAFD66] ring-offset-0.5 ring-offset-[#1A1A1A]"
+              )}
+            >
+              {isComplete ? (
+                <span className="text-[10px] font-medium select-none">
+                  {index + 1}
+                </span>
+              ) : (
+                <span
+                  className={cn(
+                    "text-[11px] font-black select-none",
+                    "animate-bounce",
+                    "text-[#1A1A1A]"
+                  )}
+                >
+                  ?
+                </span>
+              )}
+            </div>
+
+            {/* 완료 표시 도트 */}
+            {isComplete && (
+              <div
+                className={cn(
+                  "absolute -top-0.5 -right-0.5",
+                  "w-1.5 h-1.5 rounded-full",
+                  "border border-[#1A1A1A]",
+                  "bg-[#EAFD66]",
+                  "transition-all duration-200",
+                  "shadow-sm"
+                )}
+              />
+            )}
+          </div>
+        </div>
+      );
+    },
   };
 
   const markerStepProps = {
@@ -880,14 +1167,14 @@ export function RequestFormModal({
   // 현재 단계에 따른 헤더 타이틀 결정
   const getHeaderTitle = () => {
     if (modalType === "request") {
-    switch (currentStep) {
-      case 1:
-        return t.request.steps.upload.title || "새 게시물";
-      case 2: 
-        return t.request.steps.marker.title || "마커 추가";
-      case 3:
-        return t.request.steps.context.title || "상세 정보";
-      default:
+      switch (currentStep) {
+        case 1:
+          return t.request.steps.upload.title || "새 게시물";
+        case 2:
+          return t.request.steps.marker.title || "마커 추가";
+        case 3:
+          return t.request.steps.context.title || "상세 정보";
+        default:
           return "새 게시물";
       }
     } else if (modalType === "style") {
@@ -897,7 +1184,7 @@ export function RequestFormModal({
         case 2:
           return "마커 추가";
         case 3:
-          return "스타일 영감 추가";
+          return "스타일 링크 추가";
         default:
           return "스타일 추가";
       }
@@ -914,10 +1201,11 @@ export function RequestFormModal({
 
   // 여기서 StylePointForm 컴포넌트를 분리
   function StylePointForm() {
-    const pointData = selectedPoint !== null ? points[selectedPoint] as StylePoint : null;
+    const pointData =
+      selectedPoint !== null ? (points[selectedPoint] as StylePoint) : null;
     const [localBrand, setLocalBrand] = useState("");
     const [localPrice, setLocalPrice] = useState("");
-    
+
     // 선택된 점이 변경될 때마다 로컬 상태를 업데이트
     useEffect(() => {
       if (pointData) {
@@ -925,25 +1213,27 @@ export function RequestFormModal({
         setLocalPrice(pointData.price || "");
       }
     }, [pointData]);
-    
+
     const handleSave = () => {
       if (selectedPoint !== null) {
         const newPoints = [...points];
         newPoints[selectedPoint] = {
           ...newPoints[selectedPoint],
           brand: localBrand,
-          price: localPrice
+          price: localPrice,
         } as StylePoint;
         setPoints(newPoints);
         setSelectedPoint(null);
       }
     };
-    
+
     if (!pointData) return null;
-    
+
     return (
-      <Dialog 
-        open={selectedPoint !== null && currentStep === 2 && modalType === "style"} 
+      <Dialog
+        open={
+          selectedPoint !== null && currentStep === 2 && modalType === "style"
+        }
         onOpenChange={(open) => {
           // open이 false일 때만 처리하고, 아이템 정보 모달만 닫음
           if (!open) {
@@ -951,7 +1241,7 @@ export function RequestFormModal({
           }
         }}
       >
-        <DialogContent 
+        <DialogContent
           className="bg-[#1A1A1A] border border-gray-700 p-5 rounded-lg max-w-xs w-full shadow-xl"
           onInteractOutside={(e) => {
             e.preventDefault();
@@ -966,8 +1256,10 @@ export function RequestFormModal({
           style={{ zIndex: 300000 }}
         >
           <div className="flex justify-between items-center mb-4">
-            <DialogTitle className="text-base font-medium text-white">아이템 정보</DialogTitle>
-            <button 
+            <DialogTitle className="text-base font-medium text-white">
+              아이템 정보
+            </DialogTitle>
+            <button
               onClick={(e) => {
                 // 이벤트 전파 방지
                 e.stopPropagation();
@@ -978,10 +1270,12 @@ export function RequestFormModal({
               <X size={16} />
             </button>
           </div>
-          
+
           <div className="space-y-5">
             <div>
-              <label className="text-sm text-gray-300 block mb-1.5">브랜드</label>
+              <label className="text-sm text-gray-300 block mb-1.5">
+                브랜드
+              </label>
               <input
                 type="text"
                 value={localBrand}
@@ -990,7 +1284,7 @@ export function RequestFormModal({
                 className="w-full px-3 py-2.5 bg-[#232323] border border-gray-700 rounded-md text-sm text-white focus:border-[#EAFD66] focus:outline-none focus:ring-1 focus:ring-[#EAFD66]"
               />
             </div>
-            
+
             <div>
               <label className="text-sm text-gray-300 block mb-1.5">가격</label>
               <input
@@ -1001,7 +1295,7 @@ export function RequestFormModal({
                 className="w-full px-3 py-2.5 bg-[#232323] border border-gray-700 rounded-md text-sm text-white focus:border-[#EAFD66] focus:outline-none focus:ring-1 focus:ring-[#EAFD66]"
               />
             </div>
-            
+
             <div className="flex space-x-3 mt-5">
               <button
                 onClick={handleDeleteMarker}
@@ -1010,7 +1304,7 @@ export function RequestFormModal({
                 <Trash2 size={15} className="mr-1.5" />
                 마커 삭제
               </button>
-              
+
               <button
                 onClick={handleSave}
                 className="flex-1 py-2.5 bg-[#EAFD66] text-[#1A1A1A] rounded-md text-sm font-medium hover:bg-[#EAFD66]/90 transition-colors"
@@ -1117,12 +1411,9 @@ export function RequestFormModal({
 
                   <button
                     onClick={currentStep === totalSteps ? handleSubmit : onNext}
-                    disabled={!isStepComplete}
                     className={cn(
                       "text-sm font-semibold px-2 py-1",
-                      isStepComplete
-                        ? "text-[#EAFD66] hover:text-[#EAFD66]/90 transition-colors"
-                        : "text-gray-500 cursor-not-allowed"
+                      "text-[#EAFD66] hover:text-[#EAFD66]/90 transition-colors"
                     )}
                   >
                     {getNextButtonText()}
@@ -1148,25 +1439,42 @@ export function RequestFormModal({
               />
             </div>
 
-            {/* 마커 단계에서 필수 입력사항 안내 - flex-shrink-0 추가 */}
+            {/* 마커 단계에서 안내 - flex-shrink-0 추가 */}
             {currentStep === 2 && showMarkerGuide && (
-              <div className="px-4 py-2 bg-[#232323] border-b border-gray-800 flex-shrink-0">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-300">
-                      필수 입력사항
-                    </h3>
-                    <p className="text-xs text-gray-400 mt-1">
-                      {modalType === "style" 
-                        ? "이미지를 클릭하여 스타일의 특징적인 부분을 표시해주세요"
-                        : "이미지를 클릭하여 궁금한 아이템의 위치를 표시해주세요"}
-                    </p>
+              <div className="px-4 py-3 bg-[#232323] border-b border-gray-800 flex-shrink-0">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-2">
+                    <div className="flex items-start gap-2">
+                      <div className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center mt-0.5">
+                        <span className="text-[10px] font-medium text-gray-400">
+                          •
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-400 leading-relaxed">
+                        {modalType === "style"
+                          ? "이미지를 클릭하여 스타일의 특징적인 부분을 표시해주세요"
+                          : "이미지를 클릭하여 궁금한 아이템의 위치를 표시해주세요"}
+                      </p>
+                    </div>
+                    {modalType === "style" && (
+                      <div className="flex items-start gap-2">
+                        <div className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center mt-0.5">
+                          <span className="text-[10px] font-medium text-gray-400">
+                            •
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-400 leading-relaxed">
+                          마커를 클릭하여 브랜드와 가격 정보를 입력할 수
+                          있습니다
+                        </p>
+                      </div>
+                    )}
                   </div>
                   <button
                     onClick={() => setShowMarkerGuide(false)}
-                    className="p-1 hover:bg-gray-800 text-gray-400 hover:text-white/80"
+                    className="p-1.5 hover:bg-gray-800/50 rounded-full text-gray-400 hover:text-white/80 transition-colors"
                   >
-                    <X size={16} />
+                    <X size={14} />
                   </button>
                 </div>
               </div>
@@ -1183,110 +1491,41 @@ export function RequestFormModal({
               )}
             >
               {currentStep === 3 ? (
-                // 3단계일 때 - 모바일 환경에 따른 레이아웃 분기
-                isMobile ? (
-                  // 모바일에서는 이미지 위에 ContextStepSidebar가 오버레이됨
-                  <div className="relative w-full h-full">
-                    {/* 이미지 영역 - 전체 화면으로 표시 */}
-                    <div className="absolute inset-0 flex items-center justify-center bg-[#1A1A1A]">
-                      {selectedImage && (
-                        <div className="w-full h-full flex items-center justify-center p-1 pt-0">
-                          <ImageContainer
-                            {...imageContainerProps}
-                            showCropper={false}
-                            onCropperChange={() => {}}
-                            onPointsChange={() => {}} // 읽기 전용
-                            onPointSelect={() => {}} // 읽기 전용
-                          />
-                        </div>
-                      )}
-
-                      {/* 이미지 위에 그라데이션 오버레이 추가 - 슬라이드 메뉴와의 대비 강화 */}
-                      <div
-                        className="absolute inset-0 pointer-events-none"
-                        style={{
-                          background:
-                            "linear-gradient(to bottom, transparent 70%, rgba(0,0,0,0.4) 100%)",
-                        }}
+                <div className="w-full h-full flex">
+                  {/* 이미지 영역 */}
+                  <div className="w-[65%] h-full flex items-center justify-center bg-[#1A1A1A] overflow-hidden">
+                    <div className="relative aspect-[4/5] h-[calc(100%-20px)] flex items-center justify-center">
+                      <ImageContainer
+                        {...imageContainerProps}
+                        ref={imageContainerRef}
                       />
                     </div>
+                  </div>
 
-                    {/* 모바일용 드래그 힌트 - 처음에만 잠깐 표시됨 */}
-                    {currentStep === 3 && (
-                      <div className="absolute bottom-3 left-0 right-0 flex justify-center items-center pointer-events-none">
-                        <div className="bg-black/50 text-white/80 text-xs px-3 py-1.5 rounded-full flex items-center gap-1 animate-pulse">
-                          <span>위로 드래그하여 정보 입력</span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* 모바일용 슬라이드 컨텍스트 사이드바 */}
+                  {/* 사이드바 영역 */}
+                  <div className="flex-1 h-full border-l border-gray-800">
                     {modalType === "style" ? (
                       <StyleContextSidebar
                         onAnswerChange={(answer) => setContextAnswers(answer)}
                         onSubmit={handleSubmit}
-                        isMobile={true}
+                        isMobile={isMobile}
+                        points={points}
+                        onPointUpdate={(index, updatedPoint) => {
+                          const newPoints = [...points];
+                          newPoints[index] = updatedPoint;
+                          setPoints(newPoints);
+                        }}
                       />
                     ) : (
                       <ContextStepSidebar
-                        modalType={modalType}
+                        modalType="request"
                         onAnswerChange={(answer) => setContextAnswers(answer)}
                         onSubmit={handleSubmit}
-                        isMobile={true}
+                        isMobile={isMobile}
                       />
                     )}
                   </div>
-                ) : (
-                  // 데스크톱에서는 기존 그리드 레이아웃 유지
-                  <div className="grid grid-cols-1 sm:grid-cols-[6fr_4fr] w-full h-full">
-                    {/* 왼쪽 이미지 섹션 */}
-                    <div
-                      className="relative flex items-center justify-center p-3 bg-[#232323] sm:border-r sm:border-gray-800 overflow-hidden"
-                      style={{
-                        minHeight: "300px",
-                      }}
-                    >
-                      <div
-                        className="relative mx-auto my-auto flex items-center justify-center max-h-full"
-                        style={{
-                          minHeight: "250px",
-                          minWidth: "200px",
-                        }}
-                      >
-                        {/* 2단계에서 넘겨받은 마커를 그대로 표시하기 위해 ImageContainer 사용 */}
-                        {selectedImage && (
-                          <div className="w-full h-full flex items-center justify-center p-2">
-                            <ImageContainer
-                              {...imageContainerProps}
-                              showCropper={false}
-                              onCropperChange={() => {}}
-                              onPointsChange={() => {}} // 읽기 전용으로 설정
-                              onPointSelect={() => {}} // 읽기 전용으로 설정
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* 오른쪽 폼 섹션 */}
-                    <div className="h-full w-full bg-[#1A1A1A]">
-                      {modalType === "style" ? (
-                        <StyleContextSidebar
-                          onAnswerChange={(answer) => setContextAnswers(answer)}
-                          onSubmit={handleSubmit}
-                          isMobile={isMobile}
-                        />
-                      ) : (
-                        <ContextStepSidebar
-                          modalType="request"
-                          onAnswerChange={(answer) => setContextAnswers(answer)}
-                          onSubmit={handleSubmit}
-                          isMobile={isMobile}
-                        />
-                      )}
-                    </div>
-                  </div>
-                )
+                </div>
               ) : (
                 // 1-2단계에서는 이미지만 표시
                 <div className="w-full h-full flex items-center justify-center overflow-hidden p-0">
@@ -1318,7 +1557,8 @@ export function RequestFormModal({
                       <div
                         className={cn(
                           "relative aspect-[4/5] h-full max-h-[calc(100% - 10px)]",
-                          "flex items-center justify-center overflow-hidden"
+                          "flex items-center justify-center overflow-hidden",
+                          currentStep === 3 && "max-w-[60%]"
                         )}
                       >
                         <ImageContainer

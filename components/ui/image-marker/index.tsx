@@ -20,6 +20,7 @@ interface ImageMarkerProps {
   className?: string;
   disableEditing?: boolean;
   selectedPointIndex?: number | null;
+  renderPoint?: (point: Point, index: number) => React.ReactNode;
 }
 
 export function ImageMarker({
@@ -33,6 +34,7 @@ export function ImageMarker({
   className,
   disableEditing,
   selectedPointIndex,
+  renderPoint,
 }: ImageMarkerProps) {
   const imageRef = useRef<HTMLDivElement>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -191,19 +193,33 @@ export function ImageMarker({
             style={{ left: `${point.x}%`, top: `${point.y}%` }}
             onClick={(e) => handleMarkerClick(e, index)}
           >
-            <div className={cn(
-              "relative w-4 h-4 hover:scale-125 transition-transform",
-              selectedPointIndex === index && "scale-125"
-            )}>
-              <div className={cn(
-                "absolute inset-0 border-2 rounded-full animate-pulse",
-                selectedPointIndex === index ? "border-[#FFFFFF]" : "border-[#EAFD66]"
-              )} />
-              <div className={cn(
-                "absolute inset-[2px] rounded-full backdrop-blur-sm",
-                selectedPointIndex === index ? "bg-[#FFFFFF]/50" : "bg-[#EAFD66]/30"
-              )} />
-            </div>
+            {renderPoint ? (
+              renderPoint(point, index)
+            ) : (
+              <div
+                className={cn(
+                  "relative w-4 h-4 hover:scale-125 transition-transform",
+                  selectedPointIndex === index && "scale-125"
+                )}
+              >
+                <div
+                  className={cn(
+                    "absolute inset-0 border-2 rounded-full animate-pulse",
+                    selectedPointIndex === index
+                      ? "border-[#FFFFFF]"
+                      : "border-[#EAFD66]"
+                  )}
+                />
+                <div
+                  className={cn(
+                    "absolute inset-[2px] rounded-full backdrop-blur-sm",
+                    selectedPointIndex === index
+                      ? "bg-[#FFFFFF]/50"
+                      : "bg-[#EAFD66]/30"
+                  )}
+                />
+              </div>
+            )}
           </div>
         ))}
       </div>

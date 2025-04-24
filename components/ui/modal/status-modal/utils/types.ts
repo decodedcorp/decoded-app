@@ -1,18 +1,19 @@
-export type StatusType = 'success' | 'error' | 'warning' | 'loading';
+export type StatusType = "success" | "error" | "warning" | "loading";
 
-export type StatusMessageKey = 
-  | 'request'
-  | 'provide'
-  | 'save'
-  | 'default'
-  | 'unsavedChanges'
-  | 'delete'
-  | 'login'
-  | 'duplicate'
-  | 'empty_links'
-  | 'submitting'
-  | 'link_added'
-  | 'link_error';
+export type StatusMessageKey =
+  | "request"
+  | "provide"
+  | "save"
+  | "default"
+  | "unsavedChanges"
+  | "delete"
+  | "login"
+  | "duplicate"
+  | "empty_links"
+  | "submitting"
+  | "link_added"
+  | "link_error"
+  | "style.marker.incomplete";
 
 export interface StatusConfig {
   type: StatusType;
@@ -33,4 +34,4 @@ export interface StatusStore {
   isLoading?: boolean;
   setStatus: (config: StatusConfig) => void;
   closeStatus: () => void;
-} 
+}

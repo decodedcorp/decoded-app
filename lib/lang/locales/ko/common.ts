@@ -79,6 +79,10 @@ export const common = {
           title: "중복 요청",
           message: "이미 요청한 아이템입니다.",
         },
+        "style.marker.incomplete": {
+          title: "마커 정보 미입력",
+          message: "모든 마커의 브랜드와 가격 정보를 입력해주세요.",
+        },
       },
     },
   },
