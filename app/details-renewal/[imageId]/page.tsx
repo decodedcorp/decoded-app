@@ -3,9 +3,6 @@ import { LoadingDisplay } from './components/loading';
 import { notFound } from 'next/navigation';
 import { ErrorDisplay } from './components/error';
 import { getImageDetails } from '@/app/details/utils/hooks/fetchImageDetails';
-import { ImageSection } from './components/image-section/image-section';
-import { DetailsList } from './components/item-list-section/server/details-list';
-import { RelatedStylingSection } from './components/related-styling/related-style';
 import { ImageDetails, DecodedItem } from '@/lib/api/_types/image';
 import { generateItemSchema } from '@/lib/structured-data/geneartors/item';
 import { MobileDetailsList } from './components/item-list-section/mobile/mobile-details-list';
@@ -13,6 +10,7 @@ import { MobileActions } from './components/item-list-section/mobile/mobile-acti
 import { GridWrapper } from './components/item-list-section/server/grid-wrapper';
 import { ImageSectionWrapper } from './components/image-section-wrapper';
 import { ArtistHeader } from './components/related-styling/client/artist-header';
+import { LinkButton } from './components/modal/link-button';
 
 // 타입 정의
 interface PageProps {
@@ -141,19 +139,16 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
                   <div className="hidden lg:block h-[100vh] overflow-y-auto custom-scrollbar p-4 rounded-lg bg-zinc-950/50 relative">
                     {/* 헤더와 버튼 레이아웃 조정 */}
                     <div className="flex justify-between items-center mb-8">
-                      <h2 className="text-white text-xl font-medium">DECODED</h2>
+                      <h2 className="text-white text-xl font-medium">
+                        DECODED
+                      </h2>
                     </div>
-                    
+
                     {/* 우측 상단 스티키 아이템 추가 버튼 */}
                     <div className="sticky top-6 float-right -mt-16 mr-2 z-20">
-                      <button className="w-10 h-10 bg-black/40 hover:bg-black/60 text-white rounded-full flex items-center justify-center shadow-md transition-all duration-200">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M12 4V20M20 12H4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                        </svg>
-                        <span className="sr-only">아이템 추가</span>
-                      </button>
+                      <LinkButton imageId={imageId} />
                     </div>
-                    
+
                     <GridWrapper imageId={imageId} />
                   </div>
                 </div>

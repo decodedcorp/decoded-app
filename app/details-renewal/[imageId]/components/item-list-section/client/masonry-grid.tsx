@@ -251,11 +251,11 @@ export const MasonryGrid = () => {
 
   // 화면 크기에 따른 아이템 너비 결정
   const getItemWidth = () => {
-    return containerWidth < 640 ? 180 : 
-           containerWidth < 1024 ? 220 : 
-           containerWidth < 1440 ? 260 : 
-           containerWidth < 1920 ? 240 :
-           220; // 아주 큰 화면에서는 오히려 더 작게
+    return containerWidth < 640 ? Math.min(160, containerWidth/3 - 12) : 
+           containerWidth < 1024 ? Math.min(200, containerWidth/4 - 12) : 
+           containerWidth < 1440 ? Math.min(240, containerWidth/5 - 12) : 
+           containerWidth < 1920 ? Math.min(220, containerWidth/5 - 12) :
+           Math.min(200, containerWidth/6 - 12);
   };
 
   // 컬럼 사이즈 결정
@@ -291,7 +291,7 @@ export const MasonryGrid = () => {
         // 실제 API에서 새 데이터 가져오기
         const newItems = fetchDummyItems(nextGroupKey, PAGE_SIZE);
         
-        // 더 불러올 데이터가 없는 경우 체크
+        // 더 불러올 데이터가 없는 경우 체크  
         if (newItems.length === 0) {
           setHasMore(false);
         }
@@ -471,7 +471,7 @@ export const MasonryGrid = () => {
   };
 
   return (
-    <div ref={containerRef} className="w-full">
+    <div ref={containerRef} className="w-full overflow-x-hidden">
       <MasonryInfiniteGrid
         className="w-full"
         style={{ width: '100%', margin: '0 auto' }}

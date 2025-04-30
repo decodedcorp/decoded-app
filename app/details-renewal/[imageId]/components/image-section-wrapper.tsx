@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { ImageSection } from './image-section/image-section';
-import { MobileActions } from '../components/item-list-section/mobile/mobile-actions';
+import { useLike } from '@/app/details-renewal/utils/hooks/use-like';
+import { ShareButtons } from '@/components/ui/share-buttons';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 
 interface ImageSectionWrapperProps {
   imageData: any;
@@ -11,15 +13,36 @@ interface ImageSectionWrapperProps {
 
 export function ImageSectionWrapper({ imageData, selectedItemId }: ImageSectionWrapperProps) {
   const [showGuide, setShowGuide] = useState(false);
+  const [displayLikeCount, setDisplayLikeCount] = useState(imageData?.like || 0);
+  
+  const { isLiked, likeCount, toggleLike, isLikeLoading } = useLike({
+    itemId: imageData?.doc_id || '',
+    type: 'image',
+    initialLikeCount: imageData?.like || 0,
+    initialIsLiked: imageData?.is_liked || false
+  });
+
+  // 좋아요 상태가 변경될 때만 displayLikeCount 업데이트
+  useEffect(() => {
+    if (isLiked) {
+      setDisplayLikeCount((prev: number) => prev + 1);
+    } else {
+      setDisplayLikeCount((prev: number) => prev - 1);
+    }
+  }, [isLiked]);
   
   useEffect(() => {
-    // 첫 방문 여부 확인
     const hasVisited = localStorage.getItem('hasVisitedDetailPage');
     if (!hasVisited) {
       setShowGuide(true);
       localStorage.setItem('hasVisitedDetailPage', 'true');
     }
   }, []);
+
+  const handleLikeClick = () => {
+    if (isLikeLoading) return;
+    toggleLike();
+  };
 
   return (
     <div className="relative w-full h-full">
@@ -33,12 +56,36 @@ export function ImageSectionWrapper({ imageData, selectedItemId }: ImageSectionW
       
       {/* 오버레이 액션 버튼 */}
       <div className="absolute bottom-4 right-4 flex gap-2">
-        <button className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center hover:bg-black/60">
-          <HeartIcon className="w-5 h-5 text-white" />
-        </button>
-        <button className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center hover:bg-black/60">
-          <ShareIcon className="w-5 h-5 text-white" />
-        </button>
+        <div className="group relative">
+          <button 
+            onClick={handleLikeClick}
+            disabled={isLikeLoading}
+            className={`w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center transition-all duration-300 ${
+              isLikeLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-black/60'
+            }`}
+          >
+            <HeartIcon className={`w-5 h-5 transition-all duration-300 ${
+              isLiked ? 'text-red-500 fill-red-500' : 'text-white'
+            }`} />
+          </button>
+          <div className="absolute right-full top-1/2 -translate-y-1/2 mr-2 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black/80 text-white px-2 py-1 rounded text-xs whitespace-nowrap">
+            {displayLikeCount} likes
+          </div>
+        </div>
+        <Dialog>
+          <DialogTrigger asChild>
+            <button className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center hover:bg-black/60 transition-all duration-300">
+              <ShareIcon className="w-5 h-5 text-white" />
+            </button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md bg-black/90 dark:bg-black border-0 shadow-lg rounded-lg overflow-hidden p-0">
+            <ShareButtons 
+              title={imageData?.title || '이미지 공유하기'}
+              description={imageData?.description || ''}
+              buttonVariant="ghost"
+            />
+          </DialogContent>
+        </Dialog>
         <button className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center hover:bg-black/60">
           <PlusIcon className="w-5 h-5 text-white" />
         </button>
@@ -62,7 +109,7 @@ export function ImageSectionWrapper({ imageData, selectedItemId }: ImageSectionW
 
 // 임시 아이콘 컴포넌트 (실제로는 heroicons나 다른 아이콘 라이브러리를 사용하세요)
 function HeartIcon(props: any) {
-  return <svg {...props} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>;
+  return <svg {...props} viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>;
 }
 
 function ShareIcon(props: any) {

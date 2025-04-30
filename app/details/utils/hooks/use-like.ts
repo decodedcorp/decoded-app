@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import { networkManager } from '@/lib/network/network';
 import { useStatusStore } from '@/components/ui/modal/status-modal/utils/store';
@@ -10,11 +10,9 @@ interface UseLikeProps {
 }
 
 interface LikeResponse {
-  status?: boolean;
-  message?: string;
-  status_code?: number;
-  description?: string;
-  data?: {
+  status_code: number;
+  description: string;
+  data: {
     is_like?: boolean;
   };
 }
@@ -23,134 +21,72 @@ interface LikeCountResponse {
   count: number;
 }
 
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 1000; // 1초
+const STALE_TIME = 1000 * 60 * 5; // 5분
+const GC_TIME = 1000 * 60 * 30; // 30분
+
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+const isNetworkError = (error: any): boolean => {
+  return error?.message?.includes('Network') || 
+         error?.message?.includes('Failed to fetch') ||
+         error?.status === 0;
+};
+
 export function useLike({ itemId, type, initialLikeCount }: UseLikeProps) {
   const queryClient = useQueryClient();
   const setStatus = useStatusStore((state) => state.setStatus);
   const userId = typeof window !== 'undefined' ? sessionStorage.getItem('USER_DOC_ID') : null;
+  const [likeCount, setLikeCount] = useState(initialLikeCount);
 
-  // Query for getting initial like status
-  const { data: isLiked = false } = useQuery<boolean>({
+  // 좋아요 상태 조회
+  const { data: likeData } = useQuery({
     queryKey: ['like', type, itemId, userId],
     queryFn: async () => {
-      if (!userId) return false;
+      if (!userId) return { isLiked: false };
       
-      try {
-        // Check if user has already liked this item
-        if (type === 'item') {
+      let retries = 0;
+      while (retries < MAX_RETRIES) {
+        try {
           const response = await networkManager.request<LikeResponse>(
-            `user/${userId}/islike?doc_type=items&doc_id=${itemId}`,
+            `user/${userId}/islike?doc_type=${type}s&doc_id=${itemId}`,
             'GET'
           );
-          return response?.data?.is_like || false;
+
+          if (!response || response.status_code !== 200) {
+            throw new Error(`Invalid response: ${response?.status_code}`);
+          }
+
+          return {
+            isLiked: Boolean(response.data?.is_like)
+          };
+        } catch (error: any) {
+          if (isNetworkError(error)) {
+            retries++;
+            if (retries < MAX_RETRIES) {
+              const waitTime = RETRY_DELAY * Math.pow(2, retries - 1);
+              await delay(waitTime);
+              continue;
+            }
+          }
+          return { isLiked: false };
         }
-
-        const response = await networkManager.request<LikeResponse>(
-          `${type}/like/status/${itemId}/${userId}`,
-          'GET'
-        );
-
-        return response?.status || false;
-      } catch (error) {
-        console.error('Error checking like status:', error);
-        return false;
       }
+      return { isLiked: false };
     },
-    // Only run query if we have both userId and itemId
     enabled: !!userId && !!itemId,
-    // Prevent background refetches
-    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+    staleTime: STALE_TIME,
+    gcTime: GC_TIME,
   });
 
-  // Mutation for toggling like
-  const { mutate: toggleLike } = useMutation({
-    mutationFn: async () => {
-      if (!userId) {
-        setStatus({
-          type: 'warning',
-          message: '로그인이 필요한 기능입니다.',
-        });
-        throw new Error('User not logged in');
-      }
-
-      try {
-        // Attempt to toggle like status
-        const endpoint = type === 'item'
-          ? `user/${userId}/${isLiked ? 'unlike' : 'like'}/item/${itemId}`
-          : `${type}/like/${itemId}/${userId}`;
-
-        const response = await networkManager.request<LikeResponse>(
-          endpoint,
-          'POST'
-        );
-
-        if (!response) {
-          throw new Error('No response from server');
-        }
-
-        return response;
-      } catch (error: any) {
-        throw error;
-      }
-    },
-    onMutate: async () => {
-      // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ['like', type, itemId, userId] });
-      if (type !== 'item') {
-        await queryClient.cancelQueries({ queryKey: ['likeCount', type, itemId] });
-      }
-
-      // Snapshot the previous values
-      const previousLikeStatus = queryClient.getQueryData(['like', type, itemId, userId]);
-      const previousCount = type === 'item' 
-        ? initialLikeCount 
-        : (queryClient.getQueryData(['likeCount', type, itemId]) as number ?? initialLikeCount);
-
-      // Optimistically update the cache
-      const newLikeStatus = !isLiked;
-      queryClient.setQueryData(['like', type, itemId, userId], newLikeStatus);
-      if (type !== 'item') {
-        queryClient.setQueryData(
-          ['likeCount', type, itemId], 
-          (old: number) => (isLiked ? Math.max(0, (old - 1)) : (old + 1))
-        );
-      }
-
-      return { previousLikeStatus, previousCount };
-    },
-    onError: (err, variables, context) => {
-      // On error, roll back to the previous values
-      if (context) {
-        queryClient.setQueryData(['like', type, itemId, userId], context.previousLikeStatus);
-        if (type !== 'item') {
-          queryClient.setQueryData(['likeCount', type, itemId], context.previousCount);
-        }
-      }
-      
-      if (err instanceof Error && err.message !== 'Duplicate like action') {
-        setStatus({
-          type: 'error',
-          message: '좋아요 처리 중 오류가 발생했습니다. 다시 시도해주세요.',
-        });
-      }
-      console.error('Error toggling like:', err);
-    },
-    onSettled: () => {
-      // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ['like', type, itemId, userId] });
-      if (type !== 'item') {
-        queryClient.invalidateQueries({ queryKey: ['likeCount', type, itemId] });
-      }
-    },
-  });
-
-  // Query for like count
-  const { data: likeCount = initialLikeCount } = useQuery<number>({
+  // 좋아요 수 조회
+  const { data: likeCountData } = useQuery({
     queryKey: ['likeCount', type, itemId],
     queryFn: async () => {
+      if (type === 'item') return initialLikeCount;
+      
       try {
-        if (type === 'item') {
-          return initialLikeCount;
-        }
         const response = await networkManager.request<LikeCountResponse>(
           `${type}/like/count/${itemId}`,
           'GET'
@@ -161,7 +97,86 @@ export function useLike({ itemId, type, initialLikeCount }: UseLikeProps) {
         return initialLikeCount;
       }
     },
-    staleTime: 1000 * 60, // Consider data fresh for 1 minute
+    staleTime: STALE_TIME,
+    gcTime: GC_TIME,
+  });
+
+  // 좋아요 수 동기화
+  useEffect(() => {
+    if (likeCountData !== undefined) {
+      setLikeCount(likeCountData);
+    }
+  }, [likeCountData]);
+
+  // 좋아요 토글
+  const { mutate: toggleLike, isPending } = useMutation({
+    mutationFn: async () => {
+      if (!userId) {
+        setStatus({
+          type: 'warning',
+          message: '로그인이 필요한 기능입니다.',
+        });
+        throw new Error('User not logged in');
+      }
+
+      let retries = 0;
+      while (retries < MAX_RETRIES) {
+        try {
+          const endpoint = `user/${userId}/${likeData?.isLiked ? 'unlike' : 'like'}/${type}/${itemId}`;
+          const response = await networkManager.request<LikeResponse>(
+            endpoint,
+            'POST'
+          );
+
+          if (!response || response.status_code !== 200) {
+            throw new Error(`Invalid response: ${response?.status_code}`);
+          }
+
+          return response;
+        } catch (error: any) {
+          if (isNetworkError(error)) {
+            retries++;
+            if (retries < MAX_RETRIES) {
+              const waitTime = RETRY_DELAY * Math.pow(2, retries - 1);
+              await delay(waitTime);
+              continue;
+            }
+          }
+          throw error;
+        }
+      }
+      throw new Error('Failed to toggle like status after max retries');
+    },
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ['like', type, itemId, userId] });
+
+      const previousData = queryClient.getQueryData(['like', type, itemId, userId]);
+
+      // Optimistic update
+      queryClient.setQueryData(['like', type, itemId, userId], (old: any) => ({
+        ...old,
+        isLiked: !old?.isLiked
+      }));
+
+      setLikeCount(prev => likeData?.isLiked ? prev - 1 : prev + 1);
+
+      return { previousData };
+    },
+    onError: (err, variables, context) => {
+      if (context?.previousData) {
+        queryClient.setQueryData(['like', type, itemId, userId], context.previousData);
+        setLikeCount(initialLikeCount);
+      }
+      
+      setStatus({
+        type: 'error',
+        message: '좋아요 처리 중 오류가 발생했습니다. 다시 시도해주세요.',
+      });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['like', type, itemId, userId] });
+      queryClient.invalidateQueries({ queryKey: ['likeCount', type, itemId] });
+    },
   });
 
   const handleToggleLike = useCallback(() => {
@@ -172,12 +187,16 @@ export function useLike({ itemId, type, initialLikeCount }: UseLikeProps) {
       });
       return;
     }
+    
+    if (isPending) return;
+    
     toggleLike();
-  }, [toggleLike, userId, setStatus]);
+  }, [toggleLike, userId, setStatus, isPending]);
 
   return {
-    isLiked,
+    isLiked: likeData?.isLiked ?? false,
     likeCount,
     toggleLike: handleToggleLike,
+    isLikeLoading: isPending,
   };
 } 
