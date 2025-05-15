@@ -28,6 +28,9 @@ import {
   StyleContextSidebar, 
   ContextAnswer as StyleContextAnswer 
 } from "./style-context-sidebar";
+import { ModalHeader } from "./components/header/modal-header";
+import { ProgressBar } from "./components/progress/progress-bar";
+import { ImageContainerWrapper } from "./components/image-section/image-container-wrapper";
 // CSS는 globals.css에서 import
 
 // 간단한 모바일 환경 감지 훅
@@ -701,38 +704,27 @@ export function RequestFormModal({
     onUpdateContext: handleUpdateContext,
   };
 
-  // 현재 단계에 따른 헤더 타이틀 결정
+  // 헤더 관련 함수들
   const getHeaderTitle = () => {
     if (modalType === "request") {
       switch (currentStep) {
-        case 1:
-          return t.request.steps.upload.title || "새 게시물";
-        case 2:
-          return t.request.steps.marker.title || "아이템 추가";
-        case 3:
-          return t.request.steps.context.title || "상세 정보";
-        default:
-          return "새 게시물";
+        case 1: return "새 게시물";
+        case 2: return "아이템 추가";
+        case 3: return "상세 정보";
+        default: return "새 게시물";
       }
-    } else if (modalType === "style") {
+    } else {
       switch (currentStep) {
-        case 1:
-          return "스타일 추가";
-        case 2:
-          return "아이템 정보 입력";
-        case 3:
-          return "스타일 참고 링크";
-        default:
-          return "스타일 추가";
+        case 1: return "스타일 추가";
+        case 2: return "아이템 정보 입력";
+        case 3: return "스타일 참고 링크";
+        default: return "스타일 추가";
       }
     }
   };
 
-  // 현재 단계에 따른 다음 버튼 텍스트 결정
   const getNextButtonText = () => {
-    if (currentStep === totalSteps) {
-      return "공유";
-    }
+    if (currentStep === totalSteps) return "공유";
     return "다음";
   };
 
@@ -824,7 +816,6 @@ export function RequestFormModal({
 
   return (
     <>
-      {/* Main Modal Content */}
       <Dialog
         open={isOpen}
         onOpenChange={(open) => {
@@ -833,24 +824,18 @@ export function RequestFormModal({
           }
         }}
       >
-        <DialogContent
-          className={cn(
-            "p-0 border-0 overflow-hidden bg-[#1A1A1A]",
-            // 모바일에서는 전체화면으로 설정
-            "w-full h-screen max-w-full max-h-screen rounded-none",
-            // 태블릿 이상에서는 적절한 크기로 제한
-            currentStep === 2 || currentStep === 3
-              ? "sm:w-[min(1000px,95vw)] sm:h-[min(700px,90vh)]"
-              : "sm:w-[min(450px,80vw)] sm:h-[min(600px,90vh)]",
-            "sm:min-w-[320px] sm:min-h-[500px]",
-            // 데스크탑에서도 너무 커지지 않도록 제한
-            currentStep === 2 || currentStep === 3
-              ? "lg:w-[min(1200px,90vw)] lg:h-[min(800px,80vh)]"
-              : "lg:w-[min(500px,60vw)] lg:h-[min(650px,80vh)]",
-            "sm:rounded-md flex flex-col"
-          )}
-        >
-          {/* 접근성을 위한 DialogTitle */}
+        <DialogContent className={cn(
+          "p-0 border-0 overflow-hidden bg-[#1A1A1A]",
+          "w-full h-screen max-w-full max-h-screen rounded-none",
+          currentStep === 2 || currentStep === 3
+            ? "sm:w-[min(1000px,95vw)] sm:h-[min(700px,90vh)]"
+            : "sm:w-[min(450px,80vw)] sm:h-[min(600px,90vh)]",
+          "sm:min-w-[320px] sm:min-h-[500px]",
+          currentStep === 2 || currentStep === 3
+            ? "lg:w-[min(1200px,90vw)] lg:h-[min(800px,80vh)]"
+            : "lg:w-[min(500px,60vw)] lg:h-[min(650px,80vh)]",
+          "sm:rounded-md flex flex-col"
+        )}>
           <DialogTitle className="sr-only">
             {currentStep === 1 && selectedImage && showCropper
               ? "이미지 크롭"
@@ -858,103 +843,27 @@ export function RequestFormModal({
           </DialogTitle>
 
           <div className="flex flex-col h-full w-full">
-            <header
-              className={cn(
-                "flex items-center justify-between h-12 px-4 z-30 border-b border-gray-800",
-                "bg-[#1A1A1A] flex-shrink-0"
-              )}
-            >
-              {currentStep === 1 && selectedImage && showCropper ? (
-                <>
-                  <button
-                    onClick={() => handleSetShowCropper(false)}
-                    className="p-2 -ml-2 hover:bg-gray-800 rounded-full transition-colors text-white/80"
-                  >
-                    <ArrowLeft size={20} />
-                  </button>
+            <ModalHeader
+              currentStep={currentStep}
+              modalType={modalType}
+              isStepComplete={isStepComplete}
+              onPrev={onPrev}
+              onNext={onNext}
+              onClose={handleModalClose}
+              onSubmit={handleSubmit}
+              isApplying={isApplying}
+              showCropper={showCropper}
+              onCropperChange={setShowCropper}
+              onApplyCrop={handleApplyCrop}
+            />
 
-                  <h1 className="text-base font-medium text-white/80">편집</h1>
+            <ProgressBar
+              currentStep={currentStep}
+              totalSteps={totalSteps}
+              selectedImage={selectedImage}
+            />
 
-                  <button
-                    onClick={() => {
-                      // 직접 함수 호출하여 이벤트 버블링 방지
-                      handleApplyCrop();
-                    }}
-                    className={cn(
-                      "text-sm font-semibold px-3 py-1.5",
-                      "text-[#1A1A1A] bg-[#EAFD66]",
-                      "rounded-md shadow-md", // 그림자 추가하여 버튼 가시성 향상
-                      isApplying
-                        ? "opacity-50 cursor-not-allowed"
-                        : "hover:bg-[#EAFD66]/90 transition-colors"
-                    )}
-                    disabled={isApplying}
-                  >
-                    {isApplying ? "처리 중..." : "적용"}
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() =>
-                      currentStep > 1 ? onPrev() : handleModalClose()
-                    }
-                    className="p-2 -ml-2 hover:bg-gray-800 rounded-full transition-colors text-white/80"
-                  >
-                    {currentStep > 1 ? (
-                      <ArrowLeft size={20} />
-                    ) : (
-                      <X size={20} />
-                    )}
-                  </button>
-
-                  <h1 className="text-base font-medium text-white/80">
-                    {getHeaderTitle()}
-                  </h1>
-
-                  <button
-                    onClick={currentStep === totalSteps ? handleSubmit : onNext}
-                    disabled={!isStepComplete}
-                    className={cn(
-                      "text-sm font-semibold px-2 py-1",
-                      isStepComplete
-                        ? "text-[#EAFD66] hover:text-[#EAFD66]/90 transition-colors"
-                        : "text-gray-500 cursor-not-allowed"
-                    )}
-                  >
-                    {getNextButtonText()}
-                  </button>
-                </>
-              )}
-            </header>
-
-            <div
-              className={cn(
-                "w-full h-0.5 bg-gray-800 overflow-hidden",
-                "opacity-100 flex-shrink-0",
-                "transition-all duration-300"
-              )}
-            >
-              <div
-                className="h-full bg-[#EAFD66] transition-all duration-300"
-                style={{
-                  width: selectedImage
-                    ? `${(currentStep / totalSteps) * 100}%`
-                    : "0%",
-                }}
-              />
-            </div>
-
-            <div
-              className={cn(
-                "flex-1",
-                "min-h-0 relative",
-                "flex",
-                currentStep === 1 && selectedImage && showCropper
-                  ? "overflow-hidden bg-[#1A1A1A] pt-0"
-                  : "overflow-hidden bg-[#1A1A1A]"
-              )}
-            >
+            <div className="flex-1 min-h-0 relative flex">
               {currentStep === 2 || currentStep === 3 ? (
                 <div className="w-full h-full flex flex-col md:flex-row">
                   {/* 이미지 영역 - 모바일에서는 전체 화면 */}
@@ -964,15 +873,10 @@ export function RequestFormModal({
                     "md:w-[60%]"
                   )}>
                     <div className="relative aspect-[4/5] h-full flex items-center justify-center">
-                      <ImageContainer
+                      <ImageContainerWrapper
                         {...imageContainerProps}
                         ref={imageContainerRef}
-                        showCropper={false}
-                        onCropperChange={() => {}}
-                        onPointsChange={setPoints}
-                        onPointSelect={(pointIndex: number | null) => {
-                          setSelectedPoint(pointIndex);
-                        }}
+                        isCroppingMode={false}
                       />
                     </div>
                   </div>
@@ -1453,62 +1357,18 @@ export function RequestFormModal({
                   </div>
                 </div>
               ) : (
-                // 1단계에서는 이미지만 표시
-                <div className="w-full h-full flex items-center justify-center overflow-hidden p-0">
-                  {currentStep === 1 && selectedImage && showCropper ? (
-                    // 크롭 모드 컨테이너 스타일 조정
-                    <div
-                      className={cn(
-                        "w-full h-full",
-                        "flex items-center justify-center",
-                        "p-0",
-                        "overflow-hidden",
-                        "bg-[#1A1A1A]"
-                      )}
-                    >
-                      <ImageContainer
-                        {...imageContainerProps}
-                        ref={imageContainerRef}
-                      />
-                    </div>
-                  ) : (
-                    // 일반 이미지 컨테이너 (크롭 모드 아닐 때)
-                    <div
-                      className={cn(
-                        "relative flex items-center justify-center",
-                        "h-full w-full p-0 mx-auto overflow-hidden",
-                        "bg-[#1A1A1A]"
-                      )}
-                    >
-                      <div
-                        className={cn(
-                          "relative aspect-[4/5] h-full max-h-[calc(100% - 10px)]",
-                          "flex items-center justify-center overflow-hidden"
-                        )}
-                      >
-                        <ImageContainer
-                          {...imageContainerProps}
-                          ref={imageContainerRef}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
+                <ImageContainerWrapper
+                  {...imageContainerProps}
+                  ref={imageContainerRef}
+                  isCroppingMode={Boolean(selectedImage && showCropper)}
+                />
               )}
             </div>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* StatusModal - Dialog 외부로 이동시켜 최상위 z-index 보장 */}
-      <StatusModal
-        isOpen={modalConfig.isOpen}
-        onClose={modalConfig.onClose}
-        type={modalConfig.type}
-        messageKey={modalConfig.messageKey}
-      />
-
-      {/* Confirmation Modal for closing the entire form */}
+      <StatusModal {...modalConfig} />
       <ConfirmModal
         isOpen={showConfirmModal}
         onClose={() => setShowConfirmModal(false)}

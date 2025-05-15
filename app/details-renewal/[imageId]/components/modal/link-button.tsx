@@ -30,7 +30,7 @@ export function LinkButton({ imageId }: LinkButtonProps) {
       <div className="sticky top-6 float-right -mt-16 mr-2 z-20">
         <button 
           onClick={handleOpenModal}
-          className="w-10 h-10 bg-black/40 hover:bg-black/60 text-white rounded-full flex items-center justify-center shadow-md transition-all duration-200"
+          className="w-10 h-10 bg-black/40 hover:bg-black/60 text-white rounded-full flex items-center justify-center shadow-md transition-all duration-200 border border-primary/50 hover:border-primary hover:shadow-primary/20 hover:shadow-lg"
           aria-label="링크 추가"
         >
           <svg
@@ -39,6 +39,7 @@ export function LinkButton({ imageId }: LinkButtonProps) {
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
+            className="text-primary"
           >
             <path
               d="M12 4V20M20 12H4"

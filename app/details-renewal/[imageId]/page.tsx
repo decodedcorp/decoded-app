@@ -117,10 +117,10 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
           <div className="w-full mx-auto pt-16 sm:pt-24 px-4 sm:px-6">
             <Suspense fallback={<LoadingDisplay />}>
               <div className="overflow-hidden">
-                <div className="grid grid-cols-1 lg:grid-cols-[minmax(350px,500px)_1fr] items-start gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-[minmax(300px,400px)_1fr] lg:grid-cols-[minmax(350px,500px)_1fr] items-start gap-4 md:gap-6">
                   <div className="w-full">
                     {/* 아티스트 정보 표시 */}
-                    <div className="mb-4 rounded-lg overflow-hidden">
+                    <div className="mb-3 md:mb-4 rounded-lg overflow-hidden">
                       {artistName && (
                         <ArtistHeader
                           artistId={artistId}
@@ -136,20 +136,47 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
                       />
                     </div>
                   </div>
-                  <div className="hidden lg:block h-[100vh] overflow-y-auto custom-scrollbar p-4 rounded-lg bg-zinc-950/50 relative">
-                    {/* 헤더와 버튼 레이아웃 조정 */}
-                    <div className="flex justify-between items-center mb-8">
-                      <h2 className="text-white text-xl font-medium">
-                        DECODED
-                      </h2>
-                    </div>
+                  <div className="hidden md:block h-[100vh] overflow-y-auto custom-scrollbar p-3 md:p-4 rounded-lg bg-zinc-950/50 relative">
+                    {/* 헤더와 필터링 섹션 */}
+                    <div className="space-y-4 mb-6 md:mb-8">
+                      <div className="flex justify-between items-center">
+                        <h2 className="text-white text-lg md:text-xl font-medium">
+                          DECODED
+                        </h2>
+                      </div>
 
-                    {/* 우측 상단 스티키 아이템 추가 버튼 */}
-                    <div className="sticky top-6 float-right -mt-16 mr-2 z-20">
-                      <LinkButton imageId={imageId} />
+                      {/* 필터링 섹션 - 심플 스타일 */}
+                      <div className="flex items-center gap-6">
+                        {/* 콘텐츠 타입 필터 */}
+                        <div className="flex items-center gap-6">
+                          {['전체', '아이템', '블로그', '쇼츠'].map((type) => (
+                            <button
+                              key={type}
+                              className="text-sm text-zinc-400 hover:text-primary transition-colors"
+                            >
+                              {type}
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* 구분선 */}
+                        <div className="h-4 w-px bg-zinc-800" />
+
+                        {/* 정렬 옵션 */}
+                        <select className="text-sm text-zinc-400 hover:text-primary bg-transparent border-none focus:outline-none cursor-pointer">
+                          <option value="latest">최신순</option>
+                          <option value="popular">인기순</option>
+                          <option value="trending">트렌딩</option>
+                        </select>
+                      </div>
                     </div>
 
                     <GridWrapper imageId={imageId} />
+
+                    {/* 우측 하단 고정 버튼 */}
+                    <div className="fixed bottom-8 right-8 z-50">
+                      <LinkButton imageId={imageId} />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -165,7 +192,7 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
               />
             </Suspense>
           </div> */}
-          <div className="lg:hidden px-4">
+          <div className="md:hidden px-3 sm:px-4">
             <MobileDetailsList
               imageData={processedImageData}
               selectedItemId={selectedItemId}
