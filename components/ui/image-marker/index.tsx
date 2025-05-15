@@ -192,7 +192,7 @@ export function ImageMarker({
             onClick={(e) => handleMarkerClick(e, index)}
           >
             <div className={cn(
-              "relative w-4 h-4 hover:scale-125 transition-transform",
+              "relative w-5 h-5 hover:scale-125 transition-transform",
               selectedPointIndex === index && "scale-125"
             )}>
               <div className={cn(
@@ -203,6 +203,14 @@ export function ImageMarker({
                 "absolute inset-[2px] rounded-full backdrop-blur-sm",
                 selectedPointIndex === index ? "bg-[#FFFFFF]/50" : "bg-[#EAFD66]/30"
               )} />
+              {/* 마커 안에 숫자 표시 - 가시성 개선 */}
+              {modalType === "style" && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-[10px] font-bold text-[#1A1A1A] leading-none drop-shadow-[0_0_1px_rgba(255,255,255,0.8)]">
+                    {index + 1}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         ))}

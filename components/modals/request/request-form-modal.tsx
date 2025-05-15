@@ -24,7 +24,6 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ConfirmModal } from "./common/confirm-modal";
 import { RequestImage } from "@/lib/api/_types/request";
 import { motion } from "framer-motion";
-import { StylePoint } from "./style-point-form";
 import { 
   StyleContextSidebar, 
   ContextAnswer as StyleContextAnswer 
@@ -67,6 +66,14 @@ interface ContextAnswer extends BaseContextAnswer {
     category: string;
     url: string;
   }>;
+}
+
+// StylePoint 타입 수정
+interface StylePoint extends Point {
+  brand?: string;
+  price?: string;
+  isSecret?: boolean;
+  context?: string;
 }
 
 export function RequestFormModal({
@@ -164,7 +171,7 @@ export function RequestFormModal({
   // selectedPoint 상태 변경 감지를 위한 useEffect 추가
   useEffect(() => {
     if (selectedPoint !== null) {
-      // 사이드바의 마커 섹션으로 스크롤
+      // 사이드바의 아이템 섹션으로 스크롤
       const markerElement = document.getElementById(`marker-${selectedPoint}`);
       if (markerElement) {
         markerElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -176,6 +183,26 @@ export function RequestFormModal({
       }
     }
   }, [selectedPoint]);
+
+  // points가 변경될 때 마지막 아이템을 자동으로 선택하는 useEffect 추가
+  useEffect(() => {
+    if (points.length > 0) {
+      // 마지막 아이템의 인덱스
+      const lastIndex = points.length - 1;
+      setSelectedPoint(lastIndex);
+      
+      // 해당 아이템으로 스크롤
+      const markerElement = document.getElementById(`marker-${lastIndex}`);
+      if (markerElement) {
+        markerElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // 포커스 효과를 위한 하이라이트
+        markerElement.classList.add('bg-[#232323]/80');
+        setTimeout(() => {
+          markerElement.classList.remove('bg-[#232323]/80');
+        }, 1000);
+      }
+    }
+  }, [points.length]); // points.length가 변경될 때만 실행
 
   // 이미지 최적화 함수 - 높은 해상도와 품질을 유지하도록 개선
   const compressImage = async (
@@ -341,7 +368,7 @@ export function RequestFormModal({
           name: contextAnswers.location,
           inspiration_links: inspirationLinks.map(link => ({
             id: link.id,
-            category: "general", // 기본 카테고리
+            category: "general",
             url: link.url
           })),
           user_id: userId,
@@ -352,14 +379,15 @@ export function RequestFormModal({
             },
             brand: point.brand || null,
             price: point.price || null,
+            is_secret: point.isSecret || false, // 찔러보기 여부 추가
           })),
         };
         
         // 콘솔에 정보 출력
         console.log("====== STYLE 데이터 전송 ======");
         console.log("스타일 이름:", styleData.name);
-        console.log("마커 개수:", styleData.style_points.length);
-        console.log("마커 정보:", styleData.style_points);
+        console.log("아이템 개수:", styleData.style_points.length);
+        console.log("아이템 정보:", styleData.style_points);
         console.log("영감 링크 개수:", styleData.inspiration_links.length);
         console.log("영감 링크:", styleData.inspiration_links);
         console.log("============================");
@@ -650,7 +678,7 @@ export function RequestFormModal({
         case 1:
           return t.request.steps.upload.title || "새 게시물";
         case 2:
-          return t.request.steps.marker.title || "마커 추가";
+          return t.request.steps.marker.title || "아이템 추가";
         case 3:
           return t.request.steps.context.title || "상세 정보";
         default:
@@ -661,7 +689,7 @@ export function RequestFormModal({
         case 1:
           return "스타일 추가";
         case 2:
-          return "마커 정보 입력";
+          return "아이템 정보 입력";
         case 3:
           return "스타일 참고 링크";
         default:
@@ -813,8 +841,8 @@ export function RequestFormModal({
             >
               {currentStep === 2 || currentStep === 3 ? (
                 <div className="w-full h-full flex">
-                  {/* 이미지 영역 - 여백 제거 */}
-                  <div className="w-[65%] h-full flex items-center justify-center bg-[#1A1A1A] overflow-hidden relative p-0">
+                  {/* 이미지 영역 - 너비 조정 */}
+                  <div className="w-[60%] h-full flex items-center justify-center bg-[#1A1A1A] overflow-hidden relative p-0">
                     <div className="relative aspect-[4/5] h-full flex items-center justify-center">
                       <ImageContainer
                         {...imageContainerProps}
@@ -828,98 +856,139 @@ export function RequestFormModal({
                       />
                     </div>
                   </div>
-                  {/* 사이드바 영역 */}
-                  <div className="flex-1 h-full border-l border-gray-800 overflow-y-auto">
+                  {/* 사이드바 영역 - 너비 조정 */}
+                  <div className="w-[40%] h-full border-l border-gray-800 overflow-y-auto">
                     {modalType === "style" && (
                       <div className="h-full flex flex-col">
                         {currentStep === 2 && (
                           <div className="p-4 flex flex-col h-full flex-1">
-                            <h3 className="text-sm font-medium text-white mb-3">마커 정보</h3>
-                            <div
-                              className={cn(
-                                "grid grid-cols-2 gap-3 overflow-y-auto pr-1",
-                                points.length >= 3 && "min-h-[400px]"
-                              )}
-                            >
-                              {points.map((point, index) => (
-                                <div
-                                  key={index}
-                                  id={`marker-${index}`}
-                                  className={cn(
-                                    "p-3 bg-[#232323] border rounded-lg transition-all",
-                                    selectedPoint === index
-                                      ? "border-[#EAFD66] bg-[#232323]/80"
-                                      : "border-gray-700/50 hover:border-[#EAFD66]/20"
-                                  )}
-                                  onClick={() => setSelectedPoint(index)}
-                                >
-                                  <div className="flex items-center justify-between mb-2">
-                                    <div className="flex items-center gap-2">
-                                      <div className="w-5 h-5 flex items-center justify-center bg-[#EAFD66] text-[#1A1A1A] rounded-full text-[10px] font-bold">
-                                        {index + 1}
-                                      </div>
-                                      <span className="text-sm text-white">마커 {index + 1}</span>
-                                    </div>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation(); // 이벤트 버블링 방지
-                                        const newPoints = [...points];
-                                        newPoints.splice(index, 1);
-                                        setPoints(newPoints);
-                                        if (selectedPoint === index) {
-                                          setSelectedPoint(null);
-                                        }
-                                      }}
-                                      className="p-1 hover:bg-white/5 rounded-full text-gray-400 hover:text-red-400 transition-colors"
-                                    >
-                                      <Trash2 size={14} />
-                                    </button>
-                                  </div>
-                                  <div className="space-y-2">
-                                    <div>
-                                      <label className="text-xs text-gray-400 block mb-1">
-                                        브랜드
-                                      </label>
-                                      <input
-                                        type="text"
-                                        value={point.brand || ""}
-                                        onChange={(e) => {
-                                          const newPoints = [...points];
-                                          newPoints[index] = { ...point, brand: e.target.value };
-                                          setPoints(newPoints);
-                                        }}
-                                        placeholder="브랜드명"
-                                        className="w-full px-2 py-1.5 bg-[#2A2A2A] border border-gray-700 rounded text-sm text-white focus:border-[#EAFD66] focus:outline-none"
-                                        onClick={(e) => {
-                                          e.stopPropagation(); // 이벤트 버블링 방지
-                                          setSelectedPoint(index);
-                                        }}
-                                      />
-                                    </div>
-                                    <div>
-                                      <label className="text-xs text-gray-400 block mb-1">
-                                        가격
-                                      </label>
-                                      <input
-                                        type="text"
-                                        value={point.price || ""}
-                                        onChange={(e) => {
-                                          const newPoints = [...points];
-                                          newPoints[index] = { ...point, price: e.target.value };
-                                          setPoints(newPoints);
-                                        }}
-                                        placeholder="가격"
-                                        className="w-full px-2 py-1.5 bg-[#2A2A2A] border border-gray-700 rounded text-sm text-white focus:border-[#EAFD66] focus:outline-none"
-                                        onClick={(e) => {
-                                          e.stopPropagation(); // 이벤트 버블링 방지
-                                          setSelectedPoint(index);
-                                        }}
-                                      />
-                                    </div>
-                                  </div>
+                            <h3 className="text-sm font-medium text-white mb-3">아이템 정보</h3>
+                            {points.length === 0 ? (
+                              <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
+                                <div className="w-12 h-12 rounded-full bg-[#232323] flex items-center justify-center mb-4">
+                                  <div className="w-6 h-6 border-2 border-[#EAFD66] rounded-full" />
                                 </div>
-                              ))}
-                            </div>
+                                <h4 className="text-base font-medium text-white mb-2">마커를 추가해주세요</h4>
+                                <p className="text-sm text-gray-400 max-w-[280px]">
+                                  이미지에 원하는 위치를 클릭하여 마커를 추가하고, 브랜드와 가격 정보를 입력해주세요.
+                                </p>
+                              </div>
+                            ) : (
+                              <div className="flex flex-col gap-2 overflow-y-auto pr-1">
+                                {points.map((point, index) => (
+                                  <div
+                                    key={index}
+                                    id={`marker-${index}`}
+                                    className={cn(
+                                      "p-3 border rounded-lg transition-all",
+                                      // 필수 정보가 누락된 경우 연한 붉은색 배경 적용
+                                      !point.brand || !point.price
+                                        ? "bg-[#2A1A1A] border-red-500/20"
+                                        : "bg-[#232323] border-gray-700/50",
+                                      selectedPoint === index
+                                        ? "border-[#EAFD66] bg-[#232323]/80"
+                                        : "hover:border-[#EAFD66]/20"
+                                    )}
+                                  >
+                                    {/* 아이템 헤더 */}
+                                    <div className="flex items-center justify-between">
+                                      {/* 왼쪽 영역 - 클릭 시 펼치기/접기 */}
+                                      <div 
+                                        className="flex items-center gap-2 cursor-pointer flex-1"
+                                        onClick={() => setSelectedPoint(selectedPoint === index ? null : index)}
+                                      >
+                                        <div className="w-5 h-5 flex items-center justify-center bg-[#EAFD66] text-[#1A1A1A] rounded-full text-[10px] font-bold">
+                                          {index + 1}
+                                        </div>
+                                        <span className="text-sm text-white">아이템 {index + 1}</span>
+                                      </div>
+
+                                      {/* 오른쪽 영역 - 체크박스와 삭제 버튼 */}
+                                      <div className="flex items-center gap-3">
+                                        {/* 찔러보기 체크박스 */}
+                                        <div 
+                                          className="flex items-center gap-2"
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          <input
+                                            type="checkbox"
+                                            id={`secret-${index}`}
+                                            checked={point.isSecret || false}
+                                            onChange={(e) => {
+                                              const newPoints = [...points];
+                                              newPoints[index] = { ...point, isSecret: e.target.checked };
+                                              setPoints(newPoints);
+                                            }}
+                                            className="w-4 h-4 rounded border-gray-600 bg-[#2A2A2A] text-[#EAFD66] focus:ring-[#EAFD66] focus:ring-offset-0 focus:ring-2 accent-[#EAFD66]"
+                                          />
+                                          <label 
+                                            htmlFor={`secret-${index}`} 
+                                            className="text-xs text-[#EAFD66] cursor-pointer whitespace-nowrap"
+                                          >
+                                            찔러보기
+                                          </label>
+                                        </div>
+                                        {/* 삭제 버튼 */}
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            const newPoints = [...points];
+                                            newPoints.splice(index, 1);
+                                            setPoints(newPoints);
+                                            if (selectedPoint === index) {
+                                              setSelectedPoint(null);
+                                            }
+                                          }}
+                                          className="p-1 hover:bg-white/5 rounded-full text-gray-400 hover:text-red-400 transition-colors"
+                                        >
+                                          <Trash2 size={14} />
+                                        </button>
+                                      </div>
+                                    </div>
+
+                                    {/* 아이템 상세 정보 */}
+                                    {selectedPoint === index && (
+                                      <div className="mt-3 space-y-2 pt-3 border-t border-gray-700/50">
+                                        <div>
+                                          <label className="text-xs text-gray-400 block mb-1">
+                                            브랜드
+                                          </label>
+                                          <input
+                                            type="text"
+                                            value={point.brand || ""}
+                                            onChange={(e) => {
+                                              const newPoints = [...points];
+                                              newPoints[index] = { ...point, brand: e.target.value };
+                                              setPoints(newPoints);
+                                            }}
+                                            placeholder="브랜드명"
+                                            className="w-full px-2 py-1.5 bg-[#2A2A2A] border border-gray-700 rounded text-sm text-white focus:border-[#EAFD66] focus:outline-none"
+                                            onClick={(e) => e.stopPropagation()}
+                                          />
+                                        </div>
+                                        <div>
+                                          <label className="text-xs text-gray-400 block mb-1">
+                                            가격
+                                          </label>
+                                          <input
+                                            type="text"
+                                            value={point.price || ""}
+                                            onChange={(e) => {
+                                              const newPoints = [...points];
+                                              newPoints[index] = { ...point, price: e.target.value };
+                                              setPoints(newPoints);
+                                            }}
+                                            placeholder="가격"
+                                            className="w-full px-2 py-1.5 bg-[#2A2A2A] border border-gray-700 rounded text-sm text-white focus:border-[#EAFD66] focus:outline-none"
+                                            onClick={(e) => e.stopPropagation()}
+                                          />
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         )}
                         {currentStep === 3 && (
@@ -956,7 +1025,17 @@ export function RequestFormModal({
                                 링크 추가
                               </button>
                             </div>
-                            {inspirationLinks.length > 0 && (
+                            {inspirationLinks.length === 0 ? (
+                              <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
+                                <div className="w-12 h-12 rounded-full bg-[#232323] flex items-center justify-center mb-4">
+                                  <Link className="w-6 h-6 text-[#EAFD66]" />
+                                </div>
+                                <h4 className="text-base font-medium text-white mb-2">참고 링크를 추가해주세요</h4>
+                                <p className="text-sm text-gray-400 max-w-[280px]">
+                                  이 스타일을 만들 때 참고한 이미지나 영상의 링크를 추가하면 다른 사용자들에게 도움이 됩니다.
+                                </p>
+                              </div>
+                            ) : (
                               <div className="mt-4 flex-1 overflow-y-auto">
                                 <div className="flex flex-col gap-2 pr-1">
                                   {inspirationLinks.map((link) => (
