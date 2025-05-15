@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 
 export interface LinkMetadata {
   url: string;
@@ -17,15 +18,80 @@ interface LinkCardProps {
 
 export function LinkCard({ metadata, onRemove }: LinkCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
   const [isHovered, setIsHovered] = useState(false);
-  const [isClicked, setIsClicked] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
   const [glowPosition, setGlowPosition] = useState({ x: 50, y: 50 });
   const [imageError, setImageError] = useState(false);
 
+  const [imageAspectRatio, setImageAspectRatio] = useState<number | null>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  // RGB를 HEX로 변환하는 함수
+  const rgbToHex = (rgb: [number, number, number]) => {
+    return (
+      '#' +
+      rgb
+        .map((x) => {
+          const hex = x.toString(16);
+          return hex.length === 1 ? '0' + hex : hex;
+        })
+        .join('')
+    );
+  };
+
+  const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    const aspectRatio = img.naturalWidth / img.naturalHeight;
+    setImageAspectRatio(aspectRatio);
+    setImageLoaded(true);
+
+    console.log('이미지 로드됨:', img.src);
+    console.log('이미지 크기:', img.naturalWidth, 'x', img.naturalHeight);
+    console.log('이미지 비율:', aspectRatio);
+  };
+
+  const getImageHeight = () => {
+    if (!imageAspectRatio) return 'h-44'; // 기본값
+
+    if (imageAspectRatio > 2.0) return 'h-32'; // 파노라마
+    if (imageAspectRatio > 1.4) return 'h-40'; // 일반 가로형
+    if (imageAspectRatio > 1.3) return 'h-48'; // 가로형 (4:3)
+    if (imageAspectRatio > 1.1) return 'h-52'; // 거의 정사각형
+    if (imageAspectRatio > 0.95) return 'h-56'; // 살짝 세로
+    if (imageAspectRatio > 0.5) return 'h-72'; // 세로형
+
+    const result = 'h-96'; // 매우 세로
+
+    // 디버그용 로그
+    console.log(
+      `이미지 비율: ${imageAspectRatio?.toFixed(2) || 'N/A'}, 적용된 높이: ${
+        imageAspectRatio > 2.0
+          ? 'h-32'
+          : imageAspectRatio > 1.4
+          ? 'h-40'
+          : imageAspectRatio > 1.3
+          ? 'h-48'
+          : imageAspectRatio > 1.1
+          ? 'h-52'
+          : imageAspectRatio > 0.95
+          ? 'h-56'
+          : imageAspectRatio > 0.5
+          ? 'h-72'
+          : 'h-96'
+      }`
+    );
+
+    return result;
+  };
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current || isClicked) return; // 클릭 상태에서는 마우스 움직임 효과 비활성화
+    if (!cardRef.current) return;
 
     // 카드의 위치와 크기를 구합니다
     const rect = cardRef.current.getBoundingClientRect();
@@ -33,9 +99,9 @@ export function LinkCard({ metadata, onRemove }: LinkCardProps) {
     const x = (e.clientX - rect.left) / rect.width;
     const y = (e.clientY - rect.top) / rect.height;
 
-    // rotateX & rotateY
-    const rotateY = (x - 0.5) * 8;
-    const rotateX = (0.5 - y) * 8;
+    // rotateX & rotateY - 기울기를 더 크게 수정 (8도에서 15도로)
+    const rotateY = (x - 0.5) * 40;
+    const rotateX = (0.5 - y) * 40;
 
     setRotation({ x: rotateX, y: rotateY });
 
@@ -45,83 +111,59 @@ export function LinkCard({ metadata, onRemove }: LinkCardProps) {
   };
 
   const handleMouseEnter = () => {
-    if (!isClicked) setIsHovered(true);
+    setIsHovered(true);
   };
 
   const handleMouseLeave = () => {
     setIsHovered(false);
-    if (!isClicked) {
-      setRotation({ x: 0, y: 0 });
-      setGlowPosition({ x: 50, y: 50 });
-    }
-  };
-
-  const handleCardClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    setIsClicked(!isClicked);
-
-    if (!isClicked) {
-      // 클릭 시 카드 회전 설정
-      const randomRotation = {
-        x: Math.random() * 10 - 5,
-        y: Math.random() * 20 - 10,
-      };
-      setRotation(randomRotation);
-    } else {
-      // 클릭 해제 시 원래 상태로
-      setRotation({ x: 0, y: 0 });
-    }
+    setRotation({ x: 0, y: 0 });
+    setGlowPosition({ x: 50, y: 50 });
   };
 
   // 가져온 도메인 이름
-  const hostname = metadata.url ? new URL(metadata.url).hostname : '';
+  const hostname = metadata?.url ? new URL(metadata.url).hostname : '';
 
   return (
     <div
       ref={cardRef}
-      className={`relative w-full my-3 mx-auto cursor-pointer ${
-        isHovered || isClicked ? 'z-20' : 'z-10'
+      className={`relative w-full my-3 mx-auto ${
+        isHovered ? 'z-20' : 'z-10'
       }`}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      onClick={handleCardClick}
       style={{
         perspective: '1000px',
         maxWidth: '340px',
-        height: isClicked ? '400px' : 'auto',
+        height: 'auto',
       }}
     >
       <div
-        className={`relative rounded-lg overflow-hidden transition-all duration-300 ${
-          isClicked ? 'absolute inset-x-0' : ''
-        }`}
+        className="relative rounded-lg overflow-hidden transition-all duration-300"
         style={{
           transform: `
-            ${isClicked ? 'scale(1.15) translateY(-30px) ' : ''}
             rotateY(${rotation.y}deg) 
             rotateX(${rotation.x}deg)
-            ${isClicked ? ` rotate(${rotation.y > 0 ? 5 : -5}deg)` : ''}
           `,
-          transformStyle: 'preserve-3d',
           transformOrigin: 'center center',
-          transition: isClicked
-            ? 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-            : 'all 0.3s ease',
-          boxShadow: isClicked
-            ? '0 20px 30px rgba(0, 0, 0, 0.3), 0 0 15px rgba(234, 253, 102, 0.2)'
-            : isHovered
-            ? '0 5px 15px rgba(0, 0, 0, 0.15), 0 0 5px rgba(234, 253, 102, 0.1)'
-            : '0 2px 5px rgba(0, 0, 0, 0.1)',
+          transition: 'all 0.3s ease',
+          boxShadow: isHovered
+            ? '0 0 20px rgba(234, 253, 102, 0.4), 0 5px 15px rgba(0, 0, 0, 0.2)'
+            : '0 0 8px rgba(234, 253, 102, 0.15), 0 2px 5px rgba(0, 0, 0, 0.1)',
+          border: isHovered ? '1px solid rgba(234, 253, 102, 0.3)' : '1px solid rgba(255, 255, 255, 0.05)',
         }}
       >
-        <div className="bg-[#111111] border border-white/5 rounded-lg overflow-hidden">
+        <div className="bg-[#111111] rounded-lg overflow-hidden">
           {/* 이미지 영역 - 홀로그래픽 효과 여기에만 적용 */}
-          <div className="w-full h-44 bg-[#1A1A1A] flex items-center justify-center overflow-hidden relative">
+          <div
+            className={`w-full ${getImageHeight()} bg-[#1A1A1A] flex items-center justify-center overflow-hidden relative`}
+          >
+            {/* 디버그 정보 - 개발 중에만 사용 */}
+            <div className="absolute top-1 left-1 bg-black/60 px-1.5 py-0.5 rounded text-[10px] text-white/80 z-10">
+              {imageAspectRatio?.toFixed(2) || 'N/A'}
+            </div>
             {/* 홀로그래픽 효과 (이미지 영역에만 적용) */}
-            {(isHovered || isClicked) && (
+            {isHovered && (
               <>
                 {/* 마우스 포인트 하이라이트 */}
                 <div
@@ -153,9 +195,7 @@ export function LinkCard({ metadata, onRemove }: LinkCardProps) {
                     `,
                     backgroundSize: '200% 200%',
                     backgroundPosition: `${glowPosition.x}% ${glowPosition.y}%`,
-                    animation: isClicked
-                      ? 'colorShift 3s infinite alternate'
-                      : 'none',
+                    animation: 'none',
                   }}
                 />
                 {/* 부드러운 하이라이트 스웹 */}
@@ -170,53 +210,70 @@ export function LinkCard({ metadata, onRemove }: LinkCardProps) {
                         rgba(255, 255, 255, 0) ${glowPosition.x + 5}%
                       )
                     `,
-                    animation: isClicked ? 'sweep 2s infinite linear' : 'none',
                   }}
                 />
               </>
             )}
 
+            {/* 홀로그래픽 효과 적용 */}
+            <div
+              className="absolute inset-0 opacity-0 holographic-effect"
+              style={{
+                background: `linear-gradient(
+                  125deg, 
+                  rgba(234, 253, 102, 0.1) 0%,
+                  rgba(255, 236, 210, 0.3) 30%, 
+                  rgba(234, 253, 102, 0.5) 48%,
+                  rgba(255, 236, 210, 0.3) 70%,
+                  rgba(234, 253, 102, 0.1) 100%)`,
+                backgroundSize: '300% 300%',
+                backgroundPosition: `${glowPosition.x}% ${glowPosition.y}%`,
+                filter: 'saturate(1.5) contrast(1.2)',
+                mixBlendMode: 'overlay',
+                transform: `translateZ(${isHovered ? '10' : '0'}px)`,
+                opacity: isHovered ? 0.6 : 0,
+              }}
+            />
             {/* OG 이미지 또는 기본 아이콘 표시 */}
             {metadata.image && !imageError ? (
               <div className="w-full h-full relative">
-                <img
+                <Image
+                  ref={imgRef}
                   src={metadata.image}
                   alt={metadata.title || 'Link preview'}
-                  className="w-full h-full object-cover transition-transform duration-300"
+                  className="object-cover transition-transform duration-300"
                   style={{
-                    transform: `translateZ(${
-                      isClicked ? '20' : isHovered ? '5' : '0'
-                    }px)`,
+                    transform: `translateZ(${isHovered ? '5' : '0'}px)`,
+                    objectFit: 'cover',
                   }}
-                  onError={() => setImageError(true)}
+                  fill
+                  sizes="(max-width: 340px) 100vw, 340px"
+                  quality={85}
+                  unoptimized // 외부 이미지 URL을 사용하기 위해 추가
+                  onLoad={handleImageLoad}
+                  onError={(e) => {
+                    console.error('이미지 로드 오류:', e);
+                    setImageError(true);
+                  }}
                 />
                 <div
                   className="absolute inset-0 bg-gradient-to-t from-[#111111]/70 to-transparent"
                   style={{
-                    transform: `translateZ(${
-                      isClicked ? '25' : isHovered ? '7' : '0'
-                    }px)`,
+                    transform: `translateZ(${isHovered ? '7' : '0'}px)`,
                   }}
                 />
               </div>
             ) : (
               <div
-                className={`rounded-full bg-[#2A2A2A] flex items-center justify-center transition-all duration-300 ${
-                  isClicked ? 'scale-in-center' : ''
-                }`}
+                className="rounded-full bg-[#2A2A2A] flex items-center justify-center transition-all duration-300"
                 style={{
-                  width: isClicked ? '60px' : '56px',
-                  height: isClicked ? '60px' : '56px',
+                  width: '56px',
+                  height: '56px',
                   transform: `
-                    ${isHovered && !isClicked ? 'scale(1.05) ' : ''}
-                    ${isClicked ? 'scale(1.2) ' : ''}
-                    translateZ(${isClicked ? '30' : isHovered ? '10' : '0'}px)
-                    ${isClicked ? ` rotate(${Date.now() % 360}deg)` : ''}
+                    ${isHovered ? 'scale(1.05) ' : ''}
+                    translateZ(${isHovered ? '10' : '0'}px)
                   `,
-                  animation: isClicked
-                    ? 'pulse 1.5s infinite alternate'
-                    : 'none',
-                  boxShadow: isClicked
+                  boxShadow: isHovered
                     ? '0 0 10px rgba(234, 253, 102, 0.3)'
                     : 'none',
                 }}
@@ -228,11 +285,8 @@ export function LinkCard({ metadata, onRemove }: LinkCardProps) {
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                   className={`${
-                    isHovered || isClicked ? 'text-[#EAFD66]' : 'text-white/60'
+                    isHovered ? 'text-[#EAFD66]' : 'text-white/60'
                   } transition-colors duration-300`}
-                  style={{
-                    animation: isClicked ? 'spin 3s infinite linear' : 'none',
-                  }}
                 >
                   <path
                     d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
@@ -257,22 +311,19 @@ export function LinkCard({ metadata, onRemove }: LinkCardProps) {
           <div className="p-4 flex flex-col">
             <div
               style={{
-                transform:
-                  isHovered || isClicked
-                    ? `translateZ(${isClicked ? '15' : '5'}px)`
-                    : 'none',
+                transform: isHovered ? `translateZ(5px)` : 'none',
               }}
               className="transition-transform duration-300"
             >
               <h3
                 className={`font-medium text-md mb-2 transition-colors duration-300
-                ${isHovered || isClicked ? 'text-[#EAFD66]' : 'text-white/90'}`}
+                ${isHovered ? 'text-[#EAFD66]' : 'text-white/90'}`}
               >
                 {metadata.title || hostname || 'No title'}
               </h3>
               <p
                 className={`text-white/70 text-xs mb-3 leading-relaxed ${
-                  isClicked ? '' : 'line-clamp-2'
+                  isHovered ? '' : 'line-clamp-2'
                 }`}
               >
                 {metadata.description || 'No description available'}
@@ -287,16 +338,9 @@ export function LinkCard({ metadata, onRemove }: LinkCardProps) {
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()} // 클릭 시 부모 onClick 이벤트 전파 방지
                 className={`text-xs truncate max-w-full transition-colors duration-300 
-                  ${
-                    isHovered || isClicked
-                      ? 'text-[#EAFD66]/90'
-                      : 'text-[#EAFD66]/70'
-                  }`}
+                  ${isHovered ? 'text-[#EAFD66]/90' : 'text-[#EAFD66]/70'}`}
                 style={{
-                  transform:
-                    isHovered || isClicked
-                      ? `translateZ(${isClicked ? '10' : '3'}px)`
-                      : 'none',
+                  transform: isHovered ? `translateZ(3px)` : 'none',
                 }}
               >
                 {hostname}
@@ -304,22 +348,6 @@ export function LinkCard({ metadata, onRemove }: LinkCardProps) {
             </div>
           </div>
         </div>
-
-        {/* 클릭 유도 텍스트 */}
-        {isHovered && !isClicked && (
-          <div
-            className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200"
-            style={{
-              background: 'rgba(0,0,0,0.3)',
-              backdropFilter: 'blur(1px)',
-              pointerEvents: 'none',
-            }}
-          >
-            <span className="text-white/90 text-xs font-medium bg-black/40 px-2 py-1 rounded">
-              클릭하여 확대
-            </span>
-          </div>
-        )}
 
         {/* 삭제 버튼 (onRemove prop이 전달된 경우에만 표시) */}
         {onRemove && (
@@ -330,7 +358,7 @@ export function LinkCard({ metadata, onRemove }: LinkCardProps) {
             }}
             className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 flex items-center justify-center text-white/80 hover:text-white hover:bg-black/80 transition-colors"
             style={{
-              transform: `translateZ(${isClicked ? '50' : '10'}px)`,
+              transform: `translateZ(10px)`,
               zIndex: 30,
             }}
             aria-label="Remove link"
@@ -358,10 +386,10 @@ export function LinkCard({ metadata, onRemove }: LinkCardProps) {
       <style jsx>{`
         @keyframes pulse {
           0% {
-            transform: scale(1.2) translateZ(30px);
+            transform: scale(1.05) translateZ(20px);
           }
           100% {
-            transform: scale(1.3) translateZ(40px);
+            transform: scale(1.1) translateZ(25px);
           }
         }
         @keyframes spin {
@@ -388,14 +416,15 @@ export function LinkCard({ metadata, onRemove }: LinkCardProps) {
             background-position: 100% 100%;
           }
         }
-        @keyframes scale-in-center {
+        @keyframes glow {
           0% {
-            transform: scale(0);
-            opacity: 0;
+            box-shadow: 0 0 12px rgba(234, 253, 102, 0.3), 0 3px 8px rgba(0, 0, 0, 0.15);
+          }
+          50% {
+            box-shadow: 0 0 22px rgba(234, 253, 102, 0.5), 0 5px 12px rgba(0, 0, 0, 0.18);
           }
           100% {
-            transform: scale(1);
-            opacity: 1;
+            box-shadow: 0 0 12px rgba(234, 253, 102, 0.3), 0 3px 8px rgba(0, 0, 0, 0.15);
           }
         }
       `}</style>

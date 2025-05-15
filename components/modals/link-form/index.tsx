@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { X, ArrowLeft } from 'lucide-react';
 import { LinkCard, LinkMetadata } from './components/link-preview/link-card';
 import { useOGTags } from '@/lib/hooks/features/metadata/useOGTags';
+import { LinkCardSkeleton } from './components/link-preview/LinkCardSkeleton';
 
 interface LinkFormProps {
   isOpen: boolean;
@@ -48,7 +49,6 @@ export function LinkForm({
       };
 
       setLinkMetadata(metadata);
-      setView('card');
     }
   }, [ogTags, previewUrl]);
 
@@ -74,6 +74,24 @@ export function LinkForm({
 
     // API를 통해 OG 태그 데이터 가져오기
     fetchAndSetMetadata(url);
+  };
+
+  const isAlidUrl = (url: string) => {
+    try {
+      new URL(url);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault(); // Prevent the default paste behavior
+    const pastedText = e.clipboardData?.getData('text') || '';
+    if (isAlidUrl(pastedText)) {
+      setUrl(pastedText);
+      fetchAndSetMetadata(pastedText);
+    }
   };
 
   // 메타데이터 생성 함수
@@ -177,6 +195,7 @@ export function LinkForm({
                 id="url"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
+                onPaste={handlePaste}
                 placeholder="https://example.com"
                 className="w-full px-4 py-3 bg-[#1A1A1A] rounded-lg border border-white/5 
                 text-white/90 placeholder-gray-500 focus:border-[#EAFD66] 
@@ -185,6 +204,24 @@ export function LinkForm({
                 required
               />
             </div>
+
+            {url && (
+              <>
+                <div className="mt-4">
+                  {isLoading ? (
+                    <LinkCardSkeleton />
+                  ) : error ? (
+                    <div className="p-4 bg-[#1A1A1A] rounded-lg flex items-center justify-center h-32">
+                      <p className="text-red-400">
+                        링크 정보를 가져오지 못했습니다.
+                      </p>
+                    </div>
+                  ) : (
+                    linkMetadata && <LinkCard metadata={linkMetadata} />
+                  )}
+                </div>
+              </>
+            )}
 
             <div className="flex gap-3 pt-3">
               <button
@@ -225,9 +262,7 @@ export function LinkForm({
                 <p className="text-red-400">링크 정보를 가져오지 못했습니다.</p>
               </div>
             ) : (
-              linkMetadata && (
-                <LinkCard metadata={linkMetadata} onRemove={handleRemoveLink} />
-              )
+              linkMetadata && <LinkCard metadata={linkMetadata} onRemove={handleRemoveLink} />
             )}
 
             {!isLoading && !error && linkMetadata && (
