@@ -159,9 +159,9 @@ export function LinkCard({ metadata, onRemove }: LinkCardProps) {
             className={`w-full ${getImageHeight()} bg-[#1A1A1A] flex items-center justify-center overflow-hidden relative`}
           >
             {/* 디버그 정보 - 개발 중에만 사용 */}
-            <div className="absolute top-1 left-1 bg-black/60 px-1.5 py-0.5 rounded text-[10px] text-white/80 z-10">
+            {/* <div className="absolute top-1 left-1 bg-black/60 px-1.5 py-0.5 rounded text-[10px] text-white/80 z-10">
               {imageAspectRatio?.toFixed(2) || 'N/A'}
-            </div>
+            </div> */}
             {/* 홀로그래픽 효과 (이미지 영역에만 적용) */}
             {isHovered && (
               <>

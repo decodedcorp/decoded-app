@@ -116,6 +116,13 @@ export function RequestFormModal({
   const [isApplying, setIsApplying] = useState(false);
   const [newUrl, setNewUrl] = useState("");
   const [inspirationLinks, setInspirationLinks] = useState<{ id: string; url: string }[]>([]);
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+  const bottomSheetRef = useRef<HTMLDivElement>(null);
+
+  // 드래그 관련 상태 추가
+  const [dragStartY, setDragStartY] = useState(0);
+  const [currentDragY, setCurrentDragY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Reset state when modal is opened
   useEffect(() => {
@@ -168,41 +175,64 @@ export function RequestFormModal({
     console.log("Should show form:", currentStep === 2 && modalType === "style" && selectedPoint !== null);
   }, [selectedPoint, currentStep, modalType, points]);
 
-  // selectedPoint 상태 변경 감지를 위한 useEffect 추가
+  // 초기 상태 설정을 위한 useEffect 추가
   useEffect(() => {
-    if (selectedPoint !== null) {
-      // 사이드바의 아이템 섹션으로 스크롤
-      const markerElement = document.getElementById(`marker-${selectedPoint}`);
-      if (markerElement) {
-        markerElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        // 포커스 효과를 위한 하이라이트
-        markerElement.classList.add('bg-[#232323]/80');
-        setTimeout(() => {
-          markerElement.classList.remove('bg-[#232323]/80');
-        }, 1000);
-      }
+    if (isMobile) {
+      setIsBottomSheetOpen(false);
     }
-  }, [selectedPoint]);
+  }, [isMobile]);
 
-  // points가 변경될 때 마지막 아이템을 자동으로 선택하는 useEffect 추가
+  // points가 변경될 때 마지막 아이템을 자동으로 선택하는 useEffect 수정
   useEffect(() => {
     if (points.length > 0) {
       // 마지막 아이템의 인덱스
       const lastIndex = points.length - 1;
       setSelectedPoint(lastIndex);
       
-      // 해당 아이템으로 스크롤
-      const markerElement = document.getElementById(`marker-${lastIndex}`);
-      if (markerElement) {
-        markerElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        // 포커스 효과를 위한 하이라이트
-        markerElement.classList.add('bg-[#232323]/80');
-        setTimeout(() => {
-          markerElement.classList.remove('bg-[#232323]/80');
-        }, 1000);
+      // 새로운 마커가 추가된 경우 (points.length가 증가한 경우)
+      if (isMobile) {
+        setIsBottomSheetOpen(true);
       }
     }
-  }, [points.length]); // points.length가 변경될 때만 실행
+  }, [points.length, isMobile]);
+
+  // selectedPoint 상태 변경 감지를 위한 useEffect 수정
+  useEffect(() => {
+    if (selectedPoint !== null) {
+      if (isMobile) {
+        // 기존 마커 클릭 시 바텀시트 열기
+        setIsBottomSheetOpen(true);
+        
+        // 스크롤 처리 - requestAnimationFrame 사용하여 더 부드러운 스크롤
+        requestAnimationFrame(() => {
+          const markerElement = document.getElementById(`marker-${selectedPoint}`);
+          if (markerElement) {
+            markerElement.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center',
+              inline: 'nearest'
+            });
+          }
+        });
+      } else {
+        // 데스크탑에서만 스크롤 동작
+        requestAnimationFrame(() => {
+          const markerElement = document.getElementById(`marker-${selectedPoint}`);
+          if (markerElement) {
+            markerElement.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center',
+              inline: 'nearest'
+            });
+            markerElement.classList.add('bg-[#232323]/80');
+            setTimeout(() => {
+              markerElement.classList.remove('bg-[#232323]/80');
+            }, 1000);
+          }
+        });
+      }
+    }
+  }, [selectedPoint, isMobile]);
 
   // 이미지 최적화 함수 - 높은 해상도와 품질을 유지하도록 개선
   const compressImage = async (
@@ -706,6 +736,92 @@ export function RequestFormModal({
     return "다음";
   };
 
+  // 마우스 이벤트 핸들러 추가
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStartY(e.clientY);
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isDragging) return;
+    
+    const deltaY = e.clientY - dragStartY;
+    if (deltaY > 0) { // 아래로 드래그할 때만
+      // 부드러운 드래그를 위해 deltaY에 감쇠 적용
+      const dampedDeltaY = deltaY * 0.8;
+      setCurrentDragY(dampedDeltaY);
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (!isDragging) return;
+    
+    if (currentDragY > 100) { // 100px 이상 드래그되면 닫기
+      handleBottomSheetClose();
+    } else {
+      setIsBottomSheetOpen(true);
+    }
+    
+    setIsDragging(false);
+    setCurrentDragY(0);
+  };
+
+  // 터치 이벤트 핸들러 수정
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsDragging(true);
+    setDragStartY(e.touches[0].clientY);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    
+    const deltaY = e.touches[0].clientY - dragStartY;
+    if (deltaY > 0) { // 아래로 드래그할 때만
+      // 부드러운 드래그를 위해 deltaY에 감쇠 적용
+      const dampedDeltaY = deltaY * 0.8;
+      setCurrentDragY(dampedDeltaY);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging) return;
+    
+    if (currentDragY > 100) { // 100px 이상 드래그되면 닫기
+      handleBottomSheetClose();
+    } else {
+      setIsBottomSheetOpen(true);
+    }
+    
+    setIsDragging(false);
+    setCurrentDragY(0);
+  };
+
+  // 드래그 핸들 클릭 핸들러 수정
+  const handleHandleClick = (e: React.MouseEvent) => {
+    if (!isDragging) {
+      handleBottomSheetClose();
+    }
+  };
+
+  // 바텀시트가 닫힐 때 마커 포커스 해제
+  const handleBottomSheetClose = () => {
+    setIsBottomSheetOpen(false);
+    setSelectedPoint(null);
+  };
+
+  // 이벤트 리스너 등록
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    }
+    
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging]);
+
   return (
     <>
       {/* Main Modal Content */}
@@ -723,13 +839,13 @@ export function RequestFormModal({
             // 모바일에서는 전체화면으로 설정
             "w-full h-screen max-w-full max-h-screen rounded-none",
             // 태블릿 이상에서는 적절한 크기로 제한
-            currentStep === 2 || currentStep === 3  // 2단계와 3단계 모두 동일한 크기 적용
-              ? "sm:w-[min(900px,95vw)] sm:h-[min(600px,90vh)]" 
+            currentStep === 2 || currentStep === 3
+              ? "sm:w-[min(1000px,95vw)] sm:h-[min(700px,90vh)]"
               : "sm:w-[min(450px,80vw)] sm:h-[min(600px,90vh)]",
             "sm:min-w-[320px] sm:min-h-[500px]",
             // 데스크탑에서도 너무 커지지 않도록 제한
-            currentStep === 2 || currentStep === 3  // 2단계와 3단계 모두 동일한 크기 적용
-              ? "lg:w-[min(1000px,90vw)] lg:h-[min(700px,80vh)]" 
+            currentStep === 2 || currentStep === 3
+              ? "lg:w-[min(1200px,90vw)] lg:h-[min(800px,80vh)]"
               : "lg:w-[min(500px,60vw)] lg:h-[min(650px,80vh)]",
             "sm:rounded-md flex flex-col"
           )}
@@ -840,9 +956,13 @@ export function RequestFormModal({
               )}
             >
               {currentStep === 2 || currentStep === 3 ? (
-                <div className="w-full h-full flex">
-                  {/* 이미지 영역 - 너비 조정 */}
-                  <div className="w-[60%] h-full flex items-center justify-center bg-[#1A1A1A] overflow-hidden relative p-0">
+                <div className="w-full h-full flex flex-col md:flex-row">
+                  {/* 이미지 영역 - 모바일에서는 전체 화면 */}
+                  <div className={cn(
+                    "w-full h-full",
+                    "flex items-center justify-center bg-[#1A1A1A] overflow-hidden relative p-0",
+                    "md:w-[60%]"
+                  )}>
                     <div className="relative aspect-[4/5] h-full flex items-center justify-center">
                       <ImageContainer
                         {...imageContainerProps}
@@ -856,13 +976,267 @@ export function RequestFormModal({
                       />
                     </div>
                   </div>
-                  {/* 사이드바 영역 - 너비 조정 */}
-                  <div className="w-[40%] h-full border-l border-gray-800 overflow-y-auto">
+
+                  {/* 모바일용 바텀 시트 */}
+                  <div className={cn(
+                    "md:hidden fixed bottom-0 left-0 right-0",
+                    "bg-[#1A1A1A] rounded-t-2xl",
+                    "transition-all duration-300 ease-out", // ease-out으로 변경하여 더 자연스러운 움직임
+                    "shadow-[0_-4px_20px_rgba(0,0,0,0.3)]",
+                    "z-50",
+                    isBottomSheetOpen ? "translate-y-0" : "translate-y-[calc(100%-40px)]",
+                    isDragging && "transition-none"
+                  )}
+                  style={{
+                    transform: isDragging 
+                      ? `translateY(${currentDragY}px)` 
+                      : isBottomSheetOpen 
+                        ? 'translateY(0)' 
+                        : 'translateY(calc(100% - 40px))',
+                    willChange: 'transform' // 성능 최적화
+                  }}>
+                    {/* 드래그 핸들 */}
+                    <div
+                      ref={bottomSheetRef}
+                      className="h-[40px] flex items-center justify-center cursor-grab active:cursor-grabbing"
+                      onMouseDown={handleMouseDown}
+                      onTouchStart={handleTouchStart}
+                      onTouchMove={handleTouchMove}
+                      onTouchEnd={handleTouchEnd}
+                      onClick={handleHandleClick}
+                    >
+                      <div className="w-12 h-1 bg-gray-600 rounded-full" />
+                    </div>
+
+                    {/* 바텀 시트 컨텐츠 */}
+                    <div className="h-[60vh] overflow-y-auto">
+                      {modalType === "style" && (
+                        <div className="h-full flex flex-col">
+                          {currentStep === 2 && (
+                            <div className="p-5 flex flex-col h-full flex-1">
+                              <h3 className="text-base font-medium text-white mb-4">아이템 정보</h3>
+                              {points.length === 0 ? (
+                                <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
+                                  <div className="w-12 h-12 rounded-full bg-[#232323] flex items-center justify-center mb-4">
+                                    <div className="w-6 h-6 border-2 border-[#EAFD66] rounded-full" />
+                                  </div>
+                                  <h4 className="text-base font-medium text-white mb-2">마커를 추가해주세요</h4>
+                                  <p className="text-sm text-gray-400 max-w-[280px]">
+                                    이미지에 원하는 위치를 클릭하여 마커를 추가하고, 브랜드와 가격 정보를 입력해주세요.
+                                  </p>
+                                </div>
+                              ) : (
+                                <div className="flex flex-col gap-2 overflow-y-auto pr-1">
+                                  {points.map((point, index) => (
+                                    <div
+                                      key={index}
+                                      id={`marker-${index}`}
+                                      className={cn(
+                                        "p-3 border rounded-lg transition-all",
+                                        !point.brand || !point.price
+                                          ? "bg-[#2A1A1A] border-red-500/20"
+                                          : "bg-[#232323] border-gray-700/50",
+                                        selectedPoint === index
+                                          ? "border-[#EAFD66] bg-[#232323]/80"
+                                          : "hover:border-[#EAFD66]/20"
+                                      )}
+                                    >
+                                      {/* 아이템 헤더 */}
+                                      <div className="flex items-center justify-between">
+                                        <div 
+                                          className="flex items-center gap-2 cursor-pointer flex-1"
+                                          onClick={() => {
+                                            setSelectedPoint(selectedPoint === index ? null : index);
+                                          }}
+                                        >
+                                          <div className="w-5 h-5 flex items-center justify-center bg-[#EAFD66] text-[#1A1A1A] rounded-full text-[10px] font-bold">
+                                            {index + 1}
+                                          </div>
+                                          <span className="text-sm text-white">아이템 {index + 1}</span>
+                                        </div>
+
+                                        {/* 오른쪽 영역 - 체크박스와 삭제 버튼 */}
+                                        <div className="flex items-center gap-3">
+                                          {/* 찔러보기 체크박스 */}
+                                          <div 
+                                            className="flex items-center gap-2"
+                                            onClick={(e) => e.stopPropagation()}
+                                          >
+                                            <input
+                                              type="checkbox"
+                                              id={`secret-${index}`}
+                                              checked={point.isSecret || false}
+                                              onChange={(e) => {
+                                                const newPoints = [...points];
+                                                newPoints[index] = { ...point, isSecret: e.target.checked };
+                                                setPoints(newPoints);
+                                              }}
+                                              className="w-4 h-4 rounded border-gray-600 bg-[#2A2A2A] text-[#EAFD66] focus:ring-[#EAFD66] focus:ring-offset-0 focus:ring-2 accent-[#EAFD66]"
+                                            />
+                                            <label 
+                                              htmlFor={`secret-${index}`} 
+                                              className="text-xs text-[#EAFD66] cursor-pointer whitespace-nowrap"
+                                            >
+                                              찔러보기
+                                            </label>
+                                          </div>
+                                          {/* 삭제 버튼 */}
+                                          <button
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              const newPoints = [...points];
+                                              newPoints.splice(index, 1);
+                                              setPoints(newPoints);
+                                              if (selectedPoint === index) {
+                                                setSelectedPoint(null);
+                                              }
+                                            }}
+                                            className="p-1 hover:bg-white/5 rounded-full text-gray-400 hover:text-red-400 transition-colors"
+                                          >
+                                            <Trash2 size={14} />
+                                          </button>
+                                        </div>
+                                      </div>
+
+                                      {/* 아이템 상세 정보 */}
+                                      {selectedPoint === index && (
+                                        <div className="mt-3 space-y-2 pt-3 border-t border-gray-700/50">
+                                          <div>
+                                            <label className="text-xs text-gray-400 block mb-1">
+                                              브랜드
+                                            </label>
+                                            <input
+                                              type="text"
+                                              value={point.brand || ""}
+                                              onChange={(e) => {
+                                                const newPoints = [...points];
+                                                newPoints[index] = { ...point, brand: e.target.value };
+                                                setPoints(newPoints);
+                                              }}
+                                              placeholder="브랜드명"
+                                              className="w-full px-2 py-1.5 bg-[#2A2A2A] border border-gray-700 rounded text-sm text-white focus:border-[#EAFD66] focus:outline-none"
+                                              onClick={(e) => e.stopPropagation()}
+                                            />
+                                          </div>
+                                          <div>
+                                            <label className="text-xs text-gray-400 block mb-1">
+                                              가격
+                                            </label>
+                                            <input
+                                              type="text"
+                                              value={point.price || ""}
+                                              onChange={(e) => {
+                                                const newPoints = [...points];
+                                                newPoints[index] = { ...point, price: e.target.value };
+                                                setPoints(newPoints);
+                                              }}
+                                              placeholder="가격"
+                                              className="w-full px-2 py-1.5 bg-[#2A2A2A] border border-gray-700 rounded text-sm text-white focus:border-[#EAFD66] focus:outline-none"
+                                              onClick={(e) => e.stopPropagation()}
+                                            />
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          {currentStep === 3 && (
+                            <div className="p-5 flex flex-col h-full flex-1">
+                              <div className="flex items-center gap-2 mb-3">
+                                <h3 className="text-base font-medium text-white">스타일 참고 링크</h3>
+                                <div className="group relative">
+                                  <div className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center cursor-help">
+                                    <span className="text-[10px] font-medium text-gray-400">i</span>
+                                  </div>
+                                  <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 p-2 bg-[#232323] border border-gray-700 rounded-lg text-xs text-gray-300 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                    이 스타일을 만들 때 참고한 이미지나 영상의 링크를 추가해주세요. 다른 사용자들이 스타일의 영감을 얻는데 도움이 됩니다.
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex flex-col space-y-3">
+                                <input
+                                  type="text"
+                                  value={newUrl}
+                                  onChange={(e) => setNewUrl(e.target.value)}
+                                  placeholder="URL을 입력하세요"
+                                  className="w-full px-3 py-2.5 bg-[#232323] border border-gray-700 rounded-md text-sm text-white focus:border-[#EAFD66] focus:outline-none focus:ring-1 focus:ring-[#EAFD66]"
+                                />
+                                <button
+                                  onClick={handleAddInspirationLink}
+                                  disabled={!newUrl.trim()}
+                                  className={cn(
+                                    "w-full py-2.5 text-sm rounded-md transition-colors font-medium",
+                                    newUrl.trim()
+                                      ? "bg-[#EAFD66] text-[#1A1A1A] hover:bg-[#EAFD66]/90"
+                                      : "bg-gray-700 text-gray-400 cursor-not-allowed"
+                                  )}
+                                >
+                                  링크 추가
+                                </button>
+                              </div>
+                              {inspirationLinks.length === 0 ? (
+                                <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
+                                  <div className="w-12 h-12 rounded-full bg-[#232323] flex items-center justify-center mb-4">
+                                    <Link className="w-6 h-6 text-[#EAFD66]" />
+                                  </div>
+                                  <h4 className="text-base font-medium text-white mb-2">참고 링크를 추가해주세요</h4>
+                                  <p className="text-sm text-gray-400 max-w-[280px]">
+                                    이 스타일을 만들 때 참고한 이미지나 영상의 링크를 추가하면 다른 사용자들에게 도움이 됩니다.
+                                  </p>
+                                </div>
+                              ) : (
+                                <div className="mt-4 flex-1 overflow-y-auto">
+                                  <div className="flex flex-col gap-2 pr-1">
+                                    {inspirationLinks.map((link) => (
+                                      <div
+                                        key={link.id}
+                                        className="flex items-center justify-between p-2 bg-[#232323] border border-gray-700 rounded-md hover:border-gray-600 transition-colors"
+                                      >
+                                        <a
+                                          href={link.url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="flex items-center gap-2 text-xs text-[#EAFD66] hover:text-[#EAFD66]/80 hover:underline truncate"
+                                        >
+                                          <Link size={14} className="flex-shrink-0" />
+                                          <span className="truncate">{link.url}</span>
+                                        </a>
+                                        <button
+                                          onClick={() => handleRemoveInspirationLink(link.id)}
+                                          className="p-1 text-gray-400 hover:text-red-400 transition-colors"
+                                        >
+                                          <X size={14} />
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {modalType === "request" && (
+                        <ContextStepSidebar
+                          modalType="request"
+                          onAnswerChange={(answer) => setContextAnswers(answer)}
+                          onSubmit={handleSubmit}
+                          isMobile={isMobile}
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  {/* 데스크탑용 사이드바 */}
+                  <div className="hidden md:block w-[40%] h-full border-l border-gray-800 overflow-y-auto">
                     {modalType === "style" && (
                       <div className="h-full flex flex-col">
                         {currentStep === 2 && (
-                          <div className="p-4 flex flex-col h-full flex-1">
-                            <h3 className="text-sm font-medium text-white mb-3">아이템 정보</h3>
+                          <div className="p-5 flex flex-col h-full flex-1">
+                            <h3 className="text-base font-medium text-white mb-4">아이템 정보</h3>
                             {points.length === 0 ? (
                               <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
                                 <div className="w-12 h-12 rounded-full bg-[#232323] flex items-center justify-center mb-4">
@@ -881,7 +1255,6 @@ export function RequestFormModal({
                                     id={`marker-${index}`}
                                     className={cn(
                                       "p-3 border rounded-lg transition-all",
-                                      // 필수 정보가 누락된 경우 연한 붉은색 배경 적용
                                       !point.brand || !point.price
                                         ? "bg-[#2A1A1A] border-red-500/20"
                                         : "bg-[#232323] border-gray-700/50",
@@ -895,7 +1268,9 @@ export function RequestFormModal({
                                       {/* 왼쪽 영역 - 클릭 시 펼치기/접기 */}
                                       <div 
                                         className="flex items-center gap-2 cursor-pointer flex-1"
-                                        onClick={() => setSelectedPoint(selectedPoint === index ? null : index)}
+                                        onClick={() => {
+                                          setSelectedPoint(selectedPoint === index ? null : index);
+                                        }}
                                       >
                                         <div className="w-5 h-5 flex items-center justify-center bg-[#EAFD66] text-[#1A1A1A] rounded-full text-[10px] font-bold">
                                           {index + 1}
@@ -992,9 +1367,9 @@ export function RequestFormModal({
                           </div>
                         )}
                         {currentStep === 3 && (
-                          <div className="p-4 flex flex-col h-full flex-1">
+                          <div className="p-5 flex flex-col h-full flex-1">
                             <div className="flex items-center gap-2 mb-3">
-                              <h3 className="text-sm font-medium text-white">스타일 참고 링크</h3>
+                              <h3 className="text-base font-medium text-white">스타일 참고 링크</h3>
                               <div className="group relative">
                                 <div className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center cursor-help">
                                   <span className="text-[10px] font-medium text-gray-400">i</span>
