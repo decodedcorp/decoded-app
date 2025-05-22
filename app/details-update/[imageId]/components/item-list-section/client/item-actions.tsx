@@ -1,19 +1,21 @@
-"use client";
+'use client';
 
-import { Heart } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import { cn } from "@/lib/utils/style";
-import { AddItemModal } from "@/components/ui/modal/add-item-modal";
-import { useProtectedAction } from "@/lib/hooks/auth/use-protected-action";
-import { useLocaleContext } from "@/lib/contexts/locale-context";
-import { ShareButtons } from "@/components/ui/share-buttons";
+import { Heart } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
+import { cn } from '@/lib/utils/style';
+import { AddItemModal } from '@/components/ui/modal/add-item-modal';
+import { useProtectedAction } from '@/lib/hooks/auth/use-protected-action';
+import { useLocaleContext } from '@/lib/contexts/locale-context';
+import { ShareButtons } from '@/components/ui/share-buttons';
+import { LinkButton } from '@/app/details-renewal/[imageId]/components/modal/link-button';
 
 interface ItemActionsProps {
   likeCount: number;
   isLiked: boolean;
   isLoading: boolean;
   onLike: (userId: string) => Promise<void>;
+  layoutType: 'masonry' | 'list';
 }
 
 export function ItemActions({
@@ -21,6 +23,7 @@ export function ItemActions({
   isLiked,
   isLoading,
   onLike,
+  layoutType,
 }: ItemActionsProps) {
   const { t } = useLocaleContext();
   const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
@@ -45,14 +48,14 @@ export function ItemActions({
               onClick={handleLike}
               disabled={isLoading}
               className={cn(
-                "text-neutral-400 hover:text-white/80 transition-colors",
-                isLiked && "text-red-500 hover:text-red-400",
-                isLoading && "opacity-50 cursor-not-allowed"
+                'text-neutral-400 hover:text-white/80 transition-colors',
+                isLiked && 'text-red-500 hover:text-red-400',
+                isLoading && 'opacity-50 cursor-not-allowed'
               )}
             >
               <Heart
                 className="w-4 h-4"
-                fill={isLiked ? "currentColor" : "none"}
+                fill={isLiked ? 'currentColor' : 'none'}
               />
             </button>
             <span className="text-xs text-neutral-400">{likeCount}</span>
@@ -66,12 +69,16 @@ export function ItemActions({
             thumbnailUrl={directImageUrl}
           />
         </div>
-        <button
-          onClick={() => setIsAddItemModalOpen(true)}
-          className="px-4 py-2 rounded text-xs font-medium bg-neutral-800 text-white/80 hover:bg-neutral-700 transition-colors"
-        >
-          {t.common.actions.addItem}
-        </button>
+        {layoutType === 'masonry' ? (
+          <button
+            onClick={() => setIsAddItemModalOpen(true)}
+            className="px-4 py-2 rounded text-xs font-medium bg-neutral-800 text-white/80 hover:bg-neutral-700 transition-colors"
+          >
+            {t.common.actions.addItem}
+          </button>
+        ) : (
+          <LinkButton imageId={imageId} />
+        )}
       </div>
 
       {isAddItemModalOpen && (
@@ -80,7 +87,7 @@ export function ItemActions({
           onClose={() => setIsAddItemModalOpen(false)}
           imageId={imageId}
           requestUrl={`user/${sessionStorage.getItem(
-            "USER_DOC_ID"
+            'USER_DOC_ID'
           )}/image/${imageId}/request/add`}
         />
       )}

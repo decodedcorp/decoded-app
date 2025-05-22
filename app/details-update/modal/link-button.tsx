@@ -25,19 +25,34 @@ export function LinkButton({ imageId }: LinkButtonProps) {
   };
 
   return (
-    <div>
+    <div className="w-full">
       {/* 링크 추가 버튼 */}
-
-      <button
-        onClick={handleOpenModal}
-        className="px-4 py-2 rounded text-xs font-medium bg-neutral-800 text-white/80 hover:bg-neutral-700 transition-colors"
-        aria-label="링크 추가"
-      >
-        링크 추가
-      </button>
-
+      <div className="sticky top-6 float-right -mt-16 mr-2 z-20">
+        <button 
+          onClick={handleOpenModal}
+          className="text-neutral-400 hover:text-white/80 transition-colors"
+          aria-label="링크 추가"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-4 h-4"
+          >
+            <path
+              d="M12 4V20M20 12H4"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
+      </div>
+      
       {/* 링크 모달 폼 */}
-      <LinkForm
+      <LinkForm 
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onSubmit={handleSubmit}

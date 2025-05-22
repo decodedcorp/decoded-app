@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import React from 'react';
 import { DetailsList } from './item-list-section/server/details-list';
 import { useItemDetail } from '../context/item-detail-context';
@@ -12,88 +12,137 @@ interface DetailsListProps {
   mainContainerRef?: React.RefObject<HTMLDivElement>;
   bgContainerRef?: React.RefObject<HTMLDivElement>;
   gridLayoutRef?: React.RefObject<HTMLDivElement>;
+  isExpanded: boolean;
 }
 
 interface DetailLayoutProps {
-  children: React.ReactElement | React.ReactElement[];
+  children: React.ReactElement<{
+    mainContainerRef?: React.RefObject<HTMLDivElement>;
+    bgContainerRef?: React.RefObject<HTMLDivElement>;
+    gridLayoutRef?: React.RefObject<HTMLDivElement>;
+    layoutType: 'masonry' | 'list';
+  }>[];
   imageData: any;
   selectedItemId?: string;
+  layoutType: 'masonry' | 'list';
 }
 
-export function DetailLayout({ children, imageData, selectedItemId }: DetailLayoutProps) {
+export function DetailLayout({ children, imageData, selectedItemId, layoutType }: DetailLayoutProps) {
   const mainContainerRef = useRef<HTMLDivElement>(null);
   const bgContainerRef = useRef<HTMLDivElement>(null);
   const gridLayoutRef = useRef<HTMLDivElement>(null);
   const { selectedItemId: contextSelectedItemId } = useItemDetail();
+  const isExpanded = !!contextSelectedItemId;
+  const [isFirstRender, setIsFirstRender] = useState(true);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
+    if (isFirstRender) {
+      // 첫 렌더링 시에는 애니메이션 없이 초기 스타일만 적용
+      if (mainContainerRef.current && bgContainerRef.current && gridLayoutRef.current) {
+        gsap.set(mainContainerRef.current, {
+          maxWidth: '960px',
+          width: '100%',
+          marginLeft: 'auto',
+          marginRight: 'auto',
+          padding: '0 1rem'
+        });
+
+        gsap.set(bgContainerRef.current, {
+          backgroundColor: '#1A1A1A',
+          borderRadius: '1rem',
+          padding: '1.5rem'
+        });
+
+        gsap.set(gridLayoutRef.current, {
+          gridTemplateColumns: 'minmax(350px, 500px) minmax(350px, 1fr)'
+        });
+      }
+      setIsFirstRender(false);
+      return;
+    }
+
     if (contextSelectedItemId && mainContainerRef.current && bgContainerRef.current && gridLayoutRef.current) {
       // 레이아웃 확장
-      const tl = gsap.timeline();
+      setIsAnimating(true);
+      window.dispatchEvent(new CustomEvent('layoutAnimationStart'));
       
-      // 섹션 즉시 사라짐
-      tl.set(mainContainerRef.current, {
+      const tl = gsap.timeline({
+        onComplete: () => {
+          setIsAnimating(false);
+          // 애니메이션 완료 후 그리드 업데이트를 위한 이벤트 발생
+          window.dispatchEvent(new CustomEvent('layoutAnimationComplete'));
+        }
+      });
+      
+      // 그리드 레이아웃 변경 (먼저 시작)
+      tl.to(gridLayoutRef.current, {
+        gridTemplateColumns: 'minmax(350px, 500px) minmax(350px, 1fr)',
+        duration: 0.4,
+        ease: 'power2.inOut'
+      });
+
+      // 메인 컨테이너 확장
+      tl.to(mainContainerRef.current, {
         maxWidth: '100%',
         width: '100%',
         marginLeft: 0,
         marginRight: 0,
-        padding: 0
-      });
+        padding: 0,
+        duration: 0.4,
+        ease: 'power2.inOut'
+      }, '-=0.2');
 
-      tl.set(bgContainerRef.current, {
+      // 배경 컨테이너 전환
+      tl.to(bgContainerRef.current, {
         backgroundColor: 'transparent',
         borderRadius: 0,
-        padding: 0
-      });
+        padding: 0,
+        duration: 0.4,
+        ease: 'power2.inOut'
+      }, '-=0.2');
 
-      // 그리드 레이아웃 변경 (약간의 지연 후)
-      tl.to(gridLayoutRef.current, {
-        gridTemplateColumns: 'minmax(350px, 500px) minmax(350px, 1fr)',
-        duration: 0.5,
-        ease: 'power2.inOut',
-        delay: 0.2
-      });
     } else if (mainContainerRef.current && bgContainerRef.current && gridLayoutRef.current) {
       // 레이아웃 축소
-      const tl = gsap.timeline();
+      setIsAnimating(true);
+      window.dispatchEvent(new CustomEvent('layoutAnimationStart'));
       
-      // 그리드 레이아웃 변경
+      const tl = gsap.timeline({
+        onComplete: () => {
+          setIsAnimating(false);
+          // 애니메이션 완료 후 그리드 업데이트를 위한 이벤트 발생
+          window.dispatchEvent(new CustomEvent('layoutAnimationComplete'));
+        }
+      });
+      
+      // 그리드 레이아웃 변경 (먼저 시작)
       tl.to(gridLayoutRef.current, {
         gridTemplateColumns: 'minmax(350px, 500px) minmax(350px, 1fr)',
-        duration: 0.5,
+        duration: 0.4,
         ease: 'power2.inOut'
       });
 
-      // 섹션 즉시 복원
-      tl.set(bgContainerRef.current, {
+      // 배경 컨테이너 복원
+      tl.to(bgContainerRef.current, {
         backgroundColor: '#1A1A1A',
         borderRadius: '1rem',
-        padding: '1.5rem'
-      });
+        padding: '1.5rem',
+        duration: 0.4,
+        ease: 'power2.inOut'
+      }, '-=0.2');
 
-      tl.set(mainContainerRef.current, {
+      // 메인 컨테이너 복원
+      tl.to(mainContainerRef.current, {
         maxWidth: '960px',
         width: '100%',
         marginLeft: 'auto',
         marginRight: 'auto',
-        padding: '0 1rem'
-      });
+        padding: '0 1rem',
+        duration: 0.4,
+        ease: 'power2.inOut'
+      }, '-=0.2');
     }
-  }, [contextSelectedItemId]);
-
-  const childrenWithRefs = React.Children.map(children, child => {
-    if (React.isValidElement(child)) {
-      if (child.type === DetailsList || (typeof child.type === 'function' && child.type.name === 'DetailsList')) {
-        return React.cloneElement(child, {
-          mainContainerRef,
-          bgContainerRef,
-          gridLayoutRef
-        } as DetailsListProps);
-      }
-      return child;
-    }
-    return child;
-  });
+  }, [contextSelectedItemId, isFirstRender]);
 
   return (
     <div className="min-h-screen pt-16 sm:pt-24 bg-black">
@@ -103,7 +152,17 @@ export function DetailLayout({ children, imageData, selectedItemId }: DetailLayo
             ref={gridLayoutRef} 
             className="grid grid-cols-1 lg:grid-cols-[minmax(350px,500px)_minmax(350px,1fr)] items-start justify-center gap-6"
           >
-            {childrenWithRefs}
+            {React.Children.map(children, child => {
+              if (React.isValidElement(child)) {
+                return React.cloneElement(child, {
+                  mainContainerRef,
+                  bgContainerRef,
+                  gridLayoutRef,
+                  layoutType
+                });
+              }
+              return child;
+            })}
           </div>
         </div>
       </div>

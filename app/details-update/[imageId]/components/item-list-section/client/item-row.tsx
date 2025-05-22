@@ -127,28 +127,11 @@ export function ItemRow({
           ref={gridContainerRef}
           className="w-full"
         >
-          <div className="flex items-center mb-6">
-            <button
-              onClick={handleBackClick}
-              className="flex items-center text-neutral-400 hover:text-white transition-colors"
-            >
-              <svg
-                className="w-5 h-5 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-              <span>뒤로가기</span>
-            </button>
-          </div>
-          <MasonryGrid />
+          <MasonryGrid 
+            category={category}
+            subCategory={subCategory}
+            onBackClick={handleBackClick}
+          />
         </div>
       )}
     </>

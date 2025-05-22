@@ -5,6 +5,7 @@ import { X, ArrowLeft } from 'lucide-react';
 import { LinkCard, LinkMetadata } from './components/link-preview/link-card';
 import { useOGTags } from '@/lib/hooks/features/metadata/useOGTags';
 import { LinkCardSkeleton } from './components/link-preview/LinkCardSkeleton';
+import { createPortal } from 'react-dom';
 
 interface LinkFormProps {
   isOpen: boolean;
@@ -140,9 +141,9 @@ export function LinkForm({
 
   const isSubmitDisabled = !url.trim();
 
-  return (
+  return createPortal(
     <div
-      className={`fixed inset-0 flex items-center justify-center p-4 z-50 
+      className={`fixed inset-0 flex items-center justify-center p-4 z-[100] 
       bg-black/80 backdrop-blur-sm transition-opacity duration-300 ${
         isClosing ? 'opacity-0' : 'opacity-100'
       }`}
@@ -282,6 +283,7 @@ export function LinkForm({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

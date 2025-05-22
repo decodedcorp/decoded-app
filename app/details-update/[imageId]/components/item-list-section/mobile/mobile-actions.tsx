@@ -11,12 +11,14 @@ interface MobileActionsProps {
   initialLikeCount: number;
   imageId: string;
   isFixed?: boolean;
+  layoutType: string;
 }
 
 export function MobileActions({
   initialLikeCount,
   imageId,
   isFixed = false,
+  layoutType,
 }: MobileActionsProps) {
   const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
 
@@ -36,6 +38,7 @@ export function MobileActions({
           <ItemActionsWrapper
             initialLikeCount={initialLikeCount}
             imageId={imageId}
+            layoutType={layoutType}
             render={({ likeCount, isLiked, isLoading, onLike }) => (
               <>
                 <button

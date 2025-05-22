@@ -5,6 +5,7 @@ import { ProcessedImageData, DecodedItem } from '@/lib/api/_types/image';
 import { ItemListSection } from '../client/item-list';
 import { getCategoryInfo } from '../../../../utils/hooks/category';
 import { ItemActionsWrapper } from '../client/item-actions-wrapper';
+import { useItemDetail } from '../../../context/item-detail-context';
 
 interface DetailsListProps {
   imageData: ProcessedImageData;
@@ -12,6 +13,7 @@ interface DetailsListProps {
   mainContainerRef?: React.RefObject<HTMLDivElement>;
   bgContainerRef?: React.RefObject<HTMLDivElement>;
   gridLayoutRef?: React.RefObject<HTMLDivElement>;
+  isExpanded?: boolean;
 }
 
 export function DetailsList({ 
@@ -19,8 +21,11 @@ export function DetailsList({
   selectedItemId,
   mainContainerRef,
   bgContainerRef,
-  gridLayoutRef
+  gridLayoutRef,
+  isExpanded
 }: DetailsListProps) {
+  const { selectedItemId: contextSelectedItemId } = useItemDetail();
+
   if (!imageData?.items?.length) {
     console.log('No items found in imageData:', imageData);
     return (
@@ -79,13 +84,15 @@ export function DetailsList({
             </div>
           )}
         </div>
-
-        <div className="flex-shrink-0 mt-auto px-4 pt-3 border-t border-neutral-800">
-          <ItemActionsWrapper
-            initialLikeCount={imageData.like || 0}
-            imageId={imageData.doc_id}
-          />
-        </div>
+        {!isExpanded && !contextSelectedItemId && (
+          <div className="flex-shrink-0 mt-auto px-4 pt-3 border-t border-neutral-800">
+            <ItemActionsWrapper
+              initialLikeCount={imageData.like || 0}
+              imageId={imageData.doc_id}
+              layoutType="masonry"
+            />
+          </div>
+        )}
       </div>
     </div>
   );

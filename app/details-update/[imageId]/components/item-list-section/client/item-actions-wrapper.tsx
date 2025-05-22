@@ -9,6 +9,7 @@ import { useLoginModalStore } from '@/components/auth/login-modal/store';
 interface ItemActionsWrapperProps {
   initialLikeCount: number;
   imageId: string;
+  layoutType: 'masonry' | 'list';
   render?: (props: {
     likeCount: number;
     isLiked: boolean;
@@ -22,6 +23,7 @@ const DEBOUNCE_DELAY = 300; // 300ms
 export function ItemActionsWrapper({
   initialLikeCount,
   imageId,
+  layoutType,
   render,
 }: ItemActionsWrapperProps) {
   const [userId, setUserId] = useState<string | null>(null);
@@ -168,6 +170,7 @@ export function ItemActionsWrapper({
       isLiked={isLiked}
       isLoading={isLoading}
       onLike={handleLike}
+      layoutType={layoutType}
     />
   );
 }

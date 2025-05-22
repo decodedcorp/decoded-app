@@ -11,6 +11,8 @@ import { MobileDetailsList } from "./components/item-list-section/mobile/mobile-
 import { MobileActions } from "./components/item-list-section/mobile/mobile-actions";
 import { ItemDetailProvider } from './context/item-detail-context';
 import { DetailLayout } from "./components/layout";
+import { ItemActionsWrapper } from "./components/item-list-section/client/item-actions-wrapper";
+import { ImageActions } from './components/image-actions';
 
 // 타입 정의
 interface PageProps {
@@ -108,14 +110,24 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
             }}
           />
         )}
-        <DetailLayout imageData={processedImageData} selectedItemId={selectedItemId}>
-          <div className="w-screen sm:w-full max-w-[500px] mx-auto lg:mx-0">
+        <DetailLayout 
+          imageData={processedImageData} 
+          selectedItemId={selectedItemId}
+          layoutType="list"
+        >
+          <div className="w-screen sm:w-full max-w-[500px] mx-auto lg:mx-0 lg:sticky lg:top-4 lg:self-start">
             <div className="aspect-[4/5] w-full overflow-hidden rounded-none sm:rounded-lg">
               <ImageSection
                 imageData={processedImageData}
                 selectedItemId={selectedItemId}
+                layoutType="list"
               />
             </div>
+            <ImageActions
+              initialLikeCount={imageData.like || 0}
+              imageId={imageData.doc_id}
+              layoutType="list"
+            />
           </div>
           <DetailsList
             imageData={processedImageData}
@@ -142,6 +154,7 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
             initialLikeCount={imageData.like}
             imageId={imageData.doc_id}
             isFixed={true}
+            layoutType="list"
           />
         </div>
       </ItemDetailProvider>

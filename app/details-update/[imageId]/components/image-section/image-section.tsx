@@ -1,24 +1,30 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { Heart } from "lucide-react";
-import { ItemButton } from "@/components/ui/item-marker";
-import { useNavigateToDetail } from "@/lib/hooks/common/useNavigateToDetail";
-import { ProcessedImageData } from "@/lib/api/_types/image";
-import { cn } from "@/lib/utils/style";
-import { ItemActionsWrapper } from "../item-list-section/client/item-actions-wrapper";
-import { AddItemModal } from "@/components/ui/modal/add-item-modal";
-import { useState, useRef, useEffect } from "react";
+import Image from 'next/image';
+import { Heart } from 'lucide-react';
+import { ItemButton } from '@/components/ui/item-marker';
+import { useNavigateToDetail } from '@/lib/hooks/common/useNavigateToDetail';
+import { ProcessedImageData } from '@/lib/api/_types/image';
+import { cn } from '@/lib/utils/style';
+import { ItemActionsWrapper } from '../item-list-section/client/item-actions-wrapper';
+import { AddItemModal } from '@/components/ui/modal/add-item-modal';
+import { useState, useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { useItemDetail } from '../../context/item-detail-context';
+import { LinkButton } from '@/app/details-update/modal/link-button';
 
 interface ImageSectionProps {
   imageData: ProcessedImageData;
   selectedItemId?: string;
+  layoutType: string;
   className?: string;
 }
 
-export function ImageSection({ imageData, selectedItemId }: ImageSectionProps) {
+export function ImageSection({
+  imageData,
+  selectedItemId,
+  layoutType,
+}: ImageSectionProps) {
   const navigateToDetail = useNavigateToDetail();
   const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
   const { selectedItemId: contextSelectedId } = useItemDetail();
@@ -26,6 +32,32 @@ export function ImageSection({ imageData, selectedItemId }: ImageSectionProps) {
   const imageRef = useRef<HTMLDivElement>(null);
   const parentContainerRef = useRef<HTMLDivElement>(null);
   const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const threshold = 400; // 스크롤 시작 임계값
+      const maxScroll =
+        document.documentElement.scrollHeight - window.innerHeight;
+      const scrollProgress = Math.min(scrollY / maxScroll, 1);
+
+      if (parentContainerRef.current) {
+        if (scrollY > threshold) {
+          parentContainerRef.current.style.position = 'sticky';
+          // 스크롤 진행도에 따라 top 값을 조정 (최소 100px, 최대 300px)
+          const topValue = 100 + scrollProgress * 200;
+          parentContainerRef.current.style.top = `${topValue}px`;
+          parentContainerRef.current.style.zIndex = '10';
+        } else {
+          parentContainerRef.current.style.position = 'relative';
+          parentContainerRef.current.style.top = '0';
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -40,14 +72,14 @@ export function ImageSection({ imageData, selectedItemId }: ImageSectionProps) {
         marginLeft: 'auto',
         padding: '1rem',
         duration: 0.5,
-        ease: 'power2.inOut'
+        ease: 'power2.inOut',
       });
 
       // 이미지 컨테이너 애니메이션
       gsap.to(imageContainerRef.current, {
         width: '100%',
         duration: 0.5,
-        ease: 'power2.inOut'
+        ease: 'power2.inOut',
       });
     } else {
       // 부모 컨테이너 원래 상태로
@@ -56,14 +88,14 @@ export function ImageSection({ imageData, selectedItemId }: ImageSectionProps) {
         marginLeft: 'auto',
         padding: '1rem',
         duration: 0.5,
-        ease: 'power2.inOut'
+        ease: 'power2.inOut',
       });
 
       // 이미지 컨테이너 원래 상태로
       gsap.to(imageContainerRef.current, {
         width: '100%',
         duration: 0.5,
-        ease: 'power2.inOut'
+        ease: 'power2.inOut',
       });
     }
   }, [contextSelectedId]);
@@ -73,22 +105,19 @@ export function ImageSection({ imageData, selectedItemId }: ImageSectionProps) {
   const allItems = Object.values(imageData.items).flat();
 
   return (
-    <div 
+    <div
       ref={parentContainerRef}
       className="w-full sm:max-w-[960px] mx-auto px-0 sm:px-4 mb-0 sm:mb-8 lg:mb-16 transition-all duration-300"
     >
-      <div 
+      <div
         ref={imageContainerRef}
         className="relative w-full transition-all duration-300"
       >
-        <div 
-          ref={imageRef}
-          className="relative w-full h-full"
-        >
+        <div ref={imageRef} className="relative w-full h-full">
           <div className="relative w-full h-full aspect-[4/5] overflow-hidden rounded-lg">
             <Image
               src={imageData.img_url}
-              alt={Object.values(imageData.metadata)[0] || "이미지"}
+              alt={Object.values(imageData.metadata)[0] || '이미지'}
               fill
               className="object-cover sm:object-cover w-full h-full"
               priority
@@ -137,50 +166,59 @@ export function ImageSection({ imageData, selectedItemId }: ImageSectionProps) {
               <ItemActionsWrapper
                 initialLikeCount={imageData.like}
                 imageId={imageData.doc_id}
+                layoutType={layoutType as 'masonry' | 'list'}
                 render={({ likeCount, isLiked, isLoading, onLike }) => (
                   <>
                     <button
                       onClick={onLike}
                       disabled={isLoading}
                       className={cn(
-                        "flex items-center gap-2 px-4 py-2 rounded-full",
-                        "bg-white/5 hover:bg-white/10 transition-colors",
-                        isLoading && "opacity-50 cursor-not-allowed"
+                        'flex items-center gap-2 px-4 py-2 rounded-full',
+                        'bg-white/5 hover:bg-white/10 transition-colors',
+                        isLoading && 'opacity-50 cursor-not-allowed'
                       )}
                     >
                       <Heart
                         className={cn(
-                          "w-5 h-5",
-                          isLiked ? "fill-red-500 text-red-500" : "text-white/80/60"
+                          'w-5 h-5',
+                          isLiked
+                            ? 'fill-red-500 text-red-500'
+                            : 'text-white/80/60'
                         )}
                       />
-                      <span className="text-sm text-white/80/60">{likeCount}</span>
+                      <span className="text-sm text-white/80/60">
+                        {likeCount}
+                      </span>
                     </button>
 
-                    <button
-                      onClick={() => setIsAddItemModalOpen(true)}
-                      className={cn(
-                        "px-6 py-2 rounded-full text-sm font-medium",
-                        "bg-[#EAFD66] text-black hover:bg-[#EAFD66]/90 transition-colors"
-                      )}
-                    >
-                      아이템 추가
-                    </button>
+                    {layoutType === 'masonry' ? (
+                      <LinkButton imageId={imageData.doc_id} />
+                    ) : (
+                      <button
+                        onClick={() => setIsAddItemModalOpen(true)}
+                        className={cn(
+                          'px-6 py-2 rounded-full text-sm font-medium',
+                          'bg-[#EAFD66] text-black hover:bg-[#EAFD66]/90 transition-colors'
+                        )}
+                      >
+                        아이템 추가
+                      </button>
+                    )}
                   </>
                 )}
               />
             </div>
           </div>
 
-          {/* 아이템 추가 모달 */}
+          {/* 모달 */}
           {isAddItemModalOpen && (
             <AddItemModal
               isOpen={isAddItemModalOpen}
               onClose={() => setIsAddItemModalOpen(false)}
               imageId={imageData.doc_id}
-              requestUrl={`user/${sessionStorage.getItem("USER_DOC_ID")}/image/${
-                imageData.doc_id
-              }/request/add`}
+              requestUrl={`user/${sessionStorage.getItem(
+                'USER_DOC_ID'
+              )}/image/${imageData.doc_id}/request/add`}
             />
           )}
         </div>
