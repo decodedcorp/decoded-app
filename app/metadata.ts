@@ -136,7 +136,9 @@ export function generateDetailMetadata(
   const description =
     data?.description ||
     (locale === "ko" ? "상품 상세 정보" : "Product Details");
-  const imageUrl = data?.imageUrl || "/images/decoded.png";
+  const imageUrl = data?.imageId
+    ? `https://pub-65bb4012fb354951a2c6139a4b49b717.r2.dev/images/${data.imageId}.webp`
+    : "/images/decoded.png";
 
   return {
     ...baseMetadata,
