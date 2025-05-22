@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import { LoadingDisplay } from "./components/loading";
 import { notFound } from "next/navigation";
 import { ErrorDisplay } from "./components/error";
 import { getImageDetails } from "@/app/details/utils/hooks/fetchImageDetails";
@@ -10,6 +9,8 @@ import { ImageDetails, DecodedItem } from "@/lib/api/_types/image";
 import { generateItemSchema } from "@/lib/structured-data/geneartors/item";
 import { MobileDetailsList } from "./components/item-list-section/mobile/mobile-details-list";
 import { MobileActions } from "./components/item-list-section/mobile/mobile-actions";
+import { ItemDetailProvider } from './context/item-detail-context';
+import { DetailLayout } from "./components/layout";
 
 // 타입 정의
 interface PageProps {
@@ -70,7 +71,7 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
     );
 
     return (
-      <>
+      <ItemDetailProvider>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -107,39 +108,29 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
             }}
           />
         )}
-        <div className="min-h-screen pt-16 sm:pt-24 bg-black">
-          <div className="w-full sm:max-w-[960px] mx-auto px-0 sm:px-4 mb-0 sm:mb-8 lg:mb-16">
-            <Suspense fallback={<LoadingDisplay />}>
-              <div className="bg-transparent sm:bg-transparent lg:bg-[#1A1A1A] sm:rounded-2xl p-0 sm:p-4 lg:p-6">
-                <div className="grid grid-cols-1 lg:grid-cols-[minmax(350px,500px)_minmax(350px,1fr)] items-start justify-center gap-6">
-                  <div className="w-screen sm:w-full max-w-[500px] mx-auto lg:mx-0">
-                    <div className="aspect-[4/5] w-full overflow-hidden rounded-none sm:rounded-lg">
-                      <ImageSection
-                        imageData={processedImageData}
-                        selectedItemId={selectedItemId}
-                      />
-                    </div>
-                  </div>
-                  <div className="hidden lg:block h-full">
-                    <DetailsList
-                      imageData={processedImageData}
-                      selectedItemId={selectedItemId}
-                    />
-                  </div>
-                </div>
-              </div>
-            </Suspense>
-          </div>
-          <div className="w-full">
-            <Suspense fallback={<div className="h-20"></div>}>
-              <RelatedStylingSection
-                imageId={imageData.doc_id}
+        <DetailLayout imageData={processedImageData} selectedItemId={selectedItemId}>
+          <div className="w-screen sm:w-full max-w-[500px] mx-auto lg:mx-0">
+            <div className="aspect-[4/5] w-full overflow-hidden rounded-none sm:rounded-lg">
+              <ImageSection
+                imageData={processedImageData}
                 selectedItemId={selectedItemId}
-                artistId={potentialArtistId}
-                artistName={Object.values(imageData.metadata)[0] || undefined}
               />
-            </Suspense>
+            </div>
           </div>
+          <DetailsList
+            imageData={processedImageData}
+            selectedItemId={selectedItemId}
+          />
+        </DetailLayout>
+        <div className="w-full">
+          <Suspense fallback={<div className="h-20"></div>}>
+            <RelatedStylingSection
+              imageId={imageData.doc_id}
+              selectedItemId={selectedItemId}
+              artistId={potentialArtistId}
+              artistName={Object.values(imageData.metadata)[0] || undefined}
+            />
+          </Suspense>
         </div>
         <div className="lg:hidden">
           <MobileDetailsList
@@ -153,7 +144,7 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
             isFixed={true}
           />
         </div>
-      </>
+      </ItemDetailProvider>
     );
   } catch (error) {
     // TODO: Support `en` locale

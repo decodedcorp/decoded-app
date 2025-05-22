@@ -11,9 +11,17 @@ interface ProcessedItem {
 
 interface ItemListSectionProps {
   items: ProcessedItem[];
+  mainContainerRef?: React.RefObject<HTMLDivElement>;
+  bgContainerRef?: React.RefObject<HTMLDivElement>;
+  gridLayoutRef?: React.RefObject<HTMLDivElement>;
 }
 
-export function ItemListSection({ items }: ItemListSectionProps) {
+export function ItemListSection({ 
+  items,
+  mainContainerRef,
+  bgContainerRef,
+  gridLayoutRef
+}: ItemListSectionProps) {
   return (
     <div className="relative h-full">
       <div className="h-full overflow-y-auto">
@@ -24,6 +32,9 @@ export function ItemListSection({ items }: ItemListSectionProps) {
             category={item.category}
             subCategory={item.subCategory}
             imageUrl={item.imageUrl}
+            mainContainerRef={mainContainerRef}
+            bgContainerRef={bgContainerRef}
+            gridLayoutRef={gridLayoutRef}
           />
         ))}
       </div>

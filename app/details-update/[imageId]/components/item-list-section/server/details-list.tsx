@@ -1,17 +1,26 @@
 'use client';
 
+import { useRef } from 'react';
 import { ProcessedImageData, DecodedItem } from '@/lib/api/_types/image';
 import { ItemListSection } from '../client/item-list';
 import { getCategoryInfo } from '../../../../utils/hooks/category';
 import { ItemActionsWrapper } from '../client/item-actions-wrapper';
-import { DetailSlideSection } from '../../item-detail-section/detail-slide-section';
 
 interface DetailsListProps {
   imageData: ProcessedImageData;
   selectedItemId?: string;
+  mainContainerRef?: React.RefObject<HTMLDivElement>;
+  bgContainerRef?: React.RefObject<HTMLDivElement>;
+  gridLayoutRef?: React.RefObject<HTMLDivElement>;
 }
 
-export function DetailsList({ imageData, selectedItemId }: DetailsListProps) {
+export function DetailsList({ 
+  imageData, 
+  selectedItemId,
+  mainContainerRef,
+  bgContainerRef,
+  gridLayoutRef
+}: DetailsListProps) {
   if (!imageData?.items?.length) {
     console.log('No items found in imageData:', imageData);
     return (
@@ -53,38 +62,22 @@ export function DetailsList({ imageData, selectedItemId }: DetailsListProps) {
     })
     .filter((item): item is NonNullable<typeof item> => item !== null);
 
-  const topLevelCategory =
-    imageData.items
-      .map((item) => getCategoryInfo(item?.item?.item?.metadata))
-      .flat()
-      .find((cat) => cat?.depth === 1)?.displayName || 'FASHION';
-
   return (
     <div className="w-full h-full flex flex-col justify-between relative">
       <div className="w-full h-full flex flex-col">
-        {imageData.title && (
-          <div className="flex-shrink-0 px-3 py-2.5 border-b border-neutral-800">
-            <h1 className="text-sm text-neutral-300 font-medium truncate">
-              {imageData.title}
-            </h1>
-          </div>
-        )}
-        <div>
-          <div className="flex-shrink-0 px-3 py-2.5 border-b border-neutral-800">
-            <h2 className="text-sm font-medium text-neutral-400">
-              {topLevelCategory}
-            </h2>
-          </div>
-
-          <div className="flex-1 min-h-0 overflow-y-auto">
-            {processedItems.length > 0 ? (
-              <ItemListSection items={processedItems} />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <p className="text-neutral-400">No items available</p>
-              </div>
-            )}
-          </div>
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          {processedItems.length > 0 ? (
+            <ItemListSection 
+              items={processedItems} 
+              mainContainerRef={mainContainerRef}
+              bgContainerRef={bgContainerRef}
+              gridLayoutRef={gridLayoutRef}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <p className="text-neutral-400">No items available</p>
+            </div>
+          )}
         </div>
 
         <div className="flex-shrink-0 mt-auto px-4 pt-3 border-t border-neutral-800">
@@ -94,8 +87,6 @@ export function DetailsList({ imageData, selectedItemId }: DetailsListProps) {
           />
         </div>
       </div>
-
-      <DetailSlideSection />
     </div>
   );
 }
