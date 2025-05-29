@@ -23,7 +23,7 @@ export interface ContentItem {
 interface ContentCardProps {
   item: ContentItem;
   index: number;
-  filterIcons: Record<TabType, JSX.Element>;
+  filterIcons: Record<TabType, React.ReactElement>;
 }
 
 export const ContentCard = ({ item, index, filterIcons }: ContentCardProps) => {

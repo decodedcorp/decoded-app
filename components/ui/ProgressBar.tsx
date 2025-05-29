@@ -13,8 +13,8 @@ function ProgressBar({
   totalItems: number;
 }) {
   const [progress, setProgress] = useState(0);
-  const animationRef = useRef<number>();
-  const startTimeRef = useRef<number>();
+  const animationRef = useRef<number | undefined>(undefined);
+  const startTimeRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     const animate = (timestamp: number) => {

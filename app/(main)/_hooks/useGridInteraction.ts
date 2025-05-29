@@ -2,7 +2,7 @@ import { useRef, useCallback, useEffect, useState } from "react";
 import type { ImageDetail } from "../_types/image-grid";
 
 interface UseGridInteractionProps {
-  scrollContainerRef: React.RefObject<HTMLDivElement>;
+  scrollContainerRef: React.MutableRefObject<HTMLDivElement | null>;
   contentOffset: { x: number; y: number };
   setContentOffset: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>;
   fetchImageDetail: (imageDocId: string) => void;

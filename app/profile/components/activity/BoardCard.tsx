@@ -23,7 +23,7 @@ export interface BoardItem {
 interface BoardCardProps {
   item: BoardItem;
   index: number;
-  filterIcons: Record<TabType, JSX.Element>;
+  filterIcons: Record<TabType, React.ReactElement>;
 }
 
 export const BoardCard = ({ item, index, filterIcons }: BoardCardProps) => {

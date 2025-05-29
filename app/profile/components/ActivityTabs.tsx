@@ -37,7 +37,7 @@ interface ContentItem {
 interface ContentCardProps {
   item: ContentItem;
   index: number;
-  filterIcons: Record<TabType, JSX.Element>;
+  filterIcons: Record<TabType, React.ReactElement>;
   t: any;
 }
 
@@ -107,7 +107,7 @@ const ContentCard = ({ item, index, filterIcons, t }: ContentCardProps) => {
 // 보드 카드 컴포넌트
 interface BoardCardProps {
   type: TabType;
-  filterIcons: Record<TabType, JSX.Element>;
+  filterIcons: Record<TabType, React.ReactElement>;
   counts: Record<TabType, number>;
   isActive: boolean;
   onClick: () => void;
@@ -155,7 +155,7 @@ interface FilterButtonProps {
   label: string;
   count: number;
   isActive: boolean;
-  icon: JSX.Element;
+  icon: React.ReactElement;
   onClick: () => void;
 }
 
