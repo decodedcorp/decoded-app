@@ -101,7 +101,7 @@ const ImageItem = React.memo(function ImageItem({
   }
 
   const handleImageClick = () => {
-    router.push(`/details-update/${image.image_doc_id}`);
+    router.push(`/details/${image.image_doc_id}`);
   };
 
   const handleArtistClick = (e: React.MouseEvent<HTMLDivElement>) => {

@@ -5,4 +5,4 @@ export const CELL_WIDTH = ITEM_WIDTH + GAP;
 export const CELL_HEIGHT = ITEM_HEIGHT + GAP;
 export const LOAD_THRESHOLD = Math.max(CELL_WIDTH, CELL_HEIGHT) * 1.5;
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://dev.decoded.style/image"; 
+export const API_BASE_URL = "https://api.decoded.style/image"; 

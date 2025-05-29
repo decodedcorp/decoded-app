@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const baseMetadata = locale === "ko" ? koMetadata : enMetadata;
 
   // 상세 페이지인 경우
-  if (pathname.startsWith('/details-update/')) {
+  if (pathname.startsWith('/details/')) {
     const imageId = pathname.split('/').pop();
     if (imageId) {
       const imageData = await getImageDetails(imageId);
