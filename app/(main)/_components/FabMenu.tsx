@@ -13,6 +13,12 @@ export function FabMenu() {
     setIsFabMenuOpen(false); // FAB 메뉴는 닫아줍니다.
   };
 
+  const handleMouseLeave = () => {
+    if (isFabMenuOpen) {
+      setIsFabMenuOpen(false);
+    }
+  };
+
   return (
     <>
       <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-40">
@@ -21,6 +27,7 @@ export function FabMenu() {
             isFabMenuOpen ? "w-48 h-12 px-4" : "w-10 h-10"
           }`}
           onClick={() => setIsFabMenuOpen(!isFabMenuOpen)}
+          onMouseLeave={handleMouseLeave}
           aria-expanded={isFabMenuOpen}
           role="button"
           tabIndex={0}

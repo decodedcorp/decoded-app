@@ -7,11 +7,13 @@ import { ItemActionsWrapper } from "../client/item-actions-wrapper";
 interface MobileItemActionsProps {
   imageId: string;
   initialLikeCount: number;
+  layoutType: 'masonry' | 'list';
 }
 
 export function MobileItemActions({
   imageId,
   initialLikeCount,
+  layoutType,
 }: MobileItemActionsProps) {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#1A1A1A] border-t border-white/10">
@@ -19,6 +21,7 @@ export function MobileItemActions({
         <ItemActionsWrapper
           initialLikeCount={initialLikeCount}
           imageId={imageId}
+          layoutType={layoutType}
           render={({ likeCount, isLiked, isLoading, onLike }) => (
             <>
               <button

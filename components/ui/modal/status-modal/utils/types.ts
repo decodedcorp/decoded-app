@@ -12,7 +12,8 @@ export type StatusMessageKey =
   | 'empty_links'
   | 'submitting'
   | 'link_added'
-  | 'link_error';
+  | 'link_error'
+  | 'style.marker.incomplete';
 
 export interface StatusConfig {
   type: StatusType;

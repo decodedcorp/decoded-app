@@ -1,44 +1,29 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
-import React from 'react';
-import { DetailsList } from './item-list-section/server/details-list';
+import React, { useRef, useEffect, useState, cloneElement, Children, isValidElement } from 'react';
 import { useItemDetail } from '../context/item-detail-context';
 import gsap from 'gsap';
 
-interface DetailsListProps {
-  imageData: any;
-  selectedItemId?: string;
-  mainContainerRef?: React.RefObject<HTMLDivElement>;
-  bgContainerRef?: React.RefObject<HTMLDivElement>;
-  gridLayoutRef?: React.RefObject<HTMLDivElement>;
-  isExpanded: boolean;
-}
-
-interface DetailLayoutProps {
-  children: React.ReactElement<{
-    mainContainerRef?: React.RefObject<HTMLDivElement>;
-    bgContainerRef?: React.RefObject<HTMLDivElement>;
-    gridLayoutRef?: React.RefObject<HTMLDivElement>;
-    layoutType: 'masonry' | 'list';
-  }>[];
+interface DetailViewLayoutProps {
+  children: React.ReactNode;
   imageData: any;
   selectedItemId?: string;
   layoutType: 'masonry' | 'list';
 }
 
-export default function DetailLayout({ children, imageData, selectedItemId, layoutType }: DetailLayoutProps) {
+export function DetailViewLayout({ children, imageData, selectedItemId, layoutType }: DetailViewLayoutProps) {
   const mainContainerRef = useRef<HTMLDivElement>(null);
   const bgContainerRef = useRef<HTMLDivElement>(null);
   const gridLayoutRef = useRef<HTMLDivElement>(null);
   const { selectedItemId: contextSelectedItemId } = useItemDetail();
+  // selectedItemId prop과 contextSelectedItemId를 구분해야 합니다.
+  // UI 확장 여부는 contextSelectedItemId를 사용하고 있으므로 그대로 둡니다.
   const isExpanded = !!contextSelectedItemId;
   const [isFirstRender, setIsFirstRender] = useState(true);
   const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
     if (isFirstRender) {
-      // 첫 렌더링 시에는 애니메이션 없이 초기 스타일만 적용
       if (mainContainerRef.current && bgContainerRef.current && gridLayoutRef.current) {
         gsap.set(mainContainerRef.current, {
           maxWidth: '960px',
@@ -62,27 +47,25 @@ export default function DetailLayout({ children, imageData, selectedItemId, layo
       return;
     }
 
+    // GSAP 애니메이션 로직 (mainContainerRef, bgContainerRef, gridLayoutRef 사용)
+    // 확장 로직
     if (contextSelectedItemId && mainContainerRef.current && bgContainerRef.current && gridLayoutRef.current) {
-      // 레이아웃 확장
       setIsAnimating(true);
       window.dispatchEvent(new CustomEvent('layoutAnimationStart'));
       
       const tl = gsap.timeline({
         onComplete: () => {
           setIsAnimating(false);
-          // 애니메이션 완료 후 그리드 업데이트를 위한 이벤트 발생
           window.dispatchEvent(new CustomEvent('layoutAnimationComplete'));
         }
       });
       
-      // 그리드 레이아웃 변경 (먼저 시작)
       tl.to(gridLayoutRef.current, {
         gridTemplateColumns: 'minmax(350px, 500px) minmax(350px, 1fr)',
         duration: 0.4,
         ease: 'power2.inOut'
       });
 
-      // 메인 컨테이너 확장
       tl.to(mainContainerRef.current, {
         maxWidth: '100%',
         width: '100%',
@@ -93,7 +76,6 @@ export default function DetailLayout({ children, imageData, selectedItemId, layo
         ease: 'power2.inOut'
       }, '-=0.2');
 
-      // 배경 컨테이너 전환
       tl.to(bgContainerRef.current, {
         backgroundColor: 'transparent',
         borderRadius: 0,
@@ -102,27 +84,24 @@ export default function DetailLayout({ children, imageData, selectedItemId, layo
         ease: 'power2.inOut'
       }, '-=0.2');
 
+    // 축소 로직
     } else if (mainContainerRef.current && bgContainerRef.current && gridLayoutRef.current) {
-      // 레이아웃 축소
       setIsAnimating(true);
       window.dispatchEvent(new CustomEvent('layoutAnimationStart'));
       
       const tl = gsap.timeline({
         onComplete: () => {
           setIsAnimating(false);
-          // 애니메이션 완료 후 그리드 업데이트를 위한 이벤트 발생
           window.dispatchEvent(new CustomEvent('layoutAnimationComplete'));
         }
       });
       
-      // 그리드 레이아웃 변경 (먼저 시작)
       tl.to(gridLayoutRef.current, {
         gridTemplateColumns: 'minmax(350px, 500px) minmax(350px, 1fr)',
         duration: 0.4,
         ease: 'power2.inOut'
       });
 
-      // 배경 컨테이너 복원
       tl.to(bgContainerRef.current, {
         backgroundColor: '#1A1A1A',
         borderRadius: '1rem',
@@ -131,7 +110,6 @@ export default function DetailLayout({ children, imageData, selectedItemId, layo
         ease: 'power2.inOut'
       }, '-=0.2');
 
-      // 메인 컨테이너 복원
       tl.to(mainContainerRef.current, {
         maxWidth: '960px',
         width: '100%',
@@ -152,13 +130,16 @@ export default function DetailLayout({ children, imageData, selectedItemId, layo
             ref={gridLayoutRef} 
             className="grid grid-cols-1 lg:grid-cols-[minmax(350px,500px)_minmax(350px,1fr)] items-start justify-center gap-6"
           >
-            {React.Children.map(children, child => {
-              if (React.isValidElement(child)) {
-                return React.cloneElement(child, {
+            {Children.map(children, child => {
+              if (isValidElement(child)) {
+                // 자식 컴포넌트에 필요한 ref와 props를 전달합니다.
+                // 원래 코드에서는 mainContainerRef, bgContainerRef, gridLayoutRef를 전달했습니다.
+                // 이 ref들은 DetailViewLayout 내부에서 생성 및 관리됩니다.
+                return cloneElement(child as React.ReactElement<any>, {
                   mainContainerRef,
                   bgContainerRef,
                   gridLayoutRef,
-                  layoutType
+                  layoutType // layoutType prop도 자식에게 전달
                 });
               }
               return child;

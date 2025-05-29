@@ -25,6 +25,10 @@ export function MobileActions({
   // 직접 Cloudflare R2 이미지 URL 생성 (OG 이미지용)
   const directImageUrl = `https://pub-65bb4012fb354951a2c6139a4b49b717.r2.dev/images/${imageId}.webp`;
 
+  const validLayoutType = layoutType === 'masonry' || layoutType === 'list'
+    ? layoutType
+    : 'masonry';
+
   return (
     <>
       <div
@@ -38,7 +42,7 @@ export function MobileActions({
           <ItemActionsWrapper
             initialLikeCount={initialLikeCount}
             imageId={imageId}
-            layoutType={layoutType}
+            layoutType={validLayoutType}
             render={({ likeCount, isLiked, isLoading, onLike }) => (
               <>
                 <button

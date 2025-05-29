@@ -10,7 +10,7 @@ import { generateItemSchema } from "@/lib/structured-data/geneartors/item";
 import { MobileDetailsList } from "./components/item-list-section/mobile/mobile-details-list";
 import { MobileActions } from "./components/item-list-section/mobile/mobile-actions";
 import { ItemDetailProvider } from './context/item-detail-context';
-import { DetailLayout } from "./components/layout";
+import { DetailSectionLayout } from './components/detail-section-layout';
 import { ItemActionsWrapper } from "./components/item-list-section/client/item-actions-wrapper";
 import { ImageActions } from './components/image-actions';
 import { Metadata } from 'next';
@@ -111,7 +111,7 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
             }}
           />
         )}
-        <DetailLayout 
+        <DetailSectionLayout 
           imageData={processedImageData} 
           selectedItemId={selectedItemId}
           layoutType="list"
@@ -134,7 +134,7 @@ export default async function DetailPage({ params, searchParams }: PageProps) {
             imageData={processedImageData}
             selectedItemId={selectedItemId}
           />
-        </DetailLayout>
+        </DetailSectionLayout>
         <div className="w-full">
           <Suspense fallback={<div className="h-20"></div>}>
             <RelatedStylingSection

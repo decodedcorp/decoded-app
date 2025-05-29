@@ -2,13 +2,15 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
-import ImageGridHeader from './_components/ImageGridHeader';
+import { ImageGridHeader } from './_components/ImageGridHeader';
 import ImageItem from './_components/ImageItem';
 import FabMenu from './_components/FabMenu';
 import type { ImageItemData, ImageDetail } from './_types/image-grid';
 import { useImageApi } from './_hooks/useImageApi';
 import { useImageGrid } from './_hooks/useImageGrid';
 import { useGridInteraction } from './_hooks/useGridInteraction';
+import { useIsLike } from "@/app/details/utils/hooks/isLike";
+import { useAuth } from "@/lib/hooks/features/auth/useAuth";
 
 const MainPage = () => {
   const {
@@ -44,6 +46,8 @@ const MainPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImageItemForModal, setSelectedImageItemForModal] =
     useState<ImageItemData | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [likedStatusesMap, setLikedStatusesMap] = useState<Record<string, boolean>>({});
 
   const {
     handleMouseDown,
@@ -56,6 +60,45 @@ const MainPage = () => {
     setContentOffset,
     fetchImageDetail,
   });
+
+  const { checkInitialLikeStatus, toggleLike: originalToggleLike } = useIsLike();
+  const { isLogin, isInitialized } = useAuth();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && isInitialized) {
+      const storedUserId = window.sessionStorage.getItem("USER_DOC_ID");
+      setUserId(storedUserId);
+    }
+  }, [isInitialized, isLogin]);
+
+  useEffect(() => {
+    if (userId && hoveredImageDetailData?.doc_id && likedStatusesMap[hoveredImageDetailData.doc_id] === undefined) {
+      const fetchLikeStatusForHovered = async () => {
+        const isLiked = await checkInitialLikeStatus('image', hoveredImageDetailData.doc_id, userId);
+        setLikedStatusesMap(prevMap => ({
+          ...prevMap,
+          [hoveredImageDetailData.doc_id]: isLiked,
+        }));
+      };
+      fetchLikeStatusForHovered();
+    }
+  }, [userId, hoveredImageDetailData, checkInitialLikeStatus]);
+
+  const handleToggleLike = async (imageDocId: string) => {
+    if (!userId) {
+      console.warn("User not logged in, cannot toggle like.");
+      return;
+    }
+    const currentStatus = likedStatusesMap[imageDocId] || false;
+    const newStatus = !currentStatus;
+    const success = await originalToggleLike('image', imageDocId, userId, currentStatus);
+    if (success) {
+      setLikedStatusesMap(prevMap => ({
+        ...prevMap,
+        [imageDocId]: newStatus,
+      }));
+    }
+  };
 
   const handleImageClickForModal = (
     imageItem: ImageItemData,
@@ -118,6 +161,8 @@ const MainPage = () => {
                   onImageLoaded={onImageLoaded}
                   onMouseEnterItem={handleMouseEnterItem}
                   onMouseLeaveItem={handleMouseLeaveItem}
+                  onToggleLike={handleToggleLike}
+                  isLiked={likedStatusesMap[image.image_doc_id] || false}
                 />
               );
             })}

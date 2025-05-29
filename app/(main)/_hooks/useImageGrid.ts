@@ -13,7 +13,7 @@ import {
 
 interface UseImageGridProps {
   apiImageUrlListRef: React.RefObject<ApiImage[]>;
-  currentApiImageIndexRef: React.RefObject<number>;
+  currentApiImageIndexRef: React.MutableRefObject<number>;
   allApiImagesFetchedRef: React.RefObject<boolean>;
   isFetchingApiImagesRef: React.RefObject<boolean>;
   apiImageCount: number;
