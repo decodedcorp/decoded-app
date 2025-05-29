@@ -13,6 +13,7 @@ import { ItemDetailProvider } from './context/item-detail-context';
 import { DetailLayout } from "./components/layout";
 import { ItemActionsWrapper } from "./components/item-list-section/client/item-actions-wrapper";
 import { ImageActions } from './components/image-actions';
+import { Metadata } from 'next';
 
 // 타입 정의
 interface PageProps {

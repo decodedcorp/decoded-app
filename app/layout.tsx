@@ -5,15 +5,74 @@ import Footer from "@/components/Footer";
 import { Providers } from "./providers";
 import { Locale } from "@/lib/lang/locales";
 import { Metadata } from "next";
-import { koMetadata, enMetadata } from "./metadata";
+import { koMetadata, enMetadata, generateDetailMetadata } from "./metadata";
 import { GoogleRedirectHandler } from "@/components/auth/GoogleRedirectHandler";
 import Script from "next/script";
+import { getImageDetails } from "@/app/details/utils/hooks/fetchImageDetails";
 
 export async function generateMetadata(): Promise<Metadata> {
   const headersList = await headers();
   const locale = headersList.get("x-locale") || "ko";
+  const pathname = headersList.get("x-pathname") || "";
+  const searchParams = headersList.get("x-search-params") || "";
 
-  return locale === "ko" ? koMetadata : enMetadata;
+  // 기본 메타데이터
+  const baseMetadata = locale === "ko" ? koMetadata : enMetadata;
+
+  // 상세 페이지인 경우
+  if (pathname.startsWith('/details-update/')) {
+    const imageId = pathname.split('/').pop();
+    if (imageId) {
+      const imageData = await getImageDetails(imageId);
+      if (imageData) {
+        return generateDetailMetadata(imageData, locale as 'ko' | 'en');
+      }
+    }
+  }
+
+  // 검색 페이지인 경우
+  if (pathname.startsWith('/search')) {
+    const params = new URLSearchParams(searchParams);
+    const query = params.get('q') || '';
+    
+    return {
+      ...baseMetadata,
+      title: `${query} 검색 결과 | DECODED`,
+      description: `DECODED에서 "${query}"에 대한 검색 결과를 확인하세요`,
+      openGraph: {
+        ...baseMetadata.openGraph,
+        title: `${query} 검색 결과 | DECODED`,
+        description: `DECODED에서 "${query}"에 대한 검색 결과를 확인하세요`,
+      },
+      twitter: {
+        ...baseMetadata.twitter,
+        title: `${query} 검색 결과 | DECODED`,
+        description: `DECODED에서 "${query}"에 대한 검색 결과를 확인하세요`,
+      },
+    };
+  }
+
+  // 목록 페이지인 경우
+  if (pathname.startsWith('/list')) {
+    return {
+      ...baseMetadata,
+      title: '아이템 목록 | DECODED',
+      description: 'DECODED에서 공유된 아이템 목록을 확인하세요',
+      openGraph: {
+        ...baseMetadata.openGraph,
+        title: '아이템 목록 | DECODED',
+        description: 'DECODED에서 공유된 아이템 목록을 확인하세요',
+      },
+      twitter: {
+        ...baseMetadata.twitter,
+        title: '아이템 목록 | DECODED',
+        description: 'DECODED에서 공유된 아이템 목록을 확인하세요',
+      },
+    };
+  }
+
+  // 기본 메타데이터 반환
+  return baseMetadata;
 }
 
 export default async function RootLayout({
@@ -47,9 +106,9 @@ export default async function RootLayout({
       <body className="flex flex-col min-h-screen">
         <GoogleRedirectHandler />
         <Providers locale={locale as Locale}>
-          {!isCallbackPage && <HeaderLayout />}
+          {/* {!isCallbackPage && <HeaderLayout />} */}
           <main className="flex-1">{children}</main>
-          {!isCallbackPage && <Footer />}
+          {/* {!isCallbackPage && <Footer />} */}
         </Providers>
 
         <Script
