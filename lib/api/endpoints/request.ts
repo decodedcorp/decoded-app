@@ -26,15 +26,14 @@ export const requestAPI = {
     }
     
     try {
-      console.log('RequestAPI: Sending request to URL:', 
-                 `/user/${userDocId}/image/request`);
+      console.log('RequestAPI: Sending request to URL:', `/user/${userDocId}/image/request`);
       console.log('RequestAPI: Using token:', accessToken ? 'Yes (token exists)' : 'No (missing)');
       
       // 데이터 크기 계산 및 로깅 (디버깅용)
       const dataSize = JSON.stringify(requestData).length;
       console.log(`RequestAPI: Data size: ${Math.floor(dataSize / 1024)}KB`);
       
-      // 토큰을 포함하여 요청
+      // 토큰을 포함하여 요청 - URL 변경
       const response = await networkManager.request<APIResponse<void>>(
         `/user/${userDocId}/image/request`,
         'POST',
@@ -51,11 +50,11 @@ export const requestAPI = {
     } catch (error: any) {
       console.error('RequestAPI: Error in createImageRequest:', error);
       
-      // 네트워크 에러인 경우 대체 방법으로 fetch API 사용
+      // 네트워크 에러인 경우 대체 방법으로 fetch API 사용 - URL 변경
       if (error.message === 'Network Error') {
         console.log('RequestAPI: Trying alternative fetch API method');
         try {
-          const fetchResponse = await fetch(`https://dev.decoded.style/user/${userDocId}/image/request`, {
+          const fetchResponse = await fetch(`https://dev.decoded.style/image/request`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -65,7 +64,8 @@ export const requestAPI = {
           });
           
           if (!fetchResponse.ok) {
-            throw new Error(`Fetch API failed with status: ${fetchResponse.status}`);
+            const errorText = await fetchResponse.text();
+            throw new Error(`Fetch API failed with status: ${fetchResponse.status}, message: ${errorText}`);
           }
           
           const responseData = await fetchResponse.json();

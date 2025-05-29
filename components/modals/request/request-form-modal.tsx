@@ -6,8 +6,9 @@ import { ImageContainer, ImageContainerHandle } from "./common/image-container";
 import { cn } from "@/lib/utils/style";
 import {
   ContextStepSidebar,
-  ContextAnswer,
+  // ContextAnswer 가져오지 않음
 } from "./steps/context-step/context-step-sidebar";
+import type { ContextAnswer as BaseContextAnswer } from "./steps/context-step/context-step-sidebar";
 import { useRequestData } from "@/lib/hooks/features/images/useRequestData";
 import { useRouter } from "next/navigation";
 import { useLocaleContext } from "@/lib/contexts/locale-context";
@@ -18,10 +19,18 @@ import {
 } from "@/components/ui/modal/status-modal";
 import { useProtectedAction } from "@/lib/hooks/auth/use-protected-action";
 import { useStatusMessage } from "@/components/ui/modal/status-modal/utils/use-status-message";
-import { ArrowLeft, X } from "lucide-react";
+import { ArrowLeft, X, Trash2, Link } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ConfirmModal } from "./common/confirm-modal";
-import { RequestImage as APIRequestImage } from "@/lib/api/_types/request";
+import { RequestImage } from "@/lib/api/_types/request";
+import { motion } from "framer-motion";
+import { 
+  StyleContextSidebar, 
+  ContextAnswer as StyleContextAnswer 
+} from "./style-context-sidebar";
+import { ModalHeader } from "./components/header/modal-header";
+import { ProgressBar } from "./components/progress/progress-bar";
+import { ImageContainerWrapper } from "./components/image-section/image-container-wrapper";
 // CSS는 globals.css에서 import
 
 // 간단한 모바일 환경 감지 훅
@@ -49,26 +58,43 @@ function useIsMobile() {
 
 interface RequestFormModalProps {
   isOpen: boolean;
-  isRequest: boolean;
+  modalType: "request" | "style";
   onClose: () => void;
+}
+
+// 확장된 ContextAnswer 인터페이스 정의
+interface ContextAnswer extends BaseContextAnswer {
+  inspirationLinks?: Array<{
+    id: string;
+    category: string;
+    url: string;
+  }>;
+}
+
+// StylePoint 타입 수정
+interface StylePoint extends Point {
+  brand?: string;
+  price?: string;
+  isSecret?: boolean;
+  context?: string;
 }
 
 export function RequestFormModal({
   isOpen,
   onClose,
-  isRequest,
+  modalType = "request",
 }: RequestFormModalProps) {
   const { t } = useLocaleContext();
+  const isMobile = useIsMobile(); // 모바일 환경 감지
   const router = useRouter();
   const { createRequest } = useRequestData("");
   const { withAuth } = useProtectedAction();
-  const isMobile = useIsMobile(); // 모바일 환경 감지
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 3;
   const [isStepComplete, setIsStepComplete] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [points, setPoints] = useState<Point[]>([]);
+  const [points, setPoints] = useState<StylePoint[]>([]);
   const [selectedPoint, setSelectedPoint] = useState<number | null>(null);
   const [contextAnswers, setContextAnswers] = useState<ContextAnswer | null>(
     null
@@ -91,6 +117,15 @@ export function RequestFormModal({
   const [showMarkerGuide, setShowMarkerGuide] = useState(true);
   const { showLoadingStatus } = useStatusMessage();
   const [isApplying, setIsApplying] = useState(false);
+  const [newUrl, setNewUrl] = useState("");
+  const [inspirationLinks, setInspirationLinks] = useState<{ id: string; url: string }[]>([]);
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+  const bottomSheetRef = useRef<HTMLDivElement>(null);
+
+  // 드래그 관련 상태 추가
+  const [dragStartY, setDragStartY] = useState(0);
+  const [currentDragY, setCurrentDragY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Reset state when modal is opened
   useEffect(() => {
@@ -112,22 +147,102 @@ export function RequestFormModal({
         setIsStepComplete(!!selectedImage);
         break;
       case 2:
-        setIsStepComplete(points.length > 0);
+        if (modalType === "style") {
+          // style 모드에서는 모든 마커가 필수 정보(브랜드, 가격)를 가지고 있어야 함
+          const allPointsHaveInfo = points.length > 0 && 
+            points.every(point => point.brand && point.price);
+          setIsStepComplete(allPointsHaveInfo);
+        } else {
+          // request 모드에서는 마커만 있으면 됨
+          setIsStepComplete(points.length > 0);
+        }
         break;
       case 3:
-        setIsStepComplete(!!contextAnswers?.location);
+        if (modalType === "style") {
+          // 스타일 모드에서는 링크가 없어도 완료로 처리
+          setIsStepComplete(true);
+        } else {
+          setIsStepComplete(!!contextAnswers?.location);
+        }
         break;
       default:
         setIsStepComplete(false);
     }
-  }, [currentStep, selectedImage, points, contextAnswers?.location]);
+  }, [currentStep, selectedImage, points, contextAnswers?.location, modalType]);
 
-  // 개선된 이미지 압축 함수
+  useEffect(() => {
+    console.log("Selected point:", selectedPoint);
+    console.log("Current step:", currentStep);
+    console.log("Modal type:", modalType);
+    console.log("Points:", points);
+    console.log("Should show form:", currentStep === 2 && modalType === "style" && selectedPoint !== null);
+  }, [selectedPoint, currentStep, modalType, points]);
+
+  // 초기 상태 설정을 위한 useEffect 추가
+  useEffect(() => {
+    if (isMobile) {
+      setIsBottomSheetOpen(false);
+    }
+  }, [isMobile]);
+
+  // points가 변경될 때 마지막 아이템을 자동으로 선택하는 useEffect 수정
+  useEffect(() => {
+    if (points.length > 0) {
+      // 마지막 아이템의 인덱스
+      const lastIndex = points.length - 1;
+      setSelectedPoint(lastIndex);
+      
+      // 새로운 마커가 추가된 경우 (points.length가 증가한 경우)
+      if (isMobile) {
+        setIsBottomSheetOpen(true);
+      }
+    }
+  }, [points.length, isMobile]);
+
+  // selectedPoint 상태 변경 감지를 위한 useEffect 수정
+  useEffect(() => {
+    if (selectedPoint !== null) {
+      if (isMobile) {
+        // 기존 마커 클릭 시 바텀시트 열기
+        setIsBottomSheetOpen(true);
+        
+        // 스크롤 처리 - requestAnimationFrame 사용하여 더 부드러운 스크롤
+        requestAnimationFrame(() => {
+          const markerElement = document.getElementById(`marker-${selectedPoint}`);
+          if (markerElement) {
+            markerElement.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center',
+              inline: 'nearest'
+            });
+          }
+        });
+      } else {
+        // 데스크탑에서만 스크롤 동작
+        requestAnimationFrame(() => {
+          const markerElement = document.getElementById(`marker-${selectedPoint}`);
+          if (markerElement) {
+            markerElement.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center',
+              inline: 'nearest'
+            });
+            markerElement.classList.add('bg-[#232323]/80');
+            setTimeout(() => {
+              markerElement.classList.remove('bg-[#232323]/80');
+            }, 1000);
+          }
+        });
+      }
+    }
+  }, [selectedPoint, isMobile]);
+
+  // 이미지 최적화 함수 - 높은 해상도와 품질을 유지하도록 개선
   const compressImage = async (
     imageFile: File,
-    maxWidth = 1500,
-    maxHeight = 1500,
-    quality = 0.95
+    maxWidth = 2500, // 최대 너비 증가
+    maxHeight = 3125, // 4:5 비율에 맞춘 최대 높이 (2500 * 5/4 = 3125)
+    quality = 1.0 // 최대 품질
   ): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -138,25 +253,45 @@ export function RequestFormModal({
           const originalWidth = img.width;
           const originalHeight = img.height;
 
-          // 새로운 크기 계산 - 너무 크지 않게 적절히 제한
+          // 4:5 비율 계산을 위한 값
+          const targetRatio = 4 / 5;
+
+          // 새로운 크기 계산 - 4:5 비율 유지하면서 해상도 최대화
           let newWidth = originalWidth;
           let newHeight = originalHeight;
+          
+          // 원본 비율
+          const originalRatio = originalWidth / originalHeight;
 
-          if (originalWidth > maxWidth || originalHeight > maxHeight) {
-            if (originalWidth / originalHeight > maxWidth / maxHeight) {
-              // 가로가 더 긴 경우
+          // 비율 맞추기
+          if (originalRatio > targetRatio) {
+            // 너무 넓은 이미지는 높이에 맞추고 잘라내기
+            newWidth = originalHeight * targetRatio;
+            newHeight = originalHeight;
+          } else if (originalRatio < targetRatio) {
+            // 너무 높은 이미지는 넓이에 맞추고 잘라내기
+            newWidth = originalWidth;
+            newHeight = originalWidth / targetRatio;
+          }
+
+          // 최대 크기 제한 (해상도가 너무 높지 않도록)
+          if (newWidth > maxWidth || newHeight > maxHeight) {
+            if (newWidth > maxWidth) {
+              const scale = maxWidth / newWidth;
               newWidth = maxWidth;
-              newHeight = Math.floor(
-                originalHeight * (maxWidth / originalWidth)
-              );
-            } else {
-              // 세로가 더 긴 경우
+              newHeight = newHeight * scale;
+            }
+            
+            if (newHeight > maxHeight) {
+              const scale = maxHeight / newHeight;
               newHeight = maxHeight;
-              newWidth = Math.floor(
-                originalWidth * (maxHeight / originalHeight)
-              );
+              newWidth = newWidth * scale;
             }
           }
+
+          // 정수로 반올림
+          newWidth = Math.round(newWidth);
+          newHeight = Math.round(newHeight);
 
           // Canvas에 리사이징된 이미지 그리기
           const canvas = document.createElement("canvas");
@@ -164,11 +299,32 @@ export function RequestFormModal({
           canvas.height = newHeight;
 
           const ctx = canvas.getContext("2d");
-          ctx?.drawImage(img, 0, 0, newWidth, newHeight);
+          
+          // 이미지가 4:5 비율에 맞게 중앙에 배치되도록 계산
+          let sx = 0;
+          let sy = 0;
+          let sWidth = originalWidth;
+          let sHeight = originalHeight;
+
+          if (originalRatio > targetRatio) {
+            // 원본이 더 넓은 경우 좌우 잘라내기
+            sx = (originalWidth - (originalHeight * targetRatio)) / 2;
+            sWidth = originalHeight * targetRatio;
+          } else if (originalRatio < targetRatio) {
+            // 원본이 더 높은 경우 상하 잘라내기
+            sy = (originalHeight - (originalWidth / targetRatio)) / 2;
+            sHeight = originalWidth / targetRatio;
+          }
+
+          // 이미지를 캔버스에 그릴 때 smoothing 품질 설정
+          if (ctx) {
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, newWidth, newHeight);
+          }
 
           try {
-            // 최적의 품질로 JPEG 형식으로 변환
-            // 1.0 대신 0.95 사용 - 완벽한 품질(1.0)이 때로는 오류 발생 가능
+            // 최대 품질로 JPEG 형식으로 변환
             const compressedBase64 = canvas.toDataURL("image/jpeg", quality);
 
             // 포맷 검증 - 올바른 base64 문자열인지 확인
@@ -183,9 +339,12 @@ export function RequestFormModal({
             const base64String = compressedBase64.split(",")[1];
 
             // 결과 로깅
-            console.log("Image compression completed:", {
+            console.log("Image processing completed:", {
               originalSize: originalWidth + "x" + originalHeight,
+              originalRatio: originalRatio.toFixed(2),
               newSize: newWidth + "x" + newHeight,
+              newRatio: (newWidth / newHeight).toFixed(2),
+              targetRatio: targetRatio.toFixed(2),
               quality: quality,
               dataLength: base64String.length,
             });
@@ -225,58 +384,114 @@ export function RequestFormModal({
     }
 
     try {
-      // 이미지 압축 - 품질 0.95로 약간 낮추어 안정성 확보
-      const base64Image = await compressImage(imageFile, 1200, 1200, 0.95);
-
-      // position 객체 명시적 생성 및 검증
-      const requestItems = points.map((point) => {
-        // 포지션 값에서 % 기호 제거 - API는 숫자 문자열 형태를 예상함
-        const leftPos =
-          typeof point.x === "number"
-            ? String(point.x)
-            : point.x
-            ? String(point.x).replace("%", "")
-            : "0";
-
-        const topPos =
-          typeof point.y === "number"
-            ? String(point.y)
-            : point.y
-            ? String(point.y).replace("%", "")
-            : "0";
-
-        return {
-          item_class: null,
-          item_sub_class: null,
-          category: null,
-          sub_category: null,
-          product_type: null,
-          context: point.context || null,
-          position: {
-            left: leftPos,
-            top: topPos,
-          },
-        };
+      // 로딩 상태 표시
+      setModalConfig({
+        type: "loading",
+        isOpen: true,
+        onClose: () => {}
       });
+      
+      // 공통 이미지 압축 로직
+      const base64Image = await compressImage(imageFile, 2500, 3125, 1.0);
+      
+      if (modalType === "style") {
+        // 스타일 데이터 구성
+        const styleData = {
+          image_file: base64Image,
+          name: contextAnswers.location,
+          inspiration_links: inspirationLinks.map(link => ({
+            id: link.id,
+            category: "general",
+            url: link.url
+          })),
+          user_id: userId,
+          style_points: points.map(point => ({
+            position: {
+              left: typeof point.x === "number" ? String(point.x) : point.x ? String(point.x).replace("%", "") : "0",
+              top: typeof point.y === "number" ? String(point.y) : point.y ? String(point.y).replace("%", "") : "0",
+            },
+            brand: point.brand || null,
+            price: point.price || null,
+            is_secret: point.isSecret || false, // 찔러보기 여부 추가
+          })),
+        };
+        
+        // 콘솔에 정보 출력
+        console.log("====== STYLE 데이터 전송 ======");
+        console.log("스타일 이름:", styleData.name);
+        console.log("아이템 개수:", styleData.style_points.length);
+        console.log("아이템 정보:", styleData.style_points);
+        console.log("영감 링크 개수:", styleData.inspiration_links.length);
+        console.log("영감 링크:", styleData.inspiration_links);
+        console.log("============================");
+        
+        // API 호출을 대신하는 지연 (실제 환경에서는 API 호출로 대체)
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // 성공 메시지 표시
+        setModalConfig({
+          type: "success",
+          isOpen: true,
+          onClose: () => {
+            setModalConfig((prev) => ({ ...prev, isOpen: false }));
+            onClose();
+          },
+        });
+      } else {
+        // request 모드: 기존 API 로직 유지
+        const requestItems = points.map((point) => {
+          // 포지션 값에서 % 기호 제거 - API는 숫자 문자열 형태를 예상함
+          const leftPos = typeof point.x === "number" ? String(point.x) : point.x ? String(point.x).replace("%", "") : "0";
+          const topPos = typeof point.y === "number" ? String(point.y) : point.y ? String(point.y).replace("%", "") : "0";
 
-      // 요청 데이터 구성 - 속성명 수정 (requestedItems)
-      const requestData = {
-        image_file: base64Image,
-        requestedItems: requestItems, // 속성명 수정됨
-        request_by: userId,
-        context: contextAnswers.location,
-        source: contextAnswers?.source || null,
-        metadata: {},
-      };
-
-      // 포지션 값 디버깅
-      console.log(
-        "Final position values:",
-        requestItems.map((item) => item.position)
-      );
-
-      await createRequest(requestData as unknown as APIRequestImage, userId);
-      onClose(); // Close the modal on success
+          return {
+            item_class: null,
+            item_sub_class: null,
+            category: null,
+            sub_category: null,
+            product_type: null,
+            context: point.context || null,
+            position: {
+              left: leftPos,
+              top: topPos,
+            },
+          };
+        });
+        
+        // 요청 데이터 구성
+        const requestData = {
+          image_file: base64Image,
+          requestedItems: requestItems,
+          request_by: userId,
+          context: contextAnswers.location,
+          source: contextAnswers?.source || null,
+          metadata: {},
+        };
+        
+        // 포지션 값 디버깅
+        console.log(
+          "Final position values:",
+          requestItems.map((item) => item.position)
+        );
+        
+        await createRequest(requestData as unknown as RequestImage, userId);
+        
+        // 성공 메시지 표시 및 모달 닫기
+        setModalConfig({
+          type: "success",
+          isOpen: true,
+          onClose: () => {
+            setModalConfig((prev) => ({ ...prev, isOpen: false }));
+            onClose();
+          },
+        });
+      }
+      
+      // 일정 시간 후 모달 닫기
+      setTimeout(() => {
+        setModalConfig((prev) => ({ ...prev, isOpen: false }));
+        onClose();
+      }, 2000);
     } catch (error) {
       console.error("=== Submit Error ===");
       console.error("Error:", error);
@@ -300,7 +515,7 @@ export function RequestFormModal({
   const onPrev = () => {
     if (currentStep > 1) {
       setCurrentStep((prev) => prev - 1);
-      if (currentStep === 3) {
+      if (currentStep === 2) {
         setContextAnswers(null);
       }
     }
@@ -356,6 +571,14 @@ export function RequestFormModal({
     const index = points.findIndex((p) => p.x === point.x && p.y === point.y);
     if (index !== -1) {
       newPoints[index] = { ...point, context: context || "" };
+      setPoints(newPoints);
+    }
+  };
+
+  const handleUpdateStylePoint = (index: number, updatedPoint: StylePoint) => {
+    const newPoints = [...points];
+    if (index !== -1 && index < newPoints.length) {
+      newPoints[index] = { ...updatedPoint };
       setPoints(newPoints);
     }
   };
@@ -423,16 +646,41 @@ export function RequestFormModal({
     setShowCropper(false);
   }, []);
 
+  const handleDeleteMarker = () => {
+    if (selectedPoint !== null && selectedPoint >= 0 && selectedPoint < points.length) {
+      const newPoints = [...points];
+      newPoints.splice(selectedPoint, 1);
+      setPoints(newPoints);
+      setSelectedPoint(null);
+    }
+  };
+
+  const handleAddInspirationLink = () => {
+    if (newUrl.trim()) {
+      setInspirationLinks([...inspirationLinks, { id: Date.now().toString(), url: newUrl }]);
+      setNewUrl("");
+    }
+  };
+
+  const handleRemoveInspirationLink = (id: string) => {
+    const newInspirationLinks = inspirationLinks.filter((link) => link.id !== id);
+    setInspirationLinks(newInspirationLinks);
+  };
+
   const imageContainerProps = {
-    isRequest,
+    modalType,
     step: currentStep,
     selectedImage: selectedImage,
     imageFile: imageFile,
     points: points,
     onImageSelect: handleImageSelect,
     onPointsChange: setPoints,
-    onPointContextChange: handleUpdateContext,
-    onPointSelect: setSelectedPoint,
+    onPointContextChange: modalType === "style" 
+      ? undefined  // 스타일 모달에서는 context 변경 핸들러 제거
+      : handleUpdateContext,
+    onPointSelect: (pointIndex: number | null) => {
+      setSelectedPoint(pointIndex);
+    },
     contextAnswers,
     selectedPoint,
     fullscreenMode: false,
@@ -440,6 +688,12 @@ export function RequestFormModal({
     onCropperChange: handleSetShowCropper,
     themeColor: "#EAFD66",
     isCroppingRef,
+    onPointRemove: (index: number) => {
+      const newPoints = [...points];
+      newPoints.splice(index, 1);
+      setPoints(newPoints);
+      setSelectedPoint(null);
+    },
   };
 
   const markerStepProps = {
@@ -450,53 +704,138 @@ export function RequestFormModal({
     onUpdateContext: handleUpdateContext,
   };
 
-  // 현재 단계에 따른 헤더 타이틀 결정
+  // 헤더 관련 함수들
   const getHeaderTitle = () => {
-    switch (currentStep) {
-      case 1:
-        return t.request.steps.upload.title || "새 게시물";
-      case 2:
-        return t.request.steps.marker.title || "마커 추가";
-      case 3:
-        return t.request.steps.context.title || "상세 정보";
-      default:
-        return "새 게시물";
+    if (modalType === "request") {
+      switch (currentStep) {
+        case 1: return "새 게시물";
+        case 2: return "아이템 추가";
+        case 3: return "상세 정보";
+        default: return "새 게시물";
+      }
+    } else {
+      switch (currentStep) {
+        case 1: return "스타일 추가";
+        case 2: return "아이템 정보 입력";
+        case 3: return "스타일 참고 링크";
+        default: return "스타일 추가";
+      }
     }
   };
 
-  // 현재 단계에 따른 다음 버튼 텍스트 결정
   const getNextButtonText = () => {
-    if (currentStep === totalSteps) {
-      return "공유";
-    }
+    if (currentStep === totalSteps) return "공유";
     return "다음";
   };
 
+  // 마우스 이벤트 핸들러 추가
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStartY(e.clientY);
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isDragging) return;
+    
+    const deltaY = e.clientY - dragStartY;
+    if (deltaY > 0) { // 아래로 드래그할 때만
+      // 부드러운 드래그를 위해 deltaY에 감쇠 적용
+      const dampedDeltaY = deltaY * 0.8;
+      setCurrentDragY(dampedDeltaY);
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (!isDragging) return;
+    
+    if (currentDragY > 100) { // 100px 이상 드래그되면 닫기
+      handleBottomSheetClose();
+    } else {
+      setIsBottomSheetOpen(true);
+    }
+    
+    setIsDragging(false);
+    setCurrentDragY(0);
+  };
+
+  // 터치 이벤트 핸들러 수정
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsDragging(true);
+    setDragStartY(e.touches[0].clientY);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    
+    const deltaY = e.touches[0].clientY - dragStartY;
+    if (deltaY > 0) { // 아래로 드래그할 때만
+      // 부드러운 드래그를 위해 deltaY에 감쇠 적용
+      const dampedDeltaY = deltaY * 0.8;
+      setCurrentDragY(dampedDeltaY);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging) return;
+    
+    if (currentDragY > 100) { // 100px 이상 드래그되면 닫기
+      handleBottomSheetClose();
+    } else {
+      setIsBottomSheetOpen(true);
+    }
+    
+    setIsDragging(false);
+    setCurrentDragY(0);
+  };
+
+  // 드래그 핸들 클릭 핸들러 수정
+  const handleHandleClick = (e: React.MouseEvent) => {
+    if (!isDragging) {
+      handleBottomSheetClose();
+    }
+  };
+
+  // 바텀시트가 닫힐 때 마커 포커스 해제
+  const handleBottomSheetClose = () => {
+    setIsBottomSheetOpen(false);
+    setSelectedPoint(null);
+  };
+
+  // 이벤트 리스너 등록
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    }
+    
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging]);
+
   return (
     <>
-      {/* Main Modal Content */}
       <Dialog
         open={isOpen}
-        onOpenChange={(open) => !open && handleModalClose()}
+        onOpenChange={(open) => {
+          if (!open && selectedPoint === null) {
+            handleModalClose();
+          }
+        }}
       >
-        <DialogContent
-          className={cn(
-            "p-0 border-0 overflow-hidden bg-[#1A1A1A]",
-            // 모바일에서는 전체화면으로 설정
-            "w-full h-screen max-w-full max-h-screen rounded-none",
-            // 태블릿 이상에서는 적절한 크기로 제한
-            currentStep === 3
-              ? "sm:w-[min(900px,95vw)] sm:h-[min(600px,90vh)]" // 3단계에서는 더 넓게
-              : "sm:w-[min(450px,80vw)] sm:h-[min(600px,90vh)]",
-            "sm:min-w-[320px] sm:min-h-[500px]",
-            // 데스크탑에서도 너무 커지지 않도록 제한
-            currentStep === 3
-              ? "lg:w-[min(1000px,90vw)] lg:h-[min(700px,80vh)]" // 3단계에서는 더 넓게
-              : "lg:w-[min(500px,60vw)] lg:h-[min(650px,80vh)]",
-            "sm:rounded-md flex flex-col"
-          )}
-        >
-          {/* 접근성을 위한 DialogTitle */}
+        <DialogContent className={cn(
+          "p-0 border-0 overflow-hidden bg-[#1A1A1A]",
+          "w-full h-screen max-w-full max-h-screen rounded-none",
+          currentStep === 2 || currentStep === 3
+            ? "sm:w-[min(1000px,95vw)] sm:h-[min(700px,90vh)]"
+            : "sm:w-[min(450px,80vw)] sm:h-[min(600px,90vh)]",
+          "sm:min-w-[320px] sm:min-h-[500px]",
+          currentStep === 2 || currentStep === 3
+            ? "lg:w-[min(1200px,90vw)] lg:h-[min(800px,80vh)]"
+            : "lg:w-[min(500px,60vw)] lg:h-[min(650px,80vh)]",
+          "sm:rounded-md flex flex-col"
+        )}>
           <DialogTitle className="sr-only">
             {currentStep === 1 && selectedImage && showCropper
               ? "이미지 크롭"
@@ -504,269 +843,532 @@ export function RequestFormModal({
           </DialogTitle>
 
           <div className="flex flex-col h-full w-full">
-            <header
-              className={cn(
-                "flex items-center justify-between h-12 px-4 z-30 border-b border-gray-800",
-                "bg-[#1A1A1A] flex-shrink-0"
-              )}
-            >
-              {currentStep === 1 && selectedImage && showCropper ? (
-                <>
-                  <button
-                    onClick={() => handleSetShowCropper(false)}
-                    className="p-2 -ml-2 hover:bg-gray-800 rounded-full transition-colors text-white/80"
-                  >
-                    <ArrowLeft size={20} />
-                  </button>
+            <ModalHeader
+              currentStep={currentStep}
+              modalType={modalType}
+              isStepComplete={isStepComplete}
+              onPrev={onPrev}
+              onNext={onNext}
+              onClose={handleModalClose}
+              onSubmit={handleSubmit}
+              isApplying={isApplying}
+              showCropper={showCropper}
+              onCropperChange={setShowCropper}
+              onApplyCrop={handleApplyCrop}
+            />
 
-                  <h1 className="text-base font-medium text-white/80">편집</h1>
+            <ProgressBar
+              currentStep={currentStep}
+              totalSteps={totalSteps}
+              selectedImage={selectedImage}
+            />
 
-                  <button
-                    onClick={() => {
-                      // 직접 함수 호출하여 이벤트 버블링 방지
-                      handleApplyCrop();
-                    }}
-                    className={cn(
-                      "text-sm font-semibold px-3 py-1.5",
-                      "text-[#1A1A1A] bg-[#EAFD66]",
-                      "rounded-md shadow-md", // 그림자 추가하여 버튼 가시성 향상
-                      isApplying
-                        ? "opacity-50 cursor-not-allowed"
-                        : "hover:bg-[#EAFD66]/90 transition-colors"
-                    )}
-                    disabled={isApplying}
-                  >
-                    {isApplying ? "처리 중..." : "적용"}
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() =>
-                      currentStep > 1 ? onPrev() : handleModalClose()
-                    }
-                    className="p-2 -ml-2 hover:bg-gray-800 rounded-full transition-colors text-white/80"
-                  >
-                    {currentStep > 1 ? (
-                      <ArrowLeft size={20} />
-                    ) : (
-                      <X size={20} />
-                    )}
-                  </button>
-
-                  <h1 className="text-base font-medium text-white/80">
-                    {getHeaderTitle()}
-                  </h1>
-
-                  <button
-                    onClick={currentStep === totalSteps ? handleSubmit : onNext}
-                    disabled={!isStepComplete}
-                    className={cn(
-                      "text-sm font-semibold px-2 py-1",
-                      isStepComplete
-                        ? "text-[#EAFD66] hover:text-[#EAFD66]/90 transition-colors"
-                        : "text-gray-500 cursor-not-allowed"
-                    )}
-                  >
-                    {getNextButtonText()}
-                  </button>
-                </>
-              )}
-            </header>
-
-            <div
-              className={cn(
-                "w-full h-0.5 bg-gray-800 overflow-hidden",
-                "opacity-100 flex-shrink-0",
-                "transition-all duration-300"
-              )}
-            >
-              <div
-                className="h-full bg-[#EAFD66] transition-all duration-300"
-                style={{
-                  width: selectedImage
-                    ? `${(currentStep / totalSteps) * 100}%`
-                    : "0%",
-                }}
-              />
-            </div>
-
-            {/* 마커 단계에서 필수 입력사항 안내 - flex-shrink-0 추가 */}
-            {currentStep === 2 && showMarkerGuide && (
-              <div className="px-4 py-2 bg-[#232323] border-b border-gray-800 flex-shrink-0">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-300">
-                      필수 입력사항
-                    </h3>
-                    <p className="text-xs text-gray-400 mt-1">
-                      이미지를 클릭하여 궁금한 아이템의 위치를 표시해주세요
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setShowMarkerGuide(false)}
-                    className="p-1 hover:bg-gray-800 text-gray-400 hover:text-white/80"
-                  >
-                    <X size={16} />
-                  </button>
-                </div>
-              </div>
-            )}
-
-            <div
-              className={cn(
-                "flex-1",
-                "min-h-0 relative",
-                "flex",
-                currentStep === 1 && selectedImage && showCropper
-                  ? "overflow-hidden bg-[#1A1A1A] pt-0"
-                  : "overflow-hidden bg-[#1A1A1A]"
-              )}
-            >
-              {currentStep === 3 ? (
-                // 3단계일 때 - 모바일 환경에 따른 레이아웃 분기
-                isMobile ? (
-                  // 모바일에서는 이미지 위에 ContextStepSidebar가 오버레이됨
-                  <div className="relative w-full h-full">
-                    {/* 이미지 영역 - 전체 화면으로 표시 */}
-                    <div className="absolute inset-0 flex items-center justify-center bg-[#1A1A1A]">
-                      {selectedImage && (
-                        <div className="w-full h-full flex items-center justify-center p-1 pt-0">
-                          <ImageContainer
-                            {...imageContainerProps}
-                            showCropper={false}
-                            onCropperChange={() => {}}
-                            onPointsChange={() => {}} // 읽기 전용
-                            onPointSelect={() => {}} // 읽기 전용
-                          />
-                        </div>
-                      )}
-
-                      {/* 이미지 위에 그라데이션 오버레이 추가 - 슬라이드 메뉴와의 대비 강화 */}
-                      <div
-                        className="absolute inset-0 pointer-events-none"
-                        style={{
-                          background:
-                            "linear-gradient(to bottom, transparent 70%, rgba(0,0,0,0.4) 100%)",
-                        }}
+            <div className="flex-1 min-h-0 relative flex">
+              {currentStep === 2 || currentStep === 3 ? (
+                <div className="w-full h-full flex flex-col md:flex-row">
+                  {/* 이미지 영역 - 모바일에서는 전체 화면 */}
+                  <div className={cn(
+                    "w-full h-full",
+                    "flex items-center justify-center bg-[#1A1A1A] overflow-hidden relative p-0",
+                    "md:w-[60%]"
+                  )}>
+                    <div className="relative aspect-[4/5] h-full flex items-center justify-center">
+                      <ImageContainerWrapper
+                        {...imageContainerProps}
+                        ref={imageContainerRef}
+                        isCroppingMode={false}
                       />
                     </div>
-
-                    {/* 모바일용 드래그 힌트 - 처음에만 잠깐 표시됨 */}
-                    {currentStep === 3 && (
-                      <div className="absolute bottom-3 left-0 right-0 flex justify-center items-center pointer-events-none">
-                        <div className="bg-black/50 text-white/80 text-xs px-3 py-1.5 rounded-full flex items-center gap-1 animate-pulse">
-                          <span>위로 드래그하여 정보 입력</span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* 모바일용 슬라이드 컨텍스트 사이드바 */}
-                    <ContextStepSidebar
-                      onAnswerChange={(answer) => setContextAnswers(answer)}
-                      onSubmit={handleSubmit}
-                      isMobile={true}
-                    />
                   </div>
-                ) : (
-                  // 데스크톱에서는 기존 그리드 레이아웃 유지
-                  <div className="grid grid-cols-1 sm:grid-cols-[6fr_4fr] w-full h-full">
-                    {/* 왼쪽 이미지 섹션 */}
+
+                  {/* 모바일용 바텀 시트 */}
+                  <div className={cn(
+                    "md:hidden fixed bottom-0 left-0 right-0",
+                    "bg-[#1A1A1A] rounded-t-2xl",
+                    "transition-all duration-300 ease-out", // ease-out으로 변경하여 더 자연스러운 움직임
+                    "shadow-[0_-4px_20px_rgba(0,0,0,0.3)]",
+                    "z-50",
+                    isBottomSheetOpen ? "translate-y-0" : "translate-y-[calc(100%-40px)]",
+                    isDragging && "transition-none"
+                  )}
+                  style={{
+                    transform: isDragging 
+                      ? `translateY(${currentDragY}px)` 
+                      : isBottomSheetOpen 
+                        ? 'translateY(0)' 
+                        : 'translateY(calc(100% - 40px))',
+                    willChange: 'transform' // 성능 최적화
+                  }}>
+                    {/* 드래그 핸들 */}
                     <div
-                      className="relative flex items-center justify-center p-3 bg-[#232323] sm:border-r sm:border-gray-800 overflow-hidden"
-                      style={{
-                        minHeight: "300px",
-                      }}
+                      ref={bottomSheetRef}
+                      className="h-[40px] flex items-center justify-center cursor-grab active:cursor-grabbing"
+                      onMouseDown={handleMouseDown}
+                      onTouchStart={handleTouchStart}
+                      onTouchMove={handleTouchMove}
+                      onTouchEnd={handleTouchEnd}
+                      onClick={handleHandleClick}
                     >
-                      <div
-                        className="relative mx-auto my-auto flex items-center justify-center max-h-full"
-                        style={{
-                          minHeight: "250px",
-                          minWidth: "200px",
-                        }}
-                      >
-                        {/* 2단계에서 넘겨받은 마커를 그대로 표시하기 위해 ImageContainer 사용 */}
-                        {selectedImage && (
-                          <div className="w-full h-full flex items-center justify-center p-2">
-                            <ImageContainer
-                              {...imageContainerProps}
-                              showCropper={false}
-                              onCropperChange={() => {}}
-                              onPointsChange={() => {}} // 읽기 전용으로 설정
-                              onPointSelect={() => {}} // 읽기 전용으로 설정
-                            />
+                      <div className="w-12 h-1 bg-gray-600 rounded-full" />
+                    </div>
+
+                    {/* 바텀 시트 컨텐츠 */}
+                    <div className="h-[60vh] overflow-y-auto">
+                      {modalType === "style" && (
+                        <div className="h-full flex flex-col">
+                          {currentStep === 2 && (
+                            <div className="p-5 flex flex-col h-full flex-1">
+                              <h3 className="text-base font-medium text-white mb-4">아이템 정보</h3>
+                              {points.length === 0 ? (
+                                <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
+                                  <div className="w-12 h-12 rounded-full bg-[#232323] flex items-center justify-center mb-4">
+                                    <div className="w-6 h-6 border-2 border-[#EAFD66] rounded-full" />
+                                  </div>
+                                  <h4 className="text-base font-medium text-white mb-2">마커를 추가해주세요</h4>
+                                  <p className="text-sm text-gray-400 max-w-[280px]">
+                                    이미지에 원하는 위치를 클릭하여 마커를 추가하고, 브랜드와 가격 정보를 입력해주세요.
+                                  </p>
+                                </div>
+                              ) : (
+                                <div className="flex flex-col gap-2 overflow-y-auto pr-1">
+                                  {points.map((point, index) => (
+                                    <div
+                                      key={index}
+                                      id={`marker-${index}`}
+                                      className={cn(
+                                        "p-3 border rounded-lg transition-all",
+                                        !point.brand || !point.price
+                                          ? "bg-[#2A1A1A] border-red-500/20"
+                                          : "bg-[#232323] border-gray-700/50",
+                                        selectedPoint === index
+                                          ? "border-[#EAFD66] bg-[#232323]/80"
+                                          : "hover:border-[#EAFD66]/20"
+                                      )}
+                                    >
+                                      {/* 아이템 헤더 */}
+                                      <div className="flex items-center justify-between">
+                                        <div 
+                                          className="flex items-center gap-2 cursor-pointer flex-1"
+                                          onClick={() => {
+                                            setSelectedPoint(selectedPoint === index ? null : index);
+                                          }}
+                                        >
+                                          <div className="w-5 h-5 flex items-center justify-center bg-[#EAFD66] text-[#1A1A1A] rounded-full text-[10px] font-bold">
+                                            {index + 1}
+                                          </div>
+                                          <span className="text-sm text-white">아이템 {index + 1}</span>
+                                        </div>
+
+                                        {/* 오른쪽 영역 - 체크박스와 삭제 버튼 */}
+                                        <div className="flex items-center gap-3">
+                                          {/* 찔러보기 체크박스 */}
+                                          <div 
+                                            className="flex items-center gap-2"
+                                            onClick={(e) => e.stopPropagation()}
+                                          >
+                                            <input
+                                              type="checkbox"
+                                              id={`secret-${index}`}
+                                              checked={point.isSecret || false}
+                                              onChange={(e) => {
+                                                const newPoints = [...points];
+                                                newPoints[index] = { ...point, isSecret: e.target.checked };
+                                                setPoints(newPoints);
+                                              }}
+                                              className="w-4 h-4 rounded border-gray-600 bg-[#2A2A2A] text-[#EAFD66] focus:ring-[#EAFD66] focus:ring-offset-0 focus:ring-2 accent-[#EAFD66]"
+                                            />
+                                            <label 
+                                              htmlFor={`secret-${index}`} 
+                                              className="text-xs text-[#EAFD66] cursor-pointer whitespace-nowrap"
+                                            >
+                                              찔러보기
+                                            </label>
+                                          </div>
+                                          {/* 삭제 버튼 */}
+                                          <button
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              const newPoints = [...points];
+                                              newPoints.splice(index, 1);
+                                              setPoints(newPoints);
+                                              if (selectedPoint === index) {
+                                                setSelectedPoint(null);
+                                              }
+                                            }}
+                                            className="p-1 hover:bg-white/5 rounded-full text-gray-400 hover:text-red-400 transition-colors"
+                                          >
+                                            <Trash2 size={14} />
+                                          </button>
+                                        </div>
+                                      </div>
+
+                                      {/* 아이템 상세 정보 */}
+                                      {selectedPoint === index && (
+                                        <div className="mt-3 space-y-2 pt-3 border-t border-gray-700/50">
+                                          <div>
+                                            <label className="text-xs text-gray-400 block mb-1">
+                                              브랜드
+                                            </label>
+                                            <input
+                                              type="text"
+                                              value={point.brand || ""}
+                                              onChange={(e) => {
+                                                const newPoints = [...points];
+                                                newPoints[index] = { ...point, brand: e.target.value };
+                                                setPoints(newPoints);
+                                              }}
+                                              placeholder="브랜드명"
+                                              className="w-full px-2 py-1.5 bg-[#2A2A2A] border border-gray-700 rounded text-sm text-white focus:border-[#EAFD66] focus:outline-none"
+                                              onClick={(e) => e.stopPropagation()}
+                                            />
+                                          </div>
+                                          <div>
+                                            <label className="text-xs text-gray-400 block mb-1">
+                                              가격
+                                            </label>
+                                            <input
+                                              type="text"
+                                              value={point.price || ""}
+                                              onChange={(e) => {
+                                                const newPoints = [...points];
+                                                newPoints[index] = { ...point, price: e.target.value };
+                                                setPoints(newPoints);
+                                              }}
+                                              placeholder="가격"
+                                              className="w-full px-2 py-1.5 bg-[#2A2A2A] border border-gray-700 rounded text-sm text-white focus:border-[#EAFD66] focus:outline-none"
+                                              onClick={(e) => e.stopPropagation()}
+                                            />
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          {currentStep === 3 && (
+                            <div className="p-5 flex flex-col h-full flex-1">
+                              <div className="flex items-center gap-2 mb-3">
+                                <h3 className="text-base font-medium text-white">스타일 참고 링크</h3>
+                                <div className="group relative">
+                                  <div className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center cursor-help">
+                                    <span className="text-[10px] font-medium text-gray-400">i</span>
+                                  </div>
+                                  <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 p-2 bg-[#232323] border border-gray-700 rounded-lg text-xs text-gray-300 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                    이 스타일을 만들 때 참고한 이미지나 영상의 링크를 추가해주세요. 다른 사용자들이 스타일의 영감을 얻는데 도움이 됩니다.
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex flex-col space-y-3">
+                                <input
+                                  type="text"
+                                  value={newUrl}
+                                  onChange={(e) => setNewUrl(e.target.value)}
+                                  placeholder="URL을 입력하세요"
+                                  className="w-full px-3 py-2.5 bg-[#232323] border border-gray-700 rounded-md text-sm text-white focus:border-[#EAFD66] focus:outline-none focus:ring-1 focus:ring-[#EAFD66]"
+                                />
+                                <button
+                                  onClick={handleAddInspirationLink}
+                                  disabled={!newUrl.trim()}
+                                  className={cn(
+                                    "w-full py-2.5 text-sm rounded-md transition-colors font-medium",
+                                    newUrl.trim()
+                                      ? "bg-[#EAFD66] text-[#1A1A1A] hover:bg-[#EAFD66]/90"
+                                      : "bg-gray-700 text-gray-400 cursor-not-allowed"
+                                  )}
+                                >
+                                  링크 추가
+                                </button>
+                              </div>
+                              {inspirationLinks.length === 0 ? (
+                                <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
+                                  <div className="w-12 h-12 rounded-full bg-[#232323] flex items-center justify-center mb-4">
+                                    <Link className="w-6 h-6 text-[#EAFD66]" />
+                                  </div>
+                                  <h4 className="text-base font-medium text-white mb-2">참고 링크를 추가해주세요</h4>
+                                  <p className="text-sm text-gray-400 max-w-[280px]">
+                                    이 스타일을 만들 때 참고한 이미지나 영상의 링크를 추가하면 다른 사용자들에게 도움이 됩니다.
+                                  </p>
+                                </div>
+                              ) : (
+                                <div className="mt-4 flex-1 overflow-y-auto">
+                                  <div className="flex flex-col gap-2 pr-1">
+                                    {inspirationLinks.map((link) => (
+                                      <div
+                                        key={link.id}
+                                        className="flex items-center justify-between p-2 bg-[#232323] border border-gray-700 rounded-md hover:border-gray-600 transition-colors"
+                                      >
+                                        <a
+                                          href={link.url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="flex items-center gap-2 text-xs text-[#EAFD66] hover:text-[#EAFD66]/80 hover:underline truncate"
+                                        >
+                                          <Link size={14} className="flex-shrink-0" />
+                                          <span className="truncate">{link.url}</span>
+                                        </a>
+                                        <button
+                                          onClick={() => handleRemoveInspirationLink(link.id)}
+                                          className="p-1 text-gray-400 hover:text-red-400 transition-colors"
+                                        >
+                                          <X size={14} />
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {modalType === "request" && (
+                        <ContextStepSidebar
+                          modalType="request"
+                          onAnswerChange={(answer) => setContextAnswers(answer)}
+                          onSubmit={handleSubmit}
+                          isMobile={isMobile}
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  {/* 데스크탑용 사이드바 */}
+                  <div className="hidden md:block w-[40%] h-full border-l border-gray-800 overflow-y-auto">
+                    {modalType === "style" && (
+                      <div className="h-full flex flex-col">
+                        {currentStep === 2 && (
+                          <div className="p-5 flex flex-col h-full flex-1">
+                            <h3 className="text-base font-medium text-white mb-4">아이템 정보</h3>
+                            {points.length === 0 ? (
+                              <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
+                                <div className="w-12 h-12 rounded-full bg-[#232323] flex items-center justify-center mb-4">
+                                  <div className="w-6 h-6 border-2 border-[#EAFD66] rounded-full" />
+                                </div>
+                                <h4 className="text-base font-medium text-white mb-2">마커를 추가해주세요</h4>
+                                <p className="text-sm text-gray-400 max-w-[280px]">
+                                  이미지에 원하는 위치를 클릭하여 마커를 추가하고, 브랜드와 가격 정보를 입력해주세요.
+                                </p>
+                              </div>
+                            ) : (
+                              <div className="flex flex-col gap-2 overflow-y-auto pr-1">
+                                {points.map((point, index) => (
+                                  <div
+                                    key={index}
+                                    id={`marker-${index}`}
+                                    className={cn(
+                                      "p-3 border rounded-lg transition-all",
+                                      !point.brand || !point.price
+                                        ? "bg-[#2A1A1A] border-red-500/20"
+                                        : "bg-[#232323] border-gray-700/50",
+                                      selectedPoint === index
+                                        ? "border-[#EAFD66] bg-[#232323]/80"
+                                        : "hover:border-[#EAFD66]/20"
+                                    )}
+                                  >
+                                    {/* 아이템 헤더 */}
+                                    <div className="flex items-center justify-between">
+                                      {/* 왼쪽 영역 - 클릭 시 펼치기/접기 */}
+                                      <div 
+                                        className="flex items-center gap-2 cursor-pointer flex-1"
+                                        onClick={() => {
+                                          setSelectedPoint(selectedPoint === index ? null : index);
+                                        }}
+                                      >
+                                        <div className="w-5 h-5 flex items-center justify-center bg-[#EAFD66] text-[#1A1A1A] rounded-full text-[10px] font-bold">
+                                          {index + 1}
+                                        </div>
+                                        <span className="text-sm text-white">아이템 {index + 1}</span>
+                                      </div>
+
+                                      {/* 오른쪽 영역 - 체크박스와 삭제 버튼 */}
+                                      <div className="flex items-center gap-3">
+                                        {/* 찔러보기 체크박스 */}
+                                        <div 
+                                          className="flex items-center gap-2"
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          <input
+                                            type="checkbox"
+                                            id={`secret-${index}`}
+                                            checked={point.isSecret || false}
+                                            onChange={(e) => {
+                                              const newPoints = [...points];
+                                              newPoints[index] = { ...point, isSecret: e.target.checked };
+                                              setPoints(newPoints);
+                                            }}
+                                            className="w-4 h-4 rounded border-gray-600 bg-[#2A2A2A] text-[#EAFD66] focus:ring-[#EAFD66] focus:ring-offset-0 focus:ring-2 accent-[#EAFD66]"
+                                          />
+                                          <label 
+                                            htmlFor={`secret-${index}`} 
+                                            className="text-xs text-[#EAFD66] cursor-pointer whitespace-nowrap"
+                                          >
+                                            찔러보기
+                                          </label>
+                                        </div>
+                                        {/* 삭제 버튼 */}
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            const newPoints = [...points];
+                                            newPoints.splice(index, 1);
+                                            setPoints(newPoints);
+                                            if (selectedPoint === index) {
+                                              setSelectedPoint(null);
+                                            }
+                                          }}
+                                          className="p-1 hover:bg-white/5 rounded-full text-gray-400 hover:text-red-400 transition-colors"
+                                        >
+                                          <Trash2 size={14} />
+                                        </button>
+                                      </div>
+                                    </div>
+
+                                    {/* 아이템 상세 정보 */}
+                                    {selectedPoint === index && (
+                                      <div className="mt-3 space-y-2 pt-3 border-t border-gray-700/50">
+                                        <div>
+                                          <label className="text-xs text-gray-400 block mb-1">
+                                            브랜드
+                                          </label>
+                                          <input
+                                            type="text"
+                                            value={point.brand || ""}
+                                            onChange={(e) => {
+                                              const newPoints = [...points];
+                                              newPoints[index] = { ...point, brand: e.target.value };
+                                              setPoints(newPoints);
+                                            }}
+                                            placeholder="브랜드명"
+                                            className="w-full px-2 py-1.5 bg-[#2A2A2A] border border-gray-700 rounded text-sm text-white focus:border-[#EAFD66] focus:outline-none"
+                                            onClick={(e) => e.stopPropagation()}
+                                          />
+                                        </div>
+                                        <div>
+                                          <label className="text-xs text-gray-400 block mb-1">
+                                            가격
+                                          </label>
+                                          <input
+                                            type="text"
+                                            value={point.price || ""}
+                                            onChange={(e) => {
+                                              const newPoints = [...points];
+                                              newPoints[index] = { ...point, price: e.target.value };
+                                              setPoints(newPoints);
+                                            }}
+                                            placeholder="가격"
+                                            className="w-full px-2 py-1.5 bg-[#2A2A2A] border border-gray-700 rounded text-sm text-white focus:border-[#EAFD66] focus:outline-none"
+                                            onClick={(e) => e.stopPropagation()}
+                                          />
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        {currentStep === 3 && (
+                          <div className="p-5 flex flex-col h-full flex-1">
+                            <div className="flex items-center gap-2 mb-3">
+                              <h3 className="text-base font-medium text-white">스타일 참고 링크</h3>
+                              <div className="group relative">
+                                <div className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center cursor-help">
+                                  <span className="text-[10px] font-medium text-gray-400">i</span>
+                                </div>
+                                <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 p-2 bg-[#232323] border border-gray-700 rounded-lg text-xs text-gray-300 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                  이 스타일을 만들 때 참고한 이미지나 영상의 링크를 추가해주세요. 다른 사용자들이 스타일의 영감을 얻는데 도움이 됩니다.
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex flex-col space-y-3">
+                              <input
+                                type="text"
+                                value={newUrl}
+                                onChange={(e) => setNewUrl(e.target.value)}
+                                placeholder="URL을 입력하세요"
+                                className="w-full px-3 py-2.5 bg-[#232323] border border-gray-700 rounded-md text-sm text-white focus:border-[#EAFD66] focus:outline-none focus:ring-1 focus:ring-[#EAFD66]"
+                              />
+                              <button
+                                onClick={handleAddInspirationLink}
+                                disabled={!newUrl.trim()}
+                                className={cn(
+                                  "w-full py-2.5 text-sm rounded-md transition-colors font-medium",
+                                  newUrl.trim()
+                                    ? "bg-[#EAFD66] text-[#1A1A1A] hover:bg-[#EAFD66]/90"
+                                    : "bg-gray-700 text-gray-400 cursor-not-allowed"
+                                )}
+                              >
+                                링크 추가
+                              </button>
+                            </div>
+                            {inspirationLinks.length === 0 ? (
+                              <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
+                                <div className="w-12 h-12 rounded-full bg-[#232323] flex items-center justify-center mb-4">
+                                  <Link className="w-6 h-6 text-[#EAFD66]" />
+                                </div>
+                                <h4 className="text-base font-medium text-white mb-2">참고 링크를 추가해주세요</h4>
+                                <p className="text-sm text-gray-400 max-w-[280px]">
+                                  이 스타일을 만들 때 참고한 이미지나 영상의 링크를 추가하면 다른 사용자들에게 도움이 됩니다.
+                                </p>
+                              </div>
+                            ) : (
+                              <div className="mt-4 flex-1 overflow-y-auto">
+                                <div className="flex flex-col gap-2 pr-1">
+                                  {inspirationLinks.map((link) => (
+                                    <div
+                                      key={link.id}
+                                      className="flex items-center justify-between p-2 bg-[#232323] border border-gray-700 rounded-md hover:border-gray-600 transition-colors"
+                                    >
+                                      <a
+                                        href={link.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-2 text-xs text-[#EAFD66] hover:text-[#EAFD66]/80 hover:underline truncate"
+                                      >
+                                        <Link size={14} className="flex-shrink-0" />
+                                        <span className="truncate">{link.url}</span>
+                                      </a>
+                                      <button
+                                        onClick={() => handleRemoveInspirationLink(link.id)}
+                                        className="p-1 text-gray-400 hover:text-red-400 transition-colors"
+                                      >
+                                        <X size={14} />
+                                      </button>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
-                    </div>
-
-                    {/* 오른쪽 폼 섹션 */}
-                    <div className="h-full w-full bg-[#1A1A1A]">
+                    )}
+                    {modalType === "request" && (
                       <ContextStepSidebar
+                        modalType="request"
                         onAnswerChange={(answer) => setContextAnswers(answer)}
                         onSubmit={handleSubmit}
-                        isMobile={false}
+                        isMobile={isMobile}
                       />
-                    </div>
+                    )}
                   </div>
-                )
-              ) : (
-                // 1-2단계에서는 이미지만 표시
-                <div className="w-full h-full flex items-center justify-center overflow-hidden p-0">
-                  {currentStep === 1 && selectedImage && showCropper ? (
-                    // 크롭 모드 컨테이너 스타일 조정
-                    <div
-                      className={cn(
-                        "w-full h-full",
-                        "flex items-center justify-center",
-                        "p-0",
-                        "overflow-hidden",
-                        "bg-[#1A1A1A]"
-                      )}
-                    >
-                      <ImageContainer
-                        {...imageContainerProps}
-                        ref={imageContainerRef}
-                      />
-                    </div>
-                  ) : (
-                    // 일반 이미지 컨테이너 (크롭 모드 아닐 때)
-                    <div
-                      className={cn(
-                        "relative flex items-center justify-center",
-                        "h-full w-full p-0 mx-auto overflow-hidden",
-                        "bg-[#1A1A1A]"
-                      )}
-                    >
-                      <div
-                        className={cn(
-                          "relative aspect-[4/5] h-full max-h-[calc(100% - 10px)]",
-                          "flex items-center justify-center overflow-hidden"
-                        )}
-                      >
-                        <ImageContainer
-                          {...imageContainerProps}
-                          ref={imageContainerRef}
-                        />
-                      </div>
-                    </div>
-                  )}
                 </div>
+              ) : (
+                <ImageContainerWrapper
+                  {...imageContainerProps}
+                  ref={imageContainerRef}
+                  isCroppingMode={Boolean(selectedImage && showCropper)}
+                />
               )}
             </div>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* StatusModal - Dialog 외부로 이동시켜 최상위 z-index 보장 */}
-      <StatusModal
-        isOpen={modalConfig.isOpen}
-        onClose={modalConfig.onClose}
-        type={modalConfig.type}
-        messageKey={modalConfig.messageKey}
-      />
-
-      {/* Confirmation Modal for closing the entire form */}
+      <StatusModal {...modalConfig} />
       <ConfirmModal
         isOpen={showConfirmModal}
         onClose={() => setShowConfirmModal(false)}

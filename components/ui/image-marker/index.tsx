@@ -10,24 +10,26 @@ import { X, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils/style";
 
 interface ImageMarkerProps {
-  isRequest: boolean;
+  modalType: "request" | "style";
   imageUrl: string;
   points: Point[];
   onPointsChange: (points: Point[]) => void;
   onPointContextChange?: (index: number, context: string) => void;
   onPointRemove?: (index: number) => void;
+  onPointSelect?: (index: number) => void;
   className?: string;
   disableEditing?: boolean;
   selectedPointIndex?: number | null;
 }
 
 export function ImageMarker({
-  isRequest,
+  modalType,
   imageUrl,
   points,
   onPointsChange,
   onPointContextChange,
   onPointRemove,
+  onPointSelect,
   className,
   disableEditing,
   selectedPointIndex,
@@ -88,7 +90,7 @@ export function ImageMarker({
 
       const x = ((e.clientX - rect.left) / rect.width) * 100;
       const y = ((e.clientY - rect.top) / rect.height) * 100;
-      if (isRequest) {
+      if (modalType === "request") {
         if (points.length > 0) {
           setShowWarning(true);
           setTimeout(() => setShowWarning(false), 2000);
@@ -101,7 +103,20 @@ export function ImageMarker({
       setIsEditing(true);
       setEditingPoint(newPoint);
     },
-    [points, onPointsChange, disableEditing]
+    [points, onPointsChange, disableEditing, modalType]
+  );
+
+  const handleMarkerClick = useCallback(
+    (e: React.MouseEvent, index: number) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // 마커 선택 이벤트 호출
+      if (onPointSelect) {
+        onPointSelect(index);
+      }
+    },
+    [onPointSelect]
   );
 
   return (
@@ -169,13 +184,33 @@ export function ImageMarker({
         {points.map((point, index) => (
           <div
             key={`marker-${index}-${point.x}-${point.y}`}
-            className="absolute -translate-x-1/2 -translate-y-1/2 group"
+            className={cn(
+              "absolute -translate-x-1/2 -translate-y-1/2 group z-10",
+              selectedPointIndex === index && "z-20"
+            )}
             style={{ left: `${point.x}%`, top: `${point.y}%` }}
-            onClick={(e) => handleDeleteClick(e, index)}
+            onClick={(e) => handleMarkerClick(e, index)}
           >
-            <div className="relative w-4 h-4 hover:scale-125 transition-transform">
-              <div className="absolute inset-0 border-2 border-[#EAFD66] rounded-full animate-pulse" />
-              <div className="absolute inset-[2px] bg-[#EAFD66]/30 rounded-full backdrop-blur-sm" />
+            <div className={cn(
+              "relative w-5 h-5 hover:scale-125 transition-transform",
+              selectedPointIndex === index && "scale-125"
+            )}>
+              <div className={cn(
+                "absolute inset-0 border-2 rounded-full animate-pulse",
+                selectedPointIndex === index ? "border-[#FFFFFF]" : "border-[#EAFD66]"
+              )} />
+              <div className={cn(
+                "absolute inset-[2px] rounded-full backdrop-blur-sm",
+                selectedPointIndex === index ? "bg-[#FFFFFF]/50" : "bg-[#EAFD66]/30"
+              )} />
+              {/* 마커 안에 숫자 표시 - 가시성 개선 */}
+              {modalType === "style" && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-[10px] font-bold text-[#1A1A1A] leading-none drop-shadow-[0_0_1px_rgba(255,255,255,0.8)]">
+                    {index + 1}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         ))}

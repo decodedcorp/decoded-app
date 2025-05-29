@@ -11,6 +11,10 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
+        hostname: '**',
+      },
+      {
+        protocol: 'https',
         hostname: 'cloud.appwrite.io',
       },
       {
@@ -41,7 +45,7 @@ const nextConfig = {
     return config;
   },
   publicRuntimeConfig: {
-    IS_LOCAL_DEV: process.argv.includes("dev"),
+    IS_LOCAL_DEV: process.argv.includes('dev'),
   },
   eslint: {
     ignoreDuringBuilds: true,

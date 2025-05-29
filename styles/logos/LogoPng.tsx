@@ -22,6 +22,7 @@ export default function LogoPng({
       priority={priority}   
       quality={90}
       className={className || "w-auto h-auto"}
+      unoptimized
     />
   );
 } 

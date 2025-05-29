@@ -41,7 +41,7 @@ interface Area {
 }
 
 interface ImageContainerProps {
-  isRequest: boolean;
+  modalType: "request" | "style";
   step: number;
   selectedImage: string | null;
   imageFile: File | null;
@@ -150,7 +150,7 @@ export const ImageContainer = forwardRef<
 >(
   (
     {
-      isRequest,
+      modalType,
       step,
       selectedImage,
       imageFile,
@@ -1292,7 +1292,7 @@ export const ImageContainer = forwardRef<
       return (
         <div className="relative w-full h-full max-h-full overflow-hidden flex items-center justify-center bg-[#232323]">
           <ImageMarker
-            isRequest={isRequest}
+            modalType={modalType}
             imageUrl={selectedImage}
             points={points}
             onPointsChange={onPointsChange}
@@ -1305,6 +1305,12 @@ export const ImageContainer = forwardRef<
               const newPoints = points.filter((_, i) => i !== index);
               onPointsChange(newPoints);
             }}
+            onPointSelect={(index) => {
+              console.log("Image marker point selected:", index);
+              if (onPointSelect) {
+                onPointSelect(index);
+              }
+            }}
             selectedPointIndex={selectedPoint}
             className="max-w-full max-h-full object-contain"
           />
@@ -1316,15 +1322,12 @@ export const ImageContainer = forwardRef<
       onPointsChange,
       onPointContextChange,
       selectedPoint,
+      onPointSelect,
+      modalType
     ]);
 
     // 읽기 전용 마커 컴포넌트
     const ReadOnlyMarkerComponent = useCallback(() => {
-      console.log(
-        "Rendering ReadOnlyMarkerComponent with image:",
-        selectedImage ? "provided" : "missing"
-      );
-
       if (!selectedImage) {
         return (
           <div className="w-full h-full flex items-center justify-center bg-gray-900 text-white/80">
@@ -1334,79 +1337,66 @@ export const ImageContainer = forwardRef<
       }
 
       return (
-        <div className="relative w-full h-full flex items-center justify-center bg-[#232323] p-2">
-          <div className="relative w-[90%] h-[90%] flex items-center justify-center bg-[#1A1A1A]">
-            {/* 이미지 컨테이너 */}
-            <div className="relative w-full h-full flex items-center justify-center">
-              {/* Next.js Image를 img 태그로 대체 */}
-              <img
-                src={selectedImage}
-                alt="Image with markers"
-                loading="lazy"
-                width={imageDimensions.width || 800}
-                height={imageDimensions.height || 1000}
-                className="max-w-full max-h-full object-contain"
-                onLoad={(e) => {
-                  // 이미지 로드 완료 시 처리
-                  if (window.performance) {
-                    const performanceEntries =
-                      performance.getEntriesByName(selectedImage);
-                    if (performanceEntries.length > 0) {
-                      console.log(
-                        "이미지 로드 시간:",
-                        performanceEntries[0].duration + "ms"
-                      );
-                    }
+        <div className="relative w-full h-full flex items-center justify-center bg-[#232323]">
+          <div className="relative w-full h-full flex items-center justify-center">
+            <img
+              src={selectedImage}
+              alt="Image with markers"
+              loading="lazy"
+              width={imageDimensions.width || 800}
+              height={imageDimensions.height || 1000}
+              className="max-w-full max-h-full object-contain"
+              onLoad={(e) => {
+                if (window.performance) {
+                  const performanceEntries = performance.getEntriesByName(selectedImage);
+                  if (performanceEntries.length > 0) {
+                    console.log("이미지 로드 시간:", performanceEntries[0].duration + "ms");
                   }
-                }}
-                onError={(e) => {
-                  console.error("Image failed to load");
-                  e.currentTarget.src = "/images/fallback.jpg";
-                }}
-              />
+                }
+              }}
+              onError={(e) => {
+                console.error("Image failed to load");
+                e.currentTarget.src = "/images/fallback.jpg";
+              }}
+            />
 
-              {/* 위치 정보 태그 */}
-              {contextAnswers?.location && (
-                <div className="absolute top-3 right-3 z-10">
+            {modalType === "request" && contextAnswers?.location && (
+              <div className="absolute top-3 right-3 z-10">
+                <div className="px-3 py-1.5 bg-[#222]/80 backdrop-blur-sm rounded-full 
+                              border border-[#EAFD66]/30 text-[#EAFD66] text-sm font-medium
+                              shadow-sm flex items-center">
+                  <span className="mr-0.5">#</span>
+                  <span>
+                    {contextAnswers.location.charAt(0).toUpperCase() +
+                      contextAnswers.location.slice(1)}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {points.length > 0 && (
+              <div className="absolute inset-0 pointer-events-none">
+                {points.map((point, index) => (
                   <div
-                    className="px-3 py-1.5 bg-[#222]/80 backdrop-blur-sm rounded-full 
-                                border border-[#EAFD66]/30 text-[#EAFD66] text-sm font-medium
-                                shadow-sm flex items-center"
+                    key={`marker-${index}`}
+                    className="absolute -translate-x-1/2 -translate-y-1/2 group"
+                    style={{
+                      left: `${point.x}%`,
+                      top: `${point.y}%`,
+                    }}
                   >
-                    <span className="mr-0.5">#</span>
-                    <span>
-                      {contextAnswers.location.charAt(0).toUpperCase() +
-                        contextAnswers.location.slice(1)}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {/* 마커 오버레이 */}
-              {points.length > 0 && (
-                <div className="absolute inset-0 pointer-events-none">
-                  {points.map((point, index) => (
-                    <div
-                      key={`marker-${index}`}
-                      className="absolute -translate-x-1/2 -translate-y-1/2 group"
-                      style={{
-                        left: `${point.x}%`,
-                        top: `${point.y}%`,
-                      }}
-                    >
-                      <div className="relative w-4 h-4">
-                        <div className="absolute inset-0 border-2 border-[#EAFD66] rounded-full animate-pulse" />
-                        <div className="absolute inset-[2px] bg-[#EAFD66]/30 rounded-full backdrop-blur-sm" />
-                      </div>
+                    <div className="relative w-4 h-4">
+                      <div className="absolute inset-0 border-2 border-[#EAFD66] rounded-full animate-pulse" />
+                      <div className="absolute inset-[2px] bg-[#EAFD66]/30 rounded-full backdrop-blur-sm" />
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       );
-    }, [selectedImage, points, contextAnswers]);
+    }, [selectedImage, points, contextAnswers, modalType, imageDimensions]);
 
     // 기본 이미지 표시 컴포넌트 - 마커 없이
     const BasicImageComponent = useCallback(() => {
