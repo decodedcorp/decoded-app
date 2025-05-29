@@ -1,17 +1,14 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useRef } from "react";
-import Head from "next/head";
-import ImageGridHeader from "./_components/ImageGridHeader";
-import ImageItem from "./_components/ImageItem";
-import FabMenu from "./_components/FabMenu";
-import type {
-  ImageItemData,
-  ImageDetail,
-} from "./_types/image-grid";
-import { useImageApi } from "./_hooks/useImageApi";
-import { useImageGrid } from "./_hooks/useImageGrid";
-import { useGridInteraction } from "./_hooks/useGridInteraction";
+import React, { useState, useEffect, useRef } from 'react';
+import Head from 'next/head';
+import ImageGridHeader from './_components/ImageGridHeader';
+import ImageItem from './_components/ImageItem';
+import FabMenu from './_components/FabMenu';
+import type { ImageItemData, ImageDetail } from './_types/image-grid';
+import { useImageApi } from './_hooks/useImageApi';
+import { useImageGrid } from './_hooks/useImageGrid';
+import { useGridInteraction } from './_hooks/useGridInteraction';
 
 const MainPage = () => {
   const {
@@ -44,6 +41,10 @@ const MainPage = () => {
     onImageLoaded,
   } = useImageGrid(imageGridParams);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedImageItemForModal, setSelectedImageItemForModal] =
+    useState<ImageItemData | null>(null);
+
   const {
     handleMouseDown,
     hoveredItemId,
@@ -55,6 +56,32 @@ const MainPage = () => {
     setContentOffset,
     fetchImageDetail,
   });
+
+  const handleImageClickForModal = (
+    imageItem: ImageItemData,
+    imageDetailFromItem: ImageDetail | null
+  ) => {
+    console.log('[page.tsx] handleImageClickForModal called with:', {
+      imageItem,
+      imageDetailFromItem,
+    });
+    setSelectedImageItemForModal(imageItem);
+    if (imageItem.image_doc_id) {
+      console.log(
+        '[page.tsx] Fetching details for doc_id:',
+        imageItem.image_doc_id
+      );
+      fetchImageDetail(imageItem.image_doc_id);
+    }
+    setIsModalOpen(true);
+    console.log('[page.tsx] isModalOpen set to true');
+  };
+
+  const handleCloseModal = () => {
+    console.log('[page.tsx] handleCloseModal called');
+    setIsModalOpen(false);
+    setSelectedImageItemForModal(null);
+  };
 
   return (
     <>
@@ -75,7 +102,7 @@ const MainPage = () => {
           <div
             className="absolute"
             style={{
-              willChange: "transform",
+              willChange: 'transform',
               transform: `translate(${contentOffset.x}px, ${contentOffset.y}px)`,
             }}
           >

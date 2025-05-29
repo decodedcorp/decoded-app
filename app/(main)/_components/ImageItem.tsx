@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import type { ImageItemData, ImageDetail, DecodedItem } from "../_types/image-grid"; // DecodedItem 추가
+import type { ImageItemData, ImageDetail, DecodedItem } from "../_types/image-grid";
 import { ITEM_WIDTH, ITEM_HEIGHT } from "../_constants/image-grid";
 
 interface ImageItemProps {
@@ -10,11 +10,185 @@ interface ImageItemProps {
   isFetchingDetail: boolean;
   detailError: string | null;
   onImageLoaded: (id: string) => void;
-  onMouseEnterItem: (itemId: string, imageDocId: string) => void; // 타입 변경
+  onMouseEnterItem: (itemId: string, imageDocId: string) => void;
   onMouseLeaveItem: () => void;
 }
 
-// React.memo로 컴포넌트를 감싸서 불필요한 리렌더링 방지
+interface HoverDetailEffectProps {
+  itemContainerWidth: number;
+  itemContainerHeight: number;
+  detailData: ImageDetail | null;
+}
+
+const INFO_BOX_WIDTH_PX = 170; 
+const INFO_BOX_MIN_HEIGHT_PX = 90; // Min height, will adjust if item image is taller
+const INFO_BOX_PADDING_Y = 8; 
+const INFO_BOX_OFFSET_X_FROM_IMAGE = 15;
+const BRAND_LOGO_MAX_HEIGHT = 24;
+const ITEM_IMAGE_MAX_HEIGHT = 60; // Max height for the item image inside info box
+
+function HoverDetailEffect({
+  itemContainerWidth,
+  itemContainerHeight,
+  detailData,
+}: HoverDetailEffectProps) {
+  if (!detailData || !detailData.items) {
+    return null;
+  }
+
+  const allDecodedItems: DecodedItem[] = Object.values(detailData.items).flat().filter(Boolean) as DecodedItem[];
+  if (allDecodedItems.length === 0) return null;
+
+  const midPointX = itemContainerWidth / 2;
+  const leftItems: DecodedItem[] = [];
+  const rightItems: DecodedItem[] = [];
+
+  allDecodedItems.forEach(item => {
+    const itemPctLeft = typeof item.position?.left === 'string' ? parseFloat(item.position.left) : item.position?.left;
+    if (itemPctLeft === undefined || isNaN(itemPctLeft)) return; // Skip if position is invalid
+    
+    if ((itemPctLeft / 100) * itemContainerWidth < midPointX) {
+      leftItems.push(item);
+    } else {
+      rightItems.push(item);
+    }
+  });
+
+  let accTopLeft = INFO_BOX_PADDING_Y;
+  let accTopRight = INFO_BOX_PADDING_Y;
+
+  const renderItemInfo = (decodedItem: DecodedItem, index: number, isLeftGroup: boolean) => {
+    const position = decodedItem.position;
+    const parsedTop = typeof position?.top === 'string' ? parseFloat(position.top) : position?.top;
+    const parsedLeft = typeof position?.left === 'string' ? parseFloat(position.left) : position?.left;
+
+    if (!position || typeof parsedTop !== 'number' || typeof parsedLeft !== 'number' || isNaN(parsedTop) || isNaN(parsedLeft)) {
+      return null;
+    }
+
+    const itemPctTop = parsedTop;
+    const itemPctLeft = parsedLeft;
+    const lineOriginX = (itemPctLeft / 100) * itemContainerWidth;
+    const lineOriginY = (itemPctTop / 100) * itemContainerHeight;
+    const lineStart = { x: lineOriginX, y: lineOriginY };
+
+    const currentInfoBoxTop = isLeftGroup ? accTopLeft : accTopRight;
+    const infoBoxCalculatedLeftPx =
+      isLeftGroup
+        ? -INFO_BOX_WIDTH_PX - INFO_BOX_OFFSET_X_FROM_IMAGE
+        : itemContainerWidth + INFO_BOX_OFFSET_X_FROM_IMAGE;
+
+    const brandName = decodedItem?.item?.brand_name ?? "브랜드 없음";
+    const brandLogoUrl = decodedItem?.item?.brand_logo_image_url;
+    const itemImageUrl = decodedItem?.item?.item?.img_url;
+    const itemNameFallback = decodedItem?.item?.item?.metadata?.name ?? "아이템 정보 없음";
+
+    // Dynamically calculate info box height based on content
+    let actualInfoBoxHeight = INFO_BOX_MIN_HEIGHT_PX;
+    // Add more precise height calculation if needed, e.g. based on text lines or image aspect ratio
+    // For now, assume ITEM_IMAGE_MAX_HEIGHT and brand name section contribute to MIN_HEIGHT
+
+    if (isLeftGroup) {
+      accTopLeft += actualInfoBoxHeight + INFO_BOX_PADDING_Y;
+    } else {
+      accTopRight += actualInfoBoxHeight + INFO_BOX_PADDING_Y;
+    }
+
+    const infoBoxStyle: React.CSSProperties = {
+      position: 'absolute',
+      top: `${currentInfoBoxTop}px`,
+      left: `${infoBoxCalculatedLeftPx}px`,
+      width: `${INFO_BOX_WIDTH_PX}px`,
+      minHeight: `${INFO_BOX_MIN_HEIGHT_PX}px`, // Use minHeight
+      padding: '10px 12px',
+      backgroundColor: 'rgba(40, 40, 40, 0.95)',
+      backdropFilter: 'blur(8px)',
+      color: '#EAEAEA',
+      borderRadius: '8px',
+      zIndex: 40,
+      pointerEvents: 'none',
+      boxShadow: '0 6px 18px rgba(0,0,0,0.5)',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+    };
+
+    const infoBoxCenterY = currentInfoBoxTop + actualInfoBoxHeight / 2;
+    const lineEnd = {
+      x: isLeftGroup ? 1 : itemContainerWidth - 1, // Line ends at image edge
+      y: infoBoxCenterY,
+    };
+    
+    const key = `${detailData!.doc_id}-effect-${decodedItem?.item?.item?._id || index}-${isLeftGroup ? 'left' : 'right'}`;
+
+    return (
+      <React.Fragment key={key}>
+        <div style={infoBoxStyle}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+            {brandLogoUrl && (
+              <img 
+                src={brandLogoUrl} 
+                alt={`${brandName} 로고`} 
+                style={{ 
+                  maxHeight: `${BRAND_LOGO_MAX_HEIGHT}px`, 
+                  maxWidth: '40px', // Limit width too
+                  objectFit: 'contain',
+                  marginRight: '8px',
+                  borderRadius: '3px',
+                }} 
+              />
+            )}
+            <p style={{ fontWeight: '600', fontSize:'13px', color: '#E0E0E0', flexGrow: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={brandName}>
+              {brandName}
+            </p>
+          </div>
+          {itemImageUrl ? (
+            <img 
+              src={itemImageUrl} 
+              alt={itemNameFallback} 
+              style={{ 
+                width: '100%', // Take full width of info box padding
+                maxHeight: `${ITEM_IMAGE_MAX_HEIGHT}px`, 
+                objectFit: 'cover', // or 'contain' depending on desired look
+                borderRadius: '4px', 
+                marginTop: 'auto', // Push to bottom if space allows
+              }} 
+            />
+          ) : (
+            <p style={{ fontSize: '11px', color: '#A0A0A0', textAlign:'center', marginTop:'auto', fontStyle:'italic' }}>{itemNameFallback} (이미지 없음)</p>
+          )}
+        </div>
+        <svg
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: itemContainerWidth,
+            height: itemContainerHeight,
+            pointerEvents: 'none',
+            zIndex: 39,
+          }}
+        >
+          <line
+            x1={lineStart.x} y1={lineStart.y}
+            x2={lineEnd.x} y2={lineEnd.y}
+            stroke="rgba(250, 204, 21, 0.75)"
+            strokeWidth="1.5"
+            strokeDasharray="5 2"
+          />
+        </svg>
+      </React.Fragment>
+    );
+  };
+
+  return (
+    <>
+      {leftItems.map((item, idx) => renderItemInfo(item, idx, true))}
+      {rightItems.map((item, idx) => renderItemInfo(item, idx, false))}
+    </>
+  );
+}
+
 const ImageItem = React.memo(function ImageItem({
   image,
   hoveredItemId,
@@ -22,15 +196,13 @@ const ImageItem = React.memo(function ImageItem({
   isFetchingDetail,
   detailError,
   onImageLoaded,
-  onMouseEnterItem, // 안정적인 콜백을 받음
+  onMouseEnterItem,
   onMouseLeaveItem,
 }: ImageItemProps) {
   const isCurrentlyHovered = hoveredItemId === image.id;
   const isAnotherImageHovered =
     hoveredItemId !== null && !isCurrentlyHovered;
 
-  // next/image에 전달될 width와 height를 안전하게 처리
-  // image 객체에 width/height가 없거나 유효하지 않은 경우, ITEM_WIDTH/ITEM_HEIGHT를 사용
   const displayWidth =
     typeof image.width === "number" && image.width > 0
       ? image.width
@@ -40,7 +212,13 @@ const ImageItem = React.memo(function ImageItem({
       ? image.height
       : ITEM_HEIGHT;
 
-  let itemClasses = `absolute bg-neutral-800 box-border flex justify-center items-center transition-all duration-300 ease-in-out overflow-hidden`;
+  let itemClasses = `absolute bg-neutral-800 box-border flex justify-center items-center transition-all duration-300 ease-in-out`;
+  
+  if (isCurrentlyHovered) {
+    itemClasses += " overflow-visible"; 
+  } else {
+    itemClasses += " overflow-hidden";
+  }
 
   if (image.loaded) {
     itemClasses += " opacity-100";
@@ -70,8 +248,8 @@ const ImageItem = React.memo(function ImageItem({
         ([key, value]) =>
           typeof value === "string" &&
           key !== "profile_image_url" &&
-          !key.startsWith("http") && // 간단한 URL 패턴 방지
-          value.length > 0 && value.length < 30 // 이름 길이에 대한 휴리스틱
+          !key.startsWith("http") && 
+          value.length > 0 && value.length < 30
       );
       if (personEntry) {
         primaryArtistName = personEntry[1] as string;
@@ -82,22 +260,22 @@ const ImageItem = React.memo(function ImageItem({
   return (
     <div
       key={image.id}
-      className={itemClasses}
+      className={`${itemClasses}`}
       style={{
         width: `${ITEM_WIDTH}px`,
         height: `${ITEM_HEIGHT}px`,
         left: `${image.left}px`,
         top: `${image.top}px`,
       }}
-      onMouseEnter={() => onMouseEnterItem(image.id, image.image_doc_id)} // 내부에서 인자 전달
+      onMouseEnter={() => onMouseEnterItem(image.id, image.image_doc_id)}
       onMouseLeave={onMouseLeaveItem}
     >
       <div className="relative w-full h-full">
         <Image
           src={image.src}
           alt={image.alt || `Image ${image.id}`}
-          width={displayWidth} // 수정된 width 사용
-          height={displayHeight} // 수정된 height 사용
+          width={displayWidth} 
+          height={displayHeight}
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
             isCurrentlyHovered || !isAnotherImageHovered
               ? "opacity-100"
@@ -117,7 +295,7 @@ const ImageItem = React.memo(function ImageItem({
         />
         {isCurrentlyHovered && (
           <div className="absolute inset-0 w-full h-full flex flex-col justify-between pointer-events-none bg-gradient-to-t from-black/70 via-black/40 to-transparent">
-            <div className="p-3">
+            <div className="p-3 pointer-events-none"> 
               {isFetchingDetail &&
                 hoveredImageDetailData?.doc_id !== image.image_doc_id && (
                   <div className="absolute top-2 right-2 p-1 bg-black/50 rounded-full">
@@ -134,38 +312,38 @@ const ImageItem = React.memo(function ImageItem({
                 hoveredImageDetailData.doc_id === image.image_doc_id && (
                   <>
                     {Object.values(hoveredImageDetailData.items || {}).flatMap(
-                      (itemArray: DecodedItem[] | undefined, arrayIndex: number) => { // undefined 가능성 추가
-                        if (!itemArray || itemArray.length === 0) { // itemArray가 비었거나 없는 경우 처리
+                      (itemArray: DecodedItem[] | undefined, arrayIndex: number) => {
+                        if (!itemArray || itemArray.length === 0) {
                           return [];
                         }
                         return itemArray.map((decodedItem, itemIndex) => {
-                          // decodedItem 및 내부 속성 접근 시 옵셔널 체이닝 강화
                           const itemName = decodedItem?.item?.item?.metadata?.name ?? "Unknown Item";
                           const brandName = decodedItem?.item?.brand_name ?? "Unknown Brand";
                           const brandLogoUrl = decodedItem?.item?.brand_logo_image_url;
                           const itemId = decodedItem?.item?.item?._id ?? `fallback-id-${arrayIndex}-${itemIndex}`;
-
-                          const decodedItemKey = `${image.id}-item-${arrayIndex}-${itemIndex}-${itemId}`;
-                          const tagHalfHeight = 10;
-                          const gapBetweenTagAndDot = 2;
-                          const dotTopPosition = tagHalfHeight + gapBetweenTagAndDot;
-
-                          // decodedItem.position이 없을 경우를 대비한 기본값 설정
+                          const decodedItemKey = `${image.id}-dot-${arrayIndex}-${itemIndex}-${itemId}`;
+                          
                           const positionTop = decodedItem?.position?.top ?? 50;
                           const positionLeft = decodedItem?.position?.left ?? 50;
+                          const parsedTop = typeof positionTop === 'string' ? parseFloat(positionTop) : positionTop;
+                          const parsedLeft = typeof positionLeft === 'string' ? parseFloat(positionLeft) : positionLeft;
+
+                          if (isNaN(parsedTop) || isNaN(parsedLeft)) return null;
 
                           return (
-                            <div
+                            <div 
                               key={decodedItemKey}
-                              className="absolute pointer-events-auto"
+                              className="absolute pointer-events-none"
                               style={{
-                                top: `${positionTop}%`,
-                                left: `${positionLeft}%`,
+                                top: `${parsedTop}%`,
+                                left: `${parsedLeft}%`,
+                                transform: 'translate(-50%, -50%)',
                               }}
                             >
                               <div
                                 className="flex flex-row items-center bg-black/70 rounded-full py-0.5 pl-0.5 pr-1.5 shadow-lg transform -translate-x-1/2 -translate-y-1/2 cursor-default"
                                 title={`${brandName} - ${itemName}`}
+                                style={{ position: 'relative' }}
                               >
                                 {brandLogoUrl && (
                                   <img
@@ -179,8 +357,7 @@ const ImageItem = React.memo(function ImageItem({
                                 </span>
                               </div>
                               <div
-                                className="absolute left-1/2 transform -translate-x-1/2 w-2 h-2 bg-yellow-400 rounded-full border border-white/70 shadow-md hover:scale-125 transition-transform duration-150 animate-pulse hover:animate-none cursor-pointer"
-                                style={{ top: `${dotTopPosition}px` }}
+                                className="absolute left-1/2 top-full transform -translate-x-1/2 mt-1 w-2 h-2 bg-yellow-400 rounded-full border border-white/70 shadow-md"
                                 title={`${itemName} by ${brandName}`}
                               ></div>
                             </div>
@@ -195,7 +372,7 @@ const ImageItem = React.memo(function ImageItem({
               (hoveredImageDetailData &&
                 hoveredImageDetailData.doc_id === image.image_doc_id &&
                 typeof hoveredImageDetailData.like === "number")) && (
-              <div className="px-4 pb-4 pt-12">
+              <div className="px-4 pb-4 pt-12 pointer-events-none"> 
                 <div className="flex justify-between items-center">
                   {primaryArtistName && (
                     <div className="border border-white/40 rounded-full px-3 py-1 bg-white/10 backdrop-blur-sm">
@@ -229,9 +406,17 @@ const ImageItem = React.memo(function ImageItem({
             )}
           </div>
         )}
+        
+        {isCurrentlyHovered && hoveredImageDetailData && hoveredImageDetailData.doc_id === image.image_doc_id && (
+          <HoverDetailEffect
+            itemContainerWidth={ITEM_WIDTH}
+            itemContainerHeight={ITEM_HEIGHT}
+            detailData={hoveredImageDetailData} 
+          />
+        )}
       </div>
     </div>
   );
-}); // React.memo HOC 사용
+});
 
 export default ImageItem; 
