@@ -84,7 +84,7 @@ export function BoxContainer({
 }: BoxContainerProps) {
   const [boxData, setBoxData] = useState<BoxData[]>([]);
   const initialized = useRef(false);
-  const resizeTimeoutRef = useRef<NodeJS.Timeout>();
+  const resizeTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   // 초기 위치 계산 및 설정
   useEffect(() => {

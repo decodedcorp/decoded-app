@@ -9,17 +9,17 @@ import gsap from 'gsap';
 interface DetailsListProps {
   imageData: any;
   selectedItemId?: string;
-  mainContainerRef?: React.RefObject<HTMLDivElement>;
-  bgContainerRef?: React.RefObject<HTMLDivElement>;
-  gridLayoutRef?: React.RefObject<HTMLDivElement>;
+  mainContainerRef?: React.MutableRefObject<HTMLDivElement | null>;
+  bgContainerRef?: React.MutableRefObject<HTMLDivElement | null>;
+  gridLayoutRef?: React.MutableRefObject<HTMLDivElement | null>;
   isExpanded: boolean;
 }
 
 interface DetailLayoutProps {
   children: React.ReactElement<{
-    mainContainerRef?: React.RefObject<HTMLDivElement>;
-    bgContainerRef?: React.RefObject<HTMLDivElement>;
-    gridLayoutRef?: React.RefObject<HTMLDivElement>;
+    mainContainerRef?: React.MutableRefObject<HTMLDivElement | null>;
+    bgContainerRef?: React.MutableRefObject<HTMLDivElement | null>;
+    gridLayoutRef?: React.MutableRefObject<HTMLDivElement | null>;
     layoutType: 'masonry' | 'list';
   }>[];
   imageData: any;

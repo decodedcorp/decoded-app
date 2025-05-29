@@ -18,7 +18,7 @@ interface UseInfiniteScrollReturn<T> {
   error: Error | null;
   hasMore: boolean;
   loadMore: () => Promise<void>;
-  loadingRef: React.RefObject<HTMLDivElement>;
+  loadingRef: React.MutableRefObject<HTMLDivElement | null>;
 }
 
 export function useInfiniteScroll<T>({

@@ -22,8 +22,8 @@ function FloatingBoxComponent({
   onHover,
 }: FloatingBoxProps) {
   const boxRef = useRef<HTMLDivElement>(null);
-  const animationRef = useRef<gsap.core.Timeline>();
-  const hoverTimelineRef = useRef<gsap.core.Timeline>();
+  const animationRef = useRef<gsap.core.Timeline | undefined>(undefined);
+  const hoverTimelineRef = useRef<gsap.core.Timeline | undefined>(undefined);
   const hasRequestedItems = Object.keys(resource.requested_items).length > 0;
 
   const depthEffect = useMemo(

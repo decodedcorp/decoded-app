@@ -16,7 +16,7 @@ export function useWebSocket({
   const [connectionStatus, setConnectionStatus] =
     useState<WebSocketConnectionStatus>('disconnected');
   const wsRef = useRef<WebSocket | null>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const connect = useCallback(async () => {
     try {

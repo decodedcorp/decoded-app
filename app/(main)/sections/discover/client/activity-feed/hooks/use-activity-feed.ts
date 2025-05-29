@@ -14,7 +14,7 @@ interface ActivityFeedReturn {
   totalActivities: number;
   hasMoreActivities: boolean;
   onAnimationComplete: () => void;
-  feedRef: React.RefObject<HTMLDivElement>;
+  feedRef: React.MutableRefObject<HTMLDivElement | null>;
   error?: Error;
 }
 
