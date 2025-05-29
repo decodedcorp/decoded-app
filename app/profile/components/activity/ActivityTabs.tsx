@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, type ReactElement } from 'react';
 import {
   Heart,
   SendHorizonal,
@@ -33,7 +33,7 @@ export const ActivityTabs = () => {
   };
 
   // 탭 아이콘 정의
-  const filterIcons: Record<TabType, JSX.Element> = {
+  const filterIcons: Record<TabType, ReactElement> = {
     home: <Heart className="h-3 w-3 mr-1" />,
     like: <Heart className="h-3 w-3 mr-1" />,
     request: <SendHorizonal className="h-3 w-3 mr-1" />,

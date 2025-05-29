@@ -6,7 +6,7 @@ import { TabType } from "@/components/Header/nav/modal/types/mypage";
 interface TabHeaderProps {
   activeTab: TabType;
   handleTabChange: (tab: TabType) => void;
-  filterIcons: Record<TabType, JSX.Element>;
+  filterIcons: Record<TabType, React.ReactElement>;
 }
 
 export const TabHeader = ({ activeTab, handleTabChange, filterIcons }: TabHeaderProps) => {
