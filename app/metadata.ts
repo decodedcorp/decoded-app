@@ -151,7 +151,7 @@ export function generateDetailMetadata(
 
   // 현재 페이지 URL 설정
   const currentUrl = data.doc_id
-    ? `${SITE_URL}/details-update/${data.doc_id}`
+    ? `${SITE_URL}//${data.doc_id}`
     : SITE_URL;
 
   return {
@@ -213,7 +213,7 @@ export async function generatePageMetadata({
 }
 
 function getPageType(pathname: string): PageType {
-  if (pathname.startsWith('/details-update/')) return 'detail';
+  if (pathname.startsWith('/details/')) return 'detail';
   if (pathname.startsWith('/search')) return 'search';
   if (pathname.startsWith('/list')) return 'list';
   return 'default';
