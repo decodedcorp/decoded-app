@@ -1,6 +1,50 @@
-import React from "react";
+'use client';
+
+import React, { useState, useEffect, useRef } from "react";
+import { LoginButton } from "@/components/Header/nav/LoginButton";
+import { X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { SearchModal } from "@/components/Header/search/SearchModal";
 
 export function ImageGridHeader() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const router = useRouter();
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+  const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const query = event.target.value;
+    setSearchQuery(query);
+    if (query.trim().length > 0) {
+      setIsSearchModalOpen(true);
+    } else {
+      setIsSearchModalOpen(false);
+    }
+  };
+
+  const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (searchQuery.trim()) {
+      setIsSearchModalOpen(false);
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setIsSearchModalOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [searchContainerRef]);
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
       <div className="container mx-auto px-6 py-4 flex items-center justify-between relative">
@@ -9,9 +53,9 @@ export function ImageGridHeader() {
           decoded
         </div>
 
-        {/* Center: Search Bar */}
-        <div className="absolute left-1/2 transform -translate-x-1/2 w-1/3 max-w-md">
-          <div className="relative">
+        {/* Center: Search Bar with SearchModal */}
+        <div ref={searchContainerRef} className="absolute left-1/2 transform -translate-x-1/2 w-1/3 max-w-md">
+          <form onSubmit={handleSearchSubmit} className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg
                 className="h-5 w-5 text-neutral-400"
@@ -33,14 +77,27 @@ export function ImageGridHeader() {
               className="block w-full pl-10 pr-3 py-2 border border-yellow-400 rounded-md leading-5 bg-black/30 text-white placeholder-neutral-400 focus:outline-none focus:bg-black/40 focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400 sm:text-sm"
               placeholder="Search"
               type="search"
+              value={searchQuery}
+              onChange={handleSearchInputChange}
+              onFocus={() => {
+                if (searchQuery.trim().length > 0) setIsSearchModalOpen(true);
+              }}
+              autoComplete="off"
             />
-          </div>
+          </form>
+          <SearchModal 
+            isOpen={isSearchModalOpen}
+            onClose={() => setIsSearchModalOpen(false)}
+            searchQuery={searchQuery}
+            onSearchReset={() => setSearchQuery("")}
+          />
         </div>
 
         {/* Right: Menu Button */}
         <div>
           <button
             type="button"
+            onClick={toggleSidebar}
             className="p-2 rounded-md text-neutral-300 hover:text-white hover:bg-black/20 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-yellow-400"
           >
             <span className="sr-only">Open main menu</span>
@@ -63,6 +120,39 @@ export function ImageGridHeader() {
           </button>
         </div>
       </div>
+
+      {/* Sidebar (Login Navigation) */}
+      {isSidebarOpen && (
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black/50 z-40" 
+            onClick={toggleSidebar} 
+            aria-hidden="true"
+          ></div>
+          
+          {/* Sidebar Panel */}
+          <div className="fixed top-0 right-0 w-80 h-full bg-neutral-900 z-50 p-6 shadow-xl flex flex-col">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-white">메뉴</h2>
+              <button
+                onClick={toggleSidebar}
+                className="p-1 rounded-md text-neutral-400 hover:text-white hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-yellow-400"
+              >
+                <X className="h-6 w-6" />
+                <span className="sr-only">Close menu</span>
+              </button>
+            </div>
+            
+            {/* Navigation Content */}
+            <nav className="flex flex-col space-y-4">
+              <LoginButton />
+              {/* 추가적인 네비게이션 링크나 컴포넌트를 여기에 추가할 수 있습니다. */}
+              {/* 예: <a href="/profile" className="text-neutral-300 hover:text-white">프로필</a> */}
+            </nav>
+          </div>
+        </>
+      )}
     </header>
   );
 }

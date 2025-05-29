@@ -141,7 +141,7 @@ const ImageItem = React.memo(function ImageItem({
                         return itemArray.map((decodedItem, itemIndex) => {
                           // decodedItem 및 내부 속성 접근 시 옵셔널 체이닝 강화
                           const itemName = decodedItem?.item?.item?.metadata?.name ?? "Unknown Item";
-                          const brandName = decodedItem?.item?.brand_name ?? "?";
+                          const brandName = decodedItem?.item?.brand_name ?? "Unknown Brand";
                           const brandLogoUrl = decodedItem?.item?.brand_logo_image_url;
                           const itemId = decodedItem?.item?.item?._id ?? `fallback-id-${arrayIndex}-${itemIndex}`;
 
