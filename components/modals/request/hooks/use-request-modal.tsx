@@ -12,7 +12,7 @@ interface RequestModalProps {
   modalType?: "request" | "style";
 }
 
-export const useRequestModal = ({ modalType = "request" }: RequestModalProps) => {
+export const useRequestModal = ({ isRequest = true }: RequestModalProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const { checkAuth } = useProtectedAction();
   const { openLoginModal } = useLoginModalStore();
