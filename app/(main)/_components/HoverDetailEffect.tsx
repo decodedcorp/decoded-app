@@ -5,11 +5,11 @@ import type { ImageDetail, DecodedItem } from "../_types/image-grid";
 
 // Constants migrated from ImageItem.tsx
 const INFO_BOX_WIDTH_PX = 170;
-const INFO_BOX_MIN_HEIGHT_PX = 135;
+const INFO_BOX_MIN_HEIGHT_PX = 175;
 const INFO_BOX_PADDING_Y = 8;
 const INFO_BOX_OFFSET_X_FROM_IMAGE = 15;
 const BRAND_LOGO_MAX_HEIGHT = 24;
-const ITEM_IMAGE_MAX_HEIGHT = 80;
+const ITEM_IMAGE_MAX_HEIGHT = 120;
 
 interface ItemInfoBoxProps {
   decodedItem: DecodedItem;
