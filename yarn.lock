@@ -6266,6 +6266,7 @@ __metadata:
     react-i18next: "npm:^15.4.1"
     react-intersection-observer: "npm:^9.15.1"
     react-masonry-css: "npm:^1.0.16"
+    react-type-animation: "npm:^3.2.0"
     sonner: "npm:^2.0.3"
     swiper: "npm:^11.2.2"
     tailwind-merge: "npm:^3.3.0"
@@ -10835,6 +10836,17 @@ __metadata:
     react: ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
     react-dom: ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
   checksum: 10c0/76fb8a813091951755cd7771674492f4a0faed0074aa3b175635f93b7cd38e9ca85ddff22426613f7dce52e22c9aed8602ed1f04ec17426cbed9f97cb2063256
+  languageName: node
+  linkType: hard
+
+"react-type-animation@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "react-type-animation@npm:3.2.0"
+  peerDependencies:
+    prop-types: ^15.5.4
+    react: ">= 15.0.0"
+    react-dom: ">= 15.0.0"
+  checksum: 10c0/bb8c114d9b3c81c4babe4b88ebb8b31c1e0fd7ffb39e5dce12ad20728717d3f9ba2e190e987790dc1ee95f869a909e03fd6551f1e548254e947b841c9c5ee619
   languageName: node
   linkType: hard
 

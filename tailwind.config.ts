@@ -38,8 +38,14 @@ const config: Config = {
           "100%": { transform: "translateY(0)", opacity: "1" },
         },
         slideDown: {
-          "0%": { transform: "translateY(-20px)", opacity: "0" },
-          "100%": { transform: "translateY(0)", opacity: "1" },
+          "0%": { 
+            transform: 'translateY(-100%)',
+            opacity: '0'
+          },
+          "100%": { 
+            transform: 'translateY(0)',
+            opacity: '1'
+          }
         },
         "grid-flash": {
           "0%, 100%": { opacity: "0.1" },
@@ -50,23 +56,29 @@ const config: Config = {
           "50%": { opacity: "0.8" },
         },
         float: {
-          "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-4px)" },
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-5px)' },
         },
         rotate: {
           "0%": { transform: "rotate(0deg)" },
           "100%": { transform: "rotate(360deg)" },
         },
+        fill: {
+          '0%': { fill: 'transparent' },
+          '50%': { fill: 'rgb(234 179 8)', stroke: 'rgb(234 179 8)' }, // yellow-500
+          '100%': { fill: 'transparent' },
+        }
       },
       // Custom Animations
       animation: {
         fadeIn: "fadeIn 0.5s ease-out",
         "slide-up": "slideUp 500ms ease-out",
-        "slide-down": "slideDown 500ms ease-out",
-        float: "float 1s cubic-bezier(0.37, 0, 0.63, 1) infinite",
+        "slide-down": "slide-down 0.3s ease-out forwards",
+        float: 'float 2s ease-in-out infinite',
         rotate: "rotate 10s linear infinite",
         "pulse-slow": "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         "marquee-infinite": "marquee 25s linear infinite",
+        fill: 'fill 2s ease-in-out infinite',
       },
       // Spacing & Layout
       spacing: {

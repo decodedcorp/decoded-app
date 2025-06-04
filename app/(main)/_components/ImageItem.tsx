@@ -8,6 +8,10 @@ import { ITEM_WIDTH, ITEM_HEIGHT } from "../_constants/image-grid";
 import { LikeDisplay } from "./LikeDisplay"; 
 import { ArtistBadge } from "./ArtistBadge"; 
 import { HoverDetailEffect } from "./HoverDetailEffect";
+import { TypeAnimation } from 'react-type-animation';
+import { TypeWriter } from './TypeWriter';
+import { ImageOverlay } from './ImageOverlay';
+import { ImageHeader } from './ImageHeader';
 
 interface ImageItemProps {
   image: ImageItemData;
@@ -29,6 +33,8 @@ const INFO_BOX_OFFSET_X_FROM_IMAGE = 15;
 const BRAND_LOGO_MAX_HEIGHT = 24;
 const ITEM_IMAGE_MAX_HEIGHT = 80; // Max height for the item image inside info box
 
+const ENABLE_FLIP_EFFECT = true; // true로 설정하면 플립 효과 활성화
+
 const ImageItem = React.memo(function ImageItem({
   image,
   hoveredItemId,
@@ -41,6 +47,7 @@ const ImageItem = React.memo(function ImageItem({
   onToggleLike,
   isLiked,
 }: ImageItemProps) {
+  const [isOverlayOpen, setIsOverlayOpen] = React.useState(false);
   const router = useRouter();
   const isCurrentlyHovered = hoveredItemId === image.id;
   const isAnotherImageHovered =
@@ -55,7 +62,7 @@ const ImageItem = React.memo(function ImageItem({
       ? image.height
       : ITEM_HEIGHT;
 
-  let itemClasses = `absolute bg-neutral-800 box-border flex justify-center items-center transition-all duration-300 ease-in-out group`;
+  let itemClasses = `absolute bg-black box-border flex justify-center items-center transition-all duration-300 ease-in-out group`;
   
   if (isCurrentlyHovered) {
     itemClasses += " overflow-visible"; 
@@ -100,8 +107,10 @@ const ImageItem = React.memo(function ImageItem({
     }
   }
 
-  const handleImageClick = () => {
-    router.push(`/details/${image.image_doc_id}`);
+  const handleImageClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    console.log('Header clicked, setting overlay to true');
+    setIsOverlayOpen(true);
   };
 
   const handleArtistClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -127,20 +136,21 @@ const ImageItem = React.memo(function ImageItem({
   return (
     <div
       key={image.id}
-      className={`${itemClasses} cursor-pointer`}
+      className={`${itemClasses} cursor-pointer ${isOverlayOpen ? 'overflow-hidden' : ''}`}
       style={{
         width: `${ITEM_WIDTH}px`,
         height: `${ITEM_HEIGHT}px`,
         left: `${image.left}px`,
         top: `${image.top}px`,
-        perspective: '1000px',
-        transformStyle: 'preserve-3d',
       }}
       onMouseEnter={() => onMouseEnterItem(image.id, image.image_doc_id)}
       onMouseLeave={onMouseLeaveItem}
-      onClick={handleImageClick}
     >
-      <div className="relative w-full h-full">
+      {/* 상단 헤더 */}
+      <ImageHeader onClick={handleImageClick} />
+
+      {/* 메인 이미지 */}
+      <div className={`relative w-full h-full ${isOverlayOpen ? 'overflow-hidden' : ''}`}>
         <Image
           src={image.src}
           alt={image.alt || `Image ${image.id}`}
@@ -164,7 +174,16 @@ const ImageItem = React.memo(function ImageItem({
           quality={75}
           priority={isPriorityImage}
         />
-        {isCurrentlyHovered && (
+
+        {/* 오버레이 */}
+        <ImageOverlay 
+          isOpen={isOverlayOpen}
+          isCurrentlyHovered={isCurrentlyHovered}
+          onClose={() => setIsOverlayOpen(false)}
+        />
+
+        {/* 기존 hover 효과들 */}
+        {isCurrentlyHovered && !isOverlayOpen && (
           <div className="absolute inset-0 w-full h-full flex flex-col justify-between pointer-events-none bg-gradient-to-t from-black/70 via-black/40 to-transparent">
             <div className="p-3 pointer-events-none"> 
               {isFetchingDetail &&
@@ -251,7 +270,7 @@ const ImageItem = React.memo(function ImageItem({
           </div>
         )}
         
-        {isCurrentlyHovered && hoveredImageDetailData && hoveredImageDetailData.doc_id === image.image_doc_id && (
+        {isCurrentlyHovered && !isOverlayOpen && hoveredImageDetailData && hoveredImageDetailData.doc_id === image.image_doc_id && (
           <div 
             className="absolute inset-0 w-full h-full pointer-events-none" 
             style={{transformStyle: 'preserve-3d'}}

@@ -159,12 +159,14 @@ export function ImageGridHeader() {
       {isCategoryFilterOpen && (
         <>
           {/* Backdrop */}
-          <CategoryFilter />
           <div
             className="fixed inset-0 bg-black/50 z-40"
             onClick={toggleCategoryFilter}
             aria-hidden="true"
           ></div>
+          <div className="relative z-50">
+            <CategoryFilter />
+          </div>
         </>
       )}
 

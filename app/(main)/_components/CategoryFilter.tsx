@@ -1,23 +1,22 @@
 'use client';
 
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 
 interface Category {
   id: string;
   name: string;
-  color: string; // Tailwind background color class e.g., bg-orange-500
-  textColor: string; // Tailwind text color class e.g., text-white
 }
 
 // Initial categories based on user request and provided image
 const initialCategories: Category[] = [
-  { id: 'all', name: 'all', color: 'bg-orange-500', textColor: 'text-white' },
-  { id: 'k-pop', name: 'k-pop', color: 'bg-pink-500', textColor: 'text-white' },
-  { id: 'actor', name: 'actor', color: 'bg-teal-500', textColor: 'text-white' },
-  { id: 'everyday', name: 'everyday', color: 'bg-yellow-400', textColor: 'text-black' },
-  { id: 'nature', name: 'nature', color: 'bg-green-400', textColor: 'text-black' },
-  { id: 'technology', name: 'technology', color: 'bg-sky-500', textColor: 'text-white' },
-  { id: 'transport', name: 'transport', color: 'bg-purple-500', textColor: 'text-white' },
+  { id: 'all', name: 'all' },
+  { id: 'k-pop', name: 'k-pop' },
+  { id: 'actor', name: 'actor' },
+  { id: 'everyday', name: 'everyday' },
+  { id: 'nature', name: 'nature' },
+  { id: 'technology', name: 'technology' },
+  { id: 'transport', name: 'transport' },
   // Add more categories as needed
 ];
 
@@ -34,23 +33,57 @@ export function CategoryFilter({ }: CategoryFilterProps) {
     console.log(`Category selected: ${categoryId}`);
   };
 
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05,
+        delayChildren: 0.1,
+        duration: 0.3
+      }
+    }
+  };
+
+  const item = {
+    hidden: { 
+      opacity: 0, 
+      y: -10,
+      scale: 0.95
+    },
+    show: { 
+      opacity: 1, 
+      y: 0,
+      scale: 1,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 24
+      }
+    }
+  };
+
   return (
-    <div className="flex space-x-2 px-4 py-3 justify-start md:justify-center overflow-x-auto whitespace-nowrap scrollbar-hide">
+    <motion.div
+      variants={container}
+      initial="hidden"
+      animate="show"
+      className="flex flex-wrap gap-2 px-4 py-3 justify-start md:justify-center"
+    >
       {initialCategories.map((category) => (
-        <button
+        <motion.button
           key={category.id}
+          variants={item}
           onClick={() => handleCategoryClick(category.id)}
           className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-150 ease-in-out
-            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-neutral-900
             ${category.id === selectedCategoryId 
-              ? `${category.color} ${category.textColor} ring-2 ring-white/70 shadow-md`
-              : `${category.color}/60 ${category.textColor}/90 hover:${category.color} hover:${category.textColor}/100 hover:shadow-sm`}
-          `}
+              ? 'bg-white text-black shadow-md'
+              : 'bg-white/10 text-white/70 hover:bg-white/20 hover:text-white'}`}
         >
           {category.name}
-        </button>
+        </motion.button>
       ))}
-    </div>
+    </motion.div>
   );
 }
 

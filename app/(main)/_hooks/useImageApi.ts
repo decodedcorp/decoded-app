@@ -27,6 +27,7 @@ export function useImageApi() {
     if (isFetchingApiImagesRef.current || allApiImagesFetchedRef.current) {
       return false;
     }
+
     isFetchingApiImagesRef.current = true;
     const url = nextApiPageIdRef.current
       ? `${API_BASE_URL}?next_id=${nextApiPageIdRef.current}`
@@ -36,109 +37,73 @@ export function useImageApi() {
       const response = await fetch(url, {
         headers: { accept: "application/json" },
       });
+
       if (!response.ok) {
-        let responseBody = null;
-        try {
-          responseBody = await response.text();
-        } catch (textError) {
-          // silent fail for reading body
-        }
-        throw new Error(
-          `API request failed: ${response.status} ${
-            response.statusText
-          }. Body: ${responseBody || "N/A"}`
-        );
+        throw new Error(`API request failed: ${response.status}`);
       }
+
       const data: ApiResponse = await response.json();
-      if (data.status_code === 200 && data.data && data.data.images) {
-        if (data.data.images.length > 0) {
-          apiImageUrlListRef.current = [
-            ...apiImageUrlListRef.current,
-            ...data.data.images,
-          ];
-          setApiImageCount(apiImageUrlListRef.current.length); // 상태 업데이트 함수 사용
-          nextApiPageIdRef.current = data.data.maybe_next_id;
-          if (!data.data.maybe_next_id) {
-            allApiImagesFetchedRef.current = true;
-          }
-          return true;
-        } else {
-          if (
-            apiImageUrlListRef.current.length > 0 ||
-            !data.data.maybe_next_id
-          ) {
-            allApiImagesFetchedRef.current = true;
-          }
-          nextApiPageIdRef.current = null;
-          return false;
-        }
-      } else {
-        allApiImagesFetchedRef.current = true;
-        nextApiPageIdRef.current = null;
-        return false;
+      
+      if (data.status_code === 200 && data.data?.images?.length > 0) {
+        apiImageUrlListRef.current = [
+          ...apiImageUrlListRef.current,
+          ...data.data.images,
+        ];
+        setApiImageCount(apiImageUrlListRef.current.length);
+        nextApiPageIdRef.current = data.data.maybe_next_id;
+        allApiImagesFetchedRef.current = !data.data.maybe_next_id;
+        return true;
       }
+
+      allApiImagesFetchedRef.current = true;
+      nextApiPageIdRef.current = null;
+      return false;
     } catch (error) {
-      console.error("Error fetching API images:", error); // 에러 로깅 추가
+      console.error("Error fetching API images:", error);
       allApiImagesFetchedRef.current = true;
       nextApiPageIdRef.current = null;
       return false;
     } finally {
       isFetchingApiImagesRef.current = false;
     }
-  }, [setApiImageCount]); // apiImageCount 대신 setApiImageCount를 의존성으로
+  }, []);
 
-  const fetchImageDetail = useCallback(
-    async (docId: string) => {
-      if (detailCacheRef.current[docId]) {
-        setHoveredImageDetailData(detailCacheRef.current[docId]);
-        setDetailError(null);
-        setIsFetchingDetail(false);
-        return;
-      }
-
-      setIsFetchingDetail(true);
-      setHoveredImageDetailData(null);
+  const fetchImageDetail = useCallback(async (docId: string) => {
+    if (detailCacheRef.current[docId]) {
+      setHoveredImageDetailData(detailCacheRef.current[docId]);
       setDetailError(null);
+      setIsFetchingDetail(false);
+      return;
+    }
 
-      try {
-        const response = await fetch(`${API_BASE_URL}/${docId}`, {
-          headers: { accept: "application/json" },
-        });
-        if (!response.ok) {
-          let errorBody = "Failed to fetch image details";
-          try {
-            errorBody = await response.text();
-          } catch {}
-          console.error(
-            "Error fetching image detail:",
-            response.status,
-            errorBody
-          );
-          throw new Error(
-            `Details fetch failed: ${response.status}. ${errorBody}`
-          );
-        }
-        const data: ImageDetailResponse = await response.json();
-        if (data.status_code === 200 && data.data && data.data.image) {
-          detailCacheRef.current[docId] = data.data.image;
-          setHoveredImageDetailData(data.data.image);
-        } else {
-          console.error("Image detail API response error:", data);
-          throw new Error(
-            data.description || "Invalid data structure from detail API"
-          );
-        }
-      } catch (error: any) {
-        setDetailError(
-          error.message || "An unknown error occurred while fetching details."
-        );
-        setHoveredImageDetailData(null);
-      } finally {
-        setIsFetchingDetail(false);
+    setIsFetchingDetail(true);
+    setHoveredImageDetailData(null);
+    setDetailError(null);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/${docId}`, {
+        headers: { accept: "application/json" },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Details fetch failed: ${response.status}`);
       }
-    },
-    [setHoveredImageDetailData, setDetailError, setIsFetchingDetail] // 상태 설정 함수들을 의존성으로
-  );
+
+      const data: ImageDetailResponse = await response.json();
+      
+      if (data.status_code === 200 && data.data?.image) {
+        detailCacheRef.current[docId] = data.data.image;
+        setHoveredImageDetailData(data.data.image);
+      } else {
+        throw new Error(data.description || "Invalid data structure from detail API");
+      }
+    } catch (error: any) {
+      setDetailError(error.message || "An unknown error occurred while fetching details.");
+      setHoveredImageDetailData(null);
+    } finally {
+      setIsFetchingDetail(false);
+    }
+  }, []);
 
   return {
     // API 이미지 목록 관련
@@ -149,16 +114,14 @@ export function useImageApi() {
     apiImageCount,
     allApiImagesFetchedRef,
     fetchAndCacheApiImages,
-    setApiImageCount, // MainPage에서 초기화 등에 필요할 수 있음
+    setApiImageCount,
 
     // 이미지 상세 정보 관련
     hoveredImageDetailData,
     isFetchingDetail,
     detailError,
-    detailCacheRef, // MainPage의 ImageItem에서 사용될 수 있음
+    detailCacheRef,
     fetchImageDetail,
-    setHoveredImageDetailData, // 외부에서 직접 호출할 일이 있다면 반환
-    // setDetailError, // 보통 내부에서만 관리
-    // setIsFetchingDetail, // 보통 내부에서만 관리
+    setHoveredImageDetailData,
   };
 } 
