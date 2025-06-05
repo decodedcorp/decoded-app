@@ -26,6 +26,9 @@ export interface ImageItemData {
   image_doc_id: string;
   width?: number;
   height?: number;
+  likes?: number;
+  x: number;
+  y: number;
 }
 
 // --- Interfaces for Image Detail API ---

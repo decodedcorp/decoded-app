@@ -1,17 +1,24 @@
-"use client";
+'use client';
 
-import React from "react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import type { ImageItemData, ImageDetail, DecodedItem } from "../_types/image-grid";
-import { ITEM_WIDTH, ITEM_HEIGHT } from "../_constants/image-grid";
-import { LikeDisplay } from "./LikeDisplay"; 
-import { ArtistBadge } from "./ArtistBadge"; 
-import { HoverDetailEffect } from "./HoverDetailEffect";
+import React, { useState } from 'react';
+import Image from 'next/image';
+import { useRouter, useSearchParams } from 'next/navigation';
+import type {
+  ImageItemData,
+  ImageDetail,
+  DecodedItem,
+} from '../_types/image-grid';
+import { ITEM_WIDTH, ITEM_HEIGHT } from '../_constants/image-grid';
+import { LikeDisplay } from './LikeDisplay';
+import { ArtistBadge } from './ArtistBadge';
+import { HoverDetailEffect } from './HoverDetailEffect';
 import { TypeAnimation } from 'react-type-animation';
 import { TypeWriter } from './TypeWriter';
 import { ImageOverlay } from './ImageOverlay';
 import { ImageHeader } from './ImageHeader';
+import dynamic from 'next/dynamic';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+const DetailsUpdateModal = dynamic(() => import('./DetailsUpdateModal'));
 
 interface ImageItemProps {
   image: ImageItemData;
@@ -22,20 +29,21 @@ interface ImageItemProps {
   onImageLoaded: (id: string) => void;
   onMouseEnterItem: (itemId: string, imageDocId: string) => void;
   onMouseLeaveItem: () => void;
-  onToggleLike: (imageDocId: string) => Promise<void>;
+  onToggleLike: (imageDocId: string) => void;
   isLiked: boolean;
+  onClick: (image: ImageItemData, detail: ImageDetail | null) => void;
 }
 
-const INFO_BOX_WIDTH_PX = 170; 
+const INFO_BOX_WIDTH_PX = 170;
 const INFO_BOX_MIN_HEIGHT_PX = 135; // Min height, will adjust if item image is taller
-const INFO_BOX_PADDING_Y = 8; 
+const INFO_BOX_PADDING_Y = 8;
 const INFO_BOX_OFFSET_X_FROM_IMAGE = 15;
 const BRAND_LOGO_MAX_HEIGHT = 24;
 const ITEM_IMAGE_MAX_HEIGHT = 80; // Max height for the item image inside info box
 
 const ENABLE_FLIP_EFFECT = true; // true로 설정하면 플립 효과 활성화
 
-const ImageItem = React.memo(function ImageItem({
+const ImageItem: React.FC<ImageItemProps> = ({
   image,
   hoveredItemId,
   hoveredImageDetailData,
@@ -46,42 +54,47 @@ const ImageItem = React.memo(function ImageItem({
   onMouseLeaveItem,
   onToggleLike,
   isLiked,
-}: ImageItemProps) {
-  const [isOverlayOpen, setIsOverlayOpen] = React.useState(false);
+  onClick,
+}) => {
+  const searchParams = useSearchParams();
   const router = useRouter();
+  const [isOverlayOpen, setIsOverlayOpen] = React.useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = React.useState(false);
+  const [previewData, setPreviewData] = React.useState<any>(null);
+  const [modalData, setModalData] = useState<any>(null);
+  const [isHovered, setIsHovered] = useState(false);
   const isCurrentlyHovered = hoveredItemId === image.id;
-  const isAnotherImageHovered =
-    hoveredItemId !== null && !isCurrentlyHovered;
+  const isAnotherImageHovered = hoveredItemId !== null && !isCurrentlyHovered;
 
   const displayWidth =
-    typeof image.width === "number" && image.width > 0
+    typeof image.width === 'number' && image.width > 0
       ? image.width
       : ITEM_WIDTH;
   const displayHeight =
-    typeof image.height === "number" && image.height > 0
+    typeof image.height === 'number' && image.height > 0
       ? image.height
       : ITEM_HEIGHT;
 
   let itemClasses = `absolute bg-black box-border flex justify-center items-center transition-all duration-300 ease-in-out group`;
-  
+
   if (isCurrentlyHovered) {
-    itemClasses += " overflow-visible"; 
+    itemClasses += ' overflow-visible';
   } else {
-    itemClasses += " overflow-hidden";
+    itemClasses += ' overflow-hidden';
   }
 
   if (image.loaded) {
-    itemClasses += " opacity-100";
+    itemClasses += ' opacity-100';
   } else {
-    itemClasses += " opacity-30";
+    itemClasses += ' opacity-30';
   }
 
   if (isCurrentlyHovered) {
-    itemClasses += " scale-105 -rotate-y-3 z-30 brightness-110";
+    itemClasses += ' scale-105 -rotate-y-3 z-30 brightness-110';
   } else if (isAnotherImageHovered) {
-    itemClasses += " opacity-40 blur-xs scale-95 z-0 brightness-75";
+    itemClasses += ' opacity-40 blur-xs scale-95 z-0 brightness-75';
   } else {
-    itemClasses += " z-10";
+    itemClasses += ' z-10';
   }
 
   let primaryArtistName: string | null = null;
@@ -91,15 +104,14 @@ const ImageItem = React.memo(function ImageItem({
     hoveredImageDetailData.doc_id === image.image_doc_id
   ) {
     if (hoveredImageDetailData.metadata) {
-      const metadataEntries = Object.entries(
-        hoveredImageDetailData.metadata
-      );
+      const metadataEntries = Object.entries(hoveredImageDetailData.metadata);
       const personEntry = metadataEntries.find(
         ([key, value]) =>
-          typeof value === "string" &&
-          key !== "profile_image_url" &&
-          !key.startsWith("http") && 
-          value.length > 0 && value.length < 30
+          typeof value === 'string' &&
+          key !== 'profile_image_url' &&
+          !key.startsWith('http') &&
+          value.length > 0 &&
+          value.length < 30
       );
       if (personEntry) {
         primaryArtistName = personEntry[1] as string;
@@ -113,17 +125,42 @@ const ImageItem = React.memo(function ImageItem({
     setIsOverlayOpen(true);
   };
 
+  const handleMainImageClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const response = await fetch(`/api/details-update/${image.image_doc_id}`);
+      const data = await response.json();
+      setPreviewData(data);
+      setIsPreviewOpen(true);
+    } catch (error) {
+      console.error('Failed to fetch data:', error);
+    }
+  };
+
+  const handleViewDetails = async () => {
+    try {
+      const response = await fetch(`/api/details-update/${image.image_doc_id}`);
+      const data = await response.json();
+      setModalData(data);
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('modal', image.image_doc_id);
+      router.push(`?${params.toString()}`, { scroll: false });
+    } catch (error) {
+      console.error('Failed to fetch data:', error);
+    }
+  };
+
   const handleArtistClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     if (primaryArtistName) {
-      console.log("Artist badge clicked in ImageItem:", primaryArtistName);
+      console.log('Artist badge clicked in ImageItem:', primaryArtistName);
       // router.push(`/artist/${primaryArtistName}`); // Example navigation
     }
   };
 
   const handleLikeToggle = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
-    console.log("Like clicked in ImageItem for image:", image.image_doc_id);
+    console.log('Like clicked in ImageItem for image:', image.image_doc_id);
     onToggleLike(image.image_doc_id);
   };
 
@@ -133,158 +170,159 @@ const ImageItem = React.memo(function ImageItem({
     onImageLoaded(image.id);
   };
 
+  // 라우트 프리페칭을 위한 함수
+  const prefetchRoute = async () => {
+    try {
+      // 해당 라우트의 데이터를 미리 가져옵니다
+      const response = await fetch(`/api/details-update/${image.image_doc_id}`);
+      const data = await response.json();
+      setPreviewData(data);
+      setIsPreviewOpen(true);
+    } catch (error) {
+      console.error('Failed to prefetch route:', error);
+    }
+  };
+
+  // 현재 모달이 열려있는지 확인
+  const isModalOpen = searchParams.get('modal') === image.image_doc_id;
+
+  const handleCloseModal = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('modal');
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    onMouseEnterItem(image.id, image.image_doc_id);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    onMouseLeaveItem();
+  };
+
+  const getOverlayPosition = () => {
+    const screenWidth = window.innerWidth;
+    const sectionWidth = screenWidth / 3;
+    const imageCenter = image.left + ITEM_WIDTH / 2;
+
+    // 1번째 영역 (왼쪽)
+    if (imageCenter < sectionWidth) {
+      return 'right';
+    }
+    // 2번째 영역 (가운데)
+    else if (imageCenter < sectionWidth * 2) {
+      return 'center';
+    }
+    // 3번째 영역 (오른쪽)
+    else {
+      return 'left';
+    }
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('Image clicked:', image);
+    onClick(image, hoveredImageDetailData);
+  };
+
   return (
     <div
+      data-image-id={image.id}
       key={image.id}
-      className={`${itemClasses} cursor-pointer ${isOverlayOpen ? 'overflow-hidden' : ''}`}
+      className={`${itemClasses} cursor-pointer`}
       style={{
         width: `${ITEM_WIDTH}px`,
         height: `${ITEM_HEIGHT}px`,
         left: `${image.left}px`,
         top: `${image.top}px`,
       }}
-      onMouseEnter={() => onMouseEnterItem(image.id, image.image_doc_id)}
-      onMouseLeave={onMouseLeaveItem}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onClick={handleClick}
     >
-      {/* 상단 헤더 */}
-      <ImageHeader onClick={handleImageClick} />
+      <Image
+        src={image.src}
+        alt={image.alt || `Image ${image.id}`}
+        width={displayWidth}
+        height={displayHeight}
+        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
+          isHovered || !isAnotherImageHovered ? 'opacity-100' : 'opacity-50'
+        }`}
+        style={{
+          filter:
+            isHovered || !isAnotherImageHovered
+              ? 'none'
+              : 'grayscale(80%) brightness(0.7)',
+          transition: 'opacity 300ms ease-in-out, filter 300ms ease-in-out',
+        }}
+        onLoad={handleImageLoad}
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        quality={75}
+        priority={isPriorityImage}
+      />
 
-      {/* 메인 이미지 */}
-      <div className={`relative w-full h-full ${isOverlayOpen ? 'overflow-hidden' : ''}`}>
-        <Image
-          src={image.src}
-          alt={image.alt || `Image ${image.id}`}
-          width={displayWidth}
-          height={displayHeight}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
-            isCurrentlyHovered || !isAnotherImageHovered
-              ? "opacity-100"
-              : "opacity-50"
-          }`}
-          style={{
-            filter:
-              isCurrentlyHovered || !isAnotherImageHovered
-                ? "none"
-                : "grayscale(80%) brightness(0.7)",
-            transition:
-              "opacity 300ms ease-in-out, filter 300ms ease-in-out",
+      {/* 헤더 - 상태에 따라 다른 화살표 표시 */}
+      {isHovered && (
+        <ImageHeader
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsOverlayOpen(!isOverlayOpen);
           }}
-          onLoad={handleImageLoad}
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          quality={75}
-          priority={isPriorityImage}
+          isOverlayOpen={isOverlayOpen}
         />
+      )}
 
-        {/* 오버레이 */}
-        <ImageOverlay 
-          isOpen={isOverlayOpen}
-          isCurrentlyHovered={isCurrentlyHovered}
-          onClose={() => setIsOverlayOpen(false)}
-        />
+      {/* ArtistBadge 추가 */}
+      {primaryArtistName && (
+        <div className="absolute bottom-4 left-4 z-20">
+          <ArtistBadge
+            artistName={primaryArtistName}
+            onClick={handleArtistClick}
+          />
+        </div>
+      )}
 
-        {/* 기존 hover 효과들 */}
-        {isCurrentlyHovered && !isOverlayOpen && (
-          <div className="absolute inset-0 w-full h-full flex flex-col justify-between pointer-events-none bg-gradient-to-t from-black/70 via-black/40 to-transparent">
-            <div className="p-3 pointer-events-none"> 
-              {isFetchingDetail &&
-                hoveredImageDetailData?.doc_id !== image.image_doc_id && (
-                  <div className="absolute top-2 right-2 p-1 bg-black/50 rounded-full">
-                    <div className="w-3 h-3 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
-                  </div>
-                )}
-              {detailError &&
-                hoveredImageDetailData?.doc_id !== image.image_doc_id && (
-                  <div className="absolute top-2 right-2 p-1 text-red-500 text-xs bg-black/50 rounded">
-                    Error!
-                  </div>
-                )}
-              {hoveredImageDetailData &&
-                hoveredImageDetailData.doc_id === image.image_doc_id && (
-                  <>
-                    {Object.values(hoveredImageDetailData.items || {}).flatMap(
-                      (itemArray: DecodedItem[] | undefined, arrayIndex: number) => {
-                        if (!itemArray || itemArray.length === 0) {
-                          return [];
-                        }
-                        return itemArray.map((decodedItem, itemIndex) => {
-                          const itemName = decodedItem?.item?.item?.metadata?.name ?? "Unknown Item";
-                          const brandName = decodedItem?.item?.brand_name ?? "Unknown Brand";
-                          const itemId = decodedItem?.item?.item?._id ?? `fallback-id-${arrayIndex}-${itemIndex}`;
-                          const decodedItemKey = `${image.id}-dot-${arrayIndex}-${itemIndex}-${itemId}`;
-                          
-                          const positionTop = decodedItem?.position?.top ?? 50;
-                          const positionLeft = decodedItem?.position?.left ?? 50;
-                          const parsedTop = typeof positionTop === 'string' ? parseFloat(positionTop) : positionTop;
-                          const parsedLeft = typeof positionLeft === 'string' ? parseFloat(positionLeft) : positionLeft;
+      {/* LikeDisplay 추가 */}
+      {isHovered && (
+        <div className="absolute bottom-4 right-4 z-20">
+          <LikeDisplay
+            likeCount={image.likes || 0}
+            isLiked={isLiked}
+            onLikeClick={handleLikeToggle}
+          />
+        </div>
+      )}
 
-                          if (isNaN(parsedTop) || isNaN(parsedLeft)) return null;
+      {/* ImageOverlay - 헤더 제거 */}
+      <ImageOverlay
+        isOpen={isOverlayOpen}
+        isCurrentlyHovered={isCurrentlyHovered}
+        onClose={() => {
+          setIsOverlayOpen(false);
+        }}
+      />
 
-                          return (
-                            <div 
-                              key={decodedItemKey}
-                              className="absolute pointer-events-none"
-                              style={{
-                                top: `${parsedTop}%`,
-                                left: `${parsedLeft}%`,
-                                transform: 'translate(-50%, -50%)',
-                              }}
-                            >
-                              <div
-                                className="absolute left-1/2 top-full transform -translate-x-1/2 mt-1 w-2 h-2 bg-yellow-400 rounded-full border border-white/70 shadow-md"
-                                title={`${itemName} by ${brandName}`}
-                              ></div>
-                            </div>
-                          );
-                        });
-                      }
-                    )}
-                  </>
-                )}
-            </div>
-            {(primaryArtistName ||
-              (hoveredImageDetailData &&
-                hoveredImageDetailData.doc_id === image.image_doc_id &&
-                typeof hoveredImageDetailData.like === "number")) && (
-              <div className="px-4 pb-4 pt-12">
-                <div className="flex justify-between items-center">
-                  {primaryArtistName && (
-                    <ArtistBadge 
-                      artistName={primaryArtistName} 
-                      onClick={handleArtistClick}
-                      className="pointer-events-auto"
-                    />
-                  )}
-                  {hoveredImageDetailData &&
-                    hoveredImageDetailData.doc_id === image.image_doc_id &&
-                    typeof hoveredImageDetailData.like === "number" && (
-                      <LikeDisplay
-                        likeCount={hoveredImageDetailData.like}
-                        isLiked={isLiked}
-                        onLikeClick={handleLikeToggle}
-                        className="pointer-events-auto"
-                      />
-                    )}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-        
-        {isCurrentlyHovered && !isOverlayOpen && hoveredImageDetailData && hoveredImageDetailData.doc_id === image.image_doc_id && (
-          <div 
-            className="absolute inset-0 w-full h-full pointer-events-none" 
-            style={{transformStyle: 'preserve-3d'}}
+      {/* 기존 hover 효과들 */}
+      {isCurrentlyHovered &&
+        !isOverlayOpen &&
+        hoveredImageDetailData &&
+        hoveredImageDetailData.doc_id === image.image_doc_id && (
+          <div
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            style={{ transformStyle: 'preserve-3d' }}
           >
             <HoverDetailEffect
               itemContainerWidth={ITEM_WIDTH}
               itemContainerHeight={ITEM_HEIGHT}
-              detailData={hoveredImageDetailData} 
+              detailData={hoveredImageDetailData}
             />
           </div>
         )}
-      </div>
     </div>
   );
-});
+};
 
-export default ImageItem; 
+export default ImageItem;

@@ -102,7 +102,7 @@ export function ImageSection({
 
   if (!imageData) return null;
 
-  const allItems = Object.values(imageData.items).flat();
+  const allItems = imageData.items || [];
 
   return (
     <div

@@ -68,12 +68,12 @@ export function useImageApi() {
     }
   }, []);
 
-  const fetchImageDetail = useCallback(async (docId: string) => {
+  const fetchImageDetail = async (docId: string): Promise<ImageDetail> => {
     if (detailCacheRef.current[docId]) {
       setHoveredImageDetailData(detailCacheRef.current[docId]);
       setDetailError(null);
       setIsFetchingDetail(false);
-      return;
+      return detailCacheRef.current[docId];
     }
 
     setIsFetchingDetail(true);
@@ -94,16 +94,18 @@ export function useImageApi() {
       if (data.status_code === 200 && data.data?.image) {
         detailCacheRef.current[docId] = data.data.image;
         setHoveredImageDetailData(data.data.image);
+        return data.data.image;
       } else {
         throw new Error(data.description || "Invalid data structure from detail API");
       }
     } catch (error: any) {
       setDetailError(error.message || "An unknown error occurred while fetching details.");
       setHoveredImageDetailData(null);
+      throw error;
     } finally {
       setIsFetchingDetail(false);
     }
-  }, []);
+  };
 
   return {
     // API 이미지 목록 관련
