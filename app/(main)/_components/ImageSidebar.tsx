@@ -1,8 +1,6 @@
 'use client';
 
 import { ImageDetail } from '../_types/image-grid';
-import { X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 interface ImageSidebarProps {
   isOpen: boolean;
@@ -20,17 +18,8 @@ export function ImageSidebar({
   detailError,
 }: ImageSidebarProps) {
   return (
-    <div className="h-full w-full bg-white shadow-lg">
+    <div className="h-full w-full bg-white shadow-lg relative">
       <div className="p-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-4 right-4"
-          onClick={onClose}
-        >
-          <X className="h-4 w-4" />
-        </Button>
-        
         {isFetchingDetail ? (
           <div>Loading...</div>
         ) : detailError ? (

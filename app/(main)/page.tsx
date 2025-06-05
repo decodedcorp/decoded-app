@@ -13,6 +13,8 @@ import { useIsLike } from "@/app/details/utils/hooks/isLike";
 import { useAuth } from "@/lib/hooks/features/auth/useAuth";
 import { ImageSidebar } from './_components/ImageSidebar';
 import { ScrollRemote } from './_components/ScrollRemote';
+import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
 
 const MainPage = () => {
   const {
@@ -371,9 +373,62 @@ const MainPage = () => {
               detailError={selectedImageError}
             />
           </div>
+
+          {/* 사이드바 외부 버튼 */}
+          {isSidebarOpen && (
+            <div 
+              className="absolute right-[32%] bottom-8 flex flex-col gap-4 transition-all duration-300 ease-in-out"
+              style={{
+                opacity: isSidebarOpen ? 1 : 0,
+                transform: `translateX(${isSidebarOpen ? '0' : '20px'})`
+              }}
+            >
+              <Button
+                variant="default"
+                size="icon"
+                className="h-10 w-10 rounded-full bg-yellow-400 text-black hover:bg-yellow-500 shadow-xl transition-all duration-300 group"
+                onClick={handleCloseSidebar}
+              >
+                <svg
+                  className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </Button>
+              <Button
+                variant="default"
+                size="icon"
+                className="h-10 w-10 rounded-full bg-yellow-400 text-black hover:bg-yellow-500 shadow-xl transition-all duration-300 group"
+              >
+                <svg
+                  className="w-5 h-5 transition-all duration-300 group-hover:scale-110"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5"
+                  />
+                </svg>
+              </Button>
+            </div>
+          )}
         </div>
         <FabMenu />
-        <ScrollRemote onScroll={handleRemoteScroll} />
+        {/* <ScrollRemote onScroll={handleRemoteScroll} /> */}
       </div>
     </>
   );
