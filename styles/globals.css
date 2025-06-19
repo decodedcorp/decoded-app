@@ -179,14 +179,40 @@ footer {
 @media (max-width: 640px) {
   html {
     -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
   }
   
   body {
     @apply touch-pan-y;
+    -webkit-overflow-scrolling: touch;
   }
   
   .touch-target {
     @apply min-h-[44px] min-w-[44px];  /* Apple의 권장 터치 타겟 크기 */
+  }
+  
+  /* 터치 이벤트 최적화 */
+  * {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* 이미지 터치 최적화 */
+  img {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    pointer-events: auto;
+  }
+  
+  /* 터치 매니퓰레이션 최적화 */
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
   }
 }
 

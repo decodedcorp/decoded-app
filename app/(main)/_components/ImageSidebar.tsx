@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { ImageDetail } from '../_types/image-grid';
 import Image from 'next/image';
+import { ThumbsUp, ThumbsDown } from 'lucide-react';
 
 interface ImageSidebarProps {
   isOpen: boolean;
@@ -29,8 +30,18 @@ export function ImageSidebar({
 
   // 메인 이미지 슬라이드 데이터
   const mainImages = [
-    { src: '/images/related/karina01.jpg', alt: 'Karina 1' },
-    { src: '/images/related/karina02.jpeg', alt: 'Karina 2' },
+    { 
+      src: '/images/related/karina01.jpg', 
+      alt: 'Karina 1',
+      title: 'Next Level : Karina',
+      subtitle: 'The Face of Future K-POP'
+    },
+    { 
+      src: '/images/related/karina02.jpeg', 
+      alt: 'Karina 2',
+      title: '봄이 왔나봐',
+      subtitle: '카리나와 함께 봄 나들이'
+    },
   ];
   const [mainIndex, setMainIndex] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -171,9 +182,9 @@ Because with Karina, it's never just an outfit — it's a statement.`;
 
       {/* Tab Content */}
       {activeTab === 'summary' && (
-        <div>
+        <div className="px-4 py-6">
           {/* Title, Subtitle & Description */}
-          <div className="px-4 py-6">
+          <div className="mb-6">
             <h2 className="text-4xl font-extrabold text-[#F6FF4A] mb-2 leading-tight">
               What Is She Wearing?
             </h2>
@@ -230,13 +241,22 @@ Because with Karina, it's never just an outfit — it's a statement.`;
               alt={mainImages[mainIndex].alt}
               width={480}
               height={270}
-              className="rounded-xl object-cover w-[95%] max-w-2xl h-64"
+              className="rounded-xl object-cover w-[95%] max-w-2xl h-64 opacity-80"
               style={{ objectPosition: 'center top' }}
               priority
             />
+            {/* 이미지 위 텍스트 오버레이 */}
+            <div className="absolute bottom-4 left-8 transform translate-x-4">
+              <h3 className="text-2xl font-bold text-white mb-1 drop-shadow-lg">
+                {mainImages[mainIndex].title}
+              </h3>
+              <p className="text-sm text-white/90 font-medium drop-shadow-lg">
+                {mainImages[mainIndex].subtitle}
+              </p>
+            </div>
           </div>
           {/* Items Section (2x2 그리드, more/less) */}
-          <div className="px-0 mb-6">
+          <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-base font-bold text-white">Items</h3>
               <button
@@ -272,7 +292,7 @@ Because with Karina, it's never just an outfit — it's a statement.`;
             </div>
           </div>
           {/* Comments Section */}
-          <div className="px-0 pb-8">
+          <div>
             <h3 className="text-base font-bold text-white mb-2">Comments</h3>
             {comments.map((comment) => (
               <div key={comment.id} className="flex items-start mb-3">
@@ -283,7 +303,7 @@ Because with Karina, it's never just an outfit — it's a statement.`;
                   height={32}
                   className="w-8 h-8 rounded-full mr-2 object-cover"
                 />
-                <div>
+                <div className="flex-1">
                   <div className="flex items-center gap-2 mb-0.5">
                     <span className="font-bold text-white text-sm">
                       {comment.user.name}
@@ -292,10 +312,16 @@ Because with Karina, it's never just an outfit — it's a statement.`;
                       {comment.user.badge}
                     </span>
                   </div>
-                  <div className="text-white text-xs mb-0.5">{comment.text}</div>
-                  <div className="flex items-center gap-3 text-[10px] text-gray-400">
-                    <span>Thumbs up {comment.thumbsUp}</span>
-                    <span>Thumbs down {comment.thumbsDown}</span>
+                  <div className="text-white text-xs mb-2">{comment.text}</div>
+                  <div className="flex items-center gap-4">
+                    <button className="flex items-center gap-1 text-[10px] text-gray-400 hover:text-primary transition-colors">
+                      <ThumbsUp size={12} />
+                      <span>{comment.thumbsUp}</span>
+                    </button>
+                    <button className="flex items-center gap-1 text-[10px] text-gray-400 hover:text-red-400 transition-colors">
+                      <ThumbsDown size={12} />
+                      <span>{comment.thumbsDown}</span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -307,18 +333,20 @@ Because with Karina, it's never just an outfit — it's a statement.`;
       {activeTab === 'items' && (
         <div className="px-4 py-6">
           {/* 타이틀/디스크립션 */}
-          <h2 className="text-4xl font-extrabold text-[#F6FF4A] mb-2 leading-tight">
-            Back to Y2K<br />
-            — Karina's Retro Future Look
-          </h2>
-          <p className="text-base text-white/80 mb-8">
-            It's not just about wearing Y2K — it's about reinterpreting it.<br />
-            Karina blends high-gloss textures, exposed skin, and statement accessories with modern polish.<br />
-            It's throwback, but it's also completely now — just like her.
-          </p>
+          <div className="mb-6">
+            <h2 className="text-4xl font-extrabold text-[#F6FF4A] mb-2 leading-tight">
+              Back to Y2K<br />
+              — Karina's Retro Future Look
+            </h2>
+            <p className="text-base text-white/80">
+              It's not just about wearing Y2K — it's about reinterpreting it.<br />
+              Karina blends high-gloss textures, exposed skin, and statement accessories with modern polish.<br />
+              It's throwback, but it's also completely now — just like her.
+            </p>
+          </div>
 
           {/* 아이템 썸네일 리스트 */}
-          <div className="w-full flex items-center gap-4 overflow-x-auto mb-8 pb-2">
+          <div className="w-full flex items-center gap-4 overflow-x-auto mb-6 pb-2">
             {items.map((item, idx) => (
               <button
                 key={item.id}
@@ -342,9 +370,9 @@ Because with Karina, it's never just an outfit — it's a statement.`;
           </div>
 
           {/* 상세+링크 2단 배치 */}
-          <div className="flex flex-col gap-6 mb-8">
+          <div className="flex flex-col gap-6">
             {/* 선택된 아이템 상세 */}
-            <div className="flex flex-col items-center bg-[#181818] rounded-2xl p-6 shadow mb-4">
+            <div className="flex flex-col items-center bg-[#181818] rounded-2xl p-6 shadow">
               <div className="flex items-center gap-2 mb-2">
                 <Image src="/images/brand/prada.png" alt="brand" width={32} height={32} className="rounded-full" />
                 <span className="text-lg font-bold text-white">{activeItem.brand}</span>
@@ -357,61 +385,148 @@ Because with Karina, it's never just an outfit — it's a statement.`;
               </div>
             </div>
 
-            {/* 아이템 세부 링크 그리드 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {activeItem.links.map(link => (
-                <a
-                  key={link.url}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-[#222] rounded-xl p-3 flex flex-col shadow hover:bg-[#292929] transition"
-                >
-                  <Image src={link.imageUrl} alt={link.title} width={120} height={80} className="rounded mb-2" />
-                  <div className="font-bold text-white">{link.title}</div>
-                  <div className="text-xs text-gray-400">{link.description}</div>
-                </a>
-              ))}
+            {/* 아이템 세부 링크 메이슨리 그리드 */}
+            <div className="w-full columns-2 gap-4 space-y-4">
+              {Array.from({ length: 15 }).map((_, idx) => {
+                // 다양한 크기와 비율을 위한 패턴 설정
+                const patterns = [
+                  { height: 200, aspectRatio: '4/3', type: 'normal' },
+                  { height: 280, aspectRatio: '3/4', type: 'tall' },
+                  { height: 180, aspectRatio: '16/9', type: 'wide' },
+                  { height: 320, aspectRatio: '1/1', type: 'square' },
+                  { height: 240, aspectRatio: '5/4', type: 'normal' },
+                  { height: 300, aspectRatio: '2/3', type: 'tall' },
+                  { height: 160, aspectRatio: '3/2', type: 'normal' },
+                  { height: 260, aspectRatio: '4/5', type: 'tall' },
+                ];
+                
+                const pattern = patterns[idx % patterns.length];
+                const isSpecial = idx % 7 === 0; // 7번째마다 특별한 이미지
+                const imageSrc = isSpecial ? activeItem.imageUrl : 
+                  idx % 3 === 0 ? mainImages[0].src : mainImages[1].src;
+
+                return (
+                  <div
+                    key={`grid-${idx}`}
+                    className="break-inside-avoid rounded-xl overflow-hidden bg-[#222] hover:bg-[#2a2a2a] transition-all duration-300 hover:shadow-lg mb-4"
+                  >
+                    <div className="relative">
+                      <Image
+                        src={imageSrc}
+                        alt={isSpecial ? activeItem.name : 'Related'}
+                        width={400}
+                        height={pattern.height}
+                        className={`w-full h-auto rounded-t-xl transition-all duration-300 hover:scale-105 ${
+                          isSpecial ? 'object-contain bg-white' : 'object-cover'
+                        }`}
+                        style={{ 
+                          maxHeight: pattern.height,
+                          minHeight: pattern.height * 0.8,
+                          aspectRatio: pattern.aspectRatio
+                        }}
+                      />
+                      {/* 이미지 위 오버레이 라벨 */}
+                      <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-full px-2 py-1">
+                        <span className="text-xs text-white font-semibold">
+                          {isSpecial ? 'FEATURED' : 'RELATED'}
+                        </span>
+                      </div>
+                    </div>
+                    {/* 카드 내용 */}
+                    <div className="p-3">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className={`w-3 h-3 rounded-full ${isSpecial ? 'bg-primary' : 'bg-[#F6FF4A]'}`}></div>
+                        <span className={`text-xs font-bold ${isSpecial ? 'text-primary' : 'text-[#F6FF4A]'}`}>
+                          {isSpecial ? activeItem.brand : 'KARINA'}
+                        </span>
+                      </div>
+                      <h4 className="text-sm font-bold text-white mb-1 line-clamp-1">
+                        {isSpecial ? activeItem.name : mainImages[idx % mainImages.length].title}
+                      </h4>
+                      <p className="text-xs text-gray-400 line-clamp-2">
+                        {isSpecial 
+                          ? "Signature style highlight with premium quality" 
+                          : mainImages[idx % mainImages.length].subtitle
+                        }
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
       )}
 
       {activeTab === 'related' && (
-        <div className="px-4 py-8">
-          <div className="w-full columns-2 md:columns-3 gap-4 space-y-4">
-            {Array.from({ length: 100 }).flatMap((_, repeatIdx) => [
-              // 우리 아이템 이미지
-              <div
-                key={`main-${repeatIdx}`}
-                className="break-inside-avoid rounded-xl overflow-hidden bg-[#222] p-2"
-              >
-                <Image
-                  src={activeItem.imageUrl}
-                  alt={activeItem.name}
-                  width={400}
-                  height={400}
-                  className="w-full h-auto rounded-xl object-contain bg-white"
-                  style={{ maxHeight: 300 }}
-                />
-              </div>,
-              // related 이미지들
-              ...mainImages.map((img, idx) => (
+        <div className="px-4 py-6">
+          <div className="w-full columns-2 gap-4 space-y-4">
+            {Array.from({ length: 20 }).map((_, idx) => {
+              // 다양한 크기와 비율을 위한 패턴 설정
+              const patterns = [
+                { height: 220, aspectRatio: '4/3', type: 'normal' },
+                { height: 300, aspectRatio: '3/4', type: 'tall' },
+                { height: 200, aspectRatio: '16/9', type: 'wide' },
+                { height: 350, aspectRatio: '1/1', type: 'square' },
+                { height: 260, aspectRatio: '5/4', type: 'normal' },
+                { height: 320, aspectRatio: '2/3', type: 'tall' },
+                { height: 180, aspectRatio: '3/2', type: 'normal' },
+                { height: 280, aspectRatio: '4/5', type: 'tall' },
+              ];
+              
+              const pattern = patterns[idx % patterns.length];
+              const isMainItem = idx % 4 === 0; // 4번째마다 메인 아이템
+              const imageSrc = isMainItem ? activeItem.imageUrl : 
+                idx % 2 === 0 ? mainImages[0].src : mainImages[1].src;
+
+              return (
                 <div
-                  key={`related-${repeatIdx}-${idx}`}
-                  className="break-inside-avoid rounded-xl overflow-hidden bg-[#222] p-2"
+                  key={`related-${idx}`}
+                  className="break-inside-avoid rounded-xl overflow-hidden bg-[#222] hover:bg-[#2a2a2a] transition-all duration-300 hover:shadow-lg mb-4"
                 >
-                  <Image
-                    src={img.src}
-                    alt={img.alt}
-                    width={400}
-                    height={400}
-                    className="w-full h-auto rounded-xl object-cover"
-                    style={{ maxHeight: 300 }}
-                  />
+                  <div className="relative">
+                    <Image
+                      src={imageSrc}
+                      alt={isMainItem ? activeItem.name : 'Related'}
+                      width={400}
+                      height={pattern.height}
+                      className={`w-full h-auto rounded-t-xl transition-all duration-300 hover:scale-105 ${
+                        isMainItem ? 'object-contain bg-white' : 'object-cover'
+                      }`}
+                      style={{ 
+                        maxHeight: pattern.height,
+                        minHeight: pattern.height * 0.8,
+                        aspectRatio: pattern.aspectRatio
+                      }}
+                    />
+                    {/* 이미지 위 오버레이 라벨 */}
+                    <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-full px-2 py-1">
+                      <span className="text-xs text-white font-semibold">
+                        {isMainItem ? 'MAIN ITEM' : 'RELATED'}
+                      </span>
+                    </div>
+                  </div>
+                  {/* 카드 내용 */}
+                  <div className="p-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className={`w-3 h-3 rounded-full ${isMainItem ? 'bg-primary' : 'bg-[#F6FF4A]'}`}></div>
+                      <span className={`text-xs font-bold ${isMainItem ? 'text-primary' : 'text-[#F6FF4A]'}`}>
+                        {isMainItem ? activeItem.brand : 'KARINA'}
+                      </span>
+                    </div>
+                    <h4 className="text-sm font-bold text-white mb-1 line-clamp-1">
+                      {isMainItem ? activeItem.name : mainImages[idx % mainImages.length].title}
+                    </h4>
+                    <p className="text-xs text-gray-400 line-clamp-2">
+                      {isMainItem 
+                        ? "Main item with related styling inspiration" 
+                        : mainImages[idx % mainImages.length].subtitle
+                      }
+                    </p>
+                  </div>
                 </div>
-              )),
-            ])}
+              );
+            })}
           </div>
         </div>
       )}

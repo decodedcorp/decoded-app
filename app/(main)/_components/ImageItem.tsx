@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type {
@@ -62,8 +62,27 @@ const ImageItem: React.FC<ImageItemProps> = ({
   const [previewData, setPreviewData] = React.useState<any>(null);
   const [modalData, setModalData] = useState<any>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const [isTouched, setIsTouched] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
+  const longPressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
   const isCurrentlyHovered = hoveredItemId === image.id;
   const isAnotherImageHovered = hoveredItemId !== null && !isCurrentlyHovered;
+
+  // 모바일 감지
+  useEffect(() => {
+    const checkMobile = () => {
+      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      const isMobileWidth = window.innerWidth <= 768;
+      setIsMobile(isTouchDevice || isMobileWidth);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const displayWidth =
     typeof image.width === 'number' && image.width > 0
@@ -76,7 +95,7 @@ const ImageItem: React.FC<ImageItemProps> = ({
 
   let itemClasses = `absolute bg-black box-border flex justify-center items-center transition-all duration-300 ease-in-out group`;
 
-  if (isCurrentlyHovered) {
+  if (isCurrentlyHovered || isTouched) {
     itemClasses += ' overflow-visible';
   } else {
     itemClasses += ' overflow-hidden';
@@ -88,17 +107,28 @@ const ImageItem: React.FC<ImageItemProps> = ({
     itemClasses += ' opacity-30';
   }
 
-  if (isCurrentlyHovered) {
-    itemClasses += ' scale-105 -rotate-y-3 z-30 brightness-110';
-  } else if (isAnotherImageHovered) {
-    itemClasses += ' opacity-40 blur-xs scale-95 z-0 brightness-75';
+  // 모바일에서는 호버 효과를 터치 효과로 변경
+  if (isMobile) {
+    if (isTouched) {
+      itemClasses += ' scale-105 z-30 brightness-110';
+    } else if (isAnotherImageHovered) {
+      itemClasses += ' opacity-40 scale-95 z-0 brightness-75';
+    } else {
+      itemClasses += ' z-10';
+    }
   } else {
-    itemClasses += ' z-10';
+    if (isCurrentlyHovered) {
+      itemClasses += ' scale-105 -rotate-y-3 z-30 brightness-110';
+    } else if (isAnotherImageHovered) {
+      itemClasses += ' opacity-40 blur-xs scale-95 z-0 brightness-75';
+    } else {
+      itemClasses += ' z-10';
+    }
   }
 
   let primaryArtistName: string | null = null;
   if (
-    isCurrentlyHovered &&
+    (isCurrentlyHovered || isTouched) &&
     hoveredImageDetailData &&
     hoveredImageDetailData.doc_id === image.image_doc_id
   ) {
@@ -192,13 +222,82 @@ const ImageItem: React.FC<ImageItemProps> = ({
   };
 
   const handleMouseEnter = () => {
-    setIsHovered(true);
-    onMouseEnterItem(image.id, image.image_doc_id);
+    if (!isMobile) {
+      setIsHovered(true);
+      onMouseEnterItem(image.id, image.image_doc_id);
+    }
   };
 
   const handleMouseLeave = () => {
-    setIsHovered(false);
-    onMouseLeaveItem();
+    if (!isMobile) {
+      setIsHovered(false);
+      onMouseLeaveItem();
+    }
+  };
+
+  // 터치 이벤트 핸들러들
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (isMobile) {
+      e.preventDefault(); // 기본 터치 동작 방지
+      const touch = e.touches[0];
+      touchStartRef.current = {
+        x: touch.clientX,
+        y: touch.clientY,
+        time: Date.now()
+      };
+
+      // 롱프레스 감지
+      longPressTimeoutRef.current = setTimeout(() => {
+        setIsTouched(true);
+        onMouseEnterItem(image.id, image.image_doc_id);
+      }, 500);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (isMobile && touchStartRef.current) {
+      const touch = e.touches[0];
+      const deltaX = Math.abs(touch.clientX - touchStartRef.current.x);
+      const deltaY = Math.abs(touch.clientY - touchStartRef.current.y);
+      
+      // 터치가 너무 많이 움직이면 롱프레스 취소
+      if (deltaX > 10 || deltaY > 10) {
+        if (longPressTimeoutRef.current) {
+          clearTimeout(longPressTimeoutRef.current);
+          longPressTimeoutRef.current = null;
+        }
+        // 스크롤 허용을 위해 기본 동작 방지 해제
+        e.stopPropagation();
+      }
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (isMobile) {
+      if (longPressTimeoutRef.current) {
+        clearTimeout(longPressTimeoutRef.current);
+        longPressTimeoutRef.current = null;
+      }
+
+      if (touchStartRef.current) {
+        const touch = e.changedTouches[0];
+        const deltaX = Math.abs(touch.clientX - touchStartRef.current.x);
+        const deltaY = Math.abs(touch.clientY - touchStartRef.current.y);
+        const deltaTime = Date.now() - touchStartRef.current.time;
+
+        // 탭으로 간주할 수 있는 조건 (짧은 시간, 작은 이동)
+        if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
+          e.preventDefault();
+          handleClick(e as any);
+        }
+      }
+
+      // 터치 상태 해제
+      setTimeout(() => {
+        setIsTouched(false);
+        onMouseLeaveItem();
+      }, 1000); // 1초 후 터치 상태 해제
+    }
   };
 
   const getOverlayPosition = () => {
@@ -220,7 +319,7 @@ const ImageItem: React.FC<ImageItemProps> = ({
     }
   };
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
     e.stopPropagation();
     console.log('Image clicked:', image);
@@ -231,16 +330,20 @@ const ImageItem: React.FC<ImageItemProps> = ({
     <div
       data-image-id={image.id}
       key={image.id}
-      className={`${itemClasses} cursor-pointer`}
+      className={`${itemClasses} cursor-pointer touch-manipulation select-none`}
       style={{
         width: `${ITEM_WIDTH}px`,
         height: `${ITEM_HEIGHT}px`,
         left: `${image.left}px`,
         top: `${image.top}px`,
+        touchAction: isMobile ? 'pan-y' : 'auto', // 모바일에서 세로 스크롤만 허용
       }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      onClick={handleClick}
+      onClick={!isMobile ? handleClick : undefined}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       <Image
         src={image.src}
@@ -248,11 +351,11 @@ const ImageItem: React.FC<ImageItemProps> = ({
         width={displayWidth}
         height={displayHeight}
         className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
-          isHovered || !isAnotherImageHovered ? 'opacity-100' : 'opacity-50'
+          (isHovered || isTouched) || !isAnotherImageHovered ? 'opacity-100' : 'opacity-50'
         }`}
         style={{
           filter:
-            isHovered || !isAnotherImageHovered
+            (isHovered || isTouched) || !isAnotherImageHovered
               ? 'none'
               : 'grayscale(80%) brightness(0.7)',
           transition: 'opacity 300ms ease-in-out, filter 300ms ease-in-out',
@@ -274,7 +377,7 @@ const ImageItem: React.FC<ImageItemProps> = ({
       )}
 
       {/* LikeDisplay 추가 */}
-      {isHovered && (
+      {(isHovered || isTouched) && (
         <div className="absolute bottom-4 right-4 z-20">
           <LikeDisplay
             likeCount={image.likes || 0}
@@ -287,14 +390,14 @@ const ImageItem: React.FC<ImageItemProps> = ({
       {/* ImageOverlay */}
       <ImageOverlay
         isOpen={isOverlayOpen}
-        isCurrentlyHovered={isCurrentlyHovered}
+        isCurrentlyHovered={isCurrentlyHovered || isTouched}
         onClose={() => {
           setIsOverlayOpen(false);
         }}
       />
 
       {/* 기존 hover 효과들 */}
-      {isCurrentlyHovered &&
+      {(isCurrentlyHovered || isTouched) &&
         !isOverlayOpen &&
         hoveredImageDetailData &&
         hoveredImageDetailData.doc_id === image.image_doc_id && (

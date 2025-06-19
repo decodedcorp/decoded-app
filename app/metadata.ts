@@ -8,7 +8,9 @@ const SITE_URL = 'https://decoded.style';
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: 'cover',
 };
 
 const commonMetadata = {
