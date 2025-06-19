@@ -15,7 +15,6 @@ import { HoverDetailEffect } from './HoverDetailEffect';
 import { TypeAnimation } from 'react-type-animation';
 import { TypeWriter } from './TypeWriter';
 import { ImageOverlay } from './ImageOverlay';
-import { ImageHeader } from './ImageHeader';
 import dynamic from 'next/dynamic';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 const DetailsUpdateModal = dynamic(() => import('./DetailsUpdateModal'));
@@ -264,17 +263,6 @@ const ImageItem: React.FC<ImageItemProps> = ({
         priority={isPriorityImage}
       />
 
-      {/* 헤더 - 상태에 따라 다른 화살표 표시 */}
-      {isHovered && (
-        <ImageHeader
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsOverlayOpen(!isOverlayOpen);
-          }}
-          isOverlayOpen={isOverlayOpen}
-        />
-      )}
-
       {/* ArtistBadge 추가 */}
       {primaryArtistName && (
         <div className="absolute bottom-4 left-4 z-20">
@@ -296,7 +284,7 @@ const ImageItem: React.FC<ImageItemProps> = ({
         </div>
       )}
 
-      {/* ImageOverlay - 헤더 제거 */}
+      {/* ImageOverlay */}
       <ImageOverlay
         isOpen={isOverlayOpen}
         isCurrentlyHovered={isCurrentlyHovered}

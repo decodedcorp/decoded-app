@@ -2,20 +2,21 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { LoginButton } from '@/components/Header/nav/LoginButton';
-import { X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { SearchModal } from '@/components/Header/search/SearchModal';
 import { CategoryFilter } from './CategoryFilter';
 
-export function ImageGridHeader() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+interface ImageGridHeaderProps {
+  isSidebarOpen: boolean; // MainPage에서 전달받는 사이드바 상태
+}
+
+export function ImageGridHeader({ isSidebarOpen }: ImageGridHeaderProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [isCategoryFilterOpen, setIsCategoryFilterOpen] = useState(false);
   const router = useRouter();
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const toggleCategoryFilter = () =>
     setIsCategoryFilterOpen(!isCategoryFilterOpen);
 
@@ -55,7 +56,11 @@ export function ImageGridHeader() {
   }, [searchContainerRef]);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50">
+    <header 
+      className={`fixed top-0 left-0 z-50 transition-all duration-300 ${
+        isSidebarOpen ? 'w-[70%]' : 'w-full'
+      }`}
+    >
       <div className="container mx-auto px-4 sm:px-6 py-3 flex items-center justify-between relative">
         {/* Left: Logo */}
         <div className="text-2xl font-bold text-yellow-300 tracking-tight">
@@ -107,35 +112,12 @@ export function ImageGridHeader() {
 
         {/* Right: Menu Button */}
         <div className="flex items-center space-x-2">
-          {/* <button
-            type="button"
-            onClick={toggleSidebar}
-            className="p-2 rounded-md text-neutral-300 hover:text-white hover:bg-black/20 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-yellow-400"
-          >
-            <span className="sr-only">Open main menu</span>
-            <svg
-              className="h-6 w-6"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </button> */}
           <LoginButton />
           <button
             type="button"
             onClick={toggleCategoryFilter}
             className="p-2 rounded-md text-neutral-300 hover:text-white hover:bg-black/20 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-yellow-400"
           >
-            {/* Filter Icon (Heroicons) */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -166,39 +148,6 @@ export function ImageGridHeader() {
           ></div>
           <div className="relative z-50">
             <CategoryFilter />
-          </div>
-        </>
-      )}
-
-      {/* Sidebar (Login Navigation) */}
-      {isSidebarOpen && (
-        <>
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 bg-black/50 z-40"
-            onClick={toggleSidebar}
-            aria-hidden="true"
-          ></div>
-
-          {/* Sidebar Panel */}
-          <div className="fixed top-0 right-0 w-80 h-full bg-neutral-900 z-50 p-6 shadow-xl flex flex-col">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-white">메뉴</h2>
-              <button
-                onClick={toggleSidebar}
-                className="p-1 rounded-md text-neutral-400 hover:text-white hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-yellow-400"
-              >
-                <X className="h-6 w-6" />
-                <span className="sr-only">Close menu</span>
-              </button>
-            </div>
-
-            {/* Navigation Content */}
-            <nav className="flex flex-col space-y-4">
-              {/* <LoginButton /> */}
-              {/* 추가적인 네비게이션 링크나 컴포넌트를 여기에 추가할 수 있습니다. */}
-              {/* 예: <a href="/profile" className="text-neutral-300 hover:text-white">프로필</a> */}
-            </nav>
           </div>
         </>
       )}

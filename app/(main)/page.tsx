@@ -322,7 +322,7 @@ const MainPage = () => {
           content="Infinite omnidirectional scroll grid with API images"
         />
       </Head>
-      <ImageGridHeader />
+      <ImageGridHeader isSidebarOpen={isSidebarOpen} />
       <div className="w-full h-screen m-0 overflow-hidden flex flex-col font-sans bg-black relative">
         <div className="flex w-full h-full relative">
           {/* 그리드 컨테이너 */}

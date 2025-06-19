@@ -9,6 +9,7 @@ import { koMetadata, enMetadata, generateDetailMetadata } from "./metadata";
 import { GoogleRedirectHandler } from "@/components/auth/GoogleRedirectHandler";
 import Script from "next/script";
 import { getImageDetails } from "@/app/details/utils/hooks/fetchImageDetails";
+import { SidebarProvider } from '@/lib/contexts/sidebar-context';
 
 export async function generateMetadata(): Promise<Metadata> {
   const headersList = await headers();
@@ -105,11 +106,13 @@ export default async function RootLayout({
       </head>
       <body className="flex flex-col min-h-screen">
         <GoogleRedirectHandler />
-        <Providers locale={locale as Locale}>
-          {/* {!isCallbackPage && <HeaderLayout />} */}
-          <main className="flex-1">{children}</main>
-          {/* {!isCallbackPage && <Footer />} */}
-        </Providers>
+        <SidebarProvider>
+          <Providers locale={locale as Locale}>
+            {/* {!isCallbackPage && <HeaderLayout />} */}
+            <main className="flex-1">{children}</main>
+            {/* {!isCallbackPage && <Footer />} */}
+          </Providers>
+        </SidebarProvider>
 
         <Script
           src="https://t1.kakaocdn.net/kakao_js_sdk/2.6.0/kakao.min.js"
