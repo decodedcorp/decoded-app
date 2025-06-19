@@ -329,7 +329,7 @@ const MainPage = () => {
           <div
             ref={scrollContainerRef}
             className={`h-full overflow-auto relative cursor-grab bg-black transition-all duration-300 ${
-              isSidebarOpen ? 'w-[70%]' : 'w-full'
+              isSidebarOpen ? 'w-[65%]' : 'w-full'
             }`}
             onMouseDown={handleMouseDown}
           >
@@ -362,7 +362,7 @@ const MainPage = () => {
           {/* 사이드바 */}
           <div
             className={`h-full bg-white transition-all duration-300 overflow-hidden absolute right-0 ${
-              isSidebarOpen ? 'w-[30%]' : 'w-0'
+              isSidebarOpen ? 'w-[35%]' : 'w-0'
             }`}
           >
             <ImageSidebar
@@ -377,7 +377,7 @@ const MainPage = () => {
           {/* 사이드바 외부 버튼 */}
           {isSidebarOpen && (
             <div 
-              className="absolute right-[32%] bottom-8 flex flex-col gap-4 transition-all duration-300 ease-in-out"
+              className="absolute right-[37%] bottom-8 flex flex-col gap-4 transition-all duration-300 ease-in-out"
               style={{
                 opacity: isSidebarOpen ? 1 : 0,
                 transform: `translateX(${isSidebarOpen ? '0' : '20px'})`
