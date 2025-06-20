@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Head from 'next/head';
 import { ImageGridHeader } from './_components/header/ImageGridHeader';
 import ImageItem from './_components/ImageItem';
@@ -14,7 +14,7 @@ import { useAuth } from "@/lib/hooks/features/auth/useAuth";
 import { ImageSidebar } from './_components/sidebar/ImageSidebar';
 import { ScrollRemote } from './_components/ScrollRemote';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { X, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 
 const MainPage = () => {
   const {
@@ -56,6 +56,13 @@ const MainPage = () => {
   const [focusedImageId, setFocusedImageId] = useState<string | null>(null);
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
 
+  // 줌 관련 상태 추가
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [isZooming, setIsZooming] = useState(false);
+  const [zoomTarget, setZoomTarget] = useState<{ x: number; y: number } | null>(null);
+  const [originalContentOffset, setOriginalContentOffset] = useState({ x: 0, y: 0 });
+  const [isAnimating, setIsAnimating] = useState(false); // 애니메이션 중복 방지
+
   const {
     handleMouseDown,
     hoveredItemId,
@@ -75,6 +82,14 @@ const MainPage = () => {
   const [selectedImageDetail, setSelectedImageDetail] = useState<ImageDetail | null>(null);
   const [isSelectedImageLoading, setIsSelectedImageLoading] = useState(false);
   const [selectedImageError, setSelectedImageError] = useState<string | null>(null);
+
+  // 줌 상태 변경 시 처리
+  useEffect(() => {
+    if (!isZooming && zoomLevel === 1) {
+      // 줌이 완전히 리셋되었을 때 추가 정리 작업
+      setZoomTarget(null);
+    }
+  }, [isZooming, zoomLevel]);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && isInitialized) {
@@ -112,13 +127,70 @@ const MainPage = () => {
     }
   };
 
+  // 줌 애니메이션 함수
+  const animateZoom = (targetZoom: number, targetX: number, targetY: number, duration: number = 800) => {
+    if (isAnimating) {
+      console.log('Animation already in progress, skipping...');
+      return;
+    }
+    
+    setIsAnimating(true);
+    setIsZooming(true);
+    const startZoom = zoomLevel;
+    const startX = contentOffset.x;
+    const startY = contentOffset.y;
+    const startTime = performance.now();
+
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // 더 부드러운 이징 함수 (ease-out-quint)
+      const easedProgress = 1 - Math.pow(1 - progress, 5);
+      
+      const newZoom = startZoom + (targetZoom - startZoom) * easedProgress;
+      const newX = startX + (targetX - startX) * easedProgress;
+      const newY = startY + (targetY - startY) * easedProgress;
+      
+      setZoomLevel(newZoom);
+      setContentOffset({ x: newX, y: newY });
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        setIsZooming(false);
+        setIsAnimating(false);
+      }
+    };
+    
+    requestAnimationFrame(animate);
+  };
+
+  // 줌 리셋 함수
+  const resetZoom = () => {
+    const targetZoom = 1;
+    const targetX = originalContentOffset.x;
+    const targetY = originalContentOffset.y;
+    
+    animateZoom(targetZoom, targetX, targetY, 800);
+  };
+
   const handleImageClickForModal = async (
     imageItem: ImageItemData,
     imageDetailFromItem: ImageDetail | null
   ) => {
+    // 애니메이션 중이거나 이미 사이드바가 열려있으면 무시
+    if (isAnimating || isSidebarOpen) {
+      console.log('Animation in progress or sidebar already open, ignoring click');
+      return;
+    }
+    
     console.log('=== Image Click Debug ===');
     console.log('Clicked Image:', imageItem);
     console.log('Current contentOffset:', contentOffset);
+    
+    // 현재 상태를 원본으로 저장
+    setOriginalContentOffset(contentOffset);
     
     setSelectedImageItemForModal(imageItem);
     setIsSidebarOpen(true);
@@ -176,7 +248,7 @@ const MainPage = () => {
       targetCenterY
     });
     
-    // 이동해야 할 거리 계산 (이동 정도를 1.2배로 증가)
+    // 이동해야 할 거리 계산
     const moveDistanceX = (targetCenterX - imageCenterX) * 1.2;
     const moveDistanceY = (targetCenterY - imageCenterY) * 1.2;
     
@@ -185,85 +257,29 @@ const MainPage = () => {
       moveDistanceY
     });
     
-    // X축 이동
-    if (Math.abs(moveDistanceX) > 10) {
-      const directionX = moveDistanceX > 0 ? 'left' : 'right';
-      console.log('Moving X axis:', {
-        direction: directionX,
-        distance: moveDistanceX
-      });
-      
-      const steps = 50; // 단계 수 증가
-      const stepDuration = 4; // 각 단계의 지속 시간 조정
-      
-      for (let i = 1; i <= steps; i++) {
-        setTimeout(() => {
-          const progress = i / steps;
-          // 더 부드러운 이징 함수 적용 (cubic-bezier와 유사한 효과)
-          const easedProgress = 1 - Math.pow(1 - progress, 2.8);
-          const moveX = (moveDistanceX * easedProgress) / steps;
-          
-          setContentOffset(prev => ({
-            ...prev,
-            x: prev.x + moveX
-          }));
-        }, i * stepDuration);
-      }
-    }
+    // 줌과 이동을 동시에 애니메이션
+    const targetZoom = 1.2; // 약간의 줌 효과
+    const targetX = contentOffset.x + moveDistanceX;
+    const targetY = contentOffset.y + moveDistanceY;
     
-    // Y축 이동
-    if (Math.abs(moveDistanceY) > 10) {
-      const directionY = moveDistanceY > 0 ? 'up' : 'down';
-      console.log('Moving Y axis:', {
-        direction: directionY,
-        distance: moveDistanceY
-      });
-      
-      const steps = 50; // 단계 수 증가
-      const stepDuration = 4; // 각 단계의 지속 시간 조정
-      
-      for (let i = 1; i <= steps; i++) {
-        setTimeout(() => {
-          const progress = i / steps;
-          // 더 부드러운 이징 함수 적용 (cubic-bezier와 유사한 효과)
-          const easedProgress = 1 - Math.pow(1 - progress, 2.8);
-          const moveY = (moveDistanceY * easedProgress) / steps;
-          
-          setContentOffset(prev => ({
-            ...prev,
-            y: prev.y + moveY
-          }));
-        }, i * stepDuration);
-      }
-    }
+    animateZoom(targetZoom, targetX, targetY, 1000);
   };
 
   const handleCloseSidebar = () => {
+    // 애니메이션 중이면 무시
+    if (isAnimating) {
+      console.log('Animation in progress, ignoring close request');
+      return;
+    }
+    
     setIsSidebarOpen(false);
     setSelectedImageItemForModal(null);
     setSelectedImageDetail(null);
     setSelectedImageError(null);
     setSelectedImageId(null);
     
-    // 사이드바가 닫힐 때는 오른쪽으로 이동
-    const screenWidth = window.innerWidth;
-    const sidebarWidth = screenWidth * 0.3;
-    const moveDistance = sidebarWidth;
-    const steps = 30; // 단계 수 증가
-    const stepDuration = 8; // 각 단계의 지속 시간 감소
-    
-    for (let i = 1; i <= steps; i++) {
-      setTimeout(() => {
-        const progress = i / steps;
-        const easedProgress = 1 - Math.pow(1 - progress, 4); // quartic ease-out
-        const newX = contentOffset.x + (moveDistance * easedProgress);
-        
-        setContentOffset(prev => ({
-          ...prev,
-          x: newX
-        }));
-      }, i * stepDuration);
-    }
+    // 사이드바가 닫힐 때 줌도 리셋
+    resetZoom();
   };
 
   const handleRemoteScroll = (direction: 'left' | 'right' | 'up' | 'down', customStep?: number) => {
@@ -313,6 +329,20 @@ const MainPage = () => {
     return hoveredItemId;
   };
 
+  // 즉시 실행되는 클릭 핸들러 (중복 방지만)
+  const handleImageClick = useCallback(
+    (imageItem: ImageItemData, imageDetailFromItem: ImageDetail | null) => {
+      if (isAnimating || isSidebarOpen) {
+        console.log('Animation in progress or sidebar already open, ignoring click');
+        return;
+      }
+      
+      // 즉시 실행
+      handleImageClickForModal(imageItem, imageDetailFromItem);
+    },
+    [isAnimating, isSidebarOpen, handleImageClickForModal]
+  );
+
   return (
     <>
       <Head>
@@ -334,10 +364,11 @@ const MainPage = () => {
             onMouseDown={handleMouseDown}
           >
             <div
-              className="absolute"
+              className="absolute origin-center"
               style={{
                 willChange: 'transform',
-                transform: `translate(${contentOffset.x}px, ${contentOffset.y}px)`,
+                transform: `translate(${contentOffset.x}px, ${contentOffset.y}px) scale(${zoomLevel})`,
+                transition: isZooming ? 'none' : 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
               }}
             >
               {images.map((image) => (
@@ -353,7 +384,7 @@ const MainPage = () => {
                   onMouseLeaveItem={handleMouseLeaveItem}
                   onToggleLike={handleToggleLike}
                   isLiked={likedStatusesMap[image.image_doc_id] || false}
-                  onClick={handleImageClickForModal}
+                  onClick={handleImageClick}
                 />
               ))}
             </div>
@@ -374,7 +405,7 @@ const MainPage = () => {
             />
           </div>
 
-          {/* 사이드바 외부 버튼 */}
+          {/* 사이드바 외부 버튼들 */}
           {isSidebarOpen && (
             <div 
               className="absolute right-[37%] bottom-8 flex flex-col gap-4 transition-all duration-300 ease-in-out"
@@ -389,21 +420,9 @@ const MainPage = () => {
                 className="h-10 w-10 rounded-full bg-yellow-400 text-black hover:bg-yellow-500 shadow-xl transition-all duration-300 group"
                 onClick={handleCloseSidebar}
               >
-                <svg
-                  className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+                <X className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" />
               </Button>
+              
               <Button
                 variant="default"
                 size="icon"
