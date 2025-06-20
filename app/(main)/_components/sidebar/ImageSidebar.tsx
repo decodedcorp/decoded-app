@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { ImageDetail } from '../_types/image-grid';
+import { ImageDetail } from '../../_types/image-grid';
 import Image from 'next/image';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 

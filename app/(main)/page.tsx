@@ -2,16 +2,16 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
-import { ImageGridHeader } from './_components/ImageGridHeader';
+import { ImageGridHeader } from './_components/header/ImageGridHeader';
 import ImageItem from './_components/ImageItem';
-import FabMenu from './_components/FabMenu';
+import FabMenu from './_components/footer/FabMenu';
 import type { ImageItemData, ImageDetail } from './_types/image-grid';
 import { useImageApi } from './_hooks/useImageApi';
 import { useImageGrid } from './_hooks/useImageGrid';
 import { useGridInteraction } from './_hooks/useGridInteraction';
 import { useIsLike } from "@/app/details/utils/hooks/isLike";
 import { useAuth } from "@/lib/hooks/features/auth/useAuth";
-import { ImageSidebar } from './_components/ImageSidebar';
+import { ImageSidebar } from './_components/sidebar/ImageSidebar';
 import { ScrollRemote } from './_components/ScrollRemote';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';

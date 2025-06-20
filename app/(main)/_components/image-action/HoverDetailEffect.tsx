@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import type { ImageDetail, DecodedItem } from "../_types/image-grid";
+import type { ImageDetail, DecodedItem } from "../../_types/image-grid";
 
 // Constants migrated from ImageItem.tsx
 const INFO_BOX_WIDTH_PX = 170;

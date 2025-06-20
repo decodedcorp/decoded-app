@@ -9,15 +9,13 @@ import type {
   DecodedItem,
 } from '../_types/image-grid';
 import { ITEM_WIDTH, ITEM_HEIGHT } from '../_constants/image-grid';
-import { LikeDisplay } from './LikeDisplay';
+import { LikeDisplay } from './image-action/LikeDisplay';
 import { ArtistBadge } from './ArtistBadge';
-import { HoverDetailEffect } from './HoverDetailEffect';
+import { HoverDetailEffect } from './image-action/HoverDetailEffect';
 import { TypeAnimation } from 'react-type-animation';
 import { TypeWriter } from './TypeWriter';
-import { ImageOverlay } from './ImageOverlay';
 import dynamic from 'next/dynamic';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-const DetailsUpdateModal = dynamic(() => import('./DetailsUpdateModal'));
 
 interface ImageItemProps {
   image: ImageItemData;
@@ -386,15 +384,6 @@ const ImageItem: React.FC<ImageItemProps> = ({
           />
         </div>
       )}
-
-      {/* ImageOverlay */}
-      <ImageOverlay
-        isOpen={isOverlayOpen}
-        isCurrentlyHovered={isCurrentlyHovered || isTouched}
-        onClose={() => {
-          setIsOverlayOpen(false);
-        }}
-      />
 
       {/* 기존 hover 효과들 */}
       {(isCurrentlyHovered || isTouched) &&
