@@ -21,10 +21,14 @@ export interface ThiingsGridProps {
   className?: string;
   viewportMargin?: number;
   onScrollStateChange?: (isScrolling: boolean) => void;
+  selectedImagePosition?: Position | null;
+  onImageCentered?: () => void;
+  isSidebarOpen?: boolean;
 }
 
 export interface ThiingsGridRef {
   publicGetCurrentPosition: () => Position;
+  centerOnPosition: (position: Position) => void;
 }
 
 // 개별 그리드 아이템을 메모이제이션하여 성능 최적화
@@ -77,7 +81,10 @@ const ThiingsGrid = forwardRef<ThiingsGridRef, ThiingsGridProps>(
     renderItem, 
     className = '', 
     viewportMargin = 800,
-    onScrollStateChange
+    onScrollStateChange,
+    selectedImagePosition,
+    onImageCentered,
+    isSidebarOpen = false
   }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
@@ -89,10 +96,54 @@ const ThiingsGrid = forwardRef<ThiingsGridRef, ThiingsGridProps>(
     const [lastDragTime, setLastDragTime] = useState(0);
     const [lastDragPosition, setLastDragPosition] = useState<Position>({ x: 0, y: 0 });
     const [containerDimensions, setContainerDimensions] = useState({ width: 0, height: 0 });
+    
+    // 중앙 이동 애니메이션을 위한 상태 추가
+    const [isCentering, setIsCentering] = useState(false);
+    const [centerAnimationStart, setCenterAnimationStart] = useState<Position>({ x: 0, y: 0 });
+    const [centerAnimationTarget, setCenterAnimationTarget] = useState<Position>({ x: 0, y: 0 });
+    const [centerAnimationProgress, setCenterAnimationProgress] = useState(0);
 
     // Expose public methods
     useImperativeHandle(ref, () => ({
       publicGetCurrentPosition: () => position,
+      centerOnPosition: (targetPosition: Position) => {
+        if (isCentering || isDragging) return;
+        
+        setIsCentering(true);
+        setCenterAnimationStart({ ...position });
+        setCenterAnimationTarget(targetPosition);
+        setCenterAnimationProgress(0);
+        
+        // 스크롤 상태 변경 알림
+        onScrollStateChange?.(true);
+        
+        // 애니메이션 시작
+        const startTime = Date.now();
+        const duration = 800; // 800ms 애니메이션
+        
+        const animate = () => {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          
+          // 부드러운 이징 함수 (ease-out)
+          const easedProgress = 1 - Math.pow(1 - progress, 3);
+          
+          setCenterAnimationProgress(easedProgress);
+          
+          if (progress < 1) {
+            requestAnimationFrame(animate);
+          } else {
+            // 애니메이션 완료
+            setIsCentering(false);
+            setPosition(targetPosition);
+            setDebouncedPosition(targetPosition);
+            onScrollStateChange?.(false);
+            onImageCentered?.();
+          }
+        };
+        
+        requestAnimationFrame(animate);
+      }
     }));
 
     // 디바운스된 position 업데이트
@@ -105,8 +156,37 @@ const ThiingsGrid = forwardRef<ThiingsGridRef, ThiingsGridProps>(
 
     // position이 변경될 때 디바운스된 업데이트
     useEffect(() => {
-      debouncedSetPosition(position);
-    }, [position, debouncedSetPosition]);
+      if (!isCentering) {
+        debouncedSetPosition(position);
+      }
+    }, [position, debouncedSetPosition, isCentering]);
+
+    // 중앙 이동 애니메이션 중 position 업데이트
+    useEffect(() => {
+      if (isCentering && centerAnimationProgress > 0) {
+        const newX = centerAnimationStart.x + (centerAnimationTarget.x - centerAnimationStart.x) * centerAnimationProgress;
+        const newY = centerAnimationStart.y + (centerAnimationTarget.y - centerAnimationStart.y) * centerAnimationProgress;
+        setPosition({ x: newX, y: newY });
+      }
+    }, [isCentering, centerAnimationProgress, centerAnimationStart, centerAnimationTarget]);
+
+    // selectedImagePosition이 변경될 때 자동으로 중앙 이동
+    useEffect(() => {
+      if (selectedImagePosition && containerDimensions.width > 0 && containerDimensions.height > 0) {
+        // 사이드바를 고려한 중앙 위치 계산
+        const availableWidth = isSidebarOpen ? containerDimensions.width * 0.65 : containerDimensions.width; // 사이드바가 열려있으면 65%만 사용
+        const sidebarOffset = isSidebarOpen ? containerDimensions.width * 0.005 : 0; // 사이드바 오프셋을 0.175에서 0.1로 줄여서 더 중앙에 가깝게
+        
+        // 이미지 위치를 사이드바를 고려한 중앙으로 이동시키는 계산
+        const targetX = -(selectedImagePosition.x * gridWidth) + (availableWidth - gridWidth) / 2 - sidebarOffset;
+        const targetY = -(selectedImagePosition.y * gridHeight) + (containerDimensions.height - gridHeight) / 2;
+        
+        // 현재 ref를 통해 centerOnPosition 호출
+        if (ref && typeof ref === 'object' && ref.current) {
+          ref.current.centerOnPosition({ x: targetX, y: targetY });
+        }
+      }
+    }, [selectedImagePosition, containerDimensions, gridWidth, gridHeight, ref, isSidebarOpen]);
 
     // 컨테이너 크기 감지 및 업데이트
     useEffect(() => {
@@ -232,16 +312,18 @@ const ThiingsGrid = forwardRef<ThiingsGridRef, ThiingsGridProps>(
 
     // Mouse event handlers
     const handleMouseDown = useCallback((e: React.MouseEvent) => {
+      if (isCentering) return; // 중앙 이동 중에는 드래그 방지
+      
       e.preventDefault();
       setIsDragging(true);
       setIsMoving(true);
       setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
       setVelocity({ x: 0, y: 0 });
       onScrollStateChange?.(true);
-    }, [position, onScrollStateChange]);
+    }, [position, onScrollStateChange, isCentering]);
 
     const handleMouseMove = useCallback((e: MouseEvent) => {
-      if (!isDragging) return;
+      if (!isDragging || isCentering) return;
       
       const newPosition = {
         x: e.clientX - dragStart.x,
@@ -264,9 +346,11 @@ const ThiingsGrid = forwardRef<ThiingsGridRef, ThiingsGridProps>(
         setLastDragTime(now);
         setLastDragPosition(newPosition);
       }
-    }, [isDragging, dragStart, lastDragTime, lastDragPosition]);
+    }, [isDragging, isCentering, dragStart, lastDragTime, lastDragPosition]);
 
     const handleMouseUp = useCallback(() => {
+      if (isCentering) return; // 중앙 이동 중에는 드래그 종료 방지
+      
       setIsDragging(false);
       setIsMoving(false);
       onScrollStateChange?.(false);
@@ -292,10 +376,12 @@ const ThiingsGrid = forwardRef<ThiingsGridRef, ThiingsGridProps>(
         
         requestAnimationFrame(animate);
       }
-    }, [velocity, position, onScrollStateChange]);
+    }, [velocity, position, onScrollStateChange, isCentering]);
 
     // Touch event handlers
     const handleTouchStart = useCallback((e: React.TouchEvent) => {
+      if (isCentering) return; // 중앙 이동 중에는 터치 방지
+      
       e.preventDefault();
       const touch = e.touches[0];
       setIsDragging(true);
@@ -303,10 +389,10 @@ const ThiingsGrid = forwardRef<ThiingsGridRef, ThiingsGridProps>(
       setDragStart({ x: touch.clientX - position.x, y: touch.clientY - position.y });
       setVelocity({ x: 0, y: 0 });
       onScrollStateChange?.(true);
-    }, [position, onScrollStateChange]);
+    }, [position, onScrollStateChange, isCentering]);
 
     const handleTouchMove = useCallback((e: React.TouchEvent) => {
-      if (!isDragging) return;
+      if (!isDragging || isCentering) return;
       e.preventDefault();
       
       const touch = e.touches[0];
@@ -331,9 +417,11 @@ const ThiingsGrid = forwardRef<ThiingsGridRef, ThiingsGridProps>(
         setLastDragTime(now);
         setLastDragPosition(newPosition);
       }
-    }, [isDragging, dragStart, lastDragTime, lastDragPosition]);
+    }, [isDragging, isCentering, dragStart, lastDragTime, lastDragPosition]);
 
     const handleTouchEnd = useCallback(() => {
+      if (isCentering) return; // 중앙 이동 중에는 터치 종료 방지
+      
       setIsDragging(false);
       setIsMoving(false);
       onScrollStateChange?.(false);
@@ -359,10 +447,12 @@ const ThiingsGrid = forwardRef<ThiingsGridRef, ThiingsGridProps>(
         
         requestAnimationFrame(animate);
       }
-    }, [velocity, position, onScrollStateChange]);
+    }, [velocity, position, onScrollStateChange, isCentering]);
 
     // Wheel event handler
     const handleWheel = useCallback((e: React.WheelEvent) => {
+      if (isCentering) return; // 중앙 이동 중에는 휠 스크롤 방지
+      
       e.preventDefault();
       onScrollStateChange?.(true);
       setPosition(prev => ({
@@ -374,7 +464,7 @@ const ThiingsGrid = forwardRef<ThiingsGridRef, ThiingsGridProps>(
       setTimeout(() => {
         onScrollStateChange?.(false);
       }, 100);
-    }, [onScrollStateChange]);
+    }, [onScrollStateChange, isCentering]);
 
     // Event listeners
     useEffect(() => {
@@ -397,7 +487,10 @@ const ThiingsGrid = forwardRef<ThiingsGridRef, ThiingsGridProps>(
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
         onWheel={handleWheel}
-        style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+        style={{ 
+          cursor: isDragging ? 'grabbing' : isCentering ? 'default' : 'grab',
+          pointerEvents: isCentering ? 'none' : 'auto'
+        }}
       >
         <div
           className="absolute origin-center"
@@ -406,8 +499,8 @@ const ThiingsGrid = forwardRef<ThiingsGridRef, ThiingsGridProps>(
             transform: `translate3d(${position.x}px, ${position.y}px, 0)`,
             backfaceVisibility: 'hidden',
             perspective: '1000px',
-            // 스크롤 중일 때는 트랜지션 완전 제거, 정지 시에만 부드러운 트랜지션
-            transition: isDragging ? 'none' : 'transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+            // 중앙 이동 중일 때는 트랜지션 제거, 정지 시에만 부드러운 트랜지션
+            transition: isDragging || isCentering ? 'none' : 'transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
           }}
         >
           {/* 뷰포트 내 아이템들만 렌더링 */}
@@ -417,7 +510,7 @@ const ThiingsGrid = forwardRef<ThiingsGridRef, ThiingsGridProps>(
               gridX={gridX}
               gridY={gridY}
               gridIndex={gridIndex}
-              isMoving={isMoving}
+              isMoving={isMoving || isCentering}
               renderItem={renderItem}
               gridWidth={gridWidth}
               gridHeight={gridHeight}

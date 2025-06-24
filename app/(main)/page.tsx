@@ -45,6 +45,9 @@ const MainPage = () => {
   const [isSelectedImageLoading, setIsSelectedImageLoading] = useState(false);
   const [selectedImageError, setSelectedImageError] = useState<string | null>(null);
 
+  // 선택된 이미지의 그리드 위치를 추적하는 상태 추가
+  const [selectedImagePosition, setSelectedImagePosition] = useState<{ x: number; y: number } | null>(null);
+
   const { checkInitialLikeStatus, toggleLike: originalToggleLike } = useIsLike();
   const { isLogin, isInitialized } = useAuth();
 
@@ -101,12 +104,16 @@ const MainPage = () => {
     imageDetailFromItem: ImageDetail | null
   ) => {
     console.log('handleImageClickForModal called:', imageItem);
-    
     setSelectedImageItemForModal(imageItem);
     setIsSidebarOpen(true);
     setIsSelectedImageLoading(true);
     setSelectedImageError(null);
     setSelectedImageId(imageItem.id); // 그리드 위치 기반 ID로 선택 상태 관리
+    
+    // 클릭한 이미지의 그리드 위치 계산 및 저장
+    const gridX = Math.floor(imageItem.x / CELL_WIDTH);
+    const gridY = Math.floor(imageItem.y / CELL_HEIGHT);
+    setSelectedImagePosition({ x: gridX, y: gridY });
     
     if (imageItem.image_doc_id) {
       try {
@@ -122,7 +129,7 @@ const MainPage = () => {
 
   const handleCloseSidebar = () => {
     setIsSidebarOpen(false);
-    // 그리드 위치를 원래대로 되돌리기
+    setSelectedImagePosition(null); // 선택된 이미지 위치도 초기화
     handleLeaveImage();
   };
 
@@ -133,6 +140,7 @@ const MainPage = () => {
     setSelectedImageDetail(null);
     setSelectedImageError(null);
     setSelectedImageId(null);
+    setSelectedImagePosition(null); // 선택된 이미지 위치도 초기화
     handleLeaveImage();
   };
 
@@ -335,6 +343,11 @@ const MainPage = () => {
               className="w-full h-full"
               viewportMargin={800}
               onScrollStateChange={handleScrollStateChange}
+              selectedImagePosition={selectedImagePosition}
+              onImageCentered={() => {
+                console.log('Image centered successfully');
+              }}
+              isSidebarOpen={isSidebarOpen}
             />
           </div>
 
