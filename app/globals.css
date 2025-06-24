@@ -229,4 +229,18 @@ button {
 .image-optimized {
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
+}
+
+/* Shimmer 애니메이션 */
+@keyframes shimmer {
+  0% {
+    transform: skewX(-15deg) translateX(-100%);
+  }
+  100% {
+    transform: skewX(-15deg) translateX(200%);
+  }
+}
+
+.shimmer {
+  animation: shimmer 2s infinite;
 } 

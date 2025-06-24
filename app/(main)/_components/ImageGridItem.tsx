@@ -2,11 +2,12 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import Image from 'next/image';
-import type { ImageItemData, ImageDetail } from '../_types/image-grid';
+import type { ImageItemData, ImageDetail, DecodedItem } from '../_types/image-grid';
 import type { ItemConfig } from './ThiingsGrid';
 import { ITEM_WIDTH, ITEM_HEIGHT } from '../_constants/image-grid';
 import { ArtistBadge } from './ArtistBadge';
 import { LikeDisplay } from './image-action/LikeDisplay';
+import { ItemMarker } from './image-action/ItemMarker';
 
 interface ImageGridItemProps {
   image: ImageItemData;
@@ -98,14 +99,14 @@ const ImageGridItem: React.FC<ImageGridItemProps> = ({
     console.log('Artist clicked:', image.image_doc_id);
   }, [image.image_doc_id]);
 
-  const isCurrentlyHovered = hoveredItemId === image.image_doc_id;
+  const isCurrentlyHovered = hoveredItemId === image.id;
   const isAnotherImageHovered = hoveredItemId !== null && !isCurrentlyHovered;
-  const showDetail = isCurrentlyHovered && hoveredImageDetailData && !isFetchingDetail && !detailError;
-  const shouldShowHoverInfo = isCurrentlyHovered || isHovered;
+  const showDetail = (isCurrentlyHovered || isSelected) && hoveredImageDetailData && !isFetchingDetail && !detailError;
 
-  // 아티스트 이름 추출 - 더 간단한 방식으로 수정
+  // 아티스트 이름 추출 - hover 상태일 때만
   let primaryArtistName: string | null = null;
-  if (shouldShowHoverInfo && hoveredImageDetailData && hoveredImageDetailData.doc_id === image.image_doc_id) {
+  if ((isCurrentlyHovered || isHovered) && hoveredImageDetailData && 
+      hoveredImageDetailData.doc_id === image.image_doc_id) {
     // metadata에서 아티스트 정보 찾기
     if (hoveredImageDetailData.metadata) {
       // 여러 방법으로 아티스트 정보 찾기
@@ -155,7 +156,7 @@ const ImageGridItem: React.FC<ImageGridItemProps> = ({
   if (isImageLoaded) {
     itemClasses += ' opacity-100';
   } else {
-    itemClasses += ' opacity-30';
+    itemClasses += ' opacity-0';
   }
 
   // 호버 효과
@@ -215,15 +216,15 @@ const ImageGridItem: React.FC<ImageGridItemProps> = ({
           </div>
         )}
 
-        {/* 로딩 인디케이터 */}
+        {/* 로딩 인디케이터 - 이미지가 로딩되지 않았을 때만 표시 */}
         {!isImageLoaded && !imageError && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-200">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-600"></div>
+          <div className="absolute inset-0 bg-black flex items-center justify-center border border-gray-800">
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#EAFD66] border-t-transparent"></div>
           </div>
         )}
 
         {/* 아티스트 배지 - 좌측 하단 */}
-        {primaryArtistName && shouldShowHoverInfo && (
+        {primaryArtistName && (isCurrentlyHovered || isHovered) && (
           <div className="absolute bottom-4 left-4 z-20">
             <ArtistBadge
               artistName={primaryArtistName}
@@ -233,19 +234,28 @@ const ImageGridItem: React.FC<ImageGridItemProps> = ({
         )}
 
         {/* 좋아요 표시 - 우측 하단 */}
-        {shouldShowHoverInfo && (
+        {(isCurrentlyHovered || isHovered) && !isFetchingDetail && hoveredImageDetailData && (
           <div className="absolute bottom-4 right-4 z-20">
             <LikeDisplay
-              likeCount={hoveredImageDetailData?.like || 0}
+              likeCount={hoveredImageDetailData.like || 0}
               isLiked={isLiked}
               onLikeClick={handleLikeClick}
             />
           </div>
         )}
 
+        {/* 로딩 스피너 - 우측 상단 (로딩 중일 때만) */}
+        {(isCurrentlyHovered || isHovered) && isFetchingDetail && !isSelected && (
+          <div className="absolute top-4 right-4 z-20">
+            <div className="flex items-center justify-center w-6 h-6 bg-black/60 rounded-full backdrop-blur-sm">
+              <div className="animate-spin rounded-full h-3 w-3 border-2 border-[#EAFD66] border-t-transparent"></div>
+            </div>
+          </div>
+        )}
+
         {/* 상세 정보 오버레이 */}
-        {showDetail && (
-          <div className="absolute inset-0 bg-black/60 text-white p-4 flex flex-col justify-end backdrop-blur-sm">
+        {showDetail && !isSelected && (
+          <div className="absolute inset-0 bg-black/60 text-white p-4 flex flex-col justify-end">
             <div className="space-y-2">
               <h3 className="font-semibold text-sm line-clamp-2">
                 {hoveredImageDetailData.title || 'Untitled'}
@@ -265,14 +275,14 @@ const ImageGridItem: React.FC<ImageGridItemProps> = ({
         )}
 
         {/* 로딩 상태 */}
-        {isCurrentlyHovered && isFetchingDetail && (
+        {isCurrentlyHovered && isFetchingDetail && !isSelected && (
           <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
           </div>
         )}
 
         {/* 에러 상태 */}
-        {isCurrentlyHovered && detailError && (
+        {isCurrentlyHovered && detailError && !isSelected && (
           <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
             <p className="text-white text-xs text-center px-2">
               Failed to load details
@@ -281,8 +291,26 @@ const ImageGridItem: React.FC<ImageGridItemProps> = ({
         )}
 
         {/* 호버 시 확대 효과 */}
-        {(isCurrentlyHovered || isHovered) && (
+        {(isCurrentlyHovered || isHovered) && !isSelected && (
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+        )}
+
+        {/* 아이템 마커들 - hover 시에만 표시 */}
+        {(isCurrentlyHovered || isHovered) && hoveredImageDetailData && hoveredImageDetailData.items && (
+          <>
+            {Object.entries(hoveredImageDetailData.items).flatMap(([key, decodedItems]) =>
+              decodedItems.map((decodedItem: DecodedItem, index: number) => (
+                <ItemMarker
+                  key={`${hoveredImageDetailData.doc_id}-marker-${key}-${index}`}
+                  decodedItem={decodedItem}
+                  itemContainerWidth={ITEM_WIDTH}
+                  itemContainerHeight={ITEM_HEIGHT}
+                  detailDocId={hoveredImageDetailData.doc_id}
+                  itemIndex={index}
+                />
+              ))
+            )}
+          </>
         )}
       </div>
     </div>

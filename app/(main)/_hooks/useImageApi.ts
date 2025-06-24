@@ -214,6 +214,10 @@ export function useImageApi() {
       hoverTimeoutRef.current = null;
     }
     lastHoveredDocIdRef.current = null;
+    // hover 상태 완전 초기화
+    setHoveredImageDetailData(null);
+    setDetailError(null);
+    setIsFetchingDetail(false);
   }, []);
 
   return {

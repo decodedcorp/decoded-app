@@ -100,15 +100,11 @@ const MainPage = () => {
     imageItem: ImageItemData,
     imageDetailFromItem: ImageDetail | null
   ) => {
-    if (isSidebarOpen) {
-      return;
-    }
-    
     setSelectedImageItemForModal(imageItem);
     setIsSidebarOpen(true);
     setIsSelectedImageLoading(true);
     setSelectedImageError(null);
-    setSelectedImageId(imageItem.id);
+    setSelectedImageId(imageItem.id); // 그리드 위치 기반 ID로 선택 상태 관리
     
     if (imageItem.image_doc_id) {
       try {
@@ -124,13 +120,27 @@ const MainPage = () => {
 
   const handleCloseSidebar = () => {
     setIsSidebarOpen(false);
+    // 선택된 이미지 정보는 유지 (사이드바만 닫기)
+    // setSelectedImageItemForModal(null);
+    // setSelectedImageDetail(null);
+    // setSelectedImageError(null);
+    // setSelectedImageId(null);
+    // 사이드바가 닫힐 때 hover 상태 초기화
+    handleLeaveImage();
+  };
+
+  // 사이드바와 선택된 이미지 정보를 완전히 초기화하는 함수
+  const handleResetSidebar = () => {
+    setIsSidebarOpen(false);
     setSelectedImageItemForModal(null);
     setSelectedImageDetail(null);
     setSelectedImageError(null);
     setSelectedImageId(null);
+    handleLeaveImage();
   };
 
   const getHoveredItemId = () => {
+    // 사이드바가 열려있을 때는 선택된 이미지의 그리드 위치 ID를 반환
     if (isSidebarOpen && selectedImageId) {
       return selectedImageId;
     }
@@ -139,12 +149,21 @@ const MainPage = () => {
 
   const handleImageClick = useCallback(
     (imageItem: ImageItemData, imageDetailFromItem: ImageDetail | null) => {
-      if (isSidebarOpen) {
-        return;
+      // 사이드바가 닫혀있으면 열고, 열려있으면 다른 이미지 클릭 시 해당 이미지로 변경
+      if (!isSidebarOpen) {
+        handleImageClickForModal(imageItem, imageDetailFromItem);
+      } else {
+        // 사이드바가 이미 열려있고, 다른 이미지를 클릭한 경우
+        if (selectedImageId !== imageItem.id) {
+          // 새로운 이미지로 사이드바 내용 변경
+          handleImageClickForModal(imageItem, imageDetailFromItem);
+        } else {
+          // 같은 이미지를 다시 클릭한 경우 사이드바 닫기
+          handleResetSidebar();
+        }
       }
-      handleImageClickForModal(imageItem, imageDetailFromItem);
     },
-    [isSidebarOpen, handleImageClickForModal]
+    [isSidebarOpen, selectedImageId, handleImageClickForModal, handleResetSidebar]
   );
 
   // 이미지 로드 핸들러
@@ -159,8 +178,8 @@ const MainPage = () => {
     
     if (!apiImages || apiImages.length === 0) {
       return (
-        <div className="absolute inset-1 rounded-lg bg-gray-200 flex items-center justify-center">
-          <div className="text-gray-500 text-sm">Loading...</div>
+        <div className="absolute inset-0 bg-black flex items-center justify-center border border-gray-800">
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#EAFD66] border-t-transparent"></div>
         </div>
       );
     }
@@ -171,15 +190,15 @@ const MainPage = () => {
     
     if (!apiImage) {
       return (
-        <div className="absolute inset-1 rounded-lg bg-gray-200 flex items-center justify-center">
-          <div className="text-gray-500 text-sm">No Image</div>
+        <div className="absolute inset-0 bg-black flex items-center justify-center border border-gray-800">
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#EAFD66] border-t-transparent"></div>
         </div>
       );
     }
 
     // ImageItemData 형태로 변환
     const imageItem: ImageItemData = {
-      id: `${config.position.x}_${config.position.y}`,
+      id: `${apiImage.image_doc_id}_${config.position.x}_${config.position.y}`,
       row: config.position.y,
       col: config.position.x,
       src: apiImage.image_url,
@@ -197,9 +216,9 @@ const MainPage = () => {
         image={imageItem}
         config={config}
         hoveredItemId={getHoveredItemId()}
-        hoveredImageDetailData={hoveredImageDetailData}
-        isFetchingDetail={isFetchingDetail}
-        detailError={detailError}
+        hoveredImageDetailData={selectedImageId === imageItem.id ? selectedImageDetail : hoveredImageDetailData}
+        isFetchingDetail={selectedImageId === imageItem.id ? isSelectedImageLoading : isFetchingDetail}
+        detailError={selectedImageId === imageItem.id ? selectedImageError : detailError}
         onImageLoaded={handleImageLoaded}
         onMouseEnterItem={handleHoverImage}
         onMouseLeaveItem={handleLeaveImage}
@@ -222,7 +241,28 @@ const MainPage = () => {
     likedStatusesMap,
     handleImageClick,
     selectedImageId,
+    selectedImageDetail,
+    selectedImageError,
+    isSelectedImageLoading,
   ]);
+
+  // ESC 키로 사이드바 완전 초기화
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        if (isSidebarOpen) {
+          // 사이드바가 열려있을 때만 완전 초기화
+          handleResetSidebar();
+        } else {
+          // 사이드바가 닫혀있을 때는 hover 상태만 초기화
+          handleLeaveImage();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isSidebarOpen, handleResetSidebar, handleLeaveImage]);
 
   return (
     <>
@@ -292,30 +332,12 @@ const MainPage = () => {
               }}
             >
               <button
-                className="h-10 w-10 rounded-full bg-yellow-400 text-black hover:bg-yellow-500 shadow-xl transition-all duration-300 group flex items-center justify-center"
-                onClick={handleCloseSidebar}
+                className="h-10 w-10 rounded-full bg-red-500 text-white hover:bg-red-600 shadow-xl transition-all duration-300 group flex items-center justify-center"
+                onClick={handleResetSidebar}
+                title="완전 초기화"
               >
                 <svg className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-              
-              <button
-                className="h-10 w-10 rounded-full bg-yellow-400 text-black hover:bg-yellow-500 shadow-xl transition-all duration-300 group flex items-center justify-center"
-              >
-                <svg
-                  className="w-5 h-5 transition-all duration-300 group-hover:scale-110"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5"
-                  />
                 </svg>
               </button>
             </div>
