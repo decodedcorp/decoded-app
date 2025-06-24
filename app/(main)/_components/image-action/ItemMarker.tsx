@@ -24,7 +24,8 @@ export function ItemMarker({
   itemContainerHeight,
   detailDocId,
   itemIndex,
-}: ItemMarkerProps) {
+  onExpand,
+}: ItemMarkerProps & { onExpand?: () => void }) {
   const position = decodedItem.position;
   const parsedTop = typeof position?.top === 'string' ? parseFloat(position.top) : position?.top;
   const parsedLeft = typeof position?.left === 'string' ? parseFloat(position.left) : position?.left;
@@ -80,7 +81,7 @@ export function ItemMarker({
       }}
       onClick={(e) => {
         e.stopPropagation();
-        console.log("Marker clicked:", { brandName, itemName, position: { top: itemPctTop, left: itemPctLeft } });
+        onExpand?.();
       }}
     >
       <span style={{ color: 'white', fontWeight: 'bold', fontSize: '14px' }}>

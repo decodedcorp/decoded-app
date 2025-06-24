@@ -100,6 +100,8 @@ const MainPage = () => {
     imageItem: ImageItemData,
     imageDetailFromItem: ImageDetail | null
   ) => {
+    console.log('handleImageClickForModal called:', imageItem);
+    
     setSelectedImageItemForModal(imageItem);
     setIsSidebarOpen(true);
     setIsSelectedImageLoading(true);
@@ -120,12 +122,7 @@ const MainPage = () => {
 
   const handleCloseSidebar = () => {
     setIsSidebarOpen(false);
-    // 선택된 이미지 정보는 유지 (사이드바만 닫기)
-    // setSelectedImageItemForModal(null);
-    // setSelectedImageDetail(null);
-    // setSelectedImageError(null);
-    // setSelectedImageId(null);
-    // 사이드바가 닫힐 때 hover 상태 초기화
+    // 그리드 위치를 원래대로 되돌리기
     handleLeaveImage();
   };
 
@@ -149,15 +146,20 @@ const MainPage = () => {
 
   const handleImageClick = useCallback(
     (imageItem: ImageItemData, imageDetailFromItem: ImageDetail | null) => {
+      console.log('handleImageClick called:', { imageItem, isSidebarOpen, selectedImageId });
+      
       // 사이드바가 닫혀있으면 열고, 열려있으면 다른 이미지 클릭 시 해당 이미지로 변경
       if (!isSidebarOpen) {
+        console.log('Opening sidebar...');
         handleImageClickForModal(imageItem, imageDetailFromItem);
       } else {
         // 사이드바가 이미 열려있고, 다른 이미지를 클릭한 경우
         if (selectedImageId !== imageItem.id) {
+          console.log('Changing to different image...');
           // 새로운 이미지로 사이드바 내용 변경
           handleImageClickForModal(imageItem, imageDetailFromItem);
         } else {
+          console.log('Closing sidebar...');
           // 같은 이미지를 다시 클릭한 경우 사이드바 닫기
           handleResetSidebar();
         }
@@ -172,7 +174,7 @@ const MainPage = () => {
     console.log('Image loaded:', imageId);
   }, []);
 
-  // ThiingsGrid용 렌더 아이템 함수
+  // ThiingsGrid용 렌더 아이템 함수 (극한 최적화)
   const renderGridItem = useCallback((config: ItemConfig) => {
     const apiImages = apiImageUrlListRef.current;
     
@@ -211,8 +213,31 @@ const MainPage = () => {
       image_doc_id: apiImage.image_doc_id,
     };
 
+    // 스크롤 중일 때는 최소한의 props만 전달
+    if (config.isMoving) {
+      return (
+        <ImageGridItem
+          key={imageItem.id}
+          image={imageItem}
+          config={config}
+          hoveredItemId={null} // 스크롤 중에는 hover 비활성화
+          hoveredImageDetailData={null}
+          isFetchingDetail={false}
+          detailError={null}
+          onImageLoaded={() => {}} // 스크롤 중에는 비활성화
+          onMouseEnterItem={() => {}} // 스크롤 중에는 비활성화
+          onMouseLeaveItem={() => {}} // 스크롤 중에는 비활성화
+          onToggleLike={() => {}} // 스크롤 중에는 비활성화
+          isLiked={false} // 스크롤 중에는 비활성화
+          onClick={() => {}} // 스크롤 중에는 비활성화
+          isSelected={false} // 스크롤 중에는 선택 상태 비활성화
+        />
+      );
+    }
+
     return (
       <ImageGridItem
+        key={imageItem.id}
         image={imageItem}
         config={config}
         hoveredItemId={getHoveredItemId()}
@@ -245,6 +270,11 @@ const MainPage = () => {
     selectedImageError,
     isSelectedImageLoading,
   ]);
+
+  // 스크롤 상태 감지 및 최적화
+  const handleScrollStateChange = useCallback((isScrolling: boolean) => {
+    setScrollingState(isScrolling);
+  }, [setScrollingState]);
 
   // ESC 키로 사이드바 완전 초기화
   useEffect(() => {
@@ -303,8 +333,8 @@ const MainPage = () => {
               gridHeight={CELL_HEIGHT}
               renderItem={renderGridItem}
               className="w-full h-full"
-              initialPosition={{ x: 0, y: 0 }}
               viewportMargin={800}
+              onScrollStateChange={handleScrollStateChange}
             />
           </div>
 

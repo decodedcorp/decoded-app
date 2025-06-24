@@ -167,45 +167,48 @@ export function useImageApi() {
       
       scrollEndTimeoutRef.current = setTimeout(() => {
         isScrollingRef.current = false;
-      }, 200); // 스크롤 후 200ms 대기
+      }, 150); // 스크롤 후 150ms 대기 (더 짧게)
     }
   }, []);
 
-  // 최적화된 hover 처리 함수
-  const handleHoverImage = useCallback((docId: string) => {
-    // 같은 이미지에 대해 중복 요청 방지
-    if (lastHoveredDocIdRef.current === docId) {
-      return;
-    }
-
-    // 스크롤 중일 때는 요청을 지연시킴
-    if (isScrollingRef.current) {
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current);
+  // 최적화된 hover 처리 함수 (극한 스로틀링 적용)
+  const handleHoverImage = useCallback(
+    throttle((docId: string) => {
+      // 같은 이미지에 대해 중복 요청 방지
+      if (lastHoveredDocIdRef.current === docId) {
+        return;
       }
-      
-      hoverTimeoutRef.current = setTimeout(() => {
-        if (!isScrollingRef.current) {
-          lastHoveredDocIdRef.current = docId;
-          fetchImageDetail(docId);
+
+      // 스크롤 중일 때는 요청을 더 오래 지연시킴
+      if (isScrollingRef.current) {
+        if (hoverTimeoutRef.current) {
+          clearTimeout(hoverTimeoutRef.current);
         }
-      }, 300); // 스크롤 후 300ms 대기
-      return;
-    }
+        
+        hoverTimeoutRef.current = setTimeout(() => {
+          if (!isScrollingRef.current) {
+            lastHoveredDocIdRef.current = docId;
+            fetchImageDetail(docId);
+          }
+        }, 300); // 스크롤 후 300ms 대기
+        return;
+      }
 
-    // 이미 캐시된 데이터가 있으면 즉시 반환
-    if (detailCacheRef.current[docId]) {
+      // 이미 캐시된 데이터가 있으면 즉시 반환
+      if (detailCacheRef.current[docId]) {
+        lastHoveredDocIdRef.current = docId;
+        setHoveredImageDetailData(detailCacheRef.current[docId]);
+        setDetailError(null);
+        setIsFetchingDetail(false);
+        return;
+      }
+
+      // 새로운 요청
       lastHoveredDocIdRef.current = docId;
-      setHoveredImageDetailData(detailCacheRef.current[docId]);
-      setDetailError(null);
-      setIsFetchingDetail(false);
-      return;
-    }
-
-    // 새로운 요청
-    lastHoveredDocIdRef.current = docId;
-    fetchImageDetail(docId);
-  }, [fetchImageDetail]);
+      fetchImageDetail(docId);
+    }, 150), // 150ms 스로틀링
+    [fetchImageDetail]
+  );
 
   // Hover 해제 처리
   const handleLeaveImage = useCallback(() => {

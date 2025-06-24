@@ -82,21 +82,6 @@ export function ImageSlider({ images, imageDetail }: ImageSliderProps) {
           style={{ objectPosition: 'center top' }}
           priority
         />
-        
-        {imageDetail && imageContainerSize.width > 0 && imageContainerSize.height > 0 && (
-          <div className="absolute inset-0 pointer-events-none">
-            {Object.values(imageDetail.items || {}).flat().map((decodedItem, idx) => (
-              <ItemMarker
-                key={`sidebar-marker-${decodedItem?.item?.item?._id || idx}`}
-                decodedItem={decodedItem}
-                itemContainerWidth={imageContainerSize.width}
-                itemContainerHeight={imageContainerSize.height}
-                detailDocId={imageDetail.doc_id}
-                itemIndex={idx}
-              />
-            ))}
-          </div>
-        )}
       </div>
       
       <div className="absolute bottom-4 left-8 transform translate-x-4">

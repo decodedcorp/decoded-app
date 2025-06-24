@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import type { ImageItemData, ImageDetail, DecodedItem } from '../_types/image-grid';
 import type { ItemConfig } from './ThiingsGrid';
@@ -8,6 +8,7 @@ import { ITEM_WIDTH, ITEM_HEIGHT } from '../_constants/image-grid';
 import { ArtistBadge } from './ArtistBadge';
 import { LikeDisplay } from './image-action/LikeDisplay';
 import { ItemMarker } from './image-action/ItemMarker';
+import { ItemDetailCard } from './image-action/ItemDetailCard';
 
 interface ImageGridItemProps {
   image: ImageItemData;
@@ -25,7 +26,7 @@ interface ImageGridItemProps {
   isSelected: boolean;
 }
 
-const ImageGridItem: React.FC<ImageGridItemProps> = ({
+const ImageGridItem: React.FC<ImageGridItemProps> = React.memo(({
   image,
   config,
   hoveredItemId,
@@ -44,6 +45,7 @@ const ImageGridItem: React.FC<ImageGridItemProps> = ({
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [expandedMarkerKey, setExpandedMarkerKey] = useState<string | null>(null);
 
   // 모바일 감지
   useEffect(() => {
@@ -62,6 +64,17 @@ const ImageGridItem: React.FC<ImageGridItemProps> = ({
       return () => window.removeEventListener('resize', checkMobile);
     }
   }, []);
+
+  // 아이템 디테일 카드 초기화 - hover 상태나 선택 상태가 변경될 때
+  useEffect(() => {
+    const isCurrentlyHovered = hoveredItemId === image.id;
+    const shouldShowMarkers = (isCurrentlyHovered || isHovered || isSelected) && hoveredImageDetailData;
+    
+    // 더 이상 마커를 표시하지 않아야 할 때 expandedMarkerKey 초기화
+    if (!shouldShowMarkers) {
+      setExpandedMarkerKey(null);
+    }
+  }, [hoveredItemId, isHovered, isSelected, hoveredImageDetailData, image.id]);
 
   const handleImageLoad = useCallback(() => {
     setIsImageLoaded(true);
@@ -83,6 +96,7 @@ const ImageGridItem: React.FC<ImageGridItemProps> = ({
   }, [onMouseLeaveItem]);
 
   const handleClick = useCallback(() => {
+    console.log('ImageGridItem handleClick called:', { image, hoveredImageDetailData });
     onClick(image, hoveredImageDetailData);
   }, [image, hoveredImageDetailData, onClick]);
 
@@ -103,85 +117,113 @@ const ImageGridItem: React.FC<ImageGridItemProps> = ({
   const isAnotherImageHovered = hoveredItemId !== null && !isCurrentlyHovered;
   const showDetail = (isCurrentlyHovered || isSelected) && hoveredImageDetailData && !isFetchingDetail && !detailError;
 
-  // 아티스트 이름 추출 - hover 상태일 때만
-  let primaryArtistName: string | null = null;
-  if ((isCurrentlyHovered || isHovered) && hoveredImageDetailData && 
-      hoveredImageDetailData.doc_id === image.image_doc_id) {
-    // metadata에서 아티스트 정보 찾기
-    if (hoveredImageDetailData.metadata) {
-      // 여러 방법으로 아티스트 정보 찾기
-      const metadata = hoveredImageDetailData.metadata;
-      
-      // 1. profile_image_url이 있는 키 찾기 (보통 아티스트 정보)
-      const artistKey = Object.keys(metadata).find(key => 
-        key !== 'profile_image_url' && 
-        metadata[key] && 
-        typeof metadata[key] === 'string' &&
-        (metadata[key] as string).length > 0 &&
-        (metadata[key] as string).length < 50
-      );
-      
-      if (artistKey) {
-        primaryArtistName = metadata[artistKey] as string;
-      }
-      
-      // 2. 아직 찾지 못했다면, profile_image_url이 있는 경우 해당 키의 이름 사용
-      if (!primaryArtistName && metadata.profile_image_url) {
-        const profileKey = Object.keys(metadata).find(key => 
+  // 아티스트 이름 추출 - hover 상태일 때만 (메모이제이션)
+  const primaryArtistName = useMemo(() => {
+    if ((isCurrentlyHovered || isHovered) && hoveredImageDetailData && 
+        hoveredImageDetailData.doc_id === image.image_doc_id) {
+      // metadata에서 아티스트 정보 찾기
+      if (hoveredImageDetailData.metadata) {
+        // 여러 방법으로 아티스트 정보 찾기
+        const metadata = hoveredImageDetailData.metadata;
+        
+        // 1. profile_image_url이 있는 키 찾기 (보통 아티스트 정보)
+        const artistKey = Object.keys(metadata).find(key => 
           key !== 'profile_image_url' && 
           metadata[key] && 
-          typeof metadata[key] === 'string'
+          typeof metadata[key] === 'string' &&
+          (metadata[key] as string).length > 0 &&
+          (metadata[key] as string).length < 50
         );
-        if (profileKey) {
-          primaryArtistName = metadata[profileKey] as string;
+        
+        if (artistKey) {
+          return metadata[artistKey] as string;
+        }
+        
+        // 2. 아직 찾지 못했다면, profile_image_url이 있는 경우 해당 키의 이름 사용
+        if (metadata.profile_image_url) {
+          const profileKey = Object.keys(metadata).find(key => 
+            key !== 'profile_image_url' && 
+            metadata[key] && 
+            typeof metadata[key] === 'string'
+          );
+          if (profileKey) {
+            return metadata[profileKey] as string;
+          }
+        }
+        
+        // 3. 여전히 없다면 upload_by 정보 사용
+        if (hoveredImageDetailData.upload_by) {
+          return hoveredImageDetailData.upload_by;
         }
       }
-      
-      // 3. 여전히 없다면 upload_by 정보 사용
-      if (!primaryArtistName && hoveredImageDetailData.upload_by) {
-        primaryArtistName = hoveredImageDetailData.upload_by;
+    }
+    return null;
+  }, [isCurrentlyHovered, isHovered, hoveredImageDetailData, image.image_doc_id]);
+
+  // 동적 클래스 생성 (메모이제이션)
+  const itemClasses = useMemo(() => {
+    let classes = `absolute bg-black box-border flex justify-center items-center transition-all duration-300 ease-out group opacity-100`;
+
+    if (isCurrentlyHovered || isHovered) {
+      classes += ' overflow-visible';
+    } else {
+      classes += ' overflow-hidden';
+    }
+
+    if (isImageLoaded) {
+      classes += ' opacity-100';
+    } else {
+      classes += ' opacity-0';
+    }
+
+    // 호버 효과
+    if (isMobile) {
+      if (isHovered) {
+        classes += ' scale-105 z-30 brightness-110';
+      } else if (isAnotherImageHovered) {
+        classes += ' opacity-40 scale-95 z-0 brightness-75';
+      } else {
+        classes += ' z-10';
+      }
+    } else {
+      if (isCurrentlyHovered) {
+        classes += ' scale-105 z-30 brightness-110';
+      } else if (isAnotherImageHovered) {
+        classes += ' opacity-40 scale-95 z-0 brightness-75';
+      } else {
+        classes += ' z-10';
       }
     }
-  }
 
-  // 동적 클래스 생성
-  let itemClasses = `absolute bg-black box-border flex justify-center items-center transition-all duration-300 ease-out group opacity-100`;
-
-  if (isCurrentlyHovered || isHovered) {
-    itemClasses += ' overflow-visible';
-  } else {
-    itemClasses += ' overflow-hidden';
-  }
-
-  if (isImageLoaded) {
-    itemClasses += ' opacity-100';
-  } else {
-    itemClasses += ' opacity-0';
-  }
-
-  // 호버 효과
-  if (isMobile) {
-    if (isHovered) {
-      itemClasses += ' scale-105 z-30 brightness-110';
-    } else if (isAnotherImageHovered) {
-      itemClasses += ' opacity-40 scale-95 z-0 brightness-75';
-    } else {
-      itemClasses += ' z-10';
+    // 선택 상태
+    if (isSelected) {
+      classes += ' ring-4 ring-yellow-400';
     }
-  } else {
-    if (isCurrentlyHovered) {
-      itemClasses += ' scale-105 z-30 brightness-110';
-    } else if (isAnotherImageHovered) {
-      itemClasses += ' opacity-40 scale-95 z-0 brightness-75';
-    } else {
-      itemClasses += ' z-10';
-    }
-  }
 
-  // 선택 상태
-  if (isSelected) {
-    itemClasses += ' ring-4 ring-yellow-400';
-  }
+    return classes;
+  }, [
+    isCurrentlyHovered, 
+    isHovered, 
+    isImageLoaded, 
+    isMobile, 
+    isAnotherImageHovered, 
+    isSelected
+  ]);
+
+  // 스타일 객체 메모이제이션
+  const itemStyle = useMemo(() => ({
+    transform: config.isMoving ? 'scale(0.98)' : undefined,
+    width: ITEM_WIDTH,
+    height: ITEM_HEIGHT,
+    willChange: 'transform, opacity',
+    backfaceVisibility: 'hidden' as const,
+    // 스크롤 중일 때는 더 적극적인 최적화
+    ...(config.isMoving && {
+      transition: 'none',
+      filter: 'none',
+      transform: 'scale(0.98)',
+    }),
+  }), [config.isMoving]);
 
   return (
     <div
@@ -189,11 +231,7 @@ const ImageGridItem: React.FC<ImageGridItemProps> = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
-      style={{
-        transform: config.isMoving ? 'scale(0.95)' : undefined,
-        width: ITEM_WIDTH,
-        height: ITEM_HEIGHT,
-      }}
+      style={itemStyle}
     >
       {/* 이미지 */}
       <div className="relative w-full h-full">
@@ -203,10 +241,15 @@ const ImageGridItem: React.FC<ImageGridItemProps> = ({
             alt={image.alt}
             fill
             className="object-cover transition-opacity duration-300"
-            style={{ opacity: isImageLoaded ? 1 : 0 }}
+            style={{ 
+              opacity: isImageLoaded ? 1 : 0,
+              willChange: 'opacity',
+            }}
             onLoad={handleImageLoad}
             onError={handleImageError}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            priority={false}
+            loading="lazy"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500">
@@ -298,23 +341,54 @@ const ImageGridItem: React.FC<ImageGridItemProps> = ({
         {/* 아이템 마커들 - hover 시에만 표시 */}
         {(isCurrentlyHovered || isHovered) && hoveredImageDetailData && hoveredImageDetailData.items && (
           <>
-            {Object.entries(hoveredImageDetailData.items).flatMap(([key, decodedItems]) =>
-              decodedItems.map((decodedItem: DecodedItem, index: number) => (
-                <ItemMarker
-                  key={`${hoveredImageDetailData.doc_id}-marker-${key}-${index}`}
-                  decodedItem={decodedItem}
-                  itemContainerWidth={ITEM_WIDTH}
-                  itemContainerHeight={ITEM_HEIGHT}
-                  detailDocId={hoveredImageDetailData.doc_id}
-                  itemIndex={index}
-                />
-              ))
+            {Object.entries(hoveredImageDetailData.items).flatMap(
+              ([key, decodedItems]) =>
+                decodedItems.map((decodedItem: DecodedItem, index: number) => {
+                  const markerKey = `${hoveredImageDetailData.doc_id}-marker-${key}-${index}`;
+                  const isExpanded = expandedMarkerKey === markerKey;
+
+                  // 마커 위치 계산
+                  const position = decodedItem.position;
+                  const parsedTop = typeof position?.top === 'string' ? parseFloat(position.top) : position?.top;
+                  const parsedLeft = typeof position?.left === 'string' ? parseFloat(position.left) : position?.left;
+                  const itemPctTop = parsedTop;
+                  const itemPctLeft = parsedLeft;
+                  const markerX = (itemPctLeft / 100) * ITEM_WIDTH;
+                  const markerY = (itemPctTop / 100) * ITEM_HEIGHT;
+
+                  const sharedStyle: React.CSSProperties = {
+                    position: 'absolute',
+                    left: `${markerX - 24 / 2}px`,
+                    top: `${markerY - 24 / 2}px`,
+                    zIndex: 40,
+                    pointerEvents: 'auto',
+                    transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
+                  };
+
+                  return isExpanded ? (
+                    <div key={markerKey} style={sharedStyle}>
+                      <ItemDetailCard decodedItem={decodedItem} />
+                    </div>
+                  ) : (
+                    <ItemMarker
+                      key={markerKey}
+                      decodedItem={decodedItem}
+                      itemContainerWidth={ITEM_WIDTH}
+                      itemContainerHeight={ITEM_HEIGHT}
+                      detailDocId={hoveredImageDetailData.doc_id}
+                      itemIndex={index}
+                      onExpand={() => setExpandedMarkerKey(markerKey)}
+                    />
+                  );
+                })
             )}
           </>
         )}
       </div>
     </div>
   );
-};
+});
+
+ImageGridItem.displayName = 'ImageGridItem';
 
 export default ImageGridItem; 
