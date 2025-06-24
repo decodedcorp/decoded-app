@@ -1,20 +1,17 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Head from 'next/head';
 import { ImageGridHeader } from './_components/header/ImageGridHeader';
-import ImageItem from './_components/ImageItem';
+import ThiingsGrid, { type ItemConfig } from './_components/ThiingsGrid';
+import ImageGridItem from './_components/ImageGridItem';
 import FabMenu from './_components/footer/FabMenu';
 import type { ImageItemData, ImageDetail } from './_types/image-grid';
 import { useImageApi } from './_hooks/useImageApi';
-import { useImageGrid } from './_hooks/useImageGrid';
-import { useGridInteraction } from './_hooks/useGridInteraction';
 import { useIsLike } from "@/app/details/utils/hooks/isLike";
 import { useAuth } from "@/lib/hooks/features/auth/useAuth";
 import { ImageSidebar } from './_components/sidebar/ImageSidebar';
-import { ScrollRemote } from './_components/ScrollRemote';
-import { Button } from '@/components/ui/button';
-import { X, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
+import { CELL_WIDTH, CELL_HEIGHT } from './_constants/image-grid';
 
 const MainPage = () => {
   const {
@@ -28,68 +25,40 @@ const MainPage = () => {
     hoveredImageDetailData,
     isFetchingDetail,
     detailError,
+    handleHoverImage,
+    handleLeaveImage,
+    setScrollingState,
   } = useImageApi();
 
-  const imageGridParams = {
-    apiImageUrlListRef,
-    currentApiImageIndexRef,
-    allApiImagesFetchedRef,
-    isFetchingApiImagesRef,
-    apiImageCount,
-    fetchAndCacheApiImages,
-  };
-
-  const {
-    scrollContainerRef,
-    images,
-    contentOffset,
-    setContentOffset,
-    onImageLoaded,
-  } = useImageGrid(imageGridParams);
-
+  const gridRef = useRef<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImageItemForModal, setSelectedImageItemForModal] =
     useState<ImageItemData | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [likedStatusesMap, setLikedStatusesMap] = useState<Record<string, boolean>>({});
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [focusedImageId, setFocusedImageId] = useState<string | null>(null);
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
-
-  // 줌 관련 상태 추가
-  const [zoomLevel, setZoomLevel] = useState(1);
-  const [isZooming, setIsZooming] = useState(false);
-  const [zoomTarget, setZoomTarget] = useState<{ x: number; y: number } | null>(null);
-  const [originalContentOffset, setOriginalContentOffset] = useState({ x: 0, y: 0 });
-  const [isAnimating, setIsAnimating] = useState(false); // 애니메이션 중복 방지
-
-  const {
-    handleMouseDown,
-    hoveredItemId,
-    handleMouseEnterItem,
-    handleMouseLeaveItem,
-  } = useGridInteraction({
-    scrollContainerRef,
-    contentOffset,
-    setContentOffset,
-    fetchImageDetail,
-  });
-
-  const { checkInitialLikeStatus, toggleLike: originalToggleLike } = useIsLike();
-  const { isLogin, isInitialized } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
 
   // 선택된 이미지의 상세 데이터를 위한 상태 추가
   const [selectedImageDetail, setSelectedImageDetail] = useState<ImageDetail | null>(null);
   const [isSelectedImageLoading, setIsSelectedImageLoading] = useState(false);
   const [selectedImageError, setSelectedImageError] = useState<string | null>(null);
 
-  // 줌 상태 변경 시 처리
+  const { checkInitialLikeStatus, toggleLike: originalToggleLike } = useIsLike();
+  const { isLogin, isInitialized } = useAuth();
+
+  // 초기 이미지 로딩
   useEffect(() => {
-    if (!isZooming && zoomLevel === 1) {
-      // 줌이 완전히 리셋되었을 때 추가 정리 작업
-      setZoomTarget(null);
-    }
-  }, [isZooming, zoomLevel]);
+    const loadInitialImages = async () => {
+      if (apiImageCount === 0 && !isFetchingApiImagesRef.current) {
+        await fetchAndCacheApiImages();
+      }
+      setIsLoading(false);
+    };
+
+    loadInitialImages();
+  }, [fetchAndCacheApiImages, apiImageCount]);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && isInitialized) {
@@ -127,70 +96,13 @@ const MainPage = () => {
     }
   };
 
-  // 줌 애니메이션 함수
-  const animateZoom = (targetZoom: number, targetX: number, targetY: number, duration: number = 800) => {
-    if (isAnimating) {
-      console.log('Animation already in progress, skipping...');
-      return;
-    }
-    
-    setIsAnimating(true);
-    setIsZooming(true);
-    const startZoom = zoomLevel;
-    const startX = contentOffset.x;
-    const startY = contentOffset.y;
-    const startTime = performance.now();
-
-    const animate = (currentTime: number) => {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      
-      // 더 부드러운 이징 함수 (ease-out-quint)
-      const easedProgress = 1 - Math.pow(1 - progress, 5);
-      
-      const newZoom = startZoom + (targetZoom - startZoom) * easedProgress;
-      const newX = startX + (targetX - startX) * easedProgress;
-      const newY = startY + (targetY - startY) * easedProgress;
-      
-      setZoomLevel(newZoom);
-      setContentOffset({ x: newX, y: newY });
-      
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      } else {
-        setIsZooming(false);
-        setIsAnimating(false);
-      }
-    };
-    
-    requestAnimationFrame(animate);
-  };
-
-  // 줌 리셋 함수
-  const resetZoom = () => {
-    const targetZoom = 1;
-    const targetX = originalContentOffset.x;
-    const targetY = originalContentOffset.y;
-    
-    animateZoom(targetZoom, targetX, targetY, 800);
-  };
-
   const handleImageClickForModal = async (
     imageItem: ImageItemData,
     imageDetailFromItem: ImageDetail | null
   ) => {
-    // 애니메이션 중이거나 이미 사이드바가 열려있으면 무시
-    if (isAnimating || isSidebarOpen) {
-      console.log('Animation in progress or sidebar already open, ignoring click');
+    if (isSidebarOpen) {
       return;
     }
-    
-    console.log('=== Image Click Debug ===');
-    console.log('Clicked Image:', imageItem);
-    console.log('Current contentOffset:', contentOffset);
-    
-    // 현재 상태를 원본으로 저장
-    setOriginalContentOffset(contentOffset);
     
     setSelectedImageItemForModal(imageItem);
     setIsSidebarOpen(true);
@@ -208,140 +120,109 @@ const MainPage = () => {
         setIsSelectedImageLoading(false);
       }
     }
-    
-    // 화면 크기 계산
-    const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight;
-    const sidebarWidth = screenWidth * 0.3;
-    const mainContentWidth = screenWidth - sidebarWidth;
-    
-    // 이미지 요소 가져오기
-    const imageElement = document.querySelector(`[data-image-id="${imageItem.id}"]`) as HTMLElement;
-    if (!imageElement) {
-      console.error('Image element not found');
-      return;
-    }
-    
-    const imageRect = imageElement.getBoundingClientRect();
-    console.log('Image rect:', imageRect);
-    
-    // 이미지의 현재 위치 계산
-    const imageWidth = imageRect.width;
-    const imageHeight = imageRect.height;
-    const imageCenterX = imageRect.left + (imageWidth / 2);
-    const imageCenterY = imageRect.top + (imageHeight / 2);
-    
-    console.log('Image position:', {
-      imageWidth,
-      imageHeight,
-      imageCenterX,
-      imageCenterY,
-      imageRect
-    });
-    
-    // 목표 위치 계산 (화면 중앙)
-    const targetCenterX = mainContentWidth / 2;
-    const targetCenterY = screenHeight / 2;
-    
-    console.log('Target position:', {
-      targetCenterX,
-      targetCenterY
-    });
-    
-    // 이동해야 할 거리 계산
-    const moveDistanceX = (targetCenterX - imageCenterX) * 1.2;
-    const moveDistanceY = (targetCenterY - imageCenterY) * 1.2;
-    
-    console.log('Move distances:', {
-      moveDistanceX,
-      moveDistanceY
-    });
-    
-    // 줌과 이동을 동시에 애니메이션
-    const targetZoom = 1.2; // 약간의 줌 효과
-    const targetX = contentOffset.x + moveDistanceX;
-    const targetY = contentOffset.y + moveDistanceY;
-    
-    animateZoom(targetZoom, targetX, targetY, 1000);
   };
 
   const handleCloseSidebar = () => {
-    // 애니메이션 중이면 무시
-    if (isAnimating) {
-      console.log('Animation in progress, ignoring close request');
-      return;
-    }
-    
     setIsSidebarOpen(false);
     setSelectedImageItemForModal(null);
     setSelectedImageDetail(null);
     setSelectedImageError(null);
     setSelectedImageId(null);
-    
-    // 사이드바가 닫힐 때 줌도 리셋
-    resetZoom();
   };
 
-  const handleRemoteScroll = (direction: 'left' | 'right' | 'up' | 'down', customStep?: number) => {
-    const scrollStep = customStep || 100; // 커스텀 스텝이 있으면 사용, 없으면 기본값
-    const duration = 300;
-    const startTime = performance.now();
-    const startOffset = contentOffset;
-    
-    const animate = (currentTime: number) => {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      
-      // easeOutQuad 이징 함수 적용
-      const easedProgress = 1 - (1 - progress) * (1 - progress);
-      
-      const newOffset = { ...startOffset };
-      switch (direction) {
-        case 'left':
-          newOffset.x = startOffset.x + (scrollStep * easedProgress);
-          break;
-        case 'right':
-          newOffset.x = startOffset.x - (scrollStep * easedProgress);
-          break;
-        case 'up':
-          newOffset.y = startOffset.y + (scrollStep * easedProgress);
-          break;
-        case 'down':
-          newOffset.y = startOffset.y - (scrollStep * easedProgress);
-          break;
-      }
-      
-      setContentOffset(newOffset);
-      
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      }
-    };
-    
-    requestAnimationFrame(animate);
-  };
-
-  // hover 상태를 결정하는 함수
   const getHoveredItemId = () => {
     if (isSidebarOpen && selectedImageId) {
       return selectedImageId;
     }
-    return hoveredItemId;
+    return null;
   };
 
-  // 즉시 실행되는 클릭 핸들러 (중복 방지만)
   const handleImageClick = useCallback(
     (imageItem: ImageItemData, imageDetailFromItem: ImageDetail | null) => {
-      if (isAnimating || isSidebarOpen) {
-        console.log('Animation in progress or sidebar already open, ignoring click');
+      if (isSidebarOpen) {
         return;
       }
-      
-      // 즉시 실행
       handleImageClickForModal(imageItem, imageDetailFromItem);
     },
-    [isAnimating, isSidebarOpen, handleImageClickForModal]
+    [isSidebarOpen, handleImageClickForModal]
   );
+
+  // 이미지 로드 핸들러
+  const handleImageLoaded = useCallback((imageId: string) => {
+    // 이미지 로드 완료 처리
+    console.log('Image loaded:', imageId);
+  }, []);
+
+  // ThiingsGrid용 렌더 아이템 함수
+  const renderGridItem = useCallback((config: ItemConfig) => {
+    const apiImages = apiImageUrlListRef.current;
+    
+    if (!apiImages || apiImages.length === 0) {
+      return (
+        <div className="absolute inset-1 rounded-lg bg-gray-200 flex items-center justify-center">
+          <div className="text-gray-500 text-sm">Loading...</div>
+        </div>
+      );
+    }
+
+    // gridIndex를 사용하여 API 이미지를 찾습니다
+    const imageIndex = config.gridIndex % apiImages.length;
+    const apiImage = apiImages[imageIndex];
+    
+    if (!apiImage) {
+      return (
+        <div className="absolute inset-1 rounded-lg bg-gray-200 flex items-center justify-center">
+          <div className="text-gray-500 text-sm">No Image</div>
+        </div>
+      );
+    }
+
+    // ImageItemData 형태로 변환
+    const imageItem: ImageItemData = {
+      id: `${config.position.x}_${config.position.y}`,
+      row: config.position.y,
+      col: config.position.x,
+      src: apiImage.image_url,
+      alt: `Image ${config.position.x},${config.position.y} (ID: ${apiImage.image_doc_id.slice(-6)})`,
+      left: config.position.x * CELL_WIDTH,
+      top: config.position.y * CELL_HEIGHT,
+      x: config.position.x * CELL_WIDTH,
+      y: config.position.y * CELL_HEIGHT,
+      loaded: false,
+      image_doc_id: apiImage.image_doc_id,
+    };
+
+    return (
+      <ImageGridItem
+        image={imageItem}
+        config={config}
+        hoveredItemId={getHoveredItemId()}
+        hoveredImageDetailData={hoveredImageDetailData}
+        isFetchingDetail={isFetchingDetail}
+        detailError={detailError}
+        onImageLoaded={handleImageLoaded}
+        onMouseEnterItem={handleHoverImage}
+        onMouseLeaveItem={handleLeaveImage}
+        onToggleLike={handleToggleLike}
+        isLiked={likedStatusesMap[apiImage.image_doc_id] || false}
+        onClick={handleImageClick}
+        isSelected={selectedImageId === imageItem.id}
+      />
+    );
+  }, [
+    apiImageUrlListRef,
+    getHoveredItemId,
+    hoveredImageDetailData,
+    isFetchingDetail,
+    detailError,
+    handleImageLoaded,
+    handleHoverImage,
+    handleLeaveImage,
+    handleToggleLike,
+    likedStatusesMap,
+    handleImageClick,
+    selectedImageId,
+  ]);
 
   return (
     <>
@@ -355,39 +236,35 @@ const MainPage = () => {
       <ImageGridHeader isSidebarOpen={isSidebarOpen} />
       <div className="w-full h-screen m-0 overflow-hidden flex flex-col font-sans bg-black relative">
         <div className="flex w-full h-full relative">
-          {/* 그리드 컨테이너 */}
+          {/* 새로운 ThiingsGrid 컨테이너 */}
           <div
-            ref={scrollContainerRef}
-            className={`h-full overflow-auto relative cursor-grab bg-black transition-all duration-300 ${
+            className={`h-full relative bg-black transition-all duration-300 ${
               isSidebarOpen ? 'w-[65%]' : 'w-full'
             }`}
-            onMouseDown={handleMouseDown}
           >
-            <div
-              className="absolute origin-center"
-              style={{
-                willChange: 'transform',
-                transform: `translate(${contentOffset.x}px, ${contentOffset.y}px) scale(${zoomLevel})`,
-                transition: isZooming ? 'none' : 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-              }}
-            >
-              {images.map((image) => (
-                <ImageItem
-                  key={image.id}
-                  image={image}
-                  hoveredItemId={getHoveredItemId()}
-                  hoveredImageDetailData={hoveredImageDetailData}
-                  isFetchingDetail={isFetchingDetail}
-                  detailError={detailError}
-                  onImageLoaded={onImageLoaded}
-                  onMouseEnterItem={handleMouseEnterItem}
-                  onMouseLeaveItem={handleMouseLeaveItem}
-                  onToggleLike={handleToggleLike}
-                  isLiked={likedStatusesMap[image.image_doc_id] || false}
-                  onClick={handleImageClick}
-                />
-              ))}
-            </div>
+            {/* 로딩 인디케이터 */}
+            {isLoading && (
+              <div className="absolute top-4 right-4 z-10 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                Loading images...
+              </div>
+            )}
+
+            {/* 그리드 정보 디버그 */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="absolute top-4 left-4 z-10 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                {apiImageCount} API images loaded
+              </div>
+            )}
+
+            {/* ThiingsGrid 컴포넌트 */}
+            <ThiingsGrid
+              ref={gridRef}
+              gridWidth={CELL_WIDTH}
+              gridHeight={CELL_HEIGHT}
+              renderItem={renderGridItem}
+              className="w-full h-full"
+              initialPosition={{ x: 0, y: 0 }}
+            />
           </div>
 
           {/* 사이드바 */}
@@ -414,19 +291,17 @@ const MainPage = () => {
                 transform: `translateX(${isSidebarOpen ? '0' : '20px'})`
               }}
             >
-              <Button
-                variant="default"
-                size="icon"
-                className="h-10 w-10 rounded-full bg-yellow-400 text-black hover:bg-yellow-500 shadow-xl transition-all duration-300 group"
+              <button
+                className="h-10 w-10 rounded-full bg-yellow-400 text-black hover:bg-yellow-500 shadow-xl transition-all duration-300 group flex items-center justify-center"
                 onClick={handleCloseSidebar}
               >
-                <X className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" />
-              </Button>
+                <svg className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
               
-              <Button
-                variant="default"
-                size="icon"
-                className="h-10 w-10 rounded-full bg-yellow-400 text-black hover:bg-yellow-500 shadow-xl transition-all duration-300 group"
+              <button
+                className="h-10 w-10 rounded-full bg-yellow-400 text-black hover:bg-yellow-500 shadow-xl transition-all duration-300 group flex items-center justify-center"
               >
                 <svg
                   className="w-5 h-5 transition-all duration-300 group-hover:scale-110"
@@ -442,12 +317,11 @@ const MainPage = () => {
                     d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5"
                   />
                 </svg>
-              </Button>
+              </button>
             </div>
           )}
         </div>
         <FabMenu />
-        {/* <ScrollRemote onScroll={handleRemoteScroll} /> */}
       </div>
     </>
   );

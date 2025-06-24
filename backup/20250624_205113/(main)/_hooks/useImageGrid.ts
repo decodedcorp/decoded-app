@@ -28,7 +28,6 @@ export function useImageGrid({
   apiImageCount,
   fetchAndCacheApiImages,
 }: UseImageGridProps) {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [images, setImages] = useState<ImageItemData[]>([]);
   const loadedGridRef = useRef<LoadedGrid>({
     rows: { min: 0, max: -1 },
@@ -36,13 +35,21 @@ export function useImageGrid({
   });
   const [contentOffset, setContentOffset] = useState({ x: 0, y: 0 });
   const imageElementsRef = useRef<Record<string, boolean>>({});
+  
+  // 스크롤 안정성을 위한 ref 추가
+  const isExpandingRef = useRef(false);
+  const lastContentOffsetRef = useRef({ x: 0, y: 0 });
 
   const tryAddApiImagesToCells = useCallback(
     (cells: { row: number; col: number }[]) => {
       const itemsToAddThisBatch: ImageItemData[] = [];
       let imagesAddedInThisCall = 0;
 
-      for (const cell of cells) {
+      // 배치 크기 제한으로 성능 향상
+      const maxBatchSize = 20;
+      const limitedCells = cells.slice(0, maxBatchSize);
+
+      for (const cell of limitedCells) {
         const key = `${cell.row}_${cell.col}`;
         if (imageElementsRef.current[key]) continue;
 
@@ -76,6 +83,8 @@ export function useImageGrid({
           } (ID: ${apiImage.image_doc_id.slice(-6)})`,
           left: cell.col * CELL_WIDTH,
           top: cell.row * CELL_HEIGHT,
+          x: cell.col * CELL_WIDTH,
+          y: cell.row * CELL_HEIGHT,
           loaded: false,
           image_doc_id: apiImage.image_doc_id,
         });
@@ -86,32 +95,23 @@ export function useImageGrid({
       if (itemsToAddThisBatch.length > 0) {
         setImages((prevImages) => {
           const newImages = [...prevImages, ...itemsToAddThisBatch];
-          let newMinR = loadedGridRef.current.rows.min;
-          let newMaxR = loadedGridRef.current.rows.max;
-          let newMinC = loadedGridRef.current.cols.min;
-          let newMaxC = loadedGridRef.current.cols.max;
-
-          if (
-            loadedGridRef.current.rows.max === -1 &&
-            itemsToAddThisBatch.length > 0
-          ) {
-            newMinR = itemsToAddThisBatch[0].row;
-            newMaxR = itemsToAddThisBatch[0].row;
-            newMinC = itemsToAddThisBatch[0].col;
-            newMaxC = itemsToAddThisBatch[0].col;
+          
+          // 그리드 경계 업데이트 최적화
+          if (loadedGridRef.current.rows.max === -1 && itemsToAddThisBatch.length > 0) {
+            const firstItem = itemsToAddThisBatch[0];
+            loadedGridRef.current = {
+              rows: { min: firstItem.row, max: firstItem.row },
+              cols: { min: firstItem.col, max: firstItem.col },
+            };
           }
 
           itemsToAddThisBatch.forEach((item) => {
-            newMinR = Math.min(newMinR, item.row);
-            newMaxR = Math.max(newMaxR, item.row);
-            newMinC = Math.min(newMinC, item.col);
-            newMaxC = Math.max(newMaxC, item.col);
+            loadedGridRef.current.rows.min = Math.min(loadedGridRef.current.rows.min, item.row);
+            loadedGridRef.current.rows.max = Math.max(loadedGridRef.current.rows.max, item.row);
+            loadedGridRef.current.cols.min = Math.min(loadedGridRef.current.cols.min, item.col);
+            loadedGridRef.current.cols.max = Math.max(loadedGridRef.current.cols.max, item.col);
           });
-
-          loadedGridRef.current = {
-            rows: { min: newMinR, max: newMaxR },
-            cols: { min: newMinC, max: newMaxC },
-          };
+          
           return newImages;
         });
       }
@@ -121,15 +121,24 @@ export function useImageGrid({
   );
 
   const expandGridIfNeeded = useCallback(() => {
-    if (
-      !scrollContainerRef.current ||
-      scrollContainerRef.current.clientWidth === 0
-    ) {
+    if (isExpandingRef.current) {
       return;
     }
-    const viewWidth = scrollContainerRef.current.clientWidth;
-    const viewHeight = scrollContainerRef.current.clientHeight;
+
+    // SSR 안전성 체크
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    isExpandingRef.current = true;
+    
+    // ThiingsGrid에서 관리하므로 고정된 뷰포트 크기 사용
+    const viewWidth = window.innerWidth;
+    const viewHeight = window.innerHeight;
     const currentGrid = loadedGridRef.current;
+
+    // 현재 contentOffset을 저장
+    lastContentOffsetRef.current = { ...contentOffset };
 
     if (currentGrid.rows.max === -1 && images.length > 0 && apiImageCount > 0) {
       let minR = Infinity,
@@ -156,6 +165,7 @@ export function useImageGrid({
       !allApiImagesFetchedRef.current
     ) {
       fetchAndCacheApiImages();
+      isExpandingRef.current = false;
       return;
     } else if (
       currentGrid.rows.max === -1 &&
@@ -163,6 +173,7 @@ export function useImageGrid({
       apiImageCount === 0 &&
       isFetchingApiImagesRef.current
     ) {
+      isExpandingRef.current = false;
       return;
     }
 
@@ -191,14 +202,17 @@ export function useImageGrid({
     let newMinCol = currentGrid.cols.min,
       newMaxCol = currentGrid.cols.max;
 
+    // 더 큰 LOAD_THRESHOLD 사용으로 미리 로드
+    const expandedLoadThreshold = LOAD_THRESHOLD * 2;
+
     if (
       currentGrid.rows.max === -1 &&
       (apiImageCount > 0 ||
         (allApiImagesFetchedRef.current &&
           apiImageUrlListRef.current!.length > 0))
     ) {
-      const initialVisibleCols = Math.ceil(viewWidth / CELL_WIDTH) + 2;
-      const initialVisibleRows = Math.ceil(viewHeight / CELL_HEIGHT) + 2;
+      const initialVisibleCols = Math.ceil(viewWidth / CELL_WIDTH) + 4;
+      const initialVisibleRows = Math.ceil(viewHeight / CELL_HEIGHT) + 4;
       const centerCol =
         Math.floor(-coX / CELL_WIDTH + initialVisibleCols / 2) - 1;
       const centerRow =
@@ -218,11 +232,11 @@ export function useImageGrid({
       }
     } else if (currentGrid.rows.max !== -1) {
       const shouldExpandRight =
-        visibleRight + LOAD_THRESHOLD > contentActualRight;
-      const shouldExpandLeft = visibleLeft - LOAD_THRESHOLD < contentActualLeft;
+        visibleRight + expandedLoadThreshold > contentActualRight;
+      const shouldExpandLeft = visibleLeft - expandedLoadThreshold < contentActualLeft;
       const shouldExpandBottom =
-        visibleBottom + LOAD_THRESHOLD > contentActualBottom;
-      const shouldExpandTop = visibleTop - LOAD_THRESHOLD < contentActualTop;
+        visibleBottom + expandedLoadThreshold > contentActualBottom;
+      const shouldExpandTop = visibleTop - expandedLoadThreshold < contentActualTop;
 
       let didExpandHorizontally = false;
       if (shouldExpandRight) {
@@ -275,6 +289,11 @@ export function useImageGrid({
         fetchAndCacheApiImages();
       }
     }
+
+    // 다음 프레임에서 isExpanding 해제
+    requestAnimationFrame(() => {
+      isExpandingRef.current = false;
+    });
   }, [
     contentOffset,
     images,
@@ -287,17 +306,22 @@ export function useImageGrid({
   ]);
 
   const performInitialSetup = useCallback(() => {
-    if (
-      !scrollContainerRef.current ||
-      scrollContainerRef.current.clientWidth === 0
-    ) {
+    // SSR 안전성 체크
+    if (typeof window === 'undefined') {
       return false;
     }
-    const viewWidth = scrollContainerRef.current.clientWidth;
-    const viewHeight = scrollContainerRef.current.clientHeight;
+    
+    // ThiingsGrid에서 관리하므로 고정된 뷰포트 크기 사용
+    const viewWidth = window.innerWidth;
+    const viewHeight = window.innerHeight;
 
-    const offsetX = Math.round(viewWidth * 0.75);
-    const offsetY = Math.round(viewHeight * 0.75);
+    // 첫 번째 이미지의 좌표
+    const firstImageLeft = -768;
+    const firstImageTop = -952.5;
+
+    // 화면 중앙에 첫 이미지가 오도록 보정
+    const offsetX = Math.round(viewWidth / 2 - firstImageLeft);
+    const offsetY = Math.round(viewHeight / 2 - firstImageTop);
     setContentOffset({ x: offsetX, y: offsetY });
 
     if (
@@ -310,7 +334,7 @@ export function useImageGrid({
       });
     }
     return true;
-  }, [fetchAndCacheApiImages, apiImageCount, isFetchingApiImagesRef, allApiImagesFetchedRef, ]);
+  }, [fetchAndCacheApiImages, apiImageCount, isFetchingApiImagesRef, allApiImagesFetchedRef]);
 
   useEffect(() => {
     const tryInitialSetup = () => {
@@ -325,9 +349,19 @@ export function useImageGrid({
     };
   }, [performInitialSetup]);
 
+  // expandGridIfNeeded를 throttle로 감싸서 성능 개선
+  const throttledExpandGrid = useCallback(
+    () => {
+      if (!isExpandingRef.current) {
+        expandGridIfNeeded();
+      }
+    },
+    [expandGridIfNeeded]
+  );
+
   useEffect(() => {
-    expandGridIfNeeded();
-  }, [contentOffset, apiImageCount, images.length, expandGridIfNeeded]);
+    throttledExpandGrid();
+  }, [contentOffset, apiImageCount, images.length, throttledExpandGrid]);
 
   const onImageLoaded = (id: string) => {
     setImages((prev) =>
@@ -335,16 +369,74 @@ export function useImageGrid({
     );
   };
 
+  // thiings-grid 스타일의 뷰포트 최적화
+  const calculateVisibleImages = useCallback(() => {
+    // SSR 안전성 체크
+    if (typeof window === 'undefined') {
+      return images;
+    }
+    
+    // ThiingsGrid에서 관리하므로 고정된 뷰포트 크기 사용
+    const containerWidth = window.innerWidth;
+    const containerHeight = window.innerHeight;
+    
+    // 뷰포트 마진 추가 (성능 향상)
+    const margin = 600;
+    const visibleLeft = -contentOffset.x - margin;
+    const visibleTop = -contentOffset.y - margin;
+    const visibleRight = -contentOffset.x + containerWidth + margin;
+    const visibleBottom = -contentOffset.y + containerHeight + margin;
+    
+    const minLeft = Math.min(...images.map(img => img.left));
+    const minTop = Math.min(...images.map(img => img.top));
+
+    const visibleImages = images.map(img => ({
+      ...img,
+      left: img.left - minLeft,
+      top: img.top - minTop,
+    }));
+    
+    return visibleImages.filter(image => {
+      const imageLeft = image.left;
+      const imageTop = image.top;
+      const imageRight = image.left + CELL_WIDTH;
+      const imageBottom = image.top + CELL_HEIGHT;
+      
+      return (
+        imageRight > visibleLeft &&
+        imageLeft < visibleRight &&
+        imageBottom > visibleTop &&
+        imageTop < visibleBottom
+      );
+    });
+  }, [images, contentOffset]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (images.length === 0) return;
+
+    // 첫 번째 이미지의 좌표
+    const firstImage = images[0];
+    const viewWidth = window.innerWidth;
+    const viewHeight = window.innerHeight;
+
+    const offsetX = Math.round(viewWidth / 2 - firstImage.left);
+    const offsetY = Math.round(viewHeight / 2 - firstImage.top);
+
+    setContentOffset({ x: offsetX, y: offsetY });
+    // 이 코드는 최초 1회만 실행되도록 조건을 추가하세요.
+  }, [images.length]);
+
   return {
-    scrollContainerRef,
     images,
-    loadedGridRef, // 이 ref는 MainPage에서 직접 사용하지 않을 수 있으나, ImageItem 등 하위 컴포넌트에 전달될 수 있음
+    visibleImages: calculateVisibleImages(),
+    loadedGridRef,
     contentOffset,
-    setContentOffset, // Interaction Hook에서 사용할 수 있도록 반환
-    imageElementsRef, // 이 ref는 MainPage에서 직접 사용하지 않을 수 있으나, 내부 로직에 필요
+    setContentOffset,
+    imageElementsRef,
     onImageLoaded,
-    // tryAddApiImagesToCells, // expandGridIfNeeded 내부에서만 사용되므로 반환 X
-    // expandGridIfNeeded, // useEffect 내부에서만 사용되므로 반환 X
-    // performInitialSetup, // useEffect 내부에서만 사용되므로 반환 X
+    gridBounds: loadedGridRef.current,
+    totalImages: images.length,
+    isLoading: isFetchingApiImagesRef.current,
   };
 } 
