@@ -304,6 +304,7 @@ const MainPage = () => {
               renderItem={renderGridItem}
               className="w-full h-full"
               initialPosition={{ x: 0, y: 0 }}
+              viewportMargin={800}
             />
           </div>
 

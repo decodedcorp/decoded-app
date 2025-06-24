@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect, useState, useCallback, forwardRef, useImperativeHandle } from 'react';
+import React, { useRef, useEffect, useState, useCallback, forwardRef, useImperativeHandle, useMemo } from 'react';
 
 export interface Position {
   x: number;
@@ -19,14 +19,63 @@ export interface ThiingsGridProps {
   renderItem: (config: ItemConfig) => React.ReactNode;
   className?: string;
   initialPosition?: Position;
+  viewportMargin?: number;
 }
 
 export interface ThiingsGridRef {
   publicGetCurrentPosition: () => Position;
 }
 
+// 개별 그리드 아이템을 메모이제이션하여 성능 최적화
+const GridItem = React.memo(({ 
+  gridX, 
+  gridY, 
+  gridIndex, 
+  isMoving, 
+  renderItem, 
+  gridWidth, 
+  gridHeight 
+}: {
+  gridX: number;
+  gridY: number;
+  gridIndex: number;
+  isMoving: boolean;
+  renderItem: (config: ItemConfig) => React.ReactNode;
+  gridWidth: number;
+  gridHeight: number;
+}) => {
+  const config: ItemConfig = {
+    gridIndex,
+    position: { x: gridX, y: gridY },
+    isMoving,
+  };
+
+  return (
+    <div
+      className="absolute"
+      style={{
+        left: gridX * gridWidth,
+        top: gridY * gridHeight,
+        width: gridWidth,
+        height: gridHeight,
+      }}
+    >
+      {renderItem(config)}
+    </div>
+  );
+});
+
+GridItem.displayName = 'GridItem';
+
 const ThiingsGrid = forwardRef<ThiingsGridRef, ThiingsGridProps>(
-  ({ gridWidth, gridHeight, renderItem, className = '', initialPosition = { x: 0, y: 0 } }, ref) => {
+  ({ 
+    gridWidth, 
+    gridHeight, 
+    renderItem, 
+    className = '', 
+    initialPosition = { x: 0, y: 0 },
+    viewportMargin = 600
+  }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [position, setPosition] = useState<Position>(initialPosition);
     const [isMoving, setIsMoving] = useState(false);
@@ -41,15 +90,40 @@ const ThiingsGrid = forwardRef<ThiingsGridRef, ThiingsGridProps>(
       publicGetCurrentPosition: () => position,
     }));
 
-    // Calculate grid dimensions
+    // Calculate grid dimensions with viewport optimization
     const containerWidth = containerRef.current?.clientWidth || 0;
     const containerHeight = containerRef.current?.clientHeight || 0;
     
-    const cols = Math.ceil(containerWidth / gridWidth) + 2;
-    const rows = Math.ceil(containerHeight / gridHeight) + 2;
+    // 뷰포트 마진을 포함한 렌더링 영역 계산
+    const renderWidth = containerWidth + viewportMargin * 2;
+    const renderHeight = containerHeight + viewportMargin * 2;
+    
+    const cols = Math.ceil(renderWidth / gridWidth) + 2;
+    const rows = Math.ceil(renderHeight / gridHeight) + 2;
     
     const startCol = Math.floor(-position.x / gridWidth);
     const startRow = Math.floor(-position.y / gridHeight);
+
+    // 뷰포트 내 아이템만 렌더링하기 위한 필터링 함수 (메모이제이션)
+    const isItemInViewport = useCallback((gridX: number, gridY: number) => {
+      const itemLeft = gridX * gridWidth;
+      const itemTop = gridY * gridHeight;
+      const itemRight = itemLeft + gridWidth;
+      const itemBottom = itemTop + gridHeight;
+      
+      // 뷰포트 마진을 포함한 영역
+      const viewportLeft = -position.x - viewportMargin;
+      const viewportTop = -position.y - viewportMargin;
+      const viewportRight = -position.x + containerWidth + viewportMargin;
+      const viewportBottom = -position.y + containerHeight + viewportMargin;
+      
+      return (
+        itemRight > viewportLeft &&
+        itemLeft < viewportRight &&
+        itemBottom > viewportTop &&
+        itemTop < viewportBottom
+      );
+    }, [position, containerWidth, containerHeight, gridWidth, gridHeight, viewportMargin]);
 
     // Generate grid indices
     const generateGridIndex = useCallback((x: number, y: number): number => {
@@ -79,6 +153,30 @@ const ThiingsGrid = forwardRef<ThiingsGridRef, ThiingsGridProps>(
       
       return index;
     }, []);
+
+    // 뷰포트 내 아이템들만 메모이제이션하여 계산
+    const visibleItems = useMemo(() => {
+      const items: Array<{
+        gridX: number;
+        gridY: number;
+        gridIndex: number;
+      }> = [];
+
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          const gridX = startCol + col;
+          const gridY = startRow + row;
+          
+          // 뷰포트 내 아이템만 포함
+          if (isItemInViewport(gridX, gridY)) {
+            const gridIndex = generateGridIndex(gridX, gridY);
+            items.push({ gridX, gridY, gridIndex });
+          }
+        }
+      }
+
+      return items;
+    }, [rows, cols, startCol, startRow, isItemInViewport, generateGridIndex]);
 
     // Mouse event handlers
     const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -248,32 +346,19 @@ const ThiingsGrid = forwardRef<ThiingsGridRef, ThiingsGridProps>(
             perspective: '1000px',
           }}
         >
-          {Array.from({ length: rows }, (_, row) =>
-            Array.from({ length: cols }, (_, col) => {
-              const gridX = startCol + col;
-              const gridY = startRow + row;
-              const gridIndex = generateGridIndex(gridX, gridY);
-              
-              return (
-                <div
-                  key={`${gridX}-${gridY}`}
-                  className="absolute"
-                  style={{
-                    left: gridX * gridWidth,
-                    top: gridY * gridHeight,
-                    width: gridWidth,
-                    height: gridHeight,
-                  }}
-                >
-                  {renderItem({
-                    gridIndex,
-                    position: { x: gridX, y: gridY },
-                    isMoving,
-                  })}
-                </div>
-              );
-            })
-          )}
+          {/* 뷰포트 내 아이템들만 렌더링 */}
+          {visibleItems.map(({ gridX, gridY, gridIndex }) => (
+            <GridItem
+              key={`${gridX}-${gridY}`}
+              gridX={gridX}
+              gridY={gridY}
+              gridIndex={gridIndex}
+              isMoving={isMoving}
+              renderItem={renderItem}
+              gridWidth={gridWidth}
+              gridHeight={gridHeight}
+            />
+          ))}
         </div>
       </div>
     );
