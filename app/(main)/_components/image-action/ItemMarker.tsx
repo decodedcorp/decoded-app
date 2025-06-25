@@ -64,25 +64,45 @@ export function ItemMarker({
 
   const key = `${detailDocId}-marker-${decodedItem?.item?.item?._id || itemIndex}`;
 
+  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    e.currentTarget.style.transform = 'scale(1.2)';
+    e.currentTarget.style.backgroundColor = 'rgba(17, 24, 39, 1)';
+    e.currentTarget.style.borderColor = MAIN_COLOR;
+  };
+
+  const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    e.currentTarget.style.transform = 'scale(1)';
+    e.currentTarget.style.backgroundColor = 'rgba(17, 24, 39, 0.8)';
+    e.currentTarget.style.borderColor = `rgba(${MAIN_COLOR_RGB}, 0.9)`;
+  };
+
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onExpand?.();
+  };
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+  };
+
+  const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+  };
+
   return (
     <div
       key={key}
+      data-marker="true"
       style={markerStyle}
       title={`${brandName} - ${itemName}`}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'scale(1.2)';
-        e.currentTarget.style.backgroundColor = 'rgba(17, 24, 39, 1)';
-        e.currentTarget.style.borderColor = MAIN_COLOR;
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'scale(1)';
-        e.currentTarget.style.backgroundColor = 'rgba(17, 24, 39, 0.8)';
-        e.currentTarget.style.borderColor = `rgba(${MAIN_COLOR_RGB}, 0.9)`;
-      }}
-      onClick={(e) => {
-        e.stopPropagation();
-        onExpand?.();
-      }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onClick={handleClick}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
     >
       <span style={{ color: 'white', fontWeight: 'bold', fontSize: '14px' }}>
         ?

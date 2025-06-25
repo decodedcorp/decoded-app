@@ -95,7 +95,19 @@ const ImageGridItem: React.FC<ImageGridItemProps> = React.memo(({
     onMouseLeaveItem();
   }, [onMouseLeaveItem]);
 
-  const handleClick = useCallback(() => {
+  const handleClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    // 마커나 마커 관련 요소를 클릭한 경우 이미지 클릭 이벤트를 방지
+    const target = e.target as HTMLElement;
+    const isMarkerClick = target.closest('[data-marker="true"]') || 
+                         target.closest('[data-detail-card="true"]') ||
+                         target.closest('[data-marker-container="true"]') ||
+                         target.closest('[style*="z-index: 40"]');
+    
+    if (isMarkerClick) {
+      e.stopPropagation();
+      return;
+    }
+    
     console.log('ImageGridItem handleClick called:', { image, hoveredImageDetailData });
     onClick(image, hoveredImageDetailData);
   }, [image, hoveredImageDetailData, onClick]);
@@ -366,7 +378,7 @@ const ImageGridItem: React.FC<ImageGridItemProps> = React.memo(({
                   };
 
                   return isExpanded ? (
-                    <div key={markerKey} style={sharedStyle}>
+                    <div key={markerKey} style={sharedStyle} data-marker-container="true">
                       <ItemDetailCard decodedItem={decodedItem} />
                     </div>
                   ) : (
