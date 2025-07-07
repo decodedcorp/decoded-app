@@ -243,4 +243,17 @@ button {
 
 .shimmer {
   animation: shimmer 2s infinite;
+}
+
+/* 마커 pulse 애니메이션 */
+@keyframes markerPulse {
+  0% {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 0 4px rgba(234, 253, 102, 0.3);
+  }
+  100% {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
 } 

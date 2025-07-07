@@ -47,6 +47,7 @@ const MainPage = () => {
 
   // 선택된 이미지의 그리드 위치를 추적하는 상태 추가
   const [selectedImagePosition, setSelectedImagePosition] = useState<{ x: number; y: number } | null>(null);
+  const [currentZoomLevel, setCurrentZoomLevel] = useState(1);
 
   const { checkInitialLikeStatus, toggleLike: originalToggleLike } = useIsLike();
   const { isLogin, isInitialized } = useAuth();
@@ -131,6 +132,11 @@ const MainPage = () => {
     setIsSidebarOpen(false);
     setSelectedImagePosition(null); // 선택된 이미지 위치도 초기화
     handleLeaveImage();
+    
+    // 줌 리셋
+    if (gridRef.current) {
+      gridRef.current.resetZoom();
+    }
   };
 
   // 사이드바와 선택된 이미지 정보를 완전히 초기화하는 함수
@@ -142,6 +148,11 @@ const MainPage = () => {
     setSelectedImageId(null);
     setSelectedImagePosition(null); // 선택된 이미지 위치도 초기화
     handleLeaveImage();
+    
+    // 줌 리셋
+    if (gridRef.current) {
+      gridRef.current.resetZoom();
+    }
   };
 
   const getHoveredItemId = () => {
@@ -330,7 +341,7 @@ const MainPage = () => {
             {/* 그리드 정보 디버그 */}
             {process.env.NODE_ENV === 'development' && (
               <div className="absolute top-4 left-4 z-10 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
-                {apiImageCount} API images loaded
+                {apiImageCount} API images loaded | Zoom: {currentZoomLevel.toFixed(2)}
               </div>
             )}
 
@@ -348,6 +359,8 @@ const MainPage = () => {
                 console.log('Image centered successfully');
               }}
               isSidebarOpen={isSidebarOpen}
+              enableZoom={true}
+              onZoomChange={setCurrentZoomLevel}
             />
           </div>
 

@@ -24,11 +24,14 @@ export interface ThiingsGridProps {
   selectedImagePosition?: Position | null;
   onImageCentered?: () => void;
   isSidebarOpen?: boolean;
+  enableZoom?: boolean;
+  onZoomChange?: (zoomLevel: number) => void;
 }
 
 export interface ThiingsGridRef {
   publicGetCurrentPosition: () => Position;
   centerOnPosition: (position: Position) => void;
+  resetZoom: () => void;
 }
 
 // 개별 그리드 아이템을 메모이제이션하여 성능 최적화
@@ -84,7 +87,9 @@ const ThiingsGrid = forwardRef<ThiingsGridRef, ThiingsGridProps>(
     onScrollStateChange,
     selectedImagePosition,
     onImageCentered,
-    isSidebarOpen = false
+    isSidebarOpen = false,
+    enableZoom = false,
+    onZoomChange
   }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
@@ -103,6 +108,13 @@ const ThiingsGrid = forwardRef<ThiingsGridRef, ThiingsGridProps>(
     const [centerAnimationTarget, setCenterAnimationTarget] = useState<Position>({ x: 0, y: 0 });
     const [centerAnimationProgress, setCenterAnimationProgress] = useState(0);
 
+    // 줌 상태 관리
+    const [zoomLevel, setZoomLevel] = useState(1);
+    const [targetZoomLevel, setTargetZoomLevel] = useState(1);
+    const [isZooming, setIsZooming] = useState(false);
+    const [zoomAnimationProgress, setZoomAnimationProgress] = useState(0);
+    const [zoomAnimationStart, setZoomAnimationStart] = useState(1);
+
     // Expose public methods
     useImperativeHandle(ref, () => ({
       publicGetCurrentPosition: () => position,
@@ -110,9 +122,15 @@ const ThiingsGrid = forwardRef<ThiingsGridRef, ThiingsGridProps>(
         if (isCentering || isDragging) return;
         
         setIsCentering(true);
+        setIsZooming(true);
         setCenterAnimationStart({ ...position });
         setCenterAnimationTarget(targetPosition);
         setCenterAnimationProgress(0);
+        
+        // 줌 애니메이션 설정
+        setZoomAnimationStart(zoomLevel); // 현재 줌 레벨을 시작점으로 설정
+        setTargetZoomLevel(enableZoom ? 1.5 : 1); // 줌이 활성화되어 있으면 1.5배, 아니면 1배
+        setZoomAnimationProgress(0);
         
         // 스크롤 상태 변경 알림
         onScrollStateChange?.(true);
@@ -129,16 +147,63 @@ const ThiingsGrid = forwardRef<ThiingsGridRef, ThiingsGridProps>(
           const easedProgress = 1 - Math.pow(1 - progress, 3);
           
           setCenterAnimationProgress(easedProgress);
+          setZoomAnimationProgress(easedProgress);
           
           if (progress < 1) {
             requestAnimationFrame(animate);
           } else {
             // 애니메이션 완료
             setIsCentering(false);
+            setIsZooming(false);
             setPosition(targetPosition);
             setDebouncedPosition(targetPosition);
+            setZoomLevel(targetZoomLevel);
+            onZoomChange?.(targetZoomLevel);
             onScrollStateChange?.(false);
             onImageCentered?.();
+          }
+        };
+        
+        requestAnimationFrame(animate);
+      },
+      resetZoom: () => {
+        setIsCentering(true);
+        setIsZooming(true);
+        setCenterAnimationStart({ ...position });
+        setCenterAnimationTarget({ x: 0, y: 0 });
+        setCenterAnimationProgress(0);
+        setZoomAnimationStart(zoomLevel); // 현재 줌 레벨을 시작점으로 설정
+        setTargetZoomLevel(1);
+        setZoomAnimationProgress(0);
+        
+        // 스크롤 상태 변경 알림
+        onScrollStateChange?.(true);
+        
+        // 애니메이션 시작
+        const startTime = Date.now();
+        const duration = 600; // 600ms 애니메이션
+        
+        const animate = () => {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          
+          // 부드러운 이징 함수 (ease-out)
+          const easedProgress = 1 - Math.pow(1 - progress, 3);
+          
+          setCenterAnimationProgress(easedProgress);
+          setZoomAnimationProgress(easedProgress);
+          
+          if (progress < 1) {
+            requestAnimationFrame(animate);
+          } else {
+            // 애니메이션 완료
+            setIsCentering(false);
+            setIsZooming(false);
+            setPosition({ x: 0, y: 0 });
+            setDebouncedPosition({ x: 0, y: 0 });
+            setZoomLevel(1);
+            onZoomChange?.(1);
+            onScrollStateChange?.(false);
           }
         };
         
@@ -169,6 +234,15 @@ const ThiingsGrid = forwardRef<ThiingsGridRef, ThiingsGridProps>(
         setPosition({ x: newX, y: newY });
       }
     }, [isCentering, centerAnimationProgress, centerAnimationStart, centerAnimationTarget]);
+
+    // 줌 애니메이션 중 zoom 업데이트
+    useEffect(() => {
+      if (isZooming && zoomAnimationProgress > 0) {
+        const currentZoom = zoomAnimationStart + (targetZoomLevel - zoomAnimationStart) * zoomAnimationProgress;
+        setZoomLevel(currentZoom);
+        onZoomChange?.(currentZoom);
+      }
+    }, [isZooming, zoomAnimationProgress, zoomAnimationStart, targetZoomLevel, onZoomChange]);
 
     // selectedImagePosition이 변경될 때 자동으로 중앙 이동
     useEffect(() => {
@@ -496,7 +570,7 @@ const ThiingsGrid = forwardRef<ThiingsGridRef, ThiingsGridProps>(
           className="absolute origin-center"
           style={{
             willChange: 'transform',
-            transform: `translate3d(${position.x}px, ${position.y}px, 0)`,
+            transform: `translate3d(${position.x}px, ${position.y}px, 0) scale(${zoomLevel})`,
             backfaceVisibility: 'hidden',
             perspective: '1000px',
             // 중앙 이동 중일 때는 트랜지션 제거, 정지 시에만 부드러운 트랜지션
