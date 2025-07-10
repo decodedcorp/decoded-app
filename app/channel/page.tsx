@@ -6,10 +6,9 @@ import { SimpleGrid } from './components/category-grid/SimpleGrid';
 
 export default function ChannelPage() {
   return (
-    <div className="min-h-screen w-full">
-      {/* Hero Section */}
+    <div className="min-h-screen w-full px-4 md:px-8 py-6">
       <ChannelHero />
-      {/* Category Grid Section */}
+      <div className="h-8" />
       <SimpleGrid />
     </div>
   );

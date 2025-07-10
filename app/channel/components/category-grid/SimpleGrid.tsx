@@ -48,7 +48,7 @@ const mockItems = Array.from({ length: 36 }).map((_, i) => ({
 
 export function SimpleGrid() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-0">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
       {mockItems.map((item, idx) => (
         <GridItem
           key={idx}
