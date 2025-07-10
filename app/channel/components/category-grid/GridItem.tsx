@@ -17,7 +17,7 @@ interface GridItemProps {
 
 export function GridItem({ imageUrl, title, category, editors, date }: GridItemProps) {
   return (
-    <div className="flex flex-col h-full border border-zinc-800 bg-black rounded-none p-0">
+    <div className="flex flex-col h-full border border-zinc-800 bg-black rounded-none">
       {/* 카테고리 */}
       <div className="flex items-center justify-between px-3 pt-3 pb-1">
         <span className="text-xs font-thin text-zinc-400 tracking-wide uppercase">{category}</span>
