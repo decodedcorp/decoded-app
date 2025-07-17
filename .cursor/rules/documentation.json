@@ -1,0 +1,6 @@
+{
+  "docsDirectory": "docs",
+  "useVitePress": true,
+  "oneSectionPerTopic": true,
+  "vitepressConfig": "docs/.vitepress/config.ts"
+} 

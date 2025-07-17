@@ -1,0 +1,51 @@
+{
+    "id": "init-project-from-v1",
+    "title": "🔁 Initialize project from v1 branch",
+    "description": "Start the refactor process based on feature/channel-page, applying Toss-style structure and configurations.",
+    "steps": [
+      {
+        "title": "1️⃣ Branch strategy",
+        "description": "Keep the current code in `feature/channel-page`, and create a new branch `feature/decoded-v2` for refactoring.",
+        "command": [
+          "git checkout feature/channel-page",
+          "git pull origin feature/channel-page",
+          "git checkout -b feature/decoded-v2"
+        ]
+      },
+      {
+        "title": "2️⃣ Clean up directories",
+        "description": "Remove old folders and prepare to apply Toss-style structure in the `feature/decoded-v2` branch.",
+        "command": [
+          "rm -rf src app components lib styles types node_modules .next"
+        ]
+      },
+      {
+        "title": "3️⃣ Create Toss-style directory structure",
+        "description": "Set up the new directory tree under `src/`.",
+        "command": [
+          "mkdir -p src/{app,domains,shared/{components,hooks,utils},lib,styles,types,constants,tests}"
+        ]
+      },
+      {
+        "title": "4️⃣ Create initial entrypoint files",
+        "description": "Add `layout.tsx`, `page.tsx`, and `globals.css`."
+      },
+      {
+        "title": "5️⃣ Add base config files",
+        "description": "Set up `tsconfig.json`, `tailwind.config.ts`, `.eslintrc.json`, `.prettierrc`, and `.editorconfig`."
+      },
+      {
+        "title": "6️⃣ Add Cursor rules",
+        "description": "Apply Cursor rules based on Toss frontend-fundamentals, using `.cursor-config.json` and `.cursor/rules/`."
+      },
+      {
+        "title": "7️⃣ Commit and push",
+        "description": "Stage changes and push the new refactored branch.",
+        "command": [
+          "git add .",
+          "git commit -m 'chore: initialize v2 project structure and config'",
+          "git push origin feature/decoded-v2"
+        ]
+      }
+    ]
+  }

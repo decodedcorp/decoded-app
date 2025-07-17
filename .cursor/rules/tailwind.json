@@ -1,0 +1,6 @@
+{
+  "classNameUtilityLimit": 5,
+  "semanticUtilityCombinations": true,
+  "designTokensViaConfig": true,
+  "componentDrivenStyles": true
+} 

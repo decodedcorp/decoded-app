@@ -1,0 +1,5 @@
+{
+  "testsDirectory": "src/tests",
+  "preferIntegrationTests": true,
+  "useMSWOrMockService": true
+} 

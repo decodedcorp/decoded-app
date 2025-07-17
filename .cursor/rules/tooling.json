@@ -1,0 +1,5 @@
+{
+  "useESLintPrettier": true,
+  "tsconfigAlias": "@/*",
+  "conventionalCommits": true
+} 

@@ -1,0 +1,9 @@
+{
+  "fileLengthLimit": 100,
+  "componentSingleResponsibility": true,
+  "propsObjectSizeLimit": 5,
+  "enforceHooksUtilsReuse": true,
+  "flattenControlFlow": true,
+  "namingConventions": "strict",
+  "folderScoping": "clear"
+} 

@@ -1,0 +1,7 @@
+{
+  "noDynamicImportInLoops": true,
+  "groupRelatedModules": true,
+  "noGlobalPolyfills": true,
+  "bundleSizeMeasurable": true,
+  "preferStaticImports": true
+} 

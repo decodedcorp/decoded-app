@@ -1,0 +1,26 @@
+{
+  "extends": [
+    "./.cursor/rules/code-quality.json",
+    "./.cursor/rules/tailwind.json",
+    "./.cursor/rules/bundling.json",
+    "./.cursor/rules/webpack.json",
+    "./.cursor/rules/testing.json",
+    "./.cursor/rules/documentation.json",
+    "./.cursor/rules/tooling.json",
+    "./.cursor/rules/git-mcp.json"
+  ],
+  "projectStructure": [
+    "src/app",
+    "src/domains",
+    "src/shared/components",
+    "src/shared/hooks",
+    "src/shared/utils",
+    "src/lib",
+    "src/types",
+    "src/constants",
+    "src/styles"
+  ],
+  "commitMessage": {
+    "convention": "conventional"
+  }
+} 
