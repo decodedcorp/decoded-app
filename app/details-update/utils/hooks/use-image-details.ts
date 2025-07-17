@@ -3,7 +3,7 @@
 import { imagesService } from '@/lib/api/requests/images';
 import { useQuery } from '@tanstack/react-query';
 import type { ImageDetailResponse } from '@/components/ui/modal/add-item-modal/types';
-import type { APIResponse } from '@/app/details/[imageId]/components/related-styling/types';
+import type { APIResponse } from '@/backup/app/details/[imageId]/components/related-styling/types';
 
 export function useImageDetails(itemId: string) {
   return useQuery<APIResponse<ImageDetailResponse>>({

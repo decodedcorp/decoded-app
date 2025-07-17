@@ -1,7 +1,7 @@
 "use client";
 
-import { SearchHeader } from "@/app/search/components/searchHeader";
-import { SearchResults } from "@/app/search/components/searchResults";
+import { SearchHeader } from "@/backup/app/search/components/searchHeader";
+import { SearchResults } from "@/backup/app/search/components/searchResults";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { networkManager } from "@/lib/network/network";

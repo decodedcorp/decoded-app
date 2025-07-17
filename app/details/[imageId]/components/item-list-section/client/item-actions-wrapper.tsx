@@ -1,7 +1,7 @@
 'use client';
 
 import { ItemActions } from './item-actions';
-import { useIsLike } from '@/app/details/utils/hooks/isLike';
+import { useIsLike } from '@/backup/app/details/utils/hooks/isLike';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useStatusStore } from '@/components/ui/modal/status-modal/utils/store';
 import { useLoginModalStore } from '@/components/auth/login-modal/store';

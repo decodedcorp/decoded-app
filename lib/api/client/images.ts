@@ -9,7 +9,7 @@ import type {
   BrandImagesResponse,
   APIResponse,
   ItemDetailResponse
-} from '@/app/details/[imageId]/components/related-styling/types';
+} from '@/backup/app/details/[imageId]/components/related-styling/types';
 
 export interface ItemMetadata {
   name: string | null;

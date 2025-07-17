@@ -8,7 +8,7 @@ import ImageGridItem from './_components/ImageGridItem';
 import FabMenu from './_components/footer/FabMenu';
 import type { ImageItemData, ImageDetail } from './_types/image-grid';
 import { useImageApi } from './_hooks/useImageApi';
-import { useIsLike } from "@/app/details/utils/hooks/isLike";
+import { useIsLike } from "@/backup/app/details/utils/hooks/isLike";
 import { useAuth } from "@/lib/hooks/features/auth/useAuth";
 import { ImageSidebar } from './_components/sidebar/ImageSidebar';
 import { CELL_WIDTH, CELL_HEIGHT } from './_constants/image-grid';

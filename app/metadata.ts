@@ -1,7 +1,7 @@
 import { Metadata, Viewport } from 'next';
 import { Post } from './types/post';
 import { ProcessedImageData } from '@/lib/api/_types/image';
-import { getImageDetails } from '@/app/details/utils/hooks/fetchImageDetails';
+import { getImageDetails } from '@/backup/app/details/utils/hooks/fetchImageDetails';
 
 const SITE_URL = 'https://decoded.style';
 

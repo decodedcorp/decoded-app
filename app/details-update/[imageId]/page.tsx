@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { ErrorDisplay } from "./components/error";
-import { getImageDetails } from "@/app/details/utils/hooks/fetchImageDetails";
+import { getImageDetails } from "@/backup/app/details/utils/hooks/fetchImageDetails";
 import { ImageSection } from "./components/image-section/image-section";
 import { DetailsList } from "./components/item-list-section/server/details-list";
 import { RelatedStylingSection } from "./components/related-styling/related-style";

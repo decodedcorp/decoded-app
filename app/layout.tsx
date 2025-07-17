@@ -8,7 +8,7 @@ import { Metadata } from "next";
 import { koMetadata, enMetadata, generateDetailMetadata } from "./metadata";
 import { GoogleRedirectHandler } from "@/components/auth/GoogleRedirectHandler";
 import Script from "next/script";
-import { getImageDetails } from "@/app/details/utils/hooks/fetchImageDetails";
+import { getImageDetails } from "@/backup/app/details/utils/hooks/fetchImageDetails";
 import { SidebarProvider } from '@/lib/contexts/sidebar-context';
 
 export async function generateMetadata(): Promise<Metadata> {

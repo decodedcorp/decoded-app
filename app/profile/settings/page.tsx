@@ -1,6 +1,6 @@
 import { Metadata } from "next";
-import { UserSettingsForm } from "@/app/profile/settings/components/UserSettingsForm";
-import { LogoutButton } from "@/app/profile/settings/components/LogoutButton";
+import { UserSettingsForm } from "@/backup/app/profile/settings/components/UserSettingsForm";
+import { LogoutButton } from "@/backup/app/profile/settings/components/LogoutButton";
 
 export default function SettingsPage() {
   return (

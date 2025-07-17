@@ -1,11 +1,11 @@
 import { Suspense } from "react";
-import { ImageSection } from "@/app/details-update/[imageId]/components/image-section/image-section";
-import { DetailsList } from "@/app/details-update/[imageId]/components/item-list-section/server/details-list";
-import { ItemDetailProvider } from '@/app/details-update/[imageId]/context/item-detail-context';
-import { DetailSectionLayout } from '@/app/details-update/[imageId]/components/detail-section-layout';
-import { ImageActions } from '@/app/details-update/[imageId]/components/image-actions';
+import { ImageSection } from "@/backup/app/details-update/[imageId]/components/image-section/image-section";
+import { DetailsList } from "@/backup/app/details-update/[imageId]/components/item-list-section/server/details-list";
+import { ItemDetailProvider } from '@/backup/app/details-update/[imageId]/context/item-detail-context';
+import { DetailSectionLayout } from '@/backup/app/details-update/[imageId]/components/detail-section-layout';
+import { ImageActions } from '@/backup/app/details-update/[imageId]/components/image-actions';
 import { ProcessedImageData } from '@/lib/api/_types/image';
-import { getImageDetails } from '@/app/details-update/utils/hooks/fetchImageDetails';
+import { getImageDetails } from '@/backup/app/details-update/utils/hooks/fetchImageDetails';
 
 export default async function ModalDetailsPage({ params }: { params: { id: string } }) {
   const imageData = await getImageDetails(params.id);

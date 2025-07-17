@@ -2,7 +2,7 @@
 
 import { useSearchParams, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils/style';
-import { useItemDetail } from '@/app/details/utils/hooks/use-item-detail';
+import { useItemDetail } from '@/backup/app/details/utils/hooks/use-item-detail';
 import { useState } from 'react';
 import { DetailHeader } from './components/detail-header';
 import { DetailContent } from './components/detail-content';

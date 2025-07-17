@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getImageDetails } from '@/app/details/utils/hooks/fetchImageDetails';
+import { getImageDetails } from '@/backup/app/details/utils/hooks/fetchImageDetails';
 
 // Cloudflare R2 기본 URL
 const R2_BASE_URL = 'https://pub-65bb4012fb354951a2c6139a4b49b717.r2.dev/images';

@@ -8,7 +8,7 @@ import { AddItemModal } from '@/components/ui/modal/add-item-modal';
 import { useProtectedAction } from '@/lib/hooks/auth/use-protected-action';
 import { useLocaleContext } from '@/lib/contexts/locale-context';
 import { ShareButtons } from '@/components/ui/share-buttons';
-import { LinkButton } from '@/app/details-update/modal/link-button';
+import { LinkButton } from '@/backup/app/details-update/modal/link-button';
 
 interface ItemActionsProps {
   likeCount: number;

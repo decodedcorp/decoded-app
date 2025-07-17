@@ -1,7 +1,7 @@
 import { networkManager } from '@/lib/network/network';
 import type { ImageData, DetailPageState, ItemDocument } from '../_types/image';
 import type { APIResponse } from '../_types/request';
-import type { APIImageResponse } from '@/app/(main)/sections/discover/client/activity-feed/utils/types/image';
+import type { APIImageResponse } from '@/backup/app/(main)/sections/discover/client/activity-feed/utils/types/image';
 
 interface ImageDetailResponse {
   image: ImageData;

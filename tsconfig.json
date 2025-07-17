@@ -23,7 +23,7 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "backup/.next/types/**/*.ts"],
   "exclude": ["node_modules", "src-tauri"],
   "ts-node": {
     "esm": true,

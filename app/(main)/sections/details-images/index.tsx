@@ -1,6 +1,6 @@
 "use client";
 
-import { useImageDetails } from "@/app/details/utils/hooks/use-image-details";
+import { useImageDetails } from "@/backup/app/details/utils/hooks/use-image-details";
 import { ImageDetailResponse } from "@/components/ui/modal/add-item-modal/types";
 import type { Response_GetDocumentResponse_ } from "@/lib/api/types/models/Response_GetDocumentResponse_";
 import { UseQueryResult } from "@tanstack/react-query";

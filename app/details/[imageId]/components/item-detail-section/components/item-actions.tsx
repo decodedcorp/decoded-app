@@ -8,7 +8,7 @@ import { ProvideData } from '@/types/model.d';
 import { networkManager } from '@/lib/network/network';
 import { useLocaleContext } from '@/lib/contexts/locale-context';
 import { useStatusStore } from '@/components/ui/modal/status-modal/utils/store';
-import { useLike } from '@/app/details/utils/hooks/use-like';
+import { useLike } from '@/backup/app/details/utils/hooks/use-like';
 
 interface ItemActionsProps {
   itemId: string;

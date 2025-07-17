@@ -11,7 +11,7 @@ import { AddItemModal } from '@/components/ui/modal/add-item-modal';
 import { useState, useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { useItemDetail } from '../../context/item-detail-context';
-import { LinkButton } from '@/app/details-update/modal/link-button';
+import { LinkButton } from '@/backup/app/details-update/modal/link-button';
 
 interface ImageSectionProps {
   imageData: ProcessedImageData;
