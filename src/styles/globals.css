@@ -1,0 +1,231 @@
+@import 'tailwindcss';
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  .mobile-safe-padding {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  .mobile-container {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+
+  .mobile-text {
+    @apply text-sm sm:text-base;
+  }
+
+  .mobile-heading {
+    @apply text-xl sm:text-2xl lg:text-3xl;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+:root {
+  --main-background-color: #070707;
+  --text-color: #ffffff;
+  --footer-text-color: #ffffff;
+}
+
+html {
+  height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  color: var(--text-color);
+  background-color: var(--main-background-color);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR',
+    'Malgun Gothic', sans-serif !important;
+}
+
+main {
+  flex: 1 0 auto;
+  width: 100%;
+}
+
+footer {
+  flex-shrink: 0;
+  color: var(--footer-text-color);
+  padding: 20px;
+}
+
+@keyframes scale-up {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.5);
+  }
+}
+
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+.point-animation {
+  animation: scale-up 0.5s ease-in-out infinite alternate;
+  transform-origin: center;
+}
+
+@keyframes dots {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.loading-text::after {
+  animation: dots 1.5s infinite;
+  content: '...';
+}
+
+.shadow-custom {
+  box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.blur {
+  filter: blur(5px);
+}
+
+.image-item {
+  transition: transform 0.3s ease; /* border-radius에 대한 transition 포함 */
+}
+
+.image-item:hover {
+  transform: scale(1.3);
+  border-radius: 1rem;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  filter: brightness(1.1);
+}
+
+@keyframes slide-up {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  20% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 2s ease-in-out;
+}
+
+.blur-background {
+  backdrop-filter: blur(150px);
+  -webkit-backdrop-filter: blur(70px);
+}
+
+.glass-background {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+@keyframes floating {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(var(--float-offset, 8px));
+  }
+}
+
+.floating {
+  animation: floating var(--float-duration, 4s) ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
+}
+
+/* 모바일 디바이스 최적화 */
+@media (max-width: 640px) {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply touch-pan-y;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px]; /* Apple의 권장 터치 타겟 크기 */
+  }
+
+  /* 터치 이벤트 최적화 */
+  * {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* 이미지 터치 최적화 */
+  img {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    pointer-events: auto;
+  }
+
+  /* 터치 매니퓰레이션 최적화 */
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+  }
+}
+
+/* 한글 특수 요소에 대한 추가 지정 */
+:lang(ko) {
+  font-family: Pretendard, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+}
+
+/* Safari 폰트 호환성 */
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/Pretendard-Regular.woff2') format('woff2'),
+    url('/fonts/Pretendard-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
