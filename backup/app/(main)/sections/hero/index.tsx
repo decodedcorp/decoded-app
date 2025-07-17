@@ -5,7 +5,7 @@ import { HeroContent } from "./components/hero-content";
 import ScrollIndicator from "./components/scroll-indicator";
 import type { BoxSizeMode } from "./utils/types";
 import { Suspense, useEffect } from "react";
-import { useRandomResources } from "../../../../../lib/hooks/features/images/use-random-resources";
+import { useRandomResources } from "../../../../../lib/hooks/features/images/use-random-resourcessources";
 import { Locale } from "@/lib/lang/locales";
 import type { HeroImageDoc } from "@/lib/api/types";
 

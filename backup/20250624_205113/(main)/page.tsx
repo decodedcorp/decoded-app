@@ -9,7 +9,7 @@ import type { ImageItemData, ImageDetail } from './_types/image-grid';
 import { useImageApi } from './_hooks/useImageApi';
 import { useImageGrid } from './_hooks/useImageGrid';
 import { useGridInteraction } from './_hooks/useGridInteraction';
-import { useIsLike } from "@/backup/app/details/utils/hooks/isLike";
+import { useIsLike } from "@/app/details/utils/hooks/isLike";
 import { useAuth } from "@/lib/hooks/features/auth/useAuth";
 import { ImageSidebar } from './_components/sidebar/ImageSidebar';
 
