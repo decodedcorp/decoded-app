@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Decoded Frontend App
 
-## Getting Started
+> A curation-driven platform to empower everyone to become the master of their own taste.
 
-First, run the development server:
+## ✨ Vision
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+**"Unravel stories through taste — so that everyone can own and express their unique preferences."**
+
+Decoded is a taste-sharing platform designed to spotlight the stories behind individual preferences. Whether it’s fashion, design, music, or subcultures, we help communities showcase and explore what resonates with them most.
+
+## 🚀 Tech Stack
+
+- **Framework**: Next.js 15 (with App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Bundler**: Webpack (Turbopack intentionally excluded)
+- **Linting**: ESLint, Prettier
+- **Documentation**: VitePress
+- **Package Manager**: Yarn 4 (Berry, PnP)
+
+## 🗂 Project Structure (Toss-style)
+
+```
+src/
+├── app/                # Next.js routing entry
+├── domains/            # Domain-driven features
+├── shared/
+│   ├── components/     # Shared UI components
+│   ├── hooks/          # Reusable hooks
+│   ├── utils/          # Utility functions
+├── lib/                # External libraries or wrappers
+├── styles/             # Global and shared styles
+├── types/              # Global types
+├── constants/          # Constants across the app
+├── tests/              # Unit and integration tests
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📦 Getting Started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+yarn install
+yarn dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ✅ Commit Convention
 
-## Learn More
+We follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) format:
 
-To learn more about Next.js, take a look at the following resources:
+```
+feat: Add new feature
+fix: Fix a bug
+chore: Update config or tools
+refactor: Refactor code without feature change
+docs: Update documentation
+style: Fix linting issues or code formatting
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📚 Docs
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Development practices are documented in:
 
-## Deploy on Vercel
+```
+/docs/v2-upgrade.md         # v2 refactor steps & checklist
+/cursor/rules/*             # Cursor lint rules and shared standards
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Built with purpose by the Decoded Team.
