@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop, feature/**]
   pull_request:
-    branches: [main, develop]
+    branches: [main, develop, feature/**]
 
 jobs:
   # Type validation and generation
@@ -48,12 +48,35 @@ jobs:
           name: api-types
           path: src/api/generated
 
-      # TODO: Add PR comment bot to alert if API types change
+  # Task Master integration
+  task-master:
+    runs-on: ubuntu-latest
+    needs: typegen
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Task Master check
+        run: npx task-master-ai get-tasks --projectRoot ${{ github.workspace }}
+
+      - name: Generate task complexity report
+        run: npx task-master-ai analyze-project-complexity --projectRoot ${{ github.workspace }}
+
+      - name: Upload task reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: task-reports
+          path: .taskmaster/reports/
 
   # Lint and type check
   lint-and-type-check:
     runs-on: ubuntu-latest
-    needs: typegen
+    needs: [typegen, task-master]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -71,7 +94,7 @@ jobs:
         run: yarn lint
 
       - name: Type check
-        run: yarn tsc --noEmit
+        run: yarn type-check
 
   # Build test
   build:

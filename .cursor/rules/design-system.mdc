@@ -1,0 +1,16 @@
+---
+description: "Design system rules including tokens, spacing, typography, and component semantics"
+globs: ["src/**/*.{ts,tsx,md}"]
+alwaysApply: fileMatch
+rules:
+  enforceColorTokens: true
+  enforceSpacingScale: true
+  typographyScaleDefined: true
+  componentNamingMatchesSemantic: true
+reviewPrompts:
+  - "Are only theme-defined colors, spacing values, and typography tokens used?"
+  - "Does the component layout follow the spacing and grid system defined by the design system?"
+  - "Is typography used according to the type scale (e.g., heading vs. body vs. caption)?"
+  - "Are semantic component names used to match design intent (e.g., PrimaryButton, AlertCard)?"
+  - "Is the visual hierarchy of the UI aligned with the design tokens?"
+---

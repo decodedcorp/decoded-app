@@ -1,0 +1,37 @@
+---
+description: 'Code quality rules to ensure maintainable and consistent frontend development'
+globs: ['src/**/*.{ts,tsx}']
+applyMode: fileMatch
+rules:
+  fileLengthLimit: 100
+  componentSingleResponsibility: true
+  propsObjectSizeLimit: 5
+  enforceHooksUtilsReuse: true
+  flattenControlFlow: true
+  namingConventions: 'strict'
+  folderScoping: 'clear'
+reviewPrompts:
+  - 'Are files within the 100-line recommended limit?'
+  - 'Does each component handle only one concern or responsibility?'
+  - 'Are large prop objects broken down into smaller reusable parts?'
+  - 'Are custom hooks and utilities reused across the project?'
+  - 'Is control flow readable and flattened when possible?'
+  - 'Are naming conventions followed consistently throughout the file?'
+  - 'Does the folder structure clearly represent module boundaries?'
+---
+
+# ✨ Code Quality Guidelines
+
+These rules help enforce scalable and readable code across the codebase.
+
+## ✅ Practices
+
+- **Limit file length**: Aim to keep components and utilities within 100 lines.
+- **Single Responsibility Principle**: Each React component should have a focused purpose.
+- **Prop Size Limits**: Components should receive no more than 5 props. Consider using grouped objects or composition.
+- **Hooks & Utility Reuse**: Avoid redefining hook logic — reuse through abstraction.
+- **Control Flow**: Avoid deeply nested conditions. Flatten logic using early returns.
+- **Naming**: Use strict conventions (`camelCase`, `PascalCase`, `kebab-case`) for variables, files, and components.
+- **Folder Structure**: Group related logic together to promote discoverability and minimize cross-module coupling.
+
+---

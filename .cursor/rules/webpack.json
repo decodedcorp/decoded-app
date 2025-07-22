@@ -1,6 +1,0 @@
-{
-  "useSVGRWebpack": true,
-  "optimizeCodeSplitting": true,
-  "enableTreeShaking": true,
-  "sharedChunks": true
-} 
