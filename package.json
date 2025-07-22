@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "test": "echo \"No tests specified yet\" && exit 0",
+    "typegen:dev": "yarn dlx openapi-typescript-codegen --input https://dev.decoded.style/openapi.json --output ./src/api/generated --client fetch"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -25,8 +28,10 @@
     "autoprefixer": "^10.4.21",
     "eslint": "^9",
     "eslint-config-next": "15.4.1",
+    "openapi-typescript-codegen": "^0.29.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.11",
+    "tsx": "^4.20.3",
     "typescript": "^5"
   },
   "packageManager": "yarn@4.9.2"

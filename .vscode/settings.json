@@ -9,5 +9,6 @@
     "source.fixAll": "explicit"
   },
   "editor.formatOnSave": true,
-  "prettier.configPath": "./.prettierrc"
+  "prettier.configPath": "./.prettierrc",
+  "cursor.composer.shouldAllowCustomModes": false
 }
