@@ -1,13 +1,15 @@
 {
   "extends": [
-    "./.cursor/rules/code-quality.json",
-    "./.cursor/rules/tailwind.json",
-    "./.cursor/rules/bundling.json",
-    "./.cursor/rules/webpack.json",
-    "./.cursor/rules/testing.json",
-    "./.cursor/rules/documentation.json",
-    "./.cursor/rules/tooling.json",
-    "./.cursor/rules/git-mcp.json"
+    "./.cursor/rules/code-quality.mdc",
+    "./.cursor/rules/tailwind.mdc",
+    "./.cursor/rules/bundling.mdc",
+    "./.cursor/rules/documentation.mdc",
+    "./.cursor/rules/tooling.mdc",
+    "./.cursor/rules/git-mcp.mdc",
+    "./.cursor/rules/design-system.mdc",
+    "./.cursor/rules/performance.mdc",
+    "./.cursor/rules/react-query.mdc",
+    "./.cursor/rules/zustand.mdc"
   ],
   "projectStructure": [
     "src/app",
@@ -23,4 +25,4 @@
   "commitMessage": {
     "convention": "conventional"
   }
-} 
+}

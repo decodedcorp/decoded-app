@@ -3,22 +3,8 @@
 import React from 'react';
 import { cn } from '@/lib/utils/styles';
 import Image from 'next/image';
-
-interface Editor {
-  name: string;
-  avatarUrl?: string;
-}
-
-interface GridItemProps {
-  imageUrl?: string;
-  title: string;
-  category?: string;
-  editors?: Editor[];
-  date?: string;
-  isNew?: boolean;
-  isHot?: boolean;
-  avatarBorder?: string;
-}
+import { GridItemProps } from '../../types/masonry';
+import { getInitials } from '../../utils/editorUtils';
 
 export function GridItem({
   imageUrl,
@@ -118,20 +104,4 @@ export function GridItem({
       </div>
     </div>
   );
-}
-
-function getInitials(name: string) {
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase();
-}
-
-// ISO 국가코드를 국기 이모지로 변환
-function countryCodeToFlag(code?: string) {
-  if (!code) return null;
-  return code
-    .toUpperCase()
-    .replace(/./g, (char) => String.fromCodePoint(127397 + char.charCodeAt(0)));
 }

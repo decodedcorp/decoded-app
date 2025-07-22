@@ -1,11 +1,7 @@
 'use client';
 
 import React from 'react';
-
-interface Category {
-  id: string;
-  name: string;
-}
+import { Category } from '../../types/masonry';
 
 interface CategoryFilterProps {
   categories: Category[];
@@ -13,10 +9,10 @@ interface CategoryFilterProps {
   onCategoryChange: (categoryId: string) => void;
 }
 
-export function CategoryFilter({ 
-  categories, 
-  selectedCategory, 
-  onCategoryChange 
+export function CategoryFilter({
+  categories,
+  selectedCategory,
+  onCategoryChange,
 }: CategoryFilterProps) {
   return (
     <div className="flex flex-wrap justify-center gap-8">
@@ -26,10 +22,7 @@ export function CategoryFilter({
           onClick={() => onCategoryChange(category.id)}
           className={`
             text-lg font-medium transition-colors duration-200
-            ${selectedCategory === category.id
-              ? 'text-black'
-              : 'text-gray-500 hover:text-black'
-            }
+            ${selectedCategory === category.id ? 'text-black' : 'text-gray-500 hover:text-black'}
           `}
         >
           {category.name}
@@ -37,4 +30,4 @@ export function CategoryFilter({
       ))}
     </div>
   );
-} 
+}

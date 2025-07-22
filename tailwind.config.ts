@@ -30,6 +30,10 @@ const config: Config = {
           '0%': { transform: 'translateX(0)' },
           '100%': { transform: 'translateX(-50%)' },
         },
+        'marquee-reverse': {
+          '0%': { transform: 'translateX(-50%)' },
+          '100%': { transform: 'translateX(0)' },
+        },
         fadeIn: {
           '0%': { opacity: '0', transform: 'scale(0.95)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
@@ -79,6 +83,7 @@ const config: Config = {
         rotate: 'rotate 10s linear infinite',
         'pulse-slow': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'marquee-infinite': 'marquee 25s linear infinite',
+        'marquee-reverse-infinite': 'marquee-reverse 25s linear infinite',
         fill: 'fill 2s ease-in-out infinite',
       },
       // Spacing & Layout
@@ -86,6 +91,7 @@ const config: Config = {
         'header-desktop': '72px',
         'header-mobile': '60px',
         sidebar: '280px',
+        'card-header': '28px',
       },
       // Container Sizes
       maxWidth: {
@@ -111,12 +117,15 @@ const config: Config = {
         button: '6px',
         card: '8px',
         input: '6px',
+        'card-xl': '12px',
+        'card-2xl': '16px',
       },
       // Shadows
       boxShadow: {
         card: '0 2px 4px rgba(0,0,0,0.1)',
         elevated: '0 4px 6px -1px rgba(0,0,0,0.1)',
         modal: '0 10px 15px -3px rgba(0,0,0,0.1)',
+        'card-hover': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
       },
       // Colors
       colors: {
@@ -137,6 +146,11 @@ const config: Config = {
         textColor: 'var(--text-color)',
         footerText: 'var(--footer-text-color)',
         primary: '#EAFD66',
+        // Badge colors
+        badge: {
+          new: '#16a34a', // green-600
+          hot: '#db2777', // pink-600
+        },
       },
       // Background Images
       backgroundImage: {
@@ -187,6 +201,11 @@ const config: Config = {
       // Grid Templates
       gridTemplateColumns: {
         custom: 'repeat(10, minmax(0, 1fr))', // 10열 그리드
+        'masonry-mobile': 'repeat(1, minmax(0, 1fr))',
+        'masonry-tablet': 'repeat(2, minmax(0, 1fr))',
+        'masonry-desktop': 'repeat(3, minmax(0, 1fr))',
+        'masonry-wide': 'repeat(4, minmax(0, 1fr))',
+        'masonry-xl': 'repeat(5, minmax(0, 1fr))',
       },
       perspective: {
         '1000': '1000px',
@@ -220,10 +239,14 @@ const config: Config = {
     require('@tailwindcss/aspect-ratio'),
     require('tailwindcss-filters'),
     require('daisyui'),
-    function ({ addUtilities }: { addUtilities: any }) {
+    function ({ addUtilities, addComponents }: { addUtilities: any; addComponents: any }) {
+      // Utilities
       const newUtilities = {
         '.text-shadow-neon': {
           'text-shadow': '0 0 5px #EAFD66, 0 0 10px #EAFD66',
+        },
+        '.break-inside-avoid': {
+          'break-inside': 'avoid',
         },
       };
       addUtilities(newUtilities);
