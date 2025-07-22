@@ -1,0 +1,72 @@
+{
+  "id": "mainpage-migrate",
+  "title": "🚚 Main Page Migration (Frontend)",
+  "role": "frontend-developer",
+  "description": "Migrate the backed-up legacy main page to the new v2 structure, applying the latest design system, code quality, and API integration (react-query, store, etc). Ensure all legacy features and design elements are fully functional after migration.",
+  "priority": "high",
+  "steps": [
+    {
+      "order": 1,
+      "title": "Create migration checklist from legacy main page",
+      "description": "List all key UI components, features, and design elements from the backup. Use this as a migration and verification checklist."
+    },
+    {
+      "order": 2,
+      "title": "Analyze and backup the legacy main page",
+      "description": "Review the backed-up main page code and document key features/components to migrate."
+    },
+    {
+      "order": 3,
+      "title": "Set up base layout and routing",
+      "description": "Implement the new main page layout and ensure routing is correctly configured."
+    },
+    {
+      "order": 4,
+      "title": "Migrate core UI components",
+      "description": "Refactor and migrate main UI components (banner, hero, grid, etc) to match v2 design system."
+    },
+    {
+      "order": 5,
+      "title": "Integrate API (react-query, store)",
+      "description": "Set up react-query for data fetching and Zustand (or other store) for state management as needed."
+    },
+    {
+      "order": 6,
+      "title": "Verify migrated features and design",
+      "description": "Test each migrated component and feature against the checklist. Ensure all UI/UX and interactions match the legacy version and new requirements."
+    },
+    {
+      "order": 7,
+      "title": "Regression and QA testing",
+      "description": "Perform regression testing to catch any broken features. Conduct QA for design, responsiveness, and accessibility. Address any issues found."
+    },
+    {
+      "order": 8,
+      "title": "Remove legacy code and clean up",
+      "description": "Delete unused legacy code/assets and ensure only the new structure remains."
+    },
+    {
+      "order": 9,
+      "title": "Test, review, and document",
+      "description": "Test all main page features, check responsiveness/accessibility, and update documentation."
+    }
+  ],
+  "requirements": [
+    "Apply the new design system tokens (colors, spacing, typography).",
+    "Ensure all code follows code quality and performance rules.",
+    "Integrate API using react-query and set up store for state management.",
+    "All legacy features and design elements must be fully functional after migration."
+  ],
+  "cautions": [
+    "Do not break existing navigation or routing.",
+    "Check for regressions in main page features.",
+    "Coordinate with other ongoing refactors to avoid merge conflicts.",
+    "Test responsiveness and accessibility thoroughly."
+  ],
+  "notes": [
+    "Always work as a frontend developer: prioritize UI/UX, maintainability, and performance.",
+    "Set clear priorities for each step and document decisions.",
+    "Refer to the latest Figma design and design system documentation.",
+    "Use the migration checklist to verify all features and design elements are migrated and working."
+  ]
+}

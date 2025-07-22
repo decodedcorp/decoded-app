@@ -6,7 +6,7 @@ import { MasonryGrid } from './components/category-grid/MasonryGrid';
 
 export default function ChannelPage() {
   return (
-    <div className="min-h-screen w-full px-4 md:px-8 py-6">
+    <div className="min-h-screen w-full px-2 md:px-4 py-6">
       <ChannelHero />
       <div className="h-8" />
       <MasonryGrid />

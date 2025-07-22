@@ -6,5 +6,13 @@
       "updated": "2025-07-22T07:55:22.626Z",
       "description": "Tasks for master context"
     }
+  },
+  "feature-mainpage-migrate": {
+    "tasks": [],
+    "metadata": {
+      "created": "2025-07-22T08:52:11.391Z",
+      "updated": "2025-07-22T08:52:11.391Z",
+      "description": "Main page migration tasks"
+    }
   }
 }
