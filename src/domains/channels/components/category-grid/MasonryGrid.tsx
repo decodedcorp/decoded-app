@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { GridItem } from './GridItem';
 import { CtaCard } from './CtaCard';
-import { ExpandedChannel } from '../hero/ExpandedChannel';
 import { pastelColors, cardVariants } from '../../constants/masonryConstants';
 import {
   getMockItems,
@@ -13,6 +12,8 @@ import {
 } from '../../utils/masonryUtils';
 import { MasonryItem, CtaCardType, EmptyItemType } from '../../types/masonry';
 import { cn } from '@/lib/utils/styles';
+import { useChannelModalStore } from '@/store/channelModalStore';
+import { ChannelData } from '../hero/heroData';
 
 // 타입 가드 함수들
 function isMasonryItem(item: MasonryItem | CtaCardType | EmptyItemType): item is MasonryItem {
@@ -39,12 +40,7 @@ interface MasonryGridProps {
 
 export function MasonryGrid({ onExpandChange }: MasonryGridProps) {
   const items = MOCK_ITEMS;
-  const [expandedChannel, setExpandedChannel] = useState<MasonryItem | null>(null);
-
-  // expanded 상태 변경 시 부모에게 알림
-  useEffect(() => {
-    onExpandChange?.(!!expandedChannel);
-  }, [expandedChannel, onExpandChange]);
+  const openModal = useChannelModalStore((state) => state.openModal);
 
   const handleAddChannel = () => {
     // TODO: 채널 추가 모달 또는 페이지로 이동하는 로직 구현
@@ -53,26 +49,16 @@ export function MasonryGrid({ onExpandChange }: MasonryGridProps) {
   };
 
   const handleChannelClick = (channel: MasonryItem) => {
-    setExpandedChannel(channel);
-  };
-
-  const handleCloseExpanded = () => {
-    setExpandedChannel(null);
-  };
-
-  // ExpandedChannel이 열려있으면 그것만 렌더링
-  if (expandedChannel) {
-    // MasonryItem을 ChannelData 형태로 변환
-    const channelData = {
-      name: expandedChannel.title,
-      img: expandedChannel.imageUrl,
-      description: `${expandedChannel.category} 채널입니다.`,
-      category: expandedChannel.category,
+    // MasonryItem을 ChannelData 형태로 변환하여 모달 열기
+    const channelData: ChannelData = {
+      name: channel.title,
+      img: channel.imageUrl,
+      description: `${channel.category} 채널입니다.`,
+      category: channel.category,
       followers: '1.2K', // 임시 데이터
     };
-
-    return <ExpandedChannel channel={channelData} onClose={handleCloseExpanded} />;
-  }
+    openModal(channelData);
+  };
 
   return (
     <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 w-full">

@@ -69,7 +69,7 @@ export default function ChannelPage() {
       )}
 
       {/* Main Content Grid Area */}
-      <div className="lg:col-start-2 lg:col-end-3 h-full overflow-hidden">
+      <div className="lg:col-start-2 lg:col-end-3 h-full overflow-y-auto">
         <ChannelMainContent className="h-full" />
       </div>
     </div>

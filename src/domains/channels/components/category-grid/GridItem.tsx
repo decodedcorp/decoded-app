@@ -5,6 +5,8 @@ import { cn } from '@/lib/utils/styles';
 import Image from 'next/image';
 import { GridItemProps } from '../../types/masonry';
 import { getInitials } from '../../utils/editorUtils';
+import { useChannelModalStore } from '@/store/channelModalStore';
+import { ChannelData } from '../hero/heroData';
 
 export function GridItem({
   imageUrl,
@@ -19,6 +21,26 @@ export function GridItem({
   onAddChannel,
   onChannelClick,
 }: GridItemProps) {
+  const openModal = useChannelModalStore((state) => state.openModal);
+
+  const handleChannelClick = () => {
+    if (onChannelClick) {
+      onChannelClick();
+    } else {
+      // GridItem에서 모달을 열기 위한 기본 채널 데이터 생성
+      const channelData: ChannelData = {
+        name: title,
+        description: `Explore ${title} - a curated collection of ${
+          category?.toLowerCase() || 'content'
+        }`,
+        category: category || 'General',
+        followers: `${Math.floor(Math.random() * 10) + 1}.${Math.floor(Math.random() * 9) + 1}K`,
+        img: imageUrl || undefined,
+      };
+      openModal(channelData);
+    }
+  };
+
   return (
     <div>
       {/* 카테고리 + 배지 */}
@@ -53,7 +75,7 @@ export function GridItem({
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
               <button
                 className="px-3 py-1.5 rounded-full bg-white/90 text-zinc-900 text-xs font-semibold shadow hover:bg-white"
-                onClick={onChannelClick}
+                onClick={handleChannelClick}
               >
                 View Details
               </button>

@@ -7,15 +7,9 @@ interface MarqueeRowProps {
   capsules: Array<{ name: string; img?: string }>;
   rowIndex: number;
   onCapsuleClick: (channelName: string) => void;
-  expandedChannel: string | null;
 }
 
-export function MarqueeRow({
-  capsules,
-  rowIndex,
-  onCapsuleClick,
-  expandedChannel,
-}: MarqueeRowProps) {
+export function MarqueeRow({ capsules, rowIndex, onCapsuleClick }: MarqueeRowProps) {
   const isReverse = rowIndex % 2 === 1;
   const animation = isReverse
     ? 'marquee-reverse 48s linear infinite'
@@ -26,19 +20,21 @@ export function MarqueeRow({
     return offsets[rowIdx % offsets.length];
   };
 
+  // 캡슐들을 복제하여 무한 스크롤 효과 생성
+  const duplicatedCapsules = [...capsules, ...capsules];
+
   return (
     <div
       className="relative w-full overflow-x-hidden h-[46px]"
       style={{ transform: `translateY(${getRandomOffset(rowIndex)}px)` }}
     >
       <div className="flex flex-nowrap w-max" style={{ animation }}>
-        {capsules.map((c, i) => (
+        {duplicatedCapsules.map((c, i) => (
           <Capsule
             key={c.name + i + rowIndex}
             name={c.name}
             img={c.img}
             onClick={() => onCapsuleClick(c.name)}
-            isExpanded={expandedChannel === c.name}
           />
         ))}
       </div>
