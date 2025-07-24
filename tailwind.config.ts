@@ -85,6 +85,8 @@ const config: Config = {
         'marquee-infinite': 'marquee 25s linear infinite',
         'marquee-reverse-infinite': 'marquee-reverse 25s linear infinite',
         fill: 'fill 2s ease-in-out infinite',
+        'expand-in': 'expand-in 0.6s ease-out forwards',
+        'fade-in': 'fade-in 0.4s ease-out forwards',
       },
       // Spacing & Layout
       spacing: {

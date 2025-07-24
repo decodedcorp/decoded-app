@@ -15,7 +15,7 @@ export function Header() {
   return (
     <header
       className={
-        'fixed top-0 left-0 w-full z-header transition-all duration-300 ' +
+        'fixed top-0 left-0 w-full z-[9999] transition-all duration-300 ' +
         (scrolled ? 'backdrop-blur bg-black/30' : 'bg-transparent')
       }
       style={{ WebkitBackdropFilter: 'blur(8px)' }}

@@ -16,6 +16,13 @@ export interface CtaCardType {
   ctaIdx: number;
 }
 
+export interface EmptyItemType {
+  type: 'empty';
+  id: string;
+  title: string;
+  category?: string;
+}
+
 export interface Editor {
   name: string;
   avatarUrl?: string;
@@ -35,4 +42,9 @@ export interface GridItemProps {
   isNew?: boolean;
   isHot?: boolean;
   avatarBorder?: string;
+  // 채널 추가 기능을 위한 props
+  isEmpty?: boolean;
+  onAddChannel?: () => void;
+  // 채널 클릭 기능을 위한 props
+  onChannelClick?: () => void;
 }

@@ -15,6 +15,9 @@ export function GridItem({
   isNew,
   isHot,
   avatarBorder,
+  isEmpty = false,
+  onAddChannel,
+  onChannelClick,
 }: GridItemProps) {
   return (
     <div>
@@ -48,12 +51,41 @@ export function GridItem({
             />
             {/* hover overlay */}
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-              <button className="px-3 py-1.5 rounded-full bg-white/90 text-zinc-900 text-xs font-semibold shadow hover:bg-white">
+              <button
+                className="px-3 py-1.5 rounded-full bg-white/90 text-zinc-900 text-xs font-semibold shadow hover:bg-white"
+                onClick={onChannelClick}
+              >
                 View Details
               </button>
             </div>
           </>
+        ) : isEmpty ? (
+          // 채널 추가 기능
+          <div className="flex flex-col items-center justify-center w-full h-full gap-3 p-4">
+            <div className="w-16 h-16 rounded-full bg-zinc-800 flex items-center justify-center mb-2">
+              <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                <path
+                  d="M12 5v14m-7-7h14"
+                  stroke="#52525b"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            <div className="text-center">
+              <div className="text-zinc-300 text-sm font-medium mb-1">Add New Channel</div>
+              <div className="text-zinc-500 text-xs">Create your own channel</div>
+            </div>
+            <button
+              onClick={onAddChannel}
+              className="px-4 py-2 rounded-full bg-zinc-700 text-zinc-200 text-xs font-medium hover:bg-zinc-600 transition-colors border border-zinc-600 hover:border-zinc-500"
+            >
+              Add Channel
+            </button>
+          </div>
         ) : (
+          // 기존 Coming Soon 상태
           <div className="flex flex-col items-center justify-center w-full h-full gap-1">
             <span className="text-zinc-700 text-base font-thin">Coming Soon</span>
             <svg width="32" height="32" fill="none" viewBox="0 0 32 32">

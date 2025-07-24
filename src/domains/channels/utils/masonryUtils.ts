@@ -1,4 +1,4 @@
-import { MasonryItem, CtaCardType } from '../types/masonry';
+import { MasonryItem, CtaCardType, EmptyItemType } from '../types/masonry';
 
 // mock 데이터 (신규/인기 랜덤 플래그 추가)
 export function getMockItems(): MasonryItem[] {
@@ -91,6 +91,31 @@ export function distributeNoImageCards(items: MasonryItem[]): MasonryItem[] {
   while (noImageIdx < noImage.length) {
     result.push(noImage[noImageIdx++]);
   }
+  return result;
+}
+
+// 비어있는 아이템 추가: 일정 간격마다 채널 추가 아이템 삽입
+export function insertEmptyItems(
+  items: Array<MasonryItem | CtaCardType>,
+  interval = 6,
+): Array<MasonryItem | CtaCardType | EmptyItemType> {
+  const result: Array<MasonryItem | CtaCardType | EmptyItemType> = [];
+  let emptyCount = 0;
+
+  items.forEach((item, idx) => {
+    if (idx !== 0 && idx % interval === 0) {
+      // 비어있는 아이템 삽입
+      const emptyIdx = emptyCount++;
+      result.push({
+        type: 'empty',
+        id: `empty-${idx}`,
+        title: 'Add New Channel',
+        category: 'Create',
+      });
+    }
+    result.push(item);
+  });
+
   return result;
 }
 
