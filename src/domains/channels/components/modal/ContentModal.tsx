@@ -2,21 +2,18 @@
 
 import React, { useEffect, useRef } from 'react';
 import {
-  useChannelModalStore,
-  selectIsModalOpen,
-  selectSelectedChannel,
-} from '@/store/channelModalStore';
-import { ChannelModalHeader } from './ChannelModalHeader';
-import { ChannelModalStats } from './ChannelModalStats';
-import { ChannelModalContributors } from './ChannelModalContributors';
-import { ChannelModalContent } from './ChannelModalContent';
-import { ChannelModalRelated } from './ChannelModalRelated';
-import { ChannelModalFooter } from './ChannelModalFooter';
+  useContentModalStore,
+  selectIsContentModalOpen,
+  selectSelectedContent,
+} from '@/store/contentModalStore';
+import { ContentModalHeader } from './ContentModalHeader';
+import { ContentModalBody } from './ContentModalBody';
+import { ContentModalFooter } from './ContentModalFooter';
 
-export function ChannelModal() {
-  const isOpen = useChannelModalStore(selectIsModalOpen);
-  const channel = useChannelModalStore(selectSelectedChannel);
-  const closeModal = useChannelModalStore((state) => state.closeModal);
+export function ContentModal() {
+  const isOpen = useContentModalStore(selectIsContentModalOpen);
+  const content = useContentModalStore(selectSelectedContent);
+  const closeModal = useContentModalStore((state) => state.closeModal);
   const modalRef = useRef<HTMLDivElement>(null);
 
   // ESC 키와 외부 클릭으로 모달 닫기
@@ -50,7 +47,7 @@ export function ChannelModal() {
     }
   }, [isOpen]);
 
-  if (!isOpen || !channel) return null;
+  if (!isOpen || !content) return null;
 
   return (
     <>
@@ -62,18 +59,15 @@ export function ChannelModal() {
         ref={modalRef}
         className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
       >
-        <div className="bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl max-w-[1400px] w-full max-h-[95vh] overflow-hidden animate-scale-in shadow-2xl">
-          <ChannelModalHeader channel={channel} onClose={closeModal} />
+        <div className="bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl max-w-[95vw] w-full max-h-[95vh] overflow-hidden animate-scale-in shadow-2xl">
+          <ContentModalHeader content={content} onClose={closeModal} />
 
           {/* Content */}
-          <div className="p-6 overflow-y-auto max-h-[calc(95vh-180px)]">
-            <ChannelModalStats channel={channel} />
-            <ChannelModalContributors />
-            <ChannelModalContent />
-            <ChannelModalRelated />
+          <div className="overflow-y-auto max-h-[calc(95vh-200px)]">
+            <ContentModalBody content={content} />
           </div>
 
-          <ChannelModalFooter />
+          <ContentModalFooter content={content} />
         </div>
       </div>
     </>

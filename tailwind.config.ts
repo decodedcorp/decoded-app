@@ -73,6 +73,10 @@ const config: Config = {
           '50%': { fill: 'rgb(234 179 8)', stroke: 'rgb(234 179 8)' }, // yellow-500
           '100%': { fill: 'transparent' },
         },
+        'scale-in': {
+          '0%': { transform: 'scale(0.95)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
       },
       // Custom Animations
       animation: {
@@ -87,6 +91,7 @@ const config: Config = {
         fill: 'fill 2s ease-in-out infinite',
         'expand-in': 'expand-in 0.6s ease-out forwards',
         'fade-in': 'fade-in 0.4s ease-out forwards',
+        'scale-in': 'scale-in 0.3s ease-out forwards',
       },
       // Spacing & Layout
       spacing: {
@@ -249,6 +254,16 @@ const config: Config = {
         },
         '.break-inside-avoid': {
           'break-inside': 'avoid',
+        },
+        '.scrollbar-hide': {
+          /* IE and Edge */
+          '-ms-overflow-style': 'none',
+          /* Firefox */
+          'scrollbar-width': 'none',
+          /* Safari and Chrome */
+          '&::-webkit-scrollbar': {
+            display: 'none',
+          },
         },
       };
       addUtilities(newUtilities);

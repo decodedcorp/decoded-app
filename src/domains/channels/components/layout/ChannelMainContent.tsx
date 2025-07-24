@@ -5,6 +5,7 @@ import { ChannelHero } from '../hero/ChannelHero';
 import { AnimatedSection } from './AnimatedSection';
 import { MasonryGrid } from '../category-grid/MasonryGrid';
 import { ChannelModal } from '../modal/ChannelModal';
+import { ContentModal } from '../modal/ContentModal';
 
 interface ChannelMainContentProps {
   className?: string;
@@ -118,6 +119,9 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
 
       {/* Global Channel Modal */}
       <ChannelModal />
+
+      {/* Global Content Modal */}
+      <ContentModal />
     </div>
   );
 }
