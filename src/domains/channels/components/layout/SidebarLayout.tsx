@@ -2,12 +2,15 @@
 
 import React, { useState } from 'react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
-import { ChannelSidebar, SidebarFilters } from './components/sidebar/ChannelSidebar';
-import { ChannelMainContent } from './components/layout/ChannelMainContent';
+import { ChannelSidebar, SidebarFilters } from '../sidebar/ChannelSidebar';
+import { ChannelMainContent } from './ChannelMainContent';
 
-export default function ChannelPage() {
+interface SidebarLayoutProps {
+  className?: string;
+}
+
+export function SidebarLayout({ className = '' }: SidebarLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [currentFilters, setCurrentFilters] = useState<SidebarFilters>({
     dataTypes: [],
     categories: [],
@@ -24,17 +27,8 @@ export default function ChannelPage() {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const handleSidebarCollapse = (collapsed: boolean) => {
-    setIsSidebarCollapsed(collapsed);
-  };
-
-  // 사이드바가 접혔을 때는 더 넓은 Grid 사용
-  const gridClasses = isSidebarCollapsed
-    ? 'grid grid-cols-1 lg:grid-cols-[80px_1fr] h-screen w-full bg-black overflow-hidden'
-    : 'grid grid-cols-1 lg:grid-cols-[320px_1fr] h-screen w-full bg-black overflow-hidden';
-
   return (
-    <div className={gridClasses}>
+    <div className={`flex h-screen w-full bg-black overflow-hidden ${className}`}>
       {/* Mobile Sidebar Toggle */}
       <button
         onClick={toggleSidebar}
@@ -43,20 +37,17 @@ export default function ChannelPage() {
         {isSidebarOpen ? <XMarkIcon className="w-6 h-6" /> : <Bars3Icon className="w-6 h-6" />}
       </button>
 
-      {/* Sidebar Grid Area */}
+      {/* Sidebar Container */}
       <div
         className={`
           fixed lg:relative inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out
           ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-          lg:col-start-1 lg:col-end-2
+          lg:flex-shrink-0
         `}
       >
         <ChannelSidebar
           onFilterChange={handleFilterChange}
-          onCollapseChange={handleSidebarCollapse}
-          className={`h-full border-r border-gray-800 transition-all duration-300 ${
-            isSidebarCollapsed ? 'w-20' : 'w-80'
-          }`}
+          className="h-full w-80 border-r border-gray-800"
         />
       </div>
 
@@ -68,8 +59,8 @@ export default function ChannelPage() {
         />
       )}
 
-      {/* Main Content Grid Area */}
-      <div className="lg:col-start-2 lg:col-end-3 h-full overflow-hidden">
+      {/* Main Content Container */}
+      <div className="flex-1 min-w-0 h-full overflow-hidden">
         <ChannelMainContent className="h-full" />
       </div>
     </div>

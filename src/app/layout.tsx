@@ -10,7 +10,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           className="
             w-full min-h-screen
             pt-[60px] md:pt-[72px]
-            px-4 md:px-8
             bg-mainBackground
           "
         >

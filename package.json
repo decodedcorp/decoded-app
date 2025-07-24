@@ -12,6 +12,7 @@
     "typegen:dev": "yarn dlx openapi-typescript-codegen --input https://dev.decoded.style/openapi.json --output ./src/api/generated --client fetch"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "clsx": "^2.1.1",
     "lodash": "^4.17.21",
     "lucide-react": "^0.525.0",
