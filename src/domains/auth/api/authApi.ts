@@ -1,4 +1,4 @@
-import { AuthService } from '../../../api/generated';
+import { AuthService, UsersService } from '../../../api/generated';
 import {
   LoginFormData,
   LoginResponse,
@@ -6,6 +6,7 @@ import {
   RefreshTokenResponse,
 } from '../types/auth';
 import { handleAuthError } from '../utils/errorHandler';
+import { updateApiTokenFromStorage } from '../../../api/config';
 
 /**
  * 로그인 API 호출
@@ -20,19 +21,28 @@ export const loginUser = async (credentials: LoginFormData): Promise<LoginRespon
     };
 
     const response = await AuthService.loginAuthLoginPost(loginRequest);
-    return response;
+
+    // Update API token after successful login
+    if (response.access_token) {
+      updateApiTokenFromStorage();
+    }
+
+    return {
+      access_token: response.access_token,
+      refresh_token: response.refresh_token,
+      user: response.user,
+    };
   } catch (error) {
-    const authError = handleAuthError(error);
-    throw new Error(authError.message);
+    throw handleAuthError(error);
   }
 };
 
 /**
  * Google OAuth 콜백 처리
+ * Note: This uses Next.js API routes, not the generated service
  */
 export const handleGoogleOAuthCallback = async (code: string): Promise<GoogleOAuthResponse> => {
   try {
-    // Note: This might need to be adjusted based on the actual generated API
     const response = await fetch('/api/auth/google/callback', {
       method: 'POST',
       headers: {
@@ -42,26 +52,28 @@ export const handleGoogleOAuthCallback = async (code: string): Promise<GoogleOAu
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      const error = new Error(
-        errorData.message || `HTTP ${response.status}: ${response.statusText}`,
-      );
-      throw error;
+      throw new Error(`OAuth callback failed: ${response.statusText}`);
     }
 
-    return response.json();
+    const data = await response.json();
+
+    // Update API token after successful OAuth
+    if (data.access_token) {
+      updateApiTokenFromStorage();
+    }
+
+    return data;
   } catch (error) {
-    const authError = handleAuthError(error);
-    throw new Error(authError.message);
+    throw handleAuthError(error);
   }
 };
 
 /**
  * 토큰 갱신
+ * Note: This uses Next.js API routes, not the generated service
  */
-export const refreshToken = async (refreshToken: string): Promise<RefreshTokenResponse> => {
+export const refreshUserToken = async (refreshToken: string): Promise<RefreshTokenResponse> => {
   try {
-    // Note: This might need to be adjusted based on the actual generated API
     const response = await fetch('/api/auth/refresh', {
       method: 'POST',
       headers: {
@@ -71,26 +83,31 @@ export const refreshToken = async (refreshToken: string): Promise<RefreshTokenRe
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      const error = new Error(
-        errorData.message || `HTTP ${response.status}: ${response.statusText}`,
-      );
-      throw error;
+      throw new Error(`Token refresh failed: ${response.statusText}`);
     }
 
-    return response.json();
+    const data = await response.json();
+
+    // Update API token after successful refresh
+    if (data.access_token) {
+      updateApiTokenFromStorage();
+    }
+
+    return {
+      access_token: data.access_token,
+      refresh_token: data.refresh_token,
+    };
   } catch (error) {
-    const authError = handleAuthError(error);
-    throw new Error(authError.message);
+    throw handleAuthError(error);
   }
 };
 
 /**
  * 로그아웃
+ * Note: This uses Next.js API routes, not the generated service
  */
 export const logoutUser = async (): Promise<void> => {
   try {
-    // Note: This might need to be adjusted based on the actual generated API
     const response = await fetch('/api/auth/logout', {
       method: 'POST',
       headers: {
@@ -102,34 +119,21 @@ export const logoutUser = async (): Promise<void> => {
       console.warn('Logout API call failed, but proceeding with local logout');
     }
   } catch (error) {
-    console.warn('Logout API call failed, but proceeding with local logout:', error);
+    // Logout errors are usually not critical, just log them
+    console.warn('Logout error:', error);
   }
 };
 
 /**
  * 사용자 프로필 조회
+ * Uses the generated UsersService to call the backend API
  */
-export const getUserProfile = async (): Promise<LoginResponse['user']> => {
+export const getUserProfile = async () => {
   try {
-    // Note: This might need to be adjusted based on the actual generated API
-    const response = await fetch('/api/auth/profile', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      const error = new Error(
-        errorData.message || `HTTP ${response.status}: ${response.statusText}`,
-      );
-      throw error;
-    }
-
-    return response.json();
+    // Use the generated UsersService instead of Next.js API route
+    const profile = await UsersService.getMyProfileUsersMeProfileGet();
+    return profile;
   } catch (error) {
-    const authError = handleAuthError(error);
-    throw new Error(authError.message);
+    throw handleAuthError(error);
   }
 };

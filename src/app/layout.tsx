@@ -8,9 +8,11 @@ import { Header } from '../shared/components/Header';
 import '../styles/globals.css';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  // Initialize API configuration
+  // Initialize API configuration (client-side only)
   useEffect(() => {
-    configureApi();
+    if (typeof window !== 'undefined') {
+      configureApi();
+    }
   }, []);
 
   // Initialize authentication state

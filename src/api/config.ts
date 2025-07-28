@@ -8,8 +8,8 @@ export const configureApi = () => {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://dev.decoded.style';
 
   OpenAPI.BASE = baseUrl;
-  OpenAPI.WITH_CREDENTIALS = false;
-  OpenAPI.CREDENTIALS = 'omit';
+  OpenAPI.WITH_CREDENTIALS = true;
+  OpenAPI.CREDENTIALS = 'include';
 
   // Set token from localStorage if available (client-side only)
   if (typeof window !== 'undefined') {
@@ -44,5 +44,17 @@ export const setApiToken = (token: string | null) => {
     OpenAPI.TOKEN = token;
   } else {
     OpenAPI.TOKEN = undefined;
+  }
+};
+
+// Update API token from localStorage (for client-side use)
+export const updateApiTokenFromStorage = () => {
+  if (typeof window !== 'undefined') {
+    try {
+      const token = localStorage.getItem('access_token');
+      setApiToken(token);
+    } catch (error) {
+      console.warn('Failed to update API token from storage:', error);
+    }
   }
 };

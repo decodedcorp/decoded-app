@@ -1,102 +1,71 @@
 import { useEffect, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { refreshToken } from '../api/authApi';
+import { refreshUserToken } from '../api/authApi';
 import { getAccessToken, getRefreshToken, setTokens, isTokenExpired } from '../utils/tokenManager';
 import { useAuthStore } from '../../../store/authStore';
+import { queryKeys } from '../../../lib/api/queryKeys';
 
-/**
- * Hook for automatic token refresh
- * Automatically refreshes tokens before they expire.
- */
 export const useTokenRefresh = () => {
   const queryClient = useQueryClient();
-  const refreshTimeoutRef = useRef<number | undefined>(undefined);
   const { logout } = useAuthStore();
+  const refreshTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const refreshMutation = useMutation({
-    mutationFn: refreshToken,
+    mutationFn: refreshUserToken,
     onSuccess: (data) => {
-      // Store new tokens
+      // Store new tokens (fallback to old refreshToken if undefined)
       setTokens(data.access_token, data.refresh_token || getRefreshToken()!);
 
-      // Schedule next refresh
-      scheduleNextRefresh(data.access_token);
+      // Invalidate and refetch user data
+      queryClient.invalidateQueries({ queryKey: queryKeys.auth.user });
     },
-    onError: (error) => {
-      console.error('Token refresh failed:', error);
+    onError: () => {
       // Logout on refresh failure
       logout();
     },
   });
 
-  const scheduleNextRefresh = (accessToken: string) => {
-    try {
-      // Calculate token expiration time (for JWT tokens)
-      const payload = JSON.parse(atob(accessToken.split('.')[1]));
-      const expiresAt = payload.exp * 1000; // Convert to milliseconds
-      const now = Date.now();
-
-      // Refresh 5 minutes before expiration
-      const refreshTime = expiresAt - now - 5 * 60 * 1000;
-
-      if (refreshTime > 0) {
-        // Clear existing timer
-        if (refreshTimeoutRef.current) {
-          clearTimeout(refreshTimeoutRef.current);
-        }
-
-        // Set new timer
-        refreshTimeoutRef.current = window.setTimeout(() => {
-          const currentRefreshToken = getRefreshToken();
-          if (currentRefreshToken) {
-            refreshMutation.mutate(currentRefreshToken);
-          }
-        }, refreshTime);
-      }
-    } catch (error) {
-      console.error('Failed to schedule token refresh:', error);
-    }
-  };
-
-  const startTokenRefresh = () => {
-    const accessToken = getAccessToken();
-    const currentRefreshToken = getRefreshToken();
-
-    if (!accessToken || !currentRefreshToken) {
-      return;
-    }
-
-    // Check if token is already expired
-    if (isTokenExpired(accessToken)) {
-      // Try immediate refresh
-      refreshMutation.mutate(currentRefreshToken);
-    } else {
-      // Schedule next refresh
-      scheduleNextRefresh(accessToken);
-    }
-  };
-
-  const stopTokenRefresh = () => {
-    if (refreshTimeoutRef.current) {
-      clearTimeout(refreshTimeoutRef.current);
-      refreshTimeoutRef.current = undefined;
-    }
-  };
-
   useEffect(() => {
-    // Start token refresh on component mount
-    startTokenRefresh();
+    const scheduleRefresh = () => {
+      const accessToken = getAccessToken();
+      if (!accessToken || isTokenExpired(accessToken)) {
+        return;
+      }
 
-    // Clean up timer on component unmount
-    return () => {
-      stopTokenRefresh();
+      // Clear existing timeout
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
+      }
+
+      // Calculate time until token expires (minus 5 minutes buffer)
+      const tokenData = JSON.parse(atob(accessToken.split('.')[1]));
+      const expiresAt = tokenData.exp * 1000;
+      const now = Date.now();
+      const timeUntilExpiry = expiresAt - now - 5 * 60 * 1000; // 5 minutes buffer
+
+      if (timeUntilExpiry > 0) {
+        refreshTimeoutRef.current = setTimeout(() => {
+          const refreshToken = getRefreshToken();
+          if (refreshToken) {
+            refreshMutation.mutate(refreshToken);
+          }
+        }, timeUntilExpiry);
+      }
     };
-  }, []);
 
-  return {
-    isRefreshing: refreshMutation.isPending,
-    refreshToken: refreshMutation.mutate,
-    startTokenRefresh,
-    stopTokenRefresh,
-  };
+    // Schedule initial refresh
+    scheduleRefresh();
+
+    // Set up interval to check and schedule refresh
+    const interval = setInterval(scheduleRefresh, 60 * 1000); // Check every minute
+
+    return () => {
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
+      }
+      clearInterval(interval);
+    };
+  }, [refreshMutation]);
+
+  return refreshMutation;
 };

@@ -24,9 +24,19 @@ const TOKEN_KEYS = {
 } as const;
 
 /**
+ * Check if we're in a browser environment
+ */
+const isBrowser = typeof window !== 'undefined';
+
+/**
  * Safely store tokens
  */
 export const setTokens = (accessToken: string, refreshToken: string): void => {
+  if (!isBrowser) {
+    console.warn('Cannot store tokens in server environment');
+    return;
+  }
+
   try {
     // Validate tokens
     if (!accessToken || !refreshToken) {
@@ -50,6 +60,10 @@ export const setTokens = (accessToken: string, refreshToken: string): void => {
  * Get access token
  */
 export const getAccessToken = (): string | null => {
+  if (!isBrowser) {
+    return null;
+  }
+
   try {
     return localStorage.getItem(TOKEN_KEYS.ACCESS_TOKEN);
   } catch (error) {
@@ -62,6 +76,10 @@ export const getAccessToken = (): string | null => {
  * Get refresh token
  */
 export const getRefreshToken = (): string | null => {
+  if (!isBrowser) {
+    return null;
+  }
+
   try {
     return localStorage.getItem(TOKEN_KEYS.REFRESH_TOKEN);
   } catch (error) {
@@ -74,6 +92,10 @@ export const getRefreshToken = (): string | null => {
  * Clear all tokens
  */
 export const clearTokens = (): void => {
+  if (!isBrowser) {
+    return;
+  }
+
   try {
     localStorage.removeItem(TOKEN_KEYS.ACCESS_TOKEN);
     localStorage.removeItem(TOKEN_KEYS.REFRESH_TOKEN);
@@ -171,63 +193,17 @@ export const getTokenTimeRemaining = (token: string): number => {
 };
 
 /**
- * Safely store tokens
- */
-export const storeTokens = (tokens: TokenData): void => {
-  try {
-    localStorage.setItem('access_token', tokens.access_token);
-    localStorage.setItem('refresh_token', tokens.refresh_token);
-  } catch (error) {
-    console.error('Failed to store tokens:', error);
-  }
-};
-
-/**
- * Safely get stored tokens
- */
-export const getStoredTokens = (): TokenData | null => {
-  try {
-    const accessToken = localStorage.getItem('access_token');
-    const refreshToken = localStorage.getItem('refresh_token');
-
-    if (!accessToken || !refreshToken) {
-      return null;
-    }
-
-    return {
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    };
-  } catch (error) {
-    console.error('Failed to get stored tokens:', error);
-    return null;
-  }
-};
-
-/**
- * Safely clear stored tokens
- */
-export const clearStoredTokens = (): void => {
-  try {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-  } catch (error) {
-    console.error('Failed to clear stored tokens:', error);
-  }
-};
-
-/**
  * Get the currently valid access token
  */
 export const getValidAccessToken = (): string | null => {
-  const tokens = getStoredTokens();
-  if (!tokens) return null;
+  const accessToken = getAccessToken();
+  if (!accessToken) return null;
 
-  if (isTokenExpired(tokens.access_token)) {
+  if (isTokenExpired(accessToken)) {
     return null;
   }
 
-  return tokens.access_token;
+  return accessToken;
 };
 
 /**
@@ -235,8 +211,8 @@ export const getValidAccessToken = (): string | null => {
  */
 export const refreshAccessToken = async (): Promise<string | null> => {
   try {
-    const tokens = getStoredTokens();
-    if (!tokens) {
+    const refreshToken = getRefreshToken();
+    if (!refreshToken) {
       throw new Error('No refresh token available');
     }
 
@@ -246,7 +222,7 @@ export const refreshAccessToken = async (): Promise<string | null> => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        refresh_token: tokens.refresh_token,
+        refresh_token: refreshToken,
       }),
     });
 
@@ -257,10 +233,10 @@ export const refreshAccessToken = async (): Promise<string | null> => {
     const data = await response.json();
     const newTokens: TokenData = {
       access_token: data.access_token,
-      refresh_token: data.refresh_token || tokens.refresh_token, // Use existing refresh token if new one is not provided
+      refresh_token: data.refresh_token || refreshToken, // Use existing refresh token if new one is not provided
     };
 
-    storeTokens(newTokens);
+    setTokens(newTokens.access_token, newTokens.refresh_token);
     useAuthStore.getState().setTokens(newTokens.access_token, newTokens.refresh_token);
 
     return newTokens.access_token;

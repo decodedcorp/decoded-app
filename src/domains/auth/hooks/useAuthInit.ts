@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useAuthStore } from '../../../store/authStore';
 import { getAccessToken, getRefreshToken, isTokenExpired } from '../utils/tokenManager';
+import { updateApiTokenFromStorage } from '../../../api/config';
 
 /**
  * Hook to initialize and restore authentication state on app startup
@@ -12,6 +13,11 @@ export const useAuthInit = () => {
     const initializeAuth = async () => {
       try {
         setLoading(true);
+
+        // Only run on client-side
+        if (typeof window === 'undefined') {
+          return;
+        }
 
         // Check stored tokens
         const accessToken = getAccessToken();
@@ -29,6 +35,9 @@ export const useAuthInit = () => {
           logout();
           return;
         }
+
+        // Update API token configuration
+        updateApiTokenFromStorage();
 
         // Set authentication state to true if tokens are valid
         // Actual user data will be fetched by useAuth hook using React Query

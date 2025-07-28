@@ -3,7 +3,7 @@ import { loginUser, handleGoogleOAuthCallback, logoutUser } from '../api/authApi
 import { queryKeys } from '../../../lib/api/queryKeys';
 import { LoginFormData, LoginResponse, GoogleOAuthResponse } from '../types/auth';
 import { setTokens, clearTokens } from '../utils/tokenManager';
-import { setApiToken } from '../../../api/config';
+import { updateApiTokenFromStorage } from '../../../api/config';
 
 /**
  * Login mutation hook
@@ -17,15 +17,12 @@ export const useLogin = () => {
       // Store tokens
       setTokens(data.access_token, data.refresh_token);
 
-      // Set API token for future requests
-      setApiToken(data.access_token);
+      // Update API token configuration
+      updateApiTokenFromStorage();
 
       // Update cache
       queryClient.setQueryData(queryKeys.auth.user, data.user);
-      queryClient.invalidateQueries({ queryKey: queryKeys.auth.user });
-    },
-    onError: (error: Error) => {
-      console.error('Login failed:', error);
+      queryClient.setQueryData(queryKeys.auth.profile, data.user);
     },
   });
 };
@@ -42,15 +39,12 @@ export const useGoogleOAuth = () => {
       // Store tokens
       setTokens(data.access_token, data.refresh_token);
 
-      // Set API token for future requests
-      setApiToken(data.access_token);
+      // Update API token configuration
+      updateApiTokenFromStorage();
 
       // Update cache
       queryClient.setQueryData(queryKeys.auth.user, data.user);
-      queryClient.invalidateQueries({ queryKey: queryKeys.auth.user });
-    },
-    onError: (error: Error) => {
-      console.error('Google OAuth failed:', error);
+      queryClient.setQueryData(queryKeys.auth.profile, data.user);
     },
   });
 };
@@ -67,17 +61,10 @@ export const useLogout = () => {
       // Clear tokens
       clearTokens();
 
-      // Clear API token
-      setApiToken(null);
+      // Update API token configuration
+      updateApiTokenFromStorage();
 
       // Clear cache
-      queryClient.clear();
-    },
-    onError: (error: Error) => {
-      console.error('Logout failed:', error);
-      // Proceed with local logout even if API call fails
-      clearTokens();
-      setApiToken(null);
       queryClient.clear();
     },
   });

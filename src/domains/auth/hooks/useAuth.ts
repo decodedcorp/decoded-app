@@ -13,6 +13,7 @@ import { queryKeys } from '../../../lib/api/queryKeys';
 import { getUserProfile } from '../api/authApi';
 import { getAccessToken, isTokenExpired } from '../utils/tokenManager';
 import { useLogin, useGoogleOAuth, useLogout } from './useAuthMutations';
+import { updateApiTokenFromStorage } from '../../../api/config';
 
 /**
  * Main hook providing authentication state and related actions
@@ -22,11 +23,15 @@ export const useAuth = () => {
   const queryClient = useQueryClient();
   const authStore = useAuthStore();
 
+  // Safely check for tokens (client-side only)
+  const hasValidToken =
+    typeof window !== 'undefined' && getAccessToken() && !isTokenExpired(getAccessToken()!);
+
   // Fetch user profile (only when token exists)
   const { data: userProfile, isLoading: isProfileLoading } = useQuery({
     queryKey: queryKeys.auth.user,
     queryFn: getUserProfile,
-    enabled: !!getAccessToken() && !isTokenExpired(getAccessToken()!),
+    enabled: !!hasValidToken,
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: (failureCount, error) => {
       // Don't retry on 401 errors
