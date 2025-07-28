@@ -97,7 +97,7 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
     <div ref={mainContentRef} className={`relative h-full overflow-y-auto ${className}`}>
       {/* Hero Section with Scroll Animation */}
       <div ref={heroRef} className="relative z-10 overflow-hidden">
-        <ChannelHero rowOpacities={rowOpacities} rowHeights={rowHeights} />
+        <ChannelHero />
       </div>
 
       {/* Grid Section */}

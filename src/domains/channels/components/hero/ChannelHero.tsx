@@ -1,60 +1,46 @@
 'use client';
 
-import React, { useCallback } from 'react';
-import { useChannelModalStore } from '@/store/channelModalStore';
-import { MarqueeRow } from './MarqueeRow';
-import { capsules, HERO_CAPSULE_ROWS } from './heroData';
+import React, { useState } from 'react';
 
-interface ChannelHeroProps {
-  onChannelSelect?: (channelName: string) => void;
-  rowOpacities?: number[];
-  rowHeights?: number[];
-}
+const categories = [
+  'All',
+  'Art',
+  'Design',
+  'Photography',
+  'Music',
+  'Video',
+  'Technology',
+  'Fashion',
+  'Food',
+  'Travel',
+  'Sports',
+  'Education',
+];
 
-export function ChannelHero({
-  onChannelSelect,
-  rowOpacities = [1, 1, 1, 1],
-  rowHeights = [46, 46, 46, 46],
-}: ChannelHeroProps) {
-  const openModal = useChannelModalStore((state) => state.openModal);
-
-  const handleChannelClick = useCallback(
-    (channelName: string) => {
-      // Hero에서 채널 클릭 시 해당 채널 데이터 찾기
-      const channel = capsules.find((cap) => cap.name === channelName);
-      if (channel) {
-        openModal(channel);
-      }
-
-      // 기존 콜백도 호출
-      if (onChannelSelect) {
-        onChannelSelect(channelName);
-      }
-    },
-    [openModal, onChannelSelect],
-  );
+export function ChannelHero() {
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
   return (
-    <section data-hero-section className="bg-black w-full relative overflow-x-hidden py-6 px-0">
-      {/* 마퀴 캡슐들 */}
-      <div className="flex flex-col gap-1 w-full">
-        {HERO_CAPSULE_ROWS.map((rowCapsules, rowIdx) => (
-          <div
-            key={rowIdx}
-            style={{
-              opacity: rowOpacities[rowIdx] || 1,
-              height: `${rowHeights[rowIdx] || 46}px`,
-              overflow: 'hidden',
-              transition: 'opacity 0.2s ease-out, height 0.2s ease-out',
-            }}
-          >
-            <MarqueeRow
-              capsules={rowCapsules}
-              rowIndex={rowIdx}
-              onCapsuleClick={handleChannelClick}
-            />
+    <section className="h-[40vh] bg-black relative overflow-hidden">
+      {/* 카테고리 필터 */}
+      <div className="relative z-10 flex items-center justify-center h-full px-4">
+        <div className="w-full max-w-4xl mx-auto">
+          <div className="flex flex-wrap gap-3 justify-center">
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 ${
+                  selectedCategory === category
+                    ? 'bg-white text-black shadow-lg'
+                    : 'bg-white/10 text-white/80 hover:bg-white/20 hover:text-white'
+                }`}
+              >
+                {category}
+              </button>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     </section>
   );
