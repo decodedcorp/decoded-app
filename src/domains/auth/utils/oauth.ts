@@ -1,4 +1,5 @@
 import { AUTH_CONSTANTS } from '../constants/authConstants';
+import { GoogleOAuthApiResponse } from '../types/auth';
 
 export interface GoogleOAuthConfig {
   clientId: string;
@@ -20,7 +21,7 @@ export const getGoogleOAuthConfig = (): GoogleOAuthConfig => {
 
 export const buildGoogleOAuthUrl = (): string => {
   const config = getGoogleOAuthConfig();
-  
+
   if (!config.clientId) {
     throw new Error('Google OAuth Client ID is not configured');
   }
@@ -49,7 +50,6 @@ export const initiateGoogleOAuth = (): void => {
 
 export const handleGoogleOAuthCallback = async (code: string): Promise<any> => {
   try {
-    // TODO: Send authorization code to backend
     const response = await fetch('/api/auth/google/callback', {
       method: 'POST',
       headers: {
@@ -59,10 +59,23 @@ export const handleGoogleOAuthCallback = async (code: string): Promise<any> => {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to exchange authorization code');
+      let errorMessage = 'Failed to exchange authorization code';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorMessage;
+      } catch (parseError) {
+        console.error('Failed to parse error response:', parseError);
+      }
+      throw new Error(errorMessage);
     }
 
-    return await response.json();
+    const data: GoogleOAuthApiResponse = await response.json();
+
+    if (!data.success || !data.data) {
+      throw new Error(data.message || 'Invalid response from server');
+    }
+
+    return data.data;
   } catch (error) {
     console.error('Failed to handle Google OAuth callback:', error);
     throw error;
@@ -72,4 +85,21 @@ export const handleGoogleOAuthCallback = async (code: string): Promise<any> => {
 export const extractAuthCodeFromUrl = (): string | null => {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get('code');
-}; 
+};
+
+/**
+ * Google OAuth 에러 메시지를 사용자 친화적으로 변환
+ */
+export const getGoogleOAuthErrorMessage = (error: string): string => {
+  const errorMessages: Record<string, string> = {
+    access_denied: '로그인이 취소되었습니다.',
+    invalid_request: '잘못된 요청입니다.',
+    unauthorized_client: '인증되지 않은 클라이언트입니다.',
+    unsupported_response_type: '지원되지 않는 응답 타입입니다.',
+    invalid_scope: '잘못된 권한 범위입니다.',
+    server_error: '서버 오류가 발생했습니다.',
+    temporarily_unavailable: '일시적으로 서비스를 사용할 수 없습니다.',
+  };
+
+  return errorMessages[error] || '로그인 중 오류가 발생했습니다.';
+};
