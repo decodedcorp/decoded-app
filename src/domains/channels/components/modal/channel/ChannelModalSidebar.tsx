@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { SidebarFilters } from '../sidebar/ChannelSidebar';
-import { DataTypesFilter } from './filters/DataTypesFilter';
-import { CategoriesFilter } from './filters/CategoriesFilter';
-import { TagsFilter } from './filters/TagsFilter';
+import { SidebarFilters } from '../../sidebar/ChannelSidebar';
+import { DataTypesFilter } from '../filters/DataTypesFilter';
+import { CategoriesFilter } from '../filters/CategoriesFilter';
+import { TagsFilter } from '../filters/TagsFilter';
 
 interface ChannelModalSidebarProps {
   currentFilters: SidebarFilters;

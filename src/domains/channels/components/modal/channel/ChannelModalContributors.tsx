@@ -1,5 +1,5 @@
 import React from 'react';
-import { getInitials } from '../../utils/editorUtils';
+import { getInitials } from '../../../utils/editorUtils';
 
 interface Contributor {
   id: number;

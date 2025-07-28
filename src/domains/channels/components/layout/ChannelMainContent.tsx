@@ -4,8 +4,7 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { ChannelHero } from '../hero/ChannelHero';
 import { AnimatedSection } from './AnimatedSection';
 import { MasonryGrid } from '../category-grid/MasonryGrid';
-import { ChannelModal } from '../modal/ChannelModal';
-import { ContentModal } from '../modal/ContentModal';
+import { ChannelModal, ContentModal } from '../modal';
 
 interface ChannelMainContentProps {
   className?: string;

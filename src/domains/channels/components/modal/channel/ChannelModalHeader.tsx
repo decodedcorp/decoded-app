@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChannelData } from '../hero/heroData';
+import { ChannelData } from '../../hero/heroData';
 
 interface ChannelModalHeaderProps {
   channel: ChannelData;
