@@ -15,7 +15,7 @@ import { ChannelModalContent } from './ChannelModalContent';
 import { ChannelModalRelated } from './ChannelModalRelated';
 import { ChannelModalFooter } from './ChannelModalFooter';
 import { ChannelModalSidebar } from './ChannelModalSidebar';
-import { SidebarFilters } from '../../../sidebar/ChannelSidebar';
+import type { SidebarFilters } from '@/domains/channels/components/sidebar/ChannelSidebar';
 
 export function ChannelModal() {
   const isOpen = useChannelModalStore(selectIsModalOpen);
