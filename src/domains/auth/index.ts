@@ -6,6 +6,7 @@ export { LoginModal } from './components/LoginModal';
 export type {
   LoginFormData,
   LoginResponse,
+  GoogleOAuthResponse,
   AuthState,
   LoginFormErrors,
   LoginFormState,
@@ -21,3 +22,12 @@ export {
   validateLoginForm,
   isFormValid,
 } from './utils/validation';
+
+// OAuth Utils
+export {
+  initiateGoogleOAuth,
+  handleGoogleOAuthCallback,
+  extractAuthCodeFromUrl,
+  buildGoogleOAuthUrl,
+  getGoogleOAuthConfig,
+} from './utils/oauth';

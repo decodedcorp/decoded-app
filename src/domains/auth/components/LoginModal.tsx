@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import { initiateGoogleOAuth } from '../utils/oauth';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -38,24 +39,14 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
 
   const handleGoogleLogin = async () => {
     try {
-      // TODO: Implement Google OAuth login
-      console.log('Google login initiated');
+      // Initiate Google OAuth flow
+      initiateGoogleOAuth();
 
-      // Simulate OAuth flow
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // TODO: Replace with actual Google OAuth implementation
-      // const response = await AuthService.googleLogin();
-
-      console.log('Google login successful');
-
-      // Call success callback
-      onLoginSuccess?.();
-
-      // Close modal
-      onClose();
+      // Note: The user will be redirected to Google OAuth
+      // The callback will be handled by the callback page
     } catch (error) {
       console.error('Google login failed:', error);
+      // You might want to show an error message to the user here
     }
   };
 
