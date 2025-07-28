@@ -68,6 +68,3 @@ node_modules/
 # Task Master
 .taskmaster/reports/
 .taskmaster/docs/ 
-
-# Generated API files (auto-generated, do not edit)
-src/api/generated/ 
