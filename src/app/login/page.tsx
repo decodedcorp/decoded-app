@@ -2,14 +2,13 @@
 
 import React, { useEffect, useState } from 'react';
 import { LoginForm } from '../../domains/auth/components/LoginForm';
-import { LoginFormData } from '../../domains/auth/types/auth';
 import { useAuth } from '../../domains/auth/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { initiateGoogleOAuth } from '../../domains/auth/utils/oauth';
 import { OpenAPI } from '../../api/generated';
 
 export default function LoginPage() {
-  const { login, setLoading, setError, clearError, isLoading, error } = useAuth();
+  const { setLoading, setError, clearError, isLoading, error } = useAuth();
   const router = useRouter();
   const [apiConfig, setApiConfig] = useState<any>(null);
 
@@ -23,32 +22,13 @@ export default function LoginPage() {
     });
   }, []);
 
-  const handleLogin = async (formData: LoginFormData) => {
+  const handleLogin = async () => {
     try {
       setLoading(true);
       clearError();
 
-      // TODO: 실제 API 엔드포인트로 변경
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || '로그인에 실패했습니다.');
-      }
-
-      const loginResponse = await response.json();
-
-      // Zustand 스토어에 로그인 정보 저장
-      login(loginResponse);
-
-      // 로그인 성공 후 메인 페이지로 리다이렉트
-      router.push('/');
+      // Google OAuth로 로그인
+      initiateGoogleOAuth();
     } catch (error) {
       console.error('Login error:', error);
       setError(error instanceof Error ? error.message : '로그인에 실패했습니다.');

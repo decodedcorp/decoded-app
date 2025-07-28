@@ -1,68 +1,57 @@
-import { AuthService, UsersService } from '../../../api/generated';
-import {
-  LoginFormData,
-  LoginResponse,
-  GoogleOAuthResponse,
-  RefreshTokenResponse,
-} from '../types/auth';
+import { UsersService } from '../../../api/generated';
+import { GoogleOAuthResponse, RefreshTokenResponse } from '../types/auth';
 import { handleAuthError } from '../utils/errorHandler';
-import { updateApiTokenFromStorage } from '../../../api/config';
+import { updateApiTokenFromStorage, getRequestConfig } from '../../../api/config';
+import {
+  storeUserSession,
+  clearSession,
+  getValidAccessToken,
+  setLastTokenCheck,
+  shouldCheckToken,
+} from '../utils/tokenManager';
 
 /**
- * 로그인 API 호출
- */
-export const loginUser = async (credentials: LoginFormData): Promise<LoginResponse> => {
-  try {
-    // Convert LoginFormData to LoginRequest format
-    const loginRequest = {
-      jwt_token: credentials.email, // 임시로 email을 jwt_token으로 사용
-      sui_address: credentials.password, // 임시로 password를 sui_address로 사용
-      email: credentials.email,
-    };
-
-    const response = await AuthService.loginAuthLoginPost(loginRequest);
-
-    // Update API token after successful login
-    if (response.access_token) {
-      updateApiTokenFromStorage();
-    }
-
-    return {
-      access_token: response.access_token,
-      refresh_token: response.refresh_token,
-      user: response.user,
-    };
-  } catch (error) {
-    throw handleAuthError(error);
-  }
-};
-
-/**
- * Google OAuth 콜백 처리
- * Note: This uses Next.js API routes, not the generated service
+ * Google OAuth 토큰 교환 및 사용자 정보 가져오기
+ * Backup 방식: 직접 백엔드 API 호출
  */
 export const handleGoogleOAuthCallback = async (code: string): Promise<GoogleOAuthResponse> => {
   try {
-    const response = await fetch('/api/auth/google/callback', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ code }),
-    });
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://dev.decoded.style';
+    const url = `${baseUrl}/auth/google/callback`;
+
+    const requestBody = { code };
+    const config = getRequestConfig('POST', requestBody);
+
+    const response = await fetch(url, config);
 
     if (!response.ok) {
-      throw new Error(`OAuth callback failed: ${response.statusText}`);
+      const errorData = await response.json();
+      console.error('Google OAuth API error:', errorData);
+      throw new Error(errorData.error || 'Google OAuth 처리에 실패했습니다.');
     }
 
     const data = await response.json();
 
-    // Update API token after successful OAuth
-    if (data.access_token) {
+    // Backup 방식: 세션 데이터 저장
+    if (data.access_token && data.doc_id) {
+      storeUserSession({
+        access_token: data.access_token,
+        refresh_token: data.refresh_token || '',
+        doc_id: data.doc_id,
+        email: data.user?.email || '',
+        nickname: data.user?.nickname || data.user?.name || '',
+      });
+
+      // Update API token configuration
       updateApiTokenFromStorage();
     }
 
-    return data;
+    return {
+      access_token: data.access_token,
+      refresh_token: data.refresh_token,
+      user: data.user,
+      token_type: data.token_type || 'oauth',
+    };
   } catch (error) {
     throw handleAuthError(error);
   }
@@ -70,20 +59,21 @@ export const handleGoogleOAuthCallback = async (code: string): Promise<GoogleOAu
 
 /**
  * 토큰 갱신
- * Note: This uses Next.js API routes, not the generated service
+ * Backup 방식: 클라이언트에서 직접 백엔드 API 호출
  */
 export const refreshUserToken = async (refreshToken: string): Promise<RefreshTokenResponse> => {
   try {
-    const response = await fetch('/api/auth/refresh', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ refresh_token: refreshToken }),
-    });
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://dev.decoded.style';
+    const url = `${baseUrl}/auth/refresh`;
+
+    const requestBody = { refresh_token: refreshToken };
+    const config = getRequestConfig('POST', requestBody);
+
+    const response = await fetch(url, config);
 
     if (!response.ok) {
-      throw new Error(`Token refresh failed: ${response.statusText}`);
+      const errorData = await response.json().catch(() => ({ error: 'Token refresh failed' }));
+      throw new Error(errorData.error || `Token refresh failed: ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -104,20 +94,21 @@ export const refreshUserToken = async (refreshToken: string): Promise<RefreshTok
 
 /**
  * 로그아웃
- * Note: This uses Next.js API routes, not the generated service
+ * Backup 방식: 클라이언트에서 직접 처리 (백엔드 API 호출 없이 로컬 상태만 정리)
  */
 export const logoutUser = async (): Promise<void> => {
   try {
-    const response = await fetch('/api/auth/logout', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    // Backup 방식: 세션만 정리
+    clearSession();
 
-    if (!response.ok) {
-      console.warn('Logout API call failed, but proceeding with local logout');
-    }
+    // API 토큰 초기화
+    updateApiTokenFromStorage();
+
+    // 백엔드에 로그아웃 요청을 보내고 싶다면 아래 주석을 해제
+    // const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://dev.decoded.style';
+    // const url = `${baseUrl}/auth/logout`;
+    // const config = getRequestConfig('POST');
+    // await fetch(url, config);
   } catch (error) {
     // Logout errors are usually not critical, just log them
     console.warn('Logout error:', error);
@@ -126,14 +117,45 @@ export const logoutUser = async (): Promise<void> => {
 
 /**
  * 사용자 프로필 조회
- * Uses the generated UsersService to call the backend API
+ * Backup 방식: 토큰 검증 후 API 호출
  */
 export const getUserProfile = async () => {
   try {
-    // Use the generated UsersService instead of Next.js API route
+    // Backup 방식: 토큰 검증
+    const accessToken = getValidAccessToken();
+    if (!accessToken) {
+      throw new Error('No valid access token available');
+    }
+
+    // Use the generated UsersService
     const profile = await UsersService.getMyProfileUsersMeProfileGet();
     return profile;
   } catch (error) {
     throw handleAuthError(error);
+  }
+};
+
+/**
+ * 인증 상태 확인
+ * Backup 방식: 토큰 유효성 검사
+ */
+export const checkAuthStatus = async (): Promise<boolean> => {
+  try {
+    // Backup 방식: 5분마다 한 번만 검증
+    if (!shouldCheckToken()) {
+      return true; // 최근에 검증했으면 유효하다고 가정
+    }
+
+    const accessToken = getValidAccessToken();
+    if (!accessToken) {
+      return false;
+    }
+
+    // 토큰이 유효하면 검증 시간 업데이트
+    setLastTokenCheck();
+    return true;
+  } catch (error) {
+    console.error('Auth status check failed:', error);
+    return false;
   }
 };

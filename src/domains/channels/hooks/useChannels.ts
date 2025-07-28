@@ -4,7 +4,7 @@ import { queryKeys } from '../../../lib/api/queryKeys';
 
 export const useChannels = (params?: Record<string, any>) => {
   return useQuery({
-    queryKey: queryKeys.channels.list(params),
+    queryKey: queryKeys.channels.list(params || {}),
     queryFn: () =>
       ChannelsService.listChannelsChannelsGet(
         params?.page || 1,

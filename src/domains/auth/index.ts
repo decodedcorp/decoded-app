@@ -3,31 +3,14 @@ export { LoginForm } from './components/LoginForm';
 export { LoginModal } from './components/LoginModal';
 export { AuthProvider } from './components/AuthProvider';
 
-// UI Components
-export { FormField } from './components/ui/FormField';
-export { PasswordField } from './components/ui/PasswordField';
-export { SubmitButton } from './components/ui/SubmitButton';
-
 // Types
 export type {
-  LoginFormData,
-  LoginResponse,
   GoogleOAuthResponse,
   AuthState,
-  LoginFormErrors,
-  LoginFormState,
 } from './types/auth';
 
 // Constants
 export { AUTH_CONSTANTS } from './constants/authConstants';
-
-// Utils
-export {
-  validateEmail,
-  validatePassword,
-  validateLoginForm,
-  isFormValid,
-} from './utils/validation';
 
 // OAuth Utils
 export {
@@ -44,23 +27,17 @@ export {
   getAccessToken,
   getRefreshToken,
   clearTokens,
-  hasTokens,
   isTokenExpired,
-  isTokenExpiringSoon,
-  decodeToken,
-  extractUserFromToken,
-  getTokenTimeRemaining,
 } from './utils/tokenManager';
 
 // Error Handling
-export { handleAuthError, getErrorMessage, logAuthError } from './utils/errorHandler';
+export { handleAuthError, getAuthErrorMessage, logAuthError } from './utils/errorHandler';
 
 // API Functions
 export {
-  loginUser,
   handleGoogleOAuthCallback,
   logoutUser,
-  refreshToken,
+  refreshUserToken,
   getUserProfile,
 } from './api/authApi';
 
@@ -81,4 +58,4 @@ export { useAuthInit } from './hooks/useAuthInit';
 export { useTokenRefresh } from './hooks/useTokenRefresh';
 
 // React Query Hooks
-export { useLogin, useGoogleOAuth, useLogout } from './hooks/useAuthMutations';
+export { useGoogleOAuth, useLogout } from './hooks/useAuthMutations';

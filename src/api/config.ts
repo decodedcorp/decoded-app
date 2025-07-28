@@ -1,60 +1,83 @@
-import { OpenAPI } from './generated';
+import { getAccessToken, getValidAccessToken } from '../domains/auth/utils/tokenManager';
 
-// Development mode check
-const isDevelopment = process.env.NODE_ENV === 'development';
+/**
+ * API Configuration
+ * Backup 방식: sessionStorage 기반 토큰 관리
+ */
 
-// API configuration
-export const configureApi = () => {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://dev.decoded.style';
+// Base URL configuration
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://dev.decoded.style';
 
-  OpenAPI.BASE = baseUrl;
-  OpenAPI.WITH_CREDENTIALS = true;
-  OpenAPI.CREDENTIALS = 'include';
+// Default headers
+const getDefaultHeaders = () => ({
+  'Content-Type': 'application/json',
+});
 
-  // Set token from localStorage if available (client-side only)
-  if (typeof window !== 'undefined') {
-    try {
-      const token = localStorage.getItem('access_token');
-      if (token) {
-        OpenAPI.TOKEN = token;
-      }
-    } catch (error) {
-      console.warn('Failed to get access token:', error);
-    }
+/**
+ * Get request configuration with authentication
+ * Backup 방식: sessionStorage에서 토큰 가져오기
+ */
+export const getRequestConfig = (
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
+  body?: any,
+  additionalHeaders?: Record<string, string>,
+) => {
+  const config: RequestInit = {
+    method,
+    headers: {
+      ...getDefaultHeaders(),
+      ...additionalHeaders,
+    },
+  };
+
+  // Add body for non-GET requests
+  if (method !== 'GET' && body) {
+    config.body = JSON.stringify(body);
   }
 
-  if (isDevelopment) {
-    console.log('🔧 API configured:', {
-      BASE: OpenAPI.BASE,
-      WITH_CREDENTIALS: OpenAPI.WITH_CREDENTIALS,
-      CREDENTIALS: OpenAPI.CREDENTIALS,
-      TOKEN: OpenAPI.TOKEN ? '***' : 'undefined',
-    });
+  // Add authorization header if token is available
+  const accessToken = getValidAccessToken();
+  if (accessToken) {
+    config.headers = {
+      ...config.headers,
+      Authorization: `Bearer ${accessToken}`,
+    };
   }
+
+  return config;
 };
 
-// Set API headers
-export const setApiHeaders = (headers: Record<string, string>) => {
-  OpenAPI.HEADERS = headers;
-};
-
-// Set API token
-export const setApiToken = (token: string | null) => {
-  if (token) {
-    OpenAPI.TOKEN = token;
-  } else {
-    OpenAPI.TOKEN = undefined;
-  }
-};
-
-// Update API token from localStorage (for client-side use)
+/**
+ * Update API token from storage
+ * Backup 방식: sessionStorage에서 토큰 업데이트
+ */
 export const updateApiTokenFromStorage = () => {
-  if (typeof window !== 'undefined') {
-    try {
-      const token = localStorage.getItem('access_token');
-      setApiToken(token);
-    } catch (error) {
-      console.warn('Failed to update API token from storage:', error);
-    }
-  }
+  // This function is called when tokens are updated
+  // The actual token retrieval happens in getRequestConfig
+  // No additional logic needed for sessionStorage approach
+};
+
+/**
+ * Check if user is authenticated for API calls
+ */
+export const isAuthenticatedForAPI = (): boolean => {
+  return !!getValidAccessToken();
+};
+
+/**
+ * Get current access token for API calls
+ */
+export const getCurrentAccessToken = (): string | null => {
+  return getValidAccessToken();
+};
+
+/**
+ * Configure API settings
+ * This function is called during app initialization
+ */
+export const configureApi = () => {
+  // Initialize API configuration
+  // For sessionStorage approach, no additional setup is needed
+  // Tokens are retrieved on-demand in getRequestConfig
+  console.log('API configured for sessionStorage-based authentication');
 };

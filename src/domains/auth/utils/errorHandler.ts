@@ -14,7 +14,6 @@ export const handleAuthError = (error: unknown): AuthError => {
   if (error instanceof ApiError) {
     return {
       message: error.message || 'Authentication failed',
-      code: error.code,
       status: error.status,
     };
   }

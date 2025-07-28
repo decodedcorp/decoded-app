@@ -3,82 +3,38 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/domains/auth/hooks/useAuth';
+import { handleGoogleOAuthCallback } from '@/domains/auth/api/authApi';
 
-function GoogleCallbackContent() {
+function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { loginWithGoogle, setLoading, setError } = useAuth();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-  const [message, setMessage] = useState('Google 로그인을 처리하고 있습니다...');
+  const [message, setMessage] = useState('인증을 처리하고 있습니다...');
 
   useEffect(() => {
-    const processGoogleCallback = async () => {
+    const processAuthCallback = async () => {
       try {
         setLoading(true);
         setStatus('loading');
-        setMessage('Google 로그인을 처리하고 있습니다...');
+        setMessage('Google 인증을 처리하고 있습니다...');
 
         // URL에서 인증 코드 추출
         const code = searchParams.get('code');
         const error = searchParams.get('error');
 
         if (error) {
-          throw new Error(`Google OAuth error: ${error}`);
+          throw new Error(`OAuth error: ${error}`);
         }
 
         if (!code) {
           throw new Error('인증 코드를 찾을 수 없습니다.');
         }
 
-        // Google OAuth 토큰 교환
-        const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams({
-            code,
-            client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
-            client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-            redirect_uri: process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI!,
-            grant_type: 'authorization_code',
-          }),
-        });
+        setMessage('SUI 지갑을 생성하고 있습니다...');
 
-        if (!tokenResponse.ok) {
-          const errorData = await tokenResponse.text();
-          console.error('Google token exchange error:', errorData);
-          throw new Error('Google OAuth 토큰 교환에 실패했습니다.');
-        }
-
-        const tokenData = await tokenResponse.json();
-
-        // 사용자 정보 가져오기
-        const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-          headers: {
-            Authorization: `Bearer ${tokenData.access_token}`,
-          },
-        });
-
-        if (!userInfoResponse.ok) {
-          throw new Error('사용자 정보를 가져오는데 실패했습니다.');
-        }
-
-        const userInfo = await userInfoResponse.json();
-
-        // 응답 데이터 구성
-        const response = {
-          access_token: tokenData.access_token,
-          refresh_token: tokenData.refresh_token,
-          user: {
-            id: userInfo.id,
-            email: userInfo.email,
-            name: userInfo.name,
-            picture: userInfo.picture,
-            role: 'user' as const,
-            status: 'active' as const,
-          },
-        };
+        // authApi의 handleGoogleOAuthCallback 사용
+        const response = await handleGoogleOAuthCallback(code);
 
         // Zustand 스토어에 로그인 정보 저장
         loginWithGoogle(response);
@@ -91,7 +47,7 @@ function GoogleCallbackContent() {
           router.push('/');
         }, 2000);
       } catch (error) {
-        console.error('Google OAuth callback error:', error);
+        console.error('Auth callback error:', error);
         setStatus('error');
         const errorMessage = error instanceof Error ? error.message : '로그인에 실패했습니다.';
         setMessage(errorMessage);
@@ -108,7 +64,7 @@ function GoogleCallbackContent() {
 
     // 컴포넌트가 마운트된 후에만 실행
     if (typeof window !== 'undefined') {
-      processGoogleCallback();
+      processAuthCallback();
     }
   }, [searchParams, loginWithGoogle, setLoading, setError, router]);
 
@@ -166,7 +122,7 @@ function GoogleCallbackContent() {
           )}
 
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            {status === 'loading' && '로그인 처리 중...'}
+            {status === 'loading' && '인증 처리 중...'}
             {status === 'success' && '로그인 성공!'}
             {status === 'error' && '로그인 실패'}
           </h2>
@@ -209,7 +165,7 @@ function GoogleCallbackContent() {
   );
 }
 
-export default function GoogleCallbackPage() {
+export default function AuthCallbackPage() {
   return (
     <Suspense
       fallback={
@@ -218,7 +174,7 @@ export default function GoogleCallbackPage() {
         </div>
       }
     >
-      <GoogleCallbackContent />
+      <AuthCallbackContent />
     </Suspense>
   );
 }

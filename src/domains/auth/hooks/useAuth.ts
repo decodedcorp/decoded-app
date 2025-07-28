@@ -10,86 +10,154 @@ import {
   selectUserEmail,
 } from '../../../store/authStore';
 import { queryKeys } from '../../../lib/api/queryKeys';
-import { getUserProfile } from '../api/authApi';
-import { getAccessToken, isTokenExpired } from '../utils/tokenManager';
-import { useLogin, useGoogleOAuth, useLogout } from './useAuthMutations';
+import { getUserProfile, checkAuthStatus } from '../api/authApi';
+import {
+  getAccessToken,
+  isTokenExpired,
+  getValidAccessToken,
+  isAuthenticated,
+  getUserData,
+  shouldCheckToken,
+  setLastTokenCheck,
+} from '../utils/tokenManager';
+import { useGoogleOAuth, useLogout } from './useAuthMutations';
 import { updateApiTokenFromStorage } from '../../../api/config';
+import React from 'react';
 
 /**
  * Main hook providing authentication state and related actions
- * Integrates React Query with Zustand for comprehensive state management
  */
 export const useAuth = () => {
   const queryClient = useQueryClient();
   const authStore = useAuthStore();
 
-  // Safely check for tokens (client-side only)
-  const hasValidToken =
-    typeof window !== 'undefined' && getAccessToken() && !isTokenExpired(getAccessToken()!);
-
-  // Fetch user profile (only when token exists)
-  const { data: userProfile, isLoading: isProfileLoading } = useQuery({
-    queryKey: queryKeys.auth.user,
-    queryFn: getUserProfile,
-    enabled: !!hasValidToken,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: (failureCount, error) => {
-      // Don't retry on 401 errors
-      if (error instanceof Error && error.message.includes('401')) {
-        return false;
-      }
-      return failureCount < 3;
-    },
+  // 인증 상태 확인 (backup 방식)
+  const { data: authStatus } = useQuery({
+    queryKey: queryKeys.auth.status,
+    queryFn: checkAuthStatus,
+    enabled: shouldCheckToken(), // 5분마다 한 번만 검증
+    staleTime: 5 * 60 * 1000, // 5분
+    retry: false,
   });
 
-  // React Query mutations
-  const loginMutation = useLogin();
+  // 사용자 프로필 조회
+  const { data: userProfile, isLoading: isProfileLoading } = useQuery({
+    queryKey: queryKeys.auth.profile,
+    queryFn: getUserProfile,
+    enabled: isAuthenticated() && !!getValidAccessToken(),
+    staleTime: 10 * 60 * 1000, // 10분
+  });
+
+  // Mutation hooks
   const googleOAuthMutation = useGoogleOAuth();
   const logoutMutation = useLogout();
 
-  // Zustand state selectors
-  const user = selectUser(authStore);
-  const isAuthenticated = selectIsAuthenticated(authStore);
-  const isLoading = selectIsLoading(authStore);
-  const error = selectError(authStore);
-  const userRole = selectUserRole(authStore);
-  const userName = selectUserName(authStore);
-  const userEmail = selectUserEmail(authStore);
+  // 인증 상태 동기화
+  const syncAuthState = () => {
+    const isAuth = isAuthenticated();
+    const userData = getUserData();
 
-  // Actions
-  const login = authStore.login;
-  const loginWithGoogle = authStore.loginWithGoogle;
-  const logout = authStore.logout;
-  const setLoading = authStore.setLoading;
-  const setError = authStore.setError;
-  const clearError = authStore.clearError;
-  const updateUser = authStore.updateUser;
+    if (isAuth && userData.doc_id) {
+      // 사용자 데이터가 있으면 Zustand 상태 업데이트
+      authStore.updateUser({
+        id: userData.doc_id,
+        email: userData.email || '',
+        name: userData.nickname || '',
+        nickname: userData.nickname || '',
+      });
+    } else {
+      // 인증되지 않았으면 상태 초기화
+      authStore.logout();
+    }
+  };
+
+  // 컴포넌트 마운트 시 인증 상태 동기화
+  React.useEffect(() => {
+    syncAuthState();
+  }, [authStatus]);
+
+  // 토큰 만료 감지
+  React.useEffect(() => {
+    const checkTokenExpiration = () => {
+      const token = getAccessToken();
+      if (token && isTokenExpired(token)) {
+        console.log('[Auth] Token expired, logging out');
+        authStore.logout();
+        queryClient.clear();
+      }
+    };
+
+    // 주기적으로 토큰 만료 확인 (1분마다)
+    const interval = setInterval(checkTokenExpiration, 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, [authStore, queryClient]);
+
+  // 로그인 성공 시 처리
+  const handleLoginSuccess = React.useCallback(
+    (response: any) => {
+      // API 토큰 업데이트
+      updateApiTokenFromStorage();
+
+      // 캐시 무효화
+      queryClient.invalidateQueries({ queryKey: queryKeys.auth.profile });
+
+      // 인증 상태 동기화
+      syncAuthState();
+    },
+    [queryClient],
+  );
+
+  // 로그아웃 처리
+  const handleLogout = React.useCallback(async () => {
+    try {
+      await logoutMutation.mutateAsync();
+
+      // 캐시 클리어
+      queryClient.clear();
+
+      // 인증 상태 동기화
+      syncAuthState();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  }, [logoutMutation, queryClient]);
 
   return {
     // State
-    user,
-    isAuthenticated,
-    isLoading,
-    error,
-    userRole,
-    userName,
-    userEmail,
-    userProfile,
-    isProfileLoading,
+    user: selectUser(authStore),
+    isAuthenticated: selectIsAuthenticated(authStore),
+    isLoading: selectIsLoading(authStore) || isProfileLoading,
+    error: selectError(authStore),
+    userRole: selectUserRole(authStore),
+    userName: selectUserName(authStore),
+    userEmail: selectUserEmail(authStore),
+
+    // User data from sessionStorage
+    userData: getUserData(),
 
     // Actions
-    login,
-    loginWithGoogle,
-    logout,
-    setLoading,
-    setError,
-    clearError,
-    updateUser,
+    loginWithGoogle: (response: any) => googleOAuthMutation.mutate(response),
+    logout: handleLogout,
+    setLoading: authStore.setLoading,
+    setError: authStore.setError,
+    clearError: authStore.clearError,
 
-    // Mutations
-    loginMutation,
-    googleOAuthMutation,
-    logoutMutation,
+    // Token management
+    getAccessToken: authStore.getAccessToken,
+    getRefreshToken: authStore.getRefreshToken,
+    getValidAccessToken: authStore.getValidAccessToken,
+
+    // User management
+    updateUser: authStore.updateUser,
+    getUserData: authStore.getUserData,
+
+    // Mutation states
+    isLoginLoading: googleOAuthMutation.isPending,
+    isLogoutLoading: logoutMutation.isPending,
+
+    // Auth status
+    authStatus,
   };
 };
 

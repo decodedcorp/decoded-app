@@ -13,14 +13,29 @@ export interface DecodedToken {
   role?: string;
 }
 
+export type TokenType = 'jwt' | 'oauth' | 'unknown';
+
 /**
- * Token management utility
- * Centralizes localStorage access and enhances security.
+ * Enhanced Token Management - Backup 방식 적용
+ * - Access tokens: SessionStorage (브라우저 종료 시 삭제)
+ * - User data: SessionStorage (브라우저 종료 시 삭제)
+ * - Refresh tokens: LocalStorage (장기 보관)
  */
 
-const TOKEN_KEYS = {
-  ACCESS_TOKEN: 'access_token',
-  REFRESH_TOKEN: 'refresh_token',
+const STORAGE_KEYS = {
+  // SessionStorage (브라우저 종료 시 삭제) - Backup과 동일한 키 사용
+  ACCESS_TOKEN: 'ACCESS_TOKEN',
+  USER_DOC_ID: 'USER_DOC_ID',
+  USER_EMAIL: 'USER_EMAIL',
+  USER_NICKNAME: 'USER_NICKNAME',
+
+  // LocalStorage (장기 보관)
+  REFRESH_TOKEN: 'REFRESH_TOKEN',
+  LAST_TOKEN_CHECK: 'LAST_TOKEN_CHECK',
+
+  // 임시 저장용 (모바일 OAuth 처리)
+  TEMP_ID_TOKEN: 'TEMP_ID_TOKEN',
+  LOGIN_TIMESTAMP: 'LOGIN_TIMESTAMP',
 } as const;
 
 /**
@@ -29,282 +44,238 @@ const TOKEN_KEYS = {
 const isBrowser = typeof window !== 'undefined';
 
 /**
- * Safely store tokens
+ * Get sessionStorage safely
  */
-export const setTokens = (accessToken: string, refreshToken: string): void => {
-  if (!isBrowser) {
-    console.warn('Cannot store tokens in server environment');
-    return;
-  }
+const getSessionStorage = () => {
+  if (!isBrowser) return null;
+  return window.sessionStorage;
+};
 
-  try {
-    // Validate tokens
-    if (!accessToken || !refreshToken) {
-      throw new Error('Invalid tokens provided');
-    }
+/**
+ * Get localStorage safely
+ */
+const getLocalStorage = () => {
+  if (!isBrowser) return null;
+  return window.localStorage;
+};
 
-    // Validate JWT token format (simple validation)
-    if (!accessToken.includes('.') || !refreshToken.includes('.')) {
-      throw new Error('Invalid token format');
-    }
-
-    localStorage.setItem(TOKEN_KEYS.ACCESS_TOKEN, accessToken);
-    localStorage.setItem(TOKEN_KEYS.REFRESH_TOKEN, refreshToken);
-  } catch (error) {
-    console.error('Failed to store tokens:', error);
-    throw new Error('Failed to store tokens.');
+/**
+ * Set access token in sessionStorage
+ */
+export const setAccessToken = (token: string): void => {
+  const storage = getSessionStorage();
+  if (storage) {
+    storage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token);
   }
 };
 
 /**
- * Get access token
+ * Get access token from sessionStorage
  */
 export const getAccessToken = (): string | null => {
-  if (!isBrowser) {
-    return null;
-  }
+  const storage = getSessionStorage();
+  return storage ? storage.getItem(STORAGE_KEYS.ACCESS_TOKEN) : null;
+};
 
-  try {
-    return localStorage.getItem(TOKEN_KEYS.ACCESS_TOKEN);
-  } catch (error) {
-    console.error('Failed to get access token:', error);
-    return null;
+/**
+ * Set refresh token in localStorage
+ */
+export const setRefreshToken = (token: string): void => {
+  const storage = getLocalStorage();
+  if (storage) {
+    storage.setItem(STORAGE_KEYS.REFRESH_TOKEN, token);
   }
 };
 
 /**
- * Get refresh token
+ * Get refresh token from localStorage
  */
 export const getRefreshToken = (): string | null => {
-  if (!isBrowser) {
-    return null;
-  }
+  const storage = getLocalStorage();
+  return storage ? storage.getItem(STORAGE_KEYS.REFRESH_TOKEN) : null;
+};
 
-  try {
-    return localStorage.getItem(TOKEN_KEYS.REFRESH_TOKEN);
-  } catch (error) {
-    console.error('Failed to get refresh token:', error);
-    return null;
+/**
+ * Set user data in sessionStorage (backup 방식)
+ */
+export const setUserData = (userData: {
+  doc_id: string;
+  email: string;
+  nickname: string;
+}): void => {
+  const storage = getSessionStorage();
+  if (storage) {
+    storage.setItem(STORAGE_KEYS.USER_DOC_ID, userData.doc_id);
+    storage.setItem(STORAGE_KEYS.USER_EMAIL, userData.email);
+    storage.setItem(STORAGE_KEYS.USER_NICKNAME, userData.nickname);
   }
 };
 
 /**
- * Clear all tokens
+ * Get user data from sessionStorage
  */
-export const clearTokens = (): void => {
-  if (!isBrowser) {
-    return;
-  }
-
-  try {
-    localStorage.removeItem(TOKEN_KEYS.ACCESS_TOKEN);
-    localStorage.removeItem(TOKEN_KEYS.REFRESH_TOKEN);
-  } catch (error) {
-    console.error('Failed to clear tokens:', error);
-  }
-};
-
-/**
- * Check if tokens exist
- */
-export const hasTokens = (): boolean => {
-  return !!(getAccessToken() && getRefreshToken());
-};
-
-/**
- * Check if token is expired (for JWT tokens)
- */
-export const isTokenExpired = (token: string): boolean => {
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload.exp * 1000 < Date.now();
-  } catch (error) {
-    console.error('Failed to parse token:', error);
-    return true;
-  }
-};
-
-/**
- * Check if token will expire soon (default: 5 minutes)
- */
-export const isTokenExpiringSoon = (token: string, minutes: number = 5): boolean => {
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    const expiresAt = payload.exp * 1000;
-    const now = Date.now();
-    const threshold = minutes * 60 * 1000; // Convert minutes to milliseconds
-
-    return expiresAt - now < threshold;
-  } catch (error) {
-    console.error('Failed to check token expiration:', error);
-    return true;
-  }
-};
-
-/**
- * Decode JWT token
- */
-export const decodeToken = (token: string): any => {
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload;
-  } catch (error) {
-    console.error('Failed to decode token:', error);
-    return null;
-  }
-};
-
-/**
- * Extract user information from token
- */
-export const extractUserFromToken = (token: string) => {
-  try {
-    const payload = decodeToken(token);
-    if (!payload) return null;
-
-    return {
-      id: payload.sub,
-      email: payload.email,
-      role: payload.role,
-      status: payload.status,
-    };
-  } catch (error) {
-    console.error('Failed to extract user from token:', error);
-    return null;
-  }
-};
-
-/**
- * Get remaining token validity time in milliseconds
- */
-export const getTokenTimeRemaining = (token: string): number => {
-  try {
-    const payload = decodeToken(token);
-    if (!payload) return 0;
-
-    const expiresAt = payload.exp * 1000;
-    const now = Date.now();
-
-    return Math.max(0, expiresAt - now);
-  } catch (error) {
-    console.error('Failed to get token time remaining:', error);
-    return 0;
-  }
-};
-
-/**
- * Get the currently valid access token
- */
-export const getValidAccessToken = (): string | null => {
-  const accessToken = getAccessToken();
-  if (!accessToken) return null;
-
-  if (isTokenExpired(accessToken)) {
-    return null;
-  }
-
-  return accessToken;
-};
-
-/**
- * Attempt to refresh the access token
- */
-export const refreshAccessToken = async (): Promise<string | null> => {
-  try {
-    const refreshToken = getRefreshToken();
-    if (!refreshToken) {
-      throw new Error('No refresh token available');
-    }
-
-    const response = await fetch('/api/auth/refresh', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        refresh_token: refreshToken,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to refresh token');
-    }
-
-    const data = await response.json();
-    const newTokens: TokenData = {
-      access_token: data.access_token,
-      refresh_token: data.refresh_token || refreshToken, // Use existing refresh token if new one is not provided
-    };
-
-    setTokens(newTokens.access_token, newTokens.refresh_token);
-    useAuthStore.getState().setTokens(newTokens.access_token, newTokens.refresh_token);
-
-    return newTokens.access_token;
-  } catch (error) {
-    console.error('Failed to refresh access token:', error);
-    // Log out on token refresh failure
-    useAuthStore.getState().logout();
-    return null;
-  }
-};
-
-/**
- * Generate authentication headers for API requests
- */
-export const getAuthHeaders = async (): Promise<Record<string, string>> => {
-  let accessToken = getValidAccessToken();
-
-  if (!accessToken) {
-    // Attempt to refresh if no token or expired
-    accessToken = await refreshAccessToken();
-  }
-
-  if (!accessToken) {
-    throw new Error('No valid access token available');
+export const getUserData = (): {
+  doc_id: string | null;
+  email: string | null;
+  nickname: string | null;
+} => {
+  const storage = getSessionStorage();
+  if (!storage) {
+    return { doc_id: null, email: null, nickname: null };
   }
 
   return {
-    Authorization: `Bearer ${accessToken}`,
-    'Content-Type': 'application/json',
+    doc_id: storage.getItem(STORAGE_KEYS.USER_DOC_ID),
+    email: storage.getItem(STORAGE_KEYS.USER_EMAIL),
+    nickname: storage.getItem(STORAGE_KEYS.USER_NICKNAME),
   };
 };
 
 /**
- * Wrapper function for authenticated API requests
+ * Set both tokens and user data (backup 방식)
  */
-export const authenticatedFetch = async (
-  url: string,
-  options: RequestInit = {},
-): Promise<Response> => {
-  try {
-    const headers = await getAuthHeaders();
+export const setTokens = (accessToken: string, refreshToken: string): void => {
+  setAccessToken(accessToken);
+  setRefreshToken(refreshToken);
+};
 
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        ...headers,
-        ...options.headers,
-      },
-    });
+/**
+ * Store complete user session data (backup 방식)
+ */
+export const storeUserSession = (data: {
+  access_token: string;
+  refresh_token: string;
+  doc_id: string;
+  email: string;
+  nickname: string;
+}): void => {
+  setAccessToken(data.access_token);
+  setRefreshToken(data.refresh_token);
+  setUserData({
+    doc_id: data.doc_id,
+    email: data.email,
+    nickname: data.nickname,
+  });
+};
 
-    // Retry on 401 error by refreshing token
-    if (response.status === 401) {
-      const newAccessToken = await refreshAccessToken();
-      if (newAccessToken) {
-        const newHeaders = await getAuthHeaders();
-        return fetch(url, {
-          ...options,
-          headers: {
-            ...newHeaders,
-            ...options.headers,
-          },
-        });
-      }
-    }
+/**
+ * Clear all tokens and user data
+ */
+export const clearTokens = (): void => {
+  const sessionStorage = getSessionStorage();
+  const localStorage = getLocalStorage();
 
-    return response;
-  } catch (error) {
-    console.error('Authenticated fetch failed:', error);
-    throw error;
+  if (sessionStorage) {
+    sessionStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+    sessionStorage.removeItem(STORAGE_KEYS.USER_DOC_ID);
+    sessionStorage.removeItem(STORAGE_KEYS.USER_EMAIL);
+    sessionStorage.removeItem(STORAGE_KEYS.USER_NICKNAME);
+  }
+
+  if (localStorage) {
+    localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.LAST_TOKEN_CHECK);
   }
 };
+
+/**
+ * Clear session storage only (backup 방식)
+ */
+export const clearSession = (): void => {
+  const storage = getSessionStorage();
+  if (storage) {
+    storage.clear();
+  }
+};
+
+/**
+ * Check if user is authenticated (backup 방식)
+ */
+export const isAuthenticated = (): boolean => {
+  const accessToken = getAccessToken();
+  const userDocId = getUserData().doc_id;
+  return !!(accessToken && userDocId);
+};
+
+/**
+ * Get valid access token with expiration check
+ */
+export const getValidAccessToken = (): string | null => {
+  const token = getAccessToken();
+  if (!token) return null;
+
+  try {
+    const decoded = jwtDecode<DecodedToken>(token);
+    const now = Math.floor(Date.now() / 1000);
+
+    if (decoded.exp < now) {
+      // Token expired, clear session
+      clearSession();
+      return null;
+    }
+
+    return token;
+  } catch (error) {
+    console.error('Failed to decode token:', error);
+    clearSession();
+    return null;
+  }
+};
+
+/**
+ * Check if token is expired
+ */
+export const isTokenExpired = (token: string): boolean => {
+  try {
+    const decoded = jwtDecode<DecodedToken>(token);
+    const now = Math.floor(Date.now() / 1000);
+    return decoded.exp < now;
+  } catch (error) {
+    console.error('Failed to decode token for expiration check:', error);
+    return true;
+  }
+};
+
+/**
+ * Set last token check timestamp (backup 방식)
+ */
+export const setLastTokenCheck = (): void => {
+  const storage = getLocalStorage();
+  if (storage) {
+    storage.setItem(STORAGE_KEYS.LAST_TOKEN_CHECK, Date.now().toString());
+  }
+};
+
+/**
+ * Check if token validation is needed (backup 방식)
+ */
+export const shouldCheckToken = (): boolean => {
+  const storage = getLocalStorage();
+  if (!storage) return true;
+
+  const lastCheck = storage.getItem(STORAGE_KEYS.LAST_TOKEN_CHECK);
+  if (!lastCheck) return true;
+
+  const now = Date.now();
+  const timeSinceLastCheck = now - parseInt(lastCheck, 10);
+
+  // 5분(300000ms)에 한 번만 토큰 검증 실행
+  return timeSinceLastCheck > 300000;
+};
+
+// JWT decode helper (simple implementation)
+function jwtDecode<T>(token: string): T {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join(''),
+    );
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    throw new Error('Invalid JWT token');
+  }
+}
