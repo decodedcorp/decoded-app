@@ -22,7 +22,77 @@ import {
 } from '../utils/tokenManager';
 import { useGoogleOAuth, useLogout } from './useAuthMutations';
 import { updateApiTokenFromStorage } from '../../../api/config';
+import { GoogleOAuthResponse } from '../types/auth';
 import React from 'react';
+
+// Constants
+const AUTH_STATUS_STALE_TIME = 5 * 60 * 1000; // 5 minutes
+const USER_PROFILE_STALE_TIME = 10 * 60 * 1000; // 10 minutes
+const TOKEN_CHECK_INTERVAL = 60 * 1000; // 1 minute
+
+// Types
+interface LoginResponse {
+  access_token?: string;
+  refresh_token?: string;
+  user?: {
+    doc_id?: string;
+    id?: string;
+    email: string;
+    name?: string;
+    nickname?: string;
+  };
+}
+
+/**
+ * Hook for token expiration monitoring
+ */
+const useTokenExpirationMonitor = () => {
+  const queryClient = useQueryClient();
+  const authStore = useAuthStore();
+
+  React.useEffect(() => {
+    const checkTokenExpiration = () => {
+      const token = getAccessToken();
+      if (token && isTokenExpired(token)) {
+        console.log('[Auth] Token expired, logging out');
+        authStore.logout();
+        queryClient.clear();
+      }
+    };
+
+    const interval = setInterval(checkTokenExpiration, TOKEN_CHECK_INTERVAL);
+    return () => clearInterval(interval);
+  }, [authStore, queryClient]);
+};
+
+/**
+ * Hook for auth state synchronization
+ */
+const useAuthStateSync = (authStatus: any) => {
+  const authStore = useAuthStore();
+
+  const syncAuthState = React.useCallback(() => {
+    const isAuth = isAuthenticated();
+    const userData = getUserData();
+
+    if (isAuth && userData.doc_id) {
+      authStore.updateUser({
+        id: userData.doc_id,
+        email: userData.email || '',
+        name: userData.nickname || '',
+        nickname: userData.nickname || '',
+      });
+    } else {
+      authStore.logout();
+    }
+  }, [authStore]);
+
+  React.useEffect(() => {
+    syncAuthState();
+  }, [authStatus, syncAuthState]);
+
+  return syncAuthState;
+};
 
 /**
  * Main hook providing authentication state and related actions
@@ -35,8 +105,8 @@ export const useAuth = () => {
   const { data: authStatus } = useQuery({
     queryKey: queryKeys.auth.status,
     queryFn: checkAuthStatus,
-    enabled: shouldCheckToken(), // 5분마다 한 번만 검증
-    staleTime: 5 * 60 * 1000, // 5분
+    enabled: shouldCheckToken(),
+    staleTime: AUTH_STATUS_STALE_TIME,
     retry: false,
   });
 
@@ -45,83 +115,37 @@ export const useAuth = () => {
     queryKey: queryKeys.auth.profile,
     queryFn: getUserProfile,
     enabled: isAuthenticated() && !!getValidAccessToken(),
-    staleTime: 10 * 60 * 1000, // 10분
+    staleTime: USER_PROFILE_STALE_TIME,
   });
 
   // Mutation hooks
   const googleOAuthMutation = useGoogleOAuth();
   const logoutMutation = useLogout();
 
-  // 인증 상태 동기화
-  const syncAuthState = () => {
-    const isAuth = isAuthenticated();
-    const userData = getUserData();
-
-    if (isAuth && userData.doc_id) {
-      // 사용자 데이터가 있으면 Zustand 상태 업데이트
-      authStore.updateUser({
-        id: userData.doc_id,
-        email: userData.email || '',
-        name: userData.nickname || '',
-        nickname: userData.nickname || '',
-      });
-    } else {
-      // 인증되지 않았으면 상태 초기화
-      authStore.logout();
-    }
-  };
-
-  // 컴포넌트 마운트 시 인증 상태 동기화
-  React.useEffect(() => {
-    syncAuthState();
-  }, [authStatus]);
-
-  // 토큰 만료 감지
-  React.useEffect(() => {
-    const checkTokenExpiration = () => {
-      const token = getAccessToken();
-      if (token && isTokenExpired(token)) {
-        console.log('[Auth] Token expired, logging out');
-        authStore.logout();
-        queryClient.clear();
-      }
-    };
-
-    // 주기적으로 토큰 만료 확인 (1분마다)
-    const interval = setInterval(checkTokenExpiration, 60 * 1000);
-
-    return () => clearInterval(interval);
-  }, [authStore, queryClient]);
+  // Custom hooks
+  const syncAuthState = useAuthStateSync(authStatus);
+  useTokenExpirationMonitor();
 
   // 로그인 성공 시 처리
   const handleLoginSuccess = React.useCallback(
-    (response: any) => {
-      // API 토큰 업데이트
+    (response: GoogleOAuthResponse) => {
       updateApiTokenFromStorage();
-
-      // 캐시 무효화
       queryClient.invalidateQueries({ queryKey: queryKeys.auth.profile });
-
-      // 인증 상태 동기화
       syncAuthState();
     },
-    [queryClient],
+    [queryClient, syncAuthState],
   );
 
   // 로그아웃 처리
   const handleLogout = React.useCallback(async () => {
     try {
       await logoutMutation.mutateAsync();
-
-      // 캐시 클리어
       queryClient.clear();
-
-      // 인증 상태 동기화
       syncAuthState();
     } catch (error) {
       console.error('Logout failed:', error);
     }
-  }, [logoutMutation, queryClient]);
+  }, [logoutMutation, queryClient, syncAuthState]);
 
   return {
     // State
@@ -137,7 +161,25 @@ export const useAuth = () => {
     userData: getUserData(),
 
     // Actions
-    loginWithGoogle: (response: any) => googleOAuthMutation.mutate(response),
+    loginWithGoogle: (response: GoogleOAuthResponse) => {
+      // 직접 세션 저장 및 상태 업데이트
+      if (response.access_token && response.user) {
+        const { updateUser } = authStore;
+        updateUser({
+          id: response.user.doc_id || response.user.id || '',
+          email: response.user.email,
+          name: response.user.nickname || response.user.name || '',
+          nickname: response.user.nickname || response.user.name || '',
+        });
+
+        // API 토큰 업데이트
+        updateApiTokenFromStorage();
+
+        // 캐시 무효화
+        queryClient.invalidateQueries({ queryKey: queryKeys.auth.profile });
+        queryClient.invalidateQueries({ queryKey: queryKeys.auth.status });
+      }
+    },
     logout: handleLogout,
     setLoading: authStore.setLoading,
     setError: authStore.setError,
