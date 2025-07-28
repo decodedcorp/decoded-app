@@ -1,4 +1,5 @@
-import { useAuthStore } from '../../../store/authStore';
+import { STORAGE_KEYS } from '../constants';
+import { TokenDecoder } from './tokenDecoder';
 
 export interface TokenData {
   access_token: string;
@@ -21,22 +22,6 @@ export type TokenType = 'jwt' | 'oauth' | 'unknown';
  * - User data: SessionStorage (브라우저 종료 시 삭제)
  * - Refresh tokens: LocalStorage (장기 보관)
  */
-
-const STORAGE_KEYS = {
-  // SessionStorage (브라우저 종료 시 삭제) - Backup과 동일한 키 사용
-  ACCESS_TOKEN: 'ACCESS_TOKEN',
-  USER_DOC_ID: 'USER_DOC_ID',
-  USER_EMAIL: 'USER_EMAIL',
-  USER_NICKNAME: 'USER_NICKNAME',
-
-  // LocalStorage (장기 보관)
-  REFRESH_TOKEN: 'REFRESH_TOKEN',
-  LAST_TOKEN_CHECK: 'LAST_TOKEN_CHECK',
-
-  // 임시 저장용 (모바일 OAuth 처리)
-  TEMP_ID_TOKEN: 'TEMP_ID_TOKEN',
-  LOGIN_TIMESTAMP: 'LOGIN_TIMESTAMP',
-} as const;
 
 /**
  * Check if we're in a browser environment
@@ -159,6 +144,23 @@ export const storeUserSession = (data: {
 };
 
 /**
+ * Store user session from LoginResponse
+ */
+export const storeLoginResponse = (response: {
+  access_token: { access_token: string };
+  refresh_token: string;
+  user: { doc_id: string; email: string; nickname: string };
+}): void => {
+  setAccessToken(response.access_token.access_token);
+  setRefreshToken(response.refresh_token);
+  setUserData({
+    doc_id: response.user.doc_id,
+    email: response.user.email,
+    nickname: response.user.nickname,
+  });
+};
+
+/**
  * Clear all tokens and user data
  */
 export const clearTokens = (): void => {
@@ -226,14 +228,7 @@ export const getValidAccessToken = (): string | null => {
  * Check if token is expired
  */
 export const isTokenExpired = (token: string): boolean => {
-  try {
-    const decoded = jwtDecode<DecodedToken>(token);
-    const now = Math.floor(Date.now() / 1000);
-    return decoded.exp < now;
-  } catch (error) {
-    console.error('Failed to decode token for expiration check:', error);
-    return true;
-  }
+  return TokenDecoder.isExpired(token);
 };
 
 /**
@@ -248,6 +243,7 @@ export const setLastTokenCheck = (): void => {
 
 /**
  * Check if token validation is needed (backup 방식)
+ * 최적화: 더 긴 간격으로 체크하여 불필요한 API 호출 방지
  */
 export const shouldCheckToken = (): boolean => {
   const storage = getLocalStorage();
@@ -259,23 +255,11 @@ export const shouldCheckToken = (): boolean => {
   const now = Date.now();
   const timeSinceLastCheck = now - parseInt(lastCheck, 10);
 
-  // 5분(300000ms)에 한 번만 토큰 검증 실행
-  return timeSinceLastCheck > 300000;
+  // 10분(600000ms)에 한 번만 토큰 검증 실행 (5분에서 10분으로 증가)
+  return timeSinceLastCheck > 600000;
 };
 
-// JWT decode helper (simple implementation)
+// JWT decode helper (simple implementation) - TokenDecoder로 대체됨
 function jwtDecode<T>(token: string): T {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join(''),
-    );
-    return JSON.parse(jsonPayload);
-  } catch (error) {
-    throw new Error('Invalid JWT token');
-  }
+  return TokenDecoder.decode<T>(token);
 }

@@ -2,7 +2,6 @@
 
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/domains/auth/hooks/useAuth';
-import { initiateGoogleOAuth } from '@/domains/auth/utils/oauth';
 
 export function LoginButton() {
   const router = useRouter();
@@ -29,6 +28,28 @@ export function LoginButton() {
     router.push('/');
   };
 
+  // Google OAuth 시작 함수
+  const initiateGoogleOAuth = () => {
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    const redirectUri =
+      process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/callback';
+
+    if (!clientId) {
+      throw new Error('Google Client ID가 설정되지 않았습니다.');
+    }
+
+    const googleAuthUrl =
+      `https://accounts.google.com/o/oauth2/v2/auth?` +
+      `client_id=${clientId}&` +
+      `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+      `response_type=code&` +
+      `scope=${encodeURIComponent('openid email profile')}&` +
+      `access_type=offline&` +
+      `prompt=consent`;
+
+    window.location.href = googleAuthUrl;
+  };
+
   // 로딩 중일 때는 버튼을 비활성화
   if (isLoading) {
     return (
@@ -47,7 +68,7 @@ export function LoginButton() {
         <>
           {/* 사용자 정보 표시 */}
           <span className="text-sm text-[#EAFD66] hidden md:block">
-            {user?.name || user?.email}
+            {user?.nickname || user?.email}
           </span>
 
           {/* 프로필 버튼 */}

@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { LoginForm } from '../../domains/auth/components/LoginForm';
 import { useAuth } from '../../domains/auth/hooks/useAuth';
 import { useRouter } from 'next/navigation';
-import { initiateGoogleOAuth } from '../../domains/auth/utils/oauth';
 import { OpenAPI } from '../../api/generated';
 
 export default function LoginPage() {
@@ -45,6 +44,28 @@ export default function LoginPage() {
       console.error('Google OAuth error:', error);
       setError('Google 로그인을 시작할 수 없습니다.');
     }
+  };
+
+  // Google OAuth 시작 함수
+  const initiateGoogleOAuth = () => {
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    const redirectUri =
+      process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/callback';
+
+    if (!clientId) {
+      throw new Error('Google Client ID가 설정되지 않았습니다.');
+    }
+
+    const googleAuthUrl =
+      `https://accounts.google.com/o/oauth2/v2/auth?` +
+      `client_id=${clientId}&` +
+      `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+      `response_type=code&` +
+      `scope=${encodeURIComponent('openid email profile')}&` +
+      `access_type=offline&` +
+      `prompt=consent`;
+
+    window.location.href = googleAuthUrl;
   };
 
   return (

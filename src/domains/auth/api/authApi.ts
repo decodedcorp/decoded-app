@@ -1,161 +1,216 @@
-import { UsersService } from '../../../api/generated';
-import { GoogleOAuthResponse, RefreshTokenResponse } from '../types/auth';
-import { handleAuthError } from '../utils/errorHandler';
-import { updateApiTokenFromStorage, getRequestConfig } from '../../../api/config';
+import { LoginRequest, GetUserProfile } from '../../../api/generated';
+import { getRequestConfig, API_BASE_URL } from '../../../api/config';
+import { LoginResponse, SessionData, User } from '../types/auth';
 import {
   storeUserSession,
-  clearSession,
-  getValidAccessToken,
-  setLastTokenCheck,
-  shouldCheckToken,
+  storeLoginResponse,
+  getAccessToken,
+  getUserData,
 } from '../utils/tokenManager';
+import { ResponseMapper } from '../utils/responseMapper';
+import { TokenDecoder } from '../utils/tokenDecoder';
 
 /**
- * Google OAuth 토큰 교환 및 사용자 정보 가져오기
- * Backup 방식: 직접 백엔드 API 호출
+ * JWT 토큰에서 user_doc_id 추출
  */
-export const handleGoogleOAuthCallback = async (code: string): Promise<GoogleOAuthResponse> => {
+const extractUserDocIdFromToken = (): string => {
+  const token = getAccessToken();
+  if (!token) return '';
+
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://dev.decoded.style';
-    const url = `${baseUrl}/auth/google/callback`;
-
-    const requestBody = { code };
-    const config = getRequestConfig('POST', requestBody);
-
-    const response = await fetch(url, config);
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Google OAuth API error:', errorData);
-      throw new Error(errorData.error || 'Google OAuth 처리에 실패했습니다.');
-    }
-
-    const data = await response.json();
-
-    // Backup 방식: 세션 데이터 저장
-    if (data.access_token && data.doc_id) {
-      storeUserSession({
-        access_token: data.access_token,
-        refresh_token: data.refresh_token || '',
-        doc_id: data.doc_id,
-        email: data.user?.email || '',
-        nickname: data.user?.nickname || data.user?.name || '',
-      });
-
-      // Update API token configuration
-      updateApiTokenFromStorage();
-    }
-
-    return {
-      access_token: data.access_token,
-      refresh_token: data.refresh_token,
-      user: data.user,
-      token_type: data.token_type || 'oauth',
-    };
+    return TokenDecoder.extractUserDocId(token);
   } catch (error) {
-    throw handleAuthError(error);
+    console.error('[Auth] Failed to extract user_doc_id from token:', error);
+    // 토큰 디코딩 실패 시 sessionStorage에서 직접 user_doc_id 가져오기
+    const userData = getUserData();
+    return userData.doc_id || '';
   }
 };
 
 /**
- * 토큰 갱신
- * Backup 방식: 클라이언트에서 직접 백엔드 API 호출
+ * GetUserProfile을 User 타입으로 변환
  */
-export const refreshUserToken = async (refreshToken: string): Promise<RefreshTokenResponse> => {
+const mapGetUserProfileToUser = (profile: GetUserProfile, docId: string): User => {
+  return ResponseMapper.mapUserProfile(profile, docId);
+};
+
+/**
+ * Login user with JWT token
+ */
+export const loginUser = async (request: LoginRequest): Promise<LoginResponse> => {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://dev.decoded.style';
-    const url = `${baseUrl}/auth/refresh`;
+    console.log('[Auth] Attempting login with config API:', {
+      hasJwtToken: !!request.jwt_token,
+      hasSuiAddress: !!request.sui_address,
+    });
 
-    const requestBody = { refresh_token: refreshToken };
-    const config = getRequestConfig('POST', requestBody);
+    const config = getRequestConfig('POST', request);
+    console.log('[Auth] Making fetch request to:', `${API_BASE_URL}/auth/login`);
+    console.log('[Auth] Request config:', {
+      method: config.method,
+      headers: config.headers,
+      body: config.body,
+    });
 
-    const response = await fetch(url, config);
+    console.log('[Auth] Starting fetch request...');
+    const response = await fetch(`${API_BASE_URL}/auth/login`, config);
+    console.log('[Auth] Fetch request completed, status:', response.status);
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: 'Token refresh failed' }));
-      throw new Error(errorData.error || `Token refresh failed: ${response.statusText}`);
+      throw new Error(`Login failed: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
+    console.log('[Auth] Full response data:', JSON.stringify(data, null, 2));
 
-    // Update API token after successful refresh
-    if (data.access_token) {
-      updateApiTokenFromStorage();
-    }
+    // 백엔드 응답 구조에 맞게 LoginResponse 형태로 변환
+    const loginResponse = ResponseMapper.mapLoginResponse(data);
 
-    return {
-      access_token: data.access_token,
-      refresh_token: data.refresh_token,
-    };
+    // 세션 저장
+    storeLoginResponse(loginResponse);
+
+    console.log('[Auth] Login successful:', {
+      hasAccessToken: !!loginResponse.access_token,
+      hasRefreshToken: !!loginResponse.refresh_token,
+      hasUser: !!loginResponse.user,
+      userDocId: loginResponse.user?.doc_id,
+    });
+
+    return loginResponse;
   } catch (error) {
-    throw handleAuthError(error);
+    console.error('[Auth] Login error:', error);
+    throw error;
   }
 };
 
 /**
- * 로그아웃
- * Backup 방식: 클라이언트에서 직접 처리 (백엔드 API 호출 없이 로컬 상태만 정리)
+ * Logout user
  */
 export const logoutUser = async (): Promise<void> => {
   try {
-    // Backup 방식: 세션만 정리
-    clearSession();
+    // 로컬 정리만 수행 (백엔드에 logout 요청은 없음)
+    console.log('[Auth] Logging out user');
 
-    // API 토큰 초기화
-    updateApiTokenFromStorage();
+    // 세션 스토리지 정리
+    sessionStorage.removeItem('access_token');
+    sessionStorage.removeItem('user_data');
 
-    // 백엔드에 로그아웃 요청을 보내고 싶다면 아래 주석을 해제
-    // const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://dev.decoded.style';
-    // const url = `${baseUrl}/auth/logout`;
-    // const config = getRequestConfig('POST');
-    // await fetch(url, config);
+    // 로컬 스토리지 정리
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('last_token_check');
+
+    console.log('[Auth] Logout completed');
   } catch (error) {
-    // Logout errors are usually not critical, just log them
-    console.warn('Logout error:', error);
+    console.error('[Auth] Logout error:', error);
+    throw error;
   }
 };
 
 /**
- * 사용자 프로필 조회
- * Backup 방식: 토큰 검증 후 API 호출
+ * Get user profile
  */
-export const getUserProfile = async () => {
+export const getUserProfile = async (): Promise<User> => {
   try {
-    // Backup 방식: 토큰 검증
-    const accessToken = getValidAccessToken();
-    if (!accessToken) {
-      throw new Error('No valid access token available');
+    console.log('[Auth] Fetching user profile with config API');
+
+    // 토큰에서 user_doc_id 추출
+    const userDocId = extractUserDocIdFromToken();
+    if (!userDocId) {
+      throw new Error('No user ID found in token');
     }
 
-    // Use the generated UsersService
-    const profile = await UsersService.getMyProfileUsersMeProfileGet();
-    return profile;
+    const config = getRequestConfig('GET');
+    const response = await fetch(`${API_BASE_URL}/users/${userDocId}/profile`, config);
+
+    if (!response.ok) {
+      throw new Error(`Profile fetch failed: ${response.status} ${response.statusText}`);
+    }
+
+    const profileData: GetUserProfile = await response.json();
+    console.log('[Auth] Profile data received:', JSON.stringify(profileData, null, 2));
+
+    // GetUserProfile을 User 타입으로 변환
+    const user = mapGetUserProfileToUser(profileData, userDocId);
+
+    console.log('[Auth] Mapped user data:', user);
+
+    return user;
   } catch (error) {
-    throw handleAuthError(error);
+    console.error('[Auth] Profile fetch error:', error);
+    throw error;
   }
 };
 
 /**
- * 인증 상태 확인
- * Backup 방식: 토큰 유효성 검사
+ * Check authentication status
  */
-export const checkAuthStatus = async (): Promise<boolean> => {
+export const checkAuthStatus = async () => {
   try {
-    // Backup 방식: 5분마다 한 번만 검증
-    if (!shouldCheckToken()) {
-      return true; // 최근에 검증했으면 유효하다고 가정
+    // 먼저 토큰이 있는지 확인
+    const token = getAccessToken();
+    if (!token) {
+      return { authenticated: false, error: 'No access token found' };
     }
 
-    const accessToken = getValidAccessToken();
-    if (!accessToken) {
-      return false;
+    // 토큰이 유효한지 확인하기 위해 프로필 API 호출
+    const config = getRequestConfig('GET');
+    const response = await fetch(`${API_BASE_URL}/users/me/profile`, config);
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        // 토큰이 만료되었거나 유효하지 않음
+        return { authenticated: false, error: 'Token expired or invalid' };
+      }
+      return { authenticated: false, error: `HTTP ${response.status}` };
     }
 
-    // 토큰이 유효하면 검증 시간 업데이트
-    setLastTokenCheck();
-    return true;
+    const profile = await response.json();
+    return { authenticated: true, user: profile };
   } catch (error) {
-    console.error('Auth status check failed:', error);
-    return false;
+    console.error('[Auth] Auth status check failed:', error);
+
+    // CORS 에러인지 확인
+    if (error instanceof Error && error.message === 'Failed to fetch') {
+      console.warn('[Auth] CORS error detected, this might be a development environment issue');
+      // CORS 에러의 경우 토큰이 있으면 인증된 것으로 간주
+      const token = getAccessToken();
+      if (token) {
+        return { authenticated: true, error: 'CORS blocked, but token exists' };
+      }
+    }
+
+    // 네트워크 오류나 기타 예외 상황
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return { authenticated: false, error: errorMessage };
+  }
+};
+
+/**
+ * Handle Google OAuth callback
+ * This function should be called with the authorization code from Google
+ */
+export const handleGoogleOAuthCallback = async (code: string): Promise<LoginResponse> => {
+  try {
+    console.log('[Auth] Processing Google OAuth callback with code:', {
+      codeLength: code.length,
+      hasCode: !!code,
+    });
+
+    // Google OAuth 코드를 백엔드로 전송
+    // 백엔드에서 Google API를 호출하여 사용자 정보를 가져오고 JWT 토큰을 생성
+    const response = await loginUser({
+      jwt_token: code, // Google OAuth authorization code
+      sui_address: '', // 임시 값, 실제로는 적절한 주소 필요
+    });
+
+    console.log('[Auth] Google OAuth login successful:', {
+      hasAccessToken: !!response.access_token,
+      hasUser: !!response.user,
+    });
+
+    return response;
+  } catch (error) {
+    console.error('[Auth] Google OAuth callback error:', error);
+    throw error;
   }
 };

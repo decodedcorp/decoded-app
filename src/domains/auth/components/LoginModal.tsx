@@ -2,7 +2,6 @@
 
 import React, { useEffect } from 'react';
 import { LoginForm } from './LoginForm';
-import { initiateGoogleOAuth } from '../utils/oauth';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -45,6 +44,28 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
 
   const handleLoginError = (error: string) => {
     console.error('Google login failed:', error);
+  };
+
+  // Google OAuth 시작 함수
+  const initiateGoogleOAuth = () => {
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    const redirectUri =
+      process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/callback';
+
+    if (!clientId) {
+      throw new Error('Google Client ID가 설정되지 않았습니다.');
+    }
+
+    const googleAuthUrl =
+      `https://accounts.google.com/o/oauth2/v2/auth?` +
+      `client_id=${clientId}&` +
+      `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+      `response_type=code&` +
+      `scope=${encodeURIComponent('openid email profile')}&` +
+      `access_type=offline&` +
+      `prompt=consent`;
+
+    window.location.href = googleAuthUrl;
   };
 
   if (!isOpen) return null;

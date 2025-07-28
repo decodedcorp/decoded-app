@@ -17,6 +17,14 @@ const nextConfig: NextConfig = {
   images: {
     domains: ['picsum.photos', 'randomuser.me'],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/proxy/:path*',
+        destination: 'https://dev.decoded.style/:path*',
+      },
+    ];
+  },
 };
 
 export default nextConfig;

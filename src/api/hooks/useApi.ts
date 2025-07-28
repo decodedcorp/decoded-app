@@ -1,5 +1,4 @@
-// Re-export all domain-specific hooks for centralized access
-export * from '../../domains/auth';
+// Re-export domain-specific hooks for centralized access (excluding auth types to prevent conflicts)
 export * from '../../domains/channels';
 export * from '../../domains/contents';
 export * from '../../domains/feeds';

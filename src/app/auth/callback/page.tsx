@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState, Suspense, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/domains/auth/hooks/useAuth';
 import { handleGoogleOAuthCallback } from '@/domains/auth/api/authApi';
@@ -8,157 +8,133 @@ import { handleGoogleOAuthCallback } from '@/domains/auth/api/authApi';
 function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { loginWithGoogle, setLoading, setError } = useAuth();
+  const { login, setLoading, setError } = useAuth();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('인증을 처리하고 있습니다...');
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const processAuthCallback = useCallback(async () => {
+    if (isProcessing) return;
+
+    try {
+      setIsProcessing(true);
+      setLoading(true);
+      setStatus('loading');
+      setMessage('인증을 처리하고 있습니다...');
+
+      const code = searchParams.get('code');
+      const error = searchParams.get('error');
+
+      if (error) {
+        throw new Error(`인증 오류: ${error}`);
+      }
+
+      if (!code) {
+        throw new Error('인증 코드가 없습니다.');
+      }
+
+      console.log('[Auth] Processing callback with code:', {
+        codeLength: code.length,
+        hasCode: !!code,
+      });
+
+      // Google OAuth 콜백 처리
+      const response = await handleGoogleOAuthCallback(code);
+
+      console.log('[Auth] Login successful:', {
+        hasAccessToken: !!response.access_token,
+        hasUser: !!response.user,
+        userDocId: response.user?.doc_id,
+      });
+
+      // 로그인 성공 처리
+      login(response);
+
+      setStatus('success');
+      setMessage('로그인에 성공했습니다!');
+      setLoading(false);
+
+      // 메인 페이지로 리다이렉트
+      setTimeout(() => {
+        router.push('/');
+      }, 1000);
+    } catch (error) {
+      console.error('[Auth] Callback error:', error);
+
+      setStatus('error');
+      setMessage(error instanceof Error ? error.message : '인증 처리 중 오류가 발생했습니다.');
+      setError(error instanceof Error ? error.message : '인증 처리 중 오류가 발생했습니다.');
+      setLoading(false);
+
+      // 에러 페이지로 리다이렉트
+      setTimeout(() => {
+        router.push('/login?error=auth_failed');
+      }, 3000);
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [searchParams, login, setLoading, setError, router]);
 
   useEffect(() => {
-    const processAuthCallback = async () => {
-      try {
-        setLoading(true);
-        setStatus('loading');
-        setMessage('Google 인증을 처리하고 있습니다...');
-
-        // URL에서 인증 코드 추출
-        const code = searchParams.get('code');
-        const error = searchParams.get('error');
-
-        if (error) {
-          throw new Error(`OAuth error: ${error}`);
-        }
-
-        if (!code) {
-          throw new Error('인증 코드를 찾을 수 없습니다.');
-        }
-
-        setMessage('SUI 지갑을 생성하고 있습니다...');
-
-        // authApi의 handleGoogleOAuthCallback 사용
-        const response = await handleGoogleOAuthCallback(code);
-
-        // Zustand 스토어에 로그인 정보 저장
-        loginWithGoogle(response);
-
-        setStatus('success');
-        setMessage('로그인에 성공했습니다! 메인 페이지로 이동합니다...');
-
-        // 잠시 후 메인 페이지로 리다이렉트
-        setTimeout(() => {
-          router.push('/');
-        }, 2000);
-      } catch (error) {
-        console.error('Auth callback error:', error);
-        setStatus('error');
-        const errorMessage = error instanceof Error ? error.message : '로그인에 실패했습니다.';
-        setMessage(errorMessage);
-        setError(errorMessage);
-
-        // 에러 발생 시 3초 후 로그인 페이지로 리다이렉트
-        setTimeout(() => {
-          router.push('/login');
-        }, 3000);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    // 컴포넌트가 마운트된 후에만 실행
-    if (typeof window !== 'undefined') {
+    // 한 번만 실행되도록 처리
+    if (!isProcessing) {
       processAuthCallback();
     }
-  }, [searchParams, loginWithGoogle, setLoading, setError, router]);
+  }, []); // 빈 의존성 배열로 한 번만 실행
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-md w-full space-y-8 p-6">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          {/* Loading Spinner */}
+          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">인증 처리 중</h2>
+          <p className="mt-2 text-sm text-gray-600">{message}</p>
+        </div>
+
+        <div className="mt-8 space-y-6">
           {status === 'loading' && (
-            <div className="flex justify-center mb-4">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="flex justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             </div>
           )}
 
-          {/* Success Icon */}
           {status === 'success' && (
-            <div className="flex justify-center mb-4">
-              <div className="rounded-full bg-green-100 p-3">
-                <svg
-                  className="h-6 w-6 text-green-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
+            <div className="rounded-md bg-green-50 p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-green-800">로그인 성공</p>
+                </div>
               </div>
             </div>
           )}
 
-          {/* Error Icon */}
           {status === 'error' && (
-            <div className="flex justify-center mb-4">
-              <div className="rounded-full bg-red-100 p-3">
-                <svg
-                  className="h-6 w-6 text-red-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+            <div className="rounded-md bg-red-50 p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-red-800">인증 실패</p>
+                  <p className="mt-1 text-sm text-red-700">{message}</p>
+                </div>
               </div>
             </div>
           )}
-
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            {status === 'loading' && '인증 처리 중...'}
-            {status === 'success' && '로그인 성공!'}
-            {status === 'error' && '로그인 실패'}
-          </h2>
-
-          <p className="text-gray-600 dark:text-gray-400">{message}</p>
-
-          {/* Progress Bar for Loading */}
-          {status === 'loading' && (
-            <div className="mt-4">
-              <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
-                <div
-                  className="bg-blue-600 h-2 rounded-full animate-pulse"
-                  style={{ width: '60%' }}
-                ></div>
-              </div>
-            </div>
-          )}
-
-          {/* Manual Navigation Links */}
-          <div className="mt-6 space-y-2">
-            <button
-              onClick={() => router.push('/')}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
-            >
-              메인 페이지로 이동
-            </button>
-
-            {status === 'error' && (
-              <button
-                onClick={() => router.push('/login')}
-                className="w-full bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
-              >
-                로그인 페이지로 돌아가기
-              </button>
-            )}
-          </div>
         </div>
       </div>
     </div>
@@ -169,8 +145,8 @@ export default function AuthCallbackPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
       }
     >

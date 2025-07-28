@@ -2,24 +2,35 @@
 export { LoginForm } from './components/LoginForm';
 export { LoginModal } from './components/LoginModal';
 export { AuthProvider } from './components/AuthProvider';
+export { AuthStatus } from './components/AuthStatus';
+export { ProtectedRoute } from './components/ProtectedRoute';
 
 // Types
 export type {
-  GoogleOAuthResponse,
+  LoginRequest,
+  LoginResponse,
+  User,
+  UserRole,
+  UserStatus,
   AuthState,
+  SessionData,
+  DecodedToken,
 } from './types/auth';
 
-// Constants
-export { AUTH_CONSTANTS } from './constants/authConstants';
+export type { TokenData, TokenType } from './utils/tokenManager';
 
-// OAuth Utils
+// Constants
 export {
-  initiateGoogleOAuth,
-  extractAuthCodeFromUrl,
-  buildGoogleOAuthUrl,
-  getGoogleOAuthConfig,
-  getGoogleOAuthErrorMessage,
-} from './utils/oauth';
+  STORAGE_KEYS,
+  API_ENDPOINTS,
+  GOOGLE_OAUTH_CONFIG,
+  TIMING,
+  ERROR_MESSAGES,
+  SUCCESS_MESSAGES,
+  LOADING_MESSAGES,
+  USER_ROLES,
+  USER_STATUSES,
+} from './constants';
 
 // Token Management
 export {
@@ -28,20 +39,38 @@ export {
   getRefreshToken,
   clearTokens,
   isTokenExpired,
+  storeUserSession,
+  storeLoginResponse,
+  clearSession,
+  isAuthenticated,
+  getValidAccessToken,
+  getUserData,
+  setUserData,
+  setLastTokenCheck,
+  shouldCheckToken,
 } from './utils/tokenManager';
 
-// Error Handling
-export { handleAuthError, getAuthErrorMessage, logAuthError } from './utils/errorHandler';
+// Token Decoder
+export { TokenDecoder } from './utils/tokenDecoder';
+
+// Response Mapper
+export { ResponseMapper } from './utils/responseMapper';
 
 // API Functions
 export {
-  handleGoogleOAuthCallback,
+  loginUser,
   logoutUser,
-  refreshUserToken,
   getUserProfile,
+  checkAuthStatus,
+  handleGoogleOAuthCallback,
 } from './api/authApi';
 
-// Hooks
+// Core Hooks
+export { useAuthCore } from './hooks/useAuthCore';
+export { useTokenMonitor } from './hooks/useTokenMonitor';
+export { useAuthInit } from './hooks/useAuthInit';
+
+// Main Auth Hook
 export {
   useAuth,
   useUser,
@@ -52,10 +81,8 @@ export {
   useHasRole,
   useIsAdmin,
   useIsUser,
+  useIsModerator,
 } from './hooks/useAuth';
 
-export { useAuthInit } from './hooks/useAuthInit';
-export { useTokenRefresh } from './hooks/useTokenRefresh';
-
 // React Query Hooks
-export { useGoogleOAuth, useLogout } from './hooks/useAuthMutations';
+export { useLogin, useLogout, useGoogleOAuth } from './hooks/useAuthMutations';

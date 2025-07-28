@@ -8,7 +8,7 @@ import { useAuth, useUser, useIsAdmin, useIsUser } from '../hooks/useAuth';
  */
 export const AuthStatus: React.FC = () => {
   const { isAuthenticated, isLoading, error, logout } = useAuth();
-  const { user, role, name, email } = useUser();
+  const { role, name, email } = useUser();
   const isAdmin = useIsAdmin();
   const isUser = useIsUser();
 

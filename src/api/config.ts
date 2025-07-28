@@ -6,7 +6,11 @@ import { getAccessToken, getValidAccessToken } from '../domains/auth/utils/token
  */
 
 // Base URL configuration
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://dev.decoded.style';
+// 개발 환경에서는 Next.js 프록시를 사용하여 CORS 문제 해결
+export const API_BASE_URL =
+  process.env.NODE_ENV === 'development'
+    ? '/api/proxy'
+    : process.env.NEXT_PUBLIC_API_BASE_URL || 'https://dev.decoded.style';
 
 // Default headers
 const getDefaultHeaders = () => ({

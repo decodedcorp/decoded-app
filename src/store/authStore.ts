@@ -1,13 +1,10 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { AuthState, GoogleOAuthResponse } from '../domains/auth/types/auth';
+import { AuthState, User, LoginResponse } from '../domains/auth/types/auth';
 import {
-  setTokens,
-  clearTokens,
+  clearSession,
   getAccessToken,
   getRefreshToken,
-  storeUserSession,
-  clearSession,
   getUserData,
   isAuthenticated,
   getValidAccessToken,
@@ -15,7 +12,7 @@ import {
 
 interface AuthStore extends AuthState {
   // Actions
-  loginWithGoogle: (response: GoogleOAuthResponse) => void;
+  login: (response: LoginResponse) => void;
   logout: () => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -24,13 +21,11 @@ interface AuthStore extends AuthState {
   // Token management
   getAccessToken: () => string | null;
   getRefreshToken: () => string | null;
-  setTokens: (accessToken: string, refreshToken: string) => void;
-  clearTokens: () => void;
+  getValidAccessToken: () => string | null;
 
   // User management
-  updateUser: (userData: Partial<AuthState['user']>) => void;
+  updateUser: (userData: Partial<User>) => void;
   getUserData: () => { doc_id: string | null; email: string | null; nickname: string | null };
-  getValidAccessToken: () => string | null;
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -44,36 +39,34 @@ export const useAuthStore = create<AuthStore>()(
         isAuthenticated: false,
 
         // Actions
-        loginWithGoogle: (response: GoogleOAuthResponse) => {
+        login: (response: LoginResponse) => {
           try {
-            // Backup 방식: 세션 데이터 저장
-            if (response.access_token && response.user) {
-              storeUserSession({
-                access_token: response.access_token,
-                refresh_token: response.refresh_token,
-                doc_id: response.user.doc_id || response.user.id || '',
+            if (response.access_token?.access_token && response.user) {
+              const user: User = {
+                doc_id: response.user.doc_id,
                 email: response.user.email,
-                nickname: response.user.nickname || response.user.name || '',
-              });
+                nickname: response.user.nickname,
+                role: response.user.role,
+                status: response.user.status,
+              };
 
               set({
-                user: response.user,
+                user,
                 isAuthenticated: true,
                 error: null,
                 isLoading: false,
               });
             }
           } catch (error) {
-            console.error('Failed to login with Google:', error);
+            console.error('[Auth] Failed to login:', error);
             set({
-              error: 'Google 로그인에 실패했습니다.',
+              error: '로그인에 실패했습니다.',
               isLoading: false,
             });
           }
         },
 
         logout: () => {
-          // Backup 방식: 세션만 정리
           clearSession();
 
           set({
@@ -99,15 +92,10 @@ export const useAuthStore = create<AuthStore>()(
         // Token management
         getAccessToken: () => getAccessToken(),
         getRefreshToken: () => getRefreshToken(),
-        setTokens: (accessToken: string, refreshToken: string) => {
-          setTokens(accessToken, refreshToken);
-        },
-        clearTokens: () => {
-          clearTokens();
-        },
+        getValidAccessToken: () => getValidAccessToken(),
 
         // User management
-        updateUser: (userData: Partial<AuthState['user']>) => {
+        updateUser: (userData: Partial<User>) => {
           const currentUser = get().user;
           if (currentUser) {
             set({
@@ -117,14 +105,11 @@ export const useAuthStore = create<AuthStore>()(
         },
 
         getUserData: () => getUserData(),
-        getValidAccessToken: () => getValidAccessToken(),
       }),
       {
         name: 'auth-store',
-        // Backup 방식: sessionStorage 기반이므로 persist는 최소한으로
         partialize: (state) => ({
           // 필요한 경우에만 일부 상태를 localStorage에 저장
-          // 대부분은 sessionStorage에서 관리
         }),
       },
     ),
@@ -140,5 +125,5 @@ export const selectIsAuthenticated = (state: AuthStore) => state.isAuthenticated
 export const selectIsLoading = (state: AuthStore) => state.isLoading;
 export const selectError = (state: AuthStore) => state.error;
 export const selectUserRole = (state: AuthStore) => state.user?.role;
-export const selectUserName = (state: AuthStore) => state.user?.name || state.user?.nickname;
+export const selectUserName = (state: AuthStore) => state.user?.nickname;
 export const selectUserEmail = (state: AuthStore) => state.user?.email;

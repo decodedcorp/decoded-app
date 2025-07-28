@@ -1,26 +1,34 @@
 // API response types
-export interface GoogleOAuthResponse {
-  access_token: string;
+export interface LoginResponse {
+  access_token: {
+    salt: string;
+    user_doc_id: string;
+    access_token: string;
+    has_sui_address: boolean;
+  };
   refresh_token: string;
-  user: User;
-  token_type?: 'jwt' | 'oauth'; // 토큰 타입 정보 추가
+  user: {
+    doc_id: string;
+    email: string;
+    nickname: string;
+    role: UserRole;
+    status: UserStatus;
+  };
 }
 
 export interface RefreshTokenResponse {
   access_token: string;
-  refresh_token?: string; // New refresh token may or may not be provided
+  refresh_token?: string;
 }
 
-// User types - 새로운 백엔드 API 구조에 맞춤
+// User types - 실제 백엔드 API 구조에 맞춤
 export interface User {
-  doc_id?: string; // 백엔드에서 사용하는 문서 ID
-  id?: string; // 기존 ID 필드 (호환성)
+  doc_id: string;
   email: string;
-  nickname?: string; // 사용자 닉네임
-  name?: string; // 기존 name 필드 (호환성)
-  sui_address?: string; // Sui 블록체인 주소
-  role?: UserRole;
-  status?: UserStatus;
+  nickname: string;
+  role: UserRole;
+  status: UserStatus;
+  sui_address?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -30,15 +38,23 @@ export type UserStatus = 'active' | 'inactive' | 'suspended';
 
 // Token-related types
 export interface DecodedToken {
-  sub: string; // User ID
+  sub: string;
   email: string;
   role: string;
   status: string;
-  exp: number; // Expiration time
-  iat: number; // Issued at time
+  exp: number;
+  iat: number;
 }
 
-// API response types
+// API request types
+export interface LoginRequest {
+  jwt_token: string;
+  sui_address: string;
+  email?: string;
+  marketing?: boolean;
+}
+
+// API response wrapper
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
@@ -54,30 +70,19 @@ export interface ErrorResponse {
   };
 }
 
-// User profile related types
-export interface UserProfile {
-  id: string;
-  email: string;
-  name: string;
-  role: UserRole;
-  status: UserStatus;
-  avatar?: string;
-  preferences?: UserPreferences;
-}
-
-export interface UserPreferences {
-  theme?: 'light' | 'dark' | 'system';
-  language?: string;
-  notifications?: {
-    email: boolean;
-    push: boolean;
-  };
-}
-
 // Authentication state
 export interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+}
+
+// Session storage types
+export interface SessionData {
+  access_token: string;
+  refresh_token: string;
+  doc_id: string;
+  email: string;
+  nickname: string;
 }
