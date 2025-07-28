@@ -1,57 +1,45 @@
 import { useEffect } from 'react';
 import { useAuthStore } from '../../../store/authStore';
-import { getStoredTokens, isTokenExpired, decodeToken } from '../utils/tokenManager';
+import { getAccessToken, getRefreshToken, isTokenExpired } from '../utils/tokenManager';
 
 /**
- * 앱 시작 시 인증 상태를 초기화하고 복원하는 훅
+ * Hook to initialize and restore authentication state on app startup
  */
 export const useAuthInit = () => {
-  const { setLoading, setError, login, logout } = useAuthStore();
+  const { setLoading, setError, logout } = useAuthStore();
 
   useEffect(() => {
     const initializeAuth = async () => {
       try {
         setLoading(true);
 
-        // 저장된 토큰 확인
-        const tokens = getStoredTokens();
+        // Check stored tokens
+        const accessToken = getAccessToken();
+        const refreshToken = getRefreshToken();
 
-        if (!tokens) {
-          // 토큰이 없으면 로그아웃 상태로 설정
+        if (!accessToken || !refreshToken) {
+          // Set to logout state if no tokens
           logout();
           return;
         }
 
-        // 액세스 토큰이 만료되었는지 확인
-        if (isTokenExpired(tokens.access_token)) {
-          // 토큰이 만료되었으면 로그아웃
+        // Check if access token is expired
+        if (isTokenExpired(accessToken)) {
+          // Logout if token is expired
           logout();
           return;
         }
 
-        // 토큰에서 사용자 정보 추출
-        const decodedToken = decodeToken(tokens.access_token);
-        if (!decodedToken) {
-          logout();
-          return;
-        }
-
-        // 사용자 정보를 스토어에 설정
-        const user = {
-          id: decodedToken.sub,
-          email: decodedToken.email || '',
-          role: decodedToken.role || 'user',
-          status: 'active',
-        };
-
-        login({
-          access_token: tokens.access_token,
-          refresh_token: tokens.refresh_token,
-          user,
+        // Set authentication state to true if tokens are valid
+        // Actual user data will be fetched by useAuth hook using React Query
+        useAuthStore.setState({
+          isAuthenticated: true,
+          isLoading: false,
+          error: null,
         });
       } catch (error) {
         console.error('Failed to initialize auth:', error);
-        setError('인증 상태 초기화에 실패했습니다.');
+        setError('Failed to initialize authentication state.');
         logout();
       } finally {
         setLoading(false);
@@ -59,7 +47,7 @@ export const useAuthInit = () => {
     };
 
     initializeAuth();
-  }, [setLoading, setError, login, logout]);
+  }, [setLoading, setError, logout]);
 
   return null;
 };

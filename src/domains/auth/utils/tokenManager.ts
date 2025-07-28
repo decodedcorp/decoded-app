@@ -14,19 +14,118 @@ export interface DecodedToken {
 }
 
 /**
- * JWT 토큰을 디코딩합니다 (payload 부분만)
+ * Token management utility
+ * Centralizes localStorage access and enhances security.
  */
-export const decodeToken = (token: string): DecodedToken | null => {
+
+const TOKEN_KEYS = {
+  ACCESS_TOKEN: 'access_token',
+  REFRESH_TOKEN: 'refresh_token',
+} as const;
+
+/**
+ * Safely store tokens
+ */
+export const setTokens = (accessToken: string, refreshToken: string): void => {
   try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join(''),
-    );
-    return JSON.parse(jsonPayload);
+    // Validate tokens
+    if (!accessToken || !refreshToken) {
+      throw new Error('Invalid tokens provided');
+    }
+
+    // Validate JWT token format (simple validation)
+    if (!accessToken.includes('.') || !refreshToken.includes('.')) {
+      throw new Error('Invalid token format');
+    }
+
+    localStorage.setItem(TOKEN_KEYS.ACCESS_TOKEN, accessToken);
+    localStorage.setItem(TOKEN_KEYS.REFRESH_TOKEN, refreshToken);
+  } catch (error) {
+    console.error('Failed to store tokens:', error);
+    throw new Error('Failed to store tokens.');
+  }
+};
+
+/**
+ * Get access token
+ */
+export const getAccessToken = (): string | null => {
+  try {
+    return localStorage.getItem(TOKEN_KEYS.ACCESS_TOKEN);
+  } catch (error) {
+    console.error('Failed to get access token:', error);
+    return null;
+  }
+};
+
+/**
+ * Get refresh token
+ */
+export const getRefreshToken = (): string | null => {
+  try {
+    return localStorage.getItem(TOKEN_KEYS.REFRESH_TOKEN);
+  } catch (error) {
+    console.error('Failed to get refresh token:', error);
+    return null;
+  }
+};
+
+/**
+ * Clear all tokens
+ */
+export const clearTokens = (): void => {
+  try {
+    localStorage.removeItem(TOKEN_KEYS.ACCESS_TOKEN);
+    localStorage.removeItem(TOKEN_KEYS.REFRESH_TOKEN);
+  } catch (error) {
+    console.error('Failed to clear tokens:', error);
+  }
+};
+
+/**
+ * Check if tokens exist
+ */
+export const hasTokens = (): boolean => {
+  return !!(getAccessToken() && getRefreshToken());
+};
+
+/**
+ * Check if token is expired (for JWT tokens)
+ */
+export const isTokenExpired = (token: string): boolean => {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.exp * 1000 < Date.now();
+  } catch (error) {
+    console.error('Failed to parse token:', error);
+    return true;
+  }
+};
+
+/**
+ * Check if token will expire soon (default: 5 minutes)
+ */
+export const isTokenExpiringSoon = (token: string, minutes: number = 5): boolean => {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const expiresAt = payload.exp * 1000;
+    const now = Date.now();
+    const threshold = minutes * 60 * 1000; // Convert minutes to milliseconds
+
+    return expiresAt - now < threshold;
+  } catch (error) {
+    console.error('Failed to check token expiration:', error);
+    return true;
+  }
+};
+
+/**
+ * Decode JWT token
+ */
+export const decodeToken = (token: string): any => {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload;
   } catch (error) {
     console.error('Failed to decode token:', error);
     return null;
@@ -34,30 +133,45 @@ export const decodeToken = (token: string): DecodedToken | null => {
 };
 
 /**
- * 토큰이 만료되었는지 확인합니다
+ * Extract user information from token
  */
-export const isTokenExpired = (token: string): boolean => {
-  const decoded = decodeToken(token);
-  if (!decoded) return true;
+export const extractUserFromToken = (token: string) => {
+  try {
+    const payload = decodeToken(token);
+    if (!payload) return null;
 
-  const currentTime = Math.floor(Date.now() / 1000);
-  return decoded.exp < currentTime;
+    return {
+      id: payload.sub,
+      email: payload.email,
+      role: payload.role,
+      status: payload.status,
+    };
+  } catch (error) {
+    console.error('Failed to extract user from token:', error);
+    return null;
+  }
 };
 
 /**
- * 토큰이 곧 만료될 예정인지 확인합니다 (5분 이내)
+ * Get remaining token validity time in milliseconds
  */
-export const isTokenExpiringSoon = (token: string): boolean => {
-  const decoded = decodeToken(token);
-  if (!decoded) return true;
+export const getTokenTimeRemaining = (token: string): number => {
+  try {
+    const payload = decodeToken(token);
+    if (!payload) return 0;
 
-  const currentTime = Math.floor(Date.now() / 1000);
-  const fiveMinutes = 5 * 60;
-  return decoded.exp < currentTime + fiveMinutes;
+    const expiresAt = payload.exp * 1000;
+    const now = Date.now();
+
+    return Math.max(0, expiresAt - now);
+  } catch (error) {
+    console.error('Failed to get token time remaining:', error);
+    return 0;
+  }
 };
 
 /**
- * 토큰을 안전하게 저장합니다
+ * Safely store tokens
  */
 export const storeTokens = (tokens: TokenData): void => {
   try {
@@ -69,7 +183,7 @@ export const storeTokens = (tokens: TokenData): void => {
 };
 
 /**
- * 저장된 토큰을 안전하게 가져옵니다
+ * Safely get stored tokens
  */
 export const getStoredTokens = (): TokenData | null => {
   try {
@@ -91,7 +205,7 @@ export const getStoredTokens = (): TokenData | null => {
 };
 
 /**
- * 저장된 토큰을 안전하게 제거합니다
+ * Safely clear stored tokens
  */
 export const clearStoredTokens = (): void => {
   try {
@@ -103,7 +217,7 @@ export const clearStoredTokens = (): void => {
 };
 
 /**
- * 현재 유효한 액세스 토큰을 가져옵니다
+ * Get the currently valid access token
  */
 export const getValidAccessToken = (): string | null => {
   const tokens = getStoredTokens();
@@ -117,7 +231,7 @@ export const getValidAccessToken = (): string | null => {
 };
 
 /**
- * 토큰 갱신을 시도합니다
+ * Attempt to refresh the access token
  */
 export const refreshAccessToken = async (): Promise<string | null> => {
   try {
@@ -143,7 +257,7 @@ export const refreshAccessToken = async (): Promise<string | null> => {
     const data = await response.json();
     const newTokens: TokenData = {
       access_token: data.access_token,
-      refresh_token: data.refresh_token || tokens.refresh_token, // 새로운 refresh token이 없으면 기존 것 사용
+      refresh_token: data.refresh_token || tokens.refresh_token, // Use existing refresh token if new one is not provided
     };
 
     storeTokens(newTokens);
@@ -152,20 +266,20 @@ export const refreshAccessToken = async (): Promise<string | null> => {
     return newTokens.access_token;
   } catch (error) {
     console.error('Failed to refresh access token:', error);
-    // 토큰 갱신 실패 시 로그아웃
+    // Log out on token refresh failure
     useAuthStore.getState().logout();
     return null;
   }
 };
 
 /**
- * API 요청을 위한 인증 헤더를 생성합니다
+ * Generate authentication headers for API requests
  */
 export const getAuthHeaders = async (): Promise<Record<string, string>> => {
   let accessToken = getValidAccessToken();
 
   if (!accessToken) {
-    // 토큰이 없거나 만료된 경우 갱신 시도
+    // Attempt to refresh if no token or expired
     accessToken = await refreshAccessToken();
   }
 
@@ -180,7 +294,7 @@ export const getAuthHeaders = async (): Promise<Record<string, string>> => {
 };
 
 /**
- * 인증이 필요한 API 요청을 위한 래퍼 함수
+ * Wrapper function for authenticated API requests
  */
 export const authenticatedFetch = async (
   url: string,
@@ -197,7 +311,7 @@ export const authenticatedFetch = async (
       },
     });
 
-    // 401 에러가 발생하면 토큰 갱신을 시도하고 재요청
+    // Retry on 401 error by refreshing token
     if (response.status === 401) {
       const newAccessToken = await refreshAccessToken();
       if (newAccessToken) {

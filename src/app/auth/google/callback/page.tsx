@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuth } from '../../../domains/auth/hooks/useAuth';
+import { useAuth } from '@/domains/auth/hooks/useAuth';
 
-export default function GoogleCallbackPage() {
+function GoogleCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { loginWithGoogle, setLoading, setError } = useAuth();
@@ -75,8 +75,8 @@ export default function GoogleCallbackPage() {
             email: userInfo.email,
             name: userInfo.name,
             picture: userInfo.picture,
-            role: 'user',
-            status: 'active',
+            role: 'user' as const,
+            status: 'active' as const,
           },
         };
 
@@ -206,5 +206,19 @@ export default function GoogleCallbackPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function GoogleCallbackPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      }
+    >
+      <GoogleCallbackContent />
+    </Suspense>
   );
 }

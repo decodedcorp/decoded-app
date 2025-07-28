@@ -92,7 +92,7 @@ export const AuthStatus: React.FC = () => {
             <span className="text-green-800 dark:text-green-200 font-medium">로그인됨</span>
           </div>
           <button
-            onClick={logout}
+            onClick={() => logout()}
             className="text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
           >
             로그아웃

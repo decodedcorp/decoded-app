@@ -1,5 +1,4 @@
 import { AUTH_CONSTANTS } from '../constants/authConstants';
-import { GoogleOAuthApiResponse } from '../types/auth';
 
 export interface GoogleOAuthConfig {
   clientId: string;
@@ -44,40 +43,6 @@ export const initiateGoogleOAuth = (): void => {
     window.location.href = authUrl;
   } catch (error) {
     console.error('Failed to initiate Google OAuth:', error);
-    throw error;
-  }
-};
-
-export const handleGoogleOAuthCallback = async (code: string): Promise<any> => {
-  try {
-    const response = await fetch('/api/auth/google/callback', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ code }),
-    });
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to exchange authorization code';
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || errorMessage;
-      } catch (parseError) {
-        console.error('Failed to parse error response:', parseError);
-      }
-      throw new Error(errorMessage);
-    }
-
-    const data: GoogleOAuthApiResponse = await response.json();
-
-    if (!data.success || !data.data) {
-      throw new Error(data.message || 'Invalid response from server');
-    }
-
-    return data.data;
-  } catch (error) {
-    console.error('Failed to handle Google OAuth callback:', error);
     throw error;
   }
 };

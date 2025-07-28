@@ -10,7 +10,7 @@ interface ProtectedRouteProps {
 }
 
 /**
- * 인증이 필요한 라우트를 보호하는 컴포넌트
+ * Component to protect routes that require authentication
  */
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
@@ -21,7 +21,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const { isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
 
-  // 로딩 중일 때는 fallback 또는 로딩 표시
+  // Show fallback or loading indicator while loading
   if (isLoading) {
     return (
       fallback || (
@@ -32,40 +32,42 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
-  // 인증되지 않은 경우 로그인 페이지로 리다이렉트
+  // Redirect to login page if not authenticated
   if (!isAuthenticated) {
     router.push(redirectTo);
     return fallback || null;
   }
 
-  // 특정 역할이 필요한 경우 권한 확인
+  // Check permissions if specific role is required
   if (requiredRole && user?.role !== requiredRole) {
     router.push('/unauthorized');
     return (
       fallback || (
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-red-600 mb-4">접근 권한이 없습니다</h1>
-            <p className="text-gray-600">필요한 권한이 없어 이 페이지에 접근할 수 없습니다.</p>
+            <h1 className="text-2xl font-bold text-red-600 mb-4">Access Denied</h1>
+            <p className="text-gray-600">
+              You don't have the required permissions to access this page.
+            </p>
           </div>
         </div>
       )
     );
   }
 
-  // 인증되고 권한이 있는 경우 자식 컴포넌트 렌더링
+  // Render children if authenticated and authorized
   return <>{children}</>;
 };
 
 /**
- * 관리자 권한이 필요한 라우트를 보호하는 컴포넌트
+ * Component to protect routes that require admin role
  */
 export const AdminRoute: React.FC<Omit<ProtectedRouteProps, 'requiredRole'>> = (props) => {
   return <ProtectedRoute {...props} requiredRole="admin" />;
 };
 
 /**
- * 사용자 권한이 필요한 라우트를 보호하는 컴포넌트
+ * Component to protect routes that require user role
  */
 export const UserRoute: React.FC<Omit<ProtectedRouteProps, 'requiredRole'>> = (props) => {
   return <ProtectedRoute {...props} requiredRole="user" />;

@@ -1,99 +1,102 @@
+// Form data types
 export interface LoginFormData {
   email: string;
   password: string;
 }
 
-export interface LoginResponse {
-  access_token: string;
-  refresh_token: string;
-  user: {
-    id: string;
-    email: string;
-    name?: string;
-    role: string;
-    status: string;
-  };
-}
-
-export interface GoogleOAuthResponse {
-  access_token: string;
-  refresh_token: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    picture?: string;
-    role: string;
-    status: string;
-  };
-}
-
-export interface AuthState {
-  user: LoginResponse['user'] | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  error: string | null;
-}
-
 export interface LoginFormErrors {
   email?: string;
   password?: string;
-  general?: string;
 }
 
 export interface LoginFormState {
   data: LoginFormData;
   errors: LoginFormErrors;
-  isSubmitting: boolean;
-  isSubmitted: boolean;
+  isValid: boolean;
 }
 
-// 토큰 관련 타입들
-export interface TokenPayload {
-  sub: string; // 사용자 ID
-  email: string;
-  role: string;
-  status: string;
-  exp: number; // 만료 시간
-  iat: number; // 발급 시간
-}
-
-export interface RefreshTokenRequest {
+// API response types
+export interface LoginResponse {
+  access_token: string;
   refresh_token: string;
+  user: User;
+}
+
+export interface GoogleOAuthResponse {
+  access_token: string;
+  refresh_token: string;
+  user: User;
 }
 
 export interface RefreshTokenResponse {
   access_token: string;
-  refresh_token?: string; // 새로운 refresh token이 있을 수도 있음
+  refresh_token?: string; // New refresh token may or may not be provided
 }
 
-// API 응답 타입들
-export interface ApiResponse<T = any> {
-  success: boolean;
-  data?: T;
-  message?: string;
-  error?: string;
-}
-
-export interface LoginApiResponse extends ApiResponse<LoginResponse> {}
-export interface GoogleOAuthApiResponse extends ApiResponse<GoogleOAuthResponse> {}
-export interface RefreshTokenApiResponse extends ApiResponse<RefreshTokenResponse> {}
-
-// 사용자 프로필 관련 타입들
-export interface UserProfile {
+// User types
+export interface User {
   id: string;
   email: string;
   name?: string;
-  picture?: string;
-  role: string;
-  status: string;
+  role: UserRole;
+  status: UserStatus;
   createdAt?: string;
   updatedAt?: string;
 }
 
-export interface UpdateProfileRequest {
-  name?: string;
-  picture?: string;
+export type UserRole = 'admin' | 'user' | 'moderator';
+export type UserStatus = 'active' | 'inactive' | 'suspended';
+
+// Token-related types
+export interface DecodedToken {
+  sub: string; // User ID
+  email: string;
+  role: string;
+  status: string;
+  exp: number; // Expiration time
+  iat: number; // Issued at time
 }
 
-export interface UpdateProfileResponse extends ApiResponse<UserProfile> {}
+// API response types
+export interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  message?: string;
+}
+
+export interface ErrorResponse {
+  success: false;
+  error: {
+    code: string;
+    message: string;
+    details?: string;
+  };
+}
+
+// User profile related types
+export interface UserProfile {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  status: UserStatus;
+  avatar?: string;
+  preferences?: UserPreferences;
+}
+
+export interface UserPreferences {
+  theme?: 'light' | 'dark' | 'system';
+  language?: string;
+  notifications?: {
+    email: boolean;
+    push: boolean;
+  };
+}
+
+// Authentication state
+export interface AuthState {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  error: string | null;
+}

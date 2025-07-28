@@ -2,17 +2,18 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { UpdateOptionalAgreement } from './UpdateOptionalAgreement';
 /**
  * Schema for login request.
  *
- * :param email: The email of the user(Optional).
- * :param token: The token of the user(Required).
+ * :param jwt_token: The JWT token of the user(Required).
+ * :param sui_address: The Sui address of the user(Required).
+ * :param email: The email address of the user(Optional).
+ * :param marketing: Whether the user agrees to marketing emails(Optional).
  */
 export type LoginRequest = {
-    token: string;
+    jwt_token: string;
+    sui_address: string;
     email?: (string | null);
-    aka?: (string | null);
-    agreement?: (UpdateOptionalAgreement | null);
+    marketing?: boolean;
 };
 

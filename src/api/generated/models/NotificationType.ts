@@ -3,8 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export enum NotificationType {
-    ITEM_PROVIDED = 'item_provided',
-    POINT_RECEIVED = 'point_received',
-    SYSTEM_NOTICE = 'system_notice',
-    REQUEST_APPROVED = 'request_approved',
+    NEW_LIKE = 'new_like',
+    NEW_COMMENT = 'new_comment',
+    NEW_SUBSCRIPTION = 'new_subscription',
+    NEW_CONTENT_IN_CHANNEL = 'new_content_in_channel',
 }

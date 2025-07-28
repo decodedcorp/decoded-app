@@ -3,31 +3,23 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { LoginRequest } from '../models/LoginRequest';
-import type { Response } from '../models/Response';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 export class AuthService {
     /**
      * Login
+     * User login endpoint
      * @param requestBody
-     * @param type The type of the user
-     * @param session
-     * @returns Response Successful Response
+     * @returns any Successful Response
      * @throws ApiError
      */
-    public static loginUserLoginPost(
+    public static loginAuthLoginPost(
         requestBody: LoginRequest,
-        type: string = 'user',
-        session?: any,
-    ): CancelablePromise<Response> {
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/user/login',
-            query: {
-                'type': type,
-                'session': session,
-            },
+            url: '/auth/login',
             body: requestBody,
             mediaType: 'application/json',
             errors: {

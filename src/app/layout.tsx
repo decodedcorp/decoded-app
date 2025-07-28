@@ -1,34 +1,28 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import { Header } from '@/shared/components/Header';
-import { AuthProvider } from '@/domains/auth/components/AuthProvider';
-import { initializeApiConfig } from '@/api/config';
+'use client';
+
+import React, { useEffect } from 'react';
+import { QueryProvider } from '../lib/providers/QueryProvider';
+import { useAuthInit } from '../domains/auth/hooks/useAuthInit';
+import { configureApi } from '../api/config';
+import { Header } from '../shared/components/Header';
 import '../styles/globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
-
-export const metadata: Metadata = {
-  title: 'Decoded App',
-  description: 'A modern web application',
-};
-
-// API 설정 초기화
-initializeApiConfig();
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // Initialize API configuration
+  useEffect(() => {
+    configureApi();
+  }, []);
+
+  // Initialize authentication state
+  useAuthInit();
+
   return (
-    <html lang="en">
-      <head>
-        {/* Kinetic Typography 폰트들 */}
-        <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/longsile" />
-        <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/thegoodmonolith" />
-        <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/pp-neue-montreal" />
-      </head>
-      <body className={inter.className}>
-        <AuthProvider>
+    <html lang="ko">
+      <body>
+        <QueryProvider>
           <Header />
           {children}
-        </AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );

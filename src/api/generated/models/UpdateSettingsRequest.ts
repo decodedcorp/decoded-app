@@ -2,9 +2,21 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+/**
+ * Request to update user settings
+ */
 export type UpdateSettingsRequest = {
-    base64_profile_image?: (string | null);
-    aka?: (string | null);
-    marketing?: (boolean | null);
+    /**
+     * Base64 encoded profile image
+     */
+    profile_image_base64?: (string | null);
+    /**
+     * User alias/nickname
+     */
+    aka: (string | null);
+    /**
+     * Sui blockchain address
+     */
+    sui_address?: (string | null);
 };
 

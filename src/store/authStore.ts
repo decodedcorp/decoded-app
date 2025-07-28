@@ -1,6 +1,12 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { AuthState, LoginResponse, GoogleOAuthResponse } from '../domains/auth/types/auth';
+import {
+  setTokens,
+  clearTokens,
+  getAccessToken,
+  getRefreshToken,
+} from '../domains/auth/utils/tokenManager';
 
 interface AuthStore extends AuthState {
   // Actions
@@ -43,9 +49,8 @@ export const useAuthStore = create<AuthStore>()(
             error: null,
           });
 
-          // Store tokens in localStorage
-          localStorage.setItem('access_token', response.access_token);
-          localStorage.setItem('refresh_token', response.refresh_token);
+          // Store tokens using utility
+          setTokens(response.access_token, response.refresh_token);
         },
 
         loginWithGoogle: (response: GoogleOAuthResponse) => {
@@ -56,17 +61,15 @@ export const useAuthStore = create<AuthStore>()(
             error: null,
           });
 
-          // Store tokens in localStorage
-          localStorage.setItem('access_token', response.access_token);
-          localStorage.setItem('refresh_token', response.refresh_token);
+          // Store tokens using utility
+          setTokens(response.access_token, response.refresh_token);
         },
 
         logout: () => {
           set(initialState);
 
-          // Clear tokens from localStorage
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('refresh_token');
+          // Clear tokens using utility
+          clearTokens();
         },
 
         setLoading: (loading: boolean) => {
@@ -81,24 +84,11 @@ export const useAuthStore = create<AuthStore>()(
           set({ error: null });
         },
 
-        // Token management
-        getAccessToken: () => {
-          return localStorage.getItem('access_token');
-        },
-
-        getRefreshToken: () => {
-          return localStorage.getItem('refresh_token');
-        },
-
-        setTokens: (accessToken: string, refreshToken: string) => {
-          localStorage.setItem('access_token', accessToken);
-          localStorage.setItem('refresh_token', refreshToken);
-        },
-
-        clearTokens: () => {
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('refresh_token');
-        },
+        // Token management - delegate to utility
+        getAccessToken,
+        getRefreshToken,
+        setTokens,
+        clearTokens,
 
         // User management
         updateUser: (userData: Partial<AuthState['user']>) => {

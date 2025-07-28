@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
 
     return config;
   },
-  plugins: ['@tailwindcss/postcss'],
+  // plugins: ['@tailwindcss/postcss'], // Removed invalid plugin
   images: {
     domains: ['picsum.photos', 'randomuser.me'],
   },

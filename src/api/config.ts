@@ -1,18 +1,48 @@
-import { OpenAPI } from './generated/core/OpenAPI';
+import { OpenAPI } from './generated';
 
-// API 설정 초기화
-export const initializeApiConfig = () => {
-  // BASE URL 설정
-  OpenAPI.BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://dev.decoded.style';
+// Development mode check
+const isDevelopment = process.env.NODE_ENV === 'development';
 
-  // 인증 토큰 설정 (필요시)
-  // OpenAPI.TOKEN = () => getAuthToken();
+// API configuration
+export const configureApi = () => {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://dev.decoded.style';
 
-  // 헤더 설정 (필요시)
-  // OpenAPI.HEADERS = {
-  //   'Content-Type': 'application/json',
-  // };
+  OpenAPI.BASE = baseUrl;
+  OpenAPI.WITH_CREDENTIALS = false;
+  OpenAPI.CREDENTIALS = 'omit';
+
+  // Set token from localStorage if available (client-side only)
+  if (typeof window !== 'undefined') {
+    try {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        OpenAPI.TOKEN = token;
+      }
+    } catch (error) {
+      console.warn('Failed to get access token:', error);
+    }
+  }
+
+  if (isDevelopment) {
+    console.log('🔧 API configured:', {
+      BASE: OpenAPI.BASE,
+      WITH_CREDENTIALS: OpenAPI.WITH_CREDENTIALS,
+      CREDENTIALS: OpenAPI.CREDENTIALS,
+      TOKEN: OpenAPI.TOKEN ? '***' : 'undefined',
+    });
+  }
 };
 
-// API 설정을 초기화하는 함수 export
-export { OpenAPI };
+// Set API headers
+export const setApiHeaders = (headers: Record<string, string>) => {
+  OpenAPI.HEADERS = headers;
+};
+
+// Set API token
+export const setApiToken = (token: string | null) => {
+  if (token) {
+    OpenAPI.TOKEN = token;
+  } else {
+    OpenAPI.TOKEN = undefined;
+  }
+};

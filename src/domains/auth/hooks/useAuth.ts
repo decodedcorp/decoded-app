@@ -1,3 +1,4 @@
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   useAuthStore,
   selectUser,
@@ -8,39 +9,87 @@ import {
   selectUserName,
   selectUserEmail,
 } from '../../../store/authStore';
+import { queryKeys } from '../../../lib/api/queryKeys';
+import { getUserProfile } from '../api/authApi';
+import { getAccessToken, isTokenExpired } from '../utils/tokenManager';
+import { useLogin, useGoogleOAuth, useLogout } from './useAuthMutations';
 
 /**
- * 인증 상태와 관련 액션들을 제공하는 메인 훅
+ * Main hook providing authentication state and related actions
+ * Integrates React Query with Zustand for comprehensive state management
  */
 export const useAuth = () => {
+  const queryClient = useQueryClient();
   const authStore = useAuthStore();
+
+  // Fetch user profile (only when token exists)
+  const { data: userProfile, isLoading: isProfileLoading } = useQuery({
+    queryKey: queryKeys.auth.user,
+    queryFn: getUserProfile,
+    enabled: !!getAccessToken() && !isTokenExpired(getAccessToken()!),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: (failureCount, error) => {
+      // Don't retry on 401 errors
+      if (error instanceof Error && error.message.includes('401')) {
+        return false;
+      }
+      return failureCount < 3;
+    },
+  });
+
+  // React Query mutations
+  const loginMutation = useLogin();
+  const googleOAuthMutation = useGoogleOAuth();
+  const logoutMutation = useLogout();
+
+  // Zustand state selectors
+  const user = selectUser(authStore);
+  const isAuthenticated = selectIsAuthenticated(authStore);
+  const isLoading = selectIsLoading(authStore);
+  const error = selectError(authStore);
+  const userRole = selectUserRole(authStore);
+  const userName = selectUserName(authStore);
+  const userEmail = selectUserEmail(authStore);
+
+  // Actions
+  const login = authStore.login;
+  const loginWithGoogle = authStore.loginWithGoogle;
+  const logout = authStore.logout;
+  const setLoading = authStore.setLoading;
+  const setError = authStore.setError;
+  const clearError = authStore.clearError;
+  const updateUser = authStore.updateUser;
 
   return {
     // State
-    user: useAuthStore(selectUser),
-    isAuthenticated: useAuthStore(selectIsAuthenticated),
-    isLoading: useAuthStore(selectIsLoading),
-    error: useAuthStore(selectError),
+    user,
+    isAuthenticated,
+    isLoading,
+    error,
+    userRole,
+    userName,
+    userEmail,
+    userProfile,
+    isProfileLoading,
 
     // Actions
-    login: authStore.login,
-    loginWithGoogle: authStore.loginWithGoogle,
-    logout: authStore.logout,
-    setLoading: authStore.setLoading,
-    setError: authStore.setError,
-    clearError: authStore.clearError,
-    updateUser: authStore.updateUser,
+    login,
+    loginWithGoogle,
+    logout,
+    setLoading,
+    setError,
+    clearError,
+    updateUser,
 
-    // Token management
-    getAccessToken: authStore.getAccessToken,
-    getRefreshToken: authStore.getRefreshToken,
-    setTokens: authStore.setTokens,
-    clearTokens: authStore.clearTokens,
+    // Mutations
+    loginMutation,
+    googleOAuthMutation,
+    logoutMutation,
   };
 };
 
 /**
- * 사용자 정보만 필요한 경우 사용하는 훅
+ * Hook for cases where only user information is needed
  */
 export const useUser = () => {
   return {
@@ -53,7 +102,7 @@ export const useUser = () => {
 };
 
 /**
- * 인증 상태만 필요한 경우 사용하는 훅
+ * Hook for cases where only authentication status is needed
  */
 export const useAuthStatus = () => {
   return {
@@ -64,28 +113,28 @@ export const useAuthStatus = () => {
 };
 
 /**
- * 로딩 상태만 필요한 경우 사용하는 훅
+ * Hook for cases where only loading state is needed
  */
 export const useAuthLoading = () => {
   return useAuthStore(selectIsLoading);
 };
 
 /**
- * 에러 상태만 필요한 경우 사용하는 훅
+ * Hook for cases where only error state is needed
  */
 export const useAuthError = () => {
   return useAuthStore(selectError);
 };
 
 /**
- * 사용자 역할을 확인하는 훅
+ * Hook to check user role
  */
 export const useUserRole = () => {
   return useAuthStore(selectUserRole);
 };
 
 /**
- * 특정 역할을 가졌는지 확인하는 훅
+ * Hook to check if user has a specific role
  */
 export const useHasRole = (requiredRole: string) => {
   const userRole = useAuthStore(selectUserRole);
@@ -95,14 +144,14 @@ export const useHasRole = (requiredRole: string) => {
 };
 
 /**
- * 관리자 권한을 확인하는 훅
+ * Hook to check if user is admin
  */
 export const useIsAdmin = () => {
   return useHasRole('admin');
 };
 
 /**
- * 사용자 권한을 확인하는 훅
+ * Hook to check if user has user role
  */
 export const useIsUser = () => {
   return useHasRole('user');

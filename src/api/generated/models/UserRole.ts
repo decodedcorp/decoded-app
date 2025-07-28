@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export enum UserRole {
-    ADMIN = 'admin',
-    CONTENT_MANAGER = 'content_manager',
     USER = 'user',
+    ADMIN = 'admin',
 }

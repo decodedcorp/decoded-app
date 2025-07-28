@@ -1,5 +1,9 @@
 import { MainPage } from '@/domains/main';
 
 export default function Page() {
-  return <MainPage />;
+  return (
+    <div>
+      <MainPage />
+    </div>
+  );
 }

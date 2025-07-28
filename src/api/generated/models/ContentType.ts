@@ -2,7 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+/**
+ * Content type enumeration for feeds
+ */
 export enum ContentType {
-    MAIN_PAGE = 'main_page',
-    DETAIL_PAGE = 'detail_page',
+    LINK = 'link',
+    IMAGE = 'image',
+    VIDEO = 'video',
 }
