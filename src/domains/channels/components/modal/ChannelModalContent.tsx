@@ -324,11 +324,11 @@ export function ChannelModalContent() {
               )}
 
               {/* Category badge */}
-              <div className="absolute top-3 left-3 z-10">
+              {/* <div className="absolute top-3 left-3 z-10">
                 <span className="px-3 py-1.5 bg-white/20 backdrop-blur-sm text-white text-xs font-medium rounded-full border border-white/10 transition-all duration-300 group-hover:bg-white/30 group-hover:border-white/20 group-hover:scale-105 group-hover:shadow-lg">
                   {item.category}
                 </span>
-              </div>
+              </div> */}
 
               {/* Content info overlay */}
               <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">

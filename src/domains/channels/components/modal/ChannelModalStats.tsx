@@ -7,9 +7,9 @@ interface ChannelModalStatsProps {
 
 export function ChannelModalStats({ channel }: ChannelModalStatsProps) {
   return (
-    <div className="flex flex-col lg:flex-row gap-8 mb-8">
+    <div className="mb-8">
       {/* Stats */}
-      <div className="flex space-x-6">
+      <div className="flex space-x-6 mb-4">
         <div className="text-center">
           <div className="text-2xl font-bold text-white">{channel.followers}</div>
           <div className="text-zinc-400 text-sm">Followers</div>
@@ -26,24 +26,12 @@ export function ChannelModalStats({ channel }: ChannelModalStatsProps) {
 
       {/* Tags */}
       <div className="flex flex-wrap gap-2">
-        <span className="inline-block bg-zinc-800 px-4 py-2 rounded-full text-zinc-300 text-sm">
-          {channel.category}
-        </span>
-        <span className="inline-block bg-zinc-800 px-4 py-2 rounded-full text-zinc-300 text-sm">
-          Design
-        </span>
-        <span className="inline-block bg-zinc-800 px-4 py-2 rounded-full text-zinc-300 text-sm">
-          Art
-        </span>
-        <span className="inline-block bg-zinc-800 px-4 py-2 rounded-full text-zinc-300 text-sm">
-          Technology
-        </span>
-        <span className="inline-block bg-zinc-800 px-4 py-2 rounded-full text-zinc-300 text-sm">
-          Creative
-        </span>
-        <span className="inline-block bg-zinc-800 px-4 py-2 rounded-full text-zinc-300 text-sm">
-          Innovation
-        </span>
+        <span className="text-zinc-400 text-xs">#{channel.category}</span>
+        <span className="text-zinc-400 text-xs">#Design</span>
+        <span className="text-zinc-400 text-xs">#Art</span>
+        <span className="text-zinc-400 text-xs">#Technology</span>
+        <span className="text-zinc-400 text-xs">#Creative</span>
+        <span className="text-zinc-400 text-xs">#Innovation</span>
       </div>
     </div>
   );
