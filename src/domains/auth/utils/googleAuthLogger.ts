@@ -19,13 +19,11 @@ export class GoogleAuthLogger {
   }
 
   /**
-   * Sui 주소 생성 과정 로깅
+   * Sui 주소 생성 로그
    */
   static logSuiAddressGeneration(sub: string, suiAddress: string): void {
-    if (!this.shouldLog()) return;
-
     console.log('[Google OAuth] Sub value:', sub);
-    console.log('[Google OAuth] Generated sui_address:', suiAddress);
+    console.log('[Google OAuth] Sui address:', suiAddress);
   }
 
   /**

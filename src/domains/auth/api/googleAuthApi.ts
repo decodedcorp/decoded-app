@@ -1,4 +1,5 @@
 import { hash } from '@/lib/utils/hash';
+import { UsersService } from '../../../api/generated/services/UsersService';
 
 export interface GoogleTokenData {
   access_token: string;
@@ -23,7 +24,7 @@ export interface GoogleTokenPayload {
 
 export interface BackendLoginRequest {
   jwt_token: string;
-  sui_address: string;
+  sui_address?: string; // 선택적으로 변경
   email: string;
   marketing: boolean;
 }
@@ -94,6 +95,7 @@ export class GoogleAuthApi {
 
   /**
    * Google ID 토큰의 sub 값을 기반으로 Sui 주소 생성
+   * 백엔드 요구사항으로 임시 생성에 사용
    */
   static generateSuiAddress(sub: string): string {
     return `0x${hash(sub).substring(0, 40)}`;
@@ -155,5 +157,16 @@ export class GoogleAuthApi {
       }
       return backendData.user;
     }
+  }
+
+  /**
+   * 백엔드 로그인 API 호출 (sui_address 업데이트는 클라이언트에서 처리)
+   */
+  static async callBackendLoginWithSuiAddressUpdate(
+    requestBody: BackendLoginRequest,
+  ): Promise<BackendLoginResponse> {
+    // 백엔드 로그인 API 호출만 수행
+    // sui_address 업데이트는 클라이언트에서 React Query를 통해 처리
+    return await this.callBackendLogin(requestBody);
   }
 }

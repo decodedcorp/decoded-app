@@ -6,20 +6,20 @@ import { storeLoginResponse, clearSession, extractUserDocIdFromToken } from '../
 import { updateApiTokenFromStorage } from '../../../api/config';
 
 /**
- * Login user with JWT token and Sui address
+ * Login user with JWT token and optional sui_address
  */
-export const loginUser = async (jwtToken: string, suiAddress: string, email?: string) => {
+export const loginUser = async (jwtToken: string, suiAddress?: string, email?: string) => {
   try {
     const loginData: LoginRequest = {
       jwt_token: jwtToken,
-      sui_address: suiAddress,
+      sui_address: suiAddress || '', // 초기 로그인 시에는 빈 문자열 전송
       email: email || null,
     };
 
     if (process.env.NODE_ENV === 'development') {
       console.log('[Auth] Login request:', {
         jwtToken: jwtToken.substring(0, 10) + '...',
-        suiAddress: suiAddress.substring(0, 10) + '...',
+        suiAddress: suiAddress ? suiAddress.substring(0, 10) + '...' : 'empty string',
         email: email || 'not provided',
       });
     }

@@ -24,16 +24,16 @@ export async function POST(request: NextRequest) {
 
     const { email, sub, iss, aud } = payload;
 
-    // 3. Sui 주소 및 해시된 토큰 생성
-    const suiAddress = GoogleAuthApi.generateSuiAddress(sub);
+    // 3. 해시된 토큰 생성 및 임시 sui_address 생성 (백엔드 요구사항)
     const hashedToken = GoogleAuthApi.generateHashedToken(sub, iss, aud);
+    const tempSuiAddress = GoogleAuthApi.generateSuiAddress(sub); // 임시 생성
 
-    GoogleAuthLogger.logSuiAddressGeneration(sub, suiAddress);
+    GoogleAuthLogger.logSuiAddressGeneration(sub, tempSuiAddress);
 
-    // 4. 백엔드 API 요청 준비
+    // 4. 백엔드 API 요청 준비 (백엔드 요구사항으로 sui_address 포함)
     const backendRequestBody = {
       jwt_token: hashedToken,
-      sui_address: suiAddress,
+      sui_address: tempSuiAddress, // 백엔드에서 필수로 요구
       email: email,
       marketing: false,
     };
@@ -41,8 +41,10 @@ export async function POST(request: NextRequest) {
     const hashInput = `${sub}${iss}${aud}`;
     GoogleAuthLogger.logBackendRequest(backendRequestBody, hashInput, hashedToken);
 
-    // 5. 백엔드 로그인 API 호출
-    const backendData = await GoogleAuthApi.callBackendLogin(backendRequestBody);
+    // 5. 백엔드 로그인 API 호출 (sui_address 업데이트 포함)
+    const backendData = await GoogleAuthApi.callBackendLoginWithSuiAddressUpdate(
+      backendRequestBody,
+    );
     GoogleAuthLogger.logBackendResponse(backendData);
 
     // 6. 사용자 객체 생성 또는 보완
