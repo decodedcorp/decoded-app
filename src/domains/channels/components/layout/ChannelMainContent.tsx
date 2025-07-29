@@ -5,6 +5,7 @@ import { ChannelHero } from '../hero/ChannelHero';
 import { AnimatedSection } from './AnimatedSection';
 import { MasonryGrid } from '../category-grid/MasonryGrid';
 import { ChannelModal, ContentModal } from '../modal';
+import { AddChannelModal } from '../modal/add-channel/AddChannelModal';
 
 interface ChannelMainContentProps {
   className?: string;
@@ -28,8 +29,6 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
     // 캡슐 라인 자연스러운 축소 애니메이션
     const maxScrollForHero = 600; // 더 긴 스크롤 거리로 부드러운 전환
     const scrollRatio = Math.max(0, Math.min(1, currentScrollY / maxScrollForHero));
-
-    console.log('Scroll Y:', currentScrollY, 'Ratio:', scrollRatio);
 
     // 각 라인별로 다른 시작점과 끝점 설정
     const newOpacities = [1, 1, 1, 1];
@@ -121,6 +120,9 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
 
       {/* Global Content Modal */}
       <ContentModal />
+
+      {/* Global Add Channel Modal */}
+      <AddChannelModal />
     </div>
   );
 }

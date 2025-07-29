@@ -13,6 +13,7 @@ import {
 import { MasonryItem, CtaCardType, EmptyItemType } from '../../types/masonry';
 import { cn } from '@/lib/utils/styles';
 import { useChannelModalStore } from '@/store/channelModalStore';
+import { useAddChannelStore } from '@/store/addChannelStore';
 import { ChannelData } from '../hero/heroData';
 
 // 타입 가드 함수들
@@ -41,11 +42,10 @@ interface MasonryGridProps {
 export function MasonryGrid({ onExpandChange }: MasonryGridProps) {
   const items = MOCK_ITEMS;
   const openModal = useChannelModalStore((state) => state.openModal);
+  const openAddChannelModal = useAddChannelStore((state) => state.openModal);
 
   const handleAddChannel = () => {
-    // TODO: 채널 추가 모달 또는 페이지로 이동하는 로직 구현
-    console.log('Add channel clicked');
-    alert('채널 추가 기능이 구현될 예정입니다!');
+    openAddChannelModal();
   };
 
   const handleChannelClick = (channel: MasonryItem) => {
