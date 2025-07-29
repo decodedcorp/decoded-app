@@ -85,29 +85,39 @@ export function ChannelModal() {
         isSidebarCollapsed={isSidebarCollapsed}
         onSidebarCollapseToggle={handleSidebarCollapseToggle}
       >
-        <ChannelModalHeader channel={finalChannel} onClose={closeModal} />
-
-        {/* Content */}
-        <div className="p-6 overflow-y-auto flex-1 min-h-0">
-          {isLoading && (
-            <div className="flex items-center justify-center h-32">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-            </div>
-          )}
-          {error && (
-            <div className="text-red-500 text-center p-4">채널 정보를 불러오는데 실패했습니다.</div>
-          )}
-          {!isLoading && !error && (
-            <>
-              <ChannelModalStats channel={finalChannel} />
-              <ChannelModalEditors />
-              <ChannelModalContent />
-              <ChannelModalRelated />
-            </>
-          )}
+        {/* Header */}
+        <div className="flex-shrink-0">
+          <ChannelModalHeader channel={finalChannel} onClose={closeModal} />
         </div>
 
-        <ChannelModalFooter />
+        {/* Main Content */}
+        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
+          <div className="p-6">
+            {isLoading && (
+              <div className="flex items-center justify-center h-32">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+              </div>
+            )}
+            {error && (
+              <div className="text-red-500 text-center p-4">
+                채널 정보를 불러오는데 실패했습니다.
+              </div>
+            )}
+            {!isLoading && !error && (
+              <>
+                <ChannelModalStats channel={finalChannel} />
+                <ChannelModalEditors />
+                <ChannelModalContent />
+                <ChannelModalRelated />
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex-shrink-0">
+          <ChannelModalFooter />
+        </div>
       </ChannelModalContainer>
     </BaseModal>
   );

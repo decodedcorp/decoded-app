@@ -38,9 +38,9 @@ export function ChannelModalSidebar({
   // 접힌 상태일 때 간단한 필터 버튼들
   if (isCollapsed) {
     return (
-      <div className="w-16 h-full border-r border-zinc-700/50 bg-zinc-900/50 flex flex-col animate-slide-in-left">
+      <div className="w-16 h-full border-r border-zinc-700/50 bg-zinc-900/50 flex flex-col animate-slide-in-left overflow-hidden">
         {/* 토글 버튼 */}
-        <div className="p-3 border-b border-zinc-700/50">
+        <div className="p-3 border-b border-zinc-700/50 flex-shrink-0">
           <button
             onClick={onToggleCollapse}
             className="w-10 h-10 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-all duration-200 flex items-center justify-center group"
@@ -63,7 +63,7 @@ export function ChannelModalSidebar({
         </div>
 
         {/* 간단한 필터 버튼들 - 스크롤 가능 */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-4 collapsed-sidebar-scroll">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-3 space-y-4 min-h-0">
           {/* Data Types - 핵심 3개만 표시 */}
           <div className="space-y-2">
             <div className="text-xs text-gray-400 text-center font-medium">DT</div>
@@ -174,9 +174,9 @@ export function ChannelModalSidebar({
 
   // 펼쳐진 상태
   return (
-    <div className="w-80 h-full border-r border-zinc-700/50 bg-zinc-900/50 flex flex-col animate-slide-in-left">
+    <div className="w-80 h-full border-r border-zinc-700/50 bg-zinc-900/50 flex flex-col animate-slide-in-left overflow-hidden">
       {/* 헤더 */}
-      <div className="p-4 border-b border-zinc-700/50 flex items-center justify-between">
+      <div className="p-4 border-b border-zinc-700/50 flex items-center justify-between flex-shrink-0">
         <h3 className="text-lg font-semibold text-white">Filters</h3>
         <button
           onClick={onToggleCollapse}
@@ -200,7 +200,7 @@ export function ChannelModalSidebar({
       </div>
 
       {/* 필터 컨텐츠 */}
-      <div className="flex-1 overflow-y-auto p-6">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 min-h-0">
         <div className="space-y-8">
           <div className="animate-stable-fade-in" style={{ animationDelay: '0.05s' }}>
             <DataTypesFilter
@@ -224,7 +224,7 @@ export function ChannelModalSidebar({
       {(currentFilters.dataTypes.length > 0 ||
         currentFilters.categories.length > 0 ||
         currentFilters.tags.length > 0) && (
-        <div className="p-4 border-t border-zinc-700/50 bg-zinc-800/30 animate-stable-fade-in">
+        <div className="p-4 border-t border-zinc-700/50 bg-zinc-800/30 animate-stable-fade-in flex-shrink-0">
           <div className="text-sm text-gray-300 mb-2">Active Filters:</div>
           <div className="flex flex-wrap gap-1">
             {currentFilters.dataTypes.length > 0 && (
