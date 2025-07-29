@@ -6,7 +6,12 @@ import {
   selectAddChannelFormData,
   selectAddChannelError,
 } from '@/store/addChannelStore';
-import { compressImage, validateImageFile } from '@/lib/utils/imageUtils';
+import {
+  compressImage,
+  validateImageFile,
+  logBase64Analysis,
+  getCompressionRecommendations,
+} from '@/lib/utils/imageUtils';
 
 interface AddChannelFormProps {
   onSubmit: (data: { name: string; description: string | null; thumbnail_base64?: string }) => void;
@@ -24,17 +29,6 @@ export function AddChannelForm({ onSubmit, isLoading, error }: AddChannelFormPro
     name?: string;
     description?: string;
   }>({});
-
-  // Debug: formData 상태 변화 추적
-  useEffect(() => {
-    console.log('FormData changed:', {
-      name: formData.name,
-      description: formData.description,
-      thumbnail_base64: formData.thumbnail_base64
-        ? `${formData.thumbnail_base64.substring(0, 50)}...`
-        : 'undefined',
-    });
-  }, [formData]);
 
   const handleInputChange = (field: 'name' | 'description', value: string) => {
     updateFormData({ [field]: value });
@@ -68,16 +62,34 @@ export function AddChannelForm({ onSubmit, isLoading, error }: AddChannelFormPro
       console.log('Starting image processing...');
       // Use new image utility for compression
       const optimizedBase64 = await compressImage(file, {
-        maxSizeBytes: 3 * 1024 * 1024, // 3MB
-        maxWidth: 1200,
-        maxHeight: 800,
-        quality: 0.9,
+        maxSizeBytes: 500 * 1024, // 500KB로 줄임 (기존 3MB)
+        maxWidth: 800, // 1200에서 800으로 줄임
+        maxHeight: 600, // 800에서 600으로 줄임
+        quality: 0.8, // 0.9에서 0.8로 줄임
         format: 'jpeg',
         includeDataPrefix: true, // 백엔드에서 data: 접두어를 기대하는 것 같음
       });
 
       console.log('Image processed successfully, base64 length:', optimizedBase64?.length);
       console.log('Base64 starts with data:', optimizedBase64?.startsWith('data:'));
+
+      // 새로운 유틸 함수로 Base64 분석
+      if (optimizedBase64) {
+        logBase64Analysis(optimizedBase64, 'thumbnail');
+
+        // 압축 권장사항 확인
+        const compressionRecs = getCompressionRecommendations(optimizedBase64);
+        if (compressionRecs.needsCompression) {
+          console.warn('🔧 압축 권장사항:', compressionRecs.reasons);
+          console.log('💡 제안 설정:', {
+            quality: compressionRecs.suggestedQuality,
+            maxWidth: compressionRecs.suggestedMaxWidth,
+            maxHeight: compressionRecs.suggestedMaxHeight,
+            format: compressionRecs.suggestedFormat,
+          });
+        }
+      }
+
       updateFormData({ thumbnail_base64: optimizedBase64 });
       console.log('Form data updated with thumbnail_base64');
       setValidationErrors((prev) => ({ ...prev, description: undefined }));
