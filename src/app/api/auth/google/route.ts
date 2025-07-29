@@ -48,7 +48,14 @@ export async function POST(request: NextRequest) {
 
     // 토큰 페이로드 디코딩
     const payload = JSON.parse(Buffer.from(tokenParts[1], 'base64').toString());
-    const { email } = payload;
+
+    // 개발 환경에서 토큰 페이로드 전체 로깅
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Google OAuth] Full token payload:', payload);
+      console.log('[Google OAuth] Available fields:', Object.keys(payload));
+    }
+
+    const { email, name, given_name, family_name } = payload;
 
     if (!email) {
       return NextResponse.json({ error: 'No email in token' }, { status: 400 });
@@ -62,8 +69,14 @@ export async function POST(request: NextRequest) {
       jwt_token: id_token, // Google ID 토큰을 그대로 전달
       sui_address: suiAddress,
       email: email,
+      name: name || given_name || family_name || email.split('@')[0], // ✅ name이 없으면 given_name, family_name, 또는 이메일 앞부분 사용
       marketing: false,
     };
+
+    // 개발 환경에서 백엔드 요청 로깅
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Google OAuth] Backend request body:', backendRequestBody);
+    }
 
     const backendRequestHeaders = {
       'Content-Type': 'application/json',
@@ -86,6 +99,39 @@ export async function POST(request: NextRequest) {
     }
 
     const backendData = await backendResponse.json();
+
+    // 개발 환경에서 백엔드 응답 로깅
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Google OAuth] Backend response:', backendData);
+    }
+
+    // ✅ 백엔드 응답에 user 객체가 없는 경우 생성
+    if (!backendData.user) {
+      const extractedName = name || given_name || family_name || email.split('@')[0];
+
+      backendData.user = {
+        doc_id: backendData.access_token?.user_doc_id || null,
+        email: email,
+        nickname: extractedName,
+        role: 'user', // 기본 역할
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[Google OAuth] Created user object from token:', backendData.user);
+      }
+    } else {
+      // ✅ 백엔드 응답에 name이 없는 경우 Google ID 토큰에서 추출한 name 사용
+      if (!backendData.user.nickname && !backendData.user.name) {
+        const extractedName = name || given_name || family_name || email.split('@')[0];
+        backendData.user.nickname = extractedName;
+
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[Google OAuth] Setting nickname from token:', extractedName);
+        }
+      }
+    }
 
     // 성공 응답
     return NextResponse.json({

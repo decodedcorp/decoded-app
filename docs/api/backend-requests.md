@@ -457,3 +457,120 @@ Access-Control-Allow-Credentials: true
 - [ ] 프론트엔드/백엔드 개발 주기 및 배포 계획 공유
 
 위 목록은 백엔드와의 정기 미팅에서 하나씩 체크하며 진행하는 것을 추천합니다.
+
+#### 1.1 Google OAuth 로그인 시 name 필드 지원 ⚠️
+
+**현재 문제:**
+
+1. Google OAuth 로그인 시 사용자 이름(nickname)을 받아오지 못함
+2. **백엔드 응답에 `user` 객체가 완전히 누락됨** - 이는 프론트엔드에서 사용자 정보를 표시할 수 없게 만듦
+
+**요청사항:**
+
+```yaml
+POST /auth/login
+summary: Google OAuth 로그인
+description: Google OAuth를 통한 로그인 처리
+
+requestBody:
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - jwt_token
+          - sui_address
+        properties:
+          jwt_token:
+            type: string
+            description: Google ID 토큰
+          sui_address:
+            type: string
+            description: 사용자 Sui 주소
+          email:
+            type: string
+            description: 사용자 이메일
+          name: # ✅ 새로 추가 요청
+            type: string
+            description: Google OAuth에서 받아온 사용자 이름
+          marketing:
+            type: boolean
+            description: 마케팅 동의 여부
+
+responses:
+  '200':
+    description: 로그인 성공
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - access_token
+            - user # ✅ user 객체 필수 포함
+          properties:
+            access_token:
+              type: object
+              properties:
+                salt: { type: string }
+                user_doc_id: { type: string }
+                access_token: { type: string }
+                has_sui_address: { type: boolean }
+            refresh_token:
+              type: string
+            user: # ✅ 필수 필드로 추가
+              type: object
+              required:
+                - doc_id
+                - email
+                - nickname
+              properties:
+                doc_id:
+                  type: string
+                  description: 사용자 문서 ID
+                email:
+                  type: string
+                  description: 사용자 이메일
+                nickname:
+                  type: string
+                  description: 사용자 닉네임 (Google OAuth에서 받아온 이름)
+                role:
+                  type: string
+                  enum: [user, admin]
+                  default: user
+                created_at:
+                  type: string
+                  format: date-time
+                updated_at:
+                  type: string
+                  format: date-time
+            token_type:
+              type: string
+              default: bearer
+```
+
+**현재 백엔드 응답 (문제):**
+
+```json
+{
+  "access_token": { ... },
+  "token_type": "bearer"
+}
+```
+
+**요청하는 응답 구조:**
+
+```json
+{
+  "access_token": { ... },
+  "refresh_token": "...",
+  "user": {
+    "doc_id": "688870ada946f865da94b8c7",
+    "email": "baekki0130@gmail.com",
+    "nickname": "kiyori (Kiyori)",
+    "role": "user",
+    "created_at": "2024-01-28T10:30:05.000Z",
+    "updated_at": "2024-01-28T10:30:05.000Z"
+  },
+  "token_type": "bearer"
+}
+```
