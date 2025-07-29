@@ -12,7 +12,7 @@ import { BaseModal } from '../base/BaseModal';
 import { ChannelModalContainer } from '../base/ChannelModalContainer';
 import { ChannelModalHeader } from './ChannelModalHeader';
 import { ChannelModalStats } from './ChannelModalStats';
-import { ChannelModalContributors } from './ChannelModalContributors';
+import { ChannelModalEditors } from './ChannelModalEditors';
 import { ChannelModalContent } from './ChannelModalContent';
 import { ChannelModalRelated } from './ChannelModalRelated';
 import { ChannelModalFooter } from './ChannelModalFooter';
@@ -86,14 +86,12 @@ export function ChannelModal() {
             </div>
           )}
           {error && (
-            <div className="text-red-500 text-center p-4">
-              채널 정보를 불러오는데 실패했습니다.
-            </div>
+            <div className="text-red-500 text-center p-4">채널 정보를 불러오는데 실패했습니다.</div>
           )}
           {!isLoading && !error && (
             <>
               <ChannelModalStats channel={finalChannel} />
-              <ChannelModalContributors />
+              <ChannelModalEditors />
               <ChannelModalContent />
               <ChannelModalRelated />
             </>

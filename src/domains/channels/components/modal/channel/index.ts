@@ -1,7 +1,7 @@
 export { ChannelModal } from './ChannelModal';
 export { ChannelModalHeader } from './ChannelModalHeader';
 export { ChannelModalStats } from './ChannelModalStats';
-export { ChannelModalContributors } from './ChannelModalContributors';
+export { ChannelModalEditors } from './ChannelModalEditors';
 export { ChannelModalContent } from './ChannelModalContent';
 export { ChannelModalRelated } from './ChannelModalRelated';
 export { ChannelModalFooter } from './ChannelModalFooter';
