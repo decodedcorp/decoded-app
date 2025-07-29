@@ -14,34 +14,50 @@ export const useAuthChannelSync = () => {
     const handleMessage = (event: MessageEvent<AuthMessage>) => {
       const { type, payload, timestamp } = event.data;
 
-      console.log(
-        `[AuthChannel] Received ${type} event at ${new Date(timestamp || 0).toISOString()}`,
-        { payload },
-      );
+      if (process.env.NODE_ENV === 'development') {
+        console.log(
+          `[AuthChannel] Received ${type} event at ${new Date(timestamp || 0).toISOString()}`,
+          { payload },
+        );
+      }
 
       switch (type) {
         case 'login':
           // 메시지에 user 정보가 포함된 경우 직접 사용
           if (payload?.user) {
-            console.log('[AuthChannel] Using user data from message payload:', payload.user);
+            if (process.env.NODE_ENV === 'development') {
+              console.log('[AuthChannel] Using user data from message payload:', payload.user);
+            }
             setUser(payload.user);
-            console.log('[AuthChannel] Login state synced from message payload:', payload.user);
+            if (process.env.NODE_ENV === 'development') {
+              console.log('[AuthChannel] Login state synced from message payload:', payload.user);
+            }
           } else {
             // 메시지에 user 정보가 없는 경우 sessionStorage에서 가져오기
-            console.log('[AuthChannel] No user data in message, checking sessionStorage...');
+            if (process.env.NODE_ENV === 'development') {
+              console.log('[AuthChannel] No user data in message, checking sessionStorage...');
+            }
             if (typeof window !== 'undefined') {
               const userFromSession = sessionStorage.getItem('user');
               if (userFromSession) {
                 try {
                   const user = JSON.parse(userFromSession);
-                  console.log('[AuthChannel] Found user data in sessionStorage:', user);
+                  if (process.env.NODE_ENV === 'development') {
+                    console.log('[AuthChannel] Found user data in sessionStorage:', user);
+                  }
                   setUser(user);
-                  console.log('[AuthChannel] Login state synced from sessionStorage:', user);
+                  if (process.env.NODE_ENV === 'development') {
+                    console.log('[AuthChannel] Login state synced from sessionStorage:', user);
+                  }
                 } catch (error) {
-                  console.error('[AuthChannel] Failed to parse user from sessionStorage:', error);
+                  if (process.env.NODE_ENV === 'development') {
+                    console.error('[AuthChannel] Failed to parse user from sessionStorage:', error);
+                  }
                 }
               } else {
-                console.warn('[AuthChannel] No user data found in sessionStorage for login sync');
+                if (process.env.NODE_ENV === 'development') {
+                  console.warn('[AuthChannel] No user data found in sessionStorage for login sync');
+                }
               }
             }
           }
@@ -49,12 +65,16 @@ export const useAuthChannelSync = () => {
 
         case 'logout':
         case 'token-expired':
-          console.log(`[AuthChannel] Processing ${type} event, logging out...`);
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`[AuthChannel] Processing ${type} event, logging out...`);
+          }
           logout();
           break;
 
         default:
-          console.warn(`[AuthChannel] Unknown event type: ${type}`);
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(`[AuthChannel] Unknown event type: ${type}`);
+          }
       }
     };
 

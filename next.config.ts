@@ -17,14 +17,15 @@ const nextConfig: NextConfig = {
   images: {
     domains: ['picsum.photos', 'randomuser.me'],
   },
-  async rewrites() {
-    return [
-      {
-        source: '/api/proxy/:path*',
-        destination: 'https://dev.decoded.style/:path*',
-      },
-    ];
-  },
+  // Removed rewrites to avoid conflict with API routes
+  // async rewrites() {
+  //   return [
+  //     {
+  //       source: '/api/proxy/:path*',
+  //       destination: 'https://dev.decoded.style/:path*',
+  //     },
+  //   ];
+  // },
 };
 
 export default nextConfig;

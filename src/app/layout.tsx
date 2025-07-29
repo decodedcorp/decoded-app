@@ -5,6 +5,7 @@ import { QueryProvider } from '../lib/providers/QueryProvider';
 import { useAuthLifecycle } from '../domains/auth/hooks/useAuthLifecycle';
 import { configureApi } from '../api/config';
 import { Header } from '../shared/components/Header';
+import { TokenDebugger } from '../domains/auth/components/TokenDebugger';
 import '../styles/globals.css';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <QueryProvider>
           <Header />
           {children}
+          <TokenDebugger />
         </QueryProvider>
       </body>
     </html>

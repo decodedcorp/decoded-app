@@ -46,25 +46,36 @@ const getLocalStorage = () => {
 };
 
 /**
- * Set access token in sessionStorage
+ * Set access token in localStorage (primary storage)
  */
 export const setAccessToken = (token: string): void => {
   if (!token) {
     throw new TokenError('Access token cannot be empty');
   }
 
-  const storage = getSessionStorage();
+  const storage = getLocalStorage();
   if (storage) {
     storage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Auth] Access token stored in localStorage');
+    }
   }
 };
 
 /**
- * Get access token from sessionStorage
+ * Get access token from localStorage (primary storage)
  */
 export const getAccessToken = (): string | null => {
-  const storage = getSessionStorage();
-  return storage ? storage.getItem(STORAGE_KEYS.ACCESS_TOKEN) : null;
+  const localStorage = getLocalStorage();
+
+  // localStorage에서 토큰 확인 (primary storage)
+  const token = localStorage ? localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN) : null;
+
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[Auth] getAccessToken result:', token ? 'found' : 'not found');
+  }
+
+  return token;
 };
 
 /**
@@ -228,6 +239,7 @@ export const clearTokens = (): void => {
   }
 
   if (localStorage) {
+    localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
     localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
     localStorage.removeItem(STORAGE_KEYS.LAST_TOKEN_CHECK);
   }
@@ -265,10 +277,10 @@ export const getValidAccessToken = (): string | null => {
 
   if (isTokenExpired(token)) {
     console.warn('[Auth] Access token is expired');
-    // 만료된 토큰 제거
-    const sessionStorage = getSessionStorage();
-    if (sessionStorage) {
-      sessionStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+    // 만료된 토큰 제거 (localStorage에서)
+    const localStorage = getLocalStorage();
+    if (localStorage) {
+      localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
     }
     return null;
   }
@@ -334,3 +346,41 @@ function jwtDecode<T>(token: string): T {
     throw new TokenError('Failed to decode JWT token');
   }
 }
+
+/**
+ * Force update access token (for debugging/testing)
+ */
+export const forceUpdateAccessToken = (newToken: string): void => {
+  const localStorage = getLocalStorage();
+  if (localStorage) {
+    localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, newToken);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Auth] Access token force updated');
+    }
+  }
+};
+
+/**
+ * Get token info for debugging
+ */
+export const getTokenInfo = () => {
+  const token = getAccessToken();
+  if (!token) {
+    return { hasToken: false, isExpired: true, expiresIn: 0 };
+  }
+
+  try {
+    const decoded = jwtDecode<DecodedToken>(token);
+    const currentTime = Math.floor(Date.now() / 1000);
+    const expiresIn = decoded.exp - currentTime;
+
+    return {
+      hasToken: true,
+      isExpired: expiresIn <= 0,
+      expiresIn,
+      payload: decoded,
+    };
+  } catch (error) {
+    return { hasToken: true, isExpired: true, expiresIn: 0, error: 'Failed to decode' };
+  }
+};

@@ -25,6 +25,12 @@ export const queryKeys = {
     details: () => [...queryKeys.channels.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.channels.details(), id] as const,
     stats: (id: string) => [...queryKeys.channels.detail(id), 'stats'] as const,
+    // Mutation states
+    mutations: () => [...queryKeys.channels.all, 'mutations'] as const,
+    create: () => [...queryKeys.channels.mutations(), 'create'] as const,
+    update: (id: string) => [...queryKeys.channels.mutations(), 'update', id] as const,
+    delete: (id: string) => [...queryKeys.channels.mutations(), 'delete', id] as const,
+    thumbnail: (id: string) => [...queryKeys.channels.mutations(), 'thumbnail', id] as const,
   },
 
   // Contents related queries

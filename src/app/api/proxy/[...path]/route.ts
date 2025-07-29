@@ -45,9 +45,13 @@ export async function PATCH(
 async function handleRequest(request: NextRequest, pathSegments: string[], method: string) {
   try {
     const path = pathSegments.join('/');
-    const url = `${API_BASE_URL}/${path}`;
+    // URL 끝의 슬래시 문제 해결
+    const url = path ? `${API_BASE_URL}/${path}` : API_BASE_URL;
 
-    console.log(`[Proxy] ${method} ${url}`);
+    // Log basic request info in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[Proxy] ${method} ${url}`);
+    }
 
     // 요청 헤더 복사 (중요한 헤더만)
     const headers = new Headers();
@@ -60,9 +64,36 @@ async function handleRequest(request: NextRequest, pathSegments: string[], metho
     }
 
     // Authorization 헤더 복사
-    const authorization = originalHeaders.get('authorization');
+    const authorization =
+      originalHeaders.get('authorization') || originalHeaders.get('Authorization');
     if (authorization) {
       headers.set('authorization', authorization);
+
+      // 토큰 디코딩 시도 (개발 환경에서만)
+      if (process.env.NODE_ENV === 'development') {
+        try {
+          const token = authorization.replace('Bearer ', '');
+          const base64Url = token.split('.')[1];
+          const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+          const jsonPayload = decodeURIComponent(
+            atob(base64)
+              .split('')
+              .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+              .join(''),
+          );
+          const decoded = JSON.parse(jsonPayload);
+          const currentTime = Math.floor(Date.now() / 1000);
+          console.log(`[Proxy] Token decoded:`, {
+            exp: decoded.exp,
+            currentTime,
+            isExpired: currentTime > decoded.exp,
+            sub: decoded.sub,
+            role: decoded.role,
+          });
+        } catch (error) {
+          console.log(`[Proxy] Failed to decode token:`, error);
+        }
+      }
     }
 
     // User-Agent 설정
@@ -81,21 +112,43 @@ async function handleRequest(request: NextRequest, pathSegments: string[], metho
       urlWithQuery.searchParams.set(key, value);
     });
 
-    console.log(`[Proxy] Making request to: ${urlWithQuery.toString()}`);
+    // trailing slash 문제 해결 - 원본 요청의 끝 슬래시 유지
+    const originalPath = request.nextUrl.pathname;
 
-    // 실제 API 요청
-    const response = await fetch(urlWithQuery.toString(), {
+    if (originalPath.endsWith('/') && !urlWithQuery.pathname.endsWith('/')) {
+      urlWithQuery.pathname += '/';
+    }
+
+    // 실제 API 요청 (리다이렉트 수동 처리)
+    let response = await fetch(urlWithQuery.toString(), {
       method,
       headers,
       body,
+      redirect: 'manual', // 리다이렉트 수동 처리
     });
 
-    console.log(`[Proxy] Response status: ${response.status}`);
+    // 리다이렉트 처리
+    if (
+      response.status === 301 ||
+      response.status === 302 ||
+      response.status === 307 ||
+      response.status === 308
+    ) {
+      const location = response.headers.get('location');
+      if (location) {
+        response = await fetch(location, {
+          method,
+          headers,
+          body,
+        });
+      }
+    }
 
-    // 응답 헤더 복사 (CORS 관련 헤더 제외)
+    // 응답 헤더 복사
     const responseHeaders = new Headers();
     response.headers.forEach((value, key) => {
-      if (!key.toLowerCase().includes('access-control')) {
+      // CORS 헤더는 제외하고 복사
+      if (!key.toLowerCase().startsWith('access-control-')) {
         responseHeaders.set(key, value);
       }
     });
@@ -103,14 +156,13 @@ async function handleRequest(request: NextRequest, pathSegments: string[], metho
     // CORS 헤더 추가
     responseHeaders.set('Access-Control-Allow-Origin', '*');
     responseHeaders.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-    responseHeaders.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    responseHeaders.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, User-Agent');
 
     // 응답 본문 처리
     const responseBody = await response.text();
 
     return new NextResponse(responseBody, {
       status: response.status,
-      statusText: response.statusText,
       headers: responseHeaders,
     });
   } catch (error) {

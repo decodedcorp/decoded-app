@@ -40,8 +40,10 @@ export const useAuthMutations = () => {
       }
       setUser(null as any);
       setError(null);
-      // Clear all queries
-      queryClient.clear();
+      // Clear specific auth-related queries instead of all queries
+      queryClient.removeQueries({ queryKey: queryKeys.auth.profile });
+      queryClient.removeQueries({ queryKey: queryKeys.auth.user });
+      queryClient.removeQueries({ queryKey: ['user'] });
     },
     onError: (error) => {
       if (process.env.NODE_ENV === 'development') {

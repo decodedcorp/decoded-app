@@ -7,11 +7,20 @@ import { updateApiTokenFromStorage } from '../../../api/config';
  * Hook to initialize and restore authentication state on app startup
  */
 export const useAuthInit = () => {
-  const { setLoading, setError, logout, setUser, isInitialized, setInitialized } = useAuthStore();
+  const { setLoading, setError, logout, setUser, isInitialized, setInitialized, isLoggingOut } =
+    useAuthStore();
 
   useEffect(() => {
     // 이미 초기화되었으면 다시 실행하지 않음
     if (isInitialized) {
+      return;
+    }
+
+    // 로그아웃 중이거나 로그아웃 직후에는 초기화하지 않음
+    if (isLoggingOut || sessionStorage.getItem('isLoggingOut') === 'true') {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[Auth] Skipping initialization during logout process');
+      }
       return;
     }
 

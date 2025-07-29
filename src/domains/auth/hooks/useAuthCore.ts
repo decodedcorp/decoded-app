@@ -32,9 +32,14 @@ export const useAuthCore = () => {
       const profile = await UsersService.getProfileUsersUserIdProfileGet(docId);
       return profile;
     },
-    enabled: isAuthenticated() && !!getValidAccessToken() && !!docId,
+    enabled:
+      isAuthenticated() &&
+      !!getValidAccessToken() &&
+      !!docId &&
+      authStore.isInitialized &&
+      !authStore.isLoggingOut,
     staleTime: TIMING.USER_PROFILE_STALE_TIME,
-    gcTime: TIMING.USER_PROFILE_GC_TIME,
+    gcTime: 0, // 로그아웃 시 즉시 캐시 정리
     retry: (failureCount, error) => {
       // 프로필 조회 실패 시 재시도 정책
       if (error instanceof AuthError && error.status === 401) {

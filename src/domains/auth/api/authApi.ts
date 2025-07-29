@@ -4,23 +4,63 @@ import { LoginRequest } from '../../../api/generated/models/LoginRequest';
 import { ResponseMapper } from '../utils/responseMapper';
 import { storeLoginResponse, clearSession, extractUserDocIdFromToken } from '../utils/tokenManager';
 import { updateApiTokenFromStorage } from '../../../api/config';
+import { jwtDecode } from 'jwt-decode';
+import { GoogleAuthApi } from './googleAuthApi';
+
+// Google OAuth JWT 타입
+interface GoogleJWT {
+  iss: string;
+  aud: string;
+  sub: string;
+  exp: number;
+  email: string;
+  given_name: string;
+}
 
 /**
  * Login user with JWT token and optional sui_address
+ * Modified to use backup's hashing approach
  */
 export const loginUser = async (jwtToken: string, suiAddress?: string, email?: string) => {
   try {
+    // JWT 디코딩
+    const decodedGoogle = jwtDecode<GoogleJWT>(jwtToken);
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Auth] Decoded Google token:', {
+        sub: decodedGoogle.sub,
+        iss: decodedGoogle.iss,
+        aud: decodedGoogle.aud,
+        email: decodedGoogle.email,
+        given_name: decodedGoogle.given_name,
+      });
+    }
+
+    // 필요한 값 추출
+    const { sub, iss, aud } = decodedGoogle;
+    if (!sub || !iss || !aud) {
+      throw new Error('[Auth] Missing required fields in decoded token');
+    }
+
+    // 해싱 (backup 방식과 동일) - GoogleAuthApi의 기존 함수 사용
+    const hashedToken = GoogleAuthApi.generateHashedToken(sub, iss, aud);
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Auth] Hash input:', `${sub}${iss}${aud}`);
+      console.log('[Auth] Hashed token:', hashedToken);
+    }
+
     const loginData: LoginRequest = {
-      jwt_token: jwtToken,
-      sui_address: suiAddress || '', // 초기 로그인 시에는 빈 문자열 전송
-      email: email || null,
+      jwt_token: hashedToken, // 해시된 토큰 사용
+      sui_address: suiAddress || '',
+      email: email || decodedGoogle.email || null,
     };
 
     if (process.env.NODE_ENV === 'development') {
       console.log('[Auth] Login request:', {
-        jwtToken: jwtToken.substring(0, 10) + '...',
+        hashedToken: hashedToken.substring(0, 10) + '...',
         suiAddress: suiAddress ? suiAddress.substring(0, 10) + '...' : 'empty string',
-        email: email || 'not provided',
+        email: email || decodedGoogle.email || 'not provided',
       });
     }
 

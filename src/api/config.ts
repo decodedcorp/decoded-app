@@ -110,4 +110,8 @@ export const configureApi = () => {
   // Tokens are retrieved on-demand in getRequestConfig
   console.log('[API Config] API configured for sessionStorage-based authentication');
   console.log('[API Config] Base URL:', API_BASE_URL);
+
+  // Configure OpenAPI with dynamic token resolver
+  // Note: OpenAPI configuration is now handled in useApi.ts
+  console.log('[API Config] OpenAPI configuration handled in useApi.ts');
 };

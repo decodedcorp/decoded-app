@@ -8,12 +8,14 @@ import {
   getUserData,
   isAuthenticated,
   getValidAccessToken,
+  storeLoginResponse,
 } from '../domains/auth/utils/tokenManager';
 import { AuthChannelUtils } from '../domains/auth/utils/authChannel';
 
-// AuthState를 확장하여 초기화 상태 추가
+// AuthState를 확장하여 초기화 상태와 로그아웃 상태 추가
 interface ExtendedAuthState extends AuthState {
   isInitialized: boolean; // 초기화 완료 여부
+  isLoggingOut: boolean; // 로그아웃 진행 중 여부
 }
 
 interface AuthStore extends ExtendedAuthState {
@@ -46,6 +48,7 @@ export const useAuthStore = create<AuthStore>()(
         error: null,
         isAuthenticated: false,
         isInitialized: false, // 초기화 완료 여부
+        isLoggingOut: false, // 로그아웃 진행 중 여부
 
         // Actions
         login: (response: LoginResponse) => {
@@ -59,7 +62,10 @@ export const useAuthStore = create<AuthStore>()(
                 status: response.user.status,
               };
 
-              // sessionStorage에 user 정보 저장
+              // 토큰과 사용자 정보를 sessionStorage에 저장
+              storeLoginResponse(response);
+
+              // sessionStorage에 user 정보 저장 (기존 호환성 유지)
               if (typeof window !== 'undefined') {
                 sessionStorage.setItem('user', JSON.stringify(user));
               }
@@ -86,6 +92,14 @@ export const useAuthStore = create<AuthStore>()(
         },
 
         logout: () => {
+          // 로그아웃 상태 설정
+          set({ isLoggingOut: true });
+
+          // 로그아웃 플래그 설정
+          if (typeof window !== 'undefined') {
+            sessionStorage.setItem('isLoggingOut', 'true');
+          }
+
           // 토큰 및 세션 정리
           clearSession();
 
@@ -105,7 +119,15 @@ export const useAuthStore = create<AuthStore>()(
             error: null,
             isLoading: false,
             isInitialized: false, // 로그아웃 시 초기화 상태도 리셋
+            isLoggingOut: false, // 로그아웃 완료
           });
+
+          // 로그아웃 플래그 제거 (약간의 지연 후)
+          setTimeout(() => {
+            if (typeof window !== 'undefined') {
+              sessionStorage.removeItem('isLoggingOut');
+            }
+          }, 1000);
         },
 
         setUser: (user: User) => {

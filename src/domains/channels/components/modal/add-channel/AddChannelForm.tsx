@@ -10,11 +10,12 @@ import {
 interface AddChannelFormProps {
   onSubmit: (data: { name: string; description: string | null; thumbnail_base64?: string }) => void;
   isLoading: boolean;
+  error?: string | null;
 }
 
-export function AddChannelForm({ onSubmit, isLoading }: AddChannelFormProps) {
+export function AddChannelForm({ onSubmit, isLoading, error }: AddChannelFormProps) {
   const formData = useAddChannelStore(selectAddChannelFormData);
-  const error = useAddChannelStore(selectAddChannelError);
+  const storeError = useAddChannelStore(selectAddChannelError);
   const updateFormData = useAddChannelStore((state) => state.updateFormData);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -213,9 +214,9 @@ export function AddChannelForm({ onSubmit, isLoading }: AddChannelFormProps) {
       </div>
 
       {/* API Error */}
-      {error && (
+      {(error || storeError) && (
         <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-          <p className="text-sm text-red-400">{error}</p>
+          <p className="text-sm text-red-400">{error || storeError}</p>
         </div>
       )}
     </form>

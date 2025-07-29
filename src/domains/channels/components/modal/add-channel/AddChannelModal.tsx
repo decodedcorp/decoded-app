@@ -25,6 +25,11 @@ export function AddChannelModal() {
   const createChannelMutation = useCreateChannel();
   const openChannelModal = useChannelModalStore((state) => state.openModal);
 
+  // Get mutation status for better UX
+  const isCreating = createChannelMutation.isPending;
+  const createError = createChannelMutation.error;
+  const isSuccess = createChannelMutation.isSuccess;
+
   const canSubmit = formData.name.trim().length >= 2 && formData.name.trim().length <= 50;
 
   const handleSubmit = async (data: {
@@ -32,15 +37,14 @@ export function AddChannelModal() {
     description: string | null;
     thumbnail_base64?: string;
   }) => {
-    try {
-      setLoading(true);
-      setError(null);
+    const requestData = {
+      name: data.name,
+      description: data.description || null,
+      thumbnail_base64: data.thumbnail_base64 || null,
+    };
 
-      const response = await createChannelMutation.mutateAsync({
-        name: data.name,
-        description: data.description || null,
-        thumbnail_base64: data.thumbnail_base64 || null,
-      });
+    try {
+      const response = await createChannelMutation.mutateAsync(requestData);
 
       // Close the add channel modal
       closeModal();
@@ -68,13 +72,11 @@ export function AddChannelModal() {
       }
 
       setError(errorMessage);
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleCancel = () => {
-    if (!isLoading) {
+    if (!isCreating) {
       closeModal();
     }
   };
@@ -86,17 +88,31 @@ export function AddChannelModal() {
       overlayClassName="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
       contentClassName="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
     >
-      <div className="bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden animate-scale-in shadow-2xl flex flex-col">
+      <div className="bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl w-[1200px] max-h-[90vh] overflow-hidden animate-scale-in shadow-2xl flex flex-col">
         <AddChannelHeader onClose={closeModal} />
 
         <div className="flex-1 overflow-y-auto">
-          <AddChannelForm onSubmit={handleSubmit} isLoading={isLoading} />
+          <AddChannelForm
+            onSubmit={handleSubmit}
+            isLoading={isCreating}
+            error={
+              createError
+                ? (createError as any)?.response?.data?.detail || createError.message
+                : null
+            }
+          />
         </div>
 
         <AddChannelFooter
           onCancel={handleCancel}
-          onCreate={() => handleSubmit(formData)}
-          isLoading={isLoading}
+          onCreate={() =>
+            handleSubmit({
+              name: formData.name.trim(),
+              description: formData.description.trim() || null,
+              thumbnail_base64: formData.thumbnail_base64,
+            })
+          }
+          isLoading={isCreating}
           canSubmit={canSubmit}
         />
       </div>

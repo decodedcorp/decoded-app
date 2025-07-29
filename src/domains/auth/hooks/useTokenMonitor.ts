@@ -11,6 +11,7 @@ import { AuthChannelUtils } from '../utils/authChannel';
 export const useTokenMonitor = () => {
   const logout = useAuthStore((s) => s.logout);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isLoggingOut = useAuthStore((s) => s.isLoggingOut);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastTokenRef = useRef<string | null>(null);
 
@@ -22,15 +23,17 @@ export const useTokenMonitor = () => {
       timeoutRef.current = null;
     }
 
-    // 인증되지 않은 상태면 타이머 설정하지 않음
-    if (!isAuthenticated) {
+    // 인증되지 않은 상태거나 로그아웃 중이면 타이머 설정하지 않음
+    if (!isAuthenticated || isLoggingOut) {
       return;
     }
 
     // 유효한 토큰 가져오기 (만료 검증 포함)
     const token = getValidAccessToken();
     if (!token) {
-      console.warn('[TokenMonitor] No valid access token found');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[TokenMonitor] No valid access token found, skipping timer setup');
+      }
       return;
     }
 
@@ -47,7 +50,9 @@ export const useTokenMonitor = () => {
 
       if (timeUntilExpire <= 0) {
         // 이미 만료된 경우 즉시 로그아웃
-        console.log('[TokenMonitor] Token already expired, logging out...');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[TokenMonitor] Token already expired, logging out...');
+        }
         AuthChannelUtils.sendTokenExpired();
         logout();
         return;
@@ -55,17 +60,23 @@ export const useTokenMonitor = () => {
 
       // 새로운 타이머 설정
       timeoutRef.current = setTimeout(() => {
-        console.log('[TokenMonitor] Token expired, logging out...');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[TokenMonitor] Token expired, logging out...');
+        }
         // 멀티탭 동기화를 위한 토큰 만료 이벤트 발행
         AuthChannelUtils.sendTokenExpired();
         logout();
       }, timeUntilExpire);
 
-      console.log(
-        `[TokenMonitor] Token will expire in ${Math.floor(timeUntilExpire / 1000)} seconds`,
-      );
+      if (process.env.NODE_ENV === 'development') {
+        console.log(
+          `[TokenMonitor] Token will expire in ${Math.floor(timeUntilExpire / 1000)} seconds`,
+        );
+      }
     } catch (error) {
-      console.error('[TokenMonitor] Failed to monitor token:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[TokenMonitor] Failed to monitor token:', error);
+      }
       // 토큰 디코딩 실패 시 안전하게 로그아웃
       AuthChannelUtils.sendTokenExpired();
       logout();
@@ -88,7 +99,7 @@ export const useTokenMonitor = () => {
 
   // 주기적으로 토큰 상태 확인 (토큰 갱신 감지)
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated || isLoggingOut) {
       return;
     }
 
@@ -97,7 +108,9 @@ export const useTokenMonitor = () => {
 
       // 토큰이 변경되었거나 없어진 경우 타이머 재설정
       if (currentToken !== lastTokenRef.current) {
-        console.log('[TokenMonitor] Token changed, updating timer...');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[TokenMonitor] Token changed, updating timer...');
+        }
         setupTokenTimer();
       }
     }, 30000); // 30초마다 확인
