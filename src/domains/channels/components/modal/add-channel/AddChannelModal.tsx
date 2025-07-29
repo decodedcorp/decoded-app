@@ -43,8 +43,26 @@ export function AddChannelModal() {
       thumbnail_base64: data.thumbnail_base64 || null,
     };
 
+    console.log('AddChannelModal - handleSubmit data:', {
+      name: data.name,
+      description: data.description,
+      thumbnail_base64: data.thumbnail_base64
+        ? `${data.thumbnail_base64.substring(0, 50)}...`
+        : 'undefined',
+    });
+
+    console.log('AddChannelModal - requestData:', {
+      name: requestData.name,
+      description: requestData.description,
+      thumbnail_base64: requestData.thumbnail_base64
+        ? `${requestData.thumbnail_base64.substring(0, 50)}...`
+        : 'undefined',
+    });
+
     try {
       const response = await createChannelMutation.mutateAsync(requestData);
+
+      console.log('Channel creation response:', response);
 
       // Close the add channel modal
       closeModal();
@@ -57,6 +75,8 @@ export function AddChannelModal() {
         category: 'New Channel',
         followers: '0',
       };
+
+      console.log('Opening channel modal with data:', channelData);
 
       openChannelModal(channelData);
     } catch (error: any) {

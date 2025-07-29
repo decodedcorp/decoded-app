@@ -5,14 +5,28 @@ import { createApiHeaders, getTokenStatus } from '../../../api/utils/apiHeaders'
 import { refreshOpenAPIToken } from '../../../api/hooks/useApi';
 import { getValidAccessToken } from '../../auth/utils/tokenManager';
 
-export const useChannels = (params?: Record<string, any>) => {
+export const useChannels = (params?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  ownerId?: string;
+  sortBy?: string;
+  sortOrder?: string;
+}) => {
   return useQuery({
-    queryKey: queryKeys.channels.lists(params),
+    queryKey: params ? queryKeys.channels.list(params) : queryKeys.channels.lists(),
     queryFn: async () => {
       // OpenAPI 토큰 업데이트
       refreshOpenAPIToken();
 
-      return ChannelsService.getChannelsChannelsGet(params);
+      return ChannelsService.listChannelsChannelsGet(
+        params?.page,
+        params?.limit,
+        params?.search,
+        params?.ownerId,
+        params?.sortBy,
+        params?.sortOrder,
+      );
     },
     staleTime: 5 * 60 * 1000, // 5분
   });
@@ -47,7 +61,35 @@ export const useCreateChannel = () => {
         throw new Error('Failed to update OpenAPI token');
       }
 
-      return ChannelsService.createChannelChannelsPost(data);
+      // API 요청 데이터 준비 및 검증
+      const requestData = {
+        name: data.name?.trim(),
+        description: data.description?.trim() || null,
+        thumbnail_base64: data.thumbnail_base64 || null,
+      };
+
+      // 필수 필드 검증
+      if (!requestData.name || requestData.name.length === 0) {
+        throw new Error('Channel name is required');
+      }
+
+      if (requestData.name.length < 3) {
+        throw new Error('Channel name must be at least 3 characters');
+      }
+
+      if (requestData.name.length > 50) {
+        throw new Error('Channel name must be less than 50 characters');
+      }
+
+      // Base64 데이터 검증 (있는 경우)
+      if (requestData.thumbnail_base64) {
+        if (requestData.thumbnail_base64.length > 10 * 1024 * 1024) {
+          // 10MB 제한
+          throw new Error('Image size too large (max 10MB)');
+        }
+      }
+
+      return ChannelsService.createChannelChannelsPost(requestData);
     },
     onMutate: async (newChannel) => {
       // Cancel any outgoing refetches
@@ -61,8 +103,9 @@ export const useCreateChannel = () => {
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.channels.lists() });
     },
-    onError: (error, variables, context) => {
+    onError: (error: any, variables, context) => {
       console.error('Failed to create channel:', error);
+
       // Revert to the previous value if available
       if (context?.previousChannels) {
         queryClient.setQueryData(queryKeys.channels.lists(), context.previousChannels);

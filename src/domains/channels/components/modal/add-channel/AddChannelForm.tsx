@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
   useAddChannelStore,
   selectAddChannelFormData,
   selectAddChannelError,
 } from '@/store/addChannelStore';
+import { compressImage, validateImageFile } from '@/lib/utils/imageUtils';
 
 interface AddChannelFormProps {
   onSubmit: (data: { name: string; description: string | null; thumbnail_base64?: string }) => void;
@@ -24,6 +25,17 @@ export function AddChannelForm({ onSubmit, isLoading, error }: AddChannelFormPro
     description?: string;
   }>({});
 
+  // Debug: formData 상태 변화 추적
+  useEffect(() => {
+    console.log('FormData changed:', {
+      name: formData.name,
+      description: formData.description,
+      thumbnail_base64: formData.thumbnail_base64
+        ? `${formData.thumbnail_base64.substring(0, 50)}...`
+        : 'undefined',
+    });
+  }, [formData]);
+
   const handleInputChange = (field: 'name' | 'description', value: string) => {
     updateFormData({ [field]: value });
 
@@ -33,31 +45,47 @@ export function AddChannelForm({ onSubmit, isLoading, error }: AddChannelFormPro
     }
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
+    console.log('File selected:', file.name, file.type, file.size);
+
+    // Validate file using utility function
+    const validation = validateImageFile(file, {
+      maxSizeBytes: 10 * 1024 * 1024, // 10MB
+      allowedTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
+    });
+
+    if (!validation.isValid) {
+      console.log('File validation failed:', validation.error);
       updateFormData({ thumbnail_base64: undefined });
-      setValidationErrors((prev) => ({ ...prev, description: 'Please select an image file' }));
+      setValidationErrors((prev) => ({ ...prev, description: validation.error }));
       return;
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      updateFormData({ thumbnail_base64: undefined });
-      setValidationErrors((prev) => ({ ...prev, description: 'Image size must be less than 5MB' }));
-      return;
-    }
+    try {
+      console.log('Starting image processing...');
+      // Use new image utility for compression
+      const optimizedBase64 = await compressImage(file, {
+        maxSizeBytes: 3 * 1024 * 1024, // 3MB
+        maxWidth: 1200,
+        maxHeight: 800,
+        quality: 0.9,
+        format: 'jpeg',
+        includeDataPrefix: true, // 백엔드에서 data: 접두어를 기대하는 것 같음
+      });
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const result = e.target?.result as string;
-      updateFormData({ thumbnail_base64: result });
+      console.log('Image processed successfully, base64 length:', optimizedBase64?.length);
+      console.log('Base64 starts with data:', optimizedBase64?.startsWith('data:'));
+      updateFormData({ thumbnail_base64: optimizedBase64 });
+      console.log('Form data updated with thumbnail_base64');
       setValidationErrors((prev) => ({ ...prev, description: undefined }));
-    };
-    reader.readAsDataURL(file);
+    } catch (error) {
+      console.error('Image processing error:', error);
+      updateFormData({ thumbnail_base64: undefined });
+      setValidationErrors((prev) => ({ ...prev, description: 'Failed to process image' }));
+    }
   };
 
   const handleRemoveThumbnail = () => {
@@ -72,8 +100,8 @@ export function AddChannelForm({ onSubmit, isLoading, error }: AddChannelFormPro
 
     if (!formData.name.trim()) {
       errors.name = 'Channel name is required';
-    } else if (formData.name.trim().length < 2) {
-      errors.name = 'Channel name must be at least 2 characters';
+    } else if (formData.name.trim().length < 3) {
+      errors.name = 'Channel name must be at least 3 characters';
     } else if (formData.name.trim().length > 50) {
       errors.name = 'Channel name must be less than 50 characters';
     }
@@ -93,11 +121,21 @@ export function AddChannelForm({ onSubmit, isLoading, error }: AddChannelFormPro
       return;
     }
 
-    onSubmit({
+    const submitData = {
       name: formData.name.trim(),
       description: formData.description.trim() || null,
       thumbnail_base64: formData.thumbnail_base64,
+    };
+
+    console.log('Submitting form data:', {
+      name: submitData.name,
+      description: submitData.description,
+      thumbnail_base64: submitData.thumbnail_base64
+        ? `${submitData.thumbnail_base64.substring(0, 50)}...`
+        : 'undefined',
     });
+
+    onSubmit(submitData);
   };
 
   return (
@@ -155,9 +193,11 @@ export function AddChannelForm({ onSubmit, isLoading, error }: AddChannelFormPro
           <div className="space-y-3">
             <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-zinc-700">
               <img
-                src={formData.thumbnail_base64}
+                src={`data:image/jpeg;base64,${formData.thumbnail_base64}`}
                 alt="Channel thumbnail preview"
                 className="w-full h-full object-cover"
+                onLoad={() => console.log('Image preview loaded successfully')}
+                onError={(e) => console.error('Image preview failed to load:', e)}
               />
               <button
                 type="button"
@@ -199,7 +239,7 @@ export function AddChannelForm({ onSubmit, isLoading, error }: AddChannelFormPro
                 <span className="text-xs">Upload Image</span>
               </button>
             </div>
-            <p className="text-sm text-zinc-400">JPG, PNG up to 5MB</p>
+            <p className="text-sm text-zinc-400">JPG, PNG up to 10MB (원본 품질 유지)</p>
           </div>
         )}
 
