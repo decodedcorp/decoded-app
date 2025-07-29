@@ -9,6 +9,7 @@ import {
   isAuthenticated,
   getValidAccessToken,
 } from '../domains/auth/utils/tokenManager';
+import { AuthChannelUtils } from '../domains/auth/utils/authChannel';
 
 interface AuthStore extends AuthState {
   // Actions
@@ -56,6 +57,11 @@ export const useAuthStore = create<AuthStore>()(
                 sessionStorage.setItem('user', JSON.stringify(user));
               }
 
+              // 멀티탭 동기화를 위한 login 이벤트 발행
+              if (typeof window !== 'undefined') {
+                AuthChannelUtils.sendLogin();
+              }
+
               set({
                 user,
                 isAuthenticated: true,
@@ -79,6 +85,11 @@ export const useAuthStore = create<AuthStore>()(
           // sessionStorage에서 user 정보 제거
           if (typeof window !== 'undefined') {
             sessionStorage.removeItem('user');
+          }
+
+          // 멀티탭 동기화를 위한 logout 이벤트 발행
+          if (typeof window !== 'undefined') {
+            AuthChannelUtils.sendLogout();
           }
 
           set({

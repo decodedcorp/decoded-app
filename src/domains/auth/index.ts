@@ -63,6 +63,11 @@ export { loginUser, logoutUser, fetchUserProfile, handleGoogleOAuthCallback } fr
 export { useAuthCore } from './hooks/useAuthCore';
 export { useTokenMonitor } from './hooks/useTokenMonitor';
 export { useAuthInit } from './hooks/useAuthInit';
+export { useLogoutSync } from './hooks/useLogoutSync';
+export { useLoginSync } from './hooks/useLoginSync';
+export { useAuthSync } from './hooks/useAuthSync';
+export { useAuthChannelSync } from './hooks/useAuthChannelSync';
+export { useAuthLifecycle } from './hooks/useAuthLifecycle';
 
 // Main Auth Hook
 export {
