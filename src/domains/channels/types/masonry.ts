@@ -8,6 +8,7 @@ export interface MasonryItem {
   date: string;
   isNew: boolean;
   isHot: boolean;
+  channelId?: string; // API에서 가져온 실제 채널 ID
 }
 
 export interface CtaCardType {
@@ -21,6 +22,11 @@ export interface EmptyItemType {
   id: string;
   title: string;
   category?: string;
+}
+
+export interface TestChannelItemType {
+  type: 'test-channel';
+  id: string;
 }
 
 export interface Editor {

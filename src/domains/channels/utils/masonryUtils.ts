@@ -1,4 +1,4 @@
-import { MasonryItem, CtaCardType, EmptyItemType } from '../types/masonry';
+import { MasonryItem, CtaCardType, EmptyItemType, TestChannelItemType } from '../types/masonry';
 
 // mock 데이터 (신규/인기 랜덤 플래그 추가)
 export function getMockItems(): MasonryItem[] {
@@ -94,32 +94,16 @@ export function distributeNoImageCards(items: MasonryItem[]): MasonryItem[] {
   return result;
 }
 
-// 비어있는 아이템 추가: 일정 간격마다 채널 추가 아이템 삽입
+// 비어있는 아이템 추가: 채널 추가 아이템 삽입 비활성화
 export function insertEmptyItems(
   items: Array<MasonryItem | CtaCardType>,
   interval = 6,
 ): Array<MasonryItem | CtaCardType | EmptyItemType> {
-  const result: Array<MasonryItem | CtaCardType | EmptyItemType> = [];
-  let emptyCount = 0;
-
-  items.forEach((item, idx) => {
-    if (idx !== 0 && idx % interval === 0) {
-      // 비어있는 아이템 삽입
-      const emptyIdx = emptyCount++;
-      result.push({
-        type: 'empty',
-        id: `empty-${idx}`,
-        title: 'Add New Channel',
-        category: 'Create',
-      });
-    }
-    result.push(item);
-  });
-
-  return result;
+  // 채널 추가 아이템 삽입을 비활성화하고 원본 아이템만 반환
+  return items as Array<MasonryItem | CtaCardType | EmptyItemType>;
 }
 
-// Masonry 레이아웃 + CTA 카드 랜덤 삽입
+// Masonry 레이아웃 + CTA 카드 삽입 (채널 추가 고정)
 export function insertSpecialCards(
   items: MasonryItem[],
   interval = 8,
@@ -128,11 +112,28 @@ export function insertSpecialCards(
   let ctaCount = 0;
   items.forEach((item, idx) => {
     if (idx !== 0 && idx % interval === 0) {
-      // CTA 카드 종류를 순환/랜덤하게 삽입
-      const ctaIdx = ctaCount++ % 3;
-      result.push({ type: 'cta', id: `cta-${idx}`, ctaIdx });
+      // CTA 카드를 항상 채널 추가(ctaIdx=3)로 고정
+      result.push({ type: 'cta', id: `cta-${idx}`, ctaIdx: 3 });
     }
     result.push(item);
   });
+  return result;
+}
+
+// TestChannelItem 고정 삽입
+export function insertTestChannelItem(
+  items: Array<MasonryItem | CtaCardType>,
+  position = 0,
+): Array<MasonryItem | CtaCardType | TestChannelItemType> {
+  const result: Array<MasonryItem | CtaCardType | TestChannelItemType> = [];
+
+  items.forEach((item, idx) => {
+    if (idx === position) {
+      // 지정된 위치에 TestChannelItem 삽입
+      result.push({ type: 'test-channel', id: 'test-channel-fixed' });
+    }
+    result.push(item);
+  });
+
   return result;
 }

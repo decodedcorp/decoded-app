@@ -36,6 +36,12 @@ export const ctaVariants = [
     button: 'View Collection',
     iconType: 'collection',
   },
+  {
+    title: 'Add New Channel',
+    desc: 'Create your own channel and share your content.',
+    button: 'Add Channel',
+    iconType: 'add-channel',
+  },
 ];
 
 // ChannelHero에서 사용할 heroData (2차원 배열)

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { ChannelMainContent } from './components/layout/ChannelMainContent';
+import { TestChannelItem } from './components/TestChannelItem';
 
 export default function ChannelPage() {
   return (
@@ -10,6 +11,9 @@ export default function ChannelPage() {
       <div className="h-full overflow-y-auto">
         <ChannelMainContent className="h-full" />
       </div>
+      
+      {/* 테스트용 채널 아이템 */}
+      <TestChannelItem />
     </div>
   );
 }
