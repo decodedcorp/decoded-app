@@ -1,81 +1,76 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { loginUser, logoutUser } from '../api/authApi';
-import { queryKeys } from '../../../lib/api/queryKeys';
-import { LoginRequest, LoginResponse } from '../types/auth';
-import { clearSession } from '../utils/tokenManager';
-import { updateApiTokenFromStorage } from '../../../api/config';
-import { ERROR_MESSAGES } from '../constants';
+import { useAuthStore } from '../../../store/authStore';
+import { loginUser, logoutUser, handleGoogleOAuthCallback } from '../api/authApi';
+import { LoginRequest } from '../types/auth';
 
 /**
- * 사용자 로그인 mutation 훅
+ * Hook for authentication mutations
  */
-export const useLogin = () => {
+export const useAuthMutations = () => {
+  const { setUser, setError, setLoading } = useAuthStore();
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: loginUser,
-    onSuccess: (data: LoginResponse) => {
-      console.log('[Auth] Login mutation successful');
-
-      // 캐시 무효화 및 재조회
-      queryClient.invalidateQueries({ queryKey: queryKeys.auth.profile });
-      queryClient.invalidateQueries({ queryKey: queryKeys.auth.status });
+  const loginMutation = useMutation({
+    mutationFn: (request: LoginRequest) =>
+      loginUser(request.jwt_token, request.sui_address, request.email),
+    onSuccess: (data) => {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[Auth] Login mutation successful');
+      }
+      setUser(data.user);
+      setError(null);
+      // Invalidate and refetch user-related queries
+      queryClient.invalidateQueries({ queryKey: ['user'] });
     },
     onError: (error) => {
-      console.error('[Auth] Login mutation failed:', error);
-      // 로그인 실패 시 세션 정리
-      clearSession();
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[Auth] Login mutation failed:', error);
+      }
+      setError(error instanceof Error ? error.message : 'Login failed');
     },
   });
-};
 
-/**
- * 사용자 로그아웃 mutation 훅
- */
-export const useLogout = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
+  const logoutMutation = useMutation({
     mutationFn: logoutUser,
     onSuccess: () => {
-      console.log('[Auth] Logout mutation successful');
-
-      // 모든 쿼리 캐시 정리
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[Auth] Logout mutation successful');
+      }
+      setUser(null as any);
+      setError(null);
+      // Clear all queries
       queryClient.clear();
-
-      // 로컬 세션 정리
-      clearSession();
-      updateApiTokenFromStorage();
     },
     onError: (error) => {
-      console.error('[Auth] Logout mutation failed:', error);
-      // 로그아웃 API 실패해도 로컬 정리는 계속 진행
-      queryClient.clear();
-      clearSession();
-      updateApiTokenFromStorage();
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[Auth] Logout mutation failed:', error);
+      }
+      setError(error instanceof Error ? error.message : 'Logout failed');
     },
   });
-};
 
-// Legacy function for backward compatibility
-export const useGoogleOAuth = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (code: string) =>
-      loginUser({
-        jwt_token: code,
-        sui_address: '', // 임시 값
-      }),
-    onSuccess: (data: LoginResponse) => {
-      console.log('[Auth] Google OAuth mutation successful');
-
-      queryClient.invalidateQueries({ queryKey: queryKeys.auth.profile });
-      queryClient.invalidateQueries({ queryKey: queryKeys.auth.status });
+  const googleOAuthMutation = useMutation({
+    mutationFn: handleGoogleOAuthCallback,
+    onSuccess: (data) => {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[Auth] Google OAuth mutation successful');
+      }
+      setUser(data.user);
+      setError(null);
+      // Invalidate and refetch user-related queries
+      queryClient.invalidateQueries({ queryKey: ['user'] });
     },
     onError: (error) => {
-      console.error('[Auth] Google OAuth mutation failed:', error);
-      clearSession();
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[Auth] Google OAuth mutation failed:', error);
+      }
+      setError(error instanceof Error ? error.message : 'Google OAuth failed');
     },
   });
+
+  return {
+    loginMutation,
+    logoutMutation,
+    googleOAuthMutation,
+  };
 };

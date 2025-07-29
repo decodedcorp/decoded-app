@@ -1,5 +1,5 @@
 import { useAuthCore } from './useAuthCore';
-import { useLogin, useLogout, useGoogleOAuth } from './useAuthMutations';
+import { useAuthMutations } from './useAuthMutations';
 import { useAuthStore } from '../../../store/authStore';
 import { UserRole } from '../types/auth';
 
@@ -9,12 +9,16 @@ import { UserRole } from '../types/auth';
 export const useAuth = () => {
   const authCore = useAuthCore();
   const authStore = useAuthStore();
+  const { loginMutation, logoutMutation, googleOAuthMutation } = useAuthMutations();
+
+  // 통합된 로딩 상태
+  const isLoading = authCore.isLoading || authCore.isAuthLoading || authCore.isProfileLoading;
 
   return {
     // Core auth state
     user: authCore.user,
     isAuthenticated: authCore.isAuthenticated,
-    isLoading: authCore.isLoading || authCore.isAuthLoading || authCore.isProfileLoading,
+    isLoading,
     error: authCore.error,
 
     // Query state
@@ -31,9 +35,9 @@ export const useAuth = () => {
     updateUser: authCore.updateUser,
 
     // Mutation hooks (직접 사용 가능)
-    useLogin,
-    useLogout,
-    useGoogleOAuth,
+    useLogin: loginMutation,
+    useLogout: logoutMutation,
+    useGoogleOAuth: googleOAuthMutation,
   };
 };
 
@@ -68,10 +72,10 @@ export const useAuthStatus = () => {
 };
 
 /**
- * 로딩 상태만 필요한 경우
+ * 로딩 상태만 필요한 경우 (통합된 로딩 상태)
  */
 export const useAuthLoading = () => {
-  const isLoading = useAuthStore((state) => state.isLoading);
+  const { isLoading } = useAuth();
   return isLoading;
 };
 
@@ -119,4 +123,37 @@ export const useIsUser = () => {
  */
 export const useIsModerator = () => {
   return useHasRole('moderator');
+};
+
+/**
+ * 인증 상태와 로딩 상태를 함께 제공하는 훅
+ */
+export const useAuthState = () => {
+  const { isAuthenticated, isLoading, error } = useAuth();
+
+  return {
+    isAuthenticated,
+    isLoading,
+    error,
+    isReady: !isLoading && !error,
+  };
+};
+
+/**
+ * 보호된 액션을 위한 훅 (인증 필요)
+ */
+export const useProtectedAction = () => {
+  const { isAuthenticated, login } = useAuth();
+
+  return {
+    isAuthenticated,
+    requireAuth: (action: () => void) => {
+      if (isAuthenticated) {
+        action();
+      } else {
+        // 로그인 모달 열기 또는 로그인 페이지로 리다이렉트
+        console.log('Authentication required for this action');
+      }
+    },
+  };
 };

@@ -2,10 +2,18 @@
 
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/domains/auth/hooks/useAuth';
+import { useEffect, useState } from 'react';
 
 export function LoginButton() {
   const router = useRouter();
   const { isAuthenticated, user, logout, isLoading } = useAuth();
+
+  // Hydration mismatch 방지를 위한 클라이언트 사이드 상태
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleClick = () => {
     if (isAuthenticated) {
@@ -49,6 +57,18 @@ export function LoginButton() {
 
     window.location.href = googleAuthUrl;
   };
+
+  // 서버 사이드 렌더링 시 기본 버튼만 표시 (hydration mismatch 방지)
+  if (!mounted) {
+    return (
+      <button
+        disabled
+        className="px-4 py-2 rounded-md text-sm font-medium bg-neutral-900/50 text-[#EAFD66]/50 cursor-not-allowed transition"
+      >
+        로딩 중...
+      </button>
+    );
+  }
 
   // 로딩 중일 때는 버튼을 비활성화
   if (isLoading) {

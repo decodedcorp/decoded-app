@@ -57,13 +57,7 @@ export { TokenDecoder } from './utils/tokenDecoder';
 export { ResponseMapper } from './utils/responseMapper';
 
 // API Functions
-export {
-  loginUser,
-  logoutUser,
-  getUserProfile,
-  checkAuthStatus,
-  handleGoogleOAuthCallback,
-} from './api/authApi';
+export { loginUser, logoutUser, fetchUserProfile, handleGoogleOAuthCallback } from './api/authApi';
 
 // Core Hooks
 export { useAuthCore } from './hooks/useAuthCore';
@@ -85,4 +79,4 @@ export {
 } from './hooks/useAuth';
 
 // React Query Hooks
-export { useLogin, useLogout, useGoogleOAuth } from './hooks/useAuthMutations';
+export { useAuthMutations } from './hooks/useAuthMutations';

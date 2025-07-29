@@ -40,7 +40,9 @@ export const GOOGLE_OAUTH_CONFIG = {
 // Cache and timing constants
 export const TIMING = {
   AUTH_STATUS_STALE_TIME: 5 * 60 * 1000, // 5 minutes
+  AUTH_STATUS_GC_TIME: 10 * 60 * 1000, // 10 minutes
   USER_PROFILE_STALE_TIME: 10 * 60 * 1000, // 10 minutes
+  USER_PROFILE_GC_TIME: 15 * 60 * 1000, // 15 minutes
   TOKEN_CHECK_INTERVAL: 5 * 60 * 1000, // 5 minutes
   TOKEN_REFRESH_THRESHOLD: 60 * 1000, // 1 minute before expiry
 } as const;

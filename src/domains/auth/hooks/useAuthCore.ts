@@ -1,9 +1,12 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '../../../store/authStore';
 import { queryKeys } from '../../../lib/api/queryKeys';
-import { getUserProfile, checkAuthStatus } from '../api/authApi';
+import { fetchUserProfile } from '../api/authApi';
 import { isAuthenticated, getValidAccessToken, shouldCheckToken } from '../utils/tokenManager';
 import { TIMING } from '../constants';
+import { AuthError, NetworkError } from '../types/auth';
+import { UsersService } from '../../../api/generated';
+import { useDocId } from './useDocId';
 
 /**
  * 핵심 인증 훅 - 기본적인 인증 상태와 사용자 정보만 관리
@@ -11,27 +14,36 @@ import { TIMING } from '../constants';
 export const useAuthCore = () => {
   const queryClient = useQueryClient();
   const authStore = useAuthStore();
+  const docId = useDocId();
 
-  // 인증 상태 확인
-  const { data: authStatus, isLoading: isAuthLoading } = useQuery({
-    queryKey: queryKeys.auth.status,
-    queryFn: checkAuthStatus,
-    enabled: shouldCheckToken(),
-    staleTime: TIMING.AUTH_STATUS_STALE_TIME,
-    retry: false,
-  });
-
-  // 사용자 프로필 조회
+  // 사용자 프로필 조회 (typgen UsersService 사용)
   const {
     data: userProfile,
     isLoading: isProfileLoading,
     error: profileError,
   } = useQuery({
     queryKey: queryKeys.auth.profile,
-    queryFn: getUserProfile,
-    enabled: isAuthenticated() && !!getValidAccessToken(),
+    queryFn: async () => {
+      // doc_id가 없으면 에러
+      if (!docId) {
+        throw new Error('No user ID available');
+      }
+
+      // typgen으로 생성된 UsersService 사용
+      const profile = await UsersService.getProfileUsersUserIdProfileGet(docId);
+      return profile;
+    },
+    enabled: isAuthenticated() && !!getValidAccessToken() && !!docId,
     staleTime: TIMING.USER_PROFILE_STALE_TIME,
-    retry: 1,
+    gcTime: TIMING.USER_PROFILE_GC_TIME,
+    retry: (failureCount, error) => {
+      // 프로필 조회 실패 시 재시도 정책
+      if (error instanceof AuthError && error.status === 401) {
+        return false; // 인증 실패는 재시도하지 않음
+      }
+      return failureCount < 2;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
   });
 
   return {
@@ -42,10 +54,11 @@ export const useAuthCore = () => {
     error: authStore.error,
 
     // Query state
-    authStatus,
+    authStatus: null, // checkAuthStatus 제거됨
     userProfile,
-    isAuthLoading,
+    isAuthLoading: false, // checkAuthStatus 제거됨
     isProfileLoading,
+    authError: null, // checkAuthStatus 제거됨
     profileError,
 
     // Actions

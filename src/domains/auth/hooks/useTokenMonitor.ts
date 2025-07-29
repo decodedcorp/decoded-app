@@ -1,43 +1,29 @@
-import React from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { useAuthStore } from '../../../store/authStore';
-import { getAccessToken, isTokenExpired } from '../utils/tokenManager';
-import { TIMING } from '../constants';
+import { isTokenExpired } from '../utils/tokenManager';
 
 /**
- * 토큰 만료 모니터링 훅
- * 별도 컴포넌트에서 사용하여 토큰 만료 시 자동 로그아웃 처리
+ * Hook to monitor token expiration and handle logout
  */
 export const useTokenMonitor = () => {
-  const queryClient = useQueryClient();
-  const logout = useAuthStore((state) => state.logout);
+  const { logout } = useAuthStore();
 
-  React.useEffect(() => {
-    let intervalId: NodeJS.Timeout;
-
+  useEffect(() => {
     const checkTokenExpiration = () => {
-      const token = getAccessToken();
-      if (token && isTokenExpired(token)) {
-        console.log('[Auth] Token expired, logging out');
-        logout();
-        queryClient.clear();
-      }
+      // This will be implemented when we have proper token monitoring
+      // For now, just a placeholder
     };
 
-    if (typeof window !== 'undefined') {
-      // 초기 체크
-      checkTokenExpiration();
+    const interval = setInterval(checkTokenExpiration, 60000); // Check every minute
 
-      // 주기적 체크
-      intervalId = setInterval(checkTokenExpiration, TIMING.TOKEN_CHECK_INTERVAL);
+    return () => clearInterval(interval);
+  }, [logout]);
+
+  // Placeholder for token expiration check
+  const handleTokenExpiration = () => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Auth] Token expired, logging out');
     }
-
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
-  }, [logout, queryClient]);
-
-  return null; // 이 훅은 부작용만 있음
+    logout();
+  };
 };

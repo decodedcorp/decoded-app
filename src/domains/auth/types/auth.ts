@@ -16,6 +16,31 @@ export interface LoginResponse {
   };
 }
 
+// 백엔드 응답 타입 (실제 API 응답 구조)
+export interface BackendLoginResponse {
+  access_token:
+    | {
+        salt?: string;
+        user_doc_id?: string;
+        access_token: string;
+        has_sui_address?: boolean;
+      }
+    | string; // access_token이 문자열일 수도 있음
+  refresh_token?: string;
+  user?: {
+    doc_id?: string;
+    id?: string; // doc_id 대신 id를 사용할 수도 있음
+    user_id?: string; // doc_id 대신 user_id를 사용할 수도 있음
+    _id?: string; // doc_id 대신 _id를 사용할 수도 있음
+    email?: string;
+    nickname?: string;
+    name?: string; // nickname 대신 name을 사용할 수도 있음
+    username?: string; // nickname 대신 username을 사용할 수도 있음
+    role?: string;
+    status?: string;
+  };
+}
+
 export interface RefreshTokenResponse {
   access_token: string;
   refresh_token?: string;
@@ -85,4 +110,26 @@ export interface SessionData {
   doc_id: string;
   email: string;
   nickname: string;
+}
+
+// 에러 타입 정의
+export class AuthError extends Error {
+  constructor(message: string, public status: number, public code?: string) {
+    super(message);
+    this.name = 'AuthError';
+  }
+}
+
+export class NetworkError extends Error {
+  constructor(message: string = 'Network error occurred') {
+    super(message);
+    this.name = 'NetworkError';
+  }
+}
+
+export class TokenError extends Error {
+  constructor(message: string = 'Token error occurred') {
+    super(message);
+    this.name = 'TokenError';
+  }
 }

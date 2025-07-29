@@ -7,10 +7,35 @@ import { getAccessToken, getValidAccessToken } from '../domains/auth/utils/token
 
 // Base URL configuration
 // 개발 환경에서는 Next.js 프록시를 사용하여 CORS 문제 해결
-export const API_BASE_URL =
-  process.env.NODE_ENV === 'development'
-    ? '/api/proxy'
-    : process.env.NEXT_PUBLIC_API_BASE_URL || 'https://dev.decoded.style';
+const getApiBaseUrl = () => {
+  // 환경 변수 확인
+  const envApiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const nodeEnv = process.env.NODE_ENV;
+
+  console.log('[API Config] Environment check:', {
+    NODE_ENV: nodeEnv,
+    NEXT_PUBLIC_API_BASE_URL: envApiUrl,
+  });
+
+  // 개발 환경에서는 프록시 사용
+  if (nodeEnv === 'development') {
+    console.log('[API Config] Using development proxy: /api/proxy');
+    return '/api/proxy';
+  }
+
+  // 프로덕션 환경에서는 환경 변수 또는 기본값 사용
+  if (envApiUrl) {
+    console.log('[API Config] Using production URL:', envApiUrl);
+    return envApiUrl;
+  }
+
+  // 기본값 설정
+  const defaultUrl = 'https://dev.decoded.style';
+  console.log('[API Config] Using default URL:', defaultUrl);
+  return defaultUrl;
+};
+
+export const API_BASE_URL = getApiBaseUrl();
 
 // Default headers
 const getDefaultHeaders = () => ({
@@ -83,5 +108,6 @@ export const configureApi = () => {
   // Initialize API configuration
   // For sessionStorage approach, no additional setup is needed
   // Tokens are retrieved on-demand in getRequestConfig
-  console.log('API configured for sessionStorage-based authentication');
+  console.log('[API Config] API configured for sessionStorage-based authentication');
+  console.log('[API Config] Base URL:', API_BASE_URL);
 };

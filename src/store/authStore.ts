@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
+import { devtools, persist, createJSONStorage } from 'zustand/middleware';
 import { AuthState, User, LoginResponse } from '../domains/auth/types/auth';
 import {
   clearSession,
@@ -17,6 +17,7 @@ interface AuthStore extends AuthState {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   clearError: () => void;
+  setUser: (user: User) => void; // user 상태 직접 설정
 
   // Token management
   getAccessToken: () => string | null;
@@ -50,6 +51,11 @@ export const useAuthStore = create<AuthStore>()(
                 status: response.user.status,
               };
 
+              // sessionStorage에 user 정보 저장
+              if (typeof window !== 'undefined') {
+                sessionStorage.setItem('user', JSON.stringify(user));
+              }
+
               set({
                 user,
                 isAuthenticated: true,
@@ -67,7 +73,13 @@ export const useAuthStore = create<AuthStore>()(
         },
 
         logout: () => {
+          // 토큰 및 세션 정리
           clearSession();
+
+          // sessionStorage에서 user 정보 제거
+          if (typeof window !== 'undefined') {
+            sessionStorage.removeItem('user');
+          }
 
           set({
             user: null,
@@ -77,11 +89,26 @@ export const useAuthStore = create<AuthStore>()(
           });
         },
 
+        setUser: (user: User) => {
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[Auth] Setting user:', user);
+          }
+          // sessionStorage에 user 정보 저장
+          if (typeof window !== 'undefined') {
+            sessionStorage.setItem('user', JSON.stringify(user));
+          }
+
+          set({ user, isAuthenticated: true });
+        },
+
         setLoading: (loading: boolean) => {
           set({ isLoading: loading });
         },
 
         setError: (error: string | null) => {
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[Auth] Setting error:', error);
+          }
           set({ error });
         },
 
@@ -98,9 +125,14 @@ export const useAuthStore = create<AuthStore>()(
         updateUser: (userData: Partial<User>) => {
           const currentUser = get().user;
           if (currentUser) {
-            set({
-              user: { ...currentUser, ...userData },
-            });
+            const updatedUser = { ...currentUser, ...userData };
+
+            // sessionStorage 업데이트
+            if (typeof window !== 'undefined') {
+              sessionStorage.setItem('user', JSON.stringify(updatedUser));
+            }
+
+            set({ user: updatedUser, isAuthenticated: true });
           }
         },
 
@@ -108,9 +140,34 @@ export const useAuthStore = create<AuthStore>()(
       }),
       {
         name: 'auth-store',
+        storage: createJSONStorage(() => localStorage), // localStorage 사용
         partialize: (state) => ({
-          // 필요한 경우에만 일부 상태를 localStorage에 저장
+          // localStorage에는 isAuthenticated만 저장
+          isAuthenticated: state.isAuthenticated,
         }),
+        onRehydrateStorage: () => (state) => {
+          // 새로고침 시 sessionStorage에서 user 복원
+          if (typeof window !== 'undefined' && state) {
+            const userFromSession = sessionStorage.getItem('user');
+            if (userFromSession) {
+              try {
+                const user = JSON.parse(userFromSession);
+                // 사용자 정보와 인증 상태를 함께 설정
+                state.setUser(user);
+                state.isAuthenticated = true;
+                console.log('[Auth] User restored from sessionStorage:', user);
+              } catch (error) {
+                console.error('[Auth] Failed to parse user from sessionStorage:', error);
+                // 파싱 실패 시에만 로그아웃
+                state.logout();
+              }
+            } else {
+              // user 정보가 없고 isAuthenticated가 true인 경우에만 로그아웃
+              // (useAuthInit에서 처리할 예정이므로 여기서는 로그아웃하지 않음)
+              console.log('[Auth] No user data in sessionStorage, will be handled by useAuthInit');
+            }
+          }
+        },
       },
     ),
     {

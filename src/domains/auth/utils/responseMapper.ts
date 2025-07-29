@@ -1,4 +1,12 @@
-import { LoginResponse, User } from '../types/auth';
+import {
+  LoginResponse,
+  User,
+  BackendLoginResponse,
+  AuthError,
+  NetworkError,
+  UserRole,
+  UserStatus,
+} from '../types/auth';
 import { GetUserProfile } from '../../../api/generated';
 
 /**
@@ -6,70 +14,204 @@ import { GetUserProfile } from '../../../api/generated';
  */
 export class ResponseMapper {
   /**
-   * 백엔드 로그인 응답을 LoginResponse로 변환
+   * 백엔드 로그인 응답을 LoginResponse로 변환 (타입 안전성 강화)
    */
-  static mapLoginResponse(data: any): LoginResponse {
-    return {
+  static mapLoginResponse(data: BackendLoginResponse): LoginResponse {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[ResponseMapper] Raw backend response:', JSON.stringify(data, null, 2));
+      console.log('[ResponseMapper] Response type:', typeof data);
+      console.log('[ResponseMapper] Response keys:', Object.keys(data));
+    }
+
+    // 다양한 응답 구조 처리
+    let accessTokenData = data.access_token;
+    let userData = data.user;
+    let refreshToken = data.refresh_token || '';
+
+    // refresh_token이 유효한지 확인
+    if (refreshToken && typeof refreshToken === 'string' && refreshToken.trim() === '') {
+      refreshToken = '';
+    }
+
+    // access_token이 문자열인 경우 객체로 변환
+    if (typeof accessTokenData === 'string') {
+      accessTokenData = {
+        salt: '',
+        user_doc_id: '',
+        access_token: accessTokenData,
+        has_sui_address: false,
+      };
+    }
+
+    // user 데이터가 없는 경우 기본값 설정
+    if (!userData) {
+      userData = {
+        doc_id: '',
+        email: '',
+        nickname: '',
+        role: 'user',
+        status: 'active',
+      };
+    }
+
+    // user.doc_id가 없는 경우 다른 필드에서 찾기
+    if (!userData.doc_id) {
+      if (userData.id) {
+        userData.doc_id = userData.id;
+      } else if (userData.user_id) {
+        userData.doc_id = userData.user_id;
+      } else if (userData._id) {
+        userData.doc_id = userData._id;
+      } else if (accessTokenData.user_doc_id) {
+        userData.doc_id = accessTokenData.user_doc_id;
+      }
+    }
+
+    // nickname이 없는 경우 다른 필드에서 찾기
+    if (!userData.nickname) {
+      if (userData.name) {
+        userData.nickname = userData.name;
+      } else if (userData.username) {
+        userData.nickname = userData.username;
+      } else {
+        userData.nickname = userData.email || 'Unknown User';
+      }
+    }
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[ResponseMapper] Processed data:', {
+        hasAccessToken: !!accessTokenData,
+        hasRefreshToken: !!refreshToken,
+        hasUser: !!userData,
+        accessTokenType: typeof accessTokenData,
+        userType: typeof userData,
+        userDocId: userData.doc_id,
+      });
+    }
+
+    if (!accessTokenData?.access_token) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[ResponseMapper] Missing access_token.access_token:', {
+          hasAccessToken: !!accessTokenData,
+          accessTokenKeys: accessTokenData ? Object.keys(accessTokenData) : null,
+          accessTokenType: typeof accessTokenData,
+          accessTokenData: accessTokenData,
+        });
+      }
+      throw new AuthError('Invalid access token in response', 400, 'INVALID_ACCESS_TOKEN');
+    }
+
+    if (!userData.doc_id) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[ResponseMapper] Missing user.doc_id after processing:', {
+          hasUser: !!userData,
+          userKeys: userData ? Object.keys(userData) : null,
+          userData: userData,
+        });
+      }
+      throw new AuthError('Invalid user data in response', 400, 'INVALID_USER_DATA');
+    }
+
+    const loginResponse: LoginResponse = {
       access_token: {
-        salt: data.access_token?.salt || '',
-        user_doc_id: data.access_token?.user_doc_id || '',
-        access_token: data.access_token?.access_token || data.access_token || '',
-        has_sui_address: data.access_token?.has_sui_address || false,
+        access_token: accessTokenData.access_token,
+        salt: accessTokenData.salt || '',
+        user_doc_id: accessTokenData.user_doc_id || userData.doc_id,
+        has_sui_address: accessTokenData.has_sui_address || false,
       },
-      refresh_token: data.refresh_token || '',
+      refresh_token: refreshToken,
       user: {
-        doc_id: data.user?.doc_id || data.access_token?.user_doc_id || '',
-        email: data.user?.email || '',
-        nickname: data.user?.nickname || '',
-        role: data.user?.role || 'user',
-        status: data.user?.status || 'active',
+        doc_id: userData.doc_id,
+        email: userData.email || '',
+        nickname: userData.nickname || '',
+        role: this.mapUserRole(userData.role),
+        status: this.mapUserStatus(userData.status),
       },
     };
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[ResponseMapper] Successfully mapped response:', {
+        hasAccessToken: !!loginResponse.access_token,
+        hasRefreshToken: !!loginResponse.refresh_token,
+        hasUser: !!loginResponse.user,
+        userDocId: loginResponse.user.doc_id,
+        userEmail: loginResponse.user.email,
+      });
+    }
+
+    return loginResponse;
   }
 
   /**
    * GetUserProfile을 User 타입으로 변환
    */
-  static mapUserProfile(profile: GetUserProfile, docId: string): User {
+  static mapUserProfile(data: GetUserProfile): User {
     return {
-      doc_id: docId,
+      doc_id: '', // GetUserProfile에는 doc_id가 없으므로 빈 문자열
       email: '', // GetUserProfile에는 email이 없음
-      nickname: profile.aka || '',
-      role: 'user' as const, // 기본값
-      status: 'active' as const, // 기본값
-      sui_address: profile.sui_address || undefined,
-      createdAt: undefined,
-      updatedAt: undefined,
+      nickname: data.aka || 'Unknown User',
+      role: 'user' as UserRole, // 기본값
+      status: 'active' as UserStatus, // 기본값
+      sui_address: data.sui_address || undefined,
     };
   }
 
   /**
-   * 백엔드 에러 응답을 표준 에러로 변환
+   * 사용자 역할을 UserRole로 변환
    */
-  static mapErrorResponse(error: any): Error {
-    if (error?.response?.data?.message) {
-      return new Error(error.response.data.message);
+  private static mapUserRole(role?: string): UserRole {
+    if (!role) return 'user';
+
+    const roleLower = role.toLowerCase();
+    if (roleLower === 'admin' || roleLower === 'administrator') {
+      return 'admin';
     }
-    if (error?.message) {
-      return new Error(error.message);
+    if (roleLower === 'moderator' || roleLower === 'mod') {
+      return 'moderator';
     }
-    return new Error('An unexpected error occurred');
+    return 'user';
   }
 
   /**
-   * API 응답이 성공인지 확인
+   * 사용자 상태를 UserStatus로 변환
    */
-  static isSuccessResponse(response: any): boolean {
-    return response && response.status >= 200 && response.status < 300;
+  private static mapUserStatus(status?: string): UserStatus {
+    if (!status) return 'active';
+
+    const statusLower = status.toLowerCase();
+    if (statusLower === 'inactive' || statusLower === 'suspended') {
+      return 'inactive';
+    }
+    return 'active';
   }
 
   /**
-   * API 응답에서 데이터 추출
+   * 에러 응답을 AuthError로 변환
    */
-  static extractData<T>(response: any): T {
-    if (this.isSuccessResponse(response)) {
-      return response.data || response;
+  static mapErrorResponse(error: any): AuthError {
+    if (error instanceof AuthError) {
+      return error;
     }
-    throw this.mapErrorResponse(response);
+
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      return new AuthError('Network connection failed', 0, 'NETWORK_ERROR');
+    }
+
+    // API 에러 응답 처리
+    if (error?.response?.data) {
+      const { message, detail, error_code } = error.response.data;
+      return new AuthError(
+        message || detail || 'API request failed',
+        error.response.status,
+        error_code,
+      );
+    }
+
+    // 일반적인 에러 처리
+    const message = error?.message || 'Unknown error occurred';
+    const status = error?.status || error?.statusCode || 500;
+    const code = error?.code || 'UNKNOWN_ERROR';
+
+    return new AuthError(message, status, code);
   }
 }
