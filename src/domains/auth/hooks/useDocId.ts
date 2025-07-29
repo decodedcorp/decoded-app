@@ -15,7 +15,9 @@ export const useDocId = (): string | undefined => {
 
   // 1. Zustand store에서 먼저 확인
   if (user?.doc_id) {
-    console.log('[useDocId] Found doc_id from Zustand store:', user.doc_id);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[useDocId] Found doc_id from Zustand store:', user.doc_id);
+    }
     return user.doc_id;
   }
 
@@ -26,12 +28,16 @@ export const useDocId = (): string | undefined => {
       if (userFromSession) {
         const parsedUser = JSON.parse(userFromSession);
         if (parsedUser?.doc_id) {
-          console.log('[useDocId] Found doc_id from sessionStorage:', parsedUser.doc_id);
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[useDocId] Found doc_id from sessionStorage:', parsedUser.doc_id);
+          }
           return parsedUser.doc_id;
         }
       }
     } catch (error) {
-      console.warn('[useDocId] Failed to parse user from sessionStorage:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[useDocId] Failed to parse user from sessionStorage:', error);
+      }
     }
   }
 
@@ -41,15 +47,24 @@ export const useDocId = (): string | undefined => {
     if (token) {
       const decoded = TokenDecoder.decode(token);
       if (decoded?.sub) {
-        console.log('[useDocId] Found doc_id from JWT token:', decoded.sub);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[useDocId] Found doc_id from JWT token:', decoded.sub);
+        }
         return decoded.sub;
       }
     }
   } catch (error) {
-    console.warn('[useDocId] Failed to extract doc_id from token:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('[useDocId] Failed to extract doc_id from token:', error);
+    }
   }
 
-  console.warn('[useDocId] No doc_id found from any source');
+  // 개발 모드에서만 로그 출력 (에러가 아닌 정보성 메시지)
+  if (process.env.NODE_ENV === 'development') {
+    console.log(
+      '[useDocId] No doc_id found from any source - this is normal during initialization',
+    );
+  }
   return undefined;
 };
 
