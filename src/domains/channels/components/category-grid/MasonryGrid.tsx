@@ -22,15 +22,21 @@ import { ChannelResponse } from '@/api/generated';
 import { mapChannelsToMasonryItems } from '../../utils/apiMappers';
 
 // 타입 가드 함수들
-function isMasonryItem(item: MasonryItem | CtaCardType | EmptyItemType): item is MasonryItem {
+function isMasonryItem(
+  item: MasonryItem | CtaCardType | EmptyItemType | TestChannelItemType,
+): item is MasonryItem {
   return !('type' in item);
 }
 
-function isCtaCard(item: MasonryItem | CtaCardType | EmptyItemType): item is CtaCardType {
+function isCtaCard(
+  item: MasonryItem | CtaCardType | EmptyItemType | TestChannelItemType,
+): item is CtaCardType {
   return 'type' in item && item.type === 'cta';
 }
 
-function isEmptyItem(item: MasonryItem | CtaCardType | EmptyItemType): item is EmptyItemType {
+function isEmptyItem(
+  item: MasonryItem | CtaCardType | EmptyItemType | TestChannelItemType,
+): item is EmptyItemType {
   return 'type' in item && item.type === 'empty';
 }
 

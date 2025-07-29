@@ -26,6 +26,7 @@ export function ChannelModal() {
   const channelId = useChannelModalStore(selectSelectedChannelId);
   const closeModal = useChannelModalStore((state) => state.closeModal);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   // 채널 ID로 API 데이터 가져오기
   const { data: apiChannel, isLoading, error } = useChannel(channelId || '');
@@ -41,6 +42,10 @@ export function ChannelModal() {
     setCurrentFilters(filters);
     console.log('Filters changed:', filters);
     // TODO: Implement filter logic for content
+  };
+
+  const handleSidebarCollapseToggle = () => {
+    setIsSidebarCollapsed(!isSidebarCollapsed);
   };
 
   // 채널 데이터 결정: API 데이터가 있으면 사용, 없으면 기존 데이터 사용
@@ -71,10 +76,14 @@ export function ChannelModal() {
           <ChannelModalSidebar
             currentFilters={currentFilters}
             onFilterChange={handleFilterChange}
+            isCollapsed={isSidebarCollapsed}
+            onToggleCollapse={handleSidebarCollapseToggle}
           />
         }
         isSidebarOpen={isSidebarOpen}
         onSidebarToggle={() => setIsSidebarOpen(!isSidebarOpen)}
+        isSidebarCollapsed={isSidebarCollapsed}
+        onSidebarCollapseToggle={handleSidebarCollapseToggle}
       >
         <ChannelModalHeader channel={finalChannel} onClose={closeModal} />
 

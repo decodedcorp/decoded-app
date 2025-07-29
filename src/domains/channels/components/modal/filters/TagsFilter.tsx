@@ -1,13 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 
 interface TagsFilterProps {
   selectedTags: string[];
   onTagsChange: (tags: string[]) => void;
 }
 
-export function TagsFilter({ selectedTags, onTagsChange }: TagsFilterProps) {
+export const TagsFilter = memo(function TagsFilter({
+  selectedTags,
+  onTagsChange,
+}: TagsFilterProps) {
   const [newTag, setNewTag] = useState('');
   const [isInputFocused, setIsInputFocused] = useState(false);
 
@@ -137,4 +140,4 @@ export function TagsFilter({ selectedTags, onTagsChange }: TagsFilterProps) {
       )}
     </div>
   );
-}
+});

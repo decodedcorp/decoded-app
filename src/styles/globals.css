@@ -2,7 +2,7 @@
 
 @layer utilities {
   .animate-fade-in {
-    animation: fadeIn 0.2s ease-out;
+    animation: fadeIn 0.4s ease-out;
   }
 
   .animate-scale-in {
@@ -19,6 +19,10 @@
 
   .animate-bounce-in {
     animation: bounceIn 0.4s ease-out;
+  }
+
+  .animate-stable-fade-in {
+    animation: stableFadeIn 0.6s ease-out;
   }
 
   .mobile-safe-padding {
@@ -62,6 +66,17 @@
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes stableFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -269,6 +284,24 @@ footer {
 .floating {
   animation: floating var(--float-duration, 4s) ease-in-out infinite;
   animation-delay: var(--float-delay, 0s);
+}
+
+/* 접힌 사이드바 스크롤바 스타일 */
+.collapsed-sidebar-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.collapsed-sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.collapsed-sidebar-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.collapsed-sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* 모바일 디바이스 최적화 */

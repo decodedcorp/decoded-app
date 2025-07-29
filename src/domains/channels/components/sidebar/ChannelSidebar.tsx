@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -50,6 +50,25 @@ export function ChannelSidebar({
   const [newTag, setNewTag] = useState('');
   const [isDataTypesExpanded, setIsDataTypesExpanded] = useState(true);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [showMiniFilters, setShowMiniFilters] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement>(null);
+
+  // 외부 클릭 시 미니 필터 닫기
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node)) {
+        setShowMiniFilters(false);
+      }
+    };
+
+    if (showMiniFilters) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showMiniFilters]);
 
   const handleDataTypeToggle = (dataTypeId: string) => {
     const newSelected = selectedDataTypes.includes(dataTypeId)
@@ -82,47 +101,103 @@ export function ChannelSidebar({
     onFilterChange?.(filters);
   };
 
+  // 사이드바가 접힐 때 Data Types 섹션도 자동으로 접기
   const toggleSidebar = () => {
     const newCollapsedState = !isSidebarCollapsed;
     setIsSidebarCollapsed(newCollapsedState);
+
+    // 사이드바가 접힐 때 Data Types 섹션도 접기
+    if (newCollapsedState) {
+      setIsDataTypesExpanded(false);
+    }
+
     onCollapseChange?.(newCollapsedState);
   };
 
   if (isSidebarCollapsed) {
     return (
       <aside
+        ref={sidebarRef}
         className={`bg-black text-white h-full flex flex-col border-r border-gray-800 ${className}`}
       >
-        {/* 접힌 상태 아이콘들 */}
-        <div className="flex flex-col items-center space-y-3 p-3 pt-4">
-          {/* 접기/펼치기 토글 버튼 - 상단에 배치 */}
+        {/* 접힌 상태 - 핵심 기능만 표시 */}
+        <div className="flex flex-col items-center space-y-2 p-2 pt-4 relative">
+          {/* 접기/펼치기 토글 버튼 */}
           <button
             onClick={toggleSidebar}
-            className="p-2 bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors duration-200 w-12 h-12 flex items-center justify-center mb-2"
-            title="사이드바 펼치기"
+            className="p-2 bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors duration-200 w-10 h-10 flex items-center justify-center"
+            title="사이드바 펼치기 - 필터 옵션 보기"
           >
-            <ChevronRightIcon className="w-5 h-5" />
+            <ChevronRightIcon className="w-4 h-4" />
           </button>
 
-          {/* Library 아이콘 */}
-          <button className="p-2 bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors duration-200 w-12 h-12 flex items-center justify-center">
-            <span className="text-lg">📚</span>
+          {/* Library 아이콘 - 메인 기능 */}
+          <button
+            className="p-2 bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors duration-200 w-10 h-10 flex items-center justify-center"
+            title="Library - 채널 및 콘텐츠 관리"
+          >
+            <span className="text-base">📚</span>
           </button>
 
-          {/* Data Types 아이콘 */}
-          <button className="p-2 bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors duration-200 w-12 h-12 flex items-center justify-center">
-            <span className="text-lg">📊</span>
+          {/* 필터 아이콘 - 필터 기능 통합 */}
+          <button
+            onClick={() => setShowMiniFilters(!showMiniFilters)}
+            className={`p-2 rounded-lg transition-colors duration-200 w-10 h-10 flex items-center justify-center ${
+              showMiniFilters ? 'bg-white text-black' : 'bg-gray-900 hover:bg-gray-800'
+            }`}
+            title="Filters - 데이터 타입, 카테고리, 태그 필터링"
+          >
+            <span className="text-base">🔍</span>
           </button>
 
-          {/* Categories 아이콘 */}
-          <button className="p-2 bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors duration-200 w-12 h-12 flex items-center justify-center">
-            <span className="text-lg">🏷️</span>
-          </button>
+          {/* 미니 필터 드롭다운 */}
+          {showMiniFilters && (
+            <div className="absolute left-full ml-2 top-0 bg-gray-900 border border-gray-700 rounded-lg p-3 min-w-48 z-10">
+              <div className="space-y-3">
+                {/* Data Types - 핵심 3개만 표시 */}
+                <div>
+                  <h4 className="text-sm font-medium text-gray-300 mb-2">Data Types</h4>
+                  <div className="grid grid-cols-3 gap-1">
+                    {DATA_TYPES.slice(0, 3).map((dataType) => (
+                      <button
+                        key={dataType.id}
+                        onClick={() => handleDataTypeToggle(dataType.id)}
+                        className={`text-xs p-2 rounded transition-colors duration-200 ${
+                          selectedDataTypes.includes(dataType.id)
+                            ? 'bg-white text-black'
+                            : 'bg-gray-800 hover:bg-gray-700 text-gray-300'
+                        }`}
+                        title={`${dataType.label} - ${dataType.icon}`}
+                      >
+                        <span className="text-sm">{dataType.icon}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-          {/* Tags 아이콘 */}
-          <button className="p-2 bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors duration-200 w-12 h-12 flex items-center justify-center">
-            <span className="text-lg">#</span>
-          </button>
+                {/* Categories - 핵심 4개만 표시 */}
+                <div>
+                  <h4 className="text-sm font-medium text-gray-300 mb-2">Categories</h4>
+                  <div className="grid grid-cols-2 gap-1">
+                    {CATEGORIES.slice(0, 4).map((category) => (
+                      <button
+                        key={category.id}
+                        onClick={() => handleCategoryToggle(category.id)}
+                        className={`text-xs p-2 rounded transition-colors duration-200 ${
+                          selectedCategories.includes(category.id)
+                            ? 'bg-white text-black'
+                            : 'bg-gray-800 hover:bg-gray-700 text-gray-300'
+                        }`}
+                        title={`${category.label} - ${category.icon}`}
+                      >
+                        <span className="text-sm">{category.icon}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </aside>
     );

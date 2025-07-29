@@ -122,10 +122,10 @@ export function insertSpecialCards(
 
 // TestChannelItem 고정 삽입
 export function insertTestChannelItem(
-  items: Array<MasonryItem | CtaCardType>,
+  items: Array<MasonryItem | CtaCardType | EmptyItemType>,
   position = 0,
-): Array<MasonryItem | CtaCardType | TestChannelItemType> {
-  const result: Array<MasonryItem | CtaCardType | TestChannelItemType> = [];
+): Array<MasonryItem | CtaCardType | EmptyItemType | TestChannelItemType> {
+  const result: Array<MasonryItem | CtaCardType | EmptyItemType | TestChannelItemType> = [];
 
   items.forEach((item, idx) => {
     if (idx === position) {

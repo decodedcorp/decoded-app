@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 
 interface CategoriesFilterProps {
   selectedCategories: string[];
@@ -34,7 +34,7 @@ const CATEGORIES = [
   { id: 'games', label: 'Games', icon: '🎮', count: 11, color: 'bg-cyan-500/20 text-cyan-300' },
 ];
 
-export function CategoriesFilter({
+export const CategoriesFilter = memo(function CategoriesFilter({
   selectedCategories,
   onCategoriesChange,
 }: CategoriesFilterProps) {
@@ -135,4 +135,4 @@ export function CategoriesFilter({
       )}
     </div>
   );
-}
+});
