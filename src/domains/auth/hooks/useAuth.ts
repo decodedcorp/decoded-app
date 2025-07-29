@@ -11,8 +11,9 @@ export const useAuth = () => {
   const authStore = useAuthStore();
   const { loginMutation, logoutMutation, googleOAuthMutation } = useAuthMutations();
 
-  // 통합된 로딩 상태
-  const isLoading = authCore.isLoading || authCore.isAuthLoading || authCore.isProfileLoading;
+  // 통합된 로딩 상태 - 개별 상태를 직접 구독
+  const storeLoading = useAuthStore((state) => state.isLoading);
+  const isLoading = storeLoading || authCore.isProfileLoading;
 
   return {
     // Core auth state

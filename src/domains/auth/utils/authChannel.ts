@@ -3,6 +3,8 @@
  * 탭 간 빠르고 안정적인 메시지 전달을 제공합니다.
  */
 
+import { User } from '../types/auth';
+
 const CHANNEL_NAME = 'auth-channel';
 
 // BroadcastChannel 인스턴스 생성
@@ -13,7 +15,9 @@ export const authChannel = new BroadcastChannel(CHANNEL_NAME);
  */
 export type AuthMessage = {
   type: 'login' | 'logout' | 'token-expired';
-  payload?: unknown;
+  payload?: {
+    user?: User;
+  };
   timestamp?: number;
 };
 
@@ -24,13 +28,14 @@ export const AuthChannelUtils = {
   /**
    * 로그인 이벤트 전송
    */
-  sendLogin: () => {
+  sendLogin: (user?: User) => {
     const message: AuthMessage = {
       type: 'login',
+      payload: user ? { user } : undefined,
       timestamp: Date.now(),
     };
     authChannel.postMessage(message);
-    console.log('[AuthChannel] Login event sent');
+    console.log('[AuthChannel] Login event sent', user ? 'with user data' : 'without user data');
   },
 
   /**

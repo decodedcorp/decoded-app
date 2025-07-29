@@ -1,10 +1,9 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '../../../store/authStore';
 import { queryKeys } from '../../../lib/api/queryKeys';
-import { fetchUserProfile } from '../api/authApi';
-import { isAuthenticated, getValidAccessToken, shouldCheckToken } from '../utils/tokenManager';
+import { isAuthenticated, getValidAccessToken } from '../utils/tokenManager';
 import { TIMING } from '../constants';
-import { AuthError, NetworkError } from '../types/auth';
+import { AuthError } from '../types/auth';
 import { UsersService } from '../../../api/generated';
 import { useDocId } from './useDocId';
 
@@ -44,6 +43,10 @@ export const useAuthCore = () => {
       return failureCount < 2;
     },
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
+    // 캐시 무효화 방지를 위한 추가 설정
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
   });
 
   return {

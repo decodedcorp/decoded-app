@@ -12,27 +12,37 @@ export const useAuthChannelSync = () => {
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent<AuthMessage>) => {
-      const { type, timestamp } = event.data;
+      const { type, payload, timestamp } = event.data;
 
       console.log(
         `[AuthChannel] Received ${type} event at ${new Date(timestamp || 0).toISOString()}`,
+        { payload },
       );
 
       switch (type) {
         case 'login':
-          // sessionStorage에서 user 정보 가져오기
-          if (typeof window !== 'undefined') {
-            const userFromSession = sessionStorage.getItem('user');
-            if (userFromSession) {
-              try {
-                const user = JSON.parse(userFromSession);
-                setUser(user);
-                console.log('[AuthChannel] Login state synced from sessionStorage:', user);
-              } catch (error) {
-                console.error('[AuthChannel] Failed to parse user from sessionStorage:', error);
+          // 메시지에 user 정보가 포함된 경우 직접 사용
+          if (payload?.user) {
+            console.log('[AuthChannel] Using user data from message payload:', payload.user);
+            setUser(payload.user);
+            console.log('[AuthChannel] Login state synced from message payload:', payload.user);
+          } else {
+            // 메시지에 user 정보가 없는 경우 sessionStorage에서 가져오기
+            console.log('[AuthChannel] No user data in message, checking sessionStorage...');
+            if (typeof window !== 'undefined') {
+              const userFromSession = sessionStorage.getItem('user');
+              if (userFromSession) {
+                try {
+                  const user = JSON.parse(userFromSession);
+                  console.log('[AuthChannel] Found user data in sessionStorage:', user);
+                  setUser(user);
+                  console.log('[AuthChannel] Login state synced from sessionStorage:', user);
+                } catch (error) {
+                  console.error('[AuthChannel] Failed to parse user from sessionStorage:', error);
+                }
+              } else {
+                console.warn('[AuthChannel] No user data found in sessionStorage for login sync');
               }
-            } else {
-              console.warn('[AuthChannel] No user data found in sessionStorage for login sync');
             }
           }
           break;

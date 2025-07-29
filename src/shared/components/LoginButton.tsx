@@ -1,13 +1,22 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/domains/auth/hooks/useAuth';
+import { useAuthStore } from '@/store/authStore';
 import { useEffect, useState } from 'react';
 import { LoginModal } from '@/domains/auth/components/LoginModal';
 
 export function LoginButton() {
   const router = useRouter();
-  const { isAuthenticated, user, logout, isLoading } = useAuth();
+
+  // 개별 상태를 직접 구독하여 무한 루프 방지
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isLoading = useAuthStore((state) => state.isLoading);
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
+
+  // 사용자 표시 이름 계산
+  const userDisplayName = user?.nickname || user?.email || '';
+
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   // Hydration mismatch 방지를 위한 클라이언트 사이드 상태
@@ -48,7 +57,7 @@ export function LoginButton() {
         disabled
         className="px-4 py-2 rounded-md text-sm font-medium bg-neutral-900/50 text-[#EAFD66]/50 cursor-not-allowed transition"
       >
-        로딩 중...
+        Loading...
       </button>
     );
   }
@@ -60,7 +69,7 @@ export function LoginButton() {
         disabled
         className="px-4 py-2 rounded-md text-sm font-medium bg-neutral-900/50 text-[#EAFD66]/50 cursor-not-allowed transition"
       >
-        로딩 중...
+        Loading...
       </button>
     );
   }
@@ -71,16 +80,14 @@ export function LoginButton() {
         {isAuthenticated ? (
           <>
             {/* 사용자 정보 표시 */}
-            <span className="text-sm text-[#EAFD66] hidden md:block">
-              {user?.nickname || user?.email}
-            </span>
+            <span className="text-sm text-[#EAFD66] hidden md:block">{userDisplayName}</span>
 
             {/* 프로필 버튼 */}
             <button
               onClick={handleClick}
               className="px-4 py-2 rounded-md text-sm font-medium bg-neutral-900 text-[#EAFD66] hover:bg-[#EAFD66] hover:text-black transition"
             >
-              마이페이지
+              My Page
             </button>
 
             {/* 로그아웃 버튼 */}
@@ -88,7 +95,7 @@ export function LoginButton() {
               onClick={handleLogout}
               className="px-3 py-2 rounded-md text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition"
             >
-              로그아웃
+              Logout
             </button>
           </>
         ) : (
@@ -96,7 +103,7 @@ export function LoginButton() {
             onClick={handleClick}
             className="px-4 py-2 rounded-md text-sm font-medium bg-neutral-900 text-[#EAFD66] hover:bg-[#EAFD66] hover:text-black transition"
           >
-            로그인
+            Login
           </button>
         )}
       </div>

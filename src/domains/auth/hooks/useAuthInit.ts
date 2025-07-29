@@ -7,9 +7,14 @@ import { updateApiTokenFromStorage } from '../../../api/config';
  * Hook to initialize and restore authentication state on app startup
  */
 export const useAuthInit = () => {
-  const { setLoading, setError, logout, setUser } = useAuthStore();
+  const { setLoading, setError, logout, setUser, isInitialized, setInitialized } = useAuthStore();
 
   useEffect(() => {
+    // 이미 초기화되었으면 다시 실행하지 않음
+    if (isInitialized) {
+      return;
+    }
+
     const initializeAuth = async () => {
       try {
         setLoading(true);
@@ -37,6 +42,7 @@ export const useAuthInit = () => {
             console.log('[Auth] No tokens found, user not logged in');
           }
           setLoading(false);
+          setInitialized(true);
           return;
         }
 
@@ -47,6 +53,7 @@ export const useAuthInit = () => {
               console.log('[Auth] Access token expired, logging out');
             }
             logout();
+            setInitialized(true);
             return;
           }
 
@@ -90,15 +97,17 @@ export const useAuthInit = () => {
         }
 
         setLoading(false);
+        setInitialized(true);
       } catch (error) {
         if (process.env.NODE_ENV === 'development') {
           console.error('[Auth] Error during auth initialization:', error);
         }
         setError(error instanceof Error ? error.message : 'Authentication initialization failed');
         setLoading(false);
+        setInitialized(true);
       }
     };
 
     initializeAuth();
-  }, [setLoading, setError, logout, setUser]);
+  }, [setLoading, setError, logout, setUser, isInitialized, setInitialized]);
 };

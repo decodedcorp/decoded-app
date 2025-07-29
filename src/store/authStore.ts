@@ -11,7 +11,12 @@ import {
 } from '../domains/auth/utils/tokenManager';
 import { AuthChannelUtils } from '../domains/auth/utils/authChannel';
 
-interface AuthStore extends AuthState {
+// AuthState를 확장하여 초기화 상태 추가
+interface ExtendedAuthState extends AuthState {
+  isInitialized: boolean; // 초기화 완료 여부
+}
+
+interface AuthStore extends ExtendedAuthState {
   // Actions
   login: (response: LoginResponse) => void;
   logout: () => void;
@@ -19,6 +24,7 @@ interface AuthStore extends AuthState {
   setError: (error: string | null) => void;
   clearError: () => void;
   setUser: (user: User) => void; // user 상태 직접 설정
+  setInitialized: (initialized: boolean) => void; // 초기화 상태 설정
 
   // Token management
   getAccessToken: () => string | null;
@@ -39,6 +45,7 @@ export const useAuthStore = create<AuthStore>()(
         isLoading: false,
         error: null,
         isAuthenticated: false,
+        isInitialized: false, // 초기화 완료 여부
 
         // Actions
         login: (response: LoginResponse) => {
@@ -57,9 +64,9 @@ export const useAuthStore = create<AuthStore>()(
                 sessionStorage.setItem('user', JSON.stringify(user));
               }
 
-              // 멀티탭 동기화를 위한 login 이벤트 발행
+              // 멀티탭 동기화를 위한 login 이벤트 발행 (user 정보 포함)
               if (typeof window !== 'undefined') {
-                AuthChannelUtils.sendLogin();
+                AuthChannelUtils.sendLogin(user);
               }
 
               set({
@@ -97,6 +104,7 @@ export const useAuthStore = create<AuthStore>()(
             isAuthenticated: false,
             error: null,
             isLoading: false,
+            isInitialized: false, // 로그아웃 시 초기화 상태도 리셋
           });
         },
 
@@ -125,6 +133,13 @@ export const useAuthStore = create<AuthStore>()(
 
         clearError: () => {
           set({ error: null });
+        },
+
+        setInitialized: (initialized: boolean) => {
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[Auth] Setting initialized:', initialized);
+          }
+          set({ isInitialized: initialized });
         },
 
         // Token management
@@ -187,7 +202,7 @@ export const useAuthStore = create<AuthStore>()(
   ),
 );
 
-// Selectors
+// 안전한 개별 selector들만 유지
 export const selectUser = (state: AuthStore) => state.user;
 export const selectIsAuthenticated = (state: AuthStore) => state.isAuthenticated;
 export const selectIsLoading = (state: AuthStore) => state.isLoading;
