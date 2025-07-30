@@ -1,9 +1,10 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { ChannelsService } from '../../../api/generated';
 import { queryKeys } from '../../../lib/api/queryKeys';
 import { createApiHeaders, getTokenStatus } from '../../../api/utils/apiHeaders';
 import { refreshOpenAPIToken } from '../../../api/hooks/useApi';
 import { getValidAccessToken } from '../../auth/utils/tokenManager';
+import { OpenAPI } from '../../../api/generated/core/OpenAPI';
 
 export const useChannels = (params?: {
   page?: number;
@@ -28,14 +29,41 @@ export const useChannels = (params?: {
         params?.sortOrder,
       );
     },
-    staleTime: 5 * 60 * 1000, // 5분
+    staleTime: 2 * 60 * 1000, // 2분으로 단축
+    gcTime: 10 * 60 * 1000, // 10분 (기존 cacheTime)
+    refetchOnWindowFocus: false, // 윈도우 포커스 시 재요청 비활성화
+    refetchOnMount: false, // 마운트 시 재요청 비활성화
+    retry: 1, // 재시도 횟수 제한
+    retryDelay: 1000, // 재시도 간격 1초
   });
 };
 
 export const useChannel = (channelId: string) => {
   return useQuery({
     queryKey: queryKeys.channels.detail(channelId),
-    queryFn: () => ChannelsService.getChannelChannelsChannelIdGet(channelId),
+    queryFn: async () => {
+      // OpenAPI 토큰 업데이트
+      refreshOpenAPIToken();
+
+      console.log('[useChannel] Making API call for channelId:', channelId);
+      console.log('[useChannel] OpenAPI.BASE:', OpenAPI.BASE);
+      console.log('[useChannel] OpenAPI.TOKEN:', OpenAPI.TOKEN ? 'present' : 'missing');
+
+      try {
+        const result = await ChannelsService.getChannelChannelsChannelIdGet(channelId);
+        console.log('[useChannel] API call successful:', result);
+
+        // API 응답이 undefined인 경우 에러 던지기
+        if (result === undefined) {
+          throw new Error('API response is undefined - server returned empty response');
+        }
+
+        return result;
+      } catch (error) {
+        console.error('[useChannel] API call failed:', error);
+        throw error;
+      }
+    },
     enabled: !!channelId,
   });
 };
@@ -180,5 +208,44 @@ export const useRemoveChannelManagers = () => {
     onSuccess: (_, { channelId }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.channels.detail(channelId) });
     },
+  });
+};
+
+export const useInfiniteChannels = (params?: {
+  limit?: number;
+  search?: string;
+  ownerId?: string;
+  sortBy?: string;
+  sortOrder?: string;
+}) => {
+  return useInfiniteQuery({
+    queryKey: queryKeys.channels.list(params || {}),
+    queryFn: async ({ pageParam = 1 }) => {
+      // OpenAPI 토큰 업데이트
+      refreshOpenAPIToken();
+
+      return ChannelsService.listChannelsChannelsGet(
+        pageParam as number,
+        params?.limit || 20,
+        params?.search,
+        params?.ownerId,
+        params?.sortBy,
+        params?.sortOrder,
+      );
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage: any, allPages) => {
+      // 마지막 페이지에 더 많은 데이터가 있으면 다음 페이지 반환
+      if (lastPage?.channels && lastPage.channels.length === (params?.limit || 20)) {
+        return allPages.length + 1;
+      }
+      return undefined;
+    },
+    staleTime: 2 * 60 * 1000, // 2분으로 단축
+    gcTime: 10 * 60 * 1000, // 10분 (기존 cacheTime)
+    refetchOnWindowFocus: false, // 윈도우 포커스 시 재요청 비활성화
+    refetchOnMount: false, // 마운트 시 재요청 비활성화
+    retry: 1, // 재시도 횟수 제한
+    retryDelay: 1000, // 재시도 간격 1초
   });
 };

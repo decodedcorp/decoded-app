@@ -48,7 +48,7 @@ async function handleRequest(request: NextRequest, pathSegments: string[], metho
     // URL 끝의 슬래시 문제 해결
     const url = path ? `${API_BASE_URL}/${path}` : API_BASE_URL;
 
-    // Log basic request info in development
+    // Log basic request info in development (minimal)
     if (process.env.NODE_ENV === 'development') {
       console.log(`[Proxy] ${method} ${url}`);
     }
@@ -83,17 +83,17 @@ async function handleRequest(request: NextRequest, pathSegments: string[], metho
           );
           const decoded = JSON.parse(jsonPayload);
           const currentTime = Math.floor(Date.now() / 1000);
-          console.log(`[Proxy] Token decoded:`, {
-            exp: decoded.exp,
-            currentTime,
-            isExpired: currentTime > decoded.exp,
-            sub: decoded.sub,
-            role: decoded.role,
-          });
+          console.log(
+            `[Proxy] Token: ${decoded.sub} (${decoded.role}) - ${
+              currentTime > decoded.exp ? 'EXPIRED' : 'VALID'
+            }`,
+          );
         } catch (error) {
-          console.log(`[Proxy] Failed to decode token:`, error);
+          console.log(`[Proxy] Invalid token format`);
         }
       }
+    } else {
+      // 개발 환경에서는 인증 없이도 API 호출 허용
     }
 
     // User-Agent 설정
@@ -119,13 +119,20 @@ async function handleRequest(request: NextRequest, pathSegments: string[], metho
       urlWithQuery.pathname += '/';
     }
 
-    // 실제 API 요청 (리다이렉트 수동 처리)
+    // 실제 API 요청 (리다이렉트 수동 처리) - 타임아웃과 캐싱 추가
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10초 타임아웃
+
     let response = await fetch(urlWithQuery.toString(), {
       method,
       headers,
       body,
       redirect: 'manual', // 리다이렉트 수동 처리
+      signal: controller.signal,
+      cache: 'no-store', // 캐싱 비활성화로 최신 데이터 보장
     });
+
+    clearTimeout(timeoutId);
 
     // 리다이렉트 처리
     if (
@@ -158,8 +165,12 @@ async function handleRequest(request: NextRequest, pathSegments: string[], metho
     responseHeaders.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     responseHeaders.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, User-Agent');
 
-    // 응답 본문 처리
-    const responseBody = await response.text();
+    // 압축 관련 헤더 제거하여 디코딩 문제 해결
+    responseHeaders.delete('content-encoding');
+    responseHeaders.delete('content-length');
+
+    // 응답 본문 처리 - 스트림으로 처리하여 압축 문제 해결
+    const responseBody = await response.arrayBuffer();
 
     return new NextResponse(responseBody, {
       status: response.status,
