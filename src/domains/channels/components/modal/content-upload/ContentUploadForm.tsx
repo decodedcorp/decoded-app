@@ -98,33 +98,34 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
           file: 'Error occurred while processing image.',
         }));
       }
-    } else if (formData.type === ContentType.VIDEO) {
-      // Video file validation
-      const allowedVideoTypes = ['video/mp4', 'video/webm', 'video/ogg'];
-      if (!allowedVideoTypes.includes(file.type)) {
-        setValidationErrors((prev) => ({
-          ...prev,
-          file: 'Unsupported video format. (MP4, WebM, OGG)',
-        }));
-        return;
-      }
-
-      if (file.size > 100 * 1024 * 1024) {
-        // 100MB
-        setValidationErrors((prev) => ({
-          ...prev,
-          file: 'Video file is too large. (Max 100MB)',
-        }));
-        return;
-      }
-
-      updateFormData({
-        file,
-        filePreview: URL.createObjectURL(file),
-        video_url: URL.createObjectURL(file), // 임시 URL
-      });
-      setValidationErrors((prev) => ({ ...prev, file: undefined }));
     }
+    // } else if (formData.type === ContentType.VIDEO) {
+    //   // Video file validation - Temporarily disabled
+    //   const allowedVideoTypes = ['video/mp4', 'video/webm', 'video/ogg'];
+    //   if (!allowedVideoTypes.includes(file.type)) {
+    //     setValidationErrors((prev) => ({
+    //       ...prev,
+    //       file: 'Unsupported video format. (MP4, WebM, OGG)',
+    //     }));
+    //     return;
+    //   }
+
+    //   if (file.size > 100 * 1024 * 1024) {
+    //     // 100MB
+    //     setValidationErrors((prev) => ({
+    //       ...prev,
+    //       file: 'Video file is too large. (Max 100MB)',
+    //     }));
+    //     return;
+    //   }
+
+    //   updateFormData({
+    //     file,
+    //     filePreview: URL.createObjectURL(file),
+    //     video_url: URL.createObjectURL(file), // 임시 URL
+    //   });
+    //   setValidationErrors((prev) => ({ ...prev, file: undefined }));
+    // }
   };
 
   const validateForm = () => {
@@ -146,9 +147,9 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
       errors.file = 'Please select an image.';
     }
 
-    if (formData.type === ContentType.VIDEO && !formData.file) {
-      errors.file = 'Please select a video.';
-    }
+    // if (formData.type === ContentType.VIDEO && !formData.file) {
+    //   errors.file = 'Please select a video.';
+    // }
 
     if (formData.type === ContentType.LINK && !formData.url?.trim()) {
       errors.url = 'Please enter a link URL.';
@@ -215,10 +216,10 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
       {/* Content Type Selection */}
       <div>
         <label className="block text-sm font-medium text-white mb-3">Content Type *</label>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 gap-3">
           {[
             { type: ContentType.IMAGE, label: 'Image', icon: '🖼️' },
-            { type: ContentType.VIDEO, label: 'Video', icon: '🎥' },
+            // { type: ContentType.VIDEO, label: 'Video', icon: '🎥' }, // Temporarily disabled
             { type: ContentType.LINK, label: 'Link', icon: '🔗' },
           ].map(({ type, label, icon }) => (
             <button
@@ -283,25 +284,20 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
         <p className="mt-1 text-xs text-zinc-500">{formData.description.length}/500</p>
       </div>
 
-      {/* File Upload for Image/Video */}
-      {(formData.type === ContentType.IMAGE || formData.type === ContentType.VIDEO) && (
+      {/* File Upload for Image */}
+      {formData.type === ContentType.IMAGE && (
+        // formData.type === ContentType.VIDEO && (
         <div>
-          <label className="block text-sm font-medium text-white mb-3">
-            {formData.type === ContentType.IMAGE ? 'Image' : 'Video'} Upload *
-          </label>
+          <label className="block text-sm font-medium text-white mb-3">Image Upload *</label>
 
           {formData.filePreview ? (
             <div className="space-y-3">
               <div className="relative rounded-lg overflow-hidden bg-zinc-800/50 border border-zinc-700/50">
-                {formData.type === ContentType.IMAGE ? (
-                  <img
-                    src={formData.filePreview}
-                    alt="Preview"
-                    className="w-full h-48 object-cover"
-                  />
-                ) : (
-                  <video src={formData.filePreview} className="w-full h-48 object-cover" controls />
-                )}
+                <img
+                  src={formData.filePreview}
+                  alt="Preview"
+                  className="w-full h-48 object-cover"
+                />
                 <button
                   type="button"
                   onClick={removeFile}
@@ -332,23 +328,17 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
                       strokeLinejoin="round"
                     />
                   </svg>
-                  <span className="text-sm">
-                    Select {formData.type === ContentType.IMAGE ? 'Image' : 'Video'}
-                  </span>
+                  <span className="text-sm">Select Image</span>
                 </button>
               </div>
-              <p className="text-sm text-zinc-400">
-                {formData.type === ContentType.IMAGE
-                  ? 'JPG, PNG, WebP, GIF up to 10MB'
-                  : 'MP4, WebM, OGG up to 100MB'}
-              </p>
+              <p className="text-sm text-zinc-400">JPG, PNG, WebP, GIF up to 10MB</p>
             </div>
           )}
 
           <input
             ref={fileInputRef}
             type="file"
-            accept={formData.type === ContentType.IMAGE ? 'image/*' : 'video/*'}
+            accept="image/*"
             onChange={handleFileChange}
             className="hidden"
             disabled={isLoading}

@@ -26,11 +26,12 @@ export function ContentUploadModal() {
 
   // API mutations
   const createImageContent = useCreateImageContent();
-  const createVideoContent = useCreateVideoContent();
+  // const createVideoContent = useCreateVideoContent(); // Temporarily disabled
   const createLinkContent = useCreateLinkContent();
 
   const isLoading =
-    createImageContent.isPending || createVideoContent.isPending || createLinkContent.isPending;
+    createImageContent.isPending ||
+    /* createVideoContent.isPending || */ createLinkContent.isPending;
 
   // 폼 유효성 검사
   const canSubmit = React.useMemo(() => {
@@ -39,8 +40,8 @@ export function ContentUploadModal() {
     switch (formData.type) {
       case ContentType.IMAGE:
         return !!formData.img_url;
-      case ContentType.VIDEO:
-        return !!formData.video_url;
+      // case ContentType.VIDEO:
+      //   return !!formData.video_url;
       case ContentType.LINK:
         return !!formData.url?.trim() && !!formData.category?.trim();
       default:
@@ -63,15 +64,15 @@ export function ContentUploadModal() {
           });
           break;
 
-        case ContentType.VIDEO:
-          result = await createVideoContent.mutateAsync({
-            channel_id: data.channel_id,
-            title: data.title,
-            description: data.description,
-            video_url: data.video_url,
-            thumbnail_url: data.thumbnail_url,
-          });
-          break;
+        // case ContentType.VIDEO:
+        //   result = await createVideoContent.mutateAsync({
+        //     channel_id: data.channel_id,
+        //     title: data.title,
+        //     description: data.description,
+        //     video_url: data.video_url,
+        //     thumbnail_url: data.thumbnail_url,
+        //   });
+        //   break;
 
         case ContentType.LINK:
           result = await createLinkContent.mutateAsync({
@@ -126,7 +127,7 @@ export function ContentUploadModal() {
             isLoading={isLoading}
             error={
               createImageContent.error?.message ||
-              createVideoContent.error?.message ||
+              // createVideoContent.error?.message ||
               createLinkContent.error?.message
             }
           />
