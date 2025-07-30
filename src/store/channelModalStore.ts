@@ -2,11 +2,17 @@ import { create } from 'zustand';
 import { ChannelResponse } from '@/api/generated';
 
 export interface ChannelData {
+  id?: string;
   name: string;
   img?: string;
   description: string;
   category: string;
   followers: string;
+  contentCount?: number;
+  ownerId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  isSubscribed?: boolean;
 }
 
 interface ChannelModalState {

@@ -24,10 +24,7 @@ export interface EmptyItemType {
   category?: string;
 }
 
-export interface TestChannelItemType {
-  type: 'test-channel';
-  id: string;
-}
+
 
 export interface Editor {
   name: string;

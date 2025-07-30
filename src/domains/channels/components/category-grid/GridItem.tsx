@@ -7,7 +7,6 @@ import { GridItemProps } from '../../types/masonry';
 import { getInitials } from '../../utils/editorUtils';
 import { useChannelModalStore } from '@/store/channelModalStore';
 import { ChannelData } from '../hero/heroData';
-import { CtaCard } from './CtaCard';
 
 export function GridItem({
   imageUrl,
@@ -62,17 +61,42 @@ export function GridItem({
       </div>
       {/* 이미지 + hover overlay */}
       <div className="relative w-full aspect-[4/5] bg-zinc-900 flex items-center justify-center overflow-hidden group">
-        {imageUrl ? (
+        {isEmpty ? (
+          // 채널 추가 버튼 (간단한 버튼)
+          <div className="w-full h-full bg-zinc-800 flex items-center justify-center">
+            <button
+              onClick={onAddChannel}
+              className="px-6 py-3 rounded-full bg-zinc-700 hover:bg-zinc-600 text-white font-medium transition-colors border border-zinc-600"
+            >
+              + Add Channel
+            </button>
+          </div>
+        ) : (
           <>
-            <Image
-              src={imageUrl}
-              alt={title}
-              fill
-              className="object-cover"
-              loading="lazy"
-              sizes="(max-width: 768px) 100vw, 33vw"
-            />
-            {/* hover overlay */}
+            {imageUrl ? (
+              <Image
+                src={imageUrl}
+                alt={title}
+                fill
+                className="object-cover"
+                loading="lazy"
+                sizes="(max-width: 768px) 100vw, 33vw"
+              />
+            ) : (
+              // 썸네일이 없을 때 기본 배경
+              <div className="w-full h-full bg-zinc-800 flex items-center justify-center">
+                <svg width="32" height="32" fill="none" viewBox="0 0 32 32">
+                  <rect width="32" height="32" rx="8" fill="#52525b" />
+                  <path
+                    d="M10 16h12M16 10v12"
+                    stroke="#71717a"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+            )}
+            {/* hover overlay - 썸네일 유무와 관계없이 항상 표시 */}
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
               <button
                 className="px-3 py-1.5 rounded-full bg-white/90 text-zinc-900 text-xs font-semibold shadow hover:bg-white"
@@ -82,18 +106,6 @@ export function GridItem({
               </button>
             </div>
           </>
-        ) : isEmpty ? (
-          // 채널 추가 CTA
-          <CtaCard ctaIdx={3} onClick={onAddChannel} />
-        ) : (
-          // 기존 Coming Soon 상태
-          <div className="flex flex-col items-center justify-center w-full h-full gap-1">
-            <span className="text-zinc-700 text-base font-thin">Coming Soon</span>
-            <svg width="32" height="32" fill="none" viewBox="0 0 32 32">
-              <rect width="32" height="32" rx="8" fill="#27272a" />
-              <path d="M10 16h12M16 10v12" stroke="#52525b" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-          </div>
         )}
       </div>
       {/* 텍스트 정보 */}

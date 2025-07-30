@@ -1,9 +1,9 @@
-import { MainPage } from '@/domains/main';
+import ChannelPage from '@/domains/channels/page';
 
 export default function Page() {
   return (
-    <div>
-      <MainPage />
-    </div>
+    <main>
+      <ChannelPage />
+    </main>
   );
 }

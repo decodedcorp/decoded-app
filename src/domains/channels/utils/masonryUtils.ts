@@ -1,4 +1,4 @@
-import { MasonryItem, CtaCardType, EmptyItemType, TestChannelItemType } from '../types/masonry';
+import { MasonryItem, CtaCardType, EmptyItemType } from '../types/masonry';
 
 // mock 데이터 (신규/인기 랜덤 플래그 추가)
 export function getMockItems(): MasonryItem[] {
@@ -94,46 +94,64 @@ export function distributeNoImageCards(items: MasonryItem[]): MasonryItem[] {
   return result;
 }
 
-// 비어있는 아이템 추가: 채널 추가 아이템 삽입 비활성화
+// 비어있는 아이템 추가: 채널 추가 아이템 삽입
 export function insertEmptyItems(
   items: Array<MasonryItem | CtaCardType>,
   interval = 6,
 ): Array<MasonryItem | CtaCardType | EmptyItemType> {
-  // 채널 추가 아이템 삽입을 비활성화하고 원본 아이템만 반환
-  return items as Array<MasonryItem | CtaCardType | EmptyItemType>;
+  const result: Array<MasonryItem | CtaCardType | EmptyItemType> = [];
+  let emptyCount = 0;
+
+  items.forEach((item, idx) => {
+    if (idx !== 0 && idx % interval === 0) {
+      // 빈 아이템 삽입
+      result.push({
+        type: 'empty',
+        id: `empty-${emptyCount++}`,
+        title: 'Add Channel',
+        category: 'Add New',
+      });
+    }
+    result.push(item);
+  });
+
+  return result;
 }
 
-// Masonry 레이아웃 + CTA 카드 삽입 (채널 추가 고정)
+// Masonry 레이아웃 + CTA 카드 삽입 (Add Channel CTA 필수 포함)
 export function insertSpecialCards(
   items: MasonryItem[],
   interval = 8,
 ): Array<MasonryItem | CtaCardType> {
   const result: Array<MasonryItem | CtaCardType> = [];
   let ctaCount = 0;
+
+  // CTA 카드 타입 (0: Discover, 1: Trending, 2: Featured, 3: Add Channel)
+  const ctaTypes = [0, 1, 2, 3];
+
   items.forEach((item, idx) => {
     if (idx !== 0 && idx % interval === 0) {
-      // CTA 카드를 항상 채널 추가(ctaIdx=3)로 고정
-      result.push({ type: 'cta', id: `cta-${idx}`, ctaIdx: 3 });
+      // Add Channel CTA를 우선적으로 배치하고, 나머지는 순환
+      let ctaType;
+      if (ctaCount === 0) {
+        // 첫 번째 CTA는 항상 Add Channel
+        ctaType = 3;
+      } else {
+        // 나머지는 순환 (Add Channel 제외)
+        const regularTypes = [0, 1, 2];
+        ctaType = regularTypes[(ctaCount - 1) % regularTypes.length];
+      }
+
+      result.push({ type: 'cta', id: `cta-${idx}`, ctaIdx: ctaType });
+      ctaCount++;
     }
     result.push(item);
   });
-  return result;
-}
 
-// TestChannelItem 고정 삽입
-export function insertTestChannelItem(
-  items: Array<MasonryItem | CtaCardType | EmptyItemType>,
-  position = 0,
-): Array<MasonryItem | CtaCardType | EmptyItemType | TestChannelItemType> {
-  const result: Array<MasonryItem | CtaCardType | EmptyItemType | TestChannelItemType> = [];
-
-  items.forEach((item, idx) => {
-    if (idx === position) {
-      // 지정된 위치에 TestChannelItem 삽입
-      result.push({ type: 'test-channel', id: 'test-channel-fixed' });
-    }
-    result.push(item);
-  });
+  // 아이템이 충분하지 않으면 마지막에 Add Channel CTA 추가
+  if (ctaCount === 0 && items.length > 0) {
+    result.push({ type: 'cta', id: 'cta-final', ctaIdx: 3 });
+  }
 
   return result;
 }

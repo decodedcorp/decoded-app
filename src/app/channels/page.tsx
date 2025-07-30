@@ -1,9 +1,5 @@
-import ChannelPage from '@/domains/channels/page';
+import { redirect } from 'next/navigation';
 
 export default function ChannelsPage() {
-  return (
-    <main>
-      <ChannelPage />
-    </main>
-  );
+  redirect('/');
 }

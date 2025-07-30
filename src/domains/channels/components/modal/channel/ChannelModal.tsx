@@ -19,6 +19,7 @@ import { ChannelModalFooter } from './ChannelModalFooter';
 import { ChannelModalSidebar } from './ChannelModalSidebar';
 import type { SidebarFilters } from '@/domains/channels/components/sidebar/ChannelSidebar';
 import { ChannelData } from '@/store/channelModalStore';
+import { ChannelModalSkeleton } from './ChannelModalSkeleton';
 
 export function ChannelModal() {
   const isOpen = useChannelModalStore(selectIsModalOpen);
@@ -30,6 +31,19 @@ export function ChannelModal() {
 
   // 채널 ID로 API 데이터 가져오기
   const { data: apiChannel, isLoading, error } = useChannel(channelId || '');
+
+  // 디버깅을 위한 로그
+  React.useEffect(() => {
+    if (apiChannel) {
+      console.log('API Channel Data:', apiChannel);
+    }
+    if (error) {
+      console.error('Channel API Error:', error);
+    }
+    console.log('Channel ID:', channelId);
+    console.log('Channel from store:', channel);
+    console.log('Is modal open:', isOpen);
+  }, [apiChannel, error, channelId, channel, isOpen]);
 
   // 사이드바 상태 관리
   const [currentFilters, setCurrentFilters] = useState<SidebarFilters>({
@@ -52,18 +66,29 @@ export function ChannelModal() {
   const finalChannel = useMemo((): ChannelData | null => {
     if (apiChannel) {
       // API 데이터를 ChannelData 형태로 변환
-      return {
+      const convertedChannel = {
+        id: apiChannel.id,
         name: apiChannel.name,
         img: apiChannel.thumbnail_url || undefined,
         description: apiChannel.description || '채널 설명이 없습니다.',
         category: 'default', // TODO: API에서 카테고리 정보 추가 필요
         followers: apiChannel.subscriber_count ? apiChannel.subscriber_count.toLocaleString() : '0',
+        contentCount: apiChannel.content_count || 0,
+        ownerId: apiChannel.owner_id,
+        createdAt: apiChannel.created_at,
+        updatedAt: apiChannel.updated_at || undefined,
+        isSubscribed: apiChannel.is_subscribed || false,
       };
+      return convertedChannel;
     }
     return channel;
-  }, [apiChannel, channel]);
+  }, [apiChannel, channel, channelId]);
 
-  if (!finalChannel) return null;
+  // finalChannel이 없어도 모달은 열어두고 로딩 상태 표시
+  if (!isOpen) return null;
+
+  // finalChannel이 없어도 모달은 열어두고 로딩 상태 표시
+  if (!isOpen) return null;
 
   return (
     <BaseModal
@@ -87,23 +112,22 @@ export function ChannelModal() {
       >
         {/* Header */}
         <div className="flex-shrink-0">
-          <ChannelModalHeader channel={finalChannel} onClose={closeModal} />
+          {finalChannel ? (
+            <ChannelModalHeader channel={finalChannel} onClose={closeModal} />
+          ) : (
+            <ChannelModalSkeleton onClose={closeModal} />
+          )}
         </div>
 
         {/* Main Content */}
         <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
           <div className="p-6">
-            {isLoading && (
-              <div className="flex items-center justify-center h-32">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-              </div>
-            )}
             {error && (
               <div className="text-red-500 text-center p-4">
                 채널 정보를 불러오는데 실패했습니다.
               </div>
             )}
-            {!isLoading && !error && (
+            {!error && finalChannel && (
               <>
                 <ChannelModalStats channel={finalChannel} />
                 <ChannelModalEditors />
@@ -111,12 +135,42 @@ export function ChannelModal() {
                 <ChannelModalRelated />
               </>
             )}
+            {!error && !finalChannel && (
+              <div className="space-y-6">
+                {/* Stats 스켈레톤 */}
+                <div className="space-y-4">
+                  <div className="flex space-x-6">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <div key={i} className="text-center">
+                        <div className="h-6 w-12 bg-zinc-700 rounded mx-auto mb-1 animate-pulse" />
+                        <div className="h-3 w-10 bg-zinc-800 rounded mx-auto animate-pulse" />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                      <div key={i} className="h-4 w-16 bg-zinc-800 rounded animate-pulse" />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Content 스켈레톤 */}
+                <div>
+                  <div className="h-8 w-32 bg-zinc-700 rounded mb-6 animate-pulse" />
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {Array.from({ length: 8 }).map((_, i) => (
+                      <div key={i} className="h-40 bg-zinc-800 rounded-xl animate-pulse" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Footer */}
         <div className="flex-shrink-0">
-          <ChannelModalFooter />
+          {finalChannel && <ChannelModalFooter channel={finalChannel} />}
         </div>
       </ChannelModalContainer>
     </BaseModal>

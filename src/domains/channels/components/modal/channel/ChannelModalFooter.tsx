@@ -1,11 +1,24 @@
 import React from 'react';
+import { ChannelData } from '@/store/channelModalStore';
 
-export function ChannelModalFooter() {
+interface ChannelModalFooterProps {
+  channel: ChannelData;
+}
+
+export function ChannelModalFooter({ channel }: ChannelModalFooterProps) {
+  const isSubscribed = channel.isSubscribed;
+
   return (
     <div className="flex items-center justify-between p-4 border-t border-zinc-700/50 bg-zinc-900/50">
       <div className="flex space-x-4">
-        <button className="px-6 py-2 bg-white text-black font-semibold rounded-full hover:bg-zinc-200 transition-colors">
-          Follow Channel
+        <button
+          className={`px-6 py-2 font-semibold rounded-full transition-colors ${
+            isSubscribed
+              ? 'border border-zinc-600 text-white hover:bg-zinc-800'
+              : 'bg-white text-black hover:bg-zinc-200'
+          }`}
+        >
+          {isSubscribed ? 'Unfollow' : 'Follow Channel'}
         </button>
         <button className="px-6 py-2 border border-zinc-600 text-white font-semibold rounded-full hover:bg-zinc-800 transition-colors">
           Share Channel

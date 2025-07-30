@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChannelData } from '../../hero/heroData';
+import { ChannelData } from '@/store/channelModalStore';
 
 interface ChannelModalStatsProps {
   channel: ChannelData;
@@ -15,7 +15,7 @@ export function ChannelModalStats({ channel }: ChannelModalStatsProps) {
           <div className="text-zinc-400 text-sm">Followers</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-white">247</div>
+          <div className="text-2xl font-bold text-white">{channel.contentCount || 0}</div>
           <div className="text-zinc-400 text-sm">Posts</div>
         </div>
         <div className="text-center">
@@ -28,7 +28,7 @@ export function ChannelModalStats({ channel }: ChannelModalStatsProps) {
       <div className="flex flex-wrap gap-2">
         <span className="text-zinc-400 text-xs">#{channel.category}</span>
         <span className="text-zinc-400 text-xs">#Design</span>
-        <span className="text-zinc-400 text-xs">#Art</span>
+        <span className="text-zinc-400 text-xs">#Art</span> 
         <span className="text-zinc-400 text-xs">#Technology</span>
         <span className="text-zinc-400 text-xs">#Creative</span>
         <span className="text-zinc-400 text-xs">#Innovation</span>
