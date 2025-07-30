@@ -9,7 +9,7 @@ export type LinkContentResponse = {
     channel_id: string;
     provider_id: string;
     url: string;
-    category: string;
+    category?: (string | null);
     link_preview_metadata?: (LinkPreviewMetadataResponse | null);
     ai_gen_metadata?: (AIGenMetadataResponse | null);
     created_at?: (string | null);

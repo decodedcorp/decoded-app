@@ -39,11 +39,11 @@ export function ContentUploadModal() {
 
     switch (formData.type) {
       case ContentType.IMAGE:
-        return !!formData.img_url;
+        return !!formData.base64_img_url;
       // case ContentType.VIDEO:
       //   return !!formData.video_url;
       case ContentType.LINK:
-        return !!formData.url?.trim() && !!formData.category?.trim();
+        return !!formData.url?.trim();
       default:
         return false;
     }
@@ -60,7 +60,7 @@ export function ContentUploadModal() {
         case ContentType.IMAGE:
           result = await createImageContent.mutateAsync({
             channel_id: data.channel_id,
-            img_url: data.img_url,
+            base64_img_url: data.base64_img_url,
           });
           break;
 
@@ -78,7 +78,6 @@ export function ContentUploadModal() {
           result = await createLinkContent.mutateAsync({
             channel_id: data.channel_id,
             url: data.url,
-            category: data.category,
           });
           break;
 

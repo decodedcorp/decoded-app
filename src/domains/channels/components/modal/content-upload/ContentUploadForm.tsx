@@ -26,7 +26,6 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     description?: string;
     file?: string;
     url?: string;
-    category?: string;
   }>({});
 
   const handleInputChange = (field: keyof typeof formData, value: string) => {
@@ -46,7 +45,6 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
       img_url: undefined,
       video_url: undefined,
       url: undefined,
-      category: undefined,
     });
     setValidationErrors({});
   };
@@ -87,7 +85,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
         updateFormData({
           file,
           filePreview: URL.createObjectURL(file),
-          img_url: optimizedBase64,
+          base64_img_url: optimizedBase64,
         });
         setValidationErrors((prev) => ({ ...prev, file: undefined }));
       } catch (error) {
@@ -147,6 +145,10 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
       errors.file = 'Please select an image.';
     }
 
+    if (formData.type === ContentType.IMAGE && !formData.base64_img_url) {
+      errors.file = 'Please select an image.';
+    }
+
     // if (formData.type === ContentType.VIDEO && !formData.file) {
     //   errors.file = 'Please select a video.';
     // }
@@ -161,10 +163,6 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
       } catch {
         errors.url = 'Please enter a valid URL format.';
       }
-    }
-
-    if (formData.type === ContentType.LINK && !formData.category?.trim()) {
-      errors.category = 'Please enter a category.';
     }
 
     setValidationErrors(errors);
@@ -190,7 +188,6 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
       }),
       ...(formData.type === ContentType.LINK && {
         url: formData.url?.trim(),
-        category: formData.category?.trim(),
       }),
     };
 
@@ -370,27 +367,6 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
             />
             {validationErrors.url && (
               <p className="mt-1 text-sm text-red-400">{validationErrors.url}</p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="content-category" className="block text-sm font-medium text-white mb-2">
-              Category *
-            </label>
-            <input
-              id="content-category"
-              type="text"
-              value={formData.category || ''}
-              onChange={(e) => handleInputChange('category', e.target.value)}
-              className={`w-full px-4 py-3 bg-zinc-800 border rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-600 focus:border-transparent transition-colors ${
-                validationErrors.category ? 'border-red-500' : 'border-zinc-700'
-              }`}
-              placeholder="e.g., Technology, Design, News"
-              disabled={isLoading}
-              maxLength={50}
-            />
-            {validationErrors.category && (
-              <p className="mt-1 text-sm text-red-400">{validationErrors.category}</p>
             )}
           </div>
         </div>

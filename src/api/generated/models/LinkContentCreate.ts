@@ -5,6 +5,5 @@
 export type LinkContentCreate = {
     channel_id: string;
     url: string;
-    category: string;
 };
 

@@ -6,6 +6,12 @@ interface ContentModalBodyProps {
 }
 
 export function ContentModalBody({ content }: ContentModalBodyProps) {
+  // 디버깅을 위한 콘솔 로그
+  console.log('ContentModalBody - content:', content);
+  console.log('ContentModalBody - content.type:', content.type);
+  console.log('ContentModalBody - content.imageUrl:', content.imageUrl);
+  console.log('ContentModalBody - content.linkUrl:', content.linkUrl);
+
   return (
     <div className="p-6">
       {/* Content Title */}
@@ -19,12 +25,38 @@ export function ContentModalBody({ content }: ContentModalBodyProps) {
       {/* Content Display */}
       <div className="mb-6">
         {content.type === 'image' && content.imageUrl && (
-          <div className="relative rounded-xl overflow-hidden bg-zinc-800/50">
-            <img
-              src={content.imageUrl}
-              alt={content.title}
-              className="w-full h-auto max-h-[70vh] object-contain"
-            />
+          <div className="space-y-4">
+            <div className="relative rounded-xl overflow-hidden bg-zinc-800/50">
+              <img
+                src={content.imageUrl}
+                alt={content.title}
+                className="w-full h-auto max-h-[70vh] object-contain"
+              />
+            </div>
+
+            {/* Image Info */}
+            <div className="bg-zinc-800/30 rounded-lg p-4 border border-zinc-700/50">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <p className="text-sm text-zinc-400 mb-2">Image URL:</p>
+                  <p className="text-blue-400 text-sm break-all font-mono">{content.imageUrl}</p>
+                </div>
+                <button
+                  onClick={() => window.open(content.imageUrl, '_blank')}
+                  className="ml-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 flex items-center space-x-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
+                  </svg>
+                  <span>Open Image</span>
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
@@ -48,7 +80,38 @@ export function ContentModalBody({ content }: ContentModalBodyProps) {
           <div className="bg-zinc-800/50 rounded-xl p-8 border border-zinc-700/50">
             <div className="prose prose-invert max-w-none">
               <h3 className="text-xl font-semibold text-white mb-4">{content.title}</h3>
-              <p className="text-zinc-300 leading-relaxed">{content.description}</p>
+              <p className="text-zinc-300 leading-relaxed mb-4">{content.description}</p>
+
+              {/* Link URL Display */}
+              {content.linkUrl && (
+                <div className="mt-6 p-4 bg-zinc-700/30 rounded-lg border border-zinc-600/50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-zinc-400 mb-2">Link URL:</p>
+                      <p className="text-blue-400 text-sm break-all font-mono">{content.linkUrl}</p>
+                    </div>
+                    <button
+                      onClick={() => window.open(content.linkUrl, '_blank')}
+                      className="ml-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 flex items-center space-x-2"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                        />
+                      </svg>
+                      <span>Open Link</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}

@@ -4,15 +4,16 @@ import { ContentItem } from '@/lib/types/content';
 import { useChannelContentsSinglePage } from '@/domains/channels/hooks/useChannelContents';
 import { useChannelModalStore } from '@/store/channelModalStore';
 import { useContentUploadStore } from '@/store/contentUploadStore';
+import { ContentType } from '@/api/generated';
 
 export function ChannelModalContent() {
   const openContentModal = useContentModalStore((state) => state.openModal);
   const channelId = useChannelModalStore((state) => state.selectedChannelId);
   const openContentUploadModal = useContentUploadStore((state) => state.openModal);
 
-  // API에서 채널 콘텐츠 조회
+  // API에서 채널 콘텐츠 조회 (이미 ContentItem으로 변환됨)
   const {
-    data: apiContents,
+    data: contentItems,
     isLoading,
     error,
   } = useChannelContentsSinglePage({
@@ -188,7 +189,7 @@ export function ChannelModalContent() {
       height: 'h-80',
       width: 'col-span-2',
       category: 'Mobile',
-      imageUrl: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&h=500&fit=crop',
+      imageUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=600&h=800&fit=crop',
       description: 'Mobile app design best practices',
     },
     {
@@ -285,27 +286,25 @@ export function ChannelModalContent() {
       height: 'h-72',
       width: 'col-span-1',
       category: 'Experimental',
-      imageUrl: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=500&fit=crop',
+      imageUrl: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=600&h=500&fit=crop',
       description: 'Pushing boundaries in design innovation',
     },
   ];
 
   // API 데이터가 있으면 사용, 없으면 mock 데이터 사용
-  const contentItems = apiContents || mockContentItems;
+  const displayContentItems = contentItems || mockContentItems;
 
   // 로딩 상태 처리
   if (isLoading) {
     return (
-      <div className="mb-8">
-        <h3 className="text-xl font-semibold text-white mb-6">Channel Content</h3>
-        <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6 gap-4 space-y-4">
-          {Array.from({ length: 12 }).map((_, index) => (
-            <div key={index} className="break-inside-avoid mb-4">
-              <div className="relative overflow-hidden rounded-xl bg-zinc-800/50 border border-zinc-700/50 h-64 animate-pulse">
-                <div className="w-full h-full bg-zinc-700/50"></div>
-              </div>
-            </div>
-          ))}
+      <div className="p-6">
+        <div className="animate-pulse">
+          <div className="h-8 bg-zinc-700 rounded mb-4"></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <div key={i} className="h-64 bg-zinc-700 rounded-xl"></div>
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -314,53 +313,63 @@ export function ChannelModalContent() {
   // 에러 상태 처리
   if (error) {
     return (
-      <div className="mb-8">
-        <h3 className="text-xl font-semibold text-white mb-6">Channel Content</h3>
-        <div className="text-center py-8">
-          <p className="text-zinc-400">Failed to load content. Using sample data.</p>
+      <div className="p-6">
+        <div className="text-center">
+          <p className="text-red-400 mb-4">Failed to load content</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+          >
+            Retry
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="mb-8">
+    <div className="p-6">
+      {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-semibold text-white">
-          Channel Content {apiContents && `(${apiContents.length} items)`}
-        </h3>
-
-        {/* Upload Button */}
+        <div>
+          <h3 className="text-xl font-semibold text-white mb-2">Channel Content</h3>
+          <p className="text-zinc-400">
+            {displayContentItems.length} items • {contentItems ? 'Live data' : 'Demo content'}
+          </p>
+        </div>
         <button
           onClick={() => openContentUploadModal(channelId || '')}
-          className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg transition-all duration-200 hover:scale-[1.02] flex items-center space-x-2 border border-zinc-700 hover:border-zinc-600"
+          className="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg transition-all duration-200 flex items-center space-x-3 border border-zinc-700 hover:border-zinc-600 hover:scale-[1.02] font-medium shadow-lg hover:shadow-xl"
         >
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
-            <path
-              d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
-          <span>Upload Content</span>
+          <span>Add Content</span>
         </button>
       </div>
 
       {/* Masonry Grid Container */}
       <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6 gap-4 space-y-4">
-        {contentItems.map((item: ContentItem) => (
+        {displayContentItems.map((item: ContentItem) => (
           <div
             key={item.id}
             className={`break-inside-avoid mb-4 group cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl`}
-            onClick={() => openContentModal(item)}
+            onClick={() => {
+              // 링크 콘텐츠인 경우 새 탭에서 URL 열기
+              if (item.linkUrl) {
+                window.open(item.linkUrl, '_blank');
+              } else {
+                openContentModal(item);
+              }
+            }}
           >
             <div
-              className={`relative overflow-hidden rounded-xl bg-zinc-800/50 border border-zinc-700/50 ${item.height}`}
+              className={`relative overflow-hidden rounded-xl bg-zinc-800/50 border border-zinc-700/50 ${
+                item.height || 'h-64'
+              }`}
             >
               {/* Content based on type */}
-              {item.type === 'image' && item.imageUrl && (
+              {item.imageUrl && (
                 <img
                   src={item.imageUrl}
                   alt={item.title}
@@ -368,44 +377,35 @@ export function ChannelModalContent() {
                 />
               )}
 
-              {item.type === 'video' && item.imageUrl && (
-                <>
-                  <img
-                    src={item.imageUrl}
-                    alt={item.title}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                  {/* Video play button overlay */}
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-5">
-                    <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                      <div className="w-0 h-0 border-l-[12px] border-l-white border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent ml-1" />
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {item.type === 'text' && (
+              {!item.imageUrl && (
                 <div className="w-full h-full bg-gradient-to-br from-zinc-700/50 to-zinc-800/50 flex items-center justify-center p-6">
                   <div className="text-center">
                     <h4 className="text-white font-semibold text-lg mb-2">{item.title}</h4>
                     <p className="text-zinc-300 text-sm">{item.description}</p>
+                    {item.linkUrl && (
+                      <div className="mt-3">
+                        <span className="text-blue-400 text-xs break-all">{item.linkUrl}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
 
-              {/* Category badge */}
-              {/* <div className="absolute top-3 left-3 z-10">
-                <span className="px-3 py-1.5 bg-white/20 backdrop-blur-sm text-white text-xs font-medium rounded-full border border-white/10 transition-all duration-300 group-hover:bg-white/30 group-hover:border-white/20 group-hover:scale-105 group-hover:shadow-lg">
-                  {item.category}
+              {/* Type indicator */}
+              <div className="absolute top-3 right-3">
+                <span className="px-2 py-1 bg-black/50 text-white text-xs rounded-full">
+                  {item.type}
                 </span>
-              </div> */}
+              </div>
 
-              {/* Content info overlay */}
-              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <h4 className="text-white font-semibold text-sm mb-1 line-clamp-2">{item.title}</h4>
-                {item.description && (
-                  <p className="text-zinc-300 text-xs line-clamp-2">{item.description}</p>
-                )}
+              {/* Overlay on hover */}
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-end">
+                <div className="w-full p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                  <h4 className="text-white font-semibold text-sm mb-1">{item.title}</h4>
+                  {item.description && (
+                    <p className="text-zinc-300 text-xs line-clamp-2">{item.description}</p>
+                  )}
+                </div>
               </div>
             </div>
           </div>

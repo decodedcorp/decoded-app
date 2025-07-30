@@ -31,12 +31,12 @@ export function ChannelModalSubscribeButton({
       onClick={handleClick}
       disabled={isLoading}
       className={`
-        px-6 py-3 rounded-full font-semibold transition-all duration-200
+        px-6 py-3 rounded-lg font-medium transition-all duration-200 border shadow-lg hover:shadow-xl
         ${isSubscribed
-          ? 'bg-zinc-700 hover:bg-zinc-600 text-white'
-          : 'bg-blue-600 hover:bg-blue-500 text-white'
+          ? 'bg-zinc-800 hover:bg-zinc-700 text-white border-zinc-700 hover:border-zinc-600'
+          : 'bg-zinc-700 hover:bg-zinc-600 text-white border-zinc-600 hover:border-zinc-500'
         }
-        ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+        ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:scale-[1.02]'}
       `}
     >
       {isLoading ? (

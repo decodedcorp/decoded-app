@@ -14,6 +14,7 @@ export interface ContentItem {
   date?: string;
   likes?: number;
   views?: number;
+  linkUrl?: string;
 }
 
 interface ContentModalState {

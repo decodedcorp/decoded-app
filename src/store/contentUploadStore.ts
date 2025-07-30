@@ -9,6 +9,7 @@ export interface ContentUploadFormData {
 
   // 이미지 콘텐츠용
   img_url?: string;
+  base64_img_url?: string;
 
   // 비디오 콘텐츠용
   video_url?: string;
@@ -16,7 +17,6 @@ export interface ContentUploadFormData {
 
   // 링크 콘텐츠용
   url?: string;
-  category?: string;
 
   // 파일 업로드용
   file?: File;

@@ -5,7 +5,7 @@
 import type { TaggedItemCreate } from './TaggedItemCreate';
 export type ImageContentCreate = {
     channel_id: string;
-    img_url: string;
+    base64_img_url: string;
     tagged_items?: Array<TaggedItemCreate>;
 };
 
