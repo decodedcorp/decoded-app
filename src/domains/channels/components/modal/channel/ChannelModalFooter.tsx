@@ -6,7 +6,7 @@ interface ChannelModalFooterProps {
 }
 
 export function ChannelModalFooter({ channel }: ChannelModalFooterProps) {
-  const isSubscribed = channel.isSubscribed;
+  const isSubscribed = channel.is_subscribed;
 
   return (
     <div className="flex items-center justify-between p-4 border-t border-zinc-700/50 bg-zinc-900/50">

@@ -120,11 +120,15 @@ export function MasonryGrid({ onExpandChange }: MasonryGridProps) {
 
     // API 데이터가 없거나 해당 채널이 없으면 mock 데이터로 모달 열기 (인증 불필요)
     const channelData: ChannelData = {
+      id: `temp-${Date.now()}`,
       name: channel.title,
-      img: channel.imageUrl,
       description: `${channel.category} 채널입니다.`,
-      category: channel.category,
-      followers: '0',
+      owner_id: 'temp-owner',
+      thumbnail_url: channel.imageUrl || null,
+      subscriber_count: 0,
+      content_count: 0,
+      created_at: new Date().toISOString(),
+      is_subscribed: false,
     };
     openModal(channelData);
   };

@@ -1,12 +1,13 @@
 import { create } from 'zustand';
+import { ContentType } from '@/api/generated';
 
 export interface ContentItem {
-  id: number;
-  type: 'image' | 'video' | 'text';
+  id: string | number;
+  type: ContentType | 'image' | 'video' | 'text';
   title: string;
-  height: string;
-  width: string;
-  category: string;
+  height?: string;
+  width?: string;
+  category?: string;
   imageUrl?: string;
   description?: string;
   author?: string;

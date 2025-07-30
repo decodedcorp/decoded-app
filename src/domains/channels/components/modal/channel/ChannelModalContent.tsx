@@ -1,12 +1,28 @@
 import React from 'react';
 import { useContentModalStore } from '@/store/contentModalStore';
-import { ContentItem } from '@/store/contentModalStore';
+import { ContentItem } from '@/lib/types/content';
+import { useChannelContentsSinglePage } from '@/domains/channels/hooks/useChannelContents';
+import { useChannelModalStore } from '@/store/channelModalStore';
+import { useContentUploadStore } from '@/store/contentUploadStore';
 
 export function ChannelModalContent() {
   const openContentModal = useContentModalStore((state) => state.openModal);
+  const channelId = useChannelModalStore((state) => state.selectedChannelId);
+  const openContentUploadModal = useContentUploadStore((state) => state.openModal);
 
-  // Enhanced mock data for content items with different sizes and types
-  const contentItems: ContentItem[] = [
+  // API에서 채널 콘텐츠 조회
+  const {
+    data: apiContents,
+    isLoading,
+    error,
+  } = useChannelContentsSinglePage({
+    channelId: channelId || '',
+    limit: 25,
+    enabled: !!channelId,
+  });
+
+  // Enhanced mock data for content items with different sizes and types (fallback)
+  const mockContentItems: ContentItem[] = [
     // Large featured items with images
     {
       id: 1,
@@ -274,13 +290,67 @@ export function ChannelModalContent() {
     },
   ];
 
+  // API 데이터가 있으면 사용, 없으면 mock 데이터 사용
+  const contentItems = apiContents || mockContentItems;
+
+  // 로딩 상태 처리
+  if (isLoading) {
+    return (
+      <div className="mb-8">
+        <h3 className="text-xl font-semibold text-white mb-6">Channel Content</h3>
+        <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6 gap-4 space-y-4">
+          {Array.from({ length: 12 }).map((_, index) => (
+            <div key={index} className="break-inside-avoid mb-4">
+              <div className="relative overflow-hidden rounded-xl bg-zinc-800/50 border border-zinc-700/50 h-64 animate-pulse">
+                <div className="w-full h-full bg-zinc-700/50"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // 에러 상태 처리
+  if (error) {
+    return (
+      <div className="mb-8">
+        <h3 className="text-xl font-semibold text-white mb-6">Channel Content</h3>
+        <div className="text-center py-8">
+          <p className="text-zinc-400">Failed to load content. Using sample data.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mb-8">
-      <h3 className="text-xl font-semibold text-white mb-6">Channel Content</h3>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-semibold text-white">
+          Channel Content {apiContents && `(${apiContents.length} items)`}
+        </h3>
+
+        {/* Upload Button */}
+        <button
+          onClick={() => openContentUploadModal(channelId || '')}
+          className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg transition-all duration-200 hover:scale-[1.02] flex items-center space-x-2 border border-zinc-700 hover:border-zinc-600"
+        >
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+            <path
+              d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <span>Upload Content</span>
+        </button>
+      </div>
 
       {/* Masonry Grid Container */}
       <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6 gap-4 space-y-4">
-        {contentItems.map((item) => (
+        {contentItems.map((item: ContentItem) => (
           <div
             key={item.id}
             className={`break-inside-avoid mb-4 group cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl`}

@@ -14,7 +14,11 @@ import {
 } from '@/lib/utils/imageUtils';
 
 interface AddChannelFormProps {
-  onSubmit: (data: { name: string; description: string | null; thumbnail_base64?: string }) => void;
+  onSubmit: (data?: {
+    name: string;
+    description: string | null;
+    thumbnail_base64?: string;
+  }) => void;
   isLoading: boolean;
   error?: string | null;
 }
@@ -92,6 +96,12 @@ export function AddChannelForm({ onSubmit, isLoading, error }: AddChannelFormPro
 
       updateFormData({ thumbnail_base64: optimizedBase64 });
       console.log('Form data updated with thumbnail_base64');
+      console.log('Thumbnail base64 details:', {
+        length: optimizedBase64?.length,
+        startsWithData: optimizedBase64?.startsWith('data:'),
+        first50Chars: optimizedBase64?.substring(0, 50),
+        last50Chars: optimizedBase64?.substring(-50),
+      });
       setValidationErrors((prev) => ({ ...prev, description: undefined }));
     } catch (error) {
       console.error('Image processing error:', error);

@@ -32,60 +32,51 @@ export function AddChannelModal() {
 
   const canSubmit = formData.name.trim().length >= 2 && formData.name.trim().length <= 50;
 
-  const handleSubmit = async (data: {
+  const handleSubmit = async (data?: {
     name: string;
     description: string | null;
     thumbnail_base64?: string;
   }) => {
-    const requestData = {
-      name: data.name,
-      description: data.description || null,
-      thumbnail_base64: data.thumbnail_base64 || null,
+    // data가 제공되지 않으면 formData에서 가져오기
+    const inputData = data || {
+      name: formData.name.trim(),
+      description: formData.description.trim() || null,
+      thumbnail_base64: formData.thumbnail_base64,
     };
 
-    console.log('AddChannelModal - handleSubmit data:', {
-      name: data.name,
-      description: data.description,
-      thumbnail_base64: data.thumbnail_base64
-        ? `${data.thumbnail_base64.substring(0, 50)}...`
-        : 'undefined',
-    });
-
-    console.log('AddChannelModal - requestData:', {
-      name: requestData.name,
-      description: requestData.description,
-      thumbnail_base64: requestData.thumbnail_base64
-        ? `${requestData.thumbnail_base64.substring(0, 50)}...`
-        : 'undefined',
-    });
+    const requestData = {
+      name: inputData.name,
+      description: inputData.description || null,
+      thumbnail_base64: inputData.thumbnail_base64 || null,
+    };
 
     try {
       const response = await createChannelMutation.mutateAsync(requestData);
-
-      console.log('Channel creation response:', response);
 
       // Close the add channel modal
       closeModal();
 
       // Open the newly created channel modal
       const channelData = {
+        id: response.id,
         name: response.name,
-        img: response.thumbnail_url || undefined,
         description: response.description || `${response.name} 채널입니다.`,
-        category: 'New Channel',
-        followers: '0',
+        owner_id: response.owner_id || 'current-user',
+        thumbnail_url: response.thumbnail_url || null,
+        subscriber_count: 0,
+        content_count: 0,
+        created_at: response.created_at || new Date().toISOString(),
+        is_subscribed: false,
       };
-
-      console.log('Opening channel modal with data:', channelData);
 
       openChannelModal(channelData);
     } catch (error: any) {
-      console.error('Failed to create channel:', error);
-
       // Handle different types of errors
       let errorMessage = 'Failed to create channel. Please try again.';
 
-      if (error?.response?.data?.detail) {
+      if (error?.response?.status === 500) {
+        errorMessage = '서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+      } else if (error?.response?.data?.detail) {
         errorMessage = error.response.data.detail;
       } else if (error?.message) {
         errorMessage = error.message;
@@ -125,13 +116,7 @@ export function AddChannelModal() {
 
         <AddChannelFooter
           onCancel={handleCancel}
-          onCreate={() =>
-            handleSubmit({
-              name: formData.name.trim(),
-              description: formData.description.trim() || null,
-              thumbnail_base64: formData.thumbnail_base64,
-            })
-          }
+          onCreate={() => handleSubmit()}
           isLoading={isCreating}
           canSubmit={canSubmit}
         />

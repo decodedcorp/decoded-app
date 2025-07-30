@@ -1,18 +1,28 @@
 import React from 'react';
 import { ChannelData } from '@/store/channelModalStore';
+import { ChannelModalSubscribeButton } from './ChannelModalSubscribeButton';
 
 interface ChannelModalHeaderProps {
   channel: ChannelData;
   onClose: () => void;
+  onSubscribe?: (channelId: string) => void;
+  onUnsubscribe?: (channelId: string) => void;
+  isSubscribeLoading?: boolean;
 }
 
-export function ChannelModalHeader({ channel, onClose }: ChannelModalHeaderProps) {
+export function ChannelModalHeader({ 
+  channel, 
+  onClose, 
+  onSubscribe, 
+  onUnsubscribe, 
+  isSubscribeLoading = false 
+}: ChannelModalHeaderProps) {
   return (
     <div className="flex items-start justify-between p-6 border-b border-zinc-700/50">
       <div className="flex items-start space-x-6 flex-1">
-        {channel.img && (
+        {channel.thumbnail_url && (
           <img
-            src={channel.img}
+            src={channel.thumbnail_url}
             alt={`${channel.name} avatar`}
             className="w-20 h-20 rounded-full object-cover border-2 border-zinc-600 flex-shrink-0"
           />
@@ -27,21 +37,31 @@ export function ChannelModalHeader({ channel, onClose }: ChannelModalHeaderProps
         </div>
       </div>
 
-      <button
-        onClick={onClose}
-        className="p-3 rounded-full bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors flex-shrink-0 ml-4"
-        aria-label="Close modal"
-      >
-        <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-          <path
-            d="M18 6L6 18M6 6l12 12"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+      <div className="flex items-center space-x-4 flex-shrink-0 ml-4">
+        {onSubscribe && onUnsubscribe && (
+          <ChannelModalSubscribeButton
+            channel={channel}
+            onSubscribe={onSubscribe}
+            onUnsubscribe={onUnsubscribe}
+            isLoading={isSubscribeLoading}
           />
-        </svg>
-      </button>
+        )}
+        <button
+          onClick={onClose}
+          className="p-3 rounded-full bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors"
+          aria-label="Close modal"
+        >
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+            <path
+              d="M18 6L6 18M6 6l12 12"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      </div>
     </div>
   );
 }

@@ -29,13 +29,17 @@ export function GridItem({
     } else {
       // GridItem에서 모달을 열기 위한 기본 채널 데이터 생성
       const channelData: ChannelData = {
+        id: `temp-${Date.now()}`,
         name: title,
         description: `Explore ${title} - a curated collection of ${
           category?.toLowerCase() || 'content'
         }`,
-        category: category || 'General',
-        followers: `${Math.floor(Math.random() * 10) + 1}.${Math.floor(Math.random() * 9) + 1}K`,
-        img: imageUrl || undefined,
+        owner_id: 'temp-owner',
+        thumbnail_url: imageUrl || null,
+        subscriber_count: Math.floor(Math.random() * 10000) + 1000,
+        content_count: Math.floor(Math.random() * 100) + 10,
+        created_at: new Date().toISOString(),
+        is_subscribed: false,
       };
       openModal(channelData);
     }

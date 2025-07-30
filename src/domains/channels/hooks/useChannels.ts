@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { ChannelsService } from '../../../api/generated';
+import type { ChannelCreate } from '../../../api/generated/models/ChannelCreate';
 import { queryKeys } from '../../../lib/api/queryKeys';
 import { createApiHeaders, getTokenStatus } from '../../../api/utils/apiHeaders';
 import { refreshOpenAPIToken } from '../../../api/hooks/useApi';
@@ -73,7 +74,7 @@ export const useCreateChannel = () => {
 
   return useMutation({
     mutationKey: queryKeys.channels.create(),
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: ChannelCreate) => {
       // 유효한 토큰이 있는지 확인
       const validToken = getValidAccessToken();
       if (!validToken) {
@@ -132,8 +133,6 @@ export const useCreateChannel = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.channels.lists() });
     },
     onError: (error: any, variables, context) => {
-      console.error('Failed to create channel:', error);
-
       // Revert to the previous value if available
       if (context?.previousChannels) {
         queryClient.setQueryData(queryKeys.channels.lists(), context.previousChannels);

@@ -1,5 +1,6 @@
 import { ChannelResponse } from '@/api/generated';
 import { MasonryItem, Editor } from '../types/masonry';
+import { formatDateByContext } from '@/lib/utils/dateUtils';
 
 /**
  * ChannelResponse를 MasonryItem으로 변환하는 함수
@@ -20,7 +21,7 @@ export const mapChannelToMasonryItem = (channel: ChannelResponse): MasonryItem =
     imageUrl: channel.thumbnail_url || undefined,
     category: 'default', // TODO: API에서 카테고리 정보 추가 필요
     editors: [], // TODO: 채널별 기여자 API 추가 필요
-    date: channel.created_at || new Date().toISOString(),
+    date: formatDateByContext(channel.created_at || new Date().toISOString(), 'card'),
     isNew,
     isHot,
     channelId: channel.id, // 실제 채널 ID 추가

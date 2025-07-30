@@ -20,6 +20,8 @@ import { ChannelModalSidebar } from './ChannelModalSidebar';
 import type { SidebarFilters } from '@/domains/channels/components/sidebar/ChannelSidebar';
 import { ChannelData } from '@/store/channelModalStore';
 import { ChannelModalSkeleton } from './ChannelModalSkeleton';
+import { formatDateByContext } from '@/lib/utils/dateUtils';
+import { ContentUploadModal } from '../content-upload/ContentUploadModal';
 
 export function ChannelModal() {
   const isOpen = useChannelModalStore(selectIsModalOpen);
@@ -62,26 +64,28 @@ export function ChannelModal() {
     setIsSidebarCollapsed(!isSidebarCollapsed);
   };
 
-  // 채널 데이터 결정: API 데이터가 있으면 사용, 없으면 기존 데이터 사용
+  // 채널 데이터 결정: API 데이터를 직접 사용하거나 기존 데이터를 API 형식으로 변환
   const finalChannel = useMemo((): ChannelData | null => {
     if (apiChannel) {
-      // API 데이터를 ChannelData 형태로 변환
-      const convertedChannel = {
-        id: apiChannel.id,
-        name: apiChannel.name,
-        img: apiChannel.thumbnail_url || undefined,
-        description: apiChannel.description || '채널 설명이 없습니다.',
-        category: 'default', // TODO: API에서 카테고리 정보 추가 필요
-        followers: apiChannel.subscriber_count ? apiChannel.subscriber_count.toLocaleString() : '0',
-        contentCount: apiChannel.content_count || 0,
-        ownerId: apiChannel.owner_id,
-        createdAt: apiChannel.created_at,
-        updatedAt: apiChannel.updated_at || undefined,
-        isSubscribed: apiChannel.is_subscribed || false,
-      };
-      return convertedChannel;
+      // API 데이터를 직접 사용
+      return apiChannel;
     }
-    return channel;
+    if (channel) {
+      // 기존 데이터를 API 형식으로 변환
+      return {
+        id: channel.id || '',
+        name: channel.name,
+        description: channel.description || null,
+        owner_id: channel.owner_id || '',
+        thumbnail_url: channel.thumbnail_url || null,
+        subscriber_count: channel.subscriber_count || 0,
+        content_count: channel.content_count || 0,
+        created_at: channel.created_at || undefined,
+        updated_at: channel.updated_at || null,
+        is_subscribed: channel.is_subscribed || false,
+      };
+    }
+    return null;
   }, [apiChannel, channel, channelId]);
 
   // finalChannel이 없어도 모달은 열어두고 로딩 상태 표시
@@ -113,7 +117,19 @@ export function ChannelModal() {
         {/* Header */}
         <div className="flex-shrink-0">
           {finalChannel ? (
-            <ChannelModalHeader channel={finalChannel} onClose={closeModal} />
+            <ChannelModalHeader
+              channel={finalChannel}
+              onClose={closeModal}
+              onSubscribe={(channelId) => {
+                console.log('Subscribe to channel:', channelId);
+                // TODO: Implement subscribe functionality
+              }}
+              onUnsubscribe={(channelId) => {
+                console.log('Unsubscribe from channel:', channelId);
+                // TODO: Implement unsubscribe functionality
+              }}
+              isSubscribeLoading={false}
+            />
           ) : (
             <ChannelModalSkeleton onClose={closeModal} />
           )}
@@ -173,6 +189,9 @@ export function ChannelModal() {
           {finalChannel && <ChannelModalFooter channel={finalChannel} />}
         </div>
       </ChannelModalContainer>
+
+      {/* Content Upload Modal */}
+      <ContentUploadModal />
     </BaseModal>
   );
 }

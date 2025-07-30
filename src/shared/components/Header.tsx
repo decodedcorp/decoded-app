@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { LoginButton } from './LoginButton';
+import { SearchBar } from './SearchBar';
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -11,6 +12,11 @@ export function Header() {
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  const handleSearch = (query: string) => {
+    // TODO: Implement search functionality
+    console.log('Search query:', query);
+  };
 
   return (
     <header
@@ -30,6 +36,10 @@ export function Header() {
       >
         {/* Logo */}
         <div className="text-2xl font-bold text-[#EAFD66] tracking-tight drop-shadow">decoded</div>
+
+        {/* Search Bar */}
+        <SearchBar onSearch={handleSearch} />
+
         {/* Login Button */}
         <LoginButton />
       </div>
