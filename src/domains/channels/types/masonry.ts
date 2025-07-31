@@ -1,3 +1,5 @@
+import { ContentStatus } from '@/lib/types/content';
+
 // MasonryGrid에서 사용하는 타입 정의
 
 export interface MasonryItem {
@@ -24,8 +26,6 @@ export interface EmptyItemType {
   category?: string;
 }
 
-
-
 export interface Editor {
   name: string;
   avatarUrl?: string;
@@ -45,9 +45,7 @@ export interface GridItemProps {
   isNew?: boolean;
   isHot?: boolean;
   avatarBorder?: string;
-  // 채널 추가 기능을 위한 props
   isEmpty?: boolean;
   onAddChannel?: () => void;
-  // 채널 클릭 기능을 위한 props
   onChannelClick?: () => void;
 }

@@ -71,6 +71,8 @@ export function getMockItems(): MasonryItem[] {
     ][i % 12],
     isNew: i % 5 === 0,
     isHot: i % 7 === 0,
+    // 대부분 approved 상태로 설정하고, 테스트용으로만 일부 pending/processing 상태 유지
+    status: i % 20 === 0 ? 'pending' : i % 25 === 0 ? 'processing' : 'approved',
   }));
 }
 

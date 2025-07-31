@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { QueryProvider } from '../lib/providers/QueryProvider';
+import { ToastProvider } from '../lib/providers/ToastProvider';
 import { useAuthLifecycle } from '../domains/auth/hooks/useAuthLifecycle';
 import { configureApi } from '../api/config';
 import { Header } from '../shared/components/Header';
@@ -23,8 +24,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ko">
       <body>
         <QueryProvider>
-          <Header />
-          {children}
+          <ToastProvider>
+            <Header />
+            {children}
+          </ToastProvider>
         </QueryProvider>
       </body>
     </html>

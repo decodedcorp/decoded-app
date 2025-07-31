@@ -6,6 +6,8 @@ import { createApiHeaders, getTokenStatus } from '../../../api/utils/apiHeaders'
 import { refreshOpenAPIToken } from '../../../api/hooks/useApi';
 import { getValidAccessToken } from '../../auth/utils/tokenManager';
 import { OpenAPI } from '../../../api/generated/core/OpenAPI';
+import { useToastMutation, useSimpleToastMutation } from '../../../lib/hooks/useToastMutation';
+import { extractApiErrorMessage } from '../../../lib/utils/toastUtils';
 
 export const useChannels = (params?: {
   page?: number;
@@ -72,9 +74,8 @@ export const useChannel = (channelId: string) => {
 export const useCreateChannel = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationKey: queryKeys.channels.create(),
-    mutationFn: async (data: ChannelCreate) => {
+  return useToastMutation(
+    async (data: ChannelCreate) => {
       // 유효한 토큰이 있는지 확인
       const validToken = getValidAccessToken();
       if (!validToken) {
@@ -120,70 +121,90 @@ export const useCreateChannel = () => {
 
       return ChannelsService.createChannelChannelsPost(requestData);
     },
-    onMutate: async (newChannel) => {
-      // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: queryKeys.channels.lists() });
+    {
+      messages: {
+        loading: '채널을 생성하고 있습니다...',
+        success: '채널이 성공적으로 생성되었습니다!',
+        error: (err: unknown) => `채널 생성 실패: ${extractApiErrorMessage(err)}`,
+      },
+      toastId: 'create-channel',
+      mutationKey: queryKeys.channels.create(),
+      onMutate: async (newChannel: ChannelCreate) => {
+        // Cancel any outgoing refetches
+        await queryClient.cancelQueries({ queryKey: queryKeys.channels.lists() });
 
-      // Snapshot the previous value
-      const previousChannels = queryClient.getQueryData(queryKeys.channels.lists());
+        // Snapshot the previous value
+        const previousChannels = queryClient.getQueryData(queryKeys.channels.lists());
 
-      return { previousChannels };
+        return { previousChannels };
+      },
+      onSuccess: (response: any) => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.channels.lists() });
+      },
+      onError: (error: any, variables: ChannelCreate, context: any) => {
+        // Revert to the previous value if available
+        if (context?.previousChannels) {
+          queryClient.setQueryData(queryKeys.channels.lists(), context.previousChannels);
+        }
+      },
+      onSettled: () => {
+        // Always refetch after error or success
+        queryClient.invalidateQueries({ queryKey: queryKeys.channels.lists() });
+      },
     },
-    onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.channels.lists() });
-    },
-    onError: (error: any, variables, context) => {
-      // Revert to the previous value if available
-      if (context?.previousChannels) {
-        queryClient.setQueryData(queryKeys.channels.lists(), context.previousChannels);
-      }
-    },
-    onSettled: () => {
-      // Always refetch after error or success
-      queryClient.invalidateQueries({ queryKey: queryKeys.channels.lists() });
-    },
-  });
+  );
 };
 
 export const useUpdateChannel = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: ({ channelId, data }: { channelId: string; data: any }) => {
+  return useSimpleToastMutation<any, any, { channelId: string; data: any }, any>(
+    ({ channelId, data }) => {
       return ChannelsService.updateChannelChannelsChannelIdPut(channelId, data);
     },
-    onSuccess: (response, { channelId }) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.channels.detail(channelId) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.channels.lists() });
+    {
+      actionName: 'update channel',
+      toastId: 'update-channel',
+      onSuccess: (response: any, { channelId }) => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.channels.detail(channelId) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.channels.lists() });
+      },
+      onError: (error: any, { channelId }) => {
+        console.error('Failed to update channel:', channelId, error);
+      },
     },
-    onError: (error, { channelId }) => {
-      console.error('Failed to update channel:', channelId, error);
-    },
-  });
+  );
 };
 
 export const useDeleteChannel = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: (channelId: string) =>
-      ChannelsService.deleteChannelChannelsChannelIdDelete(channelId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.channels.lists() });
+  return useSimpleToastMutation(
+    (channelId: string) => ChannelsService.deleteChannelChannelsChannelIdDelete(channelId),
+    {
+      actionName: 'delete channel',
+      toastId: 'delete-channel',
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.channels.lists() });
+      },
     },
-  });
+  );
 };
 
 export const useUpdateChannelThumbnail = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: ({ channelId, data }: { channelId: string; data: any }) =>
+  return useSimpleToastMutation<any, any, { channelId: string; data: any }, any>(
+    ({ channelId, data }) =>
       ChannelsService.updateThumbnailChannelsChannelIdThumbnailPatch(channelId, data),
-    onSuccess: (_, { channelId }) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.channels.detail(channelId) });
+    {
+      actionName: 'update thumbnail',
+      toastId: 'update-thumbnail',
+      onSuccess: (_: any, { channelId }) => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.channels.detail(channelId) });
+      },
     },
-  });
+  );
 };
 
 export const useAddChannelManagers = () => {

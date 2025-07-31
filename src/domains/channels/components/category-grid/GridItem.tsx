@@ -23,21 +23,21 @@ export function GridItem({
 }: GridItemProps) {
   const openModal = useChannelModalStore((state) => state.openModal);
 
-  const handleChannelClick = () => {
-    if (onChannelClick) {
+  const handleClick = () => {
+    if (isEmpty && onAddChannel) {
+      onAddChannel();
+    } else if (onChannelClick) {
       onChannelClick();
     } else {
-      // GridItem에서 모달을 열기 위한 기본 채널 데이터 생성
+      // 채널 데이터로 모달 열기
       const channelData: ChannelData = {
-        id: `temp-${Date.now()}`,
+        id: title, // 임시 ID
         name: title,
-        description: `Explore ${title} - a curated collection of ${
-          category?.toLowerCase() || 'content'
-        }`,
+        description: 'Channel description',
         owner_id: 'temp-owner',
         thumbnail_url: imageUrl || null,
-        subscriber_count: Math.floor(Math.random() * 10000) + 1000,
-        content_count: Math.floor(Math.random() * 100) + 10,
+        subscriber_count: 1000,
+        content_count: 50,
         created_at: new Date().toISOString(),
         is_subscribed: false,
       };
@@ -46,23 +46,7 @@ export function GridItem({
   };
 
   return (
-    <div>
-      {/* 카테고리 + 배지 */}
-      <div className="flex items-start justify-between px-3 pt-3 pb-1 min-h-[28px]">
-        <span className="text-xs font-thin text-zinc-400 tracking-wide uppercase">{category}</span>
-        <div className="flex gap-1">
-          {isNew && (
-            <span className="px-2 py-0.5 rounded-full bg-green-600 text-xs text-white font-bold">
-              NEW
-            </span>
-          )}
-          {isHot && (
-            <span className="px-2 py-0.5 rounded-full bg-pink-600 text-xs text-white font-bold">
-              HOT
-            </span>
-          )}
-        </div>
-      </div>
+    <div className="bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800 hover:border-zinc-700 transition-colors">
       {/* 이미지 + hover overlay */}
       <div className="relative w-full aspect-[4/5] bg-zinc-900 flex items-center justify-center overflow-hidden group">
         {isEmpty ? (
@@ -100,11 +84,12 @@ export function GridItem({
                 </svg>
               </div>
             )}
-            {/* hover overlay - 썸네일 유무와 관계없이 항상 표시 */}
+
+            {/* hover overlay */}
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
               <button
                 className="px-3 py-1.5 rounded-full bg-white/90 text-zinc-900 text-xs font-semibold shadow hover:bg-white"
-                onClick={handleChannelClick}
+                onClick={handleClick}
               >
                 View Details
               </button>
@@ -114,42 +99,61 @@ export function GridItem({
       </div>
       {/* 텍스트 정보 */}
       <div className="flex flex-col gap-2 px-3 py-2 flex-1">
-        <div className="text-2xl font-semibold text-white leading-tight truncate">{title}</div>
-        {/* Editors 아바타 스택 */}
-        {editors && editors.length > 0 && (
-          <div className="flex items-center mt-1 gap-1">
-            {editors.slice(0, 5).map((editor, idx) => (
-              <div
-                key={editor.name + idx}
-                className={cn(
-                  'w-7 h-7 rounded-full bg-zinc-800 flex items-center justify-center text-xs text-white font-thin -ml-2 first:ml-0 overflow-hidden border-2',
-                  avatarBorder,
-                )}
-                style={{ zIndex: 10 - idx }}
-                title={editor.name}
-              >
-                {editor.avatarUrl ? (
-                  <img
-                    src={editor.avatarUrl}
-                    alt={editor.name}
-                    className="w-full h-full object-cover rounded-full"
-                  />
-                ) : (
-                  <span>{getInitials(editor.name)}</span>
-                )}
-              </div>
-            ))}
-            {editors.length > 5 && (
-              <div
-                className="w-7 h-7 rounded-full bg-zinc-700 flex items-center justify-center text-xs text-white font-thin -ml-2 border-2 border-zinc-700"
-                style={{ zIndex: 4 }}
-              >
-                +{editors.length - 5}
-              </div>
+        {/* 제목과 카테고리 */}
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <h3 className="text-white font-semibold text-sm truncate">{title}</h3>
+            {category && <p className="text-zinc-400 text-xs mt-1">{category}</p>}
+          </div>
+          {/* 상태 배지들 */}
+          <div className="flex gap-1 flex-shrink-0">
+            {isNew && (
+              <span className="px-1.5 py-0.5 bg-blue-500 text-white text-xs rounded-full">New</span>
+            )}
+            {isHot && (
+              <span className="px-1.5 py-0.5 bg-red-500 text-white text-xs rounded-full">Hot</span>
             )}
           </div>
+        </div>
+
+        {/* 편집자 정보 */}
+        {editors && editors.length > 0 && (
+          <div className="flex items-center gap-2">
+            <div className="flex -space-x-2">
+              {editors.slice(0, 3).map((editor, index) => (
+                <div
+                  key={index}
+                  className={cn(
+                    'w-6 h-6 rounded-full border-2 border-zinc-900 flex items-center justify-center text-xs font-medium',
+                    avatarBorder || 'bg-zinc-700 text-zinc-300',
+                  )}
+                >
+                  {editor.avatarUrl ? (
+                    <Image
+                      src={editor.avatarUrl}
+                      alt={editor.name}
+                      width={24}
+                      height={24}
+                      className="rounded-full"
+                    />
+                  ) : (
+                    getInitials(editor.name)
+                  )}
+                </div>
+              ))}
+            </div>
+            <span className="text-zinc-500 text-xs">
+              {editors.length > 3
+                ? `+${editors.length - 3} more`
+                : editors.length === 1
+                ? 'editor'
+                : 'editors'}
+            </span>
+          </div>
         )}
-        {date && <div className="text-xs font-thin text-zinc-500 mt-1">{date}</div>}
+
+        {/* 날짜 */}
+        {date && <p className="text-zinc-500 text-xs">{date}</p>}
       </div>
     </div>
   );

@@ -6,6 +6,11 @@ import {
 } from '@/api/generated';
 
 /**
+ * 콘텐츠 상태 타입
+ */
+export type ContentStatus = 'pending' | 'approved' | 'rejected' | 'processing';
+
+/**
  * 통합된 콘텐츠 타입 - API 응답을 프론트엔드에서 사용하기 위한 통합 인터페이스
  */
 export interface UnifiedContent {
@@ -15,6 +20,7 @@ export interface UnifiedContent {
   provider_id: string;
   created_at?: string | null;
   updated_at?: string | null;
+  status?: ContentStatus; // 콘텐츠 상태 추가
 
   // 공통 필드
   title?: string;
@@ -62,11 +68,13 @@ export interface ContentItem {
   title: string;
   description?: string;
   imageUrl?: string;
+  thumbnailUrl?: string; // thumbnailUrl 필드 추가
   category?: string;
   author?: string;
   date?: string;
   likes?: number;
   views?: number;
+  status?: ContentStatus; // 콘텐츠 상태 추가
 
   // 레이아웃 관련
   height?: string;
@@ -104,7 +112,7 @@ export const isLinkContent = (
  */
 export const unifyContent = (content: Record<string, any>): UnifiedContent => {
   console.log('unifyContent - input content:', content);
-  
+
   // 필드 존재 여부로 타입 구분
   let contentType = ContentType.IMAGE; // 기본값
   if (content.url) {
@@ -127,11 +135,12 @@ export const unifyContent = (content: Record<string, any>): UnifiedContent => {
     title: content.title,
     description: content.description,
     thumbnail_url: content.thumbnail_url,
+    status: content.status || 'pending', // status 필드 추가, 기본값은 pending
   };
 
   switch (contentType) {
     case ContentType.IMAGE:
-      const imageResult = {
+      return {
         ...baseContent,
         imageContent: {
           img_url: content.img_url,
@@ -139,11 +148,9 @@ export const unifyContent = (content: Record<string, any>): UnifiedContent => {
           tagged_items: content.tagged_items,
         },
       };
-      console.log('unifyContent - image result:', imageResult);
-      return imageResult;
 
     case ContentType.VIDEO:
-      const videoResult = {
+      return {
         ...baseContent,
         videoContent: {
           video_url: content.video_url,
@@ -152,11 +159,9 @@ export const unifyContent = (content: Record<string, any>): UnifiedContent => {
           transcript: content.transcript,
         },
       };
-      console.log('unifyContent - video result:', videoResult);
-      return videoResult;
 
     case ContentType.LINK:
-      const linkResult = {
+      return {
         ...baseContent,
         linkContent: {
           url: content.url,
@@ -165,65 +170,50 @@ export const unifyContent = (content: Record<string, any>): UnifiedContent => {
           ai_gen_metadata: content.ai_gen_metadata,
         },
       };
-      console.log('unifyContent - link result:', linkResult);
-      return linkResult;
 
     default:
-      console.log('unifyContent - default result:', baseContent);
+      console.warn('unifyContent - unknown content type:', contentType, content);
       return baseContent;
   }
 };
 
 /**
- * 통합 콘텐츠를 프론트엔드 ContentItem으로 변환
+ * UnifiedContent를 ContentItem으로 변환
  */
 export const convertToContentItem = (content: UnifiedContent): ContentItem => {
-  console.log('convertToContentItem - input content:', content);
-  
   const baseItem: ContentItem = {
     id: content.id,
     type: content.type,
     title: content.title || 'Untitled',
     description: content.description || undefined,
-    date: content.created_at ? new Date(content.created_at).toISOString() : undefined,
+    status: content.status, // status 필드 추가
   };
 
-  // 타입별 특화 정보 추가
   if (isImageContent(content)) {
-    const result = {
+    return {
       ...baseItem,
       imageUrl: content.imageContent.img_url,
       likes: content.imageContent.likes,
-      category: 'Image',
     };
-    console.log('convertToContentItem - image result:', result);
-    return result;
   }
 
   if (isVideoContent(content)) {
-    const result = {
+    return {
       ...baseItem,
-      imageUrl: content.thumbnail_url || undefined,
       videoUrl: content.videoContent.video_url,
+      thumbnailUrl: content.thumbnail_url || undefined,
       duration: content.videoContent.details?.duration_seconds,
-      category: 'Video',
     };
-    console.log('convertToContentItem - video result:', result);
-    return result;
   }
 
   if (isLinkContent(content)) {
-    const result = {
+    return {
       ...baseItem,
-      imageUrl:
-        content.linkContent.link_preview_metadata?.image_url || content.thumbnail_url || undefined,
       linkUrl: content.linkContent.url,
       category: content.linkContent.category,
+      imageUrl: content.linkContent.link_preview_metadata?.image_url || undefined,
     };
-    console.log('convertToContentItem - link result:', result);
-    return result;
   }
 
-  console.log('convertToContentItem - default result:', baseItem);
   return baseItem;
 };

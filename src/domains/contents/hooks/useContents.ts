@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ContentsService } from '../../../api/generated';
 import { queryKeys } from '../../../lib/api/queryKeys';
+import { useToastMutation, useSimpleToastMutation } from '../../../lib/hooks/useToastMutation';
+import { extractApiErrorMessage } from '../../../lib/utils/toastUtils';
 
 export const useContentsByChannel = (channelId: string, params?: Record<string, any>) => {
   return useQuery({
@@ -54,9 +56,9 @@ export const useVideoContent = (id: string) => {
 
 export const useCreateLinkContent = () => {
   const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ContentsService.createLinkContentContentsLinksPost,
+  return useSimpleToastMutation(ContentsService.createLinkContentContentsLinksPost, {
+    actionName: 'Create content',
+    toastId: 'create-link-content',
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
     },
@@ -65,9 +67,9 @@ export const useCreateLinkContent = () => {
 
 export const useCreateImageContent = () => {
   const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ContentsService.createImageContentContentsImagesPost,
+  return useSimpleToastMutation(ContentsService.createImageContentContentsImagesPost, {
+    actionName: 'Create content',
+    toastId: 'create-image-content',
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
     },
@@ -76,9 +78,9 @@ export const useCreateImageContent = () => {
 
 export const useCreateVideoContent = () => {
   const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ContentsService.createVideoContentContentsVideosPost,
+  return useSimpleToastMutation(ContentsService.createVideoContentContentsVideosPost, {
+    actionName: 'Create content',
+    toastId: 'create-video-content',
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
     },
@@ -87,75 +89,92 @@ export const useCreateVideoContent = () => {
 
 export const useUpdateLinkContent = () => {
   const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ contentId, data }: { contentId: string; data: any }) =>
+  return useSimpleToastMutation(
+    ({ contentId, data }: { contentId: string; data: any }) =>
       ContentsService.updateLinkContentContentsLinksContentIdPut(contentId, data),
-    onSuccess: (_, { contentId }) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.contents.detail(contentId) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
+    {
+      actionName: 'Update content',
+      toastId: 'update-link-content',
+      onSuccess: (_, { contentId }) => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.contents.detail(contentId) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
+      },
     },
-  });
+  );
 };
 
 export const useUpdateImageContent = () => {
   const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ contentId, data }: { contentId: string; data: any }) =>
+  return useSimpleToastMutation(
+    ({ contentId, data }: { contentId: string; data: any }) =>
       ContentsService.updateImageContentContentsImagesContentIdPut(contentId, data),
-    onSuccess: (_, { contentId }) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.contents.detail(contentId) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
+    {
+      actionName: 'Update content',
+      toastId: 'update-image-content',
+      onSuccess: (_, { contentId }) => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.contents.detail(contentId) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
+      },
     },
-  });
+  );
 };
 
 export const useUpdateVideoContent = () => {
   const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ contentId, data }: { contentId: string; data: any }) =>
+  return useSimpleToastMutation(
+    ({ contentId, data }: { contentId: string; data: any }) =>
       ContentsService.updateVideoContentContentsVideosContentIdPut(contentId, data),
-    onSuccess: (_, { contentId }) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.contents.detail(contentId) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
+    {
+      actionName: 'Update content',
+      toastId: 'update-video-content',
+      onSuccess: (_, { contentId }) => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.contents.detail(contentId) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
+      },
     },
-  });
+  );
 };
 
 export const useDeleteLinkContent = () => {
   const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (contentId: string) =>
-      ContentsService.deleteLinkContentContentsLinksContentIdDelete(contentId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
+  return useSimpleToastMutation(
+    (contentId: string) => ContentsService.deleteLinkContentContentsLinksContentIdDelete(contentId),
+    {
+      actionName: 'Delete content',
+      toastId: 'delete-link-content',
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
+      },
     },
-  });
+  );
 };
 
 export const useDeleteImageContent = () => {
   const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (contentId: string) =>
+  return useSimpleToastMutation(
+    (contentId: string) =>
       ContentsService.deleteImageContentContentsImagesContentIdDelete(contentId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
+    {
+      actionName: 'Delete content',
+      toastId: 'delete-image-content',
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
+      },
     },
-  });
+  );
 };
 
 export const useDeleteVideoContent = () => {
   const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (contentId: string) =>
+  return useSimpleToastMutation(
+    (contentId: string) =>
       ContentsService.deleteVideoContentContentsVideosContentIdDelete(contentId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
+    {
+      actionName: 'Delete content',
+      toastId: 'delete-video-content',
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
+      },
     },
-  });
+  );
 };

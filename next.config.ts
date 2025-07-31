@@ -15,7 +15,13 @@ const nextConfig: NextConfig = {
   },
   // plugins: ['@tailwindcss/postcss'], // Removed invalid plugin
   images: {
-    domains: ['picsum.photos', 'randomuser.me', 'pub-65bb4012fb354951a2c6139a4b49b717.r2.dev'],
+    domains: [
+      'picsum.photos',
+      'randomuser.me',
+      'pub-65bb4012fb354951a2c6139a4b49b717.r2.dev',
+      'images.unsplash.com',
+      'plus.unsplash.com',
+    ],
   },
   // Removed rewrites to avoid conflict with API routes
   // async rewrites() {

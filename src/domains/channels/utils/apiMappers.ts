@@ -25,6 +25,7 @@ export const mapChannelToMasonryItem = (channel: ChannelResponse): MasonryItem =
     isNew,
     isHot,
     channelId: channel.id, // 실제 채널 ID 추가
+    // status: 'approved', // 기본값은 approved, API에서 status 필드가 추가되면 수정 필요
   };
 };
 
