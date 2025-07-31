@@ -123,9 +123,9 @@ export const useCreateChannel = () => {
     },
     {
       messages: {
-        loading: '채널을 생성하고 있습니다...',
-        success: '채널이 성공적으로 생성되었습니다!',
-        error: (err: unknown) => `채널 생성 실패: ${extractApiErrorMessage(err)}`,
+        loading: 'Creating channel...',
+        success: 'Channel created successfully!',
+        error: (err: unknown) => `Failed to create channel: ${extractApiErrorMessage(err)}`,
       },
       toastId: 'create-channel',
       mutationKey: queryKeys.channels.create(),
@@ -163,7 +163,7 @@ export const useUpdateChannel = () => {
       return ChannelsService.updateChannelChannelsChannelIdPut(channelId, data);
     },
     {
-      actionName: 'update channel',
+      actionName: 'Update channel',
       toastId: 'update-channel',
       onSuccess: (response: any, { channelId }) => {
         queryClient.invalidateQueries({ queryKey: queryKeys.channels.detail(channelId) });
@@ -182,7 +182,7 @@ export const useDeleteChannel = () => {
   return useSimpleToastMutation(
     (channelId: string) => ChannelsService.deleteChannelChannelsChannelIdDelete(channelId),
     {
-      actionName: 'delete channel',
+      actionName: 'Delete channel',
       toastId: 'delete-channel',
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: queryKeys.channels.lists() });
@@ -198,7 +198,7 @@ export const useUpdateChannelThumbnail = () => {
     ({ channelId, data }) =>
       ChannelsService.updateThumbnailChannelsChannelIdThumbnailPatch(channelId, data),
     {
-      actionName: 'update thumbnail',
+      actionName: 'Update thumbnail',
       toastId: 'update-thumbnail',
       onSuccess: (_: any, { channelId }) => {
         queryClient.invalidateQueries({ queryKey: queryKeys.channels.detail(channelId) });
@@ -210,25 +210,33 @@ export const useUpdateChannelThumbnail = () => {
 export const useAddChannelManagers = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: ({ channelId, data }: { channelId: string; data: any }) =>
+  return useSimpleToastMutation(
+    ({ channelId, data }: { channelId: string; data: any }) =>
       ChannelsService.addManagersChannelsChannelIdManagersPost(channelId, data),
-    onSuccess: (_, { channelId }) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.channels.detail(channelId) });
+    {
+      actionName: 'Add managers',
+      toastId: 'add-channel-managers',
+      onSuccess: (_, { channelId }) => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.channels.detail(channelId) });
+      },
     },
-  });
+  );
 };
 
 export const useRemoveChannelManagers = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: ({ channelId, data }: { channelId: string; data: any }) =>
+  return useSimpleToastMutation(
+    ({ channelId, data }: { channelId: string; data: any }) =>
       ChannelsService.removeManagersChannelsChannelIdManagersDelete(channelId, data),
-    onSuccess: (_, { channelId }) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.channels.detail(channelId) });
+    {
+      actionName: 'Remove managers',
+      toastId: 'remove-channel-managers',
+      onSuccess: (_, { channelId }) => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.channels.detail(channelId) });
+      },
     },
-  });
+  );
 };
 
 export const useInfiniteChannels = (params?: {

@@ -125,9 +125,9 @@ export function ContentUploadModal() {
             onSubmit={handleSubmit}
             isLoading={isLoading}
             error={
-              createImageContent.error?.message ||
-              // createVideoContent.error?.message ||
-              createLinkContent.error?.message
+              (createImageContent.error as Error)?.message ||
+              // (createVideoContent.error as Error)?.message ||
+              (createLinkContent.error as Error)?.message
             }
           />
         </div>
