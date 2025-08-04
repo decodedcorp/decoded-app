@@ -15,6 +15,7 @@ export type VideoContentResponse = {
     details?: (VideoDetailsResponse | null);
     chapters?: Array<VideoChapterResponse>;
     transcript?: (string | null);
+    status: string;
     created_at?: (string | null);
     updated_at?: (string | null);
 };

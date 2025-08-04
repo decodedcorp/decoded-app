@@ -14,5 +14,98 @@
       "updated": "2025-07-22T08:52:11.391Z",
       "description": "Main page migration tasks"
     }
+  },
+  "feature-channel-content-optimization": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "채널 콘텐츠 기능 최적화 및 리팩토링",
+        "description": "채널 콘텐츠 컴포넌트의 성능 최적화, 코드 리팩토링, 모듈화 작업",
+        "details": "현재 상태 분석:\n1. ChannelModalContent.tsx가 500줄로 너무 큼\n2. 중복된 폴링 로직 (shouldEnablePolling과 별도 쿼리)\n3. Mock 데이터가 실제 코드에 하드코딩됨\n4. 메모이제이션 최적화 여지 있음\n5. 에러 처리와 로딩 상태 관리 개선 필요\n\n최적화 목표:\n- 컴포넌트 분리 및 모듈화\n- 폴링 로직 단순화\n- 성능 최적화 (렌더링, 메모리 사용량)\n- 코드 가독성 및 유지보수성 향상\n- 타입 안전성 강화",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "ContentItemCard 컴포넌트 분리",
+            "description": "ContentItemCard를 별도 파일로 분리하여 모듈화",
+            "details": "- src/domains/channels/components/modal/channel/components/ContentItemCard.tsx 생성\n- 메모이제이션 최적화 유지\n- 타입 정의 개선\n- 이미지 최적화 적용\n- 호버 효과 및 로딩 상태 개선",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 2,
+            "title": "ContentGrid 컴포넌트 생성",
+            "description": "Masonry 그리드 레이아웃을 담당하는 별도 컴포넌트 생성",
+            "details": "- src/domains/channels/components/modal/channel/components/ContentGrid.tsx 생성\n- 반응형 그리드 레이아웃 구현\n- 가상화 고려 (대량 데이터 처리)\n- 로딩 스켈레톤 UI 포함\n- 무한 스크롤 지원 준비",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 3,
+            "title": "ContentHeader 컴포넌트 생성",
+            "description": "헤더 부분을 별도 컴포넌트로 분리",
+            "details": "- src/domains/channels/components/modal/channel/components/ContentHeader.tsx 생성\n- 새로고침 버튼 및 콘텐츠 추가 버튼 포함\n- AI 처리 상태 표시\n- 폴링 상태 표시\n- 에러 상태 표시",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 4,
+            "title": "폴링 로직 최적화",
+            "description": "중복된 폴링 로직을 단순화하고 커스텀 훅으로 분리",
+            "details": "- useChannelContentPolling 커스텀 훅 생성\n- 중복 쿼리 제거\n- 폴링 상태 관리 개선\n- 메모리 누수 방지\n- 성능 최적화",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 5,
+            "title": "Mock 데이터 분리",
+            "description": "하드코딩된 Mock 데이터를 별도 파일로 분리",
+            "details": "- src/domains/channels/components/modal/channel/data/mockContentData.ts 생성\n- 다양한 콘텐츠 타입과 크기의 Mock 데이터\n- 개발 환경에서만 사용되도록 설정\n- 타입 안전성 보장\n- 실제 API 응답 구조와 일치하도록 구성",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 6,
+            "title": "타입 정의 개선",
+            "description": "타입 안전성을 강화하고 런타임 검증 추가",
+            "details": "- ContentItem 타입 정의 개선\n- 런타임 타입 검증 유틸리티 추가\n- 에러 타입 정의\n- 폴링 상태 타입 정의\n- 컴포넌트 Props 타입 정의",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 7,
+            "title": "에러 처리 및 로딩 상태 개선",
+            "description": "에러 바운더리 추가 및 로딩 상태 관리 개선",
+            "details": "- 에러 바운더리 컴포넌트 생성\n- 스켈레톤 UI 개선\n- 재시도 로직 개선\n- 에러 메시지 표시 개선\n- 로딩 상태 표시 개선",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 8,
+            "title": "메인 컴포넌트 리팩토링",
+            "description": "ChannelModalContent를 새로운 컴포넌트들로 리팩토링",
+            "details": "- 기존 ChannelModalContent.tsx 리팩토링\n- 새로운 컴포넌트들 통합\n- 성능 최적화 적용\n- 코드 가독성 향상\n- 테스트 및 검증",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 1
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "created": "2025-08-04T06:31:47.512Z",
+      "updated": "2025-08-04T06:32:27.718Z",
+      "description": "채널 콘텐츠 기능 최적화 및 리팩토링 작업"
+    }
   }
 }

@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import { useContentModalStore } from '@/store/contentModalStore';
 import { ContentItem } from '@/lib/types/content';
+import { ContentStatus } from '@/api/generated';
 import { useChannelContentsSinglePage } from '@/domains/channels/hooks/useChannelContents';
 import { useChannelModalStore } from '@/store/channelModalStore';
 import { useContentUploadStore } from '@/store/contentUploadStore';
@@ -142,7 +143,7 @@ export const ChannelModalContent = React.memo(() => {
   const shouldEnablePolling = React.useMemo(() => {
     if (!contentItems) return false;
     const hasProcessing = contentItems.some(
-      (item: ContentItem) => item.status === 'processing' || item.status === 'pending',
+      (item: ContentItem) => item.status === ContentStatus.PENDING,
     );
 
     if (process.env.NODE_ENV === 'development') {
@@ -150,7 +151,7 @@ export const ChannelModalContent = React.memo(() => {
         contentItemsCount: contentItems.length,
         hasProcessing,
         processingItems: contentItems
-          .filter((item: ContentItem) => item.status === 'processing' || item.status === 'pending')
+          .filter((item: ContentItem) => item.status === ContentStatus.PENDING)
           .map((item: ContentItem) => ({ id: item.id, status: item.status })),
       });
     }
@@ -175,7 +176,7 @@ export const ChannelModalContent = React.memo(() => {
       contentItemsCount: contentItems?.length || 0,
       processingItems:
         contentItems
-          ?.filter((item: ContentItem) => item.status === 'processing' || item.status === 'pending')
+          ?.filter((item: ContentItem) => item.status === ContentStatus.PENDING)
           .map((item: ContentItem) => ({ id: item.id, status: item.status, title: item.title })) ||
         [],
       allItemsStatus:
@@ -441,7 +442,7 @@ export const ChannelModalContent = React.memo(() => {
           {shouldEnablePolling && (
             <p className="text-sm text-yellow-400 mt-1">
               {finalContentItems?.filter(
-                (item: ContentItem) => item.status === 'processing' || item.status === 'pending',
+                (item: ContentItem) => item.status === ContentStatus.PENDING,
               ).length || 0}{' '}
               items being processed by AI
               {isPolling && ' • Auto-refreshing every 3s'}

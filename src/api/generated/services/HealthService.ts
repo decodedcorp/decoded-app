@@ -8,6 +8,10 @@ import { request as __request } from '../core/request';
 export class HealthService {
     /**
      * Health
+     * Basic health check endpoint
+     *
+     * Returns simple status to indicate the server is running.
+     * This endpoint is always available regardless of service states.
      * @returns any Successful Response
      * @throws ApiError
      */

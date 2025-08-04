@@ -7,7 +7,8 @@ export type ImageContentResponse = {
     id: string;
     channel_id: string;
     provider_id: string;
-    img_url: string;
+    url: string;
+    status: string;
     likes?: number;
     tagged_items?: Array<TaggedItemResponse>;
     created_at?: (string | null);

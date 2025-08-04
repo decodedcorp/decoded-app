@@ -1,4 +1,4 @@
-import { ContentStatus } from '@/lib/types/content';
+import { ContentStatus } from '@/api/generated';
 
 // MasonryGrid에서 사용하는 타입 정의
 

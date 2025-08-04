@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { ContentListResponse } from '../models/ContentListResponse';
+import type { ContentStatus } from '../models/ContentStatus';
 import type { ImageContentCreate } from '../models/ImageContentCreate';
 import type { ImageContentResponse } from '../models/ImageContentResponse';
 import type { ImageContentUpdate } from '../models/ImageContentUpdate';
@@ -325,6 +326,35 @@ export class ContentsService {
             url: '/contents/provider/{provider_id}',
             path: {
                 'provider_id': providerId,
+            },
+            query: {
+                'skip': skip,
+                'limit': limit,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Get Contents By Status
+     * Get all contents with a specific status - public endpoint
+     * @param status
+     * @param skip
+     * @param limit
+     * @returns ContentListResponse Successful Response
+     * @throws ApiError
+     */
+    public static getContentsByStatusContentsStatusStatusGet(
+        status: ContentStatus,
+        skip?: number,
+        limit: number = 20,
+    ): CancelablePromise<ContentListResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/contents/status/{status}',
+            path: {
+                'status': status,
             },
             query: {
                 'skip': skip,

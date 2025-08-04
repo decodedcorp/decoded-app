@@ -9,45 +9,7 @@ import type { DemoResponse } from '../models/DemoResponse';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-export class PublicService {
-    /**
-     * Search
-     * @param query
-     * @param nextId
-     * @returns any Successful Response
-     * @throws ApiError
-     */
-    public static searchSearchGet(
-        query: string = '',
-        nextId?: string,
-    ): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/search',
-            query: {
-                'query': query,
-                'next_id': nextId,
-            },
-            errors: {
-                422: `Validation Error`,
-            },
-        });
-    }
-    /**
-     * Health
-     * Basic health check endpoint
-     *
-     * Returns simple status to indicate the server is running.
-     * This endpoint is always available regardless of service states.
-     * @returns any Successful Response
-     * @throws ApiError
-     */
-    public static healthHealthGet(): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/health',
-        });
-    }
+export class DemoAiServerIntegrationService {
     /**
      * Create Demo Link Content
      * Test AI-Server integration with link content

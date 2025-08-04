@@ -60,7 +60,7 @@ export function ContentUploadModal() {
         case ContentType.IMAGE:
           result = await createImageContent.mutateAsync({
             channel_id: data.channel_id,
-            base64_img_url: data.base64_img_url,
+            base64_img: data.base64_img_url,
           });
           break;
 

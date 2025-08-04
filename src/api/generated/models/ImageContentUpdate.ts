@@ -4,7 +4,7 @@
 /* eslint-disable */
 import type { TaggedItemCreate } from './TaggedItemCreate';
 export type ImageContentUpdate = {
-    img_url?: (string | null);
+    url?: (string | null);
     tagged_items?: (Array<TaggedItemCreate> | null);
 };
 
