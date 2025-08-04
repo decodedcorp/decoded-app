@@ -115,6 +115,116 @@ export function ContentModalBody({ content }: ContentModalBodyProps) {
             </div>
           </div>
         )}
+
+        {content.type === 'link' && (
+          <div className="space-y-6">
+            {/* AI Generated Summary */}
+            {content.aiSummary && (
+              <div className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 rounded-xl p-6 border border-blue-700/30">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-semibold text-white">AI Generated Summary</h3>
+                </div>
+                <p className="text-zinc-200 leading-relaxed text-lg">{content.aiSummary}</p>
+              </div>
+            )}
+
+            {/* AI Generated Q&A */}
+            {content.aiQaList && content.aiQaList.length > 0 && (
+              <div className="bg-gradient-to-br from-green-900/20 to-emerald-900/20 rounded-xl p-6 border border-green-700/30">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-semibold text-white">AI Generated Q&A</h3>
+                </div>
+                <div className="space-y-4">
+                  {content.aiQaList.map((qa, index) => (
+                    <div key={index} className="bg-zinc-800/50 rounded-lg p-4 border border-zinc-700/50">
+                      <div className="flex items-start space-x-3">
+                        <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                          <span className="text-white text-xs font-bold">{index + 1}</span>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-zinc-300 font-medium mb-2">{qa.question}</p>
+                          <p className="text-zinc-400 text-sm">{qa.answer}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Original Link Information */}
+            <div className="bg-zinc-800/50 rounded-xl p-6 border border-zinc-700/50">
+              <h3 className="text-xl font-semibold text-white mb-4">Original Link</h3>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm text-zinc-400 mb-2">URL:</p>
+                  <p className="text-blue-400 text-sm break-all font-mono bg-zinc-900/50 p-3 rounded-lg border border-zinc-700/50">
+                    {content.linkUrl}
+                  </p>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <button
+                      onClick={() => window.open(content.linkUrl, '_blank')}
+                      className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 flex items-center space-x-2 font-medium"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                        />
+                      </svg>
+                      <span>Open Original Link</span>
+                    </button>
+                    
+                    <button
+                      onClick={() => {
+                        if (content.linkUrl) {
+                          navigator.clipboard.writeText(content.linkUrl);
+                          // TODO: Add toast notification
+                        }
+                      }}
+                      className="px-4 py-3 bg-zinc-700 hover:bg-zinc-600 text-white rounded-lg transition-colors duration-200 flex items-center space-x-2"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                        />
+                      </svg>
+                      <span>Copy URL</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Content Metadata */}

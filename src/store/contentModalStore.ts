@@ -15,6 +15,9 @@ export interface ContentItem {
   likes?: number;
   views?: number;
   linkUrl?: string;
+  // AI generated data
+  aiSummary?: string;
+  aiQaList?: Array<{ question: string; answer: string }>;
 }
 
 interface ContentModalState {

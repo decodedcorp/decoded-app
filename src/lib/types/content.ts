@@ -8,7 +8,7 @@ import {
 /**
  * 콘텐츠 상태 타입
  */
-export type ContentStatus = 'pending' | 'approved' | 'rejected' | 'processing';
+export type ContentStatus = 'pending' | 'approved' | 'rejected' | 'processing' | 'active';
 
 /**
  * 통합된 콘텐츠 타입 - API 응답을 프론트엔드에서 사용하기 위한 통합 인터페이스
@@ -84,6 +84,10 @@ export interface ContentItem {
   videoUrl?: string;
   linkUrl?: string;
   duration?: number;
+
+  // AI generated data
+  aiSummary?: string;
+  aiQaList?: Array<{ question: string; answer: string }>;
 }
 
 /**
@@ -108,10 +112,76 @@ export const isLinkContent = (
 };
 
 /**
+ * DB 상태를 프론트엔드 상태로 매핑하는 함수
+ */
+export const mapContentStatus = (
+  dbStatus?: string,
+  processingStatus?: string,
+  content?: Record<string, any>,
+): ContentStatus => {
+  console.log('mapContentStatus - input:', { dbStatus, processingStatus, content });
+
+  // processing_status가 'completed'이면 approved로 처리
+  if (processingStatus === 'completed') {
+    console.log('mapContentStatus - processing completed, returning approved');
+    return 'approved';
+  }
+
+  // processing_status가 'processing'이면 processing으로 처리
+  if (processingStatus === 'processing') {
+    console.log('mapContentStatus - processing in progress, returning processing');
+    return 'processing';
+  }
+
+  // 기존 status 필드 처리
+  switch (dbStatus) {
+    case 'active':
+      console.log('mapContentStatus - status active, returning approved');
+      return 'approved';
+    case 'pending':
+    case 'processing':
+    case 'approved':
+    case 'rejected':
+      console.log('mapContentStatus - status mapped directly:', dbStatus);
+      return dbStatus as ContentStatus;
+    default:
+      // status 필드가 없을 때 다른 필드들로 상태 추론
+      if (content) {
+        // ai_gen_metadata가 있으면 처리 완료로 간주
+        if (content.ai_gen_metadata && Object.keys(content.ai_gen_metadata).length > 0) {
+          console.log('mapContentStatus - ai_gen_metadata exists, returning approved');
+          return 'approved';
+        }
+
+        // created_at과 updated_at이 다르면 처리 중일 가능성
+        if (content.created_at && content.updated_at && content.created_at !== content.updated_at) {
+          const createdTime = new Date(content.created_at).getTime();
+          const updatedTime = new Date(content.updated_at).getTime();
+          const timeDiff = updatedTime - createdTime;
+
+          // 30초 이상 차이나면 처리 완료로 간주
+          if (timeDiff > 30000) {
+            console.log('mapContentStatus - time difference > 30s, returning approved');
+            return 'approved';
+          } else {
+            console.log('mapContentStatus - time difference < 30s, returning processing');
+            return 'processing';
+          }
+        }
+      }
+
+      console.log('mapContentStatus - default case, returning pending');
+      return 'pending';
+  }
+};
+
+/**
  * API 콘텐츠를 통합 타입으로 변환
  */
 export const unifyContent = (content: Record<string, any>): UnifiedContent => {
   console.log('unifyContent - input content:', content);
+  console.log('unifyContent - status field:', content.status);
+  console.log('unifyContent - processing_status field:', content.processing_status);
 
   // 필드 존재 여부로 타입 구분
   let contentType = ContentType.IMAGE; // 기본값
@@ -125,6 +195,20 @@ export const unifyContent = (content: Record<string, any>): UnifiedContent => {
 
   console.log('unifyContent - detected contentType:', contentType);
 
+  // status 매핑 전후 로그
+  const mappedStatus = mapContentStatus(content.status, content.processing_status, content);
+  console.log('unifyContent - status mapping:', {
+    originalStatus: content.status,
+    mappedStatus: mappedStatus,
+    processingStatus: content.processing_status,
+    hasAiGenMetadata: !!content.ai_gen_metadata,
+    aiGenMetadataKeys: content.ai_gen_metadata ? Object.keys(content.ai_gen_metadata) : [],
+    timeDiff:
+      content.created_at && content.updated_at
+        ? new Date(content.updated_at).getTime() - new Date(content.created_at).getTime()
+        : null,
+  });
+
   const baseContent: UnifiedContent = {
     id: content.id,
     type: contentType,
@@ -135,7 +219,7 @@ export const unifyContent = (content: Record<string, any>): UnifiedContent => {
     title: content.title,
     description: content.description,
     thumbnail_url: content.thumbnail_url,
-    status: content.status || 'pending', // status 필드 추가, 기본값은 pending
+    status: mappedStatus, // status 매핑 함수 사용
   };
 
   switch (contentType) {
@@ -212,6 +296,12 @@ export const convertToContentItem = (content: UnifiedContent): ContentItem => {
       linkUrl: content.linkContent.url,
       category: content.linkContent.category,
       imageUrl: content.linkContent.link_preview_metadata?.image_url || undefined,
+      // AI 생성 데이터 추가
+      aiSummary: content.linkContent.ai_gen_metadata?.summary,
+      aiQaList: content.linkContent.ai_gen_metadata?.qa_list?.map((qa: any) => ({
+        question: qa.question || '',
+        answer: qa.answer || '',
+      })),
     };
   }
 

@@ -87,9 +87,19 @@ export function ContentUploadModal() {
 
       console.log('Content created successfully:', result);
 
-      // 채널 콘텐츠 캐시 무효화하여 새로고침
+      // 채널 콘텐츠 캐시 무효화하여 새로고침 (single 페이지 포함)
       queryClient.invalidateQueries({
         queryKey: queryKeys.contents.byChannel(data.channel_id),
+      });
+
+      // single 페이지 쿼리도 명시적으로 무효화
+      queryClient.invalidateQueries({
+        queryKey: [...queryKeys.contents.byChannel(data.channel_id), 'single'],
+      });
+
+      // 모든 콘텐츠 관련 쿼리 무효화 (더 포괄적)
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.contents.all,
       });
 
       // 성공 시 모달 닫기

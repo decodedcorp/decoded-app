@@ -12,6 +12,7 @@ export const getContentStatusStyles = (status?: ContentStatus) => {
         text: 'Processing...',
       };
     case 'approved':
+    case 'active': // active 상태도 approved와 동일하게 처리
       return {
         container: 'cursor-pointer',
         image: '',
@@ -42,7 +43,9 @@ export const getContentStatusStyles = (status?: ContentStatus) => {
  * 콘텐츠 상태에 따라 클릭 가능한지 확인하는 함수
  */
 export const isContentClickable = (status?: ContentStatus): boolean => {
-  return status === 'approved';
+  // 임시로 모든 상태에서 클릭 가능하도록 설정
+  return true;
+  // return status === 'approved' || status === 'active';
 };
 
 /**
@@ -56,5 +59,5 @@ export const shouldShowLoadingSpinner = (status?: ContentStatus): boolean => {
  * 콘텐츠 상태에 따른 호버 효과 표시 여부
  */
 export const shouldShowHoverEffects = (status?: ContentStatus): boolean => {
-  return status === 'approved';
+  return status === 'approved' || status === 'active';
 };

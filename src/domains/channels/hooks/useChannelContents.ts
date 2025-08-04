@@ -49,6 +49,12 @@ export const useChannelContents = ({
 
           if (process.env.NODE_ENV === 'development') {
             console.log('[useChannelContents] API call successful:', result);
+            console.log('[useChannelContents] API response structure:', {
+              hasContents: !!result.contents,
+              contentsLength: result.contents?.length || 0,
+              firstContent: result.contents?.[0],
+              allContentKeys: result.contents?.[0] ? Object.keys(result.contents[0]) : [],
+            });
           }
 
           // API 응답이 undefined인 경우 에러 던지기
@@ -127,7 +133,8 @@ export const useChannelContentsSinglePage = ({
   channelId,
   limit = 20,
   enabled = true,
-}: UseChannelContentsParams) => {
+  enablePolling = false, // AI 처리 상태 폴링 활성화 옵션
+}: UseChannelContentsParams & { enablePolling?: boolean }) => {
   return useQuery({
     queryKey: [...queryKeys.contents.byChannel(channelId), 'single'],
     queryFn: async () => {
@@ -160,6 +167,9 @@ export const useChannelContentsSinglePage = ({
     // 캐싱 최적화
     staleTime: 2 * 60 * 1000, // 2분 (기존 3분에서 단축)
     gcTime: 5 * 60 * 1000, // 5분 (기존 10분에서 단축)
+    // AI 처리 상태 폴링 (처리 중인 콘텐츠가 있을 때만)
+    refetchInterval: enablePolling ? 3000 : false, // 3초마다 폴링 (기존 5초에서 단축)
+    refetchIntervalInBackground: false, // 백그라운드에서는 폴링하지 않음
     // 불필요한 리페치 방지
     refetchOnWindowFocus: false,
     refetchOnMount: false,

@@ -12,6 +12,8 @@ import {
   shouldShowLoadingSpinner,
   shouldShowHoverEffects,
 } from '@/lib/utils/contentStatusUtils';
+import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/api/queryKeys';
 
 // 개별 콘텐츠 아이템 컴포넌트 (메모이제이션)
 const ContentItemCard = React.memo<{
@@ -24,12 +26,8 @@ const ContentItemCard = React.memo<{
       return;
     }
 
-    // 링크 콘텐츠인 경우 새 탭에서 URL 열기
-    if (item.linkUrl) {
-      window.open(item.linkUrl, '_blank');
-    } else {
-      onItemClick(item);
-    }
+    // 모든 콘텐츠 타입에 대해 모달 열기
+    onItemClick(item);
   }, [item, onItemClick]);
 
   // 상태별 스타일 가져오기
@@ -132,19 +130,93 @@ export const ChannelModalContent = React.memo(() => {
     data: contentItems,
     isLoading,
     error,
+    refetch,
   } = useChannelContentsSinglePage({
     channelId: channelId || '',
     limit: 25,
     enabled: !!channelId,
+    enablePolling: false, // 초기에는 폴링 비활성화
   });
+
+  // AI 처리 중인 콘텐츠가 있는지 확인하고 폴링 활성화
+  const shouldEnablePolling = React.useMemo(() => {
+    if (!contentItems) return false;
+    const hasProcessing = contentItems.some(
+      (item: ContentItem) => item.status === 'processing' || item.status === 'pending',
+    );
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[ChannelModalContent] Polling check:', {
+        contentItemsCount: contentItems.length,
+        hasProcessing,
+        processingItems: contentItems
+          .filter((item: ContentItem) => item.status === 'processing' || item.status === 'pending')
+          .map((item: ContentItem) => ({ id: item.id, status: item.status })),
+      });
+    }
+
+    return hasProcessing;
+  }, [contentItems]);
+
+  // 폴링이 필요한 경우 별도 쿼리로 폴링 활성화
+  const { data: polledContentItems, isFetching: isPolling } = useChannelContentsSinglePage({
+    channelId: channelId || '',
+    limit: 25,
+    enabled: !!channelId && shouldEnablePolling,
+    enablePolling: true,
+  });
+
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[ChannelModalContent] Polling state:', {
+      channelId,
+      shouldEnablePolling,
+      isPolling,
+      polledContentItemsCount: polledContentItems?.length || 0,
+      contentItemsCount: contentItems?.length || 0,
+      processingItems:
+        contentItems
+          ?.filter((item: ContentItem) => item.status === 'processing' || item.status === 'pending')
+          .map((item: ContentItem) => ({ id: item.id, status: item.status, title: item.title })) ||
+        [],
+      allItemsStatus:
+        contentItems?.map((item: ContentItem) => ({
+          id: item.id,
+          status: item.status,
+          title: item.title,
+        })) || [],
+    });
+  }
+
+  // 최종 표시할 콘텐츠 결정
+  const finalContentItems = polledContentItems || contentItems;
+
+  // 수동 새로고침 핸들러
+  const handleRefresh = React.useCallback(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[ChannelModalContent] Manual refresh triggered');
+    }
+
+    // 강제 캐시 무효화
+    if (channelId) {
+      const queryClient = useQueryClient();
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.contents.byChannel(channelId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: [...queryKeys.contents.byChannel(channelId), 'single'],
+      });
+    }
+
+    refetch();
+  }, [refetch, channelId]);
 
   if (process.env.NODE_ENV === 'development') {
     console.log('[ChannelModalContent] State:', {
       channelId,
       isLoading,
       hasError: !!error,
-      contentItemsCount: contentItems?.length || 0,
-      contentItems: contentItems,
+      contentItemsCount: finalContentItems?.length || 0,
+      contentItems: finalContentItems,
     });
   }
 
@@ -274,7 +346,13 @@ export const ChannelModalContent = React.memo(() => {
   // 콘텐츠 아이템 클릭 핸들러 (메모이제이션)
   const handleItemClick = React.useCallback(
     (item: ContentItem) => {
-      openContentModal(item);
+      // URL 타입이면 콘텐츠 모달 열기
+      if (item.type === 'link') {
+        openContentModal(item);
+      } else {
+        // 다른 타입들은 기존 로직 유지
+        openContentModal(item);
+      }
     },
     [openContentModal],
   );
@@ -288,11 +366,11 @@ export const ChannelModalContent = React.memo(() => {
 
   // 표시할 콘텐츠 결정 (메모이제이션)
   const displayContentItems = React.useMemo(() => {
-    if (contentItems && contentItems.length > 0) {
-      return contentItems;
+    if (finalContentItems && finalContentItems.length > 0) {
+      return finalContentItems;
     }
     return mockContentItems;
-  }, [contentItems, mockContentItems]);
+  }, [finalContentItems, mockContentItems]);
 
   if (process.env.NODE_ENV === 'development') {
     console.log('[ChannelModalContent] Display items:', {
@@ -352,18 +430,63 @@ export const ChannelModalContent = React.memo(() => {
         <div>
           <h3 className="text-xl font-semibold text-white mb-2">Channel Content</h3>
           <p className="text-zinc-400">
-            {displayContentItems.length} items • {contentItems ? 'Live data' : 'Demo content'}
+            {finalContentItems?.length || 0} items • {contentItems ? 'Live data' : 'Demo content'}
+            {shouldEnablePolling && (
+              <span className="ml-2 text-blue-400">
+                {isPolling ? '🔄 Updating...' : '⏳ AI processing...'}
+              </span>
+            )}
           </p>
+          {/* AI 처리 중인 콘텐츠 개수 표시 */}
+          {shouldEnablePolling && (
+            <p className="text-sm text-yellow-400 mt-1">
+              {finalContentItems?.filter(
+                (item: ContentItem) => item.status === 'processing' || item.status === 'pending',
+              ).length || 0}{' '}
+              items being processed by AI
+              {isPolling && ' • Auto-refreshing every 3s'}
+            </p>
+          )}
         </div>
-        <button
-          onClick={handleAddContent}
-          className="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg transition-all duration-200 flex items-center space-x-3 border border-zinc-700 hover:border-zinc-600 hover:scale-[1.02] font-medium shadow-lg hover:shadow-xl"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          <span>Add Content</span>
-        </button>
+        <div className="flex items-center space-x-3">
+          {/* 새로고침 버튼 */}
+          <button
+            onClick={handleRefresh}
+            disabled={isLoading}
+            className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 disabled:bg-zinc-900 disabled:text-zinc-500 text-white rounded-lg transition-all duration-200 flex items-center space-x-2 border border-zinc-700 hover:border-zinc-600 font-medium"
+          >
+            <svg
+              className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+            <span>Refresh</span>
+          </button>
+
+          {/* 콘텐츠 추가 버튼 */}
+          <button
+            onClick={handleAddContent}
+            className="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg transition-all duration-200 flex items-center space-x-3 border border-zinc-700 hover:border-zinc-600 hover:scale-[1.02] font-medium shadow-lg hover:shadow-xl"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            <span>Add Content</span>
+          </button>
+        </div>
       </div>
 
       {/* Masonry Grid Container */}

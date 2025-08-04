@@ -10,7 +10,24 @@
 
 #### 2024-12-19 (Today)
 
-- **8b158c6** (24분 전) - **feat: Temporarily disable video upload functionality**
+- **d600081** (최신) - **refactor(channels): Change all channel toast messages to English and add toast to manager operations**
+
+  - 채널 관련 모든 토스트 메시지를 영어로 변경
+  - 매니저 작업에 토스트 알림 추가
+  - 일관된 사용자 경험을 위한 메시지 통일
+
+- **37f3597** - **feat(content, toast): Add toast notifications to all content CRUD actions and unify messages in English**
+
+  - 모든 콘텐츠 CRUD 작업에 토스트 알림 추가
+  - 영어로 메시지 통일
+  - 사용자 피드백 개선
+
+- **e008575** - **feat(ui): Improve button design to match project theme**
+
+  - 버튼 디자인을 프로젝트 테마에 맞게 개선
+  - UI 일관성 향상
+
+- **8b158c6** - **feat: Temporarily disable video upload functionality**
 
   - 비디오 업로드 기능을 임시로 비활성화
   - 업로드 폼에서 비디오 콘텐츠 타입 옵션 주석 처리
@@ -20,17 +37,17 @@
   - 향후 재활성화를 위해 비디오 업로드 코드는 주석으로 보존
   - 이미지 및 링크 업로드 기능은 유지
 
-- **229a390** (42분 전) - **feat: Add content upload functionality with English UI**
+- **229a390** - **feat: Add content upload functionality with English UI**
 
   - 영어 UI로 콘텐츠 업로드 기능 추가
   - 콘텐츠 업로드 모달 및 폼 구현
 
-- **1369904** (2시간 전) - **feat: Complete channel modal and grid improvements**
+- **1369904** - **feat: Complete channel modal and grid improvements**
 
   - 채널 모달 및 그리드 개선 완료
   - 채널 상세 정보 표시 기능 강화
 
-- **4e05ae3** (2시간 전) - **feat: Refactor MasonryGrid with infinite scroll and performance optimizations**
+- **4e05ae3** - **feat: Refactor MasonryGrid with infinite scroll and performance optimizations**
   - MasonryGrid 리팩토링
   - 무한 스크롤 기능 추가
   - 성능 최적화 적용
@@ -100,17 +117,11 @@
 ### Working Branch
 
 - **Branch**: `feature/add-channel`
-- **Status**: Active development with uncommitted changes
+- **Status**: Active development with all changes committed
 
 ### Pending Changes
 
-다음 파일들이 커밋되지 않은 상태입니다:
-
-- `src/api/generated/models/LinkContentCreate.ts`
-- `src/api/generated/models/LinkContentResponse.ts`
-- `src/domains/channels/components/modal/content-upload/ContentUploadForm.tsx`
-- `src/domains/channels/components/modal/content-upload/ContentUploadModal.tsx`
-- `src/store/contentUploadStore.ts`
+현재 모든 변경사항이 커밋된 상태입니다. 작업 디렉토리가 깨끗합니다.
 
 ## Key Features Implemented
 
@@ -120,6 +131,8 @@
 - ✅ 채널 그리드 및 모달 개선
 - ✅ 채널 편집자 관리 (contributors → editors)
 - ✅ CTA 카드 통합
+- ✅ 채널 관련 토스트 메시지 영어화
+- ✅ 매니저 작업 토스트 알림
 
 ### 2. Content Upload System
 
@@ -127,6 +140,7 @@
 - ⏸️ 비디오 업로드 (임시 비활성화)
 - ✅ Base64 이미지 처리 최적화
 - ✅ 파일 검증 및 에러 처리
+- ✅ 콘텐츠 CRUD 작업 토스트 알림
 
 ### 3. UI/UX Improvements
 
@@ -134,6 +148,8 @@
 - ✅ 성능 최적화
 - ✅ 모달 레이아웃 개선
 - ✅ 필터 컴포넌트 개선
+- ✅ 버튼 디자인 테마 통일
+- ✅ 토스트 메시지 영어화
 
 ### 4. Authentication
 
@@ -155,6 +171,7 @@
 - Google OAuth 로직 모듈화
 - 디버그 컴포넌트 제거
 - 일관된 네이밍 컨벤션 적용
+- 토스트 메시지 통일
 
 ### Bug Fixes
 
@@ -164,14 +181,16 @@
 
 ## Next Steps
 
-1. **Pending Changes Commit**: 현재 수정된 파일들을 커밋
-2. **Video Upload Re-enable**: 비디오 업로드 기능 재활성화 검토
-3. **Testing**: 구현된 기능들의 테스트 진행
-4. **Code Review**: 코드 리뷰 및 최적화
-5. **Merge to Main**: 메인 브랜치로 병합 준비
+1. **Video Upload Re-enable**: 비디오 업로드 기능 재활성화 검토
+2. **Testing**: 구현된 기능들의 테스트 진행
+3. **Code Review**: 코드 리뷰 및 최적화
+4. **Merge to Main**: 메인 브랜치로 병합 준비
+5. **User Feedback**: 토스트 메시지 및 UI 개선사항 검증
 
 ## Notes
 
 - 비디오 업로드 기능은 임시로 비활성화되었지만, 코드는 주석으로 보존되어 있어 필요시 쉽게 재활성화 가능
 - 현재 `feature/add-channel` 브랜치에서 활발한 개발 진행 중
 - 인증 시스템이 완전히 구현되어 사용자 관리 기능이 안정적으로 작동
+- 모든 토스트 메시지가 영어로 통일되어 일관된 사용자 경험 제공
+- 콘텐츠 CRUD 작업에 대한 사용자 피드백이 개선됨
