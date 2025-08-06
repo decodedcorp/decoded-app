@@ -1,6 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const API_BASE_URL = 'https://dev.decoded.style';
+// 환경에 따른 API URL 설정
+const getApiBaseUrl = () => {
+  // 환경 변수 확인
+  const envApiUrl = process.env.API_BASE_URL;
+  const nodeEnv = process.env.NODE_ENV;
+  
+  // 프로덕션 환경에서는 운영 API 사용
+  if (nodeEnv === 'production') {
+    return envApiUrl || 'https://api.decoded.style';
+  }
+  
+  // 개발 환경에서는 개발 API 사용
+  return envApiUrl || 'https://dev.decoded.style';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 export async function GET(
   request: NextRequest,
