@@ -6,12 +6,8 @@ const getApiBaseUrl = () => {
   const envApiUrl = process.env.API_BASE_URL;
   const nodeEnv = process.env.NODE_ENV;
   
-  // 프로덕션 환경에서는 운영 API 사용
-  if (nodeEnv === 'production') {
-    return envApiUrl || 'https://api.decoded.style';
-  }
-  
-  // 개발 환경에서는 개발 API 사용
+  // 임시로 모든 환경에서 개발 API 사용 (API 서버 문제 해결 후 변경)
+  console.log(`[Proxy] Environment: ${nodeEnv}, Using dev API temporarily`);
   return envApiUrl || 'https://dev.decoded.style';
 };
 
