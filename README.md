@@ -2,21 +2,43 @@
 
 A modern web application built with Next.js, TypeScript, and Tailwind CSS.
 
-## Getting Started
+## 🚀 Quick Start
 
-First, run the development server:
+### Local Development
 
 ```bash
+# Install dependencies
+yarn install
+
+# Start development server
 yarn dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## API Type Generation
+### Production Build
+
+```bash
+# Build the application
+yarn build
+
+# Start production server
+yarn start
+```
+
+## 📚 Documentation
+
+- **[Access Guide](docs/access-guide.md)** - How to access the development server
+- **[Deployment Guide](docs/deployment.md)** - Complete deployment instructions
+- **[API Documentation](docs/api/)** - API integration guides
+
+## 🔧 Development
+
+### API Type Generation
 
 This project uses OpenAPI TypeScript codegen to generate API types from the backend OpenAPI specification.
 
-### Generate API Types
+#### Generate API Types
 
 ```bash
 # Generate types from development API
@@ -26,7 +48,7 @@ yarn typegen:dev
 yarn pre-commit
 ```
 
-### API Configuration
+#### API Configuration
 
 API types are automatically generated and committed to Git to ensure:
 
@@ -36,29 +58,92 @@ API types are automatically generated and committed to Git to ensure:
 
 **Note**: Generated files in `src/api/generated/` should not be manually edited as they will be overwritten on the next type generation.
 
-## Environment Variables
+### Environment Variables
 
-Create a `.env` file in the root directory:
+Copy the example environment file and configure it:
 
 ```bash
-NEXT_PUBLIC_APP_ENV=local
-NEXT_PUBLIC_API_BASE_URL=http://dev.decoded.style
-NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id
-NEXT_PUBLIC_GOOGLE_REDIRECT_URI=http://localhost:3000/auth/callback
-GOOGLE_CLIENT_SECRET=your_google_client_secret
+# Copy example environment file
+cp env.example .env.local
+
+# Edit with your actual values
+nano .env.local
 ```
 
-## Learn More
+#### Required Environment Variables
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# API Configuration
+NEXT_PUBLIC_API_BASE_URL=https://dev.decoded.style
+API_BASE_URL=https://dev.decoded.style
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Google OAuth Configuration
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id_here
+NEXT_PUBLIC_GOOGLE_REDIRECT_URI=http://localhost:3000/auth/callback
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+# Server Configuration
+PORT=3000
+```
 
-## Deploy on Vercel
+## 🌐 Development Server
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The development server is deployed on macOS Mini:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- **URL**: `http://121.130.214.186:3000`
+- **Environment**: Development
+- **API**: `https://dev.decoded.style`
+
+For access instructions, see [Access Guide](docs/access-guide.md).
+
+## 🚀 Deployment
+
+### Quick Deployment
+
+```bash
+# Build and deploy to development server
+./deploy-macos-dev.sh
+```
+
+### Manual Deployment
+
+See [Deployment Guide](docs/deployment.md) for detailed instructions.
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 15.4.1
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **State Management**: Zustand
+- **API**: React Query
+- **Authentication**: Google OAuth
+- **Package Manager**: Yarn (PnP)
+
+## 📁 Project Structure
+
+```
+src/
+├── api/           # API integration and generated types
+├── app/           # Next.js App Router pages
+├── components/    # Reusable UI components
+├── domains/       # Feature-based modules
+├── lib/           # Utility libraries
+├── shared/        # Shared components
+├── store/         # State management
+└── styles/        # Global styles
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and type generation
+5. Submit a pull request
+
+## 📄 License
+
+This project is private and proprietary.
+
+---
+
+For more information, see the [Next.js Documentation](https://nextjs.org/docs).

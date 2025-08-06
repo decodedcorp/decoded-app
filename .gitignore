@@ -32,6 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -47,10 +48,13 @@ backup
 logs
 *.log
 dev-debug.log
+
 # Dependency directories
 node_modules/
+
 # Environment variables
 .env
+
 # Editor directories and files
 .idea
 .vscode
@@ -59,12 +63,29 @@ node_modules/
 *.njsproj
 *.sln
 *.sw?
-# OS specific
 
-# Task files
-# tasks.json
-# tasks/ 
+# OS specific files
+.DS_Store
+Thumbs.db
 
 # Task Master
 .taskmaster/reports/
-.taskmaster/docs/ 
+.taskmaster/docs/
+
+# Build artifacts and temporary files
+*.tar.gz
+decoded-app-*.tar.gz
+deploy-package/
+server.log
+
+# AI assistant files (optional - can be included for team reference)
+# .claude/
+# .gemini/
+# .cursor/
+
+# Yarn PnP
+.pnp.cjs
+.pnp.loader.mjs
+
+# TypeScript build info
+tsconfig.tsbuildinfo 
