@@ -1,0 +1,40 @@
+---
+description: 'Documentation writing guide and review prompts for frontend developers'
+globs: ['docs/**/*.md']
+applyMode: fileMatch
+rules:
+  oneSectionPerTopic: true
+reviewPrompts:
+  - "Is the document's purpose clearly stated at the beginning?"
+  - 'Does the structure match the intended document type (learning, reference, troubleshooting, etc.)?'
+  - 'Are all code examples runnable and minimal?'
+  - 'Is the overall length and complexity of the document appropriate?'
+  - 'Would a teammate understand the feature behavior and usage from this document alone?'
+  - 'Are key components or UI behaviors described clearly, possibly with visuals?'
+  - 'Is it clear how the documented code fits into the broader application context?'
+---
+
+# 📘 Documentation Writing Guide
+
+This rule applies to all Markdown files under the `docs/` directory.
+
+## Goals
+
+- Encourage clear, purposeful documentation for frontend development
+- Ensure consistency and readability across team-shared documents
+
+## Writing Rules
+
+- Each document should focus on a single topic or concern
+- Begin with a clear explanation of **what** the document covers and **why**
+- Include runnable code snippets, and annotate them where necessary
+- Use diagrams or screenshots to explain UI behavior if applicable
+- Keep section headings short and structured logically
+
+## Examples of Document Types
+
+- Learning-oriented (e.g., "How to use Zustand for local state management")
+- Reference-style (e.g., "Props and behavior of `<ImageCard />` component")
+- Troubleshooting guides (e.g., "Fixing hydration mismatch in Next.js")
+
+Ensure each document type follows its appropriate structure and communicates clearly to your team.

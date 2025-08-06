@@ -1,0 +1,28 @@
+{
+  "extends": [
+    "./.cursor/rules/code-quality.mdc",
+    "./.cursor/rules/tailwind.mdc",
+    "./.cursor/rules/bundling.mdc",
+    "./.cursor/rules/documentation.mdc",
+    "./.cursor/rules/tooling.mdc",
+    "./.cursor/rules/git-mcp.mdc",
+    "./.cursor/rules/design-system.mdc",
+    "./.cursor/rules/performance.mdc",
+    "./.cursor/rules/react-query.mdc",
+    "./.cursor/rules/zustand.mdc"
+  ],
+  "projectStructure": [
+    "src/app",
+    "src/domains",
+    "src/shared/components",
+    "src/shared/hooks",
+    "src/shared/utils",
+    "src/lib",
+    "src/types",
+    "src/constants",
+    "src/styles"
+  ],
+  "commitMessage": {
+    "convention": "conventional"
+  }
+}

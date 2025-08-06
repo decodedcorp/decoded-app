@@ -1,0 +1,28 @@
+---
+description: "Tailwind CSS rules to encourage scalable and consistent utility usage"
+globs: ["src/**/*.{ts,tsx}"]
+applyMode: fileMatch
+rules:
+  classNameUtilityLimit: 5
+  semanticUtilityCombinations: true
+  designTokensViaConfig: true
+  componentDrivenStyles: true
+reviewPrompts:
+  - "Are utility class names limited to 5 per element for readability?"
+  - "Are utility classes combined semantically rather than arbitrarily?"
+  - "Are Tailwind design tokens (e.g., spacing, color) used via config instead of hardcoding?"
+  - "Are styles structured in a component-driven way, avoiding global overrides?"
+---
+
+# 🎨 Tailwind CSS Rules
+
+These rules promote maintainable and scalable use of Tailwind CSS.
+
+## ✅ Guidelines
+
+- **Utility Limit**: Avoid overloading elements with too many utility classes. Consider using `clsx`, `cva`, or extract to component-level styling.
+- **Semantic Grouping**: Group utilities meaningfully (e.g., `text-sm font-medium text-gray-500`) rather than randomly.
+- **Design Tokens**: Use theme-based values from `tailwind.config.js` for colors, spacing, etc.
+- **Component-Driven**: Co-locate styling logic with components instead of global overrides or long shared class lists.
+
+Following these rules keeps Tailwind usage clean, reusable, and aligned with the design system.

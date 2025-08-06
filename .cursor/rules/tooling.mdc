@@ -1,0 +1,15 @@
+---
+description: 'Tooling standards and configurations for the Decoded project'
+globs: ['**/*.{ts,tsx,js,jsx}']
+alwaysApply: true
+rules:
+  useESLintPrettier: true
+  tsconfigAlias: '@/*'
+  conventionalCommits: true
+reviewPrompts:
+  - 'Is ESLint and Prettier properly configured and consistently applied across the codebase?'
+  - 'Is the TypeScript path alias (`@/`) used consistently instead of relative imports?'
+  - 'Do commit messages follow the conventional commit format (e.g., feat: add X)?'
+  - 'Are developer tooling setups (linters, formatters, etc.) defined and shared in the repository?'
+  - 'Is the tooling environment reproducible for all team members (e.g., with consistent configs, lockfiles)?'
+---

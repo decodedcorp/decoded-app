@@ -1,0 +1,70 @@
+---
+description: 'State management rules and best practices using Zustand'
+globs: ['src/store/**/*.{ts,tsx}', 'src/hooks/**/*.{ts,tsx}']
+applyMode: fileMatch
+rules:
+  storeDirectory: 'src/store'
+  namingConvention: 'useStore'
+  avoidRedundantSelectors: true
+  preferSlicePattern: true
+  extractSelectors: true
+reviewPrompts:
+  - 'Are Zustand stores located under the designated `src/store` directory?'
+  - 'Are store hooks named using the `useStore` or similar convention?'
+  - 'Are selectors extracted to avoid unnecessary re-renders?'
+  - 'Is the slice pattern used to modularize store logic?'
+  - 'Is there any redundant selector or unnecessary global state?'
+---
+
+# 🧠 Zustand Usage Rules
+
+This guideline ensures consistent and scalable usage of Zustand across the application.
+
+## ✅ Rules
+
+### 1. Use `src/store` to manage Zustand stores
+
+All Zustand stores should be placed under `src/store` for clarity and discoverability.
+
+### 2. Follow naming convention
+
+Zustand store accessors should be named using a consistent pattern like `useUserStore`, `useAuthStore`.
+
+### 3. Avoid redundant selectors
+
+Use Zustand's selector feature (`useStore(state => state.value)`) to prevent unnecessary re-renders.
+
+### 4. Prefer slice pattern
+
+When state grows, organize it by slices:
+
+```ts
+// userSlice.ts
+export const createUserSlice = (set) => ({
+  user: null,
+  setUser: (user) => set({ user }),
+});
+```
+
+Then compose stores:
+
+```ts
+const useStore = create((...a) => ({
+  ...createUserSlice(...a),
+  ...createUiSlice(...a),
+}));
+```
+
+### 5. Extract selectors
+
+Use selector functions like `selectUser = (state) => state.user` and reuse them to keep components clean and DRY.
+
+## ⚠️ Common Pitfalls
+
+- Using full store state in components → triggers excessive re-renders
+- Spreading unrelated state into single store → hurts modularity and testing
+- Inconsistent naming → hard to track usage across files
+
+---
+
+Use this rule to guide Zustand integration in the application.

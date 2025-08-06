@@ -1,0 +1,662 @@
+/* Shhhh I'm using three different fonts, but i don't care */
+@import url('https://fonts.cdnfonts.com/css/longsile');
+@import url('https://fonts.cdnfonts.com/css/thegoodmonolith');
+@import url('https://fonts.cdnfonts.com/css/pp-neue-montreal');
+
+.backgroundFrame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* background-image: url("https://assets.codepen.io/7558/web03.webp"); */
+  background-size: 100% 100%;
+  background-position: center;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.bottomGradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.backgroundImage {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  z-index: 1;
+  mix-blend-mode: multiply;
+  transition: opacity 0.8s ease-in-out;
+}
+
+.backgroundImage.default {
+  /* background-image: url("https://assets.codepen.io/7558/wave-bg-001.webp"); */
+  opacity: 1;
+}
+
+.backgroundImage.focus {
+  /* background-image: url("https://assets.codepen.io/7558/wave-bg-002.webp"); */
+}
+
+.backgroundImage.presence {
+  /* background-image: url("https://assets.codepen.io/7558/wave-bg-003.webp"); */
+}
+
+.backgroundImage.feel {
+  /* background-image: url("https://assets.codepen.io/7558/wave-bg-004.webp"); */
+}
+
+.textBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.textItem {
+  position: absolute;
+  color: #ffcc00;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  opacity: 0.8;
+  white-space: nowrap;
+  font-family: 'TheGoodMonolith', monospace;
+  z-index: 0;
+}
+
+.textItem::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -4px;
+  width: 0;
+  height: calc(100% + 4px);
+  background-color: #ffcc00;
+  z-index: 1;
+  transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.textItem.highlight::after {
+  width: calc(100% + 8px);
+}
+
+.textItem.highlightReverse::after {
+  width: 0;
+  right: -4px;
+  left: auto;
+}
+
+.mainContent {
+  position: relative;
+  z-index: 10;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.slicedContainer {
+  position: relative;
+  width: auto;
+  max-width: 100%;
+  margin: 0 auto;
+  transform: translateZ(0);
+}
+
+.textRow {
+  position: relative;
+  width: 100%;
+  height: 140px;
+  margin: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  z-index: 100;
+}
+
+.textContent,
+.char,
+.charInner {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.textContent {
+  position: relative;
+  font-size: 10rem;
+  font-weight: normal;
+  text-transform: uppercase;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  color: #ffcc00;
+  letter-spacing: 0px;
+  transition: letter-spacing 0.5s ease;
+  visibility: visible;
+  transform: translate3d(0, 0, 0);
+}
+
+.textRow:hover .textContent {
+  letter-spacing: 5px;
+}
+
+.interactiveArea {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  cursor: pointer;
+}
+
+.char {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  max-width: 80px;
+  transition: max-width 0.64s cubic-bezier(0.86, 0, 0.07, 1);
+  margin-right: 0px;
+}
+
+.textRow.active .char::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1px;
+  height: 80%;
+  background-color: rgba(255, 204, 0, 0.2);
+  transform: none;
+  opacity: 0;
+  animation: fadeIn 0.3s forwards;
+  animation-delay: calc(var(--char-index, 0) * 0.05s);
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+.char.narrowChar {
+  max-width: 40px;
+}
+
+.char:last-child::after {
+  display: none;
+}
+
+.charInner {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+  transform: translate3d(-20px, 0, 0);
+}
+
+.type {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  text-transform: uppercase;
+  display: none;
+  justify-content: center;
+  align-content: center;
+  text-align: center;
+  top: 0;
+  left: 0;
+  will-change: transform;
+  z-index: 5;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+
+.typeLine {
+  white-space: nowrap;
+  font-size: clamp(7rem, 18.75vh, 15rem);
+  line-height: 0.75;
+  font-weight: bold;
+  font-family: 'PP Neue Montreal', sans-serif;
+  color: #ffffff;
+  opacity: 0.05;
+  user-select: none;
+  will-change: transform, opacity;
+  position: relative;
+}
+
+.typeLine.odd {
+  z-index: 50;
+}
+
+.typeLine.even {
+  z-index: 150;
+}
+
+/* Mobile Optimization */
+
+/* For tablets and smaller screens */
+@media screen and (max-width: 992px) {
+  .textContent {
+    font-size: 7rem;
+  }
+
+  .textRow {
+    height: 110px;
+  }
+
+  .typeLine {
+    font-size: clamp(5rem, 12vh, 10rem);
+  }
+}
+
+/* For mobile phones */
+@media screen and (max-width: 768px) {
+  .textContent {
+    font-size: 5rem;
+  }
+
+  .textRow {
+    height: 80px;
+    margin: 8px 0;
+  }
+
+  .typeLine {
+    font-size: clamp(3.5rem, 8vh, 7rem);
+  }
+
+  .textItem {
+    font-size: 0.7rem;
+  }
+}
+
+/* For very small screens */
+@media screen and (max-width: 480px) {
+  .textContent {
+    font-size: 3.5rem;
+  }
+
+  .textRow {
+    height: 60px;
+    margin: 6px 0;
+  }
+
+  .typeLine {
+    font-size: clamp(2.5rem, 6vh, 5rem);
+  }
+
+  .textItem {
+    font-size: 0.6rem;
+  }
+}
+
+/* New Reddit Answers Style Hero */
+.searchHero {
+  position: relative;
+  z-index: 10;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+.heroContent {
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+}
+
+.heroTitle {
+  margin-bottom: 2rem;
+}
+
+.mainTitle {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+  font-family: 'PP Neue Montreal', sans-serif;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+/* GlitchText 커스텀 스타일 */
+.glitchText {
+  font-size: clamp(2.5rem, 5vw, 4rem) !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  font-family: 'PP Neue Montreal', sans-serif !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.1 !important;
+}
+
+.subtitle {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 400;
+  font-family: 'PP Neue Montreal', sans-serif;
+  margin: 0;
+}
+
+.searchForm {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Simple Hero Styles */
+.simpleHero {
+  position: relative;
+  z-index: 10;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+.simpleHeroContent {
+  text-align: center;
+  max-width: 800px;
+  width: 100%;
+}
+
+.simpleHeroTitle {
+  margin-bottom: 2rem;
+}
+
+.simpleMainTitle {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+  font-family: 'PP Neue Montreal', sans-serif;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.simpleSubtitle {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 400;
+  font-family: 'PP Neue Montreal', sans-serif;
+  margin: 0;
+}
+
+.simpleSearchForm {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto 3rem auto;
+}
+
+/* Scrolling Questions */
+.scrollingQuestionsContainer {
+  width: 100%;
+  overflow: hidden;
+  margin-top: 2rem;
+}
+
+.scrollingQuestions {
+  display: flex;
+  animation: scrollLeft 30s linear infinite;
+  white-space: nowrap;
+}
+
+.scrollingQuestion {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 0.75rem 1.5rem;
+  margin-right: 1rem;
+  font-size: 0.875rem;
+  font-family: 'PP Neue Montreal', sans-serif;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.scrollingQuestion:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes scrollLeft {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Responsive Design for Simple Hero */
+@media screen and (max-width: 768px) {
+  .scrollingQuestion {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    margin-right: 0.75rem;
+  }
+  
+  .scrollingQuestions {
+    animation-duration: 20s;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .scrollingQuestion {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.6875rem;
+    margin-right: 0.5rem;
+  }
+  
+  .scrollingQuestions {
+    animation-duration: 15s;
+  }
+}
+
+/* Flowing Questions */
+.flowingQuestionsContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.flowingQuestions {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.flowingQuestion {
+  position: absolute;
+  top: var(--top, 20%);
+  color: rgba(255, 255, 255, 0.08);
+  font-size: clamp(0.75rem, 1.5vw, 1rem);
+  font-family: 'PP Neue Montreal', sans-serif;
+  font-weight: 400;
+  white-space: nowrap;
+  animation: flowAcross var(--duration, 8s) linear infinite;
+  animation-delay: var(--delay, 0s);
+  opacity: 0;
+  transform: translateX(-100%);
+  animation-timing-function: linear;
+}
+
+@keyframes flowAcross {
+  0% {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  10% {
+    opacity: 0.3;
+  }
+  90% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100vw);
+  }
+}
+
+/* Trending Tags */
+.trendingTagsContainer {
+  position: absolute;
+  bottom: 2rem;
+  left: 0;
+  width: 100%;
+  z-index: 3;
+  pointer-events: auto;
+}
+
+.trendingTags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.trendingTag {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-family: 'PP Neue Montreal', sans-serif;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 400;
+  animation: floatUpDown var(--duration, 4s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+  opacity: 0;
+  transform: translateY(20px) scale(0.9);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  pointer-events: auto;
+}
+
+.trendingTag:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.trendingTag:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+
+@keyframes floatUpDown {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  20% {
+    opacity: 0.6;
+    transform: translateY(0) scale(1);
+  }
+  80% {
+    opacity: 0.6;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.9);
+  }
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  .searchContainer {
+    border-radius: 25px;
+    padding: 0.25rem;
+  }
+
+  .searchInput {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  .searchButton {
+    width: 40px;
+    height: 40px;
+  }
+
+  .trendingTags {
+    gap: 0.5rem;
+  }
+
+  .trendingTag {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .heroContent {
+    padding: 0 0.5rem;
+  }
+
+  .searchContainer {
+    border-radius: 20px;
+  }
+
+  .searchInput {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.8125rem;
+  }
+
+  .searchButton {
+    width: 36px;
+    height: 36px;
+  }
+
+  .trendingTags {
+    gap: 0.375rem;
+  }
+
+  .trendingTag {
+    padding: 0.25rem 0.625rem;
+    font-size: 0.6875rem;
+  }
+}

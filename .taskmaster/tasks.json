@@ -1,0 +1,49 @@
+{
+  "project": {
+    "name": "decoded-app",
+    "version": "1.0.0",
+    "description": "Decoded application with API type generation and CI/CD pipeline"
+  },
+  "tasks": [
+    {
+      "id": "1",
+      "title": "Setup API Type Generation",
+      "description": "Configure OpenAPI TypeScript code generation for the project",
+      "status": "done",
+      "priority": "high",
+      "complexity": 3,
+      "dependencies": [],
+      "createdAt": "2025-07-22T07:30:00Z",
+      "updatedAt": "2025-07-22T07:30:00Z"
+    },
+    {
+      "id": "2",
+      "title": "Setup CI/CD Pipeline",
+      "description": "Configure GitHub Actions workflow for automated testing and deployment",
+      "status": "done",
+      "priority": "high",
+      "complexity": 4,
+      "dependencies": ["1"],
+      "createdAt": "2025-07-22T07:30:00Z",
+      "updatedAt": "2025-07-22T07:30:00Z"
+    },
+    {
+      "id": "3",
+      "title": "Integrate Task Master",
+      "description": "Setup task management system with MCP integration",
+      "status": "in-progress",
+      "priority": "medium",
+      "complexity": 3,
+      "dependencies": ["2"],
+      "createdAt": "2025-07-22T07:30:00Z",
+      "updatedAt": "2025-07-22T07:30:00Z"
+    }
+  ],
+  "tags": {
+    "current": {
+      "name": "current",
+      "description": "Current development iteration",
+      "createdAt": "2025-07-22T07:30:00Z"
+    }
+  }
+}

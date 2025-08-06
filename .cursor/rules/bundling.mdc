@@ -1,0 +1,71 @@
+---
+description: 'Bundling rules for performance optimization and code maintainability'
+globs: ['src/**/*.{ts,tsx}']
+applyMode: fileMatch
+rules:
+  noDynamicImportInLoops: true
+  groupRelatedModules: true
+  noGlobalPolyfills: true
+  bundleSizeMeasurable: true
+  preferStaticImports: true
+reviewPrompts:
+  - 'Are there any dynamic imports inside loops that could cause unpredictable bundle splits?'
+  - 'Are related modules grouped together to improve readability and optimize chunking?'
+  - 'Are there any unnecessary global polyfills that could pollute the global scope?'
+  - 'Is the code structured in a way that enables analyzing or splitting bundles effectively?'
+  - 'Are static imports preferred to enable tree shaking?'
+---
+
+# 📦 Bundling Strategy & Rules
+
+This guideline helps ensure that your code is modular, lazy-loadable, and optimized for production bundles.
+
+## ✅ Rules
+
+### 1. Avoid dynamic imports inside loops
+
+Using `await import()` inside a `for`/`while` loop can lead to unpredictable code-splitting and performance regressions.
+
+```ts
+// ❌ Bad
+for (const moduleName of modules) {
+  const mod = await import(`./${moduleName}`);
+}
+```
+
+### 2. Group related modules
+
+Keep imports that belong to the same concern (e.g., React-related, UI components, API utils) close together. This improves readability and helps static analysis tools optimize chunking.
+
+### 3. No global polyfills
+
+Avoid adding polyfills like Object.assign or fetch to the global scope (e.g., window.fetch = ...). Use scoped polyfills or browser compatibility layers instead.
+
+### 4. Make bundles measurable
+
+Split large features or pages into separate chunks using dynamic import() only where meaningful. This allows you to analyze and optimize bundle sizes using tools like `webpack-bundle-analyzer` or `source-map-explorer`.
+
+### 5. Prefer static imports
+
+Use `import ... from` for most imports. This allows Webpack to perform tree shaking and reduces final bundle size.
+
+## 🧪 Examples
+
+```ts
+// ✅ Good
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+
+// ✅ Good: dynamic import for code splitting
+const Chart = lazy(() => import('@/components/Chart'));
+```
+
+## ⚠️ Common Pitfalls
+
+- Dynamic imports inside conditional logic (`if`, `switch`) can be hard to analyze
+- Overuse of `import()` leads to too many small chunks → increased network overhead
+- Bundling everything into one huge file → slow initial load, poor LCP
+
+---
+
+Use this rule to guide your bundling strategy in `src/` files.

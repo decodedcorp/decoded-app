@@ -1,0 +1,67 @@
+---
+description: 'API state management and caching best practices using React Query'
+globs: ['src/lib/api/**/*.{ts,tsx}', 'src/hooks/**/*.{ts,tsx}']
+applyMode: fileMatch
+rules:
+  preferUseQueryMutationHooks: true
+  centralizeQueryKeys: true
+  useEnabledFlagForConditionalQueries: true
+  avoidInlineQueryKeys: true
+  abstractErrorHandling: true
+reviewPrompts:
+  - 'Are `useQuery` and `useMutation` hooks used for API access?'
+  - 'Are query keys defined in a centralized module?'
+  - 'Are conditional queries guarded with `enabled: ...` instead of inline logic?'
+  - 'Is error handling abstracted (e.g., with a global handler or wrapper)?'
+  - 'Are query/mutation options like staleTime, retry, and cacheTime clearly set?'
+---
+
+# 🔁 React Query Usage Rules
+
+This rule ensures consistent and efficient usage of React Query for API state, error, and cache handling.
+
+## ✅ Rules
+
+### 1. Use `useQuery` / `useMutation` Hooks
+
+All data fetching or mutation logic should be implemented through these hooks instead of raw fetch or axios logic inside components.
+
+### 2. Centralize Query Keys
+
+Define all query keys in one place (`lib/api/queryKeys.ts`) to ensure consistency and prevent accidental cache collisions.
+
+```ts
+export const queryKeys = {
+  user: (id: string) => ['user', id],
+  posts: ['posts'],
+};
+```
+
+### 3. Use `enabled` for Conditional Queries
+
+Avoid placing logic inside query key conditionals. Use the `enabled` flag instead.
+
+```ts
+// ✅ Good
+useQuery(queryKeys.user(id), fetchUser, {
+  enabled: !!id,
+});
+```
+
+### 4. Avoid Inline Query Keys
+
+```ts
+// ❌ Bad
+useQuery(['user', userId], fetchUser);
+
+// ✅ Good
+useQuery(queryKeys.user(userId), fetchUser);
+```
+
+### 5. Abstract Error Handling
+
+Use a wrapper hook or global error boundary to handle common error behavior.
+
+---
+
+Use this rule to guide consistent and optimized use of React Query in your app.

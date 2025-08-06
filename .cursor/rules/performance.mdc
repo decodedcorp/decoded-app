@@ -1,0 +1,79 @@
+---
+description: 'Performance optimization practices for frontend applications'
+globs: ['src/**/*.{ts,tsx}']
+applyMode: fileMatch
+rules:
+  avoidUnnecessaryReRenders: true
+  useMemoAndUseCallback: true
+  lazyLoadRoutesAndComponents: true
+  optimizeImages: true
+  minimizeThirdPartyDependencies: true
+  avoidAnonymousFunctionsInJSX: true
+  useSuspenseAndFallbacks: true
+reviewPrompts:
+  - 'Are expensive components wrapped with `React.memo` or optimized with `useMemo`?'
+  - 'Are callbacks memoized using `useCallback` where needed?'
+  - 'Are dynamic imports used for route-based or heavy component lazy loading?'
+  - 'Are large images optimized or served through responsive formats (e.g., `next/image`)?'
+  - 'Is excessive use of third-party libraries avoided?'
+  - 'Are anonymous inline functions avoided in JSX?'
+  - 'Is Suspense used with a meaningful fallback UI?'
+---
+
+# 🚀 Frontend Performance Rules
+
+Apply these rules to improve runtime performance, initial load speed, and overall user experience.
+
+## ✅ Rules
+
+### 1. Avoid Unnecessary Re-renders
+
+Use `React.memo` for presentational components and `useMemo` for expensive calculations.
+
+```ts
+const MemoizedList = React.memo(function List(props) { ... });
+```
+
+### 2. Memoize Callbacks
+
+Use `useCallback` to prevent unnecessary re-renders of child components relying on function props.
+
+### 3. Lazy-load Components and Routes
+
+Split routes or heavy UI sections with dynamic imports:
+
+```ts
+const Page = lazy(() => import('@/pages/Page'));
+```
+
+### 4. Optimize Images
+
+Use `next/image`, responsive image formats, and lazy loading for below-the-fold content.
+
+### 5. Minimize Dependencies
+
+Import only required submodules and avoid heavy unused libraries.
+
+### 6. Avoid Inline Anonymous Functions in JSX
+
+Define event handlers outside JSX to avoid re-creating them on every render.
+
+```tsx
+// ✅ Good
+const handleClick = () => { ... };
+return <button onClick={handleClick}>Click</button>;
+```
+
+### 7. Use Suspense and Fallbacks
+
+Use `React.Suspense` for lazy-loaded components with meaningful fallback UI:
+
+```tsx
+<Suspense fallback={<Spinner />}>
+  <LazyComponent />
+</Suspense>
+```
+
+---
+
+Follow these practices to ensure a fast, responsive, and production-grade frontend experience.

@@ -1,0 +1,5 @@
+# Decoded App PRD
+
+- Test Git MCP integration
+- Set up CI/CD pipeline
+- Experiment with Task Master basic features

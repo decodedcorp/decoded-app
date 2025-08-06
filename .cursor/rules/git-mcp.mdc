@@ -1,0 +1,16 @@
+---
+description: 'Git workflow automation and MCP integration for commit consistency'
+globs: ['**/*']
+alwaysApply: true
+rules:
+  autoStage: true
+  conventionalCommits: true
+  branchNaming: 'feature/description'
+  commitMessageTemplate: 'type(scope): description'
+reviewPrompts:
+  - 'Are all commits following the conventional format (e.g., feat(component): add feature)?'
+  - 'Are branches named using the agreed convention like feature/login-page?'
+  - 'Does the commit message clearly describe what and why the change was made?'
+  - 'Are changes auto-staged or manually selected during commit?'
+  - 'Is this integrated with the MCP Git server for consistency?'
+---

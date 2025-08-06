@@ -3,8 +3,12 @@
 # dependencies
 /node_modules
 /.pnp
-.pnp.js
-.yarn/install-state.gz
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
 
 # testing
 /coverage
@@ -24,6 +28,10 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
 
 # vercel
 .vercel
@@ -32,14 +40,31 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# cursor
-.cursorrules
+# backup
+backup
 
-# env
+# Logs
+logs
+*.log
+dev-debug.log
+# Dependency directories
+node_modules/
+# Environment variables
 .env
-.env.local
-.env.*.local
-.env.production
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+# OS specific
 
-# src-tauri
-src-tauri
+# Task files
+# tasks.json
+# tasks/ 
+
+# Task Master
+.taskmaster/reports/
+.taskmaster/docs/ 
