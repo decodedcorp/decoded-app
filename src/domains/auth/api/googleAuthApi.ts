@@ -48,11 +48,18 @@ export class GoogleAuthApi {
    * Google OAuth 인증 코드를 액세스 토큰으로 교환
    */
   static async exchangeCodeForToken(code: string): Promise<GoogleTokenData> {
+    // 환경에 따른 redirect_uri 설정
+    const redirectUri =
+      process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI ||
+      (typeof window !== 'undefined'
+        ? `${window.location.origin}/auth/callback`
+        : 'http://localhost:3000/auth/callback');
+
     const tokenRequestBody = new URLSearchParams({
       code,
       client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
       client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-      redirect_uri: process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI!,
+      redirect_uri: redirectUri,
       grant_type: 'authorization_code',
     });
 
