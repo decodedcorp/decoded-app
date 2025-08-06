@@ -67,7 +67,7 @@ export default function TiltedCardTest() {
               • <strong>기본 카드:</strong> 마우스를 올려서 3D 틸트 효과를 확인하세요
             </li>
             <li>
-              • <strong>픽셀 전환 카드:</strong> "픽셀 전환 시작" 버튼을 클릭하여 이미지 전환
+              • <strong>픽셀 전환 카드:</strong> &quot;픽셀 전환 시작&quot; 버튼을 클릭하여 이미지 전환
               애니메이션을 확인하세요
             </li>
             <li>

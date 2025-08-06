@@ -182,7 +182,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
       {/* Additional Info */}
       <div className="text-center">
         <p className="text-xs text-gray-400 leading-relaxed">
-          By continuing, you agree to our Terms of Service and Privacy Policy. We'll use your Google
+          By continuing, you agree to our Terms of Service and Privacy Policy. We&apos;ll use your Google
           account information to provide you with a personalized experience.
         </p>
       </div>

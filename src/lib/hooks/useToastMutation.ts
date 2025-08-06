@@ -41,19 +41,14 @@ export function useToastMutation<TData, TError, TVariables, TContext = unknown>(
 ): UseMutationResult<TData, TError, TVariables, TContext> {
   const { messages, toastId, disableToast = false, ...mutationOptions } = options;
 
-  // toast를 비활성화한 경우 일반 useMutation 사용
-  if (disableToast) {
-    return useMutation({
-      mutationFn,
-      ...mutationOptions,
-    });
-  }
-
   // toast가 활성화된 경우 래핑된 함수 사용
   const wrappedMutationFn = createToastMutation(mutationFn, messages, toastId);
 
+  // 조건부로 다른 mutation 함수 사용
+  const finalMutationFn = disableToast ? mutationFn : wrappedMutationFn;
+
   return useMutation({
-    mutationFn: wrappedMutationFn,
+    mutationFn: finalMutationFn,
     ...mutationOptions,
   });
 }

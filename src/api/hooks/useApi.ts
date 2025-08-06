@@ -40,7 +40,7 @@ const updateOpenAPIToken = () => {
 };
 
 // 토큰을 동적으로 가져오는 함수로 설정
-OpenAPI.TOKEN = (options: any) => {
+OpenAPI.TOKEN = (options: unknown) => {
   const token = getValidAccessToken();
   if (process.env.NODE_ENV === 'development') {
     console.log('[useApi] Dynamic token resolver called:', token ? 'token found' : 'no token');

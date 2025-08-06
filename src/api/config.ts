@@ -50,7 +50,7 @@ const getDefaultHeaders = () => ({
  */
 export const getRequestConfig = (
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
-  body?: any,
+  body?: unknown,
   additionalHeaders?: Record<string, string>,
 ) => {
   const config: RequestInit = {
