@@ -2,10 +2,8 @@
 
 import React from 'react';
 
-// 레거시 컴포넌트 임시 import (실제 마이그레이션 시 src/domains/main/로 복사/리팩터 필요)
-import ThiingsGrid from '../../../backup/app/(main)/_components/ThiingsGrid';
-import { ImageSidebar } from '../../../backup/app/(main)/_components/sidebar/ImageSidebar';
-import FabMenu from '../../../backup/app/(main)/_components/footer/FabMenu';
+// 로컬 컴포넌트 import
+import ThiingsGrid from './ThiingsGrid';
 
 export function MainPage() {
   return (
