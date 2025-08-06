@@ -2019,6 +2019,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@next/eslint-plugin-next@npm:^15.4.5":
+  version: 15.4.5
+  resolution: "@next/eslint-plugin-next@npm:15.4.5"
+  dependencies:
+    fast-glob: "npm:3.3.1"
+  checksum: 10c0/38f8037d36af3432d1c86e2070c7b4f0f70085ab1080622d91f3f416b306c320e32f22a18680a3df1651faeaa60f61c1a1a1eee4e8d7382b7ee101f6f0ec7571
+  languageName: node
+  linkType: hard
+
 "@next/swc-darwin-arm64@npm:15.4.1":
   version: 15.4.1
   resolution: "@next/swc-darwin-arm64@npm:15.4.1"
@@ -3668,6 +3677,7 @@ __metadata:
     "@gsap/react": "npm:^2.1.2"
     "@heroicons/react": "npm:^2.2.0"
     "@mysten/zklogin": "npm:^0.8.1"
+    "@next/eslint-plugin-next": "npm:^15.4.5"
     "@svgr/webpack": "npm:^8.1.0"
     "@tailwindcss/postcss": "npm:^4.1.11"
     "@tanstack/react-query": "npm:^5.83.0"
