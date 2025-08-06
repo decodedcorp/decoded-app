@@ -7,17 +7,30 @@ interface ContentModalHeaderProps {
 }
 
 export function ContentModalHeader({ content, onClose }: ContentModalHeaderProps) {
+  // 링크 콘텐츠의 경우 linkPreview의 title을 우선적으로 사용
+  const displayTitle =
+    content.type === 'link' && content.linkPreview?.title
+      ? content.linkPreview.title
+      : content.title;
+
   return (
     <div className="flex items-center justify-between p-6 border-b border-zinc-700/50">
-      {/* Left Section: Category and Type */}
-      <div className="flex items-center space-x-3">
+      {/* Left Section: Title, Category and Type */}
+      <div className="flex items-center space-x-4 flex-1 min-w-0">
+        {/* Title */}
+        <div className="flex-1 min-w-0">
+          <h2 className="text-lg font-semibold text-white truncate">{displayTitle}</h2>
+        </div>
+
         {/* Category Badge */}
-        <span className="px-3 py-1.5 bg-zinc-800 text-zinc-300 text-sm font-medium rounded-full">
-          {content.category}
-        </span>
+        {content.category && (
+          <span className="px-3 py-1.5 bg-zinc-800 text-zinc-300 text-sm font-medium rounded-full flex-shrink-0">
+            {content.category}
+          </span>
+        )}
 
         {/* Content Type Icon */}
-        <div className="flex items-center justify-center w-6 h-6">
+        <div className="flex items-center justify-center w-6 h-6 flex-shrink-0">
           {content.type === 'image' && (
             <svg
               className="w-5 h-5 text-zinc-400"
@@ -84,7 +97,7 @@ export function ContentModalHeader({ content, onClose }: ContentModalHeaderProps
       {/* Right Section: Close Button */}
       <button
         onClick={onClose}
-        className="flex items-center justify-center w-8 h-8 rounded-full bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors"
+        className="flex items-center justify-center w-8 h-8 rounded-full bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors flex-shrink-0 ml-4"
         aria-label="Close modal"
       >
         <svg width="16" height="16" fill="none" viewBox="0 0 24 24">

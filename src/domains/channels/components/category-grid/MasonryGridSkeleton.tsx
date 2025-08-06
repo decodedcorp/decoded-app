@@ -3,12 +3,12 @@ import { cardVariants } from '../../constants/masonryConstants';
 
 export function MasonryGridSkeleton() {
   return (
-    <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 w-full pt-4">
+    <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 w-full pt-4 animate-in fade-in duration-300">
       {Array.from({ length: 20 }).map((_, idx) => (
         <div
           key={idx}
           className={cn(
-            'mb-4 break-inside-avoid transition-transform duration-200',
+            'mb-4 break-inside-avoid transition-all duration-300 ease-out',
             cardVariants[idx % cardVariants.length],
           )}
         >

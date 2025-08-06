@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils/styles';
-import Image from 'next/image';
+import { ProxiedImage } from '@/components/ProxiedImage';
 import { GridItemProps } from '../../types/masonry';
 import { getInitials } from '../../utils/editorUtils';
 import { useChannelModalStore } from '@/store/channelModalStore';
@@ -46,9 +46,9 @@ export function GridItem({
   };
 
   return (
-    <div className="bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800 hover:border-zinc-700 transition-colors">
+    <div className="w-full h-full bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800 hover:border-zinc-700 transition-colors">
       {/* 이미지 + hover overlay */}
-      <div className="relative w-full aspect-[4/5] bg-zinc-900 flex items-center justify-center overflow-hidden group">
+      <div className="relative w-full h-4/5 bg-zinc-900 flex items-center justify-center overflow-hidden group">
         {isEmpty ? (
           // 채널 추가 버튼 (간단한 버튼)
           <div className="w-full h-full bg-zinc-800 flex items-center justify-center">
@@ -62,12 +62,11 @@ export function GridItem({
         ) : (
           <>
             {imageUrl ? (
-              <Image
+              <ProxiedImage
                 src={imageUrl}
                 alt={title}
                 fill
                 className="object-cover"
-                loading="lazy"
                 sizes="(max-width: 768px) 100vw, 33vw"
               />
             ) : (
@@ -98,7 +97,7 @@ export function GridItem({
         )}
       </div>
       {/* 텍스트 정보 */}
-      <div className="flex flex-col gap-2 px-3 py-2 flex-1">
+      <div className="flex flex-col gap-2 px-3 py-2 h-1/5">
         {/* 제목과 카테고리 */}
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
@@ -129,7 +128,7 @@ export function GridItem({
                   )}
                 >
                   {editor.avatarUrl ? (
-                    <Image
+                    <ProxiedImage
                       src={editor.avatarUrl}
                       alt={editor.name}
                       width={24}

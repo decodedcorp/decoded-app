@@ -145,10 +145,10 @@ export function ChannelModal() {
             )}
             {!error && finalChannel && (
               <>
-                <ChannelModalStats channel={finalChannel} />
-                <ChannelModalEditors />
+                {/* <ChannelModalStats channel={finalChannel} /> */}
+                {/* <ChannelModalEditors /> */}
                 <ChannelModalContent />
-                <ChannelModalRelated />
+                {/* <ChannelModalRelated /> */}
               </>
             )}
             {!error && !finalChannel && (

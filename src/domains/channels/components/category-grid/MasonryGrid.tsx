@@ -15,6 +15,7 @@ import { useInfiniteChannels } from '../../hooks/useChannels';
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
 import { ChannelResponse } from '@/api/generated';
 import { mapChannelsToMasonryItems } from '../../utils/apiMappers';
+import Masonry from '@/components/ReactBitsMasonry';
 
 // 타입 가드 함수들
 function isMasonryItem(item: MasonryItem | CtaCardType): item is MasonryItem {
@@ -56,6 +57,27 @@ export function MasonryGrid({ onExpandChange }: MasonryGridProps) {
     if (!infiniteData?.pages) return [];
     return infiniteData.pages.flatMap((page) => page.channels || []);
   }, [infiniteData]);
+
+  // 로딩 상태를 더 정확하게 판단
+  const isDataReady = useMemo(() => {
+    // 초기 로딩 중이거나 에러가 있으면 false
+    if (isLoading) return false;
+
+    // 에러가 있어도 mock 데이터를 사용할 수 있으므로 true
+    if (error) return true;
+
+    // 데이터가 있으면 true
+    if (allChannels.length > 0) return true;
+
+    // 로딩이 완료되었으면 true (mock 데이터 사용)
+    return true;
+  }, [isLoading, error, allChannels.length]);
+
+  // 스켈레톤 표시 여부 결정
+  const shouldShowSkeleton = useMemo(() => {
+    // 초기 로딩 중일 때만 스켈레톤 표시
+    return isLoading;
+  }, [isLoading]);
 
   // API 데이터와 기존 레이아웃 요소들을 조합
   const items = useMemo(() => {
@@ -133,8 +155,104 @@ export function MasonryGrid({ onExpandChange }: MasonryGridProps) {
     openModal(channelData);
   };
 
-  // 로딩 상태 표시
-  if (isLoading) {
+  // 새로운 메이슨리 컴포넌트용 아이템 변환
+  const masonryItems = useMemo(() => {
+    return items
+      .map((item, idx) => {
+        if (isCtaCard(item)) {
+          return {
+            id: item.id,
+            img: '', // CTA 카드는 이미지가 없음
+            height: 280 + (idx % 3) * 40, // CTA 카드 높이 다양화
+            type: 'cta' as const,
+            ctaIdx: item.ctaIdx,
+          };
+        }
+
+        if (isMasonryItem(item)) {
+          // 편집자 수와 제목 길이에 따라 높이 조정
+          const editorsCount = Array.isArray(item.editors) ? item.editors.length : 0;
+          const titleLength = item.title?.length || 0;
+          const baseHeight = 380;
+          const editorsBonus = Math.min(editorsCount * 20, 60); // 편집자당 20px, 최대 60px
+          const titleBonus = Math.min(titleLength * 2, 40); // 제목 길이당 2px, 최대 40px
+          const categoryBonus = item.category ? 30 : 0;
+          const badgesBonus = item.isNew || item.isHot ? 25 : 0;
+
+          const dynamicHeight =
+            baseHeight + editorsBonus + titleBonus + categoryBonus + badgesBonus;
+
+          return {
+            id: `channel-${idx}`,
+            img: item.imageUrl || '',
+            height: dynamicHeight, // 동적 높이 계산
+            title: item.title,
+            category: item.category,
+            editors: item.editors,
+            date: item.date,
+            isNew: item.isNew,
+            isHot: item.isHot,
+            type: 'channel' as const,
+          };
+        }
+
+        return null;
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null);
+  }, [items]);
+
+  // 커스텀 렌더링 함수
+  const renderMasonryItem = (gridItem: any) => {
+    const originalItem = items.find((item, idx) => {
+      if (isCtaCard(item)) {
+        return item.id === gridItem.id;
+      }
+      if (isMasonryItem(item)) {
+        return `channel-${idx}` === gridItem.id;
+      }
+      return false;
+    });
+
+    if (!originalItem) return null;
+
+    if (isCtaCard(originalItem)) {
+      return (
+        <div className="w-full h-full">
+          <CtaCard
+            ctaIdx={originalItem.ctaIdx}
+            onClick={() => handleCtaClick(originalItem.ctaIdx)}
+          />
+        </div>
+      );
+    }
+
+    if (isMasonryItem(originalItem)) {
+      const idx = items.indexOf(originalItem);
+      const cardClass = cardVariants[idx % cardVariants.length];
+      const avatarBorder = pastelColors[idx % pastelColors.length];
+
+      return (
+        <div className={cn('w-full h-full', cardClass)}>
+          <GridItem
+            imageUrl={originalItem.imageUrl}
+            title={originalItem.title}
+            category={originalItem.category}
+            editors={originalItem.editors}
+            date={originalItem.date}
+            isNew={originalItem.isNew}
+            isHot={originalItem.isHot}
+            avatarBorder={avatarBorder}
+            onChannelClick={() => handleChannelClick(originalItem)}
+          />
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+  // 명확한 조건부 렌더링: 초기 로딩 중일 때만 스켈레톤 표시
+  if (shouldShowSkeleton) {
     return <MasonryGridSkeleton />;
   }
 
@@ -144,46 +262,32 @@ export function MasonryGrid({ onExpandChange }: MasonryGridProps) {
   }
 
   return (
-    <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 w-full pt-4">
-      {items.map((item, idx) => {
-        if (isCtaCard(item)) {
-          return (
-            <CtaCard
-              key={item.id}
-              ctaIdx={item.ctaIdx}
-              onClick={() => handleCtaClick(item.ctaIdx)}
-            />
-          );
-        }
-
-        if (isMasonryItem(item)) {
-          const cardClass = cardVariants[idx % cardVariants.length];
-          const avatarBorder = pastelColors[idx % pastelColors.length];
-          return (
-            <div
-              key={idx}
-              className={cn(
-                'mb-4 break-inside-avoid transition-transform duration-200 hover:scale-105 hover:shadow-2xl cursor-pointer group',
-                cardClass,
-              )}
-            >
-              <GridItem
-                imageUrl={item.imageUrl}
-                title={item.title}
-                category={item.category}
-                editors={item.editors}
-                date={item.date}
-                isNew={item.isNew}
-                isHot={item.isHot}
-                avatarBorder={avatarBorder}
-                onChannelClick={() => handleChannelClick(item)}
-              />
-            </div>
-          );
-        }
-
-        return null;
-      })}
+    <div className="w-full pt-4 animate-in fade-in duration-500">
+      <Masonry
+        items={masonryItems}
+        ease="power3.out"
+        duration={0.6}
+        stagger={0.05}
+        animateFrom="bottom"
+        scaleOnHover={true}
+        hoverScale={0.98}
+        blurToFocus={true}
+        colorShiftOnHover={false}
+        className="w-full min-h-[1200px]"
+        onItemClick={(item) => {
+          if (item.type === 'cta') {
+            handleCtaClick(item.ctaIdx!);
+          } else if (item.type === 'channel') {
+            const originalItem = items.find(
+              (originalItem, idx) => isMasonryItem(originalItem) && `channel-${idx}` === item.id,
+            ) as MasonryItem;
+            if (originalItem) {
+              handleChannelClick(originalItem);
+            }
+          }
+        }}
+        renderItem={renderMasonryItem}
+      />
 
       {/* 무한 스크롤 로딩 인디케이터 */}
       <InfiniteScrollLoader

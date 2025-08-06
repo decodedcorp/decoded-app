@@ -4,6 +4,8 @@ import {
   LinkContentResponse,
   ContentType,
   ContentStatus,
+  AIGenMetadataResponse,
+  LinkPreviewMetadataResponse,
 } from '@/api/generated';
 
 /**
@@ -50,13 +52,15 @@ export interface UnifiedContent {
   linkContent?: {
     url: string;
     category?: string | null; // nullable로 변경
-    link_preview_metadata?: {
-      title?: string;
-      description?: string;
-      image_url?: string;
-      site_name?: string;
+    link_preview_metadata?: LinkPreviewMetadataResponse | null;
+    ai_gen_metadata?: AIGenMetadataResponse | null;
+    metadata?: {
+      game?: string;
+      topics?: string;
+      platforms?: string;
+      content_type?: string;
+      release_year?: string;
     } | null;
-    ai_gen_metadata?: any;
   };
 }
 
@@ -89,6 +93,23 @@ export interface ContentItem {
   // AI generated data
   aiSummary?: string;
   aiQaList?: Array<{ question: string; answer: string }>;
+
+  // 링크 프리뷰 메타데이터
+  linkPreview?: {
+    title?: string;
+    description?: string;
+    imageUrl?: string;
+    siteName?: string;
+  };
+
+  // 추가 메타데이터
+  metadata?: {
+    game?: string;
+    topics?: string;
+    platforms?: string;
+    contentType?: string;
+    releaseYear?: string;
+  };
 }
 
 /**
@@ -146,7 +167,9 @@ export const unifyContent = (content: Record<string, any>): UnifiedContent => {
 
   // 필드 존재 여부로 타입 구분
   let contentType = ContentType.IMAGE; // 기본값
-  if (content.url && content.type === ContentType.LINK) {
+
+  // 링크 콘텐츠 확인 (link_preview_metadata나 ai_gen_metadata가 있으면 링크)
+  if (content.link_preview_metadata || content.ai_gen_metadata || content.category) {
     contentType = ContentType.LINK;
   } else if (content.video_url && content.type === ContentType.VIDEO) {
     contentType = ContentType.VIDEO;
@@ -206,6 +229,7 @@ export const unifyContent = (content: Record<string, any>): UnifiedContent => {
           category: content.category,
           link_preview_metadata: content.link_preview_metadata,
           ai_gen_metadata: content.ai_gen_metadata,
+          metadata: content.metadata,
         },
       };
 
@@ -219,6 +243,14 @@ export const unifyContent = (content: Record<string, any>): UnifiedContent => {
  * UnifiedContent를 ContentItem으로 변환
  */
 export const convertToContentItem = (content: UnifiedContent): ContentItem => {
+  console.log('[convertToContentItem] Processing content:', {
+    id: content.id,
+    type: content.type,
+    hasImageContent: !!content.imageContent,
+    hasVideoContent: !!content.videoContent,
+    hasLinkContent: !!content.linkContent,
+  });
+
   const baseItem: ContentItem = {
     id: content.id,
     type: content.type,
@@ -228,6 +260,7 @@ export const convertToContentItem = (content: UnifiedContent): ContentItem => {
   };
 
   if (isImageContent(content)) {
+    console.log('[convertToContentItem] Processing as image content');
     return {
       ...baseItem,
       imageUrl: content.imageContent.url, // url 필드 사용
@@ -237,6 +270,7 @@ export const convertToContentItem = (content: UnifiedContent): ContentItem => {
   }
 
   if (isVideoContent(content)) {
+    console.log('[convertToContentItem] Processing as video content');
     return {
       ...baseItem,
       videoUrl: content.videoContent.video_url,
@@ -246,14 +280,83 @@ export const convertToContentItem = (content: UnifiedContent): ContentItem => {
   }
 
   if (isLinkContent(content)) {
-    return {
+    console.log('[convertToContentItem] Processing as link content:', {
+      id: content.id,
+      url: content.linkContent.url,
+      hasLinkPreview: !!content.linkContent.link_preview_metadata,
+      hasAiGenMetadata: !!content.linkContent.ai_gen_metadata,
+      linkPreviewImageUrl: content.linkContent.link_preview_metadata?.img_url,
+      linkPreviewTitle: content.linkContent.link_preview_metadata?.title,
+      linkPreviewSiteName: content.linkContent.link_preview_metadata?.site_name,
+      aiSummary: content.linkContent.ai_gen_metadata?.summary,
+      aiQaListCount: content.linkContent.ai_gen_metadata?.qa_list?.length || 0,
+    });
+
+    // 링크 URL에서 도메인 추출하여 기본 사이트명 생성
+    const getDefaultSiteName = (url: string) => {
+      try {
+        const domain = new URL(url).hostname.replace('www.', '');
+        return domain.split('.')[0]; // 첫 번째 부분만 사용 (예: naver, youtube)
+      } catch {
+        return 'link';
+      }
+    };
+
+    // 링크 프리뷰 메타데이터 처리
+    const linkPreview = content.linkContent.link_preview_metadata
+      ? {
+          title: content.linkContent.link_preview_metadata.title || '링크 제목 없음',
+          description: content.linkContent.link_preview_metadata.description || '설명이 없습니다.',
+          imageUrl: content.linkContent.link_preview_metadata.img_url || undefined,
+          siteName:
+            content.linkContent.link_preview_metadata.site_name ||
+            getDefaultSiteName(content.linkContent.url),
+        }
+      : {
+          title: '링크 제목 없음',
+          description: '설명이 없습니다.',
+          imageUrl: undefined,
+          siteName: getDefaultSiteName(content.linkContent.url),
+        };
+
+    const result = {
       ...baseItem,
       linkUrl: content.linkContent.url,
       category: content.linkContent.category || undefined,
-      imageUrl: content.linkContent.link_preview_metadata?.image_url || undefined,
+      // 링크 콘텐츠는 imageUrl을 설정하지 않음 (linkPreview.imageUrl 사용)
       thumbnailUrl: content.thumbnail_url || undefined,
+      // AI 생성 메타데이터 추가
+      aiSummary: content.linkContent.ai_gen_metadata?.summary,
+      aiQaList: content.linkContent.ai_gen_metadata?.qa_list?.map((qa) => ({
+        question: qa.question,
+        answer: qa.answer,
+      })),
+      // 링크 프리뷰 메타데이터 추가 (개선된 처리)
+      linkPreview,
+      // 추가 메타데이터
+      metadata: content.linkContent.metadata
+        ? {
+            game: content.linkContent.metadata.game,
+            topics: content.linkContent.metadata.topics,
+            platforms: content.linkContent.metadata.platforms,
+            contentType: content.linkContent.metadata.content_type,
+            releaseYear: content.linkContent.metadata.release_year,
+          }
+        : undefined,
     };
+
+    console.log('[convertToContentItem] Link content result:', {
+      type: result.type,
+      linkUrl: result.linkUrl,
+      aiSummary: result.aiSummary,
+      aiQaListCount: result.aiQaList?.length || 0,
+      linkPreviewTitle: result.linkPreview?.title,
+      linkPreviewSiteName: result.linkPreview?.siteName,
+    });
+
+    return result;
   }
 
+  console.log('[convertToContentItem] Processing as unknown content type');
   return baseItem;
 };

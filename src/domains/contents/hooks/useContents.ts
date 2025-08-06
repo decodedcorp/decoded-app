@@ -3,6 +3,8 @@ import { ContentsService } from '../../../api/generated';
 import { queryKeys } from '../../../lib/api/queryKeys';
 import { useToastMutation, useSimpleToastMutation } from '../../../lib/hooks/useToastMutation';
 import { extractApiErrorMessage } from '../../../lib/utils/toastUtils';
+import { getValidAccessToken } from '@/domains/auth/utils/tokenManager';
+import { refreshOpenAPIToken } from '@/api/hooks/useApi';
 
 export const useContentsByChannel = (channelId: string, params?: Record<string, any>) => {
   return useQuery({
@@ -56,35 +58,83 @@ export const useVideoContent = (id: string) => {
 
 export const useCreateLinkContent = () => {
   const queryClient = useQueryClient();
-  return useSimpleToastMutation(ContentsService.createLinkContentContentsLinksPost, {
-    actionName: 'Create content',
-    toastId: 'create-link-content',
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
+  return useSimpleToastMutation(
+    async (data: { channel_id: string; url: string }) => {
+      // API 요청 전 토큰 상태 확인
+      const token = getValidAccessToken();
+      if (!token) {
+        throw new Error('Authentication required. Please log in again.');
+      }
+      
+      // 토큰이 있으면 OpenAPI 토큰 업데이트
+      refreshOpenAPIToken();
+      
+      return ContentsService.createLinkContentContentsLinksPost(data);
     },
-  });
+    {
+      actionName: 'Create content',
+      toastId: 'create-link-content',
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
+      },
+    },
+  );
 };
 
 export const useCreateImageContent = () => {
   const queryClient = useQueryClient();
-  return useSimpleToastMutation(ContentsService.createImageContentContentsImagesPost, {
-    actionName: 'Create content',
-    toastId: 'create-image-content',
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
+  return useSimpleToastMutation(
+    async (data: { channel_id: string; base64_img: string }) => {
+      // API 요청 전 토큰 상태 확인
+      const token = getValidAccessToken();
+      if (!token) {
+        throw new Error('Authentication required. Please log in again.');
+      }
+      
+      // 토큰이 있으면 OpenAPI 토큰 업데이트
+      refreshOpenAPIToken();
+      
+      return ContentsService.createImageContentContentsImagesPost(data);
     },
-  });
+    {
+      actionName: 'Create content',
+      toastId: 'create-image-content',
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
+      },
+    },
+  );
 };
 
 export const useCreateVideoContent = () => {
   const queryClient = useQueryClient();
-  return useSimpleToastMutation(ContentsService.createVideoContentContentsVideosPost, {
-    actionName: 'Create content',
-    toastId: 'create-video-content',
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
+  return useSimpleToastMutation(
+    async (data: {
+      channel_id: string;
+      title: string;
+      description?: string;
+      video_url: string;
+      thumbnail_url?: string;
+    }) => {
+      // API 요청 전 토큰 상태 확인
+      const token = getValidAccessToken();
+      if (!token) {
+        throw new Error('Authentication required. Please log in again.');
+      }
+      
+      // 토큰이 있으면 OpenAPI 토큰 업데이트
+      refreshOpenAPIToken();
+      
+      return ContentsService.createVideoContentContentsVideosPost(data);
     },
-  });
+    {
+      actionName: 'Create content',
+      toastId: 'create-video-content',
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
+      },
+    },
+  );
 };
 
 export const useUpdateLinkContent = () => {

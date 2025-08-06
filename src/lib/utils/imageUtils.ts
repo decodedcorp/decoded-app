@@ -353,3 +353,63 @@ export const getCompressionRecommendations = (base64String: string) => {
 
   return recommendations;
 };
+
+/**
+ * 이미지 URL 유효성 검사
+ */
+export const isValidImageUrl = (url: string): boolean => {
+  if (!url) return false;
+  
+  try {
+    const urlObj = new URL(url);
+    const validProtocols = ['http:', 'https:'];
+    const validExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp'];
+    
+    // 프로토콜 검사
+    if (!validProtocols.includes(urlObj.protocol)) {
+      return false;
+    }
+    
+    // 파일 확장자 검사 (URL에 확장자가 있는 경우)
+    const hasValidExtension = validExtensions.some(ext => 
+      urlObj.pathname.toLowerCase().includes(ext)
+    );
+    
+    // 확장자가 없어도 유효할 수 있음 (API 응답 등)
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * 이미지 URL을 안전한 URL로 변환
+ */
+export const sanitizeImageUrl = (url: string): string | null => {
+  if (!url) return null;
+  
+  try {
+    const urlObj = new URL(url);
+    return urlObj.toString();
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * 이미지 로딩 에러 처리
+ */
+export const handleImageError = (event: React.SyntheticEvent<HTMLImageElement, Event>, fallbackUrl?: string) => {
+  const target = event.target as HTMLImageElement;
+  
+  if (fallbackUrl && target.src !== fallbackUrl) {
+    target.src = fallbackUrl;
+  } else {
+    // 이미지를 숨기고 에러 상태 표시
+    target.style.display = 'none';
+    const parent = target.parentElement;
+    if (parent) {
+      parent.classList.add('image-error');
+    }
+  }
+};

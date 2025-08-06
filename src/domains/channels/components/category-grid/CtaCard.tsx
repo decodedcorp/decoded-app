@@ -55,7 +55,7 @@ function getCtaIcon(iconType: string) {
 export function CtaCard({ ctaIdx, onClick }: CtaCardProps) {
   const cta = ctaVariants[ctaIdx % ctaVariants.length];
   return (
-    <div className="mb-4 break-inside-avoid rounded-2xl border border-zinc-800 bg-zinc-950 p-6 flex flex-col items-center justify-center text-center shadow-lg hover:scale-105 hover:shadow-2xl transition-transform duration-200">
+    <div className="w-full h-full rounded-2xl border border-zinc-800 bg-zinc-950 p-6 flex flex-col items-center justify-center text-center shadow-lg hover:scale-105 hover:shadow-2xl transition-transform duration-200">
       <div className="mb-2">{getCtaIcon(cta.iconType)}</div>
       <div className="text-base font-semibold text-zinc-100 mb-1">{cta.title}</div>
       <div className="text-zinc-400 text-sm mb-3">{cta.desc}</div>

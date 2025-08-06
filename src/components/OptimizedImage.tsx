@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
+import Image from 'next/image';
 import { optimizeImageUrl, createImageObserver, imageCache } from '@/lib/utils/imageOptimization';
+import { isValidImageUrl } from '@/lib/utils/imageUtils';
 
 interface OptimizedImageProps {
   src: string;
@@ -14,6 +16,7 @@ interface OptimizedImageProps {
   placeholder?: string;
   onLoad?: () => void;
   onError?: () => void;
+  useNextImage?: boolean; // Next.js Image 사용 여부
 }
 
 export const OptimizedImage: React.FC<OptimizedImageProps> = ({
@@ -27,6 +30,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   placeholder,
   onLoad,
   onError,
+  useNextImage = true, // 기본값은 Next.js Image 사용
 }) => {
   const imgRef = useRef<HTMLImageElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -128,9 +132,55 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
       isLoaded,
       hasError,
       loading,
+      useNextImage,
     });
   }
 
+  // Next.js Image 사용 (도메인 제한 있음)
+  if (useNextImage && isValidImageUrl(optimizedSrc)) {
+    return (
+      <div className={`relative overflow-hidden ${className}`}>
+        {/* 플레이스홀더 */}
+        {!isLoaded && !hasError && placeholder && (
+          <div
+            className="absolute inset-0 bg-zinc-800 animate-pulse"
+            style={{ backgroundImage: `url(${placeholder})`, backgroundSize: 'cover' }}
+          />
+        )}
+
+        {/* 에러 상태 */}
+        {hasError && (
+          <div className="absolute inset-0 bg-zinc-800 flex items-center justify-center">
+            <div className="text-zinc-400 text-sm">Failed to load image</div>
+          </div>
+        )}
+
+        {/* Next.js Image */}
+        {isInView && !hasError && (
+          <Image
+            src={optimizedSrc}
+            alt={alt}
+            width={width}
+            height={height}
+            className={`transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+            onLoad={handleLoad}
+            onError={handleError}
+            loading={loading}
+            quality={quality}
+            placeholder="blur"
+            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+          />
+        )}
+
+        {/* 로딩 스켈레톤 */}
+        {!isLoaded && !hasError && !placeholder && (
+          <div className="absolute inset-0 bg-zinc-800 animate-pulse" />
+        )}
+      </div>
+    );
+  }
+
+  // 일반 img 태그 사용 (도메인 제한 없음)
   return (
     <div className={`relative overflow-hidden ${className}`}>
       {/* 플레이스홀더 */}
@@ -148,7 +198,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
         </div>
       )}
 
-      {/* 실제 이미지 */}
+      {/* 일반 img 태그 */}
       {isInView && !hasError && (
         <img
           ref={imgRef}
@@ -179,4 +229,9 @@ export const LazyImage: React.FC<Omit<OptimizedImageProps, 'loading'>> = (props)
 // 즉시 로딩 이미지 컴포넌트
 export const EagerImage: React.FC<Omit<OptimizedImageProps, 'loading'>> = (props) => {
   return <OptimizedImage {...props} loading="eager" />;
+};
+
+// 도메인 제한 없는 이미지 컴포넌트
+export const UnrestrictedImage: React.FC<Omit<OptimizedImageProps, 'useNextImage'>> = (props) => {
+  return <OptimizedImage {...props} useNextImage={false} />;
 };

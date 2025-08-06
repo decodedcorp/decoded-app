@@ -382,3 +382,19 @@ footer {
   font-style: normal;
   font-display: swap;
 }
+
+/* Masonry Grid Styles */
+.my-masonry-grid {
+  display: flex;
+  margin-left: -1.5rem; /* gap과 동일 */
+  width: auto;
+}
+
+.my-masonry-grid_column {
+  padding-left: 1.5rem; /* gap */
+  background-clip: padding-box;
+}
+
+.my-masonry-grid_column > div {
+  margin-bottom: 1.5rem;
+}

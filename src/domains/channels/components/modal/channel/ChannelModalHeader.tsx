@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChannelData } from '@/store/channelModalStore';
 import { ChannelModalSubscribeButton } from './ChannelModalSubscribeButton';
+import { ProxiedImage } from '@/components/ProxiedImage';
 
 interface ChannelModalHeaderProps {
   channel: ChannelData;
@@ -21,9 +22,11 @@ export function ChannelModalHeader({
     <div className="flex items-start justify-between p-6 border-b border-zinc-700/50">
       <div className="flex items-start space-x-6 flex-1">
         {channel.thumbnail_url && (
-          <img
+          <ProxiedImage
             src={channel.thumbnail_url}
             alt={`${channel.name} avatar`}
+            width={80}
+            height={80}
             className="w-20 h-20 rounded-full object-cover border-2 border-zinc-600 flex-shrink-0"
           />
         )}
