@@ -7,11 +7,8 @@ interface ContentModalHeaderProps {
 }
 
 export function ContentModalHeader({ content, onClose }: ContentModalHeaderProps) {
-  // 링크 콘텐츠의 경우 linkPreview의 title을 우선적으로 사용
-  const displayTitle =
-    content.type === 'link' && content.linkPreview?.title
-      ? content.linkPreview.title
-      : content.title;
+  // 링크 콘텐츠의 경우 linkUrl이 있으면 링크 아이콘을 표시
+  const displayTitle = content.title;
 
   return (
     <div className="flex items-center justify-between p-6 border-b border-zinc-700/50">
@@ -76,7 +73,7 @@ export function ContentModalHeader({ content, onClose }: ContentModalHeaderProps
               />
             </svg>
           )}
-          {content.type === 'link' && (
+          {(content.type === 'link' || content.linkUrl) && (
             <svg
               className="w-5 h-5 text-zinc-400"
               fill="none"

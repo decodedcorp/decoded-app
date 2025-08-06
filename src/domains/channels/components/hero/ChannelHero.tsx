@@ -1,14 +1,20 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './ChannelHero.module.css';
 import { useChannelHeroAnimation } from './hooks/useChannelHeroAnimation';
-import { BackgroundText } from './components/BackgroundText';
-import { MainText } from './components/MainText';
-import { KineticType } from './components/KineticType';
+import { SearchHero } from './components/SearchHero';
+import { SimpleHero } from './components/SimpleHero';
+import { FlowingQuestions } from './components/FlowingQuestions';
+import { TrendingTags } from './components/TrendingTags';
 
 export function ChannelHero() {
   const { sectionRef } = useChannelHeroAnimation();
+  const [isSimpleDesign, setIsSimpleDesign] = useState(false);
+
+  const handleToggleDesign = () => {
+    setIsSimpleDesign(!isSimpleDesign);
+  };
 
   return (
     <section ref={sectionRef} className="relative h-[60vh] overflow-hidden">
@@ -21,9 +27,15 @@ export function ChannelHero() {
 
       <div className={styles.bottomGradient}></div>
 
-      <BackgroundText />
-      <MainText />
-      <KineticType />
+      {!isSimpleDesign && (
+        <>
+          <FlowingQuestions />
+          <SearchHero onToggleDesign={handleToggleDesign} />
+          <TrendingTags />
+        </>
+      )}
+
+      {isSimpleDesign && <SimpleHero onToggleDesign={handleToggleDesign} />}
     </section>
   );
 }

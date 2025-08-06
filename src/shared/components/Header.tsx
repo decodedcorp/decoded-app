@@ -38,7 +38,7 @@ export function Header() {
         <div className="text-2xl font-bold text-[#EAFD66] tracking-tight drop-shadow">decoded</div>
 
         {/* Search Bar */}
-        <SearchBar onSearch={handleSearch} />
+        {/* <SearchBar onSearch={handleSearch} /> */}
 
         {/* Login Button */}
         <LoginButton />

@@ -311,3 +311,352 @@
     font-size: 0.6rem;
   }
 }
+
+/* New Reddit Answers Style Hero */
+.searchHero {
+  position: relative;
+  z-index: 10;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+.heroContent {
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+}
+
+.heroTitle {
+  margin-bottom: 2rem;
+}
+
+.mainTitle {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+  font-family: 'PP Neue Montreal', sans-serif;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+/* GlitchText 커스텀 스타일 */
+.glitchText {
+  font-size: clamp(2.5rem, 5vw, 4rem) !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  font-family: 'PP Neue Montreal', sans-serif !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.1 !important;
+}
+
+.subtitle {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 400;
+  font-family: 'PP Neue Montreal', sans-serif;
+  margin: 0;
+}
+
+.searchForm {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Simple Hero Styles */
+.simpleHero {
+  position: relative;
+  z-index: 10;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+.simpleHeroContent {
+  text-align: center;
+  max-width: 800px;
+  width: 100%;
+}
+
+.simpleHeroTitle {
+  margin-bottom: 2rem;
+}
+
+.simpleMainTitle {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+  font-family: 'PP Neue Montreal', sans-serif;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.simpleSubtitle {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 400;
+  font-family: 'PP Neue Montreal', sans-serif;
+  margin: 0;
+}
+
+.simpleSearchForm {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto 3rem auto;
+}
+
+/* Scrolling Questions */
+.scrollingQuestionsContainer {
+  width: 100%;
+  overflow: hidden;
+  margin-top: 2rem;
+}
+
+.scrollingQuestions {
+  display: flex;
+  animation: scrollLeft 30s linear infinite;
+  white-space: nowrap;
+}
+
+.scrollingQuestion {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 0.75rem 1.5rem;
+  margin-right: 1rem;
+  font-size: 0.875rem;
+  font-family: 'PP Neue Montreal', sans-serif;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.scrollingQuestion:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes scrollLeft {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Responsive Design for Simple Hero */
+@media screen and (max-width: 768px) {
+  .scrollingQuestion {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    margin-right: 0.75rem;
+  }
+  
+  .scrollingQuestions {
+    animation-duration: 20s;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .scrollingQuestion {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.6875rem;
+    margin-right: 0.5rem;
+  }
+  
+  .scrollingQuestions {
+    animation-duration: 15s;
+  }
+}
+
+/* Flowing Questions */
+.flowingQuestionsContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.flowingQuestions {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.flowingQuestion {
+  position: absolute;
+  top: var(--top, 20%);
+  color: rgba(255, 255, 255, 0.08);
+  font-size: clamp(0.75rem, 1.5vw, 1rem);
+  font-family: 'PP Neue Montreal', sans-serif;
+  font-weight: 400;
+  white-space: nowrap;
+  animation: flowAcross var(--duration, 8s) linear infinite;
+  animation-delay: var(--delay, 0s);
+  opacity: 0;
+  transform: translateX(-100%);
+  animation-timing-function: linear;
+}
+
+@keyframes flowAcross {
+  0% {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  10% {
+    opacity: 0.3;
+  }
+  90% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100vw);
+  }
+}
+
+/* Trending Tags */
+.trendingTagsContainer {
+  position: absolute;
+  bottom: 2rem;
+  left: 0;
+  width: 100%;
+  z-index: 3;
+  pointer-events: auto;
+}
+
+.trendingTags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.trendingTag {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-family: 'PP Neue Montreal', sans-serif;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 400;
+  animation: floatUpDown var(--duration, 4s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+  opacity: 0;
+  transform: translateY(20px) scale(0.9);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  pointer-events: auto;
+}
+
+.trendingTag:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.trendingTag:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+
+@keyframes floatUpDown {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  20% {
+    opacity: 0.6;
+    transform: translateY(0) scale(1);
+  }
+  80% {
+    opacity: 0.6;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.9);
+  }
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  .searchContainer {
+    border-radius: 25px;
+    padding: 0.25rem;
+  }
+
+  .searchInput {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  .searchButton {
+    width: 40px;
+    height: 40px;
+  }
+
+  .trendingTags {
+    gap: 0.5rem;
+  }
+
+  .trendingTag {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .heroContent {
+    padding: 0 0.5rem;
+  }
+
+  .searchContainer {
+    border-radius: 20px;
+  }
+
+  .searchInput {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.8125rem;
+  }
+
+  .searchButton {
+    width: 36px;
+    height: 36px;
+  }
+
+  .trendingTags {
+    gap: 0.375rem;
+  }
+
+  .trendingTag {
+    padding: 0.25rem 0.625rem;
+    font-size: 0.6875rem;
+  }
+}
