@@ -37,15 +37,43 @@ export function ContentUploadModal() {
 
   // AI 생성 완료 감지
   React.useEffect(() => {
-    if (aiGeneratedContent?.ai_gen_metadata && aiGeneratedContent.link_preview_metadata?.img_url) {
-      console.log('AI generation completed with metadata and image:', aiGeneratedContent);
-      setGeneratedContent({
-        id: aiGeneratedContent.id,
-        title: aiGeneratedContent.ai_gen_metadata.summary,
-        description: aiGeneratedContent.ai_gen_metadata.summary,
-        image_url: aiGeneratedContent.link_preview_metadata.img_url,
-        created_at: aiGeneratedContent.created_at || new Date().toISOString(),
+    if (aiGeneratedContent) {
+      console.log('AI generated content received:', aiGeneratedContent);
+      
+      // AI 생성 메타데이터가 있거나 링크 프리뷰 메타데이터가 있으면 완료로 처리
+      const hasAiMetadata = aiGeneratedContent.ai_gen_metadata;
+      const hasLinkPreview = aiGeneratedContent.link_preview_metadata;
+      
+      console.log('Content analysis:', {
+        hasAiMetadata,
+        hasLinkPreview,
+        aiMetadata: aiGeneratedContent.ai_gen_metadata,
+        linkPreview: aiGeneratedContent.link_preview_metadata,
+        contentId: aiGeneratedContent.id,
+        url: aiGeneratedContent.url
       });
+      
+      if (hasAiMetadata || hasLinkPreview) {
+        console.log('AI generation completed with metadata:', {
+          hasAiMetadata,
+          hasLinkPreview,
+          aiMetadata: aiGeneratedContent.ai_gen_metadata,
+          linkPreview: aiGeneratedContent.link_preview_metadata
+        });
+        
+        const generatedContentData = {
+          id: aiGeneratedContent.id,
+          title: aiGeneratedContent.ai_gen_metadata?.summary || aiGeneratedContent.link_preview_metadata?.title || 'Untitled',
+          description: aiGeneratedContent.ai_gen_metadata?.summary || aiGeneratedContent.link_preview_metadata?.description || '',
+          image_url: aiGeneratedContent.link_preview_metadata?.img_url || '',
+          created_at: aiGeneratedContent.created_at || new Date().toISOString(),
+        };
+        
+        console.log('Setting generated content:', generatedContentData);
+        setGeneratedContent(generatedContentData);
+      } else {
+        console.log('Content received but no metadata found yet, continuing to wait...');
+      }
     }
   }, [aiGeneratedContent, setGeneratedContent]);
 

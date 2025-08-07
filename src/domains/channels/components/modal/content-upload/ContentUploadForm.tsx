@@ -323,59 +323,17 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
 
         {generatedContent && (
           <div className="flex flex-col items-center justify-center py-8">
-            {/* AI 이미지가 있을 때만 TiltedCard 표시 */}
-            {generatedContent.image_url ? (
-              <div className="w-[400px] h-[300px]">
-                <TiltedCard
-                  imageSrc={generatedContent.image_url}
-                  altText={generatedContent.title}
-                  captionText="AI generation complete!"
-                  containerWidth="400px"
-                  containerHeight="300px"
-                  imageWidth="400px"
-                  imageHeight="300px"
-                />
-              </div>
-            ) : (
-              /* AI 이미지가 없을 때는 텍스트만 표시 */
-              <div className="w-[400px] h-[300px] bg-gradient-to-br from-blue-900/20 to-purple-900/20 rounded-xl border border-blue-700/30 flex items-center justify-center p-8">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg
-                      className="w-8 h-8 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                      />
-                    </svg>
-                  </div>
-                  <h4 className="text-lg font-semibold text-white mb-2">AI Content Generated</h4>
-                  <p className="text-sm text-zinc-300">
-                    Content has been processed and added to your channel
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* 콘텐츠 정보 */}
-            <div className="mt-6 text-center max-w-md">
-              <h4 className="text-lg font-semibold text-white mb-2">{generatedContent.title}</h4>
-              <p className="text-sm text-zinc-300 leading-relaxed">
-                {generatedContent.description}
-              </p>
-            </div>
-
-            {/* AI 생성 완료 메시지 */}
-            <div className="mt-6 text-center">
-              <p className="text-sm text-zinc-400">
-                AI content has been generated and added to your channel
-              </p>
+            {/* AI 생성 완료 시 항상 TiltedCard 표시 (이미지가 없어도 기본 이미지 사용) */}
+            <div className="w-[400px] h-[300px]">
+              <TiltedCard
+                imageSrc={generatedContent.image_url || 'https://picsum.photos/400/300?random=1'}
+                altText={generatedContent.title || 'Generated content'}
+                captionText={generatedContent.title || 'AI generation complete!'}
+                containerWidth="400px"
+                containerHeight="300px"
+                imageWidth="400px"
+                imageHeight="300px"
+              />
             </div>
           </div>
         )}

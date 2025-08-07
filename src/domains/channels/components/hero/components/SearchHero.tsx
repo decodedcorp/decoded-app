@@ -94,7 +94,7 @@ export function SearchHero({ onToggleDesign }: SearchHeroProps) {
         </div>
 
         <form onSubmit={handleSearch} className={styles.searchForm}>
-          <div className="relative w-full max-w-4xl mx-auto px-4">
+          <div className="relative w-full mx-auto px-4">
             <input
               type="text"
               value={searchQuery}

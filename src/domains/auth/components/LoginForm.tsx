@@ -66,12 +66,16 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
 
   const handleGoogleLogin = async () => {
     try {
-      // 메시지 처리 상태 초기화
       messageHandledRef.current = false;
 
       const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+
+      // 동적으로 현재 도메인 사용
       const redirectUri =
-        process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/callback';
+        process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI ||
+        (typeof window !== 'undefined'
+          ? `${window.location.origin}/auth/callback`
+          : 'http://localhost:3000/auth/callback');
 
       if (!clientId) {
         throw new Error('Google Client ID가 설정되지 않았습니다.');
@@ -182,8 +186,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
       {/* Additional Info */}
       <div className="text-center">
         <p className="text-xs text-gray-400 leading-relaxed">
-          By continuing, you agree to our Terms of Service and Privacy Policy. We&apos;ll use your Google
-          account information to provide you with a personalized experience.
+          By continuing, you agree to our Terms of Service and Privacy Policy. We&apos;ll use your
+          Google account information to provide you with a personalized experience.
         </p>
       </div>
     </div>

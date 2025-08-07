@@ -102,17 +102,6 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
       {/* Grid Section */}
       <AnimatedSection isExpanded={isGridExpanded} className="relative z-5">
         <MasonryGrid />
-
-        {/* Grid 확장/축소 컨트롤 */}
-        <div className="flex justify-center mt-8 mb-4">
-          <button
-            onClick={toggleGridExpansion}
-            className="px-6 py-3 rounded-full bg-zinc-800 hover:bg-zinc-700 text-white font-medium transition-colors duration-300"
-            aria-label={isGridExpanded ? 'Show less' : 'Show more'}
-          >
-            {isGridExpanded ? 'Show Less' : 'Show More'}
-          </button>
-        </div>
       </AnimatedSection>
 
       {/* Global Channel Modal */}

@@ -51,9 +51,7 @@ export class GoogleAuthApi {
     // 환경에 따른 redirect_uri 설정
     const redirectUri =
       process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI ||
-      (process.env.NODE_ENV === 'production'
-        ? 'https://decoded.style/auth/callback'
-        : typeof window !== 'undefined'
+      (typeof window !== 'undefined'
         ? `${window.location.origin}/auth/callback`
         : 'http://localhost:3000/auth/callback');
 

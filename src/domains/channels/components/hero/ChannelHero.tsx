@@ -17,7 +17,7 @@ export function ChannelHero() {
   };
 
   return (
-    <section ref={sectionRef} className="relative h-[60vh] overflow-hidden">
+    <section ref={sectionRef} className="relative h-[60vh] overflow-hidden w-full">
       <div className={styles.backgroundFrame}></div>
 
       <div className={`${styles.backgroundImage} ${styles.default}`} id="default-bg"></div>

@@ -382,8 +382,8 @@
 
 .simpleHeroContent {
   text-align: center;
-  max-width: 800px;
   width: 100%;
+  padding: 0 1rem;
 }
 
 .simpleHeroTitle {
@@ -467,7 +467,7 @@
     font-size: 0.75rem;
     margin-right: 0.75rem;
   }
-  
+
   .scrollingQuestions {
     animation-duration: 20s;
   }
@@ -479,7 +479,7 @@
     font-size: 0.6875rem;
     margin-right: 0.5rem;
   }
-  
+
   .scrollingQuestions {
     animation-duration: 15s;
   }

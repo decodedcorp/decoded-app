@@ -109,11 +109,29 @@ export const useGetLinkContent = (contentId: string | null) => {
     refetchInterval: (data: any) => {
       // AI 생성이 완료되면 polling 중단
       if (data?.ai_gen_metadata) {
+        console.log('[useGetLinkContent] AI generation completed, stopping polling');
         return false;
       }
-      // AI 생성 중이면 2초마다 polling
-      return 2000;
+
+      // 링크 프리뷰 메타데이터가 있으면 polling 중단 (AI 생성 없이도 완료 가능)
+      if (data?.link_preview_metadata) {
+        console.log('[useGetLinkContent] Link preview metadata available, stopping polling');
+        return false;
+      }
+
+      // AI 생성 중이면 3초마다 polling (2초에서 3초로 증가)
+      console.log('[useGetLinkContent] AI generation in progress, continuing polling');
+      return 3000;
     },
     refetchIntervalInBackground: false,
+    // 최대 폴링 시간 제한 (5분)
+    retry: (failureCount, error) => {
+      if (failureCount >= 100) {
+        // 5분 / 3초 = 약 100회
+        console.log('[useGetLinkContent] Max polling time reached, stopping');
+        return false;
+      }
+      return true;
+    },
   });
 };

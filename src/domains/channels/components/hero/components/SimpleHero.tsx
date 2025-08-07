@@ -10,25 +10,25 @@ interface SimpleHeroProps {
 
 const trendingQuestions = [
   "What's your favorite coffee brewing method?",
-  "Which music genre speaks to your soul?",
+  'Which music genre speaks to your soul?',
   "What's your ideal weekend activity?",
-  "Which art style resonates with you?",
+  'Which art style resonates with you?',
   "What's your preferred workout style?",
-  "Which cuisine do you crave most?",
+  'Which cuisine do you crave most?',
   "What's your go-to fashion aesthetic?",
-  "Which travel destination calls to you?",
+  'Which travel destination calls to you?',
   "What's your favorite way to unwind?",
-  "Which book genre captures your imagination?",
+  'Which book genre captures your imagination?',
   "What's your preferred home decor style?",
-  "Which hobby brings you the most joy?",
+  'Which hobby brings you the most joy?',
   "What's your ideal social gathering size?",
-  "Which season matches your personality?",
+  'Which season matches your personality?',
   "What's your preferred learning style?",
   "What's your favorite way to start the day?",
-  "Which type of art do you find most inspiring?",
+  'Which type of art do you find most inspiring?',
   "What's your preferred way to stay active?",
   "Which culture's cuisine interests you most?",
-  "What's your ideal vacation style?"
+  "What's your ideal vacation style?",
 ];
 
 export function SimpleHero({ onToggleDesign }: SimpleHeroProps) {
@@ -73,7 +73,7 @@ export function SimpleHero({ onToggleDesign }: SimpleHeroProps) {
     <div className={styles.simpleHero}>
       <div className={styles.simpleHeroContent}>
         <div className={styles.simpleHeroTitle}>
-          <h1 
+          <h1
             className={`${styles.simpleMainTitle} cursor-pointer hover:opacity-80 transition-opacity`}
             onClick={handleTitleClick}
           >
@@ -83,7 +83,7 @@ export function SimpleHero({ onToggleDesign }: SimpleHeroProps) {
         </div>
 
         <form onSubmit={handleSearch} className={styles.simpleSearchForm}>
-          <div className="relative max-w-md mx-auto">
+          <div className="relative w-full max-w-2xl mx-auto px-4">
             <input
               type="text"
               value={searchQuery}
@@ -127,13 +127,13 @@ export function SimpleHero({ onToggleDesign }: SimpleHeroProps) {
         <div className={styles.scrollingQuestionsContainer}>
           <div className={styles.scrollingQuestions}>
             {trendingQuestions.map((question, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className={styles.scrollingQuestion}
                 onClick={() => {
                   const searchParams = new URLSearchParams({
                     q: question,
-                    type: 'trending'
+                    type: 'trending',
                   });
                   router.push(`/channels?${searchParams.toString()}`);
                 }}
@@ -143,13 +143,13 @@ export function SimpleHero({ onToggleDesign }: SimpleHeroProps) {
             ))}
             {/* Duplicate for seamless loop */}
             {trendingQuestions.map((question, index) => (
-              <div 
-                key={`duplicate-${index}`} 
+              <div
+                key={`duplicate-${index}`}
                 className={styles.scrollingQuestion}
                 onClick={() => {
                   const searchParams = new URLSearchParams({
                     q: question,
-                    type: 'trending'
+                    type: 'trending',
                   });
                   router.push(`/channels?${searchParams.toString()}`);
                 }}

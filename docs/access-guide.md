@@ -66,6 +66,45 @@ ssh decoded@121.130.214.186 -p 2202 "pkill -f 'next start'"
 ssh decoded@121.130.214.186 -p 2202 "export NVM_DIR=\"\$HOME/.nvm\" && [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\" && cd /Users/decoded/decoded-app && rm -rf node_modules package-lock.json && npm install"
 ```
 
+## 🚨 서버 접속 문제 해결
+
+### 현재 상황
+
+- **서버 상태**: 정상 실행 중 ✅
+- **로컬 접속**: 정상 작동 ✅
+- **외부 접속**: 차단됨 ❌
+
+### 문제 원인
+
+맥미니의 방화벽에서 포트 3000이 외부 접속을 차단하고 있습니다.
+
+### 해결 방법
+
+#### 방법 1: 방화벽 설정 (관리자 권한 필요)
+
+```bash
+# 맥미니에서 직접 실행
+sudo pfctl -e
+echo "pass in proto tcp from any to any port 3000" | sudo pfctl -f -
+```
+
+#### 방법 2: 라우터 포트 포워딩
+
+1. 라우터 관리 페이지 접속 (보통 192.168.1.1)
+2. 포트 포워딩 설정에서:
+   - 외부 포트: 3000
+   - 내부 IP: 172.30.1.7 (맥미니 IP)
+   - 내부 포트: 3000
+
+#### 방법 3: SSH 터널링 (임시 해결책)
+
+```bash
+# 로컬에서 실행
+ssh -L 3000:localhost:3000 decoded@121.130.214.186 -p 2202
+```
+
+그 후 `http://localhost:3000`으로 접속
+
 ### 기능 테스트
 
 #### 1. 기본 기능
@@ -114,6 +153,11 @@ ssh decoded@121.130.214.186 -p 2202 "export NVM_DIR=\"\$HOME/.nvm\" && [ -s \"\$
 
    - 개발팀에 서버 상태 문의
    - 서버 재시작 요청
+
+6. **방화벽 설정 확인**
+
+   - 맥미니 방화벽에서 포트 3000 허용
+   - 라우터 포트 포워딩 설정
 
 #### 성능 문제
 
