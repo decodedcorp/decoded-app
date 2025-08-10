@@ -104,7 +104,10 @@ async function handleRequest(request: NextRequest, pathSegments: string[], metho
         }
       }
     } else {
-      // 개발 환경에서는 인증 없이도 API 호출 허용
+      // 개발 환경에서는 인증 없이도 API 호출 허용하지만 경고
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[Proxy] No authorization header found');
+      }
     }
 
     // User-Agent 설정

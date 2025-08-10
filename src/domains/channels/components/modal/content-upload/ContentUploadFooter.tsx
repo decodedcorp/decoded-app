@@ -22,7 +22,11 @@ export function ContentUploadFooter({
       </button>
 
       <button
-        onClick={onSubmit}
+        onClick={() => {
+          console.log('=== Footer submit button clicked ===');
+          console.log('onSubmit function:', typeof onSubmit);
+          onSubmit();
+        }}
         disabled={isLoading || !canSubmit}
         className="px-6 py-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 border border-zinc-700 hover:border-zinc-600"
       >

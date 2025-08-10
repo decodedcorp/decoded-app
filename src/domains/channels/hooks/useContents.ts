@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ContentsService } from '../../../api/generated';
 import type { LinkContentCreate } from '../../../api/generated/models/LinkContentCreate';
+import type { ImageContentCreate } from '../../../api/generated/models/ImageContentCreate';
 import { queryKeys } from '../../../lib/api/queryKeys';
 import { refreshOpenAPIToken } from '../../../api/hooks/useApi';
 import { getValidAccessToken } from '../../auth/utils/tokenManager';
@@ -41,6 +42,7 @@ export const useCreateLinkContent = () => {
       }
 
       console.log('[useCreateLinkContent] Making API call with data:', requestData);
+      console.log('[useCreateLinkContent] Token available:', !!updatedToken);
 
       try {
         const result = await ContentsService.createLinkContentContentsLinksPost(requestData);
@@ -48,6 +50,20 @@ export const useCreateLinkContent = () => {
         return result;
       } catch (error) {
         console.error('[useCreateLinkContent] API call failed:', error);
+
+        // 더 자세한 에러 정보 로깅
+        if (error instanceof Error) {
+          console.error('[useCreateLinkContent] Error message:', error.message);
+          console.error('[useCreateLinkContent] Error stack:', error.stack);
+        }
+
+        // API 응답 에러인 경우 더 자세한 정보 제공
+        if (error && typeof error === 'object' && 'response' in error) {
+          const apiError = error as any;
+          console.error('[useCreateLinkContent] API Error status:', apiError.response?.status);
+          console.error('[useCreateLinkContent] API Error data:', apiError.response?.data);
+        }
+
         throw error;
       }
     },
@@ -72,6 +88,80 @@ export const useCreateLinkContent = () => {
       },
       onError: (error) => {
         console.error('[useCreateLinkContent] Error:', error);
+      },
+    },
+  );
+};
+
+export const useCreateImageContent = () => {
+  const queryClient = useQueryClient();
+
+  return useToastMutation(
+    async (data: ImageContentCreate) => {
+      // 유효한 토큰이 있는지 확인
+      const validToken = getValidAccessToken();
+      if (!validToken) {
+        throw new Error('No valid access token available');
+      }
+
+      // Update OpenAPI token before making the request
+      refreshOpenAPIToken();
+
+      // 토큰이 제대로 설정되었는지 다시 확인
+      const updatedToken = getValidAccessToken();
+      if (!updatedToken) {
+        throw new Error('Failed to update OpenAPI token');
+      }
+
+      // API 요청 데이터 준비 및 검증
+      const requestData = {
+        channel_id: data.channel_id,
+        base64_img: data.base64_img,
+      };
+
+      // 필수 필드 검증
+      if (!requestData.channel_id) {
+        throw new Error('Channel ID is required');
+      }
+      if (!requestData.base64_img) {
+        throw new Error('Base64 image is required');
+      }
+
+      console.log('[useCreateImageContent] Making API call with data:', {
+        channel_id: requestData.channel_id,
+        base64_img_length: requestData.base64_img?.length || 0,
+      });
+
+      try {
+        const result = await ContentsService.createImageContentContentsImagesPost(requestData);
+        console.log('[useCreateImageContent] API call successful:', result);
+        return result;
+      } catch (error) {
+        console.error('[useCreateImageContent] API call failed:', error);
+        throw error;
+      }
+    },
+    {
+      messages: {
+        loading: 'Creating image content...',
+        success: 'Image content created successfully',
+        error: 'Failed to create image content',
+      },
+      onSuccess: (data, variables) => {
+        console.log('[useCreateImageContent] Success:', data);
+
+        // 채널의 콘텐츠 목록 무효화
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.contents.list({ channelId: variables.channel_id }),
+        });
+
+        // 채널 상세 정보 무효화 (콘텐츠 수 등이 변경될 수 있음)
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.channels.detail(variables.channel_id),
+        });
+      },
+      onError: (error) => {
+        console.error('[useCreateImageContent] Error:', error);
       },
     },
   );

@@ -850,9 +850,30 @@ export function useChannelHeroAnimation() {
       };
 
       function scrambleRandomText() {
+        // Check if backgroundTextItems exists and has elements
+        if (!backgroundTextItems || backgroundTextItems.length === 0) {
+          // If no elements found, try again later
+          setTimeout(scrambleRandomText, 2000);
+          return;
+        }
+
         const randomIndex = Math.floor(Math.random() * backgroundTextItems.length);
         const randomItem = backgroundTextItems[randomIndex];
+
+        // Check if the selected item exists and is valid
+        if (!randomItem || !randomItem.getAttribute) {
+          // If invalid item, try again later
+          setTimeout(scrambleRandomText, 2000);
+          return;
+        }
+
         const originalText = randomItem.getAttribute('data-text') || '';
+
+        // Only proceed if we have valid text
+        if (!originalText) {
+          setTimeout(scrambleRandomText, 2000);
+          return;
+        }
 
         gsap.to(randomItem, {
           duration: 1,

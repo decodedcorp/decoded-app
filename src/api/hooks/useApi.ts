@@ -39,13 +39,23 @@ const updateOpenAPIToken = () => {
   }
 };
 
-// 토큰을 동적으로 가져오는 함수로 설정
+// 토큰을 동적으로 가져오는 함수로 설정 (더 안정적인 방식)
 OpenAPI.TOKEN = (options: unknown) => {
   const token = getValidAccessToken();
   if (process.env.NODE_ENV === 'development') {
     console.log('[useApi] Dynamic token resolver called:', token ? 'token found' : 'no token');
+    if (token) {
+      console.log('[useApi] Token starts with:', token.substring(0, 20) + '...');
+    }
   }
-  return Promise.resolve(token || '');
+
+  // 토큰이 없으면 에러를 발생시키지 않고 빈 문자열 반환
+  if (!token) {
+    console.warn('[useApi] No valid token available for API request');
+    return Promise.resolve('');
+  }
+
+  return Promise.resolve(token);
 };
 
 // Initial token setup

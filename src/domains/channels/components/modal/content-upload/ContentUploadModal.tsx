@@ -3,11 +3,7 @@
 import React from 'react';
 import { ContentType } from '@/api/generated';
 import { useContentUploadStore, selectIsContentUploadModalOpen } from '@/store/contentUploadStore';
-import {
-  useCreateImageContent,
-  useCreateVideoContent,
-  useCreateLinkContent,
-} from '@/domains/contents/hooks/useContents';
+import { useCreateImageContent, useCreateLinkContent } from '@/domains/channels/hooks/useContents';
 import { useGetLinkContent } from '@/domains/channels/hooks/useContents';
 import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/api/queryKeys';
@@ -39,36 +35,42 @@ export function ContentUploadModal() {
   React.useEffect(() => {
     if (aiGeneratedContent) {
       console.log('AI generated content received:', aiGeneratedContent);
-      
+
       // AI 생성 메타데이터가 있거나 링크 프리뷰 메타데이터가 있으면 완료로 처리
       const hasAiMetadata = aiGeneratedContent.ai_gen_metadata;
       const hasLinkPreview = aiGeneratedContent.link_preview_metadata;
-      
+
       console.log('Content analysis:', {
         hasAiMetadata,
         hasLinkPreview,
         aiMetadata: aiGeneratedContent.ai_gen_metadata,
         linkPreview: aiGeneratedContent.link_preview_metadata,
         contentId: aiGeneratedContent.id,
-        url: aiGeneratedContent.url
+        url: aiGeneratedContent.url,
       });
-      
+
       if (hasAiMetadata || hasLinkPreview) {
         console.log('AI generation completed with metadata:', {
           hasAiMetadata,
           hasLinkPreview,
           aiMetadata: aiGeneratedContent.ai_gen_metadata,
-          linkPreview: aiGeneratedContent.link_preview_metadata
+          linkPreview: aiGeneratedContent.link_preview_metadata,
         });
-        
+
         const generatedContentData = {
           id: aiGeneratedContent.id,
-          title: aiGeneratedContent.ai_gen_metadata?.summary || aiGeneratedContent.link_preview_metadata?.title || 'Untitled',
-          description: aiGeneratedContent.ai_gen_metadata?.summary || aiGeneratedContent.link_preview_metadata?.description || '',
+          title:
+            aiGeneratedContent.ai_gen_metadata?.summary ||
+            aiGeneratedContent.link_preview_metadata?.title ||
+            'Untitled',
+          description:
+            aiGeneratedContent.ai_gen_metadata?.summary ||
+            aiGeneratedContent.link_preview_metadata?.description ||
+            '',
           image_url: aiGeneratedContent.link_preview_metadata?.img_url || '',
           created_at: aiGeneratedContent.created_at || new Date().toISOString(),
         };
-        
+
         console.log('Setting generated content:', generatedContentData);
         setGeneratedContent(generatedContentData);
       } else {
@@ -87,7 +89,7 @@ export function ContentUploadModal() {
 
   // API mutations
   const createImageContent = useCreateImageContent();
-  // const createVideoContent = useCreateVideoContent(); // Temporarily disabled
+  // // const createVideoContent = useCreateVideoContent(); // Temporarily disabled // Temporarily disabled
   const createLinkContent = useCreateLinkContent();
 
   const isLoading =
@@ -112,54 +114,12 @@ export function ContentUploadModal() {
   }, [formData]);
 
   const handleSubmit = async (data: any) => {
+    console.log('ContentUploadModal handleSubmit called with data:', data);
+
+    // ContentUploadForm에서 이미 API 호출이 완료되었으므로
+    // 여기서는 추가적인 상태 관리만 수행
     try {
-      // 인증 상태 확인
-      const token = getValidAccessToken();
-      if (!token) {
-        setError('로그인이 필요합니다. 먼저 로그인해주세요.');
-        return;
-      }
-
-      setLoading(true);
-      setError(null);
-
-      // channel_id가 없으면 기본값 설정
-      const channelId = data.channel_id || 'test-channel-id';
-
-      let result;
-
-      switch (data.type) {
-        case ContentType.IMAGE:
-          result = await createImageContent.mutateAsync({
-            channel_id: channelId,
-            base64_img: data.base64_img_url,
-          });
-          break;
-
-        // case ContentType.VIDEO:
-        //   result = await createVideoContent.mutateAsync({
-        //     channel_id: channelId,
-        //     title: data.title,
-        //     description: data.description,
-        //     video_url: data.video_url,
-        //     thumbnail_url: data.thumbnail_url,
-        //   });
-        //   break;
-
-        case ContentType.LINK:
-          result = await createLinkContent.mutateAsync({
-            channel_id: channelId,
-            url: data.url,
-          });
-          break;
-
-        default:
-          throw new Error('지원하지 않는 콘텐츠 타입입니다.');
-      }
-
-      console.log('Content created successfully:', result);
-
-      // 채널 콘텐츠 캐시 무효화하여 새로고침 (single 페이지 포함)
+      // 채널 콘텐츠 캐시 무효화
       queryClient.invalidateQueries({
         queryKey: queryKeys.contents.byChannel(data.channel_id),
       });
@@ -174,30 +134,9 @@ export function ContentUploadModal() {
         queryKey: queryKeys.contents.all,
       });
 
-      // 성공 시 모달을 닫지 않고 AI 생성 상태로 전환
-      // closeModal(); // 이 줄을 주석처리
-
-      // AI 생성 시작 - 실제 API 응답을 기다림
-      console.log('Starting AI generation from modal...');
-      startGeneration();
-      console.log('AI generation started from modal, isGenerating should be true');
-
-      // 생성된 콘텐츠 ID를 설정하여 polling 시작
-      setCreatedContentId(result.id);
-      console.log('Started polling for AI generated content with ID:', result.id);
-    } catch (error: any) {
-      console.error('Content creation failed:', error);
-
-      // 인증 관련 에러 처리
-      if (error.message?.includes('Authentication required')) {
-        setError('로그인이 필요합니다. 먼저 로그인해주세요.');
-      } else {
-        setError(
-          error?.response?.data?.detail || error.message || '콘텐츠 업로드 중 오류가 발생했습니다.',
-        );
-      }
-    } finally {
-      setLoading(false);
+      console.log('Cache invalidated successfully');
+    } catch (error) {
+      console.error('Failed to invalidate cache:', error);
     }
   };
 
@@ -231,7 +170,16 @@ export function ContentUploadModal() {
             canSubmit={canSubmit}
             isLoading={isLoading}
             onCancel={handleCancel}
-            onSubmit={() => handleSubmit(formData)}
+            onSubmit={() => {
+              console.log('=== Footer submit button clicked ===');
+              // 전역 함수를 통해 ContentUploadForm의 handleSubmit 호출
+              if ((window as any).triggerContentFormSubmit) {
+                console.log('Calling global submit function...');
+                (window as any).triggerContentFormSubmit();
+              } else {
+                console.error('Global submit function not found!');
+              }
+            }}
           />
         )}
       </div>
