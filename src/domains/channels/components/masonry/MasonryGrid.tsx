@@ -2,19 +2,7 @@
 
 import React, { useCallback } from 'react';
 import Masonry from './grid'; // 원래의 grid.tsx 컴포넌트로 복원
-
-// grid.tsx의 Item 인터페이스와 일치하도록 정의
-interface Item {
-  id: string;
-  img: string;
-  url: string;
-  width?: number;
-  height?: number;
-  aspectRatio?: number;
-  title?: string;
-  category?: string;
-  editors?: Array<{ name: string; avatar: string | null }>;
-}
+import { Item } from './types'; // 새로 만든 types.ts에서 import
 
 interface MasonryGridProps {
   items: Item[];
@@ -30,8 +18,8 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({ items, onItemClick }) => {
     title: item.title,
     category: item.category,
     editors: item.editors,
-    width: item.width,
-    height: item.height,
+    width: item.width || 300, // 기본값 제공
+    height: item.height || 200, // 기본값 제공
     aspectRatio: item.aspectRatio,
   }));
 

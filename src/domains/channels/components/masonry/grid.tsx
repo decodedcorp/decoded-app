@@ -1,5 +1,7 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState, useCallback } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from 'react';
 import { gsap } from 'gsap';
+import ChannelCard from './channel-card/ChannelCard';
+import { Item, MasonryProps } from './types';
 
 // 개발 환경에서만 로그 출력 (성능 최적화)
 const isDev = process.env.NODE_ENV === 'development';
@@ -209,36 +211,11 @@ const preloadImages = async (items: Item[]): Promise<Item[]> => {
   return loadedItems;
 };
 
-interface Item {
-  id: string;
-  img: string;
-  url: string;
-  width?: number;
-  height?: number;
-  aspectRatio?: number;
-  title?: string;
-  category?: string;
-  editors?: Array<{ name: string; avatar: string | null }>;
-}
-
 interface GridItem extends Item {
   x: number;
   y: number;
   w: number;
   h: number;
-}
-
-interface MasonryProps {
-  items: Item[];
-  ease?: string; // gsap.EaseValue는 타입 에러가 발생하여 string으로 유지
-  duration?: number;
-  stagger?: number;
-  animateFrom?: 'bottom' | 'top' | 'left' | 'right' | 'center' | 'random';
-  scaleOnHover?: boolean;
-  hoverScale?: number;
-  blurToFocus?: boolean;
-  colorShiftOnHover?: boolean;
-  onItemClick?: (item: Item) => void;
 }
 
 const Masonry: React.FC<MasonryProps> = ({
@@ -693,90 +670,16 @@ const Masonry: React.FC<MasonryProps> = ({
   return (
     <div ref={containerRef} className="relative w-full" style={{ height: containerHeight }}>
       {laidOut.map((item) => (
-        <div
+        <ChannelCard
           key={item.id}
-          data-key={item.id}
-          role="link"
-          tabIndex={0}
-          className="absolute box-content cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          style={{
-            willChange: 'transform, width, height, opacity',
-            transform: 'translate3d(0, 0, 0)', // GPU 가속 힌트
-            // content-visibility를 컨테이너에서 제거하여 RO 자극 방지
-          }}
-          onClick={() => handleItemClick(item)}
-          onKeyDown={(e) => handleKeyDown(e, item)}
-          onMouseEnter={(e) => handleMouseEnter(e.currentTarget)}
-          onMouseLeave={(e) => handleMouseLeave(e.currentTarget)}
-        >
-          <div
-            className="relative w-full h-full bg-cover bg-center rounded-[12px] shadow-[0px_4px_20px_-8px_rgba(0,0,0,0.15)] overflow-hidden"
-            style={{
-              backgroundImage: `url(${item.img})`,
-              contentVisibility: 'auto', // 개별 카드 내부에서만 사용
-            }}
-          >
-            {/* 그라데이션 오버레이 */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-
-            {/* 색상 시프트 오버레이 (옵션) */}
-            {colorShiftOnHover && (
-              <div className="color-overlay absolute inset-0 rounded-[12px] bg-gradient-to-tr from-pink-500/50 to-sky-500/50 opacity-0 pointer-events-none" />
-            )}
-
-            {/* 카드 콘텐츠 */}
-            <div className="absolute bottom-3 left-3 right-3 text-white">
-              {/* 제목과 카테고리 */}
-              <div className="flex items-center gap-2 mb-2">
-                <h3 className="text-base font-semibold line-clamp-1">
-                  {item.title || `Channel ${item.id}`}
-                </h3>
-                {item.category && (
-                  <span className="text-xs bg-white/20 px-2 py-1 rounded-full backdrop-blur-sm">
-                    {item.category}
-                  </span>
-                )}
-              </div>
-
-              {/* 에디터 정보 */}
-              {item.editors && item.editors.length > 0 && (
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="flex -space-x-2">
-                    {item.editors.slice(0, 3).map((editor, index) => (
-                      <div
-                        key={index}
-                        className="w-6 h-6 bg-white/20 rounded-full border-2 border-white/30 flex items-center justify-center text-xs text-white font-medium backdrop-blur-sm"
-                      >
-                        {editor.name.charAt(0).toUpperCase()}
-                      </div>
-                    ))}
-                  </div>
-                  {item.editors.length > 3 && (
-                    <span className="text-xs text-white/70">+{item.editors.length - 3} more</span>
-                  )}
-                </div>
-              )}
-
-              {/* 액션 버튼 */}
-              <div className="flex items-center justify-between">
-                <div className="flex gap-4 text-xs text-white/70">
-                  <span>👤 312</span>
-                  <span>❤️ 48</span>
-                </div>
-                <button
-                  className="px-3 py-1.5 rounded-full bg-white text-black text-xs font-medium hover:bg-gray-100 transition-colors"
-                  onClick={(e) => {
-                    e.stopPropagation(); // 부모 onClick 이벤트 버블링 방지
-                    log('View Details clicked for:', item.id);
-                    // TODO: 별도 액션 (Follow, 상세 모달 등)
-                  }}
-                >
-                  View Details
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+          item={item}
+          onItemClick={handleItemClick}
+          onKeyDown={handleKeyDown}
+          onMouseEnter={(e) => handleMouseEnter(e.currentTarget as HTMLElement)}
+          onMouseLeave={(e) => handleMouseLeave(e.currentTarget as HTMLElement)}
+          scaleOnHover={scaleOnHover}
+          colorShiftOnHover={colorShiftOnHover}
+        />
       ))}
     </div>
   );
