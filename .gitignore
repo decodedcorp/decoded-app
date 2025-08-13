@@ -89,3 +89,12 @@ server.log
 
 # TypeScript build info
 tsconfig.tsbuildinfo 
+
+# OS specific
+
+# Task files
+# tasks.json
+# tasks/ 
+
+.aiexclude
+.mcp.json
