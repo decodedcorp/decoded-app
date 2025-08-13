@@ -3,7 +3,7 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { ChannelHero } from '../hero/ChannelHero';
 import { AnimatedSection } from './AnimatedSection';
-import { MasonryGrid } from '../category-grid/MasonryGrid';
+import MasonryGrid from '../masonry/MasonryGrid';
 import { ChannelModal, ContentModal } from '../modal';
 import { AddChannelModal } from '../modal/add-channel/AddChannelModal';
 
@@ -92,6 +92,39 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
     setIsGridExpanded((prev) => !prev);
   }, []);
 
+  // 안정적인 아이템 클릭 핸들러 (리렌더 방지)
+  const handleItemClick = useCallback((item: any) => {
+    console.log('Channel clicked:', item);
+    // TODO: 채널 모달 열기 또는 라우팅
+  }, []);
+
+  // 간단한 테스트 데이터 생성 (나중에 API로 교체)
+  const testItems = React.useMemo(() => {
+    const categories = ['Business', 'Technology', 'Design', 'Marketing', 'Education'];
+    const images = [
+      '/images/sususupanova.jpg',
+      '/images/karina01.jpg', 
+      '/images/karina02.jpeg',
+      '/images/karina_profile.webp',
+      '/images/73032-1920x1200-desktop-hd-kanye-west-background.jpg',
+      '/images/image-proxy.webp',
+    ];
+
+    return Array.from({ length: 20 }, (_, i) => ({
+      id: `channel-${i + 1}`,
+      img: images[i % images.length],
+      url: `/channels/channel-${i + 1}`,
+      title: `Channel ${i + 1}`,
+      category: categories[i % categories.length],
+      editors: [
+        { name: `Editor ${i + 1}`, avatar: null },
+        { name: `Editor ${i + 2}`, avatar: null },
+      ],
+      width: 300,
+      height: 200,
+    }));
+  }, []);
+
   return (
     <div ref={mainContentRef} className={`relative h-full overflow-y-auto ${className}`}>
       {/* Hero Section with Scroll Animation */}
@@ -101,7 +134,7 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
 
       {/* Grid Section */}
       <AnimatedSection isExpanded={isGridExpanded} className="relative z-5">
-        <MasonryGrid />
+        <MasonryGrid items={testItems} onItemClick={handleItemClick} />
       </AnimatedSection>
 
       {/* Global Channel Modal */}

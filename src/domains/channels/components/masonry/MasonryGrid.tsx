@@ -1,95 +1,53 @@
 'use client';
 
-import { useMemo } from 'react';
-import MasonryGridCore from './MasonryGridCore';
-import { Editor } from '@/domains/channels/types/masonry';
-import type { Item } from './utils/masonryCalculations';
+import React, { useCallback } from 'react';
+import Masonry from './grid'; // 원래의 grid.tsx 컴포넌트로 복원
 
-interface ChannelItem {
+// grid.tsx의 Item 인터페이스와 일치하도록 정의
+interface Item {
   id: string;
-  title: string;
-  category: string;
-  editors: Editor[];
-  imageUrl: string;
+  img: string;
+  url: string;
+  width?: number;
+  height?: number;
+  aspectRatio?: number;
+  title?: string;
+  category?: string;
+  editors?: Array<{ name: string; avatar: string | null }>;
 }
 
-// 임시 채널 데이터 (나중에 API로 교체)
-const generateChannelItems = (count: number = 20): ChannelItem[] => {
-  const categories = [
-    'Business',
-    'Technology',
-    'Design',
-    'Marketing',
-    'Education',
-    'Art',
-    'Science',
-    'Health',
-  ];
+interface MasonryGridProps {
+  items: Item[];
+  onItemClick?: (item: Item) => void;
+}
 
-  // 다양한 이미지들 (메이슨리 그리드 테스트용)
-  const images = [
-    '/images/sususupanova.jpg', // 기본 이미지
-    '/images/karina01.jpg', // 세로형 이미지
-    '/images/karina02.jpeg', // 가로형 이미지
-    '/images/karina_profile.webp', // 프로필 이미지
-    '/images/73032-1920x1200-desktop-hd-kanye-west-background.jpg', // 와이드 이미지
-    '/images/image-proxy.webp', // 작은 이미지
-  ];
-
-  return Array.from({ length: count }, (_, i) => ({
-    id: `channel-${i + 1}`,
-    title: `Channel ${i + 1}`,
-    category: categories[i % categories.length],
-    editors: [
-      { name: `Editor ${i + 1}`, avatarUrl: undefined },
-      { name: `Editor ${i + 2}`, avatarUrl: undefined },
-    ],
-    // 다양한 이미지를 순환하여 사용 (메이슨리 그리드 효과 확인)
-    imageUrl: images[i % images.length],
+const MasonryGrid: React.FC<MasonryGridProps> = ({ items, onItemClick }) => {
+  // channelItems를 Item 타입으로 변환 (url 필드 추가)
+  const channelItems: Item[] = items.map((item) => ({
+    id: item.id,
+    img: item.img,
+    url: `/channels/${item.id}`, // url 필드 추가
+    title: item.title,
+    category: item.category,
+    editors: item.editors,
+    width: item.width,
+    height: item.height,
+    aspectRatio: item.aspectRatio,
   }));
-};
 
-export function MasonryGrid() {
-  const channelItems = useMemo(() => generateChannelItems(20), []);
-
-  // MasonryGridCore에 맞는 데이터 형식으로 변환
-  const masonryItems = useMemo(
-    () =>
-      channelItems.map(
-        (item): Item => ({
-          id: item.id,
-          img: item.imageUrl,
-          url: `/channels/${item.id}`,
-          title: item.title,
-          category: item.category,
-          editors: item.editors.map((editor) => ({
-            name: editor.name,
-            avatar: editor.avatarUrl || null,
-          })),
-          // 기본 이미지 크기 (실제로는 이미지 로딩 후 naturalWidth/Height로 계산됨)
-          width: 300,
-          height: 200,
-        }),
-      ),
-    [channelItems],
+  // 안정적인 클릭 핸들러 (리렌더 방지)
+  const handleItemClick = useCallback(
+    (item: Item) => {
+      onItemClick?.(item);
+    },
+    [onItemClick],
   );
-
-  const handleItemClick = (item: Item) => {
-    console.log('Channel clicked:', item);
-    // TODO: 채널 모달 열기 또는 라우팅
-  };
 
   return (
-    <div className="w-full pt-4 animate-in fade-in duration-500">
-      <MasonryGridCore
-        items={masonryItems}
-        scaleOnHover={true}
-        hoverScale={0.95}
-        blurToFocus={true}
-        animateFrom="bottom"
-        stagger={0.05}
-        onItemClick={handleItemClick}
-      />
+    <div className="w-full pt-4">
+      <Masonry items={channelItems} onItemClick={handleItemClick} />
     </div>
   );
-}
+};
+
+export default MasonryGrid;
