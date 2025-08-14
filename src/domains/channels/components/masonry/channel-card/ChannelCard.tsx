@@ -32,6 +32,28 @@ const ChannelCard: React.FC<ChannelCardProps> = ({
     muted: { rgb: string; hex: string; hsl: string };
   } | null>(null);
 
+  // 색상 추출 상태를 안정화 (한 번만 실행)
+  const [hasProcessedColor, setHasProcessedColor] = useState(false);
+
+  // Memoize the color extraction callback to prevent infinite loops
+  const handleColorExtracted = useCallback(
+    (colorData: {
+      primary: { rgb: string; hex: string; hsl: string };
+      vibrant: { rgb: string; hex: string; hsl: string };
+      muted: { rgb: string; hex: string; hsl: string };
+    }) => {
+      // 중복 처리 방지
+      if (!hasProcessedColor) {
+        console.log('🎨 ChannelCard received color data:', colorData);
+        console.log('🎨 Primary RGB:', colorData.primary?.rgb);
+        console.log('🎨 Vibrant RGB:', colorData.vibrant?.rgb);
+        setExtractedColor(colorData);
+        setHasProcessedColor(true);
+      }
+    },
+    [hasProcessedColor],
+  );
+
   // 실제 채널 데이터에서 메트릭 추출 (API 응답 구조에 맞춤)
   const channelId = item.id;
   const channelName = item.title || `Channel ${channelId}`;
@@ -47,19 +69,6 @@ const ChannelCard: React.FC<ChannelCardProps> = ({
       // TODO: 실제 구독 로직 구현
     },
     [channelId],
-  );
-
-  // Memoize the color extraction callback to prevent infinite loops
-  const handleColorExtracted = useCallback(
-    (colorData: {
-      primary: { rgb: string; hex: string; hsl: string };
-      vibrant: { rgb: string; hex: string; hsl: string };
-      muted: { rgb: string; hex: string; hsl: string };
-    }) => {
-      console.log('🎨 ChannelCard received color data:', colorData);
-      setExtractedColor(colorData);
-    },
-    [],
   );
 
   // Enhanced dynamic styles based on extracted colors with stronger visual impact
@@ -110,6 +119,15 @@ const ChannelCard: React.FC<ChannelCardProps> = ({
         '--focus-ring': 'rgba(100, 116, 139, 0.8)',
         '--inner-glow': 'rgba(100, 116, 139, 0.08)',
       };
+
+  // 디버깅: extractedColor 상태 로깅 (최적화)
+  if (process.env.NODE_ENV !== 'production' && extractedColor && !hasProcessedColor) {
+    console.log('🎨 ChannelCard cardStyle updated:', {
+      hasExtractedColor: !!extractedColor,
+      extractedColor,
+      cardStyle: 'Dynamic colors',
+    });
+  }
 
   return (
     <div
@@ -179,7 +197,7 @@ const ChannelCard: React.FC<ChannelCardProps> = ({
           {/* Header Section */}
           <ChannelHeaderSection
             channelName={channelName}
-            category={item.category}
+            description={item.description || undefined}
             isVerified={isVerified}
             extractedColor={extractedColor}
           />
@@ -195,28 +213,47 @@ const ChannelCard: React.FC<ChannelCardProps> = ({
         </div>
 
         {/* Enhanced inner glow effect when colors are loaded */}
-        {extractedColor && (
-          <div
-            className="absolute inset-0 pointer-events-none rounded-2xl transition-opacity duration-500"
-            style={{
-              background: `radial-gradient(circle at 50% 50%, rgba(${extractedColor.primary.rgb}, 0.08) 0%, transparent 70%)`,
-              opacity: 0,
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.opacity = '1';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.opacity = '0';
-            }}
-          />
-        )}
+        {(() => {
+          const shouldRender =
+            extractedColor && extractedColor.primary && extractedColor.primary.rgb;
+          if (shouldRender) {
+            console.log('🎨 Rendering glow effect with RGB:', extractedColor.primary.rgb);
+          } else {
+            console.log('🎨 Not rendering glow effect:', {
+              hasExtractedColor: !!extractedColor,
+              hasPrimary: !!(extractedColor && extractedColor.primary),
+              hasRgb: !!(extractedColor && extractedColor.primary && extractedColor.primary.rgb),
+            });
+          }
+          return shouldRender;
+        })() &&
+          extractedColor &&
+          extractedColor.primary &&
+          extractedColor.primary.rgb && (
+            <div
+              className="absolute inset-0 pointer-events-none rounded-2xl transition-opacity duration-500"
+              style={{
+                background: `radial-gradient(circle at 50% 50%, rgba(${extractedColor.primary.rgb}, 0.3) 0%, rgba(${extractedColor.primary.rgb}, 0.1) 50%, transparent 70%)`,
+                opacity: 0,
+              }}
+              onMouseEnter={(e) => {
+                console.log('🎨 Glow effect activated with RGB:', extractedColor.primary.rgb);
+                console.log('🎨 Full extractedColor object:', extractedColor);
+                console.log('🎨 Glow background style:', e.currentTarget.style.background);
+                e.currentTarget.style.opacity = '1';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = '0';
+              }}
+            />
+          )}
 
         {/* Subtle border glow effect */}
-        {extractedColor && (
+        {extractedColor && extractedColor.vibrant && extractedColor.vibrant.rgb && (
           <div
             className="absolute inset-0 pointer-events-none rounded-2xl transition-opacity duration-300"
             style={{
-              background: `linear-gradient(45deg, transparent 30%, rgba(${extractedColor.vibrant.rgb}, 0.1) 50%, transparent 70%)`,
+              background: `linear-gradient(45deg, transparent 30%, rgba(${extractedColor.vibrant.rgb}, 0.4) 50%, transparent 70%)`,
               opacity: 0,
             }}
             onMouseEnter={(e) => {

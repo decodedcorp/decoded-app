@@ -46,29 +46,58 @@ const ChannelImageSection: React.FC<ChannelImageSectionProps> = ({
 
       // Next.js Image가 완전히 로드된 후 색상 추출
       if (imgRef.current?.complete) {
-        extractFromImgEl(imgRef.current);
+        console.log('🖼️ Image already complete, extracting colors immediately');
+        // 중복 방지를 위해 hasExtractedRef 체크
+        if (!hasExtractedRef.current) {
+          hasExtractedRef.current = true; // 즉시 플래그 설정
+          extractFromImgEl(imgRef.current)
+            .then((colorData) => {
+              console.log('🎨 Color extraction completed from useEffect:', colorData);
+              // 색상 추출 완료 시 콜백 호출 (null 체크)
+              if (colorData && onColorExtracted) {
+                onColorExtracted(colorData);
+              }
+            })
+            .catch((error) => {
+              console.error('🎨 Color extraction failed from useEffect:', error);
+              hasExtractedRef.current = false; // 실패 시 플래그 리셋
+            });
+        }
+      } else {
+        console.log('🖼️ Image not complete yet, waiting for onLoad...');
       }
     }
-  }, [imageUrl, extractFromImgEl]);
+  }, [imageUrl, extractFromImgEl]); // hasExtractedRef.current 제거
 
   useEffect(() => {
     if (extractedColor && !hasExtractedRef.current) {
+      console.log('🎨 Color extracted successfully:', extractedColor);
       handleColorExtracted(extractedColor);
+      hasExtractedRef.current = true; // 색상 추출 완료 플래그 설정
     }
   }, [extractedColor, handleColorExtracted]);
 
   // Dynamic gradient styles based on extracted colors (always use extractedColor or fallback)
   const primaryGradientStyle = extractedColor
-    ? `linear-gradient(180deg, transparent 0%, transparent 45%, rgba(${extractedColor.primary.rgb}, 0.03) 55%, rgba(${extractedColor.primary.rgb}, 0.08) 65%, rgba(${extractedColor.primary.rgb}, 0.25) 75%, rgba(${extractedColor.primary.rgb}, 0.6) 85%, rgba(${extractedColor.primary.rgb}, 0.8) 95%, rgba(${extractedColor.primary.rgb}, 0.9) 100%)`
-    : 'linear-gradient(180deg, transparent 0%, transparent 45%, rgba(100, 116, 139, 0.03) 55%, rgba(100, 116, 139, 0.08) 65%, rgba(100, 116, 139, 0.25) 75%, rgba(100, 116, 139, 0.6) 85%, rgba(100, 116, 139, 0.8) 95%, rgba(100, 116, 139, 0.9) 100%)';
+    ? `linear-gradient(180deg, transparent 0%, transparent 45%, rgba(${extractedColor.primary.rgb}, 0.02) 55%, rgba(${extractedColor.primary.rgb}, 0.04) 65%, rgba(${extractedColor.primary.rgb}, 0.08) 75%, rgba(${extractedColor.primary.rgb}, 0.15) 85%, rgba(${extractedColor.primary.rgb}, 0.25) 95%, rgba(${extractedColor.primary.rgb}, 0.35) 100%)`
+    : 'linear-gradient(180deg, transparent 0%, transparent 45%, rgba(100, 116, 139, 0.02) 55%, rgba(100, 116, 139, 0.04) 65%, rgba(100, 116, 139, 0.08) 75%, rgba(100, 116, 139, 0.15) 85%, rgba(100, 116, 139, 0.25) 95%, rgba(100, 116, 139, 0.35) 100%)';
 
   const blurGradientStyle = extractedColor
-    ? `linear-gradient(to top, rgba(${extractedColor.primary.rgb}, 0.1) 0%, transparent 70%)`
-    : 'linear-gradient(to top, rgba(100, 116, 139, 0.1) 0%, transparent 70%)';
+    ? `linear-gradient(to top, rgba(${extractedColor.primary.rgb}, 0.08) 0%, rgba(${extractedColor.muted.rgb}, 0.04) 50%, transparent 100%)`
+    : 'linear-gradient(to top, rgba(100, 116, 139, 0.08) 0%, rgba(100, 116, 139, 0.04) 50%, transparent 100%)';
 
   const atmosphericGradientStyle = extractedColor
-    ? `linear-gradient(to top, rgba(${extractedColor.primary.rgb}, 0.05) 0%, transparent 100%)`
-    : 'linear-gradient(to top, rgba(100, 116, 139, 0.05) 0%, transparent 100%)';
+    ? `linear-gradient(to top, rgba(${extractedColor.muted.rgb}, 0.06) 0%, rgba(${extractedColor.vibrant.rgb}, 0.03) 50%, transparent 100%)`
+    : 'linear-gradient(to top, rgba(100, 116, 139, 0.06) 0%, rgba(100, 116, 139, 0.03) 50%, transparent 100%)';
+
+  // 추가적인 색상 효과들
+  const subtleGlowStyle = extractedColor
+    ? `radial-gradient(circle at 50% 50%, rgba(${extractedColor.vibrant.rgb}, 0.03) 0%, transparent 70%)`
+    : 'radial-gradient(circle at 50% 50%, rgba(100, 116, 139, 0.03) 0%, transparent 70%)';
+
+  const edgeHighlightStyle = extractedColor
+    ? `linear-gradient(45deg, transparent 30%, rgba(${extractedColor.primary.rgb}, 0.02) 50%, transparent 70%)`
+    : 'linear-gradient(45deg, transparent 30%, rgba(100, 116, 139, 0.02) 50%, transparent 70%)';
 
   return (
     <div className="absolute inset-0">
@@ -81,10 +110,34 @@ const ChannelImageSection: React.FC<ChannelImageSectionProps> = ({
         className="object-cover"
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         onLoad={() => {
-          // 이미지 완전 로드 후 색상 추출
+          // 이미지 완전 로드 후 색상 추출 (중복 방지)
           if (imgRef.current && !hasExtractedRef.current) {
             console.log('🖼️ Image loaded, extracting colors...');
-            extractFromImgEl(imgRef.current);
+            console.log('🖼️ Image element:', imgRef.current);
+            console.log('🖼️ Image src:', imgRef.current.src);
+            console.log('🖼️ Image currentSrc:', imgRef.current.currentSrc);
+            console.log('🖼️ Image complete:', imgRef.current.complete);
+            console.log('🖼️ Image naturalWidth:', imgRef.current.naturalWidth);
+            console.log('🖼️ Image naturalHeight:', imgRef.current.naturalHeight);
+
+            // 색상 추출 실행 (중복 방지를 위해 hasExtractedRef 체크)
+            if (!hasExtractedRef.current) {
+              hasExtractedRef.current = true; // 즉시 플래그 설정
+              extractFromImgEl(imgRef.current)
+                .then((colorData) => {
+                  console.log('🎨 Color extraction completed from onLoad:', colorData);
+                  // 색상 추출 완료 시 콜백 호출 (null 체크)
+                  if (colorData && onColorExtracted) {
+                    onColorExtracted(colorData);
+                  }
+                })
+                .catch((error) => {
+                  console.error('🎨 Color extraction failed from onLoad:', error);
+                  hasExtractedRef.current = false; // 실패 시 플래그 리셋
+                });
+            }
+          } else {
+            console.log('🖼️ Color extraction already completed or in progress, skipping...');
           }
         }}
         onError={() => {
@@ -125,14 +178,38 @@ const ChannelImageSection: React.FC<ChannelImageSectionProps> = ({
               'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.3) 60%, transparent 100%)',
           }}
         />
+
+        {/* Subtle glow effect - 추출된 색상으로 은은한 빛 효과 */}
+        <div
+          className="absolute inset-0 transition-all duration-1000"
+          style={{
+            background: subtleGlowStyle,
+            opacity: extractedColor ? 0.8 : 0.6,
+          }}
+        />
+
+        {/* Edge highlight - 가장자리 은은한 하이라이트 */}
+        <div
+          className="absolute inset-0 transition-all duration-1000"
+          style={{
+            background: edgeHighlightStyle,
+            opacity: extractedColor ? 0.6 : 0.4,
+          }}
+        />
       </div>
 
       {/* 색상 시프트 오버레이 (호버 시) */}
       {colorShiftOnHover && extractedColor && (
         <div
-          className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-500"
+          className="absolute inset-0 opacity-0 hover:opacity-100 transition-all duration-700 ease-out"
           style={{
-            background: `linear-gradient(45deg, rgba(${extractedColor.vibrant.rgb}, 0.1) 0%, rgba(${extractedColor.primary.rgb}, 0.05) 100%)`,
+            background: `linear-gradient(45deg, 
+              rgba(${extractedColor.vibrant.rgb}, 0.08) 0%, 
+              rgba(${extractedColor.primary.rgb}, 0.04) 25%, 
+              rgba(${extractedColor.muted.rgb}, 0.06) 50%, 
+              rgba(${extractedColor.primary.rgb}, 0.03) 75%, 
+              rgba(${extractedColor.vibrant.rgb}, 0.05) 100%)`,
+            backdropFilter: 'blur(0.5px)',
           }}
         />
       )}

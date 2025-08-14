@@ -16,12 +16,27 @@ export async function GET(request: NextRequest) {
       'decoded-app.vercel.app',
       'decoded-app-git-main.vercel.app',
       'decoded-app-git-develop.vercel.app',
+      // 한국 뉴스 사이트들
+      'nateimg.co.kr',
+      'thumbnews.nateimg.co.kr',
+      'news.nateimg.co.kr',
+      'imgnews.naver.net',
+      'imgnews.pstatic.net',
+      'img.donga.com',
+      'img.chosun.com',
+      'img.hani.co.kr',
+      'img.khan.co.kr',
+      'img.kmib.co.kr',
+      'img.mk.co.kr',
+      'img.seoul.co.kr',
+      'img.segye.com',
+      'img.ytn.co.kr',
       // 프로덕션 도메인 추가
     ];
 
     const url = new URL(imageUrl);
-    const isAllowed = allowedDomains.some(domain => 
-      url.hostname === domain || url.hostname.endsWith(`.${domain}`)
+    const isAllowed = allowedDomains.some(
+      (domain) => url.hostname === domain || url.hostname.endsWith(`.${domain}`),
     );
 
     if (!isAllowed) {
@@ -58,10 +73,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Image proxy error:', error);
-    return NextResponse.json(
-      { error: 'Failed to proxy image' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to proxy image' }, { status: 500 });
   }
 }
 

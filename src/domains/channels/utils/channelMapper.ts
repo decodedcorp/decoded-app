@@ -7,13 +7,14 @@ import { Item } from '../components/masonry/types';
 export const mapChannelToItem = (channel: ChannelResponse): Item => {
   // 썸네일이 없는 경우 기본 이미지 사용
   const defaultImage = '/images/image-proxy.webp';
-  
+
   return {
     id: channel.id,
     img: channel.thumbnail_url || defaultImage,
     url: `/channels/${channel.id}`,
     title: channel.name,
     category: 'Channel', // 기본 카테고리
+    description: channel.description || undefined, // 채널 설명 추가
     editors: [], // 채널에는 editors 정보가 없으므로 빈 배열
     width: 300, // 기본 너비
     height: 200, // 기본 높이

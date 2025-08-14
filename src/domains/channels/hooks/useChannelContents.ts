@@ -307,22 +307,67 @@ export const useChannelContentsSinglePage = ({
     retryDelay: 1000,
     // 데이터 변환 최적화 (메모이제이션)
     select: React.useCallback((data: any) => {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[useChannelContentsSinglePage] Raw API response:', data);
+      }
+
       const contents = data.contents || [];
-      return contents
-        .map((content: any) => {
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[useChannelContentsSinglePage] Contents array length:', contents.length);
+      }
+
+      const convertedContents = contents
+        .map((content: any, index: number) => {
           try {
+            if (process.env.NODE_ENV === 'development') {
+              console.log(`[useChannelContentsSinglePage] Converting content ${index}:`, {
+                id: content.id,
+                type: content.type,
+                title: content.title,
+                status: content.status,
+              });
+            }
+
             const unifiedContent = unifyContent(content);
-            return convertToContentItem(unifiedContent);
+            const convertedItem = convertToContentItem(unifiedContent);
+
+            if (process.env.NODE_ENV === 'development') {
+              console.log(`[useChannelContentsSinglePage] Successfully converted content ${index}:`, {
+                originalId: content.id,
+                convertedId: convertedItem?.id,
+                type: convertedItem?.type,
+                title: convertedItem?.title,
+              });
+            }
+
+            return convertedItem;
           } catch (error) {
             console.error(
-              '[useChannelContentsSinglePage] Error converting content:',
+              `[useChannelContentsSinglePage] Error converting content ${index}:`,
               error,
+              'Original content:',
               content,
             );
             return null;
           }
         })
         .filter(isNotNullContentItem);
+
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[useChannelContentsSinglePage] Final converted contents:', {
+          originalCount: contents.length,
+          convertedCount: convertedContents.length,
+          convertedItems: convertedContents.map((item: any) => ({
+            id: item.id,
+            type: item.type,
+            title: item.title,
+            status: item.status,
+          })),
+        });
+      }
+
+      return convertedContents;
     }, []),
   });
 

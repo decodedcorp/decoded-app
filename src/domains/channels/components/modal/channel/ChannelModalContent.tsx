@@ -99,6 +99,7 @@ const ContentItemCard = React.memo<{
             }`}
             quality={95}
             loading="lazy"
+            fallbackSrc="/images/image-proxy.webp"
             onError={() => {
               console.error('[ContentItemCard] Image failed to load:', imageUrl);
             }}
@@ -253,8 +254,12 @@ ContentItemCard.displayName = 'ContentItemCard';
 // 메인 컴포넌트 (메모이제이션)
 export const ChannelModalContent = React.memo(() => {
   const openContentModal = useContentModalStore((state) => state.openModal);
-  const channelId = useChannelModalStore((state) => state.selectedChannelId);
+  const selectedChannelId = useChannelModalStore((state) => state.selectedChannelId);
+  const selectedChannel = useChannelModalStore((state) => state.selectedChannel);
   const openContentUploadModal = useContentUploadStore((state) => state.openModal);
+
+  // 채널 ID 결정: selectedChannelId가 있으면 사용, 없으면 selectedChannel.id 사용
+  const channelId = selectedChannelId || selectedChannel?.id || '';
 
   // 채널 콘텐츠 조회 (폴링 비활성화)
   const {
@@ -263,7 +268,7 @@ export const ChannelModalContent = React.memo(() => {
     error,
     refetch,
   } = useChannelContentsSinglePage({
-    channelId: channelId || '',
+    channelId: channelId,
     limit: 25,
     enabled: !!channelId,
     enableSmartPolling: false, // 폴링 비활성화
@@ -280,137 +285,6 @@ export const ChannelModalContent = React.memo(() => {
       contentItems: contentItems,
     });
   }
-
-  // Enhanced mock data for content items with different sizes and types (fallback)
-  const mockContentItems: ContentItem[] = React.useMemo(
-    () => [
-      // Large featured items with images
-      {
-        id: 1,
-        type: 'image',
-        title: 'Modern Architecture Collection',
-        height: 'h-96',
-        width: 'col-span-2',
-        category: 'Featured',
-        imageUrl:
-          'https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=800&h=600&fit=crop',
-        description: 'Stunning modern architecture from around the world',
-        author: 'Alex Chen',
-        date: '2024-01-15',
-        likes: 1247,
-        views: 8923,
-        status: ContentStatus.ACTIVE,
-      },
-      {
-        id: 2,
-        type: 'video',
-        title: 'Design Process Documentary',
-        height: 'h-80',
-        width: 'col-span-1',
-        category: 'Video',
-        imageUrl:
-          'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=600&h=800&fit=crop',
-        description: 'Behind the scenes of creative design process',
-        author: 'Sarah Kim',
-        date: '2024-01-12',
-        likes: 892,
-        views: 5678,
-        status: ContentStatus.ACTIVE,
-      },
-      {
-        id: 3,
-        type: 'image',
-        title: 'Minimalist Interior Design',
-        height: 'h-64',
-        width: 'col-span-1',
-        category: 'Interior',
-        imageUrl:
-          'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=400&fit=crop',
-        description: 'Clean and modern interior spaces',
-        author: 'Emma Davis',
-        date: '2024-01-08',
-        likes: 678,
-        views: 3456,
-        status: ContentStatus.ACTIVE,
-      },
-      {
-        id: 4,
-        type: 'text',
-        title: 'Design Principles Guide',
-        height: 'h-48',
-        width: 'col-span-1',
-        category: 'Guide',
-        description: 'Essential principles for effective design',
-        author: 'Mike Johnson',
-        date: '2024-01-10',
-        likes: 456,
-        views: 2345,
-        status: ContentStatus.ACTIVE,
-      },
-      {
-        id: 5,
-        type: 'image',
-        title: 'Color Theory in Practice',
-        height: 'h-72',
-        width: 'col-span-2',
-        category: 'Color',
-        imageUrl: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=800&h=500&fit=crop',
-        description: 'Understanding color psychology and application',
-        author: 'David Park',
-        date: '2024-01-05',
-        likes: 945,
-        views: 6789,
-        status: ContentStatus.ACTIVE,
-      },
-      {
-        id: 6,
-        type: 'image',
-        title: 'Typography Showcase',
-        height: 'h-56',
-        width: 'col-span-1',
-        category: 'Typography',
-        imageUrl:
-          'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=600&h=400&fit=crop',
-        description: 'Beautiful typography examples and techniques',
-        author: 'Lisa Wang',
-        date: '2024-01-03',
-        likes: 567,
-        views: 3456,
-        status: ContentStatus.ACTIVE,
-      },
-      {
-        id: 7,
-        type: 'video',
-        title: 'UI/UX Design Trends 2024',
-        height: 'h-64',
-        width: 'col-span-2',
-        category: 'Trends',
-        imageUrl: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=500&fit=crop',
-        description: 'Latest trends in user interface and experience design',
-        author: 'Tom Chen',
-        date: '2024-01-01',
-        likes: 1234,
-        views: 7890,
-        status: ContentStatus.ACTIVE,
-      },
-      {
-        id: 8,
-        type: 'image',
-        title: 'Brand Identity Design',
-        height: 'h-48',
-        width: 'col-span-1',
-        category: 'Branding',
-        imageUrl: 'https://images.unsplash.com/photo-1558655146-d09347e92766?w=600&h=400&fit=crop',
-        description: 'Creating memorable brand identities',
-        author: 'Anna Lee',
-        date: '2023-12-28',
-        likes: 789,
-        views: 4567,
-        status: ContentStatus.ACTIVE,
-      },
-    ],
-    [],
-  );
 
   // 콘텐츠 아이템 클릭 핸들러 (메모이제이션)
   const handleItemClick = React.useCallback(
@@ -433,13 +307,10 @@ export const ChannelModalContent = React.memo(() => {
     }
   }, [channelId, openContentUploadModal]);
 
-  // 표시할 콘텐츠 결정 (고도화된 메모이제이션)
+  // 표시할 콘텐츠 결정 (실제 API 데이터만 사용)
   const displayContentItems = React.useMemo(() => {
-    if (contentItems && contentItems.length > 0) {
-      return contentItems;
-    }
-    return mockContentItems;
-  }, [contentItems, mockContentItems]);
+    return contentItems || [];
+  }, [contentItems]);
 
   // 리렌더링 방지를 위한 이전 값 참조
   const prevDisplayContentItemsRef = React.useRef<ContentItem[] | null>(null);
@@ -504,17 +375,53 @@ export const ChannelModalContent = React.memo(() => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h3 className="text-xl font-semibold text-white mb-2">Channel Content</h3>
-            <p className="text-zinc-400">Demo content</p>
+            <p className="text-zinc-400">Error loading content</p>
           </div>
         </div>
         <div className="text-center py-12">
-          <p className="text-red-400 mb-4">Failed to load content</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-          >
-            Retry
-          </button>
+          <div className="w-20 h-20 mx-auto mb-6 bg-red-900/20 rounded-full flex items-center justify-center">
+            <svg
+              className="w-10 h-10 text-red-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+              />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-white mb-2">Failed to Load Content</h3>
+          <p className="text-zinc-400 mb-6 max-w-md mx-auto">
+            There was an error loading the channel content. Please try again.
+          </p>
+          <div className="flex items-center justify-center space-x-3">
+            <button
+              onClick={() => refetch()}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+            >
+              Try Again
+            </button>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-white rounded-lg transition-colors"
+            >
+              Reload Page
+            </button>
+          </div>
+          {process.env.NODE_ENV === 'development' && (
+            <details className="mt-6 text-left max-w-2xl mx-auto">
+              <summary className="text-sm text-zinc-500 cursor-pointer hover:text-zinc-400">
+                Error Details (Development)
+              </summary>
+              <pre className="mt-2 p-3 bg-zinc-900/50 rounded text-xs text-red-400 overflow-auto">
+                {error.message || 'Unknown error'}
+              </pre>
+            </details>
+          )}
         </div>
       </div>
     );
@@ -526,13 +433,14 @@ export const ChannelModalContent = React.memo(() => {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-xl font-semibold text-white mb-2">Channel Content</h3>
-          <p className="text-zinc-400">
-            {finalDisplayContentItems?.length || 0} items •{' '}
-            {contentItems ? 'Live data' : 'Demo content'}
-          </p>
+          <p className="text-zinc-400">{finalDisplayContentItems?.length || 0} items</p>
           {/* PENDING 상태 콘텐츠 개수 표시 */}
           {pendingCount > 0 && (
             <p className="text-sm text-yellow-400 mt-1">{pendingCount} items being processed</p>
+          )}
+          {/* 데이터 상태 표시 */}
+          {!isLoading && !error && finalDisplayContentItems.length === 0 && (
+            <p className="text-sm text-blue-400 mt-1">No content available</p>
           )}
         </div>
         <div className="flex items-center space-x-3">
@@ -577,64 +485,103 @@ export const ChannelModalContent = React.memo(() => {
       </div>
 
       {/* Masonry Grid Container */}
-      <Masonry
-        items={finalDisplayContentItems.map((item: ContentItem, idx: number) => {
-          // 이미지가 있는 경우 고정 높이, 없는 경우 텍스트에 맞는 높이
-          const imageUrl = item.linkPreview?.imageUrl || item.imageUrl;
-          const isWebPageUrl =
-            imageUrl &&
-            (imageUrl.includes('youtube.com') ||
-              imageUrl.includes('instagram.com') ||
-              imageUrl.includes('blog.naver.com') ||
-              imageUrl.includes('khan.co.kr') ||
-              imageUrl.includes('watch?v=') ||
-              imageUrl.includes('/shorts/') ||
-              imageUrl.includes('/article/'));
-          const hasValidImage = imageUrl && !isWebPageUrl;
+      {finalDisplayContentItems.length > 0 ? (
+        <Masonry
+          items={finalDisplayContentItems.map((item: ContentItem, idx: number) => {
+            // 이미지가 있는 경우 고정 높이, 없는 경우 텍스트에 맞는 높이
+            const imageUrl = item.linkPreview?.imageUrl || item.imageUrl;
+            const isWebPageUrl =
+              imageUrl &&
+              (imageUrl.includes('youtube.com') ||
+                imageUrl.includes('instagram.com') ||
+                imageUrl.includes('blog.naver.com') ||
+                imageUrl.includes('khan.co.kr') ||
+                imageUrl.includes('watch?v=') ||
+                imageUrl.includes('/shorts/') ||
+                imageUrl.includes('/article/'));
+            const hasValidImage = imageUrl && !isWebPageUrl;
 
-          // 이미지가 있으면 더 큰 높이, 없으면 최소 높이 보장
-          const height = hasValidImage ? 320 : 240; // 이미지: 320px, 텍스트: 240px (최소 높이 보장)
+            // 이미지가 있으면 더 큰 높이, 없으면 최소 높이 보장
+            const height = hasValidImage ? 320 : 240; // 이미지: 320px, 텍스트: 240px (최소 높이 보장)
 
-          return {
-            id: item.id.toString(),
-            img: item.imageUrl || '',
-            height: height,
-            title: item.title,
-            category: item.category,
-            type: item.type,
-            status: item.status,
-          };
-        })}
-        ease="power3.out"
-        duration={0.6}
-        stagger={0.05}
-        animateFrom="bottom"
-        scaleOnHover={true}
-        hoverScale={0.98}
-        blurToFocus={true}
-        colorShiftOnHover={false}
-        className="w-full min-h-[600px]"
-        onItemClick={(item) => {
-          const contentItem = finalDisplayContentItems.find(
-            (ci: ContentItem) => ci.id.toString() === item.id,
-          );
-          if (contentItem) {
-            handleItemClick(contentItem);
-          }
-        }}
-        renderItem={(gridItem) => {
-          const contentItem = finalDisplayContentItems.find(
-            (ci: ContentItem) => ci.id.toString() === gridItem.id,
-          );
-          if (!contentItem) return null;
+            return {
+              id: item.id.toString(),
+              img: item.imageUrl || '',
+              height: height,
+              title: item.title,
+              category: item.category,
+              type: item.type,
+              status: item.status,
+            };
+          })}
+          ease="power3.out"
+          duration={0.6}
+          stagger={0.05}
+          animateFrom="bottom"
+          scaleOnHover={true}
+          hoverScale={0.98}
+          blurToFocus={true}
+          colorShiftOnHover={false}
+          className="w-full min-h-[600px]"
+          onItemClick={(item) => {
+            const contentItem = finalDisplayContentItems.find(
+              (ci: ContentItem) => ci.id.toString() === item.id,
+            );
+            if (contentItem) {
+              handleItemClick(contentItem);
+            }
+          }}
+          renderItem={(gridItem) => {
+            const contentItem = finalDisplayContentItems.find(
+              (ci: ContentItem) => ci.id.toString() === gridItem.id,
+            );
+            if (!contentItem) return null;
 
-          return (
-            <div className="w-full h-full">
-              <ContentItemCard item={contentItem} onItemClick={handleItemClick} />
-            </div>
-          );
-        }}
-      />
+            return (
+              <div className="w-full h-full">
+                <ContentItemCard item={contentItem} onItemClick={handleItemClick} />
+              </div>
+            );
+          }}
+        />
+      ) : (
+        // 빈 상태 UI
+        <div className="text-center py-16">
+          <div className="w-24 h-24 mx-auto mb-6 bg-zinc-800/50 rounded-full flex items-center justify-center">
+            <svg
+              className="w-12 h-12 text-zinc-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+              />
+            </svg>
+          </div>
+          <h3 className="text-xl font-semibold text-white mb-2">No Content Yet</h3>
+          <p className="text-zinc-400 mb-6 max-w-md mx-auto">
+            This channel doesn't have any content yet. Be the first to add something!
+          </p>
+          <button
+            onClick={handleAddContent}
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 flex items-center space-x-3 mx-auto hover:scale-[1.02] font-medium shadow-lg hover:shadow-xl"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            <span>Add First Content</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 });

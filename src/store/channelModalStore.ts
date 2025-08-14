@@ -28,7 +28,7 @@ export const useChannelModalStore = create<ChannelModalState>((set) => ({
   selectedChannel: null,
   selectedChannelId: null,
   openModal: (channel: ChannelData) => {
-    set({ isOpen: true, selectedChannel: channel, selectedChannelId: null });
+    set({ isOpen: true, selectedChannel: channel, selectedChannelId: channel.id });
   },
   openModalById: (channelId: string) => {
     set({ isOpen: true, selectedChannel: null, selectedChannelId: channelId });

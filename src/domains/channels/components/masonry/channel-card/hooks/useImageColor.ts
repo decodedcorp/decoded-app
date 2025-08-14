@@ -94,10 +94,202 @@ export const useImageColor = () => {
     }
 
     // Derive URL from string or <img> element; prefer same-origin currentSrc from next/image when available.
-    let imageUrl = typeof source === 'string' ? source : source.currentSrc || source.src || '';
+    const imageUrl = typeof source === 'string' ? source : source.currentSrc || source.src || '';
 
     if (!imageUrl) {
       return defaultColors;
+    }
+
+    // HTMLImageElement인 경우 추가 정보 로깅
+    if (typeof source !== 'string') {
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('🖼️ Processing HTMLImageElement:', {
+          src: source.src,
+          currentSrc: source.currentSrc,
+          complete: source.complete,
+          naturalWidth: source.naturalWidth,
+          naturalHeight: source.naturalHeight,
+          crossOrigin: source.crossOrigin,
+        });
+      }
+
+      // 이미지가 아직 로드되지 않은 경우 대기
+      if (!source.complete || source.naturalWidth === 0) {
+        console.log('🖼️ Image not ready yet, waiting...');
+        return new Promise((resolve) => {
+          const onLoad = () => {
+            source.removeEventListener('load', onLoad);
+            console.log('🖼️ Image now ready, proceeding with extraction');
+            extractColors(source).then(resolve);
+          };
+          source.addEventListener('load', onLoad);
+        });
+      }
+
+      // HTMLImageElement를 직접 사용하여 색상 추출
+      try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        if (!ctx) {
+          console.warn('Could not get canvas context for image element');
+          return defaultColors;
+        }
+
+        // 성능을 위해 적절한 크기로 분석
+        canvas.width = 150;
+        canvas.height = 150;
+
+        try {
+          ctx.drawImage(source, 0, 0, 150, 150);
+        } catch (drawError) {
+          console.warn('Failed to draw image element to canvas:', drawError);
+          return defaultColors;
+        }
+
+        let imageData: ImageData;
+        try {
+          imageData = ctx.getImageData(0, 0, 150, 150);
+          if (process.env.NODE_ENV !== 'production') {
+            console.log('🎨 Canvas pixel data extracted successfully from image element');
+          }
+        } catch (e) {
+          console.warn('Tainted canvas (CORS) – falling back to defaultColors for image element');
+          return defaultColors;
+        }
+
+        // 색상 분석 및 추출 (기존 로직과 동일)
+        const data = imageData.data;
+        const colorMap: { [key: string]: number } = {};
+
+        // 픽셀 분석 및 색상 그룹화
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+          const alpha = data[i + 3];
+
+          if (alpha < 100) continue;
+          const brightness = r + g + b;
+          if (brightness < 30 || brightness > 700) continue;
+
+          const roundedR = Math.round(r / 10) * 10;
+          const roundedG = Math.round(g / 10) * 10;
+          const roundedB = Math.round(b / 10) * 10;
+
+          const key = `${roundedR},${roundedG},${roundedB}`;
+          colorMap[key] = (colorMap[key] || 0) + 1;
+        }
+
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('Color extraction debug from image element:', {
+            totalPixels: data.length / 4,
+            validColors: Object.keys(colorMap).length,
+            colorDistribution: Object.entries(colorMap)
+              .sort(([, a], [, b]) => b - a)
+              .slice(0, 5)
+              .map(([color, count]) => ({ color, count })),
+          });
+        }
+
+        if (Object.keys(colorMap).length === 0) {
+          console.warn('No valid colors extracted from image element');
+          return defaultColors;
+        }
+
+        // 대표 색상 찾기
+        let dominantRgb = '100, 116, 139';
+        let maxScore = 0;
+
+        for (const [color, count] of Object.entries(colorMap)) {
+          const [r, g, b] = color.split(',').map((n) => parseInt(n.trim(), 10));
+          const brightness = r + g + b;
+          const saturation = Math.max(r, g, b) - Math.min(r, g, b);
+
+          const frequencyScore = count;
+          const brightnessScore = brightness > 200 && brightness < 500 ? 2 : 1;
+          const saturationScore = saturation > 50 ? 1.5 : 1;
+
+          const totalScore = frequencyScore * brightnessScore * saturationScore;
+
+          if (totalScore > maxScore) {
+            maxScore = totalScore;
+            dominantRgb = color;
+          }
+        }
+
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('Selected dominant color from image element:', {
+            color: dominantRgb,
+            score: maxScore,
+          });
+        }
+
+        // 색상 팔레트 생성
+        const [r, g, b] = dominantRgb.split(',').map((n) => parseInt(n.trim(), 10));
+
+        const safeRgbToHex = (r: number, g: number, b: number): string => {
+          const safeR = clamp(r);
+          const safeG = clamp(g);
+          const safeB = clamp(b);
+          return `#${safeR.toString(16).padStart(2, '0')}${safeG
+            .toString(16)
+            .padStart(2, '0')}${safeB.toString(16).padStart(2, '0')}`;
+        };
+
+        const safeRgbToHsl = (r: number, g: number, b: number): string => {
+          return rgbToHsl(clamp(r), clamp(g), clamp(b));
+        };
+
+        const hex = safeRgbToHex(r, g, b);
+        const hsl = safeRgbToHsl(r, g, b);
+
+        const vibrantR = clamp(r + Math.round((255 - r) * 0.3));
+        const vibrantG = clamp(g + Math.round((255 - g) * 0.3));
+        const vibrantB = clamp(b + Math.round((255 - b) * 0.3));
+        const vibrantRgb = `${vibrantR}, ${vibrantG}, ${vibrantB}`;
+
+        const mutedR = clamp(r - Math.round(r * 0.2));
+        const mutedG = clamp(g - Math.round(g * 0.2));
+        const mutedB = clamp(b - Math.round(b * 0.2));
+        const mutedRgb = `${mutedR}, ${mutedG}, ${mutedB}`;
+
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('Generated color palette from image element:', {
+            primary: dominantRgb,
+            vibrant: vibrantRgb,
+            muted: mutedRgb,
+          });
+        }
+
+        const colorData: ColorData = {
+          primary: { rgb: dominantRgb, hex, hsl },
+          vibrant: {
+            rgb: vibrantRgb,
+            hex: safeRgbToHex(vibrantR, vibrantG, vibrantB),
+            hsl: safeRgbToHsl(vibrantR, vibrantG, vibrantB),
+          },
+          muted: {
+            rgb: mutedRgb,
+            hex: safeRgbToHex(mutedR, mutedG, mutedB),
+            hsl: safeRgbToHsl(mutedR, mutedG, mutedB),
+          },
+        };
+
+        // 캐시에 저장
+        colorCache.set(imageUrl, colorData);
+
+        // 상태 업데이트
+        if (aliveRef.current) {
+          setExtractedColor(colorData);
+          setIsExtracting(false);
+        }
+
+        return colorData;
+      } catch (error) {
+        console.warn('Color extraction from image element failed:', error);
+        return defaultColors;
+      }
     }
 
     // If the URL is not allowed by scheme/path, bail early.
@@ -327,6 +519,19 @@ export const useImageColor = () => {
                 muted: mutedRgb,
                 complementary: complementaryRgb,
               });
+              console.log('🎨 Final color data structure:', {
+                primary: { rgb: dominantRgb, hex, hsl },
+                vibrant: {
+                  rgb: vibrantRgb,
+                  hex: safeRgbToHex(vibrantR, vibrantG, vibrantB),
+                  hsl: safeRgbToHsl(vibrantR, vibrantG, vibrantB),
+                },
+                muted: {
+                  rgb: mutedRgb,
+                  hex: safeRgbToHex(mutedR, mutedG, mutedB),
+                  hsl: safeRgbToHsl(mutedR, mutedG, mutedB),
+                },
+              });
             }
 
             const colorData: ColorData = {
@@ -384,8 +589,15 @@ export const useImageColor = () => {
     }
   }, []);
 
-  const extractFromImgEl = (el: HTMLImageElement | null) =>
-    el ? extractColors(el) : Promise.resolve(defaultColors);
+  const extractFromImgEl = (el: HTMLImageElement | null) => {
+    if (!el) {
+      return Promise.resolve(defaultColors);
+    }
+
+    // HTMLImageElement에서 직접 색상 추출
+    return extractColors(el);
+  };
+
   return { extractedColor, isExtracting, extractColors, extractFromImgEl };
 };
 
