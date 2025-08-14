@@ -32,17 +32,21 @@ const ChannelCard: React.FC<ChannelCardProps> = ({
     muted: { rgb: string; hex: string; hsl: string };
   } | null>(null);
 
-  // 동적 메트릭 생성 (실제 데이터로 교체 예정)
-  const subscribers = 312 + parseInt(item.id.replace(/\D/g, '') || '0') * 10;
-  const contents = 48 + parseInt(item.id.replace(/\D/g, '') || '0') * 5;
-  const isVerified = parseInt(item.id.replace(/\D/g, '') || '0') % 3 === 0; // 3의 배수만 인증됨
+  // 실제 채널 데이터에서 메트릭 추출 (API 응답 구조에 맞춤)
+  const channelId = item.id;
+  const channelName = item.title || `Channel ${channelId}`;
+
+  // API 데이터에서 실제 값 사용
+  const subscribers = item.subscriber_count || 0;
+  const contents = item.content_count || 0;
+  const isVerified = false; // item.is_verified || false
 
   const handleSubscribe = useCallback(
     (isSubscribed: boolean) => {
-      console.log(`Channel ${item.id} subscription changed to: ${isSubscribed}`);
+      console.log(`Channel ${channelId} subscription changed to: ${isSubscribed}`);
       // TODO: 실제 구독 로직 구현
     },
-    [item.id],
+    [channelId],
   );
 
   // Memoize the color extraction callback to prevent infinite loops
@@ -89,8 +93,8 @@ const ChannelCard: React.FC<ChannelCardProps> = ({
         '--inner-glow': `rgba(${extractedColor.primary.rgb}, 0.08)`,
       }
     : {
-        // 기본 스타일 (색상 추출 전) - 더 세련되게
-        borderColor: 'rgba(59, 130, 246, 0.4)',
+        // 기본 스타일 (색상 추출 전 또는 실패 시) - 더 세련되게
+        borderColor: 'rgba(100, 116, 139, 0.4)',
         borderWidth: '2px',
         borderStyle: 'solid',
         boxShadow: `
@@ -98,6 +102,13 @@ const ChannelCard: React.FC<ChannelCardProps> = ({
           0 3px 10px -3px rgba(0, 0, 0, 0.1),
           inset 0 1px 0 rgba(255, 255, 255, 0.1)
         `,
+        '--hover-shadow': `
+          0 20px 40px -10px rgba(100, 116, 139, 0.2),
+          0 10px 20px -5px rgba(100, 116, 139, 0.15),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1)
+        `,
+        '--focus-ring': 'rgba(100, 116, 139, 0.8)',
+        '--inner-glow': 'rgba(100, 116, 139, 0.08)',
       };
 
   return (
@@ -131,6 +142,16 @@ const ChannelCard: React.FC<ChannelCardProps> = ({
               0 2px 8px -2px rgba(${extractedColor.vibrant.rgb}, 0.2),
               inset 0 1px 0 rgba(255, 255, 255, 0.1)
             `;
+          } else {
+            // 기본 색상 사용
+            e.currentTarget.style.borderColor = 'rgba(100, 116, 139, 0.9)';
+            e.currentTarget.style.boxShadow = `
+              0 0 0 4px rgba(100, 116, 139, 0.3),
+              0 8px 32px -8px rgba(100, 116, 139, 0.4),
+              0 4px 16px -4px rgba(100, 116, 139, 0.3),
+              0 2px 8px -2px rgba(100, 116, 139, 0.2),
+              inset 0 1px 0 rgba(255, 255, 255, 0.1)
+            `;
           }
         }}
         onBlur={(e) => {
@@ -138,13 +159,17 @@ const ChannelCard: React.FC<ChannelCardProps> = ({
           if (extractedColor) {
             e.currentTarget.style.borderColor = `rgba(${extractedColor.vibrant.rgb}, 0.6)`;
             e.currentTarget.style.boxShadow = cardStyle.boxShadow;
+          } else {
+            // 기본 색상으로 복원
+            e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.4)';
+            e.currentTarget.style.boxShadow = cardStyle.boxShadow;
           }
         }}
       >
         {/* Image Section */}
         <ChannelImageSection
           imageUrl={item.img}
-          channelName={item.title || `Channel ${item.id}`}
+          channelName={channelName}
           colorShiftOnHover={colorShiftOnHover}
           onColorExtracted={handleColorExtracted}
         />
@@ -153,7 +178,7 @@ const ChannelCard: React.FC<ChannelCardProps> = ({
         <div className="absolute bottom-0 left-0 right-0 p-5">
           {/* Header Section */}
           <ChannelHeaderSection
-            channelName={item.title || `Channel ${item.id}`}
+            channelName={channelName}
             category={item.category}
             isVerified={isVerified}
             extractedColor={extractedColor}

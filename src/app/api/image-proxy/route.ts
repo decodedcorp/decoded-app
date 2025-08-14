@@ -1,83 +1,70 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// 선택적 보안: 허용된 도메인 목록 (필요시 활성화)
-const ALLOWED_HOSTS = [
-  'ogp.me',
-  'images.unsplash.com',
-  'cdn.example.com',
-  // 추가 허용 도메인들...
-];
-
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const imageUrl = searchParams.get('url');
-
-  if (!imageUrl) {
-    return new NextResponse('Missing url parameter', { status: 400 });
-  }
-
   try {
-    const parsed = new URL(imageUrl);
-    
-    // 프로토콜 검증
-    if (!['http:', 'https:'].includes(parsed.protocol)) {
-      return new NextResponse('Invalid protocol', { status: 400 });
+    const { searchParams } = new URL(request.url);
+    const imageUrl = searchParams.get('url');
+
+    if (!imageUrl) {
+      return NextResponse.json({ error: 'Missing image URL' }, { status: 400 });
     }
 
-    // 선택적 도메인 필터링 (필요시 활성화)
-    // if (!ALLOWED_HOSTS.includes(parsed.hostname)) {
-    //   return new NextResponse('Domain not allowed', { status: 403 });
-    // }
+    // 허용된 도메인 체크 (보안)
+    const allowedDomains = [
+      'localhost',
+      '127.0.0.1',
+      'decoded-app.vercel.app',
+      'decoded-app-git-main.vercel.app',
+      'decoded-app-git-develop.vercel.app',
+      // 프로덕션 도메인 추가
+    ];
 
-    // 외부 이미지 fetch
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10초 타임아웃
+    const url = new URL(imageUrl);
+    const isAllowed = allowedDomains.some(domain => 
+      url.hostname === domain || url.hostname.endsWith(`.${domain}`)
+    );
 
-    const externalRes = await fetch(imageUrl, {
-      signal: controller.signal,
+    if (!isAllowed) {
+      console.warn('Blocked image proxy request for:', imageUrl);
+      return NextResponse.json({ error: 'Domain not allowed' }, { status: 403 });
+    }
+
+    // 이미지 fetch
+    const response = await fetch(imageUrl, {
       headers: {
-        'User-Agent': 'Decoded-App/1.0',
+        'User-Agent': 'Mozilla/5.0 (compatible; DecodedApp/1.0)',
       },
     });
 
-    clearTimeout(timeoutId);
-
-    if (!externalRes.ok) {
-      return new NextResponse('Image fetch failed', { status: externalRes.status });
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.status}`);
     }
 
-    const contentType = externalRes.headers.get('content-type') || 'image/jpeg';
-    
-    // 이미지 타입 검증
-    if (!contentType.startsWith('image/')) {
-      return new NextResponse('URL is not an image', { status: 400 });
-    }
+    const imageBuffer = await response.arrayBuffer();
+    const contentType = response.headers.get('content-type') || 'image/jpeg';
 
-    const buffer = await externalRes.arrayBuffer();
-
-    // 응답 헤더 설정
+    // CORS 헤더 설정
     const headers = new Headers();
-    headers.set('Content-Type', contentType);
-    headers.set('Cache-Control', 'public, max-age=86400'); // 하루 캐싱
     headers.set('Access-Control-Allow-Origin', '*');
+    headers.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    headers.set('Access-Control-Allow-Headers', 'Content-Type');
+    headers.set('Cache-Control', 'public, max-age=3600'); // 1시간 캐시
+    headers.set('Content-Type', contentType);
+    headers.set('Content-Length', imageBuffer.byteLength.toString());
 
-    return new NextResponse(buffer, {
+    return new NextResponse(imageBuffer, {
       status: 200,
       headers,
     });
-
   } catch (error) {
-    console.error('[Image Proxy] Error:', error);
-    
-    if (error instanceof Error && error.name === 'AbortError') {
-      return new NextResponse('Request timeout', { status: 408 });
-    }
-
-    return new NextResponse('Image fetch failed', { status: 500 });
+    console.error('Image proxy error:', error);
+    return NextResponse.json(
+      { error: 'Failed to proxy image' },
+      { status: 500 }
+    );
   }
 }
 
-// OPTIONS 요청 처리 (CORS preflight)
 export async function OPTIONS() {
   return new NextResponse(null, {
     status: 200,

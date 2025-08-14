@@ -6,6 +6,11 @@ import { AnimatedSection } from './AnimatedSection';
 import MasonryGrid from '../masonry/MasonryGrid';
 import { ChannelModal, ContentModal } from '../modal';
 import { AddChannelModal } from '../modal/add-channel/AddChannelModal';
+import { useChannels } from '../../hooks/useChannels';
+import { mapChannelsToItems } from '../../utils/channelMapper';
+import { Item } from '../masonry/types';
+import { useChannelModalStore } from '../../../../store/channelModalStore';
+import { ChannelResponse } from '../../../../api/generated/models/ChannelResponse';
 
 interface ChannelMainContentProps {
   className?: string;
@@ -18,6 +23,31 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
   const [rowHeights, setRowHeights] = useState([46, 46, 46, 46]); // 각 라인의 높이
   const mainContentRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
+
+  // 채널 모달 스토어
+  const openChannelModal = useChannelModalStore((state) => state.openModal);
+
+  // 채널 데이터 가져오기
+  const {
+    data: channelsData,
+    isLoading,
+    error,
+  } = useChannels({
+    limit: 50, // 더 많은 채널 로드
+    sortBy: 'created_at',
+    sortOrder: 'desc',
+  });
+
+  // API 데이터를 Item 타입으로 변환
+  const channelItems: Item[] = React.useMemo(() => {
+    if (!channelsData?.channels) return [];
+    return mapChannelsToItems(channelsData.channels);
+  }, [channelsData]);
+
+  // 원본 채널 데이터를 저장 (모달에서 사용)
+  const originalChannels = React.useMemo(() => {
+    return channelsData?.channels || [];
+  }, [channelsData]);
 
   // 스크롤 이벤트 핸들러
   const handleScroll = useCallback(() => {
@@ -93,37 +123,52 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
   }, []);
 
   // 안정적인 아이템 클릭 핸들러 (리렌더 방지)
-  const handleItemClick = useCallback((item: any) => {
-    console.log('Channel clicked:', item);
-    // TODO: 채널 모달 열기 또는 라우팅
-  }, []);
+  const handleItemClick = useCallback(
+    (item: Item) => {
+      console.log('Channel clicked:', item);
 
-  // 간단한 테스트 데이터 생성 (나중에 API로 교체)
-  const testItems = React.useMemo(() => {
-    const categories = ['Business', 'Technology', 'Design', 'Marketing', 'Education'];
-    const images = [
-      '/images/sususupanova.jpg',
-      '/images/karina01.jpg', 
-      '/images/karina02.jpeg',
-      '/images/karina_profile.webp',
-      '/images/73032-1920x1200-desktop-hd-kanye-west-background.jpg',
-      '/images/image-proxy.webp',
-    ];
+      // 원본 채널 데이터 찾기
+      const originalChannel = originalChannels.find((channel) => channel.id === item.id);
+      if (originalChannel) {
+        // 모달 열기
+        openChannelModal(originalChannel);
+      }
+    },
+    [originalChannels, openChannelModal],
+  );
 
-    return Array.from({ length: 20 }, (_, i) => ({
-      id: `channel-${i + 1}`,
-      img: images[i % images.length],
-      url: `/channels/channel-${i + 1}`,
-      title: `Channel ${i + 1}`,
-      category: categories[i % categories.length],
-      editors: [
-        { name: `Editor ${i + 1}`, avatar: null },
-        { name: `Editor ${i + 2}`, avatar: null },
-      ],
-      width: 300,
-      height: 200,
-    }));
-  }, []);
+  // 로딩 상태 렌더링
+  if (isLoading) {
+    return (
+      <div className={`relative h-full overflow-y-auto ${className}`}>
+        <div className="h-full flex items-center justify-center">
+          <div className="text-white text-lg">Loading channels...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // 에러 상태 렌더링
+  if (error) {
+    return (
+      <div className={`relative h-full overflow-y-auto ${className}`}>
+        <div className="h-full flex items-center justify-center">
+          <div className="text-red-500 text-lg">Failed to load channels. Please try again.</div>
+        </div>
+      </div>
+    );
+  }
+
+  // 채널이 없는 경우
+  if (!channelItems.length) {
+    return (
+      <div className={`relative h-full overflow-y-auto ${className}`}>
+        <div className="h-full flex items-center justify-center">
+          <div className="text-gray-400 text-lg">No channels found.</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div ref={mainContentRef} className={`relative h-full overflow-y-auto ${className}`}>
@@ -134,7 +179,7 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
 
       {/* Grid Section */}
       <AnimatedSection isExpanded={isGridExpanded} className="relative z-5">
-        <MasonryGrid items={testItems} onItemClick={handleItemClick} />
+        <MasonryGrid items={channelItems} onItemClick={handleItemClick} />
       </AnimatedSection>
 
       {/* Global Channel Modal */}
