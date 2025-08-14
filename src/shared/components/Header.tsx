@@ -1,9 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { LoginButton } from './LoginButton';
-import { SearchBar } from './SearchBar';
 
+import { LoginButton } from './LoginButton';
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
 
@@ -12,11 +11,6 @@ export function Header() {
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
-
-  const handleSearch = (query: string) => {
-    // TODO: Implement search functionality
-    console.log('Search query:', query);
-  };
 
   return (
     <header

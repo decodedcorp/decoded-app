@@ -1,0 +1,30 @@
+# Decoded App Code Owners
+
+# Global fallback
+* @tech-leads
+
+# Domain-specific ownership
+/src/domains/auth/ @auth-team
+/src/domains/channels/ @frontend-team  
+/src/domains/contents/ @content-team
+/src/domains/feeds/ @feed-team
+
+# Shared system areas (require broader review)
+/lib/ @tech-leads @senior-developers
+/shared/ @tech-leads @frontend-team
+/store/ @tech-leads @senior-developers
+
+# Infrastructure and configuration
+/.github/ @tech-leads @devops-team
+/docs/ @tech-leads
+/CLAUDE.md @tech-leads
+/eslint.config.mjs @tech-leads
+/tailwind.config.ts @tech-leads @design-system-team
+/tsconfig.json @tech-leads
+
+# Package management
+/package.json @tech-leads
+/yarn.lock @tech-leads
+
+# Task Master configuration  
+/.taskmaster/ @tech-leads

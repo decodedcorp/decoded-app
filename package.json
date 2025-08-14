@@ -9,8 +9,11 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "test": "echo \"No tests specified yet\" && exit 0",
+    "analyze": "ANALYZE=true next build",
+    "complexity": "yarn lint --format json > lint-report.json 2>/dev/null || true && echo 'Lint analysis complete'",
     "typegen:dev": "yarn dlx openapi-typescript-codegen --input https://dev.decoded.style/openapi.json --output ./src/api/generated --client fetch",
-    "pre-commit": "yarn typegen:dev && git add src/api/generated/"
+    "pre-commit": "yarn typegen:dev && git add src/api/generated/",
+    "prepare": "husky"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -39,7 +42,8 @@
     "zustand": "^5.0.6"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
+    "@eslint/eslintrc": "^3.3.1",
+    "@next/bundle-analyzer": "^15.4.6",
     "@next/eslint-plugin-next": "^15.4.5",
     "@svgr/webpack": "^8.1.0",
     "@tailwindcss/postcss": "^4.1.11",
@@ -51,6 +55,8 @@
     "eslint": "^9",
     "eslint-config-next": "15.4.1",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "husky": "^9.1.7",
+    "lighthouse": "^12.8.1",
     "openapi-typescript-codegen": "^0.29.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.11",

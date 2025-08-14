@@ -1,24 +1,9 @@
 import { create } from 'zustand';
-import { ContentType } from '@/api/generated';
 
-export interface ContentItem {
-  id: string | number;
-  type: ContentType | 'image' | 'video' | 'text';
-  title: string;
-  height?: string;
-  width?: string;
-  category?: string;
-  imageUrl?: string;
-  description?: string;
-  author?: string;
-  date?: string;
-  likes?: number;
-  views?: number;
-  linkUrl?: string;
-  // AI generated data
-  aiSummary?: string;
-  aiQaList?: Array<{ question: string; answer: string }>;
-}
+import { ContentItem } from '@/lib/types/content';
+
+// Re-export for backward compatibility
+export type { ContentItem };
 
 interface ContentModalState {
   isOpen: boolean;
