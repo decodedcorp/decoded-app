@@ -1,6 +1,7 @@
 import React from 'react';
-import { ContentItem } from '@/lib/types/content';
 import deepEqual from 'fast-deep-equal';
+
+import { ContentItem } from '@/lib/types/content';
 
 /**
  * 콘텐츠 아이템의 안정적인 키 생성

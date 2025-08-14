@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, ReactNode } from 'react';
+
 import { SidebarFilters } from '../../sidebar/ChannelSidebar';
 
 interface ChannelModalContainerProps {

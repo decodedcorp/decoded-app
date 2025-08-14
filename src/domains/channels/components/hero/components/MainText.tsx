@@ -1,4 +1,5 @@
 import React from 'react';
+
 import styles from '../ChannelHero.module.css';
 
 export function MainText() {

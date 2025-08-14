@@ -92,9 +92,9 @@ tsconfig.tsbuildinfo
 
 # OS specific
 
+.aiexclude
+.mcp.json
+
 # Task files
 # tasks.json
 # tasks/ 
-
-.aiexclude
-.mcp.json

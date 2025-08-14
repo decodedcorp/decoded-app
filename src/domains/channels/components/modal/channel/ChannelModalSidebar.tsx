@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+
 import { SidebarFilters } from '../../sidebar/ChannelSidebar';
 import { DataTypesFilter } from '../filters/DataTypesFilter';
 import { CategoriesFilter } from '../filters/CategoriesFilter';

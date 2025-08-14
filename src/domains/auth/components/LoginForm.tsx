@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+
 import { useAuthMutations } from '../hooks/useAuthMutations';
 import { AuthError, NetworkError } from '../types/auth';
 import { useAuthStore } from '../../../store/authStore';

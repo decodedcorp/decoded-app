@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+
 import {
   useAddChannelStore,
   selectIsAddChannelModalOpen,
@@ -9,7 +10,9 @@ import {
 } from '@/store/addChannelStore';
 import { useCreateChannel } from '@/domains/channels/hooks/useChannels';
 import { useChannelModalStore } from '@/store/channelModalStore';
+
 import { BaseModal } from '../base/BaseModal';
+
 import { AddChannelHeader } from './AddChannelHeader';
 import { AddChannelForm } from './AddChannelForm';
 import { AddChannelFooter } from './AddChannelFooter';

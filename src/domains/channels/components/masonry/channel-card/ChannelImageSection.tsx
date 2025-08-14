@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useEffect, useCallback, useRef } from 'react';
+
 import Image from 'next/image';
+
 import { useImageColor } from './hooks/useImageColor';
 
 interface ChannelImageSectionProps {

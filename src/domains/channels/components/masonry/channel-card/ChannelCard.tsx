@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
+
 import { Item } from '../types';
+
 import ChannelImageSection from './ChannelImageSection';
 import ChannelHeaderSection from './ChannelHeaderSection';
 import ChannelMetricsSection from './ChannelMetricsSection';

@@ -1,11 +1,14 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+
 import { useRouter } from 'next/navigation';
+
 import styles from '../ChannelHero.module.css';
+import { SearchHeroProps, Question } from '../types';
+
 import GlitchText from './GlitchText';
 import { AddChannelButton } from './AddChannelButton';
-import { SearchHeroProps, Question } from '../types';
 
 export function SearchHero({ 
   onToggleDesign, 

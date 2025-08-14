@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useMemo, useCallback } from 'react';
+
 import { useRouter } from 'next/navigation';
+
 import styles from '../ChannelHero.module.css';
 import { TrendingTagsProps, TrendingTag } from '../types';
 

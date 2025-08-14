@@ -1,6 +1,7 @@
 import { STORAGE_KEYS } from '../constants';
-import { TokenDecoder } from './tokenDecoder';
 import { AuthError, TokenError } from '../types/auth';
+
+import { TokenDecoder } from './tokenDecoder';
 
 export interface TokenData {
   access_token: string;

@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { getExpandAnimationClasses } from '../../utils/animationUtils';
 
 interface AnimatedSectionProps {

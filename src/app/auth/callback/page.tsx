@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useCallback, Suspense } from 'react';
+
 import { useRouter, useSearchParams } from 'next/navigation';
+
 import { useAuthStore } from '../../../store/authStore';
 import { handleGoogleOAuthCallback } from '../../../domains/auth/api/authApi';
 

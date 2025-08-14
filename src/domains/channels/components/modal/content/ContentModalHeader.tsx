@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { ContentItem } from '@/store/contentModalStore';
 
 interface ContentModalHeaderProps {

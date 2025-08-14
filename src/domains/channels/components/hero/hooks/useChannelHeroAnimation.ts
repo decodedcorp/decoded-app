@@ -3,6 +3,7 @@ import { gsap } from 'gsap';
 import { CustomEase } from 'gsap/CustomEase';
 import { SplitText } from 'gsap/SplitText';
 import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
+
 import styles from '../ChannelHero.module.css';
 
 // Register GSAP plugins

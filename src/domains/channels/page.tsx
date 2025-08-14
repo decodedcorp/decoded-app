@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+
 import { ChannelMainContent } from './components/layout/ChannelMainContent';
 
 export default function ChannelPage() {

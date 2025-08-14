@@ -1,4 +1,6 @@
 import React from 'react';
+import deepEqual from 'fast-deep-equal';
+
 import Image from 'next/image';
 import { useContentModalStore } from '@/store/contentModalStore';
 import { ContentItem } from '@/lib/types/content';
@@ -18,7 +20,6 @@ import { queryKeys } from '@/lib/api/queryKeys';
 import { isValidImageUrl, handleImageError } from '@/lib/utils/imageUtils';
 import { ProxiedImage } from '@/components/ProxiedImage';
 import Masonry from '@/components/ReactBitsMasonry';
-import deepEqual from 'fast-deep-equal';
 
 // 개별 콘텐츠 아이템 컴포넌트 (고도화된 메모이제이션)
 const ContentItemCard = React.memo<{

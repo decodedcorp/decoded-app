@@ -1,11 +1,12 @@
 import React from 'react';
+import deepEqual from 'fast-deep-equal';
+
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { ContentsService } from '@/api/generated/services/ContentsService';
 import { PublicService } from '@/api/generated/services/PublicService';
 import { queryKeys } from '@/lib/api/queryKeys';
 import { convertToContentItem, unifyContent, ContentItem } from '@/lib/types/content';
 import { ContentStatus } from '@/api/generated';
-import deepEqual from 'fast-deep-equal';
 
 const isNotNullContentItem = (item: any): item is ContentItem => item !== null;
 

@@ -1,11 +1,13 @@
 'use client';
 
 import React from 'react';
+
 import { cn } from '@/lib/utils/styles';
 import { ProxiedImage } from '@/components/ProxiedImage';
+import { useChannelModalStore } from '@/store/channelModalStore';
+
 import { GridItemProps } from '../../types/masonry';
 import { getInitials } from '../../utils/editorUtils';
-import { useChannelModalStore } from '@/store/channelModalStore';
 import { ChannelData } from '../hero/heroData';
 
 export function GridItem({

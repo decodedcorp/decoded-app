@@ -1,4 +1,4 @@
-import { getAccessToken, getValidAccessToken } from '../domains/auth/utils/tokenManager';
+import { getValidAccessToken } from '../domains/auth/utils/tokenManager';
 
 /**
  * API Configuration

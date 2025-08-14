@@ -1,10 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getValidAccessToken } from '@/domains/auth/utils/tokenManager';
+import { refreshOpenAPIToken } from '@/api/hooks/useApi';
+
 import { ContentsService } from '../../../api/generated';
 import { queryKeys } from '../../../lib/api/queryKeys';
 import { useToastMutation, useSimpleToastMutation } from '../../../lib/hooks/useToastMutation';
 import { extractApiErrorMessage } from '../../../lib/utils/toastUtils';
-import { getValidAccessToken } from '@/domains/auth/utils/tokenManager';
-import { refreshOpenAPIToken } from '@/api/hooks/useApi';
 
 export const useContentsByChannel = (channelId: string, params?: Record<string, any>) => {
   return useQuery({

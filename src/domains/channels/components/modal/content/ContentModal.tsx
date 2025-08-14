@@ -1,13 +1,16 @@
 'use client';
 
 import React from 'react';
+
 import {
   useContentModalStore,
   selectIsContentModalOpen,
   selectSelectedContent,
 } from '@/store/contentModalStore';
+
 import { BaseModal } from '../base/BaseModal';
 import { ContentModalContainer } from '../base/ContentModalContainer';
+
 import { ContentModalHeader } from './ContentModalHeader';
 import { ContentModalBody } from './ContentModalBody';
 import { ContentModalFooter } from './ContentModalFooter';

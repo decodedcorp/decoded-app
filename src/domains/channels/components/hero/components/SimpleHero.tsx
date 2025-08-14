@@ -1,10 +1,13 @@
 'use client';
 
 import React, { useState, useCallback, useMemo } from 'react';
+
 import { useRouter } from 'next/navigation';
+
 import styles from '../ChannelHero.module.css';
-import { AddChannelButton } from './AddChannelButton';
 import { SimpleHeroProps, Question } from '../types';
+
+import { AddChannelButton } from './AddChannelButton';
 
 export function SimpleHero({ 
   onToggleDesign, 

@@ -1,6 +1,7 @@
 import { ChannelResponse } from '@/api/generated';
-import { MasonryItem, Editor } from '../types/masonry';
 import { formatDateByContext } from '@/lib/utils/dateUtils';
+
+import { MasonryItem, Editor } from '../types/masonry';
 
 /**
  * ChannelResponse를 MasonryItem으로 변환하는 함수

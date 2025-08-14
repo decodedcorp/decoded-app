@@ -1,10 +1,12 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+
 import { useAuthStore } from '../../../store/authStore';
 import { queryKeys } from '../../../lib/api/queryKeys';
 import { isAuthenticated, getValidAccessToken } from '../utils/tokenManager';
 import { TIMING } from '../constants';
 import { AuthError } from '../types/auth';
 import { UsersService } from '../../../api/generated';
+
 import { useDocId } from './useDocId';
 
 /**

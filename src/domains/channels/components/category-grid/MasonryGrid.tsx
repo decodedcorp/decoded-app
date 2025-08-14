@@ -1,21 +1,25 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { GridItem } from './GridItem';
-import { CtaCard } from './CtaCard';
-import { MasonryGridSkeleton } from './MasonryGridSkeleton';
-import { InfiniteScrollLoader } from './InfiniteScrollLoader';
-import { pastelColors, cardVariants } from '../../constants/masonryConstants';
-import { getMockItems, distributeNoImageCards, insertSpecialCards } from '../../utils/masonryUtils';
-import { MasonryItem, CtaCardType } from '../../types/masonry';
+
 import { cn } from '@/lib/utils/styles';
 import { useChannelModalStore, ChannelData } from '@/store/channelModalStore';
 import { useAddChannelStore } from '@/store/addChannelStore';
+import { ChannelResponse } from '@/api/generated';
+import Masonry from '@/components/ReactBitsMasonry';
+
+import { pastelColors, cardVariants } from '../../constants/masonryConstants';
+import { getMockItems, distributeNoImageCards, insertSpecialCards } from '../../utils/masonryUtils';
+import { MasonryItem, CtaCardType } from '../../types/masonry';
 import { useInfiniteChannels } from '../../hooks/useChannels';
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
-import { ChannelResponse } from '@/api/generated';
 import { mapChannelsToMasonryItems } from '../../utils/apiMappers';
-import Masonry from '@/components/ReactBitsMasonry';
+
+
+import { InfiniteScrollLoader } from './InfiniteScrollLoader';
+import { MasonryGridSkeleton } from './MasonryGridSkeleton';
+import { CtaCard } from './CtaCard';
+import { GridItem } from './GridItem';
 
 // 타입 가드 함수들
 function isMasonryItem(item: MasonryItem | CtaCardType): item is MasonryItem {

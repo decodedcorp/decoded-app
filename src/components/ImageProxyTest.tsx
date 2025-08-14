@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { ProxiedImage } from './ProxiedImage';
+
 import { getProxiedImageUrl } from '@/lib/utils/imageProxy';
+
+import { ProxiedImage } from './ProxiedImage';
 
 export function ImageProxyTest() {
   const [imageUrl, setImageUrl] = useState('');

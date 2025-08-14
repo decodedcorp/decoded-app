@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState, useCallback, useMemo } from 'react';
+
 import { useRouter, useSearchParams } from 'next/navigation';
+
 import styles from './ChannelHero.module.css';
 import { useChannelHeroAnimation } from './hooks/useChannelHeroAnimation';
 import { SearchHero } from './components/SearchHero';

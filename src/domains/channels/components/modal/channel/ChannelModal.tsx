@@ -1,15 +1,22 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+
 import {
   useChannelModalStore,
   selectIsModalOpen,
   selectSelectedChannel,
   selectSelectedChannelId,
 } from '@/store/channelModalStore';
+import type { SidebarFilters } from '@/domains/channels/components/sidebar/ChannelSidebar';
+import { ChannelData } from '@/store/channelModalStore';
+import { formatDateByContext } from '@/lib/utils/dateUtils';
+
 import { useChannel } from '../../../hooks/useChannels';
 import { BaseModal } from '../base/BaseModal';
 import { ChannelModalContainer } from '../base/ChannelModalContainer';
+import { ContentUploadModal } from '../content-upload/ContentUploadModal';
+
 import { ChannelModalHeader } from './ChannelModalHeader';
 import { ChannelModalStats } from './ChannelModalStats';
 import { ChannelModalEditors } from './ChannelModalEditors';
@@ -17,11 +24,9 @@ import { ChannelModalContent } from './ChannelModalContent';
 import { ChannelModalRelated } from './ChannelModalRelated';
 import { ChannelModalFooter } from './ChannelModalFooter';
 import { ChannelModalSidebar } from './ChannelModalSidebar';
-import type { SidebarFilters } from '@/domains/channels/components/sidebar/ChannelSidebar';
-import { ChannelData } from '@/store/channelModalStore';
 import { ChannelModalSkeleton } from './ChannelModalSkeleton';
-import { formatDateByContext } from '@/lib/utils/dateUtils';
-import { ContentUploadModal } from '../content-upload/ContentUploadModal';
+
+
 
 export function ChannelModal() {
   const isOpen = useChannelModalStore(selectIsModalOpen);

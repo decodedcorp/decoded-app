@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
+
 import { ChannelHero } from '../hero/ChannelHero';
-import { AnimatedSection } from './AnimatedSection';
 import MasonryGrid from '../masonry/MasonryGrid';
 import { ChannelModal, ContentModal } from '../modal';
 import { AddChannelModal } from '../modal/add-channel/AddChannelModal';
@@ -11,6 +11,8 @@ import { mapChannelsToItems } from '../../utils/channelMapper';
 import { Item } from '../masonry/types';
 import { useChannelModalStore } from '../../../../store/channelModalStore';
 import { ChannelResponse } from '../../../../api/generated/models/ChannelResponse';
+
+import { AnimatedSection } from './AnimatedSection';
 
 interface ChannelMainContentProps {
   className?: string;

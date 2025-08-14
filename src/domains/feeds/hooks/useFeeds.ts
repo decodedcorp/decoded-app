@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+
 import { FeedsService } from '../../../api/generated';
 import { queryKeys } from '../../../lib/api/queryKeys';
 

@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { LoginForm } from './LoginForm';
+
 import { cn } from '@/lib/utils/styles';
+
+import { LoginForm } from './LoginForm';
 
 // 고급 모달 컨트롤러 커스텀 훅
 function useModalController({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {

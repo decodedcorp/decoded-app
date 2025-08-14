@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from 'react';
 import { gsap } from 'gsap';
+
 import ChannelCard from './channel-card/ChannelCard';
 import { Item, MasonryProps } from './types';
 

@@ -1,12 +1,12 @@
 import { create } from 'zustand';
 import { devtools, persist, createJSONStorage } from 'zustand/middleware';
+
 import { AuthState, User, LoginResponse } from '../domains/auth/types/auth';
 import {
   clearSession,
   getAccessToken,
   getRefreshToken,
   getUserData,
-  isAuthenticated,
   getValidAccessToken,
   storeLoginResponse,
 } from '../domains/auth/utils/tokenManager';

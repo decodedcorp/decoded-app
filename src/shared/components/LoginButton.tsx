@@ -1,8 +1,9 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
-import { useEffect, useState } from 'react';
 import { LoginModal } from '@/domains/auth/components/LoginModal';
 
 export function LoginButton() {
