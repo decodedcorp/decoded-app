@@ -1,9 +1,1443 @@
 {
   "master": {
-    "tasks": [],
+    "tasks": [
+      {
+        "id": 1,
+        "title": "코드베이스 분석 및 리팩토링 계획 수립",
+        "description": "현재 코드베이스를 분석하여 가이드라인 위반 사항을 식별하고 리팩토링 우선순위를 설정합니다.",
+        "details": "1. 정적 코드 분석 도구(ESLint, SonarQube)를 사용하여 코드베이스 스캔\n2. 100줄 이상 파일, 5개 이상 props를 가진 컴포넌트, 중첩 조건문 등 위반 사항 목록화\n3. 컴포넌트 복잡도 분석(Cyclomatic complexity)\n4. 번들 크기 분석(webpack-bundle-analyzer 또는 @next/bundle-analyzer 사용)\n5. 성능 기준점 설정을 위한 Lighthouse 및 Core Web Vitals 측정\n6. 리팩토링 우선순위 매트릭스 작성(영향도/복잡도 기준)\n7. 단계별 리팩토링 계획 문서화",
+        "testStrategy": "분석 결과를 검증하기 위한 자동화된 보고서 생성. 코드 품질 메트릭스(복잡도, 중복, 유지보수성 지수)를 측정하고 기준점 설정. Lighthouse 성능 점수 기록.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "정적 코드 분석 및 위반 사항 식별",
+            "description": "ESLint, SonarQube 등의 정적 코드 분석 도구를 사용하여 코드베이스를 스캔하고 가이드라인 위반 사항을 식별합니다.",
+            "dependencies": [],
+            "details": "ESLint와 SonarQube를 설정하여 코드베이스 전체를 스캔합니다. 100줄 이상 파일, 5개 이상 props를 가진 컴포넌트, 중첩 조건문 등 가이드라인 위반 사항을 목록화합니다. 발견된 문제점을 카테고리별로 분류하고 심각도를 평가합니다.\n<info added on 2025-08-14T14:37:14.169Z>\n## 정적 코드 분석 도구 설정 및 분석 결과\n\n### ESLint 고도화 완료\n- CLAUDE.md 가이드라인 적용: 100줄 파일 제한, 5개 props 제한, 복잡도 제한 등\n- React 성능 최적화 규칙 추가\n- Import 정리 규칙 적용\n- TypeScript 네이밍 컨벤션 강제\n\n### 분석 결과 요약\n- 총 666개 위반 사항 발견 (393개 에러, 273개 경고)\n- 주요 위반 패턴:\n  - 100줄 이상 파일: 다수 (최대 283줄까지)\n  - 복잡한 함수: 복잡도 31까지 발견 (기준: 10)\n  - 긴 함수: 102줄 함수 발견 (기준: 50줄)\n  - Import 정리 필요\n\n### 번들 분석기 설정 완료\n- @next/bundle-analyzer 설치 및 구성\n- next.config.ts 설정\n- package.json에 analyze 스크립트 추가\n\n### 분석 스크립트 준비\n- complexity 스크립트로 JSON 보고서 생성 가능\n- Lighthouse 성능 측정 준비 완료\n</info added on 2025-08-14T14:37:14.169Z>",
+            "status": "done",
+            "testStrategy": "분석 도구의 설정이 올바른지 확인하고, 샘플 코드에서 위반 사항이 정확히 감지되는지 검증합니다. 분석 결과를 JSON 형식으로 출력하여 후속 작업에 활용할 수 있도록 합니다."
+          },
+          {
+            "id": 2,
+            "title": "컴포넌트 복잡도 및 성능 분석",
+            "description": "컴포넌트의 순환 복잡도를 분석하고 번들 크기 및 웹 성능 지표를 측정합니다.",
+            "dependencies": [],
+            "details": "컴포넌트의 순환 복잡도(Cyclomatic complexity)를 분석하여 복잡한 컴포넌트를 식별합니다. webpack-bundle-analyzer 또는 @next/bundle-analyzer를 사용하여 번들 크기를 분석합니다. Lighthouse 및 Core Web Vitals를 측정하여 성능 기준점을 설정합니다.\n<info added on 2025-08-14T14:41:33.417Z>\n## 컴포넌트 복잡도 및 성능 분석 완료:\n\n✅ **번들 분석 완료**\n- @next/bundle-analyzer 설정 및 분석 실행\n- 클라이언트, 서버, 엣지 번들 보고서 생성됨 (.next/analyze/ 폴더)\n- 번들 크기 분석 결과: 빌드 성공하였으나 린트 에러로 인한 경고 다수\n\n✅ **Lighthouse 성능 측정 완료**\n- 현재 성능 점수: **38% (매우 낮음)**\n- Core Web Vitals 측정 결과:\n  - FCP (First Contentful Paint): 1.9초 (점수: 88%) ✅ \n  - LCP (Largest Contentful Paint): 43.7초 (점수: 0%) ❌ **심각**\n  - CLS (Cumulative Layout Shift): 0.001 (점수: 100%) ✅\n\n✅ **주요 발견 사항**\n- **심각한 성능 이슈**: LCP 43.7초는 극도로 낮은 성능\n- FCP와 CLS는 양호하지만, LCP 최적화가 시급함\n- 총 666개 ESLint 위반 사항으로 코드 품질 개선 필요\n- 번들 크기 최적화 여지 있음\n\n**다음 단계**: 리팩토링 우선순위에서 LCP 최적화를 최우선으로 설정해야 함\n</info added on 2025-08-14T14:41:33.417Z>",
+            "status": "done",
+            "testStrategy": "복잡도 분석 결과를 검증하고, 번들 크기 분석이 정확한지 확인합니다. Lighthouse 성능 점수를 기록하고 반복 측정하여 일관성을 확인합니다."
+          },
+          {
+            "id": 3,
+            "title": "리팩토링 우선순위 매트릭스 작성",
+            "description": "영향도와 복잡도를 기준으로 리팩토링 우선순위 매트릭스를 작성합니다.",
+            "dependencies": [],
+            "details": "코드 품질 문제의 영향도(사용자 경험, 유지보수성, 성능에 미치는 영향)와 복잡도(수정 난이도, 시간 소요)를 평가합니다. 이를 바탕으로 2x2 매트릭스(높은 영향/낮은 복잡도, 높은 영향/높은 복잡도, 낮은 영향/낮은 복잡도, 낮은 영향/높은 복잡도)를 작성하여 리팩토링 우선순위를 설정합니다.\n<info added on 2025-08-14T14:44:10.657Z>\n## 리팩토링 우선순위 매트릭스 작성 결과\n\n✅ **영향도/복잡도 기반 매트릭스 생성**\n- 666개 위반 사항을 영향도(High/Medium/Low)와 복잡도(High/Medium/Low)로 분류\n- 9개 카테고리의 우선순위 매트릭스 구성\n\n✅ **최우선 순위 선정** (🔴 즉시 대응)\n1. **LCP 최적화** (43.7초 → 2.5초 목표) - 성능 개선 시급\n2. **Import 정리** (100+ 위반) - 자동화 가능, 낮은 리스크\n3. **Unused 변수 제거** (50+ 위반) - 코드 정리 효과 큰\n4. **img → next/image 변환** (20+ 위반) - 성능 직결\n\n✅ **구체적 파일별 우선순위 설정**\n- **Critical**: content.ts (285줄, 복잡도31), imageUtils.ts (288줄), authStore.ts (179줄)\n- **High**: dateUtils.ts, imageOptimization.ts, contentUploadStore.ts\n- **Medium**: Import 정리, TypeScript any 타입 해결\n\n✅ **단계별 계획 및 성공 지표 정의**\n- Phase 1 (1-2주): Critical Issues 해결\n- Phase 2 (2-3주): High Priority 처리  \n- Phase 3 (3-4주): Medium Priority 개선\n- 성능 목표: 38% → 85% Lighthouse 점수\n\n**결과**: `.taskmaster/reports/refactoring-priority-matrix.md` 파일 생성\n</info added on 2025-08-14T14:44:10.657Z>",
+            "status": "done",
+            "testStrategy": "우선순위 매트릭스의 일관성을 검토하고, 팀 구성원들과 함께 우선순위를 검증합니다. 매트릭스가 객관적인 데이터에 기반하는지 확인합니다."
+          },
+          {
+            "id": 4,
+            "title": "단계별 리팩토링 계획 수립",
+            "description": "우선순위 매트릭스를 바탕으로 단계별 리팩토링 계획을 수립합니다.",
+            "dependencies": [],
+            "details": "우선순위 매트릭스를 바탕으로 단계별 리팩토링 계획을 수립합니다. 각 단계별 목표, 필요한 리소스, 예상 소요 시간을 명시합니다. 리팩토링 작업을 작은 단위로 나누어 점진적으로 적용할 수 있도록 계획합니다. 각 리팩토링 작업의 위험 요소와 대응 방안도 함께 문서화합니다.\n<info added on 2025-08-14T14:46:37.575Z>\n# 단계별 리팩토링 계획 수립 완료\n\n## 4단계 12주 계획 수립\n- **Phase 1 (1-2주)**: Critical Issues - LCP 최적화, 핵심 파일 분해\n- **Phase 2 (3-5주)**: High Priority - 컴포넌트 분해, React 최적화  \n- **Phase 3 (6-8주)**: Medium Priority - TypeScript strict, 디자인 시스템\n- **Phase 4 (9-12주)**: 고급 최적화 - 아키텍처 개선, 최종 최적화\n\n## 구체적 작업 일정 및 순서 정의\n- Week별 세부 작업 계획\n- 파일별 리팩토링 순서 (imageUtils.ts → content.ts → authStore.ts 순)\n- 성능 목표 단계별 설정 (38% → 60% → 75% → 85%)\n\n## 위험 관리 및 롤백 계획\n- 높은 위험 작업 식별 및 대응 방안\n- 브랜치 전략 및 커밋 가이드라인\n- 각 단계별 검증 절차 정의\n\n## 성공 지표 및 모니터링 체계\n- 정량적 지표: Lighthouse 85%, LCP 2.5초, ESLint 0 에러\n- 정성적 지표: 개발자 경험, 유지보수성 향상\n- 일별 모니터링 항목 정의\n\n**결과**: `.taskmaster/reports/step-by-step-refactoring-plan.md` 파일 생성\n</info added on 2025-08-14T14:46:37.575Z>",
+            "status": "done",
+            "testStrategy": "계획의 실현 가능성을 평가하고, 각 단계가 명확한 목표와 성공 기준을 가지고 있는지 확인합니다. 샘플 리팩토링을 통해 계획의 효과성을 검증합니다."
+          },
+          {
+            "id": 5,
+            "title": "리팩토링 가이드라인 및 문서화",
+            "description": "리팩토링 작업을 위한 가이드라인을 작성하고 분석 결과와 계획을 문서화합니다.",
+            "dependencies": [],
+            "details": "리팩토링 작업을 위한 구체적인 가이드라인을 작성합니다. 코드 품질 개선을 위한 패턴과 안티패턴을 정의하고, 예시 코드를 포함합니다. 분석 결과, 우선순위 매트릭스, 단계별 계획을 종합적으로 문서화하여 팀원들이 쉽게 참조할 수 있도록 합니다. 리팩토링 진행 상황을 추적할 수 있는 대시보드나 체크리스트를 준비합니다.\n<info added on 2025-08-14T14:50:55.778Z>\n# 리팩토링 가이드라인 및 문서화 완료 내용\n\n## 포괄적 리팩토링 가이드라인 작성\n- CLAUDE.md 가이드라인 준수를 위한 구체적 패턴과 안티패턴을 정의했습니다\n- 파일 분해, 함수 리팩토링, React 성능 최적화 패턴을 제시했습니다\n- Import 정리, TypeScript 엄격 모드, 상태 관리 최적화 가이드를 작성했습니다\n\n## 실무 중심 예시 코드 제공\n- Before/After 비교를 통한 명확한 개선 방향을 제시했습니다\n- 285줄 content.ts 파일 분해 예시를 포함했습니다\n- 복잡도 31 → 3-5로 개선하는 구체적 방법을 문서화했습니다\n- React 성능 최적화 메모이제이션 패턴을 상세히 설명했습니다\n\n## 자동화 도구 및 스크립트 준비\n- 성능 측정 자동화 스크립트를 개발했습니다\n- Pre-commit hook 설정 방법을 문서화했습니다\n- GitHub Actions 워크플로우를 구성했습니다\n- 성능 추적 대시보드 코드를 준비했습니다\n\n## 종합 분석 보고서 작성\n- 현황 분석: 666개 위반사항, 성능 38%, LCP 43.7초 등 주요 지표를 정리했습니다\n- 상세 문제 분석 및 우선순위화 작업을 완료했습니다\n- 12주 계획과 단계별 목표를 정의했습니다\n- 위험 관리 및 성공 기준을 명시했습니다\n\n## 생성된 문서\n- `refactoring-guidelines.md`: 실무 가이드라인\n- `code-analysis-summary.md`: 종합 분석 보고서\n</info added on 2025-08-14T14:50:55.778Z>",
+            "status": "done",
+            "testStrategy": "문서의 명확성과 완전성을 검토하고, 팀원들의 피드백을 수집하여 개선합니다. 가이드라인이 실제 코드 작성 시 적용 가능한지 테스트합니다."
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "자동화된 린팅 규칙 및 CI/CD 파이프라인 구성",
+        "description": "CLAUDE.md 가이드라인과 Cursor 규칙을 적용하기 위한 자동화된 린팅 규칙을 설정하고 CI/CD 파이프라인에 통합합니다.",
+        "details": "1. ESLint 설정 업데이트:\n   - max-lines: 100 규칙 추가\n   - max-params: 5 규칙 추가\n   - 명명 규칙(camelCase/PascalCase/kebab-case) 적용\n   - 중첩 조건문 제한 규칙 추가\n2. Prettier 설정 최적화\n3. Husky를 사용한 pre-commit 훅 설정\n4. lint-staged 설정으로 변경된 파일만 검사\n5. GitHub Actions 또는 기존 CI/CD 파이프라인에 린트 검사 추가\n6. 번들 크기 제한 설정(size-limit 라이브러리 사용)\n7. TypeScript strict 모드 점진적 적용 계획 수립",
+        "testStrategy": "CI 파이프라인에서 린트 규칙 적용 테스트. 샘플 코드로 각 규칙이 올바르게 적용되는지 검증. 린트 규칙 위반 시 빌드 실패 확인.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "ESLint 설정 업데이트 및 Prettier 최적화",
+            "description": "CLAUDE.md 가이드라인과 Cursor 규칙에 맞게 ESLint 규칙을 업데이트하고 Prettier 설정을 최적화합니다.",
+            "dependencies": [],
+            "details": "1. max-lines: 100 규칙 추가\n2. max-params: 5 규칙 추가\n3. 명명 규칙(camelCase/PascalCase/kebab-case) 적용\n4. 중첩 조건문 제한 규칙 추가\n5. Prettier 설정 파일(.prettierrc) 최적화\n6. ESLint와 Prettier 충돌 방지 설정\n7. 프로젝트 특성에 맞는 추가 규칙 구성",
+            "status": "pending",
+            "testStrategy": "샘플 코드로 각 린트 규칙이 올바르게 적용되는지 검증. 규칙 위반 시 오류 메시지 확인. ESLint와 Prettier 간 충돌 없는지 테스트."
+          },
+          {
+            "id": 2,
+            "title": "Git 훅 설정 (Husky 및 lint-staged)",
+            "description": "Husky를 사용한 pre-commit 훅과 lint-staged를 설정하여 커밋 전 코드 품질 검사를 자동화합니다.",
+            "dependencies": [
+              "2.1"
+            ],
+            "details": "1. Husky 설치 및 초기화\n2. pre-commit 훅 구성\n3. lint-staged 설정으로 변경된 파일만 검사\n4. 커밋 메시지 형식 검사를 위한 commitlint 설정\n5. 테스트 실행 훅 추가\n6. 설정 문서화",
+            "status": "pending",
+            "testStrategy": "여러 파일 변경 후 커밋 시도하여 훅 작동 확인. 린트 규칙 위반 파일 커밋 시 차단되는지 테스트. 성능 측정(대규모 변경 시 처리 시간)."
+          },
+          {
+            "id": 3,
+            "title": "CI/CD 파이프라인 린트 통합",
+            "description": "GitHub Actions 또는 기존 CI/CD 파이프라인에 린트 검사를 추가하여 모든 PR과 푸시에서 코드 품질을 검증합니다.",
+            "dependencies": [
+              "2.1"
+            ],
+            "details": "1. GitHub Actions 워크플로우 파일 생성\n2. 린트 검사 작업 구성\n3. 테스트 실행 작업 추가\n4. 빌드 검증 단계 추가\n5. PR 시 자동 코멘트 기능 설정\n6. 실패 시 알림 설정\n7. 캐싱 최적화로 CI 속도 개선",
+            "status": "pending",
+            "testStrategy": "테스트 PR 생성하여 CI 파이프라인 작동 확인. 린트 규칙 위반 시 빌드 실패 검증. 다양한 브랜치에서 파이프라인 일관성 테스트."
+          },
+          {
+            "id": 4,
+            "title": "번들 크기 제한 설정",
+            "description": "size-limit 라이브러리를 사용하여 번들 크기 제한을 설정하고 CI/CD 파이프라인에 통합합니다.",
+            "dependencies": [
+              "2.3"
+            ],
+            "details": "1. size-limit 라이브러리 설치\n2. 컴포넌트별 크기 제한 설정\n3. 전체 앱 번들 크기 제한 설정\n4. CI/CD 파이프라인에 번들 크기 검사 추가\n5. 번들 크기 시각화 도구 통합\n6. 자동 보고서 생성 설정",
+            "status": "pending",
+            "testStrategy": "다양한 컴포넌트 변경 후 번들 크기 제한 초과 시 빌드 실패 확인. 시간 경과에 따른 번들 크기 추적. 최적화 전후 크기 비교 테스트."
+          },
+          {
+            "id": 5,
+            "title": "TypeScript strict 모드 적용 계획 수립",
+            "description": "TypeScript strict 모드를 점진적으로 적용하기 위한 계획을 수립하고 구현합니다.",
+            "dependencies": [
+              "2.1",
+              "2.3"
+            ],
+            "details": "1. 현재 TypeScript 설정 분석\n2. strict 모드 활성화 시 예상 이슈 식별\n3. 단계별 적용 계획 문서화\n4. 우선순위가 높은 모듈부터 strict 적용\n5. 타입 정의 개선 가이드라인 작성\n6. 마이그레이션 도구 및 헬퍼 함수 개발\n7. 진행 상황 모니터링 방법 설정",
+            "status": "pending",
+            "testStrategy": "strict 모드 적용 전후 타입 오류 수 비교. 점진적 적용 후 기능 회귀 테스트. 개발자 피드백 수집 및 분석."
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "타입 시스템 정리 및 중앙화",
+        "description": "TypeScript 타입 정의를 정리하고 중앙화하여 일관된 타입 시스템을 구축합니다.",
+        "details": "1. 도메인별 타입 정의 파일 구성(src/types/ 디렉토리 구조화)\n2. 공통 타입 추출 및 중앙화(src/types/common.ts)\n3. API 응답 타입 정의 표준화(src/types/api/)\n4. 컴포넌트 Props 타입 정의 표준화(src/types/components/)\n5. 유틸리티 타입 함수 구현(Pick, Omit 등 활용)\n6. 열거형(enum) 대신 union 타입 또는 as const 객체 사용\n7. zod 또는 io-ts와 같은 런타임 타입 검증 라이브러리 도입 검토\n8. 타입 가드 함수 표준화 및 중앙화",
+        "testStrategy": "TypeScript 컴파일러를 사용한 타입 검증. 주요 타입 정의에 대한 단위 테스트 작성(타입 가드 함수). API 응답 타입과 실제 응답 일치 여부 테스트.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "도메인별 타입 정의 파일 구조화",
+            "description": "src/types/ 디렉토리를 도메인별로 구조화하고 공통 타입을 중앙화합니다.",
+            "dependencies": [],
+            "details": "1. src/types/ 디렉토리 내 도메인별 하위 디렉토리 생성\n2. 각 도메인별 index.ts 파일 생성하여 타입 내보내기 구성\n3. 공통 타입을 src/types/common.ts로 추출\n4. 타입 정의 파일 간 의존성 최소화 전략 수립\n5. 타입 네이밍 컨벤션 문서화",
+            "status": "pending",
+            "testStrategy": "디렉토리 구조 검증 스크립트 작성. TypeScript 컴파일러를 통한 타입 정의 유효성 검사."
+          },
+          {
+            "id": 2,
+            "title": "API 응답 타입 정의 표준화",
+            "description": "API 응답에 대한 타입 정의를 표준화하고 src/types/api/ 디렉토리에 구성합니다.",
+            "dependencies": [
+              "3.1"
+            ],
+            "details": "1. API 응답 기본 인터페이스 정의(성공/실패 응답 구조)\n2. API 엔드포인트별 응답 타입 정의 파일 생성\n3. API 클라이언트와 타입 정의 연동\n4. 중첩된 API 응답 타입의 재사용성 향상\n5. API 요청 파라미터 타입 정의",
+            "status": "pending",
+            "testStrategy": "실제 API 응답과 정의된 타입의 일치 여부 검증 테스트 작성. 타입 불일치 시 컴파일 오류 발생 확인."
+          },
+          {
+            "id": 3,
+            "title": "컴포넌트 Props 타입 정의 표준화",
+            "description": "React 컴포넌트의 Props 타입 정의를 표준화하고 src/types/components/ 디렉토리에 구성합니다.",
+            "dependencies": [
+              "3.1"
+            ],
+            "details": "1. 컴포넌트 Props 인터페이스 명명 규칙 수립(예: ComponentNameProps)\n2. 공통 Props 타입 추출 및 재사용\n3. 컴포넌트 이벤트 핸들러 타입 표준화\n4. 제네릭 컴포넌트 타입 정의 패턴 수립\n5. 컴포넌트 ref 타입 정의 표준화",
+            "status": "pending",
+            "testStrategy": "TypeScript 컴파일러를 통한 타입 검증. 컴포넌트 사용 시 타입 추론 정확성 테스트."
+          },
+          {
+            "id": 4,
+            "title": "유틸리티 타입 및 타입 가드 구현",
+            "description": "재사용 가능한 유틸리티 타입과 타입 가드 함수를 구현하고 중앙화합니다.",
+            "dependencies": [
+              "3.1",
+              "3.2",
+              "3.3"
+            ],
+            "details": "1. 자주 사용되는 유틸리티 타입 구현(Pick, Omit 등 활용)\n2. 타입 가드 함수 표준화 및 중앙화\n3. 열거형(enum) 대신 union 타입 또는 as const 객체로 전환\n4. 타입 안전성을 위한 헬퍼 함수 구현\n5. 타입 변환 유틸리티 함수 개발",
+            "status": "pending",
+            "testStrategy": "유틸리티 타입과 타입 가드 함수에 대한 단위 테스트 작성. 다양한 사용 사례에 대한 타입 안전성 검증."
+          },
+          {
+            "id": 5,
+            "title": "런타임 타입 검증 라이브러리 도입",
+            "description": "zod 또는 io-ts와 같은 런타임 타입 검증 라이브러리를 도입하여 타입 안전성을 강화합니다.",
+            "dependencies": [
+              "3.1",
+              "3.2",
+              "3.3",
+              "3.4"
+            ],
+            "details": "1. zod와 io-ts 등 런타임 타입 검증 라이브러리 비교 분석\n2. 선택한 라이브러리 도입 및 기본 스키마 정의\n3. API 응답 검증을 위한 스키마 구현\n4. 폼 입력 데이터 검증 스키마 구현\n5. TypeScript 타입과 런타임 검증 스키마 간 동기화 전략 수립",
+            "status": "pending",
+            "testStrategy": "런타임 타입 검증 테스트 케이스 작성. 유효하지 않은 데이터에 대한 오류 처리 검증. 성능 영향 평가."
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "디자인 시스템 토큰 마이그레이션",
+        "description": "하드코딩된 색상, 간격, 타이포그래피 값을 디자인 시스템 토큰으로 마이그레이션합니다.",
+        "details": "1. src/constants/colors.ts의 색상 토큰 검토 및 업데이트\n2. tailwind.config.ts의 간격 스케일 검토 및 표준화\n3. 타이포그래피 시스템 정의(heading/body/caption)\n4. CSS 변수를 활용한 디자인 토큰 구현:\n   ```css\n   :root {\n     --color-primary: #3b82f6;\n     --spacing-sm: 0.5rem;\n     /* 추가 토큰 */\n   }\n   ```\n5. Tailwind CSS 클래스 사용 표준화\n6. 하드코딩된 스타일 값을 토큰으로 대체하는 스크립트 작성\n7. 스타일드 컴포넌트 사용 시 토큰 통합 방법 정의\n8. 디자인 토큰 문서화",
+        "testStrategy": "시각적 회귀 테스트(Storybook 또는 Chromatic). 하드코딩된 값 검출을 위한 린트 규칙 추가. 디자인 토큰 사용 감사(audit) 스크립트 실행.",
+        "priority": "high",
+        "dependencies": [
+          1,
+          2
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "디자인 토큰 시스템 설계 및 구조화",
+            "description": "색상, 간격, 타이포그래피 등 디자인 토큰의 기본 구조를 설계하고 CSS 변수 시스템 구축",
+            "dependencies": [],
+            "details": "1. 디자인 토큰 카테고리 정의(색상, 간격, 타이포그래피, 그림자 등)\n2. 토큰 네이밍 컨벤션 수립(--color-primary, --spacing-sm 등)\n3. CSS 변수 기반 토큰 시스템 구조 설계\n4. 기존 src/constants/colors.ts 분석 및 토큰 매핑\n5. 토큰 계층 구조 설계(기본 토큰, 시맨틱 토큰, 컴포넌트 토큰)",
+            "status": "pending",
+            "testStrategy": "디자인 토큰 구조 검증을 위한 문서 리뷰. 네이밍 컨벤션 일관성 검사. 토큰 계층 구조의 적절성 평가."
+          },
+          {
+            "id": 2,
+            "title": "CSS 변수 기반 토큰 구현",
+            "description": "설계된 디자인 토큰을 CSS 변수로 구현하고 Tailwind 설정과 통합",
+            "dependencies": [
+              "4.1"
+            ],
+            "details": "1. 루트 CSS 파일에 기본 디자인 토큰 변수 정의\n2. tailwind.config.ts 파일 업데이트로 CSS 변수 참조 설정\n3. 색상 토큰 구현(브랜드 색상, 중립 색상, 의미적 색상 등)\n4. 간격 스케일 표준화 및 구현(4px 또는 8px 기반 시스템)\n5. 타이포그래피 토큰 구현(글꼴 패밀리, 크기, 두께, 행간 등)",
+            "status": "pending",
+            "testStrategy": "CSS 변수가 올바르게 정의되었는지 확인. Tailwind 설정과의 통합 테스트. 브라우저 호환성 검사."
+          },
+          {
+            "id": 3,
+            "title": "스타일드 컴포넌트 및 Tailwind 통합",
+            "description": "디자인 토큰을 스타일드 컴포넌트와 Tailwind CSS에 통합하는 방법론 개발",
+            "dependencies": [
+              "4.2"
+            ],
+            "details": "1. 스타일드 컴포넌트에서 CSS 변수 사용 패턴 정의\n2. Tailwind CSS 클래스 사용 표준화 가이드라인 작성\n3. 디자인 토큰과 스타일드 컴포넌트 통합을 위한 유틸리티 함수 개발\n4. 토큰 기반 Tailwind 플러그인 개발 검토\n5. 스타일드 컴포넌트와 Tailwind 혼합 사용 시나리오에 대한 가이드라인 작성",
+            "status": "pending",
+            "testStrategy": "스타일드 컴포넌트에서 토큰 사용 테스트. Tailwind 클래스와 토큰 일관성 검증. 다양한 컴포넌트에서의 적용 테스트."
+          },
+          {
+            "id": 4,
+            "title": "하드코딩된 값 마이그레이션 스크립트 개발",
+            "description": "기존 코드베이스에서 하드코딩된 스타일 값을 디자인 토큰으로 대체하는 자동화 스크립트 개발",
+            "dependencies": [
+              "4.2",
+              "4.3"
+            ],
+            "details": "1. 하드코딩된 색상, 간격, 타이포그래피 값을 감지하는 정규식 패턴 개발\n2. 감지된 하드코딩 값을 해당 디자인 토큰으로 매핑하는 로직 구현\n3. 코드베이스 스캔 및 자동 변환 스크립트 작성\n4. 변환 결과 검증 및 수동 검토 프로세스 정의\n5. 마이그레이션 진행 상황 추적 및 보고 기능 구현",
+            "status": "pending",
+            "testStrategy": "스크립트의 정확성 테스트. 다양한 코드 패턴에 대한 변환 테스트. 변환 후 시각적 회귀 테스트."
+          },
+          {
+            "id": 5,
+            "title": "디자인 토큰 문서화 및 품질 관리",
+            "description": "디자인 토큰 시스템 문서화 및 지속적인 품질 관리를 위한 도구 및 프로세스 구축",
+            "dependencies": [
+              "4.1",
+              "4.2",
+              "4.3",
+              "4.4"
+            ],
+            "details": "1. Storybook을 활용한 디자인 토큰 문서화\n2. 토큰 사용 가이드라인 및 예시 작성\n3. 하드코딩된 값 사용 방지를 위한 ESLint 규칙 개발\n4. 디자인 토큰 사용 현황 감사(audit) 스크립트 개발\n5. 디자인 토큰 변경 관리 및 버전 관리 프로세스 수립",
+            "status": "pending",
+            "testStrategy": "문서의 정확성 및 완전성 검증. ESLint 규칙 테스트. 감사 스크립트 정확성 테스트. 개발자 피드백 수집."
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "파일 구조 재구성 및 도메인 기반 설계 적용",
+        "description": "코드베이스를 도메인 기반 설계 원칙에 따라 재구성하고 관련 컴포넌트를 도메인 경계 내에 통합합니다.",
+        "details": "1. 도메인 경계 식별 및 정의\n2. 새로운 디렉토리 구조 설계:\n   ```\n   src/\n     ├── domains/           # 도메인별 모듈\n     │   ├── auth/\n     │   ├── user/\n     │   └── [기타 도메인]/\n     ├── shared/            # 공유 컴포넌트\n     │   ├── components/\n     │   ├── hooks/\n     │   └── utils/\n     ├── core/              # 핵심 인프라\n     │   ├── api/\n     │   ├── state/\n     │   └── config/\n     └── pages/             # Next.js 페이지\n   ```\n3. 점진적 마이그레이션 계획 수립\n4. 각 도메인 모듈의 public API 정의(index.ts 내보내기 제한)\n5. 도메인 간 의존성 관리 규칙 수립\n6. 공유 컴포넌트 추출 및 재사용성 향상\n7. 상수 및 설정 중앙화",
+        "testStrategy": "디렉토리 구조 검증 스크립트 작성. 순환 의존성 감지 도구 설정(madge). 도메인 경계 위반 감지를 위한 린트 규칙 추가. 각 도메인 모듈의 독립적 테스트 실행.",
+        "priority": "high",
+        "dependencies": [
+          1,
+          3
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "도메인 경계 식별 및 정의",
+            "description": "현재 코드베이스를 분석하여 핵심 도메인을 식별하고 각 도메인의 경계와 책임을 명확히 정의합니다.",
+            "dependencies": [],
+            "details": "1. 비즈니스 로직 분석을 통한 핵심 도메인 식별\n2. 각 도메인의 주요 엔티티, 값 객체, 서비스 정의\n3. 도메인 간 관계 및 의존성 매핑\n4. 도메인별 유비쿼터스 언어(공통 용어) 정의\n5. 각 도메인의 경계와 책임 문서화",
+            "status": "pending",
+            "testStrategy": "도메인 모델 검증 워크숍 진행. 도메인 간 의존성 그래프 시각화. 주요 이해관계자와 도메인 모델 검토."
+          },
+          {
+            "id": 2,
+            "title": "새로운 디렉토리 구조 설계 및 구현",
+            "description": "DDD 원칙에 따라 새로운 디렉토리 구조를 설계하고 기존 코드를 새 구조로 이동할 마이그레이션 계획을 수립합니다.",
+            "dependencies": [
+              "5.1"
+            ],
+            "details": "1. 제안된 디렉토리 구조 상세화 및 문서화\n2. 각 도메인 모듈의 내부 구조 설계(entities, repositories, services 등)\n3. 공유 모듈과 코어 인프라 구성 요소 정의\n4. 디렉토리 구조 검증을 위한 스크립트 작성\n5. 점진적 마이그레이션을 위한 단계별 계획 수립",
+            "status": "pending",
+            "testStrategy": "디렉토리 구조 검증 스크립트 실행. 파일 위치 규칙 준수 여부 자동 검사. 샘플 모듈로 구조 테스트."
+          },
+          {
+            "id": 3,
+            "title": "도메인 모듈의 public API 설계",
+            "description": "각 도메인 모듈의 public API를 설계하고 index.ts 파일을 통해 내보내기를 제한하여 캡슐화를 강화합니다.",
+            "dependencies": [
+              "5.1",
+              "5.2"
+            ],
+            "details": "1. 각 도메인 모듈의 public API 인터페이스 정의\n2. index.ts 파일을 통한 선택적 내보내기 구현\n3. 내부 구현 세부 사항 숨기기 전략 수립\n4. 도메인 API 문서화 및 사용 예제 작성\n5. API 안정성 보장을 위한 버전 관리 전략 수립",
+            "status": "pending",
+            "testStrategy": "모듈 경계 테스트. 비공개 API에 대한 접근 제한 검증. API 변경 시 영향도 분석 자동화."
+          },
+          {
+            "id": 4,
+            "title": "도메인 간 의존성 관리 규칙 구현",
+            "description": "도메인 간 의존성을 관리하기 위한 규칙을 수립하고 이를 강제하는 도구와 프로세스를 구현합니다.",
+            "dependencies": [
+              "5.2",
+              "5.3"
+            ],
+            "details": "1. 도메인 간 의존성 방향 규칙 정의(단방향 의존성 원칙)\n2. 순환 의존성 감지를 위한 madge 설정\n3. 의존성 규칙 위반을 감지하는 ESLint 규칙 추가\n4. 도메인 간 통신을 위한 이벤트 기반 아키텍처 설계\n5. 의존성 주입 패턴 구현 가이드라인 작성",
+            "status": "pending",
+            "testStrategy": "순환 의존성 감지 테스트. ESLint 규칙 검증. 의존성 그래프 시각화 및 분석. 도메인 경계 위반 자동 감지."
+          },
+          {
+            "id": 5,
+            "title": "공유 컴포넌트 추출 및 재사용성 향상",
+            "description": "도메인 간 공유되는 컴포넌트를 식별하여 추출하고, 재사용성을 높이기 위한 설계 패턴을 적용합니다.",
+            "dependencies": [
+              "5.1",
+              "5.2"
+            ],
+            "details": "1. 공유 가능한 UI 컴포넌트 식별 및 추출\n2. 공유 훅, 유틸리티 함수 추출 및 문서화\n3. 컴포넌트 합성 패턴 적용으로 재사용성 향상\n4. 공유 컴포넌트 스토리북 문서화\n5. 상수 및 설정 중앙화 구현",
+            "status": "pending",
+            "testStrategy": "공유 컴포넌트 단위 테스트. 다양한 사용 사례에서의 컴포넌트 동작 검증. 스토리북을 통한 시각적 테스트. 재사용성 메트릭 측정."
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "대형 컴포넌트 분해 및 단일 책임 원칙 적용",
+        "description": "100줄 이상의 대형 컴포넌트를 작고 집중된 모듈로 분해하고 단일 책임 원칙을 적용합니다.",
+        "details": "1. 100줄 이상 컴포넌트 목록 작성\n2. 각 컴포넌트의 책임 분석 및 분해 계획 수립\n3. 컴포넌트 분해 패턴 적용:\n   - 렌더링 로직과 비즈니스 로직 분리\n   - UI 섹션별 하위 컴포넌트 추출\n   - 조건부 렌더링을 별도 컴포넌트로 추출\n4. 컴포넌트 합성 패턴 적용:\n   ```jsx\n   // 기존: 모놀리식 컴포넌트\n   <ComplexForm {...manyProps} />\n   \n   // 개선: 합성 패턴\n   <Form>\n     <Form.Header title=\"제목\" />\n     <Form.Fields>\n       <Form.Field name=\"field1\" />\n     </Form.Fields>\n     <Form.Actions>\n       <Button>제출</Button>\n     </Form.Actions>\n   </Form>\n   ```\n5. 컨텍스트 API를 활용한 prop drilling 감소\n6. 고차 컴포넌트(HOC) 또는 커스텀 훅으로 로직 추출",
+        "testStrategy": "리팩토링 전후 동일한 출력 검증을 위한 스냅샷 테스트. 컴포넌트 단위 테스트 작성. 시각적 회귀 테스트. 사용자 시나리오 기반 통합 테스트.",
+        "priority": "high",
+        "dependencies": [
+          1,
+          2,
+          5
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "대형 컴포넌트 식별 및 분석",
+            "description": "100줄 이상의 대형 컴포넌트를 식별하고 각 컴포넌트의 책임과 기능을 분석합니다.",
+            "dependencies": [],
+            "details": "1. 정적 코드 분석 도구를 사용하여 100줄 이상의 컴포넌트 목록 작성\n2. 각 컴포넌트의 주요 기능과 책임 영역 문서화\n3. 컴포넌트의 복잡도 측정(순환 복잡도, 중첩 수준 등)\n4. 컴포넌트 내 중복 코드 및 패턴 식별\n5. 분해 우선순위 결정 및 리팩토링 계획 수립",
+            "status": "pending",
+            "testStrategy": "정적 분석 도구 보고서 검증, 복잡도 메트릭 측정, 컴포넌트 책임 분석의 정확성 검토"
+          },
+          {
+            "id": 2,
+            "title": "렌더링 로직과 비즈니스 로직 분리",
+            "description": "대형 컴포넌트에서 UI 렌더링 로직과 비즈니스 로직을 분리하여 관심사 분리 원칙을 적용합니다.",
+            "dependencies": [
+              "6.1"
+            ],
+            "details": "1. 비즈니스 로직을 커스텀 훅으로 추출(useXxx 형태)\n2. 데이터 변환 및 계산 로직을 별도 유틸리티 함수로 분리\n3. API 호출 및 상태 관리 로직 분리\n4. 이벤트 핸들러 로직 단순화 및 추출\n5. 순수 UI 컴포넌트와 컨테이너 컴포넌트 패턴 적용",
+            "status": "pending",
+            "testStrategy": "추출된 커스텀 훅과 유틸리티 함수에 대한 단위 테스트 작성, 리팩토링 전후 동작 일치 검증"
+          },
+          {
+            "id": 3,
+            "title": "UI 섹션별 하위 컴포넌트 추출",
+            "description": "대형 컴포넌트의 UI를 논리적 섹션으로 나누고 각 섹션을 독립적인 하위 컴포넌트로 추출합니다.",
+            "dependencies": [
+              "6.1",
+              "6.2"
+            ],
+            "details": "1. UI를 기능적/시각적 섹션으로 분류\n2. 각 섹션을 독립적인 하위 컴포넌트로 추출\n3. 적절한 props 인터페이스 설계\n4. 조건부 렌더링 로직을 별도 컴포넌트로 분리\n5. 반복적인 UI 패턴을 재사용 가능한 컴포넌트로 추출",
+            "status": "pending",
+            "testStrategy": "각 하위 컴포넌트에 대한 스냅샷 테스트, 스토리북을 활용한 시각적 테스트, 다양한 props 조합에 대한 렌더링 검증"
+          },
+          {
+            "id": 4,
+            "title": "컴포넌트 합성 패턴 적용",
+            "description": "추출된 하위 컴포넌트를 조합하여 합성 패턴을 적용하고 컴포넌트 간 인터페이스를 개선합니다.",
+            "dependencies": [
+              "6.3"
+            ],
+            "details": "1. 컴포넌트 합성 패턴 구현(Compound Components)\n2. children prop을 활용한 유연한 컴포넌트 구조 설계\n3. Context API를 활용한 내부 상태 공유 메커니즘 구현\n4. 명시적인 컴포넌트 네임스페이스 구조 적용(Form.Header, Form.Fields 등)\n5. 합성 패턴을 통한 컴포넌트 재사용성 및 유연성 향상",
+            "status": "pending",
+            "testStrategy": "합성 패턴이 적용된 컴포넌트의 다양한 구성 테스트, 컴포넌트 간 상태 공유 검증, 사용자 시나리오 기반 통합 테스트"
+          },
+          {
+            "id": 5,
+            "title": "고차 컴포넌트 및 Context API 활용",
+            "description": "공통 로직을 고차 컴포넌트(HOC)로 추출하고 Context API를 활용하여 prop drilling 문제를 해결합니다.",
+            "dependencies": [
+              "6.2",
+              "6.4"
+            ],
+            "details": "1. 공통 로직을 고차 컴포넌트(HOC)로 추출\n2. Context API를 설계하여 깊은 prop drilling 제거\n3. 성능 최적화를 위한 메모이제이션 전략 적용\n4. 컨텍스트 분리 및 최적화(필요한 경우 여러 컨텍스트로 분리)\n5. 리팩토링 결과 검증 및 성능 측정",
+            "status": "pending",
+            "testStrategy": "HOC와 Context 구현에 대한 단위 테스트, 메모이제이션 효과 검증을 위한 성능 테스트, 리팩토링 전후 동작 일치 확인"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "재사용 가능한 커스텀 훅 추출",
+        "description": "반복되는 로직을 재사용 가능한 커스텀 훅으로 추출하여 코드 중복을 줄이고 일관성을 향상시킵니다.",
+        "details": "1. 컴포넌트 간 중복 로직 식별\n2. 다음 패턴에 대한 커스텀 훅 추출:\n   - 데이터 페칭 및 상태 관리\n   - 폼 처리 및 유효성 검사\n   - 이벤트 핸들러 및 사이드 이펙트\n   - 브라우저 API 접근(localStorage, mediaQuery 등)\n3. 커스텀 훅 구현 예시:\n   ```typescript\n   // src/shared/hooks/useForm.ts\n   export function useForm<T>(initialValues: T) {\n     const [values, setValues] = useState<T>(initialValues);\n     const [errors, setErrors] = useState<Record<keyof T, string>>({} as Record<keyof T, string>);\n     \n     // 폼 처리 로직 구현\n     \n     return { values, errors, handleChange, handleSubmit, reset };\n   }\n   ```\n4. 훅 테스트 전략 수립\n5. 훅 문서화 및 사용 예시 작성\n6. 훅 조합 패턴 적용(여러 훅을 조합하여 복잡한 로직 구현)",
+        "testStrategy": "React Testing Library와 renderHook을 사용한 훅 단위 테스트. 다양한 시나리오와 에지 케이스 테스트. 실제 컴포넌트에서의 통합 테스트.",
+        "priority": "medium",
+        "dependencies": [
+          1,
+          3,
+          6
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "중복 로직 분석 및 추출 대상 식별",
+            "description": "프로젝트 내 컴포넌트 간 중복되는 로직을 분석하고 커스텀 훅으로 추출할 대상을 식별합니다.",
+            "dependencies": [],
+            "details": "1. 프로젝트 코드베이스 전체를 검토하여 컴포넌트 간 반복되는 패턴 식별\n2. 데이터 페칭, 폼 처리, 이벤트 핸들링, 브라우저 API 사용 등의 카테고리별 중복 로직 목록화\n3. 각 중복 로직의 사용 빈도와 복잡도 평가\n4. 추출 우선순위 결정 및 문서화\n5. 각 대상 로직의 입출력 인터페이스 정의",
+            "status": "pending",
+            "testStrategy": "정적 코드 분석 도구를 활용한 중복 코드 식별 및 검증. 추출 대상 로직의 사용 패턴 분석 보고서 작성."
+          },
+          {
+            "id": 2,
+            "title": "데이터 페칭 및 상태 관리 훅 구현",
+            "description": "API 호출과 관련된 상태(로딩, 에러, 데이터)를 관리하는 재사용 가능한 커스텀 훅을 구현합니다.",
+            "dependencies": [
+              "7.1"
+            ],
+            "details": "1. useFetch, useQuery 등의 데이터 페칭 훅 설계\n2. 로딩, 에러, 성공 상태 관리 로직 구현\n3. 캐싱 및 재시도 메커니즘 추가\n4. 의존성 배열을 통한 조건부 요청 지원\n5. 타입스크립트 제네릭을 활용한 타입 안전성 확보\n6. 훅 사용 예시 코드 작성",
+            "status": "pending",
+            "testStrategy": "React Testing Library와 MSW(Mock Service Worker)를 활용한 다양한 API 응답 시나리오 테스트. 성공, 실패, 로딩 상태 전환 검증. 메모리 누수 방지를 위한 cleanup 테스트."
+          },
+          {
+            "id": 3,
+            "title": "폼 처리 및 유효성 검사 훅 구현",
+            "description": "폼 상태 관리, 입력 처리, 유효성 검사를 위한 재사용 가능한 커스텀 훅을 구현합니다.",
+            "dependencies": [
+              "7.1"
+            ],
+            "details": "1. useForm 훅 구현 완성\n2. 필드별 유효성 검사 규칙 설정 기능 추가\n3. 동적 폼 필드 지원 (필드 추가/제거)\n4. 폼 제출 처리 및 API 연동 로직 구현\n5. 필드 종속성 및 조건부 유효성 검사 지원\n6. 다양한 입력 타입(텍스트, 숫자, 체크박스, 셀렉트 등) 지원",
+            "status": "pending",
+            "testStrategy": "다양한 폼 시나리오에 대한 단위 테스트. 유효성 검사 규칙 적용 테스트. 사용자 입력 시뮬레이션을 통한 상태 변화 검증. 에지 케이스(빈 값, 잘못된 형식 등) 처리 테스트."
+          },
+          {
+            "id": 4,
+            "title": "브라우저 API 접근 훅 구현",
+            "description": "localStorage, sessionStorage, mediaQuery, geolocation 등 브라우저 API에 접근하는 재사용 가능한 커스텀 훅을 구현합니다.",
+            "dependencies": [
+              "7.1"
+            ],
+            "details": "1. useLocalStorage 훅 구현 (데이터 저장, 조회, 삭제)\n2. useMediaQuery 훅 구현 (반응형 디자인 지원)\n3. useGeolocation 훅 구현 (위치 정보 접근)\n4. useOnlineStatus 훅 구현 (네트워크 상태 감지)\n5. SSR 환경에서의 안전한 브라우저 API 접근 처리\n6. 브라우저 호환성 고려 및 폴백 메커니즘 구현",
+            "status": "pending",
+            "testStrategy": "JSDOM 환경에서의 브라우저 API 모킹. 다양한 브라우저 환경 시뮬레이션. SSR/CSR 전환 시나리오 테스트. 메모리 누수 방지를 위한 이벤트 리스너 정리 검증."
+          },
+          {
+            "id": 5,
+            "title": "훅 문서화 및 테스트 자동화",
+            "description": "구현된 모든 커스텀 훅에 대한 문서화, 사용 예시, 테스트 자동화를 구현합니다.",
+            "dependencies": [
+              "7.2",
+              "7.3",
+              "7.4"
+            ],
+            "details": "1. 각 훅의 목적, 매개변수, 반환값을 명확히 문서화\n2. JSDoc 주석을 활용한 인라인 문서화\n3. Storybook을 활용한 훅 사용 예시 구현\n4. 자동화된 테스트 스위트 구성\n5. 훅 조합 패턴 및 고급 사용 사례 문서화\n6. 훅 사용 시 주의사항 및 모범 사례 정리",
+            "status": "pending",
+            "testStrategy": "문서와 실제 구현의 일치성 검증. 예시 코드의 실행 테스트. CI/CD 파이프라인에 훅 테스트 통합. 코드 커버리지 측정 및 보고서 생성."
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "상태 관리 최적화",
+        "description": "Zustand 패턴 적용, React Query 최적화, 컨텍스트 최적화 및 상태 배치를 통해 상태 관리를 개선합니다.",
+        "details": "1. Zustand 스토어 구조화:\n   ```typescript\n   // src/core/state/store.ts\n   import create from 'zustand';\n   import { userSlice } from './slices/userSlice';\n   import { uiSlice } from './slices/uiSlice';\n   \n   export const useStore = create((...args) => ({\n     ...userSlice(...args),\n     ...uiSlice(...args),\n   }));\n   ```\n2. React Query 최적화:\n   - 쿼리 키 구조화 및 표준화\n   - 캐싱 전략 최적화(staleTime, cacheTime)\n   - 쿼리 무효화 패턴 구현\n   - 페이지네이션 및 무한 스크롤 최적화\n3. 컨텍스트 최적화:\n   - 상태와 디스패치 분리\n   - 메모이제이션 적용\n   - 컨텍스트 분할로 불필요한 리렌더링 방지\n4. 상태 배치 원칙 적용:\n   - 전역 상태 최소화\n   - 컴포넌트 로컬 상태 활용\n   - 파생 상태 계산 최적화(useMemo)\n5. 상태 관리 도구 간 상호작용 패턴 정의",
+        "testStrategy": "상태 변경에 따른 컴포넌트 리렌더링 테스트. React Query 캐싱 및 무효화 테스트. 메모리 누수 검사. 비동기 상태 관리 테스트. 상태 지속성(persistence) 테스트.",
+        "priority": "high",
+        "dependencies": [
+          1,
+          3,
+          7
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Zustand 스토어 구조화 및 최적화",
+            "description": "Zustand 스토어를 모듈화하고 타입 안전성을 개선하며 미들웨어를 적용합니다.",
+            "dependencies": [],
+            "details": "1. 도메인별 슬라이스 구조 개선 (userSlice, uiSlice 등)\n2. 타입스크립트 타입 정의 강화\n3. persist, devtools 등 미들웨어 통합\n4. 선택자 함수 최적화 (shallow 비교 적용)\n5. 상태 변경 로직 단순화 및 불변성 보장",
+            "status": "pending",
+            "testStrategy": "스토어 초기화 테스트, 상태 업데이트 테스트, 미들웨어 동작 검증, 메모리 누수 검사, 타입 안전성 검증"
+          },
+          {
+            "id": 2,
+            "title": "React Query 캐싱 및 데이터 패칭 최적화",
+            "description": "React Query의 캐싱 전략을 최적화하고 표준화된 쿼리 키 구조를 구현합니다.",
+            "dependencies": [
+              "8.1"
+            ],
+            "details": "1. 쿼리 키 팩토리 구현으로 일관된 키 구조 생성\n2. staleTime, cacheTime 최적화 (데이터 유형별 차별화)\n3. 쿼리 무효화 패턴 구현 (CRUD 작업 후 자동 무효화)\n4. 페이지네이션 및 무한 스크롤 쿼리 최적화\n5. 에러 처리 및 재시도 전략 구현",
+            "status": "pending",
+            "testStrategy": "캐시 적중률 테스트, 쿼리 무효화 검증, 네트워크 요청 최소화 확인, 오프라인 상태에서의 동작 테스트"
+          },
+          {
+            "id": 3,
+            "title": "컨텍스트 API 최적화 및 리렌더링 방지",
+            "description": "React 컨텍스트 구조를 개선하여 불필요한 리렌더링을 방지하고 성능을 향상시킵니다.",
+            "dependencies": [
+              "8.1",
+              "8.2"
+            ],
+            "details": "1. 상태와 디스패치 함수 분리 (별도 컨텍스트 제공)\n2. React.memo와 useMemo를 활용한 메모이제이션 적용\n3. 컨텍스트 분할로 변경 범위 최소화\n4. 컨텍스트 값 변경 감지 최적화\n5. 컨텍스트와 Zustand 간 상호작용 패턴 구현",
+            "status": "pending",
+            "testStrategy": "리렌더링 횟수 측정, 메모리 사용량 모니터링, 컴포넌트 트리 깊이에 따른 성능 테스트"
+          },
+          {
+            "id": 4,
+            "title": "상태 배치 원칙 구현 및 코드 리팩토링",
+            "description": "상태 배치 원칙을 적용하여 전역/로컬 상태를 최적화하고 기존 코드를 리팩토링합니다.",
+            "dependencies": [
+              "8.1",
+              "8.2",
+              "8.3"
+            ],
+            "details": "1. 전역 상태 최소화 (필수 공유 데이터만 유지)\n2. 컴포넌트 로컬 상태 활용 확대 (useState, useReducer)\n3. 파생 상태 계산 최적화 (useMemo, useCallback)\n4. 상태 접근 패턴 표준화 (훅 기반 인터페이스)\n5. 기존 코드 리팩토링 및 상태 관리 패턴 적용",
+            "status": "pending",
+            "testStrategy": "상태 변경에 따른 리렌더링 테스트, 메모리 사용량 비교, 컴포넌트 격리 테스트, 성능 프로파일링"
+          },
+          {
+            "id": 5,
+            "title": "상태 관리 도구 간 통합 및 성능 모니터링",
+            "description": "다양한 상태 관리 도구 간 상호작용 패턴을 정의하고 성능 모니터링 시스템을 구축합니다.",
+            "dependencies": [
+              "8.1",
+              "8.2",
+              "8.3",
+              "8.4"
+            ],
+            "details": "1. Zustand와 React Query 통합 패턴 구현\n2. 컨텍스트와 Zustand 간 데이터 흐름 최적화\n3. 상태 변경 추적 및 디버깅 도구 구현\n4. 성능 메트릭 수집 및 모니터링 시스템 구축\n5. 상태 관리 가이드라인 및 모범 사례 문서화",
+            "status": "pending",
+            "testStrategy": "통합 테스트, 성능 벤치마크, 메모리 누수 검사, 실제 사용자 시나리오 테스트, 디버깅 도구 유효성 검증"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "API 통합 개선",
+        "description": "일관된 오류 처리, 로딩 상태, 캐시 관리 및 API 유틸리티를 구현하여 API 통합을 개선합니다.",
+        "details": "1. API 클라이언트 표준화:\n   ```typescript\n   // src/core/api/client.ts\n   import axios from 'axios';\n   \n   export const apiClient = axios.create({\n     baseURL: process.env.NEXT_PUBLIC_API_URL,\n     timeout: 10000,\n     headers: {\n       'Content-Type': 'application/json',\n     },\n   });\n   \n   // 인터셉터 설정\n   apiClient.interceptors.request.use(/* 인증 토큰 추가 등 */);\n   apiClient.interceptors.response.use(\n     response => response,\n     error => {\n       // 표준화된 오류 처리\n       return Promise.reject(error);\n     }\n   );\n   ```\n2. React Query와 통합된 API 훅 구현:\n   ```typescript\n   // src/core/api/hooks/useData.ts\n   import { useQuery } from '@tanstack/react-query';\n   import { apiClient } from '../client';\n   \n   export function useData<T>(endpoint: string, queryKey: unknown[], options = {}) {\n     return useQuery({\n       queryKey,\n       queryFn: async () => {\n         const response = await apiClient.get<T>(endpoint);\n         return response.data;\n       },\n       ...options,\n     });\n   }\n   ```\n3. 오류 경계 패턴 구현\n4. 일관된 로딩 및 스켈레톤 컴포넌트 표준화\n5. React Query 캐시 무효화 전략 구현\n6. API 응답 매핑 및 변환 유틸리티 작성\n7. 오프라인 지원 및 낙관적 업데이트 패턴 구현",
+        "testStrategy": "API 모킹을 통한 성공/실패 시나리오 테스트. 네트워크 지연 및 오류 시뮬레이션. 캐시 동작 검증. 오류 경계 테스트. 오프라인 동작 테스트.",
+        "priority": "high",
+        "dependencies": [
+          3,
+          7,
+          8
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "API 인터셉터 및 오류 처리 개선",
+            "description": "API 클라이언트의 인터셉터를 확장하여 인증 토큰 관리, 표준화된 오류 처리 및 네트워크 상태 모니터링을 구현합니다.",
+            "dependencies": [],
+            "details": "1. 인증 토큰 자동 추가 및 갱신 로직 구현\n2. 오류 응답 표준화 (에러 코드, 메시지 형식 통일)\n3. 네트워크 상태 감지 및 오프라인 모드 처리\n4. 401/403 오류 시 인증 갱신 또는 로그아웃 로직 구현\n5. 글로벌 오류 알림 시스템과 연동",
+            "status": "pending",
+            "testStrategy": "다양한 오류 상황(401, 403, 404, 500 등)에 대한 모의 응답 테스트, 토큰 만료 및 갱신 시나리오 테스트, 네트워크 연결 끊김 상황 시뮬레이션"
+          },
+          {
+            "id": 2,
+            "title": "React Query 훅 확장 및 표준화",
+            "description": "기존 React Query 훅을 확장하여 데이터 조회, 변이, 무한 스크롤 등 다양한 API 패턴을 지원하는 표준화된 훅 세트를 개발합니다.",
+            "dependencies": [
+              "9.1"
+            ],
+            "details": "1. useQuery 기반 데이터 조회 훅 확장(useData, useEntity 등)\n2. useMutation 기반 데이터 변경 훅 개발(useCreate, useUpdate, useDelete)\n3. useInfiniteQuery 기반 무한 스크롤/페이지네이션 훅 구현\n4. 낙관적 업데이트 패턴 표준화 및 유틸리티 함수 개발\n5. 타입 안전성이 보장된 제네릭 훅 인터페이스 설계",
+            "status": "pending",
+            "testStrategy": "각 훅의 성공/실패 시나리오 테스트, 낙관적 업데이트 및 롤백 테스트, 무한 스크롤 동작 검증, 타입 안전성 검증"
+          },
+          {
+            "id": 3,
+            "title": "로딩 및 오류 상태 UI 컴포넌트 개발",
+            "description": "API 요청의 로딩, 오류, 빈 상태를 일관되게 표시하기 위한 재사용 가능한 UI 컴포넌트 세트를 개발합니다.",
+            "dependencies": [
+              "9.1",
+              "9.2"
+            ],
+            "details": "1. 다양한 크기와 스타일의 스켈레톤 로더 컴포넌트 개발\n2. 데이터 로딩 상태 래퍼 컴포넌트(DataLoader) 구현\n3. 오류 표시 및 재시도 기능이 있는 ErrorBoundary 컴포넌트 개발\n4. 빈 상태 및 결과 없음 UI 패턴 구현\n5. 로딩/오류 상태 관리를 위한 커스텀 훅 개발",
+            "status": "pending",
+            "testStrategy": "다양한 로딩/오류 상태에서의 컴포넌트 렌더링 테스트, 접근성 검증, 반응형 디자인 테스트, 사용자 상호작용(재시도 등) 테스트"
+          },
+          {
+            "id": 4,
+            "title": "캐시 관리 전략 구현",
+            "description": "React Query 캐시 관리를 위한 전략을 구현하여 데이터 일관성, 캐시 무효화 및 최적화된 리페칭을 보장합니다.",
+            "dependencies": [
+              "9.2"
+            ],
+            "details": "1. 쿼리 키 구조 표준화 및 팩토리 함수 개발\n2. 관련 엔티티 간 캐시 무효화 자동화 메커니즘 구현\n3. 백그라운드 리페칭 및 폴링 전략 설정\n4. 캐시 지속성 구현(localStorage/sessionStorage 활용)\n5. 사용자 행동 기반 프리페칭 전략 개발",
+            "status": "pending",
+            "testStrategy": "캐시 무효화 시나리오 테스트, 데이터 일관성 검증, 메모리 사용량 모니터링, 다양한 캐싱 전략의 성능 비교 테스트"
+          },
+          {
+            "id": 5,
+            "title": "API 응답 변환 및 정규화 유틸리티 개발",
+            "description": "API 응답을 프론트엔드 모델로 변환하고 정규화하는 유틸리티 함수를 개발하여 데이터 일관성과 사용 편의성을 향상시킵니다.",
+            "dependencies": [
+              "9.1",
+              "9.2"
+            ],
+            "details": "1. API 응답을 도메인 모델로 변환하는 매퍼 함수 개발\n2. 중첩된 API 응답을 정규화하는 유틸리티 구현\n3. 타입 안전성이 보장된 변환 파이프라인 구축\n4. zod 또는 유사 라이브러리를 활용한 런타임 데이터 검증 구현\n5. 일관된 날짜, 통화 등의 포맷팅 유틸리티 통합",
+            "status": "pending",
+            "testStrategy": "다양한 API 응답 구조에 대한 변환 테스트, 잘못된 데이터 형식 처리 테스트, 성능 벤치마킹, 타입 안전성 검증"
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "React 성능 최적화 구현",
+        "description": "React.memo, useCallback, 지연 로딩, Suspense 및 JSX 최적화를 통해 React 성능을 개선합니다.",
+        "details": "1. 메모이제이션 적용:\n   ```jsx\n   // 비용이 많이 드는 컴포넌트에 React.memo 적용\n   const ExpensiveComponent = React.memo(function ExpensiveComponent(props) {\n     // 컴포넌트 구현\n   });\n   ```\n2. 콜백 최적화:\n   ```jsx\n   // useCallback으로 이벤트 핸들러 메모이제이션\n   const handleClick = useCallback(() => {\n     // 이벤트 처리 로직\n   }, [/* 의존성 */]);\n   ```\n3. 지연 로딩 구현:\n   ```jsx\n   // 동적 임포트로 무거운 컴포넌트 지연 로딩\n   const HeavyComponent = dynamic(() => import('../components/HeavyComponent'), {\n     loading: () => <LoadingPlaceholder />,\n     ssr: false, // 필요한 경우\n   });\n   ```\n4. Suspense 통합:\n   ```jsx\n   <Suspense fallback={<LoadingUI />}>\n     <LazyLoadedContent />\n   </Suspense>\n   ```\n5. JSX 최적화:\n   - 인라인 익명 함수 제거\n   - 불필요한 중첩 요소 제거\n   - 조건부 렌더링 최적화\n6. 렌더링 최적화 도구 설정(React DevTools Profiler, why-did-you-render)",
+        "testStrategy": "React DevTools Profiler를 사용한 렌더링 성능 측정. 컴포넌트 리렌더링 횟수 추적. 메모리 사용량 모니터링. 사용자 인터랙션 지연 측정.",
+        "priority": "high",
+        "dependencies": [
+          6,
+          7,
+          8
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "메모이제이션 기법 구현",
+            "description": "React.memo와 useMemo를 사용하여 비용이 많이 드는 컴포넌트와 계산을 최적화합니다.",
+            "dependencies": [],
+            "details": "1. 렌더링 비용이 높은 컴포넌트 식별\n2. React.memo 적용 기준 수립(props 변경 빈도, 렌더링 비용 등)\n3. React.memo 래퍼 구현\n4. useMemo를 사용하여 비용이 많이 드는 계산 최적화\n5. 커스텀 비교 함수 구현(필요한 경우)\n6. 메모이제이션 전후 성능 측정",
+            "status": "pending",
+            "testStrategy": "React DevTools Profiler를 사용하여 메모이제이션 전후 렌더링 횟수 비교. 컴포넌트 렌더링 시간 측정. 다양한 시나리오에서 메모이제이션 효과 검증."
+          },
+          {
+            "id": 2,
+            "title": "이벤트 핸들러 최적화",
+            "description": "useCallback을 사용하여 이벤트 핸들러를 메모이제이션하고 불필요한 리렌더링을 방지합니다.",
+            "dependencies": [
+              "10.1"
+            ],
+            "details": "1. 자주 사용되는 이벤트 핸들러 식별\n2. useCallback으로 이벤트 핸들러 래핑\n3. 의존성 배열 최적화\n4. 인라인 함수를 메모이제이션된 콜백으로 교체\n5. 자식 컴포넌트로 전달되는 함수 props 최적화\n6. 이벤트 위임 패턴 구현(적절한 경우)",
+            "status": "pending",
+            "testStrategy": "React DevTools를 사용하여 콜백 변경으로 인한 리렌더링 추적. 이벤트 핸들러 최적화 전후 성능 비교. 메모리 사용량 모니터링."
+          },
+          {
+            "id": 3,
+            "title": "코드 분할 및 지연 로딩 구현",
+            "description": "동적 임포트와 React.lazy를 사용하여 코드 분할 및 지연 로딩을 구현합니다.",
+            "dependencies": [],
+            "details": "1. 지연 로딩이 필요한 대형 컴포넌트 식별\n2. Next.js dynamic 임포트 또는 React.lazy 설정\n3. 로딩 플레이스홀더 컴포넌트 구현\n4. 경로 기반 코드 분할 구성\n5. 사용자 상호작용 기반 지연 로딩 구현(예: 버튼 클릭 시)\n6. 번들 분석 및 최적화",
+            "status": "pending",
+            "testStrategy": "번들 크기 분석(webpack-bundle-analyzer). 초기 로드 시간 측정. 지연 로딩 트리거 테스트. 네트워크 조건 변화에 따른 사용자 경험 테스트."
+          },
+          {
+            "id": 4,
+            "title": "Suspense 및 에러 경계 통합",
+            "description": "React Suspense와 에러 경계를 사용하여 로딩 상태와 오류 처리를 개선합니다.",
+            "dependencies": [
+              "10.3"
+            ],
+            "details": "1. Suspense 경계 설계 및 배치\n2. 다양한 로딩 상태를 위한 폴백 UI 구현\n3. 중첩된 Suspense 구성(필요한 경우)\n4. 에러 경계 컴포넌트 구현\n5. Suspense와 에러 경계 통합\n6. 데이터 페칭 라이브러리와 Suspense 통합(React Query, SWR 등)",
+            "status": "pending",
+            "testStrategy": "다양한 네트워크 상태에서 Suspense 동작 테스트. 에러 경계 복구 메커니즘 검증. 사용자 경험 평가를 위한 사용성 테스트."
+          },
+          {
+            "id": 5,
+            "title": "렌더링 최적화 및 성능 모니터링",
+            "description": "JSX 최적화, 렌더링 최적화 도구 설정 및 지속적인 성능 모니터링 시스템을 구축합니다.",
+            "dependencies": [
+              "10.1",
+              "10.2",
+              "10.3",
+              "10.4"
+            ],
+            "details": "1. JSX 최적화 적용(인라인 함수 제거, 불필요한 중첩 요소 제거)\n2. 조건부 렌더링 패턴 최적화\n3. React DevTools Profiler 설정 및 사용 가이드 작성\n4. why-did-you-render 라이브러리 통합\n5. 성능 메트릭 수집 및 모니터링 시스템 구축\n6. 성능 회귀 테스트 자동화",
+            "status": "pending",
+            "testStrategy": "Lighthouse 성능 점수 측정. Core Web Vitals 모니터링. 실제 사용자 메트릭(RUM) 수집. A/B 테스트를 통한 최적화 효과 검증."
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "이미지 및 자산 최적화",
+        "description": "Next.js Image 컴포넌트, 반응형 이미지, 최신 포맷, 지연 로딩 및 사전 로딩을 구현하여 이미지와 자산을 최적화합니다.",
+        "details": "1. Next.js Image 컴포넌트로 마이그레이션:\n   ```jsx\n   // 기존 img 태그\n   <img src=\"/images/photo.jpg\" alt=\"설명\" />\n   \n   // Next.js Image 컴포넌트\n   import Image from 'next/image';\n   \n   <Image\n     src=\"/images/photo.jpg\"\n     alt=\"설명\"\n     width={800}\n     height={600}\n     placeholder=\"blur\"\n     blurDataURL=\"data:image/jpeg;base64,...\"\n   />\n   ```\n2. 반응형 이미지 구현:\n   ```jsx\n   <Image\n     src=\"/images/hero.jpg\"\n     alt=\"히어로 이미지\"\n     sizes=\"(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw\"\n     fill\n     style={{ objectFit: 'cover' }}\n   />\n   ```\n3. 최신 이미지 포맷 적용:\n   - next.config.js에서 이미지 최적화 설정\n   - WebP/AVIF 포맷 지원 구성\n   - 폴백 이미지 전략 구현\n4. 지연 로딩 구현:\n   - 뷰포트 아래 이미지에 loading=\"lazy\" 적용\n   - Intersection Observer API 활용\n5. 중요 이미지 사전 로딩:\n   ```jsx\n   // pages/_app.js 또는 Layout 컴포넌트\n   import Head from 'next/head';\n   \n   <Head>\n     <link rel=\"preload\" href=\"/images/critical.jpg\" as=\"image\" />\n   </Head>\n   ```\n6. 레이아웃 시프트 방지:\n   - 이미지 크기 명시\n   - 이미지 컨테이너에 aspect-ratio 적용\n   - 스켈레톤 UI 구현",
+        "testStrategy": "Lighthouse 이미지 최적화 점수 측정. 이미지 로딩 시간 및 크기 비교. CLS(Cumulative Layout Shift) 측정. 다양한 디바이스 및 네트워크 조건에서 테스트.",
+        "priority": "high",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Next.js Image 컴포넌트 마이그레이션",
+            "description": "기존 img 태그를 Next.js Image 컴포넌트로 변환하고 최적화 옵션 적용하기",
+            "dependencies": [],
+            "details": "1. 프로젝트 내 모든 img 태그 식별\n2. 각 이미지에 적절한 width, height 속성 결정\n3. placeholder 및 blurDataURL 옵션 구성\n4. 이미지 품질 및 로딩 우선순위 설정\n5. 기존 CSS 스타일을 Next.js Image 컴포넌트에 맞게 조정",
+            "status": "pending",
+            "testStrategy": "변환된 이미지의 로딩 시간 측정, Lighthouse 성능 점수 비교, 이미지 렌더링 품질 확인"
+          },
+          {
+            "id": 2,
+            "title": "반응형 이미지 구현",
+            "description": "다양한 화면 크기와 디바이스에 최적화된 반응형 이미지 시스템 구축",
+            "dependencies": [
+              "11.1"
+            ],
+            "details": "1. 주요 브레이크포인트 정의 (모바일, 태블릿, 데스크톱)\n2. 각 이미지에 적절한 sizes 속성 구성\n3. fill 속성과 objectFit 스타일 적용\n4. 아트 디렉션을 위한 다중 소스 이미지 구현\n5. 반응형 이미지 컨테이너 스타일링",
+            "status": "pending",
+            "testStrategy": "다양한 화면 크기에서 이미지 렌더링 테스트, 네트워크 패널에서 적절한 이미지 크기 로드 확인"
+          },
+          {
+            "id": 3,
+            "title": "최신 이미지 포맷 및 최적화 설정",
+            "description": "WebP, AVIF 등 최신 이미지 포맷 지원 및 next.config.js 최적화 설정",
+            "dependencies": [
+              "11.1"
+            ],
+            "details": "1. next.config.js에 이미지 최적화 설정 구성\n2. WebP 및 AVIF 포맷 지원 활성화\n3. 이미지 품질 및 크기 최적화 매개변수 조정\n4. 외부 도메인 이미지 최적화 설정\n5. 폴백 이미지 전략 구현",
+            "status": "pending",
+            "testStrategy": "다양한 브라우저에서 이미지 포맷 지원 테스트, 이미지 크기 감소율 측정, 로딩 시간 개선 확인"
+          },
+          {
+            "id": 4,
+            "title": "지연 로딩 및 Intersection Observer 구현",
+            "description": "뷰포트 밖 이미지의 지연 로딩 구현 및 Intersection Observer API 활용",
+            "dependencies": [
+              "11.1",
+              "11.2"
+            ],
+            "details": "1. 뷰포트 밖 이미지에 loading='lazy' 속성 적용\n2. Intersection Observer API를 활용한 커스텀 지연 로딩 구현\n3. 스크롤 이벤트에 따른 이미지 로딩 최적화\n4. 로딩 상태 표시를 위한 스켈레톤 UI 구현\n5. 지연 로딩 임계값 최적화",
+            "status": "pending",
+            "testStrategy": "스크롤 시 이미지 로딩 동작 확인, 네트워크 사용량 측정, 메모리 사용량 모니터링"
+          },
+          {
+            "id": 5,
+            "title": "중요 이미지 사전 로딩 및 레이아웃 시프트 방지",
+            "description": "핵심 이미지 사전 로딩 구현 및 CLS(Cumulative Layout Shift) 최소화",
+            "dependencies": [
+              "11.1",
+              "11.2",
+              "11.3",
+              "11.4"
+            ],
+            "details": "1. 중요 이미지 식별 및 우선순위 지정\n2. Head 컴포넌트에 preload 링크 추가\n3. 이미지 컨테이너에 aspect-ratio CSS 속성 적용\n4. 이미지 로딩 전 공간 예약을 위한 스켈레톤 UI 구현\n5. Core Web Vitals 모니터링 및 CLS 최적화",
+            "status": "pending",
+            "testStrategy": "CLS 측정 및 개선 확인, 초기 로딩 시간 측정, 사용자 경험 테스트"
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "title": "번들 및 코드 최적화",
+        "description": "코드 분할, 트리 쉐이킹, 의존성 감사, CSS 최적화 및 스크립트 로딩 전략을 구현하여 번들 및 코드를 최적화합니다.",
+        "details": "1. 코드 분할 구현:\n   - 라우트 기반 분할(Next.js 기본 제공)\n   - 컴포넌트 기반 분할(dynamic import)\n   - 공급업체 청크 분리(vendor chunk)\n2. 트리 쉐이킹 최적화:\n   - 사용하지 않는 임포트 제거\n   - 사용하지 않는 코드 제거\n   - 사이드 이펙트 최소화(package.json의 sideEffects 필드)\n3. 의존성 감사:\n   - npm-check 또는 depcheck로 사용하지 않는 패키지 식별\n   - 번들 크기 영향이 큰 패키지 최적화\n   - 필요한 모듈만 임포트(lodash-es 등)\n4. CSS 최적화:\n   - 사용하지 않는 스타일 제거(PurgeCSS)\n   - 중요 CSS 구현(Critical CSS)\n   - CSS 분할 및 지연 로딩\n5. 스크립트 로딩 최적화:\n   - 비동기/지연 로딩 전략 적용\n   - 스크립트 우선순위 지정\n   - 리소스 힌트 사용(preload, prefetch, preconnect)",
+        "testStrategy": "webpack-bundle-analyzer로 번들 크기 분석. 페이지별 로드 시간 측정. 첫 번째 바이트까지의 시간(TTFB) 및 상호 작용까지의 시간(TTI) 측정. 코드 커버리지 분석으로 사용하지 않는 코드 식별.",
+        "priority": "high",
+        "dependencies": [
+          2,
+          10
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "코드 분할 및 동적 임포트 구현",
+            "description": "라우트 기반 분할, 컴포넌트 기반 분할 및 공급업체 청크 분리를 구현하여 초기 로딩 시간을 개선합니다.",
+            "dependencies": [],
+            "details": "1. Next.js의 기본 라우트 기반 코드 분할 확인 및 최적화\n2. React.lazy()와 dynamic import를 사용한 컴포넌트 기반 분할 구현\n3. 공급업체 청크 분리를 위한 webpack 설정 최적화\n4. 코드 분할 경계 식별 및 구현\n5. 로딩 상태 및 오류 처리 컴포넌트 개발",
+            "status": "pending",
+            "testStrategy": "webpack-bundle-analyzer를 사용하여 분할된 청크 크기 분석, Lighthouse를 통한 초기 로딩 시간 측정, 네트워크 스로틀링 조건에서 사용자 경험 테스트"
+          },
+          {
+            "id": 2,
+            "title": "트리 쉐이킹 및 번들 최적화",
+            "description": "사용하지 않는 코드 제거, 사이드 이펙트 최소화 및 번들 크기 최적화를 통해 애플리케이션 성능을 향상시킵니다.",
+            "dependencies": [
+              "12.1"
+            ],
+            "details": "1. package.json에 sideEffects 필드 구성\n2. ESLint의 no-unused-imports 규칙 적용\n3. 번들 분석기를 사용하여 사용하지 않는 코드 식별\n4. import/export 구문 최적화\n5. babel-plugin-transform-imports 설정으로 부분 임포트 자동화",
+            "status": "pending",
+            "testStrategy": "최적화 전후 번들 크기 비교, 코드 커버리지 분석으로 사용되지 않는 코드 식별, 성능 메트릭스 측정"
+          },
+          {
+            "id": 3,
+            "title": "의존성 감사 및 최적화",
+            "description": "사용하지 않는 패키지 식별, 대체 가능한 경량 라이브러리 검토 및 부분 임포트 구현을 통해 의존성을 최적화합니다.",
+            "dependencies": [
+              "12.2"
+            ],
+            "details": "1. npm-check 또는 depcheck를 사용하여 사용하지 않는 패키지 식별\n2. 번들 크기에 큰 영향을 미치는 패키지 목록 작성\n3. 대체 가능한 경량 라이브러리 조사 및 교체 계획 수립\n4. lodash, moment 등 큰 패키지의 부분 임포트 구현\n5. 중복 패키지 및 버전 충돌 해결",
+            "status": "pending",
+            "testStrategy": "의존성 그래프 분석, 최적화 전후 번들 크기 비교, 기능 회귀 테스트"
+          },
+          {
+            "id": 4,
+            "title": "CSS 최적화 및 스타일 로딩 전략",
+            "description": "사용하지 않는 스타일 제거, 중요 CSS 구현 및 CSS 분할을 통해 스타일 로딩을 최적화합니다.",
+            "dependencies": [
+              "12.1",
+              "12.2"
+            ],
+            "details": "1. PurgeCSS 설정으로 사용하지 않는 스타일 제거\n2. Critical CSS 추출 및 인라인 삽입\n3. CSS 모듈 또는 CSS-in-JS 접근 방식 최적화\n4. CSS 분할 및 지연 로딩 구현\n5. 미디어 쿼리 최적화 및 중복 스타일 통합",
+            "status": "pending",
+            "testStrategy": "스타일시트 크기 측정, 렌더링 성능 분석, 시각적 회귀 테스트, 다양한 디바이스에서의 스타일 로딩 테스트"
+          },
+          {
+            "id": 5,
+            "title": "스크립트 로딩 최적화 및 리소스 힌트 구현",
+            "description": "비동기/지연 로딩 전략, 스크립트 우선순위 지정 및 리소스 힌트를 구현하여 스크립트 로딩을 최적화합니다.",
+            "dependencies": [
+              "12.1",
+              "12.2",
+              "12.3",
+              "12.4"
+            ],
+            "details": "1. 스크립트에 async/defer 속성 적용\n2. 중요 리소스에 preload 힌트 구현\n3. 향후 탐색을 위한 prefetch 전략 개발\n4. 외부 도메인 연결을 위한 preconnect 힌트 추가\n5. 스크립트 실행 우선순위 최적화 및 메인 스레드 차단 최소화",
+            "status": "pending",
+            "testStrategy": "웹 바이탈 메트릭스(LCP, FID, CLS) 측정, 네트워크 워터폴 분석, 다양한 네트워크 조건에서의 로딩 성능 테스트"
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "title": "성능 모니터링 및 알림 설정",
+        "description": "Core Web Vitals 추적, 성능 회귀 테스트, 자동화된 알림을 구현하여 성능 모니터링 시스템을 설정합니다.",
+        "details": "1. Core Web Vitals 모니터링 설정:\n   ```javascript\n   // pages/_app.js\n   import { useEffect } from 'react';\n   import { getCLS, getFID, getLCP, getFCP, getTTFB } from 'web-vitals';\n   \n   function reportWebVitals({ name, delta, id, value }) {\n     // 분석 서비스로 데이터 전송(Google Analytics, Sentry 등)\n     console.log(name, delta, id, value);\n   }\n   \n   useEffect(() => {\n     getCLS(reportWebVitals);\n     getFID(reportWebVitals);\n     getLCP(reportWebVitals);\n     getFCP(reportWebVitals);\n     getTTFB(reportWebVitals);\n   }, []);\n   ```\n2. Sentry 또는 유사 서비스 통합:\n   - 성능 모니터링 설정\n   - 오류 추적 및 보고\n   - 사용자 세션 기록\n3. 자동화된 성능 테스트:\n   - Lighthouse CI 설정\n   - GitHub Actions와 통합\n   - 성능 회귀 감지\n4. 알림 시스템 구현:\n   - 성능 임계값 설정\n   - Slack/이메일 알림 구성\n   - 대시보드 구현\n5. 실사용자 모니터링(RUM) 설정:\n   - 실제 사용자 경험 데이터 수집\n   - 지역별, 디바이스별 성능 분석\n   - 사용자 여정 추적",
+        "testStrategy": "모니터링 시스템 자체 테스트. 알림 트리거 테스트. 성능 회귀 시뮬레이션. 다양한 환경(디바이스, 브라우저, 네트워크)에서의 데이터 수집 검증.",
+        "priority": "medium",
+        "dependencies": [
+          10,
+          11,
+          12
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Core Web Vitals 모니터링 시스템 구축",
+            "description": "web-vitals 라이브러리를 사용하여 Core Web Vitals 데이터를 수집하고 분석 서비스에 전송하는 시스템 구축",
+            "dependencies": [],
+            "details": "1. web-vitals 라이브러리 통합 완료\n2. Google Analytics 또는 다른 분석 서비스와 연동\n3. 실시간 데이터 수집 파이프라인 구축\n4. 사용자 세션별 성능 데이터 분류 및 저장\n5. 데이터 시각화를 위한 기본 구조 설정",
+            "status": "pending",
+            "testStrategy": "다양한 환경(브라우저, 디바이스)에서 Web Vitals 데이터가 정확히 수집되는지 검증. 분석 서비스에 데이터가 올바르게 전송되는지 확인. 네트워크 지연 상황에서의 동작 테스트."
+          },
+          {
+            "id": 2,
+            "title": "Sentry 통합 및 오류 추적 시스템 설정",
+            "description": "Sentry 또는 유사 서비스를 통합하여 성능 모니터링, 오류 추적 및 사용자 세션 기록 구현",
+            "dependencies": [
+              "13.1"
+            ],
+            "details": "1. Sentry SDK 설치 및 프로젝트 설정\n2. 프론트엔드 오류 자동 캡처 구성\n3. 성능 트랜잭션 모니터링 설정\n4. 사용자 컨텍스트 및 세션 추적 구현\n5. 오류 그룹화 및 우선순위 지정 규칙 설정",
+            "status": "pending",
+            "testStrategy": "의도적인 오류 발생 후 Sentry에서 정확히 캡처되는지 확인. 성능 트랜잭션이 올바르게 기록되는지 검증. 사용자 세션 데이터의 정확성 테스트."
+          },
+          {
+            "id": 3,
+            "title": "자동화된 성능 테스트 파이프라인 구축",
+            "description": "Lighthouse CI를 설정하고 GitHub Actions와 통합하여 자동화된 성능 테스트 및 성능 회귀 감지 시스템 구현",
+            "dependencies": [
+              "13.1",
+              "13.2"
+            ],
+            "details": "1. Lighthouse CI 설치 및 구성\n2. GitHub Actions 워크플로우 설정\n3. 성능 기준점(baseline) 설정\n4. 성능 회귀 감지 로직 구현\n5. PR 및 배포 시 자동 성능 테스트 통합",
+            "status": "pending",
+            "testStrategy": "CI 파이프라인에서 Lighthouse 테스트가 정상 작동하는지 확인. 의도적인 성능 저하 코드로 회귀 감지 시스템 테스트. 다양한 페이지에서의 성능 측정 정확성 검증."
+          },
+          {
+            "id": 4,
+            "title": "알림 시스템 구현 및 통합",
+            "description": "성능 임계값 설정, Slack/이메일 알림 구성 및 성능 모니터링 대시보드 구현",
+            "dependencies": [
+              "13.2",
+              "13.3"
+            ],
+            "details": "1. 성능 및 오류 임계값 정의\n2. Slack 웹훅 또는 이메일 알림 시스템 구축\n3. 알림 우선순위 및 필터링 로직 구현\n4. 알림 집계 및 중복 방지 메커니즘 설정\n5. 실시간 모니터링 대시보드 개발",
+            "status": "pending",
+            "testStrategy": "다양한 임계값 시나리오에서 알림 트리거 테스트. 알림 전달 지연 및 신뢰성 검증. 대시보드 데이터 정확성 및 실시간 업데이트 테스트."
+          },
+          {
+            "id": 5,
+            "title": "실사용자 모니터링(RUM) 시스템 구축",
+            "description": "실제 사용자 경험 데이터를 수집하고 지역별, 디바이스별 성능을 분석하며 사용자 여정을 추적하는 RUM 시스템 구현",
+            "dependencies": [
+              "13.1",
+              "13.2",
+              "13.4"
+            ],
+            "details": "1. RUM 데이터 수집 스크립트 구현\n2. 지역, 디바이스, 브라우저별 데이터 분류\n3. 사용자 여정 및 상호작용 추적 구현\n4. 성능 데이터와 사용자 행동 상관관계 분석\n5. 데이터 시각화 및 보고서 자동화 구현",
+            "status": "pending",
+            "testStrategy": "다양한 지역 및 디바이스에서의 데이터 수집 정확성 검증. 사용자 여정 추적의 정확성 테스트. 대량의 사용자 데이터 처리 시 시스템 성능 테스트."
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "title": "의미론적 컴포넌트 명명 및 구조화",
+        "description": "컴포넌트에 의미론적 이름을 지정하고 디자인 토큰 시스템에 맞게 시각적 계층 구조를 조정합니다.",
+        "details": "1. 의미론적 명명 규칙 적용:\n   - 일반적인 이름(Button, Card) 대신 의미론적 이름(PrimaryButton, AlertCard) 사용\n   - 컴포넌트 역할과 목적을 명확히 하는 이름 지정\n   - 일관된 접두사/접미사 사용(예: use- 훅, -Provider 컨텍스트)\n2. 컴포넌트 라이브러리 구조화:\n   ```jsx\n   // 기본 버튼 컴포넌트\n   export const Button = ({ variant = 'primary', ...props }) => {\n     // 구현\n   };\n   \n   // 의미론적 버튼 컴포넌트\n   export const PrimaryButton = (props) => <Button variant=\"primary\" {...props} />;\n   export const SecondaryButton = (props) => <Button variant=\"secondary\" {...props} />;\n   export const DangerButton = (props) => <Button variant=\"danger\" {...props} />;\n   ```\n3. 디자인 토큰 시스템 통합:\n   - 색상, 간격, 타이포그래피 토큰 적용\n   - 시각적 계층 구조 조정\n   - 일관된 컴포넌트 API 설계\n4. 컴포넌트 문서화:\n   - 사용 예시 및 프롭 설명\n   - 디자인 시스템 연결\n   - 접근성 고려사항",
+        "testStrategy": "컴포넌트 명명 규칙 준수 여부 검증. 디자인 토큰 사용 감사. 스토리북을 통한 시각적 검증. 접근성 테스트(ARIA 속성, 키보드 탐색 등).",
+        "priority": "medium",
+        "dependencies": [
+          4,
+          6
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "의미론적 명명 규칙 가이드라인 개발",
+            "description": "컴포넌트, 훅, 컨텍스트 등에 대한 의미론적 명명 규칙 가이드라인을 개발하고 문서화합니다.",
+            "dependencies": [],
+            "details": "- 컴포넌트 유형별 명명 규칙 정의(PrimaryButton, AlertCard 등)\n- 훅(use-), 컨텍스트(-Provider), 유틸리티 함수 등의 접두사/접미사 규칙 수립\n- 명명 규칙 예시 및 안티패턴 문서화\n- 기존 코드베이스에서 변경이 필요한 컴포넌트 목록 작성\n- 팀 내 명명 규칙 합의 도출",
+            "status": "pending",
+            "testStrategy": "명명 규칙 준수 여부를 자동으로 검사하는 ESLint 규칙 개발 및 테스트. 기존 컴포넌트와 새 명명 규칙 간의 일관성 검증."
+          },
+          {
+            "id": 2,
+            "title": "컴포넌트 구조 리팩토링 템플릿 구현",
+            "description": "기본 컴포넌트와 의미론적 컴포넌트 간의 관계를 정의하는 구조 패턴을 구현합니다.",
+            "dependencies": [
+              "14.1"
+            ],
+            "details": "- 기본 컴포넌트와 의미론적 컴포넌트 간의 구조 패턴 정의\n- 컴포지션 패턴을 활용한 컴포넌트 구조화 방법 구현\n- 공통 props 처리 및 전달 메커니즘 설계\n- 버튼, 카드, 입력 필드 등 주요 컴포넌트에 대한 템플릿 구현\n- 컴포넌트 간 일관된 API 설계",
+            "status": "pending",
+            "testStrategy": "구현된 템플릿의 기능 테스트. 다양한 사용 사례에서의 컴포넌트 동작 검증. 스토리북을 통한 시각적 테스트."
+          },
+          {
+            "id": 3,
+            "title": "디자인 토큰 시스템 통합",
+            "description": "컴포넌트에 디자인 토큰 시스템을 통합하여 시각적 일관성을 보장합니다.",
+            "dependencies": [
+              "14.2"
+            ],
+            "details": "- 색상, 간격, 타이포그래피, 그림자 등의 디자인 토큰 정의\n- 하드코딩된 값을 디자인 토큰으로 대체\n- 디자인 토큰을 활용한 시각적 계층 구조 구현\n- 반응형 디자인을 위한 토큰 적용 방법 정의\n- 테마 변경 지원을 위한 토큰 구조 설계",
+            "status": "pending",
+            "testStrategy": "디자인 토큰 사용 감사를 통한 하드코딩된 값 검출. 다양한 화면 크기와 테마에서의 시각적 일관성 테스트."
+          },
+          {
+            "id": 4,
+            "title": "컴포넌트 문서화 시스템 구축",
+            "description": "의미론적 컴포넌트의 사용법, 프롭, 예시를 문서화하는 시스템을 구축합니다.",
+            "dependencies": [
+              "14.1",
+              "14.2",
+              "14.3"
+            ],
+            "details": "- Storybook을 활용한 컴포넌트 문서화 환경 구성\n- 각 컴포넌트의 사용 예시, 프롭 설명, 변형 옵션 문서화\n- 접근성 고려사항 및 모범 사례 포함\n- 디자인 시스템과의 연결성 표시\n- 자동화된 문서 생성 도구 구현(JSDoc, TypeDoc 등)",
+            "status": "pending",
+            "testStrategy": "문서의 정확성 검증. 예시 코드 실행 테스트. 문서와 실제 구현 간의 일치성 확인."
+          },
+          {
+            "id": 5,
+            "title": "의미론적 컴포넌트 마이그레이션 계획 수립",
+            "description": "기존 컴포넌트를 의미론적 컴포넌트로 마이그레이션하기 위한 단계적 계획을 수립합니다.",
+            "dependencies": [
+              "14.1",
+              "14.2",
+              "14.3",
+              "14.4"
+            ],
+            "details": "- 기존 컴포넌트 사용 현황 분석\n- 우선순위에 따른 마이그레이션 로드맵 작성\n- 하위 호환성을 유지하면서 점진적으로 마이그레이션하는 전략 수립\n- 마이그레이션 테스트 계획 수립\n- 팀 교육 및 가이드라인 전파 방안 마련",
+            "status": "pending",
+            "testStrategy": "마이그레이션 전후 동작 일치 테스트. 회귀 테스트 자동화. 성능 영향 분석."
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "title": "제어 흐름 최적화",
+        "description": "중첩된 조건을 초기 반환으로 평탄화하고 조건부 렌더링을 최적화합니다.",
+        "details": "1. 초기 반환 패턴 적용:\n   ```javascript\n   // 기존: 중첩된 조건\n   function Component(props) {\n     if (condition1) {\n       if (condition2) {\n         // 주요 로직\n       } else {\n         return <Fallback2 />;\n       }\n     } else {\n       return <Fallback1 />;\n     }\n   }\n   \n   // 개선: 초기 반환으로 평탄화\n   function Component(props) {\n     if (!condition1) return <Fallback1 />;\n     if (!condition2) return <Fallback2 />;\n     \n     // 주요 로직\n   }\n   ```\n2. 조건부 렌더링 최적화:\n   - 삼항 연산자 vs 논리 연산자 사용 지침\n   - 조건부 렌더링을 별도 컴포넌트로 추출\n   - 조건부 훅 사용 패턴 정의\n3. 스위치 케이스 패턴 구현:\n   ```javascript\n   const renderContent = () => {\n     switch (state) {\n       case 'loading': return <LoadingState />;\n       case 'error': return <ErrorState error={error} />;\n       case 'empty': return <EmptyState />;\n       case 'success': return <SuccessState data={data} />;\n       default: return null;\n     }\n   };\n   ```\n4. 렌더 프롭 및 고차 컴포넌트 패턴 최적화",
+        "testStrategy": "다양한 조건에 대한 단위 테스트. 조건부 렌더링 경로 테스트. 에지 케이스 및 예외 처리 테스트. 코드 복잡도 측정.",
+        "priority": "medium",
+        "dependencies": [
+          6,
+          10
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "초기 반환 패턴 구현 가이드 작성",
+            "description": "중첩된 조건문을 초기 반환 패턴으로 평탄화하는 상세 가이드라인과 예제 코드를 작성합니다.",
+            "dependencies": [],
+            "details": "1. 중첩 조건문의 문제점 분석(가독성, 유지보수성)\n2. 초기 반환 패턴의 이점 설명\n3. 다양한 복잡도 수준의 변환 예제 작성\n4. 초기 반환 패턴 적용을 위한 리팩토링 체크리스트 개발\n5. 초기 반환 패턴이 적합하지 않은 경우에 대한 가이드라인 제공",
+            "status": "pending",
+            "testStrategy": "다양한 복잡도의 중첩 조건문에 대한 변환 예제 검증. 리팩토링 전후 동작 일치 확인. 코드 복잡도 측정을 통한 개선 효과 검증."
+          },
+          {
+            "id": 2,
+            "title": "조건부 렌더링 최적화 전략 개발",
+            "description": "React에서 조건부 렌더링을 최적화하기 위한 다양한 패턴과 사용 지침을 개발합니다.",
+            "dependencies": [
+              "15.1"
+            ],
+            "details": "1. 삼항 연산자와 논리 연산자 사용에 대한 명확한 지침 작성\n2. 조건부 렌더링을 별도 컴포넌트로 추출하는 패턴 구현\n3. 조건부 훅 사용 패턴 정의 및 예제 작성\n4. 조건부 렌더링 시 불필요한 리렌더링을 방지하는 기법 연구\n5. 각 패턴의 성능 영향 분석 및 사용 시나리오 정의",
+            "status": "pending",
+            "testStrategy": "각 패턴의 렌더링 성능 측정. 메모리 사용량 비교. 다양한 조건에서의 렌더링 정확성 검증. React DevTools Profiler를 사용한 리렌더링 분석."
+          },
+          {
+            "id": 3,
+            "title": "스위치 케이스 패턴 최적화",
+            "description": "다중 조건 처리를 위한 스위치 케이스 패턴을 구현하고 최적화합니다.",
+            "dependencies": [
+              "15.2"
+            ],
+            "details": "1. 기본 스위치 케이스 패턴 구현 및 사용 사례 정의\n2. 객체 리터럴을 사용한 대안적 패턴 개발\n3. 상태 기반 렌더링을 위한 컴포넌트 맵 패턴 구현\n4. 각 패턴의 성능 및 가독성 비교 분석\n5. 상태 전환 로직과 렌더링 로직 분리를 위한 가이드라인 작성",
+            "status": "pending",
+            "testStrategy": "다양한 상태 전환 시나리오에 대한 테스트. 각 패턴의 번들 크기 영향 분석. 상태 변경 시 리렌더링 효율성 측정. 에지 케이스 처리 검증."
+          },
+          {
+            "id": 4,
+            "title": "렌더 프롭 및 고차 컴포넌트 패턴 최적화",
+            "description": "렌더 프롭과 고차 컴포넌트(HOC) 패턴을 사용한 조건부 렌더링 최적화 방법을 개발합니다.",
+            "dependencies": [
+              "15.2",
+              "15.3"
+            ],
+            "details": "1. 렌더 프롭 패턴을 사용한 조건부 렌더링 구현\n2. 고차 컴포넌트를 활용한 조건부 로직 추상화\n3. 두 패턴의 장단점 비교 및 적절한 사용 시나리오 정의\n4. 훅과의 통합 방법 및 현대적인 React 패턴과의 조화\n5. 패턴 적용 시 발생할 수 있는 성능 이슈 및 해결 방안",
+            "status": "pending",
+            "testStrategy": "컴포넌트 재사용성 테스트. 다양한 조건에서의 렌더링 정확성 검증. 메모리 누수 검사. 깊은 컴포넌트 트리에서의 성능 영향 분석."
+          },
+          {
+            "id": 5,
+            "title": "제어 흐름 최적화 가이드 문서화 및 통합",
+            "description": "개발된 모든 제어 흐름 최적화 패턴을 종합하여 개발자 가이드를 작성하고 코드베이스에 통합합니다.",
+            "dependencies": [
+              "15.1",
+              "15.2",
+              "15.3",
+              "15.4"
+            ],
+            "details": "1. 모든 패턴을 포함한 종합 가이드 문서 작성\n2. 패턴 선택을 위한 의사결정 트리 개발\n3. ESLint 규칙 개발을 통한 패턴 적용 자동화\n4. 기존 코드베이스에 패턴 적용을 위한 마이그레이션 계획 수립\n5. 개발자 교육 자료 및 워크숍 준비",
+            "status": "pending",
+            "testStrategy": "문서 정확성 검증. ESLint 규칙 테스트. 샘플 코드베이스에 패턴 적용 후 성능 개선 측정. 개발자 피드백 수집 및 가이드 개선."
+          }
+        ]
+      },
+      {
+        "id": 16,
+        "title": "폰트 로딩 및 웹 폰트 최적화",
+        "description": "웹 폰트 로딩 전략을 최적화하여 성능과 사용자 경험을 개선합니다.",
+        "details": "1. 폰트 로딩 최적화:\n   ```jsx\n   // pages/_document.js\n   import Document, { Html, Head, Main, NextScript } from 'next/document';\n   \n   class MyDocument extends Document {\n     render() {\n       return (\n         <Html>\n           <Head>\n             <link\n               rel=\"preload\"\n               href=\"/fonts/font-file.woff2\"\n               as=\"font\"\n               type=\"font/woff2\"\n               crossOrigin=\"anonymous\"\n             />\n           </Head>\n           <body>\n             <Main />\n             <NextScript />\n           </body>\n         </Html>\n       );\n     }\n   }\n   ```\n2. font-display 속성 최적화:\n   ```css\n   @font-face {\n     font-family: 'CustomFont';\n     src: url('/fonts/custom-font.woff2') format('woff2');\n     font-weight: 400;\n     font-style: normal;\n     font-display: swap; /* 또는 optional, fallback */\n   }\n   ```\n3. 가변 폰트(Variable Fonts) 사용 검토\n4. 폰트 서브셋 적용(필요한 문자만 포함)\n5. 시스템 폰트 대체 전략 구현\n6. 폰트 로딩 중 레이아웃 시프트 방지:\n   - font-size-adjust 속성 활용\n   - 폰트 크기 조정으로 CLS 최소화",
+        "testStrategy": "폰트 로딩 시간 측정. CLS(Cumulative Layout Shift) 측정. 다양한 네트워크 조건에서 폰트 로딩 테스트. 폰트 렌더링 품질 검증.",
+        "priority": "medium",
+        "dependencies": [
+          11,
+          12
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "웹 폰트 프리로딩 전략 구현",
+            "description": "Next.js의 _document.js에서 폰트 프리로딩을 구현하고 최적화하여 폰트 로딩 시간을 단축합니다.",
+            "dependencies": [],
+            "details": "1. _document.js 파일에서 중요 폰트 파일에 대한 preload 링크 구현\n2. 폰트 파일 형식 최적화(WOFF2 우선 사용)\n3. 중요하지 않은 폰트는 프리로드에서 제외\n4. 프리로드 우선순위 설정(fetchpriority 속성 활용)\n5. 프리로드 전략이 성능에 미치는 영향 측정",
+            "status": "pending",
+            "testStrategy": "Lighthouse와 WebPageTest를 사용하여 폰트 로딩 시간 측정. 다양한 네트워크 조건(3G, 4G)에서 폰트 로딩 성능 테스트. 프리로딩 전후 성능 비교 분석."
+          },
+          {
+            "id": 2,
+            "title": "font-display 속성 최적화 및 FOUT/FOIT 방지",
+            "description": "font-display 속성을 최적화하고 폰트 로딩 중 발생하는 FOUT(Flash of Unstyled Text)와 FOIT(Flash of Invisible Text) 문제를 해결합니다.",
+            "dependencies": [
+              "16.1"
+            ],
+            "details": "1. @font-face 규칙에서 font-display 속성 최적화(swap, fallback, optional 중 적절한 전략 선택)\n2. 각 폰트 가중치와 스타일에 대한 개별 font-display 전략 수립\n3. 폰트 로딩 중 레이아웃 시프트 방지를 위한 CSS 설정\n4. font-size-adjust 속성을 활용한 대체 폰트와 웹 폰트 간 크기 일관성 유지\n5. 폰트 로딩 상태에 따른 시각적 처리 구현",
+            "status": "pending",
+            "testStrategy": "CLS(Cumulative Layout Shift) 측정을 통한 레이아웃 시프트 확인. 다양한 font-display 값에 따른 사용자 경험 비교 테스트. 느린 네트워크 환경에서 폰트 렌더링 과정 기록 및 분석."
+          },
+          {
+            "id": 3,
+            "title": "가변 폰트 및 폰트 서브셋 적용",
+            "description": "가변 폰트(Variable Fonts)를 도입하고 필요한 문자만 포함하는 폰트 서브셋을 적용하여 폰트 파일 크기를 최소화합니다.",
+            "dependencies": [
+              "16.1",
+              "16.2"
+            ],
+            "details": "1. 프로젝트에 적합한 가변 폰트 선택 및 구현\n2. 한글 폰트의 경우 자주 사용되는 문자만 포함하는 서브셋 생성\n3. pyftsubset 또는 glyphhanger 도구를 사용한 폰트 서브셋 생성\n4. unicode-range 속성을 활용한 문자 범위별 폰트 로딩 최적화\n5. 가변 폰트와 기존 폰트의 성능 및 시각적 품질 비교 분석",
+            "status": "pending",
+            "testStrategy": "원본 폰트와 서브셋 폰트의 파일 크기 및 로딩 시간 비교. 가변 폰트와 일반 폰트 간의 번들 크기 및 성능 비교. 다양한 기기에서 폰트 렌더링 품질 검증."
+          },
+          {
+            "id": 4,
+            "title": "시스템 폰트 대체 전략 구현",
+            "description": "웹 폰트 로딩 실패 또는 지연 시 사용할 시스템 폰트 대체 전략을 구현하여 사용자 경험을 개선합니다.",
+            "dependencies": [
+              "16.2"
+            ],
+            "details": "1. 시스템 폰트 스택 최적화(font-family 우선순위 설정)\n2. OS별 최적의 시스템 폰트 매핑 구현\n3. font-family에 적절한 대체 폰트 설정\n4. 웹 폰트와 시스템 폰트 간의 시각적 일관성을 위한 CSS 조정\n5. 폰트 로딩 실패 시 자동 대체 메커니즘 구현",
+            "status": "pending",
+            "testStrategy": "다양한 운영체제 및 브라우저에서 폰트 렌더링 테스트. 폰트 로딩 실패 시나리오 시뮬레이션 및 대체 전략 검증. 사용자 경험 평가를 위한 A/B 테스트."
+          },
+          {
+            "id": 5,
+            "title": "폰트 로딩 성능 모니터링 및 최적화",
+            "description": "폰트 로딩 성능을 지속적으로 모니터링하고 분석하여 추가적인 최적화 기회를 식별하고 구현합니다.",
+            "dependencies": [
+              "16.1",
+              "16.2",
+              "16.3",
+              "16.4"
+            ],
+            "details": "1. Web Font API를 활용한 폰트 로딩 이벤트 모니터링\n2. 실제 사용자 메트릭스(RUM)를 통한 폰트 로딩 성능 데이터 수집\n3. 폰트 로딩 성능 대시보드 구축\n4. 성능 데이터 기반의 추가 최적화 전략 수립\n5. 폰트 로딩 관련 Core Web Vitals 개선 방안 구현",
+            "status": "pending",
+            "testStrategy": "성능 모니터링 도구(Web Vitals, Lighthouse)를 통한 지속적인 측정. 사용자 세션 기록 및 분석을 통한 실제 사용자 경험 평가. A/B 테스트를 통한 최적화 전략 효과 검증."
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "title": "접근성 개선",
+        "description": "ARIA 속성, 키보드 탐색, 색상 대비 및 스크린 리더 지원을 개선하여 접근성을 향상시킵니다.",
+        "details": "1. ARIA 속성 구현:\n   ```jsx\n   <button\n     aria-label=\"닫기\"\n     aria-pressed={isPressed}\n     onClick={handleClose}\n   >\n     <CloseIcon />\n   </button>\n   ```\n2. 키보드 탐색 개선:\n   - 포커스 관리\n   - 키보드 단축키\n   - 포커스 트랩(모달, 드롭다운)\n3. 색상 대비 최적화:\n   - WCAG 2.1 AA 기준 준수(대비율 4.5:1)\n   - 색상에만 의존하지 않는 정보 전달\n   - 다크 모드 지원\n4. 스크린 리더 지원:\n   - 의미론적 HTML 구조\n   - 숨겨진 텍스트 제공\n   - 실시간 영역 업데이트(aria-live)\n5. 접근성 테스트 자동화:\n   - axe-core 통합\n   - 접근성 감사 CI/CD 파이프라인 구성",
+        "testStrategy": "axe-core를 사용한 자동화된 접근성 테스트. 스크린 리더 호환성 테스트. 키보드 전용 탐색 테스트. WCAG 2.1 AA 준수 여부 검증.",
+        "priority": "medium",
+        "dependencies": [
+          4,
+          14
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "ARIA 속성 구현 및 의미론적 HTML 구조 개선",
+            "description": "모든 UI 요소에 적절한 ARIA 속성을 구현하고 의미론적 HTML 구조를 개선합니다.",
+            "dependencies": [],
+            "details": "1. 모든 상호작용 요소(버튼, 링크 등)에 적절한 aria-label, aria-pressed, aria-expanded 등의 속성 추가\n2. 의미론적 HTML 태그(nav, article, section 등) 사용 검토 및 개선\n3. 숨겨진 콘텐츠에 대한 적절한 aria-hidden 속성 적용\n4. 동적으로 변경되는 콘텐츠에 aria-live 영역 구현\n5. 헤딩 레벨(h1-h6)의 계층 구조 최적화",
+            "status": "pending",
+            "testStrategy": "스크린 리더(NVDA, VoiceOver)를 사용한 수동 테스트, axe-core를 사용한 자동화된 ARIA 속성 검증, HTML 유효성 검사"
+          },
+          {
+            "id": 2,
+            "title": "키보드 탐색 및 포커스 관리 개선",
+            "description": "키보드 사용자를 위한 탐색 경험과 포커스 관리를 개선합니다.",
+            "dependencies": [
+              "17.1"
+            ],
+            "details": "1. 모든 상호작용 요소에 대한 키보드 접근성 확인 및 개선\n2. 모달, 드롭다운 메뉴 등에 포커스 트랩 구현\n3. 키보드 단축키 구현 및 문서화\n4. 포커스 표시기 스타일 개선(outline 속성 등)\n5. 스킵 네비게이션 링크 구현",
+            "status": "pending",
+            "testStrategy": "키보드만 사용한 전체 애플리케이션 탐색 테스트, 포커스 순서 검증, 포커스 트랩 기능 테스트"
+          },
+          {
+            "id": 3,
+            "title": "색상 대비 및 시각적 접근성 최적화",
+            "description": "WCAG 2.1 AA 기준을 준수하는 색상 대비와 시각적 접근성을 구현합니다.",
+            "dependencies": [],
+            "details": "1. 모든 텍스트 요소의 색상 대비 분석 및 WCAG 2.1 AA 기준(4.5:1) 준수 확인\n2. 색상에만 의존하지 않는 정보 전달 방식 구현(아이콘, 텍스트 레이블 추가)\n3. 다크 모드 지원 및 색상 대비 최적화\n4. 확대/축소 및 텍스트 크기 조정 지원\n5. 애니메이션 및 움직임 감소 옵션 제공(prefers-reduced-motion 미디어 쿼리 지원)",
+            "status": "pending",
+            "testStrategy": "색상 대비 분석 도구(Contrast Checker) 사용, 다양한 화면 크기 및 확대 수준에서의 테스트, 다크 모드 전환 테스트"
+          },
+          {
+            "id": 4,
+            "title": "스크린 리더 지원 및 대체 텍스트 최적화",
+            "description": "스크린 리더 사용자를 위한 대체 텍스트 및 보조 기능을 구현합니다.",
+            "dependencies": [
+              "17.1"
+            ],
+            "details": "1. 모든 이미지에 적절한 alt 텍스트 제공\n2. 복잡한 UI 요소에 대한 설명 텍스트 추가\n3. 실시간으로 업데이트되는 콘텐츠에 aria-live 영역 구현\n4. 스크린 리더에만 제공되는 숨겨진 텍스트 구현(sr-only 클래스 활용)\n5. 폼 요소의 레이블 및 오류 메시지 접근성 개선",
+            "status": "pending",
+            "testStrategy": "NVDA, VoiceOver 등 다양한 스크린 리더로 테스트, 대체 텍스트 적절성 검토, 동적 콘텐츠 업데이트 시 스크린 리더 알림 확인"
+          },
+          {
+            "id": 5,
+            "title": "접근성 테스트 자동화 및 모니터링 시스템 구축",
+            "description": "지속적인 접근성 모니터링을 위한 자동화된 테스트 및 CI/CD 파이프라인을 구축합니다.",
+            "dependencies": [
+              "17.1",
+              "17.2",
+              "17.3",
+              "17.4"
+            ],
+            "details": "1. axe-core 라이브러리 통합 및 자동화된 접근성 테스트 구현\n2. CI/CD 파이프라인에 접근성 검사 단계 추가\n3. 접근성 위반 사항에 대한 보고서 생성 및 알림 시스템 구축\n4. 정기적인 접근성 감사 일정 수립\n5. 접근성 문제 추적 및 해결 프로세스 문서화",
+            "status": "pending",
+            "testStrategy": "CI/CD 파이프라인에서 접근성 테스트 실행 확인, 접근성 위반 시 빌드 실패 테스트, 보고서 생성 및 알림 기능 검증"
+          }
+        ]
+      },
+      {
+        "id": 18,
+        "title": "국제화(i18n) 및 지역화(l10n) 지원",
+        "description": "다국어 지원, 날짜/시간/숫자 형식 및 RTL 레이아웃을 구현하여 국제화 및 지역화를 지원합니다.",
+        "details": "1. next-i18next 설정:\n   ```javascript\n   // next-i18next.config.js\n   module.exports = {\n     i18n: {\n       defaultLocale: 'ko',\n       locales: ['ko', 'en', 'ja'],\n       localeDetection: true,\n     },\n   };\n   ```\n2. 번역 파일 구성:\n   ```json\n   // public/locales/ko/common.json\n   {\n     \"greeting\": \"안녕하세요\",\n     \"welcome\": \"환영합니다, {{name}}!\"\n   }\n   ```\n3. 번역 훅 사용:\n   ```jsx\n   import { useTranslation } from 'next-i18next';\n   \n   function Component() {\n     const { t } = useTranslation('common');\n     return <h1>{t('greeting')}</h1>;\n   }\n   ```\n4. 날짜/시간/숫자 형식화:\n   - Intl API 또는 date-fns 사용\n   - 지역에 맞는 형식 적용\n5. RTL(Right-to-Left) 레이아웃 지원:\n   - dir 속성 설정\n   - CSS 논리적 속성 사용(margin-inline-start 등)\n   - RTL 스타일 전환 자동화",
+        "testStrategy": "다양한 로케일에서의 렌더링 테스트. 번역 키 누락 검사. RTL 레이아웃 시각적 테스트. 날짜/시간/숫자 형식 검증.",
+        "priority": "low",
+        "dependencies": [
+          4,
+          14
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "다국어 번역 파일 구성 및 확장",
+            "description": "모든 지원 언어(한국어, 영어, 일본어)에 대한 번역 파일을 구성하고 주요 UI 요소에 대한 번역 키를 추가합니다.",
+            "dependencies": [],
+            "details": "1. 모든 지원 언어(ko, en, ja)에 대한 번역 파일 디렉토리 구조 생성\n2. 공통 번역 키(common.json)와 기능별 번역 파일(auth.json, dashboard.json 등) 구성\n3. 주요 UI 컴포넌트의 텍스트를 번역 키로 대체\n4. 동적 콘텐츠에 대한 변수 처리({{name}} 등) 구현\n5. 누락된 번역 키를 감지하는 유틸리티 함수 개발",
+            "status": "pending",
+            "testStrategy": "각 언어별 번역 파일의 구조 일관성 검증, 누락된 번역 키 자동 감지 테스트, 변수 치환 기능 테스트"
+          },
+          {
+            "id": 2,
+            "title": "날짜/시간/숫자 형식화 유틸리티 구현",
+            "description": "각 지역에 맞는 날짜, 시간, 숫자 형식을 지원하는 유틸리티 함수를 개발합니다.",
+            "dependencies": [
+              "18.1"
+            ],
+            "details": "1. Intl API를 활용한 날짜/시간 형식화 유틸리티 함수 개발\n2. 통화 및 숫자 형식화 유틸리티 함수 개발\n3. 각 로케일별 기본 형식 설정(한국어: YYYY년 MM월 DD일, 영어: MM/DD/YYYY 등)\n4. 사용자 지정 형식 옵션 지원\n5. 상대적 시간 표시 기능 구현(예: '3일 전', '방금 전')",
+            "status": "pending",
+            "testStrategy": "다양한 로케일에서의 날짜/시간/숫자 형식화 정확성 검증, 경계값 테스트(연도 변경, 시간대 변경 등)"
+          },
+          {
+            "id": 3,
+            "title": "RTL(Right-to-Left) 레이아웃 지원 구현",
+            "description": "아랍어나 히브리어와 같은 RTL 언어를 위한 레이아웃 지원을 구현합니다.",
+            "dependencies": [
+              "18.1"
+            ],
+            "details": "1. HTML dir 속성 자동 설정 기능 구현\n2. CSS 논리적 속성 사용으로 레이아웃 리팩토링(margin-inline-start, padding-inline-end 등)\n3. RTL 전용 스타일 분리 및 자동 적용 메커니즘 구현\n4. 아이콘 및 UI 요소 방향 자동 전환 기능 구현\n5. RTL 언어(아랍어) 지원을 위한 기본 설정 추가",
+            "status": "pending",
+            "testStrategy": "RTL 레이아웃 시각적 검증, 방향 전환 시 UI 요소 정렬 테스트, 다양한 화면 크기에서의 RTL 레이아웃 테스트"
+          },
+          {
+            "id": 4,
+            "title": "언어 전환 UI 및 로케일 감지 기능 개발",
+            "description": "사용자가 언어를 쉽게 전환할 수 있는 UI와 브라우저 설정 기반 자동 로케일 감지 기능을 구현합니다.",
+            "dependencies": [
+              "18.1",
+              "18.2"
+            ],
+            "details": "1. 언어 선택 드롭다운 컴포넌트 개발\n2. 언어 전환 시 URL 경로 업데이트 및 페이지 새로고침 없는 전환 구현\n3. 사용자 언어 선택 저장 기능(로컬 스토리지 또는 쿠키 활용)\n4. 브라우저 설정 기반 초기 언어 자동 감지 기능 구현\n5. 언어별 폰트 최적화 및 자동 적용",
+            "status": "pending",
+            "testStrategy": "다양한 브라우저에서의 언어 감지 테스트, 언어 전환 시 UI 상태 유지 검증, 사용자 선택 저장 및 복원 테스트"
+          },
+          {
+            "id": 5,
+            "title": "국제화 테스트 및 최적화",
+            "description": "다양한 언어 및 지역 설정에서 애플리케이션을 테스트하고 성능을 최적화합니다.",
+            "dependencies": [
+              "18.1",
+              "18.2",
+              "18.3",
+              "18.4"
+            ],
+            "details": "1. 각 지원 언어별 전체 UI 테스트 및 검증\n2. 번역 파일 분할 로딩 구현으로 초기 로드 최적화\n3. 번역 키 누락 및 오류 자동 감지 시스템 구축\n4. 다국어 SEO 최적화(hreflang 태그, 메타 데이터 등)\n5. 국제화 관련 성능 메트릭 측정 및 개선(번역 로딩 시간, 전환 지연 등)",
+            "status": "pending",
+            "testStrategy": "자동화된 스크린샷 테스트로 다양한 언어에서의 UI 검증, 성능 메트릭 측정 및 비교, 실제 사용자 피드백 수집"
+          }
+        ]
+      },
+      {
+        "id": 19,
+        "title": "오프라인 지원 및 PWA 기능 구현",
+        "description": "서비스 워커, 캐싱 전략 및 오프라인 경험을 구현하여 오프라인 지원 및 PWA 기능을 추가합니다.",
+        "details": "1. next-pwa 설정:\n   ```javascript\n   // next.config.js\n   const withPWA = require('next-pwa');\n   \n   module.exports = withPWA({\n     pwa: {\n       dest: 'public',\n       register: true,\n       skipWaiting: true,\n       disable: process.env.NODE_ENV === 'development',\n     },\n     // 기타 Next.js 설정\n   });\n   ```\n2. 매니페스트 파일 구성:\n   ```json\n   // public/manifest.json\n   {\n     \"name\": \"Decoded App\",\n     \"short_name\": \"Decoded\",\n     \"icons\": [\n       {\n         \"src\": \"/icons/icon-192x192.png\",\n         \"sizes\": \"192x192\",\n         \"type\": \"image/png\"\n       },\n       {\n         \"src\": \"/icons/icon-512x512.png\",\n         \"sizes\": \"512x512\",\n         \"type\": \"image/png\"\n       }\n     ],\n     \"theme_color\": \"#ffffff\",\n     \"background_color\": \"#ffffff\",\n     \"start_url\": \"/\",\n     \"display\": \"standalone\",\n     \"orientation\": \"portrait\"\n   }\n   ```\n3. 캐싱 전략 구현:\n   - 정적 자산 캐싱\n   - API 응답 캐싱\n   - 스토리지 퍼시스턴스\n4. 오프라인 경험 구현:\n   - 오프라인 페이지 설계\n   - 오프라인 상태 감지 및 알림\n   - 백그라운드 동기화",
+        "testStrategy": "오프라인 모드 테스트. 서비스 워커 설치 및 활성화 검증. 캐싱 전략 테스트. 다양한 네트워크 조건에서의 동작 테스트.",
+        "priority": "low",
+        "dependencies": [
+          9,
+          12,
+          13
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "서비스 워커 설정 및 기본 PWA 구성",
+            "description": "next-pwa 패키지를 설치하고 서비스 워커 설정, 매니페스트 파일 구성, 아이콘 생성을 완료합니다.",
+            "dependencies": [],
+            "details": "1. next-pwa 패키지 설치\n2. next.config.js에 PWA 설정 구현\n3. manifest.json 파일 생성 및 구성\n4. 다양한 크기의 앱 아이콘 생성 (192x192, 512x512 등)\n5. HTML head에 필요한 메타 태그 추가\n6. 서비스 워커 등록 확인",
+            "status": "pending",
+            "testStrategy": "Lighthouse를 사용하여 PWA 점수 확인, 서비스 워커 등록 상태 확인, 매니페스트 파일 유효성 검증"
+          },
+          {
+            "id": 2,
+            "title": "정적 자산 캐싱 전략 구현",
+            "description": "이미지, 스타일시트, 스크립트 등 정적 자산에 대한 효율적인 캐싱 전략을 구현합니다.",
+            "dependencies": [
+              "19.1"
+            ],
+            "details": "1. 서비스 워커에서 정적 자산 캐싱 전략 정의\n2. 이미지, CSS, JS 파일에 대한 Cache-First 전략 구현\n3. 폰트 및 아이콘에 대한 캐싱 설정\n4. 캐시 만료 정책 설정\n5. 캐시 버전 관리 메커니즘 구현",
+            "status": "pending",
+            "testStrategy": "오프라인 상태에서 정적 자산 로딩 테스트, 캐시 적중률 측정, 캐시 업데이트 메커니즘 검증"
+          },
+          {
+            "id": 3,
+            "title": "API 응답 캐싱 및 데이터 퍼시스턴스 구현",
+            "description": "API 응답을 캐싱하고 IndexedDB를 활용하여 오프라인 상태에서도 데이터를 사용할 수 있도록 구현합니다.",
+            "dependencies": [
+              "19.1",
+              "19.2"
+            ],
+            "details": "1. API 요청에 대한 Network-First 또는 Stale-While-Revalidate 전략 구현\n2. IndexedDB 설정 및 데이터 저장 로직 구현\n3. 오프라인 상태에서 캐시된 API 응답 제공\n4. 사용자 생성 데이터의 로컬 저장 및 동기화 메커니즘 구현\n5. 캐시된 데이터의 만료 및 갱신 정책 설정",
+            "status": "pending",
+            "testStrategy": "다양한 네트워크 상태에서 API 응답 테스트, IndexedDB 데이터 저장 및 검색 검증, 오프라인 상태에서 데이터 접근성 테스트"
+          },
+          {
+            "id": 4,
+            "title": "오프라인 경험 및 상태 관리 구현",
+            "description": "오프라인 상태 감지, 사용자 알림, 오프라인 전용 페이지를 구현하여 원활한 오프라인 경험을 제공합니다.",
+            "dependencies": [
+              "19.2",
+              "19.3"
+            ],
+            "details": "1. 네트워크 상태 감지 훅 구현\n2. 오프라인 상태 알림 UI 컴포넌트 개발\n3. 오프라인 전용 폴백 페이지 구현\n4. 오프라인 상태에서 사용 가능한 기능 표시\n5. 네트워크 재연결 시 자동 데이터 동기화 구현",
+            "status": "pending",
+            "testStrategy": "네트워크 연결 차단 후 오프라인 경험 테스트, 상태 변경 알림 검증, 오프라인 폴백 페이지 렌더링 확인"
+          },
+          {
+            "id": 5,
+            "title": "백그라운드 동기화 및 푸시 알림 구현",
+            "description": "백그라운드 동기화 기능과 푸시 알림을 구현하여 오프라인 상태에서 수행된 작업을 온라인 상태가 되면 자동으로 동기화합니다.",
+            "dependencies": [
+              "19.3",
+              "19.4"
+            ],
+            "details": "1. Background Sync API 구현\n2. 오프라인 상태에서 수행된 작업 큐 관리\n3. 네트워크 재연결 시 자동 동기화 로직 구현\n4. 푸시 알림 서비스 워커 설정\n5. 동기화 상태 및 결과에 대한 사용자 알림 구현\n6. 동기화 충돌 해결 전략 개발",
+            "status": "pending",
+            "testStrategy": "오프라인 상태에서 작업 수행 후 온라인 전환 시 동기화 테스트, 푸시 알림 수신 확인, 동기화 충돌 시나리오 테스트"
+          }
+        ]
+      },
+      {
+        "id": 20,
+        "title": "문서화 및 개발자 가이드 작성",
+        "description": "컴포넌트 사용법, 리팩토링 패턴, 성능 최적화 지침 및 코드 스타일 가이드를 포함한 포괄적인 문서를 작성합니다.",
+        "details": "1. 컴포넌트 문서화:\n   - Storybook 설정 및 구성\n   - 컴포넌트 사용 예시 및 프롭 설명\n   - 디자인 시스템 연결\n2. 아키텍처 문서:\n   - 폴더 구조 및 파일 명명 규칙\n   - 상태 관리 패턴\n   - API 통합 패턴\n3. 성능 최적화 지침:\n   - 메모이제이션 사용 지침\n   - 번들 크기 최적화 방법\n   - 이미지 최적화 가이드\n4. 코드 스타일 가이드:\n   - ESLint 및 Prettier 설정 설명\n   - 명명 규칙 및 패턴\n   - 주석 작성 지침\n5. 개발 워크플로우:\n   - 브랜치 전략\n   - 코드 리뷰 프로세스\n   - 배포 파이프라인\n6. 온보딩 가이드:\n   - 개발 환경 설정\n   - 첫 번째 컴포넌트 작성\n   - 일반적인 문제 해결",
+        "testStrategy": "문서 정확성 검증. 코드 예시 실행 테스트. 신규 개발자 온보딩 테스트. 문서 검색 및 탐색 테스트.",
+        "priority": "medium",
+        "dependencies": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Storybook 기반 컴포넌트 문서화 시스템 구축",
+            "description": "Storybook을 설정하고 컴포넌트 사용 예시, 프롭 설명 및 디자인 시스템 연결을 포함한 컴포넌트 문서화 시스템을 구축합니다.",
+            "dependencies": [],
+            "details": "1. Storybook 설치 및 기본 설정\n2. 디자인 시스템과 연결하는 Storybook 애드온 구성\n3. 컴포넌트별 스토리 템플릿 작성\n4. 프롭 타입 및 기본값 자동 문서화 설정\n5. 컴포넌트 사용 예시 코드 작성\n6. 접근성 검사 도구 통합\n7. 문서 배포 자동화 파이프라인 구성",
+            "status": "pending",
+            "testStrategy": "Storybook 렌더링 테스트, 문서 정확성 검증, 모든 컴포넌트 예시가 올바르게 작동하는지 확인, 접근성 검사 통과 여부 확인"
+          },
+          {
+            "id": 2,
+            "title": "아키텍처 및 코드 스타일 가이드 작성",
+            "description": "폴더 구조, 파일 명명 규칙, 상태 관리 패턴, API 통합 패턴, ESLint/Prettier 설정, 명명 규칙 및 주석 작성 지침을 포함한 포괄적인 아키텍처 및 코드 스타일 가이드를 작성합니다.",
+            "dependencies": [
+              "20.1"
+            ],
+            "details": "1. 프로젝트 폴더 구조 및 파일 명명 규칙 문서화\n2. 상태 관리 패턴 및 모범 사례 정의\n3. API 통합 패턴 및 에러 처리 가이드라인 작성\n4. ESLint 및 Prettier 설정 상세 설명\n5. 변수, 함수, 컴포넌트 명명 규칙 정의\n6. 주석 작성 표준 및 JSDoc 사용 지침 작성\n7. 코드 리뷰 체크리스트 작성",
+            "status": "pending",
+            "testStrategy": "가이드라인에 따른 샘플 코드 검증, 린트 규칙과 가이드라인 일치 여부 확인, 신규 개발자 피드백 수집"
+          },
+          {
+            "id": 3,
+            "title": "성능 최적화 지침 개발",
+            "description": "메모이제이션 사용 지침, 번들 크기 최적화 방법, 이미지 최적화 가이드를 포함한 성능 최적화 지침을 개발합니다.",
+            "dependencies": [
+              "20.1",
+              "20.2"
+            ],
+            "details": "1. React 메모이제이션(useMemo, useCallback, React.memo) 사용 지침 작성\n2. 코드 스플리팅 및 지연 로딩 구현 가이드 개발\n3. 번들 분석 및 최적화 방법론 문서화\n4. 이미지 최적화 기법 및 도구 가이드 작성\n5. 성능 측정 및 모니터링 방법 설명\n6. 렌더링 최적화 패턴 정리\n7. 성능 디버깅 및 병목 현상 식별 방법 안내",
+            "status": "pending",
+            "testStrategy": "성능 최적화 전후 비교 측정, Lighthouse 점수 개선 확인, 번들 크기 감소 검증, 최적화 기법 적용 예시 테스트"
+          },
+          {
+            "id": 4,
+            "title": "개발 워크플로우 및 협업 프로세스 문서화",
+            "description": "브랜치 전략, 코드 리뷰 프로세스, 배포 파이프라인을 포함한 개발 워크플로우 및 협업 프로세스를 문서화합니다.",
+            "dependencies": [
+              "20.2"
+            ],
+            "details": "1. Git 브랜치 전략 및 커밋 메시지 규칙 정의\n2. 이슈 및 PR 템플릿 작성\n3. 코드 리뷰 프로세스 및 체크리스트 개발\n4. CI/CD 파이프라인 구성 및 사용법 설명\n5. 배포 환경별 프로세스 문서화\n6. 버전 관리 및 릴리스 노트 작성 가이드\n7. 팀 협업 도구 및 커뮤니케이션 채널 안내",
+            "status": "pending",
+            "testStrategy": "워크플로우 시뮬레이션 테스트, PR 및 코드 리뷰 프로세스 검증, CI/CD 파이프라인 정상 작동 확인"
+          },
+          {
+            "id": 5,
+            "title": "온보딩 가이드 및 문제 해결 매뉴얼 작성",
+            "description": "개발 환경 설정, 첫 번째 컴포넌트 작성, 일반적인 문제 해결 방법을 포함한 온보딩 가이드 및 문제 해결 매뉴얼을 작성합니다.",
+            "dependencies": [
+              "20.1",
+              "20.2",
+              "20.3",
+              "20.4"
+            ],
+            "details": "1. 개발 환경 설정 단계별 가이드 작성\n2. 필수 도구 및 확장 프로그램 설치 안내\n3. 첫 번째 컴포넌트 개발 튜토리얼 작성\n4. 일반적인 오류 및 해결 방법 목록화\n5. 디버깅 도구 및 기법 안내\n6. 자주 묻는 질문(FAQ) 섹션 개발\n7. 추가 학습 자료 및 참고 문서 링크 제공",
+            "status": "pending",
+            "testStrategy": "신규 개발자 온보딩 테스트, 문서 따라하기 검증, 문제 해결 가이드 효과성 평가, 피드백 수집 및 개선"
+          }
+        ]
+      }
+    ],
     "metadata": {
       "created": "2025-07-22T07:55:22.626Z",
-      "updated": "2025-07-22T07:55:22.626Z",
+      "updated": "2025-08-14T14:51:08.850Z",
       "description": "Tasks for master context"
     }
   },
@@ -106,6 +1540,14 @@
       "created": "2025-08-04T06:31:47.512Z",
       "updated": "2025-08-04T06:32:27.718Z",
       "description": "채널 콘텐츠 기능 최적화 및 리팩토링 작업"
+    }
+  },
+  "refactoring-optimization": {
+    "tasks": [],
+    "metadata": {
+      "created": "2025-08-14T14:10:48.501Z",
+      "updated": "2025-08-14T14:10:48.501Z",
+      "description": "Comprehensive refactoring and performance optimization following CLAUDE.md, Cursor rules, and frontend performance checklist"
     }
   }
 }
