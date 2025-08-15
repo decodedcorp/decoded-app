@@ -19,6 +19,7 @@ interface ProxiedImageProps {
   onError?: () => void;
   onLoad?: () => void;
   fallbackSrc?: string; // fallback 이미지 URL 추가
+  downloadedSrc?: string; // 백엔드에서 다운로드한 이미지 URL (downloaded_img_url)
 }
 
 /**
@@ -43,28 +44,50 @@ export const ProxiedImage = forwardRef<HTMLImageElement, ProxiedImageProps>(
       onError,
       onLoad,
       fallbackSrc = '', // 기본 fallback 이미지
+      downloadedSrc, // 백엔드에서 다운로드한 이미지 URL
       ...props
     },
     ref,
   ) => {
     const [hasError, setHasError] = useState(false);
-    const [currentSrc, setCurrentSrc] = useState<string>(src);
+    
+    // 이미지 URL 우선순위: downloadedSrc > src > fallbackSrc
+    const [currentSrc, setCurrentSrc] = useState<string>(() => {
+      if (downloadedSrc && downloadedSrc.trim()) {
+        return downloadedSrc;
+      }
+      return src;
+    });
 
-    // 외부 이미지 URL을 프록시 URL로 변환
-    const proxiedSrc = getProxiedImageUrl(currentSrc);
+    // downloadedSrc가 있으면 프록시를 사용하지 않고, 없으면 기존 로직 사용
+    const finalSrc = React.useMemo(() => {
+      if (downloadedSrc && downloadedSrc.trim() && currentSrc === downloadedSrc) {
+        // downloadedSrc는 이미 백엔드에서 처리된 안전한 URL이므로 프록시 없이 직접 사용
+        return downloadedSrc;
+      }
+      // 기존 프록시 로직 사용
+      return getProxiedImageUrl(currentSrc);
+    }, [currentSrc, downloadedSrc]);
 
     const handleError = () => {
       console.warn(`[ProxiedImage] Failed to load image: ${currentSrc}`);
 
+      // downloadedSrc가 실패한 경우 원본 src로 폴백
+      if (downloadedSrc && downloadedSrc.trim() && currentSrc === downloadedSrc && src !== downloadedSrc) {
+        console.log(`[ProxiedImage] Downloaded image failed, switching to original src: ${src}`);
+        setCurrentSrc(src);
+        return;
+      }
+
       // fallback 이미지가 있고 아직 시도하지 않았다면 fallback으로 전환
-      if (!hasError && fallbackSrc && currentSrc !== fallbackSrc) {
+      if (!hasError && fallbackSrc && fallbackSrc.trim() && currentSrc !== fallbackSrc) {
         console.log(`[ProxiedImage] Switching to fallback image: ${fallbackSrc}`);
         setHasError(true);
         setCurrentSrc(fallbackSrc);
         return;
       }
 
-      // fallback도 실패했다면 에러 상태로 설정
+      // fallback도 실패했거나 없다면 에러 상태로 설정
       setHasError(true);
       onError?.();
     };
@@ -74,20 +97,25 @@ export const ProxiedImage = forwardRef<HTMLImageElement, ProxiedImageProps>(
       onLoad?.();
     };
 
-    // 에러 상태일 때 검정 화면 표시
+    // 에러 상태일 때 fallback UI 표시
     if (hasError && currentSrc === fallbackSrc) {
       return (
         <div
-          className={`${className} bg-black flex items-center justify-center`}
+          className={`${className} bg-zinc-800/50 border border-zinc-700/50 rounded-lg flex flex-col items-center justify-center text-zinc-400`}
           style={{ width: width || '100%', height: height || '100%' }}
-        />
+        >
+          <svg className="w-8 h-8 mb-2 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span className="text-xs text-center">Image not available</span>
+        </div>
       );
     }
 
     return (
       <Image
         ref={ref}
-        src={proxiedSrc}
+        src={finalSrc}
         alt={alt}
         width={width}
         height={height}

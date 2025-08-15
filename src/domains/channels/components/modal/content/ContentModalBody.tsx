@@ -41,16 +41,19 @@ const ActionButton = ({
 const ImageDisplay = ({
   src,
   alt,
+  downloadedSrc,
   showInfo = true,
 }: {
   src: string;
   alt: string;
+  downloadedSrc?: string;
   showInfo?: boolean;
 }) => (
   <div className="space-y-4">
     <div className="relative rounded-xl overflow-hidden bg-zinc-800/50">
       <ProxiedImage
         src={src}
+        downloadedSrc={downloadedSrc}
         alt={alt}
         width={800}
         height={600}
@@ -107,7 +110,11 @@ export function ContentModalBody({ content }: ContentModalBodyProps) {
       <div>
         {/* Image Content */}
         {content.type === 'image' && content.imageUrl && (
-          <ImageDisplay src={content.imageUrl} alt={content.title} />
+          <ImageDisplay 
+            src={content.imageUrl} 
+            downloadedSrc={content.linkPreview?.downloadedImageUrl}
+            alt={content.title} 
+          />
         )}
 
         {/* Video Content */}
@@ -115,6 +122,7 @@ export function ContentModalBody({ content }: ContentModalBodyProps) {
           <div className="relative rounded-xl overflow-hidden bg-zinc-800/50">
             <ProxiedImage
               src={content.imageUrl}
+              downloadedSrc={content.linkPreview?.downloadedImageUrl}
               alt={content.title}
               width={800}
               height={600}
@@ -161,6 +169,7 @@ export function ContentModalBody({ content }: ContentModalBodyProps) {
             {content.linkPreview?.imageUrl && (
               <ImageDisplay
                 src={content.linkPreview.imageUrl}
+                downloadedSrc={content.linkPreview.downloadedImageUrl}
                 alt={content.linkPreview.title || content.title}
                 showInfo={false}
               />
