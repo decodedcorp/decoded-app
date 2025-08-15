@@ -18,19 +18,38 @@ const useMedia = (queries: string[], values: number[], defaultValue: number): nu
   return value;
 };
 
-// 요소 크기 측정 훅
+// 요소 크기 측정 훅 (debounced)
 const useMeasure = <T extends HTMLElement>() => {
   const ref = useRef<T | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
 
   useLayoutEffect(() => {
     if (!ref.current) return;
+    
+    let timeoutId: NodeJS.Timeout;
+    
     const ro = new ResizeObserver(([entry]) => {
       const { width, height } = entry.contentRect;
-      setSize({ width, height });
+      
+      // debounce resize events to prevent excessive re-renders
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        setSize((prev) => {
+          // Only update if size actually changed significantly
+          if (Math.abs(prev.width - width) > 5 || Math.abs(prev.height - height) > 5) {
+            return { width, height };
+          }
+          return prev;
+        });
+      }, 100);
     });
+    
     ro.observe(ref.current);
-    return () => ro.disconnect();
+    
+    return () => {
+      ro.disconnect();
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   return [ref, size] as const;
@@ -172,17 +191,23 @@ const Masonry: React.FC<MasonryProps> = ({
     const totalGaps = (columns - 1) * gap;
     const columnWidth = (width - totalGaps) / columns;
 
-    return items.map((child) => {
+    return items.map((child, index) => {
       const col = colHeights.indexOf(Math.min(...colHeights));
       const x = col * (columnWidth + gap);
-      // 높이를 더 정확하게 계산하고 다양성 추가
-      const baseHeight = Math.max(child.height, 200);
-      // 높이에 약간의 랜덤성 추가 (5% 범위 내로 줄임)
-      const heightVariation = baseHeight * (0.95 + Math.random() * 0.1);
-      const height = Math.round(heightVariation);
+      
+      // 안정적인 높이 계산 - 랜덤성 제거
+      const baseHeight = Math.max(child.height, 240);
+      // 콘텐츠 타입별로 예측 가능한 높이 조정
+      let height = baseHeight;
+      if (child.type === 'image') {
+        height = Math.max(baseHeight, 300);
+      } else if (child.type === 'link') {
+        height = Math.max(baseHeight, 200);
+      }
+      
       const y = colHeights[col];
-
       colHeights[col] += height + gap;
+      
       return { ...child, x, y, w: columnWidth, h: height };
     });
   }, [columns, items, width]);
@@ -192,59 +217,57 @@ const Masonry: React.FC<MasonryProps> = ({
   useLayoutEffect(() => {
     if (!imagesReady || !containerReady) return;
 
-    // 애니메이션 시작 전에 아이템들을 올바른 위치에 배치
-    grid.forEach((item) => {
-      const selector = `[data-key="${item.id}"]`;
-      gsap.set(selector, {
-        x: item.x,
-        y: item.y,
-        width: item.w,
-        height: item.h,
-        opacity: 0,
-      });
-    });
+    // 더 안정적인 애니메이션을 위해 단순화
+    const animationDelay = 50; // 짧은 지연으로 레이아웃 안정화
 
-    // 바로 애니메이션 시작
-    setIsAnimating(true);
+    const timeoutId = setTimeout(() => {
+      setIsAnimating(true);
+      
+      grid.forEach((item, index) => {
+        const selector = `[data-key="${item.id}"]`;
+        const element = document.querySelector(selector) as HTMLElement;
+        
+        if (!element) return;
 
-    grid.forEach((item, index) => {
-      const selector = `[data-key="${item.id}"]`;
-      const animProps = { x: item.x, y: item.y, width: item.w, height: item.h };
+        // 초기 위치 설정 (CSS로 더 안정적으로)
+        element.style.transform = `translate(${item.x}px, ${item.y}px)`;
+        element.style.width = `${item.w}px`;
+        element.style.height = `${item.h}px`;
 
-      if (!hasMounted.current) {
-        const start = getInitialPosition(item);
-        gsap.fromTo(
-          selector,
-          {
-            opacity: 0,
-            x: start.x,
-            y: start.y,
-            width: item.w,
-            height: item.h,
-            ...(blurToFocus && { filter: 'blur(10px)' }),
-          },
-          {
+        if (!hasMounted.current) {
+          // 첫 렌더링 시 부드러운 페이드인
+          gsap.fromTo(
+            element,
+            {
+              opacity: 0,
+              scale: 0.8,
+              ...(blurToFocus && { filter: 'blur(5px)' }),
+            },
+            {
+              opacity: 1,
+              scale: 1,
+              ...(blurToFocus && { filter: 'blur(0px)' }),
+              duration: 0.5,
+              ease: 'power2.out',
+              delay: index * Math.min(stagger, 0.03), // 최대 지연 시간 제한
+            },
+          );
+        } else {
+          // 리사이즈나 재배치 시 부드러운 전환
+          gsap.to(element, {
             opacity: 1,
-            ...animProps,
-            ...(blurToFocus && { filter: 'blur(0px)' }),
-            duration: 0.8,
-            ease: 'power3.out',
-            delay: index * stagger,
-          },
-        );
-      } else {
-        gsap.to(selector, {
-          ...animProps,
-          opacity: 1,
-          duration,
-          ease,
-          overwrite: 'auto',
-        });
-      }
-    });
+            duration: Math.min(duration, 0.4),
+            ease: 'power2.out',
+            overwrite: 'auto',
+          });
+        }
+      });
 
-    hasMounted.current = true;
-  }, [grid, imagesReady, containerReady, stagger, animateFrom, blurToFocus, duration, ease]);
+      hasMounted.current = true;
+    }, animationDelay);
+
+    return () => clearTimeout(timeoutId);
+  }, [grid, imagesReady, containerReady, stagger, blurToFocus, duration]);
 
   const handleMouseEnter = (id: string, element: HTMLElement) => {
     if (scaleOnHover) {
@@ -282,12 +305,19 @@ const Masonry: React.FC<MasonryProps> = ({
     }
   };
 
-  // 컨테이너가 준비되지 않았으면 로딩 상태 반환
+  // 컨테이너가 준비되지 않았으면 스켈레톤 UI 표시
   if (!containerReady) {
     return (
-      <div ref={containerRef} className={`relative w-full h-full ${className || ''}`}>
-        <div className="w-full h-full flex items-center justify-center">
-          <div className="text-zinc-500">Loading...</div>
+      <div ref={containerRef} className={`relative w-full ${className || ''}`}>
+        <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6 gap-4 space-y-4">
+          {Array.from({ length: 12 }).map((_, index) => (
+            <div key={index} className="break-inside-avoid mb-4">
+              <div 
+                className="bg-zinc-800/50 border border-zinc-700/50 rounded-xl animate-pulse" 
+                style={{ height: `${200 + Math.random() * 200}px` }}
+              />
+            </div>
+          ))}
         </div>
       </div>
     );

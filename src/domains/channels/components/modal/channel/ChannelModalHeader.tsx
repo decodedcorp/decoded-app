@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRouter } from 'next/navigation';
 
 import { ChannelData } from '@/store/channelModalStore';
 import { ProxiedImage } from '@/components/ProxiedImage';
@@ -20,6 +21,8 @@ export function ChannelModalHeader({
   onUnsubscribe,
   isSubscribeLoading = false,
 }: ChannelModalHeaderProps) {
+  const router = useRouter();
+
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -27,6 +30,10 @@ export function ChannelModalHeader({
     if (query.trim() && onSearch) {
       onSearch(query.trim());
     }
+  };
+
+  const handleFullscreen = () => {
+    router.push(`/channels/${channel.id}`);
   };
 
   return (
@@ -73,6 +80,25 @@ export function ChannelModalHeader({
       </div>
 
       <div className="flex items-center space-x-4 flex-shrink-0 ml-4">
+        {/* Fullscreen button */}
+        <button
+          onClick={handleFullscreen}
+          className="p-3 rounded-full bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors"
+          aria-label="Open in fullscreen"
+          title="전체화면으로 보기"
+        >
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+            <path
+              d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+
+        {/* Close button */}
         <button
           onClick={onClose}
           className="p-3 rounded-full bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors"

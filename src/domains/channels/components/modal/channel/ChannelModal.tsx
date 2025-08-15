@@ -152,7 +152,7 @@ export function ChannelModal() {
               <>
                 {/* <ChannelModalStats channel={finalChannel} /> */}
                 {/* <ChannelModalEditors /> */}
-                <ChannelModalContent />
+                <ChannelModalContent currentFilters={currentFilters} />
                 {/* <ChannelModalRelated /> */}
               </>
             )}

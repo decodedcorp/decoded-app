@@ -6,6 +6,8 @@ import { SidebarFilters } from '../../sidebar/ChannelSidebar';
 import { DataTypesFilter } from '../filters/DataTypesFilter';
 import { CategoriesFilter } from '../filters/CategoriesFilter';
 import { TagsFilter } from '../filters/TagsFilter';
+import { useChannelFilters } from '../../../hooks/useChannelFilters';
+import { useChannelModalStore } from '@/store/channelModalStore';
 
 interface ChannelModalSidebarProps {
   currentFilters: SidebarFilters;
@@ -20,6 +22,19 @@ export function ChannelModalSidebar({
   isCollapsed = false,
   onToggleCollapse,
 }: ChannelModalSidebarProps) {
+  // 현재 선택된 채널 ID 가져오기
+  const selectedChannelId = useChannelModalStore((state) => state.selectedChannelId);
+  const selectedChannel = useChannelModalStore((state) => state.selectedChannel);
+  const channelId = selectedChannelId || selectedChannel?.id || '';
+
+  // 채널의 실제 필터 데이터 가져오기
+  const {
+    dataTypes,
+    categories,
+    isLoading: isFiltersLoading,
+    error: filtersError,
+  } = useChannelFilters(channelId);
+
   const handleDataTypesChange = (dataTypes: string[]) => {
     onFilterChange({ ...currentFilters, dataTypes });
   };
@@ -65,15 +80,15 @@ export function ChannelModalSidebar({
 
         {/* 간단한 필터 버튼들 - 스크롤 가능 */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden p-3 space-y-4 min-h-0">
-          {/* Data Types - 핵심 3개만 표시 */}
+          {/* Data Types - 실제 데이터 기반 상위 3개만 표시 */}
           <div className="space-y-2">
             <div className="text-xs text-gray-400 text-center font-medium">DT</div>
             <div className="space-y-2">
-              {[
-                { id: 'link', icon: '🔗', label: 'Link' },
-                { id: 'image', icon: '🖼️', label: 'Image' },
-                { id: 'pdf', icon: '📄', label: 'PDF' },
-              ].map((type) => (
+              {(dataTypes.length > 0 ? dataTypes.slice(0, 3) : [
+                { id: 'link', icon: '🔗', label: 'Link', count: 0 },
+                { id: 'image', icon: '🖼️', label: 'Image', count: 0 },
+                { id: 'pdf', icon: '📄', label: 'PDF', count: 0 },
+              ]).map((type) => (
                 <button
                   key={type.id}
                   onClick={() => {
@@ -95,16 +110,16 @@ export function ChannelModalSidebar({
             </div>
           </div>
 
-          {/* Categories - 핵심 4개만 표시 */}
+          {/* Categories - 실제 데이터 기반 상위 4개만 표시 */}
           <div className="space-y-2">
             <div className="text-xs text-gray-400 text-center font-medium">CAT</div>
             <div className="space-y-2">
-              {[
-                { id: 'articles', icon: '📰', label: 'Articles' },
-                { id: 'books', icon: '📚', label: 'Books' },
-                { id: 'education', icon: '🎓', label: 'Education' },
-                { id: 'fashion', icon: '👠', label: 'Fashion' },
-              ].map((category) => (
+              {(categories.length > 0 ? categories.slice(0, 4) : [
+                { id: 'articles', icon: '📰', label: 'Articles', count: 0, color: 'bg-red-500/20 text-red-300' },
+                { id: 'books', icon: '📚', label: 'Books', count: 0, color: 'bg-emerald-500/20 text-emerald-300' },
+                { id: 'education', icon: '🎓', label: 'Education', count: 0, color: 'bg-amber-500/20 text-amber-300' },
+                { id: 'fashion', icon: '👠', label: 'Fashion', count: 0, color: 'bg-pink-500/20 text-pink-300' },
+              ]).map((category) => (
                 <button
                   key={category.id}
                   onClick={() => {
@@ -207,12 +222,16 @@ export function ChannelModalSidebar({
             <DataTypesFilter
               selectedDataTypes={currentFilters.dataTypes}
               onDataTypesChange={handleDataTypesChange}
+              dataTypes={dataTypes}
+              isLoading={isFiltersLoading}
             />
           </div>
           <div className="animate-stable-fade-in" style={{ animationDelay: '0.1s' }}>
             <CategoriesFilter
               selectedCategories={currentFilters.categories}
               onCategoriesChange={handleCategoriesChange}
+              categories={categories}
+              isLoading={isFiltersLoading}
             />
           </div>
           <div className="animate-stable-fade-in" style={{ animationDelay: '0.15s' }}>
