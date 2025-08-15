@@ -9,6 +9,7 @@ import { useChannelContentsSinglePage } from '@/domains/channels/hooks/useChanne
 import { useChannelModalStore } from '@/store/channelModalStore';
 import { useContentUploadStore } from '@/store/contentUploadStore';
 import { ContentType } from '@/api/generated';
+import { useChannelContentFiltering } from '@/domains/channels/hooks/useChannelFilters';
 import {
   getContentStatusStyles,
   isContentClickable,
@@ -63,8 +64,9 @@ const ContentItemCard = React.memo<{
     });
   }
 
-  // 이미지 URL 결정 (링크 프리뷰 이미지 우선, 없으면 기본 이미지)
+  // 이미지 URL 결정 (다운로드된 이미지 우선, 링크 프리뷰 이미지, 없으면 기본 이미지)
   const imageUrl = item.linkPreview?.imageUrl || item.imageUrl;
+  const downloadedImageUrl = item.linkPreview?.downloadedImageUrl;
 
   // 웹페이지 URL이 아닌 실제 이미지인지 확인
   const isWebPageUrl =
@@ -92,6 +94,7 @@ const ContentItemCard = React.memo<{
         {hasValidImage ? (
           <ProxiedImage
             src={imageUrl}
+            downloadedSrc={downloadedImageUrl} // 백엔드에서 다운로드한 이미지 URL 사용
             alt={item.title}
             width={400}
             height={256}
@@ -100,7 +103,7 @@ const ContentItemCard = React.memo<{
             }`}
             quality={95}
             loading="lazy"
-            fallbackSrc="/images/image-proxy.webp"
+            fallbackSrc=""
             onError={() => {
               console.error('[ContentItemCard] Image failed to load:', imageUrl);
             }}
@@ -253,27 +256,61 @@ const ContentItemCard = React.memo<{
 ContentItemCard.displayName = 'ContentItemCard';
 
 // 메인 컴포넌트 (메모이제이션)
-export const ChannelModalContent = React.memo(() => {
+export const ChannelModalContent = React.memo<{
+  currentFilters?: {
+    dataTypes: string[];
+    categories: string[];
+    tags: string[];
+  };
+  channelId?: string; // URL에서 전달받는 채널 ID
+}>(({ currentFilters, channelId: propChannelId }) => {
   const openContentModal = useContentModalStore((state) => state.openModal);
   const selectedChannelId = useChannelModalStore((state) => state.selectedChannelId);
   const selectedChannel = useChannelModalStore((state) => state.selectedChannel);
   const openContentUploadModal = useContentUploadStore((state) => state.openModal);
 
-  // 채널 ID 결정: selectedChannelId가 있으면 사용, 없으면 selectedChannel.id 사용
-  const channelId = selectedChannelId || selectedChannel?.id || '';
+  // 채널 ID 결정: Props > selectedChannelId > selectedChannel.id 순서로 우선순위
+  const channelId = propChannelId || selectedChannelId || selectedChannel?.id || '';
 
-  // 채널 콘텐츠 조회 (폴링 비활성화)
+  // 필터가 있으면 필터링된 콘텐츠 사용, 없으면 기본 콘텐츠 사용
+  const shouldUseFiltering = currentFilters && (
+    currentFilters.dataTypes.length > 0 ||
+    currentFilters.categories.length > 0 ||
+    currentFilters.tags.length > 0 ||
+    (currentFilters.statuses?.length > 0 && currentFilters.statuses.length < 3) // 3개 모두 선택되지 않은 경우 필터링으로 간주
+  );
+
+  // 기본 콘텐츠 조회 (필터가 없을 때)
   const {
-    data: contentItems,
-    isLoading,
-    error,
-    refetch,
+    data: allContentItems,
+    isLoading: isLoadingAll,
+    error: errorAll,
+    refetch: refetchAll,
   } = useChannelContentsSinglePage({
     channelId: channelId,
     limit: 25,
-    enabled: !!channelId,
+    enabled: !!channelId && !shouldUseFiltering,
     enableSmartPolling: false, // 폴링 비활성화
   });
+
+  // 필터링된 콘텐츠 조회 (필터가 있을 때)
+  const {
+    filteredContent,
+    totalCount,
+    filteredCount,
+    isLoading: isLoadingFiltered,
+    error: errorFiltered,
+    refetch: refetchFiltered,
+  } = useChannelContentFiltering(
+    channelId,
+    currentFilters || { dataTypes: [], categories: [], tags: [], statuses: ['active'] }
+  );
+
+  // 사용할 데이터 결정
+  const contentItems = shouldUseFiltering ? filteredContent : allContentItems;
+  const isLoading = shouldUseFiltering ? isLoadingFiltered : isLoadingAll;
+  const error = shouldUseFiltering ? errorFiltered : errorAll;
+  const refetch = shouldUseFiltering ? refetchFiltered : refetchAll;
 
   // 개발 모드에서만 로깅 (빈도 제한)
   if (process.env.NODE_ENV === 'development' && Math.random() < 0.01) {
@@ -434,14 +471,59 @@ export const ChannelModalContent = React.memo(() => {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-xl font-semibold text-white mb-2">Channel Content</h3>
-          <p className="text-zinc-400">{finalDisplayContentItems?.length || 0} items</p>
+          
+          {/* 필터 상태 표시 */}
+          {shouldUseFiltering && (
+            <div className="flex items-center gap-2 mb-2">
+              <p className="text-zinc-400">
+                {finalDisplayContentItems?.length || 0} of {totalCount || 0} items
+              </p>
+              <span className="text-xs bg-blue-600/20 text-blue-300 px-2 py-1 rounded-full">
+                Filtered
+              </span>
+            </div>
+          )}
+          
+          {!shouldUseFiltering && (
+            <p className="text-zinc-400">{finalDisplayContentItems?.length || 0} items</p>
+          )}
+          
+          {/* 활성 필터 표시 */}
+          {shouldUseFiltering && currentFilters && (
+            <div className="flex flex-wrap gap-1 mt-1">
+              {currentFilters.dataTypes.length > 0 && (
+                <span className="text-xs bg-white/10 text-white px-2 py-1 rounded">
+                  {currentFilters.dataTypes.length} data type{currentFilters.dataTypes.length > 1 ? 's' : ''}
+                </span>
+              )}
+              {currentFilters.categories.length > 0 && (
+                <span className="text-xs bg-white/10 text-white px-2 py-1 rounded">
+                  {currentFilters.categories.length} categor{currentFilters.categories.length > 1 ? 'ies' : 'y'}
+                </span>
+              )}
+              {currentFilters.tags.length > 0 && (
+                <span className="text-xs bg-white/10 text-white px-2 py-1 rounded">
+                  {currentFilters.tags.length} tag{currentFilters.tags.length > 1 ? 's' : ''}
+                </span>
+              )}
+              {currentFilters.statuses?.length > 0 && currentFilters.statuses.length < 3 && (
+                <span className="text-xs bg-white/10 text-white px-2 py-1 rounded">
+                  {currentFilters.statuses.join(', ')} status
+                </span>
+              )}
+            </div>
+          )}
+          
           {/* PENDING 상태 콘텐츠 개수 표시 */}
           {pendingCount > 0 && (
             <p className="text-sm text-yellow-400 mt-1">{pendingCount} items being processed</p>
           )}
+          
           {/* 데이터 상태 표시 */}
           {!isLoading && !error && finalDisplayContentItems.length === 0 && (
-            <p className="text-sm text-blue-400 mt-1">No content available</p>
+            <p className="text-sm text-blue-400 mt-1">
+              {shouldUseFiltering ? 'No content matches current filters' : 'No content available'}
+            </p>
           )}
         </div>
         <div className="flex items-center space-x-3">
