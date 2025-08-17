@@ -59,12 +59,19 @@ export const ProxiedImage = forwardRef<HTMLImageElement, ProxiedImageProps>(
       return src;
     });
 
-    // downloadedSrc가 있으면 프록시를 사용하지 않고, 없으면 기존 로직 사용
+    // 이미지 URL 결정 로직
     const finalSrc = React.useMemo(() => {
+      // downloadedSrc가 있으면 우선 사용 (백엔드에서 처리된 안전한 URL)
       if (downloadedSrc && downloadedSrc.trim() && currentSrc === downloadedSrc) {
-        // downloadedSrc는 이미 백엔드에서 처리된 안전한 URL이므로 프록시 없이 직접 사용
         return downloadedSrc;
       }
+      
+      // R2 도메인 감지 (Cloudflare R2는 안전한 CDN이므로 proxy 우회)
+      const isR2Domain = currentSrc.includes('.r2.dev') || currentSrc.includes('r2.cloudflarestorage.com');
+      if (isR2Domain) {
+        return currentSrc;
+      }
+      
       // 기존 프록시 로직 사용
       return getProxiedImageUrl(currentSrc);
     }, [currentSrc, downloadedSrc]);
