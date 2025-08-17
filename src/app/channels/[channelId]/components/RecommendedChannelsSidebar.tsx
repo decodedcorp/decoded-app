@@ -10,14 +10,23 @@ import { ProxiedImage } from '@/components/ProxiedImage';
 interface RecommendedChannelsSidebarProps {
   currentChannelId: string;
   className?: string;
+  onCollapseChange?: (isCollapsed: boolean) => void;
 }
 
 export function RecommendedChannelsSidebar({ 
   currentChannelId, 
-  className = '' 
+  className = '',
+  onCollapseChange 
 }: RecommendedChannelsSidebarProps) {
   const router = useRouter();
   const [isCollapsed, setIsCollapsed] = React.useState(false);
+
+  // collapse 상태 변경 시 부모에게 알림
+  const handleCollapseToggle = () => {
+    const newCollapsedState = !isCollapsed;
+    setIsCollapsed(newCollapsedState);
+    onCollapseChange?.(newCollapsedState);
+  };
   
   // 추천 채널 데이터 가져오기 (현재 채널 제외)
   const { data: channelsData, isLoading } = useChannels({
@@ -77,7 +86,7 @@ export function RecommendedChannelsSidebar({
                 Discover Channels
               </div>
               <button
-                onClick={() => setIsCollapsed(!isCollapsed)}
+                onClick={handleCollapseToggle}
                 className="p-1 hover:bg-zinc-700/50 rounded transition-colors duration-200"
                 aria-label="Collapse"
               >
@@ -95,7 +104,7 @@ export function RecommendedChannelsSidebar({
         ) : (
           <div className="flex flex-col items-center">
             <button
-              onClick={() => setIsCollapsed(!isCollapsed)}
+              onClick={handleCollapseToggle}
               className="p-1 hover:bg-zinc-700/50 rounded transition-colors duration-200 mb-4"
               aria-label="Expand"
             >

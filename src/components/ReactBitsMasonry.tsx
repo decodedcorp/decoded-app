@@ -126,8 +126,8 @@ const Masonry: React.FC<MasonryProps> = ({
   renderItem,
 }) => {
   const columns = useMedia(
-    ['(min-width:1500px)', '(min-width:1000px)', '(min-width:600px)', '(min-width:400px)'],
-    [5, 4, 3, 2],
+    ['(min-width:1200px)', '(min-width:800px)', '(min-width:600px)', '(min-width:400px)'],
+    [3, 3, 2, 2],
     1,
   );
 
@@ -199,11 +199,8 @@ const Masonry: React.FC<MasonryProps> = ({
       const baseHeight = Math.max(child.height, 240);
       // 콘텐츠 타입별로 예측 가능한 높이 조정
       let height = baseHeight;
-      if (child.type === 'image') {
-        height = Math.max(baseHeight, 300);
-      } else if (child.type === 'link') {
-        height = Math.max(baseHeight, 200);
-      }
+      // Since we're now using channel data, we use consistent height
+      height = Math.max(baseHeight, 280);
       
       const y = colHeights[col];
       colHeights[col] += height + gap;
