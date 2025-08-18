@@ -8,6 +8,7 @@ import { TrendingSection, CategorySection } from '../explore/CategorySection';
 import { RecommendedSection } from '../explore/RecommendedSection';
 import { ChannelModal, ContentModal } from '../modal';
 import { AddChannelModal } from '../modal/add-channel/AddChannelModal';
+import { LoadingState, ErrorState, EmptyState } from '../common/LoadingStates';
 import { useChannels } from '../../hooks/useChannels';
 import { useChannelModalStore } from '../../../../store/channelModalStore';
 import { ChannelResponse } from '../../../../api/generated/models/ChannelResponse';
@@ -45,19 +46,19 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
   }, [channelsData]);
 
   // Group channels by category for organized sections (exclude uncategorized)
+  // Note: For now we'll use a simple categorization until API provides category field
   const categorizedChannels = useMemo(() => {
-    const categoryGroups: Record<string, ChannelResponse[]> = {};
+    const categoryGroups: Record<string, ChannelResponse[]> = {
+      'technology': [],
+      'design': [],
+      'lifestyle': []
+    };
     
-    channels.forEach(channel => {
-      const category = channel.category;
-      // Skip channels without category (uncategorized)
-      if (!category || category.toLowerCase() === 'uncategorized') {
-        return;
-      }
-      
-      if (!categoryGroups[category]) {
-        categoryGroups[category] = [];
-      }
+    // Simple distribution of channels for now
+    channels.forEach((channel, index) => {
+      const categories = Object.keys(categoryGroups);
+      const categoryIndex = index % categories.length;
+      const category = categories[categoryIndex];
       categoryGroups[category].push(channel);
     });
 
@@ -82,12 +83,7 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
   if (isLoading) {
     return (
       <div className={`relative h-full overflow-y-auto ${className}`}>
-        <div className="h-full flex items-center justify-center">
-          <div className="flex flex-col items-center">
-            <div className="animate-spin w-8 h-8 border-2 border-white/30 border-t-white rounded-full mb-4"></div>
-            <div className="text-gray-400 text-lg">큐레이터들을 찾는 중...</div>
-          </div>
-        </div>
+        <LoadingState title="큐레이터들을 찾는 중..." />
       </div>
     );
   }
@@ -96,15 +92,10 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
   if (error) {
     return (
       <div className={`relative h-full overflow-y-auto ${className}`}>
-        <div className="h-full flex items-center justify-center">
-          <div className="flex flex-col items-center text-center">
-            <svg className="w-16 h-16 text-red-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.996-.833-2.664 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
-            <div className="text-red-500 text-lg mb-2">큐레이터 정보를 불러올 수 없습니다</div>
-            <div className="text-gray-500">잠시 후 다시 시도해 주세요</div>
-          </div>
-        </div>
+        <ErrorState 
+          title="큐레이터 정보를 불러올 수 없습니다"
+          subtitle="잠시 후 다시 시도해 주세요"
+        />
       </div>
     );
   }
@@ -113,14 +104,10 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
   if (!channels.length) {
     return (
       <div className={`relative h-full overflow-y-auto ${className}`}>
-        <div className="h-full flex items-center justify-center">
-          <div className="flex flex-col items-center text-center">
-            <svg className="w-16 h-16 text-zinc-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-            </svg>
-            <div className="text-gray-400 text-lg">등록된 큐레이터가 없습니다</div>
-          </div>
-        </div>
+        <EmptyState 
+          title="등록된 큐레이터가 없습니다"
+          subtitle="새로운 채널을 추가해보세요"
+        />
       </div>
     );
   }

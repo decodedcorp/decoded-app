@@ -4,6 +4,7 @@ import React, { useMemo } from 'react';
 import { ChannelResponse } from '@/api/generated/models/ChannelResponse';
 import { ChannelCard } from './ChannelCard';
 import { ExploreFilters } from './ExploreHeader';
+import { EmptyState } from '../common/LoadingStates';
 
 interface ExploreGridProps {
   channels: ChannelResponse[];
@@ -27,16 +28,17 @@ export function ExploreGrid({
       const searchTerm = filters.search.toLowerCase().trim();
       filtered = filtered.filter(channel => 
         channel.name.toLowerCase().includes(searchTerm) ||
-        (channel.description && channel.description.toLowerCase().includes(searchTerm)) ||
-        (channel.category && channel.category.toLowerCase().includes(searchTerm))
+        (channel.description && channel.description.toLowerCase().includes(searchTerm))
       );
     }
 
     // Apply category filter
+    // Note: Category filtering is temporarily disabled until API provides category field
     if (filters.category !== 'all') {
-      filtered = filtered.filter(channel => 
-        channel.category && channel.category.toLowerCase() === filters.category.toLowerCase()
-      );
+      // TODO: Implement category filtering when API supports it
+      // filtered = filtered.filter(channel => 
+      //   channel.category && channel.category.toLowerCase() === filters.category.toLowerCase()
+      // );
     }
 
     // Apply sorting
@@ -93,28 +95,33 @@ export function ExploreGrid({
   }, [processedChannels]);
 
   if (processedChannels.length === 0) {
+    const searchIcon = (
+      <svg 
+        className="w-16 h-16 text-zinc-600 mb-4" 
+        fill="none" 
+        stroke="currentColor" 
+        viewBox="0 0 24 24"
+      >
+        <path 
+          strokeLinecap="round" 
+          strokeLinejoin="round" 
+          strokeWidth={1.5} 
+          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
+        />
+      </svg>
+    );
+
     return (
-      <div className={`flex flex-col items-center justify-center py-24 ${className}`}>
-        <svg 
-          className="w-16 h-16 text-zinc-600 mb-4" 
-          fill="none" 
-          stroke="currentColor" 
-          viewBox="0 0 24 24"
-        >
-          <path 
-            strokeLinecap="round" 
-            strokeLinejoin="round" 
-            strokeWidth={1.5} 
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
-          />
-        </svg>
-        <h3 className="text-xl font-semibold text-white mb-2">No channels found</h3>
-        <p className="text-zinc-400 text-center max-w-md">
-          {filters.search.trim() 
-            ? `No channels match "${filters.search}". Try adjusting your search terms or filters.`
-            : 'No channels match your current filters. Try adjusting your filter criteria.'
+      <div className={`py-24 ${className}`}>
+        <EmptyState
+          icon={searchIcon}
+          title="No channels found"
+          subtitle={
+            filters.search.trim() 
+              ? `No channels match "${filters.search}". Try adjusting your search terms or filters.`
+              : 'No channels match your current filters. Try adjusting your filter criteria.'
           }
-        </p>
+        />
       </div>
     );
   }
@@ -133,7 +140,7 @@ export function ExploreGrid({
 
       {/* Bento Grid Layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-        {gridItems.map(({ channel, size, gridClass, index }) => (
+        {gridItems.map(({ channel, size, gridClass }) => (
           <div key={channel.id} className={gridClass}>
             <ChannelCard
               channel={channel}
