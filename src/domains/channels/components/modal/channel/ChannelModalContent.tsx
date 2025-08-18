@@ -26,6 +26,8 @@ import { isValidImageUrl, handleImageError } from '@/lib/utils/imageUtils';
 import { ProxiedImage } from '@/components/ProxiedImage';
 import Masonry from '@/components/ReactBitsMasonry';
 import { ContentFiltersBar } from '../filters/ContentFiltersBar';
+import CommunityHighlights from '@/domains/channels/components/highlights/CommunityHighlights';
+import { HighlightItem } from '@/lib/types/highlightTypes';
 
 // 개별 콘텐츠 아이템 컴포넌트 (고도화된 메모이제이션)
 const ContentItemCard = React.memo<{
@@ -374,6 +376,15 @@ export const ChannelModalContent = React.memo<{
     }
   }, [channelId, openContentUploadModal]);
 
+  // 하이라이트 클릭 핸들러 (메모이제이션)
+  const handleHighlightClick = React.useCallback((highlight: HighlightItem) => {
+    if (highlight.clickAction.type === 'content_modal' && highlight.clickAction.data) {
+      // ContentItem 데이터로 콘텐츠 모달 열기
+      openContentModal(highlight.clickAction.data as ContentItem);
+    }
+    // 향후 다른 action type들 (external_link, internal_link) 추가 가능
+  }, [openContentModal]);
+
   // 표시할 콘텐츠 결정 (실제 API 데이터만 사용)
   const displayContentItems = React.useMemo(() => {
     return contentItems || [];
@@ -504,6 +515,12 @@ export const ChannelModalContent = React.memo<{
 
   return (
     <div className="px-4">
+      {/* Community Highlights */}
+      <CommunityHighlights
+        channelId={channelId}
+        onItemClick={handleHighlightClick}
+      />
+
       {/* Header */}
       <div className="flex items-center justify-between pt-2">
         <div>
