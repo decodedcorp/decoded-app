@@ -1,30 +1,29 @@
 'use client';
 
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 
-import { ChannelHero } from '../hero/ChannelHero';
-import MasonryGrid from '../masonry/MasonryGrid';
+import { ExploreHeader, ExploreFilters } from '../explore/ExploreHeader';
+import { ExploreGrid } from '../explore/ExploreGrid';
+import { TrendingSection, CategorySection } from '../explore/CategorySection';
+import { RecommendedSection } from '../explore/RecommendedSection';
 import { ChannelModal, ContentModal } from '../modal';
 import { AddChannelModal } from '../modal/add-channel/AddChannelModal';
 import { useChannels } from '../../hooks/useChannels';
-import { mapChannelsToItems } from '../../utils/channelMapper';
-import { Item } from '../masonry/types';
 import { useChannelModalStore } from '../../../../store/channelModalStore';
 import { ChannelResponse } from '../../../../api/generated/models/ChannelResponse';
-
-import { AnimatedSection } from './AnimatedSection';
 
 interface ChannelMainContentProps {
   className?: string;
 }
 
 export function ChannelMainContent({ className = '' }: ChannelMainContentProps) {
-  const [isGridExpanded, setIsGridExpanded] = useState(false);
-  const [scrollY, setScrollY] = useState(0);
-  const [rowOpacities, setRowOpacities] = useState([1, 1, 1, 1]); // 각 라인의 투명도
-  const [rowHeights, setRowHeights] = useState([46, 46, 46, 46]); // 각 라인의 높이
-  const mainContentRef = useRef<HTMLDivElement>(null);
-  const heroRef = useRef<HTMLDivElement>(null);
+  // Explore filters state
+  const [filters, setFilters] = useState<ExploreFilters>({
+    search: '',
+    category: 'all',
+    sortBy: 'recent',
+    sortOrder: 'desc',
+  });
 
   // 채널 모달 스토어
   const openChannelModal = useChannelModalStore((state) => state.openModal);
@@ -35,108 +34,48 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
     isLoading,
     error,
   } = useChannels({
-    limit: 50, // 더 많은 채널 로드
+    limit: 100, // Load more channels for better explore experience
     sortBy: 'created_at',
     sortOrder: 'desc',
   });
 
-  // API 데이터를 Item 타입으로 변환
-  const channelItems: Item[] = React.useMemo(() => {
-    if (!channelsData?.channels) return [];
-    return mapChannelsToItems(channelsData.channels);
-  }, [channelsData]);
-
-  // 원본 채널 데이터를 저장 (모달에서 사용)
-  const originalChannels = React.useMemo(() => {
+  // 원본 채널 데이터
+  const channels = useMemo(() => {
     return channelsData?.channels || [];
   }, [channelsData]);
 
-  // 스크롤 이벤트 핸들러
-  const handleScroll = useCallback(() => {
-    if (!mainContentRef.current) return;
-
-    const currentScrollY = mainContentRef.current.scrollTop;
-    setScrollY(currentScrollY);
-
-    // 캡슐 라인 자연스러운 축소 애니메이션
-    const maxScrollForHero = 600; // 더 긴 스크롤 거리로 부드러운 전환
-    const scrollRatio = Math.max(0, Math.min(1, currentScrollY / maxScrollForHero));
-
-    // 각 라인별로 다른 시작점과 끝점 설정
-    const newOpacities = [1, 1, 1, 1];
-    const newHeights = [46, 46, 46, 46];
-
-    // 라인 4 (맨 위): 가장 먼저 사라짐
-    const line4Start = 0.1;
-    const line4End = 0.4;
-    if (scrollRatio > line4Start) {
-      const line4Ratio = Math.min(1, (scrollRatio - line4Start) / (line4End - line4Start));
-      newOpacities[3] = Math.max(0, 1 - line4Ratio);
-      newHeights[3] = Math.max(0, 46 * (1 - line4Ratio * 0.8));
-    }
-
-    // 라인 3: 두 번째로 사라짐
-    const line3Start = 0.2;
-    const line3End = 0.6;
-    if (scrollRatio > line3Start) {
-      const line3Ratio = Math.min(1, (scrollRatio - line3Start) / (line3End - line3Start));
-      newOpacities[2] = Math.max(0, 1 - line3Ratio);
-      newHeights[2] = Math.max(0, 46 * (1 - line3Ratio * 0.8));
-    }
-
-    // 라인 2: 세 번째로 사라짐
-    const line2Start = 0.4;
-    const line2End = 0.8;
-    if (scrollRatio > line2Start) {
-      const line2Ratio = Math.min(1, (scrollRatio - line2Start) / (line2End - line2Start));
-      newOpacities[1] = Math.max(0, 1 - line2Ratio);
-      newHeights[1] = Math.max(0, 46 * (1 - line2Ratio * 0.8));
-    }
-
-    // 라인 1 (맨 아래): 마지막까지 유지 (최소 높이만 줄어듦)
-    const line1Start = 0.6;
-    const line1End = 1.0;
-    if (scrollRatio > line1Start) {
-      const line1Ratio = Math.min(1, (scrollRatio - line1Start) / (line1End - line1Start));
-      newOpacities[0] = Math.max(0.3, 1 - line1Ratio * 0.7); // 최소 투명도 유지
-      newHeights[0] = Math.max(20, 46 * (1 - line1Ratio * 0.6)); // 최소 높이 유지
-    }
-
-    setRowOpacities(newOpacities);
-    setRowHeights(newHeights);
-  }, []);
-
-  useEffect(() => {
-    const element = mainContentRef.current;
-    if (!element) return;
-
-    element.addEventListener('scroll', handleScroll, { passive: true });
-
-    // 초기 상태 설정 (스크롤이 0일 때 모든 라인이 보이도록)
-    setRowOpacities([1, 1, 1, 1]);
-    setRowHeights([46, 46, 46, 46]);
-
-    return () => element.removeEventListener('scroll', handleScroll);
-  }, [handleScroll]);
-
-  // Grid 확장/축소 토글
-  const toggleGridExpansion = useCallback(() => {
-    setIsGridExpanded((prev) => !prev);
-  }, []);
-
-  // 안정적인 아이템 클릭 핸들러 (리렌더 방지)
-  const handleItemClick = useCallback(
-    (item: Item) => {
-      console.log('Channel clicked:', item);
-
-      // 원본 채널 데이터 찾기
-      const originalChannel = originalChannels.find((channel) => channel.id === item.id);
-      if (originalChannel) {
-        // 모달 열기
-        openChannelModal(originalChannel);
+  // Group channels by category for organized sections (exclude uncategorized)
+  const categorizedChannels = useMemo(() => {
+    const categoryGroups: Record<string, ChannelResponse[]> = {};
+    
+    channels.forEach(channel => {
+      const category = channel.category;
+      // Skip channels without category (uncategorized)
+      if (!category || category.toLowerCase() === 'uncategorized') {
+        return;
       }
+      
+      if (!categoryGroups[category]) {
+        categoryGroups[category] = [];
+      }
+      categoryGroups[category].push(channel);
+    });
+
+    return categoryGroups;
+  }, [channels]);
+
+  // Filter change handler
+  const handleFilterChange = useCallback((newFilters: ExploreFilters) => {
+    setFilters(newFilters);
+  }, []);
+
+  // Channel click handler
+  const handleChannelClick = useCallback(
+    (channel: ChannelResponse) => {
+      console.log('Channel clicked:', channel);
+      openChannelModal(channel);
     },
-    [originalChannels, openChannelModal],
+    [openChannelModal],
   );
 
   // 로딩 상태 렌더링
@@ -144,7 +83,10 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
     return (
       <div className={`relative h-full overflow-y-auto ${className}`}>
         <div className="h-full flex items-center justify-center">
-          <div className="text-white text-lg">Loading channels...</div>
+          <div className="flex flex-col items-center">
+            <div className="animate-spin w-8 h-8 border-2 border-white/30 border-t-white rounded-full mb-4"></div>
+            <div className="text-gray-400 text-lg">큐레이터들을 찾는 중...</div>
+          </div>
         </div>
       </div>
     );
@@ -155,42 +97,127 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
     return (
       <div className={`relative h-full overflow-y-auto ${className}`}>
         <div className="h-full flex items-center justify-center">
-          <div className="text-red-500 text-lg">Failed to load channels. Please try again.</div>
+          <div className="flex flex-col items-center text-center">
+            <svg className="w-16 h-16 text-red-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.996-.833-2.664 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+            <div className="text-red-500 text-lg mb-2">큐레이터 정보를 불러올 수 없습니다</div>
+            <div className="text-gray-500">잠시 후 다시 시도해 주세요</div>
+          </div>
         </div>
       </div>
     );
   }
 
   // 채널이 없는 경우
-  if (!channelItems.length) {
+  if (!channels.length) {
     return (
       <div className={`relative h-full overflow-y-auto ${className}`}>
         <div className="h-full flex items-center justify-center">
-          <div className="text-gray-400 text-lg">No channels found.</div>
+          <div className="flex flex-col items-center text-center">
+            <svg className="w-16 h-16 text-zinc-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+            <div className="text-gray-400 text-lg">등록된 큐레이터가 없습니다</div>
+          </div>
         </div>
       </div>
     );
   }
 
+  // Check if we should show organized sections or filtered grid
+  const showOrganizedSections = !filters.search.trim() && filters.category === 'all';
+
   return (
-    <div ref={mainContentRef} className={`relative h-full overflow-y-auto ${className}`}>
-      {/* Hero Section with Scroll Animation */}
-      <div ref={heroRef} className="relative z-10 overflow-hidden">
-        <ChannelHero />
+    <div className={`relative h-full overflow-y-auto bg-black ${className}`}>
+      {/* Top padding for Header */}
+      <div className="h-[60px] md:h-[72px]" />
+      
+      {/* Explore Header */}
+      <ExploreHeader 
+        onFilterChange={handleFilterChange}
+        totalChannels={channels.length}
+      />
+
+      <div className="px-4 md:px-8 pb-12">
+        {showOrganizedSections ? (
+          // Organized sections view (default explore experience)
+          <>
+            {/* Personalized Recommendations */}
+            <RecommendedSection 
+              channels={channels}
+              onChannelClick={handleChannelClick}
+              className="mt-8"
+            />
+
+            {/* Trending Section */}
+            <TrendingSection 
+              channels={channels}
+              onChannelClick={handleChannelClick}
+            />
+
+            {/* Category Sections */}
+            {Object.entries(categorizedChannels).map(([category, categoryChannels]) => {
+              const displayTitle = category.charAt(0).toUpperCase() + category.slice(1);
+              
+              return (
+                <CategorySection
+                  key={category}
+                  title={displayTitle}
+                  channels={categoryChannels}
+                  onChannelClick={handleChannelClick}
+                  onViewAll={() => {
+                    setFilters(prev => ({ ...prev, category }));
+                  }}
+                />
+              );
+            })}
+            
+            {/* Become an Editor CTA */}
+            <section className="mt-20 mb-8">
+              <div className="bg-zinc-900/50 rounded-2xl p-8 border border-zinc-700/30">
+                <div className="text-center max-w-2xl mx-auto">
+                  <div className="w-12 h-12 mx-auto mb-4 bg-zinc-800 rounded-full flex items-center justify-center">
+                    <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-400 mb-3">
+                    당신만의 편집 철학을 공유해보세요
+                  </h3>
+                  <p className="text-gray-500 mb-6 text-lg leading-relaxed">
+                    Decoded는 누구나 에디터가 될 수 있는 플랫폼입니다. <br />
+                    당신의 독창적인 관점과 큐레이션으로 새로운 가치를 만들어보세요.
+                  </p>
+                  <div className="flex items-center justify-center space-x-6 mb-6 text-sm text-gray-500">
+                    <span>무료로 시작</span>
+                    <span>•</span>
+                    <span>전문 도구 제공</span>
+                    <span>•</span>
+                    <span>커뮤니티 지원</span>
+                  </div>
+                  <button className="bg-zinc-800 hover:bg-zinc-700 text-gray-400 hover:text-gray-300 font-semibold px-8 py-3 rounded-lg transition-colors duration-200">
+                    에디터 되기
+                  </button>
+                </div>
+              </div>
+            </section>
+          </>
+        ) : (
+          // Filtered grid view
+          <div className="mt-8">
+            <ExploreGrid 
+              channels={channels}
+              filters={filters}
+              onChannelClick={handleChannelClick}
+            />
+          </div>
+        )}
       </div>
 
-      {/* Grid Section */}
-      <AnimatedSection isExpanded={isGridExpanded} className="relative z-5">
-        <MasonryGrid items={channelItems} onItemClick={handleItemClick} />
-      </AnimatedSection>
-
-      {/* Global Channel Modal */}
+      {/* Global Modals */}
       <ChannelModal />
-
-      {/* Global Content Modal */}
       <ContentModal />
-
-      {/* Global Add Channel Modal */}
       <AddChannelModal />
     </div>
   );

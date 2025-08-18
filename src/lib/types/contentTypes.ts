@@ -117,6 +117,7 @@ export interface ContentItem {
     title?: string;
     description?: string;
     imageUrl?: string;
+    downloadedImageUrl?: string; // 백엔드에서 다운로드한 이미지 URL
     siteName?: string;
     favicon?: string;
     ogImage?: string;

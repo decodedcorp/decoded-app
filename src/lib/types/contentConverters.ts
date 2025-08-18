@@ -153,6 +153,7 @@ const convertLinkContent = (content: UnifiedContent, baseItem: ContentItem): Con
         title: content.linkContent.link_preview_metadata.title || '링크 제목 없음',
         description: content.linkContent.link_preview_metadata.description || '설명이 없습니다.',
         imageUrl: content.linkContent.link_preview_metadata.img_url || undefined,
+        downloadedImageUrl: content.linkContent.link_preview_metadata.downloaded_img_url || undefined, // 백엔드에서 다운로드한 이미지 URL
         siteName:
           content.linkContent.link_preview_metadata.site_name ||
           getDefaultSiteName(content.linkContent.url),
@@ -161,6 +162,7 @@ const convertLinkContent = (content: UnifiedContent, baseItem: ContentItem): Con
         title: '링크 제목 없음',
         description: '설명이 없습니다.',
         imageUrl: undefined,
+        downloadedImageUrl: undefined,
         siteName: getDefaultSiteName(content.linkContent.url),
       };
 

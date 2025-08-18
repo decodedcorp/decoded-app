@@ -20,6 +20,7 @@ export interface SidebarFilters {
   dataTypes: string[];
   categories: string[];
   tags: string[];
+  statuses: string[]; // 추가: 콘텐츠 상태 필터
 }
 
 const DATA_TYPES = [
@@ -40,6 +41,12 @@ const CATEGORIES = [
   { id: 'games', label: 'Games', icon: '🎮', count: 0 },
 ];
 
+const CONTENT_STATUSES = [
+  { id: 'active', label: 'Active', icon: '✅', description: 'Published content' },
+  { id: 'pending', label: 'Pending', icon: '⏳', description: 'Awaiting approval' },
+  { id: 'hidden', label: 'Hidden', icon: '👁️‍🗨️', description: 'Hidden content' },
+];
+
 export function ChannelSidebar({
   onFilterChange,
   onCollapseChange,
@@ -48,6 +55,7 @@ export function ChannelSidebar({
   const [selectedDataTypes, setSelectedDataTypes] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>(['active']); // 기본값: active 콘텐츠만 표시
   const [newTag, setNewTag] = useState('');
   const [isDataTypesExpanded, setIsDataTypesExpanded] = useState(true);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -77,7 +85,7 @@ export function ChannelSidebar({
       : [...selectedDataTypes, dataTypeId];
 
     setSelectedDataTypes(newSelected);
-    updateFilters({ dataTypes: newSelected, categories: selectedCategories, tags: [] });
+    updateFilters({ dataTypes: newSelected, categories: selectedCategories, tags: [], statuses: selectedStatuses });
   };
 
   const handleCategoryToggle = (categoryId: string) => {
@@ -86,7 +94,16 @@ export function ChannelSidebar({
       : [...selectedCategories, categoryId];
 
     setSelectedCategories(newSelected);
-    updateFilters({ dataTypes: selectedDataTypes, categories: newSelected, tags: [] });
+    updateFilters({ dataTypes: selectedDataTypes, categories: newSelected, tags: [], statuses: selectedStatuses });
+  };
+
+  const handleStatusToggle = (statusId: string) => {
+    const newSelected = selectedStatuses.includes(statusId)
+      ? selectedStatuses.filter((id) => id !== statusId)
+      : [...selectedStatuses, statusId];
+
+    setSelectedStatuses(newSelected);
+    updateFilters({ dataTypes: selectedDataTypes, categories: selectedCategories, tags: [], statuses: newSelected });
   };
 
   const handleAddTag = (e: React.FormEvent) => {
@@ -196,6 +213,27 @@ export function ChannelSidebar({
                     ))}
                   </div>
                 </div>
+                
+                {/* Content Status - 컴팩트 표시 */}
+                <div>
+                  <h4 className="text-sm font-medium text-gray-300 mb-2">Status</h4>
+                  <div className="grid grid-cols-3 gap-1">
+                    {CONTENT_STATUSES.map((status) => (
+                      <button
+                        key={status.id}
+                        onClick={() => handleStatusToggle(status.id)}
+                        className={`text-xs p-2 rounded transition-colors duration-200 ${
+                          selectedStatuses.includes(status.id)
+                            ? 'bg-white text-black'
+                            : 'bg-gray-800 hover:bg-gray-700 text-gray-300'
+                        }`}
+                        title={`${status.label} - ${status.description}`}
+                      >
+                        <span className="text-sm">{status.icon}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -295,6 +333,37 @@ export function ChannelSidebar({
           <button className="text-white hover:text-gray-300 text-sm font-medium transition-colors duration-200">
             Show All
           </button>
+        </div>
+
+        {/* Content Status Section */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-medium text-lg">Content Status</h3>
+            <QuestionMarkCircleIcon className="w-5 h-5 text-gray-400" />
+          </div>
+          <div className="space-y-2 mb-4">
+            {CONTENT_STATUSES.map((status) => (
+              <button
+                key={status.id}
+                onClick={() => handleStatusToggle(status.id)}
+                className={`
+                  flex items-center justify-between w-full p-3 rounded-lg text-sm transition-colors duration-200
+                  ${
+                    selectedStatuses.includes(status.id)
+                      ? 'bg-white text-black'
+                      : 'bg-gray-900 hover:bg-gray-800 text-gray-300'
+                  }
+                `}
+                title={status.description}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-base">{status.icon}</span>
+                  <span>{status.label}</span>
+                </div>
+                <span className="text-xs opacity-75">{status.description}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Tags Section */}

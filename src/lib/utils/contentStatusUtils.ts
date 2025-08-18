@@ -7,9 +7,9 @@ export const getContentStatusStyles = (status?: ContentStatus) => {
   switch (status) {
     case ContentStatus.PENDING:
       return {
-        container: 'cursor-not-allowed opacity-60',
-        image: 'blur-sm',
-        text: 'Processing...',
+        container: 'cursor-not-allowed',
+        image: '',
+        text: 'Pending Review',
       };
     case ContentStatus.ACTIVE:
       return {
@@ -44,7 +44,8 @@ export const isContentClickable = (status?: ContentStatus): boolean => {
  * 콘텐츠 상태에 따른 로딩 스피너 표시 여부
  */
 export const shouldShowLoadingSpinner = (status?: ContentStatus): boolean => {
-  return status === ContentStatus.PENDING;
+  // Pending 상태는 더 이상 로딩 스피너를 표시하지 않음
+  return false;
 };
 
 /**
@@ -52,4 +53,11 @@ export const shouldShowLoadingSpinner = (status?: ContentStatus): boolean => {
  */
 export const shouldShowHoverEffects = (status?: ContentStatus): boolean => {
   return status === ContentStatus.ACTIVE;
+};
+
+/**
+ * 콘텐츠 상태에 따른 Pending 오버레이 표시 여부
+ */
+export const shouldShowPendingOverlay = (status?: ContentStatus): boolean => {
+  return status === ContentStatus.PENDING;
 };

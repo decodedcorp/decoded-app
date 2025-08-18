@@ -161,7 +161,7 @@ function useResponsiveModalStyles() {
     styles: {
       width: isMobile ? '100%' : isTablet ? '420px' : '400px',
       height: isMobile ? '100%' : isTablet ? '75vh' : '65vh',
-      marginTop: isMobile ? '0' : '48px',
+      marginTop: '0', // 중앙 정렬을 위해 모든 화면 크기에서 0으로 설정
       borderRadius: isMobile ? '0' : '16px',
       minWidth: isMobile ? '100%' : '350px',
       minHeight: isMobile ? '100%' : '500px',
@@ -273,66 +273,66 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
         }}
       />
 
-      {/* 모달 패널 */}
-      <div
-        ref={modalRef}
-        id="login-modal-panel"
-        data-modal-container="true"
-        data-no-close-on-click="true"
-        className={cn(
-          'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2',
-          'flex flex-col',
-          'border border-white/10',
-          'transition-all duration-300 ease-out',
-          'rounded-2xl p-8',
-          'shadow-2xl',
-          {
-            'opacity-100 scale-100': isOpen && isVisible,
-            'opacity-0 scale-95': !isOpen || !isVisible,
-          },
-        )}
-        style={{
-          pointerEvents: isOpen ? 'auto' : 'none',
-          zIndex: 100001,
-          width: styles.width,
-          height: styles.height,
-          marginTop: styles.marginTop,
-          borderRadius: styles.borderRadius,
-          minWidth: styles.minWidth,
-          minHeight: styles.minHeight,
-          background: `
+      {/* 중앙 정렬 컨테이너 */}
+      <div className="flex items-center justify-center" style={{ zIndex: 100001 }}>
+        {/* 모달 패널 */}
+        <div
+          ref={modalRef}
+          id="login-modal-panel"
+          data-modal-container="true"
+          data-no-close-on-click="true"
+          className={cn(
+            'flex flex-col',
+            'border border-white/10',
+            'transition-all duration-300 ease-out',
+            'rounded-2xl p-8',
+            'shadow-2xl',
+            {
+              'opacity-100 scale-100': isOpen && isVisible,
+              'opacity-0 scale-95': !isOpen || !isVisible,
+            },
+          )}
+          style={{
+            pointerEvents: isOpen ? 'auto' : 'none',
+            zIndex: 100001,
+            width: styles.width,
+            height: styles.height,
+            borderRadius: styles.borderRadius,
+            minWidth: styles.minWidth,
+            minHeight: styles.minHeight,
+            background: `
             radial-gradient(ellipse at center, rgba(58, 39, 15, 0.4) 0%, rgba(0, 0, 0, 0.9) 70%),
             rgba(10, 10, 10, 0.95)
           `,
-          backdropFilter: 'blur(10px)',
-        }}
-      >
-        {/* 상단 섹션 (로고 + 제목) */}
-        <div className="flex flex-col items-center flex-shrink-0 mb-8">
-          <div className="text-3xl font-bold text-[#EAFD66] tracking-tight drop-shadow mb-2">
-            decoded
+            backdropFilter: 'blur(10px)',
+          }}
+        >
+          {/* 상단 섹션 (로고 + 제목) */}
+          <div className="flex flex-col items-center flex-shrink-0 mb-8">
+            <div className="text-3xl font-bold text-[#EAFD66] tracking-tight drop-shadow mb-2">
+              decoded
+            </div>
+            <div className="text-center space-y-2">
+              <p className="text-gray-300 text-sm">Sign in with your Google account to continue</p>
+            </div>
           </div>
-          <div className="text-center space-y-2">
-            <h2 className="text-xl font-semibold text-white">Welcome to Decoded</h2>
-            <p className="text-gray-300 text-sm">Sign in with your Google account to continue</p>
+
+          {/* 로그인 폼 섹션 */}
+          <div className="flex-1 flex flex-col justify-center">
+            <LoginForm onSuccess={handleLoginSuccess} onError={handleLoginError} />
           </div>
-        </div>
 
-        {/* 로그인 폼 섹션 */}
-        <div className="flex-1 flex flex-col justify-center">
-          <LoginForm onSuccess={handleLoginSuccess} onError={handleLoginError} />
-        </div>
-
-        {/* 하단 섹션 (약관 및 개인정보처리방침) */}
-        <div className="flex-shrink-0 mt-8">
-          <div className="text-center text-xs text-gray-400 space-x-4">
-            <a href="/terms-of-service" className="hover:text-gray-200 transition-colors">
-              Terms of Service
-            </a>
-            <span>|</span>
-            <a href="/privacy-policy" className="hover:text-gray-200 transition-colors">
-              Privacy Policy
-            </a>
+          {/* 하단 섹션 (약관 및 개인정보처리방침) */}
+          <div className="flex-shrink-0 mt-8">
+            <div className="text-center text-xs text-gray-400 space-x-4">
+              <a href="/terms-of-service" className="hover:text-gray-200 transition-colors">
+                Terms of Service
+              </a>
+              <span>|</span>
+              <a href="/privacy-policy" className="hover:text-gray-200 transition-colors">
+                Privacy Policy
+              </a>
+            </div>
           </div>
         </div>
       </div>
