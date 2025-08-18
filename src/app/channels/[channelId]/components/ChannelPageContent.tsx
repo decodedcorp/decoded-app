@@ -9,8 +9,10 @@ import { formatDateByContext } from '@/lib/utils/dateUtils';
 
 import { useChannel } from '@/domains/channels/hooks/useChannels';
 import { ChannelModalContent } from '@/domains/channels/components/modal/channel/ChannelModalContent';
-import { ChannelModalSidebar } from '@/domains/channels/components/modal/channel/ChannelModalSidebar';
 import { ChannelModalSkeleton } from '@/domains/channels/components/modal/channel/ChannelModalSkeleton';
+import { ContentModal } from '@/domains/channels/components/modal/content/ContentModal';
+import { ContentUploadModal } from '@/domains/channels/components/modal/content-upload/ContentUploadModal';
+import { useChannelContentsSinglePage } from '@/domains/channels/hooks/useChannelContents';
 
 import { ChannelPageHeader } from './ChannelPageHeader';
 import { RecommendedChannelsSidebar } from './RecommendedChannelsSidebar';
@@ -21,11 +23,12 @@ interface ChannelPageContentProps {
 
 export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
   const router = useRouter();
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  const [isRightSidebarCollapsed, setIsRightSidebarCollapsed] = useState(false);
 
   // 채널 ID로 API 데이터 가져오기
   const { data: apiChannel, isLoading, error } = useChannel(channelId || '');
+
+  // 실제 콘텐츠 수는 API 채널 데이터에서 가져오기 (대용량 API 호출 제거)
 
   // 디버깅을 위한 로그
   React.useEffect(() => {
@@ -52,9 +55,6 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
     // TODO: Implement filter logic for content
   };
 
-  const handleSidebarCollapseToggle = () => {
-    setIsSidebarCollapsed(!isSidebarCollapsed);
-  };
 
   // 채널 데이터 결정: API 데이터를 직접 사용
   const finalChannel = useMemo((): ChannelData | null => {
@@ -62,6 +62,11 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
       return apiChannel;
     }
     return null;
+  }, [apiChannel]);
+
+  // 실제 콘텐츠 수 계산 (API 채널 데이터 사용)
+  const actualContentCount = useMemo(() => {
+    return apiChannel?.content_count || 0;
   }, [apiChannel]);
 
   // 뒤로가기 핸들러 - 더 스마트한 네비게이션
@@ -94,7 +99,6 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
       tags: [],
       statuses: ['active'], // 기본값: active 콘텐츠만 표시
     });
-    setIsMobileFiltersOpen(false); // 모바일 필터도 닫기
   }, [channelId]);
 
   // 로딩 상태 렌더링
@@ -125,16 +129,6 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Left Sidebar - Filters */}
-      <div className="hidden md:block flex-shrink-0">
-        <ChannelModalSidebar
-          currentFilters={currentFilters}
-          onFilterChange={handleFilterChange}
-          isCollapsed={isSidebarCollapsed}
-          onToggleCollapse={handleSidebarCollapseToggle}
-        />
-      </div>
-
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header */}
@@ -152,7 +146,7 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
                 // TODO: Implement unsubscribe functionality
               }}
               isSubscribeLoading={false}
-              onMobileFiltersToggle={() => setIsMobileFiltersOpen(!isMobileFiltersOpen)}
+              onMobileFiltersToggle={() => {}}
             />
           ) : (
             <ChannelModalSkeleton onClose={handleGoBack} />
@@ -171,6 +165,7 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
               <ChannelModalContent 
                 currentFilters={currentFilters} 
                 channelId={channelId}
+                onFilterChange={handleFilterChange}
               />
             </>
           )}
@@ -208,49 +203,20 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
       </div>
 
       {/* Right Sidebar - Recommended Channels */}
-      <div className="hidden xl:block flex-shrink-0">
+      <div className={`hidden xl:block flex-shrink-0 ${isRightSidebarCollapsed ? 'w-12' : 'w-80'}`}>
         <RecommendedChannelsSidebar 
           currentChannelId={channelId}
           className="h-screen"
+          onCollapseChange={setIsRightSidebarCollapsed}
         />
       </div>
 
-      {/* Mobile Filters Overlay */}
-      {isMobileFiltersOpen && (
-        <div className="md:hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
-          <div className="absolute inset-y-0 left-0 w-80 bg-zinc-900 shadow-xl">
-            <div className="flex items-center justify-between p-4 border-b border-zinc-700">
-              <h3 className="text-lg font-semibold text-white">Filters</h3>
-              <button
-                onClick={() => setIsMobileFiltersOpen(false)}
-                className="p-2 rounded-lg bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors"
-                aria-label="Close filters"
-              >
-                <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-                  <path
-                    d="M6 18L18 6M6 6l12 12"
-                    stroke="white"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-            </div>
-            <div className="h-full overflow-y-auto">
-              <ChannelModalSidebar
-                currentFilters={currentFilters}
-                onFilterChange={(filters) => {
-                  handleFilterChange(filters);
-                  setIsMobileFiltersOpen(false); // Close after applying filters
-                }}
-                isCollapsed={false}
-                onToggleCollapse={() => {}}
-              />
-            </div>
-          </div>
-        </div>
-      )}
+
+      {/* Content Modal */}
+      <ContentModal />
+
+      {/* Content Upload Modal */}
+      <ContentUploadModal />
     </div>
   );
 }
