@@ -74,7 +74,7 @@ export function ChannelSearchBar({
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder={`Search in r/${channelName}`}
+          placeholder={`Search in ${channelName}`}
           className="flex-1 py-3 pr-4 bg-transparent text-white placeholder-zinc-400 focus:outline-none rounded-full"
         />
 
