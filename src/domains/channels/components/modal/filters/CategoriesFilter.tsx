@@ -134,12 +134,9 @@ export const CategoriesFilter = memo(function CategoriesFilter({
                 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}
               `}
             >
-              <div className="flex items-center gap-2 min-w-0 flex-1">
-                <span className="text-base flex-shrink-0">{category.icon}</span>
+              <div className="flex items-center justify-between w-full">
                 <span className="font-medium truncate">{category.label}</span>
-              </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <span className={`px-2 py-1 rounded-full text-xs ${category.color}`}>
+                <span className="text-xs bg-[#eafd66]/20 text-[#eafd66] px-1.5 py-0.5 rounded-full ml-2">
                   {category.count}
                 </span>
               </div>

@@ -45,29 +45,6 @@ const CATEGORY_COLORS = [
   'bg-purple-500/20 text-purple-300',
 ];
 
-// Category 아이콘 매핑 (기본값들)
-const CATEGORY_ICONS: Record<string, string> = {
-  articles: '📰',
-  books: '📚',
-  education: '🎓',
-  fashion: '👠',
-  finance: '💰',
-  games: '🎮',
-  technology: '💻',
-  music: '🎵',
-  sports: '⚽',
-  food: '🍕',
-  travel: '✈️',
-  health: '🏥',
-  news: '📢',
-  business: '💼',
-  science: '🔬',
-  art: '🎨',
-  photography: '📸',
-  design: '🎭',
-  programming: '⌨️',
-  lifestyle: '🌟',
-};
 
 /**
  * 채널의 콘텐츠를 기반으로 실제 사용되는 필터 옵션들을 추출하는 훅
@@ -127,7 +104,7 @@ export const useChannelFilters = (channelId: string): UseChannelFiltersResult =>
 
     return Array.from(categoryCount.entries())
       .map(([category, count], index) => {
-        const icon = CATEGORY_ICONS[category] || '📁';
+        const icon = '📁'; // 모든 카테고리에 동일한 기본 아이콘 사용
         const color = CATEGORY_COLORS[index % CATEGORY_COLORS.length];
         
         return {

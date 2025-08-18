@@ -111,11 +111,10 @@ export const DataTypesFilter = memo(function DataTypesFilter({
                 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}
               `}
             >
-              <div className="flex items-center gap-2 min-w-0 flex-1">
-                <span className="text-base flex-shrink-0">{dataType.icon}</span>
+              <div className="flex items-center justify-between w-full">
                 <span className="font-medium truncate">{dataType.label}</span>
                 {dataType.count !== undefined && (
-                  <span className="text-xs bg-zinc-600 text-zinc-300 px-1.5 py-0.5 rounded-full ml-auto">
+                  <span className="text-xs bg-[#eafd66]/20 text-[#eafd66] px-1.5 py-0.5 rounded-full ml-2">
                     {dataType.count}
                   </span>
                 )}

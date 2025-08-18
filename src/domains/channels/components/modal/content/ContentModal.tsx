@@ -25,14 +25,14 @@ export function ContentModal() {
   return (
     <BaseModal isOpen={isOpen} onClose={closeModal}>
       <ContentModalContainer>
-        <ContentModalHeader content={content} onClose={closeModal} />
+        {/* <ContentModalHeader content={content} onClose={closeModal} /> */}
 
         {/* Content */}
         <div className="overflow-y-auto max-h-[calc(95vh-200px)]">
           <ContentModalBody content={content} />
         </div>
 
-        <ContentModalFooter content={content} />
+        {/* <ContentModalFooter content={content} /> */}
       </ContentModalContainer>
     </BaseModal>
   );
