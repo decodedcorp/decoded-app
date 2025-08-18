@@ -4,6 +4,8 @@ import React from 'react';
 
 import { ChannelData } from '@/store/channelModalStore';
 import { ProxiedImage } from '@/components/ProxiedImage';
+import { useContentUploadStore } from '@/store/contentUploadStore';
+import { toast } from 'react-hot-toast';
 
 interface ChannelPageHeaderProps {
   channel: ChannelData;
@@ -22,6 +24,20 @@ export function ChannelPageHeader({
   isSubscribeLoading = false,
   onMobileFiltersToggle,
 }: ChannelPageHeaderProps) {
+  const openContentUploadModal = useContentUploadStore((state) => state.openModal);
+
+  const handleAddContent = () => {
+    if (channel.id) {
+      openContentUploadModal(channel.id);
+    }
+  };
+
+  const handleFollow = () => {
+    toast('Follow feature coming soon!', { 
+      icon: 'ℹ️',
+      duration: 2000 
+    });
+  };
   return (
     <div>
       {/* 상단 배너 섹션 */}
@@ -88,10 +104,16 @@ export function ChannelPageHeader({
 
           {/* 오른쪽: 액션 버튼들 */}
           <div className="flex items-center space-x-3">
-            <button className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-full text-white font-medium transition-colors">
+            <button 
+              onClick={handleAddContent}
+              className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-full text-white font-medium transition-colors"
+            >
               + Add Content
             </button>
-            <button className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-full text-white transition-colors">
+            <button 
+              onClick={handleFollow}
+              className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-full text-white transition-colors"
+            >
               Follow
             </button>
             <button className="p-2 bg-zinc-800 hover:bg-zinc-700 rounded-full text-white transition-colors">
