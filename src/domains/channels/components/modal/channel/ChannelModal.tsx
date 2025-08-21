@@ -127,7 +127,7 @@ export function ChannelModal() {
           {!error && finalChannel && (
             <ChannelModalContent 
               currentFilters={currentFilters} 
-              channelId={channelId}
+              channelId={channelId || undefined}
               onFilterChange={handleFilterChange}
             />
           )}

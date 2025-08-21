@@ -13,9 +13,13 @@ import { ChannelModalSkeleton } from '@/domains/channels/components/modal/channe
 import { ContentModal } from '@/domains/channels/components/modal/content/ContentModal';
 import { ContentUploadModal } from '@/domains/channels/components/modal/content-upload/ContentUploadModal';
 import { useChannelContentsSinglePage } from '@/domains/channels/hooks/useChannelContents';
+import { useContentModalStore } from '@/store/contentModalStore';
+import { ContentItem } from '@/lib/types/content';
 
 import { ChannelPageHeader } from './ChannelPageHeader';
 import { RecommendedChannelsSidebar } from './RecommendedChannelsSidebar';
+import CommunityHighlights from '@/domains/channels/components/highlights/CommunityHighlights';
+import { HighlightItem } from '@/lib/types/highlightTypes';
 
 interface ChannelPageContentProps {
   channelId: string;
@@ -24,6 +28,7 @@ interface ChannelPageContentProps {
 export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
   const router = useRouter();
   const [isRightSidebarCollapsed, setIsRightSidebarCollapsed] = useState(false);
+  const openContentModal = useContentModalStore((state) => state.openModal);
 
   // 채널 ID로 API 데이터 가져오기
   const { data: apiChannel, isLoading, error } = useChannel(channelId || '');
@@ -78,6 +83,14 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
       router.push('/');
     }
   };
+
+  // 하이라이트 클릭 핸들러
+  const handleHighlightClick = React.useCallback((highlight: HighlightItem) => {
+    if (highlight.clickAction.type === 'content_modal' && highlight.clickAction.data) {
+      // ContentItem 데이터로 콘텐츠 모달 열기
+      openContentModal(highlight.clickAction.data as ContentItem);
+    }
+  }, [openContentModal]);
 
   // 키보드 네비게이션 지원
   React.useEffect(() => {

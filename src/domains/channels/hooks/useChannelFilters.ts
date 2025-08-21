@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { ContentType } from '@/api/generated';
 import { useChannelContentsSinglePage } from './useChannelContents';
+import { ContentItem } from '@/lib/types/content';
 
 interface FilterOption {
   id: string;
@@ -67,7 +68,7 @@ export const useChannelFilters = (channelId: string): UseChannelFiltersResult =>
 
     const typeCount = new Map<string, number>();
     
-    contentItems.forEach((item) => {
+    contentItems.forEach((item: ContentItem) => {
       const type = item.type;
       typeCount.set(type, (typeCount.get(type) || 0) + 1);
     });
@@ -95,7 +96,7 @@ export const useChannelFilters = (channelId: string): UseChannelFiltersResult =>
 
     const categoryCount = new Map<string, number>();
     
-    contentItems.forEach((item) => {
+    contentItems.forEach((item: ContentItem) => {
       if (item.category) {
         const category = item.category.toLowerCase().trim();
         categoryCount.set(category, (categoryCount.get(category) || 0) + 1);
@@ -153,7 +154,7 @@ export const useChannelContentFiltering = (
   const filteredContent = useMemo(() => {
     if (!contentItems) return [];
 
-    return contentItems.filter((item) => {
+    return contentItems.filter((item: ContentItem) => {
       // Data Type 필터링
       if (filters.dataTypes.length > 0 && !filters.dataTypes.includes(item.type)) {
         return false;

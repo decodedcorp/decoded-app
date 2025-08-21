@@ -33,18 +33,18 @@ const CARD_SIZES = {
     title: 'text-xl md:text-2xl',
     description: 'text-base line-clamp-4',
     stats: 'text-sm',
-  }
+  },
 };
 
-export function ChannelCard({ 
-  channel, 
-  onClick, 
-  size = 'medium', 
+export function ChannelCard({
+  channel,
+  onClick,
+  size = 'medium',
   className = '',
-  highlightCategory = false 
+  highlightCategory = false,
 }: ChannelCardProps) {
   const sizeStyles = CARD_SIZES[size];
-  
+
   const formatCount = (count: number | undefined) => {
     if (!count) return '0';
     if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
@@ -58,7 +58,7 @@ export function ChannelCard({
       return new Date(dateString).toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
-        year: 'numeric'
+        year: 'numeric',
       });
     } catch {
       return '';
@@ -92,11 +92,13 @@ export function ChannelCard({
       `}
     >
       {/* Channel Thumbnail */}
-      <div className={`relative ${sizeStyles.image} overflow-hidden bg-gradient-to-br from-zinc-800 to-zinc-900`}>
+      <div
+        className={`relative ${sizeStyles.image} overflow-hidden bg-gradient-to-br from-zinc-800 to-zinc-900`}
+      >
         {channel.thumbnail_url ? (
           <ProxiedImage
             src={channel.thumbnail_url}
-            downloadedSrc={channel.download_img_url}
+            downloadedSrc={channel.thumbnail_url}
             alt={`${channel.name} thumbnail`}
             width={400}
             height={300}
@@ -105,14 +107,16 @@ export function ChannelCard({
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-500/20 to-purple-500/20">
-            <span className={`font-bold text-white/80 ${
-              size === 'large' ? 'text-4xl' : size === 'medium' ? 'text-2xl' : 'text-xl'
-            }`}>
+            <span
+              className={`font-bold text-white/80 ${
+                size === 'large' ? 'text-4xl' : size === 'medium' ? 'text-2xl' : 'text-xl'
+              }`}
+            >
               {channel.name.charAt(0).toUpperCase()}
             </span>
           </div>
         )}
-        
+
         {/* Content Count Badge */}
         {channel.content_count && channel.content_count > 0 && (
           <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm px-2 py-1 rounded-full">
@@ -126,7 +130,9 @@ export function ChannelCard({
       {/* Channel Info */}
       <div className="p-6 flex flex-col flex-grow">
         {/* Channel Name */}
-        <h3 className={`font-semibold text-gray-400 mb-2 group-hover:text-gray-300 transition-colors line-clamp-2 ${sizeStyles.title}`}>
+        <h3
+          className={`font-semibold text-gray-400 mb-2 group-hover:text-gray-300 transition-colors line-clamp-2 ${sizeStyles.title}`}
+        >
           {channel.name}
         </h3>
 
@@ -143,15 +149,7 @@ export function ChannelCard({
 
         {/* Channel Tags/Keywords */}
         <div className="flex flex-wrap gap-1 mb-3">
-          {channel.category && (
-            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-              highlightCategory 
-                ? 'bg-[#eafd66]/20 text-[#eafd66]'
-                : 'bg-zinc-800/50 text-gray-400'
-            }`}>
-              {channel.category}
-            </span>
-          )}
+          {/* Category removed - not available in current API */}
           {(channel.content_count || 0) > 50 && (
             <span className="px-2 py-1 bg-zinc-800/50 text-gray-400 rounded-full text-xs font-medium">
               전문 큐레이션
@@ -170,11 +168,11 @@ export function ChannelCard({
             {/* Subscriber Count */}
             <div className="flex items-center space-x-1">
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" 
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
                 />
               </svg>
               <span>{formatCount(channel.subscriber_count)}</span>
@@ -184,7 +182,12 @@ export function ChannelCard({
             {channel.created_at && (
               <div className="flex items-center space-x-1">
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 <span>{formatDate(channel.created_at)}</span>
               </div>
@@ -193,7 +196,12 @@ export function ChannelCard({
 
           {/* Arrow Icon */}
           <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="w-4 h-4 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </div>

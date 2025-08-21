@@ -18,12 +18,12 @@ interface DataTypesFilterProps {
 
 // 기본 데이터 타입 (API 데이터가 없을 때 사용)
 const DEFAULT_DATA_TYPES = [
-  { id: 'link', label: 'Link', icon: '🔗' },
-  { id: 'image', label: 'Image', icon: '🖼️' },
-  { id: 'pdf', label: 'PDF', icon: '📄' },
-  { id: 'video', label: 'Video', icon: '🎥' },
-  { id: 'audio', label: 'Audio', icon: '🎵' },
-  { id: 'text', label: 'Text', icon: '📝' },
+  { id: 'link', label: 'Link', icon: '🔗', count: 0 },
+  { id: 'image', label: 'Image', icon: '🖼️', count: 0 },
+  { id: 'pdf', label: 'PDF', icon: '📄', count: 0 },
+  { id: 'video', label: 'Video', icon: '🎥', count: 0 },
+  { id: 'audio', label: 'Audio', icon: '🎵', count: 0 },
+  { id: 'text', label: 'Text', icon: '📝', count: 0 },
 ];
 
 export const DataTypesFilter = memo(function DataTypesFilter({

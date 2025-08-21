@@ -20,22 +20,22 @@ interface ContentFiltersBarProps {
 
 // 기본 데이터 타입
 const DEFAULT_DATA_TYPES = [
-  { id: 'link', label: 'Link' },
-  { id: 'image', label: 'Image' },
-  { id: 'pdf', label: 'PDF' },
-  { id: 'video', label: 'Video' },
-  { id: 'audio', label: 'Audio' },
-  { id: 'text', label: 'Text' },
+  { id: 'link', label: 'Link', count: 0 },
+  { id: 'image', label: 'Image', count: 0 },
+  { id: 'pdf', label: 'PDF', count: 0 },
+  { id: 'video', label: 'Video', count: 0 },
+  { id: 'audio', label: 'Audio', count: 0 },
+  { id: 'text', label: 'Text', count: 0 },
 ];
 
 // 기본 카테고리 (예시)
 const DEFAULT_CATEGORIES = [
-  { id: 'tech', label: 'Technology' },
-  { id: 'news', label: 'News' },
-  { id: 'research', label: 'Research' },
-  { id: 'entertainment', label: 'Entertainment' },
-  { id: 'education', label: 'Education' },
-  { id: 'business', label: 'Business' },
+  { id: 'tech', label: 'Technology', count: 0 },
+  { id: 'news', label: 'News', count: 0 },
+  { id: 'research', label: 'Research', count: 0 },
+  { id: 'entertainment', label: 'Entertainment', count: 0 },
+  { id: 'education', label: 'Education', count: 0 },
+  { id: 'business', label: 'Business', count: 0 },
 ];
 
 export const ContentFiltersBar = memo(function ContentFiltersBar({
