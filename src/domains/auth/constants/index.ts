@@ -1,18 +1,18 @@
-// Storage keys
+// Storage keys (소문자 통일)
 export const STORAGE_KEYS = {
   // SessionStorage (브라우저 종료 시 삭제)
-  ACCESS_TOKEN: 'ACCESS_TOKEN',
-  USER_DOC_ID: 'USER_DOC_ID',
-  USER_EMAIL: 'USER_EMAIL',
-  USER_NICKNAME: 'USER_NICKNAME',
+  ACCESS_TOKEN: 'access_token',
+  USER_DOC_ID: 'user_doc_id',
+  USER_EMAIL: 'user_email',
+  USER_NICKNAME: 'user_nickname',
 
   // LocalStorage (장기 보관)
-  REFRESH_TOKEN: 'REFRESH_TOKEN',
-  LAST_TOKEN_CHECK: 'LAST_TOKEN_CHECK',
+  REFRESH_TOKEN: 'refresh_token',
+  LAST_TOKEN_CHECK: 'last_token_check',
 
   // 임시 저장용 (모바일 OAuth 처리)
-  TEMP_ID_TOKEN: 'TEMP_ID_TOKEN',
-  LOGIN_TIMESTAMP: 'LOGIN_TIMESTAMP',
+  TEMP_ID_TOKEN: 'temp_id_token',
+  LOGIN_TIMESTAMP: 'login_timestamp',
 } as const;
 
 // API endpoints

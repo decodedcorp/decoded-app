@@ -226,8 +226,8 @@ const SimpleCard = memo(
         data-original-card-id={card.id}
         data-grid-index={gridIndex}
         className={`relative bg-zinc-900 rounded-xl overflow-hidden mx-auto cursor-pointer transition-shadow duration-300 ease-out ${
-          isSelected 
-            ? 'ring-4 ring-blue-400/50 shadow-[0_0_50px_rgba(59,130,246,0.5)]' 
+          isSelected
+            ? 'ring-4 ring-blue-400/50 shadow-[0_0_50px_rgba(59,130,246,0.5)]'
             : 'hover:shadow-[var(--hover-shadow,0_20px_40px_-10px_rgba(0,0,0,0.2))] hover:scale-[1.03]'
         }`}
         style={{
@@ -240,7 +240,7 @@ const SimpleCard = memo(
       >
         {/* 블러 오버레이 - 선택되지 않은 카드에만 적용 */}
         <BlurOverlay isBlurred={isBlurred} />
-        
+
         {/* 배경색 */}
         <div className="absolute inset-0" style={bgStyle} />
 
@@ -350,7 +350,7 @@ const SimpleCard = memo(
       prevProps.uniqueId === nextProps.uniqueId &&
       prevProps.gridIndex === nextProps.gridIndex
     );
-  }
+  },
 );
 
 SimpleCard.displayName = 'SimpleCard';
@@ -358,9 +358,9 @@ SimpleCard.displayName = 'SimpleCard';
 // 블러 오버레이 컴포넌트 - 성능 최적화를 위해 별도 분리
 const BlurOverlay = memo(({ isBlurred }: { isBlurred: boolean }) => {
   if (!isBlurred) return null;
-  
+
   return (
-    <div 
+    <div
       className="absolute inset-0 z-20 backdrop-blur-sm bg-black/20 rounded-xl transition-all duration-300 ease-out"
       style={{
         backdropFilter: 'blur(4px)',
@@ -417,7 +417,7 @@ export function SimpleThiingsGrid({
 
   // Hydration 오류 방지를 위한 상태 관리
   const [gridSize, setGridSize] = useState(400); // 기본값으로 시작 (높이 기준)
-  
+
   // 선택된 카드 중앙 정렬을 위한 ref
   const gridContainerRef = useRef<HTMLDivElement>(null);
 
@@ -445,39 +445,39 @@ export function SimpleThiingsGrid({
     if (isSidebarOpen && selectedCardId && gridContainerRef.current) {
       // 선택된 카드 ID와 일치하는 모든 요소 찾기
       const selectedCardElements = gridContainerRef.current.querySelectorAll(
-        `[data-original-card-id="${selectedCardId}"]`
+        `[data-original-card-id="${selectedCardId}"]`,
       ) as NodeListOf<HTMLElement>;
-      
+
       if (selectedCardElements.length > 0) {
         // 뷰포트 중앙에 가장 가까운 카드 찾기
         const viewportCenterY = window.innerHeight / 2;
         const viewportCenterX = window.innerWidth / 2;
-        
+
         let closestElement = selectedCardElements[0];
         let minDistance = Number.MAX_VALUE;
-        
+
         selectedCardElements.forEach((element) => {
           const rect = element.getBoundingClientRect();
           const elementCenterY = rect.top + rect.height / 2;
           const elementCenterX = rect.left + rect.width / 2;
-          
+
           // 뷰포트 중앙까지의 거리 계산
           const distance = Math.sqrt(
-            Math.pow(elementCenterX - viewportCenterX, 2) + 
-            Math.pow(elementCenterY - viewportCenterY, 2)
+            Math.pow(elementCenterX - viewportCenterX, 2) +
+              Math.pow(elementCenterY - viewportCenterY, 2),
           );
-          
+
           if (distance < minDistance) {
             minDistance = distance;
             closestElement = element;
           }
         });
-        
+
         // 가장 가까운 카드를 뷰포트 중앙으로 스크롤
         closestElement.scrollIntoView({
           behavior: 'smooth',
           block: 'center',
-          inline: 'center'
+          inline: 'center',
         });
       }
     }
@@ -633,18 +633,23 @@ export function SimpleThiingsGrid({
       // gridIndex를 이용해 카드 순환 사용
       const card = cards[gridIndex % cards.length];
       console.log('🎯 [renderItem] Using real card:', card);
-      
+
+      // card가 null인 경우 처리
+      if (!card) {
+        return null;
+      }
+
       // 고유 식별자 생성 - 카드ID와 그리드인덱스 조합으로 중복 방지
       const uniqueCardId = `${card.id}-grid-${gridIndex}`;
-      
+
       // 카드 선택/블러 상태 계산 - 카드 ID만으로 비교 (그리드 인덱스 무관)
       const isSelected = isSidebarOpen && selectedCardId === card.id;
       const isBlurred = isSidebarOpen && selectedCardId !== card.id;
-      
+
       return (
-        <SimpleCard 
-          card={card} 
-          isMoving={isMoving} 
+        <SimpleCard
+          card={card}
+          isMoving={isMoving}
           onCardClick={cardClickHandler}
           isSelected={isSelected}
           isBlurred={isBlurred}

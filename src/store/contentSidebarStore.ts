@@ -24,7 +24,7 @@ export const useContentSidebarStore = create<ContentSidebarState>((set) => ({
     set({
       isOpen: true,
       selectedContent: content,
-      selectedCardId: content.id,
+      selectedCardId: String(content.id),
     });
     console.log('🎯 [contentSidebarStore] Sidebar opened successfully');
   },

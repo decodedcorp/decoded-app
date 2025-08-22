@@ -100,12 +100,26 @@ export const useAuthStore = create<AuthStore>()(
             sessionStorage.setItem('isLoggingOut', 'true');
           }
 
-          // 토큰 및 세션 정리
+          // 강화된 토큰 및 세션 완전 정리
           clearSession();
 
-          // sessionStorage에서 user 정보 제거
+          // 추가적인 sessionStorage 정리 (확실한 제거 보장)
           if (typeof window !== 'undefined') {
             sessionStorage.removeItem('user');
+            // 현재 키들
+            sessionStorage.removeItem('access_token');
+            sessionStorage.removeItem('user_doc_id');
+            sessionStorage.removeItem('user_email');
+            sessionStorage.removeItem('user_nickname');
+            // Legacy 대문자 키들도 정리
+            sessionStorage.removeItem('ACCESS_TOKEN');
+            sessionStorage.removeItem('USER_DOC_ID');
+            sessionStorage.removeItem('USER_EMAIL');
+            sessionStorage.removeItem('USER_NICKNAME');
+            
+            if (process.env.NODE_ENV === 'development') {
+              console.log('[AuthStore] 로그아웃 시 모든 인증 데이터 강제 제거 완료 (legacy 키 포함)');
+            }
           }
 
           // 멀티탭 동기화를 위한 logout 이벤트 발행

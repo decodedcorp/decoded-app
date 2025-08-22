@@ -19,10 +19,10 @@ export interface DecodedToken {
 export type TokenType = 'jwt' | 'oauth' | 'unknown';
 
 /**
- * Enhanced Token Management - Backup 방식 적용
- * - Access tokens: SessionStorage (브라우저 종료 시 삭제)
+ * Enhanced Token Management - 보안 강화 적용
+ * - Access tokens: SessionStorage (브라우저 종료 시 삭제, XSS 공격 완화)
  * - User data: SessionStorage (브라우저 종료 시 삭제)
- * - Refresh tokens: LocalStorage (장기 보관)
+ * - Refresh tokens: LocalStorage (장기 보관, 향후 HttpOnly Cookie 권장)
  */
 
 /**
@@ -47,33 +47,46 @@ const getLocalStorage = () => {
 };
 
 /**
- * Set access token in localStorage (primary storage)
+ * Set access token in sessionStorage (보안 강화)
  */
 export const setAccessToken = (token: string): void => {
   if (!token) {
     throw new TokenError('Access token cannot be empty');
   }
 
-  const storage = getLocalStorage();
+  const storage = getSessionStorage();
   if (storage) {
     storage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token);
     if (process.env.NODE_ENV === 'development') {
-      console.log('[Auth] Access token stored in localStorage');
+      console.log('[Auth] Access token stored in sessionStorage:', {
+        key: STORAGE_KEYS.ACCESS_TOKEN,
+        tokenLength: token.length,
+        tokenStart: token.substring(0, 20) + '...',
+        storageAvailable: !!storage
+      });
     }
+  } else {
+    console.error('[Auth] SessionStorage not available!');
   }
 };
 
 /**
- * Get access token from localStorage (primary storage)
+ * Get access token from sessionStorage (보안 강화)
  */
 export const getAccessToken = (): string | null => {
-  const localStorage = getLocalStorage();
+  const sessionStorage = getSessionStorage();
 
-  // localStorage에서 토큰 확인 (primary storage)
-  const token = localStorage ? localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN) : null;
+  // sessionStorage에서 토큰 확인 (XSS 보안 강화)
+  const token = sessionStorage ? sessionStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN) : null;
 
   if (process.env.NODE_ENV === 'development') {
-    console.log('[Auth] getAccessToken result:', token ? 'found' : 'not found');
+    console.log('[Auth] getAccessToken from sessionStorage:', {
+      key: STORAGE_KEYS.ACCESS_TOKEN,
+      found: !!token,
+      tokenLength: token?.length || 0,
+      storageAvailable: !!sessionStorage,
+      allKeys: sessionStorage ? Object.keys(sessionStorage).filter(k => k.includes('token') || k.includes('user')) : []
+    });
   }
 
   return token;
@@ -207,6 +220,16 @@ export const storeLoginResponse = (response: {
   refresh_token: string;
   user: { doc_id: string; email: string; nickname: string };
 }): void => {
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[Auth] storeLoginResponse called with:', {
+      hasAccessToken: !!response.access_token?.access_token,
+      accessTokenLength: response.access_token?.access_token?.length || 0,
+      hasRefreshToken: !!response.refresh_token,
+      hasUser: !!response.user,
+      userDocId: response.user?.doc_id
+    });
+  }
+
   setAccessToken(response.access_token.access_token);
 
   // refresh_token이 있는 경우에만 저장
@@ -221,40 +244,74 @@ export const storeLoginResponse = (response: {
     email: response.user.email,
     nickname: response.user.nickname,
   });
+
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[Auth] storeLoginResponse completed, checking storage...');
+    // 즉시 확인
+    setTimeout(() => {
+      const storedToken = getAccessToken();
+      console.log('[Auth] Token verification after storage:', !!storedToken);
+    }, 100);
+  }
 };
 
 /**
- * Clear tokens from storage
+ * Clear tokens from storage (완전 제거 보장)
  */
 export const clearTokens = (): void => {
   const sessionStorage = getSessionStorage();
   const localStorage = getLocalStorage();
 
   if (sessionStorage) {
+    // sessionStorage에서 모든 인증 관련 데이터 제거
     sessionStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
     sessionStorage.removeItem(STORAGE_KEYS.USER_DOC_ID);
     sessionStorage.removeItem(STORAGE_KEYS.USER_EMAIL);
     sessionStorage.removeItem(STORAGE_KEYS.USER_NICKNAME);
-    // sessionStorage의 'user' 항목도 제거
     sessionStorage.removeItem('user');
+    sessionStorage.removeItem('isLoggingOut');
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Auth] SessionStorage 완전 정리 완료');
+    }
   }
 
   if (localStorage) {
-    localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+    // localStorage에서 refresh token 및 기타 인증 데이터 제거
     localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
     localStorage.removeItem(STORAGE_KEYS.LAST_TOKEN_CHECK);
+    
+    // 혹시 남아있을 수 있는 legacy access token도 제거
+    localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Auth] LocalStorage 인증 데이터 정리 완료');
+    }
   }
 };
 
 /**
- * Clear session storage
+ * Clear session storage (강화된 세션 정리)
  */
 export const clearSession = (): void => {
   const sessionStorage = getSessionStorage();
   if (sessionStorage) {
-    sessionStorage.clear();
+    // 선택적 정리: 인증 관련 항목만 제거 (다른 앱 데이터 보존)
+    const authKeys = [
+      STORAGE_KEYS.ACCESS_TOKEN,
+      STORAGE_KEYS.USER_DOC_ID,
+      STORAGE_KEYS.USER_EMAIL,
+      STORAGE_KEYS.USER_NICKNAME,
+      'user',
+      'isLoggingOut'
+    ];
+    
+    authKeys.forEach(key => {
+      sessionStorage.removeItem(key);
+    });
+    
     if (process.env.NODE_ENV === 'development') {
-      console.log('[Auth] Session cleared');
+      console.log('[Auth] 인증 관련 세션 데이터만 선택적 정리 완료');
     }
   }
 };
@@ -278,10 +335,10 @@ export const getValidAccessToken = (): string | null => {
 
   if (isTokenExpired(token)) {
     console.warn('[Auth] Access token is expired');
-    // 만료된 토큰 제거 (localStorage에서)
-    const localStorage = getLocalStorage();
-    if (localStorage) {
-      localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+    // 만료된 토큰 제거 (sessionStorage에서)
+    const sessionStorage = getSessionStorage();
+    if (sessionStorage) {
+      sessionStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
     }
     return null;
   }
@@ -362,6 +419,46 @@ export const forceUpdateAccessToken = (newToken: string): void => {
 };
 
 /**
+ * 강제 로그아웃 (모든 저장소에서 토큰 완전 제거)
+ */
+export const forceLogout = (): void => {
+  const sessionStorage = getSessionStorage();
+  const localStorage = getLocalStorage();
+
+  // sessionStorage 완전 정리
+  if (sessionStorage) {
+    const keysToRemove = [
+      STORAGE_KEYS.ACCESS_TOKEN,
+      STORAGE_KEYS.USER_DOC_ID,
+      STORAGE_KEYS.USER_EMAIL,
+      STORAGE_KEYS.USER_NICKNAME,
+      'user',
+      'isLoggingOut',
+      // Legacy 대문자 키들도 정리
+      'ACCESS_TOKEN',
+      'USER_DOC_ID', 
+      'USER_EMAIL',
+      'USER_NICKNAME'
+    ];
+    
+    keysToRemove.forEach(key => {
+      sessionStorage.removeItem(key);
+    });
+  }
+
+  // localStorage에서 인증 관련 데이터 제거
+  if (localStorage) {
+    localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN); // legacy
+    localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.LAST_TOKEN_CHECK);
+  }
+
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[Auth] 강제 로그아웃: 모든 저장소에서 인증 데이터 완전 제거');
+  }
+};
+
+/**
  * Get token info for debugging
  */
 export const getTokenInfo = () => {
@@ -380,6 +477,7 @@ export const getTokenInfo = () => {
       isExpired: expiresIn <= 0,
       expiresIn,
       payload: decoded,
+      storage: 'sessionStorage', // 저장소 위치 명시
     };
   } catch (error) {
     return { hasToken: true, isExpired: true, expiresIn: 0, error: 'Failed to decode' };

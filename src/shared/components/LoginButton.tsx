@@ -12,6 +12,7 @@ export function LoginButton() {
   // 개별 상태를 직접 구독하여 무한 루프 방지
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isLoading = useAuthStore((state) => state.isLoading);
+  const isInitialized = useAuthStore((state) => state.isInitialized);
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
 
@@ -63,14 +64,14 @@ export function LoginButton() {
     );
   }
 
-  // 로딩 중일 때는 버튼을 비활성화
-  if (isLoading) {
+  // 로딩 중이거나 아직 초기화되지 않았을 때는 버튼을 비활성화
+  if (isLoading || !isInitialized) {
     return (
       <button
         disabled
         className="px-4 py-2 rounded-md text-sm font-medium bg-neutral-900/50 text-[#EAFD66]/50 cursor-not-allowed transition"
       >
-        Loading...
+        {isLoading ? 'Loading...' : 'Initializing...'}
       </button>
     );
   }

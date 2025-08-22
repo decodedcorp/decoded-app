@@ -55,7 +55,7 @@ export function BaseModal({
   // 접근성 훅 적용
   useRestoreFocus(isOpen);
   useScrollLock(isOpen);
-  useFocusTrap(dialogRef, isOpen);
+  useFocusTrap(dialogRef as React.RefObject<HTMLElement>, isOpen);
   useAriaInert(isOpen, modalRootRef.current);
 
   // ESC 키로 모달 닫기

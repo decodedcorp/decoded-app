@@ -9,20 +9,20 @@ import { useAriaInert } from '@/lib/hooks/useAriaInert';
 type ModalProps = {
   open: boolean;
   onClose: () => void;
-  titleId: string;          // h2 id
-  descId?: string;          // p id
+  titleId: string; // h2 id
+  descId?: string; // p id
   children: React.ReactNode;
-  withBackgroundBlur?: boolean;  // 카드/배경 블러
+  withBackgroundBlur?: boolean; // 카드/배경 블러
   className?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
 };
 
 const sizeClasses = {
   sm: 'max-w-md',
-  md: 'max-w-lg', 
+  md: 'max-w-lg',
   lg: 'max-w-4xl',
   xl: 'max-w-6xl',
-  full: 'max-w-[90vw]'
+  full: 'max-w-[90vw]',
 };
 
 export function Modal({
@@ -33,7 +33,7 @@ export function Modal({
   children,
   withBackgroundBlur = true,
   className = '',
-  size = 'md'
+  size = 'md',
 }: ModalProps) {
   const [mounted, setMounted] = useState(false);
   const modalRootRef = useRef<HTMLDivElement | null>(null);
@@ -53,7 +53,7 @@ export function Modal({
 
   useRestoreFocus(open);
   useScrollLock(open);
-  useFocusTrap(dialogRef, open);
+  useFocusTrap(dialogRef as React.RefObject<HTMLElement>, open);
   useAriaInert(open, modalRootRef.current);
 
   useEffect(() => {

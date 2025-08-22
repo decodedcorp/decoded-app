@@ -13,7 +13,7 @@ interface LoginFormProps {
 
 export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
   const { googleOAuthMutation } = useAuthMutations();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, login } = useAuthStore();
   const popupRef = useRef<Window | null>(null);
   const messageHandledRef = useRef(false);
 
@@ -37,6 +37,20 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
           console.log('[LoginForm] Received OAuth success message:', event.data);
         }
 
+        // 팝업에서 받은 완전한 로그인 데이터로 메인 창에서 로그인 처리
+        if (event.data.loginData) {
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[LoginForm] Processing login data in main window:', {
+              hasAccessToken: !!event.data.loginData.access_token?.access_token,
+              hasUser: !!event.data.loginData.user,
+              hasRefreshToken: !!event.data.loginData.refresh_token
+            });
+          }
+          
+          // AuthStore의 login 함수를 호출하여 메인 창에서 토큰 저장
+          login(event.data.loginData);
+        }
+
         // 로그인 성공 콜백 호출
         onSuccess?.();
       } else if (event.data.type === 'GOOGLE_OAUTH_ERROR') {
@@ -52,7 +66,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [onSuccess, onError]);
+  }, [onSuccess, onError, login]);
 
   // 로그인 상태 변경 감지
   useEffect(() => {
