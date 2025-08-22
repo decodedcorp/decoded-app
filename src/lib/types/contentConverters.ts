@@ -109,7 +109,7 @@ const getDefaultSiteName = (url: string): string => {
  */
 const convertImageContent = (content: UnifiedContent, baseItem: ContentItem): ContentItem => {
   if (!isImageContent(content)) return baseItem;
-  
+
   console.log('[convertToContentItem] Processing as image content');
   return {
     ...baseItem,
@@ -124,7 +124,7 @@ const convertImageContent = (content: UnifiedContent, baseItem: ContentItem): Co
  */
 const convertVideoContent = (content: UnifiedContent, baseItem: ContentItem): ContentItem => {
   if (!isVideoContent(content)) return baseItem;
-  
+
   console.log('[convertToContentItem] Processing as video content');
   return {
     ...baseItem,
@@ -139,7 +139,7 @@ const convertVideoContent = (content: UnifiedContent, baseItem: ContentItem): Co
  */
 const convertLinkContent = (content: UnifiedContent, baseItem: ContentItem): ContentItem => {
   if (!isLinkContent(content)) return baseItem;
-  
+
   console.log('[convertToContentItem] Processing as link content:', {
     id: content.id,
     url: content.linkContent.url,
@@ -152,8 +152,11 @@ const convertLinkContent = (content: UnifiedContent, baseItem: ContentItem): Con
     ? {
         title: content.linkContent.link_preview_metadata.title || '링크 제목 없음',
         description: content.linkContent.link_preview_metadata.description || '설명이 없습니다.',
-        imageUrl: content.linkContent.link_preview_metadata.img_url || undefined,
-        downloadedImageUrl: content.linkContent.link_preview_metadata.downloaded_img_url || undefined, // 백엔드에서 다운로드한 이미지 URL
+        imageUrl: content.linkContent.link_preview_metadata.img_url || content.thumbnail_url || '',
+        downloadedImageUrl:
+          content.linkContent.link_preview_metadata.downloaded_img_url ||
+          content.thumbnail_url ||
+          '',
         siteName:
           content.linkContent.link_preview_metadata.site_name ||
           getDefaultSiteName(content.linkContent.url),
@@ -161,8 +164,8 @@ const convertLinkContent = (content: UnifiedContent, baseItem: ContentItem): Con
     : {
         title: '링크 제목 없음',
         description: '설명이 없습니다.',
-        imageUrl: undefined,
-        downloadedImageUrl: undefined,
+        imageUrl: content.thumbnail_url || '',
+        downloadedImageUrl: content.thumbnail_url || '',
         siteName: getDefaultSiteName(content.linkContent.url),
       };
 

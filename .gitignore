@@ -95,6 +95,12 @@ tsconfig.tsbuildinfo
 .aiexclude
 .mcp.json
 
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
 # Task files
 # tasks.json
 # tasks/ 

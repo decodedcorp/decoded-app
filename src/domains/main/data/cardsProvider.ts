@@ -20,21 +20,21 @@ function filterCards(cards: Card[], filters: Partial<CardsRequest>): Card[] {
   // 카테고리 필터
   if (filters.category) {
     filtered = filtered.filter(card => 
-      card.metadata.category === filters.category
+      card.metadata?.category === filters.category
     )
   }
   
   // 태그 필터
   if (filters.tags && filters.tags.length > 0) {
     filtered = filtered.filter(card =>
-      card.metadata.tags?.some(tag => filters.tags!.includes(tag))
+      card.metadata?.tags?.some(tag => filters.tags!.includes(tag))
     )
   }
   
   // 작성자 필터
   if (filters.author) {
     filtered = filtered.filter(card =>
-      card.metadata.author?.id === filters.author
+      card.metadata?.author?.id === filters.author
     )
   }
   
@@ -60,6 +60,7 @@ function sortCards(cards: Card[], sortBy: string = 'latest'): Card[] {
   switch (sortBy) {
     case 'latest':
       return sorted.sort((a, b) => {
+        if (!a.createdAt || !b.createdAt) return 0;
         const dateCompare = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         if (dateCompare !== 0) return dateCompare
         return b.id.localeCompare(a.id)
@@ -67,8 +68,8 @@ function sortCards(cards: Card[], sortBy: string = 'latest'): Card[] {
       
     case 'popular':
       return sorted.sort((a, b) => {
-        const popularityA = a.metadata.likeCount + a.metadata.viewCount * 0.1
-        const popularityB = b.metadata.likeCount + b.metadata.viewCount * 0.1
+        const popularityA = (a.metadata?.likeCount || 0) + (a.metadata?.viewCount || 0) * 0.1
+        const popularityB = (b.metadata?.likeCount || 0) + (b.metadata?.viewCount || 0) * 0.1
         return popularityB - popularityA
       })
       
@@ -76,6 +77,7 @@ function sortCards(cards: Card[], sortBy: string = 'latest'): Card[] {
       // 최근 생성된 것 중 인기있는 것
       const recentThreshold = Date.now() - (7 * 24 * 60 * 60 * 1000) // 7일
       return sorted.sort((a, b) => {
+        if (!a.createdAt || !b.createdAt) return 0;
         const aRecent = new Date(a.createdAt).getTime() > recentThreshold
         const bRecent = new Date(b.createdAt).getTime() > recentThreshold
         
@@ -83,9 +85,9 @@ function sortCards(cards: Card[], sortBy: string = 'latest'): Card[] {
         if (!aRecent && bRecent) return 1
         
         const trendingScoreA = aRecent ? 
-          (a.metadata.likeCount + a.metadata.shareCount * 2) : 0
+          ((a.metadata?.likeCount || 0) + (a.metadata?.shareCount || 0) * 2) : 0
         const trendingScoreB = bRecent ? 
-          (b.metadata.likeCount + b.metadata.shareCount * 2) : 0
+          ((b.metadata?.likeCount || 0) + (b.metadata?.shareCount || 0) * 2) : 0
         
         return trendingScoreB - trendingScoreA
       })
@@ -213,12 +215,18 @@ export async function getCards(request: CardsRequest = {}): Promise<CardsRespons
       
       // nextCursor: 마지막 아이템 기준
       if (items.length > 0) {
-        nextCursor = hasMore ? createCursorFromCard(items[items.length - 1]) : undefined
+        nextCursor = hasMore ? createCursorFromCard({
+          createdAt: items[items.length - 1].createdAt || new Date().toISOString(),
+          id: items[items.length - 1].id
+        }) : undefined
       }
       
       // prevCursor: 첫 번째 아이템 기준 (첫 페이지가 아닌 경우)
       if (cursor && items.length > 0) {
-        prevCursor = createCursorFromCard(items[0])
+        prevCursor = createCursorFromCard({
+          createdAt: items[0].createdAt || new Date().toISOString(),
+          id: items[0].id
+        })
       }
     } else {
       // backward direction
@@ -228,8 +236,14 @@ export async function getCards(request: CardsRequest = {}): Promise<CardsRespons
       
       // 역방향이므로 커서 계산이 반대
       if (items.length > 0) {
-        prevCursor = hasPrev ? createCursorFromCard(items[0]) : undefined
-        nextCursor = createCursorFromCard(items[items.length - 1])
+        prevCursor = hasPrev ? createCursorFromCard({
+          createdAt: items[0].createdAt || new Date().toISOString(),
+          id: items[0].id
+        }) : undefined
+        nextCursor = createCursorFromCard({
+          createdAt: items[items.length - 1].createdAt || new Date().toISOString(),
+          id: items[items.length - 1].id
+        })
       }
     }
     
@@ -303,14 +317,16 @@ export async function getCardsStats() {
       }, {} as Record<string, number>),
       
       byPriority: allCards.reduce((acc, card) => {
-        acc[card.priority] = (acc[card.priority] || 0) + 1
+        if (card.priority) {
+          acc[card.priority] = (acc[card.priority] || 0) + 1
+        }
         return acc
       }, {} as Record<string, number>),
       
       averageInteractions: {
-        likes: Math.round(allCards.reduce((sum, c) => sum + c.metadata.likeCount, 0) / allCards.length),
-        comments: Math.round(allCards.reduce((sum, c) => sum + c.metadata.commentCount, 0) / allCards.length),
-        views: Math.round(allCards.reduce((sum, c) => sum + c.metadata.viewCount, 0) / allCards.length)
+        likes: Math.round(allCards.reduce((sum, c) => sum + (c.metadata?.likeCount || 0), 0) / allCards.length),
+        comments: Math.round(allCards.reduce((sum, c) => sum + (c.metadata?.commentCount || 0), 0) / allCards.length),
+        views: Math.round(allCards.reduce((sum, c) => sum + (c.metadata?.viewCount || 0), 0) / allCards.length)
       }
     }
     

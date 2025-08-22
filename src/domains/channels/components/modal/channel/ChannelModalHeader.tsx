@@ -111,8 +111,8 @@ export function ChannelModalHeader({
 
             {/* 채널 정보 */}
             <div>
-              <h1 className="text-2xl font-bold text-white">{channel.name}</h1>
-              <div className="flex items-center space-x-4 text-sm text-zinc-400 mt-1">
+              <h1 id="channel-modal-title" className="text-2xl font-bold text-white">{channel.name}</h1>
+              <div id="channel-modal-description" className="flex items-center space-x-4 text-sm text-zinc-400 mt-1">
                 <span>{channel.subscriber_count || 0} followers</span>
                 <span>•</span>
                 <span>{channel.content_count || 0} editors</span>

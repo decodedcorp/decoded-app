@@ -21,13 +21,21 @@ import { ChannelModalHeader } from './ChannelModalHeader';
 import { ChannelModalContent } from './ChannelModalContent';
 import { ChannelModalSkeleton } from './ChannelModalSkeleton';
 
-
-
 export function ChannelModal() {
   const isOpen = useChannelModalStore(selectIsModalOpen);
   const channel = useChannelModalStore(selectSelectedChannel);
   const channelId = useChannelModalStore(selectSelectedChannelId);
   const closeModal = useChannelModalStore((state) => state.closeModal);
+
+  // 디버깅을 위한 로그
+  React.useEffect(() => {
+    console.log('🎯 [ChannelModal] Modal state changed:', {
+      isOpen,
+      channelId,
+      hasChannel: !!channel,
+      channelData: channel,
+    });
+  }, [isOpen, channelId, channel]);
 
   // 채널 ID로 API 데이터 가져오기
   const { data: apiChannel, isLoading, error } = useChannel(channelId || '');
@@ -35,14 +43,14 @@ export function ChannelModal() {
   // 디버깅을 위한 로그
   React.useEffect(() => {
     if (apiChannel) {
-      console.log('API Channel Data:', apiChannel);
+      console.log('🎯 [ChannelModal] API Channel Data:', apiChannel);
     }
     if (error) {
-      console.error('Channel API Error:', error);
+      console.error('🎯 [ChannelModal] Channel API Error:', error);
     }
-    console.log('Channel ID:', channelId);
-    console.log('Channel from store:', channel);
-    console.log('Is modal open:', isOpen);
+    console.log('🎯 [ChannelModal] Channel ID:', channelId);
+    console.log('🎯 [ChannelModal] Channel from store:', channel);
+    console.log('🎯 [ChannelModal] Is modal open:', isOpen);
   }, [apiChannel, error, channelId, channel, isOpen]);
 
   // 필터 상태 관리
@@ -83,17 +91,23 @@ export function ChannelModal() {
     return null;
   }, [apiChannel, channel, channelId]);
 
-  // finalChannel이 없어도 모달은 열어두고 로딩 상태 표시
-  if (!isOpen) return null;
+  // 디버깅: 모달 상태를 강제로 표시
+  console.log('🎯 [ChannelModal] RENDER - isOpen:', isOpen, 'channelId:', channelId);
 
   // finalChannel이 없어도 모달은 열어두고 로딩 상태 표시
-  if (!isOpen) return null;
+  if (!isOpen) {
+    console.log('🎯 [ChannelModal] Modal is not open, returning null');
+    return null;
+  }
+
+  console.log('🎯 [ChannelModal] Modal is open, rendering modal content');
 
   return (
-    <BaseModal
-      isOpen={isOpen}
+    <BaseModal 
+      isOpen={isOpen} 
       onClose={closeModal}
-      overlayClassName="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9998] animate-fade-in"
+      titleId="channel-modal-title"
+      descId="channel-modal-description"
     >
       <ChannelModalContainer>
         {/* Header */}
@@ -120,13 +134,11 @@ export function ChannelModal() {
         {/* Main Content */}
         <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
           {error && (
-            <div className="text-red-500 text-center p-4">
-              채널 정보를 불러오는데 실패했습니다.
-            </div>
+            <div className="text-red-500 text-center p-4">채널 정보를 불러오는데 실패했습니다.</div>
           )}
           {!error && finalChannel && (
-            <ChannelModalContent 
-              currentFilters={currentFilters} 
+            <ChannelModalContent
+              currentFilters={currentFilters}
               channelId={channelId || undefined}
               onFilterChange={handleFilterChange}
             />
@@ -145,7 +157,7 @@ export function ChannelModal() {
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="h-4 w-16 bg-zinc-800 rounded animate-pulse" />
+                    <div key={i} className="h-4 w-16 bg-zinc-800 rounded mx-auto animate-pulse" />
                   ))}
                 </div>
               </div>

@@ -24,56 +24,65 @@ export interface CardMetadata {
   author?: CardAuthor
   
   // Interaction data
-  likeCount: number
-  commentCount: number
-  viewCount: number
-  shareCount: number
-  isLiked: boolean
-  isSaved: boolean
+  likeCount?: number
+  commentCount?: number
+  viewCount?: number
+  shareCount?: number
+  isLiked?: boolean
+  isSaved?: boolean
   
   // SEO and discovery
   seoTitle?: string
   seoDescription?: string
   keywords?: string[]
+  
+  // API Channel Content specific fields
+  aiSummary?: string
+  qaList?: Array<{
+    question: string
+    answer: string
+  }>
+  sourceUrl?: string
+  siteName?: string
 }
 
 export interface Card {
   // Primary identifiers
   id: string
-  createdAt: string // ISO 8601
-  updatedAt: string // ISO 8601
+  createdAt?: string // ISO 8601
+  updatedAt?: string // ISO 8601
   
   // Card type and layout
   type: CardType
-  priority: CardPriority
+  priority?: CardPriority
   
-  // Layout dimensions (CSS pixels)
-  width: number
-  height: number
+  // Layout dimensions (CSS pixels) - optional for API-based cards
+  width?: number
+  height?: number
   
-  // Grid span (grid units)
-  spanX: number
-  spanY: number
+  // Grid span (grid units) - optional for API-based cards
+  spanX?: number
+  spanY?: number
   
   // Image/media properties
-  cdnBase: string // Base URL for CDN transformations
+  cdnBase?: string // Base URL for CDN transformations
   thumbnailUrl: string // Pre-optimized thumbnail
-  originalUrl: string // Original high-res URL
+  originalUrl?: string // Original high-res URL
   
   // Visual optimization
-  avgColor: string // Hex color for placeholder (#RRGGBB)
-  blurhash: string // BlurHash string for placeholder
-  aspectRatio: number // width / height
+  avgColor?: string // Hex color for placeholder (#RRGGBB)
+  blurhash?: string // BlurHash string for placeholder
+  aspectRatio?: number // width / height
   
   // Content metadata
-  metadata: CardMetadata
+  metadata?: CardMetadata
   
-  // Status and visibility
-  status: 'published' | 'draft' | 'archived'
-  visibility: 'public' | 'private' | 'unlisted'
+  // Status and visibility - adapted for API response
+  status?: 'published' | 'draft' | 'archived' | 'active' | 'pending'
+  visibility?: 'public' | 'private' | 'unlisted'
   
   // Performance hints
-  loadPriority?: 'high' | 'normal' | 'low'
+  loadPriority?: 'high' | 'medium' | 'low'
   preloadHint?: boolean
 }
 

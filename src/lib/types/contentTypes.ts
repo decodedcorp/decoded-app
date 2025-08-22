@@ -83,20 +83,20 @@ export interface ContentItem {
   likes?: number;
   views?: number;
   status?: ContentStatusType;
-  
+
   // 색상 정보
   colors?: {
     primary: string;
     secondary: string;
   };
-  
+
   // 추가 메타데이터
   width?: number;
   height?: number;
   duration?: number; // 비디오 길이 (초)
   sourceUrl?: string; // 원본 링크
   domain?: string; // 도메인 정보
-  
+
   // AI 생성 메타데이터
   aiSummary?: string;
   aiQaList?: Array<{
@@ -111,11 +111,12 @@ export interface ContentItem {
     objects?: string[];
     colors?: string[];
   };
-  
+
   // 링크 미리보기
   linkPreview?: {
     title?: string;
     description?: string;
+    url?: string; // URL 필드 추가
     imageUrl?: string;
     downloadedImageUrl?: string; // 백엔드에서 다운로드한 이미지 URL
     siteName?: string;
@@ -132,7 +133,7 @@ export interface ContentItem {
     contentType?: string;
     releaseYear?: string;
   };
-  
+
   // UI 상태 (프론트엔드 전용)
   isLoading?: boolean;
   hasError?: boolean;

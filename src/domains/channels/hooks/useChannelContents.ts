@@ -313,7 +313,7 @@ export const useChannelContentsSinglePage = ({
       }
 
       const contents = data.contents || [];
-      
+
       if (process.env.NODE_ENV === 'development') {
         console.log('[useChannelContentsSinglePage] Contents array length:', contents.length);
       }
@@ -334,12 +334,15 @@ export const useChannelContentsSinglePage = ({
             const convertedItem = convertToContentItem(unifiedContent);
 
             if (process.env.NODE_ENV === 'development') {
-              console.log(`[useChannelContentsSinglePage] Successfully converted content ${index}:`, {
-                originalId: content.id,
-                convertedId: convertedItem?.id,
-                type: convertedItem?.type,
-                title: convertedItem?.title,
-              });
+              console.log(
+                `[useChannelContentsSinglePage] Successfully converted content ${index}:`,
+                {
+                  originalId: content.id,
+                  convertedId: convertedItem?.id,
+                  type: convertedItem?.type,
+                  title: convertedItem?.title,
+                },
+              );
             }
 
             return convertedItem;
@@ -450,7 +453,7 @@ export const useChannelContentsSinglePage = ({
     if (prevMergedContentsRef.current && deepEqual(prevMergedContentsRef.current, mergedContents)) {
       return prevMergedContentsRef.current;
     }
-    
+
     // 새로운 값 저장
     prevMergedContentsRef.current = mergedContents;
     return mergedContents;

@@ -151,7 +151,7 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
     this.view.y = this.state.offset.y;
     this.updateGridItems();
 
-    // Add non-passive event listener
+    // Add non-passive event listener for wheel
     if (this.containerRef.current) {
       this.containerRef.current.addEventListener('wheel', this.handleWheel, {
         passive: false,
@@ -166,7 +166,7 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
     }
     this.debouncedUpdateGridItems.cancel();
 
-    // Remove event listeners
+    // Remove wheel event listener
     if (this.containerRef.current) {
       this.containerRef.current.removeEventListener('wheel', this.handleWheel);
     }
@@ -251,7 +251,7 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
     this.view.lastTs = now;
 
     const speed = Math.hypot(this.view.vx, this.view.vy);
-    
+
     // 더 정교한 속도 임계값
     if (speed < 1) {
       this.view.vx = 0;
@@ -276,7 +276,7 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
     if (this.innerRef.current) {
       this.innerRef.current.style.transform = `translate3d(${this.view.x}px, ${this.view.y}px, 0)`;
     }
-    
+
     // 스마트 grid 업데이트 (거리 기반)
     const distanceMoved = getDistance(this.view, this.lastGridUpdatePos);
     if (distanceMoved > MOVEMENT_THRESHOLD) {
@@ -394,18 +394,29 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
           overflow: 'hidden',
           cursor: isDragging ? 'grabbing' : 'grab',
         }}
-        onPointerDown={(e) => {
-          (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-          this.handleDown({ x: e.clientX, y: e.clientY });
+        onMouseDown={(e) => {
+          // 카드 클릭을 방해하지 않도록 조건 추가
+          if (e.target === e.currentTarget) {
+            this.handleDown({ x: e.clientX, y: e.clientY });
+          }
         }}
-        onPointerMove={(e) => this.handleMove({ x: e.clientX, y: e.clientY })}
-        onPointerUp={(e) => {
-          (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
-          this.handleUp();
+        onMouseMove={(e) => {
+          // 드래그 중일 때만 이동 처리
+          if (this.state.isDragging) {
+            this.handleMove({ x: e.clientX, y: e.clientY });
+          }
         }}
-        onPointerCancel={(e) => {
-          (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
-          this.handleUp();
+        onMouseUp={(e) => {
+          // 드래그 중일 때만 처리
+          if (this.state.isDragging) {
+            this.handleUp();
+          }
+        }}
+        onMouseLeave={(e) => {
+          // 드래그 중일 때만 처리
+          if (this.state.isDragging) {
+            this.handleUp();
+          }
         }}
       >
         <div
@@ -422,7 +433,7 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
             const { cellWidthRatio = 1.0 } = this.props;
             const cellWidth = gridSize * cellWidthRatio;
             const cellHeight = gridSize;
-            
+
             const spacingX = cellWidth * 1.1; // 10% 추가 가로 간격
             const spacingY = cellHeight * 1.1; // 10% 추가 세로 간격
             const x = item.position.x * spacingX + containerWidth / 2;

@@ -6,11 +6,9 @@ interface ChannelModalContainerProps {
   children: ReactNode;
 }
 
-export function ChannelModalContainer({
-  children,
-}: ChannelModalContainerProps) {
+export function ChannelModalContainer({ children }: ChannelModalContainerProps) {
   return (
-    <div className="bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl w-[70vw] max-w-[1000px] h-[70vh] overflow-hidden animate-bounce-in shadow-2xl flex">
+    <div className="bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl w-[90vw] max-w-[1200px] h-[80vh] max-h-[800px] overflow-hidden shadow-2xl flex relative">
       {/* Main Content - Full Width */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Content Area - children을 직접 배치 */}

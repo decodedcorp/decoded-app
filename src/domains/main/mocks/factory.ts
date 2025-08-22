@@ -234,7 +234,7 @@ function generateCard(index: number): Card {
     status: randomBoolean(0.95) ? 'published' : 'draft',
     visibility: randomBoolean(0.98) ? 'public' : 'unlisted',
     
-    loadPriority: priority === 'high' ? 'high' : 'normal',
+    loadPriority: priority === 'high' ? 'high' : 'medium',
     preloadHint: priority === 'high' && randomBoolean(0.3)
   }
   
@@ -254,6 +254,7 @@ export function generateSeedCards(): Card[] {
   // createdAt 기준 내림차순 정렬 (최신이 먼저)
   // 같은 createdAt인 경우 id 기준 내림차순
   cards.sort((a, b) => {
+    if (!a.createdAt || !b.createdAt) return 0;
     const dateCompare = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     if (dateCompare !== 0) return dateCompare
     return b.id.localeCompare(a.id)
@@ -295,7 +296,9 @@ export function getSeedStats() {
   }, {} as Record<CardType, number>)
   
   const priorityStats = cards.reduce((acc, card) => {
-    acc[card.priority] = (acc[card.priority] || 0) + 1
+    if (card.priority) {
+      acc[card.priority] = (acc[card.priority] || 0) + 1
+    }
     return acc
   }, {} as Record<CardPriority, number>)
   
