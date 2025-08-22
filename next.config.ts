@@ -35,6 +35,8 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+    // Next.js 16 경고 해결을 위한 설정
+    qualities: [25, 50, 75, 90, 95, 100],
     // 프로덕션에서는 특정 도메인만 허용하도록 설정 가능
     // unoptimized: process.env.NODE_ENV === 'development', // 개발 환경에서 최적화 비활성화
   },

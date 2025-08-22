@@ -29,10 +29,8 @@ export interface ContentsCardProps {
 // 블러 오버레이 컴포넌트
 const BlurOverlay = ({ isBlurred }: { isBlurred: boolean }) => {
   if (!isBlurred) return null;
-  
-  return (
-    <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-10" />
-  );
+
+  return <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-10" />;
 };
 
 // 고급 카드 컴포넌트 - 색상 추출 및 동적 스타일링 적용
@@ -47,6 +45,16 @@ export const ContentsCard = memo(
     gridIndex,
     className = '',
   }: ContentsCardProps) => {
+    // 안전장치: card prop이 undefined인지 확인
+    if (!card) {
+      console.error('🔍 [ContentsCard] Card prop is undefined:', { card, uniqueId, gridIndex });
+      return (
+        <div className="w-full aspect-[4/5] bg-red-500 flex items-center justify-center text-white text-xs">
+          Error: Card data is missing
+        </div>
+      );
+    }
+
     // 디버깅: 카드 데이터 로깅
     console.log('🔍 [ContentsCard] Rendering card:', {
       id: card.id,
@@ -92,7 +100,7 @@ export const ContentsCard = memo(
     const cardStyle = useMemo(() => {
       const baseStyle = {
         width: '100%',
-        height: '100%',
+        // 4:5 비율로 고정 - 높이는 자동 계산
         // 변형 애니메이션 최적화
         transform: `scale(${isMoving ? 0.98 : isSelected ? 1.05 : 1})`,
         // 블러와 오파시티 분리 - 성능 최적화
@@ -245,7 +253,7 @@ export const ContentsCard = memo(
         data-card-id={uniqueId}
         data-original-card-id={card.id}
         data-grid-index={gridIndex}
-        className={`relative bg-zinc-900 rounded-xl overflow-hidden mx-auto cursor-pointer transition-shadow duration-300 ease-out ${className} ${
+        className={`relative bg-zinc-900 rounded-xl overflow-hidden mx-auto cursor-pointer transition-shadow duration-300 ease-out aspect-[4/5] ${className} ${
           isSelected
             ? 'ring-4 ring-blue-400/50 shadow-[0_0_50px_rgba(59,130,246,0.5)]'
             : 'hover:shadow-[var(--hover-shadow,0_20px_40px_-10px_rgba(0,0,0,0.2))] hover:scale-[1.03]'

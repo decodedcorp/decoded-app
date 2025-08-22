@@ -42,11 +42,11 @@ export function ChannelSearchBar({
     const value = e.target.value;
     setQuery(value);
     setHighlightedIndex(-1);
-    setIsAutocompleteOpen(value.trim().length > 0);
+    setIsAutocompleteOpen(value.trim().length >= 2); // 2글자 이상에서만 표시
   };
 
   const handleInputFocus = () => {
-    if (query.trim().length > 0) {
+    if (query.trim().length >= 2) { // 2글자 이상에서만 포커스 시 열기
       setIsAutocompleteOpen(true);
     }
   };

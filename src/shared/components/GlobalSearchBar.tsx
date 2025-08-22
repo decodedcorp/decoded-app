@@ -7,10 +7,15 @@ import { SearchAutocomplete, type AutocompleteItem } from '../../domains/search'
 interface GlobalSearchBarProps {
   onSearch?: (query: string) => void;
   className?: string;
+  defaultValue?: string;
 }
 
-export function GlobalSearchBar({ onSearch, className = '' }: GlobalSearchBarProps) {
-  const [query, setQuery] = useState('');
+export function GlobalSearchBar({
+  onSearch,
+  className = '',
+  defaultValue = '',
+}: GlobalSearchBarProps) {
+  const [query, setQuery] = useState(defaultValue);
   const [isAutocompleteOpen, setIsAutocompleteOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -33,11 +38,12 @@ export function GlobalSearchBar({ onSearch, className = '' }: GlobalSearchBarPro
     const value = e.target.value;
     setQuery(value);
     setHighlightedIndex(-1);
-    setIsAutocompleteOpen(value.trim().length > 0);
+    setIsAutocompleteOpen(value.trim().length >= 2); // 2글자 이상에서만 표시
   };
 
   const handleInputFocus = () => {
-    if (query.trim().length > 0) {
+    if (query.trim().length >= 2) {
+      // 2글자 이상에서만 포커스 시 열기
       setIsAutocompleteOpen(true);
     }
   };
@@ -99,7 +105,16 @@ export function GlobalSearchBar({ onSearch, className = '' }: GlobalSearchBarPro
           // This would need the actual results array
           return;
         }
-        handleSubmit(e);
+        // Enter 키로 검색 실행
+        if (query.trim()) {
+          if (onSearch) {
+            onSearch(query.trim());
+          } else {
+            // Default behavior - navigate to search results
+            router.push(`/search?q=${encodeURIComponent(query.trim())}`);
+          }
+          setIsAutocompleteOpen(false);
+        }
         break;
     }
   };

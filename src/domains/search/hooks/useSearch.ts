@@ -6,19 +6,39 @@ import { useMemo, useState, useEffect } from 'react';
 import { SearchService } from '../../../api/generated';
 import { queryKeys } from '../../../lib/api/queryKeys';
 
-// Debounce hook for search input
-function useDebounce<T>(value: T, delay: number): T {
+// 적응형 지연 시간 계산
+function getAdaptiveDelay(query: string, baseDelay: number): number {
+  const length = query.trim().length;
+  
+  // 짧은 쿼리는 더 오래 기다림 (너무 많은 결과 방지)
+  if (length <= 1) return baseDelay + 200;
+  if (length === 2) return baseDelay + 100;
+  
+  // 긴 쿼리는 빠르게 반응 (구체적인 검색)
+  if (length >= 8) return Math.max(baseDelay - 100, 150);
+  if (length >= 5) return Math.max(baseDelay - 50, 200);
+  
+  return baseDelay;
+}
+
+// Adaptive debounce hook for search input
+function useDebounce<T>(value: T, baseDelay: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
   useEffect(() => {
+    // 문자열인 경우 적응형 지연 적용
+    const adaptiveDelay = typeof value === 'string' 
+      ? getAdaptiveDelay(value, baseDelay)
+      : baseDelay;
+
     const handler = setTimeout(() => {
       setDebouncedValue(value);
-    }, delay);
+    }, adaptiveDelay);
 
     return () => {
       clearTimeout(handler);
     };
-  }, [value, delay]);
+  }, [value, baseDelay]);
 
   return debouncedValue;
 }
@@ -56,15 +76,18 @@ export const useSearchContents = ({
 }: UseSearchContentsParams) => {
   const debouncedQuery = useDebounce(query, debounceMs);
   
-  // Only enable search if query has meaningful content
-  const shouldQuery = enabled && debouncedQuery.trim().length > 0;
+  // Only enable search if query has meaningful content (최소 2글자)
+  const shouldQuery = enabled && debouncedQuery.trim().length >= 2;
 
   return useQuery({
     queryKey: queryKeys.search.contents(debouncedQuery, limit),
     queryFn: () => SearchService.searchContentsSearchContentsGet(debouncedQuery, limit),
     enabled: shouldQuery,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 2 * 60 * 1000, // 2 minutes - 자동완성용 짧게
+    gcTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false, // 포커스 시 재요청 비활성화
+    retry: 1, // 실패 시 1회만 재시도 (빠른 응답 중시)
+    retryDelay: 500, // 재시도 지연 최소화
   });
 };
 
@@ -79,15 +102,18 @@ export const useSearchChannels = ({
 }: UseSearchChannelsParams) => {
   const debouncedQuery = useDebounce(query, debounceMs);
   
-  // Only enable search if query has meaningful content
-  const shouldQuery = enabled && debouncedQuery.trim().length > 0;
+  // Only enable search if query has meaningful content (최소 2글자)
+  const shouldQuery = enabled && debouncedQuery.trim().length >= 2;
 
   return useQuery({
     queryKey: queryKeys.search.channels(debouncedQuery, limit),
     queryFn: () => SearchService.searchChannelsSearchChannelsGet(debouncedQuery, limit),
     enabled: shouldQuery,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes - 채널은 덜 자주 변함
     gcTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false,
+    retry: 1,
+    retryDelay: 500,
   });
 };
 
@@ -103,8 +129,8 @@ export const useSearchChannelContents = ({
 }: UseSearchChannelContentsParams) => {
   const debouncedQuery = useDebounce(query, debounceMs);
   
-  // Only enable search if query has meaningful content and channelId exists
-  const shouldQuery = enabled && debouncedQuery.trim().length > 0 && channelId.trim().length > 0;
+  // Only enable search if query has meaningful content and channelId exists (최소 2글자)
+  const shouldQuery = enabled && debouncedQuery.trim().length >= 2 && channelId.trim().length > 0;
 
   return useQuery({
     queryKey: queryKeys.search.channelContents(channelId, debouncedQuery, limit),
@@ -114,8 +140,11 @@ export const useSearchChannelContents = ({
       limit
     ),
     enabled: shouldQuery,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 3 * 60 * 1000, // 3 minutes - 채널별 콘텐츠
+    gcTime: 8 * 60 * 1000, // 8 minutes
+    refetchOnWindowFocus: false,
+    retry: 1,
+    retryDelay: 500,
   });
 };
 

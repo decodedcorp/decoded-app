@@ -20,28 +20,10 @@ interface AutocompleteItemProps {
   item: AutocompleteItem;
   isHighlighted: boolean;
   onClick: () => void;
-  query: string;
 }
 
 const AutocompleteItemComponent = React.memo(
-  ({ item, isHighlighted, onClick, query }: AutocompleteItemProps) => {
-    const highlightMatch = useCallback((text: string, query: string) => {
-      if (!query.trim()) return text;
-
-      const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-      const parts = text.split(regex);
-
-      return parts.map((part, index) =>
-        regex.test(part) ? (
-          <mark key={index} className="bg-[#EAFD66]/30 text-white">
-            {part}
-          </mark>
-        ) : (
-          part
-        ),
-      );
-    }, []);
-
+  ({ item, isHighlighted, onClick }: AutocompleteItemProps) => {
     const getIcon = () => {
       switch (item.type) {
         case 'channel':
@@ -98,22 +80,19 @@ const AutocompleteItemComponent = React.memo(
           'hover:bg-zinc-700/50',
           isHighlighted && 'bg-zinc-700/70',
         )}
-        style={{ pointerEvents: 'auto' }} // 명시적으로 pointer-events 설정
+        style={{ pointerEvents: 'auto' }}
         onClick={(e) => {
           e.stopPropagation();
           onClick();
         }}
         onMouseDown={(e) => {
-          // 이벤트 위임: 클릭된 요소가 현재 컨테이너 내부에 있으면 클릭 처리
           if (e.currentTarget.contains(e.target as Node)) {
             if (e.button === 0) {
-              // 왼쪽 클릭만 처리
               onClick();
             }
           }
         }}
         onMouseUp={(e) => {
-          // mouseup에서도 클릭 로직 처리 (백업용)
           if (e.button === 0) {
             onClick();
           }
@@ -136,16 +115,10 @@ const AutocompleteItemComponent = React.memo(
           )}
         </div>
 
-        {/* Content */}
+        {/* Content - 하이라이트 없이 일반 텍스트로 표시 */}
         <div className="flex-1 min-w-0">
-          <div className="text-sm font-medium text-white truncate">
-            {highlightMatch(item.title, query)}
-          </div>
-          {item.subtitle && (
-            <div className="text-xs text-zinc-400 truncate">
-              {highlightMatch(item.subtitle, query)}
-            </div>
-          )}
+          <div className="text-sm font-medium text-white truncate">{item.title}</div>
+          {item.subtitle && <div className="text-xs text-zinc-400 truncate">{item.subtitle}</div>}
         </div>
 
         {/* Type badge */}
@@ -252,8 +225,8 @@ export const SearchAutocomplete = React.memo(
       };
     }, [highlightedIndex, handleKeyboardSelect]);
 
-    // Don't render if no query
-    if (!query.trim()) {
+    // Don't render if query is too short (minimum 2 characters)
+    if (query.trim().length < 2) {
       return null;
     }
 
@@ -341,7 +314,7 @@ export const SearchAutocomplete = React.memo(
                   }}
                   tabIndex={-1}
                   className="focus:outline-none"
-                  style={{ pointerEvents: 'auto' }} // 명시적으로 pointer-events 설정
+                  style={{ pointerEvents: 'auto' }}
                   onFocus={() => onHighlightChange?.(resultIndex)}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -351,7 +324,6 @@ export const SearchAutocomplete = React.memo(
                     item={item}
                     isHighlighted={highlightedIndex === resultIndex}
                     onClick={() => handleItemClick(item, resultIndex)}
-                    query={query}
                   />
                 </div>
               );
@@ -383,7 +355,7 @@ export const SearchAutocomplete = React.memo(
                     }}
                     tabIndex={-1}
                     className="focus:outline-none"
-                    style={{ pointerEvents: 'auto' }} // 명시적으로 pointer-events 설정
+                    style={{ pointerEvents: 'auto' }}
                     onFocus={() => onHighlightChange?.(resultIndex)}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -393,7 +365,6 @@ export const SearchAutocomplete = React.memo(
                       item={item}
                       isHighlighted={highlightedIndex === resultIndex}
                       onClick={() => handleItemClick(item, resultIndex)}
-                      query={query}
                     />
                   </div>
                 );

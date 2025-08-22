@@ -183,18 +183,18 @@ export const ChannelCard = memo(
     const cardSizeClass = (() => {
       switch (effectiveSize) {
         case 'small':
-          return 'w-80 aspect-[3/2]'; // 4:3 → 3:2 (더 넓은 이미지)
+          return 'w-full h-[320px]'; // 고정 높이로 설정
         case 'medium':
-          return 'w-96 aspect-[4/3] md:aspect-[3/2]'; // 3:4 → 4:3 (더 넓은 이미지)
+          return 'w-full h-[360px]'; // 고정 높이로 설정
         case 'large':
-          return 'w-[28rem] aspect-[5/3]'; // 16:10 → 5:3 (더 넓은 이미지)
+          return 'w-full h-[400px]'; // 고정 높이로 설정
         case 'compact':
-          return 'w-80';
+          return 'w-full h-[280px]'; // 고정 높이로 설정
         case 'featured':
         case 'default':
         case 'soft':
         default:
-          return 'w-[28rem]';
+          return 'w-full h-[360px]'; // 기본값도 고정 높이로
       }
     })();
 
@@ -202,13 +202,15 @@ export const ChannelCard = memo(
     const imageHeightClass = (() => {
       switch (effectiveSize) {
         case 'small':
-          return 'h-52'; // h-48 → h-52 (3:2 비율에 맞춤)
+          return 'h-32'; // 카드 높이의 약 40%
         case 'medium':
-          return 'h-60 md:h-72'; // h-56 md:h-64 → h-60 md:h-72 (4:3 비율에 맞춤)
+          return 'h-40'; // 카드 높이의 약 40%
         case 'large':
-          return 'h-72 md:h-80'; // h-64 md:h-72 → h-72 md:h-80 (5:3 비율에 맞춤)
+          return 'h-48'; // 카드 높이의 약 40%
+        case 'compact':
+          return 'h-28'; // 카드 높이의 약 40%
         default:
-          return 'h-80';
+          return 'h-40'; // 기본값도 카드 높이의 약 40%
       }
     })();
 
@@ -238,7 +240,7 @@ export const ChannelCard = memo(
         onClick={handleCardClick}
       >
         <div
-          className={`p-3 flex flex-col flex-1 pb-3 mb-4 ${
+          className={`p-3 flex flex-col flex-1 ${
             isExploreStyle ? 'bg-zinc-900/50 border border-zinc-800/50 rounded-xl' : ''
           }`}
         >
@@ -285,140 +287,112 @@ export const ChannelCard = memo(
             )}
           </div>
 
-          {/* 하단 정보 섹션 */}
-          <div className="mb-5 flex-shrink-0 py-4 px-5">
-            {/* 이름과 인증 배지 */}
-            <div className="flex items-center gap-3 mb-4">
-              <h3 className={`font-semibold text-white ${isExploreStyle ? 'text-xl' : 'text-3xl'}`}>
-                {channelData.name}
-              </h3>
-              {channelData.isVerified && <VerificationBadge />}
+          {/* 하단 정보 섹션 - flex-1로 남은 공간 채움 */}
+          <div className="flex-1 flex flex-col justify-between py-2 px-3">
+            {/* 상단 정보 */}
+            <div className="mb-3">
+              {/* 이름과 인증 배지 */}
+              <div className="flex items-center gap-2 mb-2">
+                <h3
+                  className={`font-semibold text-white ${isExploreStyle ? 'text-lg' : 'text-xl'}`}
+                >
+                  {channelData.name}
+                </h3>
+                {channelData.isVerified && <VerificationBadge />}
+              </div>
+
+              {/* 설명 */}
+              {channelData.description ? (
+                <p
+                  className={`text-gray-400 leading-relaxed line-clamp-2 ${
+                    isExploreStyle ? 'text-sm' : 'text-base'
+                  }`}
+                >
+                  {channelData.description}
+                </p>
+              ) : isExploreStyle ? (
+                <p className="text-gray-600 text-sm italic">
+                  {channelData.contentCount || 0}개의 엄선된 콘텐츠
+                </p>
+              ) : null}
             </div>
 
-            {/* 설명 */}
-            {channelData.description ? (
-              <p
-                className={`text-gray-400 leading-relaxed line-clamp-2 ${
-                  isExploreStyle ? 'text-base' : 'text-lg'
-                }`}
-              >
-                {channelData.description}
-              </p>
-            ) : isExploreStyle ? (
-              <p className="text-gray-600 mb-4 flex-grow text-base italic">
-                {channelData.contentCount || 0}개의 엄선된 콘텐츠로 구성된 전문 에디터의 큐레이션
-              </p>
-            ) : null}
-
-            {/* 태그/키워드 (explore 스타일) */}
-            {isExploreStyle && (
-              <div className="flex flex-wrap gap-2 mb-4">
-                {(channelData.contentCount || 0) > 50 && (
-                  <span className="px-3 py-1.5 bg-zinc-800/50 text-gray-400 rounded-full text-sm font-medium">
-                    전문 큐레이션
+            {/* 하단 통계 정보 */}
+            <div className="flex items-center justify-between">
+              {/* 통계 정보 */}
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <FollowerIcon />
+                  <span
+                    className={`text-white font-medium ${isExploreStyle ? 'text-xs' : 'text-sm'}`}
+                  >
+                    {formatCount(channelData.followerCount)}
                   </span>
-                )}
-                {(channelData.followerCount || 0) > 100 && (
-                  <span className="px-3 py-1.5 bg-zinc-800/50 text-gray-400 rounded-full text-sm font-medium">
-                    인기 에디터
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <ContentIcon />
+                  <span
+                    className={`text-white font-medium ${isExploreStyle ? 'text-xs' : 'text-sm'}`}
+                  >
+                    {formatCount(channelData.contentCount)}
                   </span>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* 통계와 구독 버튼 */}
-          <div className="flex items-center justify-between flex-shrink-0 px-5">
-            {/* 통계 정보 */}
-            <div className="flex items-center gap-8">
-              <div className="flex items-center gap-3">
-                <FollowerIcon />
-                <span
-                  className={`text-white font-medium ${isExploreStyle ? 'text-sm' : 'text-base'}`}
-                >
-                  {formatCount(channelData.followerCount)}
-                </span>
+                </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <ContentIcon />
-                <span
-                  className={`text-white font-medium ${isExploreStyle ? 'text-sm' : 'text-base'}`}
+              {/* Subscribe 버튼 (explore 스타일이 아닐 때만 표시) */}
+              {!isExploreStyle && (
+                <button
+                  onClick={handleFollowClick}
+                  disabled={isLoading}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-sm transition-all duration-200 hover:transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed ${
+                    isFollowing
+                      ? 'bg-gray-600 text-white hover:bg-gray-500'
+                      : 'bg-white text-gray-900 hover:bg-gray-100'
+                  }`}
                 >
-                  {formatCount(channelData.contentCount)}
-                </span>
-              </div>
+                  {isLoading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span className="text-xs">Loading...</span>
+                    </div>
+                  ) : (
+                    <>
+                      <span className="text-xs">{followButtonText}</span>
+                      {!isFollowing && (
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path
+                            fillRule="evenodd"
+                            d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      )}
+                    </>
+                  )}
+                </button>
+              )}
+
+              {/* 화살표 아이콘 (explore 스타일) */}
+              {isExploreStyle && (
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <svg
+                    className="w-4 h-4 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </div>
+              )}
             </div>
-
-            {/* 구독 버튼 (explore 스타일이 아닐 때만 표시) */}
-            {!isExploreStyle && (
-              <button
-                onClick={handleFollowClick}
-                disabled={isLoading}
-                className={`flex items-center gap-3 px-8 py-4 rounded-2xl font-medium text-base transition-all duration-200 hover:transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed ${
-                  isFollowing
-                    ? 'bg-gray-600 text-white hover:bg-gray-500'
-                    : 'bg-white text-gray-900 hover:bg-gray-100'
-                }`}
-              >
-                {isLoading ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Loading...
-                  </div>
-                ) : (
-                  <>
-                    <span>{followButtonText}</span>
-                    {!isFollowing && (
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    )}
-                  </>
-                )}
-              </button>
-            )}
-
-            {/* 화살표 아이콘 (explore 스타일) */}
-            {isExploreStyle && (
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <svg
-                  className="w-5 h-5 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </div>
-            )}
           </div>
-
-          {/* 생성일 표시 (explore 스타일) */}
-          {isExploreStyle && 'created_at' in channelData && channelData.created_at && (
-            <div className="px-5 pb-4">
-              <div className="flex items-center space-x-2 text-sm text-gray-500">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                <span>{formatDate(channelData.created_at)}</span>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* 호버 효과 오버레이 */}

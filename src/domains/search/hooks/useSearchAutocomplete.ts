@@ -191,6 +191,6 @@ export const useSearchSuggestions = (query: string, enabled = true) => {
     maxChannels: 2,
     maxContents: 3,
     enabled,
-    debounceMs: 200, // Faster response for suggestions
+    debounceMs: 150, // 더 빠른 반응 (적응형 적용됨)
   });
 };

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 import { useScrollDirection } from '@/lib/hooks/useScrollDirection';
@@ -12,6 +12,7 @@ import { GlobalSearchBar } from './GlobalSearchBar';
 
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const { scrollDirection, isScrolled, isAtTop } = useScrollDirection({
     threshold: 15,
     debounceMs: 10,
@@ -35,12 +36,18 @@ export function Header() {
   // 검색 핸들러
   const handleChannelSearch = (query: string) => {
     console.log('Channel search:', query);
-    // TODO: 채널 내 검색 로직 구현
+    // 채널 내 검색 시 검색 페이지로 이동 (채널 컨텍스트 유지)
+    if (query.trim() && channelId) {
+      router.push(`/search?q=${encodeURIComponent(query.trim())}&channel=${channelId}`);
+    }
   };
 
   const handleGlobalSearch = (query: string) => {
     console.log('Global search:', query);
-    // TODO: 전역 검색 로직 구현
+    // 전역 검색 시 검색 페이지로 이동
+    if (query.trim()) {
+      router.push(`/search?q=${encodeURIComponent(query.trim())}`);
+    }
   };
 
   const handleClearChannel = () => {
