@@ -65,6 +65,7 @@ export function ChannelSearchBar({
   };
 
   const handleAutocompleteSelect = useCallback((item: AutocompleteItem) => {
+    console.log('Channel autocomplete item selected:', item); // 디버깅용 로그
     // For channel search, navigate to the content detail
     router.push(`/content/${item.id}`);
     setQuery('');

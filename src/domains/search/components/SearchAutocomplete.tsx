@@ -99,6 +99,7 @@ const AutocompleteItemComponent = React.memo(
           isHighlighted && 'bg-zinc-700/70',
         )}
         onClick={(e) => {
+          console.log('AutocompleteItemComponent clicked!', item); // 디버깅용 로그
           e.preventDefault();
           e.stopPropagation();
           onClick();
@@ -180,7 +181,6 @@ export const SearchAutocomplete = React.memo(
 
     const handleItemClick = useCallback(
       (item: AutocompleteItem, index: number) => {
-
         onSelect(item);
         onClose?.();
         // Set focus back to the search input for better UX

@@ -50,6 +50,7 @@ export function GlobalSearchBar({ onSearch, className = '' }: GlobalSearchBarPro
   };
 
   const handleAutocompleteSelect = useCallback((item: AutocompleteItem) => {
+    console.log('Autocomplete item selected:', item); // 디버깅용 로그
     if (item.type === 'channel') {
       router.push(`/channels/${item.channelId}`);
     } else {
