@@ -9,6 +9,7 @@ import { DefaultContentCard } from './DefaultContentCard';
 
 interface ContentModalBodyProps {
   content: ContentItem;
+  onClose: () => void;
 }
 
 // 공통 버튼 컴포넌트
@@ -105,7 +106,7 @@ const SectionHeader = ({
   </div>
 );
 
-export function ContentModalBody({ content }: ContentModalBodyProps) {
+export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
   // 디버깅을 위한 콘솔 로그
   console.log('ContentModalBody - content:', content);
   console.log('ContentModalBody - content.type:', content.type);
@@ -116,6 +117,30 @@ export function ContentModalBody({ content }: ContentModalBodyProps) {
   if (content.status === 'pending') {
     return (
       <div className="p-8">
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={onClose}
+            className="flex items-center justify-center w-10 h-10 rounded-full bg-zinc-800/30 hover:bg-zinc-700/50 transition-all duration-200 group"
+            aria-label="Close modal"
+          >
+            <svg
+              width="18"
+              height="18"
+              fill="none"
+              viewBox="0 0 24 24"
+              className="group-hover:scale-110 transition-transform duration-200"
+            >
+              <path
+                d="M18 6L6 18M6 6l12 12"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-gray-400 group-hover:text-white transition-colors duration-200"
+              />
+            </svg>
+          </button>
+        </div>
         <DefaultContentCard content={content} />
       </div>
     );
@@ -174,7 +199,9 @@ export function ContentModalBody({ content }: ContentModalBodyProps) {
             {content.description ? (
               <div className="bg-zinc-800/30 rounded-xl p-8 border border-zinc-700/30">
                 <div className="prose prose-invert max-w-none">
-                  <p className="text-gray-400 leading-relaxed text-lg mb-6">{content.description}</p>
+                  <p className="text-gray-400 leading-relaxed text-lg mb-6">
+                    {content.description}
+                  </p>
 
                   {/* Link URL Display */}
                   {content.linkUrl && (
@@ -207,7 +234,9 @@ export function ContentModalBody({ content }: ContentModalBodyProps) {
         {content.type === 'link' && (
           <div className="space-y-8">
             {/* 1. AI Generated Summary - 맨 위 */}
-            {content.aiSummary && <SummarySection title="Summary" summary={content.aiSummary} />}
+            {content.aiSummary && (
+              <SummarySection title="Summary" summary={content.aiSummary} onClose={onClose} />
+            )}
 
             {/* 2. Link Preview Card - 중간 (LinkPreview가 있는 경우) */}
             {content.linkPreview ? (
@@ -234,7 +263,7 @@ export function ContentModalBody({ content }: ContentModalBodyProps) {
 
       {/* AI Generated Summary for non-link content */}
       {content.type !== 'link' && content.aiSummary && (
-        <SummarySection title="Summary" summary={content.aiSummary} />
+        <SummarySection title="Summary" summary={content.aiSummary} onClose={onClose} />
       )}
 
       {/* Interactive Q&A Section for non-link content */}

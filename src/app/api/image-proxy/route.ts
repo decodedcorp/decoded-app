@@ -104,9 +104,10 @@ export async function GET(request: NextRequest) {
     headers.set('Access-Control-Allow-Origin', '*');
     headers.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
     headers.set('Access-Control-Allow-Headers', 'Content-Type');
-    headers.set('Cache-Control', 'public, max-age=3600'); // 1시간 캐시
+    headers.set('Cache-Control', 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=604800'); // 1일 캐시, CDN 1주일, 백그라운드 재검증
     headers.set('Content-Type', contentType);
     headers.set('Content-Length', imageBuffer.byteLength.toString());
+    headers.set('ETag', `"${imageBuffer.byteLength}-${Date.now()}"`); // ETag 추가
 
     return new NextResponse(imageBuffer, {
       status: 200,

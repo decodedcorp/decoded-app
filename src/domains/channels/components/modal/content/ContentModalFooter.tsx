@@ -4,9 +4,10 @@ import { ContentItem } from '@/store/contentModalStore';
 
 interface ContentModalFooterProps {
   content: ContentItem;
+  onClose: () => void;
 }
 
-export function ContentModalFooter({ content }: ContentModalFooterProps) {
+export function ContentModalFooter({ content, onClose }: ContentModalFooterProps) {
   return (
     <div className="bg-zinc-900 p-6 border-t border-zinc-700/30">
       <div className="flex items-center justify-between">
@@ -30,7 +31,7 @@ export function ContentModalFooter({ content }: ContentModalFooterProps) {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
+                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367 2.684z"
               />
             </svg>
             <span className="font-medium">Share</span>
@@ -49,10 +50,31 @@ export function ContentModalFooter({ content }: ContentModalFooterProps) {
           </button>
         </div>
 
-        {/* Additional Info */}
-        <div className="flex items-center space-x-6 text-sm text-zinc-500">
-          <span className="font-mono">ID: {content.id}</span>
-          <span className="uppercase tracking-wider font-medium">Type: {content.type}</span>
+        {/* Right Section: Close Button and Additional Info */}
+        <div className="flex items-center space-x-6">
+          {/* Additional Info */}
+          <div className="flex items-center space-x-6 text-sm text-zinc-500">
+            <span className="font-mono">ID: {content.id}</span>
+            <span className="uppercase tracking-wider font-medium">Type: {content.type}</span>
+          </div>
+
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="flex items-center justify-center w-10 h-10 rounded-full bg-zinc-800/30 hover:bg-zinc-700/50 transition-all duration-200 flex-shrink-0 group"
+            aria-label="Close modal"
+          >
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" className="group-hover:scale-110 transition-transform duration-200">
+              <path
+                d="M18 6L6 18M6 6l12 12"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-gray-400 group-hover:text-white transition-colors duration-200"
+              />
+            </svg>
+          </button>
         </div>
       </div>
     </div>

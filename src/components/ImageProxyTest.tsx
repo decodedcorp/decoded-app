@@ -65,6 +65,7 @@ export function ImageProxyTest() {
         {imageUrl && (
           <div className="border rounded-lg p-4">
             <ProxiedImage
+              data-testid="proxied-image"
               src={imageUrl}
               alt="Test image"
               width={400}
@@ -83,6 +84,7 @@ export function ImageProxyTest() {
             <div key={index} className="border rounded-lg p-4 space-y-2">
               <div className="text-sm text-gray-600 truncate">{url}</div>
               <ProxiedImage
+                data-testid={`proxied-image-${index}`}
                 src={url}
                 alt={`Test image ${index + 1}`}
                 width={300}
@@ -128,6 +130,7 @@ export function ImageProxyTest() {
               <h4 className="text-sm font-medium text-gray-700 mb-2">Proxied Image (Safe)</h4>
               <div className="border rounded-lg p-2">
                 <ProxiedImage
+                  data-testid="proxied-image-real-content"
                   src={mockContentData.linkPreview.imageUrl}
                   alt={mockContentData.linkPreview.title}
                   width={400}
@@ -162,17 +165,248 @@ export function ImageProxyTest() {
         </div>
       </div>
 
+      {/* 에러 처리 테스트 */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Error Handling Tests</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="border rounded-lg p-4 space-y-2">
+            <h4 className="text-sm font-medium text-gray-700">Invalid URL (should show error)</h4>
+            <ProxiedImage
+              data-testid="proxied-image-error"
+              src="https://via.placeholder.com/invalid-url-that-will-fail"
+              alt="Invalid image"
+              width={300}
+              height={200}
+              className="rounded-lg"
+              fallbackSrc="https://via.placeholder.com/300x200/ff0000/ffffff?text=Fallback+Image"
+            />
+          </div>
+          
+          <div className="border rounded-lg p-4 space-y-2">
+            <h4 className="text-sm font-medium text-gray-700">Blocked domain (403 error)</h4>
+            <ProxiedImage
+              data-testid="proxied-image-blocked"
+              src="https://evil-domain.com/malicious-image.jpg"
+              alt="Blocked domain image"
+              width={300}
+              height={200}
+              className="rounded-lg"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* 우선순위 테스트 */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Priority and Loading Tests</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="border rounded-lg p-4 space-y-2">
+            <h4 className="text-sm font-medium text-gray-700">High priority</h4>
+            <ProxiedImage
+              data-testid="proxied-image-high-priority"
+              src="https://via.placeholder.com/200x150/cc0000/ffffff?text=High+Priority"
+              alt="High priority image"
+              width={200}
+              height={150}
+              imagePriority="high"
+              className="rounded-lg"
+            />
+          </div>
+          
+          <div className="border rounded-lg p-4 space-y-2">
+            <h4 className="text-sm font-medium text-gray-700">Medium priority</h4>
+            <ProxiedImage
+              data-testid="proxied-image-medium-priority"
+              src="https://via.placeholder.com/200x150/00cc00/ffffff?text=Medium+Priority"
+              alt="Medium priority image"
+              width={200}
+              height={150}
+              imagePriority="medium"
+              className="rounded-lg"
+            />
+          </div>
+          
+          <div className="border rounded-lg p-4 space-y-2">
+            <h4 className="text-sm font-medium text-gray-700">Low priority</h4>
+            <ProxiedImage
+              data-testid="proxied-image-low-priority"
+              src="https://via.placeholder.com/200x150/0000cc/ffffff?text=Low+Priority"
+              alt="Low priority image"
+              width={200}
+              height={150}
+              imagePriority="low"
+              className="rounded-lg"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Downloaded src 및 R2 테스트 */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Downloaded Source and R2 Tests</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="border rounded-lg p-4 space-y-2">
+            <h4 className="text-sm font-medium text-gray-700">Downloaded src priority</h4>
+            <ProxiedImage
+              data-testid="proxied-image-downloaded"
+              src="https://via.placeholder.com/300x200/cccccc/000000?text=Original"
+              downloadedSrc="https://via.placeholder.com/300x200/00cc66/ffffff?text=Downloaded"
+              alt="Downloaded source priority test"
+              width={300}
+              height={200}
+              className="rounded-lg"
+            />
+          </div>
+          
+          <div className="border rounded-lg p-4 space-y-2">
+            <h4 className="text-sm font-medium text-gray-700">R2 domain (proxy bypass)</h4>
+            <ProxiedImage
+              data-testid="proxied-image-r2"
+              src="https://example.r2.dev/test-image.jpg"
+              alt="R2 domain test"
+              width={300}
+              height={200}
+              className="rounded-lg"
+              fallbackSrc="https://via.placeholder.com/300x200/9966cc/ffffff?text=R2+Fallback"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Fallback 테스트 */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Fallback Tests</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="border rounded-lg p-4 space-y-2">
+            <h4 className="text-sm font-medium text-gray-700">With fallback image</h4>
+            <ProxiedImage
+              data-testid="proxied-image-fallback"
+              src="https://via.placeholder.com/300x200/original-image.jpg"
+              fallbackSrc="https://via.placeholder.com/300x200/ff9900/ffffff?text=Fallback+Used"
+              alt="Fallback test"
+              width={300}
+              height={200}
+              className="rounded-lg"
+            />
+          </div>
+          
+          <div className="border rounded-lg p-4 space-y-2">
+            <h4 className="text-sm font-medium text-gray-700">No fallback (error UI)</h4>
+            <ProxiedImage
+              data-testid="proxied-image-no-fallback"
+              src="https://via.placeholder.com/300x200/invalid-no-fallback.jpg"
+              alt="No fallback test"
+              width={300}
+              height={200}
+              className="rounded-lg"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* 재시도 및 Smart Fallback 테스트 */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Enhanced Error Handling & Smart Fallbacks</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="border rounded-lg p-4 space-y-2">
+            <h4 className="text-sm font-medium text-gray-700">Retry mechanism test</h4>
+            <ProxiedImage
+              data-testid="retry-test-image"
+              src="https://example.com/retry-test-image.jpg"
+              alt="Retry test"
+              width={200}
+              height={150}
+              imageType="news"
+              className="rounded-lg"
+            />
+          </div>
+          
+          <div className="border rounded-lg p-4 space-y-2">
+            <h4 className="text-sm font-medium text-gray-700">News image with smart fallback</h4>
+            <ProxiedImage
+              data-testid="news-image-fallback"
+              src="https://invalid-news-site.com/image.jpg"
+              alt="News image"
+              width={200}
+              height={150}
+              imageType="news"
+              className="rounded-lg"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* 다양한 타입별 Smart Fallback 테스트 */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Image Type Fallbacks</h3>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="border rounded-lg p-4 space-y-2">
+            <h4 className="text-sm font-medium text-gray-700">Avatar fallback</h4>
+            <ProxiedImage
+              data-testid="avatar-fallback"
+              src="https://invalid-avatar.com/avatar.jpg"
+              alt="Avatar"
+              width={100}
+              height={100}
+              imageType="avatar"
+              className="rounded-full"
+            />
+          </div>
+          
+          <div className="border rounded-lg p-4 space-y-2">
+            <h4 className="text-sm font-medium text-gray-700">Logo fallback</h4>
+            <ProxiedImage
+              data-testid="logo-fallback"
+              src="https://invalid-logo.com/logo.png"
+              alt="Logo"
+              width={150}
+              height={75}
+              imageType="logo"
+              className="rounded"
+            />
+          </div>
+          
+          <div className="border rounded-lg p-4 space-y-2">
+            <h4 className="text-sm font-medium text-gray-700">Preview fallback</h4>
+            <ProxiedImage
+              data-testid="preview-fallback"
+              src="https://invalid-preview.com/preview.jpg"
+              alt="Preview"
+              width={150}
+              height={100}
+              imageType="preview"
+              className="rounded"
+            />
+          </div>
+          
+          <div className="border rounded-lg p-4 space-y-2">
+            <h4 className="text-sm font-medium text-gray-700">General fallback</h4>
+            <ProxiedImage
+              data-testid="general-fallback"
+              src="https://invalid-general.com/image.jpg"
+              alt="General"
+              width={150}
+              height={100}
+              imageType="general"
+              className="rounded"
+            />
+          </div>
+        </div>
+      </div>
+
       {/* 프록시 URL 정보 */}
       <div className="bg-gray-50 p-4 rounded-lg">
-        <h3 className="text-lg font-semibold mb-2">How it works</h3>
+        <h3 className="text-lg font-semibold mb-2">Enhanced Features</h3>
         <ul className="text-sm space-y-1">
           <li>
-            • External image URLs are automatically proxied through <code>/api/image-proxy</code>
+            • External image URLs are automatically proxied through <code>/api/proxy/image</code>
           </li>
-          <li>• Images are cached for 24 hours</li>
-          <li>• Supports all image formats (JPEG, PNG, WebP, etc.)</li>
-          <li>• Includes timeout protection (10 seconds)</li>
-          <li>• CORS headers are automatically handled</li>
+          <li>• Images are cached for 30 days with CDN optimization</li>
+          <li>• Supports WebP, JPEG, PNG with quality optimization</li>
+          <li>• <strong>Automatic retry mechanism</strong> with exponential backoff (up to 2 retries)</li>
+          <li>• <strong>Smart fallback images</strong> based on content type (news, avatar, logo, etc.)</li>
+          <li>• <strong>Enhanced error handling</strong> with graceful degradation</li>
+          <li>• CORS headers and security domain allowlist</li>
         </ul>
       </div>
     </div>

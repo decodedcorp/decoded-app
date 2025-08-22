@@ -20,6 +20,8 @@ interface BaseModalProps {
   closeOnEscape?: boolean;
   titleId?: string;
   descId?: string;
+  onEscape?: () => void;
+  onOverlayClick?: () => void;
 }
 
 export function BaseModal({
@@ -34,6 +36,8 @@ export function BaseModal({
   closeOnEscape = true,
   titleId = 'modal-title',
   descId,
+  onEscape,
+  onOverlayClick,
 }: BaseModalProps) {
   const [mounted, setMounted] = useState(false);
   const modalRootRef = useRef<HTMLDivElement | null>(null);
@@ -62,11 +66,17 @@ export function BaseModal({
   useEffect(() => {
     if (!isOpen || !closeOnEscape) return;
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        if (onEscape) {
+          onEscape();
+        } else {
+          onClose();
+        }
+      }
     }
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [isOpen, onClose, closeOnEscape]);
+  }, [isOpen, onClose, closeOnEscape, onEscape]);
 
   if (!mounted || !modalRootRef.current || !isOpen) {
     return null;
@@ -82,7 +92,13 @@ export function BaseModal({
           role="presentation"
           onMouseDown={(e) => {
             // dialog 박스 밖 클릭 시 닫기
-            if (closeOnOverlayClick && e.target === e.currentTarget) onClose();
+            if (closeOnOverlayClick && e.target === e.currentTarget) {
+              if (onOverlayClick) {
+                onOverlayClick();
+              } else {
+                onClose();
+              }
+            }
           }}
         />
       )}

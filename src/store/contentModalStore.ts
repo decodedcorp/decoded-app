@@ -10,15 +10,27 @@ interface ContentModalState {
   selectedContent: ContentItem | null;
   openModal: (content: ContentItem) => void;
   closeModal: () => void;
+  closeModalOnEscape: () => void;
+  closeModalOnOverlay: () => void;
 }
 
 export const useContentModalStore = create<ContentModalState>((set) => ({
   isOpen: false,
   selectedContent: null,
   openModal: (content: ContentItem) => {
+    console.log('🎯 [contentModalStore] openModal called with:', content.title);
     set({ isOpen: true, selectedContent: content });
   },
   closeModal: () => {
+    console.log('🎯 [contentModalStore] closeModal called (programmatic)');
+    set({ isOpen: false, selectedContent: null });
+  },
+  closeModalOnEscape: () => {
+    console.log('🎯 [contentModalStore] closeModalOnEscape called');
+    set({ isOpen: false, selectedContent: null });
+  },
+  closeModalOnOverlay: () => {
+    console.log('🎯 [contentModalStore] closeModalOnOverlay called');
     set({ isOpen: false, selectedContent: null });
   },
 }));

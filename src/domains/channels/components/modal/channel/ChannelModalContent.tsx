@@ -111,7 +111,7 @@ const ContentItemCard = React.memo<{
             }`}
             quality={95}
             loading="lazy"
-            fallbackSrc=""
+            imageType="news"
             onError={() => {
               console.error('[ContentItemCard] Image failed to load:', imageUrl);
             }}

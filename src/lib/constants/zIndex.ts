@@ -3,17 +3,21 @@ export const Z_INDEX = {
   // Background layers
   BACKGROUND: 0,
   CONTENT: 1,
-  
+
   // UI Elements
   DROPDOWN: 100,
   STICKY_HEADER: 200,
   TOOLTIP: 300,
-  
+
   // Overlays
   MODAL_BACKGROUND_BLUR: 999,
   MODAL_OVERLAY: 1000,
   MODAL_CONTENT: 1010,
-  
+
+  // Content Modal (Higher than regular modals)
+  CONTENT_MODAL_OVERLAY: 1100,
+  CONTENT_MODAL_CONTENT: 1110,
+
   // Top level
   TOAST: 2000,
   DEBUG: 9999,
@@ -32,6 +36,8 @@ export const Z_INDEX_CLASSES = {
   MODAL_BACKGROUND_BLUR: 'z-[999]',
   MODAL_OVERLAY: 'z-[1000]',
   MODAL_CONTENT: 'z-[1010]',
+  CONTENT_MODAL_OVERLAY: 'z-[1100]',
+  CONTENT_MODAL_CONTENT: 'z-[1110]',
   TOAST: 'z-[2000]',
   DEBUG: 'z-[9999]',
 } as const;

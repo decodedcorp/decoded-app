@@ -16,6 +16,7 @@ import { useChannel } from '../../../hooks/useChannels';
 import { BaseModal } from '../base/BaseModal';
 import { ChannelModalContainer } from '../base/ChannelModalContainer';
 import { ContentUploadModal } from '../content-upload/ContentUploadModal';
+import { useContentModalStore, selectIsContentModalOpen } from '@/store/contentModalStore';
 
 import { ChannelModalHeader } from './ChannelModalHeader';
 import { ChannelModalContent } from './ChannelModalContent';
@@ -27,6 +28,9 @@ export function ChannelModal() {
   const channelId = useChannelModalStore(selectSelectedChannelId);
   const closeModal = useChannelModalStore((state) => state.closeModal);
 
+  // 콘텐츠 모달 상태 확인
+  const isContentModalOpen = useContentModalStore(selectIsContentModalOpen);
+
   // 디버깅을 위한 로그
   React.useEffect(() => {
     console.log('🎯 [ChannelModal] Modal state changed:', {
@@ -34,8 +38,9 @@ export function ChannelModal() {
       channelId,
       hasChannel: !!channel,
       channelData: channel,
+      isContentModalOpen,
     });
-  }, [isOpen, channelId, channel]);
+  }, [isOpen, channelId, channel, isContentModalOpen]);
 
   // 채널 ID로 API 데이터 가져오기
   const { data: apiChannel, isLoading, error } = useChannel(channelId || '');
@@ -103,9 +108,10 @@ export function ChannelModal() {
   console.log('🎯 [ChannelModal] Modal is open, rendering modal content');
 
   return (
-    <BaseModal 
-      isOpen={isOpen} 
+    <BaseModal
+      isOpen={isOpen}
       onClose={closeModal}
+      closeOnEscape={!isContentModalOpen}
       titleId="channel-modal-title"
       descId="channel-modal-description"
     >

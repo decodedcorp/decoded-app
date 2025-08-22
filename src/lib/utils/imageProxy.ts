@@ -2,7 +2,7 @@
 export type ImageSize = 'thumb' | 'small' | 'medium' | 'large' | 'original';
 
 // Image quality options
-export type ImageQuality = 'low' | 'medium' | 'high';
+export type ImageQuality = 'low' | 'medium' | 'high' | 'max';
 
 // Image format options
 export type ImageFormat = 'webp' | 'jpeg' | 'png' | 'original';
@@ -113,24 +113,24 @@ function buildProxyUrl(imageUrl: string, options: ImageProxyOptions): string {
 }
 
 /**
- * 채널 콘텐츠용 최적화된 이미지 URL 생성
+ * 채널 콘텐츠용 최적화된 이미지 URL 생성 (품질 우선)
  */
-export function getOptimizedChannelImageUrl(imageUrl: string, size: ImageSize = 'medium'): string {
+export function getOptimizedChannelImageUrl(imageUrl: string, size: ImageSize = 'large'): string {
   return getProxiedImageUrl(imageUrl, {
     size,
     format: 'webp',
-    quality: 'medium',
+    quality: 'high', // 품질 우선 설정
   });
 }
 
 /**
- * 썸네일용 최적화된 이미지 URL 생성
+ * 썸네일용 최적화된 이미지 URL 생성 (품질 우선)
  */
 export function getThumbnailImageUrl(imageUrl: string): string {
   return getProxiedImageUrl(imageUrl, {
-    size: 'thumb',
+    size: 'medium', // thumb → medium으로 크기 향상
     format: 'webp',
-    quality: 'medium',
+    quality: 'high', // 품질 우선 설정
   });
 }
 
@@ -153,6 +153,33 @@ export function getBlurPlaceholderUrl(imageUrl: string): string {
  */
 export function getProxiedImageUrls(imageUrls: string[]): string[] {
   return imageUrls.map(url => getProxiedImageUrl(url));
+}
+
+/**
+ * 컨테이너 크기에 맞는 최적 이미지 사이즈 반환
+ */
+export function getOptimalSizeForContainer(containerWidth: number): ImageSize {
+  if (containerWidth <= 200) return 'thumb';
+  if (containerWidth <= 400) return 'small';
+  if (containerWidth <= 800) return 'medium';
+  return 'large';
+}
+
+/**
+ * 네트워크 상태에 맞는 이미지 품질 반환 (품질 우선 모드)
+ */
+export function getQualityForNetwork(effectiveType?: string): ImageQuality {
+  switch (effectiveType) {
+    case 'slow-2g':
+    case '2g':
+      return 'medium'; // low → medium으로 품질 향상
+    case '3g':
+      return 'high'; // low → high로 품질 향상
+    case '4g':
+      return 'max'; // medium → max로 최고 품질
+    default:
+      return 'high'; // medium → high로 기본 품질 향상
+  }
 }
 
 /**
