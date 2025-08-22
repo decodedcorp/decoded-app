@@ -64,14 +64,17 @@ export function ChannelSearchBar({
     onClearChannel?.();
   };
 
-  const handleAutocompleteSelect = useCallback((item: AutocompleteItem) => {
-    console.log('Channel autocomplete item selected:', item); // 디버깅용 로그
-    // For channel search, navigate to the content detail
-    router.push(`/content/${item.id}`);
-    setQuery('');
-    setIsAutocompleteOpen(false);
-    inputRef.current?.blur();
-  }, [router]);
+  const handleAutocompleteSelect = useCallback(
+    (item: AutocompleteItem) => {
+      console.log('Channel autocomplete item selected:', item); // 디버깅용 로그
+      // For channel search, navigate to the content detail
+      router.push(`/content/${item.id}`);
+      setQuery('');
+      setIsAutocompleteOpen(false);
+      inputRef.current?.blur();
+    },
+    [router],
+  );
 
   const handleAutocompleteClose = useCallback(() => {
     setIsAutocompleteOpen(false);
@@ -84,14 +87,14 @@ export function ChannelSearchBar({
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setHighlightedIndex(prev => 
-          prev < 7 ? prev + 1 : 0 // Assuming max 8 results
+        setHighlightedIndex(
+          (prev) => (prev < 7 ? prev + 1 : 0), // Assuming max 8 results
         );
         break;
       case 'ArrowUp':
         e.preventDefault();
-        setHighlightedIndex(prev => 
-          prev > 0 ? prev - 1 : 7 // Assuming max 8 results
+        setHighlightedIndex(
+          (prev) => (prev > 0 ? prev - 1 : 7), // Assuming max 8 results
         );
         break;
       case 'Escape':

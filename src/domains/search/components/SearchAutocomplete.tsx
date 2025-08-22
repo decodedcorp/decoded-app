@@ -98,11 +98,25 @@ const AutocompleteItemComponent = React.memo(
           'hover:bg-zinc-700/50',
           isHighlighted && 'bg-zinc-700/70',
         )}
+        style={{ pointerEvents: 'auto' }} // 명시적으로 pointer-events 설정
         onClick={(e) => {
-          console.log('AutocompleteItemComponent clicked!', item); // 디버깅용 로그
-          e.preventDefault();
           e.stopPropagation();
           onClick();
+        }}
+        onMouseDown={(e) => {
+          // 이벤트 위임: 클릭된 요소가 현재 컨테이너 내부에 있으면 클릭 처리
+          if (e.currentTarget.contains(e.target as Node)) {
+            if (e.button === 0) {
+              // 왼쪽 클릭만 처리
+              onClick();
+            }
+          }
+        }}
+        onMouseUp={(e) => {
+          // mouseup에서도 클릭 로직 처리 (백업용)
+          if (e.button === 0) {
+            onClick();
+          }
         }}
         role="option"
         aria-selected={isHighlighted}
@@ -183,9 +197,10 @@ export const SearchAutocomplete = React.memo(
       (item: AutocompleteItem, index: number) => {
         onSelect(item);
         onClose?.();
+
         // Set focus back to the search input for better UX
         setTimeout(() => {
-          const searchInput = document.querySelector('input[role="combobox"]') as HTMLInputElement;
+          const searchInput = document.querySelector('input[role="combobox']') as HTMLInputElement;
           searchInput?.focus();
         }, 0);
       },
@@ -326,7 +341,11 @@ export const SearchAutocomplete = React.memo(
                   }}
                   tabIndex={-1}
                   className="focus:outline-none"
+                  style={{ pointerEvents: 'auto' }} // 명시적으로 pointer-events 설정
                   onFocus={() => onHighlightChange?.(resultIndex)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
                 >
                   <AutocompleteItemComponent
                     item={item}
@@ -364,7 +383,11 @@ export const SearchAutocomplete = React.memo(
                     }}
                     tabIndex={-1}
                     className="focus:outline-none"
+                    style={{ pointerEvents: 'auto' }} // 명시적으로 pointer-events 설정
                     onFocus={() => onHighlightChange?.(resultIndex)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
                   >
                     <AutocompleteItemComponent
                       item={item}

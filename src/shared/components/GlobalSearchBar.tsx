@@ -49,18 +49,21 @@ export function GlobalSearchBar({ onSearch, className = '' }: GlobalSearchBarPro
     }, 200);
   };
 
-  const handleAutocompleteSelect = useCallback((item: AutocompleteItem) => {
-    console.log('Autocomplete item selected:', item); // 디버깅용 로그
-    if (item.type === 'channel') {
-      router.push(`/channels/${item.channelId}`);
-    } else {
-      // Navigate to content detail page
-      router.push(`/content/${item.id}`);
-    }
-    setQuery('');
-    setIsAutocompleteOpen(false);
-    inputRef.current?.blur();
-  }, [router]);
+  const handleAutocompleteSelect = useCallback(
+    (item: AutocompleteItem) => {
+      console.log('Autocomplete item selected:', item); // 디버깅용 로그
+      if (item.type === 'channel') {
+        router.push(`/channels/${item.channelId}`);
+      } else {
+        // Navigate to content detail page
+        router.push(`/content/${item.id}`);
+      }
+      setQuery('');
+      setIsAutocompleteOpen(false);
+      inputRef.current?.blur();
+    },
+    [router],
+  );
 
   const handleAutocompleteClose = useCallback(() => {
     setIsAutocompleteOpen(false);
@@ -73,14 +76,14 @@ export function GlobalSearchBar({ onSearch, className = '' }: GlobalSearchBarPro
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setHighlightedIndex(prev => 
-          prev < 7 ? prev + 1 : 0 // Assuming max 8 results
+        setHighlightedIndex(
+          (prev) => (prev < 7 ? prev + 1 : 0), // Assuming max 8 results
         );
         break;
       case 'ArrowUp':
         e.preventDefault();
-        setHighlightedIndex(prev => 
-          prev > 0 ? prev - 1 : 7 // Assuming max 8 results
+        setHighlightedIndex(
+          (prev) => (prev > 0 ? prev - 1 : 7), // Assuming max 8 results
         );
         break;
       case 'Escape':
@@ -131,7 +134,7 @@ export function GlobalSearchBar({ onSearch, className = '' }: GlobalSearchBarPro
               />
             </svg>
           </div>
-          
+
           <input
             ref={inputRef}
             type="text"
@@ -148,7 +151,7 @@ export function GlobalSearchBar({ onSearch, className = '' }: GlobalSearchBarPro
             aria-haspopup="listbox"
             aria-autocomplete="list"
           />
-          
+
           {/* Clear button */}
           {query && (
             <button
@@ -172,13 +175,9 @@ export function GlobalSearchBar({ onSearch, className = '' }: GlobalSearchBarPro
               </svg>
             </button>
           )}
-          
+
           {/* 숨겨진 검색 버튼 (접근성을 위해 유지) */}
-          <button
-            type="submit"
-            className="sr-only"
-            aria-label="Search"
-          >
+          <button type="submit" className="sr-only" aria-label="Search">
             Search
           </button>
         </div>
