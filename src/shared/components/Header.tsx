@@ -93,12 +93,15 @@ export function Header() {
         "
       >
         {/* Logo */}
-        <Link href="/" className="text-2xl font-bold text-[#EAFD66] tracking-tight drop-shadow">decoded</Link>
+        <Link href="/" className="text-2xl font-bold text-[#EAFD66] tracking-tight drop-shadow">
+          decoded
+        </Link>
 
         {/* Search Bar */}
         <div className="hidden md:flex flex-1 mx-8 justify-center">
           {isChannelPage && channelName ? (
             <ChannelSearchBar
+              channelId={channelId || ''}
               channelName={channelName}
               onSearch={handleChannelSearch}
               onClearChannel={handleClearChannel}
