@@ -12,20 +12,21 @@ const getCategoryIcon = (category: string) => {
 
 const getCategoryDescription = (category: string) => {
   const descriptions: Record<string, string> = {
-    'Technology': '혁신적 기술을 선별하는 전문 에디터들',
-    'Design': '창의적 시각을 제공하는 디자인 큐레이터들', 
-    'Business': '비즈니스 인사이트를 전하는 편집 전문가들',
-    'Lifestyle': '라이프스타일을 재해석하는 독창적 에디터들',
-    'Education': '학습 경험을 설계하는 교육 큐레이터들',
-    'Entertainment': '문화 콘텐츠를 발굴하는 편집자들',
-    'Uncategorized': '다양한 관점을 제시하는 큐레이터들',
-    'uncategorized': '다양한 관점을 제시하는 큐레이터들',
+    Technology: '혁신적 기술을 선별하는 전문 에디터들',
+    Design: '창의적 시각을 제공하는 디자인 큐레이터들',
+    Business: '비즈니스 인사이트를 전하는 편집 전문가들',
+    Lifestyle: '라이프스타일을 재해석하는 독창적 에디터들',
+    Education: '학습 경험을 설계하는 교육 큐레이터들',
+    Entertainment: '문화 콘텐츠를 발굴하는 편집자들',
+    Uncategorized: '다양한 관점을 제시하는 큐레이터들',
+    uncategorized: '다양한 관점을 제시하는 큐레이터들',
   };
   return descriptions[category] || '독특한 편집 철학을 가진 큐레이터들';
 };
 
 const getChannelQuality = (channels: ChannelResponse[]) => {
-  const avgContent = channels.reduce((sum, ch) => sum + (ch.content_count || 0), 0) / channels.length;
+  const avgContent =
+    channels.reduce((sum, ch) => sum + (ch.content_count || 0), 0) / channels.length;
   if (avgContent > 100) return '마스터 에디터';
   if (avgContent > 50) return '검증된 큐레이터';
   return '신진 편집자';
@@ -39,12 +40,12 @@ interface CategorySectionProps {
   className?: string;
 }
 
-export function CategorySection({ 
-  title, 
-  channels, 
-  onChannelClick, 
+export function CategorySection({
+  title,
+  channels,
+  onChannelClick,
   onViewAll,
-  className = '' 
+  className = '',
 }: CategorySectionProps) {
   if (channels.length === 0) {
     return null;
@@ -58,18 +59,18 @@ export function CategorySection({
       {/* Section Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-gray-400 mb-1">
-            {title}
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-400 mb-1">{title}</h2>
           <p className="text-gray-500 text-sm mb-1">
             {channels.length}명의 큐레이터 • {getCategoryDescription(title)}
           </p>
           <div className="flex items-center space-x-2 text-xs text-gray-500">
-            <span className="bg-zinc-800/50 px-2 py-1 rounded-full">{getChannelQuality(channels)}</span>
+            <span className="bg-zinc-800/50 px-2 py-1 rounded-full">
+              {getChannelQuality(channels)}
+            </span>
             <span>• 독창적 편집 관점</span>
           </div>
         </div>
-        
+
         {channels.length > 6 && onViewAll && (
           <button
             onClick={onViewAll}
@@ -90,9 +91,10 @@ export function CategorySection({
             {displayChannels.map((channel) => (
               <div key={channel.id} className="flex-shrink-0 w-72">
                 <ChannelCard
+                  key={channel.id}
                   channel={channel}
-                  onClick={onChannelClick}
-                  size="medium"
+                  size="small"
+                  onCardClick={onChannelClick}
                   className="h-full"
                 />
               </div>
@@ -114,10 +116,10 @@ interface TrendingSectionProps {
   className?: string;
 }
 
-export function TrendingSection({ 
-  channels, 
-  onChannelClick, 
-  className = '' 
+export function TrendingSection({
+  channels,
+  onChannelClick,
+  className = '',
 }: TrendingSectionProps) {
   // Get top trending channels (most subscribers + content)
   const trendingChannels = useMemo(() => {
@@ -159,7 +161,7 @@ export function TrendingSection({
           <ChannelCard
             key={channel.id}
             channel={channel}
-            onClick={onChannelClick}
+            onCardClick={onChannelClick}
             size="medium"
             className="h-full"
           />

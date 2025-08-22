@@ -91,4 +91,17 @@ export const queryKeys = {
     lists: () => [...queryKeys.users.all, 'list'] as const,
     list: (filters: Record<string, any>) => [...queryKeys.users.lists(), filters] as const,
   },
+
+  // Search related queries
+  search: {
+    all: ['search'] as const,
+    contents: (query: string, limit?: number) => 
+      [...queryKeys.search.all, 'contents', { query, limit }] as const,
+    channels: (query: string, limit?: number) => 
+      [...queryKeys.search.all, 'channels', { query, limit }] as const,
+    channelContents: (channelId: string, query: string, limit?: number) => 
+      [...queryKeys.search.all, 'channel-contents', { channelId, query, limit }] as const,
+    autocomplete: (query: string, type?: 'all' | 'channels' | 'contents') => 
+      [...queryKeys.search.all, 'autocomplete', { query, type }] as const,
+  },
 } as const;

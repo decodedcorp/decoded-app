@@ -82,10 +82,9 @@ export function RecommendedSection({
           <ChannelCard
             key={channel.id}
             channel={channel}
-            onClick={onChannelClick}
             size="medium"
+            onCardClick={onChannelClick}
             className="h-full"
-            highlightCategory={false}
           />
         ))}
       </div>

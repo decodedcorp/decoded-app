@@ -46,6 +46,53 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
     console.log('Channel ID:', channelId);
   }, [apiChannel, error, channelId]);
 
+  // URL 파라미터에서 content ID 확인하고 모달 열기
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const contentId = params.get('content');
+
+      if (contentId && apiChannel) {
+        console.log('Content ID from URL:', contentId, 'Opening modal...');
+
+        // 채널 콘텐츠를 가져와서 해당 콘텐츠 찾기
+        const fetchContentAndOpenModal = async () => {
+          try {
+            // ContentsService를 사용하여 특정 콘텐츠 가져오기
+            const { ContentsService } = await import('@/api/generated/services/ContentsService');
+            const result = await ContentsService.getContentsByChannelContentsChannelChannelIdGet(
+              channelId,
+              0,
+              100, // 충분한 수의 콘텐츠 가져오기
+            );
+
+            if (result?.contents) {
+              const targetContent = result.contents.find((content) => content.id === contentId);
+              if (targetContent) {
+                // 콘텐츠를 ContentItem으로 변환
+                const { unifyContent, convertToContentItem } = await import('@/lib/types/content');
+                const unifiedContent = unifyContent(targetContent);
+                const contentItem = convertToContentItem(unifiedContent);
+
+                // 콘텐츠 모달 열기
+                openContentModal(contentItem);
+
+                // URL에서 content 파라미터 제거
+                const url = new URL(window.location.href);
+                url.searchParams.delete('content');
+                window.history.replaceState({}, '', url.pathname + url.search);
+              }
+            }
+          } catch (error) {
+            console.error('Failed to fetch content for modal:', error);
+          }
+        };
+
+        fetchContentAndOpenModal();
+      }
+    }
+  }, [apiChannel, channelId, openContentModal]);
+
   // 사이드바 상태 관리
   const [currentFilters, setCurrentFilters] = useState<SidebarFilters>({
     dataTypes: [],
@@ -59,7 +106,6 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
     console.log('Filters changed:', filters);
     // TODO: Implement filter logic for content
   };
-
 
   // 채널 데이터 결정: API 데이터를 직접 사용
   const finalChannel = useMemo((): ChannelData | null => {
@@ -85,12 +131,15 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
   };
 
   // 하이라이트 클릭 핸들러
-  const handleHighlightClick = React.useCallback((highlight: HighlightItem) => {
-    if (highlight.clickAction.type === 'content_modal' && highlight.clickAction.data) {
-      // ContentItem 데이터로 콘텐츠 모달 열기
-      openContentModal(highlight.clickAction.data as ContentItem);
-    }
-  }, [openContentModal]);
+  const handleHighlightClick = React.useCallback(
+    (highlight: HighlightItem) => {
+      if (highlight.clickAction.type === 'content_modal' && highlight.clickAction.data) {
+        // ContentItem 데이터로 콘텐츠 모달 열기
+        openContentModal(highlight.clickAction.data as ContentItem);
+      }
+    },
+    [openContentModal],
+  );
 
   // 키보드 네비게이션 지원
   React.useEffect(() => {
@@ -169,14 +218,12 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
         {/* Content */}
         <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
           {error && (
-            <div className="text-red-500 text-center p-4">
-              채널 정보를 불러오는데 실패했습니다.
-            </div>
+            <div className="text-red-500 text-center p-4">채널 정보를 불러오는데 실패했습니다.</div>
           )}
           {!error && finalChannel && (
             <>
-              <ChannelModalContent 
-                currentFilters={currentFilters} 
+              <ChannelModalContent
+                currentFilters={currentFilters}
                 channelId={channelId}
                 onFilterChange={handleFilterChange}
               />
@@ -217,13 +264,12 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
 
       {/* Right Sidebar - Recommended Channels */}
       <div className={`hidden xl:block flex-shrink-0 ${isRightSidebarCollapsed ? 'w-12' : 'w-80'}`}>
-        <RecommendedChannelsSidebar 
+        <RecommendedChannelsSidebar
           currentChannelId={channelId}
           className="h-screen"
           onCollapseChange={setIsRightSidebarCollapsed}
         />
       </div>
-
 
       {/* Content Modal */}
       <ContentModal />

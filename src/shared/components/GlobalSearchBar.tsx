@@ -51,12 +51,12 @@ export function GlobalSearchBar({ onSearch, className = '' }: GlobalSearchBarPro
 
   const handleAutocompleteSelect = useCallback(
     (item: AutocompleteItem) => {
-      console.log('Autocomplete item selected:', item); // 디버깅용 로그
       if (item.type === 'channel') {
+        // 채널인 경우: 채널 페이지로 이동
         router.push(`/channels/${item.channelId}`);
       } else {
-        // Navigate to content detail page
-        router.push(`/content/${item.id}`);
+        // 콘텐츠인 경우: 해당 채널 페이지로 이동 + 콘텐츠 모달 열기
+        router.push(`/channels/${item.channelId}?content=${item.id}`);
       }
       setQuery('');
       setIsAutocompleteOpen(false);

@@ -144,8 +144,8 @@ export function ExploreGrid({
           <div key={channel.id} className={gridClass}>
             <ChannelCard
               channel={channel}
-              onClick={onChannelClick}
               size={size}
+              onCardClick={onChannelClick}
               className="h-full"
             />
           </div>

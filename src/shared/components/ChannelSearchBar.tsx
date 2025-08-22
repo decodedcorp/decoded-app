@@ -66,14 +66,18 @@ export function ChannelSearchBar({
 
   const handleAutocompleteSelect = useCallback(
     (item: AutocompleteItem) => {
-      console.log('Channel autocomplete item selected:', item); // 디버깅용 로그
-      // For channel search, navigate to the content detail
-      router.push(`/content/${item.id}`);
+      if (item.type === 'channel') {
+        // 채널인 경우: 채널 페이지로 이동
+        router.push(`/channels/${item.channelId}`);
+      } else {
+        // 콘텐츠인 경우: 현재 채널 페이지에서 콘텐츠 모달 열기
+        router.push(`/channels/${channelId}?content=${item.id}`);
+      }
       setQuery('');
       setIsAutocompleteOpen(false);
       inputRef.current?.blur();
     },
-    [router],
+    [router, channelId],
   );
 
   const handleAutocompleteClose = useCallback(() => {

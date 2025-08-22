@@ -200,7 +200,7 @@ export const SearchAutocomplete = React.memo(
 
         // Set focus back to the search input for better UX
         setTimeout(() => {
-          const searchInput = document.querySelector('input[role="combobox']') as HTMLInputElement;
+          const searchInput = document.querySelector("input[role='combobox']") as HTMLInputElement;
           searchInput?.focus();
         }, 0);
       },
