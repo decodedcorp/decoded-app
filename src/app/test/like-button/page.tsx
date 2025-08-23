@@ -49,8 +49,7 @@ export default function LikeButtonTestPage() {
                 <h3 className="text-lg text-gray-300 mb-3">기본 (좋아요 버튼 없음)</h3>
                 <ChannelCard
                   channel={testChannelData}
-                  variant="medium"
-                  highlightCategory={true}
+                  size="medium"
                   showLikeButton={false}
                 />
               </div>
@@ -60,8 +59,7 @@ export default function LikeButtonTestPage() {
                 <h3 className="text-lg text-gray-300 mb-3">작은 크기 + 좋아요</h3>
                 <ChannelCard
                   channel={testChannelData}
-                  variant="small"
-                  highlightCategory={true}
+                  size="small"
                   showLikeButton={true}
                 />
               </div>
@@ -71,8 +69,7 @@ export default function LikeButtonTestPage() {
                 <h3 className="text-lg text-gray-300 mb-3">큰 크기 + 좋아요</h3>
                 <ChannelCard
                   channel={testChannelData}
-                  variant="large"
-                  highlightCategory={true}
+                  size="large"
                   showLikeButton={true}
                 />
               </div>

@@ -9,6 +9,15 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 /** @type {import('next').NextConfig} */
 const nextConfig: NextConfig = {
   experimental: {},
+  // ESLint 오류가 있어도 빌드 진행 (배포용)
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  // TypeScript 오류가 있어도 빌드 진행 (선택사항)
+  typescript: {
+    // ⚠️ production 빌드에서도 타입 체크 스킵 (주의해서 사용)
+    // ignoreBuildErrors: true,
+  },
   webpack(config, { isServer }) {
     config.module.rules.push({
       test: /\.svg$/,

@@ -85,7 +85,7 @@ export const ContentsCard = memo(
           contentId,
           cardId: card.id,
           cardContentId: card.contentId,
-          cardTitle: card.title
+          cardTitle: card.metadata?.title
         });
       }
     }

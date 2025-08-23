@@ -6,9 +6,9 @@ export { default as Masonry } from './grid';
 export { ChannelCard } from '@/components/ChannelCard';
 
 // 채널 카드 섹션 컴포넌트들
-export { ChannelImageSection } from './channel-card/ChannelImageSection';
-export { ChannelHeaderSection } from './channel-card/ChannelHeaderSection';
-export { ChannelMetricsSection } from './channel-card/ChannelMetricsSection';
+export { default as ChannelImageSection } from './channel-card/ChannelImageSection';
+export { default as ChannelHeaderSection } from './channel-card/ChannelHeaderSection';
+export { default as ChannelMetricsSection } from './channel-card/ChannelMetricsSection';
 export { SubscribeButtonSection } from './channel-card/SubscribeButtonSection';
 
 // 타입들

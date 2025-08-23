@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { InteractionsService } from '../../../api/generated';
 import { queryKeys } from '../../../lib/api/queryKeys';
+import { ContentLikeStatsResponse } from '../../../api/generated/models/ContentLikeStatsResponse';
 
 // Likes
 export const useMyLikes = (params?: Record<string, any>) => {
@@ -20,22 +21,22 @@ export const useLikeContent = () => {
       if (!/^[a-f\d]{24}$/i.test(contentId)) {
         throw new Error(`Invalid content ID format: ${contentId}`);
       }
-      
+
       // API 호출 디버깅
       if (process.env.NODE_ENV === 'development') {
         console.log('🔄 [useLikeContent] API 호출:', {
           contentId,
           endpoint: `/contents/${contentId}/like`,
-          method: 'POST'
+          method: 'POST',
         });
       }
-      
+
       return InteractionsService.createContentLikeContentsContentIdLikePost(contentId);
     },
     onSuccess: (_, contentId) => {
       // 콘텐츠 좋아요 통계 무효화
-      queryClient.invalidateQueries({ 
-        queryKey: queryKeys.contents.likesStats(contentId)
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.contents.likesStats(contentId),
       });
       // 콘텐츠 목록 무효화
       queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
@@ -55,22 +56,22 @@ export const useUnlikeContent = () => {
       if (!/^[a-f\d]{24}$/i.test(contentId)) {
         throw new Error(`Invalid content ID format: ${contentId}`);
       }
-      
+
       // API 호출 디버깅
       if (process.env.NODE_ENV === 'development') {
         console.log('🔄 [useUnlikeContent] API 호출:', {
           contentId,
           endpoint: `/contents/${contentId}/like`,
-          method: 'DELETE'
+          method: 'DELETE',
         });
       }
-      
+
       return InteractionsService.removeContentLikeContentsContentIdLikeDelete(contentId);
     },
     onSuccess: (_, contentId) => {
       // 콘텐츠 좋아요 통계 무효화
-      queryClient.invalidateQueries({ 
-        queryKey: queryKeys.contents.likesStats(contentId)
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.contents.likesStats(contentId),
       });
       // 콘텐츠 목록 무효화
       queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
@@ -82,7 +83,7 @@ export const useUnlikeContent = () => {
 };
 
 export const useContentLikeStats = (contentId: string) => {
-  return useQuery({
+  return useQuery<ContentLikeStatsResponse>({
     queryKey: queryKeys.contents.likesStats(contentId),
     queryFn: () => {
       // API 호출 디버깅
@@ -90,10 +91,10 @@ export const useContentLikeStats = (contentId: string) => {
         console.log('🔄 [useContentLikeStats] API 호출:', {
           contentId,
           endpoint: `/contents/${contentId}/likes/stats`,
-          method: 'GET'
+          method: 'GET',
         });
       }
-      
+
       return InteractionsService.getContentLikeStatsContentsContentIdLikesStatsGet(contentId);
     },
     enabled: !!contentId,
@@ -104,15 +105,6 @@ export const useContentLikeStats = (contentId: string) => {
       }
       return failureCount < 3;
     },
-    onError: (error) => {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('❌ [useContentLikeStats] API 에러:', {
-          contentId,
-          error: error.message || error,
-          status: 'status' in error ? error.status : 'unknown'
-        });
-      }
-    }
   });
 };
 
@@ -204,7 +196,8 @@ export const useCreateNotification = () => {
 export const useChannelLikeStats = (channelId: string) => {
   return useQuery({
     queryKey: queryKeys.channels.likeStats(channelId),
-    queryFn: () => InteractionsService.getChannelLikeStatsEndpointChannelsChannelIdLikesStatsGet(channelId),
+    queryFn: () =>
+      InteractionsService.getChannelLikeStatsEndpointChannelsChannelIdLikesStatsGet(channelId),
     enabled: !!channelId,
   });
 };
@@ -217,8 +210,8 @@ export const useLikeChannel = () => {
       InteractionsService.createChannelLikeChannelsChannelIdLikePost(channelId),
     onSuccess: (_, channelId) => {
       // 채널 좋아요 통계 무효화
-      queryClient.invalidateQueries({ 
-        queryKey: queryKeys.channels.likeStats(channelId)
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.channels.likeStats(channelId),
       });
       // 채널 목록 무효화 (좋아요 상태 반영)
       queryClient.invalidateQueries({ queryKey: queryKeys.channels.lists() });
@@ -236,8 +229,8 @@ export const useUnlikeChannel = () => {
       InteractionsService.removeChannelLikeChannelsChannelIdLikeDelete(channelId),
     onSuccess: (_, channelId) => {
       // 채널 좋아요 통계 무효화
-      queryClient.invalidateQueries({ 
-        queryKey: queryKeys.channels.likeStats(channelId)
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.channels.likeStats(channelId),
       });
       // 채널 목록 무효화 (좋아요 상태 반영)
       queryClient.invalidateQueries({ queryKey: queryKeys.channels.lists() });

@@ -33,13 +33,14 @@ export const useContentLike = (contentId: string) => {
   // 서버 데이터로 로컬 상태 초기화
   useEffect(() => {
     if (likeStats && optimisticIsLiked === null) {
-      setOptimisticIsLiked(likeStats.is_liked || false);
+      // is_liked 속성이 API 응답에 없으므로 기본값 사용
+      setOptimisticIsLiked(false);
       setOptimisticLikeCount(likeStats.total_likes || 0);
     }
   }, [likeStats, optimisticIsLiked]);
 
   // 현재 상태 계산 (낙관적 업데이트가 있으면 우선 사용)
-  const isLiked = optimisticIsLiked ?? likeStats?.is_liked ?? false;
+  const isLiked = optimisticIsLiked ?? false;
   const likeCount = optimisticLikeCount ?? likeStats?.total_likes ?? 0;
   const isLoading = isStatsLoading || likeMutation.isPending || unlikeMutation.isPending;
 

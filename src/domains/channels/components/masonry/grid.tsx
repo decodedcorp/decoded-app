@@ -676,7 +676,7 @@ const Masonry: React.FC<MasonryProps> = ({
           channel={{
             id: item.id,
             name: item.title || `Channel ${item.id}`,
-            description: item.description,
+            description: item.description || undefined,
             profileImageUrl: item.img,
             isVerified: false,
             followerCount: item.subscriber_count || 0,
