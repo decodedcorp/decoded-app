@@ -1,4 +1,4 @@
-import { getAccessToken, getValidAccessToken } from '../domains/auth/utils/tokenManager';
+import { getValidAccessToken } from '../domains/auth/utils/tokenManager';
 
 /**
  * API Configuration
@@ -24,8 +24,12 @@ const getApiBaseUrl = () => {
   // 백업 방식 사용 시 직접 API 호출
   if (useDirectApi) {
     if (envApiUrl) {
-      console.log('[API Config] Using direct API URL:', envApiUrl);
-      return envApiUrl;
+      // Mixed Content 방지: HTTP를 HTTPS로 강제 변환 (프로덕션 환경에서)
+      const secureApiUrl = nodeEnv === 'production' && envApiUrl.startsWith('http:') 
+        ? envApiUrl.replace('http:', 'https:')
+        : envApiUrl;
+      console.log('[API Config] Using direct API URL:', secureApiUrl);
+      return secureApiUrl;
     }
     const defaultUrl = 'https://dev.decoded.style';
     console.log('[API Config] Using default direct URL:', defaultUrl);

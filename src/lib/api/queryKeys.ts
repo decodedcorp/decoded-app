@@ -25,6 +25,9 @@ export const queryKeys = {
     details: () => [...queryKeys.channels.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.channels.details(), id] as const,
     stats: (id: string) => [...queryKeys.channels.detail(id), 'stats'] as const,
+    // Likes related queries
+    likes: (id: string) => [...queryKeys.channels.detail(id), 'likes'] as const,
+    likeStats: (id: string) => [...queryKeys.channels.likes(id), 'stats'] as const,
     // Mutation states
     mutations: () => [...queryKeys.channels.all, 'mutations'] as const,
     create: () => [...queryKeys.channels.mutations(), 'create'] as const,
@@ -90,5 +93,18 @@ export const queryKeys = {
     all: ['users'] as const,
     lists: () => [...queryKeys.users.all, 'list'] as const,
     list: (filters: Record<string, any>) => [...queryKeys.users.lists(), filters] as const,
+  },
+
+  // Search related queries
+  search: {
+    all: ['search'] as const,
+    contents: (query: string, limit?: number) => 
+      [...queryKeys.search.all, 'contents', { query, limit }] as const,
+    channels: (query: string, limit?: number) => 
+      [...queryKeys.search.all, 'channels', { query, limit }] as const,
+    channelContents: (channelId: string, query: string, limit?: number) => 
+      [...queryKeys.search.all, 'channel-contents', { channelId, query, limit }] as const,
+    autocomplete: (query: string, type?: 'all' | 'channels' | 'contents') => 
+      [...queryKeys.search.all, 'autocomplete', { query, type }] as const,
   },
 } as const;

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+
 import {
   useAddChannelStore,
   selectIsAddChannelModalOpen,
@@ -9,7 +10,9 @@ import {
 } from '@/store/addChannelStore';
 import { useCreateChannel } from '@/domains/channels/hooks/useChannels';
 import { useChannelModalStore } from '@/store/channelModalStore';
+
 import { BaseModal } from '../base/BaseModal';
+
 import { AddChannelHeader } from './AddChannelHeader';
 import { AddChannelForm } from './AddChannelForm';
 import { AddChannelFooter } from './AddChannelFooter';
@@ -36,18 +39,21 @@ export function AddChannelModal() {
     name: string;
     description: string | null;
     thumbnail_base64?: string;
+    banner_base64?: string;
   }) => {
     // data가 제공되지 않으면 formData에서 가져오기
     const inputData = data || {
       name: formData.name.trim(),
       description: formData.description.trim() || null,
       thumbnail_base64: formData.thumbnail_base64,
+      banner_base64: formData.banner_base64,
     };
 
     const requestData = {
       name: inputData.name,
       description: inputData.description || null,
       thumbnail_base64: inputData.thumbnail_base64 || null,
+      banner_base64: inputData.banner_base64 || null,
     };
 
     try {

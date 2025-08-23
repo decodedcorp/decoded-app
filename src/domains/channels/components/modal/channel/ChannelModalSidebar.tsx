@@ -1,16 +1,26 @@
 'use client';
 
 import React, { useState } from 'react';
+
 import { SidebarFilters } from '../../sidebar/ChannelSidebar';
 import { DataTypesFilter } from '../filters/DataTypesFilter';
 import { CategoriesFilter } from '../filters/CategoriesFilter';
 import { TagsFilter } from '../filters/TagsFilter';
+import { useChannelFilters } from '../../../hooks/useChannelFilters';
+import { useChannelModalStore } from '@/store/channelModalStore';
+import { ProxiedImage } from '@/components/ProxiedImage';
 
 interface ChannelModalSidebarProps {
   currentFilters: SidebarFilters;
   onFilterChange: (filters: SidebarFilters) => void;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
+  onSubscribe?: (channelId: string) => void;
+  onUnsubscribe?: (channelId: string) => void;
+  isSubscribeLoading?: boolean;
+  channel?: any; // 실제 API 채널 데이터
+  contentCount?: number; // 실제 콘텐츠 수
+  channelId?: string; // 명시적 채널 ID prop
 }
 
 export function ChannelModalSidebar({
@@ -18,7 +28,29 @@ export function ChannelModalSidebar({
   onFilterChange,
   isCollapsed = false,
   onToggleCollapse,
+  onSubscribe,
+  onUnsubscribe,
+  isSubscribeLoading = false,
+  channel,
+  contentCount,
+  channelId: propChannelId,
 }: ChannelModalSidebarProps) {
+  // 채널 ID 결정 (props 우선, 새로고침 시 store는 초기화되므로)
+  const selectedChannelId = useChannelModalStore((state) => state.selectedChannelId);
+  const selectedChannel = useChannelModalStore((state) => state.selectedChannel);
+  const channelId = propChannelId || selectedChannelId || selectedChannel?.id || '';
+  
+  // 실제 채널 데이터 사용 (API 데이터 우선)
+  const displayChannel = channel || selectedChannel;
+
+  // 채널의 실제 필터 데이터 가져오기
+  const {
+    dataTypes,
+    categories,
+    isLoading: isFiltersLoading,
+    error: filtersError,
+  } = useChannelFilters(channelId);
+
   const handleDataTypesChange = (dataTypes: string[]) => {
     onFilterChange({ ...currentFilters, dataTypes });
   };
@@ -34,6 +66,7 @@ export function ChannelModalSidebar({
   const handleRemoveTag = (tag: string) => {
     onFilterChange({ ...currentFilters, tags: currentFilters.tags.filter((t) => t !== tag) });
   };
+
 
   // 접힌 상태일 때 간단한 필터 버튼들
   if (isCollapsed) {
@@ -64,15 +97,15 @@ export function ChannelModalSidebar({
 
         {/* 간단한 필터 버튼들 - 스크롤 가능 */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden p-3 space-y-4 min-h-0">
-          {/* Data Types - 핵심 3개만 표시 */}
+          {/* Data Types - 실제 데이터 기반 상위 3개만 표시 */}
           <div className="space-y-2">
             <div className="text-xs text-gray-400 text-center font-medium">DT</div>
             <div className="space-y-2">
-              {[
-                { id: 'link', icon: '🔗', label: 'Link' },
-                { id: 'image', icon: '🖼️', label: 'Image' },
-                { id: 'pdf', icon: '📄', label: 'PDF' },
-              ].map((type) => (
+              {(dataTypes.length > 0 ? dataTypes.slice(0, 3) : [
+                { id: 'link', icon: '🔗', label: 'Link', count: 0 },
+                { id: 'image', icon: '🖼️', label: 'Image', count: 0 },
+                { id: 'pdf', icon: '📄', label: 'PDF', count: 0 },
+              ]).map((type) => (
                 <button
                   key={type.id}
                   onClick={() => {
@@ -88,22 +121,24 @@ export function ChannelModalSidebar({
                   }`}
                   title={`${type.label} content`}
                 >
-                  {type.icon}
+                  {type.label.charAt(0)}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Categories - 핵심 4개만 표시 */}
-          <div className="space-y-2">
-            <div className="text-xs text-gray-400 text-center font-medium">CAT</div>
+          {/* Categories - 실제 데이터 기반 상위 4개만 표시 */}
+          {(categories.length > 0 || isFiltersLoading) && (
             <div className="space-y-2">
-              {[
-                { id: 'articles', icon: '📰', label: 'Articles' },
-                { id: 'books', icon: '📚', label: 'Books' },
-                { id: 'education', icon: '🎓', label: 'Education' },
-                { id: 'fashion', icon: '👠', label: 'Fashion' },
-              ].map((category) => (
+              <div className="text-xs text-gray-400 text-center font-medium">CAT</div>
+              <div className="space-y-2">
+                {isFiltersLoading ? (
+                  // 로딩 상태
+                  Array.from({ length: 4 }).map((_, index) => (
+                    <div key={index} className="w-10 h-10 bg-zinc-800 rounded-lg animate-pulse" />
+                  ))
+                ) : (
+                  categories.slice(0, 4).map((category) => (
                 <button
                   key={category.id}
                   onClick={() => {
@@ -119,41 +154,14 @@ export function ChannelModalSidebar({
                   }`}
                   title={category.label}
                 >
-                  {category.icon}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Tags */}
-          {currentFilters.tags.length > 0 && (
-            <div className="space-y-2">
-              <div className="text-xs text-gray-400 text-center font-medium">TAG</div>
-              <div className="space-y-2">
-                {currentFilters.tags.slice(0, 5).map((tag, index) => (
-                  <div
-                    key={tag}
-                    className="w-10 h-10 bg-purple-600/20 text-purple-300 border border-purple-500/30 rounded-lg flex items-center justify-center text-xs font-medium relative group"
-                    title={tag}
-                  >
-                    {tag.length > 3 ? tag.slice(0, 3) : tag}
-                    <button
-                      onClick={() => handleRemoveTag(tag)}
-                      className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 hover:bg-red-400 rounded-full flex items-center justify-center text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                      title={`Remove ${tag}`}
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-                {currentFilters.tags.length > 5 && (
-                  <div className="w-10 h-10 bg-purple-600/20 text-purple-300 border border-purple-500/30 rounded-lg flex items-center justify-center text-xs font-medium">
-                    +{currentFilters.tags.length - 5}
-                  </div>
+                    {category.label.charAt(0)}
+                  </button>
+                  ))
                 )}
               </div>
             </div>
           )}
+
 
           {/* Active Filters Count */}
           {(currentFilters.dataTypes.length > 0 ||
@@ -176,8 +184,7 @@ export function ChannelModalSidebar({
   return (
     <div className="w-80 h-full border-r border-zinc-700/50 bg-zinc-900/50 flex flex-col animate-slide-in-left overflow-hidden">
       {/* 헤더 */}
-      <div className="p-4 border-b border-zinc-700/50 flex items-center justify-between flex-shrink-0">
-        <h3 className="text-lg font-semibold text-white">Filters</h3>
+      <div className="p-4 border-b border-zinc-700/50 flex justify-end flex-shrink-0">
         <button
           onClick={onToggleCollapse}
           className="w-8 h-8 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-all duration-200 flex items-center justify-center group"
@@ -199,6 +206,7 @@ export function ChannelModalSidebar({
         </button>
       </div>
 
+
       {/* 필터 컨텐츠 */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 min-h-0">
         <div className="space-y-8">
@@ -206,16 +214,17 @@ export function ChannelModalSidebar({
             <DataTypesFilter
               selectedDataTypes={currentFilters.dataTypes}
               onDataTypesChange={handleDataTypesChange}
+              dataTypes={dataTypes}
+              isLoading={isFiltersLoading}
             />
           </div>
           <div className="animate-stable-fade-in" style={{ animationDelay: '0.1s' }}>
             <CategoriesFilter
               selectedCategories={currentFilters.categories}
               onCategoriesChange={handleCategoriesChange}
+              categories={categories}
+              isLoading={isFiltersLoading}
             />
-          </div>
-          <div className="animate-stable-fade-in" style={{ animationDelay: '0.15s' }}>
-            <TagsFilter selectedTags={currentFilters.tags} onTagsChange={handleTagsChange} />
           </div>
         </div>
       </div>

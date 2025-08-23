@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
+
 import { useAuthLifecycle } from '../hooks/useAuthLifecycle';
 import { configureApi } from '../../../api/config';
 

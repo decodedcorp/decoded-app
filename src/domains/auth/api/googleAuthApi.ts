@@ -1,4 +1,5 @@
 import { hash } from '@/lib/utils/hash';
+
 import { UsersService } from '../../../api/generated/services/UsersService';
 
 export interface GoogleTokenData {
@@ -125,7 +126,13 @@ export class GoogleAuthApi {
       Accept: 'application/json',
     };
 
-    const backendResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`, {
+    // Mixed Content 방지: 프로덕션 환경에서 HTTP를 HTTPS로 변환
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+    const secureBaseUrl = process.env.NODE_ENV === 'production' && baseUrl.startsWith('http:')
+      ? baseUrl.replace('http:', 'https:')
+      : baseUrl;
+
+    const backendResponse = await fetch(`${secureBaseUrl}/auth/login`, {
       method: 'POST',
       headers: backendRequestHeaders,
       body: JSON.stringify(requestBody),

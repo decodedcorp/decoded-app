@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useCallback, Suspense } from 'react';
+
 import { useRouter, useSearchParams } from 'next/navigation';
+
 import { useAuthStore } from '../../../store/authStore';
 import { handleGoogleOAuthCallback } from '../../../domains/auth/api/authApi';
 
@@ -64,13 +66,13 @@ function AuthCallbackContent() {
         });
       }
 
-      // 팝업 창인 경우: auth store 업데이트 후 부모 창으로 메시지 전송
+      // 팝업 창인 경우: 토큰 데이터를 부모 창으로 전송 (팝업에서는 저장하지 않음)
       if (window.opener) {
-        // auth store에 로그인 정보 저장
-        login(result);
-
-        // 부모 창으로 성공 메시지 전송
-        sendMessageToParent('GOOGLE_OAUTH_SUCCESS', { user: result.user });
+        // 부모 창으로 로그인 데이터 전송 (토큰 포함)
+        sendMessageToParent('GOOGLE_OAUTH_SUCCESS', { 
+          user: result.user,
+          loginData: result  // 전체 로그인 응답 데이터 포함
+        });
         return;
       }
 

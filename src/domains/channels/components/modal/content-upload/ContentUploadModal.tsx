@@ -1,17 +1,20 @@
 'use client';
 
 import React from 'react';
+
 import { ContentType } from '@/api/generated';
 import { useContentUploadStore, selectIsContentUploadModalOpen } from '@/store/contentUploadStore';
 import { useCreateImageContent, useCreateLinkContent } from '@/domains/channels/hooks/useContents';
 import { useGetLinkContent } from '@/domains/channels/hooks/useContents';
 import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/api/queryKeys';
+import { getValidAccessToken } from '@/domains/auth/utils/tokenManager';
+
 import { BaseModal } from '../base/BaseModal';
+
 import { ContentUploadHeader } from './ContentUploadHeader';
 import { ContentUploadForm } from './ContentUploadForm';
 import { ContentUploadFooter } from './ContentUploadFooter';
-import { getValidAccessToken } from '@/domains/auth/utils/tokenManager';
 
 export function ContentUploadModal() {
   const isOpen = useContentUploadStore(selectIsContentUploadModalOpen);

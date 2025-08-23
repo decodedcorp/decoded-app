@@ -1,9 +1,11 @@
 'use client';
 
 import React from 'react';
+
 import { motion } from 'framer-motion';
-import TiltedCard from './TiltedCard';
 import { GeneratedContent } from '@/store/contentUploadStore';
+
+import TiltedCard from './TiltedCard';
 
 interface ContentPreviewCardProps {
   content: GeneratedContent;

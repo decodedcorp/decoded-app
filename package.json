@@ -8,9 +8,14 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
-    "test": "echo \"No tests specified yet\" && exit 0",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "analyze": "ANALYZE=true next build",
+    "complexity": "yarn lint --format json > lint-report.json 2>/dev/null || true && echo 'Lint analysis complete'",
     "typegen:dev": "yarn dlx openapi-typescript-codegen --input https://dev.decoded.style/openapi.json --output ./src/api/generated --client fetch",
-    "pre-commit": "yarn typegen:dev && git add src/api/generated/"
+    "pre-commit": "yarn typegen:dev && git add src/api/generated/",
+    "prepare": "husky"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -31,31 +36,38 @@
     "lucide-react": "^0.525.0",
     "matter-js": "^0.20.0",
     "next": "^15.4.1",
+    "playwright": "^1.55.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hot-toast": "^2.5.2",
+    "sharp": "^0.34.3",
     "tailwind-merge": "^3.3.1",
     "three": "^0.178.0",
     "zustand": "^5.0.6"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
+    "@eslint/eslintrc": "^3.3.1",
+    "@next/bundle-analyzer": "^15.4.6",
     "@next/eslint-plugin-next": "^15.4.5",
+    "@playwright/test": "^1.55.0",
     "@svgr/webpack": "^8.1.0",
     "@tailwindcss/postcss": "^4.1.11",
     "@types/lodash": "^4",
     "@types/node": "^24.0.14",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
+    "@types/sharp": "^0.32.0",
     "autoprefixer": "^10.4.21",
     "eslint": "^9",
     "eslint-config-next": "15.4.1",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "husky": "^9.1.7",
+    "lighthouse": "^12.8.1",
     "openapi-typescript-codegen": "^0.29.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.11",
     "tsx": "^4.20.3",
-    "typescript": "^5"
+    "typescript": "5.9.2"
   },
   "packageManager": "yarn@4.9.2"
 }

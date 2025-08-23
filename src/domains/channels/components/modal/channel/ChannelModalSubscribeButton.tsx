@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { ChannelData } from '@/store/channelModalStore';
 
 interface ChannelModalSubscribeButtonProps {

@@ -1,18 +1,149 @@
+// Image size options for optimization
+export type ImageSize = 'thumb' | 'small' | 'medium' | 'large' | 'original';
+
+// Image quality options
+export type ImageQuality = 'low' | 'medium' | 'high' | 'max';
+
+// Image format options
+export type ImageFormat = 'webp' | 'jpeg' | 'png' | 'original';
+
+interface ImageProxyOptions {
+  size?: ImageSize;
+  quality?: ImageQuality;
+  format?: ImageFormat;
+  blur?: boolean;
+}
+
 /**
- * 외부 이미지 URL을 프록시 URL로 변환
+ * 외부 이미지 URL을 최적화된 프록시 URL로 변환
  * @param imageUrl 외부 이미지 URL
+ * @param options 프록시 최적화 옵션
  * @returns 프록시 URL
  */
-export function getProxiedImageUrl(imageUrl: string): string {
-  if (!imageUrl) return '';
+export function getProxiedImageUrl(imageUrl: string, options: ImageProxyOptions = {}): string {
+  if (!imageUrl) return '/placeholder.jpg';
   
   // 이미 프록시 URL인 경우 그대로 반환
-  if (imageUrl.startsWith('/api/image-proxy')) {
+  if (imageUrl.startsWith('/api/proxy') || imageUrl.startsWith('/api/image-proxy')) {
     return imageUrl;
   }
 
-  // 외부 URL을 프록시로 변환
-  return `/api/image-proxy?url=${encodeURIComponent(imageUrl)}`;
+  // 로컬 이미지인 경우 프록시 사용하지 않음
+  if (imageUrl.startsWith('/') || imageUrl.startsWith('./') || imageUrl.startsWith('../')) {
+    return imageUrl;
+  }
+
+  // 현재 도메인의 이미지인 경우 프록시 사용하지 않음
+  if (typeof window !== 'undefined') {
+    try {
+      const url = new URL(imageUrl);
+      if (url.hostname === window.location.hostname) {
+        return imageUrl;
+      }
+    } catch {
+      // URL 파싱 실패 시 상대 경로로 간주
+      return imageUrl;
+    }
+  }
+
+  // 신뢰할 수 있는 도메인들 (API 응답에서 자주 나오는 도메인들)
+  const trustedDomains = [
+    'images.unsplash.com',
+    'via.placeholder.com',
+    'picsum.photos',
+    'avatars.githubusercontent.com',
+    'cdn.pixabay.com',
+    'images.pexels.com',
+    'pickcon.co.kr',
+    'ajunews.com',
+    'cdn.nc.press',
+    'talkimg.imbc.com',
+    'blogthumb.pstatic.net',
+    'newsimg.hankookilbo.com',
+    'scontent-ssn1-1.cdninstagram.com',
+    'image.imnews.imbc.com',
+    'thumbnews.nateimg.co.kr',
+    'cdn.kstarfashion.com',
+    'biz.chosun.com',
+  ];
+
+  try {
+    const url = new URL(imageUrl);
+    
+    // HTTPS이고 신뢰할 수 있는 도메인인 경우 직접 사용 (작은 이미지는 프록시 사용)
+    if (url.protocol === 'https:' && trustedDomains.some(domain => url.hostname.includes(domain))) {
+      // 큰 이미지나 최적화가 필요한 경우에만 프록시 사용
+      if (options.size && options.size !== 'original') {
+        return buildProxyUrl(imageUrl, options);
+      }
+      return imageUrl;
+    }
+  } catch {
+    // URL 파싱 실패 시 프록시 사용
+  }
+
+  // 외부 URL을 프록시로 변환 (최적화 옵션 포함)
+  return buildProxyUrl(imageUrl, options);
+}
+
+/**
+ * 프록시 URL 빌드 (최적화 옵션 포함)
+ */
+function buildProxyUrl(imageUrl: string, options: ImageProxyOptions): string {
+  const params = new URLSearchParams();
+  params.set('url', imageUrl);
+  
+  if (options.size && options.size !== 'original') {
+    params.set('size', options.size);
+  }
+  
+  if (options.quality && options.quality !== 'medium') {
+    params.set('quality', options.quality);
+  }
+  
+  if (options.format && options.format !== 'original') {
+    params.set('format', options.format);
+  }
+  
+  if (options.blur) {
+    params.set('blur', 'true');
+  }
+  
+  return `/api/proxy/image?${params.toString()}`;
+}
+
+/**
+ * 채널 콘텐츠용 최적화된 이미지 URL 생성 (품질 우선)
+ */
+export function getOptimizedChannelImageUrl(imageUrl: string, size: ImageSize = 'large'): string {
+  return getProxiedImageUrl(imageUrl, {
+    size,
+    format: 'webp',
+    quality: 'high', // 품질 우선 설정
+  });
+}
+
+/**
+ * 썸네일용 최적화된 이미지 URL 생성 (품질 우선)
+ */
+export function getThumbnailImageUrl(imageUrl: string): string {
+  return getProxiedImageUrl(imageUrl, {
+    size: 'medium', // thumb → medium으로 크기 향상
+    format: 'webp',
+    quality: 'high', // 품질 우선 설정
+  });
+}
+
+/**
+ * 플레이스홀더용 블러 이미지 URL 생성
+ */
+export function getBlurPlaceholderUrl(imageUrl: string): string {
+  return getProxiedImageUrl(imageUrl, {
+    size: 'thumb',
+    format: 'jpeg',
+    quality: 'low',
+    blur: true,
+  });
 }
 
 /**
@@ -22,6 +153,33 @@ export function getProxiedImageUrl(imageUrl: string): string {
  */
 export function getProxiedImageUrls(imageUrls: string[]): string[] {
   return imageUrls.map(url => getProxiedImageUrl(url));
+}
+
+/**
+ * 컨테이너 크기에 맞는 최적 이미지 사이즈 반환
+ */
+export function getOptimalSizeForContainer(containerWidth: number): ImageSize {
+  if (containerWidth <= 200) return 'thumb';
+  if (containerWidth <= 400) return 'small';
+  if (containerWidth <= 800) return 'medium';
+  return 'large';
+}
+
+/**
+ * 네트워크 상태에 맞는 이미지 품질 반환 (품질 우선 모드)
+ */
+export function getQualityForNetwork(effectiveType?: string): ImageQuality {
+  switch (effectiveType) {
+    case 'slow-2g':
+    case '2g':
+      return 'medium'; // low → medium으로 품질 향상
+    case '3g':
+      return 'high'; // low → high로 품질 향상
+    case '4g':
+      return 'max'; // medium → max로 최고 품질
+    default:
+      return 'high'; // medium → high로 기본 품질 향상
+  }
 }
 
 /**

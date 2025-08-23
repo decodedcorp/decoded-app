@@ -4,6 +4,7 @@ export interface AddChannelFormData {
   name: string;
   description: string;
   thumbnail_base64?: string;
+  banner_base64?: string;
 }
 
 interface AddChannelState {
@@ -25,6 +26,7 @@ const initialFormData: AddChannelFormData = {
   name: '',
   description: '',
   thumbnail_base64: undefined,
+  banner_base64: undefined,
 };
 
 export const useAddChannelStore = create<AddChannelState>((set) => ({

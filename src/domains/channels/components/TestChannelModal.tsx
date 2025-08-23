@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+
 import { useChannelModalStore } from '@/store/channelModalStore';
 
 export function TestChannelModal() {

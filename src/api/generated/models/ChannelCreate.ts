@@ -18,5 +18,9 @@ export type ChannelCreate = {
      * Base64 encoded thumbnail image
      */
     thumbnail_base64?: (string | null);
+    /**
+     * Base64 encoded banner image
+     */
+    banner_base64?: (string | null);
 };
 

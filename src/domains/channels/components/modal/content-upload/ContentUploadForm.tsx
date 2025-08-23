@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
+
 import { ContentType } from '@/api/generated';
 import {
   useContentUploadStore,

@@ -5,9 +5,9 @@ export * from '../../domains/feeds';
 export * from '../../domains/interactions';
 
 // Auth-specific hooks using generated services
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
+
 import { AuthService } from '../generated';
-import { queryKeys } from '../../lib/api/queryKeys';
 import { updateApiTokenFromStorage } from '../config';
 import { OpenAPI } from '../generated/core/OpenAPI';
 import { getValidAccessToken } from '../../domains/auth/utils/tokenManager';
@@ -40,7 +40,7 @@ const updateOpenAPIToken = () => {
 };
 
 // 토큰을 동적으로 가져오는 함수로 설정 (더 안정적인 방식)
-OpenAPI.TOKEN = (options: unknown) => {
+OpenAPI.TOKEN = () => {
   const token = getValidAccessToken();
   if (process.env.NODE_ENV === 'development') {
     console.log('[useApi] Dynamic token resolver called:', token ? 'token found' : 'no token');

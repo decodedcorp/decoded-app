@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+
 import { Category } from '../../types/masonry';
 
 interface CategoryFilterProps {

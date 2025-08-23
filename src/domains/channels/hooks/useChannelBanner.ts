@@ -1,0 +1,61 @@
+'use client';
+
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'react-hot-toast';
+import { ChannelsService } from '@/api/generated/services/ChannelsService';
+import type { BannerUpdate } from '@/api/generated/models/BannerUpdate';
+
+interface UseChannelBannerProps {
+  channelId: string;
+  onSuccess?: () => void;
+  onError?: (error: Error) => void;
+}
+
+export const useChannelBanner = ({ 
+  channelId, 
+  onSuccess, 
+  onError 
+}: UseChannelBannerProps) => {
+  const queryClient = useQueryClient();
+
+  // Update banner mutation
+  const updateBannerMutation = useMutation({
+    mutationFn: async (bannerBase64: string) => {
+      const bannerUpdate: BannerUpdate = {
+        banner_base64: bannerBase64,
+      };
+      
+      return ChannelsService.updateBannerChannelsChannelIdBannerPatch(
+        channelId,
+        bannerUpdate
+      );
+    },
+    onSuccess: () => {
+      // Invalidate channel queries to refetch updated data
+      queryClient.invalidateQueries({ 
+        queryKey: ['channel', channelId] 
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: ['channels'] 
+      });
+      
+      toast.success('Banner updated successfully!');
+      onSuccess?.();
+    },
+    onError: (error: Error) => {
+      console.error('Failed to update banner:', error);
+      toast.error('Failed to update banner. Please try again.');
+      onError?.(error);
+    },
+  });
+
+  return {
+    updateBanner: updateBannerMutation.mutate,
+    updateBannerAsync: updateBannerMutation.mutateAsync,
+    isUpdating: updateBannerMutation.isPending,
+    error: updateBannerMutation.error,
+    isError: updateBannerMutation.isError,
+    isSuccess: updateBannerMutation.isSuccess,
+    reset: updateBannerMutation.reset,
+  };
+};

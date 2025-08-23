@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
+
+import { categories } from '../../constants/categoryConstants';
+
 import { CategoryFilter } from './CategoryFilter';
 import { MasonryGrid } from './MasonryGrid';
-import { categories } from '../../constants/categoryConstants';
 
 export function CategoryGrid() {
   const [selectedCategory, setSelectedCategory] = useState('all');

@@ -3,19 +3,20 @@
 @import url('https://fonts.cdnfonts.com/css/thegoodmonolith');
 @import url('https://fonts.cdnfonts.com/css/pp-neue-montreal');
 
+/* Background Frame */
 .backgroundFrame {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  /* background-image: url("https://assets.codepen.io/7558/web03.webp"); */
   background-size: 100% 100%;
   background-position: center;
   z-index: 0;
   pointer-events: none;
 }
 
+/* Bottom Gradient Overlay */
 .bottomGradient {
   position: absolute;
   bottom: 0;
@@ -27,6 +28,7 @@
   pointer-events: none;
 }
 
+/* Background Image Layers */
 .backgroundImage {
   position: absolute;
   width: 100%;
@@ -40,7 +42,6 @@
 }
 
 .backgroundImage.default {
-  /* background-image: url("https://assets.codepen.io/7558/wave-bg-001.webp"); */
   opacity: 1;
 }
 
@@ -56,6 +57,7 @@
   /* background-image: url("https://assets.codepen.io/7558/wave-bg-004.webp"); */
 }
 
+/* Text Background Elements */
 .textBackground {
   position: absolute;
   top: 0;
@@ -99,6 +101,7 @@
   left: auto;
 }
 
+/* Main Content Container */
 .mainContent {
   position: relative;
   z-index: 10;
@@ -109,6 +112,7 @@
   align-items: center;
 }
 
+/* Sliced Container */
 .slicedContainer {
   position: relative;
   width: auto;
@@ -117,6 +121,7 @@
   transform: translateZ(0);
 }
 
+/* Text Row */
 .textRow {
   position: relative;
   width: 100%;
@@ -129,6 +134,7 @@
   z-index: 100;
 }
 
+/* Text Content and Characters */
 .textContent,
 .char,
 .charInner {
@@ -161,6 +167,7 @@
   letter-spacing: 5px;
 }
 
+/* Interactive Area */
 .interactiveArea {
   position: absolute;
   top: 0;
@@ -171,6 +178,7 @@
   cursor: pointer;
 }
 
+/* Character Styling */
 .char {
   display: inline-block;
   position: relative;
@@ -217,6 +225,7 @@
   transform: translate3d(-20px, 0, 0);
 }
 
+/* Type Lines */
 .type {
   position: absolute;
   height: 100%;
@@ -255,64 +264,7 @@
   z-index: 150;
 }
 
-/* Mobile Optimization */
-
-/* For tablets and smaller screens */
-@media screen and (max-width: 992px) {
-  .textContent {
-    font-size: 7rem;
-  }
-
-  .textRow {
-    height: 110px;
-  }
-
-  .typeLine {
-    font-size: clamp(5rem, 12vh, 10rem);
-  }
-}
-
-/* For mobile phones */
-@media screen and (max-width: 768px) {
-  .textContent {
-    font-size: 5rem;
-  }
-
-  .textRow {
-    height: 80px;
-    margin: 8px 0;
-  }
-
-  .typeLine {
-    font-size: clamp(3.5rem, 8vh, 7rem);
-  }
-
-  .textItem {
-    font-size: 0.7rem;
-  }
-}
-
-/* For very small screens */
-@media screen and (max-width: 480px) {
-  .textContent {
-    font-size: 3.5rem;
-  }
-
-  .textRow {
-    height: 60px;
-    margin: 6px 0;
-  }
-
-  .typeLine {
-    font-size: clamp(2.5rem, 6vh, 5rem);
-  }
-
-  .textItem {
-    font-size: 0.6rem;
-  }
-}
-
-/* New Reddit Answers Style Hero */
+/* Search Hero Styles */
 .searchHero {
   position: relative;
   z-index: 10;
@@ -460,31 +412,6 @@
   }
 }
 
-/* Responsive Design for Simple Hero */
-@media screen and (max-width: 768px) {
-  .scrollingQuestion {
-    padding: 0.5rem 1rem;
-    font-size: 0.75rem;
-    margin-right: 0.75rem;
-  }
-
-  .scrollingQuestions {
-    animation-duration: 20s;
-  }
-}
-
-@media screen and (max-width: 480px) {
-  .scrollingQuestion {
-    padding: 0.375rem 0.75rem;
-    font-size: 0.6875rem;
-    margin-right: 0.5rem;
-  }
-
-  .scrollingQuestions {
-    animation-duration: 15s;
-  }
-}
-
 /* Flowing Questions */
 .flowingQuestionsContainer {
   position: absolute;
@@ -605,8 +532,64 @@
   }
 }
 
+/* Category-specific border colors */
+.border-lifestyle {
+  border-left: 3px solid #10b981;
+}
+
+.border-entertainment {
+  border-left: 3px solid #8b5cf6;
+}
+
+.border-wellness {
+  border-left: 3px solid #f59e0b;
+}
+
+.border-culture {
+  border-left: 3px solid #ef4444;
+}
+
+.border-tech {
+  border-left: 3px solid #06b6d4;
+}
+
+.border-food {
+  border-left: 3px solid #84cc16;
+}
+
 /* Responsive Design */
+@media screen and (max-width: 992px) {
+  .textContent {
+    font-size: 7rem;
+  }
+
+  .textRow {
+    height: 110px;
+  }
+
+  .typeLine {
+    font-size: clamp(5rem, 12vh, 10rem);
+  }
+}
+
 @media screen and (max-width: 768px) {
+  .textContent {
+    font-size: 5rem;
+  }
+
+  .textRow {
+    height: 80px;
+    margin: 8px 0;
+  }
+
+  .typeLine {
+    font-size: clamp(3.5rem, 8vh, 7rem);
+  }
+
+  .textItem {
+    font-size: 0.7rem;
+  }
+
   .searchContainer {
     border-radius: 25px;
     padding: 0.25rem;
@@ -630,9 +613,36 @@
     padding: 0.375rem 0.75rem;
     font-size: 0.75rem;
   }
+
+  .scrollingQuestion {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    margin-right: 0.75rem;
+  }
+
+  .scrollingQuestions {
+    animation-duration: 20s;
+  }
 }
 
 @media screen and (max-width: 480px) {
+  .textContent {
+    font-size: 3.5rem;
+  }
+
+  .textRow {
+    height: 60px;
+    margin: 6px 0;
+  }
+
+  .typeLine {
+    font-size: clamp(2.5rem, 6vh, 5rem);
+  }
+
+  .textItem {
+    font-size: 0.6rem;
+  }
+
   .heroContent {
     padding: 0 0.5rem;
   }
@@ -659,4 +669,27 @@
     padding: 0.25rem 0.625rem;
     font-size: 0.6875rem;
   }
+
+  .scrollingQuestion {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.6875rem;
+    margin-right: 0.5rem;
+  }
+
+  .scrollingQuestions {
+    animation-duration: 15s;
+  }
+}
+
+/* Screen reader only content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

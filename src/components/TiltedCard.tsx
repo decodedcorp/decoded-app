@@ -1,7 +1,9 @@
-import type { SpringOptions } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
-import { motion, useMotionValue, useSpring } from 'framer-motion';
 import { gsap } from 'gsap';
+
+import type { SpringOptions } from 'framer-motion';
+import { motion, useMotionValue, useSpring } from 'framer-motion';
+
 
 interface TiltedCardProps {
   imageSrc: React.ComponentProps<'img'>['src'];

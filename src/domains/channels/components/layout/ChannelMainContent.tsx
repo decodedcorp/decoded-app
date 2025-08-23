@@ -1,116 +1,209 @@
 'use client';
 
-import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { ChannelHero } from '../hero/ChannelHero';
-import { AnimatedSection } from './AnimatedSection';
-import { MasonryGrid } from '../category-grid/MasonryGrid';
+import React, { useState, useCallback, useMemo } from 'react';
+
+import { ExploreHeader, ExploreFilters } from '../explore/ExploreHeader';
+import { ExploreGrid } from '../explore/ExploreGrid';
+import { TrendingSection, CategorySection } from '../explore/CategorySection';
+import { RecommendedSection } from '../explore/RecommendedSection';
 import { ChannelModal, ContentModal } from '../modal';
 import { AddChannelModal } from '../modal/add-channel/AddChannelModal';
+import { AddChannelButton } from '../hero/components/AddChannelButton';
+import { LoadingState, ErrorState, EmptyState } from '../common/LoadingStates';
+import { useChannels } from '../../hooks/useChannels';
+import { useChannelModalStore } from '../../../../store/channelModalStore';
+import { ChannelResponse } from '../../../../api/generated/models/ChannelResponse';
 
 interface ChannelMainContentProps {
   className?: string;
 }
 
 export function ChannelMainContent({ className = '' }: ChannelMainContentProps) {
-  const [isGridExpanded, setIsGridExpanded] = useState(false);
-  const [scrollY, setScrollY] = useState(0);
-  const [rowOpacities, setRowOpacities] = useState([1, 1, 1, 1]); // 각 라인의 투명도
-  const [rowHeights, setRowHeights] = useState([46, 46, 46, 46]); // 각 라인의 높이
-  const mainContentRef = useRef<HTMLDivElement>(null);
-  const heroRef = useRef<HTMLDivElement>(null);
+  // Explore filters state
+  const [filters, setFilters] = useState<ExploreFilters>({
+    search: '',
+    category: 'all',
+    sortBy: 'recent',
+    sortOrder: 'desc',
+  });
 
-  // 스크롤 이벤트 핸들러
-  const handleScroll = useCallback(() => {
-    if (!mainContentRef.current) return;
+  // 채널 모달 스토어
+  const openChannelModal = useChannelModalStore((state) => state.openModal);
 
-    const currentScrollY = mainContentRef.current.scrollTop;
-    setScrollY(currentScrollY);
+  // 채널 데이터 가져오기
+  const {
+    data: channelsData,
+    isLoading,
+    error,
+  } = useChannels({
+    limit: 100, // Load more channels for better explore experience
+    sortBy: 'created_at',
+    sortOrder: 'desc',
+  });
 
-    // 캡슐 라인 자연스러운 축소 애니메이션
-    const maxScrollForHero = 600; // 더 긴 스크롤 거리로 부드러운 전환
-    const scrollRatio = Math.max(0, Math.min(1, currentScrollY / maxScrollForHero));
+  // 원본 채널 데이터
+  const channels = useMemo(() => {
+    return channelsData?.channels || [];
+  }, [channelsData]);
 
-    // 각 라인별로 다른 시작점과 끝점 설정
-    const newOpacities = [1, 1, 1, 1];
-    const newHeights = [46, 46, 46, 46];
+  // Group channels by category for organized sections (exclude uncategorized)
+  // Note: For now we'll use a simple categorization until API provides category field
+  const categorizedChannels = useMemo(() => {
+    const categoryGroups: Record<string, ChannelResponse[]> = {
+      'technology': [],
+      'design': [],
+      'lifestyle': []
+    };
+    
+    // Simple distribution of channels for now
+    channels.forEach((channel, index) => {
+      const categories = Object.keys(categoryGroups);
+      const categoryIndex = index % categories.length;
+      const category = categories[categoryIndex];
+      categoryGroups[category].push(channel);
+    });
 
-    // 라인 4 (맨 위): 가장 먼저 사라짐
-    const line4Start = 0.1;
-    const line4End = 0.4;
-    if (scrollRatio > line4Start) {
-      const line4Ratio = Math.min(1, (scrollRatio - line4Start) / (line4End - line4Start));
-      newOpacities[3] = Math.max(0, 1 - line4Ratio);
-      newHeights[3] = Math.max(0, 46 * (1 - line4Ratio * 0.8));
-    }
+    return categoryGroups;
+  }, [channels]);
 
-    // 라인 3: 두 번째로 사라짐
-    const line3Start = 0.2;
-    const line3End = 0.6;
-    if (scrollRatio > line3Start) {
-      const line3Ratio = Math.min(1, (scrollRatio - line3Start) / (line3End - line3Start));
-      newOpacities[2] = Math.max(0, 1 - line3Ratio);
-      newHeights[2] = Math.max(0, 46 * (1 - line3Ratio * 0.8));
-    }
-
-    // 라인 2: 세 번째로 사라짐
-    const line2Start = 0.4;
-    const line2End = 0.8;
-    if (scrollRatio > line2Start) {
-      const line2Ratio = Math.min(1, (scrollRatio - line2Start) / (line2End - line2Start));
-      newOpacities[1] = Math.max(0, 1 - line2Ratio);
-      newHeights[1] = Math.max(0, 46 * (1 - line2Ratio * 0.8));
-    }
-
-    // 라인 1 (맨 아래): 마지막까지 유지 (최소 높이만 줄어듦)
-    const line1Start = 0.6;
-    const line1End = 1.0;
-    if (scrollRatio > line1Start) {
-      const line1Ratio = Math.min(1, (scrollRatio - line1Start) / (line1End - line1Start));
-      newOpacities[0] = Math.max(0.3, 1 - line1Ratio * 0.7); // 최소 투명도 유지
-      newHeights[0] = Math.max(20, 46 * (1 - line1Ratio * 0.6)); // 최소 높이 유지
-    }
-
-    setRowOpacities(newOpacities);
-    setRowHeights(newHeights);
+  // Filter change handler
+  const handleFilterChange = useCallback((newFilters: ExploreFilters) => {
+    setFilters(newFilters);
   }, []);
 
-  useEffect(() => {
-    const element = mainContentRef.current;
-    if (!element) return;
+  // Channel click handler
+  const handleChannelClick = useCallback(
+    (channel: ChannelResponse) => {
+      console.log('Channel clicked:', channel);
+      openChannelModal(channel);
+    },
+    [openChannelModal],
+  );
 
-    element.addEventListener('scroll', handleScroll, { passive: true });
+  // 로딩 상태 렌더링
+  if (isLoading) {
+    return (
+      <div className={`relative h-full overflow-y-auto ${className}`}>
+        <LoadingState title="큐레이터들을 찾는 중..." />
+      </div>
+    );
+  }
 
-    // 초기 상태 설정 (스크롤이 0일 때 모든 라인이 보이도록)
-    setRowOpacities([1, 1, 1, 1]);
-    setRowHeights([46, 46, 46, 46]);
+  // 에러 상태 렌더링
+  if (error) {
+    return (
+      <div className={`relative h-full overflow-y-auto ${className}`}>
+        <ErrorState 
+          title="큐레이터 정보를 불러올 수 없습니다"
+          subtitle="잠시 후 다시 시도해 주세요"
+        />
+      </div>
+    );
+  }
 
-    return () => element.removeEventListener('scroll', handleScroll);
-  }, [handleScroll]);
+  // 채널이 없는 경우
+  if (!channels.length) {
+    return (
+      <div className={`relative h-full overflow-y-auto ${className}`}>
+        <EmptyState 
+          title="등록된 큐레이터가 없습니다"
+          subtitle="새로운 채널을 추가해보세요"
+        />
+      </div>
+    );
+  }
 
-  // Grid 확장/축소 토글
-  const toggleGridExpansion = useCallback(() => {
-    setIsGridExpanded((prev) => !prev);
-  }, []);
+  // Check if we should show organized sections or filtered grid
+  const showOrganizedSections = !filters.search.trim() && filters.category === 'all';
 
   return (
-    <div ref={mainContentRef} className={`relative h-full overflow-y-auto ${className}`}>
-      {/* Hero Section with Scroll Animation */}
-      <div ref={heroRef} className="relative z-10 overflow-hidden">
-        <ChannelHero />
+    <div className={`relative h-full overflow-y-auto bg-black ${className}`}>
+      {/* Top padding for Header */}
+      <div className="h-[60px] md:h-[72px]" />
+      
+      {/* Explore Header */}
+      <ExploreHeader 
+        onFilterChange={handleFilterChange}
+        totalChannels={channels.length}
+      />
+
+      <div className="px-4 md:px-8 pb-12">
+        {showOrganizedSections ? (
+          // Organized sections view (default explore experience)
+          <>
+            {/* Personalized Recommendations */}
+            <RecommendedSection 
+              channels={channels}
+              onChannelClick={handleChannelClick}
+              className="mt-8"
+            />
+
+            {/* Trending Section */}
+            <TrendingSection 
+              channels={channels}
+              onChannelClick={handleChannelClick}
+            />
+
+            {/* Category Sections */}
+            {Object.entries(categorizedChannels).map(([category, categoryChannels]) => {
+              const displayTitle = category.charAt(0).toUpperCase() + category.slice(1);
+              
+              return (
+                <CategorySection
+                  key={category}
+                  title={displayTitle}
+                  channels={categoryChannels}
+                  onChannelClick={handleChannelClick}
+                  onViewAll={() => {
+                    setFilters(prev => ({ ...prev, category }));
+                  }}
+                />
+              );
+            })}
+            
+            {/* Become an Editor CTA */}
+            <section className="mt-20 mb-8">
+              <div className="bg-zinc-900/50 rounded-2xl p-8 border border-zinc-700/30">
+                <div className="text-center max-w-2xl mx-auto">
+                  <div className="w-12 h-12 mx-auto mb-4 bg-zinc-800 rounded-full flex items-center justify-center">
+                    <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-400 mb-3">
+                    당신만의 편집 철학을 공유해보세요
+                  </h3>
+                  <p className="text-gray-500 mb-6 text-lg leading-relaxed">
+                    Decoded는 누구나 에디터가 될 수 있는 플랫폼입니다. <br />
+                    당신의 독창적인 관점과 큐레이션으로 새로운 가치를 만들어보세요.
+                  </p>
+                  <div className="flex items-center justify-center space-x-6 mb-6 text-sm text-gray-500">
+                    <span>무료로 시작</span>
+                    <span>•</span>
+                    <span>전문 도구 제공</span>
+                    <span>•</span>
+                    <span>커뮤니티 지원</span>
+                  </div>
+                  <AddChannelButton variant="post" className="font-semibold" />
+                </div>
+              </div>
+            </section>
+          </>
+        ) : (
+          // Filtered grid view
+          <div className="mt-8">
+            <ExploreGrid 
+              channels={channels}
+              filters={filters}
+              onChannelClick={handleChannelClick}
+            />
+          </div>
+        )}
       </div>
 
-      {/* Grid Section */}
-      <AnimatedSection isExpanded={isGridExpanded} className="relative z-5">
-        <MasonryGrid />
-      </AnimatedSection>
-
-      {/* Global Channel Modal */}
+      {/* Global Modals */}
       <ChannelModal />
-
-      {/* Global Content Modal */}
       <ContentModal />
-
-      {/* Global Add Channel Modal */}
       <AddChannelModal />
     </div>
   );

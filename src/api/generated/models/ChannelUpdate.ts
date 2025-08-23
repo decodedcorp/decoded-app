@@ -18,5 +18,9 @@ export type ChannelUpdate = {
      * Updated base64 encoded thumbnail image
      */
     thumbnail_base64?: (string | null);
+    /**
+     * Updated base64 encoded banner image
+     */
+    banner_base64?: (string | null);
 };
 

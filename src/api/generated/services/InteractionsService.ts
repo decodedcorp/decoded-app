@@ -2,17 +2,18 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ChannelLikeListResponse } from '../models/ChannelLikeListResponse';
+import type { ChannelLikeResponse } from '../models/ChannelLikeResponse';
+import type { ChannelLikeStatsResponse } from '../models/ChannelLikeStatsResponse';
 import type { ChannelSubscriptionStatsResponse } from '../models/ChannelSubscriptionStatsResponse';
 import type { ContentLikeStatsResponse } from '../models/ContentLikeStatsResponse';
 import type { InteractionStatsResponse } from '../models/InteractionStatsResponse';
-import type { LikeCreateRequest } from '../models/LikeCreateRequest';
 import type { LikeListResponse } from '../models/LikeListResponse';
 import type { LikeResponse } from '../models/LikeResponse';
 import type { NotificationCreateRequest } from '../models/NotificationCreateRequest';
 import type { NotificationListResponse } from '../models/NotificationListResponse';
 import type { NotificationMarkReadRequest } from '../models/NotificationMarkReadRequest';
 import type { NotificationResponse } from '../models/NotificationResponse';
-import type { SubscriptionCreateRequest } from '../models/SubscriptionCreateRequest';
 import type { SubscriptionListResponse } from '../models/SubscriptionListResponse';
 import type { SubscriptionResponse } from '../models/SubscriptionResponse';
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -318,58 +319,18 @@ export class InteractionsService {
         });
     }
     /**
-     * Create Like
-     * Create like
-     * @param requestBody
-     * @returns LikeResponse Successful Response
-     * @throws ApiError
-     */
-    public static createLikeLikesPost(
-        requestBody: LikeCreateRequest,
-    ): CancelablePromise<LikeResponse> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/likes',
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                422: `Validation Error`,
-            },
-        });
-    }
-    /**
-     * Create Like
-     * Create like
-     * @param requestBody
-     * @returns LikeResponse Successful Response
-     * @throws ApiError
-     */
-    public static createLikeLikesPost1(
-        requestBody: LikeCreateRequest,
-    ): CancelablePromise<LikeResponse> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/likes',
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                422: `Validation Error`,
-            },
-        });
-    }
-    /**
-     * Remove Like
-     * Remove like
+     * Create Content Like
+     * Create content like
      * @param contentId
-     * @returns void
+     * @returns LikeResponse Successful Response
      * @throws ApiError
      */
-    public static removeLikeLikesContentIdDelete(
+    public static createContentLikeContentsContentIdLikePost(
         contentId: string,
-    ): CancelablePromise<void> {
+    ): CancelablePromise<LikeResponse> {
         return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/likes/{content_id}',
+            method: 'POST',
+            url: '/contents/{content_id}/like',
             path: {
                 'content_id': contentId,
             },
@@ -379,18 +340,18 @@ export class InteractionsService {
         });
     }
     /**
-     * Remove Like
-     * Remove like
+     * Create Content Like
+     * Create content like
      * @param contentId
-     * @returns void
+     * @returns LikeResponse Successful Response
      * @throws ApiError
      */
-    public static removeLikeLikesContentIdDelete1(
+    public static createContentLikeContentsContentIdLikePost1(
         contentId: string,
-    ): CancelablePromise<void> {
+    ): CancelablePromise<LikeResponse> {
         return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/likes/{content_id}',
+            method: 'POST',
+            url: '/contents/{content_id}/like',
             path: {
                 'content_id': contentId,
             },
@@ -400,58 +361,60 @@ export class InteractionsService {
         });
     }
     /**
-     * Create Subscription
-     * Create subscription
-     * @param requestBody
-     * @returns SubscriptionResponse Successful Response
+     * Remove Content Like
+     * Remove content like
+     * @param contentId
+     * @returns void
      * @throws ApiError
      */
-    public static createSubscriptionSubscriptionsPost(
-        requestBody: SubscriptionCreateRequest,
-    ): CancelablePromise<SubscriptionResponse> {
+    public static removeContentLikeContentsContentIdLikeDelete(
+        contentId: string,
+    ): CancelablePromise<void> {
         return __request(OpenAPI, {
-            method: 'POST',
-            url: '/subscriptions',
-            body: requestBody,
-            mediaType: 'application/json',
+            method: 'DELETE',
+            url: '/contents/{content_id}/like',
+            path: {
+                'content_id': contentId,
+            },
             errors: {
                 422: `Validation Error`,
             },
         });
     }
     /**
-     * Create Subscription
-     * Create subscription
-     * @param requestBody
-     * @returns SubscriptionResponse Successful Response
+     * Remove Content Like
+     * Remove content like
+     * @param contentId
+     * @returns void
      * @throws ApiError
      */
-    public static createSubscriptionSubscriptionsPost1(
-        requestBody: SubscriptionCreateRequest,
-    ): CancelablePromise<SubscriptionResponse> {
+    public static removeContentLikeContentsContentIdLikeDelete1(
+        contentId: string,
+    ): CancelablePromise<void> {
         return __request(OpenAPI, {
-            method: 'POST',
-            url: '/subscriptions',
-            body: requestBody,
-            mediaType: 'application/json',
+            method: 'DELETE',
+            url: '/contents/{content_id}/like',
+            path: {
+                'content_id': contentId,
+            },
             errors: {
                 422: `Validation Error`,
             },
         });
     }
     /**
-     * Remove Subscription
-     * Remove subscription
+     * Create Channel Like
+     * Create channel like
      * @param channelId
-     * @returns void
+     * @returns ChannelLikeResponse Successful Response
      * @throws ApiError
      */
-    public static removeSubscriptionSubscriptionsChannelIdDelete(
+    public static createChannelLikeChannelsChannelIdLikePost(
         channelId: string,
-    ): CancelablePromise<void> {
+    ): CancelablePromise<ChannelLikeResponse> {
         return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/subscriptions/{channel_id}',
+            method: 'POST',
+            url: '/channels/{channel_id}/like',
             path: {
                 'channel_id': channelId,
             },
@@ -461,18 +424,244 @@ export class InteractionsService {
         });
     }
     /**
-     * Remove Subscription
-     * Remove subscription
+     * Create Channel Like
+     * Create channel like
+     * @param channelId
+     * @returns ChannelLikeResponse Successful Response
+     * @throws ApiError
+     */
+    public static createChannelLikeChannelsChannelIdLikePost1(
+        channelId: string,
+    ): CancelablePromise<ChannelLikeResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/channels/{channel_id}/like',
+            path: {
+                'channel_id': channelId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Remove Channel Like
+     * Remove channel like
      * @param channelId
      * @returns void
      * @throws ApiError
      */
-    public static removeSubscriptionSubscriptionsChannelIdDelete1(
+    public static removeChannelLikeChannelsChannelIdLikeDelete(
         channelId: string,
     ): CancelablePromise<void> {
         return __request(OpenAPI, {
             method: 'DELETE',
-            url: '/subscriptions/{channel_id}',
+            url: '/channels/{channel_id}/like',
+            path: {
+                'channel_id': channelId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Remove Channel Like
+     * Remove channel like
+     * @param channelId
+     * @returns void
+     * @throws ApiError
+     */
+    public static removeChannelLikeChannelsChannelIdLikeDelete1(
+        channelId: string,
+    ): CancelablePromise<void> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/channels/{channel_id}/like',
+            path: {
+                'channel_id': channelId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Get Channel Likes
+     * Get channel likes list (public endpoint)
+     * @param channelId
+     * @param limit
+     * @param skip
+     * @returns ChannelLikeListResponse Successful Response
+     * @throws ApiError
+     */
+    public static getChannelLikesChannelsChannelIdLikesGet(
+        channelId: string,
+        limit: number = 50,
+        skip?: number,
+    ): CancelablePromise<ChannelLikeListResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/channels/{channel_id}/likes',
+            path: {
+                'channel_id': channelId,
+            },
+            query: {
+                'limit': limit,
+                'skip': skip,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Get Channel Likes
+     * Get channel likes list (public endpoint)
+     * @param channelId
+     * @param limit
+     * @param skip
+     * @returns ChannelLikeListResponse Successful Response
+     * @throws ApiError
+     */
+    public static getChannelLikesChannelsChannelIdLikesGet1(
+        channelId: string,
+        limit: number = 50,
+        skip?: number,
+    ): CancelablePromise<ChannelLikeListResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/channels/{channel_id}/likes',
+            path: {
+                'channel_id': channelId,
+            },
+            query: {
+                'limit': limit,
+                'skip': skip,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Get Channel Like Stats Endpoint
+     * Get like statistics for channel (public endpoint with optional user context)
+     * @param channelId
+     * @returns ChannelLikeStatsResponse Successful Response
+     * @throws ApiError
+     */
+    public static getChannelLikeStatsEndpointChannelsChannelIdLikesStatsGet(
+        channelId: string,
+    ): CancelablePromise<ChannelLikeStatsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/channels/{channel_id}/likes/stats',
+            path: {
+                'channel_id': channelId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Get Channel Like Stats Endpoint
+     * Get like statistics for channel (public endpoint with optional user context)
+     * @param channelId
+     * @returns ChannelLikeStatsResponse Successful Response
+     * @throws ApiError
+     */
+    public static getChannelLikeStatsEndpointChannelsChannelIdLikesStatsGet1(
+        channelId: string,
+    ): CancelablePromise<ChannelLikeStatsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/channels/{channel_id}/likes/stats',
+            path: {
+                'channel_id': channelId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Create Channel Subscription
+     * Create channel subscription
+     * @param channelId
+     * @returns SubscriptionResponse Successful Response
+     * @throws ApiError
+     */
+    public static createChannelSubscriptionChannelsChannelIdSubscribePost(
+        channelId: string,
+    ): CancelablePromise<SubscriptionResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/channels/{channel_id}/subscribe',
+            path: {
+                'channel_id': channelId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Create Channel Subscription
+     * Create channel subscription
+     * @param channelId
+     * @returns SubscriptionResponse Successful Response
+     * @throws ApiError
+     */
+    public static createChannelSubscriptionChannelsChannelIdSubscribePost1(
+        channelId: string,
+    ): CancelablePromise<SubscriptionResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/channels/{channel_id}/subscribe',
+            path: {
+                'channel_id': channelId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Remove Channel Subscription
+     * Remove channel subscription
+     * @param channelId
+     * @returns void
+     * @throws ApiError
+     */
+    public static removeChannelSubscriptionChannelsChannelIdSubscribeDelete(
+        channelId: string,
+    ): CancelablePromise<void> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/channels/{channel_id}/subscribe',
+            path: {
+                'channel_id': channelId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Remove Channel Subscription
+     * Remove channel subscription
+     * @param channelId
+     * @returns void
+     * @throws ApiError
+     */
+    public static removeChannelSubscriptionChannelsChannelIdSubscribeDelete1(
+        channelId: string,
+    ): CancelablePromise<void> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/channels/{channel_id}/subscribe',
             path: {
                 'channel_id': channelId,
             },

@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils/styles';
+
 import { cardVariants } from '../../constants/masonryConstants';
 
 export function MasonryGridSkeleton() {

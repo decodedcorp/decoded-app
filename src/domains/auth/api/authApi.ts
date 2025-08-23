@@ -1,10 +1,12 @@
+import { jwtDecode } from 'jwt-decode';
+
 import { AuthService } from '../../../api/generated/services/AuthService';
 import { UsersService } from '../../../api/generated/services/UsersService';
 import { LoginRequest } from '../../../api/generated/models/LoginRequest';
 import { ResponseMapper } from '../utils/responseMapper';
 import { storeLoginResponse, clearSession, extractUserDocIdFromToken } from '../utils/tokenManager';
 import { updateApiTokenFromStorage } from '../../../api/config';
-import { jwtDecode } from 'jwt-decode';
+
 import { GoogleAuthApi } from './googleAuthApi';
 
 // Google OAuth JWT 타입

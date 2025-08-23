@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { getSpacerAnimationClasses } from '../../utils/animationUtils';
 import { LAYOUT_CONSTANTS } from '../../constants/layoutConstants';
 

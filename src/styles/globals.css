@@ -1,3 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom CSS Variables for Dynamic Shadows */
+:root {
+  --hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  --focus-ring: rgba(59, 130, 246, 0.6);
+}
+
+/* Enhanced focus styles for channel cards */
+.channel-card:focus-within {
+  outline: none;
+}
+
+.channel-card:focus-within .card-container {
+  outline: 2px solid var(--focus-ring, rgba(59, 130, 246, 0.6));
+  outline-offset: 2px;
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Enhanced hover effects for channel cards */
+.channel-card:hover .card-container {
+  transform: translateY(-2px);
+  box-shadow: var(--hover-shadow, 0 20px 25px -5px rgba(0, 0, 0, 0.1));
+}
+
+/* Color extraction loading animation */
+.color-loading {
+  animation: color-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes color-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Smooth color transitions */
+.color-transition {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced shadow depth */
+.shadow-depth-1 {
+  box-shadow: 
+    0 1px 3px 0 rgba(0, 0, 0, 0.1),
+    0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.shadow-depth-2 {
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.shadow-depth-3 {
+  box-shadow: 
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-depth-4 {
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
 @import 'tailwindcss';
 
 @layer utilities {

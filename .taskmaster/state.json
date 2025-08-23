@@ -1,8 +1,9 @@
 {
-  "currentTag": "feature-channel-content-optimization",
-  "lastSwitched": "2025-08-04T06:31:49.940Z",
+  "currentTag": "master",
+  "lastSwitched": "2025-08-14T14:18:07.780Z",
   "branchTagMapping": {
-    "feature/channel-content-optimization": "feature-channel-content-optimization"
+    "feature/channel-content-optimization": "feature-channel-content-optimization",
+    "feature/search-functionality": "feature-search-functionality"
   },
   "migrationNoticeShown": true
 }

@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { UserProfileResponse } from './UserProfileResponse';
 /**
  * Channel response schema
  */
@@ -23,9 +24,21 @@ export type ChannelResponse = {
      */
     owner_id: string;
     /**
+     * Channel managers with full profile info
+     */
+    managers?: Array<UserProfileResponse>;
+    /**
+     * List of manager user IDs for quick access
+     */
+    manager_ids?: Array<string>;
+    /**
      * Channel thumbnail URL
      */
     thumbnail_url?: (string | null);
+    /**
+     * Channel banner URL
+     */
+    banner_url?: (string | null);
     /**
      * Number of subscribers
      */
@@ -43,5 +56,13 @@ export type ChannelResponse = {
      * Whether current user is subscribed
      */
     is_subscribed?: boolean;
+    /**
+     * Whether current user is the channel owner
+     */
+    is_owner?: boolean;
+    /**
+     * Whether current user is a channel manager
+     */
+    is_manager?: boolean;
 };
 

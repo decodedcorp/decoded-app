@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+
 import { authChannel, AuthMessage } from '../utils/authChannel';
 import { useAuthStore } from '../../../store/authStore';
 

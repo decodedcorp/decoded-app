@@ -1,5 +1,6 @@
 import { useCallback, useRef } from 'react';
 import { gsap } from 'gsap';
+
 import styles from '../ChannelHero.module.css';
 
 export function useKineticAnimation() {

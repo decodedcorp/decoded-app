@@ -6,27 +6,80 @@ import type { BatchStatusResponse } from '../models/BatchStatusResponse';
 import type { DemoImageContentRequest } from '../models/DemoImageContentRequest';
 import type { DemoLinkContentRequest } from '../models/DemoLinkContentRequest';
 import type { DemoResponse } from '../models/DemoResponse';
+import type { SearchChannelResponse } from '../models/SearchChannelResponse';
+import type { SearchContentsResponse } from '../models/SearchContentsResponse';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 export class PublicService {
     /**
-     * Search
+     * Search Contents
      * @param query
-     * @param nextId
-     * @returns any Successful Response
+     * @param limit
+     * @returns SearchContentsResponse Successful Response
      * @throws ApiError
      */
-    public static searchSearchGet(
+    public static searchContentsSearchContentsGet(
         query: string = '',
-        nextId?: string,
-    ): CancelablePromise<any> {
+        limit: number = 10,
+    ): CancelablePromise<SearchContentsResponse> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/search',
+            url: '/search/contents',
             query: {
                 'query': query,
-                'next_id': nextId,
+                'limit': limit,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Search Channels
+     * @param query
+     * @param limit
+     * @returns SearchChannelResponse Successful Response
+     * @throws ApiError
+     */
+    public static searchChannelsSearchChannelsGet(
+        query: string = '',
+        limit: number = 10,
+    ): CancelablePromise<SearchChannelResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/search/channels',
+            query: {
+                'query': query,
+                'limit': limit,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Search Channel Contents
+     * @param channelId
+     * @param query
+     * @param limit
+     * @returns SearchContentsResponse Successful Response
+     * @throws ApiError
+     */
+    public static searchChannelContentsSearchChannelsChannelIdContentsGet(
+        channelId: string,
+        query: string = '',
+        limit: number = 10,
+    ): CancelablePromise<SearchContentsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/search/channels/{channel_id}/contents',
+            path: {
+                'channel_id': channelId,
+            },
+            query: {
+                'query': query,
+                'limit': limit,
             },
             errors: {
                 422: `Validation Error`,

@@ -6,6 +6,7 @@ export type LinkPreviewMetadataResponse = {
     title?: (string | null);
     description?: (string | null);
     img_url?: (string | null);
+    downloaded_img_url?: (string | null);
     site_name?: (string | null);
 };
 
