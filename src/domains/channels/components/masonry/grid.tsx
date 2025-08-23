@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from 'react';
 import { gsap } from 'gsap';
 
-import ChannelCard from './channel-card/ChannelCard';
+import { ChannelCard } from '@/components/ChannelCard';
 import { Item, MasonryProps } from './types';
 
 // 개발 환경에서만 로그 출력 (성능 최적화)
@@ -673,13 +673,26 @@ const Masonry: React.FC<MasonryProps> = ({
       {laidOut.map((item) => (
         <ChannelCard
           key={item.id}
-          item={item}
-          onItemClick={handleItemClick}
-          onKeyDown={handleKeyDown}
-          onMouseEnter={(e) => handleMouseEnter(e.currentTarget as HTMLElement)}
-          onMouseLeave={(e) => handleMouseLeave(e.currentTarget as HTMLElement)}
-          scaleOnHover={scaleOnHover}
-          colorShiftOnHover={colorShiftOnHover}
+          channel={{
+            id: item.id,
+            name: item.title || `Channel ${item.id}`,
+            description: item.description,
+            profileImageUrl: item.img,
+            isVerified: false,
+            followerCount: item.subscriber_count || 0,
+            contentCount: item.content_count || 0,
+            category: item.category,
+          }}
+          useSubscriptionHook={true}
+          showLikeButton={true}
+          highlightCategory={true}
+          masonry={{
+            item,
+            onItemClick: handleItemClick,
+            onKeyDown: handleKeyDown,
+            onMouseEnter: (e: React.MouseEvent) => handleMouseEnter(e.currentTarget as HTMLElement),
+            onMouseLeave: (e: React.MouseEvent) => handleMouseLeave(e.currentTarget as HTMLElement),
+          }}
         />
       ))}
     </div>

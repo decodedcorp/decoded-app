@@ -8,6 +8,7 @@ import { TrendingSection, CategorySection } from '../explore/CategorySection';
 import { RecommendedSection } from '../explore/RecommendedSection';
 import { ChannelModal, ContentModal } from '../modal';
 import { AddChannelModal } from '../modal/add-channel/AddChannelModal';
+import { AddChannelButton } from '../hero/components/AddChannelButton';
 import { LoadingState, ErrorState, EmptyState } from '../common/LoadingStates';
 import { useChannels } from '../../hooks/useChannels';
 import { useChannelModalStore } from '../../../../store/channelModalStore';
@@ -183,9 +184,7 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
                     <span>•</span>
                     <span>커뮤니티 지원</span>
                   </div>
-                  <button className="bg-zinc-800 hover:bg-zinc-700 text-gray-400 hover:text-gray-300 font-semibold px-8 py-3 rounded-lg transition-colors duration-200">
-                    에디터 되기
-                  </button>
+                  <AddChannelButton variant="post" className="font-semibold" />
                 </div>
               </div>
             </section>

@@ -3,12 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Like creation request
+ * Pin target type for API
  */
-export type LikeCreateRequest = {
-    /**
-     * Content ID to like
-     */
-    content_id: string;
-};
-
+export enum PinTargetType {
+    CONTENT = 'content',
+    FOLDER = 'folder',
+}

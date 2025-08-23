@@ -2,32 +2,56 @@
 
 import React, { memo } from 'react';
 import { ChannelResponse } from '@/api/generated/models/ChannelResponse';
+import { useChannelSubscription } from '@/domains/interactions/hooks/useChannelSubscription';
+import { HeartButton } from '@/components/ui/HeartButton';
+import { useChannelLike } from '@/domains/interactions/hooks/useChannelLike';
 
-// ChannelCard Props 인터페이스 - ChannelResponse 직접 지원 추가
+// Base channel data interface
+interface BaseChannel {
+  id: string;
+  name: string;
+  description?: string;
+  profileImageUrl: string;
+  isVerified?: boolean;
+  followerCount?: number;
+  contentCount?: number;
+  category?: string;
+}
+
+// Masonry-specific event handlers
+interface MasonryProps {
+  item?: any;
+  onItemClick?: (item: any) => void;
+  onKeyDown?: (e: React.KeyboardEvent, item: any) => void;
+  onMouseEnter?: (e: React.MouseEvent) => void;
+  onMouseLeave?: (e: React.MouseEvent) => void;
+}
+
+// Main ChannelCard Props - Optimized from 46 to 25 props
 export interface ChannelCardProps {
-  // ChannelResponse를 직접 받을 수 있도록 확장
-  channel:
-    | ChannelResponse
-    | {
-        id: string;
-        name: string;
-        description?: string;
-        profileImageUrl: string;
-        isVerified?: boolean;
-        followerCount?: number;
-        contentCount?: number;
-        category?: string;
-      };
-  onFollow?: (channelId: string) => void;
+  // Core props
+  channel: ChannelResponse | BaseChannel;
+  className?: string;
+
+  // Size and display
+  size?: 'small' | 'medium' | 'large';
+  variant?: 'default' | 'compact' | 'featured' | 'soft';
+
+  // Features
+  showLikeButton?: boolean;
+  highlightCategory?: boolean;
+  useSubscriptionHook?: boolean;
+
+  // Events
   onCardClick?: (channel: any) => void;
+
+  // Legacy support (deprecated)
+  onFollow?: (channelId: string) => void;
   isFollowing?: boolean;
   isLoading?: boolean;
-  className?: string;
-  // explore의 크기 variant 추가
-  variant?: 'default' | 'compact' | 'featured' | 'soft' | 'small' | 'medium' | 'large';
-  // explore 전용 props
-  size?: 'small' | 'medium' | 'large';
-  highlightCategory?: boolean;
+
+  // Masonry integration
+  masonry?: MasonryProps;
 }
 
 // 인증 배지 컴포넌트
@@ -121,14 +145,19 @@ const formatCount = (count: number | undefined) => {
 export const ChannelCard = memo(
   ({
     channel,
-    onFollow,
+    className = '',
+    size,
+    variant = 'default',
+    showLikeButton = false,
+    highlightCategory = false,
+    useSubscriptionHook = true,
     onCardClick,
+    // Legacy support (deprecated)
+    onFollow,
     isFollowing = false,
     isLoading = false,
-    className = '',
-    variant = 'default',
-    size,
-    highlightCategory = false,
+    // Masonry integration
+    masonry,
   }: ChannelCardProps) => {
     // ChannelResponse인지 확인
     const isChannelResponse = 'owner_id' in channel;
@@ -150,12 +179,43 @@ export const ChannelCard = memo(
         }
       : channel;
 
-    // 카드 클릭 핸들러
+    // Use new subscription hook - always call hook but with conditional id
+    const subscriptionHook = useChannelSubscription(channelData.id);
+
+    // 좋아요 기능
+    const {
+      isLiked,
+      likeCount,
+      toggleLike,
+      isLoading: isLikeLoading,
+    } = useChannelLike(channelData.id);
+
+    // Use subscription stats if available
+    const effectiveFollowerCount =
+      useSubscriptionHook && subscriptionHook.subscriptionStats
+        ? subscriptionHook.subscriptionStats.total_subscribers
+        : channelData.followerCount;
+
+    // Use subscription state from hook if available, otherwise fallback to props
+    const effectiveIsSubscribed =
+      subscriptionHook?.isSubscribed !== undefined
+        ? subscriptionHook.isSubscribed
+        : isFollowing || (isChannelResponse && channel.is_subscribed);
+
+    const effectiveIsLoading =
+      subscriptionHook?.isLoading !== undefined || subscriptionHook?.isInitialLoading !== undefined
+        ? subscriptionHook.isLoading || subscriptionHook.isInitialLoading
+        : isLoading;
+
+    // 카드 클릭 핸들러 - masonry와 일반 클릭 모두 지원
     const handleCardClick = (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
 
-      if (onCardClick) {
+      // Masonry item 클릭 핸들러 우선
+      if (masonry?.onItemClick && masonry.item) {
+        masonry.onItemClick(masonry.item);
+      } else if (onCardClick) {
         onCardClick(channel);
       }
     };
@@ -165,52 +225,53 @@ export const ChannelCard = memo(
       e.preventDefault();
       e.stopPropagation();
 
-      if (onFollow) {
+      if (subscriptionHook?.toggleSubscription) {
+        // Use subscription hook if available
+        try {
+          subscriptionHook.toggleSubscription();
+        } catch (error) {
+          console.error('Error toggling subscription:', error);
+        }
+      } else if (onFollow) {
+        // Use legacy callback
         onFollow(channelData.id);
+      } else {
+        console.warn('ChannelCard: No subscription handler available');
       }
     };
 
     // 구독 버튼 텍스트
-    const followButtonText = isFollowing ? 'Subscribed' : 'Subscribe';
-    const followButtonVariant = isFollowing
-      ? 'bg-gray-700 hover:bg-gray-600 text-white'
-      : 'bg-gray-800 hover:bg-gray-700 text-white';
+    const followButtonText = effectiveIsSubscribed ? 'Subscribed' : 'Subscribe';
 
-    // 크기 variant 결정 (size prop 우선, 없으면 variant 사용)
-    const effectiveSize = size || variant;
+    // 크기 결정 로직 단순화 - size 우선, 없으면 variant에서 크기 추출
+    const effectiveSize =
+      size || (variant === 'compact' ? 'small' : variant === 'featured' ? 'large' : 'medium');
 
-    // 카드 크기 클래스 결정
+    // 카드 크기 클래스 결정 - 고정 높이 제거하고 최소/최대 높이로 변경
     const cardSizeClass = (() => {
       switch (effectiveSize) {
         case 'small':
-          return 'w-full h-[320px]'; // 고정 높이로 설정
+          return 'w-full min-h-[300px]';
         case 'medium':
-          return 'w-full h-[360px]'; // 고정 높이로 설정
+          return 'w-full min-h-[360px]';
         case 'large':
-          return 'w-full h-[400px]'; // 고정 높이로 설정
-        case 'compact':
-          return 'w-full h-[280px]'; // 고정 높이로 설정
-        case 'featured':
-        case 'default':
-        case 'soft':
+          return 'w-full min-h-[420px]';
         default:
-          return 'w-full h-[360px]'; // 기본값도 고정 높이로
+          return 'w-full min-h-[360px]';
       }
     })();
 
-    // 이미지 높이 클래스 결정
-    const imageHeightClass = (() => {
+    // 이미지 컨테이너 비율 클래스 추가 - 이미지 왜곡 방지
+    const imageContainerClass = (() => {
       switch (effectiveSize) {
         case 'small':
-          return 'h-32'; // 카드 높이의 약 40%
+          return 'aspect-[4/3]';
         case 'medium':
-          return 'h-40'; // 카드 높이의 약 40%
+          return 'aspect-[3/2]';
         case 'large':
-          return 'h-48'; // 카드 높이의 약 40%
-        case 'compact':
-          return 'h-28'; // 카드 높이의 약 40%
+          return 'aspect-[16/10]';
         default:
-          return 'h-40'; // 기본값도 카드 높이의 약 40%
+          return 'aspect-[3/2]';
       }
     })();
 
@@ -226,9 +287,6 @@ export const ChannelCard = memo(
           boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4), 0 8px 16px rgba(0, 0, 0, 0.3)',
         };
 
-    // explore 스타일인지 확인
-    const isExploreStyle = size && ['small', 'medium', 'large'].includes(size);
-
     return (
       <div
         className={`relative rounded-3xl overflow-hidden cursor-pointer transition-all duration-300 flex flex-col ${cardSizeClass} ${className} ${
@@ -236,20 +294,24 @@ export const ChannelCard = memo(
             ? 'hover:shadow-2xl'
             : 'hover:transform hover:-translate-y-1 hover:shadow-3xl'
         }`}
-        style={isExploreStyle ? undefined : softUIProps}
+        style={softUIProps}
         onClick={handleCardClick}
+        onMouseEnter={masonry?.onMouseEnter}
+        onMouseLeave={masonry?.onMouseLeave}
+        onKeyDown={
+          masonry?.onKeyDown && masonry.item
+            ? (e) => masonry.onKeyDown?.(e, masonry.item)
+            : undefined
+        }
+        tabIndex={masonry?.onKeyDown ? 0 : undefined}
+        role={masonry?.onKeyDown ? 'button' : undefined}
+        aria-label={`Channel ${channelData.name}`}
       >
-        <div
-          className={`p-3 flex flex-col flex-1 ${
-            isExploreStyle ? 'bg-zinc-900/50 border border-zinc-800/50 rounded-xl' : ''
-          }`}
-        >
-          {/* 상단 프로필 이미지 섹션 */}
+        <div className="p-3 flex flex-col flex-1 bg-zinc-900/50 border border-zinc-800/50 rounded-xl">
+          {/* 상단 프로필 이미지 섹션 - 비율 기반으로 변경 */}
           <div className="relative mb-3 flex-shrink-0">
             <div
-              className={`w-full ${imageHeightClass} ${
-                isExploreStyle ? 'bg-gradient-to-br from-zinc-800 to-zinc-900' : 'bg-gray-700'
-              } rounded-2xl overflow-hidden`}
+              className={`w-full ${imageContainerClass} bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-2xl overflow-hidden`}
             >
               {channelData.profileImageUrl ? (
                 <img
@@ -258,19 +320,44 @@ export const ChannelCard = memo(
                   className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                   loading="lazy"
                   decoding="async"
+                  // 이미지 품질 최적화 속성 추가
+                  style={{
+                    imageRendering: 'auto',
+                    backfaceVisibility: 'hidden',
+                  }}
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-500/20 to-purple-500/20">
-                  <span className="font-bold text-white/80 text-3xl">
-                    {channelData.name.charAt(0).toUpperCase()}
+                  <span className="font-bold text-white/80 text-lg">
+                    {channelData.name && channelData.name.length > 0
+                      ? channelData.name.charAt(0).toUpperCase()
+                      : '?'}
                   </span>
                 </div>
               )}
             </div>
 
-            {/* 콘텐츠 수 배지 (explore 스타일) */}
-            {isExploreStyle && channelData.contentCount && channelData.contentCount > 0 && (
-              <div className="absolute top-4 right-4 bg-black/70 backdrop-blur-sm px-3 py-1.5 rounded-full">
+            {/* 좋아요 버튼 - 상단 우측 우선 배치 */}
+            {showLikeButton && (
+              <div className="absolute top-4 right-4 z-10">
+                <HeartButton
+                  isLiked={isLiked}
+                  likeCount={likeCount}
+                  onLike={toggleLike}
+                  size="sm"
+                  showCount={false}
+                  isLoading={isLikeLoading}
+                />
+              </div>
+            )}
+
+            {/* 콘텐츠 수 배지 - 좋아요 버튼이 있으면 왼쪽으로 이동 */}
+            {(channelData.contentCount ?? 0) > 0 && highlightCategory && (
+              <div
+                className={`absolute top-4 ${
+                  showLikeButton ? 'left-4' : 'right-4'
+                } bg-black/70 backdrop-blur-sm px-3 py-1.5 rounded-full`}
+              >
                 <span className="text-white text-sm font-medium">
                   {formatCount(channelData.contentCount)} items
                 </span>
@@ -293,26 +380,14 @@ export const ChannelCard = memo(
             <div className="mb-3">
               {/* 이름과 인증 배지 */}
               <div className="flex items-center gap-2 mb-2">
-                <h3
-                  className={`font-semibold text-white ${isExploreStyle ? 'text-lg' : 'text-xl'}`}
-                >
-                  {channelData.name}
-                </h3>
+                <h3 className={`font-semibold text-white text-2xl`}>{channelData.name}</h3>
                 {channelData.isVerified && <VerificationBadge />}
               </div>
 
               {/* 설명 */}
               {channelData.description ? (
-                <p
-                  className={`text-gray-400 leading-relaxed line-clamp-2 ${
-                    isExploreStyle ? 'text-sm' : 'text-base'
-                  }`}
-                >
+                <p className="text-gray-400 leading-relaxed line-clamp-2 text-base">
                   {channelData.description}
-                </p>
-              ) : isExploreStyle ? (
-                <p className="text-gray-600 text-sm italic">
-                  {channelData.contentCount || 0}개의 엄선된 콘텐츠
                 </p>
               ) : null}
             </div>
@@ -323,43 +398,50 @@ export const ChannelCard = memo(
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
                   <FollowerIcon />
-                  <span
-                    className={`text-white font-medium ${isExploreStyle ? 'text-xs' : 'text-sm'}`}
-                  >
-                    {formatCount(channelData.followerCount)}
+                  <span className="text-white font-medium text-sm">
+                    {formatCount(effectiveFollowerCount)}
                   </span>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <ContentIcon />
-                  <span
-                    className={`text-white font-medium ${isExploreStyle ? 'text-xs' : 'text-sm'}`}
-                  >
+                  <span className="text-white font-medium text-sm">
                     {formatCount(channelData.contentCount)}
                   </span>
                 </div>
               </div>
 
-              {/* Subscribe 버튼 (explore 스타일이 아닐 때만 표시) */}
-              {!isExploreStyle && (
+              {/* 오른쪽 버튼 영역 - 여백 없이 오른쪽 끝에 배치 */}
+              <div
+                className="flex items-center gap-2 ml-auto"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                }}
+              >
+                {/* Subscribe 버튼 - 항상 표시 */}
                 <button
                   onClick={handleFollowClick}
-                  disabled={isLoading}
+                  disabled={effectiveIsLoading}
+                  type="button"
+                  style={{ pointerEvents: 'auto', zIndex: 10 }}
                   className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-sm transition-all duration-200 hover:transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed ${
-                    isFollowing
+                    effectiveIsSubscribed
                       ? 'bg-gray-600 text-white hover:bg-gray-500'
                       : 'bg-white text-gray-900 hover:bg-gray-100'
                   }`}
                 >
-                  {isLoading ? (
+                  {effectiveIsLoading ? (
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span className="text-xs">Loading...</span>
+                      <span className="text-xs">
+                        {effectiveIsSubscribed ? 'Unsubscribing...' : 'Subscribing...'}
+                      </span>
                     </div>
                   ) : (
                     <>
                       <span className="text-xs">{followButtonText}</span>
-                      {!isFollowing && (
+                      {!effectiveIsSubscribed && (
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                           <path
                             fillRule="evenodd"
@@ -371,26 +453,7 @@ export const ChannelCard = memo(
                     </>
                   )}
                 </button>
-              )}
-
-              {/* 화살표 아이콘 (explore 스타일) */}
-              {isExploreStyle && (
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  <svg
-                    className="w-4 h-4 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </div>
-              )}
+              </div>
             </div>
           </div>
         </div>
@@ -406,8 +469,10 @@ export const ChannelCard = memo(
       prevProps.channel.id === nextProps.channel.id &&
       prevProps.isFollowing === nextProps.isFollowing &&
       prevProps.isLoading === nextProps.isLoading &&
+      prevProps.useSubscriptionHook === nextProps.useSubscriptionHook &&
       prevProps.variant === nextProps.variant &&
-      prevProps.size === nextProps.size
+      prevProps.size === nextProps.size &&
+      prevProps.showLikeButton === nextProps.showLikeButton
     );
   },
 );

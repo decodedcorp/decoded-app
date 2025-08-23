@@ -3,12 +3,12 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Request to add or remove channel managers
+ * Request to update channel banner
  */
-export type ManagersUpdate = {
+export type BannerUpdate = {
     /**
-     * List of user IDs to add/remove as managers
+     * Base64 encoded banner image
      */
-    user_ids: Array<string>;
+    banner_base64: string;
 };
 

@@ -2,11 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { BannerUpdate } from '../models/BannerUpdate';
 import type { ChannelCreate } from '../models/ChannelCreate';
 import type { ChannelListResponse } from '../models/ChannelListResponse';
 import type { ChannelResponse } from '../models/ChannelResponse';
 import type { ChannelUpdate } from '../models/ChannelUpdate';
-import type { ManagersUpdate } from '../models/ManagersUpdate';
 import type { ThumbnailUpdate } from '../models/ThumbnailUpdate';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -161,45 +161,20 @@ export class ChannelsService {
         });
     }
     /**
-     * Add Managers
-     * Add managers to channel (owner only)
+     * Update Banner
+     * Update channel banner (owner only)
      * @param channelId
      * @param requestBody
      * @returns any Successful Response
      * @throws ApiError
      */
-    public static addManagersChannelsChannelIdManagersPost(
+    public static updateBannerChannelsChannelIdBannerPatch(
         channelId: string,
-        requestBody: ManagersUpdate,
+        requestBody: BannerUpdate,
     ): CancelablePromise<any> {
         return __request(OpenAPI, {
-            method: 'POST',
-            url: '/channels/{channel_id}/managers',
-            path: {
-                'channel_id': channelId,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                422: `Validation Error`,
-            },
-        });
-    }
-    /**
-     * Remove Managers
-     * Remove managers from channel (owner only)
-     * @param channelId
-     * @param requestBody
-     * @returns any Successful Response
-     * @throws ApiError
-     */
-    public static removeManagersChannelsChannelIdManagersDelete(
-        channelId: string,
-        requestBody: ManagersUpdate,
-    ): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/channels/{channel_id}/managers',
+            method: 'PATCH',
+            url: '/channels/{channel_id}/banner',
             path: {
                 'channel_id': channelId,
             },

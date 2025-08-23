@@ -15,11 +15,32 @@ export const useLikeContent = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (contentId: string) =>
-      InteractionsService.createLikeLikesPost({ content_id: contentId }),
-    onSuccess: () => {
+    mutationFn: (contentId: string) => {
+      // MongoDB ObjectID 형식 검증 (24자리 hex)
+      if (!/^[a-f\d]{24}$/i.test(contentId)) {
+        throw new Error(`Invalid content ID format: ${contentId}`);
+      }
+      
+      // API 호출 디버깅
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔄 [useLikeContent] API 호출:', {
+          contentId,
+          endpoint: `/contents/${contentId}/like`,
+          method: 'POST'
+        });
+      }
+      
+      return InteractionsService.createContentLikeContentsContentIdLikePost(contentId);
+    },
+    onSuccess: (_, contentId) => {
+      // 콘텐츠 좋아요 통계 무효화
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.contents.likesStats(contentId)
+      });
+      // 콘텐츠 목록 무효화
       queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
       queryClient.invalidateQueries({ queryKey: queryKeys.feeds.lists() });
+      // 내 좋아요 목록 무효화
       queryClient.invalidateQueries({ queryKey: queryKeys.interactions.myLikes() });
     },
   });
@@ -29,11 +50,32 @@ export const useUnlikeContent = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (contentId: string) =>
-      InteractionsService.removeLikeLikesContentIdDelete(contentId),
-    onSuccess: () => {
+    mutationFn: (contentId: string) => {
+      // MongoDB ObjectID 형식 검증 (24자리 hex)
+      if (!/^[a-f\d]{24}$/i.test(contentId)) {
+        throw new Error(`Invalid content ID format: ${contentId}`);
+      }
+      
+      // API 호출 디버깅
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔄 [useUnlikeContent] API 호출:', {
+          contentId,
+          endpoint: `/contents/${contentId}/like`,
+          method: 'DELETE'
+        });
+      }
+      
+      return InteractionsService.removeContentLikeContentsContentIdLikeDelete(contentId);
+    },
+    onSuccess: (_, contentId) => {
+      // 콘텐츠 좋아요 통계 무효화
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.contents.likesStats(contentId)
+      });
+      // 콘텐츠 목록 무효화
       queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
       queryClient.invalidateQueries({ queryKey: queryKeys.feeds.lists() });
+      // 내 좋아요 목록 무효화
       queryClient.invalidateQueries({ queryKey: queryKeys.interactions.myLikes() });
     },
   });
@@ -42,8 +84,35 @@ export const useUnlikeContent = () => {
 export const useContentLikeStats = (contentId: string) => {
   return useQuery({
     queryKey: queryKeys.contents.likesStats(contentId),
-    queryFn: () => InteractionsService.getContentLikeStatsContentsContentIdLikesStatsGet(contentId),
+    queryFn: () => {
+      // API 호출 디버깅
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔄 [useContentLikeStats] API 호출:', {
+          contentId,
+          endpoint: `/contents/${contentId}/likes/stats`,
+          method: 'GET'
+        });
+      }
+      
+      return InteractionsService.getContentLikeStatsContentsContentIdLikesStatsGet(contentId);
+    },
     enabled: !!contentId,
+    retry: (failureCount, error) => {
+      // 404 에러는 재시도하지 않음
+      if (error && 'status' in error && error.status === 404) {
+        return false;
+      }
+      return failureCount < 3;
+    },
+    onError: (error) => {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('❌ [useContentLikeStats] API 에러:', {
+          contentId,
+          error: error.message || error,
+          status: 'status' in error ? error.status : 'unknown'
+        });
+      }
+    }
   });
 };
 
@@ -61,7 +130,7 @@ export const useSubscribeToChannel = () => {
 
   return useMutation({
     mutationFn: (channelId: string) =>
-      InteractionsService.createSubscriptionSubscriptionsPost({ channel_id: channelId }),
+      InteractionsService.createChannelSubscriptionChannelsChannelIdSubscribePost(channelId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.interactions.mySubscriptions() });
       queryClient.invalidateQueries({ queryKey: queryKeys.channels.lists() });
@@ -74,7 +143,7 @@ export const useUnsubscribeFromChannel = () => {
 
   return useMutation({
     mutationFn: (channelId: string) =>
-      InteractionsService.removeSubscriptionSubscriptionsChannelIdDelete(channelId),
+      InteractionsService.removeChannelSubscriptionChannelsChannelIdSubscribeDelete(channelId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.interactions.mySubscriptions() });
       queryClient.invalidateQueries({ queryKey: queryKeys.channels.lists() });
@@ -127,6 +196,53 @@ export const useCreateNotification = () => {
     mutationFn: InteractionsService.createNotificationAdminAdminNotificationsPost,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.interactions.myNotifications() });
+    },
+  });
+};
+
+// Channel Likes
+export const useChannelLikeStats = (channelId: string) => {
+  return useQuery({
+    queryKey: queryKeys.channels.likeStats(channelId),
+    queryFn: () => InteractionsService.getChannelLikeStatsEndpointChannelsChannelIdLikesStatsGet(channelId),
+    enabled: !!channelId,
+  });
+};
+
+export const useLikeChannel = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (channelId: string) =>
+      InteractionsService.createChannelLikeChannelsChannelIdLikePost(channelId),
+    onSuccess: (_, channelId) => {
+      // 채널 좋아요 통계 무효화
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.channels.likeStats(channelId)
+      });
+      // 채널 목록 무효화 (좋아요 상태 반영)
+      queryClient.invalidateQueries({ queryKey: queryKeys.channels.lists() });
+      // 내 좋아요 목록 무효화
+      queryClient.invalidateQueries({ queryKey: queryKeys.interactions.myLikes() });
+    },
+  });
+};
+
+export const useUnlikeChannel = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (channelId: string) =>
+      InteractionsService.removeChannelLikeChannelsChannelIdLikeDelete(channelId),
+    onSuccess: (_, channelId) => {
+      // 채널 좋아요 통계 무효화
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.channels.likeStats(channelId)
+      });
+      // 채널 목록 무효화 (좋아요 상태 반영)
+      queryClient.invalidateQueries({ queryKey: queryKeys.channels.lists() });
+      // 내 좋아요 목록 무효화
+      queryClient.invalidateQueries({ queryKey: queryKeys.interactions.myLikes() });
     },
   });
 };

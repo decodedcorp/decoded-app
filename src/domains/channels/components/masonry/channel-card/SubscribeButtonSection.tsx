@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 interface SubscribeButtonSectionProps {
   onSubscribe?: (isSubscribed: boolean) => void;
+  initialIsSubscribed?: boolean;
   extractedColor?: {
     primary: { rgb: string; hex: string; hsl: string };
     vibrant: { rgb: string; hex: string; hsl: string };
@@ -11,66 +12,78 @@ interface SubscribeButtonSectionProps {
   } | null;
 }
 
-const SubscribeButtonSection: React.FC<SubscribeButtonSectionProps> = ({
+export const SubscribeButtonSection: React.FC<SubscribeButtonSectionProps> = ({
   onSubscribe,
+  initialIsSubscribed = false,
   extractedColor,
 }) => {
-  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(initialIsSubscribed);
 
-  const handleSubscribe = () => {
-    const newState = !isSubscribed;
-    setIsSubscribed(newState);
-    onSubscribe?.(newState);
-  };
+  useEffect(() => {
+    setIsSubscribed(initialIsSubscribed);
+  }, [initialIsSubscribed]);
 
-  // Enhanced dynamic button style based on extracted colors
-  const buttonStyle = isSubscribed && extractedColor
-    ? {
-        // 구독 상태: Vibrant 색상으로 강렬한 효과
-        backgroundColor: `rgba(${extractedColor.vibrant.rgb}, 0.25)`,
-        borderColor: `rgba(${extractedColor.vibrant.rgb}, 0.6)`,
-        color: 'white',
-        // 강화된 그림자 효과
-        boxShadow: `
-          0 4px 12px -2px rgba(${extractedColor.vibrant.rgb}, 0.4),
-          0 2px 6px -1px rgba(${extractedColor.vibrant.rgb}, 0.2),
-          inset 0 1px 0 rgba(255, 255, 255, 0.1)
-        `,
-        // 호버 시 더 강한 그림자
-        '--hover-shadow': `
-          0 6px 16px -3px rgba(${extractedColor.vibrant.rgb}, 0.5),
-          0 3px 8px -1px rgba(${extractedColor.vibrant.rgb}, 0.3),
-          inset 0 1px 0 rgba(255, 255, 255, 0.15)
-        `,
+  const handleClick = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      // 모든 이벤트 전파 중단
+      event.stopPropagation();
+      event.preventDefault();
+      event.nativeEvent.stopImmediatePropagation();
+
+      console.log('🔴 SubscribeButton CLICKED!');
+      console.log('🔴 Event details:', {
+        type: event.type,
+        target: event.target,
+        currentTarget: event.currentTarget,
+        isPropagationStopped: event.isPropagationStopped(),
+        defaultPrevented: event.defaultPrevented,
+      });
+
+      const newState = !isSubscribed;
+      console.log('🔴 Changing subscription from', isSubscribed, 'to', newState);
+
+      // 상태 업데이트
+      setIsSubscribed(newState);
+
+      // 콜백 호출
+      if (onSubscribe) {
+        console.log('🔴 Calling onSubscribe with:', newState);
+        try {
+          onSubscribe(newState);
+          console.log('🔴 onSubscribe completed successfully');
+        } catch (error) {
+          console.error('🔴 Error in onSubscribe:', error);
+        }
+      } else {
+        console.warn('🔴 No onSubscribe callback provided');
       }
-    : extractedColor
-    ? {
-        // 기본 상태: Muted 색상으로 자연스러운 그림자
-        boxShadow: `
-          0 2px 8px -1px rgba(${extractedColor.muted.rgb}, 0.2),
-          0 1px 4px -1px rgba(${extractedColor.muted.rgb}, 0.1)
-        `,
-        // 호버 시 Primary 색상으로 강화
-        '--hover-shadow': `
-          0 4px 12px -2px rgba(${extractedColor.primary.rgb}, 0.3),
-          0 2px 6px -1px rgba(${extractedColor.primary.rgb}, 0.2)
-        `,
-      }
-    : {};
+    },
+    [isSubscribed, onSubscribe],
+  );
 
   return (
-    <button
-      onClick={handleSubscribe}
-      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 backdrop-blur-sm hover:scale-105 ${
-        isSubscribed
-          ? 'border hover:shadow-[var(--hover-shadow,0_6px_16px_-3px_rgba(0,0,0,0.3))]'
-          : 'bg-white text-gray-900 hover:bg-white/95 hover:shadow-[var(--hover-shadow,0_4px_12px_-2px_rgba(0,0,0,0.2))]'
-      }`}
-      style={buttonStyle}
+    <div
+      className="subscribe-button-wrapper"
+      style={{
+        position: 'relative',
+        zIndex: 9999,
+        pointerEvents: 'auto',
+      }}
     >
-      {isSubscribed ? 'Subscribed' : 'Subscribe'}
-    </button>
+      <button
+        onClick={handleClick}
+        type="button"
+        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+        style={{
+          position: 'relative',
+          zIndex: 10000,
+          pointerEvents: 'auto',
+        }}
+        data-testid="subscribe-button"
+        data-subscribed={isSubscribed}
+      >
+        {isSubscribed ? 'Subscribed' : 'Subscribe'}
+      </button>
+    </div>
   );
 };
-
-export default SubscribeButtonSection;

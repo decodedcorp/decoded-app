@@ -11,52 +11,52 @@ interface RecommendedSectionProps {
 }
 
 // Mock recommended channels data
-const mockRecommendedChannels: ChannelResponse[] = [
-  {
-    id: 'rec-1',
-    name: '테크 인사이더',
-    description: '최신 기술 트렌드와 스타트업 생태계 분석',
-    owner_id: 'system',
-    content_count: 45,
-    subscriber_count: 1200,
-    thumbnail_url: null,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 'rec-2',
-    name: '디자인 모멘텀',
-    description: 'UI/UX 트렌드와 창의적 영감을 전하는 디자인 큐레이션',
-    owner_id: 'system',
-    content_count: 38,
-    subscriber_count: 950,
-    thumbnail_url: null,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 'rec-3',
-    name: '비즈 리더십',
-    description: '성장하는 기업들의 전략과 리더십 인사이트',
-    owner_id: 'system',
-    content_count: 52,
-    subscriber_count: 1500,
-    thumbnail_url: null,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 'rec-4',
-    name: '라이프 큐레이터',
-    description: '일상의 질을 높이는 라이프스타일과 웰빙 콘텐츠',
-    owner_id: 'system',
-    content_count: 29,
-    subscriber_count: 780,
-    thumbnail_url: null,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-];
+// const mockRecommendedChannels: ChannelResponse[] = [
+//   {
+//     id: 'rec-1',
+//     name: '테크 인사이더',
+//     description: '최신 기술 트렌드와 스타트업 생태계 분석',
+//     owner_id: 'system',
+//     content_count: 45,
+//     subscriber_count: 1200,
+//     thumbnail_url: null,
+//     created_at: new Date().toISOString(),
+//     updated_at: new Date().toISOString(),
+//   },
+//   {
+//     id: 'rec-2',
+//     name: '디자인 모멘텀',
+//     description: 'UI/UX 트렌드와 창의적 영감을 전하는 디자인 큐레이션',
+//     owner_id: 'system',
+//     content_count: 38,
+//     subscriber_count: 950,
+//     thumbnail_url: null,
+//     created_at: new Date().toISOString(),
+//     updated_at: new Date().toISOString(),
+//   },
+//   {
+//     id: 'rec-3',
+//     name: '비즈 리더십',
+//     description: '성장하는 기업들의 전략과 리더십 인사이트',
+//     owner_id: 'system',
+//     content_count: 52,
+//     subscriber_count: 1500,
+//     thumbnail_url: null,
+//     created_at: new Date().toISOString(),
+//     updated_at: new Date().toISOString(),
+//   },
+//   {
+//     id: 'rec-4',
+//     name: '라이프 큐레이터',
+//     description: '일상의 질을 높이는 라이프스타일과 웰빙 콘텐츠',
+//     owner_id: 'system',
+//     content_count: 29,
+//     subscriber_count: 780,
+//     thumbnail_url: null,
+//     created_at: new Date().toISOString(),
+//     updated_at: new Date().toISOString(),
+//   },
+// ];
 
 export function RecommendedSection({
   channels,
@@ -64,7 +64,7 @@ export function RecommendedSection({
   className = '',
 }: RecommendedSectionProps) {
   // Always use mock data for recommendations
-  const recommendedChannels = mockRecommendedChannels;
+  const recommendedChannels = channels;
 
   return (
     <section className={`mb-16 ${className}`}>

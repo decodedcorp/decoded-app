@@ -97,6 +97,7 @@ export const useCreateChannel = () => {
         name: data.name?.trim(),
         description: data.description?.trim() || null,
         thumbnail_base64: data.thumbnail_base64 || null,
+        banner_base64: data.banner_base64 || null,
       };
 
       // 필수 필드 검증
@@ -208,37 +209,7 @@ export const useUpdateChannelThumbnail = () => {
   );
 };
 
-export const useAddChannelManagers = () => {
-  const queryClient = useQueryClient();
-
-  return useSimpleToastMutation(
-    ({ channelId, data }: { channelId: string; data: any }) =>
-      ChannelsService.addManagersChannelsChannelIdManagersPost(channelId, data),
-    {
-      actionName: 'Add managers',
-      toastId: 'add-channel-managers',
-      onSuccess: (_, { channelId }) => {
-        queryClient.invalidateQueries({ queryKey: queryKeys.channels.detail(channelId) });
-      },
-    },
-  );
-};
-
-export const useRemoveChannelManagers = () => {
-  const queryClient = useQueryClient();
-
-  return useSimpleToastMutation(
-    ({ channelId, data }: { channelId: string; data: any }) =>
-      ChannelsService.removeManagersChannelsChannelIdManagersDelete(channelId, data),
-    {
-      actionName: 'Remove managers',
-      toastId: 'remove-channel-managers',
-      onSuccess: (_, { channelId }) => {
-        queryClient.invalidateQueries({ queryKey: queryKeys.channels.detail(channelId) });
-      },
-    },
-  );
-};
+// Manager methods removed - not available in ChannelsService
 
 export const useInfiniteChannels = (params?: {
   limit?: number;

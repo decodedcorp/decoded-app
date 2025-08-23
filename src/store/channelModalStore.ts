@@ -6,11 +6,14 @@ export interface ChannelData {
   description?: string | null;
   owner_id: string;
   thumbnail_url?: string | null;
+  banner_url?: string | null;
   subscriber_count?: number;
   content_count?: number;
   created_at?: string;
   updated_at?: string | null;
   is_subscribed?: boolean;
+  is_owner?: boolean;
+  is_manager?: boolean;
 }
 
 interface ChannelModalState {

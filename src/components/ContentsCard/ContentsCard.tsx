@@ -2,6 +2,8 @@
 
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useImageColor } from '@/domains/main/hooks/useImageColor';
+import { HeartButton } from '@/components/ui/HeartButton';
+import { useContentLike } from '@/domains/interactions/hooks/useContentLike';
 
 // ContentsCard Props 인터페이스
 export interface ContentsCardProps {
@@ -16,6 +18,7 @@ export interface ContentsCardProps {
       };
     };
     type?: string;
+    contentId?: string; // 좋아요 기능을 위한 콘텐츠 ID (id와 동일하지만 명시적으로)
   };
   isMoving?: boolean;
   onCardClick?: (card: any) => void;
@@ -24,6 +27,7 @@ export interface ContentsCardProps {
   uniqueId: string;
   gridIndex: number;
   className?: string;
+  showLikeButton?: boolean; // 좋아요 버튼 표시 여부
 }
 
 // 블러 오버레이 컴포넌트
@@ -44,6 +48,7 @@ export const ContentsCard = memo(
     uniqueId,
     gridIndex,
     className = '',
+    showLikeButton = true,
   }: ContentsCardProps) => {
     // 안전장치: card prop이 undefined인지 확인
     if (!card) {
@@ -67,6 +72,29 @@ export const ContentsCard = memo(
     const { extractedColor, isExtracting, extractFromImgEl } = useImageColor();
     const [hasProcessedColor, setHasProcessedColor] = useState(false);
     const imgRef = useRef<HTMLImageElement>(null);
+
+    // 좋아요 기능 (콘텐츠 ID가 있고 showLikeButton이 true일 때만)
+    const contentId = card.contentId || card.id; // contentId가 없으면 카드 id 사용
+    const shouldShowLike = showLikeButton && contentId;
+    
+    // 디버깅: 콘텐츠 ID 형식 확인
+    if (process.env.NODE_ENV === 'development' && contentId) {
+      const isValidFormat = /^[a-f\d]{24}$/i.test(contentId);
+      if (!isValidFormat) {
+        console.warn('Invalid content ID format detected:', {
+          contentId,
+          cardId: card.id,
+          cardContentId: card.contentId,
+          cardTitle: card.title
+        });
+      }
+    }
+    const { 
+      isLiked, 
+      likeCount, 
+      toggleLike, 
+      isLoading: isLikeLoading 
+    } = useContentLike(contentId);
 
     // 색상 추출 콜백 (메모이제이션으로 성능 최적화)
     // isMoving 중에는 색상 추출을 방지하여 성능 향상
@@ -290,6 +318,20 @@ export const ContentsCard = memo(
           }}
         />
 
+        {/* 좋아요 버튼 - 상단 우측 */}
+        {shouldShowLike && (
+          <div className="absolute top-3 right-3 z-20">
+            <HeartButton
+              isLiked={isLiked}
+              likeCount={likeCount}
+              onLike={toggleLike}
+              size="sm"
+              showCount={false}
+              isLoading={isLikeLoading}
+            />
+          </div>
+        )}
+
         {/* 동적 그라디언트 오버레이 */}
         <div className="absolute inset-0">
           {/* Primary gradient */}
@@ -372,11 +414,13 @@ export const ContentsCard = memo(
   (prevProps, nextProps) => {
     return (
       prevProps.card.id === nextProps.card.id &&
+      prevProps.card.contentId === nextProps.card.contentId &&
       prevProps.isMoving === nextProps.isMoving &&
       prevProps.isSelected === nextProps.isSelected &&
       prevProps.isBlurred === nextProps.isBlurred &&
       prevProps.uniqueId === nextProps.uniqueId &&
-      prevProps.gridIndex === nextProps.gridIndex
+      prevProps.gridIndex === nextProps.gridIndex &&
+      prevProps.showLikeButton === nextProps.showLikeButton
     );
   },
 );

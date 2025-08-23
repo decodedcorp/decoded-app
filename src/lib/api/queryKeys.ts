@@ -25,6 +25,9 @@ export const queryKeys = {
     details: () => [...queryKeys.channels.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.channels.details(), id] as const,
     stats: (id: string) => [...queryKeys.channels.detail(id), 'stats'] as const,
+    // Likes related queries
+    likes: (id: string) => [...queryKeys.channels.detail(id), 'likes'] as const,
+    likeStats: (id: string) => [...queryKeys.channels.likes(id), 'stats'] as const,
     // Mutation states
     mutations: () => [...queryKeys.channels.all, 'mutations'] as const,
     create: () => [...queryKeys.channels.mutations(), 'create'] as const,

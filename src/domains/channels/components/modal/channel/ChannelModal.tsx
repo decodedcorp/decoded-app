@@ -17,6 +17,7 @@ import { BaseModal } from '../base/BaseModal';
 import { ChannelModalContainer } from '../base/ChannelModalContainer';
 import { ContentUploadModal } from '../content-upload/ContentUploadModal';
 import { useContentModalStore, selectIsContentModalOpen } from '@/store/contentModalStore';
+import { useUser } from '@/domains/auth/hooks/useAuth';
 
 import { ChannelModalHeader } from './ChannelModalHeader';
 import { ChannelModalContent } from './ChannelModalContent';
@@ -30,6 +31,9 @@ export function ChannelModal() {
 
   // 콘텐츠 모달 상태 확인
   const isContentModalOpen = useContentModalStore(selectIsContentModalOpen);
+
+  // 현재 사용자 정보 가져오기
+  const { user } = useUser();
 
   // 디버깅을 위한 로그
   React.useEffect(() => {
@@ -131,6 +135,7 @@ export function ChannelModal() {
                 // TODO: Implement unsubscribe functionality
               }}
               isSubscribeLoading={false}
+              currentUserId={user?.doc_id}
             />
           ) : (
             <ChannelModalSkeleton onClose={closeModal} />
