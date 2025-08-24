@@ -2,11 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ChannelLikeListResponse } from '../models/ChannelLikeListResponse';
-import type { ChannelLikeResponse } from '../models/ChannelLikeResponse';
-import type { ChannelLikeStatsResponse } from '../models/ChannelLikeStatsResponse';
+import type { Body_invalidate_content_caches_admin_cache_invalidate_post } from '../models/Body_invalidate_content_caches_admin_cache_invalidate_post';
+import type { Body_trigger_manual_aggregation_admin_background_tasks_aggregate_post } from '../models/Body_trigger_manual_aggregation_admin_background_tasks_aggregate_post';
 import type { ChannelSubscriptionStatsResponse } from '../models/ChannelSubscriptionStatsResponse';
 import type { ContentLikeStatsResponse } from '../models/ContentLikeStatsResponse';
+import type { EnhancedContentInteractionStats } from '../models/EnhancedContentInteractionStats';
 import type { InteractionStatsResponse } from '../models/InteractionStatsResponse';
 import type { LikeListResponse } from '../models/LikeListResponse';
 import type { LikeResponse } from '../models/LikeResponse';
@@ -14,8 +14,14 @@ import type { NotificationCreateRequest } from '../models/NotificationCreateRequ
 import type { NotificationListResponse } from '../models/NotificationListResponse';
 import type { NotificationMarkReadRequest } from '../models/NotificationMarkReadRequest';
 import type { NotificationResponse } from '../models/NotificationResponse';
+import type { ShareCreateRequest } from '../models/ShareCreateRequest';
+import type { ShareResponse } from '../models/ShareResponse';
+import type { ShareStatsResponse } from '../models/ShareStatsResponse';
 import type { SubscriptionListResponse } from '../models/SubscriptionListResponse';
 import type { SubscriptionResponse } from '../models/SubscriptionResponse';
+import type { ViewCreateRequest } from '../models/ViewCreateRequest';
+import type { ViewResponse } from '../models/ViewResponse';
+import type { ViewStatsResponse } from '../models/ViewStatsResponse';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
@@ -364,12 +370,12 @@ export class InteractionsService {
      * Remove Content Like
      * Remove content like
      * @param contentId
-     * @returns void
+     * @returns any Successful Response
      * @throws ApiError
      */
     public static removeContentLikeContentsContentIdLikeDelete(
         contentId: string,
-    ): CancelablePromise<void> {
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/contents/{content_id}/like',
@@ -385,201 +391,17 @@ export class InteractionsService {
      * Remove Content Like
      * Remove content like
      * @param contentId
-     * @returns void
+     * @returns any Successful Response
      * @throws ApiError
      */
     public static removeContentLikeContentsContentIdLikeDelete1(
         contentId: string,
-    ): CancelablePromise<void> {
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/contents/{content_id}/like',
             path: {
                 'content_id': contentId,
-            },
-            errors: {
-                422: `Validation Error`,
-            },
-        });
-    }
-    /**
-     * Create Channel Like
-     * Create channel like
-     * @param channelId
-     * @returns ChannelLikeResponse Successful Response
-     * @throws ApiError
-     */
-    public static createChannelLikeChannelsChannelIdLikePost(
-        channelId: string,
-    ): CancelablePromise<ChannelLikeResponse> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/channels/{channel_id}/like',
-            path: {
-                'channel_id': channelId,
-            },
-            errors: {
-                422: `Validation Error`,
-            },
-        });
-    }
-    /**
-     * Create Channel Like
-     * Create channel like
-     * @param channelId
-     * @returns ChannelLikeResponse Successful Response
-     * @throws ApiError
-     */
-    public static createChannelLikeChannelsChannelIdLikePost1(
-        channelId: string,
-    ): CancelablePromise<ChannelLikeResponse> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/channels/{channel_id}/like',
-            path: {
-                'channel_id': channelId,
-            },
-            errors: {
-                422: `Validation Error`,
-            },
-        });
-    }
-    /**
-     * Remove Channel Like
-     * Remove channel like
-     * @param channelId
-     * @returns void
-     * @throws ApiError
-     */
-    public static removeChannelLikeChannelsChannelIdLikeDelete(
-        channelId: string,
-    ): CancelablePromise<void> {
-        return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/channels/{channel_id}/like',
-            path: {
-                'channel_id': channelId,
-            },
-            errors: {
-                422: `Validation Error`,
-            },
-        });
-    }
-    /**
-     * Remove Channel Like
-     * Remove channel like
-     * @param channelId
-     * @returns void
-     * @throws ApiError
-     */
-    public static removeChannelLikeChannelsChannelIdLikeDelete1(
-        channelId: string,
-    ): CancelablePromise<void> {
-        return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/channels/{channel_id}/like',
-            path: {
-                'channel_id': channelId,
-            },
-            errors: {
-                422: `Validation Error`,
-            },
-        });
-    }
-    /**
-     * Get Channel Likes
-     * Get channel likes list (public endpoint)
-     * @param channelId
-     * @param limit
-     * @param skip
-     * @returns ChannelLikeListResponse Successful Response
-     * @throws ApiError
-     */
-    public static getChannelLikesChannelsChannelIdLikesGet(
-        channelId: string,
-        limit: number = 50,
-        skip?: number,
-    ): CancelablePromise<ChannelLikeListResponse> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/channels/{channel_id}/likes',
-            path: {
-                'channel_id': channelId,
-            },
-            query: {
-                'limit': limit,
-                'skip': skip,
-            },
-            errors: {
-                422: `Validation Error`,
-            },
-        });
-    }
-    /**
-     * Get Channel Likes
-     * Get channel likes list (public endpoint)
-     * @param channelId
-     * @param limit
-     * @param skip
-     * @returns ChannelLikeListResponse Successful Response
-     * @throws ApiError
-     */
-    public static getChannelLikesChannelsChannelIdLikesGet1(
-        channelId: string,
-        limit: number = 50,
-        skip?: number,
-    ): CancelablePromise<ChannelLikeListResponse> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/channels/{channel_id}/likes',
-            path: {
-                'channel_id': channelId,
-            },
-            query: {
-                'limit': limit,
-                'skip': skip,
-            },
-            errors: {
-                422: `Validation Error`,
-            },
-        });
-    }
-    /**
-     * Get Channel Like Stats Endpoint
-     * Get like statistics for channel (public endpoint with optional user context)
-     * @param channelId
-     * @returns ChannelLikeStatsResponse Successful Response
-     * @throws ApiError
-     */
-    public static getChannelLikeStatsEndpointChannelsChannelIdLikesStatsGet(
-        channelId: string,
-    ): CancelablePromise<ChannelLikeStatsResponse> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/channels/{channel_id}/likes/stats',
-            path: {
-                'channel_id': channelId,
-            },
-            errors: {
-                422: `Validation Error`,
-            },
-        });
-    }
-    /**
-     * Get Channel Like Stats Endpoint
-     * Get like statistics for channel (public endpoint with optional user context)
-     * @param channelId
-     * @returns ChannelLikeStatsResponse Successful Response
-     * @throws ApiError
-     */
-    public static getChannelLikeStatsEndpointChannelsChannelIdLikesStatsGet1(
-        channelId: string,
-    ): CancelablePromise<ChannelLikeStatsResponse> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/channels/{channel_id}/likes/stats',
-            path: {
-                'channel_id': channelId,
             },
             errors: {
                 422: `Validation Error`,
@@ -632,12 +454,12 @@ export class InteractionsService {
      * Remove Channel Subscription
      * Remove channel subscription
      * @param channelId
-     * @returns void
+     * @returns any Successful Response
      * @throws ApiError
      */
     public static removeChannelSubscriptionChannelsChannelIdSubscribeDelete(
         channelId: string,
-    ): CancelablePromise<void> {
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/channels/{channel_id}/subscribe',
@@ -653,12 +475,12 @@ export class InteractionsService {
      * Remove Channel Subscription
      * Remove channel subscription
      * @param channelId
-     * @returns void
+     * @returns any Successful Response
      * @throws ApiError
      */
     public static removeChannelSubscriptionChannelsChannelIdSubscribeDelete1(
         channelId: string,
-    ): CancelablePromise<void> {
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/channels/{channel_id}/subscribe',
@@ -703,6 +525,508 @@ export class InteractionsService {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/admin/notifications',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Create View
+     * Record a view for content (anonymous or authenticated)
+     * @param contentId
+     * @param requestBody
+     * @returns ViewResponse Successful Response
+     * @throws ApiError
+     */
+    public static createViewContentContentIdViewsPost(
+        contentId: string,
+        requestBody: ViewCreateRequest,
+    ): CancelablePromise<ViewResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/content/{content_id}/views',
+            path: {
+                'content_id': contentId,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Create View
+     * Record a view for content (anonymous or authenticated)
+     * @param contentId
+     * @param requestBody
+     * @returns ViewResponse Successful Response
+     * @throws ApiError
+     */
+    public static createViewContentContentIdViewsPost1(
+        contentId: string,
+        requestBody: ViewCreateRequest,
+    ): CancelablePromise<ViewResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/content/{content_id}/views',
+            path: {
+                'content_id': contentId,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Get View Stats
+     * Get view statistics for content
+     * @param contentId
+     * @returns ViewStatsResponse Successful Response
+     * @throws ApiError
+     */
+    public static getViewStatsContentContentIdViewsStatsGet(
+        contentId: string,
+    ): CancelablePromise<ViewStatsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/content/{content_id}/views/stats',
+            path: {
+                'content_id': contentId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Get View Stats
+     * Get view statistics for content
+     * @param contentId
+     * @returns ViewStatsResponse Successful Response
+     * @throws ApiError
+     */
+    public static getViewStatsContentContentIdViewsStatsGet1(
+        contentId: string,
+    ): CancelablePromise<ViewStatsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/content/{content_id}/views/stats',
+            path: {
+                'content_id': contentId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Create Share
+     * Share content to a platform
+     * @param contentId
+     * @param requestBody
+     * @returns ShareResponse Successful Response
+     * @throws ApiError
+     */
+    public static createShareContentContentIdSharesPost(
+        contentId: string,
+        requestBody: ShareCreateRequest,
+    ): CancelablePromise<ShareResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/content/{content_id}/shares',
+            path: {
+                'content_id': contentId,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Create Share
+     * Share content to a platform
+     * @param contentId
+     * @param requestBody
+     * @returns ShareResponse Successful Response
+     * @throws ApiError
+     */
+    public static createShareContentContentIdSharesPost1(
+        contentId: string,
+        requestBody: ShareCreateRequest,
+    ): CancelablePromise<ShareResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/content/{content_id}/shares',
+            path: {
+                'content_id': contentId,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Get Share Stats
+     * Get share statistics for content
+     * @param contentId
+     * @returns ShareStatsResponse Successful Response
+     * @throws ApiError
+     */
+    public static getShareStatsContentContentIdSharesStatsGet(
+        contentId: string,
+    ): CancelablePromise<ShareStatsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/content/{content_id}/shares/stats',
+            path: {
+                'content_id': contentId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Get Share Stats
+     * Get share statistics for content
+     * @param contentId
+     * @returns ShareStatsResponse Successful Response
+     * @throws ApiError
+     */
+    public static getShareStatsContentContentIdSharesStatsGet1(
+        contentId: string,
+    ): CancelablePromise<ShareStatsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/content/{content_id}/shares/stats',
+            path: {
+                'content_id': contentId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Get Enhanced Content Stats
+     * Get enhanced interaction statistics for content including views and shares
+     * @param contentId
+     * @returns EnhancedContentInteractionStats Successful Response
+     * @throws ApiError
+     */
+    public static getEnhancedContentStatsContentContentIdStatsEnhancedGet(
+        contentId: string,
+    ): CancelablePromise<EnhancedContentInteractionStats> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/content/{content_id}/stats/enhanced',
+            path: {
+                'content_id': contentId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Get Enhanced Content Stats
+     * Get enhanced interaction statistics for content including views and shares
+     * @param contentId
+     * @returns EnhancedContentInteractionStats Successful Response
+     * @throws ApiError
+     */
+    public static getEnhancedContentStatsContentContentIdStatsEnhancedGet1(
+        contentId: string,
+    ): CancelablePromise<EnhancedContentInteractionStats> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/content/{content_id}/stats/enhanced',
+            path: {
+                'content_id': contentId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Get Performance Stats
+     * Get performance statistics for interactions system (admin only)
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static getPerformanceStatsAdminPerformanceStatsGet(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/admin/performance/stats',
+        });
+    }
+    /**
+     * Get Performance Stats
+     * Get performance statistics for interactions system (admin only)
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static getPerformanceStatsAdminPerformanceStatsGet1(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/admin/performance/stats',
+        });
+    }
+    /**
+     * Trigger Full Optimization
+     * Trigger full performance optimization cycle (admin only)
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static triggerFullOptimizationAdminPerformanceOptimizePost(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/admin/performance/optimize',
+        });
+    }
+    /**
+     * Trigger Full Optimization
+     * Trigger full performance optimization cycle (admin only)
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static triggerFullOptimizationAdminPerformanceOptimizePost1(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/admin/performance/optimize',
+        });
+    }
+    /**
+     * Trigger Cache Warmup
+     * Trigger cache warmup for trending content (admin only)
+     * @param limit
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static triggerCacheWarmupAdminCacheWarmupPost(
+        limit: number = 100,
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/admin/cache/warmup',
+            query: {
+                'limit': limit,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Trigger Cache Warmup
+     * Trigger cache warmup for trending content (admin only)
+     * @param limit
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static triggerCacheWarmupAdminCacheWarmupPost1(
+        limit: number = 100,
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/admin/cache/warmup',
+            query: {
+                'limit': limit,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Invalidate Content Caches
+     * Invalidate caches for specific content items (admin only)
+     * @param requestBody
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static invalidateContentCachesAdminCacheInvalidatePost(
+        requestBody: Body_invalidate_content_caches_admin_cache_invalidate_post,
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/admin/cache/invalidate',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Invalidate Content Caches
+     * Invalidate caches for specific content items (admin only)
+     * @param requestBody
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static invalidateContentCachesAdminCacheInvalidatePost1(
+        requestBody: Body_invalidate_content_caches_admin_cache_invalidate_post,
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/admin/cache/invalidate',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Clean Stale Cache
+     * Clean stale cache entries (admin only)
+     * @param maxAgeHours
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static cleanStaleCacheAdminCacheStaleDelete(
+        maxAgeHours: number = 24,
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/admin/cache/stale',
+            query: {
+                'max_age_hours': maxAgeHours,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Clean Stale Cache
+     * Clean stale cache entries (admin only)
+     * @param maxAgeHours
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static cleanStaleCacheAdminCacheStaleDelete1(
+        maxAgeHours: number = 24,
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/admin/cache/stale',
+            query: {
+                'max_age_hours': maxAgeHours,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Get Background Tasks Status
+     * Get status of all background tasks (admin only)
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static getBackgroundTasksStatusAdminBackgroundTasksStatusGet(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/admin/background-tasks/status',
+        });
+    }
+    /**
+     * Get Background Tasks Status
+     * Get status of all background tasks (admin only)
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static getBackgroundTasksStatusAdminBackgroundTasksStatusGet1(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/admin/background-tasks/status',
+        });
+    }
+    /**
+     * Trigger Manual Sync
+     * Trigger manual cache sync (admin only)
+     * @param requestBody
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static triggerManualSyncAdminBackgroundTasksSyncPost(
+        requestBody?: (Array<string> | null),
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/admin/background-tasks/sync',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Trigger Manual Sync
+     * Trigger manual cache sync (admin only)
+     * @param requestBody
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static triggerManualSyncAdminBackgroundTasksSyncPost1(
+        requestBody?: (Array<string> | null),
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/admin/background-tasks/sync',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Trigger Manual Aggregation
+     * Trigger manual aggregation (admin only)
+     * @param requestBody
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static triggerManualAggregationAdminBackgroundTasksAggregatePost(
+        requestBody?: Body_trigger_manual_aggregation_admin_background_tasks_aggregate_post,
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/admin/background-tasks/aggregate',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Trigger Manual Aggregation
+     * Trigger manual aggregation (admin only)
+     * @param requestBody
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static triggerManualAggregationAdminBackgroundTasksAggregatePost1(
+        requestBody?: Body_trigger_manual_aggregation_admin_background_tasks_aggregate_post,
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/admin/background-tasks/aggregate',
             body: requestBody,
             mediaType: 'application/json',
             errors: {

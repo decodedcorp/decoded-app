@@ -11,11 +11,9 @@ import { request as __request } from '../core/request';
 export class InvitationsService {
     /**
      * List Invitations
-     * List invitations with pagination and filtering
+     * List current user's invitations (sent and received)
      * @param page
      * @param limit
-     * @param channelId
-     * @param inviteeUserId
      * @param includeExpired
      * @returns InvitationListResponse Successful Response
      * @throws ApiError
@@ -23,8 +21,6 @@ export class InvitationsService {
     public static listInvitationsInvitationsGet(
         page: number = 1,
         limit: number = 20,
-        channelId?: string,
-        inviteeUserId?: string,
         includeExpired: boolean = false,
     ): CancelablePromise<InvitationListResponse> {
         return __request(OpenAPI, {
@@ -33,8 +29,6 @@ export class InvitationsService {
             query: {
                 'page': page,
                 'limit': limit,
-                'channel_id': channelId,
-                'invitee_user_id': inviteeUserId,
                 'include_expired': includeExpired,
             },
             errors: {

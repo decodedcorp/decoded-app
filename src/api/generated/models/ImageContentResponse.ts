@@ -9,6 +9,7 @@ export type ImageContentResponse = {
     provider_id: string;
     url: string;
     status: string;
+    description?: (string | null);
     likes?: number;
     tagged_items?: Array<TaggedItemResponse>;
     created_at?: (string | null);

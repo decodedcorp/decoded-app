@@ -5,6 +5,7 @@
 import type { TaggedItemCreate } from './TaggedItemCreate';
 export type ImageContentUpdate = {
     url?: (string | null);
+    description?: (string | null);
     tagged_items?: (Array<TaggedItemCreate> | null);
 };
 

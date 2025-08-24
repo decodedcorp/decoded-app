@@ -18,7 +18,7 @@ export type FeedItemData = {
     /**
      * Content title
      */
-    title: string;
+    title?: (string | null);
     /**
      * Content description
      */
@@ -27,6 +27,10 @@ export type FeedItemData = {
      * Thumbnail URL
      */
     thumbnail_url?: (string | null);
+    /**
+     * Content URL
+     */
+    url: string;
     /**
      * Creation timestamp
      */
@@ -47,5 +51,9 @@ export type FeedItemData = {
      * Channel information
      */
     channel: Record<string, any>;
+    /**
+     * Type-specific content data
+     */
+    content_data: Record<string, any>;
 };
 

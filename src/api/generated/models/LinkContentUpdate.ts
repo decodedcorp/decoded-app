@@ -4,6 +4,7 @@
 /* eslint-disable */
 export type LinkContentUpdate = {
     url?: (string | null);
+    description?: (string | null);
     category?: (string | null);
 };
 

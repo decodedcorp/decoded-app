@@ -10,6 +10,7 @@ export type LinkContentResponse = {
     provider_id: string;
     url: string;
     status: string;
+    description?: (string | null);
     category?: (string | null);
     link_preview_metadata?: (LinkPreviewMetadataResponse | null);
     ai_gen_metadata?: (AIGenMetadataResponse | null);
