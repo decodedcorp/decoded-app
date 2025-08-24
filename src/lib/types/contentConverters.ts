@@ -207,6 +207,29 @@ const convertLinkContent = (content: UnifiedContent, baseItem: ContentItem): Con
 };
 
 /**
+ * Helper function to extract title based on content type
+ */
+const getContentTitle = (content: UnifiedContent): string => {
+  // Link content - check link preview metadata first
+  if (content.linkContent?.link_preview_metadata?.title) {
+    return content.linkContent.link_preview_metadata.title;
+  }
+  
+  // Video content - title might be directly available
+  if (content.title && content.title !== 'Untitled') {
+    return content.title;
+  }
+  
+  // AI generated metadata
+  if (content.linkContent?.ai_gen_metadata?.title) {
+    return content.linkContent.ai_gen_metadata.title;
+  }
+  
+  // Fallback
+  return content.title || 'Untitled';
+};
+
+/**
  * UnifiedContent를 ContentItem으로 변환
  */
 export const convertToContentItem = (content: UnifiedContent): ContentItem => {
@@ -221,7 +244,7 @@ export const convertToContentItem = (content: UnifiedContent): ContentItem => {
   const baseItem: ContentItem = {
     id: content.id,
     type: content.type,
-    title: content.title || 'Untitled',
+    title: getContentTitle(content),
     description: content.description || undefined,
     status: content.status,
   };

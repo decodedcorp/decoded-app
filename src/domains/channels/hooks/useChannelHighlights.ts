@@ -1,6 +1,6 @@
 /**
  * Channel Highlights Hook - API Abstraction Layer
- * 
+ *
  * This hook provides an abstraction layer for channel highlights.
  * Currently uses ContentItem conversion, but can be easily switched
  * to dedicated highlights API in the future.
@@ -9,7 +9,11 @@
 import { useMemo } from 'react';
 import { useChannelContentsSinglePage } from './useChannelContents';
 import { convertContentToHighlights } from '@/lib/utils/highlightConverters';
-import { HighlightItem, HighlightConfig, DEFAULT_HIGHLIGHT_CONFIG } from '@/lib/types/highlightTypes';
+import {
+  HighlightItem,
+  HighlightConfig,
+  DEFAULT_HIGHLIGHT_CONFIG,
+} from '@/lib/types/highlightTypes';
 
 // Feature flag for future API migration
 const USE_HIGHLIGHTS_API = false;
@@ -38,13 +42,13 @@ function useChannelHighlightsAPI(channelId: string): UseChannelHighlightsReturn 
   //   queryFn: () => api.getChannelHighlights(channelId),
   //   enabled: !!channelId
   // });
-  
+
   return {
     highlights: [],
     isLoading: false,
     error: null,
     refetch: () => {},
-    hasHighlights: false
+    hasHighlights: false,
   };
 }
 
@@ -52,59 +56,59 @@ function useChannelHighlightsAPI(channelId: string): UseChannelHighlightsReturn 
  * Current: Convert ContentItems to highlights
  */
 function useChannelHighlightsFromContent(
-  channelId: string, 
-  options: UseChannelHighlightsOptions = {}
+  channelId: string,
+  options: UseChannelHighlightsOptions = {},
 ): UseChannelHighlightsReturn {
   const { enabled = true, config: configOverrides = {} } = options;
-  
+
   const finalConfig: HighlightConfig = {
     ...DEFAULT_HIGHLIGHT_CONFIG,
-    ...configOverrides
+    ...configOverrides,
   };
-  
+
   // Get channel content data
   const {
     data: contentItems,
     isLoading,
     error,
-    refetch
+    refetch,
   } = useChannelContentsSinglePage({
     channelId,
     limit: 25, // Get more items to have better highlight selection
     enabled: enabled && !!channelId,
-    enableSmartPolling: false
+    enableSmartPolling: false,
   });
-  
+
   // Convert content to highlights
   const highlights = useMemo(() => {
     if (!contentItems?.length) return [];
-    
+
     const converted = convertContentToHighlights(contentItems, finalConfig);
-    
+
     // Debug logging in development
     if (process.env.NODE_ENV === 'development') {
       console.log('[useChannelHighlights] Generated highlights:', {
         channelId,
         totalContent: contentItems.length,
         totalHighlights: converted.length,
-        highlights: converted.map(h => ({
+        highlights: converted.map((h) => ({
           title: h.title,
           type: h.type,
           priority: h.priority,
-          badge: h.badge
-        }))
+          badge: h.badge,
+        })),
       });
     }
-    
+
     return converted;
   }, [contentItems, finalConfig, channelId]);
-  
+
   return {
     highlights,
     isLoading,
     error,
     refetch,
-    hasHighlights: highlights.length > 0
+    hasHighlights: highlights.length > 0,
   };
 }
 
@@ -113,14 +117,10 @@ function useChannelHighlightsFromContent(
  */
 export function useChannelHighlights(
   channelId: string,
-  options: UseChannelHighlightsOptions = {}
+  options: UseChannelHighlightsOptions = {},
 ): UseChannelHighlightsReturn {
   // Switch between implementations based on feature flag
-  if (USE_HIGHLIGHTS_API) {
-    return useChannelHighlightsAPI(channelId);
-  } else {
-    return useChannelHighlightsFromContent(channelId, options);
-  }
+  return useChannelHighlightsAPI(channelId);
 }
 
 /**
@@ -128,9 +128,9 @@ export function useChannelHighlights(
  */
 export function useHasChannelHighlights(channelId: string): boolean {
   const { hasHighlights } = useChannelHighlights(channelId, {
-    config: { maxItems: 1 } // Only check for one highlight
+    config: { maxItems: 1 }, // Only check for one highlight
   });
-  
+
   return hasHighlights;
 }
 

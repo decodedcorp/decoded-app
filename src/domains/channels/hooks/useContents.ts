@@ -32,6 +32,7 @@ export const useCreateLinkContent = () => {
       const requestData = {
         channel_id: data.channel_id,
         url: data.url?.trim(),
+        description: data.description?.trim() || null,
       };
 
       // 필수 필드 검증
@@ -118,6 +119,7 @@ export const useCreateImageContent = () => {
       const requestData = {
         channel_id: data.channel_id,
         base64_img: data.base64_img,
+        description: data.description?.trim() || null,
       };
 
       // 필수 필드 검증
