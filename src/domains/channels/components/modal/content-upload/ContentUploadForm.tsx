@@ -167,9 +167,9 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     //   errors.title = 'Title must be 100 characters or less.';
     // }
 
-    // if (formData.description.trim().length > 500) {
-    //   errors.description = 'Description must be 500 characters or less.';
-    // }
+    if (formData.description && formData.description.trim().length > 500) {
+      errors.description = 'Description must be 500 characters or less.';
+    }
 
     if (formData.type === ContentType.IMAGE && !formData.file) {
       errors.file = 'Please select an image.';
@@ -247,6 +247,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
           const result = await createImageContent.mutateAsync({
             channel_id: submitData.channel_id,
             base64_img: formData.base64_img_url,
+            description: formData.description?.trim() || null,
           });
 
           console.log('Image content created successfully:', result);
@@ -273,6 +274,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
           const result = await createLinkContent.mutateAsync({
             channel_id: submitData.channel_id,
             url: formData.url.trim(),
+            description: formData.description?.trim() || null,
           });
 
           console.log('Link content created successfully:', result);
@@ -522,6 +524,34 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
           </div>
         </div>
       )}
+
+      {/* Description Input - shown for all content types */}
+      <div>
+        <label htmlFor="content-description" className="block text-sm font-medium text-white mb-2">
+          Description
+          <span className="text-zinc-400 font-normal ml-1">(Optional)</span>
+        </label>
+        <textarea
+          id="content-description"
+          value={formData.description || ''}
+          onChange={(e) => handleInputChange('description', e.target.value)}
+          className={`w-full px-4 py-3 bg-zinc-800 border rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-600 focus:border-transparent transition-colors resize-none ${
+            validationErrors.description ? 'border-red-500' : 'border-zinc-700'
+          }`}
+          placeholder="Add a description for your content..."
+          rows={3}
+          maxLength={500}
+          disabled={isLoading || createLinkContent.isPending || createImageContent.isPending}
+        />
+        <div className="flex justify-between items-center mt-1">
+          {validationErrors.description && (
+            <p className="text-sm text-red-400">{validationErrors.description}</p>
+          )}
+          <p className="text-xs text-zinc-500 ml-auto">
+            {(formData.description || '').length}/500
+          </p>
+        </div>
+      </div>
 
       {/* API Error */}
       {(error || storeError || generationError) && (

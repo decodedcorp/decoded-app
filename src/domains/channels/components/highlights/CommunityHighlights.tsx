@@ -1,8 +1,11 @@
 'use client';
 
-import React, { memo, useState, useCallback } from 'react';
-import { useChannelHighlights } from '@/domains/channels/hooks/useChannelHighlights';
+import React, { memo, useState, useCallback, useMemo } from 'react';
+import { useChannelPins } from '@/domains/channels/hooks/useChannelPins';
+import { useContentsByIds } from '@/domains/channels/hooks/useContentsByIds';
 import { HighlightItem } from '@/lib/types/highlightTypes';
+import { UnifiedPinnedItem } from '@/api/generated/models/UnifiedPinnedItem';
+import { ContentItem } from '@/lib/types/content';
 import HighlightCard from './HighlightCard';
 
 interface CommunityHighlightsProps {
@@ -18,7 +21,66 @@ const CommunityHighlights = memo(function CommunityHighlights({
 }: CommunityHighlightsProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
-  const { highlights, isLoading, error, hasHighlights, refetch } = useChannelHighlights(channelId);
+  const { data: pinsData, isLoading: pinsLoading, error: pinsError } = useChannelPins(channelId);
+
+  // Extract content IDs from pins data for batch fetching
+  const contentIds = useMemo(() => {
+    if (!pinsData?.items) return [];
+    return pinsData.items
+      .filter((pin: UnifiedPinnedItem) => pin.type === 'content')
+      .map((pin: UnifiedPinnedItem) => pin.id);
+  }, [pinsData?.items]);
+
+  // Fetch content data for all pinned content items
+  const { 
+    contentMap, 
+    isLoadingAny: contentsLoading, 
+    hasErrors: hasContentErrors 
+  } = useContentsByIds({
+    contentIds,
+    enabled: contentIds.length > 0
+  });
+
+  // Convert UnifiedPinnedItem + ContentItem to HighlightItem format
+  const highlights = useMemo(() => {
+    if (!pinsData?.items) return [];
+    
+    return pinsData.items.map((pin: UnifiedPinnedItem): HighlightItem => {
+      const isContent = pin.type === 'content';
+      const contentItem = isContent ? contentMap.get(pin.id) : null;
+      
+      // Use content data if available, otherwise fallback to pin metadata
+      const title = contentItem?.title || pin.name;
+      const baseDescription = contentItem?.description || 
+        (isContent ? pin.content_metadata?.description : pin.folder_metadata?.description);
+      const imageUrl = contentItem?.imageUrl || 
+        (isContent ? pin.content_metadata?.thumbnail_url : undefined);
+      
+      // Pin note가 있으면 description에 추가
+      const finalDescription = pin.pin_note 
+        ? `${baseDescription ? `${baseDescription}\n\n` : ''}📌 ${pin.pin_note}`
+        : baseDescription;
+      
+      return {
+        id: pin.id,
+        title,
+        description: finalDescription || undefined,
+        imageUrl: imageUrl || undefined,
+        badge: 'Pinned',
+        type: 'recent', // All pinned items treated as recent type
+        date: new Date(pin.pinned_at).toLocaleDateString(),
+        priority: pin.pin_order,
+        clickAction: {
+          type: 'content_modal',
+          data: contentItem || { id: pin.id, type: pin.type, pinNote: pin.pin_note }
+        },
+      };
+    }).sort((a: HighlightItem, b: HighlightItem) => a.priority - b.priority); // Sort by pin_order
+  }, [pinsData?.items, contentMap]);
+
+  const hasHighlights = highlights.length > 0;
+  const isLoading = pinsLoading || contentsLoading;
+  const error = pinsError || (hasContentErrors ? new Error('Failed to load some content data') : null);
 
   const handleItemClick = useCallback(
     (highlight: HighlightItem) => {
@@ -38,8 +100,8 @@ const CommunityHighlights = memo(function CommunityHighlights({
 
   // Don't render if there's an error
   if (error) {
-    if (process.env.NODE_ENV === 'development') {
-      console.error('[CommunityHighlights] Error loading highlights:', error);
+    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+      console.error('[CommunityHighlights] Error loading pins:', error);
     }
     return null;
   }
@@ -113,7 +175,7 @@ const CommunityHighlights = memo(function CommunityHighlights({
           {isLoading ? (
             /* Loading skeleton */
             <div className="flex space-x-4 overflow-x-hidden">
-              {Array.from({ length: 4 }).map((_, index) => (
+              {Array.from({ length: 4 }).map((_: any, index: number) => (
                 <div
                   key={index}
                   className="w-80 h-40 bg-zinc-800/50 border border-zinc-700/50 rounded-xl animate-pulse flex-shrink-0"
@@ -122,7 +184,7 @@ const CommunityHighlights = memo(function CommunityHighlights({
             </div>
           ) : highlights.length > 0 ? (
             <div className="flex space-x-4 overflow-x-auto overflow-y-hidden pb-2 scrollbar-hide">
-              {highlights.map((highlight) => {
+              {highlights.map((highlight: HighlightItem) => {
                 return (
                   <HighlightCard
                     key={highlight.id}

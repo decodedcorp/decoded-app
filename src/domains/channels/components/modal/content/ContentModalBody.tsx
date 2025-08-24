@@ -147,7 +147,7 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
   }
 
   return (
-    <div className="p-8 space-y-8">
+    <div className="p-8 space-y-8 max-h-full overflow-y-auto">
       {/* Main Content Viewer */}
       <div>
         {/* Image Content */}
@@ -233,9 +233,11 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
         {/* Link Content */}
         {content.type === 'link' && (
           <div className="space-y-8">
-            {/* 1. AI Generated Summary - 맨 위 */}
+            {/* 1. AI Generated Summary - 맨 위 (Mobile only) */}
             {content.aiSummary && (
-              <SummarySection title="Summary" summary={content.aiSummary} onClose={onClose} />
+              <div className="block lg:hidden">
+                <SummarySection title="Summary" summary={content.aiSummary} onClose={onClose} />
+              </div>
             )}
 
             {/* 2. Link Preview Card - 중간 (LinkPreview가 있는 경우) */}
@@ -253,22 +255,28 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
               <DefaultContentCard content={content} />
             )}
 
-            {/* 3. Interactive Q&A Section - 아래 */}
+            {/* 3. Interactive Q&A Section - 아래 (Mobile only) */}
             {content.aiQaList && content.aiQaList.length > 0 && (
-              <InteractiveQASection qaList={content.aiQaList} title="Q&A" />
+              <div className="block lg:hidden">
+                <InteractiveQASection qaList={content.aiQaList} title="Q&A" />
+              </div>
             )}
           </div>
         )}
       </div>
 
-      {/* AI Generated Summary for non-link content */}
+      {/* AI Generated Summary for non-link content (Mobile only) */}
       {content.type !== 'link' && content.aiSummary && (
-        <SummarySection title="Summary" summary={content.aiSummary} onClose={onClose} />
+        <div className="block lg:hidden">
+          <SummarySection title="Summary" summary={content.aiSummary} onClose={onClose} />
+        </div>
       )}
 
-      {/* Interactive Q&A Section for non-link content */}
+      {/* Interactive Q&A Section for non-link content (Mobile only) */}
       {content.type !== 'link' && content.aiQaList && content.aiQaList.length > 0 && (
-        <InteractiveQASection qaList={content.aiQaList} title="Q&A" />
+        <div className="block lg:hidden">
+          <InteractiveQASection qaList={content.aiQaList} title="Q&A" />
+        </div>
       )}
 
       {/* Content Metadata */}

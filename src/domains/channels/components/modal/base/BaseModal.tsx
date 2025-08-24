@@ -83,16 +83,19 @@ export function BaseModal({
   }
 
   const node = (
-    <>
-      {/* 오버레이 */}
+    <div
+      className={`fixed inset-0 ${Z_INDEX_CLASSES.MODAL_OVERLAY} flex items-center justify-center p-4 pt-20`}
+      style={{ backdropFilter: 'blur(8px)' }}
+      role="presentation"
+    >
+      {/* 오버레이 배경 */}
       {showOverlay && (
         <div
-          className={`fixed inset-0 ${Z_INDEX_CLASSES.MODAL_OVERLAY} bg-black/70`}
-          style={{ backdropFilter: 'blur(8px)' }}
+          className="absolute inset-0 bg-black/70"
           role="presentation"
-          onMouseDown={(e) => {
-            // dialog 박스 밖 클릭 시 닫기
-            if (closeOnOverlayClick && e.target === e.currentTarget) {
+          onClick={() => {
+            // backdrop 클릭 시 모달 닫기
+            if (closeOnOverlayClick) {
               if (onOverlayClick) {
                 onOverlayClick();
               } else {
@@ -110,17 +113,13 @@ export function BaseModal({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descId}
-        className={`fixed inset-0 ${Z_INDEX_CLASSES.MODAL_CONTENT} flex items-center justify-center p-4`}
+        className={`relative ${Z_INDEX_CLASSES.MODAL_CONTENT} ${className}`}
+        // 모달 내부 클릭은 버블링 중단(backdrop 클릭 닫기와 충돌 방지)
+        onClick={(e) => e.stopPropagation()}
       >
-        <div
-          className={className}
-          // 모달 내부 클릭은 버블링 중단(바깥 클릭 닫기와 충돌 방지)
-          onMouseDown={(e) => e.stopPropagation()}
-        >
-          {children}
-        </div>
+        {children}
       </div>
-    </>
+    </div>
   );
 
   return createPortal(node, modalRootRef.current);
