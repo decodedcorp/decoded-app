@@ -93,6 +93,26 @@ export const queryKeys = {
     all: ['users'] as const,
     lists: () => [...queryKeys.users.all, 'list'] as const,
     list: (filters: Record<string, any>) => [...queryKeys.users.lists(), filters] as const,
+    bookmarks: () => [...queryKeys.users.all, 'bookmarks'] as const,
+    myBookmarks: (params?: Record<string, any>) => [...queryKeys.users.bookmarks(), 'my', params] as const,
+    bookmarkStatus: (contentId: string) => [...queryKeys.users.bookmarks(), 'status', contentId] as const,
+  },
+
+  // Pins related queries
+  pins: {
+    all: ['pins'] as const,
+    byChannel: (channelId: string) => [...queryKeys.pins.all, 'channel', channelId] as const,
+    byContent: (contentId: string) => [...queryKeys.pins.all, 'content', contentId] as const,
+  },
+
+  // Comments related queries
+  comments: {
+    all: ['comments'] as const,
+    byContent: (contentId: string) => [...queryKeys.comments.all, 'content', contentId] as const,
+    detail: (commentId: string) => [...queryKeys.comments.all, 'detail', commentId] as const,
+    replies: (parentCommentId: string) => [...queryKeys.comments.all, 'replies', parentCommentId] as const,
+    stats: (contentId: string) => [...queryKeys.comments.all, 'stats', contentId] as const,
+    userStats: (userId: string) => [...queryKeys.comments.all, 'user-stats', userId] as const,
   },
 
   // Search related queries
