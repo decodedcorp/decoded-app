@@ -44,6 +44,8 @@ export const queryKeys = {
     details: () => [...queryKeys.contents.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.contents.details(), id] as const,
     byChannel: (channelId: string) => [...queryKeys.contents.all, 'channel', channelId] as const,
+    infiniteByChannel: (channelId: string, sortBy: string) => 
+      [...queryKeys.contents.all, 'infinite', 'channel', channelId, sortBy] as const,
     byProvider: (providerId: string) =>
       [...queryKeys.contents.all, 'provider', providerId] as const,
     likes: (contentId: string) => [...queryKeys.contents.detail(contentId), 'likes'] as const,

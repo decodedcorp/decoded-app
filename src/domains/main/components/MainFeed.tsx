@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { PostCard } from './PostCard';
-import { useContentsByChannel } from '@/domains/contents/hooks/useContents';
+import { useInfiniteContentsByChannel } from '@/domains/contents/hooks/useInfiniteContentsByChannel';
+import { InfiniteScrollLoader } from './InfiniteScrollLoader';
+import { PostCardSkeleton } from './PostCardSkeleton';
 import type { ContentListResponse } from '@/api/generated/models/ContentListResponse';
 import { useContentModalStore } from '@/store/contentModalStore';
 import { convertToContentItem } from '@/lib/types/content';
@@ -12,7 +14,7 @@ import { getThumbnailImageUrl } from '@/lib/utils/imageProxy';
 
 type SortOption = 'hot' | 'new' | 'top';
 
-export function MainFeed() {
+export const MainFeed = React.memo(function MainFeed() {
   const [activeSort, setActiveSort] = useState<SortOption>('hot');
   const openModal = useContentModalStore((state) => state.openModal);
 
@@ -22,18 +24,23 @@ export function MainFeed() {
     { value: 'top', label: 'Top', icon: '⭐' },
   ];
 
-  // 특정 채널의 콘텐츠 가져오기
+  // 특정 채널의 콘텐츠 가져오기 - 무한스크롤 사용
   const channelId = '688a317213dbcfcd941c85b4'; // 테스트용 채널 ID
-  const contentsQuery = useContentsByChannel(channelId, {
-    skip: 0,
+  const infiniteQuery = useInfiniteContentsByChannel(channelId, {
     limit: 20,
+    sortBy: activeSort,
   });
 
-  const feedData = contentsQuery.data?.contents || [];
-  const currentQuery = contentsQuery; // 기존 쿼리 인터페이스 유지
+  // 모든 페이지의 데이터를 평면화
+  const allContents = useMemo(() => {
+    return infiniteQuery.data?.pages.flatMap(page => page.contents) || [];
+  }, [infiniteQuery.data]);
 
-  // Content를 PostCard props로 변환하는 함수
-  const transformContentItem = (item: Record<string, any>, index: number) => {
+  const feedData = allContents;
+  const currentQuery = infiniteQuery; // 기존 인터페이스와의 호환성 유지
+
+  // Content를 PostCard props로 변환하는 함수 - 메모화로 성능 최적화
+  const transformContentItem = useCallback((item: Record<string, any>, index: number) => {
     // 여러 가능한 이미지 소스 확인 (API 응답에 맞게 수정)
     const rawThumbnail =
       item.link_preview_metadata?.img_url ||
@@ -74,10 +81,10 @@ export function MainFeed() {
       contentType: mapContentType(item.type) || ('link' as const),
       originalItem: item, // 원본 데이터 보조
     };
-  };
+  }, [channelId]);
 
-  // ContentItem으로 변환하는 함수 (API 데이터에 맞게 수정)
-  const transformToContentItem = (item: Record<string, any>): ContentItem => {
+  // ContentItem으로 변환하는 함수 (API 데이터에 맞게 수정) - 메모화로 성능 최적화
+  const transformToContentItem = useCallback((item: Record<string, any>): ContentItem => {
     // 이미지 URL 찾기 - API 응답 구조에 맞게 수정
     const rawThumbnailUrl =
       item.link_preview_metadata?.img_url ||
@@ -112,10 +119,10 @@ export function MainFeed() {
         siteName: item.link_preview_metadata?.site_name,
       },
     };
-  };
+  }, []);
 
-  // 콘텐츠 타입 매핑
-  const mapContentType = (type: string): 'text' | 'image' | 'video' | 'link' => {
+  // 콘텐츠 타입 매핑 - 메모화로 성능 최적화
+  const mapContentType = useCallback((type: string): 'text' | 'image' | 'video' | 'link' => {
     switch (type?.toLowerCase()) {
       case 'image':
         return 'image';
@@ -126,10 +133,10 @@ export function MainFeed() {
       default:
         return 'text';
     }
-  };
+  }, []);
 
-  // 시간 차이 계산
-  const getTimeAgo = (createdAt: string): string => {
+  // 시간 차이 계산 - 메모화로 성능 최적화
+  const getTimeAgo = useCallback((createdAt: string): string => {
     const now = new Date();
     const created = new Date(createdAt);
     const diffMs = now.getTime() - created.getTime();
@@ -139,11 +146,17 @@ export function MainFeed() {
     if (diffDays > 0) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
     if (diffHours > 0) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
     return 'Just now';
-  };
+  }, []);
 
   return (
     <div className="w-full min-h-screen bg-black">
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div 
+        className="max-w-4xl mx-auto px-4 py-6"
+        style={{ 
+          scrollBehavior: 'smooth',
+          willChange: 'scroll-position'
+        }}
+      >
         {/* 피드 헤더 */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
@@ -157,7 +170,13 @@ export function MainFeed() {
               {sortOptions.map((option) => (
                 <button
                   key={option.value}
-                  onClick={() => setActiveSort(option.value)}
+                  onClick={() => {
+                    if (activeSort !== option.value) {
+                      setActiveSort(option.value);
+                      // 정렬 변경 시 쿼리 리프레시하여 새로운 데이터 로드
+                      currentQuery.refetch();
+                    }
+                  }}
                   className={`
                     px-4 py-2 text-sm rounded-md transition-all duration-200 font-medium
                     ${
@@ -191,29 +210,13 @@ export function MainFeed() {
           </div>
         </div>
 
-        {/* 로딩 상태 */}
-        {currentQuery.isLoading && (
-          <div className="space-y-4">
-            {[...Array(5)].map((_, i) => (
-              <div
-                key={i}
-                className="bg-zinc-900 border border-zinc-700 rounded-lg p-4 animate-pulse"
-              >
-                <div className="flex gap-3">
-                  <div className="w-16 h-16 bg-zinc-800 rounded flex-shrink-0"></div>
-                  <div className="flex-1">
-                    <div className="h-4 bg-zinc-800 rounded mb-2"></div>
-                    <div className="h-3 bg-zinc-800 rounded mb-3 w-3/4"></div>
-                    <div className="h-3 bg-zinc-800 rounded w-1/2"></div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+        {/* 초기 로딩 상태 - 최적화된 스켈레톤 */}
+        {currentQuery.isLoading && !currentQuery.data && (
+          <PostCardSkeleton count={5} />
         )}
 
         {/* 에러 상태 */}
-        {currentQuery.isError && (
+        {currentQuery.isError && !currentQuery.data && (
           <div className="text-center py-8">
             <div className="text-red-400 mb-2">Failed to load posts</div>
             <button
@@ -226,9 +229,12 @@ export function MainFeed() {
         )}
 
         {/* 포스트 목록 */}
-        {!currentQuery.isLoading && !currentQuery.isError && (
-          <div className="space-y-6">
-            {feedData.length === 0 ? (
+        {(!currentQuery.isLoading || currentQuery.data) && !currentQuery.isError && (
+          <div 
+            className="space-y-6"
+            style={{ containIntrinsicSize: 'auto 500px' }}
+          >
+            {feedData.length === 0 && !currentQuery.isLoading ? (
               <div className="text-center py-12">
                 <div className="text-6xl mb-4">📭</div>
                 <div className="text-gray-400 text-lg mb-2">No posts found</div>
@@ -266,16 +272,30 @@ export function MainFeed() {
           </div>
         )}
 
-        {/* 로드 더 버튼 */}
-        {!currentQuery.isLoading && !currentQuery.isError && feedData.length > 0 && (
-          <div className="mt-12 text-center">
-            <button className="px-8 py-3 bg-zinc-800 text-white rounded-lg hover:bg-zinc-700 transition-colors border border-zinc-600 font-medium">
-              Load More Posts
-            </button>
-            <div className="mt-4 text-xs text-gray-500">Showing {feedData.length} posts</div>
+        {/* 무한스크롤 로더 */}
+        {feedData.length > 0 && (
+          <InfiniteScrollLoader
+            hasNextPage={currentQuery.hasNextPage || false}
+            isFetchingNextPage={currentQuery.isFetchingNextPage}
+            fetchNextPage={currentQuery.fetchNextPage}
+            error={currentQuery.error}
+            onRetry={() => currentQuery.refetch()}
+            className="mt-12"
+          />
+        )}
+
+        {/* 포스트 수 표시 */}
+        {feedData.length > 0 && (
+          <div className="text-center mt-6">
+            <div className="text-xs text-gray-500">
+              Showing {feedData.length} posts
+              {currentQuery.data?.pages?.[0] && (currentQuery.data.pages[0] as any)?.totalCount && (
+                <span> of {(currentQuery.data.pages[0] as any).totalCount}</span>
+              )}
+            </div>
           </div>
         )}
       </div>
     </div>
   );
-}
+});

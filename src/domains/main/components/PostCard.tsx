@@ -74,7 +74,8 @@ function ThumbnailImage({
   );
 }
 
-export function PostCard({
+// React.memo로 성능 최적화
+export const PostCard = React.memo<PostCardProps>(function PostCard({
   title,
   description,
   channel,
@@ -223,4 +224,4 @@ export function PostCard({
       </div>
     </div>
   );
-}
+});
