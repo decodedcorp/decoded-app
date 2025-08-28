@@ -7,7 +7,7 @@ import {
   selectIsAddChannelModalOpen,
   selectAddChannelLoading,
   selectAddChannelFormData,
-} from '@/store/addChannelStore';
+} from '@/domains/create/store/addChannelStore';
 import { useCreateChannel } from '@/domains/channels/hooks/useChannels';
 import { useChannelModalStore } from '@/store/channelModalStore';
 import { useGlobalContentUploadStore } from '@/store/globalContentUploadStore';

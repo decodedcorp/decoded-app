@@ -45,7 +45,7 @@ export function InvitationNotificationItem({ invitation }: InvitationNotificatio
           </div>
           
           <p className="text-sm text-zinc-200 mb-1">
-            <span className="font-medium">{invitation.inviter?.display_name || invitation.inviter?.email}</span>
+            <span className="font-medium">{invitation.inviter?.aka || invitation.inviter?.email}</span>
             {' '}invited you to manage a channel
           </p>
           

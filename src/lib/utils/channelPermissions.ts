@@ -1,41 +1,40 @@
-import { ChannelResponse } from '@/api/generated/models/ChannelResponse';
-import { UserProfileResponse } from '@/api/generated/models/UserProfileResponse';
+import type { ChannelResponse } from '@/api/generated/models/ChannelResponse';
+import type { User } from '@/domains/auth/types/auth';
 
 /**
  * 사용자가 채널의 소유자인지 확인
  */
 export const isChannelOwner = (
-  user: UserProfileResponse | null | undefined,
-  channel: ChannelResponse | null | undefined
+  user: User | null | undefined,
+  channel: ChannelResponse | null | undefined,
 ): boolean => {
   if (!user || !channel) return false;
-  
+
   // channel.is_owner 플래그 확인 (가장 확실한 방법)
   if (channel.is_owner === true) return true;
-  
-  // owner_id와 user.id 또는 user.doc_id 비교
-  const userId = user.id || (user as any).doc_id;
-  return channel.owner_id === userId;
+
+  // owner_id와 user.doc_id 비교
+  return channel.owner_id === user.doc_id;
 };
 
 /**
  * 사용자가 채널의 관리자인지 확인
  */
 export const isChannelManager = (
-  user: UserProfileResponse | null | undefined,
-  channel: ChannelResponse | null | undefined
+  user: User | null | undefined,
+  channel: ChannelResponse | null | undefined,
 ): boolean => {
   if (!user || !channel) return false;
-  
+
   // is_manager 플래그 확인
   if (channel.is_manager === true) return true;
-  
+
   // manager_ids 배열 확인
-  if (channel.manager_ids?.includes(user.id)) return true;
-  
+  if (channel.manager_ids?.includes(user.doc_id)) return true;
+
   // managers 배열 확인
-  if (channel.managers?.some(manager => manager.id === user.id)) return true;
-  
+  if (channel.managers?.some((manager) => manager.id === user.doc_id)) return true;
+
   return false;
 };
 
@@ -44,8 +43,8 @@ export const isChannelManager = (
  * - 채널 소유자 또는 관리자만 가능
  */
 export const canPinContent = (
-  user: UserProfileResponse | null | undefined,
-  channel: ChannelResponse | null | undefined
+  user: User | null | undefined,
+  channel: ChannelResponse | null | undefined,
 ): boolean => {
   if (!user || !channel) return false;
   return isChannelOwner(user, channel) || isChannelManager(user, channel);
@@ -56,8 +55,8 @@ export const canPinContent = (
  * - 채널 소유자 또는 관리자만 가능
  */
 export const canUnpinContent = (
-  user: UserProfileResponse | null | undefined,
-  channel: ChannelResponse | null | undefined
+  user: User | null | undefined,
+  channel: ChannelResponse | null | undefined,
 ): boolean => {
   return canPinContent(user, channel);
 };
@@ -67,8 +66,8 @@ export const canUnpinContent = (
  * - 채널 소유자 또는 관리자만 가능
  */
 export const canReorderPins = (
-  user: UserProfileResponse | null | undefined,
-  channel: ChannelResponse | null | undefined
+  user: User | null | undefined,
+  channel: ChannelResponse | null | undefined,
 ): boolean => {
   return canPinContent(user, channel);
 };
@@ -78,8 +77,8 @@ export const canReorderPins = (
  * - 채널 소유자 또는 관리자만 가능
  */
 export const canEditChannel = (
-  user: UserProfileResponse | null | undefined,
-  channel: ChannelResponse | null | undefined
+  user: User | null | undefined,
+  channel: ChannelResponse | null | undefined,
 ): boolean => {
   if (!user || !channel) return false;
   return isChannelOwner(user, channel) || isChannelManager(user, channel);
@@ -90,8 +89,8 @@ export const canEditChannel = (
  * - 채널 소유자만 가능
  */
 export const canDeleteChannel = (
-  user: UserProfileResponse | null | undefined,
-  channel: ChannelResponse | null | undefined
+  user: User | null | undefined,
+  channel: ChannelResponse | null | undefined,
 ): boolean => {
   if (!user || !channel) return false;
   return isChannelOwner(user, channel);
@@ -102,8 +101,8 @@ export const canDeleteChannel = (
  * - 채널 소유자만 가능
  */
 export const canManageChannelManagers = (
-  user: UserProfileResponse | null | undefined,
-  channel: ChannelResponse | null | undefined
+  user: User | null | undefined,
+  channel: ChannelResponse | null | undefined,
 ): boolean => {
   if (!user || !channel) return false;
   return isChannelOwner(user, channel);
@@ -114,8 +113,8 @@ export const canManageChannelManagers = (
  * - 채널 소유자 또는 관리자만 가능
  */
 export const canUploadContent = (
-  user: UserProfileResponse | null | undefined,
-  channel: ChannelResponse | null | undefined
+  user: User | null | undefined,
+  channel: ChannelResponse | null | undefined,
 ): boolean => {
   if (!user || !channel) return false;
   return isChannelOwner(user, channel) || isChannelManager(user, channel);
@@ -126,8 +125,8 @@ export const canUploadContent = (
  * - 채널 소유자 또는 관리자만 가능
  */
 export const canDeleteContent = (
-  user: UserProfileResponse | null | undefined,
-  channel: ChannelResponse | null | undefined
+  user: User | null | undefined,
+  channel: ChannelResponse | null | undefined,
 ): boolean => {
   if (!user || !channel) return false;
   return isChannelOwner(user, channel) || isChannelManager(user, channel);
@@ -139,15 +138,15 @@ export const canDeleteContent = (
 export type ChannelPermissionLevel = 'owner' | 'manager' | 'subscriber' | 'viewer';
 
 export const getChannelPermissionLevel = (
-  user: UserProfileResponse | null | undefined,
-  channel: ChannelResponse | null | undefined
+  user: User | null | undefined,
+  channel: ChannelResponse | null | undefined,
 ): ChannelPermissionLevel => {
   if (!user || !channel) return 'viewer';
-  
+
   if (isChannelOwner(user, channel)) return 'owner';
   if (isChannelManager(user, channel)) return 'manager';
   if (channel.is_subscribed) return 'subscriber';
-  
+
   return 'viewer';
 };
 
@@ -155,29 +154,29 @@ export const getChannelPermissionLevel = (
  * 권한에 따른 UI 표시 여부 결정
  */
 export const shouldShowPinButton = (
-  user: UserProfileResponse | null | undefined,
-  channel: ChannelResponse | null | undefined
+  user: User | null | undefined,
+  channel: ChannelResponse | null | undefined,
 ): boolean => {
   return canPinContent(user, channel);
 };
 
 export const shouldShowEditButton = (
-  user: UserProfileResponse | null | undefined,
-  channel: ChannelResponse | null | undefined
+  user: User | null | undefined,
+  channel: ChannelResponse | null | undefined,
 ): boolean => {
   return canEditChannel(user, channel);
 };
 
 export const shouldShowDeleteButton = (
-  user: UserProfileResponse | null | undefined,
-  channel: ChannelResponse | null | undefined
+  user: User | null | undefined,
+  channel: ChannelResponse | null | undefined,
 ): boolean => {
   return canDeleteChannel(user, channel);
 };
 
 export const shouldShowUploadButton = (
-  user: UserProfileResponse | null | undefined,
-  channel: ChannelResponse | null | undefined
+  user: User | null | undefined,
+  channel: ChannelResponse | null | undefined,
 ): boolean => {
   return canUploadContent(user, channel);
 };

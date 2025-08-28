@@ -2,7 +2,10 @@
 
 import React, { useEffect } from 'react';
 
-import { useGlobalContentUploadStore, selectIsGlobalContentUploadModalOpen } from '@/store/globalContentUploadStore';
+import {
+  useGlobalContentUploadStore,
+  selectIsGlobalContentUploadModalOpen,
+} from '@/store/globalContentUploadStore';
 import { useContentUploadStore } from '@/store/contentUploadStore';
 
 import { BaseModal } from '../base/BaseModal';
@@ -52,12 +55,7 @@ export function GlobalContentUploadModal() {
   return (
     <>
       {/* 채널 선택 단계 모달 */}
-      <BaseModal
-        isOpen={isOpen && currentStep === 'channel-selection'}
-        onClose={handleClose}
-        overlayClassName="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-        contentClassName="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
-      >
+      <BaseModal isOpen={isOpen && currentStep === 'channel-selection'} onClose={handleClose}>
         <div className="bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl w-[600px] max-h-[90vh] overflow-hidden animate-scale-in shadow-2xl flex flex-col">
           <GlobalContentUploadHeader onClose={handleClose} />
 

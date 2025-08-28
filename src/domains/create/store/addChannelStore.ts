@@ -7,7 +7,7 @@ export interface AddChannelFormData {
   banner_base64?: string;
 }
 
-interface AddChannelState {
+export interface AddChannelState {
   isOpen: boolean;
   formData: AddChannelFormData;
   isLoading: boolean;

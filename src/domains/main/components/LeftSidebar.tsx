@@ -3,11 +3,10 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useChannels } from '@/domains/channels/hooks/useChannels';
-import { useAddChannelStore } from '@/store/addChannelStore';
+import { useAddChannelStore } from '@/domains/create/store/addChannelStore';
 import { useGlobalContentUploadStore } from '@/store/globalContentUploadStore';
 import { useLeftSidebarStore } from '@/store/leftSidebarStore';
-import { AddChannelModal } from '@/domains/channels/components/modal/add-channel/AddChannelModal';
-import { GlobalContentUploadModal } from '@/domains/channels/components/modal/global-content-upload/GlobalContentUploadModal';
+import { AddChannelModal } from '@/domains/create/components/modal/add-channel/AddChannelModal';
 
 export function LeftSidebar() {
   const router = useRouter();
@@ -298,9 +297,6 @@ export function LeftSidebar() {
 
       {/* Add Channel Modal */}
       <AddChannelModal />
-
-      {/* Global Content Upload Modal */}
-      <GlobalContentUploadModal />
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useUpdateChannel } from '../../../hooks/useChannels';
+import { useUpdateChannel } from '@/domains/channels/hooks/useChannels';
 
 interface ChannelUpdateTestProps {
   channelId: string;
@@ -7,10 +7,10 @@ interface ChannelUpdateTestProps {
   currentDescription?: string;
 }
 
-export function ChannelUpdateTest({ 
-  channelId, 
-  currentName = '', 
-  currentDescription = '' 
+export function ChannelUpdateTest({
+  channelId,
+  currentName = '',
+  currentDescription = '',
 }: ChannelUpdateTestProps) {
   const [name, setName] = useState(currentName);
   const [description, setDescription] = useState(currentDescription);
@@ -21,7 +21,7 @@ export function ChannelUpdateTest({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!channelId) {
       alert('채널 ID가 필요합니다.');
       return;
@@ -36,14 +36,14 @@ export function ChannelUpdateTest({
       };
 
       console.log('Updating channel with data:', updateData);
-      
+
       await updateChannelMutation.mutateAsync({
         channelId,
         data: updateData,
       });
 
       alert('채널 업데이트 성공!');
-      
+
       // 성공 후 입력 필드 초기화
       setThumbnailBase64('');
       setBannerBase64('');
@@ -53,7 +53,10 @@ export function ChannelUpdateTest({
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'thumbnail' | 'banner') => {
+  const handleFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    type: 'thumbnail' | 'banner',
+  ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -74,13 +77,11 @@ export function ChannelUpdateTest({
       <h3 className="text-lg font-semibold text-white mb-4">
         PUT /channels/{channelId} API 테스트
       </h3>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* 채널 이름 */}
         <div>
-          <label className="block text-sm font-medium text-zinc-300 mb-2">
-            채널 이름
-          </label>
+          <label className="block text-sm font-medium text-zinc-300 mb-2">채널 이름</label>
           <input
             type="text"
             value={name}
@@ -92,9 +93,7 @@ export function ChannelUpdateTest({
 
         {/* 채널 설명 */}
         <div>
-          <label className="block text-sm font-medium text-zinc-300 mb-2">
-            채널 설명
-          </label>
+          <label className="block text-sm font-medium text-zinc-300 mb-2">채널 설명</label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -117,9 +116,9 @@ export function ChannelUpdateTest({
           />
           {thumbnailBase64 && (
             <div className="mt-2">
-              <img 
-                src={thumbnailBase64} 
-                alt="Thumbnail preview" 
+              <img
+                src={thumbnailBase64}
+                alt="Thumbnail preview"
                 className="w-20 h-20 object-cover rounded border border-zinc-600"
               />
               <p className="text-xs text-zinc-400 mt-1">
@@ -142,9 +141,9 @@ export function ChannelUpdateTest({
           />
           {bannerBase64 && (
             <div className="mt-2">
-              <img 
-                src={bannerBase64} 
-                alt="Banner preview" 
+              <img
+                src={bannerBase64}
+                alt="Banner preview"
                 className="w-40 h-20 object-cover rounded border border-zinc-600"
               />
               <p className="text-xs text-zinc-400 mt-1">
@@ -184,10 +183,18 @@ export function ChannelUpdateTest({
       <div className="mt-6 p-4 bg-zinc-800 rounded-md">
         <h4 className="text-sm font-medium text-zinc-300 mb-2">API 정보</h4>
         <div className="text-xs text-zinc-400 space-y-1">
-          <p><strong>Method:</strong> PUT</p>
-          <p><strong>Endpoint:</strong> /channels/{channelId}</p>
-          <p><strong>Body:</strong> {`{ name?, description?, thumbnail_base64?, banner_base64? }`}</p>
-          <p><strong>인증:</strong> 액세스 토큰 필요</p>
+          <p>
+            <strong>Method:</strong> PUT
+          </p>
+          <p>
+            <strong>Endpoint:</strong> /channels/{channelId}
+          </p>
+          <p>
+            <strong>Body:</strong> {`{ name?, description?, thumbnail_base64?, banner_base64? }`}
+          </p>
+          <p>
+            <strong>인증:</strong> 액세스 토큰 필요
+          </p>
         </div>
       </div>
     </div>

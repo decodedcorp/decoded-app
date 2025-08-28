@@ -132,7 +132,7 @@ export function ImageSection({ channel }: ImageSectionProps) {
             <div className="h-20 bg-zinc-700 relative overflow-hidden">
               {(channel.banner_url || channel.thumbnail_url) && (
                 <img
-                  src={channel.banner_url || channel.thumbnail_url}
+                  src={channel.banner_url || channel.thumbnail_url || ''}
                   alt="Banner preview"
                   className="w-full h-full object-cover opacity-60"
                 />

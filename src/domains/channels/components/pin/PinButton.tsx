@@ -45,7 +45,7 @@ export const PinButton: React.FC<PinButtonProps> = ({
     registration_date: user.createdAt || new Date().toISOString(),
   } : null;
   
-  const canPin = canPinContent(userProfile, channel);
+  const canPin = canPinContent(user, channel);
   
   // 권한이 없으면 버튼을 표시하지 않음
   if (!canPin) {

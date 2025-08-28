@@ -6,7 +6,7 @@ import {
   useAddChannelStore,
   selectAddChannelFormData,
   selectAddChannelError,
-} from '@/store/addChannelStore';
+} from '../../../store/addChannelStore';
 import {
   compressImage,
   validateImageFile,

@@ -1,30 +1,39 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
-import { 
-  HomeIcon, 
+import {
+  HomeIcon,
   RectangleStackIcon,
   MagnifyingGlassIcon,
   BookmarkIcon,
   PlusIcon,
   UserIcon,
   Bars3Icon,
-  XMarkIcon
+  XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { SidebarItem } from './SidebarItem';
 import { useAuthStore } from '@/store/authStore';
+import { useAddChannelStore } from '@/domains/create/store/addChannelStore';
+import { useRouter, usePathname } from 'next/navigation';
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const openAddChannelModal = useAddChannelStore((state) => state.openModal);
+  const isModalOpen = useAddChannelStore((state) => state.isOpen);
 
   // Close mobile sidebar when route changes
   useEffect(() => {
     setIsMobileOpen(false);
   }, [pathname]);
 
+  // Handle create button click
+  const handleCreateClick = () => {
+    // 모달은 /create 페이지에서 열도록 하고, 여기서는 라우팅만 처리
+    router.push('/create');
+  };
 
   return (
     <>
@@ -54,18 +63,17 @@ export function Sidebar() {
           relative top-0 left-0 h-[calc(100vh-72px)] w-[245px]
           bg-black border-r border-zinc-800
           overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-black
-          ${isMobileOpen ? 'fixed translate-x-0 z-[9998]' : 'lg:relative fixed -translate-x-full lg:translate-x-0'}
+          ${
+            isMobileOpen
+              ? 'fixed translate-x-0 z-[9998]'
+              : 'lg:relative fixed -translate-x-full lg:translate-x-0'
+          }
         `}
       >
         <div className="py-6 px-3">
           {/* Main Navigation */}
           <div className="space-y-2">
-            <SidebarItem
-              href="/"
-              icon={<HomeIcon />}
-              label="Home"
-              isActive={pathname === '/'}
-            />
+            <SidebarItem href="/" icon={<HomeIcon />} label="Home" isActive={pathname === '/'} />
             <SidebarItem
               href="/search"
               icon={<MagnifyingGlassIcon />}
@@ -78,7 +86,7 @@ export function Sidebar() {
               label="Channels"
               isActive={pathname === '/channels'}
             />
-            
+
             {/* Authenticated user features */}
             {isAuthenticated && (
               <>
@@ -89,10 +97,10 @@ export function Sidebar() {
                   isActive={pathname === '/bookmarks'}
                 />
                 <SidebarItem
-                  href="/create"
+                  onClick={handleCreateClick}
                   icon={<PlusIcon />}
                   label="Create"
-                  isActive={pathname === '/create'}
+                  isActive={isModalOpen}
                 />
                 <SidebarItem
                   href="/profile"

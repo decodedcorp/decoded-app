@@ -3,8 +3,21 @@
 import React, { useEffect, useMemo } from 'react';
 import { RiPushpin2Line } from 'react-icons/ri';
 import { MdDragIndicator } from 'react-icons/md';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useChannelPins, useReorderPins } from '../../hooks/useChannelPins';
@@ -30,26 +43,29 @@ const getContentTitle = (item: UnifiedPinnedItem): string => {
       return (item.content_metadata as any).linkPreview.title;
     }
     // Direct title in content metadata
-    if ((item.content_metadata as any)?.title && (item.content_metadata as any).title !== 'Untitled') {
+    if (
+      (item.content_metadata as any)?.title &&
+      (item.content_metadata as any).title !== 'Untitled'
+    ) {
       return (item.content_metadata as any).title;
     }
   }
-  
+
   // Folder metadata
   if (item.type === 'folder' && item.folder_metadata?.description) {
     return item.folder_metadata.description;
   }
-  
+
   // Use item.name if it's not "Untitled"
   if (item.name && item.name !== 'Untitled') {
     return item.name;
   }
-  
+
   // AI generated metadata
   if ((item.content_metadata as any)?.ai_gen_metadata?.title) {
     return (item.content_metadata as any).ai_gen_metadata.title;
   }
-  
+
   // Fallback
   return item.name || 'Untitled';
 };
@@ -61,16 +77,9 @@ interface PinnedItemCardProps {
 }
 
 const PinnedItemCard: React.FC<PinnedItemCardProps> = ({ item, isDraggable, onClick }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ 
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
-    disabled: !isDraggable 
+    disabled: !isDraggable,
   });
 
   const style = {
@@ -80,24 +89,31 @@ const PinnedItemCard: React.FC<PinnedItemCardProps> = ({ item, isDraggable, onCl
 
   // API에서 제공하는 풍부한 메타데이터 사용
   const title = getContentTitle(item);
-  const description = item.pin_note || 
-    (item.type === 'content' ? item.content_metadata?.description : item.folder_metadata?.description) || 
+  const description =
+    item.pin_note ||
+    (item.type === 'content'
+      ? item.content_metadata?.description
+      : item.folder_metadata?.description) ||
     '';
-  
+
   // 썸네일 URL (컨텐츠인 경우)
   const thumbnailUrl = item.type === 'content' ? item.content_metadata?.thumbnail_url : null;
-  
+
   // 폴더 색상 (폴더인 경우)
-  const folderColor = item.type === 'folder' ? (item.folder_color || item.folder_metadata?.color) : null;
-  
+  const folderColor =
+    item.type === 'folder' ? item.folder_color || item.folder_metadata?.color : null;
+
   // 통계 정보
-  const stats = item.type === 'content' ? {
-    views: item.content_metadata?.views_count,
-    likes: item.content_metadata?.likes,
-    comments: item.content_metadata?.comments_count,
-  } : {
-    contentCount: item.content_count || item.folder_metadata?.content_count,
-  };
+  const stats =
+    item.type === 'content'
+      ? {
+          views: item.content_metadata?.views_count,
+          likes: item.content_metadata?.likes,
+          comments: item.content_metadata?.comments_count,
+        }
+      : {
+          contentCount: item.content_count || item.folder_metadata?.content_count,
+        };
 
   return (
     <div
@@ -107,7 +123,7 @@ const PinnedItemCard: React.FC<PinnedItemCardProps> = ({ item, isDraggable, onCl
         'relative group bg-zinc-900/50 rounded-lg border border-zinc-800',
         'hover:bg-zinc-800/70 hover:border-zinc-700 transition-all duration-200',
         'cursor-pointer overflow-hidden',
-        isDragging && 'opacity-50 z-50'
+        isDragging && 'opacity-50 z-50',
       )}
       onClick={onClick}
     >
@@ -126,25 +142,29 @@ const PinnedItemCard: React.FC<PinnedItemCardProps> = ({ item, isDraggable, onCl
         {/* Thumbnail */}
         <div className="flex-shrink-0 w-20 h-20 rounded-md overflow-hidden bg-zinc-800">
           {thumbnailUrl ? (
-            <img 
-              src={thumbnailUrl} 
-              alt={title}
-              className="w-full h-full object-cover"
-            />
+            <img src={thumbnailUrl} alt={title} className="w-full h-full object-cover" />
           ) : (
-            <div 
+            <div
               className="w-full h-full flex items-center justify-center text-zinc-600"
               style={folderColor ? { backgroundColor: folderColor + '20', color: folderColor } : {}}
             >
               {item.type === 'content' ? (
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
                 </svg>
               ) : (
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
-                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
+                  />
                 </svg>
               )}
             </div>
@@ -154,20 +174,14 @@ const PinnedItemCard: React.FC<PinnedItemCardProps> = ({ item, isDraggable, onCl
         {/* Content info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start gap-2">
-            <h4 className="font-medium text-sm text-zinc-100 line-clamp-2 flex-1">
-              {title}
-            </h4>
+            <h4 className="font-medium text-sm text-zinc-100 line-clamp-2 flex-1">{title}</h4>
             <div className="flex-shrink-0">
               <RiPushpin2Line className="w-4 h-4 text-blue-400 rotate-45" />
             </div>
           </div>
-          
-          {description && (
-            <p className="mt-1 text-xs text-zinc-400 line-clamp-2">
-              {description}
-            </p>
-          )}
-          
+
+          {description && <p className="mt-1 text-xs text-zinc-400 line-clamp-2">{description}</p>}
+
           <div className="mt-2 flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs text-zinc-500">
               <span className="capitalize">{item.type}</span>
@@ -178,15 +192,25 @@ const PinnedItemCard: React.FC<PinnedItemCardProps> = ({ item, isDraggable, onCl
                 </>
               )}
             </div>
-            
+
             {/* Stats */}
             {item.type === 'content' && (stats.views || stats.likes || stats.comments) ? (
               <div className="flex items-center gap-3 text-xs text-zinc-500">
                 {stats.views && (
                   <div className="flex items-center gap-1">
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                      />
                     </svg>
                     <span>{stats.views}</span>
                   </div>
@@ -194,7 +218,12 @@ const PinnedItemCard: React.FC<PinnedItemCardProps> = ({ item, isDraggable, onCl
                 {stats.likes && (
                   <div className="flex items-center gap-1">
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                      />
                     </svg>
                     <span>{stats.likes}</span>
                   </div>
@@ -202,7 +231,12 @@ const PinnedItemCard: React.FC<PinnedItemCardProps> = ({ item, isDraggable, onCl
                 {stats.comments && (
                   <div className="flex items-center gap-1">
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                      />
                     </svg>
                     <span>{stats.comments}</span>
                   </div>
@@ -211,7 +245,12 @@ const PinnedItemCard: React.FC<PinnedItemCardProps> = ({ item, isDraggable, onCl
             ) : item.type === 'folder' && stats.contentCount ? (
               <div className="flex items-center gap-1 text-xs text-zinc-500">
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                  />
                 </svg>
                 <span>{stats.contentCount} items</span>
               </div>
@@ -245,16 +284,18 @@ export const ChannelPinnedSection: React.FC<ChannelPinnedSectionProps> = ({
   const openContentModal = useContentModalStore((state) => state.openModal);
 
   // 권한 체크 - user 타입 변환
-  const userProfile = user ? {
-    id: user.doc_id || user.email || '',
-    email: user.email,
-    username: user.nickname,
-    full_name: user.nickname,
-    avatar_url: '',
-    registration_date: user.createdAt || new Date().toISOString(),
-  } : null;
-  
-  const canReorder = canReorderPins(userProfile, channel);
+  const userProfile = user
+    ? {
+        id: user.doc_id || user.email || '',
+        email: user.email,
+        username: user.nickname,
+        full_name: user.nickname,
+        avatar_url: '',
+        registration_date: user.createdAt || new Date().toISOString(),
+      }
+    : null;
+
+  const canReorder = canReorderPins(user, channel);
 
   // Store에 pinned items 저장
   useEffect(() => {
@@ -272,15 +313,13 @@ export const ChannelPinnedSection: React.FC<ChannelPinnedSectionProps> = ({
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   // Pinned items 정렬
   const sortedPins = useMemo(() => {
     if (!pinsData?.items) return [];
-    return [...pinsData.items]
-      .sort((a, b) => a.pin_order - b.pin_order)
-      .slice(0, maxItems);
+    return [...pinsData.items].sort((a, b) => a.pin_order - b.pin_order).slice(0, maxItems);
   }, [pinsData?.items, maxItems]);
 
   // 드래그 종료 핸들러
@@ -289,14 +328,14 @@ export const ChannelPinnedSection: React.FC<ChannelPinnedSectionProps> = ({
 
     if (!over || active.id === over.id || !canReorder) return;
 
-    const oldIndex = sortedPins.findIndex(item => item.id === active.id);
-    const newIndex = sortedPins.findIndex(item => item.id === over.id);
+    const oldIndex = sortedPins.findIndex((item) => item.id === active.id);
+    const newIndex = sortedPins.findIndex((item) => item.id === over.id);
 
     if (oldIndex === -1 || newIndex === -1) return;
 
     // 새로운 순서 계산
     const newOrder = arrayMove(sortedPins, oldIndex, newIndex);
-    
+
     // pin_order 업데이트
     const pinOrders = newOrder.map((item, index) => ({
       target_id: item.id,
@@ -316,7 +355,7 @@ export const ChannelPinnedSection: React.FC<ChannelPinnedSectionProps> = ({
   const convertPinnedItemToContentItem = (item: UnifiedPinnedItem): ContentItem => {
     return {
       id: item.id,
-      type: item.content_type as any || 'text',
+      type: (item.content_type as any) || 'text',
       title: item.name,
       description: item.pin_note || item.content_metadata?.description || '',
       thumbnailUrl: item.content_metadata?.thumbnail_url || undefined,
@@ -349,7 +388,7 @@ export const ChannelPinnedSection: React.FC<ChannelPinnedSectionProps> = ({
           <h3 className="text-lg font-semibold text-zinc-100">Pinned</h3>
         </div>
         <div className="space-y-2">
-          {[1, 2, 3].map(i => (
+          {[1, 2, 3].map((i) => (
             <div key={i} className="h-24 bg-zinc-900/50 rounded-lg animate-pulse" />
           ))}
         </div>
@@ -377,13 +416,9 @@ export const ChannelPinnedSection: React.FC<ChannelPinnedSectionProps> = ({
 
       {/* Pinned items list */}
       {canReorder && sortedPins.length > 1 ? (
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext
-            items={sortedPins.map(item => item.id)}
+            items={sortedPins.map((item) => item.id)}
             strategy={verticalListSortingStrategy}
           >
             <div className="space-y-2">

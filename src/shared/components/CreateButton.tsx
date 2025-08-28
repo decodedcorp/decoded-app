@@ -1,17 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useGlobalContentUploadStore } from '@/store/globalContentUploadStore';
 
 export function CreateButton() {
-  const router = useRouter();
+  const openModal = useGlobalContentUploadStore((state) => state.openModal);
   const [showTooltip, setShowTooltip] = useState(false);
 
   const handleClick = () => {
-    // TODO: Open content upload modal or navigate to create page
-    console.log('Open create content modal');
-    // For now, navigate to a create page (you can change this to open a modal)
-    router.push('/create');
+    // 글로벌 콘텐츠 업로드 모달 열기
+    openModal();
   };
 
   return (
@@ -30,10 +28,10 @@ export function CreateButton() {
         "
         aria-label="Create new content"
       >
-        <svg 
-          className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" 
-          fill="none" 
-          viewBox="0 0 24 24" 
+        <svg
+          className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"
+          fill="none"
+          viewBox="0 0 24 24"
           stroke="currentColor"
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

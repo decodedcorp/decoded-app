@@ -36,9 +36,9 @@ export function InvitationCard({ invitation, type }: InvitationCardProps) {
         <div className="flex items-start space-x-3">
           {/* User Avatar */}
           <div className="w-10 h-10 rounded-full bg-zinc-700 overflow-hidden">
-            {(type === 'sent' ? invitation.invitee : invitation.inviter)?.profile_picture_url && (
+            {(type === 'sent' ? invitation.invitee : invitation.inviter)?.profile_image_url && (
               <img
-                src={(type === 'sent' ? invitation.invitee : invitation.inviter)?.profile_picture_url}
+                src={(type === 'sent' ? invitation.invitee : invitation.inviter)?.profile_image_url || ''}
                 alt="User avatar"
                 className="w-full h-full object-cover"
               />
@@ -49,7 +49,7 @@ export function InvitationCard({ invitation, type }: InvitationCardProps) {
           <div className="flex-1">
             <div className="flex items-center space-x-2 mb-1">
               <h3 className="font-medium text-white">
-                {type === 'sent' ? invitation.invitee?.display_name : invitation.inviter?.display_name}
+                {type === 'sent' ? invitation.invitee?.aka : invitation.inviter?.aka}
               </h3>
               <span className={`px-2 py-1 text-xs rounded-full ${
                 isExpired 

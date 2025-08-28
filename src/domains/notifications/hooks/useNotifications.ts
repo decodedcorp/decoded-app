@@ -18,9 +18,9 @@ export const useNotifications = (params?: {
       
       try {
         const result = await InteractionsService.getMyNotificationsMeNotificationsGet(
-          params?.page || 1,
+          params?.unreadOnly || false,
           params?.limit || 20,
-          params?.unreadOnly || false
+          params?.page || 1
         );
         return result;
       } catch (error) {
@@ -46,7 +46,7 @@ export const useMarkNotificationRead = () => {
   return useToastMutation(
     async (notificationId: string) => {
       refreshOpenAPIToken();
-      return InteractionsService.markNotificationReadMeNotificationsMarkReadPost({
+      return InteractionsService.markMyNotificationsAsReadMeNotificationsMarkReadPatch({
         notification_ids: [notificationId]
       });
     },
@@ -72,7 +72,9 @@ export const useMarkAllNotificationsRead = () => {
   return useToastMutation(
     async () => {
       refreshOpenAPIToken();
-      return InteractionsService.markNotificationReadMeNotificationsMarkReadPost({});
+      return InteractionsService.markMyNotificationsAsReadMeNotificationsMarkReadPatch({
+        notification_ids: []
+      });
     },
     {
       messages: {
@@ -97,7 +99,7 @@ export const useNotificationStats = () => {
       refreshOpenAPIToken();
       
       try {
-        const result = await InteractionsService.getMyStatsInteractionsMeStatsGet();
+        const result = await InteractionsService.getMyInteractionStatsMeStatsGet();
         return result;
       } catch (error) {
         console.error('[useNotificationStats] API call failed:', error);

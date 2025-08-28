@@ -216,7 +216,9 @@ export function ChannelPageHeader({
                       </>
                     )}
                     {channel.managers.length <= 5 && (
-                      <span>{channel.managers.length} editor{channel.managers.length > 1 ? 's' : ''}</span>
+                      <span>
+                        {channel.managers.length} editor{channel.managers.length > 1 ? 's' : ''}
+                      </span>
                     )}
                   </button>
                 ) : (
@@ -262,7 +264,7 @@ export function ChannelPageHeader({
               </button>
             )}
             {canManageSettings && (
-              <button 
+              <button
                 onClick={handleSettings}
                 className="p-2 bg-zinc-800 hover:bg-zinc-700 rounded-full text-white transition-colors"
                 title="Channel Settings"
@@ -291,7 +293,7 @@ export function ChannelPageHeader({
       </div>
 
       {/* Banner Edit Modal - EditableImage에서 처리하므로 제거 */}
-      
+
       {/* Editors List Modal */}
       <EditorsListModal
         isOpen={isEditorsModalOpen}

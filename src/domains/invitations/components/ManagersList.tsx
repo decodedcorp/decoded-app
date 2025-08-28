@@ -34,10 +34,10 @@ export function ManagersList({ channel, onRemoveManager }: ManagersListProps) {
           <div className="flex items-center space-x-3">
             {/* Manager Avatar */}
             <div className="w-10 h-10 rounded-full bg-zinc-700 overflow-hidden">
-              {manager.profile_picture_url && (
+              {manager.profile_image_url && (
                 <img
-                  src={manager.profile_picture_url}
-                  alt={manager.display_name || 'Manager'}
+                  src={manager.profile_image_url}
+                  alt={manager.aka || 'Manager'}
                   className="w-full h-full object-cover"
                 />
               )}
@@ -46,9 +46,9 @@ export function ManagersList({ channel, onRemoveManager }: ManagersListProps) {
             {/* Manager Info */}
             <div>
               <h4 className="font-medium text-white">
-                {manager.display_name || manager.email}
+                {manager.aka || manager.email}
               </h4>
-              {manager.display_name && manager.email && (
+              {manager.aka && manager.email && (
                 <p className="text-xs text-zinc-400">{manager.email}</p>
               )}
               <p className="text-xs text-green-400">Manager</p>
@@ -62,7 +62,7 @@ export function ManagersList({ channel, onRemoveManager }: ManagersListProps) {
                 onClick={() => onRemoveManager(manager.id)}
                 className="p-2 rounded-full hover:bg-zinc-700 text-zinc-400 hover:text-red-400 transition-colors"
                 title="Remove manager"
-                aria-label={`Remove ${manager.display_name || manager.email} as manager`}
+                aria-label={`Remove ${manager.aka || manager.email} as manager`}
               >
                 <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
                   <path

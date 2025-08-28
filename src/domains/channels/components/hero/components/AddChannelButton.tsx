@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { useAddChannelStore } from '@/store/addChannelStore';
+import { useAddChannelStore } from '@/domains/create/store/addChannelStore';
 
 interface AddChannelButtonProps {
   variant?: 'default' | 'simple' | 'post';

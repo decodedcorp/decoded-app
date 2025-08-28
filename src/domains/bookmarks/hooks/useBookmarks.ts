@@ -31,7 +31,8 @@ export function useBookmarkStats() {
 export function useCheckBookmarkStatus(contentId: string) {
   return useQuery({
     queryKey: ['bookmark-status', contentId],
-    queryFn: () => BookmarksService.checkBookmarkStatusUsersMeBookmarksContentIdStatusGet(contentId),
+    queryFn: () =>
+      BookmarksService.checkBookmarkStatusUsersMeBookmarksContentIdStatusGet(contentId),
     enabled: !!contentId,
   });
 }
@@ -45,11 +46,11 @@ export function useBookmarkMutations() {
     onSuccess: (data, contentId) => {
       // Update bookmark status cache
       queryClient.setQueryData(['bookmark-status', contentId], { is_bookmarked: true });
-      
+
       // Invalidate bookmarks list
       queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
       queryClient.invalidateQueries({ queryKey: ['bookmark-stats'] });
-      
+
       toast.success('Added to bookmarks');
     },
     onError: (error) => {
@@ -64,11 +65,11 @@ export function useBookmarkMutations() {
     onSuccess: (data, contentId) => {
       // Update bookmark status cache
       queryClient.setQueryData(['bookmark-status', contentId], { is_bookmarked: false });
-      
+
       // Invalidate bookmarks list
       queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
       queryClient.invalidateQueries({ queryKey: ['bookmark-stats'] });
-      
+
       toast.success('Removed from bookmarks');
     },
     onError: (error) => {

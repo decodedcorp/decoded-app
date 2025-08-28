@@ -81,7 +81,7 @@ export function ManagerSection({ channel }: ManagerSectionProps) {
         <h3 className="text-lg font-medium mb-4">Manager Invitations</h3>
         <InvitationList
           channelId={channel.id || ''}
-          currentUserId={user?.id || user?.doc_id || (user as any)?.user_id}
+          currentUserId={user?.doc_id || ''}
         />
       </div>
 

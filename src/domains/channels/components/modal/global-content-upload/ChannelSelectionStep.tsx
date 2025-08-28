@@ -3,7 +3,7 @@
 import React, { useState, useCallback } from 'react';
 
 import { useSearchChannels } from '@/domains/search/hooks/useSearch';
-import { useAddChannelStore } from '@/store/addChannelStore';
+import { useAddChannelStore } from '@/domains/create/store/addChannelStore';
 import { useGlobalContentUploadStore } from '@/store/globalContentUploadStore';
 
 import { ChannelSearchComponent } from './ChannelSearchComponent';

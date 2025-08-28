@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 
 import { cn } from '@/lib/utils/styles';
 import { useChannelModalStore, ChannelData } from '@/store/channelModalStore';
-import { useAddChannelStore } from '@/store/addChannelStore';
+import { useAddChannelStore } from '@/domains/create/store/addChannelStore';
 import { ChannelResponse } from '@/api/generated';
 import Masonry from '@/components/ReactBitsMasonry';
 

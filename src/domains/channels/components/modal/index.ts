@@ -4,7 +4,6 @@ export * from './base';
 // Modal Components
 export * from './channel';
 export * from './content';
-export * from './add-channel';
 
 // Filter Components
 export { CategoriesFilter } from './filters/CategoriesFilter';

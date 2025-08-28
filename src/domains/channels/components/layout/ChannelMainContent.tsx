@@ -6,7 +6,7 @@ import { ExploreHeader, ExploreFilters } from '../explore/ExploreHeader';
 import { ExploreGrid } from '../explore/ExploreGrid';
 import { DiscoverSection } from '../explore/DiscoverSection';
 import { ChannelModal, ContentModal } from '../modal';
-import { AddChannelModal } from '../modal/add-channel/AddChannelModal';
+import { AddChannelModal } from '@/domains/create/components/modal/add-channel/AddChannelModal';
 import { LoadingState, ErrorState, EmptyState } from '../common/LoadingStates';
 import { useChannels } from '../../hooks/useChannels';
 import { useChannelModalStore } from '../../../../store/channelModalStore';
