@@ -58,7 +58,7 @@ export const useComments = ({
       const result = await CommentsService.getCommentsByContentCommentsContentContentIdGet(
         contentId,
         20, // limit
-        pageParam, // skip
+        pageParam as number, // skip
         includeReplies,
         sortOrder,
         parentCommentId

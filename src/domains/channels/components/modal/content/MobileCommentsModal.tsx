@@ -38,7 +38,7 @@ export function MobileCommentsModal({ isOpen, onClose, content }: MobileComments
 
         {/* Comments Section */}
         <div className="flex-1 min-h-0">
-          <CommentSection contentId={content.id} />
+          <CommentSection contentId={String(content.id)} />
         </div>
       </div>
     </BaseModal>

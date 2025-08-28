@@ -94,8 +94,6 @@ export const useContentLike = (contentId: string) => {
     error: likeMutation.error || unlikeMutation.error || statsError,
     /** 에러 리셋 함수 */
     resetError,
-    /** 최근 좋아요 수 (24시간) */
-    recentLikes: likeStats?.recent_likes ?? 0,
   };
 };
 

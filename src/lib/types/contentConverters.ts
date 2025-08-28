@@ -221,8 +221,8 @@ const getContentTitle = (content: UnifiedContent): string => {
   }
   
   // AI generated metadata
-  if (content.linkContent?.ai_gen_metadata?.title) {
-    return content.linkContent.ai_gen_metadata.title;
+  if (content.linkContent?.ai_gen_metadata?.summary) {
+    return content.linkContent.ai_gen_metadata.summary;
   }
   
   // Fallback

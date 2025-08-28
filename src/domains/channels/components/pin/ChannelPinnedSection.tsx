@@ -36,8 +36,8 @@ const getContentTitle = (item: UnifiedPinnedItem): string => {
   }
   
   // Folder metadata
-  if (item.type === 'folder' && item.folder_metadata?.name) {
-    return item.folder_metadata.name;
+  if (item.type === 'folder' && item.folder_metadata?.description) {
+    return item.folder_metadata.description;
   }
   
   // Use item.name if it's not "Untitled"

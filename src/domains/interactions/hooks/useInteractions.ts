@@ -192,7 +192,8 @@ export const useCreateNotification = () => {
   });
 };
 
-// Channel Likes
+// Channel Likes - Temporarily disabled due to missing API methods
+/*
 export const useChannelLikeStats = (channelId: string) => {
   return useQuery({
     queryKey: queryKeys.channels.likeStats(channelId),
@@ -239,6 +240,7 @@ export const useUnlikeChannel = () => {
     },
   });
 };
+*/
 
 // Stats
 export const useMyInteractionStats = () => {
