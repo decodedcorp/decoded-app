@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { BookmarkListResponse } from '../models/BookmarkListResponse';
+import type { BookmarkListWithContentResponse } from '../models/BookmarkListWithContentResponse';
 import type { BookmarkResponse } from '../models/BookmarkResponse';
 import type { BookmarkStatsResponse } from '../models/BookmarkStatsResponse';
 import type { BookmarkStatusResponse } from '../models/BookmarkStatusResponse';
@@ -54,22 +54,25 @@ export class BookmarksService {
     }
     /**
      * Get Bookmarks
-     * Get current user's bookmarks with pagination
+     * Get current user's bookmarks with pagination and optional content details
      * @param offset Offset for pagination
      * @param limit Number of bookmarks to return
-     * @returns BookmarkListResponse Successful Response
+     * @param includeContent Include content details in response
+     * @returns BookmarkListWithContentResponse Successful Response
      * @throws ApiError
      */
     public static getBookmarksUsersMeBookmarksGet(
         offset?: number,
         limit: number = 20,
-    ): CancelablePromise<BookmarkListResponse> {
+        includeContent: boolean = true,
+    ): CancelablePromise<BookmarkListWithContentResponse> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/users/me/bookmarks',
             query: {
                 'offset': offset,
                 'limit': limit,
+                'include_content': includeContent,
             },
             errors: {
                 422: `Validation Error`,

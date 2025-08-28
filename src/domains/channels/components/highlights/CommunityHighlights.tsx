@@ -183,7 +183,7 @@ const CommunityHighlights = memo(function CommunityHighlights({
               ))}
             </div>
           ) : highlights.length > 0 ? (
-            <div className="flex space-x-4 overflow-x-auto overflow-y-hidden pb-2 scrollbar-hide">
+            <div className="flex space-x-4 overflow-x-auto overflow-y-hidden pb-2 scrollbar-hide w-full">
               {highlights.map((highlight: HighlightItem) => {
                 return (
                   <HighlightCard

@@ -2,15 +2,15 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { BookmarkResponse } from './BookmarkResponse';
+import type { BookmarkWithContentResponse } from './BookmarkWithContentResponse';
 /**
- * Bookmark list response
+ * Bookmark list response with content details
  */
-export type BookmarkListResponse = {
+export type BookmarkListWithContentResponse = {
     /**
-     * List of bookmarks
+     * List of bookmarks with content
      */
-    bookmarks: Array<BookmarkResponse>;
+    bookmarks: Array<BookmarkWithContentResponse>;
     /**
      * Total number of bookmarks
      */

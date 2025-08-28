@@ -9,7 +9,13 @@ export const isChannelOwner = (
   channel: ChannelResponse | null | undefined
 ): boolean => {
   if (!user || !channel) return false;
-  return channel.owner_id === user.id || channel.is_owner === true;
+  
+  // channel.is_owner 플래그 확인 (가장 확실한 방법)
+  if (channel.is_owner === true) return true;
+  
+  // owner_id와 user.id 또는 user.doc_id 비교
+  const userId = user.id || (user as any).doc_id;
+  return channel.owner_id === userId;
 };
 
 /**

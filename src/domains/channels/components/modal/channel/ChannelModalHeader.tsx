@@ -8,15 +8,19 @@ import { useContentUploadStore } from '@/store/contentUploadStore';
 import { useUpdateChannelThumbnail } from '@/domains/channels/hooks/useChannels';
 import { useChannelBanner } from '@/domains/channels/hooks/useChannelBanner';
 import { EditableImage } from './EditableImage';
+import { toast } from 'react-hot-toast';
+import { ChannelEditorsStackedAvatars } from '@/shared/components/ChannelEditorsStackedAvatars';
+import { EditorsListModal } from '@/shared/components/EditorsListModal';
 
 interface ChannelModalHeaderProps {
   channel: ChannelData;
   onClose: () => void;
   onSearch?: (query: string) => void;
-  onSubscribe?: (channelId: string) => void;
-  onUnsubscribe?: (channelId: string) => void;
+  onSubscribe?: () => void;
+  onUnsubscribe?: () => void;
   isSubscribeLoading?: boolean;
   currentUserId?: string; // 현재 사용자 ID (소유자 확인용)
+  subscriptionHook?: any; // useChannelSubscription hook return value
 }
 
 export function ChannelModalHeader({
@@ -27,10 +31,12 @@ export function ChannelModalHeader({
   onUnsubscribe,
   isSubscribeLoading = false,
   currentUserId,
+  subscriptionHook,
 }: ChannelModalHeaderProps) {
   const router = useRouter();
   const openContentUploadModal = useContentUploadStore((state) => state.openModal);
   const [isBannerHovered, setIsBannerHovered] = useState(false);
+  const [isEditorsModalOpen, setIsEditorsModalOpen] = useState(false);
 
   // 소유자 권한 확인
   const isOwner = currentUserId && channel.owner_id && currentUserId === channel.owner_id;
@@ -75,6 +81,18 @@ export function ChannelModalHeader({
   const handleBannerUpdate = (base64: string) => {
     if (!channel.id || !isOwner) return;
     updateBanner(base64);
+  };
+
+  const handleSubscribe = () => {
+    if (subscriptionHook?.toggleSubscription) {
+      try {
+        subscriptionHook.toggleSubscription();
+      } catch (error) {
+        console.error('Error toggling subscription:', error);
+      }
+    } else {
+      toast.error('Subscription feature not available');
+    }
   };
 
   return (
@@ -165,26 +183,87 @@ export function ChannelModalHeader({
               </h1>
               <div
                 id="channel-modal-description"
-                className="flex items-center space-x-4 text-sm text-zinc-400 mt-1"
+                className="flex items-center space-x-3 text-sm text-zinc-400 mt-1"
               >
                 <span>{channel.subscriber_count || 0} followers</span>
                 <span>•</span>
-                <span>{channel.content_count || 0} editors</span>
+                {/* Editors with stacked avatars - Clickable */}
+                {channel.managers && channel.managers.length > 0 ? (
+                  <button
+                    onClick={() => setIsEditorsModalOpen(true)}
+                    className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+                  >
+                    <ChannelEditorsStackedAvatars
+                      editors={channel.managers}
+                      maxDisplay={5}
+                      size="sm"
+                      showTooltip={true}
+                    />
+                    {channel.managers.length > 5 && (
+                      <>
+                        <span>•••</span>
+                        <span>{channel.managers.length - 5}+ editors</span>
+                      </>
+                    )}
+                    {channel.managers.length <= 5 && (
+                      <span>{channel.managers.length} editor{channel.managers.length > 1 ? 's' : ''}</span>
+                    )}
+                  </button>
+                ) : (
+                  <span>0 editors</span>
+                )}
               </div>
             </div>
           </div>
 
           {/* 오른쪽: 액션 버튼들 */}
           <div className="flex items-center space-x-3">
-            <button
-              onClick={handleAddContent}
-              className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-full text-white font-medium transition-colors"
-            >
-              + Add Content
-            </button>
+            {/* Add Content 버튼 - owner이거나 manager인 경우에만 표시 */}
+            {(isOwner || channel.is_manager) && (
+              <button
+                onClick={handleAddContent}
+                className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-full text-white font-medium transition-colors"
+              >
+                + Add Content
+              </button>
+            )}
+            {/* Subscribe 버튼 - 소유자가 아닌 경우에만 표시 */}
+            {!isOwner && (
+              <button
+                onClick={handleSubscribe}
+                disabled={subscriptionHook?.isLoading}
+                className={`px-4 py-2 rounded-full font-medium transition-colors ${
+                  subscriptionHook?.isSubscribed
+                    ? 'bg-zinc-600 text-white hover:bg-zinc-500'
+                    : 'bg-white text-gray-900 hover:bg-gray-100'
+                } ${subscriptionHook?.isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+              >
+                {subscriptionHook?.isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    <span className="text-sm">
+                      {subscriptionHook?.isSubscribed ? 'Unsubscribing...' : 'Subscribing...'}
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-sm">
+                    {subscriptionHook?.isSubscribed ? 'Subscribed' : 'Subscribe'}
+                  </span>
+                )}
+              </button>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Editors List Modal */}
+      <EditorsListModal
+        isOpen={isEditorsModalOpen}
+        onClose={() => setIsEditorsModalOpen(false)}
+        editors={channel.managers || []}
+        channelName={channel.name}
+        ownerId={channel.owner_id}
+      />
     </div>
   );
 }

@@ -9,7 +9,7 @@ export default function ChannelPage() {
   const channelId = params.channelId as string;
 
   return (
-    <div className="min-h-screen bg-black pt-[60px] md:pt-[72px]">
+    <div className="min-h-screen bg-black">
       <ChannelPageContent channelId={channelId} />
     </div>
   );
