@@ -64,7 +64,9 @@ export function MainFeed() {
       title: item.link_preview_metadata?.title || item.url || 'Untitled',
       description: item.description || item.link_preview_metadata?.description || undefined,
       channel: 'decoded', // 임시로 고정값 사용
+      channelId: item.channel_id || channelId, // API에서 채널 ID 가져오거나 현재 채널 ID 사용
       author: item.provider_id || 'anonymous',
+      authorId: item.provider_id || item.created_by || 'anonymous', // 사용자 ID (provider_id 또는 created_by 필드 사용)
       timeAgo: getTimeAgo(item.created_at || new Date().toISOString()),
       upvotes: 0, // 콘텐츠 응답에는 좋아요 수가 없으므로 0으로 설정
       comments: 0, // 콘텐츠 응답에는 댓글 수가 없으므로 0으로 설정
@@ -244,14 +246,15 @@ export function MainFeed() {
                     title={post.title}
                     description={post.description}
                     channel={post.channel}
+                    channelId={post.channelId}
                     author={post.author}
+                    authorId={post.authorId}
                     timeAgo={post.timeAgo}
                     upvotes={post.upvotes}
                     comments={post.comments}
                     thumbnail={post.thumbnail}
                     contentType={post.contentType}
-                    onClick={() => {
-                      console.log('Post clicked:', item.id, item.channel_id);
+                    onPostClick={() => {
                       // ContentModal에서 콘텐츠 표시
                       const contentItem = transformToContentItem(item);
                       openModal(contentItem);

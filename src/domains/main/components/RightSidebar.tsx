@@ -4,18 +4,25 @@ import React from 'react';
 
 export function RightSidebar() {
   return (
-    <div className="w-full h-screen bg-zinc-900 border-l border-zinc-700 p-4 sticky top-0 overflow-y-auto">
+    <div className="w-full h-screen p-4 sticky top-0 overflow-y-auto">
       {/* 트렌딩 커뮤니티 */}
       <div className="mb-6">
         <div className="text-white text-sm font-medium mb-4">🔥 Trending Channels</div>
         <div className="space-y-3">
           {[
-            { name: 'technology', members: '12.5M', description: 'Latest tech news and discussions' },
+            {
+              name: 'technology',
+              members: '12.5M',
+              description: 'Latest tech news and discussions',
+            },
             { name: 'programming', members: '8.2M', description: 'Programming discussions' },
             { name: 'webdev', members: '2.1M', description: 'Web development channel' },
             { name: 'reactjs', members: '891K', description: 'React.js discussions' },
           ].map((channel, index) => (
-            <div key={channel.name} className="p-3 bg-zinc-800 rounded-lg hover:bg-zinc-750 cursor-pointer transition-colors">
+            <div
+              key={channel.name}
+              className="p-3 bg-zinc-800 rounded-lg hover:bg-zinc-750 cursor-pointer transition-colors"
+            >
               <div className="flex items-center justify-between mb-1">
                 <span className="text-white text-sm font-medium">r/{channel.name}</span>
                 <span className="text-xs text-gray-400">#{index + 1}</span>
@@ -39,10 +46,11 @@ export function RightSidebar() {
             { title: 'AI breakthrough in coding assistants', channel: 'technology', upvotes: 892 },
             { title: 'Best practices for modern CSS', channel: 'webdev', upvotes: 567 },
           ].map((post, index) => (
-            <div key={index} className="p-3 bg-zinc-800 rounded-lg hover:bg-zinc-750 cursor-pointer transition-colors">
-              <div className="text-white text-xs font-medium mb-1 line-clamp-2">
-                {post.title}
-              </div>
+            <div
+              key={index}
+              className="p-3 bg-zinc-800 rounded-lg hover:bg-zinc-750 cursor-pointer transition-colors"
+            >
+              <div className="text-white text-xs font-medium mb-1 line-clamp-2">{post.title}</div>
               <div className="flex items-center justify-between text-xs text-gray-400">
                 <span>r/{post.channel}</span>
                 <span>↑ {post.upvotes}</span>
