@@ -4,41 +4,65 @@ import React from 'react';
 
 interface AddChannelHeaderProps {
   onClose: () => void;
+  currentStep: number;
 }
 
-export function AddChannelHeader({ onClose }: AddChannelHeaderProps) {
+export function AddChannelHeader({ onClose, currentStep }: AddChannelHeaderProps) {
   return (
     <div className="flex items-center justify-between p-6 border-b border-zinc-700/50">
-      <div className="flex items-center space-x-4">
-        <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center">
-          <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-            <path
-              d="M12 5v14m-7-7h14"
-              stroke="#52525b"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </div>
-        <div>
-          <h2 className="text-2xl font-bold text-white">Create New Channel</h2>
-          <p className="text-zinc-400 text-sm">Add a new channel to your collection</p>
+      <div className="flex space-x-6 justify-between w-full pr-2">
+        <h2 className="text-2xl font-semibold text-white">Create Channel</h2>
+
+        {/* Step Indicator */}
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center">
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                currentStep >= 1
+                  ? 'bg-gradient-to-br from-[#eafd66] to-[#d4e85c] text-black'
+                  : 'bg-zinc-700 text-zinc-300'
+              }`}
+            >
+              1
+            </div>
+            <span
+              className={`ml-2 text-sm ${currentStep >= 1 ? 'text-[#eafd66]' : 'text-zinc-500'}`}
+            >
+              Basic Info
+            </span>
+          </div>
+
+          <div className="w-16 h-0.5 bg-zinc-700"></div>
+
+          <div className="flex items-center">
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                currentStep >= 2
+                  ? 'bg-gradient-to-br from-[#eafd66] to-[#d4e85c] text-black'
+                  : 'bg-zinc-700 text-zinc-300'
+              }`}
+            >
+              2
+            </div>
+            <span
+              className={`ml-2 text-sm ${currentStep >= 2 ? 'text-[#eafd66]' : 'text-zinc-500'}`}
+            >
+              Media Upload
+            </span>
+          </div>
         </div>
       </div>
 
       <button
         onClick={onClose}
-        className="p-3 rounded-full bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors"
-        aria-label="Close modal"
+        className="w-8 h-8 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg flex items-center justify-center transition-colors"
       >
-        <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
-            d="M18 6L6 18M6 6l12 12"
-            stroke="white"
-            strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
+            strokeWidth={2}
+            d="M6 18L18 6M6 6l12 12"
           />
         </svg>
       </button>
