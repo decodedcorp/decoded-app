@@ -4,7 +4,9 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useChannels } from '@/domains/channels/hooks/useChannels';
 import { useAddChannelStore } from '@/store/addChannelStore';
+import { useGlobalContentUploadStore } from '@/store/globalContentUploadStore';
 import { AddChannelModal } from '@/domains/channels/components/modal/add-channel/AddChannelModal';
+import { GlobalContentUploadModal } from '@/domains/channels/components/modal/global-content-upload/GlobalContentUploadModal';
 
 export function LeftSidebar() {
   const router = useRouter();
@@ -18,6 +20,7 @@ export function LeftSidebar() {
     sortOrder: 'desc',
   });
   const openAddChannelModal = useAddChannelStore((state) => state.openModal);
+  const openGlobalContentUploadModal = useGlobalContentUploadStore((state) => state.openModal);
 
   const channels = channelsData?.channels || [];
 
@@ -27,6 +30,10 @@ export function LeftSidebar() {
 
   const handleCreateChannel = () => {
     openAddChannelModal();
+  };
+
+  const handleCreatePost = () => {
+    openGlobalContentUploadModal();
   };
 
   return (
@@ -123,7 +130,7 @@ export function LeftSidebar() {
         </button>
         <button
           className="w-full p-3 bg-zinc-800 text-white font-medium rounded-lg hover:bg-zinc-700 transition-colors border border-zinc-600"
-          onClick={() => handleNavigation('/upload')}
+          onClick={handleCreatePost}
         >
           + Create Post
         </button>
@@ -131,6 +138,9 @@ export function LeftSidebar() {
 
       {/* Add Channel Modal */}
       <AddChannelModal />
+      
+      {/* Global Content Upload Modal */}
+      <GlobalContentUploadModal />
     </div>
   );
 }

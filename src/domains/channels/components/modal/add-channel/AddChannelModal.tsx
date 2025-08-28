@@ -10,6 +10,7 @@ import {
 } from '@/store/addChannelStore';
 import { useCreateChannel } from '@/domains/channels/hooks/useChannels';
 import { useChannelModalStore } from '@/store/channelModalStore';
+import { useGlobalContentUploadStore } from '@/store/globalContentUploadStore';
 
 import { BaseModal } from '../base/BaseModal';
 
@@ -38,6 +39,7 @@ export function AddChannelModal() {
 
   const createChannelMutation = useCreateChannel();
   const openChannelModal = useChannelModalStore((state) => state.openModal);
+  const selectChannel = useGlobalContentUploadStore((state) => state.selectChannel);
 
   // Step management
   const [currentStep, setCurrentStep] = useState(1);
@@ -91,20 +93,30 @@ export function AddChannelModal() {
       // Close the add channel modal
       closeModal();
 
-      // Open the newly created channel modal
+      // Create channel data for global content upload
       const channelData = {
         id: response.id,
         name: response.name,
         description: response.description || `This is the ${response.name} channel.`,
-        owner_id: response.owner_id || 'current-user',
         thumbnail_url: response.thumbnail_url || null,
         subscriber_count: 0,
-        content_count: 0,
-        created_at: response.created_at || new Date().toISOString(),
-        is_subscribed: false,
       };
 
-      openChannelModal(channelData);
+      // If opened from global content upload modal, select the channel
+      // Otherwise, open the channel modal
+      if (useGlobalContentUploadStore.getState().isOpen) {
+        selectChannel(channelData);
+      } else {
+        // For channel modal, we need to include additional fields
+        const fullChannelData = {
+          ...channelData,
+          owner_id: response.owner_id || 'current-user',
+          content_count: 0,
+          created_at: response.created_at || new Date().toISOString(),
+          is_subscribed: false,
+        };
+        openChannelModal(fullChannelData);
+      }
     } catch (error: any) {
       // Handle different types of errors
       let errorMessage = 'Failed to create channel. Please try again.';
