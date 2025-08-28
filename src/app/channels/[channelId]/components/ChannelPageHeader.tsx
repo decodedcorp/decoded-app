@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { ChannelEditorsStackedAvatars } from '@/shared/components/ChannelEditorsStackedAvatars';
+import { EditorsListModal } from '@/shared/components/EditorsListModal';
 
 import { ChannelData } from '@/store/channelModalStore';
 import { useContentUploadStore } from '@/store/contentUploadStore';
@@ -10,6 +13,8 @@ import { useChannelBanner } from '@/domains/channels/hooks/useChannelBanner';
 import { useUpdateChannelThumbnail } from '@/domains/channels/hooks/useChannels';
 import { EditableImage } from '@/domains/channels/components/modal/channel/EditableImage';
 import { useUser } from '@/domains/auth/hooks/useAuth';
+import { canManageChannelManagers } from '@/lib/utils/channelPermissions';
+import { useChannelSubscription } from '@/domains/interactions/hooks/useChannelSubscription';
 
 interface ChannelPageHeaderProps {
   channel: ChannelData;
@@ -28,11 +33,16 @@ export function ChannelPageHeader({
   isSubscribeLoading = false,
   onMobileFiltersToggle,
 }: ChannelPageHeaderProps) {
+  const router = useRouter();
   const openContentUploadModal = useContentUploadStore((state) => state.openModal);
   const [isBannerHovered, setIsBannerHovered] = useState(false);
+  const [isEditorsModalOpen, setIsEditorsModalOpen] = useState(false);
 
   // 현재 사용자 정보
   const { user } = useUser();
+
+  // 구독 기능
+  const subscriptionHook = useChannelSubscription(channel.id);
 
   // 배너 업데이트 hook
   const { updateBanner, isUpdating } = useChannelBanner({
@@ -55,11 +65,20 @@ export function ChannelPageHeader({
     }
   };
 
-  const handleFollow = () => {
-    toast('Follow feature coming soon!', {
-      icon: 'ℹ️',
-      duration: 2000,
-    });
+  const handleSubscribe = () => {
+    if (subscriptionHook?.toggleSubscription) {
+      try {
+        subscriptionHook.toggleSubscription();
+      } catch (error) {
+        console.error('Error toggling subscription:', error);
+      }
+    } else {
+      toast.error('Subscription feature not available');
+    }
+  };
+
+  const handleSettings = () => {
+    router.push(`/channels/${channel.id}/settings`);
   };
 
   const handleBannerChange = (base64: string) => {
@@ -84,16 +103,19 @@ export function ChannelPageHeader({
   const isOwner = user?.doc_id && channel.owner_id && user.doc_id === channel.owner_id;
   const canEditBanner = isOwner; // 소유자만 배너 편집 가능
   const canEditThumbnail = isOwner;
+  const canManageSettings = canManageChannelManagers(user, channel);
 
   // 디버깅용 로그 (개발 완료 후 제거 가능)
-  // console.log('ChannelPageHeader Debug:', {
-  //   userId: user?.doc_id,
-  //   channelOwnerId: channel.owner_id,
-  //   isOwner,
-  //   canEditBanner,
-  //   canEditThumbnail,
-  //   channel: channel,
-  // });
+  console.log('ChannelPageHeader Debug:', {
+    userId: user?.doc_id,
+    userEmail: user?.email,
+    channelOwnerId: channel.owner_id,
+    isOwner,
+    canManageSettings,
+    canEditBanner,
+    canEditThumbnail,
+    channel: channel,
+  });
   return (
     <div>
       {/* 상단 배너 섹션 */}
@@ -172,44 +194,112 @@ export function ChannelPageHeader({
             {/* 채널 정보 */}
             <div>
               <h2 className="text-xl font-semibold text-zinc-300">{channel.name}</h2>
-              <div className="flex items-center space-x-4 text-sm text-zinc-400 mt-1">
+              <div className="flex items-center space-x-3 text-sm text-zinc-400 mt-1">
                 <span>{channel.subscriber_count || 0} followers</span>
                 <span>•</span>
-                <span>{channel.content_count || 0} editors</span>
+                {/* Editors with stacked avatars - Clickable */}
+                {channel.managers && channel.managers.length > 0 ? (
+                  <button
+                    onClick={() => setIsEditorsModalOpen(true)}
+                    className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+                  >
+                    <ChannelEditorsStackedAvatars
+                      editors={channel.managers}
+                      maxDisplay={5}
+                      size="sm"
+                      showTooltip={true}
+                    />
+                    {channel.managers.length > 5 && (
+                      <>
+                        <span>•••</span>
+                        <span>{channel.managers.length - 5}+ editors</span>
+                      </>
+                    )}
+                    {channel.managers.length <= 5 && (
+                      <span>{channel.managers.length} editor{channel.managers.length > 1 ? 's' : ''}</span>
+                    )}
+                  </button>
+                ) : (
+                  <span>0 editors</span>
+                )}
               </div>
             </div>
           </div>
 
           {/* 오른쪽: 액션 버튼들 */}
           <div className="flex items-center space-x-3">
-            <button
-              onClick={handleAddContent}
-              className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-full text-white font-medium transition-colors"
-            >
-              + Add Content
-            </button>
-            <button
-              onClick={handleFollow}
-              className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-full text-white transition-colors"
-            >
-              Follow
-            </button>
-            <button className="p-2 bg-zinc-800 hover:bg-zinc-700 rounded-full text-white transition-colors">
-              <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-                <path
-                  d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zM12 13a1 1 0 110-2 1 1 0 010 2zM12 20a1 1 0 110-2 1 1 0 010 2z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
+            {/* Add Content 버튼 - owner이거나 manager인 경우에만 표시 */}
+            {(isOwner || channel.is_manager) && (
+              <button
+                onClick={handleAddContent}
+                className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-full text-white font-medium transition-colors"
+              >
+                + Add Content
+              </button>
+            )}
+            {!isOwner && (
+              <button
+                onClick={handleSubscribe}
+                disabled={subscriptionHook?.isLoading}
+                className={`px-4 py-2 rounded-full font-medium transition-colors ${
+                  subscriptionHook?.isSubscribed
+                    ? 'bg-zinc-600 text-white hover:bg-zinc-500'
+                    : 'bg-white text-gray-900 hover:bg-gray-100'
+                } ${subscriptionHook?.isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+              >
+                {subscriptionHook?.isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    <span className="text-sm">
+                      {subscriptionHook?.isSubscribed ? 'Unsubscribing...' : 'Subscribing...'}
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-sm">
+                    {subscriptionHook?.isSubscribed ? 'Subscribed' : 'Subscribe'}
+                  </span>
+                )}
+              </button>
+            )}
+            {canManageSettings && (
+              <button 
+                onClick={handleSettings}
+                className="p-2 bg-zinc-800 hover:bg-zinc-700 rounded-full text-white transition-colors"
+                title="Channel Settings"
+                aria-label="Open channel settings"
+              >
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+                  <path
+                    d="M12 15a3 3 0 100-6 3 3 0 000 6z"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            )}
           </div>
         </div>
       </div>
 
       {/* Banner Edit Modal - EditableImage에서 처리하므로 제거 */}
+      
+      {/* Editors List Modal */}
+      <EditorsListModal
+        isOpen={isEditorsModalOpen}
+        onClose={() => setIsEditorsModalOpen(false)}
+        editors={channel.managers || []}
+        channelName={channel.name}
+        ownerId={channel.owner_id}
+      />
     </div>
   );
 }

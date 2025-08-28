@@ -17,7 +17,6 @@ import { useContentModalStore } from '@/store/contentModalStore';
 import { ContentItem } from '@/lib/types/content';
 
 import { ChannelPageHeader } from './ChannelPageHeader';
-import { RecommendedChannelsSidebar } from './RecommendedChannelsSidebar';
 import CommunityHighlights from '@/domains/channels/components/highlights/CommunityHighlights';
 import { HighlightItem } from '@/lib/types/highlightTypes';
 
@@ -27,7 +26,6 @@ interface ChannelPageContentProps {
 
 export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
   const router = useRouter();
-  const [isRightSidebarCollapsed, setIsRightSidebarCollapsed] = useState(false);
   const openContentModal = useContentModalStore((state) => state.openModal);
 
   // 채널 ID로 API 데이터 가져오기
@@ -191,8 +189,8 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      {/* Main Content - Full width */}
+      <div className="w-full flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex-shrink-0">
           {finalChannel ? (
@@ -216,7 +214,7 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
         </div>
 
         {/* Content */}
-        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden">
           {error && (
             <div className="text-red-500 text-center p-4">채널 정보를 불러오는데 실패했습니다.</div>
           )}
@@ -251,8 +249,8 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
               {/* Content 스켈레톤 */}
               <div>
                 <div className="h-8 w-32 bg-zinc-700 rounded mb-6 animate-pulse" />
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {Array.from({ length: 8 }).map((_, i) => (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                  {Array.from({ length: 10 }).map((_, i) => (
                     <div key={i} className="h-40 bg-zinc-800 rounded-xl animate-pulse" />
                   ))}
                 </div>
@@ -260,15 +258,6 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
             </div>
           )}
         </div>
-      </div>
-
-      {/* Right Sidebar - Recommended Channels */}
-      <div className={`hidden xl:block flex-shrink-0 ${isRightSidebarCollapsed ? 'w-12' : 'w-80'}`}>
-        <RecommendedChannelsSidebar
-          currentChannelId={channelId}
-          className="h-screen"
-          onCollapseChange={setIsRightSidebarCollapsed}
-        />
       </div>
 
       {/* Content Modal */}
