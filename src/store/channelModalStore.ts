@@ -1,10 +1,13 @@
 import { create } from 'zustand';
+import type { UserProfileResponse } from '@/api/generated/models/UserProfileResponse';
 
 export interface ChannelData {
   id: string;
   name: string;
   description?: string | null;
   owner_id: string;
+  managers?: UserProfileResponse[];
+  manager_ids?: string[];
   thumbnail_url?: string | null;
   banner_url?: string | null;
   subscriber_count?: number;

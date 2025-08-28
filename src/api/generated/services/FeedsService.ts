@@ -2,21 +2,24 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ContentType } from '../models/ContentType';
 import type { FeedHealthResponse } from '../models/FeedHealthResponse';
 import type { FeedListResponse } from '../models/FeedListResponse';
 import type { FeedResponse } from '../models/FeedResponse';
 import type { FeedStatsResponse } from '../models/FeedStatsResponse';
 import type { FeedType } from '../models/FeedType';
+import type { TrendingTimeWindow } from '../models/TrendingTimeWindow';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 export class FeedsService {
     /**
      * Get Recent Feed
-     * Get recent image contents feed
+     * Get recent contents feed (supports filtering by content types)
      * @param limit
      * @param skip
      * @param daysBack
+     * @param contentTypes Filter by content types
      * @returns FeedResponse Successful Response
      * @throws ApiError
      */
@@ -24,6 +27,7 @@ export class FeedsService {
         limit?: (number | null),
         skip?: (number | null),
         daysBack?: (number | null),
+        contentTypes?: (Array<ContentType> | null),
     ): CancelablePromise<FeedResponse> {
         return __request(OpenAPI, {
             method: 'GET',
@@ -32,6 +36,7 @@ export class FeedsService {
                 'limit': limit,
                 'skip': skip,
                 'days_back': daysBack,
+                'content_types': contentTypes,
             },
             errors: {
                 422: `Validation Error`,
@@ -40,10 +45,11 @@ export class FeedsService {
     }
     /**
      * Get Popular Feed
-     * Get popular image contents feed based on likes
+     * Get popular contents feed based on likes (supports filtering by content types)
      * @param limit
      * @param skip
      * @param minLikes
+     * @param contentTypes Filter by content types
      * @returns FeedResponse Successful Response
      * @throws ApiError
      */
@@ -51,6 +57,7 @@ export class FeedsService {
         limit?: (number | null),
         skip?: (number | null),
         minLikes?: (number | null),
+        contentTypes?: (Array<ContentType> | null),
     ): CancelablePromise<FeedResponse> {
         return __request(OpenAPI, {
             method: 'GET',
@@ -59,6 +66,7 @@ export class FeedsService {
                 'limit': limit,
                 'skip': skip,
                 'min_likes': minLikes,
+                'content_types': contentTypes,
             },
             errors: {
                 422: `Validation Error`,
@@ -67,10 +75,11 @@ export class FeedsService {
     }
     /**
      * Get Trending Feed
-     * Get trending image contents feed (recent + popular)
+     * Get trending contents feed (recent + popular, supports filtering by content types)
      * @param limit
      * @param skip
      * @param hoursBack
+     * @param contentTypes Filter by content types
      * @returns FeedResponse Successful Response
      * @throws ApiError
      */
@@ -78,6 +87,7 @@ export class FeedsService {
         limit?: (number | null),
         skip?: (number | null),
         hoursBack?: (number | null),
+        contentTypes?: (Array<ContentType> | null),
     ): CancelablePromise<FeedResponse> {
         return __request(OpenAPI, {
             method: 'GET',
@@ -86,6 +96,7 @@ export class FeedsService {
                 'limit': limit,
                 'skip': skip,
                 'hours_back': hoursBack,
+                'content_types': contentTypes,
             },
             errors: {
                 422: `Validation Error`,
@@ -94,10 +105,11 @@ export class FeedsService {
     }
     /**
      * Get Mixed Feed
-     * Get mixed feed combining recent and popular content
+     * Get mixed feed combining recent and popular content (supports filtering by content types)
      * @param limit
      * @param skip
      * @param recentRatio
+     * @param contentTypes Filter by content types
      * @returns FeedResponse Successful Response
      * @throws ApiError
      */
@@ -105,6 +117,7 @@ export class FeedsService {
         limit?: (number | null),
         skip?: (number | null),
         recentRatio?: (number | null),
+        contentTypes?: (Array<ContentType> | null),
     ): CancelablePromise<FeedResponse> {
         return __request(OpenAPI, {
             method: 'GET',
@@ -113,6 +126,7 @@ export class FeedsService {
                 'limit': limit,
                 'skip': skip,
                 'recent_ratio': recentRatio,
+                'content_types': contentTypes,
             },
             errors: {
                 422: `Validation Error`,
@@ -247,6 +261,81 @@ export class FeedsService {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/feeds/health',
+        });
+    }
+    /**
+     * Get Advanced Trending Feed
+     * Get trending feed using advanced algorithm with Redis caching
+     * @param timeWindow Time window for trending
+     * @param contentTypes Filter by content types
+     * @param limit
+     * @param skip
+     * @returns FeedResponse Successful Response
+     * @throws ApiError
+     */
+    public static getAdvancedTrendingFeedFeedsTrendingAdvancedGet(
+        timeWindow?: (TrendingTimeWindow | null),
+        contentTypes?: (Array<ContentType> | null),
+        limit?: (number | null),
+        skip?: (number | null),
+    ): CancelablePromise<FeedResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/feeds/trending/advanced',
+            query: {
+                'time_window': timeWindow,
+                'content_types': contentTypes,
+                'limit': limit,
+                'skip': skip,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Batch Update Trending Scores
+     * Batch update trending scores for content (admin endpoint)
+     * @param contentTypes Content types to update
+     * @param limit Max number of items to update
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static batchUpdateTrendingScoresFeedsTrendingUpdatePost(
+        contentTypes?: (Array<ContentType> | null),
+        limit?: (number | null),
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/feeds/trending/update',
+            query: {
+                'content_types': contentTypes,
+                'limit': limit,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Get Trending Statistics
+     * Get trending statistics and metrics
+     * @param timeWindow Time window for stats
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static getTrendingStatisticsFeedsTrendingStatsGet(
+        timeWindow?: (TrendingTimeWindow | null),
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/feeds/trending/stats',
+            query: {
+                'time_window': timeWindow,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
         });
     }
     /**

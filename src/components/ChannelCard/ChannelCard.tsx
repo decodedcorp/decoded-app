@@ -5,6 +5,7 @@ import { ChannelResponse } from '@/api/generated/models/ChannelResponse';
 import { useChannelSubscription } from '@/domains/interactions/hooks/useChannelSubscription';
 import { HeartButton } from '@/components/ui/HeartButton';
 import { useChannelLike } from '@/domains/interactions/hooks/useChannelLike';
+import { ChannelEditorsStackedAvatars } from '@/shared/components/ChannelEditorsStackedAvatars';
 
 // Base channel data interface
 interface BaseChannel {
@@ -16,6 +17,8 @@ interface BaseChannel {
   followerCount?: number;
   contentCount?: number;
   category?: string;
+  managers?: import('@/api/generated/models/UserProfileResponse').UserProfileResponse[];
+  manager_ids?: string[];
 }
 
 // Masonry-specific event handlers
@@ -176,6 +179,8 @@ export const ChannelCard = memo(
           created_at: channel.created_at,
           updated_at: channel.updated_at,
           is_subscribed: channel.is_subscribed,
+          managers: channel.managers,
+          manager_ids: channel.manager_ids,
         }
       : channel;
 
@@ -409,6 +414,18 @@ export const ChannelCard = memo(
                     {formatCount(channelData.contentCount)}
                   </span>
                 </div>
+
+                {/* Editors */}
+                {channelData.managers && channelData.managers.length > 0 && (
+                  <div className="flex items-center">
+                    <ChannelEditorsStackedAvatars 
+                      editors={channelData.managers}
+                      maxDisplay={3}
+                      size="sm"
+                      showTooltip={true}
+                    />
+                  </div>
+                )}
               </div>
 
               {/* 오른쪽 버튼 영역 - 여백 없이 오른쪽 끝에 배치 */}

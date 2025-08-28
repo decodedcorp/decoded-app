@@ -6,7 +6,7 @@ export function ContentUploadHeader({ onClose }: ContentUploadHeaderProps) {
   return (
     <div className="flex items-center justify-between p-6 border-b border-zinc-700/50">
       <div>
-        <h2 className="text-xl font-semibold text-white">Add Link</h2>
+        <h2 className="text-xl font-semibold text-white">Add Content</h2>
         <p className="text-sm text-zinc-400 mt-1">Add a new link to your channel</p>
       </div>
 

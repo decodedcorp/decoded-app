@@ -28,12 +28,19 @@ import Masonry from '@/components/ReactBitsMasonry';
 import { ContentFiltersBar } from '../filters/ContentFiltersBar';
 import CommunityHighlights from '@/domains/channels/components/highlights/CommunityHighlights';
 import { HighlightItem } from '@/lib/types/highlightTypes';
+import { PinButton, PinIndicator } from '../../pin/PinButton';
+import { ChannelPinnedSection } from '../../pin/ChannelPinnedSection';
+import { useChannel } from '../../../hooks/useChannels';
+import { useUser } from '@/domains/auth/hooks/useAuth';
+import { canPinContent } from '@/lib/utils/channelPermissions';
 
 // 개별 콘텐츠 아이템 컴포넌트 (고도화된 메모이제이션)
 const ContentItemCard = React.memo<{
   item: ContentItem;
   onItemClick: (item: ContentItem) => void;
-}>(({ item, onItemClick }) => {
+  channelId: string;
+  channel?: any;
+}>(({ item, onItemClick, channelId, channel }) => {
   const handleClick = React.useCallback(() => {
     // 클릭 가능한 상태가 아닌 경우 클릭 제한
     if (!isContentClickable(item.status)) {
@@ -98,6 +105,18 @@ const ContentItemCard = React.memo<{
       <div
         className={`relative overflow-hidden rounded-xl bg-zinc-800/50 border border-zinc-700/50 w-full h-full`}
       >
+        {/* Pin Button - hover 시 표시 */}
+        {channel && (
+          <div className="absolute top-2 right-2 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <PinButton
+              contentId={String(item.id)}
+              channelId={channelId}
+              channel={channel}
+              size="sm"
+              className="backdrop-blur-sm"
+            />
+          </div>
+        )}
         {/* 이미지가 있는 경우: 이미지만 전체 표시 */}
         {hasValidImage ? (
           <ProxiedImage
@@ -299,6 +318,9 @@ export const ChannelModalContent = React.memo<{
 
   // 채널 ID 결정: Props > selectedChannelId > selectedChannel.id 순서로 우선순위
   const channelId = propChannelId || selectedChannelId || selectedChannel?.id || '';
+  
+  // 채널 정보 가져오기
+  const { data: channelData } = useChannel(channelId);
 
   // 채널의 실제 필터 데이터 가져오기
   const { dataTypes, categories, isLoading: isFiltersLoading } = useChannelFilters(channelId);
@@ -704,7 +726,12 @@ export const ChannelModalContent = React.memo<{
 
               return (
                 <div className="w-full h-full">
-                  <ContentItemCard item={contentItem} onItemClick={handleItemClick} />
+                  <ContentItemCard 
+                    item={contentItem} 
+                    onItemClick={handleItemClick}
+                    channelId={channelId}
+                    channel={channelData}
+                  />
                 </div>
               );
             }}

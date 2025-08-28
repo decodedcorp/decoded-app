@@ -8,6 +8,7 @@ import type { DemoLinkContentRequest } from '../models/DemoLinkContentRequest';
 import type { DemoResponse } from '../models/DemoResponse';
 import type { SearchChannelResponse } from '../models/SearchChannelResponse';
 import type { SearchContentsResponse } from '../models/SearchContentsResponse';
+import type { SearchUsersResponse } from '../models/SearchUsersResponse';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
@@ -77,6 +78,29 @@ export class PublicService {
             path: {
                 'channel_id': channelId,
             },
+            query: {
+                'query': query,
+                'limit': limit,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Search Users
+     * @param query
+     * @param limit
+     * @returns SearchUsersResponse Successful Response
+     * @throws ApiError
+     */
+    public static searchUsersSearchUsersGet(
+        query: string = '',
+        limit: number = 10,
+    ): CancelablePromise<SearchUsersResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/search/users',
             query: {
                 'query': query,
                 'limit': limit,

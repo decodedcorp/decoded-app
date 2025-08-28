@@ -4,11 +4,9 @@ import React, { useState, useCallback, useMemo } from 'react';
 
 import { ExploreHeader, ExploreFilters } from '../explore/ExploreHeader';
 import { ExploreGrid } from '../explore/ExploreGrid';
-import { TrendingSection, CategorySection } from '../explore/CategorySection';
-import { RecommendedSection } from '../explore/RecommendedSection';
+import { DiscoverSection } from '../explore/DiscoverSection';
 import { ChannelModal, ContentModal } from '../modal';
-import { AddChannelModal } from '../modal/add-channel/AddChannelModal';
-import { AddChannelButton } from '../hero/components/AddChannelButton';
+import { AddChannelModal } from '@/domains/create/components/modal/add-channel/AddChannelModal';
 import { LoadingState, ErrorState, EmptyState } from '../common/LoadingStates';
 import { useChannels } from '../../hooks/useChannels';
 import { useChannelModalStore } from '../../../../store/channelModalStore';
@@ -46,25 +44,6 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
     return channelsData?.channels || [];
   }, [channelsData]);
 
-  // Group channels by category for organized sections (exclude uncategorized)
-  // Note: For now we'll use a simple categorization until API provides category field
-  const categorizedChannels = useMemo(() => {
-    const categoryGroups: Record<string, ChannelResponse[]> = {
-      'technology': [],
-      'design': [],
-      'lifestyle': []
-    };
-    
-    // Simple distribution of channels for now
-    channels.forEach((channel, index) => {
-      const categories = Object.keys(categoryGroups);
-      const categoryIndex = index % categories.length;
-      const category = categories[categoryIndex];
-      categoryGroups[category].push(channel);
-    });
-
-    return categoryGroups;
-  }, [channels]);
 
   // Filter change handler
   const handleFilterChange = useCallback((newFilters: ExploreFilters) => {
@@ -118,8 +97,8 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
 
   return (
     <div className={`relative h-full overflow-y-auto bg-black ${className}`}>
-      {/* Top padding for Header */}
-      <div className="h-[60px] md:h-[72px]" />
+      {/* Top padding for Header - minimal */}
+      <div className="h-[8px] md:h-[12px]" />
       
       {/* Explore Header */}
       <ExploreHeader 
@@ -131,63 +110,12 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
         {showOrganizedSections ? (
           // Organized sections view (default explore experience)
           <>
-            {/* Personalized Recommendations */}
-            <RecommendedSection 
+            {/* Discover Section - Channel listings */}
+            <DiscoverSection 
               channels={channels}
               onChannelClick={handleChannelClick}
-              className="mt-8"
+              className="mt-16"
             />
-
-            {/* Trending Section */}
-            <TrendingSection 
-              channels={channels}
-              onChannelClick={handleChannelClick}
-            />
-
-            {/* Category Sections */}
-            {Object.entries(categorizedChannels).map(([category, categoryChannels]) => {
-              const displayTitle = category.charAt(0).toUpperCase() + category.slice(1);
-              
-              return (
-                <CategorySection
-                  key={category}
-                  title={displayTitle}
-                  channels={categoryChannels}
-                  onChannelClick={handleChannelClick}
-                  onViewAll={() => {
-                    setFilters(prev => ({ ...prev, category }));
-                  }}
-                />
-              );
-            })}
-            
-            {/* Become an Editor CTA */}
-            <section className="mt-20 mb-8">
-              <div className="bg-zinc-900/50 rounded-2xl p-8 border border-zinc-700/30">
-                <div className="text-center max-w-2xl mx-auto">
-                  <div className="w-12 h-12 mx-auto mb-4 bg-zinc-800 rounded-full flex items-center justify-center">
-                    <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-400 mb-3">
-                    당신만의 편집 철학을 공유해보세요
-                  </h3>
-                  <p className="text-gray-500 mb-6 text-lg leading-relaxed">
-                    Decoded는 누구나 에디터가 될 수 있는 플랫폼입니다. <br />
-                    당신의 독창적인 관점과 큐레이션으로 새로운 가치를 만들어보세요.
-                  </p>
-                  <div className="flex items-center justify-center space-x-6 mb-6 text-sm text-gray-500">
-                    <span>무료로 시작</span>
-                    <span>•</span>
-                    <span>전문 도구 제공</span>
-                    <span>•</span>
-                    <span>커뮤니티 지원</span>
-                  </div>
-                  <AddChannelButton variant="post" className="font-semibold" />
-                </div>
-              </div>
-            </section>
           </>
         ) : (
           // Filtered grid view

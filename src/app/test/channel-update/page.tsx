@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ChannelUpdateTest } from '../../../domains/channels/components/modal/add-channel/ChannelUpdateTest';
+import { ChannelUpdateTest } from '../../../domains/create/components/modal/add-channel/ChannelUpdateTest';
 
 export default function ChannelUpdateTestPage() {
   const [channelId, setChannelId] = useState('68a8abfec2052dc81884b700');

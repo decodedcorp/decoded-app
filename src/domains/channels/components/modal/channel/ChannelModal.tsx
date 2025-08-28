@@ -18,6 +18,7 @@ import { ChannelModalContainer } from '../base/ChannelModalContainer';
 import { ContentUploadModal } from '../content-upload/ContentUploadModal';
 import { useContentModalStore, selectIsContentModalOpen } from '@/store/contentModalStore';
 import { useUser } from '@/domains/auth/hooks/useAuth';
+import { useChannelSubscription } from '@/domains/interactions/hooks/useChannelSubscription';
 
 import { ChannelModalHeader } from './ChannelModalHeader';
 import { ChannelModalContent } from './ChannelModalContent';
@@ -48,6 +49,9 @@ export function ChannelModal() {
 
   // 채널 ID로 API 데이터 가져오기
   const { data: apiChannel, isLoading, error } = useChannel(channelId || '');
+  
+  // 구독 기능
+  const subscriptionHook = useChannelSubscription(channelId || '');
 
   // 디버깅을 위한 로그
   React.useEffect(() => {
@@ -89,12 +93,16 @@ export function ChannelModal() {
         name: channel.name,
         description: channel.description || null,
         owner_id: channel.owner_id || '',
+        managers: channel.managers || [],
+        manager_ids: channel.manager_ids || [],
         thumbnail_url: channel.thumbnail_url || null,
         subscriber_count: channel.subscriber_count || 0,
         content_count: channel.content_count || 0,
         created_at: channel.created_at || undefined,
         updated_at: channel.updated_at || null,
         is_subscribed: channel.is_subscribed || false,
+        is_owner: channel.is_owner || false,
+        is_manager: channel.is_manager || false,
       };
     }
     return null;
@@ -126,16 +134,11 @@ export function ChannelModal() {
             <ChannelModalHeader
               channel={finalChannel}
               onClose={closeModal}
-              onSubscribe={(channelId) => {
-                console.log('Subscribe to channel:', channelId);
-                // TODO: Implement subscribe functionality
-              }}
-              onUnsubscribe={(channelId) => {
-                console.log('Unsubscribe from channel:', channelId);
-                // TODO: Implement unsubscribe functionality
-              }}
-              isSubscribeLoading={false}
+              onSubscribe={subscriptionHook?.toggleSubscription}
+              onUnsubscribe={subscriptionHook?.toggleSubscription}
+              isSubscribeLoading={subscriptionHook?.isLoading || false}
               currentUserId={user?.doc_id}
+              subscriptionHook={subscriptionHook}
             />
           ) : (
             <ChannelModalSkeleton onClose={closeModal} />

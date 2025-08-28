@@ -2,6 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ContentPreviewMetadata } from './ContentPreviewMetadata';
+import type { FolderPreviewMetadata } from './FolderPreviewMetadata';
 /**
  * Unified response for pinned items (content or folder)
  */
@@ -50,5 +52,13 @@ export type UnifiedPinnedItem = {
      * Content count (for folder items)
      */
     content_count?: (number | null);
+    /**
+     * Content preview metadata
+     */
+    content_metadata?: (ContentPreviewMetadata | null);
+    /**
+     * Folder preview metadata
+     */
+    folder_metadata?: (FolderPreviewMetadata | null);
 };
 

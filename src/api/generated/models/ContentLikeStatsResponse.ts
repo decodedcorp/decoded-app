@@ -15,16 +15,8 @@ export type ContentLikeStatsResponse = {
      */
     total_likes?: number;
     /**
-     * Recent likes (24h)
+     * Whether current user liked this content
      */
-    recent_likes?: number;
-    /**
-     * Like trend (increasing/decreasing/stable)
-     */
-    like_trend: string;
-    /**
-     * Top users who liked this content
-     */
-    top_likers?: Array<Record<string, any>>;
+    user_liked?: boolean;
 };
 

@@ -26,5 +26,9 @@ export type ChannelSubscriptionStatsResponse = {
      * Subscriber engagement metrics
      */
     subscriber_engagement?: Record<string, any>;
+    /**
+     * Whether current user is subscribed to this channel
+     */
+    user_subscribed?: boolean;
 };
 

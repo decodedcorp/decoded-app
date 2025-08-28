@@ -7,8 +7,43 @@ interface ContentModalHeaderProps {
   onClose: () => void;
 }
 
+// Helper function to extract title based on content type
+const getContentTitle = (content: any): string => {
+  // Link content - linkPreview를 먼저 체크 (우선순위 높음)
+  if (content.linkPreview?.title) {
+    return content.linkPreview.title;
+  }
+  
+  // Link content - link_preview_metadata도 체크
+  if (content.link_preview_metadata?.title) {
+    return content.link_preview_metadata.title;
+  }
+  
+  // Video content - title이 "Untitled"가 아닌 경우만 사용
+  if (content.title && content.title !== 'Untitled') {
+    return content.title;
+  }
+  
+  // AI generated content might have title in ai_gen_metadata
+  if (content.ai_gen_metadata?.title) {
+    return content.ai_gen_metadata.title;
+  }
+  
+  // AI summary도 체크
+  if (content.aiSummary) {
+    // Summary의 첫 줄이나 첫 문장을 title로 사용할 수도 있음
+    const firstLine = content.aiSummary.split('\n')[0];
+    if (firstLine && firstLine.length < 100) {
+      return firstLine;
+    }
+  }
+  
+  // Image content or fallback
+  return 'Untitled';
+};
+
 export function ContentModalHeader({ content, onClose }: ContentModalHeaderProps) {
-  const displayTitle = content.title;
+  const displayTitle = getContentTitle(content);
 
   return (
     <div className="bg-zinc-900 p-6 border-b border-zinc-700/30">

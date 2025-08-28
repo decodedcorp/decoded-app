@@ -44,6 +44,8 @@ export const queryKeys = {
     details: () => [...queryKeys.contents.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.contents.details(), id] as const,
     byChannel: (channelId: string) => [...queryKeys.contents.all, 'channel', channelId] as const,
+    infiniteByChannel: (channelId: string, sortBy: string) => 
+      [...queryKeys.contents.all, 'infinite', 'channel', channelId, sortBy] as const,
     byProvider: (providerId: string) =>
       [...queryKeys.contents.all, 'provider', providerId] as const,
     likes: (contentId: string) => [...queryKeys.contents.detail(contentId), 'likes'] as const,
@@ -93,6 +95,26 @@ export const queryKeys = {
     all: ['users'] as const,
     lists: () => [...queryKeys.users.all, 'list'] as const,
     list: (filters: Record<string, any>) => [...queryKeys.users.lists(), filters] as const,
+    bookmarks: () => [...queryKeys.users.all, 'bookmarks'] as const,
+    myBookmarks: (params?: Record<string, any>) => [...queryKeys.users.bookmarks(), 'my', params] as const,
+    bookmarkStatus: (contentId: string) => [...queryKeys.users.bookmarks(), 'status', contentId] as const,
+  },
+
+  // Pins related queries
+  pins: {
+    all: ['pins'] as const,
+    byChannel: (channelId: string) => [...queryKeys.pins.all, 'channel', channelId] as const,
+    byContent: (contentId: string) => [...queryKeys.pins.all, 'content', contentId] as const,
+  },
+
+  // Comments related queries
+  comments: {
+    all: ['comments'] as const,
+    byContent: (contentId: string) => [...queryKeys.comments.all, 'content', contentId] as const,
+    detail: (commentId: string) => [...queryKeys.comments.all, 'detail', commentId] as const,
+    replies: (parentCommentId: string) => [...queryKeys.comments.all, 'replies', parentCommentId] as const,
+    stats: (contentId: string) => [...queryKeys.comments.all, 'stats', contentId] as const,
+    userStats: (userId: string) => [...queryKeys.comments.all, 'user-stats', userId] as const,
   },
 
   // Search related queries
@@ -102,9 +124,26 @@ export const queryKeys = {
       [...queryKeys.search.all, 'contents', { query, limit }] as const,
     channels: (query: string, limit?: number) => 
       [...queryKeys.search.all, 'channels', { query, limit }] as const,
+    users: (query: string, limit?: number) => 
+      [...queryKeys.search.all, 'users', { query, limit }] as const,
     channelContents: (channelId: string, query: string, limit?: number) => 
       [...queryKeys.search.all, 'channel-contents', { channelId, query, limit }] as const,
     autocomplete: (query: string, type?: 'all' | 'channels' | 'contents') => 
       [...queryKeys.search.all, 'autocomplete', { query, type }] as const,
+  },
+
+  // Invitations related queries
+  invitations: {
+    all: ['invitations'] as const,
+    lists: () => [...queryKeys.invitations.all, 'list'] as const,
+    list: (filters: Record<string, any>) => [...queryKeys.invitations.lists(), filters] as const,
+    details: () => [...queryKeys.invitations.all, 'detail'] as const,
+    detail: (id: string) => [...queryKeys.invitations.details(), id] as const,
+    // Mutation states
+    mutations: () => [...queryKeys.invitations.all, 'mutations'] as const,
+    create: () => [...queryKeys.invitations.mutations(), 'create'] as const,
+    accept: (id: string) => [...queryKeys.invitations.mutations(), 'accept', id] as const,
+    reject: (id: string) => [...queryKeys.invitations.mutations(), 'reject', id] as const,
+    cancel: (id: string) => [...queryKeys.invitations.mutations(), 'cancel', id] as const,
   },
 } as const;
