@@ -25,7 +25,7 @@ export interface GoogleTokenPayload {
 
 export interface BackendLoginRequest {
   jwt_token: string;
-  sui_address?: string; // 선택적으로 변경
+  sui_address: string; // 필수로 변경 (백엔드 요구사항)
   email: string;
   marketing: boolean;
 }

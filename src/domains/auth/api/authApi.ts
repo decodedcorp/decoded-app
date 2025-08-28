@@ -52,9 +52,12 @@ export const loginUser = async (jwtToken: string, suiAddress?: string, email?: s
       console.log('[Auth] Hashed token:', hashedToken);
     }
 
+    // suiAddress가 없으면 sub를 기반으로 생성 (GoogleAuthApi의 기존 함수 사용)
+    const finalSuiAddress = suiAddress || GoogleAuthApi.generateSuiAddress(sub);
+
     const loginData: LoginRequest = {
       jwt_token: hashedToken, // 해시된 토큰 사용
-      sui_address: suiAddress || '',
+      sui_address: finalSuiAddress, // 항상 유효한 sui_address 제공
       email: email || decodedGoogle.email || null,
     };
 
