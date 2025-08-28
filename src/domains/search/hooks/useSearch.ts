@@ -148,6 +148,39 @@ export const useSearchChannelContents = ({
   });
 };
 
+interface UseSearchUsersParams {
+  query: string;
+  limit?: number;
+  enabled?: boolean;
+  debounceMs?: number;
+}
+
+/**
+ * Hook for searching users
+ */
+export const useSearchUsers = ({
+  query,
+  limit = 10,
+  enabled = true,
+  debounceMs = 300,
+}: UseSearchUsersParams) => {
+  const debouncedQuery = useDebounce(query, debounceMs);
+  
+  // Only enable search if query has meaningful content (최소 2글자)
+  const shouldQuery = enabled && debouncedQuery.trim().length >= 2;
+
+  return useQuery({
+    queryKey: queryKeys.search.users(debouncedQuery, limit),
+    queryFn: () => SearchService.searchUsersSearchUsersGet(debouncedQuery, limit),
+    enabled: shouldQuery,
+    staleTime: 5 * 60 * 1000, // 5 minutes - 사용자 정보는 덜 자주 변함
+    gcTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false,
+    retry: 1,
+    retryDelay: 500,
+  });
+};
+
 /**
  * Combined search hook that provides both channel and content results
  */

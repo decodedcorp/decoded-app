@@ -6,7 +6,11 @@ import Link from 'next/link';
 
 import { useScrollDirection } from '@/lib/hooks/useScrollDirection';
 import { useChannel } from '@/domains/channels/hooks/useChannels';
+import { useAuthStore } from '@/store/authStore';
 import { LoginButton } from './LoginButton';
+import { UserAvatar } from './UserAvatar';
+import { NotificationButton } from './NotificationButton';
+import { CreateButton } from './CreateButton';
 import { ChannelSearchBar } from './ChannelSearchBar';
 import { GlobalSearchBar } from './GlobalSearchBar';
 
@@ -20,6 +24,11 @@ export function Header() {
 
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  
+  // Get auth state
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isLoading = useAuthStore((state) => state.isLoading);
+  const isInitialized = useAuthStore((state) => state.isInitialized);
 
   // 채널 페이지인지 확인
   const isChannelPage = pathname?.startsWith('/channels/') && pathname !== '/channels';
@@ -118,21 +127,33 @@ export function Header() {
           )}
         </div>
 
-        {/* Mobile Search Button */}
-        <button className="md:hidden p-2 text-white hover:text-[#eafd66] transition-colors">
-          <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-            <path
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
+        {/* Right side actions */}
+        <div className="flex items-center gap-2 md:gap-3">
+          {/* Mobile Search Button */}
+          <button className="md:hidden p-2 text-white hover:text-[#eafd66] transition-colors">
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+              <path
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
 
-        {/* Login Button */}
-        <LoginButton />
+          {/* Actions for authenticated users */}
+          {isAuthenticated && isInitialized ? (
+            <>
+              <CreateButton />
+              <NotificationButton />
+              <UserAvatar />
+            </>
+          ) : (
+            /* Show login button for non-authenticated users */
+            <LoginButton />
+          )}
+        </div>
       </div>
     </header>
   );
