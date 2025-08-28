@@ -3,6 +3,7 @@ import React from 'react';
 import { QueryProvider } from '../lib/providers/QueryProvider';
 import { ToastProvider } from '../lib/providers/ToastProvider';
 import { Header } from '../shared/components/Header';
+import { MainLayout } from '../shared/components/MainLayout';
 import { AuthInitializer } from '../domains/auth/components/AuthInitializer';
 
 import '../styles/globals.css';
@@ -15,7 +16,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ToastProvider>
             <AuthInitializer />
             <Header />
-            {children}
+            <MainLayout>
+              {children}
+            </MainLayout>
           </ToastProvider>
         </QueryProvider>
       </body>
