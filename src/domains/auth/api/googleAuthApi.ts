@@ -126,8 +126,15 @@ export class GoogleAuthApi {
       Accept: 'application/json',
     };
 
+    // 서버/클라이언트 환경에 따른 URL 설정
+    const baseUrl = typeof window !== 'undefined' 
+      ? '' // 클라이언트에서는 상대 경로 사용
+      : 'http://localhost:3000'; // 서버에서는 절대 경로 사용
+
+    const apiUrl = `${baseUrl}/api/proxy/auth/login`;
+
     // 프록시 경로 사용하여 CORS 및 환경변수 문제 해결
-    const backendResponse = await fetch('/api/proxy/auth/login', {
+    const backendResponse = await fetch(apiUrl, {
       method: 'POST',
       headers: backendRequestHeaders,
       body: JSON.stringify(requestBody),

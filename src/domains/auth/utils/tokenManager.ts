@@ -26,15 +26,10 @@ export type TokenType = 'jwt' | 'oauth' | 'unknown';
  */
 
 /**
- * Check if we're in a browser environment
- */
-const isBrowser = typeof window !== 'undefined';
-
-/**
  * Get sessionStorage safely
  */
 const getSessionStorage = () => {
-  if (!isBrowser) return null;
+  if (typeof window === 'undefined') return null;
   return window.sessionStorage;
 };
 
@@ -42,7 +37,7 @@ const getSessionStorage = () => {
  * Get localStorage safely
  */
 const getLocalStorage = () => {
-  if (!isBrowser) return null;
+  if (typeof window === 'undefined') return null;
   return window.localStorage;
 };
 

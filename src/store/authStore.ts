@@ -220,13 +220,19 @@ export const useAuthStore = create<AuthStore>()(
                 console.log('[Auth] User restored from sessionStorage:', user);
               } catch (error) {
                 console.error('[Auth] Failed to parse user from sessionStorage:', error);
-                // 파싱 실패 시에만 로그아웃
+                // 파싱 실패 시 로그아웃
                 state.logout();
               }
             } else {
-              // user 정보가 없고 isAuthenticated가 true인 경우에만 로그아웃
-              // (useAuthInit에서 처리할 예정이므로 여기서는 로그아웃하지 않음)
-              console.log('[Auth] No user data in sessionStorage, will be handled by useAuthInit');
+              // localStorage에서 isAuthenticated가 true로 복원되었지만 sessionStorage에 user가 없는 경우
+              // 실제로는 로그아웃 상태로 처리
+              if (state.isAuthenticated) {
+                console.log('[Auth] isAuthenticated true but no sessionStorage data, resetting to logout state');
+                state.isAuthenticated = false;
+                state.user = null;
+                state.error = null;
+                state.isLoading = false;
+              }
             }
           }
         },
