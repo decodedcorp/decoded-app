@@ -118,7 +118,7 @@ export class GoogleAuthApi {
   }
 
   /**
-   * 백엔드 로그인 API 호출
+   * 백엔드 로그인 API 호출 (프록시 사용)
    */
   static async callBackendLogin(requestBody: BackendLoginRequest): Promise<BackendLoginResponse> {
     const backendRequestHeaders = {
@@ -126,13 +126,8 @@ export class GoogleAuthApi {
       Accept: 'application/json',
     };
 
-    // Mixed Content 방지: 프로덕션 환경에서 HTTP를 HTTPS로 변환
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '';
-    const secureBaseUrl = process.env.NODE_ENV === 'production' && baseUrl.startsWith('http:')
-      ? baseUrl.replace('http:', 'https:')
-      : baseUrl;
-
-    const backendResponse = await fetch(`${secureBaseUrl}/auth/login`, {
+    // 프록시 경로 사용하여 CORS 및 환경변수 문제 해결
+    const backendResponse = await fetch('/api/proxy/auth/login', {
       method: 'POST',
       headers: backendRequestHeaders,
       body: JSON.stringify(requestBody),
