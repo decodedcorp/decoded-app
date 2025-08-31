@@ -167,12 +167,11 @@ export const fetchUserProfile = async () => {
  */
 export const handleGoogleOAuthCallback = async (code: string) => {
   try {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[Auth] Processing Google OAuth callback with code:', {
-        code: code.substring(0, 10) + '...',
-        codeLength: code.length,
-      });
-    }
+    console.log('[Auth] Processing Google OAuth callback with code:', {
+      code: code.substring(0, 10) + '...',
+      codeLength: code.length,
+      timestamp: new Date().toISOString(),
+    });
 
     // Call the backend OAuth endpoint
     const response = await fetch('/api/auth/google', {
@@ -183,28 +182,45 @@ export const handleGoogleOAuthCallback = async (code: string) => {
       body: JSON.stringify({ code }),
     });
 
+    console.log('[Auth] OAuth API response:', {
+      status: response.status,
+      statusText: response.statusText,
+      ok: response.ok,
+      headers: Object.fromEntries(response.headers.entries()),
+    });
+
     if (!response.ok) {
-      throw new Error(`OAuth callback failed: ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('[Auth] OAuth API error response:', errorText);
+      throw new Error(`OAuth callback failed: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
     const data = await response.json();
+    console.log('[Auth] OAuth API success data:', {
+      hasAccessToken: !!data.access_token,
+      hasUser: !!data.user,
+      hasRefreshToken: !!data.refresh_token,
+      tokenType: data.token_type,
+    });
+
     const mappedResponse = ResponseMapper.mapLoginResponse(data);
 
     // Store login response
     storeLoginResponse(mappedResponse);
 
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[Auth] Google OAuth login successful:', {
-        hasUser: !!mappedResponse.user,
-        hasAccessToken: !!mappedResponse.access_token,
-      });
-    }
+    console.log('[Auth] Google OAuth login successful:', {
+      hasUser: !!mappedResponse.user,
+      hasAccessToken: !!mappedResponse.access_token,
+      userEmail: mappedResponse.user?.email,
+    });
 
     return mappedResponse;
   } catch (error) {
-    if (process.env.NODE_ENV === 'development') {
-      console.error('[Auth] Google OAuth callback error:', error);
-    }
+    console.error('[Auth] Google OAuth callback error:', {
+      error: error instanceof Error ? error.message : error,
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+    });
     throw error;
   }
 };
