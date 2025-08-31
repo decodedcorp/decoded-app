@@ -4,17 +4,32 @@ import { GoogleAuthLogger } from '@/domains/auth/utils/googleAuthLogger';
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('[Google OAuth API] Received request at:', new Date().toISOString());
+    
     const { code } = await request.json();
+    console.log('[Google OAuth API] Authorization code:', {
+      hasCode: !!code,
+      codeLength: code?.length,
+      codePreview: code ? code.substring(0, 10) + '...' : 'none',
+    });
 
     if (!code) {
+      console.error('[Google OAuth API] No authorization code provided');
       return NextResponse.json({ error: 'Authorization code is required' }, { status: 400 });
     }
 
     // 1. Google OAuth 토큰 교환
+    console.log('[Google OAuth API] Starting token exchange with Google...');
     const tokenData = await GoogleAuthApi.exchangeCodeForToken(code);
+    console.log('[Google OAuth API] Token exchange result:', {
+      hasAccessToken: !!tokenData.access_token,
+      hasIdToken: !!tokenData.id_token,
+    });
+
     const { id_token } = tokenData;
 
     if (!id_token) {
+      console.error('[Google OAuth API] No ID token received from Google');
       return NextResponse.json({ error: 'No ID token received from Google' }, { status: 400 });
     }
 
@@ -42,24 +57,46 @@ export async function POST(request: NextRequest) {
     GoogleAuthLogger.logBackendRequest(backendRequestBody, hashInput, hashedToken);
 
     // 5. 백엔드 로그인 API 호출 (sui_address 업데이트 포함)
+    console.log('[Google OAuth API] Calling backend login API...');
     const backendData = await GoogleAuthApi.callBackendLoginWithSuiAddressUpdate(
       backendRequestBody,
     );
+    console.log('[Google OAuth API] Backend login response:', {
+      hasAccessToken: !!backendData.access_token,
+      hasUser: !!backendData.user,
+      hasRefreshToken: !!backendData.refresh_token,
+    });
     GoogleAuthLogger.logBackendResponse(backendData);
 
     // 6. 사용자 객체 생성 또는 보완
     const user = GoogleAuthApi.createOrEnhanceUser(backendData, payload);
+    console.log('[Google OAuth API] User created/enhanced:', {
+      email: user.email,
+      nickname: user.nickname,
+      docId: user.doc_id,
+    });
     GoogleAuthLogger.logUserCreation(user);
 
     // 7. 성공 응답
-    return NextResponse.json({
+    const finalResponse = {
       access_token: backendData.access_token,
       refresh_token: backendData.refresh_token,
       user: user,
       token_type: 'oauth',
+    };
+    console.log('[Google OAuth API] Sending final response:', {
+      hasAccessToken: !!finalResponse.access_token,
+      hasUser: !!finalResponse.user,
+      tokenType: finalResponse.token_type,
     });
+
+    return NextResponse.json(finalResponse);
   } catch (error) {
-    console.error('Google OAuth API error:', error);
+    console.error('[Google OAuth API] Complete error details:', {
+      error: error instanceof Error ? error.message : error,
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+    });
 
     // 에러 타입에 따른 적절한 응답
     if (error instanceof Error) {
