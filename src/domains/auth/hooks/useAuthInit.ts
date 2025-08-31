@@ -12,6 +12,14 @@ export const useAuthInit = () => {
     useAuthStore();
 
   useEffect(() => {
+    // Client-side only
+    if (typeof window === 'undefined') {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[Auth] Skipping initialization on server-side');
+      }
+      return;
+    }
+
     // 이미 초기화되었으면 다시 실행하지 않음
     if (isInitialized) {
       return;
