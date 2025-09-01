@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     console.log('[Google OAuth API] Received request at:', new Date().toISOString());
     console.log('[Google OAuth API] Environment:', {
       NODE_ENV: process.env.NODE_ENV,
-      BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL,
+      API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
       GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? 'SET' : 'MISSING',
       GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET ? 'SET' : 'MISSING'
     });
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
       stack: error instanceof Error ? error.stack : undefined,
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV,
-      backendUrl: process.env.NEXT_PUBLIC_BACKEND_URL,
+      apiBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
       hasGoogleClientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
     });
 
