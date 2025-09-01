@@ -126,16 +126,11 @@ export class GoogleAuthApi {
       Accept: 'application/json',
     };
 
-    // 서버/클라이언트 환경에 따른 URL 설정
-    const baseUrl = typeof window !== 'undefined' 
-      ? '' // 클라이언트에서는 상대 경로 사용
-      : process.env.VERCEL_URL 
-        ? `https://${process.env.VERCEL_URL}` // Vercel 프로덕션
-        : 'http://localhost:3000'; // 로컬 개발
+    // 직접 백엔드 API 호출 (프록시 우회)
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
+    const apiUrl = `${apiBaseUrl}/auth/login`;
 
-    const apiUrl = `${baseUrl}/api/proxy/auth/login`;
-
-    // 프록시 경로 사용하여 CORS 및 환경변수 문제 해결
+    // 직접 백엔드 API 호출하여 Vercel deployment protection 우회
     const backendResponse = await fetch(apiUrl, {
       method: 'POST',
       headers: backendRequestHeaders,
