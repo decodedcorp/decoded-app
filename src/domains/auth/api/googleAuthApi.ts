@@ -124,10 +124,13 @@ export class GoogleAuthApi {
     const backendRequestHeaders = {
       'Content-Type': 'application/json',
       Accept: 'application/json',
+      'Origin': 'https://decoded.style',
+      'Access-Control-Request-Method': 'POST',
+      'Access-Control-Request-Headers': 'Content-Type'
     };
 
     // 직접 백엔드 API 호출 (프록시 우회)
-    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://dev.decoded.style';
     const apiUrl = `${apiBaseUrl}/auth/login`;
 
     // 직접 백엔드 API 호출하여 Vercel deployment protection 우회
@@ -135,11 +138,18 @@ export class GoogleAuthApi {
       method: 'POST',
       headers: backendRequestHeaders,
       body: JSON.stringify(requestBody),
+      mode: 'cors'
     });
 
     if (!backendResponse.ok) {
       const errorData = await backendResponse.text();
       console.error('Backend login API error:', errorData);
+      console.error('Request details:', {
+        url: apiUrl,
+        method: 'POST',
+        headers: backendRequestHeaders,
+        bodyPreview: JSON.stringify(requestBody).substring(0, 100)
+      });
       throw new Error(`Backend login failed: ${backendResponse.status}`);
     }
 
