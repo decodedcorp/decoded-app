@@ -28,11 +28,30 @@ export const API_ENDPOINTS = {
 // Google OAuth configuration
 export const GOOGLE_OAUTH_CONFIG = {
   CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '',
-  REDIRECT_URI:
-    process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI ||
-    (typeof window !== 'undefined'
-      ? `${window.location.origin}/auth/callback`
-      : 'http://localhost:3000/auth/callback'),
+  REDIRECT_URI: (() => {
+    // 명시적으로 설정된 경우 우선 사용
+    if (process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI) {
+      return process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI;
+    }
+    
+    // 브라우저 환경에서는 현재 origin 사용
+    if (typeof window !== 'undefined') {
+      return `${window.location.origin}/auth/callback`;
+    }
+    
+    // 서버 환경에서 환경별 기본값 설정
+    if (process.env.VERCEL_URL) {
+      return `https://${process.env.VERCEL_URL}/auth/callback`;
+    }
+    
+    // 프로덕션 환경 기본값
+    if (process.env.NODE_ENV === 'production') {
+      return 'https://decoded.style/auth/callback';
+    }
+    
+    // 개발 환경 기본값
+    return 'http://localhost:3000/auth/callback';
+  })(),
   SCOPE: 'email profile',
   AUTH_URL: 'https://accounts.google.com/o/oauth2/v2/auth',
 } as const;
