@@ -50,11 +50,39 @@ export class GoogleAuthApi {
    */
   static async exchangeCodeForToken(code: string): Promise<GoogleTokenData> {
     // 환경에 따른 redirect_uri 설정
-    const redirectUri =
-      process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI ||
-      (typeof window !== 'undefined'
-        ? `${window.location.origin}/auth/callback`
-        : 'http://localhost:3000/auth/callback');
+    const getRedirectUri = () => {
+      // 명시적으로 설정된 경우 우선 사용
+      if (process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI) {
+        return process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI;
+      }
+      
+      // 브라우저 환경에서는 현재 origin 사용
+      if (typeof window !== 'undefined') {
+        return `${window.location.origin}/auth/callback`;
+      }
+      
+      // 서버 환경에서 환경별 기본값 설정
+      if (process.env.VERCEL_URL) {
+        return `https://${process.env.VERCEL_URL}/auth/callback`;
+      }
+      
+      // 프로덕션 환경 기본값
+      if (process.env.NODE_ENV === 'production') {
+        return 'https://decoded.style/auth/callback';
+      }
+      
+      // 개발 환경 기본값
+      return 'http://localhost:3000/auth/callback';
+    };
+    
+    const redirectUri = getRedirectUri();
+    
+    console.log('[GoogleAuthApi] Using redirect URI:', redirectUri);
+    console.log('[GoogleAuthApi] Environment details:', {
+      NODE_ENV: process.env.NODE_ENV,
+      VERCEL_URL: process.env.VERCEL_URL,
+      EXPLICIT_REDIRECT_URI: process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI
+    });
 
     const tokenRequestBody = new URLSearchParams({
       code,
