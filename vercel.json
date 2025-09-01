@@ -4,13 +4,5 @@
       "memory": 1024,
       "maxDuration": 10
     }
-  },
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "headers": {
-        "X-Vercel-Skip-Protection": "1"
-      }
-    }
-  ]
+  }
 }
