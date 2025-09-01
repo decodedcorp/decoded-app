@@ -5,6 +5,12 @@ import { GoogleAuthLogger } from '@/domains/auth/utils/googleAuthLogger';
 export async function POST(request: NextRequest) {
   try {
     console.log('[Google OAuth API] Received request at:', new Date().toISOString());
+    console.log('[Google OAuth API] Environment:', {
+      NODE_ENV: process.env.NODE_ENV,
+      BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL,
+      GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? 'SET' : 'MISSING',
+      GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET ? 'SET' : 'MISSING'
+    });
     
     const { code } = await request.json();
     console.log('[Google OAuth API] Authorization code:', {
