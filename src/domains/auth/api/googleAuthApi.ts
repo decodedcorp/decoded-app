@@ -129,7 +129,9 @@ export class GoogleAuthApi {
     // 서버/클라이언트 환경에 따른 URL 설정
     const baseUrl = typeof window !== 'undefined' 
       ? '' // 클라이언트에서는 상대 경로 사용
-      : 'http://localhost:3000'; // 서버에서는 절대 경로 사용
+      : process.env.VERCEL_URL 
+        ? `https://${process.env.VERCEL_URL}` // Vercel 프로덕션
+        : 'http://localhost:3000'; // 로컬 개발
 
     const apiUrl = `${baseUrl}/api/proxy/auth/login`;
 
