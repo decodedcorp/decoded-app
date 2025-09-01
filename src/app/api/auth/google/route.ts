@@ -102,7 +102,16 @@ export async function POST(request: NextRequest) {
       error: error instanceof Error ? error.message : error,
       stack: error instanceof Error ? error.stack : undefined,
       timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV,
+      backendUrl: process.env.NEXT_PUBLIC_BACKEND_URL,
+      hasGoogleClientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
     });
+
+    // 추가 상세 로깅
+    if (error instanceof Error) {
+      console.error('[Google OAuth API] Error name:', error.name);
+      console.error('[Google OAuth API] Error cause:', error.cause);
+    }
 
     // 에러 타입에 따른 적절한 응답
     if (error instanceof Error) {
