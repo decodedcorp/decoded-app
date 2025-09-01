@@ -157,9 +157,36 @@ export class GoogleAuthApi {
       'Access-Control-Request-Headers': 'Content-Type'
     };
 
-    // 직접 백엔드 API 호출 (프록시 우회)
-    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://dev.decoded.style';
+    // 환경별 API 기본 URL 설정
+    const getApiBaseUrl = () => {
+      // 명시적으로 설정된 경우 우선 사용
+      if (process.env.NEXT_PUBLIC_API_BASE_URL) {
+        return process.env.NEXT_PUBLIC_API_BASE_URL;
+      }
+      
+      // Vercel 환경에서 프로덕션 URL 강제 사용
+      if (process.env.VERCEL || process.env.VERCEL_URL) {
+        return 'http://dev.decoded.style';
+      }
+      
+      // 프로덕션 환경 기본값
+      if (process.env.NODE_ENV === 'production') {
+        return 'http://dev.decoded.style';
+      }
+      
+      // 개발 환경 기본값
+      return 'http://dev.decoded.style';
+    };
+    
+    const apiBaseUrl = getApiBaseUrl();
     const apiUrl = `${apiBaseUrl}/auth/login`;
+    
+    console.log('[GoogleAuthApi] Backend API details:', {
+      apiBaseUrl,
+      apiUrl,
+      NODE_ENV: process.env.NODE_ENV,
+      EXPLICIT_API_URL: process.env.NEXT_PUBLIC_API_BASE_URL
+    });
 
     // 직접 백엔드 API 호출하여 Vercel deployment protection 우회
     const backendResponse = await fetch(apiUrl, {
