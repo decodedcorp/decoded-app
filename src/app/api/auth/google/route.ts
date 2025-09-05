@@ -7,12 +7,29 @@ export async function POST(request: NextRequest) {
     console.log('[Google OAuth API] Received request at:', new Date().toISOString());
     console.log('[Google OAuth API] Environment:', {
       NODE_ENV: process.env.NODE_ENV,
-      API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
+      API_BASE_URL: process.env.API_BASE_URL || 'MISSING',
+      NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || 'MISSING',
       GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? 'SET' : 'MISSING',
       GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET ? 'SET' : 'MISSING',
       VERCEL_URL: process.env.VERCEL_URL || 'NOT_SET',
       REDIRECT_URI: process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI || 'USING_FALLBACK',
     });
+
+    // 환경 변수 검증
+    if (!process.env.API_BASE_URL) {
+      console.error('[Google OAuth API] API_BASE_URL is missing in production');
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+    }
+
+    if (!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) {
+      console.error('[Google OAuth API] GOOGLE_CLIENT_ID is missing');
+      return NextResponse.json({ error: 'Google OAuth not configured' }, { status: 500 });
+    }
+
+    if (!process.env.GOOGLE_CLIENT_SECRET) {
+      console.error('[Google OAuth API] GOOGLE_CLIENT_SECRET is missing');
+      return NextResponse.json({ error: 'Google OAuth not configured' }, { status: 500 });
+    }
 
     const { code } = await request.json();
     console.log('[Google OAuth API] Authorization code:', {
