@@ -25,7 +25,7 @@ export interface GoogleTokenPayload {
 
 export interface BackendLoginRequest {
   jwt_token: string;
-  sui_address: string; // 백엔드 API 요구사항에 따라 필수로 변경
+  sui_address?: string; // 스모크 테스트를 위해 선택적으로 변경
   email: string;
   marketing: boolean;
 }
@@ -150,10 +150,11 @@ export class GoogleAuthApi {
    */
   static async callBackendLogin(requestBody: BackendLoginRequest): Promise<BackendLoginResponse> {
     // 1. API_BASE_URL 가드 + 절대 URL 사용
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const API_BASE_URL = process.env.API_BASE_URL;
     if (!API_BASE_URL) {
       throw new Error('[Config] API_BASE_URL missing (prod)');
     }
+    console.log('[LOGIN] apiBaseUrl=', API_BASE_URL?.slice(0, 12));
     const loginUrl = new URL('/auth/login', API_BASE_URL).toString();
 
     // 2. 서버-서버 호출 헤더 정리 (CORS 헤더 제거)
@@ -177,7 +178,7 @@ export class GoogleAuthApi {
 
     // 4. 응답 에러 핸들링 명확화
     if (!backendResponse.ok) {
-      let errorInfo: { detail?: string; error?: string } = {};
+      let errorInfo: any = null;
       try {
         errorInfo = await backendResponse.json();
       } catch {
@@ -201,11 +202,7 @@ export class GoogleAuthApi {
         },
       });
 
-      throw new Error(
-        `Backend /auth/login ${backendResponse.status}: ${
-          errorInfo.detail || errorInfo.error || 'unknown'
-        }`,
-      );
+      throw new Error(`[LOGIN] ${backendResponse.status} ${JSON.stringify(errorInfo)}`);
     }
 
     return await backendResponse.json();

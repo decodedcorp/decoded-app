@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     GoogleAuthLogger.logSuiAddressGeneration(sub, tempSuiAddress);
 
     // 4. 백엔드 API 요청 준비 (백엔드 요구사항으로 sui_address 포함)
-    const backendRequestBody = {
+    const backendRequestBody: any = {
       jwt_token: hashedToken,
       sui_address: tempSuiAddress, // 백엔드에서 필수로 요구
       email: email,
