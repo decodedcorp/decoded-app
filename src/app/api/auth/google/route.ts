@@ -64,31 +64,54 @@ export async function POST(request: NextRequest) {
 
     const { email, sub, iss, aud } = payload;
 
-    // 3. 해시된 토큰 생성 및 임시 sui_address 생성 (백엔드 요구사항)
-    const hashedToken = GoogleAuthApi.generateHashedToken(sub, iss, aud);
+    // 3. JWT 토큰 검증 및 임시 sui_address 생성 (백엔드 요구사항)
     const tempSuiAddress = GoogleAuthApi.generateSuiAddress(sub); // 임시 생성
 
     GoogleAuthLogger.logSuiAddressGeneration(sub, tempSuiAddress);
 
+    // JWT 형식 검증
+    const isJwt = (s: string) => /^[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+$/.test(s);
+    if (!isJwt(id_token)) {
+      throw new Error('[LOGIN] id_token must be a valid JWT format');
+    }
+
+    console.log('[Google OAuth API] JWT token validation:', {
+      isJwtFormat: isJwt(id_token),
+      tokenLength: id_token.length,
+      tokenPreview: id_token.substring(0, 20) + '...' + id_token.substring(id_token.length - 20),
+      hasDots: (id_token.match(/\./g) || []).length,
+      dotCount: (id_token.match(/\./g) || []).length,
+      firstDotIndex: id_token.indexOf('.'),
+      secondDotIndex: id_token.indexOf('.', id_token.indexOf('.') + 1),
+    });
+
     // 4. 백엔드 API 요청 준비 (백엔드 요구사항으로 sui_address 포함)
     const backendRequestBody: any = {
-      jwt_token: hashedToken,
+      jwt_token: id_token, // ✅ 실제 Google id_token (JWT) 사용
       sui_address: tempSuiAddress, // 백엔드에서 필수로 요구
       email: email,
+      sub: sub, // Google의 고유 ID 추가 (백엔드에서 unique key로 사용할 가능성)
       marketing: false,
     };
 
     const hashInput = `${sub}${iss}${aud}`;
-    GoogleAuthLogger.logBackendRequest(backendRequestBody, hashInput, hashedToken);
+    GoogleAuthLogger.logBackendRequest(backendRequestBody, hashInput, id_token);
 
     // 디버깅을 위한 추가 로그
     console.log('[Google OAuth API] Backend request body validation:', {
       hasJwtToken: !!backendRequestBody.jwt_token,
       jwtTokenLength: backendRequestBody.jwt_token?.length,
+      jwtTokenIsJwt: isJwt(backendRequestBody.jwt_token || ''),
+      jwtTokenDots: (backendRequestBody.jwt_token?.match(/\./g) || []).length,
+      jwtTokenPreview:
+        backendRequestBody.jwt_token?.substring(0, 12) +
+        '...' +
+        backendRequestBody.jwt_token?.substring(backendRequestBody.jwt_token.length - 12),
       hasSuiAddress: !!backendRequestBody.sui_address,
       suiAddressLength: backendRequestBody.sui_address?.length,
       suiAddressFormat: backendRequestBody.sui_address?.startsWith('0x'),
       hasEmail: !!backendRequestBody.email,
+      hasSub: !!backendRequestBody.sub,
       marketing: backendRequestBody.marketing,
     });
 
