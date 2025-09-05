@@ -3,6 +3,7 @@
 import React from 'react';
 
 import { motion } from 'framer-motion';
+import { Button } from '@decoded/ui';
 import { GeneratedContent } from '@/store/contentUploadStore';
 
 import TiltedCard from './TiltedCard';

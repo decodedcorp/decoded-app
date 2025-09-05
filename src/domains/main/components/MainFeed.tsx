@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useMemo } from 'react';
-import { Flame, Sparkles, Star, MailOpen } from 'lucide-react';
+import { MailOpen } from 'lucide-react';
 import { PostCard } from './PostCard';
 import { useInfiniteContentsByChannel } from '@/domains/contents/hooks/useInfiniteContentsByChannel';
 import { InfiniteScrollLoader } from './InfiniteScrollLoader';
@@ -22,11 +22,10 @@ export const MainFeed = React.memo(function MainFeed() {
   const sortOptions: {
     value: SortOption;
     label: string;
-    icon: React.ComponentType<{ className?: string }>;
   }[] = [
-    { value: 'hot', label: 'Hot', icon: Flame },
-    { value: 'new', label: 'New', icon: Sparkles },
-    { value: 'top', label: 'Top', icon: Star },
+    { value: 'hot', label: 'Hot' },
+    { value: 'new', label: 'New' },
+    { value: 'top', label: 'Top' },
   ];
 
   // 특정 채널의 콘텐츠 가져오기 - 무한스크롤 사용
@@ -194,7 +193,6 @@ export const MainFeed = React.memo(function MainFeed() {
                     }
                   `}
                 >
-                  <option.icon className="w-4 h-4 mr-1.5" />
                   {option.label}
                 </button>
               ))}

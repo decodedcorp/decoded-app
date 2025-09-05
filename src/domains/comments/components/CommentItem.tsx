@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { Button } from '@decoded/ui';
 import { 
   MdFavorite, 
   MdFavoriteBorder, 
@@ -196,13 +197,14 @@ export function CommentItem({
                 >
                   Cancel
                 </button>
-                <button
+                <Button
                   onClick={handleEdit}
                   disabled={!editText.trim() || editText === comment.text || updateCommentMutation.isPending}
-                  className="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 disabled:bg-zinc-600 text-white rounded transition-colors"
+                  variant="primary"
+                  size="sm"
                 >
                   {updateCommentMutation.isPending ? 'Saving...' : 'Save'}
-                </button>
+                </Button>
               </div>
             </div>
           </div>

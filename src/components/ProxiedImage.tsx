@@ -179,7 +179,7 @@ export const ProxiedImage = forwardRef<HTMLImageElement, ProxiedImageProps>(
           style={{ width: width || '100%', height: height || '100%' }}
         >
           <svg
-            className="w-8 h-8 mb-2 text-zinc-500"
+            className="w-8 h-8 text-zinc-500"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -191,7 +191,6 @@ export const ProxiedImage = forwardRef<HTMLImageElement, ProxiedImageProps>(
               d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
             />
           </svg>
-          <span className="text-xs text-center">Image not available</span>
         </div>
       );
     }
@@ -201,15 +200,10 @@ export const ProxiedImage = forwardRef<HTMLImageElement, ProxiedImageProps>(
       return (
         <div
           ref={containerRef}
-          className={`${className} bg-zinc-800/30 border border-zinc-700/30 rounded-lg flex flex-col items-center justify-center animate-pulse`}
+          className={`${className} bg-zinc-800/30 border border-zinc-700/30 rounded-lg flex flex-col items-center justify-center`}
           style={{ width: width || '100%', height: height || '100%' }}
         >
-          <div className="w-6 h-6 border-2 border-zinc-500 border-t-transparent rounded-full animate-spin" />
-          {isRetrying && (
-            <span className="text-xs text-zinc-400 mt-2">
-              Retrying... ({retryCount}/{maxRetries})
-            </span>
-          )}
+          <div className="w-4 h-4 border-2 border-zinc-500 border-t-transparent rounded-full animate-spin" />
         </div>
       );
     }

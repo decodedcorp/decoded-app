@@ -141,7 +141,7 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
                 router.push(`/channels/${channelId}`);
               }
             }}
-            aria-label={`Go to r/${channel}`}
+            aria-label={`Go to ${channel}`}
           >
             <span className="text-zinc-900 font-bold text-sm">r</span>
           </button>
@@ -158,7 +158,7 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
                 }
               }}
             >
-              r/{channel}
+              {channel}
             </button>
             <span className="text-zinc-600">•</span>
             <button

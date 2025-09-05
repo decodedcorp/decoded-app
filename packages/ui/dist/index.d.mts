@@ -74,8 +74,8 @@ interface VisuallyHiddenProps extends HTMLAttributes<HTMLSpanElement> {
 declare const VisuallyHidden: react.ForwardRefExoticComponent<VisuallyHiddenProps & react.RefAttributes<HTMLSpanElement>>;
 
 declare const buttonVariants: (props?: ({
-    variant?: "primary" | "secondary" | "outline" | "ghost" | "destructive" | null | undefined;
-    size?: "sm" | "md" | "lg" | null | undefined;
+    variant?: "primary" | "secondary" | "outline" | "ghost" | "destructive" | "accent" | "accent-outline" | "login" | null | undefined;
+    size?: "sm" | "md" | "lg" | "xl" | null | undefined;
 } & class_variance_authority_dist_types.ClassProp) | undefined) => string;
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
     loading?: boolean;
@@ -93,6 +93,8 @@ declare const DialogTrigger: react.ForwardRefExoticComponent<DialogPrimitive.Dia
 interface DialogContentProps extends DialogPrimitive.DialogContentProps {
     variant?: 'default' | 'alert';
     hideCloseButton?: boolean;
+    className?: string;
+    children?: React.ReactNode;
 }
 declare const DialogContent: react.ForwardRefExoticComponent<DialogContentProps & react.RefAttributes<HTMLDivElement>>;
 declare const DialogHeader: ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => react_jsx_runtime.JSX.Element;

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { Button } from '@decoded/ui';
 import { formatDateByContext } from '@/lib/utils/dateUtils';
 import { useAcceptInvitation, useRejectInvitation, useCancelInvitation } from '../hooks/useInvitations';
 import type { InvitationResponse } from '@/api/generated/models/InvitationResponse';
@@ -54,7 +55,7 @@ export function InvitationCard({ invitation, type }: InvitationCardProps) {
               <span className={`px-2 py-1 text-xs rounded-full ${
                 isExpired 
                   ? 'bg-red-600/20 text-red-400' 
-                  : 'bg-blue-600/20 text-blue-400'
+                  : 'bg-primary/20 text-primary'
               }`}>
                 {isExpired ? 'Expired' : 'Pending'}
               </span>
@@ -85,31 +86,34 @@ export function InvitationCard({ invitation, type }: InvitationCardProps) {
         <div className="flex items-center space-x-2">
           {type === 'received' && !isExpired && (
             <>
-              <button
+              <Button
                 onClick={handleAccept}
                 disabled={isPending}
-                className="px-3 py-1 bg-green-600 hover:bg-green-700 disabled:bg-green-800 disabled:cursor-not-allowed text-white text-sm rounded transition-colors"
+                variant="primary"
+                size="sm"
               >
                 Accept
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={handleReject}
                 disabled={isPending}
-                className="px-3 py-1 bg-red-600 hover:bg-red-700 disabled:bg-red-800 disabled:cursor-not-allowed text-white text-sm rounded transition-colors"
+                variant="destructive"
+                size="sm"
               >
                 Reject
-              </button>
+              </Button>
             </>
           )}
           
           {type === 'sent' && !isExpired && (
-            <button
+            <Button
               onClick={handleCancel}
               disabled={isPending}
-              className="px-3 py-1 bg-zinc-600 hover:bg-zinc-500 disabled:bg-zinc-700 disabled:cursor-not-allowed text-white text-sm rounded transition-colors"
+              variant="secondary"
+              size="sm"
             >
               Cancel
-            </button>
+            </Button>
           )}
         </div>
       </div>

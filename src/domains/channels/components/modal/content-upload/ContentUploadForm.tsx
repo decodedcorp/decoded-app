@@ -1,19 +1,16 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
+import { X } from 'lucide-react';
+import { Button } from '@decoded/ui';
 
 import { ContentType } from '@/api/generated';
 import {
   useContentUploadStore,
   selectContentUploadFormData,
   selectContentUploadError,
-  selectIsGenerating,
-  selectGeneratedContent,
-  selectGenerationProgress,
-  selectGenerationError,
 } from '@/store/contentUploadStore';
-import LoadingAnimation from '@/components/LoadingAnimation';
-import TiltedCard from '@/components/TiltedCard';
+// AI 생성 관련 컴포넌트 import 제거
 import { useCreateLinkContent, useCreateImageContent } from '@/domains/channels/hooks/useContents';
 import { compressImage, validateImageFile } from '@/lib/utils/imageUtils';
 
@@ -26,16 +23,7 @@ interface ContentUploadFormProps {
 export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadFormProps) {
   const formData = useContentUploadStore(selectContentUploadFormData);
   const storeError = useContentUploadStore(selectContentUploadError);
-  const isGenerating = useContentUploadStore(selectIsGenerating);
-  const generatedContent = useContentUploadStore(selectGeneratedContent);
-  const generationProgress = useContentUploadStore(selectGenerationProgress);
-  const generationError = useContentUploadStore(selectGenerationError);
   const updateFormData = useContentUploadStore((state) => state.updateFormData);
-  const startGeneration = useContentUploadStore((state) => state.startGeneration);
-  const updateGenerationProgress = useContentUploadStore((state) => state.updateGenerationProgress);
-  const setGeneratedContent = useContentUploadStore((state) => state.setGeneratedContent);
-  const setGenerationError = useContentUploadStore((state) => state.setGenerationError);
-  const resetGeneration = useContentUploadStore((state) => state.resetGeneration);
 
   const createLinkContent = useCreateLinkContent();
   const createImageContent = useCreateImageContent();
@@ -53,37 +41,9 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     type: formData.type,
     url: formData.url,
     channel_id: formData.channel_id,
-    isGenerating,
-    generatedContent: !!generatedContent,
   });
 
-  // AI 생성 시뮬레이션 (실제로는 API 호출)
-  useEffect(() => {
-    if (isGenerating) {
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += Math.random() * 15 + 5; // 5-20%씩 증가
-        if (progress >= 100) {
-          progress = 100;
-          clearInterval(interval);
-
-          // AI 생성 완료 시뮬레이션
-          setTimeout(() => {
-            setGeneratedContent({
-              id: `content_${Date.now()}`,
-              title: `${formData.url} related content`,
-              description: `AI-generated content based on the analysis of ${formData.url}. This content was automatically created based on the link's information.`,
-              image_url: `https://picsum.photos/400/300?random=${Date.now()}`, // 랜덤 이미지
-              created_at: new Date().toISOString(),
-            });
-          }, 500);
-        }
-        updateGenerationProgress(Math.min(progress, 100));
-      }, 200);
-
-      return () => clearInterval(interval);
-    }
-  }, [isGenerating, formData.url, updateGenerationProgress, setGeneratedContent]);
+  // AI 생성 시뮬레이션 로직 제거 - 링크 포스트는 기본 포스트 동작으로 처리
 
   const handleInputChange = (field: keyof typeof formData, value: string) => {
     updateFormData({ [field]: value });
@@ -252,12 +212,8 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
 
           console.log('Image content created successfully:', result);
 
-          // AI 생성 시작 (실제로는 서버에서 처리)
-          console.log('Starting AI generation...');
-          startGeneration();
-          console.log('AI generation started, isGenerating should be true');
-
-          // 폼 제출 콜백 호출하여 모달 상태 업데이트
+          // 이미지 포스트 생성 완료 후 바로 모달 닫기
+          console.log('Image content created, closing modal...');
           onSubmit(submitData);
         } else if (formData.type === ContentType.LINK && submitData.channel_id && formData.url) {
           console.log('About to call createLinkContent.mutateAsync...');
@@ -279,12 +235,8 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
 
           console.log('Link content created successfully:', result);
 
-          // AI 생성 시작 (실제로는 서버에서 처리)
-          console.log('Starting AI generation...');
-          startGeneration();
-          console.log('AI generation started, isGenerating should be true');
-
-          // 폼 제출 콜백 호출하여 모달 상태 업데이트
+          // 링크 포스트 생성 완료 후 바로 모달 닫기 (기본 포스트 동작)
+          console.log('Link content created, closing modal...');
           onSubmit(submitData);
         } else {
           console.log('Condition not met for API call');
@@ -299,19 +251,10 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
         }
       } catch (error) {
         console.error('Failed to create content:', error);
-        setGenerationError(error instanceof Error ? error.message : 'Failed to create content');
+        // 에러는 상위 컴포넌트에서 처리
       }
     },
-    [
-      formData,
-      validateForm,
-      createImageContent,
-      createLinkContent,
-      startGeneration,
-      onSubmit,
-      updateFormData,
-      setGenerationError,
-    ],
+    [formData, validateForm, createImageContent, createLinkContent, onSubmit, updateFormData],
   );
 
   // 외부에서 폼 제출을 트리거할 수 있도록 전역 함수 노출
@@ -339,73 +282,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     setValidationErrors((prev) => ({ ...prev, file: undefined }));
   };
 
-  // AI 생성 중이거나 결과가 있을 때 다른 UI 표시
-  console.log(
-    'ContentUploadForm render - isGenerating:',
-    isGenerating,
-    'generatedContent:',
-    generatedContent,
-  );
-
-  if (isGenerating || generatedContent) {
-    return (
-      <div className="p-6 space-y-6">
-        {isGenerating && (
-          <div className="flex flex-col items-center justify-center py-12">
-            {/* 간단한 로딩 메시지 */}
-            <div className="text-center">
-              <div className="w-16 h-16 border-4 border-zinc-700 border-t-blue-500 rounded-full animate-spin mx-auto mb-4"></div>
-              <h3 className="text-lg font-semibold text-white mb-2">
-                AI is generating information...
-              </h3>
-              <p className="text-sm text-zinc-400">Processing your link content</p>
-            </div>
-            {generationError && (
-              <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                <p className="text-sm text-red-400">{generationError}</p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {generatedContent && (
-          <div className="flex flex-col items-center justify-center py-8 space-y-6">
-            {/* AI 생성 완료 시 항상 TiltedCard 표시 (이미지가 없어도 기본 이미지 사용) */}
-            <div className="w-[400px] h-[300px]">
-              <TiltedCard
-                imageSrc={generatedContent.image_url || 'https://picsum.photos/400/300?random=1'}
-                altText={generatedContent.title || 'Generated content'}
-                captionText={generatedContent.title || 'AI generation complete!'}
-                containerWidth="400px"
-                containerHeight="300px"
-                imageWidth="400px"
-                imageHeight="300px"
-                enablePixelTransition={true}
-                pixelTransitionTrigger={true}
-                gridSize={16}
-                animationStepDuration={0.6}
-              />
-            </div>
-
-            {/* 생성된 콘텐츠 정보 표시 */}
-            <div className="text-center space-y-3 max-w-md">
-              <h3 className="text-xl font-semibold text-white">
-                {generatedContent.title || 'AI Generated Content'}
-              </h3>
-              {generatedContent.description && (
-                <p className="text-sm text-zinc-300 leading-relaxed">
-                  {generatedContent.description}
-                </p>
-              )}
-              <div className="text-xs text-zinc-500">
-                Generated at {new Date(generatedContent.created_at).toLocaleString()}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
+  // AI 생성 로직 제거 - 링크 포스트는 기본 포스트 동작으로 처리
 
   return (
     <form onSubmit={handleSubmit} className="p-6 space-y-6">
@@ -448,13 +325,15 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
                   alt="Preview"
                   className="w-full h-48 object-cover"
                 />
-                <button
+                <Button
                   type="button"
                   onClick={removeFile}
-                  className="absolute top-2 right-2 w-8 h-8 bg-red-500/80 hover:bg-red-500 text-white rounded-full flex items-center justify-center transition-colors"
+                  variant="destructive"
+                  size="sm"
+                  className="absolute top-2 right-2 w-8 h-8 rounded-full p-0"
                 >
-                  ×
-                </button>
+                  <X className="w-4 h-4" />
+                </Button>
               </div>
               <p className="text-sm text-zinc-400">
                 {formData.file?.name} ({(formData.file?.size || 0 / 1024 / 1024).toFixed(2)} MB)
@@ -547,18 +426,14 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
           {validationErrors.description && (
             <p className="text-sm text-red-400">{validationErrors.description}</p>
           )}
-          <p className="text-xs text-zinc-500 ml-auto">
-            {(formData.description || '').length}/500
-          </p>
+          <p className="text-xs text-zinc-500 ml-auto">{(formData.description || '').length}/500</p>
         </div>
       </div>
 
       {/* API Error */}
-      {(error || storeError || generationError) && (
+      {(error || storeError) && (
         <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-          <p className="text-sm text-red-400">
-            {error || storeError || generationError || 'An error occurred'}
-          </p>
+          <p className="text-sm text-red-400">{error || storeError || 'An error occurred'}</p>
         </div>
       )}
     </form>

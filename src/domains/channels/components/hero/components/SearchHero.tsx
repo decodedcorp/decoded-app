@@ -10,11 +10,11 @@ import { SearchHeroProps, Question } from '../types';
 import GlitchText from './GlitchText';
 import { AddChannelButton } from './AddChannelButton';
 
-export function SearchHero({ 
-  onToggleDesign, 
+export function SearchHero({
+  onToggleDesign,
   className = '',
   placeholderQuestions: customPlaceholderQuestions,
-  searchSource = 'hero'
+  searchSource = 'hero',
 }: SearchHeroProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -22,25 +22,42 @@ export function SearchHero({
   const router = useRouter();
 
   // Memoized placeholder questions with categories
-  const placeholderQuestions: Question[] = useMemo(() => 
-    customPlaceholderQuestions || [
-      { id: '1', text: 'Ask about your interests, hobbies, or preferences...', category: 'general' },
-      { id: '2', text: 'What kind of content do you love to consume?', category: 'specific' },
-      { id: '3', text: 'Tell me about your favorite topics or passions...', category: 'emotional' },
-      { id: '4', text: 'What are you curious about today?', category: 'general' },
-      { id: '5', text: 'Share your interests and discover new channels...', category: 'specific' },
-      { id: '6', text: 'What topics make you excited to learn more?', category: 'emotional' },
-      { id: '7', text: 'Describe your ideal content experience...', category: 'general' },
-      { id: '8', text: 'What would you like to explore today?', category: 'specific' },
-      { id: '9', text: 'Tell me about your favorite activities or hobbies...', category: 'emotional' },
-      { id: '10', text: 'What kind of stories resonate with you?', category: 'general' },
-      { id: '11', text: 'Share your interests and find your community...', category: 'specific' },
-      { id: '12', text: 'What topics spark your curiosity?', category: 'emotional' },
-      { id: '13', text: "Describe what you're passionate about...", category: 'general' },
-      { id: '14', text: 'What content brings you joy and inspiration?', category: 'specific' },
-      { id: '15', text: 'Tell me about your favorite things to learn...', category: 'emotional' },
-    ], 
-    [customPlaceholderQuestions]
+  const placeholderQuestions: Question[] = useMemo(
+    () =>
+      customPlaceholderQuestions || [
+        {
+          id: '1',
+          text: 'Ask about your interests, hobbies, or preferences...',
+          category: 'general',
+        },
+        { id: '2', text: 'What kind of content do you love to consume?', category: 'specific' },
+        {
+          id: '3',
+          text: 'Tell me about your favorite topics or passions...',
+          category: 'emotional',
+        },
+        { id: '4', text: 'What are you curious about today?', category: 'general' },
+        {
+          id: '5',
+          text: 'Share your interests and discover new channels...',
+          category: 'specific',
+        },
+        { id: '6', text: 'What topics make you excited to learn more?', category: 'emotional' },
+        { id: '7', text: 'Describe your ideal content experience...', category: 'general' },
+        { id: '8', text: 'What would you like to explore today?', category: 'specific' },
+        {
+          id: '9',
+          text: 'Tell me about your favorite activities or hobbies...',
+          category: 'emotional',
+        },
+        { id: '10', text: 'What kind of stories resonate with you?', category: 'general' },
+        { id: '11', text: 'Share your interests and find your community...', category: 'specific' },
+        { id: '12', text: 'What topics spark your curiosity?', category: 'emotional' },
+        { id: '13', text: "Describe what you're passionate about...", category: 'general' },
+        { id: '14', text: 'What content brings you joy and inspiration?', category: 'specific' },
+        { id: '15', text: 'Tell me about your favorite things to learn...', category: 'emotional' },
+      ],
+    [customPlaceholderQuestions],
   );
 
   // Auto-rotate placeholders
@@ -53,41 +70,47 @@ export function SearchHero({
   }, [placeholderQuestions.length]);
 
   // Memoized current placeholder
-  const currentPlaceholder = useMemo(() => 
-    placeholderQuestions[currentPlaceholderIndex], 
-    [placeholderQuestions, currentPlaceholderIndex]
+  const currentPlaceholder = useMemo(
+    () => placeholderQuestions[currentPlaceholderIndex],
+    [placeholderQuestions, currentPlaceholderIndex],
   );
 
   // Handle search submission
-  const handleSearch = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearch = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
 
-    if (!searchQuery.trim()) return;
+      if (!searchQuery.trim()) return;
 
-    setIsSearching(true);
+      setIsSearching(true);
 
-    try {
-      const searchParams = new URLSearchParams({
-        q: searchQuery.trim(),
-        type: 'search',
-        source: searchSource,
-      });
+      try {
+        const searchParams = new URLSearchParams({
+          q: searchQuery.trim(),
+          type: 'search',
+          source: searchSource,
+        });
 
-      router.push(`/channels?${searchParams.toString()}`);
-    } catch (error) {
-      console.error('Search error:', error);
-      // TODO: Add proper error handling with toast notification
-    } finally {
-      setIsSearching(false);
-    }
-  }, [searchQuery, router, searchSource]);
+        router.push(`/channels?${searchParams.toString()}`);
+      } catch (error) {
+        console.error('Search error:', error);
+        // TODO: Add proper error handling with toast notification
+      } finally {
+        setIsSearching(false);
+      }
+    },
+    [searchQuery, router, searchSource],
+  );
 
   // Handle keyboard events
-  const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSearch(e as any);
-    }
-  }, [handleSearch]);
+  const handleKeyPress = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        handleSearch(e as any);
+      }
+    },
+    [handleSearch],
+  );
 
   // Handle title click for design toggle
   const handleTitleClick = useCallback(() => {
@@ -104,8 +127,8 @@ export function SearchHero({
       <div className={styles.heroContent}>
         {/* Hero Title Section */}
         <div className={styles.heroTitle}>
-          <div 
-            onClick={handleTitleClick} 
+          <div
+            onClick={handleTitleClick}
             className="cursor-pointer transition-opacity hover:opacity-80"
             role="button"
             tabIndex={0}
@@ -126,9 +149,7 @@ export function SearchHero({
               Your Taste Your Trend
             </GlitchText>
           </div>
-          <p className={styles.subtitle}>
-            Decoding the stories behind every taste
-          </p>
+          <p className={styles.subtitle}>Decoding the stories behind every taste</p>
         </div>
 
         {/* Add Channel Button */}
@@ -137,8 +158,8 @@ export function SearchHero({
         </div>
 
         {/* Search Form */}
-        <form 
-          onSubmit={handleSearch} 
+        <form
+          onSubmit={handleSearch}
           className={styles.searchForm}
           role="search"
           aria-label="Search for channels and content"
@@ -168,7 +189,7 @@ export function SearchHero({
                 hover:border-white/30
               "
             />
-            
+
             {/* Search Icon */}
             <svg
               className="absolute left-6 top-1/2 transform -translate-y-1/2 w-6 h-6 text-white/60"
@@ -184,19 +205,19 @@ export function SearchHero({
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
               />
             </svg>
-            
-            {/* Loading Spinner */}
+
+            {/* Loading Indicator */}
             {isSearching && (
-              <div 
+              <div
                 className="absolute right-6 top-1/2 transform -translate-y-1/2"
                 role="status"
                 aria-label="Searching..."
               >
-                <div className="animate-spin w-6 h-6 border-2 border-white/30 border-t-white rounded-full"></div>
+                <div className="w-4 h-4 border-2 border-white/60 border-t-transparent rounded-full animate-spin" />
               </div>
             )}
           </div>
-          
+
           {/* Search Description for Screen Readers */}
           <div id="search-description" className="sr-only">
             Search for channels and content based on your interests and preferences

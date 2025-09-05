@@ -80,29 +80,17 @@ export function LoginButton() {
             <span className="text-sm text-[#EAFD66] hidden md:block">{userDisplayName}</span>
 
             {/* 프로필 버튼 */}
-            <Button
-              onClick={handleClick}
-              variant="primary"
-              size="sm"
-            >
+            <Button onClick={handleClick} variant="login" size="sm">
               My Page
             </Button>
 
             {/* 로그아웃 버튼 */}
-            <Button
-              onClick={handleLogout}
-              variant="destructive"
-              size="sm"
-            >
+            <Button onClick={handleLogout} variant="destructive" size="sm">
               Logout
             </Button>
           </>
         ) : (
-          <Button
-            onClick={handleClick}
-            variant="primary"
-            size="sm"
-          >
+          <Button onClick={handleClick} variant="login" size="sm">
             Login
           </Button>
         )}

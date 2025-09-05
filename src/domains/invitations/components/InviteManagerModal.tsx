@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { Button } from '@decoded/ui';
 import { useCreateInvitation } from '../hooks/useInvitations';
 import { useSearchUsers } from '@/domains/search/hooks/useSearch';
 import type { ChannelResponse } from '@/api/generated/models/ChannelResponse';
@@ -175,13 +176,13 @@ export function InviteManagerModal({ isOpen, onClose, channel }: InviteManagerMo
               >
                 Reset
               </button>
-              <button
+              <Button
                 type="submit"
                 disabled={!selectedUserId || createInvitationMutation.isPending}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:cursor-not-allowed text-white rounded transition-colors"
+                variant="primary"
               >
                 {createInvitationMutation.isPending ? 'Sending...' : 'Send Invitation'}
-              </button>
+              </Button>
             </div>
           </form>
         </div>

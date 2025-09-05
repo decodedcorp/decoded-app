@@ -28,7 +28,7 @@ export function RightSidebar() {
               className="p-3 bg-zinc-800 rounded-lg hover:bg-zinc-750 cursor-pointer transition-colors"
             >
               <div className="flex items-center justify-between mb-1">
-                <span className="text-white text-sm font-medium">r/{channel.name}</span>
+                <span className="text-white text-sm font-medium">{channel.name}</span>
                 <span className="text-xs text-gray-400">#{index + 1}</span>
               </div>
               <div className="text-xs text-gray-400 mb-1">{channel.members} members</div>
@@ -59,7 +59,7 @@ export function RightSidebar() {
             >
               <div className="text-white text-xs font-medium mb-1 line-clamp-2">{post.title}</div>
               <div className="flex items-center justify-between text-xs text-gray-400">
-                <span>r/{post.channel}</span>
+                <span>{post.channel}</span>
                 <span>↑ {post.upvotes}</span>
               </div>
             </div>

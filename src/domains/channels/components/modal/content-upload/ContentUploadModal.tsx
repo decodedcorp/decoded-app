@@ -5,10 +5,9 @@ import React from 'react';
 import { ContentType } from '@/api/generated';
 import { useContentUploadStore, selectIsContentUploadModalOpen } from '@/store/contentUploadStore';
 import { useCreateImageContent, useCreateLinkContent } from '@/domains/channels/hooks/useContents';
-import { useGetLinkContent } from '@/domains/channels/hooks/useContents';
 import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/api/queryKeys';
-import { getValidAccessToken } from '@/domains/auth/utils/tokenManager';
+// getValidAccessToken import 제거 (사용하지 않음)
 
 import { BaseModal } from '../base/BaseModal';
 
@@ -22,73 +21,11 @@ export function ContentUploadModal() {
   const formData = useContentUploadStore((state) => state.formData);
   const setLoading = useContentUploadStore((state) => state.setLoading);
   const setError = useContentUploadStore((state) => state.setError);
-  const isGenerating = useContentUploadStore((state) => state.isGenerating);
-  const generatedContent = useContentUploadStore((state) => state.generatedContent);
-  const startGeneration = useContentUploadStore((state) => state.startGeneration);
-  const setGeneratedContent = useContentUploadStore((state) => state.setGeneratedContent);
-  const setGenerationError = useContentUploadStore((state) => state.setGenerationError);
+  // AI 생성 관련 상태 제거 - 링크 포스트는 기본 포스트 동작으로 처리
 
   const queryClient = useQueryClient();
 
-  // AI 생성된 콘텐츠를 가져오기 위한 상태
-  const [createdContentId, setCreatedContentId] = React.useState<string | null>(null);
-  const { data: aiGeneratedContent, error: aiError } = useGetLinkContent(createdContentId);
-
-  // AI 생성 완료 감지
-  React.useEffect(() => {
-    if (aiGeneratedContent) {
-      console.log('AI generated content received:', aiGeneratedContent);
-
-      // AI 생성 메타데이터가 있거나 링크 프리뷰 메타데이터가 있으면 완료로 처리
-      const hasAiMetadata = aiGeneratedContent.ai_gen_metadata;
-      const hasLinkPreview = aiGeneratedContent.link_preview_metadata;
-
-      console.log('Content analysis:', {
-        hasAiMetadata,
-        hasLinkPreview,
-        aiMetadata: aiGeneratedContent.ai_gen_metadata,
-        linkPreview: aiGeneratedContent.link_preview_metadata,
-        contentId: aiGeneratedContent.id,
-        url: aiGeneratedContent.url,
-      });
-
-      if (hasAiMetadata || hasLinkPreview) {
-        console.log('AI generation completed with metadata:', {
-          hasAiMetadata,
-          hasLinkPreview,
-          aiMetadata: aiGeneratedContent.ai_gen_metadata,
-          linkPreview: aiGeneratedContent.link_preview_metadata,
-        });
-
-        const generatedContentData = {
-          id: aiGeneratedContent.id,
-          title:
-            aiGeneratedContent.ai_gen_metadata?.summary ||
-            aiGeneratedContent.link_preview_metadata?.title ||
-            'Untitled',
-          description:
-            aiGeneratedContent.ai_gen_metadata?.summary ||
-            aiGeneratedContent.link_preview_metadata?.description ||
-            '',
-          image_url: aiGeneratedContent.link_preview_metadata?.img_url || '',
-          created_at: aiGeneratedContent.created_at || new Date().toISOString(),
-        };
-
-        console.log('Setting generated content:', generatedContentData);
-        setGeneratedContent(generatedContentData);
-      } else {
-        console.log('Content received but no metadata found yet, continuing to wait...');
-      }
-    }
-  }, [aiGeneratedContent, setGeneratedContent]);
-
-  // AI 에러 처리
-  React.useEffect(() => {
-    if (aiError) {
-      console.error('AI generation error:', aiError);
-      setGenerationError('Failed to generate AI content');
-    }
-  }, [aiError, setGenerationError]);
+  // AI 생성 관련 로직 제거 - 링크 포스트는 기본 포스트 동작으로 처리
 
   // API mutations
   const createImageContent = useCreateImageContent();
@@ -144,7 +81,7 @@ export function ContentUploadModal() {
   };
 
   const handleCancel = () => {
-    if (!isLoading && !isGenerating) {
+    if (!isLoading) {
       closeModal();
     }
   };
@@ -167,24 +104,22 @@ export function ContentUploadModal() {
           />
         </div>
 
-        {/* AI 생성 중이거나 결과가 있을 때는 푸터 숨김 */}
-        {!isGenerating && !generatedContent && (
-          <ContentUploadFooter
-            canSubmit={canSubmit}
-            isLoading={isLoading}
-            onCancel={handleCancel}
-            onSubmit={() => {
-              console.log('=== Footer submit button clicked ===');
-              // 전역 함수를 통해 ContentUploadForm의 handleSubmit 호출
-              if ((window as any).triggerContentFormSubmit) {
-                console.log('Calling global submit function...');
-                (window as any).triggerContentFormSubmit();
-              } else {
-                console.error('Global submit function not found!');
-              }
-            }}
-          />
-        )}
+        {/* 푸터는 항상 표시 (AI 생성 로직 제거) */}
+        <ContentUploadFooter
+          canSubmit={canSubmit}
+          isLoading={isLoading}
+          onCancel={handleCancel}
+          onSubmit={() => {
+            console.log('=== Footer submit button clicked ===');
+            // 전역 함수를 통해 ContentUploadForm의 handleSubmit 호출
+            if ((window as any).triggerContentFormSubmit) {
+              console.log('Calling global submit function...');
+              (window as any).triggerContentFormSubmit();
+            } else {
+              console.error('Global submit function not found!');
+            }
+          }}
+        />
       </div>
     </BaseModal>
   );
