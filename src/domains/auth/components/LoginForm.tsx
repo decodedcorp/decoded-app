@@ -33,20 +33,16 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
       if (event.data.type === 'GOOGLE_OAUTH_SUCCESS') {
         messageHandledRef.current = true;
 
-        if (process.env.NODE_ENV === 'development') {
-          console.log('[LoginForm] Received OAuth success message:', event.data);
-        }
+        console.log('[LoginForm] Received OAuth success message:', event.data);
 
         // 팝업에서 받은 완전한 로그인 데이터로 메인 창에서 로그인 처리
         if (event.data.loginData) {
-          if (process.env.NODE_ENV === 'development') {
-            console.log('[LoginForm] Processing login data in main window:', {
-              hasAccessToken: !!event.data.loginData.access_token?.access_token,
-              hasUser: !!event.data.loginData.user,
-              hasRefreshToken: !!event.data.loginData.refresh_token
-            });
-          }
-          
+          console.log('[LoginForm] Processing login data in main window:', {
+            hasAccessToken: !!event.data.loginData.access_token?.access_token,
+            hasUser: !!event.data.loginData.user,
+            hasRefreshToken: !!event.data.loginData.refresh_token,
+          });
+
           // AuthStore의 login 함수를 호출하여 메인 창에서 토큰 저장
           login(event.data.loginData);
         }
@@ -56,11 +52,33 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
       } else if (event.data.type === 'GOOGLE_OAUTH_ERROR') {
         messageHandledRef.current = true;
 
-        if (process.env.NODE_ENV === 'development') {
-          console.log('[LoginForm] Received OAuth error message:', event.data);
-        }
+        console.log('[LoginForm] Received OAuth error message:', event.data);
 
         onError?.(event.data.error || 'Google 로그인에 실패했습니다.');
+      } else if (event.data.type === 'GOOGLE_OAUTH_LOG') {
+        // 팝업에서 전달받은 로그를 메인 창 콘솔에 출력
+        const { level, message, data, timestamp } = event.data;
+        const logMessage = `[Popup] ${message}`;
+
+        // 디버깅을 위한 구분선 추가
+        console.log('='.repeat(80));
+        console.log(`[OAuth Debug] ${timestamp}`);
+        console.log('='.repeat(80));
+
+        switch (level) {
+          case 'error':
+            console.error(logMessage, data);
+            break;
+          case 'warn':
+            console.warn(logMessage, data);
+            break;
+          case 'info':
+            console.info(logMessage, data);
+            break;
+          default:
+            console.log(logMessage, data);
+        }
+        console.log('='.repeat(80));
       }
     };
 
@@ -96,6 +114,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
         throw new Error('Google Client ID가 설정되지 않았습니다.');
       }
 
+      // 디버그 모드를 위한 파라미터 추가
+      const debugParam = process.env.NODE_ENV === 'development' ? '&debug=true' : '';
+
       const googleAuthUrl =
         `https://accounts.google.com/o/oauth2/v2/auth?` +
         `client_id=${clientId}&` +
@@ -103,23 +124,29 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
         `response_type=code&` +
         `scope=${encodeURIComponent('openid email profile')}&` +
         `access_type=offline&` +
-        `prompt=consent`;
+        `prompt=consent${debugParam}`;
 
-      // 팝업 창 열기
-      const popup = window.open(
-        googleAuthUrl,
-        'googleOAuth',
-        'width=500,height=600,scrollbars=yes,resizable=yes,menubar=no,toolbar=no,location=no,status=no',
-      );
+      // 개발 환경에서는 메인 창에서 OAuth 처리, 프로덕션에서는 팝업 사용
+      if (process.env.NODE_ENV === 'development') {
+        // 개발 환경: 메인 창에서 OAuth 처리 (디버깅 용이)
+        window.location.href = googleAuthUrl;
+      } else {
+        // 프로덕션 환경: 팝업 창에서 OAuth 처리
+        const popup = window.open(
+          googleAuthUrl,
+          'googleOAuth',
+          'width=500,height=600,scrollbars=yes,resizable=yes,menubar=no,toolbar=no,location=no,status=no',
+        );
 
-      if (!popup) {
-        throw new Error('팝업이 차단되었습니다. 팝업 차단을 해제해주세요.');
+        if (!popup) {
+          throw new Error('팝업이 차단되었습니다. 팝업 차단을 해제해주세요.');
+        }
+
+        popupRef.current = popup;
+
+        // 팝업 창 포커스
+        popup.focus();
       }
-
-      popupRef.current = popup;
-
-      // 팝업 창 포커스
-      popup.focus();
     } catch (error) {
       let errorMessage = 'Google 로그인에 실패했습니다.';
 

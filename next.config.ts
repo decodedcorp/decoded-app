@@ -9,6 +9,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 /** @type {import('next').NextConfig} */
 const nextConfig: NextConfig = {
   experimental: {},
+  transpilePackages: ['@decoded/ui'],
   // ESLint 오류가 있어도 빌드 진행 (배포용)
   eslint: {
     ignoreDuringBuilds: true,

@@ -192,7 +192,15 @@ export const handleGoogleOAuthCallback = async (code: string) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('[Auth] OAuth API error response:', errorText);
-      throw new Error(`OAuth callback failed: ${response.status} ${response.statusText} - ${errorText}`);
+      console.error('[Auth] Full error response details:', {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries()),
+        errorText: errorText,
+      });
+      throw new Error(
+        `OAuth callback failed: ${response.status} ${response.statusText} - ${errorText}`,
+      );
     }
 
     const data = await response.json();

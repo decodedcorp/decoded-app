@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { LoginModal } from '@/domains/auth/components/LoginModal';
+import { Button } from '@decoded/ui';
 
 export function LoginButton() {
   const router = useRouter();
@@ -55,24 +56,18 @@ export function LoginButton() {
   // 서버 사이드 렌더링 시 기본 버튼만 표시 (hydration mismatch 방지)
   if (!mounted) {
     return (
-      <button
-        disabled
-        className="px-4 py-2 rounded-md text-sm font-medium bg-neutral-900/50 text-[#EAFD66]/50 cursor-not-allowed transition"
-      >
+      <Button disabled size="sm">
         Loading...
-      </button>
+      </Button>
     );
   }
 
   // 로딩 중이거나 아직 초기화되지 않았을 때는 버튼을 비활성화
   if (isLoading || !isInitialized) {
     return (
-      <button
-        disabled
-        className="px-4 py-2 rounded-md text-sm font-medium bg-neutral-900/50 text-[#EAFD66]/50 cursor-not-allowed transition"
-      >
+      <Button disabled size="sm" loading={isLoading}>
         {isLoading ? 'Loading...' : 'Initializing...'}
-      </button>
+      </Button>
     );
   }
 
@@ -85,28 +80,31 @@ export function LoginButton() {
             <span className="text-sm text-[#EAFD66] hidden md:block">{userDisplayName}</span>
 
             {/* 프로필 버튼 */}
-            <button
+            <Button
               onClick={handleClick}
-              className="px-4 py-2 rounded-md text-sm font-medium bg-neutral-900 text-[#EAFD66] hover:bg-[#EAFD66] hover:text-black transition"
+              variant="primary"
+              size="sm"
             >
               My Page
-            </button>
+            </Button>
 
             {/* 로그아웃 버튼 */}
-            <button
+            <Button
               onClick={handleLogout}
-              className="px-3 py-2 rounded-md text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition"
+              variant="destructive"
+              size="sm"
             >
               Logout
-            </button>
+            </Button>
           </>
         ) : (
-          <button
+          <Button
             onClick={handleClick}
-            className="px-4 py-2 rounded-md text-sm font-medium bg-neutral-900 text-[#EAFD66] hover:bg-[#EAFD66] hover:text-black transition"
+            variant="primary"
+            size="sm"
           >
             Login
-          </button>
+          </Button>
         )}
       </div>
 
