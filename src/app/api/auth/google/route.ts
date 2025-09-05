@@ -11,9 +11,9 @@ export async function POST(request: NextRequest) {
       GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? 'SET' : 'MISSING',
       GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET ? 'SET' : 'MISSING',
       VERCEL_URL: process.env.VERCEL_URL || 'NOT_SET',
-      REDIRECT_URI: process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI || 'USING_FALLBACK'
+      REDIRECT_URI: process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI || 'USING_FALLBACK',
     });
-    
+
     const { code } = await request.json();
     console.log('[Google OAuth API] Authorization code:', {
       hasCode: !!code,
@@ -63,6 +63,17 @@ export async function POST(request: NextRequest) {
 
     const hashInput = `${sub}${iss}${aud}`;
     GoogleAuthLogger.logBackendRequest(backendRequestBody, hashInput, hashedToken);
+
+    // 디버깅을 위한 추가 로그
+    console.log('[Google OAuth API] Backend request body validation:', {
+      hasJwtToken: !!backendRequestBody.jwt_token,
+      jwtTokenLength: backendRequestBody.jwt_token?.length,
+      hasSuiAddress: !!backendRequestBody.sui_address,
+      suiAddressLength: backendRequestBody.sui_address?.length,
+      suiAddressFormat: backendRequestBody.sui_address?.startsWith('0x'),
+      hasEmail: !!backendRequestBody.email,
+      marketing: backendRequestBody.marketing,
+    });
 
     // 5. 백엔드 로그인 API 호출 (sui_address 업데이트 포함)
     console.log('[Google OAuth API] Calling backend login API...');

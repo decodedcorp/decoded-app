@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useEffect } from 'react';
+import { RotateCcw } from 'lucide-react';
 
 interface InfiniteScrollLoaderProps {
   hasNextPage: boolean;
@@ -75,7 +76,7 @@ export function InfiniteScrollLoader({
               onClick={onRetry || fetchNextPage}
               className="px-4 py-2 bg-zinc-800 text-white rounded-lg hover:bg-zinc-700 transition-all duration-200 text-sm font-medium border border-zinc-600 flex items-center space-x-2"
             >
-              <span>🔄</span>
+              <RotateCcw className="w-4 h-4" />
               <span>Try Again</span>
             </button>
             {(error as any)?.status >= 500 && (

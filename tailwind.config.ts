@@ -2,6 +2,9 @@ import type { Config } from 'tailwindcss';
 import { colors } from './src/constants/colors';
 
 const config: Config = {
+  presets: [
+    require('./packages/ui/tailwind-preset.js')
+  ],
   content: [
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
     './src/shared/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -9,6 +12,7 @@ const config: Config = {
     './src/domains/**/*.{js,ts,jsx,tsx,mdx}',
     './src/constants/**/*.{js,ts,jsx,tsx,mdx}',
     './src/lib/**/*.{js,ts,jsx,tsx,mdx}',
+    './packages/ui/dist/**/*.{js,mjs}',
   ],
   theme: {
     extend: {

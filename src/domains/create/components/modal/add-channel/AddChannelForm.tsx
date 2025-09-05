@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
+import { X, Camera } from 'lucide-react';
+import { Button } from '@decoded/ui';
 
 import {
   useAddChannelStore,
@@ -254,45 +256,32 @@ export function AddChannelForm({ onSubmit, isLoading, error }: AddChannelFormPro
                   handleRemoveImage('thumbnail');
                 }}
               />
-              <button
+              <Button
                 type="button"
                 onClick={() => handleRemoveImage('thumbnail')}
-                className="absolute top-2 right-2 p-1 bg-red-500 hover:bg-red-600 rounded-full transition-colors"
+                variant="destructive"
+                size="sm"
+                className="absolute top-2 right-2 w-8 h-8 rounded-full p-0"
                 disabled={isLoading}
               >
-                <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
-                  <path
-                    d="M18 6L6 18M6 6l12 12"
-                    stroke="white"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
+                <X className="w-4 h-4" />
+              </Button>
             </div>
             <p className="text-sm text-zinc-400">Click the X button to remove the image</p>
           </div>
         ) : (
           <div className="space-y-3">
             <div className="w-32 h-32 border-2 border-dashed border-zinc-700 rounded-lg flex items-center justify-center hover:border-zinc-600 transition-colors cursor-pointer">
-              <button
+              <Button
                 type="button"
                 onClick={() => thumbnailInputRef.current?.click()}
-                className="flex flex-col items-center space-y-2 text-zinc-400 hover:text-zinc-300 transition-colors"
+                variant="ghost"
+                className="flex flex-col items-center space-y-2 text-zinc-400 hover:text-zinc-300 p-4 h-auto"
                 disabled={isLoading}
               >
-                <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-                  <path
-                    d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <Camera className="w-6 h-6" />
                 <span className="text-xs">Upload Thumbnail</span>
-              </button>
+              </Button>
             </div>
             <p className="text-sm text-zinc-400">Square (800x600) JPG, PNG up to 10MB</p>
           </div>
@@ -334,22 +323,16 @@ export function AddChannelForm({ onSubmit, isLoading, error }: AddChannelFormPro
                   handleRemoveImage('banner');
                 }}
               />
-              <button
+              <Button
                 type="button"
                 onClick={() => handleRemoveImage('banner')}
-                className="absolute top-2 right-2 p-1 bg-red-500 hover:bg-red-600 rounded-full transition-colors"
+                variant="destructive"
+                size="sm"
+                className="absolute top-2 right-2 w-8 h-8 rounded-full p-0"
                 disabled={isLoading}
               >
-                <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
-                  <path
-                    d="M18 6L6 18M6 6l12 12"
-                    stroke="white"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
+                <X className="w-4 h-4" />
+              </Button>
             </div>
             <p className="text-sm text-zinc-400">Click the X button to remove the banner</p>
           </div>

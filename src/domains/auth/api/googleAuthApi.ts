@@ -25,7 +25,7 @@ export interface GoogleTokenPayload {
 
 export interface BackendLoginRequest {
   jwt_token: string;
-  sui_address?: string; // 선택적으로 변경
+  sui_address: string; // 백엔드 API 요구사항에 따라 필수로 변경
   email: string;
   marketing: boolean;
 }
@@ -55,33 +55,33 @@ export class GoogleAuthApi {
       if (process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI) {
         return process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI;
       }
-      
+
       // 브라우저 환경에서는 현재 origin 사용
       if (typeof window !== 'undefined') {
         return `${window.location.origin}/auth/callback`;
       }
-      
+
       // 서버 환경에서 환경별 기본값 설정
       if (process.env.VERCEL_URL) {
         return `https://${process.env.VERCEL_URL}/auth/callback`;
       }
-      
+
       // 프로덕션 환경 기본값
       if (process.env.NODE_ENV === 'production') {
         return 'https://decoded.style/auth/callback';
       }
-      
+
       // 개발 환경 기본값
       return 'http://localhost:3000/auth/callback';
     };
-    
+
     const redirectUri = getRedirectUri();
-    
+
     console.log('[GoogleAuthApi] Using redirect URI:', redirectUri);
     console.log('[GoogleAuthApi] Environment details:', {
       NODE_ENV: process.env.NODE_ENV,
       VERCEL_URL: process.env.VERCEL_URL,
-      EXPLICIT_REDIRECT_URI: process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI
+      EXPLICIT_REDIRECT_URI: process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI,
     });
 
     const tokenRequestBody = new URLSearchParams({
@@ -152,9 +152,9 @@ export class GoogleAuthApi {
     const backendRequestHeaders = {
       'Content-Type': 'application/json',
       Accept: 'application/json',
-      'Origin': 'https://decoded.style',
+      Origin: 'https://decoded.style',
       'Access-Control-Request-Method': 'POST',
-      'Access-Control-Request-Headers': 'Content-Type'
+      'Access-Control-Request-Headers': 'Content-Type',
     };
 
     // 환경별 API 기본 URL 설정
@@ -163,29 +163,29 @@ export class GoogleAuthApi {
       if (process.env.NEXT_PUBLIC_API_BASE_URL) {
         return process.env.NEXT_PUBLIC_API_BASE_URL;
       }
-      
+
       // Vercel 환경에서 프로덕션 URL 강제 사용
       if (process.env.VERCEL || process.env.VERCEL_URL) {
         return 'http://dev.decoded.style';
       }
-      
+
       // 프로덕션 환경 기본값
       if (process.env.NODE_ENV === 'production') {
         return 'http://dev.decoded.style';
       }
-      
+
       // 개발 환경 기본값
       return 'http://dev.decoded.style';
     };
-    
+
     const apiBaseUrl = getApiBaseUrl();
     const apiUrl = `${apiBaseUrl}/auth/login`;
-    
+
     console.log('[GoogleAuthApi] Backend API details:', {
       apiBaseUrl,
       apiUrl,
       NODE_ENV: process.env.NODE_ENV,
-      EXPLICIT_API_URL: process.env.NEXT_PUBLIC_API_BASE_URL
+      EXPLICIT_API_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
     });
 
     // 직접 백엔드 API 호출하여 Vercel deployment protection 우회
@@ -193,7 +193,7 @@ export class GoogleAuthApi {
       method: 'POST',
       headers: backendRequestHeaders,
       body: JSON.stringify(requestBody),
-      mode: 'cors'
+      mode: 'cors',
     });
 
     if (!backendResponse.ok) {
@@ -203,8 +203,25 @@ export class GoogleAuthApi {
         url: apiUrl,
         method: 'POST',
         headers: backendRequestHeaders,
-        bodyPreview: JSON.stringify(requestBody).substring(0, 100)
+        bodyPreview: JSON.stringify(requestBody).substring(0, 100),
       });
+
+      // 추가 디버깅 정보
+      console.error('Backend API debugging info:', {
+        status: backendResponse.status,
+        statusText: backendResponse.statusText,
+        responseHeaders: Object.fromEntries(backendResponse.headers.entries()),
+        requestBodyValidation: {
+          hasJwtToken: !!requestBody.jwt_token,
+          jwtTokenLength: requestBody.jwt_token?.length,
+          hasSuiAddress: !!requestBody.sui_address,
+          suiAddressLength: requestBody.sui_address?.length,
+          suiAddressFormat: requestBody.sui_address?.startsWith('0x'),
+          hasEmail: !!requestBody.email,
+          marketing: requestBody.marketing,
+        },
+      });
+
       throw new Error(`Backend login failed: ${backendResponse.status}`);
     }
 

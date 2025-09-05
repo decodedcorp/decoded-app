@@ -123,21 +123,21 @@ export function SimpleThiingsGrid({
   // 카드 클릭 핸들러 - ContentModal 열기만 (URL 변경 없음)
   const handleCardClick = useCallback(
     (card: any) => {
-      console.log('🎯 [SimpleThiingsGrid] ====== handleCardClick EXECUTED ======');
-      console.log('🎯 [SimpleThiingsGrid] Card clicked:', card);
-      console.log('🎯 [SimpleThiingsGrid] Current channelId:', channelId);
-      console.log('🎯 [SimpleThiingsGrid] openContentModal function:', openContentModal);
-      console.log('🎯 [SimpleThiingsGrid] openContentModal type:', typeof openContentModal);
+      console.log(' [SimpleThiingsGrid] ====== handleCardClick EXECUTED ======');
+      console.log(' [SimpleThiingsGrid] Card clicked:', card);
+      console.log(' [SimpleThiingsGrid] Current channelId:', channelId);
+      console.log(' [SimpleThiingsGrid] openContentModal function:', openContentModal);
+      console.log(' [SimpleThiingsGrid] openContentModal type:', typeof openContentModal);
 
       // 카드가 속한 채널 ID와 콘텐츠 ID 추출
       const targetChannelId = channelId;
       const contentId = card.id;
 
-      console.log('🎯 [SimpleThiingsGrid] Target channel ID:', targetChannelId);
-      console.log('🎯 [SimpleThiingsGrid] Content ID:', contentId);
+      console.log(' [SimpleThiingsGrid] Target channel ID:', targetChannelId);
+      console.log(' [SimpleThiingsGrid] Content ID:', contentId);
 
       if (targetChannelId && contentId) {
-        console.log('🎯 [SimpleThiingsGrid] Opening ContentModal for content:', contentId);
+        console.log(' [SimpleThiingsGrid] Opening ContentModal for content:', contentId);
 
         try {
           // ContentModal을 위해 콘텐츠 데이터 준비
@@ -196,22 +196,22 @@ export function SimpleThiingsGrid({
           // TODO: 사이드바 구현 후 활성화
           // openContentModal(contentData);
           console.log(
-            '🎯 [SimpleThiingsGrid] ContentModal temporarily disabled, preparing for sidebar implementation',
+            ' [SimpleThiingsGrid] ContentModal temporarily disabled, preparing for sidebar implementation',
           );
-          console.log('🎯 [SimpleThiingsGrid] Content data prepared:', contentData);
+          console.log(' [SimpleThiingsGrid] Content data prepared:', contentData);
 
           // 사이드바 열기
           openContentSidebar(contentData);
-          console.log('🎯 [SimpleThiingsGrid] ContentSidebar opened successfully');
-          console.log('🎯 [SimpleThiingsGrid] Sidebar content data:', contentData);
+          console.log(' [SimpleThiingsGrid] ContentSidebar opened successfully');
+          console.log(' [SimpleThiingsGrid] Sidebar content data:', contentData);
 
           // URL 변경 제거 - 모달만 열기
-          console.log('🎯 [SimpleThiingsGrid] Sidebar opened without URL change');
+          console.log(' [SimpleThiingsGrid] Sidebar opened without URL change');
         } catch (error) {
-          console.error('🎯 [SimpleThiingsGrid] Error opening modal:', error);
+          console.error(' [SimpleThiingsGrid] Error opening modal:', error);
         }
       } else {
-        console.warn('🎯 [SimpleThiingsGrid] Missing channel ID or content ID');
+        console.warn(' [SimpleThiingsGrid] Missing channel ID or content ID');
       }
     },
     [channelId, openContentModal, openContentSidebar], // router 의존성 제거
@@ -221,7 +221,7 @@ export function SimpleThiingsGrid({
   React.useEffect(() => {
     // @ts-ignore - 디버깅 목적
     (window as any).debugHandleCardClick = handleCardClick;
-    console.log('🎯 [SimpleThiingsGrid] handleCardClick exposed to window.debugHandleCardClick');
+    console.log(' [SimpleThiingsGrid] handleCardClick exposed to window.debugHandleCardClick');
 
     return () => {
       // @ts-ignore - 디버깅 목적
@@ -232,18 +232,18 @@ export function SimpleThiingsGrid({
   // 최적화된 renderItem - useCallback 적용
   const renderItem = useCallback(
     ({ gridIndex, isMoving }: ItemConfig) => {
-      console.log('🎯 [renderItem] Rendering item:', { gridIndex, isMoving });
-      console.log('🎯 [renderItem] handleCardClick function:', handleCardClick);
-      console.log('🎯 [renderItem] handleCardClick type:', typeof handleCardClick);
+      console.log(' [renderItem] Rendering item:', { gridIndex, isMoving });
+      console.log(' [renderItem] handleCardClick function:', handleCardClick);
+      console.log(' [renderItem] handleCardClick type:', typeof handleCardClick);
       console.log(
-        '🎯 [renderItem] handleCardClick === function:',
+        ' [renderItem] handleCardClick === function:',
         typeof handleCardClick === 'function',
       );
-      console.log('🎯 [renderItem] handleCardClick toString:', handleCardClick?.toString());
+      console.log(' [renderItem] handleCardClick toString:', handleCardClick?.toString());
 
       // 카드 클릭 핸들러를 인라인으로 정의하여 함수 참조 문제 해결
       const cardClickHandler = (card: any) => {
-        console.log('🎯 [renderItem] Inline cardClickHandler called with:', card);
+        console.log(' [renderItem] Inline cardClickHandler called with:', card);
         handleCardClick(card);
       };
 
@@ -263,13 +263,13 @@ export function SimpleThiingsGrid({
       //     avgColor: '#18ba9b',
       //     preloadHint: false,
       //   };
-      //   console.log('🎯 [renderItem] Using test card:', testCard);
+      //   console.log(' [renderItem] Using test card:', testCard);
       //   return <SimpleCard card={testCard} isMoving={isMoving} onCardClick={cardClickHandler} />;
       // }
 
       // gridIndex를 이용해 카드 순환 사용
       const card = cards[gridIndex % cards.length];
-      console.log('🎯 [renderItem] Using real card:', card);
+      console.log(' [renderItem] Using real card:', card);
 
       // card가 null인 경우 처리
       if (!card) {
@@ -376,7 +376,7 @@ export function SimpleThiingsGrid({
         {/* 디버그 정보 - production에서는 제거 */}
         {process.env.NODE_ENV === 'development' && (
           <div className="fixed top-4 left-4 bg-black/90 text-white p-4 rounded-lg text-xs font-mono z-50">
-            <div className="font-bold mb-2">🎯 Channel API Grid</div>
+            <div className="font-bold mb-2"> Channel API Grid</div>
             <div>Channel: {channelId}</div>
             <div>Cards: {cards.length}</div>
             <div>Grid Size: {gridSize}px</div>

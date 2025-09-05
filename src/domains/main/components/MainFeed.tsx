@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useMemo } from 'react';
+import { MailOpen } from 'lucide-react';
 import { PostCard } from './PostCard';
 import { useInfiniteContentsByChannel } from '@/domains/contents/hooks/useInfiniteContentsByChannel';
 import { InfiniteScrollLoader } from './InfiniteScrollLoader';
@@ -18,10 +19,13 @@ export const MainFeed = React.memo(function MainFeed() {
   const [activeSort, setActiveSort] = useState<SortOption>('hot');
   const openModal = useContentModalStore((state) => state.openModal);
 
-  const sortOptions: { value: SortOption; label: string; icon: string }[] = [
-    { value: 'hot', label: 'Hot', icon: '🔥' },
-    { value: 'new', label: 'New', icon: '🆕' },
-    { value: 'top', label: 'Top', icon: '⭐' },
+  const sortOptions: {
+    value: SortOption;
+    label: string;
+  }[] = [
+    { value: 'hot', label: 'Hot' },
+    { value: 'new', label: 'New' },
+    { value: 'top', label: 'Top' },
   ];
 
   // 특정 채널의 콘텐츠 가져오기 - 무한스크롤 사용
@@ -33,55 +37,58 @@ export const MainFeed = React.memo(function MainFeed() {
 
   // 모든 페이지의 데이터를 평면화
   const allContents = useMemo(() => {
-    return infiniteQuery.data?.pages.flatMap(page => page.contents) || [];
+    return infiniteQuery.data?.pages.flatMap((page) => page.contents) || [];
   }, [infiniteQuery.data]);
 
   const feedData = allContents;
   const currentQuery = infiniteQuery; // 기존 인터페이스와의 호환성 유지
 
   // Content를 PostCard props로 변환하는 함수 - 메모화로 성능 최적화
-  const transformContentItem = useCallback((item: Record<string, any>, index: number) => {
-    // 여러 가능한 이미지 소스 확인 (API 응답에 맞게 수정)
-    const rawThumbnail =
-      item.link_preview_metadata?.img_url ||
-      item.link_preview_metadata?.downloaded_img_url ||
-      item.thumbnail_url ||
-      item.image_url ||
-      null;
+  const transformContentItem = useCallback(
+    (item: Record<string, any>, index: number) => {
+      // 여러 가능한 이미지 소스 확인 (API 응답에 맞게 수정)
+      const rawThumbnail =
+        item.link_preview_metadata?.img_url ||
+        item.link_preview_metadata?.downloaded_img_url ||
+        item.thumbnail_url ||
+        item.image_url ||
+        null;
 
-    // 이미지 프록시 처리 적용
-    const thumbnail = rawThumbnail ? getThumbnailImageUrl(rawThumbnail) : null;
+      // 이미지 프록시 처리 적용
+      const thumbnail = rawThumbnail ? getThumbnailImageUrl(rawThumbnail) : null;
 
-    // 디버깅을 위한 로그 (개발 환경에서만)
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Content item:', {
-        id: item.id,
-        title: item.link_preview_metadata?.title,
-        img_url: item.link_preview_metadata?.img_url,
-        downloaded_img_url: item.link_preview_metadata?.downloaded_img_url,
-        raw_thumbnail: rawThumbnail,
-        thumbnail_url: item.thumbnail_url,
-        image_url_direct: item.image_url,
-        final_thumbnail: thumbnail,
-      });
-    }
+      // 디버깅을 위한 로그 (개발 환경에서만)
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Content item:', {
+          id: item.id,
+          title: item.link_preview_metadata?.title,
+          img_url: item.link_preview_metadata?.img_url,
+          downloaded_img_url: item.link_preview_metadata?.downloaded_img_url,
+          raw_thumbnail: rawThumbnail,
+          thumbnail_url: item.thumbnail_url,
+          image_url_direct: item.image_url,
+          final_thumbnail: thumbnail,
+        });
+      }
 
-    return {
-      id: index,
-      title: item.link_preview_metadata?.title || item.url || 'Untitled',
-      description: item.description || item.link_preview_metadata?.description || undefined,
-      channel: 'decoded', // 임시로 고정값 사용
-      channelId: item.channel_id || channelId, // API에서 채널 ID 가져오거나 현재 채널 ID 사용
-      author: item.provider_id || 'anonymous',
-      authorId: item.provider_id || item.created_by || 'anonymous', // 사용자 ID (provider_id 또는 created_by 필드 사용)
-      timeAgo: getTimeAgo(item.created_at || new Date().toISOString()),
-      upvotes: 0, // 콘텐츠 응답에는 좋아요 수가 없으므로 0으로 설정
-      comments: 0, // 콘텐츠 응답에는 댓글 수가 없으므로 0으로 설정
-      thumbnail,
-      contentType: mapContentType(item.type) || ('link' as const),
-      originalItem: item, // 원본 데이터 보조
-    };
-  }, [channelId]);
+      return {
+        id: index,
+        title: item.link_preview_metadata?.title || item.url || 'Untitled',
+        description: item.description || item.link_preview_metadata?.description || undefined,
+        channel: 'decoded', // 임시로 고정값 사용
+        channelId: item.channel_id || channelId, // API에서 채널 ID 가져오거나 현재 채널 ID 사용
+        author: item.provider_id || 'anonymous',
+        authorId: item.provider_id || item.created_by || 'anonymous', // 사용자 ID (provider_id 또는 created_by 필드 사용)
+        timeAgo: getTimeAgo(item.created_at || new Date().toISOString()),
+        upvotes: 0, // 콘텐츠 응답에는 좋아요 수가 없으므로 0으로 설정
+        comments: 0, // 콘텐츠 응답에는 댓글 수가 없으므로 0으로 설정
+        thumbnail,
+        contentType: mapContentType(item.type) || ('link' as const),
+        originalItem: item, // 원본 데이터 보조
+      };
+    },
+    [channelId],
+  );
 
   // ContentItem으로 변환하는 함수 (API 데이터에 맞게 수정) - 메모화로 성능 최적화
   const transformToContentItem = useCallback((item: Record<string, any>): ContentItem => {
@@ -150,11 +157,11 @@ export const MainFeed = React.memo(function MainFeed() {
 
   return (
     <div className="w-full min-h-screen bg-black">
-      <div 
+      <div
         className="max-w-4xl mx-auto px-4 py-6"
-        style={{ 
+        style={{
           scrollBehavior: 'smooth',
-          willChange: 'scroll-position'
+          willChange: 'scroll-position',
         }}
       >
         {/* 피드 헤더 */}
@@ -186,7 +193,6 @@ export const MainFeed = React.memo(function MainFeed() {
                     }
                   `}
                 >
-                  <span className="mr-1.5">{option.icon}</span>
                   {option.label}
                 </button>
               ))}
@@ -211,9 +217,7 @@ export const MainFeed = React.memo(function MainFeed() {
         </div>
 
         {/* 초기 로딩 상태 - 최적화된 스켈레톤 */}
-        {currentQuery.isLoading && !currentQuery.data && (
-          <PostCardSkeleton count={5} />
-        )}
+        {currentQuery.isLoading && !currentQuery.data && <PostCardSkeleton count={5} />}
 
         {/* 에러 상태 */}
         {currentQuery.isError && !currentQuery.data && (
@@ -230,13 +234,12 @@ export const MainFeed = React.memo(function MainFeed() {
 
         {/* 포스트 목록 */}
         {(!currentQuery.isLoading || currentQuery.data) && !currentQuery.isError && (
-          <div 
-            className="space-y-6"
-            style={{ containIntrinsicSize: 'auto 500px' }}
-          >
+          <div className="space-y-6" style={{ containIntrinsicSize: 'auto 500px' }}>
             {feedData.length === 0 && !currentQuery.isLoading ? (
               <div className="text-center py-12">
-                <div className="text-6xl mb-4">📭</div>
+                <div className="mb-4">
+                  <MailOpen className="w-16 h-16 mx-auto text-gray-600" />
+                </div>
                 <div className="text-gray-400 text-lg mb-2">No posts found</div>
                 <div className="text-gray-600 text-sm">
                   Try a different filter or check back later!

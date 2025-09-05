@@ -24,7 +24,8 @@ export function Header() {
 
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-  
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+
   // Get auth state
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isLoading = useAuthStore((state) => state.isLoading);
@@ -108,8 +109,36 @@ export function Header() {
           h-[60px] md:h-[72px]
         "
       >
+        {/* Mobile Menu Button */}
+        <button
+          onClick={() => {
+            // 모바일 사이드바 토글 로직을 여기에 추가
+            const event = new CustomEvent('toggle-mobile-sidebar');
+            window.dispatchEvent(event);
+          }}
+          className="lg:hidden p-2 rounded-lg bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 transition-colors"
+          aria-label="Open menu"
+        >
+          <svg
+            className="w-5 h-5 text-zinc-300"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </button>
+
         {/* Logo */}
-        <Link href="/" className="text-2xl font-bold text-[#EAFD66] tracking-tight drop-shadow">
+        <Link
+          href="/"
+          className="text-2xl font-bold text-[#EAFD66] tracking-tight drop-shadow ml-2 lg:ml-0"
+        >
           decoded
         </Link>
 
@@ -130,7 +159,11 @@ export function Header() {
         {/* Right side actions */}
         <div className="flex items-center gap-2 md:gap-3">
           {/* Mobile Search Button */}
-          <button className="md:hidden p-2 text-white hover:text-[#eafd66] transition-colors">
+          <button
+            onClick={() => setIsMobileSearchOpen(true)}
+            className="md:hidden p-2 text-white hover:text-[#eafd66] transition-colors"
+            aria-label="Open search"
+          >
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
               <path
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
@@ -155,6 +188,48 @@ export function Header() {
           )}
         </div>
       </div>
+
+      {/* Mobile Search Overlay */}
+      {isMobileSearchOpen && (
+        <div className="fixed top-[60px] md:top-[72px] left-0 right-0 bg-black border-b border-zinc-700 p-4 z-[10000] md:hidden">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsMobileSearchOpen(false)}
+              className="p-2 text-zinc-400 hover:text-white transition-colors"
+              aria-label="Close search"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+            <div className="flex-1">
+              {isChannelPage && channelName ? (
+                <ChannelSearchBar
+                  channelId={channelId || ''}
+                  channelName={channelName}
+                  onSearch={(query) => {
+                    handleChannelSearch(query);
+                    setIsMobileSearchOpen(false);
+                  }}
+                  onClearChannel={handleClearChannel}
+                />
+              ) : (
+                <GlobalSearchBar
+                  onSearch={(query) => {
+                    handleGlobalSearch(query);
+                    setIsMobileSearchOpen(false);
+                  }}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

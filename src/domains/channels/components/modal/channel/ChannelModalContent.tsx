@@ -2,6 +2,7 @@ import React from 'react';
 import deepEqual from 'fast-deep-equal';
 
 import Image from 'next/image';
+import { Button } from '@decoded/ui';
 import { useContentModalStore } from '@/store/contentModalStore';
 import { ContentItem } from '@/lib/types/content';
 import { ContentStatus } from '@/api/generated';
@@ -504,18 +505,18 @@ export const ChannelModalContent = React.memo<{
             There was an error loading the channel content. Please try again.
           </p>
           <div className="flex items-center justify-center space-x-3">
-            <button
+            <Button
               onClick={() => refetch()}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+              variant="primary"
             >
               Try Again
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-white rounded-lg transition-colors"
+              variant="secondary"
             >
               Reload Page
-            </button>
+            </Button>
           </div>
           {process.env.NODE_ENV === 'development' && (
             <details className="mt-6 text-left max-w-2xl mx-auto">

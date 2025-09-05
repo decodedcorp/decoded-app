@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { MdSend, MdClose } from 'react-icons/md';
+import { Button } from '@decoded/ui';
 import { useCreateComment } from '../hooks/useComments';
 import { useUser } from '@/domains/auth/hooks/useAuth';
 
@@ -81,9 +82,9 @@ export function CommentInput({
     return (
       <div className={`${compact ? 'p-3' : 'p-4'} text-center`}>
         <p className="text-sm text-zinc-400 mb-2">Sign in to join the conversation</p>
-        <button className="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+        <Button variant="primary" size="sm">
           Sign In
-        </button>
+        </Button>
       </div>
     );
   }

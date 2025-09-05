@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { MdPushPin, MdClose } from 'react-icons/md';
+import { Button } from '@decoded/ui';
 
 interface PinNoteModalProps {
   isOpen: boolean;
@@ -122,21 +123,18 @@ const PinNoteModal = ({
 
         {/* Actions */}
         <div className="flex space-x-3">
-          <button
+          <Button
             onClick={handleClose}
-            className="flex-1 px-4 py-2 text-zinc-300 border border-zinc-600 rounded-lg
-                     hover:bg-zinc-700 transition-colors
-                     disabled:opacity-50 disabled:cursor-not-allowed"
+            variant="secondary"
+            className="flex-1"
             disabled={isLoading}
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handlePin}
-            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg
-                     hover:bg-blue-700 transition-colors
-                     disabled:opacity-50 disabled:cursor-not-allowed
-                     flex items-center justify-center space-x-2"
+            variant="primary"
+            className="flex-1"
             disabled={isLoading}
           >
             {isLoading ? (
@@ -150,7 +148,7 @@ const PinNoteModal = ({
                 <span>Pin Content</span>
               </>
             )}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

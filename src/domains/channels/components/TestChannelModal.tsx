@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { Button } from '@decoded/ui';
 
 import { useChannelModalStore } from '@/store/channelModalStore';
 
@@ -25,12 +26,13 @@ export function TestChannelModal() {
           placeholder="채널 ID 입력"
           className="px-2 py-1 text-sm border rounded"
         />
-        <button
+        <Button
           onClick={handleOpenModal}
-          className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+          variant="primary"
+          size="sm"
         >
           모달 열기
-        </button>
+        </Button>
       </div>
       <p className="text-xs text-gray-500 mt-1">예: test-channel-1, demo-channel-2</p>
     </div>

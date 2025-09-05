@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { Button } from '@decoded/ui';
 
 interface SubscribeButtonSectionProps {
   onSubscribe?: (isSubscribed: boolean) => void;
@@ -70,10 +71,11 @@ export const SubscribeButtonSection: React.FC<SubscribeButtonSectionProps> = ({
         pointerEvents: 'auto',
       }}
     >
-      <button
+      <Button
         onClick={handleClick}
         type="button"
-        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+        variant={isSubscribed ? "secondary" : "primary"}
+        size="sm"
         style={{
           position: 'relative',
           zIndex: 10000,
@@ -83,7 +85,7 @@ export const SubscribeButtonSection: React.FC<SubscribeButtonSectionProps> = ({
         data-subscribed={isSubscribed}
       >
         {isSubscribed ? 'Subscribed' : 'Subscribe'}
-      </button>
+      </Button>
     </div>
   );
 };

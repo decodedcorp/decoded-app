@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@decoded/ui';
 
 import type { SidebarFilters } from '@/domains/channels/components/sidebar/ChannelSidebar';
 import { ChannelData } from '@/store/channelModalStore';
@@ -14,6 +15,7 @@ import { ContentModal } from '@/domains/channels/components/modal/content/Conten
 import { ContentUploadModal } from '@/domains/channels/components/modal/content-upload/ContentUploadModal';
 import { useChannelContentsSinglePage } from '@/domains/channels/hooks/useChannelContents';
 import { useContentModalStore } from '@/store/contentModalStore';
+import { useContentUploadStore } from '@/store/contentUploadStore';
 import { ContentItem } from '@/lib/types/content';
 
 import { ChannelPageHeader } from './ChannelPageHeader';
@@ -139,17 +141,8 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
     [openContentModal],
   );
 
-  // 키보드 네비게이션 지원
-  React.useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        handleGoBack();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  // ESC 키로 뒤로가기 기능 제거 - 모달이 열려있을 때만 ESC 키 처리
+  // 모달들은 각자의 BaseModal에서 ESC 키를 처리하므로 여기서는 제거
 
   // 채널 ID 변경 시 필터 상태 초기화
   React.useEffect(() => {
@@ -176,12 +169,9 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="text-red-500 text-lg mb-4">Failed to load channel</div>
-          <button
-            onClick={handleGoBack}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-          >
+          <Button onClick={handleGoBack} variant="primary">
             Go Back
-          </button>
+          </Button>
         </div>
       </div>
     );

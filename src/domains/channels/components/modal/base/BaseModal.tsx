@@ -84,7 +84,7 @@ export function BaseModal({
 
   const node = (
     <div
-      className={`fixed inset-0 ${Z_INDEX_CLASSES.MODAL_OVERLAY} flex items-center justify-center p-4 pt-20`}
+      className={`fixed inset-0 ${Z_INDEX_CLASSES.MODAL_OVERLAY} flex items-center justify-center p-2 sm:p-4 pt-16 sm:pt-20`}
       style={{ backdropFilter: 'blur(8px)' }}
       role="presentation"
     >

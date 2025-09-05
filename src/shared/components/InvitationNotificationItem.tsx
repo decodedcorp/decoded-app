@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
+import { Button } from '@decoded/ui';
 import { useAcceptInvitation, useRejectInvitation } from '@/domains/invitations/hooks/useInvitations';
 import type { InvitationResponse } from '@/api/generated/models/InvitationResponse';
 
@@ -61,13 +62,14 @@ export function InvitationNotificationItem({ invitation }: InvitationNotificatio
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2">
-            <button
+            <Button
               onClick={handleAccept}
               disabled={isPending}
-              className="px-3 py-1 bg-green-600 hover:bg-green-700 disabled:bg-green-800 disabled:cursor-not-allowed text-white text-xs rounded transition-colors font-medium"
+              variant="primary"
+              size="sm"
             >
               {acceptMutation.isPending ? 'Accepting...' : 'Accept'}
-            </button>
+            </Button>
             <button
               onClick={handleReject}
               disabled={isPending}
