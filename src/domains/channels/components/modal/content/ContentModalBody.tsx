@@ -54,20 +54,20 @@ const ImageDisplay = ({
   downloadedSrc?: string;
   showInfo?: boolean;
 }) => (
-  <div className="space-y-6">
-    <div className="relative rounded-xl overflow-hidden bg-zinc-900/50 border border-zinc-700/50 shadow-lg">
+  <div className="space-y-4">
+    <div className="relative rounded-lg overflow-hidden bg-zinc-900/50 border border-zinc-700/50 shadow-lg">
       <ProxiedImage
         src={src}
         downloadedSrc={downloadedSrc}
         alt={alt}
         width={800}
         height={600}
-        className="w-full h-auto max-h-[70vh] object-contain"
+        className="w-full h-auto max-h-[75vh] object-contain"
       />
     </div>
 
     {showInfo && (
-      <div className="bg-zinc-800/30 rounded-xl p-6 border border-zinc-700/30">
+      <div className="bg-zinc-800/30 rounded-lg p-4 border border-zinc-700/30">
         <div className="flex items-center justify-between">
           <div className="flex-1">
             <p className="text-sm font-medium text-zinc-400 mb-3">Image URL:</p>
@@ -116,8 +116,8 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
   // Pending 상태인 경우 기본 카드 표시
   if (content.status === 'pending') {
     return (
-      <div className="p-8">
-        <div className="flex justify-end mb-4">
+      <div className="h-full flex flex-col">
+        <div className="flex justify-end mb-4 p-4 pb-0">
           <button
             onClick={onClose}
             className="flex items-center justify-center w-10 h-10 rounded-full bg-zinc-800/30 hover:bg-zinc-700/50 transition-all duration-200 group"
@@ -141,15 +141,17 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
             </svg>
           </button>
         </div>
-        <DefaultContentCard content={content} />
+        <div className="flex-1 p-4 pt-0">
+          <DefaultContentCard content={content} />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="p-8 space-y-8 max-h-full overflow-y-auto">
+    <div className="h-full flex flex-col">
       {/* Main Content Viewer */}
-      <div>
+      <div className="flex-1 overflow-y-auto p-4 space-y-6">
         {/* Image Content */}
         {content.type === 'image' && (
           <>
@@ -170,14 +172,14 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
         {content.type === 'video' && (
           <>
             {content.imageUrl ? (
-              <div className="relative rounded-xl overflow-hidden bg-zinc-900/50 border border-zinc-700/50 shadow-lg">
+              <div className="relative rounded-lg overflow-hidden bg-zinc-900/50 border border-zinc-700/50 shadow-lg">
                 <ProxiedImage
                   src={content.imageUrl}
                   downloadedSrc={content.linkPreview?.downloadedImageUrl}
                   alt={content.title}
                   width={800}
                   height={600}
-                  className="w-full h-auto max-h-[70vh] object-contain"
+                  className="w-full h-auto max-h-[75vh] object-contain"
                 />
                 {/* Video Play Button Overlay */}
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
@@ -197,15 +199,15 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
         {content.type === 'text' && (
           <>
             {content.description ? (
-              <div className="bg-zinc-800/30 rounded-xl p-8 border border-zinc-700/30">
+              <div className="bg-zinc-800/30 rounded-lg p-6 border border-zinc-700/30">
                 <div className="prose prose-invert max-w-none">
-                  <p className="text-gray-400 leading-relaxed text-lg mb-6">
+                  <p className="text-gray-400 leading-relaxed text-lg mb-4">
                     {content.description}
                   </p>
 
                   {/* Link URL Display */}
                   {content.linkUrl && (
-                    <div className="mt-8 p-6 bg-zinc-900/30 rounded-xl border border-zinc-700/30">
+                    <div className="mt-6 p-4 bg-zinc-900/30 rounded-lg border border-zinc-700/30">
                       <div className="flex items-center justify-between">
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-zinc-400 mb-3">Link URL:</p>
@@ -263,28 +265,25 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
             )}
           </div>
         )}
+
+        {/* AI Generated Summary for non-link content (Mobile only) */}
+        {content.type !== 'link' && content.aiSummary && (
+          <div className="block lg:hidden">
+            <SummarySection title="Summary" summary={content.aiSummary} onClose={onClose} />
+          </div>
+        )}
+
+        {/* Interactive Q&A Section for non-link content (Mobile only) */}
+        {content.type !== 'link' && content.aiQaList && content.aiQaList.length > 0 && (
+          <div className="block lg:hidden">
+            <InteractiveQASection qaList={content.aiQaList} title="Q&A" />
+          </div>
+        )}
       </div>
 
-      {/* AI Generated Summary for non-link content (Mobile only) */}
-      {content.type !== 'link' && content.aiSummary && (
-        <div className="block lg:hidden">
-          <SummarySection title="Summary" summary={content.aiSummary} onClose={onClose} />
-        </div>
-      )}
-
-      {/* Interactive Q&A Section for non-link content (Mobile only) */}
-      {content.type !== 'link' && content.aiQaList && content.aiQaList.length > 0 && (
-        <div className="block lg:hidden">
-          <InteractiveQASection qaList={content.aiQaList} title="Q&A" />
-        </div>
-      )}
-
-      {/* Content Metadata */}
-      {(content.author ||
-        content.date ||
-        content.likes !== undefined ||
-        content.views !== undefined) && (
-        <div className="flex flex-wrap items-center gap-6 text-sm text-zinc-500 pt-6 border-t border-zinc-700/30">
+      {/* Content Metadata - Always visible at bottom */}
+      <div className="flex-shrink-0 p-4 pt-3 border-t border-zinc-700/30">
+        <div className="flex flex-wrap items-center gap-4 text-sm text-zinc-500">
           {content.author && (
             <div className="flex items-center space-x-2">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -347,7 +346,7 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
             </div>
           )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
