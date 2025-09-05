@@ -1,13 +1,17 @@
 'use client';
 
 import React from 'react';
+import { Flame, TrendingUp } from 'lucide-react';
 
 export function RightSidebar() {
   return (
     <div className="w-full h-screen p-4 sticky top-0 overflow-y-auto">
       {/* 트렌딩 커뮤니티 */}
       <div className="mb-6">
-        <div className="text-white text-sm font-medium mb-4">🔥 Trending Channels</div>
+        <div className="text-white text-sm font-medium mb-4 flex items-center gap-2">
+          <Flame className="w-4 h-4" />
+          Trending Channels
+        </div>
         <div className="space-y-3">
           {[
             {
@@ -39,7 +43,10 @@ export function RightSidebar() {
 
       {/* 인기 포스트 */}
       <div className="mb-6">
-        <div className="text-white text-sm font-medium mb-4">📈 Popular Today</div>
+        <div className="text-white text-sm font-medium mb-4 flex items-center gap-2">
+          <TrendingUp className="w-4 h-4" />
+          Popular Today
+        </div>
         <div className="space-y-3">
           {[
             { title: 'New React 19 features announced', channel: 'reactjs', upvotes: 1234 },

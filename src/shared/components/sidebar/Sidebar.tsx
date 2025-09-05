@@ -29,6 +29,18 @@ export function Sidebar() {
     setIsMobileOpen(false);
   }, [pathname]);
 
+  // Listen for mobile sidebar toggle events from header
+  useEffect(() => {
+    const handleToggleMobileSidebar = () => {
+      setIsMobileOpen((prev) => !prev);
+    };
+
+    window.addEventListener('toggle-mobile-sidebar', handleToggleMobileSidebar);
+    return () => {
+      window.removeEventListener('toggle-mobile-sidebar', handleToggleMobileSidebar);
+    };
+  }, []);
+
   // Handle create button click
   const handleCreateClick = () => {
     // 모달은 /create 페이지에서 열도록 하고, 여기서는 라우팅만 처리
@@ -37,22 +49,10 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Mobile Menu Button */}
-      <button
-        onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="fixed top-[18px] left-4 z-[10000] p-2 rounded-lg bg-zinc-900 border border-zinc-700 lg:hidden"
-      >
-        {isMobileOpen ? (
-          <XMarkIcon className="w-5 h-5 text-zinc-300" />
-        ) : (
-          <Bars3Icon className="w-5 h-5 text-zinc-300" />
-        )}
-      </button>
-
       {/* Mobile Backdrop */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-[9997] lg:hidden"
+          className="fixed inset-0 bg-black/50 z-[10001] lg:hidden"
           onClick={() => setIsMobileOpen(false)}
         />
       )}
@@ -60,13 +60,13 @@ export function Sidebar() {
       {/* Fixed Sidebar - Instagram style */}
       <aside
         className={`
-          relative top-0 left-0 h-[calc(100vh-72px)] w-[245px]
+          w-[245px]
           bg-black border-r border-zinc-800
           overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-black
           ${
             isMobileOpen
-              ? 'fixed translate-x-0 z-[9998]'
-              : 'lg:relative fixed -translate-x-full lg:translate-x-0'
+              ? 'fixed top-[60px] md:top-[72px] left-0 h-[calc(100vh-60px)] md:h-[calc(100vh-72px)] translate-x-0 z-[10002]'
+              : 'lg:relative fixed top-0 left-0 h-[calc(100vh-72px)] -translate-x-full lg:translate-x-0'
           }
         `}
       >

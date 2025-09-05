@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Camera, Video, Link, FileText, MessageCircle, Share, Bookmark } from 'lucide-react';
 
 interface PostCardProps {
   id: number;
@@ -30,7 +31,7 @@ function ThumbnailImage({
 }: {
   src: string;
   alt: string;
-  getContentIcon: () => string;
+  getContentIcon: () => React.ReactNode;
   getContentTypeColor: () => string;
 }) {
   const [imageError, setImageError] = useState(false);
@@ -39,7 +40,9 @@ function ThumbnailImage({
   if (imageError) {
     return (
       <div className="w-full h-64 bg-zinc-800 rounded-lg flex items-center justify-center border border-zinc-700">
-        <span className={`text-4xl ${getContentTypeColor()}`}>{getContentIcon()}</span>
+        <div className={`${getContentTypeColor()}`} style={{ fontSize: '4rem' }}>
+          {getContentIcon()}
+        </div>
       </div>
     );
   }
@@ -67,7 +70,7 @@ function ThumbnailImage({
       </div>
       {imageLoaded && (
         <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm px-2 py-1 rounded text-xs">
-          <span className={`text-xs font-medium ${getContentTypeColor()}`}>{getContentIcon()}</span>
+          <div className={`text-xs font-medium ${getContentTypeColor()}`}>{getContentIcon()}</div>
         </div>
       )}
     </div>
@@ -100,13 +103,13 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
   const getContentIcon = () => {
     switch (contentType) {
       case 'image':
-        return '📷';
+        return <Camera className="w-4 h-4" />;
       case 'video':
-        return '🎥';
+        return <Video className="w-4 h-4" />;
       case 'link':
-        return '🔗';
+        return <Link className="w-4 h-4" />;
       default:
-        return '📝';
+        return <FileText className="w-4 h-4" />;
     }
   };
 
@@ -176,9 +179,12 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
         </div>
 
         {/* 포스트 콘텐츠 영역 - 클릭 시 모달 */}
-        <div className="cursor-pointer group/content hover:bg-zinc-900/50 rounded-lg p-2 -m-2 transition-colors" onClick={() => {
-          onPostClick?.();
-        }}>
+        <div
+          className="cursor-pointer group/content hover:bg-zinc-900/50 rounded-lg p-2 -m-2 transition-colors"
+          onClick={() => {
+            onPostClick?.();
+          }}
+        >
           {/* 제목 */}
           <h3 className="text-white font-semibold mb-3 line-clamp-2 leading-tight text-lg group-hover/content:text-[#eafd66] transition-colors">
             {title}
@@ -209,15 +215,15 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
             <span className="font-medium">{upvotes.toLocaleString()}</span>
           </button>
           <button className="hover:text-blue-400 transition-colors flex items-center gap-2">
-            <span className="text-lg">💬</span>
+            <MessageCircle className="w-4 h-4" />
             <span className="font-medium">{comments}</span>
           </button>
           <button className="hover:text-green-400 transition-colors flex items-center gap-2">
-            <span className="text-lg">📤</span>
+            <Share className="w-4 h-4" />
             <span>Share</span>
           </button>
           <button className="hover:text-purple-400 transition-colors flex items-center gap-2">
-            <span className="text-lg">🔖</span>
+            <Bookmark className="w-4 h-4" />
             <span>Save</span>
           </button>
         </div>
