@@ -6,12 +6,14 @@ const getApiBaseUrl = () => {
   const envApiUrl = process.env.API_BASE_URL;
   const nodeEnv = process.env.NODE_ENV;
 
-  // 임시로 모든 환경에서 개발 API 사용 (API 서버 문제 해결 후 변경)
-  console.log(`[Proxy] Environment: ${nodeEnv}, Using dev API temporarily`);
-  return envApiUrl || 'https://dev.decoded.style';
-};
+  // API_BASE_URL 가드 (런타임에서만 체크)
+  if (!envApiUrl) {
+    throw new Error('[Config] API_BASE_URL missing (prod)');
+  }
 
-const API_BASE_URL = getApiBaseUrl();
+  console.log(`[Proxy] Environment: ${nodeEnv}, API_BASE_URL: ${envApiUrl}`);
+  return envApiUrl;
+};
 
 export async function GET(
   request: NextRequest,
@@ -55,6 +57,7 @@ export async function PATCH(
 
 async function handleRequest(request: NextRequest, pathSegments: string[], method: string) {
   try {
+    const API_BASE_URL = getApiBaseUrl();
     const path = pathSegments.join('/');
     // URL 끝의 슬래시 문제 해결
     const url = path ? `${API_BASE_URL}/${path}` : API_BASE_URL;
@@ -193,6 +196,25 @@ async function handleRequest(request: NextRequest, pathSegments: string[], metho
   } catch (error) {
     console.error('[Proxy] Error:', error);
 
+    // API_BASE_URL 누락 에러인 경우 구체적으로 표시
+    if (error instanceof Error && error.message.includes('API_BASE_URL missing')) {
+      return new NextResponse(
+        JSON.stringify({
+          error: 'Configuration Error',
+          message: 'API_BASE_URL environment variable is missing',
+          details: error.message,
+        }),
+        {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
+        },
+      );
+    }
+
+    // 일반적인 에러 핸들링
     return new NextResponse(
       JSON.stringify({
         error: 'Proxy request failed',

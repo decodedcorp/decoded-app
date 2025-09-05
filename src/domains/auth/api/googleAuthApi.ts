@@ -149,68 +149,47 @@ export class GoogleAuthApi {
    * 백엔드 로그인 API 호출 (프록시 사용)
    */
   static async callBackendLogin(requestBody: BackendLoginRequest): Promise<BackendLoginResponse> {
+    // 1. API_BASE_URL 가드 + 절대 URL 사용
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+    if (!API_BASE_URL) {
+      throw new Error('[Config] API_BASE_URL missing (prod)');
+    }
+    const loginUrl = new URL('/auth/login', API_BASE_URL).toString();
+
+    // 2. 서버-서버 호출 헤더 정리 (CORS 헤더 제거)
     const backendRequestHeaders = {
       'Content-Type': 'application/json',
       Accept: 'application/json',
-      Origin: 'https://decoded.style',
-      'Access-Control-Request-Method': 'POST',
-      'Access-Control-Request-Headers': 'Content-Type',
     };
-
-    // 환경별 API 기본 URL 설정
-    const getApiBaseUrl = () => {
-      // 명시적으로 설정된 경우 우선 사용
-      if (process.env.NEXT_PUBLIC_API_BASE_URL) {
-        return process.env.NEXT_PUBLIC_API_BASE_URL;
-      }
-
-      // Vercel 환경에서 프로덕션 URL 강제 사용
-      if (process.env.VERCEL || process.env.VERCEL_URL) {
-        return 'http://dev.decoded.style';
-      }
-
-      // 프로덕션 환경 기본값
-      if (process.env.NODE_ENV === 'production') {
-        return 'http://dev.decoded.style';
-      }
-
-      // 개발 환경 기본값
-      return 'http://dev.decoded.style';
-    };
-
-    const apiBaseUrl = getApiBaseUrl();
-    const apiUrl = `${apiBaseUrl}/auth/login`;
 
     console.log('[GoogleAuthApi] Backend API details:', {
-      apiBaseUrl,
-      apiUrl,
+      apiBaseUrl: API_BASE_URL,
+      loginUrl,
       NODE_ENV: process.env.NODE_ENV,
-      EXPLICIT_API_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
     });
 
-    // 직접 백엔드 API 호출하여 Vercel deployment protection 우회
-    const backendResponse = await fetch(apiUrl, {
+    // 3. 백엔드 API 호출
+    const backendResponse = await fetch(loginUrl, {
       method: 'POST',
       headers: backendRequestHeaders,
       body: JSON.stringify(requestBody),
-      mode: 'cors',
     });
 
+    // 4. 응답 에러 핸들링 명확화
     if (!backendResponse.ok) {
-      const errorData = await backendResponse.text();
-      console.error('Backend login API error:', errorData);
-      console.error('Request details:', {
-        url: apiUrl,
-        method: 'POST',
-        headers: backendRequestHeaders,
-        bodyPreview: JSON.stringify(requestBody).substring(0, 100),
-      });
+      let errorInfo: { detail?: string; error?: string } = {};
+      try {
+        errorInfo = await backendResponse.json();
+      } catch {
+        // JSON 파싱 실패 시 텍스트로 시도
+        const errorText = await backendResponse.text();
+        errorInfo = { error: errorText };
+      }
 
-      // 추가 디버깅 정보
-      console.error('Backend API debugging info:', {
+      console.error('[GoogleAuthApi] Backend login failed:', {
         status: backendResponse.status,
         statusText: backendResponse.statusText,
-        responseHeaders: Object.fromEntries(backendResponse.headers.entries()),
+        errorInfo,
         requestBodyValidation: {
           hasJwtToken: !!requestBody.jwt_token,
           jwtTokenLength: requestBody.jwt_token?.length,
@@ -222,7 +201,11 @@ export class GoogleAuthApi {
         },
       });
 
-      throw new Error(`Backend login failed: ${backendResponse.status}`);
+      throw new Error(
+        `Backend /auth/login ${backendResponse.status}: ${
+          errorInfo.detail || errorInfo.error || 'unknown'
+        }`,
+      );
     }
 
     return await backendResponse.json();
