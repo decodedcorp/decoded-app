@@ -22,5 +22,13 @@ export type ChannelUpdate = {
      * Updated base64 encoded banner image
      */
     banner_base64?: (string | null);
+    /**
+     * Category name (대분류)
+     */
+    category?: (string | null);
+    /**
+     * Subcategory name (서브카테고리)
+     */
+    subcategory?: (string | null);
 };
 

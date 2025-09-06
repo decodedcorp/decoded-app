@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { UserProfileResponse } from './UserProfileResponse';
+import type { ChannelUserProfile } from './ChannelUserProfile';
 /**
  * Channel response schema
  */
@@ -24,9 +24,9 @@ export type ChannelResponse = {
      */
     owner_id: string;
     /**
-     * Channel managers with full profile info
+     * Channel managers profile info
      */
-    managers?: Array<UserProfileResponse>;
+    managers?: Array<ChannelUserProfile>;
     /**
      * List of manager user IDs for quick access
      */
@@ -64,5 +64,13 @@ export type ChannelResponse = {
      * Whether current user is a channel manager
      */
     is_manager?: boolean;
+    /**
+     * Category name (parent category)
+     */
+    category?: (string | null);
+    /**
+     * Subcategory name
+     */
+    subcategory?: (string | null);
 };
 

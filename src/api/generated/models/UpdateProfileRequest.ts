@@ -3,17 +3,17 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Request to update user settings
+ * Request to update user profile - all fields optional for PATCH
  */
-export type UpdateSettingsRequest = {
-    /**
-     * Base64 encoded profile image
-     */
-    profile_image_base64?: (string | null);
+export type UpdateProfileRequest = {
     /**
      * User alias/nickname
      */
     aka: (string | null);
+    /**
+     * Base64 encoded profile image
+     */
+    base64_profile_image?: (string | null);
     /**
      * Sui blockchain address
      */
