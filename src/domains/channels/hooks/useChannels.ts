@@ -98,6 +98,8 @@ export const useCreateChannel = () => {
         description: data.description?.trim() || null,
         thumbnail_base64: data.thumbnail_base64 || null,
         banner_base64: data.banner_base64 || null,
+        category: data.category || null,
+        subcategory: data.subcategory || null,
       };
 
       // 필수 필드 검증
