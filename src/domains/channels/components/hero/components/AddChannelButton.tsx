@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { useAddChannelStore } from '@/domains/create/store/addChannelStore';
+import { useGlobalContentUploadStore } from '@/store/globalContentUploadStore';
 
 interface AddChannelButtonProps {
   variant?: 'default' | 'simple' | 'post';
@@ -10,10 +10,13 @@ interface AddChannelButtonProps {
 }
 
 export function AddChannelButton({ variant = 'default', className = '' }: AddChannelButtonProps) {
-  const openModal = useAddChannelStore((state) => state.openModal);
+  const startChannelCreation = useGlobalContentUploadStore((state) => state.startChannelCreation);
+  const openModal = useGlobalContentUploadStore((state) => state.openModal);
 
   const handleClick = () => {
+    // Open the global modal and immediately start channel creation
     openModal();
+    startChannelCreation();
   };
 
   if (variant === 'simple') {

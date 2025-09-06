@@ -3,7 +3,6 @@
 import React, { useState, useCallback } from 'react';
 
 import { useSearchChannels } from '@/domains/search/hooks/useSearch';
-import { useAddChannelStore } from '@/domains/create/store/addChannelStore';
 import { useGlobalContentUploadStore } from '@/store/globalContentUploadStore';
 
 import { ChannelSearchComponent } from './ChannelSearchComponent';
@@ -12,7 +11,7 @@ import { RecentChannelsList } from './RecentChannelsList';
 export function ChannelSelectionStep() {
   const [searchQuery, setSearchQuery] = useState('');
   const selectChannel = useGlobalContentUploadStore((state) => state.selectChannel);
-  const openAddChannelModal = useAddChannelStore((state) => state.openModal);
+  const startChannelCreation = useGlobalContentUploadStore((state) => state.startChannelCreation);
 
   // 채널 검색 결과
   const {
@@ -39,20 +38,20 @@ export function ChannelSelectionStep() {
 
   // 새 채널 생성 핸들러
   const handleCreateNewChannel = useCallback(() => {
-    openAddChannelModal();
-  }, [openAddChannelModal]);
+    startChannelCreation();
+  }, [startChannelCreation]);
 
   // 검색 컴포넌트에서 새 채널 생성 이벤트 감지
   React.useEffect(() => {
     const handleCreateNewChannelEvent = () => {
-      openAddChannelModal();
+      startChannelCreation();
     };
 
     window.addEventListener('create-new-channel', handleCreateNewChannelEvent);
     return () => {
       window.removeEventListener('create-new-channel', handleCreateNewChannelEvent);
     };
-  }, [openAddChannelModal]);
+  }, [startChannelCreation]);
 
   // 검색 핸들러
   const handleSearch = useCallback((query: string) => {
