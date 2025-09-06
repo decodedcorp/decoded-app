@@ -18,6 +18,7 @@ import { AddChannelHeader } from './AddChannelHeader';
 
 import { Step1BasicInfo } from './Step1BasicInfo';
 import { Step2MediaUpload } from './Step2MediaUpload';
+import { Step3CategorySelection } from './Step3CategorySelection';
 import { NavigationButtons } from './NavigationButtons';
 
 interface Step1Data {
@@ -28,6 +29,11 @@ interface Step1Data {
 interface Step2Data {
   thumbnail_base64: string | null;
   banner_base64: string | null;
+}
+
+interface Step3Data {
+  selectedCategory: string;
+  selectedSubcategory: string;
 }
 
 export function AddChannelModal() {
@@ -51,6 +57,10 @@ export function AddChannelModal() {
     thumbnail_base64: null,
     banner_base64: null,
   });
+  const [step3Data, setStep3Data] = useState<Step3Data>({
+    selectedCategory: '',
+    selectedSubcategory: '',
+  });
 
   // Sync step1Data with form data
   useEffect(() => {
@@ -63,7 +73,8 @@ export function AddChannelModal() {
   const isSuccess = createChannelMutation.isSuccess;
 
   const canProceedToStep2 = step1Data.name.trim().length >= 2 && step1Data.name.trim().length <= 50;
-  const canSubmit = canProceedToStep2 && currentStep === 2;
+  const canProceedToStep3 = canProceedToStep2 && currentStep === 2;
+  const canSubmit = canProceedToStep2 && currentStep === 3;
 
   const handleStep1Submit = (data: Step1Data) => {
     setStep1Data(data);
@@ -72,11 +83,20 @@ export function AddChannelModal() {
 
   const handleStep2Submit = (data: Step2Data) => {
     setStep2Data(data);
+    setCurrentStep(3);
+  };
+
+  const handleStep3Submit = (data: Step3Data) => {
+    setStep3Data(data);
     handleFinalSubmit();
   };
 
   const handleBackToStep1 = () => {
     setCurrentStep(1);
+  };
+
+  const handleBackToStep2 = () => {
+    setCurrentStep(2);
   };
 
   const handleFinalSubmit = async () => {
@@ -85,6 +105,8 @@ export function AddChannelModal() {
       description: step1Data.description.trim() || null,
       thumbnail_base64: step2Data.thumbnail_base64,
       banner_base64: step2Data.banner_base64,
+      category: step3Data.selectedCategory,
+      subcategory: step3Data.selectedSubcategory,
     };
 
     try {
@@ -143,7 +165,22 @@ export function AddChannelModal() {
     setCurrentStep(1);
     setStep1Data({ name: '', description: '' });
     setStep2Data({ thumbnail_base64: null, banner_base64: null });
+    setStep3Data({ selectedCategory: '', selectedSubcategory: '' });
   };
+
+  // ESC 키로 모달 닫기
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleCancel();
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, handleCancel]);
 
   return (
     <BaseModal
@@ -158,7 +195,7 @@ export function AddChannelModal() {
         <div className="flex-1 overflow-y-auto p-4 sm:p-6">
           {currentStep === 1 ? (
             <Step1BasicInfo data={step1Data} onDataChange={(data) => setStep1Data(data)} />
-          ) : (
+          ) : currentStep === 2 ? (
             <Step2MediaUpload
               step1Data={step1Data}
               data={step2Data}
@@ -171,13 +208,24 @@ export function AddChannelModal() {
                   : null
               }
             />
-          )}
+          ) : currentStep === 3 ? (
+            <Step3CategorySelection
+              data={step3Data}
+              onDataChange={(data) => setStep3Data(data)}
+            />
+          ) : null}
         </div>
 
         <NavigationButtons
           currentStep={currentStep}
           onCancel={handleCancel}
-          onBack={currentStep === 2 ? handleBackToStep1 : undefined}
+          onBack={
+            currentStep === 2 
+              ? handleBackToStep1 
+              : currentStep === 3 
+              ? handleBackToStep2 
+              : undefined
+          }
           onNext={
             currentStep === 1 && canProceedToStep2
               ? () => {
@@ -186,11 +234,13 @@ export function AddChannelModal() {
                     setCurrentStep(2);
                   }
                 }
+              : currentStep === 2
+              ? () => setCurrentStep(3)
               : undefined
           }
-          onSubmit={currentStep === 2 ? handleFinalSubmit : undefined}
+          onSubmit={currentStep === 3 ? handleFinalSubmit : undefined}
           isLoading={isCreating}
-          canProceed={canProceedToStep2}
+          canProceed={currentStep === 1 ? canProceedToStep2 : currentStep === 2 ? canProceedToStep3 : false}
           canSubmit={canSubmit}
         />
       </div>

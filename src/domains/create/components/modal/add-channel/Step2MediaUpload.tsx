@@ -122,236 +122,136 @@ export function Step2MediaUpload({
   const [bannerPosition, setBannerPosition] = useState({ x: 50, y: 50 });
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-white mb-2">Media Upload</h2>
-        <p className="text-zinc-400">Upload thumbnail and banner images for your channel.</p>
+    <div className="flex gap-6 max-w-full mx-auto">
+      {/* Left side - Upload Options */}
+      <div className="flex-1">
+        <div className="text-left mb-6">
+          <h2 className="text-2xl font-bold text-white mb-2">Style your channel</h2>
+          <p className="text-zinc-400">Adding visual flair will catch new members attention and help establish your channel's culture! You can update this at any time.</p>
+        </div>
+
+        <div className="space-y-6">
+          {/* Banner Upload */}
+          <div>
+            <label className="text-lg font-medium text-white mb-3 block">Banner</label>
+            <button
+              onClick={() => handleFileSelect('banner')}
+              className="w-full h-32 border-2 border-dashed border-zinc-600 rounded-lg flex items-center justify-center hover:border-[#eafd66] transition-colors bg-zinc-800/30"
+            >
+              <div className="text-center">
+                <svg className="w-8 h-8 text-zinc-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                <div className="text-zinc-300 font-medium">Add</div>
+              </div>
+            </button>
+            {previewData.banner && (
+              <button
+                onClick={() => handleImageRemove('banner')}
+                className="mt-2 text-red-400 text-sm hover:text-red-300"
+              >
+                Remove banner
+              </button>
+            )}
+          </div>
+
+          {/* Icon Upload */}
+          <div>
+            <label className="text-lg font-medium text-white mb-3 block">Icon</label>
+            <button
+              onClick={() => handleFileSelect('thumbnail')}
+              className="w-full h-32 border-2 border-dashed border-zinc-600 rounded-lg flex items-center justify-center hover:border-[#eafd66] transition-colors bg-zinc-800/30"
+            >
+              <div className="text-center">
+                <svg className="w-8 h-8 text-zinc-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                <div className="text-zinc-300 font-medium">Add</div>
+              </div>
+            </button>
+            {previewData.thumbnail && (
+              <button
+                onClick={() => handleImageRemove('thumbnail')}
+                className="mt-2 text-red-400 text-sm hover:text-red-300"
+              >
+                Remove icon
+              </button>
+            )}
+          </div>
+        </div>
       </div>
-      {/* Channel Preview */}
-      <h3 className="text-lg font-semibold text-white mb-4 p-6 pb-0">Channel Preview</h3>
-      <div className="mb-8 bg-zinc-900/95 rounded-xl border border-zinc-700/50 overflow-hidden">
-        {/* 상단 배너 섹션 */}
-        <div className="h-full bg-zinc-800 relative overflow-hidden">
-          {previewData.banner ? (
-            <div className="relative w-full h-full">
+
+      {/* Right side - Preview */}
+      <div className="flex-1">
+        <div className="bg-zinc-900/50 rounded-xl border border-zinc-700/50 overflow-hidden">
+          {/* Banner section */}
+          <div className="h-32 bg-zinc-800 relative overflow-hidden">
+            {previewData.banner ? (
               <img
                 src={previewData.banner}
                 alt="Banner preview"
-                className="w-full h-32 object-cover opacity-60"
-                style={{
-                  objectPosition: `${bannerPosition.x}% ${bannerPosition.y}%`,
-                }}
+                className="w-full h-full object-cover"
               />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-r from-zinc-700 to-zinc-600"></div>
+            )}
+          </div>
 
-              {/* 배너 위치 조정 컨트롤 */}
-              <div className="absolute top-4 left-4 flex space-x-2">
-                <button
-                  onClick={() =>
-                    setBannerPosition((prev) => ({ ...prev, x: Math.max(0, prev.x - 10) }))
-                  }
-                  className="w-8 h-8 bg-zinc-800/70 hover:bg-zinc-700/70 text-white rounded-full flex items-center justify-center text-sm transition-colors"
-                  title="Move banner left"
-                >
-                  ←
-                </button>
-                <button
-                  onClick={() =>
-                    setBannerPosition((prev) => ({ ...prev, x: Math.min(100, prev.x + 10) }))
-                  }
-                  className="w-8 h-8 bg-zinc-800/70 hover:bg-zinc-700/70 text-white rounded-full flex items-center justify-center text-sm transition-colors"
-                  title="Move banner right"
-                >
-                  →
-                </button>
-                <button
-                  onClick={() =>
-                    setBannerPosition((prev) => ({ ...prev, y: Math.max(0, prev.y - 10) }))
-                  }
-                  className="w-8 h-8 bg-zinc-800/70 hover:bg-zinc-700/70 text-white rounded-full flex items-center justify-center text-sm transition-colors"
-                  title="Move banner up"
-                >
-                  ↑
-                </button>
-                <button
-                  onClick={() =>
-                    setBannerPosition((prev) => ({ ...prev, y: Math.min(100, prev.y + 10) }))
-                  }
-                  className="w-8 h-8 bg-zinc-800/70 hover:bg-zinc-70 text-white rounded-full flex items-center justify-center text-sm transition-colors"
-                  title="Move banner down"
-                >
-                  ↓
-                </button>
-                <button
-                  onClick={() => setBannerPosition({ x: 50, y: 50 })}
-                  className="w-8 h-8 bg-zinc-800/70 hover:bg-zinc-700/70 text-white rounded-full flex items-center justify-center text-sm transition-colors"
-                  title="Reset banner position"
-                >
-                  ⌂
-                </button>
-              </div>
-              {/* 배너 편집 버튼 */}
-              <button
-                onClick={() => handleFileSelect('banner')}
-                className="absolute top-4 right-4 p-2 rounded-full bg-zinc-800/70 hover:bg-zinc-700/70 transition-colors backdrop-blur-sm"
-                title="Change banner image"
-              >
-                <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
-                  <path
-                    d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"
-                    stroke="white"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"
-                    stroke="white"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-
-              {/* 배너 제거 버튼 */}
-              <button
-                onClick={() => handleImageRemove('banner')}
-                className="absolute top-4 right-16 w-6 h-6 bg-red-500/80 hover:bg-red-500 text-white rounded-full flex items-center justify-center text-sm transition-colors"
-                title="Remove banner image"
-              >
-                ×
-              </button>
-            </div>
-          ) : (
-            <div
-              onClick={() => handleFileSelect('banner')}
-              className="w-full h-full border-2 border-dashed border-zinc-600 flex items-center justify-center cursor-pointer hover:border-[#eafd66] transition-colors"
-            >
-              <div className="text-center">
-                <div className="text-zinc-400 text-sm">Click to upload banner image</div>
-                <div className="text-zinc-500 text-xs mt-1">Recommended size: 1200x300px</div>
-              </div>
-            </div>
-          )}
-
-          {/* 배너 파일 입력 필드 */}
-          <input
-            ref={bannerInputRef}
-            type="file"
-            accept="image/*"
-            onChange={(e) => handleFileChange('banner', e)}
-            className="hidden"
-          />
-        </div>
-
-        {/* 하단 정보 섹션 */}
-        <div className="bg-zinc-900/95 backdrop-blur-sm px-4 py-4">
-          <div className="flex items-center justify-between">
-            {/* 왼쪽: 아바타 + 채널 정보 */}
-            <div className="flex items-center">
-              {/* 편집 가능한 큰 아바타 - 배너에서 튀어나오게 */}
-              <div className="relative -mt-10">
+          {/* Channel info section */}
+          <div className="p-6">
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 rounded-full -mt-12 border-4 border-zinc-900 bg-zinc-700 flex items-center justify-center relative">
                 {previewData.thumbnail ? (
-                  <div className="relative">
-                    <img
-                      src={previewData.thumbnail}
-                      alt="Channel thumbnail"
-                      className="w-20 h-20 rounded-full border-4 border-black bg-black object-cover"
-                    />
-                    {/* 썸네일 편집 버튼 */}
-                    <button
-                      onClick={() => handleFileSelect('thumbnail')}
-                      className="absolute -bottom-1 -right-1 w-6 h-6 bg-gradient-to-r from-[#eafd66] to-[#d4e85c] text-black rounded-full flex items-center justify-center text-sm hover:from-[#d4e85c] hover:to-[#eafd66] transition-all"
-                      title="Change thumbnail image"
-                    >
-                      <svg width="12" height="12" fill="none" viewBox="0 0 24 24">
-                        <path
-                          d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </button>
-
-                    {/* 썸네일 제거 버튼 */}
-                    <button
-                      onClick={() => handleImageRemove('thumbnail')}
-                      className="absolute -top-1 -left-1 w-5 h-5 bg-red-500/80 hover:bg-red-500 text-white rounded-full flex items-center justify-center text-xs transition-colors"
-                      title="Remove thumbnail image"
-                    >
-                      ×
-                    </button>
-                  </div>
+                  <img
+                    src={previewData.thumbnail}
+                    alt="Channel icon"
+                    className="w-full h-full rounded-full object-cover"
+                  />
                 ) : (
-                  <div
-                    onClick={() => handleFileSelect('thumbnail')}
-                    className="w-20 h-20 rounded-full border-4 border-black bg-zinc-700 flex items-center justify-center cursor-pointer hover:bg-zinc-600 transition-colors"
-                  >
-                    <div className="text-center">
-                      <div className="text-zinc-400 text-xs">Click to upload</div>
-                      <div className="text-zinc-500 text-xs mt-1">300x300px</div>
-                    </div>
+                  <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold text-lg">r/</span>
                   </div>
                 )}
-
-                {/* 썸네일 파일 입력 필드 */}
-                <input
-                  ref={thumbnailInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleFileChange('thumbnail', e)}
-                  className="hidden"
-                />
               </div>
-
-              {/* 채널 정보 */}
-              <div className="ml-4">
-                <h4 className="text-2xl font-bold text-white">{step1Data.name}</h4>
-                <div className="flex items-center space-x-4 text-sm text-zinc-400 mt-1">
-                  <span>0 followers</span>
+              <div>
+                <h3 className="text-xl font-bold text-white">
+                  r/{step1Data.name || 'adfadadfadfd'}
+                </h3>
+                <div className="flex items-center space-x-2 text-sm text-zinc-400">
+                  <span>1 member</span>
                   <span>•</span>
-                  <span>0 editors</span>
+                  <span>1 online</span>
                 </div>
-                {step1Data.description && (
-                  <p className="text-zinc-400 text-sm mt-2 max-w-md">{step1Data.description}</p>
-                )}
               </div>
             </div>
-
-            {/* 오른쪽: 액션 버튼들 */}
-            <div className="flex items-center space-x-3">
-              <button
-                className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-full text-white font-medium transition-colors"
-                disabled
-              >
-                + Add Content
-              </button>
+            <div className="mt-4 flex items-center">
+              <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Hidden file inputs */}
+      <input
+        ref={bannerInputRef}
+        type="file"
+        accept="image/*"
+        onChange={(e) => handleFileChange('banner', e)}
+        className="hidden"
+      />
+      <input
+        ref={thumbnailInputRef}
+        type="file"
+        accept="image/*"
+        onChange={(e) => handleFileChange('thumbnail', e)}
+        className="hidden"
+      />
       {/* Error Display */}
       {error && (
         <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-lg">
           <p className="text-red-400 text-sm">{error}</p>
         </div>
       )}
-
-      {/* Upload Instructions */}
-      <div className="text-center text-zinc-400 text-sm">
-        <p>Images are optional. You can modify them anytime later.</p>
-        <p className="mt-1">Supported formats: JPG, PNG, WebP (max 5MB)</p>
-      </div>
     </div>
   );
 }
