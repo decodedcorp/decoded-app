@@ -132,6 +132,15 @@ export const queryKeys = {
       [...queryKeys.search.all, 'autocomplete', { query, type }] as const,
   },
 
+  // Categories related queries
+  categories: {
+    all: ['categories'] as const,
+    lists: () => [...queryKeys.categories.all, 'list'] as const,
+    list: (filters: Record<string, any>) => [...queryKeys.categories.lists(), filters] as const,
+    simple: (categoryType: any) => [...queryKeys.categories.all, 'simple', categoryType] as const,
+    tree: (categoryType: any) => [...queryKeys.categories.all, 'tree', categoryType] as const,
+  },
+
   // Invitations related queries
   invitations: {
     all: ['invitations'] as const,
