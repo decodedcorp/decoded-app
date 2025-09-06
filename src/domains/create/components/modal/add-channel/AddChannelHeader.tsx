@@ -9,12 +9,12 @@ interface AddChannelHeaderProps {
 
 export function AddChannelHeader({ onClose, currentStep }: AddChannelHeaderProps) {
   return (
-    <div className="flex items-center justify-between p-6 border-b border-zinc-700/50">
+    <div className="flex items-center justify-between px-4 py-4 border-b border-zinc-700/50">
       <div className="flex space-x-6 justify-between w-full pr-2">
         <h2 className="text-2xl font-semibold text-white">Create Channel</h2>
 
         {/* Step Indicator */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-3">
           <div className="flex items-center">
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
@@ -32,7 +32,7 @@ export function AddChannelHeader({ onClose, currentStep }: AddChannelHeaderProps
             </span>
           </div>
 
-          <div className="w-16 h-0.5 bg-zinc-700"></div>
+          <div className={`w-12 h-0.5 ${currentStep >= 2 ? 'bg-[#eafd66]' : 'bg-zinc-700'}`}></div>
 
           <div className="flex items-center">
             <div
@@ -47,7 +47,26 @@ export function AddChannelHeader({ onClose, currentStep }: AddChannelHeaderProps
             <span
               className={`ml-2 text-sm ${currentStep >= 2 ? 'text-[#eafd66]' : 'text-zinc-500'}`}
             >
-              Media Upload
+              Style
+            </span>
+          </div>
+
+          <div className={`w-12 h-0.5 ${currentStep >= 3 ? 'bg-[#eafd66]' : 'bg-zinc-700'}`}></div>
+
+          <div className="flex items-center">
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                currentStep >= 3
+                  ? 'bg-gradient-to-br from-[#eafd66] to-[#d4e85c] text-black'
+                  : 'bg-zinc-700 text-zinc-300'
+              }`}
+            >
+              3
+            </div>
+            <span
+              className={`ml-2 text-sm ${currentStep >= 3 ? 'text-[#eafd66]' : 'text-zinc-500'}`}
+            >
+              Topics
             </span>
           </div>
         </div>
