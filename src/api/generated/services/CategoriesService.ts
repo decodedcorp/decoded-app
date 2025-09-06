@@ -7,6 +7,7 @@ import type { CategoryBulkCreateResponse } from '../models/CategoryBulkCreateRes
 import type { CategoryCreate } from '../models/CategoryCreate';
 import type { CategoryListResponse } from '../models/CategoryListResponse';
 import type { CategoryResponse } from '../models/CategoryResponse';
+import type { CategorySimpleListResponse } from '../models/CategorySimpleListResponse';
 import type { CategoryTreeResponse } from '../models/CategoryTreeResponse';
 import type { CategoryType } from '../models/CategoryType';
 import type { CategoryUpdate } from '../models/CategoryUpdate';
@@ -94,6 +95,27 @@ export class CategoriesService {
             query: {
                 'category_type': categoryType,
                 'is_active': isActive,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Get Simple Categories
+     * Get categories in simple format for frontend (대분류 + 서브카테고리 목록)
+     * @param categoryType Category type for simple list
+     * @returns CategorySimpleListResponse Successful Response
+     * @throws ApiError
+     */
+    public static getSimpleCategoriesCategoriesSimpleGet(
+        categoryType: CategoryType,
+    ): CancelablePromise<CategorySimpleListResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/categories/simple',
+            query: {
+                'category_type': categoryType,
             },
             errors: {
                 422: `Validation Error`,
