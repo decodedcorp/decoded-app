@@ -57,7 +57,6 @@ export type { ContentListResponse } from './models/ContentListResponse';
 export type { ContentPreviewMetadata } from './models/ContentPreviewMetadata';
 export type { ContentPreviewResponse } from './models/ContentPreviewResponse';
 export { ContentStatus } from './models/ContentStatus';
-export { ContentType } from './models/ContentType';
 export type { CreateReportRequest } from './models/CreateReportRequest';
 export type { DemoImageContentRequest } from './models/DemoImageContentRequest';
 export type { DemoLinkContentRequest } from './models/DemoLinkContentRequest';
