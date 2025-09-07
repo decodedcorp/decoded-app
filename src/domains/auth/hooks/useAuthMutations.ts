@@ -99,7 +99,10 @@ export const useSuiAddressUpdate = () => {
 
   const updateSuiAddressMutation = useMutation({
     mutationFn: (suiAddress: string) =>
-      UsersService.updateMySuiAddressUsersMeSuiAddressPatch(suiAddress),
+      UsersService.updateMyProfileUsersMeProfilePatch({ 
+        aka: null, // Keep existing aka unchanged
+        sui_address: suiAddress 
+      }),
     onSuccess: () => {
       if (process.env.NODE_ENV === 'development') {
         console.log('[Auth] Sui address update mutation successful');
