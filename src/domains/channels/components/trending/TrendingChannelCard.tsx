@@ -16,14 +16,14 @@ export function TrendingChannelCard({ channel, className = '' }: TrendingChannel
     openChannelModal({
       id: channel.id,
       name: channel.name,
-      description: channel.description || '',
-      thumbnail: channel.thumbnail_url || '',
-      category: '',
-      subcategory: '',
-      subscribers: channel.subscribers_count || 0,
-      contents: channel.contents_count || 0,
-      created_at: '',
-      updated_at: ''
+      description: channel.description || null,
+      thumbnail_url: channel.thumbnail_url || null,
+      banner_url: null,
+      owner_id: '',
+      subscriber_count: channel.subscribers_count || 0,
+      content_count: channel.contents_count || 0,
+      category: null,
+      subcategory: null,
     });
   };
 

@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react';
 import type { UserProfileResponse } from '@/api/generated/models/UserProfileResponse';
+import type { ChannelUserProfile } from '@/api/generated/models/ChannelUserProfile';
 
 interface ChannelEditorsStackedAvatarsProps {
-  editors: UserProfileResponse[];
+  editors: UserProfileResponse[] | ChannelUserProfile[];
   maxDisplay?: number;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
@@ -39,18 +40,20 @@ export function ChannelEditorsStackedAvatars({
     lg: '-ml-3 first:ml-0',
   };
 
-  const getInitials = (editor: UserProfileResponse): string => {
+  const getInitials = (editor: UserProfileResponse | ChannelUserProfile): string => {
     if (editor.aka) {
       return editor.aka.substring(0, 2).toUpperCase();
     }
-    if (editor.email) {
+    if ('email' in editor && editor.email) {
       return editor.email.substring(0, 2).toUpperCase();
     }
     return 'U';
   };
 
-  const getDisplayName = (editor: UserProfileResponse): string => {
-    return editor.aka || editor.email || 'Unknown';
+  const getDisplayName = (editor: UserProfileResponse | ChannelUserProfile): string => {
+    if (editor.aka) return editor.aka;
+    if ('email' in editor && editor.email) return editor.email;
+    return 'Unknown';
   };
 
   return (

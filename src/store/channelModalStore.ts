@@ -1,12 +1,13 @@
 import { create } from 'zustand';
 import type { UserProfileResponse } from '@/api/generated/models/UserProfileResponse';
+import type { ChannelUserProfile } from '@/api/generated/models/ChannelUserProfile';
 
 export interface ChannelData {
   id: string;
   name: string;
   description?: string | null;
   owner_id: string;
-  managers?: UserProfileResponse[];
+  managers?: UserProfileResponse[] | ChannelUserProfile[];
   manager_ids?: string[];
   thumbnail_url?: string | null;
   banner_url?: string | null;
@@ -17,6 +18,8 @@ export interface ChannelData {
   is_subscribed?: boolean;
   is_owner?: boolean;
   is_manager?: boolean;
+  category?: string | null;
+  subcategory?: string | null;
 }
 
 interface ChannelModalState {

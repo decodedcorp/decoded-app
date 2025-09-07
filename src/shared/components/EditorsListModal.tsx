@@ -2,11 +2,12 @@
 
 import React, { useEffect } from 'react';
 import type { UserProfileResponse } from '@/api/generated/models/UserProfileResponse';
+import type { ChannelUserProfile } from '@/api/generated/models/ChannelUserProfile';
 
 interface EditorsListModalProps {
   isOpen: boolean;
   onClose: () => void;
-  editors: UserProfileResponse[];
+  editors: UserProfileResponse[] | ChannelUserProfile[];
   channelName?: string;
   ownerId?: string;
 }
@@ -51,11 +52,13 @@ export function EditorsListModal({
     return 0;
   });
 
-  const getDisplayName = (editor: UserProfileResponse): string => {
-    return editor.aka || editor.email?.split('@')[0] || 'Unknown';
+  const getDisplayName = (editor: UserProfileResponse | ChannelUserProfile): string => {
+    if (editor.aka) return editor.aka;
+    if ('email' in editor && editor.email) return editor.email.split('@')[0];
+    return 'Unknown';
   };
 
-  const getInitials = (editor: UserProfileResponse): string => {
+  const getInitials = (editor: UserProfileResponse | ChannelUserProfile): string => {
     const name = getDisplayName(editor);
     return name.substring(0, 2).toUpperCase();
   };
@@ -67,7 +70,7 @@ export function EditorsListModal({
     return `${count} followers`;
   };
 
-  const isOwner = (editor: UserProfileResponse): boolean => {
+  const isOwner = (editor: UserProfileResponse | ChannelUserProfile): boolean => {
     return ownerId === editor.id;
   };
 
@@ -141,7 +144,7 @@ export function EditorsListModal({
                               <path d="M5 16L3 6l5.5 4L12 4l3.5 6L21 6l-2 10H5zm2.7-2h8.6l.9-4.4-2.4 2L12 9l-2.8 2.6-2.4-2L7.7 14z"/>
                             </svg>
                           </div>
-                        ) : editor.is_verified && (
+                        ) : ('is_verified' in editor && editor.is_verified) && (
                           <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
                             <svg width="12" height="12" fill="white" viewBox="0 0 20 20">
                               <path
@@ -167,10 +170,10 @@ export function EditorsListModal({
                           )}
                         </div>
                         <p className="text-sm text-zinc-400">
-                          {formatFollowers(editor.total_followers)}
+                          {formatFollowers('total_followers' in editor ? editor.total_followers : 0)}
                         </p>
                         {/* Bio/Description if available */}
-                        {editor.email && (
+                        {('email' in editor && editor.email) && (
                           <p className="text-sm text-zinc-500 mt-1 line-clamp-2">
                             {editor.email}
                           </p>

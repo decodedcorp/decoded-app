@@ -3,6 +3,7 @@
 import React from 'react';
 import type { ChannelResponse } from '@/api/generated/models/ChannelResponse';
 import type { UserProfileResponse } from '@/api/generated/models/UserProfileResponse';
+import type { ChannelUserProfile } from '@/api/generated/models/ChannelUserProfile';
 
 interface ManagersListProps {
   channel: ChannelResponse;
@@ -26,7 +27,7 @@ export function ManagersList({ channel, onRemoveManager }: ManagersListProps) {
 
   return (
     <div className="space-y-3">
-      {managers.map((manager: UserProfileResponse) => (
+      {managers.map((manager: UserProfileResponse | ChannelUserProfile) => (
         <div
           key={manager.id}
           className="flex items-center justify-between bg-zinc-800/50 rounded-lg p-3 border border-zinc-700/50"
@@ -46,9 +47,9 @@ export function ManagersList({ channel, onRemoveManager }: ManagersListProps) {
             {/* Manager Info */}
             <div>
               <h4 className="font-medium text-white">
-                {manager.aka || manager.email}
+                {manager.aka || ('email' in manager ? manager.email : 'Manager')}
               </h4>
-              {manager.aka && manager.email && (
+              {manager.aka && ('email' in manager && manager.email) && (
                 <p className="text-xs text-zinc-400">{manager.email}</p>
               )}
               <p className="text-xs text-green-400">Manager</p>
@@ -62,7 +63,7 @@ export function ManagersList({ channel, onRemoveManager }: ManagersListProps) {
                 onClick={() => onRemoveManager(manager.id)}
                 className="p-2 rounded-full hover:bg-zinc-700 text-zinc-400 hover:text-red-400 transition-colors"
                 title="Remove manager"
-                aria-label={`Remove ${manager.aka || manager.email} as manager`}
+                aria-label={`Remove ${manager.aka || ('email' in manager ? manager.email : 'Manager')} as manager`}
               >
                 <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
                   <path

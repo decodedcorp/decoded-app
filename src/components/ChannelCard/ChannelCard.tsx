@@ -309,7 +309,7 @@ export const ChannelCard = memo(
             <div className="flex items-center justify-between min-h-[20px]">
               {/* Creation date - left side */}
               <div className="text-zinc-400 text-xs">
-                {channelData.created_at && <span>{formatDate(channelData.created_at)}</span>}
+                {('created_at' in channelData && channelData.created_at) && <span>{formatDate(channelData.created_at)}</span>}
               </div>
 
               {/* Subcategory only - right side */}
