@@ -187,7 +187,10 @@ export function GlobalContentUploadModal() {
                   thumbnail_base64: channelFormData.thumbnail_base64 || null,
                   banner_base64: channelFormData.banner_base64 || null,
                 }}
-                onDataChange={(data) => updateChannelFormData(data)}
+                onDataChange={(data) => updateChannelFormData({
+                  thumbnail_base64: data.thumbnail_base64 ?? undefined,
+                  banner_base64: data.banner_base64 ?? undefined,
+                })}
                 onBack={handleChannelCreationBack}
                 isLoading={isCreatingChannel}
                 error={channelCreationError}

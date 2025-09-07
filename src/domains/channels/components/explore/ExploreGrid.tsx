@@ -112,7 +112,6 @@ export function ExploreGrid({
               channel={channel}
               size="medium"
               onCardClick={onChannelClick}
-              variant="magazine"
               className="h-full"
             />
           </div>
