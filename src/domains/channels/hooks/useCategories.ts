@@ -12,6 +12,9 @@ export function useCategories(categoryType: CategoryType = CategoryType.CHANNEL)
   });
 }
 
+// Alias for backward compatibility
+export const useSimpleCategories = useCategories;
+
 // Helper function to extract dropdown options from API response
 export function formatCategoriesForDropdown(data?: CategorySimpleListResponse) {
   if (!data?.categories) return { categories: [], subcategories: {} };
