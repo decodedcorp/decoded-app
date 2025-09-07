@@ -3,8 +3,9 @@
 import React, { useMemo } from 'react';
 import { ChannelResponse } from '@/api/generated/models/ChannelResponse';
 import { ChannelCard } from './ChannelCard';
-import { ExploreFilters } from './ExploreHeader';
+import { ExploreFilters } from '../../types/filters';
 import { EmptyState } from '../common/LoadingStates';
+import { filterChannelsByCategory } from '../../utils/categoryUtils';
 
 interface ExploreGridProps {
   channels: ChannelResponse[];
@@ -28,18 +29,14 @@ export function ExploreGrid({
       const searchTerm = filters.search.toLowerCase().trim();
       filtered = filtered.filter(channel => 
         channel.name.toLowerCase().includes(searchTerm) ||
-        (channel.description && channel.description.toLowerCase().includes(searchTerm))
+        (channel.description && channel.description.toLowerCase().includes(searchTerm)) ||
+        (channel.category && channel.category.toLowerCase().includes(searchTerm)) ||
+        (channel.subcategory && channel.subcategory.toLowerCase().includes(searchTerm))
       );
     }
 
-    // Apply category filter
-    // Note: Category filtering is temporarily disabled until API provides category field
-    if (filters.category !== 'all') {
-      // TODO: Implement category filtering when API supports it
-      // filtered = filtered.filter(channel => 
-      //   channel.category && channel.category.toLowerCase() === filters.category.toLowerCase()
-      // );
-    }
+    // Apply category and subcategory filters
+    filtered = filterChannelsByCategory(filtered, filters.category, filters.subcategory);
 
     // Apply sorting
     filtered.sort((a, b) => {
@@ -62,37 +59,6 @@ export function ExploreGrid({
     return filtered;
   }, [channels, filters]);
 
-  // Generate Bento-style grid layout with varying card sizes
-  const gridItems = useMemo(() => {
-    return processedChannels.map((channel, index) => {
-      // Create varied layout pattern
-      let size: 'small' | 'medium' | 'large' = 'medium';
-      let gridClass = 'col-span-1';
-      
-      // Every 7th item starting from index 0 is large (featured)
-      if (index % 7 === 0 && index < 21) {
-        size = 'large';
-        gridClass = 'col-span-1 md:col-span-2 lg:col-span-2';
-      }
-      // Every 5th item (not already large) is small
-      else if (index % 5 === 0 && index % 7 !== 0) {
-        size = 'small';
-        gridClass = 'col-span-1';
-      }
-      // Rest are medium
-      else {
-        size = 'medium';
-        gridClass = 'col-span-1';
-      }
-
-      return {
-        channel,
-        size,
-        gridClass,
-        index
-      };
-    });
-  }, [processedChannels]);
 
   if (processedChannels.length === 0) {
     const searchIcon = (
@@ -138,14 +104,15 @@ export function ExploreGrid({
         </p>
       </div>
 
-      {/* Bento Grid Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-        {gridItems.map(({ channel, size, gridClass }) => (
-          <div key={channel.id} className={gridClass}>
+      {/* Magazine Style Grid Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {processedChannels.map((channel) => (
+          <div key={channel.id}>
             <ChannelCard
               channel={channel}
-              size={size}
+              size="medium"
               onCardClick={onChannelClick}
+              variant="magazine"
               className="h-full"
             />
           </div>

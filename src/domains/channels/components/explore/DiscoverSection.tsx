@@ -1,11 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { ChannelData } from '@/store/channelModalStore';
-import { ProxiedImage } from '@/components/ProxiedImage';
 import { useChannelModalStore } from '@/store/channelModalStore';
+import { useCategories, formatCategoriesForDropdown } from '../../hooks/useCategories';
+import { CategoryType } from '@/api/generated/models/CategoryType';
+import { ChannelCard } from '@/components/ChannelCard/ChannelCard';
 
 interface DiscoverSectionProps {
   channels: ChannelData[];
@@ -16,6 +18,14 @@ interface DiscoverSectionProps {
 export function DiscoverSection({ channels, className = '', onChannelClick }: DiscoverSectionProps) {
   const router = useRouter();
   const openChannelModal = useChannelModalStore((state) => state.openModal);
+  
+  // Category filters state
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedSubcategory, setSelectedSubcategory] = useState('all');
+  
+  // Fetch categories from API
+  const { data: categoriesData, isLoading: categoriesLoading } = useCategories(CategoryType.CHANNEL);
+  const { categories, subcategories } = formatCategoriesForDropdown(categoriesData);
 
   const handleChannelClick = (channel: ChannelData) => {
     if (onChannelClick) {
@@ -25,6 +35,28 @@ export function DiscoverSection({ channels, className = '', onChannelClick }: Di
     }
   };
 
+  // Filter channels based on selected category and subcategory
+  const filteredChannels = useMemo(() => {
+    let filtered = [...channels];
+    
+    if (selectedCategory !== 'all') {
+      // Convert API category format back to match channel data format
+      const targetCategory = categories.find(c => c.id === selectedCategory)?.label;
+      filtered = filtered.filter(channel => 
+        channel.category?.toLowerCase() === targetCategory?.toLowerCase()
+      );
+    }
+    
+    if (selectedSubcategory !== 'all') {
+      const targetSubcategory = subcategories[selectedCategory]?.find(s => s.id === selectedSubcategory)?.label;
+      filtered = filtered.filter(channel =>
+        channel.subcategory?.toLowerCase() === targetSubcategory?.toLowerCase()
+      );
+    }
+    
+    return filtered.slice(0, 12); // Show up to 12 channels
+  }, [channels, selectedCategory, selectedSubcategory, categories, subcategories]);
+
   if (!channels.length) {
     return null;
   }
@@ -33,73 +65,57 @@ export function DiscoverSection({ channels, className = '', onChannelClick }: Di
     <section className={`${className}`}>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-400 mb-2">Discover Channels</h2>
-          <p className="text-zinc-500 text-sm mt-1">Popular channels you might like</p>
+          <h2 className="text-2xl font-bold text-gray-400 mb-2">모든 채널</h2>
+          <p className="text-zinc-500 text-sm mt-1">카테고리별로 채널을 둘러보고 나에게 맞는 채널을 찾아보세요</p>
+        </div>
+        
+        {/* Category Filters */}
+        <div className="flex items-center space-x-3">
+          {/* Category Dropdown */}
+          <select
+            value={selectedCategory}
+            onChange={(e) => {
+              setSelectedCategory(e.target.value);
+              setSelectedSubcategory('all'); // Reset subcategory when category changes
+            }}
+            className="bg-zinc-800 text-white text-sm px-3 py-2 rounded-lg border border-zinc-700 hover:border-zinc-600 focus:outline-none focus:ring-2 focus:ring-[#eafd66]/20"
+            disabled={categoriesLoading}
+          >
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.label}
+              </option>
+            ))}
+          </select>
+
+          {/* Subcategory Dropdown */}
+          {subcategories[selectedCategory] && subcategories[selectedCategory].length > 1 && (
+            <select
+              value={selectedSubcategory}
+              onChange={(e) => setSelectedSubcategory(e.target.value)}
+              className="bg-zinc-800 text-white text-sm px-3 py-2 rounded-lg border border-zinc-700 hover:border-zinc-600 focus:outline-none focus:ring-2 focus:ring-[#eafd66]/20"
+            >
+              {subcategories[selectedCategory].map((subcategory) => (
+                <option key={subcategory.id} value={subcategory.id}>
+                  {subcategory.label}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {channels.slice(0, 8).map((channel: ChannelData) => (
-          <div
+      {/* Magazine Style Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredChannels.map((channel: ChannelData) => (
+          <ChannelCard
             key={channel.id}
-            onClick={() => handleChannelClick(channel)}
-            className="group bg-zinc-900/50 rounded-xl p-6 hover:bg-zinc-800/50 transition-all duration-200 cursor-pointer border border-zinc-800 hover:border-zinc-600 flex flex-col h-full"
-          >
-            {/* Channel Thumbnail */}
-            <div className="flex items-center mb-4">
-              {channel.thumbnail_url ? (
-                <ProxiedImage
-                  src={channel.thumbnail_url}
-                  alt={`${channel.name} thumbnail`}
-                  width={56}
-                  height={56}
-                  className="w-14 h-14 rounded-full object-cover flex-shrink-0 group-hover:scale-105 transition-transform duration-200"
-                />
-              ) : (
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center flex-shrink-0">
-                  <span className="text-white font-semibold text-xl">
-                    {channel.name.charAt(0).toUpperCase()}
-                  </span>
-                </div>
-              )}
-              <div className="ml-4 flex-1 min-w-0">
-                <h3 className="font-semibold text-white group-hover:text-blue-300 transition-colors duration-200 truncate">
-                  {channel.name}
-                </h3>
-              </div>
-            </div>
-
-            {/* Channel Metadata - separate row for consistency */}
-            <div className="flex items-center space-x-3 text-sm text-zinc-400 mb-4">
-              <span>{channel.subscriber_count || 0} followers</span>
-              <span>•</span>
-              <span>{channel.managers?.length || 0} editors</span>
-            </div>
-
-            {/* Channel Description - flexible height */}
-            <div className="flex-grow mb-4">
-              {channel.description && (
-                <p className="text-sm text-zinc-500 group-hover:text-zinc-400 transition-colors duration-200 line-clamp-2">
-                  {channel.description}
-                </p>
-              )}
-            </div>
-
-            {/* Channel Stats - always at bottom */}
-            <div className="flex items-center justify-between text-xs text-zinc-500 mt-auto">
-              <span className="flex items-center">
-                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-                {channel.content_count || 0} contents
-              </span>
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <svg className="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </div>
-          </div>
+            channel={channel}
+            variant="magazine"
+            size="medium"
+            onCardClick={handleChannelClick}
+            className="h-full"
+          />
         ))}
       </div>
 
