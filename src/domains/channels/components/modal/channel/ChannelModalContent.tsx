@@ -9,7 +9,7 @@ import { ContentStatus } from '@/api/generated';
 import { useChannelContentsSinglePage } from '@/domains/channels/hooks/useChannelContents';
 import { useChannelModalStore } from '@/store/channelModalStore';
 import { useContentUploadStore } from '@/store/contentUploadStore';
-import { ContentType } from '@/api/generated';
+import { ContentType } from '@/lib/types/ContentType';
 import {
   useChannelContentFiltering,
   useChannelFilters,

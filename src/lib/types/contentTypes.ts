@@ -2,11 +2,11 @@
  * Core content types and interfaces
  */
 import {
-  ContentType,
   ContentStatus,
   AIGenMetadataResponse,
   LinkPreviewMetadataResponse,
 } from '@/api/generated';
+import { ContentType } from './ContentType';
 
 /**
  * 콘텐츠 상태 타입 - 새로운 API enum과 일치

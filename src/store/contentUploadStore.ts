@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { ContentType } from '@/api/generated';
+import { ContentType } from '@/lib/types/ContentType';
 
 export interface ContentUploadFormData {
   type: ContentType;

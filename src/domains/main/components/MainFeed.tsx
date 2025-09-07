@@ -10,7 +10,7 @@ import type { ContentListResponse } from '@/api/generated/models/ContentListResp
 import { useContentModalStore } from '@/store/contentModalStore';
 import { convertToContentItem } from '@/lib/types/content';
 import type { ContentItem } from '@/lib/types/content';
-import { ContentType } from '@/api/generated/models/ContentType';
+import { ContentType } from '@/lib/types/ContentType';
 import { getThumbnailImageUrl } from '@/lib/utils/imageProxy';
 
 type SortOption = 'hot' | 'new' | 'top';

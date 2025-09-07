@@ -1,7 +1,7 @@
 /**
  * Complex content conversion utilities
  */
-import { ContentType } from '@/api/generated';
+import { ContentType } from '@/lib/types/ContentType';
 
 import { UnifiedContent, ContentItem } from './contentTypes';
 import { mapContentStatus } from './contentMappers';

@@ -1,7 +1,7 @@
 /**
  * Content type guard functions
  */
-import { ContentType } from '@/api/generated';
+import { ContentType } from '@/lib/types/ContentType';
 
 import { UnifiedContent } from './contentTypes';
 

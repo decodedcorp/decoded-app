@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { ContentType } from '@/api/generated';
+import { ContentType } from '@/lib/types/ContentType';
 import { useChannelContentsSinglePage } from './useChannelContents';
 import { ContentItem } from '@/lib/types/content';
 

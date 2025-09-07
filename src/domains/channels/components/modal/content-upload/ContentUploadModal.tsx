@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { ContentType } from '@/api/generated';
+import { ContentType } from '@/lib/types/ContentType';
 import { useContentUploadStore, selectIsContentUploadModalOpen } from '@/store/contentUploadStore';
 import { useCreateImageContent, useCreateLinkContent } from '@/domains/channels/hooks/useContents';
 import { useQueryClient } from '@tanstack/react-query';
