@@ -17,6 +17,7 @@ interface BaseChannel {
   followerCount?: number;
   contentCount?: number;
   category?: string;
+  subcategory?: string;
   managers?: import('@/api/generated/models/UserProfileResponse').UserProfileResponse[];
   manager_ids?: string[];
 }
@@ -38,7 +39,7 @@ export interface ChannelCardProps {
 
   // Size and display
   size?: 'small' | 'medium' | 'large';
-  variant?: 'default' | 'compact' | 'featured' | 'soft';
+  variant?: 'default' | 'compact' | 'featured' | 'soft' | 'magazine';
 
   // Features
   showLikeButton?: boolean;
@@ -175,7 +176,8 @@ export const ChannelCard = memo(
           isVerified: false, // API에서 제공하지 않음
           followerCount: channel.subscriber_count || 0,
           contentCount: channel.content_count || 0,
-          category: undefined, // API에서 제공하지 않음
+          category: channel.category,
+          subcategory: channel.subcategory,
           created_at: channel.created_at,
           updated_at: channel.updated_at,
           is_subscribed: channel.is_subscribed,
@@ -282,6 +284,8 @@ export const ChannelCard = memo(
 
     // 소프트 UI 스타일 계산
     const isSoftVariant = variant === 'soft';
+    const isMagazineVariant = variant === 'magazine';
+
     const softUIProps = isSoftVariant
       ? {
           backgroundColor: '#2f2f2f',
@@ -292,6 +296,120 @@ export const ChannelCard = memo(
           boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4), 0 8px 16px rgba(0, 0, 0, 0.3)',
         };
 
+    // Magazine variant - completely different layout
+    if (isMagazineVariant) {
+      return (
+        <article
+          className={`bg-zinc-900/50 border border-zinc-800/50 rounded-lg overflow-hidden cursor-pointer hover:shadow-xl hover:border-zinc-700 hover:bg-zinc-800/50 transition-all duration-300 ${className}`}
+          onClick={handleCardClick}
+          aria-label={`Channel ${channelData.name}`}
+        >
+          {/* Top metadata section */}
+          <div className="p-4">
+            <div className="flex items-center justify-between min-h-[20px]">
+              {/* Creation date - left side */}
+              <div className="text-zinc-400 text-xs">
+                {channelData.created_at && <span>{formatDate(channelData.created_at)}</span>}
+              </div>
+
+              {/* Subcategory only - right side */}
+              <div className="flex flex-wrap gap-1 justify-end">
+                {channelData.subcategory && (
+                  <span className="px-1.5 py-0.5 bg-zinc-700/60 text-zinc-300 text-xs font-medium rounded-full border border-zinc-600/40">
+                    {channelData.subcategory}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Channel Image */}
+          <div className="aspect-[4/3] bg-gradient-to-br from-zinc-800 to-zinc-900 overflow-hidden mx-3 mb-3 rounded">
+            {channelData.profileImageUrl ? (
+              <img
+                src={channelData.profileImageUrl}
+                alt={`${channelData.name} thumbnail`}
+                className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-500"
+                loading="lazy"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-700 to-zinc-800">
+                <span className="font-bold text-white/90 text-3xl">
+                  {channelData.name.charAt(0).toUpperCase()}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Content */}
+          <div className="px-3 pb-3">
+            {/* Channel Title */}
+            <h3 className="font-bold text-white text-base mb-1.5 line-clamp-1">
+              {channelData.name}
+            </h3>
+
+            {/* Channel Description */}
+            {channelData.description && (
+              <p className="text-zinc-400 text-sm line-clamp-2 mb-3 leading-relaxed">
+                {channelData.description}
+              </p>
+            )}
+
+            {/* Stats */}
+            <div className="flex items-center justify-between text-xs text-zinc-400 border-t border-zinc-700/50 pt-2.5 mt-3">
+              <div className="flex items-center space-x-3">
+                <span className="flex items-center">
+                  <svg className="w-3 h-3 mr-1 opacity-60" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z" />
+                  </svg>
+                  {formatCount(effectiveFollowerCount)}
+                </span>
+                <span className="flex items-center">
+                  <svg className="w-3 h-3 mr-1 opacity-60" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fillRule="evenodd"
+                      d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  {formatCount(channelData.contentCount)}
+                </span>
+                {channelData.managers && channelData.managers.length > 0 && (
+                  <span className="flex items-center">
+                    <svg
+                      className="w-3 h-3 mr-1 opacity-60"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {channelData.managers.length}
+                  </span>
+                )}
+              </div>
+
+              {/* Subscribe button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleFollowClick(e);
+                }}
+                disabled={effectiveIsLoading}
+                className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
+                  effectiveIsSubscribed
+                    ? 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                    : 'bg-[#eafd66] text-black hover:bg-[#eafd66]/90'
+                }`}
+              >
+                {effectiveIsLoading ? '...' : effectiveIsSubscribed ? 'Subscribed' : 'Subscribe'}
+              </button>
+            </div>
+          </div>
+        </article>
+      );
+    }
+
+    // Original card layout
     return (
       <div
         className={`relative rounded-3xl overflow-hidden cursor-pointer transition-all duration-300 flex flex-col ${cardSizeClass} ${className} ${
@@ -370,11 +488,20 @@ export const ChannelCard = memo(
             )}
 
             {/* 카테고리 태그 (있는 경우) */}
-            {channelData.category && (
-              <div className="absolute top-4 left-4">
-                <span className="px-4 py-2 bg-black/70 backdrop-blur-md text-white text-sm font-medium rounded-full border border-white/20">
-                  {channelData.category}
-                </span>
+            {(channelData.category || channelData.subcategory) && (
+              <div className="absolute top-3 left-3">
+                <div className="flex flex-col space-y-1">
+                  {channelData.category && (
+                    <span className="px-2 py-0.5 bg-zinc-600/30 text-zinc-300 text-xs rounded-full border border-zinc-500/30">
+                      {channelData.category}
+                    </span>
+                  )}
+                  {channelData.subcategory && (
+                    <span className="px-2 py-0.5 bg-zinc-600/30 text-zinc-300 text-xs rounded-full border border-zinc-500/30">
+                      {channelData.subcategory}
+                    </span>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -418,7 +545,7 @@ export const ChannelCard = memo(
                 {/* Editors */}
                 {channelData.managers && channelData.managers.length > 0 && (
                   <div className="flex items-center">
-                    <ChannelEditorsStackedAvatars 
+                    <ChannelEditorsStackedAvatars
                       editors={channelData.managers}
                       maxDisplay={3}
                       size="sm"
