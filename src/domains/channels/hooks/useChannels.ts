@@ -15,6 +15,7 @@ export const useChannels = (params?: {
   limit?: number;
   search?: string;
   ownerId?: string;
+  isManager?: boolean;
   sortBy?: string;
   sortOrder?: string;
 }) => {
@@ -29,6 +30,7 @@ export const useChannels = (params?: {
         params?.limit,
         params?.search,
         params?.ownerId,
+        params?.isManager,
         params?.sortBy,
         params?.sortOrder,
       );
@@ -217,6 +219,7 @@ export const useInfiniteChannels = (params?: {
   limit?: number;
   search?: string;
   ownerId?: string;
+  isManager?: boolean;
   sortBy?: string;
   sortOrder?: string;
 }) => {
@@ -231,6 +234,7 @@ export const useInfiniteChannels = (params?: {
         params?.limit || 20,
         params?.search,
         params?.ownerId,
+        params?.isManager,
         params?.sortBy,
         params?.sortOrder,
       );
