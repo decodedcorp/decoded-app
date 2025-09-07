@@ -15,10 +15,15 @@ export class ChannelsService {
     /**
      * List Channels
      * List channels with pagination and filtering
+     *
+     * - is_manager=true: Returns channels where current user is owner or manager (requires auth)
+     * - owner_id: Returns channels owned by specific user
+     * - search: Search channels by name
      * @param page
      * @param limit
      * @param search
      * @param ownerId
+     * @param isManager
      * @param sortBy
      * @param sortOrder
      * @returns ChannelListResponse Successful Response
@@ -29,6 +34,7 @@ export class ChannelsService {
         limit: number = 20,
         search?: string,
         ownerId?: string,
+        isManager?: (boolean | null),
         sortBy: string = 'created_at',
         sortOrder: string = 'desc',
     ): CancelablePromise<ChannelListResponse> {
@@ -40,6 +46,7 @@ export class ChannelsService {
                 'limit': limit,
                 'search': search,
                 'owner_id': ownerId,
+                'is_manager': isManager,
                 'sort_by': sortBy,
                 'sort_order': sortOrder,
             },

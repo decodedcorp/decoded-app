@@ -10,6 +10,7 @@ import type { ImageContentUpdate } from '../models/ImageContentUpdate';
 import type { LinkContentCreate } from '../models/LinkContentCreate';
 import type { LinkContentResponse } from '../models/LinkContentResponse';
 import type { LinkContentUpdate } from '../models/LinkContentUpdate';
+import type { SharePlatform } from '../models/SharePlatform';
 import type { VideoContentCreate } from '../models/VideoContentCreate';
 import type { VideoContentResponse } from '../models/VideoContentResponse';
 import type { VideoContentUpdate } from '../models/VideoContentUpdate';
@@ -359,6 +360,53 @@ export class ContentsService {
             query: {
                 'skip': skip,
                 'limit': limit,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Get Content
+     * Get content by ID (any type) and auto-increment views - public endpoint
+     * @param contentId
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static getContentContentsContentIdGet(
+        contentId: string,
+    ): CancelablePromise<Record<string, any>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/contents/{content_id}',
+            path: {
+                'content_id': contentId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Share Content
+     * Share content and increment shares count - public endpoint
+     * @param contentId
+     * @param platform
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static shareContentContentsContentIdSharePost(
+        contentId: string,
+        platform?: (SharePlatform | null),
+    ): CancelablePromise<Record<string, any>> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/contents/{content_id}/share',
+            path: {
+                'content_id': contentId,
+            },
+            query: {
+                'platform': platform,
             },
             errors: {
                 422: `Validation Error`,

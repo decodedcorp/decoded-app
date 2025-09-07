@@ -3,10 +3,12 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Content type enumeration for feeds
+ * Content type enum
  */
-export enum ContentType {
-    LINK = 'link',
-    IMAGE = 'image',
-    VIDEO = 'video',
-}
+export const ContentType = {
+    IMAGE: 'image',
+    VIDEO: 'video',
+    LINK: 'link',
+} as const;
+
+export type ContentType = typeof ContentType[keyof typeof ContentType];
