@@ -9,9 +9,6 @@ import { ChannelData } from '@/store/channelModalStore';
 import { useContentUploadStore } from '@/store/contentUploadStore';
 import { toast } from 'react-hot-toast';
 
-import { useChannelBanner } from '@/domains/channels/hooks/useChannelBanner';
-import { useUpdateChannelThumbnail } from '@/domains/channels/hooks/useChannels';
-import { EditableImage } from '@/domains/channels/components/modal/channel/EditableImage';
 import { useUser } from '@/domains/auth/hooks/useAuth';
 import { canManageChannelManagers } from '@/lib/utils/channelPermissions';
 import { useChannelSubscription } from '@/domains/interactions/hooks/useChannelSubscription';
@@ -35,7 +32,6 @@ export function ChannelPageHeader({
 }: ChannelPageHeaderProps) {
   const router = useRouter();
   const openContentUploadModal = useContentUploadStore((state) => state.openModal);
-  const [isBannerHovered, setIsBannerHovered] = useState(false);
   const [isEditorsModalOpen, setIsEditorsModalOpen] = useState(false);
 
   // 현재 사용자 정보
@@ -43,21 +39,6 @@ export function ChannelPageHeader({
 
   // 구독 기능
   const subscriptionHook = useChannelSubscription(channel.id);
-
-  // 배너 업데이트 hook
-  const { updateBanner, isUpdating } = useChannelBanner({
-    channelId: channel.id,
-    onSuccess: () => {
-      console.log('Banner update successful');
-      // 배너 업데이트 성공 시 처리
-    },
-    onError: (error) => {
-      console.error('Banner update failed:', error);
-    },
-  });
-
-  // 썸네일 업데이트 hook
-  const updateThumbnailMutation = useUpdateChannelThumbnail();
 
   const handleAddContent = () => {
     if (channel.id) {
@@ -81,75 +62,24 @@ export function ChannelPageHeader({
     router.push(`/channels/${channel.id}/settings`);
   };
 
-  const handleBannerChange = (base64: string) => {
-    console.log('handleBannerChange called with base64 length:', base64.length);
-    updateBanner(base64);
-  };
-
-  const handleThumbnailUpdate = async (base64: string) => {
-    if (!channel.id || !isOwner) return;
-
-    try {
-      await updateThumbnailMutation.mutateAsync({
-        channelId: channel.id,
-        data: { thumbnail_base64: base64 },
-      });
-    } catch (error) {
-      console.error('Failed to update thumbnail:', error);
-    }
-  };
-
   // 소유자 권한 확인
   const isOwner = user?.doc_id && channel.owner_id && user.doc_id === channel.owner_id;
-  const canEditBanner = isOwner; // 소유자만 배너 편집 가능
-  const canEditThumbnail = isOwner;
   const canManageSettings = canManageChannelManagers(user, channel);
 
-  // 디버깅용 로그 (개발 완료 후 제거 가능)
-  console.log('ChannelPageHeader Debug:', {
-    userId: user?.doc_id,
-    userEmail: user?.email,
-    channelOwnerId: channel.owner_id,
-    isOwner,
-    canManageSettings,
-    canEditBanner,
-    canEditThumbnail,
-    channel: channel,
-  });
   return (
     <div>
       {/* 상단 배너 섹션 */}
       <div className="h-48 bg-zinc-800 relative overflow-hidden">
-        {/* Banner Image - EditableImage 사용 */}
-        <EditableImage
-          src={channel.banner_url || channel.thumbnail_url}
+        {/* Banner Image - 읽기 전용 */}
+        <img
+          src={channel.banner_url || channel.thumbnail_url || ''}
           alt={`${channel.name} banner`}
-          width={1200}
-          height={192}
-          className="w-full h-full"
-          type="banner"
-          isOwner={!!canEditBanner}
-          onImageUpdate={handleBannerChange}
-          isUploading={isUpdating}
-          onHoverChange={setIsBannerHovered}
+          className="w-full h-full object-cover"
         />
 
-        {/* 디버깅용 배너 상태 표시 */}
-        <div className="absolute top-2 right-2 bg-black/70 text-white text-xs p-2 rounded">
-          canEdit: {canEditBanner ? 'true' : 'false'}, hover: {isBannerHovered ? 'true' : 'false'}
-        </div>
-
-        {/* 그라디언트 오버레이 - hover 상태일 때는 숨김 */}
-        {!isBannerHovered && (
-          <>
-            {/* 위쪽 그라디언트 (텍스트 가독성용) */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent pointer-events-none" />
-            {/* 아래쪽 그라디언트 (기존) */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-          </>
-        )}
-
-        {/* Banner Edit Button - EditableImage에서 처리하므로 제거 */}
+        {/* 그라디언트 오버레이 */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
       </div>
 
       {/* 하단 정보 섹션 */}
@@ -176,23 +106,17 @@ export function ChannelPageHeader({
               </button>
             )}
 
-            {/* 편집 가능한 큰 아바타 - 배너에서 튀어나오게 */}
+            {/* 큰 아바타 - 배너에서 튀어나오게 */}
             <div className="relative -mt-16">
-              <EditableImage
-                src={channel.thumbnail_url}
+              <img
+                src={channel.thumbnail_url || ''}
                 alt={`${channel.name} avatar`}
-                width={80}
-                height={80}
-                className="w-20 h-20 rounded-full border-4 border-black bg-black"
-                type="thumbnail"
-                isOwner={canEditThumbnail || false}
-                onImageUpdate={handleThumbnailUpdate}
-                isUploading={updateThumbnailMutation.isPending}
+                className="w-20 h-20 rounded-full border-4 border-black bg-black object-cover"
               />
             </div>
 
             {/* 채널 정보 */}
-            <div>
+            <div className="ml-4">
               <h2 className="text-xl font-semibold text-zinc-300">{channel.name}</h2>
               <div className="flex items-center space-x-3 text-sm text-zinc-400 mt-1">
                 <span>{channel.subscriber_count || 0} followers</span>
@@ -225,6 +149,21 @@ export function ChannelPageHeader({
                   <span>0 editors</span>
                 )}
               </div>
+              {/* Category/Subcategory Tags */}
+              {(channel.category || channel.subcategory) && (
+                <div className="flex items-center space-x-1.5 mt-2">
+                  {channel.category && (
+                    <span className="px-2 py-0.5 bg-zinc-600/30 text-zinc-300 text-xs rounded-full border border-zinc-500/30">
+                      {channel.category}
+                    </span>
+                  )}
+                  {channel.subcategory && (
+                    <span className="px-2 py-0.5 bg-zinc-600/30 text-zinc-300 text-xs rounded-full border border-zinc-500/30">
+                      {channel.subcategory}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 

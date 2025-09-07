@@ -2,9 +2,11 @@
 
 import React, { useState, useCallback, useMemo } from 'react';
 
-import { ExploreHeader, ExploreFilters } from '../explore/ExploreHeader';
+import { ExploreFilters } from '../../types/filters';
 import { ExploreGrid } from '../explore/ExploreGrid';
 import { DiscoverSection } from '../explore/DiscoverSection';
+import { TrendingContentsSection } from '../trending/TrendingContentsSection';
+import { TrendingChannelsSection } from '../trending/TrendingChannelsSection';
 import { ChannelModal, ContentModal } from '../modal';
 import { AddChannelModal } from '@/domains/create/components/modal/add-channel/AddChannelModal';
 import { LoadingState, ErrorState, EmptyState } from '../common/LoadingStates';
@@ -21,6 +23,7 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
   const [filters, setFilters] = useState<ExploreFilters>({
     search: '',
     category: 'all',
+    subcategory: 'all',
     sortBy: 'recent',
     sortOrder: 'desc',
   });
@@ -43,7 +46,6 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
   const channels = useMemo(() => {
     return channelsData?.channels || [];
   }, [channelsData]);
-
 
   // Filter change handler
   const handleFilterChange = useCallback((newFilters: ExploreFilters) => {
@@ -72,7 +74,7 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
   if (error) {
     return (
       <div className={`relative h-full overflow-y-auto ${className}`}>
-        <ErrorState 
+        <ErrorState
           title="큐레이터 정보를 불러올 수 없습니다"
           subtitle="잠시 후 다시 시도해 주세요"
         />
@@ -84,43 +86,35 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
   if (!channels.length) {
     return (
       <div className={`relative h-full overflow-y-auto ${className}`}>
-        <EmptyState 
-          title="등록된 큐레이터가 없습니다"
-          subtitle="새로운 채널을 추가해보세요"
-        />
+        <EmptyState title="등록된 큐레이터가 없습니다" subtitle="새로운 채널을 추가해보세요" />
       </div>
     );
   }
 
   // Check if we should show organized sections or filtered grid
-  const showOrganizedSections = !filters.search.trim() && filters.category === 'all';
+  const showOrganizedSections =
+    !filters.search.trim() && filters.category === 'all' && filters.subcategory === 'all';
 
   return (
-    <div className={`relative h-full overflow-y-auto bg-black ${className}`}>
-      {/* Top padding for Header - minimal */}
-      <div className="h-[8px] md:h-[12px]" />
-      
-      {/* Explore Header */}
-      <ExploreHeader 
-        onFilterChange={handleFilterChange}
-        totalChannels={channels.length}
-      />
-
+    <div className={`relative h-full overflow-hidden bg-black ${className}`}>
+      <div className="h-full overflow-y-auto overflow-x-hidden">
       <div className="px-4 md:px-8 pb-12">
         {showOrganizedSections ? (
           // Organized sections view (default explore experience)
           <>
-            {/* Discover Section - Channel listings */}
-            <DiscoverSection 
-              channels={channels}
-              onChannelClick={handleChannelClick}
-              className="mt-16"
-            />
+            {/* Trending Contents Section */}
+            <TrendingContentsSection className="mt-8 mb-16" />
+
+            {/* Trending Channels Section */}
+            <TrendingChannelsSection className="mb-16" />
+
+            {/* All Channels Section */}
+            <DiscoverSection channels={channels} onChannelClick={handleChannelClick} className="" />
           </>
         ) : (
           // Filtered grid view
           <div className="mt-8">
-            <ExploreGrid 
+            <ExploreGrid
               channels={channels}
               filters={filters}
               onChannelClick={handleChannelClick}
@@ -133,6 +127,7 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
       <ChannelModal />
       <ContentModal />
       <AddChannelModal />
+      </div>
     </div>
   );
 }

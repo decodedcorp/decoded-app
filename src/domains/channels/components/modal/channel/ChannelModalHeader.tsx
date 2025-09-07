@@ -4,10 +4,6 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { ChannelData } from '@/store/channelModalStore';
-import { useContentUploadStore } from '@/store/contentUploadStore';
-import { useUpdateChannelThumbnail } from '@/domains/channels/hooks/useChannels';
-import { useChannelBanner } from '@/domains/channels/hooks/useChannelBanner';
-import { EditableImage } from './EditableImage';
 import { toast } from 'react-hot-toast';
 import { ChannelEditorsStackedAvatars } from '@/shared/components/ChannelEditorsStackedAvatars';
 import { EditorsListModal } from '@/shared/components/EditorsListModal';
@@ -34,53 +30,13 @@ export function ChannelModalHeader({
   subscriptionHook,
 }: ChannelModalHeaderProps) {
   const router = useRouter();
-  const openContentUploadModal = useContentUploadStore((state) => state.openModal);
-  const [isBannerHovered, setIsBannerHovered] = useState(false);
   const [isEditorsModalOpen, setIsEditorsModalOpen] = useState(false);
 
   // 소유자 권한 확인
   const isOwner = currentUserId && channel.owner_id && currentUserId === channel.owner_id;
 
-  // 썸네일 업데이트 hook
-  const updateThumbnailMutation = useUpdateChannelThumbnail();
-
-  // 배너 업데이트 hook
-  const { updateBanner, isUpdating: isBannerUpdating } = useChannelBanner({
-    channelId: channel.id || '',
-    onSuccess: () => {
-      console.log('Banner updated successfully');
-    },
-    onError: (error) => {
-      console.error('Failed to update banner:', error);
-    },
-  });
-
   const handleFullscreen = () => {
     router.push(`/channels/${channel.id}`);
-  };
-
-  const handleAddContent = () => {
-    if (channel.id) {
-      openContentUploadModal(channel.id);
-    }
-  };
-
-  const handleThumbnailUpdate = async (base64: string) => {
-    if (!channel.id || !isOwner) return;
-
-    try {
-      await updateThumbnailMutation.mutateAsync({
-        channelId: channel.id,
-        data: { thumbnail_base64: base64 },
-      });
-    } catch (error) {
-      console.error('Failed to update thumbnail:', error);
-    }
-  };
-
-  const handleBannerUpdate = (base64: string) => {
-    if (!channel.id || !isOwner) return;
-    updateBanner(base64);
   };
 
   const handleSubscribe = () => {
@@ -99,23 +55,14 @@ export function ChannelModalHeader({
     <div>
       {/* 상단 배너 섹션 */}
       <div className="h-32 bg-zinc-800 relative overflow-hidden">
-        {/* 편집 가능한 배너 이미지 */}
-        <EditableImage
-          src={channel.banner_url || channel.thumbnail_url}
+        {/* 배너 이미지 - 읽기 전용 */}
+        <img
+          src={channel.banner_url || channel.thumbnail_url || ''}
           alt={`${channel.name} banner`}
-          width={1200}
-          height={128}
-          className="w-full h-full opacity-60"
-          type="banner"
-          isOwner={isOwner || false}
-          onImageUpdate={handleBannerUpdate}
-          isUploading={isBannerUpdating}
-          onHoverChange={setIsBannerHovered}
+          className="w-full h-full opacity-60 object-cover"
         />
-        {/* 그라디언트 오버레이 - EditableImage의 hover 상태일 때는 숨김 */}
-        {!isBannerHovered && (
-          <div className="absolute inset-0 bg-gradient-to-r from-zinc-800/60 to-zinc-700/60 pointer-events-none" />
-        )}
+        {/* 그라디언트 오버레이 */}
+        <div className="absolute inset-0 bg-gradient-to-r from-zinc-800/60 to-zinc-700/60 pointer-events-none" />
 
         {/* 상단 우측 버튼들 */}
         <div className="absolute top-4 right-4 flex items-center space-x-3">
@@ -161,23 +108,17 @@ export function ChannelModalHeader({
         <div className="flex items-center justify-between">
           {/* 왼쪽: 아바타 + 채널 정보 */}
           <div className="flex items-center">
-            {/* 편집 가능한 큰 아바타 - 배너에서 튀어나오게 */}
+            {/* 큰 아바타 - 배너에서 튀어나오게 */}
             <div className="relative -mt-10">
-              <EditableImage
-                src={channel.thumbnail_url}
+              <img
+                src={channel.thumbnail_url || ''}
                 alt={`${channel.name} avatar`}
-                width={80}
-                height={80}
-                className="w-20 h-20 rounded-full border-4 border-black bg-black"
-                type="thumbnail"
-                isOwner={isOwner || false}
-                onImageUpdate={handleThumbnailUpdate}
-                isUploading={updateThumbnailMutation.isPending}
+                className="w-20 h-20 rounded-full border-4 border-black bg-black object-cover"
               />
             </div>
 
             {/* 채널 정보 */}
-            <div>
+            <div className="ml-4">
               <h1 id="channel-modal-title" className="text-2xl font-bold text-white">
                 {channel.name}
               </h1>
@@ -213,20 +154,26 @@ export function ChannelModalHeader({
                   <span>0 editors</span>
                 )}
               </div>
+              {/* Category/Subcategory Tags */}
+              {(channel.category || channel.subcategory) && (
+                <div className="flex items-center space-x-1.5 mt-2">
+                  {channel.category && (
+                    <span className="px-2 py-0.5 bg-zinc-600/30 text-zinc-300 text-xs rounded-full border border-zinc-500/30">
+                      {channel.category}
+                    </span>
+                  )}
+                  {channel.subcategory && (
+                    <span className="px-2 py-0.5 bg-zinc-600/30 text-zinc-300 text-xs rounded-full border border-zinc-500/30">
+                      {channel.subcategory}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
           {/* 오른쪽: 액션 버튼들 */}
           <div className="flex items-center space-x-3">
-            {/* Add Content 버튼 - owner이거나 manager인 경우에만 표시 */}
-            {(isOwner || channel.is_manager) && (
-              <button
-                onClick={handleAddContent}
-                className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-full text-white font-medium transition-colors"
-              >
-                + Add Content
-              </button>
-            )}
             {/* Subscribe 버튼 - 소유자가 아닌 경우에만 표시 */}
             {!isOwner && (
               <button
