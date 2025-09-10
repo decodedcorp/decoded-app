@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 export const useCommonTranslation = () => {
   const { t } = useTranslation('common');
-  
+
   return {
     actions: {
       create: () => t('actions.create'),
@@ -39,13 +39,25 @@ export const useCommonTranslation = () => {
       fullscreen: () => t('ui.fullscreen'),
       openSidebar: () => t('ui.openSidebar'),
       closeSidebar: () => t('ui.closeSidebar'),
-    }
+    },
+    navigation: {
+      home: () => t('navigation.home'),
+      channels: () => t('navigation.channels'),
+      explore: () => t('navigation.explore'),
+      library: () => t('navigation.library'),
+      bookmarks: () => t('navigation.bookmarks'),
+      settings: () => t('navigation.settings'),
+      profile: () => t('navigation.profile'),
+      help: () => t('navigation.help'),
+      about: () => t('navigation.about'),
+      contact: () => t('navigation.contact'),
+    },
   };
 };
 
 export const useAuthTranslation = () => {
   const { t } = useTranslation('auth');
-  
+
   return {
     login: {
       title: () => t('login.title'),
@@ -70,13 +82,13 @@ export const useAuthTranslation = () => {
     },
     status: {
       checking: () => t('status.checking'),
-    }
+    },
   };
 };
 
 export const useChannelTranslation = () => {
   const { t } = useTranslation('channels');
-  
+
   return {
     actions: {
       create: () => t('actions.create'),
@@ -175,13 +187,21 @@ export const useChannelTranslation = () => {
       master: () => t('curatorLevels.master'),
       verified: () => t('curatorLevels.verified'),
       newbie: () => t('curatorLevels.newbie'),
-    }
+    },
+    sidebar: {
+      trendingChannels: () => t('sidebar.trendingChannels'),
+      subscribedChannels: () => t('sidebar.subscribedChannels'),
+      trendingEmpty: () => t('sidebar.trendingEmpty'),
+      subscribedEmpty: () => t('sidebar.subscribedEmpty'),
+      loadError: () => t('sidebar.loadError'),
+      viewMoreChannels: () => t('sidebar.viewMoreChannels'),
+    },
   };
 };
 
 export const useContentTranslation = () => {
   const { t } = useTranslation('content');
-  
+
   return {
     metadata: {
       noTitle: () => t('metadata.noTitle'),
@@ -203,13 +223,13 @@ export const useContentTranslation = () => {
       empty: () => t('related.empty'),
       channelEmpty: () => t('related.channelEmpty'),
       channelContentEmpty: () => t('related.channelContentEmpty'),
-    }
+    },
   };
 };
 
 export const useErrorTranslation = () => {
   const { t } = useTranslation('errors');
-  
+
   return {
     general: {
       unknown: () => t('general.unknown'),
@@ -228,13 +248,13 @@ export const useErrorTranslation = () => {
       loginFailed: () => t('specific.loginFailed'),
       uploadFailed: () => t('specific.uploadFailed'),
       loadFailed: () => t('specific.loadFailed'),
-    }
+    },
   };
 };
 
 export const useImageTranslation = () => {
   const { t } = useTranslation('images');
-  
+
   return {
     analysis: {
       categories: {
@@ -262,21 +282,22 @@ export const useImageTranslation = () => {
         userExperience: () => t('analysis.warnings.userExperience'),
       },
       logging: {
-        sizeAnalysisTitle: (context: string) => t('analysis.logging.sizeAnalysisTitle', { context }),
+        sizeAnalysisTitle: (context: string) =>
+          t('analysis.logging.sizeAnalysisTitle', { context }),
         sizeInfo: () => t('analysis.logging.sizeInfo'),
         base64Length: () => t('analysis.logging.base64Length'),
         estimatedSize: () => t('analysis.logging.estimatedSize'),
         category: () => t('analysis.logging.category'),
         warningsTitle: () => t('analysis.logging.warningsTitle'),
         recommendation: () => t('analysis.logging.recommendation'),
-      }
+      },
     },
     validation: {
       reasons: {
         over1MB: () => t('validation.reasons.over1MB'),
         over2MB: () => t('validation.reasons.over2MB'),
         over4MB: () => t('validation.reasons.over4MB'),
-      }
-    }
+      },
+    },
   };
 };

@@ -90,6 +90,14 @@
     "empty": "표시할 채널이 없습니다",
     "viewAll": "전체 보기"
   },
+  "sidebar": {
+    "trendingChannels": "트렌딩 채널",
+    "subscribedChannels": "구독한 채널",
+    "trendingEmpty": "트렌딩 채널이 없어요",
+    "subscribedEmpty": "구독한 채널이 없어요",
+    "loadError": "채널을 불러올 수 없어요",
+    "viewMoreChannels": "더 많은 채널 보기"
+  },
   "images": {
     "thumbnail": "썸네일 변경",
     "banner": "배너 변경",

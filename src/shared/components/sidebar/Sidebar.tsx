@@ -12,9 +12,12 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { SidebarItem } from './SidebarItem';
+import { SidebarToggleItem } from './SidebarToggleItem';
+import { SidebarChannelList } from './SidebarChannelList';
 import { useAuthStore } from '@/store/authStore';
 import { useAddChannelStore } from '@/domains/create/store/addChannelStore';
 import { useRouter, usePathname } from 'next/navigation';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -23,6 +26,7 @@ export function Sidebar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const openAddChannelModal = useAddChannelStore((state) => state.openModal);
   const isModalOpen = useAddChannelStore((state) => state.isOpen);
+  const t = useCommonTranslation();
 
   // Close mobile sidebar when route changes
   useEffect(() => {
@@ -73,19 +77,27 @@ export function Sidebar() {
         <div className="py-6 px-3">
           {/* Main Navigation */}
           <div className="space-y-2">
-            <SidebarItem href="/" icon={<HomeIcon />} label="Home" isActive={pathname === '/'} />
+            <SidebarItem
+              href="/"
+              icon={<HomeIcon />}
+              label={t.navigation.home()}
+              isActive={pathname === '/'}
+            />
             <SidebarItem
               href="/search"
               icon={<MagnifyingGlassIcon />}
-              label="Search"
+              label={t.actions.search()}
               isActive={pathname === '/search'}
             />
-            <SidebarItem
-              href="/channels"
+            {/* Channels with toggleable channel list */}
+            <SidebarToggleItem
               icon={<RectangleStackIcon />}
-              label="Channels"
-              isActive={pathname === '/channels'}
-            />
+              label={t.navigation.channels()}
+              isActive={pathname === '/channels' || pathname.startsWith('/channels/')}
+              href="/channels"
+            >
+              <SidebarChannelList />
+            </SidebarToggleItem>
 
             {/* Authenticated user features */}
             {isAuthenticated && (
@@ -93,19 +105,19 @@ export function Sidebar() {
                 <SidebarItem
                   href="/bookmarks"
                   icon={<BookmarkIcon />}
-                  label="Bookmarks"
+                  label={t.navigation.bookmarks()}
                   isActive={pathname === '/bookmarks'}
                 />
                 <SidebarItem
                   onClick={handleCreateClick}
                   icon={<PlusIcon />}
-                  label="Create"
+                  label={t.actions.create()}
                   isActive={isModalOpen}
                 />
                 <SidebarItem
                   href="/profile"
                   icon={<UserIcon />}
-                  label="Profile"
+                  label={t.navigation.profile()}
                   isActive={pathname === '/profile'}
                 />
               </>

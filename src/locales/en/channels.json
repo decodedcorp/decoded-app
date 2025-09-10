@@ -90,6 +90,14 @@
     "empty": "No channels to display",
     "viewAll": "View All"
   },
+  "sidebar": {
+    "trendingChannels": "Trending Channels",
+    "subscribedChannels": "Subscribed Channels",
+    "trendingEmpty": "No trending channels",
+    "subscribedEmpty": "No subscribed channels",
+    "loadError": "Cannot load channels",
+    "viewMoreChannels": "View more channels"
+  },
   "images": {
     "thumbnail": "Change thumbnail",
     "banner": "Change banner",
