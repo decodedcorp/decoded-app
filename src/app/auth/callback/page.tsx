@@ -27,11 +27,6 @@ function AuthCallbackContent() {
         console.error('Failed to send message to parent:', error);
         window.close();
       }
-    } else {
-      // 팝업이 아닌 경우에도 창을 닫을 수 있으면 닫기
-      if (window.close) {
-        window.close();
-      }
     }
   }, []);
 
@@ -112,10 +107,10 @@ function AuthCallbackContent() {
         return;
       }
 
-      // 팝업이 아닌 경우: 일반적인 로그인 처리 (fallback)
+      // 팝업이 아닌 경우: 일반적인 로그인 처리
       login(result);
-      // 로그인 성공 후 홈페이지로 리다이렉트
-      router.push('/');
+      // dashboard로 리다이렉트하지 않음
+      // router.push('/dashboard');
     } catch (error) {
       console.error('[Auth] OAuth callback error:', error);
       sendLogToParent('error', '[Auth] OAuth callback error:', error);

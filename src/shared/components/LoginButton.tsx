@@ -5,20 +5,14 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { LoginModal } from '@/domains/auth/components/LoginModal';
+import { UserAvatar } from '@/shared/components/UserAvatar';
 import { Button } from '@decoded/ui';
 
 export function LoginButton() {
   const router = useRouter();
 
-  // 개별 상태를 직접 구독하여 무한 루프 방지
+  // 🔄 RESET: Simplified state management - only use essential states
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const isLoading = useAuthStore((state) => state.isLoading);
-  const isInitialized = useAuthStore((state) => state.isInitialized);
-  const user = useAuthStore((state) => state.user);
-  const logout = useAuthStore((state) => state.logout);
-
-  // 사용자 표시 이름 계산
-  const userDisplayName = user?.nickname || user?.email || '';
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
@@ -29,32 +23,9 @@ export function LoginButton() {
     setMounted(true);
   }, []);
 
-  // 디버깅을 위한 로그
-  useEffect(() => {
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('[LoginButton] State update:', {
-        mounted,
-        isAuthenticated,
-        isLoading,
-        isInitialized,
-        user: user ? { doc_id: user.doc_id, email: user.email, nickname: user.nickname } : null,
-      });
-    }
-  }, [mounted, isAuthenticated, isLoading, isInitialized, user]);
-
   const handleClick = () => {
-    if (isAuthenticated) {
-      // 로그인된 경우 프로필 페이지로 이동
-      router.push('/profile');
-    } else {
-      // 로그인되지 않은 경우 로그인 모달 열기
-      setIsLoginModalOpen(true);
-    }
-  };
-
-  const handleLogout = () => {
-    logout();
-    router.push('/');
+    // 로그인되지 않은 경우 로그인 모달 열기
+    setIsLoginModalOpen(true);
   };
 
   const handleLoginSuccess = () => {
@@ -66,42 +37,16 @@ export function LoginButton() {
     setIsLoginModalOpen(false);
   };
 
-  // 서버 사이드 렌더링 시 기본 버튼만 표시 (hydration mismatch 방지)
+  // 🔄 RESET: Simple hydration handling only
   if (!mounted) {
-    return (
-      <Button disabled size="sm">
-        Loading...
-      </Button>
-    );
-  }
-
-  // 초기화되지 않았거나 로딩 중일 때는 로딩 상태 표시
-  if (!isInitialized || isLoading) {
-    return (
-      <Button disabled size="sm" loading={isLoading || !isInitialized}>
-        Loading...
-      </Button>
-    );
+    return <Button size="sm">Login</Button>;
   }
 
   return (
     <>
       <div className="flex items-center space-x-2">
         {isAuthenticated ? (
-          <>
-            {/* 사용자 정보 표시 */}
-            <span className="text-sm text-[#EAFD66] hidden md:block">{userDisplayName}</span>
-
-            {/* 프로필 버튼 */}
-            <Button onClick={handleClick} variant="login" size="sm">
-              My Page
-            </Button>
-
-            {/* 로그아웃 버튼 */}
-            <Button onClick={handleLogout} variant="destructive" size="sm">
-              Logout
-            </Button>
-          </>
+          <UserAvatar size="md" showDropdown={true} />
         ) : (
           <Button onClick={handleClick} variant="login" size="sm">
             Login

@@ -12,30 +12,16 @@ export const useAuthInit = () => {
     useAuthStore();
 
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[Auth] useAuthInit useEffect triggered:', {
-        isInitialized,
-        isLoggingOut,
-        windowDefined: typeof window !== 'undefined',
-        sessionStorageLoggingOut: sessionStorage.getItem('isLoggingOut'),
-      });
-    }
-
     // Client-side only
     if (typeof window === 'undefined') {
       if (process.env.NODE_ENV === 'development') {
         console.log('[Auth] Skipping initialization on server-side');
       }
-      setLoading(false);
-      setInitialized(true);
       return;
     }
 
     // 이미 초기화되었으면 다시 실행하지 않음
     if (isInitialized) {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[Auth] Already initialized, skipping');
-      }
       return;
     }
 
@@ -47,47 +33,14 @@ export const useAuthInit = () => {
       return;
     }
 
-    // sessionStorage 변경 모니터링 (디버깅용)
-    if (process.env.NODE_ENV === 'development') {
-      const handleStorageChange = (e: StorageEvent) => {
-        if (e.key === 'access_token' || e.key === 'user') {
-          console.log('[Auth] SessionStorage changed:', {
-            key: e.key,
-            oldValue: e.oldValue ? e.oldValue.substring(0, 20) + '...' : null,
-            newValue: e.newValue ? e.newValue.substring(0, 20) + '...' : null,
-            url: e.url,
-            storageArea: e.storageArea === sessionStorage ? 'sessionStorage' : 'localStorage',
-          });
-        }
-      };
-
-      window.addEventListener('storage', handleStorageChange);
-
-      // cleanup
-      return () => {
-        window.removeEventListener('storage', handleStorageChange);
-      };
-    }
-
-    // 타임아웃 설정 (5초 후 강제로 초기화 완료)
-    let timeoutId: NodeJS.Timeout | null = null;
-
     const initializeAuth = async () => {
       try {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('[Auth] initializeAuth started');
-        }
-
         setLoading(true);
 
-        // 타임아웃 설정 (3초)
-        timeoutId = setTimeout(() => {
-          if (process.env.NODE_ENV === 'development') {
-            console.warn('[Auth] Initialization timeout, forcing completion');
-          }
-          setLoading(false);
-          setInitialized(true);
-        }, 3000);
+        // Only run on client-side
+        if (typeof window === 'undefined') {
+          return;
+        }
 
         // Check stored tokens
         const accessToken = getAccessToken();
@@ -106,27 +59,17 @@ export const useAuthInit = () => {
           if (process.env.NODE_ENV === 'development') {
             console.log('[Auth] No tokens found, user not logged in');
           }
-          clearTimeout(timeoutId);
           setLoading(false);
           setInitialized(true);
           return;
         }
 
-        // Case 2: Has access token
-        if (accessToken) {
-          if (process.env.NODE_ENV === 'development') {
-            console.log('[Auth] Found access token, checking expiration...', {
-              tokenLength: accessToken.length,
-              tokenPreview: accessToken.substring(0, 20) + '...',
-              isExpired: isTokenExpired(accessToken),
-            });
-          }
-
+        // Case 2: Has access token but no refresh token (current backend behavior)
+        if (accessToken && !refreshToken) {
           if (isTokenExpired(accessToken)) {
             if (process.env.NODE_ENV === 'development') {
               console.log('[Auth] Access token expired, logging out');
             }
-            clearTimeout(timeoutId);
             logout();
             setInitialized(true);
             return;
@@ -146,75 +89,43 @@ export const useAuthInit = () => {
               const user = JSON.parse(userFromSession);
               setUser(user);
               if (process.env.NODE_ENV === 'development') {
-                console.log('[Auth] User restored from session storage:', {
-                  userId: user.doc_id,
-                  email: user.email,
-                  nickname: user.nickname,
-                });
+                console.log('[Auth] User restored from session storage');
               }
             } catch (error) {
               if (process.env.NODE_ENV === 'development') {
                 console.error('[Auth] Failed to parse user from session:', error);
               }
-              clearTimeout(timeoutId);
               logout();
-              setInitialized(true);
-              return;
             }
+          } else {
+            if (process.env.NODE_ENV === 'development') {
+              console.log('[Auth] No user in session storage, will fetch from API');
+            }
+            // User will be fetched by useAuthCore hook
           }
         }
 
-        // Case 3: No access token but has user data (inconsistent state - force logout)
-        if (!accessToken && sessionStorage.getItem('user')) {
+        // Case 3: Has both tokens (future implementation)
+        if (accessToken && refreshToken) {
           if (process.env.NODE_ENV === 'development') {
-            console.log(
-              '[Auth] Inconsistent state detected: user data exists but no access token. Forcing logout.',
-            );
+            console.log('[Auth] Both tokens found, using refresh token flow');
           }
-          clearTimeout(timeoutId);
-          logout();
-          setInitialized(true);
-          return;
-        }
-
-        // Case 4: Has refresh token (future implementation)
-        if (refreshToken) {
-          if (process.env.NODE_ENV === 'development') {
-            console.log('[Auth] Refresh token found, using refresh token flow');
-          }
+          // TODO: Implement refresh token flow when backend supports it
           updateApiTokenFromStorage();
         }
 
-        // 타임아웃 취소하고 초기화 완료
-        clearTimeout(timeoutId);
         setLoading(false);
         setInitialized(true);
-
-        if (process.env.NODE_ENV !== 'production') {
-          console.log('[Auth] Initialization completed successfully', {
-            isInitialized: true,
-            isLoading: false,
-            hasAccessToken: !!accessToken,
-            hasRefreshToken: !!refreshToken,
-            hasUser: !!sessionStorage.getItem('user'),
-          });
-        }
       } catch (error) {
         if (process.env.NODE_ENV === 'development') {
           console.error('[Auth] Error during auth initialization:', error);
         }
         setError(error instanceof Error ? error.message : 'Authentication initialization failed');
-        if (timeoutId) {
-          clearTimeout(timeoutId);
-        }
         setLoading(false);
         setInitialized(true);
       }
     };
 
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('[Auth] About to call initializeAuth');
-    }
     initializeAuth();
-  }, [setLoading, setError, logout, setUser, isInitialized, setInitialized, isLoggingOut]);
+  }, [setLoading, setError, logout, setUser, isInitialized, setInitialized]);
 };

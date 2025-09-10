@@ -57,7 +57,7 @@ export const setAccessToken = (token: string): void => {
         key: STORAGE_KEYS.ACCESS_TOKEN,
         tokenLength: token.length,
         tokenStart: token.substring(0, 20) + '...',
-        storageAvailable: !!storage,
+        storageAvailable: !!storage
       });
     }
   } else {
@@ -80,9 +80,7 @@ export const getAccessToken = (): string | null => {
       found: !!token,
       tokenLength: token?.length || 0,
       storageAvailable: !!sessionStorage,
-      allKeys: sessionStorage
-        ? Object.keys(sessionStorage).filter((k) => k.includes('token') || k.includes('user'))
-        : [],
+      allKeys: sessionStorage ? Object.keys(sessionStorage).filter(k => k.includes('token') || k.includes('user')) : []
     });
   }
 
@@ -221,68 +219,33 @@ export const storeLoginResponse = (response: {
     console.log('[Auth] storeLoginResponse called with:', {
       hasAccessToken: !!response.access_token?.access_token,
       accessTokenLength: response.access_token?.access_token?.length || 0,
-      accessTokenPreview: response.access_token?.access_token?.substring(0, 20) + '...' || 'none',
       hasRefreshToken: !!response.refresh_token,
-      refreshTokenLength: response.refresh_token?.length || 0,
       hasUser: !!response.user,
-      userDocId: response.user?.doc_id,
-      userEmail: response.user?.email,
-      userNickname: response.user?.nickname,
+      userDocId: response.user?.doc_id
     });
   }
 
-  try {
-    setAccessToken(response.access_token.access_token);
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[Auth] Access token set successfully');
-    }
-  } catch (error) {
-    console.error('[Auth] Failed to set access token:', error);
-    throw error;
-  }
+  setAccessToken(response.access_token.access_token);
 
   // refresh_token이 있는 경우에만 저장
   if (response.refresh_token && response.refresh_token.trim() !== '') {
-    try {
-      setRefreshToken(response.refresh_token);
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[Auth] Refresh token set successfully');
-      }
-    } catch (error) {
-      console.error('[Auth] Failed to set refresh token:', error);
-    }
+    setRefreshToken(response.refresh_token);
   } else {
     console.warn('[Auth] No refresh token provided in login response');
   }
 
-  try {
-    setUserData({
-      doc_id: response.user.doc_id,
-      email: response.user.email,
-      nickname: response.user.nickname,
-    });
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[Auth] User data set successfully');
-    }
-  } catch (error) {
-    console.error('[Auth] Failed to set user data:', error);
-  }
+  setUserData({
+    doc_id: response.user.doc_id,
+    email: response.user.email,
+    nickname: response.user.nickname,
+  });
 
   if (process.env.NODE_ENV === 'development') {
     console.log('[Auth] storeLoginResponse completed, checking storage...');
     // 즉시 확인
     setTimeout(() => {
       const storedToken = getAccessToken();
-      const storedRefreshToken = getRefreshToken();
-      const storedUserData = getUserData();
-      console.log('[Auth] Token verification after storage:', {
-        hasAccessToken: !!storedToken,
-        hasRefreshToken: !!storedRefreshToken,
-        hasUserData: !!storedUserData,
-        accessTokenLength: storedToken?.length || 0,
-        refreshTokenLength: storedRefreshToken?.length || 0,
-        userDocId: storedUserData?.doc_id || 'none',
-      });
+      console.log('[Auth] Token verification after storage:', !!storedToken);
     }, 100);
   }
 };
@@ -302,7 +265,7 @@ export const clearTokens = (): void => {
     sessionStorage.removeItem(STORAGE_KEYS.USER_NICKNAME);
     sessionStorage.removeItem('user');
     sessionStorage.removeItem('isLoggingOut');
-
+    
     if (process.env.NODE_ENV === 'development') {
       console.log('[Auth] SessionStorage 완전 정리 완료');
     }
@@ -312,10 +275,10 @@ export const clearTokens = (): void => {
     // localStorage에서 refresh token 및 기타 인증 데이터 제거
     localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
     localStorage.removeItem(STORAGE_KEYS.LAST_TOKEN_CHECK);
-
+    
     // 혹시 남아있을 수 있는 legacy access token도 제거
     localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
-
+    
     if (process.env.NODE_ENV === 'development') {
       console.log('[Auth] LocalStorage 인증 데이터 정리 완료');
     }
@@ -335,13 +298,13 @@ export const clearSession = (): void => {
       STORAGE_KEYS.USER_EMAIL,
       STORAGE_KEYS.USER_NICKNAME,
       'user',
-      'isLoggingOut',
+      'isLoggingOut'
     ];
-
-    authKeys.forEach((key) => {
+    
+    authKeys.forEach(key => {
       sessionStorage.removeItem(key);
     });
-
+    
     if (process.env.NODE_ENV === 'development') {
       console.log('[Auth] 인증 관련 세션 데이터만 선택적 정리 완료');
     }
@@ -361,42 +324,20 @@ export const isAuthenticated = (): boolean => {
  */
 export const getValidAccessToken = (): string | null => {
   const token = getAccessToken();
-
-  if (process.env.NODE_ENV === 'development') {
-    console.log('[Auth] getValidAccessToken called:', {
-      hasToken: !!token,
-      tokenLength: token?.length || 0,
-      tokenPreview: token ? token.substring(0, 20) + '...' : 'none',
-      sessionStorageAvailable: !!getSessionStorage(),
-      allSessionKeys: getSessionStorage()
-        ? Object.keys(getSessionStorage()!).filter((k) => k.includes('token') || k.includes('user'))
-        : [],
-    });
-  }
-
   if (!token) {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[Auth] No access token found in sessionStorage');
-    }
     return null;
   }
 
   if (isTokenExpired(token)) {
-    console.warn('[Auth] Access token is expired, removing from sessionStorage');
+    console.warn('[Auth] Access token is expired');
     // 만료된 토큰 제거 (sessionStorage에서)
     const sessionStorage = getSessionStorage();
     if (sessionStorage) {
       sessionStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[Auth] Access token removed from sessionStorage');
-      }
     }
     return null;
   }
 
-  if (process.env.NODE_ENV === 'development') {
-    console.log('[Auth] Access token is valid');
-  }
   return token;
 };
 
@@ -405,54 +346,12 @@ export const getValidAccessToken = (): string | null => {
  */
 export const isTokenExpired = (token: string): boolean => {
   try {
-    // JWT 형식인지 먼저 확인 (3개의 점으로 구분된 구조)
-    const isJwtFormat = /^[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+$/.test(token);
-
-    if (!isJwtFormat) {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[Auth] Token is not JWT format, treating as non-expiring:', {
-          tokenLength: token.length,
-          tokenPreview: token.substring(0, 20) + '...',
-          isJwtFormat: false,
-          isTempToken: token.startsWith('temp_token_'),
-          isFallbackToken: token.includes('fallback'),
-        });
-      }
-      // JWT가 아닌 경우 (예: temp_token, fallback token) 만료되지 않은 것으로 간주
-      return false;
-    }
-
     const decoded = jwtDecode<DecodedToken>(token);
     const currentTime = Math.floor(Date.now() / 1000);
-    const isExpired = decoded.exp < currentTime;
-
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[Auth] Token expiration check:', {
-        tokenLength: token.length,
-        tokenPreview: token.substring(0, 20) + '...',
-        isJwtFormat: true,
-        decodedExp: decoded.exp,
-        currentTime: currentTime,
-        timeUntilExpiry: decoded.exp - currentTime,
-        isExpired: isExpired,
-        expiresAt: new Date(decoded.exp * 1000).toISOString(),
-        currentTimeISO: new Date().toISOString(),
-      });
-    }
-
-    return isExpired;
+    return decoded.exp < currentTime;
   } catch (error) {
     console.error('[Auth] Failed to decode token:', error);
-    console.error('[Auth] Token that failed to decode:', {
-      tokenLength: token.length,
-      tokenPreview: token.substring(0, 50) + '...',
-      error: error instanceof Error ? error.message : error,
-    });
-
-    // JWT 디코딩 실패 시에도 JWT 형식이면 만료된 것으로 간주
-    // JWT 형식이 아니면 만료되지 않은 것으로 간주 (fallback token 등)
-    const isJwtFormat = /^[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+$/.test(token);
-    return isJwtFormat;
+    return true; // 디코딩 실패 시 만료된 것으로 간주
   }
 };
 
@@ -532,12 +431,12 @@ export const forceLogout = (): void => {
       'isLoggingOut',
       // Legacy 대문자 키들도 정리
       'ACCESS_TOKEN',
-      'USER_DOC_ID',
+      'USER_DOC_ID', 
       'USER_EMAIL',
-      'USER_NICKNAME',
+      'USER_NICKNAME'
     ];
-
-    keysToRemove.forEach((key) => {
+    
+    keysToRemove.forEach(key => {
       sessionStorage.removeItem(key);
     });
   }

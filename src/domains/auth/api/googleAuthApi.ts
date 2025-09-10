@@ -1,7 +1,6 @@
 import { hash } from '@/lib/utils/hash';
 
 import { UsersService } from '../../../api/generated/services/UsersService';
-import type { LoginRequest } from '../../../api/generated/models/LoginRequest';
 
 export interface GoogleTokenData {
   access_token: string;
@@ -24,13 +23,12 @@ export interface GoogleTokenPayload {
   exp: number;
 }
 
-// Use the generated LoginRequest type instead
-// export interface BackendLoginRequest {
-//   jwt_token: string;
-//   sui_address?: string; // 스모크 테스트를 위해 선택적으로 변경
-//   email: string;
-//   marketing: boolean;
-// }
+export interface BackendLoginRequest {
+  jwt_token: string;
+  sui_address?: string; // 스모크 테스트를 위해 선택적으로 변경
+  email: string;
+  marketing: boolean;
+}
 
 export interface BackendLoginResponse {
   access_token: {
@@ -150,7 +148,7 @@ export class GoogleAuthApi {
   /**
    * 백엔드 로그인 API 호출 (프록시 사용)
    */
-  static async callBackendLogin(requestBody: LoginRequest): Promise<BackendLoginResponse> {
+  static async callBackendLogin(requestBody: BackendLoginRequest): Promise<BackendLoginResponse> {
     // 1. API_BASE_URL 가드 + 절대 URL 사용
     const API_BASE_URL = process.env.API_BASE_URL;
     if (!API_BASE_URL) {
@@ -172,29 +170,10 @@ export class GoogleAuthApi {
     });
 
     // 3. 백엔드 API 호출
-    console.log('[GoogleAuthApi] Making backend API call:', {
-      url: loginUrl,
-      method: 'POST',
-      headers: backendRequestHeaders,
-      requestBody: {
-        jwt_token: requestBody.jwt_token?.substring(0, 50) + '...',
-        email: requestBody.email,
-        sui_address: requestBody.sui_address,
-        marketing: requestBody.marketing,
-      },
-    });
-
     const backendResponse = await fetch(loginUrl, {
       method: 'POST',
       headers: backendRequestHeaders,
       body: JSON.stringify(requestBody),
-    });
-
-    console.log('[GoogleAuthApi] Backend API response:', {
-      status: backendResponse.status,
-      statusText: backendResponse.statusText,
-      ok: backendResponse.ok,
-      headers: Object.fromEntries(backendResponse.headers.entries()),
     });
 
     // 4. 응답 에러 핸들링 명확화
@@ -256,61 +235,13 @@ export class GoogleAuthApi {
   }
 
   /**
-   * 백엔드 로그인 API 호출 - Optimized retry logic with circuit breaker pattern
-   * ⚡ Performance: Smart retry with reduced attempts and faster validation
+   * 백엔드 로그인 API 호출 (sui_address 업데이트는 클라이언트에서 처리)
    */
   static async callBackendLoginWithSuiAddressUpdate(
-    requestBody: LoginRequest,
+    requestBody: BackendLoginRequest,
   ): Promise<BackendLoginResponse> {
-    let lastError: Error;
-    
-    // ⚡ Performance: Quick validation without promises for better performance
-    if (!requestBody.jwt_token || !requestBody.email) {
-      throw new Error('JWT token and email are required');
-    }
-    
-    // ⚡ Performance: Reduced retry attempts (2 instead of 3) for faster UX
-    const maxAttempts = 2;
-    
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-      try {
-        if (process.env.NODE_ENV === 'development') {
-          console.log(`[GoogleAuthApi] Login attempt ${attempt}/${maxAttempts}`);
-        }
-        
-        return await this.callBackendLogin(requestBody);
-      } catch (error) {
-        lastError = error as Error;
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        
-        // ⚡ Performance: More specific error matching for faster decisions
-        const isRetryableError = errorMessage.includes('Failed to retrieve user after creation attempt') ||
-                               errorMessage.includes('timeout') ||
-                               errorMessage.includes('ECONNRESET') ||
-                               errorMessage.includes('503') ||
-                               errorMessage.includes('502');
-        
-        if (isRetryableError && attempt < maxAttempts) {
-          // ⚡ Performance: Reduced delay with smart backoff
-          const delayMs = Math.min(300 + (attempt * 200), 800); // Cap at 800ms
-          
-          if (process.env.NODE_ENV === 'development') {
-            console.log(`[GoogleAuthApi] Retryable error, waiting ${delayMs}ms:`, errorMessage.substring(0, 100));
-          }
-          
-          await new Promise(resolve => setTimeout(resolve, delayMs));
-          continue;
-        }
-        
-        // ⚡ Performance: Fast fail for non-retryable errors
-        if (process.env.NODE_ENV === 'development') {
-          console.error(`[GoogleAuthApi] Non-retryable error:`, errorMessage.substring(0, 150));
-        }
-        throw error;
-      }
-    }
-    
-    throw lastError!;
+    // 백엔드 로그인 API 호출만 수행
+    // sui_address 업데이트는 클라이언트에서 React Query를 통해 처리
+    return await this.callBackendLogin(requestBody);
   }
-
 }

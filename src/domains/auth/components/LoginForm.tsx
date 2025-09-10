@@ -5,7 +5,6 @@ import React, { useEffect, useRef } from 'react';
 import { useAuthMutations } from '../hooks/useAuthMutations';
 import { AuthError, NetworkError } from '../types/auth';
 import { useAuthStore } from '../../../store/authStore';
-import { useAuthTranslation } from '../../../lib/i18n/hooks';
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -15,7 +14,6 @@ interface LoginFormProps {
 export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
   const { googleOAuthMutation } = useAuthMutations();
   const { isAuthenticated, login } = useAuthStore();
-  const { login: loginText } = useAuthTranslation();
   const popupRef = useRef<Window | null>(null);
   const messageHandledRef = useRef(false);
 
@@ -56,7 +54,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
 
         console.log('[LoginForm] Received OAuth error message:', event.data);
 
-        onError?.(event.data.error || loginText.failed());
+        onError?.(event.data.error || 'Google 로그인에 실패했습니다.');
       } else if (event.data.type === 'GOOGLE_OAUTH_LOG') {
         // 팝업에서 전달받은 로그를 메인 창 콘솔에 출력
         const { level, message, data, timestamp } = event.data;
@@ -113,7 +111,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
           : 'http://localhost:3000/auth/callback');
 
       if (!clientId) {
-        throw new Error(loginText.clientIdMissing());
+        throw new Error('Google Client ID가 설정되지 않았습니다.');
       }
 
       // 디버그 모드를 위한 파라미터 추가
@@ -128,28 +126,34 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
         `access_type=offline&` +
         `prompt=consent${debugParam}`;
 
-      // 모든 환경에서 팝업 창에서 OAuth 처리
-      const popup = window.open(
-        googleAuthUrl,
-        'googleOAuth',
-        'width=500,height=600,scrollbars=yes,resizable=yes,menubar=no,toolbar=no,location=no,status=no',
-      );
+      // 개발 환경에서는 메인 창에서 OAuth 처리, 프로덕션에서는 팝업 사용
+      if (process.env.NODE_ENV === 'development') {
+        // 개발 환경: 메인 창에서 OAuth 처리 (디버깅 용이)
+        window.location.href = googleAuthUrl;
+      } else {
+        // 프로덕션 환경: 팝업 창에서 OAuth 처리
+        const popup = window.open(
+          googleAuthUrl,
+          'googleOAuth',
+          'width=500,height=600,scrollbars=yes,resizable=yes,menubar=no,toolbar=no,location=no,status=no',
+        );
 
-      if (!popup) {
-        throw new Error(loginText.popupBlocked());
+        if (!popup) {
+          throw new Error('팝업이 차단되었습니다. 팝업 차단을 해제해주세요.');
+        }
+
+        popupRef.current = popup;
+
+        // 팝업 창 포커스
+        popup.focus();
       }
-
-      popupRef.current = popup;
-
-      // 팝업 창 포커스
-      popup.focus();
     } catch (error) {
-      let errorMessage = loginText.failed();
+      let errorMessage = 'Google 로그인에 실패했습니다.';
 
       if (error instanceof AuthError) {
-        errorMessage = loginText.authError(error.message);
+        errorMessage = `인증 오류: ${error.message}`;
       } else if (error instanceof NetworkError) {
-        errorMessage = loginText.networkError();
+        errorMessage = '네트워크 연결을 확인해주세요.';
       } else if (error instanceof Error) {
         errorMessage = error.message;
       }
@@ -171,7 +175,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
         {isFormLoading ? (
           <div className="flex items-center">
             <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-3"></div>
-            <span className="text-white">{loginText.button()}</span>
+            <span className="text-white">Signing in...</span>
           </div>
         ) : (
           <>
@@ -193,7 +197,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
               />
             </svg>
-            <span className="text-white font-medium">{loginText.button()}</span>
+            <span className="text-white font-medium">Continue with Google</span>
           </>
         )}
       </button>
