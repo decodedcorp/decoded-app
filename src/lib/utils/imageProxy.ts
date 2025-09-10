@@ -22,7 +22,7 @@ interface ImageProxyOptions {
  */
 export function getProxiedImageUrl(imageUrl: string, options: ImageProxyOptions = {}): string {
   if (!imageUrl) return '/placeholder.jpg';
-  
+
   // 이미 프록시 URL인 경우 그대로 반환
   if (imageUrl.startsWith('/api/proxy') || imageUrl.startsWith('/api/image-proxy')) {
     return imageUrl;
@@ -46,6 +46,11 @@ export function getProxiedImageUrl(imageUrl: string, options: ImageProxyOptions 
     }
   }
 
+  // R2 스토리지 도메인인 경우 직접 사용 (이미 최적화된 이미지)
+  if (imageUrl.includes('pub-65bb4012fb354951a2c6139a4b49b717.r2.dev')) {
+    return imageUrl;
+  }
+
   // 신뢰할 수 있는 도메인들 (API 응답에서 자주 나오는 도메인들)
   const trustedDomains = [
     'images.unsplash.com',
@@ -65,13 +70,17 @@ export function getProxiedImageUrl(imageUrl: string, options: ImageProxyOptions 
     'thumbnews.nateimg.co.kr',
     'cdn.kstarfashion.com',
     'biz.chosun.com',
+    'pub-65bb4012fb354951a2c6139a4b49b717.r2.dev', // R2 스토리지 도메인
   ];
 
   try {
     const url = new URL(imageUrl);
-    
+
     // HTTPS이고 신뢰할 수 있는 도메인인 경우 직접 사용 (작은 이미지는 프록시 사용)
-    if (url.protocol === 'https:' && trustedDomains.some(domain => url.hostname.includes(domain))) {
+    if (
+      url.protocol === 'https:' &&
+      trustedDomains.some((domain) => url.hostname.includes(domain))
+    ) {
       // 큰 이미지나 최적화가 필요한 경우에만 프록시 사용
       if (options.size && options.size !== 'original') {
         return buildProxyUrl(imageUrl, options);
@@ -92,23 +101,23 @@ export function getProxiedImageUrl(imageUrl: string, options: ImageProxyOptions 
 function buildProxyUrl(imageUrl: string, options: ImageProxyOptions): string {
   const params = new URLSearchParams();
   params.set('url', imageUrl);
-  
+
   if (options.size && options.size !== 'original') {
     params.set('size', options.size);
   }
-  
+
   if (options.quality && options.quality !== 'medium') {
     params.set('quality', options.quality);
   }
-  
+
   if (options.format && options.format !== 'original') {
     params.set('format', options.format);
   }
-  
+
   if (options.blur) {
     params.set('blur', 'true');
   }
-  
+
   return `/api/proxy/image?${params.toString()}`;
 }
 
@@ -152,7 +161,7 @@ export function getBlurPlaceholderUrl(imageUrl: string): string {
  * @returns 프록시 URL 배열
  */
 export function getProxiedImageUrls(imageUrls: string[]): string[] {
-  return imageUrls.map(url => getProxiedImageUrl(url));
+  return imageUrls.map((url) => getProxiedImageUrl(url));
 }
 
 /**
@@ -189,7 +198,7 @@ export function getQualityForNetwork(effectiveType?: string): ImageQuality {
  */
 export function isExternalImageUrl(imageUrl: string): boolean {
   if (!imageUrl) return false;
-  
+
   try {
     const url = new URL(imageUrl);
     // 현재 도메인과 다른 경우 외부 URL로 간주

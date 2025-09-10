@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface SidebarItemProps {
   href?: string;
@@ -22,6 +23,22 @@ export function SidebarItem({
   isActive = false,
   className = '',
 }: SidebarItemProps) {
+  const router = useRouter();
+
+  const handleClick = (e: React.MouseEvent) => {
+    console.log('SidebarItem clicked:', { href, onClick, label });
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (onClick) {
+      console.log('Calling onClick handler');
+      onClick();
+    } else if (href) {
+      console.log('Navigating to:', href);
+      router.push(href);
+    }
+  };
+
   const content = (
     <>
       {icon && <span className="w-7 h-7 flex-shrink-0">{icon}</span>}
@@ -34,24 +51,13 @@ export function SidebarItem({
 
   const baseClasses = `
     flex items-center gap-4 px-3 py-3 rounded-xl
-    text-base font-normal transition-all duration-200
-    ${isActive 
-      ? 'bg-zinc-900 text-white' 
-      : 'text-zinc-300 hover:bg-zinc-900/50 hover:text-white'
-    }
+    text-base font-normal transition-all duration-200 cursor-pointer w-full text-left
+    ${isActive ? 'bg-zinc-900 text-white' : 'text-zinc-300 hover:bg-zinc-900/50 hover:text-white'}
     ${className}
   `;
 
-  if (href) {
-    return (
-      <Link href={href} className={baseClasses}>
-        {content}
-      </Link>
-    );
-  }
-
   return (
-    <button onClick={onClick} className={`${baseClasses} w-full text-left`}>
+    <button onClick={handleClick} className={baseClasses}>
       {content}
     </button>
   );

@@ -1,0 +1,145 @@
+{
+  "actions": {
+    "create": "만들기",
+    "update": "수정하기",
+    "edit": "편집하기",
+    "delete": "삭제하기",
+    "save": "저장하기",
+    "cancel": "취소하기",
+    "confirm": "확인",
+    "back": "뒤로가기",
+    "next": "다음",
+    "previous": "이전",
+    "close": "닫기",
+    "open": "열기",
+    "search": "검색",
+    "filter": "필터",
+    "refresh": "새로고침",
+    "reload": "다시 불러오기",
+    "copy": "복사",
+    "share": "공유",
+    "download": "다운로드",
+    "upload": "업로드"
+  },
+  "status": {
+    "loading": "불러오는 중이에요...",
+    "saving": "저장하고 있어요...",
+    "uploading": "업로드하고 있어요...",
+    "processing": "처리하고 있어요...",
+    "success": "완료되었어요!",
+    "error": "문제가 발생했어요",
+    "ready": "준비되었어요",
+    "pending": "대기 중이에요",
+    "completed": "완료됨",
+    "failed": "실패함"
+  },
+  "navigation": {
+    "home": "홈",
+    "channels": "채널",
+    "explore": "탐색",
+    "library": "라이브러리",
+    "bookmarks": "북마크",
+    "settings": "설정",
+    "profile": "프로필",
+    "help": "도움말",
+    "about": "정보",
+    "contact": "문의"
+  },
+  "time": {
+    "justNow": "방금 전",
+    "minutesAgo": "{{minutes}}분 전",
+    "hoursAgo": "{{hours}}시간 전",
+    "yesterday": "어제",
+    "daysAgo": "{{days}}일 전",
+    "weeksAgo": "{{weeks}}주 전",
+    "monthsAgo": "{{months}}개월 전",
+    "yearsAgo": "{{years}}년 전"
+  },
+  "ui": {
+    "expand": "펼치기",
+    "collapse": "접기",
+    "fullscreen": "전체화면으로 보기",
+    "exitFullscreen": "전체화면 나가기",
+    "showMore": "더 보기",
+    "showLess": "접기",
+    "toggleSidebar": "사이드바 토글",
+    "openSidebar": "사이드바 펼치기",
+    "closeSidebar": "사이드바 접기"
+  },
+  "header": {
+    "openMenu": "메뉴 열기",
+    "openSearch": "검색 열기",
+    "closeSearch": "검색 닫기"
+  },
+  "search": {
+    "placeholder": "관심 있는 채널·콘텐츠를 찾아보세요",
+    "clearSearch": "검색어 지우기",
+    "searchButton": "검색",
+    "searchingChannels": "채널 검색 중...",
+    "lookingForChannels": "{{query}}와(과) 일치하는 채널을 찾고 있어요",
+    "searchError": "검색 오류",
+    "failedToSearch": "채널 검색에 실패했어요. 다시 시도해 주세요.",
+    "channels": "채널",
+    "found": "{{count}}개 발견됨",
+    "updatingResults": "결과 업데이트 중...",
+    "searching": "검색 중...",
+    "searchErrorOccurred": "검색 오류가 발생했어요. 다시 시도해 주세요.",
+    "noResultsFound": "\"{{query}}\" 에 대한 검색 결과가 없어요",
+    "content": "콘텐츠",
+    "loadingMore": "더 불러오는 중..."
+  },
+  "create": {
+    "create": "만들기",
+    "createNewContent": "새 콘텐츠 만들기"
+  },
+  "notifications": {
+    "notifications": "알림",
+    "marking": "처리 중...",
+    "markAllAsRead": "모두 읽음으로 표시",
+    "loadingNotifications": "알림 불러오는 중...",
+    "noNotifications": "알림이 없어요",
+    "viewAllNotifications": "모든 알림 보기"
+  },
+  "user": {
+    "userMenu": "사용자 메뉴",
+    "user": "사용자",
+    "myPage": "내 페이지",
+    "settings": "설정",
+    "logout": "로그아웃"
+  },
+  "feed": {
+    "section": {
+      "header": "지금 뜨는 콘텐츠",
+      "sub": "채널 전반에서 반응이 높은 업데이트"
+    },
+    "meta": {
+      "line": "{{range}} · {{sort}} · {{count}}개"
+    },
+    "sort": {
+      "hot": "인기",
+      "new": "최신",
+      "top": "상위",
+      "hotTooltip": "최근 반응(좋아요·저장·댓글)이 많은 순",
+      "newTooltip": "업로드가 최신 순",
+      "topTooltip": "누적 반응이 높은 순"
+    },
+    "filter": {
+      "by": "필터:",
+      "today": "오늘",
+      "thisWeek": "이번 주",
+      "allTime": "전체 기간"
+    },
+    "loadingContent": "최신 콘텐츠를 불러오는 중",
+    "noPostsFound": "아직 게시물이 없어요",
+    "tryDifferentFilter": "다른 필터를 시도하거나 채널 탐색으로 새 콘텐츠를 찾아보세요",
+    "exploreChannelsCta": "채널 탐색",
+    "failedToLoadPosts": "불러오기에 실패했어요",
+    "tryAgain": "다시 시도",
+    "showingPosts": "{{count}}개 게시물 표시 중",
+    "of": "총 {{total}}개 중",
+    "badge": {
+      "justIn": "방금",
+      "trending": "급상승"
+    }
+  }
+}

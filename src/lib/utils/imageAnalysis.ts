@@ -1,6 +1,7 @@
 /**
  * Image analysis and logging utilities
  */
+import i18n from '../i18n/config';
 
 /**
  * Get image dimensions from file
@@ -44,38 +45,38 @@ export const analyzeBase64Size = (base64String: string, context: string = 'image
 
   // 크기 카테고리 분류
   if (base64Length <= 135000) {
-    analysis.sizeCategory = 'Small (≤100KB)';
+    analysis.sizeCategory = i18n.t('images:analysis.categories.smallOptimal');
     analysis.isOptimal = true;
-    analysis.recommendation = '✅ 최적 크기입니다.';
+    analysis.recommendation = i18n.t('images:analysis.recommendations.optimal');
   } else if (base64Length <= 675000) {
-    analysis.sizeCategory = 'Medium (≤500KB)';
+    analysis.sizeCategory = i18n.t('images:analysis.categories.mediumOptimal');
     analysis.isOptimal = true;
-    analysis.recommendation = '✅ 권장 크기입니다.';
+    analysis.recommendation = i18n.t('images:analysis.recommendations.recommended');
   } else if (base64Length <= 1350000) {
-    analysis.sizeCategory = 'Large (≤1MB)';
+    analysis.sizeCategory = i18n.t('images:analysis.categories.largeWarning');
     analysis.isOptimal = false;
-    analysis.recommendation = '⚠️ 모바일에서 로딩이 느릴 수 있습니다.';
-    analysis.warnings.push('모바일 성능 고려 필요');
+    analysis.recommendation = i18n.t('images:analysis.recommendations.slowMobile');
+    analysis.warnings.push(i18n.t('images:analysis.warnings.mobilePerformance'));
   } else if (base64Length <= 2700000) {
-    analysis.sizeCategory = 'Very Large (≤2MB)';
+    analysis.sizeCategory = i18n.t('images:analysis.categories.veryLargeWarning');
     analysis.isOptimal = false;
-    analysis.recommendation = '⚠️ 서버 제한에 근접합니다.';
-    analysis.warnings.push('서버 제한 위험');
-    analysis.warnings.push('네트워크 성능 저하');
+    analysis.recommendation = i18n.t('images:analysis.recommendations.serverLimit');
+    analysis.warnings.push(i18n.t('images:analysis.warnings.serverLimitRisk'));
+    analysis.warnings.push(i18n.t('images:analysis.warnings.networkPerformance'));
   } else {
-    analysis.sizeCategory = 'Too Large (>2MB)';
+    analysis.sizeCategory = i18n.t('images:analysis.categories.tooLarge');
     analysis.isOptimal = false;
-    analysis.recommendation = '❌ 압축이 필요합니다.';
-    analysis.warnings.push('서버 제한 초과 위험');
-    analysis.warnings.push('네트워크 타임아웃 가능성');
-    analysis.warnings.push('사용자 경험 저하');
+    analysis.recommendation = i18n.t('images:analysis.recommendations.compressionNeeded');
+    analysis.warnings.push(i18n.t('images:analysis.warnings.serverOverLimit'));
+    analysis.warnings.push(i18n.t('images:analysis.warnings.networkTimeout'));
+    analysis.warnings.push(i18n.t('images:analysis.warnings.userExperience'));
   }
 
   // 컨텍스트별 추가 권장사항
   if (context === 'thumbnail' && base64Length > 675000) {
-    analysis.recommendation += ' 썸네일은 500KB 이하 권장.';
+    analysis.recommendation += ' ' + i18n.t('images:analysis.recommendations.thumbnailLimit');
   } else if (context === 'profile' && base64Length > 1350000) {
-    analysis.recommendation += ' 프로필 이미지는 1MB 이하 권장.';
+    analysis.recommendation += ' ' + i18n.t('images:analysis.recommendations.profileLimit');
   }
 
   return analysis;
@@ -100,21 +101,21 @@ export const logBase64Analysis = (
 
   const analysis = analyzeBase64Size(base64String, context);
 
-  console.group(`📊 Base64 크기 분석 (${context})`);
+  console.group(`${i18n.t('images:analysis.logging.sizeAnalysisTitle')} (${context})`);
 
   if (showDetails) {
-    console.log(`📏 크기 정보:`);
-    console.log(`  - Base64 길이: ${analysis.base64Length.toLocaleString()} chars`);
-    console.log(`  - 예상 파일 크기: ${analysis.estimatedKB} KB (${analysis.estimatedMB} MB)`);
-    console.log(`  - 카테고리: ${analysis.sizeCategory}`);
+    console.log(`${i18n.t('images:analysis.logging.sizeInfo')}:`);
+    console.log(`  - ${i18n.t('images:analysis.logging.base64Length')}: ${analysis.base64Length.toLocaleString()} chars`);
+    console.log(`  - ${i18n.t('images:analysis.logging.estimatedSize')}: ${analysis.estimatedKB} KB (${analysis.estimatedMB} MB)`);
+    console.log(`  - ${i18n.t('images:analysis.logging.category')}: ${analysis.sizeCategory}`);
   }
 
   if (showWarnings && analysis.warnings.length > 0) {
-    console.warn('⚠️ 경고사항:', analysis.warnings);
+    console.warn(`${i18n.t('images:analysis.logging.warningsTitle')}:`, analysis.warnings);
   }
 
   if (showRecommendations) {
-    console.log(`💡 권장사항: ${analysis.recommendation}`);
+    console.log(`${i18n.t('images:analysis.logging.recommendation')}: ${analysis.recommendation}`);
   }
 
   console.groupEnd();

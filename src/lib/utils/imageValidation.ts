@@ -2,6 +2,7 @@
  * Image validation and compression recommendation utilities
  */
 import React from 'react';
+import i18n from '../i18n/config';
 
 import { analyzeBase64Size } from './imageAnalysis';
 
@@ -27,7 +28,7 @@ export const getCompressionRecommendations = (base64String: string) => {
     recommendations.suggestedQuality = 0.7;
     recommendations.suggestedMaxWidth = 800;
     recommendations.suggestedMaxHeight = 600;
-    recommendations.reasons.push('1MB 초과로 압축 필요');
+    recommendations.reasons.push(i18n.t('images:validation.reasons.over1MB'));
   }
 
   if (analysis.base64Length > 2700000) {
@@ -35,7 +36,7 @@ export const getCompressionRecommendations = (base64String: string) => {
     recommendations.suggestedQuality = 0.6;
     recommendations.suggestedMaxWidth = 600;
     recommendations.suggestedMaxHeight = 400;
-    recommendations.reasons.push('2MB 초과로 강력한 압축 필요');
+    recommendations.reasons.push(i18n.t('images:validation.reasons.over2MB'));
   }
 
   if (analysis.base64Length > 4000000) {
@@ -43,7 +44,7 @@ export const getCompressionRecommendations = (base64String: string) => {
     recommendations.suggestedQuality = 0.5;
     recommendations.suggestedMaxWidth = 400;
     recommendations.suggestedMaxHeight = 300;
-    recommendations.reasons.push('4MB 초과로 극한 압축 필요');
+    recommendations.reasons.push(i18n.t('images:validation.reasons.over4MB'));
   }
 
   return recommendations;

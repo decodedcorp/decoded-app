@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
+import { useLocale } from '@/lib/hooks/useLocale';
 import {
   useNotifications,
   useMarkAllNotificationsRead,
@@ -18,6 +19,7 @@ interface NotificationButtonProps {
 export function NotificationButton({ unreadCount }: NotificationButtonProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { t } = useLocale();
 
   // API 데이터 가져오기
   const {
@@ -94,7 +96,7 @@ export function NotificationButton({ unreadCount }: NotificationButtonProps) {
       <button
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
         className="relative p-2 rounded-lg hover:bg-zinc-800 transition-colors"
-        aria-label="Notifications"
+        aria-label={t('notifications.notifications')}
       >
         <svg
           className="w-5 h-5 text-zinc-300"
@@ -125,13 +127,17 @@ export function NotificationButton({ unreadCount }: NotificationButtonProps) {
         <div className="absolute right-0 mt-2 w-80 bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl overflow-hidden z-50">
           {/* Header */}
           <div className="px-4 py-3 border-b border-zinc-800 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-zinc-200">Notifications</h3>
+            <h3 className="text-sm font-semibold text-zinc-200">
+              {t('notifications.notifications')}
+            </h3>
             <button
               onClick={handleMarkAllRead}
               disabled={markAllReadMutation.isPending}
               className="text-xs text-[#EAFD66] hover:text-[#d9ec55] transition-colors disabled:opacity-50"
             >
-              {markAllReadMutation.isPending ? 'Marking...' : 'Mark all as read'}
+              {markAllReadMutation.isPending
+                ? t('notifications.marking')
+                : t('notifications.markAllAsRead')}
             </button>
           </div>
 
@@ -139,7 +145,7 @@ export function NotificationButton({ unreadCount }: NotificationButtonProps) {
           <div className="max-h-96 overflow-y-auto">
             {notificationsLoading || invitationsLoading ? (
               <div className="px-4 py-8 text-center text-sm text-zinc-500">
-                <div className="animate-pulse">Loading notifications...</div>
+                <div className="animate-pulse">{t('notifications.loadingNotifications')}</div>
               </div>
             ) : (
               <>
@@ -231,7 +237,7 @@ export function NotificationButton({ unreadCount }: NotificationButtonProps) {
                   ))
                 ) : receivedInvitations.length === 0 && sentInvitations.length === 0 ? (
                   <div className="px-4 py-8 text-center text-sm text-zinc-500">
-                    No notifications
+                    {t('notifications.noNotifications')}
                   </div>
                 ) : null}
               </>
@@ -241,7 +247,7 @@ export function NotificationButton({ unreadCount }: NotificationButtonProps) {
           {/* Footer */}
           <div className="px-4 py-2 border-t border-zinc-800">
             <button className="w-full text-center text-sm text-[#EAFD66] hover:text-[#d9ec55] transition-colors">
-              View all notifications
+              {t('notifications.viewAllNotifications')}
             </button>
           </div>
         </div>

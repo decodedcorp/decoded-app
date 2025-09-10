@@ -3,6 +3,7 @@
 import React from 'react';
 
 import { useAuth, useUser, useIsAdmin, useIsUser } from '../hooks/useAuth';
+import { useAuthTranslation } from '../../../lib/i18n/hooks';
 
 /**
  * 인증 상태를 표시하는 데모 컴포넌트
@@ -12,13 +13,14 @@ export const AuthStatus: React.FC = () => {
   const { role, name, email } = useUser();
   const isAdmin = useIsAdmin();
   const isUser = useIsUser();
+  const { status, fields, permissions, logout: logoutText } = useAuthTranslation();
 
   if (isLoading) {
     return (
       <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
         <div className="flex items-center space-x-2">
           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-          <span className="text-blue-800 dark:text-blue-200">인증 상태 확인 중...</span>
+          <span className="text-blue-800 dark:text-blue-200">{status.checking()}</span>
         </div>
       </div>
     );
@@ -41,7 +43,7 @@ export const AuthStatus: React.FC = () => {
               d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <span className="text-red-800 dark:text-red-200">에러: {error}</span>
+          <span className="text-red-800 dark:text-red-200">{status.error(error)}</span>
         </div>
       </div>
     );
@@ -65,7 +67,7 @@ export const AuthStatus: React.FC = () => {
                 d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
               />
             </svg>
-            <span className="text-yellow-800 dark:text-yellow-200">로그인이 필요합니다</span>
+            <span className="text-yellow-800 dark:text-yellow-200">{status.loginRequired()}</span>
           </div>
         </div>
       </div>
@@ -90,25 +92,25 @@ export const AuthStatus: React.FC = () => {
                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <span className="text-green-800 dark:text-green-200 font-medium">로그인됨</span>
+            <span className="text-green-800 dark:text-green-200 font-medium">{status.signedIn()}</span>
           </div>
           <button
             onClick={() => logout()}
             className="text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
           >
-            로그아웃
+            {logoutText.button()}
           </button>
         </div>
 
         <div className="text-sm text-green-700 dark:text-green-300 space-y-1">
           <div>
-            <strong>이름:</strong> {name || 'N/A'}
+            <strong>{fields.name()}:</strong> {name || 'N/A'}
           </div>
           <div>
-            <strong>이메일:</strong> {email}
+            <strong>{fields.email()}:</strong> {email}
           </div>
           <div>
-            <strong>역할:</strong> {role}
+            <strong>{fields.role()}:</strong> {role}
           </div>
           <div className="flex space-x-2">
             <span
@@ -118,7 +120,7 @@ export const AuthStatus: React.FC = () => {
                   : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
               }`}
             >
-              {isAdmin ? '관리자' : '일반 사용자'}
+              {isAdmin ? permissions.adminRole() : permissions.regularUser()}
             </span>
             <span
               className={`px-2 py-1 rounded text-xs ${
@@ -127,7 +129,7 @@ export const AuthStatus: React.FC = () => {
                   : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
               }`}
             >
-              사용자 권한
+              {permissions.userPermission()}
             </span>
           </div>
         </div>

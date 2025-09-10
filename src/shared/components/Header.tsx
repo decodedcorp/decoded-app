@@ -1,8 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, memo, useMemo, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
+// import { useTranslations } from 'next-intl';
+import { useLocale } from '@/lib/hooks/useLocale';
 
 import { useScrollDirection } from '@/lib/hooks/useScrollDirection';
 import { useChannel } from '@/domains/channels/hooks/useChannels';
@@ -14,9 +16,10 @@ import { CreateButton } from './CreateButton';
 import { ChannelSearchBar } from './ChannelSearchBar';
 import { GlobalSearchBar } from './GlobalSearchBar';
 
-export function Header() {
+export const Header = memo(function Header() {
   const pathname = usePathname();
   const router = useRouter();
+  const { t } = useLocale();
   const { scrollDirection, isScrolled, isAtTop } = useScrollDirection({
     threshold: 15,
     debounceMs: 10,
@@ -26,39 +29,52 @@ export function Header() {
   const [isFocused, setIsFocused] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
-  // Get auth state
+  // Get auth state - 개별적으로 구독하여 무한 루프 방지
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isLoading = useAuthStore((state) => state.isLoading);
   const isInitialized = useAuthStore((state) => state.isInitialized);
 
-  // 채널 페이지인지 확인
-  const isChannelPage = pathname?.startsWith('/channels/') && pathname !== '/channels';
+  // 채널 페이지인지 확인 - useMemo로 최적화
+  const isChannelPage = useMemo(
+    () => pathname?.startsWith('/channels/') && pathname !== '/channels',
+    [pathname],
+  );
 
-  // 채널 ID 추출
-  const channelId = isChannelPage ? pathname?.split('/channels/')[1] : null;
+  // 채널 ID 추출 - useMemo로 최적화
+  const channelId = useMemo(
+    () => (isChannelPage ? pathname?.split('/channels/')[1] : null),
+    [isChannelPage, pathname],
+  );
 
-  // 채널 데이터 가져오기
-  const { data: channelData } = useChannel(channelId || '');
+  // 채널 데이터 가져오기 - 조건부로만 실행
+  const channelQuery = useChannel(channelId || '');
+  const channelData = channelQuery.data;
 
-  // 채널명 결정
-  const channelName = channelData?.name || channelId;
+  // 채널명 결정 - useMemo로 최적화
+  const channelName = useMemo(() => channelData?.name || channelId, [channelData?.name, channelId]);
 
-  // 검색 핸들러
-  const handleChannelSearch = (query: string) => {
-    console.log('Channel search:', query);
-    // 채널 내 검색 시 검색 페이지로 이동 (채널 컨텍스트 유지)
-    if (query.trim() && channelId) {
-      router.push(`/search?q=${encodeURIComponent(query.trim())}&channel=${channelId}`);
-    }
-  };
+  // 검색 핸들러 - useCallback으로 최적화
+  const handleChannelSearch = useCallback(
+    (query: string) => {
+      console.log('Channel search:', query);
+      // 채널 내 검색 시 검색 페이지로 이동 (채널 컨텍스트 유지)
+      if (query.trim() && channelId) {
+        router.push(`/search?q=${encodeURIComponent(query.trim())}&channel=${channelId}`);
+      }
+    },
+    [router, channelId],
+  );
 
-  const handleGlobalSearch = (query: string) => {
-    console.log('Global search:', query);
-    // 전역 검색 시 검색 페이지로 이동
-    if (query.trim()) {
-      router.push(`/search?q=${encodeURIComponent(query.trim())}`);
-    }
-  };
+  const handleGlobalSearch = useCallback(
+    (query: string) => {
+      console.log('Global search:', query);
+      // 전역 검색 시 검색 페이지로 이동
+      if (query.trim()) {
+        router.push(`/search?q=${encodeURIComponent(query.trim())}`);
+      }
+    },
+    [router],
+  );
 
   const handleClearChannel = () => {
     console.log('Clear channel filter');
@@ -117,7 +133,7 @@ export function Header() {
             window.dispatchEvent(event);
           }}
           className="lg:hidden p-2 rounded-lg bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 transition-colors"
-          aria-label="Open menu"
+          aria-label={t('header.openMenu')}
         >
           <svg
             className="w-5 h-5 text-zinc-300"
@@ -162,7 +178,7 @@ export function Header() {
           <button
             onClick={() => setIsMobileSearchOpen(true)}
             className="md:hidden p-2 text-white hover:text-[#eafd66] transition-colors"
-            aria-label="Open search"
+            aria-label={t('header.openSearch')}
           >
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
               <path
@@ -196,7 +212,7 @@ export function Header() {
             <button
               onClick={() => setIsMobileSearchOpen(false)}
               className="p-2 text-zinc-400 hover:text-white transition-colors"
-              aria-label="Close search"
+              aria-label={t('header.closeSearch')}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -232,4 +248,4 @@ export function Header() {
       )}
     </header>
   );
-}
+});

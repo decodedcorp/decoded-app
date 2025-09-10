@@ -1,0 +1,145 @@
+{
+  "actions": {
+    "create": "Create",
+    "update": "Update",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "open": "Open",
+    "search": "Search",
+    "filter": "Filter",
+    "refresh": "Refresh",
+    "reload": "Reload",
+    "copy": "Copy",
+    "share": "Share",
+    "download": "Download",
+    "upload": "Upload"
+  },
+  "status": {
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "uploading": "Uploading...",
+    "processing": "Processing...",
+    "success": "Success!",
+    "error": "An error occurred",
+    "ready": "Ready",
+    "pending": "Pending",
+    "completed": "Completed",
+    "failed": "Failed"
+  },
+  "navigation": {
+    "home": "Home",
+    "channels": "Channels",
+    "explore": "Explore",
+    "library": "Library",
+    "bookmarks": "Bookmarks",
+    "settings": "Settings",
+    "profile": "Profile",
+    "help": "Help",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "time": {
+    "justNow": "Just now",
+    "minutesAgo": "{{minutes}} minutes ago",
+    "hoursAgo": "{{hours}} hours ago",
+    "yesterday": "Yesterday",
+    "daysAgo": "{{days}} days ago",
+    "weeksAgo": "{{weeks}} weeks ago",
+    "monthsAgo": "{{months}} months ago",
+    "yearsAgo": "{{years}} years ago"
+  },
+  "ui": {
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "fullscreen": "View fullscreen",
+    "exitFullscreen": "Exit fullscreen",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "toggleSidebar": "Toggle sidebar",
+    "openSidebar": "Open sidebar",
+    "closeSidebar": "Close sidebar"
+  },
+  "header": {
+    "openMenu": "Open menu",
+    "openSearch": "Open search",
+    "closeSearch": "Close search"
+  },
+  "search": {
+    "placeholder": "Find channels and content you care about",
+    "clearSearch": "Clear search",
+    "searchButton": "Search",
+    "searchingChannels": "Searching channels...",
+    "lookingForChannels": "Looking for channels matching \"{{query}}\"",
+    "searchError": "Search error",
+    "failedToSearch": "Failed to search channels. Please try again.",
+    "channels": "Channels",
+    "found": "{{count}} found",
+    "updatingResults": "Updating results...",
+    "searching": "Searching...",
+    "searchErrorOccurred": "Search error occurred. Please try again.",
+    "noResultsFound": "No results found for \"{{query}}\"",
+    "content": "Content",
+    "loadingMore": "Loading more..."
+  },
+  "create": {
+    "create": "Create",
+    "createNewContent": "Create new content"
+  },
+  "notifications": {
+    "notifications": "Notifications",
+    "marking": "Marking...",
+    "markAllAsRead": "Mark all as read",
+    "loadingNotifications": "Loading notifications...",
+    "noNotifications": "No notifications",
+    "viewAllNotifications": "View all notifications"
+  },
+  "user": {
+    "userMenu": "User menu",
+    "user": "User",
+    "myPage": "My Page",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "feed": {
+    "section": {
+      "header": "Trending now",
+      "sub": "What's popular across channels"
+    },
+    "meta": {
+      "line": "{{range}} · {{sort}} · {{count}}"
+    },
+    "sort": {
+      "hot": "Hot",
+      "new": "New",
+      "top": "Top",
+      "hotTooltip": "Sort by recent engagement (likes, saves, comments)",
+      "newTooltip": "Most recent uploads first",
+      "topTooltip": "Highest total engagement"
+    },
+    "filter": {
+      "by": "Filter by:",
+      "today": "Today",
+      "thisWeek": "This Week",
+      "allTime": "All Time"
+    },
+    "loadingContent": "Fetching the latest",
+    "noPostsFound": "Nothing here yet",
+    "tryDifferentFilter": "Try a different filter or explore channels for new content",
+    "exploreChannelsCta": "Explore channels",
+    "failedToLoadPosts": "We couldn't load this",
+    "tryAgain": "Try Again",
+    "showingPosts": "Showing {{count}} posts",
+    "of": "of {{total}}",
+    "badge": {
+      "justIn": "Just in",
+      "trending": "Trending"
+    }
+  }
+}

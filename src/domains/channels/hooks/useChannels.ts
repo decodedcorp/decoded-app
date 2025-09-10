@@ -44,7 +44,7 @@ export const useChannels = (params?: {
   });
 };
 
-export const useChannel = (channelId: string) => {
+export const useChannel = (channelId: string, options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: queryKeys.channels.detail(channelId),
     queryFn: async () => {
@@ -70,7 +70,13 @@ export const useChannel = (channelId: string) => {
         throw error;
       }
     },
-    enabled: !!channelId,
+    enabled: !!channelId && options?.enabled !== false,
+    staleTime: 5 * 60 * 1000, // 5분 - 채널 정보는 자주 변경되지 않음
+    gcTime: 30 * 60 * 1000, // 30분 - 더 오래 캐시
+    refetchOnWindowFocus: false, // 윈도우 포커스 시 재요청 비활성화
+    refetchOnMount: false, // 마운트 시 재요청 비활성화
+    retry: 1, // 재시도 횟수 제한
+    retryDelay: 1000, // 재시도 간격 1초
   });
 };
 
