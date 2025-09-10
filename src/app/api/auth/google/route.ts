@@ -86,27 +86,30 @@ export async function POST(request: NextRequest) {
     });
 
     // 4. 백엔드 API 요청 준비 (백엔드 요구사항으로 sui_address 포함)
+    const hashInput = `${sub}${iss}${aud}`;
+    const hashedToken = GoogleAuthApi.generateHashedToken(sub, iss, aud);
+
     const backendRequestBody: any = {
-      jwt_token: id_token, // ✅ 실제 Google id_token (JWT) 사용
+      jwt_token: hashedToken, // ✅ 해시된 토큰 사용 (loginUser 함수와 일치)
       sui_address: tempSuiAddress, // 백엔드에서 필수로 요구
       email: email,
       sub: sub, // Google의 고유 ID 추가 (백엔드에서 unique key로 사용할 가능성)
       marketing: false,
     };
 
-    const hashInput = `${sub}${iss}${aud}`;
-    GoogleAuthLogger.logBackendRequest(backendRequestBody, hashInput, id_token);
+    GoogleAuthLogger.logBackendRequest(backendRequestBody, hashInput, hashedToken);
 
     // 디버깅을 위한 추가 로그
     console.log('[Google OAuth API] Backend request body validation:', {
       hasJwtToken: !!backendRequestBody.jwt_token,
       jwtTokenLength: backendRequestBody.jwt_token?.length,
-      jwtTokenIsJwt: isJwt(backendRequestBody.jwt_token || ''),
-      jwtTokenDots: (backendRequestBody.jwt_token?.match(/\./g) || []).length,
+      jwtTokenIsHash: !isJwt(backendRequestBody.jwt_token || ''), // 해시이므로 JWT 형식이 아님
       jwtTokenPreview:
         backendRequestBody.jwt_token?.substring(0, 12) +
         '...' +
         backendRequestBody.jwt_token?.substring(backendRequestBody.jwt_token.length - 12),
+      originalIdTokenLength: id_token.length,
+      hashInput: hashInput,
       hasSuiAddress: !!backendRequestBody.sui_address,
       suiAddressLength: backendRequestBody.sui_address?.length,
       suiAddressFormat: backendRequestBody.sui_address?.startsWith('0x'),
