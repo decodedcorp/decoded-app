@@ -202,21 +202,34 @@ export const ImageCropEditor = React.memo(
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
 
-      // 회전과 스케일 적용
+      // 디버깅 로그
+      console.log('🔍 Preview generation:', {
+        completedCrop: { x, y, width, height },
+        rotation,
+        scale,
+        imgNaturalWidth: imgRef.current.naturalWidth,
+        imgNaturalHeight: imgRef.current.naturalHeight,
+        imgDisplayWidth: imgRef.current.width,
+        imgDisplayHeight: imgRef.current.height,
+      });
+
+      // 회전과 스케일을 적용한 상태로 이미지 그리기
       ctx.save();
       ctx.translate(width / 2, height / 2);
       ctx.rotate((rotation * Math.PI) / 180);
       ctx.scale(scale, scale);
+      
+      // 원본 이미지에서 크롭 영역을 정확히 추출
       ctx.drawImage(
         imgRef.current,
-        x - width / 2,
-        y - height / 2,
-        width,
-        height,
-        -width / 2,
-        -height / 2,
-        width,
-        height,
+        x, // 원본 이미지에서의 시작 x 좌표
+        y, // 원본 이미지에서의 시작 y 좌표
+        width, // 크롭할 너비
+        height, // 크롭할 높이
+        -width / 2, // 캔버스에서의 시작 x 좌표 (중앙 기준)
+        -height / 2, // 캔버스에서의 시작 y 좌표 (중앙 기준)
+        width, // 캔버스에 그릴 너비
+        height, // 캔버스에 그릴 높이
       );
       ctx.restore();
 
@@ -256,21 +269,34 @@ export const ImageCropEditor = React.memo(
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
 
-      // 회전과 스케일 적용
+      // 디버깅 로그
+      console.log('🔍 Save generation:', {
+        completedCrop: { x, y, width, height },
+        rotation,
+        scale,
+        imgNaturalWidth: imgRef.current.naturalWidth,
+        imgNaturalHeight: imgRef.current.naturalHeight,
+        imgDisplayWidth: imgRef.current.width,
+        imgDisplayHeight: imgRef.current.height,
+      });
+
+      // 회전과 스케일을 적용한 상태로 이미지 그리기
       ctx.save();
       ctx.translate(width / 2, height / 2);
       ctx.rotate((rotation * Math.PI) / 180);
       ctx.scale(scale, scale);
+      
+      // 원본 이미지에서 크롭 영역을 정확히 추출
       ctx.drawImage(
         imgRef.current,
-        x - width / 2,
-        y - height / 2,
-        width,
-        height,
-        -width / 2,
-        -height / 2,
-        width,
-        height,
+        x, // 원본 이미지에서의 시작 x 좌표
+        y, // 원본 이미지에서의 시작 y 좌표
+        width, // 크롭할 너비
+        height, // 크롭할 높이
+        -width / 2, // 캔버스에서의 시작 x 좌표 (중앙 기준)
+        -height / 2, // 캔버스에서의 시작 y 좌표 (중앙 기준)
+        width, // 캔버스에 그릴 너비
+        height, // 캔버스에 그릴 높이
       );
       ctx.restore();
 
@@ -349,17 +375,15 @@ export const ImageCropEditor = React.memo(
                   <Move className="w-4 h-4" />
                   <span>미리보기</span>
                 </div>
-                
+
                 <div className="flex justify-center">
-                  <div className={`border border-zinc-700 rounded-lg overflow-hidden bg-zinc-800 ${
-                    type === 'thumbnail' ? 'w-32 h-32' : 'w-64 h-20'
-                  }`}>
+                  <div
+                    className={`border border-zinc-700 rounded-lg overflow-hidden bg-zinc-800 ${
+                      type === 'thumbnail' ? 'w-32 h-32' : 'w-64 h-20'
+                    }`}
+                  >
                     {previewUrl ? (
-                      <img
-                        src={previewUrl}
-                        alt="Preview"
-                        className="w-full h-full object-cover"
-                      />
+                      <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-zinc-500">
                         <div className="text-center">
@@ -374,8 +398,13 @@ export const ImageCropEditor = React.memo(
                 {/* 미리보기 정보 */}
                 {completedCrop && (
                   <div className="text-xs text-zinc-400 text-center">
-                    <p>크롭 크기: {Math.round(completedCrop.width)} × {Math.round(completedCrop.height)}</p>
-                    <p>회전: {rotation}° | 확대: {Math.round(scale * 100)}%</p>
+                    <p>
+                      크롭 크기: {Math.round(completedCrop.width)} ×{' '}
+                      {Math.round(completedCrop.height)}
+                    </p>
+                    <p>
+                      회전: {rotation}° | 확대: {Math.round(scale * 100)}%
+                    </p>
                   </div>
                 )}
               </div>

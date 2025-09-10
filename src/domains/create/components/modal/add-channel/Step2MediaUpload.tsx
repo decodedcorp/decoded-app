@@ -100,6 +100,11 @@ export function Step2MediaUpload({
       if (onDataChange) {
         onDataChange(newData);
       }
+
+      // 업로드 후 바로 편집 모달 열기
+      setTimeout(() => {
+        setEditingImage({ type: field, src: compressedBase64 });
+      }, 100);
     } catch (error) {
       console.error('Image upload error:', error);
       alert('Failed to process image. Please try again.');
@@ -246,27 +251,30 @@ export function Step2MediaUpload({
   const handleDragOver = useCallback((e: React.DragEvent, field: 'thumbnail' | 'banner') => {
     e.preventDefault();
     e.stopPropagation();
-    setDragOver(prev => ({ ...prev, [field]: true }));
+    setDragOver((prev) => ({ ...prev, [field]: true }));
   }, []);
 
   const handleDragLeave = useCallback((e: React.DragEvent, field: 'thumbnail' | 'banner') => {
     e.preventDefault();
     e.stopPropagation();
-    setDragOver(prev => ({ ...prev, [field]: false }));
+    setDragOver((prev) => ({ ...prev, [field]: false }));
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent, field: 'thumbnail' | 'banner') => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragOver(prev => ({ ...prev, [field]: false }));
+  const handleDrop = useCallback(
+    (e: React.DragEvent, field: 'thumbnail' | 'banner') => {
+      e.preventDefault();
+      e.stopPropagation();
+      setDragOver((prev) => ({ ...prev, [field]: false }));
 
-    const files = Array.from(e.dataTransfer.files);
-    const imageFile = files.find(file => file.type.startsWith('image/'));
-    
-    if (imageFile) {
-      handleImageUpload(field, imageFile);
-    }
-  }, [handleImageUpload]);
+      const files = Array.from(e.dataTransfer.files);
+      const imageFile = files.find((file) => file.type.startsWith('image/'));
+
+      if (imageFile) {
+        handleImageUpload(field, imageFile);
+      }
+    },
+    [handleImageUpload],
+  );
 
   return (
     <div className="flex gap-6 max-w-full mx-auto">
@@ -291,51 +299,29 @@ export function Step2MediaUpload({
               className={`w-full h-32 border-2 border-dashed rounded-lg flex items-center justify-center transition-all duration-200 cursor-pointer ${
                 dragOver.banner
                   ? 'border-[#eafd66] bg-[#eafd66]/10'
-                  : previewData.banner
-                  ? 'border-zinc-500 bg-zinc-800/50'
                   : 'border-zinc-600 hover:border-[#eafd66] bg-zinc-800/30'
               }`}
               onClick={() => handleFileSelect('banner')}
             >
-              {previewData.banner ? (
-                <div className="relative w-full h-full group">
-                  <img
-                    src={
-                      previewData.banner.startsWith('data:')
-                        ? previewData.banner
-                        : `data:image/jpeg;base64,${previewData.banner}`
-                    }
-                    alt="Banner preview"
-                    className="w-full h-full object-cover rounded-lg"
+              <div className="text-center">
+                <svg
+                  className="w-8 h-8 text-zinc-400 mx-auto mb-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                   />
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center rounded-lg">
-                    <div className="text-center text-white">
-                      <svg className="w-6 h-6 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <p className="text-xs">Change Banner</p>
-                    </div>
-                  </div>
+                </svg>
+                <div className="text-zinc-300 font-medium mb-1">
+                  {previewData.banner ? 'Change Banner' : 'Add Banner'}
                 </div>
-              ) : (
-                <div className="text-center">
-                  <svg
-                    className="w-8 h-8 text-zinc-400 mx-auto mb-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                    />
-                  </svg>
-                  <div className="text-zinc-300 font-medium mb-1">Add Banner</div>
-                  <div className="text-xs text-zinc-500">Click or drag & drop</div>
-                </div>
-              )}
+                <div className="text-xs text-zinc-500">Click or drag & drop</div>
+              </div>
             </div>
             {previewData.banner && (
               <div className="mt-2 flex gap-2">
@@ -368,51 +354,29 @@ export function Step2MediaUpload({
               className={`w-full h-32 border-2 border-dashed rounded-lg flex items-center justify-center transition-all duration-200 cursor-pointer ${
                 dragOver.thumbnail
                   ? 'border-[#eafd66] bg-[#eafd66]/10'
-                  : previewData.thumbnail
-                  ? 'border-zinc-500 bg-zinc-800/50'
                   : 'border-zinc-600 hover:border-[#eafd66] bg-zinc-800/30'
               }`}
               onClick={() => handleFileSelect('thumbnail')}
             >
-              {previewData.thumbnail ? (
-                <div className="relative w-full h-full group">
-                  <img
-                    src={
-                      previewData.thumbnail.startsWith('data:')
-                        ? previewData.thumbnail
-                        : `data:image/jpeg;base64,${previewData.thumbnail}`
-                    }
-                    alt="Thumbnail preview"
-                    className="w-full h-full object-cover rounded-lg"
+              <div className="text-center">
+                <svg
+                  className="w-8 h-8 text-zinc-400 mx-auto mb-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                   />
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center rounded-lg">
-                    <div className="text-center text-white">
-                      <svg className="w-6 h-6 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <p className="text-xs">Change Icon</p>
-                    </div>
-                  </div>
+                </svg>
+                <div className="text-zinc-300 font-medium mb-1">
+                  {previewData.thumbnail ? 'Change Icon' : 'Add Icon'}
                 </div>
-              ) : (
-                <div className="text-center">
-                  <svg
-                    className="w-8 h-8 text-zinc-400 mx-auto mb-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                    />
-                  </svg>
-                  <div className="text-zinc-300 font-medium mb-1">Add Icon</div>
-                  <div className="text-xs text-zinc-500">Click or drag & drop</div>
-                </div>
-              )}
+                <div className="text-xs text-zinc-500">Click or drag & drop</div>
+              </div>
             </div>
             {previewData.thumbnail && (
               <div className="mt-2 flex gap-2">
@@ -457,7 +421,24 @@ export function Step2MediaUpload({
                 }}
               />
             ) : (
-              <div className="w-full h-full bg-gradient-to-r from-zinc-700 to-zinc-600"></div>
+              <div className="w-full h-full bg-gradient-to-r from-zinc-700 to-zinc-600 flex items-center justify-center">
+                <div className="text-center text-zinc-500">
+                  <svg
+                    className="w-8 h-8 mx-auto mb-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                  <p className="text-sm">배너를 업로드하세요</p>
+                </div>
+              </div>
             )}
           </div>
 
