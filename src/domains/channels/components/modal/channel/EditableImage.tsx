@@ -3,6 +3,7 @@
 import React, { useRef, useState } from 'react';
 import { ProxiedImage } from '@/components/ProxiedImage';
 import { compressImage, validateImageFile } from '@/lib/utils/imageUtils';
+import { useChannelTranslation, useCommonTranslation } from '@/lib/i18n/hooks';
 
 interface EditableImageProps {
   src?: string | null;
@@ -32,6 +33,9 @@ export function EditableImage({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  const { images } = useChannelTranslation();
+  const { status } = useCommonTranslation();
 
   const handleFileSelect = () => {
     if (!isOwner || isUploading) return;
@@ -85,7 +89,7 @@ export function EditableImage({
       }
     } catch (error) {
       console.error(`${type} processing error:`, error);
-      setError(`Failed to process ${type}. Please try again.`);
+      setError(images.processError());
     }
   };
 
@@ -157,7 +161,7 @@ export function EditableImage({
           {isUploading ? (
             <div className="text-white text-center">
               <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-              <span className="text-sm">업로드 중...</span>
+              <span className="text-sm">{images.uploading()}</span>
             </div>
           ) : (
             <div className="text-white text-center">
@@ -180,14 +184,14 @@ export function EditableImage({
                   type === 'banner' ? 'text-base' : 'text-sm' // 배너는 더 큰 텍스트
                 }`}
               >
-                {type === 'thumbnail' ? '썸네일 변경' : '배너 변경'}
+                {type === 'thumbnail' ? images.thumbnail() : images.banner()}
               </span>
               <span
                 className={`text-xs opacity-80 ${
                   type === 'banner' ? 'text-sm' : 'text-xs' // 배너는 더 큰 텍스트
                 }`}
               >
-                클릭하여 이미지 업로드
+                {images.uploadInstruction()}
               </span>
             </div>
           )}

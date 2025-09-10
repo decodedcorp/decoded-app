@@ -1,4 +1,5 @@
 import { toast } from 'react-hot-toast';
+import i18n from '../i18n/config';
 
 export interface ToastMessages {
   loading: string;
@@ -51,7 +52,7 @@ export const extractErrorMessage = (error: unknown): string => {
     return String(error.message);
   }
   
-  return '알 수 없는 오류가 발생했습니다.';
+  return i18n.t('errors:general.unknown');
 };
 
 /**

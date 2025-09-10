@@ -1,6 +1,7 @@
 import { hash } from '@/lib/utils/hash';
 
 import { UsersService } from '../../../api/generated/services/UsersService';
+import type { LoginRequest } from '../../../api/generated/models/LoginRequest';
 
 export interface GoogleTokenData {
   access_token: string;
@@ -23,12 +24,13 @@ export interface GoogleTokenPayload {
   exp: number;
 }
 
-export interface BackendLoginRequest {
-  jwt_token: string;
-  sui_address?: string; // 스모크 테스트를 위해 선택적으로 변경
-  email: string;
-  marketing: boolean;
-}
+// Use the generated LoginRequest type instead
+// export interface BackendLoginRequest {
+//   jwt_token: string;
+//   sui_address?: string; // 스모크 테스트를 위해 선택적으로 변경
+//   email: string;
+//   marketing: boolean;
+// }
 
 export interface BackendLoginResponse {
   access_token: {
@@ -148,7 +150,7 @@ export class GoogleAuthApi {
   /**
    * 백엔드 로그인 API 호출 (프록시 사용)
    */
-  static async callBackendLogin(requestBody: BackendLoginRequest): Promise<BackendLoginResponse> {
+  static async callBackendLogin(requestBody: LoginRequest): Promise<BackendLoginResponse> {
     // 1. API_BASE_URL 가드 + 절대 URL 사용
     const API_BASE_URL = process.env.API_BASE_URL;
     if (!API_BASE_URL) {
@@ -236,12 +238,42 @@ export class GoogleAuthApi {
 
   /**
    * 백엔드 로그인 API 호출 (sui_address 업데이트는 클라이언트에서 처리)
+   * "Failed to retrieve user after creation attempt" 에러에 대한 재시도 로직 포함
    */
   static async callBackendLoginWithSuiAddressUpdate(
-    requestBody: BackendLoginRequest,
+    requestBody: LoginRequest,
   ): Promise<BackendLoginResponse> {
-    // 백엔드 로그인 API 호출만 수행
-    // sui_address 업데이트는 클라이언트에서 React Query를 통해 처리
-    return await this.callBackendLogin(requestBody);
+    let lastError: Error;
+    
+    // 최대 3번 시도 (첫 시도 + 2번 재시도)
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        console.log(`[GoogleAuthApi] Login attempt ${attempt}/3`);
+        return await this.callBackendLogin(requestBody);
+      } catch (error) {
+        lastError = error as Error;
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        
+        // "Failed to retrieve user after creation attempt" 에러인 경우에만 재시도
+        if (errorMessage.includes('Failed to retrieve user after creation attempt')) {
+          console.log(`[GoogleAuthApi] Retryable error on attempt ${attempt}/3:`, errorMessage);
+          
+          if (attempt < 3) {
+            // 재시도 전 대기 (1초 -> 2초)
+            const delayMs = attempt * 1000;
+            console.log(`[GoogleAuthApi] Waiting ${delayMs}ms before retry...`);
+            await new Promise(resolve => setTimeout(resolve, delayMs));
+            continue;
+          }
+        }
+        
+        // 재시도할 수 없는 에러이거나 최대 시도 횟수 도달
+        console.error(`[GoogleAuthApi] Non-retryable error or max attempts reached:`, errorMessage);
+        throw error;
+      }
+    }
+    
+    // 이 코드에 도달하지 않아야 하지만 TypeScript를 위해 추가
+    throw lastError!;
   }
 }

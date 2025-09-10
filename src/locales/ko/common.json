@@ -1,0 +1,68 @@
+{
+  "actions": {
+    "create": "만들기",
+    "update": "수정하기",
+    "edit": "편집하기",
+    "delete": "삭제하기",
+    "save": "저장하기",
+    "cancel": "취소하기",
+    "confirm": "확인",
+    "back": "뒤로가기",
+    "next": "다음",
+    "previous": "이전",
+    "close": "닫기",
+    "open": "열기",
+    "search": "검색",
+    "filter": "필터",
+    "refresh": "새로고침",
+    "reload": "다시 불러오기",
+    "copy": "복사",
+    "share": "공유",
+    "download": "다운로드",
+    "upload": "업로드"
+  },
+  "status": {
+    "loading": "불러오는 중이에요...",
+    "saving": "저장하고 있어요...",
+    "uploading": "업로드하고 있어요...",
+    "processing": "처리하고 있어요...",
+    "success": "완료되었어요!",
+    "error": "문제가 발생했어요",
+    "ready": "준비되었어요",
+    "pending": "대기 중이에요",
+    "completed": "완료됨",
+    "failed": "실패함"
+  },
+  "navigation": {
+    "home": "홈",
+    "channels": "채널",
+    "explore": "탐색",
+    "library": "라이브러리",
+    "settings": "설정",
+    "profile": "프로필",
+    "help": "도움말",
+    "about": "정보",
+    "contact": "문의"
+  },
+  "time": {
+    "justNow": "방금 전",
+    "minutesAgo": "{{minutes}}분 전",
+    "hoursAgo": "{{hours}}시간 전",
+    "yesterday": "어제",
+    "daysAgo": "{{days}}일 전",
+    "weeksAgo": "{{weeks}}주 전",
+    "monthsAgo": "{{months}}개월 전",
+    "yearsAgo": "{{years}}년 전"
+  },
+  "ui": {
+    "expand": "펼치기",
+    "collapse": "접기",
+    "fullscreen": "전체화면으로 보기",
+    "exitFullscreen": "전체화면 나가기",
+    "showMore": "더 보기",
+    "showLess": "접기",
+    "toggleSidebar": "사이드바 토글",
+    "openSidebar": "사이드바 펼치기",
+    "closeSidebar": "사이드바 접기"
+  }
+}

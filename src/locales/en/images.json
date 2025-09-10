@@ -1,0 +1,44 @@
+{
+  "analysis": {
+    "categories": {
+      "smallOptimal": "Small (≤100KB)",
+      "mediumOptimal": "Medium (≤500KB)", 
+      "largeWarning": "Large (≤1MB)",
+      "veryLargeWarning": "Very Large (≤2MB)",
+      "tooLarge": "Too Large (>2MB)"
+    },
+    "recommendations": {
+      "optimal": "✅ Optimal size",
+      "recommended": "✅ Recommended size", 
+      "slowMobile": "⚠️ May load slowly on mobile",
+      "serverLimit": "⚠️ Approaching server limits",
+      "compressionNeeded": "❌ Compression needed",
+      "thumbnailLimit": "Thumbnails should be under 500KB",
+      "profileLimit": "Profile images should be under 1MB"
+    },
+    "warnings": {
+      "mobilePerformance": "Consider mobile performance",
+      "serverLimitRisk": "Server limit risk", 
+      "networkPerformance": "Network performance degradation",
+      "serverOverLimit": "Server limit exceeded risk",
+      "networkTimeout": "Network timeout possibility",
+      "userExperience": "User experience degradation"
+    },
+    "logging": {
+      "sizeAnalysisTitle": "📊 Base64 Size Analysis",
+      "sizeInfo": "📏 Size Information",
+      "base64Length": "Base64 length",
+      "estimatedSize": "Estimated file size", 
+      "category": "Category",
+      "warningsTitle": "⚠️ Warnings",
+      "recommendation": "💡 Recommendation"
+    }
+  },
+  "validation": {
+    "reasons": {
+      "over1MB": "Over 1MB, compression needed",
+      "over2MB": "Over 2MB, strong compression needed", 
+      "over4MB": "Over 4MB, extreme compression needed"
+    }
+  }
+}

@@ -1,0 +1,276 @@
+---
+description: 'UX writing rules for consistent, user-friendly text across Korean/English bilingual interface'
+globs: ['src/**/*.{ts,tsx,md}', 'docs/**/*.md']
+alwaysApply: true
+rules:
+  enforceConsistentTerminology: true
+  enforceButtonTextPatterns: true
+  enforceFormLabelConsistency: true
+  enforceErrorMessageStructure: true
+  enforceAccessibilityText: true
+  enforceBilingualConsistency: true
+reviewPrompts:
+  - 'Does the text use consistent terminology from our Korean/English glossary?'
+  - 'Are button texts clear, actionable, and follow our established patterns?'
+  - 'Do form labels and help text provide clear guidance to users?'
+  - 'Are error messages specific, helpful, and actionable?'
+  - 'Is the text accessible to users with disabilities?'
+  - 'Does the tone match our brand voice guidelines for both languages?'
+  - 'Are text lengths appropriate for their context (buttons, labels, messages)?'
+  - 'Does the Korean text use appropriate honorifics (-요체)?'
+  - 'Does the English text use sentence case and active voice?'
+---
+
+# UX Writing Rules (UX 라이팅 규칙)
+
+This rule enforces consistent, user-friendly text across Korean/English bilingual interface in the Decoded App project.
+
+## Core Principles (핵심 원칙)
+
+- **Consistency**: Use the same words for the same concepts in both languages
+- **Clarity**: Use simple, everyday language
+- **Accessibility**: Ensure text is accessible to all users
+- **User-centered**: Write from the user's perspective
+- **Bilingual harmony**: Maintain consistent tone and meaning across languages
+
+## Terminology Rules (용어 규칙)
+
+### Authentication Terms (인증 용어)
+
+- **Korean**: "로그인" (not "사인인" or "로그인하기")
+- **English**: "Log in" (not "Sign in" or "Login")
+- **Korean**: "회원가입" (not "가입" or "등록")
+- **English**: "Sign up" (not "Register" or "Create account")
+- **Korean**: "계정" (for user data), "프로필" (for user information display)
+- **English**: "Account" (for user data), "Profile" (for user information display)
+
+### Action Terms (액션 용어)
+
+- **Korean**: "저장" (not "보관" or "유지")
+- **English**: "Save" (not "Store" or "Keep")
+- **Korean**: "취소" (not "버리기" or "중단")
+- **English**: "Cancel" (not "Discard" or "Abort")
+- **Korean**: "계속" (not "진행" or "다음")
+- **English**: "Continue" (not "Proceed" or "Next")
+- **Korean**: "삭제" (not "제거" for destructive actions)
+- **English**: "Delete" (not "Remove" for destructive actions)
+
+### Content Terms (콘텐츠 용어)
+
+- **Korean**: "이미지" (not "사진" or "그림")
+- **English**: "Image" (not "Picture" or "Photo")
+- **Korean**: "파일" (not "문서" for generic uploads)
+- **English**: "File" (not "Document" for generic uploads)
+- **Korean**: "업로드" (not "추가" or "가져오기")
+- **English**: "Upload" (not "Add" or "Import")
+- **Korean**: "다운로드" (not "저장" or "받기")
+- **English**: "Download" (not "Save" or "Get")
+
+## Button Text Rules (버튼 텍스트 규칙)
+
+### Length Guidelines (길이 가이드라인)
+
+- **Primary buttons**: 1-3 words
+- **Secondary buttons**: 1-4 words
+- **Icon buttons**: 1-2 words (if text is present)
+
+### Action Patterns (액션 패턴)
+
+- **Primary actions**: "저장", "계속", "시작하기", "로그인" / "Save", "Continue", "Get Started", "Log in"
+- **Secondary actions**: "취소", "뒤로", "건너뛰기", "더 알아보기" / "Cancel", "Back", "Skip", "Learn More"
+- **Destructive actions**: "삭제", "제거", "버리기", "모두 지우기" / "Delete", "Remove", "Discard", "Clear All"
+
+### Avoid These Patterns (피해야 할 패턴)
+
+- Generic terms: "제출", "확인", "예" / "Submit", "OK", "Yes"
+- Technical terms: "실행", "처리", "초기화" / "Execute", "Process", "Initialize"
+- Ambiguous terms: "가기", "하기", "액션" / "Go", "Do", "Action"
+
+## Form Text Rules (폼 텍스트 규칙)
+
+### Label Guidelines (라벨 가이드라인)
+
+- Be specific: "이메일 주소" not "이메일" / "Email address" not "Email"
+- Be clear: "전체 이름" not "이름" / "Full name" not "Name"
+- Be consistent: Use the same label style throughout
+- Be helpful: "비밀번호 (최소 8자)" not "비밀번호" / "Password (minimum 8 characters)" not "Password"
+
+### Required/Optional Indicators (필수/선택 표시)
+
+- **Required**: Use asterisk (\*) or "필수" / "Required"
+- **Optional**: Use "(선택사항)" or "(비워두어도 됨)" / "(Optional)" or "(Leave blank if not applicable)"
+- **Placement**: After the label
+- **Consistency**: Use the same indicator throughout
+
+### Help Text Guidelines (도움말 텍스트 가이드라인)
+
+- **Length**: 1-2 sentences maximum
+- **Purpose**: Explain what's needed and why
+- **Examples**: Provide examples when helpful
+- **Context**: Explain why the information is needed
+
+## Error Message Rules (에러 메시지 규칙)
+
+### Structure Requirements (구조 요구사항)
+
+1. **Problem**: What went wrong
+2. **Cause**: Why it happened (if helpful)
+3. **Solution**: What the user can do
+4. **Action**: Specific steps to fix it
+
+### Message Patterns (메시지 패턴)
+
+- **Validation**: "올바른 [필드명]을(를) 입력해 주세요" / "Please enter a valid [field name]"
+- **Network**: "[액션]할 수 없어요. 연결을 확인해 주세요" / "Unable to [action]. Please check your connection"
+- **Permission**: "[액션]할 권한이 없어요" / "You don't have permission to [action]"
+- **System**: "문제가 발생했어요. 다시 시도해 주세요" / "Something went wrong. Please try again"
+
+### Avoid These Patterns (피해야 할 패턴)
+
+- Generic messages: "오류", "잘못된 입력" / "Error", "Invalid input"
+- Technical jargon: "HTTP 500", "데이터베이스 연결 실패" / "HTTP 500", "Database connection failed"
+- Blaming language: "잘못된 비밀번호를 입력하셨습니다" / "You entered the wrong password"
+
+## Accessibility Rules (접근성 규칙)
+
+### Screen Reader Support (스크린 리더 지원)
+
+- Use descriptive alt text for images
+- Provide context for interactive elements
+- Use proper heading hierarchy
+- Include ARIA labels when necessary
+
+### Language Accessibility (언어 접근성)
+
+- Use simple sentence structures
+- Avoid complex vocabulary
+- Provide clear instructions
+- Use consistent terminology
+
+### Visual Accessibility (시각적 접근성)
+
+- Ensure sufficient color contrast
+- Use clear, readable fonts
+- Provide text alternatives for icons
+- Use meaningful link text
+
+## Tone and Voice Rules (톤과 보이스 규칙)
+
+### Brand Voice Characteristics (브랜드 보이스 특성)
+
+- **Approachable**: Friendly but not overly casual
+- **Confident**: Clear and decisive
+- **Helpful**: Proactive in providing guidance
+- **Respectful**: Acknowledges user time and effort
+
+### Korean Writing Style (한국어 작성 스타일)
+
+- Use -요체 consistently (not 반말)
+- Avoid excessive honorifics (님 남발 금지)
+- Use simple, everyday words
+- Avoid complex Chinese characters when possible
+
+### English Writing Style (영어 작성 스타일)
+
+- Use sentence case for most UI text
+- Use title case only for proper nouns and page titles
+- Avoid all caps except for acronyms
+- Use active voice when possible
+- Use present tense for current actions
+
+## Text Length Rules (텍스트 길이 규칙)
+
+### Button Text (버튼 텍스트)
+
+- **Primary**: 1-3 words
+- **Secondary**: 1-4 words
+- **Destructive**: 1-3 words
+
+### Labels and Form Fields (라벨 및 폼 필드)
+
+- **Field labels**: 1-2 words
+- **Help text**: 1-2 sentences
+- **Error messages**: 1-2 sentences
+
+### Messages and Feedback (메시지 및 피드백)
+
+- **Success messages**: 1-2 sentences
+- **Warning messages**: 1-2 sentences
+- **Info messages**: 1-2 sentences
+
+## Common Patterns (일반적인 패턴)
+
+### Error Handling Pattern (에러 처리 패턴)
+
+```
+Korean: "저장할 수 없어요. 세션이 만료되었어요. 다시 로그인해 주세요."
+English: "Unable to save changes. Your session has expired. Please sign in again."
+```
+
+### Success Message Pattern (성공 메시지 패턴)
+
+```
+Korean: "변경사항이 저장되었어요. 프로필이 업데이트되었어요."
+English: "Changes saved successfully. Your profile has been updated."
+```
+
+### Empty State Pattern (빈 상태 패턴)
+
+```
+Korean: "아직 항목이 없어요. 첫 번째 항목을 추가해 보세요."
+English: "No items yet. Start by adding your first item."
+```
+
+## Bilingual Consistency Rules (이중 언어 일관성 규칙)
+
+### Translation Quality (번역 품질)
+
+- Maintain consistent tone across languages
+- Preserve meaning and context
+- Use appropriate cultural adaptations
+- Test with native speakers
+
+### Key-Value Structure (키-값 구조)
+
+- Use consistent key naming: `area.feature.element.state`
+- Example: `channels.create.cta`, `auth.login.cta`, `error.file.too_large`
+- Include both Korean and English values
+
+### ICU MessageFormat (ICU 메시지 포맷)
+
+- Use proper pluralization rules
+- Handle variables consistently
+- Example: `{count, plural, one {1 like} other {# likes}}` (EN) / `좋아요 {count}개` (KR)
+
+## Review Checklist (검토 체크리스트)
+
+Before publishing any user-facing text, verify:
+
+- [ ] Is the terminology consistent with our bilingual glossary?
+- [ ] Are button texts clear and actionable in both languages?
+- [ ] Do form labels provide clear guidance to users?
+- [ ] Are error messages specific and helpful?
+- [ ] Is the text accessible to all users?
+- [ ] Does the tone match our brand voice guidelines?
+- [ ] Are text lengths appropriate for their context?
+- [ ] Does the Korean text use appropriate honorifics?
+- [ ] Does the English text use sentence case and active voice?
+- [ ] Do both languages convey the same meaning and tone?
+
+## Examples (예시)
+
+### Good Examples (좋은 예시)
+
+- Button: "저장" / "Save"
+- Label: "이메일 주소" / "Email address"
+- Help text: "업데이트를 보내드릴 이메일이에요" / "We'll use this to send you updates"
+- Error: "올바른 이메일 주소를 입력해 주세요" / "Please enter a valid email address"
+- Success: "변경사항이 저장되었어요" / "Changes saved successfully"
+
+### Avoid These (피해야 할 것)
+
+- Button: "제출" (use "저장" instead) / "Submit" (use "Save" instead)
+- Label: "이메일" (use "이메일 주소" instead) / "Email" (use "Email address" instead)
+- Help text: "이메일 입력" (use "업데이트를 보내드릴 이메일이에요" instead) / "Enter email" (use "We'll use this to send you updates" instead)
+- Error: "잘못된 입력" (use "올바른 이메일 주소를 입력해 주세요" instead) / "Invalid input" (use "Please enter a valid email address" instead)
+- Success: "성공" (use "변경사항이 저장되었어요" instead) / "Success" (use "Changes saved successfully" instead)

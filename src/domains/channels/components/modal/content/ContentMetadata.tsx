@@ -1,4 +1,5 @@
 import React from 'react';
+import { useCommonTranslation } from '../../../../../lib/i18n/hooks';
 
 interface ContentMetadataProps {
   author?: string;
@@ -8,16 +9,18 @@ interface ContentMetadataProps {
 }
 
 export function ContentMetadata({ author, date, likes, views }: ContentMetadataProps) {
+  const { time } = useCommonTranslation();
+  
   // 날짜를 더 간단하게 포맷팅
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
 
-    if (diffInHours < 1) return '방금 전';
-    if (diffInHours < 24) return `${diffInHours}시간 전`;
-    if (diffInHours < 48) return '어제';
-    if (diffInHours < 168) return `${Math.floor(diffInHours / 24)}일 전`;
+    if (diffInHours < 1) return time.justNow();
+    if (diffInHours < 24) return time.hoursAgo(diffInHours);
+    if (diffInHours < 48) return time.yesterday();
+    if (diffInHours < 168) return time.daysAgo(Math.floor(diffInHours / 24));
     return date.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
   };
 

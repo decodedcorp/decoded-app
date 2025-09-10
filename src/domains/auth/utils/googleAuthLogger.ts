@@ -1,4 +1,5 @@
-import { GoogleTokenPayload, BackendLoginRequest } from '../api/googleAuthApi';
+import { GoogleTokenPayload } from '../api/googleAuthApi';
+import type { LoginRequest } from '../../../api/generated/models/LoginRequest';
 
 export class GoogleAuthLogger {
   /**
@@ -30,15 +31,15 @@ export class GoogleAuthLogger {
    * 백엔드 요청 로깅
    */
   static logBackendRequest(
-    requestBody: BackendLoginRequest,
+    requestBody: LoginRequest,
     hashInput: string,
-    hashedToken: string,
+    originalJwtToken: string,
   ): void {
     if (!this.shouldLog()) return;
 
     console.log('[Google OAuth] Backend request body:', requestBody);
     console.log('[Google OAuth] Hash input:', hashInput);
-    console.log('[Google OAuth] Hashed token:', hashedToken);
+    console.log('[Google OAuth] Original JWT token (first 50 chars):', originalJwtToken.substring(0, 50) + '...');
   }
 
   /**

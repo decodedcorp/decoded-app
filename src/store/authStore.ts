@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { devtools, persist, createJSONStorage } from 'zustand/middleware';
+import i18n from '../lib/i18n/config';
 
 import { AuthState, User, LoginResponse } from '../domains/auth/types/auth';
 import {
@@ -85,7 +86,7 @@ export const useAuthStore = create<AuthStore>()(
           } catch (error) {
             console.error('[Auth] Failed to login:', error);
             set({
-              error: '로그인에 실패했습니다.',
+              error: i18n.t('auth:login.failed'),
               isLoading: false,
             });
           }

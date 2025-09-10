@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleAuthApi } from '@/domains/auth/api/googleAuthApi';
 import { GoogleAuthLogger } from '@/domains/auth/utils/googleAuthLogger';
+import type { LoginRequest } from '@/api/generated/models/LoginRequest';
 
 export async function POST(request: NextRequest) {
   try {
@@ -86,11 +87,11 @@ export async function POST(request: NextRequest) {
     });
 
     // 4. 백엔드 API 요청 준비 (백엔드 요구사항으로 sui_address 포함)
-    const backendRequestBody: any = {
+    // 재로그인 이슈 해결을 위해 email을 null로 설정하여 백엔드가 JWT에서 추출하도록 함
+    const backendRequestBody: LoginRequest = {
       jwt_token: id_token, // ✅ 실제 Google id_token (JWT) 사용
       sui_address: tempSuiAddress, // 백엔드에서 필수로 요구
-      email: email,
-      sub: sub, // Google의 고유 ID 추가 (백엔드에서 unique key로 사용할 가능성)
+      email: null, // 백엔드가 JWT에서 추출하도록 null로 설정
       marketing: false,
     };
 
@@ -111,8 +112,12 @@ export async function POST(request: NextRequest) {
       suiAddressLength: backendRequestBody.sui_address?.length,
       suiAddressFormat: backendRequestBody.sui_address?.startsWith('0x'),
       hasEmail: !!backendRequestBody.email,
-      hasSub: !!backendRequestBody.sub,
       marketing: backendRequestBody.marketing,
+      // JWT payload info for debugging
+      jwtPayloadSub: sub,
+      jwtPayloadEmail: email,
+      jwtPayloadIss: iss,
+      isReturningUser: 'UNKNOWN - let backend determine',
     });
 
     // 5. 백엔드 로그인 API 호출 (sui_address 업데이트 포함)

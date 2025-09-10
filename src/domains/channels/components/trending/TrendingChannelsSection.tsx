@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useTrendingChannels, TrendingType } from '../../hooks/useTrending';
 import { TrendingChannelCard } from './TrendingChannelCard';
 import { LoadingState, ErrorState } from '../common/LoadingStates';
+import { useChannelTranslation, useCommonTranslation } from '../../../../lib/i18n/hooks';
 
 interface TrendingChannelsSectionProps {
   className?: string;
@@ -13,17 +14,19 @@ export function TrendingChannelsSection({ className = '' }: TrendingChannelsSect
   const [activeType, setActiveType] = useState<TrendingType>('popular');
   
   const { data, isLoading, error } = useTrendingChannels(activeType, 12);
+  const { trending, states } = useChannelTranslation();
+  const { ui } = useCommonTranslation();
 
   if (isLoading) {
     return (
       <section className={`${className}`}>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-400 mb-2">인기 채널</h2>
-            <p className="text-zinc-500 text-sm">가장 활발하고 주목받는 채널들</p>
+            <h2 className="text-2xl font-bold text-gray-400 mb-2">{trending.title()}</h2>
+            <p className="text-zinc-500 text-sm">{trending.subtitle()}</p>
           </div>
         </div>
-        <LoadingState title="인기 채널을 불러오는 중..." />
+        <LoadingState title={trending.loading()} />
       </section>
     );
   }
@@ -33,11 +36,11 @@ export function TrendingChannelsSection({ className = '' }: TrendingChannelsSect
       <section className={`${className}`}>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-400 mb-2">인기 채널</h2>
-            <p className="text-zinc-500 text-sm">가장 활발하고 주목받는 채널들</p>
+            <h2 className="text-2xl font-bold text-gray-400 mb-2">{trending.title()}</h2>
+            <p className="text-zinc-500 text-sm">{trending.subtitle()}</p>
           </div>
         </div>
-        <ErrorState title="채널을 불러올 수 없습니다" subtitle="잠시 후 다시 시도해 주세요" />
+        <ErrorState title={trending.error()} subtitle={trending.errorSubtitle()} />
       </section>
     );
   }
@@ -62,7 +65,7 @@ export function TrendingChannelsSection({ className = '' }: TrendingChannelsSect
                 : 'text-zinc-400 hover:text-white'
             }`}
           >
-            인기
+            {trending.popular()}
           </button>
           <button
             onClick={() => setActiveType('trending')}
@@ -72,7 +75,7 @@ export function TrendingChannelsSection({ className = '' }: TrendingChannelsSect
                 : 'text-zinc-400 hover:text-white'
             }`}
           >
-            트렌딩
+            {trending.trendingNow()}
           </button>
         </div>
       </div>
@@ -80,7 +83,7 @@ export function TrendingChannelsSection({ className = '' }: TrendingChannelsSect
       {/* Content Area - Conditional */}
       {!channels.length ? (
         <div className="text-center py-12">
-          <p className="text-zinc-500">표시할 채널이 없습니다</p>
+          <p className="text-zinc-500">{trending.empty()}</p>
         </div>
       ) : (
         <>
@@ -100,7 +103,7 @@ export function TrendingChannelsSection({ className = '' }: TrendingChannelsSect
           {/* View All Button */}
           <div className="text-center mt-6">
             <button className="px-6 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-sm font-medium transition-colors duration-200">
-              전체 보기
+              {trending.viewAll()}
             </button>
           </div>
         </>

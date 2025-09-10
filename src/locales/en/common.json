@@ -1,0 +1,68 @@
+{
+  "actions": {
+    "create": "Create",
+    "update": "Update",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "open": "Open",
+    "search": "Search",
+    "filter": "Filter",
+    "refresh": "Refresh",
+    "reload": "Reload",
+    "copy": "Copy",
+    "share": "Share",
+    "download": "Download",
+    "upload": "Upload"
+  },
+  "status": {
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "uploading": "Uploading...",
+    "processing": "Processing...",
+    "success": "Success!",
+    "error": "An error occurred",
+    "ready": "Ready",
+    "pending": "Pending",
+    "completed": "Completed",
+    "failed": "Failed"
+  },
+  "navigation": {
+    "home": "Home",
+    "channels": "Channels",
+    "explore": "Explore",
+    "library": "Library",
+    "settings": "Settings",
+    "profile": "Profile",
+    "help": "Help",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "time": {
+    "justNow": "Just now",
+    "minutesAgo": "{{minutes}} minutes ago",
+    "hoursAgo": "{{hours}} hours ago",
+    "yesterday": "Yesterday",
+    "daysAgo": "{{days}} days ago",
+    "weeksAgo": "{{weeks}} weeks ago",
+    "monthsAgo": "{{months}} months ago",
+    "yearsAgo": "{{years}} years ago"
+  },
+  "ui": {
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "fullscreen": "View fullscreen",
+    "exitFullscreen": "Exit fullscreen",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "toggleSidebar": "Toggle sidebar",
+    "openSidebar": "Open sidebar",
+    "closeSidebar": "Close sidebar"
+  }
+}

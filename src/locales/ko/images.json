@@ -1,0 +1,44 @@
+{
+  "analysis": {
+    "categories": {
+      "smallOptimal": "Small (≤100KB)",
+      "mediumOptimal": "Medium (≤500KB)", 
+      "largeWarning": "Large (≤1MB)",
+      "veryLargeWarning": "Very Large (≤2MB)",
+      "tooLarge": "Too Large (>2MB)"
+    },
+    "recommendations": {
+      "optimal": "✅ 최적 크기입니다",
+      "recommended": "✅ 권장 크기입니다", 
+      "slowMobile": "⚠️ 모바일에서 로딩이 느릴 수 있습니다",
+      "serverLimit": "⚠️ 서버 제한에 근접합니다",
+      "compressionNeeded": "❌ 압축이 필요합니다",
+      "thumbnailLimit": "썸네일은 500KB 이하 권장",
+      "profileLimit": "프로필 이미지는 1MB 이하 권장"
+    },
+    "warnings": {
+      "mobilePerformance": "모바일 성능 고려 필요",
+      "serverLimitRisk": "서버 제한 위험", 
+      "networkPerformance": "네트워크 성능 저하",
+      "serverOverLimit": "서버 제한 초과 위험",
+      "networkTimeout": "네트워크 타임아웃 가능성",
+      "userExperience": "사용자 경험 저하"
+    },
+    "logging": {
+      "sizeAnalysisTitle": "📊 Base64 크기 분석",
+      "sizeInfo": "📏 크기 정보",
+      "base64Length": "Base64 길이",
+      "estimatedSize": "예상 파일 크기", 
+      "category": "카테고리",
+      "warningsTitle": "⚠️ 경고사항",
+      "recommendation": "💡 권장사항"
+    }
+  },
+  "validation": {
+    "reasons": {
+      "over1MB": "1MB 초과로 압축 필요",
+      "over2MB": "2MB 초과로 강력한 압축 필요", 
+      "over4MB": "4MB 초과로 극한 압축 필요"
+    }
+  }
+}
