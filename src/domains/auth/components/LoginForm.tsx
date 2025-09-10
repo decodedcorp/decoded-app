@@ -86,6 +86,26 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
     return () => window.removeEventListener('message', handleMessage);
   }, [onSuccess, onError, login]);
 
+  // 팝업 창 모니터링
+  useEffect(() => {
+    if (!popupRef.current) return;
+
+    const checkClosed = setInterval(() => {
+      if (popupRef.current?.closed) {
+        clearInterval(checkClosed);
+        popupRef.current = null;
+        
+        // 팝업이 닫혔는데 메시지가 처리되지 않았다면 에러 처리
+        if (!messageHandledRef.current) {
+          console.log('[LoginForm] Popup closed without completing OAuth');
+          onError?.('로그인이 취소되었습니다.');
+        }
+      }
+    }, 1000);
+
+    return () => clearInterval(checkClosed);
+  }, [onError]);
+
   // 로그인 상태 변경 감지
   useEffect(() => {
     if (isAuthenticated && messageHandledRef.current) {
@@ -126,27 +146,21 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
         `access_type=offline&` +
         `prompt=consent${debugParam}`;
 
-      // 개발 환경에서는 메인 창에서 OAuth 처리, 프로덕션에서는 팝업 사용
-      if (process.env.NODE_ENV === 'development') {
-        // 개발 환경: 메인 창에서 OAuth 처리 (디버깅 용이)
-        window.location.href = googleAuthUrl;
-      } else {
-        // 프로덕션 환경: 팝업 창에서 OAuth 처리
-        const popup = window.open(
-          googleAuthUrl,
-          'googleOAuth',
-          'width=500,height=600,scrollbars=yes,resizable=yes,menubar=no,toolbar=no,location=no,status=no',
-        );
+      // 모든 환경에서 팝업 창에서 OAuth 처리
+      const popup = window.open(
+        googleAuthUrl,
+        'googleOAuth',
+        'width=500,height=600,scrollbars=yes,resizable=yes,menubar=no,toolbar=no,location=no,status=no',
+      );
 
-        if (!popup) {
-          throw new Error('팝업이 차단되었습니다. 팝업 차단을 해제해주세요.');
-        }
-
-        popupRef.current = popup;
-
-        // 팝업 창 포커스
-        popup.focus();
+      if (!popup) {
+        throw new Error('팝업이 차단되었습니다. 팝업 차단을 해제해주세요.');
       }
+
+      popupRef.current = popup;
+
+      // 팝업 창 포커스
+      popup.focus();
     } catch (error) {
       let errorMessage = 'Google 로그인에 실패했습니다.';
 
