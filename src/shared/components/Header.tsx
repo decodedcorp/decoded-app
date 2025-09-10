@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, memo, useMemo, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -14,7 +14,7 @@ import { CreateButton } from './CreateButton';
 import { ChannelSearchBar } from './ChannelSearchBar';
 import { GlobalSearchBar } from './GlobalSearchBar';
 
-export function Header() {
+export const Header = memo(function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const { scrollDirection, isScrolled, isAtTop } = useScrollDirection({
@@ -26,39 +26,53 @@ export function Header() {
   const [isFocused, setIsFocused] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
-  // Get auth state
+  // Get auth state - 개별적으로 구독하여 무한 루프 방지
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isLoading = useAuthStore((state) => state.isLoading);
   const isInitialized = useAuthStore((state) => state.isInitialized);
 
-  // 채널 페이지인지 확인
-  const isChannelPage = pathname?.startsWith('/channels/') && pathname !== '/channels';
+  // 채널 페이지인지 확인 - useMemo로 최적화
+  const isChannelPage = useMemo(
+    () => pathname?.startsWith('/channels/') && pathname !== '/channels',
+    [pathname],
+  );
 
-  // 채널 ID 추출
-  const channelId = isChannelPage ? pathname?.split('/channels/')[1] : null;
+  // 채널 ID 추출 - useMemo로 최적화
+  const channelId = useMemo(
+    () => (isChannelPage ? pathname?.split('/channels/')[1] : null),
+    [isChannelPage, pathname],
+  );
 
-  // 채널 데이터 가져오기
-  const { data: channelData } = useChannel(channelId || '');
+  // 채널 데이터 가져오기 - 조건부로만 실행
+  const { data: channelData } = useChannel(channelId || '', {
+    enabled: !!channelId, // 채널 ID가 있을 때만 실행
+  });
 
-  // 채널명 결정
-  const channelName = channelData?.name || channelId;
+  // 채널명 결정 - useMemo로 최적화
+  const channelName = useMemo(() => channelData?.name || channelId, [channelData?.name, channelId]);
 
-  // 검색 핸들러
-  const handleChannelSearch = (query: string) => {
-    console.log('Channel search:', query);
-    // 채널 내 검색 시 검색 페이지로 이동 (채널 컨텍스트 유지)
-    if (query.trim() && channelId) {
-      router.push(`/search?q=${encodeURIComponent(query.trim())}&channel=${channelId}`);
-    }
-  };
+  // 검색 핸들러 - useCallback으로 최적화
+  const handleChannelSearch = useCallback(
+    (query: string) => {
+      console.log('Channel search:', query);
+      // 채널 내 검색 시 검색 페이지로 이동 (채널 컨텍스트 유지)
+      if (query.trim() && channelId) {
+        router.push(`/search?q=${encodeURIComponent(query.trim())}&channel=${channelId}`);
+      }
+    },
+    [router, channelId],
+  );
 
-  const handleGlobalSearch = (query: string) => {
-    console.log('Global search:', query);
-    // 전역 검색 시 검색 페이지로 이동
-    if (query.trim()) {
-      router.push(`/search?q=${encodeURIComponent(query.trim())}`);
-    }
-  };
+  const handleGlobalSearch = useCallback(
+    (query: string) => {
+      console.log('Global search:', query);
+      // 전역 검색 시 검색 페이지로 이동
+      if (query.trim()) {
+        router.push(`/search?q=${encodeURIComponent(query.trim())}`);
+      }
+    },
+    [router],
+  );
 
   const handleClearChannel = () => {
     console.log('Clear channel filter');
@@ -232,4 +246,4 @@ export function Header() {
       )}
     </header>
   );
-}
+});

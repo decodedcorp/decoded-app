@@ -98,7 +98,7 @@ export function SidebarChannelList({ className = '', showTitle = false }: Sideba
             {/* More channels link */}
             <Link
               href="/channels"
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 transition-all duration-200 group"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 transition-all duration-200 group cursor-pointer"
             >
               <div className="w-6 h-6 rounded-full bg-zinc-700 flex items-center justify-center flex-shrink-0">
                 <ArrowRightIcon className="w-3 h-3" />

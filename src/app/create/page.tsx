@@ -37,37 +37,13 @@ export default function CreatePage() {
 
     // 모달이 닫혔고, 모달 열기가 시작된 후에만 리다이렉트
     if (!isModalOpen && hasStartedOpening) {
-      console.log('Modal is closed, redirecting immediately...');
-
-      // 즉시 리다이렉트 시도
-      console.log('Attempting redirect...');
-
-      // 방법 1: Next.js router로 부드러운 네비게이션 (새로고침 없음)
-      router.replace('/');
-      console.log('Method 1: router.replace executed');
-
-      // 방법 2: window.location.href (새로고침 없음)
+      console.log('Modal is closed, redirecting to home...');
+      
+      // 약간의 지연을 두고 리다이렉트 (사용자가 모달이 닫힌 것을 인지할 수 있도록)
       setTimeout(() => {
-        console.log('Fallback: window.location.href');
-        window.location.href = '/';
-      }, 100);
-    }
-  }, [isModalOpen, hasStartedOpening, router]);
-
-  // 모달이 닫혔을 때는 즉시 홈으로 이동 (모달이 열린 후에만 처리)
-  useEffect(() => {
-    if (!isModalOpen && hasStartedOpening) {
-      console.log('Modal closed, redirecting to home');
-
-      // 방법 1: Next.js router로 부드러운 네비게이션 (새로고침 없음)
-      router.replace('/');
-      console.log('Method 1: router.replace executed');
-
-      // 방법 2: window.location.href (새로고침 없음)
-      setTimeout(() => {
-        console.log('Fallback: window.location.href');
-        window.location.href = '/';
-      }, 150);
+        console.log('Redirecting to home after delay');
+        router.replace('/');
+      }, 300);
     }
   }, [isModalOpen, hasStartedOpening, router]);
 

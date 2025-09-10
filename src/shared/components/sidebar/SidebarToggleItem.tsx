@@ -3,6 +3,7 @@
 import { ReactNode, useState } from 'react';
 import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface SidebarToggleItemProps {
   href?: string;
@@ -26,9 +27,25 @@ export function SidebarToggleItem({
   defaultExpanded = true,
 }: SidebarToggleItemProps) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const router = useRouter();
 
   const handleToggle = () => {
     setIsExpanded(!isExpanded);
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    console.log('SidebarToggleItem clicked:', { href, label });
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // If there's an href, navigate to it
+    if (href) {
+      console.log('Navigating to:', href);
+      router.push(href);
+    }
+    // Always toggle the expansion state
+    console.log('Toggling expansion state');
+    handleToggle();
   };
 
   const buttonContent = (
@@ -48,22 +65,16 @@ export function SidebarToggleItem({
 
   const buttonClasses = `
     flex items-center gap-4 px-3 py-3 rounded-xl
-    text-base font-normal transition-all duration-200 w-full text-left
+    text-base font-normal transition-all duration-200 w-full text-left cursor-pointer
     ${isActive ? 'bg-zinc-900 text-white' : 'text-zinc-300 hover:bg-zinc-900/50 hover:text-white'}
   `;
 
   return (
     <div className={`space-y-1 ${className}`}>
       {/* Toggle button */}
-      {href ? (
-        <Link href={href} className={buttonClasses}>
-          {buttonContent}
-        </Link>
-      ) : (
-        <button onClick={handleToggle} className={buttonClasses}>
-          {buttonContent}
-        </button>
-      )}
+      <button onClick={handleClick} className={buttonClasses}>
+        {buttonContent}
+      </button>
 
       {/* Children content */}
       {isExpanded && children && <div className="ml-7 space-y-1">{children}</div>}
