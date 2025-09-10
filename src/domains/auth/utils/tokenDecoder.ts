@@ -9,7 +9,17 @@ export class TokenDecoder {
    */
   static decode<T = DecodedToken>(token: string): T {
     try {
-      const base64Url = token.split('.')[1];
+      // JWT 형식 검증 (3개의 점으로 구분된 구조)
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        throw new Error('Invalid JWT format: token must have 3 parts separated by dots');
+      }
+
+      const base64Url = parts[1];
+      if (!base64Url) {
+        throw new Error('Invalid JWT format: missing payload part');
+      }
+
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
       const jsonPayload = decodeURIComponent(
         atob(base64)

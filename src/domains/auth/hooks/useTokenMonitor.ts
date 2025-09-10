@@ -46,6 +46,19 @@ export const useTokenMonitor = () => {
     lastTokenRef.current = token;
 
     try {
+      // JWT 형식이 아닌 토큰 (임시 토큰 등)은 만료 시간을 모니터링하지 않음
+      const isJwtFormat = (token.match(/\./g) || []).length === 2;
+      
+      if (!isJwtFormat) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[TokenMonitor] Non-JWT token detected, skipping expiration monitoring:', {
+            tokenPreview: token.substring(0, 20) + '...',
+            isTempToken: token.startsWith('temp_token_'),
+          });
+        }
+        return; // JWT가 아닌 토큰은 만료 모니터링하지 않음
+      }
+
       // 토큰 만료 시간 계산
       const timeUntilExpire = TokenDecoder.getTimeUntilExpiry(token) * 1000; // 밀리초로 변환
 
