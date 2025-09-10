@@ -59,78 +59,92 @@ function AuthCallbackContent() {
       const code = searchParams.get('code');
       const error = searchParams.get('error');
 
-      if (error) {
-        const errorMessage = `OAuth error: ${error}`;
-        console.log('[Auth] OAuth error:', error);
-        sendLogToParent('error', '[Auth] OAuth error:', error);
+      console.log('[Auth Callback] Starting auth processing:', {
+        hasCode: !!code,
+        hasError: !!error,
+        isPopup: !!window.opener,
+        isDebugMode,
+        timestamp: new Date().toISOString()
+      });
 
-        // 팝업 창에서 부모 창으로 에러 메시지 전송
+      if (error) {
+        const errorMessage = `Google OAuth error: ${error}`;
+        console.error('[Auth] OAuth error:', error);
+        sendLogToParent('error', '[Auth] OAuth error:', error);
         sendMessageToParent('GOOGLE_OAUTH_ERROR', { error: errorMessage });
         return;
       }
 
       if (!code) {
-        const errorMessage = 'No authorization code received';
-        console.log('[Auth] No authorization code received');
+        const errorMessage = 'No authorization code received from Google';
+        console.error('[Auth] No authorization code received');
         sendLogToParent('error', '[Auth] No authorization code received');
-
-        // 팝업 창에서 부모 창으로 에러 메시지 전송
         sendMessageToParent('GOOGLE_OAUTH_ERROR', { error: errorMessage });
         return;
       }
 
-      console.log('[Auth] Processing OAuth callback with code:', code.substring(0, 10) + '...');
-      sendLogToParent(
-        'info',
-        '[Auth] Processing OAuth callback with code:',
-        code.substring(0, 10) + '...',
-      );
+      console.log('[Auth] Processing OAuth callback with code:', {
+        codeLength: code.length,
+        codePreview: code.substring(0, 15) + '...'
+      });
+      sendLogToParent('info', '[Auth] Processing OAuth callback', { codeLength: code.length });
 
+      // OAuth 콜백 처리 시작
       const result = await handleGoogleOAuthCallback(code);
 
-      console.log('[Auth] Login successful:', {
+      console.log('[Auth] OAuth callback successful:', {
         hasUser: !!result.user,
         hasAccessToken: !!result.access_token,
+        userEmail: result.user?.email
       });
-      sendLogToParent('info', '[Auth] Login successful:', {
+      
+      sendLogToParent('info', '[Auth] OAuth callback successful', {
         hasUser: !!result.user,
-        hasAccessToken: !!result.access_token,
+        hasAccessToken: !!result.access_token
       });
 
-      // 팝업 창인 경우: 토큰 데이터를 부모 창으로 전송 (팝업에서는 저장하지 않음)
+      // 팝업 상황 처리: 부모 창으로 데이터 전송
       if (window.opener) {
-        // 부모 창으로 로그인 데이터 전송 (토큰 포함)
         sendMessageToParent('GOOGLE_OAUTH_SUCCESS', {
           user: result.user,
-          loginData: result, // 전체 로그인 응답 데이터 포함
+          loginData: result
         });
         return;
       }
 
-      // 팝업이 아닌 경우: 일반적인 로그인 처리
+      // 일반 로그인 처리 (브라우저에서 직접 접근한 경우)
       login(result);
-      // dashboard로 리다이렉트하지 않음
-      // router.push('/dashboard');
+      
+      // 로그인 성공 후 리다이렉트
+      setTimeout(() => {
+        router.push('/');
+      }, 1500);
+
     } catch (error) {
-      console.error('[Auth] OAuth callback error:', error);
-      sendLogToParent('error', '[Auth] OAuth callback error:', error);
+      console.error('[Auth] OAuth callback failed:', {
+        error: error instanceof Error ? error.message : error,
+        stack: error instanceof Error ? error.stack : undefined
+      });
+      
+      sendLogToParent('error', '[Auth] OAuth callback failed', {
+        error: error instanceof Error ? error.message : String(error)
+      });
 
       const errorMessage = error instanceof Error ? error.message : 'OAuth callback failed';
 
-      // 디버그 모드에서는 팝업을 닫지 않고 에러 표시
+      // 디버그 모드에서는 에러 표시
       if (isDebugMode) {
         setError(errorMessage);
         setLoading(false);
         return;
       }
 
-      // 팝업 창에서 부모 창으로 에러 메시지 전송
+      // 팝업에서 에러 메시지 전송
       sendMessageToParent('GOOGLE_OAUTH_ERROR', { error: errorMessage });
-      return;
     } finally {
       setLoading(false);
     }
-  }, [searchParams, router, setError, setLoading, sendMessageToParent, sendLogToParent, login]);
+  }, [searchParams, router, setError, setLoading, sendMessageToParent, sendLogToParent, login, isDebugMode]);
 
   useEffect(() => {
     // 즉시 처리 시작

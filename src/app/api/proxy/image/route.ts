@@ -105,6 +105,17 @@ export async function GET(request: NextRequest) {
       'pickcon.co.kr',
       'image.msscdn.net',
       'blogthumb.pstatic.net',
+      // 추가 문제 도메인
+      'image.imnews.imbc.com',
+      'cdn.kstarfashion.com',
+      'scontent-ssn1-1.cdninstagram.com',
+      // 더 많은 한국 뉴스 도메인
+      'img.wowtv.co.kr',
+      'img.tf.co.kr',
+      'cdn.joongdo.co.kr',
+      'img.insight.co.kr',
+      'img.topstarnews.net',
+      'img.asiae.co.kr',
     ];
 
     const url = new URL(imageUrl);
@@ -117,11 +128,26 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Domain not allowed' }, { status: 403 });
     }
 
-    // 이미지 fetch
+    // 이미지 fetch (개선된 헤더와 에러 처리)
     const response = await fetch(imageUrl, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; DecodedApp/1.0)',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'image/webp,image/avif,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+        'Accept-Language': 'ko-KR,ko;q=0.9,en;q=0.8',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'DNT': '1',
+        'Connection': 'keep-alive',
+        'Sec-Fetch-Dest': 'image',
+        'Sec-Fetch-Mode': 'no-cors',
+        'Sec-Fetch-Site': 'cross-site',
+        'sec-ch-ua': '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"Windows"',
+        // Referer 추가 (많은 사이트에서 필요)
+        'Referer': url.origin + '/',
       },
+      // 타임아웃 추가
+      signal: AbortSignal.timeout(15000), // 15초 타임아웃
     });
 
     if (!response.ok) {

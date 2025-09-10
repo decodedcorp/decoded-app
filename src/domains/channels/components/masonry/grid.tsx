@@ -4,20 +4,10 @@ import { gsap } from 'gsap';
 import { ChannelCard } from '@/components/ChannelCard';
 import { Item, MasonryProps } from './types';
 
-// 개발 환경에서만 로그 출력 (성능 최적화)
+// Development logging utility
 const isDev = process.env.NODE_ENV === 'development';
-const log = (message: string, ...args: any[]) => {
-  if (isDev) {
-    console.log(message, ...args);
-  }
-};
-
-// 성능에 민감한 로그는 별도 함수로 분리
-const perfLog = (message: string, ...args: any[]) => {
-  if (isDev && process.env.NODE_ENV === 'development') {
-    console.log(`[PERF] ${message}`, ...args);
-  }
-};
+const log = isDev ? (...args: any[]) => console.log(...args) : () => {};
+const perfLog = isDev ? (msg: string, ...args: any[]) => console.log(`[PERF] ${msg}`, ...args) : () => {};
 
 // SSR-safe useMedia hook
 const useMedia = (queries: string[], values: number[], defaultValue: number): number => {

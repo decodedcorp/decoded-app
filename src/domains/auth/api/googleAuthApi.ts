@@ -49,66 +49,77 @@ export class GoogleAuthApi {
    * Google OAuth 인증 코드를 액세스 토큰으로 교환
    */
   static async exchangeCodeForToken(code: string): Promise<GoogleTokenData> {
-    // 환경에 따른 redirect_uri 설정
-    const getRedirectUri = () => {
-      // 명시적으로 설정된 경우 우선 사용
-      if (process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI) {
-        return process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI;
+    try {
+      // 고정된 redirect_uri 사용 (일관성 보장)
+      const getRedirectUri = () => {
+        if (process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI) {
+          return process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI;
+        }
+        
+        // 서버사이드에서는 Vercel URL 또는 프로덕션 URL 사용
+        if (process.env.VERCEL_URL) {
+          return `https://${process.env.VERCEL_URL}/auth/callback`;
+        }
+        
+        if (process.env.NODE_ENV === 'production') {
+          return 'https://decoded.style/auth/callback';
+        }
+        
+        return 'http://localhost:3000/auth/callback';
+      };
+
+      const redirectUri = getRedirectUri();
+      
+      console.log('[GoogleAuthApi] Token exchange request:', {
+        redirectUri,
+        codeLength: code.length,
+        hasClientId: !!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+        hasClientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
+        timestamp: new Date().toISOString()
+      });
+
+      const tokenRequestBody = new URLSearchParams({
+        code,
+        client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+        redirect_uri: redirectUri,
+        grant_type: 'authorization_code',
+      });
+
+      const tokenResponse = await fetch(this.GOOGLE_TOKEN_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json'
+        },
+        body: tokenRequestBody,
+      });
+
+      const responseText = await tokenResponse.text();
+      
+      if (!tokenResponse.ok) {
+        console.error('[GoogleAuthApi] Token exchange failed:', {
+          status: tokenResponse.status,
+          statusText: tokenResponse.statusText,
+          response: responseText,
+          headers: Object.fromEntries(tokenResponse.headers.entries())
+        });
+        throw new Error(`Google token exchange failed: ${tokenResponse.status} ${tokenResponse.statusText}`);
       }
 
-      // 브라우저 환경에서는 현재 origin 사용
-      if (typeof window !== 'undefined') {
-        return `${window.location.origin}/auth/callback`;
-      }
+      const tokenData = JSON.parse(responseText);
+      
+      console.log('[GoogleAuthApi] Token exchange successful:', {
+        hasAccessToken: !!tokenData.access_token,
+        hasIdToken: !!tokenData.id_token,
+        hasRefreshToken: !!tokenData.refresh_token
+      });
 
-      // 서버 환경에서 환경별 기본값 설정
-      if (process.env.VERCEL_URL) {
-        return `https://${process.env.VERCEL_URL}/auth/callback`;
-      }
-
-      // 프로덕션 환경 기본값
-      if (process.env.NODE_ENV === 'production') {
-        return 'https://decoded.style/auth/callback';
-      }
-
-      // 개발 환경 기본값
-      return 'http://localhost:3000/auth/callback';
-    };
-
-    const redirectUri = getRedirectUri();
-
-    console.log('[GoogleAuthApi] Using redirect URI:', redirectUri);
-    console.log('[GoogleAuthApi] Environment details:', {
-      NODE_ENV: process.env.NODE_ENV,
-      VERCEL_URL: process.env.VERCEL_URL,
-      EXPLICIT_REDIRECT_URI: process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI,
-    });
-
-    const tokenRequestBody = new URLSearchParams({
-      code,
-      client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
-      client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-      redirect_uri: redirectUri,
-      grant_type: 'authorization_code',
-    });
-
-    const tokenRequestHeaders = {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    };
-
-    const tokenResponse = await fetch(this.GOOGLE_TOKEN_URL, {
-      method: 'POST',
-      headers: tokenRequestHeaders,
-      body: tokenRequestBody,
-    });
-
-    if (!tokenResponse.ok) {
-      const errorData = await tokenResponse.text();
-      console.error('Google token exchange error:', errorData);
-      throw new Error('Failed to exchange authorization code');
+      return tokenData;
+    } catch (error) {
+      console.error('[GoogleAuthApi] Token exchange error:', error);
+      throw error;
     }
-
-    return await tokenResponse.json();
   }
 
   /**

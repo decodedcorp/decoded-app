@@ -102,51 +102,45 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
       messageHandledRef.current = false;
 
       const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-
-      // 동적으로 현재 도메인 사용
-      const redirectUri =
-        process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI ||
-        (typeof window !== 'undefined'
-          ? `${window.location.origin}/auth/callback`
-          : 'http://localhost:3000/auth/callback');
-
       if (!clientId) {
         throw new Error('Google Client ID가 설정되지 않았습니다.');
       }
 
-      // 디버그 모드를 위한 파라미터 추가
-      const debugParam = process.env.NODE_ENV === 'development' ? '&debug=true' : '';
+      // 일관성 있는 redirect URI 설정
+      const redirectUri = `${window.location.origin}/auth/callback`;
 
-      const googleAuthUrl =
-        `https://accounts.google.com/o/oauth2/v2/auth?` +
-        `client_id=${clientId}&` +
-        `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-        `response_type=code&` +
-        `scope=${encodeURIComponent('openid email profile')}&` +
-        `access_type=offline&` +
-        `prompt=consent${debugParam}`;
-
-      // 개발 환경에서는 메인 창에서 OAuth 처리, 프로덕션에서는 팝업 사용
+      const googleAuthUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+      googleAuthUrl.searchParams.set('client_id', clientId);
+      googleAuthUrl.searchParams.set('redirect_uri', redirectUri);
+      googleAuthUrl.searchParams.set('response_type', 'code');
+      googleAuthUrl.searchParams.set('scope', 'openid email profile');
+      googleAuthUrl.searchParams.set('access_type', 'offline');
+      googleAuthUrl.searchParams.set('prompt', 'consent');
+      
       if (process.env.NODE_ENV === 'development') {
-        // 개발 환경: 메인 창에서 OAuth 처리 (디버깅 용이)
-        window.location.href = googleAuthUrl;
-      } else {
-        // 프로덕션 환경: 팝업 창에서 OAuth 처리
-        const popup = window.open(
-          googleAuthUrl,
-          'googleOAuth',
-          'width=500,height=600,scrollbars=yes,resizable=yes,menubar=no,toolbar=no,location=no,status=no',
-        );
-
-        if (!popup) {
-          throw new Error('팝업이 차단되었습니다. 팝업 차단을 해제해주세요.');
-        }
-
-        popupRef.current = popup;
-
-        // 팝업 창 포커스
-        popup.focus();
+        googleAuthUrl.searchParams.set('debug', 'true');
       }
+
+      console.log('[LoginForm] Starting Google OAuth:', {
+        clientId: clientId.substring(0, 10) + '...',
+        redirectUri,
+        timestamp: new Date().toISOString()
+      });
+
+      // 팝업 방식으로 통일 (개발/프로덕션 환경 모두)
+      const popup = window.open(
+        googleAuthUrl.toString(),
+        'googleOAuth',
+        'width=500,height=600,scrollbars=yes,resizable=yes,menubar=no,toolbar=no,location=no,status=no'
+      );
+
+      if (!popup) {
+        throw new Error('팝업이 차단되었습니다. 팝업 차단을 해제해주세요.');
+      }
+
+      popupRef.current = popup;
+      popup.focus();
+
     } catch (error) {
       let errorMessage = 'Google 로그인에 실패했습니다.';
 
@@ -158,6 +152,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
         errorMessage = error.message;
       }
 
+      console.error('[LoginForm] Google login error:', errorMessage);
       onError?.(errorMessage);
     }
   };

@@ -2,12 +2,13 @@
 
 import React, { useEffect, useCallback, useRef } from 'react';
 
-import Image from 'next/image';
+import { UltraRobustImage } from '@/components/UltraRobustImage';
 
 import { useImageColor } from './hooks/useImageColor';
 
 interface ChannelImageSectionProps {
   imageUrl: string;
+  downloadedImageUrl?: string; // 다운로드된 이미지 URL 추가
   channelName: string;
   colorShiftOnHover?: boolean;
   onColorExtracted?: (colorData: {
@@ -19,6 +20,7 @@ interface ChannelImageSectionProps {
 
 const ChannelImageSection: React.FC<ChannelImageSectionProps> = ({
   imageUrl,
+  downloadedImageUrl,
   channelName,
   colorShiftOnHover = false,
   onColorExtracted,
@@ -103,47 +105,56 @@ const ChannelImageSection: React.FC<ChannelImageSectionProps> = ({
 
   return (
     <div className="absolute inset-0">
-      {/* Background Image - Next.js Image 사용 */}
-      <Image
-        ref={imgRef}
+      {/* Background Image - Ultra Robust Image 사용 (최강 안정성) */}
+      <UltraRobustImage
+        ref={imgRef as any}
         src={imageUrl}
+        downloadedSrc={downloadedImageUrl}
         alt={channelName}
         fill
-        className="object-cover"
+        className="object-cover transition-opacity duration-300"
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        imageType="preview"
+        quality={95}
+        maxRetries={3}
+        enableDomainRotation={true}
+        enableFormatFallback={true}
+        enableCorsWorkaround={true}
+        customFallbacks={[
+          // 기본 placeholder 이미지들
+          'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800&h=600&fit=crop',
+          'https://via.placeholder.com/800x600/374151/9CA3AF?text=Channel+Image'
+        ]}
+        useNextImage={true}
         onLoad={() => {
           // 이미지 완전 로드 후 색상 추출 (중복 방지)
           if (imgRef.current && !hasExtractedRef.current) {
-            console.log('🖼️ Image loaded, extracting colors...');
-            console.log('🖼️ Image element:', imgRef.current);
-            console.log('🖼️ Image src:', imgRef.current.src);
-            console.log('🖼️ Image currentSrc:', imgRef.current.currentSrc);
-            console.log('🖼️ Image complete:', imgRef.current.complete);
-            console.log('🖼️ Image naturalWidth:', imgRef.current.naturalWidth);
-            console.log('🖼️ Image naturalHeight:', imgRef.current.naturalHeight);
-
+            console.log('🖼️ Ultra robust image loaded, extracting colors...');
+            
             // 색상 추출 실행 (중복 방지를 위해 hasExtractedRef 체크)
             if (!hasExtractedRef.current) {
               hasExtractedRef.current = true; // 즉시 플래그 설정
               extractFromImgEl(imgRef.current)
                 .then((colorData) => {
-                  console.log('🎨 Color extraction completed from onLoad:', colorData);
+                  console.log('🎨 Color extraction completed from ultra robust image:', colorData);
                   // 색상 추출 완료 시 콜백 호출 (null 체크)
                   if (colorData && onColorExtracted) {
                     onColorExtracted(colorData);
                   }
                 })
                 .catch((error) => {
-                  console.error('🎨 Color extraction failed from onLoad:', error);
+                  console.error('🎨 Color extraction failed from ultra robust image:', error);
                   hasExtractedRef.current = false; // 실패 시 플래그 리셋
                 });
             }
-          } else {
-            console.log('🖼️ Color extraction already completed or in progress, skipping...');
           }
         }}
-        onError={() => {
-          console.warn('Failed to load image:', imageUrl);
+        onError={(error) => {
+          console.warn('Ultra robust image failed to load (this should rarely happen):', error);
+          hasExtractedRef.current = false; // 에러 시 플래그 리셋
+        }}
+        onSourceChange={(source) => {
+          console.log('🖼️ Ultra robust image source changed to:', source);
         }}
       />
 
