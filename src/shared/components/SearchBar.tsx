@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocale } from '@/lib/hooks/useLocale';
 
 interface SearchBarProps {
   placeholder?: string;
@@ -8,12 +9,19 @@ interface SearchBarProps {
   className?: string;
 }
 
-export function SearchBar({
-  placeholder = 'Search channels, content...',
-  onSearch,
-  className = '',
-}: SearchBarProps) {
+export function SearchBar({ placeholder, onSearch, className = '' }: SearchBarProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const { t } = useLocale();
+
+  // Placeholder를 state로 관리하여 locale 변경 시 업데이트
+  const [dynamicPlaceholder, setDynamicPlaceholder] = useState(
+    placeholder || t('search.placeholder'),
+  );
+
+  // Locale 변경 시 placeholder 업데이트
+  useEffect(() => {
+    setDynamicPlaceholder(placeholder || t('search.placeholder'));
+  }, [t, placeholder]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,7 +40,7 @@ export function SearchBar({
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={placeholder}
+          placeholder={dynamicPlaceholder}
           className="
             w-full
             px-4 py-2 pl-10

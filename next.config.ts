@@ -1,10 +1,13 @@
 import type { NextConfig } from 'next';
 import '@tailwindcss/postcss';
+import createNextIntlPlugin from 'next-intl/plugin';
 
 // Bundle analyzer 설정
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 });
+
+const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
 
 /** @type {import('next').NextConfig} */
 const nextConfig: NextConfig = {
@@ -61,4 +64,4 @@ const nextConfig: NextConfig = {
   // },
 };
 
-export default withBundleAnalyzer(nextConfig);
+export default withBundleAnalyzer(withNextIntl(nextConfig));

@@ -1749,7 +1749,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formatjs/fast-memoize@npm:2.2.7":
+"@formatjs/fast-memoize@npm:2.2.7, @formatjs/fast-memoize@npm:^2.2.0":
   version: 2.2.7
   resolution: "@formatjs/fast-memoize@npm:2.2.7"
   dependencies:
@@ -1785,6 +1785,15 @@ __metadata:
   dependencies:
     tslib: "npm:^2.8.0"
   checksum: 10c0/bacbedd508519c1bb5ca2620e89dc38f12101be59439aa14aa472b222915b462cb7d679726640f6dcf52a05dd218b5aa27ccd60f2e5010bb96f1d4929848cde0
+  languageName: node
+  linkType: hard
+
+"@formatjs/intl-localematcher@npm:^0.5.4":
+  version: 0.5.10
+  resolution: "@formatjs/intl-localematcher@npm:0.5.10"
+  dependencies:
+    tslib: "npm:2"
+  checksum: 10c0/362ec83aca9382165be575f1cefa477478339e6fead8ca8866185ce6e58427ea1487a811b12c73d1bcfa99fd4db0c24543b35c823451839f585576bfccb8c9cc
   languageName: node
   linkType: hard
 
@@ -3462,6 +3471,13 @@ __metadata:
   version: 1.12.0
   resolution: "@rushstack/eslint-patch@npm:1.12.0"
   checksum: 10c0/1e567656d92632c085a446f40767bc451caffe1131e8d6a7a3e8f3e3f4167f5f29744a84c709f2440f299442d4bc68ff773784462166800b8c09c0e08042415b
+  languageName: node
+  linkType: hard
+
+"@schummar/icu-type-parser@npm:1.21.5":
+  version: 1.21.5
+  resolution: "@schummar/icu-type-parser@npm:1.21.5"
+  checksum: 10c0/8c2bdb2087b2aeaafb484afefcc5291b21a7179fb92429cabc5f6b46019c6dedbeac6025b1a8f08e8749fb963f8a011e0ccba340ca3761f3c2348aac4b667c2c
   languageName: node
   linkType: hard
 
@@ -5405,6 +5421,7 @@ __metadata:
     matter-js: "npm:^0.20.0"
     next: "npm:^15.4.1"
     next-i18next: "npm:^15.4.2"
+    next-intl: "npm:^4.3.7"
     openapi-typescript-codegen: "npm:^0.29.0"
     playwright: "npm:^1.55.0"
     postcss: "npm:^8.5.6"
@@ -6982,7 +6999,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"intl-messageformat@npm:^10.5.3":
+"intl-messageformat@npm:^10.5.14, intl-messageformat@npm:^10.5.3":
   version: 10.7.16
   resolution: "intl-messageformat@npm:10.7.16"
   dependencies:
@@ -8126,6 +8143,24 @@ __metadata:
     react: ">= 17.0.2"
     react-i18next: ">= 13.5.0"
   checksum: 10c0/161ce6fa3740aa9d89a4d7ee583124c39c12db3812d40e4e7b5184922ad7387d2d219131338037481d8f5dea8c7b828013bdc313dfc42d681af5679d7c67d59d
+  languageName: node
+  linkType: hard
+
+"next-intl@npm:^4.3.7":
+  version: 4.3.7
+  resolution: "next-intl@npm:4.3.7"
+  dependencies:
+    "@formatjs/intl-localematcher": "npm:^0.5.4"
+    negotiator: "npm:^1.0.0"
+    use-intl: "npm:^4.3.7"
+  peerDependencies:
+    next: ^12.0.0 || ^13.0.0 || ^14.0.0 || ^15.0.0
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || >=19.0.0-rc <19.0.0 || ^19.0.0
+    typescript: ^5.0.0
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 10c0/00a2df0622f8f6474778ceefbb5e119459ab91a9d586abd94cbbd831affb187117689181eddc45ecedb1f1967ef2215485334b9eb6a039ad22a92ce6447cc738
   languageName: node
   linkType: hard
 
@@ -9846,7 +9881,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.0.0, tslib@npm:^2.0.1, tslib@npm:^2.0.3, tslib@npm:^2.1.0, tslib@npm:^2.4.0, tslib@npm:^2.8.0":
+"tslib@npm:2, tslib@npm:^2.0.0, tslib@npm:^2.0.1, tslib@npm:^2.0.3, tslib@npm:^2.1.0, tslib@npm:^2.4.0, tslib@npm:^2.8.0":
   version: 2.8.1
   resolution: "tslib@npm:2.8.1"
   checksum: 10c0/9c4759110a19c53f992d9aae23aac5ced636e99887b51b9e61def52611732872ff7668757d4e4c61f19691e36f4da981cd9485e869b4a7408d689f6bf1f14e62
@@ -10158,6 +10193,19 @@ __metadata:
     "@types/react":
       optional: true
   checksum: 10c0/f887488c6e6075cdad4962979da1714b217bcb1ee009a9e57ce9a844bcfc4c3a99e93983dfc2e5af9e0913824d24e730090ff255e902c516dcb58d2d3837e01c
+  languageName: node
+  linkType: hard
+
+"use-intl@npm:^4.3.7":
+  version: 4.3.7
+  resolution: "use-intl@npm:4.3.7"
+  dependencies:
+    "@formatjs/fast-memoize": "npm:^2.2.0"
+    "@schummar/icu-type-parser": "npm:1.21.5"
+    intl-messageformat: "npm:^10.5.14"
+  peerDependencies:
+    react: ^17.0.0 || ^18.0.0 || >=19.0.0-rc <19.0.0 || ^19.0.0
+  checksum: 10c0/d98caa7d0a55eea323a9403dbf32e6d3aebbb1e666ca6e76ba5a755e5838d3262177dbe49474c8c5dd6df752a529ca35f85a9aabd8eb5a6508330c9c9a38adeb
   languageName: node
   linkType: hard
 

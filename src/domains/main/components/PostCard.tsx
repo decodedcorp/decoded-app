@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Camera, Video, Link, FileText, MessageCircle, Share, Bookmark, Pin } from 'lucide-react';
 
-interface PostCardProps {
+export interface PostCardProps {
   id: number;
   title: string;
   description?: string;
@@ -20,6 +20,7 @@ interface PostCardProps {
   comments: number;
   thumbnail?: string | null;
   contentType: 'text' | 'image' | 'video' | 'link';
+  badge?: string | null;
   onPostClick?: () => void;
   onChannelClick?: (channelId: string, channel: string) => void;
   onAuthorClick?: (authorId: string, author: string) => void;
@@ -119,6 +120,7 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
   comments,
   thumbnail,
   contentType,
+  badge,
   onPostClick,
   onChannelClick,
   onAuthorClick,
@@ -285,13 +287,19 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
 
           {/* 이미지 (있는 경우) */}
           {thumbnail && (
-            <div className="mb-4">
+            <div className="mb-4 relative">
               <ThumbnailImage
                 src={thumbnail}
                 alt={title}
                 getContentIcon={getContentIcon}
                 getContentTypeColor={getContentTypeColor}
               />
+              {/* 배지 */}
+              {badge && (
+                <div className="absolute top-2 right-2 bg-[#eafd66] text-black text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                  {badge}
+                </div>
+              )}
             </div>
           )}
         </div>

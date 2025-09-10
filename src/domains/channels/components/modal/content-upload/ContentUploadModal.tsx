@@ -75,6 +75,9 @@ export function ContentUploadModal() {
       });
 
       console.log('Cache invalidated successfully');
+
+      // 콘텐츠 업로드 완료 후 모달 닫기
+      closeModal();
     } catch (error) {
       console.error('Failed to invalidate cache:', error);
     }

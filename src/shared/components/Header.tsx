@@ -3,6 +3,8 @@
 import { useEffect, useState, memo, useMemo, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
+// import { useTranslations } from 'next-intl';
+import { useLocale } from '@/lib/hooks/useLocale';
 
 import { useScrollDirection } from '@/lib/hooks/useScrollDirection';
 import { useChannel } from '@/domains/channels/hooks/useChannels';
@@ -17,6 +19,7 @@ import { GlobalSearchBar } from './GlobalSearchBar';
 export const Header = memo(function Header() {
   const pathname = usePathname();
   const router = useRouter();
+  const { t } = useLocale();
   const { scrollDirection, isScrolled, isAtTop } = useScrollDirection({
     threshold: 15,
     debounceMs: 10,
@@ -44,9 +47,8 @@ export const Header = memo(function Header() {
   );
 
   // 채널 데이터 가져오기 - 조건부로만 실행
-  const { data: channelData } = useChannel(channelId || '', {
-    enabled: !!channelId, // 채널 ID가 있을 때만 실행
-  });
+  const channelQuery = useChannel(channelId || '');
+  const channelData = channelQuery.data;
 
   // 채널명 결정 - useMemo로 최적화
   const channelName = useMemo(() => channelData?.name || channelId, [channelData?.name, channelId]);
@@ -131,7 +133,7 @@ export const Header = memo(function Header() {
             window.dispatchEvent(event);
           }}
           className="lg:hidden p-2 rounded-lg bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 transition-colors"
-          aria-label="Open menu"
+          aria-label={t('header.openMenu')}
         >
           <svg
             className="w-5 h-5 text-zinc-300"
@@ -176,7 +178,7 @@ export const Header = memo(function Header() {
           <button
             onClick={() => setIsMobileSearchOpen(true)}
             className="md:hidden p-2 text-white hover:text-[#eafd66] transition-colors"
-            aria-label="Open search"
+            aria-label={t('header.openSearch')}
           >
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
               <path
@@ -210,7 +212,7 @@ export const Header = memo(function Header() {
             <button
               onClick={() => setIsMobileSearchOpen(false)}
               className="p-2 text-zinc-400 hover:text-white transition-colors"
-              aria-label="Close search"
+              aria-label={t('header.closeSearch')}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path

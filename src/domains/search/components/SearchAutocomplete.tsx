@@ -2,6 +2,7 @@
 
 import React, { useCallback, useMemo, useRef, useEffect } from 'react';
 import { clsx } from 'clsx';
+import { useLocale } from '@/lib/hooks/useLocale';
 import { ProxiedImage } from '../../../components/ProxiedImage';
 import { useSearchAutocomplete, type AutocompleteItem } from '../hooks/useSearchAutocomplete';
 
@@ -154,6 +155,7 @@ export const SearchAutocomplete = React.memo(
   }: SearchAutocompleteProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+    const { t } = useLocale();
 
     const { results, groupedResults, isLoading, error, hasResults } = useSearchAutocomplete({
       query,
@@ -243,7 +245,7 @@ export const SearchAutocomplete = React.memo(
           <div className="flex items-center justify-center py-8">
             <div className="flex items-center gap-2 text-zinc-400">
               <div className="w-4 h-4 border-2 border-zinc-400 border-t-transparent rounded-full animate-spin" />
-              <span className="text-sm">Searching...</span>
+              <span className="text-sm">{t('search.searching')}</span>
             </div>
           </div>
         </div>
@@ -261,7 +263,7 @@ export const SearchAutocomplete = React.memo(
           )}
         >
           <div className="flex items-center justify-center py-8">
-            <div className="text-red-400 text-sm">Search error occurred. Please try again.</div>
+            <div className="text-red-400 text-sm">{t('search.searchErrorOccurred')}</div>
           </div>
         </div>
       );
@@ -278,7 +280,7 @@ export const SearchAutocomplete = React.memo(
           )}
         >
           <div className="flex items-center justify-center py-8">
-            <div className="text-zinc-400 text-sm">No results found for "{query}"</div>
+            <div className="text-zinc-400 text-sm">{t('search.noResultsFound', { query })}</div>
           </div>
         </div>
       );
@@ -302,7 +304,7 @@ export const SearchAutocomplete = React.memo(
               id="channels-heading"
               className="px-4 py-2 text-xs font-semibold text-zinc-500 uppercase tracking-wide bg-zinc-900/50"
             >
-              Channels
+              {t('search.channels')}
             </div>
             {groupedResults.channels.map((item, index) => {
               const resultIndex = results.indexOf(item);
@@ -341,7 +343,7 @@ export const SearchAutocomplete = React.memo(
               id="contents-heading"
               className="px-4 py-2 text-xs font-semibold text-zinc-500 uppercase tracking-wide bg-zinc-900/50"
             >
-              Content
+              {t('search.content')}
             </div>
             {groupedResults.contents
               .slice(0, maxResults - groupedResults.channels.length)
@@ -377,7 +379,7 @@ export const SearchAutocomplete = React.memo(
           <div className="border-t border-zinc-700/50 px-4 py-2">
             <div className="flex items-center gap-2 text-zinc-400 text-xs">
               <div className="w-3 h-3 border border-zinc-400 border-t-transparent rounded-full animate-spin" />
-              <span>Loading more...</span>
+              <span>{t('search.loadingMore')}</span>
             </div>
           </div>
         )}
