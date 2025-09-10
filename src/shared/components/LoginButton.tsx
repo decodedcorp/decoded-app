@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
@@ -28,6 +28,19 @@ export function LoginButton() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // 디버깅을 위한 로그
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[LoginButton] State update:', {
+        mounted,
+        isAuthenticated,
+        isLoading,
+        isInitialized,
+        user: user ? { doc_id: user.doc_id, email: user.email, nickname: user.nickname } : null,
+      });
+    }
+  }, [mounted, isAuthenticated, isLoading, isInitialized, user]);
 
   const handleClick = () => {
     if (isAuthenticated) {
@@ -62,11 +75,11 @@ export function LoginButton() {
     );
   }
 
-  // 로딩 중이거나 아직 초기화되지 않았을 때는 버튼을 비활성화
-  if (isLoading || !isInitialized) {
+  // 초기화되지 않았거나 로딩 중일 때는 로딩 상태 표시
+  if (!isInitialized || isLoading) {
     return (
-      <Button disabled size="sm" loading={isLoading}>
-        {isLoading ? 'Loading...' : 'Initializing...'}
+      <Button disabled size="sm" loading={isLoading || !isInitialized}>
+        Loading...
       </Button>
     );
   }

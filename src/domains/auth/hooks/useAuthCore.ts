@@ -56,6 +56,31 @@ export const useAuthCore = () => {
     refetchOnReconnect: false,
   });
 
+  // 쿼리가 비활성화된 경우 로딩 상태를 false로 설정
+  const isQueryEnabled =
+    isAuthenticated() &&
+    !!getValidAccessToken() &&
+    !!docId &&
+    authStore.isInitialized &&
+    !authStore.isLoggingOut;
+
+  const actualIsProfileLoading = isQueryEnabled ? isProfileLoading : false;
+
+  // 디버깅을 위한 로깅
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[useAuthCore] Loading state check:', {
+      isAuthenticated: isAuthenticated(),
+      hasValidToken: !!getValidAccessToken(),
+      hasDocId: !!docId,
+      isInitialized: authStore.isInitialized,
+      isLoggingOut: authStore.isLoggingOut,
+      isQueryEnabled,
+      isProfileLoading,
+      actualIsProfileLoading,
+      storeLoading: authStore.isLoading,
+    });
+  }
+
   return {
     // Store state
     user: authStore.user,
@@ -67,7 +92,7 @@ export const useAuthCore = () => {
     authStatus: null, // checkAuthStatus 제거됨
     userProfile,
     isAuthLoading: false, // checkAuthStatus 제거됨
-    isProfileLoading,
+    isProfileLoading: actualIsProfileLoading,
     authError: null, // checkAuthStatus 제거됨
     profileError,
 

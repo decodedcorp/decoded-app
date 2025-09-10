@@ -13,6 +13,7 @@ import { LoadingState, ErrorState, EmptyState } from '../common/LoadingStates';
 import { useChannels } from '../../hooks/useChannels';
 import { useChannelModalStore } from '../../../../store/channelModalStore';
 import { ChannelResponse } from '../../../../api/generated/models/ChannelResponse';
+import { useChannelTranslation } from '../../../../lib/i18n/hooks';
 
 interface ChannelMainContentProps {
   className?: string;
@@ -28,6 +29,9 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
     sortOrder: 'desc',
   });
 
+  // Translation hooks
+  const { states } = useChannelTranslation();
+  
   // 채널 모달 스토어
   const openChannelModal = useChannelModalStore((state) => state.openModal);
 
@@ -65,7 +69,7 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
   if (isLoading) {
     return (
       <div className={`relative h-full overflow-y-auto ${className}`}>
-        <LoadingState title="큐레이터들을 찾는 중..." />
+        <LoadingState title={states.searching()} />
       </div>
     );
   }
@@ -75,8 +79,8 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
     return (
       <div className={`relative h-full overflow-y-auto ${className}`}>
         <ErrorState
-          title="큐레이터 정보를 불러올 수 없습니다"
-          subtitle="잠시 후 다시 시도해 주세요"
+          title={states.loadError()}
+          subtitle={states.loadErrorSubtitle()}
         />
       </div>
     );
@@ -86,7 +90,7 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
   if (!channels.length) {
     return (
       <div className={`relative h-full overflow-y-auto ${className}`}>
-        <EmptyState title="등록된 큐레이터가 없습니다" subtitle="새로운 채널을 추가해보세요" />
+        <EmptyState title={states.empty()} subtitle={states.emptySubtitle()} />
       </div>
     );
   }

@@ -187,6 +187,18 @@ export async function POST(request: NextRequest) {
       hasAccessToken: !!finalResponse.access_token,
       hasUser: !!finalResponse.user,
       tokenType: finalResponse.token_type,
+      isFallback: useFallback,
+      accessTokenStructure: finalResponse.access_token
+        ? {
+            hasAccessToken: !!finalResponse.access_token.access_token,
+            accessTokenLength: finalResponse.access_token.access_token?.length || 0,
+            accessTokenPreview:
+              finalResponse.access_token.access_token?.substring(0, 20) + '...' || 'none',
+            hasSalt: !!finalResponse.access_token.salt,
+            hasUserDocId: !!finalResponse.access_token.user_doc_id,
+            hasSuiAddress: !!finalResponse.access_token.has_sui_address,
+          }
+        : null,
     });
 
     return NextResponse.json(finalResponse);

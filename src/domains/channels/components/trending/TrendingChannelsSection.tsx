@@ -51,8 +51,8 @@ export function TrendingChannelsSection({ className = '' }: TrendingChannelsSect
     <section className={`${className}`}>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-400 mb-2">인기 채널</h2>
-          <p className="text-zinc-500 text-sm">가장 활발하고 주목받는 채널들</p>
+          <h2 className="text-2xl font-bold text-gray-400 mb-2">{trending.title()}</h2>
+          <p className="text-zinc-500 text-sm">{trending.subtitle()}</p>
         </div>
         
         {/* Popular/Trending Toggle */}

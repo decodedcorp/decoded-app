@@ -8,6 +8,7 @@ import { DEFAULT_CHANNEL_ID } from '../data/channelCardsProvider';
 import { useContentModalStore } from '@/store/contentModalStore';
 import { useContentSidebarStore } from '@/store/contentSidebarStore';
 import { ContentsCard } from '@/components/ContentsCard';
+import { useContentTranslation } from '@/lib/i18n/hooks';
 
 export function SimpleThiingsGrid({
   className = '',
@@ -16,6 +17,8 @@ export function SimpleThiingsGrid({
   className?: string;
   channelId?: string;
 }) {
+  const { states } = useContentTranslation();
+  
   // 채널 콘텐츠 데이터 로드 - 실제 API 사용
   const { cards, isLoading, isError, error, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useChannelContents({
@@ -304,7 +307,7 @@ export function SimpleThiingsGrid({
       <div className="w-full h-screen bg-black flex items-center justify-center">
         <div className="text-white text-center">
           <div className="animate-spin w-12 h-12 border-2 border-white border-t-transparent rounded-full mx-auto mb-4" />
-          <p>카드 로딩 중...</p>
+          <p>{states.cardLoading()}</p>
         </div>
       </div>
     ),
@@ -316,7 +319,7 @@ export function SimpleThiingsGrid({
     () => (
       <div className="w-full h-screen bg-black flex items-center justify-center">
         <div className="text-red-400 text-center">
-          <h2 className="text-xl font-semibold mb-2">로딩 실패</h2>
+          <h2 className="text-xl font-semibold mb-2">{states.loadingFailed()}</h2>
           <p className="text-sm opacity-80">{error?.message}</p>
         </div>
       </div>

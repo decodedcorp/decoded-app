@@ -82,6 +82,19 @@ export const useAuthTranslation = () => {
     },
     status: {
       checking: () => t('status.checking'),
+      signedIn: () => t('status.signedIn'),
+      loginRequired: () => t('status.loginRequired'),
+      error: (message: string) => t('status.error', { message }),
+    },
+    fields: {
+      name: () => t('fields.name'),
+      email: () => t('fields.email'),
+      role: () => t('fields.role'),
+    },
+    permissions: {
+      userPermission: () => t('permissions.userPermission'),
+      adminRole: () => t('permissions.adminRole'),
+      regularUser: () => t('permissions.regularUser'),
     },
   };
 };
@@ -196,6 +209,11 @@ export const useChannelTranslation = () => {
       loadError: () => t('sidebar.loadError'),
       viewMoreChannels: () => t('sidebar.viewMoreChannels'),
     },
+    test: {
+      modalTitle: () => t('test.modalTitle'),
+      openModal: () => t('test.openModal'),
+      example: () => t('test.example'),
+    },
   };
 };
 
@@ -212,6 +230,8 @@ export const useContentTranslation = () => {
     },
     states: {
       loading: () => t('states.loading'),
+      cardLoading: () => t('states.cardLoading'),
+      loadingFailed: () => t('states.loadingFailed'),
       empty: () => t('states.empty'),
       error: () => t('states.error'),
       errorSubtitle: () => t('states.errorSubtitle'),
@@ -298,6 +318,54 @@ export const useImageTranslation = () => {
         over2MB: () => t('validation.reasons.over2MB'),
         over4MB: () => t('validation.reasons.over4MB'),
       },
+    },
+  };
+};
+
+export const useFormsTranslation = () => {
+  const { t } = useTranslation('forms');
+
+  return {
+    validation: {
+      required: () => t('validation.required'),
+      invalidFormat: () => t('validation.invalidFormat'),
+      tooLong: () => t('validation.tooLong'),
+      tooShort: () => t('validation.tooShort'),
+      minimumLength: (min: number) => t('validation.minimumLength', { min }),
+      maximumLength: (max: number) => t('validation.maximumLength', { max }),
+    },
+    placeholders: {
+      name: () => t('placeholders.name'),
+      email: () => t('placeholders.email'),
+      title: () => t('placeholders.title'),
+      description: () => t('placeholders.description'),
+      search: () => t('placeholders.search'),
+    },
+    buttons: {
+      submit: () => t('buttons.submit'),
+      save: () => t('buttons.save'),
+      cancel: () => t('buttons.cancel'),
+      upload: () => t('buttons.upload'),
+    },
+    states: {
+      submitting: () => t('states.submitting'),
+      saving: () => t('states.saving'),
+      loading: () => t('states.loading'),
+      success: () => t('states.success'),
+      error: () => t('states.error'),
+    },
+    file: {
+      select: () => t('file.select'),
+      dragDrop: () => t('file.dragDrop'),
+      uploading: (progress: number) => t('file.uploading', { progress }),
+      uploadSuccess: () => t('file.uploadSuccess'),
+      uploadError: () => t('file.uploadError'),
+    },
+    media: {
+      uploadBanner: () => t('media.uploadBanner'),
+      uploadThumbnail: () => t('media.uploadThumbnail'),
+      bannerPreview: () => t('media.bannerPreview'),
+      thumbnailPreview: () => t('media.thumbnailPreview'),
     },
   };
 };

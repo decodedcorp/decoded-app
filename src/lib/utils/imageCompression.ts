@@ -31,7 +31,7 @@ export const compressImage = async (
 
   // If file is already small enough, return as-is
   if (file.size <= maxSizeBytes) {
-    return fileToBase64(file);
+    return fileToBase64(file, includeDataPrefix);
   }
 
   return new Promise((resolve, reject) => {

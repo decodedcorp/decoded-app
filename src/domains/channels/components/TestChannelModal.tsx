@@ -4,9 +4,11 @@ import React, { useState } from 'react';
 import { Button } from '@decoded/ui';
 
 import { useChannelModalStore } from '@/store/channelModalStore';
+import { useChannelTranslation } from '../../../lib/i18n/hooks';
 
 export function TestChannelModal() {
   const [channelId, setChannelId] = useState('');
+  const { placeholders, test } = useChannelTranslation();
   const openModalById = useChannelModalStore((state) => state.openModalById);
 
   const handleOpenModal = () => {
@@ -17,13 +19,13 @@ export function TestChannelModal() {
 
   return (
     <div className="fixed top-4 right-4 z-50 bg-white p-4 rounded-lg shadow-lg border">
-      <h3 className="text-sm font-semibold mb-2">채널 모달 테스트</h3>
+      <h3 className="text-sm font-semibold mb-2">{test.modalTitle()}</h3>
       <div className="flex gap-2">
         <input
           type="text"
           value={channelId}
           onChange={(e) => setChannelId(e.target.value)}
-          placeholder="채널 ID 입력"
+          placeholder={placeholders.channelId()}
           className="px-2 py-1 text-sm border rounded"
         />
         <Button
@@ -31,10 +33,10 @@ export function TestChannelModal() {
           variant="primary"
           size="sm"
         >
-          모달 열기
+          {test.openModal()}
         </Button>
       </div>
-      <p className="text-xs text-gray-500 mt-1">예: test-channel-1, demo-channel-2</p>
+      <p className="text-xs text-gray-500 mt-1">{test.example()}</p>
     </div>
   );
 }

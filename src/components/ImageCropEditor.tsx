@@ -218,7 +218,7 @@ export const ImageCropEditor = React.memo(
       ctx.translate(width / 2, height / 2);
       ctx.rotate((rotation * Math.PI) / 180);
       ctx.scale(scale, scale);
-      
+
       // 원본 이미지에서 크롭 영역을 정확히 추출
       ctx.drawImage(
         imgRef.current,
@@ -285,7 +285,7 @@ export const ImageCropEditor = React.memo(
       ctx.translate(width / 2, height / 2);
       ctx.rotate((rotation * Math.PI) / 180);
       ctx.scale(scale, scale);
-      
+
       // 원본 이미지에서 크롭 영역을 정확히 추출
       ctx.drawImage(
         imgRef.current,
