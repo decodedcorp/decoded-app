@@ -137,13 +137,13 @@ export async function POST(request: NextRequest) {
       console.warn('[Google OAuth API] Backend login failed, using fallback:', error);
       useFallback = true;
 
-      // Fallback: 임시 사용자 세션 생성
+      // Fallback: 임시 사용자 세션 생성 (실제 JWT 토큰 사용)
       const fallbackUserId = `temp_${sub}_${Date.now()}`;
       backendData = {
         access_token: {
           salt: 'fallback_salt',
           user_doc_id: fallbackUserId,
-          access_token: `temp_token_${fallbackUserId}`,
+          access_token: id_token, // 실제 JWT 토큰 사용
           has_sui_address: true,
         },
         token_type: 'oauth',

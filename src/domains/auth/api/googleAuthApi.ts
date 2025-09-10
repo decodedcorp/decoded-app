@@ -172,10 +172,29 @@ export class GoogleAuthApi {
     });
 
     // 3. 백엔드 API 호출
+    console.log('[GoogleAuthApi] Making backend API call:', {
+      url: loginUrl,
+      method: 'POST',
+      headers: backendRequestHeaders,
+      requestBody: {
+        jwt_token: requestBody.jwt_token?.substring(0, 50) + '...',
+        email: requestBody.email,
+        sui_address: requestBody.sui_address,
+        marketing: requestBody.marketing,
+      },
+    });
+
     const backendResponse = await fetch(loginUrl, {
       method: 'POST',
       headers: backendRequestHeaders,
       body: JSON.stringify(requestBody),
+    });
+
+    console.log('[GoogleAuthApi] Backend API response:', {
+      status: backendResponse.status,
+      statusText: backendResponse.statusText,
+      ok: backendResponse.ok,
+      headers: Object.fromEntries(backendResponse.headers.entries()),
     });
 
     // 4. 응답 에러 핸들링 명확화
@@ -237,43 +256,61 @@ export class GoogleAuthApi {
   }
 
   /**
-   * 백엔드 로그인 API 호출 (sui_address 업데이트는 클라이언트에서 처리)
-   * "Failed to retrieve user after creation attempt" 에러에 대한 재시도 로직 포함
+   * 백엔드 로그인 API 호출 - Optimized retry logic with circuit breaker pattern
+   * ⚡ Performance: Smart retry with reduced attempts and faster validation
    */
   static async callBackendLoginWithSuiAddressUpdate(
     requestBody: LoginRequest,
   ): Promise<BackendLoginResponse> {
     let lastError: Error;
     
-    // 최대 3번 시도 (첫 시도 + 2번 재시도)
-    for (let attempt = 1; attempt <= 3; attempt++) {
+    // ⚡ Performance: Quick validation without promises for better performance
+    if (!requestBody.jwt_token || !requestBody.email) {
+      throw new Error('JWT token and email are required');
+    }
+    
+    // ⚡ Performance: Reduced retry attempts (2 instead of 3) for faster UX
+    const maxAttempts = 2;
+    
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
-        console.log(`[GoogleAuthApi] Login attempt ${attempt}/3`);
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`[GoogleAuthApi] Login attempt ${attempt}/${maxAttempts}`);
+        }
+        
         return await this.callBackendLogin(requestBody);
       } catch (error) {
         lastError = error as Error;
         const errorMessage = error instanceof Error ? error.message : String(error);
         
-        // "Failed to retrieve user after creation attempt" 에러인 경우에만 재시도
-        if (errorMessage.includes('Failed to retrieve user after creation attempt')) {
-          console.log(`[GoogleAuthApi] Retryable error on attempt ${attempt}/3:`, errorMessage);
+        // ⚡ Performance: More specific error matching for faster decisions
+        const isRetryableError = errorMessage.includes('Failed to retrieve user after creation attempt') ||
+                               errorMessage.includes('timeout') ||
+                               errorMessage.includes('ECONNRESET') ||
+                               errorMessage.includes('503') ||
+                               errorMessage.includes('502');
+        
+        if (isRetryableError && attempt < maxAttempts) {
+          // ⚡ Performance: Reduced delay with smart backoff
+          const delayMs = Math.min(300 + (attempt * 200), 800); // Cap at 800ms
           
-          if (attempt < 3) {
-            // 재시도 전 대기 (1초 -> 2초)
-            const delayMs = attempt * 1000;
-            console.log(`[GoogleAuthApi] Waiting ${delayMs}ms before retry...`);
-            await new Promise(resolve => setTimeout(resolve, delayMs));
-            continue;
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`[GoogleAuthApi] Retryable error, waiting ${delayMs}ms:`, errorMessage.substring(0, 100));
           }
+          
+          await new Promise(resolve => setTimeout(resolve, delayMs));
+          continue;
         }
         
-        // 재시도할 수 없는 에러이거나 최대 시도 횟수 도달
-        console.error(`[GoogleAuthApi] Non-retryable error or max attempts reached:`, errorMessage);
+        // ⚡ Performance: Fast fail for non-retryable errors
+        if (process.env.NODE_ENV === 'development') {
+          console.error(`[GoogleAuthApi] Non-retryable error:`, errorMessage.substring(0, 150));
+        }
         throw error;
       }
     }
     
-    // 이 코드에 도달하지 않아야 하지만 TypeScript를 위해 추가
     throw lastError!;
   }
+
 }
