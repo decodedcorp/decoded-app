@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
-import { X, Camera, Edit3 } from 'lucide-react';
+import { X, Camera } from 'lucide-react';
 import { Button } from '@decoded/ui';
-import { ImageCropEditor } from '@/components/ImageCropEditor';
 
 import {
   useAddChannelStore,
@@ -41,10 +40,6 @@ export function AddChannelForm({ onSubmit, isLoading, error }: AddChannelFormPro
     thumbnail?: string;
     banner?: string;
   }>({});
-  const [editingImage, setEditingImage] = useState<{
-    type: 'thumbnail' | 'banner';
-    src: string;
-  } | null>(null);
 
   const handleInputChange = (field: 'name' | 'description', value: string) => {
     updateFormData({ [field]: value });
@@ -142,62 +137,6 @@ export function AddChannelForm({ onSubmit, isLoading, error }: AddChannelFormPro
     const inputRef = type === 'thumbnail' ? thumbnailInputRef : bannerInputRef;
     if (inputRef.current) {
       inputRef.current.value = '';
-    }
-  };
-
-  const handleEditImage = (type: 'thumbnail' | 'banner') => {
-    const src = formData[`${type}_base64`];
-    if (src) {
-      // data: prefix가 없으면 추가
-      const imageSrc = src.startsWith('data:') ? src : `data:image/jpeg;base64,${src}`;
-      setEditingImage({ type, src: imageSrc });
-    }
-  };
-
-  const handleSaveEditedImage = async (editedBase64: string) => {
-    if (!editingImage) return;
-
-    try {
-      // 기존 압축 로직 적용
-      const compressionOptions =
-        editingImage.type === 'thumbnail'
-          ? {
-              maxSizeBytes: 500 * 1024, // 500KB
-              maxWidth: 800,
-              maxHeight: 800,
-              quality: 0.8,
-              format: 'jpeg' as const,
-              includeDataPrefix: true,
-            }
-          : {
-              maxSizeBytes: 800 * 1024, // 800KB for banner
-              maxWidth: 1200,
-              maxHeight: 400,
-              quality: 0.85,
-              format: 'jpeg' as const,
-              includeDataPrefix: true,
-            };
-
-      // Base64를 File 객체로 변환 후 압축
-      const base64Data = editedBase64.replace(/^data:image\/[a-z]+;base64,/, '');
-      const byteCharacters = atob(base64Data);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(byteNumbers);
-      const file = new File([byteArray], 'edited-image.jpg', { type: 'image/jpeg' });
-
-      const compressed = await compressImage(file, compressionOptions);
-
-      updateFormData({ [`${editingImage.type}_base64`]: compressed });
-      setEditingImage(null);
-    } catch (error) {
-      console.error('Failed to save edited image:', error);
-      setValidationErrors((prev) => ({
-        ...prev,
-        [editingImage.type]: 'Failed to save edited image',
-      }));
     }
   };
 
@@ -301,7 +240,7 @@ export function AddChannelForm({ onSubmit, isLoading, error }: AddChannelFormPro
 
         {formData.thumbnail_base64 ? (
           <div className="space-y-3">
-            <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-zinc-700 group">
+            <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-zinc-700">
               <img
                 src={
                   formData.thumbnail_base64?.startsWith('data:')
@@ -317,33 +256,18 @@ export function AddChannelForm({ onSubmit, isLoading, error }: AddChannelFormPro
                   handleRemoveImage('thumbnail');
                 }}
               />
-
-              {/* 편집 및 삭제 버튼 */}
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                <Button
-                  type="button"
-                  onClick={() => handleEditImage('thumbnail')}
-                  variant="secondary"
-                  size="sm"
-                  className="text-xs"
-                  disabled={isLoading}
-                >
-                  <Edit3 className="w-3 h-3 mr-1" />
-                  편집
-                </Button>
-                <Button
-                  type="button"
-                  onClick={() => handleRemoveImage('thumbnail')}
-                  variant="destructive"
-                  size="sm"
-                  className="w-8 h-8 rounded-full p-0"
-                  disabled={isLoading}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
+              <Button
+                type="button"
+                onClick={() => handleRemoveImage('thumbnail')}
+                variant="destructive"
+                size="sm"
+                className="absolute top-2 right-2 w-8 h-8 rounded-full p-0"
+                disabled={isLoading}
+              >
+                <X className="w-4 h-4" />
+              </Button>
             </div>
-            <p className="text-sm text-zinc-400">마우스를 올리면 편집/삭제 버튼이 나타납니다</p>
+            <p className="text-sm text-zinc-400">Click the X button to remove the image</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -383,7 +307,7 @@ export function AddChannelForm({ onSubmit, isLoading, error }: AddChannelFormPro
 
         {formData.banner_base64 ? (
           <div className="space-y-3">
-            <div className="relative w-full h-32 rounded-lg overflow-hidden border border-zinc-700 group">
+            <div className="relative w-full h-32 rounded-lg overflow-hidden border border-zinc-700">
               <img
                 src={
                   formData.banner_base64?.startsWith('data:')
@@ -399,33 +323,18 @@ export function AddChannelForm({ onSubmit, isLoading, error }: AddChannelFormPro
                   handleRemoveImage('banner');
                 }}
               />
-
-              {/* 편집 및 삭제 버튼 */}
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                <Button
-                  type="button"
-                  onClick={() => handleEditImage('banner')}
-                  variant="secondary"
-                  size="sm"
-                  className="text-xs"
-                  disabled={isLoading}
-                >
-                  <Edit3 className="w-3 h-3 mr-1" />
-                  편집
-                </Button>
-                <Button
-                  type="button"
-                  onClick={() => handleRemoveImage('banner')}
-                  variant="destructive"
-                  size="sm"
-                  className="w-8 h-8 rounded-full p-0"
-                  disabled={isLoading}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
+              <Button
+                type="button"
+                onClick={() => handleRemoveImage('banner')}
+                variant="destructive"
+                size="sm"
+                className="absolute top-2 right-2 w-8 h-8 rounded-full p-0"
+                disabled={isLoading}
+              >
+                <X className="w-4 h-4" />
+              </Button>
             </div>
-            <p className="text-sm text-zinc-400">마우스를 올리면 편집/삭제 버튼이 나타납니다</p>
+            <p className="text-sm text-zinc-400">Click the X button to remove the banner</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -472,16 +381,6 @@ export function AddChannelForm({ onSubmit, isLoading, error }: AddChannelFormPro
         <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
           <p className="text-sm text-red-400">{error || storeError}</p>
         </div>
-      )}
-
-      {/* 이미지 편집 모달 */}
-      {editingImage && (
-        <ImageCropEditor
-          src={editingImage.src}
-          type={editingImage.type}
-          onSave={handleSaveEditedImage}
-          onCancel={() => setEditingImage(null)}
-        />
       )}
     </form>
   );
