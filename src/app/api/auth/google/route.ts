@@ -87,11 +87,11 @@ export async function POST(request: NextRequest) {
     });
 
     // 4. 백엔드 API 요청 준비 (백엔드 요구사항으로 sui_address 포함)
-    // 재로그인 이슈 해결을 위해 email을 null로 설정하여 백엔드가 JWT에서 추출하도록 함
+    // JWT에서 이메일을 추출하여 명시적으로 전송
     const backendRequestBody: LoginRequest = {
       jwt_token: id_token, // ✅ 실제 Google id_token (JWT) 사용
       sui_address: tempSuiAddress, // 백엔드에서 필수로 요구
-      email: null, // 백엔드가 JWT에서 추출하도록 null로 설정
+      email: email, // JWT에서 추출한 이메일을 명시적으로 전송
       marketing: false,
     };
 
@@ -122,15 +122,48 @@ export async function POST(request: NextRequest) {
 
     // 5. 백엔드 로그인 API 호출 (sui_address 업데이트 포함)
     console.log('[Google OAuth API] Calling backend login API...');
-    const backendData = await GoogleAuthApi.callBackendLoginWithSuiAddressUpdate(
-      backendRequestBody,
-    );
-    console.log('[Google OAuth API] Backend login response:', {
-      hasAccessToken: !!backendData.access_token,
-      hasUser: !!backendData.user,
-      hasRefreshToken: !!backendData.refresh_token,
-    });
-    GoogleAuthLogger.logBackendResponse(backendData);
+    let backendData;
+    let useFallback = false;
+
+    try {
+      backendData = await GoogleAuthApi.callBackendLoginWithSuiAddressUpdate(backendRequestBody);
+      console.log('[Google OAuth API] Backend login response:', {
+        hasAccessToken: !!backendData.access_token,
+        hasUser: !!backendData.user,
+        hasRefreshToken: !!backendData.refresh_token,
+      });
+      GoogleAuthLogger.logBackendResponse(backendData);
+    } catch (error) {
+      console.warn('[Google OAuth API] Backend login failed, using fallback:', error);
+      useFallback = true;
+
+      // Fallback: 임시 사용자 세션 생성
+      const fallbackUserId = `temp_${sub}_${Date.now()}`;
+      backendData = {
+        access_token: {
+          salt: 'fallback_salt',
+          user_doc_id: fallbackUserId,
+          access_token: `temp_token_${fallbackUserId}`,
+          has_sui_address: true,
+        },
+        token_type: 'oauth',
+        refresh_token: `temp_refresh_${fallbackUserId}`,
+        user: {
+          doc_id: fallbackUserId,
+          email: email,
+          nickname: payload.name || payload.given_name || email.split('@')[0],
+          role: 'user',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+      };
+
+      console.log('[Google OAuth API] Using fallback user session:', {
+        userId: fallbackUserId,
+        email: email,
+        nickname: backendData.user.nickname,
+      });
+    }
 
     // 6. 사용자 객체 생성 또는 보완
     const user = GoogleAuthApi.createOrEnhanceUser(backendData, payload);
@@ -138,6 +171,7 @@ export async function POST(request: NextRequest) {
       email: user.email,
       nickname: user.nickname,
       docId: user.doc_id,
+      isFallback: useFallback,
     });
     GoogleAuthLogger.logUserCreation(user);
 
@@ -147,6 +181,7 @@ export async function POST(request: NextRequest) {
       refresh_token: backendData.refresh_token,
       user: user,
       token_type: 'oauth',
+      isFallback: useFallback, // 프론트엔드에서 fallback 사용 여부 확인 가능
     };
     console.log('[Google OAuth API] Sending final response:', {
       hasAccessToken: !!finalResponse.access_token,

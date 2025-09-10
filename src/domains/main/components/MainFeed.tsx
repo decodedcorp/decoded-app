@@ -134,7 +134,7 @@ export const MainFeed = React.memo(function MainFeed() {
       }
     });
     return Array.from(channelIds);
-  }, [feedData.length, feedData.map(item => item.channel_id).join(',')]);
+  }, [feedData.length, feedData.map((item) => item.channel_id).join(',')]);
 
   // 고유한 유저 ID들 추출 - feedData의 길이와 ID들만 의존성으로 설정
   const uniqueUserIds = useMemo(() => {
@@ -145,7 +145,7 @@ export const MainFeed = React.memo(function MainFeed() {
       }
     });
     return Array.from(userIds);
-  }, [feedData.length, feedData.map(item => item.provider_id).join(',')]);
+  }, [feedData.length, feedData.map((item) => item.provider_id).join(',')]);
 
   // 모든 채널의 썸네일 가져오기
   const channelQueries = uniqueChannelIds.map((channelId) => ({
@@ -186,13 +186,13 @@ export const MainFeed = React.memo(function MainFeed() {
       setChannelThumbnails((prev) => {
         // 이미 존재하는 썸네일과 비교하여 실제로 변경된 것만 업데이트
         const hasChanges = Object.entries(newThumbnails).some(
-          ([key, value]) => prev[key] !== value
+          ([key, value]) => prev[key] !== value,
         );
-        
+
         if (!hasChanges) {
           return prev;
         }
-        
+
         return {
           ...prev,
           ...newThumbnails,
@@ -221,14 +221,12 @@ export const MainFeed = React.memo(function MainFeed() {
     if (Object.keys(newAvatars).length > 0) {
       setUserAvatars((prev) => {
         // 이미 존재하는 아바타와 비교하여 실제로 변경된 것만 업데이트
-        const hasChanges = Object.entries(newAvatars).some(
-          ([key, value]) => prev[key] !== value
-        );
-        
+        const hasChanges = Object.entries(newAvatars).some(([key, value]) => prev[key] !== value);
+
         if (!hasChanges) {
           return prev;
         }
-        
+
         return {
           ...prev,
           ...newAvatars,
@@ -239,14 +237,12 @@ export const MainFeed = React.memo(function MainFeed() {
     if (Object.keys(newAkas).length > 0) {
       setUserAkas((prev) => {
         // 이미 존재하는 aka와 비교하여 실제로 변경된 것만 업데이트
-        const hasChanges = Object.entries(newAkas).some(
-          ([key, value]) => prev[key] !== value
-        );
-        
+        const hasChanges = Object.entries(newAkas).some(([key, value]) => prev[key] !== value);
+
         if (!hasChanges) {
           return prev;
         }
-        
+
         return {
           ...prev,
           ...newAkas,
