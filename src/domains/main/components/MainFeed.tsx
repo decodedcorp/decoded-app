@@ -125,7 +125,7 @@ export const MainFeed = React.memo(function MainFeed() {
     }
   }, [activeSort, popularContents, trendingContents]);
 
-  // 고유한 채널 ID들 추출
+  // 고유한 채널 ID들 추출 - feedData의 길이와 ID들만 의존성으로 설정
   const uniqueChannelIds = useMemo(() => {
     const channelIds = new Set<string>();
     feedData.forEach((item) => {
@@ -134,9 +134,9 @@ export const MainFeed = React.memo(function MainFeed() {
       }
     });
     return Array.from(channelIds);
-  }, [feedData]);
+  }, [feedData.length, feedData.map(item => item.channel_id).join(',')]);
 
-  // 고유한 유저 ID들 추출
+  // 고유한 유저 ID들 추출 - feedData의 길이와 ID들만 의존성으로 설정
   const uniqueUserIds = useMemo(() => {
     const userIds = new Set<string>();
     feedData.forEach((item) => {
@@ -145,7 +145,7 @@ export const MainFeed = React.memo(function MainFeed() {
       }
     });
     return Array.from(userIds);
-  }, [feedData]);
+  }, [feedData.length, feedData.map(item => item.provider_id).join(',')]);
 
   // 모든 채널의 썸네일 가져오기
   const channelQueries = uniqueChannelIds.map((channelId) => ({
@@ -183,10 +183,21 @@ export const MainFeed = React.memo(function MainFeed() {
     });
 
     if (Object.keys(newThumbnails).length > 0) {
-      setChannelThumbnails((prev) => ({
-        ...prev,
-        ...newThumbnails,
-      }));
+      setChannelThumbnails((prev) => {
+        // 이미 존재하는 썸네일과 비교하여 실제로 변경된 것만 업데이트
+        const hasChanges = Object.entries(newThumbnails).some(
+          ([key, value]) => prev[key] !== value
+        );
+        
+        if (!hasChanges) {
+          return prev;
+        }
+        
+        return {
+          ...prev,
+          ...newThumbnails,
+        };
+      });
     }
   }, [channelResults, uniqueChannelIds]);
 
@@ -208,17 +219,39 @@ export const MainFeed = React.memo(function MainFeed() {
     });
 
     if (Object.keys(newAvatars).length > 0) {
-      setUserAvatars((prev) => ({
-        ...prev,
-        ...newAvatars,
-      }));
+      setUserAvatars((prev) => {
+        // 이미 존재하는 아바타와 비교하여 실제로 변경된 것만 업데이트
+        const hasChanges = Object.entries(newAvatars).some(
+          ([key, value]) => prev[key] !== value
+        );
+        
+        if (!hasChanges) {
+          return prev;
+        }
+        
+        return {
+          ...prev,
+          ...newAvatars,
+        };
+      });
     }
 
     if (Object.keys(newAkas).length > 0) {
-      setUserAkas((prev) => ({
-        ...prev,
-        ...newAkas,
-      }));
+      setUserAkas((prev) => {
+        // 이미 존재하는 aka와 비교하여 실제로 변경된 것만 업데이트
+        const hasChanges = Object.entries(newAkas).some(
+          ([key, value]) => prev[key] !== value
+        );
+        
+        if (!hasChanges) {
+          return prev;
+        }
+        
+        return {
+          ...prev,
+          ...newAkas,
+        };
+      });
     }
   }, [userResults, uniqueUserIds]);
 
