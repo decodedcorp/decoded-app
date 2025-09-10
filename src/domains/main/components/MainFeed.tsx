@@ -1,23 +1,88 @@
 'use client';
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { MailOpen } from 'lucide-react';
+import { useQueries } from '@tanstack/react-query';
 import { PostCard } from './PostCard';
-import { useInfiniteContentsByChannel } from '@/domains/contents/hooks/useInfiniteContentsByChannel';
+import { useTrendingContents } from '../hooks/useTrendingContents';
+import { useContentDetail } from '@/domains/contents/hooks/useContentDetail';
+import { ChannelsService } from '@/api/generated/services/ChannelsService';
+import { UsersService } from '@/api/generated/services/UsersService';
 import { InfiniteScrollLoader } from './InfiniteScrollLoader';
 import { PostCardSkeleton } from './PostCardSkeleton';
-import type { ContentListResponse } from '@/api/generated/models/ContentListResponse';
 import { useContentModalStore } from '@/store/contentModalStore';
-import { convertToContentItem } from '@/lib/types/content';
 import type { ContentItem } from '@/lib/types/content';
 import { ContentType } from '@/lib/types/ContentType';
 import { getThumbnailImageUrl } from '@/lib/utils/imageProxy';
+import type { TrendingContentItem } from '@/api/generated/models/TrendingContentItem';
 
 type SortOption = 'hot' | 'new' | 'top';
 
 export const MainFeed = React.memo(function MainFeed() {
   const [activeSort, setActiveSort] = useState<SortOption>('hot');
+  const [selectedContentId, setSelectedContentId] = useState<string | null>(null);
+  const [channelThumbnails, setChannelThumbnails] = useState<Record<string, string>>({});
+  const [userAvatars, setUserAvatars] = useState<Record<string, string>>({});
+  const [userAkas, setUserAkas] = useState<Record<string, string>>({});
   const openModal = useContentModalStore((state) => state.openModal);
+
+  // 선택된 콘텐츠의 상세 정보 가져오기
+  const { data: contentDetail, isLoading: isContentLoading } = useContentDetail({
+    contentId: selectedContentId || '',
+    enabled: !!selectedContentId,
+  });
+
+  // API 응답을 ContentItem으로 변환하는 함수
+  const convertApiResponseToContentItem = useCallback(
+    (apiResponse: Record<string, any>): ContentItem => {
+      // 이미지 URL 찾기
+      const rawThumbnailUrl =
+        apiResponse.link_preview_metadata?.img_url ||
+        apiResponse.link_preview_metadata?.downloaded_img_url ||
+        apiResponse.thumbnail_url ||
+        undefined;
+
+      // 이미지 프록시 처리 적용
+      const thumbnailUrl = rawThumbnailUrl ? getThumbnailImageUrl(rawThumbnailUrl) : undefined;
+
+      return {
+        id: apiResponse.id || Date.now().toString(),
+        type: ContentType.LINK,
+        title: apiResponse.link_preview_metadata?.title || apiResponse.url || 'Untitled',
+        description:
+          apiResponse.description || apiResponse.link_preview_metadata?.description || undefined,
+        linkUrl: apiResponse.url,
+        thumbnailUrl,
+        author: apiResponse.provider_id || 'anonymous',
+        date: apiResponse.created_at || new Date().toISOString(),
+        category: apiResponse.category,
+        status: apiResponse.status,
+        // AI 생성 메타데이터
+        aiSummary: apiResponse.ai_gen_metadata?.summary,
+        aiQaList: apiResponse.ai_gen_metadata?.qa_list,
+        linkPreview: {
+          title: apiResponse.link_preview_metadata?.title,
+          description: apiResponse.link_preview_metadata?.description,
+          url: apiResponse.url,
+          imageUrl: thumbnailUrl,
+          downloadedImageUrl: apiResponse.link_preview_metadata?.downloaded_img_url,
+          siteName: apiResponse.link_preview_metadata?.site_name,
+        },
+      };
+    },
+    [],
+  );
+
+  // 콘텐츠 상세 정보가 로드되면 모달 열기
+  useEffect(() => {
+    if (contentDetail && !isContentLoading) {
+      // API 응답을 ContentItem으로 변환
+      const contentItem = convertApiResponseToContentItem(contentDetail);
+      openModal(contentItem);
+      // 모달이 열린 후 선택된 콘텐츠 ID 초기화
+      setSelectedContentId(null);
+    }
+  }, [contentDetail, isContentLoading, openModal, convertApiResponseToContentItem]);
 
   const sortOptions: {
     value: SortOption;
@@ -28,102 +93,226 @@ export const MainFeed = React.memo(function MainFeed() {
     { value: 'top', label: 'Top' },
   ];
 
-  // 특정 채널의 콘텐츠 가져오기 - 무한스크롤 사용
-  const channelId = '688a317213dbcfcd941c85b4'; // 테스트용 채널 ID
-  const infiniteQuery = useInfiniteContentsByChannel(channelId, {
-    limit: 20,
-    sortBy: activeSort,
+  // Trending contents 가져오기 - popular와 trending 병렬 호출
+  const { popularContents, trendingContents, isLoading, isError, error, refetch } =
+    useTrendingContents({
+      limit: 20,
+      enabled: true,
+    });
+
+  // 디버깅을 위한 로그 - API 응답 확인
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Trending API Response:', {
+      popularContents,
+      trendingContents,
+      isLoading,
+      isError,
+      error,
+    });
+  }
+
+  // 정렬 옵션에 따라 적절한 데이터 선택
+  const feedData = useMemo(() => {
+    if (activeSort === 'hot') {
+      return popularContents?.content || [];
+    } else if (activeSort === 'new') {
+      return trendingContents?.content || [];
+    } else {
+      // 'top'의 경우 popular와 trending를 합쳐서 정렬
+      const popular = popularContents?.content || [];
+      const trending = trendingContents?.content || [];
+      return [...popular, ...trending].slice(0, 20);
+    }
+  }, [activeSort, popularContents, trendingContents]);
+
+  // 고유한 채널 ID들 추출
+  const uniqueChannelIds = useMemo(() => {
+    const channelIds = new Set<string>();
+    feedData.forEach((item) => {
+      if (item.channel_id) {
+        channelIds.add(item.channel_id);
+      }
+    });
+    return Array.from(channelIds);
+  }, [feedData]);
+
+  // 고유한 유저 ID들 추출
+  const uniqueUserIds = useMemo(() => {
+    const userIds = new Set<string>();
+    feedData.forEach((item) => {
+      if (item.provider_id) {
+        userIds.add(item.provider_id);
+      }
+    });
+    return Array.from(userIds);
+  }, [feedData]);
+
+  // 모든 채널의 썸네일 가져오기
+  const channelQueries = uniqueChannelIds.map((channelId) => ({
+    queryKey: ['channel', channelId],
+    queryFn: () => ChannelsService.getChannelChannelsChannelIdGet(channelId),
+    enabled: !!channelId,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false,
+  }));
+
+  const channelResults = useQueries({
+    queries: channelQueries,
   });
 
-  // 모든 페이지의 데이터를 평면화
-  const allContents = useMemo(() => {
-    return infiniteQuery.data?.pages.flatMap((page) => page.contents) || [];
-  }, [infiniteQuery.data]);
+  // 모든 유저의 프로필 가져오기
+  const userQueries = uniqueUserIds.map((userId) => ({
+    queryKey: ['user', 'profile', userId],
+    queryFn: () => UsersService.getProfileUsersUserIdProfileGet(userId),
+    enabled: !!userId,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false,
+  }));
 
-  const feedData = allContents;
-  const currentQuery = infiniteQuery; // 기존 인터페이스와의 호환성 유지
+  const userResults = useQueries({
+    queries: userQueries,
+  });
 
-  // Content를 PostCard props로 변환하는 함수 - 메모화로 성능 최적화
-  const transformContentItem = useCallback(
-    (item: Record<string, any>, index: number) => {
-      // 여러 가능한 이미지 소스 확인 (API 응답에 맞게 수정)
-      const rawThumbnail =
-        item.link_preview_metadata?.img_url ||
-        item.link_preview_metadata?.downloaded_img_url ||
-        item.thumbnail_url ||
-        item.image_url ||
-        null;
-
-      // 이미지 프록시 처리 적용
-      const thumbnail = rawThumbnail ? getThumbnailImageUrl(rawThumbnail) : null;
-
-      // 디버깅을 위한 로그 (개발 환경에서만)
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Content item:', {
-          id: item.id,
-          title: item.link_preview_metadata?.title,
-          img_url: item.link_preview_metadata?.img_url,
-          downloaded_img_url: item.link_preview_metadata?.downloaded_img_url,
-          raw_thumbnail: rawThumbnail,
-          thumbnail_url: item.thumbnail_url,
-          image_url_direct: item.image_url,
-          final_thumbnail: thumbnail,
-        });
+  // 채널 썸네일 상태 업데이트
+  useEffect(() => {
+    const newThumbnails: Record<string, string> = {};
+    channelResults.forEach((result, index) => {
+      if (result.data?.thumbnail_url) {
+        newThumbnails[uniqueChannelIds[index]] = result.data.thumbnail_url;
       }
+    });
 
-      return {
-        id: index,
-        title: item.link_preview_metadata?.title || item.url || 'Untitled',
-        description: item.description || item.link_preview_metadata?.description || undefined,
-        channel: 'decoded', // 임시로 고정값 사용
-        channelId: item.channel_id || channelId, // API에서 채널 ID 가져오거나 현재 채널 ID 사용
-        author: item.provider_id || 'anonymous',
-        authorId: item.provider_id || item.created_by || 'anonymous', // 사용자 ID (provider_id 또는 created_by 필드 사용)
-        timeAgo: getTimeAgo(item.created_at || new Date().toISOString()),
-        upvotes: 0, // 콘텐츠 응답에는 좋아요 수가 없으므로 0으로 설정
-        comments: 0, // 콘텐츠 응답에는 댓글 수가 없으므로 0으로 설정
-        thumbnail,
-        contentType: mapContentType(item.type) || ('link' as const),
-        originalItem: item, // 원본 데이터 보조
-      };
-    },
-    [channelId],
-  );
+    if (Object.keys(newThumbnails).length > 0) {
+      setChannelThumbnails((prev) => ({
+        ...prev,
+        ...newThumbnails,
+      }));
+    }
+  }, [channelResults, uniqueChannelIds]);
 
-  // ContentItem으로 변환하는 함수 (API 데이터에 맞게 수정) - 메모화로 성능 최적화
-  const transformToContentItem = useCallback((item: Record<string, any>): ContentItem => {
-    // 이미지 URL 찾기 - API 응답 구조에 맞게 수정
-    const rawThumbnailUrl =
-      item.link_preview_metadata?.img_url ||
-      item.link_preview_metadata?.downloaded_img_url ||
-      item.thumbnail_url ||
-      item.image_url ||
-      undefined;
+  // 유저 아바타 및 aka 상태 업데이트
+  useEffect(() => {
+    const newAvatars: Record<string, string> = {};
+    const newAkas: Record<string, string> = {};
 
-    // 이미지 프록시 처리 적용
-    const thumbnailUrl = rawThumbnailUrl ? getThumbnailImageUrl(rawThumbnailUrl) : undefined;
+    userResults.forEach((result, index) => {
+      const userId = uniqueUserIds[index];
+      if (result.data) {
+        if (result.data.profile_image_url) {
+          newAvatars[userId] = result.data.profile_image_url;
+        }
+        if (result.data.aka) {
+          newAkas[userId] = result.data.aka;
+        }
+      }
+    });
+
+    if (Object.keys(newAvatars).length > 0) {
+      setUserAvatars((prev) => ({
+        ...prev,
+        ...newAvatars,
+      }));
+    }
+
+    if (Object.keys(newAkas).length > 0) {
+      setUserAkas((prev) => ({
+        ...prev,
+        ...newAkas,
+      }));
+    }
+  }, [userResults, uniqueUserIds]);
+
+  // 기존 인터페이스와의 호환성을 위한 mock query 객체
+  const currentQuery = {
+    isLoading,
+    isError,
+    error,
+    data: { pages: [{ contents: feedData }] },
+    hasNextPage: false,
+    isFetchingNextPage: false,
+    fetchNextPage: () => {},
+    refetch,
+  };
+
+  // TrendingContentItem을 PostCard props로 변환하는 함수 - 메모화로 성능 최적화
+  const transformContentItem = useCallback((item: TrendingContentItem, index: number) => {
+    // 임시로 이미지 프록시 우회 - 직접 URL 사용
+    const thumbnail = item.thumbnail_url || null;
+
+    // 디버깅을 위한 로그 (개발 환경에서만)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Trending content item:', {
+        id: item.id,
+        title: item.title,
+        thumbnail_url: item.thumbnail_url,
+        raw_thumbnail: item.thumbnail_url,
+        final_thumbnail: thumbnail,
+        channel_name: item.channel_name,
+        provider_id: item.provider_id,
+        type: item.type,
+        url: item.url,
+        hasThumbnail: !!item.thumbnail_url,
+        thumbnailAfterProxy: thumbnail,
+      });
+    }
+
+    // 제목이 없을 때 URL에서 도메인 추출하여 표시
+    const getDisplayTitle = () => {
+      if (item.title) return item.title;
+      if (item.url) {
+        try {
+          const url = new URL(item.url);
+          return url.hostname.replace('www.', '');
+        } catch {
+          return 'Untitled';
+        }
+      }
+      return 'Untitled';
+    };
 
     return {
-      id: item.id || Date.now().toString(),
+      id: index,
+      title: getDisplayTitle(),
+      description: item.description || undefined,
+      channel: item.channel_name || 'Unknown Channel',
+      channelId: item.channel_id,
+      author: item.provider_id || 'anonymous',
+      authorId: item.provider_id || 'anonymous',
+      timeAgo: 'Trending', // Trending 콘텐츠임을 명시
+      upvotes: 0, // 실제 데이터가 없으므로 0으로 설정
+      comments: 0, // 실제 데이터가 없으므로 0으로 설정
+      thumbnail,
+      contentType: mapContentType(item.type) || ('link' as const),
+      originalItem: item, // 원본 데이터 보조
+    };
+  }, []);
+
+  // TrendingContentItem을 ContentItem으로 변환하는 함수 - 메모화로 성능 최적화
+  const transformToContentItem = useCallback((item: TrendingContentItem): ContentItem => {
+    // 이미지 프록시 처리 적용
+    const thumbnailUrl = item.thumbnail_url ? getThumbnailImageUrl(item.thumbnail_url) : undefined;
+
+    return {
+      id: item.id,
       type: ContentType.LINK,
-      title: item.link_preview_metadata?.title || item.url || 'Untitled',
-      description: item.description || item.link_preview_metadata?.description || undefined,
-      linkUrl: item.url,
+      title: item.title || item.url || 'Untitled',
+      description: item.description || undefined,
+      linkUrl: item.url || undefined,
       thumbnailUrl,
       author: item.provider_id || 'anonymous',
-      date: item.created_at,
-      category: item.category,
-      status: item.status,
-      // AI 생성 메타데이터 - ContentItem 타입에 맞게 매핑
-      aiSummary: item.ai_gen_metadata?.summary,
-      aiQaList: item.ai_gen_metadata?.qa_list,
+      date: new Date().toISOString(), // TrendingContentItem에는 시간 정보가 없으므로 현재 시간 사용
+      category: undefined,
+      status: undefined,
+      // AI 생성 메타데이터는 TrendingContentItem에 없으므로 undefined
+      aiSummary: undefined,
+      aiQaList: undefined,
       linkPreview: {
-        title: item.link_preview_metadata?.title,
-        description: item.link_preview_metadata?.description,
-        url: item.url,
-        imageUrl: thumbnailUrl, // 이미 프록시 처리된 URL
-        downloadedImageUrl: item.link_preview_metadata?.downloaded_img_url,
-        siteName: item.link_preview_metadata?.site_name,
+        title: item.title || undefined,
+        description: item.description || undefined,
+        url: item.url || undefined,
+        imageUrl: thumbnailUrl,
+        downloadedImageUrl: undefined,
+        siteName: undefined,
       },
     };
   }, []);
@@ -140,19 +329,6 @@ export const MainFeed = React.memo(function MainFeed() {
       default:
         return 'text';
     }
-  }, []);
-
-  // 시간 차이 계산 - 메모화로 성능 최적화
-  const getTimeAgo = useCallback((createdAt: string): string => {
-    const now = new Date();
-    const created = new Date(createdAt);
-    const diffMs = now.getTime() - created.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffHours / 24);
-
-    if (diffDays > 0) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-    if (diffHours > 0) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    return 'Just now';
   }, []);
 
   return (
@@ -246,8 +422,9 @@ export const MainFeed = React.memo(function MainFeed() {
                 </div>
               </div>
             ) : (
-              feedData.map((item: Record<string, any>, index: number) => {
+              feedData.map((item: TrendingContentItem, index: number) => {
                 const post = transformContentItem(item, index);
+                const isSelected = selectedContentId === item.id;
                 return (
                   <PostCard
                     key={`${item.id}-${index}`}
@@ -256,22 +433,38 @@ export const MainFeed = React.memo(function MainFeed() {
                     description={post.description}
                     channel={post.channel}
                     channelId={post.channelId}
+                    channelThumbnail={channelThumbnails[item.channel_id]}
                     author={post.author}
                     authorId={post.authorId}
+                    userAvatar={userAvatars[item.provider_id]}
+                    userAka={userAkas[item.provider_id]}
                     timeAgo={post.timeAgo}
                     upvotes={post.upvotes}
                     comments={post.comments}
                     thumbnail={post.thumbnail}
                     contentType={post.contentType}
                     onPostClick={() => {
-                      // ContentModal에서 콘텐츠 표시
-                      const contentItem = transformToContentItem(item);
-                      openModal(contentItem);
+                      // 콘텐츠 ID를 설정하여 상세 정보 가져오기
+                      setSelectedContentId(item.id);
                     }}
+                    // 로딩 상태 표시
+                    className={
+                      isSelected && isContentLoading ? 'opacity-50 pointer-events-none' : ''
+                    }
                   />
                 );
               })
             )}
+          </div>
+        )}
+
+        {/* 콘텐츠 로딩 오버레이 */}
+        {isContentLoading && selectedContentId && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-zinc-900 rounded-lg p-6 flex items-center gap-3">
+              <div className="w-6 h-6 border-2 border-[#eafd66] border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-white">Loading content...</span>
+            </div>
           </div>
         )}
 

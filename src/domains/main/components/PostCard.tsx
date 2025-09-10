@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Camera, Video, Link, FileText, MessageCircle, Share, Bookmark } from 'lucide-react';
+import { Camera, Video, Link, FileText, MessageCircle, Share, Bookmark, Pin } from 'lucide-react';
 
 interface PostCardProps {
   id: number;
@@ -10,8 +10,11 @@ interface PostCardProps {
   description?: string;
   channel: string;
   channelId: string;
+  channelThumbnail?: string | null;
   author: string;
   authorId: string;
+  userAvatar?: string | null;
+  userAka?: string | null;
   timeAgo: string;
   upvotes: number;
   comments: number;
@@ -20,6 +23,7 @@ interface PostCardProps {
   onPostClick?: () => void;
   onChannelClick?: (channelId: string, channel: string) => void;
   onAuthorClick?: (authorId: string, author: string) => void;
+  className?: string;
 }
 
 // 썸네일 이미지 컴포넌트
@@ -36,6 +40,18 @@ function ThumbnailImage({
 }) {
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+
+  // 디버깅을 위한 로그
+  if (process.env.NODE_ENV === 'development') {
+    console.log('ThumbnailImage render:', {
+      src,
+      alt,
+      hasSrc: !!src,
+      srcType: typeof src,
+      imageError,
+      imageLoaded,
+    });
+  }
 
   if (imageError) {
     return (
@@ -61,9 +77,19 @@ function ThumbnailImage({
           className={`w-full h-auto object-contain rounded-md transition-opacity duration-200 ${
             imageLoaded ? 'opacity-100' : 'opacity-0'
           }`}
-          onLoad={() => setImageLoaded(true)}
-          onError={() => {
-            console.log('Image failed to load:', src);
+          onLoad={() => {
+            console.log('Image loaded successfully:', { src, alt });
+            setImageLoaded(true);
+          }}
+          onError={(e) => {
+            console.log('Image failed to load:', {
+              src,
+              error: e,
+              alt,
+              timestamp: new Date().toISOString(),
+              errorType: e.type,
+              target: e.target,
+            });
             setImageError(true);
           }}
         />
@@ -83,8 +109,11 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
   description,
   channel,
   channelId,
+  channelThumbnail,
   author,
   authorId,
+  userAvatar,
+  userAka,
   timeAgo,
   upvotes,
   comments,
@@ -93,11 +122,18 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
   onPostClick,
   onChannelClick,
   onAuthorClick,
+  className = '',
 }: PostCardProps) {
   const router = useRouter();
   // 디버깅을 위한 로그
-  if (process.env.NODE_ENV === 'development' && thumbnail) {
-    console.log('PostCard with thumbnail:', { title, thumbnail, contentType });
+  if (process.env.NODE_ENV === 'development') {
+    console.log('PostCard render:', {
+      title,
+      thumbnail,
+      contentType,
+      hasThumbnail: !!thumbnail,
+      thumbnailType: typeof thumbnail,
+    });
   }
 
   const getContentIcon = () => {
@@ -127,13 +163,15 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
   };
 
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden hover:border-zinc-700 transition-all duration-200 group">
+    <div
+      className={`bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden hover:border-zinc-700 transition-all duration-200 group ${className}`}
+    >
       <div className="p-4">
         {/* 상단: 채널 정보 및 메타데이터 */}
         <div className="flex items-center gap-3 mb-3">
           {/* 동그란 채널 썸네일 - 클릭 시 채널 페이지로 */}
           <button
-            className="w-9 h-9 bg-gradient-to-br from-[#eafd66] to-[#d4e85c] rounded-full flex items-center justify-center flex-shrink-0 hover:from-[#f0ff70] hover:to-[#e0f066] transition-colors cursor-pointer"
+            className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity cursor-pointer overflow-hidden"
             onClick={() => {
               if (onChannelClick) {
                 onChannelClick(channelId, channel);
@@ -143,7 +181,29 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
             }}
             aria-label={`Go to ${channel}`}
           >
-            <span className="text-zinc-900 font-bold text-sm">r</span>
+            {channelThumbnail ? (
+              <img
+                src={channelThumbnail}
+                alt={`${channel} channel`}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  // 이미지 로딩 실패 시 기본 아이콘으로 폴백
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const fallback = target.nextElementSibling as HTMLElement;
+                  if (fallback) fallback.style.display = 'flex';
+                }}
+              />
+            ) : null}
+            <div
+              className={`w-full h-full bg-gradient-to-br from-[#eafd66] to-[#d4e85c] rounded-full flex items-center justify-center ${
+                channelThumbnail ? 'hidden' : 'flex'
+              }`}
+            >
+              <span className="text-zinc-900 font-bold text-sm">
+                {channel.charAt(0).toUpperCase()}
+              </span>
+            </div>
           </button>
 
           {/* 채널명, 작성자, 시간 */}
@@ -161,18 +221,46 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
               {channel}
             </button>
             <span className="text-zinc-600">•</span>
-            <button
-              className="hover:text-zinc-300 transition-colors cursor-pointer"
-              onClick={() => {
-                if (onAuthorClick) {
-                  onAuthorClick(authorId, author);
-                } else {
-                  router.push(`/users/${authorId}`);
-                }
-              }}
-            >
-              u/{author}
-            </button>
+            <div className="flex items-center gap-1">
+              {/* 유저 아바타 */}
+              <div className="w-4 h-4 rounded-full overflow-hidden flex-shrink-0">
+                {userAvatar ? (
+                  <img
+                    src={userAvatar}
+                    alt={`${author} avatar`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      // 이미지 로딩 실패 시 기본 아이콘으로 폴백
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const fallback = target.nextElementSibling as HTMLElement;
+                      if (fallback) fallback.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <div
+                  className={`w-full h-full bg-zinc-600 rounded-full flex items-center justify-center ${
+                    userAvatar ? 'hidden' : 'flex'
+                  }`}
+                >
+                  <span className="text-zinc-300 text-xs font-medium">
+                    {author.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              </div>
+              <button
+                className="hover:text-zinc-300 transition-colors cursor-pointer"
+                onClick={() => {
+                  if (onAuthorClick) {
+                    onAuthorClick(authorId, author);
+                  } else {
+                    router.push(`/users/${authorId}`);
+                  }
+                }}
+              >
+                {userAka || author}
+              </button>
+            </div>
             <span className="text-zinc-600">•</span>
             <span>{timeAgo}</span>
           </div>
@@ -211,12 +299,12 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
         {/* 포스트 액션 버튼들 */}
         <div className="flex items-center gap-6 text-sm text-zinc-500 border-t border-zinc-800 pt-4">
           <button className="hover:text-orange-400 transition-colors flex items-center gap-2">
-            <span className="text-orange-400 text-lg">▲</span>
-            <span className="font-medium">{upvotes.toLocaleString()}</span>
+            <Pin className="w-4 h-4" />
+            <span className="font-medium">{upvotes > 0 ? upvotes.toLocaleString() : 'Pin'}</span>
           </button>
           <button className="hover:text-blue-400 transition-colors flex items-center gap-2">
             <MessageCircle className="w-4 h-4" />
-            <span className="font-medium">{comments}</span>
+            <span className="font-medium">{comments > 0 ? comments : 'Comment'}</span>
           </button>
           <button className="hover:text-green-400 transition-colors flex items-center gap-2">
             <Share className="w-4 h-4" />
