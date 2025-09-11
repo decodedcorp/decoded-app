@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useCallback, useEffect } from 'react';
+
 import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import { Button } from '@decoded/ui';
 import { X, RotateCw, ZoomIn, ZoomOut, Move, Crop as CropIcon } from 'lucide-react';

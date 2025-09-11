@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+
 import { X } from 'lucide-react';
 import { validateImageFile, compressImage } from '@/lib/utils/imageUtils';
 import { useFormsTranslation } from '@/lib/i18n/hooks';

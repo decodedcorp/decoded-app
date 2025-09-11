@@ -1,6 +1,7 @@
 'use client';
 
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
 import { useImageColor } from '@/domains/main/hooks/useImageColor';
 import { HeartButton } from '@/components/ui/HeartButton';
 import { useContentLike } from '@/domains/interactions/hooks/useContentLike';

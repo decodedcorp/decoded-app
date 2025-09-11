@@ -3,6 +3,7 @@
 import React from 'react';
 
 import { useGlobalContentUploadStore } from '@/store/globalContentUploadStore';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 interface AddChannelButtonProps {
   variant?: 'default' | 'simple' | 'post';
@@ -12,6 +13,7 @@ interface AddChannelButtonProps {
 export function AddChannelButton({ variant = 'default', className = '' }: AddChannelButtonProps) {
   const startChannelCreation = useGlobalContentUploadStore((state) => state.startChannelCreation);
   const openModal = useGlobalContentUploadStore((state) => state.openModal);
+  const t = useCommonTranslation();
 
   const handleClick = () => {
     // Open the global modal and immediately start channel creation
@@ -52,7 +54,7 @@ export function AddChannelButton({ variant = 'default', className = '' }: AddCha
             d="M12 6v6m0 0v6m0-6h6m-6 0H6"
           />
         </svg>
-        Add Channel
+        {t.actions.create()} Channel
       </button>
     );
   }
@@ -90,7 +92,7 @@ export function AddChannelButton({ variant = 'default', className = '' }: AddCha
             d="M12 6v6m0 0v6m0-6h6m-6 0H6"
           />
         </svg>
-        채널 만들기
+        {t.actions.create()} Channel
       </button>
     );
   }
@@ -129,7 +131,7 @@ export function AddChannelButton({ variant = 'default', className = '' }: AddCha
           d="M12 6v6m0 0v6m0-6h6m-6 0H6"
         />
       </svg>
-      Add Channel
+      {t.actions.create()} Channel
     </button>
   );
 }

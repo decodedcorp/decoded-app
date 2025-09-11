@@ -11,14 +11,14 @@ import {
 import type { SidebarFilters } from '@/domains/channels/components/sidebar/ChannelSidebar';
 import { ChannelData } from '@/store/channelModalStore';
 import { formatDateByContext } from '@/lib/utils/dateUtils';
+import { useContentModalStore, selectIsContentModalOpen } from '@/store/contentModalStore';
+import { useUser } from '@/domains/auth/hooks/useAuth';
+import { useChannelSubscription } from '@/domains/interactions/hooks/useChannelSubscription';
 
 import { useChannel } from '../../../hooks/useChannels';
 import { BaseModal } from '../base/BaseModal';
 import { ChannelModalContainer } from '../base/ChannelModalContainer';
 import { ContentUploadModal } from '../content-upload/ContentUploadModal';
-import { useContentModalStore, selectIsContentModalOpen } from '@/store/contentModalStore';
-import { useUser } from '@/domains/auth/hooks/useAuth';
-import { useChannelSubscription } from '@/domains/interactions/hooks/useChannelSubscription';
 
 import { ChannelModalHeader } from './ChannelModalHeader';
 import { ChannelModalContent } from './ChannelModalContent';

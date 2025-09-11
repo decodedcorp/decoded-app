@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
+
 import { MessageCircle } from 'lucide-react';
 import { Button } from '@decoded/ui';
-
 import {
   useContentModalStore,
   selectIsContentModalOpen,

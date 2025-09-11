@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+
 import {
   MdClose,
   MdFavorite,
@@ -13,9 +14,10 @@ import {
 } from 'react-icons/md';
 import { ContentItem } from '@/lib/types/content';
 import { CommentSection } from '@/domains/comments/components/CommentSection';
+import { useBookmarkStatus, useBookmark } from '@/domains/users/hooks/useBookmark';
+
 import { SummarySection } from './SummarySection';
 import { InteractiveQASection } from './InteractiveQASection';
-import { useBookmarkStatus, useBookmark } from '@/domains/users/hooks/useBookmark';
 
 interface ContentSidebarProps {
   content: ContentItem;

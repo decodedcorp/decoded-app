@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, memo, useMemo, useCallback } from 'react';
+
 import {
   HomeIcon,
   RectangleStackIcon,
@@ -11,13 +12,14 @@ import {
   Bars3Icon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
-import { SidebarItem } from './SidebarItem';
-import { SidebarToggleItem } from './SidebarToggleItem';
-import { SidebarChannelList } from './SidebarChannelList';
 import { useAuthStore } from '@/store/authStore';
 import { useAddChannelStore } from '@/domains/create/store/addChannelStore';
 import { useRouter, usePathname } from 'next/navigation';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
+
+import { SidebarChannelList } from './SidebarChannelList';
+import { SidebarToggleItem } from './SidebarToggleItem';
+import { SidebarItem } from './SidebarItem';
 
 export const Sidebar = memo(function Sidebar() {
   const pathname = usePathname();

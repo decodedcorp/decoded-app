@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
+
 import { Button } from '@decoded/ui';
-import { useCreateInvitation } from '../hooks/useInvitations';
 import { useSearchUsers } from '@/domains/search/hooks/useSearch';
 import type { ChannelResponse } from '@/api/generated/models/ChannelResponse';
+
+import { useCreateInvitation } from '../hooks/useInvitations';
 
 interface InviteManagerModalProps {
   isOpen: boolean;

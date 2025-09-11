@@ -2,6 +2,7 @@
  * Image validation and compression recommendation utilities
  */
 import React from 'react';
+
 import i18n from '../i18n/config';
 
 import { analyzeBase64Size } from './imageAnalysis';

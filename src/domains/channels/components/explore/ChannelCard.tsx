@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+
 import { ChannelCard as CommonChannelCard, ChannelCardProps } from '@/components/ChannelCard';
 import { ChannelResponse } from '@/api/generated/models/ChannelResponse';
 

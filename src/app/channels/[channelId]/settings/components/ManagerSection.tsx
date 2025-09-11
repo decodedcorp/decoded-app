@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
+
 import type { ChannelResponse } from '@/api/generated/models/ChannelResponse';
 import { useUser } from '@/domains/auth/hooks/useAuth';
-
 import { InviteManagerModal } from '@/domains/invitations/components/InviteManagerModal';
 import { ManagersList } from '@/domains/invitations/components/ManagersList';
 import { InvitationList } from '@/domains/invitations/components/InvitationList';

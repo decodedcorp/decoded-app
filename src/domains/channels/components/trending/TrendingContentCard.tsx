@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+
 import { useRouter } from 'next/navigation';
 import { TrendingContentItem } from '@/api/generated/models/TrendingContentItem';
 

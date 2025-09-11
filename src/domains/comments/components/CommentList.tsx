@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+
 import { CommentResponse } from '@/api/generated/models/CommentResponse';
+
 import { CommentItem } from './CommentItem';
 
 interface CommentListProps {

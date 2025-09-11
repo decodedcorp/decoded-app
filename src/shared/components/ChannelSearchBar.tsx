@@ -1,7 +1,10 @@
 'use client';
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+
 import { useRouter } from 'next/navigation';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
+
 import { SearchAutocomplete, type AutocompleteItem } from '../../domains/search';
 
 interface ChannelSearchBarProps {
@@ -24,6 +27,15 @@ export function ChannelSearchBar({
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const t = useCommonTranslation();
+
+  // Placeholder를 state로 관리하여 locale 변경 시 업데이트
+  const [placeholder, setPlaceholder] = useState(t.search.channelPlaceholder(channelName));
+
+  // Locale 또는 channelName 변경 시 placeholder 업데이트
+  useEffect(() => {
+    setPlaceholder(t.search.channelPlaceholder(channelName));
+  }, [t, channelName]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +58,8 @@ export function ChannelSearchBar({
   };
 
   const handleInputFocus = () => {
-    if (query.trim().length >= 2) { // 2글자 이상에서만 포커스 시 열기
+    if (query.trim().length >= 2) {
+      // 2글자 이상에서만 포커스 시 열기
       setIsAutocompleteOpen(true);
     }
   };
@@ -160,7 +173,7 @@ export function ChannelSearchBar({
               type="button"
               onClick={handleClear}
               className="ml-2 text-zinc-400 hover:text-white transition-colors p-0.5"
-              aria-label="Clear channel filter"
+              aria-label={t.search.clearSearch()}
             >
               <svg width="10" height="10" fill="none" viewBox="0 0 24 24">
                 <path
@@ -183,7 +196,7 @@ export function ChannelSearchBar({
             onFocus={handleInputFocus}
             onBlur={handleInputBlur}
             onKeyDown={handleKeyDown}
-            placeholder={`Search in ${channelName}`}
+            placeholder={placeholder}
             className="flex-1 py-3 pr-4 bg-transparent text-white placeholder-zinc-400 focus:outline-none rounded-full"
             autoComplete="off"
             role="combobox"
@@ -202,7 +215,7 @@ export function ChannelSearchBar({
                 inputRef.current?.focus();
               }}
               className="mr-3 p-1 text-zinc-400 hover:text-white transition-colors"
-              aria-label="Clear search"
+              aria-label={t.search.clearSearch()}
             >
               <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
                 <path
@@ -217,8 +230,8 @@ export function ChannelSearchBar({
           )}
 
           {/* 숨겨진 검색 버튼 (접근성을 위해 유지) */}
-          <button type="submit" className="sr-only" aria-label="Search">
-            Search
+          <button type="submit" className="sr-only" aria-label={t.search.searchButton()}>
+            {t.search.searchButton()}
           </button>
         </div>
 

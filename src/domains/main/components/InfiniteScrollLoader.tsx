@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useEffect } from 'react';
+
 import { RotateCcw } from 'lucide-react';
 
 interface InfiniteScrollLoaderProps {

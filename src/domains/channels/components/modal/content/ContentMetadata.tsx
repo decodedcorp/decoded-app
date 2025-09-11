@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { useCommonTranslation } from '../../../../../lib/i18n/hooks';
 
 interface ContentMetadataProps {

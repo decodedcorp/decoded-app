@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, ReactNode, useState } from 'react';
+
 import { createPortal } from 'react-dom';
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap';
 import { useRestoreFocus } from '@/lib/hooks/useRestoreFocus';

@@ -7,10 +7,12 @@
 
 'use client';
 
-import { useInfiniteQuery } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
+
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { ContentsService } from '@/api/generated';
 import type { ContentListResponse } from '@/api/generated';
+
 import type { Card, CardsRequest, CardsResponse } from '../types/card';
 
 // Channel Contents Hook Options

@@ -1,7 +1,9 @@
 import React, { useMemo } from 'react';
+
 import { ContentType } from '@/lib/types/ContentType';
-import { useChannelContentsSinglePage } from './useChannelContents';
 import { ContentItem } from '@/lib/types/content';
+
+import { useChannelContentsSinglePage } from './useChannelContents';
 
 interface FilterOption {
   id: string;

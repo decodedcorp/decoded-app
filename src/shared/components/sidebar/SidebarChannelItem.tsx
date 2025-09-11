@@ -1,7 +1,8 @@
 'use client';
 
-import Link from 'next/link';
 import { ReactNode } from 'react';
+
+import Link from 'next/link';
 import { ChannelResponse } from '@/api/generated/models/ChannelResponse';
 
 interface SidebarChannelItemProps {

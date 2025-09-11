@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { ContentItem } from '@/store/contentModalStore';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 interface ContentModalFooterProps {
   content: ContentItem;
@@ -8,6 +9,8 @@ interface ContentModalFooterProps {
 }
 
 export function ContentModalFooter({ content, onClose }: ContentModalFooterProps) {
+  const t = useCommonTranslation();
+  
   return (
     <div className="bg-zinc-900 p-6 border-t border-zinc-700/30">
       <div className="flex items-center justify-between">
@@ -22,7 +25,7 @@ export function ContentModalFooter({ content, onClose }: ContentModalFooterProps
                 d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
               />
             </svg>
-            <span className="font-medium">Like</span>
+            <span className="font-medium">{t.actions.like()}</span>
           </button>
 
           <button className="flex items-center space-x-2 px-5 py-2.5 bg-zinc-800/50 hover:bg-zinc-700/50 text-gray-400 hover:text-white rounded-lg transition-all duration-200 border border-zinc-700/50 hover:border-zinc-600/50 group">
@@ -34,7 +37,7 @@ export function ContentModalFooter({ content, onClose }: ContentModalFooterProps
                 d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367 2.684z"
               />
             </svg>
-            <span className="font-medium">Share</span>
+            <span className="font-medium">{t.actions.share()}</span>
           </button>
 
           <button className="flex items-center space-x-2 px-5 py-2.5 bg-zinc-800/50 hover:bg-zinc-700/50 text-gray-400 hover:text-white rounded-lg transition-all duration-200 border border-zinc-700/50 hover:border-zinc-600/50 group">
@@ -46,7 +49,7 @@ export function ContentModalFooter({ content, onClose }: ContentModalFooterProps
                 d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
               />
             </svg>
-            <span className="font-medium">Save</span>
+            <span className="font-medium">{t.actions.save()}</span>
           </button>
         </div>
 
@@ -55,7 +58,7 @@ export function ContentModalFooter({ content, onClose }: ContentModalFooterProps
           {/* Additional Info */}
           <div className="flex items-center space-x-6 text-sm text-zinc-500">
             <span className="font-mono">ID: {content.id}</span>
-            <span className="uppercase tracking-wider font-medium">Type: {content.type}</span>
+            <span className="uppercase tracking-wider font-medium">{t.ui.type()}: {content.type}</span>
           </div>
 
           {/* Close Button */}

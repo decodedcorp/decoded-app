@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+
 import { useRouter } from 'next/navigation';
 import { useDeleteChannel } from '@/domains/channels/hooks/useChannels';
 import type { ChannelResponse } from '@/api/generated/models/ChannelResponse';

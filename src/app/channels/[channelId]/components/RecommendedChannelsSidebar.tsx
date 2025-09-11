@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
 
+import { useRouter } from 'next/navigation';
 import { ChannelData } from '@/store/channelModalStore';
 import { useChannels } from '@/domains/channels/hooks/useChannels';
 import { ProxiedImage } from '@/components/ProxiedImage';

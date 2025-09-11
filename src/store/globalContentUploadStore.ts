@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-
 import type { ChannelResponse } from '@/api/generated';
 
 export interface ChannelData {

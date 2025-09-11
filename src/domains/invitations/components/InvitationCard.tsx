@@ -1,10 +1,12 @@
 'use client';
 
 import React from 'react';
+
 import { Button } from '@decoded/ui';
 import { formatDateByContext } from '@/lib/utils/dateUtils';
-import { useAcceptInvitation, useRejectInvitation, useCancelInvitation } from '../hooks/useInvitations';
 import type { InvitationResponse } from '@/api/generated/models/InvitationResponse';
+
+import { useAcceptInvitation, useRejectInvitation, useCancelInvitation } from '../hooks/useInvitations';
 
 interface InvitationCardProps {
   invitation: InvitationResponse;

@@ -1,5 +1,6 @@
 'use client';
 import React, { useState } from 'react';
+
 import { Modal } from './Modal';
 
 // 예: 모달 열기 버튼 있는 카드 목록

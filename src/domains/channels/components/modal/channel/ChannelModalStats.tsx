@@ -4,6 +4,7 @@ import { ChannelData } from '@/store/channelModalStore';
 import { formatDateByContext } from '@/lib/utils/dateUtils';
 import { ChannelEditorsStackedAvatars } from '@/shared/components/ChannelEditorsStackedAvatars';
 import { EditorsListModal } from '@/shared/components/EditorsListModal';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 interface ChannelModalStatsProps {
   channel: ChannelData;
@@ -11,6 +12,7 @@ interface ChannelModalStatsProps {
 
 export function ChannelModalStats({ channel }: ChannelModalStatsProps) {
   const [isEditorsModalOpen, setIsEditorsModalOpen] = useState(false);
+  const t = useCommonTranslation();
 
   return (
     <div className="mb-8">
@@ -20,17 +22,17 @@ export function ChannelModalStats({ channel }: ChannelModalStatsProps) {
           <div className="text-2xl font-bold text-white">
             {channel.subscriber_count ? channel.subscriber_count.toLocaleString() : '0'}
           </div>
-          <div className="text-zinc-400 text-sm">Subscribers</div>
+          <div className="text-zinc-400 text-sm">{t.ui.subscribers()}</div>
         </div>
         <div className="text-center">
           <div className="text-2xl font-bold text-white">{channel.content_count || 0}</div>
-          <div className="text-zinc-400 text-sm">Posts</div>
+          <div className="text-zinc-400 text-sm">{t.ui.posts()}</div>
         </div>
         <div className="text-center">
           <div className="text-2xl font-bold text-white">
-            {channel.is_subscribed ? 'Subscribed' : 'Subscribe'}
+            {channel.is_subscribed ? t.states.subscribed() : t.actions.subscribe()}
           </div>
-          <div className="text-zinc-400 text-sm">Status</div>
+          <div className="text-zinc-400 text-sm">{t.ui.status()}</div>
         </div>
       </div>
 
@@ -42,7 +44,7 @@ export function ChannelModalStats({ channel }: ChannelModalStatsProps) {
             className="flex items-center justify-between w-full hover:bg-zinc-800/50 transition-colors rounded-lg p-1 -m-1"
           >
             <div className="flex items-center space-x-3">
-              <span className="text-zinc-300 text-sm font-medium">Editors:</span>
+              <span className="text-zinc-300 text-sm font-medium">{t.ui.editors()}:</span>
               <ChannelEditorsStackedAvatars 
                 editors={channel.managers}
                 maxDisplay={5}
@@ -77,7 +79,7 @@ export function ChannelModalStats({ channel }: ChannelModalStatsProps) {
       {channel.created_at && (
         <div className="mb-4">
           <div className="text-zinc-400 text-sm">
-            Created: {formatDateByContext(channel.created_at, 'detail')}
+            {t.ui.created()}: {formatDateByContext(channel.created_at, 'detail')}
           </div>
         </div>
       )}
@@ -86,7 +88,7 @@ export function ChannelModalStats({ channel }: ChannelModalStatsProps) {
       {channel.updated_at && channel.updated_at !== channel.created_at && (
         <div className="mb-4">
           <div className="text-zinc-400 text-sm">
-            Updated: {formatDateByContext(channel.updated_at, 'detail')}
+            {t.ui.updated()}: {formatDateByContext(channel.updated_at, 'detail')}
           </div>
         </div>
       )}

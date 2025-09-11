@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo } from 'react';
+
 import { RiPushpin2Line } from 'react-icons/ri';
 import { MdDragIndicator } from 'react-icons/md';
 import {
@@ -20,7 +21,6 @@ import {
 } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { useChannelPins, useReorderPins } from '../../hooks/useChannelPins';
 import { useChannelPinsStore } from '@/store/channelPinsStore';
 import { canReorderPins } from '@/lib/utils/channelPermissions';
 import { useUser } from '@/domains/auth/hooks/useAuth';
@@ -30,6 +30,8 @@ import { PinTargetType } from '@/api/generated/models/PinTargetType';
 import { cn } from '@/lib/utils/cn';
 import { useContentModalStore } from '@/store/contentModalStore';
 import { ContentItem } from '@/lib/types/content';
+
+import { useChannelPins, useReorderPins } from '../../hooks/useChannelPins';
 
 // Helper function to extract title based on content type and metadata
 const getContentTitle = (item: UnifiedPinnedItem): string => {

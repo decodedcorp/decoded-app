@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+
 import { TrendingChannelItem } from '@/api/generated/models/TrendingChannelItem';
 import { useChannelModalStore } from '@/store/channelModalStore';
 

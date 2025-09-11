@@ -2,13 +2,14 @@
 
 import React, { useState } from 'react';
 
+import { useChannelModalStore } from '@/store/channelModalStore';
+import { ProxiedImage } from '@/components/ProxiedImage';
+
 import { SidebarFilters } from '../../sidebar/ChannelSidebar';
 import { DataTypesFilter } from '../filters/DataTypesFilter';
 import { CategoriesFilter } from '../filters/CategoriesFilter';
 import { TagsFilter } from '../filters/TagsFilter';
 import { useChannelFilters } from '../../../hooks/useChannelFilters';
-import { useChannelModalStore } from '@/store/channelModalStore';
-import { ProxiedImage } from '@/components/ProxiedImage';
 
 interface ChannelModalSidebarProps {
   currentFilters: SidebarFilters;

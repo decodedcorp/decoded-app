@@ -25,7 +25,7 @@ This document provides a comprehensive overview of the Decoded App's UX writing 
 - Follow established patterns
 - Maintain consistent tone across all touchpoints
 
-### 4. Trust & Honesty
+### 4. Trust & Honesty20
 
 - Be transparent about limitations and costs
 - Avoid unfounded confidence

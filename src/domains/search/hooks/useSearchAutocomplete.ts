@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+
 import { useCombinedSearch, useSearchChannelContents } from './useSearch';
 
 export interface AutocompleteItem {

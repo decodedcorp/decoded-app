@@ -2,6 +2,8 @@
 
 import React from 'react';
 
+import { useCommonTranslation } from '@/lib/i18n/hooks';
+
 interface ExploreHeaderProps {
   className?: string;
 }
@@ -11,8 +13,7 @@ interface ExploreHeaderProps {
 export function ExploreHeader({
   className = '',
 }: ExploreHeaderProps) {
-
-
+  const t = useCommonTranslation();
 
   return (
     <div className={`bg-black/80 backdrop-blur-sm ${className}`}>
@@ -20,7 +21,7 @@ export function ExploreHeader({
         {/* Header Title */}
         <div>
           <h1 className="text-3xl font-bold text-white">CHANNELS</h1>
-          <p className="text-zinc-500 text-sm mt-1">Discover curated content channels</p>
+          <p className="text-zinc-500 text-sm mt-1">{t.ui.discoverChannels()}</p>
         </div>
       </div>
     </div>

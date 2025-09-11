@@ -1,59 +1,11 @@
 import { useTranslation } from 'react-i18next';
 
-// Type-safe translation hooks for each namespace
-
-export const useCommonTranslation = () => {
-  const { t } = useTranslation('common');
-
-  return {
-    actions: {
-      create: () => t('actions.create'),
-      update: () => t('actions.update'),
-      edit: () => t('actions.edit'),
-      delete: () => t('actions.delete'),
-      save: () => t('actions.save'),
-      cancel: () => t('actions.cancel'),
-      confirm: () => t('actions.confirm'),
-      back: () => t('actions.back'),
-      next: () => t('actions.next'),
-      close: () => t('actions.close'),
-      search: () => t('actions.search'),
-    },
-    status: {
-      loading: () => t('status.loading'),
-      saving: () => t('status.saving'),
-      uploading: () => t('status.uploading'),
-      processing: () => t('status.processing'),
-      success: () => t('status.success'),
-      error: () => t('status.error'),
-    },
-    time: {
-      justNow: () => t('time.justNow'),
-      hoursAgo: (hours: number) => t('time.hoursAgo', { hours }),
-      yesterday: () => t('time.yesterday'),
-      daysAgo: (days: number) => t('time.daysAgo', { days }),
-    },
-    ui: {
-      expand: () => t('ui.expand'),
-      collapse: () => t('ui.collapse'),
-      fullscreen: () => t('ui.fullscreen'),
-      openSidebar: () => t('ui.openSidebar'),
-      closeSidebar: () => t('ui.closeSidebar'),
-    },
-    navigation: {
-      home: () => t('navigation.home'),
-      channels: () => t('navigation.channels'),
-      explore: () => t('navigation.explore'),
-      library: () => t('navigation.library'),
-      bookmarks: () => t('navigation.bookmarks'),
-      settings: () => t('navigation.settings'),
-      profile: () => t('navigation.profile'),
-      help: () => t('navigation.help'),
-      about: () => t('navigation.about'),
-      contact: () => t('navigation.contact'),
-    },
-  };
-};
+// Re-export centralized hooks for consistency
+export { 
+  useCommonTranslation, 
+  useLanguageSwitch, 
+  useLocaleStatus 
+} from './centralizedHooks';
 
 export const useAuthTranslation = () => {
   const { t } = useTranslation('auth');

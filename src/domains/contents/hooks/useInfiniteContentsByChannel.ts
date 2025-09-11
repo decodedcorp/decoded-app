@@ -1,4 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
+
 import { ContentsService } from '../../../api/generated';
 import { queryKeys } from '../../../lib/api/queryKeys';
 

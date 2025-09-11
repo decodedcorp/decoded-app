@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
+
 import { Button } from '@decoded/ui';
 import { useAcceptInvitation, useRejectInvitation } from '@/domains/invitations/hooks/useInvitations';
 import type { InvitationResponse } from '@/api/generated/models/InvitationResponse';

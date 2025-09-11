@@ -2,17 +2,17 @@
 
 import React, { useEffect, useState } from 'react';
 
-import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { LoginModal } from '@/domains/auth/components/LoginModal';
 import { UserAvatar } from '@/shared/components/UserAvatar';
 import { Button } from '@decoded/ui';
+import { useAuthTranslation } from '@/lib/i18n/hooks';
 
 export function LoginButton() {
-  const router = useRouter();
 
   // 🔄 RESET: Simplified state management - only use essential states
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const t = useAuthTranslation();
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
@@ -39,7 +39,7 @@ export function LoginButton() {
 
   // 🔄 RESET: Simple hydration handling only
   if (!mounted) {
-    return <Button size="sm">Login</Button>;
+    return <Button size="sm">{t.login.title()}</Button>;
   }
 
   return (
@@ -49,7 +49,7 @@ export function LoginButton() {
           <UserAvatar size="md" showDropdown={true} />
         ) : (
           <Button onClick={handleClick} variant="login" size="sm">
-            Login
+            {t.login.title()}
           </Button>
         )}
       </div>

@@ -1,9 +1,11 @@
 'use client';
 
 import { ReactNode, memo } from 'react';
-import { Sidebar } from './sidebar/Sidebar';
+
 import { RightSidebar } from '@/domains/main/components/RightSidebar';
 import { GlobalContentUploadModal } from '@/domains/channels/components/modal/global-content-upload/GlobalContentUploadModal';
+
+import { Sidebar } from './sidebar/Sidebar';
 
 interface MainLayoutProps {
   children: ReactNode;

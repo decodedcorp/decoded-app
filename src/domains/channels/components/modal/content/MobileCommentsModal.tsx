@@ -1,9 +1,11 @@
 'use client';
 
 import React from 'react';
+
 import { MdClose } from 'react-icons/md';
 import { ContentItem } from '@/lib/types/content';
 import { CommentSection } from '@/domains/comments/components/CommentSection';
+
 import { BaseModal } from '../base/BaseModal';
 
 interface MobileCommentsModalProps {

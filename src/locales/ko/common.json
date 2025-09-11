@@ -33,6 +33,12 @@
     "completed": "완료됨",
     "failed": "실패함"
   },
+  "states": {
+    "subscribed": "구독됨",
+    "saving": "저장 중...",
+    "subscribing": "구독 중...",
+    "unsubscribing": "구독 해제 중..."
+  },
   "navigation": {
     "home": "홈",
     "channels": "채널",
@@ -64,7 +70,30 @@
     "showLess": "접기",
     "toggleSidebar": "사이드바 토글",
     "openSidebar": "사이드바 펼치기",
-    "closeSidebar": "사이드바 접기"
+    "closeSidebar": "사이드바 접기",
+    "discoverChannels": "큐레이션된 콘텐츠 채널 발견하기",
+    "loading": "로딩 중...",
+    "subscribers": "구독자",
+    "posts": "게시물",
+    "items": "개 항목",
+    "status": "상태",
+    "editors": "편집자",
+    "created": "생성됨",
+    "updated": "업데이트됨",
+    "type": "유형",
+    "filters": "필터",
+    "hideFilters": "필터 숨기기",
+    "byCardType": "카드 유형별",
+    "byCategory": "카테고리별",
+    "addNewLink": "채널에 새 링크 추가하기",
+    "basicInformation": "기본 정보",
+    "updateChannelBasicInfo": "모든 사용자에게 표시될 채널의 기본 정보를 업데이트하세요.",
+    "channelName": "채널 이름",
+    "enterChannelName": "채널 이름 입력",
+    "description": "설명",
+    "describeChannel": "채널 설명하기 (선택사항)",
+    "channelStatistics": "채널 통계",
+    "contentItems": "콘텐츠 항목"
   },
   "header": {
     "openMenu": "메뉴 열기",
@@ -73,6 +102,7 @@
   },
   "search": {
     "placeholder": "관심 있는 채널·콘텐츠를 찾아보세요",
+    "channelPlaceholder": "{{channelName}}에서 검색",
     "clearSearch": "검색어 지우기",
     "searchButton": "검색",
     "searchingChannels": "채널 검색 중...",
@@ -86,7 +116,13 @@
     "searchErrorOccurred": "검색 오류가 발생했어요. 다시 시도해 주세요.",
     "noResultsFound": "\"{{query}}\" 에 대한 검색 결과가 없어요",
     "content": "콘텐츠",
-    "loadingMore": "더 불러오는 중..."
+    "loadingMore": "더 불러오는 중...",
+    "enterSearchTerm": "검색어를 입력하세요",
+    "searchForChannelsAndContent": "채널과 콘텐츠를 검색해보세요",
+    "searchTermTooShort": "검색어가 너무 짧아요",
+    "enterAtLeast2Characters": "검색하려면 최소 2글자 이상 입력해 주세요",
+    "searchResultsFor": "\"{{query}}\" 검색 결과",
+    "foundResultsInChannelsAndContent": "채널과 콘텐츠에서 검색 결과를 찾았어요"
   },
   "create": {
     "create": "만들기",

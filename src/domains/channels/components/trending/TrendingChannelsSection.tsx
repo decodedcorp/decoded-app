@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
+
 import { useTrendingChannels, TrendingType } from '../../hooks/useTrending';
-import { TrendingChannelCard } from './TrendingChannelCard';
 import { LoadingState, ErrorState } from '../common/LoadingStates';
 import { useChannelTranslation, useCommonTranslation } from '../../../../lib/i18n/hooks';
+
+import { TrendingChannelCard } from './TrendingChannelCard';
 
 interface TrendingChannelsSectionProps {
   className?: string;

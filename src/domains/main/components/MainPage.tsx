@@ -1,8 +1,10 @@
 'use client';
 
 import React from 'react';
-import { MainFeed } from './MainFeed';
+
 import { ContentModal } from '@/domains/channels/components/modal/content/ContentModal';
+
+import { MainFeed } from './MainFeed';
 
 export function MainPage() {
   return (

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
+
 import { HighlightItem } from '@/lib/types/highlightTypes';
 import { ProxiedImage } from '@/components/ProxiedImage';
 

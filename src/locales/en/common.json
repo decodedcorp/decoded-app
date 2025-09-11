@@ -19,7 +19,14 @@
     "copy": "Copy",
     "share": "Share",
     "download": "Download",
-    "upload": "Upload"
+    "upload": "Upload",
+    "add": "Add",
+    "like": "Like",
+    "subscribe": "Subscribe",
+    "unsubscribe": "Unsubscribe",
+    "reset": "Reset",
+    "saveChanges": "Save Changes",
+    "clearAll": "Clear all"
   },
   "status": {
     "loading": "Loading...",
@@ -32,6 +39,12 @@
     "pending": "Pending",
     "completed": "Completed",
     "failed": "Failed"
+  },
+  "states": {
+    "subscribed": "Subscribed",
+    "saving": "Saving...",
+    "subscribing": "Subscribing...",
+    "unsubscribing": "Unsubscribing..."
   },
   "navigation": {
     "home": "Home",
@@ -64,7 +77,30 @@
     "showLess": "Show less",
     "toggleSidebar": "Toggle sidebar",
     "openSidebar": "Open sidebar",
-    "closeSidebar": "Close sidebar"
+    "closeSidebar": "Close sidebar",
+    "discoverChannels": "Discover curated content channels",
+    "loading": "Loading...",
+    "subscribers": "Subscribers",
+    "posts": "Posts",
+    "items": "items",
+    "status": "Status",
+    "editors": "Editors",
+    "created": "Created",
+    "updated": "Updated",
+    "type": "Type",
+    "filters": "Filters",
+    "hideFilters": "Hide filters",
+    "byCardType": "By card type",
+    "byCategory": "By category",
+    "addNewLink": "Add a new link to your channel",
+    "basicInformation": "Basic Information",
+    "updateChannelBasicInfo": "Update your channel's basic information that will be visible to all users.",
+    "channelName": "Channel Name",
+    "enterChannelName": "Enter channel name",
+    "description": "Description",
+    "describeChannel": "Describe your channel (optional)",
+    "channelStatistics": "Channel Statistics",
+    "contentItems": "Content Items"
   },
   "header": {
     "openMenu": "Open menu",
@@ -73,6 +109,7 @@
   },
   "search": {
     "placeholder": "Find channels and content you care about",
+    "channelPlaceholder": "Search in {{channelName}}",
     "clearSearch": "Clear search",
     "searchButton": "Search",
     "searchingChannels": "Searching channels...",
@@ -86,7 +123,13 @@
     "searchErrorOccurred": "Search error occurred. Please try again.",
     "noResultsFound": "No results found for \"{{query}}\"",
     "content": "Content",
-    "loadingMore": "Loading more..."
+    "loadingMore": "Loading more...",
+    "enterSearchTerm": "Enter a search term",
+    "searchForChannelsAndContent": "Search for channels and content",
+    "searchTermTooShort": "Search term too short",
+    "enterAtLeast2Characters": "Please enter at least 2 characters to search",
+    "searchResultsFor": "Search results for \"{{query}}\"",
+    "foundResultsInChannelsAndContent": "Found search results in channels and content"
   },
   "create": {
     "create": "Create",

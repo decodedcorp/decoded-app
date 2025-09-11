@@ -1,13 +1,16 @@
+import { useCommonTranslation } from '@/lib/i18n/hooks';
+
 interface ContentUploadHeaderProps {
   onClose: () => void;
 }
 
 export function ContentUploadHeader({ onClose }: ContentUploadHeaderProps) {
+  const t = useCommonTranslation();
   return (
     <div className="flex items-center justify-between p-6 border-b border-zinc-700/50">
       <div>
-        <h2 className="text-xl font-semibold text-white">Add Content</h2>
-        <p className="text-sm text-zinc-400 mt-1">Add a new link to your channel</p>
+        <h2 className="text-xl font-semibold text-white">{t.actions.add()} Content</h2>
+        <p className="text-sm text-zinc-400 mt-1">{t.ui.addNewLink()}</p>
       </div>
 
       <button

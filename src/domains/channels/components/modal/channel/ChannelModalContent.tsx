@@ -26,14 +26,17 @@ import { queryKeys } from '@/lib/api/queryKeys';
 import { isValidImageUrl, handleImageError } from '@/lib/utils/imageUtils';
 import { ProxiedImage } from '@/components/ProxiedImage';
 import Masonry from '@/components/ReactBitsMasonry';
-import { ContentFiltersBar } from '../filters/ContentFiltersBar';
 import CommunityHighlights from '@/domains/channels/components/highlights/CommunityHighlights';
 import { HighlightItem } from '@/lib/types/highlightTypes';
+import { useUser } from '@/domains/auth/hooks/useAuth';
+import { canPinContent } from '@/lib/utils/channelPermissions';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
+
+import { ContentFiltersBar } from '../filters/ContentFiltersBar';
 import { PinButton, PinIndicator } from '../../pin/PinButton';
 import { ChannelPinnedSection } from '../../pin/ChannelPinnedSection';
 import { useChannel } from '../../../hooks/useChannels';
-import { useUser } from '@/domains/auth/hooks/useAuth';
-import { canPinContent } from '@/lib/utils/channelPermissions';
+
 
 // 개별 콘텐츠 아이템 컴포넌트 (고도화된 메모이제이션)
 const ContentItemCard = React.memo<{
@@ -42,6 +45,7 @@ const ContentItemCard = React.memo<{
   channelId: string;
   channel?: any;
 }>(({ item, onItemClick, channelId, channel }) => {
+  const t = useCommonTranslation();
   const handleClick = React.useCallback(() => {
     // 클릭 가능한 상태가 아닌 경우 클릭 제한
     if (!isContentClickable(item.status)) {
@@ -202,7 +206,7 @@ const ContentItemCard = React.memo<{
           <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-20 group">
             <div
               className="bg-yellow-500/90 text-white px-2 py-1.5 rounded-full font-medium flex items-center space-x-1 cursor-help relative shadow-lg"
-              title="Content is awaiting review and approval"
+              title={t.status.pending()}
             >
               <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                 <path
@@ -211,13 +215,13 @@ const ContentItemCard = React.memo<{
                   clipRule="evenodd"
                 />
               </svg>
-              <span className="text-xs">Pending</span>
+              <span className="text-xs">{t.status.pending()}</span>
 
               {/* Hover Tooltip */}
               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 bg-zinc-900/95 text-white text-xs rounded-lg shadow-xl border border-zinc-700/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
                 <div className="text-center">
-                  <div className="font-medium mb-1">검토 대기중</div>
-                  <div className="text-zinc-400">콘텐츠가 승인을 기다리고 있습니다</div>
+                  <div className="font-medium mb-1">{t.status.pending()}</div>
+                  <div className="text-zinc-400">{t.status.processing()}</div>
                 </div>
                 {/* Arrow pointing down */}
                 <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-2 border-r-2 border-t-4 border-l-transparent border-r-transparent border-t-zinc-900/95"></div>
@@ -312,6 +316,7 @@ export const ChannelModalContent = React.memo<{
   channelId?: string; // URL에서 전달받는 채널 ID
   onFilterChange?: (filters: any) => void;
 }>(({ currentFilters, channelId: propChannelId, onFilterChange }) => {
+  const t = useCommonTranslation();
   const openContentModal = useContentModalStore((state) => state.openModal);
   const selectedChannelId = useChannelModalStore((state) => state.selectedChannelId);
   const selectedChannel = useChannelModalStore((state) => state.selectedChannel);
@@ -459,8 +464,8 @@ export const ChannelModalContent = React.memo<{
       <div className="p-6 pl-4">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-xl font-semibold text-white mb-2">Channel Content</h3>
-            <p className="text-zinc-400">Loading content...</p>
+            <h3 className="text-xl font-semibold text-white mb-2">{t.ui.contentItems()}</h3>
+            <p className="text-zinc-400">{t.status.loading()}</p>
           </div>
         </div>
         <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6 gap-4 space-y-4">
@@ -480,8 +485,8 @@ export const ChannelModalContent = React.memo<{
       <div className="p-6 pl-4">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-xl font-semibold text-white mb-2">Channel Content</h3>
-            <p className="text-zinc-400">Error loading content</p>
+            <h3 className="text-xl font-semibold text-white mb-2">{t.ui.contentItems()}</h3>
+            <p className="text-zinc-400">{t.status.error()}</p>
           </div>
         </div>
         <div className="text-center py-12">
@@ -500,22 +505,22 @@ export const ChannelModalContent = React.memo<{
               />
             </svg>
           </div>
-          <h3 className="text-lg font-semibold text-white mb-2">Failed to Load Content</h3>
+          <h3 className="text-lg font-semibold text-white mb-2">{t.feed.failedToLoadPosts()}</h3>
           <p className="text-zinc-400 mb-6 max-w-md mx-auto">
-            There was an error loading the channel content. Please try again.
+            {t.status.error()}
           </p>
           <div className="flex items-center justify-center space-x-3">
             <Button
               onClick={() => refetch()}
               variant="primary"
             >
-              Try Again
+              {t.feed.tryAgain()}
             </Button>
             <Button
               onClick={() => window.location.reload()}
               variant="secondary"
             >
-              Reload Page
+              {t.actions.reload()}
             </Button>
           </div>
           {process.env.NODE_ENV === 'development' && (
@@ -554,7 +559,7 @@ export const ChannelModalContent = React.memo<{
         <div>
           {/* 콘텐츠 개수 및 상태 필터 */}
           <div className="flex items-center gap-3 mb-2">
-            <p className="text-gray-500">{totalCount || 0} items</p>
+            <p className="text-gray-500">{totalCount || 0} {t.ui.contentItems()}</p>
 
             {/* 상태 필터 버튼들 */}
             <div className="flex gap-1">
@@ -584,7 +589,7 @@ export const ChannelModalContent = React.memo<{
                     : 'bg-zinc-800/50 text-gray-500 hover:text-gray-400'
                 }`}
               >
-                Pending
+                {t.status.pending()}
               </button>
               <button
                 onClick={() => {
@@ -623,14 +628,14 @@ export const ChannelModalContent = React.memo<{
                   clipRule="evenodd"
                 />
               </svg>
-              <span>{pendingCount} items being processed (click to view)</span>
+              <span>{pendingCount} {t.ui.contentItems()} {t.status.processing()}</span>
             </button>
           )}
 
           {/* 데이터 상태 표시 */}
           {!isLoading && !error && finalDisplayContentItems.length === 0 && (
             <p className="text-sm text-gray-500 mt-1">
-              {shouldUseFiltering ? 'No content matches current filters' : 'No content available'}
+              {shouldUseFiltering ? t.feed.noPostsFound() : t.feed.noPostsFound()}
             </p>
           )}
         </div>
@@ -655,7 +660,7 @@ export const ChannelModalContent = React.memo<{
                 d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
               />
             </svg>
-            <span>Refresh</span>
+            <span>{t.actions.refresh()}</span>
           </button>
         </div>
       </div>
@@ -755,9 +760,9 @@ export const ChannelModalContent = React.memo<{
                 />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-gray-400 mb-2">No Content Yet</h3>
+            <h3 className="text-xl font-semibold text-gray-400 mb-2">{t.feed.noPostsFound()}</h3>
             <p className="text-gray-500 mb-6 max-w-md mx-auto">
-              This channel doesn't have any content yet. Be the first to add something!
+              {t.feed.tryDifferentFilter()}
             </p>
             <button
               onClick={handleAddContent}
@@ -771,7 +776,7 @@ export const ChannelModalContent = React.memo<{
                   d="M12 4v16m8-8H4"
                 />
               </svg>
-              <span>Add First Content</span>
+              <span>{t.create.createNewContent()}</span>
             </button>
           </div>
         )}

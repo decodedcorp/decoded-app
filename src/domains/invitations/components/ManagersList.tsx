@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+
 import type { ChannelResponse } from '@/api/generated/models/ChannelResponse';
 import type { UserProfileResponse } from '@/api/generated/models/UserProfileResponse';
 import type { ChannelUserProfile } from '@/api/generated/models/ChannelUserProfile';

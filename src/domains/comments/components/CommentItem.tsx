@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+
 import { Button } from '@decoded/ui';
 import { 
   MdFavorite, 
@@ -13,8 +14,10 @@ import {
   MdThumbDownOffAlt
 } from 'react-icons/md';
 import { CommentResponse } from '@/api/generated/models/CommentResponse';
-import { useCommentLike, useUpdateComment, useDeleteComment } from '../hooks/useComments';
 import { useUser } from '@/domains/auth/hooks/useAuth';
+
+import { useCommentLike, useUpdateComment, useDeleteComment } from '../hooks/useComments';
+
 import { CommentInput } from './CommentInput';
 
 interface CommentItemProps {

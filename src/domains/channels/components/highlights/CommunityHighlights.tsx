@@ -1,11 +1,13 @@
 'use client';
 
 import React, { memo, useState, useCallback, useMemo } from 'react';
+
 import { useChannelPins } from '@/domains/channels/hooks/useChannelPins';
 import { useContentsByIds } from '@/domains/channels/hooks/useContentsByIds';
 import { HighlightItem } from '@/lib/types/highlightTypes';
 import { UnifiedPinnedItem } from '@/api/generated/models/UnifiedPinnedItem';
 import { ContentItem } from '@/lib/types/content';
+
 import HighlightCard from './HighlightCard';
 
 interface CommunityHighlightsProps {

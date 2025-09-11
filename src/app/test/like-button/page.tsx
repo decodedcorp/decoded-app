@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+
 import { ChannelCard } from '@/components/ChannelCard/ChannelCard';
 import { ContentsCard } from '@/components/ContentsCard/ContentsCard';
 

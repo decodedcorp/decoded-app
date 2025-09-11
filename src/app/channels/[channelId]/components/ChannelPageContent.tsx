@@ -1,13 +1,12 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+
 import { useRouter } from 'next/navigation';
 import { Button } from '@decoded/ui';
-
 import type { SidebarFilters } from '@/domains/channels/components/sidebar/ChannelSidebar';
 import { ChannelData } from '@/store/channelModalStore';
 import { formatDateByContext } from '@/lib/utils/dateUtils';
-
 import { useChannel } from '@/domains/channels/hooks/useChannels';
 import { ChannelModalContent } from '@/domains/channels/components/modal/channel/ChannelModalContent';
 import { ChannelModalSkeleton } from '@/domains/channels/components/modal/channel/ChannelModalSkeleton';
@@ -17,10 +16,11 @@ import { useChannelContentsSinglePage } from '@/domains/channels/hooks/useChanne
 import { useContentModalStore } from '@/store/contentModalStore';
 import { useContentUploadStore } from '@/store/contentUploadStore';
 import { ContentItem } from '@/lib/types/content';
-
-import { ChannelPageHeader } from './ChannelPageHeader';
 import CommunityHighlights from '@/domains/channels/components/highlights/CommunityHighlights';
 import { HighlightItem } from '@/lib/types/highlightTypes';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
+
+import { ChannelPageHeader } from './ChannelPageHeader';
 
 interface ChannelPageContentProps {
   channelId: string;
@@ -28,6 +28,7 @@ interface ChannelPageContentProps {
 
 export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
   const router = useRouter();
+  const t = useCommonTranslation();
   const openContentModal = useContentModalStore((state) => state.openModal);
 
   // 채널 ID로 API 데이터 가져오기
@@ -158,7 +159,7 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-white text-lg">Loading channel...</div>
+        <div className="text-white text-lg">{t.status.loading()}</div>
       </div>
     );
   }
@@ -168,9 +169,9 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="text-red-500 text-lg mb-4">Failed to load channel</div>
+          <div className="text-red-500 text-lg mb-4">{t.status.error()}</div>
           <Button onClick={handleGoBack} variant="primary">
-            Go Back
+            {t.actions.back()}
           </Button>
         </div>
       </div>
@@ -206,7 +207,7 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
         {/* Content */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden">
           {error && (
-            <div className="text-red-500 text-center p-4">채널 정보를 불러오는데 실패했습니다.</div>
+            <div className="text-red-500 text-center p-4">{t.status.error()}</div>
           )}
           {!error && finalChannel && (
             <>

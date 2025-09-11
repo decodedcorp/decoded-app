@@ -1,20 +1,21 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
+
 import { X, Camera } from 'lucide-react';
 import { Button } from '@decoded/ui';
-
-import {
-  useAddChannelStore,
-  selectAddChannelFormData,
-  selectAddChannelError,
-} from '../../../store/addChannelStore';
 import {
   compressImage,
   validateImageFile,
   logBase64Analysis,
   getCompressionRecommendations,
 } from '@/lib/utils/imageUtils';
+
+import {
+  useAddChannelStore,
+  selectAddChannelFormData,
+  selectAddChannelError,
+} from '../../../store/addChannelStore';
 
 interface AddChannelFormProps {
   onSubmit: (data?: {
