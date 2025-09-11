@@ -97,6 +97,8 @@ type CommonTranslations = {
     describeChannel: () => string;
     channelStatistics: () => string;
     contentItems: () => string;
+    active: () => string;
+    all: () => string;
   };
   header: {
     openMenu: () => string;
@@ -146,6 +148,22 @@ type CommonTranslations = {
     settings: () => string;
     logout: () => string;
   };
+  login: {
+    title: () => string;
+    subtitle: () => string;
+    termsOfService: () => string;
+    privacyPolicy: () => string;
+    continueWithGoogle: () => string;
+    signingIn: () => string;
+    popupBlocked: () => string;
+    loginCancelled: () => string;
+    loginFailed: () => string;
+    authError: () => string;
+    networkError: () => string;
+    clientIdMissing: () => string;
+    error: () => string;
+    agreementText: () => string;
+  };
   feed: {
     section: {
       header: () => string;
@@ -179,6 +197,228 @@ type CommonTranslations = {
     badge: {
       justIn: () => string;
       trending: () => string;
+    };
+  };
+  globalContentUpload: {
+    title: () => string;
+    subtitle: () => string;
+    channelSelection: {
+      title: () => string;
+      subtitle: () => string;
+      createNewChannel: () => string;
+      selectExistingChannel: () => string;
+    };
+    channelCreation: {
+      title: () => string;
+      subtitle: () => string;
+    };
+    header: {
+      selectChannel: () => string;
+      addContentToChannel: (channelName: string) => string;
+      chooseWhereToUpload: () => string;
+      uploadToSelectedChannel: () => string;
+      stepChannel: () => string;
+      stepContent: () => string;
+    };
+    search: {
+      placeholder: () => string;
+      searchingChannels: () => string;
+      failedToSearch: () => string;
+      noChannelsFound: () => string;
+      createNewChannel: () => string;
+    };
+    recentChannels: {
+      title: () => string;
+    };
+    contentUpload: {
+      contentType: () => string;
+      image: () => string;
+      link: () => string;
+      imageUpload: () => string;
+      selectImage: () => string;
+      linkUrl: () => string;
+      description: () => string;
+      optional: () => string;
+      addDescription: () => string;
+      fileFormats: () => string;
+      validation: {
+        descriptionTooLong: () => string;
+        imageRequired: () => string;
+        urlRequired: () => string;
+        invalidUrl: () => string;
+        imageProcessingError: () => string;
+      };
+    };
+    addChannel: {
+      title: () => string;
+      steps: {
+        basicInfo: () => string;
+        style: () => string;
+        topics: () => string;
+      };
+      step1: {
+        title: () => string;
+        subtitle: () => string;
+        channelName: () => string;
+        description: () => string;
+        required: () => string;
+        channelNamePlaceholder: () => string;
+        descriptionPlaceholder: () => string;
+        preview: {
+          channelName: () => string;
+          newChannel: () => string;
+          subscribers: () => string;
+          descriptionPlaceholder: () => string;
+        };
+      };
+      step2: {
+        title: () => string;
+        subtitle: () => string;
+        banner: () => string;
+        icon: () => string;
+        addBanner: () => string;
+        addIcon: () => string;
+        clickOrDrag: () => string;
+        removeBanner: () => string;
+        removeIcon: () => string;
+        preview: {
+          member: () => string;
+          online: () => string;
+        };
+      };
+      step3: {
+        title: () => string;
+        subtitle: () => string;
+        chooseCategory: () => string;
+        subcategories: () => string;
+        loadingCategories: () => string;
+        failedToLoad: () => string;
+        errorLoading: () => string;
+        noCategorySelected: () => string;
+        category: () => string;
+        preview: {
+          channelName: () => string;
+          newChannel: () => string;
+          subscribers: () => string;
+          descriptionPlaceholder: () => string;
+        };
+      };
+      navigation: {
+        back: () => string;
+        cancel: () => string;
+        next: () => string;
+        nextStep: () => string;
+        createChannel: () => string;
+        creating: () => string;
+      };
+      errors: {
+        channelCreationFailed: () => string;
+        internalServerError: () => string;
+        imageProcessingFailed: () => string;
+        pleaseDropImage: () => string;
+      };
+    };
+    bookmarks: {
+      title: () => string;
+      subtitle: () => string;
+      signInRequired: () => string;
+      signInRequiredDescription: () => string;
+      goToHome: () => string;
+      failedToLoad: () => string;
+      failedToLoadDescription: () => string;
+      retry: () => string;
+      loading: () => string;
+      loadMore: () => string;
+      bookmarked: () => string;
+      from: () => string;
+      noBookmarks: () => string;
+      noBookmarksDescription: () => string;
+      exploreChannels: () => string;
+      bookmarksCount: () => string;
+    };
+    toast: {
+      actions: {
+        createChannel: () => string;
+        updateChannel: () => string;
+        deleteChannel: () => string;
+        updateThumbnail: () => string;
+        createContent: () => string;
+        updateContent: () => string;
+        deleteContent: () => string;
+        createLinkContent: () => string;
+        createImageContent: () => string;
+        createVideoContent: () => string;
+        updateLinkContent: () => string;
+        updateImageContent: () => string;
+        updateVideoContent: () => string;
+        deleteLinkContent: () => string;
+        deleteImageContent: () => string;
+        deleteVideoContent: () => string;
+      };
+      states: {
+        loading: () => string;
+        completed: () => string;
+        failed: () => string;
+      };
+      messages: {
+        creatingChannel: () => string;
+        channelCreated: () => string;
+        channelCreateFailed: () => string;
+        updatingChannel: () => string;
+        channelUpdated: () => string;
+        channelUpdateFailed: () => string;
+        deletingChannel: () => string;
+        channelDeleted: () => string;
+        channelDeleteFailed: () => string;
+        updatingThumbnail: () => string;
+        thumbnailUpdated: () => string;
+        thumbnailUpdateFailed: () => string;
+        creatingContent: () => string;
+        contentCreated: () => string;
+        contentCreateFailed: () => string;
+        updatingContent: () => string;
+        contentUpdated: () => string;
+        contentUpdateFailed: () => string;
+        deletingContent: () => string;
+        contentDeleted: () => string;
+        contentDeleteFailed: () => string;
+        sendingInvitation: () => string;
+        invitationSent: () => string;
+        invitationSendFailed: () => string;
+        acceptingInvitation: () => string;
+        invitationAccepted: () => string;
+        invitationAcceptFailed: () => string;
+        rejectingInvitation: () => string;
+        invitationRejected: () => string;
+        invitationRejectFailed: () => string;
+        cancelingInvitation: () => string;
+        invitationCanceled: () => string;
+        invitationCancelFailed: () => string;
+        markingNotificationRead: () => string;
+        notificationMarkedRead: () => string;
+        notificationMarkReadFailed: () => string;
+        markingAllNotificationsRead: () => string;
+        allNotificationsMarkedRead: () => string;
+        allNotificationsMarkReadFailed: () => string;
+      };
+    };
+    errors: {
+      channelCreationFailed: () => string;
+      internalServerError: () => string;
+      networkError: () => string;
+    };
+    sidebar: {
+      trendingChannels: () => string;
+      popularToday: () => string;
+      sponsored: () => string;
+      advertisementPlaceholder: () => string;
+      members: () => string;
+      upvotes: () => string;
+      about: () => string;
+      help: () => string;
+      privacyPolicy: () => string;
+      termsOfService: () => string;
+      copyright: () => string;
     };
   };
 };
@@ -280,6 +520,8 @@ export const useCommonTranslation = (): CommonTranslations => {
       describeChannel: () => t('ui.describeChannel'),
       channelStatistics: () => t('ui.channelStatistics'),
       contentItems: () => t('ui.contentItems'),
+      active: () => t('ui.active'),
+      all: () => t('ui.all'),
     },
     header: {
       openMenu: () => t('header.openMenu'),
@@ -329,13 +571,29 @@ export const useCommonTranslation = (): CommonTranslations => {
       settings: () => t('user.settings'),
       logout: () => t('user.logout'),
     },
+    login: {
+      title: () => t('login.title'),
+      subtitle: () => t('login.subtitle'),
+      termsOfService: () => t('login.termsOfService'),
+      privacyPolicy: () => t('login.privacyPolicy'),
+      continueWithGoogle: () => t('login.continueWithGoogle'),
+      signingIn: () => t('login.signingIn'),
+      popupBlocked: () => t('login.popupBlocked'),
+      loginCancelled: () => t('login.loginCancelled'),
+      loginFailed: () => t('login.loginFailed'),
+      authError: () => t('login.authError'),
+      networkError: () => t('login.networkError'),
+      clientIdMissing: () => t('login.clientIdMissing'),
+      error: () => t('login.error'),
+      agreementText: () => t('login.agreementText'),
+    },
     feed: {
       section: {
         header: () => t('feed.section.header'),
         sub: () => t('feed.section.sub'),
       },
       meta: {
-        line: (params: { range: string; sort: string; count: number }) => 
+        line: (params: { range: string; sort: string; count: number }) =>
           t('feed.meta.line', params),
       },
       sort: {
@@ -363,6 +621,249 @@ export const useCommonTranslation = (): CommonTranslations => {
       badge: {
         justIn: () => t('feed.badge.justIn'),
         trending: () => t('feed.badge.trending'),
+      },
+    },
+    globalContentUpload: {
+      title: () => t('globalContentUpload.title'),
+      subtitle: () => t('globalContentUpload.subtitle'),
+      channelSelection: {
+        title: () => t('globalContentUpload.channelSelection.title'),
+        subtitle: () => t('globalContentUpload.channelSelection.subtitle'),
+        createNewChannel: () => t('globalContentUpload.channelSelection.createNewChannel'),
+        selectExistingChannel: () =>
+          t('globalContentUpload.channelSelection.selectExistingChannel'),
+      },
+      channelCreation: {
+        title: () => t('globalContentUpload.channelCreation.title'),
+        subtitle: () => t('globalContentUpload.channelCreation.subtitle'),
+      },
+      header: {
+        selectChannel: () => t('globalContentUpload.header.selectChannel'),
+        addContentToChannel: (channelName: string) =>
+          t('globalContentUpload.header.addContentToChannel', { channelName }),
+        chooseWhereToUpload: () => t('globalContentUpload.header.chooseWhereToUpload'),
+        uploadToSelectedChannel: () => t('globalContentUpload.header.uploadToSelectedChannel'),
+        stepChannel: () => t('globalContentUpload.header.stepChannel'),
+        stepContent: () => t('globalContentUpload.header.stepContent'),
+      },
+      search: {
+        placeholder: () => t('globalContentUpload.search.placeholder'),
+        searchingChannels: () => t('globalContentUpload.search.searchingChannels'),
+        failedToSearch: () => t('globalContentUpload.search.failedToSearch'),
+        noChannelsFound: () => t('globalContentUpload.search.noChannelsFound'),
+        createNewChannel: () => t('globalContentUpload.search.createNewChannel'),
+      },
+      recentChannels: {
+        title: () => t('globalContentUpload.recentChannels.title'),
+      },
+      contentUpload: {
+        contentType: () => t('globalContentUpload.contentUpload.contentType'),
+        image: () => t('globalContentUpload.contentUpload.image'),
+        link: () => t('globalContentUpload.contentUpload.link'),
+        imageUpload: () => t('globalContentUpload.contentUpload.imageUpload'),
+        selectImage: () => t('globalContentUpload.contentUpload.selectImage'),
+        linkUrl: () => t('globalContentUpload.contentUpload.linkUrl'),
+        description: () => t('globalContentUpload.contentUpload.description'),
+        optional: () => t('globalContentUpload.contentUpload.optional'),
+        addDescription: () => t('globalContentUpload.contentUpload.addDescription'),
+        fileFormats: () => t('globalContentUpload.contentUpload.fileFormats'),
+        validation: {
+          descriptionTooLong: () =>
+            t('globalContentUpload.contentUpload.validation.descriptionTooLong'),
+          imageRequired: () => t('globalContentUpload.contentUpload.validation.imageRequired'),
+          urlRequired: () => t('globalContentUpload.contentUpload.validation.urlRequired'),
+          invalidUrl: () => t('globalContentUpload.contentUpload.validation.invalidUrl'),
+          imageProcessingError: () =>
+            t('globalContentUpload.contentUpload.validation.imageProcessingError'),
+        },
+      },
+      addChannel: {
+        title: () => t('globalContentUpload.addChannel.title'),
+        steps: {
+          basicInfo: () => t('globalContentUpload.addChannel.steps.basicInfo'),
+          style: () => t('globalContentUpload.addChannel.steps.style'),
+          topics: () => t('globalContentUpload.addChannel.steps.topics'),
+        },
+        step1: {
+          title: () => t('globalContentUpload.addChannel.step1.title'),
+          subtitle: () => t('globalContentUpload.addChannel.step1.subtitle'),
+          channelName: () => t('globalContentUpload.addChannel.step1.channelName'),
+          description: () => t('globalContentUpload.addChannel.step1.description'),
+          required: () => t('globalContentUpload.addChannel.step1.required'),
+          channelNamePlaceholder: () =>
+            t('globalContentUpload.addChannel.step1.channelNamePlaceholder'),
+          descriptionPlaceholder: () =>
+            t('globalContentUpload.addChannel.step1.descriptionPlaceholder'),
+          preview: {
+            channelName: () => t('globalContentUpload.addChannel.step1.preview.channelName'),
+            newChannel: () => t('globalContentUpload.addChannel.step1.preview.newChannel'),
+            subscribers: () => t('globalContentUpload.addChannel.step1.preview.subscribers'),
+            descriptionPlaceholder: () =>
+              t('globalContentUpload.addChannel.step1.preview.descriptionPlaceholder'),
+          },
+        },
+        step2: {
+          title: () => t('globalContentUpload.addChannel.step2.title'),
+          subtitle: () => t('globalContentUpload.addChannel.step2.subtitle'),
+          banner: () => t('globalContentUpload.addChannel.step2.banner'),
+          icon: () => t('globalContentUpload.addChannel.step2.icon'),
+          addBanner: () => t('globalContentUpload.addChannel.step2.addBanner'),
+          addIcon: () => t('globalContentUpload.addChannel.step2.addIcon'),
+          clickOrDrag: () => t('globalContentUpload.addChannel.step2.clickOrDrag'),
+          removeBanner: () => t('globalContentUpload.addChannel.step2.removeBanner'),
+          removeIcon: () => t('globalContentUpload.addChannel.step2.removeIcon'),
+          preview: {
+            member: () => t('globalContentUpload.addChannel.step2.preview.member'),
+            online: () => t('globalContentUpload.addChannel.step2.preview.online'),
+          },
+        },
+        step3: {
+          title: () => t('globalContentUpload.addChannel.step3.title'),
+          subtitle: () => t('globalContentUpload.addChannel.step3.subtitle'),
+          chooseCategory: () => t('globalContentUpload.addChannel.step3.chooseCategory'),
+          subcategories: () => t('globalContentUpload.addChannel.step3.subcategories'),
+          loadingCategories: () => t('globalContentUpload.addChannel.step3.loadingCategories'),
+          failedToLoad: () => t('globalContentUpload.addChannel.step3.failedToLoad'),
+          errorLoading: () => t('globalContentUpload.addChannel.step3.errorLoading'),
+          noCategorySelected: () => t('globalContentUpload.addChannel.step3.noCategorySelected'),
+          category: () => t('globalContentUpload.addChannel.step3.category'),
+          preview: {
+            channelName: () => t('globalContentUpload.addChannel.step3.preview.channelName'),
+            newChannel: () => t('globalContentUpload.addChannel.step3.preview.newChannel'),
+            subscribers: () => t('globalContentUpload.addChannel.step3.preview.subscribers'),
+            descriptionPlaceholder: () =>
+              t('globalContentUpload.addChannel.step3.preview.descriptionPlaceholder'),
+          },
+        },
+        navigation: {
+          back: () => t('globalContentUpload.addChannel.navigation.back'),
+          cancel: () => t('globalContentUpload.addChannel.navigation.cancel'),
+          next: () => t('globalContentUpload.addChannel.navigation.next'),
+          nextStep: () => t('globalContentUpload.addChannel.navigation.nextStep'),
+          createChannel: () => t('globalContentUpload.addChannel.navigation.createChannel'),
+          creating: () => t('globalContentUpload.addChannel.navigation.creating'),
+        },
+        errors: {
+          channelCreationFailed: () =>
+            t('globalContentUpload.addChannel.errors.channelCreationFailed'),
+          internalServerError: () => t('globalContentUpload.addChannel.errors.internalServerError'),
+          imageProcessingFailed: () =>
+            t('globalContentUpload.addChannel.errors.imageProcessingFailed'),
+          pleaseDropImage: () => t('globalContentUpload.addChannel.errors.pleaseDropImage'),
+        },
+      },
+      bookmarks: {
+        title: () => t('globalContentUpload.bookmarks.title'),
+        subtitle: () => t('globalContentUpload.bookmarks.subtitle'),
+        signInRequired: () => t('globalContentUpload.bookmarks.signInRequired'),
+        signInRequiredDescription: () =>
+          t('globalContentUpload.bookmarks.signInRequiredDescription'),
+        goToHome: () => t('globalContentUpload.bookmarks.goToHome'),
+        failedToLoad: () => t('globalContentUpload.bookmarks.failedToLoad'),
+        failedToLoadDescription: () => t('globalContentUpload.bookmarks.failedToLoadDescription'),
+        retry: () => t('globalContentUpload.bookmarks.retry'),
+        loading: () => t('globalContentUpload.bookmarks.loading'),
+        loadMore: () => t('globalContentUpload.bookmarks.loadMore'),
+        bookmarked: () => t('globalContentUpload.bookmarks.bookmarked'),
+        from: () => t('globalContentUpload.bookmarks.from'),
+        noBookmarks: () => t('globalContentUpload.bookmarks.noBookmarks'),
+        noBookmarksDescription: () => t('globalContentUpload.bookmarks.noBookmarksDescription'),
+        exploreChannels: () => t('globalContentUpload.bookmarks.exploreChannels'),
+        bookmarksCount: () => t('globalContentUpload.bookmarks.bookmarksCount'),
+      },
+      toast: {
+        actions: {
+          createChannel: () => t('globalContentUpload.toast.actions.createChannel'),
+          updateChannel: () => t('globalContentUpload.toast.actions.updateChannel'),
+          deleteChannel: () => t('globalContentUpload.toast.actions.deleteChannel'),
+          updateThumbnail: () => t('globalContentUpload.toast.actions.updateThumbnail'),
+          createContent: () => t('globalContentUpload.toast.actions.createContent'),
+          updateContent: () => t('globalContentUpload.toast.actions.updateContent'),
+          deleteContent: () => t('globalContentUpload.toast.actions.deleteContent'),
+          createLinkContent: () => t('globalContentUpload.toast.actions.createLinkContent'),
+          createImageContent: () => t('globalContentUpload.toast.actions.createImageContent'),
+          createVideoContent: () => t('globalContentUpload.toast.actions.createVideoContent'),
+          updateLinkContent: () => t('globalContentUpload.toast.actions.updateLinkContent'),
+          updateImageContent: () => t('globalContentUpload.toast.actions.updateImageContent'),
+          updateVideoContent: () => t('globalContentUpload.toast.actions.updateVideoContent'),
+          deleteLinkContent: () => t('globalContentUpload.toast.actions.deleteLinkContent'),
+          deleteImageContent: () => t('globalContentUpload.toast.actions.deleteImageContent'),
+          deleteVideoContent: () => t('globalContentUpload.toast.actions.deleteVideoContent'),
+        },
+        states: {
+          loading: () => t('globalContentUpload.toast.states.loading'),
+          completed: () => t('globalContentUpload.toast.states.completed'),
+          failed: () => t('globalContentUpload.toast.states.failed'),
+        },
+        messages: {
+          creatingChannel: () => t('globalContentUpload.toast.messages.creatingChannel'),
+          channelCreated: () => t('globalContentUpload.toast.messages.channelCreated'),
+          channelCreateFailed: () => t('globalContentUpload.toast.messages.channelCreateFailed'),
+          updatingChannel: () => t('globalContentUpload.toast.messages.updatingChannel'),
+          channelUpdated: () => t('globalContentUpload.toast.messages.channelUpdated'),
+          channelUpdateFailed: () => t('globalContentUpload.toast.messages.channelUpdateFailed'),
+          deletingChannel: () => t('globalContentUpload.toast.messages.deletingChannel'),
+          channelDeleted: () => t('globalContentUpload.toast.messages.channelDeleted'),
+          channelDeleteFailed: () => t('globalContentUpload.toast.messages.channelDeleteFailed'),
+          updatingThumbnail: () => t('globalContentUpload.toast.messages.updatingThumbnail'),
+          thumbnailUpdated: () => t('globalContentUpload.toast.messages.thumbnailUpdated'),
+          thumbnailUpdateFailed: () =>
+            t('globalContentUpload.toast.messages.thumbnailUpdateFailed'),
+          creatingContent: () => t('globalContentUpload.toast.messages.creatingContent'),
+          contentCreated: () => t('globalContentUpload.toast.messages.contentCreated'),
+          contentCreateFailed: () => t('globalContentUpload.toast.messages.contentCreateFailed'),
+          updatingContent: () => t('globalContentUpload.toast.messages.updatingContent'),
+          contentUpdated: () => t('globalContentUpload.toast.messages.contentUpdated'),
+          contentUpdateFailed: () => t('globalContentUpload.toast.messages.contentUpdateFailed'),
+          deletingContent: () => t('globalContentUpload.toast.messages.deletingContent'),
+          contentDeleted: () => t('globalContentUpload.toast.messages.contentDeleted'),
+          contentDeleteFailed: () => t('globalContentUpload.toast.messages.contentDeleteFailed'),
+          sendingInvitation: () => t('globalContentUpload.toast.messages.sendingInvitation'),
+          invitationSent: () => t('globalContentUpload.toast.messages.invitationSent'),
+          invitationSendFailed: () => t('globalContentUpload.toast.messages.invitationSendFailed'),
+          acceptingInvitation: () => t('globalContentUpload.toast.messages.acceptingInvitation'),
+          invitationAccepted: () => t('globalContentUpload.toast.messages.invitationAccepted'),
+          invitationAcceptFailed: () =>
+            t('globalContentUpload.toast.messages.invitationAcceptFailed'),
+          rejectingInvitation: () => t('globalContentUpload.toast.messages.rejectingInvitation'),
+          invitationRejected: () => t('globalContentUpload.toast.messages.invitationRejected'),
+          invitationRejectFailed: () =>
+            t('globalContentUpload.toast.messages.invitationRejectFailed'),
+          cancelingInvitation: () => t('globalContentUpload.toast.messages.cancelingInvitation'),
+          invitationCanceled: () => t('globalContentUpload.toast.messages.invitationCanceled'),
+          invitationCancelFailed: () =>
+            t('globalContentUpload.toast.messages.invitationCancelFailed'),
+          markingNotificationRead: () =>
+            t('globalContentUpload.toast.messages.markingNotificationRead'),
+          notificationMarkedRead: () =>
+            t('globalContentUpload.toast.messages.notificationMarkedRead'),
+          notificationMarkReadFailed: () =>
+            t('globalContentUpload.toast.messages.notificationMarkReadFailed'),
+          markingAllNotificationsRead: () =>
+            t('globalContentUpload.toast.messages.markingAllNotificationsRead'),
+          allNotificationsMarkedRead: () =>
+            t('globalContentUpload.toast.messages.allNotificationsMarkedRead'),
+          allNotificationsMarkReadFailed: () =>
+            t('globalContentUpload.toast.messages.allNotificationsMarkReadFailed'),
+        },
+      },
+      errors: {
+        channelCreationFailed: () => t('globalContentUpload.errors.channelCreationFailed'),
+        internalServerError: () => t('globalContentUpload.errors.internalServerError'),
+        networkError: () => t('globalContentUpload.errors.networkError'),
+      },
+      sidebar: {
+        trendingChannels: () => t('globalContentUpload.sidebar.trendingChannels'),
+        popularToday: () => t('globalContentUpload.sidebar.popularToday'),
+        sponsored: () => t('globalContentUpload.sidebar.sponsored'),
+        advertisementPlaceholder: () => t('globalContentUpload.sidebar.advertisementPlaceholder'),
+        members: () => t('globalContentUpload.sidebar.members'),
+        upvotes: () => t('globalContentUpload.sidebar.upvotes'),
+        about: () => t('globalContentUpload.sidebar.about'),
+        help: () => t('globalContentUpload.sidebar.help'),
+        privacyPolicy: () => t('globalContentUpload.sidebar.privacyPolicy'),
+        termsOfService: () => t('globalContentUpload.sidebar.termsOfService'),
+        copyright: () => t('globalContentUpload.sidebar.copyright'),
       },
     },
   };

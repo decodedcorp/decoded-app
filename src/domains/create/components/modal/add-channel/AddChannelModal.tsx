@@ -11,6 +11,7 @@ import {
 import { useCreateChannel } from '@/domains/channels/hooks/useChannels';
 import { useChannelModalStore } from '@/store/channelModalStore';
 import { useGlobalContentUploadStore } from '@/store/globalContentUploadStore';
+import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
 
 import { BaseModal } from '../base/BaseModal';
 
@@ -36,6 +37,7 @@ interface Step3Data {
 }
 
 export function AddChannelModal() {
+  const t = useCommonTranslation();
   const isOpen = useAddChannelStore(selectIsAddChannelModalOpen);
   const isLoading = useAddChannelStore(selectAddChannelLoading);
   const closeModal = useAddChannelStore((state) => state.closeModal);
@@ -140,10 +142,10 @@ export function AddChannelModal() {
       }
     } catch (error: any) {
       // Handle different types of errors
-      let errorMessage = 'Failed to create channel. Please try again.';
+      let errorMessage = t.globalContentUpload.addChannel.errors.channelCreationFailed();
 
       if (error?.response?.status === 500) {
-        errorMessage = 'Internal server error occurred. Please try again later.';
+        errorMessage = t.globalContentUpload.addChannel.errors.internalServerError();
       } else if (error?.response?.data?.detail) {
         errorMessage = error.response.data.detail;
       } else if (error?.message) {
@@ -170,13 +172,13 @@ export function AddChannelModal() {
   // ESC 키로 모달 닫기
   useEffect(() => {
     if (!isOpen) return;
-    
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         handleCancel();
       }
     };
-    
+
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, handleCancel]);
@@ -185,10 +187,12 @@ export function AddChannelModal() {
     <BaseModal
       isOpen={isOpen}
       onClose={closeModal}
-      overlayClassName="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-      contentClassName="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
+      closeOnOverlayClick={true}
+      closeOnEscape={true}
+      titleId="add-channel-modal-title"
+      descId="add-channel-modal-description"
     >
-      <div className="bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl w-full max-w-[1200px] max-h-[90vh] overflow-hidden animate-scale-in shadow-2xl flex flex-col">
+      <div className="bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-[1200px] lg:max-w-[1200px] max-h-[90vh] sm:max-h-[85vh] md:max-h-[90vh] overflow-hidden animate-scale-in shadow-2xl flex flex-col">
         <AddChannelHeader onClose={closeModal} currentStep={currentStep} />
 
         <div className="flex-1 overflow-y-auto p-4 sm:p-6">
@@ -208,10 +212,7 @@ export function AddChannelModal() {
               }
             />
           ) : currentStep === 3 ? (
-            <Step3CategorySelection
-              data={step3Data}
-              onDataChange={(data) => setStep3Data(data)}
-            />
+            <Step3CategorySelection data={step3Data} onDataChange={(data) => setStep3Data(data)} />
           ) : null}
         </div>
 
@@ -219,10 +220,10 @@ export function AddChannelModal() {
           currentStep={currentStep}
           onCancel={handleCancel}
           onBack={
-            currentStep === 2 
-              ? handleBackToStep1 
-              : currentStep === 3 
-              ? handleBackToStep2 
+            currentStep === 2
+              ? handleBackToStep1
+              : currentStep === 3
+              ? handleBackToStep2
               : undefined
           }
           onNext={
@@ -239,7 +240,9 @@ export function AddChannelModal() {
           }
           onSubmit={currentStep === 3 ? handleFinalSubmit : undefined}
           isLoading={isCreating}
-          canProceed={currentStep === 1 ? canProceedToStep2 : currentStep === 2 ? canProceedToStep3 : false}
+          canProceed={
+            currentStep === 1 ? canProceedToStep2 : currentStep === 2 ? canProceedToStep3 : false
+          }
           canSubmit={canSubmit}
         />
       </div>

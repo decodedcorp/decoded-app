@@ -114,7 +114,7 @@ export function BaseModal({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descId}
-        className={`relative ${Z_INDEX_CLASSES.MODAL_CONTENT} ${className}`}
+        className={`relative ${Z_INDEX_CLASSES.MODAL_CONTENT} max-w-[95vw] sm:max-w-[90vw] md:max-w-[80vw] lg:max-w-[70vw] xl:max-w-[60vw] max-h-[90vh] sm:max-h-[85vh] md:max-h-[80vh] ${className}`}
         // 모달 내부 클릭은 버블링 중단(backdrop 클릭 닫기와 충돌 방지)
         onClick={(e) => e.stopPropagation()}
       >

@@ -3,9 +3,9 @@
 import React from 'react';
 
 import { Dialog, DialogContent } from '@decoded/ui';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 import { LoginForm } from './LoginForm';
-
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -14,6 +14,8 @@ interface LoginModalProps {
 }
 
 export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess }) => {
+  const t = useCommonTranslation();
+
   const handleLoginSuccess = () => {
     onLoginSuccess?.();
     onClose();
@@ -25,30 +27,36 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-full max-w-md mx-4 sm:mx-auto bg-gradient-to-br from-zinc-900/95 to-black/95 border border-white/10 backdrop-blur-xl">
+      <DialogContent className="w-full max-w-md mx-4 sm:mx-auto bg-gradient-to-br from-zinc-900/95 to-black/95 border border-white/10 backdrop-blur-xl max-h-[90vh] overflow-y-auto">
         {/* 상단 섹션 (로고 + 제목) */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="text-3xl font-bold text-[#EAFD66] tracking-tight drop-shadow mb-2">
+        <div className="flex flex-col items-center mb-6 sm:mb-8">
+          <div className="text-2xl sm:text-3xl font-bold text-[#EAFD66] tracking-tight drop-shadow mb-2">
             decoded
           </div>
           <div className="text-center">
-            <p className="text-gray-300 text-sm">Sign in with your Google account to continue</p>
+            <p className="text-white text-sm px-4">{t.login.subtitle()}</p>
           </div>
         </div>
 
         {/* 로그인 폼 섹션 */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <LoginForm onSuccess={handleLoginSuccess} onError={handleLoginError} />
         </div>
 
         {/* 하단 섹션 (약관 및 개인정보처리방침) */}
-        <div className="text-center text-xs text-gray-400 space-x-4">
-          <a href="/terms-of-service" className="hover:text-gray-200 transition-colors">
-            Terms of Service
+        <div className="text-center text-xs text-gray-200 space-x-2 sm:space-x-4 px-4">
+          <a
+            href="/terms-of-service"
+            className="hover:text-white transition-colors touch-manipulation"
+          >
+            {t.login.termsOfService()}
           </a>
           <span>|</span>
-          <a href="/privacy-policy" className="hover:text-gray-200 transition-colors">
-            Privacy Policy
+          <a
+            href="/privacy-policy"
+            className="hover:text-white transition-colors touch-manipulation"
+          >
+            {t.login.privacyPolicy()}
           </a>
         </div>
       </DialogContent>

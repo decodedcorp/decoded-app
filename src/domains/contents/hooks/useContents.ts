@@ -6,6 +6,7 @@ import { ContentsService } from '../../../api/generated';
 import { queryKeys } from '../../../lib/api/queryKeys';
 import { useToastMutation, useSimpleToastMutation } from '../../../lib/hooks/useToastMutation';
 import { extractApiErrorMessage } from '../../../lib/utils/toastUtils';
+import { useCommonTranslation } from '../../../lib/i18n/centralizedHooks';
 
 export const useContentsByChannel = (channelId: string, params?: Record<string, any>) => {
   return useQuery({
@@ -59,6 +60,8 @@ export const useVideoContent = (id: string) => {
 
 export const useCreateLinkContent = () => {
   const queryClient = useQueryClient();
+  const t = useCommonTranslation();
+
   return useSimpleToastMutation(
     async (data: { channel_id: string; url: string }) => {
       // API 요청 전 토큰 상태 확인
@@ -66,14 +69,14 @@ export const useCreateLinkContent = () => {
       if (!token) {
         throw new Error('Authentication required. Please log in again.');
       }
-      
+
       // 토큰이 있으면 OpenAPI 토큰 업데이트
       refreshOpenAPIToken();
-      
+
       return ContentsService.createLinkContentContentsLinksPost(data);
     },
     {
-      actionName: 'Create content',
+      actionName: t.globalContentUpload.toast.actions.createLinkContent(),
       toastId: 'create-link-content',
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
@@ -84,6 +87,8 @@ export const useCreateLinkContent = () => {
 
 export const useCreateImageContent = () => {
   const queryClient = useQueryClient();
+  const t = useCommonTranslation();
+
   return useSimpleToastMutation(
     async (data: { channel_id: string; base64_img: string }) => {
       // API 요청 전 토큰 상태 확인
@@ -91,14 +96,14 @@ export const useCreateImageContent = () => {
       if (!token) {
         throw new Error('Authentication required. Please log in again.');
       }
-      
+
       // 토큰이 있으면 OpenAPI 토큰 업데이트
       refreshOpenAPIToken();
-      
+
       return ContentsService.createImageContentContentsImagesPost(data);
     },
     {
-      actionName: 'Create content',
+      actionName: t.globalContentUpload.toast.actions.createImageContent(),
       toastId: 'create-image-content',
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
@@ -109,6 +114,8 @@ export const useCreateImageContent = () => {
 
 export const useCreateVideoContent = () => {
   const queryClient = useQueryClient();
+  const t = useCommonTranslation();
+
   return useSimpleToastMutation(
     async (data: {
       channel_id: string;
@@ -122,14 +129,14 @@ export const useCreateVideoContent = () => {
       if (!token) {
         throw new Error('Authentication required. Please log in again.');
       }
-      
+
       // 토큰이 있으면 OpenAPI 토큰 업데이트
       refreshOpenAPIToken();
-      
+
       return ContentsService.createVideoContentContentsVideosPost(data);
     },
     {
-      actionName: 'Create content',
+      actionName: t.globalContentUpload.toast.actions.createVideoContent(),
       toastId: 'create-video-content',
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
@@ -140,11 +147,13 @@ export const useCreateVideoContent = () => {
 
 export const useUpdateLinkContent = () => {
   const queryClient = useQueryClient();
+  const t = useCommonTranslation();
+
   return useSimpleToastMutation(
     ({ contentId, data }: { contentId: string; data: any }) =>
       ContentsService.updateLinkContentContentsLinksContentIdPut(contentId, data),
     {
-      actionName: 'Update content',
+      actionName: t.globalContentUpload.toast.actions.updateLinkContent(),
       toastId: 'update-link-content',
       onSuccess: (_, { contentId }) => {
         queryClient.invalidateQueries({ queryKey: queryKeys.contents.detail(contentId) });
@@ -156,11 +165,13 @@ export const useUpdateLinkContent = () => {
 
 export const useUpdateImageContent = () => {
   const queryClient = useQueryClient();
+  const t = useCommonTranslation();
+
   return useSimpleToastMutation(
     ({ contentId, data }: { contentId: string; data: any }) =>
       ContentsService.updateImageContentContentsImagesContentIdPut(contentId, data),
     {
-      actionName: 'Update content',
+      actionName: t.globalContentUpload.toast.actions.updateImageContent(),
       toastId: 'update-image-content',
       onSuccess: (_, { contentId }) => {
         queryClient.invalidateQueries({ queryKey: queryKeys.contents.detail(contentId) });
@@ -172,11 +183,13 @@ export const useUpdateImageContent = () => {
 
 export const useUpdateVideoContent = () => {
   const queryClient = useQueryClient();
+  const t = useCommonTranslation();
+
   return useSimpleToastMutation(
     ({ contentId, data }: { contentId: string; data: any }) =>
       ContentsService.updateVideoContentContentsVideosContentIdPut(contentId, data),
     {
-      actionName: 'Update content',
+      actionName: t.globalContentUpload.toast.actions.updateVideoContent(),
       toastId: 'update-video-content',
       onSuccess: (_, { contentId }) => {
         queryClient.invalidateQueries({ queryKey: queryKeys.contents.detail(contentId) });
@@ -188,10 +201,12 @@ export const useUpdateVideoContent = () => {
 
 export const useDeleteLinkContent = () => {
   const queryClient = useQueryClient();
+  const t = useCommonTranslation();
+
   return useSimpleToastMutation(
     (contentId: string) => ContentsService.deleteLinkContentContentsLinksContentIdDelete(contentId),
     {
-      actionName: 'Delete content',
+      actionName: t.globalContentUpload.toast.actions.deleteLinkContent(),
       toastId: 'delete-link-content',
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
@@ -202,11 +217,13 @@ export const useDeleteLinkContent = () => {
 
 export const useDeleteImageContent = () => {
   const queryClient = useQueryClient();
+  const t = useCommonTranslation();
+
   return useSimpleToastMutation(
     (contentId: string) =>
       ContentsService.deleteImageContentContentsImagesContentIdDelete(contentId),
     {
-      actionName: 'Delete content',
+      actionName: t.globalContentUpload.toast.actions.deleteImageContent(),
       toastId: 'delete-image-content',
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });
@@ -217,11 +234,13 @@ export const useDeleteImageContent = () => {
 
 export const useDeleteVideoContent = () => {
   const queryClient = useQueryClient();
+  const t = useCommonTranslation();
+
   return useSimpleToastMutation(
     (contentId: string) =>
       ContentsService.deleteVideoContentContentsVideosContentIdDelete(contentId),
     {
-      actionName: 'Delete content',
+      actionName: t.globalContentUpload.toast.actions.deleteVideoContent(),
       toastId: 'delete-video-content',
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: queryKeys.contents.lists() });

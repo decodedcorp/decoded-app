@@ -3,27 +3,29 @@
 import React from 'react';
 
 import { useGlobalContentUploadStore } from '@/store/globalContentUploadStore';
+import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
 
 interface GlobalContentUploadHeaderProps {
   onClose: () => void;
 }
 
 export function GlobalContentUploadHeader({ onClose }: GlobalContentUploadHeaderProps) {
+  const t = useCommonTranslation();
   const currentStep = useGlobalContentUploadStore((state) => state.currentStep);
   const selectedChannel = useGlobalContentUploadStore((state) => state.selectedChannel);
 
   const getStepTitle = () => {
     if (currentStep === 'channel-selection') {
-      return 'Select Channel';
+      return t.globalContentUpload.header.selectChannel();
     }
-    return `Add Content to ${selectedChannel?.name || 'Channel'}`;
+    return t.globalContentUpload.header.addContentToChannel(selectedChannel?.name || 'Channel');
   };
 
   const getStepDescription = () => {
     if (currentStep === 'channel-selection') {
-      return 'Choose where to upload your content';
+      return t.globalContentUpload.header.chooseWhereToUpload();
     }
-    return 'Upload your content to the selected channel';
+    return t.globalContentUpload.header.uploadToSelectedChannel();
   };
 
   return (
@@ -50,7 +52,7 @@ export function GlobalContentUploadHeader({ onClose }: GlobalContentUploadHeader
               currentStep === 'channel-selection' ? 'text-[#eafd66]' : 'text-zinc-500'
             }`}
           >
-            Channel
+            {t.globalContentUpload.header.stepChannel()}
           </span>
         </div>
 
@@ -71,7 +73,7 @@ export function GlobalContentUploadHeader({ onClose }: GlobalContentUploadHeader
               currentStep === 'content-upload' ? 'text-[#eafd66]' : 'text-zinc-500'
             }`}
           >
-            Content
+            {t.globalContentUpload.header.stepContent()}
           </span>
         </div>
       </div>

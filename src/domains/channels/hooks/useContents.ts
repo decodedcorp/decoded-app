@@ -7,9 +7,11 @@ import { queryKeys } from '../../../lib/api/queryKeys';
 import { refreshOpenAPIToken } from '../../../api/hooks/useApi';
 import { getValidAccessToken } from '../../auth/utils/tokenManager';
 import { useToastMutation } from '../../../lib/hooks/useToastMutation';
+import { useCommonTranslation } from '../../../lib/i18n/centralizedHooks';
 
 export const useCreateLinkContent = () => {
   const queryClient = useQueryClient();
+  const t = useCommonTranslation();
 
   return useToastMutation(
     async (data: LinkContentCreate) => {
@@ -71,9 +73,9 @@ export const useCreateLinkContent = () => {
     },
     {
       messages: {
-        loading: 'Creating link content...',
-        success: 'Link content created successfully',
-        error: 'Failed to create link content',
+        loading: t.globalContentUpload.toast.messages.creatingContent(),
+        success: t.globalContentUpload.toast.messages.contentCreated(),
+        error: t.globalContentUpload.toast.messages.contentCreateFailed(),
       },
       onSuccess: (data, variables) => {
         console.log('[useCreateLinkContent] Success:', data);
@@ -97,6 +99,7 @@ export const useCreateLinkContent = () => {
 
 export const useCreateImageContent = () => {
   const queryClient = useQueryClient();
+  const t = useCommonTranslation();
 
   return useToastMutation(
     async (data: ImageContentCreate) => {
@@ -146,9 +149,9 @@ export const useCreateImageContent = () => {
     },
     {
       messages: {
-        loading: 'Creating image content...',
-        success: 'Image content created successfully',
-        error: 'Failed to create image content',
+        loading: t.globalContentUpload.toast.messages.creatingContent(),
+        success: t.globalContentUpload.toast.messages.contentCreated(),
+        error: t.globalContentUpload.toast.messages.contentCreateFailed(),
       },
       onSuccess: (data, variables) => {
         console.log('[useCreateImageContent] Success:', data);

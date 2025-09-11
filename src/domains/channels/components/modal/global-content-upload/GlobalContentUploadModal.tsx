@@ -9,10 +9,10 @@ import {
   selectChannelCreationStep,
 } from '@/store/globalContentUploadStore';
 import { useContentUploadStore } from '@/store/contentUploadStore';
+import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
 
 import { BaseModal } from '../base/BaseModal';
 import { ContentUploadModal } from '../content-upload/ContentUploadModal';
-
 
 // Import AddChannel components
 import { AddChannelHeader } from '../../../../create/components/modal/add-channel/AddChannelHeader';
@@ -26,23 +26,31 @@ import { ChannelSelectionStep } from './ChannelSelectionStep';
 import { GlobalContentUploadHeader } from './GlobalContentUploadHeader';
 
 export function GlobalContentUploadModal() {
+  const t = useCommonTranslation();
+
   const isOpen = useGlobalContentUploadStore(selectIsGlobalContentUploadModalOpen);
   const closeModal = useGlobalContentUploadStore((state) => state.closeModal);
   const currentStep = useGlobalContentUploadStore(selectGlobalContentUploadCurrentStep);
   const selectedChannel = useGlobalContentUploadStore((state) => state.selectedChannel);
   const resetSelection = useGlobalContentUploadStore((state) => state.resetSelection);
-  
+
   // Channel creation state
   const channelCreationStep = useGlobalContentUploadStore(selectChannelCreationStep);
   const channelFormData = useGlobalContentUploadStore((state) => state.channelFormData);
   const isCreatingChannel = useGlobalContentUploadStore((state) => state.isCreatingChannel);
   const channelCreationError = useGlobalContentUploadStore((state) => state.channelCreationError);
-  
+
   // Channel creation actions
-  const setChannelCreationStep = useGlobalContentUploadStore((state) => state.setChannelCreationStep);
+  const setChannelCreationStep = useGlobalContentUploadStore(
+    (state) => state.setChannelCreationStep,
+  );
   const updateChannelFormData = useGlobalContentUploadStore((state) => state.updateChannelFormData);
-  const setChannelCreationLoading = useGlobalContentUploadStore((state) => state.setChannelCreationLoading);
-  const setChannelCreationError = useGlobalContentUploadStore((state) => state.setChannelCreationError);
+  const setChannelCreationLoading = useGlobalContentUploadStore(
+    (state) => state.setChannelCreationLoading,
+  );
+  const setChannelCreationError = useGlobalContentUploadStore(
+    (state) => state.setChannelCreationError,
+  );
   const selectChannel = useGlobalContentUploadStore((state) => state.selectChannel);
 
   // 기존 ContentUploadModal 스토어 액션들
@@ -118,7 +126,7 @@ export function GlobalContentUploadModal() {
     try {
       setChannelCreationLoading(true);
       setChannelCreationError(null);
-      
+
       const response = await createChannelMutation.mutateAsync(requestData);
 
       // Create channel data for selection
@@ -132,18 +140,17 @@ export function GlobalContentUploadModal() {
 
       // Automatically select the newly created channel and move to content upload
       selectChannel(channelData);
-      
     } catch (error: any) {
-      let errorMessage = 'Failed to create channel. Please try again.';
-      
+      let errorMessage = t.globalContentUpload.errors.channelCreationFailed();
+
       if (error?.response?.status === 500) {
-        errorMessage = 'Internal server error occurred. Please try again later.';
+        errorMessage = t.globalContentUpload.errors.internalServerError();
       } else if (error?.response?.data?.detail) {
         errorMessage = error.response.data.detail;
       } else if (error?.message) {
         errorMessage = error.message;
       }
-      
+
       setChannelCreationError(errorMessage);
     } finally {
       setChannelCreationLoading(false);
@@ -154,10 +161,10 @@ export function GlobalContentUploadModal() {
     <>
       {/* 채널 선택 단계 모달 */}
       <BaseModal isOpen={isOpen && currentStep === 'channel-selection'} onClose={handleClose}>
-        <div className="bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl w-[600px] max-h-[90vh] overflow-hidden animate-scale-in shadow-2xl flex flex-col">
+        <div className="bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-[600px] lg:max-w-[600px] max-h-[90vh] sm:max-h-[85vh] md:max-h-[90vh] overflow-hidden animate-scale-in shadow-2xl flex flex-col">
           <GlobalContentUploadHeader onClose={handleClose} />
 
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6">
             <ChannelSelectionStep />
           </div>
         </div>
@@ -165,12 +172,12 @@ export function GlobalContentUploadModal() {
 
       {/* 채널 생성 단계 모달 */}
       <BaseModal isOpen={isOpen && currentStep === 'channel-creation'} onClose={handleClose}>
-        <div className="bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl w-full max-w-[800px] mx-4 max-h-[90vh] overflow-hidden animate-scale-in shadow-2xl flex flex-col">
+        <div className="bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-[800px] lg:max-w-[800px] max-h-[90vh] sm:max-h-[85vh] md:max-h-[90vh] overflow-hidden animate-scale-in shadow-2xl flex flex-col">
           <AddChannelHeader onClose={handleClose} currentStep={channelCreationStep} />
 
           <div className="flex-1 overflow-y-auto p-4">
             {channelCreationStep === 1 && (
-              <Step1BasicInfo 
+              <Step1BasicInfo
                 data={{
                   name: channelFormData.name,
                   description: channelFormData.description,
@@ -188,10 +195,12 @@ export function GlobalContentUploadModal() {
                   thumbnail_base64: channelFormData.thumbnail_base64 || null,
                   banner_base64: channelFormData.banner_base64 || null,
                 }}
-                onDataChange={(data) => updateChannelFormData({
-                  thumbnail_base64: data.thumbnail_base64 ?? undefined,
-                  banner_base64: data.banner_base64 ?? undefined,
-                })}
+                onDataChange={(data) =>
+                  updateChannelFormData({
+                    thumbnail_base64: data.thumbnail_base64 ?? undefined,
+                    banner_base64: data.banner_base64 ?? undefined,
+                  })
+                }
                 onBack={handleChannelCreationBack}
                 isLoading={isCreatingChannel}
                 error={channelCreationError}
@@ -216,9 +225,12 @@ export function GlobalContentUploadModal() {
             onSubmit={channelCreationStep === 3 ? handleChannelCreationSubmit : undefined}
             isLoading={isCreatingChannel}
             canProceed={
-              channelCreationStep === 1 ? channelFormData.name.trim().length >= 2 && channelFormData.name.trim().length <= 50 :
-              channelCreationStep === 2 ? true :
-              false
+              channelCreationStep === 1
+                ? channelFormData.name.trim().length >= 2 &&
+                  channelFormData.name.trim().length <= 50
+                : channelCreationStep === 2
+                ? true
+                : false
             }
             canSubmit={channelCreationStep === 3 && channelFormData.selectedCategory !== ''}
           />

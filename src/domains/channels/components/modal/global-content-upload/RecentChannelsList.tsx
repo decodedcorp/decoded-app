@@ -3,19 +3,18 @@
 import React, { useState, useEffect } from 'react';
 
 import { useChannels } from '@/domains/channels/hooks/useChannels';
+import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
 
 interface RecentChannelsListProps {
   onChannelSelect: (channel: any) => void;
 }
 
 export function RecentChannelsList({ onChannelSelect }: RecentChannelsListProps) {
+  const t = useCommonTranslation();
   const [recentChannels, setRecentChannels] = useState<any[]>([]);
 
   // 최근 사용한 채널들 가져오기 (최신 순)
-  const {
-    data: channelsData,
-    isLoading,
-  } = useChannels({
+  const { data: channelsData, isLoading } = useChannels({
     limit: 5,
     sortBy: 'created_at',
     sortOrder: 'desc',
@@ -30,7 +29,9 @@ export function RecentChannelsList({ onChannelSelect }: RecentChannelsListProps)
   if (isLoading) {
     return (
       <div className="space-y-3">
-        <div className="text-sm font-medium text-gray-400">Recent Channels</div>
+        <div className="text-sm font-medium text-gray-400">
+          {t.globalContentUpload.recentChannels.title()}
+        </div>
         <div className="space-y-2">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="p-3 bg-zinc-800 rounded-lg animate-pulse">
@@ -54,7 +55,9 @@ export function RecentChannelsList({ onChannelSelect }: RecentChannelsListProps)
 
   return (
     <div className="space-y-3">
-      <div className="text-sm font-medium text-gray-400">Recent Channels</div>
+      <div className="text-sm font-medium text-gray-400">
+        {t.globalContentUpload.recentChannels.title()}
+      </div>
       <div className="space-y-2">
         {recentChannels.map((channel) => (
           <div

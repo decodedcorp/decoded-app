@@ -3,15 +3,18 @@
 import React from 'react';
 
 import { Flame, TrendingUp } from 'lucide-react';
+import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
 
 export function RightSidebar() {
+  const t = useCommonTranslation();
+
   return (
     <div className="w-full h-screen p-4 sticky top-0 overflow-y-auto">
       {/* 트렌딩 커뮤니티 */}
       <div className="mb-6">
         <div className="text-white text-sm font-medium mb-4 flex items-center gap-2">
           <Flame className="w-4 h-4" />
-          Trending Channels
+          {t.globalContentUpload.sidebar.trendingChannels()}
         </div>
         <div className="space-y-3">
           {[
@@ -32,7 +35,9 @@ export function RightSidebar() {
                 <span className="text-white text-sm font-medium">{channel.name}</span>
                 <span className="text-xs text-gray-400">#{index + 1}</span>
               </div>
-              <div className="text-xs text-gray-400 mb-1">{channel.members} members</div>
+              <div className="text-xs text-gray-400 mb-1">
+                {channel.members} {t.globalContentUpload.sidebar.members()}
+              </div>
               <div className="text-xs text-gray-500">{channel.description}</div>
             </div>
           ))}
@@ -46,7 +51,7 @@ export function RightSidebar() {
       <div className="mb-6">
         <div className="text-white text-sm font-medium mb-4 flex items-center gap-2">
           <TrendingUp className="w-4 h-4" />
-          Popular Today
+          {t.globalContentUpload.sidebar.popularToday()}
         </div>
         <div className="space-y-3">
           {[
@@ -73,20 +78,32 @@ export function RightSidebar() {
 
       {/* 광고 영역 (플레이스홀더) */}
       <div className="mb-6">
-        <div className="text-white text-sm font-medium mb-4">Sponsored</div>
+        <div className="text-white text-sm font-medium mb-4">
+          {t.globalContentUpload.sidebar.sponsored()}
+        </div>
         <div className="p-4 bg-zinc-800 rounded-lg border border-zinc-600">
           <div className="w-full h-20 bg-zinc-700 rounded mb-3"></div>
-          <div className="text-xs text-gray-400">Advertisement placeholder</div>
+          <div className="text-xs text-gray-400">
+            {t.globalContentUpload.sidebar.advertisementPlaceholder()}
+          </div>
         </div>
       </div>
 
       {/* 하단 링크들 */}
       <div className="text-xs text-gray-500 space-y-1">
-        <div className="cursor-pointer hover:text-gray-400">About</div>
-        <div className="cursor-pointer hover:text-gray-400">Help</div>
-        <div className="cursor-pointer hover:text-gray-400">Privacy Policy</div>
-        <div className="cursor-pointer hover:text-gray-400">Terms of Service</div>
-        <div className="mt-3 text-gray-600">© 2024 Decoded</div>
+        <div className="cursor-pointer hover:text-gray-400">
+          {t.globalContentUpload.sidebar.about()}
+        </div>
+        <div className="cursor-pointer hover:text-gray-400">
+          {t.globalContentUpload.sidebar.help()}
+        </div>
+        <div className="cursor-pointer hover:text-gray-400">
+          {t.globalContentUpload.sidebar.privacyPolicy()}
+        </div>
+        <div className="cursor-pointer hover:text-gray-400">
+          {t.globalContentUpload.sidebar.termsOfService()}
+        </div>
+        <div className="mt-3 text-gray-600">{t.globalContentUpload.sidebar.copyright()}</div>
       </div>
     </div>
   );

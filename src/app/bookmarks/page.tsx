@@ -4,21 +4,31 @@ import React, { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
-import { useBookmarks, useBookmarkStats, useBookmarkMutations } from '@/domains/bookmarks/hooks/useBookmarks';
+import {
+  useBookmarks,
+  useBookmarkStats,
+  useBookmarkMutations,
+} from '@/domains/bookmarks/hooks/useBookmarks';
 import { useContentModalStore } from '@/store/contentModalStore';
 import { ContentItem } from '@/lib/types/content';
 import { formatDateByContext } from '@/lib/utils/dateUtils';
+import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
 
 export default function BookmarksPage() {
+  const t = useCommonTranslation();
   const router = useRouter();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const openContentModal = useContentModalStore((state) => state.openModal);
-  
+
   const [offset, setOffset] = useState(0);
   const limit = 20;
 
   // Fetch bookmarks
-  const { data: bookmarksData, isLoading, error } = useBookmarks({
+  const {
+    data: bookmarksData,
+    isLoading,
+    error,
+  } = useBookmarks({
     offset,
     limit,
     enabled: isAuthenticated,
@@ -26,7 +36,7 @@ export default function BookmarksPage() {
 
   // Fetch bookmark stats
   const { data: statsData } = useBookmarkStats();
-  
+
   // Bookmark mutations
   const { removeBookmark } = useBookmarkMutations();
 
@@ -34,13 +44,17 @@ export default function BookmarksPage() {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Sign in required</h1>
-          <p className="text-zinc-400 mb-6">You need to sign in to view your bookmarks.</p>
+          <h1 className="text-2xl font-bold text-white mb-4">
+            {t.globalContentUpload.bookmarks.signInRequired()}
+          </h1>
+          <p className="text-zinc-400 mb-6">
+            {t.globalContentUpload.bookmarks.signInRequiredDescription()}
+          </p>
           <button
             onClick={() => router.push('/')}
             className="px-6 py-3 bg-[#EAFD66] text-black rounded-lg font-medium hover:bg-[#d9ec55] transition-colors"
           >
-            Go to Home
+            {t.globalContentUpload.bookmarks.goToHome()}
           </button>
         </div>
       </div>
@@ -54,7 +68,7 @@ export default function BookmarksPage() {
         const { unifyContent, convertToContentItem } = await import('@/lib/types/content');
         const unifiedContent = unifyContent(contentPreview);
         const contentItem = convertToContentItem(unifiedContent);
-        
+
         openContentModal(contentItem);
       } else {
         console.warn('No content preview available for content:', contentId);
@@ -66,7 +80,7 @@ export default function BookmarksPage() {
 
   const loadMore = () => {
     if (bookmarksData?.has_more) {
-      setOffset(prev => prev + limit);
+      setOffset((prev) => prev + limit);
     }
   };
 
@@ -78,10 +92,12 @@ export default function BookmarksPage() {
       <div className="min-h-screen bg-black">
         <div className="container mx-auto px-4 py-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-white mb-2">Bookmarks</h1>
-            <p className="text-zinc-400">Your saved content</p>
+            <h1 className="text-3xl font-bold text-white mb-2">
+              {t.globalContentUpload.bookmarks.title()}
+            </h1>
+            <p className="text-zinc-400">{t.globalContentUpload.bookmarks.subtitle()}</p>
           </div>
-          
+
           {/* Loading skeleton */}
           <div className="space-y-4">
             {Array.from({ length: 5 }).map((_, i) => (
@@ -105,13 +121,17 @@ export default function BookmarksPage() {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-white mb-2">Failed to load bookmarks</h2>
-          <p className="text-zinc-400 mb-6">Something went wrong. Please try again.</p>
+          <h2 className="text-xl font-semibold text-white mb-2">
+            {t.globalContentUpload.bookmarks.failedToLoad()}
+          </h2>
+          <p className="text-zinc-400 mb-6">
+            {t.globalContentUpload.bookmarks.failedToLoadDescription()}
+          </p>
           <button
             onClick={() => window.location.reload()}
             className="px-6 py-3 bg-[#EAFD66] text-black rounded-lg font-medium hover:bg-[#d9ec55] transition-colors"
           >
-            Retry
+            {t.globalContentUpload.bookmarks.retry()}
           </button>
         </div>
       </div>
@@ -123,12 +143,14 @@ export default function BookmarksPage() {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Bookmarks</h1>
+          <h1 className="text-3xl font-bold text-white mb-2">
+            {t.globalContentUpload.bookmarks.title()}
+          </h1>
           <div className="flex items-center space-x-6 text-zinc-400">
-            <span>Your saved content</span>
+            <span>{t.globalContentUpload.bookmarks.subtitle()}</span>
             {statsData && (
               <span className="text-sm">
-                {bookmarksData?.total_count || 0} bookmarks
+                {bookmarksData?.total_count || 0} {t.globalContentUpload.bookmarks.bookmarksCount()}
               </span>
             )}
           </div>
@@ -145,37 +167,51 @@ export default function BookmarksPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center overflow-hidden">
-                      {(bookmark.content?.thumbnail_url || bookmark.content?.link_preview_img_url) ? (
-                        <img 
-                          src={(bookmark.content.thumbnail_url || bookmark.content.link_preview_img_url)!} 
+                      {bookmark.content?.thumbnail_url || bookmark.content?.link_preview_img_url ? (
+                        <img
+                          src={
+                            (bookmark.content.thumbnail_url ||
+                              bookmark.content.link_preview_img_url)!
+                          }
                           alt="Content thumbnail"
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        <svg
+                          className="w-8 h-8 text-white"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                          />
                         </svg>
                       )}
                     </div>
-                    
+
                     <div>
                       <h3 className="font-medium text-white">
-                        {bookmark.content?.link_preview_title || 
-                         bookmark.content?.video_title || 
-                         bookmark.content?.description || 
-                         `Content ${bookmark.content_id}`}
+                        {bookmark.content?.link_preview_title ||
+                          bookmark.content?.video_title ||
+                          bookmark.content?.description ||
+                          `Content ${bookmark.content_id}`}
                       </h3>
                       <p className="text-sm text-zinc-400">
-                        Bookmarked {formatDateByContext(bookmark.bookmark_created_at)}
+                        {t.globalContentUpload.bookmarks.bookmarked()}{' '}
+                        {formatDateByContext(bookmark.bookmark_created_at)}
                       </p>
                       {bookmark.content?.channel_name && (
                         <p className="text-xs text-zinc-500">
-                          From {bookmark.content.channel_name}
+                          {t.globalContentUpload.bookmarks.from()} {bookmark.content.channel_name}
                         </p>
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={(e) => {
@@ -185,18 +221,38 @@ export default function BookmarksPage() {
                       disabled={removeBookmark.isPending}
                       className="p-2 text-zinc-400 hover:text-red-400 transition-colors disabled:opacity-50"
                     >
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
                       </svg>
                     </button>
-                    <svg className="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    <svg
+                      className="w-4 h-4 text-zinc-500"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
                     </svg>
                   </div>
                 </div>
               </div>
             ))}
-            
+
             {/* Load More Button */}
             {bookmarksData?.has_more && (
               <div className="text-center pt-6">
@@ -205,7 +261,9 @@ export default function BookmarksPage() {
                   disabled={isLoading}
                   className="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
                 >
-                  {isLoading ? 'Loading...' : 'Load More'}
+                  {isLoading
+                    ? t.globalContentUpload.bookmarks.loading()
+                    : t.globalContentUpload.bookmarks.loadMore()}
                 </button>
               </div>
             )}
@@ -214,17 +272,31 @@ export default function BookmarksPage() {
           /* Empty State */
           <div className="text-center py-16">
             <div className="w-24 h-24 mx-auto mb-6 bg-zinc-800 rounded-full flex items-center justify-center">
-              <svg className="w-12 h-12 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+              <svg
+                className="w-12 h-12 text-zinc-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-white mb-2">No bookmarks yet</h2>
-            <p className="text-zinc-400 mb-6">Start bookmarking content you want to save for later.</p>
+            <h2 className="text-xl font-semibold text-white mb-2">
+              {t.globalContentUpload.bookmarks.noBookmarks()}
+            </h2>
+            <p className="text-zinc-400 mb-6">
+              {t.globalContentUpload.bookmarks.noBookmarksDescription()}
+            </p>
             <button
               onClick={() => router.push('/channels')}
               className="px-6 py-3 bg-[#EAFD66] text-black rounded-lg font-medium hover:bg-[#d9ec55] transition-colors"
             >
-              Explore Channels
+              {t.globalContentUpload.bookmarks.exploreChannels()}
             </button>
           </div>
         )}

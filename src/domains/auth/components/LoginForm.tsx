@@ -5,6 +5,7 @@ import React, { useEffect, useRef } from 'react';
 import { useAuthMutations } from '../hooks/useAuthMutations';
 import { AuthError, NetworkError } from '../types/auth';
 import { useAuthStore } from '../../../store/authStore';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -14,8 +15,18 @@ interface LoginFormProps {
 export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
   const { googleOAuthMutation } = useAuthMutations();
   const { isAuthenticated, login } = useAuthStore();
+  const t = useCommonTranslation();
   const popupRef = useRef<Window | null>(null);
   const messageHandledRef = useRef(false);
+
+  // 디버깅용 로그
+  console.log('LoginForm translation test:', {
+    agreementText: t.login.agreementText(),
+    continueWithGoogle: t.login.continueWithGoogle(),
+    signingIn: t.login.signingIn(),
+    rawAgreementText: t.login.agreementText(),
+    isFunction: typeof t.login.agreementText,
+  });
 
   // 팝업 창에서 OAuth 완료 후 메시지 수신
   useEffect(() => {
@@ -54,7 +65,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
 
         console.log('[LoginForm] Received OAuth error message:', event.data);
 
-        onError?.(event.data.error || 'Google 로그인에 실패했습니다.');
+        onError?.(event.data.error || t.login.loginFailed());
       } else if (event.data.type === 'GOOGLE_OAUTH_LOG') {
         // 팝업에서 전달받은 로그를 메인 창 콘솔에 출력
         const { level, message, data, timestamp } = event.data;
@@ -94,11 +105,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
       if (popupRef.current?.closed) {
         clearInterval(checkClosed);
         popupRef.current = null;
-        
+
         // 팝업이 닫혔는데 메시지가 처리되지 않았다면 에러 처리
         if (!messageHandledRef.current) {
           console.log('[LoginForm] Popup closed without completing OAuth');
-          onError?.('로그인이 취소되었습니다.');
+          onError?.(t.login.loginCancelled());
         }
       }
     }, 1000);
@@ -131,7 +142,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
           : 'http://localhost:3000/auth/callback');
 
       if (!clientId) {
-        throw new Error('Google Client ID가 설정되지 않았습니다.');
+        throw new Error(t.login.clientIdMissing());
       }
 
       // 디버그 모드를 위한 파라미터 추가
@@ -154,7 +165,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
       );
 
       if (!popup) {
-        throw new Error('팝업이 차단되었습니다. 팝업 차단을 해제해주세요.');
+        throw new Error(t.login.popupBlocked());
       }
 
       popupRef.current = popup;
@@ -162,12 +173,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
       // 팝업 창 포커스
       popup.focus();
     } catch (error) {
-      let errorMessage = 'Google 로그인에 실패했습니다.';
+      let errorMessage = t.login.loginFailed();
 
       if (error instanceof AuthError) {
-        errorMessage = `인증 오류: ${error.message}`;
+        errorMessage = `${t.login.authError()}: ${error.message}`;
       } else if (error instanceof NetworkError) {
-        errorMessage = '네트워크 연결을 확인해주세요.';
+        errorMessage = t.login.networkError();
       } else if (error instanceof Error) {
         errorMessage = error.message;
       }
@@ -189,7 +200,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
         {isFormLoading ? (
           <div className="flex items-center">
             <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-3"></div>
-            <span className="text-white">Signing in...</span>
+            <span className="text-white">{t.login.signingIn()}</span>
           </div>
         ) : (
           <>
@@ -211,7 +222,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
               />
             </svg>
-            <span className="text-white font-medium">Continue with Google</span>
+            <span className="text-white font-medium">{t.login.continueWithGoogle()}</span>
           </>
         )}
       </button>
@@ -231,7 +242,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
             </div>
             <div className="ml-3">
               <h3 className="text-sm font-medium text-red-300">
-                {googleOAuthMutation.error instanceof AuthError ? 'Authentication Error' : 'Error'}
+                {googleOAuthMutation.error instanceof AuthError
+                  ? t.login.authError()
+                  : t.login.error()}
               </h3>
               <div className="mt-1 text-sm text-red-200">{googleOAuthMutation.error.message}</div>
             </div>
@@ -241,9 +254,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
 
       {/* Additional Info */}
       <div className="text-center">
-        <p className="text-xs text-gray-400 leading-relaxed">
-          By continuing, you agree to our Terms of Service and Privacy Policy. We&apos;ll use your
-          Google account information to provide you with a personalized experience.
+        <p className="text-xs text-gray-300 leading-relaxed">
+          {t.login.agreementText() ||
+            "By continuing, you agree to our Terms of Service and Privacy Policy. We'll use your Google account information to provide you with a personalized experience."}
         </p>
       </div>
     </div>

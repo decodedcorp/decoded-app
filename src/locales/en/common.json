@@ -100,7 +100,9 @@
     "description": "Description",
     "describeChannel": "Describe your channel (optional)",
     "channelStatistics": "Channel Statistics",
-    "contentItems": "Content Items"
+    "contentItems": "Content Items",
+    "active": "Active",
+    "all": "All"
   },
   "header": {
     "openMenu": "Open menu",
@@ -150,6 +152,22 @@
     "settings": "Settings",
     "logout": "Logout"
   },
+  "login": {
+    "title": "Sign In",
+    "subtitle": "Sign in with your Google account to continue",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "continueWithGoogle": "Continue with Google",
+    "signingIn": "Signing in...",
+    "popupBlocked": "Popup blocked. Please allow popups for this site.",
+    "loginCancelled": "Login was cancelled.",
+    "loginFailed": "Google login failed.",
+    "authError": "Authentication Error",
+    "networkError": "Please check your network connection.",
+    "clientIdMissing": "Google Client ID is not configured.",
+    "error": "Error",
+    "agreementText": "By continuing, you agree to our Terms of Service and Privacy Policy. We'll use your Google account information to provide you with a personalized experience."
+  },
   "feed": {
     "section": {
       "header": "Trending now",
@@ -183,6 +201,228 @@
     "badge": {
       "justIn": "Just in",
       "trending": "Trending"
+    }
+  },
+  "globalContentUpload": {
+    "title": "Upload Content",
+    "subtitle": "Select a channel or create a new one to upload content",
+    "channelSelection": {
+      "title": "Select Channel",
+      "subtitle": "Choose a channel to upload content to",
+      "createNewChannel": "Create New Channel",
+      "selectExistingChannel": "Select Existing Channel"
+    },
+    "channelCreation": {
+      "title": "Create New Channel",
+      "subtitle": "Create a new channel to upload content"
+    },
+    "header": {
+      "selectChannel": "Select Channel",
+      "addContentToChannel": "Add Content to {{channelName}}",
+      "chooseWhereToUpload": "Choose where to upload your content",
+      "uploadToSelectedChannel": "Upload your content to the selected channel",
+      "stepChannel": "Channel",
+      "stepContent": "Content"
+    },
+    "search": {
+      "placeholder": "Search channels...",
+      "searchingChannels": "Searching channels...",
+      "failedToSearch": "Failed to search channels",
+      "noChannelsFound": "No channels found",
+      "createNewChannel": "Create New Channel"
+    },
+    "recentChannels": {
+      "title": "Recent Channels"
+    },
+    "contentUpload": {
+      "contentType": "Content Type",
+      "image": "Image",
+      "link": "Link",
+      "imageUpload": "Image Upload",
+      "selectImage": "Select Image",
+      "linkUrl": "Link URL",
+      "description": "Description",
+      "optional": "(Optional)",
+      "addDescription": "Add a description for your content...",
+      "fileFormats": "JPG, PNG, WebP, GIF up to 10MB",
+      "validation": {
+        "descriptionTooLong": "Description must be 500 characters or less.",
+        "imageRequired": "Please select an image.",
+        "urlRequired": "Please enter a link URL.",
+        "invalidUrl": "Please enter a valid URL format.",
+        "imageProcessingError": "Error occurred while processing image."
+      }
+    },
+    "addChannel": {
+      "title": "Create Channel",
+      "steps": {
+        "basicInfo": "Basic Info",
+        "style": "Style",
+        "topics": "Topics"
+      },
+      "step1": {
+        "title": "Tell us about your channel",
+        "subtitle": "A name and description help people understand what your channel is all about.",
+        "channelName": "Channel name",
+        "description": "Description",
+        "required": "Required",
+        "channelNamePlaceholder": "Channel name",
+        "descriptionPlaceholder": "Description",
+        "preview": {
+          "channelName": "Channel Name",
+          "newChannel": "New channel",
+          "subscribers": "subscribers",
+          "descriptionPlaceholder": "Your channel description will appear here"
+        }
+      },
+      "step2": {
+        "title": "Style your channel",
+        "subtitle": "Adding visual flair will catch new members attention and help establish your channel's culture! You can update this at any time.",
+        "banner": "Banner",
+        "icon": "Icon",
+        "addBanner": "Add Banner",
+        "addIcon": "Add Icon",
+        "clickOrDrag": "Click or drag & drop",
+        "removeBanner": "Remove banner",
+        "removeIcon": "Remove icon",
+        "preview": {
+          "member": "member",
+          "online": "online"
+        }
+      },
+      "step3": {
+        "title": "Choose category",
+        "subtitle": "Select a main category and subcategory for your channel.",
+        "chooseCategory": "Choose category",
+        "subcategories": "subcategories",
+        "loadingCategories": "Loading categories...",
+        "failedToLoad": "Failed to load categories. Please try again.",
+        "errorLoading": "Error loading categories",
+        "noCategorySelected": "No category selected yet. Choose a main category to get started.",
+        "category": "Category:",
+        "preview": {
+          "channelName": "Channel Name",
+          "newChannel": "New channel",
+          "subscribers": "subscribers",
+          "descriptionPlaceholder": "Your channel description will appear here"
+        }
+      },
+      "navigation": {
+        "back": "Back",
+        "cancel": "Cancel",
+        "next": "Next",
+        "nextStep": "Next Step",
+        "createChannel": "Create Channel",
+        "creating": "Creating..."
+      },
+      "errors": {
+        "channelCreationFailed": "Failed to create channel. Please try again.",
+        "internalServerError": "Internal server error occurred. Please try again later.",
+        "imageProcessingFailed": "Failed to process image. Please try again.",
+        "pleaseDropImage": "Please drop an image file"
+      }
+    },
+    "bookmarks": {
+      "title": "Bookmarks",
+      "subtitle": "Your saved content",
+      "signInRequired": "Sign in required",
+      "signInRequiredDescription": "You need to sign in to view your bookmarks.",
+      "goToHome": "Go to Home",
+      "failedToLoad": "Failed to load bookmarks",
+      "failedToLoadDescription": "Something went wrong. Please try again.",
+      "retry": "Retry",
+      "loading": "Loading...",
+      "loadMore": "Load More",
+      "bookmarked": "Bookmarked",
+      "from": "From",
+      "noBookmarks": "No bookmarks yet",
+      "noBookmarksDescription": "Start bookmarking content you want to save for later.",
+      "exploreChannels": "Explore Channels",
+      "bookmarksCount": "bookmarks"
+    },
+    "toast": {
+      "actions": {
+        "createChannel": "Create channel",
+        "updateChannel": "Update channel",
+        "deleteChannel": "Delete channel",
+        "updateThumbnail": "Update thumbnail",
+        "createContent": "Create content",
+        "updateContent": "Update content",
+        "deleteContent": "Delete content",
+        "createLinkContent": "Create link content",
+        "createImageContent": "Create image content",
+        "createVideoContent": "Create video content",
+        "updateLinkContent": "Update link content",
+        "updateImageContent": "Update image content",
+        "updateVideoContent": "Update video content",
+        "deleteLinkContent": "Delete link content",
+        "deleteImageContent": "Delete image content",
+        "deleteVideoContent": "Delete video content"
+      },
+      "states": {
+        "loading": "Processing...",
+        "completed": "Completed",
+        "failed": "Failed"
+      },
+      "messages": {
+        "creatingChannel": "Creating channel...",
+        "channelCreated": "Channel created successfully!",
+        "channelCreateFailed": "Failed to create channel",
+        "updatingChannel": "Updating channel...",
+        "channelUpdated": "Channel updated",
+        "channelUpdateFailed": "Failed to update channel",
+        "deletingChannel": "Deleting channel...",
+        "channelDeleted": "Channel deleted",
+        "channelDeleteFailed": "Failed to delete channel",
+        "updatingThumbnail": "Updating thumbnail...",
+        "thumbnailUpdated": "Thumbnail updated",
+        "thumbnailUpdateFailed": "Failed to update thumbnail",
+        "creatingContent": "Creating content...",
+        "contentCreated": "Content created",
+        "contentCreateFailed": "Failed to create content",
+        "updatingContent": "Updating content...",
+        "contentUpdated": "Content updated",
+        "contentUpdateFailed": "Failed to update content",
+        "deletingContent": "Deleting content...",
+        "contentDeleted": "Content deleted",
+        "contentDeleteFailed": "Failed to delete content",
+        "sendingInvitation": "Sending invitation...",
+        "invitationSent": "Invitation sent successfully!",
+        "invitationSendFailed": "Failed to send invitation",
+        "acceptingInvitation": "Accepting invitation...",
+        "invitationAccepted": "Invitation accepted",
+        "invitationAcceptFailed": "Failed to accept invitation",
+        "rejectingInvitation": "Rejecting invitation...",
+        "invitationRejected": "Invitation rejected",
+        "invitationRejectFailed": "Failed to reject invitation",
+        "cancelingInvitation": "Canceling invitation...",
+        "invitationCanceled": "Invitation canceled",
+        "invitationCancelFailed": "Failed to cancel invitation",
+        "markingNotificationRead": "Marking notification as read...",
+        "notificationMarkedRead": "Notification marked as read",
+        "notificationMarkReadFailed": "Failed to mark notification as read",
+        "markingAllNotificationsRead": "Marking all notifications as read...",
+        "allNotificationsMarkedRead": "All notifications marked as read",
+        "allNotificationsMarkReadFailed": "Failed to mark notifications as read"
+      }
+    },
+    "errors": {
+      "channelCreationFailed": "Failed to create channel. Please try again.",
+      "internalServerError": "Internal server error occurred. Please try again later.",
+      "networkError": "Please check your network connection."
+    },
+    "sidebar": {
+      "trendingChannels": "Trending Channels",
+      "popularToday": "Popular Today",
+      "sponsored": "Sponsored",
+      "advertisementPlaceholder": "Advertisement placeholder",
+      "members": "members",
+      "upvotes": "upvotes",
+      "about": "About",
+      "help": "Help",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "copyright": "© 2024 Decoded"
     }
   }
 }
