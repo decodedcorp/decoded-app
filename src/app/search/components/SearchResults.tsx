@@ -1,15 +1,19 @@
 'use client';
 
 import React from 'react';
+
+import { useCombinedSearch } from '@/domains/search/hooks/useSearch';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
+
 import { ChannelSearchResults } from './ChannelSearchResults';
 import { ContentSearchResults } from './ContentSearchResults';
-import { useCombinedSearch } from '@/domains/search/hooks/useSearch';
 
 interface SearchResultsProps {
   query: string;
 }
 
 export function SearchResults({ query }: SearchResultsProps) {
+  const t = useCommonTranslation();
   // 전체 검색 상태 확인
   const {
     data: searchData,
@@ -94,11 +98,11 @@ export function SearchResults({ query }: SearchResultsProps) {
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
               />
             </svg>
-            <h3 className="text-xl font-semibold text-white mb-3">No results found</h3>
+            <h3 className="text-xl font-semibold text-white mb-3">{t.search.noResultsFound(query)}</h3>
             <p className="text-zinc-500 text-lg">
-              No channels or content found for "{query}".
+              {t.search.noResultsFound(query)}
               {query.trim().length < 3 &&
-                ' Try using more specific search terms for better results.'}
+                ` ${t.search.searchErrorOccurred()}`}
             </p>
           </div>
         </div>

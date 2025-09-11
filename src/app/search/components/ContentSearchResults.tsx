@@ -1,9 +1,11 @@
 'use client';
 
 import React from 'react';
+
 import { useRouter } from 'next/navigation';
 import { ContentsCard } from '@/components/ContentsCard';
 import { useSearchContents } from '@/domains/search/hooks/useSearch';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 interface ContentSearchResultsProps {
   query: string;
@@ -11,6 +13,7 @@ interface ContentSearchResultsProps {
 
 export function ContentSearchResults({ query }: ContentSearchResultsProps) {
   const router = useRouter();
+  const t = useCommonTranslation();
 
   // 실제 검색 API 사용
   const {
@@ -85,8 +88,8 @@ export function ContentSearchResults({ query }: ContentSearchResultsProps) {
       <div className="text-center py-16">
         <div className="text-zinc-400">
           <div className="animate-spin w-16 h-16 border-4 border-zinc-600 border-t-blue-500 rounded-full mx-auto mb-6" />
-          <h3 className="text-xl font-semibold text-white mb-3">Searching content...</h3>
-          <p className="text-zinc-500 text-lg">Looking for content matching "{query}"</p>
+          <h3 className="text-xl font-semibold text-white mb-3">{t.search.searching()}</h3>
+          <p className="text-zinc-500 text-lg">{t.search.lookingForChannels(query)}</p>
         </div>
       </div>
     );
@@ -106,8 +109,8 @@ export function ContentSearchResults({ query }: ContentSearchResultsProps) {
               />
             </svg>
           </div>
-          <h3 className="text-xl font-semibold text-white mb-3">Search error</h3>
-          <p className="text-zinc-500 text-lg">Failed to search content. Please try again.</p>
+          <h3 className="text-xl font-semibold text-white mb-3">{t.search.searchError()}</h3>
+          <p className="text-zinc-500 text-lg">{t.search.failedToSearch()}</p>
         </div>
       </div>
     );
@@ -122,14 +125,14 @@ export function ContentSearchResults({ query }: ContentSearchResultsProps) {
     <div>
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-white">Content</h2>
+          <h2 className="text-2xl font-bold text-white">{t.search.content()}</h2>
           <div className="flex items-center gap-2">
             <span className="px-3 py-1 bg-zinc-800 text-zinc-300 text-sm rounded-full">
-              {contents.length} found
+              {t.search.found(contents.length)}
             </span>
             {isFetching && (
               <span className="px-3 py-1 bg-blue-900/20 text-blue-400 text-xs rounded-full border border-blue-700/30 animate-pulse">
-                Updating...
+                {t.search.updatingResults()}
               </span>
             )}
           </div>
@@ -317,7 +320,7 @@ export function ContentSearchResults({ query }: ContentSearchResultsProps) {
         <div className="mt-6 text-center">
           <div className="flex items-center justify-center gap-2 text-zinc-400 text-sm">
             <div className="w-4 h-4 border border-zinc-400 border-t-transparent rounded-full animate-spin" />
-            <span>Updating results...</span>
+            <span>{t.search.updatingResults()}</span>
           </div>
         </div>
       )}

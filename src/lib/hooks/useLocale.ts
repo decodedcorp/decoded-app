@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import koTranslations from '@/locales/ko/common.json';
 import enTranslations from '@/locales/en/common.json';
 
-// 간단한 로케일 상태 관리
+// @deprecated This hook is deprecated. Use useCommonTranslation from '@/lib/i18n/hooks' instead.
+// 간단한 로케일 상태 관리 - DEPRECATED
 const useLocale = () => {
+  console.warn('⚠️ useLocale is deprecated. Use useCommonTranslation from "@/lib/i18n/hooks" instead.');
   const [locale, setLocale] = useState<'ko' | 'en'>('ko');
 
   useEffect(() => {

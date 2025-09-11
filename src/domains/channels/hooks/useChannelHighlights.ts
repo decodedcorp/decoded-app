@@ -7,13 +7,15 @@
  */
 
 import { useMemo } from 'react';
-import { useChannelContentsSinglePage } from './useChannelContents';
+
 import { convertContentToHighlights } from '@/lib/utils/highlightConverters';
 import {
   HighlightItem,
   HighlightConfig,
   DEFAULT_HIGHLIGHT_CONFIG,
 } from '@/lib/types/highlightTypes';
+
+import { useChannelContentsSinglePage } from './useChannelContents';
 
 // Feature flag for future API migration
 const USE_HIGHLIGHTS_API = false;

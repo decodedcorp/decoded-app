@@ -1,8 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
+
 import { MdComment } from 'react-icons/md';
+
 import { useComments, useCommentStats } from '../hooks/useComments';
+
 import { CommentList } from './CommentList';
 import { CommentInput } from './CommentInput';
 

@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
+
 import { BookmarkIcon as BookmarkOutlineIcon } from '@heroicons/react/24/outline';
 import { BookmarkIcon as BookmarkSolidIcon } from '@heroicons/react/24/solid';
-
 import { useCheckBookmarkStatus, useBookmarkMutations } from '@/domains/bookmarks/hooks/useBookmarks';
 import { useAuthStore } from '@/store/authStore';
 

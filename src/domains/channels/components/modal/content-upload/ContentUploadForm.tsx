@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
+
 import { X } from 'lucide-react';
 import { Button } from '@decoded/ui';
-
 import { ContentType } from '@/lib/types/ContentType';
 import {
   useContentUploadStore,

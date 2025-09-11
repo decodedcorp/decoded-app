@@ -13,8 +13,6 @@ import { useContentUploadStore } from '@/store/contentUploadStore';
 import { BaseModal } from '../base/BaseModal';
 import { ContentUploadModal } from '../content-upload/ContentUploadModal';
 
-import { GlobalContentUploadHeader } from './GlobalContentUploadHeader';
-import { ChannelSelectionStep } from './ChannelSelectionStep';
 
 // Import AddChannel components
 import { AddChannelHeader } from '../../../../create/components/modal/add-channel/AddChannelHeader';
@@ -23,6 +21,9 @@ import { Step2MediaUpload } from '../../../../create/components/modal/add-channe
 import { Step3CategorySelection } from '../../../../create/components/modal/add-channel/Step3CategorySelection';
 import { NavigationButtons } from '../../../../create/components/modal/add-channel/NavigationButtons';
 import { useCreateChannel } from '../../../../channels/hooks/useChannels';
+
+import { ChannelSelectionStep } from './ChannelSelectionStep';
+import { GlobalContentUploadHeader } from './GlobalContentUploadHeader';
 
 export function GlobalContentUploadModal() {
   const isOpen = useGlobalContentUploadStore(selectIsGlobalContentUploadModalOpen);

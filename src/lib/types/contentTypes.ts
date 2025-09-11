@@ -6,6 +6,7 @@ import {
   AIGenMetadataResponse,
   LinkPreviewMetadataResponse,
 } from '@/api/generated';
+
 import { ContentType } from './ContentType';
 
 /**

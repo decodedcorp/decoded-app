@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+
 import { ChevronDownIcon, ChevronRightIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
-import { SidebarChannelItem } from './SidebarChannelItem';
 import { useChannels } from '@/domains/channels/hooks/useChannels';
 import { useSubscribedChannels } from '@/domains/interactions/hooks/useSubscribedChannels';
 import { useAuthStore } from '@/store/authStore';
@@ -10,6 +10,8 @@ import { usePathname } from 'next/navigation';
 import { ChannelResponse } from '@/api/generated/models/ChannelResponse';
 import { useChannelTranslation } from '@/lib/i18n/hooks';
 import Link from 'next/link';
+
+import { SidebarChannelItem } from './SidebarChannelItem';
 
 interface SidebarChannelListProps {
   className?: string;

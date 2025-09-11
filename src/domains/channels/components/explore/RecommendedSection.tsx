@@ -1,7 +1,9 @@
 'use client';
 
 import React from 'react';
+
 import { ChannelResponse } from '@/api/generated/models/ChannelResponse';
+
 import { ChannelCard } from './ChannelCard';
 
 interface RecommendedSectionProps {

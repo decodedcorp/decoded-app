@@ -1,7 +1,9 @@
 'use client';
 
 import React, { Suspense } from 'react';
+
 import { useSearchParams } from 'next/navigation';
+
 import { SearchPageContent } from './components/SearchPageContent';
 
 function SearchPageInner() {

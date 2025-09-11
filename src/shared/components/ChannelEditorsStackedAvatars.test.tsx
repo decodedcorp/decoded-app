@@ -1,8 +1,10 @@
 'use client';
 
 import React from 'react';
-import { ChannelEditorsStackedAvatars } from './ChannelEditorsStackedAvatars';
+
 import type { UserProfileResponse } from '@/api/generated/models/UserProfileResponse';
+
+import { ChannelEditorsStackedAvatars } from './ChannelEditorsStackedAvatars';
 
 // 테스트용 mock 데이터
 const mockEditors: UserProfileResponse[] = [

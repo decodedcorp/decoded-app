@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
+
 import { useTrendingContents, TrendingType } from '../../hooks/useTrending';
-import { TrendingContentCard } from './TrendingContentCard';
 import { LoadingState, ErrorState } from '../common/LoadingStates';
+
+import { TrendingContentCard } from './TrendingContentCard';
 
 interface TrendingContentsSectionProps {
   className?: string;

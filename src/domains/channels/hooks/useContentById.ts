@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { useQuery } from '@tanstack/react-query';
 import { ContentsService } from '@/api/generated/services/ContentsService';
 import { queryKeys } from '@/lib/api/queryKeys';

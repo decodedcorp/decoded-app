@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
+import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { useBookmarks, useBookmarkStats, useBookmarkMutations } from '@/domains/bookmarks/hooks/useBookmarks';
 import { useContentModalStore } from '@/store/contentModalStore';

@@ -1,21 +1,24 @@
 'use client';
 
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
+
 import { MailOpen, Info, TrendingUp, Clock } from 'lucide-react';
 import { useQueries } from '@tanstack/react-query';
-import { useLocale } from '@/lib/hooks/useLocale';
-import { PostCard } from './PostCard';
-import { useTrendingContents } from '../hooks/useTrendingContents';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 import { useContentDetail } from '@/domains/contents/hooks/useContentDetail';
 import { ChannelsService } from '@/api/generated/services/ChannelsService';
 import { UsersService } from '@/api/generated/services/UsersService';
-import { InfiniteScrollLoader } from './InfiniteScrollLoader';
-import { PostCardSkeleton } from './PostCardSkeleton';
 import { useContentModalStore } from '@/store/contentModalStore';
 import type { ContentItem } from '@/lib/types/content';
 import { ContentType } from '@/lib/types/ContentType';
 import { getThumbnailImageUrl } from '@/lib/utils/imageProxy';
 import type { TrendingContentItem } from '@/api/generated/models/TrendingContentItem';
+
+import { useTrendingContents } from '../hooks/useTrendingContents';
+
+import { PostCardSkeleton } from './PostCardSkeleton';
+import { InfiniteScrollLoader } from './InfiniteScrollLoader';
+import { PostCard } from './PostCard';
 
 type SortOption = 'hot' | 'new' | 'top';
 
@@ -26,7 +29,7 @@ export const MainFeed = React.memo(function MainFeed() {
   const [userAvatars, setUserAvatars] = useState<Record<string, string>>({});
   const [userAkas, setUserAkas] = useState<Record<string, string>>({});
   const openModal = useContentModalStore((state) => state.openModal);
-  const { t } = useLocale();
+  const t = useCommonTranslation();
 
   // 선택된 콘텐츠의 상세 정보 가져오기
   const { data: contentDetail, isLoading: isContentLoading } = useContentDetail({
@@ -91,9 +94,9 @@ export const MainFeed = React.memo(function MainFeed() {
     label: string;
     tooltip: string;
   }[] = [
-    { value: 'hot', label: t('feed.sort.hot'), tooltip: t('feed.sort.hotTooltip') },
-    { value: 'new', label: t('feed.sort.new'), tooltip: t('feed.sort.newTooltip') },
-    { value: 'top', label: t('feed.sort.top'), tooltip: t('feed.sort.topTooltip') },
+    { value: 'hot', label: t.feed.sort.hot(), tooltip: t.feed.sort.hotTooltip() },
+    { value: 'new', label: t.feed.sort.new(), tooltip: t.feed.sort.newTooltip() },
+    { value: 'top', label: t.feed.sort.top(), tooltip: t.feed.sort.topTooltip() },
   ];
 
   // Trending contents 가져오기 - popular와 trending 병렬 호출
@@ -304,8 +307,8 @@ export const MainFeed = React.memo(function MainFeed() {
 
     // 배지 결정 로직
     const getBadge = () => {
-      if (index < 3) return t('feed.badge.trending'); // 상위 3개는 급상승
-      if (index < 6) return t('feed.badge.justIn'); // 4-6번째는 방금
+      if (index < 3) return t.feed.badge.trending(); // 상위 3개는 급상승
+      if (index < 6) return t.feed.badge.justIn(); // 4-6번째는 방금
       return null;
     };
 
@@ -384,8 +387,8 @@ export const MainFeed = React.memo(function MainFeed() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-white text-2xl font-bold mb-1">{t('feed.section.header')}</h1>
-              <p className="text-gray-400 text-sm">{t('feed.section.sub')}</p>
+              <h1 className="text-white text-2xl font-bold mb-1">{t.feed.section.header()}</h1>
+              <p className="text-gray-400 text-sm">{t.feed.section.sub()}</p>
             </div>
 
             {/* 정렬 옵션 */}
@@ -419,9 +422,9 @@ export const MainFeed = React.memo(function MainFeed() {
           {/* 메타라인 */}
           <div className="mb-4">
             <div className="text-xs text-gray-500">
-              {t('feed.meta.line', {
-                range: t('feed.filter.today'),
-                sort: t(`feed.sort.${activeSort}`),
+              {t.feed.meta.line({
+                range: t.feed.filter.today(),
+                sort: activeSort === 'hot' ? t.feed.sort.hot() : activeSort === 'new' ? t.feed.sort.new() : t.feed.sort.top(),
                 count: feedData.length,
               })}
             </div>
@@ -429,16 +432,16 @@ export const MainFeed = React.memo(function MainFeed() {
 
           {/* 필터/서브 옵션 */}
           <div className="flex items-center gap-3 text-sm">
-            <span className="text-gray-400">{t('feed.filter.by')}</span>
+            <span className="text-gray-400">{t.feed.filter.by()}</span>
             <div className="flex gap-2">
               <button className="px-3 py-1.5 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-md border border-zinc-700 transition-colors">
-                {t('feed.filter.today')}
+                {t.feed.filter.today()}
               </button>
               <button className="px-3 py-1.5 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-md border border-zinc-700 transition-colors">
-                {t('feed.filter.thisWeek')}
+                {t.feed.filter.thisWeek()}
               </button>
               <button className="px-3 py-1.5 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-md border border-zinc-700 transition-colors">
-                {t('feed.filter.allTime')}
+                {t.feed.filter.allTime()}
               </button>
             </div>
           </div>
@@ -450,12 +453,12 @@ export const MainFeed = React.memo(function MainFeed() {
         {/* 에러 상태 */}
         {currentQuery.isError && !currentQuery.data && (
           <div className="text-center py-8">
-            <div className="text-red-400 mb-2">{t('feed.failedToLoadPosts')}</div>
+            <div className="text-red-400 mb-2">{t.feed.failedToLoadPosts()}</div>
             <button
               onClick={() => currentQuery.refetch()}
               className="px-4 py-2 bg-zinc-800 text-white rounded hover:bg-zinc-700 transition-colors"
             >
-              {t('feed.tryAgain')}
+              {t.feed.tryAgain()}
             </button>
           </div>
         )}
@@ -468,10 +471,10 @@ export const MainFeed = React.memo(function MainFeed() {
                 <div className="mb-4">
                   <MailOpen className="w-16 h-16 mx-auto text-gray-600" />
                 </div>
-                <div className="text-gray-400 text-lg mb-2">{t('feed.noPostsFound')}</div>
-                <div className="text-gray-600 text-sm mb-4">{t('feed.tryDifferentFilter')}</div>
+                <div className="text-gray-400 text-lg mb-2">{t.feed.noPostsFound()}</div>
+                <div className="text-gray-600 text-sm mb-4">{t.feed.tryDifferentFilter()}</div>
                 <button className="px-4 py-2 bg-[#eafd66] text-black rounded hover:bg-[#d4e85a] transition-colors font-medium">
-                  {t('feed.exploreChannelsCta')}
+                  {t.feed.exploreChannelsCta()}
                 </button>
               </div>
             ) : (
@@ -517,7 +520,7 @@ export const MainFeed = React.memo(function MainFeed() {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-zinc-900 rounded-lg p-6 flex items-center gap-3">
               <div className="w-6 h-6 border-2 border-[#eafd66] border-t-transparent rounded-full animate-spin"></div>
-              <span className="text-white">{t('feed.loadingContent')}</span>
+              <span className="text-white">{t.feed.loadingContent()}</span>
             </div>
           </div>
         )}
@@ -538,11 +541,11 @@ export const MainFeed = React.memo(function MainFeed() {
         {feedData.length > 0 && (
           <div className="text-center mt-6">
             <div className="text-xs text-gray-500">
-              {t('feed.showingPosts', { count: feedData.length })}
+              {t.feed.showingPosts({ count: feedData.length })}
               {currentQuery.data?.pages?.[0] && (currentQuery.data.pages[0] as any)?.totalCount && (
                 <span>
                   {' '}
-                  {t('feed.of', { total: (currentQuery.data.pages[0] as any).totalCount })}
+                  {t.feed.of({ total: (currentQuery.data.pages[0] as any).totalCount })}
                 </span>
               )}
             </div>

@@ -2,13 +2,14 @@
 
 import React, { useState, useCallback, useMemo } from 'react';
 
+import { AddChannelModal } from '@/domains/create/components/modal/add-channel/AddChannelModal';
+
 import { ExploreFilters } from '../../types/filters';
 import { ExploreGrid } from '../explore/ExploreGrid';
 import { DiscoverSection } from '../explore/DiscoverSection';
 import { TrendingContentsSection } from '../trending/TrendingContentsSection';
 import { TrendingChannelsSection } from '../trending/TrendingChannelsSection';
 import { ChannelModal, ContentModal } from '../modal';
-import { AddChannelModal } from '@/domains/create/components/modal/add-channel/AddChannelModal';
 import { LoadingState, ErrorState, EmptyState } from '../common/LoadingStates';
 import { useChannels } from '../../hooks/useChannels';
 import { useChannelModalStore } from '../../../../store/channelModalStore';

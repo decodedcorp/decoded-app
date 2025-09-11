@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+
 import { Flame, TrendingUp } from 'lucide-react';
 
 export function RightSidebar() {

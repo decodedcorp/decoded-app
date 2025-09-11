@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+
 import { Button } from '@decoded/ui';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 interface SubscribeButtonSectionProps {
   onSubscribe?: (isSubscribed: boolean) => void;
@@ -19,6 +21,7 @@ export const SubscribeButtonSection: React.FC<SubscribeButtonSectionProps> = ({
   extractedColor,
 }) => {
   const [isSubscribed, setIsSubscribed] = useState(initialIsSubscribed);
+  const t = useCommonTranslation();
 
   useEffect(() => {
     setIsSubscribed(initialIsSubscribed);
@@ -84,7 +87,7 @@ export const SubscribeButtonSection: React.FC<SubscribeButtonSectionProps> = ({
         data-testid="subscribe-button"
         data-subscribed={isSubscribed}
       >
-        {isSubscribed ? 'Subscribed' : 'Subscribe'}
+        {isSubscribed ? t.states.subscribed() : t.actions.subscribe()}
       </Button>
     </div>
   );

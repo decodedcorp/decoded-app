@@ -5,10 +5,11 @@
  * 기존 CardsProvider와 호환되면서 실제 API 데이터 사용
  */
 
-import type { Card, CardsRequest, CardsResponse } from '../types/card';
 import { ContentsService } from '@/api/generated';
 import type { ContentListResponse } from '@/api/generated';
 import { getOptimizedChannelImageUrl, getThumbnailImageUrl } from '@/lib/utils/imageProxy';
+
+import type { Card, CardsRequest, CardsResponse } from '../types/card';
 import {
   determineCardType,
   detectContentSource,

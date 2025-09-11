@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+
 import { useLocale } from '@/lib/hooks/useLocale';
 
 interface SearchBarProps {

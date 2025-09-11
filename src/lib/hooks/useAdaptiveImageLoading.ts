@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+
 import { ImageSize, ImageQuality } from '@/lib/utils/imageProxy';
 
 interface NetworkInfo {

@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
+import { useRouter } from 'next/navigation';
 import { ChannelData } from '@/store/channelModalStore';
 import { toast } from 'react-hot-toast';
 import { ChannelEditorsStackedAvatars } from '@/shared/components/ChannelEditorsStackedAvatars';

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+
 import { ImageQuality, ImageSize } from '@/lib/utils/imageProxy';
 
 interface NetworkConnection {

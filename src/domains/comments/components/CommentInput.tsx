@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+
 import { MdSend, MdClose } from 'react-icons/md';
 import { Button } from '@decoded/ui';
-import { useCreateComment } from '../hooks/useComments';
 import { useUser } from '@/domains/auth/hooks/useAuth';
+
+import { useCreateComment } from '../hooks/useComments';
 
 interface CommentInputProps {
   contentId: string;

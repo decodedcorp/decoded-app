@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { ChannelData } from '@/store/channelModalStore';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 interface ChannelModalSubscribeButtonProps {
   channel: ChannelData;
@@ -16,6 +17,7 @@ export function ChannelModalSubscribeButton({
   isLoading = false,
 }: ChannelModalSubscribeButtonProps) {
   const isSubscribed = channel.is_subscribed || false;
+  const t = useCommonTranslation();
 
   const handleClick = () => {
     if (isLoading) return;
@@ -43,10 +45,10 @@ export function ChannelModalSubscribeButton({
       {isLoading ? (
         <div className="flex items-center space-x-2">
           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-          <span>Loading...</span>
+          <span>{t.ui.loading()}</span>
         </div>
       ) : (
-        <span>{isSubscribed ? 'Unsubscribe' : 'Subscribe'}</span>
+        <span>{isSubscribed ? t.actions.unsubscribe() : t.actions.subscribe()}</span>
       )}
     </button>
   );

@@ -1,17 +1,17 @@
 'use client';
 
 import React, { useState } from 'react';
+
 import { useRouter } from 'next/navigation';
 import { ChannelEditorsStackedAvatars } from '@/shared/components/ChannelEditorsStackedAvatars';
 import { EditorsListModal } from '@/shared/components/EditorsListModal';
-
 import { ChannelData } from '@/store/channelModalStore';
 import { useContentUploadStore } from '@/store/contentUploadStore';
 import { toast } from 'react-hot-toast';
-
 import { useUser } from '@/domains/auth/hooks/useAuth';
 import { canManageChannelManagers } from '@/lib/utils/channelPermissions';
 import { useChannelSubscription } from '@/domains/interactions/hooks/useChannelSubscription';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 interface ChannelPageHeaderProps {
   channel: ChannelData;
@@ -33,6 +33,7 @@ export function ChannelPageHeader({
   const router = useRouter();
   const openContentUploadModal = useContentUploadStore((state) => state.openModal);
   const [isEditorsModalOpen, setIsEditorsModalOpen] = useState(false);
+  const t = useCommonTranslation();
 
   // 현재 사용자 정보
   const { user } = useUser();
@@ -54,7 +55,7 @@ export function ChannelPageHeader({
         console.error('Error toggling subscription:', error);
       }
     } else {
-      toast.error('Subscription feature not available');
+      toast.error(t.status.error());
     }
   };
 
@@ -92,7 +93,7 @@ export function ChannelPageHeader({
               <button
                 onClick={onMobileFiltersToggle}
                 className="md:hidden p-2 rounded-lg bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors"
-                aria-label="Toggle filters"
+                aria-label={t.actions.filter()}
               >
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
                   <path
@@ -119,7 +120,7 @@ export function ChannelPageHeader({
             <div className="ml-4">
               <h2 className="text-xl font-semibold text-zinc-300">{channel.name}</h2>
               <div className="flex items-center space-x-3 text-sm text-zinc-400 mt-1">
-                <span>{channel.subscriber_count || 0} followers</span>
+                <span>{channel.subscriber_count || 0} {t.ui.subscribers()}</span>
                 <span>•</span>
                 {/* Editors with stacked avatars - Clickable */}
                 {channel.managers && channel.managers.length > 0 ? (
@@ -136,17 +137,17 @@ export function ChannelPageHeader({
                     {channel.managers.length > 5 && (
                       <>
                         <span>•••</span>
-                        <span>{channel.managers.length - 5}+ editors</span>
+                        <span>{channel.managers.length - 5}+ {t.ui.editors()}</span>
                       </>
                     )}
                     {channel.managers.length <= 5 && (
                       <span>
-                        {channel.managers.length} editor{channel.managers.length > 1 ? 's' : ''}
+                        {channel.managers.length} {t.ui.editors()}
                       </span>
                     )}
                   </button>
                 ) : (
-                  <span>0 editors</span>
+                  <span>0 {t.ui.editors()}</span>
                 )}
               </div>
               {/* Category/Subcategory Tags */}
@@ -175,7 +176,7 @@ export function ChannelPageHeader({
                 onClick={handleAddContent}
                 className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-full text-white font-medium transition-colors"
               >
-                + Add Content
+                + {t.create.createNewContent()}
               </button>
             )}
             {!isOwner && (
@@ -192,12 +193,12 @@ export function ChannelPageHeader({
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                     <span className="text-sm">
-                      {subscriptionHook?.isSubscribed ? 'Unsubscribing...' : 'Subscribing...'}
+                      {subscriptionHook?.isSubscribed ? `${t.actions.unsubscribe()}...` : `${t.actions.subscribe()}...`}
                     </span>
                   </div>
                 ) : (
                   <span className="text-sm">
-                    {subscriptionHook?.isSubscribed ? 'Subscribed' : 'Subscribe'}
+                    {subscriptionHook?.isSubscribed ? t.states.subscribed() : t.actions.subscribe()}
                   </span>
                 )}
               </button>
@@ -206,8 +207,8 @@ export function ChannelPageHeader({
               <button
                 onClick={handleSettings}
                 className="p-2 bg-zinc-800 hover:bg-zinc-700 rounded-full text-white transition-colors"
-                title="Channel Settings"
-                aria-label="Open channel settings"
+                title={t.navigation.settings()}
+                aria-label={t.navigation.settings()}
               >
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
                   <path

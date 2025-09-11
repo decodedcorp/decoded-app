@@ -1,11 +1,13 @@
 'use client';
 
 import React from 'react';
-import { SimpleThiingsGrid } from './SimpleThiingsGrid';
+
 import { ChannelModal } from '@/domains/channels/components/modal/channel/ChannelModal';
 import { ContentModal } from '@/domains/channels/components/modal/content/ContentModal';
 import { ContentSidebar } from '@/domains/channels/components/sidebar/ContentSidebar';
 import { useContentSidebarStore } from '@/store/contentSidebarStore';
+
+import { SimpleThiingsGrid } from './SimpleThiingsGrid';
 
 export function MainPage() {
   const { isOpen: isSidebarOpen, selectedContent, closeSidebar } = useContentSidebarStore();

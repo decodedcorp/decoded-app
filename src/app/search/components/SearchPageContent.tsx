@@ -1,21 +1,26 @@
 'use client';
 
 import React from 'react';
+
+import { useCombinedSearch } from '@/domains/search/hooks/useSearch';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
+
 import { SearchResults } from './SearchResults';
 import { SearchHeader } from './SearchHeader';
-import { useCombinedSearch } from '@/domains/search/hooks/useSearch';
 
 interface SearchPageContentProps {
   query: string;
 }
 
 export function SearchPageContent({ query }: SearchPageContentProps) {
+  const t = useCommonTranslation();
+
   if (!query) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center text-zinc-400">
-          <h2 className="text-2xl font-semibold mb-2">Enter a search term</h2>
-          <p>Search for channels and content</p>
+          <h2 className="text-2xl font-semibold mb-2">{t.search.enterSearchTerm()}</h2>
+          <p>{t.search.searchForChannelsAndContent()}</p>
         </div>
       </div>
     );
@@ -26,8 +31,8 @@ export function SearchPageContent({ query }: SearchPageContentProps) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center text-zinc-400">
-          <h2 className="text-2xl font-semibold mb-2">Search term too short</h2>
-          <p>Please enter at least 2 characters to search</p>
+          <h2 className="text-2xl font-semibold mb-2">{t.search.searchTermTooShort()}</h2>
+          <p>{t.search.enterAtLeast2Characters()}</p>
         </div>
       </div>
     );

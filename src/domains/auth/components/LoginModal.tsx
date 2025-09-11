@@ -1,7 +1,9 @@
 'use client';
 
 import React from 'react';
+
 import { Dialog, DialogContent } from '@decoded/ui';
+
 import { LoginForm } from './LoginForm';
 
 

@@ -1,11 +1,13 @@
 'use client';
 
 import React, { memo } from 'react';
+
 import { ChannelResponse } from '@/api/generated/models/ChannelResponse';
 import { useChannelSubscription } from '@/domains/interactions/hooks/useChannelSubscription';
 import { HeartButton } from '@/components/ui/HeartButton';
 import { useChannelLike } from '@/domains/interactions/hooks/useChannelLike';
 import { ChannelEditorsStackedAvatars } from '@/shared/components/ChannelEditorsStackedAvatars';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 // Base channel data interface
 interface BaseChannel {
@@ -163,6 +165,8 @@ export const ChannelCard = memo(
     // Masonry integration
     masonry,
   }: ChannelCardProps) => {
+    const t = useCommonTranslation();
+    
     // ChannelResponse인지 확인
     const isChannelResponse = 'owner_id' in channel;
 
@@ -248,7 +252,7 @@ export const ChannelCard = memo(
     };
 
     // 구독 버튼 텍스트
-    const followButtonText = effectiveIsSubscribed ? 'Subscribed' : 'Subscribe';
+    const followButtonText = effectiveIsSubscribed ? t.states.subscribed() : t.actions.subscribe();
 
     // 크기 결정 로직 단순화 - size 우선, 없으면 variant에서 크기 추출
     const effectiveSize =
@@ -401,7 +405,7 @@ export const ChannelCard = memo(
                     : 'bg-[#eafd66] text-black hover:bg-[#eafd66]/90'
                 }`}
               >
-                {effectiveIsLoading ? '...' : effectiveIsSubscribed ? 'Subscribed' : 'Subscribe'}
+                {effectiveIsLoading ? '...' : effectiveIsSubscribed ? t.states.subscribed() : t.actions.subscribe()}
               </button>
             </div>
           </div>
@@ -482,7 +486,7 @@ export const ChannelCard = memo(
                 } bg-black/70 backdrop-blur-sm px-3 py-1.5 rounded-full`}
               >
                 <span className="text-white text-sm font-medium">
-                  {formatCount(channelData.contentCount)} items
+                  {formatCount(channelData.contentCount)} {t.ui.items()}
                 </span>
               </div>
             )}
@@ -579,7 +583,7 @@ export const ChannelCard = memo(
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                       <span className="text-xs">
-                        {effectiveIsSubscribed ? 'Unsubscribing...' : 'Subscribing...'}
+                        {effectiveIsSubscribed ? t.states.unsubscribing() : t.states.subscribing()}
                       </span>
                     </div>
                   ) : (

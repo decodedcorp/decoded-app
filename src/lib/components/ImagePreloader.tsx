@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+
 import { getThumbnailImageUrl } from '@/lib/utils/imageProxy';
 
 interface ImagePreloaderProps {

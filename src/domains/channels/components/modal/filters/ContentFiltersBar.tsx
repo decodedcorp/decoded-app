@@ -2,6 +2,8 @@
 
 import React, { memo, useState } from 'react';
 
+import { useCommonTranslation } from '@/lib/i18n/hooks';
+
 interface FilterOption {
   id: string;
   label: string;
@@ -48,6 +50,7 @@ export const ContentFiltersBar = memo(function ContentFiltersBar({
   isLoading = false,
 }: ContentFiltersBarProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const t = useCommonTranslation();
 
   // 실제 데이터가 있으면 사용하고, 없으면 기본 데이터 사용
   const displayDataTypes = dataTypes && dataTypes.length > 0 ? dataTypes : DEFAULT_DATA_TYPES;
@@ -99,7 +102,7 @@ export const ContentFiltersBar = memo(function ContentFiltersBar({
                 />
               </svg>
               <span className="text-sm font-medium text-white">
-                Filters {activeFilterCount > 0 && `(${activeFilterCount} active)`}
+                {t.ui.filters()} {activeFilterCount > 0 && `(${activeFilterCount} active)`}
               </span>
             </div>
 
@@ -144,7 +147,7 @@ export const ContentFiltersBar = memo(function ContentFiltersBar({
                   d="M19 9l-7 7-7-7"
                 />
               </svg>
-              <span>Hide filters</span>
+              <span>{t.ui.hideFilters()}</span>
             </button>
 
             {hasActiveFilters && (
@@ -160,7 +163,7 @@ export const ContentFiltersBar = memo(function ContentFiltersBar({
                     d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                   />
                 </svg>
-                <span>Clear all</span>
+                <span>{t.actions.clearAll()}</span>
               </button>
             )}
           </div>
@@ -168,7 +171,7 @@ export const ContentFiltersBar = memo(function ContentFiltersBar({
           <div className="space-y-6">
             {/* By card type section */}
             <div>
-              <h3 className="text-base font-medium text-white mb-3">By card type:</h3>
+              <h3 className="text-base font-medium text-white mb-3">{t.ui.byCardType()}:</h3>
 
               <div className="flex flex-wrap gap-2">
                 {displayDataTypes.map((dataType) => {
@@ -202,7 +205,7 @@ export const ContentFiltersBar = memo(function ContentFiltersBar({
 
             {/* By category section */}
             <div>
-              <h3 className="text-base font-medium text-white mb-3">By category:</h3>
+              <h3 className="text-base font-medium text-white mb-3">{t.ui.byCategory()}:</h3>
 
               <div className="flex flex-wrap gap-2">
                 {displayCategories.map((category) => {

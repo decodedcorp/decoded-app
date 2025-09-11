@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, ReactNode } from 'react';
+
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 
 interface SidebarSectionProps {

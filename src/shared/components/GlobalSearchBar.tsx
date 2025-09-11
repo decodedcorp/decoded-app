@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+
 import { useRouter } from 'next/navigation';
-import { useLocale } from '@/lib/hooks/useLocale';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
+
 import { SearchAutocomplete, type AutocompleteItem } from '../../domains/search';
 
 interface GlobalSearchBarProps {
@@ -21,14 +23,14 @@ export function GlobalSearchBar({
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-  const { t } = useLocale();
+  const t = useCommonTranslation();
 
   // Placeholder를 state로 관리하여 locale 변경 시 업데이트
-  const [placeholder, setPlaceholder] = useState(t('search.placeholder'));
+  const [placeholder, setPlaceholder] = useState(t.search.placeholder());
 
   // Locale 변경 시 placeholder 업데이트
   useEffect(() => {
-    setPlaceholder(t('search.placeholder'));
+    setPlaceholder(t.search.placeholder());
   }, [t]);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -187,7 +189,7 @@ export function GlobalSearchBar({
                 inputRef.current?.focus();
               }}
               className="mr-3 p-1 text-zinc-400 hover:text-white transition-colors"
-              aria-label={t('search.clearSearch')}
+              aria-label={t.search.clearSearch()}
             >
               <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
                 <path
@@ -202,8 +204,8 @@ export function GlobalSearchBar({
           )}
 
           {/* 숨겨진 검색 버튼 (접근성을 위해 유지) */}
-          <button type="submit" className="sr-only" aria-label={t('search.searchButton')}>
-            {t('search.searchButton')}
+          <button type="submit" className="sr-only" aria-label={t.search.searchButton()}>
+            {t.search.searchButton()}
           </button>
         </div>
 

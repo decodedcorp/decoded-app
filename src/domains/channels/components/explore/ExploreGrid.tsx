@@ -1,11 +1,14 @@
 'use client';
 
 import React, { useMemo } from 'react';
+
 import { ChannelResponse } from '@/api/generated/models/ChannelResponse';
-import { ChannelCard } from './ChannelCard';
+
 import { ExploreFilters } from '../../types/filters';
 import { EmptyState } from '../common/LoadingStates';
 import { filterChannelsByCategory } from '../../utils/categoryUtils';
+
+import { ChannelCard } from './ChannelCard';
 
 interface ExploreGridProps {
   channels: ChannelResponse[];

@@ -1,14 +1,17 @@
 'use client';
 
 import React, { memo, useCallback, useMemo, useState, useEffect, useRef } from 'react';
-import ThiingsGrid, { type ItemConfig } from './ThiingsGrid';
-import { useChannelContents } from '../hooks/useChannelContents';
-import { useImageColor } from '../hooks';
-import { DEFAULT_CHANNEL_ID } from '../data/channelCardsProvider';
+
 import { useContentModalStore } from '@/store/contentModalStore';
 import { useContentSidebarStore } from '@/store/contentSidebarStore';
 import { ContentsCard } from '@/components/ContentsCard';
 import { useContentTranslation } from '@/lib/i18n/hooks';
+
+import { DEFAULT_CHANNEL_ID } from '../data/channelCardsProvider';
+import { useImageColor } from '../hooks';
+import { useChannelContents } from '../hooks/useChannelContents';
+
+import ThiingsGrid, { type ItemConfig } from './ThiingsGrid';
 
 export function SimpleThiingsGrid({
   className = '',

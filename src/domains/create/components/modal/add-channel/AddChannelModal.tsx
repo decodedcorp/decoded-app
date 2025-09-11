@@ -15,7 +15,6 @@ import { useGlobalContentUploadStore } from '@/store/globalContentUploadStore';
 import { BaseModal } from '../base/BaseModal';
 
 import { AddChannelHeader } from './AddChannelHeader';
-
 import { Step1BasicInfo } from './Step1BasicInfo';
 import { Step2MediaUpload } from './Step2MediaUpload';
 import { Step3CategorySelection } from './Step3CategorySelection';

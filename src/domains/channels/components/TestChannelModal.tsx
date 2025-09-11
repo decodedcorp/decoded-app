@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button } from '@decoded/ui';
 
+import { Button } from '@decoded/ui';
 import { useChannelModalStore } from '@/store/channelModalStore';
+
 import { useChannelTranslation } from '../../../lib/i18n/hooks';
 
 export function TestChannelModal() {

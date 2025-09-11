@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 interface SearchFiltersType {
   categories: string[];
@@ -14,6 +15,20 @@ interface SearchFiltersProps {
 }
 
 export function SearchFilters({ filters, onFilterChange }: SearchFiltersProps) {
+  const t = useCommonTranslation();
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'active':
+        return 'Active';
+      case 'pending':
+        return t.status.pending();
+      case 'archived':
+        return 'Archived';
+      default:
+        return status;
+    }
+  };
   const handleCategoryChange = (category: string) => {
     const newCategories = filters.categories.includes(category)
       ? filters.categories.filter((c) => c !== category)
@@ -81,11 +96,11 @@ export function SearchFilters({ filters, onFilterChange }: SearchFiltersProps) {
 
         {/* 상태 필터 */}
         <div>
-          <h4 className="text-sm font-medium text-zinc-300 mb-3">상태</h4>
+          <h4 className="text-sm font-medium text-zinc-300 mb-3">{t.ui.status()}</h4>
           <div className="space-y-2">
             {['active', 'pending', 'archived'].map((status) => (
               <label key={status} className="flex items-center space-x-2 cursor-pointer">
-                <span className="text-sm text-zinc-400 capitalize">{status}</span>
+                <span className="text-sm text-zinc-400">{getStatusLabel(status)}</span>
                 <input
                   type="checkbox"
                   checked={filters.statuses.includes(status)}

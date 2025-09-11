@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
 
+import { useRouter } from 'next/navigation';
 import { ChannelData } from '@/store/channelModalStore';
 import { useChannelModalStore } from '@/store/channelModalStore';
-import { useCategories, formatCategoriesForDropdown } from '../../hooks/useCategories';
 import { CategoryType } from '@/api/generated/models/CategoryType';
 import { ChannelCard } from '@/components/ChannelCard/ChannelCard';
+
+import { useCategories, formatCategoriesForDropdown } from '../../hooks/useCategories';
 
 interface DiscoverSectionProps {
   channels: ChannelData[];

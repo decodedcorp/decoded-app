@@ -1,9 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useInvitations } from '../hooks/useInvitations';
-import { InvitationCard } from './InvitationCard';
+
 import type { InvitationResponse } from '@/api/generated/models/InvitationResponse';
+
+import { useInvitations } from '../hooks/useInvitations';
+
+import { InvitationCard } from './InvitationCard';
 
 interface InvitationListProps {
   channelId: string;

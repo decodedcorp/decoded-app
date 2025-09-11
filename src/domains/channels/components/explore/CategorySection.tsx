@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useMemo } from 'react';
+
 import { ChannelResponse } from '@/api/generated/models/ChannelResponse';
+
 import { ChannelCard } from './ChannelCard';
 
 // Helper functions for category information

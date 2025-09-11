@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
+
 import { useRouter } from 'next/navigation';
-import { useLocale } from '@/lib/hooks/useLocale';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 import { ChannelCard } from '@/domains/channels/components/explore/ChannelCard';
 import { useSearchChannels } from '@/domains/search/hooks/useSearch';
 
@@ -12,7 +13,7 @@ interface ChannelSearchResultsProps {
 
 export function ChannelSearchResults({ query }: ChannelSearchResultsProps) {
   const router = useRouter();
-  const { t } = useLocale();
+  const t = useCommonTranslation();
 
   // 실제 검색 API 사용
   const {
@@ -63,8 +64,8 @@ export function ChannelSearchResults({ query }: ChannelSearchResultsProps) {
       <div className="text-center py-16">
         <div className="text-zinc-400">
           <div className="animate-spin w-16 h-16 border-4 border-zinc-600 border-t-blue-500 rounded-full mx-auto mb-6" />
-          <h3 className="text-xl font-semibold text-white mb-3">{t('search.searchingChannels')}</h3>
-          <p className="text-zinc-500 text-lg">{t('search.lookingForChannels', { query })}</p>
+          <h3 className="text-xl font-semibold text-white mb-3">{t.search.searchingChannels()}</h3>
+          <p className="text-zinc-500 text-lg">{t.search.lookingForChannels(query)}</p>
         </div>
       </div>
     );
@@ -84,8 +85,8 @@ export function ChannelSearchResults({ query }: ChannelSearchResultsProps) {
               />
             </svg>
           </div>
-          <h3 className="text-xl font-semibold text-white mb-3">{t('search.searchError')}</h3>
-          <p className="text-zinc-500 text-lg">{t('search.failedToSearch')}</p>
+          <h3 className="text-xl font-semibold text-white mb-3">{t.search.searchError()}</h3>
+          <p className="text-zinc-500 text-lg">{t.search.failedToSearch()}</p>
         </div>
       </div>
     );
@@ -100,10 +101,10 @@ export function ChannelSearchResults({ query }: ChannelSearchResultsProps) {
     <div>
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-white">{t('search.channels')}</h2>
+          <h2 className="text-2xl font-bold text-white">{t.search.channels()}</h2>
           <div className="flex items-center gap-2">
             <span className="px-3 py-1 bg-zinc-800 text-zinc-300 text-sm rounded-full">
-              {t('search.found', { count: channels.length })}
+              {t.search.found(channels.length)}
             </span>
           </div>
         </div>
@@ -130,7 +131,7 @@ export function ChannelSearchResults({ query }: ChannelSearchResultsProps) {
         <div className="mt-6 text-center">
           <div className="flex items-center justify-center gap-2 text-zinc-400 text-sm">
             <div className="w-4 h-4 border border-zinc-400 border-t-transparent rounded-full animate-spin" />
-            <span>{t('search.updatingResults')}</span>
+            <span>{t.search.updatingResults()}</span>
           </div>
         </div>
       )}

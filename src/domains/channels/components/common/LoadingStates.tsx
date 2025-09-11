@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+
 import { useCommonTranslation, useErrorTranslation } from '../../../../lib/i18n/hooks';
 
 interface LoadingSpinnerProps {

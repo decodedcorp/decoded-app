@@ -2,6 +2,7 @@ import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallba
 import { gsap } from 'gsap';
 
 import { ChannelCard } from '@/components/ChannelCard';
+
 import { Item, MasonryProps } from './types';
 
 // 개발 환경에서만 로그 출력 (성능 최적화)

@@ -8,11 +8,12 @@
 
 'use client';
 
-import { useInfiniteQuery, useQuery, type UseInfiniteQueryOptions } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
 
-import type { Card, CardsRequest, CardsResponse } from '../types/card';
+import { useInfiniteQuery, useQuery, type UseInfiniteQueryOptions } from '@tanstack/react-query';
 import type { InfiniteData } from '@tanstack/react-query';
+
+import type { Card, CardsRequest, CardsResponse } from '../types/card';
 import { CardsProvider } from '../data/cardsProvider';
 import { CARD_CONSTANTS } from '../types/card';
 

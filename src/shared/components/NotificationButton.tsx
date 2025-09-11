@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
+
 import { useLocale } from '@/lib/hooks/useLocale';
 import {
   useNotifications,
@@ -9,6 +10,7 @@ import {
 } from '@/domains/notifications/hooks/useNotifications';
 import { useInvitations } from '@/domains/invitations/hooks/useInvitations';
 import { useAuthStore } from '@/store/authStore';
+
 import { InvitationNotificationItem } from './InvitationNotificationItem';
 import { SentInvitationNotificationItem } from './SentInvitationNotificationItem';
 

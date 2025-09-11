@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
+
 import { ProxiedImage } from '@/components/ProxiedImage';
 import { compressImage, validateImageFile } from '@/lib/utils/imageUtils';
 import { useChannelTranslation, useCommonTranslation } from '@/lib/i18n/hooks';

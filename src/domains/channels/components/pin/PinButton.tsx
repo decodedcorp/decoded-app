@@ -1,12 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
+
 import { RiPushpin2Line, RiUnpinLine } from 'react-icons/ri';
-import { useTogglePin, useIsContentPinned } from '../../hooks/useChannelPins';
 import { canPinContent } from '@/lib/utils/channelPermissions';
 import { useUser } from '@/domains/auth/hooks/useAuth';
 import { ChannelResponse } from '@/api/generated/models/ChannelResponse';
 import { cn } from '@/lib/utils/cn';
+
+import { useTogglePin, useIsContentPinned } from '../../hooks/useChannelPins';
+
 import PinNoteModal from './PinNoteModal';
 
 interface PinButtonProps {

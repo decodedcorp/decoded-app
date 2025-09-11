@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
-
 import { BookmarksService } from '@/api/generated/services/BookmarksService';
 import { BookmarkListWithContentResponse, BookmarkResponse } from '@/api/generated';
 

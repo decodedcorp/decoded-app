@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-
 import { ContentItem } from '@/lib/types/content';
 
 // Re-export for backward compatibility

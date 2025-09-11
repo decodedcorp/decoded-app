@@ -1,4 +1,5 @@
 import { toast } from 'react-hot-toast';
+
 import i18n from '../i18n/config';
 
 export interface ToastMessages {

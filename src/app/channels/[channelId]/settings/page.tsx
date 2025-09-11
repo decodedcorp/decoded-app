@@ -1,10 +1,12 @@
 'use client';
 
 import React from 'react';
+
 import { useParams, useRouter } from 'next/navigation';
 import { useChannel } from '@/domains/channels/hooks/useChannels';
 import { useUser } from '@/domains/auth/hooks/useAuth';
 import { canManageChannelManagers } from '@/lib/utils/channelPermissions';
+
 import { ChannelSettingsLayout } from './components/ChannelSettingsLayout';
 
 export default function ChannelSettingsPage() {
