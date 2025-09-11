@@ -45,7 +45,8 @@ export function ContentModal() {
               <Button
                 onClick={() => setShowMobileComments(true)}
                 variant="primary"
-                className="rounded-full shadow-lg flex items-center space-x-2 px-4 py-3"
+                className="rounded-full shadow-lg flex items-center space-x-2 px-4 py-3 min-h-[48px] touch-manipulation"
+                aria-label="Open comments"
               >
                 <MessageCircle className="w-5 h-5" />
                 <span className="text-sm font-medium">Comments</span>

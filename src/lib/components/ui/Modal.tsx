@@ -19,11 +19,11 @@ type ModalProps = {
 };
 
 const sizeClasses = {
-  sm: 'max-w-md',
-  md: 'max-w-lg',
-  lg: 'max-w-4xl',
-  xl: 'max-w-6xl',
-  full: 'max-w-[90vw]',
+  sm: 'max-w-[95vw] sm:max-w-md',
+  md: 'max-w-[95vw] sm:max-w-lg',
+  lg: 'max-w-[95vw] sm:max-w-4xl',
+  xl: 'max-w-[95vw] sm:max-w-6xl',
+  full: 'max-w-[95vw] sm:max-w-[90vw]',
 };
 
 export function Modal({
@@ -96,10 +96,10 @@ export function Modal({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descId}
-        className="fixed inset-0 z-[1010] flex items-center justify-center p-4"
+        className="fixed inset-0 z-[1010] flex items-center justify-center p-2 sm:p-4"
       >
         <div
-          className={`w-full ${sizeClasses[size]} rounded-2xl bg-white shadow-xl outline-none ${className}`}
+          className={`w-full ${sizeClasses[size]} max-h-[90vh] sm:max-h-[85vh] rounded-2xl bg-white shadow-xl outline-none overflow-y-auto ${className}`}
           // 모달 내부 클릭은 버블링 중단(바깥 클릭 닫기와 충돌 방지)
           onMouseDown={(e) => e.stopPropagation()}
         >

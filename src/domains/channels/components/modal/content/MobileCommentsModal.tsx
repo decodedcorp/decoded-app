@@ -22,7 +22,7 @@ export function MobileCommentsModal({ isOpen, onClose, content }: MobileComments
       closeOnOverlayClick={true}
       closeOnEscape={true}
       overlayClassName="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
-      contentClassName="fixed inset-x-0 bottom-0 top-[10vh] z-50"
+      contentClassName="fixed inset-x-0 bottom-0 top-[8vh] sm:top-[10vh] z-50"
     >
       <div className="w-full h-full bg-zinc-900 rounded-t-2xl shadow-2xl border-t border-zinc-700/50 flex flex-col overflow-hidden">
         {/* Header */}
@@ -32,14 +32,15 @@ export function MobileCommentsModal({ isOpen, onClose, content }: MobileComments
           </div>
           <button
             onClick={onClose}
-            className="flex items-center justify-center w-8 h-8 rounded-full bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors"
+            className="flex items-center justify-center w-10 h-10 sm:w-8 sm:h-8 rounded-full bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors touch-manipulation"
+            aria-label="Close comments"
           >
-            <MdClose className="w-5 h-5 text-zinc-400" />
+            <MdClose className="w-6 h-6 sm:w-5 sm:h-5 text-zinc-400" />
           </button>
         </div>
 
         {/* Comments Section */}
-        <div className="flex-1 min-h-0">
+        <div className="flex-1 min-h-0 overflow-y-auto">
           <CommentSection contentId={String(content.id)} />
         </div>
       </div>
