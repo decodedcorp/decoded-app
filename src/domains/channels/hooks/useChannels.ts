@@ -9,6 +9,7 @@ import { getValidAccessToken } from '../../auth/utils/tokenManager';
 import { OpenAPI } from '../../../api/generated/core/OpenAPI';
 import { useToastMutation, useSimpleToastMutation } from '../../../lib/hooks/useToastMutation';
 import { extractApiErrorMessage } from '../../../lib/utils/toastUtils';
+import { useCommonTranslation } from '../../../lib/i18n/centralizedHooks';
 
 export const useChannels = (params?: {
   page?: number;
@@ -82,6 +83,7 @@ export const useChannel = (channelId: string, options?: { enabled?: boolean }) =
 
 export const useCreateChannel = () => {
   const queryClient = useQueryClient();
+  const t = useCommonTranslation();
 
   return useToastMutation(
     async (data: ChannelCreate) => {
@@ -135,9 +137,12 @@ export const useCreateChannel = () => {
     },
     {
       messages: {
-        loading: 'Creating channel...',
-        success: 'Channel created successfully!',
-        error: (err: unknown) => `Failed to create channel: ${extractApiErrorMessage(err)}`,
+        loading: t.globalContentUpload.toast.messages.creatingChannel(),
+        success: t.globalContentUpload.toast.messages.channelCreated(),
+        error: (err: unknown) =>
+          `${t.globalContentUpload.toast.messages.channelCreateFailed()}: ${extractApiErrorMessage(
+            err,
+          )}`,
       },
       toastId: 'create-channel',
       mutationKey: queryKeys.channels.create(),
@@ -169,13 +174,14 @@ export const useCreateChannel = () => {
 
 export const useUpdateChannel = () => {
   const queryClient = useQueryClient();
+  const t = useCommonTranslation();
 
   return useSimpleToastMutation<any, any, { channelId: string; data: any }, any>(
     ({ channelId, data }) => {
       return ChannelsService.updateChannelChannelsChannelIdPut(channelId, data);
     },
     {
-      actionName: 'Update channel',
+      actionName: t.globalContentUpload.toast.actions.updateChannel(),
       toastId: 'update-channel',
       onSuccess: (response: any, { channelId }) => {
         queryClient.invalidateQueries({ queryKey: queryKeys.channels.detail(channelId) });
@@ -190,11 +196,12 @@ export const useUpdateChannel = () => {
 
 export const useDeleteChannel = () => {
   const queryClient = useQueryClient();
+  const t = useCommonTranslation();
 
   return useSimpleToastMutation(
     (channelId: string) => ChannelsService.deleteChannelChannelsChannelIdDelete(channelId),
     {
-      actionName: 'Delete channel',
+      actionName: t.globalContentUpload.toast.actions.deleteChannel(),
       toastId: 'delete-channel',
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: queryKeys.channels.lists() });
@@ -205,12 +212,13 @@ export const useDeleteChannel = () => {
 
 export const useUpdateChannelThumbnail = () => {
   const queryClient = useQueryClient();
+  const t = useCommonTranslation();
 
   return useSimpleToastMutation<any, any, { channelId: string; data: any }, any>(
     ({ channelId, data }) =>
       ChannelsService.updateThumbnailChannelsChannelIdThumbnailPatch(channelId, data),
     {
-      actionName: 'Update thumbnail',
+      actionName: t.globalContentUpload.toast.actions.updateThumbnail(),
       toastId: 'update-thumbnail',
       onSuccess: (_: any, { channelId }) => {
         queryClient.invalidateQueries({ queryKey: queryKeys.channels.detail(channelId) });

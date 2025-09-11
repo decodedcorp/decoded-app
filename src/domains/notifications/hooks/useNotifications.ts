@@ -4,6 +4,7 @@ import { queryKeys } from '@/lib/api/queryKeys';
 import { refreshOpenAPIToken } from '@/api/hooks/useApi';
 import { useToastMutation } from '@/lib/hooks/useToastMutation';
 import { extractApiErrorMessage } from '@/lib/utils/toastUtils';
+import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
 
 // 알림 목록 조회
 export const useNotifications = (params?: {
@@ -15,12 +16,12 @@ export const useNotifications = (params?: {
     queryKey: queryKeys.interactions.myNotifications(params || {}),
     queryFn: async () => {
       refreshOpenAPIToken();
-      
+
       try {
         const result = await InteractionsService.getMyNotificationsMeNotificationsGet(
           params?.unreadOnly || false,
           params?.limit || 20,
-          params?.page || 1
+          params?.page || 1,
         );
         return result;
       } catch (error) {
@@ -42,52 +43,60 @@ export const useNotifications = (params?: {
 // 알림 읽음 처리
 export const useMarkNotificationRead = () => {
   const queryClient = useQueryClient();
+  const t = useCommonTranslation();
 
   return useToastMutation(
     async (notificationId: string) => {
       refreshOpenAPIToken();
       return InteractionsService.markMyNotificationsAsReadMeNotificationsMarkReadPatch({
-        notification_ids: [notificationId]
+        notification_ids: [notificationId],
       });
     },
     {
       messages: {
-        loading: 'Marking notification as read...',
-        success: 'Notification marked as read',
-        error: (err: unknown) => `Failed to mark notification as read: ${extractApiErrorMessage(err)}`,
+        loading: t.globalContentUpload.toast.messages.markingNotificationRead(),
+        success: t.globalContentUpload.toast.messages.notificationMarkedRead(),
+        error: (err: unknown) =>
+          `${t.globalContentUpload.toast.messages.notificationMarkReadFailed()}: ${extractApiErrorMessage(
+            err,
+          )}`,
       },
       toastId: 'mark-notification-read',
       onSuccess: () => {
         // 알림 목록 다시 불러오기
         queryClient.invalidateQueries({ queryKey: queryKeys.interactions.myNotifications() });
       },
-    }
+    },
   );
 };
 
 // 모든 알림 읽음 처리
 export const useMarkAllNotificationsRead = () => {
   const queryClient = useQueryClient();
+  const t = useCommonTranslation();
 
   return useToastMutation(
     async () => {
       refreshOpenAPIToken();
       return InteractionsService.markMyNotificationsAsReadMeNotificationsMarkReadPatch({
-        notification_ids: []
+        notification_ids: [],
       });
     },
     {
       messages: {
-        loading: 'Marking all notifications as read...',
-        success: 'All notifications marked as read',
-        error: (err: unknown) => `Failed to mark notifications as read: ${extractApiErrorMessage(err)}`,
+        loading: t.globalContentUpload.toast.messages.markingAllNotificationsRead(),
+        success: t.globalContentUpload.toast.messages.allNotificationsMarkedRead(),
+        error: (err: unknown) =>
+          `${t.globalContentUpload.toast.messages.allNotificationsMarkReadFailed()}: ${extractApiErrorMessage(
+            err,
+          )}`,
       },
       toastId: 'mark-all-notifications-read',
       onSuccess: () => {
         // 알림 목록 다시 불러오기
         queryClient.invalidateQueries({ queryKey: queryKeys.interactions.myNotifications() });
       },
-    }
+    },
   );
 };
 
@@ -97,7 +106,7 @@ export const useNotificationStats = () => {
     queryKey: queryKeys.interactions.myStats(),
     queryFn: async () => {
       refreshOpenAPIToken();
-      
+
       try {
         const result = await InteractionsService.getMyInteractionStatsMeStatsGet();
         return result;

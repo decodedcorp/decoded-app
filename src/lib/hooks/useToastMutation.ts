@@ -1,10 +1,7 @@
 import { useMutation, UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
 
-import {
-  createToastMutation,
-  ToastMessages,
-  extractApiErrorMessage,
-} from '../utils/toastUtils';
+import { createToastMutation, ToastMessages, extractApiErrorMessage } from '../utils/toastUtils';
+import { useCommonTranslation } from '../i18n/centralizedHooks';
 
 interface UseToastMutationOptions<TData, TError, TVariables, TContext>
   extends Omit<UseMutationOptions<TData, TError, TVariables, TContext>, 'mutationFn'> {
@@ -63,11 +60,44 @@ export function useSimpleToastMutation<TData, TError, TVariables, TContext = unk
   },
 ): UseMutationResult<TData, TError, TVariables, TContext> {
   const { actionName, ...restOptions } = options;
+  const t = useCommonTranslation();
+
+  // 액션 이름에 따라 적절한 로케일 키를 매핑
+  const getActionKey = (actionName: string): string => {
+    const actionMap: Record<string, string> = {
+      'Create channel': 'createChannel',
+      'Update channel': 'updateChannel',
+      'Delete channel': 'deleteChannel',
+      'Update thumbnail': 'updateThumbnail',
+      'Create content': 'createContent',
+      'Update content': 'updateContent',
+      'Delete content': 'deleteContent',
+      'Create link content': 'createLinkContent',
+      'Create image content': 'createImageContent',
+      'Create video content': 'createVideoContent',
+      'Update link content': 'updateLinkContent',
+      'Update image content': 'updateImageContent',
+      'Update video content': 'updateVideoContent',
+      'Delete link content': 'deleteLinkContent',
+      'Delete image content': 'deleteImageContent',
+      'Delete video content': 'deleteVideoContent',
+    };
+    return actionMap[actionName] || 'createContent';
+  };
+
+  const actionKey = getActionKey(actionName);
 
   const defaultMessages: ToastMessages = {
-    loading: `${actionName} loading...`,
-    success: `${actionName} completed.`,
-    error: (err: unknown) => `${actionName} failed: ${extractApiErrorMessage(err)}`,
+    loading: `${t.globalContentUpload.toast.actions[
+      actionKey as keyof typeof t.globalContentUpload.toast.actions
+    ]()} ${t.globalContentUpload.toast.states.loading()}`,
+    success: `${t.globalContentUpload.toast.actions[
+      actionKey as keyof typeof t.globalContentUpload.toast.actions
+    ]()} ${t.globalContentUpload.toast.states.completed()}`,
+    error: (err: unknown) =>
+      `${t.globalContentUpload.toast.actions[
+        actionKey as keyof typeof t.globalContentUpload.toast.actions
+      ]()} ${t.globalContentUpload.toast.states.failed()}: ${extractApiErrorMessage(err)}`,
   };
 
   return useToastMutation(mutationFn, {
