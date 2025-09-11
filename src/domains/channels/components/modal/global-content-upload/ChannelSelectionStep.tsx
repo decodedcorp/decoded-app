@@ -4,11 +4,13 @@ import React, { useState, useCallback } from 'react';
 
 import { useSearchChannels } from '@/domains/search/hooks/useSearch';
 import { useGlobalContentUploadStore } from '@/store/globalContentUploadStore';
+import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
 
 import { ChannelSearchComponent } from './ChannelSearchComponent';
 import { RecentChannelsList } from './RecentChannelsList';
 
 export function ChannelSelectionStep() {
+  const t = useCommonTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const selectChannel = useGlobalContentUploadStore((state) => state.selectChannel);
   const startChannelCreation = useGlobalContentUploadStore((state) => state.startChannelCreation);
@@ -62,10 +64,10 @@ export function ChannelSelectionStep() {
     <div className="space-y-6">
       {/* 헤더 */}
       <div className="text-center">
-        <h3 className="text-xl font-semibold text-white mb-2">Select a Channel</h3>
-        <p className="text-gray-400 text-sm">
-          Choose where to upload your content, or create a new channel
-        </p>
+        <h3 className="text-xl font-semibold text-white mb-2">
+          {t.globalContentUpload.channelSelection.title()}
+        </h3>
+        <p className="text-gray-400 text-sm">{t.globalContentUpload.channelSelection.subtitle()}</p>
       </div>
 
       {/* 채널 검색 */}
@@ -94,7 +96,7 @@ export function ChannelSelectionStep() {
               d="M12 6v6m0 0v6m0-6h6m-6 0H6"
             />
           </svg>
-          Create New Channel
+          {t.globalContentUpload.channelSelection.createNewChannel()}
         </button>
       </div>
     </div>

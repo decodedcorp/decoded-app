@@ -37,7 +37,6 @@ import { PinButton, PinIndicator } from '../../pin/PinButton';
 import { ChannelPinnedSection } from '../../pin/ChannelPinnedSection';
 import { useChannel } from '../../../hooks/useChannels';
 
-
 // 개별 콘텐츠 아이템 컴포넌트 (고도화된 메모이제이션)
 const ContentItemCard = React.memo<{
   item: ContentItem;
@@ -324,7 +323,7 @@ export const ChannelModalContent = React.memo<{
 
   // 채널 ID 결정: Props > selectedChannelId > selectedChannel.id 순서로 우선순위
   const channelId = propChannelId || selectedChannelId || selectedChannel?.id || '';
-  
+
   // 채널 정보 가져오기
   const { data: channelData } = useChannel(channelId);
 
@@ -337,7 +336,9 @@ export const ChannelModalContent = React.memo<{
     (currentFilters.dataTypes.length > 0 ||
       currentFilters.categories.length > 0 ||
       currentFilters.tags.length > 0 ||
-      (currentFilters.statuses && currentFilters.statuses.length > 0 && currentFilters.statuses.length < 3)); // 3개 모두 선택되지 않은 경우 필터링으로 간주
+      (currentFilters.statuses &&
+        currentFilters.statuses.length > 0 &&
+        currentFilters.statuses.length < 3)); // 3개 모두 선택되지 않은 경우 필터링으로 간주
 
   // 기본 콘텐츠 조회 (필터가 없을 때)
   const {
@@ -360,15 +361,12 @@ export const ChannelModalContent = React.memo<{
     isLoading: isLoadingFiltered,
     error: errorFiltered,
     refetch: refetchFiltered,
-  } = useChannelContentFiltering(
-    channelId,
-    {
-      dataTypes: currentFilters?.dataTypes || [],
-      categories: currentFilters?.categories || [],
-      tags: currentFilters?.tags || [],
-      statuses: currentFilters?.statuses || ['active'],
-    },
-  );
+  } = useChannelContentFiltering(channelId, {
+    dataTypes: currentFilters?.dataTypes || [],
+    categories: currentFilters?.categories || [],
+    tags: currentFilters?.tags || [],
+    statuses: currentFilters?.statuses || ['active'],
+  });
 
   // 사용할 데이터 결정
   const contentItems = shouldUseFiltering ? filteredContent : allContentItems;
@@ -410,13 +408,16 @@ export const ChannelModalContent = React.memo<{
   }, [channelId, openContentUploadModal]);
 
   // 하이라이트 클릭 핸들러 (메모이제이션)
-  const handleHighlightClick = React.useCallback((highlight: HighlightItem) => {
-    if (highlight.clickAction.type === 'content_modal' && highlight.clickAction.data) {
-      // ContentItem 데이터로 콘텐츠 모달 열기
-      openContentModal(highlight.clickAction.data as ContentItem);
-    }
-    // 향후 다른 action type들 (external_link, internal_link) 추가 가능
-  }, [openContentModal]);
+  const handleHighlightClick = React.useCallback(
+    (highlight: HighlightItem) => {
+      if (highlight.clickAction.type === 'content_modal' && highlight.clickAction.data) {
+        // ContentItem 데이터로 콘텐츠 모달 열기
+        openContentModal(highlight.clickAction.data as ContentItem);
+      }
+      // 향후 다른 action type들 (external_link, internal_link) 추가 가능
+    },
+    [openContentModal],
+  );
 
   // 표시할 콘텐츠 결정 (실제 API 데이터만 사용)
   const displayContentItems = React.useMemo(() => {
@@ -506,20 +507,12 @@ export const ChannelModalContent = React.memo<{
             </svg>
           </div>
           <h3 className="text-lg font-semibold text-white mb-2">{t.feed.failedToLoadPosts()}</h3>
-          <p className="text-zinc-400 mb-6 max-w-md mx-auto">
-            {t.status.error()}
-          </p>
+          <p className="text-zinc-400 mb-6 max-w-md mx-auto">{t.status.error()}</p>
           <div className="flex items-center justify-center space-x-3">
-            <Button
-              onClick={() => refetch()}
-              variant="primary"
-            >
+            <Button onClick={() => refetch()} variant="primary">
               {t.feed.tryAgain()}
             </Button>
-            <Button
-              onClick={() => window.location.reload()}
-              variant="secondary"
-            >
+            <Button onClick={() => window.location.reload()} variant="secondary">
               {t.actions.reload()}
             </Button>
           </div>
@@ -549,17 +542,16 @@ export const ChannelModalContent = React.memo<{
   return (
     <div className="px-4">
       {/* Community Highlights */}
-      <CommunityHighlights
-        channelId={channelId}
-        onItemClick={handleHighlightClick}
-      />
+      <CommunityHighlights channelId={channelId} onItemClick={handleHighlightClick} />
 
       {/* Header */}
       <div className="flex items-center justify-between pt-2">
         <div>
           {/* 콘텐츠 개수 및 상태 필터 */}
           <div className="flex items-center gap-3 mb-2">
-            <p className="text-gray-500">{totalCount || 0} {t.ui.contentItems()}</p>
+            <p className="text-gray-500">
+              {totalCount || 0} {t.ui.contentItems()}
+            </p>
 
             {/* 상태 필터 버튼들 */}
             <div className="flex gap-1">
@@ -575,7 +567,7 @@ export const ChannelModalContent = React.memo<{
                     : 'bg-zinc-800/50 text-gray-500 hover:text-gray-400'
                 }`}
               >
-                Active
+                {t.ui.active()}
               </button>
               <button
                 onClick={() => {
@@ -602,7 +594,7 @@ export const ChannelModalContent = React.memo<{
                     : 'bg-zinc-800/50 text-gray-500 hover:text-gray-400'
                 }`}
               >
-                All
+                {t.ui.all()}
               </button>
             </div>
           </div>
@@ -628,7 +620,9 @@ export const ChannelModalContent = React.memo<{
                   clipRule="evenodd"
                 />
               </svg>
-              <span>{pendingCount} {t.ui.contentItems()} {t.status.processing()}</span>
+              <span>
+                {pendingCount} {t.ui.contentItems()} {t.status.processing()}
+              </span>
             </button>
           )}
 
@@ -732,8 +726,8 @@ export const ChannelModalContent = React.memo<{
 
               return (
                 <div className="w-full h-full">
-                  <ContentItemCard 
-                    item={contentItem} 
+                  <ContentItemCard
+                    item={contentItem}
                     onItemClick={handleItemClick}
                     channelId={channelId}
                     channel={channelData}
@@ -761,9 +755,7 @@ export const ChannelModalContent = React.memo<{
               </svg>
             </div>
             <h3 className="text-xl font-semibold text-gray-400 mb-2">{t.feed.noPostsFound()}</h3>
-            <p className="text-gray-500 mb-6 max-w-md mx-auto">
-              {t.feed.tryDifferentFilter()}
-            </p>
+            <p className="text-gray-500 mb-6 max-w-md mx-auto">{t.feed.tryDifferentFilter()}</p>
             <button
               onClick={handleAddContent}
               className="px-6 py-3 bg-zinc-900 hover:bg-[#eafd66] text-white hover:text-black rounded-lg transition-all duration-200 flex items-center space-x-3 mx-auto hover:scale-[1.02] font-medium shadow-lg hover:shadow-xl"

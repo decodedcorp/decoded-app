@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 
 import { X } from 'lucide-react';
 import { validateImageFile, compressImage } from '@/lib/utils/imageUtils';
-import { useFormsTranslation } from '@/lib/i18n/hooks';
+import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
 
 interface Step1Data {
   name: string;
@@ -31,7 +31,7 @@ export function Step2MediaUpload({
   isLoading,
   error,
 }: Step2MediaUploadProps) {
-  const { media } = useFormsTranslation();
+  const t = useCommonTranslation();
   const [formData, setFormData] = useState<Step2Data>(data);
   const [previewData, setPreviewData] = useState<{
     thumbnail: string | null;
@@ -103,7 +103,7 @@ export function Step2MediaUpload({
       }
     } catch (error) {
       console.error('Image upload error:', error);
-      alert('Failed to process image. Please try again.');
+      alert(t.globalContentUpload.addChannel.errors.imageProcessingFailed());
     }
   };
 
@@ -173,7 +173,7 @@ export function Step2MediaUpload({
     if (imageFile) {
       handleImageUpload(field, imageFile);
     } else {
-      alert('Please drop an image file');
+      alert(t.globalContentUpload.addChannel.errors.pleaseDropImage());
     }
   };
 
@@ -182,17 +182,18 @@ export function Step2MediaUpload({
       {/* Left side - Upload Options */}
       <div className="flex-1">
         <div className="text-left mb-6">
-          <h2 className="text-2xl font-bold text-white mb-2">Style your channel</h2>
-          <p className="text-zinc-400">
-            Adding visual flair will catch new members attention and help establish your channel's
-            culture! You can update this at any time.
-          </p>
+          <h2 className="text-2xl font-bold text-white mb-2">
+            {t.globalContentUpload.addChannel.step2.title()}
+          </h2>
+          <p className="text-zinc-400">{t.globalContentUpload.addChannel.step2.subtitle()}</p>
         </div>
 
         <div className="space-y-6">
           {/* Banner Upload */}
           <div>
-            <label className="text-lg font-medium text-white mb-3 block">Banner</label>
+            <label className="text-lg font-medium text-white mb-3 block">
+              {t.globalContentUpload.addChannel.step2.banner()}
+            </label>
             <div
               onDragOver={(e) => handleDragOver(e, 'banner')}
               onDragLeave={(e) => handleDragLeave(e, 'banner')}
@@ -229,8 +230,12 @@ export function Step2MediaUpload({
                       d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                     />
                   </svg>
-                  <div className="text-zinc-300 font-medium mb-1">Add Banner</div>
-                  <div className="text-xs text-zinc-500">Click or drag & drop</div>
+                  <div className="text-zinc-300 font-medium mb-1">
+                    {t.globalContentUpload.addChannel.step2.addBanner()}
+                  </div>
+                  <div className="text-xs text-zinc-500">
+                    {t.globalContentUpload.addChannel.step2.clickOrDrag()}
+                  </div>
                 </div>
               )}
             </div>
@@ -240,7 +245,7 @@ export function Step2MediaUpload({
                   onClick={() => handleImageRemove('banner')}
                   className="text-red-400 text-sm hover:text-red-300"
                 >
-                  Remove banner
+                  {t.globalContentUpload.addChannel.step2.removeBanner()}
                 </button>
               </div>
             )}
@@ -248,7 +253,9 @@ export function Step2MediaUpload({
 
           {/* Icon Upload */}
           <div>
-            <label className="text-lg font-medium text-white mb-3 block">Icon</label>
+            <label className="text-lg font-medium text-white mb-3 block">
+              {t.globalContentUpload.addChannel.step2.icon()}
+            </label>
             <div
               onDragOver={(e) => handleDragOver(e, 'thumbnail')}
               onDragLeave={(e) => handleDragLeave(e, 'thumbnail')}
@@ -285,8 +292,12 @@ export function Step2MediaUpload({
                       d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                     />
                   </svg>
-                  <div className="text-zinc-300 font-medium mb-1">Add Icon</div>
-                  <div className="text-xs text-zinc-500">Click or drag & drop</div>
+                  <div className="text-zinc-300 font-medium mb-1">
+                    {t.globalContentUpload.addChannel.step2.addIcon()}
+                  </div>
+                  <div className="text-xs text-zinc-500">
+                    {t.globalContentUpload.addChannel.step2.clickOrDrag()}
+                  </div>
                 </div>
               )}
             </div>
@@ -296,7 +307,7 @@ export function Step2MediaUpload({
                   onClick={() => handleImageRemove('thumbnail')}
                   className="text-red-400 text-sm hover:text-red-300"
                 >
-                  Remove icon
+                  {t.globalContentUpload.addChannel.step2.removeIcon()}
                 </button>
               </div>
             )}
@@ -339,7 +350,7 @@ export function Step2MediaUpload({
                       d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                     />
                   </svg>
-                  <p className="text-sm">{media.uploadBanner()}</p>
+                  <p className="text-sm">{t.globalContentUpload.addChannel.step2.addBanner()}</p>
                 </div>
               </div>
             )}
@@ -374,9 +385,9 @@ export function Step2MediaUpload({
                   r/{step1Data.name || 'adfadadfadfd'}
                 </h3>
                 <div className="flex items-center space-x-2 text-sm text-zinc-400">
-                  <span>1 member</span>
+                  <span>1 {t.globalContentUpload.addChannel.step2.preview.member()}</span>
                   <span>•</span>
-                  <span>1 online</span>
+                  <span>1 {t.globalContentUpload.addChannel.step2.preview.online()}</span>
                 </div>
               </div>
             </div>

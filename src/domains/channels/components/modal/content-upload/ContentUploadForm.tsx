@@ -2,7 +2,7 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 
-import { X } from 'lucide-react';
+import { X, Image, Link, Upload } from 'lucide-react';
 import { Button } from '@decoded/ui';
 import { ContentType } from '@/lib/types/ContentType';
 import {
@@ -10,6 +10,7 @@ import {
   selectContentUploadFormData,
   selectContentUploadError,
 } from '@/store/contentUploadStore';
+import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
 // AI 생성 관련 컴포넌트 import 제거
 import { useCreateLinkContent, useCreateImageContent } from '@/domains/channels/hooks/useContents';
 import { compressImage, validateImageFile } from '@/lib/utils/imageUtils';
@@ -21,6 +22,7 @@ interface ContentUploadFormProps {
 }
 
 export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadFormProps) {
+  const t = useCommonTranslation();
   const formData = useContentUploadStore(selectContentUploadFormData);
   const storeError = useContentUploadStore(selectContentUploadError);
   const updateFormData = useContentUploadStore((state) => state.updateFormData);
@@ -110,7 +112,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
         updateFormData({ file: undefined, filePreview: undefined });
         setValidationErrors((prev) => ({
           ...prev,
-          file: 'Error occurred while processing image.',
+          file: t.globalContentUpload.contentUpload.validation.imageProcessingError(),
         }));
       }
     }
@@ -128,15 +130,15 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     // }
 
     if (formData.description && formData.description.trim().length > 500) {
-      errors.description = 'Description must be 500 characters or less.';
+      errors.description = t.globalContentUpload.contentUpload.validation.descriptionTooLong();
     }
 
     if (formData.type === ContentType.IMAGE && !formData.file) {
-      errors.file = 'Please select an image.';
+      errors.file = t.globalContentUpload.contentUpload.validation.imageRequired();
     }
 
     if (formData.type === ContentType.IMAGE && !formData.base64_img_url) {
-      errors.file = 'Please select an image.';
+      errors.file = t.globalContentUpload.contentUpload.validation.imageRequired();
     }
 
     // // if (formData.type === ContentType.VIDEO && !formData.file) {
@@ -144,14 +146,14 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     // // }
 
     if (formData.type === ContentType.LINK && !formData.url?.trim()) {
-      errors.url = 'Please enter a link URL.';
+      errors.url = t.globalContentUpload.contentUpload.validation.urlRequired();
     }
 
     if (formData.type === ContentType.LINK && formData.url?.trim()) {
       try {
         new URL(formData.url.trim());
       } catch {
-        errors.url = 'Please enter a valid URL format.';
+        errors.url = t.globalContentUpload.contentUpload.validation.invalidUrl();
       }
     }
 
@@ -288,13 +290,23 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     <form onSubmit={handleSubmit} className="p-6 space-y-6">
       {/* Content Type Selection */}
       <div>
-        <label className="block text-sm font-medium text-white mb-3">Content Type *</label>
+        <label className="block text-sm font-medium text-white mb-3">
+          {t.globalContentUpload.contentUpload.contentType()} *
+        </label>
         <div className="grid grid-cols-1 gap-3">
           {[
-            { type: ContentType.IMAGE, label: 'Image', icon: '🖼️' },
+            {
+              type: ContentType.IMAGE,
+              label: t.globalContentUpload.contentUpload.image(),
+              icon: Image,
+            },
             // { type: ContentType.VIDEO, label: 'Video', icon: '🎥' }, // Temporarily disabled
-            { type: ContentType.LINK, label: 'Link', icon: '🔗' },
-          ].map(({ type, label, icon }) => (
+            {
+              type: ContentType.LINK,
+              label: t.globalContentUpload.contentUpload.link(),
+              icon: Link,
+            },
+          ].map(({ type, label, icon: IconComponent }) => (
             <button
               key={type}
               type="button"
@@ -305,7 +317,9 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
                   : 'border-zinc-700 bg-zinc-800/50 text-zinc-400 hover:border-zinc-600 hover:text-zinc-300'
               }`}
             >
-              <div className="text-2xl mb-1">{icon}</div>
+              <div className="flex items-center justify-center mb-2">
+                <IconComponent className="w-6 h-6" />
+              </div>
               <div className="text-sm font-medium">{label}</div>
             </button>
           ))}
@@ -315,7 +329,9 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
       {/* File Upload for Image */}
       {formData.type === ContentType.IMAGE && (
         <div>
-          <label className="block text-sm font-medium text-white mb-3">Image Upload *</label>
+          <label className="block text-sm font-medium text-white mb-3">
+            {t.globalContentUpload.contentUpload.imageUpload()} *
+          </label>
 
           {formData.filePreview ? (
             <div className="space-y-3">
@@ -348,19 +364,15 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
                   className="flex flex-col items-center space-y-2 text-zinc-400 hover:text-zinc-300 transition-colors"
                   disabled={isLoading}
                 >
-                  <svg width="32" height="32" fill="none" viewBox="0 0 24 24">
-                    <path
-                      d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  <span className="text-sm">Select Image</span>
+                  <Upload className="w-8 h-8" />
+                  <span className="text-sm">
+                    {t.globalContentUpload.contentUpload.selectImage()}
+                  </span>
                 </button>
               </div>
-              <p className="text-sm text-zinc-400">JPG, PNG, WebP, GIF up to 10MB</p>
+              <p className="text-sm text-zinc-400">
+                {t.globalContentUpload.contentUpload.fileFormats()}
+              </p>
             </div>
           )}
 
@@ -384,7 +396,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
         <div className="space-y-4">
           <div>
             <label htmlFor="content-url" className="block text-sm font-medium text-white mb-2">
-              Link URL *
+              {t.globalContentUpload.contentUpload.linkUrl()} *
             </label>
             <input
               id="content-url"
@@ -407,8 +419,10 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
       {/* Description Input - shown for all content types */}
       <div>
         <label htmlFor="content-description" className="block text-sm font-medium text-white mb-2">
-          Description
-          <span className="text-zinc-400 font-normal ml-1">(Optional)</span>
+          {t.globalContentUpload.contentUpload.description()}
+          <span className="text-zinc-400 font-normal ml-1">
+            {t.globalContentUpload.contentUpload.optional()}
+          </span>
         </label>
         <textarea
           id="content-description"
@@ -417,7 +431,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
           className={`w-full px-4 py-3 bg-zinc-800 border rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-600 focus:border-transparent transition-colors resize-none ${
             validationErrors.description ? 'border-red-500' : 'border-zinc-700'
           }`}
-          placeholder="Add a description for your content..."
+          placeholder={t.globalContentUpload.contentUpload.addDescription()}
           rows={3}
           maxLength={500}
           disabled={isLoading || createLinkContent.isPending || createImageContent.isPending}

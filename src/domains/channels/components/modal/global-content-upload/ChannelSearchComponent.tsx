@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
+import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
 
 interface ChannelSearchComponentProps {
   onSearch: (query: string) => void;
@@ -17,6 +18,7 @@ export function ChannelSearchComponent({
   error,
   onChannelSelect,
 }: ChannelSearchComponentProps) {
+  const t = useCommonTranslation();
   const [query, setQuery] = useState('');
 
   // 검색 입력 핸들러
@@ -35,7 +37,7 @@ export function ChannelSearchComponent({
       <div className="relative">
         <input
           type="text"
-          placeholder="Search channels..."
+          placeholder={t.globalContentUpload.search.placeholder()}
           value={query}
           onChange={handleInputChange}
           className="w-full px-4 py-3 bg-zinc-800 border border-zinc-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#eafd66] transition-colors"
@@ -52,11 +54,13 @@ export function ChannelSearchComponent({
         <div className="space-y-2">
           {isLoading ? (
             <div className="text-center py-4">
-              <div className="text-gray-400">Searching channels...</div>
+              <div className="text-gray-400">
+                {t.globalContentUpload.search.searchingChannels()}
+              </div>
             </div>
           ) : error ? (
             <div className="text-center py-4">
-              <div className="text-red-400">Failed to search channels</div>
+              <div className="text-red-400">{t.globalContentUpload.search.failedToSearch()}</div>
             </div>
           ) : channels.length > 0 ? (
             <div className="space-y-2 max-h-60 overflow-y-auto">
@@ -93,7 +97,9 @@ export function ChannelSearchComponent({
             </div>
           ) : (
             <div className="text-center py-4">
-              <div className="text-gray-400 mb-3">No channels found</div>
+              <div className="text-gray-400 mb-3">
+                {t.globalContentUpload.search.noChannelsFound()}
+              </div>
               <button
                 onClick={() => {
                   // 부모 컴포넌트에서 새 채널 생성 모달 열기
@@ -102,7 +108,7 @@ export function ChannelSearchComponent({
                 }}
                 className="px-4 py-2 bg-[#eafd66] text-black font-medium rounded-lg hover:bg-[#d4e755] transition-colors"
               >
-                Create New Channel
+                {t.globalContentUpload.search.createNewChannel()}
               </button>
             </div>
           )}

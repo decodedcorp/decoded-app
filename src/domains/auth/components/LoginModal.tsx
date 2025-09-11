@@ -3,9 +3,9 @@
 import React from 'react';
 
 import { Dialog, DialogContent } from '@decoded/ui';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 import { LoginForm } from './LoginForm';
-
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -14,6 +14,8 @@ interface LoginModalProps {
 }
 
 export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess }) => {
+  const t = useCommonTranslation();
+
   const handleLoginSuccess = () => {
     onLoginSuccess?.();
     onClose();
@@ -32,7 +34,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
             decoded
           </div>
           <div className="text-center">
-            <p className="text-gray-300 text-sm">Sign in with your Google account to continue</p>
+            <p className="text-white text-sm">{t.login.subtitle()}</p>
           </div>
         </div>
 
@@ -42,13 +44,13 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
         </div>
 
         {/* 하단 섹션 (약관 및 개인정보처리방침) */}
-        <div className="text-center text-xs text-gray-400 space-x-4">
-          <a href="/terms-of-service" className="hover:text-gray-200 transition-colors">
-            Terms of Service
+        <div className="text-center text-xs text-gray-200 space-x-4">
+          <a href="/terms-of-service" className="hover:text-white transition-colors">
+            {t.login.termsOfService()}
           </a>
           <span>|</span>
-          <a href="/privacy-policy" className="hover:text-gray-200 transition-colors">
-            Privacy Policy
+          <a href="/privacy-policy" className="hover:text-white transition-colors">
+            {t.login.privacyPolicy()}
           </a>
         </div>
       </DialogContent>

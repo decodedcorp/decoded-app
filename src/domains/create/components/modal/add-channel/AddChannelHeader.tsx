@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
 
 interface AddChannelHeaderProps {
   onClose: () => void;
@@ -8,10 +9,14 @@ interface AddChannelHeaderProps {
 }
 
 export function AddChannelHeader({ onClose, currentStep }: AddChannelHeaderProps) {
+  const t = useCommonTranslation();
+
   return (
     <div className="flex items-center justify-between px-4 py-4 border-b border-zinc-700/50">
       <div className="flex space-x-6 justify-between w-full pr-2">
-        <h2 className="text-2xl font-semibold text-white">Create Channel</h2>
+        <h2 className="text-2xl font-semibold text-white">
+          {t.globalContentUpload.addChannel.title()}
+        </h2>
 
         {/* Step Indicator */}
         <div className="flex items-center space-x-3">
@@ -28,7 +33,7 @@ export function AddChannelHeader({ onClose, currentStep }: AddChannelHeaderProps
             <span
               className={`ml-2 text-sm ${currentStep >= 1 ? 'text-[#eafd66]' : 'text-zinc-500'}`}
             >
-              Basic Info
+              {t.globalContentUpload.addChannel.steps.basicInfo()}
             </span>
           </div>
 
@@ -47,7 +52,7 @@ export function AddChannelHeader({ onClose, currentStep }: AddChannelHeaderProps
             <span
               className={`ml-2 text-sm ${currentStep >= 2 ? 'text-[#eafd66]' : 'text-zinc-500'}`}
             >
-              Style
+              {t.globalContentUpload.addChannel.steps.style()}
             </span>
           </div>
 
@@ -66,7 +71,7 @@ export function AddChannelHeader({ onClose, currentStep }: AddChannelHeaderProps
             <span
               className={`ml-2 text-sm ${currentStep >= 3 ? 'text-[#eafd66]' : 'text-zinc-500'}`}
             >
-              Topics
+              {t.globalContentUpload.addChannel.steps.topics()}
             </span>
           </div>
         </div>
