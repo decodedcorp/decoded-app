@@ -22,6 +22,7 @@ export const queryKeys = {
     all: ['channels'] as const,
     lists: () => [...queryKeys.channels.all, 'list'] as const,
     list: (filters: Record<string, any>) => [...queryKeys.channels.lists(), filters] as const,
+    myChannels: () => [...queryKeys.channels.all, 'my'] as const,
     details: () => [...queryKeys.channels.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.channels.details(), id] as const,
     stats: (id: string) => [...queryKeys.channels.detail(id), 'stats'] as const,
@@ -90,12 +91,20 @@ export const queryKeys = {
     myStats: () => [...queryKeys.interactions.stats(), 'my'] as const,
   },
 
+  // Subscriptions standalone queries
+  subscriptions: {
+    all: ['subscriptions'] as const,
+    list: (params?: Record<string, any>) => [...queryKeys.subscriptions.all, 'list', params] as const,
+  },
+
   // Users related queries
   users: {
     all: ['users'] as const,
     lists: () => [...queryKeys.users.all, 'list'] as const,
     list: (filters: Record<string, any>) => [...queryKeys.users.lists(), filters] as const,
     profile: (userId: string) => [...queryKeys.users.all, 'profile', userId] as const,
+    stats: () => [...queryKeys.users.all, 'stats'] as const,
+    activityStats: () => [...queryKeys.users.all, 'activity-stats'] as const,
     bookmarks: () => [...queryKeys.users.all, 'bookmarks'] as const,
     myBookmarks: (params?: Record<string, any>) =>
       [...queryKeys.users.bookmarks(), 'my', params] as const,

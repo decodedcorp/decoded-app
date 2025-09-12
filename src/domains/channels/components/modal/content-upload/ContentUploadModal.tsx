@@ -7,6 +7,7 @@ import { useContentUploadStore, selectIsContentUploadModalOpen } from '@/store/c
 import { useCreateImageContent, useCreateLinkContent } from '@/domains/channels/hooks/useContents';
 import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/api/queryKeys';
+import { Z_INDEX_CLASSES } from '@/lib/constants/zIndex';
 // getValidAccessToken import 제거 (사용하지 않음)
 
 import { BaseModal } from '../base/BaseModal';

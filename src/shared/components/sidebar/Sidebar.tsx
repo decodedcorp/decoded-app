@@ -27,6 +27,7 @@ export const Sidebar = memo(function Sidebar() {
 
   // 상태 구독 최적화 - 필요한 상태만 구독
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const user = useAuthStore((state) => state.user);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   // 모달 상태를 개별적으로 구독하여 무한 루프 방지
@@ -123,10 +124,10 @@ export const Sidebar = memo(function Sidebar() {
                   isActive={isModalOpen}
                 />
                 <SidebarItem
-                  href="/profile"
+                  href={user?.doc_id ? `/profile/${user.doc_id}` : '/profile'}
                   icon={<UserIcon />}
                   label={t.navigation.profile()}
-                  isActive={pathname === '/profile'}
+                  isActive={pathname.startsWith('/profile')}
                 />
               </>
             )}
