@@ -56,14 +56,17 @@ export const useAuthMutations = () => {
 
   const googleOAuthMutation = useMutation({
     mutationFn: handleGoogleOAuthCallback,
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (process.env.NODE_ENV === 'development') {
         console.log('[Auth] Google OAuth mutation successful');
       }
       setUser(data.user);
       setError(null);
+      
       // Invalidate and refetch user-related queries
       queryClient.invalidateQueries({ queryKey: ['user'] });
+      
+      // Note: 백엔드에서 이제 aka를 직접 제공하므로 별도 prefetch 불필요
 
       // Check if sui_address needs to be updated
       if (data.access_token && !data.access_token.has_sui_address) {
