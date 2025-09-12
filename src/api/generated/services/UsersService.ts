@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { GetUserProfile } from '../models/GetUserProfile';
 import type { UpdateProfileRequest } from '../models/UpdateProfileRequest';
+import type { UserActivityStatsResponse } from '../models/UserActivityStatsResponse';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
@@ -56,6 +57,39 @@ export class UsersService {
             url: '/users/me/profile',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Get My Activity Stats
+     * Get current user's activity statistics
+     * @returns UserActivityStatsResponse Successful Response
+     * @throws ApiError
+     */
+    public static getMyActivityStatsUsersMeStatsGet(): CancelablePromise<UserActivityStatsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/users/me/stats',
+        });
+    }
+    /**
+     * Get User Activity Stats
+     * Get user's public activity statistics
+     * @param userId
+     * @returns UserActivityStatsResponse Successful Response
+     * @throws ApiError
+     */
+    public static getUserActivityStatsUsersUserIdStatsGet(
+        userId: string,
+    ): CancelablePromise<UserActivityStatsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/users/{user_id}/stats',
+            path: {
+                'user_id': userId,
+            },
             errors: {
                 422: `Validation Error`,
             },

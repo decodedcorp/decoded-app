@@ -11,13 +11,25 @@ export type SubscriptionResponse = {
      */
     id: string;
     /**
-     * User ID
-     */
-    user_id: string;
-    /**
      * Channel ID
      */
     channel_id: string;
+    /**
+     * Channel name
+     */
+    channel_name: string;
+    /**
+     * Channel thumbnail URL
+     */
+    channel_thumbnail_url?: (string | null);
+    /**
+     * Number of content items in channel
+     */
+    channel_content_count?: number;
+    /**
+     * Number of channel subscribers
+     */
+    channel_subscriber_count?: number;
     /**
      * Subscription creation timestamp
      */
