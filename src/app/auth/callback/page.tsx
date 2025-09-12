@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useCallback, Suspense } from 'react';
+import { useEffect, useCallback, useRef, Suspense } from 'react';
 
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -11,6 +11,7 @@ function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setError, setLoading, login, error } = useAuthStore();
+  const processingRef = useRef(false);
 
   // Debug mode: 디버그 파라미터 확인
   const isDebugMode = searchParams.get('debug') === 'true';
@@ -133,9 +134,13 @@ function AuthCallbackContent() {
   }, [searchParams, router, setError, setLoading, sendMessageToParent, sendLogToParent, login]);
 
   useEffect(() => {
+    // 이미 처리 중이면 실행하지 않음
+    if (processingRef.current) return;
+    processingRef.current = true;
+    
     // 즉시 처리 시작
     processAuthCallback();
-  }, [processAuthCallback]);
+  }, []); // 의존성 배열을 빈 배열로 변경하여 한 번만 실행
 
   return (
     <div className="flex items-center justify-center min-h-screen">

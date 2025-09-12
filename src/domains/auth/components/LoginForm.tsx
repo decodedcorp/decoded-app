@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { useAuthMutations } from '../hooks/useAuthMutations';
 import { AuthError, NetworkError } from '../types/auth';
@@ -16,6 +18,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
   const { googleOAuthMutation } = useAuthMutations();
   const { isAuthenticated, login } = useAuthStore();
   const t = useCommonTranslation();
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const popupRef = useRef<Window | null>(null);
   const messageHandledRef = useRef(false);
 
@@ -56,10 +60,23 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
 
           // AuthStore의 login 함수를 호출하여 메인 창에서 토큰 저장
           login(event.data.loginData);
+          
+          // React Query 캐시 무효화
+          queryClient.invalidateQueries({ queryKey: ['user'] });
+          queryClient.invalidateQueries({ queryKey: ['auth'] });
+          
+          // 로그인 성공 후 상태 업데이트를 위한 짧은 지연
+          setTimeout(() => {
+            // 로그인 성공 콜백 호출
+            onSuccess?.();
+            
+            // 페이지 새로고침으로 UI 강제 업데이트
+            window.location.reload();
+          }, 100);
+        } else {
+          // 로그인 성공 콜백 호출 (loginData가 없는 경우)
+          onSuccess?.();
         }
-
-        // 로그인 성공 콜백 호출
-        onSuccess?.();
       } else if (event.data.type === 'GOOGLE_OAUTH_ERROR') {
         messageHandledRef.current = true;
 
@@ -95,7 +112,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [onSuccess, onError, login]);
+  }, [onSuccess, onError, login, queryClient, t]);
 
   // 팝업 창 모니터링
   useEffect(() => {
@@ -115,7 +132,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
     }, 1000);
 
     return () => clearInterval(checkClosed);
-  }, [onError]);
+  }, [onError, t]);
 
   // 로그인 상태 변경 감지
   useEffect(() => {
