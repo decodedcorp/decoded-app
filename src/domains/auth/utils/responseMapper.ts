@@ -16,7 +16,7 @@ export class ResponseMapper {
   /**
    * 백엔드 로그인 응답을 LoginResponse로 변환 (새로운 단순한 구조)
    */
-  static mapLoginResponse(data: BackendLoginResponse): LoginResponse {
+  static mapLoginResponse(data: any): LoginResponse {
     if (process.env.NODE_ENV === 'development') {
       console.log('[ResponseMapper] Raw backend response:', JSON.stringify(data, null, 2));
       console.log('[ResponseMapper] Response type:', typeof data);
@@ -45,10 +45,12 @@ export class ResponseMapper {
         has_sui_address: data.has_sui_address,
       },
       refresh_token: '', // 새로운 백엔드 구조에서는 refresh_token 없음
-      user: {
+      user: data.user || {
+        // /api/auth/google에서 이미 user 객체를 만들어서 보내주면 그것을 사용
+        // 없으면 기본값 사용
         doc_id: userDocId,
-        email: '', // 새 백엔드 구조에서는 별도로 제공되지 않음 - Google API에서 추출 예정
-        nickname: '', // 새 백엔드 구조에서는 별도로 제공되지 않음 - Google API에서 추출 예정
+        email: data.email || '', 
+        nickname: data.aka || '', // ✨ 백엔드 aka 필드 사용
         role: 'user' as UserRole,
         status: 'active' as UserStatus,
       },

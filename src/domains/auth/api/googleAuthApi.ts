@@ -220,10 +220,11 @@ export class GoogleAuthApi {
     const extractedName = name || given_name || family_name || email.split('@')[0];
 
     // 새로운 백엔드 응답 구조에 맞게 user 객체 생성
+    // 백엔드에서 제공하는 aka를 우선 사용, 없으면 Google 정보로 fallback
     return {
       doc_id: backendData.user_doc_id,
       email: email,
-      nickname: extractedName,
+      nickname: backendData.aka || extractedName, // ✨ 백엔드 aka 우선 사용
       role: 'user',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),

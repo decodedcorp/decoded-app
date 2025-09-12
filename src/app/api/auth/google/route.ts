@@ -186,9 +186,9 @@ export async function POST(request: NextRequest) {
     });
     GoogleAuthLogger.logUserCreation(user);
 
-    // 7. 성공 응답
+    // 7. 성공 응답 - 백엔드 응답 구조 유지하면서 user 정보 추가
     const finalResponse = {
-      access_token: backendData.access_token,
+      ...backendData,  // salt, user_doc_id, access_token, has_sui_address 포함
       user: user,
       token_type: 'oauth',
     };

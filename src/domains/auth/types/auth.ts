@@ -22,6 +22,7 @@ export interface BackendLoginResponse {
   user_doc_id: string;
   access_token: string;
   has_sui_address: boolean;
+  aka?: string | null; // ✨ 백엔드에서 추가된 nickname 필드
 }
 
 export interface RefreshTokenResponse {
