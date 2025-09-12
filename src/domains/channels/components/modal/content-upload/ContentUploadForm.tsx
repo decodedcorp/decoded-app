@@ -291,10 +291,10 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
         <label className="block text-sm font-medium text-white mb-3">Content Type *</label>
         <div className="grid grid-cols-1 gap-3">
           {[
-            { type: ContentType.IMAGE, label: 'Image', icon: '🖼️' },
-            // { type: ContentType.VIDEO, label: 'Video', icon: '🎥' }, // Temporarily disabled
-            { type: ContentType.LINK, label: 'Link', icon: '🔗' },
-          ].map(({ type, label, icon }) => (
+            { type: ContentType.IMAGE, label: 'Image' },
+            // { type: ContentType.VIDEO, label: 'Video' }, // Temporarily disabled
+            { type: ContentType.LINK, label: 'Link' },
+          ].map(({ type, label }) => (
             <button
               key={type}
               type="button"
@@ -305,7 +305,6 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
                   : 'border-zinc-700 bg-zinc-800/50 text-zinc-400 hover:border-zinc-600 hover:text-zinc-300'
               }`}
             >
-              <div className="text-2xl mb-1">{icon}</div>
               <div className="text-sm font-medium">{label}</div>
             </button>
           ))}

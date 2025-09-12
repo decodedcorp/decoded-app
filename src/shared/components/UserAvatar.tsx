@@ -50,7 +50,11 @@ export function UserAvatar({ size = 'md', showDropdown = true }: UserAvatarProps
 
   const handleProfileClick = () => {
     setIsDropdownOpen(false);
-    router.push('/profile');
+    if (user?.doc_id) {
+      router.push(`/profile/${user.doc_id}`);
+    } else {
+      router.push('/profile');
+    }
   };
 
   const handleSettingsClick = () => {

@@ -51,7 +51,13 @@ export function BaseModal({
     document.body.appendChild(root);
     setMounted(true);
     return () => {
-      root.remove();
+      try {
+        if (root.parentNode) {
+          root.parentNode.removeChild(root);
+        }
+      } catch (error) {
+        console.warn('Portal cleanup error:', error);
+      }
       modalRootRef.current = null;
     };
   }, []);
@@ -60,7 +66,7 @@ export function BaseModal({
   useRestoreFocus(isOpen);
   useScrollLock(isOpen);
   useFocusTrap(dialogRef as React.RefObject<HTMLElement>, isOpen);
-  useAriaInert(isOpen, modalRootRef.current);
+  // useAriaInert(isOpen, modalRootRef.current); // 임시 비활성화 - 앱 전체가 inert되어 조작 불가능해짐
 
   // ESC 키로 모달 닫기
   useEffect(() => {
@@ -87,22 +93,22 @@ export function BaseModal({
       className={`fixed inset-0 ${Z_INDEX_CLASSES.MODAL_OVERLAY} flex items-center justify-center p-2 sm:p-4 pt-16 sm:pt-20`}
       style={{ backdropFilter: 'blur(8px)' }}
       role="presentation"
+      onClick={(e) => {
+        // 모달 내용이 아닌 배경 클릭시에만 모달 닫기
+        if (e.target === e.currentTarget && closeOnOverlayClick) {
+          if (onOverlayClick) {
+            onOverlayClick();
+          } else {
+            onClose();
+          }
+        }
+      }}
     >
       {/* 오버레이 배경 */}
       {showOverlay && (
         <div
-          className="absolute inset-0 bg-black/70"
+          className="absolute inset-0 bg-black/70 pointer-events-none"
           role="presentation"
-          onClick={() => {
-            // backdrop 클릭 시 모달 닫기
-            if (closeOnOverlayClick) {
-              if (onOverlayClick) {
-                onOverlayClick();
-              } else {
-                onClose();
-              }
-            }
-          }}
         />
       )}
 
@@ -114,8 +120,6 @@ export function BaseModal({
         aria-labelledby={titleId}
         aria-describedby={descId}
         className={`relative ${Z_INDEX_CLASSES.MODAL_CONTENT} ${className}`}
-        // 모달 내부 클릭은 버블링 중단(backdrop 클릭 닫기와 충돌 방지)
-        onClick={(e) => e.stopPropagation()}
       >
         {children}
       </div>
