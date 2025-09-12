@@ -181,16 +181,17 @@ export const useMarkNotificationsAsRead = () => {
   });
 };
 
-export const useCreateNotification = () => {
-  const queryClient = useQueryClient();
+// Admin notification creation hook removed - API endpoint no longer available
+// export const useCreateNotification = () => {
+//   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: InteractionsService.createNotificationAdminAdminNotificationsPost,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.interactions.myNotifications() });
-    },
-  });
-};
+//   return useMutation({
+//     mutationFn: InteractionsService.createNotificationAdminAdminNotificationsPost,
+//     onSuccess: () => {
+//       queryClient.invalidateQueries({ queryKey: queryKeys.interactions.myNotifications() });
+//     },
+//   });
+// };
 
 // Channel Likes - Temporarily disabled due to missing API methods
 /*
