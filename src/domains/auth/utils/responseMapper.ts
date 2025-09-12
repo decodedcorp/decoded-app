@@ -14,7 +14,7 @@ import { GetUserProfile } from '../../../api/generated';
  */
 export class ResponseMapper {
   /**
-   * 백엔드 로그인 응답을 LoginResponse로 변환 (타입 안전성 강화)
+   * 백엔드 로그인 응답을 LoginResponse로 변환 (새로운 단순한 구조)
    */
   static mapLoginResponse(data: BackendLoginResponse): LoginResponse {
     if (process.env.NODE_ENV === 'development') {
@@ -23,109 +23,36 @@ export class ResponseMapper {
       console.log('[ResponseMapper] Response keys:', Object.keys(data));
     }
 
-    // 다양한 응답 구조 처리
-    let accessTokenData = data.access_token;
-    let userData = data.user;
-    let refreshToken = data.refresh_token || '';
-
-    // refresh_token이 유효한지 확인
-    if (refreshToken && typeof refreshToken === 'string' && refreshToken.trim() === '') {
-      refreshToken = '';
-    }
-
-    // access_token이 문자열인 경우 객체로 변환
-    if (typeof accessTokenData === 'string') {
-      accessTokenData = {
-        salt: '',
-        user_doc_id: '',
-        access_token: accessTokenData,
-        has_sui_address: false,
-      };
-    }
-
-    // user 데이터가 없는 경우 기본값 설정
-    if (!userData) {
-      userData = {
-        doc_id: '',
-        email: '',
-        nickname: '',
-        role: 'user',
-        status: 'active',
-      };
-    }
-
-    // user.doc_id가 없는 경우 다른 필드에서 찾기
-    if (!userData.doc_id) {
-      if (userData.id) {
-        userData.doc_id = userData.id;
-      } else if (userData.user_id) {
-        userData.doc_id = userData.user_id;
-      } else if (userData._id) {
-        userData.doc_id = userData._id;
-      } else if (accessTokenData.user_doc_id) {
-        userData.doc_id = accessTokenData.user_doc_id;
-      }
-    }
-
-    // nickname이 없는 경우 다른 필드에서 찾기
-    if (!userData.nickname) {
-      if (userData.name) {
-        userData.nickname = userData.name;
-      } else if (userData.username) {
-        userData.nickname = userData.username;
-      } else {
-        userData.nickname = userData.email || 'Unknown User';
-      }
-    }
-
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[ResponseMapper] Processed data:', {
-        hasAccessToken: !!accessTokenData,
-        hasRefreshToken: !!refreshToken,
-        hasUser: !!userData,
-        accessTokenType: typeof accessTokenData,
-        userType: typeof userData,
-        userDocId: userData.doc_id,
-      });
-    }
-
-    if (!accessTokenData?.access_token) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('[ResponseMapper] Missing access_token.access_token:', {
-          hasAccessToken: !!accessTokenData,
-          accessTokenKeys: accessTokenData ? Object.keys(accessTokenData) : null,
-          accessTokenType: typeof accessTokenData,
-          accessTokenData: accessTokenData,
-        });
-      }
+    if (!data.access_token) {
       throw new AuthError('Invalid access token in response', 400, 'INVALID_ACCESS_TOKEN');
     }
 
-    if (!userData.doc_id) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('[ResponseMapper] Missing user.doc_id after processing:', {
-          hasUser: !!userData,
-          userKeys: userData ? Object.keys(userData) : null,
-          userData: userData,
-        });
-      }
+    // Google OAuth와 일반 로그인 응답 모두 지원
+    const userDocId = data.user_doc_id || data.user?.doc_id;
+    if (!userDocId) {
+      console.error('[ResponseMapper] Missing user_doc_id. Available data:', {
+        hasUserDocId: !!data.user_doc_id,
+        hasUser: !!data.user,
+        userKeys: data.user ? Object.keys(data.user) : null,
+        dataKeys: Object.keys(data)
+      });
       throw new AuthError('Invalid user data in response', 400, 'INVALID_USER_DATA');
     }
 
     const loginResponse: LoginResponse = {
       access_token: {
-        access_token: accessTokenData.access_token,
-        salt: accessTokenData.salt || '',
-        user_doc_id: accessTokenData.user_doc_id || userData.doc_id,
-        has_sui_address: accessTokenData.has_sui_address || false,
+        access_token: data.access_token,
+        salt: data.salt,
+        user_doc_id: userDocId,
+        has_sui_address: data.has_sui_address,
       },
-      refresh_token: refreshToken,
+      refresh_token: '', // 새로운 백엔드 구조에서는 refresh_token 없음
       user: {
-        doc_id: userData.doc_id,
-        email: userData.email || '',
-        nickname: userData.nickname || '',
-        role: this.mapUserRole(userData.role),
-        status: this.mapUserStatus(userData.status),
+        doc_id: userDocId,
+        email: data.user?.email || '', // Google OAuth에서 user 객체의 email 사용
+        nickname: data.user?.nickname || '', // Google OAuth에서 user 객체의 nickname 사용
+        role: (data.user?.role as UserRole) || 'user',
+        status: (data.user?.status as UserStatus) || 'active',
       },
     };
 
@@ -135,7 +62,8 @@ export class ResponseMapper {
         hasRefreshToken: !!loginResponse.refresh_token,
         hasUser: !!loginResponse.user,
         userDocId: loginResponse.user.doc_id,
-        userEmail: loginResponse.user.email,
+        salt: loginResponse.access_token.salt,
+        hasSuiAddress: loginResponse.access_token.has_sui_address,
       });
     }
 
