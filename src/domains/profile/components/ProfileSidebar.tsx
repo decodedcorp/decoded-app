@@ -28,7 +28,7 @@ export function ProfileSidebar({ userId, profileData, isMyProfile }: ProfileSide
   const statsData = isMyProfile ? [
     {
       label: 'My Channels',
-      value: activityStats?.owned_channels ?? channels?.total ?? 0,
+      value: activityStats?.owned_channels ?? channels?.total_count ?? 0,
       onClick: () => router.push(`/profile/${userId}?tab=channels`),
     },
     {
@@ -59,14 +59,7 @@ export function ProfileSidebar({ userId, profileData, isMyProfile }: ProfileSide
               <div
                 key={stat.label}
                 onClick={stat.onClick}
-                className={`
-                  p-3 rounded-lg border border-zinc-700
-                  transition-all duration-200
-                  ${stat.onClick 
-                    ? 'hover:border-zinc-600 cursor-pointer hover:bg-zinc-800/50' 
-                    : 'bg-zinc-800/30'
-                  }
-                `}
+                className="p-3 rounded-lg border border-zinc-700 transition-all duration-200 hover:border-zinc-600 cursor-pointer hover:bg-zinc-800/50"
               >
                 <p className="text-xs text-zinc-400 mb-1">{stat.label}</p>
                 <p className="text-xl font-bold text-white">{stat.value}</p>
@@ -168,7 +161,7 @@ export function ProfileSidebar({ userId, profileData, isMyProfile }: ProfileSide
               <div className="space-y-3">
                 {bookmarks.bookmarks.slice(0, 2).map((bookmark) => (
                   <div
-                    key={bookmark.content_id || bookmark.id}
+                    key={bookmark.content_id}
                     className="flex items-center gap-3 p-2 rounded-lg hover:bg-zinc-800/50 cursor-pointer transition-colors"
                   >
                     <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">

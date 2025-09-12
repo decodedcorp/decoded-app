@@ -74,15 +74,12 @@ export const processProfileImage = async (file: File): Promise<string> => {
   }
   
   try {
-    // Compress image
-    const compressedFile = await compressImage(file, {
+    // Compress image (returns base64 string directly)
+    const base64 = await compressImage(file, {
       maxWidth: 512,
       maxHeight: 512,
       quality: 0.8,
     });
-    
-    // Convert to base64
-    const base64 = await fileToBase64(compressedFile);
     
     return base64;
   } catch (error) {
