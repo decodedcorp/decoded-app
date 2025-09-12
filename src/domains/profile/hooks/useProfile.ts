@@ -13,7 +13,13 @@ export const useMyProfile = () => {
   
   return useQuery({
     queryKey: queryKeys.users.profile(user?.doc_id || ''),
-    queryFn: () => UsersService.getMyProfileUsersMeProfileGet(),
+    queryFn: () => {
+      if (!user?.doc_id) {
+        throw new Error('User ID not available');
+      }
+      // 실제 사용자 ID를 사용해서 프로필 가져오기 ('me' 대신)
+      return UsersService.getProfileUsersUserIdProfileGet(user.doc_id);
+    },
     enabled: !!user?.doc_id,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
