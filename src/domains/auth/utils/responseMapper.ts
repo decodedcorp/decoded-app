@@ -27,13 +27,11 @@ export class ResponseMapper {
       throw new AuthError('Invalid access token in response', 400, 'INVALID_ACCESS_TOKEN');
     }
 
-    // Google OAuth와 일반 로그인 응답 모두 지원
-    const userDocId = data.user_doc_id || data.user?.doc_id;
+    // 새로운 백엔드 응답 구조 사용
+    const userDocId = data.user_doc_id;
     if (!userDocId) {
       console.error('[ResponseMapper] Missing user_doc_id. Available data:', {
         hasUserDocId: !!data.user_doc_id,
-        hasUser: !!data.user,
-        userKeys: data.user ? Object.keys(data.user) : null,
         dataKeys: Object.keys(data)
       });
       throw new AuthError('Invalid user data in response', 400, 'INVALID_USER_DATA');
@@ -49,10 +47,10 @@ export class ResponseMapper {
       refresh_token: '', // 새로운 백엔드 구조에서는 refresh_token 없음
       user: {
         doc_id: userDocId,
-        email: data.user?.email || '', // Google OAuth에서 user 객체의 email 사용
-        nickname: data.user?.nickname || '', // Google OAuth에서 user 객체의 nickname 사용
-        role: (data.user?.role as UserRole) || 'user',
-        status: (data.user?.status as UserStatus) || 'active',
+        email: '', // 새 백엔드 구조에서는 별도로 제공되지 않음 - Google API에서 추출 예정
+        nickname: '', // 새 백엔드 구조에서는 별도로 제공되지 않음 - Google API에서 추출 예정
+        role: 'user' as UserRole,
+        status: 'active' as UserStatus,
       },
     };
 

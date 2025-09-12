@@ -54,14 +54,12 @@ export const loginUser = async (jwtToken: string, suiAddress?: string, email?: s
 
     const loginData: LoginRequest = {
       jwt_token: hashedToken, // 해시된 토큰 사용
-      sui_address: suiAddress || '',
       email: email || decodedGoogle.email || null,
     };
 
     if (process.env.NODE_ENV === 'development') {
       console.log('[Auth] Login request:', {
         hashedToken: hashedToken.substring(0, 10) + '...',
-        suiAddress: suiAddress ? suiAddress.substring(0, 10) + '...' : 'empty string',
         email: email || decodedGoogle.email || 'not provided',
       });
     }
