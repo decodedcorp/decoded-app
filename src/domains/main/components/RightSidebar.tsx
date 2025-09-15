@@ -2,18 +2,7 @@
 
 import React from 'react';
 
-import {
-  Flame,
-  TrendingUp,
-  Users,
-  BookOpen,
-  Shield,
-  Mail,
-  ExternalLink,
-  Smartphone,
-  Github,
-  Twitter,
-} from 'lucide-react';
+import { Flame, TrendingUp, Mail, Github, Twitter } from 'lucide-react';
 import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
 
 export function RightSidebar() {
@@ -122,8 +111,12 @@ export function RightSidebar() {
             <div className="cursor-pointer hover:text-gray-400">
               {t.globalContentUpload.sidebar.about()}
             </div>
-            <div className="cursor-pointer hover:text-gray-400">Careers</div>
-            <div className="cursor-pointer hover:text-gray-400">Press</div>
+            {/* <div className="cursor-pointer hover:text-gray-400">
+              {t.globalContentUpload.sidebar.careers()}
+            </div> */}
+            {/* <div className="cursor-pointer hover:text-gray-400">
+              {t.globalContentUpload.sidebar.press()}
+            </div> */}
             <div className="cursor-pointer hover:text-gray-400">
               {t.globalContentUpload.sidebar.termsOfService()}
             </div>

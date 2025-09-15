@@ -135,7 +135,12 @@
   },
   "create": {
     "create": "Create",
-    "createNewContent": "Create new content"
+    "createNewContent": "Create new content",
+    "generatedContent": "Generated Content",
+    "aiGeneratedContent": "AI-generated content",
+    "generatedAt": "Generated at",
+    "regenerate": "Regenerate",
+    "addToChannel": "Add to Channel"
   },
   "notifications": {
     "notifications": "Notifications",
@@ -245,6 +250,11 @@
       "optional": "(Optional)",
       "addDescription": "Add a description for your content...",
       "fileFormats": "JPG, PNG, WebP, GIF up to 10MB",
+      "footer": {
+        "cancel": "Cancel",
+        "addLink": "Add Link",
+        "adding": "Adding..."
+      },
       "validation": {
         "descriptionTooLong": "Description must be 500 characters or less.",
         "imageRequired": "Please select an image.",
@@ -422,7 +432,17 @@
       "help": "Help",
       "privacyPolicy": "Privacy Policy",
       "termsOfService": "Terms of Service",
-      "copyright": "© 2024 Decoded"
+      "copyright": "© 2025 Decoded",
+      "careers": "Careers",
+      "press": "Press"
     }
+  },
+  "invitations": {
+    "inviteManager": "Invite Manager",
+    "searchUser": "Search User",
+    "personalMessage": "Personal Message (Optional)",
+    "expiresIn": "Expires In",
+    "sending": "Sending...",
+    "sendInvitation": "Send Invitation"
   }
 }

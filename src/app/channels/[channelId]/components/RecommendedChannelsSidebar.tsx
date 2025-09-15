@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ChannelData } from '@/store/channelModalStore';
 import { useChannels } from '@/domains/channels/hooks/useChannels';
 import { ProxiedImage } from '@/components/ProxiedImage';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 interface RecommendedChannelsSidebarProps {
   currentChannelId: string;
@@ -20,6 +21,7 @@ export function RecommendedChannelsSidebar({
 }: RecommendedChannelsSidebarProps) {
   const router = useRouter();
   const [isCollapsed, setIsCollapsed] = React.useState(false);
+  const t = useCommonTranslation();
 
   // collapse 상태 변경 시 부모에게 알림
   const handleCollapseToggle = () => {
@@ -51,7 +53,7 @@ export function RecommendedChannelsSidebar({
   if (isLoading) {
     return (
       <div className={`w-80 bg-zinc-900/50 border-l border-zinc-700/50 p-6 ${className}`}>
-        <h3 className="text-lg font-semibold text-white mb-6">Discover Channels</h3>
+        <h3 className="text-lg font-semibold text-white mb-6">{t.ui.discoverChannels()}</h3>
         <div className="space-y-4">
           {Array.from({ length: 6 }).map((_, index) => (
             <div key={index} className="flex items-center space-x-3">
@@ -81,7 +83,7 @@ export function RecommendedChannelsSidebar({
         {!isCollapsed ? (
           <>
             <h3 className="text-lg font-semibold text-white mb-6 flex items-center justify-between">
-              <div className="flex items-center">Discover Channels</div>
+              <div className="flex items-center">{t.ui.discoverChannels()}</div>
               <button
                 onClick={handleCollapseToggle}
                 className="p-1 hover:bg-zinc-700/50 rounded transition-colors duration-200"
@@ -200,7 +202,7 @@ export function RecommendedChannelsSidebar({
                             d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
                           />
                         </svg>
-                        {channel.content_count || 0} items
+                        {channel.content_count || 0} {t.ui.items()}
                       </span>
                     </div>
                     {channel.description && (
@@ -235,7 +237,7 @@ export function RecommendedChannelsSidebar({
                 onClick={() => router.push('/channels')}
                 className="w-full px-4 py-2 bg-zinc-800/50 hover:bg-zinc-700/50 text-white rounded-lg transition-colors duration-200 text-sm font-medium flex items-center justify-center space-x-2"
               >
-                <span>Explore All Channels</span>
+                <span>{t.navigation.channels()}</span>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"

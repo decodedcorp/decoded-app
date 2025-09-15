@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { Button } from '@decoded/ui';
 import { useSearchUsers } from '@/domains/search/hooks/useSearch';
 import type { ChannelResponse } from '@/api/generated/models/ChannelResponse';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 import { useCreateInvitation } from '../hooks/useInvitations';
 
@@ -19,6 +20,7 @@ export function InviteManagerModal({ isOpen, onClose, channel }: InviteManagerMo
   const [selectedUserId, setSelectedUserId] = useState('');
   const [message, setMessage] = useState('');
   const [expiresInDays, setExpiresInDays] = useState(7);
+  const t = useCommonTranslation();
 
   const createInvitationMutation = useCreateInvitation();
 
@@ -76,7 +78,7 @@ export function InviteManagerModal({ isOpen, onClose, channel }: InviteManagerMo
         <div className="p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-white">Invite Manager</h2>
+            <h2 className="text-xl font-semibold text-white">{t.invitations.inviteManager()}</h2>
             <button
               onClick={onClose}
               className="p-1 rounded-full hover:bg-zinc-800 transition-colors"
@@ -96,7 +98,7 @@ export function InviteManagerModal({ isOpen, onClose, channel }: InviteManagerMo
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* User Search */}
             <div>
-              <label className="block text-sm font-medium text-white mb-2">Search User</label>
+              <label className="block text-sm font-medium text-white mb-2">{t.invitations.searchUser()}</label>
               <div className="relative">
                 <input
                   type="text"
@@ -110,7 +112,7 @@ export function InviteManagerModal({ isOpen, onClose, channel }: InviteManagerMo
                 {searchQuery.length >= 2 && (
                   <div className="absolute top-full left-0 right-0 mt-1 bg-zinc-800 border border-zinc-700 rounded max-h-40 overflow-y-auto z-10">
                     {isSearching ? (
-                      <div className="p-3 text-zinc-400 text-sm">Searching...</div>
+                      <div className="p-3 text-zinc-400 text-sm">{t.search.searching()}</div>
                     ) : (
                       <div className="py-1">
                         <button
@@ -140,7 +142,7 @@ export function InviteManagerModal({ isOpen, onClose, channel }: InviteManagerMo
             {/* Personal Message */}
             <div>
               <label className="block text-sm font-medium text-white mb-2">
-                Personal Message (Optional)
+                {t.invitations.personalMessage()}
               </label>
               <textarea
                 value={message}
@@ -155,7 +157,7 @@ export function InviteManagerModal({ isOpen, onClose, channel }: InviteManagerMo
 
             {/* Expiry */}
             <div>
-              <label className="block text-sm font-medium text-white mb-2">Expires In</label>
+              <label className="block text-sm font-medium text-white mb-2">{t.invitations.expiresIn()}</label>
               <select
                 value={expiresInDays}
                 onChange={(e) => setExpiresInDays(Number(e.target.value))}
@@ -176,14 +178,14 @@ export function InviteManagerModal({ isOpen, onClose, channel }: InviteManagerMo
                 onClick={handleReset}
                 className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-white rounded transition-colors"
               >
-                Reset
+                {t.actions.reset()}
               </button>
               <Button
                 type="submit"
                 disabled={!selectedUserId || createInvitationMutation.isPending}
                 variant="primary"
               >
-                {createInvitationMutation.isPending ? 'Sending...' : 'Send Invitation'}
+                {createInvitationMutation.isPending ? t.invitations.sending() : t.invitations.sendInvitation()}
               </Button>
             </div>
           </form>

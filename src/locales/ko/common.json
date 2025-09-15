@@ -135,7 +135,12 @@
   },
   "create": {
     "create": "만들기",
-    "createNewContent": "새 콘텐츠 만들기"
+    "createNewContent": "새 콘텐츠 만들기",
+    "generatedContent": "생성된 콘텐츠",
+    "aiGeneratedContent": "AI가 생성한 콘텐츠입니다",
+    "generatedAt": "생성 시간",
+    "regenerate": "다시 생성",
+    "addToChannel": "채널에 추가"
   },
   "notifications": {
     "notifications": "알림",
@@ -245,6 +250,11 @@
       "optional": "(선택사항)",
       "addDescription": "콘텐츠에 대한 설명을 추가하세요...",
       "fileFormats": "JPG, PNG, WebP, GIF 최대 10MB",
+      "footer": {
+        "cancel": "취소",
+        "addLink": "링크 추가",
+        "adding": "추가 중..."
+      },
       "validation": {
         "descriptionTooLong": "설명은 500자 이하여야 합니다.",
         "imageRequired": "이미지를 선택해 주세요.",
@@ -422,7 +432,17 @@
       "help": "도움말",
       "privacyPolicy": "개인정보처리방침",
       "termsOfService": "이용약관",
-      "copyright": "© 2024 Decoded"
+      "copyright": "© 2025 Decoded",
+      "careers": "채용정보",
+      "press": "보도자료"
     }
+  },
+  "invitations": {
+    "inviteManager": "초대 관리",
+    "searchUser": "사용자 검색",
+    "personalMessage": "개인 메시지 (선택사항)",
+    "expiresIn": "만료 기간",
+    "sending": "전송 중...",
+    "sendInvitation": "초대 보내기"
   }
 }

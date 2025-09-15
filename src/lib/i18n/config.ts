@@ -49,7 +49,7 @@ if (!i18n.isInitialized) {
       lng: 'ko', // Default language
       fallbackLng: 'en',
       debug: process.env.NODE_ENV === 'development',
-      
+
       interpolation: {
         escapeValue: false, // React already escapes values
       },
@@ -68,6 +68,13 @@ if (!i18n.isInitialized) {
         prefix: 'decoded_i18n_',
         expirationTime: 7 * 24 * 60 * 60 * 1000, // 7 days
       },
+
+      // Development-only missing key warning
+      ...(process.env.NODE_ENV === 'development' && {
+        missingKeyHandler: (lngs: readonly string[], ns: string, key: string, fallbackValue: string) => {
+          console.warn(`[i18n] Missing translation key: "${key}" in namespace "${ns}" for languages "${lngs.join(', ')}"`);
+        },
+      }),
     });
 }
 

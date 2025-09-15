@@ -132,6 +132,11 @@ type CommonTranslations = {
   create: {
     create: () => string;
     createNewContent: () => string;
+    generatedContent: () => string;
+    aiGeneratedContent: () => string;
+    generatedAt: () => string;
+    regenerate: () => string;
+    addToChannel: () => string;
   };
   notifications: {
     notifications: () => string;
@@ -241,6 +246,11 @@ type CommonTranslations = {
       optional: () => string;
       addDescription: () => string;
       fileFormats: () => string;
+      footer: {
+        cancel: () => string;
+        addLink: () => string;
+        adding: () => string;
+      };
       validation: {
         descriptionTooLong: () => string;
         imageRequired: () => string;
@@ -419,7 +429,17 @@ type CommonTranslations = {
       privacyPolicy: () => string;
       termsOfService: () => string;
       copyright: () => string;
+      careers: () => string;
+      press: () => string;
     };
+  };
+  invitations: {
+    inviteManager: () => string;
+    searchUser: () => string;
+    personalMessage: () => string;
+    expiresIn: () => string;
+    sending: () => string;
+    sendInvitation: () => string;
   };
 };
 
@@ -555,6 +575,11 @@ export const useCommonTranslation = (): CommonTranslations => {
     create: {
       create: () => t('create.create'),
       createNewContent: () => t('create.createNewContent'),
+      generatedContent: () => t('create.generatedContent'),
+      aiGeneratedContent: () => t('create.aiGeneratedContent'),
+      generatedAt: () => t('create.generatedAt'),
+      regenerate: () => t('create.regenerate'),
+      addToChannel: () => t('create.addToChannel'),
     },
     notifications: {
       notifications: () => t('notifications.notifications'),
@@ -667,6 +692,11 @@ export const useCommonTranslation = (): CommonTranslations => {
         optional: () => t('globalContentUpload.contentUpload.optional'),
         addDescription: () => t('globalContentUpload.contentUpload.addDescription'),
         fileFormats: () => t('globalContentUpload.contentUpload.fileFormats'),
+        footer: {
+          cancel: () => t('globalContentUpload.contentUpload.footer.cancel'),
+          addLink: () => t('globalContentUpload.contentUpload.footer.addLink'),
+          adding: () => t('globalContentUpload.contentUpload.footer.adding'),
+        },
         validation: {
           descriptionTooLong: () =>
             t('globalContentUpload.contentUpload.validation.descriptionTooLong'),
@@ -864,7 +894,17 @@ export const useCommonTranslation = (): CommonTranslations => {
         privacyPolicy: () => t('globalContentUpload.sidebar.privacyPolicy'),
         termsOfService: () => t('globalContentUpload.sidebar.termsOfService'),
         copyright: () => t('globalContentUpload.sidebar.copyright'),
+        careers: () => t('globalContentUpload.sidebar.careers'),
+        press: () => t('globalContentUpload.sidebar.press'),
       },
+    },
+    invitations: {
+      inviteManager: () => t('invitations.inviteManager'),
+      searchUser: () => t('invitations.searchUser'),
+      personalMessage: () => t('invitations.personalMessage'),
+      expiresIn: () => t('invitations.expiresIn'),
+      sending: () => t('invitations.sending'),
+      sendInvitation: () => t('invitations.sendInvitation'),
     },
   };
 };
