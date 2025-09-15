@@ -7,6 +7,7 @@
 - Code Quality: 100-line file limit, single responsibility, prop limits, naming conventions
 - Design System: Enforce color tokens, spacing scale, typography, semantic naming
 - Performance: React.memo, useCallback, lazy loading, image optimization
+- **Mobile Optimization: Viewport meta, safe area, touch targets, dynamic viewport units**
 - Tailwind: Consistent utility usage, custom component patterns
 - React Query: Data fetching patterns, cache management
 - Zustand: State management conventions
@@ -39,6 +40,18 @@
 - **Dependencies**: Minimize third-party libraries, import only needed modules
 - **JSX Functions**: Avoid inline anonymous functions
 - **Suspense**: Use meaningful fallback UI for lazy-loaded content
+
+### Mobile Optimization Standards
+
+- **Viewport Configuration**: Use `viewport-fit=cover` with safe area insets
+- **Dynamic Viewport Units**: Use `dvh`/`svh`/`lvh` instead of `vh` for mobile
+- **Touch Targets**: Minimum 44px (iOS) or 48dp (Android) touch targets
+- **Image Optimization**: Always include `width`, `height`, `srcset`, `sizes`
+- **Form UX**: Use `inputmode`, `enterkeyhint`, `autocomplete` attributes
+- **Scroll Performance**: Use passive scroll listeners, content-visibility
+- **Gesture Handling**: Avoid conflicts with system edge gestures
+- **Accessibility**: Maintain 4.5:1 text contrast, 3:1 UI contrast
+- **Core Web Vitals**: Target LCP ≤ 2.5s, INP ≤ 200ms, CLS < 0.1
 
 ### Tailwind Guidelines
 

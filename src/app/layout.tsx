@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Metadata } from 'next';
 
 import { QueryProvider } from '../lib/providers/QueryProvider';
 import { ToastProvider } from '../lib/providers/ToastProvider';
@@ -9,6 +10,23 @@ import { AuthInitializer } from '../domains/auth/components/AuthInitializer';
 
 import '../styles/globals.css';
 
+export const metadata: Metadata = {
+  title: 'Decoded App',
+  description: 'AI-powered content discovery and curation platform',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    viewportFit: 'cover',
+  },
+  themeColor: '#000000',
+  colorScheme: 'light dark',
+  other: {
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'black-translucent',
+    'apple-mobile-web-app-title': 'Decoded',
+  },
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
@@ -18,9 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <ToastProvider>
               <AuthInitializer />
               <Header />
-              <MainLayout>
-                {children}
-              </MainLayout>
+              <MainLayout>{children}</MainLayout>
             </ToastProvider>
           </QueryProvider>
         </I18nProvider>

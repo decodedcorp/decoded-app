@@ -1,60 +1,96 @@
 {
   "metadata": {
-    "noTitle": "제목 없음",
-    "noDescription": "설명 없음",
-    "noContent": "콘텐츠가 없어요",
-    "noPreview": "미리보기가 없어요",
-    "linkNoTitle": "링크 제목 없음",
-    "linkNoDescription": "설명이 없어요"
+    "noTitle": "Untitled",
+    "noDescription": "No description",
+    "noContent": "No content",
+    "noPreview": "No preview",
+    "linkNoTitle": "No link title",
+    "linkNoDescription": "No description"
   },
   "states": {
-    "loading": "콘텐츠를 불러오는 중...",
-    "empty": "콘텐츠가 없어요",
-    "emptySubtitle": "새로운 콘텐츠를 추가해보세요",
-    "error": "콘텐츠를 불러올 수 없어요",
-    "errorSubtitle": "잠시 후 다시 시도해주세요",
-    "notFound": "콘텐츠를 찾을 수 없어요",
-    "processing": "콘텐츠를 처리하고 있어요..."
+    "loading": "Loading content...",
+    "cardLoading": "Loading card...",
+    "loadingFailed": "Loading failed",
+    "empty": "No content",
+    "emptySubtitle": "Add new content",
+    "error": "Unable to load content",
+    "errorSubtitle": "Please try again later",
+    "notFound": "Content not found",
+    "processing": "Processing content..."
   },
   "actions": {
-    "view": "콘텐츠 보기",
-    "like": "좋아요",
-    "unlike": "좋아요 취소",
-    "share": "공유하기",
-    "report": "신고하기",
-    "edit": "편집하기",
-    "delete": "삭제하기",
-    "download": "다운로드",
-    "copy": "링크 복사"
+    "view": "View content",
+    "like": "Like",
+    "unlike": "Unlike",
+    "share": "Share",
+    "report": "Report",
+    "edit": "Edit",
+    "delete": "Delete",
+    "download": "Download",
+    "copy": "Copy link",
+    "save": "Save",
+    "saved": "Saved"
   },
   "categories": {
-    "all": "전체",
-    "text": "텍스트",
-    "image": "이미지",
-    "video": "비디오",
-    "audio": "오디오",
-    "link": "링크",
-    "document": "문서",
-    "other": "기타"
+    "all": "All",
+    "text": "Text",
+    "image": "Image",
+    "video": "Video",
+    "audio": "Audio",
+    "link": "Link",
+    "document": "Document",
+    "other": "Other"
   },
   "interactions": {
-    "likeError": "좋아요 처리 중 오류가 발생했어요. 다시 시도해주세요",
-    "shareSuccess": "링크가 복사되었어요",
-    "shareError": "공유 중 오류가 발생했어요"
+    "likeError": "Error processing like. Please try again",
+    "shareSuccess": "Link copied to clipboard",
+    "shareError": "Error sharing content"
   },
   "related": {
-    "title": "관련 콘텐츠",
-    "empty": "관련 콘텐츠가 없어요",
-    "channelEmpty": "채널 정보를 찾을 수 없어요",
-    "channelContentEmpty": "이 채널에 관련 콘텐츠가 없어요"
+    "title": "Related content",
+    "empty": "No related content",
+    "channelEmpty": "Channel information not found",
+    "channelContentEmpty": "No related content in this channel"
   },
   "upload": {
-    "title": "콘텐츠 업로드",
-    "dragDrop": "파일을 드래그하거나 클릭하여 업로드하세요",
-    "processing": "파일을 처리하고 있어요...",
-    "success": "업로드가 완료되었어요!",
-    "error": "업로드 중 오류가 발생했어요",
-    "sizeLimit": "파일 크기가 너무 커요 (최대 {{max}}MB)",
-    "typeNotSupported": "지원하지 않는 파일 형식이에요"
+    "title": "Upload content",
+    "dragDrop": "Drag and drop files or click to upload",
+    "processing": "Processing file...",
+    "success": "Upload completed!",
+    "error": "Error during upload",
+    "sizeLimit": "File too large (max {{max}}MB)",
+    "typeNotSupported": "Unsupported file type"
+  },
+  "sidebar": {
+    "aiOverview": "AI Overview",
+    "aiAnalyzing": "AI analyzing content...",
+    "summary": "Summary",
+    "qa": "Q&A",
+    "showLess": "Show less",
+    "moreQuestions": "+{{count}} more questions",
+    "description": "Description",
+    "closeModal": "Close modal"
+  },
+  "comments": {
+    "title": "Comments",
+    "count": "{{count}} comments",
+    "recent": "{{count}} recent",
+    "replies": "{{count}} replies",
+    "sort": {
+      "newest": "New",
+      "oldest": "Old",
+      "mostLiked": "Top"
+    },
+    "empty": {
+      "title": "No comments yet",
+      "subtitle": "Be the first to share your thoughts!"
+    },
+    "error": {
+      "loadFailed": "Failed to load comments",
+      "tryAgain": "Try again"
+    },
+    "input": {
+      "placeholder": "Add a comment..."
+    }
   }
 }

@@ -321,7 +321,7 @@ export const MainFeed = React.memo(function MainFeed() {
       author: item.provider_id || 'anonymous',
       authorId: item.provider_id || 'anonymous',
       timeAgo: 'Trending', // Trending 콘텐츠임을 명시
-      upvotes: 0, // 실제 데이터가 없으므로 0으로 설정
+      pins: 0, // 실제 데이터가 없으므로 0으로 설정
       comments: 0, // 실제 데이터가 없으므로 0으로 설정
       thumbnail,
       contentType: mapContentType(item.type) || ('link' as const),
@@ -424,7 +424,12 @@ export const MainFeed = React.memo(function MainFeed() {
             <div className="text-xs text-gray-500">
               {t.feed.meta.line({
                 range: t.feed.filter.today(),
-                sort: activeSort === 'hot' ? t.feed.sort.hot() : activeSort === 'new' ? t.feed.sort.new() : t.feed.sort.top(),
+                sort:
+                  activeSort === 'hot'
+                    ? t.feed.sort.hot()
+                    : activeSort === 'new'
+                    ? t.feed.sort.new()
+                    : t.feed.sort.top(),
                 count: feedData.length,
               })}
             </div>
@@ -495,7 +500,7 @@ export const MainFeed = React.memo(function MainFeed() {
                     userAvatar={userAvatars[item.provider_id]}
                     userAka={userAkas[item.provider_id]}
                     timeAgo={post.timeAgo}
-                    upvotes={post.upvotes}
+                    pins={post.pins}
                     comments={post.comments}
                     thumbnail={post.thumbnail}
                     contentType={post.contentType}
@@ -543,10 +548,7 @@ export const MainFeed = React.memo(function MainFeed() {
             <div className="text-xs text-gray-500">
               {t.feed.showingPosts({ count: feedData.length })}
               {currentQuery.data?.pages?.[0] && (currentQuery.data.pages[0] as any)?.totalCount && (
-                <span>
-                  {' '}
-                  {t.feed.of({ total: (currentQuery.data.pages[0] as any).totalCount })}
-                </span>
+                <span> {t.feed.of({ total: (currentQuery.data.pages[0] as any).totalCount })}</span>
               )}
             </div>
           </div>

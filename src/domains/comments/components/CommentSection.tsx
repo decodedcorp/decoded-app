@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 
 import { MdComment } from 'react-icons/md';
+import { useTranslation } from 'react-i18next';
 
 import { useComments, useCommentStats } from '../hooks/useComments';
 
@@ -15,22 +16,17 @@ interface CommentSectionProps {
 
 export function CommentSection({ contentId }: CommentSectionProps) {
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest' | 'most_liked'>('newest');
-  
+
+  // Translation hook
+  const { t } = useTranslation('content');
+
   // Fetch comments and stats
-  const {
-    comments,
-    isLoading,
-    isLoadingMore,
-    error,
-    hasMore,
-    totalCount,
-    fetchMore,
-    refetch,
-  } = useComments({
-    contentId,
-    sortOrder,
-    includeReplies: true,
-  });
+  const { comments, isLoading, isLoadingMore, error, hasMore, totalCount, fetchMore, refetch } =
+    useComments({
+      contentId,
+      sortOrder,
+      includeReplies: true,
+    });
 
   const { data: stats, isLoading: statsLoading } = useCommentStats(contentId);
 
@@ -43,14 +39,16 @@ export function CommentSection({ contentId }: CommentSectionProps) {
       {/* Comments Header */}
       <div className="p-4 border-b border-zinc-700/50">
         <div className="mb-2">
-          <h3 className="text-base font-medium text-white mb-1">Comments</h3>
+          <h3 className="text-base font-medium text-white mb-1">{t('comments.title')}</h3>
           {!statsLoading && stats?.total_comments !== undefined && (
-            <span className="text-sm text-zinc-400">({stats.total_comments} comments)</span>
+            <span className="text-sm text-zinc-400">
+              ({t('comments.count', { count: stats.total_comments })})
+            </span>
           )}
         </div>
 
-          {/* Sort Options - temporarily hidden for debugging */}
-          {false && (
+        {/* Sort Options - temporarily hidden for debugging */}
+        {false && (
           <div className="flex space-x-1">
             {(['newest', 'oldest', 'most_liked'] as const).map((sort) => (
               <button
@@ -62,22 +60,22 @@ export function CommentSection({ contentId }: CommentSectionProps) {
                     : 'text-zinc-400 hover:text-white hover:bg-zinc-700/50'
                 }`}
               >
-                {sort === 'newest' && 'New'}
-                {sort === 'oldest' && 'Old'}
-                {sort === 'most_liked' && 'Top'}
+                {sort === 'newest' && t('comments.sort.newest')}
+                {sort === 'oldest' && t('comments.sort.oldest')}
+                {sort === 'most_liked' && t('comments.sort.mostLiked')}
               </button>
             ))}
           </div>
-          )}
+        )}
 
         {/* Stats Summary */}
         {!statsLoading && stats && (
           <div className="text-xs text-zinc-400 space-x-4">
             {stats.recent_comments !== undefined && stats.recent_comments > 0 && (
-              <span>{stats.recent_comments} recent</span>
+              <span>{t('comments.recent', { count: stats.recent_comments })}</span>
             )}
             {stats.total_replies !== undefined && stats.total_replies > 0 && (
-              <span>{stats.total_replies} replies</span>
+              <span>{t('comments.replies', { count: stats.total_replies })}</span>
             )}
           </div>
         )}
@@ -87,12 +85,12 @@ export function CommentSection({ contentId }: CommentSectionProps) {
       <div className="flex-1 min-h-0 overflow-y-auto">
         {error ? (
           <div className="p-4 text-center text-red-400">
-            <p className="text-sm">Failed to load comments</p>
+            <p className="text-sm">{t('comments.error.loadFailed')}</p>
             <button
               onClick={() => refetch()}
               className="mt-2 px-3 py-1 text-xs bg-zinc-800/50 hover:bg-zinc-700/50 rounded transition-colors"
             >
-              Try again
+              {t('comments.error.tryAgain')}
             </button>
           </div>
         ) : isLoading ? (
@@ -102,8 +100,8 @@ export function CommentSection({ contentId }: CommentSectionProps) {
         ) : comments.length === 0 ? (
           <div className="p-4 text-center text-zinc-400">
             <MdComment className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p className="text-sm">No comments yet</p>
-            <p className="text-xs mt-1 opacity-75">Be the first to share your thoughts!</p>
+            <p className="text-sm">{t('comments.empty.title')}</p>
+            <p className="text-xs mt-1 opacity-75">{t('comments.empty.subtitle')}</p>
           </div>
         ) : (
           <CommentList
@@ -121,7 +119,7 @@ export function CommentSection({ contentId }: CommentSectionProps) {
         <CommentInput
           contentId={contentId}
           onCommentCreated={() => refetch()}
-          placeholder="Add a comment..."
+          placeholder={t('comments.input.placeholder')}
         />
       </div>
     </div>

@@ -110,6 +110,32 @@
   .mobile-heading {
     @apply text-xl sm:text-2xl lg:text-3xl;
   }
+
+  /* Mobile optimization utilities */
+  .mobile-fullscreen {
+    min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height */
+  }
+
+  .mobile-safe-area {
+    padding-left: max(env(safe-area-inset-left), 16px);
+    padding-right: max(env(safe-area-inset-right), 16px);
+    padding-top: max(env(safe-area-inset-top), 16px);
+    padding-bottom: max(env(safe-area-inset-bottom), 16px);
+  }
+
+  .mobile-touch-target {
+    @apply min-h-[44px] min-w-[44px]; /* iOS minimum touch target */
+  }
+
+  .mobile-text-base {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+
+  .mobile-scroll-smooth {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 /* Kinetic Typography Variables */
@@ -230,6 +256,7 @@ body {
   color: var(--text-color);
   background-color: var(--main-background-color);
   min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height for mobile */
   display: flex;
   flex-direction: column;
   font-family: Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR',
@@ -378,11 +405,15 @@ footer {
   html {
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
   }
 
   body {
     @apply touch-pan-y;
     -webkit-overflow-scrolling: touch;
+    /* Dynamic viewport height for mobile */
+    min-height: 100vh;
+    min-height: 100dvh;
   }
 
   .touch-target {
@@ -403,6 +434,7 @@ footer {
   img {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
+    user-select: none;
     pointer-events: auto;
   }
 
@@ -411,6 +443,44 @@ footer {
     touch-action: manipulation;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* 모바일 폼 최적화 */
+  input,
+  textarea,
+  select {
+    font-size: 16px; /* Prevent zoom on iOS */
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 0;
+  }
+
+  /* 모바일 버튼 최적화 */
+  button {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+}
+
+/* 접근성 최적화 */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* 다크모드 지원 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
   }
 }
 

@@ -17,7 +17,7 @@ export interface PostCardProps {
   userAvatar?: string | null;
   userAka?: string | null;
   timeAgo: string;
-  upvotes: number;
+  pins: number;
   comments: number;
   thumbnail?: string | null;
   contentType: 'text' | 'image' | 'video' | 'link';
@@ -117,7 +117,7 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
   userAvatar,
   userAka,
   timeAgo,
-  upvotes,
+  pins,
   comments,
   thumbnail,
   contentType,
@@ -309,7 +309,7 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
         <div className="flex items-center gap-6 text-sm text-zinc-500 border-t border-zinc-800 pt-4">
           <button className="hover:text-orange-400 transition-colors flex items-center gap-2">
             <Pin className="w-4 h-4" />
-            <span className="font-medium">{upvotes > 0 ? upvotes.toLocaleString() : 'Pin'}</span>
+            <span className="font-medium">{pins > 0 ? pins.toLocaleString() : 'Pin'}</span>
           </button>
           <button className="hover:text-blue-400 transition-colors flex items-center gap-2">
             <MessageCircle className="w-4 h-4" />

@@ -12,7 +12,7 @@ export function ContentUploadFooter({
   canSubmit,
 }: ContentUploadFooterProps) {
   return (
-    <div className="flex items-center justify-end space-x-3 p-6 border-t border-zinc-700/50">
+    <div className="flex items-center justify-end space-x-3 p-4 sm:p-6 border-t border-zinc-700/50">
       <button
         onClick={onCancel}
         disabled={isLoading}
