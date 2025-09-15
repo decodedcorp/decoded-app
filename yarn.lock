@@ -1249,9 +1249,9 @@ __metadata:
   linkType: hard
 
 "@babel/runtime@npm:^7.23.2, @babel/runtime@npm:^7.27.6":
-  version: 7.28.4
-  resolution: "@babel/runtime@npm:7.28.4"
-  checksum: 10c0/792ce7af9750fb9b93879cc9d1db175701c4689da890e6ced242ea0207c9da411ccf16dc04e689cc01158b28d7898c40d75598f4559109f761c12ce01e959bf7
+  version: 7.28.3
+  resolution: "@babel/runtime@npm:7.28.3"
+  checksum: 10c0/b360f82c2c5114f2a062d4d143d7b4ec690094764853937110585a9497977aed66c102166d0e404766c274e02a50ffb8f6d77fef7251ecf3f607f0e03e6397bc
   languageName: node
   linkType: hard
 
@@ -6350,7 +6350,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fdir@npm:^6.4.4":
+"fdir@npm:^6.4.4, fdir@npm:^6.5.0":
   version: 6.5.0
   resolution: "fdir@npm:6.5.0"
   peerDependencies:
@@ -8147,12 +8147,12 @@ __metadata:
   linkType: hard
 
 "next-intl@npm:^4.3.7":
-  version: 4.3.7
-  resolution: "next-intl@npm:4.3.7"
+  version: 4.3.8
+  resolution: "next-intl@npm:4.3.8"
   dependencies:
     "@formatjs/intl-localematcher": "npm:^0.5.4"
     negotiator: "npm:^1.0.0"
-    use-intl: "npm:^4.3.7"
+    use-intl: "npm:^4.3.8"
   peerDependencies:
     next: ^12.0.0 || ^13.0.0 || ^14.0.0 || ^15.0.0
     react: ^16.8.0 || ^17.0.0 || ^18.0.0 || >=19.0.0-rc <19.0.0 || ^19.0.0
@@ -8160,7 +8160,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10c0/00a2df0622f8f6474778ceefbb5e119459ab91a9d586abd94cbbd831affb187117689181eddc45ecedb1f1967ef2215485334b9eb6a039ad22a92ce6447cc738
+  checksum: 10c0/b64c8e1d671f93260ca81ae6c803c6187a0cd03b62d95fc3cfbef255af19b7eb022010a5009dc525344db7ff9c90de2151cf38ee9311f9463fab91816cb4c20a
   languageName: node
   linkType: hard
 
@@ -8610,7 +8610,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"picomatch@npm:^4.0.2":
+"picomatch@npm:^4.0.2, picomatch@npm:^4.0.3":
   version: 4.0.3
   resolution: "picomatch@npm:4.0.3"
   checksum: 10c0/9582c951e95eebee5434f59e426cddd228a7b97a0161a375aed4be244bd3fe8e3a31b846808ea14ef2c8a2527a6eeab7b3946a67d5979e81694654f939473ae2
@@ -9818,7 +9818,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tinyglobby@npm:^0.2.12, tinyglobby@npm:^0.2.13":
+"tinyglobby@npm:^0.2.12":
+  version: 0.2.15
+  resolution: "tinyglobby@npm:0.2.15"
+  dependencies:
+    fdir: "npm:^6.5.0"
+    picomatch: "npm:^4.0.3"
+  checksum: 10c0/869c31490d0d88eedb8305d178d4c75e7463e820df5a9b9d388291daf93e8b1eb5de1dad1c1e139767e4269fe75f3b10d5009b2cc14db96ff98986920a186844
+  languageName: node
+  linkType: hard
+
+"tinyglobby@npm:^0.2.13":
   version: 0.2.14
   resolution: "tinyglobby@npm:0.2.14"
   dependencies:
@@ -10196,16 +10206,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-intl@npm:^4.3.7":
-  version: 4.3.7
-  resolution: "use-intl@npm:4.3.7"
+"use-intl@npm:^4.3.8":
+  version: 4.3.8
+  resolution: "use-intl@npm:4.3.8"
   dependencies:
     "@formatjs/fast-memoize": "npm:^2.2.0"
     "@schummar/icu-type-parser": "npm:1.21.5"
     intl-messageformat: "npm:^10.5.14"
   peerDependencies:
     react: ^17.0.0 || ^18.0.0 || >=19.0.0-rc <19.0.0 || ^19.0.0
-  checksum: 10c0/d98caa7d0a55eea323a9403dbf32e6d3aebbb1e666ca6e76ba5a755e5838d3262177dbe49474c8c5dd6df752a529ca35f85a9aabd8eb5a6508330c9c9a38adeb
+  checksum: 10c0/8be65ce82f46ab924b6416c2ec144e0cbe53f7671fdfad6a8b2d8265213d0c1f5d14cc3ab17f6c9b24424fd3d9c927b1b64ebcd09d38d084d0569df723b7d616
   languageName: node
   linkType: hard
 

@@ -113,7 +113,11 @@ export const Header = memo(function Header() {
       style={{
         WebkitBackdropFilter: 'blur(12px)',
         backdropFilter: 'blur(12px)',
-      }}
+        '--header-h': '60px',
+        '--header-h-md': '72px',
+      } as React.CSSProperties & { '--header-h': string; '--header-h-md': string }}
+      data-header-height="60"
+      data-header-height-md="72"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -121,9 +125,9 @@ export const Header = memo(function Header() {
         className="
           flex items-center justify-between
           w-full
-          px-4 md:px-8
           h-[60px] md:h-[72px]
         "
+        style={{ paddingInline: 'var(--space-page-x)' }}
       >
         {/* Mobile Menu Button */}
         <button
@@ -207,7 +211,7 @@ export const Header = memo(function Header() {
 
       {/* Mobile Search Overlay */}
       {isMobileSearchOpen && (
-        <div className="fixed top-[60px] md:top-[72px] left-0 right-0 bg-black border-b border-zinc-700 p-4 z-[10000] md:hidden">
+        <div className="fixed top-[60px] md:top-[72px] left-0 right-0 bg-black border-b border-zinc-700 py-4 z-[10000] md:hidden" style={{ paddingInline: 'var(--space-page-x)' }}>
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsMobileSearchOpen(false)}

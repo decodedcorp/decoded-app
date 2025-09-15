@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 
 import type { UserProfileResponse } from '@/api/generated/models/UserProfileResponse';
 import type { ChannelUserProfile } from '@/api/generated/models/ChannelUserProfile';
+import { useScrollLock } from '@/lib/hooks/useScrollLock';
 
 interface EditorsListModalProps {
   isOpen: boolean;
@@ -13,14 +14,17 @@ interface EditorsListModalProps {
   ownerId?: string;
 }
 
-export function EditorsListModal({ 
-  isOpen, 
-  onClose, 
+export function EditorsListModal({
+  isOpen,
+  onClose,
   editors,
   channelName = 'Channel',
   ownerId
 }: EditorsListModalProps) {
-  
+
+  // Use improved scroll lock
+  useScrollLock(isOpen);
+
   // ESC key handler
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -31,13 +35,10 @@ export function EditorsListModal({
 
     if (isOpen) {
       document.addEventListener('keydown', handleEsc);
-      // Prevent body scroll when modal is open
-      document.body.style.overflow = 'hidden';
     }
 
     return () => {
       document.removeEventListener('keydown', handleEsc);
-      document.body.style.overflow = 'unset';
     };
   }, [isOpen, onClose]);
 
@@ -110,7 +111,7 @@ export function EditorsListModal({
           </div>
 
           {/* Editors List */}
-          <div className="overflow-y-auto max-h-[calc(80vh-80px)]">
+          <div className="overflow-auto max-h-[calc(80vh-80px)]" style={{ WebkitOverflowScrolling: 'touch' }}>
             {sortedEditors.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-zinc-400">No editors for this channel yet</p>

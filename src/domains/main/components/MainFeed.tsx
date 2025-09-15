@@ -377,7 +377,7 @@ export const MainFeed = React.memo(function MainFeed() {
   return (
     <div className="w-full min-h-screen bg-black">
       <div
-        className="max-w-4xl mx-auto px-4 py-6"
+        className="w-full py-6"
         style={{
           scrollBehavior: 'smooth',
           willChange: 'scroll-position',

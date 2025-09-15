@@ -69,20 +69,20 @@ export const Sidebar = memo(function Sidebar() {
         />
       )}
 
-      {/* Fixed Sidebar - Instagram style */}
+      {/* Responsive Sidebar - sticky on desktop, fixed overlay on mobile */}
       <aside
         className={`
-          w-[245px]
-          bg-black border-r border-zinc-800
+          w-[220px]
+          bg-black
           overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-black
           ${
             isMobileOpen
-              ? 'fixed top-[60px] md:top-[72px] left-0 h-[calc(100vh-60px)] md:h-[calc(100vh-72px)] translate-x-0 z-[10002]'
-              : 'fixed top-0 left-0 h-[calc(100vh-72px)] -translate-x-full lg:relative lg:translate-x-0'
+              ? 'fixed top-[60px] md:top-[72px] left-0 h-[calc(100dvh-60px)] md:h-[calc(100dvh-72px)] translate-x-0 z-[10002]'
+              : 'fixed top-0 left-0 h-screen -translate-x-full md:sticky md:top-[72px] md:h-fit md:self-start md:translate-x-0'
           }
         `}
       >
-        <div className="py-6 px-3">
+        <div className="py-4 px-3">
           {/* Main Navigation */}
           <div className="space-y-2">
             <SidebarItem

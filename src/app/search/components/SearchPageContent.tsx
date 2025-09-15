@@ -39,7 +39,7 @@ export function SearchPageContent({ query }: SearchPageContentProps) {
   }
 
   return (
-    <div className="container mx-auto px-4 md:px-8 py-6">
+    <div className="w-full py-6">
       {/* Search header */}
       <SearchHeader query={query} />
 

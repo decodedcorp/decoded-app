@@ -1,9 +1,25 @@
 @tailwind utilities;
 
-/* Custom CSS Variables for Dynamic Shadows */
+/* Custom CSS Variables for Dynamic Shadows and Spacing */
 :root {
   --hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
   --focus-ring: rgba(59, 130, 246, 0.6);
+
+  /* Page horizontal gutter spacing - Reddit-style compact layout */
+  --space-page-x: 1rem;
+}
+
+/* Responsive page spacing - Reddit-style minimal gutters with max-width container */
+@media (min-width: 1024px) {
+  :root {
+    --space-page-x: 1.5rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --space-page-x: 2rem;
+  }
 }
 
 /* Enhanced focus styles for channel cards */
@@ -135,6 +151,11 @@
   .mobile-scroll-smooth {
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
+  }
+
+  /* Page spacing utility class */
+  .page-x-spacing {
+    padding-inline: var(--space-page-x);
   }
 }
 

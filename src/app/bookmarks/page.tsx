@@ -90,7 +90,7 @@ export default function BookmarksPage() {
   if (isLoading && offset === 0) {
     return (
       <div className="min-h-screen bg-black">
-        <div className="container mx-auto px-4 py-8">
+        <div className="w-full py-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">
               {t.globalContentUpload.bookmarks.title()}
@@ -140,7 +140,7 @@ export default function BookmarksPage() {
 
   return (
     <div className="min-h-screen bg-black">
-      <div className="container mx-auto px-4 py-8">
+      <div className="w-full py-8">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">
