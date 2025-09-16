@@ -157,7 +157,8 @@ export const Header = memo(function Header() {
         {/* Logo */}
         <Link
           href="/"
-          className="text-2xl font-bold text-[#EAFD66] tracking-tight drop-shadow ml-2 lg:ml-0"
+          className="text-2xl font-bold tracking-tight drop-shadow ml-2 lg:ml-0"
+          style={{ color: 'var(--color-primary)' }}
         >
           decoded
         </Link>
@@ -181,7 +182,7 @@ export const Header = memo(function Header() {
           {/* Mobile Search Button */}
           <button
             onClick={() => setIsMobileSearchOpen(true)}
-            className="md:hidden p-2 text-white hover:text-[#eafd66] transition-colors"
+            className="md:hidden p-2 text-white hover:text-primary transition-colors"
             aria-label={t.header.openSearch()}
           >
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24">

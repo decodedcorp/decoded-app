@@ -49,7 +49,7 @@ export function SearchBar({ placeholder, onSearch, className = '' }: SearchBarPr
             border border-white/20
             rounded-full
             text-white placeholder-white/60
-            focus:outline-none focus:ring-2 focus:ring-[#EAFD66]/50 focus:border-[#EAFD66]/50
+            focus:outline-none focus:ring-2 focus:ring-primary-focus/50 focus:border-primary/50
             transition-all duration-200
           "
         />

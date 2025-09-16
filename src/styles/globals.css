@@ -325,9 +325,7 @@
   --bg: #000000;
   --highlight-bg: #ffcc00;
   --type-line-opacity: 0.05;
-  --main-background-color: #070707;
-  --text-color: #ffffff;
-  --footer-text-color: #ffffff;
+  /* Legacy color variables removed - now using design-tokens.css and design-alias.css */
 }
 
 /* Kinetic Typography Fonts */

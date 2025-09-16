@@ -12,19 +12,19 @@ const buttonVariants = cva(
       variant: {
         // 프로젝트 테마 컬러 적용 - primary는 테마 컬러 사용
         primary:
-          'bg-gray-900 text-[#EAFD66] hover:bg-[#EAFD66] hover:text-black shadow-sm hover:shadow-md',
+          'bg-surface text-primary hover:bg-primary hover:text-primary-on shadow-sm hover:shadow-md',
         secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300 shadow-sm hover:shadow-md',
         outline:
           'border border-gray-300 bg-transparent text-gray-900 hover:bg-gray-100 hover:border-gray-400',
         ghost: 'bg-transparent text-gray-900 hover:bg-gray-100',
         destructive: 'bg-red-600 text-white hover:bg-red-700 shadow-sm hover:shadow-md',
         // 테마 컬러를 사용한 새로운 variant들
-        accent: 'bg-[#EAFD66] text-black hover:bg-[#EAFD66]/90 shadow-sm hover:shadow-md',
+        accent: 'bg-primary text-primary-on hover:bg-primary-hover shadow-sm hover:shadow-md',
         'accent-outline':
-          'border border-[#EAFD66] bg-transparent text-[#EAFD66] hover:bg-[#EAFD66] hover:text-black',
-        // 로그인 버튼 전용 variant - 더 명확한 테마 컬러 적용
+          'border border-primary-bd bg-transparent text-primary hover:bg-primary hover:text-primary-on',
+        // 로그인 버튼 전용 variant - MainFeed 필터 버튼 스타일 + 메인 컬러
         login:
-          'bg-gray-900 text-[#EAFD66] hover:bg-[#EAFD66] hover:text-black border border-[#EAFD66]/20 hover:border-[#EAFD66]/40 shadow-sm hover:shadow-md',
+          'text-[#EAFD66] hover:text-black hover:bg-[#EAFD66] border border-zinc-700 transition-colors',
       },
       size: {
         sm: 'h-8 px-3 text-sm',

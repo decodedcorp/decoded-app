@@ -23,13 +23,18 @@
 - **Naming**: Strict camelCase/PascalCase/kebab-case conventions
 - **Folder Structure**: Clear module boundaries, group related logic
 
-### Design System Enforcement
+### Design System Enforcement (v3)
 
-- **Colors**: Only use theme-defined color tokens from `src/constants/colors.ts`
+- **Colors**: Use role-based design tokens from Design System v3 (NO hardcoded hex values)
+  - Use `text-primary`, `bg-primary`, `border-primary-bd` instead of `#EAFD66`
+  - Use `text-primary-on` for text on primary backgrounds
+  - Use `bg-primary-bg` for subtle primary backgrounds
+  - Legacy colors available during migration via alias layer
 - **Spacing**: Follow spacing scale from `tailwind.config.ts`
 - **Typography**: Use defined type scale (heading/body/caption)
 - **Components**: Semantic naming (PrimaryButton, AlertCard, etc.)
 - **Hierarchy**: Align visual hierarchy with design tokens
+- **Theme Support**: All components must work in both dark and light themes
 
 ### Performance Requirements
 
@@ -85,6 +90,31 @@
 - Update relevant documentation when changing APIs
 
 **Follow all above guidelines strictly** - they ensure code consistency, maintainability, and performance across the frontend application.
+
+## Design System v3 Migration Status
+
+**✅ Infrastructure Complete** - All foundation components ready for migration:
+- Role-based design tokens (`src/styles/design-tokens.css`)
+- Legacy compatibility layer (`src/styles/design-alias.css`)
+- SSR theme system with FOUC prevention (`src/hooks/useTheme.ts`)
+- Updated Tailwind config with new color mappings
+- Comprehensive migration guide (`docs/design-system-migration-guide.md`)
+- PR template with DoD checklist (`docs/pr-template.md`)
+
+**🎯 Current Migration Phase**: Replace hardcoded `#EAFD66` with semantic tokens
+
+**Priority Order for Component Migration**:
+1. **Button Component** - `packages/ui/src/components/Button/Button.tsx`
+2. **Header Component** - `src/shared/components/Header.tsx`
+3. **Notification Components** - `src/shared/components/NotificationButton.tsx`
+4. **Search Components** - `src/domains/search/components/SearchAutocomplete.tsx`
+
+**Key Migration Rules**:
+- Replace `text-[#EAFD66]` → `text-primary`
+- Replace `bg-[#EAFD66]` → `bg-primary`
+- Replace `bg-[#EAFD66] text-black` → `bg-primary text-primary-on`
+- Replace `border-[#EAFD66]` → `border-primary-bd`
+- Use `bg-primary-bg` for subtle backgrounds (replaces `bg-[#EAFD66]/10`)
 
 ## Task Master AI Instructions
 

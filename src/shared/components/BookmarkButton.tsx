@@ -74,7 +74,7 @@ export function BookmarkButton({
           ${buttonSizeClasses[size]}
           rounded-lg transition-all duration-200
           ${isBookmarked 
-            ? 'text-[#EAFD66] hover:text-[#d9ec55] bg-[#EAFD66]/10 hover:bg-[#EAFD66]/20' 
+            ? 'text-primary hover:text-primary-hover bg-primary-bg hover:bg-primary/20' 
             : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800'
           }
           ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}

@@ -75,7 +75,7 @@ const config: Config = {
         },
         fill: {
           '0%': { fill: 'transparent' },
-          '50%': { fill: 'rgb(234 179 8)', stroke: 'rgb(234 179 8)' }, // yellow-500
+          '50%': { fill: 'var(--color-primary)', stroke: 'var(--color-primary)' },
           '100%': { fill: 'transparent' },
         },
         'scale-in': {
@@ -196,8 +196,9 @@ const config: Config = {
         modal: '0 10px 15px -3px rgba(0,0,0,0.1)',
         'card-hover': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
       },
-      // Colors
+      // Colors - Design System v3
       colors: {
+        // Legacy grayscale (keep for compatibility)
         black: colors.black,
         white: colors.white,
         gray: {
@@ -211,15 +212,40 @@ const config: Config = {
           200: colors.gray[200],
           100: colors.gray[100],
         },
+
+        // New Design System v3 - Role-based tokens
+        bg: 'var(--color-background)',
+        surface: 'var(--color-surface)',
+        surface2: 'var(--color-surface-2)',
+        border: 'var(--color-border)',
+        text: 'var(--color-text)',
+        muted: 'var(--color-muted)',
+
+        primary: {
+          DEFAULT: 'var(--color-primary)',
+          hover: 'var(--color-primary-hover)',
+          active: 'var(--color-primary-active)',
+          on: 'var(--color-on-primary)',
+          bg: 'var(--color-primary-bg)',
+          bd: 'var(--color-primary-bd)',
+          focus: 'var(--color-focus)',
+        },
+
+        success: 'var(--color-success)',
+        warning: 'var(--color-warning)',
+        error: 'var(--color-error)',
+        info: 'var(--color-info)',
+
+        // Badge colors
+        badge: {
+          new: 'var(--color-badge-new)',
+          hot: 'var(--color-badge-hot)',
+        },
+
+        // Legacy compatibility (will be removed after migration)
         mainBackground: 'var(--main-background-color)',
         textColor: 'var(--text-color)',
         footerText: 'var(--footer-text-color)',
-        primary: '#EAFD66',
-        // Badge colors
-        badge: {
-          new: '#16a34a', // green-600
-          hot: '#db2777', // pink-600
-        },
       },
       // Background Images
       backgroundImage: {
@@ -317,7 +343,7 @@ const config: Config = {
       // Utilities
       const newUtilities = {
         '.text-shadow-neon': {
-          'text-shadow': '0 0 5px #EAFD66, 0 0 10px #EAFD66',
+          'text-shadow': '0 0 5px var(--color-primary), 0 0 10px var(--color-primary)',
         },
         '.break-inside-avoid': {
           'break-inside': 'avoid',

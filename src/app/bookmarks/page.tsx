@@ -52,7 +52,7 @@ export default function BookmarksPage() {
           </p>
           <button
             onClick={() => router.push('/')}
-            className="px-6 py-3 bg-[#EAFD66] text-black rounded-lg font-medium hover:bg-[#d9ec55] transition-colors"
+            className="px-6 py-3 bg-primary text-primary-on rounded-lg font-medium hover:bg-primary-hover transition-colors"
           >
             {t.globalContentUpload.bookmarks.goToHome()}
           </button>
@@ -129,7 +129,7 @@ export default function BookmarksPage() {
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-[#EAFD66] text-black rounded-lg font-medium hover:bg-[#d9ec55] transition-colors"
+            className="px-6 py-3 bg-primary text-primary-on rounded-lg font-medium hover:bg-primary-hover transition-colors"
           >
             {t.globalContentUpload.bookmarks.retry()}
           </button>
@@ -294,7 +294,7 @@ export default function BookmarksPage() {
             </p>
             <button
               onClick={() => router.push('/channels')}
-              className="px-6 py-3 bg-[#EAFD66] text-black rounded-lg font-medium hover:bg-[#d9ec55] transition-colors"
+              className="px-6 py-3 bg-primary text-primary-on rounded-lg font-medium hover:bg-primary-hover transition-colors"
             >
               {t.globalContentUpload.bookmarks.exploreChannels()}
             </button>

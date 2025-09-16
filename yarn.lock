@@ -1293,7 +1293,7 @@ __metadata:
 
 "@decoded/ui@file:packages/ui::locator=decoded-app%40workspace%3A.":
   version: 0.1.0
-  resolution: "@decoded/ui@file:packages/ui#packages/ui::hash=ac115b&locator=decoded-app%40workspace%3A."
+  resolution: "@decoded/ui@file:packages/ui#packages/ui::hash=abea5d&locator=decoded-app%40workspace%3A."
   dependencies:
     "@radix-ui/react-dialog": "npm:^1.1.15"
     "@radix-ui/react-dropdown-menu": "npm:^2.0.6"
@@ -1308,7 +1308,7 @@ __metadata:
     react: ">=18.0.0"
     react-dom: ">=18.0.0"
     tailwindcss: ">=3.0.0"
-  checksum: 10c0/a70640abfe0dd19111218ce24d0091f7eb3fa6339770eec404c3830051488aa9d7392b177c2212d4cf0d852f96831c1ecde8bd0c000644d90239e7f8315603fc
+  checksum: 10c0/99381a41cbe7faaac07fb925f918b42e43c80235b4e2b2acd5b726aa3ffe7e9828b566b74c7d0cc74a5bfaf00c943473100d49f310201d154deee2b5663bdc76
   languageName: node
   linkType: hard
 

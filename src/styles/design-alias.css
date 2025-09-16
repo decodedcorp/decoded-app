@@ -1,0 +1,79 @@
+/**
+ * Legacy Alias Layer - Backward Compatibility
+ * Maps old CSS variables to new design system tokens
+ *
+ * This ensures existing styles don't break during migration.
+ * Remove this file after all components are migrated to new tokens.
+ */
+
+:root {
+  /* Legacy Background & Text Variables */
+  --main-background-color: var(--color-background);
+  --text-color: var(--color-text);
+  --footer-text-color: var(--color-muted);
+
+  /* Legacy Layout Variables (keep as-is) */
+  --edge-x: 16px;
+  --main-gap: 24px;
+  --sidebar-w: 220px;
+  --sidebar-right-w: 280px;
+  --header-h: 60px;
+
+  /* Legacy Brand Color Mapping */
+  /* Note: These map to the new primary tokens */
+  --legacy-primary: var(--color-primary);
+  --legacy-primary-hover: var(--color-primary-hover);
+  --legacy-primary-active: var(--color-primary-active);
+
+  /* Legacy Z-Index (keep existing values) */
+  --z-overlay: 50;
+  --z-modal: 60;
+  --z-modal-root: 70;
+
+  /* Legacy Modal Variables (keep as-is) */
+  --modal-max-w: 56rem;
+  --modal-max-w-wide: 75rem;
+  --modal-max-w-small: 32rem;
+  --modal-pad: 1rem;
+  --modal-pad-lg: 1.25rem;
+  --modal-gap: 1.5rem;
+
+  /* Legacy Animation Variables (keep as-is) */
+  --modal-transition: 200ms ease-out;
+  --modal-scale-in: scale(0.95);
+  --modal-scale-out: scale(1.05);
+  --modal-anim-ms: 180ms;
+  --modal-anim-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Legacy Safe Area Variables (keep as-is) */
+  --safe-bottom: env(safe-area-inset-bottom);
+  --safe-top: env(safe-area-inset-top);
+  --safe-left: env(safe-area-inset-left);
+  --safe-right: env(safe-area-inset-right);
+}
+
+/* Responsive Legacy Mappings */
+@media (min-width: 768px) {
+  :root {
+    --edge-x: 24px;
+    --main-gap: 28px;
+    --header-h: 72px;
+    --modal-pad: 20px;
+    --modal-pad-lg: 32px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --edge-x: 32px;
+    --main-gap: 32px;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --edge-x: 40px;
+    --main-gap: 36px;
+    --sidebar-right-w: 336px;
+  }
+}

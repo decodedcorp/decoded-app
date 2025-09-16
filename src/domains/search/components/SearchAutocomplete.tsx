@@ -31,7 +31,7 @@ const AutocompleteItemComponent = React.memo(
       switch (item.type) {
         case 'channel':
           return (
-            <div className="w-6 h-6 rounded-full bg-[#EAFD66] flex items-center justify-center">
+            <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
               <span className="text-xs font-bold text-black">#</span>
             </div>
           );
@@ -128,7 +128,7 @@ const AutocompleteItemComponent = React.memo(
         <div className="flex-shrink-0">
           <span
             className={clsx('px-2 py-1 text-xs font-medium rounded-full', {
-              'bg-[#EAFD66]/20 text-[#EAFD66]': item.type === 'channel',
+              'bg-primary-bg text-primary': item.type === 'channel',
               'bg-blue-500/20 text-blue-400': item.type === 'image',
               'bg-red-500/20 text-red-400': item.type === 'video',
               'bg-green-500/20 text-green-400': item.type === 'link',
