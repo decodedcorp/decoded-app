@@ -2,11 +2,9 @@
 
 import React from 'react';
 
-import { MdClose } from 'react-icons/md';
+import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalClose } from '@/lib/components/ui/modal';
 import { ContentItem } from '@/lib/types/content';
 import { CommentSection } from '@/domains/comments/components/CommentSection';
-
-import { BaseModal } from '../base/BaseModal';
 
 interface MobileCommentsModalProps {
   isOpen: boolean;
@@ -15,35 +13,31 @@ interface MobileCommentsModalProps {
 }
 
 export function MobileCommentsModal({ isOpen, onClose, content }: MobileCommentsModalProps) {
-  return (
-    <BaseModal
-      isOpen={isOpen}
-      onClose={onClose}
-      closeOnOverlayClick={true}
-      closeOnEscape={true}
-      overlayClassName="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
-      contentClassName="fixed inset-x-0 bottom-0 top-[8vh] sm:top-[10vh] z-50"
-    >
-      <div className="w-full h-full bg-zinc-900 rounded-t-2xl shadow-2xl border-t border-zinc-700/50 flex flex-col overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-zinc-700/50 bg-zinc-900/95 backdrop-blur-sm">
-          <div className="flex items-center space-x-3">
-            <h2 className="text-lg font-semibold text-white">Comments</h2>
-          </div>
-          <button
-            onClick={onClose}
-            className="flex items-center justify-center w-10 h-10 sm:w-8 sm:h-8 rounded-full bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors touch-manipulation"
-            aria-label="Close comments"
-          >
-            <MdClose className="w-6 h-6 sm:w-5 sm:h-5 text-zinc-400" />
-          </button>
-        </div>
+  const handleOpenChange = (open: boolean) => {
+    if (!open) onClose();
+  };
 
-        {/* Comments Section */}
-        <div className="flex-1 min-h-0 overflow-y-auto">
-          <CommentSection contentId={String(content.id)} />
-        </div>
-      </div>
-    </BaseModal>
+  return (
+    <Modal
+      open={isOpen}
+      onOpenChange={handleOpenChange}
+      variant="sheet-bottom"
+      size="auto"
+      dismissible={true}
+      ariaLabel="Comments"
+    >
+      <ModalOverlay className="modal-overlay--heavy">
+        <ModalContent className="bg-zinc-900 border-t border-zinc-700/50 shadow-2xl">
+          <ModalHeader className="bg-zinc-900/95 backdrop-blur-sm">
+            <h2 className="text-lg font-semibold text-white">Comments</h2>
+            <ModalClose />
+          </ModalHeader>
+
+          <ModalBody className="min-h-0">
+            <CommentSection contentId={String(content.id)} />
+          </ModalBody>
+        </ModalContent>
+      </ModalOverlay>
+    </Modal>
   );
 }

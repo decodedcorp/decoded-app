@@ -376,15 +376,17 @@ export const MainFeed = React.memo(function MainFeed() {
 
   return (
     <div className="w-full min-h-screen bg-black">
-      <div
-        className="w-full py-6"
-        style={{
-          scrollBehavior: 'smooth',
-          willChange: 'scroll-position',
-        }}
-      >
-        {/* 피드 헤더 */}
-        <div className="mb-8">
+      {/* 메인 피드 (primary) - 기본 여백 유지 */}
+      <section data-role="primary-feed" className="layout-edge">
+        <div
+          className="w-full py-6"
+          style={{
+            scrollBehavior: 'smooth',
+            willChange: 'scroll-position',
+          }}
+        >
+          {/* 피드 헤더 */}
+          <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-white text-2xl font-bold mb-1">{t.feed.section.header()}</h1>
@@ -553,7 +555,18 @@ export const MainFeed = React.memo(function MainFeed() {
             </div>
           </div>
         )}
-      </div>
+        </div>
+      </section>
+
+      {/* 보조 섹션들 (dense) - 향후 추가 시 거의 무여백 적용 */}
+      {/*
+      <section data-role="secondary-grid" className="layout-edge--dense">
+        <SecondaryGrid />
+      </section>
+      <section data-role="recommend" className="px-[var(--edge-x-dense)]">
+        <RecommendList />
+      </section>
+      */}
     </div>
   );
 });

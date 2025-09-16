@@ -9,25 +9,46 @@ import { Sidebar } from './sidebar/Sidebar';
 
 interface MainLayoutProps {
   children: ReactNode;
+  maxWidth?: 'default' | 'wide' | 'full';
 }
 
-export const MainLayout = memo(function MainLayout({ children }: MainLayoutProps) {
+export const MainLayout = memo(function MainLayout({
+  children,
+  maxWidth = 'default',
+}: MainLayoutProps) {
   return (
-    <div className="flex pt-[60px] md:pt-[72px] overflow-visible">
-      {/* 사이드바 - 데스크톱과 모바일에서 모두 렌더링하되 CSS로 제어 */}
-      <Sidebar />
-
-      {/* Reddit-style centered container - wider for better content display */}
-      <div className="flex-1 min-w-0 flex justify-center">
-        <div className="w-full max-w-7xl flex">
-          {/* 메인 콘텐츠 - Reddit 스타일 최대 너비 제한 */}
-          <main className="flex-1 min-w-0 page-x-spacing">{children}</main>
-
-          {/* 오른쪽 사이드바 - 데스크톱에서만 표시 */}
-          <div className="hidden lg:block w-[280px] flex-shrink-0">
-            <RightSidebar />
-          </div>
+    <div className="min-h-dvh pt-[var(--header-h)]">
+      <div className="grid grid-cols-1 lg:grid-cols-[var(--sidebar-w)_minmax(0,1fr)_var(--sidebar-right-w)]">
+        {/* 왼쪽 사이드바 - 데스크톱에서만 표시, 화면 끝에 붙음 */}
+        <div className="hidden lg:block">
+          <Sidebar />
         </div>
+
+        {/* 메인 콘텐츠 영역 - 모바일: layout-edge만, 데스크톱: 사이드바 간격 추가 */}
+        <div className="layout-edge lg:ml-[var(--main-gap)]">
+          <main
+            id="main"
+            data-role="primary"
+            className={`min-w-0 ${
+              maxWidth === 'wide' ? 'max-w-8xl' : maxWidth === 'full' ? 'max-w-none' : 'max-w-7xl'
+            } ${maxWidth === 'full' ? '' : 'mx-auto'}`}
+          >
+            {children}
+          </main>
+        </div>
+
+        {/* 오른쪽 사이드바 - 데스크톱에서만 표시 */}
+        <aside
+          id="sidebar-right"
+          className="hidden lg:block sticky top-[var(--header-h)] h-[calc(100dvh-var(--header-h))] overflow-auto lg:ml-[var(--main-gap)]"
+        >
+          <RightSidebar />
+        </aside>
+      </div>
+
+      {/* 모바일 사이드바 - 오버레이로 렌더링 */}
+      <div className="lg:hidden">
+        <Sidebar />
       </div>
 
       {/* Global Content Upload Modal - 전역적으로 렌더링 */}

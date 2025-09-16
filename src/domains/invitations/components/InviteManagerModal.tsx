@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 
 import { Button } from '@decoded/ui';
+import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalClose } from '@/lib/components/ui/modal';
 import { useSearchUsers } from '@/domains/search/hooks/useSearch';
 import type { ChannelResponse } from '@/api/generated/models/ChannelResponse';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
@@ -66,36 +67,31 @@ export function InviteManagerModal({ isOpen, onClose, channel }: InviteManagerMo
     setExpiresInDays(7);
   };
 
+  const handleOpenChange = (open: boolean) => {
+    if (!open) onClose();
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-
-      {/* Modal */}
-      <div className="relative bg-zinc-900 rounded-lg border border-zinc-700 w-full max-w-md mx-4">
-        <div className="p-6">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
+    <Modal
+      open={isOpen}
+      onOpenChange={handleOpenChange}
+      variant="center"
+      size="md"
+      dismissible={true}
+      ariaLabel={t.invitations.inviteManager()}
+    >
+      <ModalOverlay className="modal-overlay--heavy">
+        <ModalContent className="bg-zinc-900 border border-zinc-700">
+          <ModalHeader>
             <h2 className="text-xl font-semibold text-white">{t.invitations.inviteManager()}</h2>
-            <button
-              onClick={onClose}
-              className="p-1 rounded-full hover:bg-zinc-800 transition-colors"
-            >
-              <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-                <path
-                  d="M18 6L6 18M6 6l12 12"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          </div>
+            <ModalClose />
+          </ModalHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <ModalBody>
+
+          <form id="invite-form" onSubmit={handleSubmit} className="space-y-4">
             {/* User Search */}
             <div>
               <label className="block text-sm font-medium text-white mb-2">{t.invitations.searchUser()}</label>
@@ -171,26 +167,28 @@ export function InviteManagerModal({ isOpen, onClose, channel }: InviteManagerMo
               </select>
             </div>
 
-            {/* Actions */}
-            <div className="flex items-center justify-end space-x-3 pt-4">
-              <button
-                type="button"
-                onClick={handleReset}
-                className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-white rounded transition-colors"
-              >
-                {t.actions.reset()}
-              </button>
-              <Button
-                type="submit"
-                disabled={!selectedUserId || createInvitationMutation.isPending}
-                variant="primary"
-              >
-                {createInvitationMutation.isPending ? t.invitations.sending() : t.invitations.sendInvitation()}
-              </Button>
-            </div>
           </form>
-        </div>
-      </div>
-    </div>
+          </ModalBody>
+
+          <ModalFooter>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-white rounded transition-colors"
+            >
+              {t.actions.reset()}
+            </button>
+            <Button
+              type="submit"
+              form="invite-form"
+              disabled={!selectedUserId || createInvitationMutation.isPending}
+              variant="primary"
+            >
+              {createInvitationMutation.isPending ? t.invitations.sending() : t.invitations.sendInvitation()}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </ModalOverlay>
+    </Modal>
   );
 }

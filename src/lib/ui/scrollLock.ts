@@ -83,16 +83,23 @@ class ScrollLockManager {
     // Calculate scrollbar width to prevent layout shift
     const scrollbarWidth = window.innerWidth - documentElement.clientWidth;
 
-    // Apply lock styles
+    // 🔧 개선된 스크롤 락 전략: overflow hidden을 기본으로 사용
+    // 이렇게 하면 오버레이 클릭이 body 레벨에서 "먹히는" 문제 방지
     body.style.overflow = 'hidden';
     if (scrollbarWidth > 0) {
       body.style.paddingRight = `${scrollbarWidth}px`;
     }
 
-    // iOS Safari fix: Use fixed positioning with negative top
-    body.style.position = 'fixed';
-    body.style.top = `-${this.originalState.originalScrollY}px`;
-    body.style.width = '100%';
+    // iOS/Safari 특정 이슈에서만 position: fixed 폴백 사용
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+
+    if (isIOS || (isSafari && window.visualViewport)) {
+      // iOS Safari 전용: position fixed + negative top
+      body.style.position = 'fixed';
+      body.style.top = `-${this.originalState.originalScrollY}px`;
+      body.style.width = '100%';
+    }
 
     // Prevent overscroll behavior on mobile
     documentElement.style.overscrollBehavior = 'contain';

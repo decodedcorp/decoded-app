@@ -1,5 +1,6 @@
 import type { Config } from 'tailwindcss';
 import { colors } from './src/constants/colors';
+import { Z_INDEX_CSS_VARS } from './src/lib/constants/zIndex';
 
 const config: Config = {
   presets: [
@@ -81,6 +82,31 @@ const config: Config = {
           '0%': { transform: 'scale(0.95)', opacity: '0' },
           '100%': { transform: 'scale(1)', opacity: '1' },
         },
+        // Modal specific animations
+        'modal-enter': {
+          '0%': { opacity: '0', transform: 'scale(0.95) translateY(10px)' },
+          '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
+        },
+        'modal-exit': {
+          '0%': { opacity: '1', transform: 'scale(1) translateY(0)' },
+          '100%': { opacity: '0', transform: 'scale(0.95) translateY(10px)' },
+        },
+        'sheet-enter': {
+          '0%': { opacity: '0', transform: 'translateY(100%)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        'sheet-exit': {
+          '0%': { opacity: '1', transform: 'translateY(0)' },
+          '100%': { opacity: '0', transform: 'translateY(100%)' },
+        },
+        'drawer-enter': {
+          '0%': { opacity: '0', transform: 'translateX(100%)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+        'drawer-exit': {
+          '0%': { opacity: '1', transform: 'translateX(0)' },
+          '100%': { opacity: '0', transform: 'translateX(100%)' },
+        },
         glitch: {
           '0%': { 'clip-path': 'inset(20% 0 50% 0)' },
           '5%': { 'clip-path': 'inset(10% 0 60% 0)' },
@@ -121,6 +147,13 @@ const config: Config = {
         'scale-in': 'scale-in 0.3s ease-out forwards',
         'glitch-after': 'glitch var(--after-duration) infinite linear alternate-reverse',
         'glitch-before': 'glitch var(--before-duration) infinite linear alternate-reverse',
+        // Modal animations
+        'modal-enter': 'modal-enter 200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+        'modal-exit': 'modal-exit 150ms ease-out',
+        'sheet-enter': 'sheet-enter 200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+        'sheet-exit': 'sheet-exit 150ms ease-out',
+        'drawer-enter': 'drawer-enter 200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+        'drawer-exit': 'drawer-exit 150ms ease-out',
       },
       // Spacing & Layout
       spacing: {
@@ -275,7 +308,12 @@ const config: Config = {
     require('@tailwindcss/aspect-ratio'),
     require('tailwindcss-filters'),
     require('daisyui'),
-    function ({ addUtilities, addComponents }: { addUtilities: any; addComponents: any }) {
+    function ({ addUtilities, addComponents, addBase }: { addUtilities: any; addComponents: any; addBase: any }) {
+      // Z-Index CSS 변수 주입
+      addBase({
+        ':root': Z_INDEX_CSS_VARS,
+      });
+
       // Utilities
       const newUtilities = {
         '.text-shadow-neon': {

@@ -35,7 +35,7 @@ export function SearchBar({ placeholder, onSearch, className = '' }: SearchBarPr
   };
 
   return (
-    <form onSubmit={handleSubmit} className={`flex-1 max-w-md mx-4 md:mx-8 ${className}`}>
+    <form onSubmit={handleSubmit} className={`flex-1 max-w-md ${className}`}>
       <div className="relative">
         <input
           type="text"

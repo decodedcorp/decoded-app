@@ -127,7 +127,7 @@ export const Header = memo(function Header() {
           w-full
           h-[60px] md:h-[72px]
         "
-        style={{ paddingInline: 'var(--space-page-x)' }}
+        style={{ paddingInline: 'var(--edge-x)' }}
       >
         {/* Mobile Menu Button */}
         <button
@@ -163,7 +163,7 @@ export const Header = memo(function Header() {
         </Link>
 
         {/* Search Bar */}
-        <div className="hidden md:flex flex-1 mx-8 justify-center">
+        <div className="hidden md:flex flex-1 justify-center">
           {isChannelPage && channelName ? (
             <ChannelSearchBar
               channelId={channelId || ''}

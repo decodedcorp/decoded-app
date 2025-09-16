@@ -5,20 +5,85 @@
   --hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
   --focus-ring: rgba(59, 130, 246, 0.6);
 
-  /* Page horizontal gutter spacing - Reddit-style compact layout */
-  --space-page-x: 1rem;
+  /* Layout design tokens - unified edge padding system */
+  --edge-x: 16px; /* 뷰포트 좌우 기본 여백 */
+  --main-gap: 24px; /* 메인↔사이드 가로 간격 */
+  --sidebar-w: 220px; /* 데스크톱 사이드바 너비 */
+  --sidebar-right-w: 280px; /* 오른쪽 사이드바 너비 */
+  --header-h: 60px; /* 헤더 높이, sticky 기준 */
+
+  /* dense 모드(거의 무여백) */
+  --edge-x-dense: 4px;
+
+  /* Legacy - 기존 호환성 유지 */
+  --space-page-x: var(--edge-x);
+
+  /* Modal design tokens - 통합 모달 시스템 */
+  /* Z-index scale (toasts < modals < popovers above?) */
+  --z-overlay: 50;
+  --z-modal: 60;
+  --z-modal-root: 70;
+
+  /* Modal sizes */
+  --modal-max-w-sm: 24rem; /* 384px */
+  --modal-max-w-md: 32rem; /* 512px */
+  --modal-max-w-lg: 40rem; /* 640px */
+  --modal-max-w-xl: 56rem; /* 896px */
+  --modal-max-w-full: 90vw; /* Responsive full */
+
+  /* Modal paddings & radius */
+  --modal-pad: 16px;
+  --modal-pad-sm: 12px;
+  --modal-pad-lg: 24px;
+  --modal-radius: 16px;
+  --modal-radius-lg: 20px;
+
+  /* Overlay & motion */
+  --overlay-bg: rgba(0, 0, 0, 0.5);
+  --overlay-bg-heavy: rgba(0, 0, 0, 0.7);
+  --modal-anim-ms: 180ms;
+  --modal-anim-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Safe area & viewport units */
+  --safe-bottom: env(safe-area-inset-bottom);
+  --safe-top: env(safe-area-inset-top);
+  --safe-left: env(safe-area-inset-left);
+  --safe-right: env(safe-area-inset-right);
+
+  /* Drawer & sheet dimensions */
+  --drawer-w: min(38vw, 520px);
+  --drawer-w-mobile: 85vw;
+  --sheet-max-h: min(90dvh, 80vh);
 }
 
-/* Responsive page spacing - Reddit-style minimal gutters with max-width container */
+/* Responsive design tokens - 반응형 여백 관리 */
+@media (min-width: 768px) {
+  :root {
+    --edge-x: 24px;
+    --main-gap: 28px;
+    --header-h: 72px;
+
+    /* Modal responsive adjustments */
+    --modal-pad: 20px;
+    --modal-pad-lg: 32px;
+    --drawer-w: min(35vw, 480px);
+  }
+}
+
 @media (min-width: 1024px) {
   :root {
-    --space-page-x: 1.5rem;
+    --edge-x: 32px;
+    --main-gap: 32px;
+    --space-page-x: var(--edge-x);
   }
 }
 
 @media (min-width: 1280px) {
   :root {
-    --space-page-x: 2rem;
+    --edge-x: 40px;
+    --main-gap: 36px;
+    --sidebar-right-w: 336px;
+    --space-page-x: var(--edge-x);
   }
 }
 
@@ -157,6 +222,98 @@
   .page-x-spacing {
     padding-inline: var(--space-page-x);
   }
+
+  /* Layout utility classes */
+  .layout-edge {
+    padding-left: var(--edge-x);
+    padding-right: var(--edge-x);
+  }
+
+  .layout-edge--dense {
+    padding-left: var(--edge-x-dense);
+    padding-right: var(--edge-x-dense);
+  }
+
+  /* Layout debugging helper */
+  [data-layout-debug='1'] [data-role] {
+    outline: 1px dashed rgba(234, 253, 102, 0.3);
+    background: rgba(234, 253, 102, 0.05);
+  }
+
+  [data-layout-debug='1'] [data-role='primary'] {
+    outline-color: rgba(34, 197, 94, 0.5);
+    background: rgba(34, 197, 94, 0.05);
+  }
+
+  [data-layout-debug='1'] [data-role*='dense'] {
+    outline-color: rgba(239, 68, 68, 0.5);
+    background: rgba(239, 68, 68, 0.05);
+  }
+
+  /* Modal utility classes */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--overlay-bg);
+    z-index: var(--z-overlay);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    pointer-events: auto;
+    cursor: pointer;
+  }
+
+  .modal-overlay--heavy {
+    background: var(--overlay-bg-heavy);
+  }
+
+  .modal-content {
+    border-radius: var(--modal-radius);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    z-index: var(--z-modal);
+    pointer-events: auto;
+    cursor: default;
+  }
+
+  .modal-content--lg {
+    border-radius: var(--modal-radius-lg);
+  }
+
+  /* Modal animations */
+  .modal-enter {
+    animation: modalEnter var(--modal-anim-ms) var(--modal-anim-spring);
+  }
+
+  .modal-exit {
+    animation: modalExit var(--modal-anim-ms) ease-out;
+  }
+
+  .sheet-enter {
+    animation: sheetEnter var(--modal-anim-ms) var(--modal-anim-spring);
+  }
+
+  .sheet-exit {
+    animation: sheetExit var(--modal-anim-ms) ease-out;
+  }
+
+  .drawer-enter {
+    animation: drawerEnter var(--modal-anim-ms) var(--modal-anim-spring);
+  }
+
+  .drawer-exit {
+    animation: drawerExit var(--modal-anim-ms) ease-out;
+  }
+
+  /* Safe area utilities */
+  .safe-area-bottom {
+    padding-bottom: max(var(--safe-bottom), 16px);
+  }
+
+  .safe-area-all {
+    padding-top: max(var(--safe-top), 16px);
+    padding-bottom: max(var(--safe-bottom), 16px);
+    padding-left: max(var(--safe-left), 16px);
+    padding-right: max(var(--safe-right), 16px);
+  }
 }
 
 /* Kinetic Typography Variables */
@@ -244,6 +401,73 @@
   100% {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+/* Modal-specific animations */
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes modalExit {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+}
+
+@keyframes sheetEnter {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sheetExit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+
+@keyframes drawerEnter {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes drawerExit {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
   }
 }
 

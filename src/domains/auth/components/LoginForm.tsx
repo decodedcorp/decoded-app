@@ -19,15 +19,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
   const popupRef = useRef<Window | null>(null);
   const messageHandledRef = useRef(false);
 
-  // 디버깅용 로그
-  console.log('LoginForm translation test:', {
-    agreementText: t.login.agreementText(),
-    continueWithGoogle: t.login.continueWithGoogle(),
-    signingIn: t.login.signingIn(),
-    rawAgreementText: t.login.agreementText(),
-    isFunction: typeof t.login.agreementText,
-  });
-
   // 팝업 창에서 OAuth 완료 후 메시지 수신
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -129,6 +120,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
   }, [isAuthenticated, onSuccess]);
 
   const handleGoogleLogin = async () => {
+    console.log('🔘 Google login button clicked!');
     try {
       messageHandledRef.current = false;
 
@@ -193,9 +185,17 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
     <div className="w-full space-y-6">
       {/* Google OAuth Button */}
       <button
-        onClick={handleGoogleLogin}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handleGoogleLogin();
+        }}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
         disabled={isFormLoading}
-        className="w-full flex justify-center items-center px-6 py-4 border border-white/20 rounded-xl shadow-lg text-base font-medium text-white bg-white/10 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#EAFD66] focus:ring-offset-black/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 backdrop-blur-sm hover:scale-[1.02] active:scale-[0.98]"
+        className="w-full flex justify-center items-center px-6 py-4 border border-white/20 rounded-xl shadow-lg text-base font-medium text-white bg-white/10 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#EAFD66] focus:ring-offset-black/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 backdrop-blur-sm hover:scale-[1.02] active:scale-[0.98] relative z-10"
       >
         {isFormLoading ? (
           <div className="flex items-center">
