@@ -23,8 +23,8 @@ export class ResponseMapper {
       console.log('[ResponseMapper] Response keys:', Object.keys(data));
     }
 
-    // 다양한 응답 구조 처리
-    let accessTokenData = data.access_token;
+    // 새로운 백엔드 응답 구조 처리
+    let accessTokenData: any;
     let userData = data.user;
     let refreshToken = data.refresh_token || '';
 
@@ -33,15 +33,13 @@ export class ResponseMapper {
       refreshToken = '';
     }
 
-    // access_token이 문자열인 경우 객체로 변환
-    if (typeof accessTokenData === 'string') {
-      accessTokenData = {
-        salt: '',
-        user_doc_id: '',
-        access_token: accessTokenData,
-        has_sui_address: false,
-      };
-    }
+    // 새로운 구조: 최상위 레벨에 access_token 관련 필드들이 있음
+    accessTokenData = {
+      salt: data.salt || '',
+      user_doc_id: data.user_doc_id || '',
+      access_token: data.access_token || '',
+      has_sui_address: data.has_sui_address || false,
+    };
 
     // user 데이터가 없는 경우 기본값 설정
     if (!userData) {
@@ -65,6 +63,11 @@ export class ResponseMapper {
       } else if (accessTokenData.user_doc_id) {
         userData.doc_id = accessTokenData.user_doc_id;
       }
+    }
+
+    // 여전히 doc_id가 없는 경우 access_token에서 가져오기
+    if (!userData.doc_id && accessTokenData.user_doc_id) {
+      userData.doc_id = accessTokenData.user_doc_id;
     }
 
     // nickname이 없는 경우 다른 필드에서 찾기

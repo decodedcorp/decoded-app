@@ -1,6 +1,7 @@
 import { hash } from '@/lib/utils/hash';
 
 import { UsersService } from '../../../api/generated/services/UsersService';
+import { BackendLoginResponse } from '../types/auth';
 
 export interface GoogleTokenData {
   access_token: string;
@@ -28,18 +29,6 @@ export interface BackendLoginRequest {
   sui_address?: string; // 스모크 테스트를 위해 선택적으로 변경
   email: string;
   marketing: boolean;
-}
-
-export interface BackendLoginResponse {
-  access_token: {
-    salt: string;
-    user_doc_id: string;
-    access_token: string;
-    has_sui_address: boolean;
-  };
-  token_type: string;
-  refresh_token?: string;
-  user?: any;
 }
 
 export class GoogleAuthApi {
@@ -218,7 +207,7 @@ export class GoogleAuthApi {
     if (!backendData.user) {
       // 백엔드 응답에 user 객체가 없는 경우 생성
       return {
-        doc_id: backendData.access_token?.user_doc_id || null,
+        doc_id: backendData.user_doc_id || null,
         email: email,
         nickname: extractedName,
         role: 'user',
@@ -230,6 +219,12 @@ export class GoogleAuthApi {
       if (!backendData.user.nickname && !backendData.user.name) {
         backendData.user.nickname = extractedName;
       }
+
+      // doc_id가 없는 경우 최상위 user_doc_id에서 가져오기
+      if (!backendData.user.doc_id && backendData.user_doc_id) {
+        backendData.user.doc_id = backendData.user_doc_id;
+      }
+
       return backendData.user;
     }
   }

@@ -18,14 +18,13 @@ export interface LoginResponse {
 
 // 백엔드 응답 타입 (실제 API 응답 구조)
 export interface BackendLoginResponse {
-  access_token:
-    | {
-        salt?: string;
-        user_doc_id?: string;
-        access_token: string;
-        has_sui_address?: boolean;
-      }
-    | string; // access_token이 문자열일 수도 있음
+  // 실제 백엔드 응답 구조에 맞춤
+  salt: string;
+  user_doc_id: string;
+  access_token: string;
+  has_sui_address: boolean;
+  aka?: string;
+  token_type?: string;
   refresh_token?: string;
   user?: {
     doc_id?: string;
