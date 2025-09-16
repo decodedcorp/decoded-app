@@ -1,0 +1,98 @@
+/**
+ * Modal System Tokens
+ * 중앙 집중식 모달 크기 및 스타일 관리
+ */
+
+:root {
+  /* Modal Sizes */
+  --modal-max-w: 56rem; /* 896px - 기본 모달 */
+  --modal-max-w-wide: 75rem; /* 1200px - WIDE 모달 */
+  --modal-max-w-small: 32rem; /* 512px - 작은 모달 */
+
+  /* Modal Spacing */
+  --modal-pad: 1rem; /* 16px */
+  --modal-pad-lg: 1.25rem; /* 20px */
+  --modal-gap: 1.5rem; /* 24px */
+
+  /* Modal Z-Index */
+  --z-modal-overlay: 60;
+  --z-modal-content: 61;
+  --z-modal-header: 62;
+
+  /* Modal Animation */
+  --modal-transition: 200ms ease-out;
+  --modal-scale-in: scale(0.95);
+  --modal-scale-out: scale(1.05);
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --modal-pad: 1.25rem; /* 20px */
+    --modal-pad-lg: 1.5rem; /* 24px */
+  }
+}
+
+/* Modal Size Variants */
+.modal-size-sm {
+  max-width: var(--modal-max-w-small);
+}
+
+.modal-size-md {
+  max-width: var(--modal-max-w);
+}
+
+.modal-size-wide {
+  max-width: var(--modal-max-w-wide);
+}
+
+/* Grid-based Centering */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal-overlay);
+  display: grid;
+  place-items: center;
+  padding: var(--modal-pad);
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+}
+
+.modal-content {
+  position: relative;
+  z-index: var(--z-modal-content);
+  pointer-events: auto;
+  width: min(90dvw, var(--modal-max-w));
+  max-height: 90dvh;
+  border-radius: 1rem;
+  background: rgb(24 24 27); /* zinc-900 */
+  border: 1px solid rgb(63 63 70 / 0.5); /* zinc-700/50 */
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  transform: var(--modal-scale-in);
+  transition: transform var(--modal-transition);
+}
+
+.modal-content.open {
+  transform: scale(1);
+}
+
+/* Scroll Lock Body */
+body.modal-open {
+  overflow: hidden;
+  padding-right: var(--scrollbar-width, 0px);
+}
+
+/* iOS Safari Fix */
+@supports (-webkit-touch-callout: none) {
+  .modal-content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) var(--modal-scale-in);
+  }
+
+  .modal-content.open {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
