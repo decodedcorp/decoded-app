@@ -31,7 +31,7 @@ export function BaseModal({
   children,
   className = '',
   overlayClassName = `fixed inset-0 bg-black/50 backdrop-blur-sm ${Z_INDEX_CLASSES.MODAL_OVERLAY}`,
-  contentClassName = `fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${Z_INDEX_CLASSES.MODAL_CONTENT}`,
+  contentClassName = `fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[95vw] sm:max-w-[90vw] md:max-w-[80vw] lg:max-w-[70vw] xl:max-w-[60vw] max-h-[90vh] sm:max-h-[85vh] md:max-h-[80vh] ${Z_INDEX_CLASSES.MODAL_CONTENT}`,
   showOverlay = true,
   closeOnOverlayClick = true,
   closeOnEscape = true,
@@ -114,7 +114,7 @@ export function BaseModal({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descId}
-        className={`relative ${Z_INDEX_CLASSES.MODAL_CONTENT} max-w-[95vw] sm:max-w-[90vw] md:max-w-[80vw] lg:max-w-[70vw] xl:max-w-[60vw] max-h-[90vh] sm:max-h-[85vh] md:max-h-[80vh] ${className}`}
+        className={`relative ${Z_INDEX_CLASSES.MODAL_CONTENT} ${contentClassName} ${className}`}
         // 모달 내부 클릭은 버블링 중단(backdrop 클릭 닫기와 충돌 방지)
         onClick={(e) => e.stopPropagation()}
       >
