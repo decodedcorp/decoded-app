@@ -40,7 +40,7 @@ export function MobileCommentsModal({ isOpen, onClose, content }: MobileComments
       // Only handle swipe on header area
       const target = e.target as HTMLElement;
       if (!target.closest('[data-swipe-handle]')) return;
-      
+
       startY = e.touches[0].clientY;
       isDragging = true;
     };
@@ -104,11 +104,8 @@ export function MobileCommentsModal({ isOpen, onClose, content }: MobileComments
   return (
     <div className="fixed inset-0 z-[9999] flex items-end justify-center">
       {/* Overlay */}
-      <div 
-        className="absolute inset-0 bg-black/20 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      
+      <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={onClose} />
+
       {/* Modal Content */}
       <div
         ref={modalRef}
