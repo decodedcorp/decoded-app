@@ -25,6 +25,9 @@ const buttonVariants = cva(
         // 로그인 버튼 전용 variant - MainFeed 필터 버튼 스타일 + 메인 컬러
         login:
           'text-[#EAFD66] hover:text-black hover:bg-[#EAFD66] border border-zinc-700 transition-colors cursor-pointer',
+        // 댓글 버튼 전용 variant - 테두리와 배경이 있는 floating 버튼
+        'comments-floating':
+          'bg-black/80 text-white border border-primary/30 hover:bg-black/90 hover:border-primary/50 shadow-2xl hover:shadow-[0_8px_32px_rgba(234,253,102,0.15)] backdrop-blur-md hover:backdrop-blur-lg transition-all duration-300',
       },
       size: {
         sm: 'h-8 px-3 text-sm',

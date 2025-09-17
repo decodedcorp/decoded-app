@@ -9,6 +9,7 @@ import {
   selectIsContentModalOpen,
   selectSelectedContent,
 } from '@/store/contentModalStore';
+import { useTranslation } from 'react-i18next';
 
 import { BaseModal } from '../base/BaseModal';
 import { ContentModalContainer } from '../base/ContentModalContainer';
@@ -22,6 +23,7 @@ export function ContentModal() {
   const content = useContentModalStore(selectSelectedContent);
   const closeModal = useContentModalStore((state) => state.closeModal);
   const [showMobileComments, setShowMobileComments] = useState(false);
+  const { t } = useTranslation('content');
 
   if (!content) return null;
 
@@ -44,12 +46,12 @@ export function ContentModal() {
             <div className="lg:hidden fixed bottom-6 right-6 z-10">
               <Button
                 onClick={() => setShowMobileComments(true)}
-                variant="primary"
-                className="rounded-full shadow-lg flex items-center space-x-2 px-4 py-3 min-h-[48px] touch-manipulation"
-                aria-label="Open comments"
+                variant="comments-floating"
+                className="rounded-full flex items-center space-x-2 px-5 py-3 min-h-[48px] touch-manipulation font-medium"
+                aria-label={t('comments.title')}
               >
                 <MessageCircle className="w-5 h-5" />
-                <span className="text-sm font-medium">Comments</span>
+                <span className="text-sm font-medium">{t('comments.title')}</span>
               </Button>
             </div>
           </ContentModalContainer>

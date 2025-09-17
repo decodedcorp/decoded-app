@@ -370,8 +370,8 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
           </div>
         )}
 
-        {/* Comments Section */}
-        <div className="min-h-0">
+        {/* Comments Section - Hidden on mobile, shown in separate modal */}
+        <div className="min-h-0 hidden lg:block">
           <CommentSection contentId={contentId} />
         </div>
       </div>

@@ -21,7 +21,11 @@
     "i18n:validate": "node scripts/validate-interpolation.js",
     "i18n:all": "yarn i18n:check && yarn i18n:validate && yarn i18n:prune",
     "i18n:ci": "yarn i18n:check && yarn i18n:validate",
-    "build:ci": "yarn i18n:ci && next build"
+    "build:ci": "yarn i18n:ci && next build",
+    "ui:build": "cd packages/ui && npx tsup",
+    "ui:dev": "cd packages/ui && npx tsup --watch",
+    "ui:version": "cd packages/ui && npm version patch",
+    "ui:deploy": "cd packages/ui && npx tsup && cd ../.. && npx yarn install"
   },
   "dependencies": {
     "@decoded/ui": "file:packages/ui",

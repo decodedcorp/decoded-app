@@ -1,11 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 // Re-export centralized hooks for consistency
-export { 
-  useCommonTranslation, 
-  useLanguageSwitch, 
-  useLocaleStatus 
-} from './centralizedHooks';
+export { useCommonTranslation, useLanguageSwitch, useLocaleStatus } from './centralizedHooks';
 
 export const useAuthTranslation = () => {
   const { t } = useTranslation('auth');
@@ -348,23 +344,35 @@ export const useInvitationTranslation = () => {
 };
 
 export const useCommentTranslation = () => {
-  const { t } = useTranslation('comments');
+  const { t } = useTranslation('content');
 
   return {
-    editor: {
-      placeholder: () => t('editor.placeholder'),
-      replyPlaceholder: () => t('editor.replyPlaceholder'),
+    input: {
+      placeholder: () => t('comments.input.placeholder'),
+      signInPrompt: () => t('comments.input.signInPrompt'),
+      signIn: () => t('comments.input.signIn'),
+      posting: () => t('comments.input.posting'),
+      reply: () => t('comments.input.reply'),
+      comment: () => t('comments.input.comment'),
+      save: () => t('comments.input.save'),
+      cancel: () => t('comments.input.cancel'),
+      charCount: (count: number) => t('comments.input.charCount', { count }),
+      shortcut: () => t('comments.input.shortcut'),
+      replyPlaceholder: () => t('comments.input.replyPlaceholder'),
     },
-    actions: {
-      save: () => t('actions.save'),
-      saving: () => t('actions.saving'),
-      cancel: () => t('actions.cancel'),
+    item: {
+      edit: () => t('comments.item.edit'),
+      delete: () => t('comments.item.delete'),
+      edited: () => t('comments.item.edited'),
+      reply: () => t('comments.item.reply'),
+      replies: (count: number) => t('comments.item.replies', { count }),
+      deleteConfirm: () => t('comments.item.deleteConfirm'),
     },
     time: {
-      now: () => t('time.now'),
-      minutesAgo: (minutes: number) => t('time.minutesAgo', { minutes }),
-      hoursAgo: (hours: number) => t('time.hoursAgo', { hours }),
-      daysAgo: (days: number) => t('time.daysAgo', { days }),
+      now: () => t('comments.time.now'),
+      minutesAgo: (minutes: number) => t('comments.time.minutesAgo', { minutes }),
+      hoursAgo: (hours: number) => t('comments.time.hoursAgo', { hours }),
+      daysAgo: (days: number) => t('comments.time.daysAgo', { days }),
     },
   };
 };

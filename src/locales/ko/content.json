@@ -5,7 +5,9 @@
     "noContent": "콘텐츠가 없어요",
     "noPreview": "미리보기가 없어요",
     "linkNoTitle": "링크 제목 없음",
-    "linkNoDescription": "설명이 없어요"
+    "linkNoDescription": "설명이 없어요",
+    "imageUrl": "이미지 URL",
+    "linkUrl": "링크 URL"
   },
   "states": {
     "loading": "콘텐츠를 불러오는 중...",
@@ -73,6 +75,7 @@
   },
   "comments": {
     "title": "댓글",
+    "close": "댓글 창 닫기",
     "count": "{{count}}개 댓글",
     "recent": "{{count}}개 최근",
     "replies": "{{count}}개 답글",
@@ -83,14 +86,41 @@
     },
     "empty": {
       "title": "아직 댓글이 없어요",
-      "subtitle": "첫 번째 댓글을 남겨보세요!"
+      "description": "첫 번째 댓글을 남겨보세요!"
     },
     "error": {
       "loadFailed": "댓글을 불러올 수 없어요",
       "tryAgain": "다시 시도"
     },
     "input": {
-      "placeholder": "댓글을 입력하세요..."
-    }
+      "placeholder": "댓글을 입력하세요...",
+      "signInPrompt": "로그인해서 대화에 참여하세요",
+      "signIn": "로그인",
+      "posting": "게시 중...",
+      "reply": "답글",
+      "comment": "댓글",
+      "save": "저장",
+      "cancel": "취소",
+      "charCount": "{{count}}/1000",
+      "shortcut": "Enter로 게시, Shift+Enter로 줄바꿈",
+      "replyPlaceholder": "답글을 입력하세요..."
+    },
+    "item": {
+      "edit": "편집",
+      "delete": "삭제",
+      "edited": "(수정됨)",
+      "reply": "답글",
+      "replies": "{{count}}개 답글",
+      "deleteConfirm": "이 댓글을 삭제하시겠어요?"
+    },
+    "time": {
+      "now": "방금 전",
+      "minutesAgo": "{{minutes}}분 전",
+      "hoursAgo": "{{hours}}시간 전",
+      "daysAgo": "{{days}}일 전"
+    },
+    "loadingMore": "댓글을 더 불러오는 중...",
+    "loadMore": "더 보기",
+    "noMore": "더 이상 댓글이 없어요"
   }
 }

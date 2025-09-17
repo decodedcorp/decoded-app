@@ -5,6 +5,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MdSend, MdClose } from 'react-icons/md';
 import { Button } from '@decoded/ui';
 import { useUser } from '@/domains/auth/hooks/useAuth';
+import { useCommentTranslation } from '@/lib/i18n/hooks';
 
 import { useCreateComment } from '../hooks/useComments';
 
@@ -21,15 +22,16 @@ export function CommentInput({
   contentId,
   parentCommentId,
   onCommentCreated,
-  placeholder = 'Write a comment...',
+  placeholder,
   compact = false,
-  autoFocus = false
+  autoFocus = false,
 }: CommentInputProps) {
   const { user } = useUser();
+  const tc = useCommentTranslation();
   const [text, setText] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  
+
   const createCommentMutation = useCreateComment();
 
   useEffect(() => {
@@ -48,7 +50,7 @@ export function CommentInput({
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    
+
     const trimmedText = text.trim();
     if (!trimmedText || createCommentMutation.isPending) return;
 
@@ -56,9 +58,9 @@ export function CommentInput({
       await createCommentMutation.mutateAsync({
         contentId,
         text: trimmedText,
-        parentCommentId
+        parentCommentId,
       });
-      
+
       setText('');
       setIsFocused(false);
       onCommentCreated?.();
@@ -83,9 +85,9 @@ export function CommentInput({
   if (!user) {
     return (
       <div className={`${compact ? 'p-3' : 'p-4'} text-center`}>
-        <p className="text-sm text-zinc-400 mb-2">Sign in to join the conversation</p>
+        <p className="text-sm text-zinc-400 mb-2">{tc.input.signInPrompt()}</p>
         <Button variant="primary" size="sm">
-          Sign In
+          {tc.input.signIn()}
         </Button>
       </div>
     );
@@ -97,7 +99,11 @@ export function CommentInput({
         {/* User avatar and input */}
         <div className="flex space-x-3">
           {/* User avatar */}
-          <div className={`${compact ? 'w-6 h-6' : 'w-8 h-8'} bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0`}>
+          <div
+            className={`${
+              compact ? 'w-6 h-6' : 'w-8 h-8'
+            } bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0`}
+          >
             <span className="text-white font-semibold text-xs">
               {(user.nickname || user.email || 'U').charAt(0).toUpperCase()}
             </span>
@@ -111,7 +117,7 @@ export function CommentInput({
               onChange={(e) => setText(e.target.value)}
               onFocus={() => setIsFocused(true)}
               onKeyDown={handleKeyDown}
-              placeholder={placeholder}
+              placeholder={placeholder || tc.input.placeholder()}
               rows={1}
               maxLength={1000}
               className={`w-full resize-none bg-zinc-800/50 border border-zinc-600 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
@@ -126,9 +132,10 @@ export function CommentInput({
         {(isFocused || text.trim()) && (
           <div className="flex items-center justify-between">
             <span className="text-xs text-zinc-400 ml-11">
-              {text.length}/1000 {!compact && '• Press Enter to post, Shift+Enter for new line'}
+              {tc.input.charCount(text.length)}
+              {!compact && ` • ${tc.input.shortcut()}`}
             </span>
-            
+
             <div className="flex space-x-2">
               {(isFocused || text.trim()) && (
                 <button
@@ -137,10 +144,10 @@ export function CommentInput({
                   className="flex items-center space-x-1 px-3 py-1.5 text-sm text-zinc-400 hover:text-white transition-colors"
                 >
                   <MdClose className="w-4 h-4" />
-                  {!compact && <span>Cancel</span>}
+                  {!compact && <span>{tc.input.cancel()}</span>}
                 </button>
               )}
-              
+
               <button
                 type="submit"
                 disabled={!text.trim() || createCommentMutation.isPending}
@@ -153,12 +160,11 @@ export function CommentInput({
                 )}
                 {!compact && (
                   <span>
-                    {createCommentMutation.isPending 
-                      ? 'Posting...' 
-                      : parentCommentId 
-                        ? 'Reply' 
-                        : 'Comment'
-                    }
+                    {createCommentMutation.isPending
+                      ? tc.input.posting()
+                      : parentCommentId
+                      ? tc.input.reply()
+                      : tc.input.comment()}
                   </span>
                 )}
               </button>

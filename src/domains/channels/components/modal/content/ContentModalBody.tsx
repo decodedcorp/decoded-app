@@ -2,6 +2,7 @@ import React from 'react';
 
 import { ContentItem } from '@/lib/types/content';
 import { ProxiedImage } from '@/components/ProxiedImage';
+import { useTranslation } from 'react-i18next';
 
 import { SummarySection } from './SummarySection';
 import { InteractiveQASection } from './InteractiveQASection';
@@ -51,12 +52,14 @@ const ImageDisplay = ({
   downloadedSrc,
   showInfo = true,
   fullHeight = false,
+  t,
 }: {
   src: string;
   alt: string;
   downloadedSrc?: string;
   showInfo?: boolean;
   fullHeight?: boolean;
+  t: (key: string) => string;
 }) => (
   <div className={`${fullHeight ? 'h-full flex flex-col' : 'space-y-4 sm:space-y-6'}`}>
     <div
@@ -80,13 +83,17 @@ const ImageDisplay = ({
       <div className="bg-zinc-800/40 rounded-xl p-4 sm:p-6 border border-zinc-700/40">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <p className="text-sm sm:text-base font-medium text-zinc-400 mb-3">Image URL:</p>
+            <p className="text-sm sm:text-base font-medium text-zinc-400 mb-3">
+              {t('metadata.imageUrl')}:
+            </p>
             <p className="text-[#EAFD66] text-xs sm:text-sm break-all font-mono bg-zinc-900/50 p-3 rounded-lg leading-relaxed">
               {src}
             </p>
           </div>
           <div className="flex-shrink-0 sm:ml-6">
-            <ActionButton onClick={() => window.open(src, '_blank')}>Open Image</ActionButton>
+            <ActionButton onClick={() => window.open(src, '_blank')}>
+              {t('actions.view')}
+            </ActionButton>
           </div>
         </div>
       </div>
@@ -117,6 +124,8 @@ const SectionHeader = ({
 );
 
 export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
+  const { t } = useTranslation('content');
+
   // 디버깅을 위한 콘솔 로그
   console.log('ContentModalBody - content:', content);
   console.log('ContentModalBody - content.type:', content.type);
@@ -131,7 +140,7 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
           <button
             onClick={onClose}
             className="flex items-center justify-center w-12 h-12 sm:w-10 sm:h-10 rounded-full bg-zinc-800/40 hover:bg-zinc-700/60 transition-all duration-300 group touch-manipulation"
-            aria-label="Close modal"
+            aria-label={t('actions.close')}
           >
             <svg
               width="20"
@@ -172,6 +181,7 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
                 alt={content.title}
                 fullHeight={true}
                 showInfo={false}
+                t={t}
               />
             ) : (
               /* 이미지 URL이 없는 경우 기본 카드 표시 */
@@ -223,7 +233,7 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div className="flex-1 min-w-0">
                           <p className="text-sm sm:text-base font-medium text-zinc-400 mb-3">
-                            Link URL:
+                            {t('metadata.linkUrl')}:
                           </p>
                           <p className="text-[#EAFD66] text-xs sm:text-sm break-all font-mono bg-zinc-900/50 p-3 rounded-lg leading-relaxed">
                             {content.linkUrl}
@@ -231,7 +241,7 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
                         </div>
                         <div className="flex-shrink-0 sm:ml-6">
                           <ActionButton onClick={() => window.open(content.linkUrl, '_blank')}>
-                            Open Link
+                            {t('actions.view')}
                           </ActionButton>
                         </div>
                       </div>
@@ -252,7 +262,11 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
             {/* 1. AI Generated Summary - 맨 위 (Mobile only) */}
             {content.aiSummary && (
               <div className="block lg:hidden">
-                <SummarySection title="Summary" summary={content.aiSummary} onClose={onClose} />
+                <SummarySection
+                  title={t('sidebar.summary')}
+                  summary={content.aiSummary}
+                  onClose={onClose}
+                />
               </div>
             )}
 
@@ -276,7 +290,7 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
             {/* 3. Interactive Q&A Section - 아래 (Mobile only) */}
             {content.aiQaList && content.aiQaList.length > 0 && (
               <div className="block lg:hidden">
-                <InteractiveQASection qaList={content.aiQaList} title="Q&A" />
+                <InteractiveQASection qaList={content.aiQaList} title={t('sidebar.qa')} />
               </div>
             )}
           </div>
@@ -285,14 +299,18 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
         {/* AI Generated Summary for non-link content (Mobile only) */}
         {content.type !== 'link' && content.aiSummary && (
           <div className="block lg:hidden">
-            <SummarySection title="Summary" summary={content.aiSummary} onClose={onClose} />
+            <SummarySection
+              title={t('sidebar.summary')}
+              summary={content.aiSummary}
+              onClose={onClose}
+            />
           </div>
         )}
 
         {/* Interactive Q&A Section for non-link content (Mobile only) */}
         {content.type !== 'link' && content.aiQaList && content.aiQaList.length > 0 && (
           <div className="block lg:hidden">
-            <InteractiveQASection qaList={content.aiQaList} title="Q&A" />
+            <InteractiveQASection qaList={content.aiQaList} title={t('sidebar.qa')} />
           </div>
         )}
       </div>

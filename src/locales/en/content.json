@@ -5,7 +5,9 @@
     "noContent": "No content",
     "noPreview": "No preview",
     "linkNoTitle": "No link title",
-    "linkNoDescription": "No description"
+    "linkNoDescription": "No description",
+    "imageUrl": "Image URL",
+    "linkUrl": "Link URL"
   },
   "states": {
     "loading": "Loading content...",
@@ -73,6 +75,7 @@
   },
   "comments": {
     "title": "Comments",
+    "close": "Close comments",
     "count": "{{count}} comments",
     "recent": "{{count}} recent",
     "replies": "{{count}} replies",
@@ -83,14 +86,41 @@
     },
     "empty": {
       "title": "No comments yet",
-      "subtitle": "Be the first to share your thoughts!"
+      "description": "Be the first to share your thoughts!"
     },
     "error": {
       "loadFailed": "Failed to load comments",
       "tryAgain": "Try again"
     },
     "input": {
-      "placeholder": "Add a comment..."
-    }
+      "placeholder": "Add a comment...",
+      "signInPrompt": "Sign in to join the conversation",
+      "signIn": "Sign In",
+      "posting": "Posting...",
+      "reply": "Reply",
+      "comment": "Comment",
+      "save": "Save",
+      "cancel": "Cancel",
+      "charCount": "{{count}}/1000",
+      "shortcut": "Press Enter to post, Shift+Enter for new line",
+      "replyPlaceholder": "Write a reply..."
+    },
+    "item": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "edited": "(edited)",
+      "reply": "Reply",
+      "replies": "{{count}} replies",
+      "deleteConfirm": "Are you sure you want to delete this comment?"
+    },
+    "time": {
+      "now": "now",
+      "minutesAgo": "{{minutes}}m ago",
+      "hoursAgo": "{{hours}}h ago",
+      "daysAgo": "{{days}}d ago"
+    },
+    "loadingMore": "Loading more comments...",
+    "loadMore": "Load more",
+    "noMore": "No more comments"
   }
 }
