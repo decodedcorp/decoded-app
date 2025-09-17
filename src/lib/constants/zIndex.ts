@@ -25,6 +25,10 @@ export const Z_INDEX_TOKENS = {
   // Legacy compatibility (기존 코드 호환)
   'modal-legacy': 1000,
   'content-modal': 1100,
+  
+  // 새로운 댓글 시스템 (기존 모달보다 위에 표시)
+  'comments-modal': 1200,
+  'comments-sheet': 1200,
 
   // System overlays
   popover: 70,
@@ -90,5 +94,12 @@ export const Z_INDEX_CLASSES = {
   MODAL_CONTENT: 'z-[1010]',
   CONTENT_MODAL_OVERLAY: 'z-[1100]',
   CONTENT_MODAL_CONTENT: 'z-[1110]',
+  
+  // 새로운 댓글 시스템
+  COMMENTS_MODAL_OVERLAY: 'z-[1200]',
+  COMMENTS_MODAL_CONTENT: 'z-[1210]',
+  COMMENTS_SHEET_OVERLAY: 'z-[1200]',
+  COMMENTS_SHEET_CONTENT: 'z-[1210]',
+  
   DEBUG: 'z-[99]',
 } as const;

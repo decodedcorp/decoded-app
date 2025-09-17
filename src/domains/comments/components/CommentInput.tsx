@@ -16,6 +16,7 @@ interface CommentInputProps {
   placeholder?: string;
   compact?: boolean;
   autoFocus?: boolean;
+  onLoginRequired?: () => void;
 }
 
 export function CommentInput({
@@ -25,6 +26,7 @@ export function CommentInput({
   placeholder,
   compact = false,
   autoFocus = false,
+  onLoginRequired,
 }: CommentInputProps) {
   const { user } = useUser();
   const tc = useCommentTranslation();
@@ -86,7 +88,7 @@ export function CommentInput({
     return (
       <div className={`${compact ? 'p-3' : 'p-4'} text-center`}>
         <p className="text-sm text-zinc-400 mb-2">{tc.input.signInPrompt()}</p>
-        <Button variant="primary" size="sm">
+        <Button variant="primary" size="sm" onClick={onLoginRequired}>
           {tc.input.signIn()}
         </Button>
       </div>

@@ -13,9 +13,14 @@ import { CommentInput } from './CommentInput';
 interface CommentSectionProps {
   contentId: string;
   showHeader?: boolean;
+  onLoginRequired?: () => void;
 }
 
-export function CommentSection({ contentId, showHeader = true }: CommentSectionProps) {
+export function CommentSection({
+  contentId,
+  showHeader = true,
+  onLoginRequired,
+}: CommentSectionProps) {
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest' | 'most_liked'>('newest');
 
   // Translation hook
@@ -36,10 +41,10 @@ export function CommentSection({ contentId, showHeader = true }: CommentSectionP
   };
 
   return (
-    <div className="flex flex-col h-full relative z-[10003]">
+    <div className="flex flex-col h-full relative">
       {/* Comments Header - Only show if showHeader is true */}
       {showHeader && (
-        <div className="p-4 border-b border-zinc-700/50 relative z-[10004]">
+        <div className="p-4 border-b border-zinc-700/50 relative">
           <div className="mb-2">
             <h3 className="text-base font-medium text-white mb-1">{t('comments.title')}</h3>
             {!statsLoading && stats?.total_comments !== undefined && (
@@ -85,7 +90,7 @@ export function CommentSection({ contentId, showHeader = true }: CommentSectionP
       )}
 
       {/* Comments List */}
-      <div className="flex-1 min-h-0 overflow-y-auto relative z-[10004]">
+      <div className="flex-1 min-h-0 overflow-y-auto relative">
         {error ? (
           <div className="p-4 text-center text-red-400">
             <p className="text-sm">{t('comments.error.loadFailed')}</p>
@@ -118,11 +123,12 @@ export function CommentSection({ contentId, showHeader = true }: CommentSectionP
       </div>
 
       {/* Comment Input */}
-      <div className="border-t border-zinc-700/50 relative z-[10005]">
+      <div className="border-t border-zinc-700/50 relative">
         <CommentInput
           contentId={contentId}
           onCommentCreated={() => refetch()}
           placeholder={t('comments.input.placeholder')}
+          onLoginRequired={onLoginRequired}
         />
       </div>
     </div>
