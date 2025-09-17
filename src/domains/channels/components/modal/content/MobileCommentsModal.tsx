@@ -112,45 +112,50 @@ export function MobileCommentsModal({ isOpen, onClose, content }: MobileComments
       ariaLabel={t('comments.title')}
     >
       <ModalOverlay className="bg-black/20 backdrop-blur-sm">
-        <div
-          ref={modalRef}
-          className="bg-zinc-900 shadow-2xl max-h-[70vh] w-full sm:max-w-4xl lg:max-w-6xl mx-auto flex flex-col rounded-t-2xl transform transition-transform duration-300 ease-out"
-        >
-          {/* Header with swipe handle */}
-          <div 
-            data-swipe-handle
-            className="bg-zinc-900 flex-shrink-0 px-4 py-4 border-b border-zinc-700/30 cursor-grab active:cursor-grabbing"
+        <ModalContent className="bg-zinc-900 shadow-2xl max-h-[70vh] w-full sm:max-w-4xl lg:max-w-6xl mx-auto flex flex-col rounded-t-2xl transform transition-transform duration-300 ease-out border-0 p-0">
+          <div
+            ref={modalRef}
+            className="flex flex-col h-full"
           >
-            {/* Swipe indicator */}
-            <div className="flex justify-center mb-4">
-              <div className="w-10 h-1 bg-zinc-500 rounded-full"></div>
-            </div>
-
-            {/* Header content */}
-            <div className="flex items-center justify-between w-full">
-              <div className="flex items-center space-x-3">
-                <h2 className="text-xl font-bold text-white">{t('comments.title')}</h2>
-                <span className="text-sm text-zinc-300 bg-zinc-700/50 px-3 py-1 rounded-full">
-                  {(content as any).comments_count || 0}
-                </span>
+            {/* Header with swipe handle */}
+            <div 
+              data-swipe-handle
+              className="bg-zinc-900 flex-shrink-0 px-4 py-4 border-b border-zinc-700/30 cursor-grab active:cursor-grabbing"
+            >
+              {/* Swipe indicator */}
+              <div className="flex justify-center mb-4">
+                <div className="w-10 h-1 bg-zinc-500 rounded-full"></div>
               </div>
-              <button
-                onClick={() => onClose()}
-                className="flex items-center justify-center w-12 h-12 rounded-full bg-zinc-800/80 hover:bg-zinc-700/80 transition-all duration-200 group touch-manipulation active:scale-95"
-                aria-label={t('comments.close')}
-              >
-                <MdClose className="w-6 h-6 text-zinc-300 group-hover:text-white" />
-              </button>
-            </div>
-          </div>
 
-          {/* Body with optimized scrolling */}
-          <div className="flex-1 min-h-0 p-0 overflow-hidden">
-            <div className="h-full overflow-y-auto">
-              <CommentSection contentId={String(content.id)} showHeader={false} />
+              {/* Header content */}
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center space-x-3">
+                  <h2 className="text-xl font-bold text-white">{t('comments.title')}</h2>
+                  <span className="text-sm text-zinc-300 bg-zinc-700/50 px-3 py-1 rounded-full">
+                    {(content as any).comments_count || 0}
+                  </span>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onClose();
+                  }}
+                  className="flex items-center justify-center w-12 h-12 rounded-full bg-zinc-800/80 hover:bg-zinc-700/80 transition-all duration-200 group touch-manipulation active:scale-95"
+                  aria-label={t('comments.close')}
+                >
+                  <MdClose className="w-6 h-6 text-zinc-300 group-hover:text-white" />
+                </button>
+              </div>
+            </div>
+
+            {/* Body with optimized scrolling */}
+            <div className="flex-1 min-h-0 p-0 overflow-hidden">
+              <div className="h-full overflow-y-auto">
+                <CommentSection contentId={String(content.id)} showHeader={false} />
+              </div>
             </div>
           </div>
-        </div>
+        </ModalContent>
       </ModalOverlay>
     </Modal>
   );
