@@ -87,7 +87,9 @@ export function CommentInput({
     return (
       <div className={`${compact ? 'p-3' : 'p-4'} text-center`}>
         <p className="text-sm text-zinc-400 mb-3">{tc.input.signInPrompt()}</p>
-        <LoginButton />
+        <div className="flex justify-center">
+          <LoginButton />
+        </div>
       </div>
     );
   }

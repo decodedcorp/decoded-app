@@ -265,7 +265,7 @@ export function CommentItem({
                 )}
               </>
             ) : (
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center justify-center space-x-2">
                 <span className="text-zinc-500 text-xs">로그인하여 상호작용</span>
                 <LoginButton />
               </div>

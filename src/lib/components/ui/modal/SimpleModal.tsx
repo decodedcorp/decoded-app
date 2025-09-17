@@ -42,7 +42,7 @@ export function SimpleModal({ isOpen, onClose, children, className = '' }: Simpl
   const modal = (
     <div
       ref={modalRef}
-      className={`fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 ${className}`}
+      className={`fixed inset-0 z-[2000] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 ${className}`}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           onClose();
