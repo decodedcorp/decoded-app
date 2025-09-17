@@ -71,7 +71,14 @@ export function CommentItem({
 
   // Handle like/dislike actions
   const handleLike = () => {
-    if (!user) return;
+    if (!user) {
+      // Show login modal
+      const loginButton = document.querySelector('[data-login-button]') as HTMLButtonElement;
+      if (loginButton) {
+        loginButton.click();
+      }
+      return;
+    }
     commentLikeMutation.mutate({
       commentId: comment.id,
       action: 'like',
@@ -80,7 +87,14 @@ export function CommentItem({
   };
 
   const handleDislike = () => {
-    if (!user) return;
+    if (!user) {
+      // Show login modal
+      const loginButton = document.querySelector('[data-login-button]') as HTMLButtonElement;
+      if (loginButton) {
+        loginButton.click();
+      }
+      return;
+    }
     commentLikeMutation.mutate({
       commentId: comment.id,
       action: 'dislike',
@@ -231,44 +245,45 @@ export function CommentItem({
         {/* Comment actions */}
         {!isEditing && (
           <div className="flex items-center space-x-4 text-xs">
-            {user ? (
-              <>
-                {/* Like button */}
-                <button
-                  onClick={handleLike}
-                  disabled={commentLikeMutation.isPending}
-                  className="flex items-center space-x-1 text-zinc-400 hover:text-red-400 transition-colors"
-                >
-                  <MdFavoriteBorder className="w-4 h-4" />
-                  <span>{comment.likes || 0}</span>
-                </button>
+            {/* Like button */}
+            <button
+              onClick={handleLike}
+              disabled={commentLikeMutation.isPending}
+              className="flex items-center space-x-1 text-zinc-400 hover:text-red-400 transition-colors"
+            >
+              <MdFavoriteBorder className="w-4 h-4" />
+              <span>{comment.likes || 0}</span>
+            </button>
 
-                {/* Dislike button */}
-                <button
-                  onClick={handleDislike}
-                  disabled={commentLikeMutation.isPending}
-                  className="flex items-center space-x-1 text-zinc-400 hover:text-blue-400 transition-colors"
-                >
-                  <MdThumbDownOffAlt className="w-4 h-4" />
-                  <span>{comment.dislikes || 0}</span>
-                </button>
+            {/* Dislike button */}
+            <button
+              onClick={handleDislike}
+              disabled={commentLikeMutation.isPending}
+              className="flex items-center space-x-1 text-zinc-400 hover:text-blue-400 transition-colors"
+            >
+              <MdThumbDownOffAlt className="w-4 h-4" />
+              <span>{comment.dislikes || 0}</span>
+            </button>
 
-                {/* Reply button (only for top-level comments) */}
-                {!isReply && (
-                  <button
-                    onClick={() => setShowReplyInput(!showReplyInput)}
-                    className="flex items-center space-x-1 text-zinc-400 hover:text-white transition-colors"
-                  >
-                    <MdReply className="w-4 h-4" />
-                    <span>{tc.item.reply()}</span>
-                  </button>
-                )}
-              </>
-            ) : (
-              <div className="flex items-center justify-center space-x-2">
-                <span className="text-zinc-500 text-xs">로그인하여 상호작용</span>
-                <LoginButton />
-              </div>
+            {/* Reply button (only for top-level comments) */}
+            {!isReply && (
+              <button
+                onClick={() => {
+                  if (!user) {
+                    // Show login modal
+                    const loginButton = document.querySelector('[data-login-button]') as HTMLButtonElement;
+                    if (loginButton) {
+                      loginButton.click();
+                    }
+                    return;
+                  }
+                  setShowReplyInput(!showReplyInput);
+                }}
+                className="flex items-center space-x-1 text-zinc-400 hover:text-white transition-colors"
+              >
+                <MdReply className="w-4 h-4" />
+                <span>{tc.item.reply()}</span>
+              </button>
             )}
 
             {/* Reply count */}

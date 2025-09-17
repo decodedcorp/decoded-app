@@ -47,7 +47,7 @@ export function LoginButton() {
         {isAuthenticated ? (
           <UserAvatar size="md" showDropdown={true} />
         ) : (
-          <Button onClick={handleClick} variant="login" size="sm">
+          <Button onClick={handleClick} variant="login" size="sm" data-login-button>
             {t.login.title()}
           </Button>
         )}

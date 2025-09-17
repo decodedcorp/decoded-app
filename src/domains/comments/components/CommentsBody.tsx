@@ -11,7 +11,7 @@ interface CommentsBodyProps {
 
 export function CommentsBody({ contentId, showHeader = true, className = '' }: CommentsBodyProps) {
   return (
-    <div 
+    <div
       className={`flex flex-col h-full ${className}`}
       onClick={(e) => {
         console.log('CommentsBody clicked:', e.target);
@@ -22,10 +22,7 @@ export function CommentsBody({ contentId, showHeader = true, className = '' }: C
         e.stopPropagation();
       }}
     >
-      <CommentSection 
-        contentId={contentId} 
-        showHeader={showHeader}
-      />
+      <CommentSection contentId={contentId} showHeader={showHeader} />
     </div>
   );
 }
