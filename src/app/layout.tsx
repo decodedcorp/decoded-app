@@ -15,6 +15,7 @@ import '../styles/design-alias.css';
 import '../styles/globals.css';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   title: 'Decoded App',
   description: 'AI-powered content discovery and curation platform',
   viewport: {

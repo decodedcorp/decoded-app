@@ -5,6 +5,7 @@ import React, { memo, useCallback, useMemo, useState, useEffect, useRef } from '
 import { useContentModalStore } from '@/store/contentModalStore';
 import { useContentSidebarStore } from '@/store/contentSidebarStore';
 import { ContentsCard } from '@/components/ContentsCard';
+import { ContentsCardLink } from '@/components/ContentsCardLink';
 import { useContentTranslation } from '@/lib/i18n/hooks';
 
 import { DEFAULT_CHANNEL_ID } from '../data/channelCardsProvider';
@@ -247,11 +248,7 @@ export function SimpleThiingsGrid({
       );
       console.log(' [renderItem] handleCardClick toString:', handleCardClick?.toString());
 
-      // 카드 클릭 핸들러를 인라인으로 정의하여 함수 참조 문제 해결
-      const cardClickHandler = (card: any) => {
-        console.log(' [renderItem] Inline cardClickHandler called with:', card);
-        handleCardClick(card);
-      };
+      // ContentsCardLink가 네비게이션을 처리하므로 카드 클릭 핸들러 불필요
 
       // 카드가 없는 경우 테스트용 카드 생성
       // if (cards.length === 0) {
@@ -290,18 +287,20 @@ export function SimpleThiingsGrid({
       const isBlurred = isSidebarOpen && selectedCardId !== card.id;
 
       return (
-        <ContentsCard
+        <ContentsCardLink
+          channelId={channelId}
           card={card}
           isMoving={isMoving}
-          onCardClick={cardClickHandler}
           isSelected={isSelected}
           isBlurred={isBlurred}
           uniqueId={uniqueCardId}
           gridIndex={gridIndex}
+          prefetchOnHover={true}
+          prefetchOnViewport={false}
         />
       );
     },
-    [cards, handleCardClick, isSidebarOpen, selectedCardId], // 사이드바 상태 의존성 추가
+    [cards, channelId, isSidebarOpen, selectedCardId], // ContentsCardLink 의존성
   );
 
   // 로딩 상태 렌더링
