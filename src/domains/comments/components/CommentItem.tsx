@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 
-import { Button } from '@decoded/ui';
+import { Button, Avatar } from '@decoded/ui';
 import {
   MdFavorite,
   MdFavoriteBorder,
@@ -16,6 +16,7 @@ import {
 import { CommentResponse } from '@/api/generated/models/CommentResponse';
 import { useUser } from '@/domains/auth/hooks/useAuth';
 import { useCommentTranslation } from '@/lib/i18n/hooks';
+import { useUserProfile } from '@/domains/users/hooks/useUserProfile';
 
 import { useCommentLike, useUpdateComment, useDeleteComment } from '../hooks/useComments';
 import { LoginButton } from '@/shared/components/LoginButton';
@@ -45,6 +46,9 @@ export function CommentItem({
   const updateCommentMutation = useUpdateComment();
   const deleteCommentMutation = useDeleteComment();
   const tc = useCommentTranslation();
+
+  // Get user profile for avatar
+  const { data: userProfile } = useUserProfile(comment.author_id);
 
   // Check if current user is the comment author
   const isAuthor = user?.doc_id === comment.author_id;
@@ -149,20 +153,19 @@ export function CommentItem({
   return (
     <div className={`flex space-x-3 ${isReply ? 'text-sm' : ''}`}>
       {/* Avatar */}
-      <div
-        className={`${
-          isReply ? 'w-6 h-6' : 'w-8 h-8'
-        } bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0`}
-      >
-        <span className="text-white font-semibold text-xs">
-          {comment.author_id.charAt(0).toUpperCase()}
-        </span>
-      </div>
+      <Avatar
+        userId={comment.author_id}
+        src={userProfile?.profile_image_url || undefined}
+        size={isReply ? 'sm' : 'md'}
+        className="flex-shrink-0"
+      />
 
       <div className="flex-1 min-w-0">
         {/* Comment header */}
         <div className="flex items-center space-x-2 mb-1">
-          <span className="font-medium text-white text-sm truncate">{comment.author_id}</span>
+          <span className="font-medium text-white text-sm truncate">
+            {userProfile?.aka || comment.author_id}
+          </span>
           <span className="text-xs text-zinc-400 flex-shrink-0">
             {formatDate(comment.created_at)}
           </span>
@@ -209,7 +212,7 @@ export function CommentItem({
             <textarea
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
-              className="w-full p-2 text-sm bg-zinc-800/50 border border-zinc-600 rounded-lg text-white resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full p-2 text-sm bg-zinc-800/50 border border-zinc-600 rounded-lg text-white resize-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               rows={2}
               maxLength={1000}
             />
@@ -271,7 +274,9 @@ export function CommentItem({
                 onClick={() => {
                   if (!user) {
                     // Show login modal
-                    const loginButton = document.querySelector('[data-login-button]') as HTMLButtonElement;
+                    const loginButton = document.querySelector(
+                      '[data-login-button]',
+                    ) as HTMLButtonElement;
                     if (loginButton) {
                       loginButton.click();
                     }
@@ -287,9 +292,9 @@ export function CommentItem({
             )}
 
             {/* Reply count */}
-            {!isReply && comment.replies_count && comment.replies_count > 0 && (
+            {!isReply && comment.replies_count && comment.replies_count > 0 ? (
               <span className="text-zinc-500">{tc.item.replies(comment.replies_count)}</span>
-            )}
+            ) : null}
           </div>
         )}
 
