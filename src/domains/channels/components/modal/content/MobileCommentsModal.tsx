@@ -86,19 +86,15 @@ export function MobileCommentsModal({ isOpen, onClose, content }: MobileComments
       isDragging = false;
     };
 
-    const modalElement = modalRef.current;
-    if (modalElement) {
-      modalElement.addEventListener('touchstart', handleTouchStart, { passive: true });
-      modalElement.addEventListener('touchmove', handleTouchMove, { passive: true });
-      modalElement.addEventListener('touchend', handleTouchEnd, { passive: true });
-    }
+    // Add event listeners to document to ensure they work
+    document.addEventListener('touchstart', handleTouchStart, { passive: true });
+    document.addEventListener('touchmove', handleTouchMove, { passive: true });
+    document.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     return () => {
-      if (modalElement) {
-        modalElement.removeEventListener('touchstart', handleTouchStart);
-        modalElement.removeEventListener('touchmove', handleTouchMove);
-        modalElement.removeEventListener('touchend', handleTouchEnd);
-      }
+      document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
     };
   }, [isOpen, onClose]);
 
@@ -108,17 +104,16 @@ export function MobileCommentsModal({ isOpen, onClose, content }: MobileComments
       onOpenChange={handleOpenChange}
       variant="sheet-bottom"
       size="auto"
-      dismissible={true}
+      dismissible={false}
       ariaLabel={t('comments.title')}
     >
       <ModalOverlay className="bg-black/20 backdrop-blur-sm">
-        <ModalContent className="bg-zinc-900 shadow-2xl max-h-[70vh] w-full sm:max-w-4xl lg:max-w-6xl mx-auto flex flex-col rounded-t-2xl transform transition-transform duration-300 ease-out border-0 p-0">
-          <div
-            ref={modalRef}
-            className="flex flex-col h-full"
-          >
+        <ModalContent 
+          className="bg-zinc-900 shadow-2xl max-h-[70vh] w-full sm:max-w-4xl lg:max-w-6xl mx-auto flex flex-col rounded-t-2xl transform transition-transform duration-300 ease-out border-0 p-0"
+        >
+          <div ref={modalRef} className="flex flex-col h-full">
             {/* Header with swipe handle */}
-            <div 
+            <div
               data-swipe-handle
               className="bg-zinc-900 flex-shrink-0 px-4 py-4 border-b border-zinc-700/30 cursor-grab active:cursor-grabbing"
             >
@@ -137,10 +132,13 @@ export function MobileCommentsModal({ isOpen, onClose, content }: MobileComments
                 </div>
                 <button
                   onClick={(e) => {
+                    e.preventDefault();
                     e.stopPropagation();
                     onClose();
                   }}
-                  className="flex items-center justify-center w-12 h-12 rounded-full bg-zinc-800/80 hover:bg-zinc-700/80 transition-all duration-200 group touch-manipulation active:scale-95"
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                  className="flex items-center justify-center w-12 h-12 rounded-full bg-zinc-800/80 hover:bg-zinc-700/80 transition-all duration-200 group touch-manipulation active:scale-95 z-50"
                   aria-label={t('comments.close')}
                 >
                   <MdClose className="w-6 h-6 text-zinc-300 group-hover:text-white" />
