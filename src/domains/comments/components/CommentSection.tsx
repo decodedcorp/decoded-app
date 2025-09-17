@@ -36,10 +36,10 @@ export function CommentSection({ contentId, showHeader = true }: CommentSectionP
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full relative z-[10003]">
       {/* Comments Header - Only show if showHeader is true */}
       {showHeader && (
-        <div className="p-4 border-b border-zinc-700/50">
+        <div className="p-4 border-b border-zinc-700/50 relative z-[10004]">
           <div className="mb-2">
             <h3 className="text-base font-medium text-white mb-1">{t('comments.title')}</h3>
             {!statsLoading && stats?.total_comments !== undefined && (
@@ -85,7 +85,7 @@ export function CommentSection({ contentId, showHeader = true }: CommentSectionP
       )}
 
       {/* Comments List */}
-      <div className="flex-1 min-h-0 overflow-y-auto">
+      <div className="flex-1 min-h-0 overflow-y-auto relative z-[10004]">
         {error ? (
           <div className="p-4 text-center text-red-400">
             <p className="text-sm">{t('comments.error.loadFailed')}</p>
@@ -118,7 +118,7 @@ export function CommentSection({ contentId, showHeader = true }: CommentSectionP
       </div>
 
       {/* Comment Input */}
-      <div className="border-t border-zinc-700/50">
+      <div className="border-t border-zinc-700/50 relative z-[10005]">
         <CommentInput
           contentId={contentId}
           onCommentCreated={() => refetch()}

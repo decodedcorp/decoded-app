@@ -76,8 +76,8 @@ export function CommentList({
   };
 
   return (
-    <div ref={scrollRef} className="flex flex-col h-full">
-      <div className="space-y-4 p-4 pb-6">
+    <div ref={scrollRef} className="flex flex-col h-full relative z-[10006]">
+      <div className="space-y-4 p-4 pb-6 relative z-[10007]">
         {topLevelComments.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <div className="w-16 h-16 bg-zinc-800/50 rounded-full flex items-center justify-center mb-4">

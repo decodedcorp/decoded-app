@@ -41,7 +41,7 @@ export function MobileCommentsModal({ isOpen, onClose, content }: MobileComments
       // Only handle swipe on header area
       const target = e.target as HTMLElement;
       if (!target.closest('[data-swipe-handle]')) return;
-      
+
       startY = e.touches[0].clientY;
       isDragging = true;
     };
@@ -107,15 +107,13 @@ export function MobileCommentsModal({ isOpen, onClose, content }: MobileComments
       dismissible={false}
       ariaLabel={t('comments.title')}
     >
-      <ModalOverlay className="bg-black/20 backdrop-blur-sm">
-        <ModalContent 
-          className="bg-zinc-900 shadow-2xl max-h-[70vh] w-full sm:max-w-4xl lg:max-w-6xl mx-auto flex flex-col rounded-t-2xl transform transition-transform duration-300 ease-out border-0 p-0"
-        >
-          <div ref={modalRef} className="flex flex-col h-full">
+      <ModalOverlay className="bg-black/20 backdrop-blur-sm z-[9998]">
+        <ModalContent className="bg-zinc-900 shadow-2xl max-h-[70vh] w-full sm:max-w-4xl lg:max-w-6xl mx-auto flex flex-col rounded-t-2xl transform transition-transform duration-300 ease-out border-0 p-0 z-[9999] relative">
+          <div ref={modalRef} className="flex flex-col h-full relative z-[10000]">
             {/* Header with swipe handle */}
             <div
               data-swipe-handle
-              className="bg-zinc-900 flex-shrink-0 px-4 py-4 border-b border-zinc-700/30 cursor-grab active:cursor-grabbing"
+              className="bg-zinc-900 flex-shrink-0 px-4 py-4 border-b border-zinc-700/30 cursor-grab active:cursor-grabbing relative z-[10001]"
             >
               {/* Swipe indicator */}
               <div className="flex justify-center mb-4">
@@ -138,7 +136,7 @@ export function MobileCommentsModal({ isOpen, onClose, content }: MobileComments
                   }}
                   onMouseDown={(e) => e.stopPropagation()}
                   onTouchStart={(e) => e.stopPropagation()}
-                  className="flex items-center justify-center w-12 h-12 rounded-full bg-zinc-800/80 hover:bg-zinc-700/80 transition-all duration-200 group touch-manipulation active:scale-95 z-50"
+                  className="flex items-center justify-center w-12 h-12 rounded-full bg-zinc-800/80 hover:bg-zinc-700/80 transition-all duration-200 group touch-manipulation active:scale-95 relative z-[10002]"
                   aria-label={t('comments.close')}
                 >
                   <MdClose className="w-6 h-6 text-zinc-300 group-hover:text-white" />
@@ -147,8 +145,8 @@ export function MobileCommentsModal({ isOpen, onClose, content }: MobileComments
             </div>
 
             {/* Body with optimized scrolling */}
-            <div className="flex-1 min-h-0 p-0 overflow-hidden">
-              <div className="h-full overflow-y-auto">
+            <div className="flex-1 min-h-0 p-0 overflow-hidden relative z-[10001]">
+              <div className="h-full overflow-y-auto relative z-[10002]">
                 <CommentSection contentId={String(content.id)} showHeader={false} />
               </div>
             </div>
