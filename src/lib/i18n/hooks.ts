@@ -321,3 +321,50 @@ export const useFormsTranslation = () => {
     },
   };
 };
+
+export const useInvitationTranslation = () => {
+  const { t } = useTranslation('invitations');
+
+  return {
+    title: () => t('title'),
+    userSearch: {
+      label: () => t('userSearch.label'),
+      placeholder: () => t('userSearch.placeholder'),
+    },
+    personalMessage: {
+      label: () => t('personalMessage.label'),
+      placeholder: () => t('personalMessage.placeholder'),
+    },
+    actions: {
+      send: () => t('actions.send'),
+      cancel: () => t('actions.cancel'),
+    },
+    state: {
+      sending: () => t('state.sending'),
+      sent: () => t('state.sent'),
+    },
+    expiresIn: () => t('expiresIn'),
+  };
+};
+
+export const useCommentTranslation = () => {
+  const { t } = useTranslation('comments');
+
+  return {
+    editor: {
+      placeholder: () => t('editor.placeholder'),
+      replyPlaceholder: () => t('editor.replyPlaceholder'),
+    },
+    actions: {
+      save: () => t('actions.save'),
+      saving: () => t('actions.saving'),
+      cancel: () => t('actions.cancel'),
+    },
+    time: {
+      now: () => t('time.now'),
+      minutesAgo: (minutes: number) => t('time.minutesAgo', { minutes }),
+      hoursAgo: (hours: number) => t('time.hoursAgo', { hours }),
+      daysAgo: (days: number) => t('time.daysAgo', { days }),
+    },
+  };
+};

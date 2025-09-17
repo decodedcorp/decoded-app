@@ -1,0 +1,17 @@
+{
+  "editor": {
+    "placeholder": "댓글을 입력해 주세요",
+    "replyPlaceholder": "답글을 입력해 주세요"
+  },
+  "actions": {
+    "save": "저장",
+    "saving": "저장 중…",
+    "cancel": "취소"
+  },
+  "time": {
+    "now": "방금",
+    "minutesAgo": "{minutes}분 전",
+    "hoursAgo": "{hours}시간 전",
+    "daysAgo": "{days}일 전"
+  }
+}

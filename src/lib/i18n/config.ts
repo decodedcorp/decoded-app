@@ -9,6 +9,8 @@ import koContent from '@/locales/ko/content.json';
 import koForms from '@/locales/ko/forms.json';
 import koErrors from '@/locales/ko/errors.json';
 import koImages from '@/locales/ko/images.json';
+import koInvitations from '@/locales/ko/invitations.json';
+import koComments from '@/locales/ko/comments.json';
 
 // Import English translations
 import enCommon from '@/locales/en/common.json';
@@ -18,6 +20,8 @@ import enContent from '@/locales/en/content.json';
 import enForms from '@/locales/en/forms.json';
 import enErrors from '@/locales/en/errors.json';
 import enImages from '@/locales/en/images.json';
+import enInvitations from '@/locales/en/invitations.json';
+import enComments from '@/locales/en/comments.json';
 
 const resources = {
   ko: {
@@ -28,6 +32,8 @@ const resources = {
     forms: koForms,
     errors: koErrors,
     images: koImages,
+    invitations: koInvitations,
+    comments: koComments,
   },
   en: {
     common: enCommon,
@@ -37,6 +43,8 @@ const resources = {
     forms: enForms,
     errors: enErrors,
     images: enImages,
+    invitations: enInvitations,
+    comments: enComments,
   },
 };
 

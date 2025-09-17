@@ -1,0 +1,17 @@
+{
+  "editor": {
+    "placeholder": "Write a comment…",
+    "replyPlaceholder": "Write a reply…"
+  },
+  "actions": {
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel"
+  },
+  "time": {
+    "now": "now",
+    "minutesAgo": "{minutes}m",
+    "hoursAgo": "{hours}h",
+    "daysAgo": "{days}d"
+  }
+}

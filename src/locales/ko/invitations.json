@@ -1,0 +1,20 @@
+{
+  "title": "멤버 초대",
+  "userSearch": {
+    "label": "사용자 검색",
+    "placeholder": "사용자명 또는 이메일을 입력해 주세요"
+  },
+  "personalMessage": {
+    "label": "개인 메시지",
+    "placeholder": "초대에 개인 메시지를 추가해 주세요"
+  },
+  "actions": {
+    "send": "초대 보내기",
+    "cancel": "취소"
+  },
+  "state": {
+    "sending": "보내는 중…",
+    "sent": "초대를 보냈어요"
+  },
+  "expiresIn": "만료 기간"
+}

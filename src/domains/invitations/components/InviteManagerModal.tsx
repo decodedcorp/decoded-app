@@ -6,7 +6,7 @@ import { Button } from '@decoded/ui';
 import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalClose } from '@/lib/components/ui/modal';
 import { useSearchUsers } from '@/domains/search/hooks/useSearch';
 import type { ChannelResponse } from '@/api/generated/models/ChannelResponse';
-import { useCommonTranslation } from '@/lib/i18n/hooks';
+import { useCommonTranslation, useInvitationTranslation } from '@/lib/i18n/hooks';
 
 import { useCreateInvitation } from '../hooks/useInvitations';
 
@@ -22,6 +22,7 @@ export function InviteManagerModal({ isOpen, onClose, channel }: InviteManagerMo
   const [message, setMessage] = useState('');
   const [expiresInDays, setExpiresInDays] = useState(7);
   const t = useCommonTranslation();
+  const ti = useInvitationTranslation();
 
   const createInvitationMutation = useCreateInvitation();
 
@@ -80,12 +81,12 @@ export function InviteManagerModal({ isOpen, onClose, channel }: InviteManagerMo
       variant="center"
       size="md"
       dismissible={true}
-      ariaLabel={t.invitations.inviteManager()}
+      ariaLabel={ti.title()}
     >
       <ModalOverlay className="modal-overlay--heavy">
         <ModalContent className="bg-zinc-900 border border-zinc-700">
           <ModalHeader>
-            <h2 className="text-xl font-semibold text-white">{t.invitations.inviteManager()}</h2>
+            <h2 className="text-xl font-semibold text-white">{ti.title()}</h2>
             <ModalClose />
           </ModalHeader>
 
@@ -94,13 +95,13 @@ export function InviteManagerModal({ isOpen, onClose, channel }: InviteManagerMo
           <form id="invite-form" onSubmit={handleSubmit} className="space-y-4">
             {/* User Search */}
             <div>
-              <label className="block text-sm font-medium text-white mb-2">{t.invitations.searchUser()}</label>
+              <label className="block text-sm font-medium text-white mb-2">{ti.userSearch.label()}</label>
               <div className="relative">
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Type username or email..."
+                  placeholder={ti.userSearch.placeholder()}
                   className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
 
@@ -138,13 +139,13 @@ export function InviteManagerModal({ isOpen, onClose, channel }: InviteManagerMo
             {/* Personal Message */}
             <div>
               <label className="block text-sm font-medium text-white mb-2">
-                {t.invitations.personalMessage()}
+                {ti.personalMessage.label()}
               </label>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 rows={3}
-                placeholder="Add a personal note to your invitation..."
+                placeholder={ti.personalMessage.placeholder()}
                 className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                 maxLength={500}
               />
@@ -153,7 +154,7 @@ export function InviteManagerModal({ isOpen, onClose, channel }: InviteManagerMo
 
             {/* Expiry */}
             <div>
-              <label className="block text-sm font-medium text-white mb-2">{t.invitations.expiresIn()}</label>
+              <label className="block text-sm font-medium text-white mb-2">{ti.expiresIn()}</label>
               <select
                 value={expiresInDays}
                 onChange={(e) => setExpiresInDays(Number(e.target.value))}
@@ -184,7 +185,7 @@ export function InviteManagerModal({ isOpen, onClose, channel }: InviteManagerMo
               disabled={!selectedUserId || createInvitationMutation.isPending}
               variant="primary"
             >
-              {createInvitationMutation.isPending ? t.invitations.sending() : t.invitations.sendInvitation()}
+              {createInvitationMutation.isPending ? ti.state.sending() : ti.actions.send()}
             </Button>
           </ModalFooter>
         </ModalContent>

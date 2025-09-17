@@ -15,6 +15,7 @@ import {
 } from 'react-icons/md';
 import { CommentResponse } from '@/api/generated/models/CommentResponse';
 import { useUser } from '@/domains/auth/hooks/useAuth';
+import { useCommentTranslation } from '@/lib/i18n/hooks';
 
 import { useCommentLike, useUpdateComment, useDeleteComment } from '../hooks/useComments';
 
@@ -42,6 +43,7 @@ export function CommentItem({
   const commentLikeMutation = useCommentLike();
   const updateCommentMutation = useUpdateComment();
   const deleteCommentMutation = useDeleteComment();
+  const tc = useCommentTranslation();
 
   // Check if current user is the comment author
   const isAuthor = user?.doc_id === comment.author_id;
@@ -56,11 +58,11 @@ export function CommentItem({
 
     if (diffHours < 1) {
       const diffMinutes = Math.floor(diffMs / (1000 * 60));
-      return diffMinutes < 1 ? 'now' : `${diffMinutes}m`;
+      return diffMinutes < 1 ? tc.time.now() : tc.time.minutesAgo(diffMinutes);
     } else if (diffDays < 1) {
-      return `${diffHours}h`;
+      return tc.time.hoursAgo(diffHours);
     } else if (diffDays < 7) {
-      return `${diffDays}d`;
+      return tc.time.daysAgo(diffDays);
     } else {
       return date.toLocaleDateString();
     }
@@ -198,7 +200,7 @@ export function CommentItem({
                   }}
                   className="px-3 py-1 text-xs text-zinc-400 hover:text-white transition-colors"
                 >
-                  Cancel
+                  {tc.actions.cancel()}
                 </button>
                 <Button
                   onClick={handleEdit}
@@ -206,7 +208,7 @@ export function CommentItem({
                   variant="primary"
                   size="sm"
                 >
-                  {updateCommentMutation.isPending ? 'Saving...' : 'Save'}
+                  {updateCommentMutation.isPending ? tc.actions.saving() : tc.actions.save()}
                 </Button>
               </div>
             </div>

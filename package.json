@@ -15,7 +15,11 @@
     "complexity": "yarn lint --format json > lint-report.json 2>/dev/null || true && echo 'Lint analysis complete'",
     "typegen:dev": "yarn dlx openapi-typescript-codegen --input http://dev.decoded.style/openapi.json --output ./src/api/generated --client fetch",
     "pre-commit": "yarn typegen:dev && git add src/api/generated/",
-    "prepare": "husky"
+    "prepare": "husky",
+    "i18n:check": "node scripts/check-i18n-keys.js",
+    "i18n:prune": "node scripts/prune-unused-keys.js",
+    "i18n:validate": "node scripts/validate-interpolation.js",
+    "i18n:all": "yarn i18n:check && yarn i18n:validate && yarn i18n:prune"
   },
   "dependencies": {
     "@decoded/ui": "file:packages/ui",
@@ -71,6 +75,7 @@
     "autoprefixer": "^10.4.21",
     "eslint": "^9",
     "eslint-config-next": "15.4.1",
+    "eslint-plugin-i18next": "^6.1.3",
     "eslint-plugin-react-hooks": "^5.2.0",
     "husky": "^9.1.7",
     "lighthouse": "^12.8.1",
