@@ -118,6 +118,7 @@ export function CommentSection({
             isLoadingMore={isLoadingMore}
             hasMore={hasMore}
             onLoadMore={fetchMore}
+            onLoginRequired={onLoginRequired}
           />
         )}
       </div>

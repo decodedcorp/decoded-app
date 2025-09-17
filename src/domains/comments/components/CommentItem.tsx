@@ -26,6 +26,7 @@ interface CommentItemProps {
   contentId: string;
   isReply?: boolean;
   onReplyCreated?: () => void;
+  onLoginRequired?: () => void;
 }
 
 export function CommentItem({
@@ -33,6 +34,7 @@ export function CommentItem({
   contentId,
   isReply = false,
   onReplyCreated,
+  onLoginRequired,
 }: CommentItemProps) {
   const { user } = useUser();
   const [showReplyInput, setShowReplyInput] = useState(false);
@@ -70,6 +72,10 @@ export function CommentItem({
 
   // Handle like/dislike actions
   const handleLike = () => {
+    if (!user) {
+      onLoginRequired?.();
+      return;
+    }
     commentLikeMutation.mutate({
       commentId: comment.id,
       action: 'like',
@@ -78,6 +84,10 @@ export function CommentItem({
   };
 
   const handleDislike = () => {
+    if (!user) {
+      onLoginRequired?.();
+      return;
+    }
     commentLikeMutation.mutate({
       commentId: comment.id,
       action: 'dislike',
@@ -251,7 +261,13 @@ export function CommentItem({
             {/* Reply button (only for top-level comments) */}
             {!isReply && (
               <button
-                onClick={() => setShowReplyInput(!showReplyInput)}
+                onClick={() => {
+                  if (!user) {
+                    onLoginRequired?.();
+                    return;
+                  }
+                  setShowReplyInput(!showReplyInput);
+                }}
                 className="flex items-center space-x-1 text-zinc-400 hover:text-white transition-colors"
               >
                 <MdReply className="w-4 h-4" />
@@ -275,6 +291,7 @@ export function CommentItem({
               onCommentCreated={handleReplyCreated}
               placeholder={tc.input.replyPlaceholder()}
               compact
+              onLoginRequired={onLoginRequired}
             />
           </div>
         )}

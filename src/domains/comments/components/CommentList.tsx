@@ -13,6 +13,7 @@ interface CommentListProps {
   isLoadingMore?: boolean;
   hasMore?: boolean;
   onLoadMore?: () => void;
+  onLoginRequired?: () => void;
 }
 
 export function CommentList({
@@ -21,6 +22,7 @@ export function CommentList({
   isLoadingMore = false,
   hasMore = false,
   onLoadMore,
+  onLoginRequired,
 }: CommentListProps) {
   const { t } = useTranslation('content');
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -106,6 +108,7 @@ export function CommentList({
                 comment={comment}
                 contentId={contentId}
                 onReplyCreated={handleReplyCreated}
+                onLoginRequired={onLoginRequired}
               />
 
               {/* Replies */}
@@ -118,6 +121,7 @@ export function CommentList({
                       contentId={contentId}
                       isReply
                       onReplyCreated={handleReplyCreated}
+                      onLoginRequired={onLoginRequired}
                     />
                   ))}
                 </div>
