@@ -76,5 +76,11 @@
     "uploading": "업로드 중... {{progress}}%",
     "uploadSuccess": "파일이 업로드되었어요",
     "uploadError": "파일 업로드에 실패했어요"
+  },
+  "media": {
+    "uploadBanner": "Upload Banner",
+    "uploadThumbnail": "Upload Thumbnail",
+    "bannerPreview": "Banner Preview",
+    "thumbnailPreview": "Thumbnail Preview"
   }
 }

@@ -368,3 +368,49 @@ export const useCommentTranslation = () => {
     },
   };
 };
+
+export const useAccessibilityTranslation = () => {
+  const { t } = useTranslation('common');
+
+  return {
+    closeModal: () => t('accessibility.closeModal'),
+    expandSidebar: () => t('accessibility.expandSidebar'),
+    collapseSidebar: () => t('accessibility.collapseSidebar'),
+    searchResults: () => t('accessibility.searchResults'),
+    goBack: () => t('accessibility.goBack'),
+    closeSidebar: () => t('accessibility.closeSidebar'),
+    trendingTopics: () => t('accessibility.trendingTopics'),
+    toggleDesignMode: () => t('accessibility.toggleDesignMode'),
+    removeManager: () => t('accessibility.removeManager'),
+    libraryNavigation: () => t('accessibility.libraryNavigation'),
+    filtersNavigation: () => t('accessibility.filtersNavigation'),
+    keyboardNavigation: () => t('accessibility.keyboardNavigation'),
+    screenReaderInstructions: () => t('accessibility.screenReaderInstructions'),
+    liveRegion: {
+      contentLoaded: () => t('accessibility.liveRegion.contentLoaded'),
+      pageChanged: () => t('accessibility.liveRegion.pageChanged'),
+      searchCompleted: (count: number) => t('accessibility.liveRegion.searchCompleted', { count }),
+      modalOpened: () => t('accessibility.liveRegion.modalOpened'),
+      modalClosed: () => t('accessibility.liveRegion.modalClosed'),
+      formSubmitted: () => t('accessibility.liveRegion.formSubmitted'),
+      errorOccurred: (message: string) => t('accessibility.liveRegion.errorOccurred', { message }),
+      successMessage: () => t('accessibility.liveRegion.successMessage'),
+      dataUpdated: () => t('accessibility.liveRegion.dataUpdated'),
+      navigationChanged: () => t('accessibility.liveRegion.navigationChanged'),
+    },
+    keyboard: {
+      shortcuts: () => t('accessibility.keyboard.shortcuts'),
+      enterToActivate: () => t('accessibility.keyboard.enterToActivate'),
+      spaceToToggle: () => t('accessibility.keyboard.spaceToToggle'),
+      escapeToClose: () => t('accessibility.keyboard.escapeToClose'),
+      arrowKeysToNavigate: () => t('accessibility.keyboard.arrowKeysToNavigate'),
+      tabToNavigate: () => t('accessibility.keyboard.tabToNavigate'),
+      shiftTabToPrevious: () => t('accessibility.keyboard.shiftTabToPrevious'),
+      homeToFirst: () => t('accessibility.keyboard.homeToFirst'),
+      endToLast: () => t('accessibility.keyboard.endToLast'),
+      pageUpDown: () => t('accessibility.keyboard.pageUpDown'),
+      ctrlEnterToSubmit: () => t('accessibility.keyboard.ctrlEnterToSubmit'),
+      altText: (key: string) => t('accessibility.keyboard.altText', { key }),
+    },
+  };
+};

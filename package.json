@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "yarn i18n:all && next build",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
@@ -14,12 +14,14 @@
     "analyze": "ANALYZE=true next build",
     "complexity": "yarn lint --format json > lint-report.json 2>/dev/null || true && echo 'Lint analysis complete'",
     "typegen:dev": "yarn dlx openapi-typescript-codegen --input http://dev.decoded.style/openapi.json --output ./src/api/generated --client fetch",
-    "pre-commit": "yarn typegen:dev && git add src/api/generated/",
+    "pre-commit": "yarn typegen:dev && yarn i18n:all && git add src/api/generated/",
     "prepare": "husky",
     "i18n:check": "node scripts/check-i18n-keys.js",
     "i18n:prune": "node scripts/prune-unused-keys.js",
     "i18n:validate": "node scripts/validate-interpolation.js",
-    "i18n:all": "yarn i18n:check && yarn i18n:validate && yarn i18n:prune"
+    "i18n:all": "yarn i18n:check && yarn i18n:validate && yarn i18n:prune",
+    "i18n:ci": "yarn i18n:check && yarn i18n:validate",
+    "build:ci": "yarn i18n:ci && next build"
   },
   "dependencies": {
     "@decoded/ui": "file:packages/ui",

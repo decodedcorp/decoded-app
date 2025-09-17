@@ -185,7 +185,7 @@ var buttonVariants = (0, import_class_variance_authority.cva)(
         accent: "bg-primary text-primary-on hover:bg-primary-hover shadow-sm hover:shadow-md",
         "accent-outline": "border border-primary-bd bg-transparent text-primary hover:bg-primary hover:text-primary-on",
         // 로그인 버튼 전용 variant - MainFeed 필터 버튼 스타일 + 메인 컬러
-        login: "text-[#EAFD66] hover:text-black hover:bg-[#EAFD66] border border-zinc-700 transition-colors"
+        login: "text-[#EAFD66] hover:text-black hover:bg-[#EAFD66] border border-zinc-700 transition-colors cursor-pointer"
       },
       size: {
         sm: "h-8 px-3 text-sm",

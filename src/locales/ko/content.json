@@ -16,7 +16,7 @@
     "error": "콘텐츠를 불러올 수 없어요",
     "errorSubtitle": "잠시 후 다시 시도해주세요",
     "notFound": "콘텐츠를 찾을 수 없어요",
-    "processing": "콘텐츠를 처리하고 있어요..."
+    "processing": "콘텐츠 처리 중..."
   },
   "actions": {
     "view": "콘텐츠 보기",
@@ -27,7 +27,9 @@
     "edit": "편집하기",
     "delete": "삭제하기",
     "download": "다운로드",
-    "copy": "링크 복사"
+    "copy": "링크 복사",
+    "save": "저장",
+    "saved": "저장됨"
   },
   "categories": {
     "all": "전체",
@@ -53,7 +55,7 @@
   "upload": {
     "title": "콘텐츠 업로드",
     "dragDrop": "파일을 드래그하거나 클릭하여 업로드하세요",
-    "processing": "파일을 처리하고 있어요...",
+    "processing": "파일 처리 중...",
     "success": "업로드가 완료되었어요!",
     "error": "업로드 중 오류가 발생했어요",
     "sizeLimit": "파일 크기가 너무 커요 (최대 {{max}}MB)",
@@ -61,7 +63,7 @@
   },
   "sidebar": {
     "aiOverview": "AI 개요",
-    "aiAnalyzing": "AI가 콘텐츠를 분석하고 있어요...",
+    "aiAnalyzing": "AI 분석 중...",
     "summary": "요약",
     "qa": "Q&A",
     "showLess": "간단히 보기",

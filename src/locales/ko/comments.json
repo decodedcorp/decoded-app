@@ -10,8 +10,8 @@
   },
   "time": {
     "now": "방금",
-    "minutesAgo": "{minutes}분 전",
-    "hoursAgo": "{hours}시간 전",
-    "daysAgo": "{days}일 전"
+    "minutesAgo": "{{minutes}}분 전",
+    "hoursAgo": "{{hours}}시간 전",
+    "daysAgo": "{{days}}일 전"
   }
 }

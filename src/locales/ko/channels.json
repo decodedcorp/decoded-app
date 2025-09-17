@@ -23,10 +23,10 @@
     "currentDescription": "현재 채널 설명 (선택사항)"
   },
   "status": {
-    "creating": "채널을 만들고 있어요...",
-    "updating": "채널을 수정하고 있어요...",
-    "deleting": "채널을 삭제하고 있어요...",
-    "loading": "채널을 불러오는 중이에요...",
+    "creating": "채널 생성 중...",
+    "updating": "채널 수정 중...",
+    "deleting": "채널 삭제 중...",
+    "loading": "채널 로딩 중...",
     "success": "채널이 {{action}}되었어요!",
     "error": "채널 {{action}} 중 문제가 발생했어요",
     "createSuccess": "채널이 성공적으로 생성되었어요!",

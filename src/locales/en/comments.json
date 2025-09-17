@@ -10,8 +10,8 @@
   },
   "time": {
     "now": "now",
-    "minutesAgo": "{minutes}m",
-    "hoursAgo": "{hours}h",
-    "daysAgo": "{days}d"
+    "minutesAgo": "{{minutes}}m",
+    "hoursAgo": "{{hours}}h",
+    "daysAgo": "{{days}}d"
   }
 }

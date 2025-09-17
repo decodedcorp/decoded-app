@@ -3,6 +3,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@decoded/ui';
+import { useAccessibilityTranslation } from '@/lib/i18n/hooks';
 
 interface ModalHeaderProps {
   children: React.ReactNode;
@@ -11,6 +12,8 @@ interface ModalHeaderProps {
 }
 
 export function ModalHeader({ children, onClose, className = '' }: ModalHeaderProps) {
+  const a11y = useAccessibilityTranslation();
+
   return (
     <div
       className={`flex items-center justify-between p-6 border-b border-zinc-700/50 ${className}`}
@@ -22,7 +25,7 @@ export function ModalHeader({ children, onClose, className = '' }: ModalHeaderPr
           size="sm"
           onClick={onClose}
           className="ml-4 p-2 hover:bg-zinc-800"
-          aria-label="Close modal"
+          aria-label={a11y.closeModal()}
         >
           <X className="w-4 h-4" />
         </Button>

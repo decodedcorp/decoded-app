@@ -444,5 +444,46 @@
     "expiresIn": "Expires In",
     "sending": "Sending...",
     "sendInvitation": "Send Invitation"
+  },
+  "accessibility": {
+    "closeModal": "Close modal",
+    "expandSidebar": "Expand sidebar",
+    "collapseSidebar": "Collapse sidebar",
+    "searchResults": "Search results",
+    "goBack": "Go back",
+    "closeSidebar": "Close sidebar",
+    "trendingTopics": "Trending topics and interests to explore",
+    "toggleDesignMode": "Toggle design mode",
+    "removeManager": "Remove manager",
+    "libraryNavigation": "Library - Channel and content management",
+    "filtersNavigation": "Filters - Data type, category, and tag filtering",
+    "keyboardNavigation": "Keyboard navigation available",
+    "screenReaderInstructions": "Additional information for screen reader users",
+    "liveRegion": {
+      "contentLoaded": "Content has been loaded",
+      "pageChanged": "Page has changed",
+      "searchCompleted": "Search completed. Found {{count}} results",
+      "modalOpened": "Modal has opened",
+      "modalClosed": "Modal has closed",
+      "formSubmitted": "Form has been submitted",
+      "errorOccurred": "An error occurred: {{message}}",
+      "successMessage": "Operation completed successfully",
+      "dataUpdated": "Data has been updated",
+      "navigationChanged": "Navigation location has changed"
+    },
+    "keyboard": {
+      "shortcuts": "Keyboard shortcuts",
+      "enterToActivate": "Press Enter to activate",
+      "spaceToToggle": "Press Space to toggle",
+      "escapeToClose": "Press Escape to close",
+      "arrowKeysToNavigate": "Use arrow keys to navigate",
+      "tabToNavigate": "Press Tab to move to next element",
+      "shiftTabToPrevious": "Press Shift+Tab to move to previous element",
+      "homeToFirst": "Press Home to go to first element",
+      "endToLast": "Press End to go to last element",
+      "pageUpDown": "Use Page Up/Down to scroll",
+      "ctrlEnterToSubmit": "Press Ctrl+Enter to submit",
+      "altText": "Alt+{{key}} shortcut"
+    }
   }
 }
