@@ -41,6 +41,7 @@ function ThumbnailImage({
   blurDataURL,
   getContentIcon,
   getContentTypeColor,
+  getContentType,
 }: {
   src: string;
   alt: string;
@@ -49,6 +50,7 @@ function ThumbnailImage({
   blurDataURL?: string;
   getContentIcon: () => React.ReactNode;
   getContentTypeColor: () => string;
+  getContentType: () => 'image' | 'video' | 'link' | 'text';
 }) {
   // 디버깅을 위한 로그
   if (process.env.NODE_ENV === 'development') {
@@ -71,6 +73,8 @@ function ThumbnailImage({
         height={height}
         blurDataURL={blurDataURL}
         className="w-full"
+        fitPolicy="cover"
+        contentType={getContentType()}
         fallbackIcon={
           <div className={`${getContentTypeColor()}`} style={{ fontSize: '4rem' }}>
             {getContentIcon()}
@@ -135,6 +139,10 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
     }
   };
 
+  const getContentType = () => {
+    return contentType;
+  };
+
   const getContentTypeColor = () => {
     switch (contentType) {
       case 'image':
@@ -150,8 +158,14 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
 
   return (
     <div
-      className={`bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden hover:border-zinc-700 transition-all duration-200 group max-w-4xl mx-auto ${className}`}
+      className={`bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden hover:border-zinc-700 transition-all duration-200 group max-w-4xl mx-auto relative ${className}`}
     >
+      {/* 배지 - 카드 오른쪽 상단 */}
+      {badge && (
+        <div className="absolute top-3 right-3 bg-[#eafd66] text-black text-xs font-bold px-2 py-1 rounded-full shadow-lg z-10">
+          {badge}
+        </div>
+      )}
       <div className="p-4">
         {/* 상단: 채널 정보 및 메타데이터 */}
         <div className="flex items-center gap-3 mb-3">
@@ -271,7 +285,7 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
 
           {/* 이미지 (있는 경우) */}
           {thumbnail && (
-            <div className="mb-4 relative">
+            <div className="mb-4">
               <ThumbnailImage
                 src={thumbnail}
                 alt={title}
@@ -280,13 +294,8 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
                 blurDataURL={blurDataURL}
                 getContentIcon={getContentIcon}
                 getContentTypeColor={getContentTypeColor}
+                getContentType={getContentType}
               />
-              {/* 배지 */}
-              {badge && (
-                <div className="absolute top-2 right-2 bg-[#eafd66] text-black text-xs font-bold px-2 py-1 rounded-full shadow-lg">
-                  {badge}
-                </div>
-              )}
             </div>
           )}
         </div>

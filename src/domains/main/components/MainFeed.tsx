@@ -517,8 +517,9 @@ export const MainFeed = React.memo(function MainFeed() {
                             comments={post.comments}
                             thumbnail={post.thumbnail}
                             // TODO: 실제 데이터에서 가져와야 함
-                            mediaWidth={undefined}
-                            mediaHeight={undefined}
+                            // 임시로 다양한 aspect ratio 테스트를 위한 값
+                            mediaWidth={[800, 1200, 1600, 2000, 2400][index % 5]} // 다양한 너비
+                            mediaHeight={[600, 800, 1200, 1500, 1800][index % 5]} // 다양한 높이
                             blurDataURL={undefined}
                             contentType={post.contentType}
                             badge={post.badge}
@@ -596,3 +597,4 @@ export const MainFeed = React.memo(function MainFeed() {
     </div>
   );
 });
+
