@@ -13,13 +13,11 @@ import { CommentInput } from './CommentInput';
 interface CommentSectionProps {
   contentId: string;
   showHeader?: boolean;
-  onLoginRequired?: () => void;
 }
 
 export function CommentSection({
   contentId,
   showHeader = true,
-  onLoginRequired,
 }: CommentSectionProps) {
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest' | 'most_liked'>('newest');
 
@@ -118,7 +116,6 @@ export function CommentSection({
             isLoadingMore={isLoadingMore}
             hasMore={hasMore}
             onLoadMore={fetchMore}
-            onLoginRequired={onLoginRequired}
           />
         )}
       </div>
@@ -129,7 +126,6 @@ export function CommentSection({
           contentId={contentId}
           onCommentCreated={() => refetch()}
           placeholder={t('comments.input.placeholder')}
-          onLoginRequired={onLoginRequired}
         />
       </div>
     </div>

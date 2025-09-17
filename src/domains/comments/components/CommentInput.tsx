@@ -6,6 +6,7 @@ import { MdSend, MdClose } from 'react-icons/md';
 import { Button } from '@decoded/ui';
 import { useUser } from '@/domains/auth/hooks/useAuth';
 import { useCommentTranslation } from '@/lib/i18n/hooks';
+import { LoginButton } from '@/shared/components/LoginButton';
 
 import { useCreateComment } from '../hooks/useComments';
 
@@ -16,7 +17,6 @@ interface CommentInputProps {
   placeholder?: string;
   compact?: boolean;
   autoFocus?: boolean;
-  onLoginRequired?: () => void;
 }
 
 export function CommentInput({
@@ -26,7 +26,6 @@ export function CommentInput({
   placeholder,
   compact = false,
   autoFocus = false,
-  onLoginRequired,
 }: CommentInputProps) {
   const { user } = useUser();
   const tc = useCommentTranslation();
@@ -87,10 +86,8 @@ export function CommentInput({
   if (!user) {
     return (
       <div className={`${compact ? 'p-3' : 'p-4'} text-center`}>
-        <p className="text-sm text-zinc-400 mb-2">{tc.input.signInPrompt()}</p>
-        <Button variant="primary" size="sm" onClick={onLoginRequired}>
-          {tc.input.signIn()}
-        </Button>
+        <p className="text-sm text-zinc-400 mb-3">{tc.input.signInPrompt()}</p>
+        <LoginButton />
       </div>
     );
   }

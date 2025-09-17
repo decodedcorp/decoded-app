@@ -18,6 +18,7 @@ import { useUser } from '@/domains/auth/hooks/useAuth';
 import { useCommentTranslation } from '@/lib/i18n/hooks';
 
 import { useCommentLike, useUpdateComment, useDeleteComment } from '../hooks/useComments';
+import { LoginButton } from '@/shared/components/LoginButton';
 
 import { CommentInput } from './CommentInput';
 
@@ -26,7 +27,6 @@ interface CommentItemProps {
   contentId: string;
   isReply?: boolean;
   onReplyCreated?: () => void;
-  onLoginRequired?: () => void;
 }
 
 export function CommentItem({
@@ -34,7 +34,6 @@ export function CommentItem({
   contentId,
   isReply = false,
   onReplyCreated,
-  onLoginRequired,
 }: CommentItemProps) {
   const { user } = useUser();
   const [showReplyInput, setShowReplyInput] = useState(false);
@@ -72,10 +71,7 @@ export function CommentItem({
 
   // Handle like/dislike actions
   const handleLike = () => {
-    if (!user) {
-      onLoginRequired?.();
-      return;
-    }
+    if (!user) return;
     commentLikeMutation.mutate({
       commentId: comment.id,
       action: 'like',
@@ -84,10 +80,7 @@ export function CommentItem({
   };
 
   const handleDislike = () => {
-    if (!user) {
-      onLoginRequired?.();
-      return;
-    }
+    if (!user) return;
     commentLikeMutation.mutate({
       commentId: comment.id,
       action: 'dislike',
@@ -238,41 +231,44 @@ export function CommentItem({
         {/* Comment actions */}
         {!isEditing && (
           <div className="flex items-center space-x-4 text-xs">
-            {/* Like button */}
-            <button
-              onClick={handleLike}
-              disabled={commentLikeMutation.isPending}
-              className="flex items-center space-x-1 text-zinc-400 hover:text-red-400 transition-colors"
-            >
-              <MdFavoriteBorder className="w-4 h-4" />
-              <span>{comment.likes || 0}</span>
-            </button>
+            {user ? (
+              <>
+                {/* Like button */}
+                <button
+                  onClick={handleLike}
+                  disabled={commentLikeMutation.isPending}
+                  className="flex items-center space-x-1 text-zinc-400 hover:text-red-400 transition-colors"
+                >
+                  <MdFavoriteBorder className="w-4 h-4" />
+                  <span>{comment.likes || 0}</span>
+                </button>
 
-            {/* Dislike button */}
-            <button
-              onClick={handleDislike}
-              disabled={commentLikeMutation.isPending}
-              className="flex items-center space-x-1 text-zinc-400 hover:text-blue-400 transition-colors"
-            >
-              <MdThumbDownOffAlt className="w-4 h-4" />
-              <span>{comment.dislikes || 0}</span>
-            </button>
+                {/* Dislike button */}
+                <button
+                  onClick={handleDislike}
+                  disabled={commentLikeMutation.isPending}
+                  className="flex items-center space-x-1 text-zinc-400 hover:text-blue-400 transition-colors"
+                >
+                  <MdThumbDownOffAlt className="w-4 h-4" />
+                  <span>{comment.dislikes || 0}</span>
+                </button>
 
-            {/* Reply button (only for top-level comments) */}
-            {!isReply && (
-              <button
-                onClick={() => {
-                  if (!user) {
-                    onLoginRequired?.();
-                    return;
-                  }
-                  setShowReplyInput(!showReplyInput);
-                }}
-                className="flex items-center space-x-1 text-zinc-400 hover:text-white transition-colors"
-              >
-                <MdReply className="w-4 h-4" />
-                <span>{tc.item.reply()}</span>
-              </button>
+                {/* Reply button (only for top-level comments) */}
+                {!isReply && (
+                  <button
+                    onClick={() => setShowReplyInput(!showReplyInput)}
+                    className="flex items-center space-x-1 text-zinc-400 hover:text-white transition-colors"
+                  >
+                    <MdReply className="w-4 h-4" />
+                    <span>{tc.item.reply()}</span>
+                  </button>
+                )}
+              </>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <span className="text-zinc-500 text-xs">로그인하여 상호작용</span>
+                <LoginButton />
+              </div>
             )}
 
             {/* Reply count */}
@@ -291,7 +287,6 @@ export function CommentItem({
               onCommentCreated={handleReplyCreated}
               placeholder={tc.input.replyPlaceholder()}
               compact
-              onLoginRequired={onLoginRequired}
             />
           </div>
         )}
