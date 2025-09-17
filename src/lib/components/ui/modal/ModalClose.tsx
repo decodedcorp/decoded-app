@@ -51,7 +51,7 @@ export function ModalClose({
     'text-zinc-600 hover:text-zinc-900',
     'dark:text-zinc-400 dark:hover:text-zinc-100',
     'transition-colors duration-150',
-    'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
+    'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
     'touch-manipulation', // 터치 최적화
     getVariantClasses(),
     className || '',

@@ -16,7 +16,13 @@ interface InvitationListProps {
 export function InvitationList({ channelId, currentUserId }: InvitationListProps) {
   const [includeExpired, setIncludeExpired] = useState(false);
 
-  const { data: invitationsData, isLoading, error, isFetching, isStale } = useInvitations({
+  const {
+    data: invitationsData,
+    isLoading,
+    error,
+    isFetching,
+    isStale,
+  } = useInvitations({
     includeExpired,
   });
 
@@ -26,7 +32,7 @@ export function InvitationList({ channelId, currentUserId }: InvitationListProps
     return (
       <div className="bg-zinc-800/50 rounded-lg border border-zinc-700 p-6">
         <div className="animate-pulse space-y-4">
-          {[1, 2, 3].map(i => (
+          {[1, 2, 3].map((i) => (
             <div key={i} className="h-20 bg-zinc-700/50 rounded" />
           ))}
         </div>
@@ -37,17 +43,14 @@ export function InvitationList({ channelId, currentUserId }: InvitationListProps
   if (error) {
     return (
       <div className="bg-zinc-800/50 rounded-lg border border-zinc-700 p-6">
-        <div className="text-center text-red-400">
-          Failed to load invitations
-        </div>
+        <div className="text-center text-red-400">Failed to load invitations</div>
       </div>
     );
   }
 
-  
   // 채널별로 필터링하고 보낸/받은 초대로 분류
-  const channelInvitations = invitations.filter((inv: InvitationResponse) => 
-    inv.channel_id === channelId
+  const channelInvitations = invitations.filter(
+    (inv: InvitationResponse) => inv.channel_id === channelId,
   );
 
   const sentInvitations = channelInvitations.filter((inv: InvitationResponse) => {
@@ -73,7 +76,7 @@ export function InvitationList({ channelId, currentUserId }: InvitationListProps
             type="checkbox"
             checked={includeExpired}
             onChange={(e) => setIncludeExpired(e.target.checked)}
-            className="rounded border-zinc-600 bg-zinc-800 text-blue-600 focus:ring-blue-500 focus:ring-offset-zinc-900"
+            className="rounded border-zinc-600 bg-zinc-800 text-primary focus:ring-primary focus:ring-offset-zinc-900"
           />
           <span className="text-zinc-400">Show expired</span>
         </label>
@@ -83,18 +86,12 @@ export function InvitationList({ channelId, currentUserId }: InvitationListProps
       <div className="space-y-3">
         {currentInvitations.length > 0 ? (
           currentInvitations.map((invitation: InvitationResponse) => (
-            <InvitationCard
-              key={invitation.id}
-              invitation={invitation}
-              type="sent"
-            />
+            <InvitationCard key={invitation.id} invitation={invitation} type="sent" />
           ))
         ) : (
           <div className="bg-zinc-800/30 rounded-lg border border-zinc-700/50 p-8 text-center">
             <div className="text-zinc-400 mb-2">📤</div>
-            <h3 className="text-sm font-medium text-zinc-300 mb-1">
-              No invitations sent
-            </h3>
+            <h3 className="text-sm font-medium text-zinc-300 mb-1">No invitations sent</h3>
             <p className="text-xs text-zinc-500">
               Send invitations to users to manage this channel
             </p>
@@ -105,7 +102,8 @@ export function InvitationList({ channelId, currentUserId }: InvitationListProps
       {/* Summary */}
       {currentInvitations.length > 0 && (
         <div className="text-xs text-zinc-500 text-center pt-2 border-t border-zinc-700">
-          Showing {currentInvitations.length} sent invitation{currentInvitations.length !== 1 ? 's' : ''}
+          Showing {currentInvitations.length} sent invitation
+          {currentInvitations.length !== 1 ? 's' : ''}
           {!includeExpired && ' (active only)'}
         </div>
       )}

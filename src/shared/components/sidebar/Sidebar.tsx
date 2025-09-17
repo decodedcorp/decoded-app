@@ -72,7 +72,7 @@ export const Sidebar = memo(function Sidebar() {
       {/* Responsive Sidebar - sticky on desktop, fixed overlay on mobile */}
       <aside
         className={`
-          w-[220px]
+          w-[280px]
           bg-black
           overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-black
           ${

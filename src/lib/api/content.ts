@@ -1,5 +1,4 @@
 import { notFound, redirect } from 'next/navigation';
-import { revalidateTag } from 'next/cache';
 import { ContentItem } from '@/lib/types/contentTypes';
 
 /**
@@ -50,10 +49,11 @@ export async function getContentWithValidation(params: {
 
 /**
  * 콘텐츠 캐시 무효화
+ * TODO: Server Component에서만 사용 가능하므로 임시로 주석 처리
  */
-export async function revalidateContent(contentId: string): Promise<void> {
-  revalidateTag(`content:${contentId}`);
-}
+// export async function revalidateContent(contentId: string): Promise<void> {
+//   revalidateTag(`content:${contentId}`);
+// }
 
 /**
  * 채널의 콘텐츠 목록 가져오기

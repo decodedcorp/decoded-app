@@ -12,12 +12,14 @@ import {
   MdBookmark,
   MdBookmarkBorder,
 } from 'react-icons/md';
+import { HiSparkles as Sparkles } from 'react-icons/hi2';
 import { ContentItem } from '@/lib/types/content';
 import { CommentSection } from '@/domains/comments/components/CommentSection';
 import { useBookmarkStatus, useBookmark } from '@/domains/users/hooks/useBookmark';
 import { useUserProfile } from '@/domains/users/hooks/useUserProfile';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
 import { useTranslation } from 'react-i18next';
+import { Avatar } from '@decoded/ui';
 
 import { SummarySection } from './SummarySection';
 import { InteractiveQASection } from './InteractiveQASection';
@@ -67,17 +69,43 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
   const { data: bookmarkStatus } = useBookmarkStatus(contentId);
   const { addBookmark, removeBookmark, isLoading: isBookmarkLoading } = useBookmark(contentId);
 
-  // Get user profile if author_id exists (for future enhancement)
-  // For now, we'll use the author string directly
-  const authorId = (content as any).author_id;
-  const { data: userProfile } = useUserProfile({
-    userId: authorId || '',
+  // Get user profile using author field (which contains the user ID)
+  const authorId = content.author;
+  const {
+    data: userProfile,
+    isLoading: isProfileLoading,
+    error: profileError,
+  } = useUserProfile(authorId || '', {
     enabled: !!authorId,
   });
 
   // Translation hooks
   const { t } = useTranslation('content');
   const { actions, time } = useCommonTranslation();
+
+  // Format date function (same as CommentItem)
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffHours < 1) {
+      const diffMinutes = Math.floor(diffMs / (1000 * 60));
+      return diffMinutes <= 0 ? '방금 전' : `${diffMinutes}분 전`;
+    } else if (diffHours < 24) {
+      return `${diffHours}시간 전`;
+    } else if (diffDays < 7) {
+      return `${diffDays}일 전`;
+    } else {
+      return date.toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+    }
+  };
 
   // Add shimmer animation styles
   React.useEffect(() => {
@@ -200,27 +228,27 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
         {(content.author || content.likes !== undefined || content.views !== undefined) && (
           <div className="p-4 border-b border-zinc-700/50">
             {/* Author Info */}
-            {content.author && (
+            {authorId && (
               <div className="flex items-center space-x-3 mb-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-zinc-700 to-zinc-800 border border-zinc-600 rounded-full flex items-center justify-center overflow-hidden">
-                  {userProfile?.profile_image_url ? (
-                    <img
-                      src={userProfile.profile_image_url}
-                      alt={userProfile.aka || content.author}
-                      className="w-full h-full object-cover rounded-full"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <span className="text-zinc-300 font-semibold text-sm select-none">
-                      {userProfile?.aka
-                        ? userProfile.aka.substring(0, 2).toUpperCase()
-                        : content.author.charAt(0).toUpperCase()}
-                    </span>
-                  )}
-                </div>
+                <Avatar
+                  userId={authorId}
+                  src={userProfile?.profile_image_url || undefined}
+                  size="lg"
+                  className="flex-shrink-0"
+                />
                 <div>
-                  <div className="font-medium text-white">{userProfile?.aka || content.author}</div>
-                  {content.date && <div className="text-xs text-zinc-400">{content.date}</div>}
+                  <div className="font-medium text-white">
+                    {isProfileLoading ? (
+                      <span className="animate-pulse">Loading...</span>
+                    ) : profileError ? (
+                      authorId // API 에러 시 authorId 표시
+                    ) : (
+                      userProfile?.aka || authorId
+                    )}
+                  </div>
+                  {content.date && (
+                    <div className="text-xs text-zinc-400">{formatDate(content.date)}</div>
+                  )}
                 </div>
               </div>
             )}
@@ -274,7 +302,7 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
                     {/* Shimmer Loading */}
                     <div className="animate-pulse space-y-3">
                       <div className="flex items-center space-x-2">
-                        <div className="w-3 h-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full animate-bounce" />
+                        <Sparkles className="w-4 h-4 text-primary animate-pulse" />
                         <span className="text-xs text-zinc-400">{t('sidebar.aiAnalyzing')}</span>
                       </div>
 

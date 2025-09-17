@@ -2,7 +2,15 @@
 
 import React, { useState } from 'react';
 import { SimpleModal } from '@/lib/components/ui/modal/SimpleModal';
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalClose } from '@/lib/components/ui/modal';
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalClose,
+} from '@/lib/components/ui/modal';
 
 /**
  * 모달 클릭 이벤트 테스트 컴포넌트
@@ -23,7 +31,7 @@ export function ModalClickTest() {
   const [testResults, setTestResults] = useState<string[]>([]);
 
   const addTestResult = (result: string) => {
-    setTestResults(prev => [...prev, `${new Date().toLocaleTimeString()}: ${result}`]);
+    setTestResults((prev) => [...prev, `${new Date().toLocaleTimeString()}: ${result}`]);
   };
 
   const clearResults = () => {
@@ -44,7 +52,7 @@ export function ModalClickTest() {
               setSimpleModalOpen(true);
               addTestResult('SimpleModal 열기');
             }}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80"
           >
             Simple Modal 테스트
           </button>
@@ -174,9 +182,7 @@ export function ModalClickTest() {
         variant="center"
         size="lg"
       >
-        <ModalOverlay
-          onClick={() => addTestResult('Custom Modal 오버레이 클릭')}
-        >
+        <ModalOverlay onClick={() => addTestResult('Custom Modal 오버레이 클릭')}>
           <ModalContent>
             <ModalHeader>
               <h2 className="text-lg font-semibold">Custom Modal 테스트</h2>
@@ -200,7 +206,7 @@ export function ModalClickTest() {
 
                 <button
                   onClick={() => addTestResult('Custom Modal 내부 버튼 클릭')}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80"
                 >
                   내부 버튼 (닫히면 안됨)
                 </button>

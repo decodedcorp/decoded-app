@@ -44,7 +44,7 @@ export const MobileTouchTarget: React.FC<MobileTouchTargetProps> = ({
           hover:bg-blue-700 active:bg-blue-800
           disabled:bg-gray-300 disabled:cursor-not-allowed
           transition-colors duration-200
-          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+          focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
         `;
       case 'link':
         return `

@@ -19,6 +19,7 @@ import { useTrendingContents } from '../hooks/useTrendingContents';
 import { PostCardSkeleton } from './PostCardSkeleton';
 import { InfiniteScrollLoader } from './InfiniteScrollLoader';
 import { PostCard } from './PostCard';
+import { FeedGrid, FeedGridItem } from '@/components/FeedGrid/FeedGrid';
 
 type SortOption = 'hot' | 'new' | 'top';
 
@@ -386,7 +387,7 @@ export const MainFeed = React.memo(function MainFeed() {
           }}
         >
           {/* 피드 헤더 */}
-          <div className="mb-8">
+          <div className="mb-8 max-w-4xl mx-auto">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h1 className="text-white text-2xl font-bold mb-1">{t.feed.section.header()}</h1>
@@ -470,9 +471,9 @@ export const MainFeed = React.memo(function MainFeed() {
             </div>
           )}
 
-          {/* 포스트 목록 */}
+          {/* 포스트 목록 - FeedGrid 사용 */}
           {(!currentQuery.isLoading || currentQuery.data) && !currentQuery.isError && (
-            <div className="space-y-6" style={{ containIntrinsicSize: 'auto 500px' }}>
+            <>
               {feedData.length === 0 && !currentQuery.isLoading ? (
                 <div className="text-center py-12">
                   <div className="mb-4">
@@ -485,41 +486,58 @@ export const MainFeed = React.memo(function MainFeed() {
                   </button>
                 </div>
               ) : (
-                feedData.map((item: TrendingContentItem, index: number) => {
-                  const post = transformContentItem(item, index);
-                  const isSelected = selectedContentId === item.id;
-                  return (
-                    <PostCard
-                      key={`${item.id}-${index}`}
-                      id={post.id}
-                      title={post.title}
-                      description={post.description}
-                      channel={post.channel}
-                      channelId={post.channelId}
-                      channelThumbnail={channelThumbnails[item.channel_id]}
-                      author={post.author}
-                      authorId={post.authorId}
-                      userAvatar={userAvatars[item.provider_id]}
-                      userAka={userAkas[item.provider_id]}
-                      timeAgo={post.timeAgo}
-                      pins={post.pins}
-                      comments={post.comments}
-                      thumbnail={post.thumbnail}
-                      contentType={post.contentType}
-                      badge={post.badge}
-                      onPostClick={() => {
-                        // 콘텐츠 ID를 설정하여 상세 정보 가져오기
-                        setSelectedContentId(item.id);
-                      }}
-                      // 로딩 상태 표시
-                      className={
-                        isSelected && isContentLoading ? 'opacity-50 pointer-events-none' : ''
-                      }
-                    />
-                  );
-                })
+                <div className="max-w-4xl mx-auto">
+                  <FeedGrid
+                    columns={{
+                      mobile: 1,
+                      tablet: 1,
+                      desktop: 1,
+                      wide: 1,
+                    }}
+                    className="mt-6"
+                  >
+                    {feedData.map((item: TrendingContentItem, index: number) => {
+                      const post = transformContentItem(item, index);
+                      const isSelected = selectedContentId === item.id;
+                      return (
+                        <FeedGridItem key={`${item.id}-${index}`}>
+                          <PostCard
+                            id={post.id}
+                            title={post.title}
+                            description={post.description}
+                            channel={post.channel}
+                            channelId={post.channelId}
+                            channelThumbnail={channelThumbnails[item.channel_id]}
+                            author={post.author}
+                            authorId={post.authorId}
+                            userAvatar={userAvatars[item.provider_id]}
+                            userAka={userAkas[item.provider_id]}
+                            timeAgo={post.timeAgo}
+                            pins={post.pins}
+                            comments={post.comments}
+                            thumbnail={post.thumbnail}
+                            // TODO: 실제 데이터에서 가져와야 함
+                            mediaWidth={undefined}
+                            mediaHeight={undefined}
+                            blurDataURL={undefined}
+                            contentType={post.contentType}
+                            badge={post.badge}
+                            onPostClick={() => {
+                              // 콘텐츠 ID를 설정하여 상세 정보 가져오기
+                              setSelectedContentId(item.id);
+                            }}
+                            // 로딩 상태 표시
+                            className={
+                              isSelected && isContentLoading ? 'opacity-50 pointer-events-none' : ''
+                            }
+                          />
+                        </FeedGridItem>
+                      );
+                    })}
+                  </FeedGrid>
+                </div>
               )}
-            </div>
+            </>
           )}
 
           {/* 콘텐츠 로딩 오버레이 */}
@@ -534,28 +552,32 @@ export const MainFeed = React.memo(function MainFeed() {
 
           {/* 무한스크롤 로더 */}
           {feedData.length > 0 && (
-            <InfiniteScrollLoader
-              hasNextPage={currentQuery.hasNextPage || false}
-              isFetchingNextPage={currentQuery.isFetchingNextPage}
-              fetchNextPage={currentQuery.fetchNextPage}
-              error={currentQuery.error}
-              onRetry={() => currentQuery.refetch()}
-              className="mt-12"
-            />
+            <div className="max-w-4xl mx-auto">
+              <InfiniteScrollLoader
+                hasNextPage={currentQuery.hasNextPage || false}
+                isFetchingNextPage={currentQuery.isFetchingNextPage}
+                fetchNextPage={currentQuery.fetchNextPage}
+                error={currentQuery.error}
+                onRetry={() => currentQuery.refetch()}
+                className="mt-12"
+              />
+            </div>
           )}
 
           {/* 포스트 수 표시 */}
           {feedData.length > 0 && (
-            <div className="text-center mt-6">
-              <div className="text-xs text-gray-500">
-                {t.feed.showingPosts({ count: feedData.length })}
-                {currentQuery.data?.pages?.[0] &&
-                  (currentQuery.data.pages[0] as any)?.totalCount && (
-                    <span>
-                      {' '}
-                      {t.feed.of({ total: (currentQuery.data.pages[0] as any).totalCount })}
-                    </span>
-                  )}
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mt-6">
+                <div className="text-xs text-gray-500">
+                  {t.feed.showingPosts({ count: feedData.length })}
+                  {currentQuery.data?.pages?.[0] &&
+                    (currentQuery.data.pages[0] as any)?.totalCount && (
+                      <span>
+                        {' '}
+                        {t.feed.of({ total: (currentQuery.data.pages[0] as any).totalCount })}
+                      </span>
+                    )}
+                </div>
               </div>
             </div>
           )}

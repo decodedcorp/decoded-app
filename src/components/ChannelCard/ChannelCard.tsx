@@ -166,7 +166,7 @@ export const ChannelCard = memo(
     masonry,
   }: ChannelCardProps) => {
     const t = useCommonTranslation();
-    
+
     // ChannelResponse인지 확인
     const isChannelResponse = 'owner_id' in channel;
 
@@ -313,7 +313,9 @@ export const ChannelCard = memo(
             <div className="flex items-center justify-between min-h-[20px]">
               {/* Creation date - left side */}
               <div className="text-zinc-400 text-xs">
-                {('created_at' in channelData && channelData.created_at) && <span>{formatDate(channelData.created_at)}</span>}
+                {'created_at' in channelData && channelData.created_at && (
+                  <span>{formatDate(channelData.created_at)}</span>
+                )}
               </div>
 
               {/* Subcategory only - right side */}
@@ -405,7 +407,11 @@ export const ChannelCard = memo(
                     : 'bg-[#eafd66] text-black hover:bg-[#eafd66]/90'
                 }`}
               >
-                {effectiveIsLoading ? '...' : effectiveIsSubscribed ? t.states.subscribed() : t.actions.subscribe()}
+                {effectiveIsLoading
+                  ? '...'
+                  : effectiveIsSubscribed
+                  ? t.states.subscribed()
+                  : t.actions.subscribe()}
               </button>
             </div>
           </div>
@@ -454,7 +460,7 @@ export const ChannelCard = memo(
                   }}
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-500/20 to-purple-500/20">
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-gray-600/20">
                   <span className="font-bold text-white/80 text-lg">
                     {channelData.name && channelData.name.length > 0
                       ? channelData.name.charAt(0).toUpperCase()

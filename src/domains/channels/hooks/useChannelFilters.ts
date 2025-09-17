@@ -37,17 +37,16 @@ const DATA_TYPE_CONFIG = {
 // Category 색상 매핑
 const CATEGORY_COLORS = [
   'bg-red-500/20 text-red-300',
-  'bg-emerald-500/20 text-emerald-300', 
+  'bg-emerald-500/20 text-emerald-300',
   'bg-amber-500/20 text-amber-300',
   'bg-pink-500/20 text-pink-300',
   'bg-violet-500/20 text-violet-300',
   'bg-cyan-500/20 text-cyan-300',
   'bg-orange-500/20 text-orange-300',
-  'bg-blue-500/20 text-blue-300',
+  'bg-primary/20 text-primary',
   'bg-green-500/20 text-green-300',
   'bg-purple-500/20 text-purple-300',
 ];
-
 
 /**
  * 채널의 콘텐츠를 기반으로 실제 사용되는 필터 옵션들을 추출하는 훅
@@ -69,7 +68,7 @@ export const useChannelFilters = (channelId: string): UseChannelFiltersResult =>
     if (!contentItems || contentItems.length === 0) return [];
 
     const typeCount = new Map<string, number>();
-    
+
     contentItems.forEach((item: ContentItem) => {
       const type = item.type;
       typeCount.set(type, (typeCount.get(type) || 0) + 1);
@@ -81,7 +80,7 @@ export const useChannelFilters = (channelId: string): UseChannelFiltersResult =>
           label: type.charAt(0).toUpperCase() + type.slice(1),
           icon: '📄',
         };
-        
+
         return {
           id: type,
           label: config.label,
@@ -97,7 +96,7 @@ export const useChannelFilters = (channelId: string): UseChannelFiltersResult =>
     if (!contentItems || contentItems.length === 0) return [];
 
     const categoryCount = new Map<string, number>();
-    
+
     contentItems.forEach((item: ContentItem) => {
       if (item.category) {
         const category = item.category.toLowerCase().trim();
@@ -109,7 +108,7 @@ export const useChannelFilters = (channelId: string): UseChannelFiltersResult =>
       .map(([category, count], index) => {
         const icon = '📁'; // 모든 카테고리에 동일한 기본 아이콘 사용
         const color = CATEGORY_COLORS[index % CATEGORY_COLORS.length];
-        
+
         return {
           id: category,
           label: category.charAt(0).toUpperCase() + category.slice(1),
@@ -139,7 +138,7 @@ export const useChannelContentFiltering = (
     categories: string[];
     tags: string[];
     statuses: string[];
-  }
+  },
 ) => {
   const {
     data: contentItems,

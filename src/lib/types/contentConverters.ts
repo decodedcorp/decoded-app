@@ -214,17 +214,17 @@ const getContentTitle = (content: UnifiedContent): string => {
   if (content.linkContent?.link_preview_metadata?.title) {
     return content.linkContent.link_preview_metadata.title;
   }
-  
+
   // Video content - title might be directly available
   if (content.title && content.title !== 'Untitled') {
     return content.title;
   }
-  
+
   // AI generated metadata
   if (content.linkContent?.ai_gen_metadata?.summary) {
     return content.linkContent.ai_gen_metadata.summary;
   }
-  
+
   // Fallback
   return content.title || 'Untitled';
 };
@@ -247,6 +247,7 @@ export const convertToContentItem = (content: UnifiedContent): ContentItem => {
     title: getContentTitle(content),
     description: content.description || undefined,
     status: content.status,
+    provider_id: content.provider_id, // provider_id 추가
   };
 
   if (isImageContent(content)) {

@@ -1,5 +1,5 @@
 import * as react from 'react';
-import { SVGAttributes, HTMLAttributes, ReactNode, ButtonHTMLAttributes } from 'react';
+import react__default, { SVGAttributes, HTMLAttributes, ReactNode, ButtonHTMLAttributes } from 'react';
 import { LucideIcon } from 'lucide-react';
 export { LucideIcon } from 'lucide-react';
 import * as class_variance_authority_dist_types from 'class-variance-authority/dist/types';
@@ -73,6 +73,20 @@ interface VisuallyHiddenProps extends HTMLAttributes<HTMLSpanElement> {
 }
 declare const VisuallyHidden: react.ForwardRefExoticComponent<VisuallyHiddenProps & react.RefAttributes<HTMLSpanElement>>;
 
+interface AvatarProps {
+    /** User ID or name for fallback text */
+    userId: string;
+    /** Profile image URL (optional) */
+    src?: string;
+    /** Size variant */
+    size?: 'sm' | 'md' | 'lg';
+    /** Additional CSS classes */
+    className?: string;
+    /** Alt text for the image */
+    alt?: string;
+}
+declare const Avatar: react__default.FC<AvatarProps>;
+
 declare const buttonVariants: (props?: ({
     variant?: "primary" | "secondary" | "outline" | "ghost" | "destructive" | "accent" | "accent-outline" | "login" | "comments-floating" | null | undefined;
     size?: "sm" | "md" | "lg" | "xl" | null | undefined;
@@ -104,4 +118,4 @@ declare const DialogFooter: ({ className, ...props }: React.HTMLAttributes<HTMLD
 
 declare function cn(...inputs: ClassValue[]): string;
 
-export { Button, type ButtonProps, Dialog, DialogClose, DialogContent, type DialogContentProps, DialogDescription, DialogFooter, DialogHeader, type DialogProps, DialogTitle, DialogTrigger, Icon, type IconName, VisuallyHidden, cn, iconMap };
+export { Avatar, type AvatarProps, Button, type ButtonProps, Dialog, DialogClose, DialogContent, type DialogContentProps, DialogDescription, DialogFooter, DialogHeader, type DialogProps, DialogTitle, DialogTrigger, Icon, type IconName, VisuallyHidden, cn, iconMap };

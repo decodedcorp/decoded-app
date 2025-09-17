@@ -19,9 +19,8 @@ export function EditorsListModal({
   onClose,
   editors,
   channelName = 'Channel',
-  ownerId
+  ownerId,
 }: EditorsListModalProps) {
-
   // Use improved scroll lock
   useScrollLock(isOpen);
 
@@ -48,7 +47,7 @@ export function EditorsListModal({
   const sortedEditors = [...editors].sort((a, b) => {
     const aIsOwner = ownerId === a.id;
     const bIsOwner = ownerId === b.id;
-    
+
     if (aIsOwner && !bIsOwner) return -1;
     if (!aIsOwner && bIsOwner) return 1;
     return 0;
@@ -79,14 +78,11 @@ export function EditorsListModal({
   return (
     <>
       {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50"
-        onClick={onClose}
-      />
-      
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50" onClick={onClose} />
+
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-        <div 
+        <div
           className="bg-zinc-900 rounded-2xl w-full max-w-xl max-h-[80vh] overflow-hidden pointer-events-auto border border-zinc-700"
           onClick={(e) => e.stopPropagation()}
         >
@@ -111,7 +107,10 @@ export function EditorsListModal({
           </div>
 
           {/* Editors List */}
-          <div className="overflow-auto max-h-[calc(80vh-80px)]" style={{ WebkitOverflowScrolling: 'touch' }}>
+          <div
+            className="overflow-auto max-h-[calc(80vh-80px)]"
+            style={{ WebkitOverflowScrolling: 'touch' }}
+          >
             {sortedEditors.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-zinc-400">No editors for this channel yet</p>
@@ -143,28 +142,29 @@ export function EditorsListModal({
                         {isOwner(editor) ? (
                           <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center">
                             <svg width="12" height="12" fill="white" viewBox="0 0 24 24">
-                              <path d="M5 16L3 6l5.5 4L12 4l3.5 6L21 6l-2 10H5zm2.7-2h8.6l.9-4.4-2.4 2L12 9l-2.8 2.6-2.4-2L7.7 14z"/>
+                              <path d="M5 16L3 6l5.5 4L12 4l3.5 6L21 6l-2 10H5zm2.7-2h8.6l.9-4.4-2.4 2L12 9l-2.8 2.6-2.4-2L7.7 14z" />
                             </svg>
                           </div>
-                        ) : ('is_verified' in editor && editor.is_verified) && (
-                          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-                            <svg width="12" height="12" fill="white" viewBox="0 0 20 20">
-                              <path
-                                fillRule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          </div>
+                        ) : (
+                          'is_verified' in editor &&
+                          editor.is_verified && (
+                            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                              <svg width="12" height="12" fill="white" viewBox="0 0 20 20">
+                                <path
+                                  fillRule="evenodd"
+                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            </div>
+                          )
                         )}
                       </div>
 
                       {/* Editor Info */}
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-white">
-                            {getDisplayName(editor)}
-                          </h3>
+                          <h3 className="font-semibold text-white">{getDisplayName(editor)}</h3>
                           {isOwner(editor) && (
                             <span className="text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full">
                               Owner
@@ -172,13 +172,13 @@ export function EditorsListModal({
                           )}
                         </div>
                         <p className="text-sm text-zinc-400">
-                          {formatFollowers('total_followers' in editor ? editor.total_followers : 0)}
+                          {formatFollowers(
+                            'total_followers' in editor ? editor.total_followers : 0,
+                          )}
                         </p>
                         {/* Bio/Description if available */}
-                        {('email' in editor && editor.email) && (
-                          <p className="text-sm text-zinc-500 mt-1 line-clamp-2">
-                            {editor.email}
-                          </p>
+                        {'email' in editor && editor.email && (
+                          <p className="text-sm text-zinc-500 mt-1 line-clamp-2">{editor.email}</p>
                         )}
                       </div>
                     </div>

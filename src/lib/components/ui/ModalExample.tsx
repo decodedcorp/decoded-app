@@ -6,45 +6,51 @@ import { SimpleModal } from './modal';
 // 예: 모달 열기 버튼 있는 카드 목록
 export function ModalExample() {
   const [open, setOpen] = useState(false);
-  
+
   return (
     <>
-      <button 
+      <button
         className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
         onClick={() => setOpen(true)}
       >
         Open Modal
       </button>
 
-      <SimpleModal
-        isOpen={open}
-        onClose={() => setOpen(false)}
-      >
-        <form className="space-y-4" onSubmit={(e) => {
-          e.preventDefault();
-          setOpen(false);
-        }}>
+      <SimpleModal isOpen={open} onClose={() => setOpen(false)}>
+        <form
+          className="space-y-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            setOpen(false);
+          }}
+        >
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Name
             </label>
             <input
               id="name"
               type="text"
-              className="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               placeholder="Enter name"
               autoFocus
             />
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Description
             </label>
             <textarea
               id="description"
               rows={3}
-              className="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               placeholder="Enter description"
             />
           </div>

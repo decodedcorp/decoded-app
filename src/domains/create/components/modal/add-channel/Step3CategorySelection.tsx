@@ -192,7 +192,7 @@ export function Step3CategorySelection({ data, onDataChange }: Step3CategorySele
                     {formData.selectedCategory}
                   </span>
                   {formData.selectedSubcategory && (
-                    <span className="inline-block ml-2 px-3 py-1 bg-blue-500/20 text-blue-400 text-sm rounded-full border border-blue-500/30">
+                    <span className="inline-block ml-2 px-3 py-1 bg-primary/20 text-primary text-sm rounded-full border border-primary/30">
                       {formData.selectedSubcategory}
                     </span>
                   )}

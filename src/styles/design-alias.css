@@ -15,8 +15,8 @@
   /* Legacy Layout Variables (keep as-is) */
   --edge-x: 16px;
   --main-gap: 24px;
-  --sidebar-w: 220px;
-  --sidebar-right-w: 280px;
+  --sidebar-w: 280px;
+  --sidebar-right-w: 320px;
   --header-h: 60px;
 
   /* Legacy Brand Color Mapping */
@@ -74,6 +74,6 @@
   :root {
     --edge-x: 40px;
     --main-gap: 36px;
-    --sidebar-right-w: 336px;
+    --sidebar-right-w: 360px;
   }
 }

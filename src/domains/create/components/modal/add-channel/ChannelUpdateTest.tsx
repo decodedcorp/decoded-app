@@ -20,8 +20,9 @@ export function ChannelUpdateTest({
   const [bannerBase64, setBannerBase64] = useState<string>('');
 
   const updateChannelMutation = useUpdateChannel();
-  
-  const { labels, validation, actions, status, placeholders, images, api } = useChannelTranslation();
+
+  const { labels, validation, actions, status, placeholders, images, api } =
+    useChannelTranslation();
   const { general } = useErrorTranslation();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,7 +55,11 @@ export function ChannelUpdateTest({
       setBannerBase64('');
     } catch (error) {
       console.error('Channel update failed:', error);
-      alert(`${status.error(actions.update())}: ${error instanceof Error ? error.message : general.unknown()}`);
+      alert(
+        `${status.error(actions.update())}: ${
+          error instanceof Error ? error.message : general.unknown()
+        }`,
+      );
     }
   };
 
@@ -79,9 +84,7 @@ export function ChannelUpdateTest({
 
   return (
     <div className="p-6 bg-zinc-900 rounded-lg border border-zinc-700">
-      <h3 className="text-lg font-semibold text-white mb-4">
-PUT /channels/{channelId} API Test
-      </h3>
+      <h3 className="text-lg font-semibold text-white mb-4">PUT /channels/{channelId} API Test</h3>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* 채널 이름 */}
@@ -91,19 +94,21 @@ PUT /channels/{channelId} API Test
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-md text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-md text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary"
             placeholder={placeholders.newName()}
           />
         </div>
 
         {/* 채널 설명 */}
         <div>
-          <label className="block text-sm font-medium text-zinc-300 mb-2">{labels.description()}</label>
+          <label className="block text-sm font-medium text-zinc-300 mb-2">
+            {labels.description()}
+          </label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
-            className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-md text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-md text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary"
             placeholder={placeholders.newDescription()}
           />
         </div>
@@ -162,7 +167,7 @@ PUT /channels/{channelId} API Test
         <button
           type="submit"
           disabled={updateChannelMutation.isPending}
-          className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {updateChannelMutation.isPending ? status.updating() : actions.update()}
         </button>
@@ -195,7 +200,8 @@ PUT /channels/{channelId} API Test
             <strong>{api.endpoint()}:</strong> /channels/{channelId}
           </p>
           <p>
-            <strong>{api.body()}:</strong> {`{ name?, description?, thumbnail_base64?, banner_base64? }`}
+            <strong>{api.body()}:</strong>{' '}
+            {`{ name?, description?, thumbnail_base64?, banner_base64? }`}
           </p>
           <p>
             <strong>{api.auth()}:</strong> {api.authRequired()}

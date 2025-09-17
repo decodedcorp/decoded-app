@@ -166,7 +166,7 @@ export default function BookmarksPage() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center overflow-hidden">
+                    <div className="w-16 h-16 bg-gradient-to-br from-primary to-gray-600 rounded-lg flex items-center justify-center overflow-hidden">
                       {bookmark.content?.thumbnail_url || bookmark.content?.link_preview_img_url ? (
                         <img
                           src={

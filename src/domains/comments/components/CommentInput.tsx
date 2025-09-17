@@ -103,7 +103,7 @@ export function CommentInput({
           <div
             className={`${
               compact ? 'w-6 h-6' : 'w-8 h-8'
-            } bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0`}
+            } bg-gradient-to-r from-primary to-gray-600 rounded-full flex items-center justify-center flex-shrink-0`}
           >
             <span className="text-white font-semibold text-xs">
               {(user.nickname || user.email || 'U').charAt(0).toUpperCase()}
@@ -121,7 +121,7 @@ export function CommentInput({
               placeholder={placeholder || tc.input.placeholder()}
               rows={1}
               maxLength={1000}
-              className={`w-full resize-none bg-zinc-800/50 border border-zinc-600 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+              className={`w-full resize-none bg-zinc-800/50 border border-zinc-600 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all ${
                 compact ? 'px-3 py-2 text-sm' : 'px-4 py-3'
               }`}
               style={{ maxHeight: '120px' }}

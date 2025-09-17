@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 import { Camera, Video, Link, FileText, MessageCircle, Share, Bookmark, Pin } from 'lucide-react';
+import { CardMediaWithFallback } from '@/components/CardMedia/CardMedia';
 
 export interface PostCardProps {
   id: number;
@@ -20,6 +21,9 @@ export interface PostCardProps {
   pins: number;
   comments: number;
   thumbnail?: string | null;
+  mediaWidth?: number; // Original width for aspect calculation
+  mediaHeight?: number; // Original height for aspect calculation
+  blurDataURL?: string; // Blur placeholder for better loading
   contentType: 'text' | 'image' | 'video' | 'link';
   badge?: string | null;
   onPostClick?: () => void;
@@ -28,79 +32,55 @@ export interface PostCardProps {
   className?: string;
 }
 
-// 썸네일 이미지 컴포넌트
+// 썸네일 이미지 컴포넌트 - 새로운 CardMedia 사용
 function ThumbnailImage({
   src,
   alt,
+  width,
+  height,
+  blurDataURL,
   getContentIcon,
   getContentTypeColor,
 }: {
   src: string;
   alt: string;
+  width?: number;
+  height?: number;
+  blurDataURL?: string;
   getContentIcon: () => React.ReactNode;
   getContentTypeColor: () => string;
 }) {
-  const [imageError, setImageError] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
-
   // 디버깅을 위한 로그
   if (process.env.NODE_ENV === 'development') {
     console.log('ThumbnailImage render:', {
       src,
       alt,
+      width,
+      height,
       hasSrc: !!src,
       srcType: typeof src,
-      imageError,
-      imageLoaded,
     });
   }
 
-  if (imageError) {
-    return (
-      <div className="w-full h-64 bg-zinc-800 rounded-lg flex items-center justify-center border border-zinc-700">
-        <div className={`${getContentTypeColor()}`} style={{ fontSize: '4rem' }}>
-          {getContentIcon()}
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="relative w-full bg-zinc-800 rounded-lg overflow-hidden border border-zinc-700">
-      {!imageLoaded && (
-        <div className="w-full h-64 bg-zinc-800 animate-pulse flex items-center justify-center">
-          <div className="w-8 h-8 bg-zinc-600 rounded-full"></div>
-        </div>
-      )}
-      <div className="p-2 bg-zinc-900">
-        <img
-          src={src}
-          alt={alt}
-          className={`w-full h-auto object-contain rounded-md transition-opacity duration-200 ${
-            imageLoaded ? 'opacity-100' : 'opacity-0'
-          }`}
-          onLoad={() => {
-            console.log('Image loaded successfully:', { src, alt });
-            setImageLoaded(true);
-          }}
-          onError={(e) => {
-            console.log('Image failed to load:', {
-              src,
-              error: e,
-              alt,
-              timestamp: new Date().toISOString(),
-              errorType: e.type,
-              target: e.target,
-            });
-            setImageError(true);
-          }}
-        />
+    <div className="relative w-full">
+      <CardMediaWithFallback
+        src={src}
+        alt={alt}
+        width={width}
+        height={height}
+        blurDataURL={blurDataURL}
+        className="w-full"
+        fallbackIcon={
+          <div className={`${getContentTypeColor()}`} style={{ fontSize: '4rem' }}>
+            {getContentIcon()}
+          </div>
+        }
+      />
+      {/* 콘텐츠 타입 배지 */}
+      <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm px-2 py-1 rounded text-xs">
+        <div className={`text-xs font-medium ${getContentTypeColor()}`}>{getContentIcon()}</div>
       </div>
-      {imageLoaded && (
-        <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm px-2 py-1 rounded text-xs">
-          <div className={`text-xs font-medium ${getContentTypeColor()}`}>{getContentIcon()}</div>
-        </div>
-      )}
     </div>
   );
 }
@@ -120,6 +100,9 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
   pins,
   comments,
   thumbnail,
+  mediaWidth,
+  mediaHeight,
+  blurDataURL,
   contentType,
   badge,
   onPostClick,
@@ -167,7 +150,7 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
 
   return (
     <div
-      className={`bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden hover:border-zinc-700 transition-all duration-200 group ${className}`}
+      className={`bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden hover:border-zinc-700 transition-all duration-200 group max-w-4xl mx-auto ${className}`}
     >
       <div className="p-4">
         {/* 상단: 채널 정보 및 메타데이터 */}
@@ -292,6 +275,9 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
               <ThumbnailImage
                 src={thumbnail}
                 alt={title}
+                width={mediaWidth}
+                height={mediaHeight}
+                blurDataURL={blurDataURL}
                 getContentIcon={getContentIcon}
                 getContentTypeColor={getContentTypeColor}
               />

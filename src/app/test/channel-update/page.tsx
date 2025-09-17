@@ -27,7 +27,7 @@ export default function ChannelUpdateTestPage() {
                 type="text"
                 value={channelId}
                 onChange={(e) => setChannelId(e.target.value)}
-                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-md text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-md text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="68a8abfec2052dc81884b700"
                 required
               />
@@ -39,7 +39,7 @@ export default function ChannelUpdateTestPage() {
                 type="text"
                 value={currentName}
                 onChange={(e) => setCurrentName(e.target.value)}
-                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-md text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-md text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="현재 채널 이름 (선택사항)"
               />
             </div>
@@ -50,7 +50,7 @@ export default function ChannelUpdateTestPage() {
                 type="text"
                 value={currentDescription}
                 onChange={(e) => setCurrentDescription(e.target.value)}
-                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-md text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-md text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="현재 채널 설명 (선택사항)"
               />
             </div>
