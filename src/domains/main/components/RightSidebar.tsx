@@ -9,7 +9,7 @@ export function RightSidebar() {
   const t = useCommonTranslation();
 
   return (
-    <div className="w-full h-[calc(100vh-72px)] py-4 px-3 sticky top-[72px] overflow-hidden flex flex-col">
+    <div className="w-full h-[calc(100vh-72px)] py-4 px-3 sticky top-[72px] overflow-hidden flex flex-col bg-black">
       {/* 트렌딩 커뮤니티 - 축약 */}
       <div className="mb-4 flex-shrink-0">
         <div className="text-white text-sm font-medium mb-3 flex items-center gap-2">

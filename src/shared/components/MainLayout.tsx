@@ -20,12 +20,12 @@ export const MainLayout = memo(function MainLayout({
       {/* 사이드바를 별도로 렌더링 (fixed positioning) */}
       <Sidebar />
 
-      <div className="grid grid-cols-1 lg:grid-cols-[var(--sidebar-w)_minmax(0,1fr)_var(--sidebar-right-w)] pt-[var(--header-h)]">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_3fr_1fr] pt-[var(--header-h)]">
         {/* 왼쪽 사이드바 공간 확보 - 데스크톱에서만 */}
         <div className="hidden lg:block" />
 
         {/* 메인 콘텐츠 영역 - 모바일: layout-edge만, 데스크톱: 사이드바 간격 추가 */}
-        <div className="layout-edge lg:ml-[var(--main-gap)] lg:mr-[var(--main-gap)]">
+        <div className="px-1 lg:ml-1 lg:mr-1">
           <main
             id="main"
             data-role="primary"

@@ -241,47 +241,47 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
 
       {/* Content - 전체 페이지 스크롤 사용 */}
       <div>
-          {error && <div className="text-red-500 text-center p-4">{t.status.error()}</div>}
-          {!error && finalChannel && (
-            <>
-              <ChannelModalContent
-                currentFilters={currentFilters}
-                channelId={actualChannelId}
-                onFilterChange={handleFilterChange}
-              />
-            </>
-          )}
-          {!error && !finalChannel && (
-            <div className="space-y-6 p-6">
-              {/* Stats 스켈레톤 */}
-              <div className="space-y-4">
-                <div className="flex space-x-6">
-                  {Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="text-center">
-                      <div className="h-6 w-12 bg-zinc-700 rounded mx-auto mb-1 animate-pulse" />
-                      <div className="h-3 w-10 bg-zinc-800 rounded mx-auto animate-pulse" />
-                    </div>
-                  ))}
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="h-4 w-16 bg-zinc-800 rounded animate-pulse" />
-                  ))}
-                </div>
+        {error && <div className="text-red-500 text-center p-4">{t.status.error()}</div>}
+        {!error && finalChannel && (
+          <>
+            <ChannelModalContent
+              currentFilters={currentFilters}
+              channelId={actualChannelId}
+              onFilterChange={handleFilterChange}
+            />
+          </>
+        )}
+        {!error && !finalChannel && (
+          <div className="space-y-6 p-6">
+            {/* Stats 스켈레톤 */}
+            <div className="space-y-4">
+              <div className="flex space-x-6">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="text-center">
+                    <div className="h-6 w-12 bg-zinc-700 rounded mx-auto mb-1 animate-pulse" />
+                    <div className="h-3 w-10 bg-zinc-800 rounded mx-auto animate-pulse" />
+                  </div>
+                ))}
               </div>
-
-              {/* Content 스켈레톤 */}
-              <div>
-                <div className="h-8 w-32 bg-zinc-700 rounded mb-6 animate-pulse" />
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                  {Array.from({ length: 10 }).map((_, i) => (
-                    <div key={i} className="h-40 bg-zinc-800 rounded-xl animate-pulse" />
-                  ))}
-                </div>
+              <div className="flex flex-wrap gap-2">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="h-4 w-16 bg-zinc-800 rounded animate-pulse" />
+                ))}
               </div>
             </div>
-          )}
-        </div>
+
+            {/* Content 스켈레톤 */}
+            <div>
+              <div className="h-8 w-32 bg-zinc-700 rounded mb-6 animate-pulse" />
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                {Array.from({ length: 10 }).map((_, i) => (
+                  <div key={i} className="h-40 bg-zinc-800 rounded-xl animate-pulse" />
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Content Modal */}
       <ContentModal />
