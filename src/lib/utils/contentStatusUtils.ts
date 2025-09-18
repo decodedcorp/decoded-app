@@ -41,14 +41,6 @@ export const isContentClickable = (status?: ContentStatus): boolean => {
 };
 
 /**
- * 콘텐츠 상태에 따른 로딩 스피너 표시 여부
- */
-export const shouldShowLoadingSpinner = (status?: ContentStatus): boolean => {
-  // Pending 상태는 더 이상 로딩 스피너를 표시하지 않음
-  return false;
-};
-
-/**
  * 콘텐츠 상태에 따른 호버 효과 표시 여부
  */
 export const shouldShowHoverEffects = (status?: ContentStatus): boolean => {

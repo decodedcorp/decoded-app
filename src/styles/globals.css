@@ -11,8 +11,8 @@
   /* Layout design tokens - unified edge padding system */
   --edge-x: 16px; /* 뷰포트 좌우 기본 여백 */
   --main-gap: 24px; /* 메인↔사이드 가로 간격 */
-  --sidebar-w: 280px; /* 데스크톱 사이드바 너비 */
-  --sidebar-right-w: 320px; /* 오른쪽 사이드바 너비 */
+  --sidebar-w: 260px; /* 데스크톱 사이드바 너비 */
+  --sidebar-right-w: 260px; /* 오른쪽 사이드바 너비 */
   --header-h: 60px; /* 헤더 높이, sticky 기준 */
 
   /* dense 모드(거의 무여백) */
@@ -21,8 +21,10 @@
   /* Legacy - 기존 호환성 유지 */
   --space-page-x: var(--edge-x);
 
-  /* Modal design tokens - 통합 모달 시스템 */
-  /* Z-index scale (toasts < modals < popovers above?) */
+  /* Z-index scale - 레이어 우선순위 */
+  --z-header: 9999;
+  --z-sidebar: 40; /* 모달보다 낮게 설정 */
+  --z-sidebar-mobile: 10002;
   --z-overlay: 50;
   --z-modal: 60;
   --z-modal-root: 70;

@@ -377,6 +377,35 @@ export const useCommentTranslation = () => {
   };
 };
 
+export const usePostCardTranslation = () => {
+  const { t } = useTranslation('common');
+
+  return {
+    actions: {
+      pin: () => t('postCard.actions.pin'),
+      comment: () => t('postCard.actions.comment'),
+      share: () => t('postCard.actions.share'),
+      save: () => t('postCard.actions.save'),
+    },
+    contentType: {
+      image: () => t('postCard.contentType.image'),
+      video: () => t('postCard.contentType.video'),
+      link: () => t('postCard.contentType.link'),
+      text: () => t('postCard.contentType.text'),
+    },
+    accessibility: {
+      goToChannel: (channelName: string) =>
+        t('postCard.accessibility.goToChannel', { channelName }),
+      goToAuthor: (authorName: string) => t('postCard.accessibility.goToAuthor', { authorName }),
+      openPost: () => t('postCard.accessibility.openPost'),
+      pinPost: () => t('postCard.accessibility.pinPost'),
+      commentOnPost: () => t('postCard.accessibility.commentOnPost'),
+      sharePost: () => t('postCard.accessibility.sharePost'),
+      savePost: () => t('postCard.accessibility.savePost'),
+    },
+  };
+};
+
 export const useAccessibilityTranslation = () => {
   const { t } = useTranslation('common');
 

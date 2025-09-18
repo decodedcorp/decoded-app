@@ -69,7 +69,7 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
   // 로딩 상태 렌더링
   if (isLoading) {
     return (
-      <div className={`relative h-full overflow-y-auto ${className}`}>
+      <div className={`relative h-full overflow-y-auto pt-[var(--header-h)] ${className}`}>
         <LoadingState title={states.searching()} />
       </div>
     );
@@ -78,7 +78,7 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
   // 에러 상태 렌더링
   if (error) {
     return (
-      <div className={`relative h-full overflow-y-auto ${className}`}>
+      <div className={`relative h-full overflow-y-auto pt-[var(--header-h)] ${className}`}>
         <ErrorState title={states.loadError()} subtitle={states.loadErrorSubtitle()} />
       </div>
     );
@@ -87,7 +87,7 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
   // 채널이 없는 경우
   if (!channels.length) {
     return (
-      <div className={`relative h-full overflow-y-auto ${className}`}>
+      <div className={`relative h-full overflow-y-auto pt-[var(--header-h)] ${className}`}>
         <EmptyState title={states.empty()} subtitle={states.emptySubtitle()} />
       </div>
     );

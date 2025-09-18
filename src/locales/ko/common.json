@@ -445,6 +445,29 @@
     "sending": "전송 중...",
     "sendInvitation": "초대 보내기"
   },
+  "postCard": {
+    "actions": {
+      "pin": "핀",
+      "comment": "댓글",
+      "share": "공유",
+      "save": "저장"
+    },
+    "contentType": {
+      "image": "이미지",
+      "video": "비디오",
+      "link": "링크",
+      "text": "텍스트"
+    },
+    "accessibility": {
+      "goToChannel": "{{channelName}} 채널로 이동",
+      "goToAuthor": "{{authorName}} 작성자 페이지로 이동",
+      "openPost": "게시물 열기",
+      "pinPost": "게시물 핀하기",
+      "commentOnPost": "게시물에 댓글 달기",
+      "sharePost": "게시물 공유하기",
+      "savePost": "게시물 저장하기"
+    }
+  },
   "accessibility": {
     "closeModal": "모달 닫기",
     "expandSidebar": "사이드바 펼치기",

@@ -95,13 +95,8 @@ export const Header = memo(function Header() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isChannelPage]);
 
-  // 헤더 표시 여부 결정
-  const shouldShowHeader =
-    isAtTop || // 페이지 상단에 있을 때
-    scrollDirection === 'up' || // 위로 스크롤할 때
-    isHovered || // 마우스 호버 시
-    isFocused || // 키보드 포커스 시
-    !isChannelPage; // 채널 페이지가 아닐 때
+  // 헤더 항상 표시 - 고정 헤더
+  const shouldShowHeader = true;
 
   return (
     <header

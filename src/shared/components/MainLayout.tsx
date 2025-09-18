@@ -3,7 +3,6 @@
 import { ReactNode, memo } from 'react';
 
 import { RightSidebar } from '@/domains/main/components/RightSidebar';
-import { GlobalContentUploadModal } from '@/domains/channels/components/modal/global-content-upload/GlobalContentUploadModal';
 
 import { Sidebar } from './sidebar/Sidebar';
 
@@ -17,15 +16,16 @@ export const MainLayout = memo(function MainLayout({
   maxWidth = 'default',
 }: MainLayoutProps) {
   return (
-    <div className="min-h-dvh pt-[var(--header-h)]">
-      <div className="grid grid-cols-1 lg:grid-cols-[var(--sidebar-w)_minmax(0,1fr)_var(--sidebar-right-w)]">
-        {/* 왼쪽 사이드바 - 데스크톱에서만 표시, 화면 끝에 붙음 */}
-        <div className="hidden lg:block">
-          <Sidebar />
-        </div>
+    <div className="min-h-dvh">
+      {/* 사이드바를 별도로 렌더링 (fixed positioning) */}
+      <Sidebar />
+
+      <div className="grid grid-cols-1 lg:grid-cols-[var(--sidebar-w)_minmax(0,1fr)_var(--sidebar-right-w)] pt-[var(--header-h)]">
+        {/* 왼쪽 사이드바 공간 확보 - 데스크톱에서만 */}
+        <div className="hidden lg:block" />
 
         {/* 메인 콘텐츠 영역 - 모바일: layout-edge만, 데스크톱: 사이드바 간격 추가 */}
-        <div className="layout-edge lg:ml-[var(--main-gap)]">
+        <div className="layout-edge lg:ml-[var(--main-gap)] lg:mr-[var(--main-gap)]">
           <main
             id="main"
             data-role="primary"
@@ -37,22 +37,17 @@ export const MainLayout = memo(function MainLayout({
           </main>
         </div>
 
-        {/* 오른쪽 사이드바 - 데스크톱에서만 표시 */}
-        <aside
-          id="sidebar-right"
-          className="hidden lg:block sticky top-[var(--header-h)] h-[calc(100dvh-var(--header-h))] overflow-auto lg:ml-[var(--main-gap)]"
-        >
-          <RightSidebar />
-        </aside>
+        {/* 오른쪽 사이드바 공간 확보 - 데스크톱에서만 */}
+        <div className="hidden lg:block" />
       </div>
 
-      {/* 모바일 사이드바 - 오버레이로 렌더링 */}
-      <div className="lg:hidden">
-        <Sidebar />
-      </div>
-
-      {/* Global Content Upload Modal - 전역적으로 렌더링 */}
-      <GlobalContentUploadModal />
+      {/* 오른쪽 사이드바 - 별도로 렌더링 (fixed positioning) */}
+      <aside
+        id="sidebar-right"
+        className="hidden lg:block fixed top-[60px] md:top-[72px] right-0 w-[260px] h-[calc(100dvh-60px)] md:h-[calc(100dvh-72px)] overflow-auto z-[var(--z-sidebar)]"
+      >
+        <RightSidebar />
+      </aside>
     </div>
   );
 });

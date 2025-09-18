@@ -14,6 +14,12 @@ import {
   Pin,
 } from 'lucide-react';
 import { CardMediaWithFallback } from '@/components/CardMedia/CardMedia';
+import { usePostCardTranslation } from '@/lib/i18n/hooks';
+import { useTogglePin } from '@/domains/channels/hooks/useChannelPins';
+import { useBookmark } from '@/domains/users/hooks/useBookmark';
+import { useCommentStats } from '@/domains/comments/hooks/useComments';
+import { useContentLike } from '@/domains/interactions/hooks/useContentLike';
+import { useCommentsModal } from '@/hooks/useCommentsModal';
 
 export interface PostCardProps {
   id: number;
@@ -39,6 +45,12 @@ export interface PostCardProps {
   onChannelClick?: (channelId: string, channel: string) => void;
   onAuthorClick?: (authorId: string, author: string) => void;
   className?: string;
+  // API 연결을 위한 추가 props
+  contentId?: string; // 실제 콘텐츠 ID (API 호출용)
+  isPinned?: boolean; // 핀 상태 (선택적, 없으면 API에서 조회)
+  isBookmarked?: boolean; // 북마크 상태 (선택적, 없으면 API에서 조회)
+  isLiked?: boolean; // 좋아요 상태 (선택적, 없으면 API에서 조회)
+  likeCount?: number; // 좋아요 수 (선택적, 없으면 API에서 조회)
 }
 
 // 썸네일 이미지 컴포넌트 - 새로운 CardMedia 사용
@@ -122,8 +134,42 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
   onChannelClick,
   onAuthorClick,
   className = '',
+  // API 연결을 위한 추가 props
+  contentId,
+  isPinned: propIsPinned,
+  isBookmarked: propIsBookmarked,
+  isLiked: propIsLiked,
+  likeCount: propLikeCount,
 }: PostCardProps) {
   const router = useRouter();
+  const { actions, contentType: contentTypeLabels, accessibility } = usePostCardTranslation();
+  const { open: openComments } = useCommentsModal();
+
+  // API 훅들 - contentId가 있을 때만 활성화
+  const { togglePin, isLoading: isPinLoading } = useTogglePin();
+  const {
+    addBookmark,
+    removeBookmark,
+    isLoading: isBookmarkLoading,
+  } = useBookmark(contentId || '');
+  const {
+    isLiked,
+    likeCount,
+    toggleLike,
+    isLoading: isLikeLoading,
+  } = useContentLike(contentId || '');
+  const { data: commentStats, isLoading: isCommentStatsLoading } = useCommentStats(
+    contentId || '',
+    !!contentId,
+  );
+
+  // 실제 상태값들 (props 우선, 없으면 API에서 가져온 값 사용)
+  const actualIsPinned = propIsPinned ?? false; // TODO: useIsContentPinned 훅 사용 예정
+  const actualIsBookmarked = propIsBookmarked ?? false; // TODO: useBookmarkStatus 훅 사용 예정
+  const actualIsLiked = propIsLiked ?? isLiked;
+  const actualLikeCount = propLikeCount ?? likeCount;
+  const actualCommentCount = comments ?? commentStats?.total_comments ?? 0;
+
   // 디버깅을 위한 로그
   if (process.env.NODE_ENV === 'development') {
     console.log('PostCard render:', {
@@ -132,6 +178,11 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
       contentType,
       hasThumbnail: !!thumbnail,
       thumbnailType: typeof thumbnail,
+      contentId,
+      actualIsPinned,
+      actualIsBookmarked,
+      actualIsLiked,
+      actualLikeCount,
     });
   }
 
@@ -165,6 +216,71 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
     }
   };
 
+  // 액션 핸들러들
+  const handlePinClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!contentId || isPinLoading) return;
+
+    try {
+      await togglePin(contentId, channelId, actualIsPinned);
+    } catch (error) {
+      console.error('Failed to toggle pin:', error);
+    }
+  };
+
+  const handleBookmarkClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!contentId || isBookmarkLoading) return;
+
+    try {
+      if (actualIsBookmarked) {
+        removeBookmark();
+      } else {
+        addBookmark();
+      }
+    } catch (error) {
+      console.error('Failed to toggle bookmark:', error);
+    }
+  };
+
+  const handleLikeClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!contentId || isLikeLoading) return;
+
+    try {
+      await toggleLike();
+    } catch (error) {
+      console.error('Failed to toggle like:', error);
+    }
+  };
+
+  const handleCommentClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!contentId) return;
+
+    openComments(contentId);
+  };
+
+  const handleShareClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: title,
+          text: description || title,
+          url: window.location.href,
+        });
+      } else {
+        // 브라우저가 Web Share API를 지원하지 않는 경우 클립보드에 복사
+        await navigator.clipboard.writeText(window.location.href);
+        // TODO: 토스트 메시지 표시
+      }
+    } catch (error) {
+      console.error('Failed to share:', error);
+    }
+  };
+
   return (
     <div
       className={`bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden hover:border-zinc-700 transition-all duration-200 group max-w-4xl mx-auto relative ${className}`}
@@ -188,7 +304,7 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
                 router.push(`/channels/${channelId}`);
               }
             }}
-            aria-label={`Go to ${channel}`}
+            aria-label={accessibility.goToChannel(channel)}
           >
             {channelThumbnail ? (
               <img
@@ -266,6 +382,7 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
                     router.push(`/users/${authorId}`);
                   }
                 }}
+                aria-label={accessibility.goToAuthor(userAka || author)}
               >
                 {userAka || author}
               </button>
@@ -280,6 +397,15 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
           className="cursor-pointer group/content hover:bg-zinc-900/50 rounded-lg p-2 -m-2 transition-colors"
           onClick={() => {
             onPostClick?.();
+          }}
+          role="button"
+          tabIndex={0}
+          aria-label={accessibility.openPost()}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onPostClick?.();
+            }
           }}
         >
           {/* 제목 */}
@@ -310,22 +436,87 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
         </div>
 
         {/* 포스트 액션 버튼들 */}
-        <div className="flex items-center gap-6 text-sm text-zinc-500 border-t border-zinc-800 pt-4">
-          <button className="hover:text-orange-400 transition-colors flex items-center gap-2">
-            <Pin className="w-4 h-4" />
-            <span className="font-medium">{pins > 0 ? pins.toLocaleString() : 'Pin'}</span>
+        <div className="flex items-center gap-2 text-sm text-zinc-500 border-t border-zinc-800 pt-4">
+          {/* Pin 버튼 */}
+          <button
+            onClick={handlePinClick}
+            disabled={!contentId || isPinLoading}
+            className={`transition-all duration-200 flex items-center gap-2 px-3 py-2 rounded-lg ${
+              actualIsPinned
+                ? 'text-primary bg-primary/10 border border-primary/20'
+                : 'text-zinc-400 hover:text-primary hover:bg-primary/5 hover:border-primary/10 border border-transparent'
+            } ${isPinLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            aria-label={accessibility.pinPost()}
+          >
+            <Pin className={`w-4 h-4 ${actualIsPinned ? 'fill-current' : ''}`} />
+            <span className="font-medium">{pins > 0 ? pins.toLocaleString() : actions.pin()}</span>
           </button>
-          <button className="hover:text-blue-400 transition-colors flex items-center gap-2">
+
+          {/* Like 버튼 */}
+          <button
+            onClick={handleLikeClick}
+            disabled={!contentId || isLikeLoading}
+            className={`transition-all duration-200 flex items-center gap-2 px-3 py-2 rounded-lg ${
+              actualIsLiked
+                ? 'text-red-500 bg-red-500/10 border border-red-500/20'
+                : 'text-zinc-400 hover:text-red-500 hover:bg-red-500/5 hover:border-red-500/10 border border-transparent'
+            } ${isLikeLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            aria-label={actualIsLiked ? 'Unlike this post' : 'Like this post'}
+          >
+            <svg
+              className="w-4 h-4"
+              fill={actualIsLiked ? 'currentColor' : 'none'}
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              />
+            </svg>
+            <span className="font-medium">
+              {actualLikeCount > 0 ? actualLikeCount.toLocaleString() : 'Like'}
+            </span>
+          </button>
+
+          {/* Comment 버튼 */}
+          <button
+            onClick={handleCommentClick}
+            disabled={!contentId}
+            className="text-zinc-400 hover:text-blue-500 hover:bg-blue-500/5 hover:border-blue-500/10 border border-transparent transition-all duration-200 flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer"
+            aria-label={accessibility.commentOnPost()}
+          >
             <MessageCircle className="w-4 h-4" />
-            <span className="font-medium">{comments > 0 ? comments : 'Comment'}</span>
+            <span className="font-medium">
+              {actualCommentCount > 0 ? actualCommentCount.toLocaleString() : actions.comment()}
+            </span>
           </button>
-          <button className="hover:text-green-400 transition-colors flex items-center gap-2">
+
+          {/* Share 버튼 */}
+          <button
+            onClick={handleShareClick}
+            className="text-zinc-400 hover:text-green-500 hover:bg-green-500/5 hover:border-green-500/10 border border-transparent transition-all duration-200 flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer"
+            aria-label={accessibility.sharePost()}
+          >
             <Share className="w-4 h-4" />
-            <span>Share</span>
+            <span>{actions.share()}</span>
           </button>
-          <button className="hover:text-purple-400 transition-colors flex items-center gap-2">
-            <Bookmark className="w-4 h-4" />
-            <span>Save</span>
+
+          {/* Bookmark 버튼 */}
+          <button
+            onClick={handleBookmarkClick}
+            disabled={!contentId || isBookmarkLoading}
+            className={`transition-all duration-200 flex items-center gap-2 px-3 py-2 rounded-lg ${
+              actualIsBookmarked
+                ? 'text-purple-500 bg-purple-500/10 border border-purple-500/20'
+                : 'text-zinc-400 hover:text-purple-500 hover:bg-purple-500/5 hover:border-purple-500/10 border border-transparent'
+            } ${isBookmarkLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            aria-label={accessibility.savePost()}
+          >
+            <Bookmark className={`w-4 h-4 ${actualIsBookmarked ? 'fill-current' : ''}`} />
+            <span>{actions.save()}</span>
           </button>
         </div>
       </div>

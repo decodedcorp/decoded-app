@@ -222,27 +222,25 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      {/* Main Content - Full width */}
-      <div className="w-full flex flex-col overflow-hidden">
-        {/* Header */}
-        <div className="flex-shrink-0">
-          {finalChannel ? (
-            <ChannelPageHeader
-              channel={finalChannel}
-              onGoBack={handleGoBack}
-              onSubscribe={handleSubscribe}
-              onUnsubscribe={handleUnsubscribe}
-              isSubscribeLoading={false}
-              onMobileFiltersToggle={handleMobileFiltersToggle}
-            />
-          ) : (
-            <ChannelModalSkeleton onClose={handleGoBack} />
-          )}
-        </div>
+    <div className="min-h-screen">
+      {/* Header */}
+      <div className="flex-shrink-0">
+        {finalChannel ? (
+          <ChannelPageHeader
+            channel={finalChannel}
+            onGoBack={handleGoBack}
+            onSubscribe={handleSubscribe}
+            onUnsubscribe={handleUnsubscribe}
+            isSubscribeLoading={false}
+            onMobileFiltersToggle={handleMobileFiltersToggle}
+          />
+        ) : (
+          <ChannelModalSkeleton onClose={handleGoBack} />
+        )}
+      </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden">
+      {/* Content - 전체 페이지 스크롤 사용 */}
+      <div>
           {error && <div className="text-red-500 text-center p-4">{t.status.error()}</div>}
           {!error && finalChannel && (
             <>
@@ -284,7 +282,6 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
             </div>
           )}
         </div>
-      </div>
 
       {/* Content Modal */}
       <ContentModal />

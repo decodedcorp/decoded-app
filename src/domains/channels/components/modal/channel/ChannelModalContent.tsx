@@ -18,7 +18,6 @@ import {
 import {
   getContentStatusStyles,
   isContentClickable,
-  shouldShowLoadingSpinner,
   shouldShowHoverEffects,
   shouldShowPendingOverlay,
 } from '@/lib/utils/contentStatusUtils';
@@ -50,7 +49,6 @@ const ContentItemCard = React.memo<{
 
   // 상태별 스타일 가져오기
   const statusStyles = getContentStatusStyles(item.status);
-  const showLoadingSpinner = shouldShowLoadingSpinner(item.status);
   const showHoverEffects = shouldShowHoverEffects(item.status);
   const showPendingOverlay = shouldShowPendingOverlay(item.status);
 
@@ -280,16 +278,6 @@ const ContentItemCard = React.memo<{
               {item.metadata?.game && (
                 <p className="text-blue-300 text-xs">🎮 {item.metadata.game}</p>
               )}
-            </div>
-          </div>
-        )}
-
-        {/* Loading overlay */}
-        {showLoadingSpinner && (
-          <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10">
-            <div className="flex flex-col items-center justify-center">
-              <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin mb-2"></div>
-              <p className="text-white text-sm font-medium">{statusStyles.text}</p>
             </div>
           </div>
         )}

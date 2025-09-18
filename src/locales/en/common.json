@@ -445,6 +445,29 @@
     "sending": "Sending...",
     "sendInvitation": "Send Invitation"
   },
+  "postCard": {
+    "actions": {
+      "pin": "Pin",
+      "comment": "Comment",
+      "share": "Share",
+      "save": "Save"
+    },
+    "contentType": {
+      "image": "Image",
+      "video": "Video",
+      "link": "Link",
+      "text": "Text"
+    },
+    "accessibility": {
+      "goToChannel": "Go to {{channelName}} channel",
+      "goToAuthor": "Go to {{authorName}} author page",
+      "openPost": "Open post",
+      "pinPost": "Pin post",
+      "commentOnPost": "Comment on post",
+      "sharePost": "Share post",
+      "savePost": "Save post"
+    }
+  },
   "accessibility": {
     "closeModal": "Close modal",
     "expandSidebar": "Expand sidebar",

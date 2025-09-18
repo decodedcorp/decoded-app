@@ -10,6 +10,8 @@ interface ModalCoreProps {
   ariaLabel?: string;
   children: React.ReactNode;
   className?: string;
+  closeOnOverlayClick?: boolean;
+  closeOnEscape?: boolean;
 }
 
 export function ModalCore({
@@ -19,6 +21,8 @@ export function ModalCore({
   ariaLabel,
   children,
   className = '',
+  closeOnOverlayClick = true,
+  closeOnEscape = true,
 }: ModalCoreProps) {
   const [mounted, setMounted] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -48,7 +52,7 @@ export function ModalCore({
 
   // ESC key handler
   useEffect(() => {
-    if (!open) return;
+    if (!open || !closeOnEscape) return;
 
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -58,7 +62,7 @@ export function ModalCore({
 
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [open, onOpenChange]);
+  }, [open, onOpenChange, closeOnEscape]);
 
   // Runtime warning for problematic ancestors (development only)
   useEffect(() => {
@@ -93,7 +97,7 @@ export function ModalCore({
   const modal = (
     <div
       className="modal-overlay"
-      onClick={() => onOpenChange(false, 'overlay')}
+      onClick={closeOnOverlayClick ? () => onOpenChange(false, 'overlay') : undefined}
       role="presentation"
     >
       <div

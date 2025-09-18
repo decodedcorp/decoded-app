@@ -49,11 +49,20 @@ export function BaseModalAdapter({
 
   const handleOpenChange = (open: boolean, reason?: string) => {
     if (!open) {
-      if (reason === 'escape' && onEscape) {
-        onEscape();
-      } else if (reason === 'overlay' && onOverlayClick) {
-        onOverlayClick();
-      } else {
+      if (reason === 'escape' && closeOnEscape) {
+        if (onEscape) {
+          onEscape();
+        } else {
+          onClose();
+        }
+      } else if (reason === 'overlay' && closeOnOverlayClick) {
+        if (onOverlayClick) {
+          onOverlayClick();
+        } else {
+          onClose();
+        }
+      } else if (!reason) {
+        // Direct close call
         onClose();
       }
     }
@@ -66,6 +75,8 @@ export function BaseModalAdapter({
       size={getSize()}
       ariaLabel={titleId ? undefined : 'Modal'}
       className={className}
+      closeOnOverlayClick={closeOnOverlayClick}
+      closeOnEscape={closeOnEscape}
     >
       <div className="flex flex-col h-full">{children}</div>
     </ModalCore>
