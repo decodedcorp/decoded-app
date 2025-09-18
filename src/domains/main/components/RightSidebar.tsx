@@ -43,7 +43,7 @@ export function RightSidebar() {
         <div className="space-y-3">
           {list.length === 0 ? (
             <div className="text-xs text-gray-500">
-              {userDocId ? '추천 채널이 없어요' : t.globalContentUpload.sidebar.trendingEmpty()}
+              {userDocId ? '추천 채널이 없어요' : '트렌딩 채널이 없어요'}
             </div>
           ) : (
             list.slice(0, 4).map((channel, index) => (
