@@ -4,43 +4,61 @@ import React from 'react';
 
 import { Flame, TrendingUp } from 'lucide-react';
 import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
+import { useQuery } from '@tanstack/react-query';
+import { RecommendationsService } from '@/api/generated/services/RecommendationsService';
+import { useAuthStore } from '@/store/authStore';
+import type { ChannelResponse } from '@/api/generated/models/ChannelResponse';
+import { useTrendingChannels } from '@/domains/channels/hooks/useTrending';
 
 export function RightSidebar() {
   const t = useCommonTranslation();
+  const userDocId = useAuthStore((s) => s.user?.doc_id || null);
+
+  // Recommended (logged-in)
+  const { data: recData } = useQuery({
+    queryKey: ['recommendations', 'channels', { limit: 4, userId: userDocId }],
+    queryFn: () =>
+      RecommendationsService.recommendChannelsRecommendationsChannelsGet(4, undefined, userDocId),
+    enabled: !!userDocId,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
+  // Trending fallback (logged-out)
+  const { data: trendingData } = useTrendingChannels('popular', 4);
+
+  const recommended: ChannelResponse[] = recData?.channels || [];
+  const trending: ChannelResponse[] = trendingData?.channels || [];
+  const list: ChannelResponse[] = userDocId ? recommended : trending;
+  const title = userDocId ? '추천 채널' : t.globalContentUpload.sidebar.trendingChannels();
 
   return (
     <div className="w-full h-screen p-4 sticky top-0 overflow-y-auto">
-      {/* 트렌딩 커뮤니티 */}
+      {/* 추천/트렌딩 채널 */}
       <div className="mb-6">
         <div className="text-white text-sm font-medium mb-4 flex items-center gap-2">
           <Flame className="w-4 h-4" />
-          {t.globalContentUpload.sidebar.trendingChannels()}
+          {title}
         </div>
         <div className="space-y-3">
-          {[
-            {
-              name: 'technology',
-              members: '12.5M',
-              description: 'Latest tech news and discussions',
-            },
-            { name: 'programming', members: '8.2M', description: 'Programming discussions' },
-            { name: 'webdev', members: '2.1M', description: 'Web development channel' },
-            { name: 'reactjs', members: '891K', description: 'React.js discussions' },
-          ].map((channel, index) => (
-            <div
-              key={channel.name}
-              className="p-3 bg-zinc-800 rounded-lg hover:bg-zinc-750 cursor-pointer transition-colors"
-            >
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-white text-sm font-medium">{channel.name}</span>
-                <span className="text-xs text-gray-400">#{index + 1}</span>
-              </div>
-              <div className="text-xs text-gray-400 mb-1">
-                {channel.members} {t.globalContentUpload.sidebar.members()}
-              </div>
-              <div className="text-xs text-gray-500">{channel.description}</div>
+          {list.length === 0 ? (
+            <div className="text-xs text-gray-500">
+              {userDocId ? '추천 채널이 없어요' : t.globalContentUpload.sidebar.trendingEmpty()}
             </div>
-          ))}
+          ) : (
+            list.slice(0, 4).map((channel, index) => (
+              <div
+                key={channel.id}
+                className="p-3 bg-zinc-800 rounded-lg hover:bg-zinc-750 cursor-pointer transition-colors"
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-white text-sm font-medium">{channel.name}</span>
+                  <span className="text-xs text-gray-400">#{index + 1}</span>
+                </div>
+                <div className="text-xs text-gray-500 line-clamp-2">{channel.description || ''}</div>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
