@@ -79,8 +79,8 @@ export function ContentSearchResults({ query }: ContentSearchResultsProps) {
   }, [contents, searchData]);
 
   const handleContentClick = (contentId: string, channelId: string) => {
-    // 콘텐츠 클릭 시 해당 채널 페이지로 이동하면서 콘텐츠 모달 열기
-    router.push(`/channels/${channelId}?content=${contentId}`);
+    // 콘텐츠 클릭 시 콘텐츠 상세 페이지로 이동 (모달 라우팅)
+    router.push(`/channels/${channelId}/contents/${contentId}`);
   };
 
   if (isLoading && !contents.length) {

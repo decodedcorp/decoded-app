@@ -40,9 +40,9 @@ export const Header = memo(function Header() {
     [pathname],
   );
 
-  // 채널 ID 추출 - useMemo로 최적화
+  // 채널 ID 추출 - useMemo로 최적화 (contents 부분 제외)
   const channelId = useMemo(
-    () => (isChannelPage ? pathname?.split('/channels/')[1] : null),
+    () => (isChannelPage ? pathname?.split('/channels/')[1]?.split('/')[0] : null),
     [isChannelPage, pathname],
   );
 

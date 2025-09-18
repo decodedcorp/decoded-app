@@ -30,10 +30,10 @@ export function ChannelSearchBar({
   const router = useRouter();
   const t = useCommonTranslation();
 
-  // URL에서 현재 채널 ID 추출
+  // URL에서 현재 채널 ID 추출 (contents 부분 제외)
   const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
   const channelMatch = currentPath.match(/\/channels\/([^\/]+)/);
-  const currentChannelId = channelMatch?.[1] || channelId;
+  const currentChannelId = channelMatch?.[1]?.split('/')[0] || channelId;
 
   // 채널 데이터 가져오기
   const { data: channelData } = useChannel(currentChannelId);
@@ -98,13 +98,13 @@ export function ChannelSearchBar({
         // 채널인 경우: 채널 페이지로 이동
         router.push(`/channels/${item.channelId}`);
       } else {
-        // 콘텐츠인 경우: 현재 채널 페이지에서 콘텐츠 모달 열기
+        // 콘텐츠인 경우: 콘텐츠 상세 페이지로 이동 (모달 라우팅)
         // URL에서 현재 채널 ID를 추출하여 사용
         const currentPath = window.location.pathname;
         const channelMatch = currentPath.match(/\/channels\/([^\/]+)/);
         const currentChannelId = channelMatch?.[1] || channelId;
 
-        router.push(`/channels/${currentChannelId}?content=${item.id}`);
+        router.push(`/channels/${currentChannelId}/contents/${item.id}`);
       }
       setQuery('');
       setIsAutocompleteOpen(false);
