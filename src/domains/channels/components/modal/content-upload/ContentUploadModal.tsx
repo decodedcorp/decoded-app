@@ -100,10 +100,10 @@ export function ContentUploadModal() {
       descId="content-upload-modal-description"
       contentClassName={MODAL_SIZES.WIDE}
     >
-      <div className="bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl w-full h-full overflow-hidden animate-scale-in shadow-2xl flex flex-col">
+      <div className="bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl w-full max-h-[90vh] overflow-hidden animate-scale-in shadow-2xl flex flex-col">
         <ContentUploadHeader onClose={handleCancel} />
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto min-h-0">
           <ContentUploadForm
             onSubmit={handleSubmit}
             isLoading={isLoading}

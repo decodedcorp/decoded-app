@@ -169,7 +169,7 @@ export function GlobalContentUploadModal() {
         <div className="bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl w-full h-[85vh] max-h-[800px] min-h-[600px] overflow-hidden animate-scale-in shadow-2xl flex flex-col">
           <GlobalContentUploadHeader onClose={handleClose} />
 
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 min-h-0">
             <ChannelSelectionStep />
           </div>
         </div>
