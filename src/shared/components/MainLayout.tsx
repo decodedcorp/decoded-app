@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode, memo } from 'react';
-
+import { usePathname } from 'next/navigation';
 import { RightSidebar } from '@/domains/main/components/RightSidebar';
 
 import { Sidebar } from './sidebar/Sidebar';
@@ -15,6 +15,10 @@ export const MainLayout = memo(function MainLayout({
   children,
   maxWidth = 'default',
 }: MainLayoutProps) {
+  const pathname = usePathname();
+  
+  // Hide right sidebar on profile pages
+  const isProfilePage = pathname.startsWith('/profile');
   return (
     <div className="min-h-dvh">
       {/* 사이드바를 별도로 렌더링 (fixed positioning) */}
@@ -41,13 +45,15 @@ export const MainLayout = memo(function MainLayout({
         <div className="hidden lg:block" />
       </div>
 
-      {/* 오른쪽 사이드바 - 별도로 렌더링 (fixed positioning) */}
-      <aside
-        id="sidebar-right"
-        className="hidden lg:block fixed top-[60px] md:top-[72px] right-0 w-[260px] h-[calc(100dvh-60px)] md:h-[calc(100dvh-72px)] overflow-auto z-[var(--z-sidebar)]"
-      >
-        <RightSidebar />
-      </aside>
+      {/* 오른쪽 사이드바 - 별도로 렌더링 (fixed positioning), 프로필 페이지에서는 숨김 */}
+      {!isProfilePage && (
+        <aside
+          id="sidebar-right"
+          className="hidden lg:block fixed top-[60px] md:top-[72px] right-0 w-[260px] h-[calc(100dvh-60px)] md:h-[calc(100dvh-72px)] overflow-auto z-[var(--z-sidebar)]"
+        >
+          <RightSidebar />
+        </aside>
+      )}
     </div>
   );
 });

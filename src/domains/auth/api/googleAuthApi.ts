@@ -1,7 +1,6 @@
 import { hash } from '@/lib/utils/hash';
-
-import { UsersService } from '../../../api/generated/services/UsersService';
 import { BackendLoginResponse } from '../types/auth';
+import { UsersService } from '../../../api/generated/services/UsersService';
 
 export interface GoogleTokenData {
   access_token: string;
@@ -119,8 +118,23 @@ export class GoogleAuthApi {
   }
 
   /**
-   * Google ID 토큰의 sub 값을 기반으로 Sui 주소 생성
-   * 백엔드 요구사항으로 임시 생성에 사용
+   * SUI zkLogin을 사용하여 올바른 Sui 주소 생성
+   * @param jwt - Google ID Token (JWT)
+   * @param userSalt - 사용자별 고유 salt (백엔드에서 제공)
+   */
+  static async generateSuiAddressFromZkLogin(jwt: string, userSalt: string): Promise<string> {
+    try {
+      const { jwtToAddress } = await import('@mysten/zklogin');
+      return jwtToAddress(jwt, userSalt);
+    } catch (error) {
+      console.error('[SUI zkLogin] Failed to generate address:', error);
+      throw new Error('Failed to generate SUI address using zkLogin');
+    }
+  }
+
+  /**
+   * 임시 Sui 주소 생성 (백엔드 호환성 위해 유지)
+   * @deprecated 백엔드에서 user_salt 제공 후 generateSuiAddressFromZkLogin 사용 예정
    */
   static generateSuiAddress(sub: string): string {
     return `0x${hash(sub).substring(0, 40)}`;
@@ -204,12 +218,14 @@ export class GoogleAuthApi {
     const { name, given_name, family_name, email } = payload;
     const extractedName = name || given_name || family_name || email.split('@')[0];
 
+    // 새로운 백엔드 응답 구조에 맞게 user 객체 생성
+    // 백엔드에서 제공하는 aka를 우선 사용, 없으면 Google 정보로 fallback
     if (!backendData.user) {
       // 백엔드 응답에 user 객체가 없는 경우 생성
       return {
         doc_id: backendData.user_doc_id || null,
         email: email,
-        nickname: extractedName,
+        nickname: backendData.aka || extractedName, // ✨ 백엔드 aka 우선 사용
         role: 'user',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -217,7 +233,7 @@ export class GoogleAuthApi {
     } else {
       // 백엔드 응답에 name이 없는 경우 Google ID 토큰에서 추출한 name 사용
       if (!backendData.user.nickname && !backendData.user.name) {
-        backendData.user.nickname = extractedName;
+        backendData.user.nickname = backendData.aka || extractedName;
       }
 
       // doc_id가 없는 경우 최상위 user_doc_id에서 가져오기

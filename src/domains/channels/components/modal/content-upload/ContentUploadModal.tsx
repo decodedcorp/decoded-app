@@ -8,6 +8,7 @@ import { useCreateImageContent, useCreateLinkContent } from '@/domains/channels/
 import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/api/queryKeys';
 import { MODAL_SIZES } from '@/lib/constants/modalSizes';
+import { Z_INDEX_CLASSES } from '@/lib/constants/zIndex';
 // getValidAccessToken import 제거 (사용하지 않음)
 
 import { BaseModalAdapter } from '@/lib/components/ui/modal/BaseModalAdapter';

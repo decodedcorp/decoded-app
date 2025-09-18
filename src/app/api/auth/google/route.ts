@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleAuthApi } from '@/domains/auth/api/googleAuthApi';
 import { GoogleAuthLogger } from '@/domains/auth/utils/googleAuthLogger';
+import { UsersService } from '@/api/generated/services/UsersService';
 
 export async function POST(request: NextRequest) {
   try {
@@ -125,10 +126,56 @@ export async function POST(request: NextRequest) {
     );
     console.log('[Google OAuth API] Backend login response:', {
       hasAccessToken: !!backendData.access_token,
-      hasUser: !!backendData.user,
-      hasRefreshToken: !!backendData.refresh_token,
+      userDocId: backendData.user_doc_id,
+      hasSalt: !!backendData.salt,
+      hasSuiAddress: !!backendData.has_sui_address,
     });
     GoogleAuthLogger.logBackendResponse(backendData);
+
+    // 5.1. salt가 있고 SUI 주소가 없으면 zkLogin으로 올바른 주소 생성 및 업데이트
+    if (backendData.salt && !backendData.has_sui_address) {
+      try {
+        console.log('[SUI zkLogin] Generating proper SUI address using salt...');
+        const properSuiAddress = await GoogleAuthApi.generateSuiAddressFromZkLogin(
+          id_token,
+          backendData.salt
+        );
+        
+        console.log('[SUI zkLogin] Generated address:', {
+          addressPreview: properSuiAddress.substring(0, 10) + '...',
+          addressLength: properSuiAddress.length,
+        });
+
+        // 생성된 SUI 주소를 백엔드에 업데이트
+        try {
+          console.log('[SUI zkLogin] Updating SUI address in backend...');
+          
+          // OpenAPI 클라이언트에 토큰 및 BASE URL 설정
+          const { OpenAPI } = await import('@/api/generated/core/OpenAPI');
+          OpenAPI.TOKEN = backendData.access_token;
+          OpenAPI.BASE = process.env.API_BASE_URL || 'https://dev.decoded.style';
+          
+          console.log('[SUI zkLogin] OpenAPI configured:', {
+            hasToken: !!OpenAPI.TOKEN,
+            baseURL: OpenAPI.BASE,
+          });
+          
+          await UsersService.updateMyProfileUsersMeProfilePatch({
+            aka: null, // 닉네임은 변경하지 않음
+            sui_address: properSuiAddress,
+          });
+          
+          console.log('[SUI zkLogin] Successfully updated SUI address in backend');
+        } catch (updateError) {
+          console.error('[SUI zkLogin] Failed to update SUI address in backend:', updateError);
+          // 업데이트 실패해도 로그인은 계속 진행
+        }
+        
+      } catch (error) {
+        console.error('[SUI zkLogin] Failed to generate proper SUI address:', error);
+        // 실패해도 로그인은 계속 진행
+      }
+    }
 
     // 6. 사용자 객체 생성 또는 보완
     const user = GoogleAuthApi.createOrEnhanceUser(backendData, payload);
@@ -139,10 +186,9 @@ export async function POST(request: NextRequest) {
     });
     GoogleAuthLogger.logUserCreation(user);
 
-    // 7. 성공 응답
+    // 7. 성공 응답 - 백엔드 응답 구조 유지하면서 user 정보 추가
     const finalResponse = {
-      access_token: backendData.access_token,
-      refresh_token: backendData.refresh_token,
+      ...backendData,  // salt, user_doc_id, access_token, has_sui_address 포함
       user: user,
       token_type: 'oauth',
     };

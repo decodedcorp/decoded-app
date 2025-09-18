@@ -18,12 +18,11 @@ export interface LoginResponse {
 
 // 백엔드 응답 타입 (실제 API 응답 구조)
 export interface BackendLoginResponse {
-  // 실제 백엔드 응답 구조에 맞춤
   salt: string;
   user_doc_id: string;
   access_token: string;
   has_sui_address: boolean;
-  aka?: string;
+  aka?: string | null; // ✨ 백엔드에서 추가된 nickname 필드
   token_type?: string;
   refresh_token?: string;
   user?: {

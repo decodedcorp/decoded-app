@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from '@/lib/hooks/useLocale';
 import { useAuthStore } from '@/store/authStore';
+import { useMyProfile } from '@/domains/profile/hooks/useProfile';
 import { getAvatarFallback } from '@/lib/utils/defaultImages';
 
 interface UserAvatarProps {
@@ -16,6 +17,7 @@ export function UserAvatar({ size = 'md', showDropdown = true }: UserAvatarProps
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
+  const { data: profileData } = useMyProfile();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { t } = useLocale();
@@ -51,23 +53,33 @@ export function UserAvatar({ size = 'md', showDropdown = true }: UserAvatarProps
 
   const handleProfileClick = () => {
     setIsDropdownOpen(false);
-    router.push('/profile');
+    if (user?.doc_id) {
+      router.push(`/profile/${user.doc_id}`);
+    } else {
+      router.push('/profile');
+    }
   };
 
-  const handleSettingsClick = () => {
-    setIsDropdownOpen(false);
-    router.push('/settings');
-  };
 
   // Get user initials for avatar
   const getInitials = () => {
     if (!user) return '?';
-    if (user.nickname) {
+    
+    // Try to get nickname from AuthStore user first
+    if (user.nickname && user.nickname.trim()) {
       return user.nickname.substring(0, 2).toUpperCase();
     }
-    if (user.email) {
+    
+    // Fallback to profile data if AuthStore user has no nickname
+    if (profileData?.aka && profileData.aka.trim()) {
+      return profileData.aka.substring(0, 2).toUpperCase();
+    }
+    
+    // Fallback to email from AuthStore
+    if (user.email && user.email.trim()) {
       return user.email.substring(0, 2).toUpperCase();
     }
+    
     return '?';
   };
 
@@ -101,8 +113,12 @@ export function UserAvatar({ size = 'md', showDropdown = true }: UserAvatarProps
         <div className="absolute right-0 mt-2 w-56 bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl overflow-hidden z-50">
           {/* User info section */}
           <div className="px-4 py-3 border-b border-zinc-800">
-            <p className="text-sm font-medium text-zinc-200">{user.nickname || t('user.user')}</p>
-            <p className="text-xs text-zinc-500 truncate">{user.email}</p>
+            <p className="text-sm font-medium text-zinc-200">
+              {user.nickname?.trim() || profileData?.aka?.trim() || t('user.user')}
+            </p>
+            <p className="text-xs text-zinc-500 truncate">
+              {user.email?.trim() || ''}
+            </p>
           </div>
 
           {/* Menu items */}
@@ -123,8 +139,8 @@ export function UserAvatar({ size = 'md', showDropdown = true }: UserAvatarProps
             </button>
 
             <button
-              onClick={handleSettingsClick}
-              className="w-full px-4 py-2 text-left text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors flex items-center gap-3"
+              disabled
+              className="w-full px-4 py-2 text-left text-sm text-zinc-500 cursor-not-allowed flex items-center gap-3 opacity-50"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path

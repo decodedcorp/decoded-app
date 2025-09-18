@@ -14,9 +14,9 @@ import { GetUserProfile } from '../../../api/generated';
  */
 export class ResponseMapper {
   /**
-   * 백엔드 로그인 응답을 LoginResponse로 변환 (타입 안전성 강화)
+   * 백엔드 로그인 응답을 LoginResponse로 변환 (새로운 단순한 구조)
    */
-  static mapLoginResponse(data: BackendLoginResponse): LoginResponse {
+  static mapLoginResponse(data: any): LoginResponse {
     if (process.env.NODE_ENV === 'development') {
       console.log('[ResponseMapper] Raw backend response:', JSON.stringify(data, null, 2));
       console.log('[ResponseMapper] Response type:', typeof data);
@@ -104,31 +104,32 @@ export class ResponseMapper {
       throw new AuthError('Invalid access token in response', 400, 'INVALID_ACCESS_TOKEN');
     }
 
-    if (!userData.doc_id) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('[ResponseMapper] Missing user.doc_id after processing:', {
-          hasUser: !!userData,
-          userKeys: userData ? Object.keys(userData) : null,
-          userData: userData,
-        });
-      }
+    // 새로운 백엔드 응답 구조 사용
+    const userDocId = accessTokenData.user_doc_id;
+    if (!userDocId) {
+      console.error('[ResponseMapper] Missing user_doc_id. Available data:', {
+        hasUserDocId: !!data.user_doc_id,
+        dataKeys: Object.keys(data)
+      });
       throw new AuthError('Invalid user data in response', 400, 'INVALID_USER_DATA');
     }
 
     const loginResponse: LoginResponse = {
       access_token: {
-        access_token: accessTokenData.access_token,
-        salt: accessTokenData.salt || '',
-        user_doc_id: accessTokenData.user_doc_id || userData.doc_id,
-        has_sui_address: accessTokenData.has_sui_address || false,
+        access_token: data.access_token,
+        salt: data.salt,
+        user_doc_id: userDocId,
+        has_sui_address: data.has_sui_address,
       },
-      refresh_token: refreshToken,
-      user: {
-        doc_id: userData.doc_id,
-        email: userData.email || '',
-        nickname: userData.nickname || '',
-        role: this.mapUserRole(userData.role),
-        status: this.mapUserStatus(userData.status),
+      refresh_token: '', // 새로운 백엔드 구조에서는 refresh_token 없음
+      user: data.user || {
+        // /api/auth/google에서 이미 user 객체를 만들어서 보내주면 그것을 사용
+        // 없으면 기본값 사용
+        doc_id: userDocId,
+        email: data.email || '', 
+        nickname: data.aka || '', // ✨ 백엔드 aka 필드 사용
+        role: 'user' as UserRole,
+        status: 'active' as UserStatus,
       },
     };
 
@@ -138,7 +139,8 @@ export class ResponseMapper {
         hasRefreshToken: !!loginResponse.refresh_token,
         hasUser: !!loginResponse.user,
         userDocId: loginResponse.user.doc_id,
-        userEmail: loginResponse.user.email,
+        salt: loginResponse.access_token.salt,
+        hasSuiAddress: loginResponse.access_token.has_sui_address,
       });
     }
 
