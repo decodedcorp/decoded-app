@@ -15,6 +15,7 @@ import { getThumbnailImageUrl } from '@/lib/utils/imageProxy';
 import type { TrendingContentItem } from '@/api/generated/models/TrendingContentItem';
 
 import { useTrendingContents } from '../hooks/useTrendingContents';
+import { DEFAULT_CHANNEL_ID } from '../data/channelCardsProvider';
 
 import { PostCardSkeleton } from './PostCardSkeleton';
 import { InfiniteScrollLoader } from './InfiniteScrollLoader';
@@ -84,7 +85,8 @@ export const MainFeed = React.memo(function MainFeed() {
     if (contentDetail && !isContentLoading) {
       // API 응답을 ContentItem으로 변환
       const contentItem = convertApiResponseToContentItem(contentDetail);
-      openModal(contentItem);
+      // channelId를 전달하여 URL 업데이트
+      openModal(contentItem, DEFAULT_CHANNEL_ID);
       // 모달이 열린 후 선택된 콘텐츠 ID 초기화
       setSelectedContentId(null);
     }
@@ -597,4 +599,3 @@ export const MainFeed = React.memo(function MainFeed() {
     </div>
   );
 });
-

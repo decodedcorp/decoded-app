@@ -32,7 +32,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({
+  children,
+  modal,
+}: {
+  children: React.ReactNode;
+  modal: React.ReactNode;
+}) {
   // Get theme from cookies for SSR (prevents FOUC)
   const cookieStore = await cookies();
   const cookieTheme = cookieStore.get('theme')?.value;
@@ -47,6 +53,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <AuthInitializer />
               <Header />
               <MainLayout>{children}</MainLayout>
+              {/* Modal slot for intercepting routes */}
+              {modal}
             </ToastProvider>
           </QueryProvider>
         </I18nProvider>

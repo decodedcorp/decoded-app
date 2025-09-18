@@ -4,6 +4,7 @@ import React, { useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ContentsCard, type ContentsCardProps } from '@/components/ContentsCard/ContentsCard';
+import { toContentHref, getContentLinkProps } from '@/lib/routing';
 
 interface ContentsCardLinkProps extends Omit<ContentsCardProps, 'onCardClick'> {
   channelId: string;
@@ -22,7 +23,8 @@ export function ContentsCardLink({
   ...cardProps
 }: ContentsCardLinkProps) {
   const router = useRouter();
-  const contentUrl = `/channels/${channelId}/contents/${cardProps.card.id}`;
+  const contentUrl = toContentHref({ channelId, contentId: cardProps.card.id });
+  const linkProps = getContentLinkProps({ channelId, contentId: cardProps.card.id });
 
   // 호버 시 prefetch (성능 최적화)
   const handlePrefetch = useCallback(() => {
@@ -46,9 +48,7 @@ export function ContentsCardLink({
 
   return (
     <Link
-      href={contentUrl}
-      prefetch={prefetchOnViewport} // viewport 기반 prefetch
-      scroll={false} // 모달 오픈 시 배경 스크롤 보존
+      {...linkProps}
       onMouseEnter={prefetchOnHover ? handlePrefetch : undefined}
       onClick={handleCardClick}
       className="block focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-xl"

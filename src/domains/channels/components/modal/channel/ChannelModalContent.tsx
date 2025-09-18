@@ -1,5 +1,6 @@
 import React from 'react';
 import deepEqual from 'fast-deep-equal';
+import Link from 'next/link';
 
 import Image from 'next/image';
 import { Button } from '@decoded/ui';
@@ -31,6 +32,7 @@ import { HighlightItem } from '@/lib/types/highlightTypes';
 import { useUser } from '@/domains/auth/hooks/useAuth';
 import { canPinContent } from '@/lib/utils/channelPermissions';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
+import { toContentHref, getContentLinkProps } from '@/lib/routing';
 
 import { ContentFiltersBar } from '../filters/ContentFiltersBar';
 import { PinButton, PinIndicator } from '../../pin/PinButton';
@@ -40,20 +42,11 @@ import { useChannel } from '../../../hooks/useChannels';
 // 개별 콘텐츠 아이템 컴포넌트 (고도화된 메모이제이션)
 const ContentItemCard = React.memo<{
   item: ContentItem;
-  onItemClick: (item: ContentItem) => void;
   channelId: string;
   channel?: any;
-}>(({ item, onItemClick, channelId, channel }) => {
+}>(({ item, channelId, channel }) => {
   const t = useCommonTranslation();
-  const handleClick = React.useCallback(() => {
-    // 클릭 가능한 상태가 아닌 경우 클릭 제한
-    if (!isContentClickable(item.status)) {
-      return;
-    }
-
-    // 모든 콘텐츠 타입에 대해 모달 열기
-    onItemClick(item);
-  }, [item, onItemClick]);
+  // Link 컴포넌트가 네비게이션을 처리하므로 클릭 핸들러 제거
 
   // 상태별 스타일 가져오기
   const statusStyles = getContentStatusStyles(item.status);
@@ -101,10 +94,13 @@ const ContentItemCard = React.memo<{
   // 실제 이미지가 있는지 확인
   const hasValidImage = imageUrl && !isWebPageUrl;
 
+  const linkProps = getContentLinkProps({ channelId, contentId: String(item.id) });
+
   return (
-    <div
-      className={`w-full h-full group transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${statusStyles.container}`}
-      onClick={handleClick}
+    <Link
+      {...linkProps}
+      className={`w-full h-full group transition-all duration-300 hover:scale-[1.02] hover:shadow-xl block focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-xl ${statusStyles.container}`}
+      aria-label={`${item.title} 콘텐츠 보기`}
     >
       <div
         className={`relative overflow-hidden rounded-xl bg-zinc-800/50 border border-zinc-700/50 w-full h-full`}
@@ -298,7 +294,7 @@ const ContentItemCard = React.memo<{
           </div>
         )}
       </div>
-    </div>
+    </Link>
   );
 });
 
@@ -386,19 +382,8 @@ export const ChannelModalContent = React.memo<{
     });
   }
 
-  // 콘텐츠 아이템 클릭 핸들러 (메모이제이션)
-  const handleItemClick = React.useCallback(
-    (item: ContentItem) => {
-      // URL 타입이면 콘텐츠 모달 열기
-      if (item.type === 'link') {
-        openContentModal(item);
-      } else {
-        // 다른 타입들은 기존 로직 유지
-        openContentModal(item);
-      }
-    },
-    [openContentModal],
-  );
+  // 콘텐츠 아이템 클릭 핸들러는 Link 컴포넌트가 처리하므로 제거
+  // 기존 모달 스토어는 외부 링크나 특별한 경우에만 사용
 
   // 콘텐츠 업로드 모달 열기 핸들러 (메모이제이션)
   const handleAddContent = React.useCallback(() => {
@@ -715,7 +700,9 @@ export const ChannelModalContent = React.memo<{
                 (ci: ContentItem) => ci.id.toString() === item.id,
               );
               if (contentItem) {
-                handleItemClick(contentItem);
+                // Zustand store를 사용해서 모달 열기
+                const { openModal } = useContentModalStore.getState();
+                openModal(contentItem, channelId);
               }
             }}
             renderItem={(gridItem) => {
@@ -726,12 +713,7 @@ export const ChannelModalContent = React.memo<{
 
               return (
                 <div className="w-full h-full">
-                  <ContentItemCard
-                    item={contentItem}
-                    onItemClick={handleItemClick}
-                    channelId={channelId}
-                    channel={channelData}
-                  />
+                  <ContentItemCard item={contentItem} channelId={channelId} channel={channelData} />
                 </div>
               );
             }}

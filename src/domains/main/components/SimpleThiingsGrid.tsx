@@ -1,9 +1,11 @@
 'use client';
 
 import React, { memo, useCallback, useMemo, useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 
 import { useContentModalStore } from '@/store/contentModalStore';
 import { useContentSidebarStore } from '@/store/contentSidebarStore';
+import { toContentHref, getContentLinkProps } from '@/lib/routing';
 import { ContentsCard } from '@/components/ContentsCard';
 import { ContentsCardLink } from '@/components/ContentsCardLink';
 import { useContentTranslation } from '@/lib/i18n/hooks';
@@ -22,7 +24,7 @@ export function SimpleThiingsGrid({
   channelId?: string;
 }) {
   const { states } = useContentTranslation();
-  
+
   // 채널 콘텐츠 데이터 로드 - 실제 API 사용
   const { cards, isLoading, isError, error, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useChannelContents({

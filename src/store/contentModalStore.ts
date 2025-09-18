@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { ContentItem } from '@/lib/types/content';
+import { toContentHref } from '@/lib/routing';
 
 // Re-export for backward compatibility
 export type { ContentItem };
@@ -7,30 +8,64 @@ export type { ContentItem };
 interface ContentModalState {
   isOpen: boolean;
   selectedContent: ContentItem | null;
-  openModal: (content: ContentItem) => void;
+  previousUrl: string | null;
+  openModal: (content: ContentItem, channelId?: string) => void;
   closeModal: () => void;
   closeModalOnEscape: () => void;
   closeModalOnOverlay: () => void;
 }
 
-export const useContentModalStore = create<ContentModalState>((set) => ({
+export const useContentModalStore = create<ContentModalState>((set, get) => ({
   isOpen: false,
   selectedContent: null,
-  openModal: (content: ContentItem) => {
+  previousUrl: null,
+  openModal: (content: ContentItem, channelId?: string) => {
     console.log('🎯 [contentModalStore] openModal called with:', content.title);
-    set({ isOpen: true, selectedContent: content });
+
+    // URL 업데이트 (브라우저 환경에서만)
+    if (typeof window !== 'undefined' && channelId) {
+      const currentUrl = window.location.href;
+      const contentUrl = toContentHref({ channelId, contentId: String(content.id) });
+      window.history.pushState({}, '', contentUrl);
+
+      set({
+        isOpen: true,
+        selectedContent: content,
+        previousUrl: currentUrl,
+      });
+    } else {
+      set({ isOpen: true, selectedContent: content });
+    }
   },
   closeModal: () => {
     console.log('🎯 [contentModalStore] closeModal called (programmatic)');
-    set({ isOpen: false, selectedContent: null });
+
+    // URL 복원 (브라우저 환경에서만)
+    if (typeof window !== 'undefined' && get().previousUrl) {
+      window.history.pushState({}, '', get().previousUrl);
+    }
+
+    set({ isOpen: false, selectedContent: null, previousUrl: null });
   },
   closeModalOnEscape: () => {
     console.log('🎯 [contentModalStore] closeModalOnEscape called');
-    set({ isOpen: false, selectedContent: null });
+
+    // URL 복원 (브라우저 환경에서만)
+    if (typeof window !== 'undefined' && get().previousUrl) {
+      window.history.pushState({}, '', get().previousUrl);
+    }
+
+    set({ isOpen: false, selectedContent: null, previousUrl: null });
   },
   closeModalOnOverlay: () => {
     console.log('🎯 [contentModalStore] closeModalOnOverlay called');
-    set({ isOpen: false, selectedContent: null });
+
+    // URL 복원 (브라우저 환경에서만)
+    if (typeof window !== 'undefined' && get().previousUrl) {
+      window.history.pushState({}, '', get().previousUrl);
+    }
+
+    set({ isOpen: false, selectedContent: null, previousUrl: null });
   },
 }));
 

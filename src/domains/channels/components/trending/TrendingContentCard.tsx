@@ -1,9 +1,11 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 
 import { useRouter } from 'next/navigation';
 import { TrendingContentItem } from '@/api/generated/models/TrendingContentItem';
+import { toContentHref, toChannelHref, getContentLinkProps } from '@/lib/routing';
 
 interface TrendingContentCardProps {
   content: TrendingContentItem;
@@ -12,28 +14,27 @@ interface TrendingContentCardProps {
 
 export function TrendingContentCard({ content, className = '' }: TrendingContentCardProps) {
   const router = useRouter();
-
-  const handleContentClick = () => {
-    // Navigate to channel page with content modal
-    router.push(`/channels/${content.channel_id}?content=${content.id}`);
-  };
+  const contentUrl = toContentHref({ channelId: content.channel_id, contentId: content.id });
+  const channelUrl = toChannelHref(content.channel_id);
+  const linkProps = getContentLinkProps({ channelId: content.channel_id, contentId: content.id });
 
   const handleChannelClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     // Navigate to channel page only
-    router.push(`/channels/${content.channel_id}`);
+    router.push(channelUrl);
   };
 
   return (
-    <article 
-      className={`relative rounded-lg overflow-hidden aspect-square group cursor-pointer hover:shadow-xl transition-all duration-300 ${className}`}
-      onClick={handleContentClick}
+    <Link
+      {...linkProps}
+      className={`relative rounded-lg overflow-hidden aspect-square group cursor-pointer hover:shadow-xl transition-all duration-300 block focus:outline-none focus:ring-2 focus:ring-primary-500 ${className}`}
+      aria-label={`${content.title || '제목 없음'} 콘텐츠 보기`}
     >
       {/* Background Image - Full Size */}
       <div className="absolute inset-0">
         {content.thumbnail_url ? (
-          <img 
-            src={content.thumbnail_url} 
+          <img
+            src={content.thumbnail_url}
             alt={content.title || ''}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
@@ -43,24 +44,24 @@ export function TrendingContentCard({ content, className = '' }: TrendingContent
           </div>
         )}
       </div>
-      
+
       {/* Dark Overlay Gradient */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-      
+
       {/* Content Overlay - Bottom */}
       <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
         {/* Title */}
         <h3 className="font-semibold text-lg mb-1 line-clamp-2 leading-tight">
           {content.title || '제목 없음'}
         </h3>
-        
+
         {/* Description */}
         {content.description && (
           <p className="text-gray-300 text-sm mb-3 line-clamp-2 leading-relaxed">
             {content.description}
           </p>
         )}
-        
+
         {/* Channel Info Row */}
         <div className="flex items-center">
           <button
@@ -73,14 +74,12 @@ export function TrendingContentCard({ content, className = '' }: TrendingContent
                 {content.channel_name?.charAt(0).toUpperCase() || 'C'}
               </span>
             </div>
-            
+
             {/* Channel Name */}
-            <span className="text-sm font-medium truncate">
-              {content.channel_name}
-            </span>
+            <span className="text-sm font-medium truncate">{content.channel_name}</span>
           </button>
         </div>
       </div>
-    </article>
+    </Link>
   );
 }

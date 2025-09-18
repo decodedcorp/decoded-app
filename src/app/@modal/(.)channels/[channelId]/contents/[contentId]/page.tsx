@@ -2,9 +2,11 @@
 
 import React, { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import FocusLock from 'react-focus-lock';
 import { Modal } from '@/components/ui/Modal';
 import { ContentBody } from '@/domains/content/ContentBody';
 import { getContentWithValidation } from '@/lib/api/content';
+import { toChannelHref } from '@/lib/routing';
 
 interface ContentModalPageProps {
   params: Promise<{
@@ -14,7 +16,7 @@ interface ContentModalPageProps {
 }
 
 /**
- * Overlay Adapter for Intercept Routes
+ * Overlay Adapter for Intercept Routes from Home/Explore pages
  * 기존 Modal 컴포넌트는 수정하지 않고, 오버레이 레벨에서만 UX/a11y 처리
  */
 export default function ContentOverlay({ params }: ContentModalPageProps) {
@@ -52,7 +54,8 @@ export default function ContentOverlay({ params }: ContentModalPageProps) {
     if (window.history.length > 1) {
       router.back();
     } else {
-      router.replace(`/channels/${channelId}`);
+      // 홈/탐색에서 왔으므로 홈으로 돌아가기
+      router.replace('/');
     }
   };
 
@@ -63,7 +66,7 @@ export default function ContentOverlay({ params }: ContentModalPageProps) {
     };
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [channelId]);
+  }, []);
 
   if (isLoading || !content) {
     return (
@@ -74,31 +77,17 @@ export default function ContentOverlay({ params }: ContentModalPageProps) {
   }
 
   return (
-    <div
-      ref={rootRef}
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-[999]"
-    >
+    <div ref={rootRef} role="dialog" aria-modal="true" className="fixed inset-0 z-[999]">
       {/* 배경 오버레이 */}
-      <div
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
 
-      {/* 기존 Modal 컴포넌트 그대로 사용 */}
+      {/* 기존 Modal 컴포넌트 그대로 사용 + FocusLock으로 접근성 강화 */}
       <div className="relative mx-auto my-8 max-w-4xl md:my-12">
-        <Modal
-          onCloseHref="#"
-          ariaLabel={`${content.title} 콘텐츠 모달`}
-          className="h-[90vh]"
-        >
-          <ContentBody
-            content={content}
-            variant="modal"
-            channelId={channelId}
-          />
-        </Modal>
+        <FocusLock returnFocus>
+          <Modal onCloseHref="#" ariaLabel={`${content.title} 콘텐츠 모달`} className="h-[90vh]">
+            <ContentBody content={content} variant="modal" channelId={channelId} />
+          </Modal>
+        </FocusLock>
       </div>
     </div>
   );

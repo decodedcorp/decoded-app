@@ -3,7 +3,16 @@
 import React, { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
-import { Camera, Video, Link, FileText, MessageCircle, Share, Bookmark, Pin } from 'lucide-react';
+import {
+  Camera,
+  Video,
+  Link as LinkIcon,
+  FileText,
+  MessageCircle,
+  Share,
+  Bookmark,
+  Pin,
+} from 'lucide-react';
 import { CardMediaWithFallback } from '@/components/CardMedia/CardMedia';
 
 export interface PostCardProps {
@@ -133,7 +142,7 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
       case 'video':
         return <Video className="w-4 h-4" />;
       case 'link':
-        return <Link className="w-4 h-4" />;
+        return <LinkIcon className="w-4 h-4" />;
       default:
         return <FileText className="w-4 h-4" />;
     }
