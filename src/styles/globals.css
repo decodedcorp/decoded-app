@@ -8,28 +8,13 @@
   --hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
   --focus-ring: rgba(59, 130, 246, 0.6);
 
-  /* Layout design tokens - unified edge padding system */
-  --edge-x: 0px; /* 뷰포트 좌우 기본 여백 */
-  --main-gap: 24px; /* 메인↔사이드 가로 간격 */
-  --sidebar-w: 260px; /* 데스크톱 사이드바 너비 */
-  --sidebar-right-w: 260px; /* 오른쪽 사이드바 너비 */
-  --header-h: 60px; /* 헤더 높이, sticky 기준 */
-
-  /* dense 모드(거의 무여백) */
-  --edge-x-dense: 0px;
-
-  /* Legacy - 기존 호환성 유지 */
-  --space-page-x: var(--edge-x);
-
-  /* ========== NEW LAYOUT SYSTEM ========== */
-  /* Flex Layout System Variables */
-  --header-height: 72px; /* 헤더 높이 (데스크톱 기준) */
-  --sidebar-width: 0px; /* 기본값: 사이드바 숨김 (모바일 우선) */
-  --content-max-width: 1200px; /* 메인 콘텐츠 최대 너비 */
-  --content-max-width-wide: 1400px; /* 와이드 모드 최대 너비 */
-  --gap-main: 0px; /* 기본값: 간격 없음 (모바일 우선) */
-  --gap-edge: 0px; /* 뷰포트 가장자리 여백 */
-  --container-padding-x: 0px; /* 컨테이너 가로 패딩 */
+  /* ========== CANONICAL LAYOUT ARCHITECTURE ========== */
+  /* 정석 아키텍처: Header fixed + Shell 높이 분리 + Main만 스크롤 */
+  --header-height: 72px; /* 헤더 높이 */
+  --gap-main: 24px; /* 좌/우와 메인 간 간격 */
+  --container-padding-x: 16px; /* 좌우 패딩 */
+  --sidebar-width: clamp(200px, 14vw, 240px); /* 사이드바 너비 */
+  --content-max-width: 1200px; /* 메인 최대 폭 */
 
   /* Scroll & Sticky System */
   --scroll-behavior: smooth;
@@ -81,34 +66,13 @@
   --sheet-max-h: min(90dvh, 80vh);
 }
 
-/* Responsive design tokens - 반응형 여백 관리 */
+/* Responsive design tokens - 반응형 여백 관리 (LEGACY - DEPRECATED) */
 @media (min-width: 768px) {
   :root {
-    --edge-x: 0px;
-    --main-gap: 28px;
-    --header-h: 72px;
-
     /* Modal responsive adjustments */
     --modal-pad: 20px;
     --modal-pad-lg: 32px;
     --drawer-w: min(35vw, 480px);
-  }
-}
-
-@media (min-width: 1024px) {
-  :root {
-    --edge-x: 0px;
-    --main-gap: 32px;
-    --space-page-x: var(--edge-x);
-  }
-}
-
-@media (min-width: 1280px) {
-  :root {
-    --edge-x: 0px;
-    --main-gap: 36px;
-    --sidebar-right-w: 360px;
-    --space-page-x: var(--edge-x);
   }
 }
 
@@ -245,217 +209,127 @@
 
   /* Page spacing utility class */
   .page-x-spacing {
-    padding-inline: var(--space-page-x);
+    padding-inline: var(--container-padding-x);
   }
 
   /* Layout utility classes */
   .layout-edge {
-    padding-left: var(--edge-x);
-    padding-right: var(--edge-x);
+    padding-left: var(--container-padding-x);
+    padding-right: var(--container-padding-x);
   }
 
   .layout-edge--dense {
-    padding-left: var(--edge-x-dense);
-    padding-right: var(--edge-x-dense);
+    padding-left: 0px;
+    padding-right: 0px;
   }
 
-  /* ========== NEW FLEX LAYOUT SYSTEM ========== */
-  /* Main Layout Container */
-  .layout {
-    min-height: 100dvh;
-    width: 100%; /* Use container width, not viewport width */
-    max-width: 100%; /* Prevent horizontal overflow */
-    background: var(--bg-primary, #000000);
-    color: var(--text-primary, #ffffff);
+  /* ========== CANONICAL LAYOUT ARCHITECTURE ========== */
+  /* 정석 아키텍처: Header fixed + Shell 높이 분리 + Main만 스크롤 */
+
+  /* 헤더는 고정 */
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--header-height);
+    z-index: 1000;
   }
 
-  /* Content Wrapper - Single Scroll Root */
-  .content-wrapper {
-    height: 100dvh;
-    width: 100%; /* Full width of layout container */
-    max-width: 100%; /* Prevent overflow */
-    box-sizing: border-box; /* Include padding in width calculation */
-    padding-top: var(--header-height);
-    padding-inline: var(--container-padding-x);
-    padding-bottom: var(--gap-edge);
-    overflow: auto;
-    overflow-x: hidden; /* Prevent horizontal scroll */
-    scroll-behavior: var(--scroll-behavior);
+  /* 헤더 아래 "셸": 페이지 전체 높이를 정확히 채우고 스크롤은 차단 */
+  .shell {
+    margin-top: var(--header-height);
+    height: calc(100dvh - var(--header-height));
+    overflow: hidden; /* 중요: 바깥 스크롤 금지 */
+  }
+
+  /* 3열 컨테이너 */
+  .cols {
     display: flex;
     gap: var(--gap-main);
-    contain: layout paint; /* Performance optimization */
+    height: 100%; /* 셸에 딱 맞춤 */
+    padding: 0 var(--container-padding-x);
   }
 
-  /* Sidebar Base Styles */
+  /* 사이드바: 고정 위치 (헤더처럼) */
   .sidebar-left,
   .sidebar-right {
-    position: sticky;
-    top: var(--gap-edge);
-    /* Default: no flex space (mobile-first) */
-    flex: 0 0 0px;
-    width: 0px;
-    display: none; /* Default: hidden */
-    height: fit-content;
-    max-height: var(--sidebar-scroll-height);
-
-    /* Performance optimizations */
-    contain: layout style paint;
-    will-change: transform;
-    transform: translateZ(0); /* GPU layer activation */
+    position: fixed;
+    top: var(--header-height);
+    height: calc(100dvh - var(--header-height));
+    width: var(--sidebar-width);
+    background: #000;
+    z-index: 999;
+    display: none; /* 모바일 기본 숨김 */
   }
 
-  /* Sidebar Inner Content with Scroll */
-  .sidebar-inner {
+  .sidebar-left {
+    left: 0;
+  }
+
+  .sidebar-right {
+    right: 0;
+  }
+
+  .sidebar-left .inner,
+  .sidebar-right .inner {
+    max-height: 100%;
+    overflow: auto; /* 필요할 때만 내부 스크롤 */
     height: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
-
-    /* Scroll performance */
-    scroll-behavior: smooth;
-    overscroll-behavior: contain;
-
-    /* Custom scrollbar */
-    scrollbar-width: thin;
-    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+    padding: 8px 4px;
   }
 
-  .sidebar-inner::-webkit-scrollbar {
-    width: var(--scrollbar-width);
-  }
-
-  .sidebar-inner::-webkit-scrollbar-track {
-    background: var(--scrollbar-track);
-  }
-
-  .sidebar-inner::-webkit-scrollbar-thumb {
-    background: var(--scrollbar-thumb);
-    border-radius: calc(var(--scrollbar-width) / 2);
-  }
-
-  /* Main Content Area */
+  /* 메인만 스크롤 */
   .main {
-    min-width: 0; /* Prevent flex shrink bugs */
-    flex: 1 1 auto; /* Flexible width that can shrink */
-    max-width: min(100%, var(--content-max-width)); /* Allow shrinking below max-width */
-    width: 100%; /* Take available space */
-    box-sizing: border-box; /* Include padding in width calculation */
-    margin: 0 auto; /* Center align */
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+    overflow: auto; /* 유일한 스크롤 영역 */
+    overscroll-behavior: contain; /* 바운스 전파 방지 */
+    max-width: min(100%, var(--content-max-width));
+    overflow-wrap: anywhere;
+    margin: 0 auto;
   }
 
-  /* Main Content Max-Width Variants */
-  .main[data-max-width='wide'] {
-    max-width: var(--content-max-width-wide);
+  /* 이미지/비디오 최적화 */
+  img,
+  video {
+    max-width: 100%;
+    height: auto;
   }
 
-  .main[data-max-width='full'] {
-    max-width: none;
-    margin: 0;
-  }
-
-  /* ========== DOMAIN-SPECIFIC PRESETS ========== */
-  /* Home Domain */
-  .layout[data-domain='home'] {
-    --content-max-width: 1200px;
-    --container-padding-x: 0px;
-    --gap-main: 24px;
-  }
-
-  /* Channel Domain */
-  .layout[data-domain='channel'] {
-    --content-max-width: 100%;
-    --container-padding-x: 0px;
-    --gap-main: 20px;
-  }
-
-  /* Search Domain */
-  .layout[data-domain='search'] {
-    --content-max-width: 1400px;
-    --container-padding-x: 0px;
-    --gap-main: 20px;
-  }
-
-  /* Profile Domain */
-  .layout[data-domain='profile'] {
-    --content-max-width: 800px;
-    --container-padding-x: 0px;
-    --gap-main: 24px;
-  }
+  /* ========== UNIFIED LAYOUT RULES ========== */
+  /* All pages use the same layout rules - no domain-specific overrides */
 
   /* ========== RESPONSIVE BREAKPOINTS ========== */
-  /* Mobile First Approach */
-  @media (max-width: 767px) {
-    .layout {
-      --header-height: 60px; /* 모바일 헤더 높이 */
-      --sidebar-width: 0px; /* Hide sidebars on mobile */
-      --gap-main: 0px;
-      --container-padding-x: var(--edge-x);
-    }
+  /* 정석 패턴: 폭 부족 시 우측 사이드바를 단계적으로 표시 */
 
-    .sidebar-left,
-    .sidebar-right {
-      display: none;
-    }
-
-    .main {
-      max-width: none;
-      margin: 0;
-    }
-
-    /* Mobile-specific content wrapper */
-    .content-wrapper {
-      padding-inline: var(--edge-x);
-    }
-  }
-
-  /* Tablet breakpoint - Left sidebar only */
+  /* 반응형: 폭 부족 시 우측 사이드바를 단계적으로 표시 */
   @media (min-width: 768px) {
-    .layout {
-      --sidebar-width: clamp(180px, 15vw, 220px);
-      --gap-main: 16px;
-      --container-padding-x: 0px;
-    }
-
     .sidebar-left {
-      display: flex;
-      flex: 0 0 var(--sidebar-width);
-      width: var(--sidebar-width);
+      display: block;
     }
-
-    .sidebar-right {
-      display: none;
+    .cols {
+      margin-left: var(--sidebar-width);
     }
   }
 
-  /* Desktop breakpoint - Both sidebars */
   @media (min-width: 1280px) {
-    .layout {
-      --sidebar-width: clamp(200px, 14vw, 240px);
-      --gap-main: 18px;
-      --container-padding-x: 0px;
-    }
     .sidebar-left,
     .sidebar-right {
-      display: flex;
-      flex: 0 0 var(--sidebar-width);
-      width: var(--sidebar-width);
+      display: block;
+    }
+    .cols {
+      margin-left: var(--sidebar-width);
+      margin-right: var(--sidebar-width);
     }
   }
 
-  /* Large desktop - Progressive enhancement */
-  @media (min-width: 1440px) {
-    .layout {
-      --sidebar-width: clamp(220px, 16vw, 260px);
-      --gap-main: 20px;
-      --container-padding-x: 0px;
-    }
-  }
-
-  /* Extra large desktop - Maximum comfort */
-  @media (min-width: 1680px) {
-    .layout {
-      --sidebar-width: clamp(240px, 18vw, 280px);
-      --gap-main: 24px;
-      --container-padding-x: 0px;
+  /* 아주 좁은 구간에선 간격/패딩 축소 */
+  @media (max-width: 1024px) {
+    :root {
+      --gap-main: 16px;
+      --container-padding-x: 12px;
     }
   }
 
@@ -762,6 +636,7 @@
   }
 }
 
+/* 전역 안전장치 */
 html {
   height: 100%;
   width: 100%;
@@ -770,6 +645,19 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* 이미지 최적화 */
+img,
+video {
+  max-width: 100%;
+  height: auto;
 }
 
 body {

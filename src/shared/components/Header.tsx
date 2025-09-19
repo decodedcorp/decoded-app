@@ -101,7 +101,7 @@ export const Header = memo(function Header() {
   return (
     <header
       className={`
-        fixed top-0 left-0 w-full z-[9999] transition-all duration-300 ease-in-out
+        header fixed top-0 left-0 w-full z-[9999] transition-all duration-300 ease-in-out
         backdrop-blur bg-black/80 border-b border-zinc-700/50 shadow-xl
         ${shouldShowHeader ? 'translate-y-0' : '-translate-y-full'}
       `}
