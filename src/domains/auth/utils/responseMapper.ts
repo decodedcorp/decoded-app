@@ -109,7 +109,7 @@ export class ResponseMapper {
     if (!userDocId) {
       console.error('[ResponseMapper] Missing user_doc_id. Available data:', {
         hasUserDocId: !!data.user_doc_id,
-        dataKeys: Object.keys(data)
+        dataKeys: Object.keys(data),
       });
       throw new AuthError('Invalid user data in response', 400, 'INVALID_USER_DATA');
     }
@@ -126,7 +126,7 @@ export class ResponseMapper {
         // /api/auth/google에서 이미 user 객체를 만들어서 보내주면 그것을 사용
         // 없으면 기본값 사용
         doc_id: userDocId,
-        email: data.email || '', 
+        email: data.email || '',
         nickname: data.aka || '', // ✨ 백엔드 aka 필드 사용
         role: 'user' as UserRole,
         status: 'active' as UserStatus,

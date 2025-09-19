@@ -86,6 +86,7 @@
     },
     "empty": {
       "title": "아직 댓글이 없어요",
+      "subtitle": "첫 번째 댓글을 남겨보세요!",
       "description": "첫 번째 댓글을 남겨보세요!"
     },
     "error": {

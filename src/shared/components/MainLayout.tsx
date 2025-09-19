@@ -16,7 +16,7 @@ export const MainLayout = memo(function MainLayout({
   maxWidth = 'default',
 }: MainLayoutProps) {
   const pathname = usePathname();
-  
+
   // Hide right sidebar on profile pages
   const isProfilePage = pathname.startsWith('/profile');
   return (

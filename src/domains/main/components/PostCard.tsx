@@ -443,8 +443,8 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
             disabled={!contentId || isPinLoading}
             className={`transition-all duration-200 flex items-center gap-2 px-3 py-2 rounded-lg ${
               actualIsPinned
-                ? 'text-primary bg-primary/10 border border-primary/20'
-                : 'text-zinc-400 hover:text-primary hover:bg-primary/5 hover:border-primary/10 border border-transparent'
+                ? 'text-zinc-200 bg-zinc-800/50 border border-zinc-700'
+                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30 hover:border-zinc-700 border border-transparent'
             } ${isPinLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
             aria-label={accessibility.pinPost()}
           >
@@ -458,8 +458,8 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
             disabled={!contentId || isLikeLoading}
             className={`transition-all duration-200 flex items-center gap-2 px-3 py-2 rounded-lg ${
               actualIsLiked
-                ? 'text-red-500 bg-red-500/10 border border-red-500/20'
-                : 'text-zinc-400 hover:text-red-500 hover:bg-red-500/5 hover:border-red-500/10 border border-transparent'
+                ? 'text-zinc-200 bg-zinc-800/50 border border-zinc-700'
+                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30 hover:border-zinc-700 border border-transparent'
             } ${isLikeLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
             aria-label={actualIsLiked ? 'Unlike this post' : 'Like this post'}
           >
@@ -485,7 +485,7 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
           <button
             onClick={handleCommentClick}
             disabled={!contentId}
-            className="text-zinc-400 hover:text-blue-500 hover:bg-blue-500/5 hover:border-blue-500/10 border border-transparent transition-all duration-200 flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer"
+            className="text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30 hover:border-zinc-700 border border-transparent transition-all duration-200 flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer"
             aria-label={accessibility.commentOnPost()}
           >
             <MessageCircle className="w-4 h-4" />
@@ -497,7 +497,7 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
           {/* Share 버튼 */}
           <button
             onClick={handleShareClick}
-            className="text-zinc-400 hover:text-green-500 hover:bg-green-500/5 hover:border-green-500/10 border border-transparent transition-all duration-200 flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer"
+            className="text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30 hover:border-zinc-700 border border-transparent transition-all duration-200 flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer"
             aria-label={accessibility.sharePost()}
           >
             <Share className="w-4 h-4" />
@@ -510,8 +510,8 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
             disabled={!contentId || isBookmarkLoading}
             className={`transition-all duration-200 flex items-center gap-2 px-3 py-2 rounded-lg ${
               actualIsBookmarked
-                ? 'text-purple-500 bg-purple-500/10 border border-purple-500/20'
-                : 'text-zinc-400 hover:text-purple-500 hover:bg-purple-500/5 hover:border-purple-500/10 border border-transparent'
+                ? 'text-zinc-200 bg-zinc-800/50 border border-zinc-700'
+                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30 hover:border-zinc-700 border border-transparent'
             } ${isBookmarkLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
             aria-label={accessibility.savePost()}
           >
