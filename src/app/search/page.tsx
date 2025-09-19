@@ -10,16 +10,12 @@ function SearchPageInner() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
 
-  return (
-    <div className="min-h-screen bg-black pt-[60px] md:pt-[72px]">
-      <SearchPageContent query={query} />
-    </div>
-  );
+  return <SearchPageContent query={query} />;
 }
 
 export default function SearchPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-black pt-[60px] md:pt-[72px]" />}>
+    <Suspense fallback={<div />}>
       <SearchPageInner />
     </Suspense>
   );

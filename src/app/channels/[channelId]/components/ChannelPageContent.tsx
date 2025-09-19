@@ -13,6 +13,7 @@ import { ChannelModalSkeleton } from '@/domains/channels/components/modal/channe
 import { ContentModal } from '@/domains/channels/components/modal/content/ContentModal';
 import { ContentUploadModal } from '@/domains/channels/components/modal/content-upload/ContentUploadModal';
 import { useChannelContentsSinglePage } from '@/domains/channels/hooks/useChannelContents';
+import { useContentById } from '@/domains/channels/hooks/useContentById';
 import { useContentModalStore } from '@/store/contentModalStore';
 import { useContentUploadStore } from '@/store/contentUploadStore';
 import { ContentItem } from '@/lib/types/content';
@@ -144,49 +145,57 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
   // 모달들은 각자의 BaseModal에서 ESC 키를 처리하므로 여기서는 제거
 
   // URL에서 content 파라미터 감지하여 모달 열기
+  const [urlContentId, setUrlContentId] = React.useState<string | null>(null);
+
+  // URL 파라미터에서 content ID 추출 및 URL 변경 감지
   React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search);
-      const contentId = urlParams.get('content');
-
-      if (contentId && actualChannelId) {
-        console.log('Content ID from URL params:', contentId, 'Opening modal...');
-
-        // 콘텐츠 데이터를 가져와서 모달 열기
-        const fetchContentAndOpenModal = async () => {
-          try {
-            // API에서 콘텐츠 데이터 가져오기
-            const response = await fetch(`/api/proxy/contents/${contentId}`);
-            if (response.ok) {
-              const contentData = await response.json();
-              // ContentItem 형태로 변환
-              const contentItem = {
-                id: contentData.id,
-                title: contentData.title || '제목 없음',
-                description: contentData.description || '',
-                thumbnail: contentData.thumbnail || '',
-                channel_id: actualChannelId,
-                type: contentData.type || 'text', // ContentType 필수 필드 추가
-                // 기타 필요한 필드들...
-              };
-
-              // 모달 열기
-              openContentModal(contentItem, actualChannelId);
-
-              // URL에서 content 파라미터 제거
-              const newUrl = new URL(window.location.href);
-              newUrl.searchParams.delete('content');
-              window.history.replaceState({}, '', newUrl.toString());
-            }
-          } catch (error) {
-            console.error('Failed to fetch content:', error);
-          }
-        };
-
-        fetchContentAndOpenModal();
+    const checkUrlParams = () => {
+      if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search);
+        const contentId = urlParams.get('content');
+        setUrlContentId(contentId);
       }
+    };
+
+    // 초기 로드 시 확인
+    checkUrlParams();
+
+    // URL 변경 이벤트 리스너 등록
+    window.addEventListener('popstate', checkUrlParams);
+
+    // 클린업
+    return () => {
+      window.removeEventListener('popstate', checkUrlParams);
+    };
+  }, []);
+
+  // 콘텐츠 데이터 가져오기
+  const {
+    content: urlContent,
+    isLoading: isContentLoading,
+    error: contentError,
+  } = useContentById({
+    contentId: urlContentId || '',
+    enabled: !!urlContentId && !!actualChannelId,
+  });
+
+  // 콘텐츠가 로드되면 모달 열기
+  React.useEffect(() => {
+    if (urlContent && urlContentId && actualChannelId) {
+      console.log('Content loaded from URL params:', urlContent, 'Opening modal...');
+
+      // 모달 열기
+      openContentModal(urlContent, actualChannelId);
+
+      // URL에서 content 파라미터 제거
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete('content');
+      window.history.replaceState({}, '', newUrl.toString());
+
+      // 상태 초기화
+      setUrlContentId(null);
     }
-  }, [actualChannelId, openContentModal]);
+  }, [urlContent, urlContentId, actualChannelId, openContentModal]);
 
   // 채널 ID 변경 시 필터 상태 초기화
   React.useEffect(() => {

@@ -60,6 +60,60 @@ export const Sidebar = memo(function Sidebar() {
     router.push('/create');
   }, [router]);
 
+  // Sidebar content component
+  const SidebarContent = () => (
+    <div className="py-4 px-3 bg-black min-h-full">
+      {/* Main Navigation */}
+      <div className="space-y-2">
+        <SidebarItem
+          href="/"
+          icon={<HomeIcon />}
+          label={t.navigation.home()}
+          isActive={pathname === '/'}
+        />
+        <SidebarItem
+          href="/search"
+          icon={<MagnifyingGlassIcon />}
+          label={t.actions.search()}
+          isActive={pathname === '/search'}
+        />
+        {/* Channels with toggleable channel list */}
+        <SidebarToggleItem
+          icon={<RectangleStackIcon />}
+          label={t.navigation.channels()}
+          isActive={pathname === '/channels' || pathname.startsWith('/channels/')}
+          href="/channels"
+        >
+          <SidebarChannelList />
+        </SidebarToggleItem>
+
+        {/* Authenticated user features */}
+        {isAuthenticated && (
+          <>
+            <SidebarItem
+              href="/bookmarks"
+              icon={<BookmarkIcon />}
+              label={t.navigation.bookmarks()}
+              isActive={pathname === '/bookmarks'}
+            />
+            <SidebarItem
+              onClick={handleCreateClick}
+              icon={<PlusIcon />}
+              label={t.actions.create()}
+              isActive={isModalOpen}
+            />
+            <SidebarItem
+              href={user?.doc_id ? `/profile/${user.doc_id}` : '/profile'}
+              icon={<UserIcon />}
+              label={t.navigation.profile()}
+              isActive={pathname.startsWith('/profile')}
+            />
+          </>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <>
       {/* Mobile Backdrop */}
@@ -70,70 +124,26 @@ export const Sidebar = memo(function Sidebar() {
         />
       )}
 
-      {/* Responsive Sidebar - fixed with header consideration on desktop, overlay on mobile */}
+      {/* Mobile Sidebar Overlay */}
       <aside
         className={`
+          lg:hidden
           w-[260px]
-          bg-black
           overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-black
           ${
             isMobileOpen
               ? 'fixed top-[60px] md:top-[72px] left-0 h-[calc(100dvh-60px)] md:h-[calc(100dvh-72px)] translate-x-0 z-[10002]'
-              : 'fixed top-[60px] md:top-[72px] left-0 h-[calc(100dvh-60px)] md:h-[calc(100dvh-72px)] -translate-x-full lg:translate-x-0 z-[var(--z-sidebar)]'
+              : 'fixed top-[60px] md:top-[72px] left-0 h-[calc(100dvh-60px)] md:h-[calc(100dvh-72px)] -translate-x-full z-[var(--z-sidebar)]'
           }
         `}
       >
-        <div className="py-4 px-3">
-          {/* Main Navigation */}
-          <div className="space-y-2">
-            <SidebarItem
-              href="/"
-              icon={<HomeIcon />}
-              label={t.navigation.home()}
-              isActive={pathname === '/'}
-            />
-            <SidebarItem
-              href="/search"
-              icon={<MagnifyingGlassIcon />}
-              label={t.actions.search()}
-              isActive={pathname === '/search'}
-            />
-            {/* Channels with toggleable channel list */}
-            <SidebarToggleItem
-              icon={<RectangleStackIcon />}
-              label={t.navigation.channels()}
-              isActive={pathname === '/channels' || pathname.startsWith('/channels/')}
-              href="/channels"
-            >
-              <SidebarChannelList />
-            </SidebarToggleItem>
-
-            {/* Authenticated user features */}
-            {isAuthenticated && (
-              <>
-                <SidebarItem
-                  href="/bookmarks"
-                  icon={<BookmarkIcon />}
-                  label={t.navigation.bookmarks()}
-                  isActive={pathname === '/bookmarks'}
-                />
-                <SidebarItem
-                  onClick={handleCreateClick}
-                  icon={<PlusIcon />}
-                  label={t.actions.create()}
-                  isActive={isModalOpen}
-                />
-                <SidebarItem
-                  href={user?.doc_id ? `/profile/${user.doc_id}` : '/profile'}
-                  icon={<UserIcon />}
-                  label={t.navigation.profile()}
-                  isActive={pathname.startsWith('/profile')}
-                />
-              </>
-            )}
-          </div>
-        </div>
+        <SidebarContent />
       </aside>
+
+      {/* Desktop Sidebar Content - rendered by MainLayout */}
+      <div className="hidden lg:block w-full h-full">
+        <SidebarContent />
+      </div>
     </>
   );
 });

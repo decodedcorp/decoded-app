@@ -9,17 +9,37 @@
   --focus-ring: rgba(59, 130, 246, 0.6);
 
   /* Layout design tokens - unified edge padding system */
-  --edge-x: 16px; /* 뷰포트 좌우 기본 여백 */
+  --edge-x: 0px; /* 뷰포트 좌우 기본 여백 */
   --main-gap: 24px; /* 메인↔사이드 가로 간격 */
   --sidebar-w: 260px; /* 데스크톱 사이드바 너비 */
   --sidebar-right-w: 260px; /* 오른쪽 사이드바 너비 */
   --header-h: 60px; /* 헤더 높이, sticky 기준 */
 
   /* dense 모드(거의 무여백) */
-  --edge-x-dense: 4px;
+  --edge-x-dense: 0px;
 
   /* Legacy - 기존 호환성 유지 */
   --space-page-x: var(--edge-x);
+
+  /* ========== NEW LAYOUT SYSTEM ========== */
+  /* Flex Layout System Variables */
+  --header-height: 72px; /* 헤더 높이 (데스크톱 기준) */
+  --sidebar-width: 0px; /* 기본값: 사이드바 숨김 (모바일 우선) */
+  --content-max-width: 1200px; /* 메인 콘텐츠 최대 너비 */
+  --content-max-width-wide: 1400px; /* 와이드 모드 최대 너비 */
+  --gap-main: 0px; /* 기본값: 간격 없음 (모바일 우선) */
+  --gap-edge: 0px; /* 뷰포트 가장자리 여백 */
+  --container-padding-x: 0px; /* 컨테이너 가로 패딩 */
+
+  /* Scroll & Sticky System */
+  --scroll-behavior: smooth;
+  --sidebar-scroll-height: calc(100dvh - var(--header-height) - 2 * var(--gap-edge));
+  --main-min-height: calc(100dvh - var(--header-height));
+
+  /* Performance & Accessibility */
+  --scrollbar-thumb: rgba(255, 255, 255, 0.2);
+  --scrollbar-track: transparent;
+  --scrollbar-width: 6px;
 
   /* Z-index scale - 레이어 우선순위 */
   --z-header: 9999;
@@ -64,7 +84,7 @@
 /* Responsive design tokens - 반응형 여백 관리 */
 @media (min-width: 768px) {
   :root {
-    --edge-x: 24px;
+    --edge-x: 0px;
     --main-gap: 28px;
     --header-h: 72px;
 
@@ -77,7 +97,7 @@
 
 @media (min-width: 1024px) {
   :root {
-    --edge-x: 32px;
+    --edge-x: 0px;
     --main-gap: 32px;
     --space-page-x: var(--edge-x);
   }
@@ -85,7 +105,7 @@
 
 @media (min-width: 1280px) {
   :root {
-    --edge-x: 40px;
+    --edge-x: 0px;
     --main-gap: 36px;
     --sidebar-right-w: 360px;
     --space-page-x: var(--edge-x);
@@ -237,6 +257,255 @@
   .layout-edge--dense {
     padding-left: var(--edge-x-dense);
     padding-right: var(--edge-x-dense);
+  }
+
+  /* ========== NEW FLEX LAYOUT SYSTEM ========== */
+  /* Main Layout Container */
+  .layout {
+    min-height: 100dvh;
+    width: 100%; /* Use container width, not viewport width */
+    max-width: 100%; /* Prevent horizontal overflow */
+    background: var(--bg-primary, #000000);
+    color: var(--text-primary, #ffffff);
+  }
+
+  /* Content Wrapper - Single Scroll Root */
+  .content-wrapper {
+    height: 100dvh;
+    width: 100%; /* Full width of layout container */
+    max-width: 100%; /* Prevent overflow */
+    box-sizing: border-box; /* Include padding in width calculation */
+    padding-top: var(--header-height);
+    padding-inline: var(--container-padding-x);
+    padding-bottom: var(--gap-edge);
+    overflow: auto;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+    scroll-behavior: var(--scroll-behavior);
+    display: flex;
+    gap: var(--gap-main);
+    contain: layout paint; /* Performance optimization */
+  }
+
+  /* Sidebar Base Styles */
+  .sidebar-left,
+  .sidebar-right {
+    position: sticky;
+    top: var(--gap-edge);
+    /* Default: no flex space (mobile-first) */
+    flex: 0 0 0px;
+    width: 0px;
+    display: none; /* Default: hidden */
+    height: fit-content;
+    max-height: var(--sidebar-scroll-height);
+
+    /* Performance optimizations */
+    contain: layout style paint;
+    will-change: transform;
+    transform: translateZ(0); /* GPU layer activation */
+  }
+
+  /* Sidebar Inner Content with Scroll */
+  .sidebar-inner {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    /* Scroll performance */
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
+
+    /* Custom scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  }
+
+  .sidebar-inner::-webkit-scrollbar {
+    width: var(--scrollbar-width);
+  }
+
+  .sidebar-inner::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
+
+  .sidebar-inner::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: calc(var(--scrollbar-width) / 2);
+  }
+
+  /* Main Content Area */
+  .main {
+    min-width: 0; /* Prevent flex shrink bugs */
+    flex: 1 1 auto; /* Flexible width that can shrink */
+    max-width: min(100%, var(--content-max-width)); /* Allow shrinking below max-width */
+    width: 100%; /* Take available space */
+    box-sizing: border-box; /* Include padding in width calculation */
+    margin: 0 auto; /* Center align */
+  }
+
+  /* Main Content Max-Width Variants */
+  .main[data-max-width='wide'] {
+    max-width: var(--content-max-width-wide);
+  }
+
+  .main[data-max-width='full'] {
+    max-width: none;
+    margin: 0;
+  }
+
+  /* ========== DOMAIN-SPECIFIC PRESETS ========== */
+  /* Home Domain */
+  .layout[data-domain='home'] {
+    --content-max-width: 1200px;
+    --container-padding-x: 0px;
+    --gap-main: 24px;
+  }
+
+  /* Channel Domain */
+  .layout[data-domain='channel'] {
+    --content-max-width: 100%;
+    --container-padding-x: 0px;
+    --gap-main: 20px;
+  }
+
+  /* Search Domain */
+  .layout[data-domain='search'] {
+    --content-max-width: 1400px;
+    --container-padding-x: 0px;
+    --gap-main: 20px;
+  }
+
+  /* Profile Domain */
+  .layout[data-domain='profile'] {
+    --content-max-width: 800px;
+    --container-padding-x: 0px;
+    --gap-main: 24px;
+  }
+
+  /* ========== RESPONSIVE BREAKPOINTS ========== */
+  /* Mobile First Approach */
+  @media (max-width: 767px) {
+    .layout {
+      --header-height: 60px; /* 모바일 헤더 높이 */
+      --sidebar-width: 0px; /* Hide sidebars on mobile */
+      --gap-main: 0px;
+      --container-padding-x: var(--edge-x);
+    }
+
+    .sidebar-left,
+    .sidebar-right {
+      display: none;
+    }
+
+    .main {
+      max-width: none;
+      margin: 0;
+    }
+
+    /* Mobile-specific content wrapper */
+    .content-wrapper {
+      padding-inline: var(--edge-x);
+    }
+  }
+
+  /* Tablet breakpoint - Left sidebar only */
+  @media (min-width: 768px) {
+    .layout {
+      --sidebar-width: clamp(180px, 15vw, 220px);
+      --gap-main: 16px;
+      --container-padding-x: 0px;
+    }
+
+    .sidebar-left {
+      display: flex;
+      flex: 0 0 var(--sidebar-width);
+      width: var(--sidebar-width);
+    }
+
+    .sidebar-right {
+      display: none;
+    }
+  }
+
+  /* Desktop breakpoint - Both sidebars */
+  @media (min-width: 1280px) {
+    .layout {
+      --sidebar-width: clamp(200px, 14vw, 240px);
+      --gap-main: 18px;
+      --container-padding-x: 0px;
+    }
+    .sidebar-left,
+    .sidebar-right {
+      display: flex;
+      flex: 0 0 var(--sidebar-width);
+      width: var(--sidebar-width);
+    }
+  }
+
+  /* Large desktop - Progressive enhancement */
+  @media (min-width: 1440px) {
+    .layout {
+      --sidebar-width: clamp(220px, 16vw, 260px);
+      --gap-main: 20px;
+      --container-padding-x: 0px;
+    }
+  }
+
+  /* Extra large desktop - Maximum comfort */
+  @media (min-width: 1680px) {
+    .layout {
+      --sidebar-width: clamp(240px, 18vw, 280px);
+      --gap-main: 24px;
+      --container-padding-x: 0px;
+    }
+  }
+
+  /* ========== MOBILE NAVIGATION ========== */
+  /* Mobile overlay navigation */
+  .mobile-nav-overlay {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--overlay-bg);
+    z-index: var(--z-modal);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .mobile-nav-panel {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    width: 280px;
+    height: calc(100vh - var(--header-height));
+    background: var(--bg-primary, #000000);
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: calc(var(--z-modal) + 1);
+  }
+
+  .mobile-nav-panel.open {
+    transform: translateX(0);
+  }
+
+  /* Mobile touch targets */
+  .mobile-touch-target {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Mobile safe areas */
+  .mobile-safe-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom), 16px);
+  }
+
+  .mobile-safe-sides {
+    padding-left: max(env(safe-area-inset-left), 16px);
+    padding-right: max(env(safe-area-inset-right), 16px);
   }
 
   /* Layout debugging helper */
@@ -495,6 +764,9 @@
 
 html {
   height: 100%;
+  width: 100%;
+  overflow-x: hidden; /* Prevent horizontal scroll at root level */
+  scrollbar-gutter: stable both-edges; /* Prevent layout shift when scrollbar appears */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -505,6 +777,8 @@ body {
   background-color: var(--main-background-color);
   min-height: 100vh;
   min-height: 100dvh; /* Dynamic viewport height for mobile */
+  width: 100%;
+  overflow-x: hidden; /* Prevent horizontal scroll at body level */
   display: flex;
   flex-direction: column;
   font-family: Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR',

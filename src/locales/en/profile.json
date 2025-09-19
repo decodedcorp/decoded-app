@@ -1,0 +1,21 @@
+{
+  "page": {
+    "title": "Profile",
+    "notFound": "Profile not found",
+    "notFoundDescription": "No user ID provided.",
+    "signInRequired": "Sign in required",
+    "signInRequiredDescription": "You need to sign in to view your profile.",
+    "profileNotFound": "Profile not found",
+    "profileNotFoundDescription": "This user profile doesn't exist or is private.",
+    "goToHome": "Go to Home"
+  },
+  "loading": {
+    "title": "Loading profile...",
+    "description": "Loading user information"
+  },
+  "error": {
+    "title": "Something went wrong",
+    "description": "An error occurred while loading the profile",
+    "retry": "Try again"
+  }
+}

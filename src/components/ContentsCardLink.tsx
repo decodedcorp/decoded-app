@@ -47,17 +47,16 @@ export function ContentsCardLink({
   }, [contentUrl, cardProps.card.id, channelId, cardProps.gridIndex]);
 
   return (
-    <Link
-      {...linkProps}
+    <div
       onMouseEnter={prefetchOnHover ? handlePrefetch : undefined}
       onClick={handleCardClick}
-      className="block focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-xl"
+      className="block focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-xl cursor-pointer"
       aria-label={`${cardProps.card.metadata?.title || cardProps.card.id} 콘텐츠 보기`}
     >
       <ContentsCard
         {...cardProps}
         onCardClick={() => {}} // Link가 네비게이션을 처리하므로 빈 함수
       />
-    </Link>
+    </div>
   );
 }

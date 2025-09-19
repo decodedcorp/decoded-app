@@ -111,6 +111,7 @@ export const Header = memo(function Header() {
           backdropFilter: 'blur(12px)',
           '--header-h': '60px',
           '--header-h-md': '72px',
+          height: 'var(--header-height, 64px)', // Use new layout variable
         } as React.CSSProperties & { '--header-h': string; '--header-h-md': string }
       }
       data-header-height="60"

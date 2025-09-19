@@ -11,6 +11,7 @@ interface InfiniteScrollLoaderProps {
   error?: Error | null;
   onRetry?: () => void;
   className?: string;
+  scrollRoot?: Element | null; // Custom scroll container
 }
 
 export function InfiniteScrollLoader({
@@ -20,6 +21,7 @@ export function InfiniteScrollLoader({
   error,
   onRetry,
   className = '',
+  scrollRoot,
 }: InfiniteScrollLoaderProps) {
   const observerRef = useRef<HTMLDivElement>(null);
 
@@ -28,19 +30,23 @@ export function InfiniteScrollLoader({
     const currentRef = observerRef.current;
     if (!currentRef) return;
 
+    // Find scroll container (.content-wrapper) if not provided
+    const root = scrollRoot || document.querySelector('.content-wrapper');
+
     const observer = new IntersectionObserver(
       (entries) => {
         const [entry] = entries;
         if (
-          entry.isIntersecting && 
-          hasNextPage && 
-          !isFetchingNextPage && 
+          entry.isIntersecting &&
+          hasNextPage &&
+          !isFetchingNextPage &&
           !error
         ) {
           fetchNextPage();
         }
       },
       {
+        root: root, // Use custom scroll container
         threshold: 0.1, // 10% 보이면 트리거
         rootMargin: '100px', // 100px 미리 트리거 (더 부드러운 UX)
       }
@@ -54,7 +60,7 @@ export function InfiniteScrollLoader({
       }
       observer.disconnect();
     };
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage, error]);
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage, error, scrollRoot]);
 
   // 더 이상 로드할 페이지가 없으면 렌더링하지 않음
   if (!hasNextPage && !error) return null;

@@ -396,7 +396,15 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
         <div
           className="cursor-pointer group/content hover:bg-zinc-900/50 rounded-lg p-2 -m-2 transition-colors"
           onClick={() => {
-            onPostClick?.();
+            if (contentId && channelId) {
+              // URL만 변경 (라우터 push 없이)
+              const newUrl = `/channels/${channelId}?content=${contentId}`;
+              window.history.pushState({}, '', newUrl);
+              // URL 변경 이벤트 발생시키기
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            } else {
+              onPostClick?.();
+            }
           }}
           role="button"
           tabIndex={0}
@@ -404,7 +412,15 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
-              onPostClick?.();
+              if (contentId && channelId) {
+                // URL만 변경 (라우터 push 없이)
+                const newUrl = `/channels/${channelId}?content=${contentId}`;
+                window.history.pushState({}, '', newUrl);
+                // URL 변경 이벤트 발생시키기
+                window.dispatchEvent(new PopStateEvent('popstate'));
+              } else {
+                onPostClick?.();
+              }
             }
           }}
         >

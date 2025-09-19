@@ -22,48 +22,52 @@ export const useContentModalStore = create<ContentModalState>((set, get) => ({
   openModal: (content: ContentItem, channelId?: string) => {
     console.log('🎯 [contentModalStore] openModal called with:', content.title);
 
-    // URL 업데이트 (브라우저 환경에서만)
-    if (typeof window !== 'undefined' && channelId) {
-      const currentUrl = window.location.href;
-      const contentUrl = toContentHref({ channelId, contentId: String(content.id) });
-      window.history.pushState({}, '', contentUrl);
+    // TODO: URL 업데이트 기능을 나중에 다시 활성화할 예정
+    // URL 업데이트 (브라우저 환경에서만) - 일시적으로 비활성화
+    // if (typeof window !== 'undefined' && channelId) {
+    //   const currentUrl = window.location.href;
+    //   const contentUrl = toContentHref({ channelId, contentId: String(content.id) });
+    //   window.history.pushState({}, '', contentUrl);
 
-      set({
-        isOpen: true,
-        selectedContent: content,
-        previousUrl: currentUrl,
-      });
-    } else {
-      set({ isOpen: true, selectedContent: content });
-    }
+    //   set({
+    //     isOpen: true,
+    //     selectedContent: content,
+    //     previousUrl: currentUrl,
+    //   });
+    // } else {
+    set({ isOpen: true, selectedContent: content });
+    // }
   },
   closeModal: () => {
     console.log('🎯 [contentModalStore] closeModal called (programmatic)');
 
-    // URL 복원 (브라우저 환경에서만)
-    if (typeof window !== 'undefined' && get().previousUrl) {
-      window.history.pushState({}, '', get().previousUrl);
-    }
+    // TODO: URL 복원 기능을 나중에 다시 활성화할 예정
+    // URL 복원 (브라우저 환경에서만) - 일시적으로 비활성화
+    // if (typeof window !== 'undefined' && get().previousUrl) {
+    //   window.history.pushState({}, '', get().previousUrl);
+    // }
 
     set({ isOpen: false, selectedContent: null, previousUrl: null });
   },
   closeModalOnEscape: () => {
     console.log('🎯 [contentModalStore] closeModalOnEscape called');
 
-    // URL 복원 (브라우저 환경에서만)
-    if (typeof window !== 'undefined' && get().previousUrl) {
-      window.history.pushState({}, '', get().previousUrl);
-    }
+    // TODO: URL 복원 기능을 나중에 다시 활성화할 예정
+    // URL 복원 (브라우저 환경에서만) - 일시적으로 비활성화
+    // if (typeof window !== 'undefined' && get().previousUrl) {
+    //   window.history.pushState({}, '', get().previousUrl);
+    // }
 
     set({ isOpen: false, selectedContent: null, previousUrl: null });
   },
   closeModalOnOverlay: () => {
     console.log('🎯 [contentModalStore] closeModalOnOverlay called');
 
-    // URL 복원 (브라우저 환경에서만)
-    if (typeof window !== 'undefined' && get().previousUrl) {
-      window.history.pushState({}, '', get().previousUrl);
-    }
+    // TODO: URL 복원 기능을 나중에 다시 활성화할 예정
+    // URL 복원 (브라우저 환경에서만) - 일시적으로 비활성화
+    // if (typeof window !== 'undefined' && get().previousUrl) {
+    //   window.history.pushState({}, '', get().previousUrl);
+    // }
 
     set({ isOpen: false, selectedContent: null, previousUrl: null });
   },

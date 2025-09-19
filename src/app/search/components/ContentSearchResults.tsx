@@ -79,8 +79,12 @@ export function ContentSearchResults({ query }: ContentSearchResultsProps) {
   }, [contents, searchData]);
 
   const handleContentClick = (contentId: string, channelId: string) => {
-    // 콘텐츠 클릭 시 콘텐츠 상세 페이지로 이동 (모달 라우팅)
-    router.push(`/channels/${channelId}/contents/${contentId}`);
+    // TODO: 콘텐츠 모달 라우팅을 나중에 다시 활성화할 예정
+    // 콘텐츠 클릭 시 콘텐츠 상세 페이지로 이동 (모달 라우팅) - 일시적으로 비활성화
+    // router.push(`/channels/${channelId}/contents/${contentId}`);
+
+    // 임시로 콘텐츠를 직접 열기 (URL 변경 없이)
+    console.log('Content clicked:', { contentId, channelId });
   };
 
   if (isLoading && !contents.length) {

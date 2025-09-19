@@ -95,10 +95,14 @@ const ContentItemCard = React.memo<{
   const linkProps = getContentLinkProps({ channelId, contentId: String(item.id) });
 
   return (
-    <Link
-      {...linkProps}
-      className={`w-full h-full group transition-all duration-300 hover:scale-[1.02] hover:shadow-xl block focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-xl ${statusStyles.container}`}
+    <div
+      className={`w-full h-full group transition-all duration-300 hover:scale-[1.02] hover:shadow-xl block focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-xl cursor-pointer ${statusStyles.container}`}
       aria-label={`${item.title} 콘텐츠 보기`}
+      onClick={() => {
+        // TODO: 콘텐츠 모달 라우팅을 나중에 다시 활성화할 예정
+        // 임시로 콘텐츠를 직접 열기 (URL 변경 없이)
+        console.log('Channel modal content clicked:', item);
+      }}
     >
       <div
         className={`relative overflow-hidden rounded-xl bg-zinc-800/50 border border-zinc-700/50 w-full h-full`}
@@ -282,7 +286,7 @@ const ContentItemCard = React.memo<{
           </div>
         )}
       </div>
-    </Link>
+    </div>
   );
 });
 

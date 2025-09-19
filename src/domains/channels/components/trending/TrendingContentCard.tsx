@@ -1,11 +1,9 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 
 import { useRouter } from 'next/navigation';
 import { TrendingContentItem } from '@/api/generated/models/TrendingContentItem';
-import { toContentHref, toChannelHref, getContentLinkProps } from '@/lib/routing';
 
 interface TrendingContentCardProps {
   content: TrendingContentItem;
@@ -14,21 +12,22 @@ interface TrendingContentCardProps {
 
 export function TrendingContentCard({ content, className = '' }: TrendingContentCardProps) {
   const router = useRouter();
-  const contentUrl = toContentHref({ channelId: content.channel_id, contentId: content.id });
-  const channelUrl = toChannelHref(content.channel_id);
-  const linkProps = getContentLinkProps({ channelId: content.channel_id, contentId: content.id });
+
+  const handleContentClick = () => {
+    // Navigate to channel page with content modal
+    router.push(`/channels/${content.channel_id}?content=${content.id}`);
+  };
 
   const handleChannelClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     // Navigate to channel page only
-    router.push(channelUrl);
+    router.push(`/channels/${content.channel_id}`);
   };
 
   return (
-    <Link
-      {...linkProps}
-      className={`relative rounded-lg overflow-hidden aspect-square group cursor-pointer hover:shadow-xl transition-all duration-300 block focus:outline-none focus:ring-2 focus:ring-primary-500 ${className}`}
-      aria-label={`${content.title || '제목 없음'} 콘텐츠 보기`}
+    <article
+      className={`relative rounded-lg overflow-hidden aspect-square group cursor-pointer hover:shadow-xl transition-all duration-300 ${className}`}
+      onClick={handleContentClick}
     >
       {/* Background Image - Full Size */}
       <div className="absolute inset-0">
@@ -80,6 +79,6 @@ export function TrendingContentCard({ content, className = '' }: TrendingContent
           </button>
         </div>
       </div>
-    </Link>
+    </article>
   );
 }
