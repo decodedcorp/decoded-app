@@ -14,6 +14,7 @@
   --gap-main: 24px; /* 좌/우와 메인 간 간격 */
   --container-padding-x: 16px; /* 좌우 패딩 */
   --sidebar-width: clamp(200px, 14vw, 240px); /* 사이드바 너비 */
+  --sidebar-right-width: clamp(280px, 18vw, 320px); /* 오른쪽 사이드바 너비 */
   --content-max-width: 1200px; /* 메인 최대 폭 */
 
   /* Scroll & Sticky System */
@@ -252,12 +253,21 @@
   }
 
   /* 사이드바: 고정 위치 (헤더처럼) */
-  .sidebar-left,
-  .sidebar-right {
+  .sidebar-left {
     position: fixed;
     top: var(--header-height);
     height: calc(100dvh - var(--header-height));
     width: var(--sidebar-width);
+    background: #000;
+    z-index: 999;
+    display: none; /* 모바일 기본 숨김 */
+  }
+
+  .sidebar-right {
+    position: fixed;
+    top: var(--header-height);
+    height: calc(100dvh - var(--header-height));
+    width: var(--sidebar-right-width);
     background: #000;
     z-index: 999;
     display: none; /* 모바일 기본 숨김 */
@@ -321,7 +331,7 @@
     }
     .cols {
       margin-left: var(--sidebar-width);
-      margin-right: var(--sidebar-width);
+      margin-right: var(--sidebar-right-width);
     }
   }
 
@@ -330,6 +340,13 @@
     :root {
       --gap-main: 16px;
       --container-padding-x: 12px;
+    }
+  }
+
+  /* 큰 화면에서 오른쪽 사이드바 더 넓게 */
+  @media (min-width: 1536px) {
+    :root {
+      --sidebar-right-width: clamp(320px, 20vw, 380px);
     }
   }
 

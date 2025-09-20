@@ -422,8 +422,8 @@
       "networkError": "네트워크 연결을 확인해 주세요."
     },
     "sidebar": {
-      "trendingChannels": "트렌딩 채널",
-      "popularToday": "오늘의 인기",
+      "recommendedChannels": "추천 채널",
+      "noRecommendedChannels": "추천 채널이 없어요",
       "sponsored": "광고",
       "advertisementPlaceholder": "광고 영역",
       "members": "멤버",

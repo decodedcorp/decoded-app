@@ -16,16 +16,22 @@ interface DiscoverSectionProps {
   onChannelClick?: (channel: ChannelData) => void;
 }
 
-export function DiscoverSection({ channels, className = '', onChannelClick }: DiscoverSectionProps) {
+export function DiscoverSection({
+  channels,
+  className = '',
+  onChannelClick,
+}: DiscoverSectionProps) {
   const router = useRouter();
   const openChannelModal = useChannelModalStore((state) => state.openModal);
-  
+
   // Category filters state
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSubcategory, setSelectedSubcategory] = useState('all');
-  
+
   // Fetch categories from API
-  const { data: categoriesData, isLoading: categoriesLoading } = useCategories(CategoryType.CHANNEL);
+  const { data: categoriesData, isLoading: categoriesLoading } = useCategories(
+    CategoryType.CHANNEL,
+  );
   const { categories, subcategories } = formatCategoriesForDropdown(categoriesData);
 
   const handleChannelClick = (channel: ChannelData) => {
@@ -39,22 +45,24 @@ export function DiscoverSection({ channels, className = '', onChannelClick }: Di
   // Filter channels based on selected category and subcategory
   const filteredChannels = useMemo(() => {
     let filtered = [...channels];
-    
+
     if (selectedCategory !== 'all') {
       // Convert API category format back to match channel data format
-      const targetCategory = categories.find(c => c.id === selectedCategory)?.label;
-      filtered = filtered.filter(channel => 
-        channel.category?.toLowerCase() === targetCategory?.toLowerCase()
+      const targetCategory = categories.find((c) => c.id === selectedCategory)?.label;
+      filtered = filtered.filter(
+        (channel) => channel.category?.toLowerCase() === targetCategory?.toLowerCase(),
       );
     }
-    
+
     if (selectedSubcategory !== 'all') {
-      const targetSubcategory = subcategories[selectedCategory]?.find(s => s.id === selectedSubcategory)?.label;
-      filtered = filtered.filter(channel =>
-        channel.subcategory?.toLowerCase() === targetSubcategory?.toLowerCase()
+      const targetSubcategory = subcategories[selectedCategory]?.find(
+        (s) => s.id === selectedSubcategory,
+      )?.label;
+      filtered = filtered.filter(
+        (channel) => channel.subcategory?.toLowerCase() === targetSubcategory?.toLowerCase(),
       );
     }
-    
+
     return filtered.slice(0, 12); // Show up to 12 channels
   }, [channels, selectedCategory, selectedSubcategory, categories, subcategories]);
 
@@ -67,9 +75,11 @@ export function DiscoverSection({ channels, className = '', onChannelClick }: Di
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-400 mb-2">모든 채널</h2>
-          <p className="text-zinc-500 text-sm mt-1">카테고리별로 채널을 둘러보고 나에게 맞는 채널을 찾아보세요</p>
+          <p className="text-zinc-500 text-sm mt-1">
+            카테고리별로 채널을 둘러보고 나에게 맞는 채널을 찾아보세요
+          </p>
         </div>
-        
+
         {/* Category Filters */}
         <div className="flex items-center space-x-3">
           {/* Category Dropdown */}
@@ -121,7 +131,7 @@ export function DiscoverSection({ channels, className = '', onChannelClick }: Di
       </div>
 
       {/* Show More Button */}
-      <div className="text-center mt-8">
+      {/* <div className="text-center mt-8">
         <button
           onClick={() => router.push('/channels')}
           className="px-8 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg font-medium transition-colors duration-200 inline-flex items-center space-x-2"
@@ -131,7 +141,7 @@ export function DiscoverSection({ channels, className = '', onChannelClick }: Di
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>
-      </div>
+      </div> */}
     </section>
   );
 }

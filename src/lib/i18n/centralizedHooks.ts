@@ -418,8 +418,8 @@ type CommonTranslations = {
       networkError: () => string;
     };
     sidebar: {
-      trendingChannels: () => string;
-      popularToday: () => string;
+      recommendedChannels: () => string;
+      noRecommendedChannels: () => string;
       sponsored: () => string;
       advertisementPlaceholder: () => string;
       members: () => string;
@@ -883,8 +883,8 @@ export const useCommonTranslation = (): CommonTranslations => {
         networkError: () => t('globalContentUpload.errors.networkError'),
       },
       sidebar: {
-        trendingChannels: () => t('globalContentUpload.sidebar.trendingChannels'),
-        popularToday: () => t('globalContentUpload.sidebar.popularToday'),
+        recommendedChannels: () => t('globalContentUpload.sidebar.recommendedChannels'),
+        noRecommendedChannels: () => t('globalContentUpload.sidebar.noRecommendedChannels'),
         sponsored: () => t('globalContentUpload.sidebar.sponsored'),
         advertisementPlaceholder: () => t('globalContentUpload.sidebar.advertisementPlaceholder'),
         members: () => t('globalContentUpload.sidebar.members'),

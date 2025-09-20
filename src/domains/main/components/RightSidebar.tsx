@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 
-import { Flame, TrendingUp, Mail, Github, Twitter } from 'lucide-react';
+import { Heart, Mail, Github, Twitter } from 'lucide-react';
 import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
 import ShinyText from '@/components/ShinyText';
 import { useQuery } from '@tanstack/react-query';
@@ -32,62 +33,69 @@ export function RightSidebar() {
   const recommended: ChannelResponse[] = recData?.channels || [];
   const trending: TrendingChannelItem[] = trendingData?.channels || [];
   const list: (ChannelResponse | TrendingChannelItem)[] = userDocId ? recommended : trending;
-  const title = userDocId ? '추천 채널' : t.globalContentUpload.sidebar.trendingChannels();
+  const title = t.globalContentUpload.sidebar.recommendedChannels();
 
   return (
     <div className="w-full h-full py-4 px-2 overflow-hidden flex flex-col bg-black">
-      {/* 추천/트렌딩 채널 */}
+      {/* 추천 채널 */}
       <div className="mb-4 flex-shrink-0">
         <div className="text-white text-sm font-medium mb-3 flex items-center gap-2">
-          <Flame className="w-4 h-4" />
+          <Heart className="w-4 h-4" />
           {title}
         </div>
         <div className="space-y-2">
           {list.length === 0 ? (
             <div className="text-xs text-gray-500">
-              {userDocId ? '추천 채널이 없어요' : '트렌딩 채널이 없어요'}
+              {t.globalContentUpload.sidebar.noRecommendedChannels()}
             </div>
           ) : (
             list.slice(0, 4).map((channel, index) => (
-              <div
+              <Link
                 key={channel.id}
-                className="p-2 bg-zinc-800 rounded-lg hover:bg-zinc-750 cursor-pointer transition-colors"
+                href={`/channels/${channel.id}`}
+                className="block p-3 border-b border-zinc-800 hover:border-zinc-700 cursor-pointer transition-colors last:border-b-0"
               >
-                <div className="flex items-center justify-between">
-                  <span className="text-white text-xs font-medium">{channel.name}</span>
-                  <span className="text-xs text-gray-500">#{index + 1}</span>
+                <div className="flex items-center gap-3">
+                  {/* 썸네일 */}
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg overflow-hidden bg-zinc-700">
+                    {channel.thumbnail_url ? (
+                      <img
+                        src={channel.thumbnail_url}
+                        alt={channel.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-zinc-400 text-xs font-medium">
+                        {channel.name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 채널 정보 */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="text-white text-xs font-medium truncate">{channel.name}</h3>
+                      <span className="text-xs text-gray-500 ml-2 flex-shrink-0">#{index + 1}</span>
+                    </div>
+
+                    {/* 설명 */}
+                    {channel.description && (
+                      <p className="text-xs text-gray-400 line-clamp-1 mb-1">
+                        {channel.description}
+                      </p>
+                    )}
+
+                    {/* 카테고리 */}
+                    {'category' in channel && channel.category && (
+                      <div className="mt-1">
+                        <span className="text-xs text-zinc-500">{channel.category}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
+              </Link>
             ))
           )}
-        </div>
-      </div>
-
-      {/* 구분선 */}
-      <div className="h-px bg-zinc-700 my-4"></div>
-
-      {/* 인기 포스트 - 축약 */}
-      <div className="mb-4 flex-shrink-0">
-        <div className="text-white text-sm font-medium mb-3 flex items-center gap-2">
-          <TrendingUp className="w-4 h-4" />
-          {t.globalContentUpload.sidebar.popularToday()}
-        </div>
-        <div className="space-y-2">
-          {[
-            { title: 'New React 19 features announced', channel: 'reactjs', upvotes: 1234 },
-            { title: 'AI breakthrough in coding assistants', channel: 'technology', upvotes: 892 },
-          ].map((post, index) => (
-            <div
-              key={index}
-              className="p-2 bg-zinc-800 rounded-lg hover:bg-zinc-750 cursor-pointer transition-colors"
-            >
-              <div className="text-white text-xs font-medium mb-1 line-clamp-1">{post.title}</div>
-              <div className="flex items-center justify-between text-xs text-gray-400">
-                <span>{post.channel}</span>
-                <span>↑ {post.upvotes}</span>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
 

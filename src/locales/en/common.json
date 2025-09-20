@@ -422,8 +422,8 @@
       "networkError": "Please check your network connection."
     },
     "sidebar": {
-      "trendingChannels": "Trending Channels",
-      "popularToday": "Popular Today",
+      "recommendedChannels": "Recommended Channels",
+      "noRecommendedChannels": "No recommended channels",
       "sponsored": "Sponsored",
       "advertisementPlaceholder": "Advertisement placeholder",
       "members": "members",

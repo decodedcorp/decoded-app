@@ -13,7 +13,7 @@ interface TrendingContentsSectionProps {
 
 export function TrendingContentsSection({ className = '' }: TrendingContentsSectionProps) {
   const [activeType, setActiveType] = useState<TrendingType>('popular');
-  
+
   const { data, isLoading, error } = useTrendingContents(activeType, 12);
 
   if (isLoading) {
@@ -53,7 +53,7 @@ export function TrendingContentsSection({ className = '' }: TrendingContentsSect
           <h2 className="text-2xl font-bold text-gray-400 mb-2">인기 콘텐츠</h2>
           <p className="text-zinc-500 text-sm">모든 채널에서 화제가 되고 있는 인기 콘텐츠들</p>
         </div>
-        
+
         {/* Popular/Trending Toggle */}
         <div className="flex items-center bg-zinc-800/50 rounded-lg p-1">
           <button
@@ -100,11 +100,11 @@ export function TrendingContentsSection({ className = '' }: TrendingContentsSect
           </div>
 
           {/* View All Button */}
-          <div className="text-center mt-6">
+          {/* <div className="text-center mt-6">
             <button className="px-6 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-sm font-medium transition-colors duration-200">
               전체 보기
             </button>
-          </div>
+          </div> */}
         </>
       )}
     </section>
