@@ -239,6 +239,11 @@
     "recentChannels": {
       "title": "Recent Channels"
     },
+    "myChannels": {
+      "title": "My Channels",
+      "noChannels": "No channels yet",
+      "noChannelsDescription": "Create your first channel to get started"
+    },
     "contentUpload": {
       "contentType": "Content Type",
       "image": "Image",

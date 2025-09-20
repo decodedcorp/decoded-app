@@ -6,11 +6,14 @@ import { ChannelsService } from '@/api/generated/services/ChannelsService';
 import { ChannelResponse } from '@/api/generated/models/ChannelResponse';
 import { SubscriptionResponse } from '@/api/generated/models/SubscriptionResponse';
 import { queryKeys } from '@/lib/api/queryKeys';
+import { useAuthStore } from '@/store/authStore';
 
 /**
  * 구독한 채널의 상세 정보를 가져오는 훅
  */
 export const useSubscribedChannels = (limit: number = 5) => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
   return useQuery({
     queryKey: ['subscribed-channels', limit],
     queryFn: async (): Promise<ChannelResponse[]> => {
@@ -42,6 +45,7 @@ export const useSubscribedChannels = (limit: number = 5) => {
       // 3. null 값 제거하고 반환
       return channels.filter((channel): channel is ChannelResponse => channel !== null);
     },
+    enabled: isAuthenticated, // 인증된 사용자만 쿼리 실행
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false,

@@ -235,6 +235,11 @@ type CommonTranslations = {
     recentChannels: {
       title: () => string;
     };
+    myChannels: {
+      title: () => string;
+      noChannels: () => string;
+      noChannelsDescription: () => string;
+    };
     contentUpload: {
       contentType: () => string;
       image: () => string;
@@ -680,6 +685,11 @@ export const useCommonTranslation = (): CommonTranslations => {
       },
       recentChannels: {
         title: () => t('globalContentUpload.recentChannels.title'),
+      },
+      myChannels: {
+        title: () => t('globalContentUpload.myChannels.title'),
+        noChannels: () => t('globalContentUpload.myChannels.noChannels'),
+        noChannelsDescription: () => t('globalContentUpload.myChannels.noChannelsDescription'),
       },
       contentUpload: {
         contentType: () => t('globalContentUpload.contentUpload.contentType'),

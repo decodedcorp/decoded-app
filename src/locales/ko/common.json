@@ -239,6 +239,11 @@
     "recentChannels": {
       "title": "최근 사용한 채널"
     },
+    "myChannels": {
+      "title": "내 채널",
+      "noChannels": "아직 채널이 없어요",
+      "noChannelsDescription": "첫 번째 채널을 만들어보세요"
+    },
     "contentUpload": {
       "contentType": "콘텐츠 유형",
       "image": "이미지",

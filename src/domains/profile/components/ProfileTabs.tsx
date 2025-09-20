@@ -1,5 +1,6 @@
 import React from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { useProfileTranslation } from '@/lib/i18n/hooks';
 import { ChannelsTab } from './tabs/ChannelsTab';
 import { SubscriptionsTab } from './tabs/SubscriptionsTab';
 import { BookmarksTab } from './tabs/BookmarksTab';
@@ -11,30 +12,29 @@ interface ProfileTabsProps {
   isMyProfile: boolean;
 }
 
-const getAvailableTabs = (isMyProfile: boolean) => {
+const getAvailableTabs = (isMyProfile: boolean, t: any) => {
   if (isMyProfile) {
     return [
-      { id: 'channels', label: 'My Channels' },
-      { id: 'subscriptions', label: 'Subscriptions' },
-      { id: 'bookmarks', label: 'Bookmarks' },
-      { id: 'comments', label: 'Comments' },
+      { id: 'channels', label: t.tabs.myChannels() },
+      { id: 'subscriptions', label: t.tabs.subscriptions() },
+      { id: 'bookmarks', label: t.tabs.bookmarks() },
+      { id: 'comments', label: t.tabs.comments() },
     ];
   } else {
-    return [
-      { id: 'comments', label: 'Comments' },
-    ];
+    return [{ id: 'comments', label: t.tabs.comments() }];
   }
 };
 
 export function ProfileTabs({ activeTab, userId, isMyProfile }: ProfileTabsProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const tabs = getAvailableTabs(isMyProfile);
-  
+  const t = useProfileTranslation();
+  const tabs = getAvailableTabs(isMyProfile, t);
+
   const handleTabChange = (tabId: string) => {
     router.push(`/profile/${userId}?tab=${tabId}`);
   };
-  
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'channels':
@@ -52,10 +52,14 @@ export function ProfileTabs({ activeTab, userId, isMyProfile }: ProfileTabsProps
           handleTabChange(defaultTab);
           return null;
         }
-        return isMyProfile ? <ChannelsTab /> : <CommentsTab userId={userId} isMyProfile={isMyProfile} />;
+        return isMyProfile ? (
+          <ChannelsTab />
+        ) : (
+          <CommentsTab userId={userId} isMyProfile={isMyProfile} />
+        );
     }
   };
-  
+
   return (
     <div>
       {/* Tab Navigation */}
@@ -68,22 +72,21 @@ export function ProfileTabs({ activeTab, userId, isMyProfile }: ProfileTabsProps
               className={`
                 px-6 py-3 font-medium transition-all duration-200
                 border-b-2 whitespace-nowrap
-                ${activeTab === tab.id 
-                  ? 'text-[#EAFD66] border-[#EAFD66]' 
-                  : 'text-zinc-400 border-transparent hover:text-white hover:border-zinc-600'
+                ${
+                  activeTab === tab.id
+                    ? 'text-[#EAFD66] border-[#EAFD66]'
+                    : 'text-zinc-400 border-transparent hover:text-white hover:border-zinc-600'
                 }
               `}
             >
-{tab.label}
+              {tab.label}
             </button>
           ))}
         </div>
       </div>
-      
+
       {/* Tab Content */}
-      <div className="min-h-[400px]">
-        {renderTabContent()}
-      </div>
+      <div className="min-h-[400px]">{renderTabContent()}</div>
     </div>
   );
 }

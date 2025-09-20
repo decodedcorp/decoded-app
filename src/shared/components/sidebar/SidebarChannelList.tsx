@@ -53,8 +53,11 @@ export const SidebarChannelList = memo(function SidebarChannelList({
   const hasSubscribedChannels = subscribedChannelsData && subscribedChannelsData.length > 0;
   const shouldShowSubscribed = isAuthenticated && hasSubscribedChannels;
 
-  const isLoading = shouldShowSubscribed ? isSubscribedLoading : isTrendingLoading;
-  const error = shouldShowSubscribed ? subscribedError : trendingError;
+  // 로그인했지만 구독한 채널이 없거나, 로그인하지 않았을 때는 trending 채널 사용
+  const shouldUseTrending = !isAuthenticated || !hasSubscribedChannels;
+
+  const isLoading = shouldUseTrending ? isTrendingLoading : isSubscribedLoading;
+  const error = shouldUseTrending ? trendingError : subscribedError;
 
   // Extract channels from the response
   const channels: ChannelResponse[] = useMemo(() => {
@@ -70,7 +73,10 @@ export const SidebarChannelList = memo(function SidebarChannelList({
   };
 
   const getEmptyMessage = () => {
-    return shouldShowSubscribed ? t.sidebar.subscribedEmpty() : t.sidebar.trendingEmpty();
+    if (isAuthenticated && !hasSubscribedChannels) {
+      return t.sidebar.subscribedEmpty();
+    }
+    return t.sidebar.trendingEmpty();
   };
 
   // 백그라운드에서 인기 채널들을 미리 prefetch
@@ -121,9 +127,12 @@ export const SidebarChannelList = memo(function SidebarChannelList({
         ) : error ? (
           // Error state
           <div className="px-3 py-2 text-sm text-zinc-500">{t.sidebar.loadError()}</div>
-        ) : channels.length === 0 ? (
-          // Empty state
+        ) : channels.length === 0 && !shouldUseTrending ? (
+          // Empty state (only when showing subscribed channels and they're empty)
           <div className="px-3 py-2 text-sm text-zinc-500">{getEmptyMessage()}</div>
+        ) : channels.length === 0 ? (
+          // Empty state for trending channels
+          <div className="px-3 py-2 text-sm text-zinc-500">{t.sidebar.trendingEmpty()}</div>
         ) : (
           // Channel list
           <>

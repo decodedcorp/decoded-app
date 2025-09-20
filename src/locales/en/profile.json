@@ -17,5 +17,110 @@
     "title": "Something went wrong",
     "description": "An error occurred while loading the profile",
     "retry": "Try again"
+  },
+  "tabs": {
+    "myChannels": "My Channels",
+    "subscriptions": "Subscriptions",
+    "bookmarks": "Bookmarks",
+    "comments": "Comments"
+  },
+  "sidebar": {
+    "activityOverview": "Activity Overview",
+    "profileInfo": "Profile Info",
+    "suiAddress": "SUI Address",
+    "memberSince": "Member Since",
+    "activeMember": "Active member",
+    "recentChannels": "Recent Channels",
+    "recentBookmarks": "Recent Bookmarks",
+    "viewAll": "View all",
+    "about": "About",
+    "aboutDescription": "This user hasn't shared much information publicly yet.",
+    "followUser": "Follow User"
+  },
+  "stats": {
+    "myChannels": "My Channels",
+    "subscriptions": "Subscriptions",
+    "bookmarks": "Bookmarks",
+    "comments": "Comments"
+  },
+  "header": {
+    "edit": "Edit",
+    "follow": "Follow",
+    "activeMember": "Active member"
+  },
+  "editModal": {
+    "title": "Edit Profile",
+    "profileImage": "Profile Image",
+    "uploadImage": "Upload Image",
+    "changeImage": "Change Image",
+    "removeImage": "Remove Image",
+    "imageHelper": "Max 5MB, JPG or PNG",
+    "nickname": "Nickname",
+    "nicknameLabel": "Nickname *",
+    "nicknamePlaceholder": "Enter your nickname",
+    "nicknameHelper": "2-50 characters",
+    "suiAddress": "SUI Address",
+    "suiAddressLabel": "SUI Address",
+    "suiAddressPlaceholder": "0x...",
+    "suiAddressHelper": "Optional - Your SUI blockchain address",
+    "save": "Save",
+    "saveChanges": "Save Changes",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "validation": {
+      "nicknameRequired": "Nickname is required",
+      "nicknameMinLength": "Nickname must be at least 2 characters",
+      "nicknameMaxLength": "Nickname must be less than 50 characters",
+      "suiAddressInvalid": "Invalid SUI address format",
+      "imageSize": "Max 5MB, JPG or PNG",
+      "nicknameLength": "2-50 characters"
+    }
+  },
+  "channels": {
+    "title": "My Channels",
+    "count": "My Channels ({count})",
+    "createChannel": "Create Channel",
+    "createNew": "Create New",
+    "noChannels": "No channels yet",
+    "noChannelsDescription": "Create your first channel to start sharing content.",
+    "failedToLoad": "Failed to load channels",
+    "failedToLoadDescription": "Something went wrong. Please try again.",
+    "viewChannel": "View Channel",
+    "inactive": "Inactive",
+    "subscribers": "Subscribers",
+    "contents": "Contents",
+    "created": "Created"
+  },
+  "subscriptions": {
+    "title": "Subscribed Channels",
+    "count": "Subscribed Channels ({count})",
+    "noSubscriptions": "No subscriptions yet",
+    "noSubscriptionsDescription": "Subscribe to channels you're interested in.",
+    "exploreChannels": "Explore Channels",
+    "failedToLoad": "Failed to load subscriptions",
+    "failedToLoadDescription": "Something went wrong. Please try again.",
+    "subscribers": "subscribers",
+    "subscribed": "Subscribed"
+  },
+  "bookmarks": {
+    "title": "Saved Bookmarks",
+    "count": "Saved Bookmarks ({count})",
+    "noBookmarks": "No bookmarks yet",
+    "noBookmarksDescription": "Start bookmarking content you want to save for later.",
+    "failedToLoad": "Failed to load bookmarks",
+    "failedToLoadDescription": "Something went wrong. Please try again.",
+    "bookmarked": "Bookmarked",
+    "from": "From",
+    "loadMore": "Load More",
+    "loading": "Loading...",
+    "removeBookmark": "Remove bookmark"
+  },
+  "comments": {
+    "title": "Comments",
+    "noComments": "No comments yet",
+    "noCommentsDescription": "Your comments on content will appear here.",
+    "comingSoon": "Note: Comments feature is coming soon!",
+    "failedToLoad": "Failed to load comments",
+    "failedToLoadDescription": "Something went wrong. Please try again."
   }
 }
