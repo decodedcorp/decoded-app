@@ -439,7 +439,9 @@
       "termsOfService": "이용약관",
       "copyright": "© 2025 Decoded",
       "careers": "채용정보",
-      "press": "보도자료"
+      "press": "보도자료",
+      "loadChannelsFailed": "채널을 불러올 수 없어요",
+      "brandSlogan": "당신의 취향, 당신의 트렌드"
     }
   },
   "invitations": {

@@ -324,6 +324,15 @@
     }
   }
 
+  @media (min-width: 1024px) {
+    .sidebar-right {
+      display: block;
+    }
+    .cols {
+      margin-right: var(--sidebar-right-width);
+    }
+  }
+
   @media (min-width: 1280px) {
     .sidebar-left,
     .sidebar-right {

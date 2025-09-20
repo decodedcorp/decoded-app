@@ -13,9 +13,7 @@ interface MainLayoutProps {
 export const MainLayout = memo(function MainLayout({ children }: MainLayoutProps) {
   const pathname = usePathname();
 
-  // Hide right sidebar on profile pages
-  const isProfilePage = pathname.startsWith('/profile');
-
+  // Show right sidebar on all pages
   return (
     <>
       {/* Left sidebar - Fixed position */}
@@ -26,13 +24,11 @@ export const MainLayout = memo(function MainLayout({ children }: MainLayoutProps
       </aside>
 
       {/* Right sidebar - Fixed position */}
-      {!isProfilePage && (
-        <aside className="sidebar-right">
-          <div className="inner">
-            <RightSidebar />
-          </div>
-        </aside>
-      )}
+      <aside className="sidebar-right">
+        <div className="inner">
+          <RightSidebar />
+        </div>
+      </aside>
 
       {/* Shell: Header 아래 전체 높이를 정확히 채우고 스크롤은 차단 */}
       <div className="shell">

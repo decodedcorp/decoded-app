@@ -439,7 +439,9 @@
       "termsOfService": "Terms of Service",
       "copyright": "© 2025 Decoded",
       "careers": "Careers",
-      "press": "Press"
+      "press": "Press",
+      "loadChannelsFailed": "Failed to load channels",
+      "brandSlogan": "Your Taste Your Trend"
     }
   },
   "invitations": {

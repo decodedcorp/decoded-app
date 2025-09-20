@@ -18,7 +18,11 @@ export function RightSidebar() {
   const userDocId = useAuthStore((s) => s.user?.doc_id || null);
 
   // Recommended (logged-in)
-  const { data: recData } = useQuery({
+  const {
+    data: recData,
+    isLoading: recLoading,
+    error: recError,
+  } = useQuery({
     queryKey: ['recommendations', 'channels', { limit: 4, userId: userDocId }],
     queryFn: () =>
       RecommendationsService.recommendChannelsRecommendationsChannelsGet(4, undefined, userDocId),
@@ -28,12 +32,30 @@ export function RightSidebar() {
   });
 
   // Trending fallback (logged-out)
-  const { data: trendingData } = useTrendingChannels('popular', 4);
+  const {
+    data: trendingData,
+    isLoading: trendingLoading,
+    error: trendingError,
+  } = useTrendingChannels('popular', 4);
 
   const recommended: ChannelResponse[] = recData?.channels || [];
   const trending: TrendingChannelItem[] = trendingData?.channels || [];
   const list: (ChannelResponse | TrendingChannelItem)[] = userDocId ? recommended : trending;
   const title = t.globalContentUpload.sidebar.recommendedChannels();
+
+  // Debug logging
+  if (process.env.NODE_ENV === 'development') {
+    console.log('RightSidebar Debug:', {
+      userDocId,
+      recLoading,
+      recError,
+      recData,
+      trendingLoading,
+      trendingError,
+      trendingData,
+      listLength: list.length,
+    });
+  }
 
   return (
     <div className="w-full h-full py-4 px-2 overflow-hidden flex flex-col bg-black">
@@ -44,11 +66,33 @@ export function RightSidebar() {
           {title}
         </div>
         <div className="space-y-2">
-          {list.length === 0 ? (
+          {/* 로딩 상태 */}
+          {(userDocId ? recLoading : trendingLoading) ? (
+            <div className="space-y-2">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="p-3 border-b border-zinc-800 animate-pulse">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-zinc-700 rounded-lg flex-shrink-0"></div>
+                    <div className="flex-1 min-w-0">
+                      <div className="h-3 bg-zinc-700 rounded mb-1"></div>
+                      <div className="h-2 bg-zinc-700 rounded w-3/4"></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : /* 에러 상태 */
+          (userDocId ? recError : trendingError) ? (
+            <div className="text-xs text-red-400 p-3 border border-red-800 rounded">
+              {t.globalContentUpload.sidebar.loadChannelsFailed()}
+            </div>
+          ) : /* 데이터 없음 */
+          list.length === 0 ? (
             <div className="text-xs text-gray-500">
               {t.globalContentUpload.sidebar.noRecommendedChannels()}
             </div>
           ) : (
+            /* 데이터 표시 */
             list.slice(0, 4).map((channel, index) => (
               <Link
                 key={channel.id}
@@ -160,7 +204,7 @@ export function RightSidebar() {
 
           <div className="pt-2 text-center">
             <ShinyText
-              text="Your Taste Your Trend"
+              text={t.globalContentUpload.sidebar.brandSlogan()}
               disabled={false}
               speed={3}
               className="text-[11px] font-medium"

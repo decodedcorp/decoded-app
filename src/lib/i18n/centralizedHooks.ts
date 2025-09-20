@@ -436,6 +436,8 @@ type CommonTranslations = {
       copyright: () => string;
       careers: () => string;
       press: () => string;
+      loadChannelsFailed: () => string;
+      brandSlogan: () => string;
     };
   };
   invitations: {
@@ -906,6 +908,8 @@ export const useCommonTranslation = (): CommonTranslations => {
         copyright: () => t('globalContentUpload.sidebar.copyright'),
         careers: () => t('globalContentUpload.sidebar.careers'),
         press: () => t('globalContentUpload.sidebar.press'),
+        loadChannelsFailed: () => t('globalContentUpload.sidebar.loadChannelsFailed'),
+        brandSlogan: () => t('globalContentUpload.sidebar.brandSlogan'),
       },
     },
     invitations: {
