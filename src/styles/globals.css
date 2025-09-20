@@ -947,3 +947,36 @@ footer {
 .my-masonry-grid_column > div {
   margin-bottom: 1.5rem;
 }
+
+/* ShinyText Animation */
+.shiny-text {
+  background: linear-gradient(
+    90deg,
+    #ffffff 0%,
+    #f0f0f0 25%,
+    #ffffff 50%,
+    #f0f0f0 75%,
+    #ffffff 100%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shine var(--speed, 3s) ease-in-out infinite;
+}
+
+.shiny-text.disabled {
+  animation: none;
+  background: none;
+  -webkit-text-fill-color: inherit;
+  color: inherit;
+}
+
+@keyframes shine {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}

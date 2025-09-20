@@ -4,6 +4,7 @@ import React from 'react';
 
 import { Flame, TrendingUp, Mail, Github, Twitter } from 'lucide-react';
 import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
+import ShinyText from '@/components/ShinyText';
 
 export function RightSidebar() {
   const t = useCommonTranslation();
@@ -88,7 +89,7 @@ export function RightSidebar() {
         </div> */}
 
         {/* 소셜 미디어 - 간소화 */}
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <div className="flex justify-center gap-4">
             <div className="cursor-pointer hover:text-gray-300 transition-colors">
               <Twitter className="w-4 h-4 text-gray-400" />
@@ -100,31 +101,40 @@ export function RightSidebar() {
               <Mail className="w-4 h-4 text-gray-400" />
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* 하단 링크들 - Reddit 스타일로 간소화 */}
         <div className="text-xs text-gray-500 space-y-2">
-          <div className="grid grid-cols-2 gap-x-2 gap-y-1">
+          {/* <div className="grid grid-cols-2 gap-x-2 gap-y-1">
             <div className="cursor-pointer hover:text-gray-400">
               {t.globalContentUpload.sidebar.help()}
             </div>
             <div className="cursor-pointer hover:text-gray-400">
               {t.globalContentUpload.sidebar.about()}
             </div>
-            {/* <div className="cursor-pointer hover:text-gray-400">
+            <div className="cursor-pointer hover:text-gray-400">
               {t.globalContentUpload.sidebar.careers()}
-            </div> */}
-            {/* <div className="cursor-pointer hover:text-gray-400">
+            </div>
+            <div className="cursor-pointer hover:text-gray-400">
               {t.globalContentUpload.sidebar.press()}
-            </div> */}
+            </div>
             <div className="cursor-pointer hover:text-gray-400">
               {t.globalContentUpload.sidebar.termsOfService()}
             </div>
             <div className="cursor-pointer hover:text-gray-400">
               {t.globalContentUpload.sidebar.privacyPolicy()}
             </div>
+           </div> */}
+
+          <div className="pt-2 text-center">
+            <ShinyText
+              text="Your Taste Your Trend"
+              disabled={false}
+              speed={3}
+              className="text-[11px] font-medium"
+            />
           </div>
-          <div className="pt-2 text-gray-600 text-[10px] text-center">
+          <div className="pt-1 text-gray-600 text-[10px] text-center">
             {t.globalContentUpload.sidebar.copyright()}
           </div>
         </div>

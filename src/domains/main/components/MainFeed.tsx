@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 
-import { MailOpen, Info, TrendingUp, Clock } from 'lucide-react';
+import { MailOpen } from 'lucide-react';
 import { useQueries } from '@tanstack/react-query';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
 import { useContentDetail } from '@/domains/contents/hooks/useContentDetail';
@@ -12,17 +12,15 @@ import { useContentModalStore } from '@/store/contentModalStore';
 import type { ContentItem } from '@/lib/types/content';
 import { ContentType } from '@/lib/types/ContentType';
 import { getThumbnailImageUrl } from '@/lib/utils/imageProxy';
-import type { TrendingContentItem } from '@/api/generated/models/TrendingContentItem';
 
-import { useTrendingContents } from '../hooks/useTrendingContents';
+import { useFeedContents } from '../hooks/useFeedContents';
 import { DEFAULT_CHANNEL_ID } from '../data/channelCardsProvider';
+import type { FeedItem, SortOption } from '../types/feedTypes';
 
 import { PostCardSkeleton } from './PostCardSkeleton';
 import { InfiniteScrollLoader } from './InfiniteScrollLoader';
 import { PostCard } from './PostCard';
 import { FeedGrid, FeedGridItem } from '@/components/FeedGrid/FeedGrid';
-
-type SortOption = 'hot' | 'new' | 'top';
 
 export const MainFeed = React.memo(function MainFeed() {
   const [activeSort, setActiveSort] = useState<SortOption>('hot');
@@ -102,59 +100,61 @@ export const MainFeed = React.memo(function MainFeed() {
     { value: 'top', label: t.feed.sort.top(), tooltip: t.feed.sort.topTooltip() },
   ];
 
-  // Trending contents 가져오기 - popular와 trending 병렬 호출
-  const { popularContents, trendingContents, isLoading, isError, error, refetch } =
-    useTrendingContents({
-      limit: 20,
-      enabled: true,
-    });
+  // Enhanced infinite scroll feed with hybrid API strategy
+  const {
+    data,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+    isLoading,
+    isError,
+    error,
+    refetch,
+    allItems,
+    totalItems,
+  } = useFeedContents({
+    sort: activeSort,
+    limit: 20,
+  });
 
-  // 디버깅을 위한 로그 - API 응답 확인
+  // Flatten all items from all pages
+  const feedData = useMemo(() => allItems, [allItems]);
+
+  // Debug logging in development
   if (process.env.NODE_ENV === 'development') {
-    console.log('Trending API Response:', {
-      popularContents,
-      trendingContents,
+    console.log('Enhanced Feed State:', {
+      sort: activeSort,
+      totalPages: data?.pages?.length || 0,
+      totalItems,
+      hasNextPage,
+      isFetchingNextPage,
       isLoading,
       isError,
       error,
     });
   }
 
-  // 정렬 옵션에 따라 적절한 데이터 선택
-  const feedData = useMemo(() => {
-    if (activeSort === 'hot') {
-      return popularContents?.content || [];
-    } else if (activeSort === 'new') {
-      return trendingContents?.content || [];
-    } else {
-      // 'top'의 경우 popular와 trending를 합쳐서 정렬
-      const popular = popularContents?.content || [];
-      const trending = trendingContents?.content || [];
-      return [...popular, ...trending].slice(0, 20);
-    }
-  }, [activeSort, popularContents, trendingContents]);
-
   // 고유한 채널 ID들 추출 - feedData의 길이와 ID들만 의존성으로 설정
   const uniqueChannelIds = useMemo(() => {
     const channelIds = new Set<string>();
     feedData.forEach((item) => {
-      if (item.channel_id) {
-        channelIds.add(item.channel_id);
+      if (item.channelId) {
+        channelIds.add(item.channelId);
       }
     });
     return Array.from(channelIds);
-  }, [feedData.length, feedData.map((item) => item.channel_id).join(',')]);
+  }, [feedData.length, feedData.map((item) => item.channelId).join(',')]);
 
   // 고유한 유저 ID들 추출 - feedData의 길이와 ID들만 의존성으로 설정
   const uniqueUserIds = useMemo(() => {
     const userIds = new Set<string>();
     feedData.forEach((item) => {
-      if (item.provider_id) {
-        userIds.add(item.provider_id);
+      if (item.providerId) {
+        userIds.add(item.providerId);
       }
     });
     return Array.from(userIds);
-  }, [feedData.length, feedData.map((item) => item.provider_id).join(',')]);
+  }, [feedData.length, feedData.map((item) => item.providerId).join(',')]);
 
   // 모든 채널의 썸네일 가져오기
   const channelQueries = uniqueChannelIds.map((channelId) => ({
@@ -260,121 +260,52 @@ export const MainFeed = React.memo(function MainFeed() {
     }
   }, [userResults, uniqueUserIds]);
 
-  // 기존 인터페이스와의 호환성을 위한 mock query 객체
-  const currentQuery = {
-    isLoading,
-    isError,
-    error,
-    data: { pages: [{ contents: feedData }] },
-    hasNextPage: false,
-    isFetchingNextPage: false,
-    fetchNextPage: () => {},
-    refetch,
-  };
-
-  // TrendingContentItem을 PostCard props로 변환하는 함수 - 메모화로 성능 최적화
-  const transformContentItem = useCallback((item: TrendingContentItem, index: number) => {
-    // 임시로 이미지 프록시 우회 - 직접 URL 사용
-    const thumbnail = item.thumbnail_url || null;
-
-    // 디버깅을 위한 로그 (개발 환경에서만)
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Trending content item:', {
-        id: item.id,
-        title: item.title,
-        thumbnail_url: item.thumbnail_url,
-        raw_thumbnail: item.thumbnail_url,
-        final_thumbnail: thumbnail,
-        channel_name: item.channel_name,
-        provider_id: item.provider_id,
-        type: item.type,
-        url: item.url,
-        hasThumbnail: !!item.thumbnail_url,
-        thumbnailAfterProxy: thumbnail,
-      });
-    }
-
-    // 제목이 없을 때 URL에서 도메인 추출하여 표시
-    const getDisplayTitle = () => {
-      if (item.title) return item.title;
-      if (item.url) {
-        try {
-          const url = new URL(item.url);
-          return url.hostname.replace('www.', '');
-        } catch {
-          return 'Untitled';
-        }
-      }
-      return 'Untitled';
-    };
-
-    // 배지 결정 로직
-    const getBadge = () => {
-      if (index < 3) return t.feed.badge.trending(); // 상위 3개는 급상승
-      if (index < 6) return t.feed.badge.justIn(); // 4-6번째는 방금
-      return null;
-    };
+  // FeedItem을 PostCard props로 변환하는 함수 - 메모화로 성능 최적화
+  const transformFeedItem = useCallback((item: FeedItem, index: number) => {
+    // FeedItem은 이미 정규화된 데이터이므로 직접 사용
+    const thumbnail = item.imageUrl || null;
 
     return {
       id: index,
-      title: getDisplayTitle(),
+      title: item.title || 'Untitled',
       description: item.description || undefined,
-      channel: item.channel_name || 'Unknown Channel',
-      channelId: item.channel_id,
-      author: item.provider_id || 'anonymous',
-      authorId: item.provider_id || 'anonymous',
-      timeAgo: 'Trending', // Trending 콘텐츠임을 명시
-      pins: 0, // 실제 데이터가 없으므로 0으로 설정
-      comments: 0, // 실제 데이터가 없으므로 0으로 설정
+      channel: item.channelName || 'Unknown Channel',
+      channelId: item.channelId,
+      author: item.providerName || 'anonymous',
+      authorId: item.providerId || 'anonymous',
+      timeAgo: 'Recent', // 간단한 시간 표시
+      pins: item.metadata?.pins || 0,
+      comments: item.metadata?.comments || 0,
       thumbnail,
-      contentType: mapContentType(item.type) || ('link' as const),
-      originalItem: item, // 원본 데이터 보조
-      badge: getBadge(), // 배지 추가
+      contentType: item.type || 'link',
+      badge: item.metadata?.badge || null,
     };
   }, []);
 
-  // TrendingContentItem을 ContentItem으로 변환하는 함수 - 메모화로 성능 최적화
-  const transformToContentItem = useCallback((item: TrendingContentItem): ContentItem => {
-    // 이미지 프록시 처리 적용
-    const thumbnailUrl = item.thumbnail_url ? getThumbnailImageUrl(item.thumbnail_url) : undefined;
-
+  // FeedItem을 ContentItem으로 변환하는 함수 (모달용)
+  const transformToContentItem = useCallback((item: FeedItem): ContentItem => {
     return {
       id: item.id,
       type: ContentType.LINK,
-      title: item.title || item.url || 'Untitled',
+      title: item.title || 'Untitled',
       description: item.description || undefined,
-      linkUrl: item.url || undefined,
-      thumbnailUrl,
-      author: item.provider_id || 'anonymous',
-      date: new Date().toISOString(), // TrendingContentItem에는 시간 정보가 없으므로 현재 시간 사용
+      linkUrl: item.linkUrl || undefined,
+      thumbnailUrl: item.imageUrl,
+      author: item.providerName || 'anonymous',
+      date: item.createdAt,
       category: undefined,
-      status: undefined,
-      // AI 생성 메타데이터는 TrendingContentItem에 없으므로 undefined
+      status: item.status as any,
       aiSummary: undefined,
       aiQaList: undefined,
       linkPreview: {
         title: item.title || undefined,
         description: item.description || undefined,
-        url: item.url || undefined,
-        imageUrl: thumbnailUrl,
+        url: item.linkUrl || undefined,
+        imageUrl: item.imageUrl,
         downloadedImageUrl: undefined,
         siteName: undefined,
       },
     };
-  }, []);
-
-  // 콘텐츠 타입 매핑 - 메모화로 성능 최적화
-  const mapContentType = useCallback((type: string): 'text' | 'image' | 'video' | 'link' => {
-    switch (type?.toLowerCase()) {
-      case 'image':
-        return 'image';
-      case 'video':
-        return 'video';
-      case 'link':
-        return 'link';
-      default:
-        return 'text';
-    }
   }, []);
 
   return (
@@ -405,7 +336,7 @@ export const MainFeed = React.memo(function MainFeed() {
                       if (activeSort !== option.value) {
                         setActiveSort(option.value);
                         // 정렬 변경 시 쿼리 리프레시하여 새로운 데이터 로드
-                        currentQuery.refetch();
+                        refetch();
                       }
                     }}
                     title={option.tooltip}
@@ -441,7 +372,7 @@ export const MainFeed = React.memo(function MainFeed() {
             </div>
 
             {/* 필터/서브 옵션 */}
-            <div className="flex items-center gap-3 text-sm">
+            {/* <div className="flex items-center gap-3 text-sm">
               <span className="text-gray-400">{t.feed.filter.by()}</span>
               <div className="flex gap-2">
                 <button className="px-3 py-1.5 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-md border border-zinc-700 transition-colors">
@@ -454,18 +385,18 @@ export const MainFeed = React.memo(function MainFeed() {
                   {t.feed.filter.allTime()}
                 </button>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* 초기 로딩 상태 - 최적화된 스켈레톤 */}
-          {currentQuery.isLoading && !currentQuery.data && <PostCardSkeleton count={5} />}
+          {isLoading && !data && <PostCardSkeleton count={5} />}
 
           {/* 에러 상태 */}
-          {currentQuery.isError && !currentQuery.data && (
+          {isError && !data && (
             <div className="text-center py-8">
               <div className="text-red-400 mb-2">{t.feed.failedToLoadPosts()}</div>
               <button
-                onClick={() => currentQuery.refetch()}
+                onClick={() => refetch()}
                 className="px-4 py-2 bg-zinc-800 text-white rounded hover:bg-zinc-700 transition-colors"
               >
                 {t.feed.tryAgain()}
@@ -474,9 +405,9 @@ export const MainFeed = React.memo(function MainFeed() {
           )}
 
           {/* 포스트 목록 - FeedGrid 사용 */}
-          {(!currentQuery.isLoading || currentQuery.data) && !currentQuery.isError && (
+          {(!isLoading || data) && !isError && (
             <>
-              {feedData.length === 0 && !currentQuery.isLoading ? (
+              {feedData.length === 0 && !isLoading ? (
                 <div className="text-center py-12">
                   <div className="mb-4">
                     <MailOpen className="w-16 h-16 mx-auto text-gray-600" />
@@ -498,43 +429,55 @@ export const MainFeed = React.memo(function MainFeed() {
                     }}
                     className="mt-6"
                   >
-                    {feedData.map((item: TrendingContentItem, index: number) => {
-                      const post = transformContentItem(item, index);
+                    {feedData.map((item: FeedItem, index: number) => {
+                      const post = transformFeedItem(item, index);
                       const isSelected = selectedContentId === item.id;
+
                       return (
-                        <FeedGridItem key={`${item.id}-${index}`}>
-                          <PostCard
-                            id={post.id}
-                            title={post.title}
-                            description={post.description}
-                            channel={post.channel}
-                            channelId={post.channelId}
-                            channelThumbnail={channelThumbnails[item.channel_id]}
-                            author={post.author}
-                            authorId={post.authorId}
-                            userAvatar={userAvatars[item.provider_id]}
-                            userAka={userAkas[item.provider_id]}
-                            timeAgo={post.timeAgo}
-                            pins={post.pins}
-                            comments={post.comments}
-                            thumbnail={post.thumbnail}
-                            // TODO: 실제 데이터에서 가져와야 함
-                            // 임시로 다양한 aspect ratio 테스트를 위한 값
-                            mediaWidth={[800, 1200, 1600, 2000, 2400][index % 5]} // 다양한 너비
-                            mediaHeight={[600, 800, 1200, 1500, 1800][index % 5]} // 다양한 높이
-                            blurDataURL={undefined}
-                            contentType={post.contentType}
-                            badge={post.badge}
-                            onPostClick={() => {
-                              // 콘텐츠 ID를 설정하여 상세 정보 가져오기
-                              setSelectedContentId(item.id);
-                            }}
-                            // 로딩 상태 표시
-                            className={
-                              isSelected && isContentLoading ? 'opacity-50 pointer-events-none' : ''
-                            }
-                          />
-                        </FeedGridItem>
+                        <React.Fragment key={`${item.id}-${index}`}>
+                          <FeedGridItem>
+                            <PostCard
+                              id={post.id}
+                              title={post.title}
+                              description={post.description}
+                              channel={post.channel}
+                              channelId={post.channelId || ''}
+                              channelThumbnail={
+                                channelThumbnails[item.channelId || ''] || undefined
+                              }
+                              author={post.author}
+                              authorId={post.authorId}
+                              userAvatar={userAvatars[item.providerId || '']}
+                              userAka={userAkas[item.providerId || '']}
+                              timeAgo={post.timeAgo}
+                              pins={post.pins}
+                              comments={post.comments}
+                              thumbnail={post.thumbnail}
+                              // Use metadata from FeedItem if available
+                              mediaWidth={
+                                item.metadata?.mediaWidth ||
+                                [800, 1200, 1600, 2000, 2400][index % 5]
+                              }
+                              mediaHeight={
+                                item.metadata?.mediaHeight ||
+                                [600, 800, 1200, 1500, 1800][index % 5]
+                              }
+                              blurDataURL={undefined}
+                              contentType={post.contentType}
+                              badge={post.badge}
+                              onPostClick={() => {
+                                // 콘텐츠 ID를 설정하여 상세 정보 가져오기
+                                setSelectedContentId(item.id);
+                              }}
+                              // 로딩 상태 표시
+                              className={
+                                isSelected && isContentLoading
+                                  ? 'opacity-50 pointer-events-none'
+                                  : ''
+                              }
+                            />
+                          </FeedGridItem>
+                        </React.Fragment>
                       );
                     })}
                   </FeedGrid>
@@ -557,33 +500,32 @@ export const MainFeed = React.memo(function MainFeed() {
           {feedData.length > 0 && (
             <div className="max-w-4xl mx-auto">
               <InfiniteScrollLoader
-                hasNextPage={currentQuery.hasNextPage || false}
-                isFetchingNextPage={currentQuery.isFetchingNextPage}
-                fetchNextPage={currentQuery.fetchNextPage}
-                error={currentQuery.error}
-                onRetry={() => currentQuery.refetch()}
+                hasNextPage={hasNextPage || false}
+                isFetchingNextPage={isFetchingNextPage}
+                fetchNextPage={fetchNextPage}
+                error={error}
+                onRetry={() => refetch()}
                 className="mt-12"
+                scrollRoot={null} // Use window as scroll container
+                rootMargin="800px" // Load more content earlier
+                threshold={0.1}
               />
             </div>
           )}
 
           {/* 포스트 수 표시 */}
-          {feedData.length > 0 && (
+          {/* {feedData.length > 0 && (
             <div className="max-w-4xl mx-auto">
               <div className="text-center mt-6">
                 <div className="text-xs text-gray-500">
                   {t.feed.showingPosts({ count: feedData.length })}
-                  {currentQuery.data?.pages?.[0] &&
-                    (currentQuery.data.pages[0] as any)?.totalCount && (
-                      <span>
-                        {' '}
-                        {t.feed.of({ total: (currentQuery.data.pages[0] as any).totalCount })}
-                      </span>
-                    )}
+                  {data?.pages?.[0] && (data.pages[0] as any)?.totalCount && (
+                    <span> {t.feed.of({ total: (data.pages[0] as any).totalCount })}</span>
+                  )}
                 </div>
               </div>
             </div>
-          )}
+          )} */}
         </div>
       </section>
 
