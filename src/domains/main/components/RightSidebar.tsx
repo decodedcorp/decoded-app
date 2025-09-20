@@ -5,37 +5,61 @@ import React from 'react';
 import { Flame, TrendingUp, Mail, Github, Twitter } from 'lucide-react';
 import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
 import ShinyText from '@/components/ShinyText';
+import { useQuery } from '@tanstack/react-query';
+import { RecommendationsService } from '@/api/generated/services/RecommendationsService';
+import { useAuthStore } from '@/store/authStore';
+import type { ChannelResponse } from '@/api/generated/models/ChannelResponse';
+import type { TrendingChannelItem } from '@/api/generated/models/TrendingChannelItem';
+import { useTrendingChannels } from '@/domains/channels/hooks/useTrending';
 
 export function RightSidebar() {
   const t = useCommonTranslation();
+  const userDocId = useAuthStore((s) => s.user?.doc_id || null);
+
+  // Recommended (logged-in)
+  const { data: recData } = useQuery({
+    queryKey: ['recommendations', 'channels', { limit: 4, userId: userDocId }],
+    queryFn: () =>
+      RecommendationsService.recommendChannelsRecommendationsChannelsGet(4, undefined, userDocId),
+    enabled: !!userDocId,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
+  // Trending fallback (logged-out)
+  const { data: trendingData } = useTrendingChannels('popular', 4);
+
+  const recommended: ChannelResponse[] = recData?.channels || [];
+  const trending: TrendingChannelItem[] = trendingData?.channels || [];
+  const list: (ChannelResponse | TrendingChannelItem)[] = userDocId ? recommended : trending;
+  const title = userDocId ? '추천 채널' : t.globalContentUpload.sidebar.trendingChannels();
 
   return (
     <div className="w-full h-full py-4 px-2 overflow-hidden flex flex-col bg-black">
-      {/* 트렌딩 커뮤니티 - 축약 */}
+      {/* 추천/트렌딩 채널 */}
       <div className="mb-4 flex-shrink-0">
         <div className="text-white text-sm font-medium mb-3 flex items-center gap-2">
           <Flame className="w-4 h-4" />
-          {t.globalContentUpload.sidebar.trendingChannels()}
+          {title}
         </div>
         <div className="space-y-2">
-          {[
-            { name: 'technology', members: '12.5M' },
-            { name: 'programming', members: '8.2M' },
-            { name: 'webdev', members: '2.1M' },
-          ].map((channel, index) => (
-            <div
-              key={channel.name}
-              className="p-2 bg-zinc-800 rounded-lg hover:bg-zinc-750 cursor-pointer transition-colors"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-white text-xs font-medium">{channel.name}</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-400">{channel.members}</span>
+          {list.length === 0 ? (
+            <div className="text-xs text-gray-500">
+              {userDocId ? '추천 채널이 없어요' : '트렌딩 채널이 없어요'}
+            </div>
+          ) : (
+            list.slice(0, 4).map((channel, index) => (
+              <div
+                key={channel.id}
+                className="p-2 bg-zinc-800 rounded-lg hover:bg-zinc-750 cursor-pointer transition-colors"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-white text-xs font-medium">{channel.name}</span>
                   <span className="text-xs text-gray-500">#{index + 1}</span>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
