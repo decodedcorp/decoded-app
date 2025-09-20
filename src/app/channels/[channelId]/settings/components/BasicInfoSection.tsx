@@ -25,9 +25,7 @@ export function BasicInfoSection({ channel }: BasicInfoSectionProps) {
 
   const handleDescriptionChange = (value: string) => {
     setDescription(value);
-    setHasChanges(
-      value !== channel.description || name !== channel.name
-    );
+    setHasChanges(value !== channel.description || name !== channel.name);
   };
 
   const handleSave = async () => {
@@ -57,9 +55,7 @@ export function BasicInfoSection({ channel }: BasicInfoSectionProps) {
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold mb-4">{t.ui.basicInformation()}</h2>
-        <p className="text-zinc-400 mb-6">
-          {t.ui.updateChannelBasicInfo()}
-        </p>
+        <p className="text-zinc-400 mb-6">{t.ui.updateChannelBasicInfo()}</p>
       </div>
 
       {/* Channel Name */}
@@ -72,13 +68,11 @@ export function BasicInfoSection({ channel }: BasicInfoSectionProps) {
           type="text"
           value={name}
           onChange={(e) => handleNameChange(e.target.value)}
-          className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           placeholder={t.ui.enterChannelName()}
           maxLength={50}
         />
-        <p className="text-xs text-zinc-400 mt-1">
-          {name.length}/50 characters
-        </p>
+        <p className="text-xs text-zinc-400 mt-1">{name.length}/50 characters</p>
       </div>
 
       {/* Channel Description */}
@@ -91,13 +85,11 @@ export function BasicInfoSection({ channel }: BasicInfoSectionProps) {
           value={description}
           onChange={(e) => handleDescriptionChange(e.target.value)}
           rows={4}
-          className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+          className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
           placeholder={t.ui.describeChannel()}
           maxLength={500}
         />
-        <p className="text-xs text-zinc-400 mt-1">
-          {description.length}/500 characters
-        </p>
+        <p className="text-xs text-zinc-400 mt-1">{description.length}/500 characters</p>
       </div>
 
       {/* Channel Stats */}

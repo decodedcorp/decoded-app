@@ -18,7 +18,7 @@ const PinNoteModal = ({
   onClose,
   onPin,
   isLoading = false,
-  contentTitle = 'this content'
+  contentTitle = 'this content',
 }: PinNoteModalProps) => {
   const [note, setNote] = useState('');
   const modalRef = useRef<HTMLDivElement>(null);
@@ -70,7 +70,7 @@ const PinNoteModal = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div 
+      <div
         ref={modalRef}
         className="bg-zinc-800 border border-zinc-600 rounded-xl shadow-xl max-w-md w-full mx-4 p-6"
       >
@@ -78,9 +78,7 @@ const PinNoteModal = ({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
             <MdPushPin className="w-5 h-5 text-blue-400" />
-            <h3 className="text-lg font-semibold text-white">
-              Pin Content
-            </h3>
+            <h3 className="text-lg font-semibold text-white">Pin Content</h3>
           </div>
           <button
             onClick={handleClose}
@@ -94,9 +92,10 @@ const PinNoteModal = ({
         {/* Content */}
         <div className="mb-6">
           <p className="text-sm text-zinc-300 mb-4">
-            Pin <span className="font-medium text-white">{contentTitle}</span> to the top of this channel
+            Pin <span className="font-medium text-white">{contentTitle}</span> to the top of this
+            channel
           </p>
-          
+
           {/* Note Input */}
           <div className="space-y-2">
             <label htmlFor="pin-note" className="text-sm font-medium text-zinc-300">
@@ -110,7 +109,7 @@ const PinNoteModal = ({
               placeholder="Why is this content important? Add context for other members..."
               className="w-full h-20 px-3 py-2 bg-zinc-900/50 border border-zinc-600 rounded-lg 
                        text-white placeholder-zinc-400 resize-none
-                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                       focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
                        disabled:opacity-50 disabled:cursor-not-allowed"
               maxLength={500}
               disabled={isLoading}
@@ -124,20 +123,10 @@ const PinNoteModal = ({
 
         {/* Actions */}
         <div className="flex space-x-3">
-          <Button
-            onClick={handleClose}
-            variant="secondary"
-            className="flex-1"
-            disabled={isLoading}
-          >
+          <Button onClick={handleClose} variant="secondary" className="flex-1" disabled={isLoading}>
             Cancel
           </Button>
-          <Button
-            onClick={handlePin}
-            variant="primary"
-            className="flex-1"
-            disabled={isLoading}
-          >
+          <Button onClick={handlePin} variant="primary" className="flex-1" disabled={isLoading}>
             {isLoading ? (
               <>
                 <div className="w-4 h-4 border border-white/30 border-t-white rounded-full animate-spin" />

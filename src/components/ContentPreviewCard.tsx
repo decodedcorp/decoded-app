@@ -5,6 +5,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@decoded/ui';
 import { GeneratedContent } from '@/store/contentUploadStore';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 import TiltedCard from './TiltedCard';
 
@@ -19,6 +20,7 @@ export default function ContentPreviewCard({
   onClose,
   className = '',
 }: ContentPreviewCardProps) {
+  const t = useCommonTranslation();
   const defaultImage = '/api/placeholder/400/300'; // 기본 이미지 URL
 
   return (
@@ -31,8 +33,8 @@ export default function ContentPreviewCard({
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-lg font-semibold text-white">생성된 콘텐츠</h3>
-          <p className="text-sm text-zinc-400">AI가 생성한 콘텐츠입니다</p>
+          <h3 className="text-lg font-semibold text-white">{t.create.generatedContent()}</h3>
+          <p className="text-sm text-zinc-400">{t.create.aiGeneratedContent()}</p>
         </div>
         {onClose && (
           <button
@@ -80,7 +82,7 @@ export default function ContentPreviewCard({
 
           {/* 메타 정보 */}
           <div className="flex items-center justify-between text-xs text-zinc-500">
-            <span>생성 시간: {new Date(content.created_at).toLocaleString('ko-KR')}</span>
+            <span>{t.create.generatedAt()}: {new Date(content.created_at).toLocaleString('ko-KR')}</span>
             <span>ID: {content.id}</span>
           </div>
         </div>
@@ -92,14 +94,14 @@ export default function ContentPreviewCard({
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            다시 생성
+            {t.create.regenerate()}
           </motion.button>
           <motion.button
             className="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            채널에 추가
+            {t.create.addToChannel()}
           </motion.button>
         </div>
       </div>

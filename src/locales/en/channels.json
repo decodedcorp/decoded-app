@@ -115,5 +115,10 @@
     "body": "Body",
     "auth": "Authentication",
     "authRequired": "Access token required"
+  },
+  "test": {
+    "modalTitle": "Channel Modal Test",
+    "openModal": "Open Modal",
+    "example": "Example: test-channel-1, demo-channel-2"
   }
 }

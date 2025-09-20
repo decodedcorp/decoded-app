@@ -85,7 +85,7 @@ export function ContentSidebar({ isOpen, content, onClose }: ContentSidebarProps
         }`}
         style={{
           top: '60px', // 헤더 높이만큼 아래로 이동
-          height: 'calc(100vh - 60px)', // 헤더 높이를 제외한 높이
+          height: 'calc(100dvh - 60px)', // 헤더 높이를 제외한 높이
         }}
       >
         {/* Header */}
@@ -119,7 +119,7 @@ function LoadingSidebar({ onClose }: { onClose: () => void }) {
         className="fixed right-0 top-0 h-full w-[500px] bg-zinc-900/95 border-l border-zinc-700/30 shadow-2xl backdrop-blur-md transform transition-transform duration-300 ease-out z-50 translate-x-0"
         style={{
           top: '60px',
-          height: 'calc(100vh - 60px)',
+          height: 'calc(100dvh - 60px)',
         }}
       >
         {/* Header */}
@@ -168,7 +168,7 @@ function ErrorSidebar({ error, onClose }: { error: Error; onClose: () => void })
         className="fixed right-0 top-0 h-full w-[500px] bg-zinc-900/95 border-l border-zinc-700/30 shadow-2xl backdrop-blur-md transform transition-transform duration-300 ease-out z-50 translate-x-0"
         style={{
           top: '60px',
-          height: 'calc(100vh - 60px)',
+          height: 'calc(100dvh - 60px)',
         }}
       >
         {/* Header */}

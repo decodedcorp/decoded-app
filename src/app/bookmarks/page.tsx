@@ -52,7 +52,7 @@ export default function BookmarksPage() {
           </p>
           <button
             onClick={() => router.push('/')}
-            className="px-6 py-3 bg-[#EAFD66] text-black rounded-lg font-medium hover:bg-[#d9ec55] transition-colors"
+            className="px-6 py-3 bg-primary text-primary-on rounded-lg font-medium hover:bg-primary-hover transition-colors"
           >
             {t.globalContentUpload.bookmarks.goToHome()}
           </button>
@@ -90,7 +90,7 @@ export default function BookmarksPage() {
   if (isLoading && offset === 0) {
     return (
       <div className="min-h-screen bg-black">
-        <div className="container mx-auto px-4 py-8">
+        <div className="w-full py-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">
               {t.globalContentUpload.bookmarks.title()}
@@ -129,7 +129,7 @@ export default function BookmarksPage() {
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-[#EAFD66] text-black rounded-lg font-medium hover:bg-[#d9ec55] transition-colors"
+            className="px-6 py-3 bg-primary text-primary-on rounded-lg font-medium hover:bg-primary-hover transition-colors"
           >
             {t.globalContentUpload.bookmarks.retry()}
           </button>
@@ -140,7 +140,7 @@ export default function BookmarksPage() {
 
   return (
     <div className="min-h-screen bg-black">
-      <div className="container mx-auto px-4 py-8">
+      <div className="w-full py-8">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">
@@ -166,7 +166,7 @@ export default function BookmarksPage() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center overflow-hidden">
+                    <div className="w-16 h-16 bg-gradient-to-br from-primary to-gray-600 rounded-lg flex items-center justify-center overflow-hidden">
                       {bookmark.content?.thumbnail_url || bookmark.content?.link_preview_img_url ? (
                         <img
                           src={
@@ -294,7 +294,7 @@ export default function BookmarksPage() {
             </p>
             <button
               onClick={() => router.push('/channels')}
-              className="px-6 py-3 bg-[#EAFD66] text-black rounded-lg font-medium hover:bg-[#d9ec55] transition-colors"
+              className="px-6 py-3 bg-primary text-primary-on rounded-lg font-medium hover:bg-primary-hover transition-colors"
             >
               {t.globalContentUpload.bookmarks.exploreChannels()}
             </button>

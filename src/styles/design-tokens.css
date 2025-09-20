@@ -1,0 +1,100 @@
+/**
+ * Decode Design System v3 - Core Tokens
+ * Dark-first design system with role-based tokens
+ */
+
+:root {
+  /* Brand Lime Scale (74° hue, 96% saturation) */
+  --brand-h: 74;
+  --brand-s: 96%;
+  --brand-l: 70%;
+
+  /* Brand Scale Values */
+  --brand-7: hsl(var(--brand-h) var(--brand-s) 62%); /* active state */
+  --brand-8: hsl(var(--brand-h) var(--brand-s) 67%); /* base- */
+  --brand-9: hsl(var(--brand-h) var(--brand-s) var(--brand-l)); /* base */
+  --brand-10: hsl(var(--brand-h) var(--brand-s) 75%); /* hover state */
+
+  /* Neutral Scale (charcoal 6-step) - Pure neutral tones */
+  --neutral-bg: #000000; /* page background - pure black to avoid OKLCH */
+  --neutral-s1: #121212; /* surface-1 - 완전 중성 */
+  --neutral-s2: #1a1a1a; /* surface-2 - 완전 중성 */
+  --neutral-bd: #2d2d2d; /* border - 완전 중성 */
+  --neutral-tx: #ffffff; /* text - pure white to avoid OKLCH */
+  --neutral-md: #a9a9a9; /* muted text - 완전 중성 */
+
+  /* Semantic State Colors */
+  --success-9: #16a34a;
+  --warning-9: #f59e0b;
+  --error-9: #ef4444;
+  --info-9: #3b82f6;
+}
+
+/* Dark Theme (default) */
+:root,
+[data-theme='dark'] {
+  /* Surface Colors */
+  --color-background: var(--neutral-bg);
+  --color-surface: var(--neutral-s1);
+  --color-surface-2: var(--neutral-s2);
+  --color-border: var(--neutral-bd);
+  --color-text: var(--neutral-tx);
+  --color-muted: var(--neutral-md);
+
+  /* Primary Brand Colors */
+  --color-primary: var(--brand-9); /* Main brand color (#EAFD66 equivalent) */
+  --color-primary-hover: var(--brand-10);
+  --color-primary-active: var(--brand-7);
+  --color-on-primary: #111111;
+
+  /* Primary Variations - simple hex values */
+  --color-primary-bg: rgba(234, 253, 102, 0.12); /* 12% opacity lime green */
+  --color-primary-bd: #3d4a1a; /* darker lime green for borders */
+
+  /* Focus & Interaction */
+  --color-focus: var(--brand-10);
+
+  /* Semantic Colors */
+  --color-success: var(--success-9);
+  --color-warning: var(--warning-9);
+  --color-error: var(--error-9);
+  --color-info: var(--info-9);
+
+  /* Badge Colors */
+  --color-badge-new: var(--success-9);
+  --color-badge-hot: #db2777;
+}
+
+/* Light Theme */
+[data-theme='light'] {
+  /* Surface Colors */
+  --color-background: #ffffff;
+  --color-surface: #f7f7f7;
+  --color-surface-2: #efefef;
+  --color-border: #d9d9d9;
+  --color-text: #0b0b0b;
+  --color-muted: #6f6f6f;
+
+  /* Primary Brand Colors */
+  --color-primary: var(--brand-9); /* Main brand color (#EAFD66 equivalent) */
+  --color-primary-hover: var(--brand-10);
+  --color-primary-active: var(--brand-7);
+  --color-on-primary: #0b0b0b;
+
+  /* Primary Variations - simple hex values */
+  --color-primary-bg: rgba(234, 253, 102, 0.12); /* 12% opacity lime green */
+  --color-primary-bd: #2a3315; /* darker lime green for borders (light theme) */
+
+  /* Focus & Interaction */
+  --color-focus: var(--brand-10);
+
+  /* Semantic Colors */
+  --color-success: var(--success-9);
+  --color-warning: var(--warning-9);
+  --color-error: var(--error-9);
+  --color-info: var(--info-9);
+
+  /* Badge Colors */
+  --color-badge-new: var(--success-9);
+  --color-badge-hot: #db2777;
+}

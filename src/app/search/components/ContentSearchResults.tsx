@@ -79,15 +79,19 @@ export function ContentSearchResults({ query }: ContentSearchResultsProps) {
   }, [contents, searchData]);
 
   const handleContentClick = (contentId: string, channelId: string) => {
-    // 콘텐츠 클릭 시 해당 채널 페이지로 이동하면서 콘텐츠 모달 열기
-    router.push(`/channels/${channelId}?content=${contentId}`);
+    // TODO: 콘텐츠 모달 라우팅을 나중에 다시 활성화할 예정
+    // 콘텐츠 클릭 시 콘텐츠 상세 페이지로 이동 (모달 라우팅) - 일시적으로 비활성화
+    // router.push(`/channels/${channelId}/contents/${contentId}`);
+
+    // 임시로 콘텐츠를 직접 열기 (URL 변경 없이)
+    console.log('Content clicked:', { contentId, channelId });
   };
 
   if (isLoading && !contents.length) {
     return (
       <div className="text-center py-16">
         <div className="text-zinc-400">
-          <div className="animate-spin w-16 h-16 border-4 border-zinc-600 border-t-blue-500 rounded-full mx-auto mb-6" />
+          <div className="animate-spin w-16 h-16 border-4 border-zinc-600 border-t-primary rounded-full mx-auto mb-6" />
           <h3 className="text-xl font-semibold text-white mb-3">{t.search.searching()}</h3>
           <p className="text-zinc-500 text-lg">{t.search.lookingForChannels(query)}</p>
         </div>

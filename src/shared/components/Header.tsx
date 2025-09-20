@@ -40,9 +40,9 @@ export const Header = memo(function Header() {
     [pathname],
   );
 
-  // 채널 ID 추출 - useMemo로 최적화
+  // 채널 ID 추출 - useMemo로 최적화 (contents 부분 제외)
   const channelId = useMemo(
-    () => (isChannelPage ? pathname?.split('/channels/')[1] : null),
+    () => (isChannelPage ? pathname?.split('/channels/')[1]?.split('/')[0] : null),
     [isChannelPage, pathname],
   );
 
@@ -95,13 +95,8 @@ export const Header = memo(function Header() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isChannelPage]);
 
-  // 헤더 표시 여부 결정
-  const shouldShowHeader =
-    isAtTop || // 페이지 상단에 있을 때
-    scrollDirection === 'up' || // 위로 스크롤할 때
-    isHovered || // 마우스 호버 시
-    isFocused || // 키보드 포커스 시
-    !isChannelPage; // 채널 페이지가 아닐 때
+  // 헤더 항상 표시 - 고정 헤더
+  const shouldShowHeader = true;
 
   return (
     <header
@@ -110,10 +105,17 @@ export const Header = memo(function Header() {
         backdrop-blur bg-black/80 border-b border-zinc-700/50 shadow-xl
         ${shouldShowHeader ? 'translate-y-0' : '-translate-y-full'}
       `}
-      style={{
-        WebkitBackdropFilter: 'blur(12px)',
-        backdropFilter: 'blur(12px)',
-      }}
+      style={
+        {
+          WebkitBackdropFilter: 'blur(12px)',
+          backdropFilter: 'blur(12px)',
+          '--header-h': '60px',
+          '--header-h-md': '72px',
+          height: 'var(--header-height, 64px)', // Use new layout variable
+        } as React.CSSProperties & { '--header-h': string; '--header-h-md': string }
+      }
+      data-header-height="60"
+      data-header-height-md="72"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -121,9 +123,9 @@ export const Header = memo(function Header() {
         className="
           flex items-center justify-between
           w-full
-          px-4 md:px-8
           h-[60px] md:h-[72px]
         "
+        style={{ paddingInline: 'var(--edge-x)' }}
       >
         {/* Mobile Menu Button */}
         <button
@@ -153,13 +155,14 @@ export const Header = memo(function Header() {
         {/* Logo */}
         <Link
           href="/"
-          className="text-2xl font-bold text-[#EAFD66] tracking-tight drop-shadow ml-2 lg:ml-0"
+          className="text-2xl font-bold tracking-tight drop-shadow ml-2 lg:ml-0"
+          style={{ color: 'var(--color-primary)' }}
         >
           decoded
         </Link>
 
         {/* Search Bar */}
-        <div className="hidden md:flex flex-1 mx-8 justify-center">
+        <div className="hidden md:flex flex-1 justify-center">
           {isChannelPage && channelName ? (
             <ChannelSearchBar
               channelId={channelId || ''}
@@ -177,7 +180,7 @@ export const Header = memo(function Header() {
           {/* Mobile Search Button */}
           <button
             onClick={() => setIsMobileSearchOpen(true)}
-            className="md:hidden p-2 text-white hover:text-[#eafd66] transition-colors"
+            className="md:hidden p-2 text-white hover:text-primary transition-colors"
             aria-label={t.header.openSearch()}
           >
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
@@ -207,7 +210,10 @@ export const Header = memo(function Header() {
 
       {/* Mobile Search Overlay */}
       {isMobileSearchOpen && (
-        <div className="fixed top-[60px] md:top-[72px] left-0 right-0 bg-black border-b border-zinc-700 p-4 z-[10000] md:hidden">
+        <div
+          className="fixed top-[60px] md:top-[72px] left-0 right-0 bg-black border-b border-zinc-700 py-4 z-[10000] md:hidden"
+          style={{ paddingInline: 'var(--space-page-x)' }}
+        >
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsMobileSearchOpen(false)}

@@ -5,7 +5,9 @@
     "noContent": "콘텐츠가 없어요",
     "noPreview": "미리보기가 없어요",
     "linkNoTitle": "링크 제목 없음",
-    "linkNoDescription": "설명이 없어요"
+    "linkNoDescription": "설명이 없어요",
+    "imageUrl": "이미지 URL",
+    "linkUrl": "링크 URL"
   },
   "states": {
     "loading": "콘텐츠를 불러오는 중...",
@@ -16,7 +18,7 @@
     "error": "콘텐츠를 불러올 수 없어요",
     "errorSubtitle": "잠시 후 다시 시도해주세요",
     "notFound": "콘텐츠를 찾을 수 없어요",
-    "processing": "콘텐츠를 처리하고 있어요..."
+    "processing": "콘텐츠 처리 중..."
   },
   "actions": {
     "view": "콘텐츠 보기",
@@ -27,7 +29,9 @@
     "edit": "편집하기",
     "delete": "삭제하기",
     "download": "다운로드",
-    "copy": "링크 복사"
+    "copy": "링크 복사",
+    "save": "저장",
+    "saved": "저장됨"
   },
   "categories": {
     "all": "전체",
@@ -53,10 +57,72 @@
   "upload": {
     "title": "콘텐츠 업로드",
     "dragDrop": "파일을 드래그하거나 클릭하여 업로드하세요",
-    "processing": "파일을 처리하고 있어요...",
+    "processing": "파일 처리 중...",
     "success": "업로드가 완료되었어요!",
     "error": "업로드 중 오류가 발생했어요",
     "sizeLimit": "파일 크기가 너무 커요 (최대 {{max}}MB)",
     "typeNotSupported": "지원하지 않는 파일 형식이에요"
+  },
+  "sidebar": {
+    "aiOverview": "AI 개요",
+    "aiAnalyzing": "AI 분석 중...",
+    "summary": "요약",
+    "qa": "Q&A",
+    "showLess": "간단히 보기",
+    "moreQuestions": "+{{count}}개 더 보기",
+    "description": "설명",
+    "closeModal": "모달 닫기"
+  },
+  "comments": {
+    "title": "댓글",
+    "close": "댓글 창 닫기",
+    "count": "{{count}}개 댓글",
+    "recent": "{{count}}개 최근",
+    "replies": "{{count}}개 답글",
+    "sort": {
+      "newest": "최신",
+      "oldest": "오래된 순",
+      "mostLiked": "인기순"
+    },
+    "empty": {
+      "title": "아직 댓글이 없어요",
+      "subtitle": "첫 번째 댓글을 남겨보세요!",
+      "description": "첫 번째 댓글을 남겨보세요!"
+    },
+    "error": {
+      "loadFailed": "댓글을 불러올 수 없어요",
+      "tryAgain": "다시 시도"
+    },
+    "input": {
+      "placeholder": "댓글을 입력하세요...",
+      "signInPrompt": "로그인해서 대화에 참여하세요",
+      "signIn": "로그인",
+      "posting": "게시 중...",
+      "reply": "답글",
+      "comment": "댓글",
+      "save": "저장",
+      "cancel": "취소",
+      "charCount": "{{count}}/1000",
+      "shortcut": "Enter로 게시, Shift+Enter로 줄바꿈",
+      "replyPlaceholder": "답글을 입력하세요..."
+    },
+    "item": {
+      "edit": "편집",
+      "delete": "삭제",
+      "edited": "(수정됨)",
+      "reply": "답글",
+      "replies": "{{count}}개 답글",
+      "deleteConfirm": "이 댓글을 삭제하시겠어요?",
+      "loginToInteract": "로그인하여 상호작용"
+    },
+    "time": {
+      "now": "방금 전",
+      "minutesAgo": "{{minutes}}분 전",
+      "hoursAgo": "{{hours}}시간 전",
+      "daysAgo": "{{days}}일 전"
+    },
+    "loadingMore": "댓글을 더 불러오는 중...",
+    "loadMore": "더 보기",
+    "noMore": "더 이상 댓글이 없어요"
   }
 }

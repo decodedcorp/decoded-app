@@ -375,15 +375,11 @@ export function Step2MediaUpload({
                     }}
                   />
                 ) : (
-                  <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-lg">r/</span>
-                  </div>
+                  <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center"></div>
                 )}
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white">
-                  r/{step1Data.name || 'adfadadfadfd'}
-                </h3>
+                <h3 className="text-xl font-bold text-white">{step1Data.name || 'adfadadfadfd'}</h3>
                 <div className="flex items-center space-x-2 text-sm text-zinc-400">
                   <span>1 {t.globalContentUpload.addChannel.step2.preview.member()}</span>
                   <span>•</span>

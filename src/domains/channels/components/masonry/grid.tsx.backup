@@ -612,7 +612,7 @@ const Masonry: React.FC<MasonryProps> = ({
           data-key={item.id}
           role="link"
           tabIndex={0}
-          className="absolute box-content cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="absolute box-content cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
           style={{
             willChange: 'transform, width, height, opacity',
             transform: 'translate3d(0, 0, 0)', // GPU 가속 힌트

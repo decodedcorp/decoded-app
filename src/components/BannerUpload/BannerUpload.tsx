@@ -2,13 +2,13 @@
 
 import React, { useState, useRef, useCallback } from 'react';
 
-import { 
-  processBannerImage, 
-  validateBannerFile, 
+import {
+  processBannerImage,
+  validateBannerFile,
   validateBannerDimensions,
   getBannerPreviewUrl,
   formatFileSize,
-  BANNER_CONSTRAINTS 
+  BANNER_CONSTRAINTS,
 } from '@/lib/utils/bannerUtils';
 
 export interface BannerUploadProps {
@@ -44,69 +44,74 @@ export const BannerUpload: React.FC<BannerUploadProps> = ({
   });
 
   // Handle file selection
-  const handleFileSelect = useCallback(async (file: File) => {
-    setBannerState(prev => ({
-      ...prev,
-      isUploading: true,
-      error: null,
-      uploadProgress: 0,
-    }));
-
-    try {
-      // Validate file
-      const fileValidation = validateBannerFile(file);
-      if (!fileValidation.isValid) {
-        throw new Error(fileValidation.error);
-      }
-
-      // Validate dimensions
-      setBannerState(prev => ({ ...prev, uploadProgress: 20 }));
-      const dimensionValidation = await validateBannerDimensions(file);
-      if (!dimensionValidation.isValid) {
-        throw new Error(dimensionValidation.error);
-      }
-
-      // Create preview
-      setBannerState(prev => ({ ...prev, uploadProgress: 40 }));
-      const previewUrl = await getBannerPreviewUrl(file);
-
-      // Process image
-      setBannerState(prev => ({ ...prev, uploadProgress: 60 }));
-      const base64 = await processBannerImage(file);
-
-      setBannerState(prev => ({ 
-        ...prev, 
-        uploadProgress: 100,
-        previewUrl,
-        file,
-        isUploading: false,
-      }));
-
-      // Call the callback with the processed image
-      onBannerChange(base64);
-
-    } catch (error) {
-      setBannerState(prev => ({
+  const handleFileSelect = useCallback(
+    async (file: File) => {
+      setBannerState((prev) => ({
         ...prev,
-        isUploading: false,
-        error: error instanceof Error ? error.message : 'Failed to upload banner',
+        isUploading: true,
+        error: null,
         uploadProgress: 0,
       }));
-    }
-  }, [onBannerChange]);
+
+      try {
+        // Validate file
+        const fileValidation = validateBannerFile(file);
+        if (!fileValidation.isValid) {
+          throw new Error(fileValidation.error);
+        }
+
+        // Validate dimensions
+        setBannerState((prev) => ({ ...prev, uploadProgress: 20 }));
+        const dimensionValidation = await validateBannerDimensions(file);
+        if (!dimensionValidation.isValid) {
+          throw new Error(dimensionValidation.error);
+        }
+
+        // Create preview
+        setBannerState((prev) => ({ ...prev, uploadProgress: 40 }));
+        const previewUrl = await getBannerPreviewUrl(file);
+
+        // Process image
+        setBannerState((prev) => ({ ...prev, uploadProgress: 60 }));
+        const base64 = await processBannerImage(file);
+
+        setBannerState((prev) => ({
+          ...prev,
+          uploadProgress: 100,
+          previewUrl,
+          file,
+          isUploading: false,
+        }));
+
+        // Call the callback with the processed image
+        onBannerChange(base64);
+      } catch (error) {
+        setBannerState((prev) => ({
+          ...prev,
+          isUploading: false,
+          error: error instanceof Error ? error.message : 'Failed to upload banner',
+          uploadProgress: 0,
+        }));
+      }
+    },
+    [onBannerChange],
+  );
 
   // Handle drag and drop
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-    const files = Array.from(e.dataTransfer.files);
-    const imageFile = files.find(file => file.type.startsWith('image/'));
-    
-    if (imageFile) {
-      handleFileSelect(imageFile);
-    }
-  }, [handleFileSelect]);
+      const files = Array.from(e.dataTransfer.files);
+      const imageFile = files.find((file) => file.type.startsWith('image/'));
+
+      if (imageFile) {
+        handleFileSelect(imageFile);
+      }
+    },
+    [handleFileSelect],
+  );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -114,12 +119,15 @@ export const BannerUpload: React.FC<BannerUploadProps> = ({
   }, []);
 
   // Handle file input change
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      handleFileSelect(file);
-    }
-  }, [handleFileSelect]);
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        handleFileSelect(file);
+      }
+    },
+    [handleFileSelect],
+  );
 
   // Handle remove banner
   const handleRemoveBanner = useCallback(() => {
@@ -155,7 +163,7 @@ export const BannerUpload: React.FC<BannerUploadProps> = ({
         {/* Banner Preview Area */}
         <div
           className={`relative w-full h-64 md:h-80 border-2 border-dashed border-gray-600 rounded-xl overflow-hidden transition-all duration-300 ${
-            bannerState.isUploading ? 'border-blue-500 bg-blue-50/10' : 'hover:border-gray-500'
+            bannerState.isUploading ? 'border-primary bg-primary/10' : 'hover:border-gray-500'
           }`}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
@@ -168,7 +176,7 @@ export const BannerUpload: React.FC<BannerUploadProps> = ({
                 alt="Banner preview"
                 className="w-full h-full object-cover"
               />
-              
+
               {/* Overlay with controls */}
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
                 <div className="flex gap-3">
@@ -201,7 +209,7 @@ export const BannerUpload: React.FC<BannerUploadProps> = ({
                     <p className="text-sm">Processing banner...</p>
                     <div className="w-48 bg-gray-700 rounded-full h-2 mt-2">
                       <div
-                        className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                        className="bg-primary h-2 rounded-full transition-all duration-300"
                         style={{ width: `${bannerState.uploadProgress}%` }}
                       />
                     </div>

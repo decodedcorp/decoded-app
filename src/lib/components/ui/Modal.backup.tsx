@@ -99,7 +99,8 @@ export function Modal({
         className="fixed inset-0 z-[1010] flex items-center justify-center p-2 sm:p-4"
       >
         <div
-          className={`w-full ${sizeClasses[size]} max-h-[90vh] sm:max-h-[85vh] rounded-2xl bg-white shadow-xl outline-none overflow-y-auto ${className}`}
+          className={`w-full ${sizeClasses[size]} max-h-[90vh] sm:max-h-[85vh] rounded-2xl bg-white shadow-xl outline-none overflow-auto ${className}`}
+          style={{ WebkitOverflowScrolling: 'touch' }}
           // 모달 내부 클릭은 버블링 중단(바깥 클릭 닫기와 충돌 방지)
           onMouseDown={(e) => e.stopPropagation()}
         >

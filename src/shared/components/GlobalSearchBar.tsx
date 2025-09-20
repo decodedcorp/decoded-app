@@ -73,8 +73,12 @@ export function GlobalSearchBar({
         // 채널인 경우: 채널 페이지로 이동
         router.push(`/channels/${item.channelId}`);
       } else {
-        // 콘텐츠인 경우: 해당 채널 페이지로 이동 + 콘텐츠 모달 열기
-        router.push(`/channels/${item.channelId}?content=${item.id}`);
+        // TODO: 콘텐츠 모달 라우팅을 나중에 다시 활성화할 예정
+        // 콘텐츠인 경우: 콘텐츠 상세 페이지로 이동 (모달 라우팅) - 일시적으로 비활성화
+        // router.push(`/channels/${item.channelId}/contents/${item.id}`);
+
+        // 임시로 콘텐츠를 직접 열기 (URL 변경 없이)
+        console.log('Content selected:', item);
       }
       setQuery('');
       setIsAutocompleteOpen(false);
@@ -146,7 +150,7 @@ export function GlobalSearchBar({
   }, []);
 
   return (
-    <div className={`w-full max-w-2xl mx-auto ${className}`}>
+    <div className={`w-full max-w-2xl ${className}`}>
       <form onSubmit={handleSubmit} className="relative">
         <div className="relative flex items-center bg-zinc-800/70 hover:bg-zinc-800/90 rounded-full border border-zinc-600/50 hover:border-zinc-500/50 focus-within:border-[#eafd66]/50 transition-all duration-200">
           {/* 큰 검색 아이콘 - Reddit 스타일 */}

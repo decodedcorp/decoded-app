@@ -40,7 +40,7 @@ export function ChannelModalSidebar({
   const selectedChannelId = useChannelModalStore((state) => state.selectedChannelId);
   const selectedChannel = useChannelModalStore((state) => state.selectedChannel);
   const channelId = propChannelId || selectedChannelId || selectedChannel?.id || '';
-  
+
   // 실제 채널 데이터 사용 (API 데이터 우선)
   const displayChannel = channel || selectedChannel;
 
@@ -67,7 +67,6 @@ export function ChannelModalSidebar({
   const handleRemoveTag = (tag: string) => {
     onFilterChange({ ...currentFilters, tags: currentFilters.tags.filter((t) => t !== tag) });
   };
-
 
   // 접힌 상태일 때 간단한 필터 버튼들
   if (isCollapsed) {
@@ -102,11 +101,14 @@ export function ChannelModalSidebar({
           <div className="space-y-2">
             <div className="text-xs text-gray-400 text-center font-medium">DT</div>
             <div className="space-y-2">
-              {(dataTypes.length > 0 ? dataTypes.slice(0, 3) : [
-                { id: 'link', icon: '🔗', label: 'Link', count: 0 },
-                { id: 'image', icon: '🖼️', label: 'Image', count: 0 },
-                { id: 'pdf', icon: '📄', label: 'PDF', count: 0 },
-              ]).map((type) => (
+              {(dataTypes.length > 0
+                ? dataTypes.slice(0, 3)
+                : [
+                    { id: 'link', icon: '🔗', label: 'Link', count: 0 },
+                    { id: 'image', icon: '🖼️', label: 'Image', count: 0 },
+                    { id: 'pdf', icon: '📄', label: 'PDF', count: 0 },
+                  ]
+              ).map((type) => (
                 <button
                   key={type.id}
                   onClick={() => {
@@ -117,7 +119,7 @@ export function ChannelModalSidebar({
                   }}
                   className={`w-10 h-10 rounded-lg transition-all duration-200 flex items-center justify-center text-sm ${
                     currentFilters.dataTypes.includes(type.id)
-                      ? 'bg-blue-600/20 text-blue-300 border border-blue-500/30'
+                      ? 'bg-primary/20 text-primary border border-primary/30'
                       : 'bg-zinc-800 hover:bg-zinc-700 text-gray-300'
                   }`}
                   title={`${type.label} content`}
@@ -133,36 +135,33 @@ export function ChannelModalSidebar({
             <div className="space-y-2">
               <div className="text-xs text-gray-400 text-center font-medium">CAT</div>
               <div className="space-y-2">
-                {isFiltersLoading ? (
-                  // 로딩 상태
-                  Array.from({ length: 4 }).map((_, index) => (
-                    <div key={index} className="w-10 h-10 bg-zinc-800 rounded-lg animate-pulse" />
-                  ))
-                ) : (
-                  categories.slice(0, 4).map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => {
-                    const newSelected = currentFilters.categories.includes(category.id)
-                      ? currentFilters.categories.filter((id) => id !== category.id)
-                      : [...currentFilters.categories, category.id];
-                    handleCategoriesChange(newSelected);
-                  }}
-                  className={`w-10 h-10 rounded-lg transition-all duration-200 flex items-center justify-center text-sm ${
-                    currentFilters.categories.includes(category.id)
-                      ? 'bg-emerald-600/20 text-emerald-300 border border-emerald-500/30'
-                      : 'bg-zinc-800 hover:bg-zinc-700 text-gray-300'
-                  }`}
-                  title={category.label}
-                >
-                    {category.label.charAt(0)}
-                  </button>
-                  ))
-                )}
+                {isFiltersLoading
+                  ? // 로딩 상태
+                    Array.from({ length: 4 }).map((_, index) => (
+                      <div key={index} className="w-10 h-10 bg-zinc-800 rounded-lg animate-pulse" />
+                    ))
+                  : categories.slice(0, 4).map((category) => (
+                      <button
+                        key={category.id}
+                        onClick={() => {
+                          const newSelected = currentFilters.categories.includes(category.id)
+                            ? currentFilters.categories.filter((id) => id !== category.id)
+                            : [...currentFilters.categories, category.id];
+                          handleCategoriesChange(newSelected);
+                        }}
+                        className={`w-10 h-10 rounded-lg transition-all duration-200 flex items-center justify-center text-sm ${
+                          currentFilters.categories.includes(category.id)
+                            ? 'bg-emerald-600/20 text-emerald-300 border border-emerald-500/30'
+                            : 'bg-zinc-800 hover:bg-zinc-700 text-gray-300'
+                        }`}
+                        title={category.label}
+                      >
+                        {category.label.charAt(0)}
+                      </button>
+                    ))}
               </div>
             </div>
           )}
-
 
           {/* Active Filters Count */}
           {(currentFilters.dataTypes.length > 0 ||
@@ -206,7 +205,6 @@ export function ChannelModalSidebar({
           </svg>
         </button>
       </div>
-
 
       {/* 필터 컨텐츠 */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 min-h-0">

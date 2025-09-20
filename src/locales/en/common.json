@@ -135,7 +135,12 @@
   },
   "create": {
     "create": "Create",
-    "createNewContent": "Create new content"
+    "createNewContent": "Create new content",
+    "generatedContent": "Generated Content",
+    "aiGeneratedContent": "AI-generated content",
+    "generatedAt": "Generated at",
+    "regenerate": "Regenerate",
+    "addToChannel": "Add to Channel"
   },
   "notifications": {
     "notifications": "Notifications",
@@ -245,6 +250,11 @@
       "optional": "(Optional)",
       "addDescription": "Add a description for your content...",
       "fileFormats": "JPG, PNG, WebP, GIF up to 10MB",
+      "footer": {
+        "cancel": "Cancel",
+        "addLink": "Add Link",
+        "adding": "Adding..."
+      },
       "validation": {
         "descriptionTooLong": "Description must be 500 characters or less.",
         "imageRequired": "Please select an image.",
@@ -422,7 +432,81 @@
       "help": "Help",
       "privacyPolicy": "Privacy Policy",
       "termsOfService": "Terms of Service",
-      "copyright": "© 2024 Decoded"
+      "copyright": "© 2025 Decoded",
+      "careers": "Careers",
+      "press": "Press"
+    }
+  },
+  "invitations": {
+    "inviteManager": "Invite Manager",
+    "searchUser": "Search User",
+    "personalMessage": "Personal Message (Optional)",
+    "expiresIn": "Expires In",
+    "sending": "Sending...",
+    "sendInvitation": "Send Invitation"
+  },
+  "postCard": {
+    "actions": {
+      "pin": "Pin",
+      "comment": "Comment",
+      "share": "Share",
+      "save": "Save"
+    },
+    "contentType": {
+      "image": "Image",
+      "video": "Video",
+      "link": "Link",
+      "text": "Text"
+    },
+    "accessibility": {
+      "goToChannel": "Go to {{channelName}} channel",
+      "goToAuthor": "Go to {{authorName}} author page",
+      "openPost": "Open post",
+      "pinPost": "Pin post",
+      "commentOnPost": "Comment on post",
+      "sharePost": "Share post",
+      "savePost": "Save post"
+    }
+  },
+  "accessibility": {
+    "closeModal": "Close modal",
+    "expandSidebar": "Expand sidebar",
+    "collapseSidebar": "Collapse sidebar",
+    "searchResults": "Search results",
+    "goBack": "Go back",
+    "closeSidebar": "Close sidebar",
+    "trendingTopics": "Trending topics and interests to explore",
+    "toggleDesignMode": "Toggle design mode",
+    "removeManager": "Remove manager",
+    "libraryNavigation": "Library - Channel and content management",
+    "filtersNavigation": "Filters - Data type, category, and tag filtering",
+    "keyboardNavigation": "Keyboard navigation available",
+    "screenReaderInstructions": "Additional information for screen reader users",
+    "liveRegion": {
+      "contentLoaded": "Content has been loaded",
+      "pageChanged": "Page has changed",
+      "searchCompleted": "Search completed. Found {{count}} results",
+      "modalOpened": "Modal has opened",
+      "modalClosed": "Modal has closed",
+      "formSubmitted": "Form has been submitted",
+      "errorOccurred": "An error occurred: {{message}}",
+      "successMessage": "Operation completed successfully",
+      "dataUpdated": "Data has been updated",
+      "navigationChanged": "Navigation location has changed"
+    },
+    "keyboard": {
+      "shortcuts": "Keyboard shortcuts",
+      "enterToActivate": "Press Enter to activate",
+      "spaceToToggle": "Press Space to toggle",
+      "escapeToClose": "Press Escape to close",
+      "arrowKeysToNavigate": "Use arrow keys to navigate",
+      "tabToNavigate": "Press Tab to move to next element",
+      "shiftTabToPrevious": "Press Shift+Tab to move to previous element",
+      "homeToFirst": "Press Home to go to first element",
+      "endToLast": "Press End to go to last element",
+      "pageUpDown": "Use Page Up/Down to scroll",
+      "ctrlEnterToSubmit": "Press Ctrl+Enter to submit",
+      "altText": "Alt+{{key}} shortcut"
     }
   }
 }

@@ -23,6 +23,20 @@ export interface BackendLoginResponse {
   access_token: string;
   has_sui_address: boolean;
   aka?: string | null; // ✨ 백엔드에서 추가된 nickname 필드
+  token_type?: string;
+  refresh_token?: string;
+  user?: {
+    doc_id?: string;
+    id?: string; // doc_id 대신 id를 사용할 수도 있음
+    user_id?: string; // doc_id 대신 user_id를 사용할 수도 있음
+    _id?: string; // doc_id 대신 _id를 사용할 수도 있음
+    email?: string;
+    nickname?: string;
+    name?: string; // nickname 대신 name을 사용할 수도 있음
+    username?: string; // nickname 대신 username을 사용할 수도 있음
+    role?: string;
+    status?: string;
+  };
 }
 
 export interface RefreshTokenResponse {

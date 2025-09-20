@@ -31,6 +31,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.ts
 var src_exports = {};
 __export(src_exports, {
+  Avatar: () => Avatar,
   Button: () => Button,
   Dialog: () => Dialog,
   DialogClose: () => DialogClose,
@@ -165,10 +166,66 @@ var VisuallyHidden = (0, import_react2.forwardRef)(
 );
 VisuallyHidden.displayName = "VisuallyHidden";
 
+// src/components/Avatar.tsx
+var import_jsx_runtime3 = require("react/jsx-runtime");
+var sizeClasses = {
+  sm: "w-6 h-6 text-xs",
+  md: "w-8 h-8 text-sm",
+  lg: "w-12 h-12 text-base"
+};
+var Avatar = ({
+  userId,
+  src,
+  size = "md",
+  className,
+  alt
+}) => {
+  const fallbackText = userId.charAt(0).toUpperCase();
+  const sizeClass = sizeClasses[size];
+  return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+    "div",
+    {
+      className: cn(
+        "relative flex items-center justify-center flex-shrink-0 rounded-full overflow-hidden",
+        "bg-zinc-800 border border-zinc-700",
+        "transition-colors duration-200",
+        sizeClass,
+        className
+      ),
+      children: [
+        src ? /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+          "img",
+          {
+            src,
+            alt: alt || `Profile of ${userId}`,
+            className: "w-full h-full object-cover",
+            onError: (e) => {
+              e.currentTarget.style.display = "none";
+              const fallback = e.currentTarget.nextElementSibling;
+              if (fallback) fallback.style.display = "flex";
+            }
+          }
+        ) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+          "span",
+          {
+            className: cn(
+              "text-zinc-300 font-medium select-none",
+              src ? "hidden" : "flex"
+            ),
+            style: { display: src ? "none" : "flex" },
+            children: fallbackText
+          }
+        )
+      ]
+    }
+  );
+};
+
 // src/components/Button/Button.tsx
 var import_react3 = require("react");
 var import_class_variance_authority = require("class-variance-authority");
-var import_jsx_runtime3 = require("react/jsx-runtime");
+var import_jsx_runtime4 = require("react/jsx-runtime");
 var buttonVariants = (0, import_class_variance_authority.cva)(
   // 기본 스타일 (프로젝트 테마 컬러 적용)
   "inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed",
@@ -176,16 +233,18 @@ var buttonVariants = (0, import_class_variance_authority.cva)(
     variants: {
       variant: {
         // 프로젝트 테마 컬러 적용 - primary는 테마 컬러 사용
-        primary: "bg-gray-900 text-[#EAFD66] hover:bg-[#EAFD66] hover:text-black shadow-sm hover:shadow-md",
+        primary: "bg-surface text-primary hover:bg-primary hover:text-primary-on shadow-sm hover:shadow-md",
         secondary: "bg-gray-200 text-gray-900 hover:bg-gray-300 shadow-sm hover:shadow-md",
         outline: "border border-gray-300 bg-transparent text-gray-900 hover:bg-gray-100 hover:border-gray-400",
         ghost: "bg-transparent text-gray-900 hover:bg-gray-100",
         destructive: "bg-red-600 text-white hover:bg-red-700 shadow-sm hover:shadow-md",
         // 테마 컬러를 사용한 새로운 variant들
-        accent: "bg-[#EAFD66] text-black hover:bg-[#EAFD66]/90 shadow-sm hover:shadow-md",
-        "accent-outline": "border border-[#EAFD66] bg-transparent text-[#EAFD66] hover:bg-[#EAFD66] hover:text-black",
-        // 로그인 버튼 전용 variant - 더 명확한 테마 컬러 적용
-        login: "bg-gray-900 text-[#EAFD66] hover:bg-[#EAFD66] hover:text-black border border-[#EAFD66]/20 hover:border-[#EAFD66]/40 shadow-sm hover:shadow-md"
+        accent: "bg-primary text-primary-on hover:bg-primary-hover shadow-sm hover:shadow-md",
+        "accent-outline": "border border-primary-bd bg-transparent text-primary hover:bg-primary hover:text-primary-on",
+        // 로그인 버튼 전용 variant - MainFeed 필터 버튼 스타일 + 메인 컬러
+        login: "text-[#EAFD66] hover:text-black hover:bg-[#EAFD66] border border-zinc-700 transition-colors cursor-pointer",
+        // 댓글 버튼 전용 variant - 테두리와 배경이 있는 floating 버튼
+        "comments-floating": "bg-black/80 text-white border border-primary/30 hover:bg-black/90 hover:border-primary/50 shadow-2xl hover:shadow-[0_8px_32px_rgba(234,253,102,0.15)] backdrop-blur-md hover:backdrop-blur-lg transition-all duration-300"
       },
       size: {
         sm: "h-8 px-3 text-sm",
@@ -213,7 +272,7 @@ var Button = (0, import_react3.forwardRef)(
     ...props
   }, ref) => {
     const isDisabled = disabled || loading;
-    return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+    return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
       "button",
       {
         className: cn(buttonVariants({ variant, size, className })),
@@ -222,10 +281,10 @@ var Button = (0, import_react3.forwardRef)(
         ref,
         ...props,
         children: [
-          loading && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Icon, { name: "loader-2", className: "h-4 w-4 animate-spin", "aria-hidden": "true" }),
-          !loading && icon && iconPosition === "left" && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Icon, { name: icon, className: "h-4 w-4", "aria-hidden": "true" }),
+          loading && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Icon, { name: "loader-2", className: "h-4 w-4 animate-spin", "aria-hidden": "true" }),
+          !loading && icon && iconPosition === "left" && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Icon, { name: icon, className: "h-4 w-4", "aria-hidden": "true" }),
           children,
-          !loading && icon && iconPosition === "right" && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Icon, { name: icon, className: "h-4 w-4", "aria-hidden": "true" })
+          !loading && icon && iconPosition === "right" && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Icon, { name: icon, className: "h-4 w-4", "aria-hidden": "true" })
         ]
       }
     );
@@ -237,7 +296,7 @@ Button.displayName = "Button";
 var import_react4 = require("react");
 var DialogPrimitive = __toESM(require("@radix-ui/react-dialog"));
 var import_class_variance_authority2 = require("class-variance-authority");
-var import_jsx_runtime4 = require("react/jsx-runtime");
+var import_jsx_runtime5 = require("react/jsx-runtime");
 var dialogContentVariants = (0, import_class_variance_authority2.cva)(
   "fixed left-[50%] top-[50%] z-modal w-full max-w-sm sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl translate-x-[-50%] translate-y-[-50%] gap-4 border border-white/10 bg-white p-4 sm:p-6 shadow-xl transition-all duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
   {
@@ -254,11 +313,11 @@ var dialogContentVariants = (0, import_class_variance_authority2.cva)(
 );
 var DialogPortal = DialogPrimitive.Portal;
 var DialogClose = DialogPrimitive.Close;
-var Dialog = ({ children, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(DialogPrimitive.Root, { ...props, children });
+var Dialog = ({ children, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(DialogPrimitive.Root, { ...props, children });
 var DialogTrigger = DialogPrimitive.Trigger;
-var DialogContent = (0, import_react4.forwardRef)(({ className, variant, hideCloseButton = false, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(DialogPortal, { children: [
-  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(DialogPrimitive.Overlay, { className: "fixed inset-0 z-overlay bg-black/50 backdrop-blur-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" }),
-  /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
+var DialogContent = (0, import_react4.forwardRef)(({ className, variant, hideCloseButton = false, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(DialogPortal, { children: [
+  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(DialogPrimitive.Overlay, { className: "fixed inset-0 z-overlay bg-black/50 backdrop-blur-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" }),
+  /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
     DialogPrimitive.Content,
     {
       ref,
@@ -266,12 +325,12 @@ var DialogContent = (0, import_react4.forwardRef)(({ className, variant, hideClo
       ...props,
       children: [
         children,
-        !hideCloseButton && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+        !hideCloseButton && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
           DialogPrimitive.Close,
           {
             className: "absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:pointer-events-none",
             "aria-label": "Close dialog",
-            children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Icon, { name: "x", className: "h-4 w-4" })
+            children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Icon, { name: "x", className: "h-4 w-4" })
           }
         )
       ]
@@ -279,8 +338,8 @@ var DialogContent = (0, import_react4.forwardRef)(({ className, variant, hideClo
   )
 ] }));
 DialogContent.displayName = "DialogContent";
-var DialogHeader = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: cn("flex flex-col space-y-1.5 text-center sm:text-left", className), ...props });
-var DialogTitle = (0, import_react4.forwardRef)(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+var DialogHeader = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: cn("flex flex-col space-y-1.5 text-center sm:text-left", className), ...props });
+var DialogTitle = (0, import_react4.forwardRef)(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
   DialogPrimitive.Title,
   {
     ref,
@@ -289,7 +348,7 @@ var DialogTitle = (0, import_react4.forwardRef)(({ className, ...props }, ref) =
   }
 ));
 DialogTitle.displayName = "DialogTitle";
-var DialogDescription = (0, import_react4.forwardRef)(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+var DialogDescription = (0, import_react4.forwardRef)(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
   DialogPrimitive.Description,
   {
     ref,
@@ -298,7 +357,7 @@ var DialogDescription = (0, import_react4.forwardRef)(({ className, ...props }, 
   }
 ));
 DialogDescription.displayName = "DialogDescription";
-var DialogFooter = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+var DialogFooter = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
   "div",
   {
     className: cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className),
@@ -428,6 +487,7 @@ var tokens = {
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  Avatar,
   Button,
   Dialog,
   DialogClose,

@@ -12,9 +12,14 @@ import {
   MdBookmark,
   MdBookmarkBorder,
 } from 'react-icons/md';
+import { HiSparkles as Sparkles } from 'react-icons/hi2';
 import { ContentItem } from '@/lib/types/content';
 import { CommentSection } from '@/domains/comments/components/CommentSection';
 import { useBookmarkStatus, useBookmark } from '@/domains/users/hooks/useBookmark';
+import { useUserProfile } from '@/domains/users/hooks/useUserProfile';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
+import { useTranslation } from 'react-i18next';
+import { Avatar } from '@decoded/ui';
 
 import { SummarySection } from './SummarySection';
 import { InteractiveQASection } from './InteractiveQASection';
@@ -25,7 +30,7 @@ interface ContentSidebarProps {
 }
 
 // Helper function to extract title based on content type
-const getContentTitle = (content: any): string => {
+const getContentTitle = (content: any, t: (key: string) => string): string => {
   // Link content - linkPreview를 먼저 체크 (우선순위 높음)
   if (content.linkPreview?.title) {
     return content.linkPreview.title;
@@ -56,13 +61,51 @@ const getContentTitle = (content: any): string => {
   }
 
   // Image content or fallback
-  return 'Untitled';
+  return t('metadata.noTitle');
 };
 
 export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
   const contentId = typeof content.id === 'string' ? content.id : content.id.toString();
   const { data: bookmarkStatus } = useBookmarkStatus(contentId);
   const { addBookmark, removeBookmark, isLoading: isBookmarkLoading } = useBookmark(contentId);
+
+  // Get user profile using author field (which contains the user ID)
+  const authorId = content.author;
+  const {
+    data: userProfile,
+    isLoading: isProfileLoading,
+    error: profileError,
+  } = useUserProfile(authorId || '', {
+    enabled: !!authorId,
+  });
+
+  // Translation hooks
+  const { t } = useTranslation('content');
+  const { actions, time } = useCommonTranslation();
+
+  // Format date function (same as CommentItem)
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffHours < 1) {
+      const diffMinutes = Math.floor(diffMs / (1000 * 60));
+      return diffMinutes <= 0 ? '방금 전' : `${diffMinutes}분 전`;
+    } else if (diffHours < 24) {
+      return `${diffHours}시간 전`;
+    } else if (diffDays < 7) {
+      return `${diffDays}일 전`;
+    } else {
+      return date.toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+    }
+  };
 
   // Add shimmer animation styles
   React.useEffect(() => {
@@ -100,14 +143,14 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
       document.head.removeChild(style);
     };
   }, []);
-  const title = getContentTitle(content);
+  const title = getContentTitle(content, t);
   const [isQAExpanded, setIsQAExpanded] = useState(false);
   const [isAIOverviewExpanded, setIsAIOverviewExpanded] = useState(true);
   const [isAIGenerating, setIsAIGenerating] = useState(true);
 
   // AI 콘텐츠가 있는지 확인
   const hasAIContent = content.aiSummary || (content.aiQaList && content.aiQaList.length > 0);
-  
+
   // AI 생성 애니메이션 효과
   React.useEffect(() => {
     if (isAIOverviewExpanded && hasAIContent) {
@@ -115,7 +158,7 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
       const timer = setTimeout(() => {
         setIsAIGenerating(false);
       }, 800); // 0.8초 애니메이션
-      
+
       return () => clearTimeout(timer);
     }
   }, [isAIOverviewExpanded, hasAIContent]);
@@ -129,7 +172,7 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
           <button
             onClick={onClose}
             className="flex items-center justify-center w-8 h-8 rounded-full bg-zinc-800/50 hover:bg-zinc-700/50 transition-all duration-200 group lg:hidden flex-shrink-0"
-            aria-label="Close modal"
+            aria-label={t('sidebar.closeModal')}
           >
             <MdClose className="w-5 h-5 text-gray-400 group-hover:text-white" />
           </button>
@@ -154,7 +197,7 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
             ) : (
               <MdBookmarkBorder className="w-4 h-4" />
             )}
-            <span>{bookmarkStatus?.is_bookmarked ? 'Saved' : 'Save'}</span>
+            <span>{bookmarkStatus?.is_bookmarked ? t('actions.saved') : t('actions.save')}</span>
           </button>
 
           {/* Share button */}
@@ -174,7 +217,7 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
             className="flex items-center space-x-2 px-3 py-1 text-sm text-zinc-400 hover:text-white bg-zinc-800/30 hover:bg-zinc-700/50 rounded-lg transition-colors cursor-pointer"
           >
             <MdShare className="w-4 h-4" />
-            <span>Share</span>
+            <span>{t('actions.share')}</span>
           </button>
         </div>
       </div>
@@ -185,16 +228,27 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
         {(content.author || content.likes !== undefined || content.views !== undefined) && (
           <div className="p-4 border-b border-zinc-700/50">
             {/* Author Info */}
-            {content.author && (
+            {authorId && (
               <div className="flex items-center space-x-3 mb-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                  <span className="text-white font-semibold text-sm">
-                    {content.author.charAt(0).toUpperCase()}
-                  </span>
-                </div>
+                <Avatar
+                  userId={authorId}
+                  src={userProfile?.profile_image_url || undefined}
+                  size="lg"
+                  className="flex-shrink-0"
+                />
                 <div>
-                  <div className="font-medium text-white">{content.author}</div>
-                  {content.date && <div className="text-xs text-zinc-400">{content.date}</div>}
+                  <div className="font-medium text-white">
+                    {isProfileLoading ? (
+                      <span className="animate-pulse">Loading...</span>
+                    ) : profileError ? (
+                      authorId // API 에러 시 authorId 표시
+                    ) : (
+                      userProfile?.aka || authorId
+                    )}
+                  </div>
+                  {content.date && (
+                    <div className="text-xs text-zinc-400">{formatDate(content.date)}</div>
+                  )}
                 </div>
               </div>
             )}
@@ -228,7 +282,7 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
                 onClick={() => setIsAIOverviewExpanded(!isAIOverviewExpanded)}
                 className="flex items-center justify-between w-full text-left group hover:bg-zinc-800/30 rounded-lg px-2 py-1 transition-colors"
               >
-                <h4 className="text-base font-medium text-white">AI Overview</h4>
+                <h4 className="text-base font-medium text-white">{t('sidebar.aiOverview')}</h4>
                 <div className="text-zinc-400 group-hover:text-white transition-colors">
                   {isAIOverviewExpanded ? (
                     <MdKeyboardArrowUp className="w-5 h-5" />
@@ -248,10 +302,10 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
                     {/* Shimmer Loading */}
                     <div className="animate-pulse space-y-3">
                       <div className="flex items-center space-x-2">
-                        <div className="w-3 h-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full animate-bounce" />
-                        <span className="text-xs text-zinc-400">AI analyzing content...</span>
+                        <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+                        <span className="text-xs text-zinc-400">{t('sidebar.aiAnalyzing')}</span>
                       </div>
-                      
+
                       {/* Summary Skeleton */}
                       {content.aiSummary && (
                         <div className="space-y-2">
@@ -263,7 +317,7 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
                           </div>
                         </div>
                       )}
-                      
+
                       {/* Q&A Skeleton */}
                       {content.aiQaList && content.aiQaList.length > 0 && (
                         <div className="space-y-2">
@@ -282,7 +336,9 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
                     {/* Summary */}
                     {content.aiSummary && (
                       <div>
-                        <h5 className="text-xs font-medium text-zinc-400 mb-2">Summary</h5>
+                        <h5 className="text-xs font-medium text-zinc-400 mb-2">
+                          {t('sidebar.summary')}
+                        </h5>
                         <p className="text-xs text-zinc-300 leading-relaxed">{content.aiSummary}</p>
                       </div>
                     )}
@@ -290,7 +346,9 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
                     {/* Q&A */}
                     {content.aiQaList && content.aiQaList.length > 0 && (
                       <div>
-                        <h5 className="text-xs font-medium text-zinc-400 mb-2">Q&A</h5>
+                        <h5 className="text-xs font-medium text-zinc-400 mb-2">
+                          {t('sidebar.qa')}
+                        </h5>
                         <div className="text-xs space-y-2">
                           {/* First Q&A always shown */}
                           <div>
@@ -316,8 +374,10 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
                               className="text-zinc-500 hover:text-zinc-300 mt-1 cursor-pointer transition-colors"
                             >
                               {isQAExpanded
-                                ? 'Show less'
-                                : `+${content.aiQaList.length - 1} more questions`}
+                                ? t('sidebar.showLess')
+                                : t('sidebar.moreQuestions', {
+                                    count: content.aiQaList.length - 1,
+                                  })}
                             </button>
                           )}
                         </div>
@@ -333,13 +393,13 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
         {/* Content Description - Moved below AI Overview */}
         {content.description && (
           <div className="p-4 border-b border-zinc-700/50">
-            <h5 className="text-base font-medium text-white mb-2">Description</h5>
+            <h5 className="text-base font-medium text-white mb-2">{t('sidebar.description')}</h5>
             <p className="text-sm text-zinc-300 leading-relaxed">{content.description}</p>
           </div>
         )}
 
-        {/* Comments Section */}
-        <div className="min-h-0">
+        {/* Comments Section - Hidden on mobile, shown in separate modal */}
+        <div className="min-h-0 hidden lg:block">
           <CommentSection contentId={contentId} />
         </div>
       </div>

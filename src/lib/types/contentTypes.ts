@@ -1,11 +1,7 @@
 /**
  * Core content types and interfaces
  */
-import {
-  ContentStatus,
-  AIGenMetadataResponse,
-  LinkPreviewMetadataResponse,
-} from '@/api/generated';
+import { ContentStatus, AIGenMetadataResponse, LinkPreviewMetadataResponse } from '@/api/generated';
 
 import { ContentType } from './ContentType';
 
@@ -80,6 +76,7 @@ export interface ContentItem {
   thumbnailUrl?: string;
   category?: string;
   author?: string;
+  provider_id?: string; // API에서 사용하는 provider ID
   date?: string;
   likes?: number;
   views?: number;

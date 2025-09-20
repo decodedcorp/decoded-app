@@ -15,7 +15,7 @@ export function InfiniteScrollLoader({
     <div ref={observerRef} className="col-span-full flex justify-center py-8">
       {isFetchingNextPage ? (
         <div className="flex items-center space-x-2">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
           <span className="text-zinc-400">Loading more channels...</span>
         </div>
       ) : (
@@ -23,4 +23,4 @@ export function InfiniteScrollLoader({
       )}
     </div>
   );
-} 
+}

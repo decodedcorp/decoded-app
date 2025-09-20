@@ -9,7 +9,6 @@ import { Button } from '@decoded/ui';
 import { useAuthTranslation } from '@/lib/i18n/hooks';
 
 export function LoginButton() {
-
   // 🔄 RESET: Simplified state management - only use essential states
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const t = useAuthTranslation();
@@ -48,7 +47,7 @@ export function LoginButton() {
         {isAuthenticated ? (
           <UserAvatar size="md" showDropdown={true} />
         ) : (
-          <Button onClick={handleClick} variant="login" size="sm">
+          <Button onClick={handleClick} variant="login" size="sm" data-login-button>
             {t.login.title()}
           </Button>
         )}

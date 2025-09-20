@@ -135,7 +135,7 @@ export function NotificationButton({ unreadCount }: NotificationButtonProps) {
             <button
               onClick={handleMarkAllRead}
               disabled={markAllReadMutation.isPending}
-              className="text-xs text-[#EAFD66] hover:text-[#d9ec55] transition-colors disabled:opacity-50"
+              className="text-xs text-primary hover:text-primary-hover transition-colors disabled:opacity-50"
             >
               {markAllReadMutation.isPending
                 ? t('notifications.marking')
@@ -232,7 +232,7 @@ export function NotificationButton({ unreadCount }: NotificationButtonProps) {
 
                         {/* Unread indicator */}
                         {!notification.is_read && (
-                          <div className="w-2 h-2 bg-[#EAFD66] rounded-full mt-2" />
+                          <div className="w-2 h-2 bg-primary rounded-full mt-2" />
                         )}
                       </div>
                     </div>
@@ -248,7 +248,7 @@ export function NotificationButton({ unreadCount }: NotificationButtonProps) {
 
           {/* Footer */}
           <div className="px-4 py-2 border-t border-zinc-800">
-            <button className="w-full text-center text-sm text-[#EAFD66] hover:text-[#d9ec55] transition-colors">
+            <button className="w-full text-center text-sm text-primary hover:text-primary-hover transition-colors">
               {t('notifications.viewAllNotifications')}
             </button>
           </div>

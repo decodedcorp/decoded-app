@@ -3,8 +3,18 @@
 import React, { useState } from 'react';
 
 import { Button } from '@decoded/ui';
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalClose,
+} from '@/lib/components/ui/modal';
 import { useSearchUsers } from '@/domains/search/hooks/useSearch';
 import type { ChannelResponse } from '@/api/generated/models/ChannelResponse';
+import { useCommonTranslation, useInvitationTranslation } from '@/lib/i18n/hooks';
 
 import { useCreateInvitation } from '../hooks/useInvitations';
 
@@ -19,6 +29,8 @@ export function InviteManagerModal({ isOpen, onClose, channel }: InviteManagerMo
   const [selectedUserId, setSelectedUserId] = useState('');
   const [message, setMessage] = useState('');
   const [expiresInDays, setExpiresInDays] = useState(7);
+  const t = useCommonTranslation();
+  const ti = useInvitationTranslation();
 
   const createInvitationMutation = useCreateInvitation();
 
@@ -64,131 +76,132 @@ export function InviteManagerModal({ isOpen, onClose, channel }: InviteManagerMo
     setExpiresInDays(7);
   };
 
+  const handleOpenChange = (open: boolean) => {
+    if (!open) onClose();
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+    <Modal
+      open={isOpen}
+      onOpenChange={handleOpenChange}
+      variant="center"
+      size="md"
+      dismissible={true}
+      ariaLabel={ti.title()}
+    >
+      <ModalOverlay className="modal-overlay--heavy">
+        <ModalContent className="bg-zinc-900 border border-zinc-700">
+          <ModalHeader>
+            <h2 className="text-xl font-semibold text-white">{ti.title()}</h2>
+            <ModalClose />
+          </ModalHeader>
 
-      {/* Modal */}
-      <div className="relative bg-zinc-900 rounded-lg border border-zinc-700 w-full max-w-md mx-4">
-        <div className="p-6">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-white">Invite Manager</h2>
-            <button
-              onClick={onClose}
-              className="p-1 rounded-full hover:bg-zinc-800 transition-colors"
-            >
-              <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-                <path
-                  d="M18 6L6 18M6 6l12 12"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          </div>
+          <ModalBody>
+            <form id="invite-form" onSubmit={handleSubmit} className="space-y-4">
+              {/* User Search */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  {ti.userSearch.label()}
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder={ti.userSearch.placeholder()}
+                    className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* User Search */}
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">Search User</label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Type username or email..."
-                  className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-
-                {/* Search Results */}
-                {searchQuery.length >= 2 && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-zinc-800 border border-zinc-700 rounded max-h-40 overflow-y-auto z-10">
-                    {isSearching ? (
-                      <div className="p-3 text-zinc-400 text-sm">Searching...</div>
-                    ) : (
-                      <div className="py-1">
-                        <button
-                          type="button"
-                          onClick={() => handleUserSelect('68afbabeaf346786ac9d2671', 'Test User')}
-                          className="w-full px-3 py-2 text-left hover:bg-zinc-700 transition-colors"
-                        >
-                          <div className="flex items-center space-x-3">
-                            <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs">
-                              TU
-                            </div>
-                            <div>
-                              <div className="text-white text-sm">Test User</div>
-                              <div className="text-zinc-400 text-xs font-mono">
-                                68afbabeaf346786ac9d2671
+                  {/* Search Results */}
+                  {searchQuery.length >= 2 && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-zinc-800 border border-zinc-700 rounded max-h-40 overflow-y-auto z-10">
+                      {isSearching ? (
+                        <div className="p-3 text-zinc-400 text-sm">{t.search.searching()}</div>
+                      ) : (
+                        <div className="py-1">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleUserSelect('68afbabeaf346786ac9d2671', 'Test User')
+                            }
+                            className="w-full px-3 py-2 text-left hover:bg-zinc-700 transition-colors"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white text-xs">
+                                TU
+                              </div>
+                              <div>
+                                <div className="text-white text-sm">Test User</div>
+                                <div className="text-zinc-400 text-xs font-mono">
+                                  68afbabeaf346786ac9d2671
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
 
-            {/* Personal Message */}
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Personal Message (Optional)
-              </label>
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                rows={3}
-                placeholder="Add a personal note to your invitation..."
-                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                maxLength={500}
-              />
-              <p className="text-xs text-zinc-400 mt-1">{message.length}/500 characters</p>
-            </div>
+              {/* Personal Message */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  {ti.personalMessage.label()}
+                </label>
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  rows={3}
+                  placeholder={ti.personalMessage.placeholder()}
+                  className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                  maxLength={500}
+                />
+                <p className="text-xs text-zinc-400 mt-1">{message.length}/500 characters</p>
+              </div>
 
-            {/* Expiry */}
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">Expires In</label>
-              <select
-                value={expiresInDays}
-                onChange={(e) => setExpiresInDays(Number(e.target.value))}
-                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value={1}>1 day</option>
-                <option value={3}>3 days</option>
-                <option value={7}>7 days</option>
-                <option value={14}>14 days</option>
-                <option value={30}>30 days</option>
-              </select>
-            </div>
+              {/* Expiry */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  {ti.expiresIn()}
+                </label>
+                <select
+                  value={expiresInDays}
+                  onChange={(e) => setExpiresInDays(Number(e.target.value))}
+                  className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  <option value={1}>1 day</option>
+                  <option value={3}>3 days</option>
+                  <option value={7}>7 days</option>
+                  <option value={14}>14 days</option>
+                  <option value={30}>30 days</option>
+                </select>
+              </div>
+            </form>
+          </ModalBody>
 
-            {/* Actions */}
-            <div className="flex items-center justify-end space-x-3 pt-4">
-              <button
-                type="button"
-                onClick={handleReset}
-                className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-white rounded transition-colors"
-              >
-                Reset
-              </button>
-              <Button
-                type="submit"
-                disabled={!selectedUserId || createInvitationMutation.isPending}
-                variant="primary"
-              >
-                {createInvitationMutation.isPending ? 'Sending...' : 'Send Invitation'}
-              </Button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+          <ModalFooter>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-white rounded transition-colors"
+            >
+              {t.actions.reset()}
+            </button>
+            <Button
+              type="submit"
+              form="invite-form"
+              disabled={!selectedUserId || createInvitationMutation.isPending}
+              variant="primary"
+            >
+              {createInvitationMutation.isPending ? ti.state.sending() : ti.actions.send()}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </ModalOverlay>
+    </Modal>
   );
 }

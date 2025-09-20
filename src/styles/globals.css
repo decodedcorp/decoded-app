@@ -1,9 +1,115 @@
 @tailwind utilities;
 
-/* Custom CSS Variables for Dynamic Shadows */
+/* Import Modal Tokens */
+@import './modal-tokens.css';
+
+/* Custom CSS Variables for Dynamic Shadows and Spacing */
 :root {
   --hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
   --focus-ring: rgba(59, 130, 246, 0.6);
+
+  /* Layout design tokens - unified edge padding system */
+  --edge-x: 0px; /* 뷰포트 좌우 기본 여백 */
+  --main-gap: 24px; /* 메인↔사이드 가로 간격 */
+  --sidebar-w: 260px; /* 데스크톱 사이드바 너비 */
+  --sidebar-right-w: 260px; /* 오른쪽 사이드바 너비 */
+  --header-h: 60px; /* 헤더 높이, sticky 기준 */
+
+  /* dense 모드(거의 무여백) */
+  --edge-x-dense: 0px;
+
+  /* Legacy - 기존 호환성 유지 */
+  --space-page-x: var(--edge-x);
+
+  /* ========== NEW LAYOUT SYSTEM ========== */
+  /* Flex Layout System Variables */
+  --header-height: 72px; /* 헤더 높이 (데스크톱 기준) */
+  --sidebar-width: 0px; /* 기본값: 사이드바 숨김 (모바일 우선) */
+  --content-max-width: 1200px; /* 메인 콘텐츠 최대 너비 */
+  --content-max-width-wide: 1400px; /* 와이드 모드 최대 너비 */
+  --gap-main: 0px; /* 기본값: 간격 없음 (모바일 우선) */
+  --gap-edge: 0px; /* 뷰포트 가장자리 여백 */
+  --container-padding-x: 0px; /* 컨테이너 가로 패딩 */
+
+  /* Scroll & Sticky System */
+  --scroll-behavior: smooth;
+  --sidebar-scroll-height: calc(100dvh - var(--header-height) - 2 * var(--gap-edge));
+  --main-min-height: calc(100dvh - var(--header-height));
+
+  /* Performance & Accessibility */
+  --scrollbar-thumb: rgba(255, 255, 255, 0.2);
+  --scrollbar-track: transparent;
+  --scrollbar-width: 6px;
+
+  /* Z-index scale - 레이어 우선순위 */
+  --z-header: 9999;
+  --z-sidebar: 40; /* 모달보다 낮게 설정 */
+  --z-sidebar-mobile: 10002;
+  --z-overlay: 50;
+  --z-modal: 60;
+  --z-modal-root: 70;
+
+  /* Modal sizes */
+  --modal-max-w-sm: 24rem; /* 384px */
+  --modal-max-w-md: 32rem; /* 512px */
+  --modal-max-w-lg: 40rem; /* 640px */
+  --modal-max-w-xl: 56rem; /* 896px */
+  --modal-max-w-full: 90vw; /* Responsive full */
+
+  /* Modal paddings & radius */
+  --modal-pad: 16px;
+  --modal-pad-sm: 12px;
+  --modal-pad-lg: 24px;
+  --modal-radius: 16px;
+  --modal-radius-lg: 20px;
+
+  /* Overlay & motion */
+  --overlay-bg: rgba(0, 0, 0, 0.5);
+  --overlay-bg-heavy: rgba(0, 0, 0, 0.7);
+  --modal-anim-ms: 180ms;
+  --modal-anim-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Safe area & viewport units */
+  --safe-bottom: env(safe-area-inset-bottom);
+  --safe-top: env(safe-area-inset-top);
+  --safe-left: env(safe-area-inset-left);
+  --safe-right: env(safe-area-inset-right);
+
+  /* Drawer & sheet dimensions */
+  --drawer-w: min(38vw, 520px);
+  --drawer-w-mobile: 85vw;
+  --sheet-max-h: min(90dvh, 80vh);
+}
+
+/* Responsive design tokens - 반응형 여백 관리 */
+@media (min-width: 768px) {
+  :root {
+    --edge-x: 0px;
+    --main-gap: 28px;
+    --header-h: 72px;
+
+    /* Modal responsive adjustments */
+    --modal-pad: 20px;
+    --modal-pad-lg: 32px;
+    --drawer-w: min(35vw, 480px);
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --edge-x: 0px;
+    --main-gap: 32px;
+    --space-page-x: var(--edge-x);
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --edge-x: 0px;
+    --main-gap: 36px;
+    --sidebar-right-w: 360px;
+    --space-page-x: var(--edge-x);
+  }
 }
 
 /* Enhanced focus styles for channel cards */
@@ -110,6 +216,378 @@
   .mobile-heading {
     @apply text-xl sm:text-2xl lg:text-3xl;
   }
+
+  /* Mobile optimization utilities */
+  .mobile-fullscreen {
+    min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height */
+  }
+
+  .mobile-safe-area {
+    padding-left: max(env(safe-area-inset-left), 16px);
+    padding-right: max(env(safe-area-inset-right), 16px);
+    padding-top: max(env(safe-area-inset-top), 16px);
+    padding-bottom: max(env(safe-area-inset-bottom), 16px);
+  }
+
+  .mobile-touch-target {
+    @apply min-h-[44px] min-w-[44px]; /* iOS minimum touch target */
+  }
+
+  .mobile-text-base {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+
+  .mobile-scroll-smooth {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Page spacing utility class */
+  .page-x-spacing {
+    padding-inline: var(--space-page-x);
+  }
+
+  /* Layout utility classes */
+  .layout-edge {
+    padding-left: var(--edge-x);
+    padding-right: var(--edge-x);
+  }
+
+  .layout-edge--dense {
+    padding-left: var(--edge-x-dense);
+    padding-right: var(--edge-x-dense);
+  }
+
+  /* ========== NEW FLEX LAYOUT SYSTEM ========== */
+  /* Main Layout Container */
+  .layout {
+    min-height: 100dvh;
+    width: 100%; /* Use container width, not viewport width */
+    max-width: 100%; /* Prevent horizontal overflow */
+    background: var(--bg-primary, #000000);
+    color: var(--text-primary, #ffffff);
+  }
+
+  /* Content Wrapper - Single Scroll Root */
+  .content-wrapper {
+    height: 100dvh;
+    width: 100%; /* Full width of layout container */
+    max-width: 100%; /* Prevent overflow */
+    box-sizing: border-box; /* Include padding in width calculation */
+    padding-top: var(--header-height);
+    padding-inline: var(--container-padding-x);
+    padding-bottom: var(--gap-edge);
+    overflow: auto;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+    scroll-behavior: var(--scroll-behavior);
+    display: flex;
+    gap: var(--gap-main);
+    contain: layout paint; /* Performance optimization */
+  }
+
+  /* Sidebar Base Styles */
+  .sidebar-left,
+  .sidebar-right {
+    position: sticky;
+    top: var(--gap-edge);
+    /* Default: no flex space (mobile-first) */
+    flex: 0 0 0px;
+    width: 0px;
+    display: none; /* Default: hidden */
+    height: fit-content;
+    max-height: var(--sidebar-scroll-height);
+
+    /* Performance optimizations */
+    contain: layout style paint;
+    will-change: transform;
+    transform: translateZ(0); /* GPU layer activation */
+  }
+
+  /* Sidebar Inner Content with Scroll */
+  .sidebar-inner {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    /* Scroll performance */
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
+
+    /* Custom scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  }
+
+  .sidebar-inner::-webkit-scrollbar {
+    width: var(--scrollbar-width);
+  }
+
+  .sidebar-inner::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
+
+  .sidebar-inner::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: calc(var(--scrollbar-width) / 2);
+  }
+
+  /* Main Content Area */
+  .main {
+    min-width: 0; /* Prevent flex shrink bugs */
+    flex: 1 1 auto; /* Flexible width that can shrink */
+    max-width: min(100%, var(--content-max-width)); /* Allow shrinking below max-width */
+    width: 100%; /* Take available space */
+    box-sizing: border-box; /* Include padding in width calculation */
+    margin: 0 auto; /* Center align */
+  }
+
+  /* Main Content Max-Width Variants */
+  .main[data-max-width='wide'] {
+    max-width: var(--content-max-width-wide);
+  }
+
+  .main[data-max-width='full'] {
+    max-width: none;
+    margin: 0;
+  }
+
+  /* ========== DOMAIN-SPECIFIC PRESETS ========== */
+  /* Home Domain */
+  .layout[data-domain='home'] {
+    --content-max-width: 1200px;
+    --container-padding-x: 0px;
+    --gap-main: 24px;
+  }
+
+  /* Channel Domain */
+  .layout[data-domain='channel'] {
+    --content-max-width: 100%;
+    --container-padding-x: 0px;
+    --gap-main: 20px;
+  }
+
+  /* Search Domain */
+  .layout[data-domain='search'] {
+    --content-max-width: 1400px;
+    --container-padding-x: 0px;
+    --gap-main: 20px;
+  }
+
+  /* Profile Domain */
+  .layout[data-domain='profile'] {
+    --content-max-width: 800px;
+    --container-padding-x: 0px;
+    --gap-main: 24px;
+  }
+
+  /* ========== RESPONSIVE BREAKPOINTS ========== */
+  /* Mobile First Approach */
+  @media (max-width: 767px) {
+    .layout {
+      --header-height: 60px; /* 모바일 헤더 높이 */
+      --sidebar-width: 0px; /* Hide sidebars on mobile */
+      --gap-main: 0px;
+      --container-padding-x: var(--edge-x);
+    }
+
+    .sidebar-left,
+    .sidebar-right {
+      display: none;
+    }
+
+    .main {
+      max-width: none;
+      margin: 0;
+    }
+
+    /* Mobile-specific content wrapper */
+    .content-wrapper {
+      padding-inline: var(--edge-x);
+    }
+  }
+
+  /* Tablet breakpoint - Left sidebar only */
+  @media (min-width: 768px) {
+    .layout {
+      --sidebar-width: clamp(180px, 15vw, 220px);
+      --gap-main: 16px;
+      --container-padding-x: 0px;
+    }
+
+    .sidebar-left {
+      display: flex;
+      flex: 0 0 var(--sidebar-width);
+      width: var(--sidebar-width);
+    }
+
+    .sidebar-right {
+      display: none;
+    }
+  }
+
+  /* Desktop breakpoint - Both sidebars */
+  @media (min-width: 1280px) {
+    .layout {
+      --sidebar-width: clamp(200px, 14vw, 240px);
+      --gap-main: 18px;
+      --container-padding-x: 0px;
+    }
+    .sidebar-left,
+    .sidebar-right {
+      display: flex;
+      flex: 0 0 var(--sidebar-width);
+      width: var(--sidebar-width);
+    }
+  }
+
+  /* Large desktop - Progressive enhancement */
+  @media (min-width: 1440px) {
+    .layout {
+      --sidebar-width: clamp(220px, 16vw, 260px);
+      --gap-main: 20px;
+      --container-padding-x: 0px;
+    }
+  }
+
+  /* Extra large desktop - Maximum comfort */
+  @media (min-width: 1680px) {
+    .layout {
+      --sidebar-width: clamp(240px, 18vw, 280px);
+      --gap-main: 24px;
+      --container-padding-x: 0px;
+    }
+  }
+
+  /* ========== MOBILE NAVIGATION ========== */
+  /* Mobile overlay navigation */
+  .mobile-nav-overlay {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--overlay-bg);
+    z-index: var(--z-modal);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .mobile-nav-panel {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    width: 280px;
+    height: calc(100vh - var(--header-height));
+    background: var(--bg-primary, #000000);
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: calc(var(--z-modal) + 1);
+  }
+
+  .mobile-nav-panel.open {
+    transform: translateX(0);
+  }
+
+  /* Mobile touch targets */
+  .mobile-touch-target {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Mobile safe areas */
+  .mobile-safe-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom), 16px);
+  }
+
+  .mobile-safe-sides {
+    padding-left: max(env(safe-area-inset-left), 16px);
+    padding-right: max(env(safe-area-inset-right), 16px);
+  }
+
+  /* Layout debugging helper */
+  [data-layout-debug='1'] [data-role] {
+    outline: 1px dashed rgba(234, 253, 102, 0.3);
+    background: rgba(234, 253, 102, 0.05);
+  }
+
+  [data-layout-debug='1'] [data-role='primary'] {
+    outline-color: rgba(34, 197, 94, 0.5);
+    background: rgba(34, 197, 94, 0.05);
+  }
+
+  [data-layout-debug='1'] [data-role*='dense'] {
+    outline-color: rgba(239, 68, 68, 0.5);
+    background: rgba(239, 68, 68, 0.05);
+  }
+
+  /* Modal utility classes */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--overlay-bg);
+    z-index: var(--z-overlay);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    pointer-events: auto;
+    cursor: pointer;
+  }
+
+  .modal-overlay--heavy {
+    background: var(--overlay-bg-heavy);
+  }
+
+  .modal-content {
+    border-radius: var(--modal-radius);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    z-index: var(--z-modal);
+    pointer-events: auto;
+    cursor: default;
+  }
+
+  .modal-content--lg {
+    border-radius: var(--modal-radius-lg);
+  }
+
+  /* Modal animations */
+  .modal-enter {
+    animation: modalEnter var(--modal-anim-ms) var(--modal-anim-spring);
+  }
+
+  .modal-exit {
+    animation: modalExit var(--modal-anim-ms) ease-out;
+  }
+
+  .sheet-enter {
+    animation: sheetEnter var(--modal-anim-ms) var(--modal-anim-spring);
+  }
+
+  .sheet-exit {
+    animation: sheetExit var(--modal-anim-ms) ease-out;
+  }
+
+  .drawer-enter {
+    animation: drawerEnter var(--modal-anim-ms) var(--modal-anim-spring);
+  }
+
+  .drawer-exit {
+    animation: drawerExit var(--modal-anim-ms) ease-out;
+  }
+
+  /* Safe area utilities */
+  .safe-area-bottom {
+    padding-bottom: max(var(--safe-bottom), 16px);
+  }
+
+  .safe-area-all {
+    padding-top: max(var(--safe-top), 16px);
+    padding-bottom: max(var(--safe-bottom), 16px);
+    padding-left: max(var(--safe-left), 16px);
+    padding-right: max(var(--safe-right), 16px);
+  }
 }
 
 /* Kinetic Typography Variables */
@@ -118,9 +596,7 @@
   --bg: #000000;
   --highlight-bg: #ffcc00;
   --type-line-opacity: 0.05;
-  --main-background-color: #070707;
-  --text-color: #ffffff;
-  --footer-text-color: #ffffff;
+  /* Legacy color variables removed - now using design-tokens.css and design-alias.css */
 }
 
 /* Kinetic Typography Fonts */
@@ -200,6 +676,73 @@
   }
 }
 
+/* Modal-specific animations */
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes modalExit {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+}
+
+@keyframes sheetEnter {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sheetExit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+
+@keyframes drawerEnter {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes drawerExit {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
 /* Marquee animations for hero capsules */
 @keyframes marquee {
   0% {
@@ -221,6 +764,9 @@
 
 html {
   height: 100%;
+  width: 100%;
+  overflow-x: hidden; /* Prevent horizontal scroll at root level */
+  scrollbar-gutter: stable both-edges; /* Prevent layout shift when scrollbar appears */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -230,6 +776,9 @@ body {
   color: var(--text-color);
   background-color: var(--main-background-color);
   min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height for mobile */
+  width: 100%;
+  overflow-x: hidden; /* Prevent horizontal scroll at body level */
   display: flex;
   flex-direction: column;
   font-family: Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR',
@@ -378,11 +927,15 @@ footer {
   html {
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
   }
 
   body {
     @apply touch-pan-y;
     -webkit-overflow-scrolling: touch;
+    /* Dynamic viewport height for mobile */
+    min-height: 100vh;
+    min-height: 100dvh;
   }
 
   .touch-target {
@@ -403,6 +956,7 @@ footer {
   img {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
+    user-select: none;
     pointer-events: auto;
   }
 
@@ -411,6 +965,44 @@ footer {
     touch-action: manipulation;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* 모바일 폼 최적화 */
+  input,
+  textarea,
+  select {
+    font-size: 16px; /* Prevent zoom on iOS */
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 0;
+  }
+
+  /* 모바일 버튼 최적화 */
+  button {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+}
+
+/* 접근성 최적화 */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* 다크모드 지원 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
   }
 }
 

@@ -109,7 +109,7 @@ export function GridItem({
           {/* 상태 배지들 */}
           <div className="flex gap-1 flex-shrink-0">
             {isNew && (
-              <span className="px-1.5 py-0.5 bg-blue-500 text-white text-xs rounded-full">New</span>
+              <span className="px-1.5 py-0.5 bg-primary text-white text-xs rounded-full">New</span>
             )}
             {isHot && (
               <span className="px-1.5 py-0.5 bg-red-500 text-white text-xs rounded-full">Hot</span>

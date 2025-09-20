@@ -287,7 +287,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
   // AI 생성 로직 제거 - 링크 포스트는 기본 포스트 동작으로 처리
 
   return (
-    <form onSubmit={handleSubmit} className="p-6 space-y-6">
+    <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-6">
       {/* Content Type Selection */}
       <div>
         <label className="block text-sm font-medium text-white mb-3">

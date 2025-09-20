@@ -166,10 +166,66 @@ var VisuallyHidden = forwardRef2(
 );
 VisuallyHidden.displayName = "VisuallyHidden";
 
+// src/components/Avatar.tsx
+import { jsx as jsx3, jsxs } from "react/jsx-runtime";
+var sizeClasses = {
+  sm: "w-6 h-6 text-xs",
+  md: "w-8 h-8 text-sm",
+  lg: "w-12 h-12 text-base"
+};
+var Avatar = ({
+  userId,
+  src,
+  size = "md",
+  className,
+  alt
+}) => {
+  const fallbackText = userId.charAt(0).toUpperCase();
+  const sizeClass = sizeClasses[size];
+  return /* @__PURE__ */ jsxs(
+    "div",
+    {
+      className: cn(
+        "relative flex items-center justify-center flex-shrink-0 rounded-full overflow-hidden",
+        "bg-zinc-800 border border-zinc-700",
+        "transition-colors duration-200",
+        sizeClass,
+        className
+      ),
+      children: [
+        src ? /* @__PURE__ */ jsx3(
+          "img",
+          {
+            src,
+            alt: alt || `Profile of ${userId}`,
+            className: "w-full h-full object-cover",
+            onError: (e) => {
+              e.currentTarget.style.display = "none";
+              const fallback = e.currentTarget.nextElementSibling;
+              if (fallback) fallback.style.display = "flex";
+            }
+          }
+        ) : null,
+        /* @__PURE__ */ jsx3(
+          "span",
+          {
+            className: cn(
+              "text-zinc-300 font-medium select-none",
+              src ? "hidden" : "flex"
+            ),
+            style: { display: src ? "none" : "flex" },
+            children: fallbackText
+          }
+        )
+      ]
+    }
+  );
+};
+
 // src/components/Button/Button.tsx
 import { forwardRef as forwardRef3 } from "react";
 import { cva } from "class-variance-authority";
-import { jsx as jsx3, jsxs } from "react/jsx-runtime";
+import { jsx as jsx4, jsxs as jsxs2 } from "react/jsx-runtime";
 var buttonVariants = cva(
   // 기본 스타일 (프로젝트 테마 컬러 적용)
   "inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed",
@@ -177,16 +233,18 @@ var buttonVariants = cva(
     variants: {
       variant: {
         // 프로젝트 테마 컬러 적용 - primary는 테마 컬러 사용
-        primary: "bg-gray-900 text-[#EAFD66] hover:bg-[#EAFD66] hover:text-black shadow-sm hover:shadow-md",
+        primary: "bg-surface text-primary hover:bg-primary hover:text-primary-on shadow-sm hover:shadow-md",
         secondary: "bg-gray-200 text-gray-900 hover:bg-gray-300 shadow-sm hover:shadow-md",
         outline: "border border-gray-300 bg-transparent text-gray-900 hover:bg-gray-100 hover:border-gray-400",
         ghost: "bg-transparent text-gray-900 hover:bg-gray-100",
         destructive: "bg-red-600 text-white hover:bg-red-700 shadow-sm hover:shadow-md",
         // 테마 컬러를 사용한 새로운 variant들
-        accent: "bg-[#EAFD66] text-black hover:bg-[#EAFD66]/90 shadow-sm hover:shadow-md",
-        "accent-outline": "border border-[#EAFD66] bg-transparent text-[#EAFD66] hover:bg-[#EAFD66] hover:text-black",
-        // 로그인 버튼 전용 variant - 더 명확한 테마 컬러 적용
-        login: "bg-gray-900 text-[#EAFD66] hover:bg-[#EAFD66] hover:text-black border border-[#EAFD66]/20 hover:border-[#EAFD66]/40 shadow-sm hover:shadow-md"
+        accent: "bg-primary text-primary-on hover:bg-primary-hover shadow-sm hover:shadow-md",
+        "accent-outline": "border border-primary-bd bg-transparent text-primary hover:bg-primary hover:text-primary-on",
+        // 로그인 버튼 전용 variant - MainFeed 필터 버튼 스타일 + 메인 컬러
+        login: "text-[#EAFD66] hover:text-black hover:bg-[#EAFD66] border border-zinc-700 transition-colors cursor-pointer",
+        // 댓글 버튼 전용 variant - 테두리와 배경이 있는 floating 버튼
+        "comments-floating": "bg-black/80 text-white border border-primary/30 hover:bg-black/90 hover:border-primary/50 shadow-2xl hover:shadow-[0_8px_32px_rgba(234,253,102,0.15)] backdrop-blur-md hover:backdrop-blur-lg transition-all duration-300"
       },
       size: {
         sm: "h-8 px-3 text-sm",
@@ -214,7 +272,7 @@ var Button = forwardRef3(
     ...props
   }, ref) => {
     const isDisabled = disabled || loading;
-    return /* @__PURE__ */ jsxs(
+    return /* @__PURE__ */ jsxs2(
       "button",
       {
         className: cn(buttonVariants({ variant, size, className })),
@@ -223,10 +281,10 @@ var Button = forwardRef3(
         ref,
         ...props,
         children: [
-          loading && /* @__PURE__ */ jsx3(Icon, { name: "loader-2", className: "h-4 w-4 animate-spin", "aria-hidden": "true" }),
-          !loading && icon && iconPosition === "left" && /* @__PURE__ */ jsx3(Icon, { name: icon, className: "h-4 w-4", "aria-hidden": "true" }),
+          loading && /* @__PURE__ */ jsx4(Icon, { name: "loader-2", className: "h-4 w-4 animate-spin", "aria-hidden": "true" }),
+          !loading && icon && iconPosition === "left" && /* @__PURE__ */ jsx4(Icon, { name: icon, className: "h-4 w-4", "aria-hidden": "true" }),
           children,
-          !loading && icon && iconPosition === "right" && /* @__PURE__ */ jsx3(Icon, { name: icon, className: "h-4 w-4", "aria-hidden": "true" })
+          !loading && icon && iconPosition === "right" && /* @__PURE__ */ jsx4(Icon, { name: icon, className: "h-4 w-4", "aria-hidden": "true" })
         ]
       }
     );
@@ -238,7 +296,7 @@ Button.displayName = "Button";
 import { forwardRef as forwardRef4 } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { cva as cva2 } from "class-variance-authority";
-import { jsx as jsx4, jsxs as jsxs2 } from "react/jsx-runtime";
+import { jsx as jsx5, jsxs as jsxs3 } from "react/jsx-runtime";
 var dialogContentVariants = cva2(
   "fixed left-[50%] top-[50%] z-modal w-full max-w-sm sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl translate-x-[-50%] translate-y-[-50%] gap-4 border border-white/10 bg-white p-4 sm:p-6 shadow-xl transition-all duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
   {
@@ -255,11 +313,11 @@ var dialogContentVariants = cva2(
 );
 var DialogPortal = DialogPrimitive.Portal;
 var DialogClose = DialogPrimitive.Close;
-var Dialog = ({ children, ...props }) => /* @__PURE__ */ jsx4(DialogPrimitive.Root, { ...props, children });
+var Dialog = ({ children, ...props }) => /* @__PURE__ */ jsx5(DialogPrimitive.Root, { ...props, children });
 var DialogTrigger = DialogPrimitive.Trigger;
-var DialogContent = forwardRef4(({ className, variant, hideCloseButton = false, children, ...props }, ref) => /* @__PURE__ */ jsxs2(DialogPortal, { children: [
-  /* @__PURE__ */ jsx4(DialogPrimitive.Overlay, { className: "fixed inset-0 z-overlay bg-black/50 backdrop-blur-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" }),
-  /* @__PURE__ */ jsxs2(
+var DialogContent = forwardRef4(({ className, variant, hideCloseButton = false, children, ...props }, ref) => /* @__PURE__ */ jsxs3(DialogPortal, { children: [
+  /* @__PURE__ */ jsx5(DialogPrimitive.Overlay, { className: "fixed inset-0 z-overlay bg-black/50 backdrop-blur-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" }),
+  /* @__PURE__ */ jsxs3(
     DialogPrimitive.Content,
     {
       ref,
@@ -267,12 +325,12 @@ var DialogContent = forwardRef4(({ className, variant, hideCloseButton = false, 
       ...props,
       children: [
         children,
-        !hideCloseButton && /* @__PURE__ */ jsx4(
+        !hideCloseButton && /* @__PURE__ */ jsx5(
           DialogPrimitive.Close,
           {
             className: "absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:pointer-events-none",
             "aria-label": "Close dialog",
-            children: /* @__PURE__ */ jsx4(Icon, { name: "x", className: "h-4 w-4" })
+            children: /* @__PURE__ */ jsx5(Icon, { name: "x", className: "h-4 w-4" })
           }
         )
       ]
@@ -280,8 +338,8 @@ var DialogContent = forwardRef4(({ className, variant, hideCloseButton = false, 
   )
 ] }));
 DialogContent.displayName = "DialogContent";
-var DialogHeader = ({ className, ...props }) => /* @__PURE__ */ jsx4("div", { className: cn("flex flex-col space-y-1.5 text-center sm:text-left", className), ...props });
-var DialogTitle = forwardRef4(({ className, ...props }, ref) => /* @__PURE__ */ jsx4(
+var DialogHeader = ({ className, ...props }) => /* @__PURE__ */ jsx5("div", { className: cn("flex flex-col space-y-1.5 text-center sm:text-left", className), ...props });
+var DialogTitle = forwardRef4(({ className, ...props }, ref) => /* @__PURE__ */ jsx5(
   DialogPrimitive.Title,
   {
     ref,
@@ -290,7 +348,7 @@ var DialogTitle = forwardRef4(({ className, ...props }, ref) => /* @__PURE__ */ 
   }
 ));
 DialogTitle.displayName = "DialogTitle";
-var DialogDescription = forwardRef4(({ className, ...props }, ref) => /* @__PURE__ */ jsx4(
+var DialogDescription = forwardRef4(({ className, ...props }, ref) => /* @__PURE__ */ jsx5(
   DialogPrimitive.Description,
   {
     ref,
@@ -299,7 +357,7 @@ var DialogDescription = forwardRef4(({ className, ...props }, ref) => /* @__PURE
   }
 ));
 DialogDescription.displayName = "DialogDescription";
-var DialogFooter = ({ className, ...props }) => /* @__PURE__ */ jsx4(
+var DialogFooter = ({ className, ...props }) => /* @__PURE__ */ jsx5(
   "div",
   {
     className: cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className),
@@ -428,6 +486,7 @@ var tokens = {
   }
 };
 export {
+  Avatar,
   Button,
   Dialog,
   DialogClose,

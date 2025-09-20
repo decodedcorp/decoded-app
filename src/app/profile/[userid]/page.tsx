@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter, useSearchParams, useParams } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import { useUserProfile } from '@/domains/profile/hooks/useProfile';
 import { ProfileHeader } from '@/domains/profile/components/ProfileHeader';
@@ -13,31 +14,37 @@ export default function ProfilePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const params = useParams();
+  const { t } = useTranslation('profile');
   const currentUser = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  
+
   // Get userid from URL parameter
   const targetUserId = params.userid as string;
   const isMyProfile = currentUser?.doc_id === targetUserId;
-  
+
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const activeTab = searchParams.get('tab') || 'channels';
-  
+
   // Get profile data via API
   const { data: profileData, isLoading, error } = useUserProfile(targetUserId || '');
 
   // Show not found if no userid provided
   if (!targetUserId) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Profile not found</h1>
-          <p className="text-zinc-400 mb-6">No user ID provided.</p>
+      <div
+        className="min-h-screen bg-black flex items-center justify-center"
+        role="main"
+        aria-label={t('page.notFound')}
+      >
+        <div className="text-center" role="alert" aria-live="assertive">
+          <h1 className="text-2xl font-bold text-white mb-4">{t('page.notFound')}</h1>
+          <p className="text-zinc-400 mb-6">{t('page.notFoundDescription')}</p>
           <button
             onClick={() => router.push('/')}
             className="px-6 py-3 bg-[#EAFD66] text-black rounded-lg font-medium hover:bg-[#d9ec55] transition-colors"
+            aria-label={t('page.goToHome')}
           >
-            Go to Home
+            {t('page.goToHome')}
           </button>
         </div>
       </div>
@@ -47,15 +54,20 @@ export default function ProfilePage() {
   // Redirect if trying to access profile without auth and it's your own profile
   if (!isAuthenticated && isMyProfile) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Sign in required</h1>
-          <p className="text-zinc-400 mb-6">You need to sign in to view your profile.</p>
+      <div
+        className="min-h-screen bg-black flex items-center justify-center"
+        role="main"
+        aria-label={t('page.signInRequired')}
+      >
+        <div className="text-center" role="alert" aria-live="assertive">
+          <h1 className="text-2xl font-bold text-white mb-4">{t('page.signInRequired')}</h1>
+          <p className="text-zinc-400 mb-6">{t('page.signInRequiredDescription')}</p>
           <button
             onClick={() => router.push('/')}
             className="px-6 py-3 bg-[#EAFD66] text-black rounded-lg font-medium hover:bg-[#d9ec55] transition-colors"
+            aria-label={t('page.goToHome')}
           >
-            Go to Home
+            {t('page.goToHome')}
           </button>
         </div>
       </div>
@@ -66,8 +78,12 @@ export default function ProfilePage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-black">
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
-          <div className="animate-pulse">
+        <div
+          className="container mx-auto px-4 py-8 max-w-7xl"
+          role="main"
+          aria-label={t('loading.title')}
+        >
+          <div className="animate-pulse" aria-live="polite" aria-label={t('loading.description')}>
             <div className="flex gap-8">
               <div className="flex-1">
                 <div className="h-32 bg-zinc-800 rounded-xl mb-8" />
@@ -87,15 +103,20 @@ export default function ProfilePage() {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Profile not found</h1>
-          <p className="text-zinc-400 mb-6">This user profile doesn't exist or is private.</p>
+      <div
+        className="min-h-screen bg-black flex items-center justify-center"
+        role="main"
+        aria-label={t('error.title')}
+      >
+        <div className="text-center" role="alert" aria-live="assertive">
+          <h1 className="text-2xl font-bold text-white mb-4">{t('page.profileNotFound')}</h1>
+          <p className="text-zinc-400 mb-6">{t('page.profileNotFoundDescription')}</p>
           <button
             onClick={() => router.push('/')}
             className="px-6 py-3 bg-[#EAFD66] text-black rounded-lg font-medium hover:bg-[#d9ec55] transition-colors"
+            aria-label={t('page.goToHome')}
           >
-            Go to Home
+            {t('page.goToHome')}
           </button>
         </div>
       </div>
@@ -104,35 +125,35 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-black">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div
+        className="container mx-auto px-4 py-8 max-w-7xl"
+        role="main"
+        aria-label={t('page.title')}
+      >
         {/* Mobile: Stack vertically */}
         <div className="block lg:hidden">
           {/* Profile Header */}
-          <ProfileHeader 
+          <ProfileHeader
             userId={targetUserId!}
             profileData={profileData}
             isMyProfile={isMyProfile}
             onEditClick={() => setIsEditModalOpen(true)}
           />
-          
+
           {/* Sidebar on top for mobile */}
           <div className="mt-6">
-            <ProfileSidebar 
+            <ProfileSidebar
               userId={targetUserId!}
               profileData={profileData}
               isMyProfile={isMyProfile}
             />
           </div>
-          
+
           {/* Divider */}
           <div className="border-t border-zinc-800 my-6" />
-          
+
           {/* Profile Tabs */}
-          <ProfileTabs 
-            activeTab={activeTab} 
-            userId={targetUserId!}
-            isMyProfile={isMyProfile}
-          />
+          <ProfileTabs activeTab={activeTab} userId={targetUserId!} isMyProfile={isMyProfile} />
         </div>
 
         {/* Desktop: Side by side */}
@@ -140,27 +161,23 @@ export default function ProfilePage() {
           {/* Main Content */}
           <div className="flex-1 min-w-0">
             {/* Profile Header */}
-            <ProfileHeader 
+            <ProfileHeader
               userId={targetUserId!}
               profileData={profileData}
               isMyProfile={isMyProfile}
               onEditClick={() => setIsEditModalOpen(true)}
             />
-            
+
             {/* Divider */}
             <div className="border-t border-zinc-800 my-6" />
-            
+
             {/* Profile Tabs */}
-            <ProfileTabs 
-              activeTab={activeTab} 
-              userId={targetUserId!}
-              isMyProfile={isMyProfile}
-            />
+            <ProfileTabs activeTab={activeTab} userId={targetUserId!} isMyProfile={isMyProfile} />
           </div>
-          
+
           {/* Sidebar */}
           <div className="w-80 flex-shrink-0">
-            <ProfileSidebar 
+            <ProfileSidebar
               userId={targetUserId!}
               profileData={profileData}
               isMyProfile={isMyProfile}
@@ -168,13 +185,10 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
-      
+
       {/* Edit Modal - Only show for own profile */}
       {isMyProfile && isEditModalOpen && (
-        <ProfileEditModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-        />
+        <ProfileEditModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} />
       )}
     </div>
   );

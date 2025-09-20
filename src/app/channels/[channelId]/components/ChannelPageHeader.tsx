@@ -120,7 +120,9 @@ export function ChannelPageHeader({
             <div className="ml-4">
               <h2 className="text-xl font-semibold text-zinc-300">{channel.name}</h2>
               <div className="flex items-center space-x-3 text-sm text-zinc-400 mt-1">
-                <span>{channel.subscriber_count || 0} {t.ui.subscribers()}</span>
+                <span>
+                  {channel.subscriber_count || 0} {t.ui.subscribers()}
+                </span>
                 <span>•</span>
                 {/* Editors with stacked avatars - Clickable */}
                 {channel.managers && channel.managers.length > 0 ? (
@@ -137,7 +139,9 @@ export function ChannelPageHeader({
                     {channel.managers.length > 5 && (
                       <>
                         <span>•••</span>
-                        <span>{channel.managers.length - 5}+ {t.ui.editors()}</span>
+                        <span>
+                          {channel.managers.length - 5}+ {t.ui.editors()}
+                        </span>
                       </>
                     )}
                     {channel.managers.length <= 5 && (
@@ -193,7 +197,9 @@ export function ChannelPageHeader({
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                     <span className="text-sm">
-                      {subscriptionHook?.isSubscribed ? `${t.actions.unsubscribe()}...` : `${t.actions.subscribe()}...`}
+                      {subscriptionHook?.isSubscribed
+                        ? `${t.actions.unsubscribe()}...`
+                        : `${t.actions.subscribe()}...`}
                     </span>
                   </div>
                 ) : (

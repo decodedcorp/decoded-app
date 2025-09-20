@@ -2,21 +2,24 @@
 
 import React, { useState } from 'react';
 
-import { Button } from '@decoded/ui';
-import { 
-  MdFavorite, 
-  MdFavoriteBorder, 
-  MdReply, 
-  MdEdit, 
-  MdDelete, 
+import { Button, Avatar } from '@decoded/ui';
+import {
+  MdFavorite,
+  MdFavoriteBorder,
+  MdReply,
+  MdEdit,
+  MdDelete,
   MdMoreVert,
   MdThumbDown,
-  MdThumbDownOffAlt
+  MdThumbDownOffAlt,
 } from 'react-icons/md';
 import { CommentResponse } from '@/api/generated/models/CommentResponse';
 import { useUser } from '@/domains/auth/hooks/useAuth';
+import { useCommentTranslation } from '@/lib/i18n/hooks';
+import { useUserProfile } from '@/domains/users/hooks/useUserProfile';
 
 import { useCommentLike, useUpdateComment, useDeleteComment } from '../hooks/useComments';
+import { LoginButton } from '@/shared/components/LoginButton';
 
 import { CommentInput } from './CommentInput';
 
@@ -27,11 +30,11 @@ interface CommentItemProps {
   onReplyCreated?: () => void;
 }
 
-export function CommentItem({ 
-  comment, 
-  contentId, 
+export function CommentItem({
+  comment,
+  contentId,
   isReply = false,
-  onReplyCreated 
+  onReplyCreated,
 }: CommentItemProps) {
   const { user } = useUser();
   const [showReplyInput, setShowReplyInput] = useState(false);
@@ -42,6 +45,10 @@ export function CommentItem({
   const commentLikeMutation = useCommentLike();
   const updateCommentMutation = useUpdateComment();
   const deleteCommentMutation = useDeleteComment();
+  const tc = useCommentTranslation();
+
+  // Get user profile for avatar
+  const { data: userProfile } = useUserProfile(comment.author_id);
 
   // Check if current user is the comment author
   const isAuthor = user?.doc_id === comment.author_id;
@@ -56,11 +63,11 @@ export function CommentItem({
 
     if (diffHours < 1) {
       const diffMinutes = Math.floor(diffMs / (1000 * 60));
-      return diffMinutes < 1 ? 'now' : `${diffMinutes}m`;
+      return diffMinutes < 1 ? tc.time.now() : tc.time.minutesAgo(diffMinutes);
     } else if (diffDays < 1) {
-      return `${diffHours}h`;
+      return tc.time.hoursAgo(diffHours);
     } else if (diffDays < 7) {
-      return `${diffDays}d`;
+      return tc.time.daysAgo(diffDays);
     } else {
       return date.toLocaleDateString();
     }
@@ -68,34 +75,53 @@ export function CommentItem({
 
   // Handle like/dislike actions
   const handleLike = () => {
+    if (!user) {
+      // Show login modal
+      const loginButton = document.querySelector('[data-login-button]') as HTMLButtonElement;
+      if (loginButton) {
+        loginButton.click();
+      }
+      return;
+    }
     commentLikeMutation.mutate({
       commentId: comment.id,
       action: 'like',
-      contentId
+      contentId,
     });
   };
 
   const handleDislike = () => {
+    if (!user) {
+      // Show login modal
+      const loginButton = document.querySelector('[data-login-button]') as HTMLButtonElement;
+      if (loginButton) {
+        loginButton.click();
+      }
+      return;
+    }
     commentLikeMutation.mutate({
       commentId: comment.id,
       action: 'dislike',
-      contentId
+      contentId,
     });
   };
 
   // Handle edit comment
   const handleEdit = () => {
     if (editText.trim() && editText !== comment.text) {
-      updateCommentMutation.mutate({
-        commentId: comment.id,
-        text: editText.trim(),
-        contentId
-      }, {
-        onSuccess: () => {
-          setIsEditing(false);
-          setShowMenu(false);
-        }
-      });
+      updateCommentMutation.mutate(
+        {
+          commentId: comment.id,
+          text: editText.trim(),
+          contentId,
+        },
+        {
+          onSuccess: () => {
+            setIsEditing(false);
+            setShowMenu(false);
+          },
+        },
+      );
     } else {
       setIsEditing(false);
     }
@@ -103,15 +129,18 @@ export function CommentItem({
 
   // Handle delete comment
   const handleDelete = () => {
-    if (window.confirm('Are you sure you want to delete this comment?')) {
-      deleteCommentMutation.mutate({
-        commentId: comment.id,
-        contentId
-      }, {
-        onSuccess: () => {
-          setShowMenu(false);
-        }
-      });
+    if (window.confirm(tc.item.deleteConfirm())) {
+      deleteCommentMutation.mutate(
+        {
+          commentId: comment.id,
+          contentId,
+        },
+        {
+          onSuccess: () => {
+            setShowMenu(false);
+          },
+        },
+      );
     }
   };
 
@@ -124,25 +153,24 @@ export function CommentItem({
   return (
     <div className={`flex space-x-3 ${isReply ? 'text-sm' : ''}`}>
       {/* Avatar */}
-      <div className={`${isReply ? 'w-6 h-6' : 'w-8 h-8'} bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0`}>
-        <span className="text-white font-semibold text-xs">
-          {comment.author_id.charAt(0).toUpperCase()}
-        </span>
-      </div>
+      <Avatar
+        userId={comment.author_id}
+        src={userProfile?.profile_image_url || undefined}
+        size={isReply ? 'sm' : 'md'}
+        className="flex-shrink-0"
+      />
 
       <div className="flex-1 min-w-0">
         {/* Comment header */}
         <div className="flex items-center space-x-2 mb-1">
           <span className="font-medium text-white text-sm truncate">
-            {comment.author_id}
+            {userProfile?.aka || comment.author_id}
           </span>
           <span className="text-xs text-zinc-400 flex-shrink-0">
             {formatDate(comment.created_at)}
           </span>
-          {comment.is_edited && (
-            <span className="text-xs text-zinc-500">(edited)</span>
-          )}
-          
+          {comment.is_edited && <span className="text-xs text-zinc-500">{tc.item.edited()}</span>}
+
           {/* Menu button for author */}
           {isAuthor && (
             <div className="relative ml-auto">
@@ -152,7 +180,7 @@ export function CommentItem({
               >
                 <MdMoreVert className="w-4 h-4 text-zinc-400" />
               </button>
-              
+
               {showMenu && (
                 <div className="absolute right-0 top-full mt-1 bg-zinc-800 border border-zinc-700 rounded-lg shadow-lg py-1 z-10 min-w-[120px]">
                   <button
@@ -163,14 +191,14 @@ export function CommentItem({
                     className="w-full px-3 py-2 text-left text-sm text-zinc-300 hover:bg-zinc-700/50 flex items-center space-x-2"
                   >
                     <MdEdit className="w-4 h-4" />
-                    <span>Edit</span>
+                    <span>{tc.item.edit()}</span>
                   </button>
                   <button
                     onClick={handleDelete}
                     className="w-full px-3 py-2 text-left text-sm text-red-400 hover:bg-zinc-700/50 flex items-center space-x-2"
                   >
                     <MdDelete className="w-4 h-4" />
-                    <span>Delete</span>
+                    <span>{tc.item.delete()}</span>
                   </button>
                 </div>
               )}
@@ -184,7 +212,7 @@ export function CommentItem({
             <textarea
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
-              className="w-full p-2 text-sm bg-zinc-800/50 border border-zinc-600 rounded-lg text-white resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full p-2 text-sm bg-zinc-800/50 border border-zinc-600 rounded-lg text-white resize-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               rows={2}
               maxLength={1000}
             />
@@ -198,23 +226,23 @@ export function CommentItem({
                   }}
                   className="px-3 py-1 text-xs text-zinc-400 hover:text-white transition-colors"
                 >
-                  Cancel
+                  {tc.input.cancel()}
                 </button>
                 <Button
                   onClick={handleEdit}
-                  disabled={!editText.trim() || editText === comment.text || updateCommentMutation.isPending}
+                  disabled={
+                    !editText.trim() || editText === comment.text || updateCommentMutation.isPending
+                  }
                   variant="primary"
                   size="sm"
                 >
-                  {updateCommentMutation.isPending ? 'Saving...' : 'Save'}
+                  {updateCommentMutation.isPending ? tc.input.posting() : tc.input.save()}
                 </Button>
               </div>
             </div>
           </div>
         ) : (
-          <p className="text-zinc-200 mb-2 leading-relaxed whitespace-pre-wrap">
-            {comment.text}
-          </p>
+          <p className="text-zinc-200 mb-2 leading-relaxed whitespace-pre-wrap">{comment.text}</p>
         )}
 
         {/* Comment actions */}
@@ -243,20 +271,30 @@ export function CommentItem({
             {/* Reply button (only for top-level comments) */}
             {!isReply && (
               <button
-                onClick={() => setShowReplyInput(!showReplyInput)}
+                onClick={() => {
+                  if (!user) {
+                    // Show login modal
+                    const loginButton = document.querySelector(
+                      '[data-login-button]',
+                    ) as HTMLButtonElement;
+                    if (loginButton) {
+                      loginButton.click();
+                    }
+                    return;
+                  }
+                  setShowReplyInput(!showReplyInput);
+                }}
                 className="flex items-center space-x-1 text-zinc-400 hover:text-white transition-colors"
               >
                 <MdReply className="w-4 h-4" />
-                <span>Reply</span>
+                <span>{tc.item.reply()}</span>
               </button>
             )}
 
             {/* Reply count */}
-            {!isReply && comment.replies_count && comment.replies_count > 0 && (
-              <span className="text-zinc-500">
-                {comment.replies_count} {comment.replies_count === 1 ? 'reply' : 'replies'}
-              </span>
-            )}
+            {!isReply && comment.replies_count && comment.replies_count > 0 ? (
+              <span className="text-zinc-500">{tc.item.replies(comment.replies_count)}</span>
+            ) : null}
           </div>
         )}
 
@@ -267,7 +305,7 @@ export function CommentItem({
               contentId={contentId}
               parentCommentId={comment.id}
               onCommentCreated={handleReplyCreated}
-              placeholder="Write a reply..."
+              placeholder={tc.input.replyPlaceholder()}
               compact
             />
           </div>

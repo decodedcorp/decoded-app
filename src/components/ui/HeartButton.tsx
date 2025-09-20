@@ -1,6 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
+import { LoadingSpinner } from '@/domains/channels/components/common/LoadingStates';
 
 // 좋아요 수 포맷팅 함수
 const formatCount = (count: number): string => {
@@ -47,24 +48,9 @@ const HeartIcon = ({ className }: { className: string }) => (
   </svg>
 );
 
-// 로딩 스피너 컴포넌트
-const LoadingSpinner = ({ size }: { size: 'sm' | 'md' | 'lg' }) => {
-  const spinnerSizes = {
-    sm: 'w-3 h-3',
-    md: 'w-4 h-4',
-    lg: 'w-5 h-5',
-  };
-
-  return (
-    <div
-      className={`${spinnerSizes[size]} border-2 border-white border-t-transparent rounded-full animate-spin`}
-    />
-  );
-};
-
 /**
  * 하트 모양의 좋아요 버튼 컴포넌트
- * 
+ *
  * @example
  * ```tsx
  * <HeartButton
@@ -115,14 +101,14 @@ export const HeartButton = memo<HeartButtonProps>(
     const handleClick = (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      
+
       if (!isLoading && !disabled) {
         onLike();
       }
     };
 
     // ARIA 라벨
-    const ariaLabel = isLiked 
+    const ariaLabel = isLiked
       ? `Unlike this content. Currently has ${likeCount} likes.`
       : `Like this content. Currently has ${likeCount} likes.`;
 
@@ -145,7 +131,7 @@ export const HeartButton = memo<HeartButtonProps>(
       >
         {/* 로딩 상태 */}
         {isLoading ? (
-          <LoadingSpinner size={size} />
+          <LoadingSpinner size={size} className="border-white border-t-transparent" />
         ) : (
           <>
             {/* 하트 아이콘 */}
@@ -153,13 +139,14 @@ export const HeartButton = memo<HeartButtonProps>(
               className={`
                 ${styles.icon} 
                 transition-all duration-200
-                ${isLiked 
-                  ? 'text-red-500 fill-red-500 group-hover:scale-110' 
-                  : 'text-white/80 fill-none group-hover:text-red-400 group-hover:fill-red-400/20'
+                ${
+                  isLiked
+                    ? 'text-red-500 fill-red-500 group-hover:scale-110'
+                    : 'text-white/80 fill-none group-hover:text-red-400 group-hover:fill-red-400/20'
                 }
               `}
             />
-            
+
             {/* 좋아요 수 */}
             {showCount && likeCount > 0 && (
               <span className={`text-white font-medium ${styles.text}`}>

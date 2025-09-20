@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { Dialog, DialogContent } from '@decoded/ui';
+import { SimpleModal } from '@/lib/components/ui/modal/SimpleModal';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 import { LoginForm } from './LoginForm';
@@ -26,8 +26,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-full max-w-md mx-4 sm:mx-auto bg-gradient-to-br from-zinc-900/95 to-black/95 border border-white/10 backdrop-blur-xl max-h-[90vh] overflow-y-auto">
+    <SimpleModal isOpen={isOpen} onClose={onClose}>
+      <div className="bg-gradient-to-br from-zinc-900/95 to-black/95 border border-white/10 backdrop-blur-xl px-8 py-10 sm:px-10 sm:py-12">
         {/* 상단 섹션 (로고 + 제목) */}
         <div className="flex flex-col items-center mb-6 sm:mb-8">
           <div className="text-2xl sm:text-3xl font-bold text-[#EAFD66] tracking-tight drop-shadow mb-2">
@@ -59,7 +59,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
             {t.login.privacyPolicy()}
           </a>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </SimpleModal>
   );
 };

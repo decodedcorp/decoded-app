@@ -1,0 +1,305 @@
+---
+description: 'Mobile optimization rules for UIKit + UX best practices'
+globs: ['src/**/*.{ts,tsx,js,jsx}', 'src/app/**/*.{ts,tsx}', 'next.config.ts', 'tailwind.config.ts']
+alwaysApply: fileMatch
+rules:
+  enforceViewportMeta: true
+  enforceSafeAreaPadding: true
+  enforceTouchTargets: true
+  enforceDynamicViewportUnits: true
+  enforceImageOptimization: true
+  enforceFormOptimization: true
+  enforceScrollOptimization: true
+  enforceGestureOptimization: true
+  enforceAccessibilityOptimization: true
+  enforcePerformanceOptimization: true
+reviewPrompts:
+  - 'Is the viewport meta tag properly configured with viewport-fit=cover?'
+  - 'Are safe area insets used for iOS notch/Android edge handling?'
+  - 'Are touch targets at least 44px (iOS) or 48dp (Android) in size?'
+  - 'Are dynamic viewport units (dvh/svh/lvh) used instead of vh for mobile?'
+  - 'Are images optimized with width/height, srcset, and fetchpriority?'
+  - 'Are form inputs using inputmode, enterkeyhint, and autocomplete?'
+  - 'Is scroll performance optimized with passive listeners and content-visibility?'
+  - 'Are custom gestures avoiding conflicts with system edge gestures?'
+  - 'Is accessibility maintained with proper contrast ratios and screen reader support?'
+  - 'Are Core Web Vitals targets met (LCP ≤ 2.5s, INP ≤ 200ms, CLS < 0.1)?'
+---
+
+# 📱 Mobile Optimization Rules
+
+Essential mobile optimization practices for UIKit + UX excellence in the Decoded App project.
+
+## ✅ Core Rules
+
+### 1. Viewport & Safe Area Configuration
+
+**Always use proper viewport meta tag with safe area support:**
+
+```tsx
+// ✅ DO: Next.js metadata approach
+export const metadata = {
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    viewportFit: 'cover'
+  }
+};
+
+// ✅ DO: Safe area padding
+:root {
+  padding-left: max(env(safe-area-inset-left), 16px);
+  padding-right: max(env(safe-area-inset-right), 16px);
+  padding-top: max(env(safe-area-inset-top), 16px);
+  padding-bottom: max(env(safe-area-inset-bottom), 16px);
+}
+```
+
+### 2. Dynamic Viewport Units
+
+**Use dynamic viewport units for mobile height handling:**
+
+```css
+/* ✅ DO: Dynamic viewport units */
+.fullscreen {
+  min-height: 100dvh; /* Dynamic viewport height */
+  height: 100svh;     /* Small viewport height */
+}
+
+/* ❌ DON'T: Static viewport units on mobile */
+.fullscreen {
+  height: 100vh; /* Causes issues with mobile address bar */
+}
+```
+
+### 3. Touch Target Optimization
+
+**Ensure proper touch target sizes:**
+
+```tsx
+// ✅ DO: Minimum touch targets
+const TouchButton = () => (
+  <button className="min-h-[44px] min-w-[44px] p-3">
+    {/* iOS: 44pt minimum, Android: 48dp recommended */}
+  </button>
+);
+
+// ✅ DO: Adequate spacing between touch targets
+<div className="space-y-4"> {/* 16px minimum spacing */}
+  <TouchButton />
+  <TouchButton />
+</div>
+```
+
+### 4. Image Optimization
+
+**Optimize images for mobile performance:**
+
+```tsx
+// ✅ DO: Complete image optimization
+<Image
+  src="/hero-800.jpg"
+  srcset="/hero-800.jpg 800w, /hero-1200.jpg 1200w, /hero-1600.jpg 1600w"
+  sizes="(min-width: 430px) 430px, 100vw"
+  width={1200}
+  height={800}
+  alt="Hero image"
+  fetchpriority="high" // For LCP images
+  loading="lazy"       // For below-fold images
+  className="aspect-[3/2] object-cover" // Prevent CLS
+/>
+```
+
+### 5. Form UX Optimization
+
+**Enhance mobile form experience:**
+
+```tsx
+// ✅ DO: Mobile-optimized form inputs
+<input
+  type="text"
+  inputMode="numeric"
+  enterKeyHint="done"
+  autoComplete="one-time-code"
+  className="text-base" // Prevent zoom on iOS
+/>
+
+<input
+  type="email"
+  inputMode="email"
+  enterKeyHint="next"
+  autoComplete="email"
+  className="text-base"
+/>
+
+<input
+  type="tel"
+  inputMode="tel"
+  enterKeyHint="done"
+  autoComplete="tel"
+  className="text-base"
+/>
+```
+
+### 6. Scroll Performance
+
+**Optimize scrolling for mobile:**
+
+```tsx
+// ✅ DO: Passive scroll listeners
+useEffect(() => {
+  const handleScroll = () => {
+    // Scroll logic
+  };
+  
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  
+  return () => {
+    window.removeEventListener('scroll', handleScroll);
+  };
+}, []);
+
+// ✅ DO: Content visibility for long lists
+.long-list {
+  content-visibility: auto;
+  contain-intrinsic-size: 1000px;
+}
+```
+
+### 7. Gesture Optimization
+
+**Avoid conflicts with system gestures:**
+
+```css
+/* ✅ DO: Proper touch action */
+.swipe-container {
+  touch-action: pan-x pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ✅ DO: Prevent zoom where needed */
+.no-zoom {
+  touch-action: manipulation;
+  user-scalable: no;
+}
+
+/* ❌ DON'T: Custom edge gestures that conflict with system back */
+.edge-swipe {
+  /* Avoid custom left/right edge gestures */
+}
+```
+
+### 8. Accessibility & Contrast
+
+**Maintain accessibility standards:**
+
+```css
+/* ✅ DO: Proper contrast ratios */
+.text-primary {
+  color: #000000; /* 4.5:1 contrast on white background */
+}
+
+.text-secondary {
+  color: #666666; /* 3:1 contrast for UI elements */
+}
+
+/* ✅ DO: Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+```
+
+### 9. Performance Targets
+
+**Meet Core Web Vitals on mobile:**
+
+```typescript
+// ✅ DO: Performance monitoring
+const PERFORMANCE_TARGETS = {
+  LCP: 2500,    // Largest Contentful Paint ≤ 2.5s
+  INP: 200,     // Interaction to Next Paint ≤ 200ms  
+  CLS: 0.1,     // Cumulative Layout Shift < 0.1
+  FCP: 1800,    // First Contentful Paint ≤ 1.8s
+};
+
+// ✅ DO: LCP optimization
+const HeroImage = () => (
+  <Image
+    src="/hero.jpg"
+    priority
+    fetchpriority="high"
+    width={800}
+    height={600}
+    alt="Hero"
+  />
+);
+```
+
+### 10. Mobile-Specific Layout
+
+**Responsive grid and container strategies:**
+
+```css
+/* ✅ DO: Mobile-first responsive grid */
+.grid {
+  display: grid;
+  gap: clamp(8px, 2.5vw, 12px);
+  grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+}
+
+/* ✅ DO: Container queries for cards */
+@container (inline-size < 380px) {
+  .card {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ✅ DO: Mobile container max-width */
+.mobile-container {
+  max-width: 430px; /* Optimal for modern phones */
+  margin: 0 auto;
+}
+```
+
+## 🚫 Anti-Patterns
+
+### Don't Use These Patterns
+
+```tsx
+// ❌ DON'T: Static viewport units
+<div style={{ height: '100vh' }} />
+
+// ❌ DON'T: Small touch targets
+<button className="h-6 w-6" />
+
+// ❌ DON'T: Missing image dimensions
+<Image src="/image.jpg" alt="Image" />
+
+// ❌ DON'T: Non-optimized forms
+<input type="text" />
+
+// ❌ DON'T: Blocking scroll listeners
+window.addEventListener('scroll', handleScroll); // Missing passive: true
+```
+
+## 📋 Mobile Optimization Checklist
+
+Before deploying mobile features, verify:
+
+- [ ] Viewport meta tag includes `viewport-fit=cover`
+- [ ] Safe area insets are applied with `env(safe-area-inset-*)`
+- [ ] Dynamic viewport units (`dvh`, `svh`, `lvh`) are used
+- [ ] Touch targets are minimum 44px (iOS) or 48dp (Android)
+- [ ] Images have `width`, `height`, `srcset`, and `sizes` attributes
+- [ ] Forms use `inputmode`, `enterkeyhint`, and `autocomplete`
+- [ ] Scroll listeners use `{ passive: true }`
+- [ ] Custom gestures don't conflict with system back gesture
+- [ ] Contrast ratios meet WCAG AA standards (4.5:1 text, 3:1 UI)
+- [ ] Core Web Vitals targets are met (LCP ≤ 2.5s, INP ≤ 200ms, CLS < 0.1)
+
+---
+
+Follow these rules to ensure excellent mobile user experience across all devices and platforms.

@@ -61,29 +61,34 @@ export function ChannelSelectionStep() {
   }, []);
 
   return (
-    <div className="space-y-6">
-      {/* 헤더 */}
-      <div className="text-center">
-        <h3 className="text-xl font-semibold text-white mb-2">
-          {t.globalContentUpload.channelSelection.title()}
-        </h3>
-        <p className="text-gray-400 text-sm">{t.globalContentUpload.channelSelection.subtitle()}</p>
+    <div className="h-full flex flex-col">
+      {/* 스크롤 가능한 콘텐츠 영역 */}
+      <div className="flex-1 overflow-y-auto space-y-6 min-h-0">
+        {/* 헤더 */}
+        <div className="text-center">
+          <h3 className="text-xl font-semibold text-white mb-2">
+            {t.globalContentUpload.channelSelection.title()}
+          </h3>
+          <p className="text-gray-400 text-sm">
+            {t.globalContentUpload.channelSelection.subtitle()}
+          </p>
+        </div>
+
+        {/* 채널 검색 */}
+        <ChannelSearchComponent
+          onSearch={handleSearch}
+          channels={channels}
+          isLoading={isSearchLoading}
+          error={searchError}
+          onChannelSelect={handleChannelSelect}
+        />
+
+        {/* 최근 사용 채널 목록 */}
+        <RecentChannelsList onChannelSelect={handleChannelSelect} />
       </div>
 
-      {/* 채널 검색 */}
-      <ChannelSearchComponent
-        onSearch={handleSearch}
-        channels={channels}
-        isLoading={isSearchLoading}
-        error={searchError}
-        onChannelSelect={handleChannelSelect}
-      />
-
-      {/* 최근 사용 채널 목록 */}
-      <RecentChannelsList onChannelSelect={handleChannelSelect} />
-
-      {/* 새 채널 생성 버튼 */}
-      <div className="pt-4 border-t border-zinc-700">
+      {/* 하단 고정 새 채널 생성 버튼 */}
+      <div className="flex-shrink-0 pt-4 border-t border-zinc-700">
         <button
           onClick={handleCreateNewChannel}
           className="w-full p-4 bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 rounded-lg transition-colors flex items-center justify-center gap-3 text-white"

@@ -32,7 +32,7 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
 
   // Translation hooks
   const { states } = useChannelTranslation();
-  
+
   // 채널 모달 스토어
   const openChannelModal = useChannelModalStore((state) => state.openModal);
 
@@ -69,7 +69,7 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
   // 로딩 상태 렌더링
   if (isLoading) {
     return (
-      <div className={`relative h-full overflow-y-auto ${className}`}>
+      <div className={`relative h-full overflow-y-auto pt-[var(--header-h)] ${className}`}>
         <LoadingState title={states.searching()} />
       </div>
     );
@@ -78,11 +78,8 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
   // 에러 상태 렌더링
   if (error) {
     return (
-      <div className={`relative h-full overflow-y-auto ${className}`}>
-        <ErrorState
-          title={states.loadError()}
-          subtitle={states.loadErrorSubtitle()}
-        />
+      <div className={`relative h-full overflow-y-auto pt-[var(--header-h)] ${className}`}>
+        <ErrorState title={states.loadError()} subtitle={states.loadErrorSubtitle()} />
       </div>
     );
   }
@@ -90,7 +87,7 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
   // 채널이 없는 경우
   if (!channels.length) {
     return (
-      <div className={`relative h-full overflow-y-auto ${className}`}>
+      <div className={`relative h-full overflow-y-auto pt-[var(--header-h)] ${className}`}>
         <EmptyState title={states.empty()} subtitle={states.emptySubtitle()} />
       </div>
     );
@@ -103,35 +100,39 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
   return (
     <div className={`relative h-full overflow-hidden bg-black ${className}`}>
       <div className="h-full overflow-y-auto overflow-x-hidden">
-      <div className="px-4 md:px-8 pb-12">
-        {showOrganizedSections ? (
-          // Organized sections view (default explore experience)
-          <>
-            {/* Trending Contents Section */}
-            <TrendingContentsSection className="mt-8 mb-16" />
+        <div className="pb-12">
+          {showOrganizedSections ? (
+            // Organized sections view (default explore experience)
+            <>
+              {/* Trending Contents Section */}
+              <TrendingContentsSection className="mt-8 mb-16" />
 
-            {/* Trending Channels Section */}
-            <TrendingChannelsSection className="mb-16" />
+              {/* Trending Channels Section */}
+              <TrendingChannelsSection className="mb-16" />
 
-            {/* All Channels Section */}
-            <DiscoverSection channels={channels} onChannelClick={handleChannelClick} className="" />
-          </>
-        ) : (
-          // Filtered grid view
-          <div className="mt-8">
-            <ExploreGrid
-              channels={channels}
-              filters={filters}
-              onChannelClick={handleChannelClick}
-            />
-          </div>
-        )}
-      </div>
+              {/* All Channels Section */}
+              <DiscoverSection
+                channels={channels}
+                onChannelClick={handleChannelClick}
+                className=""
+              />
+            </>
+          ) : (
+            // Filtered grid view
+            <div className="mt-8">
+              <ExploreGrid
+                channels={channels}
+                filters={filters}
+                onChannelClick={handleChannelClick}
+              />
+            </div>
+          )}
+        </div>
 
-      {/* Global Modals */}
-      <ChannelModal />
-      <ContentModal />
-      <AddChannelModal />
+        {/* Global Modals */}
+        <ChannelModal />
+        <ContentModal />
+        <AddChannelModal />
       </div>
     </div>
   );

@@ -15,10 +15,12 @@ import { getThumbnailImageUrl } from '@/lib/utils/imageProxy';
 import type { TrendingContentItem } from '@/api/generated/models/TrendingContentItem';
 
 import { useTrendingContents } from '../hooks/useTrendingContents';
+import { DEFAULT_CHANNEL_ID } from '../data/channelCardsProvider';
 
 import { PostCardSkeleton } from './PostCardSkeleton';
 import { InfiniteScrollLoader } from './InfiniteScrollLoader';
 import { PostCard } from './PostCard';
+import { FeedGrid, FeedGridItem } from '@/components/FeedGrid/FeedGrid';
 
 type SortOption = 'hot' | 'new' | 'top';
 
@@ -83,7 +85,8 @@ export const MainFeed = React.memo(function MainFeed() {
     if (contentDetail && !isContentLoading) {
       // API 응답을 ContentItem으로 변환
       const contentItem = convertApiResponseToContentItem(contentDetail);
-      openModal(contentItem);
+      // channelId를 전달하여 URL 업데이트
+      openModal(contentItem, DEFAULT_CHANNEL_ID);
       // 모달이 열린 후 선택된 콘텐츠 ID 초기화
       setSelectedContentId(null);
     }
@@ -321,7 +324,7 @@ export const MainFeed = React.memo(function MainFeed() {
       author: item.provider_id || 'anonymous',
       authorId: item.provider_id || 'anonymous',
       timeAgo: 'Trending', // Trending 콘텐츠임을 명시
-      upvotes: 0, // 실제 데이터가 없으므로 0으로 설정
+      pins: 0, // 실제 데이터가 없으므로 0으로 설정
       comments: 0, // 실제 데이터가 없으므로 0으로 설정
       thumbnail,
       contentType: mapContentType(item.type) || ('link' as const),
@@ -376,35 +379,37 @@ export const MainFeed = React.memo(function MainFeed() {
 
   return (
     <div className="w-full min-h-screen bg-black">
-      <div
-        className="max-w-4xl mx-auto px-4 py-6"
-        style={{
-          scrollBehavior: 'smooth',
-          willChange: 'scroll-position',
-        }}
-      >
-        {/* 피드 헤더 */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-white text-2xl font-bold mb-1">{t.feed.section.header()}</h1>
-              <p className="text-gray-400 text-sm">{t.feed.section.sub()}</p>
-            </div>
+      {/* 메인 피드 (primary) - 기본 여백 유지 */}
+      <section data-role="primary-feed" className="layout-edge">
+        <div
+          className="w-full py-6"
+          style={{
+            scrollBehavior: 'smooth',
+            willChange: 'scroll-position',
+          }}
+        >
+          {/* 피드 헤더 */}
+          <div className="mb-8 max-w-4xl mx-auto">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h1 className="text-white text-2xl font-bold mb-1">{t.feed.section.header()}</h1>
+                <p className="text-gray-400 text-sm">{t.feed.section.sub()}</p>
+              </div>
 
-            {/* 정렬 옵션 */}
-            <div className="flex gap-1 bg-zinc-900 rounded-lg p-1 border border-zinc-700">
-              {sortOptions.map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => {
-                    if (activeSort !== option.value) {
-                      setActiveSort(option.value);
-                      // 정렬 변경 시 쿼리 리프레시하여 새로운 데이터 로드
-                      currentQuery.refetch();
-                    }
-                  }}
-                  title={option.tooltip}
-                  className={`
+              {/* 정렬 옵션 */}
+              <div className="flex gap-1 bg-zinc-900 rounded-lg p-1 border border-zinc-700">
+                {sortOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => {
+                      if (activeSort !== option.value) {
+                        setActiveSort(option.value);
+                        // 정렬 변경 시 쿼리 리프레시하여 새로운 데이터 로드
+                        currentQuery.refetch();
+                      }
+                    }}
+                    title={option.tooltip}
+                    className={`
                     px-4 py-2 text-sm rounded-md transition-all duration-200 font-medium
                     ${
                       activeSort === option.value
@@ -412,146 +417,185 @@ export const MainFeed = React.memo(function MainFeed() {
                         : 'text-gray-400 hover:text-white hover:bg-zinc-800'
                     }
                   `}
-                >
-                  {option.label}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 메타라인 */}
+            <div className="mb-4">
+              <div className="text-xs text-gray-500">
+                {t.feed.meta.line({
+                  range: t.feed.filter.today(),
+                  sort:
+                    activeSort === 'hot'
+                      ? t.feed.sort.hot()
+                      : activeSort === 'new'
+                      ? t.feed.sort.new()
+                      : t.feed.sort.top(),
+                  count: feedData.length,
+                })}
+              </div>
+            </div>
+
+            {/* 필터/서브 옵션 */}
+            <div className="flex items-center gap-3 text-sm">
+              <span className="text-gray-400">{t.feed.filter.by()}</span>
+              <div className="flex gap-2">
+                <button className="px-3 py-1.5 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-md border border-zinc-700 transition-colors">
+                  {t.feed.filter.today()}
                 </button>
-              ))}
-            </div>
-          </div>
-
-          {/* 메타라인 */}
-          <div className="mb-4">
-            <div className="text-xs text-gray-500">
-              {t.feed.meta.line({
-                range: t.feed.filter.today(),
-                sort: activeSort === 'hot' ? t.feed.sort.hot() : activeSort === 'new' ? t.feed.sort.new() : t.feed.sort.top(),
-                count: feedData.length,
-              })}
-            </div>
-          </div>
-
-          {/* 필터/서브 옵션 */}
-          <div className="flex items-center gap-3 text-sm">
-            <span className="text-gray-400">{t.feed.filter.by()}</span>
-            <div className="flex gap-2">
-              <button className="px-3 py-1.5 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-md border border-zinc-700 transition-colors">
-                {t.feed.filter.today()}
-              </button>
-              <button className="px-3 py-1.5 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-md border border-zinc-700 transition-colors">
-                {t.feed.filter.thisWeek()}
-              </button>
-              <button className="px-3 py-1.5 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-md border border-zinc-700 transition-colors">
-                {t.feed.filter.allTime()}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* 초기 로딩 상태 - 최적화된 스켈레톤 */}
-        {currentQuery.isLoading && !currentQuery.data && <PostCardSkeleton count={5} />}
-
-        {/* 에러 상태 */}
-        {currentQuery.isError && !currentQuery.data && (
-          <div className="text-center py-8">
-            <div className="text-red-400 mb-2">{t.feed.failedToLoadPosts()}</div>
-            <button
-              onClick={() => currentQuery.refetch()}
-              className="px-4 py-2 bg-zinc-800 text-white rounded hover:bg-zinc-700 transition-colors"
-            >
-              {t.feed.tryAgain()}
-            </button>
-          </div>
-        )}
-
-        {/* 포스트 목록 */}
-        {(!currentQuery.isLoading || currentQuery.data) && !currentQuery.isError && (
-          <div className="space-y-6" style={{ containIntrinsicSize: 'auto 500px' }}>
-            {feedData.length === 0 && !currentQuery.isLoading ? (
-              <div className="text-center py-12">
-                <div className="mb-4">
-                  <MailOpen className="w-16 h-16 mx-auto text-gray-600" />
-                </div>
-                <div className="text-gray-400 text-lg mb-2">{t.feed.noPostsFound()}</div>
-                <div className="text-gray-600 text-sm mb-4">{t.feed.tryDifferentFilter()}</div>
-                <button className="px-4 py-2 bg-[#eafd66] text-black rounded hover:bg-[#d4e85a] transition-colors font-medium">
-                  {t.feed.exploreChannelsCta()}
+                <button className="px-3 py-1.5 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-md border border-zinc-700 transition-colors">
+                  {t.feed.filter.thisWeek()}
+                </button>
+                <button className="px-3 py-1.5 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-md border border-zinc-700 transition-colors">
+                  {t.feed.filter.allTime()}
                 </button>
               </div>
-            ) : (
-              feedData.map((item: TrendingContentItem, index: number) => {
-                const post = transformContentItem(item, index);
-                const isSelected = selectedContentId === item.id;
-                return (
-                  <PostCard
-                    key={`${item.id}-${index}`}
-                    id={post.id}
-                    title={post.title}
-                    description={post.description}
-                    channel={post.channel}
-                    channelId={post.channelId}
-                    channelThumbnail={channelThumbnails[item.channel_id]}
-                    author={post.author}
-                    authorId={post.authorId}
-                    userAvatar={userAvatars[item.provider_id]}
-                    userAka={userAkas[item.provider_id]}
-                    timeAgo={post.timeAgo}
-                    upvotes={post.upvotes}
-                    comments={post.comments}
-                    thumbnail={post.thumbnail}
-                    contentType={post.contentType}
-                    badge={post.badge}
-                    onPostClick={() => {
-                      // 콘텐츠 ID를 설정하여 상세 정보 가져오기
-                      setSelectedContentId(item.id);
+            </div>
+          </div>
+
+          {/* 초기 로딩 상태 - 최적화된 스켈레톤 */}
+          {currentQuery.isLoading && !currentQuery.data && <PostCardSkeleton count={5} />}
+
+          {/* 에러 상태 */}
+          {currentQuery.isError && !currentQuery.data && (
+            <div className="text-center py-8">
+              <div className="text-red-400 mb-2">{t.feed.failedToLoadPosts()}</div>
+              <button
+                onClick={() => currentQuery.refetch()}
+                className="px-4 py-2 bg-zinc-800 text-white rounded hover:bg-zinc-700 transition-colors"
+              >
+                {t.feed.tryAgain()}
+              </button>
+            </div>
+          )}
+
+          {/* 포스트 목록 - FeedGrid 사용 */}
+          {(!currentQuery.isLoading || currentQuery.data) && !currentQuery.isError && (
+            <>
+              {feedData.length === 0 && !currentQuery.isLoading ? (
+                <div className="text-center py-12">
+                  <div className="mb-4">
+                    <MailOpen className="w-16 h-16 mx-auto text-gray-600" />
+                  </div>
+                  <div className="text-gray-400 text-lg mb-2">{t.feed.noPostsFound()}</div>
+                  <div className="text-gray-600 text-sm mb-4">{t.feed.tryDifferentFilter()}</div>
+                  <button className="px-4 py-2 bg-[#eafd66] text-black rounded hover:bg-[#d4e85a] transition-colors font-medium">
+                    {t.feed.exploreChannelsCta()}
+                  </button>
+                </div>
+              ) : (
+                <div className="max-w-4xl mx-auto">
+                  <FeedGrid
+                    columns={{
+                      mobile: 1,
+                      tablet: 1,
+                      desktop: 1,
+                      wide: 1,
                     }}
-                    // 로딩 상태 표시
-                    className={
-                      isSelected && isContentLoading ? 'opacity-50 pointer-events-none' : ''
-                    }
-                  />
-                );
-              })
-            )}
-          </div>
-        )}
-
-        {/* 콘텐츠 로딩 오버레이 */}
-        {isContentLoading && selectedContentId && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-zinc-900 rounded-lg p-6 flex items-center gap-3">
-              <div className="w-6 h-6 border-2 border-[#eafd66] border-t-transparent rounded-full animate-spin"></div>
-              <span className="text-white">{t.feed.loadingContent()}</span>
-            </div>
-          </div>
-        )}
-
-        {/* 무한스크롤 로더 */}
-        {feedData.length > 0 && (
-          <InfiniteScrollLoader
-            hasNextPage={currentQuery.hasNextPage || false}
-            isFetchingNextPage={currentQuery.isFetchingNextPage}
-            fetchNextPage={currentQuery.fetchNextPage}
-            error={currentQuery.error}
-            onRetry={() => currentQuery.refetch()}
-            className="mt-12"
-          />
-        )}
-
-        {/* 포스트 수 표시 */}
-        {feedData.length > 0 && (
-          <div className="text-center mt-6">
-            <div className="text-xs text-gray-500">
-              {t.feed.showingPosts({ count: feedData.length })}
-              {currentQuery.data?.pages?.[0] && (currentQuery.data.pages[0] as any)?.totalCount && (
-                <span>
-                  {' '}
-                  {t.feed.of({ total: (currentQuery.data.pages[0] as any).totalCount })}
-                </span>
+                    className="mt-6"
+                  >
+                    {feedData.map((item: TrendingContentItem, index: number) => {
+                      const post = transformContentItem(item, index);
+                      const isSelected = selectedContentId === item.id;
+                      return (
+                        <FeedGridItem key={`${item.id}-${index}`}>
+                          <PostCard
+                            id={post.id}
+                            title={post.title}
+                            description={post.description}
+                            channel={post.channel}
+                            channelId={post.channelId}
+                            channelThumbnail={channelThumbnails[item.channel_id]}
+                            author={post.author}
+                            authorId={post.authorId}
+                            userAvatar={userAvatars[item.provider_id]}
+                            userAka={userAkas[item.provider_id]}
+                            timeAgo={post.timeAgo}
+                            pins={post.pins}
+                            comments={post.comments}
+                            thumbnail={post.thumbnail}
+                            // TODO: 실제 데이터에서 가져와야 함
+                            // 임시로 다양한 aspect ratio 테스트를 위한 값
+                            mediaWidth={[800, 1200, 1600, 2000, 2400][index % 5]} // 다양한 너비
+                            mediaHeight={[600, 800, 1200, 1500, 1800][index % 5]} // 다양한 높이
+                            blurDataURL={undefined}
+                            contentType={post.contentType}
+                            badge={post.badge}
+                            onPostClick={() => {
+                              // 콘텐츠 ID를 설정하여 상세 정보 가져오기
+                              setSelectedContentId(item.id);
+                            }}
+                            // 로딩 상태 표시
+                            className={
+                              isSelected && isContentLoading ? 'opacity-50 pointer-events-none' : ''
+                            }
+                          />
+                        </FeedGridItem>
+                      );
+                    })}
+                  </FeedGrid>
+                </div>
               )}
+            </>
+          )}
+
+          {/* 콘텐츠 로딩 오버레이 */}
+          {isContentLoading && selectedContentId && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+              <div className="bg-zinc-900 rounded-lg p-6 flex items-center gap-3">
+                <div className="w-6 h-6 border-2 border-[#eafd66] border-t-transparent rounded-full animate-spin"></div>
+                <span className="text-white">{t.feed.loadingContent()}</span>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+
+          {/* 무한스크롤 로더 */}
+          {feedData.length > 0 && (
+            <div className="max-w-4xl mx-auto">
+              <InfiniteScrollLoader
+                hasNextPage={currentQuery.hasNextPage || false}
+                isFetchingNextPage={currentQuery.isFetchingNextPage}
+                fetchNextPage={currentQuery.fetchNextPage}
+                error={currentQuery.error}
+                onRetry={() => currentQuery.refetch()}
+                className="mt-12"
+              />
+            </div>
+          )}
+
+          {/* 포스트 수 표시 */}
+          {feedData.length > 0 && (
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mt-6">
+                <div className="text-xs text-gray-500">
+                  {t.feed.showingPosts({ count: feedData.length })}
+                  {currentQuery.data?.pages?.[0] &&
+                    (currentQuery.data.pages[0] as any)?.totalCount && (
+                      <span>
+                        {' '}
+                        {t.feed.of({ total: (currentQuery.data.pages[0] as any).totalCount })}
+                      </span>
+                    )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* 보조 섹션들 (dense) - 향후 추가 시 거의 무여백 적용 */}
+      {/*
+      <section data-role="secondary-grid" className="layout-edge--dense">
+        <SecondaryGrid />
+      </section>
+      <section data-role="recommend" className="px-[var(--edge-x-dense)]">
+        <RecommendList />
+      </section>
+      */}
     </div>
   );
 });

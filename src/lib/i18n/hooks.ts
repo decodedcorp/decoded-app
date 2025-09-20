@@ -1,11 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 // Re-export centralized hooks for consistency
-export { 
-  useCommonTranslation, 
-  useLanguageSwitch, 
-  useLocaleStatus 
-} from './centralizedHooks';
+export { useCommonTranslation, useLanguageSwitch, useLocaleStatus } from './centralizedHooks';
 
 export const useAuthTranslation = () => {
   const { t } = useTranslation('auth');
@@ -318,6 +314,140 @@ export const useFormsTranslation = () => {
       uploadThumbnail: () => t('media.uploadThumbnail'),
       bannerPreview: () => t('media.bannerPreview'),
       thumbnailPreview: () => t('media.thumbnailPreview'),
+    },
+  };
+};
+
+export const useInvitationTranslation = () => {
+  const { t } = useTranslation('invitations');
+
+  return {
+    title: () => t('title'),
+    userSearch: {
+      label: () => t('userSearch.label'),
+      placeholder: () => t('userSearch.placeholder'),
+    },
+    personalMessage: {
+      label: () => t('personalMessage.label'),
+      placeholder: () => t('personalMessage.placeholder'),
+    },
+    actions: {
+      send: () => t('actions.send'),
+      cancel: () => t('actions.cancel'),
+    },
+    state: {
+      sending: () => t('state.sending'),
+      sent: () => t('state.sent'),
+    },
+    expiresIn: () => t('expiresIn'),
+  };
+};
+
+export const useCommentTranslation = () => {
+  const { t } = useTranslation('content');
+
+  return {
+    input: {
+      placeholder: () => t('comments.input.placeholder'),
+      signInPrompt: () => t('comments.input.signInPrompt'),
+      signIn: () => t('comments.input.signIn'),
+      posting: () => t('comments.input.posting'),
+      reply: () => t('comments.input.reply'),
+      comment: () => t('comments.input.comment'),
+      save: () => t('comments.input.save'),
+      cancel: () => t('comments.input.cancel'),
+      charCount: (count: number) => t('comments.input.charCount', { count }),
+      shortcut: () => t('comments.input.shortcut'),
+      replyPlaceholder: () => t('comments.input.replyPlaceholder'),
+    },
+    item: {
+      edit: () => t('comments.item.edit'),
+      delete: () => t('comments.item.delete'),
+      edited: () => t('comments.item.edited'),
+      reply: () => t('comments.item.reply'),
+      replies: (count: number) => t('comments.item.replies', { count }),
+      deleteConfirm: () => t('comments.item.deleteConfirm'),
+    },
+    time: {
+      now: () => t('comments.time.now'),
+      minutesAgo: (minutes: number) => t('comments.time.minutesAgo', { minutes }),
+      hoursAgo: (hours: number) => t('comments.time.hoursAgo', { hours }),
+      daysAgo: (days: number) => t('comments.time.daysAgo', { days }),
+    },
+  };
+};
+
+export const usePostCardTranslation = () => {
+  const { t } = useTranslation('common');
+
+  return {
+    actions: {
+      pin: () => t('postCard.actions.pin'),
+      comment: () => t('postCard.actions.comment'),
+      share: () => t('postCard.actions.share'),
+      save: () => t('postCard.actions.save'),
+    },
+    contentType: {
+      image: () => t('postCard.contentType.image'),
+      video: () => t('postCard.contentType.video'),
+      link: () => t('postCard.contentType.link'),
+      text: () => t('postCard.contentType.text'),
+    },
+    accessibility: {
+      goToChannel: (channelName: string) =>
+        t('postCard.accessibility.goToChannel', { channelName }),
+      goToAuthor: (authorName: string) => t('postCard.accessibility.goToAuthor', { authorName }),
+      openPost: () => t('postCard.accessibility.openPost'),
+      pinPost: () => t('postCard.accessibility.pinPost'),
+      commentOnPost: () => t('postCard.accessibility.commentOnPost'),
+      sharePost: () => t('postCard.accessibility.sharePost'),
+      savePost: () => t('postCard.accessibility.savePost'),
+    },
+  };
+};
+
+export const useAccessibilityTranslation = () => {
+  const { t } = useTranslation('common');
+
+  return {
+    closeModal: () => t('accessibility.closeModal'),
+    expandSidebar: () => t('accessibility.expandSidebar'),
+    collapseSidebar: () => t('accessibility.collapseSidebar'),
+    searchResults: () => t('accessibility.searchResults'),
+    goBack: () => t('accessibility.goBack'),
+    closeSidebar: () => t('accessibility.closeSidebar'),
+    trendingTopics: () => t('accessibility.trendingTopics'),
+    toggleDesignMode: () => t('accessibility.toggleDesignMode'),
+    removeManager: () => t('accessibility.removeManager'),
+    libraryNavigation: () => t('accessibility.libraryNavigation'),
+    filtersNavigation: () => t('accessibility.filtersNavigation'),
+    keyboardNavigation: () => t('accessibility.keyboardNavigation'),
+    screenReaderInstructions: () => t('accessibility.screenReaderInstructions'),
+    liveRegion: {
+      contentLoaded: () => t('accessibility.liveRegion.contentLoaded'),
+      pageChanged: () => t('accessibility.liveRegion.pageChanged'),
+      searchCompleted: (count: number) => t('accessibility.liveRegion.searchCompleted', { count }),
+      modalOpened: () => t('accessibility.liveRegion.modalOpened'),
+      modalClosed: () => t('accessibility.liveRegion.modalClosed'),
+      formSubmitted: () => t('accessibility.liveRegion.formSubmitted'),
+      errorOccurred: (message: string) => t('accessibility.liveRegion.errorOccurred', { message }),
+      successMessage: () => t('accessibility.liveRegion.successMessage'),
+      dataUpdated: () => t('accessibility.liveRegion.dataUpdated'),
+      navigationChanged: () => t('accessibility.liveRegion.navigationChanged'),
+    },
+    keyboard: {
+      shortcuts: () => t('accessibility.keyboard.shortcuts'),
+      enterToActivate: () => t('accessibility.keyboard.enterToActivate'),
+      spaceToToggle: () => t('accessibility.keyboard.spaceToToggle'),
+      escapeToClose: () => t('accessibility.keyboard.escapeToClose'),
+      arrowKeysToNavigate: () => t('accessibility.keyboard.arrowKeysToNavigate'),
+      tabToNavigate: () => t('accessibility.keyboard.tabToNavigate'),
+      shiftTabToPrevious: () => t('accessibility.keyboard.shiftTabToPrevious'),
+      homeToFirst: () => t('accessibility.keyboard.homeToFirst'),
+      endToLast: () => t('accessibility.keyboard.endToLast'),
+      pageUpDown: () => t('accessibility.keyboard.pageUpDown'),
+      ctrlEnterToSubmit: () => t('accessibility.keyboard.ctrlEnterToSubmit'),
+      altText: (key: string) => t('accessibility.keyboard.altText', { key }),
     },
   };
 };

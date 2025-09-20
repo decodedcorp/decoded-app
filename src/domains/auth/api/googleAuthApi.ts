@@ -30,7 +30,6 @@ export interface BackendLoginRequest {
   marketing: boolean;
 }
 
-
 export class GoogleAuthApi {
   private static readonly GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 
@@ -221,14 +220,29 @@ export class GoogleAuthApi {
 
     // 새로운 백엔드 응답 구조에 맞게 user 객체 생성
     // 백엔드에서 제공하는 aka를 우선 사용, 없으면 Google 정보로 fallback
-    return {
-      doc_id: backendData.user_doc_id,
-      email: email,
-      nickname: backendData.aka || extractedName, // ✨ 백엔드 aka 우선 사용
-      role: 'user',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
+    if (!backendData.user) {
+      // 백엔드 응답에 user 객체가 없는 경우 생성
+      return {
+        doc_id: backendData.user_doc_id || null,
+        email: email,
+        nickname: backendData.aka || extractedName, // ✨ 백엔드 aka 우선 사용
+        role: 'user',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+    } else {
+      // 백엔드 응답에 name이 없는 경우 Google ID 토큰에서 추출한 name 사용
+      if (!backendData.user.nickname && !backendData.user.name) {
+        backendData.user.nickname = backendData.aka || extractedName;
+      }
+
+      // doc_id가 없는 경우 최상위 user_doc_id에서 가져오기
+      if (!backendData.user.doc_id && backendData.user_doc_id) {
+        backendData.user.doc_id = backendData.user_doc_id;
+      }
+
+      return backendData.user;
+    }
   }
 
   /**

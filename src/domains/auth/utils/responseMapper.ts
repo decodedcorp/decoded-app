@@ -23,16 +23,93 @@ export class ResponseMapper {
       console.log('[ResponseMapper] Response keys:', Object.keys(data));
     }
 
-    if (!data.access_token) {
+    // 새로운 백엔드 응답 구조 처리
+    let accessTokenData: any;
+    let userData = data.user;
+    let refreshToken = data.refresh_token || '';
+
+    // refresh_token이 유효한지 확인
+    if (refreshToken && typeof refreshToken === 'string' && refreshToken.trim() === '') {
+      refreshToken = '';
+    }
+
+    // 새로운 구조: 최상위 레벨에 access_token 관련 필드들이 있음
+    accessTokenData = {
+      salt: data.salt || '',
+      user_doc_id: data.user_doc_id || '',
+      access_token: data.access_token || '',
+      has_sui_address: data.has_sui_address || false,
+    };
+
+    // user 데이터가 없는 경우 기본값 설정
+    if (!userData) {
+      userData = {
+        doc_id: '',
+        email: '',
+        nickname: '',
+        role: 'user',
+        status: 'active',
+      };
+    }
+
+    // user.doc_id가 없는 경우 다른 필드에서 찾기
+    if (!userData.doc_id) {
+      if (userData.id) {
+        userData.doc_id = userData.id;
+      } else if (userData.user_id) {
+        userData.doc_id = userData.user_id;
+      } else if (userData._id) {
+        userData.doc_id = userData._id;
+      } else if (accessTokenData.user_doc_id) {
+        userData.doc_id = accessTokenData.user_doc_id;
+      }
+    }
+
+    // 여전히 doc_id가 없는 경우 access_token에서 가져오기
+    if (!userData.doc_id && accessTokenData.user_doc_id) {
+      userData.doc_id = accessTokenData.user_doc_id;
+    }
+
+    // nickname이 없는 경우 다른 필드에서 찾기
+    if (!userData.nickname) {
+      if (userData.name) {
+        userData.nickname = userData.name;
+      } else if (userData.username) {
+        userData.nickname = userData.username;
+      } else {
+        userData.nickname = userData.email || 'Unknown User';
+      }
+    }
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[ResponseMapper] Processed data:', {
+        hasAccessToken: !!accessTokenData,
+        hasRefreshToken: !!refreshToken,
+        hasUser: !!userData,
+        accessTokenType: typeof accessTokenData,
+        userType: typeof userData,
+        userDocId: userData.doc_id,
+      });
+    }
+
+    if (!accessTokenData?.access_token) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[ResponseMapper] Missing access_token.access_token:', {
+          hasAccessToken: !!accessTokenData,
+          accessTokenKeys: accessTokenData ? Object.keys(accessTokenData) : null,
+          accessTokenType: typeof accessTokenData,
+          accessTokenData: accessTokenData,
+        });
+      }
       throw new AuthError('Invalid access token in response', 400, 'INVALID_ACCESS_TOKEN');
     }
 
     // 새로운 백엔드 응답 구조 사용
-    const userDocId = data.user_doc_id;
+    const userDocId = accessTokenData.user_doc_id;
     if (!userDocId) {
       console.error('[ResponseMapper] Missing user_doc_id. Available data:', {
         hasUserDocId: !!data.user_doc_id,
-        dataKeys: Object.keys(data)
+        dataKeys: Object.keys(data),
       });
       throw new AuthError('Invalid user data in response', 400, 'INVALID_USER_DATA');
     }
@@ -49,7 +126,7 @@ export class ResponseMapper {
         // /api/auth/google에서 이미 user 객체를 만들어서 보내주면 그것을 사용
         // 없으면 기본값 사용
         doc_id: userDocId,
-        email: data.email || '', 
+        email: data.email || '',
         nickname: data.aka || '', // ✨ 백엔드 aka 필드 사용
         role: 'user' as UserRole,
         status: 'active' as UserStatus,

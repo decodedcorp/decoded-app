@@ -1,0 +1,20 @@
+{
+  "title": "Invite members",
+  "userSearch": {
+    "label": "Search user",
+    "placeholder": "Type username or email…"
+  },
+  "personalMessage": {
+    "label": "Personal note",
+    "placeholder": "Add a personal note to your invitation…"
+  },
+  "actions": {
+    "send": "Send invite",
+    "cancel": "Cancel"
+  },
+  "state": {
+    "sending": "Sending…",
+    "sent": "Invitation sent"
+  },
+  "expiresIn": "Expires in"
+}

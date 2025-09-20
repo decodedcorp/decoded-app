@@ -7,7 +7,7 @@ interface ContentUploadHeaderProps {
 export function ContentUploadHeader({ onClose }: ContentUploadHeaderProps) {
   const t = useCommonTranslation();
   return (
-    <div className="flex items-center justify-between p-6 border-b border-zinc-700/50">
+    <div className="flex items-center justify-between p-4 sm:p-6 border-b border-zinc-700/50">
       <div>
         <h2 className="text-xl font-semibold text-white">{t.actions.add()} Content</h2>
         <p className="text-sm text-zinc-400 mt-1">{t.ui.addNewLink()}</p>
