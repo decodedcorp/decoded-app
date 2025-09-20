@@ -123,15 +123,9 @@ export function useCards(options: UseCardsOptions = {}): UseCardsResult {
     staleTime,
     gcTime,
     refetchOnWindowFocus: false,
-    retry: (failureCount, error) => {
-      // 네트워크 에러는 최대 3번 재시도
-      if (error.message.includes('fetch')) {
-        return failureCount < 3;
-      }
-      // 기타 에러는 1번만 재시도
-      return failureCount < 1;
-    },
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+    refetchOnMount: false, // 캐시 우선 사용
+    retry: 0, // 빠른 실패 - 전역 설정 사용
+    notifyOnChangeProps: ['data', 'error'], // 필요한 prop만 구독
   };
 
   const {

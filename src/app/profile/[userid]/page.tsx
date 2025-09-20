@@ -126,7 +126,11 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-black">
       <div
-        className="container mx-auto px-4 py-8 max-w-7xl"
+        className="container mx-auto px-4 py-8"
+        style={{
+          maxWidth:
+            'calc(100vw - var(--sidebar-width) - var(--sidebar-right-width) - 2 * var(--gap-main) - 2 * var(--container-padding-x))',
+        }}
         role="main"
         aria-label={t('page.title')}
       >

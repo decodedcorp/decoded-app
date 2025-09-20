@@ -17,5 +17,110 @@
     "title": "오류가 발생했어요",
     "description": "프로필을 불러오는 중 문제가 발생했어요",
     "retry": "다시 시도"
+  },
+  "tabs": {
+    "myChannels": "내 채널",
+    "subscriptions": "구독",
+    "bookmarks": "북마크",
+    "comments": "댓글"
+  },
+  "sidebar": {
+    "activityOverview": "활동 개요",
+    "profileInfo": "프로필 정보",
+    "suiAddress": "SUI 주소",
+    "memberSince": "가입일",
+    "activeMember": "활성 멤버",
+    "recentChannels": "최근 채널",
+    "recentBookmarks": "최근 북마크",
+    "viewAll": "전체 보기",
+    "about": "소개",
+    "aboutDescription": "이 사용자는 아직 공개 정보를 많이 공유하지 않았어요.",
+    "followUser": "사용자 팔로우"
+  },
+  "stats": {
+    "myChannels": "내 채널",
+    "subscriptions": "구독",
+    "bookmarks": "북마크",
+    "comments": "댓글"
+  },
+  "header": {
+    "edit": "편집",
+    "follow": "팔로우",
+    "activeMember": "활성 멤버"
+  },
+  "editModal": {
+    "title": "프로필 편집",
+    "profileImage": "프로필 이미지",
+    "uploadImage": "이미지 업로드",
+    "changeImage": "이미지 변경",
+    "removeImage": "이미지 제거",
+    "imageHelper": "최대 5MB, JPG 또는 PNG",
+    "nickname": "닉네임",
+    "nicknameLabel": "닉네임 *",
+    "nicknamePlaceholder": "닉네임을 입력하세요",
+    "nicknameHelper": "2-50자",
+    "suiAddress": "SUI 주소",
+    "suiAddressLabel": "SUI 주소",
+    "suiAddressPlaceholder": "0x...",
+    "suiAddressHelper": "선택사항 - SUI 블록체인 주소",
+    "save": "저장",
+    "saveChanges": "변경사항 저장",
+    "cancel": "취소",
+    "saving": "저장 중...",
+    "validation": {
+      "nicknameRequired": "닉네임은 필수입니다",
+      "nicknameMinLength": "닉네임은 최소 2자 이상이어야 합니다",
+      "nicknameMaxLength": "닉네임은 50자 이하여야 합니다",
+      "suiAddressInvalid": "올바르지 않은 SUI 주소 형식입니다",
+      "imageSize": "최대 5MB, JPG 또는 PNG",
+      "nicknameLength": "2-50자"
+    }
+  },
+  "channels": {
+    "title": "내 채널",
+    "count": "내 채널 ({count})",
+    "createChannel": "채널 만들기",
+    "createNew": "새로 만들기",
+    "noChannels": "아직 채널이 없어요",
+    "noChannelsDescription": "첫 번째 채널을 만들어 콘텐츠를 공유해보세요.",
+    "failedToLoad": "채널을 불러올 수 없어요",
+    "failedToLoadDescription": "문제가 발생했어요. 다시 시도해 주세요.",
+    "viewChannel": "채널 보기",
+    "inactive": "비활성",
+    "subscribers": "구독자",
+    "contents": "콘텐츠",
+    "created": "생성일"
+  },
+  "subscriptions": {
+    "title": "구독한 채널",
+    "count": "구독한 채널 ({count})",
+    "noSubscriptions": "아직 구독한 채널이 없어요",
+    "noSubscriptionsDescription": "관심 있는 채널을 구독해보세요.",
+    "exploreChannels": "채널 탐색",
+    "failedToLoad": "구독 정보를 불러올 수 없어요",
+    "failedToLoadDescription": "문제가 발생했어요. 다시 시도해 주세요.",
+    "subscribers": "구독자",
+    "subscribed": "구독됨"
+  },
+  "bookmarks": {
+    "title": "저장된 북마크",
+    "count": "저장된 북마크 ({count})",
+    "noBookmarks": "아직 북마크가 없어요",
+    "noBookmarksDescription": "나중에 볼 콘텐츠를 북마크해보세요.",
+    "failedToLoad": "북마크를 불러올 수 없어요",
+    "failedToLoadDescription": "문제가 발생했어요. 다시 시도해 주세요.",
+    "bookmarked": "북마크됨",
+    "from": "출처",
+    "loadMore": "더 보기",
+    "loading": "로딩 중...",
+    "removeBookmark": "북마크 제거"
+  },
+  "comments": {
+    "title": "댓글",
+    "noComments": "아직 댓글이 없어요",
+    "noCommentsDescription": "콘텐츠에 댓글을 남기면 여기에 표시됩니다.",
+    "comingSoon": "참고: 댓글 기능이 곧 출시됩니다!",
+    "failedToLoad": "댓글을 불러올 수 없어요",
+    "failedToLoadDescription": "문제가 발생했어요. 다시 시도해 주세요."
   }
 }

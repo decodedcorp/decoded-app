@@ -14,7 +14,7 @@ interface TrendingChannelsSectionProps {
 
 export function TrendingChannelsSection({ className = '' }: TrendingChannelsSectionProps) {
   const [activeType, setActiveType] = useState<TrendingType>('popular');
-  
+
   const { data, isLoading, error } = useTrendingChannels(activeType, 12);
   const { trending, states } = useChannelTranslation();
   const { ui } = useCommonTranslation();
@@ -56,7 +56,7 @@ export function TrendingChannelsSection({ className = '' }: TrendingChannelsSect
           <h2 className="text-2xl font-bold text-gray-400 mb-2">{trending.title()}</h2>
           <p className="text-zinc-500 text-sm">{trending.subtitle()}</p>
         </div>
-        
+
         {/* Popular/Trending Toggle */}
         <div className="flex items-center bg-zinc-800/50 rounded-lg p-1">
           <button
@@ -103,11 +103,11 @@ export function TrendingChannelsSection({ className = '' }: TrendingChannelsSect
           </div>
 
           {/* View All Button */}
-          <div className="text-center mt-6">
+          {/* <div className="text-center mt-6">
             <button className="px-6 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-sm font-medium transition-colors duration-200">
               {trending.viewAll()}
             </button>
-          </div>
+          </div> */}
         </>
       )}
     </section>

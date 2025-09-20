@@ -239,6 +239,11 @@
     "recentChannels": {
       "title": "최근 사용한 채널"
     },
+    "myChannels": {
+      "title": "내 채널",
+      "noChannels": "아직 채널이 없어요",
+      "noChannelsDescription": "첫 번째 채널을 만들어보세요"
+    },
     "contentUpload": {
       "contentType": "콘텐츠 유형",
       "image": "이미지",
@@ -422,8 +427,8 @@
       "networkError": "네트워크 연결을 확인해 주세요."
     },
     "sidebar": {
-      "trendingChannels": "트렌딩 채널",
-      "popularToday": "오늘의 인기",
+      "recommendedChannels": "추천 채널",
+      "noRecommendedChannels": "추천 채널이 없어요",
       "sponsored": "광고",
       "advertisementPlaceholder": "광고 영역",
       "members": "멤버",
@@ -434,7 +439,9 @@
       "termsOfService": "이용약관",
       "copyright": "© 2025 Decoded",
       "careers": "채용정보",
-      "press": "보도자료"
+      "press": "보도자료",
+      "loadChannelsFailed": "채널을 불러올 수 없어요",
+      "brandSlogan": "당신의 취향, 당신의 트렌드"
     }
   },
   "invitations": {

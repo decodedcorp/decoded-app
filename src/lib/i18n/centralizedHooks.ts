@@ -235,6 +235,11 @@ type CommonTranslations = {
     recentChannels: {
       title: () => string;
     };
+    myChannels: {
+      title: () => string;
+      noChannels: () => string;
+      noChannelsDescription: () => string;
+    };
     contentUpload: {
       contentType: () => string;
       image: () => string;
@@ -418,8 +423,8 @@ type CommonTranslations = {
       networkError: () => string;
     };
     sidebar: {
-      trendingChannels: () => string;
-      popularToday: () => string;
+      recommendedChannels: () => string;
+      noRecommendedChannels: () => string;
       sponsored: () => string;
       advertisementPlaceholder: () => string;
       members: () => string;
@@ -431,6 +436,8 @@ type CommonTranslations = {
       copyright: () => string;
       careers: () => string;
       press: () => string;
+      loadChannelsFailed: () => string;
+      brandSlogan: () => string;
     };
   };
   invitations: {
@@ -681,6 +688,11 @@ export const useCommonTranslation = (): CommonTranslations => {
       recentChannels: {
         title: () => t('globalContentUpload.recentChannels.title'),
       },
+      myChannels: {
+        title: () => t('globalContentUpload.myChannels.title'),
+        noChannels: () => t('globalContentUpload.myChannels.noChannels'),
+        noChannelsDescription: () => t('globalContentUpload.myChannels.noChannelsDescription'),
+      },
       contentUpload: {
         contentType: () => t('globalContentUpload.contentUpload.contentType'),
         image: () => t('globalContentUpload.contentUpload.image'),
@@ -883,8 +895,8 @@ export const useCommonTranslation = (): CommonTranslations => {
         networkError: () => t('globalContentUpload.errors.networkError'),
       },
       sidebar: {
-        trendingChannels: () => t('globalContentUpload.sidebar.trendingChannels'),
-        popularToday: () => t('globalContentUpload.sidebar.popularToday'),
+        recommendedChannels: () => t('globalContentUpload.sidebar.recommendedChannels'),
+        noRecommendedChannels: () => t('globalContentUpload.sidebar.noRecommendedChannels'),
         sponsored: () => t('globalContentUpload.sidebar.sponsored'),
         advertisementPlaceholder: () => t('globalContentUpload.sidebar.advertisementPlaceholder'),
         members: () => t('globalContentUpload.sidebar.members'),
@@ -896,6 +908,8 @@ export const useCommonTranslation = (): CommonTranslations => {
         copyright: () => t('globalContentUpload.sidebar.copyright'),
         careers: () => t('globalContentUpload.sidebar.careers'),
         press: () => t('globalContentUpload.sidebar.press'),
+        loadChannelsFailed: () => t('globalContentUpload.sidebar.loadChannelsFailed'),
+        brandSlogan: () => t('globalContentUpload.sidebar.brandSlogan'),
       },
     },
     invitations: {

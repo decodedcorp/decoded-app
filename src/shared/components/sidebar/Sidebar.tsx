@@ -62,7 +62,7 @@ export const Sidebar = memo(function Sidebar() {
 
   // Sidebar content component
   const SidebarContent = () => (
-    <div className="py-4 px-3 bg-black min-h-full">
+    <div className="px-2 py-4 bg-black min-h-full" data-testid="sidebar">
       {/* Main Navigation */}
       <div className="space-y-2">
         <SidebarItem
@@ -128,12 +128,12 @@ export const Sidebar = memo(function Sidebar() {
       <aside
         className={`
           lg:hidden
-          w-[260px]
+          w-[240px]
           overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-black
           ${
             isMobileOpen
-              ? 'fixed top-[60px] md:top-[72px] left-0 h-[calc(100dvh-60px)] md:h-[calc(100dvh-72px)] translate-x-0 z-[10002]'
-              : 'fixed top-[60px] md:top-[72px] left-0 h-[calc(100dvh-60px)] md:h-[calc(100dvh-72px)] -translate-x-full z-[var(--z-sidebar)]'
+              ? 'fixed top-[72px] left-0 h-[calc(100dvh-72px)] translate-x-0 z-[10002]'
+              : 'fixed top-[72px] left-0 h-[calc(100dvh-72px)] -translate-x-full z-[var(--z-sidebar)]'
           }
         `}
       >

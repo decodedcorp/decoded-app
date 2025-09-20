@@ -177,4 +177,17 @@ export const queryKeys = {
     trending: (category: string, limit: number, hours: number) =>
       [...queryKeys.trending.all, 'trending', category, limit, hours] as const,
   },
+
+  // Feed infinite scroll queries
+  feed: {
+    all: ['feed'] as const,
+    infinite: (params: {
+      sort: string;
+      channelId?: string;
+      providerId?: string;
+      status?: string;
+      hours?: number;
+      limit?: number;
+    }) => [...queryKeys.feed.all, 'infinite', params] as const,
+  },
 } as const;
