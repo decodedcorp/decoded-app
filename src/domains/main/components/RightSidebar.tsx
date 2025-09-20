@@ -10,37 +10,133 @@ import { useQuery } from '@tanstack/react-query';
 import { RecommendationsService } from '@/api/generated/services/RecommendationsService';
 import { useAuthStore } from '@/store/authStore';
 import type { ChannelResponse } from '@/api/generated/models/ChannelResponse';
-import type { TrendingChannelItem } from '@/api/generated/models/TrendingChannelItem';
-import { useTrendingChannels } from '@/domains/channels/hooks/useTrending';
 
 export function RightSidebar() {
   const t = useCommonTranslation();
   const userDocId = useAuthStore((s) => s.user?.doc_id || null);
 
-  // Recommended (logged-in)
+  // Recommended (logged-in) - /recommendations/channels API 사용
   const {
     data: recData,
     isLoading: recLoading,
     error: recError,
+    status,
+    fetchStatus,
   } = useQuery({
-    queryKey: ['recommendations', 'channels', { limit: 4, userId: userDocId }],
-    queryFn: () =>
-      RecommendationsService.recommendChannelsRecommendationsChannelsGet(4, undefined, userDocId),
+    queryKey: ['recommendations', 'channels', 'sidebar', { limit: 4, userId: userDocId }],
+    queryFn: async () => {
+      // OpenAPI 토큰 업데이트
+      const { refreshOpenAPIToken } = await import('@/api/hooks/useApi');
+      refreshOpenAPIToken();
+
+      console.log('[RightSidebar] Making recommendations API call with params:', {
+        limit: 4,
+        userId: userDocId,
+      });
+
+      try {
+        const result = await RecommendationsService.recommendChannelsRecommendationsChannelsGet(
+          4,
+          undefined,
+          userDocId,
+        );
+
+        console.log('[RightSidebar] Recommendations API call successful:', {
+          result,
+          channelsCount: result?.channels?.length || 0,
+        });
+
+        return result;
+      } catch (error) {
+        console.error('[RightSidebar] Recommendations API call failed:', {
+          error,
+          message: error instanceof Error ? error.message : 'Unknown error',
+          userId: userDocId,
+        });
+        throw error;
+      }
+    },
     enabled: !!userDocId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 2 * 60 * 1000, // 2분
+    gcTime: 10 * 60 * 1000, // 10분
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    retry: 1,
+    retryDelay: 1000,
+  });
+
+  // 일반 채널 데이터 (fallback용)
+  const {
+    data: fallbackData,
+    isLoading: fallbackLoading,
+    error: fallbackError,
+  } = useQuery({
+    queryKey: [
+      'channels',
+      'sidebar',
+      'fallback',
+      { page: 1, limit: 4, sortBy: 'created_at', sortOrder: 'desc' },
+    ],
+    queryFn: async () => {
+      // OpenAPI 토큰 업데이트
+      const { refreshOpenAPIToken } = await import('@/api/hooks/useApi');
+      refreshOpenAPIToken();
+
+      console.log('[RightSidebar] Making fallback channels API call with params:', {
+        page: 1,
+        limit: 4,
+        sortBy: 'created_at',
+        sortOrder: 'desc',
+      });
+
+      const { ChannelsService } = await import('@/api/generated/services/ChannelsService');
+
+      try {
+        const result = await ChannelsService.listChannelsChannelsGet(
+          1,
+          4,
+          undefined,
+          undefined,
+          undefined,
+          'created_at',
+          'desc',
+        );
+
+        console.log('[RightSidebar] Fallback channels API call successful:', {
+          result,
+          channelsCount: result?.channels?.length || 0,
+        });
+
+        return result;
+      } catch (error) {
+        console.error('[RightSidebar] Fallback channels API call failed:', {
+          error,
+          message: error instanceof Error ? error.message : 'Unknown error',
+        });
+        throw error;
+      }
+    },
+    staleTime: 5 * 60 * 1000, // 5분
+    gcTime: 10 * 60 * 1000, // 10분
     refetchOnWindowFocus: false,
   });
 
-  // Trending fallback (logged-out)
-  const {
-    data: trendingData,
-    isLoading: trendingLoading,
-    error: trendingError,
-  } = useTrendingChannels('popular', 4);
-
   const recommended: ChannelResponse[] = recData?.channels || [];
-  const trending: TrendingChannelItem[] = trendingData?.channels || [];
-  const list: (ChannelResponse | TrendingChannelItem)[] = userDocId ? recommended : trending;
+  const fallbackChannels: ChannelResponse[] = fallbackData?.channels || [];
+
+  // 데이터 우선순위: 추천 채널 > 일반 채널 > 빈 배열
+  const list: ChannelResponse[] = (() => {
+    if (userDocId && recData && !recError) {
+      // 로그인했고 추천 데이터가 있으면 추천 채널 사용
+      return recommended;
+    } else if (fallbackData && !fallbackError) {
+      // 추천 데이터가 없거나 에러가 있으면 일반 채널 사용
+      return fallbackChannels;
+    } else {
+      // 모든 데이터가 없으면 빈 배열
+      return [];
+    }
+  })();
   const title = t.globalContentUpload.sidebar.recommendedChannels();
 
   // Debug logging
@@ -50,11 +146,29 @@ export function RightSidebar() {
       recLoading,
       recError,
       recData,
-      trendingLoading,
-      trendingError,
-      trendingData,
+      fallbackLoading,
+      fallbackError,
+      fallbackData,
+      status,
+      fetchStatus,
       listLength: list.length,
+      recommendedLength: recommended.length,
+      fallbackChannelsLength: fallbackChannels.length,
+      recDataChannels: recData?.channels?.length,
+      fallbackDataChannels: fallbackData?.channels?.length,
+      recDataStructure: recData ? Object.keys(recData) : null,
+      fallbackDataStructure: fallbackData ? Object.keys(fallbackData) : null,
     });
+
+    // 에러 상세 정보 로깅
+    if (recError) {
+      console.error('RightSidebar Error Details:', {
+        error: recError,
+        message: recError?.message,
+        stack: recError?.stack,
+        name: recError?.name,
+      });
+    }
   }
 
   return (
@@ -67,7 +181,7 @@ export function RightSidebar() {
         </div>
         <div className="space-y-2">
           {/* 로딩 상태 */}
-          {(userDocId ? recLoading : trendingLoading) ? (
+          {recLoading || fallbackLoading ? (
             <div className="space-y-2">
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="p-3 border-b border-zinc-800 animate-pulse">
@@ -82,7 +196,7 @@ export function RightSidebar() {
               ))}
             </div>
           ) : /* 에러 상태 */
-          (userDocId ? recError : trendingError) ? (
+          recError && fallbackError ? (
             <div className="text-xs text-red-400 p-3 border border-red-800 rounded">
               {t.globalContentUpload.sidebar.loadChannelsFailed()}
             </div>

@@ -26,15 +26,34 @@ export const useChannels = (params?: {
       // OpenAPI 토큰 업데이트
       refreshOpenAPIToken();
 
-      return ChannelsService.listChannelsChannelsGet(
-        params?.page,
-        params?.limit,
-        params?.search,
-        params?.ownerId,
-        params?.isManager,
-        params?.sortBy,
-        params?.sortOrder,
-      );
+      console.log('[useChannels] Making API call with params:', params);
+
+      try {
+        const result = await ChannelsService.listChannelsChannelsGet(
+          params?.page,
+          params?.limit,
+          params?.search,
+          params?.ownerId,
+          params?.isManager,
+          params?.sortBy,
+          params?.sortOrder,
+        );
+
+        console.log('[useChannels] API call successful:', {
+          result,
+          channelsCount: result?.channels?.length,
+          totalCount: result?.total_count,
+        });
+
+        return result;
+      } catch (error) {
+        console.error('[useChannels] API call failed:', {
+          error,
+          params,
+          message: error instanceof Error ? error.message : 'Unknown error',
+        });
+        throw error;
+      }
     },
     staleTime: 2 * 60 * 1000, // 2분으로 단축
     gcTime: 10 * 60 * 1000, // 10분 (기존 cacheTime)
