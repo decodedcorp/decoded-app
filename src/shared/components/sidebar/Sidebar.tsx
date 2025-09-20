@@ -62,7 +62,7 @@ export const Sidebar = memo(function Sidebar() {
 
   // Sidebar content component
   const SidebarContent = () => (
-    <div className="px-2 py-4 bg-black min-h-full">
+    <div className="px-2 py-4 bg-black min-h-full" data-testid="sidebar">
       {/* Main Navigation */}
       <div className="space-y-2">
         <SidebarItem

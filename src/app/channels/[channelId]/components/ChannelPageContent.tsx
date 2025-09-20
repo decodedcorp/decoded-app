@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, memo } from 'react';
 
 import { useRouter } from 'next/navigation';
 import { Button } from '@decoded/ui';
@@ -22,46 +22,47 @@ import { HighlightItem } from '@/lib/types/highlightTypes';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 import { ChannelPageHeader } from './ChannelPageHeader';
+import { ChannelLoadingSkeleton } from './ChannelLoadingSkeleton';
 
 interface ChannelPageContentProps {
   channelId: string;
 }
 
-export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
+export const ChannelPageContent = memo(function ChannelPageContent({
+  channelId,
+}: ChannelPageContentProps) {
   const router = useRouter();
   const t = useCommonTranslation();
   const openContentModal = useContentModalStore((state) => state.openModal);
 
-  // channelId에서 실제 채널 ID만 추출 (contents/... 부분 제거)
+  // channelId 최적화: 불필요한 window 접근 제거
   const actualChannelId = React.useMemo(() => {
+    // 대부분의 경우 props로 전달받은 channelId가 정확함
+    // URL 파싱은 최소한으로만 사용
+    if (channelId && !channelId.includes('/')) {
+      return channelId;
+    }
+
+    // 복잡한 URL인 경우에만 파싱
     if (typeof window !== 'undefined') {
       const pathname = window.location.pathname;
-      console.log('🔍 [ChannelPageContent] pathname:', pathname);
-
-      // URL이 content detail URL인지 확인
-      const contentPathMatch = pathname.match(/\/channels\/([^\/]+)\/contents\/([^\/]+)/);
-      if (contentPathMatch) {
-        const extractedChannelId = contentPathMatch[1];
-        console.log(
-          '🔍 [ChannelPageContent] Content URL detected, extracted channelId:',
-          extractedChannelId,
-        );
-        return extractedChannelId;
-      }
-
-      // 일반 채널 URL인 경우
       const channelMatch = pathname.match(/\/channels\/([^\/]+)/);
-      console.log('🔍 [ChannelPageContent] channelMatch:', channelMatch);
-      const extractedId = channelMatch?.[1] || channelId;
-      console.log('🔍 [ChannelPageContent] extractedId:', extractedId);
-      return extractedId;
+      return channelMatch?.[1] || channelId;
     }
-    console.log('🔍 [ChannelPageContent] SSR mode, using channelId:', channelId);
+
     return channelId;
   }, [channelId]);
 
-  // 채널 ID로 API 데이터 가져오기
-  const { data: apiChannel, isLoading, error } = useChannel(actualChannelId || '');
+  // 채널 ID로 API 데이터 가져오기 - 캐시 우선 사용으로 성능 최적화
+  const {
+    data: apiChannel,
+    isLoading,
+    error,
+    isFetching,
+    isPlaceholderData,
+  } = useChannel(actualChannelId || '', {
+    enabled: !!actualChannelId,
+  });
 
   // 실제 콘텐츠 수는 API 채널 데이터에서 가져오기 (대용량 API 호출 제거)
 
@@ -90,13 +91,20 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
     // TODO: Implement filter logic for content
   };
 
-  // 채널 데이터 결정: API 데이터를 직접 사용
+  // 채널 데이터 결정: 단순화된 로직으로 성능 향상
   const finalChannel = useMemo((): ChannelData | null => {
-    if (apiChannel) {
+    // 캐시된 데이터가 있고 올바른 채널 ID와 일치하면 즉시 반환
+    if (apiChannel && actualChannelId && apiChannel.id === actualChannelId) {
       return apiChannel;
     }
+
+    // 로딩 중이거나 placeholder 데이터인 경우에만 null 반환
+    if (isLoading || isPlaceholderData) {
+      return null;
+    }
+
     return null;
-  }, [apiChannel]);
+  }, [apiChannel, actualChannelId, isLoading, isPlaceholderData]);
 
   // 실제 콘텐츠 수 계산 (API 채널 데이터 사용)
   const actualContentCount = useMemo(() => {
@@ -207,13 +215,9 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
     });
   }, [actualChannelId]);
 
-  // 로딩 상태 렌더링
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-white text-lg">{t.status.loading()}</div>
-      </div>
-    );
+  // 로딩 상태 렌더링 - 캐시된 데이터가 없을 때만 스켈레톤 표시
+  if ((isLoading || isPlaceholderData) && !finalChannel) {
+    return <ChannelLoadingSkeleton />;
   }
 
   // 에러 상태 렌더링
@@ -231,7 +235,7 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen animate-in fade-in-50 duration-300" data-testid="channel-page">
       {/* Header */}
       <div className="flex-shrink-0">
         {finalChannel ? (
@@ -249,7 +253,7 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
       </div>
 
       {/* Content - 전체 페이지 스크롤 사용 */}
-      <div>
+      <div className="animate-in slide-in-from-bottom-4 duration-500">
         {error && <div className="text-red-500 text-center p-4">{t.status.error()}</div>}
         {!error && finalChannel && (
           <>
@@ -299,4 +303,4 @@ export function ChannelPageContent({ channelId }: ChannelPageContentProps) {
       <ContentUploadModal />
     </div>
   );
-}
+});

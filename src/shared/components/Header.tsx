@@ -8,6 +8,7 @@ import { useCommonTranslation } from '@/lib/i18n/hooks';
 import { useScrollDirection } from '@/lib/hooks/useScrollDirection';
 import { useChannel } from '@/domains/channels/hooks/useChannels';
 import { useAuthStore } from '@/store/authStore';
+import { useNavigationPrefetch, useBackgroundPrefetch } from '@/lib/hooks/usePrefetch';
 
 import { LoginButton } from './LoginButton';
 import { UserAvatar } from './UserAvatar';
@@ -33,6 +34,10 @@ export const Header = memo(function Header() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isLoading = useAuthStore((state) => state.isLoading);
   const isInitialized = useAuthStore((state) => state.isInitialized);
+
+  // Initialize navigation prefetching
+  const { createHoverHandlers } = useNavigationPrefetch();
+  useBackgroundPrefetch(); // Prefetch critical routes in background
 
   // 채널 페이지인지 확인 - useMemo로 최적화
   const isChannelPage = useMemo(
@@ -157,6 +162,7 @@ export const Header = memo(function Header() {
           href="/"
           className="text-2xl font-bold tracking-tight drop-shadow ml-2 lg:ml-0"
           style={{ color: 'var(--color-primary)' }}
+          {...createHoverHandlers('/')}
         >
           decoded
         </Link>

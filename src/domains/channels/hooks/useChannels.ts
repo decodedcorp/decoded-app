@@ -53,8 +53,6 @@ export const useChannel = (channelId: string, options?: { enabled?: boolean }) =
       refreshOpenAPIToken();
 
       console.log('[useChannel] Making API call for channelId:', channelId);
-      console.log('[useChannel] OpenAPI.BASE:', OpenAPI.BASE);
-      console.log('[useChannel] OpenAPI.TOKEN:', OpenAPI.TOKEN ? 'present' : 'missing');
 
       try {
         const result = await ChannelsService.getChannelChannelsChannelIdGet(channelId);
@@ -72,12 +70,26 @@ export const useChannel = (channelId: string, options?: { enabled?: boolean }) =
       }
     },
     enabled: !!channelId && options?.enabled !== false,
-    staleTime: 5 * 60 * 1000, // 5분 - 채널 정보는 자주 변경되지 않음
-    gcTime: 30 * 60 * 1000, // 30분 - 더 오래 캐시
-    refetchOnWindowFocus: false, // 윈도우 포커스 시 재요청 비활성화
-    refetchOnMount: false, // 마운트 시 재요청 비활성화
-    retry: 1, // 재시도 횟수 제한
-    retryDelay: 1000, // 재시도 간격 1초
+    // 캐시 전략 최적화 - 채널 전환 성능 향상
+    staleTime: 15 * 60 * 1000, // 15분으로 증가 - 채널 정보는 자주 변경되지 않음
+    gcTime: 2 * 60 * 60 * 1000, // 2시간으로 증가 - 더 오래 캐시하여 빠른 전환 지원
+    // 불필요한 리페치 방지
+    refetchOnWindowFocus: false,
+    refetchOnMount: false, // 캐시된 데이터가 있으면 즉시 사용
+    refetchOnReconnect: false,
+    // 재시도 정책 최적화
+    retry: (failureCount, error) => {
+      // 401 에러는 재시도하지 않음
+      if (error instanceof Error && error.message.includes('401')) {
+        return false;
+      }
+      return failureCount < 1; // 재시도 횟수 줄임
+    },
+    retryDelay: 500, // 재시도 지연 시간 단축
+    // 네트워크 상태에 따른 스마트 리페치
+    networkMode: 'online',
+    // 즉시 캐시된 데이터 반환
+    notifyOnChangeProps: ['data', 'error'],
   });
 };
 

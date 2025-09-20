@@ -5,6 +5,7 @@ import { cookies } from 'next/headers';
 import { QueryProvider } from '../lib/providers/QueryProvider';
 import { ToastProvider } from '../lib/providers/ToastProvider';
 import { I18nProvider } from '../lib/providers/I18nProvider';
+import { PerformanceProvider } from '../lib/providers/PerformanceProvider';
 import { Header } from '../shared/components/Header';
 import { MainLayout } from '../shared/components/MainLayout';
 import { AuthInitializer } from '../domains/auth/components/AuthInitializer';
@@ -50,15 +51,17 @@ export default async function RootLayout({
       <body suppressHydrationWarning={true}>
         <I18nProvider>
           <QueryProvider>
-            <ToastProvider>
-              <AuthInitializer />
-              <Header />
-              <MainLayout>{children}</MainLayout>
-              {/* Global Content Upload Modal - 전역적으로 렌더링 */}
-              <GlobalContentUploadModal />
-              {/* Modal slot for intercepting routes */}
-              {modal}
-            </ToastProvider>
+            <PerformanceProvider enabled={process.env.NODE_ENV === 'development'}>
+              <ToastProvider>
+                <AuthInitializer />
+                <Header />
+                <MainLayout>{children}</MainLayout>
+                {/* Global Content Upload Modal - 전역적으로 렌더링 */}
+                <GlobalContentUploadModal />
+                {/* Modal slot for intercepting routes */}
+                {modal}
+              </ToastProvider>
+            </PerformanceProvider>
           </QueryProvider>
         </I18nProvider>
       </body>

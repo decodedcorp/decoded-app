@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useNavigationPrefetch } from '@/lib/hooks/usePrefetch';
 
 interface SidebarItemProps {
   href?: string;
@@ -25,6 +26,7 @@ export function SidebarItem({
   className = '',
 }: SidebarItemProps) {
   const router = useRouter();
+  const { createHoverHandlers } = useNavigationPrefetch();
 
   const handleClick = (e: React.MouseEvent) => {
     console.log('SidebarItem clicked:', { href, onClick, label });
@@ -58,7 +60,11 @@ export function SidebarItem({
   `;
 
   return (
-    <button onClick={handleClick} className={baseClasses}>
+    <button
+      onClick={handleClick}
+      className={baseClasses}
+      {...(href ? createHoverHandlers(href) : {})}
+    >
       {content}
     </button>
   );
