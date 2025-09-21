@@ -9,9 +9,9 @@ interface MobileCardLayoutProps {
 // 모바일 전용 카드 레이아웃 - 이미지 참고 디자인
 export function MobileCardLayout({ children, title, onClose }: MobileCardLayoutProps) {
   return (
-    <div className="bg-zinc-800/60 rounded-2xl border border-zinc-700/50 shadow-2xl h-full flex flex-col">
+    <div className="bg-zinc-900 rounded-none border-none shadow-2xl h-full w-full flex flex-col">
       {/* Header with title and close button */}
-      <div className="flex items-center justify-between p-4 border-b border-zinc-700/30">
+      <div className="flex items-center justify-between p-4 pt-6 border-b border-zinc-700/30">
         <div>
           <h1 className="text-lg font-semibold text-white">{title || 'Content'}</h1>
         </div>
