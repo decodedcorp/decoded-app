@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { ChannelsService } from '@/api/generated/services/ChannelsService';
 import type { BannerUpdate } from '@/api/generated/models/BannerUpdate';
+import { useTranslations } from 'next-intl';
 
 interface UseChannelBannerProps {
   channelId: string;
@@ -17,6 +18,7 @@ export const useChannelBanner = ({
   onError 
 }: UseChannelBannerProps) => {
   const queryClient = useQueryClient();
+  const t = useTranslations('common.toast.banner');
 
   // Update banner mutation
   const updateBannerMutation = useMutation({
@@ -39,12 +41,12 @@ export const useChannelBanner = ({
         queryKey: ['channels'] 
       });
       
-      toast.success('Banner updated successfully!');
+      toast.success(t('updated'));
       onSuccess?.();
     },
     onError: (error: Error) => {
       console.error('Failed to update banner:', error);
-      toast.error('Failed to update banner. Please try again.');
+      toast.error(t('updateFailed'));
       onError?.(error);
     },
   });

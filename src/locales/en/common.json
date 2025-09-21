@@ -500,6 +500,46 @@
     "allCategories": "All Categories",
     "allSubcategories": "All Subcategories"
   },
+  "toast": {
+    "profile": {
+      "updated": "Profile updated successfully",
+      "updateFailed": "Failed to update profile",
+      "processing": "Updating profile..."
+    },
+    "bookmarks": {
+      "added": "Added to bookmarks",
+      "removed": "Removed from bookmarks",
+      "addFailed": "Failed to add bookmark",
+      "removeFailed": "Failed to remove bookmark"
+    },
+    "subscription": {
+      "subscribed": "Successfully subscribed to channel!",
+      "unsubscribed": "Successfully unsubscribed from channel!",
+      "subscribeFailed": "Failed to subscribe. Please try again.",
+      "unsubscribeFailed": "Failed to unsubscribe. Please try again."
+    },
+    "comments": {
+      "added": "Comment added successfully!",
+      "updated": "Comment updated successfully!",
+      "deleted": "Comment deleted successfully!",
+      "addFailed": "Failed to add comment",
+      "updateFailed": "Failed to update comment",
+      "deleteFailed": "Failed to delete comment"
+    },
+    "pins": {
+      "orderUpdated": "Pin order updated",
+      "orderUpdateFailed": "Failed to update pin order"
+    },
+    "banner": {
+      "updated": "Banner updated successfully!",
+      "updateFailed": "Failed to update banner. Please try again."
+    },
+    "general": {
+      "success": "Success!",
+      "error": "An error occurred",
+      "tryAgain": "Please try again"
+    }
+  },
   "accessibility": {
     "closeModal": "Close modal",
     "expandSidebar": "Expand sidebar",
