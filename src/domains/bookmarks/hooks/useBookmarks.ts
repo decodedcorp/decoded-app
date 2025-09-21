@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { BookmarksService } from '@/api/generated/services/BookmarksService';
 import { BookmarkListWithContentResponse, BookmarkResponse } from '@/api/generated';
-import { useTranslations } from 'next-intl';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 interface UseBookmarksOptions {
   offset?: number;
@@ -39,7 +39,7 @@ export function useCheckBookmarkStatus(contentId: string) {
 
 export function useBookmarkMutations() {
   const queryClient = useQueryClient();
-  const t = useTranslations('common.toast.bookmarks');
+  const t = useCommonTranslation();
 
   const addBookmark = useMutation({
     mutationFn: (contentId: string) =>
@@ -52,10 +52,10 @@ export function useBookmarkMutations() {
       queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
       queryClient.invalidateQueries({ queryKey: ['bookmark-stats'] });
 
-      toast.success(t('added'));
+      toast.success(t.toast.bookmarks.added());
     },
     onError: (error) => {
-      toast.error(t('addFailed'));
+      toast.error(t.toast.bookmarks.addFailed());
       console.error('Add bookmark error:', error);
     },
   });
@@ -71,10 +71,10 @@ export function useBookmarkMutations() {
       queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
       queryClient.invalidateQueries({ queryKey: ['bookmark-stats'] });
 
-      toast.success(t('removed'));
+      toast.success(t.toast.bookmarks.removed());
     },
     onError: (error) => {
-      toast.error(t('removeFailed'));
+      toast.error(t.toast.bookmarks.removeFailed());
       console.error('Remove bookmark error:', error);
     },
   });

@@ -63,6 +63,46 @@ type CommonTranslations = {
     about: () => string;
     contact: () => string;
   };
+  toast: {
+    profile: {
+      updated: () => string;
+      updateFailed: () => string;
+      processing: () => string;
+    };
+    bookmarks: {
+      added: () => string;
+      removed: () => string;
+      addFailed: () => string;
+      removeFailed: () => string;
+    };
+    subscription: {
+      subscribed: () => string;
+      unsubscribed: () => string;
+      subscribeFailed: () => string;
+      unsubscribeFailed: () => string;
+    };
+    comments: {
+      added: () => string;
+      updated: () => string;
+      deleted: () => string;
+      addFailed: () => string;
+      updateFailed: () => string;
+      deleteFailed: () => string;
+    };
+    pins: {
+      orderUpdated: () => string;
+      orderUpdateFailed: () => string;
+    };
+    banner: {
+      updated: () => string;
+      updateFailed: () => string;
+    };
+    general: {
+      success: () => string;
+      error: () => string;
+      tryAgain: () => string;
+    };
+  };
   time: {
     justNow: () => string;
     hoursAgo: (hours: number) => string;
@@ -513,6 +553,46 @@ export const useCommonTranslation = (): CommonTranslations => {
       help: () => t('navigation.help'),
       about: () => t('navigation.about'),
       contact: () => t('navigation.contact'),
+    },
+    toast: {
+      profile: {
+        updated: () => t('toast.profile.updated'),
+        updateFailed: () => t('toast.profile.updateFailed'),
+        processing: () => t('toast.profile.processing'),
+      },
+      bookmarks: {
+        added: () => t('toast.bookmarks.added'),
+        removed: () => t('toast.bookmarks.removed'),
+        addFailed: () => t('toast.bookmarks.addFailed'),
+        removeFailed: () => t('toast.bookmarks.removeFailed'),
+      },
+      subscription: {
+        subscribed: () => t('toast.subscription.subscribed'),
+        unsubscribed: () => t('toast.subscription.unsubscribed'),
+        subscribeFailed: () => t('toast.subscription.subscribeFailed'),
+        unsubscribeFailed: () => t('toast.subscription.unsubscribeFailed'),
+      },
+      comments: {
+        added: () => t('toast.comments.added'),
+        updated: () => t('toast.comments.updated'),
+        deleted: () => t('toast.comments.deleted'),
+        addFailed: () => t('toast.comments.addFailed'),
+        updateFailed: () => t('toast.comments.updateFailed'),
+        deleteFailed: () => t('toast.comments.deleteFailed'),
+      },
+      pins: {
+        orderUpdated: () => t('toast.pins.orderUpdated'),
+        orderUpdateFailed: () => t('toast.pins.orderUpdateFailed'),
+      },
+      banner: {
+        updated: () => t('toast.banner.updated'),
+        updateFailed: () => t('toast.banner.updateFailed'),
+      },
+      general: {
+        success: () => t('toast.general.success'),
+        error: () => t('toast.general.error'),
+        tryAgain: () => t('toast.general.tryAgain'),
+      },
     },
     time: {
       justNow: () => t('time.justNow'),

@@ -9,7 +9,7 @@ import { queryKeys } from '@/lib/api/queryKeys';
 import { refreshOpenAPIToken } from '@/api/hooks/useApi';
 import { toast } from 'react-hot-toast';
 import { useSimpleToastMutation } from '@/lib/hooks/useToastMutation';
-import { useTranslations } from 'next-intl';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 export interface UseCommentsParams {
   contentId: string;
@@ -113,7 +113,7 @@ export const useComments = ({
  */
 export const useCreateComment = () => {
   const queryClient = useQueryClient();
-  const t = useTranslations('common.toast.comments');
+  const t = useCommonTranslation();
 
   return useSimpleToastMutation<
     CommentResponse,
@@ -155,7 +155,7 @@ export const useCreateComment = () => {
           queryKey: queryKeys.comments.stats(contentId),
         });
 
-        toast.success(t('added'));
+        toast.success(t.toast.comments.added());
       },
       onError: (error, { contentId }) => {
         console.error('[useCreateComment] Failed to create comment:', contentId, error);
@@ -169,7 +169,7 @@ export const useCreateComment = () => {
  */
 export const useUpdateComment = () => {
   const queryClient = useQueryClient();
-  const t = useTranslations('common.toast.comments');
+  const t = useCommonTranslation();
 
   return useSimpleToastMutation<
     CommentResponse,
@@ -196,7 +196,7 @@ export const useUpdateComment = () => {
           queryKey: queryKeys.comments.byContent(contentId),
         });
 
-        toast.success(t('updated'));
+        toast.success(t.toast.comments.updated());
       },
       onError: (error, { commentId }) => {
         console.error('[useUpdateComment] Failed to update comment:', commentId, error);
@@ -210,7 +210,7 @@ export const useUpdateComment = () => {
  */
 export const useDeleteComment = () => {
   const queryClient = useQueryClient();
-  const t = useTranslations('common.toast.comments');
+  const t = useCommonTranslation();
 
   return useSimpleToastMutation<void, Error, { commentId: string; contentId: string }>(
     async ({ commentId }) => {
@@ -236,7 +236,7 @@ export const useDeleteComment = () => {
           queryKey: queryKeys.comments.stats(contentId),
         });
 
-        toast.success(t('deleted'));
+        toast.success(t.toast.comments.deleted());
       },
       onError: (error, { commentId }) => {
         console.error('[useDeleteComment] Failed to delete comment:', commentId, error);
