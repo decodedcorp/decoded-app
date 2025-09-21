@@ -4,6 +4,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useProfileTranslation } from '@/lib/i18n/hooks';
 import { SimpleModal } from '@/lib/components/ui/modal/SimpleModal';
 import toast from 'react-hot-toast';
+import { useTranslations } from 'next-intl';
 
 interface ProfileEditModalProps {
   isOpen: boolean;
@@ -13,6 +14,7 @@ interface ProfileEditModalProps {
 export function ProfileEditModal({ isOpen, onClose }: ProfileEditModalProps) {
   const user = useAuthStore((state) => state.user);
   const t = useProfileTranslation();
+  const toastT = useTranslations('common.toast.profile');
   const { data: profileData, isLoading: profileLoading } = useMyProfile();
   const { mutate: updateProfile, isPending } = useUpdateProfile();
 
@@ -94,7 +96,7 @@ export function ProfileEditModal({ isOpen, onClose }: ProfileEditModalProps) {
       setPreviewImage(previewUrl);
       setFormData((prev) => ({ ...prev, profile_image: file }));
     } catch (error) {
-      toast.error('Failed to process image');
+      toast.error(toastT('updateFailed'));
     }
   };
 
@@ -130,7 +132,7 @@ export function ProfileEditModal({ isOpen, onClose }: ProfileEditModalProps) {
         },
       });
     } catch (error: any) {
-      toast.error(error.message || 'Failed to update profile');
+      toast.error(error.message || toastT('updateFailed'));
     }
   };
 
