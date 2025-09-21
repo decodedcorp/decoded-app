@@ -49,30 +49,25 @@
   --tap-highlight: '[-webkit-tap-highlight-color:rgba(0,0,0,0.08)]';
 }
 
-/* 동적 뷰포트 단위 지원 브라우저에서 적용 */
-@supports (height: 100dvh) {
-  :root {
-    --sidebar-scroll-height: calc(100dvh - var(--header-height) - 2 * var(--gap-edge));
-    --main-min-height: calc(100dvh - var(--header-height));
-    --vh-fallback: 100dvh;
-  }
+/* Z-index scale - 레이어 우선순위 (표준화) */
+:root {
+  --z-base: 0;
+  --z-header: 1000;
+  --z-sidebar: 40; /* 데스크톱 사이드바 */
+  --z-overlay: 1100;
+  --z-sidebar-mobile: 1500; /* 모바일 사이드바를 가장 높게 설정 */
+  --z-modal: 60;
+  --z-modal-root: 70;
+  --z-toast: 2000;
 
   /* Performance & Accessibility */
   --scrollbar-thumb: rgba(255, 255, 255, 0.2);
   --scrollbar-track: transparent;
   --scrollbar-width: 6px;
+}
 
-  /* Z-index scale - 레이어 우선순위 (표준화) */
-  --z-base: 0;
-  --z-header: 1000;
-  --z-sidebar: 40; /* 데스크톱 사이드바 */
-  --z-overlay: 1100;
-  --z-sidebar-mobile: 1200;
-  --z-modal: 60;
-  --z-modal-root: 70;
-  --z-toast: 2000;
-
-  /* Modal sizes */
+/* Modal sizes */
+:root {
   --modal-max-w-sm: 24rem; /* 384px */
   --modal-max-w-md: 32rem; /* 512px */
   --modal-max-w-lg: 40rem; /* 640px */
@@ -102,6 +97,15 @@
   --drawer-w: min(38vw, 520px);
   --drawer-w-mobile: 85vw;
   --sheet-max-h: min(90dvh, 80vh);
+}
+
+/* 동적 뷰포트 단위 지원 브라우저에서 적용 */
+@supports (height: 100dvh) {
+  :root {
+    --sidebar-scroll-height: calc(100dvh - var(--header-height) - 2 * var(--gap-edge));
+    --main-min-height: calc(100dvh - var(--header-height));
+    --vh-fallback: 100dvh;
+  }
 }
 
 /* Responsive design tokens - 반응형 여백 관리 (LEGACY - DEPRECATED) */

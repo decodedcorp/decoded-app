@@ -70,18 +70,18 @@ export const SubscribeButtonSection: React.FC<SubscribeButtonSectionProps> = ({
       className="subscribe-button-wrapper"
       style={{
         position: 'relative',
-        zIndex: 9999,
+        zIndex: 'var(--z-base)',
         pointerEvents: 'auto',
       }}
     >
       <Button
         onClick={handleClick}
         type="button"
-        variant={isSubscribed ? "secondary" : "primary"}
+        variant={isSubscribed ? 'secondary' : 'primary'}
         size="sm"
         style={{
           position: 'relative',
-          zIndex: 10000,
+          zIndex: 'var(--z-base)',
           pointerEvents: 'auto',
         }}
         data-testid="subscribe-button"

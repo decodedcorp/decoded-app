@@ -7,6 +7,7 @@ import { ChannelData } from '@/store/channelModalStore';
 import { toast } from 'react-hot-toast';
 import { ChannelEditorsStackedAvatars } from '@/shared/components/ChannelEditorsStackedAvatars';
 import { EditorsListModal } from '@/shared/components/EditorsListModal';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 interface ChannelModalHeaderProps {
   channel: ChannelData;
@@ -29,6 +30,7 @@ export function ChannelModalHeader({
   currentUserId,
   subscriptionHook,
 }: ChannelModalHeaderProps) {
+  const t = useCommonTranslation();
   const router = useRouter();
   const [isEditorsModalOpen, setIsEditorsModalOpen] = useState(false);
 
@@ -54,15 +56,16 @@ export function ChannelModalHeader({
   return (
     <div>
       {/* 상단 배너 섹션 */}
-      <div className="h-32 bg-zinc-800 relative overflow-hidden">
+      <div className="h-48 bg-zinc-800 relative overflow-hidden">
         {/* 배너 이미지 - 읽기 전용 */}
         <img
           src={channel.banner_url || channel.thumbnail_url || ''}
           alt={`${channel.name} banner`}
-          className="w-full h-full opacity-60 object-cover"
+          className="w-full h-full object-cover"
         />
         {/* 그라디언트 오버레이 */}
-        <div className="absolute inset-0 bg-gradient-to-r from-zinc-800/60 to-zinc-700/60 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
 
         {/* 상단 우측 버튼들 */}
         <div className="absolute top-4 right-4 flex items-center space-x-3">
@@ -104,35 +107,42 @@ export function ChannelModalHeader({
       </div>
 
       {/* 하단 정보 섹션 */}
-      <div className="bg-zinc-900/95 backdrop-blur-sm px-4 py-4">
-        <div className="flex items-center justify-between">
-          {/* 왼쪽: 아바타 + 채널 정보 */}
-          <div className="flex items-center">
-            {/* 큰 아바타 - 배너에서 튀어나오게 */}
-            <div className="relative -mt-10">
+      <div className="bg-black px-4 py-4">
+        <div className="flex flex-col space-y-3">
+          {/* 첫 번째 줄: 아바타 + 채널 정보 + 액션 버튼들 */}
+          <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 md:gap-4">
+            {/* 왼쪽: 아바타 */}
+            <div className="relative -mt-16 shrink-0">
               <img
                 src={channel.thumbnail_url || ''}
                 alt={`${channel.name} avatar`}
                 className="w-20 h-20 rounded-full border-4 border-black bg-black object-cover"
+                loading="lazy"
+                decoding="async"
               />
             </div>
 
-            {/* 채널 정보 */}
-            <div className="ml-4">
-              <h1 id="channel-modal-title" className="text-2xl font-bold text-white">
+            {/* 가운데: 채널 정보 (min-w-0로 truncate 활성화) */}
+            <div className="min-w-0">
+              <h2 id="channel-modal-title" className="text-xl font-semibold text-zinc-300 truncate">
                 {channel.name}
-              </h1>
+              </h2>
               <div
                 id="channel-modal-description"
-                className="flex items-center space-x-3 text-sm text-zinc-400 mt-1"
+                className="flex items-center gap-3 text-sm text-zinc-400 mt-1 min-w-0"
               >
-                <span>{channel.subscriber_count || 0} followers</span>
-                <span>•</span>
-                {/* Editors with stacked avatars - Clickable */}
+                <span className="whitespace-nowrap">
+                  {channel.subscriber_count || 0} {t.ui.subscribers()}
+                </span>
+                <span className="opacity-60">•</span>
+
+                {/* 편집자 영역이 길어져도 줄바꿈 방지 + 말줄임 */}
                 {channel.managers && channel.managers.length > 0 ? (
                   <button
                     onClick={() => setIsEditorsModalOpen(true)}
-                    className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+                    className="flex items-center gap-2 hover:opacity-80 transition-opacity min-w-0"
+                    aria-haspopup="dialog"
+                    aria-expanded={isEditorsModalOpen ? 'true' : 'false'}
                   >
                     <ChannelEditorsStackedAvatars
                       editors={channel.managers}
@@ -140,66 +150,66 @@ export function ChannelModalHeader({
                       size="sm"
                       showTooltip={true}
                     />
-                    {channel.managers.length > 5 && (
-                      <>
-                        <span>•••</span>
-                        <span>{channel.managers.length - 5}+ editors</span>
-                      </>
-                    )}
-                    {channel.managers.length <= 5 && (
-                      <span>{channel.managers.length} editor{channel.managers.length > 1 ? 's' : ''}</span>
-                    )}
+                    <span className="truncate">
+                      {channel.managers.length} {t.ui.editors()}
+                    </span>
                   </button>
                 ) : (
-                  <span>0 editors</span>
+                  <span className="truncate">0 {t.ui.editors()}</span>
                 )}
               </div>
-              {/* Category/Subcategory Tags */}
-              {(channel.category || channel.subcategory) && (
-                <div className="flex items-center space-x-1.5 mt-2">
-                  {channel.category && (
-                    <span className="px-2 py-0.5 bg-zinc-600/30 text-zinc-300 text-xs rounded-full border border-zinc-500/30">
-                      {channel.category}
+            </div>
+
+            {/* 오른쪽: 액션 버튼들 */}
+            <div className="flex items-center gap-2 shrink-0">
+              {/* Subscribe 버튼 - 소유자가 아닌 경우에만 표시 */}
+              {!isOwner && (
+                <button
+                  onClick={handleSubscribe}
+                  disabled={subscriptionHook?.isLoading}
+                  className={`inline-flex items-center justify-center rounded-full px-3 py-2 text-sm transition-colors ${
+                    subscriptionHook?.isSubscribed
+                      ? 'bg-zinc-600 text-white hover:bg-zinc-500'
+                      : 'bg-white text-gray-900 hover:bg-gray-100'
+                  } ${subscriptionHook?.isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  aria-pressed={subscriptionHook?.isSubscribed ? 'true' : 'false'}
+                >
+                  {subscriptionHook?.isLoading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                      <span className="text-xs">
+                        {subscriptionHook?.isSubscribed
+                          ? t.states.unsubscribing()
+                          : t.states.subscribing()}
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-xs">
+                      {subscriptionHook?.isSubscribed
+                        ? t.states.subscribed()
+                        : t.actions.subscribe()}
                     </span>
                   )}
-                  {channel.subcategory && (
-                    <span className="px-2 py-0.5 bg-zinc-600/30 text-zinc-300 text-xs rounded-full border border-zinc-500/30">
-                      {channel.subcategory}
-                    </span>
-                  )}
-                </div>
+                </button>
               )}
             </div>
           </div>
 
-          {/* 오른쪽: 액션 버튼들 */}
-          <div className="flex items-center space-x-3">
-            {/* Subscribe 버튼 - 소유자가 아닌 경우에만 표시 */}
-            {!isOwner && (
-              <button
-                onClick={handleSubscribe}
-                disabled={subscriptionHook?.isLoading}
-                className={`px-4 py-2 rounded-full font-medium transition-colors ${
-                  subscriptionHook?.isSubscribed
-                    ? 'bg-zinc-600 text-white hover:bg-zinc-500'
-                    : 'bg-white text-gray-900 hover:bg-gray-100'
-                } ${subscriptionHook?.isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
-              >
-                {subscriptionHook?.isLoading ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                    <span className="text-sm">
-                      {subscriptionHook?.isSubscribed ? 'Unsubscribing...' : 'Subscribing...'}
-                    </span>
-                  </div>
-                ) : (
-                  <span className="text-sm">
-                    {subscriptionHook?.isSubscribed ? 'Subscribed' : 'Subscribe'}
-                  </span>
-                )}
-              </button>
-            )}
-          </div>
+          {/* 두 번째 줄: 카테고리/서브카테고리 태그 */}
+          {(channel.category || channel.subcategory) && (
+            <div className="flex items-center space-x-1.5">
+              {channel.category && (
+                <span className="px-2 py-0.5 bg-zinc-600/30 text-zinc-300 text-xs rounded-full border border-zinc-500/30">
+                  {channel.category}
+                </span>
+              )}
+              {channel.subcategory && (
+                <span className="px-2 py-0.5 bg-zinc-600/30 text-zinc-300 text-xs rounded-full border border-zinc-500/30">
+                  {channel.subcategory}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

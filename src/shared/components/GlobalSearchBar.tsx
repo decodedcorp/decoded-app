@@ -73,12 +73,12 @@ export function GlobalSearchBar({
         // 채널인 경우: 채널 페이지로 이동
         router.push(`/channels/${item.channelId}`);
       } else {
-        // TODO: 콘텐츠 모달 라우팅을 나중에 다시 활성화할 예정
-        // 콘텐츠인 경우: 콘텐츠 상세 페이지로 이동 (모달 라우팅) - 일시적으로 비활성화
-        // router.push(`/channels/${item.channelId}/contents/${item.id}`);
-
-        // 임시로 콘텐츠를 직접 열기 (URL 변경 없이)
-        console.log('Content selected:', item);
+        // 콘텐츠인 경우: 채널 페이지로 이동하면서 콘텐츠 모달 열기 (TrendingContentCard와 동일한 방식)
+        if (item.channelId) {
+          router.push(`/channels/${item.channelId}?content=${item.id}`);
+        } else {
+          console.warn('Channel ID not available for content:', item);
+        }
       }
       setQuery('');
       setIsAutocompleteOpen(false);

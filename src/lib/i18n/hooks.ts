@@ -94,6 +94,7 @@ export const useChannelTranslation = () => {
       title: () => t('trending.title'),
       contentTitle: () => t('trending.contentTitle'),
       subtitle: () => t('trending.subtitle'),
+      contentSubtitle: () => t('trending.contentSubtitle'),
       loading: () => t('trending.loading'),
       contentLoading: () => t('trending.contentLoading'),
       error: () => t('trending.error'),
@@ -102,6 +103,7 @@ export const useChannelTranslation = () => {
       popular: () => t('trending.popular'),
       trendingNow: () => t('trending.trendingNow'),
       empty: () => t('trending.empty'),
+      contentEmpty: () => t('trending.contentEmpty'),
       viewAll: () => t('trending.viewAll'),
     },
     images: {

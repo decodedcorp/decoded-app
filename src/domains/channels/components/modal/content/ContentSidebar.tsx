@@ -339,7 +339,9 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
                         <h5 className="text-xs font-medium text-zinc-400 mb-2">
                           {t('sidebar.summary')}
                         </h5>
-                        <p className="text-xs text-zinc-300 leading-relaxed">{content.aiSummary}</p>
+                        <p className="text-xs text-zinc-300 leading-relaxed whitespace-pre-wrap">
+                          {content.aiSummary}
+                        </p>
                       </div>
                     )}
 
@@ -355,7 +357,9 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
                             <p className="text-zinc-200 font-medium mb-1">
                               Q: {content.aiQaList[0].question}
                             </p>
-                            <p className="text-zinc-400">A: {content.aiQaList[0].answer}</p>
+                            <p className="text-zinc-400 whitespace-pre-wrap">
+                              A: {content.aiQaList[0].answer}
+                            </p>
                           </div>
 
                           {/* Additional Q&As when expanded */}
@@ -363,7 +367,7 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
                             content.aiQaList.slice(1).map((qa, index) => (
                               <div key={index + 1}>
                                 <p className="text-zinc-200 font-medium mb-1">Q: {qa.question}</p>
-                                <p className="text-zinc-400">A: {qa.answer}</p>
+                                <p className="text-zinc-400 whitespace-pre-wrap">A: {qa.answer}</p>
                               </div>
                             ))}
 
@@ -394,7 +398,9 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
         {content.description && (
           <div className="p-4 border-b border-zinc-700/50">
             <h5 className="text-base font-medium text-white mb-2">{t('sidebar.description')}</h5>
-            <p className="text-sm text-zinc-300 leading-relaxed">{content.description}</p>
+            <p className="text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap">
+              {content.description}
+            </p>
           </div>
         )}
 

@@ -6,12 +6,15 @@ import { useUpdateChannelThumbnail } from '@/domains/channels/hooks/useChannels'
 import { useChannelBanner } from '@/domains/channels/hooks/useChannelBanner';
 import { EditableImage } from '@/domains/channels/components/modal/channel/EditableImage';
 import type { ChannelResponse } from '@/api/generated/models/ChannelResponse';
+import { useTranslation } from 'react-i18next';
 
 interface ImageSectionProps {
   channel: ChannelResponse;
 }
 
 export function ImageSection({ channel }: ImageSectionProps) {
+  const { t } = useTranslation('common');
+  
   // 썸네일 업데이트 hook
   const updateThumbnailMutation = useUpdateChannelThumbnail();
 
@@ -158,7 +161,7 @@ export function ImageSection({ channel }: ImageSectionProps) {
                 <div>
                   <h4 className="font-semibold text-sm">{channel.name}</h4>
                   <p className="text-xs text-zinc-400">
-                    {channel.subscriber_count || 0} followers
+                    {channel.subscriber_count || 0} {t('followers')}
                   </p>
                 </div>
               </div>

@@ -223,9 +223,9 @@ export function DefaultContentCard({ content, className = '' }: DefaultContentCa
 
           {/* Description */}
           {(content.description || content.linkPreview?.description) && (
-            <p className="text-gray-400 leading-relaxed line-clamp-3 overflow-hidden group-hover:text-gray-300 transition-colors duration-300 mb-4">
+            <div className="text-gray-400 leading-relaxed line-clamp-3 overflow-hidden group-hover:text-gray-300 transition-colors duration-300 mb-4 whitespace-pre-wrap">
               {content.description || content.linkPreview?.description}
-            </p>
+            </div>
           )}
 
           {/* Site Name */}

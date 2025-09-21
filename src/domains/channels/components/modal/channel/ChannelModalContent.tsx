@@ -31,6 +31,7 @@ import { HighlightItem } from '@/lib/types/highlightTypes';
 import { useUser } from '@/domains/auth/hooks/useAuth';
 import { canPinContent } from '@/lib/utils/channelPermissions';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
+import { useChannelTranslation } from '@/lib/i18n/hooks';
 import { toContentHref, getContentLinkProps } from '@/lib/routing';
 
 import { ContentFiltersBar } from '../filters/ContentFiltersBar';
@@ -247,9 +248,9 @@ const ContentItemCard = React.memo<{
                     {item.linkPreview.title}
                   </h4>
                   {item.linkPreview.description && (
-                    <p className="text-zinc-300 text-xs line-clamp-2 mb-2">
+                    <div className="text-zinc-300 text-xs line-clamp-2 mb-2 whitespace-pre-wrap">
                       {item.linkPreview.description}
-                    </p>
+                    </div>
                   )}
                   {item.linkPreview.siteName && (
                     <p className="text-zinc-400 text-xs mb-2">📄 {item.linkPreview.siteName}</p>
@@ -259,7 +260,9 @@ const ContentItemCard = React.memo<{
                 <>
                   <h4 className="text-white font-semibold text-sm mb-1">{item.title}</h4>
                   {item.description && (
-                    <p className="text-zinc-300 text-xs line-clamp-2 mb-2">{item.description}</p>
+                    <div className="text-zinc-300 text-xs line-clamp-2 mb-2 whitespace-pre-wrap">
+                      {item.description}
+                    </div>
                   )}
                 </>
               )}
@@ -304,6 +307,7 @@ export const ChannelModalContent = React.memo<{
   onFilterChange?: (filters: any) => void;
 }>(({ currentFilters, channelId: propChannelId, onFilterChange }) => {
   const t = useCommonTranslation();
+  const { states } = useChannelTranslation();
   const openContentModal = useContentModalStore((state) => state.openModal);
   const selectedChannelId = useChannelModalStore((state) => state.selectedChannelId);
   const selectedChannel = useChannelModalStore((state) => state.selectedChannel);
@@ -361,6 +365,9 @@ export const ChannelModalContent = React.memo<{
   const isLoading = shouldUseFiltering ? isLoadingFiltered : isLoadingAll;
   const error = shouldUseFiltering ? errorFiltered : errorAll;
   const refetch = shouldUseFiltering ? refetchFiltered : refetchAll;
+
+  // 새로고침 버튼을 위한 로컬 상태 관리
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
 
   // 개발 모드에서만 로깅 (빈도 제한)
   if (process.env.NODE_ENV === 'development' && Math.random() < 0.01) {
@@ -436,73 +443,44 @@ export const ChannelModalContent = React.memo<{
     });
   }
 
-  // 로딩 상태
+  // 로딩 상태 - ChannelMainContent와 동일한 패턴
   if (isLoading) {
     return (
-      <div className="p-6 pl-4">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h3 className="text-xl font-semibold text-white mb-2">{t.ui.contentItems()}</h3>
-            <p className="text-zinc-400">{t.status.loading()}</p>
-          </div>
-        </div>
-        <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6 gap-4 space-y-4">
-          {Array.from({ length: 8 }).map((_, index) => (
-            <div key={index} className="break-inside-avoid mb-4">
-              <div className="h-64 bg-zinc-800/50 border border-zinc-700/50 rounded-xl animate-pulse" />
-            </div>
-          ))}
+      <div className="h-full flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <div className="w-8 h-8 border-2 border-zinc-600 border-t-zinc-400 rounded-full animate-spin mb-4" />
+          <div className="text-zinc-400 text-lg">{states.searching()}</div>
         </div>
       </div>
     );
   }
 
-  // 에러 상태
+  // 에러 상태 - ChannelMainContent와 동일한 패턴
   if (error) {
     return (
-      <div className="p-6 pl-4">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h3 className="text-xl font-semibold text-white mb-2">{t.ui.contentItems()}</h3>
-            <p className="text-zinc-400">{t.status.error()}</p>
-          </div>
-        </div>
-        <div className="text-center py-12">
-          <div className="w-20 h-20 mx-auto mb-6 bg-red-900/20 rounded-full flex items-center justify-center">
-            <svg
-              className="w-10 h-10 text-red-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-              />
-            </svg>
-          </div>
-          <h3 className="text-lg font-semibold text-white mb-2">{t.feed.failedToLoadPosts()}</h3>
-          <p className="text-zinc-400 mb-6 max-w-md mx-auto">{t.status.error()}</p>
-          <div className="flex items-center justify-center space-x-3">
-            <Button onClick={() => refetch()} variant="primary">
-              {t.feed.tryAgain()}
-            </Button>
-            <Button onClick={() => window.location.reload()} variant="secondary">
-              {t.actions.reload()}
-            </Button>
-          </div>
-          {process.env.NODE_ENV === 'development' && (
-            <details className="mt-6 text-left max-w-2xl mx-auto">
-              <summary className="text-sm text-zinc-500 cursor-pointer hover:text-zinc-400">
-                Error Details (Development)
-              </summary>
-              <pre className="mt-2 p-3 bg-zinc-900/50 rounded text-xs text-red-400 overflow-auto">
-                {error.message || 'Unknown error'}
-              </pre>
-            </details>
-          )}
+      <div className="h-full flex items-center justify-center">
+        <div className="flex flex-col items-center text-center">
+          <svg
+            className="w-16 h-16 text-red-400 mb-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.996-.833-2.664 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+            />
+          </svg>
+          <div className="text-red-500 text-lg mb-2">{states.loadError()}</div>
+          <div className="text-zinc-500">{states.loadErrorSubtitle()}</div>
+          <button
+            onClick={() => refetch()}
+            className="mt-4 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-300 rounded-lg transition-colors duration-200"
+          >
+            {t.actions.refresh()}
+          </button>
         </div>
       </div>
     );
@@ -517,235 +495,267 @@ export const ChannelModalContent = React.memo<{
   };
 
   return (
-    <div className="px-4">
-      {/* Community Highlights */}
-      <CommunityHighlights channelId={channelId} onItemClick={handleHighlightClick} />
+    <div className="relative h-full overflow-hidden bg-black">
+      <div className="h-full overflow-y-auto overflow-x-hidden">
+        <div className="pb-12">
+          {/* Community Highlights */}
+          <CommunityHighlights channelId={channelId} onItemClick={handleHighlightClick} />
 
-      {/* Header */}
-      <div className="flex items-center justify-between pt-2">
-        <div>
-          {/* 콘텐츠 개수 및 상태 필터 */}
-          <div className="flex items-center gap-3 mb-2">
-            <p className="text-gray-500">
+          {/* Header */}
+          <div className="flex items-center justify-between pt-2 px-4">
+            <div>
+              {/* 콘텐츠 개수 및 상태 필터 */}
+              <div className="flex items-center gap-3 mb-2">
+                {/* <p className="text-gray-500">
               {totalCount || 0} {t.ui.contentItems()}
-            </p>
+            </p> */}
 
-            {/* 상태 필터 버튼들 */}
-            <div className="flex gap-1">
-              <button
-                onClick={() => {
-                  const newFilters = { ...currentFilters, statuses: ['active'] };
-                  onFilterChange?.(newFilters);
-                }}
-                className={`px-2 py-1 text-xs rounded transition-colors ${
-                  currentFilters?.statuses?.includes('active') &&
-                  currentFilters.statuses.length === 1
-                    ? 'bg-zinc-700 text-gray-300'
-                    : 'bg-zinc-800/50 text-gray-500 hover:text-gray-400'
-                }`}
-              >
-                {t.ui.active()}
-              </button>
-              <button
-                onClick={() => {
-                  const newFilters = { ...currentFilters, statuses: ['pending'] };
-                  onFilterChange?.(newFilters);
-                }}
-                className={`px-2 py-1 text-xs rounded transition-colors ${
-                  currentFilters?.statuses?.includes('pending') &&
-                  currentFilters.statuses.length === 1
-                    ? 'bg-zinc-700 text-gray-300'
-                    : 'bg-zinc-800/50 text-gray-500 hover:text-gray-400'
-                }`}
-              >
-                {t.status.pending()}
-              </button>
-              <button
-                onClick={() => {
-                  const newFilters = { ...currentFilters, statuses: ['active', 'pending'] };
-                  onFilterChange?.(newFilters);
-                }}
-                className={`px-2 py-1 text-xs rounded transition-colors ${
-                  currentFilters?.statuses?.length !== 1
-                    ? 'bg-zinc-700 text-gray-300'
-                    : 'bg-zinc-800/50 text-gray-500 hover:text-gray-400'
-                }`}
-              >
-                {t.ui.all()}
-              </button>
-            </div>
-          </div>
-
-          {/* PENDING 상태 콘텐츠 개수 표시 */}
-          {pendingCount > 0 && (
-            <button
-              onClick={() => {
-                // Toggle pending filter
-                const newFilters =
-                  currentFilters && currentFilters.statuses?.includes('pending')
-                    ? { ...currentFilters, statuses: ['active'] }
-                    : { ...currentFilters, statuses: ['pending'] };
-                // Note: This would need to be connected to the actual filter change handler
-                console.log('Toggle pending filter:', newFilters);
-              }}
-              className="text-sm text-yellow-400 hover:text-yellow-300 mt-1 flex items-center space-x-1 transition-colors"
-            >
-              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span>
-                {pendingCount} {t.ui.contentItems()} {t.status.processing()}
-              </span>
-            </button>
-          )}
-
-          {/* 데이터 상태 표시 */}
-          {!isLoading && !error && finalDisplayContentItems.length === 0 && (
-            <p className="text-sm text-gray-500 mt-1">
-              {shouldUseFiltering ? t.feed.noPostsFound() : t.feed.noPostsFound()}
-            </p>
-          )}
-        </div>
-
-        <div className="flex items-center space-x-3">
-          {/* 새로고침 버튼 */}
-          <button
-            onClick={() => refetch()}
-            disabled={isLoading}
-            className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 disabled:bg-zinc-900 disabled:text-zinc-500 text-gray-400 hover:text-white rounded-md transition-all duration-200 flex items-center space-x-1.5 border border-zinc-700 hover:border-zinc-600 text-sm"
-          >
-            <svg
-              className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
-            </svg>
-            <span>{t.actions.refresh()}</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Filters Bar */}
-      <ContentFiltersBar
-        selectedDataTypes={currentFilters?.dataTypes || []}
-        selectedCategories={currentFilters?.categories || []}
-        onDataTypesChange={handleDataTypesChange}
-        onCategoriesChange={handleCategoriesChange}
-        dataTypes={dataTypes}
-        categories={categories}
-        isLoading={isFiltersLoading}
-      />
-
-      {/* Masonry Grid Container */}
-      <div className="pb-6">
-        {finalDisplayContentItems.length > 0 ? (
-          <Masonry
-            items={finalDisplayContentItems.map((item: ContentItem, idx: number) => {
-              // 이미지가 있는 경우 고정 높이, 없는 경우 텍스트에 맞는 높이
-              const imageUrl = item.linkPreview?.imageUrl || item.imageUrl;
-              const isWebPageUrl =
-                imageUrl &&
-                (imageUrl.includes('youtube.com') ||
-                  imageUrl.includes('instagram.com') ||
-                  imageUrl.includes('blog.naver.com') ||
-                  imageUrl.includes('khan.co.kr') ||
-                  imageUrl.includes('watch?v=') ||
-                  imageUrl.includes('/shorts/') ||
-                  imageUrl.includes('/article/'));
-              const hasValidImage = imageUrl && !isWebPageUrl;
-
-              // 이미지가 있으면 더 큰 높이, 없으면 최소 높이 보장
-              const height = hasValidImage ? 280 : 220; // 이미지: 280px, 텍스트: 220px (더 컴팩트한 높이)
-
-              return {
-                id: item.id.toString(),
-                img: item.imageUrl || '',
-                height: height,
-                title: item.title,
-                category: item.category,
-                type: item.type,
-                status: item.status,
-              };
-            })}
-            ease="power3.out"
-            duration={0.4}
-            stagger={0.03}
-            animateFrom="bottom"
-            scaleOnHover={false}
-            hoverScale={1.0}
-            blurToFocus={false}
-            colorShiftOnHover={false}
-            className="w-full min-h-[400px]"
-            onItemClick={(item) => {
-              const contentItem = finalDisplayContentItems.find(
-                (ci: ContentItem) => ci.id.toString() === item.id,
-              );
-              if (contentItem) {
-                // Zustand store를 사용해서 모달 열기
-                const { openModal } = useContentModalStore.getState();
-                openModal(contentItem, channelId);
-              }
-            }}
-            renderItem={(gridItem) => {
-              const contentItem = finalDisplayContentItems.find(
-                (ci: ContentItem) => ci.id.toString() === gridItem.id,
-              );
-              if (!contentItem) return null;
-
-              return (
-                <div className="w-full h-full">
-                  <ContentItemCard item={contentItem} channelId={channelId} channel={channelData} />
+                {/* 상태 필터 버튼들 */}
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => {
+                      const newFilters = { ...currentFilters, statuses: ['active'] };
+                      onFilterChange?.(newFilters);
+                    }}
+                    className={`px-2 py-1 text-xs rounded transition-colors ${
+                      currentFilters?.statuses?.includes('active') &&
+                      currentFilters.statuses.length === 1
+                        ? 'bg-zinc-700 text-gray-300'
+                        : 'bg-zinc-800/50 text-gray-500 hover:text-gray-400'
+                    }`}
+                  >
+                    {t.ui.active()}
+                  </button>
+                  <button
+                    onClick={() => {
+                      const newFilters = { ...currentFilters, statuses: ['pending'] };
+                      onFilterChange?.(newFilters);
+                    }}
+                    className={`px-2 py-1 text-xs rounded transition-colors ${
+                      currentFilters?.statuses?.includes('pending') &&
+                      currentFilters.statuses.length === 1
+                        ? 'bg-zinc-700 text-gray-300'
+                        : 'bg-zinc-800/50 text-gray-500 hover:text-gray-400'
+                    }`}
+                  >
+                    {t.status.pending()}
+                  </button>
+                  <button
+                    onClick={() => {
+                      const newFilters = { ...currentFilters, statuses: ['active', 'pending'] };
+                      onFilterChange?.(newFilters);
+                    }}
+                    className={`px-2 py-1 text-xs rounded transition-colors ${
+                      currentFilters?.statuses?.length !== 1
+                        ? 'bg-zinc-700 text-gray-300'
+                        : 'bg-zinc-800/50 text-gray-500 hover:text-gray-400'
+                    }`}
+                  >
+                    {t.ui.all()}
+                  </button>
                 </div>
-              );
-            }}
-          />
-        ) : (
-          // 빈 상태 UI
-          <div className="text-center py-16">
-            <div className="w-24 h-24 mx-auto mb-6 bg-zinc-800/50 rounded-full flex items-center justify-center">
-              <svg
-                className="w-12 h-12 text-zinc-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                />
-              </svg>
+              </div>
+
+              {/* PENDING 상태 콘텐츠 개수 표시 */}
+              {pendingCount > 0 && (
+                <button
+                  onClick={() => {
+                    // Toggle pending filter
+                    const newFilters =
+                      currentFilters && currentFilters.statuses?.includes('pending')
+                        ? { ...currentFilters, statuses: ['active'] }
+                        : { ...currentFilters, statuses: ['pending'] };
+                    // Note: This would need to be connected to the actual filter change handler
+                    console.log('Toggle pending filter:', newFilters);
+                  }}
+                  className="text-sm text-yellow-400 hover:text-yellow-300 mt-1 flex items-center space-x-1 transition-colors"
+                >
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span>
+                    {pendingCount} {t.ui.contentItems()} {t.status.processing()}
+                  </span>
+                </button>
+              )}
+
+              {/* 데이터 상태 표시 */}
+              {!isLoading && !error && finalDisplayContentItems.length === 0 && (
+                <p className="text-sm text-gray-500 mt-1">
+                  {shouldUseFiltering ? t.feed.noPostsFound() : t.feed.noPostsFound()}
+                </p>
+              )}
             </div>
-            <h3 className="text-xl font-semibold text-gray-400 mb-2">{t.feed.noPostsFound()}</h3>
-            <p className="text-gray-500 mb-6 max-w-md mx-auto">{t.feed.tryDifferentFilter()}</p>
-            <button
-              onClick={handleAddContent}
-              className="px-6 py-3 bg-zinc-900 hover:bg-[#eafd66] text-white hover:text-black rounded-lg transition-all duration-200 flex items-center space-x-3 mx-auto hover:scale-[1.02] font-medium shadow-lg hover:shadow-xl"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              <span>{t.create.createNewContent()}</span>
-            </button>
+
+            <div className="flex items-center space-x-3">
+              {/* 새로고침 버튼 */}
+              <button
+                onClick={async () => {
+                  if (isRefreshing) return; // 중복 클릭 방지
+
+                  try {
+                    setIsRefreshing(true);
+                    console.log('[ChannelModalContent] Refreshing data...');
+
+                    // React Query의 refetch는 Promise를 반환합니다
+                    const result = await refetch();
+
+                    if (result?.error) {
+                      console.error('[ChannelModalContent] Refetch returned error:', result.error);
+                    } else {
+                      console.log('[ChannelModalContent] Data refreshed successfully');
+                    }
+                  } catch (error) {
+                    console.error('[ChannelModalContent] Failed to refresh data:', error);
+                    // 에러가 발생해도 사용자에게 피드백 제공
+                  } finally {
+                    setIsRefreshing(false);
+                  }
+                }}
+                disabled={isLoading || isRefreshing}
+                className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 disabled:bg-zinc-900 disabled:text-zinc-500 disabled:cursor-not-allowed text-gray-400 hover:text-white rounded-md transition-all duration-200 flex items-center space-x-1.5 border border-zinc-700 hover:border-zinc-600 text-sm"
+                title={isLoading || isRefreshing ? t.status.loading() : t.actions.refresh()}
+              >
+                <svg
+                  className={`w-3 h-3 ${isLoading || isRefreshing ? 'animate-spin' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                <span>{isLoading || isRefreshing ? t.status.loading() : t.actions.refresh()}</span>
+              </button>
+            </div>
           </div>
-        )}
+
+          {/* Filters Bar */}
+          <div className="px-4">
+            <ContentFiltersBar
+              selectedDataTypes={currentFilters?.dataTypes || []}
+              selectedCategories={currentFilters?.categories || []}
+              onDataTypesChange={handleDataTypesChange}
+              onCategoriesChange={handleCategoriesChange}
+              dataTypes={dataTypes}
+              categories={categories}
+              isLoading={isFiltersLoading}
+            />
+          </div>
+
+          {/* Masonry Grid Container */}
+          <div className="px-4 pb-6">
+            {finalDisplayContentItems.length > 0 ? (
+              <Masonry
+                items={finalDisplayContentItems.map((item: ContentItem, idx: number) => {
+                  // 이미지가 있는 경우 고정 높이, 없는 경우 텍스트에 맞는 높이
+                  const imageUrl = item.linkPreview?.imageUrl || item.imageUrl;
+                  const isWebPageUrl =
+                    imageUrl &&
+                    (imageUrl.includes('youtube.com') ||
+                      imageUrl.includes('instagram.com') ||
+                      imageUrl.includes('blog.naver.com') ||
+                      imageUrl.includes('khan.co.kr') ||
+                      imageUrl.includes('watch?v=') ||
+                      imageUrl.includes('/shorts/') ||
+                      imageUrl.includes('/article/'));
+                  const hasValidImage = imageUrl && !isWebPageUrl;
+
+                  // 이미지가 있으면 더 큰 높이, 없으면 최소 높이 보장
+                  const height = hasValidImage ? 280 : 220; // 이미지: 280px, 텍스트: 220px (더 컴팩트한 높이)
+
+                  return {
+                    id: item.id.toString(),
+                    img: item.imageUrl || '',
+                    height: height,
+                    title: item.title,
+                    category: item.category,
+                    type: item.type,
+                    status: item.status,
+                  };
+                })}
+                ease="power3.out"
+                duration={0.4}
+                stagger={0.03}
+                animateFrom="bottom"
+                scaleOnHover={false}
+                hoverScale={1.0}
+                blurToFocus={false}
+                colorShiftOnHover={false}
+                className="w-full min-h-[400px]"
+                onItemClick={(item) => {
+                  const contentItem = finalDisplayContentItems.find(
+                    (ci: ContentItem) => ci.id.toString() === item.id,
+                  );
+                  if (contentItem) {
+                    // Zustand store를 사용해서 모달 열기
+                    const { openModal } = useContentModalStore.getState();
+                    openModal(contentItem, channelId);
+                  }
+                }}
+                renderItem={(gridItem) => {
+                  const contentItem = finalDisplayContentItems.find(
+                    (ci: ContentItem) => ci.id.toString() === gridItem.id,
+                  );
+                  if (!contentItem) return null;
+
+                  return (
+                    <div className="w-full h-full">
+                      <ContentItemCard
+                        item={contentItem}
+                        channelId={channelId}
+                        channel={channelData}
+                      />
+                    </div>
+                  );
+                }}
+              />
+            ) : (
+              // 빈 상태 UI - ChannelMainContent와 동일한 패턴
+              <div className="h-full flex items-center justify-center">
+                <div className="flex flex-col items-center text-center">
+                  <svg
+                    className="w-16 h-16 text-zinc-600 mb-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                    />
+                  </svg>
+                  <div className="text-zinc-400 text-lg mb-2">{states.empty()}</div>
+                  <div className="text-zinc-500">{states.emptySubtitle()}</div>
+                  <button
+                    onClick={handleAddContent}
+                    className="mt-4 px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-300 rounded-lg transition-colors duration-200 flex items-center space-x-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 4v16m8-8H4"
+                      />
+                    </svg>
+                    <span>{t.create.createNewContent()}</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

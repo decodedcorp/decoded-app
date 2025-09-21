@@ -21,6 +21,7 @@ import { PostCardSkeleton } from './PostCardSkeleton';
 import { InfiniteScrollLoader } from './InfiniteScrollLoader';
 import { PostCard } from './PostCard';
 import { FeedGrid, FeedGridItem } from '@/components/FeedGrid/FeedGrid';
+import { LoadingOverlay } from '@/shared/components/LoadingOverlay';
 
 export const MainFeed = React.memo(function MainFeed() {
   const [activeSort, setActiveSort] = useState<SortOption>('hot');
@@ -505,14 +506,12 @@ export const MainFeed = React.memo(function MainFeed() {
           )}
 
           {/* 콘텐츠 로딩 오버레이 */}
-          {isContentLoading && selectedContentId && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-              <div className="bg-zinc-900 rounded-lg p-6 flex items-center gap-3">
-                <div className="w-6 h-6 border-2 border-[#eafd66] border-t-transparent rounded-full animate-spin"></div>
-                <span className="text-white">{t.feed.loadingContent()}</span>
-              </div>
-            </div>
-          )}
+          <LoadingOverlay
+            isLoading={isContentLoading && !!selectedContentId}
+            message={t.feed.loadingContent()}
+            spinnerSize="md"
+            useBrandColor={true}
+          />
 
           {/* 무한스크롤 로더 */}
           {feedData.length > 0 && (

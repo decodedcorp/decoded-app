@@ -80,6 +80,7 @@
     "title": "인기 채널",
     "contentTitle": "인기 콘텐츠",
     "subtitle": "가장 활발하고 주목받는 채널들",
+    "contentSubtitle": "모든 채널에서 화제가 되고 있는 인기 콘텐츠들",
     "loading": "인기 채널을 불러오는 중...",
     "contentLoading": "인기 콘텐츠를 불러오는 중...",
     "error": "채널을 불러올 수 없습니다",
@@ -88,6 +89,7 @@
     "popular": "인기",
     "trendingNow": "트렌딩",
     "empty": "표시할 채널이 없습니다",
+    "contentEmpty": "표시할 콘텐츠가 없습니다",
     "viewAll": "전체 보기"
   },
   "sidebar": {

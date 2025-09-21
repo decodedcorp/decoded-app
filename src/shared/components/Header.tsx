@@ -114,14 +114,16 @@ export const Header = memo(function Header() {
         backdrop-blur bg-black/80 border-b border-zinc-700/50 shadow-xl
         ${shouldShowHeader ? 'translate-y-0' : '-translate-y-full'}
       `}
-      style={{
-        zIndex: 'var(--z-header)',
-        WebkitBackdropFilter: 'blur(12px)',
-        backdropFilter: 'blur(12px)',
-        '--header-h': '60px',
-        '--header-h-md': '72px',
-        height: 'var(--header-height, 64px)',
-      } as React.CSSProperties & { '--header-h': string; '--header-h-md': string }}
+      style={
+        {
+          zIndex: 'var(--z-header)',
+          WebkitBackdropFilter: 'blur(12px)',
+          backdropFilter: 'blur(12px)',
+          '--header-h': '60px',
+          '--header-h-md': '72px',
+          height: 'var(--header-height, 64px)',
+        } as React.CSSProperties & { '--header-h': string; '--header-h-md': string }
+      }
       data-header-height="60"
       data-header-height-md="72"
       onMouseEnter={() => setIsHovered(true)}
@@ -135,38 +137,40 @@ export const Header = memo(function Header() {
         "
         style={{ paddingInline: 'var(--edge-x)' }}
       >
-        {/* Mobile Menu Button */}
-        <button
-          onClick={toggleMobileSidebar}
-          className="lg:hidden min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [-webkit-tap-highlight-color:rgba(0,0,0,0.08)]"
-          aria-controls="mobile-sidebar"
-          aria-expanded={isMobileSidebarOpen}
-          aria-label={isMobileSidebarOpen ? "Close menu" : t.header.openMenu()}
-        >
-          <svg
-            className="shrink-0 w-5 h-5 text-zinc-300"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+        {/* Mobile Menu Button and Logo */}
+        <div className="flex items-center gap-3 lg:gap-0">
+          <button
+            onClick={toggleMobileSidebar}
+            className="lg:hidden min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [-webkit-tap-highlight-color:rgba(0,0,0,0.08)]"
+            aria-controls="mobile-sidebar"
+            aria-expanded={isMobileSidebarOpen}
+            aria-label={isMobileSidebarOpen ? 'Close menu' : t.header.openMenu()}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
-        </button>
+            <svg
+              className="shrink-0 w-5 h-5 text-zinc-300"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
 
-        {/* Logo */}
-        <Link
-          href="/"
-          className="text-2xl font-bold tracking-tight drop-shadow ml-2 lg:ml-0"
-          style={{ color: 'var(--color-primary)' }}
-          {...createHoverHandlers('/')}
-        >
-          decoded
-        </Link>
+          {/* Logo */}
+          <Link
+            href="/"
+            className="text-2xl font-bold tracking-tight drop-shadow"
+            style={{ color: 'var(--color-primary)' }}
+            {...createHoverHandlers('/')}
+          >
+            decoded
+          </Link>
+        </div>
 
         {/* Search Bar */}
         <div className="hidden md:flex flex-1 justify-center">

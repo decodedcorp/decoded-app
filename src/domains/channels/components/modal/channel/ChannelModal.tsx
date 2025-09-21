@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React from 'react';
 
 import {
   useChannelModalStore,
@@ -8,17 +8,16 @@ import {
   selectSelectedChannel,
   selectSelectedChannelId,
 } from '@/store/channelModalStore';
-import type { SidebarFilters } from '@/domains/channels/components/sidebar/ChannelSidebar';
-import { ChannelData } from '@/store/channelModalStore';
-import { formatDateByContext } from '@/lib/utils/dateUtils';
 import { useContentModalStore, selectIsContentModalOpen } from '@/store/contentModalStore';
 import { useUser } from '@/domains/auth/hooks/useAuth';
 import { useChannelSubscription } from '@/domains/interactions/hooks/useChannelSubscription';
 
-import { useChannel } from '../../../hooks/useChannels';
+import { useChannelData } from '../../../hooks/useChannelData';
+import { useChannelContentFilters } from '../../../hooks/useUnifiedFilters';
 import { BaseModal } from '../base/BaseModal';
 import { ChannelModalContainer } from '../base/ChannelModalContainer';
 import { ContentUploadModal } from '../content-upload/ContentUploadModal';
+import { ChannelContentContainer } from '../../common/ChannelContentContainer';
 
 import { ChannelModalHeader } from './ChannelModalHeader';
 import { ChannelModalContent } from './ChannelModalContent';
@@ -36,88 +35,31 @@ export function ChannelModal() {
   // 현재 사용자 정보 가져오기
   const { user } = useUser();
 
+  // 통일된 채널 데이터 관리
+  const { channel: finalChannel, isLoading, error, hasData } = useChannelData(channelId);
+
+  // 구독 기능
+  const subscriptionHook = useChannelSubscription(channelId || '');
+
+  // 통일된 필터 관리
+  const { filters: currentFilters, updateFilters: handleFilterChange } = useChannelContentFilters();
+
   // 디버깅을 위한 로그
   React.useEffect(() => {
     console.log('🎯 [ChannelModal] Modal state changed:', {
       isOpen,
       channelId,
-      hasChannel: !!channel,
-      channelData: channel,
+      hasChannel: !!finalChannel,
+      channelData: finalChannel,
       isContentModalOpen,
+      isLoading,
+      error: !!error,
     });
-  }, [isOpen, channelId, channel, isContentModalOpen]);
+  }, [isOpen, channelId, finalChannel, isContentModalOpen, isLoading, error]);
 
-  // 채널 ID로 API 데이터 가져오기
-  const { data: apiChannel, isLoading, error } = useChannel(channelId || '');
-  
-  // 구독 기능
-  const subscriptionHook = useChannelSubscription(channelId || '');
-
-  // 디버깅을 위한 로그
-  React.useEffect(() => {
-    if (apiChannel) {
-      console.log('🎯 [ChannelModal] API Channel Data:', apiChannel);
-    }
-    if (error) {
-      console.error('🎯 [ChannelModal] Channel API Error:', error);
-    }
-    console.log('🎯 [ChannelModal] Channel ID:', channelId);
-    console.log('🎯 [ChannelModal] Channel from store:', channel);
-    console.log('🎯 [ChannelModal] Is modal open:', isOpen);
-  }, [apiChannel, error, channelId, channel, isOpen]);
-
-  // 필터 상태 관리
-  const [currentFilters, setCurrentFilters] = useState<SidebarFilters>({
-    dataTypes: [],
-    categories: [],
-    tags: [],
-    statuses: ['active'], // 기본값: active 콘텐츠만 표시
-  });
-
-  const handleFilterChange = (filters: SidebarFilters) => {
-    setCurrentFilters(filters);
-    console.log('Filters changed:', filters);
-    // TODO: Implement filter logic for content
-  };
-
-  // 채널 데이터 결정: API 데이터를 직접 사용하거나 기존 데이터를 API 형식으로 변환
-  const finalChannel = useMemo((): ChannelData | null => {
-    if (apiChannel) {
-      // API 데이터를 직접 사용
-      return apiChannel;
-    }
-    if (channel) {
-      // 기존 데이터를 API 형식으로 변환
-      return {
-        id: channel.id || '',
-        name: channel.name,
-        description: channel.description || null,
-        owner_id: channel.owner_id || '',
-        managers: channel.managers || [],
-        manager_ids: channel.manager_ids || [],
-        thumbnail_url: channel.thumbnail_url || null,
-        subscriber_count: channel.subscriber_count || 0,
-        content_count: channel.content_count || 0,
-        created_at: channel.created_at || undefined,
-        updated_at: channel.updated_at || null,
-        is_subscribed: channel.is_subscribed || false,
-        is_owner: channel.is_owner || false,
-        is_manager: channel.is_manager || false,
-      };
-    }
-    return null;
-  }, [apiChannel, channel, channelId]);
-
-  // 디버깅: 모달 상태를 강제로 표시
-  console.log('🎯 [ChannelModal] RENDER - isOpen:', isOpen, 'channelId:', channelId);
-
-  // finalChannel이 없어도 모달은 열어두고 로딩 상태 표시
   if (!isOpen) {
-    console.log('🎯 [ChannelModal] Modal is not open, returning null');
     return null;
   }
-
-  console.log('🎯 [ChannelModal] Modal is open, rendering modal content');
 
   return (
     <BaseModal
@@ -145,49 +87,30 @@ export function ChannelModal() {
           )}
         </div>
 
-        {/* Main Content */}
-        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
-          {error && (
-            <div className="text-red-500 text-center p-4">채널 정보를 불러오는데 실패했습니다.</div>
-          )}
-          {!error && finalChannel && (
+        {/* Main Content - 통일된 컨테이너 사용 */}
+        <ChannelContentContainer
+          isLoading={isLoading}
+          error={error}
+          hasData={hasData}
+          loadingTitle="Loading channel content..."
+          errorTitle="Failed to load channel content"
+          errorSubtitle="Please try again later"
+          emptyTitle="No content available"
+          emptySubtitle="This channel doesn't have any content yet"
+        >
+          {finalChannel && (
             <ChannelModalContent
-              currentFilters={currentFilters}
+              currentFilters={{
+                dataTypes: currentFilters.dataTypes || [],
+                categories: currentFilters.categories || [],
+                tags: currentFilters.tags || [],
+                statuses: currentFilters.statuses || ['active'],
+              }}
               channelId={channelId || undefined}
               onFilterChange={handleFilterChange}
             />
           )}
-          {!error && !finalChannel && (
-            <div className="space-y-6 p-6">
-              {/* Stats 스켈레톤 */}
-              <div className="space-y-4">
-                <div className="flex space-x-6">
-                  {Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="text-center">
-                      <div className="h-6 w-12 bg-zinc-700 rounded mx-auto mb-1 animate-pulse" />
-                      <div className="h-3 w-10 bg-zinc-800 rounded mx-auto animate-pulse" />
-                    </div>
-                  ))}
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="h-4 w-16 bg-zinc-800 rounded mx-auto animate-pulse" />
-                  ))}
-                </div>
-              </div>
-
-              {/* Content 스켈레톤 */}
-              <div>
-                <div className="h-8 w-32 bg-zinc-700 rounded mb-6 animate-pulse" />
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {Array.from({ length: 8 }).map((_, i) => (
-                    <div key={i} className="h-40 bg-zinc-800 rounded-xl animate-pulse" />
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+        </ChannelContentContainer>
       </ChannelModalContainer>
 
       {/* Content Upload Modal */}

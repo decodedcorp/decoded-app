@@ -429,7 +429,9 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
 
           {/* 설명 */}
           {description && (
-            <p className="text-zinc-400 text-sm mb-4 line-clamp-3 leading-relaxed">{description}</p>
+            <div className="text-zinc-400 text-sm mb-4 line-clamp-3 leading-relaxed whitespace-pre-wrap">
+              {description}
+            </div>
           )}
 
           {/* 이미지 (있는 경우) */}
