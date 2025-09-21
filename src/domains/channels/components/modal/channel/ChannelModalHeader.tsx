@@ -9,7 +9,6 @@ import { toast } from 'react-hot-toast';
 import { ChannelEditorsStackedAvatars } from '@/shared/components/ChannelEditorsStackedAvatars';
 import { EditorsListModal } from '@/shared/components/EditorsListModal';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
-import { useTranslations } from 'next-intl';
 
 interface ChannelModalHeaderProps {
   channel: ChannelData;
@@ -33,7 +32,6 @@ export function ChannelModalHeader({
   subscriptionHook,
 }: ChannelModalHeaderProps) {
   const t = useCommonTranslation();
-  const toastT = useTranslations('common.toast.general');
   const router = useRouter();
   const [isEditorsModalOpen, setIsEditorsModalOpen] = useState(false);
 
@@ -52,7 +50,7 @@ export function ChannelModalHeader({
         console.error('Error toggling subscription:', error);
       }
     } else {
-      toast.error(toastT('error'));
+      toast.error(t.toast.general.error());
     }
   };
 

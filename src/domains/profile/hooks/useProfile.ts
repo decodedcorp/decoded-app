@@ -4,7 +4,7 @@ import { UpdateProfileRequest } from '@/api/generated/models/UpdateProfileReques
 import { queryKeys } from '@/lib/api/queryKeys';
 import { useAuthStore } from '@/store/authStore';
 import toast from 'react-hot-toast';
-import { useTranslations } from 'next-intl';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 /**
  * Hook to get current user's profile
@@ -44,7 +44,7 @@ export const useUserProfile = (userId: string) => {
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
   const user = useAuthStore((state) => state.user);
-  const t = useTranslations('common.toast.profile');
+  const t = useCommonTranslation();
 
   return useMutation({
     mutationFn: (data: UpdateProfileRequest) =>
@@ -55,11 +55,11 @@ export const useUpdateProfile = () => {
         queryKey: queryKeys.users.profile(user?.doc_id || ''),
       });
 
-      toast.success(t('updated'));
+      toast.success(t.toast.profile.updated());
     },
     onError: (error: any) => {
       console.error('Failed to update profile:', error);
-      toast.error(error?.body?.detail || t('updateFailed'));
+      toast.error(error?.body?.detail || t.toast.profile.updateFailed());
     },
   });
 };

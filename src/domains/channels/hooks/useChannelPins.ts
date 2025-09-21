@@ -9,7 +9,7 @@ import { queryKeys } from '@/lib/api/queryKeys';
 import { refreshOpenAPIToken } from '@/api/hooks/useApi';
 import { toast } from 'react-hot-toast';
 import { useSimpleToastMutation } from '@/lib/hooks/useToastMutation';
-import { useTranslations } from 'next-intl';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 /**
  * 채널의 pinned 컨텐츠 목록을 조회하는 Hook
@@ -140,7 +140,7 @@ export const useUnpinContent = () => {
  */
 export const useReorderPins = () => {
   const queryClient = useQueryClient();
-  const t = useTranslations('common.toast.pins');
+  const t = useCommonTranslation();
 
   return useMutation({
     mutationFn: async ({ 
@@ -198,7 +198,7 @@ export const useReorderPins = () => {
     },
     onSuccess: (response, { channelId }) => {
       console.log('[useReorderPins] Pins reordered successfully:', response);
-      toast.success(t('orderUpdated'));
+      toast.success(t.toast.pins.orderUpdated());
       
       // 서버 데이터로 다시 동기화
       queryClient.invalidateQueries({ 
@@ -207,7 +207,7 @@ export const useReorderPins = () => {
     },
     onError: (error, { channelId }, context) => {
       console.error('[useReorderPins] Failed to reorder pins:', error);
-      toast.error(t('orderUpdateFailed'));
+      toast.error(t.toast.pins.orderUpdateFailed());
       
       // 실패 시 이전 데이터로 롤백
       if (context?.previousPins) {

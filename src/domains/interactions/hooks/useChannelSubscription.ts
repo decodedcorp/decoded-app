@@ -5,14 +5,14 @@ import { InteractionsService } from '@/api/generated/services/InteractionsServic
 import { SubscriptionResponse } from '@/api/generated/models/SubscriptionResponse';
 import { ChannelSubscriptionStatsResponse } from '@/api/generated/models/ChannelSubscriptionStatsResponse';
 import { toast } from 'react-hot-toast';
-import { useTranslations } from 'next-intl';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 /**
  * Channel subscription hook for managing subscribe/unsubscribe actions
  */
 export const useChannelSubscription = (channelId: string) => {
   const queryClient = useQueryClient();
-  const t = useTranslations('common.toast.subscription');
+  const t = useCommonTranslation();
 
   // Query keys for caching
   const subscriptionStatsKey = ['channel-subscription-stats', channelId];
@@ -93,7 +93,7 @@ export const useChannelSubscription = (channelId: string) => {
         });
 
         // Show success message
-        toast.success(t('subscribed'));
+        toast.success(t.toast.subscription.subscribed());
 
         // Invalidate only this specific channel's queries
         queryClient.invalidateQueries({
@@ -115,7 +115,7 @@ export const useChannelSubscription = (channelId: string) => {
     },
     onError: (error: any) => {
       console.error('Subscribe error:', error);
-      toast.error(t('subscribeFailed'));
+      toast.error(t.toast.subscription.subscribeFailed());
     },
   });
 
@@ -150,7 +150,7 @@ export const useChannelSubscription = (channelId: string) => {
         });
 
         // Show success message
-        toast.success(t('unsubscribed'));
+        toast.success(t.toast.subscription.unsubscribed());
 
         // Invalidate only this specific channel's queries
         queryClient.invalidateQueries({
@@ -172,7 +172,7 @@ export const useChannelSubscription = (channelId: string) => {
     },
     onError: (error: any) => {
       console.error('Unsubscribe error:', error);
-      toast.error(t('unsubscribeFailed'));
+      toast.error(t.toast.subscription.unsubscribeFailed());
     },
   });
 
