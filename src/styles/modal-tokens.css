@@ -15,9 +15,9 @@
   --modal-gap: 1.5rem; /* 24px */
 
   /* Modal Z-Index */
-  --z-modal-overlay: 60;
-  --z-modal-content: 61;
-  --z-modal-header: 62;
+  --z-modal-overlay: 1100; /* 헤더보다 높게 */
+  --z-modal-content: 1110; /* 헤더보다 높게 */
+  --z-modal-header: 1115; /* 모달 콘텐츠보다 높게 */
 
   /* Modal Animation */
   --modal-transition: 200ms ease-out;
