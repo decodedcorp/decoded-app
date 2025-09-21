@@ -71,6 +71,8 @@
     "showLess": "간단히 보기",
     "moreQuestions": "+{{count}}개 더 보기",
     "description": "설명",
+    "showMore": "더 보기",
+    "showLessDescription": "간단히 보기",
     "closeModal": "모달 닫기"
   },
   "interactiveQA": {

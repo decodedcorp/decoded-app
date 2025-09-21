@@ -147,6 +147,8 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
   const [isQAExpanded, setIsQAExpanded] = useState(false);
   const [isAIOverviewExpanded, setIsAIOverviewExpanded] = useState(true);
   const [isAIGenerating, setIsAIGenerating] = useState(true);
+  const [isDescriptionSectionExpanded, setIsDescriptionSectionExpanded] = useState(true);
+  const [isDescriptionContentExpanded, setIsDescriptionContentExpanded] = useState(false);
 
   // AI 콘텐츠가 있는지 확인
   const hasAIContent = content.aiSummary || (content.aiQaList && content.aiQaList.length > 0);
@@ -396,11 +398,75 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
 
         {/* Content Description - Moved below AI Overview */}
         {content.description && (
-          <div className="p-4 border-b border-zinc-700/50">
-            <h5 className="text-base font-medium text-white mb-2">{t('sidebar.description')}</h5>
-            <p className="text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap">
-              {content.description}
-            </p>
+          <div className="border-b border-zinc-700/50">
+            {/* Toggle Header */}
+            <div className="p-2 pt-2">
+              <button
+                onClick={() => setIsDescriptionSectionExpanded(!isDescriptionSectionExpanded)}
+                className="flex items-center justify-between w-full text-left group hover:bg-zinc-800/30 rounded-lg px-2 py-1 transition-colors"
+              >
+                <h5 className="text-base font-medium text-white">{t('sidebar.description')}</h5>
+                <div className="text-zinc-400 group-hover:text-white transition-colors">
+                  {isDescriptionSectionExpanded ? (
+                    <MdKeyboardArrowUp className="w-5 h-5" />
+                  ) : (
+                    <MdKeyboardArrowDown className="w-5 h-5" />
+                  )}
+                </div>
+              </button>
+            </div>
+
+            {/* Expandable Content */}
+            {isDescriptionSectionExpanded && (
+              <div className="px-4 pb-4">
+                {/* Show full content when section is expanded */}
+                {isDescriptionContentExpanded ? (
+                  <div>
+                    <p className="text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap">
+                      {content.description}
+                    </p>
+                    {/* Show Less Button for Long Descriptions */}
+                    {content.description && content.description.length > 100 && (
+                      <button
+                        onClick={() => setIsDescriptionContentExpanded(false)}
+                        className="text-zinc-500 hover:text-zinc-300 mt-2 text-sm cursor-pointer transition-colors"
+                      >
+                        {t('sidebar.showLessDescription')}
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  /* Show preview for long descriptions */
+                  <div>
+                    {content.description && content.description.length > 100 ? (
+                      <>
+                        <p
+                          className="text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap"
+                          style={{
+                            display: '-webkit-box',
+                            WebkitLineClamp: 3,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {content.description}
+                        </p>
+                        <button
+                          onClick={() => setIsDescriptionContentExpanded(true)}
+                          className="text-zinc-500 hover:text-zinc-300 mt-2 text-sm cursor-pointer transition-colors"
+                        >
+                          {t('sidebar.showMore')}
+                        </button>
+                      </>
+                    ) : (
+                      <p className="text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap">
+                        {content.description}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 

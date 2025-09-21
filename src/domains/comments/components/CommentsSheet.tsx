@@ -61,46 +61,47 @@ export function CommentsSheet() {
       isDragging = true;
     };
 
-           const handleTouchMove = (e: TouchEvent) => {
-             if (!isDragging) return;
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!isDragging) return;
 
-             currentY = e.touches[0].clientY;
-             const deltaY = currentY - startY;
+      currentY = e.touches[0].clientY;
+      const deltaY = currentY - startY;
 
-             // Only allow downward swipe with smoother animation
-             if (deltaY > 0 && modalRef.current) {
-               const translateY = Math.min(deltaY * 0.9, 200);
-               const opacity = Math.max(0.2, 1 - translateY / 300);
-               modalRef.current.style.transform = `translateY(${translateY}px)`;
-               modalRef.current.style.opacity = `${opacity}`;
-               modalRef.current.style.transition = 'none'; // Disable transition during drag
-             }
-           };
+      // Only allow downward swipe with smoother animation
+      if (deltaY > 0 && modalRef.current) {
+        const translateY = Math.min(deltaY * 0.9, 200);
+        const opacity = Math.max(0.2, 1 - translateY / 300);
+        modalRef.current.style.transform = `translateY(${translateY}px)`;
+        modalRef.current.style.opacity = `${opacity}`;
+        modalRef.current.style.transition = 'none'; // Disable transition during drag
+      }
+    };
 
-           const handleTouchEnd = () => {
-             if (!isDragging) return;
+    const handleTouchEnd = () => {
+      if (!isDragging) return;
 
-             const deltaY = currentY - startY;
+      const deltaY = currentY - startY;
 
-             // If swiped down more than 100px, close the modal
-             if (deltaY > 100) {
-               close('swipe');
-             } else if (modalRef.current) {
-             // Reset position with smooth spring animation
-             modalRef.current.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-             modalRef.current.style.transform = 'translateY(0)';
-             modalRef.current.style.opacity = '1';
+      // If swiped down more than 100px, close the modal
+      if (deltaY > 100) {
+        close('swipe');
+      } else if (modalRef.current) {
+        // Reset position with smooth spring animation
+        modalRef.current.style.transition =
+          'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+        modalRef.current.style.transform = 'translateY(0)';
+        modalRef.current.style.opacity = '1';
 
-             // Remove transition after animation
-             setTimeout(() => {
-               if (modalRef.current) {
-                 modalRef.current.style.transition = '';
-               }
-             }, 300);
-             }
+        // Remove transition after animation
+        setTimeout(() => {
+          if (modalRef.current) {
+            modalRef.current.style.transition = '';
+          }
+        }, 300);
+      }
 
-             isDragging = false;
-           };
+      isDragging = false;
+    };
 
     // Add event listeners
     window.addEventListener('keydown', handleKeyDown);
@@ -128,42 +129,44 @@ export function CommentsSheet() {
     <AnimatePresence>
       {/* Backdrop */}
       <motion.div
-        className="fixed inset-0 z-[1000] bg-black/20 backdrop-blur-sm pointer-events-auto"
+        key="comments-backdrop"
+        className="fixed inset-0 z-[1200] bg-black/20 backdrop-blur-sm pointer-events-auto"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{
           duration: 0.15,
-          ease: "easeOut"
+          ease: 'easeOut',
         }}
         onClick={() => close('backdrop')}
       />
 
       {/* Wrapper (no events) */}
       <motion.div
-        className="fixed inset-0 z-[1001] flex items-end justify-center pointer-events-none"
+        key="comments-wrapper"
+        className="fixed inset-0 z-[1201] flex items-end justify-center pointer-events-none"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{
           duration: 0.18,
-          ease: "easeOut"
+          ease: 'easeOut',
         }}
       >
         {/* Panel (receives events) */}
         <motion.div
           ref={modalRef}
-          className="relative z-[1002] pointer-events-auto bg-zinc-900 shadow-2xl max-h-[70vh] w-full sm:max-w-4xl lg:max-w-6xl mx-auto flex flex-col rounded-t-2xl"
+          className="relative z-[1202] pointer-events-auto bg-zinc-900 shadow-2xl max-h-[70vh] w-full sm:max-w-4xl lg:max-w-6xl mx-auto flex flex-col rounded-t-2xl"
           style={{ willChange: 'transform, opacity' }}
           initial={{ y: '100%', opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: '100%', opacity: 0 }}
           transition={{
-            type: "spring",
+            type: 'spring',
             stiffness: 400,
             damping: 25,
             mass: 0.6,
-            duration: 0.25
+            duration: 0.25,
           }}
           layout
           onClick={(e) => e.stopPropagation()}

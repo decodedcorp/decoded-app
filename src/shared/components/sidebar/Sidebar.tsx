@@ -6,7 +6,7 @@ import { createPortal } from 'react-dom';
 import {
   HomeIcon,
   RectangleStackIcon,
-  MagnifyingGlassIcon,
+  // MagnifyingGlassIcon, // Currently disabled
   BookmarkIcon,
   PlusIcon,
   UserIcon,
@@ -172,12 +172,13 @@ export const Sidebar = memo(function Sidebar() {
           label={t.navigation.home()}
           isActive={pathname === '/'}
         />
-        <SidebarItem
+        {/* Search menu - Currently disabled */}
+        {/* <SidebarItem
           href="/search"
           icon={<MagnifyingGlassIcon />}
           label={t.actions.search()}
           isActive={pathname === '/search'}
-        />
+        /> */}
         {/* Channels with toggleable channel list */}
         <SidebarToggleItem
           icon={<RectangleStackIcon />}

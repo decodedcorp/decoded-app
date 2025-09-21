@@ -2,7 +2,7 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 
-import { X, Image, Link, Upload } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Button } from '@decoded/ui';
 import { ContentType } from '@/lib/types/ContentType';
 import {
@@ -12,8 +12,8 @@ import {
 } from '@/store/contentUploadStore';
 import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
 // AI 생성 관련 컴포넌트 import 제거
-import { useCreateLinkContent, useCreateImageContent } from '@/domains/channels/hooks/useContents';
-import { compressImage, validateImageFile } from '@/lib/utils/imageUtils';
+import { useCreateLinkContent } from '@/domains/channels/hooks/useContents';
+// import { compressImage, validateImageFile } from '@/lib/utils/imageUtils'; // Commented out for now
 
 interface ContentUploadFormProps {
   onSubmit: (data: any) => void;
@@ -28,9 +28,9 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
   const updateFormData = useContentUploadStore((state) => state.updateFormData);
 
   const createLinkContent = useCreateLinkContent();
-  const createImageContent = useCreateImageContent();
+  // const createImageContent = useCreateImageContent(); // Commented out for now
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  // const fileInputRef = useRef<HTMLInputElement>(null); // Commented out for now
   const [validationErrors, setValidationErrors] = useState<{
     title?: string;
     description?: string;
@@ -56,6 +56,13 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     }
   };
 
+  // Set default type to LINK since we're only supporting links for now
+  React.useEffect(() => {
+    if (!formData.type) {
+      updateFormData({ type: ContentType.LINK });
+    }
+  }, [formData.type, updateFormData]);
+
   const handleTypeChange = (type: ContentType) => {
     updateFormData({
       type,
@@ -68,88 +75,69 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     setValidationErrors({});
   };
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  // Commented out for now - will be used later for image upload
+  // const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = event.target.files?.[0];
+  //   if (!file) return;
 
-    console.log('File selected:', file.name, file.type, file.size);
+  //   console.log('File selected:', file.name, file.type, file.size);
 
-    // Validate file based on content type
-    if (formData.type === ContentType.IMAGE) {
-      const validation = validateImageFile(file, {
-        maxSizeBytes: 10 * 1024 * 1024, // 10MB
-        allowedTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
-      });
+  //   // Validate file based on content type
+  //   if (formData.type === ContentType.IMAGE) {
+  //     const validation = validateImageFile(file, {
+  //       maxSizeBytes: 10 * 1024 * 1024, // 10MB
+  //       allowedTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
+  //     });
 
-      if (!validation.isValid) {
-        console.log('File validation failed:', validation.error);
-        updateFormData({ file: undefined, filePreview: undefined });
-        setValidationErrors((prev) => ({ ...prev, file: validation.error }));
-        return;
-      }
+  //     if (!validation.isValid) {
+  //       console.log('File validation failed:', validation.error);
+  //       updateFormData({ file: undefined, filePreview: undefined });
+  //       setValidationErrors((prev) => ({ ...prev, file: validation.error }));
+  //       return;
+  //     }
 
-      try {
-        console.log('Starting image processing...');
-        const optimizedBase64 = await compressImage(file, {
-          maxSizeBytes: 500 * 1024, // 500KB
-          maxWidth: 800,
-          maxHeight: 600,
-          quality: 0.8,
-          format: 'jpeg',
-          includeDataPrefix: true,
-        });
+  //     try {
+  //       console.log('Starting image processing...');
+  //       const optimizedBase64 = await compressImage(file, {
+  //         maxSizeBytes: 500 * 1024, // 500KB
+  //         maxWidth: 800,
+  //         maxHeight: 600,
+  //         quality: 0.8,
+  //         format: 'jpeg',
+  //         includeDataPrefix: true,
+  //       });
 
-        console.log('Image processed successfully, base64 length:', optimizedBase64?.length);
+  //       console.log('Image processed successfully, base64 length:', optimizedBase64?.length);
 
-        updateFormData({
-          file,
-          filePreview: URL.createObjectURL(file),
-          base64_img_url: optimizedBase64,
-        });
-        setValidationErrors((prev) => ({ ...prev, file: undefined }));
-      } catch (error) {
-        console.error('Image processing failed:', error);
-        updateFormData({ file: undefined, filePreview: undefined });
-        setValidationErrors((prev) => ({
-          ...prev,
-          file: t.globalContentUpload.contentUpload.validation.imageProcessingError(),
-        }));
-      }
-    }
-  };
+  //       updateFormData({
+  //         file,
+  //         filePreview: URL.createObjectURL(file),
+  //         base64_img_url: optimizedBase64,
+  //       });
+  //       setValidationErrors((prev) => ({ ...prev, file: undefined }));
+  //     } catch (error) {
+  //       console.error('Image processing failed:', error);
+  //       updateFormData({ file: undefined, filePreview: undefined });
+  //       setValidationErrors((prev) => ({
+  //         ...prev,
+  //         file: t.globalContentUpload.contentUpload.validation.imageProcessingError(),
+  //       }));
+  //     }
+  //   }
+  // };
 
   const validateForm = () => {
     const errors: typeof validationErrors = {};
 
-    // if (!formData.title.trim()) {
-    //   errors.title = 'Please enter a title.';
-    // }
-
-    // if (formData.title.trim().length > 100) {
-    //   errors.title = 'Title must be 100 characters or less.';
-    // }
-
+    // Description validation
     if (formData.description && formData.description.trim().length > 500) {
       errors.description = t.globalContentUpload.contentUpload.validation.descriptionTooLong();
     }
 
-    if (formData.type === ContentType.IMAGE && !formData.file) {
-      errors.file = t.globalContentUpload.contentUpload.validation.imageRequired();
-    }
-
-    if (formData.type === ContentType.IMAGE && !formData.base64_img_url) {
-      errors.file = t.globalContentUpload.contentUpload.validation.imageRequired();
-    }
-
-    // // if (formData.type === ContentType.VIDEO && !formData.file) {
-    // //   errors.file = 'Please select a video.';
-    // // }
-
-    if (formData.type === ContentType.LINK && !formData.url?.trim()) {
+    // URL validation - required for links
+    if (!formData.url?.trim()) {
       errors.url = t.globalContentUpload.contentUpload.validation.urlRequired();
-    }
-
-    if (formData.type === ContentType.LINK && formData.url?.trim()) {
+    } else {
       try {
         new URL(formData.url.trim());
       } catch {
@@ -174,18 +162,11 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
       }
 
       const submitData = {
-        type: formData.type,
+        type: ContentType.LINK,
         title: formData.title.trim() || 'Untitled', // 기본값 설정
         description: formData.description.trim() || null,
         channel_id: formData.channel_id || 'test-channel-id', // 테스트용 임시 채널 ID
-        ...(formData.type === ContentType.IMAGE && { base64_img_url: formData.base64_img_url }),
-        // ...(formData.type === ContentType.VIDEO && {
-        //   video_url: formData.video_url,
-        //   thumbnail_url: formData.thumbnail_url,
-        // }),
-        ...(formData.type === ContentType.LINK && {
-          url: formData.url?.trim(),
-        }),
+        url: formData.url?.trim(),
       };
 
       // formData에 channel_id 설정
@@ -194,30 +175,12 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
       }
 
       console.log('Submitting content data:', submitData);
-      console.log('Form data type:', formData.type);
       console.log('Form data URL:', formData.url);
       console.log('Submit data channel_id:', submitData.channel_id);
 
       try {
-        // 실제 API 호출
-        if (
-          formData.type === ContentType.IMAGE &&
-          submitData.channel_id &&
-          formData.base64_img_url
-        ) {
-          console.log('About to call createImageContent.mutateAsync...');
-          const result = await createImageContent.mutateAsync({
-            channel_id: submitData.channel_id,
-            base64_img: formData.base64_img_url,
-            description: formData.description?.trim() || null,
-          });
-
-          console.log('Image content created successfully:', result);
-
-          // 이미지 포스트 생성 완료 후 바로 모달 닫기
-          console.log('Image content created, closing modal...');
-          onSubmit(submitData);
-        } else if (formData.type === ContentType.LINK && submitData.channel_id && formData.url) {
+        // 링크 콘텐츠 생성 API 호출
+        if (submitData.channel_id && formData.url) {
           console.log('About to call createLinkContent.mutateAsync...');
           console.log('Link content data:', {
             channel_id: submitData.channel_id,
@@ -237,26 +200,20 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
 
           console.log('Link content created successfully:', result);
 
-          // 링크 포스트 생성 완료 후 바로 모달 닫기 (기본 포스트 동작)
+          // 링크 포스트 생성 완료 후 바로 모달 닫기
           console.log('Link content created, closing modal...');
           onSubmit(submitData);
         } else {
-          console.log('Condition not met for API call');
-          console.log('formData.type:', formData.type);
+          console.log('Missing required data for API call');
           console.log('submitData.channel_id:', submitData.channel_id);
-          console.log('formData.base64_img_url exists:', !!formData.base64_img_url);
           console.log('formData.url:', formData.url);
-          console.log('ContentType.LINK:', ContentType.LINK);
-          console.log('formData.type === ContentType.LINK:', formData.type === ContentType.LINK);
-          console.log('submitData.channel_id truthy:', !!submitData.channel_id);
-          console.log('formData.url truthy:', !!formData.url);
         }
       } catch (error) {
         console.error('Failed to create content:', error);
         // 에러는 상위 컴포넌트에서 처리
       }
     },
-    [formData, validateForm, createImageContent, createLinkContent, onSubmit, updateFormData],
+    [formData, validateForm, createLinkContent, onSubmit, updateFormData],
   );
 
   // 외부에서 폼 제출을 트리거할 수 있도록 전역 함수 노출
@@ -271,25 +228,26 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     };
   }, [handleSubmit]);
 
-  const removeFile = () => {
-    if (formData.filePreview) {
-      URL.revokeObjectURL(formData.filePreview);
-    }
-    updateFormData({
-      file: undefined,
-      filePreview: undefined,
-      img_url: undefined,
-      video_url: undefined,
-    });
-    setValidationErrors((prev) => ({ ...prev, file: undefined }));
-  };
+  // Commented out for now - will be used later for image upload
+  // const removeFile = () => {
+  //   if (formData.filePreview) {
+  //     URL.revokeObjectURL(formData.filePreview);
+  //   }
+  //   updateFormData({
+  //     file: undefined,
+  //     filePreview: undefined,
+  //     img_url: undefined,
+  //     video_url: undefined,
+  //   });
+  //   setValidationErrors((prev) => ({ ...prev, file: undefined }));
+  // };
 
   // AI 생성 로직 제거 - 링크 포스트는 기본 포스트 동작으로 처리
 
   return (
     <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-6">
-      {/* Content Type Selection */}
-      <div>
+      {/* Content Type Selection - Commented out for now, will be used later */}
+      {/* <div>
         <label className="block text-sm font-medium text-white mb-3">
           {t.globalContentUpload.contentUpload.contentType()} *
         </label>
@@ -324,57 +282,26 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
             </button>
           ))}
         </div>
-      </div>
+      </div> */}
 
-      {/* File Upload for Image */}
-      {formData.type === ContentType.IMAGE && (
+      {/* File Upload for Image - Commented out for now, will be used later */}
+      {/* {formData.type === ContentType.IMAGE && (
         <div>
           <label className="block text-sm font-medium text-white mb-3">
             {t.globalContentUpload.contentUpload.imageUpload()} *
           </label>
 
-          {formData.filePreview ? (
-            <div className="space-y-3">
-              <div className="relative rounded-lg overflow-hidden bg-zinc-800/50 border border-zinc-700/50">
-                <img
-                  src={formData.filePreview}
-                  alt="Preview"
-                  className="w-full h-48 object-cover"
-                />
-                <Button
-                  type="button"
-                  onClick={removeFile}
-                  variant="destructive"
-                  size="sm"
-                  className="absolute top-2 right-2 w-8 h-8 rounded-full p-0"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
+          <div className="space-y-3">
+            <div className="w-full h-32 border-2 border-dashed border-zinc-700 rounded-lg flex items-center justify-center bg-zinc-800/30">
+              <div className="flex flex-col items-center space-y-2 text-zinc-500">
+                <Upload className="w-8 h-8" />
+                <span className="text-sm">{t.globalContentUpload.contentUpload.selectImage()}</span>
               </div>
-              <p className="text-sm text-zinc-400">
-                {formData.file?.name} ({(formData.file?.size || 0 / 1024 / 1024).toFixed(2)} MB)
-              </p>
             </div>
-          ) : (
-            <div className="space-y-3">
-              <div className="w-full h-32 border-2 border-dashed border-zinc-700 rounded-lg flex items-center justify-center hover:border-zinc-600 transition-colors cursor-pointer">
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="flex flex-col items-center space-y-2 text-zinc-400 hover:text-zinc-300 transition-colors"
-                  disabled={isLoading}
-                >
-                  <Upload className="w-8 h-8" />
-                  <span className="text-sm">
-                    {t.globalContentUpload.contentUpload.selectImage()}
-                  </span>
-                </button>
-              </div>
-              <p className="text-sm text-zinc-400">
-                {t.globalContentUpload.contentUpload.fileFormats()}
-              </p>
+            <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+              <p className="text-sm text-amber-400">Image upload feature is coming soon!</p>
             </div>
-          )}
+          </div>
 
           <input
             ref={fileInputRef}
@@ -382,39 +309,33 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
             accept="image/*"
             onChange={handleFileChange}
             className="hidden"
-            disabled={isLoading}
+            disabled={true}
           />
+        </div>
+      )} */}
 
-          {validationErrors.file && (
-            <p className="mt-1 text-sm text-red-400">{validationErrors.file}</p>
+      {/* URL Input for Link - Always shown for now */}
+      <div className="space-y-4">
+        <div>
+          <label htmlFor="content-url" className="block text-sm font-medium text-white mb-2">
+            {t.globalContentUpload.contentUpload.linkUrl()} *
+          </label>
+          <input
+            id="content-url"
+            type="url"
+            value={formData.url || ''}
+            onChange={(e) => handleInputChange('url', e.target.value)}
+            className={`w-full px-4 py-3 bg-zinc-800 border rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-600 focus:border-transparent transition-colors ${
+              validationErrors.url ? 'border-red-500' : 'border-zinc-700'
+            }`}
+            placeholder="https://example.com"
+            disabled={isLoading || createLinkContent.isPending}
+          />
+          {validationErrors.url && (
+            <p className="mt-1 text-sm text-red-400">{validationErrors.url}</p>
           )}
         </div>
-      )}
-
-      {/* URL Input for Link */}
-      {formData.type === ContentType.LINK && (
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="content-url" className="block text-sm font-medium text-white mb-2">
-              {t.globalContentUpload.contentUpload.linkUrl()} *
-            </label>
-            <input
-              id="content-url"
-              type="url"
-              value={formData.url || ''}
-              onChange={(e) => handleInputChange('url', e.target.value)}
-              className={`w-full px-4 py-3 bg-zinc-800 border rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-600 focus:border-transparent transition-colors ${
-                validationErrors.url ? 'border-red-500' : 'border-zinc-700'
-              }`}
-              placeholder="https://example.com"
-              disabled={isLoading || createLinkContent.isPending}
-            />
-            {validationErrors.url && (
-              <p className="mt-1 text-sm text-red-400">{validationErrors.url}</p>
-            )}
-          </div>
-        </div>
-      )}
+      </div>
 
       {/* Description Input - shown for all content types */}
       <div>
@@ -434,7 +355,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
           placeholder={t.globalContentUpload.contentUpload.addDescription()}
           rows={3}
           maxLength={500}
-          disabled={isLoading || createLinkContent.isPending || createImageContent.isPending}
+          disabled={isLoading || createLinkContent.isPending}
         />
         <div className="flex justify-between items-center mt-1">
           {validationErrors.description && (

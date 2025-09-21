@@ -141,7 +141,7 @@ export const Header = memo(function Header() {
         <div className="flex items-center gap-3 lg:gap-0">
           <button
             onClick={toggleMobileSidebar}
-            className="lg:hidden min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [-webkit-tap-highlight-color:rgba(0,0,0,0.08)]"
+            className="lg:hidden min-h-11 min-w-11 inline-flex items-center justify-center hover:bg-zinc-800/50 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [-webkit-tap-highlight-color:rgba(0,0,0,0.08)]"
             aria-controls="mobile-sidebar"
             aria-expanded={isMobileSidebarOpen}
             aria-label={isMobileSidebarOpen ? 'Close menu' : t.header.openMenu()}
@@ -226,20 +226,6 @@ export const Header = memo(function Header() {
           style={{ zIndex: 'var(--z-overlay)', paddingInline: 'var(--edge-x)' }}
         >
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => setIsMobileSearchOpen(false)}
-              className="p-2 text-zinc-400 hover:text-white transition-colors"
-              aria-label={t.header.closeSearch()}
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
             <div className="flex-1">
               {isChannelPage && channelName ? (
                 <ChannelSearchBar

@@ -103,7 +103,7 @@ export function CommentsModal() {
     <AnimatePresence>
       {/* Backdrop */}
       <motion.div
-        className="fixed inset-0 z-[1000] bg-black/60 pointer-events-auto"
+        className="fixed inset-0 z-[1200] bg-black/60 pointer-events-auto"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -112,7 +112,7 @@ export function CommentsModal() {
 
       {/* Wrapper (no events) */}
       <motion.div
-        className="fixed inset-0 z-[1001] grid place-items-center pointer-events-none"
+        className="fixed inset-0 z-[1201] grid place-items-center pointer-events-none"
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.98 }}
@@ -126,7 +126,7 @@ export function CommentsModal() {
           tabIndex={-1}
           onKeyDown={handleKeyDown}
           className={cn(
-            'relative z-[1002] pointer-events-auto max-h-[85dvh] w-[min(720px,92vw)] overflow-auto rounded-2xl bg-zinc-900 shadow-2xl',
+            'relative z-[1202] pointer-events-auto max-h-[85dvh] w-[min(720px,92vw)] overflow-auto rounded-2xl bg-zinc-900 shadow-2xl',
             'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-black',
           )}
           initial={{ opacity: 0, scale: 0.95 }}

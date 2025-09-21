@@ -10,7 +10,7 @@ import { ChannelData } from '@/store/channelModalStore';
 import { useContentUploadStore } from '@/store/contentUploadStore';
 import { toast } from 'react-hot-toast';
 import { useUser } from '@/domains/auth/hooks/useAuth';
-import { canManageChannelManagers } from '@/lib/utils/channelPermissions';
+// import { canManageChannelManagers } from '@/lib/utils/channelPermissions'; // Currently disabled
 import { useChannelSubscription } from '@/domains/interactions/hooks/useChannelSubscription';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
 
@@ -117,7 +117,7 @@ export function ChannelPageHeader({
 
   // 소유자 권한 확인
   const isOwner = user?.doc_id && channel.owner_id && user.doc_id === channel.owner_id;
-  const canManageSettings = canManageChannelManagers(user, channel);
+  // const canManageSettings = canManageChannelManagers(user, channel); // Currently disabled
 
   return (
     <div>
@@ -259,8 +259,8 @@ export function ChannelPageHeader({
                 </button>
               )}
 
-              {/* Settings 버튼 */}
-              {canManageSettings && (
+              {/* Settings 버튼 - Currently disabled */}
+              {/* {canManageSettings && (
                 <button
                   onClick={handleSettings}
                   className="p-2 rounded-full bg-zinc-800 hover:bg-zinc-700 text-white transition-colors"
@@ -284,7 +284,7 @@ export function ChannelPageHeader({
                     />
                   </svg>
                 </button>
-              )}
+              )} */}
             </div>
           </div>
 

@@ -253,6 +253,7 @@ export function CommentItem({
               onClick={handleLike}
               disabled={commentLikeMutation.isPending}
               className="flex items-center space-x-1 text-zinc-400 hover:text-red-400 transition-colors"
+              aria-label={`좋아요 ${comment.likes || 0}개`}
             >
               <MdFavoriteBorder className="w-4 h-4" />
               <span>{comment.likes || 0}</span>
@@ -263,6 +264,7 @@ export function CommentItem({
               onClick={handleDislike}
               disabled={commentLikeMutation.isPending}
               className="flex items-center space-x-1 text-zinc-400 hover:text-blue-400 transition-colors"
+              aria-label={`싫어요 ${comment.dislikes || 0}개`}
             >
               <MdThumbDownOffAlt className="w-4 h-4" />
               <span>{comment.dislikes || 0}</span>
@@ -284,10 +286,10 @@ export function CommentItem({
                   }
                   setShowReplyInput(!showReplyInput);
                 }}
-                className="flex items-center space-x-1 text-zinc-400 hover:text-white transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-full bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors"
+                aria-label={tc.item.reply()}
               >
-                <MdReply className="w-4 h-4" />
-                <span>{tc.item.reply()}</span>
+                <MdReply className="w-4 h-4 text-zinc-400 hover:text-white" />
               </button>
             )}
 

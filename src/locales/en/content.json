@@ -71,6 +71,8 @@
     "showLess": "Show less",
     "moreQuestions": "+{{count}} more questions",
     "description": "Description",
+    "showMore": "Show more",
+    "showLessDescription": "Show less",
     "closeModal": "Close modal"
   },
   "interactiveQA": {

@@ -186,8 +186,8 @@ export function EditorsListModal({
                       </div>
                     </div>
 
-                    {/* Follow Button */}
-                    <button
+                    {/* Follow Button - Currently disabled */}
+                    {/* <button
                       className="px-4 py-2 bg-zinc-700 border border-zinc-600 rounded-full hover:bg-zinc-600 transition-colors font-medium text-sm text-white"
                       onClick={() => {
                         // TODO: Implement follow functionality
@@ -195,7 +195,7 @@ export function EditorsListModal({
                       }}
                     >
                       {t('actions.follow')}
-                    </button>
+                    </button> */}
                   </div>
                 ))}
               </div>

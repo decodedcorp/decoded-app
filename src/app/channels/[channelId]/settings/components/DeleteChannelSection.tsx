@@ -44,14 +44,13 @@ export function DeleteChannelSection({ channel }: DeleteChannelSectionProps) {
       <div className="border border-red-600/30 rounded-lg p-6 bg-red-900/10">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <h3 className="text-lg font-medium text-red-400 mb-2">
-              Delete Channel
-            </h3>
+            <h3 className="text-lg font-medium text-red-400 mb-2">Delete Channel</h3>
             <p className="text-zinc-400 text-sm mb-4">
               Once you delete this channel, there is no going back. This action cannot be undone.
-              All content, subscribers, and data associated with this channel will be permanently deleted.
+              All content, subscribers, and data associated with this channel will be permanently
+              deleted.
             </p>
-            
+
             {/* Warning List */}
             <div className="bg-red-900/20 border border-red-600/20 rounded-lg p-4 mb-4">
               <h4 className="text-red-400 font-medium mb-2">This will permanently delete:</h4>
@@ -64,7 +63,8 @@ export function DeleteChannelSection({ channel }: DeleteChannelSectionProps) {
               </ul>
             </div>
 
-            {!showConfirm ? (
+            {/* Channel deletion is currently disabled */}
+            {/* {!showConfirm ? (
               <button
                 onClick={() => setShowConfirm(true)}
                 className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
@@ -75,7 +75,8 @@ export function DeleteChannelSection({ channel }: DeleteChannelSectionProps) {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Type "<span className="font-mono text-red-400">{channel.name}</span>" to confirm:
+                    Type "<span className="font-mono text-red-400">{channel.name}</span>" to
+                    confirm:
                   </label>
                   <input
                     type="text"
@@ -85,7 +86,7 @@ export function DeleteChannelSection({ channel }: DeleteChannelSectionProps) {
                     placeholder={`Type "${channel.name}" here`}
                   />
                 </div>
-                
+
                 <div className="flex items-center space-x-3">
                   <button
                     onClick={handleDelete}
@@ -105,7 +106,11 @@ export function DeleteChannelSection({ channel }: DeleteChannelSectionProps) {
                   </button>
                 </div>
               </div>
-            )}
+            )} */}
+
+            <div className="text-zinc-500 text-sm italic">
+              Channel deletion is currently disabled
+            </div>
           </div>
         </div>
       </div>
