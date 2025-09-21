@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useRouter, useSearchParams, useParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
@@ -17,6 +17,7 @@ export default function ProfilePage() {
   const { t } = useTranslation('profile');
   const currentUser = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isInitialized = useAuthStore((state) => state.isInitialized);
 
   // Get userid from URL parameter
   const targetUserId = params.userid as string;
@@ -25,8 +26,47 @@ export default function ProfilePage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const activeTab = searchParams.get('tab') || 'channels';
 
-  // Get profile data via API
+  // Get profile data via API (always call hooks at the top level)
   const { data: profileData, isLoading, error } = useUserProfile(targetUserId || '');
+
+  // Memoized components to prevent unnecessary re-renders (always call hooks at the top level)
+  const profileHeader = useMemo(
+    () => (
+      <ProfileHeader
+        userId={targetUserId!}
+        profileData={profileData}
+        isMyProfile={isMyProfile}
+        onEditClick={() => setIsEditModalOpen(true)}
+      />
+    ),
+    [targetUserId, profileData, isMyProfile],
+  );
+
+  const profileSidebar = useMemo(
+    () => (
+      <ProfileSidebar userId={targetUserId!} profileData={profileData} isMyProfile={isMyProfile} />
+    ),
+    [targetUserId, profileData, isMyProfile],
+  );
+
+  const profileTabs = useMemo(
+    () => <ProfileTabs activeTab={activeTab} userId={targetUserId!} isMyProfile={isMyProfile} />,
+    [activeTab, targetUserId, isMyProfile],
+  );
+
+  // 인증 초기화가 완료될 때까지 로딩 표시
+  if (!isInitialized) {
+    return (
+      <div className="w-full px-3 py-4 sm:px-4 sm:py-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">{t('loading.initializing')}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Show not found if no userid provided
   if (!targetUserId) {
@@ -126,67 +166,33 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-black">
       <div
-        className="container mx-auto px-4 py-8"
+        className="w-full px-3 py-4 sm:px-4 sm:py-8"
         style={{
-          maxWidth:
-            'calc(100vw - var(--sidebar-width) - var(--sidebar-right-width) - 2 * var(--gap-main) - 2 * var(--container-padding-x))',
+          maxWidth: 'var(--content-max-width)',
+          margin: '0 auto',
         }}
         role="main"
         aria-label={t('page.title')}
       >
         {/* Mobile: Stack vertically */}
-        <div className="block lg:hidden">
-          {/* Profile Header */}
-          <ProfileHeader
-            userId={targetUserId!}
-            profileData={profileData}
-            isMyProfile={isMyProfile}
-            onEditClick={() => setIsEditModalOpen(true)}
-          />
-
-          {/* Sidebar on top for mobile */}
-          <div className="mt-6">
-            <ProfileSidebar
-              userId={targetUserId!}
-              profileData={profileData}
-              isMyProfile={isMyProfile}
-            />
-          </div>
-
-          {/* Divider */}
-          <div className="border-t border-zinc-800 my-6" />
-
-          {/* Profile Tabs */}
-          <ProfileTabs activeTab={activeTab} userId={targetUserId!} isMyProfile={isMyProfile} />
+        <div className="block lg:hidden space-y-4 sm:space-y-6">
+          {profileHeader}
+          {profileSidebar}
+          <div className="border-t border-zinc-800" />
+          {profileTabs}
         </div>
 
         {/* Desktop: Side by side */}
-        <div className="hidden lg:flex gap-8">
+        <div className="hidden lg:flex gap-6">
           {/* Main Content */}
           <div className="flex-1 min-w-0">
-            {/* Profile Header */}
-            <ProfileHeader
-              userId={targetUserId!}
-              profileData={profileData}
-              isMyProfile={isMyProfile}
-              onEditClick={() => setIsEditModalOpen(true)}
-            />
-
-            {/* Divider */}
+            {profileHeader}
             <div className="border-t border-zinc-800 my-6" />
-
-            {/* Profile Tabs */}
-            <ProfileTabs activeTab={activeTab} userId={targetUserId!} isMyProfile={isMyProfile} />
+            {profileTabs}
           </div>
 
           {/* Sidebar */}
-          <div className="w-80 flex-shrink-0">
-            <ProfileSidebar
-              userId={targetUserId!}
-              profileData={profileData}
-              isMyProfile={isMyProfile}
-            />
-          </div>
+          <div className="w-80 flex-shrink-0">{profileSidebar}</div>
         </div>
       </div>
 

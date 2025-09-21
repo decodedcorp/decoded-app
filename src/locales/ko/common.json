@@ -39,7 +39,8 @@
     "ready": "준비되었어요",
     "pending": "대기 중",
     "completed": "완료됨",
-    "failed": "실패함"
+    "failed": "실패함",
+    "redirecting": "리다이렉트 중..."
   },
   "states": {
     "subscribed": "구독됨",

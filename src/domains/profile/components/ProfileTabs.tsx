@@ -63,15 +63,15 @@ export function ProfileTabs({ activeTab, userId, isMyProfile }: ProfileTabsProps
   return (
     <div>
       {/* Tab Navigation */}
-      <div className="border-b border-zinc-800 mb-8">
-        <div className="flex gap-1 overflow-x-auto scrollbar-hide">
+      <div className="border-b border-zinc-800 mb-6 sm:mb-8">
+        <div className="flex gap-1 overflow-x-auto scrollbar-hide pb-1">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => handleTabChange(tab.id)}
               className={`
-                px-6 py-3 font-medium transition-all duration-200
-                border-b-2 whitespace-nowrap
+                px-3 sm:px-6 py-2 sm:py-3 font-medium transition-all duration-200
+                border-b-2 whitespace-nowrap text-sm sm:text-base
                 ${
                   activeTab === tab.id
                     ? 'text-[#EAFD66] border-[#EAFD66]'
@@ -86,7 +86,7 @@ export function ProfileTabs({ activeTab, userId, isMyProfile }: ProfileTabsProps
       </div>
 
       {/* Tab Content */}
-      <div className="min-h-[400px]">{renderTabContent()}</div>
+      <div className="min-h-[300px] sm:min-h-[400px]">{renderTabContent()}</div>
     </div>
   );
 }

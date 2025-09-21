@@ -39,7 +39,8 @@
     "ready": "Ready",
     "pending": "Pending",
     "completed": "Completed",
-    "failed": "Failed"
+    "failed": "Failed",
+    "redirecting": "Redirecting..."
   },
   "states": {
     "subscribed": "Subscribed",

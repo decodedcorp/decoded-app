@@ -11,7 +11,8 @@
   },
   "loading": {
     "title": "프로필 로딩 중...",
-    "description": "사용자 정보를 불러오는 중이에요"
+    "description": "사용자 정보를 불러오는 중이에요",
+    "initializing": "로딩 중..."
   },
   "error": {
     "title": "오류가 발생했어요",
