@@ -18,9 +18,9 @@ export const Z_INDEX_TOKENS = {
   sticky: 55,
 
   // Overlays and modals (통합된 모달 시스템용)
-  overlay: 50, // 모달 오버레이
-  modal: 60, // 모달 콘텐츠
-  'modal-root': 70, // 모달 루트 컨테이너
+  overlay: 1100, // 모달 오버레이 (헤더보다 높게)
+  modal: 1100, // 모달 콘텐츠 (헤더보다 높게)
+  'modal-root': 1110, // 모달 루트 컨테이너 (헤더보다 높게)
 
   // Legacy compatibility (기존 코드 호환)
   'modal-legacy': 1000,
@@ -61,10 +61,10 @@ export const Z_INDEX = {
 
   // 기존 모달 시스템 (마이그레이션 후 제거 예정)
   MODAL_BACKGROUND_BLUR: 999,
-  MODAL_OVERLAY: Z_INDEX_TOKENS['modal-legacy'],
-  MODAL_CONTENT: Z_INDEX_TOKENS['modal-legacy'] + 10,
-  CONTENT_MODAL_OVERLAY: Z_INDEX_TOKENS['content-modal'],
-  CONTENT_MODAL_CONTENT: Z_INDEX_TOKENS['content-modal'] + 10,
+  MODAL_OVERLAY: 1100, // 헤더보다 높게
+  MODAL_CONTENT: 1110, // 헤더보다 높게
+  CONTENT_MODAL_OVERLAY: 1100, // 헤더보다 높게
+  CONTENT_MODAL_CONTENT: 1110, // 헤더보다 높게
 
   TOAST: Z_INDEX_TOKENS.toast,
   DEBUG: Z_INDEX_TOKENS.debug,
@@ -90,10 +90,10 @@ export const Z_INDEX_CLASSES = {
   DROPDOWN: 'z-[50]',
   STICKY_HEADER: 'z-[55]',
   MODAL_BACKGROUND_BLUR: 'z-[999]',
-  MODAL_OVERLAY: 'z-[1000]',
-  MODAL_CONTENT: 'z-[1010]',
-  CONTENT_MODAL_OVERLAY: 'z-[1100]',
-  CONTENT_MODAL_CONTENT: 'z-[1110]',
+  MODAL_OVERLAY: 'z-[1100]', // 헤더보다 높게
+  MODAL_CONTENT: 'z-[1110]', // 헤더보다 높게
+  CONTENT_MODAL_OVERLAY: 'z-[1100]', // 헤더보다 높게
+  CONTENT_MODAL_CONTENT: 'z-[1110]', // 헤더보다 높게
   
   // 새로운 댓글 시스템
   COMMENTS_MODAL_OVERLAY: 'z-[1200]',

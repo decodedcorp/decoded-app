@@ -85,8 +85,12 @@ export function BaseModal({
 
   const node = (
     <div
-      className={`fixed inset-0 ${Z_INDEX_CLASSES.MODAL_OVERLAY} flex items-center justify-center p-2 sm:p-4 pt-16 sm:pt-20`}
-      style={{ backdropFilter: 'blur(8px)' }}
+      className={`fixed inset-0 ${Z_INDEX_CLASSES.MODAL_OVERLAY} flex items-center justify-center p-2 sm:p-4`}
+      style={{ 
+        backdropFilter: 'blur(8px)',
+        paddingTop: 'max(1rem, min(5rem, 20vh))',
+        paddingBottom: 'max(1rem, min(5rem, 20vh))'
+      }}
       role="presentation"
     >
       {/* 오버레이 배경 */}
@@ -114,7 +118,8 @@ export function BaseModal({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descId}
-        className={`relative ${Z_INDEX_CLASSES.MODAL_CONTENT} ${className}`}
+        className={`relative ${Z_INDEX_CLASSES.MODAL_CONTENT} max-h-[80vh] overflow-y-auto ${className}`}
+        style={{ maxHeight: '80vh' }}
         // 모달 내부 클릭은 버블링 중단(backdrop 클릭 닫기와 충돌 방지)
         onClick={(e) => e.stopPropagation()}
       >

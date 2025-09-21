@@ -95,9 +95,13 @@ export function BaseModal({
   const node = (
     <div
       className={`fixed inset-0 ${Z_INDEX_CLASSES.MODAL_OVERLAY} flex items-center justify-center ${
-        isMobile ? 'p-0' : 'p-2 sm:p-4 pt-16 sm:pt-20'
+        isMobile ? 'p-0' : 'p-2 sm:p-4'
       }`}
-      style={{ backdropFilter: 'blur(8px)' }}
+      style={{ 
+        backdropFilter: 'blur(8px)',
+        paddingTop: isMobile ? '0' : 'max(1rem, min(5rem, 20vh))',
+        paddingBottom: isMobile ? '0' : 'max(1rem, min(5rem, 20vh))'
+      }}
       role="presentation"
       onClick={(e) => {
         // 모달 내용이 아닌 배경 클릭시에만 모달 닫기
@@ -122,7 +126,8 @@ export function BaseModal({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descId}
-        className={`relative ${Z_INDEX_CLASSES.MODAL_CONTENT} ${contentClassName} ${className}`}
+        className={`relative ${Z_INDEX_CLASSES.MODAL_CONTENT} ${contentClassName} max-h-[80vh] overflow-y-auto ${className}`}
+        style={{ maxHeight: '80vh' }}
         // 모달 내부 클릭은 버블링 중단(backdrop 클릭 닫기와 충돌 방지)
         onClick={(e) => e.stopPropagation()}
       >
