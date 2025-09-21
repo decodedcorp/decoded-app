@@ -23,6 +23,9 @@ interface BaseModalProps {
   descId?: string;
   onEscape?: () => void;
   onOverlayClick?: () => void;
+  // 새로운 구조 지원을 위한 props
+  legacyMode?: boolean; // 하위 호환성 플래그
+  enableFlexLayout?: boolean; // 새로운 flex 레이아웃 활성화
 }
 
 export function BaseModal({
@@ -39,6 +42,8 @@ export function BaseModal({
   descId,
   onEscape,
   onOverlayClick,
+  legacyMode = false,
+  enableFlexLayout = true,
 }: BaseModalProps) {
   const [mounted, setMounted] = useState(false);
   const modalRootRef = useRef<HTMLDivElement | null>(null);
@@ -83,13 +88,21 @@ export function BaseModal({
     return null;
   }
 
+  // 레이아웃 모드 결정
+  const useFlexLayout = enableFlexLayout && !legacyMode;
+
+  // 다이얼로그 클래스 결정
+  const dialogClasses = useFlexLayout
+    ? `relative ${Z_INDEX_CLASSES.MODAL_CONTENT} max-h-[80vh] flex flex-col ${className}`
+    : `relative ${Z_INDEX_CLASSES.MODAL_CONTENT} max-h-[80vh] overflow-y-auto ${className}`;
+
   const node = (
     <div
       className={`fixed inset-0 ${Z_INDEX_CLASSES.MODAL_OVERLAY} flex items-center justify-center p-2 sm:p-4`}
-      style={{ 
+      style={{
         backdropFilter: 'blur(8px)',
         paddingTop: 'max(1rem, min(5rem, 20vh))',
-        paddingBottom: 'max(1rem, min(5rem, 20vh))'
+        paddingBottom: 'max(1rem, min(5rem, 20vh))',
       }}
       role="presentation"
     >
@@ -118,7 +131,7 @@ export function BaseModal({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descId}
-        className={`relative ${Z_INDEX_CLASSES.MODAL_CONTENT} max-h-[80vh] overflow-y-auto ${className}`}
+        className={dialogClasses}
         style={{ maxHeight: '80vh' }}
         // 모달 내부 클릭은 버블링 중단(backdrop 클릭 닫기와 충돌 방지)
         onClick={(e) => e.stopPropagation()}

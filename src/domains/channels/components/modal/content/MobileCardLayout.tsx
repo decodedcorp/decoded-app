@@ -6,12 +6,12 @@ interface MobileCardLayoutProps {
   onClose?: () => void;
 }
 
-// 모바일 전용 카드 레이아웃 - 이미지 참고 디자인
+// 모바일 전용 카드 레이아웃 - 새로운 모달 구조 적용
 export function MobileCardLayout({ children, title, onClose }: MobileCardLayoutProps) {
   return (
     <div className="bg-zinc-900 rounded-none border-none shadow-2xl h-full w-full flex flex-col">
-      {/* Header with title and close button */}
-      <div className="flex items-center justify-between p-4 pt-6 border-b border-zinc-700/30">
+      {/* Header with title and close button - 고정 헤더 */}
+      <div className="flex-shrink-0 flex items-center justify-between p-4 pt-6 border-b border-zinc-700/30">
         <div>
           <h1 className="text-lg font-semibold text-white">{title || 'Content'}</h1>
         </div>
@@ -43,8 +43,8 @@ export function MobileCardLayout({ children, title, onClose }: MobileCardLayoutP
         )}
       </div>
 
-      {/* Main content area */}
-      <div className="flex-1 p-4 overflow-y-auto">{children}</div>
+      {/* Main content area - 스크롤 가능한 콘텐츠 */}
+      <div className="flex-1 p-4 overflow-y-auto min-h-0">{children}</div>
     </div>
   );
 }

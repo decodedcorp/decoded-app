@@ -68,6 +68,7 @@ export function ChannelModal() {
       closeOnEscape={!isContentModalOpen}
       titleId="channel-modal-title"
       descId="channel-modal-description"
+      enableFlexLayout={true}
     >
       <ChannelModalContainer>
         {/* Header */}

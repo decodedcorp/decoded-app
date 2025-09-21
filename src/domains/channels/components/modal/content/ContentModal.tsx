@@ -35,6 +35,7 @@ export function ContentModal() {
         onClose={closeModal}
         closeOnOverlayClick={true}
         closeOnEscape={true}
+        enableFlexLayout={true}
       >
         <div className="flex relative w-full h-full">
           {/* Left: Original Content Modal */}
