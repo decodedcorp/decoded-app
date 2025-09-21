@@ -35,7 +35,7 @@ export function DiscoverSection({
   const { data: categoriesData, isLoading: categoriesLoading } = useCategories(
     CategoryType.CHANNEL,
   );
-  const { categories, subcategories } = formatCategoriesForDropdown(categoriesData);
+  const { categories, subcategories } = formatCategoriesForDropdown(categoriesData, t);
 
   const handleChannelClick = (channel: ChannelData) => {
     if (onChannelClick) {

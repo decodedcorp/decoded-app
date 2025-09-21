@@ -496,7 +496,9 @@
   "discover": {
     "title": "All Channels",
     "subtitle": "Browse channels by category and find channels that suit you",
-    "viewAllChannels": "View All Channels"
+    "viewAllChannels": "View All Channels",
+    "allCategories": "All Categories",
+    "allSubcategories": "All Subcategories"
   },
   "accessibility": {
     "closeModal": "Close modal",

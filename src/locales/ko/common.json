@@ -496,7 +496,9 @@
   "discover": {
     "title": "모든 채널",
     "subtitle": "카테고리별로 채널을 둘러보고 나에게 맞는 채널을 찾아보세요",
-    "viewAllChannels": "모든 채널 보기"
+    "viewAllChannels": "모든 채널 보기",
+    "allCategories": "모든 카테고리",
+    "allSubcategories": "모든 하위 카테고리"
   },
   "accessibility": {
     "closeModal": "모달 닫기",
