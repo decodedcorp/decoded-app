@@ -89,7 +89,7 @@ export function ChannelPageHeader({
           {/* 왼쪽: 아바타 + 채널 정보 */}
           <div className="flex items-center">
             {/* Mobile filters button */}
-            {onMobileFiltersToggle && (
+            {/* {onMobileFiltersToggle && (
               <button
                 onClick={onMobileFiltersToggle}
                 className="md:hidden p-2 rounded-lg bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors"
@@ -105,7 +105,7 @@ export function ChannelPageHeader({
                   />
                 </svg>
               </button>
-            )}
+            )} */}
 
             {/* 큰 아바타 - 배너에서 튀어나오게 */}
             <div className="relative -mt-16">

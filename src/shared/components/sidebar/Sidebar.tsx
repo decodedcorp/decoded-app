@@ -99,7 +99,15 @@ export const Sidebar = memo(function Sidebar() {
   }, [router]);
 
   // Mobile Sidebar Portal Component
-  const MobileSidebarPortal = ({ isOpen, onClose, children }) => {
+  const MobileSidebarPortal = ({
+    isOpen,
+    onClose,
+    children,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    children: React.ReactNode;
+  }) => {
     if (!isOpen || !isMounted) return null;
 
     return createPortal(
@@ -139,7 +147,7 @@ export const Sidebar = memo(function Sidebar() {
           {children}
         </nav>
       </>,
-      document.body
+      document.body,
     );
   };
 
@@ -200,10 +208,7 @@ export const Sidebar = memo(function Sidebar() {
   return (
     <>
       {/* Mobile Sidebar Portal - 모바일에서만 표시 */}
-      <MobileSidebarPortal
-        isOpen={isMobileOpen}
-        onClose={closeMobileSidebar}
-      >
+      <MobileSidebarPortal isOpen={isMobileOpen} onClose={closeMobileSidebar}>
         <SidebarContent />
       </MobileSidebarPortal>
 

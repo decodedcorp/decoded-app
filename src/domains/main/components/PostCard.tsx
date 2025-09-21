@@ -283,7 +283,7 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
           {badge}
         </div>
       )}
-      <div className="p-4">
+      <div className="p-2 md:p-4">
         {/* 상단: 채널 정보 및 메타데이터 */}
         <div className="flex items-center gap-3 mb-3">
           {/* 동그란 채널 썸네일 - 클릭 시 채널 페이지로 */}
@@ -324,9 +324,10 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
           </button>
 
           {/* 채널명, 작성자, 시간 */}
-          <div className="flex items-center gap-2 text-sm text-zinc-400">
+          <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-2 text-sm text-zinc-400">
+            {/* 첫 번째 줄: 채널명 */}
             <button
-              className="text-[#eafd66] hover:text-white font-medium transition-colors cursor-pointer"
+              className="text-[#eafd66] hover:text-white font-medium transition-colors cursor-pointer text-left"
               onClick={() => {
                 if (onChannelClick) {
                   onChannelClick(channelId, channel);
@@ -337,50 +338,55 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
             >
               {channel}
             </button>
-            <span className="text-zinc-600">•</span>
-            <div className="flex items-center gap-1">
-              {/* 유저 아바타 */}
-              <div className="w-4 h-4 rounded-full overflow-hidden flex-shrink-0">
-                {userAvatar ? (
-                  <img
-                    src={userAvatar}
-                    alt={`${author} avatar`}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      // 이미지 로딩 실패 시 기본 아이콘으로 폴백
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                      const fallback = target.nextElementSibling as HTMLElement;
-                      if (fallback) fallback.style.display = 'flex';
-                    }}
-                  />
-                ) : null}
-                <div
-                  className={`w-full h-full bg-zinc-600 rounded-full flex items-center justify-center ${
-                    userAvatar ? 'hidden' : 'flex'
-                  }`}
-                >
-                  <span className="text-zinc-300 text-xs font-medium">
-                    {author.charAt(0).toUpperCase()}
-                  </span>
+
+            {/* 두 번째 줄: 작성자와 시간 (항상 나란히 배치) */}
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                {/* 유저 아바타 */}
+                <div className="w-4 h-4 rounded-full overflow-hidden flex-shrink-0">
+                  {userAvatar ? (
+                    <img
+                      src={userAvatar}
+                      alt={`${author} avatar`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        // 이미지 로딩 실패 시 기본 아이콘으로 폴백
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        const fallback = target.nextElementSibling as HTMLElement;
+                        if (fallback) fallback.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  <div
+                    className={`w-full h-full bg-zinc-600 rounded-full flex items-center justify-center ${
+                      userAvatar ? 'hidden' : 'flex'
+                    }`}
+                  >
+                    <span className="text-zinc-300 text-xs font-medium">
+                      {author.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
                 </div>
+                <button
+                  className="hover:text-zinc-300 transition-colors cursor-pointer text-left"
+                  onClick={() => {
+                    if (onAuthorClick) {
+                      onAuthorClick(authorId, author);
+                    } else {
+                      router.push(`/users/${authorId}`);
+                    }
+                  }}
+                  aria-label={accessibility.goToAuthor(userAka || author)}
+                >
+                  {userAka || author}
+                </button>
               </div>
-              <button
-                className="hover:text-zinc-300 transition-colors cursor-pointer"
-                onClick={() => {
-                  if (onAuthorClick) {
-                    onAuthorClick(authorId, author);
-                  } else {
-                    router.push(`/users/${authorId}`);
-                  }
-                }}
-                aria-label={accessibility.goToAuthor(userAka || author)}
-              >
-                {userAka || author}
-              </button>
+
+              {/* 구분자와 시간 */}
+              <span className="text-zinc-600">•</span>
+              <span>{timeAgo}</span>
             </div>
-            <span className="text-zinc-600">•</span>
-            <span>{timeAgo}</span>
           </div>
         </div>
 
