@@ -5,7 +5,6 @@ import { ProxiedImage } from '@/components/ProxiedImage';
 import { useTranslation } from 'react-i18next';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 
-import { SummarySection } from './SummarySection';
 import { InteractiveQASection } from './InteractiveQASection';
 import { LinkPreviewCard } from './LinkPreviewCard';
 import { DefaultContentCard } from './DefaultContentCard';
@@ -135,6 +134,9 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
   console.log('ContentModalBody - content.type:', content.type);
   console.log('ContentModalBody - content.imageUrl:', content.imageUrl);
   console.log('ContentModalBody - content.linkUrl:', content.linkUrl);
+  console.log('ContentModalBody - content.description:', content.description);
+  console.log('ContentModalBody - content.aiSummary:', content.aiSummary);
+  console.log('ContentModalBody - isMobile:', isMobile);
 
   // Pending 상태인 경우 기본 카드 표시
   if (content.status === 'pending') {
@@ -224,39 +226,7 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
         {/* Text Content */}
         {content.type === 'text' && (
           <div className="h-full min-h-full p-3 sm:p-4">
-            {content.description ? (
-              <div className="bg-zinc-800/40 rounded-xl p-6 sm:p-8 border border-zinc-700/40 h-full flex flex-col">
-                <div className="prose prose-invert max-w-none flex-1 flex flex-col">
-                  <div className="text-gray-300 leading-relaxed text-base sm:text-lg mb-6 flex-1 whitespace-pre-wrap">
-                    {content.description}
-                  </div>
-
-                  {/* Link URL Display */}
-                  {content.linkUrl && (
-                    <div className="mt-6 p-4 sm:p-6 bg-zinc-900/40 rounded-xl border border-zinc-700/40">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm sm:text-base font-medium text-zinc-400 mb-3">
-                            {t('metadata.linkUrl')}:
-                          </p>
-                          <p className="text-[#EAFD66] text-xs sm:text-sm break-all font-mono bg-zinc-900/50 p-3 rounded-lg leading-relaxed">
-                            {content.linkUrl}
-                          </p>
-                        </div>
-                        <div className="flex-shrink-0 sm:ml-6">
-                          <ActionButton onClick={() => window.open(content.linkUrl, '_blank')}>
-                            {t('actions.view')}
-                          </ActionButton>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ) : (
-              /* 텍스트 설명이 없는 경우 기본 카드 표시 */
-              <DefaultContentCard content={content} />
-            )}
+            <DefaultContentCard content={content} />
           </div>
         )}
 
@@ -267,12 +237,26 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
               /* Mobile Layout - Card-based design */
               <MobileCardLayout title={content.title} onClose={onClose}>
                 <div className="space-y-6">
-                  {/* 1. Interactive Q&A Section */}
+                  {/* 1. Description Section - Always show if exists */}
+                  {content.description && (
+                    <div>
+                      <h3 className="text-lg font-semibold text-white mb-4">
+                        {t('sidebar.description')}
+                      </h3>
+                      <div className="bg-zinc-800/40 rounded-xl p-4 sm:p-6 border border-zinc-700/40">
+                        <div className="text-gray-300 leading-relaxed text-sm sm:text-base whitespace-pre-wrap">
+                          {content.description}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 2. Interactive Q&A Section */}
                   {content.aiQaList && content.aiQaList.length > 0 && (
                     <InteractiveQASection qaList={content.aiQaList} title={t('sidebar.qa')} />
                   )}
 
-                  {/* 2. Link Preview Card - 내장 카드 형태 */}
+                  {/* 3. Link Preview Card - 내장 카드 형태 */}
                   {content.linkPreview && (
                     <MobileLinkPreviewCard
                       title={content.linkPreview.title}
@@ -288,18 +272,7 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
             ) : (
               /* Desktop Layout - 기존 구조 유지 */
               <div className="h-full min-h-full space-y-8 p-3 sm:p-4">
-                {/* 1. AI Generated Summary - 맨 위 (Mobile only) */}
-                {content.aiSummary && (
-                  <div className="block lg:hidden">
-                    <SummarySection
-                      title={t('sidebar.summary')}
-                      summary={content.aiSummary}
-                      onClose={onClose}
-                    />
-                  </div>
-                )}
-
-                {/* 2. Link Preview Card - 중간 (LinkPreview가 있는 경우) */}
+                {/* 1. Link Preview Card - 중간 (LinkPreview가 있는 경우) */}
                 {content.linkPreview ? (
                   <div className="h-full min-h-full">
                     <LinkPreviewCard
@@ -316,36 +289,12 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
                   <DefaultContentCard content={content} />
                 )}
 
-                {/* 3. Interactive Q&A Section - 아래 (Mobile only) */}
+                {/* 2. Interactive Q&A Section - 아래 (Mobile only) */}
                 {content.aiQaList && content.aiQaList.length > 0 && (
                   <div className="block lg:hidden">
                     <InteractiveQASection qaList={content.aiQaList} title={t('sidebar.qa')} />
                   </div>
                 )}
-              </div>
-            )}
-          </>
-        )}
-
-        {/* AI Generated Summary for non-link content */}
-        {content.type !== 'link' && content.aiSummary && (
-          <>
-            {isMobile ? (
-              <MobileCardLayout title={content.title} onClose={onClose}>
-                <div className="space-y-6">
-                  {/* Interactive Q&A Section */}
-                  {content.aiQaList && content.aiQaList.length > 0 && (
-                    <InteractiveQASection qaList={content.aiQaList} title={t('sidebar.qa')} />
-                  )}
-                </div>
-              </MobileCardLayout>
-            ) : (
-              <div className="block lg:hidden">
-                <SummarySection
-                  title={t('sidebar.summary')}
-                  summary={content.aiSummary}
-                  onClose={onClose}
-                />
               </div>
             )}
           </>
