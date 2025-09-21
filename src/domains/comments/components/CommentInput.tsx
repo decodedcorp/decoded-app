@@ -142,31 +142,29 @@ export function CommentInput({
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="flex items-center space-x-1 px-3 py-1.5 text-sm text-zinc-400 hover:text-white transition-colors"
+                  className="flex items-center justify-center w-8 h-8 rounded-full bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors"
+                  aria-label={tc.input.cancel()}
                 >
-                  <MdClose className="w-4 h-4" />
-                  {!compact && <span>{tc.input.cancel()}</span>}
+                  <MdClose className="w-4 h-4 text-zinc-400 hover:text-white" />
                 </button>
               )}
 
               <button
                 type="submit"
                 disabled={!text.trim() || createCommentMutation.isPending}
-                className="flex items-center space-x-1 px-3 py-1.5 text-sm bg-[#eafd66] hover:bg-[#eafd66]/80 disabled:bg-zinc-600 disabled:cursor-not-allowed text-black rounded-lg transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-full bg-[#eafd66] hover:bg-[#eafd66]/80 disabled:bg-zinc-600 disabled:cursor-not-allowed text-black transition-colors"
+                aria-label={
+                  createCommentMutation.isPending
+                    ? tc.input.posting()
+                    : parentCommentId
+                    ? tc.input.reply()
+                    : tc.input.comment()
+                }
               >
                 {createCommentMutation.isPending ? (
                   <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
                 ) : (
                   <MdSend className="w-4 h-4" />
-                )}
-                {!compact && (
-                  <span>
-                    {createCommentMutation.isPending
-                      ? tc.input.posting()
-                      : parentCommentId
-                      ? tc.input.reply()
-                      : tc.input.comment()}
-                  </span>
                 )}
               </button>
             </div>
