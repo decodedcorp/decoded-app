@@ -12,6 +12,7 @@ interface FallbackImageProps {
   fallbackText?: string;
   className?: string;
   children?: React.ReactNode;
+  disableHover?: boolean;
 }
 
 // 타입별 기본 설정
@@ -101,6 +102,7 @@ export function FallbackImage({
   fallbackText,
   className,
   children,
+  disableHover = false,
 }: FallbackImageProps) {
   const config = typeConfig[type];
   const sizeClasses = sizeConfig[size];
@@ -140,9 +142,9 @@ export function FallbackImage({
 
         // 호버 효과 (선택사항)
         'transition-colors duration-200',
-        'hover:bg-[var(--color-primary-bg)]',
-        'hover:border-[var(--color-primary-bd)]',
-        'hover:text-[var(--color-primary)]',
+        !disableHover && 'hover:bg-[var(--color-primary-bg)]',
+        !disableHover && 'hover:border-[var(--color-primary-bd)]',
+        !disableHover && 'hover:text-[var(--color-primary)]',
 
         className,
       )}
@@ -178,9 +180,16 @@ export function AvatarFallback({
   fallbackText,
   size = 'md',
   className,
+  disableHover,
 }: Omit<FallbackImageProps, 'type'>) {
   return (
-    <FallbackImage type="avatar" size={size} fallbackText={fallbackText} className={className} />
+    <FallbackImage
+      type="avatar"
+      size={size}
+      fallbackText={fallbackText}
+      className={className}
+      disableHover={disableHover}
+    />
   );
 }
 

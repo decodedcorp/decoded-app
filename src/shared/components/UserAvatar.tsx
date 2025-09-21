@@ -97,14 +97,19 @@ export function UserAvatar({ size = 'md', showDropdown = true }: UserAvatarProps
         onClick={() => showDropdown && setIsDropdownOpen(!isDropdownOpen)}
         className={`
           ${sizeClasses[size]}
-          relative transition-all duration-200
+          relative transition-all duration-200 rounded-full
           hover:ring-2 hover:ring-[var(--color-primary)] hover:ring-offset-2 hover:ring-offset-[var(--color-background)]
           ${showDropdown ? 'cursor-pointer' : 'cursor-default'}
         `}
         aria-label={t('user.userMenu')}
       >
         {/* Avatar with design system fallback */}
-        <AvatarFallback size={size} fallbackText={getInitials()} className="w-full h-full" />
+        <AvatarFallback
+          size={size}
+          fallbackText={getInitials()}
+          className="w-full h-full"
+          disableHover={true}
+        />
 
         {/* Online indicator */}
         <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-[var(--color-background)] rounded-full" />
