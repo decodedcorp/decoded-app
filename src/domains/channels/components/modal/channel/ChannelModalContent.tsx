@@ -270,7 +270,7 @@ const ContentItemCard = React.memo<{
               {/* AI 생성 요약 표시 */}
               {item.aiSummary && (
                 <div className="mb-2">
-                  <p className="text-emerald-400 text-xs line-clamp-2 font-medium">
+                  <p className="text-[#EAFD66] text-xs line-clamp-2 font-medium">
                     {item.aiSummary}
                   </p>
                 </div>
