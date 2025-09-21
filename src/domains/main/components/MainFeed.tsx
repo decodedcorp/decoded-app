@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 
-import { MailOpen } from 'lucide-react';
+import { MailOpen, Flame, Clock, TrendingUp } from 'lucide-react';
 import { useQueries } from '@tanstack/react-query';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
 import { useContentDetail } from '@/domains/contents/hooks/useContentDetail';
@@ -94,10 +94,26 @@ export const MainFeed = React.memo(function MainFeed() {
     value: SortOption;
     label: string;
     tooltip: string;
+    icon: React.ReactNode;
   }[] = [
-    { value: 'hot', label: t.feed.sort.hot(), tooltip: t.feed.sort.hotTooltip() },
-    { value: 'new', label: t.feed.sort.new(), tooltip: t.feed.sort.newTooltip() },
-    { value: 'top', label: t.feed.sort.top(), tooltip: t.feed.sort.topTooltip() },
+    {
+      value: 'hot',
+      label: t.feed.sort.hot(),
+      tooltip: t.feed.sort.hotTooltip(),
+      icon: <Flame className="w-4 h-4" />,
+    },
+    {
+      value: 'new',
+      label: t.feed.sort.new(),
+      tooltip: t.feed.sort.newTooltip(),
+      icon: <Clock className="w-4 h-4" />,
+    },
+    {
+      value: 'top',
+      label: t.feed.sort.top(),
+      tooltip: t.feed.sort.topTooltip(),
+      icon: <TrendingUp className="w-4 h-4" />,
+    },
   ];
 
   // Enhanced infinite scroll feed with hybrid API strategy
@@ -341,7 +357,7 @@ export const MainFeed = React.memo(function MainFeed() {
                     }}
                     title={option.tooltip}
                     className={`
-                    px-4 py-2 text-sm rounded-md transition-all duration-200 font-medium
+                    px-2 md:px-4 py-2 text-sm rounded-md transition-all duration-200 font-medium
                     ${
                       activeSort === option.value
                         ? 'text-black bg-[#eafd66] shadow-sm'
@@ -349,7 +365,9 @@ export const MainFeed = React.memo(function MainFeed() {
                     }
                   `}
                   >
-                    {option.label}
+                    {/* 모바일에서는 아이콘만, 데스크톱에서는 텍스트만 */}
+                    <span className="md:hidden">{option.icon}</span>
+                    <span className="hidden md:inline">{option.label}</span>
                   </button>
                 ))}
               </div>
