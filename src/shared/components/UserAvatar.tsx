@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useLocale } from '@/lib/hooks/useLocale';
 import { useAuthStore } from '@/store/authStore';
 import { useMyProfile } from '@/domains/profile/hooks/useProfile';
-import { getAvatarFallback } from '@/lib/utils/defaultImages';
+import { AvatarFallback } from '@/components/FallbackImage';
 
 interface UserAvatarProps {
   size?: 'sm' | 'md' | 'lg';
@@ -91,21 +91,21 @@ export function UserAvatar({ size = 'md', showDropdown = true }: UserAvatarProps
         onClick={() => showDropdown && setIsDropdownOpen(!isDropdownOpen)}
         className={`
           ${sizeClasses[size]}
-          relative rounded-full bg-gradient-to-br from-zinc-700 to-zinc-800
-          border border-zinc-600 hover:border-zinc-500
-          flex items-center justify-center
-          text-zinc-300 font-semibold
-          transition-all duration-200
-          hover:ring-2 hover:ring-zinc-500 hover:ring-offset-2 hover:ring-offset-black
+          relative transition-all duration-200
+          hover:ring-2 hover:ring-[var(--color-primary)] hover:ring-offset-2 hover:ring-offset-[var(--color-background)]
           ${showDropdown ? 'cursor-pointer' : 'cursor-default'}
         `}
         aria-label={t('user.userMenu')}
       >
-        {/* Avatar content */}
-        <span className="select-none">{getInitials()}</span>
+        {/* Avatar with design system fallback */}
+        <AvatarFallback
+          size={size}
+          fallbackText={getInitials()}
+          className="w-full h-full"
+        />
 
         {/* Online indicator */}
-        <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-black rounded-full" />
+        <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-[var(--color-background)] rounded-full" />
       </button>
 
       {/* Dropdown Menu */}

@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
+import { BannerFallback, AvatarFallback, ThumbnailFallback } from '@/components/FallbackImage';
 import { ChannelEditorsStackedAvatars } from '@/shared/components/ChannelEditorsStackedAvatars';
 import { EditorsListModal } from '@/shared/components/EditorsListModal';
 import { ChannelData } from '@/store/channelModalStore';
@@ -121,12 +122,27 @@ export function ChannelPageHeader({
   return (
     <div>
       {/* 상단 배너 섹션 */}
-      <div className="h-48 bg-zinc-800 relative overflow-hidden">
-        {/* Banner Image - 읽기 전용 */}
-        <img
-          src={channel.banner_url || channel.thumbnail_url || ''}
-          alt={`${channel.name} banner`}
-          className="w-full h-full object-cover"
+      <div className="h-48 relative overflow-hidden">
+        {/* Banner Image with Fallback */}
+        {channel.banner_url || channel.thumbnail_url ? (
+          <img
+            src={(channel.banner_url || channel.thumbnail_url) ?? ''}
+            alt={`${channel.name} banner`}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              // Hide broken image and show fallback
+              e.currentTarget.style.display = 'none';
+              const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+              if (fallback) fallback.style.display = 'block';
+            }}
+          />
+        ) : null}
+
+        {/* Fallback Banner */}
+        <BannerFallback
+          className={`w-full h-full ${
+            channel.banner_url || channel.thumbnail_url ? 'hidden' : 'block'
+          }`}
         />
 
         {/* 그라디언트 오버레이 */}
@@ -141,12 +157,28 @@ export function ChannelPageHeader({
           <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 md:gap-4">
             {/* 왼쪽: 아바타 */}
             <div className="relative -mt-16 shrink-0">
-              <img
-                src={channel.thumbnail_url || ''}
-                alt={`${channel.name} avatar`}
-                className="w-20 h-20 rounded-full border-4 border-black bg-black object-cover"
-                loading="lazy"
-                decoding="async"
+              {channel.thumbnail_url ? (
+                <img
+                  src={channel.thumbnail_url}
+                  alt={`${channel.name} avatar`}
+                  className="w-20 h-20 rounded-full border-4 border-black object-cover shadow-lg ring-1 ring-white/10"
+                  loading="lazy"
+                  decoding="async"
+                  onError={(e) => {
+                    // Hide broken image and show fallback
+                    e.currentTarget.style.display = 'none';
+                    const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                    if (fallback) fallback.style.display = 'block';
+                  }}
+                />
+              ) : null}
+
+              {/* Fallback Avatar */}
+              <ThumbnailFallback
+                size="xl"
+                className={`w-20 h-20 border-4 border-black shadow-lg ring-1 ring-white/10 ${
+                  channel.thumbnail_url ? 'hidden' : 'block'
+                }`}
               />
             </div>
 

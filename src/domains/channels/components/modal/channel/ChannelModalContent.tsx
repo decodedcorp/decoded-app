@@ -160,7 +160,7 @@ const ContentItemCard = React.memo<{
                     {item.linkPreview.siteName && (
                       <div className="mb-3">
                         <span className="text-zinc-400 text-xs font-medium">
-                          📄 {item.linkPreview.siteName}
+                          {item.linkPreview.siteName}
                         </span>
                       </div>
                     )}
@@ -189,7 +189,7 @@ const ContentItemCard = React.memo<{
                     )}
                     {item.linkPreview?.siteName && (
                       <div className="mt-1">
-                        <p className="text-zinc-500 text-xs">📄 {item.linkPreview.siteName}</p>
+                        <p className="text-zinc-500 text-xs">{item.linkPreview.siteName}</p>
                       </div>
                     )}
                   </>
@@ -239,7 +239,7 @@ const ContentItemCard = React.memo<{
 
         {/* Overlay on hover (호버 효과가 활성화된 경우만) */}
         {showHoverEffects && (
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-end z-10">
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors duration-300 flex items-end z-10">
             <div className="w-full p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
               {/* 링크 콘텐츠인 경우 링크 프리뷰 정보 우선 표시 */}
               {item.type === 'link' && item.linkPreview ? (
@@ -248,19 +248,19 @@ const ContentItemCard = React.memo<{
                     {item.linkPreview.title}
                   </h4>
                   {item.linkPreview.description && (
-                    <div className="text-zinc-300 text-xs line-clamp-2 mb-2 whitespace-pre-wrap">
+                    <div className="text-zinc-200 text-xs line-clamp-2 mb-2 whitespace-pre-wrap">
                       {item.linkPreview.description}
                     </div>
                   )}
                   {item.linkPreview.siteName && (
-                    <p className="text-zinc-400 text-xs mb-2">📄 {item.linkPreview.siteName}</p>
+                    <p className="text-zinc-300 text-xs mb-2">{item.linkPreview.siteName}</p>
                   )}
                 </>
               ) : (
                 <>
                   <h4 className="text-white font-semibold text-sm mb-1">{item.title}</h4>
                   {item.description && (
-                    <div className="text-zinc-300 text-xs line-clamp-2 mb-2 whitespace-pre-wrap">
+                    <div className="text-zinc-200 text-xs line-clamp-2 mb-2 whitespace-pre-wrap">
                       {item.description}
                     </div>
                   )}
@@ -270,21 +270,19 @@ const ContentItemCard = React.memo<{
               {/* AI 생성 요약 표시 */}
               {item.aiSummary && (
                 <div className="mb-2">
-                  <p className="text-green-300 text-xs line-clamp-2 font-medium">
-                    🤖 {item.aiSummary}
+                  <p className="text-emerald-400 text-xs line-clamp-2 font-medium">
+                    {item.aiSummary}
                   </p>
                 </div>
               )}
 
               {/* 링크 프리뷰 메타데이터 표시 (링크 콘텐츠가 아닌 경우) */}
               {item.type !== 'link' && item.linkPreview?.siteName && (
-                <p className="text-zinc-400 text-xs">📄 {item.linkPreview.siteName}</p>
+                <p className="text-zinc-300 text-xs">{item.linkPreview.siteName}</p>
               )}
 
               {/* 메타데이터 표시 */}
-              {item.metadata?.game && (
-                <p className="text-blue-300 text-xs">🎮 {item.metadata.game}</p>
-              )}
+              {item.metadata?.game && <p className="text-blue-400 text-xs">{item.metadata.game}</p>}
             </div>
           </div>
         )}
