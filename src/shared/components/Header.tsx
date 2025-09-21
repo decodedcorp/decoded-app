@@ -209,7 +209,7 @@ export const Header = memo(function Header() {
           {isAuthenticated && isInitialized ? (
             <>
               <CreateButton />
-              <NotificationButton />
+              {/* <NotificationButton /> */}
               <UserAvatar />
             </>
           ) : (
