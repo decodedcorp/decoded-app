@@ -5,12 +5,14 @@ import { InteractionsService } from '@/api/generated/services/InteractionsServic
 import { SubscriptionResponse } from '@/api/generated/models/SubscriptionResponse';
 import { ChannelSubscriptionStatsResponse } from '@/api/generated/models/ChannelSubscriptionStatsResponse';
 import { toast } from 'react-hot-toast';
+import { useTranslations } from 'next-intl';
 
 /**
  * Channel subscription hook for managing subscribe/unsubscribe actions
  */
 export const useChannelSubscription = (channelId: string) => {
   const queryClient = useQueryClient();
+  const t = useTranslations('common.toast.subscription');
 
   // Query keys for caching
   const subscriptionStatsKey = ['channel-subscription-stats', channelId];
@@ -91,7 +93,7 @@ export const useChannelSubscription = (channelId: string) => {
         });
 
         // Show success message
-        toast.success('Successfully subscribed to channel!');
+        toast.success(t('subscribed'));
 
         // Invalidate only this specific channel's queries
         queryClient.invalidateQueries({
@@ -113,7 +115,7 @@ export const useChannelSubscription = (channelId: string) => {
     },
     onError: (error: any) => {
       console.error('Subscribe error:', error);
-      toast.error('Failed to subscribe. Please try again.');
+      toast.error(t('subscribeFailed'));
     },
   });
 
@@ -148,7 +150,7 @@ export const useChannelSubscription = (channelId: string) => {
         });
 
         // Show success message
-        toast.success('Successfully unsubscribed from channel!');
+        toast.success(t('unsubscribed'));
 
         // Invalidate only this specific channel's queries
         queryClient.invalidateQueries({
@@ -170,7 +172,7 @@ export const useChannelSubscription = (channelId: string) => {
     },
     onError: (error: any) => {
       console.error('Unsubscribe error:', error);
-      toast.error('Failed to unsubscribe. Please try again.');
+      toast.error(t('unsubscribeFailed'));
     },
   });
 

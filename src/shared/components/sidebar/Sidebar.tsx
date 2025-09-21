@@ -48,16 +48,24 @@ export const Sidebar = memo(function Sidebar() {
 
       const originalOverflow = document.body.style.overflow;
       const originalPaddingRight = document.body.style.paddingRight;
+      const originalPosition = document.body.style.position;
 
       // 스크롤바 너비 보상 (레이아웃 시프트 방지)
       const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
 
+      // 모바일에서 더 강력한 스크롤 락
       document.body.style.overflow = 'hidden';
       document.body.style.paddingRight = `${scrollbarWidth}px`;
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      document.body.style.top = '0';
 
       return () => {
         document.body.style.overflow = originalOverflow;
         document.body.style.paddingRight = originalPaddingRight;
+        document.body.style.position = originalPosition;
+        document.body.style.width = '';
+        document.body.style.top = '';
       };
     }, [isLocked]);
   };
@@ -129,7 +137,7 @@ export const Sidebar = memo(function Sidebar() {
         {/* Mobile Sidebar */}
         <nav
           id="mobile-sidebar"
-          className="lg:hidden"
+          className="lg:hidden overflow-y-auto"
           style={{
             position: 'fixed',
             top: 'calc(var(--header-height) + env(safe-area-inset-top, 0px))',
@@ -139,6 +147,8 @@ export const Sidebar = memo(function Sidebar() {
             backgroundColor: '#000000',
             borderRight: '1px solid #27272a',
             zIndex: 'var(--z-sidebar-mobile)',
+            WebkitOverflowScrolling: 'touch',
+            overscrollBehavior: 'contain',
           }}
           data-mobile-sidebar
           data-open={isOpen}
@@ -153,9 +163,9 @@ export const Sidebar = memo(function Sidebar() {
 
   // Sidebar content component
   const SidebarContent = () => (
-    <div className="px-2 py-4 bg-black min-h-full" data-testid="sidebar">
+    <div className="px-2 py-4 bg-black min-h-full flex flex-col" data-testid="sidebar">
       {/* Main Navigation */}
-      <div className="space-y-2">
+      <div className="space-y-2 flex-1">
         <SidebarItem
           href="/"
           icon={<HomeIcon />}

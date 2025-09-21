@@ -9,6 +9,7 @@ import { queryKeys } from '@/lib/api/queryKeys';
 import { refreshOpenAPIToken } from '@/api/hooks/useApi';
 import { toast } from 'react-hot-toast';
 import { useSimpleToastMutation } from '@/lib/hooks/useToastMutation';
+import { useTranslations } from 'next-intl';
 
 export interface UseCommentsParams {
   contentId: string;
@@ -37,7 +38,7 @@ export const useComments = ({
   enabled = true,
   sortOrder = 'newest',
   includeReplies = true,
-  parentCommentId = null
+  parentCommentId = null,
 }: UseCommentsParams): UseCommentsResult => {
   const queryKey = parentCommentId
     ? [...queryKeys.comments.replies(parentCommentId), { sortOrder }]
@@ -47,33 +48,33 @@ export const useComments = ({
     queryKey,
     queryFn: async ({ pageParam = 0 }) => {
       refreshOpenAPIToken();
-      
-      console.log('[useComments] Fetching comments:', { 
-        contentId, 
-        skip: pageParam, 
-        sortOrder, 
-        parentCommentId 
+
+      console.log('[useComments] Fetching comments:', {
+        contentId,
+        skip: pageParam,
+        sortOrder,
+        parentCommentId,
       });
-      
+
       const result = await CommentsService.getCommentsByContentCommentsContentContentIdGet(
         contentId,
         20, // limit
         pageParam as number, // skip
         includeReplies,
         sortOrder,
-        parentCommentId
+        parentCommentId,
       );
-      
+
       console.log('[useComments] API response:', result);
       return result;
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage) => {
-      console.log('[useComments] Checking next page:', { 
-        hasMore: lastPage.has_more, 
-        commentsCount: lastPage.comments.length 
+      console.log('[useComments] Checking next page:', {
+        hasMore: lastPage.has_more,
+        commentsCount: lastPage.comments.length,
       });
-      return lastPage.has_more ? (lastPage.comments.length || 0) : undefined;
+      return lastPage.has_more ? lastPage.comments.length || 0 : undefined;
     },
     enabled: enabled && !!contentId,
     staleTime: 30 * 1000, // 30초
@@ -83,16 +84,16 @@ export const useComments = ({
   });
 
   // 모든 페이지의 댓글을 평면화
-  const comments = query.data?.pages.flatMap(page => page.comments || []) || [];
+  const comments = query.data?.pages.flatMap((page) => page.comments || []) || [];
   const totalCount = query.data?.pages[0]?.total_count || 0;
   const hasMore = query.hasNextPage || false;
-  
-  console.log('[useComments] Final result:', { 
-    commentsLength: comments.length, 
-    totalCount, 
-    hasMore, 
+
+  console.log('[useComments] Final result:', {
+    commentsLength: comments.length,
+    totalCount,
+    hasMore,
     isLoading: query.isLoading,
-    error: query.error
+    error: query.error,
   });
 
   return {
@@ -112,6 +113,7 @@ export const useComments = ({
  */
 export const useCreateComment = () => {
   const queryClient = useQueryClient();
+  const t = useTranslations('common.toast.comments');
 
   return useSimpleToastMutation<
     CommentResponse,
@@ -120,14 +122,14 @@ export const useCreateComment = () => {
   >(
     async ({ contentId, text, parentCommentId }) => {
       refreshOpenAPIToken();
-      
+
       console.log('[useCreateComment] Creating comment:', { contentId, text, parentCommentId });
-      
+
       const request: CommentCreateRequest = {
         text,
-        parent_comment_id: parentCommentId || null
+        parent_comment_id: parentCommentId || null,
       };
-      
+
       return CommentsService.createCommentCommentsContentContentIdPost(contentId, request);
     },
     {
@@ -135,30 +137,30 @@ export const useCreateComment = () => {
       toastId: 'create-comment',
       onSuccess: (response, { contentId, parentCommentId }) => {
         console.log('[useCreateComment] Comment created:', response);
-        
+
         // 댓글 목록 쿼리 무효화
-        queryClient.invalidateQueries({ 
-          queryKey: queryKeys.comments.byContent(contentId) 
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.comments.byContent(contentId),
         });
-        
+
         // 답글인 경우 부모 댓글 쿼리도 무효화
         if (parentCommentId) {
-          queryClient.invalidateQueries({ 
-            queryKey: queryKeys.comments.replies(parentCommentId) 
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.comments.replies(parentCommentId),
           });
         }
-        
+
         // 댓글 통계도 무효화
-        queryClient.invalidateQueries({ 
-          queryKey: queryKeys.comments.stats(contentId) 
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.comments.stats(contentId),
         });
-        
-        toast.success('Comment added successfully!');
+
+        toast.success(t('added'));
       },
       onError: (error, { contentId }) => {
         console.error('[useCreateComment] Failed to create comment:', contentId, error);
       },
-    }
+    },
   );
 };
 
@@ -167,6 +169,7 @@ export const useCreateComment = () => {
  */
 export const useUpdateComment = () => {
   const queryClient = useQueryClient();
+  const t = useTranslations('common.toast.comments');
 
   return useSimpleToastMutation<
     CommentResponse,
@@ -175,11 +178,11 @@ export const useUpdateComment = () => {
   >(
     async ({ commentId, text }) => {
       refreshOpenAPIToken();
-      
+
       console.log('[useUpdateComment] Updating comment:', { commentId, text });
-      
+
       const request: CommentUpdateRequest = { text };
-      
+
       return CommentsService.updateCommentCommentsCommentIdPut(commentId, request);
     },
     {
@@ -187,18 +190,18 @@ export const useUpdateComment = () => {
       toastId: 'update-comment',
       onSuccess: (response, { contentId }) => {
         console.log('[useUpdateComment] Comment updated:', response);
-        
+
         // 관련 댓글 쿼리들 무효화
-        queryClient.invalidateQueries({ 
-          queryKey: queryKeys.comments.byContent(contentId) 
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.comments.byContent(contentId),
         });
-        
-        toast.success('Comment updated successfully!');
+
+        toast.success(t('updated'));
       },
       onError: (error, { commentId }) => {
         console.error('[useUpdateComment] Failed to update comment:', commentId, error);
       },
-    }
+    },
   );
 };
 
@@ -207,17 +210,14 @@ export const useUpdateComment = () => {
  */
 export const useDeleteComment = () => {
   const queryClient = useQueryClient();
+  const t = useTranslations('common.toast.comments');
 
-  return useSimpleToastMutation<
-    void,
-    Error,
-    { commentId: string; contentId: string }
-  >(
+  return useSimpleToastMutation<void, Error, { commentId: string; contentId: string }>(
     async ({ commentId }) => {
       refreshOpenAPIToken();
-      
+
       console.log('[useDeleteComment] Deleting comment:', { commentId });
-      
+
       return CommentsService.deleteCommentCommentsCommentIdDelete(commentId);
     },
     {
@@ -225,23 +225,23 @@ export const useDeleteComment = () => {
       toastId: 'delete-comment',
       onSuccess: (_, { contentId }) => {
         console.log('[useDeleteComment] Comment deleted successfully');
-        
+
         // 관련 댓글 쿼리들 무효화
-        queryClient.invalidateQueries({ 
-          queryKey: queryKeys.comments.byContent(contentId) 
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.comments.byContent(contentId),
         });
-        
+
         // 댓글 통계도 무효화
-        queryClient.invalidateQueries({ 
-          queryKey: queryKeys.comments.stats(contentId) 
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.comments.stats(contentId),
         });
-        
-        toast.success('Comment deleted successfully!');
+
+        toast.success(t('deleted'));
       },
       onError: (error, { commentId }) => {
         console.error('[useDeleteComment] Failed to delete comment:', commentId, error);
       },
-    }
+    },
   );
 };
 
@@ -258,11 +258,11 @@ export const useCommentLike = () => {
   >(
     async ({ commentId, action }) => {
       refreshOpenAPIToken();
-      
+
       console.log('[useCommentLike] Handling comment like:', { commentId, action });
-      
+
       const request: CommentLikeRequest = { action };
-      
+
       return CommentsService.handleCommentLikeCommentsCommentIdLikePost(commentId, request);
     },
     {
@@ -270,16 +270,21 @@ export const useCommentLike = () => {
       toastId: 'comment-like',
       onSuccess: (_, { contentId }) => {
         console.log('[useCommentLike] Comment reaction handled successfully');
-        
+
         // 관련 댓글 쿼리들 무효화 (좋아요 수 업데이트 반영)
-        queryClient.invalidateQueries({ 
-          queryKey: queryKeys.comments.byContent(contentId) 
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.comments.byContent(contentId),
         });
       },
       onError: (error, { commentId, action }) => {
-        console.error('[useCommentLike] Failed to handle comment reaction:', commentId, action, error);
+        console.error(
+          '[useCommentLike] Failed to handle comment reaction:',
+          commentId,
+          action,
+          error,
+        );
       },
-    }
+    },
   );
 };
 
@@ -291,9 +296,9 @@ export const useCommentStats = (contentId: string, enabled: boolean = true) => {
     queryKey: [...queryKeys.comments.stats(contentId)],
     queryFn: async () => {
       refreshOpenAPIToken();
-      
+
       console.log('[useCommentStats] Fetching comment stats:', { contentId });
-      
+
       return CommentsService.getCommentStatsCommentsContentContentIdStatsGet(contentId);
     },
     enabled: enabled && !!contentId,

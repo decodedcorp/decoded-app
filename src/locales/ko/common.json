@@ -500,6 +500,46 @@
     "allCategories": "모든 카테고리",
     "allSubcategories": "모든 하위 카테고리"
   },
+  "toast": {
+    "profile": {
+      "updated": "프로필이 업데이트되었어요",
+      "updateFailed": "프로필 업데이트에 실패했어요",
+      "processing": "프로필 업데이트 중..."
+    },
+    "bookmarks": {
+      "added": "북마크에 추가되었어요",
+      "removed": "북마크에서 제거되었어요",
+      "addFailed": "북마크 추가에 실패했어요",
+      "removeFailed": "북마크 제거에 실패했어요"
+    },
+    "subscription": {
+      "subscribed": "채널을 구독했어요!",
+      "unsubscribed": "채널 구독을 해제했어요!",
+      "subscribeFailed": "구독에 실패했어요. 다시 시도해 주세요.",
+      "unsubscribeFailed": "구독 해제에 실패했어요. 다시 시도해 주세요."
+    },
+    "comments": {
+      "added": "댓글이 추가되었어요!",
+      "updated": "댓글이 수정되었어요!",
+      "deleted": "댓글이 삭제되었어요!",
+      "addFailed": "댓글 추가에 실패했어요",
+      "updateFailed": "댓글 수정에 실패했어요",
+      "deleteFailed": "댓글 삭제에 실패했어요"
+    },
+    "pins": {
+      "orderUpdated": "핀 순서가 업데이트되었어요",
+      "orderUpdateFailed": "핀 순서 업데이트에 실패했어요"
+    },
+    "banner": {
+      "updated": "배너가 업데이트되었어요!",
+      "updateFailed": "배너 업데이트에 실패했어요. 다시 시도해 주세요."
+    },
+    "general": {
+      "success": "완료되었어요!",
+      "error": "문제가 발생했어요",
+      "tryAgain": "다시 시도해 주세요"
+    }
+  },
   "accessibility": {
     "closeModal": "모달 닫기",
     "expandSidebar": "사이드바 펼치기",
