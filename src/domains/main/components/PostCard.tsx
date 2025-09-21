@@ -374,7 +374,7 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
                     if (onAuthorClick) {
                       onAuthorClick(authorId, author);
                     } else {
-                      router.push(`/users/${authorId}`);
+                      router.push(`/profile/${authorId}`);
                     }
                   }}
                   aria-label={accessibility.goToAuthor(userAka || author)}
