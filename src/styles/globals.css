@@ -27,13 +27,15 @@
   --scrollbar-track: transparent;
   --scrollbar-width: 6px;
 
-  /* Z-index scale - 레이어 우선순위 */
-  --z-header: 9999;
-  --z-sidebar: 40; /* 모달보다 낮게 설정 */
-  --z-sidebar-mobile: 10002;
-  --z-overlay: 50;
+  /* Z-index scale - 레이어 우선순위 (표준화) */
+  --z-base: 0;
+  --z-header: 1000;
+  --z-sidebar: 40; /* 데스크톱 사이드바 */
+  --z-overlay: 1100;
+  --z-sidebar-mobile: 1200;
   --z-modal: 60;
   --z-modal-root: 70;
+  --z-toast: 2000;
 
   /* Modal sizes */
   --modal-max-w-sm: 24rem; /* 384px */
@@ -260,7 +262,7 @@
     width: var(--sidebar-width);
     background: #000;
     z-index: 999;
-    display: none; /* 모바일 기본 숨김 */
+    display: none; /* 모바일 기본 숨김 - Sidebar.tsx에서 모바일 오버레이로 처리 */
   }
 
   .sidebar-right {
@@ -360,7 +362,48 @@
   }
 
   /* ========== MOBILE NAVIGATION ========== */
-  /* Mobile overlay navigation */
+  /* Mobile sidebar overlay - positioned below header */
+  [data-mobile-overlay] {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    pointer-events: auto;
+    opacity: 0;
+    transition: opacity 200ms ease-out;
+    /* Ensures overlay starts below header */
+    top: calc(var(--header-height) + env(safe-area-inset-top, 0px)) !important;
+  }
+
+  [data-mobile-overlay][data-open="true"] {
+    opacity: 1;
+  }
+
+  /* Mobile sidebar */
+  [data-mobile-sidebar] {
+    transform: translateX(-100%);
+    transition: transform 220ms cubic-bezier(.2,.7,.2,1);
+    /* iOS/Safari height compatibility */
+    height: calc(100vh - var(--header-height) - env(safe-area-inset-top, 0px));
+  }
+
+  [data-mobile-sidebar][data-open="true"] {
+    transform: translateX(0);
+  }
+
+  /* Enhanced viewport support for iOS/Safari */
+  @supports (height: 100dvh) {
+    [data-mobile-sidebar] {
+      height: calc(100dvh - var(--header-height) - env(safe-area-inset-top, 0px));
+    }
+  }
+
+  @supports (height: 100svh) {
+    [data-mobile-sidebar] {
+      height: calc(100svh - var(--header-height) - env(safe-area-inset-top, 0px));
+    }
+  }
+
+  /* Mobile overlay navigation (legacy) */
   .mobile-nav-overlay {
     position: fixed;
     top: var(--header-height);
@@ -903,6 +946,12 @@ footer {
 @media (prefers-reduced-motion: reduce) {
   * {
     animation: none !important;
+    transition: none !important;
+  }
+
+  /* Mobile sidebar animations disabled for reduced motion */
+  [data-mobile-sidebar],
+  [data-mobile-overlay] {
     transition: none !important;
   }
 }
