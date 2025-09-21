@@ -1,6 +1,9 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export function ChannelModalRelated() {
+  const { t } = useTranslation('common');
+  
   const relatedChannels = [
     'Design Masters',
     'Art Collective',
@@ -24,10 +27,10 @@ export function ChannelModalRelated() {
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-white font-medium truncate">{name}</div>
-              <div className="text-zinc-400 text-sm">{(idx + 1) * 5.2}K followers</div>
+              <div className="text-zinc-400 text-sm">{(idx + 1) * 5.2}K {t('followers')}</div>
             </div>
             <button className="text-xs bg-zinc-700 hover:bg-zinc-600 px-3 py-1 rounded-full transition-colors whitespace-nowrap">
-              Follow
+              {t('actions.follow')}
             </button>
           </div>
         ))}

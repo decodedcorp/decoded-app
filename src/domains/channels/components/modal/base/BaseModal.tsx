@@ -7,6 +7,7 @@ import { useFocusTrap } from '@/lib/hooks/useFocusTrap';
 import { useRestoreFocus } from '@/lib/hooks/useRestoreFocus';
 import { useScrollLock } from '@/lib/hooks/useScrollLock';
 import { useAriaInert } from '@/lib/hooks/useAriaInert';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { Z_INDEX_CLASSES } from '@/lib/constants/zIndex';
 import { MODAL_SIZES } from '@/lib/constants/modalSizes';
 
@@ -44,6 +45,7 @@ export function BaseModal({
   const [mounted, setMounted] = useState(false);
   const modalRootRef = useRef<HTMLDivElement | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   // Portal 생성
   useEffect(() => {
@@ -92,7 +94,9 @@ export function BaseModal({
 
   const node = (
     <div
-      className={`fixed inset-0 ${Z_INDEX_CLASSES.MODAL_OVERLAY} flex items-center justify-center p-2 sm:p-4 pt-16 sm:pt-20`}
+      className={`fixed inset-0 ${Z_INDEX_CLASSES.MODAL_OVERLAY} flex items-center justify-center ${
+        isMobile ? 'p-0' : 'p-2 sm:p-4 pt-16 sm:pt-20'
+      }`}
       style={{ backdropFilter: 'blur(8px)' }}
       role="presentation"
       onClick={(e) => {
@@ -108,10 +112,7 @@ export function BaseModal({
     >
       {/* 오버레이 배경 */}
       {showOverlay && (
-        <div
-          className="absolute inset-0 bg-black/70 pointer-events-none"
-          role="presentation"
-        />
+        <div className="absolute inset-0 bg-black/70 pointer-events-none" role="presentation" />
       )}
 
       {/* 다이얼로그 */}

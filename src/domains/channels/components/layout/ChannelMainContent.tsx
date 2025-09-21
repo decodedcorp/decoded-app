@@ -1,17 +1,17 @@
 'use client';
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 
 import { AddChannelModal } from '@/domains/create/components/modal/add-channel/AddChannelModal';
 
-import { ExploreFilters } from '../../types/filters';
 import { ExploreGrid } from '../explore/ExploreGrid';
 import { DiscoverSection } from '../explore/DiscoverSection';
 import { TrendingContentsSection } from '../trending/TrendingContentsSection';
 import { TrendingChannelsSection } from '../trending/TrendingChannelsSection';
 import { ChannelModal, ContentModal } from '../modal';
 import { LoadingState, ErrorState, EmptyState } from '../common/LoadingStates';
-import { useChannels } from '../../hooks/useChannels';
+import { useChannelsData } from '../../hooks/useChannelData';
+import { useChannelExploreFilters } from '../../hooks/useUnifiedFilters';
 import { useChannelModalStore } from '../../../../store/channelModalStore';
 import { ChannelResponse } from '../../../../api/generated/models/ChannelResponse';
 import { useChannelTranslation } from '../../../../lib/i18n/hooks';
@@ -21,41 +21,21 @@ interface ChannelMainContentProps {
 }
 
 export function ChannelMainContent({ className = '' }: ChannelMainContentProps) {
-  // Explore filters state
-  const [filters, setFilters] = useState<ExploreFilters>({
-    search: '',
-    category: 'all',
-    subcategory: 'all',
-    sortBy: 'recent',
-    sortOrder: 'desc',
-  });
-
   // Translation hooks
   const { states } = useChannelTranslation();
 
   // 채널 모달 스토어
   const openChannelModal = useChannelModalStore((state) => state.openModal);
 
-  // 채널 데이터 가져오기
-  const {
-    data: channelsData,
-    isLoading,
-    error,
-  } = useChannels({
-    limit: 100, // Load more channels for better explore experience
+  // 통일된 채널 데이터 관리
+  const { channels, isLoading, error, hasData } = useChannelsData({
+    limit: 100,
     sortBy: 'created_at',
     sortOrder: 'desc',
   });
 
-  // 원본 채널 데이터
-  const channels = useMemo(() => {
-    return channelsData?.channels || [];
-  }, [channelsData]);
-
-  // Filter change handler
-  const handleFilterChange = useCallback((newFilters: ExploreFilters) => {
-    setFilters(newFilters);
-  }, []);
+  // 통일된 필터 관리
+  const { filters, updateFilters: handleFilterChange } = useChannelExploreFilters();
 
   // Channel click handler
   const handleChannelClick = useCallback(
@@ -85,7 +65,7 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
   }
 
   // 채널이 없는 경우
-  if (!channels.length) {
+  if (!hasData) {
     return (
       <div className={`relative h-full overflow-y-auto pt-[var(--header-h)] ${className}`}>
         <EmptyState title={states.empty()} subtitle={states.emptySubtitle()} />
@@ -95,7 +75,7 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
 
   // Check if we should show organized sections or filtered grid
   const showOrganizedSections =
-    !filters.search.trim() && filters.category === 'all' && filters.subcategory === 'all';
+    !filters.search?.trim() && filters.category === 'all' && filters.subcategory === 'all';
 
   return (
     <div className={`relative h-full overflow-hidden bg-black ${className}`}>

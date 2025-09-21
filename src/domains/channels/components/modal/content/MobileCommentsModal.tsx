@@ -102,14 +102,14 @@ export function MobileCommentsModal({ isOpen, onClose, content }: MobileComments
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-end justify-center">
+    <div className="fixed inset-0 z-[var(--z-modal-root)] flex items-end justify-center">
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal Content */}
       <div
         ref={modalRef}
-        className="relative bg-zinc-900 shadow-2xl max-h-[70vh] w-full sm:max-w-4xl lg:max-w-6xl mx-auto flex flex-col rounded-t-2xl transform transition-transform duration-300 ease-out border-0 p-0 z-[10000]"
+        className="relative bg-zinc-900 shadow-2xl max-h-[70vh] w-full sm:max-w-4xl lg:max-w-6xl mx-auto flex flex-col rounded-t-2xl transform transition-transform duration-300 ease-out border-0 p-0 z-[var(--z-modal)]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header with swipe handle */}

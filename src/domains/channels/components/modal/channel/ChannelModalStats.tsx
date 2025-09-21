@@ -45,7 +45,7 @@ export function ChannelModalStats({ channel }: ChannelModalStatsProps) {
           >
             <div className="flex items-center space-x-3">
               <span className="text-zinc-300 text-sm font-medium">{t.ui.editors()}:</span>
-              <ChannelEditorsStackedAvatars 
+              <ChannelEditorsStackedAvatars
                 editors={channel.managers}
                 maxDisplay={5}
                 size="md"
@@ -56,13 +56,7 @@ export function ChannelModalStats({ channel }: ChannelModalStatsProps) {
                 {channel.managers.length > 5 && `+${channel.managers.length - 5} more`}
               </span>
             </div>
-            <svg
-              width="16"
-              height="16"
-              fill="none"
-              viewBox="0 0 24 24"
-              className="text-zinc-400"
-            >
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" className="text-zinc-400">
               <path
                 d="M9 18L15 12L9 6"
                 stroke="currentColor"
@@ -94,9 +88,11 @@ export function ChannelModalStats({ channel }: ChannelModalStatsProps) {
       )}
 
       {/* Channel Info */}
-      <div className="mb-4">
-        <div className="text-zinc-400 text-sm">Owner ID: {channel.owner_id}</div>
-      </div>
+      {/* <div className="mb-4">
+        <div className="text-zinc-400 text-sm">
+          Owner ID: {channel.owner_id}
+        </div>
+      </div> */}
 
       {/* Editors List Modal */}
       <EditorsListModal

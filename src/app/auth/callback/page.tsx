@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useAuthStore } from '../../../store/authStore';
 import { handleGoogleOAuthCallback } from '../../../domains/auth/api/authApi';
+import { LoadingOverlay } from '@/shared/components/LoadingOverlay';
 
 function AuthCallbackContent() {
   const router = useRouter();
@@ -137,7 +138,7 @@ function AuthCallbackContent() {
     // 이미 처리 중이면 실행하지 않음
     if (processingRef.current) return;
     processingRef.current = true;
-    
+
     // 즉시 처리 시작
     processAuthCallback();
   }, []); // 의존성 배열을 빈 배열로 변경하여 한 번만 실행
@@ -174,12 +175,13 @@ export default function AuthCallbackPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading...</p>
-          </div>
-        </div>
+        <LoadingOverlay
+          isLoading={true}
+          message="Authenticating..."
+          opacity={0.9}
+          useBrandColor={true}
+          className="min-h-screen"
+        />
       }
     >
       <AuthCallbackContent />

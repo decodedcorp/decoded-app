@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import { validateImageFile, compressImage } from '@/lib/utils/imageUtils';
 import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 interface Step1Data {
   name: string;
@@ -33,6 +34,7 @@ export function Step2MediaUpload({
 }: Step2MediaUploadProps) {
   const t = useCommonTranslation();
   const [formData, setFormData] = useState<Step2Data>(data);
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const [previewData, setPreviewData] = useState<{
     thumbnail: string | null;
     banner: string | null;
@@ -178,221 +180,473 @@ export function Step2MediaUpload({
   };
 
   return (
-    <div className="flex gap-6 max-w-full mx-auto">
-      {/* Left side - Upload Options */}
-      <div className="flex-1">
-        <div className="text-left mb-6">
-          <h2 className="text-2xl font-bold text-white mb-2">
-            {t.globalContentUpload.addChannel.step2.title()}
-          </h2>
-          <p className="text-zinc-400">{t.globalContentUpload.addChannel.step2.subtitle()}</p>
-        </div>
-
-        <div className="space-y-6">
-          {/* Banner Upload */}
-          <div>
-            <label className="text-lg font-medium text-white mb-3 block">
-              {t.globalContentUpload.addChannel.step2.banner()}
-            </label>
-            <div
-              onDragOver={(e) => handleDragOver(e, 'banner')}
-              onDragLeave={(e) => handleDragLeave(e, 'banner')}
-              onDrop={(e) => handleDrop(e, 'banner')}
-              className={`w-full h-32 border-2 border-dashed rounded-lg flex items-center justify-center transition-all duration-200 cursor-pointer relative overflow-hidden ${
-                dragOver.banner
-                  ? 'border-[#eafd66] bg-[#eafd66]/10'
-                  : 'border-zinc-600 hover:border-[#eafd66] bg-zinc-800/30'
-              }`}
-              onClick={() => handleFileSelect('banner')}
-            >
-              {previewData.banner ? (
-                <img
-                  src={
-                    previewData.banner.startsWith('data:')
-                      ? previewData.banner
-                      : `data:image/jpeg;base64,${previewData.banner}`
-                  }
-                  alt="Banner preview"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="text-center">
-                  <svg
-                    className="w-8 h-8 text-zinc-400 mx-auto mb-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                    />
-                  </svg>
-                  <div className="text-zinc-300 font-medium mb-1">
-                    {t.globalContentUpload.addChannel.step2.addBanner()}
-                  </div>
-                  <div className="text-xs text-zinc-500">
-                    {t.globalContentUpload.addChannel.step2.clickOrDrag()}
-                  </div>
-                </div>
-              )}
-            </div>
-            {previewData.banner && (
-              <div className="mt-2 flex gap-2">
-                <button
-                  onClick={() => handleImageRemove('banner')}
-                  className="text-red-400 text-sm hover:text-red-300"
-                >
-                  {t.globalContentUpload.addChannel.step2.removeBanner()}
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Icon Upload */}
-          <div>
-            <label className="text-lg font-medium text-white mb-3 block">
-              {t.globalContentUpload.addChannel.step2.icon()}
-            </label>
-            <div
-              onDragOver={(e) => handleDragOver(e, 'thumbnail')}
-              onDragLeave={(e) => handleDragLeave(e, 'thumbnail')}
-              onDrop={(e) => handleDrop(e, 'thumbnail')}
-              className={`w-full h-32 border-2 border-dashed rounded-lg flex items-center justify-center transition-all duration-200 cursor-pointer relative overflow-hidden ${
-                dragOver.thumbnail
-                  ? 'border-[#eafd66] bg-[#eafd66]/10'
-                  : 'border-zinc-600 hover:border-[#eafd66] bg-zinc-800/30'
-              }`}
-              onClick={() => handleFileSelect('thumbnail')}
-            >
-              {previewData.thumbnail ? (
-                <img
-                  src={
-                    previewData.thumbnail.startsWith('data:')
-                      ? previewData.thumbnail
-                      : `data:image/jpeg;base64,${previewData.thumbnail}`
-                  }
-                  alt="Icon preview"
-                  className="w-full h-full object-cover rounded-lg"
-                />
-              ) : (
-                <div className="text-center">
-                  <svg
-                    className="w-8 h-8 text-zinc-400 mx-auto mb-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                    />
-                  </svg>
-                  <div className="text-zinc-300 font-medium mb-1">
-                    {t.globalContentUpload.addChannel.step2.addIcon()}
-                  </div>
-                  <div className="text-xs text-zinc-500">
-                    {t.globalContentUpload.addChannel.step2.clickOrDrag()}
-                  </div>
-                </div>
-              )}
-            </div>
-            {previewData.thumbnail && (
-              <div className="mt-2 flex gap-2">
-                <button
-                  onClick={() => handleImageRemove('thumbnail')}
-                  className="text-red-400 text-sm hover:text-red-300"
-                >
-                  {t.globalContentUpload.addChannel.step2.removeIcon()}
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
+    <div className="max-w-full mx-auto">
+      {/* Title and Description */}
+      <div className="text-left mb-6">
+        <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-white mb-2`}>
+          {t.globalContentUpload.addChannel.step2.title()}
+        </h2>
+        <p className="text-zinc-400">{t.globalContentUpload.addChannel.step2.subtitle()}</p>
       </div>
 
-      {/* Right side - Preview */}
-      <div className="flex-1">
-        <div className="bg-zinc-900/50 rounded-xl border border-zinc-700/50 overflow-hidden">
-          {/* Banner section */}
-          <div className="h-32 bg-zinc-800 relative overflow-hidden">
-            {previewData.banner ? (
-              <img
-                src={
-                  previewData.banner.startsWith('data:')
-                    ? previewData.banner
-                    : `data:image/jpeg;base64,${previewData.banner}`
-                }
-                alt="Banner preview"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  console.error('❌ Banner preview error:', e);
-                  console.error('❌ Banner src:', previewData.banner?.substring(0, 100));
-                }}
-              />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-r from-zinc-700 to-zinc-600 flex items-center justify-center">
-                <div className="text-center text-zinc-500">
-                  <svg
-                    className="w-8 h-8 mx-auto mb-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                  <p className="text-sm">{t.globalContentUpload.addChannel.step2.addBanner()}</p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Channel info section */}
-          <div className="p-6">
-            <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 rounded-full -mt-12 border-4 border-zinc-900 bg-zinc-700 flex items-center justify-center relative">
-                {previewData.thumbnail ? (
+      {isMobile ? (
+        /* Mobile Layout: Title -> Preview -> Input */
+        <div className="flex flex-col gap-6">
+          {/* Preview Section */}
+          <div className="flex-1">
+            <div className="bg-zinc-900/50 rounded-xl border border-zinc-700/50 overflow-hidden">
+              {/* Banner section */}
+              <div className="h-32 bg-zinc-800 relative overflow-hidden">
+                {previewData.banner ? (
                   <img
                     src={
-                      previewData.thumbnail.startsWith('data:')
-                        ? previewData.thumbnail
-                        : `data:image/jpeg;base64,${previewData.thumbnail}`
+                      previewData.banner.startsWith('data:')
+                        ? previewData.banner
+                        : `data:image/jpeg;base64,${previewData.banner}`
                     }
-                    alt="Channel icon"
-                    className="w-full h-full rounded-full object-cover"
+                    alt="Banner preview"
+                    className="w-full h-full object-cover"
                     onError={(e) => {
-                      console.error('❌ Thumbnail preview error:', e);
-                      console.error('❌ Thumbnail src:', previewData.thumbnail?.substring(0, 100));
+                      console.error('❌ Banner preview error:', e);
+                      console.error('❌ Banner src:', previewData.banner?.substring(0, 100));
                     }}
                   />
                 ) : (
-                  <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center"></div>
+                  <div className="w-full h-full bg-gradient-to-r from-zinc-700 to-zinc-600 flex items-center justify-center">
+                    <div className="text-center text-zinc-500">
+                      <svg
+                        className="w-8 h-8 mx-auto mb-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                      <div className="text-xs text-zinc-500">
+                        {t.globalContentUpload.addChannel.step2.addBanner()}
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
-              <div>
-                <h3 className="text-xl font-bold text-white">{step1Data.name || 'adfadadfadfd'}</h3>
-                <div className="flex items-center space-x-2 text-sm text-zinc-400">
-                  <span>1 {t.globalContentUpload.addChannel.step2.preview.member()}</span>
-                  <span>•</span>
-                  <span>1 {t.globalContentUpload.addChannel.step2.preview.online()}</span>
+
+              {/* Channel info section */}
+              <div className="p-4">
+                <div className="flex items-center space-x-3 mb-4">
+                  {/* Thumbnail */}
+                  <div className="w-12 h-12 rounded-full overflow-hidden bg-zinc-700 flex-shrink-0">
+                    {previewData.thumbnail ? (
+                      <img
+                        src={
+                          previewData.thumbnail.startsWith('data:')
+                            ? previewData.thumbnail
+                            : `data:image/jpeg;base64,${previewData.thumbnail}`
+                        }
+                        alt="Thumbnail preview"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          console.error('❌ Thumbnail preview error:', e);
+                          console.error(
+                            '❌ Thumbnail src:',
+                            previewData.thumbnail?.substring(0, 100),
+                          );
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-zinc-600 flex items-center justify-center">
+                        <svg
+                          className="w-6 h-6 text-zinc-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                          />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Channel name */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-bold text-white truncate">
+                      {step1Data.name ||
+                        t.globalContentUpload.addChannel.step1.preview.channelName()}
+                    </h3>
+                    <div className="flex items-center space-x-2 text-sm text-zinc-400">
+                      <span>{t.globalContentUpload.addChannel.step1.preview.newChannel()}</span>
+                      <span>•</span>
+                      <span>0 {t.globalContentUpload.addChannel.step1.preview.subscribers()}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-zinc-300 text-sm">
+                  {step1Data.description ||
+                    t.globalContentUpload.addChannel.step1.preview.descriptionPlaceholder()}
                 </div>
               </div>
             </div>
-            <div className="mt-4 flex items-center">
-              <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+          </div>
+
+          {/* Upload Options Section */}
+          <div className="flex-1">
+            <div className="space-y-6">
+              {/* Banner Upload */}
+              <div>
+                <label className="text-lg font-medium text-white mb-3 block">
+                  {t.globalContentUpload.addChannel.step2.banner()}
+                </label>
+                <div
+                  onDragOver={(e) => handleDragOver(e, 'banner')}
+                  onDragLeave={(e) => handleDragLeave(e, 'banner')}
+                  onDrop={(e) => handleDrop(e, 'banner')}
+                  className={`w-full h-32 border-2 border-dashed rounded-lg flex items-center justify-center transition-all duration-200 cursor-pointer relative overflow-hidden ${
+                    dragOver.banner
+                      ? 'border-[#eafd66] bg-[#eafd66]/10'
+                      : 'border-zinc-600 hover:border-[#eafd66] bg-zinc-800/30'
+                  }`}
+                  onClick={() => handleFileSelect('banner')}
+                >
+                  {previewData.banner ? (
+                    <img
+                      src={
+                        previewData.banner.startsWith('data:')
+                          ? previewData.banner
+                          : `data:image/jpeg;base64,${previewData.banner}`
+                      }
+                      alt="Banner preview"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="text-center">
+                      <svg
+                        className="w-8 h-8 text-zinc-400 mx-auto mb-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                        />
+                      </svg>
+                      <div className="text-zinc-300 font-medium mb-1">
+                        {t.globalContentUpload.addChannel.step2.addBanner()}
+                      </div>
+                      <div className="text-xs text-zinc-500">
+                        {t.globalContentUpload.addChannel.step2.clickOrDrag()}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {previewData.banner && (
+                  <div className="mt-2 flex gap-2">
+                    <button
+                      onClick={() => handleImageRemove('banner')}
+                      className="text-red-400 text-sm hover:text-red-300"
+                    >
+                      {t.globalContentUpload.addChannel.step2.removeBanner()}
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Icon Upload */}
+              <div>
+                <label className="text-lg font-medium text-white mb-3 block">
+                  {t.globalContentUpload.addChannel.step2.icon()}
+                </label>
+                <div
+                  onDragOver={(e) => handleDragOver(e, 'thumbnail')}
+                  onDragLeave={(e) => handleDragLeave(e, 'thumbnail')}
+                  onDrop={(e) => handleDrop(e, 'thumbnail')}
+                  className={`w-full h-32 border-2 border-dashed rounded-lg flex items-center justify-center transition-all duration-200 cursor-pointer relative overflow-hidden ${
+                    dragOver.thumbnail
+                      ? 'border-[#eafd66] bg-[#eafd66]/10'
+                      : 'border-zinc-600 hover:border-[#eafd66] bg-zinc-800/30'
+                  }`}
+                  onClick={() => handleFileSelect('thumbnail')}
+                >
+                  {previewData.thumbnail ? (
+                    <img
+                      src={
+                        previewData.thumbnail.startsWith('data:')
+                          ? previewData.thumbnail
+                          : `data:image/jpeg;base64,${previewData.thumbnail}`
+                      }
+                      alt="Icon preview"
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  ) : (
+                    <div className="text-center">
+                      <svg
+                        className="w-8 h-8 text-zinc-400 mx-auto mb-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                        />
+                      </svg>
+                      <div className="text-zinc-300 font-medium mb-1">
+                        {t.globalContentUpload.addChannel.step2.addIcon()}
+                      </div>
+                      <div className="text-xs text-zinc-500">
+                        {t.globalContentUpload.addChannel.step2.clickOrDrag()}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {previewData.thumbnail && (
+                  <div className="mt-2 flex gap-2">
+                    <button
+                      onClick={() => handleImageRemove('thumbnail')}
+                      className="text-red-400 text-sm hover:text-red-300"
+                    >
+                      {t.globalContentUpload.addChannel.step2.removeIcon()}
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      ) : (
+        /* Desktop Layout: Title -> Input and Preview side by side */
+        <div className="flex gap-6">
+          {/* Upload Options Section */}
+          <div className="flex-1">
+            <div className="space-y-6">
+              {/* Banner Upload */}
+              <div>
+                <label className="text-lg font-medium text-white mb-3 block">
+                  {t.globalContentUpload.addChannel.step2.banner()}
+                </label>
+                <div
+                  onDragOver={(e) => handleDragOver(e, 'banner')}
+                  onDragLeave={(e) => handleDragLeave(e, 'banner')}
+                  onDrop={(e) => handleDrop(e, 'banner')}
+                  className={`w-full h-32 border-2 border-dashed rounded-lg flex items-center justify-center transition-all duration-200 cursor-pointer relative overflow-hidden ${
+                    dragOver.banner
+                      ? 'border-[#eafd66] bg-[#eafd66]/10'
+                      : 'border-zinc-600 hover:border-[#eafd66] bg-zinc-800/30'
+                  }`}
+                  onClick={() => handleFileSelect('banner')}
+                >
+                  {previewData.banner ? (
+                    <img
+                      src={
+                        previewData.banner.startsWith('data:')
+                          ? previewData.banner
+                          : `data:image/jpeg;base64,${previewData.banner}`
+                      }
+                      alt="Banner preview"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="text-center">
+                      <svg
+                        className="w-8 h-8 text-zinc-400 mx-auto mb-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                        />
+                      </svg>
+                      <div className="text-zinc-300 font-medium mb-1">
+                        {t.globalContentUpload.addChannel.step2.addBanner()}
+                      </div>
+                      <div className="text-xs text-zinc-500">
+                        {t.globalContentUpload.addChannel.step2.clickOrDrag()}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {previewData.banner && (
+                  <div className="mt-2 flex gap-2">
+                    <button
+                      onClick={() => handleImageRemove('banner')}
+                      className="text-red-400 text-sm hover:text-red-300"
+                    >
+                      {t.globalContentUpload.addChannel.step2.removeBanner()}
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Icon Upload */}
+              <div>
+                <label className="text-lg font-medium text-white mb-3 block">
+                  {t.globalContentUpload.addChannel.step2.icon()}
+                </label>
+                <div
+                  onDragOver={(e) => handleDragOver(e, 'thumbnail')}
+                  onDragLeave={(e) => handleDragLeave(e, 'thumbnail')}
+                  onDrop={(e) => handleDrop(e, 'thumbnail')}
+                  className={`w-full h-32 border-2 border-dashed rounded-lg flex items-center justify-center transition-all duration-200 cursor-pointer relative overflow-hidden ${
+                    dragOver.thumbnail
+                      ? 'border-[#eafd66] bg-[#eafd66]/10'
+                      : 'border-zinc-600 hover:border-[#eafd66] bg-zinc-800/30'
+                  }`}
+                  onClick={() => handleFileSelect('thumbnail')}
+                >
+                  {previewData.thumbnail ? (
+                    <img
+                      src={
+                        previewData.thumbnail.startsWith('data:')
+                          ? previewData.thumbnail
+                          : `data:image/jpeg;base64,${previewData.thumbnail}`
+                      }
+                      alt="Thumbnail preview"
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  ) : (
+                    <div className="text-center">
+                      <svg
+                        className="w-8 h-8 text-zinc-400 mx-auto mb-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                        />
+                      </svg>
+                      <div className="text-zinc-300 font-medium mb-1">
+                        {t.globalContentUpload.addChannel.step2.addIcon()}
+                      </div>
+                      <div className="text-xs text-zinc-500">
+                        {t.globalContentUpload.addChannel.step2.clickOrDrag()}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {previewData.thumbnail && (
+                  <div className="mt-2 flex gap-2">
+                    <button
+                      onClick={() => handleImageRemove('thumbnail')}
+                      className="text-red-400 text-sm hover:text-red-300"
+                    >
+                      {t.globalContentUpload.addChannel.step2.removeIcon()}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Preview Section */}
+          <div className="flex-1">
+            <div className="bg-zinc-900/50 rounded-xl border border-zinc-700/50 overflow-hidden">
+              {/* Banner section */}
+              <div className="h-32 bg-zinc-800 relative overflow-hidden">
+                {previewData.banner ? (
+                  <img
+                    src={
+                      previewData.banner.startsWith('data:')
+                        ? previewData.banner
+                        : `data:image/jpeg;base64,${previewData.banner}`
+                    }
+                    alt="Banner preview"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      console.error('❌ Banner preview error:', e);
+                      console.error('❌ Banner src:', previewData.banner?.substring(0, 100));
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-r from-zinc-700 to-zinc-600 flex items-center justify-center">
+                    <div className="text-center text-zinc-500">
+                      <svg
+                        className="w-8 h-8 mx-auto mb-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.5}
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                      <p className="text-sm">
+                        {t.globalContentUpload.addChannel.step2.addBanner()}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Channel info section */}
+              <div className="p-6">
+                <div className="flex items-center space-x-4">
+                  <div className="w-16 h-16 rounded-full -mt-12 border-4 border-zinc-900 bg-zinc-700 flex items-center justify-center relative">
+                    {previewData.thumbnail ? (
+                      <img
+                        src={
+                          previewData.thumbnail.startsWith('data:')
+                            ? previewData.thumbnail
+                            : `data:image/jpeg;base64,${previewData.thumbnail}`
+                        }
+                        alt="Channel icon"
+                        className="w-full h-full rounded-full object-cover"
+                        onError={(e) => {
+                          console.error('❌ Thumbnail preview error:', e);
+                          console.error(
+                            '❌ Thumbnail src:',
+                            previewData.thumbnail?.substring(0, 100),
+                          );
+                        }}
+                      />
+                    ) : (
+                      <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center"></div>
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white">
+                      {step1Data.name ||
+                        t.globalContentUpload.addChannel.step1.preview.channelName()}
+                    </h3>
+                    <div className="flex items-center space-x-2 text-sm text-zinc-400">
+                      <span>1 {t.globalContentUpload.addChannel.step2.preview.member()}</span>
+                      <span>•</span>
+                      <span>1 {t.globalContentUpload.addChannel.step2.preview.online()}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-4 flex items-center">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Hidden file inputs */}
       <input

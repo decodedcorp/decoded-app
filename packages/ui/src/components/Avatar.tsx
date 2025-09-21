@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '../lib/utils';
+import { AvatarFallback } from '@/components/FallbackImage';
 
 export interface AvatarProps {
   /** User ID or name for fallback text */
@@ -27,43 +28,51 @@ export const Avatar: React.FC<AvatarProps> = ({
   className,
   alt,
 }) => {
+  const [imageError, setImageError] = React.useState(false);
+  const [imageLoaded, setImageLoaded] = React.useState(false);
   const fallbackText = userId.charAt(0).toUpperCase();
   const sizeClass = sizeClasses[size];
+
+  // 이미지 상태가 변경될 때 리셋
+  React.useEffect(() => {
+    if (src) {
+      setImageError(false);
+      setImageLoaded(false);
+    }
+  }, [src]);
+
+  const showFallback = !src || imageError || !imageLoaded;
 
   return (
     <div
       className={cn(
-        'relative flex items-center justify-center flex-shrink-0 rounded-full overflow-hidden',
-        'bg-zinc-800 border border-zinc-700',
-        'transition-colors duration-200',
+        'relative flex-shrink-0 overflow-hidden',
         sizeClass,
         className
       )}
     >
-      {src ? (
+      {/* 이미지 */}
+      {src && !imageError && (
         <img
           src={src}
           alt={alt || `Profile of ${userId}`}
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            // Hide image on error and show fallback
-            e.currentTarget.style.display = 'none';
-            const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-            if (fallback) fallback.style.display = 'flex';
-          }}
+          className={cn(
+            'w-full h-full object-cover rounded-full transition-opacity duration-200',
+            imageLoaded ? 'opacity-100' : 'opacity-0'
+          )}
+          onLoad={() => setImageLoaded(true)}
+          onError={() => setImageError(true)}
         />
-      ) : null}
-      
-      {/* Fallback text - always present but hidden when image loads */}
-      <span
-        className={cn(
-          'text-zinc-300 font-medium select-none',
-          src ? 'hidden' : 'flex'
-        )}
-        style={{ display: src ? 'none' : 'flex' }}
-      >
-        {fallbackText}
-      </span>
+      )}
+
+      {/* Fallback */}
+      {showFallback && (
+        <AvatarFallback
+          size={size}
+          fallbackText={fallbackText}
+          className="w-full h-full"
+        />
+      )}
     </div>
   );
 };

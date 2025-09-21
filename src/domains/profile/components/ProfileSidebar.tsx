@@ -58,20 +58,22 @@ export function ProfileSidebar({ userId, profileData, isMyProfile }: ProfileSide
     : [];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* User Stats Card */}
       {isMyProfile && (
-        <div className="bg-zinc-900/50 rounded-xl p-6 border border-zinc-800">
-          <h3 className="text-lg font-semibold text-white mb-4">{t.sidebar.activityOverview()}</h3>
-          <div className="grid grid-cols-2 gap-4">
+        <div className="bg-zinc-900/50 rounded-xl p-4 sm:p-6 border border-zinc-800">
+          <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">
+            {t.sidebar.activityOverview()}
+          </h3>
+          <div className="grid grid-cols-2 gap-2 sm:gap-4">
             {statsData.map((stat) => (
               <div
                 key={stat.label}
                 onClick={stat.onClick}
-                className="p-3 rounded-lg border border-zinc-700 transition-all duration-200 hover:border-zinc-600 cursor-pointer hover:bg-zinc-800/50"
+                className="p-2 sm:p-3 rounded-lg border border-zinc-700 transition-all duration-200 hover:border-zinc-600 cursor-pointer hover:bg-zinc-800/50"
               >
                 <p className="text-xs text-zinc-400 mb-1">{stat.label}</p>
-                <p className="text-xl font-bold text-white">{stat.value}</p>
+                <p className="text-lg sm:text-xl font-bold text-white">{stat.value}</p>
               </div>
             ))}
           </div>
@@ -79,22 +81,24 @@ export function ProfileSidebar({ userId, profileData, isMyProfile }: ProfileSide
       )}
 
       {/* Profile Info Card */}
-      <div className="bg-zinc-900/50 rounded-xl p-6 border border-zinc-800">
-        <h3 className="text-lg font-semibold text-white mb-4">{t.sidebar.profileInfo()}</h3>
+      <div className="bg-zinc-900/50 rounded-xl p-4 sm:p-6 border border-zinc-800">
+        <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">
+          {t.sidebar.profileInfo()}
+        </h3>
 
         {/* SUI Address */}
         {profileData?.sui_address && (
-          <div className="mb-4">
+          <div className="mb-3 sm:mb-4">
             <label className="text-xs text-zinc-400 uppercase tracking-wide">
               {t.sidebar.suiAddress()}
             </label>
             <div className="flex items-center gap-2 mt-1">
-              <span className="font-mono text-sm text-zinc-300">
+              <span className="font-mono text-xs sm:text-sm text-zinc-300 break-all">
                 {profileData.sui_address.slice(0, 6)}...{profileData.sui_address.slice(-4)}
               </span>
               <button
                 onClick={() => navigator.clipboard.writeText(profileData.sui_address!)}
-                className="p-1 text-zinc-400 hover:text-white transition-colors"
+                className="p-1 text-zinc-400 hover:text-white transition-colors flex-shrink-0"
                 title="Copy address"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -115,7 +119,7 @@ export function ProfileSidebar({ userId, profileData, isMyProfile }: ProfileSide
           <label className="text-xs text-zinc-400 uppercase tracking-wide">
             {t.sidebar.memberSince()}
           </label>
-          <p className="text-sm text-zinc-300 mt-1">{t.sidebar.activeMember()}</p>
+          <p className="text-sm text-zinc-300 mt-1">{t.sidebar.memberSince()}</p>
         </div>
       </div>
 
@@ -124,24 +128,26 @@ export function ProfileSidebar({ userId, profileData, isMyProfile }: ProfileSide
         <>
           {/* Recent Channels */}
           {channels && channels.channels && channels.channels.length > 0 && (
-            <div className="bg-zinc-900/50 rounded-xl p-6 border border-zinc-800">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-white">{t.sidebar.recentChannels()}</h3>
+            <div className="bg-zinc-900/50 rounded-xl p-4 sm:p-6 border border-zinc-800">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h3 className="text-base sm:text-lg font-semibold text-white">
+                  {t.sidebar.recentChannels()}
+                </h3>
                 <button
                   onClick={() => router.push(`/profile/${userId}?tab=channels`)}
-                  className="text-sm text-[#EAFD66] hover:text-[#d9ec55] transition-colors"
+                  className="text-xs sm:text-sm text-[#EAFD66] hover:text-[#d9ec55] transition-colors"
                 >
                   {t.sidebar.viewAll()} →
                 </button>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {channels.channels.slice(0, 2).map((channel) => (
                   <div
                     key={channel.id}
                     onClick={() => router.push(`/channels/${channel.id}`)}
-                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-zinc-800/50 cursor-pointer transition-colors"
+                    className="flex items-center gap-2 sm:gap-3 p-2 rounded-lg hover:bg-zinc-800/50 cursor-pointer transition-colors"
                   >
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
                       {channel.thumbnail_url ? (
                         <img
                           src={channel.thumbnail_url}
@@ -155,7 +161,9 @@ export function ProfileSidebar({ userId, profileData, isMyProfile }: ProfileSide
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-white text-sm truncate">{channel.name}</p>
+                      <p className="font-medium text-white text-xs sm:text-sm truncate">
+                        {channel.name}
+                      </p>
                       <p className="text-xs text-zinc-400">
                         {channel.subscriber_count || 0} {t.channels.subscribers()}
                       </p>
@@ -168,25 +176,27 @@ export function ProfileSidebar({ userId, profileData, isMyProfile }: ProfileSide
 
           {/* Recent Bookmarks */}
           {bookmarks && bookmarks.bookmarks && bookmarks.bookmarks.length > 0 && (
-            <div className="bg-zinc-900/50 rounded-xl p-6 border border-zinc-800">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-white">{t.sidebar.recentBookmarks()}</h3>
+            <div className="bg-zinc-900/50 rounded-xl p-4 sm:p-6 border border-zinc-800">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h3 className="text-base sm:text-lg font-semibold text-white">
+                  {t.sidebar.recentBookmarks()}
+                </h3>
                 <button
                   onClick={() => router.push(`/profile/${userId}?tab=bookmarks`)}
-                  className="text-sm text-[#EAFD66] hover:text-[#d9ec55] transition-colors"
+                  className="text-xs sm:text-sm text-[#EAFD66] hover:text-[#d9ec55] transition-colors"
                 >
                   {t.sidebar.viewAll()} →
                 </button>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {bookmarks.bookmarks.slice(0, 2).map((bookmark) => (
                   <div
                     key={bookmark.content_id}
-                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-zinc-800/50 cursor-pointer transition-colors"
+                    className="flex items-center gap-2 sm:gap-3 p-2 rounded-lg hover:bg-zinc-800/50 cursor-pointer transition-colors"
                   >
-                    <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-green-500 to-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
                       <svg
-                        className="w-5 h-5 text-white"
+                        className="w-4 h-4 sm:w-5 sm:h-5 text-white"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -200,7 +210,7 @@ export function ProfileSidebar({ userId, profileData, isMyProfile }: ProfileSide
                       </svg>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-white text-sm line-clamp-1">
+                      <p className="font-medium text-white text-xs sm:text-sm line-clamp-1">
                         {bookmark.content?.link_preview_title ||
                           bookmark.content?.video_title ||
                           'Untitled Content'}
@@ -219,16 +229,18 @@ export function ProfileSidebar({ userId, profileData, isMyProfile }: ProfileSide
 
       {/* Other User Info */}
       {!isMyProfile && (
-        <div className="bg-zinc-900/50 rounded-xl p-6 border border-zinc-800">
-          <h3 className="text-lg font-semibold text-white mb-4">{t.sidebar.about()}</h3>
+        <div className="bg-zinc-900/50 rounded-xl p-4 sm:p-6 border border-zinc-800">
+          <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">
+            {t.sidebar.about()}
+          </h3>
           <p className="text-sm text-zinc-400">{t.sidebar.aboutDescription()}</p>
 
           {/* Future: Follow/Unfollow button */}
-          <div className="mt-4">
+          {/* <div className="mt-3 sm:mt-4">
             <button className="w-full px-4 py-2 bg-[#EAFD66] text-black rounded-lg font-medium hover:bg-[#d9ec55] transition-colors">
               {t.sidebar.followUser()}
             </button>
-          </div>
+          </div> */}
         </div>
       )}
     </div>

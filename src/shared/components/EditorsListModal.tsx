@@ -5,6 +5,7 @@ import React, { useEffect } from 'react';
 import type { UserProfileResponse } from '@/api/generated/models/UserProfileResponse';
 import type { ChannelUserProfile } from '@/api/generated/models/ChannelUserProfile';
 import { useScrollLock } from '@/lib/hooks/useScrollLock';
+import { useTranslation } from 'react-i18next';
 
 interface EditorsListModalProps {
   isOpen: boolean;
@@ -18,9 +19,11 @@ export function EditorsListModal({
   isOpen,
   onClose,
   editors,
-  channelName = 'Channel',
+  channelName,
   ownerId,
 }: EditorsListModalProps) {
+  const { t } = useTranslation('common');
+
   // Use improved scroll lock
   useScrollLock(isOpen);
 
@@ -56,7 +59,7 @@ export function EditorsListModal({
   const getDisplayName = (editor: UserProfileResponse | ChannelUserProfile): string => {
     if (editor.aka) return editor.aka;
     if ('email' in editor && editor.email) return editor.email.split('@')[0];
-    return 'Unknown';
+    return t('unknown');
   };
 
   const getInitials = (editor: UserProfileResponse | ChannelUserProfile): string => {
@@ -65,10 +68,10 @@ export function EditorsListModal({
   };
 
   const formatFollowers = (count?: number): string => {
-    if (!count) return '0 followers';
-    if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M followers`;
-    if (count >= 1000) return `${(count / 1000).toFixed(1)}K followers`;
-    return `${count} followers`;
+    if (!count) return `0 ${t('followers')}`;
+    if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M ${t('followers')}`;
+    if (count >= 1000) return `${(count / 1000).toFixed(1)}K ${t('followers')}`;
+    return `${count} ${t('followers')}`;
   };
 
   const isOwner = (editor: UserProfileResponse | ChannelUserProfile): boolean => {
@@ -88,11 +91,11 @@ export function EditorsListModal({
         >
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-5 border-b border-zinc-700">
-            <h2 className="text-2xl font-bold text-white">Editors</h2>
+            <h2 className="text-2xl font-bold text-white">{t('ui.editors')}</h2>
             <button
               onClick={onClose}
               className="p-2 hover:bg-zinc-800 rounded-full transition-colors text-zinc-400 hover:text-white"
-              aria-label="Close modal"
+              aria-label={t('actions.close')}
             >
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
                 <path
@@ -113,7 +116,7 @@ export function EditorsListModal({
           >
             {sortedEditors.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-zinc-400">No editors for this channel yet</p>
+                <p className="text-zinc-400">{t('noEditorsYet')}</p>
               </div>
             ) : (
               <div className="divide-y divide-zinc-700">
@@ -167,7 +170,7 @@ export function EditorsListModal({
                           <h3 className="font-semibold text-white">{getDisplayName(editor)}</h3>
                           {isOwner(editor) && (
                             <span className="text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full">
-                              Owner
+                              {t('owner')}
                             </span>
                           )}
                         </div>
@@ -191,7 +194,7 @@ export function EditorsListModal({
                         console.log('Follow editor:', editor.id);
                       }}
                     >
-                      Follow
+                      {t('actions.follow')}
                     </button>
                   </div>
                 ))}

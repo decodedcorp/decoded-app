@@ -11,7 +11,8 @@
   },
   "loading": {
     "title": "Loading profile...",
-    "description": "Loading user information"
+    "description": "Loading user information",
+    "initializing": "Loading..."
   },
   "error": {
     "title": "Something went wrong",

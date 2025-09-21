@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useLocale } from '@/lib/hooks/useLocale';
 import { useAuthStore } from '@/store/authStore';
 import { useMyProfile } from '@/domains/profile/hooks/useProfile';
-import { getAvatarFallback } from '@/lib/utils/defaultImages';
+import { AvatarFallback } from '@/components/FallbackImage';
+import { ProfileEditModal } from '@/domains/profile/components/ProfileEditModal';
 
 interface UserAvatarProps {
   size?: 'sm' | 'md' | 'lg';
@@ -19,6 +20,7 @@ export function UserAvatar({ size = 'md', showDropdown = true }: UserAvatarProps
   const logout = useAuthStore((state) => state.logout);
   const { data: profileData } = useMyProfile();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { t } = useLocale();
 
@@ -60,26 +62,30 @@ export function UserAvatar({ size = 'md', showDropdown = true }: UserAvatarProps
     }
   };
 
+  const handleSettingsClick = () => {
+    setIsDropdownOpen(false);
+    setIsEditModalOpen(true);
+  };
 
   // Get user initials for avatar
   const getInitials = () => {
     if (!user) return '?';
-    
+
     // Try to get nickname from AuthStore user first
     if (user.nickname && user.nickname.trim()) {
       return user.nickname.substring(0, 2).toUpperCase();
     }
-    
+
     // Fallback to profile data if AuthStore user has no nickname
     if (profileData?.aka && profileData.aka.trim()) {
       return profileData.aka.substring(0, 2).toUpperCase();
     }
-    
+
     // Fallback to email from AuthStore
     if (user.email && user.email.trim()) {
       return user.email.substring(0, 2).toUpperCase();
     }
-    
+
     return '?';
   };
 
@@ -91,21 +97,17 @@ export function UserAvatar({ size = 'md', showDropdown = true }: UserAvatarProps
         onClick={() => showDropdown && setIsDropdownOpen(!isDropdownOpen)}
         className={`
           ${sizeClasses[size]}
-          relative rounded-full bg-gradient-to-br from-zinc-700 to-zinc-800
-          border border-zinc-600 hover:border-zinc-500
-          flex items-center justify-center
-          text-zinc-300 font-semibold
-          transition-all duration-200
-          hover:ring-2 hover:ring-zinc-500 hover:ring-offset-2 hover:ring-offset-black
+          relative transition-all duration-200
+          hover:ring-2 hover:ring-[var(--color-primary)] hover:ring-offset-2 hover:ring-offset-[var(--color-background)]
           ${showDropdown ? 'cursor-pointer' : 'cursor-default'}
         `}
         aria-label={t('user.userMenu')}
       >
-        {/* Avatar content */}
-        <span className="select-none">{getInitials()}</span>
+        {/* Avatar with design system fallback */}
+        <AvatarFallback size={size} fallbackText={getInitials()} className="w-full h-full" />
 
         {/* Online indicator */}
-        <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-black rounded-full" />
+        <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-[var(--color-background)] rounded-full" />
       </button>
 
       {/* Dropdown Menu */}
@@ -116,9 +118,7 @@ export function UserAvatar({ size = 'md', showDropdown = true }: UserAvatarProps
             <p className="text-sm font-medium text-zinc-200">
               {user.nickname?.trim() || profileData?.aka?.trim() || t('user.user')}
             </p>
-            <p className="text-xs text-zinc-500 truncate">
-              {user.email?.trim() || ''}
-            </p>
+            <p className="text-xs text-zinc-500 truncate">{user.email?.trim() || ''}</p>
           </div>
 
           {/* Menu items */}
@@ -139,8 +139,8 @@ export function UserAvatar({ size = 'md', showDropdown = true }: UserAvatarProps
             </button>
 
             <button
-              disabled
-              className="w-full px-4 py-2 text-left text-sm text-zinc-500 cursor-not-allowed flex items-center gap-3 opacity-50"
+              onClick={handleSettingsClick}
+              className="w-full px-4 py-2 text-left text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors flex items-center gap-3"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -177,6 +177,11 @@ export function UserAvatar({ size = 'md', showDropdown = true }: UserAvatarProps
             </button>
           </div>
         </div>
+      )}
+
+      {/* Profile Edit Modal */}
+      {isEditModalOpen && (
+        <ProfileEditModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} />
       )}
     </div>
   );

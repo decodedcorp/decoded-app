@@ -8,6 +8,7 @@ import { useCommonTranslation } from '@/lib/i18n/hooks';
 import { useScrollDirection } from '@/lib/hooks/useScrollDirection';
 import { useChannel } from '@/domains/channels/hooks/useChannels';
 import { useAuthStore } from '@/store/authStore';
+import { useMobileSidebarStore } from '@/store/mobileSidebarStore';
 import { useNavigationPrefetch, useBackgroundPrefetch } from '@/lib/hooks/usePrefetch';
 
 import { LoginButton } from './LoginButton';
@@ -34,6 +35,9 @@ export const Header = memo(function Header() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isLoading = useAuthStore((state) => state.isLoading);
   const isInitialized = useAuthStore((state) => state.isInitialized);
+
+  // Mobile sidebar state
+  const { isOpen: isMobileSidebarOpen, toggle: toggleMobileSidebar } = useMobileSidebarStore();
 
   // Initialize navigation prefetching
   const { createHoverHandlers } = useNavigationPrefetch();
@@ -106,17 +110,18 @@ export const Header = memo(function Header() {
   return (
     <header
       className={`
-        header fixed top-0 left-0 w-full z-[9999] transition-all duration-300 ease-in-out
+        header fixed top-0 left-0 w-full transition-all duration-300 ease-in-out
         backdrop-blur bg-black/80 border-b border-zinc-700/50 shadow-xl
         ${shouldShowHeader ? 'translate-y-0' : '-translate-y-full'}
       `}
       style={
         {
+          zIndex: 'var(--z-header)',
           WebkitBackdropFilter: 'blur(12px)',
           backdropFilter: 'blur(12px)',
           '--header-h': '60px',
           '--header-h-md': '72px',
-          height: 'var(--header-height, 64px)', // Use new layout variable
+          height: 'var(--header-height, 64px)',
         } as React.CSSProperties & { '--header-h': string; '--header-h-md': string }
       }
       data-header-height="60"
@@ -132,40 +137,40 @@ export const Header = memo(function Header() {
         "
         style={{ paddingInline: 'var(--edge-x)' }}
       >
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => {
-            // 모바일 사이드바 토글 로직을 여기에 추가
-            const event = new CustomEvent('toggle-mobile-sidebar');
-            window.dispatchEvent(event);
-          }}
-          className="lg:hidden p-2 rounded-lg bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 transition-colors"
-          aria-label={t.header.openMenu()}
-        >
-          <svg
-            className="w-5 h-5 text-zinc-300"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+        {/* Mobile Menu Button and Logo */}
+        <div className="flex items-center gap-3 lg:gap-0">
+          <button
+            onClick={toggleMobileSidebar}
+            className="lg:hidden min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [-webkit-tap-highlight-color:rgba(0,0,0,0.08)]"
+            aria-controls="mobile-sidebar"
+            aria-expanded={isMobileSidebarOpen}
+            aria-label={isMobileSidebarOpen ? 'Close menu' : t.header.openMenu()}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
-        </button>
+            <svg
+              className="shrink-0 w-5 h-5 text-zinc-300"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
 
-        {/* Logo */}
-        <Link
-          href="/"
-          className="text-2xl font-bold tracking-tight drop-shadow ml-2 lg:ml-0"
-          style={{ color: 'var(--color-primary)' }}
-          {...createHoverHandlers('/')}
-        >
-          decoded
-        </Link>
+          {/* Logo */}
+          <Link
+            href="/"
+            className="text-2xl font-bold tracking-tight drop-shadow"
+            style={{ color: 'var(--color-primary)' }}
+            {...createHoverHandlers('/')}
+          >
+            decoded
+          </Link>
+        </div>
 
         {/* Search Bar */}
         <div className="hidden md:flex flex-1 justify-center">
@@ -182,14 +187,14 @@ export const Header = memo(function Header() {
         </div>
 
         {/* Right side actions */}
-        <div className="flex items-center gap-2 md:gap-3">
+        <div className="flex items-center gap-3 md:gap-4">
           {/* Mobile Search Button */}
           <button
             onClick={() => setIsMobileSearchOpen(true)}
-            className="md:hidden p-2 text-white hover:text-primary transition-colors"
+            className="md:hidden min-h-11 min-w-11 inline-flex items-center justify-center text-white hover:text-primary transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [-webkit-tap-highlight-color:rgba(0,0,0,0.08)]"
             aria-label={t.header.openSearch()}
           >
-            <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+            <svg className="shrink-0 w-5 h-5" fill="none" viewBox="0 0 24 24">
               <path
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 stroke="currentColor"
@@ -204,7 +209,7 @@ export const Header = memo(function Header() {
           {isAuthenticated && isInitialized ? (
             <>
               <CreateButton />
-              <NotificationButton />
+              {/* <NotificationButton /> */}
               <UserAvatar />
             </>
           ) : (
@@ -217,8 +222,8 @@ export const Header = memo(function Header() {
       {/* Mobile Search Overlay */}
       {isMobileSearchOpen && (
         <div
-          className="fixed top-[60px] md:top-[72px] left-0 right-0 bg-black border-b border-zinc-700 py-4 z-[10000] md:hidden"
-          style={{ paddingInline: 'var(--space-page-x)' }}
+          className="fixed top-[60px] md:top-[72px] left-0 right-0 bg-black border-b border-zinc-700 py-4 md:hidden"
+          style={{ zIndex: 'var(--z-overlay)', paddingInline: 'var(--edge-x)' }}
         >
           <div className="flex items-center gap-3">
             <button

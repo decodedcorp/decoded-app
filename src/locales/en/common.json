@@ -26,7 +26,8 @@
     "unsubscribe": "Unsubscribe",
     "reset": "Reset",
     "saveChanges": "Save Changes",
-    "clearAll": "Clear all"
+    "clearAll": "Clear all",
+    "follow": "Follow"
   },
   "status": {
     "loading": "Loading...",
@@ -38,7 +39,8 @@
     "ready": "Ready",
     "pending": "Pending",
     "completed": "Completed",
-    "failed": "Failed"
+    "failed": "Failed",
+    "redirecting": "Redirecting..."
   },
   "states": {
     "subscribed": "Subscribed",
@@ -102,7 +104,13 @@
     "channelStatistics": "Channel Statistics",
     "contentItems": "Content Items",
     "active": "Active",
-    "all": "All"
+    "all": "All",
+    "noEditorsYet": "No editors for this channel yet",
+    "owner": "Owner",
+    "followers": "followers",
+    "unknown": "Unknown",
+    "channel": "Channel",
+    "ownerId": "Owner ID"
   },
   "header": {
     "openMenu": "Open menu",
@@ -474,6 +482,23 @@
       "sharePost": "Share post",
       "savePost": "Save post"
     }
+  },
+  "trending": {
+    "title": "Trending Content",
+    "subtitle": "Popular content trending across all channels",
+    "popular": "Popular",
+    "trending": "Trending",
+    "loading": "Loading trending content...",
+    "error": "Unable to load content",
+    "errorSubtitle": "Please try again later",
+    "noContent": "No content to display"
+  },
+  "discover": {
+    "title": "All Channels",
+    "subtitle": "Browse channels by category and find channels that suit you",
+    "viewAllChannels": "View All Channels",
+    "allCategories": "All Categories",
+    "allSubcategories": "All Subcategories"
   },
   "accessibility": {
     "closeModal": "Close modal",

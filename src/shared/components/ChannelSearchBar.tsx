@@ -98,17 +98,12 @@ export function ChannelSearchBar({
         // 채널인 경우: 채널 페이지로 이동
         router.push(`/channels/${item.channelId}`);
       } else {
-        // TODO: 콘텐츠 모달 라우팅을 나중에 다시 활성화할 예정
-        // 콘텐츠인 경우: 콘텐츠 상세 페이지로 이동 (모달 라우팅) - 일시적으로 비활성화
-        // URL에서 현재 채널 ID를 추출하여 사용
-        // const currentPath = window.location.pathname;
-        // const channelMatch = currentPath.match(/\/channels\/([^\/]+)/);
-        // const currentChannelId = channelMatch?.[1] || channelId;
-
-        // router.push(`/channels/${currentChannelId}/contents/${item.id}`);
-
-        // 임시로 콘텐츠를 직접 열기 (URL 변경 없이)
-        console.log('Content selected:', item);
+        // 콘텐츠인 경우: 채널 페이지로 이동하면서 콘텐츠 모달 열기 (TrendingContentCard와 동일한 방식)
+        if (item.channelId) {
+          router.push(`/channels/${item.channelId}?content=${item.id}`);
+        } else {
+          console.warn('Channel ID not available for content:', item);
+        }
       }
       setQuery('');
       setIsAutocompleteOpen(false);
@@ -175,8 +170,8 @@ export function ChannelSearchBar({
       <form onSubmit={handleSubmit} className="relative">
         <div className="relative flex items-center bg-zinc-800/70 hover:bg-zinc-800/90 rounded-full border border-zinc-600/50 hover:border-zinc-500/50 focus-within:border-[#eafd66]/50 transition-all duration-200">
           {/* 큰 검색 아이콘 - Reddit 스타일 */}
-          <div className="flex items-center justify-center w-12 h-12 text-zinc-400">
-            <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+          <div className="flex items-center justify-center w-8 h-8 sm:w-12 sm:h-12 text-zinc-400 flex-shrink-0">
+            <svg width="16" height="16" className="sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24">
               <path
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 stroke="currentColor"
@@ -187,19 +182,27 @@ export function ChannelSearchBar({
             </svg>
           </div>
 
-          <div className="flex items-center bg-zinc-700/60 rounded-full px-3 py-1.5 mx-2">
-            <div className="flex items-center space-x-1.5">
+          <div className="flex items-center bg-zinc-700/60 rounded-full px-2 sm:px-3 py-1.5 mx-1 sm:mx-2 min-w-0 flex-shrink-0">
+            <div className="flex items-center space-x-1 sm:space-x-1.5 min-w-0">
               {/* 채널 아이콘 */}
-              <div className="w-3 h-3 rounded-full bg-[#eafd66]"></div>
-              <span className="text-[#eafd66] text-sm font-medium">{displayChannelName}</span>
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#eafd66] flex-shrink-0"></div>
+              <span className="text-[#eafd66] text-xs sm:text-sm font-medium truncate max-w-[80px] sm:max-w-[120px] md:max-w-none">
+                {displayChannelName}
+              </span>
             </div>
             <button
               type="button"
               onClick={handleClear}
-              className="ml-2 text-zinc-400 hover:text-white transition-colors p-0.5"
+              className="ml-1 sm:ml-2 text-zinc-400 hover:text-white transition-colors p-0.5 flex-shrink-0"
               aria-label={t.search.clearSearch()}
             >
-              <svg width="10" height="10" fill="none" viewBox="0 0 24 24">
+              <svg
+                width="8"
+                height="8"
+                className="sm:w-[10px] sm:h-[10px]"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
                 <path
                   d="M18 6L6 18M6 6l12 12"
                   stroke="currentColor"
@@ -221,7 +224,7 @@ export function ChannelSearchBar({
             onBlur={handleInputBlur}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            className="flex-1 py-3 pr-4 bg-transparent text-white placeholder-zinc-400 focus:outline-none rounded-full"
+            className="flex-1 py-2 sm:py-3 pr-3 sm:pr-4 bg-transparent text-white placeholder-zinc-400 focus:outline-none rounded-full text-sm sm:text-base min-w-0"
             autoComplete="off"
             role="combobox"
             aria-expanded={isAutocompleteOpen}
@@ -238,10 +241,10 @@ export function ChannelSearchBar({
                 setIsAutocompleteOpen(false);
                 inputRef.current?.focus();
               }}
-              className="mr-3 p-1 text-zinc-400 hover:text-white transition-colors"
+              className="mr-2 sm:mr-3 p-1 text-zinc-400 hover:text-white transition-colors flex-shrink-0"
               aria-label={t.search.clearSearch()}
             >
-              <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+              <svg width="14" height="14" className="sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24">
                 <path
                   d="M18 6L6 18M6 6l12 12"
                   stroke="currentColor"

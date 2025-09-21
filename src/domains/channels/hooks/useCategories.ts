@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { CategoriesService } from '@/api/generated/services/CategoriesService';
 import { CategoryType } from '@/api/generated/models/CategoryType';
 import { CategorySimpleListResponse } from '@/api/generated/models/CategorySimpleListResponse';
@@ -16,15 +17,18 @@ export function useCategories(categoryType: CategoryType = CategoryType.CHANNEL)
 export const useSimpleCategories = useCategories;
 
 // Helper function to extract dropdown options from API response
-export function formatCategoriesForDropdown(data?: CategorySimpleListResponse) {
+export function formatCategoriesForDropdown(
+  data?: CategorySimpleListResponse,
+  t?: (key: string) => string,
+) {
   if (!data?.categories) return { categories: [], subcategories: {} };
 
   const categories = [
-    { id: 'all', label: 'All Categories', count: 0 }
+    { id: 'all', label: t ? t('discover.allCategories') : 'All Categories', count: 0 },
   ];
 
   const subcategoriesMap: { [categoryId: string]: Array<{ id: string; label: string }> } = {
-    all: [{ id: 'all', label: 'All Subcategories' }]
+    all: [{ id: 'all', label: t ? t('discover.allSubcategories') : 'All Subcategories' }],
   };
 
   data.categories.forEach((item) => {
@@ -37,19 +41,21 @@ export function formatCategoriesForDropdown(data?: CategorySimpleListResponse) {
 
     if (item.subcategories && item.subcategories.length > 0) {
       subcategoriesMap[categoryId] = [
-        { id: 'all', label: 'All Subcategories' },
-        ...item.subcategories.map(sub => ({
+        { id: 'all', label: t ? t('discover.allSubcategories') : 'All Subcategories' },
+        ...item.subcategories.map((sub) => ({
           id: sub.toLowerCase().replace(/\s+/g, '-'),
-          label: sub
-        }))
+          label: sub,
+        })),
       ];
     } else {
-      subcategoriesMap[categoryId] = [{ id: 'all', label: 'All Subcategories' }];
+      subcategoriesMap[categoryId] = [
+        { id: 'all', label: t ? t('discover.allSubcategories') : 'All Subcategories' },
+      ];
     }
   });
 
   return {
     categories,
-    subcategories: subcategoriesMap
+    subcategories: subcategoriesMap,
   };
 }

@@ -1,10 +1,17 @@
 'use client';
 
-import { ReactNode, memo } from 'react';
+import { ReactNode, memo, lazy, Suspense } from 'react';
 import { usePathname } from 'next/navigation';
-import { RightSidebar } from '@/domains/main/components/RightSidebar';
 
-import { Sidebar } from './sidebar/Sidebar';
+// Lazy load sidebars for better performance
+const RightSidebar = lazy(() =>
+  import('@/domains/main/components/RightSidebar').then((module) => ({
+    default: module.RightSidebar,
+  })),
+);
+const Sidebar = lazy(() =>
+  import('./sidebar/Sidebar').then((module) => ({ default: module.Sidebar })),
+);
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -13,20 +20,23 @@ interface MainLayoutProps {
 export const MainLayout = memo(function MainLayout({ children }: MainLayoutProps) {
   const pathname = usePathname();
 
-  // Show right sidebar on all pages
   return (
     <>
       {/* Left sidebar - Fixed position */}
       <aside className="sidebar-left">
         <div className="inner">
-          <Sidebar />
+          <Suspense fallback={<div className="h-full bg-black animate-pulse" />}>
+            <Sidebar />
+          </Suspense>
         </div>
       </aside>
 
       {/* Right sidebar - Fixed position */}
       <aside className="sidebar-right">
         <div className="inner">
-          <RightSidebar />
+          <Suspense fallback={<div className="h-full bg-black animate-pulse" />}>
+            <RightSidebar />
+          </Suspense>
         </div>
       </aside>
 
@@ -35,7 +45,16 @@ export const MainLayout = memo(function MainLayout({ children }: MainLayoutProps
         {/* 3열 컨테이너 */}
         <div className="cols">
           {/* Main content area - 유일한 스크롤 영역 */}
-          <main className="main" id="main-content" data-role="primary">
+          <main
+            className="main"
+            id="main-content"
+            data-role="primary"
+            // Performance optimizations
+            style={{
+              contentVisibility: 'auto',
+              containIntrinsicSize: '1000px',
+            }}
+          >
             {children}
           </main>
         </div>

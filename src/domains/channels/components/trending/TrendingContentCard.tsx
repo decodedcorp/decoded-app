@@ -4,6 +4,8 @@ import React from 'react';
 
 import { useRouter } from 'next/navigation';
 import { TrendingContentItem } from '@/api/generated/models/TrendingContentItem';
+import { useChannel } from '../../hooks/useChannels';
+import { AvatarFallback } from '@/components/FallbackImage';
 
 interface TrendingContentCardProps {
   content: TrendingContentItem;
@@ -12,6 +14,9 @@ interface TrendingContentCardProps {
 
 export function TrendingContentCard({ content, className = '' }: TrendingContentCardProps) {
   const router = useRouter();
+
+  // Get channel data for thumbnail
+  const { data: channelData } = useChannel(content.channel_id);
 
   const handleContentClick = () => {
     // Navigate to channel page with content modal
@@ -67,12 +72,20 @@ export function TrendingContentCard({ content, className = '' }: TrendingContent
             onClick={handleChannelClick}
             className="flex items-center space-x-2 hover:bg-white/10 rounded-lg p-1 -ml-1 transition-colors"
           >
-            {/* Channel Icon */}
-            <div className="w-6 h-6 rounded-full bg-gray-600/80 flex items-center justify-center flex-shrink-0">
-              <span className="text-xs font-medium text-white">
-                {content.channel_name?.charAt(0).toUpperCase() || 'C'}
-              </span>
-            </div>
+            {/* Channel Icon with Fallback */}
+            {channelData?.thumbnail_url ? (
+              <img
+                src={channelData.thumbnail_url}
+                alt={channelData.name || ''}
+                className="w-6 h-6 rounded-full object-cover flex-shrink-0"
+              />
+            ) : (
+              <AvatarFallback
+                size="sm"
+                fallbackText={content.channel_name?.charAt(0).toUpperCase() || 'C'}
+                className="w-6 h-6"
+              />
+            )}
 
             {/* Channel Name */}
             <span className="text-sm font-medium truncate">{content.channel_name}</span>

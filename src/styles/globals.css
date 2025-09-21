@@ -12,30 +12,62 @@
   /* 정석 아키텍처: Header fixed + Shell 높이 분리 + Main만 스크롤 */
   --header-height: 72px; /* 헤더 높이 */
   --gap-main: 24px; /* 좌/우와 메인 간 간격 */
-  --container-padding-x: 16px; /* 좌우 패딩 */
+  --container-padding-x: 8px; /* 좌우 패딩 */
   --sidebar-width: clamp(200px, 14vw, 240px); /* 사이드바 너비 */
   --sidebar-right-width: clamp(280px, 18vw, 320px); /* 오른쪽 사이드바 너비 */
   --content-max-width: 1200px; /* 메인 최대 폭 */
 
-  /* Scroll & Sticky System */
+  /* 모바일 터치 및 뷰포트 최적화 */
+  --touch-target-min: 44px; /* iOS/Android 최소 터치 영역 */
+  --gap-mobile: 12px; /* 모바일 기본 간격 */
+  --gap-desktop: 16px; /* 데스크톱 기본 간격 */
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+
+  /* Scroll & Sticky System - 동적 뷰포트 지원 */
   --scroll-behavior: smooth;
-  --sidebar-scroll-height: calc(100dvh - var(--header-height) - 2 * var(--gap-edge));
-  --main-min-height: calc(100dvh - var(--header-height));
+  --sidebar-scroll-height: calc(100vh - var(--header-height) - 2 * var(--gap-edge));
+  --main-min-height: calc(100vh - var(--header-height));
+
+  /* 동적 뷰포트 지원 (iOS 툴바 대응) */
+  --vh-fallback: 100vh;
+  --vh-dynamic: 100dvh;
+
+  /* 반응형 타이포그래피 토큰 (clamp 기반) */
+  --fs-xs: clamp(12px, 0.72rem + 0.2vw, 13px);
+  --fs-sm: clamp(14px, 0.82rem + 0.25vw, 15px);
+  --fs-base: clamp(15px, 0.9rem + 0.3vw, 16px);
+  --fs-lg: clamp(16px, 0.95rem + 0.4vw, 18px);
+  --fs-xl: clamp(18px, 1.05rem + 0.5vw, 20px);
+  --fs-2xl: clamp(20px, 1.15rem + 0.6vw, 24px);
+
+  /* 터치 및 접근성 최적화 */
+  --interactive-base: 'inline-flex items-center justify-center transition-colors';
+  --focus-ring: 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary';
+  --tap-highlight: '[-webkit-tap-highlight-color:rgba(0,0,0,0.08)]';
+}
+
+/* Z-index scale - 레이어 우선순위 (표준화) */
+:root {
+  --z-base: 0;
+  --z-header: 1000;
+  --z-sidebar: 40; /* 데스크톱 사이드바 */
+  --z-overlay: 1100;
+  --z-sidebar-mobile: 1500; /* 모바일 사이드바를 가장 높게 설정 */
+  --z-modal: 60;
+  --z-modal-root: 70;
+  --z-toast: 2000;
 
   /* Performance & Accessibility */
   --scrollbar-thumb: rgba(255, 255, 255, 0.2);
   --scrollbar-track: transparent;
   --scrollbar-width: 6px;
+}
 
-  /* Z-index scale - 레이어 우선순위 */
-  --z-header: 9999;
-  --z-sidebar: 40; /* 모달보다 낮게 설정 */
-  --z-sidebar-mobile: 10002;
-  --z-overlay: 50;
-  --z-modal: 60;
-  --z-modal-root: 70;
-
-  /* Modal sizes */
+/* Modal sizes */
+:root {
   --modal-max-w-sm: 24rem; /* 384px */
   --modal-max-w-md: 32rem; /* 512px */
   --modal-max-w-lg: 40rem; /* 640px */
@@ -65,6 +97,15 @@
   --drawer-w: min(38vw, 520px);
   --drawer-w-mobile: 85vw;
   --sheet-max-h: min(90dvh, 80vh);
+}
+
+/* 동적 뷰포트 단위 지원 브라우저에서 적용 */
+@supports (height: 100dvh) {
+  :root {
+    --sidebar-scroll-height: calc(100dvh - var(--header-height) - 2 * var(--gap-edge));
+    --main-min-height: calc(100dvh - var(--header-height));
+    --vh-fallback: 100dvh;
+  }
 }
 
 /* Responsive design tokens - 반응형 여백 관리 (LEGACY - DEPRECATED) */
@@ -119,6 +160,91 @@
 /* Smooth color transitions */
 .color-transition {
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ========== 모바일 최적화 유틸리티 클래스 ========== */
+
+/* 반응형 타이포그래피 (CSS 변수 기반) */
+.text-xs {
+  font-size: var(--fs-xs);
+}
+.text-sm {
+  font-size: var(--fs-sm);
+}
+.text-base {
+  font-size: var(--fs-base);
+}
+.text-lg {
+  font-size: var(--fs-lg);
+}
+.text-xl {
+  font-size: var(--fs-xl);
+}
+.text-2xl {
+  font-size: var(--fs-2xl);
+}
+
+/* 안전한 텍스트 처리 (한/영 혼용) */
+.text-safe {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+/* 터치 최적화 인터랙티브 요소 */
+.interactive {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.08);
+  touch-action: manipulation;
+}
+
+/* 세이프 영역 대응 */
+.safe-top {
+  padding-top: var(--safe-area-top);
+}
+.safe-bottom {
+  padding-bottom: var(--safe-area-bottom);
+}
+.safe-left {
+  padding-left: var(--safe-area-left);
+}
+.safe-right {
+  padding-right: var(--safe-area-right);
+}
+.safe-inset {
+  padding-top: var(--safe-area-top);
+  padding-bottom: var(--safe-area-bottom);
+  padding-left: var(--safe-area-left);
+  padding-right: var(--safe-area-right);
+}
+
+/* 모달/시트 바디 스크롤 락 */
+.scroll-lock {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+/* 동적 뷰포트 높이 */
+.h-screen-safe {
+  height: var(--vh-fallback);
+  height: var(--vh-dynamic);
+}
+
+.min-h-screen-safe {
+  min-height: var(--vh-fallback);
+  min-height: var(--vh-dynamic);
+}
+
+/* 모션 감소 설정 대응 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Enhanced shadow depth */
@@ -260,7 +386,7 @@
     width: var(--sidebar-width);
     background: #000;
     z-index: 999;
-    display: none; /* 모바일 기본 숨김 */
+    display: none; /* 모바일 기본 숨김 - Sidebar.tsx에서 모바일 오버레이로 처리 */
   }
 
   .sidebar-right {
@@ -360,7 +486,48 @@
   }
 
   /* ========== MOBILE NAVIGATION ========== */
-  /* Mobile overlay navigation */
+  /* Mobile sidebar overlay - positioned below header */
+  [data-mobile-overlay] {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    pointer-events: auto;
+    opacity: 0;
+    transition: opacity 200ms ease-out;
+    /* Ensures overlay starts below header */
+    top: calc(var(--header-height) + env(safe-area-inset-top, 0px)) !important;
+  }
+
+  [data-mobile-overlay][data-open='true'] {
+    opacity: 1;
+  }
+
+  /* Mobile sidebar */
+  [data-mobile-sidebar] {
+    transform: translateX(-100%);
+    transition: transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    /* iOS/Safari height compatibility */
+    height: calc(100vh - var(--header-height) - env(safe-area-inset-top, 0px));
+  }
+
+  [data-mobile-sidebar][data-open='true'] {
+    transform: translateX(0);
+  }
+
+  /* Enhanced viewport support for iOS/Safari */
+  @supports (height: 100dvh) {
+    [data-mobile-sidebar] {
+      height: calc(100dvh - var(--header-height) - env(safe-area-inset-top, 0px));
+    }
+  }
+
+  @supports (height: 100svh) {
+    [data-mobile-sidebar] {
+      height: calc(100svh - var(--header-height) - env(safe-area-inset-top, 0px));
+    }
+  }
+
+  /* Mobile overlay navigation (legacy) */
   .mobile-nav-overlay {
     position: fixed;
     top: var(--header-height);
@@ -903,6 +1070,12 @@ footer {
 @media (prefers-reduced-motion: reduce) {
   * {
     animation: none !important;
+    transition: none !important;
+  }
+
+  /* Mobile sidebar animations disabled for reduced motion */
+  [data-mobile-sidebar],
+  [data-mobile-overlay] {
     transition: none !important;
   }
 }

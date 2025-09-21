@@ -3,13 +3,15 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
+import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
 
 export default function ProfileRedirectPage() {
   const router = useRouter();
   const currentUser = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const t = useCommonTranslation();
 
-  useEffect(() => {
+  useEffect(() => { 
     if (isAuthenticated && currentUser?.doc_id) {
       // Redirect to user's own profile
       router.replace(`/profile/${currentUser.doc_id}`);
@@ -21,8 +23,9 @@ export default function ProfileRedirectPage() {
 
   // Show loading while redirecting - using MainLayout styling
   return (
-    <div className="flex items-center justify-center py-20">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+    <div className="flex flex-col items-center justify-center py-20">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+      <p className="text-sm text-muted-foreground">{t.status.redirecting()}</p>
     </div>
   );
 }

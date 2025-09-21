@@ -240,7 +240,7 @@ export const SearchAutocomplete = React.memo(
         <div
           className={clsx(
             'absolute top-full left-0 right-0 mt-2 bg-zinc-800/95 backdrop-blur-sm',
-            'border border-zinc-600/50 rounded-lg shadow-xl z-[99999]',
+            'border border-zinc-600/50 rounded-lg shadow-xl z-[var(--z-modal)]',
             className,
           )}
         >
@@ -260,7 +260,7 @@ export const SearchAutocomplete = React.memo(
         <div
           className={clsx(
             'absolute top-full left-0 right-0 mt-2 bg-zinc-800/95 backdrop-blur-sm',
-            'border border-zinc-600/50 rounded-lg shadow-xl z-[99999]',
+            'border border-zinc-600/50 rounded-lg shadow-xl z-[var(--z-modal)]',
             className,
           )}
         >
@@ -277,7 +277,7 @@ export const SearchAutocomplete = React.memo(
         <div
           className={clsx(
             'absolute top-full left-0 right-0 mt-2 bg-zinc-800/95 backdrop-blur-sm',
-            'border border-zinc-600/50 rounded-lg shadow-xl z-[99999]',
+            'border border-zinc-600/50 rounded-lg shadow-xl z-[var(--z-modal)]',
             className,
           )}
         >

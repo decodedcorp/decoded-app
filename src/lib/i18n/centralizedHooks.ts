@@ -43,6 +43,7 @@ type CommonTranslations = {
     pending: () => string;
     completed: () => string;
     failed: () => string;
+    redirecting: () => string;
   };
   states: {
     subscribed: () => string;
@@ -493,6 +494,7 @@ export const useCommonTranslation = (): CommonTranslations => {
       pending: () => t('status.pending'),
       completed: () => t('status.completed'),
       failed: () => t('status.failed'),
+      redirecting: () => t('status.redirecting'),
     },
     states: {
       subscribed: () => t('states.subscribed'),

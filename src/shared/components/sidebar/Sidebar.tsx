@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, memo, useMemo, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 
 import {
   HomeIcon,
@@ -14,6 +15,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useAuthStore } from '@/store/authStore';
 import { useAddChannelStore } from '@/domains/create/store/addChannelStore';
+import { useMobileSidebarStore } from '@/store/mobileSidebarStore';
 import { useRouter, usePathname } from 'next/navigation';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
 
@@ -28,7 +30,10 @@ export const Sidebar = memo(function Sidebar() {
   // 상태 구독 최적화 - 필요한 상태만 구독
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Mobile sidebar state from Zustand store
+  const { isOpen: isMobileOpen, close: closeMobileSidebar } = useMobileSidebarStore();
 
   // 모달 상태를 개별적으로 구독하여 무한 루프 방지
   const openAddChannelModal = useAddChannelStore((state) => state.openModal);
@@ -36,22 +41,55 @@ export const Sidebar = memo(function Sidebar() {
 
   const t = useCommonTranslation();
 
+  // Custom hook for scroll lock
+  const useScrollLock = (isLocked: boolean) => {
+    useEffect(() => {
+      if (!isLocked) return;
+
+      const originalOverflow = document.body.style.overflow;
+      const originalPaddingRight = document.body.style.paddingRight;
+
+      // 스크롤바 너비 보상 (레이아웃 시프트 방지)
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+
+      document.body.style.overflow = 'hidden';
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+
+      return () => {
+        document.body.style.overflow = originalOverflow;
+        document.body.style.paddingRight = originalPaddingRight;
+      };
+    }, [isLocked]);
+  };
+
+  // Apply scroll lock when mobile sidebar is open
+  useScrollLock(isMobileOpen);
+
+  // Check if component is mounted for Portal
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   // Close mobile sidebar when route changes
   useEffect(() => {
-    setIsMobileOpen(false);
-  }, [pathname]);
+    closeMobileSidebar();
+  }, [pathname, closeMobileSidebar]);
 
-  // Listen for mobile sidebar toggle events from header
+  // Note: Mobile sidebar toggle is now handled by Zustand store
+
+  // Keyboard event handler (ESC to close)
   useEffect(() => {
-    const handleToggleMobileSidebar = () => {
-      setIsMobileOpen((prev) => !prev);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isMobileOpen) {
+        closeMobileSidebar();
+      }
     };
 
-    window.addEventListener('toggle-mobile-sidebar', handleToggleMobileSidebar);
-    return () => {
-      window.removeEventListener('toggle-mobile-sidebar', handleToggleMobileSidebar);
-    };
-  }, []);
+    if (isMobileOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [isMobileOpen, closeMobileSidebar]);
 
   // Handle create button click - useCallback으로 최적화
   const handleCreateClick = useCallback(() => {
@@ -59,6 +97,59 @@ export const Sidebar = memo(function Sidebar() {
     // 모달은 /create 페이지에서 열도록 하고, 여기서는 라우팅만 처리
     router.push('/create');
   }, [router]);
+
+  // Mobile Sidebar Portal Component
+  const MobileSidebarPortal = ({
+    isOpen,
+    onClose,
+    children,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    children: React.ReactNode;
+  }) => {
+    if (!isOpen || !isMounted) return null;
+
+    return createPortal(
+      <>
+        {/* Mobile Backdrop - starts below header */}
+        <div
+          className="fixed left-0 right-0 bottom-0 bg-black/50 lg:hidden cursor-pointer"
+          style={{
+            top: 'calc(var(--header-height) + env(safe-area-inset-top, 0px))',
+            zIndex: 'var(--z-overlay)',
+            backdropFilter: 'blur(4px)',
+            WebkitBackdropFilter: 'blur(4px)',
+          }}
+          onClick={onClose}
+          data-mobile-overlay
+          data-open={isOpen}
+        />
+
+        {/* Mobile Sidebar */}
+        <nav
+          id="mobile-sidebar"
+          className="lg:hidden"
+          style={{
+            position: 'fixed',
+            top: 'calc(var(--header-height) + env(safe-area-inset-top, 0px))',
+            left: '0px',
+            width: '240px',
+            height: 'calc(100dvh - var(--header-height) - env(safe-area-inset-top, 0px))',
+            backgroundColor: '#000000',
+            borderRight: '1px solid #27272a',
+            zIndex: 'var(--z-sidebar-mobile)',
+          }}
+          data-mobile-sidebar
+          data-open={isOpen}
+          aria-hidden={!isOpen}
+        >
+          {children}
+        </nav>
+      </>,
+      document.body,
+    );
+  };
 
   // Sidebar content component
   const SidebarContent = () => (
@@ -116,29 +207,10 @@ export const Sidebar = memo(function Sidebar() {
 
   return (
     <>
-      {/* Mobile Backdrop */}
-      {isMobileOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-[10001] lg:hidden cursor-pointer"
-          onClick={() => setIsMobileOpen(false)}
-        />
-      )}
-
-      {/* Mobile Sidebar Overlay */}
-      <aside
-        className={`
-          lg:hidden
-          w-[240px]
-          overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-black
-          ${
-            isMobileOpen
-              ? 'fixed top-[72px] left-0 h-[calc(100dvh-72px)] translate-x-0 z-[10002]'
-              : 'fixed top-[72px] left-0 h-[calc(100dvh-72px)] -translate-x-full z-[var(--z-sidebar)]'
-          }
-        `}
-      >
+      {/* Mobile Sidebar Portal - 모바일에서만 표시 */}
+      <MobileSidebarPortal isOpen={isMobileOpen} onClose={closeMobileSidebar}>
         <SidebarContent />
-      </aside>
+      </MobileSidebarPortal>
 
       {/* Desktop Sidebar Content - rendered by MainLayout */}
       <div className="hidden lg:block w-full h-full">

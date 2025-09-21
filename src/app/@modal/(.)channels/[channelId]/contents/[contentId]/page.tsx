@@ -7,6 +7,7 @@ import { Modal } from '@/components/ui/Modal';
 import { ContentBody } from '@/domains/content/ContentBody';
 import { getContentWithValidation } from '@/lib/api/content';
 import { toChannelHref } from '@/lib/routing';
+import { LoadingOverlay } from '@/shared/components/LoadingOverlay';
 
 interface ContentModalPageProps {
   params: Promise<{
@@ -70,9 +71,13 @@ export default function ContentOverlay({ params }: ContentModalPageProps) {
 
   if (isLoading || !content) {
     return (
-      <div className="fixed inset-0 z-[999] bg-black/80 backdrop-blur-sm flex items-center justify-center">
-        <div className="text-white">Loading...</div>
-      </div>
+      <LoadingOverlay
+        isLoading={true}
+        message="Loading content..."
+        opacity={0.8}
+        zIndex={999}
+        useBrandColor={true}
+      />
     );
   }
 
