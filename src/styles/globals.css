@@ -56,8 +56,8 @@
   --z-sidebar: 40; /* 데스크톱 사이드바 */
   --z-overlay: 1100;
   --z-sidebar-mobile: 1500; /* 모바일 사이드바를 가장 높게 설정 */
-  --z-modal: 60;
-  --z-modal-root: 70;
+  --z-modal: 1100; /* 헤더보다 높게 설정 */
+  --z-modal-root: 1110; /* 모달 루트도 헤더보다 높게 */
   --z-toast: 2000;
 
   /* Performance & Accessibility */
