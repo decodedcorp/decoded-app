@@ -62,6 +62,7 @@ export const MainFeed = React.memo(function MainFeed() {
         linkUrl: apiResponse.url,
         thumbnailUrl,
         author: apiResponse.provider_id || 'anonymous',
+        channel_id: apiResponse.channel_id, // channel_id 추가
         date: apiResponse.created_at || new Date().toISOString(),
         category: apiResponse.category,
         status: apiResponse.status,

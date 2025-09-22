@@ -17,6 +17,7 @@ import { ContentItem } from '@/lib/types/content';
 import { CommentSection } from '@/domains/comments/components/CommentSection';
 import { useBookmarkStatus, useBookmark } from '@/domains/users/hooks/useBookmark';
 import { useUserProfile } from '@/domains/users/hooks/useUserProfile';
+import { useChannel } from '@/domains/channels/hooks/useChannels';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
 import { useTranslation } from 'react-i18next';
 import { Avatar } from '@decoded/ui';
@@ -81,6 +82,16 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
     error: profileError,
   } = useUserProfile(authorId || '', {
     enabled: !!authorId,
+  });
+
+  // Get channel information
+  const channelId = content.channel_id;
+  const {
+    data: channelData,
+    isLoading: isChannelLoading,
+    error: channelError,
+  } = useChannel(channelId || '', {
+    enabled: !!channelId,
   });
 
   // Translation hooks
@@ -248,32 +259,90 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
 
       {/* Scrollable Content Area */}
       <div className="flex-1 min-h-0 overflow-y-auto">
-        {/* Profile & Content Info */}
-        {(content.author || content.likes !== undefined || content.views !== undefined) && (
+        {/* Channel & Author Info */}
+        {(channelId ||
+          content.author ||
+          content.likes !== undefined ||
+          content.views !== undefined) && (
           <div className="p-4 border-b border-zinc-700/50">
-            {/* Author Info */}
-            {authorId && (
-              <div className="flex items-center space-x-3 mb-3">
-                <Avatar
-                  userId={authorId}
-                  src={userProfile?.profile_image_url || undefined}
-                  size="lg"
-                  className="flex-shrink-0"
-                />
-                <div>
-                  <div className="font-medium text-white">
-                    {isProfileLoading ? (
-                      <span className="animate-pulse">Loading...</span>
-                    ) : profileError ? (
-                      authorId // API 에러 시 authorId 표시
+            {/* Channel Info */}
+            {channelId && (
+              <div className="space-y-3">
+                {/* Channel Info Row */}
+                <div className="flex items-center space-x-3">
+                  {/* Channel Thumbnail */}
+                  <div className="flex-shrink-0">
+                    {isChannelLoading ? (
+                      <div className="w-12 h-12 bg-zinc-700/50 rounded-lg animate-pulse" />
                     ) : (
-                      userProfile?.aka || authorId
+                      <div className="w-12 h-12 bg-zinc-800 rounded-lg overflow-hidden">
+                        {channelData?.thumbnail_url ? (
+                          <img
+                            src={channelData.thumbnail_url}
+                            alt={channelData.name || 'Channel'}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center">
+                            <span className="text-zinc-400 text-xs font-medium">
+                              {channelData?.name?.charAt(0) || 'C'}
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     )}
                   </div>
-                  {content.date && (
-                    <div className="text-xs text-zinc-400">{formatDate(content.date)}</div>
+
+                  {/* Channel Name */}
+                  <div className="font-medium text-white">
+                    {isChannelLoading ? (
+                      <div className="h-4 bg-zinc-700/50 rounded animate-pulse w-24" />
+                    ) : channelError ? (
+                      <span className="text-zinc-400">Channel</span>
+                    ) : (
+                      channelData?.name || 'Unknown Channel'
+                    )}
+                  </div>
+
+                  {/* Author Info - moved to same row */}
+                  {authorId && (
+                    <div className="flex items-center space-x-2 ml-auto">
+                      {/* Author Avatar */}
+                      <Avatar
+                        userId={authorId}
+                        src={userProfile?.profile_image_url || undefined}
+                        size="sm"
+                        className="flex-shrink-0"
+                      />
+
+                      {/* Author & Time */}
+                      <div className="flex items-center space-x-1 text-sm text-zinc-400">
+                        <span>
+                          {isProfileLoading ? (
+                            <span className="animate-pulse">Loading...</span>
+                          ) : profileError ? (
+                            authorId
+                          ) : (
+                            userProfile?.aka || authorId
+                          )}
+                        </span>
+                        {content.date && (
+                          <>
+                            <span>•</span>
+                            <span>{formatDate(content.date)}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
                   )}
                 </div>
+
+                {/* Channel Description */}
+                {channelData?.description && (
+                  <p className="text-xs text-zinc-400 leading-relaxed line-clamp-2 text-right">
+                    {channelData.description}
+                  </p>
+                )}
               </div>
             )}
 
