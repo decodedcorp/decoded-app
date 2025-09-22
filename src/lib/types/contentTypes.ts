@@ -77,6 +77,7 @@ export interface ContentItem {
   category?: string;
   author?: string;
   provider_id?: string; // API에서 사용하는 provider ID
+  channel_id?: string; // 채널 ID 추가
   date?: string;
   likes?: number;
   views?: number;

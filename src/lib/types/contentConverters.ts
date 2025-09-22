@@ -248,6 +248,7 @@ export const convertToContentItem = (content: UnifiedContent): ContentItem => {
     description: content.description || undefined,
     status: content.status,
     provider_id: content.provider_id, // provider_id 추가
+    channel_id: content.channel_id, // channel_id 추가
   };
 
   if (isImageContent(content)) {

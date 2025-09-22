@@ -1,11 +1,19 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { useRouter } from 'next/navigation';
-import { Camera, Video, Link as LinkIcon, FileText } from 'lucide-react';
+import { Camera, Video, Link as LinkIcon, FileText, Bookmark, BookmarkCheck } from 'lucide-react';
 import { CardMediaWithFallback } from '@/components/CardMedia/CardMedia';
 import { usePostCardTranslation } from '@/lib/i18n/hooks';
+import { useTranslation } from 'react-i18next';
+import { useBookmarkStatus, useBookmark } from '@/domains/users/hooks/useBookmark';
+import { useAuthStatus } from '@/domains/auth/hooks/useAuth';
+import { LoginModal } from '@/domains/auth/components/LoginModal';
+import { useCommentsModal } from '@/hooks/useCommentsModal';
+import { useChannel } from '@/domains/channels/hooks/useChannels';
+import { useDateFormatters } from '@/lib/utils/dateUtils';
+// import { useCommentStats } from '@/domains/comments/hooks/useComments';
 // import { useTogglePin } from '@/domains/channels/hooks/useChannelPins';
 // import { useBookmark } from '@/domains/users/hooks/useBookmark';
 // import { useCommentStats } from '@/domains/comments/hooks/useComments';
@@ -20,11 +28,12 @@ export interface PostCardProps {
   channel: string;
   channelId: string;
   channelThumbnail?: string | null;
+  channelDescription?: string; // 채널 설명 추가
   author: string;
   authorId: string;
   userAvatar?: string | null;
   userAka?: string | null;
-  timeAgo: string;
+  createdAt: string | Date; // ISO string or Date object
   pins: number;
   comments: number;
   thumbnail?: string | null;
@@ -109,11 +118,12 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
   channel,
   channelId,
   channelThumbnail,
+  channelDescription,
   author,
   authorId,
   userAvatar,
   userAka,
-  timeAgo,
+  createdAt,
   pins,
   comments,
   thumbnail,
@@ -135,7 +145,54 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
 }: PostCardProps) {
   const router = useRouter();
   const { actions, contentType: contentTypeLabels, accessibility } = usePostCardTranslation();
+  const { t } = useTranslation('common');
+  const { formatDateByContext } = useDateFormatters();
+
+  // 디버깅 로그
+  if (process.env.NODE_ENV === 'development') {
+    console.log('PostCard date debug:', {
+      title,
+      createdAt,
+      createdAtType: typeof createdAt,
+      formattedTime: formatDateByContext(createdAt, 'list'),
+    });
+  }
+
   // const { open: openComments } = useCommentsModal();
+
+  // 북마크 관련 상태 및 훅
+  const isAuthenticated = useAuthStatus();
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const { open: openComments } = useCommentsModal();
+  // const {
+  //   open: openComments,
+  //   close: closeComments,
+  //   isOpen: isCommentsModalOpen,
+  // } = useCommentsModal();
+  // const [previousUrl, setPreviousUrl] = useState<string | null>(null);
+
+  // 채널 정보 가져오기 (채널 설명을 위해)
+  const { data: channelData } = useChannel(channelId, { enabled: !!channelId });
+
+  // contentId가 있을 때만 북마크 훅 활성화
+  const { data: bookmarkStatus } = useBookmarkStatus(contentId || '');
+  const {
+    addBookmark,
+    removeBookmark,
+    isLoading: isBookmarkLoading,
+  } = useBookmark(contentId || '');
+
+  // 댓글 모달이 닫힐 때 URL 복원
+  // useEffect(() => {
+  //   if (!isCommentsModalOpen && previousUrl && typeof window !== 'undefined') {
+  //     console.log('PostCard: Restoring URL to:', previousUrl);
+  //     window.history.replaceState({}, '', previousUrl);
+  //     setPreviousUrl(null);
+  //   }
+  // }, [isCommentsModalOpen, previousUrl]);
+
+  // 댓글 통계 가져오기 (contentId가 있을 때만) - 나중에 구현
+  // const { data: commentStats } = useCommentStats(contentId || '', !!contentId);
 
   // API 훅들 - contentId가 있을 때만 활성화 (주석처리)
   // const { togglePin, isLoading: isPinLoading } = useTogglePin();
@@ -161,22 +218,6 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
   // const actualIsLiked = propIsLiked ?? isLiked;
   // const actualLikeCount = propLikeCount ?? likeCount;
   // const actualCommentCount = comments ?? commentStats?.total_comments ?? 0;
-
-  // 디버깅을 위한 로그
-  if (process.env.NODE_ENV === 'development') {
-    console.log('PostCard render:', {
-      title,
-      thumbnail,
-      contentType,
-      hasThumbnail: !!thumbnail,
-      thumbnailType: typeof thumbnail,
-      contentId,
-      // actualIsPinned,
-      // actualIsBookmarked,
-      // actualIsLiked,
-      // actualLikeCount,
-    });
-  }
 
   const getContentIcon = () => {
     switch (contentType) {
@@ -208,6 +249,51 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
     }
   };
 
+  // 북마크 핸들러
+  const handleBookmarkClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    if (!isAuthenticated) {
+      setIsLoginModalOpen(true);
+      return;
+    }
+
+    if (!contentId || isBookmarkLoading) return;
+
+    if (bookmarkStatus?.is_bookmarked) {
+      removeBookmark();
+    } else {
+      addBookmark();
+    }
+  };
+
+  // 로그인 성공 핸들러
+  const handleLoginSuccess = () => {
+    setIsLoginModalOpen(false);
+  };
+
+  // 로그인 모달 닫기 핸들러
+  const handleCloseLoginModal = () => {
+    setIsLoginModalOpen(false);
+  };
+
+  // 댓글 클릭 핸들러
+  const handleCommentClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!contentId) {
+      console.log('PostCard: No contentId for comments');
+      return;
+    }
+
+    // 현재 URL 저장
+    // if (typeof window !== 'undefined') {
+    //   setPreviousUrl(window.location.href);
+    // }
+
+    console.log('PostCard: Opening comments modal for contentId:', contentId);
+    openComments(contentId);
+  };
+
   // 액션 핸들러들 (주석처리)
   // const handlePinClick = async (e: React.MouseEvent) => {
   //   e.stopPropagation();
@@ -217,21 +303,6 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
   //     await togglePin(contentId, channelId, actualIsPinned);
   //   } catch (error) {
   //     console.error('Failed to toggle pin:', error);
-  //   }
-  // };
-
-  // const handleBookmarkClick = async (e: React.MouseEvent) => {
-  //   e.stopPropagation();
-  //   if (!contentId || isBookmarkLoading) return;
-
-  //   try {
-  //     if (actualIsBookmarked) {
-  //       removeBookmark();
-  //     } else {
-  //       addBookmark();
-  //     }
-  //   } catch (error) {
-  //     console.error('Failed to toggle bookmark:', error);
   //   }
   // };
 
@@ -280,54 +351,17 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
       {/* 배지 - 카드 오른쪽 상단 */}
       {badge && (
         <div className="absolute top-3 right-3 bg-[#eafd66] text-black text-xs font-bold px-2 py-1 rounded-full shadow-lg z-10">
-          {badge}
+          {t(`badges.${badge}`, badge)}
         </div>
       )}
       <div className="p-2 md:p-4">
         {/* 상단: 채널 정보 및 메타데이터 */}
-        <div className="flex items-center gap-3 mb-3">
-          {/* 동그란 채널 썸네일 - 클릭 시 채널 페이지로 */}
-          <button
-            className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity cursor-pointer overflow-hidden"
-            onClick={() => {
-              if (onChannelClick) {
-                onChannelClick(channelId, channel);
-              } else {
-                router.push(`/channels/${channelId}`);
-              }
-            }}
-            aria-label={accessibility.goToChannel(channel)}
-          >
-            {channelThumbnail ? (
-              <img
-                src={channelThumbnail}
-                alt={`${channel} channel`}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  // 이미지 로딩 실패 시 기본 아이콘으로 폴백
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
-                  const fallback = target.nextElementSibling as HTMLElement;
-                  if (fallback) fallback.style.display = 'flex';
-                }}
-              />
-            ) : null}
-            <div
-              className={`w-full h-full bg-gradient-to-br from-[#eafd66] to-[#d4e85c] rounded-full flex items-center justify-center ${
-                channelThumbnail ? 'hidden' : 'flex'
-              }`}
-            >
-              <span className="text-zinc-900 font-bold text-sm">
-                {channel.charAt(0).toUpperCase()}
-              </span>
-            </div>
-          </button>
-
-          {/* 채널명, 작성자, 시간 */}
-          <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-2 text-sm text-zinc-400">
-            {/* 첫 번째 줄: 채널명 */}
+        <div className="mb-3">
+          {/* 첫 번째 줄: 채널 썸네일, 채널명, 작성자, 시간 */}
+          <div className="flex items-center gap-3 mb-2">
+            {/* 동그란 채널 썸네일 - 클릭 시 채널 페이지로 */}
             <button
-              className="text-[#eafd66] hover:text-white font-medium transition-colors cursor-pointer text-left"
+              className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity cursor-pointer overflow-hidden"
               onClick={() => {
                 if (onChannelClick) {
                   onChannelClick(channelId, channel);
@@ -335,59 +369,108 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
                   router.push(`/channels/${channelId}`);
                 }
               }}
+              aria-label={accessibility.goToChannel(channel)}
             >
-              {channel}
+              {channelThumbnail ? (
+                <img
+                  src={channelThumbnail}
+                  alt={`${channel} channel`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    // 이미지 로딩 실패 시 기본 아이콘으로 폴백
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    const fallback = target.nextElementSibling as HTMLElement;
+                    if (fallback) fallback.style.display = 'flex';
+                  }}
+                />
+              ) : null}
+              <div
+                className={`w-full h-full bg-gradient-to-br from-[#eafd66] to-[#d4e85c] rounded-full flex items-center justify-center ${
+                  channelThumbnail ? 'hidden' : 'flex'
+                }`}
+              >
+                <span className="text-zinc-900 font-bold text-sm">
+                  {channel.charAt(0).toUpperCase()}
+                </span>
+              </div>
             </button>
 
-            {/* 두 번째 줄: 작성자와 시간 (항상 나란히 배치) */}
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1">
-                {/* 유저 아바타 */}
-                <div className="w-4 h-4 rounded-full overflow-hidden flex-shrink-0">
-                  {userAvatar ? (
-                    <img
-                      src={userAvatar}
-                      alt={`${author} avatar`}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        // 이미지 로딩 실패 시 기본 아이콘으로 폴백
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        const fallback = target.nextElementSibling as HTMLElement;
-                        if (fallback) fallback.style.display = 'flex';
-                      }}
-                    />
-                  ) : null}
-                  <div
-                    className={`w-full h-full bg-zinc-600 rounded-full flex items-center justify-center ${
-                      userAvatar ? 'hidden' : 'flex'
-                    }`}
-                  >
-                    <span className="text-zinc-300 text-xs font-medium">
-                      {author.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                </div>
-                <button
-                  className="hover:text-zinc-300 transition-colors cursor-pointer text-left"
-                  onClick={() => {
-                    if (onAuthorClick) {
-                      onAuthorClick(authorId, author);
-                    } else {
-                      router.push(`/profile/${authorId}`);
-                    }
-                  }}
-                  aria-label={accessibility.goToAuthor(userAka || author)}
-                >
-                  {userAka || author}
-                </button>
-              </div>
+            {/* 채널명, 작성자, 시간 */}
+            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-2 text-sm text-zinc-400">
+              {/* 첫 번째 줄: 채널명 */}
+              <button
+                className="text-[#eafd66] hover:text-white font-medium transition-colors cursor-pointer text-left"
+                onClick={() => {
+                  if (onChannelClick) {
+                    onChannelClick(channelId, channel);
+                  } else {
+                    router.push(`/channels/${channelId}`);
+                  }
+                }}
+              >
+                {channel}
+              </button>
 
-              {/* 구분자와 시간 */}
-              <span className="text-zinc-600">•</span>
-              <span>{timeAgo}</span>
+              {/* 두 번째 줄: 작성자와 시간 (항상 나란히 배치) */}
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2">
+                  {/* 유저 아바타 */}
+                  <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0">
+                    {userAvatar ? (
+                      <img
+                        src={userAvatar}
+                        alt={`${author} avatar`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          // 이미지 로딩 실패 시 기본 아이콘으로 폴백
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const fallback = target.nextElementSibling as HTMLElement;
+                          if (fallback) fallback.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    <div
+                      className={`w-full h-full bg-zinc-600 rounded-full flex items-center justify-center ${
+                        userAvatar ? 'hidden' : 'flex'
+                      }`}
+                    >
+                      <span className="text-zinc-300 text-sm font-medium">
+                        {author.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    className="hover:text-zinc-300 transition-colors cursor-pointer text-left text-sm font-medium"
+                    onClick={() => {
+                      if (onAuthorClick) {
+                        onAuthorClick(authorId, author);
+                      } else {
+                        router.push(`/profile/${authorId}`);
+                      }
+                    }}
+                    aria-label={accessibility.goToAuthor(userAka || author)}
+                  >
+                    {userAka || author}
+                  </button>
+                </div>
+
+                {/* 구분자와 시간 */}
+                {/* <span className="text-zinc-600">•</span>
+                <span>{formatDateByContext(createdAt, 'list')}</span> */}
+              </div>
             </div>
           </div>
+
+          {/* 두 번째 줄: 채널 설명 */}
+          {(channelDescription || channelData?.description) && (
+            <div className="">
+              <p className="text-zinc-500 text-sm line-clamp-2 leading-relaxed">
+                {channelDescription || channelData?.description}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* 포스트 콘텐츠 영역 - 클릭 시 모달 */}
@@ -395,11 +478,18 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
           className="cursor-pointer group/content hover:bg-zinc-900/50 rounded-lg p-2 -m-2 transition-colors"
           onClick={() => {
             if (contentId && channelId) {
+              // 현재 URL 저장 (댓글 모달용)
+              // if (typeof window !== 'undefined') {
+              //   setPreviousUrl(window.location.href);
+              // }
+
+              // onPostClick을 먼저 호출하여 로딩 상태 표시
+              onPostClick?.();
               // URL만 변경 (라우터 push 없이)
-              const newUrl = `/channels/${channelId}?content=${contentId}`;
-              window.history.pushState({}, '', newUrl);
+              // const newUrl = `/channels/${channelId}?content=${contentId}`;
+              // window.history.pushState({}, '', newUrl);
               // URL 변경 이벤트 발생시키기
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              // window.dispatchEvent(new PopStateEvent('popstate'));
             } else {
               onPostClick?.();
             }
@@ -411,11 +501,18 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
               if (contentId && channelId) {
+                // 현재 URL 저장 (댓글 모달용)
+                // if (typeof window !== 'undefined') {
+                //   setPreviousUrl(window.location.href);
+                // }
+
+                // onPostClick을 먼저 호출하여 로딩 상태 표시
+                onPostClick?.();
                 // URL만 변경 (라우터 push 없이)
-                const newUrl = `/channels/${channelId}?content=${contentId}`;
-                window.history.pushState({}, '', newUrl);
+                // const newUrl = `/channels/${channelId}?content=${contentId}`;
+                // window.history.pushState({}, '', newUrl);
                 // URL 변경 이벤트 발생시키기
-                window.dispatchEvent(new PopStateEvent('popstate'));
+                // window.dispatchEvent(new PopStateEvent('popstate'));
               } else {
                 onPostClick?.();
               }
@@ -451,18 +548,49 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
           )}
         </div>
 
-        {/* 포스트 액션 버튼들 - 주석처리 */}
-        {/* <PostActionButtons
-          contentId={contentId}
-          channelId={channelId}
-          pins={pins}
-          comments={comments}
-          isPinned={propIsPinned}
-          isBookmarked={propIsBookmarked}
-          isLiked={propIsLiked}
-          likeCount={propLikeCount}
-        /> */}
+        {/* 포스트 액션 버튼들 */}
+        <div className="flex items-center justify-between pt-3 border-t border-zinc-800">
+          <div className="flex items-center space-x-4">
+            {/* 북마크 버튼 - contentId가 있을 때만 활성화 */}
+            {contentId ? (
+              <button
+                onClick={handleBookmarkClick}
+                disabled={isBookmarkLoading}
+                className="flex items-center space-x-2 px-3 py-2 text-sm text-zinc-400 hover:text-white bg-zinc-800/30 hover:bg-zinc-700/50 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label={bookmarkStatus?.is_bookmarked ? 'Remove bookmark' : 'Add bookmark'}
+              >
+                {bookmarkStatus?.is_bookmarked ? (
+                  <BookmarkCheck className="w-4 h-4" style={{ color: '#EAFD66' }} />
+                ) : (
+                  <Bookmark className="w-4 h-4" />
+                )}
+                <span>{bookmarkStatus?.is_bookmarked ? '저장됨' : actions.save()}</span>
+              </button>
+            ) : (
+              <div className="flex items-center space-x-2 px-3 py-2 text-sm text-zinc-500 bg-zinc-800/20 rounded-lg">
+                <Bookmark className="w-4 h-4" />
+                <span>{actions.save()}</span>
+              </div>
+            )}
+
+            {/* 댓글 - 클릭 가능 */}
+            <button
+              onClick={handleCommentClick}
+              disabled={!contentId}
+              className="flex items-center space-x-1 text-sm text-zinc-400 hover:text-white transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span>{actions.comment()}</span>
+            </button>
+          </div>
+        </div>
       </div>
+
+      {/* Login Modal */}
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={handleCloseLoginModal}
+        onLoginSuccess={handleLoginSuccess}
+      />
     </div>
   );
 });

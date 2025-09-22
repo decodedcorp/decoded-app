@@ -48,6 +48,12 @@
     "subscribing": "구독 중...",
     "unsubscribing": "구독 해제 중..."
   },
+  "badges": {
+    "trending": "트렌딩",
+    "new": "신규",
+    "hot": "인기",
+    "popular": "인기"
+  },
   "navigation": {
     "home": "홈",
     "channels": "채널",
@@ -68,7 +74,13 @@
     "daysAgo": "{{days}}일 전",
     "weeksAgo": "{{weeks}}주 전",
     "monthsAgo": "{{months}}개월 전",
-    "yearsAgo": "{{years}}년 전"
+    "yearsAgo": "{{years}}년 전",
+    "unknown": "알 수 없음",
+    "today": "오늘",
+    "thisWeek": "이번 주",
+    "thisMonth": "이번 달",
+    "recent": "최근",
+    "older": "오래됨"
   },
   "ui": {
     "expand": "펼치기",
@@ -335,6 +347,11 @@
         "cancel": "취소",
         "next": "다음",
         "nextStep": "다음 단계",
+        "createChannel": "채널 만들기",
+        "creating": "만드는 중..."
+      },
+      "footer": {
+        "cancel": "취소",
         "createChannel": "채널 만들기",
         "creating": "만드는 중..."
       },

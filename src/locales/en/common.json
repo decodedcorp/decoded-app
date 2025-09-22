@@ -48,6 +48,12 @@
     "subscribing": "Subscribing...",
     "unsubscribing": "Unsubscribing..."
   },
+  "badges": {
+    "trending": "Trending",
+    "new": "New",
+    "hot": "Hot",
+    "popular": "Popular"
+  },
   "navigation": {
     "home": "Home",
     "channels": "Channels",
@@ -68,7 +74,13 @@
     "daysAgo": "{{days}} days ago",
     "weeksAgo": "{{weeks}} weeks ago",
     "monthsAgo": "{{months}} months ago",
-    "yearsAgo": "{{years}} years ago"
+    "yearsAgo": "{{years}} years ago",
+    "unknown": "Unknown",
+    "today": "Today",
+    "thisWeek": "This week",
+    "thisMonth": "This month",
+    "recent": "Recent",
+    "older": "Older"
   },
   "ui": {
     "expand": "Expand",
@@ -335,6 +347,11 @@
         "cancel": "Cancel",
         "next": "Next",
         "nextStep": "Next Step",
+        "createChannel": "Create Channel",
+        "creating": "Creating..."
+      },
+      "footer": {
+        "cancel": "Cancel",
         "createChannel": "Create Channel",
         "creating": "Creating..."
       },

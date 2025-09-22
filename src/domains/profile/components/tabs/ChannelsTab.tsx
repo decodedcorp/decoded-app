@@ -2,33 +2,19 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useMyChannels } from '../../hooks/useProfileActivity';
 import { useProfileTranslation } from '@/lib/i18n/hooks';
+import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from 'date-fns';
+import { ThumbnailFallback } from '@/components/FallbackImage';
+import { ChannelsTabSkeleton } from '@/shared/components/loading/ChannelsTabSkeleton';
 
 export function ChannelsTab() {
   const router = useRouter();
   const t = useProfileTranslation();
+  const { t: rawT } = useTranslation('profile');
   const { data, isLoading, error } = useMyChannels();
 
   if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-zinc-900/50 rounded-xl p-6 animate-pulse">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-16 h-16 bg-zinc-800 rounded-lg" />
-              <div className="flex-1">
-                <div className="h-4 bg-zinc-800 rounded w-3/4 mb-2" />
-                <div className="h-3 bg-zinc-800 rounded w-1/2" />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="h-3 bg-zinc-800 rounded" />
-              <div className="h-3 bg-zinc-800 rounded w-4/5" />
-            </div>
-          </div>
-        ))}
-      </div>
-    );
+    return <ChannelsTabSkeleton count={6} />;
   }
 
   if (error) {
@@ -90,7 +76,9 @@ export function ChannelsTab() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-white">{t.channels.count(channels.length)}</h2>
+        <h2 className="text-xl font-semibold text-white">
+          {rawT('channels.count').replace('{count}', channels.length.toString())}
+        </h2>
         <button
           onClick={() => router.push('/create')}
           className="px-4 py-2 bg-[#EAFD66] text-black rounded-lg font-medium hover:bg-[#d9ec55] transition-colors flex items-center gap-2"
@@ -110,19 +98,19 @@ export function ChannelsTab() {
           >
             {/* Channel Header */}
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center overflow-hidden">
-                {channel.thumbnail_url ? (
-                  <img
-                    src={channel.thumbnail_url}
-                    alt={channel.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
+              {channel.thumbnail_url ? (
+                <img
+                  src={channel.thumbnail_url}
+                  alt={channel.name}
+                  className="w-16 h-16 rounded-lg object-cover"
+                />
+              ) : (
+                <ThumbnailFallback size="lg" className="w-16 h-16">
                   <span className="text-xl font-bold text-white">
                     {channel.name.substring(0, 2).toUpperCase()}
                   </span>
-                )}
-              </div>
+                </ThumbnailFallback>
+              )}
               <div className="flex-1">
                 <h3 className="font-medium text-white line-clamp-1">{channel.name}</h3>
                 <p className="text-sm text-zinc-400">{t.channels.inactive()}</p>

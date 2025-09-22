@@ -11,11 +11,12 @@ import {
 } from '@/domains/bookmarks/hooks/useBookmarks';
 import { useContentModalStore } from '@/store/contentModalStore';
 import { ContentItem } from '@/lib/types/content';
-import { formatDateByContext } from '@/lib/utils/dateUtils';
+import { useDateFormatters } from '@/lib/utils/dateUtils';
 import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
 
 export default function BookmarksPage() {
   const t = useCommonTranslation();
+  const { formatDateByContext } = useDateFormatters();
   const router = useRouter();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const openContentModal = useContentModalStore((state) => state.openModal);

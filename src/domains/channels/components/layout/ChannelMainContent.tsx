@@ -10,6 +10,7 @@ import { TrendingContentsSection } from '../trending/TrendingContentsSection';
 import { TrendingChannelsSection } from '../trending/TrendingChannelsSection';
 import { ChannelModal, ContentModal } from '../modal';
 import { LoadingState, ErrorState, EmptyState } from '../common/LoadingStates';
+import { ChannelPageSkeleton } from '@/shared/components/loading/ChannelPageSkeleton';
 import { useChannelsData } from '../../hooks/useChannelData';
 import { useChannelExploreFilters } from '../../hooks/useUnifiedFilters';
 import { useChannelModalStore } from '../../../../store/channelModalStore';
@@ -40,17 +41,39 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
   // Channel click handler
   const handleChannelClick = useCallback(
     (channel: ChannelResponse) => {
-      console.log('Channel clicked:', channel);
-      openChannelModal(channel);
+      console.log('🎯 [ChannelMainContent] Channel clicked:', {
+        id: channel.id,
+        name: channel.name,
+        owner_id: channel.owner_id,
+        created_at: channel.created_at,
+        fullChannel: channel,
+      });
+
+      // 작성자 ID와 작성시간을 명시적으로 전달
+      const channelData = {
+        ...channel,
+        owner_id: channel.owner_id || 'test-owner-id', // 임시 테스트용
+        created_at: channel.created_at || new Date().toISOString(), // 임시 테스트용
+      };
+
+      console.log('🎯 [ChannelMainContent] Channel data to pass:', {
+        id: channelData.id,
+        name: channelData.name,
+        owner_id: channelData.owner_id,
+        created_at: channelData.created_at,
+        fullChannelData: channelData,
+      });
+
+      openChannelModal(channelData);
     },
     [openChannelModal],
   );
 
-  // 로딩 상태 렌더링
+  // 로딩 상태 렌더링 - 채널 페이지 전용 스켈레톤 사용
   if (isLoading) {
     return (
       <div className={`relative h-full overflow-y-auto pt-[var(--header-h)] ${className}`}>
-        <LoadingState title={states.searching()} />
+        <ChannelPageSkeleton />
       </div>
     );
   }

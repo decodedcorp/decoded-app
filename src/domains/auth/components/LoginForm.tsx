@@ -8,6 +8,7 @@ import { useAuthMutations } from '../hooks/useAuthMutations';
 import { AuthError, NetworkError } from '../types/auth';
 import { useAuthStore } from '../../../store/authStore';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
+import { InlineSpinner } from '@/shared/components/loading/InlineSpinner';
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -51,16 +52,16 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
 
           // AuthStore의 login 함수를 호출하여 메인 창에서 토큰 저장
           login(event.data.loginData);
-          
+
           // React Query 캐시 무효화
           queryClient.invalidateQueries({ queryKey: ['user'] });
           queryClient.invalidateQueries({ queryKey: ['auth'] });
-          
+
           // 로그인 성공 후 상태 업데이트를 위한 짧은 지연
           setTimeout(() => {
             // 로그인 성공 콜백 호출
             onSuccess?.();
-            
+
             // 페이지 새로고침으로 UI 강제 업데이트
             window.location.reload();
           }, 100);
@@ -216,7 +217,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
       >
         {isFormLoading ? (
           <div className="flex items-center">
-            <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-3"></div>
+            <InlineSpinner size="md" ariaLabel="Signing in" className="mr-3" />
             <span className="text-white">{t.login.signingIn()}</span>
           </div>
         ) : (

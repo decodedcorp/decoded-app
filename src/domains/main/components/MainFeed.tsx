@@ -27,6 +27,7 @@ import { LoadingOverlay } from '@/shared/components/LoadingOverlay';
 export const MainFeed = React.memo(function MainFeed() {
   const [activeSort, setActiveSort] = useState<SortOption>('hot');
   const [selectedContentId, setSelectedContentId] = useState<string | null>(null);
+  const [isLoadingContent, setIsLoadingContent] = useState(false);
   const [channelThumbnails, setChannelThumbnails] = useState<Record<string, string>>({});
   const [userAvatars, setUserAvatars] = useState<Record<string, string>>({});
   const [userAkas, setUserAkas] = useState<Record<string, string>>({});
@@ -61,6 +62,7 @@ export const MainFeed = React.memo(function MainFeed() {
         linkUrl: apiResponse.url,
         thumbnailUrl,
         author: apiResponse.provider_id || 'anonymous',
+        channel_id: apiResponse.channel_id, // channel_id 추가
         date: apiResponse.created_at || new Date().toISOString(),
         category: apiResponse.category,
         status: apiResponse.status,
@@ -87,10 +89,20 @@ export const MainFeed = React.memo(function MainFeed() {
       const contentItem = convertApiResponseToContentItem(contentDetail);
       // channelId를 전달하여 URL 업데이트
       openModal(contentItem, DEFAULT_CHANNEL_ID);
-      // 모달이 열린 후 선택된 콘텐츠 ID 초기화
+      // 모달이 열린 후 선택된 콘텐츠 ID와 로딩 상태 초기화
       setSelectedContentId(null);
+      setIsLoadingContent(false);
     }
   }, [contentDetail, isContentLoading, openModal, convertApiResponseToContentItem]);
+
+  // 선택된 콘텐츠 ID가 변경될 때 로딩 상태 관리
+  useEffect(() => {
+    if (selectedContentId) {
+      setIsLoadingContent(true);
+    } else {
+      setIsLoadingContent(false);
+    }
+  }, [selectedContentId]);
 
   const sortOptions: {
     value: SortOption;
@@ -284,7 +296,7 @@ export const MainFeed = React.memo(function MainFeed() {
     // FeedItem은 이미 정규화된 데이터이므로 직접 사용
     const thumbnail = item.imageUrl || null;
 
-    return {
+    const transformed = {
       id: index,
       title: item.title || 'Untitled',
       description: item.description || undefined,
@@ -293,12 +305,29 @@ export const MainFeed = React.memo(function MainFeed() {
       author: item.providerName || 'anonymous',
       authorId: item.providerId || 'anonymous',
       timeAgo: 'Recent', // 간단한 시간 표시
+      createdAt: item.createdAt || new Date().toISOString(), // PostCard에서 사용할 createdAt 추가
       pins: item.metadata?.pins || 0,
       comments: item.metadata?.comments || 0,
       thumbnail,
       contentType: item.type || 'link',
       badge: item.metadata?.badge || null,
     };
+
+    // 디버깅을 위한 로그
+    if (process.env.NODE_ENV === 'development') {
+      console.log('transformFeedItem:', {
+        itemId: item.id,
+        title: item.title,
+        originalCreatedAt: item.createdAt,
+        transformedCreatedAt: transformed.createdAt,
+        createdAtType: typeof item.createdAt,
+        metadata: item.metadata,
+        comments: transformed.comments,
+        pins: transformed.pins,
+      });
+    }
+
+    return transformed;
   }, []);
 
   // FeedItem을 ContentItem으로 변환하는 함수 (모달용)
@@ -470,7 +499,7 @@ export const MainFeed = React.memo(function MainFeed() {
                               authorId={post.authorId}
                               userAvatar={userAvatars[item.providerId || '']}
                               userAka={userAkas[item.providerId || '']}
-                              timeAgo={post.timeAgo}
+                              createdAt={post.createdAt}
                               pins={post.pins}
                               comments={post.comments}
                               thumbnail={post.thumbnail}
@@ -486,13 +515,14 @@ export const MainFeed = React.memo(function MainFeed() {
                               blurDataURL={undefined}
                               contentType={post.contentType}
                               badge={post.badge}
+                              contentId={item.id} // 북마크 기능을 위한 contentId 추가
                               onPostClick={() => {
                                 // 콘텐츠 ID를 설정하여 상세 정보 가져오기
                                 setSelectedContentId(item.id);
                               }}
                               // 로딩 상태 표시
                               className={
-                                isSelected && isContentLoading
+                                isSelected && (isContentLoading || isLoadingContent)
                                   ? 'opacity-50 pointer-events-none'
                                   : ''
                               }
@@ -509,7 +539,7 @@ export const MainFeed = React.memo(function MainFeed() {
 
           {/* 콘텐츠 로딩 오버레이 */}
           <LoadingOverlay
-            isLoading={isContentLoading && !!selectedContentId}
+            isLoading={isLoadingContent || (isContentLoading && !!selectedContentId)}
             message={t.feed.loadingContent()}
             spinnerSize="md"
             useBrandColor={true}

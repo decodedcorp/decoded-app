@@ -2,11 +2,15 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMySubscriptions } from '../../hooks/useProfileActivity';
 import { useProfileTranslation } from '@/lib/i18n/hooks';
+import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from 'date-fns';
+import { ThumbnailFallback } from '@/components/FallbackImage';
+import { SubscriptionsTabSkeleton } from '@/shared/components/loading/SubscriptionsTabSkeleton';
 
 export function SubscriptionsTab() {
   const router = useRouter();
   const t = useProfileTranslation();
+  const { t: rawT } = useTranslation('profile');
   const [offset, setOffset] = useState(0);
   const limit = 12;
 
@@ -19,17 +23,7 @@ export function SubscriptionsTab() {
   };
 
   if (isLoading && offset === 0) {
-    return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-          <div key={i} className="bg-zinc-900/50 rounded-xl p-4 animate-pulse">
-            <div className="w-full aspect-square bg-zinc-800 rounded-lg mb-3" />
-            <div className="h-4 bg-zinc-800 rounded w-3/4 mb-2" />
-            <div className="h-3 bg-zinc-800 rounded w-1/2" />
-          </div>
-        ))}
-      </div>
-    );
+    return <SubscriptionsTabSkeleton count={8} />;
   }
 
   if (error) {
@@ -94,7 +88,10 @@ export function SubscriptionsTab() {
     <div>
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-white">
-          {t.subscriptions.count(data?.total_count || 0)}
+          {rawT('subscriptions.count').replace(
+            '{count}',
+            (data?.total_count || subscriptions.length).toString(),
+          )}
         </h2>
       </div>
 
@@ -106,21 +103,19 @@ export function SubscriptionsTab() {
             className="bg-zinc-900/50 rounded-xl p-4 border border-zinc-800 hover:bg-zinc-800/50 hover:border-zinc-600 cursor-pointer transition-all duration-200 group"
           >
             {/* Channel Thumbnail */}
-            <div className="w-full aspect-square bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg mb-3 overflow-hidden">
-              {subscription.channel_thumbnail_url ? (
-                <img
-                  src={subscription.channel_thumbnail_url}
-                  alt={subscription.channel_name || 'Channel'}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-3xl font-bold text-white">
-                    {subscription.channel_name?.substring(0, 2).toUpperCase() || '?'}
-                  </span>
-                </div>
-              )}
-            </div>
+            {subscription.channel_thumbnail_url ? (
+              <img
+                src={subscription.channel_thumbnail_url}
+                alt={subscription.channel_name || 'Channel'}
+                className="w-full aspect-square rounded-lg object-cover group-hover:scale-105 transition-transform duration-200 mb-3"
+              />
+            ) : (
+              <ThumbnailFallback className="w-full aspect-square rounded-lg mb-3">
+                <span className="text-3xl font-bold text-white">
+                  {subscription.channel_name?.substring(0, 2).toUpperCase() || '?'}
+                </span>
+              </ThumbnailFallback>
+            )}
 
             {/* Channel Info */}
             <h3 className="font-medium text-white line-clamp-1 mb-1">

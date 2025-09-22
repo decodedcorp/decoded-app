@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface AddChannelFooterProps {
   onCancel: () => void;
@@ -15,6 +16,8 @@ export function AddChannelFooter({
   isLoading,
   canSubmit,
 }: AddChannelFooterProps) {
+  const { t } = useTranslation('common');
+
   return (
     <div className="flex items-center justify-end space-x-3 p-6 border-t border-zinc-700/50">
       <button
@@ -23,7 +26,7 @@ export function AddChannelFooter({
         disabled={isLoading}
         className="px-6 py-2.5 rounded-lg bg-zinc-800 text-white font-medium hover:bg-zinc-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Cancel
+        {t('globalContentUpload.addChannel.footer.cancel')}
       </button>
 
       <button
@@ -54,10 +57,10 @@ export function AddChannelFooter({
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               ></path>
             </svg>
-            <span>Creating...</span>
+            <span>{t('globalContentUpload.addChannel.footer.creating')}</span>
           </>
         ) : (
-          <span>Create Channel</span>
+          <span>{t('globalContentUpload.addChannel.footer.createChannel')}</span>
         )}
       </button>
     </div>

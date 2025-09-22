@@ -144,13 +144,6 @@ export function CommentList({
             )}
           </div>
         )}
-
-        {/* No more comments indicator */}
-        {!hasMore && comments.length > 0 && (
-          <div className="py-2 text-center">
-            <span className="text-xs text-zinc-500">{t('comments.noMore')}</span>
-          </div>
-        )}
       </div>
     </div>
   );

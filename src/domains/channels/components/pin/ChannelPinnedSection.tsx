@@ -365,6 +365,7 @@ export const ChannelPinnedSection: React.FC<ChannelPinnedSectionProps> = ({
       views: item.content_metadata?.views_count,
       date: item.created_at,
       status: 'published' as any, // 기본값
+      channel_id: channelId, // channel_id 추가
     };
   };
 

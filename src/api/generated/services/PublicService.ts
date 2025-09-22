@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { BatchStatusResponse } from '../models/BatchStatusResponse';
+import type { ChannelRecommendationsResponse } from '../models/ChannelRecommendationsResponse';
 import type { DemoImageContentRequest } from '../models/DemoImageContentRequest';
 import type { DemoLinkContentRequest } from '../models/DemoLinkContentRequest';
 import type { DemoResponse } from '../models/DemoResponse';
@@ -17,12 +18,14 @@ export class PublicService {
      * Search Contents
      * @param query
      * @param limit
+     * @param page
      * @returns SearchContentsResponse Successful Response
      * @throws ApiError
      */
     public static searchContentsSearchContentsGet(
         query: string = '',
         limit: number = 10,
+        page?: (number | null),
     ): CancelablePromise<SearchContentsResponse> {
         return __request(OpenAPI, {
             method: 'GET',
@@ -30,6 +33,7 @@ export class PublicService {
             query: {
                 'query': query,
                 'limit': limit,
+                'page': page,
             },
             errors: {
                 422: `Validation Error`,
@@ -40,12 +44,14 @@ export class PublicService {
      * Search Channels
      * @param query
      * @param limit
+     * @param page
      * @returns SearchChannelResponse Successful Response
      * @throws ApiError
      */
     public static searchChannelsSearchChannelsGet(
         query: string = '',
         limit: number = 10,
+        page?: (number | null),
     ): CancelablePromise<SearchChannelResponse> {
         return __request(OpenAPI, {
             method: 'GET',
@@ -53,6 +59,7 @@ export class PublicService {
             query: {
                 'query': query,
                 'limit': limit,
+                'page': page,
             },
             errors: {
                 422: `Validation Error`,
@@ -64,6 +71,7 @@ export class PublicService {
      * @param channelId
      * @param query
      * @param limit
+     * @param page
      * @returns SearchContentsResponse Successful Response
      * @throws ApiError
      */
@@ -71,6 +79,7 @@ export class PublicService {
         channelId: string,
         query: string = '',
         limit: number = 10,
+        page?: (number | null),
     ): CancelablePromise<SearchContentsResponse> {
         return __request(OpenAPI, {
             method: 'GET',
@@ -81,6 +90,7 @@ export class PublicService {
             query: {
                 'query': query,
                 'limit': limit,
+                'page': page,
             },
             errors: {
                 422: `Validation Error`,
@@ -104,6 +114,32 @@ export class PublicService {
             query: {
                 'query': query,
                 'limit': limit,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Recommend Channels
+     * @param limit
+     * @param skip
+     * @param userId
+     * @returns ChannelRecommendationsResponse Successful Response
+     * @throws ApiError
+     */
+    public static recommendChannelsRecommendationsChannelsGet(
+        limit: number = 10,
+        skip?: number,
+        userId?: (string | null),
+    ): CancelablePromise<ChannelRecommendationsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/recommendations/channels',
+            query: {
+                'limit': limit,
+                'skip': skip,
+                'user_id': userId,
             },
             errors: {
                 422: `Validation Error`,

@@ -17,9 +17,13 @@ import { ContentItem } from '@/lib/types/content';
 import { CommentSection } from '@/domains/comments/components/CommentSection';
 import { useBookmarkStatus, useBookmark } from '@/domains/users/hooks/useBookmark';
 import { useUserProfile } from '@/domains/users/hooks/useUserProfile';
+import { useChannel } from '@/domains/channels/hooks/useChannels';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
 import { useTranslation } from 'react-i18next';
 import { Avatar } from '@decoded/ui';
+import { useAuthStatus } from '@/domains/auth/hooks/useAuth';
+import { LoginModal } from '@/domains/auth/components/LoginModal';
+import { useDateFormatters } from '@/lib/utils/dateUtils';
 
 import { SummarySection } from './SummarySection';
 import { InteractiveQASection } from './InteractiveQASection';
@@ -68,6 +72,9 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
   const contentId = typeof content.id === 'string' ? content.id : content.id.toString();
   const { data: bookmarkStatus } = useBookmarkStatus(contentId);
   const { addBookmark, removeBookmark, isLoading: isBookmarkLoading } = useBookmark(contentId);
+  const isAuthenticated = useAuthStatus();
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const { formatDateByContext } = useDateFormatters();
 
   // Get user profile using author field (which contains the user ID)
   const authorId = content.author;
@@ -79,33 +86,19 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
     enabled: !!authorId,
   });
 
+  // Get channel information
+  const channelId = content.channel_id;
+  const {
+    data: channelData,
+    isLoading: isChannelLoading,
+    error: channelError,
+  } = useChannel(channelId || '', {
+    enabled: !!channelId,
+  });
+
   // Translation hooks
   const { t } = useTranslation('content');
   const { actions, time } = useCommonTranslation();
-
-  // Format date function (same as CommentItem)
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffHours < 1) {
-      const diffMinutes = Math.floor(diffMs / (1000 * 60));
-      return diffMinutes <= 0 ? '방금 전' : `${diffMinutes}분 전`;
-    } else if (diffHours < 24) {
-      return `${diffHours}시간 전`;
-    } else if (diffDays < 7) {
-      return `${diffDays}일 전`;
-    } else {
-      return date.toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-      });
-    }
-  };
 
   // Add shimmer animation styles
   React.useEffect(() => {
@@ -165,6 +158,30 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
     }
   }, [isAIOverviewExpanded, hasAIContent]);
 
+  // 북마크 버튼 클릭 핸들러
+  const handleBookmarkClick = () => {
+    if (!isAuthenticated) {
+      setIsLoginModalOpen(true);
+      return;
+    }
+
+    if (bookmarkStatus?.is_bookmarked) {
+      removeBookmark();
+    } else {
+      addBookmark();
+    }
+  };
+
+  // 로그인 성공 핸들러
+  const handleLoginSuccess = () => {
+    setIsLoginModalOpen(false);
+  };
+
+  // 로그인 모달 닫기 핸들러
+  const handleCloseLoginModal = () => {
+    setIsLoginModalOpen(false);
+  };
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header with close button */}
@@ -184,18 +201,12 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
         <div className="flex items-center space-x-2 justify-end">
           {/* Save button */}
           <button
-            onClick={() => {
-              if (bookmarkStatus?.is_bookmarked) {
-                removeBookmark();
-              } else {
-                addBookmark();
-              }
-            }}
+            onClick={handleBookmarkClick}
             disabled={isBookmarkLoading}
             className="flex items-center space-x-2 px-3 py-1 text-sm text-zinc-400 hover:text-white bg-zinc-800/30 hover:bg-zinc-700/50 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {bookmarkStatus?.is_bookmarked ? (
-              <MdBookmark className="w-4 h-4 text-blue-400" />
+              <MdBookmark className="w-4 h-4" style={{ color: '#EAFD66' }} />
             ) : (
               <MdBookmarkBorder className="w-4 h-4" />
             )}
@@ -226,32 +237,90 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
 
       {/* Scrollable Content Area */}
       <div className="flex-1 min-h-0 overflow-y-auto">
-        {/* Profile & Content Info */}
-        {(content.author || content.likes !== undefined || content.views !== undefined) && (
+        {/* Channel & Author Info */}
+        {(channelId ||
+          content.author ||
+          content.likes !== undefined ||
+          content.views !== undefined) && (
           <div className="p-4 border-b border-zinc-700/50">
-            {/* Author Info */}
-            {authorId && (
-              <div className="flex items-center space-x-3 mb-3">
-                <Avatar
-                  userId={authorId}
-                  src={userProfile?.profile_image_url || undefined}
-                  size="lg"
-                  className="flex-shrink-0"
-                />
-                <div>
-                  <div className="font-medium text-white">
-                    {isProfileLoading ? (
-                      <span className="animate-pulse">Loading...</span>
-                    ) : profileError ? (
-                      authorId // API 에러 시 authorId 표시
+            {/* Channel Info */}
+            {channelId && (
+              <div className="space-y-3">
+                {/* Channel Info Row */}
+                <div className="flex items-center space-x-3">
+                  {/* Channel Thumbnail */}
+                  <div className="flex-shrink-0">
+                    {isChannelLoading ? (
+                      <div className="w-12 h-12 bg-zinc-700/50 rounded-lg animate-pulse" />
                     ) : (
-                      userProfile?.aka || authorId
+                      <div className="w-12 h-12 bg-zinc-800 rounded-lg overflow-hidden">
+                        {channelData?.thumbnail_url ? (
+                          <img
+                            src={channelData.thumbnail_url}
+                            alt={channelData.name || 'Channel'}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center">
+                            <span className="text-zinc-400 text-xs font-medium">
+                              {channelData?.name?.charAt(0) || 'C'}
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     )}
                   </div>
-                  {content.date && (
-                    <div className="text-xs text-zinc-400">{formatDate(content.date)}</div>
+
+                  {/* Channel Name */}
+                  <div className="font-medium text-white">
+                    {isChannelLoading ? (
+                      <div className="h-4 bg-zinc-700/50 rounded animate-pulse w-24" />
+                    ) : channelError ? (
+                      <span className="text-zinc-400">Channel</span>
+                    ) : (
+                      channelData?.name || 'Unknown Channel'
+                    )}
+                  </div>
+
+                  {/* Author Info - moved to same row */}
+                  {authorId && (
+                    <div className="flex items-center space-x-2 ml-auto">
+                      {/* Author Avatar */}
+                      <Avatar
+                        userId={authorId}
+                        src={userProfile?.profile_image_url || undefined}
+                        size="sm"
+                        className="flex-shrink-0"
+                      />
+
+                      {/* Author & Time */}
+                      <div className="flex items-center space-x-1 text-sm text-zinc-400">
+                        <span>
+                          {isProfileLoading ? (
+                            <span className="animate-pulse">Loading...</span>
+                          ) : profileError ? (
+                            authorId
+                          ) : (
+                            userProfile?.aka || authorId
+                          )}
+                        </span>
+                        {content.date && (
+                          <>
+                            <span>•</span>
+                            <span>{formatDateByContext(content.date, 'list')}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
                   )}
                 </div>
+
+                {/* Channel Description */}
+                {channelData?.description && (
+                  <p className="text-xs text-zinc-400 leading-relaxed line-clamp-2 text-right">
+                    {channelData.description}
+                  </p>
+                )}
               </div>
             )}
 
@@ -475,6 +544,13 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
           <CommentSection contentId={contentId} />
         </div>
       </div>
+
+      {/* Login Modal */}
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={handleCloseLoginModal}
+        onLoginSuccess={handleLoginSuccess}
+      />
     </div>
   );
 }

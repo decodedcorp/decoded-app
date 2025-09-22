@@ -118,6 +118,7 @@
   },
   "comments": {
     "title": "댓글",
+    "count": "댓글 ({count})",
     "noComments": "아직 댓글이 없어요",
     "noCommentsDescription": "콘텐츠에 댓글을 남기면 여기에 표시됩니다.",
     "comingSoon": "참고: 댓글 기능이 곧 출시됩니다!",

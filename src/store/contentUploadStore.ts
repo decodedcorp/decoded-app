@@ -60,7 +60,7 @@ interface ContentUploadState {
 }
 
 const initialFormData: ContentUploadFormData = {
-  type: ContentType.IMAGE,
+  type: ContentType.LINK,
   title: '',
   description: '',
   channel_id: '',

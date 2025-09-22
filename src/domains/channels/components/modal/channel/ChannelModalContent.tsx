@@ -11,6 +11,7 @@ import { useChannelContentsSinglePage } from '@/domains/channels/hooks/useChanne
 import { useChannelModalStore } from '@/store/channelModalStore';
 import { useContentUploadStore } from '@/store/contentUploadStore';
 import { ContentType } from '@/lib/types/ContentType';
+import { LoadingSkeleton } from '@/shared/components/loading/LoadingSkeleton';
 import {
   useChannelContentFiltering,
   useChannelFilters,
@@ -441,14 +442,11 @@ export const ChannelModalContent = React.memo<{
     });
   }
 
-  // 로딩 상태 - ChannelMainContent와 동일한 패턴
+  // 로딩 상태 - 스켈레톤 사용
   if (isLoading) {
     return (
-      <div className="h-full flex items-center justify-center">
-        <div className="flex flex-col items-center">
-          <div className="w-8 h-8 border-2 border-zinc-600 border-t-zinc-400 rounded-full animate-spin mb-4" />
-          <div className="text-zinc-400 text-lg">{states.searching()}</div>
-        </div>
+      <div className="h-full p-6">
+        <LoadingSkeleton kind="grid" rows={4} className="w-full" />
       </div>
     );
   }
@@ -694,9 +692,29 @@ export const ChannelModalContent = React.memo<{
                     (ci: ContentItem) => ci.id.toString() === item.id,
                   );
                   if (contentItem) {
+                    // 작가 정보를 포함한 콘텐츠 데이터 생성
+                    const contentWithAuthor = {
+                      ...contentItem,
+                      // 채널 소유자를 작가로 설정
+                      provider_id: channelData?.owner_id,
+                      author: channelData?.owner_id,
+                      // 채널 ID와 생성 시간 추가
+                      channel_id: channelId,
+                      date: contentItem.date || channelData?.created_at || new Date().toISOString(),
+                    };
+
+                    console.log('🎯 [ChannelModalContent] Content clicked with author info:', {
+                      contentId: contentWithAuthor.id,
+                      title: contentWithAuthor.title,
+                      provider_id: contentWithAuthor.provider_id,
+                      author: contentWithAuthor.author,
+                      channel_id: contentWithAuthor.channel_id,
+                      date: contentWithAuthor.date,
+                    });
+
                     // Zustand store를 사용해서 모달 열기
                     const { openModal } = useContentModalStore.getState();
-                    openModal(contentItem, channelId);
+                    openModal(contentWithAuthor, channelId);
                   }
                 }}
                 renderItem={(gridItem) => {

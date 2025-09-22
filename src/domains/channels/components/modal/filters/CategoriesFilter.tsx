@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, memo } from 'react';
+import { InlineSpinner } from '@/shared/components/loading/InlineSpinner';
 
 interface CategoryOption {
   id: string;
@@ -80,9 +81,7 @@ export const CategoriesFilter = memo(function CategoriesFilter({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <h3 className="font-medium text-base text-white">Categories</h3>
-          {isLoading && (
-            <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-          )}
+          {isLoading && <InlineSpinner size="sm" ariaLabel="Loading categories" />}
           {!isLoading && (
             <svg
               className="w-4 h-4 text-gray-400"

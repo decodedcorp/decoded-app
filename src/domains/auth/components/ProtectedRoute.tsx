@@ -3,6 +3,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 
 import { useAuth } from '../hooks/useAuth';
+import { InlineSpinner } from '@/shared/components/loading/InlineSpinner';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -28,7 +29,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return (
       fallback || (
         <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <InlineSpinner size="lg" ariaLabel="Loading authentication" />
         </div>
       )
     );

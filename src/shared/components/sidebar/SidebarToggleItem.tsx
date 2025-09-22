@@ -38,7 +38,7 @@ export function SidebarToggleItem({
     console.log('SidebarToggleItem clicked:', { href, label });
     e.preventDefault();
     e.stopPropagation();
-    
+
     // If there's an href, navigate to it
     if (href) {
       console.log('Navigating to:', href);
@@ -78,7 +78,7 @@ export function SidebarToggleItem({
       </button>
 
       {/* Children content */}
-      {isExpanded && children && <div className="ml-7 space-y-1">{children}</div>}
+      {isExpanded && children && <div className="ml-4 space-y-1">{children}</div>}
     </div>
   );
 }

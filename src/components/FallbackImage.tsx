@@ -131,7 +131,7 @@ export function FallbackImage({
         // 디자인 시스템 v3 토큰 사용
         'bg-[rgb(var(--color-surface-2))]',
         // 배너와 콘텐츠는 테두리 없음
-        type === 'banner' || type === 'content' ? '' : 'border border-[rgb(var(--color-border))]',
+        type === 'banner' || type === 'content' ? '' : 'border border-transparent',
         'text-[rgb(var(--color-muted))]',
 
         // 타입별 모양

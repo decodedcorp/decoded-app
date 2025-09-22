@@ -9,6 +9,7 @@ import { ProfileHeader } from '@/domains/profile/components/ProfileHeader';
 import { ProfileSidebar } from '@/domains/profile/components/ProfileSidebar';
 import { ProfileTabs } from '@/domains/profile/components/ProfileTabs';
 import { ProfileEditModal } from '@/domains/profile/components/ProfileEditModal';
+import { InlineSpinner } from '@/shared/components/loading/InlineSpinner';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -60,7 +61,7 @@ export default function ProfilePage() {
       <div className="w-full px-3 py-4 sm:px-4 sm:py-8">
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <InlineSpinner size="lg" className="mx-auto mb-4" ariaLabel={t('loading.initializing')} />
             <p className="text-gray-600">{t('loading.initializing')}</p>
           </div>
         </div>

@@ -63,7 +63,7 @@ export function ProfileTabs({ activeTab, userId, isMyProfile }: ProfileTabsProps
   return (
     <div>
       {/* Tab Navigation */}
-      <div className="border-b border-zinc-800 mb-6 sm:mb-8">
+      <div className=" mb-6 sm:mb-8">
         <div className="flex gap-1 overflow-x-auto scrollbar-hide pb-1">
           {tabs.map((tab) => (
             <button
@@ -75,7 +75,7 @@ export function ProfileTabs({ activeTab, userId, isMyProfile }: ProfileTabsProps
                 ${
                   activeTab === tab.id
                     ? 'text-[#EAFD66] border-[#EAFD66]'
-                    : 'text-zinc-400 border-transparent hover:text-white hover:border-zinc-600'
+                    : 'text-zinc-400 border-transparent hover:text-white hover:border-zinc-600 hover:border-b-2'
                 }
               `}
             >

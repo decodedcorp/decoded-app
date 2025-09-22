@@ -5,6 +5,7 @@ import { Flame, TrendingUp } from 'lucide-react';
 
 import { useTrendingChannels, TrendingType } from '../../hooks/useTrending';
 import { LoadingState, ErrorState } from '../common/LoadingStates';
+import { LoadingSkeleton } from '@/shared/components/loading/LoadingSkeleton';
 import { useChannelTranslation, useCommonTranslation } from '../../../../lib/i18n/hooks';
 
 import { TrendingChannelCard } from './TrendingChannelCard';
@@ -29,7 +30,18 @@ export function TrendingChannelsSection({ className = '' }: TrendingChannelsSect
             <p className="text-zinc-500 text-sm">{trending.subtitle()}</p>
           </div>
         </div>
-        <LoadingState title={trending.loading()} />
+        {/* 가로 스크롤 채널 카드 스켈레톤 */}
+        <div className="overflow-x-auto scrollbar-hide">
+          <div className="flex space-x-3 pb-4" style={{ width: 'max-content' }}>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="w-64 flex-shrink-0">
+                <div className="aspect-square bg-zinc-800 rounded-lg animate-pulse mb-3" />
+                <div className="h-4 w-3/4 bg-zinc-800 rounded animate-pulse mb-2" />
+                <div className="h-3 w-1/2 bg-zinc-800 rounded animate-pulse" />
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
     );
   }

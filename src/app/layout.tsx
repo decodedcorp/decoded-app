@@ -10,6 +10,7 @@ import { Header } from '../shared/components/Header';
 import { MainLayout } from '../shared/components/MainLayout';
 import { AuthInitializer } from '../domains/auth/components/AuthInitializer';
 import { GlobalContentUploadModal } from '../domains/channels/components/modal/global-content-upload/GlobalContentUploadModal';
+import { CommentsRoot } from '../domains/comments/components/CommentsRoot';
 import { getServerTheme } from '../lib/theme-utils';
 
 import '../styles/design-tokens.css';
@@ -58,6 +59,8 @@ export default async function RootLayout({
                 <MainLayout>{children}</MainLayout>
                 {/* Global Content Upload Modal - 전역적으로 렌더링 */}
                 <GlobalContentUploadModal />
+                {/* Global Comments Modal - 전역적으로 렌더링 */}
+                <CommentsRoot />
                 {/* Modal slot for intercepting routes */}
                 {modal}
               </ToastProvider>

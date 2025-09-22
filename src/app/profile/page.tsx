@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
+import { InlineSpinner } from '@/shared/components/loading/InlineSpinner';
 
 export default function ProfileRedirectPage() {
   const router = useRouter();
@@ -24,7 +25,7 @@ export default function ProfileRedirectPage() {
   // Show loading while redirecting - using MainLayout styling
   return (
     <div className="flex flex-col items-center justify-center py-20">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+      <InlineSpinner size="lg" className="mb-4" ariaLabel={t.status.redirecting()} />
       <p className="text-sm text-muted-foreground">{t.status.redirecting()}</p>
     </div>
   );

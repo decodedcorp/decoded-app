@@ -129,14 +129,21 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
   const { t } = useTranslation('content');
   const isMobile = useMediaQuery('(max-width: 1024px)');
 
-  // 디버깅을 위한 콘솔 로그
-  console.log('ContentModalBody - content:', content);
-  console.log('ContentModalBody - content.type:', content.type);
-  console.log('ContentModalBody - content.imageUrl:', content.imageUrl);
-  console.log('ContentModalBody - content.linkUrl:', content.linkUrl);
-  console.log('ContentModalBody - content.description:', content.description);
-  console.log('ContentModalBody - content.aiSummary:', content.aiSummary);
-  console.log('ContentModalBody - isMobile:', isMobile);
+  // 채널 데이터에서 작가 정보 추출 (ChannelCard에서 전달된 경우)
+  const authorId = content.provider_id || content.author;
+  const channelId = content.channel_id;
+  const contentDate = content.date;
+
+  // Debug logging for author info
+  console.log('🎯 [ContentModalBody] Author info debug:', {
+    contentId: content.id,
+    title: content.title,
+    provider_id: content.provider_id,
+    author: content.author,
+    authorId,
+    channelId,
+    contentDate,
+  });
 
   // Pending 상태인 경우 기본 카드 표시
   if (content.status === 'pending') {
@@ -179,55 +186,150 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
       <div className="flex-1 overflow-y-auto space-y-6 sm:space-y-8 min-h-full">
         {/* Image Content - Full height layout */}
         {content.type === 'image' && (
-          <div className="h-full min-h-full p-3 sm:p-4">
-            {content.imageUrl ? (
-              <ImageDisplay
-                src={content.imageUrl}
-                downloadedSrc={content.linkPreview?.downloadedImageUrl}
-                alt={content.title}
-                fullHeight={true}
-                showInfo={false}
-                t={t}
-              />
+          <>
+            {isMobile ? (
+              /* Mobile Layout - Card-based design */
+              <MobileCardLayout
+                title={content.title}
+                onClose={onClose}
+                content={{
+                  ...content,
+                  author: authorId,
+                  channel_id: channelId,
+                  date: contentDate,
+                }}
+              >
+                <div className="h-full min-h-full">
+                  {content.imageUrl ? (
+                    <ImageDisplay
+                      src={content.imageUrl}
+                      downloadedSrc={content.linkPreview?.downloadedImageUrl}
+                      alt={content.title}
+                      fullHeight={true}
+                      showInfo={false}
+                      t={t}
+                    />
+                  ) : (
+                    /* 이미지 URL이 없는 경우 기본 카드 표시 */
+                    <DefaultContentCard content={content} />
+                  )}
+                </div>
+              </MobileCardLayout>
             ) : (
-              /* 이미지 URL이 없는 경우 기본 카드 표시 */
-              <DefaultContentCard content={content} />
+              /* Desktop Layout */
+              <div className="h-full min-h-full p-3 sm:p-4">
+                {content.imageUrl ? (
+                  <ImageDisplay
+                    src={content.imageUrl}
+                    downloadedSrc={content.linkPreview?.downloadedImageUrl}
+                    alt={content.title}
+                    fullHeight={true}
+                    showInfo={false}
+                    t={t}
+                  />
+                ) : (
+                  /* 이미지 URL이 없는 경우 기본 카드 표시 */
+                  <DefaultContentCard content={content} />
+                )}
+              </div>
             )}
-          </div>
+          </>
         )}
 
         {/* Video Content */}
         {content.type === 'video' && (
-          <div className="h-full min-h-full p-3 sm:p-4">
-            {content.imageUrl ? (
-              <div className="relative rounded-xl overflow-hidden bg-zinc-900/50 border border-zinc-700/50 shadow-xl h-full flex items-center justify-center">
-                <ProxiedImage
-                  src={content.imageUrl}
-                  downloadedSrc={content.linkPreview?.downloadedImageUrl}
-                  alt={content.title}
-                  width={800}
-                  height={600}
-                  className="w-full h-auto max-h-full object-contain"
-                />
-                {/* Video Play Button Overlay */}
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                  <div className="w-24 h-24 sm:w-28 sm:h-28 bg-[#EAFD66]/20 backdrop-blur-sm rounded-full flex items-center justify-center cursor-pointer hover:bg-[#EAFD66]/30 transition-all duration-300 group touch-manipulation">
-                    <div className="w-0 h-0 border-l-[20px] sm:border-l-[24px] border-l-[#EAFD66] border-t-[16px] sm:border-t-[20px] border-t-transparent border-b-[16px] sm:border-b-[20px] border-b-transparent ml-1 group-hover:scale-110 transition-transform duration-300" />
-                  </div>
+          <>
+            {isMobile ? (
+              /* Mobile Layout - Card-based design */
+              <MobileCardLayout
+                title={content.title}
+                onClose={onClose}
+                content={{
+                  ...content,
+                  provider_id: authorId,
+                  channel_id: channelId,
+                  date: contentDate,
+                }}
+              >
+                <div className="h-full min-h-full">
+                  {content.imageUrl ? (
+                    <div className="relative rounded-xl overflow-hidden bg-zinc-900/50 border border-zinc-700/50 shadow-xl h-full flex items-center justify-center">
+                      <ProxiedImage
+                        src={content.imageUrl}
+                        downloadedSrc={content.linkPreview?.downloadedImageUrl}
+                        alt={content.title}
+                        width={800}
+                        height={600}
+                        className="w-full h-auto max-h-full object-contain"
+                      />
+                      {/* Video Play Button Overlay */}
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                        <div className="w-24 h-24 sm:w-28 sm:h-28 bg-[#EAFD66]/20 backdrop-blur-sm rounded-full flex items-center justify-center cursor-pointer hover:bg-[#EAFD66]/30 transition-all duration-300 group touch-manipulation">
+                          <div className="w-0 h-0 border-l-[20px] sm:border-l-[24px] border-l-[#EAFD66] border-t-[16px] sm:border-t-[20px] border-t-transparent border-b-[16px] sm:border-b-[20px] border-b-transparent ml-1 group-hover:scale-110 transition-transform duration-300" />
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    /* 비디오 썸네일이 없는 경우 기본 카드 표시 */
+                    <DefaultContentCard content={content} />
+                  )}
                 </div>
-              </div>
+              </MobileCardLayout>
             ) : (
-              /* 비디오 썸네일이 없는 경우 기본 카드 표시 */
-              <DefaultContentCard content={content} />
+              /* Desktop Layout */
+              <div className="h-full min-h-full p-3 sm:p-4">
+                {content.imageUrl ? (
+                  <div className="relative rounded-xl overflow-hidden bg-zinc-900/50 border border-zinc-700/50 shadow-xl h-full flex items-center justify-center">
+                    <ProxiedImage
+                      src={content.imageUrl}
+                      downloadedSrc={content.linkPreview?.downloadedImageUrl}
+                      alt={content.title}
+                      width={800}
+                      height={600}
+                      className="w-full h-auto max-h-full object-contain"
+                    />
+                    {/* Video Play Button Overlay */}
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                      <div className="w-24 h-24 sm:w-28 sm:h-28 bg-[#EAFD66]/20 backdrop-blur-sm rounded-full flex items-center justify-center cursor-pointer hover:bg-[#EAFD66]/30 transition-all duration-300 group touch-manipulation">
+                        <div className="w-0 h-0 border-l-[20px] sm:border-l-[24px] border-l-[#EAFD66] border-t-[16px] sm:border-t-[20px] border-t-transparent border-b-[16px] sm:border-b-[20px] border-b-transparent ml-1 group-hover:scale-110 transition-transform duration-300" />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* 비디오 썸네일이 없는 경우 기본 카드 표시 */
+                  <DefaultContentCard content={content} />
+                )}
+              </div>
             )}
-          </div>
+          </>
         )}
 
         {/* Text Content */}
         {content.type === 'text' && (
-          <div className="h-full min-h-full p-3 sm:p-4">
-            <DefaultContentCard content={content} />
-          </div>
+          <>
+            {isMobile ? (
+              /* Mobile Layout - Card-based design */
+              <MobileCardLayout
+                title={content.title}
+                onClose={onClose}
+                content={{
+                  ...content,
+                  provider_id: authorId,
+                  channel_id: channelId,
+                  date: contentDate,
+                }}
+              >
+                <div className="h-full min-h-full">
+                  <DefaultContentCard content={content} />
+                </div>
+              </MobileCardLayout>
+            ) : (
+              /* Desktop Layout */
+              <div className="h-full min-h-full p-3 sm:p-4">
+                <DefaultContentCard content={content} />
+              </div>
+            )}
+          </>
         )}
 
         {/* Link Content */}
@@ -235,7 +337,16 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
           <>
             {isMobile ? (
               /* Mobile Layout - Card-based design */
-              <MobileCardLayout title={content.title} onClose={onClose}>
+              <MobileCardLayout
+                title={content.title}
+                onClose={onClose}
+                content={{
+                  ...content,
+                  provider_id: authorId,
+                  channel_id: channelId,
+                  date: contentDate,
+                }}
+              >
                 <div className="space-y-6">
                   {/* 1. Description Section - Always show if exists */}
                   {content.description && (

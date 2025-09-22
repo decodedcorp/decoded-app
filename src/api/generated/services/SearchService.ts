@@ -13,12 +13,14 @@ export class SearchService {
      * Search Contents
      * @param query
      * @param limit
+     * @param page
      * @returns SearchContentsResponse Successful Response
      * @throws ApiError
      */
     public static searchContentsSearchContentsGet(
         query: string = '',
         limit: number = 10,
+        page?: (number | null),
     ): CancelablePromise<SearchContentsResponse> {
         return __request(OpenAPI, {
             method: 'GET',
@@ -26,6 +28,7 @@ export class SearchService {
             query: {
                 'query': query,
                 'limit': limit,
+                'page': page,
             },
             errors: {
                 422: `Validation Error`,
@@ -36,12 +39,14 @@ export class SearchService {
      * Search Channels
      * @param query
      * @param limit
+     * @param page
      * @returns SearchChannelResponse Successful Response
      * @throws ApiError
      */
     public static searchChannelsSearchChannelsGet(
         query: string = '',
         limit: number = 10,
+        page?: (number | null),
     ): CancelablePromise<SearchChannelResponse> {
         return __request(OpenAPI, {
             method: 'GET',
@@ -49,6 +54,7 @@ export class SearchService {
             query: {
                 'query': query,
                 'limit': limit,
+                'page': page,
             },
             errors: {
                 422: `Validation Error`,
@@ -60,6 +66,7 @@ export class SearchService {
      * @param channelId
      * @param query
      * @param limit
+     * @param page
      * @returns SearchContentsResponse Successful Response
      * @throws ApiError
      */
@@ -67,6 +74,7 @@ export class SearchService {
         channelId: string,
         query: string = '',
         limit: number = 10,
+        page?: (number | null),
     ): CancelablePromise<SearchContentsResponse> {
         return __request(OpenAPI, {
             method: 'GET',
@@ -77,6 +85,7 @@ export class SearchService {
             query: {
                 'query': query,
                 'limit': limit,
+                'page': page,
             },
             errors: {
                 422: `Validation Error`,

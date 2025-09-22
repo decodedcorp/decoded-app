@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMyComments } from '../../hooks/useProfileActivity';
 import { useProfileTranslation } from '@/lib/i18n/hooks';
+import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from 'date-fns';
+import { CommentsTabSkeleton } from '@/shared/components/loading/CommentsTabSkeleton';
 
 interface CommentsTabProps {
   userId: string;
@@ -12,6 +14,7 @@ interface CommentsTabProps {
 export function CommentsTab({ userId, isMyProfile }: CommentsTabProps) {
   const router = useRouter();
   const t = useProfileTranslation();
+  const { t: rawT } = useTranslation('profile');
   const [offset, setOffset] = useState(0);
   const limit = 20;
 
@@ -24,22 +27,7 @@ export function CommentsTab({ userId, isMyProfile }: CommentsTabProps) {
   };
 
   if (isLoading && offset === 0) {
-    return (
-      <div className="space-y-4">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="bg-zinc-900/50 rounded-xl p-6 animate-pulse">
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-zinc-800 rounded-full" />
-              <div className="flex-1">
-                <div className="h-4 bg-zinc-800 rounded w-1/4 mb-2" />
-                <div className="h-4 bg-zinc-800 rounded w-full mb-2" />
-                <div className="h-4 bg-zinc-800 rounded w-3/4" />
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
+    return <CommentsTabSkeleton count={5} />;
   }
 
   if (error) {
@@ -97,7 +85,10 @@ export function CommentsTab({ userId, isMyProfile }: CommentsTabProps) {
     <div>
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-white">
-          {t.comments.title()} ({data?.total_count || 0})
+          {rawT('comments.count').replace(
+            '{count}',
+            (data?.total_count ?? comments.length).toString(),
+          )}
         </h2>
       </div>
 
