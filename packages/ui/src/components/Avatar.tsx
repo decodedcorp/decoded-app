@@ -1,6 +1,5 @@
 import React from 'react';
 import { cn } from '../lib/utils';
-import { AvatarFallback } from '@/components/FallbackImage';
 
 export interface AvatarProps {
   /** User ID or name for fallback text */
@@ -21,13 +20,7 @@ const sizeClasses = {
   lg: 'w-12 h-12 text-base',
 };
 
-export const Avatar: React.FC<AvatarProps> = ({
-  userId,
-  src,
-  size = 'md',
-  className,
-  alt,
-}) => {
+export const Avatar: React.FC<AvatarProps> = ({ userId, src, size = 'md', className, alt }) => {
   const [imageError, setImageError] = React.useState(false);
   const [imageLoaded, setImageLoaded] = React.useState(false);
   const fallbackText = userId.charAt(0).toUpperCase();
@@ -44,13 +37,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   const showFallback = !src || imageError || !imageLoaded;
 
   return (
-    <div
-      className={cn(
-        'relative flex-shrink-0 overflow-hidden',
-        sizeClass,
-        className
-      )}
-    >
+    <div className={cn('relative flex-shrink-0 overflow-hidden', sizeClass, className)}>
       {/* 이미지 */}
       {src && !imageError && (
         <img
@@ -58,7 +45,7 @@ export const Avatar: React.FC<AvatarProps> = ({
           alt={alt || `Profile of ${userId}`}
           className={cn(
             'w-full h-full object-cover rounded-full transition-opacity duration-200',
-            imageLoaded ? 'opacity-100' : 'opacity-0'
+            imageLoaded ? 'opacity-100' : 'opacity-0',
           )}
           onLoad={() => setImageLoaded(true)}
           onError={() => setImageError(true)}
@@ -67,13 +54,10 @@ export const Avatar: React.FC<AvatarProps> = ({
 
       {/* Fallback */}
       {showFallback && (
-        <AvatarFallback
-          size={size}
-          fallbackText={fallbackText}
-          className="w-full h-full"
-        />
+        <div className="w-full h-full bg-gray-200 rounded-full flex items-center justify-center text-gray-600 font-medium">
+          {fallbackText}
+        </div>
       )}
     </div>
   );
 };
-
