@@ -20,6 +20,8 @@ import { useUserProfile } from '@/domains/users/hooks/useUserProfile';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
 import { useTranslation } from 'react-i18next';
 import { Avatar } from '@decoded/ui';
+import { useAuthStatus } from '@/domains/auth/hooks/useAuth';
+import { LoginModal } from '@/domains/auth/components/LoginModal';
 
 import { SummarySection } from './SummarySection';
 import { InteractiveQASection } from './InteractiveQASection';
@@ -68,6 +70,8 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
   const contentId = typeof content.id === 'string' ? content.id : content.id.toString();
   const { data: bookmarkStatus } = useBookmarkStatus(contentId);
   const { addBookmark, removeBookmark, isLoading: isBookmarkLoading } = useBookmark(contentId);
+  const isAuthenticated = useAuthStatus();
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   // Get user profile using author field (which contains the user ID)
   const authorId = content.author;
@@ -165,6 +169,30 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
     }
   }, [isAIOverviewExpanded, hasAIContent]);
 
+  // 북마크 버튼 클릭 핸들러
+  const handleBookmarkClick = () => {
+    if (!isAuthenticated) {
+      setIsLoginModalOpen(true);
+      return;
+    }
+
+    if (bookmarkStatus?.is_bookmarked) {
+      removeBookmark();
+    } else {
+      addBookmark();
+    }
+  };
+
+  // 로그인 성공 핸들러
+  const handleLoginSuccess = () => {
+    setIsLoginModalOpen(false);
+  };
+
+  // 로그인 모달 닫기 핸들러
+  const handleCloseLoginModal = () => {
+    setIsLoginModalOpen(false);
+  };
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header with close button */}
@@ -184,18 +212,12 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
         <div className="flex items-center space-x-2 justify-end">
           {/* Save button */}
           <button
-            onClick={() => {
-              if (bookmarkStatus?.is_bookmarked) {
-                removeBookmark();
-              } else {
-                addBookmark();
-              }
-            }}
+            onClick={handleBookmarkClick}
             disabled={isBookmarkLoading}
             className="flex items-center space-x-2 px-3 py-1 text-sm text-zinc-400 hover:text-white bg-zinc-800/30 hover:bg-zinc-700/50 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {bookmarkStatus?.is_bookmarked ? (
-              <MdBookmark className="w-4 h-4 text-blue-400" />
+              <MdBookmark className="w-4 h-4" style={{ color: '#EAFD66' }} />
             ) : (
               <MdBookmarkBorder className="w-4 h-4" />
             )}
@@ -475,6 +497,13 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
           <CommentSection contentId={contentId} />
         </div>
       </div>
+
+      {/* Login Modal */}
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={handleCloseLoginModal}
+        onLoginSuccess={handleLoginSuccess}
+      />
     </div>
   );
 }

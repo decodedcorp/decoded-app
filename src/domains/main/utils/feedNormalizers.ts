@@ -102,7 +102,7 @@ export function normalizeContentItem(item: Record<string, any>): FeedItem {
     }
   };
 
-  return {
+  const normalized = {
     id: item.id || Date.now().toString(),
     title: getDisplayTitle(),
     description: item.description || item.link_preview_metadata?.description || undefined,
@@ -124,6 +124,22 @@ export function normalizeContentItem(item: Record<string, any>): FeedItem {
       shares: item.shares_count || 0,
     },
   };
+
+  // 디버깅을 위한 로그
+  if (process.env.NODE_ENV === 'development') {
+    console.log('normalizeContentItem:', {
+      itemId: item.id,
+      title: item.title,
+      pins_count: item.pins_count,
+      comments_count: item.comments_count,
+      views_count: item.views_count,
+      shares_count: item.shares_count,
+      normalizedComments: normalized.metadata.comments,
+      normalizedPins: normalized.metadata.pins,
+    });
+  }
+
+  return normalized;
 }
 
 /**
