@@ -5,6 +5,7 @@ import { useProfileTranslation } from '@/lib/i18n/hooks';
 import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from 'date-fns';
 import { ThumbnailFallback } from '@/components/FallbackImage';
+import { ChannelsTabSkeleton } from '@/shared/components/loading/ChannelsTabSkeleton';
 
 export function ChannelsTab() {
   const router = useRouter();
@@ -13,25 +14,7 @@ export function ChannelsTab() {
   const { data, isLoading, error } = useMyChannels();
 
   if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-zinc-900/50 rounded-xl p-6 animate-pulse">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-16 h-16 bg-zinc-800 rounded-lg" />
-              <div className="flex-1">
-                <div className="h-4 bg-zinc-800 rounded w-3/4 mb-2" />
-                <div className="h-3 bg-zinc-800 rounded w-1/2" />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="h-3 bg-zinc-800 rounded" />
-              <div className="h-3 bg-zinc-800 rounded w-4/5" />
-            </div>
-          </div>
-        ))}
-      </div>
-    );
+    return <ChannelsTabSkeleton count={6} />;
   }
 
   if (error) {

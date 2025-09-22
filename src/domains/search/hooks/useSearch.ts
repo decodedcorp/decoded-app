@@ -6,19 +6,20 @@ import { useQuery } from '@tanstack/react-query';
 
 import { SearchService } from '../../../api/generated';
 import { queryKeys } from '../../../lib/api/queryKeys';
+import { mergeQueryOptions } from '../../../lib/queryPresets';
 
 // 적응형 지연 시간 계산
 function getAdaptiveDelay(query: string, baseDelay: number): number {
   const length = query.trim().length;
-  
+
   // 짧은 쿼리는 더 오래 기다림 (너무 많은 결과 방지)
   if (length <= 1) return baseDelay + 200;
   if (length === 2) return baseDelay + 100;
-  
+
   // 긴 쿼리는 빠르게 반응 (구체적인 검색)
   if (length >= 8) return Math.max(baseDelay - 100, 150);
   if (length >= 5) return Math.max(baseDelay - 50, 200);
-  
+
   return baseDelay;
 }
 
@@ -28,9 +29,8 @@ function useDebounce<T>(value: T, baseDelay: number): T {
 
   useEffect(() => {
     // 문자열인 경우 적응형 지연 적용
-    const adaptiveDelay = typeof value === 'string' 
-      ? getAdaptiveDelay(value, baseDelay)
-      : baseDelay;
+    const adaptiveDelay =
+      typeof value === 'string' ? getAdaptiveDelay(value, baseDelay) : baseDelay;
 
     const handler = setTimeout(() => {
       setDebouncedValue(value);
@@ -76,20 +76,18 @@ export const useSearchContents = ({
   debounceMs = 300,
 }: UseSearchContentsParams) => {
   const debouncedQuery = useDebounce(query, debounceMs);
-  
+
   // Only enable search if query has meaningful content (최소 2글자)
   const shouldQuery = enabled && debouncedQuery.trim().length >= 2;
 
-  return useQuery({
-    queryKey: queryKeys.search.contents(debouncedQuery, limit),
-    queryFn: () => SearchService.searchContentsSearchContentsGet(debouncedQuery, limit),
-    enabled: shouldQuery,
-    staleTime: 2 * 60 * 1000, // 2 minutes - 자동완성용 짧게
-    gcTime: 5 * 60 * 1000, // 5 minutes
-    refetchOnWindowFocus: false, // 포커스 시 재요청 비활성화
-    retry: 1, // 실패 시 1회만 재시도 (빠른 응답 중시)
-    retryDelay: 500, // 재시도 지연 최소화
-  });
+  return useQuery(
+    mergeQueryOptions('search', {
+      queryKey: queryKeys.search.contents(debouncedQuery, limit),
+      queryFn: () => SearchService.searchContentsSearchContentsGet(debouncedQuery, limit),
+      enabled: shouldQuery,
+      retryDelay: 500, // 재시도 지연 최소화
+    }),
+  );
 };
 
 /**
@@ -102,7 +100,7 @@ export const useSearchChannels = ({
   debounceMs = 300,
 }: UseSearchChannelsParams) => {
   const debouncedQuery = useDebounce(query, debounceMs);
-  
+
   // Only enable search if query has meaningful content (최소 2글자)
   const shouldQuery = enabled && debouncedQuery.trim().length >= 2;
 
@@ -129,17 +127,18 @@ export const useSearchChannelContents = ({
   debounceMs = 300,
 }: UseSearchChannelContentsParams) => {
   const debouncedQuery = useDebounce(query, debounceMs);
-  
+
   // Only enable search if query has meaningful content and channelId exists (최소 2글자)
   const shouldQuery = enabled && debouncedQuery.trim().length >= 2 && channelId.trim().length > 0;
 
   return useQuery({
     queryKey: queryKeys.search.channelContents(channelId, debouncedQuery, limit),
-    queryFn: () => SearchService.searchChannelContentsSearchChannelsChannelIdContentsGet(
-      channelId,
-      debouncedQuery,
-      limit
-    ),
+    queryFn: () =>
+      SearchService.searchChannelContentsSearchChannelsChannelIdContentsGet(
+        channelId,
+        debouncedQuery,
+        limit,
+      ),
     enabled: shouldQuery,
     staleTime: 3 * 60 * 1000, // 3 minutes - 채널별 콘텐츠
     gcTime: 8 * 60 * 1000, // 8 minutes
@@ -166,7 +165,7 @@ export const useSearchUsers = ({
   debounceMs = 300,
 }: UseSearchUsersParams) => {
   const debouncedQuery = useDebounce(query, debounceMs);
-  
+
   // Only enable search if query has meaningful content (최소 2글자)
   const shouldQuery = enabled && debouncedQuery.trim().length >= 2;
 

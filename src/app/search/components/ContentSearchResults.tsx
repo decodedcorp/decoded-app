@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ContentsCard } from '@/components/ContentsCard';
 import { useSearchContents } from '@/domains/search/hooks/useSearch';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
+import { InlineSpinner } from '@/shared/components/loading/InlineSpinner';
 
 interface ContentSearchResultsProps {
   query: string;
@@ -91,7 +92,7 @@ export function ContentSearchResults({ query }: ContentSearchResultsProps) {
     return (
       <div className="text-center py-16">
         <div className="text-zinc-400">
-          <div className="animate-spin w-16 h-16 border-4 border-zinc-600 border-t-primary rounded-full mx-auto mb-6" />
+          <InlineSpinner size="lg" ariaLabel="Searching content" className="mx-auto mb-6" />
           <h3 className="text-xl font-semibold text-white mb-3">{t.search.searching()}</h3>
           <p className="text-zinc-500 text-lg">{t.search.lookingForChannels(query)}</p>
         </div>

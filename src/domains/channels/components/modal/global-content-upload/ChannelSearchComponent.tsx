@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
+import { InlineSpinner } from '@/shared/components/loading/InlineSpinner';
 
 interface ChannelSearchComponentProps {
   onSearch: (query: string) => void;
@@ -44,7 +45,7 @@ export function ChannelSearchComponent({
         />
         {isLoading && (
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-            <div className="w-4 h-4 border-2 border-[#eafd66] border-t-transparent rounded-full animate-spin" />
+            <InlineSpinner size="sm" ariaLabel="Searching channels" />
           </div>
         )}
       </div>

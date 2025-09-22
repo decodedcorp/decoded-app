@@ -338,6 +338,11 @@
         "createChannel": "Create Channel",
         "creating": "Creating..."
       },
+      "footer": {
+        "cancel": "Cancel",
+        "createChannel": "Create Channel",
+        "creating": "Creating..."
+      },
       "errors": {
         "channelCreationFailed": "Failed to create channel. Please try again.",
         "internalServerError": "Internal server error occurred. Please try again later.",

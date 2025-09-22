@@ -6,6 +6,8 @@ import { useContentModalStore } from '@/store/contentModalStore';
 import { useContentSidebarStore } from '@/store/contentSidebarStore';
 import { ContentsCard } from '@/components/ContentsCard';
 import { useContentTranslation } from '@/lib/i18n/hooks';
+import { LoadingSkeleton } from '@/shared/components/loading/LoadingSkeleton';
+import { InlineSpinner } from '@/shared/components/loading/InlineSpinner';
 
 import { DEFAULT_CHANNEL_ID } from '../data/channelCardsProvider';
 import { useImageColor } from '../hooks';
@@ -21,7 +23,7 @@ export function SimpleThiingsGrid({
   channelId?: string;
 }) {
   const { states } = useContentTranslation();
-  
+
   // 채널 콘텐츠 데이터 로드 - 실제 API 사용
   const { cards, isLoading, isError, error, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useChannelContents({
@@ -308,10 +310,7 @@ export function SimpleThiingsGrid({
   const loadingContent = useMemo(
     () => (
       <div className="w-full h-screen bg-black flex items-center justify-center">
-        <div className="text-white text-center">
-          <div className="animate-spin w-12 h-12 border-2 border-white border-t-transparent rounded-full mx-auto mb-4" />
-          <p>{states.cardLoading()}</p>
-        </div>
+        <LoadingSkeleton kind="grid" rows={6} className="w-full max-w-6xl px-4" />
       </div>
     ),
     [],
@@ -375,7 +374,7 @@ export function SimpleThiingsGrid({
         {/* 로딩 인디케이터 */}
         {isFetchingNextPage && (
           <div className="flex justify-center py-8">
-            <div className="animate-spin w-8 h-8 border-2 border-white border-t-transparent rounded-full" />
+            <InlineSpinner size="lg" ariaLabel="Loading more content" />
           </div>
         )}
 

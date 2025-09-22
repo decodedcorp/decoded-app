@@ -5,6 +5,7 @@ import { useProfileTranslation } from '@/lib/i18n/hooks';
 import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from 'date-fns';
 import { ThumbnailFallback } from '@/components/FallbackImage';
+import { SubscriptionsTabSkeleton } from '@/shared/components/loading/SubscriptionsTabSkeleton';
 
 export function SubscriptionsTab() {
   const router = useRouter();
@@ -22,17 +23,7 @@ export function SubscriptionsTab() {
   };
 
   if (isLoading && offset === 0) {
-    return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-          <div key={i} className="bg-zinc-900/50 rounded-xl p-4 animate-pulse">
-            <div className="w-full aspect-square bg-zinc-800 rounded-lg mb-3" />
-            <div className="h-4 bg-zinc-800 rounded w-3/4 mb-2" />
-            <div className="h-3 bg-zinc-800 rounded w-1/2" />
-          </div>
-        ))}
-      </div>
-    );
+    return <SubscriptionsTabSkeleton count={8} />;
   }
 
   if (error) {

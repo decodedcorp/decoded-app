@@ -4,6 +4,7 @@ import React, { useCallback, useMemo, useRef, useEffect } from 'react';
 import { clsx } from 'clsx';
 
 import { useCommonTranslation } from '@/lib/i18n/hooks';
+import { InlineSpinner } from '@/shared/components/loading/InlineSpinner';
 
 import { ProxiedImage } from '../../../components/ProxiedImage';
 import { useSearchAutocomplete, type AutocompleteItem } from '../hooks/useSearchAutocomplete';
@@ -246,7 +247,7 @@ export const SearchAutocomplete = React.memo(
         >
           <div className="flex items-center justify-center py-8">
             <div className="flex items-center gap-2 text-zinc-400">
-              <div className="w-4 h-4 border-2 border-zinc-400 border-t-transparent rounded-full animate-spin" />
+              <InlineSpinner size="sm" ariaLabel="Searching" />
               <span className="text-sm">{t.search.searching()}</span>
             </div>
           </div>
@@ -380,7 +381,7 @@ export const SearchAutocomplete = React.memo(
         {isLoading && hasResults && (
           <div className="border-t border-zinc-700/50 px-4 py-2">
             <div className="flex items-center gap-2 text-zinc-400 text-xs">
-              <div className="w-3 h-3 border border-zinc-400 border-t-transparent rounded-full animate-spin" />
+              <InlineSpinner size="sm" ariaLabel="Loading more results" />
               <span>{t.search.loadingMore()}</span>
             </div>
           </div>

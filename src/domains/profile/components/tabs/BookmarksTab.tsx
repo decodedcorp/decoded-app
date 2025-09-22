@@ -5,6 +5,7 @@ import { useProfileTranslation } from '@/lib/i18n/hooks';
 import { useTranslation } from 'react-i18next';
 import { formatDateByContext } from '@/lib/utils/dateUtils';
 import { ThumbnailFallback } from '@/components/FallbackImage';
+import { BookmarksTabSkeleton } from '@/shared/components/loading/BookmarksTabSkeleton';
 
 export function BookmarksTab() {
   const openContentModal = useContentModalStore((state) => state.openModal);
@@ -36,21 +37,7 @@ export function BookmarksTab() {
   };
 
   if (isLoading && offset === 0) {
-    return (
-      <div className="space-y-4">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="bg-zinc-900/50 rounded-xl p-6 animate-pulse">
-            <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 bg-zinc-800 rounded-lg" />
-              <div className="flex-1">
-                <div className="h-4 bg-zinc-800 rounded mb-2 w-3/4" />
-                <div className="h-3 bg-zinc-800 rounded w-1/2" />
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
+    return <BookmarksTabSkeleton count={5} />;
   }
 
   if (error) {

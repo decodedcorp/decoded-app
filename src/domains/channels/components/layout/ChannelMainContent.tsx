@@ -10,6 +10,7 @@ import { TrendingContentsSection } from '../trending/TrendingContentsSection';
 import { TrendingChannelsSection } from '../trending/TrendingChannelsSection';
 import { ChannelModal, ContentModal } from '../modal';
 import { LoadingState, ErrorState, EmptyState } from '../common/LoadingStates';
+import { ChannelPageSkeleton } from '@/shared/components/loading/ChannelPageSkeleton';
 import { useChannelsData } from '../../hooks/useChannelData';
 import { useChannelExploreFilters } from '../../hooks/useUnifiedFilters';
 import { useChannelModalStore } from '../../../../store/channelModalStore';
@@ -46,11 +47,11 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
     [openChannelModal],
   );
 
-  // 로딩 상태 렌더링
+  // 로딩 상태 렌더링 - 채널 페이지 전용 스켈레톤 사용
   if (isLoading) {
     return (
       <div className={`relative h-full overflow-y-auto pt-[var(--header-h)] ${className}`}>
-        <LoadingState title={states.searching()} />
+        <ChannelPageSkeleton />
       </div>
     );
   }

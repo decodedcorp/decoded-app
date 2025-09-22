@@ -4,6 +4,7 @@ import React from 'react';
 
 import { useAuth, useUser, useIsAdmin, useIsUser } from '../hooks/useAuth';
 import { useAuthTranslation } from '../../../lib/i18n/hooks';
+import { InlineSpinner } from '@/shared/components/loading/InlineSpinner';
 
 /**
  * 인증 상태를 표시하는 데모 컴포넌트
@@ -19,8 +20,7 @@ export const AuthStatus: React.FC = () => {
     return (
       <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
         <div className="flex items-center space-x-2">
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-          <span className="text-blue-800 dark:text-blue-200">{status.checking()}</span>
+          <InlineSpinner size="sm" ariaLabel="Checking authentication" />
         </div>
       </div>
     );
@@ -92,7 +92,9 @@ export const AuthStatus: React.FC = () => {
                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <span className="text-green-800 dark:text-green-200 font-medium">{status.signedIn()}</span>
+            <span className="text-green-800 dark:text-green-200 font-medium">
+              {status.signedIn()}
+            </span>
           </div>
           <button
             onClick={() => logout()}

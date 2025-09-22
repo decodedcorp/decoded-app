@@ -338,6 +338,11 @@
         "createChannel": "채널 만들기",
         "creating": "만드는 중..."
       },
+      "footer": {
+        "cancel": "취소",
+        "createChannel": "채널 만들기",
+        "creating": "만드는 중..."
+      },
       "errors": {
         "channelCreationFailed": "채널 생성에 실패했습니다. 다시 시도해 주세요.",
         "internalServerError": "서버 오류가 발생했습니다. 나중에 다시 시도해 주세요.",
