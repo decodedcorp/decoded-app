@@ -27,6 +27,8 @@ interface ChannelModalState {
   selectedChannel: ChannelData | null;
   selectedChannelId: string | null;
   selectedContentId: string | null; // 클릭한 콘텐츠 ID
+  channelOwnerId: string | null; // 채널 작성자 ID
+  channelCreatedAt: string | null; // 채널 작성시간
   openModal: (channel: ChannelData) => void;
   openModalById: (channelId: string, contentId?: string) => void;
   closeModal: () => void;
@@ -37,14 +39,33 @@ export const useChannelModalStore = create<ChannelModalState>((set) => ({
   selectedChannel: null,
   selectedChannelId: null,
   selectedContentId: null,
+  channelOwnerId: null,
+  channelCreatedAt: null,
   openModal: (channel: ChannelData) => {
-    console.log('🎯 [channelModalStore] openModal called with:', channel);
-    set({
+    console.log('🎯 [channelModalStore] openModal called with:', {
+      id: channel.id,
+      name: channel.name,
+      owner_id: channel.owner_id,
+      created_at: channel.created_at,
+      fullChannel: channel,
+    });
+
+    const newState = {
       isOpen: true,
       selectedChannel: channel,
       selectedChannelId: channel.id,
       selectedContentId: null,
+      channelOwnerId: channel.owner_id,
+      channelCreatedAt: channel.created_at || null,
+    };
+
+    console.log('🎯 [channelModalStore] Setting state:', {
+      channelOwnerId: newState.channelOwnerId,
+      channelCreatedAt: newState.channelCreatedAt,
+      fullState: newState,
     });
+
+    set(newState);
   },
   openModalById: (channelId: string, contentId?: string) => {
     console.log('🎯 [channelModalStore] openModalById called with:', { channelId, contentId });
@@ -53,11 +74,20 @@ export const useChannelModalStore = create<ChannelModalState>((set) => ({
       selectedChannel: null,
       selectedChannelId: channelId,
       selectedContentId: contentId || null,
+      channelOwnerId: null, // ID로 열 때는 나중에 API에서 가져옴
+      channelCreatedAt: null,
     });
   },
   closeModal: () => {
     console.log('🎯 [channelModalStore] closeModal called');
-    set({ isOpen: false, selectedChannel: null, selectedChannelId: null, selectedContentId: null });
+    set({
+      isOpen: false,
+      selectedChannel: null,
+      selectedChannelId: null,
+      selectedContentId: null,
+      channelOwnerId: null,
+      channelCreatedAt: null,
+    });
 
     // URL에서 channel 파라미터 제거
     if (typeof window !== 'undefined') {
@@ -74,3 +104,5 @@ export const selectIsModalOpen = (state: ChannelModalState) => state.isOpen;
 export const selectSelectedChannel = (state: ChannelModalState) => state.selectedChannel;
 export const selectSelectedChannelId = (state: ChannelModalState) => state.selectedChannelId;
 export const selectSelectedContentId = (state: ChannelModalState) => state.selectedContentId;
+export const selectChannelOwnerId = (state: ChannelModalState) => state.channelOwnerId;
+export const selectChannelCreatedAt = (state: ChannelModalState) => state.channelCreatedAt;

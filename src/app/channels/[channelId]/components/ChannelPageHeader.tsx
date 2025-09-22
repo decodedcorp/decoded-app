@@ -153,16 +153,16 @@ export function ChannelPageHeader({
 
       {/* 하단 정보 섹션 */}
       <div className="bg-black px-4 py-4">
-        <div className="flex flex-col space-y-3">
+        <div className="flex flex-col space-y-4">
           {/* 첫 번째 줄: 아바타 + 채널 정보 + 액션 버튼들 */}
-          <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 md:gap-4">
-            {/* 왼쪽: 아바타 */}
+          <div className="grid grid-cols-[auto_1fr_auto] items-start gap-4 md:gap-6">
+            {/* 왼쪽: 채널 썸네일 */}
             <div className="relative -mt-16 shrink-0">
               {channel.thumbnail_url ? (
                 <img
                   src={channel.thumbnail_url}
-                  alt={`${channel.name} avatar`}
-                  className="w-20 h-20 rounded-full border-4 border-black object-cover shadow-lg ring-1 ring-white/10"
+                  alt={`${channel.name} thumbnail`}
+                  className="w-24 h-24 rounded-full border-4 border-black object-cover shadow-lg ring-1 ring-white/10"
                   loading="lazy"
                   decoding="async"
                   onError={(e) => {
@@ -177,22 +177,32 @@ export function ChannelPageHeader({
               {/* Fallback Avatar */}
               <ThumbnailFallback
                 size="xl"
-                className={`w-20 h-20 border-4 border-black shadow-lg ring-1 ring-white/10 ${
+                className={`w-24 h-24 border-4 border-black shadow-lg ring-1 ring-white/10 ${
                   channel.thumbnail_url ? 'hidden' : 'block'
                 }`}
               />
             </div>
 
-            {/* 가운데: 채널 정보 (min-w-0로 truncate 활성화) */}
-            <div className="min-w-0">
-              <h2 className="text-xl font-semibold text-zinc-300 truncate">{channel.name}</h2>
-              <div className="flex items-center gap-1 text-sm text-zinc-400 mt-1 min-w-0">
+            {/* 가운데: 채널 정보 */}
+            <div className="min-w-0 flex-1">
+              {/* 채널 이름 */}
+              <h1 className="text-2xl font-bold text-white mb-2 truncate">{channel.name}</h1>
+
+              {/* 채널 설명 */}
+              {channel.description && (
+                <p className="text-zinc-400 text-sm mb-3 line-clamp-2 leading-relaxed">
+                  {channel.description}
+                </p>
+              )}
+
+              {/* 통계 정보 */}
+              <div className="flex items-center gap-1 text-sm text-zinc-400 min-w-0">
                 <span className="whitespace-nowrap">
                   {channel.subscriber_count || 0} {t.ui.subscribers()}
                 </span>
                 <span className="opacity-60">•</span>
 
-                {/* 편집자 영역이 길어져도 줄바꿈 방지 + 말줄임 */}
+                {/* 편집자 영역 */}
                 {channel.managers && channel.managers.length > 0 ? (
                   <button
                     onClick={() => setIsEditorsModalOpen(true)}

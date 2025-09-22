@@ -9,6 +9,58 @@ import { toast } from 'react-hot-toast';
 import { ChannelEditorsStackedAvatars } from '@/shared/components/ChannelEditorsStackedAvatars';
 import { EditorsListModal } from '@/shared/components/EditorsListModal';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
+import { InlineSpinner } from '@/shared/components/loading/InlineSpinner';
+
+// TagRow 컴포넌트
+function TagRow({ tags, mobileLimit = 3 }: { tags: string[]; mobileLimit?: number }) {
+  const visible = Math.min(tags.length, mobileLimit);
+
+  return (
+    <div className="mt-2">
+      {/* 모바일: N개 + +N, 데스크탑: wrap */}
+      <div className="flex flex-wrap gap-2 md:gap-2">
+        {/* 모바일 가시 영역 */}
+        <div className="flex gap-2 md:hidden">
+          {tags.slice(0, visible).map((t, i) => (
+            <span
+              key={i}
+              className={`px-2 py-1 bg-zinc-600/30 text-xs rounded-full border border-zinc-500/30
+                         max-w-[40vw] truncate ${i === 0 ? 'text-[#eafd66]' : 'text-zinc-300'}`}
+              title={t}
+            >
+              {t}
+            </span>
+          ))}
+          {tags.length > visible && (
+            <button
+              className="px-2 py-1 text-xs rounded-full border border-zinc-500/40 text-zinc-300/90 hover:bg-zinc-700/30 transition-colors"
+              onClick={() => {
+                /* TODO: open a modal or bottom sheet with full tag list */
+              }}
+              aria-label="Show all categories"
+            >
+              +{tags.length - visible}
+            </button>
+          )}
+        </div>
+
+        {/* 데스크탑: 전부 보여주되 wrap + truncate */}
+        <div className="hidden md:flex md:flex-wrap md:gap-2">
+          {tags.map((t, i) => (
+            <span
+              key={i}
+              className={`px-2 py-1 bg-zinc-600/30 text-xs rounded-full border border-zinc-500/30
+                         max-w-[12rem] truncate ${i === 0 ? 'text-[#eafd66]' : 'text-zinc-300'}`}
+              title={t}
+            >
+              {t}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 interface ChannelModalHeaderProps {
   channel: ChannelData;
@@ -19,6 +71,8 @@ interface ChannelModalHeaderProps {
   isSubscribeLoading?: boolean;
   currentUserId?: string; // 현재 사용자 ID (소유자 확인용)
   subscriptionHook?: any; // useChannelSubscription hook return value
+  ownerId?: string | null; // 채널 작성자 ID (명시적 전달)
+  createdAt?: string | null; // 채널 작성시간 (명시적 전달)
 }
 
 export function ChannelModalHeader({
@@ -30,13 +84,28 @@ export function ChannelModalHeader({
   isSubscribeLoading = false,
   currentUserId,
   subscriptionHook,
+  ownerId,
+  createdAt,
 }: ChannelModalHeaderProps) {
   const t = useCommonTranslation();
   const router = useRouter();
   const [isEditorsModalOpen, setIsEditorsModalOpen] = useState(false);
 
-  // 소유자 권한 확인
-  const isOwner = currentUserId && channel.owner_id && currentUserId === channel.owner_id;
+  // 소유자 권한 확인 - 명시적으로 전달된 ownerId 우선 사용
+  const effectiveOwnerId = ownerId || channel.owner_id;
+  const isOwner = currentUserId && effectiveOwnerId && currentUserId === effectiveOwnerId;
+
+  // 디버깅을 위한 로그
+  React.useEffect(() => {
+    console.log('🎯 [ChannelModalHeader] Props received:', {
+      channelOwnerId: channel.owner_id,
+      passedOwnerId: ownerId,
+      effectiveOwnerId,
+      channelCreatedAt: channel.created_at,
+      passedCreatedAt: createdAt,
+      isOwner,
+    });
+  }, [channel.owner_id, ownerId, effectiveOwnerId, channel.created_at, createdAt, isOwner]);
 
   const handleFullscreen = () => {
     router.push(`/channels/${channel.id}`);
@@ -50,7 +119,7 @@ export function ChannelModalHeader({
         console.error('Error toggling subscription:', error);
       }
     } else {
-      toast.error(t.toast.general.error());
+      toast.error(t.status.error());
     }
   };
 
@@ -124,16 +193,16 @@ export function ChannelModalHeader({
 
       {/* 하단 정보 섹션 */}
       <div className="bg-black px-4 py-4">
-        <div className="flex flex-col space-y-3">
+        <div className="flex flex-col space-y-4">
           {/* 첫 번째 줄: 아바타 + 채널 정보 + 액션 버튼들 */}
-          <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 md:gap-4">
-            {/* 왼쪽: 아바타 */}
+          <div className="grid grid-cols-[auto_1fr_auto] items-start gap-4 md:gap-6">
+            {/* 왼쪽: 채널 썸네일 */}
             <div className="relative -mt-16 shrink-0">
               {channel.thumbnail_url ? (
                 <img
                   src={channel.thumbnail_url}
-                  alt={`${channel.name} avatar`}
-                  className="w-20 h-20 rounded-full border-4 border-black object-cover shadow-lg ring-1 ring-white/10"
+                  alt={`${channel.name} thumbnail`}
+                  className="w-24 h-24 rounded-full border-4 border-black object-cover shadow-lg ring-1 ring-white/10"
                   loading="lazy"
                   decoding="async"
                   onError={(e) => {
@@ -148,27 +217,34 @@ export function ChannelModalHeader({
               {/* Fallback Avatar */}
               <ThumbnailFallback
                 size="xl"
-                className={`w-20 h-20 border-4 border-black shadow-lg ring-1 ring-white/10 ${
+                className={`w-24 h-24 border-4 border-black shadow-lg ring-1 ring-white/10 ${
                   channel.thumbnail_url ? 'hidden' : 'block'
                 }`}
               />
             </div>
 
-            {/* 가운데: 채널 정보 (min-w-0로 truncate 활성화) */}
-            <div className="min-w-0">
-              <h2 id="channel-modal-title" className="text-xl font-semibold text-zinc-300 truncate">
+            {/* 가운데: 채널 정보 */}
+            <div className="min-w-0 flex-1">
+              {/* 채널 이름 */}
+              <h2 id="channel-modal-title" className="text-2xl font-bold text-white mb-2 truncate">
                 {channel.name}
               </h2>
-              <div
-                id="channel-modal-description"
-                className="flex items-center gap-1 text-sm text-zinc-400 mt-1 min-w-0"
-              >
+
+              {/* 채널 설명 */}
+              {channel.description && (
+                <p className="text-zinc-400 text-sm mb-3 line-clamp-2 leading-relaxed">
+                  {channel.description}
+                </p>
+              )}
+
+              {/* 통계 정보 */}
+              <div className="flex items-center gap-1 text-sm text-zinc-400 min-w-0">
                 <span className="whitespace-nowrap">
                   {channel.subscriber_count || 0} {t.ui.subscribers()}
                 </span>
                 <span className="opacity-60">•</span>
 
-                {/* 편집자 영역이 길어져도 줄바꿈 방지 + 말줄임 */}
+                {/* 편집자 영역 */}
                 {channel.managers && channel.managers.length > 0 ? (
                   <button
                     onClick={() => setIsEditorsModalOpen(true)}
@@ -208,11 +284,11 @@ export function ChannelModalHeader({
                 >
                   {subscriptionHook?.isLoading ? (
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                      <InlineSpinner size="sm" className="text-white" />
                       <span className="text-xs">
                         {subscriptionHook?.isSubscribed
-                          ? t.states.unsubscribing()
-                          : t.states.subscribing()}
+                          ? `${t.actions.unsubscribe()}...`
+                          : `${t.actions.subscribe()}...`}
                       </span>
                     </div>
                   ) : (
@@ -229,18 +305,10 @@ export function ChannelModalHeader({
 
           {/* 두 번째 줄: 카테고리/서브카테고리 태그 */}
           {(channel.category || channel.subcategory) && (
-            <div className="flex items-center space-x-1.5">
-              {channel.category && (
-                <span className="px-2 py-0.5 bg-zinc-600/30 text-zinc-300 text-xs rounded-full border border-zinc-500/30">
-                  {channel.category}
-                </span>
-              )}
-              {channel.subcategory && (
-                <span className="px-2 py-0.5 bg-zinc-600/30 text-zinc-300 text-xs rounded-full border border-zinc-500/30">
-                  {channel.subcategory}
-                </span>
-              )}
-            </div>
+            <TagRow
+              tags={[channel.category, channel.subcategory].filter(Boolean) as string[]}
+              mobileLimit={3}
+            />
           )}
         </div>
       </div>
@@ -251,7 +319,7 @@ export function ChannelModalHeader({
         onClose={() => setIsEditorsModalOpen(false)}
         editors={channel.managers || []}
         channelName={channel.name}
-        ownerId={channel.owner_id}
+        ownerId={effectiveOwnerId}
       />
     </div>
   );

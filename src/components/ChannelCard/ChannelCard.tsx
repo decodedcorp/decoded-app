@@ -308,29 +308,8 @@ export const ChannelCard = memo(
           onClick={handleCardClick}
           aria-label={`Channel ${channelData.name}`}
         >
-          {/* Top metadata section */}
-          <div className="p-4">
-            <div className="flex items-center justify-between min-h-[20px]">
-              {/* Creation date - left side */}
-              <div className="text-zinc-400 text-xs">
-                {'created_at' in channelData && channelData.created_at && (
-                  <span>{formatDate(channelData.created_at)}</span>
-                )}
-              </div>
-
-              {/* Subcategory only - right side */}
-              <div className="flex flex-wrap gap-1 justify-end">
-                {channelData.subcategory && (
-                  <span className="px-1.5 py-0.5 bg-zinc-700/60 text-zinc-300 text-xs font-medium rounded-full border border-zinc-600/40">
-                    {channelData.subcategory}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Channel Image */}
-          <div className="aspect-[4/3] bg-gradient-to-br from-zinc-800 to-zinc-900 overflow-hidden mx-3 mb-3 rounded">
+          {/* Channel Thumbnail */}
+          <div className="aspect-[4/3] bg-gradient-to-br from-zinc-800 to-zinc-900 overflow-hidden relative">
             {channelData.profileImageUrl ? (
               <img
                 src={channelData.profileImageUrl}
@@ -340,30 +319,37 @@ export const ChannelCard = memo(
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-700 to-zinc-800">
-                <span className="font-bold text-white/90 text-3xl">
+                <span className="font-bold text-white/90 text-4xl">
                   {channelData.name.charAt(0).toUpperCase()}
+                </span>
+              </div>
+            )}
+
+            {/* Category badge overlay */}
+            {channelData.subcategory && (
+              <div className="absolute top-3 right-3">
+                <span className="px-2 py-1 bg-black/60 backdrop-blur-sm text-white text-xs font-medium rounded-full border border-white/20">
+                  {channelData.subcategory}
                 </span>
               </div>
             )}
           </div>
 
-          {/* Content */}
-          <div className="px-3 pb-3">
-            {/* Channel Title */}
-            <h3 className="font-bold text-white text-base mb-1.5 line-clamp-1">
-              {channelData.name}
-            </h3>
+          {/* Channel Info Section */}
+          <div className="p-4">
+            {/* Channel Name */}
+            <h3 className="font-bold text-white text-lg mb-2 line-clamp-1">{channelData.name}</h3>
 
             {/* Channel Description */}
             {channelData.description && (
-              <p className="text-zinc-400 text-sm line-clamp-2 mb-3 leading-relaxed">
+              <p className="text-zinc-400 text-sm line-clamp-2 mb-4 leading-relaxed">
                 {channelData.description}
               </p>
             )}
 
-            {/* Stats */}
-            <div className="flex items-center justify-between text-xs text-zinc-400 border-t border-zinc-700/50 pt-2.5 mt-3">
-              <div className="flex items-center space-x-3">
+            {/* Stats and Actions */}
+            <div className="flex items-center justify-between text-xs text-zinc-400 border-t border-zinc-700/50 pt-3">
+              <div className="flex items-center space-x-4">
                 <span className="flex items-center">
                   <svg className="w-3 h-3 mr-1 opacity-60" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z" />
@@ -401,7 +387,7 @@ export const ChannelCard = memo(
                   handleFollowClick(e);
                 }}
                 disabled={effectiveIsLoading}
-                className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                   effectiveIsSubscribed
                     ? 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
                     : 'bg-[#eafd66] text-black hover:bg-[#eafd66]/90'

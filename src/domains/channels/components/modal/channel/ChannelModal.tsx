@@ -7,6 +7,8 @@ import {
   selectIsModalOpen,
   selectSelectedChannel,
   selectSelectedChannelId,
+  selectChannelOwnerId,
+  selectChannelCreatedAt,
 } from '@/store/channelModalStore';
 import { useContentModalStore, selectIsContentModalOpen } from '@/store/contentModalStore';
 import { useUser } from '@/domains/auth/hooks/useAuth';
@@ -27,6 +29,8 @@ export function ChannelModal() {
   const isOpen = useChannelModalStore(selectIsModalOpen);
   const channel = useChannelModalStore(selectSelectedChannel);
   const channelId = useChannelModalStore(selectSelectedChannelId);
+  const channelOwnerId = useChannelModalStore(selectChannelOwnerId);
+  const channelCreatedAt = useChannelModalStore(selectChannelCreatedAt);
   const closeModal = useChannelModalStore((state) => state.closeModal);
 
   // 콘텐츠 모달 상태 확인
@@ -51,11 +55,22 @@ export function ChannelModal() {
       channelId,
       hasChannel: !!finalChannel,
       channelData: finalChannel,
+      channelOwnerId,
+      channelCreatedAt,
       isContentModalOpen,
       isLoading,
       error: !!error,
     });
-  }, [isOpen, channelId, finalChannel, isContentModalOpen, isLoading, error]);
+  }, [
+    isOpen,
+    channelId,
+    finalChannel,
+    channelOwnerId,
+    channelCreatedAt,
+    isContentModalOpen,
+    isLoading,
+    error,
+  ]);
 
   if (!isOpen) {
     return null;
@@ -82,6 +97,9 @@ export function ChannelModal() {
               isSubscribeLoading={subscriptionHook?.isLoading || false}
               currentUserId={user?.doc_id}
               subscriptionHook={subscriptionHook}
+              // 작성자 정보 전달
+              ownerId={channelOwnerId}
+              createdAt={channelCreatedAt}
             />
           ) : (
             <ChannelModalSkeleton onClose={closeModal} />
