@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '../../../store/authStore';
 import { handleGoogleOAuthCallback } from '../../../domains/auth/api/authApi';
 import { LoadingOverlay } from '@/shared/components/LoadingOverlay';
+import { SpinnerLoading } from '@/shared/components/loading';
 
 function AuthCallbackContent() {
   const router = useRouter();
@@ -158,13 +159,13 @@ function AuthCallbackContent() {
             </button>
           </div>
         ) : (
-          <>
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Processing authentication...</p>
-            {isDebugMode && (
-              <p className="text-sm text-gray-500 mt-2">Debug mode active - 콘솔 확인</p>
-            )}
-          </>
+          <SpinnerLoading
+            isLoading={true}
+            spinner={{ size: 'lg' }}
+            message="Processing authentication..."
+            subtitle={isDebugMode ? 'Debug mode active - 콘솔 확인' : undefined}
+            className="py-8"
+          />
         )}
       </div>
     </div>

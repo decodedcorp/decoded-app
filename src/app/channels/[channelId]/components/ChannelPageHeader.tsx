@@ -13,6 +13,7 @@ import { useUser } from '@/domains/auth/hooks/useAuth';
 // import { canManageChannelManagers } from '@/lib/utils/channelPermissions'; // Currently disabled
 import { useChannelSubscription } from '@/domains/interactions/hooks/useChannelSubscription';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
+import { InlineSpinner } from '@/shared/components/loading/InlineSpinner';
 
 // TagRow 컴포넌트
 function TagRow({ tags, mobileLimit = 3 }: { tags: string[]; mobileLimit?: number }) {
@@ -242,7 +243,7 @@ export function ChannelPageHeader({
                 >
                   {subscriptionHook?.isLoading ? (
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                      <InlineSpinner size="sm" className="text-white" />
                       <span className="text-xs">
                         {subscriptionHook?.isSubscribed
                           ? `${t.actions.unsubscribe()}...`

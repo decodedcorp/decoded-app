@@ -2,6 +2,7 @@ import { forwardRef, type ButtonHTMLAttributes } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
 import { Icon } from '../Icon';
+import { Spinner } from '../Spinner';
 import type { IconName } from '../Icon';
 
 const buttonVariants = cva(
@@ -76,7 +77,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         {...props}
       >
-        {loading && <Icon name="loader-2" className="h-4 w-4 animate-spin" aria-hidden="true" />}
+        {loading && <Spinner size="sm" variant="white" aria-label="버튼 로딩 중" />}
 
         {!loading && icon && iconPosition === 'left' && (
           <Icon name={icon} className="h-4 w-4" aria-hidden="true" />

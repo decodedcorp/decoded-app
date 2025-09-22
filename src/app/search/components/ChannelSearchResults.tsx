@@ -131,7 +131,7 @@ export function ChannelSearchResults({ query }: ChannelSearchResultsProps) {
       {isFetching && channels.length > 0 && (
         <div className="mt-6 text-center">
           <div className="flex items-center justify-center gap-2 text-zinc-400 text-sm">
-            <div className="w-4 h-4 border border-zinc-400 border-t-transparent rounded-full animate-spin" />
+            <InlineSpinner size="sm" />
             <span>{t.search.updatingResults()}</span>
           </div>
         </div>

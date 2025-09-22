@@ -11,6 +11,11 @@ interface InlineSpinnerProps {
 /**
  * 인라인 스피너 컴포넌트
  * 버튼, 입력창 등에 사용
+ *
+ * @deprecated 새로운 통합 로딩 시스템 사용을 권장합니다:
+ * - 간단한 스피너: <Spinner /> (@decoded/ui)
+ * - 인라인 로딩: <InlineLoading />
+ * - 복합 로딩: <LoadingState type="inline" />
  */
 export function InlineSpinner({ size = 'md', className = '', ariaLabel }: InlineSpinnerProps) {
   const { t } = useTranslation('common');
