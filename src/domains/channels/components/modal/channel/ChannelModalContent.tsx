@@ -692,9 +692,29 @@ export const ChannelModalContent = React.memo<{
                     (ci: ContentItem) => ci.id.toString() === item.id,
                   );
                   if (contentItem) {
+                    // 작가 정보를 포함한 콘텐츠 데이터 생성
+                    const contentWithAuthor = {
+                      ...contentItem,
+                      // 채널 소유자를 작가로 설정
+                      provider_id: channelData?.owner_id,
+                      author: channelData?.owner_id,
+                      // 채널 ID와 생성 시간 추가
+                      channel_id: channelId,
+                      date: contentItem.date || channelData?.created_at || new Date().toISOString(),
+                    };
+                    
+                    console.log('🎯 [ChannelModalContent] Content clicked with author info:', {
+                      contentId: contentWithAuthor.id,
+                      title: contentWithAuthor.title,
+                      provider_id: contentWithAuthor.provider_id,
+                      author: contentWithAuthor.author,
+                      channel_id: contentWithAuthor.channel_id,
+                      date: contentWithAuthor.date,
+                    });
+                    
                     // Zustand store를 사용해서 모달 열기
                     const { openModal } = useContentModalStore.getState();
-                    openModal(contentItem, channelId);
+                    openModal(contentWithAuthor, channelId);
                   }
                 }}
                 renderItem={(gridItem) => {
