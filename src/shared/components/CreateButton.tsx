@@ -25,7 +25,7 @@ export function CreateButton() {
         variant="outline"
         size="sm"
         icon="plus"
-        className="rounded-full border-zinc-600 text-zinc-300 hover:bg-zinc-800 hover:border-zinc-500 hover:text-white group"
+        className="rounded-full border-zinc-600 text-zinc-300 hover:bg-zinc-800 hover:border-zinc-500 hover:text-white group aspect-square md:aspect-auto p-0 w-8 h-8 md:w-auto md:h-auto md:px-4 md:py-2"
         aria-label={t.create.createNewContent()}
       >
         <span className="hidden md:inline">{t.create.create()}</span>

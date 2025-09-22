@@ -111,20 +111,21 @@ export const Header = memo(function Header() {
     <header
       className={`
         header fixed top-0 left-0 w-full transition-all duration-300 ease-in-out
-        backdrop-blur bg-black/80 border-b border-zinc-700/50 shadow-xl
+        backdrop-blur bg-black/80 border-b-[0.5px] border-white/10 shadow-xl
         ${shouldShowHeader ? 'translate-y-0' : '-translate-y-full'}
       `}
       style={
         {
           zIndex: 'var(--z-header)',
-          WebkitBackdropFilter: 'blur(12px)',
-          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          backdropFilter: 'blur(8px)',
           '--header-h': '60px',
           '--header-h-md': '72px',
           height: 'var(--header-height, 64px)',
         } as React.CSSProperties & { '--header-h': string; '--header-h-md': string }
       }
-      data-header-height="60"
+      data-header-height-xs="56"
+      data-header-height-sm="60"
       data-header-height-md="72"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -133,21 +134,21 @@ export const Header = memo(function Header() {
         className="
           flex items-center justify-between
           w-full
-          h-[60px] md:h-[72px]
+          h-[56px] sm:h-[60px] md:h-[72px]
         "
         style={{ paddingInline: 'var(--edge-x)' }}
       >
         {/* Mobile Menu Button and Logo */}
-        <div className="flex items-center gap-3 lg:gap-0">
+        <div className="flex items-center gap-1 md:gap-3 lg:gap-0">
           <button
             onClick={toggleMobileSidebar}
-            className="lg:hidden min-h-11 min-w-11 inline-flex items-center justify-center hover:bg-zinc-800/50 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [-webkit-tap-highlight-color:rgba(0,0,0,0.08)]"
+            className="lg:hidden min-h-6 min-w-6 inline-flex items-center justify-center hover:bg-zinc-800/50 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [-webkit-tap-highlight-color:rgba(0,0,0,0.08)]"
             aria-controls="mobile-sidebar"
             aria-expanded={isMobileSidebarOpen}
             aria-label={isMobileSidebarOpen ? 'Close menu' : t.header.openMenu()}
           >
             <svg
-              className="shrink-0 w-5 h-5 text-zinc-300"
+              className="shrink-0 w-6 h-6 text-zinc-300"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -155,7 +156,7 @@ export const Header = memo(function Header() {
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth={2}
+                strokeWidth={2.5}
                 d="M4 6h16M4 12h16M4 18h16"
               />
             </svg>
@@ -164,7 +165,7 @@ export const Header = memo(function Header() {
           {/* Logo */}
           <Link
             href="/"
-            className="text-2xl font-bold tracking-tight drop-shadow"
+            className="text-[17px] md:text-2xl font-bold tracking-tight drop-shadow-sm"
             style={{ color: 'var(--color-primary)' }}
             {...createHoverHandlers('/')}
           >
@@ -191,10 +192,10 @@ export const Header = memo(function Header() {
           {/* Mobile Search Button */}
           <button
             onClick={() => setIsMobileSearchOpen(true)}
-            className="md:hidden min-h-11 min-w-11 inline-flex items-center justify-center text-white hover:text-primary transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [-webkit-tap-highlight-color:rgba(0,0,0,0.08)]"
+            className="md:hidden min-h-6 min-w-6 inline-flex items-center justify-center text-white hover:text-primary transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [-webkit-tap-highlight-color:rgba(0,0,0,0.08)]"
             aria-label={t.header.openSearch()}
           >
-            <svg className="shrink-0 w-5 h-5" fill="none" viewBox="0 0 24 24">
+            <svg className="shrink-0 w-6 h-6" fill="none" viewBox="0 0 24 24">
               <path
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 stroke="currentColor"
@@ -222,9 +223,11 @@ export const Header = memo(function Header() {
       {/* Mobile Search Overlay */}
       {isMobileSearchOpen && (
         <div
-          className="fixed top-[60px] md:top-[72px] left-0 right-0 bg-black border-b border-zinc-700 py-4 md:hidden"
+          className="fixed top-[56px] sm:top-[60px] md:top-[72px] left-0 right-0 bg-black border-b border-zinc-700 py-3 md:hidden"
           style={{ zIndex: 'var(--z-overlay)', paddingInline: 'var(--edge-x)' }}
         >
+          {/* Grab handle */}
+          <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-white/15" />
           <div className="flex items-center gap-3">
             <div className="flex-1">
               {isChannelPage && channelName ? (
