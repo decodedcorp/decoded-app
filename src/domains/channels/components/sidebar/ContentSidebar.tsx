@@ -6,6 +6,9 @@ import { ContentItem } from '@/lib/types/content';
 import { ProxiedImage } from '@/components/ProxiedImage';
 import { useContentById } from '@/domains/channels/hooks/useContentById';
 import { useChannelContents } from '@/domains/channels/hooks/useChannelContents';
+import { useChannel } from '@/domains/channels/hooks/useChannels';
+import { useUserProfile } from '@/domains/users/hooks/useUserProfile';
+import { useDateFormatters } from '@/lib/utils/dateUtils';
 import ReactBitsMasonry from '@/components/ReactBitsMasonry';
 
 interface ContentSidebarProps {
@@ -273,11 +276,155 @@ function TabNavigation({
 function SummaryContent({ content }: { content: ContentItem }) {
   return (
     <div className="p-6 space-y-6 pb-24">
+      <ChannelInfo content={content} />
       <ImageDisplay content={content} />
       <AISummary content={content} />
       <AIQASection content={content} />
       <LinkPreview content={content} />
       <ContentMetadata content={content} />
+    </div>
+  );
+}
+
+// Channel Info Component - PostCard 스타일 적용
+function ChannelInfo({ content }: { content: ContentItem }) {
+  const { formatDateByContext } = useDateFormatters();
+
+  // Get user profile using provider_id field
+  const authorId = content?.provider_id || content?.author;
+  const {
+    data: userProfile,
+    isLoading: isProfileLoading,
+    error: profileError,
+  } = useUserProfile(authorId || '', {
+    enabled: !!authorId,
+  });
+
+  // Get channel information
+  const channelId = content?.channel_id;
+  const {
+    data: channelData,
+    isLoading: isChannelLoading,
+    error: channelError,
+  } = useChannel(channelId || '', {
+    enabled: !!channelId,
+  });
+
+  // Show info if we have channel or author data
+  const shouldShowInfo = channelId || authorId;
+
+  if (!shouldShowInfo) return null;
+
+  return (
+    <div className="mb-4 pb-4 border-b border-zinc-800/30">
+      <div className="space-y-3">
+        {/* Channel Info Row - PostCard 스타일로 변경 */}
+        <div className="flex items-center space-x-3">
+          {/* Channel Thumbnail - PostCard 스타일 적용 */}
+          {channelId && (
+            <div className="flex-shrink-0">
+              {isChannelLoading ? (
+                <div className="w-12 h-12 bg-zinc-700/50 rounded-full animate-pulse" />
+              ) : (
+                <div className="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden">
+                  {channelData?.thumbnail_url ? (
+                    <img
+                      src={channelData.thumbnail_url}
+                      alt={channelData.name || 'Channel'}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        const fallback = target.nextElementSibling as HTMLElement;
+                        if (fallback) fallback.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  <div
+                    className={`w-full h-full bg-gradient-to-br from-[#eafd66] to-[#d4e85c] rounded-full flex items-center justify-center ${
+                      channelData?.thumbnail_url ? 'hidden' : 'flex'
+                    }`}
+                  >
+                    <span className="text-zinc-900 font-bold text-sm">
+                      {channelData?.name?.charAt(0) || 'C'}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Channel Name - PostCard 스타일 적용 */}
+          {channelId && (
+            <div className="text-[#eafd66] font-medium text-sm">
+              {isChannelLoading ? (
+                <div className="h-4 bg-zinc-700/50 rounded animate-pulse w-20" />
+              ) : channelError ? (
+                <span className="text-zinc-400">Channel</span>
+              ) : (
+                channelData?.name || 'Unknown Channel'
+              )}
+            </div>
+          )}
+
+          {/* Author Info - 오른쪽 정렬 */}
+          {authorId && (
+            <div className="flex items-center space-x-2 ml-auto">
+              {/* Author Avatar */}
+              <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0">
+                {userProfile?.profile_image_url ? (
+                  <img
+                    src={userProfile.profile_image_url}
+                    alt={`${authorId} avatar`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const fallback = target.nextElementSibling as HTMLElement;
+                      if (fallback) fallback.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <div
+                  className={`w-full h-full bg-gradient-to-br from-zinc-600 to-zinc-700 rounded-full flex items-center justify-center ${
+                    userProfile?.profile_image_url ? 'hidden' : 'flex'
+                  }`}
+                >
+                  <span className="text-zinc-200 text-xs font-semibold">
+                    {(userProfile?.aka || authorId).charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              </div>
+
+              {/* Author & Time */}
+              <div className="flex items-center space-x-1 text-xs text-zinc-400">
+                <span>
+                  {isProfileLoading ? (
+                    <span className="animate-pulse">Loading...</span>
+                  ) : profileError ? (
+                    authorId
+                  ) : (
+                    userProfile?.aka || authorId
+                  )}
+                </span>
+                {content.date && (
+                  <>
+                    <span>•</span>
+                    <span>{formatDateByContext(content.date, 'list')}</span>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Channel Description - 별도 줄에 배치 */}
+        {channelId && channelData?.description && (
+          <p className="text-xs text-zinc-500 leading-relaxed line-clamp-2">
+            {channelData.description}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

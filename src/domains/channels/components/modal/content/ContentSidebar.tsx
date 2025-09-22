@@ -237,110 +237,126 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
 
       {/* Scrollable Content Area */}
       <div className="flex-1 min-h-0 overflow-y-auto">
-        {/* Channel & Author Info */}
+        {/* Channel & Author Info - PostCard 스타일 적용 */}
         {(channelId ||
           content.author ||
           content.likes !== undefined ||
           content.views !== undefined) && (
-          <div className="p-4 border-b border-zinc-700/50">
-            {/* Channel Info */}
-            {channelId && (
-              <div className="space-y-3">
-                {/* Channel Info Row */}
-                <div className="flex items-center space-x-3">
-                  {/* Channel Thumbnail */}
+          <div className="p-4 border-b border-zinc-800/30">
+            <div className="space-y-3">
+              {/* Channel Info Row - PostCard 스타일로 변경 */}
+              <div className="flex gap-3">
+                {/* Channel Thumbnail - PostCard 스타일 적용 */}
+                {channelId && (
                   <div className="flex-shrink-0">
                     {isChannelLoading ? (
-                      <div className="w-12 h-12 bg-zinc-700/50 rounded-lg animate-pulse" />
+                      <div className="w-12 h-12 bg-zinc-700/50 rounded-full animate-pulse" />
                     ) : (
-                      <div className="w-12 h-12 bg-zinc-800 rounded-lg overflow-hidden">
+                      <div className="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden">
                         {channelData?.thumbnail_url ? (
                           <img
                             src={channelData.thumbnail_url}
                             alt={channelData.name || 'Channel'}
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const fallback = target.nextElementSibling as HTMLElement;
+                              if (fallback) fallback.style.display = 'flex';
+                            }}
                           />
+                        ) : null}
+                        <div
+                          className={`w-full h-full bg-gradient-to-br from-[#eafd66] to-[#d4e85c] rounded-full flex items-center justify-center ${
+                            channelData?.thumbnail_url ? 'hidden' : 'flex'
+                          }`}
+                        >
+                          <span className="text-zinc-900 font-bold text-sm">
+                            {channelData?.name?.charAt(0) || 'C'}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* 오른쪽 컨텐츠 영역 */}
+                <div className="flex-1">
+                  {/* 첫 번째 줄: 채널명, 작성자 */}
+                  <div className="flex items-center gap-2">
+                    {/* Channel Name - PostCard 스타일 적용 */}
+                    {channelId && (
+                      <div className="text-[#eafd66] font-medium text-sm">
+                        {isChannelLoading ? (
+                          <div className="h-4 bg-zinc-700/50 rounded animate-pulse w-20" />
+                        ) : channelError ? (
+                          <span className="text-zinc-400">Channel</span>
                         ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center">
-                            <span className="text-zinc-400 text-xs font-medium">
-                              {channelData?.name?.charAt(0) || 'C'}
-                            </span>
-                          </div>
+                          channelData?.name || 'Unknown Channel'
                         )}
                       </div>
                     )}
-                  </div>
 
-                  {/* Channel Name */}
-                  <div className="font-medium text-white">
-                    {isChannelLoading ? (
-                      <div className="h-4 bg-zinc-700/50 rounded animate-pulse w-24" />
-                    ) : channelError ? (
-                      <span className="text-zinc-400">Channel</span>
-                    ) : (
-                      channelData?.name || 'Unknown Channel'
-                    )}
-                  </div>
+                    {/* Author Info - 오른쪽 정렬 */}
+                    {authorId && (
+                      <div className="flex items-center gap-2 ml-auto">
+                        {/* Author Avatar */}
+                        <Avatar
+                          userId={authorId}
+                          src={userProfile?.profile_image_url || undefined}
+                          size="sm"
+                          className="flex-shrink-0"
+                        />
 
-                  {/* Author Info - moved to same row */}
-                  {authorId && (
-                    <div className="flex items-center space-x-2 ml-auto">
-                      {/* Author Avatar */}
-                      <Avatar
-                        userId={authorId}
-                        src={userProfile?.profile_image_url || undefined}
-                        size="sm"
-                        className="flex-shrink-0"
-                      />
-
-                      {/* Author & Time */}
-                      <div className="flex items-center space-x-1 text-sm text-zinc-400">
-                        <span>
-                          {isProfileLoading ? (
-                            <span className="animate-pulse">Loading...</span>
-                          ) : profileError ? (
-                            authorId
-                          ) : (
-                            userProfile?.aka || authorId
+                        {/* Author & Time */}
+                        <div className="flex items-center space-x-1 text-xs text-zinc-400">
+                          <span>
+                            {isProfileLoading ? (
+                              <span className="animate-pulse">Loading...</span>
+                            ) : profileError ? (
+                              authorId
+                            ) : (
+                              userProfile?.aka || authorId
+                            )}
+                          </span>
+                          {content.date && (
+                            <>
+                              <span>•</span>
+                              <span>{formatDateByContext(content.date, 'list')}</span>
+                            </>
                           )}
-                        </span>
-                        {content.date && (
-                          <>
-                            <span>•</span>
-                            <span>{formatDateByContext(content.date, 'list')}</span>
-                          </>
-                        )}
+                        </div>
                       </div>
+                    )}
+                  </div>
+
+                  {/* 두 번째 줄: 채널 설명 */}
+                  {channelId && channelData?.description && (
+                    <p className="text-xs text-zinc-500 leading-relaxed line-clamp-2 mt-1">
+                      {channelData.description}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Interaction Stats */}
+              {(content.likes !== undefined || content.views !== undefined) && (
+                <div className="flex items-center space-x-4 text-xs text-zinc-400 mt-3">
+                  {content.likes !== undefined && (
+                    <div className="flex items-center space-x-1">
+                      <MdFavorite className="w-3 h-3" />
+                      <span>{content.likes}</span>
+                    </div>
+                  )}
+                  {content.views !== undefined && (
+                    <div className="flex items-center space-x-1">
+                      <MdVisibility className="w-3 h-3" />
+                      <span>{content.views}</span>
                     </div>
                   )}
                 </div>
-
-                {/* Channel Description */}
-                {channelData?.description && (
-                  <p className="text-xs text-zinc-400 leading-relaxed line-clamp-2 text-right">
-                    {channelData.description}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {/* Interaction Stats */}
-            {(content.likes !== undefined || content.views !== undefined) && (
-              <div className="flex items-center space-x-4 text-sm text-zinc-400">
-                {content.likes !== undefined && (
-                  <div className="flex items-center space-x-1">
-                    <MdFavorite className="w-4 h-4" />
-                    <span>{content.likes}</span>
-                  </div>
-                )}
-                {content.views !== undefined && (
-                  <div className="flex items-center space-x-1">
-                    <MdVisibility className="w-4 h-4" />
-                    <span>{content.views}</span>
-                  </div>
-                )}
-              </div>
-            )}
+              )}
+            </div>
           </div>
         )}
 

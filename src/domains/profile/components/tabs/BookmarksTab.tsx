@@ -143,8 +143,15 @@ export function BookmarksTab() {
                       onClick={(e) => handleChannelClick(bookmark.content!.channel_id, e)}
                       className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors flex items-center space-x-1"
                     >
-                      <span>{t.bookmarks.from()} {bookmark.content!.channel_name}</span>
-                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <span>
+                        {t.bookmarks.from()} {bookmark.content!.channel_name}
+                      </span>
+                      <svg
+                        className="w-3 h-3"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"

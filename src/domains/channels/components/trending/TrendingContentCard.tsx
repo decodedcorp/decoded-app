@@ -6,6 +6,9 @@ import { useRouter } from 'next/navigation';
 import { TrendingContentItem } from '@/api/generated/models/TrendingContentItem';
 import { useChannel } from '../../hooks/useChannels';
 import { AvatarFallback } from '@/components/FallbackImage';
+import { useContentModalStore } from '@/store/contentModalStore';
+import { ContentItem } from '@/lib/types/content';
+import { ContentType } from '@/lib/types/ContentType';
 
 interface TrendingContentCardProps {
   content: TrendingContentItem;
@@ -14,13 +17,35 @@ interface TrendingContentCardProps {
 
 export function TrendingContentCard({ content, className = '' }: TrendingContentCardProps) {
   const router = useRouter();
+  const openContentModal = useContentModalStore((state) => state.openModal);
 
   // Get channel data for thumbnail
   const { data: channelData } = useChannel(content.channel_id);
 
-  const handleContentClick = () => {
-    // Navigate to channel page with content modal
-    router.push(`/channels/${content.channel_id}?content=${content.id}`);
+  const handleContentClick = async () => {
+    try {
+      // Convert TrendingContentItem to ContentItem
+      const contentItem: ContentItem = {
+        id: content.id,
+        type: (content.type as ContentType) || ContentType.LINK,
+        title: content.title || '',
+        description: content.description || '',
+        thumbnailUrl: content.thumbnail_url || undefined,
+        imageUrl: content.type === ContentType.IMAGE ? content.url || undefined : undefined,
+        videoUrl: content.type === ContentType.VIDEO ? content.url || undefined : undefined,
+        linkUrl: content.type === ContentType.LINK ? content.url || undefined : undefined,
+        channel_id: content.channel_id,
+        author: content.channel_name || '',
+        provider_id: content.provider_id || '',
+        date: new Date().toISOString(),
+        likes: 0,
+        views: 0,
+      };
+
+      openContentModal(contentItem, content.channel_id);
+    } catch (error) {
+      console.error('Failed to open content modal:', error);
+    }
   };
 
   const handleChannelClick = (e: React.MouseEvent) => {
