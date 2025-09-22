@@ -161,7 +161,7 @@ export function ChannelModalHeader({
               </h2>
               <div
                 id="channel-modal-description"
-                className="flex items-center gap-3 text-sm text-zinc-400 mt-1 min-w-0"
+                className="flex items-center gap-1 text-sm text-zinc-400 mt-1 min-w-0"
               >
                 <span className="whitespace-nowrap">
                   {channel.subscriber_count || 0} {t.ui.subscribers()}

@@ -6,6 +6,7 @@ import type { UserProfileResponse } from '@/api/generated/models/UserProfileResp
 import type { ChannelUserProfile } from '@/api/generated/models/ChannelUserProfile';
 import { useScrollLock } from '@/lib/hooks/useScrollLock';
 import { useTranslation } from 'react-i18next';
+import i18n from '@/lib/i18n/config';
 
 interface EditorsListModalProps {
   isOpen: boolean;
@@ -26,6 +27,10 @@ export function EditorsListModal({
 
   // Use improved scroll lock
   useScrollLock(isOpen);
+
+  // Get translations for better performance
+  const followersText = i18n.language === 'ko' ? '팔로워' : 'followers';
+  const ownerText = i18n.language === 'ko' ? '소유자' : 'owner';
 
   // ESC key handler
   useEffect(() => {
@@ -68,10 +73,10 @@ export function EditorsListModal({
   };
 
   const formatFollowers = (count?: number): string => {
-    if (!count) return `0 ${t('followers')}`;
-    if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M ${t('followers')}`;
-    if (count >= 1000) return `${(count / 1000).toFixed(1)}K ${t('followers')}`;
-    return `${count} ${t('followers')}`;
+    if (!count) return `0 ${followersText}`;
+    if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M ${followersText}`;
+    if (count >= 1000) return `${(count / 1000).toFixed(1)}K ${followersText}`;
+    return `${count} ${followersText}`;
   };
 
   const isOwner = (editor: UserProfileResponse | ChannelUserProfile): boolean => {
@@ -170,7 +175,7 @@ export function EditorsListModal({
                           <h3 className="font-semibold text-white">{getDisplayName(editor)}</h3>
                           {isOwner(editor) && (
                             <span className="text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full">
-                              {t('owner')}
+                              {ownerText}
                             </span>
                           )}
                         </div>

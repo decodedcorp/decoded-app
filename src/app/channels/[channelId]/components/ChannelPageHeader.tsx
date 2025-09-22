@@ -185,7 +185,7 @@ export function ChannelPageHeader({
             {/* 가운데: 채널 정보 (min-w-0로 truncate 활성화) */}
             <div className="min-w-0">
               <h2 className="text-xl font-semibold text-zinc-300 truncate">{channel.name}</h2>
-              <div className="flex items-center gap-3 text-sm text-zinc-400 mt-1 min-w-0">
+              <div className="flex items-center gap-1 text-sm text-zinc-400 mt-1 min-w-0">
                 <span className="whitespace-nowrap">
                   {channel.subscriber_count || 0} {t.ui.subscribers()}
                 </span>
