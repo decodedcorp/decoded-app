@@ -41,7 +41,7 @@ function InteractiveQAItem({ qa, isOpen, onToggle }: InteractiveQAItemProps) {
         }`}
       >
         <div className="p-4 pt-0 border-t border-zinc-700/30">
-          <p className="text-gray-300 leading-relaxed">{qa.answer}</p>
+          <p className="text-gray-300 leading-relaxed mt-2">{qa.answer}</p>
         </div>
       </div>
     </div>
