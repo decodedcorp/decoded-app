@@ -8,6 +8,7 @@ import { useChannel } from '@/domains/channels/hooks/useChannels';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
 import { useTranslation } from 'react-i18next';
 import { ContentItem } from '@/lib/types/content';
+import { formatRelativeTime } from '@/lib/utils/dateUtils';
 
 interface MobileCardLayoutProps {
   children: React.ReactNode;
@@ -59,34 +60,24 @@ export function MobileCardLayout({ children, title, onClose, content }: MobileCa
     shouldShowInfo,
     authorId,
     channelId,
-    userProfile: userProfile ? { aka: userProfile.aka, profile_image_url: userProfile.profile_image_url } : null,
+    userProfile: userProfile
+      ? { aka: userProfile.aka, profile_image_url: userProfile.profile_image_url }
+      : null,
     isProfileLoading,
     profileError,
-    content: content ? { id: content.id, title: content.title, provider_id: content.provider_id, author: content.author } : null,
+    content: content
+      ? {
+          id: content.id,
+          title: content.title,
+          provider_id: content.provider_id,
+          author: content.author,
+        }
+      : null,
   });
 
-  // Format date function (same as CommentItem)
+  // Use the project's date utility for consistent formatting
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffHours < 1) {
-      const diffMinutes = Math.floor(diffMs / (1000 * 60));
-      return diffMinutes <= 0 ? '방금 전' : `${diffMinutes}분 전`;
-    } else if (diffHours < 24) {
-      return `${diffHours}시간 전`;
-    } else if (diffDays < 7) {
-      return `${diffDays}일 전`;
-    } else {
-      return date.toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-      });
-    }
+    return formatRelativeTime(dateString);
   };
 
   return (
