@@ -557,6 +557,107 @@
       "tryAgain": "다시 시도해 주세요"
     }
   },
+  "channelSettings": {
+    "title": "채널 설정",
+    "loadingSettings": "채널 설정을 불러오는 중...",
+    "channelNotFound": "채널을 찾을 수 없어요",
+    "channelNotFoundDescription": "찾고 있는 채널이 존재하지 않거나 접근 권한이 없어요.",
+    "accessDenied": "접근이 거부되었어요",
+    "accessDeniedDescription": "이 채널의 설정을 관리할 권한이 없어요.",
+    "backToChannels": "채널 목록으로",
+    "backToChannel": "채널로 돌아가기",
+    "characters": "글자",
+    "tabs": {
+      "basicInfo": "기본 정보",
+      "images": "이미지",
+      "managers": "관리자",
+      "dangerZone": "위험 구역"
+    },
+    "images": {
+      "title": "채널 이미지",
+      "subtitle": "채널의 썸네일과 배너 이미지를 업로드하고 관리하세요.",
+      "thumbnail": {
+        "title": "채널 썸네일",
+        "profilePicture": "프로필 사진",
+        "description": "이 이미지는 채널의 프로필 사진으로 표시됩니다. 권장 크기: 400x400px.",
+        "requirements": {
+          "maxFileSize": "최대 파일 크기: 10MB",
+          "supportedFormats": "지원 형식: JPG, PNG, WebP",
+          "squareImages": "정사각형 이미지가 가장 좋아요"
+        }
+      },
+      "banner": {
+        "title": "채널 배너",
+        "bannerImage": "배너 이미지",
+        "description": "이 이미지는 채널 페이지 상단에 표시됩니다. 권장 크기: 1200x400px.",
+        "requirements": {
+          "maxFileSize": "최대 파일 크기: 10MB",
+          "supportedFormats": "지원 형식: JPG, PNG, WebP",
+          "aspectRatio": "3:1 비율이 가장 좋아요"
+        }
+      },
+      "preview": {
+        "title": "미리보기",
+        "description": "방문자에게 보이는 채널 모습을 미리보세요:",
+        "bannerPreview": "배너 미리보기",
+        "thumbnailPreview": "썸네일 미리보기"
+      }
+    },
+    "managers": {
+      "title": "채널 관리자",
+      "subtitle": "관리자는 콘텐츠를 업로드하고, 댓글을 관리하며, 채널 관리에 도움을 줄 수 있어요. 채널 소유자만 관리자를 초대하거나 제거할 수 있어요.",
+      "currentManagers": "현재 관리자",
+      "inviteManager": "관리자 초대",
+      "permissions": {
+        "title": "관리자 권한",
+        "uploadContent": "채널 콘텐츠 업로드 및 관리",
+        "pinContent": "콘텐츠 항목 고정 및 해제",
+        "moderateComments": "댓글 및 상호작용 관리",
+        "editDescription": "채널 설명 편집 (허용된 경우)",
+        "cannotDelete": "채널 삭제 또는 다른 관리자 제거 불가"
+      },
+      "invitations": "관리자 초대",
+      "bestPractices": {
+        "title": "모범 사례",
+        "inviteTrusted": "신뢰할 수 있는 사용자만 관리자로 초대하세요",
+        "setExpectations": "명확한 기대치와 가이드라인을 설정하세요",
+        "reviewActivity": "관리자 활동을 정기적으로 검토하세요",
+        "trialPeriods": "새 관리자에게는 시험 기간을 고려하세요",
+        "communicateGoals": "채널 목표와 비전을 소통하세요"
+      },
+      "statistics": {
+        "title": "관리자 통계",
+        "totalManagers": "총 관리자 수",
+        "channelContent": "채널 콘텐츠"
+      }
+    },
+    "dangerZone": {
+      "title": "위험 구역",
+      "subtitle": "되돌릴 수 없는 파괴적인 작업입니다. 신중하게 진행하세요.",
+      "deleteChannel": {
+        "title": "채널 삭제",
+        "description": "채널을 삭제하면 되돌릴 수 없어요. 이 작업은 취소할 수 없으며, 이 채널과 관련된 모든 콘텐츠, 구독자, 데이터가 영구적으로 삭제됩니다.",
+        "willDelete": "다음이 영구적으로 삭제됩니다:",
+        "allContent": "모든 채널 콘텐츠 및 업로드",
+        "allSubscribers": "모든 구독자 관계",
+        "allComments": "모든 댓글 및 상호작용",
+        "allAnalytics": "채널 분석 및 통계",
+        "allManagers": "모든 관리자 관계 및 초대",
+        "confirmText": "\"{{channelName}}\"을(를) 입력하여 확인:",
+        "confirmPlaceholder": "\"{{channelName}}\"을(를) 여기에 입력",
+        "deleteForever": "채널을 영구 삭제",
+        "deleting": "삭제 중...",
+        "currentlyDisabled": "채널 삭제는 현재 비활성화되어 있습니다"
+      },
+      "beforeDeleting": {
+        "title": "삭제하기 전에:",
+        "transferOwnership": "다른 사용자에게 소유권을 이전하는 것을 고려하세요",
+        "downloadContent": "중요한 콘텐츠나 데이터를 다운로드하세요",
+        "notifySubscribers": "구독자들에게 삭제에 대해 알리세요",
+        "removeLinks": "이 채널을 가리키는 외부 링크를 제거하세요"
+      }
+    }
+  },
   "accessibility": {
     "closeModal": "모달 닫기",
     "expandSidebar": "사이드바 펼치기",

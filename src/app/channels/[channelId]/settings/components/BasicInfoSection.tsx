@@ -72,7 +72,9 @@ export function BasicInfoSection({ channel }: BasicInfoSectionProps) {
           placeholder={t.ui.enterChannelName()}
           maxLength={50}
         />
-        <p className="text-xs text-zinc-400 mt-1">{name.length}/50 characters</p>
+        <p className="text-xs text-zinc-400 mt-1">
+          {name.length}/50 {t.channelSettings.characters()}
+        </p>
       </div>
 
       {/* Channel Description */}
@@ -89,7 +91,9 @@ export function BasicInfoSection({ channel }: BasicInfoSectionProps) {
           placeholder={t.ui.describeChannel()}
           maxLength={500}
         />
-        <p className="text-xs text-zinc-400 mt-1">{description.length}/500 characters</p>
+        <p className="text-xs text-zinc-400 mt-1">
+          {description.length}/500 {t.channelSettings.characters()}
+        </p>
       </div>
 
       {/* Channel Stats */}

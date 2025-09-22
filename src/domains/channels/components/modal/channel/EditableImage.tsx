@@ -34,7 +34,7 @@ export function EditableImage({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const { images } = useChannelTranslation();
   const { status } = useCommonTranslation();
 
@@ -168,7 +168,7 @@ export function EditableImage({
             <div className="text-white text-center">
               <svg
                 className={`mx-auto mb-2 ${
-                  type === 'banner' ? 'w-10 h-10' : 'w-8 h-8' // 배너는 더 큰 아이콘
+                  type === 'banner' ? 'w-10 h-10' : 'w-8 h-8 sm:w-8 sm:h-8 md:w-10 md:h-10' // 모바일에서는 작게, 데스크톱에서는 크게
                 }`}
                 fill="none"
                 viewBox="0 0 24 24"
@@ -182,14 +182,14 @@ export function EditableImage({
               </svg>
               <span
                 className={`font-medium ${
-                  type === 'banner' ? 'text-base' : 'text-sm' // 배너는 더 큰 텍스트
+                  type === 'banner' ? 'text-base' : 'text-xs sm:text-xs md:text-sm' // 모바일에서는 작게, 데스크톱에서는 크게
                 }`}
               >
                 {type === 'thumbnail' ? images.thumbnail() : images.banner()}
               </span>
               <span
                 className={`text-xs opacity-80 ${
-                  type === 'banner' ? 'text-sm' : 'text-xs' // 배너는 더 큰 텍스트
+                  type === 'banner' ? 'text-sm' : 'text-xs sm:text-xs md:text-xs' // 모바일에서는 작게, 데스크톱에서는 크게
                 }`}
               >
                 {images.uploadInstruction()}

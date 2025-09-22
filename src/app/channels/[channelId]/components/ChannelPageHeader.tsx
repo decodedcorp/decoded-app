@@ -10,7 +10,7 @@ import { ChannelData } from '@/store/channelModalStore';
 import { useContentUploadStore } from '@/store/contentUploadStore';
 import { toast } from 'react-hot-toast';
 import { useUser } from '@/domains/auth/hooks/useAuth';
-// import { canManageChannelManagers } from '@/lib/utils/channelPermissions'; // Currently disabled
+import { canManageChannelManagers } from '@/lib/utils/channelPermissions';
 import { useChannelSubscription } from '@/domains/interactions/hooks/useChannelSubscription';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
 import { InlineSpinner } from '@/shared/components/loading/InlineSpinner';
@@ -118,7 +118,7 @@ export function ChannelPageHeader({
 
   // 소유자 권한 확인
   const isOwner = user?.doc_id && channel.owner_id && user.doc_id === channel.owner_id;
-  // const canManageSettings = canManageChannelManagers(user, channel); // Currently disabled
+  const canManageSettings = canManageChannelManagers(user, channel);
 
   return (
     <div>
@@ -186,7 +186,7 @@ export function ChannelPageHeader({
             {/* 가운데: 채널 정보 */}
             <div className="min-w-0 flex-1">
               {/* 채널 이름 */}
-              <h1 className="text-2xl font-bold text-white mb-2 truncate">{channel.name}</h1>
+              <h1 className="text-lg font-bold text-white mb-2 truncate">{channel.name}</h1>
 
               {/* 채널 설명 */}
               {channel.description && (
@@ -270,8 +270,8 @@ export function ChannelPageHeader({
                 </button>
               )}
 
-              {/* Settings 버튼 - Currently disabled */}
-              {/* {canManageSettings && (
+              {/* Settings 버튼 */}
+              {canManageSettings && (
                 <button
                   onClick={handleSettings}
                   className="p-2 rounded-full bg-zinc-800 hover:bg-zinc-700 text-white transition-colors"
@@ -295,7 +295,7 @@ export function ChannelPageHeader({
                     />
                   </svg>
                 </button>
-              )} */}
+              )}
             </div>
           </div>
 
@@ -308,8 +308,6 @@ export function ChannelPageHeader({
           )}
         </div>
       </div>
-
-      {/* Banner Edit Modal - EditableImage에서 처리하므로 제거 */}
 
       {/* Editors List Modal */}
       <EditorsListModal

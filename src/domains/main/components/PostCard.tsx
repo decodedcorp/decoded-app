@@ -41,7 +41,6 @@ export interface PostCardProps {
   mediaHeight?: number; // Original height for aspect calculation
   blurDataURL?: string; // Blur placeholder for better loading
   contentType: 'text' | 'image' | 'video' | 'link';
-  badge?: string | null;
   onPostClick?: () => void;
   onChannelClick?: (channelId: string, channel: string) => void;
   onAuthorClick?: (authorId: string, author: string) => void;
@@ -131,7 +130,6 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
   mediaHeight,
   blurDataURL,
   contentType,
-  badge,
   onPostClick,
   onChannelClick,
   onAuthorClick,
@@ -348,20 +346,14 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
     <div
       className={`bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden hover:border-zinc-700 transition-all duration-200 group max-w-4xl mx-auto relative ${className}`}
     >
-      {/* 배지 - 카드 오른쪽 상단 */}
-      {badge && (
-        <div className="absolute top-3 right-3 bg-[#eafd66] text-black text-xs font-bold px-2 py-1 rounded-full shadow-lg z-10">
-          {t(`badges.${badge}`, badge)}
-        </div>
-      )}
       <div className="p-2 md:p-4">
         {/* 상단: 채널 정보 및 메타데이터 */}
         <div className="mb-3">
-          {/* 첫 번째 줄: 채널 썸네일, 채널명, 작성자, 시간 */}
-          <div className="flex items-center gap-3 mb-2">
-            {/* 동그란 채널 썸네일 - 클릭 시 채널 페이지로 */}
+          {/* 채널 정보 영역: 채널 썸네일이 두 줄에 걸쳐 배치 */}
+          <div className="flex gap-3">
+            {/* 채널 썸네일 - 두 줄 높이 */}
             <button
-              className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity cursor-pointer overflow-hidden"
+              className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity cursor-pointer overflow-hidden self-start"
               onClick={() => {
                 if (onChannelClick) {
                   onChannelClick(channelId, channel);
@@ -396,24 +388,25 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
               </div>
             </button>
 
-            {/* 채널명, 작성자, 시간 */}
-            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-2 text-sm text-zinc-400">
-              {/* 첫 번째 줄: 채널명 */}
-              <button
-                className="text-[#eafd66] hover:text-white font-medium transition-colors cursor-pointer text-left"
-                onClick={() => {
-                  if (onChannelClick) {
-                    onChannelClick(channelId, channel);
-                  } else {
-                    router.push(`/channels/${channelId}`);
-                  }
-                }}
-              >
-                {channel}
-              </button>
-
-              {/* 두 번째 줄: 작성자와 시간 (항상 나란히 배치) */}
+            {/* 오른쪽 컨텐츠 영역 */}
+            <div className="flex-1">
+              {/* 첫 번째 줄: 채널명, 작성자 */}
               <div className="flex items-center gap-2">
+                {/* 채널명 */}
+                <button
+                  className="text-[#eafd66] hover:text-white font-medium transition-colors cursor-pointer text-left"
+                  onClick={() => {
+                    if (onChannelClick) {
+                      onChannelClick(channelId, channel);
+                    } else {
+                      router.push(`/channels/${channelId}`);
+                    }
+                  }}
+                >
+                  {channel}
+                </button>
+
+                {/* 작성자 */}
                 <div className="flex items-center gap-2">
                   {/* 유저 아바타 */}
                   <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0">
@@ -432,17 +425,17 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
                       />
                     ) : null}
                     <div
-                      className={`w-full h-full bg-zinc-600 rounded-full flex items-center justify-center ${
+                      className={`w-full h-full bg-gradient-to-br from-zinc-600 to-zinc-700 rounded-full flex items-center justify-center ${
                         userAvatar ? 'hidden' : 'flex'
                       }`}
                     >
-                      <span className="text-zinc-300 text-sm font-medium">
-                        {author.charAt(0).toUpperCase()}
+                      <span className="text-zinc-200 text-xs font-semibold">
+                        {(userAka || author).charAt(0).toUpperCase()}
                       </span>
                     </div>
                   </div>
                   <button
-                    className="hover:text-zinc-300 transition-colors cursor-pointer text-left text-sm font-medium"
+                    className="hover:text-zinc-300 transition-colors cursor-pointer text-left text-sm font-medium text-zinc-400"
                     onClick={() => {
                       if (onAuthorClick) {
                         onAuthorClick(authorId, author);
@@ -455,22 +448,16 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
                     {userAka || author}
                   </button>
                 </div>
-
-                {/* 구분자와 시간 */}
-                {/* <span className="text-zinc-600">•</span>
-                <span>{formatDateByContext(createdAt, 'list')}</span> */}
               </div>
+
+              {/* 두 번째 줄: 채널 설명 */}
+              {(channelDescription || channelData?.description) && (
+                <p className="text-zinc-500 text-xs line-clamp-2 leading-relaxed">
+                  {channelDescription || channelData?.description}
+                </p>
+              )}
             </div>
           </div>
-
-          {/* 두 번째 줄: 채널 설명 */}
-          {(channelDescription || channelData?.description) && (
-            <div className="">
-              <p className="text-zinc-500 text-sm line-clamp-2 leading-relaxed">
-                {channelDescription || channelData?.description}
-              </p>
-            </div>
-          )}
         </div>
 
         {/* 포스트 콘텐츠 영역 - 클릭 시 모달 */}

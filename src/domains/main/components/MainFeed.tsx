@@ -514,7 +514,6 @@ export const MainFeed = React.memo(function MainFeed() {
                               }
                               blurDataURL={undefined}
                               contentType={post.contentType}
-                              badge={post.badge}
                               contentId={item.id} // 북마크 기능을 위한 contentId 추가
                               onPostClick={() => {
                                 // 콘텐츠 ID를 설정하여 상세 정보 가져오기

@@ -118,6 +118,7 @@ type CommonTranslations = {
     discoverChannels: () => string;
     loading: () => string;
     subscribers: () => string;
+    followers: () => string;
     posts: () => string;
     items: () => string;
     status: () => string;
@@ -489,6 +490,110 @@ type CommonTranslations = {
     sending: () => string;
     sendInvitation: () => string;
   };
+  channelSettings: {
+    title: () => string;
+    loadingSettings: () => string;
+    channelNotFound: () => string;
+    channelNotFoundDescription: () => string;
+    accessDenied: () => string;
+    accessDeniedDescription: () => string;
+    backToChannels: () => string;
+    backToChannel: () => string;
+    characters: () => string;
+    tabs: {
+      basicInfo: () => string;
+      images: () => string;
+      managers: () => string;
+      dangerZone: () => string;
+    };
+    images: {
+      title: () => string;
+      subtitle: () => string;
+      thumbnail: {
+        title: () => string;
+        profilePicture: () => string;
+        description: () => string;
+        requirements: {
+          maxFileSize: () => string;
+          supportedFormats: () => string;
+          squareImages: () => string;
+        };
+      };
+      banner: {
+        title: () => string;
+        bannerImage: () => string;
+        description: () => string;
+        requirements: {
+          maxFileSize: () => string;
+          supportedFormats: () => string;
+          aspectRatio: () => string;
+        };
+      };
+      preview: {
+        title: () => string;
+        description: () => string;
+        bannerPreview: () => string;
+        thumbnailPreview: () => string;
+      };
+    };
+    managers: {
+      title: () => string;
+      subtitle: () => string;
+      currentManagers: () => string;
+      inviteManager: () => string;
+      permissions: {
+        title: () => string;
+        uploadContent: () => string;
+        pinContent: () => string;
+        moderateComments: () => string;
+        editDescription: () => string;
+        cannotDelete: () => string;
+      };
+      invitations: () => string;
+      bestPractices: {
+        title: () => string;
+        inviteTrusted: () => string;
+        setExpectations: () => string;
+        reviewActivity: () => string;
+        trialPeriods: () => string;
+        communicateGoals: () => string;
+      };
+      statistics: {
+        title: () => string;
+        totalManagers: () => string;
+        channelContent: () => string;
+      };
+    };
+    dangerZone: {
+      title: () => string;
+      subtitle: () => string;
+      deleteChannel: {
+        title: () => string;
+        description: () => string;
+        willDelete: () => string;
+        allContent: () => string;
+        allSubscribers: () => string;
+        allComments: () => string;
+        allAnalytics: () => string;
+        allManagers: () => string;
+        confirmText: (channelName: string) => string;
+        confirmPlaceholder: (channelName: string) => string;
+        deleteForever: () => string;
+        deleting: () => string;
+        currentlyDisabled: () => string;
+      };
+      beforeDeleting: {
+        title: () => string;
+        transferOwnership: () => string;
+        downloadContent: () => string;
+        notifySubscribers: () => string;
+        removeLinks: () => string;
+      };
+    };
+  };
+  accessibility: {
+    goBack: () => string;
+  };
 };
 
 // 통합된 Common 번역 훅 - TypeScript 타입 안전성 보장
@@ -609,6 +714,7 @@ export const useCommonTranslation = (): CommonTranslations => {
       discoverChannels: () => t('ui.discoverChannels'),
       loading: () => t('ui.loading'),
       subscribers: () => t('ui.subscribers'),
+      followers: () => t('ui.followers'),
       posts: () => t('ui.posts'),
       items: () => t('ui.items'),
       status: () => t('ui.status'),
@@ -1001,6 +1107,114 @@ export const useCommonTranslation = (): CommonTranslations => {
       expiresIn: () => t('invitations.expiresIn'),
       sending: () => t('invitations.sending'),
       sendInvitation: () => t('invitations.sendInvitation'),
+    },
+    channelSettings: {
+      title: () => t('channelSettings.title'),
+      loadingSettings: () => t('channelSettings.loadingSettings'),
+      channelNotFound: () => t('channelSettings.channelNotFound'),
+      channelNotFoundDescription: () => t('channelSettings.channelNotFoundDescription'),
+      accessDenied: () => t('channelSettings.accessDenied'),
+      accessDeniedDescription: () => t('channelSettings.accessDeniedDescription'),
+      backToChannels: () => t('channelSettings.backToChannels'),
+      backToChannel: () => t('channelSettings.backToChannel'),
+      characters: () => t('channelSettings.characters'),
+      tabs: {
+        basicInfo: () => t('channelSettings.tabs.basicInfo'),
+        images: () => t('channelSettings.tabs.images'),
+        managers: () => t('channelSettings.tabs.managers'),
+        dangerZone: () => t('channelSettings.tabs.dangerZone'),
+      },
+      images: {
+        title: () => t('channelSettings.images.title'),
+        subtitle: () => t('channelSettings.images.subtitle'),
+        thumbnail: {
+          title: () => t('channelSettings.images.thumbnail.title'),
+          profilePicture: () => t('channelSettings.images.thumbnail.profilePicture'),
+          description: () => t('channelSettings.images.thumbnail.description'),
+          requirements: {
+            maxFileSize: () => t('channelSettings.images.thumbnail.requirements.maxFileSize'),
+            supportedFormats: () =>
+              t('channelSettings.images.thumbnail.requirements.supportedFormats'),
+            squareImages: () => t('channelSettings.images.thumbnail.requirements.squareImages'),
+          },
+        },
+        banner: {
+          title: () => t('channelSettings.images.banner.title'),
+          bannerImage: () => t('channelSettings.images.banner.bannerImage'),
+          description: () => t('channelSettings.images.banner.description'),
+          requirements: {
+            maxFileSize: () => t('channelSettings.images.banner.requirements.maxFileSize'),
+            supportedFormats: () =>
+              t('channelSettings.images.banner.requirements.supportedFormats'),
+            aspectRatio: () => t('channelSettings.images.banner.requirements.aspectRatio'),
+          },
+        },
+        preview: {
+          title: () => t('channelSettings.images.preview.title'),
+          description: () => t('channelSettings.images.preview.description'),
+          bannerPreview: () => t('channelSettings.images.preview.bannerPreview'),
+          thumbnailPreview: () => t('channelSettings.images.preview.thumbnailPreview'),
+        },
+      },
+      managers: {
+        title: () => t('channelSettings.managers.title'),
+        subtitle: () => t('channelSettings.managers.subtitle'),
+        currentManagers: () => t('channelSettings.managers.currentManagers'),
+        inviteManager: () => t('channelSettings.managers.inviteManager'),
+        permissions: {
+          title: () => t('channelSettings.managers.permissions.title'),
+          uploadContent: () => t('channelSettings.managers.permissions.uploadContent'),
+          pinContent: () => t('channelSettings.managers.permissions.pinContent'),
+          moderateComments: () => t('channelSettings.managers.permissions.moderateComments'),
+          editDescription: () => t('channelSettings.managers.permissions.editDescription'),
+          cannotDelete: () => t('channelSettings.managers.permissions.cannotDelete'),
+        },
+        invitations: () => t('channelSettings.managers.invitations'),
+        bestPractices: {
+          title: () => t('channelSettings.managers.bestPractices.title'),
+          inviteTrusted: () => t('channelSettings.managers.bestPractices.inviteTrusted'),
+          setExpectations: () => t('channelSettings.managers.bestPractices.setExpectations'),
+          reviewActivity: () => t('channelSettings.managers.bestPractices.reviewActivity'),
+          trialPeriods: () => t('channelSettings.managers.bestPractices.trialPeriods'),
+          communicateGoals: () => t('channelSettings.managers.bestPractices.communicateGoals'),
+        },
+        statistics: {
+          title: () => t('channelSettings.managers.statistics.title'),
+          totalManagers: () => t('channelSettings.managers.statistics.totalManagers'),
+          channelContent: () => t('channelSettings.managers.statistics.channelContent'),
+        },
+      },
+      dangerZone: {
+        title: () => t('channelSettings.dangerZone.title'),
+        subtitle: () => t('channelSettings.dangerZone.subtitle'),
+        deleteChannel: {
+          title: () => t('channelSettings.dangerZone.deleteChannel.title'),
+          description: () => t('channelSettings.dangerZone.deleteChannel.description'),
+          willDelete: () => t('channelSettings.dangerZone.deleteChannel.willDelete'),
+          allContent: () => t('channelSettings.dangerZone.deleteChannel.allContent'),
+          allSubscribers: () => t('channelSettings.dangerZone.deleteChannel.allSubscribers'),
+          allComments: () => t('channelSettings.dangerZone.deleteChannel.allComments'),
+          allAnalytics: () => t('channelSettings.dangerZone.deleteChannel.allAnalytics'),
+          allManagers: () => t('channelSettings.dangerZone.deleteChannel.allManagers'),
+          confirmText: (channelName: string) =>
+            t('channelSettings.dangerZone.deleteChannel.confirmText', { channelName }),
+          confirmPlaceholder: (channelName: string) =>
+            t('channelSettings.dangerZone.deleteChannel.confirmPlaceholder', { channelName }),
+          deleteForever: () => t('channelSettings.dangerZone.deleteChannel.deleteForever'),
+          deleting: () => t('channelSettings.dangerZone.deleteChannel.deleting'),
+          currentlyDisabled: () => t('channelSettings.dangerZone.deleteChannel.currentlyDisabled'),
+        },
+        beforeDeleting: {
+          title: () => t('channelSettings.dangerZone.beforeDeleting.title'),
+          transferOwnership: () => t('channelSettings.dangerZone.beforeDeleting.transferOwnership'),
+          downloadContent: () => t('channelSettings.dangerZone.beforeDeleting.downloadContent'),
+          notifySubscribers: () => t('channelSettings.dangerZone.beforeDeleting.notifySubscribers'),
+          removeLinks: () => t('channelSettings.dangerZone.beforeDeleting.removeLinks'),
+        },
+      },
+    },
+    accessibility: {
+      goBack: () => t('accessibility.goBack'),
     },
   };
 };

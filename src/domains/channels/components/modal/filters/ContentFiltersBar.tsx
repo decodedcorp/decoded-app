@@ -79,7 +79,7 @@ export const ContentFiltersBar = memo(function ContentFiltersBar({
   const activeFilterCount = selectedDataTypes.length + selectedCategories.length;
 
   return (
-    <div className="border-b border-zinc-700/30">
+    <div className="border-b border-zinc-700/30 mb-2">
       {/* Collapsed state - Filter toggle button */}
       {!isExpanded && (
         <div className="py-2">

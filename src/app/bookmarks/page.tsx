@@ -79,6 +79,11 @@ export default function BookmarksPage() {
     }
   };
 
+  const handleChannelClick = (channelId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    router.push(`/channels/${channelId}`);
+  };
+
   const loadMore = () => {
     if (bookmarksData?.has_more) {
       setOffset((prev) => prev + limit);
@@ -205,10 +210,29 @@ export default function BookmarksPage() {
                         {t.globalContentUpload.bookmarks.bookmarked()}{' '}
                         {formatDateByContext(bookmark.bookmark_created_at)}
                       </p>
-                      {bookmark.content?.channel_name && (
-                        <p className="text-xs text-zinc-500">
-                          {t.globalContentUpload.bookmarks.from()} {bookmark.content.channel_name}
-                        </p>
+                      {bookmark.content?.channel_name && bookmark.content?.channel_id && (
+                        <button
+                          onClick={(e) => handleChannelClick(bookmark.content!.channel_id, e)}
+                          className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors flex items-center space-x-1"
+                        >
+                          <span>
+                            {t.globalContentUpload.bookmarks.from()}{' '}
+                            {bookmark.content!.channel_name}
+                          </span>
+                          <svg
+                            className="w-3 h-3"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                            />
+                          </svg>
+                        </button>
                       )}
                     </div>
                   </div>

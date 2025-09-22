@@ -25,9 +25,9 @@ export function UserAvatar({ size = 'md', showDropdown = true }: UserAvatarProps
   const { t } = useLocale();
 
   const sizeClasses = {
-    sm: 'w-8 h-8 text-xs',
-    md: 'w-10 h-10 text-sm',
-    lg: 'w-12 h-12 text-base',
+    sm: 'w-6 h-6 text-xs',
+    md: 'w-8 h-8 text-xs sm:w-10 sm:h-10 sm:text-sm',
+    lg: 'w-10 h-10 text-sm sm:w-12 sm:h-12 sm:text-base',
   };
 
   // Close dropdown when clicking outside
@@ -112,7 +112,7 @@ export function UserAvatar({ size = 'md', showDropdown = true }: UserAvatarProps
         />
 
         {/* Online indicator */}
-        <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-[var(--color-background)] rounded-full" />
+        <span className="absolute bottom-0 right-0 w-2 h-2 sm:w-3 sm:h-3 bg-green-500 border-2 border-[var(--color-background)] rounded-full" />
       </button>
 
       {/* Dropdown Menu */}

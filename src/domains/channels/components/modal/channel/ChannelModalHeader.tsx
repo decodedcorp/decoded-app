@@ -226,7 +226,7 @@ export function ChannelModalHeader({
             {/* 가운데: 채널 정보 */}
             <div className="min-w-0 flex-1">
               {/* 채널 이름 */}
-              <h2 id="channel-modal-title" className="text-2xl font-bold text-white mb-2 truncate">
+              <h2 id="channel-modal-title" className="text-lg font-bold text-white mb-2 truncate">
                 {channel.name}
               </h2>
 
