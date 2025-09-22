@@ -110,13 +110,13 @@ export function ChannelSettingsLayout({ channel }: ChannelSettingsLayoutProps) {
   return (
     <div className="w-full">
       {/* Header */}
-      <div className="bg-surface-secondary border-b border-border-primary">
+      <div className="bg-surface2 border-b border-white/10">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <button
                 onClick={handleGoBack}
-                className="p-2 rounded-lg bg-surface-tertiary hover:bg-surface-secondary transition-colors"
+                className="p-2 rounded-lg bg-surface hover:bg-surface2 border border-white/5 hover:border-white/10 transition-colors"
                 aria-label={t.accessibility.goBack()}
               >
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
@@ -131,7 +131,7 @@ export function ChannelSettingsLayout({ channel }: ChannelSettingsLayoutProps) {
               </button>
               <div>
                 <h1 className="text-2xl font-bold text-primary">{t.channelSettings.title()}</h1>
-                <p className="text-secondary">{channel.name}</p>
+                <p className="text-muted">{channel.name}</p>
               </div>
             </div>
           </div>
@@ -150,10 +150,10 @@ export function ChannelSettingsLayout({ channel }: ChannelSettingsLayoutProps) {
                   disabled={tab.disabled}
                   className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-colors ${
                     tab.disabled
-                      ? 'bg-surface-tertiary text-zinc-600 cursor-not-allowed opacity-50'
+                      ? 'bg-surface text-muted cursor-not-allowed opacity-50'
                       : activeTab === tab.id
-                      ? 'bg-surface-secondary text-primary'
-                      : 'bg-surface-tertiary text-secondary hover:bg-surface-secondary'
+                      ? 'bg-surface2 text-primary border border-white/5'
+                      : 'bg-surface text-text hover:bg-surface2 hover:border-white/5'
                   }`}
                 >
                   {tab.icon}
@@ -165,7 +165,7 @@ export function ChannelSettingsLayout({ channel }: ChannelSettingsLayoutProps) {
 
           {/* Main Content */}
           <div className="lg:col-span-3">
-            <div className="bg-surface-secondary rounded-lg border border-border-primary p-6">
+            <div className="bg-surface2 rounded-lg border border-white/10 p-6">
               {renderActiveSection()}
             </div>
           </div>

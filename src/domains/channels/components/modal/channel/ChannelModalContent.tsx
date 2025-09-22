@@ -613,7 +613,7 @@ export const ChannelModalContent = React.memo<{
                   }
                 }}
                 disabled={isLoading || isRefreshing}
-                className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 disabled:bg-zinc-900 disabled:text-zinc-500 disabled:cursor-not-allowed text-gray-400 hover:text-white rounded-md transition-all duration-200 flex items-center space-x-1.5 border border-zinc-700 hover:border-zinc-600 text-sm"
+                className="px-1.5 py-1 md:px-3 md:py-1.5 bg-zinc-800 hover:bg-zinc-700 disabled:bg-zinc-900 disabled:text-zinc-500 disabled:cursor-not-allowed text-gray-400 hover:text-white rounded-md transition-all duration-200 flex items-center space-x-1 md:space-x-1.5 border border-zinc-700 hover:border-zinc-600 text-xs md:text-sm"
                 title={isLoading || isRefreshing ? t.status.loading() : t.actions.refresh()}
               >
                 <svg

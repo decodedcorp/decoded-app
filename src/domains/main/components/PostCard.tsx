@@ -353,7 +353,7 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
           <div className="flex gap-3">
             {/* 채널 썸네일 - 두 줄 높이 */}
             <button
-              className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity cursor-pointer overflow-hidden self-start"
+              className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity cursor-pointer overflow-hidden self-start"
               onClick={() => {
                 if (onChannelClick) {
                   onChannelClick(channelId, channel);

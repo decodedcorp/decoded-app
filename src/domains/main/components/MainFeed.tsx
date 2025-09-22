@@ -406,7 +406,7 @@ export const MainFeed = React.memo(function MainFeed() {
             </div>
 
             {/* 메타라인 */}
-            <div className="mb-4">
+            {/* <div className="mb-4">
               <div className="text-xs text-gray-500">
                 {t.feed.meta.line({
                   range: t.feed.filter.today(),
@@ -419,7 +419,7 @@ export const MainFeed = React.memo(function MainFeed() {
                   count: feedData.length,
                 })}
               </div>
-            </div>
+            </div> */}
 
             {/* 필터/서브 옵션 */}
             {/* <div className="flex items-center gap-3 text-sm">

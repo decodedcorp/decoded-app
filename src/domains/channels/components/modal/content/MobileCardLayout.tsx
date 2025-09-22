@@ -123,9 +123,9 @@ export function MobileCardLayout({ children, title, onClose, content }: MobileCa
                 {channelId && (
                   <div className="flex-shrink-0">
                     {isChannelLoading ? (
-                      <div className="w-12 h-12 bg-zinc-700/50 rounded-full animate-pulse" />
+                      <div className="w-10 h-10 bg-zinc-700/50 rounded-full animate-pulse" />
                     ) : (
-                      <div className="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden">
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden">
                         {channelData?.thumbnail_url ? (
                           <img
                             src={channelData.thumbnail_url}

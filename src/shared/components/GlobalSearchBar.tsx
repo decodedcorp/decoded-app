@@ -157,9 +157,9 @@ export function GlobalSearchBar({
     <div className={`w-full max-w-2xl ${className}`}>
       <form onSubmit={handleSubmit} className="relative">
         <div className="relative flex items-center bg-zinc-800/70 hover:bg-zinc-800/90 rounded-full border border-zinc-600/50 hover:border-zinc-500/50 focus-within:border-[#eafd66]/50 transition-all duration-200">
-          {/* 큰 검색 아이콘 - Reddit 스타일 */}
-          <div className="flex items-center justify-center w-12 h-12 text-zinc-400">
-            <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+          {/* 검색 아이콘 */}
+          <div className="flex items-center justify-center w-8 h-8 text-zinc-400">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
               <path
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 stroke="currentColor"
@@ -179,7 +179,7 @@ export function GlobalSearchBar({
             onBlur={handleInputBlur}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            className="flex-1 py-3 pr-4 bg-transparent text-white placeholder-zinc-400 focus:outline-none rounded-full"
+            className="flex-1 py-2 pr-3 bg-transparent text-white placeholder-zinc-400 focus:outline-none rounded-full text-sm"
             autoComplete="off"
             role="combobox"
             aria-expanded={isAutocompleteOpen}
@@ -196,10 +196,10 @@ export function GlobalSearchBar({
                 setIsAutocompleteOpen(false);
                 inputRef.current?.focus();
               }}
-              className="mr-3 p-1 text-zinc-400 hover:text-white transition-colors"
+              className="mr-2 p-1 text-zinc-400 hover:text-white transition-colors"
               aria-label={t.search.clearSearch()}
             >
-              <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
                 <path
                   d="M18 6L6 18M6 6l12 12"
                   stroke="currentColor"

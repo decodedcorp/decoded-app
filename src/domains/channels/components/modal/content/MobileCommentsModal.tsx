@@ -138,7 +138,7 @@ export function MobileCommentsModal({ isOpen, onClose, content }: MobileComments
               }}
               onMouseDown={(e) => e.stopPropagation()}
               onTouchStart={(e) => e.stopPropagation()}
-              className="flex items-center justify-center w-12 h-12 rounded-full bg-zinc-800/80 hover:bg-zinc-700/80 transition-all duration-200 group touch-manipulation active:scale-95"
+              className="flex items-center justify-center w-10 h-10 rounded-full bg-zinc-800/80 hover:bg-zinc-700/80 transition-all duration-200 group touch-manipulation active:scale-95"
               aria-label={t('comments.close')}
             >
               <MdClose className="w-6 h-6 text-zinc-300 group-hover:text-white" />

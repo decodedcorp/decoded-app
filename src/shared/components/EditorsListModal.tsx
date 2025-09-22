@@ -133,7 +133,7 @@ export function EditorsListModal({
                     <div className="flex items-center gap-4">
                       {/* Avatar */}
                       <div className="relative">
-                        <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-zinc-600 to-zinc-700">
+                        <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-zinc-600 to-zinc-700">
                           {editor.profile_image_url ? (
                             <img
                               src={editor.profile_image_url}

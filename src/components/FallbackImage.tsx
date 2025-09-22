@@ -49,12 +49,12 @@ const sizeConfig = {
   md: {
     container: 'w-12 h-12',
     icon: 'w-4 h-4',
-    text: 'text-sm',
+    text: 'text-xs',
   },
   lg: {
     container: 'w-16 h-16',
     icon: 'w-6 h-6',
-    text: 'text-base',
+    text: 'text-sm',
   },
   xl: {
     container: 'w-24 h-24',
@@ -131,7 +131,7 @@ export function FallbackImage({
         // 디자인 시스템 v3 토큰 사용
         'bg-[rgb(var(--color-surface-2))]',
         // 배너와 콘텐츠는 테두리 없음
-        type === 'banner' || type === 'content' ? '' : 'border border-transparent',
+        type === 'banner' || type === 'content' ? '' : 'border border-white/40',
         'text-[rgb(var(--color-muted))]',
 
         // 타입별 모양

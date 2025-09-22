@@ -32,7 +32,7 @@ export function SidebarItem({
     console.log('SidebarItem clicked:', { href, onClick, label });
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (onClick) {
       console.log('Calling onClick handler');
       onClick();
@@ -44,17 +44,17 @@ export function SidebarItem({
 
   const content = (
     <>
-      {icon && <span className="w-7 h-7 flex-shrink-0">{icon}</span>}
+      {icon && <span className="w-7 h-7 lg:w-7 lg:h-7 flex-shrink-0">{icon}</span>}
       <span className="flex-1 truncate">{label}</span>
       {count !== undefined && (
-        <span className="text-sm text-zinc-500">{count > 999 ? '999+' : count}</span>
+        <span className="text-sm lg:text-sm text-zinc-500">{count > 999 ? '999+' : count}</span>
       )}
     </>
   );
 
   const baseClasses = `
-    flex items-center gap-4 px-3 py-3 rounded-xl
-    text-base font-normal transition-all duration-200 cursor-pointer w-full text-left
+    flex items-center gap-3 lg:gap-4 px-3 py-2 lg:py-3 rounded-xl
+    text-sm lg:text-base font-normal transition-all duration-200 cursor-pointer w-full text-left
     ${isActive ? 'bg-zinc-900 text-white' : 'text-zinc-300 hover:bg-zinc-900/50 hover:text-white'}
     ${className}
   `;

@@ -157,10 +157,10 @@ export function RecommendedChannelsSidebar({
                       alt={`${channel.name} thumbnail`}
                       width={48}
                       height={48}
-                      className="w-12 h-12 rounded-full object-cover flex-shrink-0 group-hover:scale-105 transition-transform duration-200"
+                      className="w-10 h-10 rounded-full object-cover flex-shrink-0 group-hover:scale-105 transition-transform duration-200"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-gray-600 flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-gray-600 flex items-center justify-center flex-shrink-0">
                       <span className="text-white font-semibold text-lg">
                         {channel.name.charAt(0).toUpperCase()}
                       </span>

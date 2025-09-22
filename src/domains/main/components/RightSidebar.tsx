@@ -175,21 +175,21 @@ export function RightSidebar() {
     <div className="w-full h-full py-4 px-2 overflow-hidden flex flex-col bg-black">
       {/* 추천 채널 */}
       <div className="mb-4 flex-shrink-0">
-        <div className="text-white text-sm font-medium mb-3 flex items-center gap-2">
-          <Heart className="w-4 h-4" />
+        <div className="text-white text-xs lg:text-sm font-medium mb-2 lg:mb-3 flex items-center gap-2">
+          <Heart className="w-3 h-3 lg:w-4 lg:h-4" />
           {title}
         </div>
         <div className="space-y-2">
           {/* 로딩 상태 */}
           {recLoading || fallbackLoading ? (
-            <div className="space-y-2">
+            <div className="space-y-1 lg:space-y-2">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="p-3 border-b border-zinc-800 animate-pulse">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-zinc-700 rounded-lg flex-shrink-0"></div>
+                <div key={i} className="p-2 lg:p-3 border-b border-zinc-800 animate-pulse">
+                  <div className="flex items-center gap-2 lg:gap-3">
+                    <div className="w-8 h-8 lg:w-10 lg:h-10 bg-zinc-700 rounded-lg flex-shrink-0"></div>
                     <div className="flex-1 min-w-0">
-                      <div className="h-3 bg-zinc-700 rounded mb-1"></div>
-                      <div className="h-2 bg-zinc-700 rounded w-3/4"></div>
+                      <div className="h-2.5 lg:h-3 bg-zinc-700 rounded mb-1"></div>
+                      <div className="h-1.5 lg:h-2 bg-zinc-700 rounded w-3/4"></div>
                     </div>
                   </div>
                 </div>
@@ -197,12 +197,12 @@ export function RightSidebar() {
             </div>
           ) : /* 에러 상태 */
           recError && fallbackError ? (
-            <div className="text-xs text-red-400 p-3 border border-red-800 rounded">
+            <div className="text-[10px] lg:text-xs text-red-400 p-2 lg:p-3 border border-red-800 rounded">
               {t.globalContentUpload.sidebar.loadChannelsFailed()}
             </div>
           ) : /* 데이터 없음 */
           list.length === 0 ? (
-            <div className="text-xs text-gray-500">
+            <div className="text-[10px] lg:text-xs text-gray-500">
               {t.globalContentUpload.sidebar.noRecommendedChannels()}
             </div>
           ) : (
@@ -211,11 +211,11 @@ export function RightSidebar() {
               <Link
                 key={channel.id}
                 href={`/channels/${channel.id}`}
-                className="block p-3 border-b border-zinc-800 hover:border-zinc-700 cursor-pointer transition-colors last:border-b-0"
+                className="block p-2 lg:p-3 border-b border-zinc-800 hover:border-zinc-700 cursor-pointer transition-colors last:border-b-0"
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 lg:gap-3">
                   {/* 썸네일 */}
-                  <div className="flex-shrink-0 w-10 h-10 rounded-lg overflow-hidden bg-zinc-700">
+                  <div className="flex-shrink-0 w-8 h-8 lg:w-10 lg:h-10 rounded-lg overflow-hidden bg-zinc-700">
                     {channel.thumbnail_url ? (
                       <img
                         src={channel.thumbnail_url}
@@ -223,7 +223,7 @@ export function RightSidebar() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-zinc-400 text-xs font-medium">
+                      <div className="w-full h-full flex items-center justify-center text-zinc-400 text-[10px] lg:text-xs font-medium">
                         {channel.name.charAt(0).toUpperCase()}
                       </div>
                     )}
@@ -232,13 +232,17 @@ export function RightSidebar() {
                   {/* 채널 정보 */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
-                      <h3 className="text-white text-xs font-medium truncate">{channel.name}</h3>
-                      <span className="text-xs text-gray-500 ml-2 flex-shrink-0">#{index + 1}</span>
+                      <h3 className="text-white text-[10px] lg:text-xs font-medium truncate">
+                        {channel.name}
+                      </h3>
+                      <span className="text-[10px] lg:text-xs text-gray-500 ml-2 flex-shrink-0">
+                        #{index + 1}
+                      </span>
                     </div>
 
                     {/* 설명 */}
                     {channel.description && (
-                      <p className="text-xs text-gray-400 line-clamp-1 mb-1">
+                      <p className="text-[10px] lg:text-xs text-gray-400 line-clamp-1 mb-1">
                         {channel.description}
                       </p>
                     )}
@@ -246,7 +250,9 @@ export function RightSidebar() {
                     {/* 카테고리 */}
                     {'category' in channel && channel.category && (
                       <div className="mt-1">
-                        <span className="text-xs text-zinc-500">{channel.category}</span>
+                        <span className="text-[10px] lg:text-xs text-zinc-500">
+                          {channel.category}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -260,7 +266,7 @@ export function RightSidebar() {
       {/* Footer 섹션 - 하단에 고정 */}
       <div className="mt-auto flex-shrink-0">
         {/* 구분선 */}
-        <div className="h-px bg-zinc-700 mb-4"></div>
+        <div className="h-px bg-zinc-700 mb-2 lg:mb-4"></div>
 
         {/* 앱 다운로드 - 간소화 */}
         {/* <div className="mb-4">
@@ -294,7 +300,7 @@ export function RightSidebar() {
         </div> */}
 
         {/* 하단 링크들 - Reddit 스타일로 간소화 */}
-        <div className="text-xs text-gray-500 space-y-2">
+        <div className="text-[10px] lg:text-xs text-gray-500 space-y-1 lg:space-y-2">
           {/* <div className="grid grid-cols-2 gap-x-2 gap-y-1">
             <div className="cursor-pointer hover:text-gray-400">
               {t.globalContentUpload.sidebar.help()}
@@ -316,15 +322,15 @@ export function RightSidebar() {
             </div>
            </div> */}
 
-          <div className="pt-2 text-center">
+          <div className="pt-1 lg:pt-2 text-center">
             <ShinyText
               text={t.globalContentUpload.sidebar.brandSlogan()}
               disabled={false}
               speed={3}
-              className="text-[11px] font-medium"
+              className="text-[9px] lg:text-[11px] font-medium"
             />
           </div>
-          <div className="pt-1 text-gray-600 text-[10px] text-center">
+          <div className="pt-0.5 lg:pt-1 text-gray-600 text-[9px] lg:text-[10px] text-center">
             {t.globalContentUpload.sidebar.copyright()}
           </div>
         </div>

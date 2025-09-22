@@ -39,7 +39,7 @@ export default function ChannelSettingsPage() {
           <p className="text-zinc-400 mb-6">{t.channelSettings.channelNotFoundDescription()}</p>
           <button
             onClick={() => router.push('/channels')}
-            className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg transition-colors"
+            className="px-4 py-2 bg-surface hover:bg-surface-2 text-white rounded-lg border border-gray-700 transition-colors"
           >
             {t.channelSettings.backToChannels()}
           </button>
@@ -57,7 +57,7 @@ export default function ChannelSettingsPage() {
           <p className="text-zinc-400 mb-6">{t.channelSettings.accessDeniedDescription()}</p>
           <button
             onClick={() => router.push(`/channels/${channelId}`)}
-            className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg transition-colors"
+            className="px-4 py-2 bg-surface hover:bg-surface-2 text-white rounded-lg border border-gray-700 transition-colors"
           >
             {t.channelSettings.backToChannel()}
           </button>
