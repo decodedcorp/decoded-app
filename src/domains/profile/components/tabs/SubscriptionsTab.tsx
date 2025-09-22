@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import { useMySubscriptions } from '../../hooks/useProfileActivity';
 import { useProfileTranslation } from '@/lib/i18n/hooks';
 import { formatDistanceToNow } from 'date-fns';
+import { ThumbnailFallback } from '@/components/FallbackImage';
 
 export function SubscriptionsTab() {
   const router = useRouter();
@@ -94,7 +95,7 @@ export function SubscriptionsTab() {
     <div>
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-white">
-          {t.subscriptions.count(data?.total_count || 0)}
+          {t.subscriptions.count(data?.total_count ?? subscriptions.length)}
         </h2>
       </div>
 
@@ -106,21 +107,19 @@ export function SubscriptionsTab() {
             className="bg-zinc-900/50 rounded-xl p-4 border border-zinc-800 hover:bg-zinc-800/50 hover:border-zinc-600 cursor-pointer transition-all duration-200 group"
           >
             {/* Channel Thumbnail */}
-            <div className="w-full aspect-square bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg mb-3 overflow-hidden">
-              {subscription.channel_thumbnail_url ? (
-                <img
-                  src={subscription.channel_thumbnail_url}
-                  alt={subscription.channel_name || 'Channel'}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-3xl font-bold text-white">
-                    {subscription.channel_name?.substring(0, 2).toUpperCase() || '?'}
-                  </span>
-                </div>
-              )}
-            </div>
+            {subscription.channel_thumbnail_url ? (
+              <img
+                src={subscription.channel_thumbnail_url}
+                alt={subscription.channel_name || 'Channel'}
+                className="w-full aspect-square rounded-lg object-cover group-hover:scale-105 transition-transform duration-200 mb-3"
+              />
+            ) : (
+              <ThumbnailFallback className="w-full aspect-square rounded-lg mb-3">
+                <span className="text-3xl font-bold text-white">
+                  {subscription.channel_name?.substring(0, 2).toUpperCase() || '?'}
+                </span>
+              </ThumbnailFallback>
+            )}
 
             {/* Channel Info */}
             <h3 className="font-medium text-white line-clamp-1 mb-1">

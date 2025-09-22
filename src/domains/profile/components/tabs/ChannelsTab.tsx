@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import { useMyChannels } from '../../hooks/useProfileActivity';
 import { useProfileTranslation } from '@/lib/i18n/hooks';
 import { formatDistanceToNow } from 'date-fns';
+import { ThumbnailFallback } from '@/components/FallbackImage';
 
 export function ChannelsTab() {
   const router = useRouter();
@@ -110,19 +111,19 @@ export function ChannelsTab() {
           >
             {/* Channel Header */}
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center overflow-hidden">
-                {channel.thumbnail_url ? (
-                  <img
-                    src={channel.thumbnail_url}
-                    alt={channel.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
+              {channel.thumbnail_url ? (
+                <img
+                  src={channel.thumbnail_url}
+                  alt={channel.name}
+                  className="w-16 h-16 rounded-lg object-cover"
+                />
+              ) : (
+                <ThumbnailFallback size="lg" className="w-16 h-16">
                   <span className="text-xl font-bold text-white">
                     {channel.name.substring(0, 2).toUpperCase()}
                   </span>
-                )}
-              </div>
+                </ThumbnailFallback>
+              )}
               <div className="flex-1">
                 <h3 className="font-medium text-white line-clamp-1">{channel.name}</h3>
                 <p className="text-sm text-zinc-400">{t.channels.inactive()}</p>

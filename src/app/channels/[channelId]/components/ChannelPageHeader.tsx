@@ -27,8 +27,8 @@ function TagRow({ tags, mobileLimit = 3 }: { tags: string[]; mobileLimit?: numbe
           {tags.slice(0, visible).map((t, i) => (
             <span
               key={i}
-              className="px-2 py-1 bg-zinc-600/30 text-zinc-300 text-xs rounded-full border border-zinc-500/30
-                         max-w-[40vw] truncate"
+              className={`px-2 py-1 bg-zinc-600/30 text-xs rounded-full border border-zinc-500/30
+                         max-w-[40vw] truncate ${i === 0 ? 'text-[#eafd66]' : 'text-zinc-300'}`}
               title={t}
             >
               {t}
@@ -52,8 +52,8 @@ function TagRow({ tags, mobileLimit = 3 }: { tags: string[]; mobileLimit?: numbe
           {tags.map((t, i) => (
             <span
               key={i}
-              className="px-2 py-1 bg-zinc-600/30 text-zinc-300 text-xs rounded-full border border-zinc-500/30
-                         max-w-[12rem] truncate"
+              className={`px-2 py-1 bg-zinc-600/30 text-xs rounded-full border border-zinc-500/30
+                         max-w-[12rem] truncate ${i === 0 ? 'text-[#eafd66]' : 'text-zinc-300'}`}
               title={t}
             >
               {t}
@@ -221,7 +221,7 @@ export function ChannelPageHeader({
               {(isOwner || channel.is_manager) && (
                 <button
                   onClick={handleAddContent}
-                  className="inline-flex items-center justify-center rounded-full px-3 py-2 text-sm bg-zinc-700 hover:bg-zinc-600 text-white transition-colors"
+                  className="inline-flex items-center justify-center rounded-full bg-zinc-700 hover:bg-zinc-600 text-white transition-colors px-3 py-2 text-sm sm:px-3 sm:py-2 sm:text-sm w-8 h-8 sm:w-auto sm:h-auto"
                 >
                   <span className="hidden sm:inline">+ {t.create.createNewContent()}</span>
                   <span className="sm:hidden">+</span>

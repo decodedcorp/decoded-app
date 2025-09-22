@@ -3,6 +3,7 @@ import { useBookmarks, useBookmarkMutations } from '@/domains/bookmarks/hooks/us
 import { useContentModalStore } from '@/store/contentModalStore';
 import { useProfileTranslation } from '@/lib/i18n/hooks';
 import { formatDateByContext } from '@/lib/utils/dateUtils';
+import { ThumbnailFallback } from '@/components/FallbackImage';
 
 export function BookmarksTab() {
   const openContentModal = useContentModalStore((state) => state.openModal);
@@ -104,7 +105,7 @@ export function BookmarksTab() {
     <div>
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-white">
-          {t.bookmarks.count(data?.total_count || 0)}
+          {t.bookmarks.count(data?.total_count ?? bookmarks.length)}
         </h2>
       </div>
 
@@ -117,31 +118,15 @@ export function BookmarksTab() {
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center overflow-hidden">
-                  {bookmark.content?.thumbnail_url || bookmark.content?.link_preview_img_url ? (
-                    <img
-                      src={
-                        (bookmark.content.thumbnail_url || bookmark.content.link_preview_img_url)!
-                      }
-                      alt="Content thumbnail"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <svg
-                      className="w-8 h-8 text-white"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      />
-                    </svg>
-                  )}
-                </div>
+                {bookmark.content?.thumbnail_url || bookmark.content?.link_preview_img_url ? (
+                  <img
+                    src={(bookmark.content.thumbnail_url || bookmark.content.link_preview_img_url)!}
+                    alt="Content thumbnail"
+                    className="w-16 h-16 rounded-lg object-cover"
+                  />
+                ) : (
+                  <ThumbnailFallback size="lg" className="w-16 h-16" />
+                )}
 
                 <div>
                   <h3 className="font-medium text-white">
