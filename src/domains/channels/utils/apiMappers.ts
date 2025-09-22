@@ -1,5 +1,5 @@
 import { ChannelResponse } from '@/api/generated';
-import { formatDateByContext } from '@/lib/utils/dateUtils';
+// import { formatDateByContext } from '@/lib/utils/dateUtils'; // 유틸리티 함수에서는 훅 사용 불가
 
 import { MasonryItem, Editor } from '../types/masonry';
 
@@ -22,7 +22,7 @@ export const mapChannelToMasonryItem = (channel: ChannelResponse): MasonryItem =
     imageUrl: channel.thumbnail_url || undefined,
     category: 'default', // TODO: API에서 카테고리 정보 추가 필요
     editors: [], // TODO: 채널별 기여자 API 추가 필요
-    date: formatDateByContext(channel.created_at || new Date().toISOString(), 'card'),
+    date: channel.created_at || new Date().toISOString(), // 날짜 포맷팅은 컴포넌트에서 처리
     isNew,
     isHot,
     channelId: channel.id, // 실제 채널 ID 추가

@@ -50,13 +50,27 @@ export function normalizeTrendingItem(
     }
   };
 
+  const createdAt = (item as any).created_at || new Date().toISOString();
+
+  // 디버깅 로그
+  if (process.env.NODE_ENV === 'development') {
+    console.log('normalizeTrendingItem:', {
+      itemId: item.id,
+      title: getDisplayTitle(),
+      originalCreatedAt: (item as any).created_at,
+      normalizedCreatedAt: createdAt,
+      hasCreatedAt: !!(item as any).created_at,
+      itemKeys: Object.keys(item),
+    });
+  }
+
   return {
     id: item.id,
     title: getDisplayTitle(),
     description: item.description || undefined,
     imageUrl,
     linkUrl: item.url || undefined,
-    createdAt: (item as any).created_at || new Date().toISOString(), // Use actual timestamp if available
+    createdAt, // Use actual timestamp if available
     channelId: item.channel_id,
     channelName: item.channel_name,
     providerId: item.provider_id,
@@ -102,13 +116,27 @@ export function normalizeContentItem(item: Record<string, any>): FeedItem {
     }
   };
 
+  const createdAt = item.created_at || new Date().toISOString();
+
+  // 디버깅 로그
+  if (process.env.NODE_ENV === 'development') {
+    console.log('normalizeContentItem:', {
+      itemId: item.id,
+      title: getDisplayTitle(),
+      originalCreatedAt: item.created_at,
+      normalizedCreatedAt: createdAt,
+      hasCreatedAt: !!item.created_at,
+      itemKeys: Object.keys(item),
+    });
+  }
+
   const normalized = {
     id: item.id || Date.now().toString(),
     title: getDisplayTitle(),
     description: item.description || item.link_preview_metadata?.description || undefined,
     imageUrl,
     linkUrl: item.url || undefined,
-    createdAt: item.created_at || new Date().toISOString(),
+    createdAt,
     channelId: item.channel_id,
     channelName: item.channel_name,
     providerId: item.provider_id,

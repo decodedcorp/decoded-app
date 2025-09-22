@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { Avatar } from '@decoded/ui';
 import { useAuthStatus } from '@/domains/auth/hooks/useAuth';
 import { LoginModal } from '@/domains/auth/components/LoginModal';
+import { useDateFormatters } from '@/lib/utils/dateUtils';
 
 import { SummarySection } from './SummarySection';
 import { InteractiveQASection } from './InteractiveQASection';
@@ -73,6 +74,7 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
   const { addBookmark, removeBookmark, isLoading: isBookmarkLoading } = useBookmark(contentId);
   const isAuthenticated = useAuthStatus();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const { formatDateByContext } = useDateFormatters();
 
   // Get user profile using author field (which contains the user ID)
   const authorId = content.author;
@@ -97,30 +99,6 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
   // Translation hooks
   const { t } = useTranslation('content');
   const { actions, time } = useCommonTranslation();
-
-  // Format date function (same as CommentItem)
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffHours < 1) {
-      const diffMinutes = Math.floor(diffMs / (1000 * 60));
-      return diffMinutes <= 0 ? '방금 전' : `${diffMinutes}분 전`;
-    } else if (diffHours < 24) {
-      return `${diffHours}시간 전`;
-    } else if (diffDays < 7) {
-      return `${diffDays}일 전`;
-    } else {
-      return date.toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-      });
-    }
-  };
 
   // Add shimmer animation styles
   React.useEffect(() => {
@@ -329,7 +307,7 @@ export function ContentSidebar({ content, onClose }: ContentSidebarProps) {
                         {content.date && (
                           <>
                             <span>•</span>
-                            <span>{formatDate(content.date)}</span>
+                            <span>{formatDateByContext(content.date, 'list')}</span>
                           </>
                         )}
                       </div>

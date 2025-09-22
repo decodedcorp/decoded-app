@@ -3,10 +3,14 @@
 import React from 'react';
 
 import { Button } from '@decoded/ui';
-import { formatDateByContext } from '@/lib/utils/dateUtils';
+import { useDateFormatters } from '@/lib/utils/dateUtils';
 import type { InvitationResponse } from '@/api/generated/models/InvitationResponse';
 
-import { useAcceptInvitation, useRejectInvitation, useCancelInvitation } from '../hooks/useInvitations';
+import {
+  useAcceptInvitation,
+  useRejectInvitation,
+  useCancelInvitation,
+} from '../hooks/useInvitations';
 
 interface InvitationCardProps {
   invitation: InvitationResponse;
@@ -17,6 +21,7 @@ export function InvitationCard({ invitation, type }: InvitationCardProps) {
   const acceptMutation = useAcceptInvitation();
   const rejectMutation = useRejectInvitation();
   const cancelMutation = useCancelInvitation();
+  const { formatDateByContext } = useDateFormatters();
 
   const handleAccept = () => {
     acceptMutation.mutate(invitation.id);
@@ -31,17 +36,25 @@ export function InvitationCard({ invitation, type }: InvitationCardProps) {
   };
 
   const isExpired = invitation.is_expired;
-  const isPending = acceptMutation.isPending || rejectMutation.isPending || cancelMutation.isPending;
+  const isPending =
+    acceptMutation.isPending || rejectMutation.isPending || cancelMutation.isPending;
 
   return (
-    <div className={`bg-zinc-800/50 rounded-lg border p-4 ${isExpired ? 'border-red-600/30 bg-red-900/10' : 'border-zinc-700'}`}>
+    <div
+      className={`bg-zinc-800/50 rounded-lg border p-4 ${
+        isExpired ? 'border-red-600/30 bg-red-900/10' : 'border-zinc-700'
+      }`}
+    >
       <div className="flex items-start justify-between">
         <div className="flex items-start space-x-3">
           {/* User Avatar */}
           <div className="w-10 h-10 rounded-full bg-zinc-700 overflow-hidden">
             {(type === 'sent' ? invitation.invitee : invitation.inviter)?.profile_image_url && (
               <img
-                src={(type === 'sent' ? invitation.invitee : invitation.inviter)?.profile_image_url || ''}
+                src={
+                  (type === 'sent' ? invitation.invitee : invitation.inviter)?.profile_image_url ||
+                  ''
+                }
                 alt="User avatar"
                 className="w-full h-full object-cover"
               />
@@ -54,17 +67,17 @@ export function InvitationCard({ invitation, type }: InvitationCardProps) {
               <h3 className="font-medium text-white">
                 {type === 'sent' ? invitation.invitee?.aka : invitation.inviter?.aka}
               </h3>
-              <span className={`px-2 py-1 text-xs rounded-full ${
-                isExpired 
-                  ? 'bg-red-600/20 text-red-400' 
-                  : 'bg-primary/20 text-primary'
-              }`}>
+              <span
+                className={`px-2 py-1 text-xs rounded-full ${
+                  isExpired ? 'bg-red-600/20 text-red-400' : 'bg-primary/20 text-primary'
+                }`}
+              >
                 {isExpired ? 'Expired' : 'Pending'}
               </span>
             </div>
-            
+
             <p className="text-sm text-zinc-400 mb-2">
-              {type === 'sent' 
+              {type === 'sent'
                 ? `Invited to manage your channel`
                 : `Invited you to manage their channel`}
             </p>
@@ -88,32 +101,17 @@ export function InvitationCard({ invitation, type }: InvitationCardProps) {
         <div className="flex items-center space-x-2">
           {type === 'received' && !isExpired && (
             <>
-              <Button
-                onClick={handleAccept}
-                disabled={isPending}
-                variant="primary"
-                size="sm"
-              >
+              <Button onClick={handleAccept} disabled={isPending} variant="primary" size="sm">
                 Accept
               </Button>
-              <Button
-                onClick={handleReject}
-                disabled={isPending}
-                variant="destructive"
-                size="sm"
-              >
+              <Button onClick={handleReject} disabled={isPending} variant="destructive" size="sm">
                 Reject
               </Button>
             </>
           )}
-          
+
           {type === 'sent' && !isExpired && (
-            <Button
-              onClick={handleCancel}
-              disabled={isPending}
-              variant="secondary"
-              size="sm"
-            >
+            <Button onClick={handleCancel} disabled={isPending} variant="secondary" size="sm">
               Cancel
             </Button>
           )}

@@ -305,6 +305,7 @@ export const MainFeed = React.memo(function MainFeed() {
       author: item.providerName || 'anonymous',
       authorId: item.providerId || 'anonymous',
       timeAgo: 'Recent', // 간단한 시간 표시
+      createdAt: item.createdAt || new Date().toISOString(), // PostCard에서 사용할 createdAt 추가
       pins: item.metadata?.pins || 0,
       comments: item.metadata?.comments || 0,
       thumbnail,
@@ -317,6 +318,9 @@ export const MainFeed = React.memo(function MainFeed() {
       console.log('transformFeedItem:', {
         itemId: item.id,
         title: item.title,
+        originalCreatedAt: item.createdAt,
+        transformedCreatedAt: transformed.createdAt,
+        createdAtType: typeof item.createdAt,
         metadata: item.metadata,
         comments: transformed.comments,
         pins: transformed.pins,
@@ -495,7 +499,7 @@ export const MainFeed = React.memo(function MainFeed() {
                               authorId={post.authorId}
                               userAvatar={userAvatars[item.providerId || '']}
                               userAka={userAkas[item.providerId || '']}
-                              timeAgo={post.timeAgo}
+                              createdAt={post.createdAt}
                               pins={post.pins}
                               comments={post.comments}
                               thumbnail={post.thumbnail}

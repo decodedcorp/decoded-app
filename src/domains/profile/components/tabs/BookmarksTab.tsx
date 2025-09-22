@@ -3,7 +3,7 @@ import { useBookmarks, useBookmarkMutations } from '@/domains/bookmarks/hooks/us
 import { useContentModalStore } from '@/store/contentModalStore';
 import { useProfileTranslation } from '@/lib/i18n/hooks';
 import { useTranslation } from 'react-i18next';
-import { formatDateByContext } from '@/lib/utils/dateUtils';
+import { useDateFormatters } from '@/lib/utils/dateUtils';
 import { ThumbnailFallback } from '@/components/FallbackImage';
 import { BookmarksTabSkeleton } from '@/shared/components/loading/BookmarksTabSkeleton';
 
@@ -11,6 +11,7 @@ export function BookmarksTab() {
   const openContentModal = useContentModalStore((state) => state.openModal);
   const t = useProfileTranslation();
   const { t: rawT } = useTranslation('profile');
+  const { formatDateByContext } = useDateFormatters();
   const [offset, setOffset] = useState(0);
   const limit = 20;
 

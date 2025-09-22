@@ -702,7 +702,7 @@ export const ChannelModalContent = React.memo<{
                       channel_id: channelId,
                       date: contentItem.date || channelData?.created_at || new Date().toISOString(),
                     };
-                    
+
                     console.log('🎯 [ChannelModalContent] Content clicked with author info:', {
                       contentId: contentWithAuthor.id,
                       title: contentWithAuthor.title,
@@ -711,7 +711,7 @@ export const ChannelModalContent = React.memo<{
                       channel_id: contentWithAuthor.channel_id,
                       date: contentWithAuthor.date,
                     });
-                    
+
                     // Zustand store를 사용해서 모달 열기
                     const { openModal } = useContentModalStore.getState();
                     openModal(contentWithAuthor, channelId);

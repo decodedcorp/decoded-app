@@ -133,7 +133,7 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
   const authorId = content.provider_id || content.author;
   const channelId = content.channel_id;
   const contentDate = content.date;
-  
+
   // Debug logging for author info
   console.log('🎯 [ContentModalBody] Author info debug:', {
     contentId: content.id,

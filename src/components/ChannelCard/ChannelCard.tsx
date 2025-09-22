@@ -227,7 +227,15 @@ export const ChannelCard = memo(
       if (masonry?.onItemClick && masonry.item) {
         masonry.onItemClick(masonry.item);
       } else if (onCardClick) {
-        onCardClick(channel);
+        // 작가 정보를 포함한 채널 데이터 전달
+        const channelWithAuthor = {
+          ...channel,
+          // ChannelResponse인 경우 owner_id를 provider_id로 매핑
+          provider_id: isChannelResponse ? channel.owner_id : channel.managers?.[0]?.id,
+          // 작성 시간 정보 추가
+          date: isChannelResponse ? channel.created_at : new Date().toISOString(),
+        };
+        onCardClick(channelWithAuthor);
       }
     };
 

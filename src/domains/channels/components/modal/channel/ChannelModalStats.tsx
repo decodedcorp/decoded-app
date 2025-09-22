@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { ChannelData } from '@/store/channelModalStore';
-import { formatDateByContext } from '@/lib/utils/dateUtils';
+import { useDateFormatters } from '@/lib/utils/dateUtils';
 import { ChannelEditorsStackedAvatars } from '@/shared/components/ChannelEditorsStackedAvatars';
 import { EditorsListModal } from '@/shared/components/EditorsListModal';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
@@ -13,6 +13,7 @@ interface ChannelModalStatsProps {
 export function ChannelModalStats({ channel }: ChannelModalStatsProps) {
   const [isEditorsModalOpen, setIsEditorsModalOpen] = useState(false);
   const t = useCommonTranslation();
+  const { formatDateByContext } = useDateFormatters();
 
   return (
     <div className="mb-8">

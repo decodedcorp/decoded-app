@@ -6,11 +6,13 @@ import { useRouter } from 'next/navigation';
 import { Camera, Video, Link as LinkIcon, FileText, Bookmark, BookmarkCheck } from 'lucide-react';
 import { CardMediaWithFallback } from '@/components/CardMedia/CardMedia';
 import { usePostCardTranslation } from '@/lib/i18n/hooks';
+import { useTranslation } from 'react-i18next';
 import { useBookmarkStatus, useBookmark } from '@/domains/users/hooks/useBookmark';
 import { useAuthStatus } from '@/domains/auth/hooks/useAuth';
 import { LoginModal } from '@/domains/auth/components/LoginModal';
 import { useCommentsModal } from '@/hooks/useCommentsModal';
 import { useChannel } from '@/domains/channels/hooks/useChannels';
+import { useDateFormatters } from '@/lib/utils/dateUtils';
 // import { useCommentStats } from '@/domains/comments/hooks/useComments';
 // import { useTogglePin } from '@/domains/channels/hooks/useChannelPins';
 // import { useBookmark } from '@/domains/users/hooks/useBookmark';
@@ -31,7 +33,7 @@ export interface PostCardProps {
   authorId: string;
   userAvatar?: string | null;
   userAka?: string | null;
-  timeAgo: string;
+  createdAt: string | Date; // ISO string or Date object
   pins: number;
   comments: number;
   thumbnail?: string | null;
@@ -121,7 +123,7 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
   authorId,
   userAvatar,
   userAka,
-  timeAgo,
+  createdAt,
   pins,
   comments,
   thumbnail,
@@ -143,6 +145,19 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
 }: PostCardProps) {
   const router = useRouter();
   const { actions, contentType: contentTypeLabels, accessibility } = usePostCardTranslation();
+  const { t } = useTranslation('common');
+  const { formatDateByContext } = useDateFormatters();
+
+  // 디버깅 로그
+  if (process.env.NODE_ENV === 'development') {
+    console.log('PostCard date debug:', {
+      title,
+      createdAt,
+      createdAtType: typeof createdAt,
+      formattedTime: formatDateByContext(createdAt, 'list'),
+    });
+  }
+
   // const { open: openComments } = useCommentsModal();
 
   // 북마크 관련 상태 및 훅
@@ -203,24 +218,6 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
   // const actualIsLiked = propIsLiked ?? isLiked;
   // const actualLikeCount = propLikeCount ?? likeCount;
   // const actualCommentCount = comments ?? commentStats?.total_comments ?? 0;
-
-  // 디버깅을 위한 로그
-  if (process.env.NODE_ENV === 'development') {
-    console.log('PostCard render:', {
-      title,
-      thumbnail,
-      contentType,
-      hasThumbnail: !!thumbnail,
-      thumbnailType: typeof thumbnail,
-      contentId,
-      comments,
-      pins,
-      // actualIsPinned,
-      // actualIsBookmarked,
-      // actualIsLiked,
-      // actualLikeCount,
-    });
-  }
 
   const getContentIcon = () => {
     switch (contentType) {
@@ -354,7 +351,7 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
       {/* 배지 - 카드 오른쪽 상단 */}
       {badge && (
         <div className="absolute top-3 right-3 bg-[#eafd66] text-black text-xs font-bold px-2 py-1 rounded-full shadow-lg z-10">
-          {badge}
+          {t(`badges.${badge}`, badge)}
         </div>
       )}
       <div className="p-2 md:p-4">
@@ -417,9 +414,9 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
 
               {/* 두 번째 줄: 작성자와 시간 (항상 나란히 배치) */}
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-2">
                   {/* 유저 아바타 */}
-                  <div className="w-4 h-4 rounded-full overflow-hidden flex-shrink-0">
+                  <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0">
                     {userAvatar ? (
                       <img
                         src={userAvatar}
@@ -439,13 +436,13 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
                         userAvatar ? 'hidden' : 'flex'
                       }`}
                     >
-                      <span className="text-zinc-300 text-xs font-medium">
+                      <span className="text-zinc-300 text-sm font-medium">
                         {author.charAt(0).toUpperCase()}
                       </span>
                     </div>
                   </div>
                   <button
-                    className="hover:text-zinc-300 transition-colors cursor-pointer text-left"
+                    className="hover:text-zinc-300 transition-colors cursor-pointer text-left text-sm font-medium"
                     onClick={() => {
                       if (onAuthorClick) {
                         onAuthorClick(authorId, author);
@@ -460,8 +457,8 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
                 </div>
 
                 {/* 구분자와 시간 */}
-                <span className="text-zinc-600">•</span>
-                <span>{timeAgo}</span>
+                {/* <span className="text-zinc-600">•</span>
+                <span>{formatDateByContext(createdAt, 'list')}</span> */}
               </div>
             </div>
           </div>

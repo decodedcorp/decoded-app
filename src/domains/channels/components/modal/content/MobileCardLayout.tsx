@@ -8,6 +8,7 @@ import { useChannel } from '@/domains/channels/hooks/useChannels';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
 import { useTranslation } from 'react-i18next';
 import { ContentItem } from '@/lib/types/content';
+import { useDateFormatters } from '@/lib/utils/dateUtils';
 
 interface MobileCardLayoutProps {
   children: React.ReactNode;
@@ -29,6 +30,7 @@ export function MobileCardLayout({ children, title, onClose, content }: MobileCa
   // Translation hooks
   const { t } = useTranslation('content');
   const { time } = useCommonTranslation();
+  const { formatDateByContext } = useDateFormatters();
 
   // Get user profile using provider_id field (which contains the user ID)
   // Try provider_id first, then author as fallback
@@ -73,51 +75,6 @@ export function MobileCardLayout({ children, title, onClose, content }: MobileCa
         }
       : null,
   });
-
-  // Simple and intuitive date formatting
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInMs = now.getTime() - date.getTime();
-    const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
-    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
-
-    // Invalid date
-    if (isNaN(date.getTime())) {
-      return 'Unknown';
-    }
-
-    // Same day
-    if (diffInDays === 0) {
-      if (diffInMinutes < 1) return 'Just now';
-      if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-      return 'Today';
-    }
-
-    // Yesterday
-    if (diffInDays === 1) {
-      return 'Yesterday';
-    }
-
-    // This week
-    if (diffInDays < 7) {
-      return 'This week';
-    }
-
-    // This month
-    if (diffInDays < 30) {
-      return 'This month';
-    }
-
-    // Recent (within 3 months)
-    if (diffInDays < 90) {
-      return 'Recent';
-    }
-
-    // Older
-    return 'Older';
-  };
 
   return (
     <div className="bg-zinc-900 rounded-none border-none shadow-2xl h-full w-full flex flex-col">
@@ -225,7 +182,7 @@ export function MobileCardLayout({ children, title, onClose, content }: MobileCa
                       {content.date && (
                         <>
                           <span>•</span>
-                          <span>{formatDate(content.date)}</span>
+                          <span>{formatDateByContext(content.date, 'list')}</span>
                         </>
                       )}
                     </div>
