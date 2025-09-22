@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, memo, useMemo, useCallback } from 'react';
+import { useEffect, useState, memo, useMemo, useCallback, useRef } from 'react';
 
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -30,6 +30,7 @@ export const Header = memo(function Header() {
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const mobileSearchRef = useRef<HTMLDivElement>(null);
 
   // Get auth state - 개별적으로 구독하여 무한 루프 방지
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -98,11 +99,36 @@ export const Header = memo(function Header() {
         // 3초 후 자동으로 포커스 상태 해제
         setTimeout(() => setIsFocused(false), 3000);
       }
+
+      // ESC 키로 모바일 검색 닫기
+      if (event.key === 'Escape' && isMobileSearchOpen) {
+        setIsMobileSearchOpen(false);
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isChannelPage]);
+  }, [isChannelPage, isMobileSearchOpen]);
+
+  // 외부 클릭으로 모바일 검색 닫기
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isMobileSearchOpen &&
+        mobileSearchRef.current &&
+        !mobileSearchRef.current.contains(event.target as Node)
+      ) {
+        setIsMobileSearchOpen(false);
+      }
+    };
+
+    if (isMobileSearchOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [isMobileSearchOpen]);
 
   // 헤더 항상 표시 - 고정 헤더
   const shouldShowHeader = true;
@@ -223,31 +249,33 @@ export const Header = memo(function Header() {
       {/* Mobile Search Overlay */}
       {isMobileSearchOpen && (
         <div
-          className="fixed top-[56px] sm:top-[60px] md:top-[72px] left-0 right-0 bg-black border-b border-zinc-700 py-3 md:hidden"
-          style={{ zIndex: 'var(--z-overlay)', paddingInline: 'var(--edge-x)' }}
+          ref={mobileSearchRef}
+          className="fixed top-[56px] sm:top-[60px] md:top-[72px] left-0 right-0 bottom-0 bg-black md:hidden"
+          style={{ zIndex: 'var(--z-overlay)' }}
         >
-          {/* Grab handle */}
-          <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-white/15" />
-          <div className="flex items-center gap-3">
-            <div className="flex-1">
-              {isChannelPage && channelName ? (
-                <ChannelSearchBar
-                  channelId={channelId || ''}
-                  channelName={channelName}
-                  onSearch={(query) => {
-                    handleChannelSearch(query);
-                    setIsMobileSearchOpen(false);
-                  }}
-                  onClearChannel={handleClearChannel}
-                />
-              ) : (
-                <GlobalSearchBar
-                  onSearch={(query) => {
-                    handleGlobalSearch(query);
-                    setIsMobileSearchOpen(false);
-                  }}
-                />
-              )}
+          {/* Search panel */}
+          <div
+            className="bg-black border-b border-zinc-700 py-3"
+            style={{ paddingInline: 'var(--edge-x)' }}
+          >
+            {/* Grab handle */}
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                {isChannelPage && channelName ? (
+                  <ChannelSearchBar
+                    channelId={channelId || ''}
+                    channelName={channelName}
+                    onSearch={handleChannelSearch}
+                    onSearchComplete={() => setIsMobileSearchOpen(false)}
+                    onClearChannel={handleClearChannel}
+                  />
+                ) : (
+                  <GlobalSearchBar
+                    onSearch={handleGlobalSearch}
+                    onSearchComplete={() => setIsMobileSearchOpen(false)}
+                  />
+                )}
+              </div>
             </div>
           </div>
         </div>

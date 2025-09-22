@@ -12,6 +12,7 @@ interface ChannelSearchBarProps {
   channelId: string;
   channelName: string;
   onSearch?: (query: string) => void;
+  onSearchComplete?: () => void;
   onClearChannel?: () => void;
   className?: string;
 }
@@ -20,6 +21,7 @@ export function ChannelSearchBar({
   channelId,
   channelName,
   onSearch,
+  onSearchComplete,
   onClearChannel,
   className = '',
 }: ChannelSearchBarProps) {
@@ -62,6 +64,7 @@ export function ChannelSearchBar({
         router.push(`/channels/${currentChannelId}/search?q=${encodeURIComponent(query.trim())}`);
       }
       setIsAutocompleteOpen(false);
+      onSearchComplete?.();
     }
   };
 
@@ -146,7 +149,22 @@ export function ChannelSearchBar({
           // This would need the actual results array
           return;
         }
-        handleSubmit(e);
+        if (query.trim()) {
+          if (onSearch) {
+            onSearch(query.trim());
+          } else {
+            // Default behavior - navigate to channel search results
+            const currentPath = window.location.pathname;
+            const channelMatch = currentPath.match(/\/channels\/([^\/]+)/);
+            const currentChannelId = channelMatch?.[1] || channelId;
+
+            router.push(
+              `/channels/${currentChannelId}/search?q=${encodeURIComponent(query.trim())}`,
+            );
+          }
+          setIsAutocompleteOpen(false);
+          onSearchComplete?.();
+        }
         break;
     }
   };

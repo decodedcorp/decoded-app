@@ -9,12 +9,14 @@ import { SearchAutocomplete, type AutocompleteItem } from '../../domains/search'
 
 interface GlobalSearchBarProps {
   onSearch?: (query: string) => void;
+  onSearchComplete?: () => void;
   className?: string;
   defaultValue?: string;
 }
 
 export function GlobalSearchBar({
   onSearch,
+  onSearchComplete,
   className = '',
   defaultValue = '',
 }: GlobalSearchBarProps) {
@@ -43,6 +45,7 @@ export function GlobalSearchBar({
         router.push(`/search?q=${encodeURIComponent(query.trim())}`);
       }
       setIsAutocompleteOpen(false);
+      onSearchComplete?.();
     }
   };
 
@@ -130,6 +133,7 @@ export function GlobalSearchBar({
             router.push(`/search?q=${encodeURIComponent(query.trim())}`);
           }
           setIsAutocompleteOpen(false);
+          onSearchComplete?.();
         }
         break;
     }
