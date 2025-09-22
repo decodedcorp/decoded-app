@@ -97,7 +97,7 @@ export function UserAvatar({ size = 'md', showDropdown = true }: UserAvatarProps
         onClick={() => showDropdown && setIsDropdownOpen(!isDropdownOpen)}
         className={`
           ${sizeClasses[size]}
-          relative transition-all duration-200 rounded-full
+          relative transition-all duration-200 rounded-full border border-white/10
           hover:ring-2 hover:ring-[var(--color-primary)] hover:ring-offset-2 hover:ring-offset-[var(--color-background)]
           ${showDropdown ? 'cursor-pointer' : 'cursor-default'}
         `}
