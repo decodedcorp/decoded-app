@@ -406,7 +406,7 @@ export const MainFeed = React.memo(function MainFeed() {
             </div>
 
             {/* 메타라인 */}
-            <div className="mb-4">
+            {/* <div className="mb-4">
               <div className="text-xs text-gray-500">
                 {t.feed.meta.line({
                   range: t.feed.filter.today(),
@@ -419,7 +419,7 @@ export const MainFeed = React.memo(function MainFeed() {
                   count: feedData.length,
                 })}
               </div>
-            </div>
+            </div> */}
 
             {/* 필터/서브 옵션 */}
             {/* <div className="flex items-center gap-3 text-sm">
@@ -514,7 +514,6 @@ export const MainFeed = React.memo(function MainFeed() {
                               }
                               blurDataURL={undefined}
                               contentType={post.contentType}
-                              badge={post.badge}
                               contentId={item.id} // 북마크 기능을 위한 contentId 추가
                               onPostClick={() => {
                                 // 콘텐츠 ID를 설정하여 상세 정보 가져오기

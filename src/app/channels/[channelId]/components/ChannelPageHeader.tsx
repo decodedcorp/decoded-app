@@ -10,7 +10,7 @@ import { ChannelData } from '@/store/channelModalStore';
 import { useContentUploadStore } from '@/store/contentUploadStore';
 import { toast } from 'react-hot-toast';
 import { useUser } from '@/domains/auth/hooks/useAuth';
-// import { canManageChannelManagers } from '@/lib/utils/channelPermissions'; // Currently disabled
+import { canManageChannelManagers } from '@/lib/utils/channelPermissions';
 import { useChannelSubscription } from '@/domains/interactions/hooks/useChannelSubscription';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
 import { InlineSpinner } from '@/shared/components/loading/InlineSpinner';
@@ -118,7 +118,7 @@ export function ChannelPageHeader({
 
   // 소유자 권한 확인
   const isOwner = user?.doc_id && channel.owner_id && user.doc_id === channel.owner_id;
-  // const canManageSettings = canManageChannelManagers(user, channel); // Currently disabled
+  const canManageSettings = canManageChannelManagers(user, channel);
 
   return (
     <div>
@@ -186,17 +186,22 @@ export function ChannelPageHeader({
             {/* 가운데: 채널 정보 */}
             <div className="min-w-0 flex-1">
               {/* 채널 이름 */}
-              <h1 className="text-2xl font-bold text-white mb-2 truncate">{channel.name}</h1>
+              <h1
+                className="text-lg font-bold text-white
+               truncate"
+              >
+                {channel.name}
+              </h1>
 
               {/* 채널 설명 */}
               {channel.description && (
-                <p className="text-zinc-400 text-sm mb-3 line-clamp-2 leading-relaxed">
+                <p className="text-zinc-400 text-xs mb-3 line-clamp-2 leading-relaxed">
                   {channel.description}
                 </p>
               )}
 
               {/* 통계 정보 */}
-              <div className="flex items-center gap-1 text-sm text-zinc-400 min-w-0">
+              <div className="flex items-center gap-1 text-xs text-zinc-400 min-w-0">
                 <span className="whitespace-nowrap">
                   {channel.subscriber_count || 0} {t.ui.subscribers()}
                 </span>
@@ -232,7 +237,7 @@ export function ChannelPageHeader({
               {(isOwner || channel.is_manager) && (
                 <button
                   onClick={handleAddContent}
-                  className="inline-flex items-center justify-center rounded-full bg-zinc-700 hover:bg-zinc-600 text-white transition-colors px-3 py-2 text-sm sm:px-3 sm:py-2 sm:text-sm w-8 h-8 sm:w-auto sm:h-auto"
+                  className="inline-flex items-center justify-center rounded-full bg-zinc-700 hover:bg-zinc-600 text-white transition-colors px-3 py-2 text-sm sm:px-3 sm:py-2 sm:text-sm w-6 h-6 sm:w-auto sm:h-auto"
                 >
                   <span className="hidden sm:inline">+ {t.create.createNewContent()}</span>
                   <span className="sm:hidden">+</span>
@@ -244,16 +249,16 @@ export function ChannelPageHeader({
                 <button
                   onClick={handleSubscribe}
                   disabled={subscriptionHook?.isLoading}
-                  className={`inline-flex items-center justify-center rounded-full px-3 py-2 text-sm transition-colors ${
+                  className={`inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm transition-colors border ${
                     subscriptionHook?.isSubscribed
-                      ? 'bg-zinc-600 text-white hover:bg-zinc-500'
-                      : 'bg-white text-gray-900 hover:bg-gray-100'
+                      ? 'bg-zinc-800 text-gray-400 hover:bg-zinc-700 hover:text-white border-zinc-700 hover:border-zinc-600'
+                      : 'bg-zinc-800 text-gray-400 hover:bg-zinc-700 hover:text-white border-zinc-700 hover:border-zinc-600'
                   } ${subscriptionHook?.isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                   aria-pressed={subscriptionHook?.isSubscribed ? 'true' : 'false'}
                 >
                   {subscriptionHook?.isLoading ? (
                     <div className="flex items-center gap-2">
-                      <InlineSpinner size="sm" className="text-white" />
+                      <InlineSpinner size="sm" className="text-gray-400" />
                       <span className="text-xs">
                         {subscriptionHook?.isSubscribed
                           ? `${t.actions.unsubscribe()}...`
@@ -270,15 +275,15 @@ export function ChannelPageHeader({
                 </button>
               )}
 
-              {/* Settings 버튼 - Currently disabled */}
-              {/* {canManageSettings && (
+              {/* Settings 버튼 */}
+              {canManageSettings && (
                 <button
                   onClick={handleSettings}
                   className="p-2 rounded-full bg-zinc-800 hover:bg-zinc-700 text-white transition-colors"
                   aria-label={t.navigation.settings()}
                   title={t.navigation.settings()}
                 >
-                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                     <path
                       d="M12 15a3 3 0 100-6 3 3 0 000 6z"
                       stroke="currentColor"
@@ -295,7 +300,7 @@ export function ChannelPageHeader({
                     />
                   </svg>
                 </button>
-              )} */}
+              )}
             </div>
           </div>
 
@@ -308,8 +313,6 @@ export function ChannelPageHeader({
           )}
         </div>
       </div>
-
-      {/* Banner Edit Modal - EditableImage에서 처리하므로 제거 */}
 
       {/* Editors List Modal */}
       <EditorsListModal

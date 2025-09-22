@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDeleteChannel } from '@/domains/channels/hooks/useChannels';
 import type { ChannelResponse } from '@/api/generated/models/ChannelResponse';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 interface DeleteChannelSectionProps {
   channel: ChannelResponse;
@@ -14,6 +15,7 @@ export function DeleteChannelSection({ channel }: DeleteChannelSectionProps) {
   const router = useRouter();
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmText, setConfirmText] = useState('');
+  const t = useCommonTranslation();
 
   const deleteChannelMutation = useDeleteChannel();
 
@@ -34,32 +36,34 @@ export function DeleteChannelSection({ channel }: DeleteChannelSectionProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold mb-4 text-red-400">Danger Zone</h2>
-        <p className="text-zinc-400 mb-6">
-          Irreversible and destructive actions. Please proceed with caution.
-        </p>
+        <h2 className="text-xl font-semibold mb-4 text-red-400">
+          {t.channelSettings.dangerZone.title()}
+        </h2>
+        <p className="text-zinc-400 mb-6">{t.channelSettings.dangerZone.subtitle()}</p>
       </div>
 
       {/* Delete Channel */}
       <div className="border border-red-600/30 rounded-lg p-6 bg-red-900/10">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <h3 className="text-lg font-medium text-red-400 mb-2">Delete Channel</h3>
+            <h3 className="text-lg font-medium text-red-400 mb-2">
+              {t.channelSettings.dangerZone.deleteChannel.title()}
+            </h3>
             <p className="text-zinc-400 text-sm mb-4">
-              Once you delete this channel, there is no going back. This action cannot be undone.
-              All content, subscribers, and data associated with this channel will be permanently
-              deleted.
+              {t.channelSettings.dangerZone.deleteChannel.description()}
             </p>
 
             {/* Warning List */}
             <div className="bg-red-900/20 border border-red-600/20 rounded-lg p-4 mb-4">
-              <h4 className="text-red-400 font-medium mb-2">This will permanently delete:</h4>
+              <h4 className="text-red-400 font-medium mb-2">
+                {t.channelSettings.dangerZone.deleteChannel.willDelete()}
+              </h4>
               <ul className="text-sm text-zinc-300 space-y-1">
-                <li>• All channel content and uploads</li>
-                <li>• All subscriber relationships</li>
-                <li>• All comments and interactions</li>
-                <li>• Channel analytics and statistics</li>
-                <li>• All manager relationships and invitations</li>
+                <li>• {t.channelSettings.dangerZone.deleteChannel.allContent()}</li>
+                <li>• {t.channelSettings.dangerZone.deleteChannel.allSubscribers()}</li>
+                <li>• {t.channelSettings.dangerZone.deleteChannel.allComments()}</li>
+                <li>• {t.channelSettings.dangerZone.deleteChannel.allAnalytics()}</li>
+                <li>• {t.channelSettings.dangerZone.deleteChannel.allManagers()}</li>
               </ul>
             </div>
 
@@ -109,7 +113,7 @@ export function DeleteChannelSection({ channel }: DeleteChannelSectionProps) {
             )} */}
 
             <div className="text-zinc-500 text-sm italic">
-              Channel deletion is currently disabled
+              {t.channelSettings.dangerZone.deleteChannel.currentlyDisabled()}
             </div>
           </div>
         </div>
@@ -120,12 +124,14 @@ export function DeleteChannelSection({ channel }: DeleteChannelSectionProps) {
         <div className="flex items-start space-x-3">
           <div className="text-yellow-400 mt-0.5">⚠️</div>
           <div>
-            <h4 className="text-yellow-400 font-medium mb-1">Before deleting:</h4>
+            <h4 className="text-yellow-400 font-medium mb-1">
+              {t.channelSettings.dangerZone.beforeDeleting.title()}
+            </h4>
             <ul className="text-sm text-zinc-300 space-y-1">
-              <li>• Consider transferring ownership to another user</li>
-              <li>• Download any important content or data</li>
-              <li>• Notify your subscribers about the deletion</li>
-              <li>• Remove any external links pointing to this channel</li>
+              <li>• {t.channelSettings.dangerZone.beforeDeleting.transferOwnership()}</li>
+              <li>• {t.channelSettings.dangerZone.beforeDeleting.downloadContent()}</li>
+              <li>• {t.channelSettings.dangerZone.beforeDeleting.notifySubscribers()}</li>
+              <li>• {t.channelSettings.dangerZone.beforeDeleting.removeLinks()}</li>
             </ul>
           </div>
         </div>

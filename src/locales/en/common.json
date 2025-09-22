@@ -557,6 +557,107 @@
       "tryAgain": "Please try again"
     }
   },
+  "channelSettings": {
+    "title": "Channel Settings",
+    "loadingSettings": "Loading channel settings...",
+    "channelNotFound": "Channel Not Found",
+    "channelNotFoundDescription": "The channel you're looking for doesn't exist or you don't have access to it.",
+    "accessDenied": "Access Denied",
+    "accessDeniedDescription": "You don't have permission to manage this channel's settings.",
+    "backToChannels": "Back to Channels",
+    "backToChannel": "Back to Channel",
+    "characters": "characters",
+    "tabs": {
+      "basicInfo": "Basic Info",
+      "images": "Images",
+      "managers": "Managers",
+      "dangerZone": "Danger Zone"
+    },
+    "images": {
+      "title": "Channel Images",
+      "subtitle": "Upload and manage your channel's thumbnail and banner images.",
+      "thumbnail": {
+        "title": "Channel Thumbnail",
+        "profilePicture": "Profile Picture",
+        "description": "This image will appear as your channel's profile picture. Recommended size: 400x400px.",
+        "requirements": {
+          "maxFileSize": "Maximum file size: 10MB",
+          "supportedFormats": "Supported formats: JPG, PNG, WebP",
+          "squareImages": "Square images work best"
+        }
+      },
+      "banner": {
+        "title": "Channel Banner",
+        "bannerImage": "Banner Image",
+        "description": "This image will appear at the top of your channel page. Recommended size: 1200x400px.",
+        "requirements": {
+          "maxFileSize": "Maximum file size: 10MB",
+          "supportedFormats": "Supported formats: JPG, PNG, WebP",
+          "aspectRatio": "Aspect ratio 3:1 works best"
+        }
+      },
+      "preview": {
+        "title": "Preview",
+        "description": "Preview how your channel will look to visitors:",
+        "bannerPreview": "Banner preview",
+        "thumbnailPreview": "Thumbnail preview"
+      }
+    },
+    "managers": {
+      "title": "Channel Managers",
+      "subtitle": "Managers can upload content, moderate comments, and help manage your channel. Only channel owners can invite or remove managers.",
+      "currentManagers": "Current Managers",
+      "inviteManager": "Invite Manager",
+      "permissions": {
+        "title": "Manager Permissions",
+        "uploadContent": "Upload and manage channel content",
+        "pinContent": "Pin and unpin content items",
+        "moderateComments": "Moderate comments and interactions",
+        "editDescription": "Edit channel description (if permitted)",
+        "cannotDelete": "Cannot delete channel or remove other managers"
+      },
+      "invitations": "Manager Invitations",
+      "bestPractices": {
+        "title": "Best Practices",
+        "inviteTrusted": "Only invite trusted users as managers",
+        "setExpectations": "Set clear expectations and guidelines",
+        "reviewActivity": "Regularly review manager activity",
+        "trialPeriods": "Consider trial periods for new managers",
+        "communicateGoals": "Communicate channel goals and vision"
+      },
+      "statistics": {
+        "title": "Manager Statistics",
+        "totalManagers": "Total Managers",
+        "channelContent": "Channel Content"
+      }
+    },
+    "dangerZone": {
+      "title": "Danger Zone",
+      "subtitle": "Irreversible and destructive actions. Please proceed with caution.",
+      "deleteChannel": {
+        "title": "Delete Channel",
+        "description": "Once you delete this channel, there is no going back. This action cannot be undone. All content, subscribers, and data associated with this channel will be permanently deleted.",
+        "willDelete": "This will permanently delete:",
+        "allContent": "All channel content and uploads",
+        "allSubscribers": "All subscriber relationships",
+        "allComments": "All comments and interactions",
+        "allAnalytics": "Channel analytics and statistics",
+        "allManagers": "All manager relationships and invitations",
+        "confirmText": "Type \"{{channelName}}\" to confirm:",
+        "confirmPlaceholder": "Type \"{{channelName}}\" here",
+        "deleteForever": "Delete Channel Forever",
+        "deleting": "Deleting...",
+        "currentlyDisabled": "Channel deletion is currently disabled"
+      },
+      "beforeDeleting": {
+        "title": "Before deleting:",
+        "transferOwnership": "Consider transferring ownership to another user",
+        "downloadContent": "Download any important content or data",
+        "notifySubscribers": "Notify your subscribers about the deletion",
+        "removeLinks": "Remove any external links pointing to this channel"
+      }
+    }
+  },
   "accessibility": {
     "closeModal": "Close modal",
     "expandSidebar": "Expand sidebar",

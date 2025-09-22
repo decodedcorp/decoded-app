@@ -55,7 +55,7 @@ export function BasicInfoSection({ channel }: BasicInfoSectionProps) {
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold mb-4">{t.ui.basicInformation()}</h2>
-        <p className="text-zinc-400 mb-6">{t.ui.updateChannelBasicInfo()}</p>
+        <p className="text-muted mb-6">{t.ui.updateChannelBasicInfo()}</p>
       </div>
 
       {/* Channel Name */}
@@ -68,11 +68,13 @@ export function BasicInfoSection({ channel }: BasicInfoSectionProps) {
           type="text"
           value={name}
           onChange={(e) => handleNameChange(e.target.value)}
-          className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          className="w-full px-4 py-3 bg-surface border border-white/10 rounded-lg text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           placeholder={t.ui.enterChannelName()}
           maxLength={50}
         />
-        <p className="text-xs text-zinc-400 mt-1">{name.length}/50 characters</p>
+        <p className="text-xs text-muted mt-1">
+          {name.length}/50 {t.channelSettings.characters()}
+        </p>
       </div>
 
       {/* Channel Description */}
@@ -85,11 +87,13 @@ export function BasicInfoSection({ channel }: BasicInfoSectionProps) {
           value={description}
           onChange={(e) => handleDescriptionChange(e.target.value)}
           rows={4}
-          className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+          className="w-full px-4 py-3 bg-surface border border-white/10 rounded-lg text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
           placeholder={t.ui.describeChannel()}
           maxLength={500}
         />
-        <p className="text-xs text-zinc-400 mt-1">{description.length}/500 characters</p>
+        <p className="text-xs text-muted mt-1">
+          {description.length}/500 {t.channelSettings.characters()}
+        </p>
       </div>
 
       {/* Channel Stats */}
@@ -109,10 +113,10 @@ export function BasicInfoSection({ channel }: BasicInfoSectionProps) {
 
       {/* Action Buttons */}
       {hasChanges && (
-        <div className="flex items-center justify-end space-x-3 pt-4 border-t border-zinc-700">
+        <div className="flex items-center justify-end space-x-3 pt-4 border-t border-white/10">
           <button
             onClick={handleReset}
-            className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-lg transition-colors"
+            className="px-4 py-2 bg-surface hover:bg-surface2 rounded-lg border border-white/10 transition-colors"
             disabled={updateChannelMutation.isPending}
           >
             {t.actions.reset()}
@@ -120,7 +124,7 @@ export function BasicInfoSection({ channel }: BasicInfoSectionProps) {
           <button
             onClick={handleSave}
             disabled={updateChannelMutation.isPending || !name.trim()}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:cursor-not-allowed rounded-lg transition-colors"
+            className="px-4 py-2 bg-[#EAFD66] text-black hover:bg-[#D4E85A] disabled:bg-[#EAFD66]/50 disabled:cursor-not-allowed rounded-lg border border-[#3d4a1a] transition-colors"
           >
             {updateChannelMutation.isPending ? t.states.saving() : t.actions.saveChanges()}
           </button>

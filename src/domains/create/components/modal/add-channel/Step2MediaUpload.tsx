@@ -239,7 +239,7 @@ export function Step2MediaUpload({
               <div className="p-4">
                 <div className="flex items-center space-x-3 mb-4">
                   {/* Thumbnail */}
-                  <div className="w-12 h-12 rounded-full overflow-hidden bg-zinc-700 flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-700 flex-shrink-0">
                     {previewData.thumbnail ? (
                       <img
                         src={

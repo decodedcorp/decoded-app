@@ -187,9 +187,9 @@ export function ChannelSearchBar({
     <div className={`w-full max-w-2xl ${className}`}>
       <form onSubmit={handleSubmit} className="relative">
         <div className="relative flex items-center bg-zinc-800/70 hover:bg-zinc-800/90 rounded-full border border-zinc-600/50 hover:border-zinc-500/50 focus-within:border-[#eafd66]/50 transition-all duration-200">
-          {/* 큰 검색 아이콘 - Reddit 스타일 */}
-          <div className="flex items-center justify-center w-8 h-8 sm:w-12 sm:h-12 text-zinc-400 flex-shrink-0">
-            <svg width="16" height="16" className="sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24">
+          {/* 검색 아이콘 */}
+          <div className="flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 text-zinc-400 flex-shrink-0">
+            <svg width="12" height="12" className="sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24">
               <path
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 stroke="currentColor"
@@ -200,24 +200,24 @@ export function ChannelSearchBar({
             </svg>
           </div>
 
-          <div className="flex items-center bg-zinc-700/60 rounded-full px-2 sm:px-3 py-1.5 mx-1 sm:mx-2 min-w-0 flex-shrink-0">
-            <div className="flex items-center space-x-1 sm:space-x-1.5 min-w-0">
+          <div className="flex items-center bg-zinc-700/60 rounded-full px-1.5 sm:px-2 py-1 mx-1 sm:mx-1.5 min-w-0 flex-shrink-0">
+            <div className="flex items-center space-x-1 min-w-0">
               {/* 채널 아이콘 */}
-              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#eafd66] flex-shrink-0"></div>
-              <span className="text-[#eafd66] text-xs sm:text-sm font-medium truncate max-w-[80px] sm:max-w-[120px] md:max-w-none">
+              <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#eafd66] flex-shrink-0"></div>
+              <span className="text-[#eafd66] text-xs font-medium truncate max-w-[60px] sm:max-w-[100px] md:max-w-none">
                 {displayChannelName}
               </span>
             </div>
             <button
               type="button"
               onClick={handleClear}
-              className="ml-1 sm:ml-2 text-zinc-400 hover:text-white transition-colors p-0.5 flex-shrink-0"
+              className="ml-1 text-zinc-400 hover:text-white transition-colors p-0.5 flex-shrink-0"
               aria-label={t.search.clearSearch()}
             >
               <svg
-                width="8"
-                height="8"
-                className="sm:w-[10px] sm:h-[10px]"
+                width="6"
+                height="6"
+                className="sm:w-[8px] sm:h-[8px]"
                 fill="none"
                 viewBox="0 0 24 24"
               >
@@ -242,7 +242,7 @@ export function ChannelSearchBar({
             onBlur={handleInputBlur}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            className="flex-1 py-2 sm:py-3 pr-3 sm:pr-4 bg-transparent text-white placeholder-zinc-400 focus:outline-none rounded-full text-sm sm:text-base min-w-0"
+            className="flex-1 py-1.5 sm:py-2 pr-2 sm:pr-3 bg-transparent text-white placeholder-zinc-400 focus:outline-none rounded-full text-xs sm:text-sm min-w-0"
             autoComplete="off"
             role="combobox"
             aria-expanded={isAutocompleteOpen}
@@ -259,10 +259,10 @@ export function ChannelSearchBar({
                 setIsAutocompleteOpen(false);
                 inputRef.current?.focus();
               }}
-              className="mr-2 sm:mr-3 p-1 text-zinc-400 hover:text-white transition-colors flex-shrink-0"
+              className="mr-1.5 sm:mr-2 p-1 text-zinc-400 hover:text-white transition-colors flex-shrink-0"
               aria-label={t.search.clearSearch()}
             >
-              <svg width="14" height="14" className="sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24">
+              <svg width="12" height="12" className="sm:w-3 sm:h-3" fill="none" viewBox="0 0 24 24">
                 <path
                   d="M18 6L6 18M6 6l12 12"
                   stroke="currentColor"

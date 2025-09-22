@@ -4,7 +4,7 @@ import { useMyChannels } from '../../hooks/useProfileActivity';
 import { useProfileTranslation } from '@/lib/i18n/hooks';
 import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from 'date-fns';
-import { ThumbnailFallback } from '@/components/FallbackImage';
+// import { ThumbnailFallback } from '@/components/FallbackImage';
 import { ChannelsTabSkeleton } from '@/shared/components/loading/ChannelsTabSkeleton';
 
 export function ChannelsTab() {
@@ -105,11 +105,11 @@ export function ChannelsTab() {
                   className="w-16 h-16 rounded-lg object-cover"
                 />
               ) : (
-                <ThumbnailFallback size="lg" className="w-16 h-16">
+                <div className="w-16 h-16 rounded-lg bg-zinc-800 flex items-center justify-center">
                   <span className="text-xl font-bold text-white">
                     {channel.name.substring(0, 2).toUpperCase()}
                   </span>
-                </ThumbnailFallback>
+                </div>
               )}
               <div className="flex-1">
                 <h3 className="font-medium text-white line-clamp-1">{channel.name}</h3>

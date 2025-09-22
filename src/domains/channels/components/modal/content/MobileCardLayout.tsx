@@ -117,85 +117,100 @@ export function MobileCardLayout({ children, title, onClose, content }: MobileCa
         {shouldShowInfo && (
           <div className="mb-6 pb-6 border-b border-zinc-700/30">
             <div className="space-y-3">
-              {/* Channel Info Row */}
-              <div className="flex items-center space-x-3">
-                {/* Channel Thumbnail */}
+              {/* Channel Info Row - PostCard 스타일로 변경 */}
+              <div className="flex gap-3">
+                {/* Channel Thumbnail - PostCard 스타일 적용 */}
                 {channelId && (
                   <div className="flex-shrink-0">
                     {isChannelLoading ? (
-                      <div className="w-10 h-10 bg-zinc-700/50 rounded-lg animate-pulse" />
+                      <div className="w-10 h-10 bg-zinc-700/50 rounded-full animate-pulse" />
                     ) : (
-                      <div className="w-10 h-10 bg-zinc-800 rounded-lg overflow-hidden">
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden">
                         {channelData?.thumbnail_url ? (
                           <img
                             src={channelData.thumbnail_url}
                             alt={channelData.name || 'Channel'}
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const fallback = target.nextElementSibling as HTMLElement;
+                              if (fallback) fallback.style.display = 'flex';
+                            }}
                           />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center">
-                            <span className="text-zinc-400 text-xs font-medium">
-                              {channelData?.name?.charAt(0) || 'C'}
-                            </span>
-                          </div>
-                        )}
+                        ) : null}
+                        <div
+                          className={`w-full h-full bg-gradient-to-br from-[#eafd66] to-[#d4e85c] rounded-full flex items-center justify-center ${
+                            channelData?.thumbnail_url ? 'hidden' : 'flex'
+                          }`}
+                        >
+                          <span className="text-zinc-900 font-bold text-sm">
+                            {channelData?.name?.charAt(0) || 'C'}
+                          </span>
+                        </div>
                       </div>
                     )}
                   </div>
                 )}
 
-                {/* Channel Name */}
-                {channelId && (
-                  <div className="font-medium text-white text-sm">
-                    {isChannelLoading ? (
-                      <div className="h-4 bg-zinc-700/50 rounded animate-pulse w-20" />
-                    ) : channelError ? (
-                      <span className="text-zinc-400">Channel</span>
-                    ) : (
-                      channelData?.name || 'Unknown Channel'
+                {/* 오른쪽 컨텐츠 영역 */}
+                <div className="flex-1">
+                  {/* 첫 번째 줄: 채널명, 작성자 */}
+                  <div className="flex items-center gap-2">
+                    {/* Channel Name - PostCard 스타일 적용 */}
+                    {channelId && (
+                      <div className="text-[#eafd66] font-medium text-sm">
+                        {isChannelLoading ? (
+                          <div className="h-4 bg-zinc-700/50 rounded animate-pulse w-20" />
+                        ) : channelError ? (
+                          <span className="text-zinc-400">Channel</span>
+                        ) : (
+                          channelData?.name || 'Unknown Channel'
+                        )}
+                      </div>
+                    )}
+
+                    {/* Author Info - 독립적으로 표시 */}
+                    {authorId && (
+                      <div className="flex items-center gap-2 ml-auto">
+                        {/* Author Avatar */}
+                        <Avatar
+                          userId={authorId}
+                          src={userProfile?.profile_image_url || undefined}
+                          size="sm"
+                          className="flex-shrink-0"
+                        />
+
+                        {/* Author & Time */}
+                        <div className="flex items-center space-x-1 text-xs text-zinc-400">
+                          <span>
+                            {isProfileLoading ? (
+                              <span className="animate-pulse">Loading...</span>
+                            ) : profileError ? (
+                              authorId
+                            ) : (
+                              userProfile?.aka || authorId
+                            )}
+                          </span>
+                          {content.date && (
+                            <>
+                              <span>•</span>
+                              <span>{formatDateByContext(content.date, 'list')}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
                     )}
                   </div>
-                )}
 
-                {/* Author Info - 독립적으로 표시 */}
-                {authorId && (
-                  <div className="flex items-center space-x-2 ml-auto">
-                    {/* Author Avatar */}
-                    <Avatar
-                      userId={authorId}
-                      src={userProfile?.profile_image_url || undefined}
-                      size="sm"
-                      className="flex-shrink-0"
-                    />
-
-                    {/* Author & Time */}
-                    <div className="flex items-center space-x-1 text-xs text-zinc-400">
-                      <span>
-                        {isProfileLoading ? (
-                          <span className="animate-pulse">Loading...</span>
-                        ) : profileError ? (
-                          authorId
-                        ) : (
-                          userProfile?.aka || authorId
-                        )}
-                      </span>
-                      {content.date && (
-                        <>
-                          <span>•</span>
-                          <span>{formatDateByContext(content.date, 'list')}</span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                )}
+                  {/* 두 번째 줄: 채널 설명 */}
+                  {channelId && channelData?.description && (
+                    <p className="text-xs text-zinc-500 leading-relaxed line-clamp-2 mt-1">
+                      {channelData.description}
+                    </p>
+                  )}
+                </div>
               </div>
-
-              {/* Channel Description */}
-              {channelId && channelData?.description && (
-                <p className="text-xs text-zinc-400 leading-relaxed line-clamp-2">
-                  {channelData.description}
-                </p>
-              )}
 
               {/* Interaction Stats */}
               {(content.likes !== undefined || content.views !== undefined) && (

@@ -25,9 +25,9 @@ export function UserAvatar({ size = 'md', showDropdown = true }: UserAvatarProps
   const { t } = useLocale();
 
   const sizeClasses = {
-    sm: 'w-8 h-8 text-xs',
-    md: 'w-10 h-10 text-sm',
-    lg: 'w-12 h-12 text-base',
+    sm: 'w-6 h-6 text-xs',
+    md: 'w-6 h-6 text-xs sm:w-8 sm:h-8 sm:text-xs',
+    lg: 'w-6 h-6 text-xs sm:w-10 sm:h-10 sm:text-sm',
   };
 
   // Close dropdown when clicking outside
@@ -100,6 +100,7 @@ export function UserAvatar({ size = 'md', showDropdown = true }: UserAvatarProps
           relative transition-all duration-200 rounded-full border border-white/10
           hover:ring-2 hover:ring-[var(--color-primary)] hover:ring-offset-2 hover:ring-offset-[var(--color-background)]
           ${showDropdown ? 'cursor-pointer' : 'cursor-default'}
+          flex items-center justify-center
         `}
         aria-label={t('user.userMenu')}
       >
@@ -112,7 +113,7 @@ export function UserAvatar({ size = 'md', showDropdown = true }: UserAvatarProps
         />
 
         {/* Online indicator */}
-        <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-[var(--color-background)] rounded-full" />
+        <span className="absolute bottom-0 right-0 w-2 h-2 sm:w-3 sm:h-3 bg-green-500 border-2 border-[var(--color-background)] rounded-full" />
       </button>
 
       {/* Dropdown Menu */}

@@ -226,19 +226,19 @@ export function ChannelModalHeader({
             {/* 가운데: 채널 정보 */}
             <div className="min-w-0 flex-1">
               {/* 채널 이름 */}
-              <h2 id="channel-modal-title" className="text-2xl font-bold text-white mb-2 truncate">
+              <h2 id="channel-modal-title" className="text-lg font-bold text-white truncate">
                 {channel.name}
               </h2>
 
               {/* 채널 설명 */}
               {channel.description && (
-                <p className="text-zinc-400 text-sm mb-3 line-clamp-2 leading-relaxed">
+                <p className="text-zinc-400 text-xs mb-3 line-clamp-2 leading-relaxed">
                   {channel.description}
                 </p>
               )}
 
               {/* 통계 정보 */}
-              <div className="flex items-center gap-1 text-sm text-zinc-400 min-w-0">
+              <div className="">
                 <span className="whitespace-nowrap">
                   {channel.subscriber_count || 0} {t.ui.subscribers()}
                 </span>
@@ -275,16 +275,16 @@ export function ChannelModalHeader({
                 <button
                   onClick={handleSubscribe}
                   disabled={subscriptionHook?.isLoading}
-                  className={`inline-flex items-center justify-center rounded-full px-3 py-2 text-sm transition-colors ${
+                  className={`inline-flex items-center justify-center rounded-md px-1.5 py-1 md:px-3 md:py-1.5 text-xs md:text-sm transition-colors border ${
                     subscriptionHook?.isSubscribed
-                      ? 'bg-zinc-600 text-white hover:bg-zinc-500'
-                      : 'bg-white text-gray-900 hover:bg-gray-100'
+                      ? 'bg-zinc-800 text-gray-400 hover:bg-zinc-700 hover:text-white border-zinc-700 hover:border-zinc-600'
+                      : 'bg-zinc-800 text-gray-400 hover:bg-zinc-700 hover:text-white border-zinc-700 hover:border-zinc-600'
                   } ${subscriptionHook?.isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                   aria-pressed={subscriptionHook?.isSubscribed ? 'true' : 'false'}
                 >
                   {subscriptionHook?.isLoading ? (
-                    <div className="flex items-center gap-2">
-                      <InlineSpinner size="sm" className="text-white" />
+                    <div className="flex items-center gap-1 md:gap-2">
+                      <InlineSpinner size="sm" className="text-gray-400" />
                       <span className="text-xs">
                         {subscriptionHook?.isSubscribed
                           ? `${t.actions.unsubscribe()}...`

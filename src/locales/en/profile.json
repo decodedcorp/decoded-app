@@ -114,7 +114,11 @@
     "from": "From",
     "loadMore": "Load More",
     "loading": "Loading...",
-    "removeBookmark": "Remove bookmark"
+    "removeBookmark": "Remove bookmark",
+    "deleteConfirmTitle": "Delete Bookmark",
+    "deleteConfirmMessage": "Are you sure you want to delete the bookmark for '{title}'?",
+    "delete": "Delete",
+    "cancel": "Cancel"
   },
   "comments": {
     "title": "Comments",

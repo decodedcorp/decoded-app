@@ -43,7 +43,7 @@ export const SidebarChannelItem = memo(function SidebarChannelItem({
     const cachedContentData = queryClient.getQueryData([
       'channelContents',
       channel.id,
-      { page: 1, limit: 20 }
+      { page: 1, limit: 20 },
     ]);
 
     if (!cachedContentData) {
@@ -64,8 +64,8 @@ export const SidebarChannelItem = memo(function SidebarChannelItem({
   }, [queryClient, channel.id]);
 
   const baseClasses = `
-    flex items-center gap-3 px-3 py-2 rounded-lg
-    text-sm font-normal transition-all duration-200 cursor-pointer
+    flex items-center gap-2 lg:gap-3 px-3 py-1.5 lg:py-2 rounded-lg
+    text-xs lg:text-sm font-normal transition-all duration-200 cursor-pointer
     ${
       isActive ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200'
     }
@@ -75,7 +75,7 @@ export const SidebarChannelItem = memo(function SidebarChannelItem({
   return (
     <Link href={`/channels/${channel.id}`} className={baseClasses} onMouseEnter={handleMouseEnter}>
       {/* Channel thumbnail */}
-      <div className="w-6 h-6 rounded-full bg-zinc-700 flex-shrink-0 overflow-hidden">
+      <div className="w-5 h-5 lg:w-6 lg:h-6 rounded-full bg-zinc-700 flex-shrink-0 overflow-hidden">
         {channel.thumbnail_url ? (
           <img
             src={channel.thumbnail_url}
@@ -84,7 +84,7 @@ export const SidebarChannelItem = memo(function SidebarChannelItem({
           />
         ) : (
           <div className="w-full h-full bg-zinc-600 flex items-center justify-center">
-            <span className="text-xs font-medium text-zinc-300">
+            <span className="text-[10px] lg:text-xs font-medium text-zinc-300">
               {channel.name.charAt(0).toUpperCase()}
             </span>
           </div>
@@ -92,7 +92,7 @@ export const SidebarChannelItem = memo(function SidebarChannelItem({
       </div>
 
       {/* Channel name */}
-      <span className="flex-1 truncate text-sm">{channel.name}</span>
+      <span className="flex-1 truncate text-xs lg:text-sm">{channel.name}</span>
     </Link>
   );
 });

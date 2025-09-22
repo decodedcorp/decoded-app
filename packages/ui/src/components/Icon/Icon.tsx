@@ -10,7 +10,7 @@ export interface IconProps extends Omit<SVGAttributes<SVGElement>, 'name'> {
 export const Icon = forwardRef<SVGSVGElement, IconProps>(
   ({ name, size = 16, className, ...props }, ref) => {
     const IconComponent = iconMap[name];
-    
+
     if (!IconComponent) {
       console.warn(`Icon "${name}" not found in iconMap`);
       return null;
@@ -26,7 +26,7 @@ export const Icon = forwardRef<SVGSVGElement, IconProps>(
         {...props}
       />
     );
-  }
+  },
 );
 
 Icon.displayName = 'Icon';
