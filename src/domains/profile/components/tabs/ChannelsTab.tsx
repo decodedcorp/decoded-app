@@ -2,12 +2,14 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useMyChannels } from '../../hooks/useProfileActivity';
 import { useProfileTranslation } from '@/lib/i18n/hooks';
+import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from 'date-fns';
 import { ThumbnailFallback } from '@/components/FallbackImage';
 
 export function ChannelsTab() {
   const router = useRouter();
   const t = useProfileTranslation();
+  const { t: rawT } = useTranslation('profile');
   const { data, isLoading, error } = useMyChannels();
 
   if (isLoading) {
@@ -91,7 +93,9 @@ export function ChannelsTab() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-white">{t.channels.count(channels.length)}</h2>
+        <h2 className="text-xl font-semibold text-white">
+          {rawT('channels.count').replace('{count}', channels.length.toString())}
+        </h2>
         <button
           onClick={() => router.push('/create')}
           className="px-4 py-2 bg-[#EAFD66] text-black rounded-lg font-medium hover:bg-[#d9ec55] transition-colors flex items-center gap-2"

@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { useBookmarks, useBookmarkMutations } from '@/domains/bookmarks/hooks/useBookmarks';
 import { useContentModalStore } from '@/store/contentModalStore';
 import { useProfileTranslation } from '@/lib/i18n/hooks';
+import { useTranslation } from 'react-i18next';
 import { formatDateByContext } from '@/lib/utils/dateUtils';
 import { ThumbnailFallback } from '@/components/FallbackImage';
 
 export function BookmarksTab() {
   const openContentModal = useContentModalStore((state) => state.openModal);
   const t = useProfileTranslation();
+  const { t: rawT } = useTranslation('profile');
   const [offset, setOffset] = useState(0);
   const limit = 20;
 
@@ -105,7 +107,10 @@ export function BookmarksTab() {
     <div>
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-white">
-          {t.bookmarks.count(data?.total_count ?? bookmarks.length)}
+          {rawT('bookmarks.count').replace(
+            '{count}',
+            (data?.total_count ?? bookmarks.length).toString(),
+          )}
         </h2>
       </div>
 

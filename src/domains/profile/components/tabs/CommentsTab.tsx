@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMyComments } from '../../hooks/useProfileActivity';
 import { useProfileTranslation } from '@/lib/i18n/hooks';
+import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from 'date-fns';
 
 interface CommentsTabProps {
@@ -12,6 +13,7 @@ interface CommentsTabProps {
 export function CommentsTab({ userId, isMyProfile }: CommentsTabProps) {
   const router = useRouter();
   const t = useProfileTranslation();
+  const { t: rawT } = useTranslation('profile');
   const [offset, setOffset] = useState(0);
   const limit = 20;
 
@@ -97,7 +99,10 @@ export function CommentsTab({ userId, isMyProfile }: CommentsTabProps) {
     <div>
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-white">
-          {t.comments.title()} ({data?.total_count || 0})
+          {rawT('comments.count').replace(
+            '{count}',
+            (data?.total_count ?? comments.length).toString(),
+          )}
         </h2>
       </div>
 

@@ -576,6 +576,7 @@ export const useProfileTranslation = () => {
     },
     comments: {
       title: () => t('comments.title'),
+      count: (count: number) => t('comments.count', { count }),
       noComments: () => t('comments.noComments'),
       noCommentsDescription: () => t('comments.noCommentsDescription'),
       comingSoon: () => t('comments.comingSoon'),

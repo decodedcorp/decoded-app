@@ -264,15 +264,8 @@ export function ProfileEditModal({ isOpen, onClose }: ProfileEditModalProps) {
                 setErrors((prev) => ({ ...prev, sui_address: '' }));
               }
             }}
-            className={`
-                w-full px-4 py-3 bg-zinc-800/50 border rounded-lg text-white placeholder-zinc-500
-                focus:ring-1 transition-colors font-mono
-                ${
-                  errors.sui_address
-                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                    : 'border-zinc-700 focus:border-[#EAFD66] focus:ring-[#EAFD66]'
-                }
-              `}
+            disabled
+            className="w-full px-4 py-3 bg-zinc-800/30 border border-zinc-700 rounded-lg text-zinc-500 placeholder-zinc-600 font-mono cursor-not-allowed opacity-50"
             placeholder={t.editModal.suiAddressPlaceholder()}
           />
           {errors.sui_address ? (

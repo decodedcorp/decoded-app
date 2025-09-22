@@ -118,6 +118,7 @@
   },
   "comments": {
     "title": "Comments",
+    "count": "Comments ({count})",
     "noComments": "No comments yet",
     "noCommentsDescription": "Your comments on content will appear here.",
     "comingSoon": "Note: Comments feature is coming soon!",

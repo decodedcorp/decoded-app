@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMySubscriptions } from '../../hooks/useProfileActivity';
 import { useProfileTranslation } from '@/lib/i18n/hooks';
+import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from 'date-fns';
 import { ThumbnailFallback } from '@/components/FallbackImage';
 
 export function SubscriptionsTab() {
   const router = useRouter();
   const t = useProfileTranslation();
+  const { t: rawT } = useTranslation('profile');
   const [offset, setOffset] = useState(0);
   const limit = 12;
 
@@ -95,7 +97,10 @@ export function SubscriptionsTab() {
     <div>
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-white">
-          {t.subscriptions.count(data?.total_count ?? subscriptions.length)}
+          {rawT('subscriptions.count').replace(
+            '{count}',
+            (data?.total_count || subscriptions.length).toString(),
+          )}
         </h2>
       </div>
 
