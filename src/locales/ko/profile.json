@@ -114,7 +114,11 @@
     "from": "출처",
     "loadMore": "더 보기",
     "loading": "로딩 중...",
-    "removeBookmark": "북마크 제거"
+    "removeBookmark": "북마크 제거",
+    "deleteConfirmTitle": "북마크 삭제",
+    "deleteConfirmMessage": "'{title}' 북마크를 삭제하시겠어요?",
+    "delete": "삭제",
+    "cancel": "취소"
   },
   "comments": {
     "title": "댓글",

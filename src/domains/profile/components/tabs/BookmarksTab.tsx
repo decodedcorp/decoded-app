@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useBookmarks, useBookmarkMutations } from '@/domains/bookmarks/hooks/useBookmarks';
-import { useContentModalStore } from '@/store/contentModalStore';
 import { useProfileTranslation } from '@/lib/i18n/hooks';
 import { useTranslation } from 'react-i18next';
 import { useDateFormatters } from '@/lib/utils/dateUtils';
 import { ThumbnailFallback } from '@/components/FallbackImage';
 import { BookmarksTabSkeleton } from '@/shared/components/loading/BookmarksTabSkeleton';
+import { ConfirmModal } from '@/shared/components/modals/ConfirmModal';
 
 export function BookmarksTab() {
   const router = useRouter();
-  const openContentModal = useContentModalStore((state) => state.openModal);
   const t = useProfileTranslation();
   const { t: rawT } = useTranslation('profile');
   const { formatDateByContext } = useDateFormatters();
@@ -20,22 +19,50 @@ export function BookmarksTab() {
   const { data, isLoading, error } = useBookmarks({ offset, limit });
   const { removeBookmark } = useBookmarkMutations();
 
-  const handleContentClick = async (contentId: string, contentPreview?: any) => {
-    try {
-      if (contentPreview) {
-        const { unifyContent, convertToContentItem } = await import('@/lib/types/content');
-        const unifiedContent = unifyContent(contentPreview);
-        const contentItem = convertToContentItem(unifiedContent);
-        openContentModal(contentItem);
-      }
-    } catch (error) {
-      console.error('Failed to load content:', error);
+  // Delete confirmation modal state
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean;
+    contentId: string | null;
+    contentTitle: string | null;
+  }>({
+    isOpen: false,
+    contentId: null,
+    contentTitle: null,
+  });
+
+  const handleContentClick = (contentId: string, contentPreview?: any) => {
+    // Navigate to channel page with content modal
+    if (contentPreview?.channel_id) {
+      router.push(`/channels/${contentPreview.channel_id}?content=${contentId}`);
     }
   };
 
   const handleChannelClick = (channelId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     router.push(`/channels/${channelId}`);
+  };
+
+  const handleDeleteClick = (contentId: string, contentTitle: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDeleteModal({
+      isOpen: true,
+      contentId,
+      contentTitle,
+    });
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteModal.contentId) {
+      removeBookmark.mutate(deleteModal.contentId);
+    }
+  };
+
+  const handleCloseDeleteModal = () => {
+    setDeleteModal({
+      isOpen: false,
+      contentId: null,
+      contentTitle: null,
+    });
   };
 
   const loadMore = () => {
@@ -166,10 +193,16 @@ export function BookmarksTab() {
 
               <div className="flex items-center space-x-2">
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    removeBookmark.mutate(bookmark.content_id);
-                  }}
+                  onClick={(e) =>
+                    handleDeleteClick(
+                      bookmark.content_id,
+                      bookmark.content?.link_preview_title ||
+                        bookmark.content?.video_title ||
+                        bookmark.content?.description ||
+                        `Content ${bookmark.content_id}`,
+                      e,
+                    )
+                  }
                   disabled={removeBookmark.isPending}
                   className="p-2 text-zinc-400 hover:text-red-400 transition-colors disabled:opacity-50"
                   aria-label={t.bookmarks.removeBookmark()}
@@ -214,6 +247,19 @@ export function BookmarksTab() {
           </button>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+        title="북마크 삭제"
+        message={`'${deleteModal.contentTitle || '이 콘텐츠'}' 북마크를 삭제하시겠어요?`}
+        confirmText="삭제"
+        cancelText="취소"
+        confirmVariant="danger"
+        isLoading={removeBookmark.isPending}
+      />
     </div>
   );
 }
