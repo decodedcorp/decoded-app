@@ -73,7 +73,12 @@
     "description": "Description",
     "showMore": "Show more",
     "showLessDescription": "Show less",
-    "closeModal": "Close modal"
+    "closeModal": "Close modal",
+    "recentContent": "Recent Content",
+    "recentContentEmpty": "No recent content",
+    "recentContentError": "Unable to load content",
+    "clearRecent": "Clear recent",
+    "viewedAt": "Viewed {{time}}"
   },
   "interactiveQA": {
     "title": "AI Generated Q&A",

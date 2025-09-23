@@ -13,6 +13,7 @@ import { LoginModal } from '@/domains/auth/components/LoginModal';
 import { useCommentsModal } from '@/hooks/useCommentsModal';
 import { useChannel } from '@/domains/channels/hooks/useChannels';
 import { useDateFormatters } from '@/lib/utils/dateUtils';
+import { useRecentContentStore } from '@/store/recentContentStore';
 // import { useCommentStats } from '@/domains/comments/hooks/useComments';
 // import { useTogglePin } from '@/domains/channels/hooks/useChannelPins';
 // import { useBookmark } from '@/domains/users/hooks/useBookmark';
@@ -145,6 +146,7 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
   const { actions, contentType: contentTypeLabels, accessibility } = usePostCardTranslation();
   const { t } = useTranslation('common');
   const { formatDateByContext } = useDateFormatters();
+  const { addContent } = useRecentContentStore();
 
   // 디버깅 로그
   if (process.env.NODE_ENV === 'development') {
@@ -465,6 +467,14 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
           className="cursor-pointer group/content hover:bg-zinc-900/50 rounded-lg p-2 -m-2 transition-colors"
           onClick={() => {
             if (contentId && channelId) {
+              // 최근 본 콘텐츠에 추가
+              addContent({
+                id: contentId,
+                channelId: channelId,
+                title: title,
+                thumbnailUrl: thumbnail || undefined,
+              });
+
               // 현재 URL 저장 (댓글 모달용)
               // if (typeof window !== 'undefined') {
               //   setPreviousUrl(window.location.href);

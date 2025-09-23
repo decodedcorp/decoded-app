@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ContentsCard, type ContentsCardProps } from '@/components/ContentsCard/ContentsCard';
 import { toContentHref, getContentLinkProps } from '@/lib/routing';
+import { useRecentContentStore } from '@/store/recentContentStore';
 
 interface ContentsCardLinkProps extends Omit<ContentsCardProps, 'onCardClick'> {
   channelId: string;
@@ -23,6 +24,7 @@ export function ContentsCardLink({
   ...cardProps
 }: ContentsCardLinkProps) {
   const router = useRouter();
+  const { addContent } = useRecentContentStore();
   const contentUrl = toContentHref({ channelId, contentId: cardProps.card.id });
   const linkProps = getContentLinkProps({ channelId, contentId: cardProps.card.id });
 
@@ -38,13 +40,21 @@ export function ContentsCardLink({
     // Link에서 네비게이션을 처리하므로 여기서는 analytics만
     console.log('🎯 [ContentsCardLink] Card clicked, navigating to:', contentUrl);
 
+    // 최근 본 콘텐츠에 추가
+    addContent({
+      id: cardProps.card.id,
+      channelId: channelId,
+      title: cardProps.card.metadata?.title || 'Untitled',
+      thumbnailUrl: cardProps.card.thumbnailUrl,
+    });
+
     // TODO: Analytics 이벤트 추가
     // trackEvent('content_card_click', {
     //   content_id: cardProps.card.id,
     //   channel_id: channelId,
     //   position: cardProps.gridIndex
     // });
-  }, [contentUrl, cardProps.card.id, channelId, cardProps.gridIndex]);
+  }, [contentUrl, cardProps.card.id, channelId, cardProps.gridIndex, addContent, cardProps.card.metadata?.title, cardProps.card.thumbnailUrl]);
 
   return (
     <div
