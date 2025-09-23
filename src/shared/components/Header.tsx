@@ -201,7 +201,14 @@ export const Header = memo(function Header() {
 
         {/* Search Bar */}
         <div className="hidden md:flex flex-1 justify-center">
-          <div className="w-full max-w-3xl" style={{ marginLeft: 'var(--search-offset)' }}>
+          <div
+            className="w-full"
+            style={{
+              maxWidth: 'calc(768px - 2px)',
+              marginLeft: isAuthenticated ? 'var(--search-offset)' : '0px',
+              marginRight: isAuthenticated ? '0px' : 'var(--search-offset)',
+            }}
+          >
             {isChannelPage && channelName ? (
               <ChannelSearchBar
                 channelId={channelId || ''}
@@ -263,8 +270,12 @@ export const Header = memo(function Header() {
             {/* Grab handle */}
             <div className="flex items-center gap-3">
               <div
-                className="w-full max-w-3xl mx-auto"
-                style={{ marginLeft: 'var(--search-offset)' }}
+                className="w-full mx-auto"
+                style={{
+                  maxWidth: 'calc(768px - 2px)',
+                  marginLeft: isAuthenticated ? 'var(--search-offset)' : '0px',
+                  marginRight: isAuthenticated ? '0px' : 'var(--search-offset)',
+                }}
               >
                 {isChannelPage && channelName ? (
                   <ChannelSearchBar
