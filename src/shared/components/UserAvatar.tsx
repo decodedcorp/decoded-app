@@ -25,9 +25,9 @@ export function UserAvatar({ size = 'md', showDropdown = true }: UserAvatarProps
   const { t } = useLocale();
 
   const sizeClasses = {
-    sm: 'w-6 h-6 text-xs',
-    md: 'w-6 h-6 text-xs sm:w-8 sm:h-8 sm:text-xs',
-    lg: 'w-6 h-6 text-xs sm:w-10 sm:h-10 sm:text-sm',
+    sm: 'w-7 h-7 text-xs',
+    md: 'w-7 h-7 text-xs sm:w-8 sm:h-8 sm:text-xs',
+    lg: 'w-7 h-7 text-xs sm:w-10 sm:h-10 sm:text-sm',
   };
 
   // Close dropdown when clicking outside

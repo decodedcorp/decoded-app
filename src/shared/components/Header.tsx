@@ -168,7 +168,7 @@ export const Header = memo(function Header() {
         <div className="flex items-center gap-2 md:gap-3 lg:gap-0">
           <button
             onClick={toggleMobileSidebar}
-            className="lg:hidden min-h-6 min-w-6 inline-flex items-center justify-center hover:bg-zinc-800/50 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [-webkit-tap-highlight-color:rgba(0,0,0,0.08)]"
+            className="lg:hidden min-h-7 min-w-7 inline-flex items-center justify-center hover:bg-zinc-800/50 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [-webkit-tap-highlight-color:rgba(0,0,0,0.08)]"
             aria-controls="mobile-sidebar"
             aria-expanded={isMobileSidebarOpen}
             aria-label={isMobileSidebarOpen ? 'Close menu' : t.header.openMenu()}
@@ -218,10 +218,10 @@ export const Header = memo(function Header() {
           {/* Mobile Search Button */}
           <button
             onClick={() => setIsMobileSearchOpen(true)}
-            className="md:hidden min-h-6 min-w-6 inline-flex items-center justify-center text-white hover:text-primary transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [-webkit-tap-highlight-color:rgba(0,0,0,0.08)]"
+            className="md:hidden min-h-7 min-w-7 inline-flex items-center justify-center text-white hover:text-primary transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [-webkit-tap-highlight-color:rgba(0,0,0,0.08)]"
             aria-label={t.header.openSearch()}
           >
-            <svg className="shrink-0 w-4 h-4" fill="none" viewBox="0 0 24 24">
+            <svg className="shrink-0 w-5 h-5" fill="none" viewBox="0 0 24 24">
               <path
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 stroke="currentColor"
