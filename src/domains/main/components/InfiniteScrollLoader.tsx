@@ -15,6 +15,14 @@ interface InfiniteScrollLoaderProps {
   scrollRoot?: Element | null; // Custom scroll container
   rootMargin?: string; // Custom root margin for pre-loading
   threshold?: number; // Custom intersection threshold
+  customMessages?: {
+    loadingMore?: string;
+    retry?: string;
+    serverError?: string;
+    loadFailed?: string;
+    serverIssueDetected?: string;
+    viewMoreContent?: string;
+  };
 }
 
 export function InfiniteScrollLoader({
@@ -27,6 +35,7 @@ export function InfiniteScrollLoader({
   scrollRoot,
   rootMargin = '800px', // 더 자연스러운 로딩을 위해 거리 조정
   threshold = 0.1,
+  customMessages,
 }: InfiniteScrollLoaderProps) {
   const observerRef = useRef<HTMLDivElement>(null);
   const translations = useCommonTranslation();
@@ -85,8 +94,8 @@ export function InfiniteScrollLoader({
           <div className="text-center">
             <div className="text-red-400 mb-3 text-sm">
               {(error as any)?.status >= 500
-                ? translations.feed.infiniteScroll.serverError()
-                : translations.feed.infiniteScroll.loadFailed()}
+                ? (customMessages?.serverError || translations.feed.infiniteScroll.serverError())
+                : (customMessages?.loadFailed || translations.feed.infiniteScroll.loadFailed())}
             </div>
             <div className="flex justify-center space-x-2">
               <button
@@ -94,11 +103,11 @@ export function InfiniteScrollLoader({
                 className="px-4 py-2 bg-zinc-800 text-white rounded-lg hover:bg-zinc-700 transition-all duration-200 text-sm font-medium border border-zinc-600 flex items-center space-x-2"
               >
                 <RotateCcw className="w-4 h-4" />
-                <span>{translations.feed.infiniteScroll.retry()}</span>
+                <span>{customMessages?.retry || translations.feed.infiniteScroll.retry()}</span>
               </button>
               {(error as any)?.status >= 500 && (
                 <div className="text-xs text-gray-500 self-center">
-                  {translations.feed.infiniteScroll.serverIssueDetected()}
+                  {customMessages?.serverIssueDetected || translations.feed.infiniteScroll.serverIssueDetected()}
                 </div>
               )}
             </div>
@@ -114,7 +123,7 @@ export function InfiniteScrollLoader({
               <div className="w-2 h-2 bg-[#eafd66] rounded-full animate-infinite-scroll-dot"></div>
             </div>
             <span className="text-gray-400 text-sm">
-              {translations.feed.infiniteScroll.loadingMore()}
+              {customMessages?.loadingMore || translations.feed.infiniteScroll.loadingMore()}
             </span>
           </div>
         </div>
@@ -124,7 +133,7 @@ export function InfiniteScrollLoader({
           <div className="flex flex-col items-center space-y-3">
             <div className="flex items-center space-x-2 text-gray-400">
               <ChevronDown className="w-4 h-4 animate-scroll-hint" />
-              <span className="text-sm">{translations.feed.infiniteScroll.viewMoreContent()}</span>
+              <span className="text-sm">{customMessages?.viewMoreContent || translations.feed.infiniteScroll.viewMoreContent()}</span>
             </div>
           </div>
         </div>

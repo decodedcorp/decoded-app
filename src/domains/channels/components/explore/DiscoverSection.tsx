@@ -18,10 +18,7 @@ interface DiscoverSectionProps {
   onChannelClick?: (channel: ChannelData) => void;
 }
 
-export function DiscoverSection({
-  className = '',
-  onChannelClick,
-}: DiscoverSectionProps) {
+export function DiscoverSection({ className = '', onChannelClick }: DiscoverSectionProps) {
   const { t } = useTranslation('common');
   const router = useRouter();
   const openChannelModal = useChannelModalStore((state) => state.openModal);
@@ -385,6 +382,14 @@ export function DiscoverSection({
             scrollRoot={null}
             rootMargin="400px"
             threshold={0.1}
+            customMessages={{
+              loadingMore: t('discover.infiniteScroll.loadingMore'),
+              retry: t('discover.infiniteScroll.retry'),
+              serverError: t('discover.infiniteScroll.serverError'),
+              loadFailed: t('discover.infiniteScroll.loadFailed'),
+              serverIssueDetected: t('discover.infiniteScroll.serverIssueDetected'),
+              viewMoreContent: t('discover.infiniteScroll.viewMoreChannels'),
+            }}
           />
         </div>
       )}

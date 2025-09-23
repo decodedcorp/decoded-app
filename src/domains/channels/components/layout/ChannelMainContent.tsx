@@ -114,10 +114,7 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
               <TrendingChannelsSection className="mb-16" />
 
               {/* All Channels Section */}
-              <DiscoverSection
-                onChannelClick={handleChannelClick}
-                className=""
-              />
+              <DiscoverSection onChannelClick={handleChannelClick} className="" />
             </>
           ) : (
             // Filtered grid view

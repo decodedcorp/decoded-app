@@ -523,7 +523,15 @@
     "subtitle": "Browse channels by category and find channels that suit you",
     "viewAllChannels": "View All Channels",
     "allCategories": "All Categories",
-    "allSubcategories": "All Subcategories"
+    "allSubcategories": "All Subcategories",
+    "infiniteScroll": {
+      "loadingMore": "Loading more channels...",
+      "retry": "Try Again",
+      "serverError": "Server error occurred",
+      "loadFailed": "Failed to load channels",
+      "serverIssueDetected": "Server issue detected",
+      "viewMoreChannels": "View More Channels"
+    }
   },
   "toast": {
     "profile": {
