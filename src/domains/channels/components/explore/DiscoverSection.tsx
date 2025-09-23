@@ -10,15 +10,15 @@ import { ChannelCard } from '@/components/ChannelCard/ChannelCard';
 import { useTranslation } from 'react-i18next';
 
 import { useCategories, formatCategoriesForDropdown } from '../../hooks/useCategories';
+import { useInfiniteChannels } from '../../hooks/useChannels';
+import { InfiniteScrollLoader } from '@/domains/main/components/InfiniteScrollLoader';
 
 interface DiscoverSectionProps {
-  channels: ChannelData[];
   className?: string;
   onChannelClick?: (channel: ChannelData) => void;
 }
 
 export function DiscoverSection({
-  channels,
   className = '',
   onChannelClick,
 }: DiscoverSectionProps) {
@@ -37,6 +37,28 @@ export function DiscoverSection({
   );
   const { categories, subcategories } = formatCategoriesForDropdown(categoriesData, t);
 
+  // Infinite scroll channels data
+  const {
+    data,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useInfiniteChannels({
+    limit: 12, // Show 12 channels per page
+    sortBy: 'created_at',
+    sortOrder: 'desc',
+  });
+
+  // Flatten all channels from all pages
+  const allChannels = useMemo(() => {
+    if (!data?.pages) return [];
+    return data.pages.flatMap((page) => page?.channels || []);
+  }, [data?.pages]);
+
   const handleChannelClick = (channel: ChannelData) => {
     if (onChannelClick) {
       onChannelClick(channel);
@@ -47,7 +69,7 @@ export function DiscoverSection({
 
   // Filter channels based on selected category and subcategory
   const filteredChannels = useMemo(() => {
-    let filtered = [...channels];
+    let filtered = [...allChannels];
 
     if (selectedCategory !== 'all') {
       // Convert API category format back to match channel data format
@@ -66,10 +88,49 @@ export function DiscoverSection({
       );
     }
 
-    return filtered.slice(0, 12); // Show up to 12 channels
-  }, [channels, selectedCategory, selectedSubcategory, categories, subcategories]);
+    return filtered;
+  }, [allChannels, selectedCategory, selectedSubcategory, categories, subcategories]);
 
-  if (!channels.length) {
+  // Loading state
+  if (isLoading && !allChannels.length) {
+    return (
+      <section className={`${className}`}>
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-gray-400 mb-2">{t('discover.title')}</h2>
+          <p className="text-zinc-500 text-sm">{t('discover.subtitle')}</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <div key={index} className="h-64 bg-zinc-900 rounded-lg animate-pulse"></div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  // Error state
+  if (isError && !allChannels.length) {
+    return (
+      <section className={`${className}`}>
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-gray-400 mb-2">{t('discover.title')}</h2>
+          <p className="text-zinc-500 text-sm">{t('discover.subtitle')}</p>
+        </div>
+        <div className="text-center py-12">
+          <div className="text-red-400 mb-4">Failed to load channels</div>
+          <button
+            onClick={() => refetch()}
+            className="px-4 py-2 bg-zinc-800 text-white rounded hover:bg-zinc-700 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </section>
+    );
+  }
+
+  // Empty state
+  if (!allChannels.length) {
     return null;
   }
 
@@ -306,23 +367,27 @@ export function DiscoverSection({
             variant="magazine"
             size="medium"
             onCardClick={handleChannelClick}
-            className="h-full"
+            className="h-full animate-fade-in-up"
           />
         ))}
       </div>
 
-      {/* Show More Button */}
-      {/* <div className="text-center mt-8">
-        <button
-          onClick={() => router.push('/channels')}
-          className="px-8 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg font-medium transition-colors duration-200 inline-flex items-center space-x-2"
-        >
-          <span>{t('discover.viewAllChannels')}</span>
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
-      </div> */}
+      {/* Infinite Scroll Loader */}
+      {filteredChannels.length > 0 && (
+        <div className="mt-8">
+          <InfiniteScrollLoader
+            hasNextPage={hasNextPage || false}
+            isFetchingNextPage={isFetchingNextPage}
+            fetchNextPage={fetchNextPage}
+            error={error}
+            onRetry={() => refetch()}
+            className="mt-8"
+            scrollRoot={null}
+            rootMargin="400px"
+            threshold={0.1}
+          />
+        </div>
+      )}
     </section>
   );
 }

@@ -115,7 +115,6 @@ export function ChannelMainContent({ className = '' }: ChannelMainContentProps) 
 
               {/* All Channels Section */}
               <DiscoverSection
-                channels={channels}
                 onChannelClick={handleChannelClick}
                 className=""
               />
