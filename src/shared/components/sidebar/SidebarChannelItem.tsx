@@ -65,7 +65,7 @@ export const SidebarChannelItem = memo(function SidebarChannelItem({
 
   const baseClasses = `
     flex items-center gap-2 lg:gap-3 px-3 py-1.5 lg:py-2 rounded-lg
-    text-xs lg:text-sm font-normal transition-all duration-200 cursor-pointer
+    text-sm lg:text-sm font-normal transition-all duration-200 cursor-pointer
     ${
       isActive ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200'
     }
@@ -92,7 +92,7 @@ export const SidebarChannelItem = memo(function SidebarChannelItem({
       </div>
 
       {/* Channel name */}
-      <span className="flex-1 truncate text-xs lg:text-sm">{channel.name}</span>
+      <span className="flex-1 truncate text-sm lg:text-sm">{channel.name}</span>
     </Link>
   );
 });

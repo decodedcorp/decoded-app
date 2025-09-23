@@ -3,6 +3,7 @@
 import { useRef, useEffect, useCallback } from 'react';
 
 import { RotateCcw, ChevronDown } from 'lucide-react';
+import { useCommonTranslation } from '@/lib/i18n/hooks';
 
 interface InfiniteScrollLoaderProps {
   hasNextPage: boolean;
@@ -14,6 +15,14 @@ interface InfiniteScrollLoaderProps {
   scrollRoot?: Element | null; // Custom scroll container
   rootMargin?: string; // Custom root margin for pre-loading
   threshold?: number; // Custom intersection threshold
+  customMessages?: {
+    loadingMore?: string;
+    retry?: string;
+    serverError?: string;
+    loadFailed?: string;
+    serverIssueDetected?: string;
+    viewMoreContent?: string;
+  };
 }
 
 export function InfiniteScrollLoader({
@@ -24,10 +33,12 @@ export function InfiniteScrollLoader({
   onRetry,
   className = '',
   scrollRoot,
-  rootMargin = '1200px', // Enhanced pre-loading distance
+  rootMargin = '800px', // 더 자연스러운 로딩을 위해 거리 조정
   threshold = 0.1,
+  customMessages,
 }: InfiniteScrollLoaderProps) {
   const observerRef = useRef<HTMLDivElement>(null);
+  const translations = useCommonTranslation();
 
   // Memoized fetch function to prevent unnecessary re-renders
   const handleFetchNextPage = useCallback(() => {
@@ -76,44 +87,60 @@ export function InfiniteScrollLoader({
   if (!hasNextPage && !error) return null;
 
   return (
-    <div ref={observerRef} className={`flex justify-center py-8 ${className}`}>
+    <div ref={observerRef} className={`${className}`}>
       {error ? (
         // 에러 상태 - 향상된 에러 처리
-        <div className="text-center">
-          <div className="text-red-400 mb-3 text-sm">
-            {(error as any)?.status >= 500 ? '서버 오류가 발생했어요' : '불러오기에 실패했어요'}
-          </div>
-          <div className="flex justify-center space-x-2">
-            <button
-              onClick={onRetry || fetchNextPage}
-              className="px-4 py-2 bg-zinc-800 text-white rounded-lg hover:bg-zinc-700 transition-all duration-200 text-sm font-medium border border-zinc-600 flex items-center space-x-2"
-            >
-              <RotateCcw className="w-4 h-4" />
-              <span>다시 시도</span>
-            </button>
-            {(error as any)?.status >= 500 && (
-              <div className="text-xs text-gray-500 self-center">서버 문제가 감지되었어요</div>
-            )}
+        <div className="flex justify-center py-6">
+          <div className="text-center">
+            <div className="text-red-400 mb-3 text-sm">
+              {(error as any)?.status >= 500
+                ? customMessages?.serverError || translations.feed.infiniteScroll.serverError()
+                : customMessages?.loadFailed || translations.feed.infiniteScroll.loadFailed()}
+            </div>
+            <div className="flex justify-center space-x-2">
+              <button
+                onClick={onRetry || fetchNextPage}
+                className="px-4 py-2 bg-zinc-800 text-white rounded-lg hover:bg-zinc-700 transition-all duration-200 text-sm font-medium border border-zinc-600 flex items-center space-x-2"
+              >
+                <RotateCcw className="w-4 h-4" />
+                <span>{customMessages?.retry || translations.feed.infiniteScroll.retry()}</span>
+              </button>
+              {(error as any)?.status >= 500 && (
+                <div className="text-xs text-gray-500 self-center">
+                  {customMessages?.serverIssueDetected ||
+                    translations.feed.infiniteScroll.serverIssueDetected()}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       ) : isFetchingNextPage ? (
-        // 로딩 상태 - 개선된 애니메이션
-        <div className="flex items-center space-x-3">
-          <div className="relative">
-            <div className="w-6 h-6 border-2 border-zinc-700 border-t-[#eafd66] rounded-full animate-spin"></div>
-            <div className="absolute inset-0 w-6 h-6 border-2 border-transparent border-t-[#eafd66] rounded-full animate-spin animation-delay-150"></div>
+        // 자연스러운 로딩 상태 - 새로운 애니메이션 적용
+        <div className="flex justify-center py-6">
+          <div className="flex items-center justify-center space-x-3 opacity-80">
+            <div className="flex space-x-1">
+              <div className="w-2 h-2 bg-[#eafd66] rounded-full animate-infinite-scroll-dot"></div>
+              <div className="w-2 h-2 bg-[#eafd66] rounded-full animate-infinite-scroll-dot"></div>
+              <div className="w-2 h-2 bg-[#eafd66] rounded-full animate-infinite-scroll-dot"></div>
+            </div>
+            <span className="text-gray-400 text-sm">
+              {customMessages?.loadingMore || translations.feed.infiniteScroll.loadingMore()}
+            </span>
           </div>
-          <span className="text-gray-400 text-sm font-medium">최신 콘텐츠를 불러오는 중</span>
         </div>
       ) : hasNextPage ? (
-        // 더보기 버튼 - 사용자가 수동으로 로드할 수 있음
-        <button
-          onClick={handleFetchNextPage}
-          className="px-6 py-3 bg-gradient-to-r from-zinc-800 to-zinc-700 text-white rounded-lg hover:from-zinc-700 hover:to-zinc-600 transition-all duration-200 text-sm font-medium border border-zinc-600 flex items-center space-x-2 shadow-lg hover:shadow-xl"
-        >
-          <ChevronDown className="w-4 h-4" />
-          <span>더 보기</span>
-        </button>
+        // 더 많은 콘텐츠가 있을 때 심플한 스크롤 유도 UI
+        <div className="flex justify-center py-8">
+          <div className="flex flex-col items-center space-y-3">
+            <div className="flex items-center space-x-2 text-gray-400">
+              <ChevronDown className="w-4 h-4 animate-scroll-hint" />
+              <span className="text-sm">
+                {customMessages?.viewMoreContent ||
+                  translations.feed.infiniteScroll.viewMoreContent()}
+              </span>
+            </div>
+          </div>
+        </div>
       ) : null}
     </div>
   );

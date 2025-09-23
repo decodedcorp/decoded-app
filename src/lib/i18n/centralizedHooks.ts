@@ -245,6 +245,14 @@ type CommonTranslations = {
       justIn: () => string;
       trending: () => string;
     };
+    infiniteScroll: {
+      loadingMore: () => string;
+      retry: () => string;
+      serverError: () => string;
+      loadFailed: () => string;
+      serverIssueDetected: () => string;
+      viewMoreContent: () => string;
+    };
   };
   globalContentUpload: {
     title: () => string;
@@ -841,6 +849,14 @@ export const useCommonTranslation = (): CommonTranslations => {
       badge: {
         justIn: () => t('feed.badge.justIn'),
         trending: () => t('feed.badge.trending'),
+      },
+      infiniteScroll: {
+        loadingMore: () => t('feed.infiniteScroll.loadingMore'),
+        retry: () => t('feed.infiniteScroll.retry'),
+        serverError: () => t('feed.infiniteScroll.serverError'),
+        loadFailed: () => t('feed.infiniteScroll.loadFailed'),
+        serverIssueDetected: () => t('feed.infiniteScroll.serverIssueDetected'),
+        viewMoreContent: () => t('feed.infiniteScroll.viewMoreContent'),
       },
     },
     globalContentUpload: {

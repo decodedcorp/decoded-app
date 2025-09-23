@@ -172,7 +172,7 @@ export function RightSidebar() {
   }
 
   return (
-    <div className="w-full h-full py-4 px-2 overflow-hidden flex flex-col bg-black">
+    <div className="px-2 py-4 bg-black min-h-full flex flex-col" data-testid="right-sidebar">
       {/* 추천 채널 */}
       <div className="mb-4 flex-shrink-0">
         <div className="text-white text-xs lg:text-sm font-medium mb-2 lg:mb-3 flex items-center gap-2">
@@ -184,7 +184,7 @@ export function RightSidebar() {
           {recLoading || fallbackLoading ? (
             <div className="space-y-1 lg:space-y-2">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="p-2 lg:p-3 border-b border-zinc-800 animate-pulse">
+                <div key={i} className="p-1.5 lg:p-2 border-b border-zinc-800 animate-pulse">
                   <div className="flex items-center gap-2 lg:gap-3">
                     <div className="w-8 h-8 lg:w-10 lg:h-10 bg-zinc-700 rounded-lg flex-shrink-0"></div>
                     <div className="flex-1 min-w-0">
@@ -197,7 +197,7 @@ export function RightSidebar() {
             </div>
           ) : /* 에러 상태 */
           recError && fallbackError ? (
-            <div className="text-[10px] lg:text-xs text-red-400 p-2 lg:p-3 border border-red-800 rounded">
+            <div className="text-[10px] lg:text-xs text-red-400 p-1.5 lg:p-2 border border-red-800 rounded">
               {t.globalContentUpload.sidebar.loadChannelsFailed()}
             </div>
           ) : /* 데이터 없음 */
@@ -211,7 +211,7 @@ export function RightSidebar() {
               <Link
                 key={channel.id}
                 href={`/channels/${channel.id}`}
-                className="block p-2 lg:p-3 border-b border-zinc-800 hover:border-zinc-700 cursor-pointer transition-colors last:border-b-0"
+                className="block p-1.5 lg:p-2 border-b border-zinc-800 hover:border-zinc-700 cursor-pointer transition-colors last:border-b-0"
               >
                 <div className="flex items-center gap-2 lg:gap-3">
                   {/* 썸네일 */}

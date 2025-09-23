@@ -154,7 +154,7 @@ export function GlobalSearchBar({
   }, []);
 
   return (
-    <div className={`w-full max-w-2xl ${className}`}>
+    <div className={`w-full ${className}`}>
       <form onSubmit={handleSubmit} className="relative">
         <div className="relative flex items-center bg-zinc-800/70 hover:bg-zinc-800/90 rounded-full border border-zinc-600/50 hover:border-zinc-500/50 focus-within:border-[#eafd66]/50 transition-all duration-200">
           {/* 검색 아이콘 */}

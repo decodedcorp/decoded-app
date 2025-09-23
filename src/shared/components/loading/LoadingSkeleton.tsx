@@ -28,9 +28,9 @@ export function LoadingSkeleton({
                         columns === 4 ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4' :
                         'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5';
         return (
-          <div className={`grid ${gridCols} gap-4`}>
+          <div className={`grid ${gridCols} gap-3 md:gap-4`}>
             {Array.from({ length: rows * columns }).map((_, i) => (
-              <div key={i} className="aspect-square bg-zinc-800 rounded-xl animate-pulse" />
+              <div key={i} className="aspect-[4/5] bg-zinc-800 rounded-xl animate-pulse" />
             ))}
           </div>
         );
@@ -101,25 +101,56 @@ export function LoadingSkeleton({
         );
 
       case 'feed':
-        // 메인 피드용 포스트 카드 스켈레톤
+        // 메인 피드용 포스트 카드 스켈레톤 - PostCard와 동일한 구조
         return (
-          <div className="space-y-6">
-            {Array.from({ length: rows }).map((_, i) => (
-              <div key={i} className="bg-zinc-900/50 rounded-xl p-4 animate-pulse">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-10 h-10 bg-zinc-800 rounded-full" />
-                  <div className="flex-1">
-                    <div className="h-4 bg-zinc-800 rounded mb-1 w-1/3" />
-                    <div className="h-3 bg-zinc-800 rounded w-1/4" />
+          <div className="max-w-3xl mx-auto">
+            <div className="columns-1 lg:columns-3 gap-4 space-y-0">
+              {Array.from({ length: rows }).map((_, i) => (
+                <div key={i} className="mb-4 break-inside-avoid">
+                  <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden animate-pulse">
+                    <div className="p-4">
+                      {/* 상단: 채널 정보 */}
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-9 h-9 bg-zinc-800 rounded-full flex-shrink-0" />
+                        <div className="flex items-center gap-2 text-sm">
+                          <div className="h-4 bg-zinc-800 rounded w-20" />
+                          <div className="w-1 h-1 bg-zinc-700 rounded-full" />
+                          <div className="flex items-center gap-1">
+                            <div className="w-4 h-4 bg-zinc-800 rounded-full" />
+                            <div className="h-4 bg-zinc-800 rounded w-16" />
+                          </div>
+                          <div className="w-1 h-1 bg-zinc-700 rounded-full" />
+                          <div className="h-4 bg-zinc-800 rounded w-12" />
+                        </div>
+                      </div>
+
+                      {/* 콘텐츠 영역 */}
+                      <div className="p-2 -m-2">
+                        {/* 제목 */}
+                        <div className="space-y-2 mb-3">
+                          <div className="h-6 bg-zinc-800 rounded w-full" />
+                          <div className="h-6 bg-zinc-800 rounded w-4/5" />
+                        </div>
+
+                        {/* 설명 */}
+                        <div className="space-y-2 mb-4">
+                          <div className="h-4 bg-zinc-800 rounded w-full" />
+                          <div className="h-4 bg-zinc-800 rounded w-5/6" />
+                          <div className="h-4 bg-zinc-800 rounded w-3/4" />
+                        </div>
+
+                        {/* 썸네일 이미지 */}
+                        <div className="mb-4">
+                          <div className="w-full h-64 bg-zinc-800 rounded-lg relative">
+                            <div className="absolute top-3 right-3 bg-zinc-700 w-8 h-6 rounded" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div className="aspect-[4/3] bg-zinc-800 rounded-lg mb-4" />
-                <div className="space-y-2">
-                  <div className="h-3 bg-zinc-800 rounded w-full" />
-                  <div className="h-3 bg-zinc-800 rounded w-2/3" />
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         );
 
@@ -139,9 +170,9 @@ export function LoadingSkeleton({
               </div>
             </div>
             {/* 콘텐츠 그리드 */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
               {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="aspect-square bg-zinc-800 rounded-xl" />
+                <div key={i} className="aspect-[4/5] bg-zinc-800 rounded-xl" />
               ))}
             </div>
           </div>
@@ -183,13 +214,13 @@ export function LoadingSkeleton({
             {compact ? (
               <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                 {Array.from({ length: 12 }).map((_, i) => (
-                  <div key={i} className="aspect-square bg-zinc-800 rounded-lg animate-pulse" />
+                  <div key={i} className="aspect-[4/5] bg-zinc-800 rounded-lg animate-pulse" />
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
                 {Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i} className="aspect-square bg-zinc-800 rounded-xl animate-pulse" />
+                  <div key={i} className="aspect-[4/5] bg-zinc-800 rounded-xl animate-pulse" />
                 ))}
               </div>
             )}

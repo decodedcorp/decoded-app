@@ -359,16 +359,20 @@ export const MainFeed = React.memo(function MainFeed() {
   return (
     <div className="w-full min-h-screen bg-black">
       {/* 메인 피드 (primary) - 기본 여백 유지 */}
-      <section data-role="primary-feed" className="layout-edge">
+      <section
+        data-role="primary-feed"
+        className="layout-edge"
+        style={{ paddingLeft: 'var(--edge-x)', paddingRight: 'var(--edge-x)' }}
+      >
         <div
-          className="w-full py-6"
+          className="w-full py-6 infinite-scroll-container"
           style={{
             scrollBehavior: 'smooth',
             willChange: 'scroll-position',
           }}
         >
           {/* 피드 헤더 */}
-          <div className="mb-8 max-w-4xl mx-auto">
+          <div className="mb-8 max-w-3xl mx-auto">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h1 className="text-white text-xl font-bold mb-1">{t.feed.section.header()}</h1>
@@ -469,7 +473,7 @@ export const MainFeed = React.memo(function MainFeed() {
                   </button>
                 </div>
               ) : (
-                <div className="max-w-4xl mx-auto">
+                <div className="max-w-3xl mx-auto">
                   <FeedGrid
                     columns={{
                       mobile: 1,
@@ -546,7 +550,7 @@ export const MainFeed = React.memo(function MainFeed() {
 
           {/* 무한스크롤 로더 */}
           {feedData.length > 0 && (
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-3xl mx-auto relative">
               <InfiniteScrollLoader
                 hasNextPage={hasNextPage || false}
                 isFetchingNextPage={isFetchingNextPage}
@@ -555,7 +559,7 @@ export const MainFeed = React.memo(function MainFeed() {
                 onRetry={() => refetch()}
                 className="mt-12"
                 scrollRoot={null} // Use window as scroll container
-                rootMargin="800px" // Load more content earlier
+                rootMargin="400px" // 스크롤 유도 UI가 보이도록 거리 조정
                 threshold={0.1}
               />
             </div>

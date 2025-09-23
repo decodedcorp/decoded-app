@@ -237,10 +237,10 @@ export function ChannelPageHeader({
               {(isOwner || channel.is_manager) && (
                 <button
                   onClick={handleAddContent}
-                  className="inline-flex items-center justify-center rounded-full bg-zinc-700 hover:bg-zinc-600 text-white transition-colors px-3 py-2 text-sm sm:px-3 sm:py-2 sm:text-sm w-6 h-6 sm:w-auto sm:h-auto"
+                  className="inline-flex items-center justify-center rounded-full bg-zinc-800 hover:bg-zinc-700 text-white transition-colors w-6 h-6 sm:w-auto sm:h-auto sm:rounded-md sm:px-3 sm:py-1.5 sm:text-sm sm:border sm:border-zinc-700 sm:hover:border-zinc-600"
                 >
-                  <span className="hidden sm:inline">+ {t.create.createNewContent()}</span>
-                  <span className="sm:hidden">+</span>
+                  <span className="hidden sm:inline text-xs">+ {t.create.createNewContent()}</span>
+                  <span className="sm:hidden text-lg font-medium">+</span>
                 </button>
               )}
 
@@ -279,11 +279,18 @@ export function ChannelPageHeader({
               {canManageSettings && (
                 <button
                   onClick={handleSettings}
-                  className="p-2 rounded-full bg-zinc-800 hover:bg-zinc-700 text-white transition-colors"
+                  className="inline-flex items-center justify-center rounded-full bg-zinc-800 hover:bg-zinc-700 text-white transition-colors w-6 h-6 sm:w-auto sm:h-auto sm:rounded-md sm:px-3 sm:py-1.5 sm:text-sm sm:border sm:border-zinc-700 sm:hover:border-zinc-600"
                   aria-label={t.navigation.settings()}
                   title={t.navigation.settings()}
                 >
-                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                  <svg
+                    width="12"
+                    height="12"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    className="sm:mr-1.5"
+                  >
                     <path
                       d="M12 15a3 3 0 100-6 3 3 0 000 6z"
                       stroke="currentColor"
@@ -299,6 +306,7 @@ export function ChannelPageHeader({
                       strokeLinejoin="round"
                     />
                   </svg>
+                  <span className="hidden sm:inline text-xs">{t.navigation.settings()}</span>
                 </button>
               )}
             </div>
