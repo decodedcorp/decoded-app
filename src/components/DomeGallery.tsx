@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useCallback, forwardRef, useImperativeHandle } from 'react';
 import { useGesture } from '@use-gesture/react';
+import { useTrendingContents } from '@/domains/main/hooks/useTrendingContents';
 
-const DEFAULT_IMAGES = [
+// Fallback images for when API data is not available
+const FALLBACK_IMAGES = [
   {
     src: 'https://images.unsplash.com/photo-1755331039789-7e5680e26e8f?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     alt: 'Abstract art',
@@ -51,7 +53,27 @@ const getDataNumber = (el: Element, name: string, fallback: number) => {
   return Number.isFinite(n) ? n : fallback;
 };
 
-function buildItems(pool: any[], seg: number) {
+interface ImageItem {
+  src: string;
+  alt: string;
+  id?: string;
+  url?: string;
+  channelName?: string;
+}
+
+interface BuiltItem {
+  x: number;
+  y: number;
+  sizeX: number;
+  sizeY: number;
+  src: string;
+  alt: string;
+  id?: string;
+  url?: string;
+  channelName?: string;
+}
+
+function buildItems(pool: any[], seg: number): BuiltItem[] {
   const xCols = Array.from({ length: seg }, (_, i) => -37 + i * 2);
   const evenYs = [-4, -2, 0, 2, 4];
   const oddYs = [-3, -1, 1, 3, 5];
@@ -71,11 +93,17 @@ function buildItems(pool: any[], seg: number) {
     );
   }
 
-  const normalizedImages = pool.map((image) => {
+  const normalizedImages: ImageItem[] = pool.map((image) => {
     if (typeof image === 'string') {
       return { src: image, alt: '' };
     }
-    return { src: image.src || '', alt: image.alt || '' };
+    return {
+      src: image.src || '',
+      alt: image.alt || '',
+      id: image.id,
+      url: image.url,
+      channelName: image.channelName,
+    };
   });
 
   const usedImages = Array.from(
@@ -100,6 +128,9 @@ function buildItems(pool: any[], seg: number) {
     ...c,
     src: usedImages[i].src,
     alt: usedImages[i].alt,
+    id: usedImages[i].id,
+    url: usedImages[i].url,
+    channelName: usedImages[i].channelName,
   }));
 }
 
@@ -136,11 +167,13 @@ const DomeGallery = forwardRef<
     imageBorderRadius?: string;
     openedImageBorderRadius?: string;
     grayscale?: boolean;
+    useApi?: boolean;
+    limit?: number;
   }
 >(
   (
     {
-      images = DEFAULT_IMAGES,
+      images,
       fit = 0.5,
       fitBasis = 'auto',
       minRadius = 600,
@@ -157,6 +190,8 @@ const DomeGallery = forwardRef<
       imageBorderRadius = '30px',
       openedImageBorderRadius = '30px',
       grayscale = true,
+      useApi = true,
+      limit = 20,
     },
     ref,
   ) => {
@@ -166,6 +201,44 @@ const DomeGallery = forwardRef<
     const frameRef = useRef<HTMLDivElement>(null);
     const viewerRef = useRef<HTMLDivElement>(null);
     const scrimRef = useRef<HTMLDivElement>(null);
+
+    // API hook for trending contents
+    const { popularContents, isLoading, isError } = useTrendingContents({
+      limit,
+      enabled: useApi,
+    });
+
+    // Transform API data to image format
+    const apiImages = useMemo(() => {
+      if (!useApi || !popularContents?.content) return [];
+
+      return popularContents.content
+        .filter((item) => item.thumbnail_url) // Only items with thumbnails
+        .map((item) => ({
+          src: item.thumbnail_url!,
+          alt: item.title || item.description || `Content from ${item.channel_name}`,
+          id: item.id,
+          url: item.url,
+          channelName: item.channel_name,
+        }));
+    }, [popularContents, useApi]);
+
+    // Use API images if available, otherwise fallback to provided images or default
+    const displayImages = useMemo(() => {
+      if (useApi) {
+        // When using API, only show images when data is loaded and available
+        if (!isLoading && apiImages.length > 0) {
+          return apiImages;
+        }
+        // Return empty array to prevent fallback images from showing
+        return [];
+      }
+      if (images && images.length > 0) {
+        return images;
+      }
+      // Only use fallback images when not using API
+      return FALLBACK_IMAGES;
+    }, [useApi, isLoading, apiImages, images]);
 
     // ref를 통해 외부에서 접근할 수 있는 메서드들
     useImperativeHandle(ref, () => ({
@@ -209,7 +282,7 @@ const DomeGallery = forwardRef<
       document.body.classList.remove('dg-scroll-lock');
     }, []);
 
-    const items = useMemo(() => buildItems(images, segments), [images, segments]);
+    const items = useMemo(() => buildItems(displayImages, segments), [displayImages, segments]);
 
     const applyTransform = (xDeg: number, yDeg: number) => {
       const el = sphereRef.current;
@@ -432,9 +505,10 @@ const DomeGallery = forwardRef<
             startPosRef.current = null;
             cancelTapRef.current = !isTap;
 
-            if (isTap && tapTargetRef.current && !focusedElRef.current) {
-              openItemFromElement(tapTargetRef.current);
-            }
+            // Disable tap to open functionality
+            // if (isTap && tapTargetRef.current && !focusedElRef.current) {
+            //   openItemFromElement(tapTargetRef.current);
+            // }
             tapTargetRef.current = null;
 
             if (cancelTapRef.current) setTimeout(() => (cancelTapRef.current = false), 120);
@@ -595,125 +669,8 @@ const DomeGallery = forwardRef<
     }, [enlargeTransitionMs, openedImageBorderRadius, grayscale]);
 
     const openItemFromElement = (el: HTMLElement) => {
-      if (!el || cancelTapRef.current) return;
-      if (openingRef.current) return;
-      openingRef.current = true;
-      openStartedAtRef.current = performance.now();
-      lockScroll();
-      const parent = el.parentElement;
-      if (!parent) return;
-      focusedElRef.current = el;
-      el.setAttribute('data-focused', 'true');
-
-      const offsetX = getDataNumber(parent, 'offsetX', 0);
-      const offsetY = getDataNumber(parent, 'offsetY', 0);
-      const sizeX = getDataNumber(parent, 'sizeX', 2);
-      const sizeY = getDataNumber(parent, 'sizeY', 2);
-
-      const parentRot = computeItemBaseRotation(offsetX, offsetY, sizeX, sizeY, segments);
-      const parentY = normalizeAngle(parentRot.rotateY);
-      const globalY = normalizeAngle(rotationRef.current.y);
-      let rotY = -(parentY + globalY) % 360;
-      if (rotY < -180) rotY += 360;
-      const rotX = -parentRot.rotateX - rotationRef.current.x;
-
-      parent.style.setProperty('--rot-y-delta', `${rotY}deg`);
-      parent.style.setProperty('--rot-x-delta', `${rotX}deg`);
-
-      const refDiv = document.createElement('div');
-      refDiv.className = 'item__image item__image--reference opacity-0';
-      refDiv.style.transform = `rotateX(${-parentRot.rotateX}deg) rotateY(${-parentRot.rotateY}deg)`;
-      parent.appendChild(refDiv);
-
-      const tileR = refDiv.getBoundingClientRect();
-      const mainR = mainRef.current?.getBoundingClientRect();
-      const frameR = frameRef.current?.getBoundingClientRect();
-      if (!mainR || !frameR) return;
-
-      originalTilePositionRef.current = {
-        left: tileR.left,
-        top: tileR.top,
-        width: tileR.width,
-        height: tileR.height,
-      };
-
-      el.style.visibility = 'hidden';
-      el.style.zIndex = '0';
-
-      const overlay = document.createElement('div');
-      overlay.className = 'enlarge';
-      overlay.style.position = 'absolute';
-      overlay.style.left = frameR.left - mainR.left + 'px';
-      overlay.style.top = frameR.top - mainR.top + 'px';
-      overlay.style.width = frameR.width + 'px';
-      overlay.style.height = frameR.height + 'px';
-      overlay.style.opacity = '0';
-      overlay.style.zIndex = '30';
-      overlay.style.willChange = 'transform, opacity';
-      overlay.style.transformOrigin = 'top left';
-      overlay.style.transition = `transform ${enlargeTransitionMs}ms ease, opacity ${enlargeTransitionMs}ms ease`;
-      overlay.style.borderRadius = openedImageBorderRadius;
-      overlay.style.overflow = 'hidden';
-      overlay.style.boxShadow = '0 10px 30px rgba(0,0,0,.35)';
-
-      const rawSrc = parent.dataset.src || el.querySelector('img')?.getAttribute('src') || '';
-      const rawAlt = parent.dataset.alt || el.querySelector('img')?.getAttribute('alt') || '';
-      const img = document.createElement('img');
-      img.src = rawSrc;
-      img.alt = rawAlt;
-      img.style.width = '100%';
-      img.style.height = '100%';
-      img.style.objectFit = 'cover';
-      img.style.filter = grayscale ? 'grayscale(1)' : 'none';
-      overlay.appendChild(img);
-      viewerRef.current?.appendChild(overlay);
-
-      const tx0 = tileR.left - frameR.left;
-      const ty0 = tileR.top - frameR.top;
-      const sx0 = tileR.width / frameR.width;
-      const sy0 = tileR.height / frameR.height;
-      overlay.style.transform = `translate(${tx0}px, ${ty0}px) scale(${sx0}, ${sy0})`;
-
-      requestAnimationFrame(() => {
-        overlay.style.opacity = '1';
-        overlay.style.transform = 'translate(0px, 0px) scale(1, 1)';
-        rootRef.current?.setAttribute('data-enlarging', 'true');
-      });
-
-      const wantsResize = openedImageWidth || openedImageHeight;
-      if (wantsResize) {
-        const onFirstEnd = (ev: TransitionEvent) => {
-          if (ev.propertyName !== 'transform') return;
-          overlay.removeEventListener('transitionend', onFirstEnd);
-          const prevTransition = overlay.style.transition;
-          overlay.style.transition = 'none';
-          const tempWidth = openedImageWidth || `${frameR.width}px`;
-          const tempHeight = openedImageHeight || `${frameR.height}px`;
-          overlay.style.width = tempWidth;
-          overlay.style.height = tempHeight;
-          const newRect = overlay.getBoundingClientRect();
-          overlay.style.width = frameR.width + 'px';
-          overlay.style.height = frameR.height + 'px';
-          void overlay.offsetWidth;
-          overlay.style.transition = `left ${enlargeTransitionMs}ms ease, top ${enlargeTransitionMs}ms ease, width ${enlargeTransitionMs}ms ease, height ${enlargeTransitionMs}ms ease`;
-          const centeredLeft = frameR.left - mainR.left + (frameR.width - newRect.width) / 2;
-          const centeredTop = frameR.top - mainR.top + (frameR.height - newRect.height) / 2;
-          requestAnimationFrame(() => {
-            overlay.style.left = `${centeredLeft}px`;
-            overlay.style.top = `${centeredTop}px`;
-            overlay.style.width = tempWidth;
-            overlay.style.height = tempHeight;
-          });
-          const cleanupSecond = () => {
-            overlay.removeEventListener('transitionend', cleanupSecond);
-            overlay.style.transition = prevTransition;
-          };
-          overlay.addEventListener('transitionend', cleanupSecond, {
-            once: true,
-          });
-        };
-        overlay.addEventListener('transitionend', onFirstEnd);
-      }
+      // Disable click functionality
+      return;
     };
 
     useEffect(() => {
@@ -805,6 +762,27 @@ const DomeGallery = forwardRef<
     }
   `;
 
+    // Show loading state with fallback images (no separate loading screen)
+    // The dome will show fallback images while loading API data
+
+    // Show error state
+    if (useApi && isError) {
+      return (
+        <div className="relative w-full h-full flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-red-500 mb-4">⚠️</div>
+            <p className="text-gray-600 mb-2">Failed to load trending content</p>
+            <p className="text-sm text-gray-500">Using fallback images</p>
+          </div>
+        </div>
+      );
+    }
+
+    // Don't render anything if using API and no images are available yet
+    if (useApi && displayImages.length === 0) {
+      return null;
+    }
+
     return (
       <>
         <style dangerouslySetInnerHTML={{ __html: cssStyles }} />
@@ -836,6 +814,9 @@ const DomeGallery = forwardRef<
                     className="sphere-item absolute m-auto"
                     data-src={it.src}
                     data-alt={it.alt}
+                    data-url={it.url || ''}
+                    data-id={it.id || ''}
+                    data-channel-name={it.channelName || ''}
                     data-offset-x={it.x}
                     data-offset-y={it.y}
                     data-size-x={it.sizeX}
@@ -852,18 +833,7 @@ const DomeGallery = forwardRef<
                     }}
                   >
                     <div
-                      className="item__image absolute block overflow-hidden cursor-pointer bg-gray-200 transition-transform duration-300"
-                      role="button"
-                      tabIndex={0}
-                      aria-label={it.alt || 'Open image'}
-                      onClick={(e) => {
-                        if (performance.now() - lastDragEndAt.current < 80) return;
-                        openItemFromElement(e.currentTarget);
-                      }}
-                      onTouchEnd={(e) => {
-                        if (performance.now() - lastDragEndAt.current < 80) return;
-                        openItemFromElement(e.currentTarget);
-                      }}
+                      className="item__image absolute block overflow-hidden bg-gray-200 transition-all duration-300"
                       style={{
                         inset: '10px',
                         borderRadius: `var(--tile-radius, ${imageBorderRadius})`,

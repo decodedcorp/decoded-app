@@ -90,13 +90,17 @@ export default function InviteCodePage() {
       <div className="absolute inset-0">
         <DomeGallery
           ref={domeRef}
-          fit={0.8}
-          minRadius={600}
+          fit={1.0}
+          fitBasis="width"
+          minRadius={700}
           maxVerticalRotationDeg={0}
           segments={34}
           dragDampening={2}
           grayscale={true}
           overlayBlurColor="#111111"
+          padFactor={0.12}
+          useApi={true}
+          limit={20}
         />
       </div>
 
