@@ -359,7 +359,11 @@ export const MainFeed = React.memo(function MainFeed() {
   return (
     <div className="w-full min-h-screen bg-black">
       {/* 메인 피드 (primary) - 기본 여백 유지 */}
-      <section data-role="primary-feed" className="layout-edge">
+      <section
+        data-role="primary-feed"
+        className="layout-edge"
+        style={{ paddingLeft: 'var(--edge-x)', paddingRight: 'var(--edge-x)' }}
+      >
         <div
           className="w-full py-6 infinite-scroll-container"
           style={{

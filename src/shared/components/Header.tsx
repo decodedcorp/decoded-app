@@ -201,7 +201,7 @@ export const Header = memo(function Header() {
 
         {/* Search Bar */}
         <div className="hidden md:flex flex-1 justify-center">
-          <div className="w-full max-w-md lg:max-w-lg xl:max-w-xl">
+          <div className="w-full max-w-3xl" style={{ marginLeft: 'var(--search-offset)' }}>
             {isChannelPage && channelName ? (
               <ChannelSearchBar
                 channelId={channelId || ''}
@@ -262,7 +262,10 @@ export const Header = memo(function Header() {
           >
             {/* Grab handle */}
             <div className="flex items-center gap-3">
-              <div className="w-full max-w-md mx-auto">
+              <div
+                className="w-full max-w-3xl mx-auto"
+                style={{ marginLeft: 'var(--search-offset)' }}
+              >
                 {isChannelPage && channelName ? (
                   <ChannelSearchBar
                     channelId={channelId || ''}
