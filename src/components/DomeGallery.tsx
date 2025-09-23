@@ -1,6 +1,15 @@
-import { useEffect, useMemo, useRef, useCallback, forwardRef, useImperativeHandle } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useCallback,
+  forwardRef,
+  useImperativeHandle,
+  useState,
+} from 'react';
 import { useGesture } from '@use-gesture/react';
 import { useTrendingContents } from '@/domains/main/hooks/useTrendingContents';
+import { DomeCardModal } from './DomeCardModal';
 
 // Fallback images for when API data is not available
 const FALLBACK_IMAGES = [
@@ -59,6 +68,8 @@ interface ImageItem {
   id?: string;
   url?: string;
   channelName?: string;
+  title?: string;
+  description?: string;
 }
 
 interface BuiltItem {
@@ -71,6 +82,8 @@ interface BuiltItem {
   id?: string;
   url?: string;
   channelName?: string;
+  title?: string;
+  description?: string;
 }
 
 function buildItems(pool: any[], seg: number): BuiltItem[] {
@@ -131,6 +144,8 @@ function buildItems(pool: any[], seg: number): BuiltItem[] {
     id: usedImages[i].id,
     url: usedImages[i].url,
     channelName: usedImages[i].channelName,
+    title: usedImages[i].title,
+    description: usedImages[i].description,
   }));
 }
 
@@ -202,6 +217,10 @@ const DomeGallery = forwardRef<
     const viewerRef = useRef<HTMLDivElement>(null);
     const scrimRef = useRef<HTMLDivElement>(null);
 
+    // Modal state
+    const [selectedItem, setSelectedItem] = useState<BuiltItem | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     // API hook for trending contents
     const { popularContents, isLoading, isError } = useTrendingContents({
       limit,
@@ -220,17 +239,28 @@ const DomeGallery = forwardRef<
           id: item.id,
           url: item.url,
           channelName: item.channel_name,
+          title: item.title,
+          description: item.description,
         }));
     }, [popularContents, useApi]);
 
     // Use API images if available, otherwise fallback to provided images or default
     const displayImages = useMemo(() => {
       if (useApi) {
-        // When using API, only show images when data is loaded and available
-        if (!isLoading && apiImages.length > 0) {
+        // Debug logging
+        console.log('DomeGallery API state:', {
+          isLoading,
+          apiImagesLength: apiImages.length,
+          popularContents: !!popularContents,
+          hasContent: !!popularContents?.content,
+          contentLength: popularContents?.content?.length || 0,
+        });
+
+        // When using API, show images when data is loaded (even if empty, let the component handle it)
+        if (!isLoading) {
           return apiImages;
         }
-        // Return empty array to prevent fallback images from showing
+        // Return empty array while loading to prevent fallback images from showing
         return [];
       }
       if (images && images.length > 0) {
@@ -238,7 +268,7 @@ const DomeGallery = forwardRef<
       }
       // Only use fallback images when not using API
       return FALLBACK_IMAGES;
-    }, [useApi, isLoading, apiImages, images]);
+    }, [useApi, isLoading, apiImages, images, popularContents]);
 
     // ref를 통해 외부에서 접근할 수 있는 메서드들
     useImperativeHandle(ref, () => ({
@@ -284,6 +314,51 @@ const DomeGallery = forwardRef<
 
     const items = useMemo(() => buildItems(displayImages, segments), [displayImages, segments]);
 
+    // Handle item click
+    const handleItemClick = useCallback((item: BuiltItem) => {
+      if (item.src) {
+        setSelectedItem(item);
+        setIsModalOpen(true);
+      }
+    }, []);
+
+    // Close modal
+    const closeModal = useCallback(() => {
+      setIsModalOpen(false);
+      setSelectedItem(null);
+    }, []);
+
+    // 데이터가 로드된 후 돔 크기 재계산
+    useEffect(() => {
+      if (!isLoading && displayImages.length > 0) {
+        // 약간의 지연 후 크기 재계산 (DOM 업데이트 완료 후)
+        const timeoutId = setTimeout(() => {
+          const root = rootRef.current;
+          if (root) {
+            const cr = root.getBoundingClientRect();
+            const w = Math.max(1, cr.width);
+            const h = Math.max(1, cr.height);
+
+            if (w > 0 && h > 0) {
+              const minDim = Math.min(w, h);
+              const maxDim = Math.max(w, h);
+              const aspect = w / h;
+              let basis = aspect >= 1.3 ? w : minDim;
+              let radius = basis * fit;
+              const heightGuard = h * 1.35;
+              radius = Math.min(radius, heightGuard);
+              radius = clamp(radius, minRadius, maxRadius);
+
+              root.style.setProperty('--radius', `${Math.round(radius)}px`);
+              applyTransform(rotationRef.current.x, rotationRef.current.y);
+            }
+          }
+        }, 100);
+
+        return () => clearTimeout(timeoutId);
+      }
+    }, [isLoading, displayImages.length, fit, minRadius, maxRadius]);
+
     const applyTransform = (xDeg: number, yDeg: number) => {
       const el = sphereRef.current;
       if (el) {
@@ -296,8 +371,10 @@ const DomeGallery = forwardRef<
     useEffect(() => {
       const root = rootRef.current;
       if (!root) return;
-      const ro = new ResizeObserver((entries) => {
-        const cr = entries[0].contentRect;
+
+      // 초기 크기 설정을 위한 즉시 실행
+      const updateSize = (entries?: ResizeObserverEntry[]) => {
+        const cr = entries?.[0]?.contentRect || root.getBoundingClientRect();
         const w = Math.max(1, cr.width),
           h = Math.max(1, cr.height);
         const minDim = Math.min(w, h),
@@ -360,6 +437,13 @@ const DomeGallery = forwardRef<
             (enlargedOverlay as HTMLElement).style.height = `${frameR.height}px`;
           }
         }
+      };
+
+      // 즉시 크기 업데이트 실행
+      updateSize();
+
+      const ro = new ResizeObserver((entries) => {
+        updateSize(entries);
       });
       ro.observe(root);
       return () => ro.disconnect();
@@ -833,12 +917,13 @@ const DomeGallery = forwardRef<
                     }}
                   >
                     <div
-                      className="item__image absolute block overflow-hidden bg-gray-200 transition-all duration-300"
+                      className="item__image absolute block overflow-hidden bg-gray-200 transition-all duration-300 cursor-pointer hover:scale-105"
                       style={{
                         inset: '10px',
                         borderRadius: `var(--tile-radius, ${imageBorderRadius})`,
                         backfaceVisibility: 'hidden',
                       }}
+                      onClick={() => handleItemClick(it)}
                     >
                       <img
                         src={it.src}
@@ -906,6 +991,9 @@ const DomeGallery = forwardRef<
             </div>
           </main>
         </div>
+
+        {/* Card Modal */}
+        <DomeCardModal isOpen={isModalOpen} onClose={closeModal} item={selectedItem} />
       </>
     );
   },

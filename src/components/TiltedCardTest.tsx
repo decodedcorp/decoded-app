@@ -1,24 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 
 import TiltedCard from './TiltedCard';
 
 export default function TiltedCardTest() {
-  const [pixelTransitionTrigger, setPixelTransitionTrigger] = useState(false);
-
-  const handlePixelTransition = () => {
-    setPixelTransitionTrigger(true);
-    // 3초 후에 다시 false로 설정 (다시 테스트할 수 있도록)
-    setTimeout(() => {
-      setPixelTransitionTrigger(false);
-    }, 3000);
-  };
 
   return (
     <div className="p-8 bg-zinc-900 min-h-screen">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-white mb-8">TiltedCard 픽셀 전환 테스트</h1>
+        <h1 className="text-3xl font-bold text-white mb-8">TiltedCard 테스트</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* 기본 TiltedCard */}
@@ -33,30 +24,23 @@ export default function TiltedCardTest() {
             </div>
           </div>
 
-          {/* 픽셀 전환 TiltedCard */}
+          {/* 오버레이 TiltedCard */}
           <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-white">픽셀 전환 TiltedCard</h2>
+            <h2 className="text-xl font-semibold text-white">오버레이 TiltedCard</h2>
             <div className="w-[300px] h-[300px]">
               <TiltedCard
                 imageSrc="https://picsum.photos/300/300?random=2"
-                secondImageSrc="https://picsum.photos/300/300?random=3"
-                altText="First image"
-                secondAltText="Second image"
-                captionText="픽셀 전환 카드 - 버튼 클릭으로 전환 확인"
-                enablePixelTransition={true}
-                pixelTransitionTrigger={pixelTransitionTrigger}
-                gridSize={12}
-                pixelColor="#ffffff"
-                animationStepDuration={0.4}
+                altText="Test image 2"
+                captionText="오버레이 카드 - 호버 시 오버레이 표시"
+                displayOverlayContent={true}
+                overlayContent={
+                  <div className="p-4 text-white">
+                    <h3 className="font-bold text-lg mb-2">오버레이 콘텐츠</h3>
+                    <p className="text-sm">이것은 오버레이 예시입니다.</p>
+                  </div>
+                }
               />
             </div>
-            <button
-              onClick={handlePixelTransition}
-              disabled={pixelTransitionTrigger}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-lg transition-colors"
-            >
-              {pixelTransitionTrigger ? '전환 중...' : '픽셀 전환 시작'}
-            </button>
           </div>
         </div>
 
@@ -68,11 +52,10 @@ export default function TiltedCardTest() {
               • <strong>기본 카드:</strong> 마우스를 올려서 3D 틸트 효과를 확인하세요
             </li>
             <li>
-              • <strong>픽셀 전환 카드:</strong> &quot;픽셀 전환 시작&quot; 버튼을 클릭하여 이미지 전환
-              애니메이션을 확인하세요
+              • <strong>오버레이 카드:</strong> 마우스를 올려서 오버레이 콘텐츠를 확인하세요
             </li>
             <li>
-              • 픽셀 전환은 랜덤한 순서로 픽셀이 나타났다가 사라지면서 두 번째 이미지로 전환됩니다
+              • 카드는 마우스 움직임에 따라 자연스럽게 기울어지며 3D 효과를 제공합니다
             </li>
           </ul>
         </div>

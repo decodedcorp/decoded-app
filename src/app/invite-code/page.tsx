@@ -87,18 +87,18 @@ export default function InviteCodePage() {
   return (
     <div className="min-h-screen-safe bg relative flex items-center justify-center px-6 mobile-safe-area">
       {/* 배경 영역 - 3D 돔 갤러리 */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 w-full h-full">
         <DomeGallery
           ref={domeRef}
-          fit={1.0}
-          fitBasis="width"
-          minRadius={700}
+          fit={0.8}
+          fitBasis="auto"
+          minRadius={600}
           maxVerticalRotationDeg={0}
           segments={34}
           dragDampening={2}
           grayscale={true}
           overlayBlurColor="#111111"
-          padFactor={0.12}
+          padFactor={0.25}
           useApi={true}
           limit={20}
         />
