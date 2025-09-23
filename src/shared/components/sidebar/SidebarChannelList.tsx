@@ -112,7 +112,7 @@ export const SidebarChannelList = memo(function SidebarChannelList({
   return (
     <div className={`space-y-1 ${className}`}>
       {showTitle && (
-        <div className="px-3 py-1.5 lg:py-2 text-xs lg:text-sm font-medium text-zinc-400">
+        <div className="px-3 py-1.5 lg:py-2 text-sm lg:text-sm font-medium text-zinc-400">
           {getTitle()}
         </div>
       )}
@@ -133,17 +133,17 @@ export const SidebarChannelList = memo(function SidebarChannelList({
           ))
         ) : error ? (
           // Error state
-          <div className="px-3 py-1.5 lg:py-2 text-xs lg:text-sm text-zinc-500">
+          <div className="px-3 py-1.5 lg:py-2 text-sm lg:text-sm text-zinc-500">
             {t.sidebar.loadError()}
           </div>
         ) : channels.length === 0 && !shouldUseTrending ? (
           // Empty state (only when showing subscribed channels and they're empty)
-          <div className="px-3 py-1.5 lg:py-2 text-xs lg:text-sm text-zinc-500">
+          <div className="px-3 py-1.5 lg:py-2 text-sm lg:text-sm text-zinc-500">
             {getEmptyMessage()}
           </div>
         ) : channels.length === 0 ? (
           // Empty state for trending channels
-          <div className="px-3 py-1.5 lg:py-2 text-xs lg:text-sm text-zinc-500">
+          <div className="px-3 py-1.5 lg:py-2 text-sm lg:text-sm text-zinc-500">
             {t.sidebar.trendingEmpty()}
           </div>
         ) : (
@@ -160,10 +160,10 @@ export const SidebarChannelList = memo(function SidebarChannelList({
             {/* More channels link */}
             <Link
               href="/channels"
-              className="flex items-center gap-2 px-3 py-1.5 lg:py-2 rounded-lg text-xs lg:text-sm text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 transition-all duration-200 group cursor-pointer"
+              className="flex items-center gap-2 px-3 py-1.5 lg:py-2 rounded-lg text-sm lg:text-sm text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 transition-all duration-200 group cursor-pointer"
             >
               <div className="w-5 h-5 lg:w-6 lg:h-6 rounded-full bg-zinc-700 flex items-center justify-center flex-shrink-0">
-                <ArrowRightIcon className="w-2.5 h-2.5 lg:w-3 lg:h-3" />
+                <ArrowRightIcon className="w-3 h-3 lg:w-3 lg:h-3" />
               </div>
               <span className="flex-1">{t.sidebar.viewMoreChannels()}</span>
             </Link>
