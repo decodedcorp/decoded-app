@@ -1,5 +1,8 @@
 @tailwind utilities;
 
+/* Import Design System Tokens */
+@import './design-tokens.css';
+
 /* Import Modal Tokens */
 @import './modal-tokens.css';
 

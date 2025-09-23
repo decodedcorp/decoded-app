@@ -7,12 +7,10 @@ import { QueryProvider } from '../lib/providers/QueryProvider';
 import { ToastProvider } from '../lib/providers/ToastProvider';
 import { I18nProvider } from '../lib/providers/I18nProvider';
 import { PerformanceProvider } from '../lib/providers/PerformanceProvider';
-import { Header } from '../shared/components/Header';
-import { MainLayout } from '../shared/components/MainLayout';
 import { AuthInitializer } from '../domains/auth/components/AuthInitializer';
-import { GlobalContentUploadModal } from '../domains/channels/components/modal/global-content-upload/GlobalContentUploadModal';
-import { CommentsRoot } from '../domains/comments/components/CommentsRoot';
 import { getServerTheme } from '../lib/theme-utils';
+import { InviteGate } from '../components/invite/InviteGate';
+import { ConditionalAppLayout } from '../components/invite/ConditionalAppLayout';
 
 import '../styles/design-tokens.css';
 import '../styles/design-alias.css';
@@ -56,14 +54,11 @@ export default async function RootLayout({
             <PerformanceProvider enabled={process.env.NODE_ENV === 'development'}>
               <ToastProvider>
                 <AuthInitializer />
-                <Header />
-                <MainLayout>{children}</MainLayout>
-                {/* Global Content Upload Modal - 전역적으로 렌더링 */}
-                <GlobalContentUploadModal />
-                {/* Global Comments Modal - 전역적으로 렌더링 */}
-                <CommentsRoot />
-                {/* Modal slot for intercepting routes */}
-                {modal}
+                <InviteGate>
+                  <ConditionalAppLayout modal={modal}>
+                    {children}
+                  </ConditionalAppLayout>
+                </InviteGate>
               </ToastProvider>
             </PerformanceProvider>
           </QueryProvider>
