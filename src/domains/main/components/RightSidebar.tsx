@@ -1,19 +1,39 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 
-import { Heart, Mail, Github, Twitter } from 'lucide-react';
+import { Heart, Mail, Github, Twitter, Clock, X } from 'lucide-react';
 import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
+import { useTranslation } from 'react-i18next';
 import ShinyText from '@/components/ShinyText';
 import { useQuery } from '@tanstack/react-query';
 import { RecommendationsService } from '@/api/generated/services/RecommendationsService';
 import { useAuthStore } from '@/store/authStore';
+import { useRecentContentStore } from '@/store/recentContentStore';
+import { useRecentContentDetails } from '@/hooks/useRecentContentDetails';
+import { formatRelativeTime, formatRelativeTimeEn } from '@/lib/utils/timeFormat';
+import { getThumbnailImageUrl } from '@/lib/utils/imageProxy';
 import type { ChannelResponse } from '@/api/generated/models/ChannelResponse';
 
 export function RightSidebar() {
   const t = useCommonTranslation();
+  const { t: contentT } = useTranslation('content');
   const userDocId = useAuthStore((s) => s.user?.doc_id || null);
+
+  // Recent content management
+  const { loadRecentContent, clearAll } = useRecentContentStore();
+  const {
+    contentDetails,
+    isLoading: recentLoading,
+    error: recentError,
+    hasContent,
+  } = useRecentContentDetails();
+
+  // Load recent content on mount
+  useEffect(() => {
+    loadRecentContent();
+  }, [loadRecentContent]);
 
   // Recommended (logged-in) - /recommendations/channels API 사용
   const {
@@ -275,6 +295,122 @@ export function RightSidebar() {
           )}
         </div>
       </div>
+
+      {/* 최근 본 콘텐츠 섹션 */}
+      {hasContent && (
+        <div className="mb-3 flex-shrink-0 border border-zinc-800 rounded-lg p-2 bg-zinc-900">
+          <div className="px-1 text-white text-sm lg:text-base font-medium mb-2 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              {contentT('sidebar.recentContent')}
+            </div>
+            <button
+              onClick={clearAll}
+              className="text-zinc-400 hover:text-zinc-300 transition-colors p-1"
+              title={contentT('sidebar.clearRecent')}
+            >
+              <X className="w-3 h-3" />
+            </button>
+          </div>
+          <div className="space-y-3">
+            {/* 로딩 상태 */}
+            {recentLoading ? (
+              <div className="space-y-1.5">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="p-1 border-b border-zinc-800 animate-pulse">
+                    <div className="flex items-center gap-2 lg:gap-3">
+                      <div className="w-8 h-8 lg:w-10 lg:h-10 bg-zinc-700 rounded-lg flex-shrink-0"></div>
+                      <div className="flex-1 min-w-0">
+                        <div className="h-2.5 lg:h-3 bg-zinc-700 rounded mb-1"></div>
+                        <div className="h-1.5 lg:h-2 bg-zinc-700 rounded w-3/4"></div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : /* 에러 상태 */
+            recentError ? (
+              <div className="text-[10px] lg:text-xs text-red-400 p-1 border border-red-800 rounded">
+                {contentT('sidebar.recentContentError')}
+              </div>
+            ) : /* 데이터 없음 */
+            contentDetails.length === 0 ? (
+              <div className="text-[10px] lg:text-xs text-gray-500">
+                {contentT('sidebar.recentContentEmpty')}
+              </div>
+            ) : (
+              /* 데이터 표시 */
+              contentDetails.map((content) => {
+                const thumbnailUrl = content.thumbnailUrl
+                  ? getThumbnailImageUrl(content.thumbnailUrl)
+                  : null;
+                const title = content.title;
+                const timeAgo = contentT('sidebar.viewedAt', {
+                  time: formatRelativeTime(content.viewedAt),
+                });
+
+                return (
+                  <Link
+                    key={content.id}
+                    href={`/channels/${content.channelId}?content=${content.id}`}
+                    className="group block p-1.5 rounded-md cursor-pointer transition-all duration-200 last:border-b-0 hover:bg-zinc-800/50 hover:scale-[1.02] active:scale-[0.98] active:bg-zinc-800/70"
+                  >
+                    <div className="flex items-center gap-2 lg:gap-3">
+                      {/* 썸네일 */}
+                      <div className="flex-shrink-0 w-8 h-8 lg:w-10 lg:h-10 rounded-lg overflow-hidden bg-zinc-700 transition-all duration-200 group-hover:ring-2 group-hover:ring-zinc-600 group-hover:shadow-md">
+                        {thumbnailUrl ? (
+                          <img
+                            src={thumbnailUrl}
+                            alt={title}
+                            className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-zinc-400 text-[10px] lg:text-xs font-medium transition-colors duration-200 group-hover:text-zinc-300">
+                            {title.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* 콘텐츠 정보 */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <h3 className="text-white text-[10px] lg:text-xs font-medium truncate transition-colors duration-200 group-hover:text-zinc-100">
+                            {title}
+                          </h3>
+                        </div>
+
+                        {/* 시간 정보 */}
+                        <div className="mt-1">
+                          <span className="text-[10px] lg:text-xs text-zinc-500 transition-colors duration-200 group-hover:text-zinc-400">
+                            {timeAgo}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* 호버 시 나타나는 화살표 아이콘 */}
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0">
+                        <svg
+                          className="w-3 h-3 lg:w-4 lg:h-4 text-zinc-400 group-hover:text-zinc-300"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Footer 섹션 - 하단에 고정 */}
       <div className="mt-auto flex-shrink-0">
