@@ -242,34 +242,13 @@ const ContentItemCard = React.memo<{
         {showHoverEffects && (
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors duration-300 flex items-end z-10">
             <div className="w-full p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-              {/* 링크 콘텐츠인 경우 링크 프리뷰 정보 우선 표시 */}
-              {item.type === 'link' && item.linkPreview ? (
-                <>
-                  <h4 className="text-white font-semibold text-sm mb-1">
-                    {item.linkPreview.title}
-                  </h4>
-                  {item.linkPreview.description && (
-                    <div className="text-zinc-200 text-xs line-clamp-2 mb-2 whitespace-pre-wrap">
-                      {item.linkPreview.description}
-                    </div>
-                  )}
-                  {item.linkPreview.siteName && (
-                    <p className="text-zinc-300 text-xs mb-2">{item.linkPreview.siteName}</p>
-                  )}
-                </>
-              ) : (
-                <>
-                  <h4 className="text-white font-semibold text-sm mb-1">{item.title}</h4>
-                  {item.description && (
-                    <div className="text-zinc-200 text-xs line-clamp-2 mb-2 whitespace-pre-wrap">
-                      {item.description}
-                    </div>
-                  )}
-                </>
-              )}
+              {/* 타이틀 표시 */}
+              <h4 className="text-white font-semibold text-sm mb-2">
+                {item.linkPreview?.title || item.title}
+              </h4>
 
-              {/* AI 생성 요약 표시 */}
-              {item.aiSummary && (
+              {/* AI 생성 요약 표시 (이미지가 있는 경우에만 호버에서 표시) */}
+              {hasValidImage && item.aiSummary && (
                 <div className="mb-2">
                   <p className="text-[#EAFD66] text-xs line-clamp-2 font-medium">
                     {item.aiSummary}
@@ -277,9 +256,9 @@ const ContentItemCard = React.memo<{
                 </div>
               )}
 
-              {/* 링크 프리뷰 메타데이터 표시 (링크 콘텐츠가 아닌 경우) */}
-              {item.type !== 'link' && item.linkPreview?.siteName && (
-                <p className="text-zinc-300 text-xs">{item.linkPreview.siteName}</p>
+              {/* 링크 메타데이터 표시 */}
+              {item.linkPreview?.siteName && (
+                <p className="text-zinc-300 text-xs mb-1">{item.linkPreview.siteName}</p>
               )}
 
               {/* 메타데이터 표시 */}

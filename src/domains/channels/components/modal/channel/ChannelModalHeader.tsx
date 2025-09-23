@@ -125,8 +125,8 @@ export function ChannelModalHeader({
 
   return (
     <div>
-      {/* 상단 배너 섹션 */}
-      <div className="h-48 relative overflow-hidden">
+      {/* 상단 배너 섹션 - 모바일에서 높이 축소 */}
+      <div className="h-20 md:h-48 relative overflow-hidden">
         {/* Banner Image with Fallback */}
         {channel.banner_url || channel.thumbnail_url ? (
           <img
@@ -191,18 +191,18 @@ export function ChannelModalHeader({
         </div>
       </div>
 
-      {/* 하단 정보 섹션 */}
-      <div className="bg-black px-4 py-4">
-        <div className="flex flex-col space-y-4">
+      {/* 하단 정보 섹션 - 모바일에서 패딩 축소 */}
+      <div className="bg-black px-3 py-3 md:px-4 md:py-4">
+        <div className="flex flex-col space-y-2 md:space-y-4">
           {/* 첫 번째 줄: 아바타 + 채널 정보 + 액션 버튼들 */}
           <div className="grid grid-cols-[auto_1fr_auto] items-start gap-4 md:gap-6">
-            {/* 왼쪽: 채널 썸네일 */}
-            <div className="relative -mt-16 shrink-0">
+            {/* 왼쪽: 채널 썸네일 - 모바일에서 위치 조정 */}
+            <div className="relative -mt-8 md:-mt-16 shrink-0">
               {channel.thumbnail_url ? (
                 <img
                   src={channel.thumbnail_url}
                   alt={`${channel.name} thumbnail`}
-                  className="w-24 h-24 rounded-full border-4 border-black object-cover shadow-lg ring-1 ring-white/10"
+                  className="w-16 h-16 md:w-24 md:h-24 rounded-full border-4 border-black object-cover shadow-lg ring-1 ring-white/10"
                   loading="lazy"
                   decoding="async"
                   onError={(e) => {
@@ -214,10 +214,10 @@ export function ChannelModalHeader({
                 />
               ) : null}
 
-              {/* Fallback Avatar */}
+              {/* Fallback Avatar - 모바일에서 크기 축소 */}
               <ThumbnailFallback
                 size="xl"
-                className={`w-24 h-24 border-4 border-black shadow-lg ring-1 ring-white/10 ${
+                className={`w-16 h-16 md:w-24 md:h-24 border-4 border-black shadow-lg ring-1 ring-white/10 ${
                   channel.thumbnail_url ? 'hidden' : 'block'
                 }`}
               />
@@ -225,21 +225,24 @@ export function ChannelModalHeader({
 
             {/* 가운데: 채널 정보 */}
             <div className="min-w-0 flex-1">
-              {/* 채널 이름 */}
-              <h2 id="channel-modal-title" className="text-lg font-bold text-white truncate">
+              {/* 채널 이름 - 모바일에서 폰트 크기 조정 */}
+              <h2
+                id="channel-modal-title"
+                className="text-base md:text-lg font-bold text-white truncate"
+              >
                 {channel.name}
               </h2>
 
-              {/* 채널 설명 */}
+              {/* 채널 설명 - 모바일에서 줄 수 제한 */}
               {channel.description && (
-                <p className="text-zinc-400 text-xs mb-3 line-clamp-2 leading-relaxed">
+                <p className="text-zinc-400 text-xs mb-2 md:mb-3 line-clamp-1 md:line-clamp-2 leading-relaxed">
                   {channel.description}
                 </p>
               )}
 
-              {/* 통계 정보 */}
-              <div className="">
-                <span className="whitespace-nowrap">
+              {/* 통계 정보 - 모바일에서 글씨 크기 축소 */}
+              <div className="flex items-center gap-1 text-xs text-zinc-400 min-w-0">
+                <span className="whitespace-nowrap text-xs md:text-xs">
                   {channel.subscriber_count || 0} {t.ui.subscribers()}
                 </span>
                 <span className="opacity-60">•</span>
@@ -258,12 +261,12 @@ export function ChannelModalHeader({
                       size="sm"
                       showTooltip={true}
                     />
-                    <span className="truncate">
+                    <span className="truncate text-xs md:text-xs">
                       {channel.managers.length} {t.ui.editors()}
                     </span>
                   </button>
                 ) : (
-                  <span className="truncate">0 {t.ui.editors()}</span>
+                  <span className="truncate text-xs md:text-xs">0 {t.ui.editors()}</span>
                 )}
               </div>
             </div>
