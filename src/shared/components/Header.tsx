@@ -201,16 +201,18 @@ export const Header = memo(function Header() {
 
         {/* Search Bar */}
         <div className="hidden md:flex flex-1 justify-center">
-          {isChannelPage && channelName ? (
-            <ChannelSearchBar
-              channelId={channelId || ''}
-              channelName={channelName}
-              onSearch={handleChannelSearch}
-              onClearChannel={handleClearChannel}
-            />
-          ) : (
-            <GlobalSearchBar onSearch={handleGlobalSearch} />
-          )}
+          <div className="w-full max-w-md lg:max-w-lg xl:max-w-xl">
+            {isChannelPage && channelName ? (
+              <ChannelSearchBar
+                channelId={channelId || ''}
+                channelName={channelName}
+                onSearch={handleChannelSearch}
+                onClearChannel={handleClearChannel}
+              />
+            ) : (
+              <GlobalSearchBar onSearch={handleGlobalSearch} />
+            )}
+          </div>
         </div>
 
         {/* Right side actions */}
@@ -260,7 +262,7 @@ export const Header = memo(function Header() {
           >
             {/* Grab handle */}
             <div className="flex items-center gap-3">
-              <div className="flex-1">
+              <div className="w-full max-w-md mx-auto">
                 {isChannelPage && channelName ? (
                   <ChannelSearchBar
                     channelId={channelId || ''}
