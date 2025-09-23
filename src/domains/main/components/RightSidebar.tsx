@@ -172,19 +172,18 @@ export function RightSidebar() {
   }
 
   return (
-    <div className="px-2 py-4 bg-black min-h-full flex flex-col" data-testid="right-sidebar">
+    <div className="px-1 py-1 bg-black min-h-full flex flex-col mr-4" data-testid="right-sidebar">
       {/* 추천 채널 */}
-      <div className="mb-4 flex-shrink-0">
-        <div className="text-white text-xs lg:text-sm font-medium mb-2 lg:mb-3 flex items-center gap-2">
-          <Heart className="w-3 h-3 lg:w-4 lg:h-4" />
+      <div className="mb-3 flex-shrink-0 border border-zinc-800 rounded-lg p-2 bg-zinc-900">
+        <div className="px-1 text-white text-sm lg:text-base font-medium mb-2 flex items-center gap-2">
           {title}
         </div>
-        <div className="space-y-2">
+        <div className="space-y-3">
           {/* 로딩 상태 */}
           {recLoading || fallbackLoading ? (
-            <div className="space-y-1 lg:space-y-2">
+            <div className="space-y-1.5">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="p-1.5 lg:p-2 border-b border-zinc-800 animate-pulse">
+                <div key={i} className="p-1 border-b border-zinc-800 animate-pulse">
                   <div className="flex items-center gap-2 lg:gap-3">
                     <div className="w-8 h-8 lg:w-10 lg:h-10 bg-zinc-700 rounded-lg flex-shrink-0"></div>
                     <div className="flex-1 min-w-0">
@@ -197,7 +196,7 @@ export function RightSidebar() {
             </div>
           ) : /* 에러 상태 */
           recError && fallbackError ? (
-            <div className="text-[10px] lg:text-xs text-red-400 p-1.5 lg:p-2 border border-red-800 rounded">
+            <div className="text-[10px] lg:text-xs text-red-400 p-1 border border-red-800 rounded">
               {t.globalContentUpload.sidebar.loadChannelsFailed()}
             </div>
           ) : /* 데이터 없음 */
@@ -211,19 +210,19 @@ export function RightSidebar() {
               <Link
                 key={channel.id}
                 href={`/channels/${channel.id}`}
-                className="block p-1.5 lg:p-2 border-b border-zinc-800 hover:border-zinc-700 cursor-pointer transition-colors last:border-b-0"
+                className="group block p-1.5 rounded-md cursor-pointer transition-all duration-200 last:border-b-0 hover:bg-zinc-800/50 hover:scale-[1.02] active:scale-[0.98] active:bg-zinc-800/70"
               >
                 <div className="flex items-center gap-2 lg:gap-3">
                   {/* 썸네일 */}
-                  <div className="flex-shrink-0 w-8 h-8 lg:w-10 lg:h-10 rounded-lg overflow-hidden bg-zinc-700">
+                  <div className="flex-shrink-0 w-8 h-8 lg:w-10 lg:h-10 rounded-lg overflow-hidden bg-zinc-700 transition-all duration-200 group-hover:ring-2 group-hover:ring-zinc-600 group-hover:shadow-md">
                     {channel.thumbnail_url ? (
                       <img
                         src={channel.thumbnail_url}
                         alt={channel.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-zinc-400 text-[10px] lg:text-xs font-medium">
+                      <div className="w-full h-full flex items-center justify-center text-zinc-400 text-[10px] lg:text-xs font-medium transition-colors duration-200 group-hover:text-zinc-300">
                         {channel.name.charAt(0).toUpperCase()}
                       </div>
                     )}
@@ -232,17 +231,14 @@ export function RightSidebar() {
                   {/* 채널 정보 */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
-                      <h3 className="text-white text-[10px] lg:text-xs font-medium truncate">
+                      <h3 className="text-white text-[10px] lg:text-xs font-medium truncate transition-colors duration-200 group-hover:text-zinc-100">
                         {channel.name}
                       </h3>
-                      <span className="text-[10px] lg:text-xs text-gray-500 ml-2 flex-shrink-0">
-                        #{index + 1}
-                      </span>
                     </div>
 
                     {/* 설명 */}
                     {channel.description && (
-                      <p className="text-[10px] lg:text-xs text-gray-400 line-clamp-1 mb-1">
+                      <p className="text-[10px] lg:text-xs text-gray-400 line-clamp-1 mb-1 transition-colors duration-200 group-hover:text-gray-300">
                         {channel.description}
                       </p>
                     )}
@@ -250,11 +246,28 @@ export function RightSidebar() {
                     {/* 카테고리 */}
                     {'category' in channel && channel.category && (
                       <div className="mt-1">
-                        <span className="text-[10px] lg:text-xs text-zinc-500">
+                        <span className="text-[10px] lg:text-xs text-zinc-500 transition-colors duration-200 group-hover:text-zinc-400">
                           {channel.category}
                         </span>
                       </div>
                     )}
+                  </div>
+
+                  {/* 호버 시 나타나는 화살표 아이콘 */}
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0">
+                    <svg
+                      className="w-3 h-3 lg:w-4 lg:h-4 text-zinc-400 group-hover:text-zinc-300"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
                   </div>
                 </div>
               </Link>
