@@ -344,7 +344,7 @@ export const PostCard = React.memo<PostCardProps>(function PostCard({
 
   return (
     <div
-      className={`bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden hover:border-zinc-700 transition-all duration-200 group max-w-4xl mx-auto relative ${className}`}
+      className={`bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden hover:border-zinc-700 transition-all duration-200 group max-w-4xl mx-auto relative animate-fade-in-up ${className}`}
     >
       <div className="p-2 md:p-4">
         {/* 상단: 채널 정보 및 메타데이터 */}

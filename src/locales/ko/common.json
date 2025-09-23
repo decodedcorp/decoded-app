@@ -226,6 +226,14 @@
     "badge": {
       "justIn": "방금",
       "trending": "급상승"
+    },
+    "infiniteScroll": {
+      "loadingMore": "더 불러오는 중...",
+      "retry": "다시 시도",
+      "serverError": "서버 오류가 발생했어요",
+      "loadFailed": "불러오기에 실패했어요",
+      "serverIssueDetected": "서버 문제가 감지되었어요",
+      "viewMoreContent": "더 많은 콘텐츠 보기"
     }
   },
   "globalContentUpload": {
