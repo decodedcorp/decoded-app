@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 import { QueryProvider } from '../lib/providers/QueryProvider';
 import { ToastProvider } from '../lib/providers/ToastProvider';
@@ -67,6 +68,7 @@ export default async function RootLayout({
             </PerformanceProvider>
           </QueryProvider>
         </I18nProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
