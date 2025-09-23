@@ -94,8 +94,8 @@ export function InfiniteScrollLoader({
           <div className="text-center">
             <div className="text-red-400 mb-3 text-sm">
               {(error as any)?.status >= 500
-                ? (customMessages?.serverError || translations.feed.infiniteScroll.serverError())
-                : (customMessages?.loadFailed || translations.feed.infiniteScroll.loadFailed())}
+                ? customMessages?.serverError || translations.feed.infiniteScroll.serverError()
+                : customMessages?.loadFailed || translations.feed.infiniteScroll.loadFailed()}
             </div>
             <div className="flex justify-center space-x-2">
               <button
@@ -107,7 +107,8 @@ export function InfiniteScrollLoader({
               </button>
               {(error as any)?.status >= 500 && (
                 <div className="text-xs text-gray-500 self-center">
-                  {customMessages?.serverIssueDetected || translations.feed.infiniteScroll.serverIssueDetected()}
+                  {customMessages?.serverIssueDetected ||
+                    translations.feed.infiniteScroll.serverIssueDetected()}
                 </div>
               )}
             </div>
@@ -133,7 +134,10 @@ export function InfiniteScrollLoader({
           <div className="flex flex-col items-center space-y-3">
             <div className="flex items-center space-x-2 text-gray-400">
               <ChevronDown className="w-4 h-4 animate-scroll-hint" />
-              <span className="text-sm">{customMessages?.viewMoreContent || translations.feed.infiniteScroll.viewMoreContent()}</span>
+              <span className="text-sm">
+                {customMessages?.viewMoreContent ||
+                  translations.feed.infiniteScroll.viewMoreContent()}
+              </span>
             </div>
           </div>
         </div>

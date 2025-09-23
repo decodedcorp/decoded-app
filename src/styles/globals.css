@@ -18,7 +18,11 @@
   --container-padding-x: 8px; /* 좌우 패딩 */
   --edge-x: 16px; /* 기본 좌우 여백 */
   --sidebar-width: clamp(200px, 14vw, 240px); /* 사이드바 너비 */
-  --sidebar-right-width: clamp(280px, 18vw, 320px); /* 오른쪽 사이드바 너비 */
+  --sidebar-right-width: clamp(
+    200px,
+    14vw,
+    240px
+  ); /* 오른쪽 사이드바 너비 - 왼쪽과 동일하게 설정 */
   --content-max-width: 1200px; /* 메인 최대 폭 */
 
   /* 모바일 터치 및 뷰포트 최적화 */
@@ -502,10 +506,10 @@
     }
   }
 
-  /* 큰 화면에서 오른쪽 사이드바 더 넓게 */
+  /* 큰 화면에서도 양쪽 사이드바 동일하게 유지 */
   @media (min-width: 1536px) {
     :root {
-      --sidebar-right-width: clamp(320px, 20vw, 380px);
+      --sidebar-right-width: clamp(200px, 14vw, 240px);
     }
   }
 

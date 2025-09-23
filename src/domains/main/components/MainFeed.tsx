@@ -368,7 +368,7 @@ export const MainFeed = React.memo(function MainFeed() {
           }}
         >
           {/* 피드 헤더 */}
-          <div className="mb-8 max-w-4xl mx-auto">
+          <div className="mb-8 max-w-3xl mx-auto">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h1 className="text-white text-xl font-bold mb-1">{t.feed.section.header()}</h1>
@@ -469,7 +469,7 @@ export const MainFeed = React.memo(function MainFeed() {
                   </button>
                 </div>
               ) : (
-                <div className="max-w-4xl mx-auto">
+                <div className="max-w-3xl mx-auto">
                   <FeedGrid
                     columns={{
                       mobile: 1,
@@ -546,7 +546,7 @@ export const MainFeed = React.memo(function MainFeed() {
 
           {/* 무한스크롤 로더 */}
           {feedData.length > 0 && (
-            <div className="max-w-4xl mx-auto relative">
+            <div className="max-w-3xl mx-auto relative">
               <InfiniteScrollLoader
                 hasNextPage={hasNextPage || false}
                 isFetchingNextPage={isFetchingNextPage}
