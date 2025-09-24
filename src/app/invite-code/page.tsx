@@ -138,12 +138,16 @@ export default function InviteCodePage() {
           <div className={`text-center space-y-4 ${isMobile ? 'mb-6' : 'mb-8'}`}>
             <h1
               className={`text-[#EAFD66] font-bold tracking-wide ${
-                isMobile ? 'text-2xl' : 'text-3xl md:text-4xl'
+                isMobile ? 'text-3xl' : 'text-4xl md:text-5xl'
               }`}
             >
               {t.inviteCode.title()}
             </h1>
-            <p className={`text-zinc-300 font-light ${isMobile ? 'text-base' : 'text-lg'}`}>
+            <p
+              className={`text-zinc-300 font-light tracking-tight ${
+                isMobile ? 'text-sm' : 'text-base'
+              }`}
+            >
               {t.inviteCode.subtitle()}
             </p>
           </div>

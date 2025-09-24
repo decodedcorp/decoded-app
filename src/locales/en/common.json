@@ -697,8 +697,8 @@
   },
   "inviteCode": {
     "title": "decoded",
-    "subtitle": "Please enter your invite code",
-    "placeholder": "Invite code",
+    "subtitle": "YOUR TASTE YOUR TREND",
+    "placeholder": "Please enter your invite code",
     "button": "Get Started",
     "buttonLoading": "Verifying...",
     "helpText": "Don't have an invite code?",

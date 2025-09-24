@@ -282,7 +282,6 @@ export function DomeCardModal({ isOpen, onClose, item }: DomeCardModalProps) {
                       <div>
                         <div className="flex items-center justify-between mb-3">
                           <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-                            <MessageCircle className="w-4 h-4" />
                             Q&A
                           </h3>
                           {content.ai_gen_metadata.qa_list.length > 2 && (
