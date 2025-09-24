@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ContentItem } from '@/lib/types/content';
+import { ContentItem } from '@/lib/types/contentTypes';
 import { ProxiedImage } from '@/components/ProxiedImage';
 import { useTranslation } from 'react-i18next';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -131,7 +131,7 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
 
   // 채널 데이터에서 작가 정보 추출 (ChannelCard에서 전달된 경우)
   const authorId = content.provider_id || content.author;
-  const channelId = content.channel_id;
+  const channelId = (content as any).channel_id;
   const contentDate = content.date;
 
   // Debug logging for author info
@@ -192,12 +192,14 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
               <MobileCardLayout
                 title={content.title}
                 onClose={onClose}
-                content={{
-                  ...content,
-                  author: authorId,
-                  channel_id: channelId,
-                  date: contentDate,
-                }}
+                content={
+                  {
+                    ...content,
+                    author: authorId,
+                    channel_id: channelId,
+                    date: contentDate,
+                  } as ContentItem
+                }
               >
                 <div className="h-full min-h-full">
                   {content.imageUrl ? (
@@ -244,12 +246,14 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
               <MobileCardLayout
                 title={content.title}
                 onClose={onClose}
-                content={{
-                  ...content,
-                  provider_id: authorId,
-                  channel_id: channelId,
-                  date: contentDate,
-                }}
+                content={
+                  {
+                    ...content,
+                    provider_id: authorId,
+                    channel_id: channelId,
+                    date: contentDate,
+                  } as ContentItem
+                }
               >
                 <div className="h-full min-h-full">
                   {content.imageUrl ? (
@@ -312,12 +316,14 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
               <MobileCardLayout
                 title={content.title}
                 onClose={onClose}
-                content={{
-                  ...content,
-                  provider_id: authorId,
-                  channel_id: channelId,
-                  date: contentDate,
-                }}
+                content={
+                  {
+                    ...content,
+                    provider_id: authorId,
+                    channel_id: channelId,
+                    date: contentDate,
+                  } as ContentItem
+                }
               >
                 <div className="h-full min-h-full">
                   <DefaultContentCard content={content} />
@@ -340,12 +346,14 @@ export function ContentModalBody({ content, onClose }: ContentModalBodyProps) {
               <MobileCardLayout
                 title={content.title}
                 onClose={onClose}
-                content={{
-                  ...content,
-                  provider_id: authorId,
-                  channel_id: channelId,
-                  date: contentDate,
-                }}
+                content={
+                  {
+                    ...content,
+                    provider_id: authorId,
+                    channel_id: channelId,
+                    date: contentDate,
+                  } as ContentItem
+                }
               >
                 <div className="space-y-6">
                   {/* 1. Description Section - Always show if exists */}

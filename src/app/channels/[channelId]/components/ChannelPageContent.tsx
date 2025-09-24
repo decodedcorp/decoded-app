@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@decoded/ui';
 import type { SidebarFilters } from '@/domains/channels/components/sidebar/ChannelSidebar';
 import { ChannelData } from '@/store/channelModalStore';
-import { useDateFormatters } from '@/lib/utils/dateUtils';
 import { useChannel } from '@/domains/channels/hooks/useChannels';
 import { ChannelModalContent } from '@/domains/channels/components/modal/channel/ChannelModalContent';
 import { ChannelModalSkeleton } from '@/domains/channels/components/modal/channel/ChannelModalSkeleton';
@@ -32,7 +31,6 @@ export const ChannelPageContent = memo(function ChannelPageContent({
   channelId,
 }: ChannelPageContentProps) {
   const router = useRouter();
-  const { formatDateByContext } = useDateFormatters();
   const t = useCommonTranslation();
   const openContentModal = useContentModalStore((state) => state.openModal);
 

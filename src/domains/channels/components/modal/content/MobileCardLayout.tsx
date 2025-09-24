@@ -7,7 +7,7 @@ import { useUserProfile } from '@/domains/users/hooks/useUserProfile';
 import { useChannel } from '@/domains/channels/hooks/useChannels';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
 import { useTranslation } from 'react-i18next';
-import { ContentItem } from '@/lib/types/content';
+import { ContentItem } from '@/lib/types/contentTypes';
 import { useDateFormatters } from '@/lib/utils/dateUtils';
 
 interface MobileCardLayoutProps {
