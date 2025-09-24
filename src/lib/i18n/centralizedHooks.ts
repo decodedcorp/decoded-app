@@ -602,6 +602,21 @@ type CommonTranslations = {
   accessibility: {
     goBack: () => string;
   };
+  inviteCode: {
+    title: () => string;
+    subtitle: () => string;
+    placeholder: () => string;
+    button: () => string;
+    buttonLoading: () => string;
+    helpText: () => string;
+    contactAdmin: () => string;
+    devLink: () => string;
+    error: () => string;
+    errors: {
+      required: () => string;
+      invalid: () => string;
+    };
+  };
 };
 
 // 통합된 Common 번역 훅 - TypeScript 타입 안전성 보장
@@ -1231,6 +1246,21 @@ export const useCommonTranslation = (): CommonTranslations => {
     },
     accessibility: {
       goBack: () => t('accessibility.goBack'),
+    },
+    inviteCode: {
+      title: () => t('inviteCode.title'),
+      subtitle: () => t('inviteCode.subtitle'),
+      placeholder: () => t('inviteCode.placeholder'),
+      button: () => t('inviteCode.button'),
+      buttonLoading: () => t('inviteCode.buttonLoading'),
+      helpText: () => t('inviteCode.helpText'),
+      contactAdmin: () => t('inviteCode.contactAdmin'),
+      devLink: () => t('inviteCode.devLink'),
+      error: () => t('inviteCode.error'),
+      errors: {
+        required: () => t('inviteCode.errors.required'),
+        invalid: () => t('inviteCode.errors.invalid'),
+      },
     },
   };
 };

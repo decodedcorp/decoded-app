@@ -80,19 +80,8 @@ const ContentItemCard = React.memo<{
   const imageUrl = item.linkPreview?.imageUrl || item.imageUrl;
   const downloadedImageUrl = item.linkPreview?.downloadedImageUrl;
 
-  // 웹페이지 URL이 아닌 실제 이미지인지 확인
-  const isWebPageUrl =
-    imageUrl &&
-    (imageUrl.includes('youtube.com') ||
-      imageUrl.includes('instagram.com') ||
-      imageUrl.includes('blog.naver.com') ||
-      imageUrl.includes('khan.co.kr') ||
-      imageUrl.includes('watch?v=') ||
-      imageUrl.includes('/shorts/') ||
-      imageUrl.includes('/article/'));
-
-  // 실제 이미지가 있는지 확인
-  const hasValidImage = imageUrl && !isWebPageUrl;
+  // 이미지가 있는지 확인 (LinkPreviewCard와 동일한 로직)
+  const hasValidImage = !!imageUrl;
 
   const linkProps = getContentLinkProps({ channelId, contentId: String(item.id) });
 

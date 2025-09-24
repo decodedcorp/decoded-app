@@ -7,8 +7,8 @@ import { useUserProfile } from '@/domains/users/hooks/useUserProfile';
 import { useChannel } from '@/domains/channels/hooks/useChannels';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
 import { useTranslation } from 'react-i18next';
-import { ContentItem } from '@/lib/types/content';
-import { useDateFormatters } from '@/lib/utils/dateUtils';
+import { ContentItem } from '@/lib/types/contentTypes';
+import { formatDateByContext } from '@/lib/utils/dateUtils';
 
 interface MobileCardLayoutProps {
   children: React.ReactNode;
@@ -30,7 +30,6 @@ export function MobileCardLayout({ children, title, onClose, content }: MobileCa
   // Translation hooks
   const { t } = useTranslation('content');
   const { time } = useCommonTranslation();
-  const { formatDateByContext } = useDateFormatters();
 
   // Get user profile using provider_id field (which contains the user ID)
   // Try provider_id first, then author as fallback
@@ -195,7 +194,7 @@ export function MobileCardLayout({ children, title, onClose, content }: MobileCa
                           {content.date && (
                             <>
                               <span>•</span>
-                              <span>{formatDateByContext(content.date, 'list')}</span>
+                              <span>{formatDateByContext(content.date, t, 'list')}</span>
                             </>
                           )}
                         </div>

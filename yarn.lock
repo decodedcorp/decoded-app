@@ -4444,6 +4444,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@use-gesture/core@npm:10.3.1":
+  version: 10.3.1
+  resolution: "@use-gesture/core@npm:10.3.1"
+  checksum: 10c0/2e3b5c0f7fe26cdb47be3a9c2a58a6a9edafc5b2895b07d2898eda9ab5a2b29fb0098b15597baa0856907b593075cd44cc69bba4785c9cfb7b6fabaa3b52cd3e
+  languageName: node
+  linkType: hard
+
+"@use-gesture/react@npm:^10.3.1":
+  version: 10.3.1
+  resolution: "@use-gesture/react@npm:10.3.1"
+  dependencies:
+    "@use-gesture/core": "npm:10.3.1"
+  peerDependencies:
+    react: ">= 16.8.0"
+  checksum: 10c0/978da66e4e7c424866ad52eba8fdf0ce93a4c8fc44f8837c7043e68c6a6107cd67e817fffb27f7db2ae871ef2f6addb0c8ddf1586f24c67b7e6aef1646c668cf
+  languageName: node
+  linkType: hard
+
 "@vercel/speed-insights@npm:^1.2.0":
   version: 1.2.0
   resolution: "@vercel/speed-insights@npm:1.2.0"
@@ -5428,6 +5446,7 @@ __metadata:
     "@types/react-dom": "npm:^19.1.6"
     "@types/sharp": "npm:^0.32.0"
     "@types/three": "npm:^0.178.1"
+    "@use-gesture/react": "npm:^10.3.1"
     "@vercel/speed-insights": "npm:^1.2.0"
     autoprefixer: "npm:^10.4.21"
     clsx: "npm:^2.1.1"
@@ -5448,6 +5467,7 @@ __metadata:
     lodash: "npm:^4.17.21"
     lucide-react: "npm:^0.525.0"
     matter-js: "npm:^0.20.0"
+    motion: "npm:^12.23.19"
     next: "npm:^15.4.1"
     next-i18next: "npm:^15.4.2"
     next-intl: "npm:^4.3.7"
@@ -6516,6 +6536,28 @@ __metadata:
     react-dom:
       optional: true
   checksum: 10c0/40dfb57bf714075c4f6dd0bbe5b84dd11310114474ebf603846ef9b888ed475fa653271c1fd98ec57a6a1d0b781cdf8b3ebcd5e2c6a3620e934b46304ae0fd39
+  languageName: node
+  linkType: hard
+
+"framer-motion@npm:^12.23.19":
+  version: 12.23.19
+  resolution: "framer-motion@npm:12.23.19"
+  dependencies:
+    motion-dom: "npm:^12.23.19"
+    motion-utils: "npm:^12.23.6"
+    tslib: "npm:^2.4.0"
+  peerDependencies:
+    "@emotion/is-prop-valid": "*"
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+  peerDependenciesMeta:
+    "@emotion/is-prop-valid":
+      optional: true
+    react:
+      optional: true
+    react-dom:
+      optional: true
+  checksum: 10c0/eb333b14f30ba858484719a382aa3d3a97fb0e2aac9829c59f19eae006a850272492ad0692d2e05c496b0e87fe49044b8a477dd499cc3a25a79b6f622b4f0288
   languageName: node
   linkType: hard
 
@@ -8111,10 +8153,40 @@ __metadata:
   languageName: node
   linkType: hard
 
+"motion-dom@npm:^12.23.19":
+  version: 12.23.19
+  resolution: "motion-dom@npm:12.23.19"
+  dependencies:
+    motion-utils: "npm:^12.23.6"
+  checksum: 10c0/9b649adc1b067cf329a4d6383741167c4d761af0a0cb1cd5d7b87bd5561b4f7cc14b25a8a1d89e9c2ea6f1ed4cef873746c5723484b656fd1ba2e1f7c4f71477
+  languageName: node
+  linkType: hard
+
 "motion-utils@npm:^12.23.6":
   version: 12.23.6
   resolution: "motion-utils@npm:12.23.6"
   checksum: 10c0/c058e8ba6423b3baa63e985bcc669877ee7d9579d938f5348b4e60c5ea1b4b33dd7f4877434436a4a5807f3cf00370d3fd4079a6fdd6309c5c87aa62b311a897
+  languageName: node
+  linkType: hard
+
+"motion@npm:^12.23.19":
+  version: 12.23.19
+  resolution: "motion@npm:12.23.19"
+  dependencies:
+    framer-motion: "npm:^12.23.19"
+    tslib: "npm:^2.4.0"
+  peerDependencies:
+    "@emotion/is-prop-valid": "*"
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+  peerDependenciesMeta:
+    "@emotion/is-prop-valid":
+      optional: true
+    react:
+      optional: true
+    react-dom:
+      optional: true
+  checksum: 10c0/2c0a6ca5001a3fc500148866065ad93c656c1095bdf349eccb8f96174066475d087cfd9bfee175b8413a047e02c1dfd49d138ba981574d18d1c349cb8d3e5cad
   languageName: node
   linkType: hard
 

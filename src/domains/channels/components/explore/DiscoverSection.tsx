@@ -382,14 +382,6 @@ export function DiscoverSection({ className = '', onChannelClick }: DiscoverSect
             scrollRoot={null}
             rootMargin="400px"
             threshold={0.1}
-            customMessages={{
-              loadingMore: t('discover.infiniteScroll.loadingMore'),
-              retry: t('discover.infiniteScroll.retry'),
-              serverError: t('discover.infiniteScroll.serverError'),
-              loadFailed: t('discover.infiniteScroll.loadFailed'),
-              serverIssueDetected: t('discover.infiniteScroll.serverIssueDetected'),
-              viewMoreContent: t('discover.infiniteScroll.viewMoreChannels'),
-            }}
           />
         </div>
       )}
