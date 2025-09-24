@@ -165,10 +165,22 @@ export default function InviteCodePage() {
           </form>
 
           {/* Help text */}
-          <div className="mt-8">
+          <div className="mt-8 space-y-4">
             <p className="text-center text-sm text-zinc-400 leading-relaxed">
               초대코드가 없으시나요? <span className="text-[#EAFD66]">관리자에게 문의해주세요</span>
             </p>
+
+            {/* Debug info in development */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="text-center">
+                <a
+                  href="/admin/invite-codes"
+                  className="text-xs text-zinc-500 hover:text-[#EAFD66] transition-colors"
+                >
+                  View all valid codes (Dev only)
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </div>
