@@ -839,6 +839,15 @@ const DomeGallery = forwardRef<
       -webkit-transform: translateZ(0);
       transform: translateZ(0);
     }
+    
+    .item__image img {
+      transition: filter 300ms ease-in-out;
+    }
+    
+    .item__image:hover img,
+    .item__image:active img {
+      filter: none !important;
+    }
     .item__image--reference {
       position: absolute;
       inset: 10px;

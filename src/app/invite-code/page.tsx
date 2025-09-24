@@ -137,7 +137,7 @@ export default function InviteCodePage() {
           {/* Title */}
           <div className={`text-center space-y-4 ${isMobile ? 'mb-6' : 'mb-8'}`}>
             <h1
-              className={`text-[#EAFD66] font-light tracking-wide ${
+              className={`text-[#EAFD66] font-bold tracking-wide ${
                 isMobile ? 'text-2xl' : 'text-3xl md:text-4xl'
               }`}
             >
