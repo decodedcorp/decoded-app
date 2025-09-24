@@ -122,7 +122,10 @@
     "followers": "followers",
     "unknown": "Unknown",
     "channel": "Channel",
-    "ownerId": "Owner ID"
+    "ownerId": "Owner ID",
+    "qa": "Q&A",
+    "preview": "Preview",
+    "moreItems": " more"
   },
   "header": {
     "openMenu": "Open menu",
@@ -672,6 +675,39 @@
         "notifySubscribers": "Notify your subscribers about the deletion",
         "removeLinks": "Remove any external links pointing to this channel"
       }
+    }
+  },
+  "inviteCode": {
+    "title": "decoded",
+    "subtitle": "Enter your invite code",
+    "placeholder": "Invite code",
+    "button": "Get Started",
+    "buttonLoading": "Verifying...",
+    "errors": {
+      "required": "Please enter an invite code",
+      "invalid": "Invalid invite code"
+    },
+    "help": {
+      "noCode": "Don't have an invite code?",
+      "contactAdmin": "Contact an administrator"
+    },
+    "debug": {
+      "viewCodes": "View all valid codes (Dev only)"
+    }
+  },
+  "inviteCode": {
+    "title": "decoded",
+    "subtitle": "Please enter your invite code",
+    "placeholder": "Invite code",
+    "button": "Get Started",
+    "buttonLoading": "Verifying...",
+    "helpText": "Don't have an invite code?",
+    "contactAdmin": "Contact an administrator",
+    "devLink": "View all valid codes (Dev only)",
+    "error": "An error occurred while processing",
+    "errors": {
+      "required": "Please enter an invite code",
+      "invalid": "Please enter a valid invite code"
     }
   },
   "accessibility": {
