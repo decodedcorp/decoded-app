@@ -32,6 +32,7 @@ export function CommentInput({
   const [text, setText] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const submittingRef = useRef(false);
 
   const createCommentMutation = useCreateComment();
 
@@ -53,9 +54,10 @@ export function CommentInput({
     e?.preventDefault();
 
     const trimmedText = text.trim();
-    if (!trimmedText || createCommentMutation.isPending) return;
+    if (!trimmedText || createCommentMutation.isPending || submittingRef.current) return;
 
     try {
+      submittingRef.current = true;
       await createCommentMutation.mutateAsync({
         contentId,
         text: trimmedText,
@@ -67,13 +69,16 @@ export function CommentInput({
       onCommentCreated?.();
     } catch (error) {
       console.error('Failed to create comment:', error);
+    } finally {
+      submittingRef.current = false;
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit();
+      // Enter로 제출 시에는 form submit만 트리거하여 onSubmit 한 경로로만 처리
+      e.currentTarget.form?.requestSubmit();
     }
   };
 
