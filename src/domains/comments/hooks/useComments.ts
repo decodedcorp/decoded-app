@@ -1,4 +1,10 @@
-import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+  InfiniteData,
+} from '@tanstack/react-query';
 import { CommentsService } from '@/api/generated/services/CommentsService';
 import { CommentCreateRequest } from '@/api/generated/models/CommentCreateRequest';
 import { CommentUpdateRequest } from '@/api/generated/models/CommentUpdateRequest';
@@ -11,10 +17,174 @@ import { toast } from 'react-hot-toast';
 import { useSimpleToastMutation } from '@/lib/hooks/useToastMutation';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
 
-// Optimistic cache for newly created comments per content
-const optimisticCommentsByContent: Map<string, CommentResponse[]> = new Map();
+// Type definitions for better type safety
+interface InfiniteQueryData {
+  pages: CommentListResponse[];
+  pageParams: number[];
+}
+
+interface OptimisticCommentCache {
+  comments: CommentResponse[];
+  timestamp: number;
+}
+
+interface OptimisticDeletedCache {
+  deletedIds: Set<string>;
+  timestamp: number;
+}
+
+// Optimistic cache for newly created comments per content with timestamp for cleanup
+const optimisticCommentsByContent: Map<string, OptimisticCommentCache> = new Map();
 // Optimistic tombstone set for deleted comments per content (prevents reappearing after refetch)
-const optimisticDeletedCommentsByContent: Map<string, Set<string>> = new Map();
+const optimisticDeletedCommentsByContent: Map<string, OptimisticDeletedCache> = new Map();
+
+// Cache cleanup configuration
+const CACHE_CLEANUP_INTERVAL = 5 * 60 * 1000; // 5 minutes
+const MAX_CACHE_AGE = 30 * 60 * 1000; // 30 minutes
+
+/**
+ * Custom hook for managing optimistic comment state
+ */
+export const useOptimisticComments = (contentId: string) => {
+  const getOptimisticComments = (): CommentResponse[] => {
+    const cache = optimisticCommentsByContent.get(contentId);
+    if (!cache) return [];
+
+    // Check if cache is expired
+    if (Date.now() - cache.timestamp > MAX_CACHE_AGE) {
+      optimisticCommentsByContent.delete(contentId);
+      return [];
+    }
+
+    return cache.comments;
+  };
+
+  const setOptimisticComments = (comments: CommentResponse[]): void => {
+    optimisticCommentsByContent.set(contentId, {
+      comments,
+      timestamp: Date.now(),
+    });
+  };
+
+  const addOptimisticComment = (comment: CommentResponse): void => {
+    const prev = getOptimisticComments();
+    setOptimisticComments([comment, ...prev]);
+  };
+
+  const removeOptimisticComment = (commentId: string): void => {
+    const optimistic = getOptimisticComments();
+    const filtered = optimistic.filter((c) => c.id !== commentId);
+    setOptimisticComments(filtered);
+  };
+
+  const getDeletedSet = (): Set<string> => {
+    const cache = optimisticDeletedCommentsByContent.get(contentId);
+    if (!cache) {
+      const newCache = { deletedIds: new Set<string>(), timestamp: Date.now() };
+      optimisticDeletedCommentsByContent.set(contentId, newCache);
+      return newCache.deletedIds;
+    }
+
+    // Check if cache is expired
+    if (Date.now() - cache.timestamp > MAX_CACHE_AGE) {
+      optimisticDeletedCommentsByContent.delete(contentId);
+      const newCache = { deletedIds: new Set<string>(), timestamp: Date.now() };
+      optimisticDeletedCommentsByContent.set(contentId, newCache);
+      return newCache.deletedIds;
+    }
+
+    return cache.deletedIds;
+  };
+
+  const addDeletedComment = (commentId: string): void => {
+    const deletedSet = getDeletedSet();
+    deletedSet.add(commentId);
+  };
+
+  const removeDeletedComment = (commentId: string): void => {
+    const deletedSet = getDeletedSet();
+    deletedSet.delete(commentId);
+  };
+
+  const cleanup = (): void => {
+    optimisticCommentsByContent.delete(contentId);
+    optimisticDeletedCommentsByContent.delete(contentId);
+  };
+
+  return {
+    getOptimisticComments,
+    addOptimisticComment,
+    removeOptimisticComment,
+    getDeletedSet,
+    addDeletedComment,
+    removeDeletedComment,
+    cleanup,
+  };
+};
+
+// Legacy helper functions for backward compatibility
+const getOptimisticComments = (contentId: string): CommentResponse[] => {
+  const cache = optimisticCommentsByContent.get(contentId);
+  if (!cache) return [];
+
+  // Check if cache is expired
+  if (Date.now() - cache.timestamp > MAX_CACHE_AGE) {
+    optimisticCommentsByContent.delete(contentId);
+    return [];
+  }
+
+  return cache.comments;
+};
+
+const setOptimisticComments = (contentId: string, comments: CommentResponse[]): void => {
+  optimisticCommentsByContent.set(contentId, {
+    comments,
+    timestamp: Date.now(),
+  });
+};
+
+const getDeletedSet = (contentId: string): Set<string> => {
+  const cache = optimisticDeletedCommentsByContent.get(contentId);
+  if (!cache) {
+    const newCache = { deletedIds: new Set<string>(), timestamp: Date.now() };
+    optimisticDeletedCommentsByContent.set(contentId, newCache);
+    return newCache.deletedIds;
+  }
+
+  // Check if cache is expired
+  if (Date.now() - cache.timestamp > MAX_CACHE_AGE) {
+    optimisticDeletedCommentsByContent.delete(contentId);
+    const newCache = { deletedIds: new Set<string>(), timestamp: Date.now() };
+    optimisticDeletedCommentsByContent.set(contentId, newCache);
+    return newCache.deletedIds;
+  }
+
+  return cache.deletedIds;
+};
+
+const cleanupOptimisticData = (contentId: string): void => {
+  optimisticCommentsByContent.delete(contentId);
+  optimisticDeletedCommentsByContent.delete(contentId);
+};
+
+// Periodic cleanup of expired cache entries
+setInterval(() => {
+  const now = Date.now();
+
+  // Cleanup optimistic comments
+  for (const [contentId, cache] of optimisticCommentsByContent.entries()) {
+    if (now - cache.timestamp > MAX_CACHE_AGE) {
+      optimisticCommentsByContent.delete(contentId);
+    }
+  }
+
+  // Cleanup deleted comments
+  for (const [contentId, cache] of optimisticDeletedCommentsByContent.entries()) {
+    if (now - cache.timestamp > MAX_CACHE_AGE) {
+      optimisticDeletedCommentsByContent.delete(contentId);
+    }
+  }
+}, CACHE_CLEANUP_INTERVAL);
 
 export interface UseCommentsParams {
   contentId: string;
@@ -73,9 +243,9 @@ export const useComments = ({
       console.log('[useComments] API response:', result);
 
       // Apply optimistic deletions (filter out tombstoned ids)
-      const deletedSet = optimisticDeletedCommentsByContent.get(contentId);
+      const deletedSet = getDeletedSet(contentId);
       let filtered = result;
-      if (deletedSet && deletedSet.size > 0) {
+      if (deletedSet.size > 0) {
         const comments = (result.comments || []).filter((c) => !deletedSet.has(c.id));
         filtered = {
           ...result,
@@ -86,7 +256,7 @@ export const useComments = ({
 
       // Merge optimistic comments into page 0 so they persist across refetches
       if (!parentCommentId && pageParam === 0) {
-        const optimistic = optimisticCommentsByContent.get(contentId) || [];
+        const optimistic = getOptimisticComments(contentId);
         if (optimistic.length > 0) {
           // Filter out duplicates by id
           const existingIds = new Set((filtered.comments || []).map((c) => c.id));
@@ -191,20 +361,20 @@ export const useCreateComment = () => {
         // Optimistically prepend new comment to visible lists to show immediately
         if (!parentCommentId) {
           // Save into optimistic cache for persistence across refetch
-          const prev = optimisticCommentsByContent.get(contentId) || [];
-          optimisticCommentsByContent.set(contentId, [response, ...prev]);
+          const prev = getOptimisticComments(contentId);
+          setOptimisticComments(contentId, [response, ...prev]);
           // If this id was tombstoned by a previous delete, remove from tombstone
-          const del = optimisticDeletedCommentsByContent.get(contentId);
-          if (del && del.has(response.id)) {
+          const del = getDeletedSet(contentId);
+          if (del.has(response.id)) {
             del.delete(response.id);
           }
           // Top-level comments list
           queryClient.setQueriesData(
             { queryKey: queryKeys.comments.byContent(contentId) },
-            (old: any) => {
+            (old: InfiniteData<CommentListResponse> | undefined) => {
               if (!old?.pages) return old;
-              const alreadyExists = old.pages.some((p: any) =>
-                (p.comments || []).some((c: any) => c.id === response.id),
+              const alreadyExists = old.pages.some((p) =>
+                (p.comments || []).some((c) => c.id === response.id),
               );
               if (alreadyExists) return old;
               const first = old.pages[0] || { comments: [], has_more: true, total_count: 0 };
@@ -221,10 +391,10 @@ export const useCreateComment = () => {
           // Replies list for the parent comment
           queryClient.setQueriesData(
             { queryKey: queryKeys.comments.replies(parentCommentId) },
-            (old: any) => {
+            (old: InfiniteData<CommentListResponse> | undefined) => {
               if (!old?.pages) return old;
-              const alreadyExists = old.pages.some((p: any) =>
-                (p.comments || []).some((c: any) => c.id === response.id),
+              const alreadyExists = old.pages.some((p) =>
+                (p.comments || []).some((c) => c.id === response.id),
               );
               if (alreadyExists) return old;
               const first = old.pages[0] || { comments: [], has_more: true, total_count: 0 };
@@ -264,7 +434,8 @@ export const useCreateComment = () => {
         queryClient.setQueriesData(
           {
             queryKey: queryKeys.feed.all,
-            predicate: (q) => Array.isArray(q.queryKey) && q.queryKey[0] === 'feed' && q.queryKey[1] === 'infinite',
+            predicate: (q) =>
+              Array.isArray(q.queryKey) && q.queryKey[0] === 'feed' && q.queryKey[1] === 'infinite',
           },
           (old: any) => {
             if (!old?.pages) return old;
@@ -298,8 +469,29 @@ export const useCreateComment = () => {
 
         toast.success(t.toast.comments.added());
       },
-      onError: (error, { contentId }) => {
+      onError: (error, { contentId, parentCommentId }) => {
         console.error('[useCreateComment] Failed to create comment:', contentId, error);
+
+        // Rollback optimistic updates
+        if (!parentCommentId) {
+          // Remove from optimistic cache
+          const prev = getOptimisticComments(contentId);
+          const filtered = prev.filter((c) => c.id !== 'temp-id'); // Assuming we have a temp id
+          setOptimisticComments(contentId, filtered);
+
+          // Rollback UI updates
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.comments.byContent(contentId),
+          });
+        } else {
+          // Rollback replies
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.comments.replies(parentCommentId),
+          });
+        }
+
+        // Show error toast
+        toast.error(t.toast.comments.addFailed());
       },
     },
   );
@@ -368,20 +560,19 @@ export const useDeleteComment = () => {
         console.log('[useDeleteComment] Comment deleted successfully');
 
         // Tombstone this comment id so it won't reappear on refetch
-        const set = optimisticDeletedCommentsByContent.get(contentId) || new Set<string>();
-        set.add(commentId);
-        optimisticDeletedCommentsByContent.set(contentId, set);
+        const deletedSet = getDeletedSet(contentId);
+        deletedSet.add(commentId);
 
         // Optimistically remove the deleted comment from byContent list
         queryClient.setQueriesData(
           { queryKey: queryKeys.comments.byContent(contentId) },
-          (old: any) => {
+          (old: InfiniteData<CommentListResponse> | undefined) => {
             if (!old?.pages) return old;
             let removed = false;
-            const pages = old.pages.map((p: any, idx: number) => {
+            const pages = old.pages.map((p, idx: number) => {
               if (!p?.comments) return p;
               const before = p.comments.length;
-              const filtered = p.comments.filter((c: any) => c.id !== commentId);
+              const filtered = p.comments.filter((c) => c.id !== commentId);
               if (filtered.length !== before) removed = true;
               // Adjust page object if changed
               if (filtered.length !== before) {
@@ -408,17 +599,24 @@ export const useDeleteComment = () => {
         queryClient.setQueriesData(
           {
             queryKey: queryKeys.comments.all,
-            predicate: (q) => Array.isArray(q.queryKey) && q.queryKey[0] === 'comments' && q.queryKey[1] === 'replies',
-          } as any,
-          (old: any) => {
+            predicate: (q) =>
+              Array.isArray(q.queryKey) &&
+              q.queryKey[0] === 'comments' &&
+              q.queryKey[1] === 'replies',
+          },
+          (old: InfiniteData<CommentListResponse> | undefined) => {
             if (!old?.pages) return old;
             let changed = false;
-            const pages = old.pages.map((p: any) => {
+            const pages = old.pages.map((p) => {
               if (!p?.comments) return p;
-              const filtered = p.comments.filter((c: any) => c.id !== commentId);
+              const filtered = p.comments.filter((c) => c.id !== commentId);
               if (filtered.length !== p.comments.length) {
                 changed = true;
-                return { ...p, comments: filtered, total_count: Math.max(0, (p.total_count || 0) - 1) };
+                return {
+                  ...p,
+                  comments: filtered,
+                  total_count: Math.max(0, (p.total_count || 0) - 1),
+                };
               }
               return p;
             });
@@ -427,10 +625,10 @@ export const useDeleteComment = () => {
         );
 
         // Remove from optimistic cache for this content
-        const optimistic = optimisticCommentsByContent.get(contentId) || [];
+        const optimistic = getOptimisticComments(contentId);
         if (optimistic.length > 0) {
           const filtered = optimistic.filter((c) => c.id !== commentId);
-          optimisticCommentsByContent.set(contentId, filtered);
+          setOptimisticComments(contentId, filtered);
         }
 
         // 댓글 통계도 무효화
@@ -442,8 +640,9 @@ export const useDeleteComment = () => {
         queryClient.setQueriesData(
           {
             queryKey: queryKeys.feed.all,
-            predicate: (q) => Array.isArray(q.queryKey) && q.queryKey[0] === 'feed' && q.queryKey[1] === 'infinite',
-          } as any,
+            predicate: (q) =>
+              Array.isArray(q.queryKey) && q.queryKey[0] === 'feed' && q.queryKey[1] === 'infinite',
+          },
           (old: any) => {
             if (!old?.pages) return old;
             const pages = old.pages.map((page: any) => {
@@ -467,8 +666,20 @@ export const useDeleteComment = () => {
 
         toast.success(t.toast.comments.deleted());
       },
-      onError: (error, { commentId }) => {
+      onError: (error, { commentId, contentId }) => {
         console.error('[useDeleteComment] Failed to delete comment:', commentId, error);
+
+        // Rollback optimistic updates
+        const deletedSet = getDeletedSet(contentId);
+        deletedSet.delete(commentId);
+
+        // Invalidate queries to refresh data
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.comments.byContent(contentId),
+        });
+
+        // Show error toast
+        toast.error(t.toast.comments.deleteFailed());
       },
     },
   );

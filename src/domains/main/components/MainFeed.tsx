@@ -375,8 +375,12 @@ export const MainFeed = React.memo(function MainFeed() {
           <div className="mb-8 max-w-3xl mx-auto">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h1 className="text-white text-xl font-bold mb-1">{t.feed.section.header()}</h1>
-                <p className="text-gray-400 text-xs">{t.feed.section.sub()}</p>
+                <h1 className="text-white text-xl font-bold mb-1">
+                  {activeSort === 'hot' ? t.feed.section.headerHot() : t.feed.section.headerNew()}
+                </h1>
+                <p className="text-gray-400 text-xs">
+                  {activeSort === 'hot' ? t.feed.section.subHot() : t.feed.section.subNew()}
+                </p>
               </div>
 
               {/* 정렬 옵션 */}
@@ -393,7 +397,7 @@ export const MainFeed = React.memo(function MainFeed() {
                     }}
                     title={option.tooltip}
                     className={`
-                    px-2 md:px-4 py-2 text-sm rounded-md transition-all duration-200 font-medium
+                    px-2 md:px-4 py-2 text-sm rounded-md transition-all duration-200 font-medium cursor-pointer
                     ${
                       activeSort === option.value
                         ? 'text-black bg-[#eafd66] shadow-sm'
@@ -451,7 +455,7 @@ export const MainFeed = React.memo(function MainFeed() {
               <div className="text-red-400 mb-2">{t.feed.failedToLoadPosts()}</div>
               <button
                 onClick={() => refetch()}
-                className="px-4 py-2 bg-zinc-800 text-white rounded hover:bg-zinc-700 transition-colors"
+                className="px-4 py-2 bg-zinc-800 text-white rounded hover:bg-zinc-700 transition-colors cursor-pointer"
               >
                 {t.feed.tryAgain()}
               </button>

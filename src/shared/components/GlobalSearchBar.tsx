@@ -4,6 +4,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 
 import { useRouter } from 'next/navigation';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
+import { useRecentContentStore } from '@/store/recentContentStore';
 
 import { SearchAutocomplete, type AutocompleteItem } from '../../domains/search';
 
@@ -26,6 +27,7 @@ export function GlobalSearchBar({
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const t = useCommonTranslation();
+  const { addContent } = useRecentContentStore();
 
   // Placeholder를 state로 관리하여 locale 변경 시 업데이트
   const [placeholder, setPlaceholder] = useState(t.search.placeholder());
@@ -76,8 +78,15 @@ export function GlobalSearchBar({
         // 채널인 경우: 채널 페이지로 이동
         router.push(`/channels/${item.channelId}`);
       } else {
-        // 콘텐츠인 경우: 채널 페이지로 이동하면서 콘텐츠 모달 열기 (TrendingContentCard와 동일한 방식)
+        // 콘텐츠인 경우: 최근 본 콘텐츠에 추가 후 라우팅
         if (item.channelId) {
+          addContent({
+            id: item.id,
+            channelId: item.channelId,
+            title: item.title || '제목 없음',
+            thumbnailUrl: item.thumbnail || undefined,
+          });
+
           router.push(`/channels/${item.channelId}?content=${item.id}`);
         } else {
           console.warn('Channel ID not available for content:', item);
@@ -87,7 +96,7 @@ export function GlobalSearchBar({
       setIsAutocompleteOpen(false);
       inputRef.current?.blur();
     },
-    [router],
+    [router, addContent],
   );
 
   const handleAutocompleteClose = useCallback(() => {

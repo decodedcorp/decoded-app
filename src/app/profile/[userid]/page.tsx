@@ -61,7 +61,11 @@ export default function ProfilePage() {
       <div className="w-full px-3 py-4 sm:px-4 sm:py-8">
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
-            <InlineSpinner size="lg" className="mx-auto mb-4" ariaLabel={t('loading.initializing')} />
+            <InlineSpinner
+              size="lg"
+              className="mx-auto mb-4"
+              ariaLabel={t('loading.initializing')}
+            />
             <p className="text-gray-600">{t('loading.initializing')}</p>
           </div>
         </div>
@@ -82,7 +86,7 @@ export default function ProfilePage() {
           <p className="text-zinc-400 mb-6">{t('page.notFoundDescription')}</p>
           <button
             onClick={() => router.push('/')}
-            className="px-6 py-3 bg-[#EAFD66] text-black rounded-lg font-medium hover:bg-[#d9ec55] transition-colors"
+            className="px-6 py-3 bg-[#EAFD66] text-black rounded-lg font-medium hover:bg-[#d9ec55] transition-colors cursor-pointer"
             aria-label={t('page.goToHome')}
           >
             {t('page.goToHome')}
@@ -193,7 +197,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Sidebar */}
-          <div className="w-80 flex-shrink-0">{profileSidebar}</div>
+          <div className="w-72 flex-shrink-0">{profileSidebar}</div>
         </div>
       </div>
 

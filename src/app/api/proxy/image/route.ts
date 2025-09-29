@@ -3,18 +3,18 @@ import sharp from 'sharp';
 
 // 품질 매핑 (품질 우선 모드)
 const QUALITY_MAP = {
-  low: 70,     // 기존 60 → 70으로 향상
-  medium: 85,  // 기존 75 → 85로 향상  
-  high: 95,    // 기존 85 → 95로 향상
-  max: 100,    // 새로운 최고 품질 옵션
+  low: 70, // 기존 60 → 70으로 향상
+  medium: 85, // 기존 75 → 85로 향상
+  high: 95, // 기존 85 → 95로 향상
+  max: 100, // 새로운 최고 품질 옵션
 } as const;
 
 // 사이즈 매핑 (품질 우선 모드)
 const SIZE_MAP = {
-  thumb: { width: 300, height: 300 },   // 기존 200 → 300으로 향상
-  small: { width: 600, height: 600 },   // 기존 400 → 600으로 향상
+  thumb: { width: 300, height: 300 }, // 기존 200 → 300으로 향상
+  small: { width: 600, height: 600 }, // 기존 400 → 600으로 향상
   medium: { width: 1000, height: 1000 }, // 기존 800 → 1000으로 향상
-  large: { width: 1600, height: 1600 },  // 기존 1200 → 1600으로 향상
+  large: { width: 1600, height: 1600 }, // 기존 1200 → 1600으로 향상
   original: null, // 원본 크기 유지
 } as const;
 
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       'test-image-server.com',
       // 한국 뉴스 사이트들
       'nateimg.co.kr',
-      'thumbnews.nateimg.co.kr', 
+      'thumbnews.nateimg.co.kr',
       'news.nateimg.co.kr',
       'imgnews.naver.net',
       'imgnews.pstatic.net',
@@ -105,6 +105,16 @@ export async function GET(request: NextRequest) {
       'pickcon.co.kr',
       'image.msscdn.net',
       'blogthumb.pstatic.net',
+      // Pinterest 이미지 서비스
+      'i.pinimg.com',
+      'pinimg.com',
+      // Apple Music 이미지 서비스
+      'is1-ssl.mzstatic.com',
+      'is2-ssl.mzstatic.com',
+      'is3-ssl.mzstatic.com',
+      'is4-ssl.mzstatic.com',
+      'is5-ssl.mzstatic.com',
+      'mzstatic.com',
     ];
 
     const url = new URL(imageUrl);
@@ -129,13 +139,13 @@ export async function GET(request: NextRequest) {
     }
 
     const imageBuffer = await response.arrayBuffer();
-    
+
     // Sharp를 사용한 이미지 최적화
     let sharpInstance = sharp(Buffer.from(imageBuffer));
-    
+
     // 메타데이터 확인
     const metadata = await sharpInstance.metadata();
-    
+
     // 사이즈 조정 (품질 우선)
     if (size && size !== 'original' && SIZE_MAP[size]) {
       const targetSize = SIZE_MAP[size];
@@ -148,31 +158,31 @@ export async function GET(request: NextRequest) {
         });
       }
     }
-    
+
     // 블러 효과
     if (blur) {
       sharpInstance = sharpInstance.blur(8);
     }
-    
+
     // 포맷 및 품질 설정 (품질 우선)
     const imageQuality = quality ? QUALITY_MAP[quality] : QUALITY_MAP.high;
     let outputBuffer: Buffer;
     let contentType: string;
-    
+
     switch (format) {
       case 'jpeg':
         outputBuffer = await sharpInstance
-          .jpeg({ 
+          .jpeg({
             quality: imageQuality,
             progressive: true, // 점진적 로딩
-            mozjpeg: true,     // 더 나은 압축
+            mozjpeg: true, // 더 나은 압축
           })
           .toBuffer();
         contentType = 'image/jpeg';
         break;
       case 'png':
         outputBuffer = await sharpInstance
-          .png({ 
+          .png({
             quality: imageQuality,
             progressive: true,
             compressionLevel: 6, // 품질과 압축의 균형
@@ -183,9 +193,9 @@ export async function GET(request: NextRequest) {
       case 'webp':
       default:
         outputBuffer = await sharpInstance
-          .webp({ 
+          .webp({
             quality: imageQuality,
-            effort: 6,         // 최고 압축 효율
+            effort: 6, // 최고 압축 효율
             smartSubsample: false, // 색상 정보 보존
             nearLossless: imageQuality >= 95, // 95 이상일 때 무손실에 가까운 압축
           })
@@ -199,11 +209,14 @@ export async function GET(request: NextRequest) {
     headers.set('Access-Control-Allow-Origin', '*');
     headers.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
     headers.set('Access-Control-Allow-Headers', 'Content-Type');
-    headers.set('Cache-Control', 'public, max-age=2592000, s-maxage=31536000, stale-while-revalidate=31536000'); // 30일 브라우저, 1년 CDN
+    headers.set(
+      'Cache-Control',
+      'public, max-age=2592000, s-maxage=31536000, stale-while-revalidate=31536000',
+    ); // 30일 브라우저, 1년 CDN
     headers.set('Content-Type', contentType);
     headers.set('Content-Length', outputBuffer.byteLength.toString());
     headers.set('ETag', `"${outputBuffer.byteLength}-${imageQuality}-${size || 'original'}"`);
-    
+
     // 품질 정보를 헤더에 추가 (디버깅용)
     headers.set('X-Image-Quality', imageQuality.toString());
     headers.set('X-Image-Size', size || 'original');

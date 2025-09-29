@@ -20,6 +20,7 @@ import { useUserProfile } from '@/domains/users/hooks/useUserProfile';
 
 import { useCommentLike, useUpdateComment, useDeleteComment } from '../hooks/useComments';
 import { LoginButton } from '@/shared/components/LoginButton';
+import { ConfirmModal } from '@/shared/components/modals/ConfirmModal';
 
 import { CommentInput } from './CommentInput';
 
@@ -41,6 +42,7 @@ export function CommentItem({
   const [showMenu, setShowMenu] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(comment.text);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const commentLikeMutation = useCommentLike();
   const updateCommentMutation = useUpdateComment();
@@ -129,19 +131,26 @@ export function CommentItem({
 
   // Handle delete comment
   const handleDelete = () => {
-    if (window.confirm(tc.item.deleteConfirm())) {
-      deleteCommentMutation.mutate(
-        {
-          commentId: comment.id,
-          contentId,
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = () => {
+    deleteCommentMutation.mutate(
+      {
+        commentId: comment.id,
+        contentId,
+      },
+      {
+        onSuccess: () => {
+          setShowMenu(false);
+          setShowDeleteModal(false);
         },
-        {
-          onSuccess: () => {
-            setShowMenu(false);
-          },
-        },
-      );
-    }
+      },
+    );
+  };
+
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
   };
 
   // Handle reply created
@@ -176,7 +185,7 @@ export function CommentItem({
             <div className="relative ml-auto">
               <button
                 onClick={() => setShowMenu(!showMenu)}
-                className="p-1 hover:bg-zinc-700/50 rounded transition-colors"
+                className="p-1 hover:bg-zinc-700/50 rounded transition-colors cursor-pointer"
               >
                 <MdMoreVert className="w-4 h-4 text-zinc-400" />
               </button>
@@ -188,14 +197,14 @@ export function CommentItem({
                       setIsEditing(true);
                       setShowMenu(false);
                     }}
-                    className="w-full px-3 py-2 text-left text-sm text-zinc-300 hover:bg-zinc-700/50 flex items-center space-x-2"
+                    className="w-full px-3 py-2 text-left text-sm text-zinc-300 hover:bg-zinc-700/50 flex items-center space-x-2 cursor-pointer"
                   >
                     <MdEdit className="w-4 h-4" />
                     <span>{tc.item.edit()}</span>
                   </button>
                   <button
                     onClick={handleDelete}
-                    className="w-full px-3 py-2 text-left text-sm text-red-400 hover:bg-zinc-700/50 flex items-center space-x-2"
+                    className="w-full px-3 py-2 text-left text-sm text-red-400 hover:bg-zinc-700/50 flex items-center space-x-2 cursor-pointer"
                   >
                     <MdDelete className="w-4 h-4" />
                     <span>{tc.item.delete()}</span>
@@ -224,7 +233,7 @@ export function CommentItem({
                     setEditText(comment.text);
                     setIsEditing(false);
                   }}
-                  className="px-3 py-1 text-xs text-zinc-400 hover:text-white transition-colors"
+                  className="px-3 py-1 text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer"
                 >
                   {tc.input.cancel()}
                 </button>
@@ -252,7 +261,7 @@ export function CommentItem({
             <button
               onClick={handleLike}
               disabled={commentLikeMutation.isPending}
-              className="flex items-center space-x-1 text-zinc-400 hover:text-red-400 transition-colors"
+              className="flex items-center space-x-1 text-zinc-400 hover:text-red-400 transition-colors cursor-pointer"
               aria-label={`좋아요 ${comment.likes || 0}개`}
             >
               <MdFavoriteBorder className="w-4 h-4" />
@@ -263,7 +272,7 @@ export function CommentItem({
             <button
               onClick={handleDislike}
               disabled={commentLikeMutation.isPending}
-              className="flex items-center space-x-1 text-zinc-400 hover:text-blue-400 transition-colors"
+              className="flex items-center space-x-1 text-zinc-400 hover:text-blue-400 transition-colors cursor-pointer"
               aria-label={`싫어요 ${comment.dislikes || 0}개`}
             >
               <MdThumbDownOffAlt className="w-4 h-4" />
@@ -286,7 +295,7 @@ export function CommentItem({
                   }
                   setShowReplyInput(!showReplyInput);
                 }}
-                className="flex items-center justify-center w-8 h-8 rounded-full bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-full bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors cursor-pointer"
                 aria-label={tc.item.reply()}
               >
                 <MdReply className="w-4 h-4 text-zinc-400 hover:text-white" />
@@ -313,6 +322,19 @@ export function CommentItem({
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+        title="댓글 삭제"
+        message={tc.item.deleteConfirm()}
+        confirmText={tc.item.delete()}
+        cancelText={tc.input.cancel()}
+        confirmVariant="danger"
+        isLoading={deleteCommentMutation.isPending}
+      />
     </div>
   );
 }

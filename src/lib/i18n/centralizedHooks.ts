@@ -174,6 +174,7 @@ type CommonTranslations = {
   create: {
     create: () => string;
     createNewContent: () => string;
+    onlyManagersCanAddContent: () => string;
     generatedContent: () => string;
     aiGeneratedContent: () => string;
     generatedAt: () => string;
@@ -215,6 +216,10 @@ type CommonTranslations = {
     section: {
       header: () => string;
       sub: () => string;
+      headerHot: () => string;
+      subHot: () => string;
+      headerNew: () => string;
+      subNew: () => string;
     };
     meta: {
       line: (params: { range: string; sort: string; count: number }) => string;
@@ -793,6 +798,7 @@ export const useCommonTranslation = (): CommonTranslations => {
     create: {
       create: () => t('create.create'),
       createNewContent: () => t('create.createNewContent'),
+      onlyManagersCanAddContent: () => t('create.onlyManagersCanAddContent'),
       generatedContent: () => t('create.generatedContent'),
       aiGeneratedContent: () => t('create.aiGeneratedContent'),
       generatedAt: () => t('create.generatedAt'),
@@ -834,6 +840,10 @@ export const useCommonTranslation = (): CommonTranslations => {
       section: {
         header: () => t('feed.section.header'),
         sub: () => t('feed.section.sub'),
+        headerHot: () => t('feed.section.headerHot'),
+        subHot: () => t('feed.section.subHot'),
+        headerNew: () => t('feed.section.headerNew'),
+        subNew: () => t('feed.section.subNew'),
       },
       meta: {
         line: (params: { range: string; sort: string; count: number }) =>

@@ -30,8 +30,10 @@ import { PinTargetType } from '@/api/generated/models/PinTargetType';
 import { cn } from '@/lib/utils/cn';
 import { useContentModalStore } from '@/store/contentModalStore';
 import { ContentItem } from '@/lib/types/content';
+import { useRecentContentStore } from '@/store/recentContentStore';
 
 import { useChannelPins, useReorderPins } from '../../hooks/useChannelPins';
+import { useContentsByIds } from '../../hooks/useContentsByIds';
 
 // Helper function to extract title based on content type and metadata
 const getContentTitle = (item: UnifiedPinnedItem): string => {
@@ -76,9 +78,15 @@ interface PinnedItemCardProps {
   item: UnifiedPinnedItem;
   isDraggable: boolean;
   onClick: () => void;
+  contentItem?: ContentItem | null;
 }
 
-const PinnedItemCard: React.FC<PinnedItemCardProps> = ({ item, isDraggable, onClick }) => {
+const PinnedItemCard: React.FC<PinnedItemCardProps> = ({
+  item,
+  isDraggable,
+  onClick,
+  contentItem,
+}) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
     disabled: !isDraggable,
@@ -98,8 +106,32 @@ const PinnedItemCard: React.FC<PinnedItemCardProps> = ({ item, isDraggable, onCl
       : item.folder_metadata?.description) ||
     '';
 
-  // 썸네일 URL (컨텐츠인 경우)
-  const thumbnailUrl = item.type === 'content' ? item.content_metadata?.thumbnail_url : null;
+  // 썸네일 URL (컨텐츠인 경우) - 실제 콘텐츠 데이터 우선, 없으면 메타데이터 사용
+  const thumbnailUrl =
+    item.type === 'content'
+      ? contentItem?.imageUrl ||
+        contentItem?.linkPreview?.imageUrl ||
+        contentItem?.thumbnailUrl ||
+        item.content_metadata?.thumbnail_url
+      : null;
+
+  // 디버깅: 썸네일 URL 확인
+  if (process.env.NODE_ENV === 'development' && item.type === 'content') {
+    console.log('🔍 [ChannelPinnedSection] Thumbnail debug:', {
+      itemId: item.id,
+      itemName: item.name,
+      contentType: item.content_type,
+      contentMetadata: item.content_metadata,
+      linkPreview: (item.content_metadata as any)?.linkPreview,
+      linkPreviewImageUrl: (item.content_metadata as any)?.linkPreview?.imageUrl,
+      thumbnailUrl: item.content_metadata?.thumbnail_url,
+      contentItem: contentItem,
+      contentItemImageUrl: contentItem?.imageUrl,
+      contentItemLinkPreview: contentItem?.linkPreview,
+      contentItemThumbnailUrl: contentItem?.thumbnailUrl,
+      finalThumbnailUrl: thumbnailUrl,
+    });
+  }
 
   // 폴더 색상 (폴더인 경우)
   const folderColor =
@@ -282,8 +314,61 @@ export const ChannelPinnedSection: React.FC<ChannelPinnedSectionProps> = ({
   const { user } = useUser();
   const { data: pinsData, isLoading } = useChannelPins(channelId);
   const { setPinnedItems } = useChannelPinsStore();
+
+  // Extract content IDs from pins data for batch fetching
+  const contentIds = React.useMemo(() => {
+    if (!pinsData?.items) return [];
+    return pinsData.items
+      .filter((pin: UnifiedPinnedItem) => pin.type === 'content')
+      .map((pin: UnifiedPinnedItem) => pin.id);
+  }, [pinsData?.items]);
+
+  // Fetch content data for all pinned content items
+  const {
+    contentMap,
+    isLoadingAny: contentsLoading,
+    hasErrors: hasContentErrors,
+  } = useContentsByIds({
+    contentIds,
+    enabled: contentIds.length > 0,
+  });
+
+  // 디버깅: useContentsByIds 결과 확인
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'development' && contentIds.length > 0) {
+      console.log('🔍 [ChannelPinnedSection] useContentsByIds debug:', {
+        contentIds,
+        contentMapSize: contentMap.size,
+        contentMapEntries: Array.from(contentMap.entries()),
+        isLoading: contentsLoading,
+        hasErrors: hasContentErrors,
+      });
+    }
+  }, [contentIds, contentMap, contentsLoading, hasContentErrors]);
+
+  // 디버깅: API 응답 데이터 확인
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'development' && pinsData?.items) {
+      console.log('🔍 [ChannelPinnedSection] API data debug:', {
+        channelId,
+        pinsCount: pinsData.items.length,
+        pinsData: pinsData,
+        items: pinsData.items.map((item) => ({
+          id: item.id,
+          name: item.name,
+          type: item.type,
+          content_type: item.content_type,
+          content_metadata: item.content_metadata,
+          hasLinkPreview: !!(item.content_metadata as any)?.linkPreview,
+          linkPreviewImageUrl: (item.content_metadata as any)?.linkPreview?.imageUrl,
+          thumbnail_url: item.content_metadata?.thumbnail_url,
+        })),
+      });
+    }
+  }, [pinsData, channelId]);
   const reorderMutation = useReorderPins();
   const openContentModal = useContentModalStore((state) => state.openModal);
+  const { addContent } = useRecentContentStore();
 
   // 권한 체크 - user 타입 변환
   const userProfile = user
@@ -360,7 +445,10 @@ export const ChannelPinnedSection: React.FC<ChannelPinnedSectionProps> = ({
       type: (item.content_type as any) || 'text',
       title: item.name,
       description: item.pin_note || item.content_metadata?.description || '',
-      thumbnailUrl: item.content_metadata?.thumbnail_url || undefined,
+      thumbnailUrl:
+        (item.content_metadata as any)?.linkPreview?.imageUrl ||
+        item.content_metadata?.thumbnail_url ||
+        undefined,
       likes: item.content_metadata?.likes,
       views: item.content_metadata?.views_count,
       date: item.created_at,
@@ -372,6 +460,17 @@ export const ChannelPinnedSection: React.FC<ChannelPinnedSectionProps> = ({
   // 컨텐츠 클릭 핸들러
   const handleContentClick = (item: UnifiedPinnedItem) => {
     if (item.type === 'content') {
+      // 최근 본 콘텐츠에 추가
+      addContent({
+        id: item.id,
+        channelId: channelId,
+        title: getContentTitle(item),
+        thumbnailUrl:
+          (item.content_metadata as any)?.linkPreview?.imageUrl ||
+          item.content_metadata?.thumbnail_url ||
+          undefined,
+      });
+
       if (onContentClick) {
         onContentClick(item.id);
       } else {
@@ -383,7 +482,9 @@ export const ChannelPinnedSection: React.FC<ChannelPinnedSectionProps> = ({
     // TODO: 폴더 클릭 처리
   };
 
-  if (isLoading) {
+  const isLoadingAny = isLoading || contentsLoading;
+
+  if (isLoadingAny) {
     return (
       <div className={cn('space-y-3', className)}>
         <div className="flex items-center gap-2 mb-3">
@@ -431,6 +532,7 @@ export const ChannelPinnedSection: React.FC<ChannelPinnedSectionProps> = ({
                   item={item}
                   isDraggable={canReorder}
                   onClick={() => handleContentClick(item)}
+                  contentItem={item.type === 'content' ? contentMap.get(item.id) : null}
                 />
               ))}
             </div>
@@ -444,6 +546,7 @@ export const ChannelPinnedSection: React.FC<ChannelPinnedSectionProps> = ({
               item={item}
               isDraggable={false}
               onClick={() => handleContentClick(item)}
+              contentItem={item.type === 'content' ? contentMap.get(item.id) : null}
             />
           ))}
         </div>

@@ -573,6 +573,10 @@ export const useProfileTranslation = () => {
       loadMore: () => t('bookmarks.loadMore'),
       loading: () => t('bookmarks.loading'),
       removeBookmark: () => t('bookmarks.removeBookmark'),
+      deleteConfirmTitle: () => t('bookmarks.deleteConfirmTitle'),
+      deleteConfirmMessage: () => t('bookmarks.deleteConfirmMessage'),
+      delete: () => t('bookmarks.delete'),
+      cancel: () => t('bookmarks.cancel'),
     },
     comments: {
       title: () => t('comments.title'),

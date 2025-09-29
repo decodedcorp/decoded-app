@@ -37,7 +37,7 @@ function TagRow({ tags, mobileLimit = 3 }: { tags: string[]; mobileLimit?: numbe
           ))}
           {tags.length > visible && (
             <button
-              className="px-2 py-1 text-xs rounded-full border border-zinc-500/40 text-zinc-300/90 hover:bg-zinc-700/30 transition-colors"
+              className="px-2 py-1 text-xs rounded-full border border-zinc-500/40 text-zinc-300/90 hover:bg-zinc-700/30 transition-colors cursor-pointer"
               onClick={() => {
                 /* TODO: open a modal or bottom sheet with full tag list */
               }}

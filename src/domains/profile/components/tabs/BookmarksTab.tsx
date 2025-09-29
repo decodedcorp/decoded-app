@@ -7,12 +7,14 @@ import { useDateFormatters } from '@/lib/utils/dateUtils';
 import { ThumbnailFallback } from '@/components/FallbackImage';
 import { BookmarksTabSkeleton } from '@/shared/components/loading/BookmarksTabSkeleton';
 import { ConfirmModal } from '@/shared/components/modals/ConfirmModal';
+import { useRecentContentStore } from '@/store/recentContentStore';
 
 export function BookmarksTab() {
   const router = useRouter();
   const t = useProfileTranslation();
   const { t: rawT } = useTranslation('profile');
   const { formatDateByContext } = useDateFormatters();
+  const { addContent } = useRecentContentStore();
   const [offset, setOffset] = useState(0);
   const limit = 20;
 
@@ -31,8 +33,16 @@ export function BookmarksTab() {
   });
 
   const handleContentClick = (contentId: string, contentPreview?: any) => {
-    // Navigate to channel page with content modal
+    // 최근 본 콘텐츠에 추가
     if (contentPreview?.channel_id) {
+      addContent({
+        id: contentId,
+        channelId: contentPreview.channel_id,
+        title: contentPreview.title || '제목 없음',
+        thumbnailUrl: contentPreview.thumbnail_url || undefined,
+      });
+
+      // Navigate to channel page with content modal
       router.push(`/channels/${contentPreview.channel_id}?content=${contentId}`);
     }
   };
@@ -253,10 +263,12 @@ export function BookmarksTab() {
         isOpen={deleteModal.isOpen}
         onClose={handleCloseDeleteModal}
         onConfirm={handleConfirmDelete}
-        title="북마크 삭제"
-        message={`'${deleteModal.contentTitle || '이 콘텐츠'}' 북마크를 삭제하시겠어요?`}
-        confirmText="삭제"
-        cancelText="취소"
+        title={t.bookmarks.deleteConfirmTitle()}
+        message={t.bookmarks
+          .deleteConfirmMessage()
+          .replace('{title}', deleteModal.contentTitle || t.bookmarks.noBookmarks())}
+        confirmText={t.bookmarks.delete()}
+        cancelText={t.bookmarks.cancel()}
         confirmVariant="danger"
         isLoading={removeBookmark.isPending}
       />

@@ -121,11 +121,12 @@ export const HeartButton = memo<HeartButtonProps>(
           group relative flex items-center justify-center
           ${styles.button} ${styles.gap}
           bg-black/70 backdrop-blur-sm rounded-full
-          border border-white/20 
+          border border-white/20
           transition-all duration-200
           hover:bg-black/80 hover:scale-110 hover:border-white/40
           focus:outline-none focus:ring-2 focus:ring-red-400/50 focus:ring-offset-2 focus:ring-offset-transparent
           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100
+          cursor-pointer
           ${className}
         `}
       >

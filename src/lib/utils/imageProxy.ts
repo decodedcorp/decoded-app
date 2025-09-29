@@ -71,6 +71,16 @@ export function getProxiedImageUrl(imageUrl: string, options: ImageProxyOptions 
     'cdn.kstarfashion.com',
     'biz.chosun.com',
     'pub-65bb4012fb354951a2c6139a4b49b717.r2.dev', // R2 스토리지 도메인
+    // Pinterest 이미지 서비스
+    'i.pinimg.com',
+    'pinimg.com',
+    // Apple Music 이미지 서비스
+    'is1-ssl.mzstatic.com',
+    'is2-ssl.mzstatic.com',
+    'is3-ssl.mzstatic.com',
+    'is4-ssl.mzstatic.com',
+    'is5-ssl.mzstatic.com',
+    'mzstatic.com',
   ];
 
   try {

@@ -159,6 +159,7 @@
   "create": {
     "create": "Create",
     "createNewContent": "Create new content",
+    "onlyManagersCanAddContent": "Only channel managers can add content",
     "generatedContent": "Generated Content",
     "aiGeneratedContent": "AI-generated content",
     "generatedAt": "Generated at",
@@ -199,7 +200,11 @@
   "feed": {
     "section": {
       "header": "Trending now",
-      "sub": "What's popular across channels"
+      "sub": "What's popular across channels",
+      "headerHot": "Trending now",
+      "subHot": "What's popular across channels",
+      "headerNew": "Latest content",
+      "subNew": "Fresh updates just posted"
     },
     "meta": {
       "line": "{{range}} · {{sort}} · {{count}}"
