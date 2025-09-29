@@ -30,7 +30,7 @@ import Masonry from '@/components/ReactBitsMasonry';
 import CommunityHighlights from '@/domains/channels/components/highlights/CommunityHighlights';
 import { HighlightItem } from '@/lib/types/highlightTypes';
 import { useUser } from '@/domains/auth/hooks/useAuth';
-import { canPinContent } from '@/lib/utils/channelPermissions';
+import { canPinContent, canUploadContent } from '@/lib/utils/channelPermissions';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
 import { useChannelTranslation } from '@/lib/i18n/hooks';
 import { toContentHref, getContentLinkProps } from '@/lib/routing';
@@ -280,11 +280,17 @@ export const ChannelModalContent = React.memo<{
   const selectedChannel = useChannelModalStore((state) => state.selectedChannel);
   const openContentUploadModal = useContentUploadStore((state) => state.openModal);
 
+  // 사용자 정보 가져오기
+  const { user } = useUser();
+
   // 채널 ID 결정: Props > selectedChannelId > selectedChannel.id 순서로 우선순위
   const channelId = propChannelId || selectedChannelId || selectedChannel?.id || '';
 
   // 채널 정보 가져오기
   const { data: channelData } = useChannel(channelId);
+
+  // 콘텐츠 업로드 권한 체크
+  const canUpload = canUploadContent(user, channelData);
 
   // 채널의 실제 필터 데이터 가져오기
   const { dataTypes, categories, isLoading: isFiltersLoading } = useChannelFilters(channelId);
@@ -721,20 +727,46 @@ export const ChannelModalContent = React.memo<{
                   </svg>
                   <div className="text-zinc-400 text-lg mb-2">{states.empty()}</div>
                   <div className="text-zinc-500">{states.emptySubtitle()}</div>
-                  <button
-                    onClick={handleAddContent}
-                    className="mt-4 px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-300 rounded-lg transition-colors duration-200 flex items-center space-x-2"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 4v16m8-8H4"
-                      />
-                    </svg>
-                    <span>{t.create.createNewContent()}</span>
-                  </button>
+
+                  {/* 권한이 있는 사용자에게만 콘텐츠 추가 버튼 표시 */}
+                  {canUpload ? (
+                    <button
+                      onClick={handleAddContent}
+                      className="mt-4 px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-300 rounded-lg transition-colors duration-200 flex items-center space-x-2"
+                    >
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
+                      <span>{t.create.createNewContent()}</span>
+                    </button>
+                  ) : (
+                    <div className="mt-4 px-6 py-3 bg-zinc-800/50 text-zinc-500 rounded-lg flex items-center space-x-2">
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                        />
+                      </svg>
+                      <span>{t.create.onlyManagersCanAddContent()}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

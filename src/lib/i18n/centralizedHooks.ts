@@ -174,6 +174,7 @@ type CommonTranslations = {
   create: {
     create: () => string;
     createNewContent: () => string;
+    onlyManagersCanAddContent: () => string;
     generatedContent: () => string;
     aiGeneratedContent: () => string;
     generatedAt: () => string;
@@ -793,6 +794,7 @@ export const useCommonTranslation = (): CommonTranslations => {
     create: {
       create: () => t('create.create'),
       createNewContent: () => t('create.createNewContent'),
+      onlyManagersCanAddContent: () => t('create.onlyManagersCanAddContent'),
       generatedContent: () => t('create.generatedContent'),
       aiGeneratedContent: () => t('create.aiGeneratedContent'),
       generatedAt: () => t('create.generatedAt'),

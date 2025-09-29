@@ -116,9 +116,11 @@ export const useAuthStore = create<AuthStore>()(
             sessionStorage.removeItem('USER_DOC_ID');
             sessionStorage.removeItem('USER_EMAIL');
             sessionStorage.removeItem('USER_NICKNAME');
-            
+
             if (process.env.NODE_ENV === 'development') {
-              console.log('[AuthStore] 로그아웃 시 모든 인증 데이터 강제 제거 완료 (legacy 키 포함)');
+              console.log(
+                '[AuthStore] 로그아웃 시 모든 인증 데이터 강제 제거 완료 (legacy 키 포함)',
+              );
             }
           }
 
@@ -227,7 +229,9 @@ export const useAuthStore = create<AuthStore>()(
               // localStorage에서 isAuthenticated가 true로 복원되었지만 sessionStorage에 user가 없는 경우
               // 실제로는 로그아웃 상태로 처리
               if (state.isAuthenticated) {
-                console.log('[Auth] isAuthenticated true but no sessionStorage data, resetting to logout state');
+                console.log(
+                  '[Auth] isAuthenticated true but no sessionStorage data, resetting to logout state',
+                );
                 state.isAuthenticated = false;
                 state.user = null;
                 state.error = null;

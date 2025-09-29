@@ -159,6 +159,7 @@
   "create": {
     "create": "만들기",
     "createNewContent": "새 콘텐츠 만들기",
+    "onlyManagersCanAddContent": "채널 매니저만 콘텐츠를 추가할 수 있어요",
     "generatedContent": "생성된 콘텐츠",
     "aiGeneratedContent": "AI가 생성한 콘텐츠입니다",
     "generatedAt": "생성 시간",

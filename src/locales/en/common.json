@@ -159,6 +159,7 @@
   "create": {
     "create": "Create",
     "createNewContent": "Create new content",
+    "onlyManagersCanAddContent": "Only channel managers can add content",
     "generatedContent": "Generated Content",
     "aiGeneratedContent": "AI-generated content",
     "generatedAt": "Generated at",

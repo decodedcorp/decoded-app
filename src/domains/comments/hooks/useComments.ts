@@ -264,7 +264,7 @@ export const useCreateComment = () => {
         queryClient.setQueriesData(
           {
             queryKey: queryKeys.feed.all,
-            predicate: (q) => Array.isArray(q.queryKey) && q.queryKey[0] === 'feed' && q.queryKey[1] === 'infinite',
+            predicate: (q: any) => Array.isArray(q.queryKey) && q.queryKey[0] === 'feed' && q.queryKey[1] === 'infinite',
           },
           (old: any) => {
             if (!old?.pages) return old;
@@ -408,7 +408,7 @@ export const useDeleteComment = () => {
         queryClient.setQueriesData(
           {
             queryKey: queryKeys.comments.all,
-            predicate: (q) => Array.isArray(q.queryKey) && q.queryKey[0] === 'comments' && q.queryKey[1] === 'replies',
+            predicate: (q: any) => Array.isArray(q.queryKey) && q.queryKey[0] === 'comments' && q.queryKey[1] === 'replies',
           } as any,
           (old: any) => {
             if (!old?.pages) return old;
@@ -442,7 +442,7 @@ export const useDeleteComment = () => {
         queryClient.setQueriesData(
           {
             queryKey: queryKeys.feed.all,
-            predicate: (q) => Array.isArray(q.queryKey) && q.queryKey[0] === 'feed' && q.queryKey[1] === 'infinite',
+            predicate: (q: any) => Array.isArray(q.queryKey) && q.queryKey[0] === 'feed' && q.queryKey[1] === 'infinite',
           } as any,
           (old: any) => {
             if (!old?.pages) return old;
