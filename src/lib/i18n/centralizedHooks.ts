@@ -216,6 +216,10 @@ type CommonTranslations = {
     section: {
       header: () => string;
       sub: () => string;
+      headerHot: () => string;
+      subHot: () => string;
+      headerNew: () => string;
+      subNew: () => string;
     };
     meta: {
       line: (params: { range: string; sort: string; count: number }) => string;
@@ -836,6 +840,10 @@ export const useCommonTranslation = (): CommonTranslations => {
       section: {
         header: () => t('feed.section.header'),
         sub: () => t('feed.section.sub'),
+        headerHot: () => t('feed.section.headerHot'),
+        subHot: () => t('feed.section.subHot'),
+        headerNew: () => t('feed.section.headerNew'),
+        subNew: () => t('feed.section.subNew'),
       },
       meta: {
         line: (params: { range: string; sort: string; count: number }) =>

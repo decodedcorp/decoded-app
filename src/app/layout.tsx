@@ -2,6 +2,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Analytics } from '@vercel/analytics/react';
 
 import { QueryProvider } from '../lib/providers/QueryProvider';
 import { ToastProvider } from '../lib/providers/ToastProvider';
@@ -55,15 +56,14 @@ export default async function RootLayout({
               <ToastProvider>
                 <AuthInitializer />
                 <InviteGate>
-                  <ConditionalAppLayout modal={modal}>
-                    {children}
-                  </ConditionalAppLayout>
+                  <ConditionalAppLayout modal={modal}>{children}</ConditionalAppLayout>
                 </InviteGate>
               </ToastProvider>
             </PerformanceProvider>
           </QueryProvider>
         </I18nProvider>
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );

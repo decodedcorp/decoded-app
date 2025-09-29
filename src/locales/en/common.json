@@ -200,7 +200,11 @@
   "feed": {
     "section": {
       "header": "Trending now",
-      "sub": "What's popular across channels"
+      "sub": "What's popular across channels",
+      "headerHot": "Trending now",
+      "subHot": "What's popular across channels",
+      "headerNew": "Latest content",
+      "subNew": "Fresh updates just posted"
     },
     "meta": {
       "line": "{{range}} · {{sort}} · {{count}}"

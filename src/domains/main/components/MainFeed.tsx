@@ -375,8 +375,12 @@ export const MainFeed = React.memo(function MainFeed() {
           <div className="mb-8 max-w-3xl mx-auto">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h1 className="text-white text-xl font-bold mb-1">{t.feed.section.header()}</h1>
-                <p className="text-gray-400 text-xs">{t.feed.section.sub()}</p>
+                <h1 className="text-white text-xl font-bold mb-1">
+                  {activeSort === 'hot' ? t.feed.section.headerHot() : t.feed.section.headerNew()}
+                </h1>
+                <p className="text-gray-400 text-xs">
+                  {activeSort === 'hot' ? t.feed.section.subHot() : t.feed.section.subNew()}
+                </p>
               </div>
 
               {/* 정렬 옵션 */}

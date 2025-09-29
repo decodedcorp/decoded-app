@@ -200,7 +200,11 @@
   "feed": {
     "section": {
       "header": "지금 뜨는 콘텐츠",
-      "sub": "채널 전반에서 반응이 높은 업데이트"
+      "sub": "채널 전반에서 반응이 높은 업데이트",
+      "headerHot": "지금 뜨는 콘텐츠",
+      "subHot": "채널 전반에서 반응이 높은 업데이트",
+      "headerNew": "최신 콘텐츠",
+      "subNew": "방금 올라온 새로운 업데이트"
     },
     "meta": {
       "line": "{{range}} · {{sort}} · {{count}}개"
