@@ -1,17 +1,19 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 
-import { Heart, Mail, Github, Twitter, Clock, X } from 'lucide-react';
+import { Heart, Mail, Github, Twitter, Clock, X, RefreshCw } from 'lucide-react';
 import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
 import { useTranslation } from 'react-i18next';
 import ShinyText from '@/components/ShinyText';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { RecommendationsService } from '@/api/generated/services/RecommendationsService';
 import { useAuthStore } from '@/store/authStore';
 import { useRecentContentStore } from '@/store/recentContentStore';
+import { useSubscriptionStore } from '@/store/subscriptionStore';
 import { useRecentContentDetails } from '@/hooks/useRecentContentDetails';
+import { useCacheInvalidation } from '@/hooks/useCacheInvalidation';
 import { formatRelativeTime, formatRelativeTimeEn } from '@/lib/utils/timeFormat';
 import { getThumbnailImageUrl } from '@/lib/utils/imageProxy';
 import type { ChannelResponse } from '@/api/generated/models/ChannelResponse';
@@ -20,6 +22,8 @@ export function RightSidebar() {
   const t = useCommonTranslation();
   const { t: contentT } = useTranslation('content');
   const userDocId = useAuthStore((s) => s.user?.doc_id || null);
+  const queryClient = useQueryClient();
+  const { invalidateRecommendations } = useCacheInvalidation();
 
   // Recent content management
   const { loadRecentContent, clearAll } = useRecentContentStore();
@@ -35,6 +39,30 @@ export function RightSidebar() {
     loadRecentContent();
   }, [loadRecentContent]);
 
+  // 구독 상태 변경 감지 및 캐시 무효화
+  const subscribedChannels = useSubscriptionStore((state) => state.subscribedChannels);
+  const prevSubscribedChannelsRef = React.useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (prevSubscribedChannelsRef.current !== subscribedChannels) {
+      // 구독 상태가 변경되면 추천 채널 캐시 무효화
+      console.log('[RightSidebar] Subscription state changed, invalidating recommendations cache');
+      invalidateRecommendations();
+      prevSubscribedChannelsRef.current = subscribedChannels;
+    }
+  }, [subscribedChannels, invalidateRecommendations]);
+
+  // 캐시 키 생성 함수
+  const getRecommendationsQueryKey = useCallback(
+    (userId: string | null, limit: number) => [
+      'recommendations',
+      'channels',
+      'sidebar',
+      { userId, limit },
+    ],
+    [],
+  );
+
   // Recommended (logged-in) - /recommendations/channels API 사용
   const {
     data: recData,
@@ -43,7 +71,7 @@ export function RightSidebar() {
     status,
     fetchStatus,
   } = useQuery({
-    queryKey: ['recommendations', 'channels', 'sidebar', { limit: 4, userId: userDocId }],
+    queryKey: getRecommendationsQueryKey(userDocId, 4),
     queryFn: async () => {
       // OpenAPI 토큰 업데이트
       const { refreshOpenAPIToken } = await import('@/api/hooks/useApi');
@@ -77,13 +105,24 @@ export function RightSidebar() {
       }
     },
     enabled: !!userDocId,
-    staleTime: 2 * 60 * 1000, // 2분
-    gcTime: 10 * 60 * 1000, // 10분
+    staleTime: 5 * 60 * 1000, // 5분으로 증가
+    gcTime: 15 * 60 * 1000, // 15분으로 증가
     refetchOnWindowFocus: false,
     refetchOnMount: false,
-    retry: 1,
-    retryDelay: 1000,
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
+
+  // Fallback 쿼리 키 생성 함수
+  const getFallbackQueryKey = useCallback(
+    (page: number, limit: number, sortBy: string, sortOrder: string) => [
+      'channels',
+      'sidebar',
+      'fallback',
+      { page, limit, sortBy, sortOrder },
+    ],
+    [],
+  );
 
   // 일반 채널 데이터 (fallback용)
   const {
@@ -91,12 +130,7 @@ export function RightSidebar() {
     isLoading: fallbackLoading,
     error: fallbackError,
   } = useQuery({
-    queryKey: [
-      'channels',
-      'sidebar',
-      'fallback',
-      { page: 1, limit: 4, sortBy: 'created_at', sortOrder: 'desc' },
-    ],
+    queryKey: getFallbackQueryKey(1, 4, 'created_at', 'desc'),
     queryFn: async () => {
       // OpenAPI 토큰 업데이트
       const { refreshOpenAPIToken } = await import('@/api/hooks/useApi');
@@ -136,32 +170,91 @@ export function RightSidebar() {
         throw error;
       }
     },
-    staleTime: 5 * 60 * 1000, // 5분
-    gcTime: 10 * 60 * 1000, // 10분
+    staleTime: 10 * 60 * 1000, // 10분으로 증가
+    gcTime: 20 * 60 * 1000, // 20분으로 증가
     refetchOnWindowFocus: false,
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
-  const recommended: ChannelResponse[] = recData?.channels || [];
-  const fallbackChannels: ChannelResponse[] = fallbackData?.channels || [];
+  // 메모이제이션된 데이터 처리
+  const recommended: ChannelResponse[] = useMemo(() => recData?.channels || [], [recData]);
+  const fallbackChannels: ChannelResponse[] = useMemo(
+    () => fallbackData?.channels || [],
+    [fallbackData],
+  );
+
+  // 에러 상태 확인
+  const getErrorState = useCallback(() => {
+    if (recError && fallbackError) return 'both_failed';
+    if (recError && !fallbackError) return 'recommendations_failed';
+    if (!recError && fallbackError) return 'fallback_failed';
+    return 'none';
+  }, [recError, fallbackError]);
 
   // 데이터 우선순위: 추천 채널 > 일반 채널 > 빈 배열
-  const list: ChannelResponse[] = (() => {
-    if (userDocId && recData && !recError) {
-      // 로그인했고 추천 데이터가 있으면 추천 채널 사용
+  const list: ChannelResponse[] = useMemo(() => {
+    const shouldUseRecommendations = userDocId && recData && !recError;
+    const shouldUseFallback = !userDocId || recError;
+
+    if (shouldUseRecommendations) {
       return recommended;
-    } else if (fallbackData && !fallbackError) {
-      // 추천 데이터가 없거나 에러가 있으면 일반 채널 사용
+    } else if (shouldUseFallback && fallbackData && !fallbackError) {
       return fallbackChannels;
     } else {
-      // 모든 데이터가 없으면 빈 배열
       return [];
     }
-  })();
-  const title = t.globalContentUpload.sidebar.recommendedChannels();
+  }, [userDocId, recData, recError, recommended, fallbackData, fallbackError, fallbackChannels]);
 
-  // Debug logging
-  if (process.env.NODE_ENV === 'development') {
-    console.log('RightSidebar Debug:', {
+  const title = t.globalContentUpload.sidebar.recommendedChannels();
+  const errorState = getErrorState();
+
+  // 새로고침 핸들러
+  const handleRefresh = useCallback(async () => {
+    if (recLoading || fallbackLoading) return; // 이미 로딩 중이면 무시
+
+    console.log('[RightSidebar] Manual refresh triggered');
+
+    try {
+      // 추천 채널 쿼리 새로고침 (refetch 사용)
+      await queryClient.refetchQueries({
+        queryKey: getRecommendationsQueryKey(userDocId, 4),
+      });
+
+      // Fallback 쿼리도 새로고침 (refetch 사용)
+      await queryClient.refetchQueries({
+        queryKey: getFallbackQueryKey(1, 4, 'created_at', 'desc'),
+      });
+
+      console.log('[RightSidebar] Manual refresh completed');
+    } catch (error) {
+      console.error('[RightSidebar] Manual refresh failed:', error);
+    }
+  }, [
+    queryClient,
+    getRecommendationsQueryKey,
+    getFallbackQueryKey,
+    userDocId,
+    recLoading,
+    fallbackLoading,
+  ]);
+
+  // Debug logging (메모이제이션)
+  const debugInfo = useMemo(
+    () => ({
+      userDocId,
+      recLoading,
+      recError: recError?.message,
+      recDataChannels: recData?.channels?.length,
+      fallbackLoading,
+      fallbackError: fallbackError?.message,
+      fallbackDataChannels: fallbackData?.channels?.length,
+      status,
+      fetchStatus,
+      listLength: list.length,
+      errorState,
+    }),
+    [
       userDocId,
       recLoading,
       recError,
@@ -171,32 +264,34 @@ export function RightSidebar() {
       fallbackData,
       status,
       fetchStatus,
-      listLength: list.length,
-      recommendedLength: recommended.length,
-      fallbackChannelsLength: fallbackChannels.length,
-      recDataChannels: recData?.channels?.length,
-      fallbackDataChannels: fallbackData?.channels?.length,
-      recDataStructure: recData ? Object.keys(recData) : null,
-      fallbackDataStructure: fallbackData ? Object.keys(fallbackData) : null,
-    });
+      list.length,
+      errorState,
+    ],
+  );
 
-    // 에러 상세 정보 로깅
-    if (recError) {
-      console.error('RightSidebar Error Details:', {
-        error: recError,
-        message: recError?.message,
-        stack: recError?.stack,
-        name: recError?.name,
-      });
-    }
+  // Debug logging
+  if (process.env.NODE_ENV === 'development') {
+    console.log('RightSidebar Debug:', debugInfo);
   }
 
   return (
     <div className="px-1 py-1 bg-black min-h-full flex flex-col mr-4" data-testid="right-sidebar">
       {/* 추천 채널 */}
       <div className="mb-3 flex-shrink-0 border border-zinc-800 rounded-lg p-2 bg-zinc-900">
-        <div className="px-1 text-white text-sm lg:text-base font-medium mb-2 flex items-center gap-2">
-          {title}
+        <div className="px-1 text-white text-sm lg:text-base font-medium mb-2 flex items-center justify-between">
+          <span>{title}</span>
+          <button
+            onClick={handleRefresh}
+            disabled={recLoading || fallbackLoading}
+            className="text-zinc-400 hover:text-zinc-300 transition-colors p-1 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            title="새로고침"
+          >
+            <RefreshCw
+              className={`w-3 h-3 lg:w-4 lg:h-4 ${
+                recLoading || fallbackLoading ? 'animate-spin' : ''
+              }`}
+            />
+          </button>
         </div>
         <div className="space-y-3">
           {/* 로딩 상태 */}
@@ -206,8 +301,8 @@ export function RightSidebar() {
                 <div key={i} className="p-1 border-b border-zinc-800 animate-pulse">
                   <div className="flex items-center gap-2 lg:gap-3">
                     <div className="w-8 h-8 lg:w-10 lg:h-10 bg-zinc-700 rounded-lg flex-shrink-0"></div>
-                    <div className="flex-1 min-w-0">
-                      <div className="h-2.5 lg:h-3 bg-zinc-700 rounded mb-1"></div>
+                    <div className="flex-1 min-w-0 flex flex-col justify-center">
+                      <div className="h-2.5 lg:h-3 bg-zinc-700 rounded mb-0.5"></div>
                       <div className="h-1.5 lg:h-2 bg-zinc-700 rounded w-3/4"></div>
                     </div>
                   </div>
@@ -215,9 +310,13 @@ export function RightSidebar() {
               ))}
             </div>
           ) : /* 에러 상태 */
-          recError && fallbackError ? (
+          errorState === 'both_failed' ? (
             <div className="text-[10px] lg:text-xs text-red-400 p-1 border border-red-800 rounded">
               {t.globalContentUpload.sidebar.loadChannelsFailed()}
+            </div>
+          ) : errorState === 'recommendations_failed' ? (
+            <div className="text-[10px] lg:text-xs text-yellow-400 p-1 border border-yellow-800 rounded">
+              추천 채널을 불러올 수 없어 일반 채널을 표시합니다
             </div>
           ) : /* 데이터 없음 */
           list.length === 0 ? (
@@ -226,72 +325,74 @@ export function RightSidebar() {
             </div>
           ) : (
             /* 데이터 표시 */
-            list.slice(0, 4).map((channel, index) => (
-              <Link
-                key={channel.id}
-                href={`/channels/${channel.id}`}
-                className="group block p-1.5 rounded-md cursor-pointer transition-all duration-200 last:border-b-0 hover:bg-zinc-800/50 hover:scale-[1.02] active:scale-[0.98] active:bg-zinc-800/70"
-              >
-                <div className="flex items-center gap-2 lg:gap-3">
-                  {/* 썸네일 */}
-                  <div className="flex-shrink-0 w-8 h-8 lg:w-10 lg:h-10 rounded-lg overflow-hidden bg-zinc-700 transition-all duration-200 group-hover:ring-2 group-hover:ring-zinc-600 group-hover:shadow-md">
-                    {channel.thumbnail_url ? (
-                      <img
-                        src={channel.thumbnail_url}
-                        alt={channel.name}
-                        className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-zinc-400 text-[10px] lg:text-xs font-medium transition-colors duration-200 group-hover:text-zinc-300">
-                        {channel.name.charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                  </div>
+            list.slice(0, 4).map((channel) => {
+              const thumbnailUrl = channel.thumbnail_url
+                ? getThumbnailImageUrl(channel.thumbnail_url)
+                : null;
 
-                  {/* 채널 정보 */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
+              return (
+                <Link
+                  key={channel.id}
+                  href={`/channels/${channel.id}`}
+                  className="group block p-1.5 rounded-md cursor-pointer transition-all duration-200 last:border-b-0 hover:bg-zinc-800/50 hover:scale-[1.02] active:scale-[0.98] active:bg-zinc-800/70"
+                >
+                  <div className="flex items-center gap-2 lg:gap-3">
+                    {/* 썸네일 */}
+                    <div className="flex-shrink-0 w-8 h-8 lg:w-10 lg:h-10 rounded-lg overflow-hidden bg-zinc-700 transition-all duration-200 group-hover:ring-2 group-hover:ring-zinc-600 group-hover:shadow-md">
+                      {thumbnailUrl ? (
+                        <img
+                          src={thumbnailUrl}
+                          alt={channel.name}
+                          className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-zinc-400 text-[10px] lg:text-xs font-medium transition-colors duration-200 group-hover:text-zinc-300">
+                          {channel.name.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 채널 정보 */}
+                    <div className="flex-1 min-w-0 flex flex-col justify-center">
                       <h3 className="text-white text-[10px] lg:text-xs font-medium truncate transition-colors duration-200 group-hover:text-zinc-100">
                         {channel.name}
                       </h3>
+
+                      {/* 설명과 카테고리를 한 줄에 배치 */}
+                      <div className="flex items-center gap-1 mt-0.5">
+                        {channel.description && (
+                          <p className="text-[9px] lg:text-[10px] text-gray-400 line-clamp-1 transition-colors duration-200 group-hover:text-gray-300 flex-1">
+                            {channel.description}
+                          </p>
+                        )}
+                        {'category' in channel && channel.category && (
+                          <span className="text-[9px] lg:text-[10px] text-zinc-500 transition-colors duration-200 group-hover:text-zinc-400 flex-shrink-0">
+                            {channel.category}
+                          </span>
+                        )}
+                      </div>
                     </div>
 
-                    {/* 설명 */}
-                    {channel.description && (
-                      <p className="text-[10px] lg:text-xs text-gray-400 line-clamp-1 mb-1 transition-colors duration-200 group-hover:text-gray-300">
-                        {channel.description}
-                      </p>
-                    )}
-
-                    {/* 카테고리 */}
-                    {'category' in channel && channel.category && (
-                      <div className="mt-1">
-                        <span className="text-[10px] lg:text-xs text-zinc-500 transition-colors duration-200 group-hover:text-zinc-400">
-                          {channel.category}
-                        </span>
-                      </div>
-                    )}
+                    {/* 호버 시 나타나는 화살표 아이콘 */}
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0">
+                      <svg
+                        className="w-3 h-3 lg:w-4 lg:h-4 text-zinc-400 group-hover:text-zinc-300"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </div>
                   </div>
-
-                  {/* 호버 시 나타나는 화살표 아이콘 */}
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0">
-                    <svg
-                      className="w-3 h-3 lg:w-4 lg:h-4 text-zinc-400 group-hover:text-zinc-300"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </div>
-                </div>
-              </Link>
-            ))
+                </Link>
+              );
+            })
           )}
         </div>
       </div>
@@ -320,8 +421,8 @@ export function RightSidebar() {
                   <div key={i} className="p-1 border-b border-zinc-800 animate-pulse">
                     <div className="flex items-center gap-2 lg:gap-3">
                       <div className="w-8 h-8 lg:w-10 lg:h-10 bg-zinc-700 rounded-lg flex-shrink-0"></div>
-                      <div className="flex-1 min-w-0">
-                        <div className="h-2.5 lg:h-3 bg-zinc-700 rounded mb-1"></div>
+                      <div className="flex-1 min-w-0 flex flex-col justify-center">
+                        <div className="h-2.5 lg:h-3 bg-zinc-700 rounded mb-0.5"></div>
                         <div className="h-1.5 lg:h-2 bg-zinc-700 rounded w-3/4"></div>
                       </div>
                     </div>
@@ -372,16 +473,14 @@ export function RightSidebar() {
                       </div>
 
                       {/* 콘텐츠 정보 */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <h3 className="text-white text-[10px] lg:text-xs font-medium truncate transition-colors duration-200 group-hover:text-zinc-100">
-                            {title}
-                          </h3>
-                        </div>
+                      <div className="flex-1 min-w-0 flex flex-col justify-center">
+                        <h3 className="text-white text-[10px] lg:text-xs font-medium truncate transition-colors duration-200 group-hover:text-zinc-100">
+                          {title}
+                        </h3>
 
                         {/* 시간 정보 */}
-                        <div className="mt-1">
-                          <span className="text-[10px] lg:text-xs text-zinc-500 transition-colors duration-200 group-hover:text-zinc-400">
+                        <div className="mt-0.5">
+                          <span className="text-[9px] lg:text-[10px] text-zinc-500 transition-colors duration-200 group-hover:text-zinc-400">
                             {timeAgo}
                           </span>
                         </div>
