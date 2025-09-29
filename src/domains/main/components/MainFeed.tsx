@@ -397,7 +397,7 @@ export const MainFeed = React.memo(function MainFeed() {
                     }}
                     title={option.tooltip}
                     className={`
-                    px-2 md:px-4 py-2 text-sm rounded-md transition-all duration-200 font-medium
+                    px-2 md:px-4 py-2 text-sm rounded-md transition-all duration-200 font-medium cursor-pointer
                     ${
                       activeSort === option.value
                         ? 'text-black bg-[#eafd66] shadow-sm'
@@ -455,7 +455,7 @@ export const MainFeed = React.memo(function MainFeed() {
               <div className="text-red-400 mb-2">{t.feed.failedToLoadPosts()}</div>
               <button
                 onClick={() => refetch()}
-                className="px-4 py-2 bg-zinc-800 text-white rounded hover:bg-zinc-700 transition-colors"
+                className="px-4 py-2 bg-zinc-800 text-white rounded hover:bg-zinc-700 transition-colors cursor-pointer"
               >
                 {t.feed.tryAgain()}
               </button>

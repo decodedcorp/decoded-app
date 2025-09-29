@@ -86,7 +86,7 @@ export function RecommendedChannelsSidebar({
               <div className="flex items-center">{t.ui.discoverChannels()}</div>
               <button
                 onClick={handleCollapseToggle}
-                className="p-1 hover:bg-zinc-700/50 rounded transition-colors duration-200"
+                className="p-1 hover:bg-zinc-700/50 rounded transition-colors duration-200 cursor-pointer"
                 aria-label="Collapse"
               >
                 <svg
@@ -109,7 +109,7 @@ export function RecommendedChannelsSidebar({
           <div className="flex flex-col items-center">
             <button
               onClick={handleCollapseToggle}
-              className="p-1 hover:bg-zinc-700/50 rounded transition-colors duration-200 mb-4"
+              className="p-1 hover:bg-zinc-700/50 rounded transition-colors duration-200 mb-4 cursor-pointer"
               aria-label="Expand"
             >
               <svg

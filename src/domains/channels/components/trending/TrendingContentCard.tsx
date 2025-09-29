@@ -80,7 +80,7 @@ export function TrendingContentCard({ content, className = '' }: TrendingContent
         <div className="flex items-center">
           <button
             onClick={handleChannelClick}
-            className="flex items-center space-x-2 hover:bg-white/10 rounded-lg p-1 -ml-1 transition-colors"
+            className="flex items-center space-x-2 hover:bg-white/10 rounded-lg p-1 -ml-1 transition-colors cursor-pointer"
           >
             {/* Channel Icon with Fallback */}
             {channelData?.thumbnail_url ? (

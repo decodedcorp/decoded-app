@@ -7,7 +7,7 @@ import type { IconName } from '../Icon';
 
 const buttonVariants = cva(
   // 기본 스타일 (프로젝트 테마 컬러 적용)
-  'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed',
+  'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer',
   {
     variants: {
       variant: {
@@ -25,7 +25,7 @@ const buttonVariants = cva(
           'border border-primary-bd bg-transparent text-primary hover:bg-primary hover:text-primary-on',
         // 로그인 버튼 전용 variant - MainFeed 필터 버튼 스타일 + 메인 컬러
         login:
-          'text-[#EAFD66] hover:text-black hover:bg-[#EAFD66] border border-zinc-700 transition-colors cursor-pointer',
+          'text-[#EAFD66] hover:text-black hover:bg-[#EAFD66] border border-zinc-700 transition-colors',
         // 댓글 버튼 전용 variant - 테두리와 배경이 있는 floating 버튼
         'comments-floating':
           'bg-black/80 text-white border border-primary/30 hover:bg-black/90 hover:border-primary/50 shadow-2xl hover:shadow-[0_8px_32px_rgba(234,253,102,0.15)] backdrop-blur-md hover:backdrop-blur-lg transition-all duration-300',
