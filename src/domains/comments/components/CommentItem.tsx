@@ -20,6 +20,7 @@ import { useUserProfile } from '@/domains/users/hooks/useUserProfile';
 
 import { useCommentLike, useUpdateComment, useDeleteComment } from '../hooks/useComments';
 import { LoginButton } from '@/shared/components/LoginButton';
+import { ConfirmModal } from '@/shared/components/modals/ConfirmModal';
 
 import { CommentInput } from './CommentInput';
 
@@ -41,6 +42,7 @@ export function CommentItem({
   const [showMenu, setShowMenu] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(comment.text);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const commentLikeMutation = useCommentLike();
   const updateCommentMutation = useUpdateComment();
@@ -129,19 +131,26 @@ export function CommentItem({
 
   // Handle delete comment
   const handleDelete = () => {
-    if (window.confirm(tc.item.deleteConfirm())) {
-      deleteCommentMutation.mutate(
-        {
-          commentId: comment.id,
-          contentId,
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = () => {
+    deleteCommentMutation.mutate(
+      {
+        commentId: comment.id,
+        contentId,
+      },
+      {
+        onSuccess: () => {
+          setShowMenu(false);
+          setShowDeleteModal(false);
         },
-        {
-          onSuccess: () => {
-            setShowMenu(false);
-          },
-        },
-      );
-    }
+      },
+    );
+  };
+
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
   };
 
   // Handle reply created
@@ -313,6 +322,19 @@ export function CommentItem({
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+        title="댓글 삭제"
+        message={tc.item.deleteConfirm()}
+        confirmText={tc.item.delete()}
+        cancelText={tc.input.cancel()}
+        confirmVariant="danger"
+        isLoading={deleteCommentMutation.isPending}
+      />
     </div>
   );
 }
