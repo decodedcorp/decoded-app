@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { TrendingContentItem } from '@/api/generated/models/TrendingContentItem';
 import { useChannel } from '../../hooks/useChannels';
 import { AvatarFallback } from '@/components/FallbackImage';
+import { useRecentContentStore } from '@/store/recentContentStore';
 
 interface TrendingContentCardProps {
   content: TrendingContentItem;
@@ -14,11 +15,20 @@ interface TrendingContentCardProps {
 
 export function TrendingContentCard({ content, className = '' }: TrendingContentCardProps) {
   const router = useRouter();
+  const { addContent } = useRecentContentStore();
 
   // Get channel data for thumbnail
   const { data: channelData } = useChannel(content.channel_id);
 
   const handleContentClick = () => {
+    // 최근 본 콘텐츠에 추가
+    addContent({
+      id: String(content.id),
+      channelId: content.channel_id,
+      title: content.title || '제목 없음',
+      thumbnailUrl: content.thumbnail_url || undefined,
+    });
+
     // Navigate to channel page with content modal
     router.push(`/channels/${content.channel_id}?content=${content.id}`);
   };

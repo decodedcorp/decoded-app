@@ -5,6 +5,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
 import { useChannel } from '@/domains/channels/hooks/useChannels';
+import { useRecentContentStore } from '@/store/recentContentStore';
 
 import { SearchAutocomplete, type AutocompleteItem } from '../../domains/search';
 
@@ -31,6 +32,7 @@ export function ChannelSearchBar({
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const t = useCommonTranslation();
+  const { addContent } = useRecentContentStore();
 
   // URL에서 현재 채널 ID 추출 (contents 부분 제외)
   const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
@@ -101,8 +103,15 @@ export function ChannelSearchBar({
         // 채널인 경우: 채널 페이지로 이동
         router.push(`/channels/${item.channelId}`);
       } else {
-        // 콘텐츠인 경우: 채널 페이지로 이동하면서 콘텐츠 모달 열기 (TrendingContentCard와 동일한 방식)
+        // 콘텐츠인 경우: 최근 본 콘텐츠에 추가 후 라우팅
         if (item.channelId) {
+          addContent({
+            id: item.id,
+            channelId: item.channelId,
+            title: item.title || '제목 없음',
+            thumbnailUrl: item.thumbnail || undefined,
+          });
+
           router.push(`/channels/${item.channelId}?content=${item.id}`);
         } else {
           console.warn('Channel ID not available for content:', item);
@@ -112,7 +121,7 @@ export function ChannelSearchBar({
       setIsAutocompleteOpen(false);
       inputRef.current?.blur();
     },
-    [router, channelId],
+    [router, channelId, addContent],
   );
 
   const handleAutocompleteClose = useCallback(() => {

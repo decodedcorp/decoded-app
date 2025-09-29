@@ -5,6 +5,7 @@ import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from '
 import { useImageColor } from '@/domains/main/hooks/useImageColor';
 import { HeartButton } from '@/components/ui/HeartButton';
 import { useContentLike } from '@/domains/interactions/hooks/useContentLike';
+import { getThumbnailImageUrl } from '@/lib/utils/imageProxy';
 
 // ContentsCard Props 인터페이스
 export interface ContentsCardProps {
@@ -77,7 +78,7 @@ export const ContentsCard = memo(
     // 좋아요 기능 (콘텐츠 ID가 있고 showLikeButton이 true일 때만)
     const contentId = card.contentId || card.id; // contentId가 없으면 카드 id 사용
     const shouldShowLike = showLikeButton && contentId;
-    
+
     // 디버깅: 콘텐츠 ID 형식 확인
     if (process.env.NODE_ENV === 'development' && contentId) {
       const isValidFormat = /^[a-f\d]{24}$/i.test(contentId);
@@ -86,16 +87,11 @@ export const ContentsCard = memo(
           contentId,
           cardId: card.id,
           cardContentId: card.contentId,
-          cardTitle: card.metadata?.title
+          cardTitle: card.metadata?.title,
         });
       }
     }
-    const { 
-      isLiked, 
-      likeCount, 
-      toggleLike, 
-      isLoading: isLikeLoading 
-    } = useContentLike(contentId);
+    const { isLiked, likeCount, toggleLike, isLoading: isLikeLoading } = useContentLike(contentId);
 
     // 색상 추출 콜백 (메모이제이션으로 성능 최적화)
     // isMoving 중에는 색상 추출을 방지하여 성능 향상
@@ -304,7 +300,7 @@ export const ContentsCard = memo(
         {/* 메인 이미지 */}
         <img
           ref={imgRef}
-          src={card.thumbnailUrl}
+          src={getThumbnailImageUrl(card.thumbnailUrl)}
           alt={card.metadata?.title || `Card ${card.id}`}
           className="absolute inset-0 w-full h-full object-cover"
           loading="lazy"

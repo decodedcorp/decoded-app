@@ -34,55 +34,66 @@ const CommunityHighlights = memo(function CommunityHighlights({
   }, [pinsData?.items]);
 
   // Fetch content data for all pinned content items
-  const { 
-    contentMap, 
-    isLoadingAny: contentsLoading, 
-    hasErrors: hasContentErrors 
+  const {
+    contentMap,
+    isLoadingAny: contentsLoading,
+    hasErrors: hasContentErrors,
   } = useContentsByIds({
     contentIds,
-    enabled: contentIds.length > 0
+    enabled: contentIds.length > 0,
   });
 
   // Convert UnifiedPinnedItem + ContentItem to HighlightItem format
   const highlights = useMemo(() => {
     if (!pinsData?.items) return [];
-    
-    return pinsData.items.map((pin: UnifiedPinnedItem): HighlightItem => {
-      const isContent = pin.type === 'content';
-      const contentItem = isContent ? contentMap.get(pin.id) : null;
-      
-      // Use content data if available, otherwise fallback to pin metadata
-      const title = contentItem?.title || pin.name;
-      const baseDescription = contentItem?.description || 
-        (isContent ? pin.content_metadata?.description : pin.folder_metadata?.description);
-      const imageUrl = contentItem?.imageUrl || 
-        (isContent ? pin.content_metadata?.thumbnail_url : undefined);
-      
-      // Pin note가 있으면 description에 추가
-      const finalDescription = pin.pin_note 
-        ? `${baseDescription ? `${baseDescription}\n\n` : ''}📌 ${pin.pin_note}`
-        : baseDescription;
-      
-      return {
-        id: pin.id,
-        title,
-        description: finalDescription || undefined,
-        imageUrl: imageUrl || undefined,
-        badge: 'Pinned',
-        type: 'recent', // All pinned items treated as recent type
-        date: new Date(pin.pinned_at).toLocaleDateString(),
-        priority: pin.pin_order,
-        clickAction: {
-          type: 'content_modal',
-          data: contentItem || { id: pin.id, type: pin.type, pinNote: pin.pin_note }
-        },
-      };
-    }).sort((a: HighlightItem, b: HighlightItem) => a.priority - b.priority); // Sort by pin_order
+
+    return pinsData.items
+      .map((pin: UnifiedPinnedItem): HighlightItem => {
+        const isContent = pin.type === 'content';
+        const contentItem = isContent ? contentMap.get(pin.id) : null;
+
+        // Use content data if available, otherwise fallback to pin metadata
+        const title = contentItem?.title || pin.name;
+        const baseDescription =
+          contentItem?.description ||
+          (isContent ? pin.content_metadata?.description : pin.folder_metadata?.description);
+        const imageUrl =
+          contentItem?.imageUrl || (isContent ? pin.content_metadata?.thumbnail_url : undefined);
+
+        // Pin note가 있으면 description에 추가
+        const finalDescription = pin.pin_note
+          ? `${baseDescription ? `${baseDescription}\n\n` : ''}📌 ${pin.pin_note}`
+          : baseDescription;
+
+        return {
+          id: pin.id,
+          title,
+          description: finalDescription || undefined,
+          imageUrl: imageUrl || undefined,
+          badge: 'Pinned',
+          type: 'recent', // All pinned items treated as recent type
+          date: new Date(pin.pinned_at).toLocaleDateString(),
+          priority: pin.pin_order,
+          clickAction: {
+            type: 'content_modal',
+            data: contentItem || {
+              id: pin.id,
+              type: pin.type,
+              pinNote: pin.pin_note,
+              imageUrl: imageUrl,
+              thumbnailUrl: imageUrl,
+              title: title,
+            },
+          },
+        };
+      })
+      .sort((a: HighlightItem, b: HighlightItem) => a.priority - b.priority); // Sort by pin_order
   }, [pinsData?.items, contentMap]);
 
   const hasHighlights = highlights.length > 0;
   const isLoading = pinsLoading || contentsLoading;
-  const error = pinsError || (hasContentErrors ? new Error('Failed to load some content data') : null);
+  const error =
+    pinsError || (hasContentErrors ? new Error('Failed to load some content data') : null);
 
   const handleItemClick = useCallback(
     (highlight: HighlightItem) => {

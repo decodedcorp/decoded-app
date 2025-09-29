@@ -10,6 +10,7 @@ import { ContentStatus } from '@/api/generated';
 import { useChannelContentsSinglePage } from '@/domains/channels/hooks/useChannelContents';
 import { useChannelModalStore } from '@/store/channelModalStore';
 import { useContentUploadStore } from '@/store/contentUploadStore';
+import { useRecentContentStore } from '@/store/recentContentStore';
 import { ContentType } from '@/lib/types/ContentType';
 import { LoadingSkeleton } from '@/shared/components/loading/LoadingSkeleton';
 import {
@@ -47,6 +48,7 @@ const ContentItemCard = React.memo<{
   channel?: any;
 }>(({ item, channelId, channel }) => {
   const t = useCommonTranslation();
+  const { addContent } = useRecentContentStore();
   // Link 컴포넌트가 네비게이션을 처리하므로 클릭 핸들러 제거
 
   // 상태별 스타일 가져오기
@@ -90,6 +92,14 @@ const ContentItemCard = React.memo<{
       className={`w-full h-full group transition-all duration-300 hover:scale-[1.02] hover:shadow-xl block focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-xl cursor-pointer ${statusStyles.container}`}
       aria-label={`${item.title} 콘텐츠 보기`}
       onClick={() => {
+        // 최근 본 콘텐츠에 추가
+        addContent({
+          id: String(item.id),
+          channelId: channelId,
+          title: item.title,
+          thumbnailUrl: item.linkPreview?.imageUrl || item.imageUrl,
+        });
+
         // TODO: 콘텐츠 모달 라우팅을 나중에 다시 활성화할 예정
         // 임시로 콘텐츠를 직접 열기 (URL 변경 없이)
         console.log('Channel modal content clicked:', item);
@@ -282,6 +292,7 @@ export const ChannelModalContent = React.memo<{
 
   // 사용자 정보 가져오기
   const { user } = useUser();
+  const { addContent } = useRecentContentStore();
 
   // 채널 ID 결정: Props > selectedChannelId > selectedChannel.id 순서로 우선순위
   const channelId = propChannelId || selectedChannelId || selectedChannel?.id || '';
@@ -368,12 +379,23 @@ export const ChannelModalContent = React.memo<{
   const handleHighlightClick = React.useCallback(
     (highlight: HighlightItem) => {
       if (highlight.clickAction.type === 'content_modal' && highlight.clickAction.data) {
+        const contentData = highlight.clickAction.data as ContentItem;
+
+        // 최근 본 콘텐츠에 추가
+        addContent({
+          id: String(contentData.id),
+          channelId: channelId,
+          title: contentData.title,
+          thumbnailUrl:
+            contentData.imageUrl || contentData.linkPreview?.imageUrl || contentData.thumbnailUrl,
+        });
+
         // ContentItem 데이터로 콘텐츠 모달 열기
-        openContentModal(highlight.clickAction.data as ContentItem);
+        openContentModal(contentData);
       }
       // 향후 다른 action type들 (external_link, internal_link) 추가 가능
     },
-    [openContentModal],
+    [openContentModal, addContent, channelId],
   );
 
   // 표시할 콘텐츠 결정 (실제 API 데이터만 사용)
@@ -666,6 +688,14 @@ export const ChannelModalContent = React.memo<{
                     (ci: ContentItem) => ci.id.toString() === item.id,
                   );
                   if (contentItem) {
+                    // 최근 본 콘텐츠에 추가
+                    addContent({
+                      id: String(contentItem.id),
+                      channelId: channelId,
+                      title: contentItem.title,
+                      thumbnailUrl: contentItem.linkPreview?.imageUrl || contentItem.imageUrl,
+                    });
+
                     // 작가 정보를 포함한 콘텐츠 데이터 생성
                     const contentWithAuthor = {
                       ...contentItem,
