@@ -84,7 +84,7 @@ export default function ContentOverlay({ params }: ContentModalPageProps) {
   return (
     <div ref={rootRef} role="dialog" aria-modal="true" className="fixed inset-0 z-[999]">
       {/* 배경 오버레이 */}
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm cursor-pointer" onClick={onClose} />
 
       {/* 기존 Modal 컴포넌트 그대로 사용 + FocusLock으로 접근성 강화 */}
       <div className="relative mx-auto my-8 max-w-4xl md:my-12">
