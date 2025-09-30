@@ -68,15 +68,17 @@ export const useUpdateProfile = () => {
           | GetUserProfile
           | undefined);
 
-      const cacheBustedImage = current?.profile_image_url
+      // For new image uploads, create a data URL for immediate preview
+      // For existing images, use cache busting
+      const optimisticImageUrl = data.base64_profile_image
+        ? `data:image/jpeg;base64,${data.base64_profile_image}`
+        : current?.profile_image_url
         ? `${current.profile_image_url}?v=${Date.now()}`
         : null;
 
       const optimistic: GetUserProfile = {
         aka: (data.aka as string | undefined) ?? current?.aka ?? '',
-        profile_image_url: data.base64_profile_image
-          ? cacheBustedImage
-          : current?.profile_image_url ?? null,
+        profile_image_url: optimisticImageUrl,
         sui_address: current?.sui_address ?? '',
       };
 
