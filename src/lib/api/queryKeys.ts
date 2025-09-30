@@ -103,6 +103,7 @@ export const queryKeys = {
     lists: () => [...queryKeys.users.all, 'list'] as const,
     list: (filters: Record<string, any>) => [...queryKeys.users.lists(), filters] as const,
     profile: (userId: string) => [...queryKeys.users.all, 'profile', userId] as const,
+    myProfile: () => [...queryKeys.users.all, 'profile', 'me'] as const,
     stats: () => [...queryKeys.users.all, 'stats'] as const,
     activityStats: () => [...queryKeys.users.all, 'activity-stats'] as const,
     bookmarks: () => [...queryKeys.users.all, 'bookmarks'] as const,

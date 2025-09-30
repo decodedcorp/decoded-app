@@ -35,6 +35,7 @@ interface AuthStore extends ExtendedAuthState {
 
   // User management
   updateUser: (userData: Partial<User>) => void;
+  updateUserFromProfile: (profileData: any) => void; // Profile data sync
   getUserData: () => { doc_id: string | null; email: string | null; nickname: string | null };
 }
 
@@ -62,13 +63,8 @@ export const useAuthStore = create<AuthStore>()(
                 status: response.user.status,
               };
 
-              // 토큰과 사용자 정보를 sessionStorage에 저장
+              // 토큰과 사용자 정보를 sessionStorage에 저장 (storeLoginResponse가 user도 저장함)
               storeLoginResponse(response);
-
-              // sessionStorage에 user 정보 저장 (기존 호환성 유지)
-              if (typeof window !== 'undefined') {
-                sessionStorage.setItem('user', JSON.stringify(user));
-              }
 
               // 멀티탭 동기화를 위한 login 이벤트 발행 (user 정보 포함)
               if (typeof window !== 'undefined') {
@@ -197,6 +193,47 @@ export const useAuthStore = create<AuthStore>()(
             }
 
             set({ user: updatedUser, isAuthenticated: true });
+          }
+        },
+
+        updateUserFromProfile: (profileData) => {
+          const currentUser = get().user;
+          if (currentUser && profileData) {
+            // Check if update is actually needed to prevent unnecessary updates
+            const newNickname = profileData.aka || currentUser.nickname;
+            const hasChanges = newNickname !== currentUser.nickname;
+
+            if (!hasChanges) {
+              if (process.env.NODE_ENV === 'development') {
+                console.log('[AuthStore] No changes detected, skipping update', {
+                  userId: currentUser.doc_id,
+                  currentNickname: currentUser.nickname,
+                  profileAka: profileData.aka,
+                });
+              }
+              return;
+            }
+
+            const updatedUser = {
+              ...currentUser,
+              nickname: newNickname,
+              // Map profile fields to user fields as needed
+            };
+
+            // sessionStorage 업데이트
+            if (typeof window !== 'undefined') {
+              sessionStorage.setItem('user', JSON.stringify(updatedUser));
+            }
+
+            set({ user: updatedUser, isAuthenticated: true });
+
+            if (process.env.NODE_ENV === 'development') {
+              console.log('[AuthStore] Updated user from profile data', {
+                userId: updatedUser.doc_id,
+                nickname: updatedUser.nickname,
+                profileAka: profileData.aka,
+              });
+            }
           }
         },
 

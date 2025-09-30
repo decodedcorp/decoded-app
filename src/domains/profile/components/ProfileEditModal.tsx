@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { useMyProfile, useUpdateProfile, processProfileImage } from '../hooks/useProfile';
+import { useUpdateProfile, processProfileImage } from '../hooks/useProfile';
+import { useMyProfileQuery } from '@/domains/profile/hooks/useEnhancedProfile';
 import { useAuthStore } from '@/store/authStore';
 import { useProfileTranslation } from '@/lib/i18n/hooks';
 import { SimpleModal } from '@/lib/components/ui/modal/SimpleModal';
@@ -9,13 +10,14 @@ import { useCommonTranslation } from '@/lib/i18n/hooks';
 interface ProfileEditModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onOptimisticUpdate?: () => void; // Callback for optimistic updates
 }
 
-export function ProfileEditModal({ isOpen, onClose }: ProfileEditModalProps) {
+export function ProfileEditModal({ isOpen, onClose, onOptimisticUpdate }: ProfileEditModalProps) {
   const user = useAuthStore((state) => state.user);
   const t = useProfileTranslation();
   const toastT = useCommonTranslation();
-  const { data: profileData, isLoading: profileLoading } = useMyProfile();
+  const { data: profileData, isLoading: profileLoading } = useMyProfileQuery();
   const { mutate: updateProfile, isPending } = useUpdateProfile();
 
   const [formData, setFormData] = useState({

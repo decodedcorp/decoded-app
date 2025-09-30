@@ -5,6 +5,8 @@ import { queryKeys } from '@/lib/api/queryKeys';
 import { useAuthStore } from '@/store/authStore';
 import toast from 'react-hot-toast';
 import { useCommonTranslation } from '@/lib/i18n/hooks';
+import type { GetUserProfile } from '@/api/generated/models/GetUserProfile';
+import { createDualKeyCacheManager } from '@/lib/utils/cacheHelpers';
 
 /**
  * Hook to get current user's profile
@@ -45,20 +47,74 @@ export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
   const user = useAuthStore((state) => state.user);
   const t = useCommonTranslation();
+  const { createSnapshot, rollbackToSnapshot, syncProfileKeys, invalidateProfileKeys } =
+    createDualKeyCacheManager(queryClient);
 
   return useMutation({
     mutationFn: (data: UpdateProfileRequest) =>
       UsersService.updateMyProfileUsersMeProfilePatch(data),
-    onSuccess: () => {
-      // Invalidate profile queries
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.users.profile(user?.doc_id || ''),
-      });
+    onMutate: async (data: UpdateProfileRequest) => {
+      if (!user?.doc_id) return { updateId: undefined };
 
-      toast.success(t.toast.profile.updated());
+      const updateId = `upd_${Date.now()}`;
+
+      // Create snapshot for rollback
+      createSnapshot(user.doc_id, updateId);
+
+      // Prepare optimistic profile
+      const current =
+        (queryClient.getQueryData(queryKeys.users.myProfile()) as GetUserProfile | undefined) ||
+        (queryClient.getQueryData(queryKeys.users.profile(user.doc_id)) as
+          | GetUserProfile
+          | undefined);
+
+      const cacheBustedImage = current?.profile_image_url
+        ? `${current.profile_image_url}?v=${Date.now()}`
+        : null;
+
+      const optimistic: GetUserProfile = {
+        aka: (data.aka as string | undefined) ?? current?.aka ?? '',
+        profile_image_url: data.base64_profile_image
+          ? cacheBustedImage
+          : current?.profile_image_url ?? null,
+        sui_address: current?.sui_address ?? '',
+      };
+
+      // Optimistically sync to both keys
+      if (user.doc_id) {
+        syncProfileKeys(user.doc_id, optimistic);
+      }
+
+      // Also update AuthStore nickname immediately if changed
+      try {
+        useAuthStore.getState().updateUserFromProfile({
+          aka: optimistic.aka,
+          profile_image_url: optimistic.profile_image_url,
+          sui_address: optimistic.sui_address,
+        } as any);
+      } catch {
+        // ignore store update errors
+      }
+
+      return { updateId };
     },
-    onError: (error: any) => {
+    onSuccess: () => {
+      // Don't invalidate cache - keep optimistic update
+      // Server data might be stale due to async processing
+      toast.success(t.toast.profile.updated());
+
+      // Optional: Schedule a very delayed sync (10+ seconds) for eventual consistency
+      if (user?.doc_id) {
+        setTimeout(() => {
+          invalidateProfileKeys(user.doc_id);
+        }, 10000); // Wait 10 seconds for eventual consistency
+      }
+    },
+    onError: (error: any, _variables, context) => {
       console.error('Failed to update profile:', error);
+      if (user?.doc_id && context?.updateId) {
+        rollbackToSnapshot(context.updateId);
+      }
       toast.error(error?.body?.detail || t.toast.profile.updateFailed());
     },
   });

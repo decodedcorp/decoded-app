@@ -4,7 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { useRouter, useSearchParams, useParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
-import { useUserProfile } from '@/domains/profile/hooks/useProfile';
+import { useSmartUserProfile } from '@/domains/profile/hooks/useEnhancedProfile';
 import { ProfileHeader } from '@/domains/profile/components/ProfileHeader';
 import { ProfileSidebar } from '@/domains/profile/components/ProfileSidebar';
 import { ProfileTabs } from '@/domains/profile/components/ProfileTabs';
@@ -24,11 +24,19 @@ export default function ProfilePage() {
   const targetUserId = params.userid as string;
   const isMyProfile = currentUser?.doc_id === targetUserId;
 
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[ProfilePage] Debug:', {
+      targetUserId,
+      currentUserId: currentUser?.doc_id,
+      isMyProfile,
+    });
+  }
+
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const activeTab = searchParams.get('tab') || 'channels';
 
-  // Get profile data via API (always call hooks at the top level)
-  const { data: profileData, isLoading, error } = useUserProfile(targetUserId || '');
+  // Get profile data via API (smart: me vs other)
+  const { data: profileData, isLoading, error } = useSmartUserProfile(targetUserId);
 
   // Memoized components to prevent unnecessary re-renders (always call hooks at the top level)
   const profileHeader = useMemo(

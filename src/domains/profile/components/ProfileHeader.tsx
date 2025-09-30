@@ -1,4 +1,5 @@
 import React from 'react';
+import { useAuthStore } from '@/store/authStore';
 import { GetUserProfile } from '@/api/generated/models/GetUserProfile';
 import { useProfileTranslation } from '@/lib/i18n/hooks';
 import { formatDistanceToNow } from 'date-fns';
@@ -17,19 +18,23 @@ export function ProfileHeader({
   onEditClick,
 }: ProfileHeaderProps) {
   const t = useProfileTranslation();
+  const storeUser = useAuthStore((state) => state.user);
 
   if (!profileData && !userId) return null;
 
   // Get user initials for avatar
   const getInitials = () => {
-    if (profileData?.aka) {
-      return profileData.aka.substring(0, 2).toUpperCase();
+    const displayName = profileData?.aka || storeUser?.nickname || '';
+    if (displayName) {
+      return displayName.substring(0, 2).toUpperCase();
     }
     if (userId) {
       return userId.substring(0, 2).toUpperCase();
     }
     return '?';
   };
+
+  const displayName = profileData?.aka || storeUser?.nickname || `User ${userId?.slice(0, 6)}`;
 
   return (
     <div className="bg-zinc-900/30 rounded-xl border border-zinc-800">
@@ -59,9 +64,7 @@ export function ProfileHeader({
 
           {/* User Info */}
           <div className="space-y-2">
-            <h1 className="text-xl font-bold text-white">
-              {profileData?.aka || `User ${userId?.slice(0, 6)}`}
-            </h1>
+            <h1 className="text-xl font-bold text-white">{displayName}</h1>
             <div className="flex items-center justify-center gap-3 text-sm text-zinc-400">
               <span>{userId?.slice(0, 8)}</span>
               <span>•</span>
@@ -120,9 +123,7 @@ export function ProfileHeader({
         {/* User Info */}
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-2xl font-bold text-white">
-              {profileData?.aka || `User ${userId?.slice(0, 6)}`}
-            </h1>
+            <h1 className="text-2xl font-bold text-white">{displayName}</h1>
           </div>
 
           <div className="flex items-center gap-4 text-sm text-zinc-400">
