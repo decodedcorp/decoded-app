@@ -48,7 +48,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
   const [inputType, setInputType] = useState<'url' | 'description' | 'prompt'>('url');
 
   // Step management
-  const [currentStep, setCurrentStep] = useState<'input' | 'details'>('input');
+  const [currentStep, setCurrentStep] = useState<'input' | 'preview' | 'details'>('input');
 
   // Selected prompt template
   const [selectedTemplate, setSelectedTemplate] = useState<string>('custom');
@@ -113,12 +113,34 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
   // Remove content tab
   const handleRemoveContentTab = (tabId: string) => {
     setContentTabs((prev) => {
-      const filtered = prev.filter((tab) => tab.id !== tabId);
-      // If removing URL, reset input type to url
       const removedTab = prev.find((tab) => tab.id === tabId);
+      const filtered = prev.filter((tab) => tab.id !== tabId);
+      
+      // Update input type based on what was removed
       if (removedTab?.type === 'url') {
+        // If URL was removed, reset to URL input
         setInputType('url');
+      } else if (removedTab?.type === 'description') {
+        // If description was removed, check if URL exists
+        const hasUrl = filtered.some(tab => tab.type === 'url');
+        if (hasUrl) {
+          setInputType('prompt'); // URL exists, go to prompt
+        } else {
+          setInputType('url'); // No URL, go back to URL
+        }
+      } else if (removedTab?.type === 'prompt') {
+        // If prompt was removed, check what exists
+        const hasUrl = filtered.some(tab => tab.type === 'url');
+        const hasDescription = filtered.some(tab => tab.type === 'description');
+        if (hasUrl && hasDescription) {
+          setInputType('prompt'); // Both exist, stay at prompt
+        } else if (hasUrl) {
+          setInputType('description'); // Only URL exists, go to description
+        } else {
+          setInputType('url'); // No URL, go back to URL
+        }
       }
+      
       return filtered;
     });
   };
@@ -128,13 +150,10 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     // Add current content to tabs if it exists
     if (currentInput.trim()) {
       await handleAddContentToTabs(currentInput, inputType);
-      // Move to details step after adding content
-      setCurrentStep('details');
-      return;
     }
 
-    // If no content, show error or go back to input
-    setCurrentStep('input');
+    // Move to preview step
+    setCurrentStep('preview');
   };
 
   const handleInputChange = (field: keyof typeof formData, value: string) => {
@@ -345,9 +364,6 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
               onKeyDown={async (e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
-                  await handleAnalyzeClick();
-                } else if (e.key === ' ') {
-                  e.preventDefault();
                   await handleAddContentToTabs(currentInput, inputType);
                 }
               }}
@@ -356,10 +372,10 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
               }`}
               placeholder={
                 inputType === 'url'
-                  ? 'Add content URL and press Space to add tab, Enter to analyze...'
+                  ? 'Add content URL and press Enter to add tab...'
                   : inputType === 'description'
-                  ? 'Add description and press Space to add tab, Enter to analyze...'
-                  : 'Add AI prompt and press Space to add tab, Enter to analyze...'
+                  ? 'Add description and press Enter to add tab...'
+                  : 'Add AI prompt and press Enter to add tab...'
               }
               disabled={isLoading || createLinkContent.isPending}
             />
@@ -457,26 +473,51 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
               </button>
             </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              onClick={async (e) => {
-                e.preventDefault();
-                await handleAnalyzeClick();
-              }}
-              disabled={isLoading || createLinkContent.isPending}
-              className="flex items-center gap-1.5 px-4 py-2 text-xs bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 rounded-lg font-medium transition-colors border border-zinc-700 hover:border-zinc-600 disabled:bg-zinc-700 disabled:cursor-not-allowed disabled:text-zinc-400 disabled:border-zinc-600"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                />
-              </svg>
-              Submit
-            </button>
+            {/* Submit and Skip Buttons */}
+            <div className="flex gap-2">
+              {/* Skip Button */}
+              <button
+                type="button"
+                onClick={async (e) => {
+                  e.preventDefault();
+                  // Skip to preview step without adding current input
+                  setCurrentStep('preview');
+                }}
+                disabled={isLoading || createLinkContent.isPending}
+                className="flex items-center gap-1.5 px-4 py-2 text-xs bg-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-600 rounded-lg font-medium transition-colors border border-zinc-600 hover:border-zinc-500 disabled:bg-zinc-700 disabled:cursor-not-allowed disabled:text-zinc-400 disabled:border-zinc-600"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 5l7 7-7 7M5 5l7 7-7 7"
+                  />
+                </svg>
+                Skip
+              </button>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                onClick={async (e) => {
+                  e.preventDefault();
+                  await handleAnalyzeClick();
+                }}
+                disabled={isLoading || createLinkContent.isPending}
+                className="flex items-center gap-1.5 px-4 py-2 text-xs bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 rounded-lg font-medium transition-colors border border-zinc-700 hover:border-zinc-600 disabled:bg-zinc-700 disabled:cursor-not-allowed disabled:text-zinc-400 disabled:border-zinc-600"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  />
+                </svg>
+                Submit
+              </button>
+            </div>
           </div>
         </div>
 
@@ -489,6 +530,170 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
       </form>
     </div>
   );
+
+  // Step 2: Link Preview
+  const renderPreviewStep = () => {
+    // If no content in tabs, go back to input step
+    if (contentTabs.length === 0) {
+      setCurrentStep('input');
+      return null;
+    }
+
+    const urlTab = contentTabs.find(tab => tab.type === 'url');
+    const descriptionTab = contentTabs.find(tab => tab.type === 'description');
+    const promptTab = contentTabs.find(tab => tab.type === 'prompt');
+
+    return (
+      <div className="flex flex-col p-4">
+        <div className="w-full max-w-4xl space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                <svg
+                  className="w-4 h-4 text-black"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-white">링크 미리보기</h3>
+            </div>
+            <button
+              type="button"
+              onClick={() => setCurrentStep('input')}
+              className="flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
+              </svg>
+              URL 입력으로
+            </button>
+          </div>
+
+          {/* Link Preview Card */}
+          {urlTab && urlTab.preview && (
+            <div className="flex justify-center">
+              <LinkPreviewCard
+                preview={urlTab.preview}
+                isLoading={false}
+                error={null}
+              />
+            </div>
+          )}
+
+          {/* Content Summary */}
+          <div className="bg-zinc-800 rounded-2xl p-4 space-y-4">
+            <h4 className="text-md font-semibold text-white">추가된 콘텐츠</h4>
+            
+            {/* URL Tab */}
+            {urlTab && (
+              <div className="flex items-center gap-2 px-3 py-2 bg-zinc-700 rounded-lg">
+                <img
+                  src={urlTab.preview?.favicon}
+                  alt={`${urlTab.preview?.domain} favicon`}
+                  className="w-4 h-4 rounded"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+                <span className="text-sm text-zinc-300 font-medium">
+                  URL: {urlTab.preview?.domain || urlTab.content}
+                </span>
+              </div>
+            )}
+
+            {/* Description Tab */}
+            {descriptionTab && (
+              <div className="flex items-center gap-2 px-3 py-2 bg-zinc-700 rounded-lg">
+                <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+                <span className="text-sm text-zinc-300 font-medium">
+                  Description: {descriptionTab.content}
+                </span>
+              </div>
+            )}
+
+            {/* Prompt Tab */}
+            {promptTab && (
+              <div className="flex items-center gap-2 px-3 py-2 bg-zinc-700 rounded-lg">
+                <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                  />
+                </svg>
+                <span className="text-sm text-zinc-300 font-medium">
+                  AI Prompt: {promptTab.content}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex justify-between items-center">
+            <button
+              type="button"
+              onClick={() => setCurrentStep('input')}
+              className="flex items-center gap-2 px-4 py-2 text-sm text-zinc-400 hover:text-white transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
+              </svg>
+              수정하기
+            </button>
+            
+            <button
+              type="button"
+              onClick={() => setCurrentStep('details')}
+              className="flex items-center gap-2 px-6 py-3 bg-primary text-black rounded-lg font-medium transition-colors hover:bg-primary-hover"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+              계속하기
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   // Step 3: Additional Details
   const renderDetailsStep = () => {
@@ -721,6 +926,8 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
   switch (currentStep) {
     case 'input':
       return renderInputStep();
+    case 'preview':
+      return renderPreviewStep();
     case 'details':
       return renderDetailsStep();
     default:
