@@ -53,12 +53,47 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
   // Selected prompt template
   const [selectedTemplate, setSelectedTemplate] = useState<string>('custom');
 
+  // Edit dropdown state
+  const [isEditDropdownOpen, setIsEditDropdownOpen] = useState(false);
+  const [editDropdownRef, setEditDropdownRef] = useState<HTMLDivElement | null>(null);
+
+  // Predefined action texts
+  const actionTexts = {
+    analyze: 'Analyze this content and provide insights',
+    explain: 'Explain this content in detail',
+    summarize: 'Summarize this content concisely',
+    generate: 'Generate creative content based on this',
+    translate: 'Translate this content to Korean',
+  };
+
   // Set default type to LINK
   useEffect(() => {
     if (!formData.type) {
       updateFormData({ type: ContentType.LINK });
     }
   }, [formData.type, updateFormData]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (editDropdownRef && !editDropdownRef.contains(event.target as Node)) {
+        setIsEditDropdownOpen(false);
+      }
+    };
+
+    if (isEditDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isEditDropdownOpen, editDropdownRef]);
+
+  // Update input type when contentTabs change
+  useEffect(() => {
+    setInputType(getNextInputType(contentTabs));
+  }, [contentTabs]);
 
   // Add content to tabs when Enter is pressed
   const handleAddContentToTabs = async (
@@ -103,13 +138,11 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
       };
 
       setContentTabs((prev) => {
-        const updatedTabs = type === 'url' 
-          ? prev.filter((tab) => tab.type !== 'url').concat(newTab)
-          : [...prev, newTab];
-        
-        // Update input type based on the new tabs
-        setInputType(getNextInputType(updatedTabs));
-        
+        const updatedTabs =
+          type === 'url'
+            ? prev.filter((tab) => tab.type !== 'url').concat(newTab)
+            : [...prev, newTab];
+
         return updatedTabs;
       });
 
@@ -129,7 +162,6 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     const hasDescription = tabs.some((tab) => tab.type === 'description');
     const hasPrompt = tabs.some((tab) => tab.type === 'prompt');
 
-
     // Only move to next type if current type is completed
     if (!hasUrl) return 'url';
     if (hasUrl && !hasDescription) return 'description';
@@ -141,9 +173,28 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
   const handleRemoveContentTab = (tabId: string) => {
     setContentTabs((prev) => {
       const filtered = prev.filter((tab) => tab.id !== tabId);
-      setInputType(getNextInputType(filtered));
       return filtered;
     });
+  };
+
+  // Edit dropdown handlers
+  const toggleEditDropdown = () => {
+    setIsEditDropdownOpen(!isEditDropdownOpen);
+  };
+
+  const handleEditAction = (action: 'edit' | 'delete') => {
+    // Handle edit actions here
+    console.log('Edit action:', action);
+    setIsEditDropdownOpen(false);
+  };
+
+  // Action button handlers
+  const handleActionClick = (actionType: string) => {
+    const actionText = actionTexts[actionType as keyof typeof actionTexts];
+    if (actionText) {
+      setCurrentInput(actionText);
+      setInputType('prompt'); // Set input type to prompt since these are AI prompts
+    }
   };
 
   // Load link preview when analyze button is clicked
@@ -382,7 +433,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
               {/* Analyze Button */}
               <button
                 type="button"
-                onClick={async () => await handleAnalyzeClick()}
+                onClick={() => handleActionClick('analyze')}
                 className="flex items-center gap-1.5 px-3 py-2 text-xs bg-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-600 rounded-lg font-medium transition-colors border border-zinc-600 hover:border-zinc-500"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -399,6 +450,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
               {/* Explain Button */}
               <button
                 type="button"
+                onClick={() => handleActionClick('explain')}
                 className="flex items-center gap-1.5 px-3 py-2 text-xs bg-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-600 rounded-lg font-medium transition-colors border border-zinc-600 hover:border-zinc-500"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -415,6 +467,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
               {/* Summarize Button */}
               <button
                 type="button"
+                onClick={() => handleActionClick('summarize')}
                 className="flex items-center gap-1.5 px-3 py-2 text-xs bg-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-600 rounded-lg font-medium transition-colors border border-zinc-600 hover:border-zinc-500"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -437,6 +490,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
               {/* New Generate Button */}
               <button
                 type="button"
+                onClick={() => handleActionClick('generate')}
                 className="flex items-center gap-1.5 px-3 py-2 text-xs bg-[#eafd66] text-black hover:bg-[#d4e85a] rounded-lg font-medium transition-colors border border-[#eafd66] hover:border-[#d4e85a]"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -453,6 +507,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
               {/* New Translate Button */}
               <button
                 type="button"
+                onClick={() => handleActionClick('translate')}
                 className="flex items-center gap-1.5 px-3 py-2 text-xs bg-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-600 rounded-lg font-medium transition-colors border border-zinc-600 hover:border-zinc-500"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -465,6 +520,80 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
                 </svg>
                 Translate
               </button>
+
+              {/* Edit Dropdown Button */}
+              <div className="relative" ref={setEditDropdownRef}>
+                <button
+                  type="button"
+                  onClick={toggleEditDropdown}
+                  className="flex items-center gap-1.5 px-3 py-2 text-xs text-zinc-400 hover:text-white rounded-lg font-medium transition-colors"
+                >
+                  <svg
+                    className="w-3.5 h-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                    />
+                  </svg>
+                </button>
+
+                {/* Dropdown Menu */}
+                {isEditDropdownOpen && (
+                  <div className="absolute right-0 top-full mt-1 w-48 bg-zinc-800 border border-zinc-600 rounded-lg shadow-lg z-50">
+                    <div className="py-1">
+                      {/* Edit Tab */}
+                      <button
+                        type="button"
+                        onClick={() => handleEditAction('edit')}
+                        className="flex items-center gap-2 w-full px-4 py-2 text-xs text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors"
+                      >
+                        <svg
+                          className="w-3.5 h-3.5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                          />
+                        </svg>
+                        Edit
+                      </button>
+
+                      {/* Delete Tab */}
+                      <button
+                        type="button"
+                        onClick={() => handleEditAction('delete')}
+                        className="flex items-center gap-2 w-full px-4 py-2 text-xs text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors"
+                      >
+                        <svg
+                          className="w-3.5 h-3.5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
+                        </svg>
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Submit and Skip Buttons */}
