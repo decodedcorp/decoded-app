@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 
 import { ContentType } from '@/lib/types/ContentType';
 import {
@@ -62,6 +63,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
   const [inputTypeDropdownRef, setInputTypeDropdownRef] = useState<HTMLDivElement | null>(null);
   const [isInputTypeManuallySet, setIsInputTypeManuallySet] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState<'bottom' | 'top'>('bottom');
+  const [dropdownRect, setDropdownRect] = useState<DOMRect | null>(null);
 
   // Predefined action texts
   const actionTexts = {
@@ -220,6 +222,8 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
       const rect = inputTypeDropdownRef.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
       const dropdownHeight = 200; // Approximate height of dropdown
+
+      setDropdownRect(rect);
 
       if (rect.bottom + dropdownHeight > viewportHeight - 50) {
         setDropdownPosition('top');
@@ -647,11 +651,11 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
                 Summarize
               </button>
 
-              {/* New Generate Button */}
+              {/* Generate Button */}
               <button
                 type="button"
                 onClick={() => handleActionClick('generate')}
-                className="flex items-center gap-1.5 px-3 py-2 text-xs bg-[#eafd66] text-black hover:bg-[#d4e85a] rounded-lg font-medium transition-colors border border-[#eafd66] hover:border-[#d4e85a]"
+                className="flex items-center gap-1.5 px-3 py-2 text-xs bg-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-600 rounded-lg font-medium transition-colors border border-zinc-600 hover:border-zinc-500"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
@@ -664,7 +668,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
                 Generate
               </button>
 
-              {/* New Translate Button */}
+              {/* Translate Button */}
               <button
                 type="button"
                 onClick={() => handleActionClick('translate')}
