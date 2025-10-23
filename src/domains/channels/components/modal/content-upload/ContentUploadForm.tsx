@@ -104,9 +104,13 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
   // Update input type when contentTabs change (only if not manually set)
   useEffect(() => {
     if (!isInputTypeManuallySet) {
-      setInputType(getNextInputType(contentTabs));
+      const nextType = getNextInputType(contentTabs);
+      // Only change if the suggested type is different from current
+      if (nextType !== inputType) {
+        setInputType(nextType);
+      }
     }
-  }, [contentTabs, isInputTypeManuallySet]);
+  }, [contentTabs, isInputTypeManuallySet, inputType]);
 
   // Prevent body scroll when dropdown is open
   useEffect(() => {
@@ -122,66 +126,86 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
   }, [isInputTypeDropdownOpen]);
 
   // Add content to tabs when Enter is pressed
-  const handleAddContentToTabs = async (
-    content: string,
-    type: 'url' | 'description' | 'prompt',
-  ) => {
-    if (!content.trim()) return;
+  const handleAddContentToTabs = useCallback(
+    async (content: string, type: 'url' | 'description' | 'prompt') => {
+      console.log('=== handleAddContentToTabs called ===');
+      console.log('Content:', content);
+      console.log('Type:', type);
 
-    // For URL type, check if URL already exists and validate format
-    if (type === 'url') {
-      const existingUrlTab = contentTabs.find((tab) => tab.type === 'url');
-      if (existingUrlTab) {
-        // Replace existing URL tab
-        setContentTabs((prev) => {
-          const filtered = prev.filter((tab) => tab.type !== 'url');
-          return [...filtered, { ...existingUrlTab, content: content.trim() }];
-        });
-        setCurrentInput('');
+      if (!content.trim()) {
+        console.log('Empty content, returning');
         return;
       }
 
-      // Basic URL validation
-      try {
-        new URL(content.trim().startsWith('http') ? content.trim() : `https://${content.trim()}`);
-      } catch {
-        setValidationErrors((prev) => ({ ...prev, url: '유효한 URL을 입력해주세요.' }));
-        return;
+      // For URL type, validate format first
+      if (type === 'url') {
+        try {
+          new URL(content.trim().startsWith('http') ? content.trim() : `https://${content.trim()}`);
+        } catch {
+          setValidationErrors((prev) => ({ ...prev, url: '유효한 URL을 입력해주세요.' }));
+          return;
+        }
       }
-    }
 
-    try {
+      // Handle preview fetching
       let preview: LinkPreview | undefined;
       if (type === 'url') {
-        preview = await getMockLinkPreviewAsync(content.trim());
+        console.log('Fetching preview for URL');
+        try {
+          preview = await getMockLinkPreviewAsync(content.trim());
+          console.log('Preview fetched:', preview);
+        } catch (error) {
+          console.error('Failed to fetch preview:', error);
+          setValidationErrors((prev) => ({ ...prev, url: '링크 미리보기를 가져오지 못했습니다.' }));
+          return;
+        }
       }
 
-      const newTab = {
-        id: Date.now().toString(),
-        type,
-        content: content.trim(),
-        preview,
-      };
-
+      // Single setContentTabs call to handle both replacement and addition
       setContentTabs((prev) => {
-        const updatedTabs =
-          type === 'url'
-            ? prev.filter((tab) => tab.type !== 'url').concat(newTab)
-            : [...prev, newTab];
+        console.log('Current contentTabs in setState:', prev);
 
-        return updatedTabs;
+        // Check if content of this type already exists
+        const existingTab = prev.find((tab) => tab.type === type);
+        console.log('Existing tab found:', existingTab);
+
+        if (existingTab) {
+          console.log('Replacing existing tab');
+          // Replace existing tab of the same type
+          const updated = prev.map((tab) =>
+            tab.type === type
+              ? {
+                  ...tab,
+                  content: content.trim(),
+                  preview: type === 'url' ? preview : undefined, // Use the fetched preview
+                }
+              : tab,
+          );
+          console.log('Updated tabs after replacement:', updated);
+          return updated;
+        }
+
+        // Create new tab
+        console.log('Creating new tab');
+        const newTab = {
+          id: Date.now().toString(),
+          type,
+          content: content.trim(),
+          preview,
+        };
+        console.log('New tab created:', newTab);
+
+        const updated = [...prev, newTab];
+        console.log('Added new tab, updated tabs:', updated);
+        return updated;
       });
 
       setCurrentInput('');
       setValidationErrors((prev) => ({ ...prev, url: undefined }));
-      setIsInputTypeManuallySet(false); // Reset manual flag after adding content
-    } catch (error) {
-      console.error('Failed to add content to tabs:', error);
-      if (type === 'url') {
-        setValidationErrors((prev) => ({ ...prev, url: '링크 미리보기를 가져오지 못했습니다.' }));
-      }
-    }
-  };
+      // Don't reset manual flag - let user keep their preferred input type
+    },
+    [], // Remove contentTabs from dependencies
+  );
 
   // Determine next input type based on existing tabs
   const getNextInputType = (tabs: typeof contentTabs): 'url' | 'description' | 'prompt' => {
@@ -242,23 +266,36 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
 
   // Action button handlers
   const handleActionClick = (actionType: string) => {
+    console.log('=== Action button clicked ===');
+    console.log('Action type:', actionType);
     const actionText = actionTexts[actionType as keyof typeof actionTexts];
+    console.log('Action text:', actionText);
     if (actionText) {
       setCurrentInput(actionText);
-      setInputType('prompt'); // Set input type to prompt since these are AI prompts
+      console.log('Set current input to:', actionText);
+      // Don't force input type change - let user decide or use current type
+      // Don't automatically add to tabs - let user press Enter or click Submit
     }
   };
 
   // Load link preview when analyze button is clicked
-  const handleAnalyzeClick = async () => {
+  const handleAnalyzeClick = useCallback(async () => {
+    console.log('=== handleAnalyzeClick called ===');
+    console.log('Current input:', currentInput);
+    console.log('Input type:', inputType);
+
     // Add current content to tabs if it exists
     if (currentInput.trim()) {
+      console.log('Adding current input to tabs');
       await handleAddContentToTabs(currentInput, inputType);
+    } else {
+      console.log('No current input to add');
     }
 
     // Move to preview step
+    console.log('Moving to preview step');
     setCurrentStep('preview');
-  };
+  }, [currentInput, inputType, handleAddContentToTabs]);
 
   const handleInputChange = (field: keyof typeof formData, value: string) => {
     updateFormData({ [field]: value });
@@ -296,9 +333,10 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
+      console.log('=== handleSubmit called ===');
       e.preventDefault();
       // Form submit now triggers analysis instead of content creation
-      handleAnalyzeClick();
+      await handleAnalyzeClick();
     },
     [handleAnalyzeClick],
   );
@@ -371,7 +409,9 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
 
                 {/* Content */}
                 <span
-                  className="text-sm text-zinc-300 font-medium max-w-32 truncate"
+                  className={`text-sm text-zinc-300 font-medium truncate ${
+                    tab.type === 'prompt' ? 'max-w-48' : 'max-w-32'
+                  }`}
                   title={tab.content}
                 >
                   {tab.content}
@@ -572,6 +612,9 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
               onChange={(e) => setCurrentInput(e.target.value)}
               onKeyDown={async (e) => {
                 if (e.key === 'Enter') {
+                  console.log('=== Enter key pressed ===');
+                  console.log('Current input:', currentInput);
+                  console.log('Input type:', inputType);
                   e.preventDefault();
                   await handleAddContentToTabs(currentInput, inputType);
                 }
@@ -787,10 +830,6 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
               {/* Submit Button */}
               <button
                 type="submit"
-                onClick={async (e) => {
-                  e.preventDefault();
-                  await handleAnalyzeClick();
-                }}
                 disabled={isLoading || createLinkContent.isPending}
                 className="flex items-center gap-1.5 px-4 py-2 text-xs bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 rounded-lg font-medium transition-colors border border-zinc-700 hover:border-zinc-600 disabled:bg-zinc-700 disabled:cursor-not-allowed disabled:text-zinc-400 disabled:border-zinc-600"
               >
@@ -1062,7 +1101,9 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
 
                   {/* Content */}
                   <span
-                    className="text-sm text-zinc-300 font-medium max-w-32 truncate"
+                    className={`text-sm text-zinc-300 font-medium truncate ${
+                      tab.type === 'prompt' ? 'max-w-48' : 'max-w-32'
+                    }`}
                     title={tab.content}
                   >
                     {tab.content}
