@@ -57,6 +57,15 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
   // Edit dropdown state
   const [isEditDropdownOpen, setIsEditDropdownOpen] = useState(false);
   const [editDropdownRef, setEditDropdownRef] = useState<HTMLDivElement | null>(null);
+  const [editDropdownStyle, setEditDropdownStyle] = useState<React.CSSProperties>({});
+
+  // Add prompt action modal state
+  const [isAddPromptModalOpen, setIsAddPromptModalOpen] = useState(false);
+  const [newPromptAction, setNewPromptAction] = useState({
+    emoji: '🤖',
+    title: '',
+    prompt: '',
+  });
 
   // Input type dropdown state
   const [isInputTypeDropdownOpen, setIsInputTypeDropdownOpen] = useState(false);
@@ -64,14 +73,33 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
   const [isInputTypeManuallySet, setIsInputTypeManuallySet] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState<'bottom' | 'top'>('bottom');
   const [dropdownRect, setDropdownRect] = useState<DOMRect | null>(null);
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
 
   // Predefined action texts
-  const actionTexts = {
+  const [actionTexts, setActionTexts] = useState({
     analyze: 'Analyze this content and provide insights',
     explain: 'Explain this content in detail',
     summarize: 'Summarize this content concisely',
     generate: 'Generate creative content based on this',
     translate: 'Translate this content to Korean',
+  });
+
+  // Action button icons and display names
+  const actionConfig = {
+    analyze: { icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z', displayName: 'Analyze' },
+    explain: {
+      icon: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z',
+      displayName: 'Explain',
+    },
+    summarize: {
+      icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z M9 5l7 7-7 7',
+      displayName: 'Summarize',
+    },
+    generate: { icon: 'M13 10V3L4 14h7v7l9-11h-7z', displayName: 'Generate' },
+    translate: {
+      icon: 'M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129',
+      displayName: 'Translate',
+    },
   };
 
   // Set default type to LINK
@@ -230,13 +258,70 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
 
   // Edit dropdown handlers
   const toggleEditDropdown = () => {
+    if (!isEditDropdownOpen && editDropdownRef) {
+      // Calculate position before opening
+      const rect = editDropdownRef.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const dropdownHeight = 100; // Approximate height of dropdown
+
+      // Calculate dropdown position
+      const shouldOpenTop = rect.bottom + dropdownHeight > viewportHeight - 50;
+
+      // Calculate absolute position for portal
+      const dropdownStyle: React.CSSProperties = {
+        position: 'fixed',
+        right: window.innerWidth - rect.right,
+        width: 192, // w-48 = 12rem = 192px
+        zIndex: 9999,
+      };
+
+      if (shouldOpenTop) {
+        dropdownStyle.bottom = viewportHeight - rect.top + 4; // 4px margin
+      } else {
+        dropdownStyle.top = rect.bottom + 4; // 4px margin
+      }
+
+      setEditDropdownStyle(dropdownStyle);
+    }
     setIsEditDropdownOpen(!isEditDropdownOpen);
   };
 
-  const handleEditAction = (action: 'edit' | 'delete') => {
-    // Handle edit actions here
+  const handleEditAction = (action: 'edit' | 'delete' | 'add-prompt') => {
     console.log('Edit action:', action);
     setIsEditDropdownOpen(false);
+
+    if (action === 'add-prompt') {
+      setIsAddPromptModalOpen(true);
+    }
+  };
+
+  // Add new prompt action
+  const handleAddPromptAction = () => {
+    if (newPromptAction.title && newPromptAction.prompt) {
+      const newKey = newPromptAction.title.toLowerCase().replace(/\s+/g, '-');
+      setActionTexts((prev) => ({
+        ...prev,
+        [newKey]: newPromptAction.prompt,
+      }));
+
+      // Reset form
+      setNewPromptAction({
+        emoji: '🤖',
+        title: '',
+        prompt: '',
+      });
+      setIsAddPromptModalOpen(false);
+    }
+  };
+
+  // Close add prompt modal
+  const handleCloseAddPromptModal = () => {
+    setNewPromptAction({
+      emoji: '🤖',
+      title: '',
+      prompt: '',
+    });
+    setIsAddPromptModalOpen(false);
   };
 
   // Input type dropdown handlers
@@ -249,11 +334,25 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
 
       setDropdownRect(rect);
 
-      if (rect.bottom + dropdownHeight > viewportHeight - 50) {
-        setDropdownPosition('top');
+      // Calculate dropdown position
+      const shouldOpenTop = rect.bottom + dropdownHeight > viewportHeight - 50;
+      setDropdownPosition(shouldOpenTop ? 'top' : 'bottom');
+
+      // Calculate absolute position for portal
+      const dropdownStyle: React.CSSProperties = {
+        position: 'fixed',
+        left: rect.left,
+        width: 192, // w-48 = 12rem = 192px
+        zIndex: 9999,
+      };
+
+      if (shouldOpenTop) {
+        dropdownStyle.bottom = viewportHeight - rect.top + 4; // 4px margin
       } else {
-        setDropdownPosition('bottom');
+        dropdownStyle.top = rect.bottom + 4; // 4px margin
       }
+
+      setDropdownStyle(dropdownStyle);
     }
     setIsInputTypeDropdownOpen(!isInputTypeDropdownOpen);
   };
@@ -265,16 +364,18 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
   };
 
   // Action button handlers
-  const handleActionClick = (actionType: string) => {
+  const handleActionClick = async (actionType: string) => {
     console.log('=== Action button clicked ===');
     console.log('Action type:', actionType);
     const actionText = actionTexts[actionType as keyof typeof actionTexts];
     console.log('Action text:', actionText);
     if (actionText) {
+      // Set current input to the action text
       setCurrentInput(actionText);
       console.log('Set current input to:', actionText);
-      // Don't force input type change - let user decide or use current type
-      // Don't automatically add to tabs - let user press Enter or click Submit
+
+      // Automatically add to tabs as prompt type
+      await handleAddContentToTabs(actionText, 'prompt');
     }
   };
 
@@ -515,95 +616,6 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
                   />
                 </svg>
               </button>
-
-              {/* Input Type Dropdown */}
-              {isInputTypeDropdownOpen && (
-                <div
-                  className={`absolute left-0 w-48 bg-zinc-800 border border-zinc-600 rounded-lg shadow-lg z-[9999] ${
-                    dropdownPosition === 'top' ? 'bottom-full mb-1' : 'top-full mt-1'
-                  }`}
-                >
-                  <div className="py-1">
-                    {/* URL Option */}
-                    <button
-                      type="button"
-                      onClick={() => handleInputTypeSelect('url')}
-                      className={`flex items-center gap-3 w-full px-4 py-2 text-sm transition-colors ${
-                        inputType === 'url'
-                          ? 'text-white bg-zinc-700'
-                          : 'text-zinc-300 hover:text-white hover:bg-zinc-700'
-                      }`}
-                    >
-                      <svg
-                        className="w-4 h-4 text-zinc-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-                        />
-                      </svg>
-                      <span>URL</span>
-                    </button>
-
-                    {/* Description Option */}
-                    <button
-                      type="button"
-                      onClick={() => handleInputTypeSelect('description')}
-                      className={`flex items-center gap-3 w-full px-4 py-2 text-sm transition-colors ${
-                        inputType === 'description'
-                          ? 'text-white bg-zinc-700'
-                          : 'text-zinc-300 hover:text-white hover:bg-zinc-700'
-                      }`}
-                    >
-                      <svg
-                        className="w-4 h-4 text-blue-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                        />
-                      </svg>
-                      <span>Description</span>
-                    </button>
-
-                    {/* Prompt Option */}
-                    <button
-                      type="button"
-                      onClick={() => handleInputTypeSelect('prompt')}
-                      className={`flex items-center gap-3 w-full px-4 py-2 text-sm transition-colors ${
-                        inputType === 'prompt'
-                          ? 'text-white bg-zinc-700'
-                          : 'text-zinc-300 hover:text-white hover:bg-zinc-700'
-                      }`}
-                    >
-                      <svg
-                        className="w-4 h-4 text-purple-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                        />
-                      </svg>
-                      <span>AI Prompt</span>
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
             <input
               id="content-input"
@@ -637,96 +649,35 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
           <div className="flex justify-between items-center">
             {/* Action Buttons */}
             <div className="flex gap-2">
-              {/* Analyze Button */}
-              <button
-                type="button"
-                onClick={() => handleActionClick('analyze')}
-                className="flex items-center gap-1.5 px-3 py-2 text-xs bg-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-600 rounded-lg font-medium transition-colors border border-zinc-600 hover:border-zinc-500"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-                Analyze
-              </button>
+              {Object.entries(actionTexts).map(([key, prompt]) => {
+                const config = actionConfig[key as keyof typeof actionConfig];
+                const displayName = config?.displayName || key;
+                const iconPath = config?.icon || '';
 
-              {/* Explain Button */}
-              <button
-                type="button"
-                onClick={() => handleActionClick('explain')}
-                className="flex items-center gap-1.5 px-3 py-2 text-xs bg-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-600 rounded-lg font-medium transition-colors border border-zinc-600 hover:border-zinc-500"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                  />
-                </svg>
-                Explain
-              </button>
-
-              {/* Summarize Button */}
-              <button
-                type="button"
-                onClick={() => handleActionClick('summarize')}
-                className="flex items-center gap-1.5 px-3 py-2 text-xs bg-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-600 rounded-lg font-medium transition-colors border border-zinc-600 hover:border-zinc-500"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-                Summarize
-              </button>
-
-              {/* Generate Button */}
-              <button
-                type="button"
-                onClick={() => handleActionClick('generate')}
-                className="flex items-center gap-1.5 px-3 py-2 text-xs bg-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-600 rounded-lg font-medium transition-colors border border-zinc-600 hover:border-zinc-500"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 10V3L4 14h7v7l9-11h-7z"
-                  />
-                </svg>
-                Generate
-              </button>
-
-              {/* Translate Button */}
-              <button
-                type="button"
-                onClick={() => handleActionClick('translate')}
-                className="flex items-center gap-1.5 px-3 py-2 text-xs bg-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-600 rounded-lg font-medium transition-colors border border-zinc-600 hover:border-zinc-500"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
-                  />
-                </svg>
-                Translate
-              </button>
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => handleActionClick(key)}
+                    className="flex items-center gap-1.5 px-3 py-2 text-xs bg-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-600 rounded-lg font-medium transition-colors border border-zinc-600 hover:border-zinc-500"
+                  >
+                    <svg
+                      className="w-3.5 h-3.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d={iconPath}
+                      />
+                    </svg>
+                    {displayName}
+                  </button>
+                );
+              })}
 
               {/* Edit Dropdown Button */}
               <div className="relative" ref={setEditDropdownRef}>
@@ -749,57 +700,6 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
                     />
                   </svg>
                 </button>
-
-                {/* Dropdown Menu */}
-                {isEditDropdownOpen && (
-                  <div className="absolute right-0 top-full mt-1 w-48 bg-zinc-800 border border-zinc-600 rounded-lg shadow-lg z-50">
-                    <div className="py-1">
-                      {/* Edit Tab */}
-                      <button
-                        type="button"
-                        onClick={() => handleEditAction('edit')}
-                        className="flex items-center gap-2 w-full px-4 py-2 text-xs text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors"
-                      >
-                        <svg
-                          className="w-3.5 h-3.5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                          />
-                        </svg>
-                        Edit
-                      </button>
-
-                      {/* Delete Tab */}
-                      <button
-                        type="button"
-                        onClick={() => handleEditAction('delete')}
-                        className="flex items-center gap-2 w-full px-4 py-2 text-xs text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors"
-                      >
-                        <svg
-                          className="w-3.5 h-3.5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          />
-                        </svg>
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
 
@@ -814,7 +714,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
                   setCurrentStep('preview');
                 }}
                 disabled={isLoading || createLinkContent.isPending}
-                className="flex items-center gap-1.5 px-4 py-2 text-xs bg-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-600 rounded-lg font-medium transition-colors border border-zinc-600 hover:border-zinc-500 disabled:bg-zinc-700 disabled:cursor-not-allowed disabled:text-zinc-400 disabled:border-zinc-600"
+                className="flex items-center gap-1.5 px-4 py-2 text-xs bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 rounded-lg font-medium transition-colors border border-zinc-700 hover:border-zinc-600 disabled:bg-zinc-700 disabled:cursor-not-allowed disabled:text-zinc-400 disabled:border-zinc-600"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
@@ -831,7 +731,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
               <button
                 type="submit"
                 disabled={isLoading || createLinkContent.isPending}
-                className="flex items-center gap-1.5 px-4 py-2 text-xs bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 rounded-lg font-medium transition-colors border border-zinc-700 hover:border-zinc-600 disabled:bg-zinc-700 disabled:cursor-not-allowed disabled:text-zinc-400 disabled:border-zinc-600"
+                className="flex items-center gap-1.5 px-4 py-2 text-xs bg-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-600 rounded-lg font-medium transition-colors border border-zinc-600 hover:border-zinc-500 disabled:bg-zinc-700 disabled:cursor-not-allowed disabled:text-zinc-400 disabled:border-zinc-600"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
@@ -1217,14 +1117,267 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
   };
 
   // Render current step
-  switch (currentStep) {
-    case 'input':
-      return renderInputStep();
-    case 'preview':
-      return renderPreviewStep();
-    case 'details':
-      return renderDetailsStep();
-    default:
-      return renderInputStep();
-  }
+  const renderCurrentStep = () => {
+    switch (currentStep) {
+      case 'input':
+        return renderInputStep();
+      case 'preview':
+        return renderPreviewStep();
+      case 'details':
+        return renderDetailsStep();
+      default:
+        return renderInputStep();
+    }
+  };
+
+  return (
+    <>
+      {renderCurrentStep()}
+
+      {/* Portal for Input Type Dropdown */}
+      {isInputTypeDropdownOpen &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <div
+            style={dropdownStyle}
+            className="bg-zinc-800 border border-zinc-600 rounded-lg shadow-lg"
+          >
+            <div className="py-1">
+              {/* URL Option */}
+              <button
+                type="button"
+                onClick={() => handleInputTypeSelect('url')}
+                className={`flex items-center gap-3 w-full px-4 py-2 text-sm transition-colors ${
+                  inputType === 'url'
+                    ? 'text-white bg-zinc-700'
+                    : 'text-zinc-300 hover:text-white hover:bg-zinc-700'
+                }`}
+              >
+                <svg
+                  className="w-4 h-4 text-zinc-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                  />
+                </svg>
+                <span>URL</span>
+              </button>
+
+              {/* Description Option */}
+              <button
+                type="button"
+                onClick={() => handleInputTypeSelect('description')}
+                className={`flex items-center gap-3 w-full px-4 py-2 text-sm transition-colors ${
+                  inputType === 'description'
+                    ? 'text-white bg-zinc-700'
+                    : 'text-zinc-300 hover:text-white hover:bg-zinc-700'
+                }`}
+              >
+                <svg
+                  className="w-4 h-4 text-blue-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+                <span>Description</span>
+              </button>
+
+              {/* Prompt Option */}
+              <button
+                type="button"
+                onClick={() => handleInputTypeSelect('prompt')}
+                className={`flex items-center gap-3 w-full px-4 py-2 text-sm transition-colors ${
+                  inputType === 'prompt'
+                    ? 'text-white bg-zinc-700'
+                    : 'text-zinc-300 hover:text-white hover:bg-zinc-700'
+                }`}
+              >
+                <svg
+                  className="w-4 h-4 text-purple-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                  />
+                </svg>
+                <span>AI Prompt</span>
+              </button>
+            </div>
+          </div>,
+          document.body,
+        )}
+
+      {/* Portal for Edit Dropdown */}
+      {isEditDropdownOpen &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <div
+            style={editDropdownStyle}
+            className="bg-zinc-800 border border-zinc-600 rounded-lg shadow-lg"
+          >
+            <div className="py-1">
+              {/* Edit Tab */}
+              <button
+                type="button"
+                onClick={() => handleEditAction('edit')}
+                className="flex items-center gap-2 w-full px-4 py-2 text-xs text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
+                </svg>
+                Edit
+              </button>
+
+              {/* Add Prompt Action */}
+              <button
+                type="button"
+                onClick={() => handleEditAction('add-prompt')}
+                className="flex items-center gap-2 w-full px-4 py-2 text-xs text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+                Add Prompt Action
+              </button>
+
+              {/* Delete Tab */}
+              <button
+                type="button"
+                onClick={() => handleEditAction('delete')}
+                className="flex items-center gap-2 w-full px-4 py-2 text-xs text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
+                </svg>
+                Delete
+              </button>
+            </div>
+          </div>,
+          document.body,
+        )}
+
+      {/* Portal for Add Prompt Action Modal */}
+      {isAddPromptModalOpen &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]">
+            <div className="bg-zinc-800 rounded-2xl p-6 w-full max-w-md mx-4 border border-zinc-700">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-white">Add Prompt Action</h3>
+                <button
+                  onClick={handleCloseAddPromptModal}
+                  className="text-zinc-400 hover:text-white transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {/* Emoji Input */}
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">Emoji</label>
+                  <input
+                    type="text"
+                    value={newPromptAction.emoji}
+                    onChange={(e) =>
+                      setNewPromptAction((prev) => ({ ...prev, emoji: e.target.value }))
+                    }
+                    className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+                    placeholder="🤖"
+                    maxLength={2}
+                  />
+                </div>
+
+                {/* Title Input */}
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">Title</label>
+                  <input
+                    type="text"
+                    value={newPromptAction.title}
+                    onChange={(e) =>
+                      setNewPromptAction((prev) => ({ ...prev, title: e.target.value }))
+                    }
+                    className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+                    placeholder="e.g., Creative Writing"
+                  />
+                </div>
+
+                {/* Prompt Input */}
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">
+                    Prompt Text
+                  </label>
+                  <textarea
+                    value={newPromptAction.prompt}
+                    onChange={(e) =>
+                      setNewPromptAction((prev) => ({ ...prev, prompt: e.target.value }))
+                    }
+                    className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent resize-none"
+                    placeholder="e.g., Write a creative story based on this content..."
+                    rows={3}
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={handleCloseAddPromptModal}
+                  className="flex-1 px-4 py-2 text-sm bg-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-600 rounded-lg font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddPromptAction}
+                  disabled={!newPromptAction.title || !newPromptAction.prompt}
+                  className="flex-1 px-4 py-2 text-sm bg-purple-600 text-white hover:bg-purple-700 rounded-lg font-medium transition-colors disabled:bg-zinc-700 disabled:cursor-not-allowed disabled:text-zinc-400"
+                >
+                  Add Action
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
+    </>
+  );
 }
