@@ -60,17 +60,33 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     }
   }, [formData.type, updateFormData]);
 
-  // Add content to tabs when spacebar is pressed
+  // Add content to tabs when Enter is pressed
   const handleAddContentToTabs = async (
     content: string,
     type: 'url' | 'description' | 'prompt',
   ) => {
     if (!content.trim()) return;
 
-    // For URL type, check if URL already exists
+    // For URL type, check if URL already exists and validate format
     if (type === 'url') {
       const existingUrlTab = contentTabs.find((tab) => tab.type === 'url');
-      if (existingUrlTab) return; // Only one URL allowed
+      if (existingUrlTab) {
+        // Replace existing URL tab
+        setContentTabs((prev) => {
+          const filtered = prev.filter((tab) => tab.type !== 'url');
+          return [...filtered, { ...existingUrlTab, content: content.trim() }];
+        });
+        setCurrentInput('');
+        return;
+      }
+
+      // Basic URL validation
+      try {
+        new URL(content.trim().startsWith('http') ? content.trim() : `https://${content.trim()}`);
+      } catch {
+        setValidationErrors((prev) => ({ ...prev, url: '유효한 URL을 입력해주세요.' }));
+        return;
+      }
     }
 
     try {
@@ -86,61 +102,50 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
         preview,
       };
 
-      if (type === 'url') {
-        // Replace existing URL tab if exists
-        setContentTabs((prev) => {
+      setContentTabs((prev) => {
+        if (type === 'url') {
+          // Replace existing URL tab if exists
           const filtered = prev.filter((tab) => tab.type !== 'url');
           return [...filtered, newTab];
-        });
-      } else {
-        // Add description or prompt tab
-        setContentTabs((prev) => [...prev, newTab]);
-      }
+        } else {
+          // Add description or prompt tab
+          return [...prev, newTab];
+        }
+      });
 
       setCurrentInput('');
+      setValidationErrors((prev) => ({ ...prev, url: undefined }));
 
-      // Move to next input type
-      if (type === 'url') {
-        setInputType('description');
-      } else if (type === 'description') {
-        setInputType('prompt');
-      }
+      // Move to next input type based on updated tabs
+      setContentTabs((updatedTabs) => {
+        setInputType(getNextInputType(updatedTabs));
+        return updatedTabs;
+      });
     } catch (error) {
       console.error('Failed to add content to tabs:', error);
+      if (type === 'url') {
+        setValidationErrors((prev) => ({ ...prev, url: '링크 미리보기를 가져오지 못했습니다.' }));
+      }
     }
+  };
+
+  // Determine next input type based on existing tabs
+  const getNextInputType = (tabs: typeof contentTabs): 'url' | 'description' | 'prompt' => {
+    const hasUrl = tabs.some((tab) => tab.type === 'url');
+    const hasDescription = tabs.some((tab) => tab.type === 'description');
+    const hasPrompt = tabs.some((tab) => tab.type === 'prompt');
+
+    if (!hasUrl) return 'url';
+    if (!hasDescription) return 'description';
+    if (!hasPrompt) return 'prompt';
+    return 'prompt'; // All exist, stay at prompt
   };
 
   // Remove content tab
   const handleRemoveContentTab = (tabId: string) => {
     setContentTabs((prev) => {
-      const removedTab = prev.find((tab) => tab.id === tabId);
       const filtered = prev.filter((tab) => tab.id !== tabId);
-      
-      // Update input type based on what was removed
-      if (removedTab?.type === 'url') {
-        // If URL was removed, reset to URL input
-        setInputType('url');
-      } else if (removedTab?.type === 'description') {
-        // If description was removed, check if URL exists
-        const hasUrl = filtered.some(tab => tab.type === 'url');
-        if (hasUrl) {
-          setInputType('prompt'); // URL exists, go to prompt
-        } else {
-          setInputType('url'); // No URL, go back to URL
-        }
-      } else if (removedTab?.type === 'prompt') {
-        // If prompt was removed, check what exists
-        const hasUrl = filtered.some(tab => tab.type === 'url');
-        const hasDescription = filtered.some(tab => tab.type === 'description');
-        if (hasUrl && hasDescription) {
-          setInputType('prompt'); // Both exist, stay at prompt
-        } else if (hasUrl) {
-          setInputType('description'); // Only URL exists, go to description
-        } else {
-          setInputType('url'); // No URL, go back to URL
-        }
-      }
-      
+      setInputType(getNextInputType(filtered));
       return filtered;
     });
   };
@@ -175,19 +180,15 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
   const validateForm = () => {
     const errors: typeof validationErrors = {};
 
-    if (formData.description && formData.description.trim().length > 500) {
-      errors.description = t.globalContentUpload.contentUpload.validation.descriptionTooLong();
+    // Check if at least one content tab exists
+    if (contentTabs.length === 0) {
+      errors.url = '최소 하나의 콘텐츠를 추가해주세요.';
     }
 
-    // For demo purposes, URL validation is optional
-    // Only validate URL format if provided
-    if (formData.url?.trim()) {
-      try {
-        new URL(formData.url.trim());
-      } catch {
-        // For demo, don't show error for invalid URLs
-        // errors.url = t.globalContentUpload.contentUpload.validation.invalidUrl();
-      }
+    // Validate description length if exists
+    const descriptionTab = contentTabs.find((tab) => tab.type === 'description');
+    if (descriptionTab && descriptionTab.content.length > 500) {
+      errors.description = t.globalContentUpload.contentUpload.validation.descriptionTooLong();
     }
 
     setValidationErrors(errors);
@@ -270,14 +271,11 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
                 )}
 
                 {/* Content */}
-                <span className="text-sm text-zinc-300 font-medium">
-                  {tab.type === 'url' && tab.preview
-                    ? tab.preview.domain
-                    : tab.type === 'description'
-                    ? 'Description'
-                    : tab.type === 'prompt'
-                    ? 'AI Prompt'
-                    : tab.content}
+                <span
+                  className="text-sm text-zinc-300 font-medium max-w-32 truncate"
+                  title={tab.content}
+                >
+                  {tab.content}
                 </span>
 
                 {/* Remove button */}
@@ -539,9 +537,9 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
       return null;
     }
 
-    const urlTab = contentTabs.find(tab => tab.type === 'url');
-    const descriptionTab = contentTabs.find(tab => tab.type === 'description');
-    const promptTab = contentTabs.find(tab => tab.type === 'prompt');
+    const urlTab = contentTabs.find((tab) => tab.type === 'url');
+    const descriptionTab = contentTabs.find((tab) => tab.type === 'description');
+    const promptTab = contentTabs.find((tab) => tab.type === 'prompt');
 
     return (
       <div className="flex flex-col p-4">
@@ -592,18 +590,14 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
           {/* Link Preview Card */}
           {urlTab && urlTab.preview && (
             <div className="flex justify-center">
-              <LinkPreviewCard
-                preview={urlTab.preview}
-                isLoading={false}
-                error={null}
-              />
+              <LinkPreviewCard preview={urlTab.preview} isLoading={false} error={null} />
             </div>
           )}
 
           {/* Content Summary */}
           <div className="bg-zinc-800 rounded-2xl p-4 space-y-4">
             <h4 className="text-md font-semibold text-white">추가된 콘텐츠</h4>
-            
+
             {/* URL Tab */}
             {urlTab && (
               <div className="flex items-center gap-2 px-3 py-2 bg-zinc-700 rounded-lg">
@@ -615,8 +609,11 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
                     e.currentTarget.style.display = 'none';
                   }}
                 />
-                <span className="text-sm text-zinc-300 font-medium">
-                  URL: {urlTab.preview?.domain || urlTab.content}
+                <span
+                  className="text-sm text-zinc-300 font-medium max-w-48 truncate"
+                  title={urlTab.content}
+                >
+                  {urlTab.content}
                 </span>
               </div>
             )}
@@ -624,7 +621,12 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
             {/* Description Tab */}
             {descriptionTab && (
               <div className="flex items-center gap-2 px-3 py-2 bg-zinc-700 rounded-lg">
-                <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className="w-4 h-4 text-blue-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -632,8 +634,11 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                   />
                 </svg>
-                <span className="text-sm text-zinc-300 font-medium">
-                  Description: {descriptionTab.content}
+                <span
+                  className="text-sm text-zinc-300 font-medium max-w-48 truncate"
+                  title={descriptionTab.content}
+                >
+                  {descriptionTab.content}
                 </span>
               </div>
             )}
@@ -641,7 +646,12 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
             {/* Prompt Tab */}
             {promptTab && (
               <div className="flex items-center gap-2 px-3 py-2 bg-zinc-700 rounded-lg">
-                <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className="w-4 h-4 text-purple-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -649,8 +659,11 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
                     d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
                   />
                 </svg>
-                <span className="text-sm text-zinc-300 font-medium">
-                  AI Prompt: {promptTab.content}
+                <span
+                  className="text-sm text-zinc-300 font-medium max-w-48 truncate"
+                  title={promptTab.content}
+                >
+                  {promptTab.content}
                 </span>
               </div>
             )}
@@ -673,7 +686,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
               </svg>
               수정하기
             </button>
-            
+
             <button
               type="button"
               onClick={() => setCurrentStep('details')}
@@ -726,21 +739,6 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
               </div>
               <h3 className="text-lg font-semibold text-white">추가 설정</h3>
             </div>
-            <button
-              type="button"
-              onClick={() => setCurrentStep('input')}
-              className="flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                />
-              </svg>
-              URL 입력으로
-            </button>
           </div>
 
           {/* Content Tabs Display */}
@@ -805,14 +803,11 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
                   )}
 
                   {/* Content */}
-                  <span className="text-sm text-zinc-300 font-medium">
-                    {tab.type === 'url' && tab.preview
-                      ? tab.preview.domain
-                      : tab.type === 'description'
-                      ? 'Description'
-                      : tab.type === 'prompt'
-                      ? 'AI Prompt'
-                      : tab.content}
+                  <span
+                    className="text-sm text-zinc-300 font-medium max-w-32 truncate"
+                    title={tab.content}
+                  >
+                    {tab.content}
                   </span>
 
                   {/* Remove button */}
