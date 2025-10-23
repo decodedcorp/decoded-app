@@ -35,11 +35,17 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     url?: string;
   }>({});
 
-  // URL tabs state
-  const [urlTabs, setUrlTabs] = useState<Array<{ id: string; url: string; preview: LinkPreview }>>(
-    [],
-  );
-  const [currentUrlInput, setCurrentUrlInput] = useState<string>('');
+  // Content tabs state (URL, description, prompt)
+  const [contentTabs, setContentTabs] = useState<
+    Array<{
+      id: string;
+      type: 'url' | 'description' | 'prompt';
+      content: string;
+      preview?: LinkPreview;
+    }>
+  >([]);
+  const [currentInput, setCurrentInput] = useState<string>('');
+  const [inputType, setInputType] = useState<'url' | 'description' | 'prompt'>('url');
 
   // Step management
   const [currentStep, setCurrentStep] = useState<'input' | 'details'>('input');
@@ -54,44 +60,80 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     }
   }, [formData.type, updateFormData]);
 
-  // Add URL to tabs when spacebar is pressed
-  const handleAddUrlToTabs = async (url: string) => {
-    if (!url.trim()) return;
+  // Add content to tabs when spacebar is pressed
+  const handleAddContentToTabs = async (
+    content: string,
+    type: 'url' | 'description' | 'prompt',
+  ) => {
+    if (!content.trim()) return;
 
-    // Check if URL already exists in tabs
-    const existingTab = urlTabs.find((tab) => tab.url === url.trim());
-    if (existingTab) return;
+    // For URL type, check if URL already exists
+    if (type === 'url') {
+      const existingUrlTab = contentTabs.find((tab) => tab.type === 'url');
+      if (existingUrlTab) return; // Only one URL allowed
+    }
 
     try {
-      const preview = await getMockLinkPreviewAsync(url.trim());
+      let preview: LinkPreview | undefined;
+      if (type === 'url') {
+        preview = await getMockLinkPreviewAsync(content.trim());
+      }
+
       const newTab = {
         id: Date.now().toString(),
-        url: url.trim(),
+        type,
+        content: content.trim(),
         preview,
       };
-      setUrlTabs((prev) => [...prev, newTab]);
-      setCurrentUrlInput(''); // Clear input
-    } catch (err) {
-      console.error('Failed to add URL to tabs:', err);
+
+      if (type === 'url') {
+        // Replace existing URL tab if exists
+        setContentTabs((prev) => {
+          const filtered = prev.filter((tab) => tab.type !== 'url');
+          return [...filtered, newTab];
+        });
+      } else {
+        // Add description or prompt tab
+        setContentTabs((prev) => [...prev, newTab]);
+      }
+
+      setCurrentInput('');
+
+      // Move to next input type
+      if (type === 'url') {
+        setInputType('description');
+      } else if (type === 'description') {
+        setInputType('prompt');
+      }
+    } catch (error) {
+      console.error('Failed to add content to tabs:', error);
     }
   };
 
-  // Remove URL from tabs
-  const handleRemoveUrlTab = (tabId: string) => {
-    setUrlTabs((prev) => prev.filter((tab) => tab.id !== tabId));
+  // Remove content tab
+  const handleRemoveContentTab = (tabId: string) => {
+    setContentTabs((prev) => {
+      const filtered = prev.filter((tab) => tab.id !== tabId);
+      // If removing URL, reset input type to url
+      const removedTab = prev.find((tab) => tab.id === tabId);
+      if (removedTab?.type === 'url') {
+        setInputType('url');
+      }
+      return filtered;
+    });
   };
 
   // Load link preview when analyze button is clicked
   const handleAnalyzeClick = async () => {
-    // Add current URL to tabs if it exists
-    if (currentUrlInput.trim()) {
-      await handleAddUrlToTabs(currentUrlInput);
-      // Move to details step (description input) after adding URL
+    // Add current content to tabs if it exists
+    if (currentInput.trim()) {
+      await handleAddContentToTabs(currentInput, inputType);
+      // Move to details step after adding content
       setCurrentStep('details');
       return;
     }
 
-    // If no URL, show error or go back to input
+    // If no content, show error or go back to input
     setCurrentStep('input');
   };
 
@@ -158,29 +200,71 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
   const renderInputStep = () => (
     <div className="flex flex-col p-4">
       <form onSubmit={handleSubmit} className="w-full max-w-4xl space-y-6">
-        {/* URL Tabs */}
-        {urlTabs.length > 0 && (
+        {/* Content Tabs */}
+        {contentTabs.length > 0 && (
           <div className="flex flex-wrap gap-2">
-            {urlTabs.map((tab) => (
+            {contentTabs.map((tab) => (
               <div
                 key={tab.id}
                 className="flex items-center gap-2 px-3 py-2 bg-zinc-800 rounded-lg border border-zinc-700 hover:border-zinc-600 transition-colors group"
               >
-                {/* Favicon */}
-                <img
-                  src={tab.preview.favicon}
-                  alt={`${tab.preview.domain} favicon`}
-                  className="w-4 h-4 rounded"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-                {/* Domain */}
-                <span className="text-sm text-zinc-300 font-medium">{tab.preview.domain}</span>
+                {/* Icon based on type */}
+                {tab.type === 'url' && tab.preview && (
+                  <img
+                    src={tab.preview.favicon}
+                    alt={`${tab.preview.domain} favicon`}
+                    className="w-4 h-4 rounded"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                )}
+                {tab.type === 'description' && (
+                  <svg
+                    className="w-4 h-4 text-blue-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                )}
+                {tab.type === 'prompt' && (
+                  <svg
+                    className="w-4 h-4 text-purple-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                    />
+                  </svg>
+                )}
+
+                {/* Content */}
+                <span className="text-sm text-zinc-300 font-medium">
+                  {tab.type === 'url' && tab.preview
+                    ? tab.preview.domain
+                    : tab.type === 'description'
+                    ? 'Description'
+                    : tab.type === 'prompt'
+                    ? 'AI Prompt'
+                    : tab.content}
+                </span>
+
                 {/* Remove button */}
                 <button
                   type="button"
-                  onClick={() => handleRemoveUrlTab(tab.id)}
+                  onClick={() => handleRemoveContentTab(tab.id)}
                   className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:bg-zinc-700 rounded"
                 >
                   <svg
@@ -204,41 +288,79 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
 
         {/* Main Content Input Area */}
         <div className="bg-zinc-800 rounded-2xl p-4 space-y-3">
-          {/* Content URL Input */}
+          {/* Content Input */}
           <div className="relative">
             <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-              <svg
-                className="w-5 h-5 text-zinc-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
-              </svg>
+              {inputType === 'url' && (
+                <svg
+                  className="w-5 h-5 text-zinc-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                  />
+                </svg>
+              )}
+              {inputType === 'description' && (
+                <svg
+                  className="w-5 h-5 text-blue-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+              )}
+              {inputType === 'prompt' && (
+                <svg
+                  className="w-5 h-5 text-purple-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                  />
+                </svg>
+              )}
             </div>
             <input
-              id="content-url"
+              id="content-input"
               type="text"
-              value={currentUrlInput}
-              onChange={(e) => setCurrentUrlInput(e.target.value)}
+              value={currentInput}
+              onChange={(e) => setCurrentInput(e.target.value)}
               onKeyDown={async (e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
                   await handleAnalyzeClick();
                 } else if (e.key === ' ') {
                   e.preventDefault();
-                  await handleAddUrlToTabs(currentUrlInput);
+                  await handleAddContentToTabs(currentInput, inputType);
                 }
               }}
               className={`w-full pl-12 pr-4 py-3 bg-transparent text-white placeholder-zinc-400 focus:outline-none text-lg ${
                 validationErrors.url ? 'text-red-400' : ''
               }`}
-              placeholder="Add content URL and press Space to add tab, Enter to analyze..."
+              placeholder={
+                inputType === 'url'
+                  ? 'Add content URL and press Space to add tab, Enter to analyze...'
+                  : inputType === 'description'
+                  ? 'Add description and press Space to add tab, Enter to analyze...'
+                  : 'Add AI prompt and press Space to add tab, Enter to analyze...'
+              }
               disabled={isLoading || createLinkContent.isPending}
             />
           </div>
@@ -370,8 +492,8 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
 
   // Step 3: Additional Details
   const renderDetailsStep = () => {
-    // If no URLs in tabs, go back to input step
-    if (urlTabs.length === 0) {
+    // If no content in tabs, go back to input step
+    if (contentTabs.length === 0) {
       setCurrentStep('input');
       return null;
     }
@@ -416,7 +538,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
             </button>
           </div>
 
-          {/* URL Tabs Display */}
+          {/* Content Tabs Display */}
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-sm text-zinc-400">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -427,29 +549,71 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
                   d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
                 />
               </svg>
-              <span>Added URLs ({urlTabs.length})</span>
+              <span>Added Content ({contentTabs.length})</span>
             </div>
             <div className="flex flex-wrap gap-2">
-              {urlTabs.map((tab) => (
+              {contentTabs.map((tab) => (
                 <div
                   key={tab.id}
                   className="flex items-center gap-2 px-3 py-2 bg-zinc-800 rounded-lg border border-zinc-700 hover:border-zinc-600 transition-colors group"
                 >
-                  {/* Favicon */}
-                  <img
-                    src={tab.preview.favicon}
-                    alt={`${tab.preview.domain} favicon`}
-                    className="w-4 h-4 rounded"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                  {/* Domain */}
-                  <span className="text-sm text-zinc-300 font-medium">{tab.preview.domain}</span>
+                  {/* Icon based on type */}
+                  {tab.type === 'url' && tab.preview && (
+                    <img
+                      src={tab.preview.favicon}
+                      alt={`${tab.preview.domain} favicon`}
+                      className="w-4 h-4 rounded"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  )}
+                  {tab.type === 'description' && (
+                    <svg
+                      className="w-4 h-4 text-blue-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                  )}
+                  {tab.type === 'prompt' && (
+                    <svg
+                      className="w-4 h-4 text-purple-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                      />
+                    </svg>
+                  )}
+
+                  {/* Content */}
+                  <span className="text-sm text-zinc-300 font-medium">
+                    {tab.type === 'url' && tab.preview
+                      ? tab.preview.domain
+                      : tab.type === 'description'
+                      ? 'Description'
+                      : tab.type === 'prompt'
+                      ? 'AI Prompt'
+                      : tab.content}
+                  </span>
+
                   {/* Remove button */}
                   <button
                     type="button"
-                    onClick={() => handleRemoveUrlTab(tab.id)}
+                    onClick={() => handleRemoveContentTab(tab.id)}
                     className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:bg-zinc-700 rounded"
                   >
                     <svg
