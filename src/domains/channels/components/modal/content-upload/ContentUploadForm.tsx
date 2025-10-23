@@ -35,7 +35,6 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     url?: string;
   }>({});
 
-
   // URL tabs state
   const [urlTabs, setUrlTabs] = useState<Array<{ id: string; url: string; preview: LinkPreview }>>(
     [],
@@ -159,67 +158,6 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
   const renderInputStep = () => (
     <div className="flex flex-col p-4">
       <form onSubmit={handleSubmit} className="w-full max-w-4xl space-y-6">
-        {/* Action Buttons - Analyze, Explain, Summarize */}
-        <div className="flex gap-3">
-          {/* Analyze Button - Inactive */}
-          <button
-            type="button"
-            onClick={async () => await handleAnalyzeClick()}
-            className="flex items-center gap-1.5 px-4 py-2 text-xs bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 rounded-lg font-medium transition-colors border border-zinc-700 hover:border-zinc-600"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-            Analyze
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
-            </svg>
-          </button>
-
-          {/* Explain Button - Inactive */}
-          <button
-            type="button"
-            className="flex items-center gap-1.5 px-4 py-2 text-xs bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 rounded-lg font-medium transition-colors border border-zinc-700 hover:border-zinc-600"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-              />
-            </svg>
-            Explain
-          </button>
-
-          {/* Summarize Button - Inactive */}
-          <button
-            type="button"
-            className="flex items-center gap-1.5 px-4 py-2 text-xs bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 rounded-lg font-medium transition-colors border border-zinc-700 hover:border-zinc-600"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-            Summarize
-          </button>
-        </div>
-
         {/* URL Tabs */}
         {urlTabs.length > 0 && (
           <div className="flex flex-wrap gap-2">
@@ -305,8 +243,99 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
             />
           </div>
 
-          {/* Submit Button */}
-          <div className="flex justify-end">
+          {/* Action Buttons and Submit */}
+          <div className="flex justify-between items-center">
+            {/* Action Buttons */}
+            <div className="flex gap-2">
+              {/* Analyze Button */}
+              <button
+                type="button"
+                onClick={async () => await handleAnalyzeClick()}
+                className="flex items-center gap-1.5 px-3 py-2 text-xs bg-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-600 rounded-lg font-medium transition-colors border border-zinc-600 hover:border-zinc-500"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+                Analyze
+              </button>
+
+              {/* Explain Button */}
+              <button
+                type="button"
+                className="flex items-center gap-1.5 px-3 py-2 text-xs bg-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-600 rounded-lg font-medium transition-colors border border-zinc-600 hover:border-zinc-500"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                  />
+                </svg>
+                Explain
+              </button>
+
+              {/* Summarize Button */}
+              <button
+                type="button"
+                className="flex items-center gap-1.5 px-3 py-2 text-xs bg-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-600 rounded-lg font-medium transition-colors border border-zinc-600 hover:border-zinc-500"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+                Summarize
+              </button>
+
+              {/* New Generate Button */}
+              <button
+                type="button"
+                className="flex items-center gap-1.5 px-3 py-2 text-xs bg-[#eafd66] text-black hover:bg-[#d4e85a] rounded-lg font-medium transition-colors border border-[#eafd66] hover:border-[#d4e85a]"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                  />
+                </svg>
+                Generate
+              </button>
+
+              {/* New Translate Button */}
+              <button
+                type="button"
+                className="flex items-center gap-1.5 px-3 py-2 text-xs bg-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-600 rounded-lg font-medium transition-colors border border-zinc-600 hover:border-zinc-500"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
+                  />
+                </svg>
+                Translate
+              </button>
+            </div>
+
+            {/* Submit Button */}
             <button
               type="submit"
               onClick={async (e) => {
@@ -324,7 +353,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
                   d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
                 />
               </svg>
-              Analyze
+              Submit
             </button>
           </div>
         </div>
@@ -338,7 +367,6 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
       </form>
     </div>
   );
-
 
   // Step 3: Additional Details
   const renderDetailsStep = () => {
@@ -470,7 +498,9 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
 
           {/* AI Analysis Section */}
           <div className="space-y-4">
-            <label className="block text-sm font-medium text-zinc-300">AI 분석 설정 (선택사항)</label>
+            <label className="block text-sm font-medium text-zinc-300">
+              AI 분석 설정 (선택사항)
+            </label>
 
             {/* Prompt Templates */}
             <PromptTemplates
