@@ -66,8 +66,6 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     type: 'url' | 'description' | 'prompt',
   ) => {
     if (!content.trim()) return;
-    
-    console.log('Adding content to tabs:', { content: content.trim(), type });
 
     // For URL type, check if URL already exists and validate format
     if (type === 'url') {
@@ -105,25 +103,18 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
       };
 
       setContentTabs((prev) => {
-        if (type === 'url') {
-          // Replace existing URL tab if exists
-          const filtered = prev.filter((tab) => tab.type !== 'url');
-          return [...filtered, newTab];
-        } else {
-          // Add description or prompt tab
-          return [...prev, newTab];
-        }
+        const updatedTabs = type === 'url' 
+          ? prev.filter((tab) => tab.type !== 'url').concat(newTab)
+          : [...prev, newTab];
+        
+        // Update input type based on the new tabs
+        setInputType(getNextInputType(updatedTabs));
+        
+        return updatedTabs;
       });
 
       setCurrentInput('');
       setValidationErrors((prev) => ({ ...prev, url: undefined }));
-
-      // Move to next input type based on updated tabs
-      const updatedTabs = type === 'url' 
-        ? contentTabs.filter((tab) => tab.type !== 'url').concat(newTab)
-        : [...contentTabs, newTab];
-      
-      setInputType(getNextInputType(updatedTabs));
     } catch (error) {
       console.error('Failed to add content to tabs:', error);
       if (type === 'url') {
@@ -138,7 +129,6 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     const hasDescription = tabs.some((tab) => tab.type === 'description');
     const hasPrompt = tabs.some((tab) => tab.type === 'prompt');
 
-    console.log('Current tabs state:', { hasUrl, hasDescription, hasPrompt });
 
     // Only move to next type if current type is completed
     if (!hasUrl) return 'url';
