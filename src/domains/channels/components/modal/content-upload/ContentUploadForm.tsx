@@ -66,6 +66,8 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     type: 'url' | 'description' | 'prompt',
   ) => {
     if (!content.trim()) return;
+    
+    console.log('Adding content to tabs:', { content: content.trim(), type });
 
     // For URL type, check if URL already exists and validate format
     if (type === 'url') {
@@ -117,10 +119,11 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
       setValidationErrors((prev) => ({ ...prev, url: undefined }));
 
       // Move to next input type based on updated tabs
-      setContentTabs((updatedTabs) => {
-        setInputType(getNextInputType(updatedTabs));
-        return updatedTabs;
-      });
+      const updatedTabs = type === 'url' 
+        ? contentTabs.filter((tab) => tab.type !== 'url').concat(newTab)
+        : [...contentTabs, newTab];
+      
+      setInputType(getNextInputType(updatedTabs));
     } catch (error) {
       console.error('Failed to add content to tabs:', error);
       if (type === 'url') {
@@ -135,9 +138,12 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     const hasDescription = tabs.some((tab) => tab.type === 'description');
     const hasPrompt = tabs.some((tab) => tab.type === 'prompt');
 
+    console.log('Current tabs state:', { hasUrl, hasDescription, hasPrompt });
+
+    // Only move to next type if current type is completed
     if (!hasUrl) return 'url';
-    if (!hasDescription) return 'description';
-    if (!hasPrompt) return 'prompt';
+    if (hasUrl && !hasDescription) return 'description';
+    if (hasUrl && hasDescription && !hasPrompt) return 'prompt';
     return 'prompt'; // All exist, stay at prompt
   };
 
@@ -282,7 +288,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
                 <button
                   type="button"
                   onClick={() => handleRemoveContentTab(tab.id)}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:bg-zinc-700 rounded"
+                  className="opacity-100 p-0.5 hover:bg-zinc-700 rounded transition-colors"
                 >
                   <svg
                     className="w-3 h-3 text-zinc-400 hover:text-white"
@@ -570,21 +576,6 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
               </div>
               <h3 className="text-lg font-semibold text-white">링크 미리보기</h3>
             </div>
-            <button
-              type="button"
-              onClick={() => setCurrentStep('input')}
-              className="flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                />
-              </svg>
-              URL 입력으로
-            </button>
           </div>
 
           {/* Link Preview Card */}
@@ -670,7 +661,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-between items-center">
+          <div className="flex justify-end">
             <button
               type="button"
               onClick={() => setCurrentStep('input')}
@@ -685,22 +676,6 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
                 />
               </svg>
               수정하기
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setCurrentStep('details')}
-              className="flex items-center gap-2 px-6 py-3 bg-primary text-black rounded-lg font-medium transition-colors hover:bg-primary-hover"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-              계속하기
             </button>
           </div>
         </div>
@@ -814,7 +789,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
                   <button
                     type="button"
                     onClick={() => handleRemoveContentTab(tab.id)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:bg-zinc-700 rounded"
+                    className="opacity-100 p-0.5 hover:bg-zinc-700 rounded transition-colors"
                   >
                     <svg
                       className="w-3 h-3 text-zinc-400 hover:text-white"
