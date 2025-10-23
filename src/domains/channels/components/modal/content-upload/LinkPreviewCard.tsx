@@ -53,97 +53,97 @@ export function LinkPreviewCard({ preview, isLoading, error }: LinkPreviewCardPr
         onClick={handleClick}
       >
         <div className="bg-zinc-800/30 rounded-2xl border border-zinc-700/30 overflow-hidden shadow-lg group-hover:shadow-xl group-hover:border-[#eafd66]/30 transition-all duration-300 h-full flex flex-col w-4/5">
-        {/* Image Section */}
-        {preview.image && (
-          <div className="relative flex-1 overflow-hidden">
-            <img
-              src={preview.image}
-              alt={preview.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+          {/* Image Section */}
+          {preview.image && (
+            <div className="relative flex-1 overflow-hidden">
+              <img
+                src={preview.image}
+                alt={preview.title}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-            {/* Site Badge Overlay */}
-            <div className="absolute top-4 left-4">
-              <span className="px-3 py-1.5 bg-black/60 backdrop-blur-sm text-white text-sm font-medium rounded-lg">
-                {preview.domain}
-              </span>
-            </div>
+              {/* Site Badge Overlay */}
+              <div className="absolute top-4 left-4">
+                <span className="px-3 py-1.5 bg-black/60 backdrop-blur-sm text-white text-sm font-medium rounded-lg">
+                  {preview.domain}
+                </span>
+              </div>
 
-            {/* External Link Icon */}
-            <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="p-2 bg-[#eafd66]/90 rounded-lg">
-                <svg
-                  className="w-4 h-4 text-black"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                  />
-                </svg>
+              {/* External Link Icon */}
+              <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="p-2 bg-[#eafd66]/90 rounded-lg">
+                  <svg
+                    className="w-4 h-4 text-black"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
+                  </svg>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-
-        {/* Content Section */}
-        <div className="p-6 flex-shrink-0">
-          {/* Site Badge for no-image case */}
-          {!preview.image && (
-            <div className="mb-3">
-              <span className="px-3 py-1.5 bg-[#eafd66]/20 text-[#eafd66] text-sm font-medium rounded-lg">
-                {preview.domain}
-              </span>
-            </div>
           )}
 
-          {/* Title */}
-          {preview.title && (
-            <h3 className="text-xl font-bold text-white mb-3 leading-tight group-hover:text-[#eafd66] transition-colors duration-300 line-clamp-2 overflow-hidden">
-              {preview.title}
-            </h3>
-          )}
+          {/* Content Section */}
+          <div className="p-6 flex-shrink-0">
+            {/* Site Badge for no-image case */}
+            {!preview.image && (
+              <div className="mb-3">
+                <span className="px-3 py-1.5 bg-[#eafd66]/20 text-[#eafd66] text-sm font-medium rounded-lg">
+                  {preview.domain}
+                </span>
+              </div>
+            )}
 
-          {/* Description */}
-          {preview.description && (
-            <p className="text-gray-400 leading-relaxed line-clamp-3 overflow-hidden group-hover:text-gray-300 transition-colors duration-300 mb-4">
-              {preview.description}
-            </p>
-          )}
+            {/* Title */}
+            {preview.title && (
+              <h3 className="text-xl font-bold text-white mb-3 leading-tight group-hover:text-[#eafd66] transition-colors duration-300 line-clamp-2 overflow-hidden">
+                {preview.title}
+              </h3>
+            )}
 
-          {/* URL Display */}
-          <div className="pt-4 border-t border-zinc-700/30">
-            <div className="flex items-center justify-between">
-              <p className="text-zinc-500 text-sm font-mono truncate group-hover:text-[#eafd66] transition-colors duration-300 flex-1">
-                {preview.domain}
+            {/* Description */}
+            {preview.description && (
+              <p className="text-gray-400 leading-relaxed line-clamp-3 overflow-hidden group-hover:text-gray-300 transition-colors duration-300 mb-4">
+                {preview.description}
               </p>
-              <div className="ml-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <svg
-                  className="w-4 h-4 text-[#eafd66]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                  />
-                </svg>
+            )}
+
+            {/* URL Display */}
+            <div className="pt-4 border-t border-zinc-700/30">
+              <div className="flex items-center justify-between">
+                <p className="text-zinc-500 text-sm font-mono truncate group-hover:text-[#eafd66] transition-colors duration-300 flex-1">
+                  {preview.domain}
+                </p>
+                <div className="ml-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <svg
+                    className="w-4 h-4 text-[#eafd66]"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
       </div>
 
       {/* Link Preview Modal */}

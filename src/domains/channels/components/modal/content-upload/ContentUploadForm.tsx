@@ -40,6 +40,10 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
 
+  // URL tabs state
+  const [urlTabs, setUrlTabs] = useState<Array<{ id: string; url: string; preview: LinkPreview }>>([]);
+  const [currentUrlInput, setCurrentUrlInput] = useState<string>('');
+
   // Step management
   const [currentStep, setCurrentStep] = useState<'input' | 'preview' | 'details'>('input');
 
@@ -53,10 +57,42 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     }
   }, [formData.type, updateFormData]);
 
+  // Add URL to tabs when spacebar is pressed
+  const handleAddUrlToTabs = async (url: string) => {
+    if (!url.trim()) return;
+
+    // Check if URL already exists in tabs
+    const existingTab = urlTabs.find(tab => tab.url === url.trim());
+    if (existingTab) return;
+
+    try {
+      const preview = await getMockLinkPreviewAsync(url.trim());
+      const newTab = {
+        id: Date.now().toString(),
+        url: url.trim(),
+        preview
+      };
+      setUrlTabs(prev => [...prev, newTab]);
+      setCurrentUrlInput(''); // Clear input
+    } catch (err) {
+      console.error('Failed to add URL to tabs:', err);
+    }
+  };
+
+  // Remove URL from tabs
+  const handleRemoveUrlTab = (tabId: string) => {
+    setUrlTabs(prev => prev.filter(tab => tab.id !== tabId));
+  };
+
   // Load link preview when analyze button is clicked
   const handleAnalyzeClick = async () => {
+    // Add current URL to tabs if it exists
+    if (currentUrlInput.trim()) {
+      await handleAddUrlToTabs(currentUrlInput);
+    }
+
     // For demo purposes, allow empty URL or any text
-    const url = formData.url?.trim() || 'demo-link';
+    const url = currentUrlInput.trim() || 'demo-link';
 
     setPreviewLoading(true);
     setPreviewError(null);
@@ -139,12 +175,56 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
   const renderInputStep = () => (
     <div className="flex flex-col p-4">
       <form onSubmit={handleSubmit} className="w-full max-w-4xl space-y-6">
+        {/* URL Tabs */}
+        {urlTabs.length > 0 && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-sm text-zinc-400">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+              </svg>
+              <span>Added URLs ({urlTabs.length})</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {urlTabs.map((tab) => (
+                <div
+                  key={tab.id}
+                  className="flex items-center gap-2 px-3 py-2 bg-zinc-800 rounded-lg border border-zinc-700 hover:border-zinc-600 transition-colors group"
+                >
+                  {/* Favicon */}
+                  <img
+                    src={tab.preview.favicon}
+                    alt={`${tab.preview.domain} favicon`}
+                    className="w-4 h-4 rounded"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                  {/* Domain */}
+                  <span className="text-sm text-zinc-300 font-medium">
+                    {tab.preview.domain}
+                  </span>
+                  {/* Remove button */}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveUrlTab(tab.id)}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:bg-zinc-700 rounded"
+                  >
+                    <svg className="w-3 h-3 text-zinc-400 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Action Buttons - Analyze, Explain, Summarize */}
         <div className="flex gap-3">
           {/* Analyze Button - Inactive */}
           <button
             type="button"
-            onClick={handleAnalyzeClick}
+            onClick={async () => await handleAnalyzeClick()}
             className="flex items-center gap-1.5 px-4 py-2 text-xs bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 rounded-lg font-medium transition-colors border border-zinc-700 hover:border-zinc-600"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -222,18 +302,21 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
             <input
               id="content-url"
               type="text"
-              value={formData.url || ''}
-              onChange={(e) => handleInputChange('url', e.target.value)}
-              onKeyDown={(e) => {
+              value={currentUrlInput}
+              onChange={(e) => setCurrentUrlInput(e.target.value)}
+              onKeyDown={async (e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
-                  handleAnalyzeClick();
+                  await handleAnalyzeClick();
+                } else if (e.key === ' ') {
+                  e.preventDefault();
+                  await handleAddUrlToTabs(currentUrlInput);
                 }
               }}
               className={`w-full pl-12 pr-4 py-3 bg-transparent text-white placeholder-zinc-400 focus:outline-none text-lg ${
                 validationErrors.url ? 'text-red-400' : ''
               }`}
-              placeholder="Add content URL and press Enter to analyze..."
+              placeholder="Add content URL and press Space to add tab, Enter to analyze..."
               disabled={isLoading || createLinkContent.isPending}
             />
           </div>
@@ -242,6 +325,10 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
           <div className="flex justify-end">
             <button
               type="submit"
+              onClick={async (e) => {
+                e.preventDefault();
+                await handleAnalyzeClick();
+              }}
               disabled={isLoading || createLinkContent.isPending}
               className="flex items-center gap-1.5 px-4 py-2 text-xs bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 rounded-lg font-medium transition-colors border border-zinc-700 hover:border-zinc-600 disabled:bg-zinc-700 disabled:cursor-not-allowed disabled:text-zinc-400 disabled:border-zinc-600"
             >
