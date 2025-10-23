@@ -57,6 +57,12 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
   const [isEditDropdownOpen, setIsEditDropdownOpen] = useState(false);
   const [editDropdownRef, setEditDropdownRef] = useState<HTMLDivElement | null>(null);
 
+  // Input type dropdown state
+  const [isInputTypeDropdownOpen, setIsInputTypeDropdownOpen] = useState(false);
+  const [inputTypeDropdownRef, setInputTypeDropdownRef] = useState<HTMLDivElement | null>(null);
+  const [isInputTypeManuallySet, setIsInputTypeManuallySet] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState<'bottom' | 'top'>('bottom');
+
   // Predefined action texts
   const actionTexts = {
     analyze: 'Analyze this content and provide insights',
@@ -79,21 +85,39 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
       if (editDropdownRef && !editDropdownRef.contains(event.target as Node)) {
         setIsEditDropdownOpen(false);
       }
+      if (inputTypeDropdownRef && !inputTypeDropdownRef.contains(event.target as Node)) {
+        setIsInputTypeDropdownOpen(false);
+      }
     };
 
-    if (isEditDropdownOpen) {
+    if (isEditDropdownOpen || isInputTypeDropdownOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isEditDropdownOpen, editDropdownRef]);
+  }, [isEditDropdownOpen, editDropdownRef, isInputTypeDropdownOpen, inputTypeDropdownRef]);
 
-  // Update input type when contentTabs change
+  // Update input type when contentTabs change (only if not manually set)
   useEffect(() => {
-    setInputType(getNextInputType(contentTabs));
-  }, [contentTabs]);
+    if (!isInputTypeManuallySet) {
+      setInputType(getNextInputType(contentTabs));
+    }
+  }, [contentTabs, isInputTypeManuallySet]);
+
+  // Prevent body scroll when dropdown is open
+  useEffect(() => {
+    if (isInputTypeDropdownOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isInputTypeDropdownOpen]);
 
   // Add content to tabs when Enter is pressed
   const handleAddContentToTabs = async (
@@ -148,6 +172,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
 
       setCurrentInput('');
       setValidationErrors((prev) => ({ ...prev, url: undefined }));
+      setIsInputTypeManuallySet(false); // Reset manual flag after adding content
     } catch (error) {
       console.error('Failed to add content to tabs:', error);
       if (type === 'url') {
@@ -186,6 +211,29 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     // Handle edit actions here
     console.log('Edit action:', action);
     setIsEditDropdownOpen(false);
+  };
+
+  // Input type dropdown handlers
+  const toggleInputTypeDropdown = () => {
+    if (!isInputTypeDropdownOpen && inputTypeDropdownRef) {
+      // Calculate position before opening
+      const rect = inputTypeDropdownRef.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const dropdownHeight = 200; // Approximate height of dropdown
+
+      if (rect.bottom + dropdownHeight > viewportHeight - 50) {
+        setDropdownPosition('top');
+      } else {
+        setDropdownPosition('bottom');
+      }
+    }
+    setIsInputTypeDropdownOpen(!isInputTypeDropdownOpen);
+  };
+
+  const handleInputTypeSelect = (type: 'url' | 'description' | 'prompt') => {
+    setInputType(type);
+    setIsInputTypeManuallySet(true);
+    setIsInputTypeDropdownOpen(false);
   };
 
   // Action button handlers
@@ -354,10 +402,63 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
         <div className="bg-zinc-800 rounded-2xl p-4 space-y-3">
           {/* Content Input */}
           <div className="relative">
-            <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-              {inputType === 'url' && (
+            {/* Input Type Selector */}
+            <div
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10"
+              ref={setInputTypeDropdownRef}
+            >
+              <button
+                type="button"
+                onClick={toggleInputTypeDropdown}
+                className="flex items-center gap-2 p-1 hover:bg-zinc-700 rounded transition-colors"
+              >
+                {inputType === 'url' && (
+                  <svg
+                    className="w-5 h-5 text-zinc-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                    />
+                  </svg>
+                )}
+                {inputType === 'description' && (
+                  <svg
+                    className="w-5 h-5 text-blue-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                )}
+                {inputType === 'prompt' && (
+                  <svg
+                    className="w-5 h-5 text-purple-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                    />
+                  </svg>
+                )}
                 <svg
-                  className="w-5 h-5 text-zinc-400"
+                  className="w-3 h-3 text-zinc-500"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -366,39 +467,98 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                    d="M19 9l-7 7-7-7"
                   />
                 </svg>
-              )}
-              {inputType === 'description' && (
-                <svg
-                  className="w-5 h-5 text-blue-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+              </button>
+
+              {/* Input Type Dropdown */}
+              {isInputTypeDropdownOpen && (
+                <div
+                  className={`absolute left-0 w-48 bg-zinc-800 border border-zinc-600 rounded-lg shadow-lg z-[9999] ${
+                    dropdownPosition === 'top' ? 'bottom-full mb-1' : 'top-full mt-1'
+                  }`}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
-              )}
-              {inputType === 'prompt' && (
-                <svg
-                  className="w-5 h-5 text-purple-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                  />
-                </svg>
+                  <div className="py-1">
+                    {/* URL Option */}
+                    <button
+                      type="button"
+                      onClick={() => handleInputTypeSelect('url')}
+                      className={`flex items-center gap-3 w-full px-4 py-2 text-sm transition-colors ${
+                        inputType === 'url'
+                          ? 'text-white bg-zinc-700'
+                          : 'text-zinc-300 hover:text-white hover:bg-zinc-700'
+                      }`}
+                    >
+                      <svg
+                        className="w-4 h-4 text-zinc-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                        />
+                      </svg>
+                      <span>URL</span>
+                    </button>
+
+                    {/* Description Option */}
+                    <button
+                      type="button"
+                      onClick={() => handleInputTypeSelect('description')}
+                      className={`flex items-center gap-3 w-full px-4 py-2 text-sm transition-colors ${
+                        inputType === 'description'
+                          ? 'text-white bg-zinc-700'
+                          : 'text-zinc-300 hover:text-white hover:bg-zinc-700'
+                      }`}
+                    >
+                      <svg
+                        className="w-4 h-4 text-blue-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        />
+                      </svg>
+                      <span>Description</span>
+                    </button>
+
+                    {/* Prompt Option */}
+                    <button
+                      type="button"
+                      onClick={() => handleInputTypeSelect('prompt')}
+                      className={`flex items-center gap-3 w-full px-4 py-2 text-sm transition-colors ${
+                        inputType === 'prompt'
+                          ? 'text-white bg-zinc-700'
+                          : 'text-zinc-300 hover:text-white hover:bg-zinc-700'
+                      }`}
+                    >
+                      <svg
+                        className="w-4 h-4 text-purple-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                        />
+                      </svg>
+                      <span>AI Prompt</span>
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
             <input
@@ -412,7 +572,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
                   await handleAddContentToTabs(currentInput, inputType);
                 }
               }}
-              className={`w-full pl-12 pr-4 py-3 bg-transparent text-white placeholder-zinc-400 focus:outline-none text-lg ${
+              className={`w-full pl-16 pr-4 py-3 bg-transparent text-white placeholder-zinc-400 focus:outline-none text-lg ${
                 validationErrors.url ? 'text-red-400' : ''
               }`}
               placeholder={
@@ -674,7 +834,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 text-black"
+                  className="w-4 h-4 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
