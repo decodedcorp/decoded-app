@@ -17,6 +17,7 @@ export interface ContentUploadFormData {
 
   // 링크 콘텐츠용
   url?: string;
+  prompt?: string;
 
   // 파일 업로드용
   file?: File;
@@ -50,7 +51,7 @@ interface ContentUploadState {
   resetForm: () => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
-  
+
   // AI 생성 관련 액션
   startGeneration: () => void;
   updateGenerationProgress: (progress: number) => void;

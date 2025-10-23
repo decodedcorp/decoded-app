@@ -290,6 +290,24 @@
       "description": "Description",
       "optional": "(Optional)",
       "addDescription": "Add a description for your content...",
+      "promptLabel": "AI Prompting (Optional)",
+      "promptPlaceholder": "How would you like AI to analyze this link?",
+      "promptHelp": "e.g., Summarize key points in 3 bullets, Focus on technical content, Extract business insights",
+      "promptTemplates": {
+        "selectTemplate": "Select a template or enter your own",
+        "summarize": "Summarize",
+        "summarizePrompt": "Please summarize the key points of this link in 3 main bullets.",
+        "technical": "Technical",
+        "technicalPrompt": "Please analyze focusing on technical details and implementation methods.",
+        "business": "Business",
+        "businessPrompt": "Please extract key business insights from this content.",
+        "custom": "Custom"
+      },
+      "sections": {
+        "linkInput": "Link Input",
+        "descriptionInput": "Add Description",
+        "aiAnalysis": "AI Analysis Settings"
+      },
       "fileFormats": "JPG, PNG, WebP, GIF up to 10MB",
       "footer": {
         "cancel": "Cancel",

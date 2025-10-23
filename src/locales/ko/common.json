@@ -290,6 +290,24 @@
       "description": "설명",
       "optional": "(선택사항)",
       "addDescription": "콘텐츠에 대한 설명을 추가하세요...",
+      "promptLabel": "AI 프롬프팅 (선택사항)",
+      "promptPlaceholder": "AI가 이 링크를 어떻게 분석하길 원하시나요?",
+      "promptHelp": "예: 주요 논점 3개로 요약, 기술적 내용 중심 분석, 비즈니스 인사이트 추출",
+      "promptTemplates": {
+        "selectTemplate": "템플릿을 선택하거나 직접 입력하세요",
+        "summarize": "요약",
+        "summarizePrompt": "이 링크의 핵심 내용을 3개의 주요 포인트로 요약해주세요.",
+        "technical": "기술 분석",
+        "technicalPrompt": "기술적인 내용과 구현 방법을 중심으로 분석해주세요.",
+        "business": "비즈니스",
+        "businessPrompt": "비즈니스 관점에서 핵심 인사이트를 추출해주세요.",
+        "custom": "직접 입력"
+      },
+      "sections": {
+        "linkInput": "링크 입력",
+        "descriptionInput": "설명 추가",
+        "aiAnalysis": "AI 분석 설정"
+      },
       "fileFormats": "JPG, PNG, WebP, GIF 최대 10MB",
       "footer": {
         "cancel": "취소",

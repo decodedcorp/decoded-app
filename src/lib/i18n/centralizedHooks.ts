@@ -305,6 +305,24 @@ type CommonTranslations = {
       description: () => string;
       optional: () => string;
       addDescription: () => string;
+      promptLabel: () => string;
+      promptPlaceholder: () => string;
+      promptHelp: () => string;
+      promptTemplates: {
+        selectTemplate: () => string;
+        summarize: () => string;
+        summarizePrompt: () => string;
+        technical: () => string;
+        technicalPrompt: () => string;
+        business: () => string;
+        businessPrompt: () => string;
+        custom: () => string;
+      };
+      sections: {
+        linkInput: () => string;
+        descriptionInput: () => string;
+        aiAnalysis: () => string;
+      };
       fileFormats: () => string;
       footer: {
         cancel: () => string;
@@ -932,6 +950,28 @@ export const useCommonTranslation = (): CommonTranslations => {
         description: () => t('globalContentUpload.contentUpload.description'),
         optional: () => t('globalContentUpload.contentUpload.optional'),
         addDescription: () => t('globalContentUpload.contentUpload.addDescription'),
+        promptLabel: () => t('globalContentUpload.contentUpload.promptLabel'),
+        promptPlaceholder: () => t('globalContentUpload.contentUpload.promptPlaceholder'),
+        promptHelp: () => t('globalContentUpload.contentUpload.promptHelp'),
+        promptTemplates: {
+          selectTemplate: () =>
+            t('globalContentUpload.contentUpload.promptTemplates.selectTemplate'),
+          summarize: () => t('globalContentUpload.contentUpload.promptTemplates.summarize'),
+          summarizePrompt: () =>
+            t('globalContentUpload.contentUpload.promptTemplates.summarizePrompt'),
+          technical: () => t('globalContentUpload.contentUpload.promptTemplates.technical'),
+          technicalPrompt: () =>
+            t('globalContentUpload.contentUpload.promptTemplates.technicalPrompt'),
+          business: () => t('globalContentUpload.contentUpload.promptTemplates.business'),
+          businessPrompt: () =>
+            t('globalContentUpload.contentUpload.promptTemplates.businessPrompt'),
+          custom: () => t('globalContentUpload.contentUpload.promptTemplates.custom'),
+        },
+        sections: {
+          linkInput: () => t('globalContentUpload.contentUpload.sections.linkInput'),
+          descriptionInput: () => t('globalContentUpload.contentUpload.sections.descriptionInput'),
+          aiAnalysis: () => t('globalContentUpload.contentUpload.sections.aiAnalysis'),
+        },
         fileFormats: () => t('globalContentUpload.contentUpload.fileFormats'),
         footer: {
           cancel: () => t('globalContentUpload.contentUpload.footer.cancel'),

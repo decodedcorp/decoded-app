@@ -35,6 +35,8 @@ export const useCreateLinkContent = () => {
         channel_id: data.channel_id,
         url: data.url?.trim(),
         description: data.description?.trim() || null,
+        // TODO: Add prompt field when backend API supports it
+        // prompt: data.prompt?.trim() || null,
       };
 
       // 필수 필드 검증

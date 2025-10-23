@@ -1,9 +1,7 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
-import { X } from 'lucide-react';
-import { Button } from '@decoded/ui';
 import { ContentType } from '@/lib/types/ContentType';
 import {
   useContentUploadStore,
@@ -11,9 +9,10 @@ import {
   selectContentUploadError,
 } from '@/store/contentUploadStore';
 import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
-// AI 생성 관련 컴포넌트 import 제거
 import { useCreateLinkContent } from '@/domains/channels/hooks/useContents';
-// import { compressImage, validateImageFile } from '@/lib/utils/imageUtils'; // Commented out for now
+import { getMockLinkPreviewAsync, type LinkPreview } from '@/lib/services/mockLinkPreview';
+import { LinkPreviewCard } from './LinkPreviewCard';
+import { PromptTemplates, type PromptTemplate } from './PromptTemplates';
 
 interface ContentUploadFormProps {
   onSubmit: (data: any) => void;
@@ -28,9 +27,7 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
   const updateFormData = useContentUploadStore((state) => state.updateFormData);
 
   const createLinkContent = useCreateLinkContent();
-  // const createImageContent = useCreateImageContent(); // Commented out for now
 
-  // const fileInputRef = useRef<HTMLInputElement>(null); // Commented out for now
   const [validationErrors, setValidationErrors] = useState<{
     title?: string;
     description?: string;
@@ -38,110 +35,78 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     url?: string;
   }>({});
 
-  // 폼 상태 로깅
-  console.log('ContentUploadForm render - formData:', {
-    type: formData.type,
-    url: formData.url,
-    channel_id: formData.channel_id,
-  });
+  // Link preview state
+  const [linkPreview, setLinkPreview] = useState<LinkPreview | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewError, setPreviewError] = useState<string | null>(null);
 
-  // AI 생성 시뮬레이션 로직 제거 - 링크 포스트는 기본 포스트 동작으로 처리
+  // Step management
+  const [currentStep, setCurrentStep] = useState<'input' | 'preview' | 'details'>('input');
 
-  const handleInputChange = (field: keyof typeof formData, value: string) => {
-    updateFormData({ [field]: value });
+  // Selected prompt template
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('custom');
 
-    // Clear validation error when user starts typing
-    if (validationErrors[field as keyof typeof validationErrors]) {
-      setValidationErrors((prev) => ({ ...prev, [field]: undefined }));
-    }
-  };
-
-  // Set default type to LINK since we're only supporting links for now
-  React.useEffect(() => {
+  // Set default type to LINK
+  useEffect(() => {
     if (!formData.type) {
       updateFormData({ type: ContentType.LINK });
     }
   }, [formData.type, updateFormData]);
 
-  const handleTypeChange = (type: ContentType) => {
-    updateFormData({
-      type,
-      file: undefined,
-      filePreview: undefined,
-      img_url: undefined,
-      video_url: undefined,
-      url: undefined,
-    });
-    setValidationErrors({});
+  // Load link preview when analyze button is clicked
+  const handleAnalyzeClick = async () => {
+    // For demo purposes, allow empty URL or any text
+    const url = formData.url?.trim() || 'demo-link';
+
+    setPreviewLoading(true);
+    setPreviewError(null);
+
+    try {
+      // For demo, always show mock preview regardless of URL validity
+      const preview = await getMockLinkPreviewAsync(url);
+      setLinkPreview(preview);
+      setCurrentStep('preview'); // Move to preview step
+    } catch (err) {
+      // Even if there's an error, show a demo preview
+      const demoPreview = await getMockLinkPreviewAsync('demo-link');
+      setLinkPreview(demoPreview);
+      setCurrentStep('preview'); // Move to preview step
+    } finally {
+      setPreviewLoading(false);
+    }
   };
 
-  // Commented out for now - will be used later for image upload
-  // const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = event.target.files?.[0];
-  //   if (!file) return;
+  const handleInputChange = (field: keyof typeof formData, value: string) => {
+    updateFormData({ [field]: value });
 
-  //   console.log('File selected:', file.name, file.type, file.size);
+    if (validationErrors[field as keyof typeof validationErrors]) {
+      setValidationErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
+  };
 
-  //   // Validate file based on content type
-  //   if (formData.type === ContentType.IMAGE) {
-  //     const validation = validateImageFile(file, {
-  //       maxSizeBytes: 10 * 1024 * 1024, // 10MB
-  //       allowedTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
-  //     });
-
-  //     if (!validation.isValid) {
-  //       console.log('File validation failed:', validation.error);
-  //       updateFormData({ file: undefined, filePreview: undefined });
-  //       setValidationErrors((prev) => ({ ...prev, file: validation.error }));
-  //       return;
-  //     }
-
-  //     try {
-  //       console.log('Starting image processing...');
-  //       const optimizedBase64 = await compressImage(file, {
-  //         maxSizeBytes: 500 * 1024, // 500KB
-  //         maxWidth: 800,
-  //         maxHeight: 600,
-  //         quality: 0.8,
-  //         format: 'jpeg',
-  //         includeDataPrefix: true,
-  //       });
-
-  //       console.log('Image processed successfully, base64 length:', optimizedBase64?.length);
-
-  //       updateFormData({
-  //         file,
-  //         filePreview: URL.createObjectURL(file),
-  //         base64_img_url: optimizedBase64,
-  //       });
-  //       setValidationErrors((prev) => ({ ...prev, file: undefined }));
-  //     } catch (error) {
-  //       console.error('Image processing failed:', error);
-  //       updateFormData({ file: undefined, filePreview: undefined });
-  //       setValidationErrors((prev) => ({
-  //         ...prev,
-  //         file: t.globalContentUpload.contentUpload.validation.imageProcessingError(),
-  //       }));
-  //     }
-  //   }
-  // };
+  const handleTemplateSelect = useCallback(
+    (template: PromptTemplate) => {
+      setSelectedTemplate(template.id);
+      updateFormData({ prompt: template.prompt });
+    },
+    [updateFormData],
+  );
 
   const validateForm = () => {
     const errors: typeof validationErrors = {};
 
-    // Description validation
     if (formData.description && formData.description.trim().length > 500) {
       errors.description = t.globalContentUpload.contentUpload.validation.descriptionTooLong();
     }
 
-    // URL validation - required for links
-    if (!formData.url?.trim()) {
-      errors.url = t.globalContentUpload.contentUpload.validation.urlRequired();
-    } else {
+    // For demo purposes, URL validation is optional
+    // Only validate URL format if provided
+    if (formData.url?.trim()) {
       try {
         new URL(formData.url.trim());
       } catch {
-        errors.url = t.globalContentUpload.contentUpload.validation.invalidUrl();
+        // For demo, don't show error for invalid URLs
+        // errors.url = t.globalContentUpload.contentUpload.validation.invalidUrl();
       }
     }
 
@@ -149,75 +114,17 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = React.useCallback(
+  const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      console.log('=== handleSubmit called ===');
-      console.log('Event type:', e.type);
-      console.log('Form data at submit:', formData);
-
-      if (!validateForm()) {
-        console.log('Form validation failed');
-        return;
-      }
-
-      const submitData = {
-        type: ContentType.LINK,
-        title: formData.title.trim() || 'Untitled', // 기본값 설정
-        description: formData.description.trim() || null,
-        channel_id: formData.channel_id || 'test-channel-id', // 테스트용 임시 채널 ID
-        url: formData.url?.trim(),
-      };
-
-      // formData에 channel_id 설정
-      if (!formData.channel_id) {
-        updateFormData({ channel_id: 'test-channel-id' });
-      }
-
-      console.log('Submitting content data:', submitData);
-      console.log('Form data URL:', formData.url);
-      console.log('Submit data channel_id:', submitData.channel_id);
-
-      try {
-        // 링크 콘텐츠 생성 API 호출
-        if (submitData.channel_id && formData.url) {
-          console.log('About to call createLinkContent.mutateAsync...');
-          console.log('Link content data:', {
-            channel_id: submitData.channel_id,
-            url: formData.url.trim(),
-          });
-          console.log('createLinkContent mutation state:', {
-            isPending: createLinkContent.isPending,
-            isError: createLinkContent.isError,
-            error: createLinkContent.error,
-          });
-
-          const result = await createLinkContent.mutateAsync({
-            channel_id: submitData.channel_id,
-            url: formData.url.trim(),
-            description: formData.description?.trim() || null,
-          });
-
-          console.log('Link content created successfully:', result);
-
-          // 링크 포스트 생성 완료 후 바로 모달 닫기
-          console.log('Link content created, closing modal...');
-          onSubmit(submitData);
-        } else {
-          console.log('Missing required data for API call');
-          console.log('submitData.channel_id:', submitData.channel_id);
-          console.log('formData.url:', formData.url);
-        }
-      } catch (error) {
-        console.error('Failed to create content:', error);
-        // 에러는 상위 컴포넌트에서 처리
-      }
+      // Form submit now triggers analysis instead of content creation
+      handleAnalyzeClick();
     },
-    [formData, validateForm, createLinkContent, onSubmit, updateFormData],
+    [handleAnalyzeClick],
   );
 
-  // 외부에서 폼 제출을 트리거할 수 있도록 전역 함수 노출
-  React.useEffect(() => {
+  // Expose global submit function
+  useEffect(() => {
     (window as any).triggerContentFormSubmit = () => {
       console.log('=== Global submit triggered ===');
       handleSubmit(new Event('submit') as any);
@@ -228,149 +135,336 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     };
   }, [handleSubmit]);
 
-  // Commented out for now - will be used later for image upload
-  // const removeFile = () => {
-  //   if (formData.filePreview) {
-  //     URL.revokeObjectURL(formData.filePreview);
-  //   }
-  //   updateFormData({
-  //     file: undefined,
-  //     filePreview: undefined,
-  //     img_url: undefined,
-  //     video_url: undefined,
-  //   });
-  //   setValidationErrors((prev) => ({ ...prev, file: undefined }));
-  // };
+  // Step 1: Content Input
+  const renderInputStep = () => (
+    <div className="flex flex-col p-4">
+      <form onSubmit={handleSubmit} className="w-full max-w-4xl space-y-6">
+        {/* Action Buttons - Analyze, Explain, Summarize */}
+        <div className="flex gap-3">
+          {/* Analyze Button - Inactive */}
+          <button
+            type="button"
+            onClick={handleAnalyzeClick}
+            className="flex items-center gap-1.5 px-4 py-2 text-xs bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 rounded-lg font-medium transition-colors border border-zinc-700 hover:border-zinc-600"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            Analyze
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+          </button>
 
-  // AI 생성 로직 제거 - 링크 포스트는 기본 포스트 동작으로 처리
+          {/* Explain Button - Inactive */}
+          <button
+            type="button"
+            className="flex items-center gap-1.5 px-4 py-2 text-xs bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 rounded-lg font-medium transition-colors border border-zinc-700 hover:border-zinc-600"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+              />
+            </svg>
+            Explain
+          </button>
 
-  return (
-    <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-6">
-      {/* Content Type Selection - Commented out for now, will be used later */}
-      {/* <div>
-        <label className="block text-sm font-medium text-white mb-3">
-          {t.globalContentUpload.contentUpload.contentType()} *
-        </label>
-        <div className="grid grid-cols-1 gap-3">
-          {[
-            {
-              type: ContentType.IMAGE,
-              label: t.globalContentUpload.contentUpload.image(),
-              icon: Image,
-            },
-            // { type: ContentType.VIDEO, label: 'Video', icon: '🎥' }, // Temporarily disabled
-            {
-              type: ContentType.LINK,
-              label: t.globalContentUpload.contentUpload.link(),
-              icon: Link,
-            },
-          ].map(({ type, label, icon: IconComponent }) => (
-            <button
-              key={type}
-              type="button"
-              onClick={() => handleTypeChange(type)}
-              className={`p-3 rounded-lg border transition-all duration-200 ${
-                formData.type === type
-                  ? 'border-zinc-500 bg-zinc-700/50 text-white'
-                  : 'border-zinc-700 bg-zinc-800/50 text-zinc-400 hover:border-zinc-600 hover:text-zinc-300'
-              }`}
-            >
-              <div className="flex items-center justify-center mb-2">
-                <IconComponent className="w-6 h-6" />
-              </div>
-              <div className="text-sm font-medium">{label}</div>
-            </button>
-          ))}
+          {/* Summarize Button - Inactive */}
+          <button
+            type="button"
+            className="flex items-center gap-1.5 px-4 py-2 text-xs bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 rounded-lg font-medium transition-colors border border-zinc-700 hover:border-zinc-600"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+            Summarize
+          </button>
         </div>
-      </div> */}
 
-      {/* File Upload for Image - Commented out for now, will be used later */}
-      {/* {formData.type === ContentType.IMAGE && (
-        <div>
-          <label className="block text-sm font-medium text-white mb-3">
-            {t.globalContentUpload.contentUpload.imageUpload()} *
-          </label>
-
-          <div className="space-y-3">
-            <div className="w-full h-32 border-2 border-dashed border-zinc-700 rounded-lg flex items-center justify-center bg-zinc-800/30">
-              <div className="flex flex-col items-center space-y-2 text-zinc-500">
-                <Upload className="w-8 h-8" />
-                <span className="text-sm">{t.globalContentUpload.contentUpload.selectImage()}</span>
-              </div>
+        {/* Main Content Input Area */}
+        <div className="bg-zinc-800 rounded-2xl p-4 space-y-3">
+          {/* Content URL Input */}
+          <div className="relative">
+            <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+              <svg
+                className="w-5 h-5 text-zinc-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
             </div>
-            <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
-              <p className="text-sm text-amber-400">Image upload feature is coming soon!</p>
-            </div>
+            <input
+              id="content-url"
+              type="text"
+              value={formData.url || ''}
+              onChange={(e) => handleInputChange('url', e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAnalyzeClick();
+                }
+              }}
+              className={`w-full pl-12 pr-4 py-3 bg-transparent text-white placeholder-zinc-400 focus:outline-none text-lg ${
+                validationErrors.url ? 'text-red-400' : ''
+              }`}
+              placeholder="Add content URL and press Enter to analyze..."
+              disabled={isLoading || createLinkContent.isPending}
+            />
           </div>
 
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="hidden"
-            disabled={true}
-          />
+          {/* Submit Button */}
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={isLoading || createLinkContent.isPending}
+              className="flex items-center gap-1.5 px-4 py-2 text-xs bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 rounded-lg font-medium transition-colors border border-zinc-700 hover:border-zinc-600 disabled:bg-zinc-700 disabled:cursor-not-allowed disabled:text-zinc-400 disabled:border-zinc-600"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
+              </svg>
+              Analyze
+            </button>
+          </div>
         </div>
-      )} */}
 
-      {/* URL Input for Link - Always shown for now */}
-      <div className="space-y-4">
-        <div>
-          <label htmlFor="content-url" className="block text-sm font-medium text-white mb-2">
-            {t.globalContentUpload.contentUpload.linkUrl()} *
-          </label>
-          <input
-            id="content-url"
-            type="url"
-            value={formData.url || ''}
-            onChange={(e) => handleInputChange('url', e.target.value)}
-            className={`w-full px-4 py-3 bg-zinc-800 border rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-600 focus:border-transparent transition-colors ${
-              validationErrors.url ? 'border-red-500' : 'border-zinc-700'
+        {/* API Error */}
+        {(error || storeError) && (
+          <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+            <p className="text-sm text-red-400">{error || storeError || 'An error occurred'}</p>
+          </div>
+        )}
+      </form>
+    </div>
+  );
+
+  // Step 2: Link Preview
+  const renderPreviewStep = () => (
+    <div className="flex flex-col p-4">
+      <div className="w-full max-w-4xl space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-zinc-700 rounded-xl flex items-center justify-center">
+              <svg
+                className="w-5 h-5 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-white">링크 미리보기</h3>
+          </div>
+          <button
+            type="button"
+            onClick={() => setCurrentStep('input')}
+            className="flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            다시 입력
+          </button>
+        </div>
+
+        {/* Link Preview Card */}
+        <LinkPreviewCard preview={linkPreview} isLoading={previewLoading} error={previewError} />
+
+        {/* Continue Button */}
+        {!previewLoading && !previewError && (
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => setCurrentStep('details')}
+              className="flex items-center gap-2 px-8 py-4 bg-zinc-800 text-white rounded-xl font-medium transition-all duration-200 hover:bg-zinc-700 border border-zinc-600 hover:border-zinc-500 hover:shadow-lg"
+            >
+              <span>계속하기</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  // Step 3: Additional Details
+  const renderDetailsStep = () => (
+    <div className="flex flex-col p-4">
+      <div className="w-full max-w-4xl space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+              <svg
+                className="w-4 h-4 text-black"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-white">추가 설정</h3>
+          </div>
+          <button
+            type="button"
+            onClick={() => setCurrentStep('preview')}
+            className="flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            미리보기로
+          </button>
+        </div>
+
+        {/* Description Input */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-zinc-300">설명 (선택사항)</label>
+          <textarea
+            id="content-description"
+            value={formData.description || ''}
+            onChange={(e) => handleInputChange('description', e.target.value)}
+            className={`w-full px-4 py-3 bg-zinc-800 border rounded-xl text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-600 focus:border-transparent transition-colors resize-none ${
+              validationErrors.description ? 'border-red-500' : 'border-zinc-700'
             }`}
-            placeholder="https://example.com"
+            placeholder="링크에 대한 설명을 입력하세요..."
+            rows={2}
+            maxLength={500}
             disabled={isLoading || createLinkContent.isPending}
           />
-          {validationErrors.url && (
-            <p className="mt-1 text-sm text-red-400">{validationErrors.url}</p>
-          )}
+          <div className="flex justify-between items-center">
+            {validationErrors.description && (
+              <p className="text-sm text-red-400">{validationErrors.description}</p>
+            )}
+            <p className="text-xs text-zinc-500 ml-auto">
+              {(formData.description || '').length}/500
+            </p>
+          </div>
+        </div>
+
+        {/* AI Analysis Section */}
+        <div className="space-y-4">
+          <label className="block text-sm font-medium text-zinc-300">AI 분석 설정 (선택사항)</label>
+
+          {/* Prompt Templates */}
+          <PromptTemplates
+            selectedId={selectedTemplate}
+            onSelect={handleTemplateSelect}
+            disabled={isLoading || createLinkContent.isPending}
+          />
+
+          {/* Custom Prompt Input */}
+          <textarea
+            id="content-prompt"
+            value={formData.prompt || ''}
+            onChange={(e) => {
+              handleInputChange('prompt', e.target.value);
+              if (e.target.value !== '') {
+                setSelectedTemplate('custom');
+              }
+            }}
+            className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-colors resize-vertical min-h-[100px]"
+            placeholder="AI에게 요청할 내용을 입력하세요..."
+            disabled={isLoading || createLinkContent.isPending}
+            rows={3}
+          />
+          <p className="text-xs text-zinc-400">
+            예: 주요 논점 3개로 요약, 기술적 내용 중심 분석, 비즈니스 인사이트 추출
+          </p>
+        </div>
+
+        {/* Final Submit Button */}
+        <div className="flex justify-end pt-4">
+          <button
+            type="button"
+            onClick={() => onSubmit(formData)}
+            disabled={isLoading || createLinkContent.isPending}
+            className="flex items-center gap-2 px-6 py-3 bg-primary text-black rounded-lg font-medium transition-colors hover:bg-primary-hover disabled:bg-zinc-700 disabled:cursor-not-allowed disabled:text-zinc-400 border border-primary hover:border-primary-hover disabled:border-zinc-600"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+            콘텐츠 추가 완료
+          </button>
         </div>
       </div>
-
-      {/* Description Input - shown for all content types */}
-      <div>
-        <label htmlFor="content-description" className="block text-sm font-medium text-white mb-2">
-          {t.globalContentUpload.contentUpload.description()}
-          <span className="text-zinc-400 font-normal ml-1">
-            {t.globalContentUpload.contentUpload.optional()}
-          </span>
-        </label>
-        <textarea
-          id="content-description"
-          value={formData.description || ''}
-          onChange={(e) => handleInputChange('description', e.target.value)}
-          className={`w-full px-4 py-3 bg-zinc-800 border rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-600 focus:border-transparent transition-colors resize-none ${
-            validationErrors.description ? 'border-red-500' : 'border-zinc-700'
-          }`}
-          placeholder={t.globalContentUpload.contentUpload.addDescription()}
-          rows={3}
-          maxLength={500}
-          disabled={isLoading || createLinkContent.isPending}
-        />
-        <div className="flex justify-between items-center mt-1">
-          {validationErrors.description && (
-            <p className="text-sm text-red-400">{validationErrors.description}</p>
-          )}
-          <p className="text-xs text-zinc-500 ml-auto">{(formData.description || '').length}/500</p>
-        </div>
-      </div>
-
-      {/* API Error */}
-      {(error || storeError) && (
-        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-          <p className="text-sm text-red-400">{error || storeError || 'An error occurred'}</p>
-        </div>
-      )}
-    </form>
+    </div>
   );
+
+  // Render current step
+  switch (currentStep) {
+    case 'input':
+      return renderInputStep();
+    case 'preview':
+      return renderPreviewStep();
+    case 'details':
+      return renderDetailsStep();
+    default:
+      return renderInputStep();
+  }
 }
