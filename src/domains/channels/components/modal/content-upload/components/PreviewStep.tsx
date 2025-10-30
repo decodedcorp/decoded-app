@@ -1,0 +1,177 @@
+import React from 'react';
+import { ContentTab } from '../utils/contentHelpers';
+import { LinkPreviewCard } from '../LinkPreviewCard';
+import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
+import { AnalysisResult } from '../types/analysis';
+
+interface PreviewStepProps {
+  contentTabs: ContentTab[];
+  onBackToInput: () => void;
+  analysisResult?: AnalysisResult | null;
+}
+
+export function PreviewStep({ contentTabs, onBackToInput, analysisResult }: PreviewStepProps) {
+  const t = useCommonTranslation();
+
+  // If no content in tabs, go back to input step
+  if (contentTabs.length === 0) {
+    return null;
+  }
+
+  const urlTab = contentTabs.find((tab) => tab.type === 'url');
+  // Show only one prompt in preview: pick the most recently added
+  const promptTab = [...contentTabs].reverse().find((tab) => tab.type === 'prompt');
+
+  return (
+    <div className="flex flex-col p-4">
+      <div className="w-full max-w-4xl space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+              <svg
+                className="w-4 h-4 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-white">
+              {t.globalContentUpload.contentUpload.previewStep.title()}
+            </h3>
+          </div>
+        </div>
+
+        {/* Link Preview Card */}
+        {urlTab && urlTab.preview && (
+          <div className="flex justify-center">
+            <LinkPreviewCard preview={urlTab.preview} isLoading={false} error={null} />
+          </div>
+        )}
+
+        {/* Content Summary */}
+        <div className="bg-zinc-800 rounded-2xl p-4 space-y-4">
+          <h4 className="text-md font-semibold text-white">
+            {t.globalContentUpload.contentUpload.previewStep.contentSummary()}
+          </h4>
+
+          {/* URL Tab */}
+          {urlTab && (
+            <div className="flex items-center gap-2 px-3 py-2 bg-zinc-700 rounded-lg">
+              <img
+                src={urlTab.preview?.favicon}
+                alt={`${urlTab.preview?.domain} favicon`}
+                className="w-4 h-4 rounded"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+              <span
+                className="text-sm text-zinc-300 font-medium max-w-48 truncate"
+                title={urlTab.content}
+              >
+                {urlTab.content}
+              </span>
+            </div>
+          )}
+
+          {/* Description removed: input types limited to url and prompt */}
+
+          {/* Prompt Tab */}
+          {promptTab && (
+            <div className="flex items-center gap-2 px-3 py-2 bg-zinc-700 rounded-lg">
+              <svg
+                className="w-4 h-4 text-purple-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                />
+              </svg>
+              <span
+                className="text-sm text-zinc-300 font-medium max-w-48 truncate"
+                title={promptTab.content}
+              >
+                {promptTab.content}
+              </span>
+            </div>
+          )}
+
+          {/* Analysis Result */}
+          {analysisResult && (
+            <div className="mt-2 space-y-3">
+              <div>
+                <div className="text-sm text-zinc-400 mb-1">AI Summary</div>
+                <div className="text-sm text-zinc-200">{analysisResult.summary}</div>
+              </div>
+              {analysisResult.keyPoints?.length > 0 && (
+                <div>
+                  <div className="text-sm text-zinc-400 mb-1">Key Points</div>
+                  <ul className="list-disc list-inside space-y-1 text-sm text-zinc-200">
+                    {analysisResult.keyPoints.map((p, i) => (
+                      <li key={i}>{p}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {analysisResult.keywords?.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {analysisResult.keywords.map((k, i) => (
+                    <span
+                      key={i}
+                      className="px-2 py-0.5 rounded bg-zinc-700 text-xs text-zinc-200 border border-zinc-600"
+                    >
+                      {k}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {analysisResult.estimatedReadingTime && (
+                <div className="text-xs text-zinc-400">
+                  Estimated reading time: {analysisResult.estimatedReadingTime}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={onBackToInput}
+            className="flex items-center gap-2 px-4 py-2 text-sm text-zinc-400 hover:text-white transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            {t.globalContentUpload.contentUpload.previewStep.editButton()}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
