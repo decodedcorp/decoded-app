@@ -320,6 +320,18 @@
         "urlRequired": "링크 URL을 입력해 주세요.",
         "invalidUrl": "올바른 URL 형식을 입력해 주세요.",
         "imageProcessingError": "이미지 처리 중 오류가 발생했습니다."
+      },
+      "inputStep": {
+        "urlPlaceholder": "콘텐츠 URL을 입력하고 Enter를 눌러 탭에 추가하세요...",
+        "descriptionPlaceholder": "설명을 입력하고 Enter를 눌러 탭에 추가하세요...",
+        "promptPlaceholder": "AI 프롬프트를 입력하고 Enter를 눌러 탭에 추가하세요...",
+        "skip": "건너뛰기",
+        "submit": "제출"
+      },
+      "previewStep": {
+        "title": "링크 미리보기",
+        "contentSummary": "추가된 콘텐츠",
+        "editButton": "수정하기"
       }
     },
     "addChannel": {

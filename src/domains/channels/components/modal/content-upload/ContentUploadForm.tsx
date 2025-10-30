@@ -1,9 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { createPortal } from 'react-dom';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 
-import { ContentType } from '@/lib/types/ContentType';
 import {
   useContentUploadStore,
   selectContentUploadFormData,
@@ -11,9 +9,26 @@ import {
 } from '@/store/contentUploadStore';
 import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
 import { useCreateLinkContent } from '@/domains/channels/hooks/useContents';
-import { getMockLinkPreviewAsync, type LinkPreview } from '@/lib/services/mockLinkPreview';
-import { LinkPreviewCard } from './LinkPreviewCard';
-import { PromptTemplates, type PromptTemplate } from './PromptTemplates';
+
+// Custom hooks
+import { useContentTabs } from './hooks/useContentTabs';
+import { useDropdowns } from './hooks/useDropdowns';
+import { usePromptActions } from './hooks/usePromptActions';
+import { useFormSteps } from './hooks/useFormSteps';
+
+// Components
+import { InputStep } from './components/InputStep';
+import { PreviewStep } from './components/PreviewStep';
+import { DetailsStep } from './components/DetailsStep';
+import { EditDropdown } from './components/EditDropdown';
+import { AddPromptModal } from './components/AddPromptModal';
+import { EditPromptModal } from './components/EditPromptModal';
+import { AnalysisInline } from './components/AnalysisInline';
+import { useMockAnalysis } from './hooks/useMockAnalysis';
+import { AnalysisResult } from './types/analysis';
+
+// Utils
+import { validateForm } from './utils/contentValidation';
 
 interface ContentUploadFormProps {
   onSubmit: (data: any) => void;
@@ -29,6 +44,47 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
 
   const createLinkContent = useCreateLinkContent();
 
+  // Custom hooks
+  const {
+    contentTabs,
+    currentInput,
+    setCurrentInput,
+    inputType,
+    setInputType,
+    isInputTypeManuallySet,
+    setIsInputTypeManuallySet,
+    handleAddContentToTabs,
+    handleRemoveContentTab,
+    getSuggestedInputType,
+  } = useContentTabs();
+
+  const {
+    isEditDropdownOpen,
+    setIsEditDropdownOpen,
+    editDropdownRef,
+    editDropdownStyle,
+    toggleEditDropdown,
+    isInputTypeDropdownOpen,
+    setIsInputTypeDropdownOpen,
+    inputTypeDropdownRef,
+    inputTypeDropdownPanelRef,
+    dropdownStyle,
+    toggleInputTypeDropdown,
+  } = useDropdowns();
+
+  const {
+    actionTexts,
+    isAddPromptModalOpen,
+    setIsAddPromptModalOpen,
+    newPromptAction,
+    setNewPromptAction,
+    handleAddPromptAction,
+    handleCloseAddPromptModal,
+    openAddPromptModal,
+  } = usePromptActions();
+
+  const { currentStep, setCurrentStep, selectedTemplate, setSelectedTemplate } = useFormSteps();
+
   const [validationErrors, setValidationErrors] = useState<{
     title?: string;
     description?: string;
@@ -36,328 +92,40 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     url?: string;
   }>({});
 
-  // Content tabs state (URL, description, prompt)
-  const [contentTabs, setContentTabs] = useState<
-    Array<{
-      id: string;
-      type: 'url' | 'description' | 'prompt';
-      content: string;
-      preview?: LinkPreview;
-    }>
-  >([]);
-  const [currentInput, setCurrentInput] = useState<string>('');
-  const [inputType, setInputType] = useState<'url' | 'description' | 'prompt'>('url');
+  const isEnterSubmittingRef = useRef(false);
 
-  // Step management
-  const [currentStep, setCurrentStep] = useState<'input' | 'preview' | 'details'>('input');
-
-  // Selected prompt template
-  const [selectedTemplate, setSelectedTemplate] = useState<string>('custom');
-
-  // Edit dropdown state
-  const [isEditDropdownOpen, setIsEditDropdownOpen] = useState(false);
-  const [editDropdownRef, setEditDropdownRef] = useState<HTMLDivElement | null>(null);
-  const [editDropdownStyle, setEditDropdownStyle] = useState<React.CSSProperties>({});
-
-  // Add prompt action modal state
-  const [isAddPromptModalOpen, setIsAddPromptModalOpen] = useState(false);
-  const [newPromptAction, setNewPromptAction] = useState({
-    emoji: '🤖',
-    title: '',
-    prompt: '',
+  // Analysis overlay state
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+  const [analysisInputs, setAnalysisInputs] = useState<{ url?: string; prompts: string[] }>({
+    prompts: [],
   });
+  const {
+    run: runMockAnalysis,
+    cancel: cancelMockAnalysis,
+    progress: analysisProgress,
+    isRunning: isAnalysisRunning,
+  } = useMockAnalysis();
 
-  // Input type dropdown state
-  const [isInputTypeDropdownOpen, setIsInputTypeDropdownOpen] = useState(false);
-  const [inputTypeDropdownRef, setInputTypeDropdownRef] = useState<HTMLDivElement | null>(null);
-  const [isInputTypeManuallySet, setIsInputTypeManuallySet] = useState(false);
-  const [dropdownPosition, setDropdownPosition] = useState<'bottom' | 'top'>('bottom');
-  const [dropdownRect, setDropdownRect] = useState<DOMRect | null>(null);
-  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
+  // Embedded modal portal target inside the content upload container
+  const modalLayerRef = useRef<HTMLDivElement | null>(null);
 
-  // Predefined action texts
-  const [actionTexts, setActionTexts] = useState({
-    analyze: 'Analyze this content and provide insights',
-    explain: 'Explain this content in detail',
-    summarize: 'Summarize this content concisely',
-    generate: 'Generate creative content based on this',
-    translate: 'Translate this content to Korean',
-  });
-
-  // Action button icons and display names
-  const actionConfig = {
-    analyze: { icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z', displayName: 'Analyze' },
-    explain: {
-      icon: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z',
-      displayName: 'Explain',
-    },
-    summarize: {
-      icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z M9 5l7 7-7 7',
-      displayName: 'Summarize',
-    },
-    generate: { icon: 'M13 10V3L4 14h7v7l9-11h-7z', displayName: 'Generate' },
-    translate: {
-      icon: 'M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129',
-      displayName: 'Translate',
-    },
-  };
-
-  // Set default type to LINK
-  useEffect(() => {
-    if (!formData.type) {
-      updateFormData({ type: ContentType.LINK });
-    }
-  }, [formData.type, updateFormData]);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (editDropdownRef && !editDropdownRef.contains(event.target as Node)) {
-        setIsEditDropdownOpen(false);
-      }
-      if (inputTypeDropdownRef && !inputTypeDropdownRef.contains(event.target as Node)) {
-        setIsInputTypeDropdownOpen(false);
-      }
-    };
-
-    if (isEditDropdownOpen || isInputTypeDropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isEditDropdownOpen, editDropdownRef, isInputTypeDropdownOpen, inputTypeDropdownRef]);
+  // Edit prompt modal state
+  const [isEditPromptModalOpen, setIsEditPromptModalOpen] = useState(false);
+  const [editPromptText, setEditPromptText] = useState('');
 
   // Update input type when contentTabs change (only if not manually set)
   useEffect(() => {
     if (!isInputTypeManuallySet) {
-      const nextType = getNextInputType(contentTabs);
+      const nextType = getSuggestedInputType();
       // Only change if the suggested type is different from current
       if (nextType !== inputType) {
         setInputType(nextType);
       }
     }
-  }, [contentTabs, isInputTypeManuallySet, inputType]);
-
-  // Prevent body scroll when dropdown is open
-  useEffect(() => {
-    if (isInputTypeDropdownOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isInputTypeDropdownOpen]);
-
-  // Add content to tabs when Enter is pressed
-  const handleAddContentToTabs = useCallback(
-    async (content: string, type: 'url' | 'description' | 'prompt') => {
-      console.log('=== handleAddContentToTabs called ===');
-      console.log('Content:', content);
-      console.log('Type:', type);
-
-      if (!content.trim()) {
-        console.log('Empty content, returning');
-        return;
-      }
-
-      // For URL type, validate format first
-      if (type === 'url') {
-        try {
-          new URL(content.trim().startsWith('http') ? content.trim() : `https://${content.trim()}`);
-        } catch {
-          setValidationErrors((prev) => ({ ...prev, url: '유효한 URL을 입력해주세요.' }));
-          return;
-        }
-      }
-
-      // Handle preview fetching
-      let preview: LinkPreview | undefined;
-      if (type === 'url') {
-        console.log('Fetching preview for URL');
-        try {
-          preview = await getMockLinkPreviewAsync(content.trim());
-          console.log('Preview fetched:', preview);
-        } catch (error) {
-          console.error('Failed to fetch preview:', error);
-          setValidationErrors((prev) => ({ ...prev, url: '링크 미리보기를 가져오지 못했습니다.' }));
-          return;
-        }
-      }
-
-      // Single setContentTabs call to handle both replacement and addition
-      setContentTabs((prev) => {
-        console.log('Current contentTabs in setState:', prev);
-
-        // Check if content of this type already exists
-        const existingTab = prev.find((tab) => tab.type === type);
-        console.log('Existing tab found:', existingTab);
-
-        if (existingTab) {
-          console.log('Replacing existing tab');
-          // Replace existing tab of the same type
-          const updated = prev.map((tab) =>
-            tab.type === type
-              ? {
-                  ...tab,
-                  content: content.trim(),
-                  preview: type === 'url' ? preview : undefined, // Use the fetched preview
-                }
-              : tab,
-          );
-          console.log('Updated tabs after replacement:', updated);
-          return updated;
-        }
-
-        // Create new tab
-        console.log('Creating new tab');
-        const newTab = {
-          id: Date.now().toString(),
-          type,
-          content: content.trim(),
-          preview,
-        };
-        console.log('New tab created:', newTab);
-
-        const updated = [...prev, newTab];
-        console.log('Added new tab, updated tabs:', updated);
-        return updated;
-      });
-
-      setCurrentInput('');
-      setValidationErrors((prev) => ({ ...prev, url: undefined }));
-      // Don't reset manual flag - let user keep their preferred input type
-    },
-    [], // Remove contentTabs from dependencies
-  );
-
-  // Determine next input type based on existing tabs
-  const getNextInputType = (tabs: typeof contentTabs): 'url' | 'description' | 'prompt' => {
-    const hasUrl = tabs.some((tab) => tab.type === 'url');
-    const hasDescription = tabs.some((tab) => tab.type === 'description');
-    const hasPrompt = tabs.some((tab) => tab.type === 'prompt');
-
-    // Only move to next type if current type is completed
-    if (!hasUrl) return 'url';
-    if (hasUrl && !hasDescription) return 'description';
-    if (hasUrl && hasDescription && !hasPrompt) return 'prompt';
-    return 'prompt'; // All exist, stay at prompt
-  };
-
-  // Remove content tab
-  const handleRemoveContentTab = (tabId: string) => {
-    setContentTabs((prev) => {
-      const filtered = prev.filter((tab) => tab.id !== tabId);
-      return filtered;
-    });
-  };
-
-  // Edit dropdown handlers
-  const toggleEditDropdown = () => {
-    if (!isEditDropdownOpen && editDropdownRef) {
-      // Calculate position before opening
-      const rect = editDropdownRef.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const dropdownHeight = 100; // Approximate height of dropdown
-
-      // Calculate dropdown position
-      const shouldOpenTop = rect.bottom + dropdownHeight > viewportHeight - 50;
-
-      // Calculate absolute position for portal
-      const dropdownStyle: React.CSSProperties = {
-        position: 'fixed',
-        right: window.innerWidth - rect.right,
-        width: 192, // w-48 = 12rem = 192px
-        zIndex: 9999,
-      };
-
-      if (shouldOpenTop) {
-        dropdownStyle.bottom = viewportHeight - rect.top + 4; // 4px margin
-      } else {
-        dropdownStyle.top = rect.bottom + 4; // 4px margin
-      }
-
-      setEditDropdownStyle(dropdownStyle);
-    }
-    setIsEditDropdownOpen(!isEditDropdownOpen);
-  };
-
-  const handleEditAction = (action: 'edit' | 'delete' | 'add-prompt') => {
-    console.log('Edit action:', action);
-    setIsEditDropdownOpen(false);
-
-    if (action === 'add-prompt') {
-      setIsAddPromptModalOpen(true);
-    }
-  };
-
-  // Add new prompt action
-  const handleAddPromptAction = () => {
-    if (newPromptAction.title && newPromptAction.prompt) {
-      const newKey = newPromptAction.title.toLowerCase().replace(/\s+/g, '-');
-      setActionTexts((prev) => ({
-        ...prev,
-        [newKey]: newPromptAction.prompt,
-      }));
-
-      // Reset form
-      setNewPromptAction({
-        emoji: '🤖',
-        title: '',
-        prompt: '',
-      });
-      setIsAddPromptModalOpen(false);
-    }
-  };
-
-  // Close add prompt modal
-  const handleCloseAddPromptModal = () => {
-    setNewPromptAction({
-      emoji: '🤖',
-      title: '',
-      prompt: '',
-    });
-    setIsAddPromptModalOpen(false);
-  };
+  }, [contentTabs, isInputTypeManuallySet, inputType, getSuggestedInputType, setInputType]);
 
   // Input type dropdown handlers
-  const toggleInputTypeDropdown = () => {
-    if (!isInputTypeDropdownOpen && inputTypeDropdownRef) {
-      // Calculate position before opening
-      const rect = inputTypeDropdownRef.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const dropdownHeight = 200; // Approximate height of dropdown
-
-      setDropdownRect(rect);
-
-      // Calculate dropdown position
-      const shouldOpenTop = rect.bottom + dropdownHeight > viewportHeight - 50;
-      setDropdownPosition(shouldOpenTop ? 'top' : 'bottom');
-
-      // Calculate absolute position for portal
-      const dropdownStyle: React.CSSProperties = {
-        position: 'fixed',
-        left: rect.left,
-        width: 192, // w-48 = 12rem = 192px
-        zIndex: 9999,
-      };
-
-      if (shouldOpenTop) {
-        dropdownStyle.bottom = viewportHeight - rect.top + 4; // 4px margin
-      } else {
-        dropdownStyle.top = rect.bottom + 4; // 4px margin
-      }
-
-      setDropdownStyle(dropdownStyle);
-    }
-    setIsInputTypeDropdownOpen(!isInputTypeDropdownOpen);
-  };
-
-  const handleInputTypeSelect = (type: 'url' | 'description' | 'prompt') => {
+  const handleInputTypeSelect = (type: 'url' | 'prompt') => {
     setInputType(type);
     setIsInputTypeManuallySet(true);
     setIsInputTypeDropdownOpen(false);
@@ -375,7 +143,15 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
       console.log('Set current input to:', actionText);
 
       // Automatically add to tabs as prompt type
-      await handleAddContentToTabs(actionText, 'prompt');
+      try {
+        await handleAddContentToTabs(actionText, 'prompt');
+      } catch (error) {
+        console.error('Failed to add content to tabs:', error);
+        setValidationErrors((prev) => ({
+          ...prev,
+          url: error instanceof Error ? error.message : 'Unknown error',
+        }));
+      }
     }
   };
 
@@ -388,18 +164,39 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     // Add current content to tabs if it exists
     if (currentInput.trim()) {
       console.log('Adding current input to tabs');
-      await handleAddContentToTabs(currentInput, inputType);
+      try {
+        await handleAddContentToTabs(currentInput, inputType);
+      } catch (error) {
+        console.error('Failed to add content to tabs:', error);
+        setValidationErrors((prev) => ({
+          ...prev,
+          url: error instanceof Error ? error.message : 'Unknown error',
+        }));
+        return;
+      }
     } else {
       console.log('No current input to add');
     }
 
-    // Move to preview step
-    console.log('Moving to preview step');
-    setCurrentStep('preview');
-  }, [currentInput, inputType, handleAddContentToTabs]);
+    // Prepare inputs snapshot for inline panel
+    const url = contentTabs.find((t) => t.type === 'url')?.content;
+    const prompts = contentTabs.filter((t) => t.type === 'prompt').map((t) => t.content);
+    setAnalysisInputs({ url, prompts });
 
-  const handleInputChange = (field: keyof typeof formData, value: string) => {
-    updateFormData({ [field]: value });
+    // Jump to preview immediately; render skeleton while analyzing
+    setAnalysisResult(null);
+    setCurrentStep('preview');
+    try {
+      const result = await runMockAnalysis(contentTabs);
+      setAnalysisResult(result);
+      console.log('Mock analysis completed:', result);
+    } catch (err) {
+      console.error('Analysis error or cancelled:', err);
+    }
+  }, [currentInput, inputType, handleAddContentToTabs, setCurrentStep]);
+
+  const handleInputChange = (field: string, value: string) => {
+    updateFormData({ [field as keyof typeof formData]: value });
 
     if (validationErrors[field as keyof typeof validationErrors]) {
       setValidationErrors((prev) => ({ ...prev, [field]: undefined }));
@@ -407,27 +204,15 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
   };
 
   const handleTemplateSelect = useCallback(
-    (template: PromptTemplate) => {
+    (template: any) => {
       setSelectedTemplate(template.id);
       updateFormData({ prompt: template.prompt });
     },
-    [updateFormData],
+    [updateFormData, setSelectedTemplate],
   );
 
-  const validateForm = () => {
-    const errors: typeof validationErrors = {};
-
-    // Check if at least one content tab exists
-    if (contentTabs.length === 0) {
-      errors.url = '최소 하나의 콘텐츠를 추가해주세요.';
-    }
-
-    // Validate description length if exists
-    const descriptionTab = contentTabs.find((tab) => tab.type === 'description');
-    if (descriptionTab && descriptionTab.content.length > 500) {
-      errors.description = t.globalContentUpload.contentUpload.validation.descriptionTooLong();
-    }
-
+  const validateFormData = () => {
+    const errors = validateForm(contentTabs, formData.description, t as any);
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -436,6 +221,10 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     async (e: React.FormEvent) => {
       console.log('=== handleSubmit called ===');
       e.preventDefault();
+      if (isEnterSubmittingRef.current) {
+        console.log('Submit ignored due to Enter handling lock');
+        return;
+      }
       // Form submit now triggers analysis instead of content creation
       await handleAnalyzeClick();
     },
@@ -454,930 +243,226 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     };
   }, [handleSubmit]);
 
-  // Step 1: Content Input
-  const renderInputStep = () => (
-    <div className="flex flex-col p-4">
-      <form onSubmit={handleSubmit} className="w-full max-w-4xl space-y-6">
-        {/* Content Tabs */}
-        {contentTabs.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {contentTabs.map((tab) => (
-              <div
-                key={tab.id}
-                className="flex items-center gap-2 px-3 py-2 bg-zinc-800 rounded-lg border border-zinc-700 hover:border-zinc-600 transition-colors group"
-              >
-                {/* Icon based on type */}
-                {tab.type === 'url' && tab.preview && (
-                  <img
-                    src={tab.preview.favicon}
-                    alt={`${tab.preview.domain} favicon`}
-                    className="w-4 h-4 rounded"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                )}
-                {tab.type === 'description' && (
-                  <svg
-                    className="w-4 h-4 text-blue-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                    />
-                  </svg>
-                )}
-                {tab.type === 'prompt' && (
-                  <svg
-                    className="w-4 h-4 text-purple-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                    />
-                  </svg>
-                )}
-
-                {/* Content */}
-                <span
-                  className={`text-sm text-zinc-300 font-medium truncate ${
-                    tab.type === 'prompt' ? 'max-w-48' : 'max-w-32'
-                  }`}
-                  title={tab.content}
-                >
-                  {tab.content}
-                </span>
-
-                {/* Remove button */}
-                <button
-                  type="button"
-                  onClick={() => handleRemoveContentTab(tab.id)}
-                  className="opacity-100 p-0.5 hover:bg-zinc-700 rounded transition-colors"
-                >
-                  <svg
-                    className="w-3 h-3 text-zinc-400 hover:text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Main Content Input Area */}
-        <div className="bg-zinc-800 rounded-2xl p-4 space-y-3">
-          {/* Content Input */}
-          <div className="relative">
-            {/* Input Type Selector */}
-            <div
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10"
-              ref={setInputTypeDropdownRef}
-            >
-              <button
-                type="button"
-                onClick={toggleInputTypeDropdown}
-                className="flex items-center gap-2 p-1 hover:bg-zinc-700 rounded transition-colors"
-              >
-                {inputType === 'url' && (
-                  <svg
-                    className="w-5 h-5 text-zinc-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-                    />
-                  </svg>
-                )}
-                {inputType === 'description' && (
-                  <svg
-                    className="w-5 h-5 text-blue-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                    />
-                  </svg>
-                )}
-                {inputType === 'prompt' && (
-                  <svg
-                    className="w-5 h-5 text-purple-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                    />
-                  </svg>
-                )}
-                <svg
-                  className="w-3 h-3 text-zinc-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-            </div>
-            <input
-              id="content-input"
-              type="text"
-              value={currentInput}
-              onChange={(e) => setCurrentInput(e.target.value)}
-              onKeyDown={async (e) => {
-                if (e.key === 'Enter') {
-                  console.log('=== Enter key pressed ===');
-                  console.log('Current input:', currentInput);
-                  console.log('Input type:', inputType);
-                  e.preventDefault();
-                  await handleAddContentToTabs(currentInput, inputType);
-                }
-              }}
-              className={`w-full pl-16 pr-4 py-3 bg-transparent text-white placeholder-zinc-400 focus:outline-none text-lg ${
-                validationErrors.url ? 'text-red-400' : ''
-              }`}
-              placeholder={
-                inputType === 'url'
-                  ? 'Add content URL and press Enter to add tab...'
-                  : inputType === 'description'
-                  ? 'Add description and press Enter to add tab...'
-                  : 'Add AI prompt and press Enter to add tab...'
-              }
-              disabled={isLoading || createLinkContent.isPending}
-            />
-          </div>
-
-          {/* Action Buttons and Submit */}
-          <div className="flex justify-between items-center">
-            {/* Action Buttons */}
-            <div className="flex gap-2">
-              {Object.entries(actionTexts).map(([key, prompt]) => {
-                const config = actionConfig[key as keyof typeof actionConfig];
-                const displayName = config?.displayName || key;
-                const iconPath = config?.icon || '';
-
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => handleActionClick(key)}
-                    className="flex items-center gap-1.5 px-3 py-2 text-xs bg-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-600 rounded-lg font-medium transition-colors border border-zinc-600 hover:border-zinc-500"
-                  >
-                    <svg
-                      className="w-3.5 h-3.5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d={iconPath}
-                      />
-                    </svg>
-                    {displayName}
-                  </button>
-                );
-              })}
-
-              {/* Edit Dropdown Button */}
-              <div className="relative" ref={setEditDropdownRef}>
-                <button
-                  type="button"
-                  onClick={toggleEditDropdown}
-                  className="flex items-center gap-1.5 px-3 py-2 text-xs text-zinc-400 hover:text-white rounded-lg font-medium transition-colors"
-                >
-                  <svg
-                    className="w-3.5 h-3.5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            {/* Submit and Skip Buttons */}
-            <div className="flex gap-2">
-              {/* Skip Button */}
-              <button
-                type="button"
-                onClick={async (e) => {
-                  e.preventDefault();
-                  // Skip to preview step without adding current input
-                  setCurrentStep('preview');
-                }}
-                disabled={isLoading || createLinkContent.isPending}
-                className="flex items-center gap-1.5 px-4 py-2 text-xs bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 rounded-lg font-medium transition-colors border border-zinc-700 hover:border-zinc-600 disabled:bg-zinc-700 disabled:cursor-not-allowed disabled:text-zinc-400 disabled:border-zinc-600"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 5l7 7-7 7M5 5l7 7-7 7"
-                  />
-                </svg>
-                Skip
-              </button>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isLoading || createLinkContent.isPending}
-                className="flex items-center gap-1.5 px-4 py-2 text-xs bg-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-600 rounded-lg font-medium transition-colors border border-zinc-600 hover:border-zinc-500 disabled:bg-zinc-700 disabled:cursor-not-allowed disabled:text-zinc-400 disabled:border-zinc-600"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                  />
-                </svg>
-                Submit
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* API Error */}
-        {(error || storeError) && (
-          <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-            <p className="text-sm text-red-400">{error || storeError || 'An error occurred'}</p>
-          </div>
-        )}
-      </form>
-    </div>
-  );
-
-  // Step 2: Link Preview
-  const renderPreviewStep = () => {
-    // If no content in tabs, go back to input step
-    if (contentTabs.length === 0) {
-      setCurrentStep('input');
-      return null;
+  // Handle key down for input
+  const handleKeyDown = async (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      // Avoid submitting while composing (IME) or key repeat
+      if ((e as any).nativeEvent?.isComposing) return;
+      if ((e as any).repeat) return;
+      console.log('=== Enter key pressed ===');
+      console.log('Current input:', currentInput);
+      console.log('Input type:', inputType);
+      e.preventDefault();
+      isEnterSubmittingRef.current = true;
+      try {
+        await handleAddContentToTabs(currentInput, inputType);
+      } catch (error) {
+        console.error('Failed to add content to tabs:', error);
+        setValidationErrors((prev) => ({
+          ...prev,
+          url: error instanceof Error ? error.message : 'Unknown error',
+        }));
+      } finally {
+        // Release the lock on the next tick to avoid form submit racing
+        setTimeout(() => {
+          isEnterSubmittingRef.current = false;
+        }, 0);
+      }
     }
-
-    const urlTab = contentTabs.find((tab) => tab.type === 'url');
-    const descriptionTab = contentTabs.find((tab) => tab.type === 'description');
-    const promptTab = contentTabs.find((tab) => tab.type === 'prompt');
-
-    return (
-      <div className="flex flex-col p-4">
-        <div className="w-full max-w-4xl space-y-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                <svg
-                  className="w-4 h-4 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-white">링크 미리보기</h3>
-            </div>
-          </div>
-
-          {/* Link Preview Card */}
-          {urlTab && urlTab.preview && (
-            <div className="flex justify-center">
-              <LinkPreviewCard preview={urlTab.preview} isLoading={false} error={null} />
-            </div>
-          )}
-
-          {/* Content Summary */}
-          <div className="bg-zinc-800 rounded-2xl p-4 space-y-4">
-            <h4 className="text-md font-semibold text-white">추가된 콘텐츠</h4>
-
-            {/* URL Tab */}
-            {urlTab && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-zinc-700 rounded-lg">
-                <img
-                  src={urlTab.preview?.favicon}
-                  alt={`${urlTab.preview?.domain} favicon`}
-                  className="w-4 h-4 rounded"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-                <span
-                  className="text-sm text-zinc-300 font-medium max-w-48 truncate"
-                  title={urlTab.content}
-                >
-                  {urlTab.content}
-                </span>
-              </div>
-            )}
-
-            {/* Description Tab */}
-            {descriptionTab && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-zinc-700 rounded-lg">
-                <svg
-                  className="w-4 h-4 text-blue-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
-                <span
-                  className="text-sm text-zinc-300 font-medium max-w-48 truncate"
-                  title={descriptionTab.content}
-                >
-                  {descriptionTab.content}
-                </span>
-              </div>
-            )}
-
-            {/* Prompt Tab */}
-            {promptTab && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-zinc-700 rounded-lg">
-                <svg
-                  className="w-4 h-4 text-purple-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                  />
-                </svg>
-                <span
-                  className="text-sm text-zinc-300 font-medium max-w-48 truncate"
-                  title={promptTab.content}
-                >
-                  {promptTab.content}
-                </span>
-              </div>
-            )}
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={() => setCurrentStep('input')}
-              className="flex items-center gap-2 px-4 py-2 text-sm text-zinc-400 hover:text-white transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                />
-              </svg>
-              수정하기
-            </button>
-          </div>
-        </div>
-      </div>
-    );
   };
 
-  // Step 3: Additional Details
-  const renderDetailsStep = () => {
-    // If no content in tabs, go back to input step
-    if (contentTabs.length === 0) {
-      setCurrentStep('input');
-      return null;
+  // Handle paste for URL input type
+  const handlePaste = async (e: React.ClipboardEvent<HTMLInputElement>) => {
+    if (inputType !== 'url') return;
+    const pasted = e.clipboardData?.getData('text') || '';
+    if (!pasted.trim()) return;
+    e.preventDefault();
+    try {
+      await handleAddContentToTabs(pasted, 'url');
+    } catch (error) {
+      console.error('Failed to add pasted url to tabs:', error);
+      setValidationErrors((prev) => ({
+        ...prev,
+        url: error instanceof Error ? error.message : 'Unknown error',
+      }));
     }
+  };
 
-    return (
-      <div className="flex flex-col p-4">
-        <div className="w-full max-w-4xl space-y-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                <svg
-                  className="w-4 h-4 text-black"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-white">추가 설정</h3>
-            </div>
-          </div>
+  // Paste button action: reads from clipboard and adds based on current input type
+  const handlePasteButtonClick = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (!text?.trim()) return;
+      const typeToUse = inputType;
+      await handleAddContentToTabs(text, typeToUse);
+    } catch (error) {
+      console.error('Failed to paste from clipboard:', error);
+      setValidationErrors((prev) => ({
+        ...prev,
+        url: error instanceof Error ? error.message : 'Unknown error',
+      }));
+    }
+  };
 
-          {/* Content Tabs Display */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-sm text-zinc-400">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-                />
-              </svg>
-              <span>Added Content ({contentTabs.length})</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {contentTabs.map((tab) => (
-                <div
-                  key={tab.id}
-                  className="flex items-center gap-2 px-3 py-2 bg-zinc-800 rounded-lg border border-zinc-700 hover:border-zinc-600 transition-colors group"
-                >
-                  {/* Icon based on type */}
-                  {tab.type === 'url' && tab.preview && (
-                    <img
-                      src={tab.preview.favicon}
-                      alt={`${tab.preview.domain} favicon`}
-                      className="w-4 h-4 rounded"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
-                  )}
-                  {tab.type === 'description' && (
-                    <svg
-                      className="w-4 h-4 text-blue-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      />
-                    </svg>
-                  )}
-                  {tab.type === 'prompt' && (
-                    <svg
-                      className="w-4 h-4 text-purple-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                      />
-                    </svg>
-                  )}
-
-                  {/* Content */}
-                  <span
-                    className={`text-sm text-zinc-300 font-medium truncate ${
-                      tab.type === 'prompt' ? 'max-w-48' : 'max-w-32'
-                    }`}
-                    title={tab.content}
-                  >
-                    {tab.content}
-                  </span>
-
-                  {/* Remove button */}
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveContentTab(tab.id)}
-                    className="opacity-100 p-0.5 hover:bg-zinc-700 rounded transition-colors"
-                  >
-                    <svg
-                      className="w-3 h-3 text-zinc-400 hover:text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Description Input */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-zinc-300">설명 (선택사항)</label>
-            <textarea
-              id="content-description"
-              value={formData.description || ''}
-              onChange={(e) => handleInputChange('description', e.target.value)}
-              className={`w-full px-4 py-3 bg-zinc-800 border rounded-xl text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-600 focus:border-transparent transition-colors resize-none ${
-                validationErrors.description ? 'border-red-500' : 'border-zinc-700'
-              }`}
-              placeholder="링크에 대한 설명을 입력하세요..."
-              rows={2}
-              maxLength={500}
-              disabled={isLoading || createLinkContent.isPending}
-            />
-            <div className="flex justify-between items-center">
-              {validationErrors.description && (
-                <p className="text-sm text-red-400">{validationErrors.description}</p>
-              )}
-              <p className="text-xs text-zinc-500 ml-auto">
-                {(formData.description || '').length}/500
-              </p>
-            </div>
-          </div>
-
-          {/* AI Analysis Section */}
-          <div className="space-y-4">
-            <label className="block text-sm font-medium text-zinc-300">
-              AI 분석 설정 (선택사항)
-            </label>
-
-            {/* Prompt Templates */}
-            <PromptTemplates
-              selectedId={selectedTemplate}
-              onSelect={handleTemplateSelect}
-              disabled={isLoading || createLinkContent.isPending}
-            />
-
-            {/* Custom Prompt Input */}
-            <textarea
-              id="content-prompt"
-              value={formData.prompt || ''}
-              onChange={(e) => {
-                handleInputChange('prompt', e.target.value);
-                if (e.target.value !== '') {
-                  setSelectedTemplate('custom');
-                }
-              }}
-              className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-colors resize-vertical min-h-[100px]"
-              placeholder="AI에게 요청할 내용을 입력하세요..."
-              disabled={isLoading || createLinkContent.isPending}
-              rows={3}
-            />
-            <p className="text-xs text-zinc-400">
-              예: 주요 논점 3개로 요약, 기술적 내용 중심 분석, 비즈니스 인사이트 추출
-            </p>
-          </div>
-
-          {/* Final Submit Button */}
-          <div className="flex justify-end pt-4">
-            <button
-              type="button"
-              onClick={() => onSubmit(formData)}
-              disabled={isLoading || createLinkContent.isPending}
-              className="flex items-center gap-2 px-6 py-3 bg-primary text-black rounded-lg font-medium transition-colors hover:bg-primary-hover disabled:bg-zinc-700 disabled:cursor-not-allowed disabled:text-zinc-400 border border-primary hover:border-primary-hover disabled:border-zinc-600"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-              콘텐츠 추가 완료
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+  // Handle edit dropdown actions
+  const handleEditAction = (action: 'edit' | 'delete' | 'add-prompt') => {
+    console.log('Edit action:', action);
+    if (action === 'add-prompt') {
+      setIsAddPromptModalOpen(true);
+    } else if (action === 'edit') {
+      if (inputType !== 'prompt') {
+        setInputType('prompt');
+        setIsInputTypeManuallySet(true);
+      }
+      setEditPromptText(currentInput || '');
+      setIsEditPromptModalOpen(true);
+    } else if (action === 'delete') {
+      // TODO: Implement delete functionality
+      console.log('Delete functionality not implemented yet');
+    }
+    setIsEditDropdownOpen(false);
   };
 
   // Render current step
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 'input':
-        return renderInputStep();
+        return (
+          <InputStep
+            contentTabs={contentTabs}
+            currentInput={currentInput}
+            inputType={inputType}
+            actionTexts={actionTexts}
+            validationErrors={validationErrors}
+            isLoading={isLoading || createLinkContent.isPending}
+            onInputChange={setCurrentInput}
+            onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
+            onPasteClick={handlePasteButtonClick}
+            onActionClick={handleActionClick}
+            onEditClick={toggleEditDropdown}
+            onRemoveTab={handleRemoveContentTab}
+            onInputTypeSelect={handleInputTypeSelect}
+            onSkip={() => setCurrentStep('preview')}
+            onSubmit={handleSubmit}
+            isInputTypeDropdownOpen={isInputTypeDropdownOpen}
+            inputTypeDropdownRef={inputTypeDropdownRef}
+            inputTypeDropdownPanelRef={inputTypeDropdownPanelRef}
+            dropdownStyle={dropdownStyle}
+            onToggleInputTypeDropdown={toggleInputTypeDropdown}
+            editDropdownAnchorRef={editDropdownRef}
+          />
+        );
       case 'preview':
-        return renderPreviewStep();
+        return (
+          <PreviewStep
+            contentTabs={contentTabs}
+            onBackToInput={() => setCurrentStep('input')}
+            analysisResult={analysisResult}
+            analysisProgress={analysisProgress}
+            analysisInputs={analysisInputs}
+          />
+        );
+      case 'analyzing':
+        return (
+          <AnalysisInline
+            progress={analysisProgress}
+            url={analysisInputs.url}
+            prompts={analysisInputs.prompts}
+            onCancel={() => {
+              cancelMockAnalysis();
+              setCurrentStep('input');
+            }}
+          />
+        );
       case 'details':
-        return renderDetailsStep();
+        return (
+          <DetailsStep
+            contentTabs={contentTabs}
+            formData={formData}
+            selectedTemplate={selectedTemplate}
+            validationErrors={validationErrors}
+            isLoading={isLoading || createLinkContent.isPending}
+            onRemoveTab={handleRemoveContentTab}
+            onInputChange={handleInputChange}
+            onTemplateSelect={handleTemplateSelect}
+            onSubmit={() => onSubmit(formData)}
+          />
+        );
       default:
-        return renderInputStep();
+        return (
+          <InputStep
+            contentTabs={contentTabs}
+            currentInput={currentInput}
+            inputType={inputType}
+            actionTexts={actionTexts}
+            validationErrors={validationErrors}
+            isLoading={isLoading || createLinkContent.isPending}
+            onInputChange={setCurrentInput}
+            onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
+            onPasteClick={handlePasteButtonClick}
+            onActionClick={handleActionClick}
+            onEditClick={toggleEditDropdown}
+            onRemoveTab={handleRemoveContentTab}
+            onInputTypeSelect={handleInputTypeSelect}
+            onSkip={() => setCurrentStep('preview')}
+            onSubmit={handleSubmit}
+            isInputTypeDropdownOpen={isInputTypeDropdownOpen}
+            inputTypeDropdownRef={inputTypeDropdownRef}
+            inputTypeDropdownPanelRef={inputTypeDropdownPanelRef}
+            dropdownStyle={dropdownStyle}
+            onToggleInputTypeDropdown={toggleInputTypeDropdown}
+            editDropdownAnchorRef={editDropdownRef}
+          />
+        );
     }
   };
 
   return (
     <>
-      {renderCurrentStep()}
+      <div ref={modalLayerRef} className="relative">
+        {renderCurrentStep()}
+      </div>
 
-      {/* Portal for Input Type Dropdown */}
-      {isInputTypeDropdownOpen &&
-        typeof document !== 'undefined' &&
-        createPortal(
-          <div
-            style={dropdownStyle}
-            className="bg-zinc-800 border border-zinc-600 rounded-lg shadow-lg"
-          >
-            <div className="py-1">
-              {/* URL Option */}
-              <button
-                type="button"
-                onClick={() => handleInputTypeSelect('url')}
-                className={`flex items-center gap-3 w-full px-4 py-2 text-sm transition-colors ${
-                  inputType === 'url'
-                    ? 'text-white bg-zinc-700'
-                    : 'text-zinc-300 hover:text-white hover:bg-zinc-700'
-                }`}
-              >
-                <svg
-                  className="w-4 h-4 text-zinc-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-                  />
-                </svg>
-                <span>URL</span>
-              </button>
+      {/* API Error */}
+      {(error || storeError) && (
+        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+          <p className="text-sm text-red-400">{error || storeError || 'An error occurred'}</p>
+        </div>
+      )}
 
-              {/* Description Option */}
-              <button
-                type="button"
-                onClick={() => handleInputTypeSelect('description')}
-                className={`flex items-center gap-3 w-full px-4 py-2 text-sm transition-colors ${
-                  inputType === 'description'
-                    ? 'text-white bg-zinc-700'
-                    : 'text-zinc-300 hover:text-white hover:bg-zinc-700'
-                }`}
-              >
-                <svg
-                  className="w-4 h-4 text-blue-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
-                <span>Description</span>
-              </button>
+      {/* Edit Dropdown Portal */}
+      <EditDropdown
+        isOpen={isEditDropdownOpen}
+        dropdownStyle={editDropdownStyle}
+        onEditAction={handleEditAction}
+      />
 
-              {/* Prompt Option */}
-              <button
-                type="button"
-                onClick={() => handleInputTypeSelect('prompt')}
-                className={`flex items-center gap-3 w-full px-4 py-2 text-sm transition-colors ${
-                  inputType === 'prompt'
-                    ? 'text-white bg-zinc-700'
-                    : 'text-zinc-300 hover:text-white hover:bg-zinc-700'
-                }`}
-              >
-                <svg
-                  className="w-4 h-4 text-purple-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                  />
-                </svg>
-                <span>AI Prompt</span>
-              </button>
-            </div>
-          </div>,
-          document.body,
-        )}
+      {/* Add Prompt Action Modal Portal */}
+      <AddPromptModal
+        isOpen={isAddPromptModalOpen}
+        newPromptAction={newPromptAction}
+        onUpdateAction={(updates) => setNewPromptAction((prev) => ({ ...prev, ...updates }))}
+        onAddAction={handleAddPromptAction}
+        onClose={handleCloseAddPromptModal}
+        variant="fullscreen"
+      />
 
-      {/* Portal for Edit Dropdown */}
-      {isEditDropdownOpen &&
-        typeof document !== 'undefined' &&
-        createPortal(
-          <div
-            style={editDropdownStyle}
-            className="bg-zinc-800 border border-zinc-600 rounded-lg shadow-lg"
-          >
-            <div className="py-1">
-              {/* Edit Tab */}
-              <button
-                type="button"
-                onClick={() => handleEditAction('edit')}
-                className="flex items-center gap-2 w-full px-4 py-2 text-xs text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                  />
-                </svg>
-                Edit
-              </button>
+      {/* Edit current prompt modal */}
+      <EditPromptModal
+        isOpen={isEditPromptModalOpen}
+        value={editPromptText}
+        onChange={setEditPromptText}
+        onSave={() => {
+          setCurrentInput(editPromptText);
+          setIsEditPromptModalOpen(false);
+        }}
+        onClose={() => setIsEditPromptModalOpen(false)}
+        variant="fullscreen"
+      />
 
-              {/* Add Prompt Action */}
-              <button
-                type="button"
-                onClick={() => handleEditAction('add-prompt')}
-                className="flex items-center gap-2 w-full px-4 py-2 text-xs text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>
-                Add Prompt Action
-              </button>
-
-              {/* Delete Tab */}
-              <button
-                type="button"
-                onClick={() => handleEditAction('delete')}
-                className="flex items-center gap-2 w-full px-4 py-2 text-xs text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                  />
-                </svg>
-                Delete
-              </button>
-            </div>
-          </div>,
-          document.body,
-        )}
-
-      {/* Portal for Add Prompt Action Modal */}
-      {isAddPromptModalOpen &&
-        typeof document !== 'undefined' &&
-        createPortal(
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]">
-            <div className="bg-zinc-800 rounded-2xl p-6 w-full max-w-md mx-4 border border-zinc-700">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-white">Add Prompt Action</h3>
-                <button
-                  onClick={handleCloseAddPromptModal}
-                  className="text-zinc-400 hover:text-white transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                {/* Emoji Input */}
-                <div>
-                  <label className="block text-sm font-medium text-zinc-300 mb-2">Emoji</label>
-                  <input
-                    type="text"
-                    value={newPromptAction.emoji}
-                    onChange={(e) =>
-                      setNewPromptAction((prev) => ({ ...prev, emoji: e.target.value }))
-                    }
-                    className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
-                    placeholder="🤖"
-                    maxLength={2}
-                  />
-                </div>
-
-                {/* Title Input */}
-                <div>
-                  <label className="block text-sm font-medium text-zinc-300 mb-2">Title</label>
-                  <input
-                    type="text"
-                    value={newPromptAction.title}
-                    onChange={(e) =>
-                      setNewPromptAction((prev) => ({ ...prev, title: e.target.value }))
-                    }
-                    className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
-                    placeholder="e.g., Creative Writing"
-                  />
-                </div>
-
-                {/* Prompt Input */}
-                <div>
-                  <label className="block text-sm font-medium text-zinc-300 mb-2">
-                    Prompt Text
-                  </label>
-                  <textarea
-                    value={newPromptAction.prompt}
-                    onChange={(e) =>
-                      setNewPromptAction((prev) => ({ ...prev, prompt: e.target.value }))
-                    }
-                    className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent resize-none"
-                    placeholder="e.g., Write a creative story based on this content..."
-                    rows={3}
-                  />
-                </div>
-              </div>
-
-              <div className="flex gap-3 mt-6">
-                <button
-                  onClick={handleCloseAddPromptModal}
-                  className="flex-1 px-4 py-2 text-sm bg-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-600 rounded-lg font-medium transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleAddPromptAction}
-                  disabled={!newPromptAction.title || !newPromptAction.prompt}
-                  className="flex-1 px-4 py-2 text-sm bg-purple-600 text-white hover:bg-purple-700 rounded-lg font-medium transition-colors disabled:bg-zinc-700 disabled:cursor-not-allowed disabled:text-zinc-400"
-                >
-                  Add Action
-                </button>
-              </div>
-            </div>
-          </div>,
-          document.body,
-        )}
+      {/* Inline analysis is rendered via analyzing step */}
     </>
   );
 }

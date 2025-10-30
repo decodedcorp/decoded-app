@@ -320,6 +320,18 @@
         "urlRequired": "Please enter a link URL.",
         "invalidUrl": "Please enter a valid URL format.",
         "imageProcessingError": "Error occurred while processing image."
+      },
+      "inputStep": {
+        "urlPlaceholder": "Add content URL and press Enter to add tab...",
+        "descriptionPlaceholder": "Add description and press Enter to add tab...",
+        "promptPlaceholder": "Add AI prompt and press Enter to add tab...",
+        "skip": "Skip",
+        "submit": "Submit"
+      },
+      "previewStep": {
+        "title": "Link Preview",
+        "contentSummary": "Added Content",
+        "editButton": "Edit"
       }
     },
     "addChannel": {

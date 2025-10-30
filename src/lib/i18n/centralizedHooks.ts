@@ -336,6 +336,18 @@ type CommonTranslations = {
         invalidUrl: () => string;
         imageProcessingError: () => string;
       };
+      inputStep: {
+        urlPlaceholder: () => string;
+        descriptionPlaceholder: () => string;
+        promptPlaceholder: () => string;
+        skip: () => string;
+        submit: () => string;
+      };
+      previewStep: {
+        title: () => string;
+        contentSummary: () => string;
+        editButton: () => string;
+      };
     };
     addChannel: {
       title: () => string;
@@ -986,6 +998,20 @@ export const useCommonTranslation = (): CommonTranslations => {
           invalidUrl: () => t('globalContentUpload.contentUpload.validation.invalidUrl'),
           imageProcessingError: () =>
             t('globalContentUpload.contentUpload.validation.imageProcessingError'),
+        },
+        inputStep: {
+          urlPlaceholder: () => t('globalContentUpload.contentUpload.inputStep.urlPlaceholder'),
+          descriptionPlaceholder: () =>
+            t('globalContentUpload.contentUpload.inputStep.descriptionPlaceholder'),
+          promptPlaceholder: () =>
+            t('globalContentUpload.contentUpload.inputStep.promptPlaceholder'),
+          skip: () => t('globalContentUpload.contentUpload.inputStep.skip'),
+          submit: () => t('globalContentUpload.contentUpload.inputStep.submit'),
+        },
+        previewStep: {
+          title: () => t('globalContentUpload.contentUpload.previewStep.title'),
+          contentSummary: () => t('globalContentUpload.contentUpload.previewStep.contentSummary'),
+          editButton: () => t('globalContentUpload.contentUpload.previewStep.editButton'),
         },
       },
       addChannel: {
