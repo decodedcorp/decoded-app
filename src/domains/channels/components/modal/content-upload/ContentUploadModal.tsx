@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 
 import { ContentType } from '@/lib/types/ContentType';
 import { useContentUploadStore, selectIsContentUploadModalOpen } from '@/store/contentUploadStore';
@@ -15,6 +15,7 @@ import { BaseModalAdapter } from '@/lib/components/ui/modal/BaseModalAdapter';
 
 import { ContentUploadHeader } from './ContentUploadHeader';
 import { ContentUploadForm } from './ContentUploadForm';
+import { ContentUploadFormStepper } from './ContentUploadFormStepper';
 import { ContentUploadFooter } from './ContentUploadFooter';
 
 export function ContentUploadModal() {
@@ -24,6 +25,10 @@ export function ContentUploadModal() {
   const setLoading = useContentUploadStore((state) => state.setLoading);
   const setError = useContentUploadStore((state) => state.setError);
   // AI 생성 관련 상태 제거 - 링크 포스트는 기본 포스트 동작으로 처리
+
+  // Toggle between chat-form and stepper versions
+  const [useStepper, setUseStepper] = useState(false);
+  const [stepperIndicator, setStepperIndicator] = useState<React.ReactNode>(null);
 
   const queryClient = useQueryClient();
 
@@ -102,32 +107,63 @@ export function ContentUploadModal() {
       contentClassName={MODAL_SIZES.WIDE}
     >
       <div className="bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl w-full max-h-[90vh] overflow-hidden animate-scale-in shadow-2xl flex flex-col">
-        <ContentUploadHeader onClose={handleCancel} />
-
-        <div className="flex-1 overflow-y-auto min-h-0">
-          <ContentUploadForm
-            onSubmit={handleSubmit}
-            isLoading={isLoading}
-            error={useContentUploadStore((state) => state.error)}
-          />
+        <div className="border-b border-zinc-700/50">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <ContentUploadHeader onClose={handleCancel} />
+            </div>
+            {/* Toggle Button */}
+            <div className="pr-4 sm:pr-6">
+              <button
+                onClick={() => setUseStepper(!useStepper)}
+                className="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700 flex-shrink-0"
+                title={useStepper ? 'Switch to Chat Form' : 'Switch to Stepper'}
+              >
+                {useStepper ? 'Chat Form' : 'Stepper'}
+              </button>
+            </div>
+          </div>
+          {/* Stepper Indicator in Header */}
+          {useStepper && stepperIndicator && (
+            <div className="px-4 sm:px-6 pb-4">{stepperIndicator}</div>
+          )}
         </div>
 
-        {/* 푸터는 항상 표시 (AI 생성 로직 제거) */}
-        <ContentUploadFooter
-          canSubmit={canSubmit}
-          isLoading={isLoading}
-          onCancel={handleCancel}
-          onSubmit={() => {
-            console.log('=== Footer submit button clicked ===');
-            // 전역 함수를 통해 ContentUploadForm의 handleSubmit 호출
-            if ((window as any).triggerContentFormSubmit) {
-              console.log('Calling global submit function...');
-              (window as any).triggerContentFormSubmit();
-            } else {
-              console.error('Global submit function not found!');
-            }
-          }}
-        />
+        <div className="flex-1 overflow-y-auto min-h-0">
+          {useStepper ? (
+            <ContentUploadFormStepper
+              onSubmit={handleSubmit}
+              isLoading={isLoading}
+              error={useContentUploadStore((state) => state.error)}
+              onIndicatorRender={setStepperIndicator}
+            />
+          ) : (
+            <ContentUploadForm
+              onSubmit={handleSubmit}
+              isLoading={isLoading}
+              error={useContentUploadStore((state) => state.error)}
+            />
+          )}
+        </div>
+
+        {/* 푸터는 chat-form 버전에서만 표시 (stepper는 자체 네비게이션 사용) */}
+        {!useStepper && (
+          <ContentUploadFooter
+            canSubmit={canSubmit}
+            isLoading={isLoading}
+            onCancel={handleCancel}
+            onSubmit={() => {
+              console.log('=== Footer submit button clicked ===');
+              // 전역 함수를 통해 ContentUploadForm의 handleSubmit 호출
+              if ((window as any).triggerContentFormSubmit) {
+                console.log('Calling global submit function...');
+                (window as any).triggerContentFormSubmit();
+              } else {
+                console.error('Global submit function not found!');
+              }
+            }}
+          />
+        )}
       </div>
     </BaseModalAdapter>
   );

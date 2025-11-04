@@ -64,6 +64,7 @@ export function RightSidebar() {
   );
 
   // Recommended (logged-in) - /recommendations/channels API 사용
+  // TODO: 현재 단계에서는 API 연결 비활성화
   const {
     data: recData,
     isLoading: recLoading,
@@ -96,20 +97,21 @@ export function RightSidebar() {
 
         return result;
       } catch (error) {
-        console.error('[RightSidebar] Recommendations API call failed:', {
-          error,
+        // 현재 단계에서는 에러를 조용히 처리하고 빈 데이터 반환
+        console.warn('[RightSidebar] Recommendations API call disabled for current phase:', {
           message: error instanceof Error ? error.message : 'Unknown error',
           userId: userDocId,
         });
-        throw error;
+        // 빈 결과 반환하여 fallback이 사용되도록 함
+        return { channels: [] };
       }
     },
-    enabled: !!userDocId,
+    enabled: false, // 현재 단계에서는 API 호출 비활성화
     staleTime: 5 * 60 * 1000, // 5분으로 증가
     gcTime: 15 * 60 * 1000, // 15분으로 증가
     refetchOnWindowFocus: false,
     refetchOnMount: false,
-    retry: 2,
+    retry: 0, // 재시도 비활성화
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 

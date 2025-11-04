@@ -11,7 +11,7 @@ export function ContentUploadHeader({ onClose }: ContentUploadHeaderProps) {
 
   if (isMobile) {
     return (
-      <div className="p-4 border-b border-zinc-700/50">
+      <div className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex-1 min-w-0">
             <h2 className="text-lg font-semibold text-white">{t.actions.add()} Content</h2>
@@ -37,7 +37,7 @@ export function ContentUploadHeader({ onClose }: ContentUploadHeaderProps) {
   }
 
   return (
-    <div className="flex items-center justify-between p-4 sm:p-6 border-b border-zinc-700/50">
+    <div className="flex items-center justify-between p-4 sm:p-6">
       <div>
         <h2 className="text-xl font-semibold text-white">{t.actions.add()} Content</h2>
         <p className="text-sm text-zinc-400 mt-1">{t.ui.addNewLink()}</p>
