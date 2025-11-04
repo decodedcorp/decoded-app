@@ -242,7 +242,7 @@ Warning: Bundle size exceeds recommended limits
 
 ### 내부 문서
 - [`CLAUDE.md`](../CLAUDE.md) - 프로젝트 코딩 가이드라인
-- [`HANDOFF_STATUS.md`](./HANDOFF_STATUS.md) - 현재 작업 상태
+- [`HANDOFF_STATUS.md`](./99-archive/misc/HANDOFF_STATUS.md) - 현재 작업 상태
 - [`.taskmaster/`](../.taskmaster/) - Task Master AI 작업 히스토리
 
 ### 외부 참조

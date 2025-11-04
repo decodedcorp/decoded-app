@@ -1,0 +1,288 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://decoded.app/schemas/doc.schema.json",
+  "title": "Decoded Documentation Metadata Schema",
+  "description": "Validation schema for all documentation frontmatter",
+
+  "definitions": {
+    "base": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 3,
+          "description": "Document title"
+        },
+        "created": {
+          "type": "string",
+          "format": "date",
+          "description": "Creation date (YYYY-MM-DD)"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date",
+          "description": "Last update date (YYYY-MM-DD)"
+        },
+        "owner": {
+          "type": "string",
+          "description": "Owner name or role (not team)"
+        },
+        "owner_history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "owner": { "type": "string" },
+              "from": { "type": "string", "format": "date" },
+              "to": { "type": "string", "format": "date" }
+            },
+            "required": ["owner", "from"]
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["title", "created", "owner"]
+    },
+
+    "id_prd": {
+      "type": "string",
+      "pattern": "^PRD-[A-Z]{2,4}-\\d{4}$",
+      "description": "PRD identifier (e.g., PRD-TG-0002)"
+    },
+    "id_plan": {
+      "type": "string",
+      "pattern": "^PLAN-[A-Z]{2,4}-\\d{4}$",
+      "description": "Plan identifier (e.g., PLAN-TG-0003)"
+    },
+    "id_spec": {
+      "type": "string",
+      "pattern": "^SPEC-[A-Z]{2,4}-\\d{4}$",
+      "description": "Spec identifier (e.g., SPEC-PERF-0001)"
+    },
+    "id_adr": {
+      "type": "string",
+      "pattern": "^ADR-\\d{4}$",
+      "description": "ADR identifier (e.g., ADR-0007)"
+    }
+  },
+
+  "oneOf": [
+    {
+      "title": "PRD Document",
+      "allOf": [
+        { "$ref": "#/definitions/base" },
+        {
+          "properties": {
+            "type": { "const": "prd" },
+            "id": { "$ref": "#/definitions/id_prd" },
+            "version": {
+              "type": "string",
+              "pattern": "^\\d+\\.\\d+(\\.\\d+)?$",
+              "description": "Semantic version (e.g., 2.0, 1.2.3)"
+            },
+            "status": {
+              "enum": ["draft", "active", "completed", "archived"],
+              "description": "PRD lifecycle status"
+            },
+            "related_plans": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/id_plan" },
+              "description": "List of related implementation plans"
+            },
+            "related_specs": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/id_spec" },
+              "description": "List of related technical specs"
+            }
+          },
+          "required": ["type", "id", "version", "status", "related_plans"]
+        }
+      ]
+    },
+
+    {
+      "title": "Implementation Plan",
+      "allOf": [
+        { "$ref": "#/definitions/base" },
+        {
+          "properties": {
+            "type": { "const": "plan" },
+            "id": { "$ref": "#/definitions/id_plan" },
+            "version": { "type": "string" },
+            "status": {
+              "enum": ["draft", "active", "completed", "archived"]
+            },
+            "related_specs": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  { "$ref": "#/definitions/id_prd" },
+                  { "$ref": "#/definitions/id_spec" }
+                ]
+              },
+              "minItems": 1,
+              "description": "Must reference at least one PRD or Spec"
+            },
+            "phases": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "status": { "enum": ["pending", "in-progress", "completed"] },
+                  "tasks": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "required": ["type", "id", "status", "related_specs"]
+        }
+      ]
+    },
+
+    {
+      "title": "Technical Specification",
+      "allOf": [
+        { "$ref": "#/definitions/base" },
+        {
+          "properties": {
+            "type": { "const": "spec" },
+            "id": { "$ref": "#/definitions/id_spec" },
+            "category": {
+              "enum": ["performance", "security", "compatibility", "accessibility"],
+              "description": "Spec category"
+            },
+            "metrics": {
+              "type": "object",
+              "description": "Measurable requirements"
+            }
+          },
+          "required": ["type", "id", "category"]
+        }
+      ]
+    },
+
+    {
+      "title": "Architecture Decision Record",
+      "allOf": [
+        { "$ref": "#/definitions/base" },
+        {
+          "properties": {
+            "type": { "const": "adr" },
+            "id": { "$ref": "#/definitions/id_adr" },
+            "status": {
+              "enum": ["proposed", "accepted", "rejected", "deprecated", "superseded"],
+              "description": "ADR status"
+            },
+            "decision_date": {
+              "type": "string",
+              "format": "date"
+            },
+            "reversibility": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5,
+              "description": "1=hard to revert, 5=easy to revert"
+            },
+            "related_specs": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  { "$ref": "#/definitions/id_prd" },
+                  { "$ref": "#/definitions/id_spec" }
+                ]
+              }
+            },
+            "revert_plan": {
+              "type": "object",
+              "properties": {
+                "trigger": { "type": "string" },
+                "steps": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            }
+          },
+          "required": ["type", "id", "status", "decision_date", "reversibility", "revert_plan"]
+        }
+      ]
+    },
+
+    {
+      "title": "Guideline Document",
+      "allOf": [
+        { "$ref": "#/definitions/base" },
+        {
+          "properties": {
+            "type": { "const": "guideline" },
+            "category": {
+              "enum": ["development", "design", "content", "deployment"]
+            }
+          },
+          "required": ["type", "category"]
+        }
+      ]
+    },
+
+    {
+      "title": "Status Document",
+      "allOf": [
+        { "$ref": "#/definitions/base" },
+        {
+          "properties": {
+            "type": { "const": "status" },
+            "auto_generated": {
+              "type": "boolean",
+              "description": "Whether this file is auto-generated"
+            },
+            "generation_script": {
+              "type": "string",
+              "description": "Script that generates this file"
+            }
+          },
+          "required": ["type"]
+        }
+      ]
+    },
+
+    {
+      "title": "Tombstone (Moved Document)",
+      "description": "Placeholder for moved/archived documents to preserve links",
+      "type": "object",
+      "properties": {
+        "type": { "const": "tombstone" },
+        "title": {
+          "type": "string",
+          "pattern": "^Moved: .+",
+          "description": "Title starting with 'Moved:'"
+        },
+        "moved_to": {
+          "type": "string",
+          "description": "New location path (relative to docs/)"
+        },
+        "moved_at": {
+          "type": "string",
+          "format": "date",
+          "description": "Move date (YYYY-MM-DD)"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Why was this document moved (e.g., 'Superseded by v2.0')"
+        },
+        "original_id": {
+          "type": "string",
+          "description": "Original document ID if it had one"
+        }
+      },
+      "required": ["type", "title", "moved_to", "moved_at", "reason"],
+      "additionalProperties": false
+    }
+  ]
+}
