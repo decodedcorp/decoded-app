@@ -12,6 +12,7 @@ import koImages from '@/locales/ko/images.json';
 import koInvitations from '@/locales/ko/invitations.json';
 import koComments from '@/locales/ko/comments.json';
 import koProfile from '@/locales/ko/profile.json';
+import koSkills from '@/locales/ko/skills.json';
 
 // Import English translations
 import enCommon from '@/locales/en/common.json';
@@ -24,6 +25,7 @@ import enImages from '@/locales/en/images.json';
 import enInvitations from '@/locales/en/invitations.json';
 import enComments from '@/locales/en/comments.json';
 import enProfile from '@/locales/en/profile.json';
+import enSkills from '@/locales/en/skills.json';
 
 const resources = {
   ko: {
@@ -37,6 +39,7 @@ const resources = {
     invitations: koInvitations,
     comments: koComments,
     profile: koProfile,
+    skills: koSkills,
   },
   en: {
     common: enCommon,
@@ -49,6 +52,7 @@ const resources = {
     invitations: enInvitations,
     comments: enComments,
     profile: enProfile,
+    skills: enSkills,
   },
 };
 

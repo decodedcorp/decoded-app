@@ -21,11 +21,13 @@ import { InputStep } from './components/InputStep';
 import { PreviewStep } from './components/PreviewStep';
 import { DetailsStep } from './components/DetailsStep';
 import { EditDropdown } from './components/EditDropdown';
-import { AddPromptModal } from './components/AddPromptModal';
-import { EditPromptModal } from './components/EditPromptModal';
 import { AnalysisInline } from './components/AnalysisInline';
+import { SkillsSelector } from './components/SkillsSelector';
+import { SkillEditModal } from '@/domains/profile/components/modals/SkillEditModal';
 import { useMockAnalysis } from './hooks/useMockAnalysis';
 import { AnalysisResult } from './types/analysis';
+import { Skill } from '@/domains/profile/types/skills';
+import { useCreateSkill } from '@/domains/profile/hooks/useSkills';
 
 // Utils
 import { validateForm } from './utils/contentValidation';
@@ -72,16 +74,12 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
     toggleInputTypeDropdown,
   } = useDropdowns();
 
-  const {
-    actionTexts,
-    isAddPromptModalOpen,
-    setIsAddPromptModalOpen,
-    newPromptAction,
-    setNewPromptAction,
-    handleAddPromptAction,
-    handleCloseAddPromptModal,
-    openAddPromptModal,
-  } = usePromptActions();
+  const { actionTexts, setActionTexts } = usePromptActions();
+
+  // Skill edit modal state
+  const [isSkillEditModalOpen, setIsSkillEditModalOpen] = useState(false);
+  const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
+  const createSkill = useCreateSkill();
 
   const { currentStep, setCurrentStep, selectedTemplate, setSelectedTemplate } = useFormSteps();
 
@@ -109,9 +107,53 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
   // Embedded modal portal target inside the content upload container
   const modalLayerRef = useRef<HTMLDivElement | null>(null);
 
-  // Edit prompt modal state
-  const [isEditPromptModalOpen, setIsEditPromptModalOpen] = useState(false);
-  const [editPromptText, setEditPromptText] = useState('');
+  // Skills selector state
+  const [isSkillsSelectorOpen, setIsSkillsSelectorOpen] = useState(false);
+  const skillsSelectorRef = useRef<HTMLDivElement | null>(null);
+  const skillsSelectorPanelRef = useRef<HTMLDivElement | null>(null);
+  const [skillsSelectorStyle, setSkillsSelectorStyle] = useState<React.CSSProperties>({});
+
+  // Calculate SkillsSelector position when opening
+  useEffect(() => {
+    if (isSkillsSelectorOpen && skillsSelectorRef.current) {
+      const rect = skillsSelectorRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const viewportWidth = window.innerWidth;
+      const dropdownWidth = 384; // w-96 = 24rem = 384px
+      const dropdownHeight = 384; // max-h-96 = 24rem = 384px
+
+      const style: React.CSSProperties = {
+        position: 'fixed',
+        width: dropdownWidth,
+        zIndex: 1120,
+      };
+
+      // Calculate horizontal position
+      if (rect.left + dropdownWidth > viewportWidth - 20) {
+        // Not enough space on right, align to right edge
+        style.right = viewportWidth - rect.right;
+        style.left = 'auto';
+      } else {
+        style.left = rect.left;
+      }
+
+      // Calculate vertical position
+      const spaceBelow = viewportHeight - rect.bottom;
+      const spaceAbove = rect.top;
+
+      if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
+        // Open above
+        style.bottom = viewportHeight - rect.top + 4;
+        style.top = 'auto';
+      } else {
+        // Open below
+        style.top = rect.bottom + 4;
+        style.bottom = 'auto';
+      }
+
+      setSkillsSelectorStyle(style);
+    }
+  }, [isSkillsSelectorOpen]);
 
   // Update input type when contentTabs change (only if not manually set)
   useEffect(() => {
@@ -152,6 +194,22 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
           url: error instanceof Error ? error.message : 'Unknown error',
         }));
       }
+    }
+  };
+
+  // Handle skill selection
+  const handleSkillSelect = async (skill: Skill) => {
+    console.log('=== Skill selected ===');
+    console.log('Skill:', skill);
+    try {
+      // Add skill prompt to tabs
+      await handleAddContentToTabs(skill.prompt, 'prompt');
+    } catch (error) {
+      console.error('Failed to add skill to tabs:', error);
+      setValidationErrors((prev) => ({
+        ...prev,
+        url: error instanceof Error ? error.message : 'Unknown error',
+      }));
     }
   };
 
@@ -308,19 +366,44 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
   const handleEditAction = (action: 'edit' | 'delete' | 'add-prompt') => {
     console.log('Edit action:', action);
     if (action === 'add-prompt') {
-      setIsAddPromptModalOpen(true);
+      // Add Skill (새 스킬 추가)
+      setEditingSkill(null);
+      setIsSkillEditModalOpen(true);
     } else if (action === 'edit') {
-      if (inputType !== 'prompt') {
-        setInputType('prompt');
-        setIsInputTypeManuallySet(true);
+      // 현재 prompt를 Skill로 저장하고 편집
+      // 현재 입력된 텍스트를 기반으로 임시 Skill 생성 (편집용)
+      if (currentInput.trim()) {
+        // 임시 Skill 객체 생성 (편집 시 prompt 기본값으로 사용)
+        const tempSkill: Skill = {
+          id: 'temp-edit',
+          title: '',
+          prompt: currentInput,
+          userId: '',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        setEditingSkill(tempSkill);
+        setIsSkillEditModalOpen(true);
+      } else {
+        // 빈 상태에서 새 Skill 생성
+        setEditingSkill(null);
+        setIsSkillEditModalOpen(true);
       }
-      setEditPromptText(currentInput || '');
-      setIsEditPromptModalOpen(true);
     } else if (action === 'delete') {
       // TODO: Implement delete functionality
       console.log('Delete functionality not implemented yet');
     }
     setIsEditDropdownOpen(false);
+  };
+
+  // Handle skill creation/update
+  const handleSkillSaved = async (skill: Skill) => {
+    // Skill이 저장되면 해당 prompt를 content tabs에 추가
+    try {
+      await handleAddContentToTabs(skill.prompt, 'prompt');
+    } catch (error) {
+      console.error('Failed to add skill prompt to tabs:', error);
+    }
   };
 
   // Render current step
@@ -351,6 +434,12 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
             dropdownStyle={dropdownStyle}
             onToggleInputTypeDropdown={toggleInputTypeDropdown}
             editDropdownAnchorRef={editDropdownRef}
+            onSkillsClick={() => {
+              if (!isSkillsSelectorOpen) {
+                setIsSkillsSelectorOpen(true);
+              }
+            }}
+            skillsSelectorRef={skillsSelectorRef}
           />
         );
       case 'preview':
@@ -414,6 +503,12 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
             dropdownStyle={dropdownStyle}
             onToggleInputTypeDropdown={toggleInputTypeDropdown}
             editDropdownAnchorRef={editDropdownRef}
+            onSkillsClick={() => {
+              if (!isSkillsSelectorOpen) {
+                setIsSkillsSelectorOpen(true);
+              }
+            }}
+            skillsSelectorRef={skillsSelectorRef}
           />
         );
     }
@@ -439,27 +534,27 @@ export function ContentUploadForm({ onSubmit, isLoading, error }: ContentUploadF
         onEditAction={handleEditAction}
       />
 
-      {/* Add Prompt Action Modal Portal */}
-      <AddPromptModal
-        isOpen={isAddPromptModalOpen}
-        newPromptAction={newPromptAction}
-        onUpdateAction={(updates) => setNewPromptAction((prev) => ({ ...prev, ...updates }))}
-        onAddAction={handleAddPromptAction}
-        onClose={handleCloseAddPromptModal}
-        variant="fullscreen"
+      {/* Skill Edit Modal */}
+      <SkillEditModal
+        isOpen={isSkillEditModalOpen}
+        onClose={() => {
+          setIsSkillEditModalOpen(false);
+          setEditingSkill(null);
+        }}
+        skill={editingSkill}
+        onSkillSaved={handleSkillSaved}
       />
 
-      {/* Edit current prompt modal */}
-      <EditPromptModal
-        isOpen={isEditPromptModalOpen}
-        value={editPromptText}
-        onChange={setEditPromptText}
-        onSave={() => {
-          setCurrentInput(editPromptText);
-          setIsEditPromptModalOpen(false);
-        }}
-        onClose={() => setIsEditPromptModalOpen(false)}
-        variant="fullscreen"
+      {/* Skills Selector - Portal renders outside modal */}
+      <div className="relative" ref={skillsSelectorRef}>
+        {/* Empty div for positioning reference */}
+      </div>
+      <SkillsSelector
+        isOpen={isSkillsSelectorOpen}
+        onClose={() => setIsSkillsSelectorOpen(false)}
+        onSelectSkill={handleSkillSelect}
+        dropdownStyle={skillsSelectorStyle}
+        containerRef={skillsSelectorPanelRef}
       />
 
       {/* Inline analysis is rendered via analyzing step */}

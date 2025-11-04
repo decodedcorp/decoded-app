@@ -5,6 +5,7 @@ import { ChannelsTab } from './tabs/ChannelsTab';
 import { SubscriptionsTab } from './tabs/SubscriptionsTab';
 import { BookmarksTab } from './tabs/BookmarksTab';
 import { CommentsTab } from './tabs/CommentsTab';
+import { SkillsTab } from './tabs/SkillsTab';
 
 interface ProfileTabsProps {
   activeTab: string;
@@ -18,6 +19,7 @@ const getAvailableTabs = (isMyProfile: boolean, t: any) => {
       { id: 'channels', label: t.tabs.myChannels() },
       { id: 'subscriptions', label: t.tabs.subscriptions() },
       { id: 'bookmarks', label: t.tabs.bookmarks() },
+      { id: 'skills', label: t.tabs.skills() },
       { id: 'comments', label: t.tabs.comments() },
     ];
   } else {
@@ -43,6 +45,8 @@ export function ProfileTabs({ activeTab, userId, isMyProfile }: ProfileTabsProps
         return isMyProfile ? <SubscriptionsTab /> : null;
       case 'bookmarks':
         return isMyProfile ? <BookmarksTab /> : null;
+      case 'skills':
+        return isMyProfile ? <SkillsTab /> : null;
       case 'comments':
         return <CommentsTab userId={userId} isMyProfile={isMyProfile} />;
       default:

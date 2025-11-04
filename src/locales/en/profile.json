@@ -23,6 +23,7 @@
     "myChannels": "My Channels",
     "subscriptions": "Subscriptions",
     "bookmarks": "Bookmarks",
+    "skills": "Skills",
     "comments": "Comments"
   },
   "sidebar": {
@@ -128,5 +129,43 @@
     "comingSoon": "Note: Comments feature is coming soon!",
     "failedToLoad": "Failed to load comments",
     "failedToLoadDescription": "Something went wrong. Please try again."
+  },
+  "skills": {
+    "title": "Skills",
+    "count": "Skills ({count})",
+    "createNew": "Add New Skill",
+    "noSkills": "No skills yet",
+    "noSkillsDescription": "Save your reusable prompts as skills for quick access.",
+    "failedToLoad": "Failed to load skills",
+    "failedToLoadDescription": "Something went wrong. Please try again.",
+    "edit": "Edit",
+    "delete": "Delete",
+    "createTitle": "Add New Skill",
+    "editTitle": "Edit Skill",
+    "titleLabel": "Command",
+    "titlePlaceholder": "fact-check",
+    "titleHelper": "Use lowercase letters, numbers, and hyphens only (e.g., fact-check, color-analysis)",
+    "promptLabel": "Prompt",
+    "promptPlaceholder": "Please verify the facts of this information and provide reliable sources.",
+    "promptHelper": "characters",
+    "save": "Save",
+    "create": "Create",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "createSuccess": "Skill created successfully",
+    "updateSuccess": "Skill updated successfully",
+    "deleteSuccess": "Skill deleted successfully",
+    "saveError": "Failed to save skill",
+    "deleteError": "Failed to delete skill",
+    "deleteConfirmMessage": "Are you sure you want to delete the skill '{title}'?",
+    "validation": {
+      "titleRequired": "Command is required",
+      "titleMinLength": "Command must be at least 2 characters",
+      "titleMaxLength": "Command must be less than 50 characters",
+      "titleInvalidFormat": "Only lowercase letters, numbers, and hyphens are allowed",
+      "promptRequired": "Prompt is required",
+      "promptMinLength": "Prompt must be at least 10 characters",
+      "promptMaxLength": "Prompt must be less than 2000 characters"
+    }
   }
 }

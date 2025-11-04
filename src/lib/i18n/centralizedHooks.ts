@@ -57,6 +57,7 @@ type CommonTranslations = {
     explore: () => string;
     library: () => string;
     bookmarks: () => string;
+    skills: () => string;
     settings: () => string;
     profile: () => string;
     help: () => string;
@@ -711,6 +712,7 @@ export const useCommonTranslation = (): CommonTranslations => {
       explore: () => t('navigation.explore'),
       library: () => t('navigation.library'),
       bookmarks: () => t('navigation.bookmarks'),
+      skills: () => t('navigation.skills'),
       settings: () => t('navigation.settings'),
       profile: () => t('navigation.profile'),
       help: () => t('navigation.help'),

@@ -111,6 +111,7 @@ export const queryKeys = {
       [...queryKeys.users.bookmarks(), 'my', params] as const,
     bookmarkStatus: (contentId: string) =>
       [...queryKeys.users.bookmarks(), 'status', contentId] as const,
+    skills: (userId: string) => [...queryKeys.users.all, 'skills', userId] as const,
   },
 
   // Pins related queries

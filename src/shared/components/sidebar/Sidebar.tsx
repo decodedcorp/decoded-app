@@ -12,6 +12,7 @@ import {
   UserIcon,
   Bars3Icon,
   XMarkIcon,
+  SparklesIcon,
 } from '@heroicons/react/24/outline';
 import { useAuthStore } from '@/store/authStore';
 import { useAddChannelStore } from '@/domains/create/store/addChannelStore';
@@ -197,6 +198,12 @@ export const Sidebar = memo(function Sidebar() {
               icon={<BookmarkIcon />}
               label={t.navigation.bookmarks()}
               isActive={pathname === '/bookmarks'}
+            />
+            <SidebarItem
+              href="/skills"
+              icon={<SparklesIcon />}
+              label={t.navigation.skills()}
+              isActive={pathname === '/skills' || pathname.startsWith('/skills')}
             />
             <SidebarItem
               onClick={handleCreateClick}

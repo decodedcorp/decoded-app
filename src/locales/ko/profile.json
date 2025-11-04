@@ -23,6 +23,7 @@
     "myChannels": "내 채널",
     "subscriptions": "구독",
     "bookmarks": "북마크",
+    "skills": "스킬",
     "comments": "댓글"
   },
   "sidebar": {
@@ -128,5 +129,43 @@
     "comingSoon": "참고: 댓글 기능이 곧 출시됩니다!",
     "failedToLoad": "댓글을 불러올 수 없어요",
     "failedToLoadDescription": "문제가 발생했어요. 다시 시도해 주세요."
+  },
+  "skills": {
+    "title": "스킬",
+    "count": "스킬 ({count})",
+    "createNew": "새 스킬 추가",
+    "noSkills": "아직 스킬이 없어요",
+    "noSkillsDescription": "반복 사용하는 프롬프트를 스킬로 저장해보세요.",
+    "failedToLoad": "스킬을 불러올 수 없어요",
+    "failedToLoadDescription": "문제가 발생했어요. 다시 시도해 주세요.",
+    "edit": "편집",
+    "delete": "삭제",
+    "createTitle": "새 스킬 추가",
+    "editTitle": "스킬 편집",
+    "titleLabel": "커맨드",
+    "titlePlaceholder": "fact-check",
+    "titleHelper": "소문자, 숫자, 하이픈만 사용 가능 (예: fact-check, color-analysis)",
+    "promptLabel": "프롬프트",
+    "promptPlaceholder": "이 정보의 사실 여부를 확인하고 신뢰할 수 있는 출처를 제공해주세요.",
+    "promptHelper": "자",
+    "save": "저장",
+    "create": "생성",
+    "cancel": "취소",
+    "saving": "저장 중...",
+    "createSuccess": "스킬이 생성되었어요",
+    "updateSuccess": "스킬이 수정되었어요",
+    "deleteSuccess": "스킬이 삭제되었어요",
+    "saveError": "스킬 저장에 실패했어요",
+    "deleteError": "스킬 삭제에 실패했어요",
+    "deleteConfirmMessage": "'{title}' 스킬을 삭제하시겠어요?",
+    "validation": {
+      "titleRequired": "커맨드는 필수입니다",
+      "titleMinLength": "커맨드는 최소 2자 이상이어야 합니다",
+      "titleMaxLength": "커맨드는 50자 이하여야 합니다",
+      "titleInvalidFormat": "소문자, 숫자, 하이픈만 사용 가능합니다",
+      "promptRequired": "프롬프트는 필수입니다",
+      "promptMinLength": "프롬프트는 최소 10자 이상이어야 합니다",
+      "promptMaxLength": "프롬프트는 2000자 이하여야 합니다"
+    }
   }
 }

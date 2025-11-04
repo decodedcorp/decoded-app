@@ -29,6 +29,9 @@ interface InputStepProps {
   dropdownStyle: React.CSSProperties;
   onToggleInputTypeDropdown: () => void;
   editDropdownAnchorRef?: React.RefObject<HTMLDivElement | null>;
+  // Skills props
+  onSkillsClick?: () => void;
+  skillsSelectorRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 export function InputStep({
@@ -54,6 +57,8 @@ export function InputStep({
   dropdownStyle,
   onToggleInputTypeDropdown,
   editDropdownAnchorRef,
+  onSkillsClick,
+  skillsSelectorRef,
 }: InputStepProps) {
   const t = useCommonTranslation();
 
@@ -168,7 +173,9 @@ export function InputStep({
               actionTexts={actionTexts}
               onActionClick={onActionClick}
               onEditClick={onEditClick}
+              onSkillsClick={onSkillsClick}
               editDropdownAnchorRef={editDropdownAnchorRef}
+              skillsSelectorRef={skillsSelectorRef}
               disabled={isLoading}
             />
 
