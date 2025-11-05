@@ -1,0 +1,18 @@
+{
+  "File-level spec tag": {
+    "prefix": "spec",
+    "scope": "javascript,typescript,javascriptreact,typescriptreact",
+    "body": [
+      "// spec: ${1:PRD-TG-0002}$0"
+    ],
+    "description": "Insert file-level spec tag (PRD, PLAN, SPEC, or ADR)"
+  },
+  "Multiple spec tags": {
+    "prefix": "specs",
+    "scope": "javascript,typescript,javascriptreact,typescriptreact",
+    "body": [
+      "// spec: ${1:PRD-TG-0002}, ${2:PLAN-TG-0003}$0"
+    ],
+    "description": "Insert multiple spec tags separated by commas"
+  }
+}
