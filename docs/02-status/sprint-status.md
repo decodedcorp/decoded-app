@@ -8,7 +8,7 @@ generation_script: "docs/scripts/generate-sprint-status.mjs"
 tags: [status, sprint, metrics, weekly]
 ---
 # Sprint Status Report
-**Generated**: 2025-11-05T10:07:06.407Z
+**Generated**: 2025-11-05T10:08:09.978Z
 **Period**: 2025-10-29 → 2025-11-05 (Last 7 days)
 ---
 ## 📊 Key Metrics
@@ -16,12 +16,12 @@ tags: [status, sprint, metrics, weekly]
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
 | Unknown Docs | 25 | ≤ 5 | ❌ |
-| Spec Coverage | 0% | ≥ 80% | ❌ |
+| Spec Coverage | 9% | ≥ 80% | ❌ |
 | Sync-Fail Rate | 100% | ≤ 10% | ❌ |
 ### Development Activity
 | Metric | Count |
 |--------|-------|
-| Commits (7d) | 8 |
+| Commits (7d) | 9 |
 | Contributors | 1 |
 | Files Changed | filesChanged} |
 | Open PRs | 0 |
@@ -61,13 +61,13 @@ Now   | 25    | baseline
 ```
 Week  | Coverage | Changed Files with spec()
 ------|----------|---------------------------
-Now   | 0%      | 0/70
+Now   | 9%      | 7/82
 ```
 ---
 ## 🚨 Issues & Blockers
 - ⚠️ **High unknown count**: 25 unknowns need classification
 - ⚠️ **Sync failures detected**: 100% failure rate
-- ⚠️ **Low spec coverage**: Only 0% of commits reference specs
+- ⚠️ **Low spec coverage**: Only 9% of commits reference specs
 ---
 ## 📝 Action Items
 ### This Week
