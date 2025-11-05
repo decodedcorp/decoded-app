@@ -25,9 +25,23 @@ const trace = {
       code_comments: 0,
       pr_descriptions: 0
     },
-    by_spec: {}
+    by_spec: {},
+    by_spec_type: {
+      PRD: 0,
+      PLAN: 0,
+      SPEC: 0,
+      ADR: 0
+    }
   },
   references: []
+}
+
+// Helper: Track spec type (C안: PLAN/ADR 동등 가중)
+function trackSpecType(specId) {
+  const type = specId.split('-')[0] // PRD, PLAN, SPEC, ADR
+  if (trace.summary.by_spec_type[type] !== undefined) {
+    trace.summary.by_spec_type[type]++
+  }
 }
 
 // 1. Collect from commit messages (last 100 commits)
@@ -55,6 +69,7 @@ try {
         })
         trace.summary.by_source.commits++
         trace.summary.by_spec[specId] = (trace.summary.by_spec[specId] || 0) + 1
+        trackSpecType(specId)
       }
     }
   }
@@ -95,6 +110,7 @@ try {
             })
             trace.summary.by_source.code_comments++
             trace.summary.by_spec[specId] = (trace.summary.by_spec[specId] || 0) + 1
+            trackSpecType(specId)
           }
         }
       }
@@ -131,6 +147,7 @@ try {
         })
         trace.summary.by_source.pr_descriptions++
         trace.summary.by_spec[specId] = (trace.summary.by_spec[specId] || 0) + 1
+        trackSpecType(specId)
       }
     }
   }
@@ -142,9 +159,26 @@ try {
 
 // Calculate changed-file-based spec coverage
 console.log('📊 Calculating spec coverage...')
+
+// Exclude patterns for coverage calculation (A안: 분모 정제)
+const COVERAGE_IGNORES = [
+  '/__tests__/',
+  '.spec.',
+  '.test.',
+  '.stories.',
+  '.d.ts',
+  '.generated.',
+  '/migrations/',
+  '/.storybook/',
+  '/scripts/',
+  '/docs/scripts/'
+]
+
 let specCoverage = 0
 let changedFilesTotal = 0
 let changedFilesWithSpec = 0
+let filesWithoutSpec = []
+let excludedFiles = []
 
 try {
   const changedFilesOutput = execSync('git diff --name-only origin/main...HEAD', {
@@ -152,8 +186,17 @@ try {
   }).trim()
 
   if (changedFilesOutput) {
-    const changedFiles = changedFilesOutput.split('\n')
+    const allChangedFiles = changedFilesOutput.split('\n')
       .filter(f => f.match(/\.(ts|tsx|js|jsx)$/))
+
+    // Apply filters (분모 정제)
+    const changedFiles = allChangedFiles.filter(filepath => {
+      const shouldExclude = COVERAGE_IGNORES.some(pattern => filepath.includes(pattern))
+      if (shouldExclude) {
+        excludedFiles.push(filepath)
+      }
+      return !shouldExclude
+    })
 
     changedFilesTotal = changedFiles.length
 
@@ -163,6 +206,8 @@ try {
         const content = fs.readFileSync(filepath, 'utf-8')
         if (SPEC_PATTERN.test(content)) {
           changedFilesWithSpec++
+        } else {
+          filesWithoutSpec.push(filepath)
         }
       }
     }
@@ -172,8 +217,10 @@ try {
       : 0
   }
 
-  console.log(`   Changed files: ${changedFilesTotal}`)
-  console.log(`   Files with spec: ${changedFilesWithSpec}`)
+  console.log(`   Total changed: ${changedFilesOutput ? changedFilesOutput.split('\n').filter(f => f.match(/\.(ts|tsx|js|jsx)$/)).length : 0}`)
+  console.log(`   Excluded: ${excludedFiles.length}`)
+  console.log(`   Analyzed: ${changedFilesTotal}`)
+  console.log(`   With spec: ${changedFilesWithSpec}`)
 } catch (error) {
   console.log('   ℹ️  Could not calculate coverage (main branch may not exist)')
 }
@@ -184,10 +231,35 @@ trace.summary.total_references =
   trace.summary.by_source.code_comments +
   trace.summary.by_source.pr_descriptions
 
+// B안: 자동 제안 (spec-by-path 매핑)
+let specByPath = {}
+let suggestions = []
+try {
+  specByPath = JSON.parse(fs.readFileSync('docs/.generated/spec-by-path.json', 'utf-8'))
+
+  // Generate suggestions for files without spec
+  for (const filepath of filesWithoutSpec) {
+    const matchedPrefix = Object.keys(specByPath).find(prefix => filepath.startsWith(prefix))
+    if (matchedPrefix) {
+      suggestions.push({
+        file: filepath,
+        suggested_specs: specByPath[matchedPrefix],
+        reason: `Matched path prefix: ${matchedPrefix}`
+      })
+    }
+  }
+} catch (error) {
+  console.log('   ℹ️  spec-by-path.json not found, suggestions disabled')
+}
+
 // Add coverage metrics to summary
 trace.summary.spec_coverage = specCoverage
 trace.summary.changed_files_total = changedFilesTotal
 trace.summary.changed_files_with_spec = changedFilesWithSpec
+trace.summary.files_without_spec = filesWithoutSpec
+trace.summary.excluded_files_count = excludedFiles.length
+trace.summary.excluded_samples = excludedFiles.slice(0, 5) // 검증용 샘플
+trace.summary.suggestions = suggestions.slice(0, 10) // Top 10 제안
 
 // Sort references by spec_id, then timestamp
 trace.references.sort((a, b) => {
@@ -214,6 +286,12 @@ console.log(`   Commits: ${trace.summary.by_source.commits}`)
 console.log(`   Code comments: ${trace.summary.by_source.code_comments}`)
 console.log(`   PR descriptions: ${trace.summary.by_source.pr_descriptions}`)
 console.log('')
+console.log('📚 By spec type (C안: PLAN/ADR 동등 가중):')
+console.log(`   PRD: ${trace.summary.by_spec_type.PRD}`)
+console.log(`   PLAN: ${trace.summary.by_spec_type.PLAN}`)
+console.log(`   SPEC: ${trace.summary.by_spec_type.SPEC}`)
+console.log(`   ADR: ${trace.summary.by_spec_type.ADR}`)
+console.log('')
 console.log('🎯 Most referenced specs:')
 const topSpecs = Object.entries(trace.summary.by_spec)
   .sort((a, b) => b[1] - a[1])
@@ -221,4 +299,11 @@ const topSpecs = Object.entries(trace.summary.by_spec)
 
 for (const [specId, count] of topSpecs) {
   console.log(`   ${specId}: ${count} references`)
+}
+
+if (suggestions.length > 0) {
+  console.log('')
+  console.log('💡 Spec suggestions (B안: 자동 제안):')
+  console.log(`   ${suggestions.length} files need spec tags`)
+  console.log(`   Run "yarn docs:trace" to see full suggestions in trace.json`)
 }

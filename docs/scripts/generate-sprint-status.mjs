@@ -219,6 +219,23 @@ const lines = [
   '',
   '---',
   '',
+  '## 🎯 Top 10 Files Missing Spec Tags',
+  '',
+  trace.summary.files_without_spec && trace.summary.files_without_spec.length > 0
+    ? trace.summary.files_without_spec.slice(0, 10).map(f => `- \`${f}\``).join('\n')
+    : '✅ All changed files have spec tags!',
+  '',
+  trace.summary.suggestions && trace.summary.suggestions.length > 0
+    ? '**Suggested specs** (from spec-by-path.json):'
+    : '',
+  trace.summary.suggestions && trace.summary.suggestions.length > 0
+    ? trace.summary.suggestions.slice(0, 5).map(s =>
+        `- \`${s.file}\` → ${s.suggested_specs.join(', ')}`
+      ).join('\n')
+    : '',
+  '',
+  '---',
+  '',
   '## 📝 Action Items',
   '',
   '### This Week',

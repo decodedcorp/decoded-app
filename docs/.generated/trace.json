@@ -1,5 +1,5 @@
 {
-  "generated_at": "2025-11-05T10:08:05.816Z",
+  "generated_at": "2025-11-05T10:37:32.004Z",
   "summary": {
     "total_references": 12,
     "by_source": {
@@ -10,94 +10,260 @@
     "by_spec": {
       "PRD-TG-0002": 12
     },
+    "by_spec_type": {
+      "PRD": 12,
+      "PLAN": 0,
+      "SPEC": 0,
+      "ADR": 0
+    },
     "spec_coverage": 9,
     "changed_files_total": 82,
-    "changed_files_with_spec": 7
+    "changed_files_with_spec": 7,
+    "files_without_spec": [
+      "src/app/profile/[userid]/page.tsx",
+      "src/app/skills/page.tsx",
+      "src/app/test-link-prompt/page.tsx",
+      "src/components/three/MetaBalls.tsx",
+      "src/domains/channels/components/category-grid/GridItem.tsx",
+      "src/domains/channels/components/category-grid/MasonryGridSkeleton.tsx",
+      "src/domains/channels/components/masonry/MasonryGrid.tsx",
+      "src/domains/channels/components/modal/content-upload/ContentUploadForm.tsx",
+      "src/domains/channels/components/modal/content-upload/ContentUploadFormStepper.tsx",
+      "src/domains/channels/components/modal/content-upload/ContentUploadHeader.tsx",
+      "src/domains/channels/components/modal/content-upload/ContentUploadModal.tsx",
+      "src/domains/channels/components/modal/content-upload/LinkPreviewCard.tsx",
+      "src/domains/channels/components/modal/content-upload/LinkPreviewModal.tsx",
+      "src/domains/channels/components/modal/content-upload/PromptTemplates.tsx",
+      "src/domains/channels/components/modal/content-upload/components/ActionButtons.tsx",
+      "src/domains/channels/components/modal/content-upload/components/AddPromptModal.tsx",
+      "src/domains/channels/components/modal/content-upload/components/AnalysisHeader.tsx",
+      "src/domains/channels/components/modal/content-upload/components/AnalysisInline.tsx",
+      "src/domains/channels/components/modal/content-upload/components/AnalysisOverlay.tsx",
+      "src/domains/channels/components/modal/content-upload/components/ContentTabs.tsx",
+      "src/domains/channels/components/modal/content-upload/components/DetailsStep.tsx",
+      "src/domains/channels/components/modal/content-upload/components/EditDropdown.tsx",
+      "src/domains/channels/components/modal/content-upload/components/EditPromptModal.tsx",
+      "src/domains/channels/components/modal/content-upload/components/ExplorerPulse.tsx",
+      "src/domains/channels/components/modal/content-upload/components/InputStep.tsx",
+      "src/domains/channels/components/modal/content-upload/components/InputTypeDropdown.tsx",
+      "src/domains/channels/components/modal/content-upload/components/LinkPreviewCard.tsx",
+      "src/domains/channels/components/modal/content-upload/components/PhaseItem.tsx",
+      "src/domains/channels/components/modal/content-upload/components/PreviewStep.tsx",
+      "src/domains/channels/components/modal/content-upload/components/PromptTemplates.tsx",
+      "src/domains/channels/components/modal/content-upload/components/SkillsSelector.tsx",
+      "src/domains/channels/components/modal/content-upload/components/Stepper.tsx",
+      "src/domains/channels/components/modal/content-upload/components/TextType.tsx",
+      "src/domains/channels/components/modal/content-upload/components/TypingDots.tsx",
+      "src/domains/channels/components/modal/content-upload/components/stepper/Step1LinkInput.tsx",
+      "src/domains/channels/components/modal/content-upload/components/stepper/Step2Description.tsx",
+      "src/domains/channels/components/modal/content-upload/components/stepper/Step3AIEdit.tsx",
+      "src/domains/channels/components/modal/content-upload/components/useStreamingText.ts",
+      "src/domains/channels/components/modal/content-upload/hooks/useContentTabs.ts",
+      "src/domains/channels/components/modal/content-upload/hooks/useDropdowns.ts",
+      "src/domains/channels/components/modal/content-upload/hooks/useFormSteps.ts",
+      "src/domains/channels/components/modal/content-upload/hooks/useMockAnalysis.ts",
+      "src/domains/channels/components/modal/content-upload/hooks/usePromptActions.ts",
+      "src/domains/channels/components/modal/content-upload/types/analysis.ts",
+      "src/domains/channels/components/modal/content-upload/utils/contentHelpers.ts",
+      "src/domains/channels/components/modal/content-upload/utils/contentValidation.ts",
+      "src/domains/channels/components/modal/content/ContentSidebar.tsx",
+      "src/domains/channels/hooks/useContents.ts",
+      "src/domains/explore/components/ThiingsGrid.tsx",
+      "src/domains/main/components/RightSidebar.tsx",
+      "src/domains/main/components/ThiingsGrid.tsx",
+      "src/domains/profile/components/ProfileEditModal.tsx",
+      "src/domains/profile/components/ProfileHeader.tsx",
+      "src/domains/profile/components/ProfileTabs.tsx",
+      "src/domains/profile/components/modals/SkillDetailModal.tsx",
+      "src/domains/profile/components/modals/SkillEditModal.tsx",
+      "src/domains/profile/components/tabs/SkillsTab.tsx",
+      "src/domains/profile/hooks/useEnhancedProfile.ts",
+      "src/domains/profile/hooks/useProfile.ts",
+      "src/domains/profile/hooks/useSkills.ts",
+      "src/domains/profile/hooks/useSkillsStorage.ts",
+      "src/domains/profile/hooks/useSyncProfileToStore.ts",
+      "src/domains/profile/types/skills.ts",
+      "src/lib/api/queryKeys.ts",
+      "src/lib/i18n/centralizedHooks.ts",
+      "src/lib/i18n/config.ts",
+      "src/lib/i18n/hooks.ts",
+      "src/lib/services/mockLinkPreview.ts",
+      "src/lib/utils/cacheHelpers.ts",
+      "src/lib/utils/profileSync.ts",
+      "src/lib/utils/userSelectors.ts",
+      "src/shared/components/UserAvatar.tsx",
+      "src/shared/components/sidebar/Sidebar.tsx",
+      "src/store/authStore.ts",
+      "src/store/contentUploadStore.ts"
+    ],
+    "excluded_files_count": 0,
+    "excluded_samples": [],
+    "suggestions": [
+      {
+        "file": "src/components/three/MetaBalls.tsx",
+        "suggested_specs": [
+          "PRD-TG-0002"
+        ],
+        "reason": "Matched path prefix: src/components/"
+      },
+      {
+        "file": "src/domains/channels/components/category-grid/GridItem.tsx",
+        "suggested_specs": [
+          "PRD-TG-0002",
+          "PLAN-TG-0003"
+        ],
+        "reason": "Matched path prefix: src/domains/channels/"
+      },
+      {
+        "file": "src/domains/channels/components/category-grid/MasonryGridSkeleton.tsx",
+        "suggested_specs": [
+          "PRD-TG-0002",
+          "PLAN-TG-0003"
+        ],
+        "reason": "Matched path prefix: src/domains/channels/"
+      },
+      {
+        "file": "src/domains/channels/components/masonry/MasonryGrid.tsx",
+        "suggested_specs": [
+          "PRD-TG-0002",
+          "PLAN-TG-0003"
+        ],
+        "reason": "Matched path prefix: src/domains/channels/"
+      },
+      {
+        "file": "src/domains/channels/components/modal/content-upload/ContentUploadForm.tsx",
+        "suggested_specs": [
+          "PRD-TG-0002",
+          "PLAN-TG-0003"
+        ],
+        "reason": "Matched path prefix: src/domains/channels/"
+      },
+      {
+        "file": "src/domains/channels/components/modal/content-upload/ContentUploadFormStepper.tsx",
+        "suggested_specs": [
+          "PRD-TG-0002",
+          "PLAN-TG-0003"
+        ],
+        "reason": "Matched path prefix: src/domains/channels/"
+      },
+      {
+        "file": "src/domains/channels/components/modal/content-upload/ContentUploadHeader.tsx",
+        "suggested_specs": [
+          "PRD-TG-0002",
+          "PLAN-TG-0003"
+        ],
+        "reason": "Matched path prefix: src/domains/channels/"
+      },
+      {
+        "file": "src/domains/channels/components/modal/content-upload/ContentUploadModal.tsx",
+        "suggested_specs": [
+          "PRD-TG-0002",
+          "PLAN-TG-0003"
+        ],
+        "reason": "Matched path prefix: src/domains/channels/"
+      },
+      {
+        "file": "src/domains/channels/components/modal/content-upload/LinkPreviewCard.tsx",
+        "suggested_specs": [
+          "PRD-TG-0002",
+          "PLAN-TG-0003"
+        ],
+        "reason": "Matched path prefix: src/domains/channels/"
+      },
+      {
+        "file": "src/domains/channels/components/modal/content-upload/LinkPreviewModal.tsx",
+        "suggested_specs": [
+          "PRD-TG-0002",
+          "PLAN-TG-0003"
+        ],
+        "reason": "Matched path prefix: src/domains/channels/"
+      }
+    ]
   },
   "references": [
     {
       "spec_id": "PRD-TG-0002",
       "source": "code_comment",
-      "location": "src/domains/channels/components/masonry/MasonryGrid.tsx:1",
+      "location": "src/domains/channels/components/masonry/grid.tsx:1",
       "context": "// spec: PRD-TG-0002",
-      "timestamp": "2025-11-05T10:08:05.954Z"
+      "timestamp": "2025-11-05T10:37:32.142Z"
     },
     {
       "spec_id": "PRD-TG-0002",
       "source": "code_comment",
-      "location": "src/domains/channels/components/masonry/grid.tsx:1",
+      "location": "src/domains/channels/components/masonry/MasonryGrid.tsx:1",
       "context": "// spec: PRD-TG-0002",
-      "timestamp": "2025-11-05T10:08:05.954Z"
+      "timestamp": "2025-11-05T10:37:32.141Z"
     },
     {
       "spec_id": "PRD-TG-0002",
       "source": "code_comment",
       "location": "src/domains/channels/components/explore/ExploreGrid.tsx:1",
       "context": "// spec: PRD-TG-0002",
-      "timestamp": "2025-11-05T10:08:05.953Z"
-    },
-    {
-      "spec_id": "PRD-TG-0002",
-      "source": "code_comment",
-      "location": "src/domains/channels/components/category-grid/CategoryGrid.tsx:1",
-      "context": "// spec: PRD-TG-0002",
-      "timestamp": "2025-11-05T10:08:05.952Z"
-    },
-    {
-      "spec_id": "PRD-TG-0002",
-      "source": "code_comment",
-      "location": "src/domains/channels/components/category-grid/GridItem.tsx:1",
-      "context": "// spec: PRD-TG-0002",
-      "timestamp": "2025-11-05T10:08:05.952Z"
-    },
-    {
-      "spec_id": "PRD-TG-0002",
-      "source": "code_comment",
-      "location": "src/domains/channels/components/category-grid/MasonryGrid.tsx:1",
-      "context": "// spec: PRD-TG-0002",
-      "timestamp": "2025-11-05T10:08:05.952Z"
+      "timestamp": "2025-11-05T10:37:32.140Z"
     },
     {
       "spec_id": "PRD-TG-0002",
       "source": "code_comment",
       "location": "src/domains/channels/components/category-grid/MasonryGridSkeleton.tsx:1",
       "context": "// spec: PRD-TG-0002",
-      "timestamp": "2025-11-05T10:08:05.952Z"
+      "timestamp": "2025-11-05T10:37:32.139Z"
+    },
+    {
+      "spec_id": "PRD-TG-0002",
+      "source": "code_comment",
+      "location": "src/domains/channels/components/category-grid/CategoryGrid.tsx:1",
+      "context": "// spec: PRD-TG-0002",
+      "timestamp": "2025-11-05T10:37:32.138Z"
+    },
+    {
+      "spec_id": "PRD-TG-0002",
+      "source": "code_comment",
+      "location": "src/domains/channels/components/category-grid/GridItem.tsx:1",
+      "context": "// spec: PRD-TG-0002",
+      "timestamp": "2025-11-05T10:37:32.138Z"
+    },
+    {
+      "spec_id": "PRD-TG-0002",
+      "source": "code_comment",
+      "location": "src/domains/channels/components/category-grid/MasonryGrid.tsx:1",
+      "context": "// spec: PRD-TG-0002",
+      "timestamp": "2025-11-05T10:37:32.138Z"
     },
     {
       "spec_id": "PRD-TG-0002",
       "source": "code_comment",
       "location": "src/domains/main/components/SimpleThiingsGrid.tsx:1",
       "context": "// spec: PRD-TG-0002",
-      "timestamp": "2025-11-05T10:08:05.944Z"
+      "timestamp": "2025-11-05T10:37:32.127Z"
     },
     {
       "spec_id": "PRD-TG-0002",
       "source": "code_comment",
       "location": "src/domains/main/components/ThiingsGrid.tsx:1",
       "context": "// spec: PRD-TG-0002",
-      "timestamp": "2025-11-05T10:08:05.944Z"
+      "timestamp": "2025-11-05T10:37:32.127Z"
     },
     {
       "spec_id": "PRD-TG-0002",
       "source": "code_comment",
       "location": "src/domains/explore/components/SimpleThiingsGrid.tsx:1",
       "context": "// spec: PRD-TG-0002",
-      "timestamp": "2025-11-05T10:08:05.938Z"
+      "timestamp": "2025-11-05T10:37:32.120Z"
     },
     {
       "spec_id": "PRD-TG-0002",
       "source": "code_comment",
       "location": "src/domains/explore/components/ThiingsGrid.tsx:1",
       "context": "// spec: PRD-TG-0002",
-      "timestamp": "2025-11-05T10:08:05.938Z"
+      "timestamp": "2025-11-05T10:37:32.120Z"
     },
     {
       "spec_id": "PRD-TG-0002",
       "source": "code_comment",
       "location": "src/components/FeedGrid/FeedGrid.tsx:1",
       "context": "// spec: PRD-TG-0002",
-      "timestamp": "2025-11-05T10:08:05.894Z"
+      "timestamp": "2025-11-05T10:37:32.064Z"
     }
   ]
 }

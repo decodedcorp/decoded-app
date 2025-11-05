@@ -8,7 +8,7 @@ generation_script: "docs/scripts/generate-sprint-status.mjs"
 tags: [status, sprint, metrics, weekly]
 ---
 # Sprint Status Report
-**Generated**: 2025-11-05T10:08:09.978Z
+**Generated**: 2025-11-05T10:37:53.488Z
 **Period**: 2025-10-29 → 2025-11-05 (Last 7 days)
 ---
 ## 📊 Key Metrics
@@ -21,7 +21,7 @@ tags: [status, sprint, metrics, weekly]
 ### Development Activity
 | Metric | Count |
 |--------|-------|
-| Commits (7d) | 9 |
+| Commits (7d) | 10 |
 | Contributors | 1 |
 | Files Changed | filesChanged} |
 | Open PRs | 0 |
@@ -68,6 +68,24 @@ Now   | 9%      | 7/82
 - ⚠️ **High unknown count**: 25 unknowns need classification
 - ⚠️ **Sync failures detected**: 100% failure rate
 - ⚠️ **Low spec coverage**: Only 9% of commits reference specs
+---
+## 🎯 Top 10 Files Missing Spec Tags
+- `src/app/profile/[userid]/page.tsx`
+- `src/app/skills/page.tsx`
+- `src/app/test-link-prompt/page.tsx`
+- `src/components/three/MetaBalls.tsx`
+- `src/domains/channels/components/category-grid/GridItem.tsx`
+- `src/domains/channels/components/category-grid/MasonryGridSkeleton.tsx`
+- `src/domains/channels/components/masonry/MasonryGrid.tsx`
+- `src/domains/channels/components/modal/content-upload/ContentUploadForm.tsx`
+- `src/domains/channels/components/modal/content-upload/ContentUploadFormStepper.tsx`
+- `src/domains/channels/components/modal/content-upload/ContentUploadHeader.tsx`
+**Suggested specs** (from spec-by-path.json):
+- `src/components/three/MetaBalls.tsx` → PRD-TG-0002
+- `src/domains/channels/components/category-grid/GridItem.tsx` → PRD-TG-0002, PLAN-TG-0003
+- `src/domains/channels/components/category-grid/MasonryGridSkeleton.tsx` → PRD-TG-0002, PLAN-TG-0003
+- `src/domains/channels/components/masonry/MasonryGrid.tsx` → PRD-TG-0002, PLAN-TG-0003
+- `src/domains/channels/components/modal/content-upload/ContentUploadForm.tsx` → PRD-TG-0002, PLAN-TG-0003
 ---
 ## 📝 Action Items
 ### This Week
