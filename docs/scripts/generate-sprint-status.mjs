@@ -81,10 +81,10 @@ try {
   console.log('ℹ️  gh CLI not available, PR metrics unavailable')
 }
 
-// Calculate Spec Coverage
-const specCoverage = commitCount > 0
-  ? Math.round((trace.summary.total_references / commitCount) * 100)
-  : 0
+// Calculate Spec Coverage (from changed-file-based calculation in trace.json)
+const specCoverage = trace.summary.spec_coverage || 0
+const changedFilesTotal = trace.summary.changed_files_total || 0
+const changedFilesWithSpec = trace.summary.changed_files_with_spec || 0
 
 // Check Sync-Fail rate (run sync check)
 let syncFailCount = 0
@@ -196,9 +196,9 @@ const lines = [
   '### Spec Coverage',
   '',
   '```',
-  'Week  | Coverage | Commits with spec()',
-  '------|----------|---------------------',
-  `Now   | ${specCoverage}%      | ${trace.summary.by_source.commits || 0}/${commitCount}`,
+  'Week  | Coverage | Changed Files with spec()',
+  '------|----------|---------------------------',
+  `Now   | ${specCoverage}%      | ${changedFilesWithSpec}/${changedFilesTotal}`,
   '```',
   '',
   '---',

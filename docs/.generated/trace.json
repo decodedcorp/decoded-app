@@ -1,13 +1,103 @@
 {
-  "generated_at": "2025-11-05T09:52:04.451Z",
+  "generated_at": "2025-11-05T10:06:39.847Z",
   "summary": {
-    "total_references": 0,
+    "total_references": 12,
     "by_source": {
       "commits": 0,
-      "code_comments": 0,
+      "code_comments": 12,
       "pr_descriptions": 0
     },
-    "by_spec": {}
+    "by_spec": {
+      "PRD-TG-0002": 12
+    },
+    "spec_coverage": 0,
+    "changed_files_total": 70,
+    "changed_files_with_spec": 0
   },
-  "references": []
+  "references": [
+    {
+      "spec_id": "PRD-TG-0002",
+      "source": "code_comment",
+      "location": "src/domains/channels/components/masonry/MasonryGrid.tsx:1",
+      "context": "// spec: PRD-TG-0002",
+      "timestamp": "2025-11-05T10:06:39.977Z"
+    },
+    {
+      "spec_id": "PRD-TG-0002",
+      "source": "code_comment",
+      "location": "src/domains/channels/components/masonry/grid.tsx:1",
+      "context": "// spec: PRD-TG-0002",
+      "timestamp": "2025-11-05T10:06:39.977Z"
+    },
+    {
+      "spec_id": "PRD-TG-0002",
+      "source": "code_comment",
+      "location": "src/domains/channels/components/explore/ExploreGrid.tsx:1",
+      "context": "// spec: PRD-TG-0002",
+      "timestamp": "2025-11-05T10:06:39.975Z"
+    },
+    {
+      "spec_id": "PRD-TG-0002",
+      "source": "code_comment",
+      "location": "src/domains/channels/components/category-grid/CategoryGrid.tsx:1",
+      "context": "// spec: PRD-TG-0002",
+      "timestamp": "2025-11-05T10:06:39.973Z"
+    },
+    {
+      "spec_id": "PRD-TG-0002",
+      "source": "code_comment",
+      "location": "src/domains/channels/components/category-grid/GridItem.tsx:1",
+      "context": "// spec: PRD-TG-0002",
+      "timestamp": "2025-11-05T10:06:39.973Z"
+    },
+    {
+      "spec_id": "PRD-TG-0002",
+      "source": "code_comment",
+      "location": "src/domains/channels/components/category-grid/MasonryGrid.tsx:1",
+      "context": "// spec: PRD-TG-0002",
+      "timestamp": "2025-11-05T10:06:39.973Z"
+    },
+    {
+      "spec_id": "PRD-TG-0002",
+      "source": "code_comment",
+      "location": "src/domains/channels/components/category-grid/MasonryGridSkeleton.tsx:1",
+      "context": "// spec: PRD-TG-0002",
+      "timestamp": "2025-11-05T10:06:39.973Z"
+    },
+    {
+      "spec_id": "PRD-TG-0002",
+      "source": "code_comment",
+      "location": "src/domains/main/components/SimpleThiingsGrid.tsx:1",
+      "context": "// spec: PRD-TG-0002",
+      "timestamp": "2025-11-05T10:06:39.963Z"
+    },
+    {
+      "spec_id": "PRD-TG-0002",
+      "source": "code_comment",
+      "location": "src/domains/main/components/ThiingsGrid.tsx:1",
+      "context": "// spec: PRD-TG-0002",
+      "timestamp": "2025-11-05T10:06:39.963Z"
+    },
+    {
+      "spec_id": "PRD-TG-0002",
+      "source": "code_comment",
+      "location": "src/domains/explore/components/SimpleThiingsGrid.tsx:1",
+      "context": "// spec: PRD-TG-0002",
+      "timestamp": "2025-11-05T10:06:39.958Z"
+    },
+    {
+      "spec_id": "PRD-TG-0002",
+      "source": "code_comment",
+      "location": "src/domains/explore/components/ThiingsGrid.tsx:1",
+      "context": "// spec: PRD-TG-0002",
+      "timestamp": "2025-11-05T10:06:39.958Z"
+    },
+    {
+      "spec_id": "PRD-TG-0002",
+      "source": "code_comment",
+      "location": "src/components/FeedGrid/FeedGrid.tsx:1",
+      "context": "// spec: PRD-TG-0002",
+      "timestamp": "2025-11-05T10:06:39.906Z"
+    }
+  ]
 }

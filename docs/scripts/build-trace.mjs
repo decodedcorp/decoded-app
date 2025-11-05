@@ -140,11 +140,54 @@ try {
   console.log('   ℹ️  gh CLI not available or no PRs found')
 }
 
+// Calculate changed-file-based spec coverage
+console.log('📊 Calculating spec coverage...')
+let specCoverage = 0
+let changedFilesTotal = 0
+let changedFilesWithSpec = 0
+
+try {
+  const changedFilesOutput = execSync('git diff --name-only origin/main...HEAD', {
+    encoding: 'utf-8'
+  }).trim()
+
+  if (changedFilesOutput) {
+    const changedFiles = changedFilesOutput.split('\n')
+      .filter(f => f.match(/\.(ts|tsx|js|jsx)$/))
+
+    changedFilesTotal = changedFiles.length
+
+    // Count files with spec references
+    for (const filepath of changedFiles) {
+      if (fs.existsSync(filepath)) {
+        const content = fs.readFileSync(filepath, 'utf-8')
+        if (SPEC_PATTERN.test(content)) {
+          changedFilesWithSpec++
+        }
+      }
+    }
+
+    specCoverage = changedFilesTotal > 0
+      ? Math.round((changedFilesWithSpec / changedFilesTotal) * 100)
+      : 0
+  }
+
+  console.log(`   Changed files: ${changedFilesTotal}`)
+  console.log(`   Files with spec: ${changedFilesWithSpec}`)
+} catch (error) {
+  console.log('   ℹ️  Could not calculate coverage (main branch may not exist)')
+}
+
 // Calculate total
 trace.summary.total_references =
   trace.summary.by_source.commits +
   trace.summary.by_source.code_comments +
   trace.summary.by_source.pr_descriptions
+
+// Add coverage metrics to summary
+trace.summary.spec_coverage = specCoverage
+trace.summary.changed_files_total = changedFilesTotal
+trace.summary.changed_files_with_spec = changedFilesWithSpec
 
 // Sort references by spec_id, then timestamp
 trace.references.sort((a, b) => {
@@ -164,6 +207,7 @@ console.log('')
 console.log('📊 Summary:')
 console.log(`   Total references: ${trace.summary.total_references}`)
 console.log(`   Unique specs: ${Object.keys(trace.summary.by_spec).length}`)
+console.log(`   Spec coverage: ${specCoverage}% (${changedFilesWithSpec}/${changedFilesTotal} changed files)`)
 console.log('')
 console.log('📖 By source:')
 console.log(`   Commits: ${trace.summary.by_source.commits}`)

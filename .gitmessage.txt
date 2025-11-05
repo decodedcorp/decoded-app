@@ -1,0 +1,4 @@
+<type>(<scope>): <subject>
+
+Body: what/why
+spec(PRD-XX-####)
