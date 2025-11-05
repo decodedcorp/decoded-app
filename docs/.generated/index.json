@@ -526,34 +526,6 @@
     "version": null
   },
   {
-    "path": "docs/mainpage-migrate/2024-07-22-init.md",
-    "id": null,
-    "type": "tombstone",
-    "title": "Moved: 2024-07-22-init",
-    "status": null,
-    "owner": null,
-    "created": null,
-    "updated": null,
-    "related_specs": [],
-    "related_plans": [],
-    "tags": [],
-    "version": null
-  },
-  {
-    "path": "docs/mainpage-migrate/ThiingsGrid-migration.md",
-    "id": null,
-    "type": "tombstone",
-    "title": "Moved: ThiingsGrid-migration",
-    "status": null,
-    "owner": null,
-    "created": null,
-    "updated": null,
-    "related_specs": [],
-    "related_plans": [],
-    "tags": [],
-    "version": null
-  },
-  {
     "path": "docs/prd-templates/prd-template.md",
     "id": null,
     "type": "note",
@@ -569,6 +541,34 @@
       "prd",
       "product-requirements"
     ],
+    "version": null
+  },
+  {
+    "path": "docs/login/2024-07-28.md",
+    "id": null,
+    "type": "unknown",
+    "title": "2024-07-28.md",
+    "status": null,
+    "owner": null,
+    "created": null,
+    "updated": null,
+    "related_specs": [],
+    "related_plans": [],
+    "tags": [],
+    "version": null
+  },
+  {
+    "path": "docs/login/implementation-summary.md",
+    "id": null,
+    "type": "unknown",
+    "title": "implementation-summary.md",
+    "status": null,
+    "owner": null,
+    "created": null,
+    "updated": null,
+    "related_specs": [],
+    "related_plans": [],
+    "tags": [],
     "version": null
   },
   {
@@ -675,6 +675,34 @@
     "version": null
   },
   {
+    "path": "docs/mainpage-migrate/2024-07-22-init.md",
+    "id": null,
+    "type": "tombstone",
+    "title": "Moved: 2024-07-22-init",
+    "status": null,
+    "owner": null,
+    "created": null,
+    "updated": null,
+    "related_specs": [],
+    "related_plans": [],
+    "tags": [],
+    "version": null
+  },
+  {
+    "path": "docs/mainpage-migrate/ThiingsGrid-migration.md",
+    "id": null,
+    "type": "tombstone",
+    "title": "Moved: ThiingsGrid-migration",
+    "status": null,
+    "owner": null,
+    "created": null,
+    "updated": null,
+    "related_specs": [],
+    "related_plans": [],
+    "tags": [],
+    "version": null
+  },
+  {
     "path": "docs/04-analysis/decisions/template.md",
     "id": "ADR-0000",
     "type": "adr",
@@ -696,34 +724,6 @@
       "architecture",
       "infrastructure"
     ],
-    "version": null
-  },
-  {
-    "path": "docs/login/2024-07-28.md",
-    "id": null,
-    "type": "unknown",
-    "title": "2024-07-28.md",
-    "status": null,
-    "owner": null,
-    "created": null,
-    "updated": null,
-    "related_specs": [],
-    "related_plans": [],
-    "tags": [],
-    "version": null
-  },
-  {
-    "path": "docs/login/implementation-summary.md",
-    "id": null,
-    "type": "unknown",
-    "title": "implementation-summary.md",
-    "status": null,
-    "owner": null,
-    "created": null,
-    "updated": null,
-    "related_specs": [],
-    "related_plans": [],
-    "tags": [],
     "version": null
   },
   {

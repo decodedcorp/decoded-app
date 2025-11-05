@@ -31,7 +31,9 @@
     "docs:verify": "yarn node docs/scripts/verify-relations.mjs",
     "docs:sync": "bash docs/scripts/check-sync.sh",
     "docs:sync:strict": "bash docs/scripts/check-sync.sh --strict",
-    "docs:unknowns": "yarn node docs/scripts/report-unknowns.mjs"
+    "docs:unknowns": "yarn node docs/scripts/report-unknowns.mjs",
+    "docs:trace": "yarn node docs/scripts/build-trace.mjs",
+    "docs:status": "yarn node docs/scripts/generate-sprint-status.mjs"
   },
   "dependencies": {
     "@decoded/ui": "portal:./packages/ui",
