@@ -1,3 +1,13 @@
+---
+type: guideline
+title: "Mobile Optimization Guide"
+created: 2025-09-15
+owner: Frontend Team
+category: development
+tags: [mobile, performance, optimization, responsive]
+status: active
+---
+
 # 📱 Mobile Optimization Guide
 
 This guide provides comprehensive mobile optimization practices for the Decoded App project, ensuring excellent user experience across all mobile devices.

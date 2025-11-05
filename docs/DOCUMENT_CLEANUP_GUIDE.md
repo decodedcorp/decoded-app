@@ -1,3 +1,13 @@
+---
+type: guideline
+title: "Document Cleanup Execution Guide"
+created: 2025-11-04
+owner: Documentation Team
+category: documentation
+tags: [cleanup, archive, tombstone, workflow]
+status: active
+---
+
 # Document Cleanup Execution Guide
 
 **목표**: 불필요/중복/완료된 문서를 안전하게 아카이브하고 링크 무결성 유지

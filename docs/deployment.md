@@ -1,3 +1,12 @@
+---
+type: note
+title: "Decoded App Deployment Guide"
+created: 2025-08-06
+owner: DevOps Team
+tags: [deployment, devops, production, setup]
+status: active
+---
+
 # Decoded App Deployment Guide
 
 ## Overview

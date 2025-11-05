@@ -1,3 +1,12 @@
+---
+type: note
+title: "Design System v3 Migration PR Template"
+created: 2025-09-16
+owner: Design Team
+tags: [pr-template, design-system, migration, checklist]
+status: active
+---
+
 # Design System v3 Migration PR Template
 
 ## Summary

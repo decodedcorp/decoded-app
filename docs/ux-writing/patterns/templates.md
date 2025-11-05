@@ -1,3 +1,12 @@
+---
+type: note
+title: "UX Writing Text Templates"
+created: 2025-09-10
+owner: UX Team
+tags: [ux-writing, templates, patterns, reference]
+status: active
+---
+
 # Text Templates
 
 ## Overview

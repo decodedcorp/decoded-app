@@ -1,13 +1,18 @@
 {
-  "total": 55,
+  "total": 52,
   "by_type": {
-    "unknown": 41,
+    "guideline": 7,
     "tombstone": 13,
+    "unknown": 25,
+    "note": 5,
+    "research": 1,
     "adr": 1
   },
   "by_status": {
+    "active": 12,
+    "completed": 1,
     "proposed": 1
   },
   "missing_ids": [],
-  "updated": "2025-11-04T12:44:44.179Z"
+  "updated": "2025-11-05T09:44:38.250Z"
 }

@@ -1,3 +1,13 @@
+---
+type: note
+title: "Decoded 프로젝트 문서 시스템"
+created: 2025-11-04
+owner: Documentation Team
+tags: [readme, documentation, onboarding, git-spec]
+status: active
+version: "2.0"
+---
+
 # Decoded 프로젝트 문서 시스템
 
 **문서 버전:** 2.0 (Git-Spec 주도 개발 체계)

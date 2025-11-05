@@ -1,3 +1,13 @@
+---
+type: guideline
+title: "UX Writing Guidelines"
+created: 2025-09-10
+owner: UX Team
+category: content
+tags: [ux-writing, guidelines, korean, english]
+status: active
+---
+
 # UX Writing Guidelines (UX 라이팅 가이드라인)
 
 ## Core Principles (핵심 원칙)

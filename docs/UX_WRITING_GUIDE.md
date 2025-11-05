@@ -1,3 +1,13 @@
+---
+type: guideline
+title: "UX Writing Guide - Localization Implementation Plan"
+created: 2025-09-10
+owner: UX Team
+category: content
+tags: [ux-writing, localization, i18n, korean]
+status: active
+---
+
 # UX Writing Guide - Localization Implementation Plan
 
 ## Current State Analysis

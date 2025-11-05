@@ -1,3 +1,13 @@
+---
+type: guideline
+title: "Decoded App 팀 개발 가이드"
+created: 2025-08-15
+owner: Dev Team
+category: development
+tags: [team, development, workflow, standards]
+status: active
+---
+
 # 👥 Decoded App 팀 개발 가이드
 
 ## 🎯 핵심 원칙

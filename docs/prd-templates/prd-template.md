@@ -1,7 +1,16 @@
+---
+type: note
+title: "PRD Template"
+created: 2025-11-05
+owner: Product Team
+tags: [template, prd, product-requirements]
+status: active
+---
+
 # [Feature Name] - Product Requirements Document
-**Version:** [Version Number]  
-**Date:** [Date]  
-**Authors:** [Authors]  
+**Version:** [Version Number]
+**Date:** [Date]
+**Authors:** [Authors]
 **Status:** [Draft/Review/Approved/Active/Archived]  
 
 ---

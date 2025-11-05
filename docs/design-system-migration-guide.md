@@ -1,3 +1,14 @@
+---
+type: guideline
+title: "Design System v3 Migration Guide"
+created: 2025-09-16
+owner: Design Team
+category: design
+tags: [design-system, migration, tokens, theming]
+status: active
+version: "3.0"
+---
+
 # Design System v3 Migration Guide
 
 🎯 **Goal**: Replace hardcoded `#EAFD66` with role-based design tokens for better maintainability and theme support.

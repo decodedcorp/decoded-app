@@ -253,6 +253,108 @@
     },
 
     {
+      "title": "Note Document",
+      "description": "Lightweight note or memo without strict structure requirements",
+      "type": "object",
+      "properties": {
+        "type": { "const": "note" },
+        "title": {
+          "type": "string",
+          "minLength": 3,
+          "description": "Note title"
+        },
+        "created": {
+          "type": "string",
+          "format": "date",
+          "description": "Creation date (YYYY-MM-DD)"
+        },
+        "owner": {
+          "type": "string",
+          "description": "Owner name or role"
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "status": {
+          "enum": ["draft", "active", "archived"],
+          "description": "Note status"
+        }
+      },
+      "required": ["type", "title", "created", "owner"]
+    },
+
+    {
+      "title": "Memo Document",
+      "description": "Quick memo or temporary document",
+      "type": "object",
+      "properties": {
+        "type": { "const": "memo" },
+        "title": {
+          "type": "string",
+          "minLength": 3,
+          "description": "Memo title"
+        },
+        "created": {
+          "type": "string",
+          "format": "date",
+          "description": "Creation date (YYYY-MM-DD)"
+        },
+        "owner": {
+          "type": "string",
+          "description": "Owner name or role"
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date",
+          "description": "Expiration date for temporary memos"
+        }
+      },
+      "required": ["type", "title", "created", "owner"]
+    },
+
+    {
+      "title": "Research Document",
+      "description": "Research findings or investigation notes",
+      "type": "object",
+      "properties": {
+        "type": { "const": "research" },
+        "title": {
+          "type": "string",
+          "minLength": 3,
+          "description": "Research title"
+        },
+        "created": {
+          "type": "string",
+          "format": "date",
+          "description": "Creation date (YYYY-MM-DD)"
+        },
+        "owner": {
+          "type": "string",
+          "description": "Owner name or role"
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "related_specs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Related PRDs or Specs"
+        },
+        "status": {
+          "enum": ["draft", "in-progress", "completed", "archived"],
+          "description": "Research status"
+        }
+      },
+      "required": ["type", "title", "created", "owner"]
+    },
+
+    {
       "title": "Tombstone (Moved Document)",
       "description": "Placeholder for moved/archived documents to preserve links",
       "type": "object",

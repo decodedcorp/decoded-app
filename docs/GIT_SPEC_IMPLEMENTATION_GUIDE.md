@@ -1,3 +1,14 @@
+---
+type: guideline
+title: "Git-Spec 주도 개발 체계 구축 가이드"
+created: 2025-11-04
+owner: Documentation Team
+category: development
+tags: [git-spec, workflow, implementation, validation]
+status: active
+version: "2.0"
+---
+
 # Git-Spec 주도 개발 체계 구축 가이드 (v2.0)
 
 **작성일:** 2025-11-04
