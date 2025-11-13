@@ -6,15 +6,23 @@ A modern web application built with Next.js, TypeScript, and Tailwind CSS.
 
 ### Local Development
 
+This project uses **Yarn Berry (v4.9.2) with Plug'n'Play (PnP)** for package management. With Zero-Install enabled, dependencies are already included in Git, so you typically don't need to run `yarn install` after cloning.
+
 ```bash
-# Install dependencies
-yarn install
+# Clone the repository
+git clone <repository-url>
+cd decoded-app
+
+# Dependencies are already installed (Zero-Install)
+# No yarn install needed!
 
 # Start development server
 yarn dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+**Note**: If you need to update dependencies, run `yarn install` which will update `.pnp.cjs` and `.yarn/cache/`.
 
 ### Production Build
 
@@ -200,13 +208,56 @@ docs/
 └── settings.local.json.example # Local settings template
 ```
 
+## 📦 Package Management: Yarn Berry PnP
+
+This project uses **Yarn Berry (v4.9.2) with Plug'n'Play (PnP)** mode, following [Toss's best practices](https://toss.tech/article/node-modules-and-yarn-berry).
+
+### Key Benefits
+
+- **Zero-Install**: Dependencies are version-controlled (`.pnp.cjs`, `.yarn/cache/`) - no `yarn install` needed after clone
+- **Faster CI/CD**: Saves 60-90 seconds per build (no dependency installation step)
+- **Guaranteed Correctness**: No phantom dependencies, strict dependency validation
+- **Smaller Repository**: ~139MB vs ~1.2GB with node_modules (2,000 zip files vs 135,000 files)
+- **Better Performance**: Faster dependency resolution, no deep directory traversal
+
+### Configuration
+
+- **PnP Mode**: `nodeLinker: pnp` in `.yarnrc.yml`
+- **Loose Mode**: `pnpMode: loose` for compatibility
+- **Zero-Install**: `.pnp.cjs` and `.yarn/cache/` are committed to Git
+
+### Usage
+
+```bash
+# Add a dependency
+yarn add <package-name>
+
+# Add a dev dependency
+yarn add -D <package-name>
+
+# Update dependencies
+yarn upgrade
+
+# Run scripts (no node_modules needed!)
+yarn dev
+yarn build
+yarn test
+```
+
+### Important Notes
+
+- **Never use `npm`** - Always use `yarn` commands
+- **No `node_modules` directory** - Dependencies resolved via PnP
+- **For CLI tools**: Use `yarn dlx` instead of `npx`
+- **IDE Support**: Install [ZipFS extension](https://marketplace.visualstudio.com/items?itemName=arcanis.vscode-zipfs) for VS Code/Cursor
+
 ## 🛠️ Tech Stack
 
 - **Frontend**: Next.js 15.4.1, React 19.1.0, TypeScript 5.9.2
 - **Styling**: Tailwind CSS 4.1.11 with custom design system
 - **State Management**: Zustand 5.0.6, React Query 5.83.0
 - **Testing**: Playwright 1.55.0
-- **Build Tools**: Yarn 4.9.2, ESLint, TypeScript
+- **Build Tools**: Yarn 4.9.2 (PnP), ESLint, TypeScript
 - **Deployment**: Vercel
 
 ## 📝 License

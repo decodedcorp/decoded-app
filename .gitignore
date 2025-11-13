@@ -43,6 +43,16 @@ Thumbs.db
 .claude/settings.local.json
 .codex/config.local.toml
 
+# Yarn Berry PnP
+# Note: .yarn/cache/ contains large files (>100MB) that exceed GitHub's limits
+# Keeping .pnp.cjs for faster dependency resolution, but cache excluded
+# CI/CD will need to run 'yarn install' but will benefit from Yarn's cache
+.pnp.*
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+
 # Generated files
 *.tsbuildinfo
 next-env.d.ts
