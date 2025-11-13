@@ -26,6 +26,12 @@ const nextConfig: NextConfig = {
       use: ['@svgr/webpack'],
     });
 
+    // Add GLB file support
+    config.module.rules.push({
+      test: /\.(glb|gltf)$/,
+      type: 'asset/resource',
+    });
+
     return config;
   },
   // plugins: ['@tailwindcss/postcss'], // Removed invalid plugin

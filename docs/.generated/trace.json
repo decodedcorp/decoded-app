@@ -1,5 +1,5 @@
 {
-  "generated_at": "2025-11-05T10:37:32.004Z",
+  "generated_at": "2025-11-05T10:51:35.386Z",
   "summary": {
     "total_references": 12,
     "by_source": {
@@ -184,86 +184,86 @@
     {
       "spec_id": "PRD-TG-0002",
       "source": "code_comment",
-      "location": "src/domains/channels/components/masonry/grid.tsx:1",
-      "context": "// spec: PRD-TG-0002",
-      "timestamp": "2025-11-05T10:37:32.142Z"
-    },
-    {
-      "spec_id": "PRD-TG-0002",
-      "source": "code_comment",
-      "location": "src/domains/channels/components/masonry/MasonryGrid.tsx:1",
-      "context": "// spec: PRD-TG-0002",
-      "timestamp": "2025-11-05T10:37:32.141Z"
-    },
-    {
-      "spec_id": "PRD-TG-0002",
-      "source": "code_comment",
-      "location": "src/domains/channels/components/explore/ExploreGrid.tsx:1",
-      "context": "// spec: PRD-TG-0002",
-      "timestamp": "2025-11-05T10:37:32.140Z"
-    },
-    {
-      "spec_id": "PRD-TG-0002",
-      "source": "code_comment",
       "location": "src/domains/channels/components/category-grid/MasonryGridSkeleton.tsx:1",
       "context": "// spec: PRD-TG-0002",
-      "timestamp": "2025-11-05T10:37:32.139Z"
+      "timestamp": "2025-11-05T10:51:35.534Z"
     },
     {
       "spec_id": "PRD-TG-0002",
       "source": "code_comment",
       "location": "src/domains/channels/components/category-grid/CategoryGrid.tsx:1",
       "context": "// spec: PRD-TG-0002",
-      "timestamp": "2025-11-05T10:37:32.138Z"
+      "timestamp": "2025-11-05T10:51:35.533Z"
     },
     {
       "spec_id": "PRD-TG-0002",
       "source": "code_comment",
       "location": "src/domains/channels/components/category-grid/GridItem.tsx:1",
       "context": "// spec: PRD-TG-0002",
-      "timestamp": "2025-11-05T10:37:32.138Z"
+      "timestamp": "2025-11-05T10:51:35.533Z"
     },
     {
       "spec_id": "PRD-TG-0002",
       "source": "code_comment",
       "location": "src/domains/channels/components/category-grid/MasonryGrid.tsx:1",
       "context": "// spec: PRD-TG-0002",
-      "timestamp": "2025-11-05T10:37:32.138Z"
+      "timestamp": "2025-11-05T10:51:35.533Z"
     },
     {
       "spec_id": "PRD-TG-0002",
       "source": "code_comment",
-      "location": "src/domains/main/components/SimpleThiingsGrid.tsx:1",
+      "location": "src/domains/channels/components/masonry/MasonryGrid.tsx:1",
       "context": "// spec: PRD-TG-0002",
-      "timestamp": "2025-11-05T10:37:32.127Z"
+      "timestamp": "2025-11-05T10:51:35.525Z"
+    },
+    {
+      "spec_id": "PRD-TG-0002",
+      "source": "code_comment",
+      "location": "src/domains/channels/components/masonry/grid.tsx:1",
+      "context": "// spec: PRD-TG-0002",
+      "timestamp": "2025-11-05T10:51:35.525Z"
+    },
+    {
+      "spec_id": "PRD-TG-0002",
+      "source": "code_comment",
+      "location": "src/domains/channels/components/explore/ExploreGrid.tsx:1",
+      "context": "// spec: PRD-TG-0002",
+      "timestamp": "2025-11-05T10:51:35.522Z"
     },
     {
       "spec_id": "PRD-TG-0002",
       "source": "code_comment",
       "location": "src/domains/main/components/ThiingsGrid.tsx:1",
       "context": "// spec: PRD-TG-0002",
-      "timestamp": "2025-11-05T10:37:32.127Z"
+      "timestamp": "2025-11-05T10:51:35.514Z"
+    },
+    {
+      "spec_id": "PRD-TG-0002",
+      "source": "code_comment",
+      "location": "src/domains/main/components/SimpleThiingsGrid.tsx:1",
+      "context": "// spec: PRD-TG-0002",
+      "timestamp": "2025-11-05T10:51:35.513Z"
     },
     {
       "spec_id": "PRD-TG-0002",
       "source": "code_comment",
       "location": "src/domains/explore/components/SimpleThiingsGrid.tsx:1",
       "context": "// spec: PRD-TG-0002",
-      "timestamp": "2025-11-05T10:37:32.120Z"
+      "timestamp": "2025-11-05T10:51:35.503Z"
     },
     {
       "spec_id": "PRD-TG-0002",
       "source": "code_comment",
       "location": "src/domains/explore/components/ThiingsGrid.tsx:1",
       "context": "// spec: PRD-TG-0002",
-      "timestamp": "2025-11-05T10:37:32.120Z"
+      "timestamp": "2025-11-05T10:51:35.503Z"
     },
     {
       "spec_id": "PRD-TG-0002",
       "source": "code_comment",
       "location": "src/components/FeedGrid/FeedGrid.tsx:1",
       "context": "// spec: PRD-TG-0002",
-      "timestamp": "2025-11-05T10:37:32.064Z"
+      "timestamp": "2025-11-05T10:51:35.452Z"
     }
   ]
 }

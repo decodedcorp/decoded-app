@@ -195,17 +195,22 @@ export default function ProfilePage() {
           {profileTabs}
         </div>
 
-        {/* Desktop: Side by side */}
-        <div className="hidden lg:flex gap-6">
-          {/* Main Content */}
-          <div className="flex-1 min-w-0">
+        {/* Desktop: Stack vertically */}
+        <div className="hidden lg:flex flex-col gap-6">
+          {/* Profile Header */}
+          <div className="w-full">
             {profileHeader}
-            <div className="border-t border-zinc-800 my-6" />
-            {profileTabs}
           </div>
 
-          {/* Sidebar */}
-          <div className="w-72 flex-shrink-0">{profileSidebar}</div>
+          {/* Sidebar - ProfileHeader 바로 아래 배치 */}
+          <div className="w-full border-t border-zinc-800 pt-6">
+            {profileSidebar}
+          </div>
+
+          {/* Profile Tabs - Sidebar 아래 배치 */}
+          <div className="w-full border-t border-zinc-800 pt-6">
+            {profileTabs}
+          </div>
         </div>
       </div>
 

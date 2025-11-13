@@ -5,7 +5,6 @@ import { useCommonTranslation } from '@/lib/i18n/centralizedHooks';
 import { AnalysisProgress, AnalysisResult } from '../types/analysis';
 import { useStreamingText } from './useStreamingText';
 import TextType from './TextType';
-import MetaBalls from '@/components/three/MetaBalls';
 
 interface PreviewStepProps {
   contentTabs: ContentTab[];
@@ -68,23 +67,7 @@ export function PreviewStep({
 
   return (
     <div className="relative flex flex-col p-4">
-      {/* MetaBalls Background */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
-        <MetaBalls
-          color="#6366f1"
-          cursorBallColor="#8b5cf6"
-          cursorBallSize={2}
-          ballCount={15}
-          animationSize={30}
-          enableMouseInteraction={true}
-          enableTransparency={true}
-          hoverSmoothness={0.05}
-          clumpFactor={1}
-          speed={0.3}
-        />
-      </div>
-
-      <div className="relative z-10 w-full max-w-4xl space-y-6">
+      <div className="w-full max-w-4xl space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">

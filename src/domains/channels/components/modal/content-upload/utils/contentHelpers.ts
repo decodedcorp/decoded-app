@@ -51,8 +51,6 @@ export const defaultActionTexts: ActionTexts = {
   analyze: 'Analyze this content and provide insights',
   explain: 'Explain this content in detail',
   summarize: 'Summarize this content concisely',
-  generate: 'Generate creative content based on this',
-  translate: 'Translate this content to Korean',
 };
 
 // Action button icons and display names
@@ -65,10 +63,5 @@ export const actionConfigs: ActionConfigs = {
   summarize: {
     icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z M9 5l7 7-7 7',
     displayName: 'Summarize',
-  },
-  generate: { icon: 'M13 10V3L4 14h7v7l9-11h-7z', displayName: 'Generate' },
-  translate: {
-    icon: 'M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129',
-    displayName: 'Translate',
   },
 };
