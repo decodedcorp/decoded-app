@@ -1,0 +1,10 @@
+{
+  "enabledMcpjsonServers": [],
+  "enableAllProjectMcpServers": false,
+  "toolAllowlist": [],
+  "preferences": {
+    "autoLoadRules": true,
+    "specDrivenWorkflow": true
+  }
+}
+

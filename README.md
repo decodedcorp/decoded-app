@@ -26,11 +26,105 @@ yarn build
 yarn start
 ```
 
+## 🤖 AI Dev Boilerplate
+
+This project includes a comprehensive AI development boilerplate for multi-AI workflow (Cursor + Codex CLI + SpecKit + Claude/GPT).
+
+### Quick Start for Spec-Driven Development
+
+1. **Install SpecKit/Specify CLI** (separate installation required):
+   ```bash
+   # Via uvx (recommended)
+   uvx specify
+   
+   # Or via specify init
+   specify init
+   ```
+   Note: This boilerplate provides directory structure and templates only. SpecKit CLI installation is separate.
+
+2. **Create a spec**:
+   ```bash
+   # Using SpecKit CLI (if installed)
+   specify new feature FEATURE-my-feature
+   
+   # Or manually copy from template
+   cp specs/feature/FEATURE-sample-feature.yml specs/feature/FEATURE-my-feature.yml
+   ```
+
+3. **Use Cursor** for implementation:
+   - Cursor automatically reads specs via `.cursor/rules/spec-workflow.mdc`
+   - Reference spec IDs in code: `// spec: FEATURE-xxx - description`
+
+4. **Use Codex CLI** for terminal-based work:
+   ```bash
+   # Copy config to global location first
+   cp .codex/config.toml ~/.codex/config.toml
+   
+   # Run workflow script
+   scripts/run-spec-workflow.sh FEATURE-my-feature
+   ```
+
+5. **Document decisions** in ADR:
+   ```bash
+   cp docs/adr/ADR-0000-template.md docs/adr/ADR-YYYYMMDD-decision-name.md
+   ```
+
+### Phase 1 vs Phase 2 Setup
+
+#### Phase 1: Core Skeleton (Essential)
+- ✅ Specs directory structure (`specs/`)
+- ✅ ADR templates (`docs/adr/`)
+- ✅ Cursor spec-workflow rule (`.cursor/rules/spec-workflow.mdc`)
+- ✅ Codex config template (`.codex/config.toml`)
+- ✅ Workflow script (`scripts/run-spec-workflow.sh`)
+
+#### Phase 2: Advanced AI Integration (Optional)
+- Claude configuration (`CLAUDE.md`, `.claude/settings.json`)
+- Cursor MCP configuration (`.cursor/mcp.json`, `.cursor/cli-config.json`)
+- MCP reference template (`.mcp.json`)
+- Comprehensive AI usage guide (`docs/ai-playbook/ai-usage-guide.md`)
+
+**Recommendation**: Start with Phase 1, test with one small feature, then proceed to Phase 2 if needed.
+
+### Codex CLI Setup
+
+1. **Copy config to global location**:
+   ```bash
+   mkdir -p ~/.codex
+   cp .codex/config.toml ~/.codex/config.toml
+   ```
+
+2. **Customize global config** as needed (model, paths, etc.)
+
+3. **Use workflow script**:
+   ```bash
+   scripts/run-spec-workflow.sh FEATURE-xxx
+   ```
+
+### Claude Setup
+
+1. **Project settings**: `.claude/settings.json` (already configured)
+2. **Local settings**: Copy `.claude/settings.local.json.example` to `.claude/settings.local.json` and customize
+3. **MCP reference**: See `.mcp.json` for Claude Desktop/CLI MCP configuration template
+
+### Cursor Setup
+
+- **Rules**: Auto-loaded from `.cursor/rules/*.mdc` (no manual configuration needed)
+- **CLI Config**: `.cursor/cli-config.json` (Phase 2)
+- **MCP Config**: `.cursor/mcp.json` (Phase 2)
+
+### Documentation
+
+- **AI Usage Guide**: `docs/ai-playbook/ai-usage-guide.md` - Comprehensive guide for all AI tools
+- **ADR Template**: `docs/adr/ADR-0000-template.md` - Architecture Decision Record template
+- **Spec Template**: `specs/feature/FEATURE-sample-feature.yml` - Feature specification template
+
 ## 📚 Documentation
 
 - **[Access Guide](docs/access-guide.md)** - How to access the development server
 - **[Deployment Guide](docs/deployment.md)** - Complete deployment instructions
 - **[API Documentation](docs/api/)** - API integration guides
+- **[AI Playbook](docs/ai-playbook/ai-usage-guide.md)** - AI tool usage guide
 
 ## 🔧 Development
 
@@ -48,102 +142,74 @@ yarn typegen:dev
 yarn pre-commit
 ```
 
-#### API Configuration
-
-API types are automatically generated and committed to Git to ensure:
-
-- Type safety across the team
-- Build stability even when API server is down
-- Immediate access to API schema changes
-
-**Note**: Generated files in `src/api/generated/` should not be manually edited as they will be overwritten on the next type generation.
-
-### Environment Variables
-
-Copy the example environment file and configure it:
+### Testing
 
 ```bash
-# Copy example environment file
-cp env.example .env.local
+# Run tests
+yarn test
 
-# Edit with your actual values
-nano .env.local
+# Run tests in UI mode
+yarn test:ui
+
+# Run tests in headed mode
+yarn test:headed
 ```
 
-#### Required Environment Variables
+### Linting and Type Checking
 
 ```bash
-# API Configuration
-NEXT_PUBLIC_API_BASE_URL=https://dev.decoded.style
-API_BASE_URL=https://dev.decoded.style
+# Run linter
+yarn lint
 
-# Google OAuth Configuration
-NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id_here
-NEXT_PUBLIC_GOOGLE_REDIRECT_URI=http://localhost:3000/auth/callback
-
-# Server Configuration
-PORT=3000
+# Type check
+yarn type-check
 ```
 
-## 🌐 Development Server
-
-The development server is deployed on macOS Mini:
-
-- **URL**: `http://121.130.214.186:3000`
-- **Environment**: Development
-- **API**: `https://dev.decoded.style`
-
-For access instructions, see [Access Guide](docs/access-guide.md).
-
-## 🚀 Deployment
-
-### Quick Deployment
-
-```bash
-# Build and deploy to development server
-./deploy-macos-dev.sh
-```
-
-### Manual Deployment
-
-See [Deployment Guide](docs/deployment.md) for detailed instructions.
-
-## 🛠️ Tech Stack
-
-- **Framework**: Next.js 15.4.1
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **State Management**: Zustand
-- **API**: React Query
-- **Authentication**: Google OAuth
-- **Package Manager**: Yarn (PnP)
-
-## 📁 Project Structure
+## 📦 Project Structure
 
 ```
 src/
-├── api/           # API integration and generated types
-├── app/           # Next.js App Router pages
-├── components/    # Reusable UI components
-├── domains/       # Feature-based modules
-├── lib/           # Utility libraries
-├── shared/        # Shared components
-├── store/         # State management
-└── styles/        # Global styles
+├── app/           # Next.js app router pages
+├── domains/       # Feature-based modules (auth, channels, profile, etc.)
+├── shared/        # Shared components and utilities
+├── styles/        # Global styles and design tokens
+├── lib/           # Library utilities and hooks
+├── store/         # Zustand state management
+├── constants/     # Application constants
+└── types/         # TypeScript type definitions
+
+specs/             # Spec-driven development specs
+├── feature/       # Feature specifications
+├── bugfix/        # Bugfix specifications
+└── experiment/    # Experiment specifications
+
+docs/
+├── adr/           # Architecture Decision Records
+└── ai-playbook/   # AI tool usage guides
+
+.cursor/
+├── rules/         # Cursor AI rules
+├── cli-config.json # Cursor CLI configuration
+└── mcp.json       # MCP server configuration
+
+.codex/
+└── config.toml   # Codex CLI configuration template
+
+.claude/
+├── settings.json           # Claude Code settings
+└── settings.local.json.example # Local settings template
 ```
 
-## 🤝 Contributing
+## 🛠️ Tech Stack
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests and type generation
-5. Submit a pull request
+- **Frontend**: Next.js 15.4.1, React 19.1.0, TypeScript 5.9.2
+- **Styling**: Tailwind CSS 4.1.11 with custom design system
+- **State Management**: Zustand 5.0.6, React Query 5.83.0
+- **Testing**: Playwright 1.55.0
+- **Build Tools**: Yarn 4.9.2, ESLint, TypeScript
+- **Deployment**: Vercel
 
-## 📄 License
+## 📝 License
 
-This project is private and proprietary.
+[Add your license information here]
 
----
-
-For more information, see the [Next.js Documentation](https://nextjs.org/docs).

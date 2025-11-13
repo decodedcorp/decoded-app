@@ -1,0 +1,33 @@
+[project]
+name = "ai-dev-boilerplate"
+root = "."
+
+# Optional: restrict file operations to these directories
+allowed_paths = [
+  "src",
+  "specs",
+  "docs",
+  "scripts"
+]
+
+[model]
+# You can swap this with another model (e.g., o3-mini, o4-mini) depending on your plan
+name = "gpt-4.1-mini"
+
+[workflow]
+require_approval = true
+show_diff_before_applying = true
+auto_stage_git_changes = false
+
+[specs]
+# Where to look for spec files by default
+directory = "specs"
+# File pattern to detect spec files
+pattern = "FEATURE-*.yml"
+
+[scripts]
+# Define reusable commands Codex can call by name
+test = "pnpm test"
+lint = "pnpm lint"
+typecheck = "pnpm typecheck"
+

@@ -1,0 +1,55 @@
+---
+description: Spec-driven workflow for multi-AI development (SpecKit + Cursor + Codex + Claude/GPT)
+globs: ["specs/**/*.yml", "src/**/*", "docs/adr/**/*.md"]
+alwaysApply: false
+---
+
+# Spec-driven workflow (SpecKit + Cursor + Codex)
+
+## Role
+
+You are an AI assistant helping with a spec-driven development workflow.
+
+Specs live in the `specs/` directory (feature, bugfix, experiment).
+
+## Rules
+
+- Before writing or modifying code, ALWAYS look for a relevant spec in `specs/`.
+
+- If no spec exists, ask the user whether to:
+  - create a new spec file, or
+  - proceed with a quick ad-hoc change.
+
+- When a spec is provided:
+  - Extract: context, functional requirements, non-functional requirements, acceptance criteria.
+  - Propose an implementation plan with concrete file paths and checkpoints.
+  - WAIT for user approval before editing any files.
+
+## Implementation Plan
+
+For each spec:
+
+1. Summarize the spec in your own words (2-3 bullet points).
+
+2. Propose a step-by-step plan, including:
+   - Which files to create or update.
+   - How the changes relate to specific requirements.
+
+3. Mark checkpoints like:
+   - "// checkpoint: verify UI behavior"
+   - "// checkpoint: run tests for module X"
+
+4. Do not write code until the user approves the plan.
+
+## Tagging
+
+- When writing code that implements a spec requirement, add a comment:
+  - `// spec: <spec-id> - <short description>`
+
+- Keep comments short and focused on WHY.
+
+## Integration with Other Tools
+
+- **Codex CLI**: Use `scripts/run-spec-workflow.sh FEATURE-xxx` to launch Codex with spec context.
+- **Claude**: Reference spec files when asking for architecture review.
+- **ADR**: Document significant decisions in `docs/adr/` when implementing specs.
