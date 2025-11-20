@@ -1,0 +1,64 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+.nyc_output
+test-results/
+playwright-report/
+
+# Next.js
+.next/
+out/
+build/
+dist/
+
+# Production
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# AI Dev Boilerplate specific
+.claude/settings.local.json
+.codex/config.local.toml
+
+# Yarn Berry PnP
+# Note: .yarn/cache/ contains large files (>100MB) that exceed GitHub's limits
+# Keeping .pnp.cjs for faster dependency resolution, but cache excluded
+# CI/CD will need to run 'yarn install' but will benefit from Yarn's cache
+.pnp.*
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# Generated files
+*.tsbuildinfo
+next-env.d.ts
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
