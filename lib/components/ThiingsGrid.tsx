@@ -117,7 +117,7 @@ export type ThiingsGridProps = {
   renderItem: (itemConfig: ItemConfig) => React.ReactNode;
   className?: string;
   initialPosition?: Position;
-  filter?: 'all' | 'latest' | 'animals' | 'vehicles' | 'sponsors';
+  filter?: 'all' | 'latest' | 'clothing' | 'accessories' | 'shoes' | 'bags';
   searchQuery?: string;
 };
 
@@ -455,16 +455,18 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
       // For now, we'll filter by gridIndex modulo for demo purposes
       // In production, this would filter based on actual item metadata
       filtered = filtered.filter((item) => {
-        const mod = item.gridIndex % 5;
+        const mod = item.gridIndex % 6;
         switch (filter) {
           case 'latest':
             return mod === 0;
-          case 'animals':
+          case 'clothing':
             return mod === 1;
-          case 'vehicles':
+          case 'accessories':
             return mod === 2;
-          case 'sponsors':
+          case 'shoes':
             return mod === 3;
+          case 'bags':
+            return mod === 4;
           default:
             return true;
         }

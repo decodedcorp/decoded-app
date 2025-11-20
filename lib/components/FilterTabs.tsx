@@ -6,9 +6,10 @@ import { useFilterStore } from "../stores/filterStore";
 const filters = [
   { key: "all", label: "All", color: "rgb(255, 133, 0)" }, // Orange
   { key: "latest", label: "Latest", color: "rgb(255, 215, 0)" }, // Gold
-  { key: "animals", label: "Animals", color: "rgb(152, 251, 152)" }, // Light green
-  { key: "vehicles", label: "Vehicles", color: "rgb(135, 206, 235)" }, // Sky blue
-  { key: "sponsors", label: "Sponsors", color: "rgb(221, 160, 221)" }, // Plum
+  { key: "clothing", label: "Clothing", color: "rgb(255, 182, 193)" }, // Pink
+  { key: "accessories", label: "Accessories", color: "rgb(221, 160, 221)" }, // Plum
+  { key: "shoes", label: "Shoes", color: "rgb(135, 206, 250)" }, // Light blue
+  { key: "bags", label: "Bags", color: "rgb(210, 180, 140)" }, // Tan
 ] as const;
 
 export function FilterTabs() {
