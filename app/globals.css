@@ -5,9 +5,9 @@
 /* Scroll Animation Classes */
 .js-observe {
   opacity: 0;
-  transform: translateY(12px) scale(0.98);
-  transition: opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateY(10px) scale(1);
+  transition: opacity 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
   transition-delay: var(--stagger, 0ms);
   will-change: opacity, transform;
 }
@@ -19,5 +19,34 @@
 
 .js-observe.is-hidden {
   opacity: 0;
-  transform: translateY(12px) scale(0.98);
+  transform: translateY(10px) scale(1);
+}
+
+/* Image layout stability for CLS optimization */
+.js-observe img[data-src],
+.js-observe img.lazy {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Support aspect-ratio for layout stability */
+.js-observe img[data-src][width][height],
+.js-observe img.lazy[width][height] {
+  aspect-ratio: attr(width) / attr(height);
+}
+
+/* Accessibility: Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .js-observe {
+    transition: none;
+    transform: none;
+    opacity: 1;
+  }
+  
+  .js-observe.is-visible,
+  .js-observe.is-hidden {
+    opacity: 1;
+    transform: none;
+  }
 }

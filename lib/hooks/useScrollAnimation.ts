@@ -191,15 +191,21 @@ export function useScrollAnimation(
             // Handle lazy image loading (if enabled)
             if (enableLazyLoad && !state.imageLoaded) {
               // Single querySelector per element - O(1) for element tree
-              const img = element.querySelector('img[data-src]') as HTMLImageElement | null
+              // Support both .lazy class and img[data-src] selector
+              const img = element.querySelector('img.lazy[data-src], img[data-src]') as HTMLImageElement | null
               if (img) {
-                const src = img.getAttribute('data-src')
-                if (src) {
-                  img.setAttribute('src', src)
-                  img.setAttribute('data-loaded', 'true')
-                  // Update WeakMap state to prevent reloading
-                  state.imageLoaded = true
-                  elementStateMap.current.set(element, state)
+                // Check if already loaded via dataset.loaded or data-loaded attribute
+                const alreadyLoaded = img.dataset.loaded === 'true' || img.getAttribute('data-loaded') === 'true'
+                if (!alreadyLoaded) {
+                  const src = img.getAttribute('data-src')
+                  if (src) {
+                    // Use direct property assignment for better performance
+                    img.src = src
+                    img.dataset.loaded = 'true'
+                    // Update WeakMap state to prevent reloading
+                    state.imageLoaded = true
+                    elementStateMap.current.set(element, state)
+                  }
                 }
               }
             }

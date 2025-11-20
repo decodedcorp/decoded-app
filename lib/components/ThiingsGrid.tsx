@@ -111,8 +111,9 @@ export type ItemConfig = {
   gridIndex: number;
 };
 
+// Props 타입 변경
 export type ThiingsGridProps = {
-  gridSize: number;
+  gridSize: number | { width: number; height: number };
   renderItem: (itemConfig: ItemConfig) => React.ReactNode;
   className?: string;
   initialPosition?: Position;
@@ -125,6 +126,11 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
   private isComponentMounted: boolean;
   private lastUpdateTime: number;
   private debouncedUpdateGridItems: ReturnType<typeof throttle>;
+  private intersectionObserver: IntersectionObserver | null;
+  private imageObserver: IntersectionObserver | null;
+  private staggerPositionCache: WeakMap<Element, number>; // Cache top position for stagger calculation
+  private staggerDelayMap: WeakMap<Element, number>; // Cache stagger delay value
+  private staggerTick: number; // Counter for stagger assignment
 
   constructor(props: ThiingsGridProps) {
     super(props);
@@ -145,6 +151,11 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
     this.animationFrame = null;
     this.isComponentMounted = false;
     this.lastUpdateTime = 0;
+    this.intersectionObserver = null;
+    this.imageObserver = null;
+    this.staggerPositionCache = new WeakMap();
+    this.staggerDelayMap = new WeakMap();
+    this.staggerTick = 0;
     this.debouncedUpdateGridItems = throttle(
       this.updateGridItems,
       UPDATE_INTERVAL,
@@ -158,6 +169,8 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
   componentDidMount() {
     this.isComponentMounted = true;
     this.updateGridItems();
+    this.initializeIntersectionObserver();
+    this.initializeImageObserver();
 
     // Add non-passive event listener
     if (this.containerRef.current) {
@@ -172,12 +185,29 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
     }
   }
 
+  componentDidUpdate() {
+    // Observe new card elements when grid items update
+    this.observeCardElements();
+    // Observe new images when grid items update
+    this.observeImages();
+  }
+
   componentWillUnmount() {
     this.isComponentMounted = false;
     if (this.animationFrame) {
       cancelAnimationFrame(this.animationFrame);
     }
     this.debouncedUpdateGridItems.cancel();
+
+    // Disconnect IntersectionObservers
+    if (this.intersectionObserver) {
+      this.intersectionObserver.disconnect();
+      this.intersectionObserver = null;
+    }
+    if (this.imageObserver) {
+      this.imageObserver.disconnect();
+      this.imageObserver = null;
+    }
 
     // Remove event listeners
     if (this.containerRef.current) {
@@ -193,21 +223,163 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
     return this.state.offset;
   };
 
+  // Initialize IntersectionObserver for scroll animations
+  private initializeIntersectionObserver = () => {
+    if (typeof IntersectionObserver === 'undefined') {
+      return; // Fallback for browsers without IntersectionObserver support
+    }
+
+    this.intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        // First pass: cache positions for new entries (only on first appearance)
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !this.staggerPositionCache.has(entry.target)) {
+            const rect = entry.target.getBoundingClientRect();
+            this.staggerPositionCache.set(entry.target, rect.top);
+          }
+        });
+
+        // Second pass: sort by cached position and assign stagger delays
+        const intersectingEntries = entries
+          .filter(e => e.isIntersecting)
+          .sort((a, b) => {
+            const topA = this.staggerPositionCache.get(a.target) ?? 0;
+            const topB = this.staggerPositionCache.get(b.target) ?? 0;
+            return topA - topB;
+          });
+
+        // Assign stagger delays (max 240ms)
+        intersectingEntries.forEach((entry) => {
+          const el = entry.target as HTMLElement;
+          if (!this.staggerDelayMap.has(el)) {
+            const delay = Math.min((this.staggerTick++ % 6) * 40, 240); // Max 240ms
+            this.staggerDelayMap.set(el, delay);
+          }
+          const delay = this.staggerDelayMap.get(el) ?? 0;
+          el.style.setProperty('--stagger', `${delay}ms`);
+        });
+
+        // Third pass: handle visibility classes with hysteresis
+        entries.forEach((entry) => {
+          const el = entry.target as HTMLElement;
+          const intersectionRatio = entry.intersectionRatio;
+          
+          if (entry.isIntersecting && intersectionRatio >= 0.15) {
+            // Entry: only trigger at 0.15 threshold
+            el.classList.add('is-visible');
+            el.classList.remove('is-hidden');
+          } else if (!entry.isIntersecting || intersectionRatio < 0.05) {
+            // Exit: trigger at 0.0 threshold (or very low ratio)
+            el.classList.add('is-hidden');
+            el.classList.remove('is-visible');
+          }
+        });
+      },
+      {
+        threshold: [0, 0.15, 0.3], // Multiple thresholds for hysteresis
+        rootMargin: '10% 0px -15% 0px', // Asymmetric: early entry (top 10%), late exit (bottom -15%)
+      }
+    );
+
+    // Observe existing card elements
+    this.observeCardElements();
+  };
+
+  // Initialize separate IntersectionObserver for faster image loading
+  private initializeImageObserver = () => {
+    if (typeof IntersectionObserver === 'undefined') {
+      return;
+    }
+
+    // Calculate viewport height in pixels for rootMargin (0.8-1.2x range, default 1.0x)
+    // Tune based on WebPageTest/DevTools Network waterfall: if concurrent requests > 6-8, reduce to 0.6-0.8x
+    const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 1000;
+    const rootMarginMultiplier = 1.0; // Tune between 0.6-1.2 based on network/main thread balance
+    const rootMarginValue = `${Math.round(viewportHeight * rootMarginMultiplier)}px`;
+
+    this.imageObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const img = entry.target as HTMLImageElement;
+            const alreadyLoaded = img.dataset.loaded === 'true' || img.getAttribute('data-loaded') === 'true';
+            if (!alreadyLoaded && img.dataset.src) {
+              img.src = img.dataset.src;
+              img.dataset.loaded = 'true';
+              // Stop observing once loaded
+              this.imageObserver?.unobserve(img);
+            }
+          }
+        });
+      },
+      {
+        threshold: 0, // Trigger immediately when any pixel enters
+        rootMargin: rootMarginValue, // Start loading 3x viewport height before entering
+      }
+    );
+
+    // Observe existing images
+    this.observeImages();
+  };
+
+  // Observe all card elements with js-observe class
+  private observeCardElements = () => {
+    if (!this.intersectionObserver || !this.containerRef.current) {
+      return;
+    }
+
+    // Use setTimeout to ensure DOM is updated after render
+    setTimeout(() => {
+      const cardElements = this.containerRef.current?.querySelectorAll('.js-observe');
+      cardElements?.forEach((el) => {
+        this.intersectionObserver?.observe(el);
+      });
+    }, 0);
+  };
+
+  // Observe all images with data-src for faster loading
+  private observeImages = () => {
+    if (!this.imageObserver || !this.containerRef.current) {
+      return;
+    }
+
+    // Use requestAnimationFrame batching for performance
+    requestAnimationFrame(() => {
+      const images = this.containerRef.current?.querySelectorAll('img[data-src]');
+      images?.forEach((img) => {
+        const alreadyLoaded = img.getAttribute('data-loaded') === 'true';
+        if (!alreadyLoaded) {
+          // Let IntersectionObserver handle visibility check (no getBoundingClientRect)
+          this.imageObserver?.observe(img);
+        }
+      });
+    });
+  };
+
+  // Helper method 추가
+  private getGridSize = () => {
+    const { gridSize } = this.props;
+    if (typeof gridSize === 'number') {
+      return { width: gridSize, height: gridSize };
+    }
+    return gridSize;
+  };
+
+  // calculateVisiblePositions 수정
   private calculateVisiblePositions = (): Position[] => {
     if (!this.containerRef.current) return [];
-
+    
     const rect = this.containerRef.current.getBoundingClientRect();
     const width = rect.width;
     const height = rect.height;
-
-    // Calculate grid cells needed to fill container
-    const cellsX = Math.ceil(width / this.props.gridSize);
-    const cellsY = Math.ceil(height / this.props.gridSize);
-
-    // Calculate center position based on offset
-    const centerX = -Math.round(this.state.offset.x / this.props.gridSize);
-    const centerY = -Math.round(this.state.offset.y / this.props.gridSize);
-
+    const { width: gridWidth, height: gridHeight } = this.getGridSize();
+    
+    const cellsX = Math.ceil(width / gridWidth);
+    const cellsY = Math.ceil(height / gridHeight);
+    
+    const centerX = -Math.round(this.state.offset.x / gridWidth);
+    const centerY = -Math.round(this.state.offset.y / gridHeight);
+    
     const positions: Position[] = [];
     const halfCellsX = Math.ceil(cellsX / 2);
     const halfCellsY = Math.ceil(cellsY / 2);
@@ -276,7 +448,10 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
 
     const distanceFromRest = getDistance(this.state.offset, this.state.restPos);
 
-    this.setState({ gridItems: newItems, isMoving: distanceFromRest > 5 });
+    this.setState({ gridItems: newItems, isMoving: distanceFromRest > 5 }, () => {
+      // Observe images immediately after state update
+      this.observeImages();
+    });
 
     this.debouncedStopMoving();
   };
@@ -455,7 +630,8 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
 
   render() {
     const { offset, isDragging, gridItems, isMoving } = this.state;
-    const { gridSize, className } = this.props;
+    const { className } = this.props;
+    const { width: gridWidth, height: gridHeight } = this.getGridSize();
 
     // Get container dimensions
     const containerRect = this.containerRef.current?.getBoundingClientRect();
@@ -490,23 +666,24 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
           }}
         >
           {gridItems.map((item) => {
-            const x = item.position.x * gridSize + containerWidth / 2;
-            const y = item.position.y * gridSize + containerHeight / 2;
+            const x = item.position.x * gridWidth + containerWidth / 2;
+            const y = item.position.y * gridHeight + containerHeight / 2;
 
             return (
               <div
                 key={`${item.position.x}-${item.position.y}`}
+                className="js-observe"
                 style={{
                   position: "absolute",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   userSelect: "none",
-                  width: gridSize,
-                  height: gridSize,
+                  width: gridWidth,
+                  height: gridHeight,
                   transform: `translate3d(${x}px, ${y}px, 0)`,
-                  marginLeft: `-${gridSize / 2}px`,
-                  marginTop: `-${gridSize / 2}px`,
+                  marginLeft: `-${gridWidth / 2}px`,
+                  marginTop: `-${gridHeight / 2}px`,
                   willChange: "transform",
                 }}
               >
