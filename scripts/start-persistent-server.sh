@@ -54,7 +54,16 @@ else
     
     echo ""
     echo -e "${GREEN}Server is running in tmux session '$SESSION_NAME'${NC}"
-    echo -e "${GREEN}Access it at: http://$HOST:$PORT${NC}"
+    
+    # Get local IP address for external access
+    LOCAL_IP=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo "")
+    if [ -n "$LOCAL_IP" ]; then
+        echo -e "${GREEN}Local access:${NC} http://localhost:$PORT"
+        echo -e "${GREEN}External access:${NC} http://$LOCAL_IP:$PORT"
+    else
+        echo -e "${GREEN}Access it at:${NC} http://$HOST:$PORT"
+        echo -e "${YELLOW}Note:${NC} To get external IP, run: ifconfig | grep 'inet ' | grep -v 127.0.0.1"
+    fi
     echo ""
     echo -e "${YELLOW}To detach from tmux:${NC} Press Ctrl+b, then d"
     echo -e "${YELLOW}To reattach later:${NC} tmux attach -t $SESSION_NAME"
