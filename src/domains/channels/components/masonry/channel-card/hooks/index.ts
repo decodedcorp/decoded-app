@@ -1,1 +1,0 @@
-export { useImageColor } from './useImageColor';
