@@ -22,6 +22,18 @@ yarn dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+### Remote Development Server
+
+For running the server persistently on Mac Mini (survives SSH disconnection):
+
+**Quick Reference**: `tmux new -s frontend → HOST=0.0.0.0 PORT=3000 yarn dev → Ctrl+b, d`
+
+See **[Server Setup Guide](docs/server-setup.md)** for detailed instructions including:
+- tmux session management
+- Development vs production server modes
+- Team access configuration
+- Convenience automation script
+
 ### Production Build
 
 ```bash
@@ -128,6 +140,7 @@ This project includes a comprehensive AI development boilerplate for multi-AI wo
 ## 📚 Documentation
 
 - **[Access Guide](docs/access-guide.md)** - How to access the development server
+- **[Server Setup Guide](docs/server-setup.md)** - Persistent server setup on Mac Mini using tmux
 - **[Deployment Guide](docs/deployment.md)** - Complete deployment instructions
 - **[API Documentation](docs/api/)** - API integration guides
 - **[AI Playbook](docs/ai-playbook/ai-usage-guide.md)** - AI tool usage guide
