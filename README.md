@@ -6,23 +6,21 @@ A modern web application built with Next.js, TypeScript, and Tailwind CSS.
 
 ### Local Development
 
-This project uses **Yarn Berry (v4.9.2) with Plug'n'Play (PnP)** for package management. With Zero-Install enabled, dependencies are already included in Git, so you typically don't need to run `yarn install` after cloning.
+This project uses **Yarn** for package management.
 
 ```bash
 # Clone the repository
 git clone <repository-url>
 cd decoded-app
 
-# Dependencies are already installed (Zero-Install)
-# No yarn install needed!
+# Install dependencies
+yarn install
 
 # Start development server
 yarn dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-**Note**: If you need to update dependencies, run `yarn install` which will update `.pnp.cjs` and `.yarn/cache/`.
 
 ### Production Build
 
