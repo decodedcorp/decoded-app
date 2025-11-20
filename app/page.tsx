@@ -5,30 +5,35 @@ import ThiingsGrid, { type ItemConfig } from "@/lib/components/ThiingsGrid";
 
 // Card cell component with position display and lazy-loaded image
 const CardCell = memo(({ gridIndex, position, isMoving }: ItemConfig) => {
-  // Top 1-2 images get high priority for LCP optimization
-  const isTopImage = gridIndex < 2;
+  // Top 6 images get high priority for faster initial load
+  const isTopImage = gridIndex < 6;
+  const imageUrl = `https://picsum.photos/seed/${gridIndex}/400/300`;
 
   return (
     <div
-      className={`absolute inset-1 flex flex-col items-center justify-center bg-white border border-gray-200 rounded-xl p-2 text-xs text-gray-800 transition-shadow overflow-hidden ${
+      className={`absolute inset-1 border border-gray-200 rounded-xl overflow-hidden transition-shadow ${
         isMoving ? "shadow-xl" : "shadow-md"
       }`}
     >
-      {/* Lazy-loaded image */}
+      {/* Optimized image loading */}
       <img
-        data-src={`https://picsum.photos/seed/${gridIndex}/300/200`}
+        src={imageUrl}
         loading={isTopImage ? "eager" : "lazy"}
         decoding="async"
-        fetchPriority={isTopImage ? "high" : "low"}
-        width={300}
-        height={200}
+        fetchPriority={isTopImage ? "high" : "auto"}
+        width={400}
+        height={300}
         alt={`Card ${gridIndex} image`}
-        className="w-full h-auto rounded-lg mb-2 object-cover"
-        style={{ aspectRatio: "3/2" }}
+        className="absolute inset-0 w-full h-full min-w-full min-h-full object-cover z-0"
       />
-      <div className="text-base font-bold mb-1">#{gridIndex}</div>
-      <div className="text-[10px] text-gray-500">
-        {position.x}, {position.y}
+      {/* Overlay text */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-xs z-10 pointer-events-none">
+        <div className="text-base font-bold mb-1 drop-shadow-lg">
+          #{gridIndex}
+        </div>
+        <div className="text-[10px] text-white/90 drop-shadow-md">
+          {position.x}, {position.y}
+        </div>
       </div>
     </div>
   );
