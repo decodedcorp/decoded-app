@@ -1,7 +1,10 @@
 "use client";
 
 import { memo } from "react";
+import { Header } from "@/lib/components/Header";
 import ThiingsGrid, { type ItemConfig } from "@/lib/components/ThiingsGrid";
+import { useFilterStore } from "@/lib/stores/filterStore";
+import { useSearchStore } from "@/lib/stores/searchStore";
 
 // Card cell component with position display and lazy-loaded image
 const CardCell = memo(({ gridIndex, position, isMoving }: ItemConfig) => {
@@ -42,15 +45,23 @@ const CardCell = memo(({ gridIndex, position, isMoving }: ItemConfig) => {
 CardCell.displayName = "CardCell";
 
 export default function Home() {
+  const activeFilter = useFilterStore((state) => state.activeFilter);
+  const debouncedQuery = useSearchStore((state) => state.debouncedQuery);
+
   return (
-    <main className="relative w-screen h-screen overflow-hidden">
-      <div className="absolute inset-0 z-0">
-        <ThiingsGrid
-          gridSize={{ width: 400, height: 500 }}
-          renderItem={(config) => <CardCell {...config} />}
-          initialPosition={{ x: 0, y: 0 }}
-        />
-      </div>
-    </main>
+    <>
+      <Header />
+      <main className="relative w-screen h-screen overflow-hidden">
+        <div className="absolute inset-0 z-0 pt-14 md:pt-16">
+          <ThiingsGrid
+            gridSize={{ width: 400, height: 500 }}
+            renderItem={(config) => <CardCell {...config} />}
+            initialPosition={{ x: 0, y: 0 }}
+            filter={activeFilter}
+            searchQuery={debouncedQuery}
+          />
+        </div>
+      </main>
+    </>
   );
 }

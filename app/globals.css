@@ -49,4 +49,11 @@
     opacity: 1;
     transform: none;
   }
+
+  /* Remove transitions for header components */
+  button,
+  a,
+  input {
+    transition: none !important;
+  }
 }

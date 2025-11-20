@@ -117,6 +117,8 @@ export type ThiingsGridProps = {
   renderItem: (itemConfig: ItemConfig) => React.ReactNode;
   className?: string;
   initialPosition?: Position;
+  filter?: 'all' | 'latest' | 'animals' | 'vehicles' | 'sponsors';
+  searchQuery?: string;
 };
 
 class ThiingsGrid extends Component<ThiingsGridProps, State> {
@@ -185,7 +187,16 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
     }
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps: ThiingsGridProps) {
+    // Re-observe elements when filter or search changes
+    if (
+      prevProps.filter !== this.props.filter ||
+      prevProps.searchQuery !== this.props.searchQuery
+    ) {
+      // Recalculate grid items with new filter/search
+      this.updateGridItems();
+    }
+
     // Observe new card elements when grid items update
     this.observeCardElements();
     // Observe new images when grid items update
@@ -434,11 +445,50 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
     this.setState({ isMoving: false, restPos: { ...this.state.offset } });
   }, 200);
 
+  // Filter items based on filter type and search query
+  private filterItems = (items: GridItem[]): GridItem[] => {
+    const { filter = 'all', searchQuery = '' } = this.props;
+    let filtered = items;
+
+    // Apply filter
+    if (filter !== 'all') {
+      // For now, we'll filter by gridIndex modulo for demo purposes
+      // In production, this would filter based on actual item metadata
+      filtered = filtered.filter((item) => {
+        const mod = item.gridIndex % 5;
+        switch (filter) {
+          case 'latest':
+            return mod === 0;
+          case 'animals':
+            return mod === 1;
+          case 'vehicles':
+            return mod === 2;
+          case 'sponsors':
+            return mod === 3;
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Apply search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter((item) => {
+        // For now, search by gridIndex
+        // In production, this would search actual item metadata
+        return item.gridIndex.toString().includes(query);
+      });
+    }
+
+    return filtered;
+  };
+
   private updateGridItems = () => {
     if (!this.isComponentMounted) return;
 
     const positions = this.calculateVisiblePositions();
-    const newItems = positions.map((position) => {
+    const allItems = positions.map((position) => {
       const gridIndex = this.getItemIndexForPosition(position.x, position.y);
       return {
         position,
@@ -446,9 +496,12 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
       };
     });
 
+    // Apply filtering
+    const filteredItems = this.filterItems(allItems);
+
     const distanceFromRest = getDistance(this.state.offset, this.state.restPos);
 
-    this.setState({ gridItems: newItems, isMoving: distanceFromRest > 5 }, () => {
+    this.setState({ gridItems: filteredItems, isMoving: distanceFromRest > 5 }, () => {
       // Observe images immediately after state update
       this.observeImages();
     });
@@ -648,6 +701,7 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
           touchAction: "none",
           overflow: "hidden",
           cursor: isDragging ? "grabbing" : "grab",
+          zIndex: 0,
         }}
         onMouseDown={this.handleMouseDown}
         onMouseMove={this.handleMouseMove}
