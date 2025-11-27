@@ -93,6 +93,7 @@ You'll return to your original shell prompt and see:
 ```
 
 In this state:
+
 - You can `exit` or close the SSH window - the server continues running
 - The server only stops when the Mac Mini reboots or powers off
 
@@ -113,11 +114,13 @@ http://맥미니_IP:3000
 ```
 
 Requirements:
+
 - Mac Mini must be on the same network
 - Port 3000 must not be blocked by Mac Mini firewall
 - The page should load immediately
 
 For future organization:
+
 - Standardize ports (e.g., 3000/4000)
 - Configure firewall settings
 - Document tmux session naming conventions
@@ -149,6 +152,14 @@ These three steps ensure the server stays alive until the Mac Mini shuts down.
 
 ---
 
+## HTTPS Access via Domain Name
+
+For production-like HTTPS access via a domain name (e.g., `https://decoded.dev`) instead of direct IP:3000 access, see the **[nginx + Cloudflare SSL Setup Guide](nginx-cloudflare-setup.md)**.
+
+**Note**: When using nginx as a reverse proxy, configure Next.js to run on `127.0.0.1:3000` (internal only) instead of `0.0.0.0:3000`. The nginx guide includes instructions for this configuration.
+
+---
+
 ## Convenience Script
 
 You can also use the provided convenience script:
@@ -162,6 +173,7 @@ You can also use the provided convenience script:
 ```
 
 The script automatically:
+
 - Checks if tmux is installed
 - Checks if the `frontend` session already exists
 - Creates a new session or attaches to existing one
@@ -173,4 +185,3 @@ You can customize `HOST` and `PORT` via environment variables:
 ```bash
 HOST=0.0.0.0 PORT=4000 ./scripts/start-persistent-server.sh dev
 ```
-
