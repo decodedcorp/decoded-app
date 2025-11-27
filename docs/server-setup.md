@@ -229,7 +229,7 @@ yarn server:dev-remote dev
 This single command will:
 
 1. Pull latest changes from the specified branch (defaults to current branch)
-2. Install dependencies (`yarn install --frozen-lockfile`)
+2. Install dependencies (`yarn install`)
 3. Build the application (`yarn build`)
 4. Restart the tmux session `frontend-dev` running production server on PORT 3000
 
