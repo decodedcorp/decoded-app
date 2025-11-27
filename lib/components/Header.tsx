@@ -21,6 +21,7 @@ export function Header() {
           <nav aria-label="Filters" className="flex items-center">
             <FilterTabs />
           </nav>
+          <MoreMenu />
         </div>
       </div>
     </header>

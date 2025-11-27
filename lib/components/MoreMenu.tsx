@@ -1,10 +1,18 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+const labPages = [
+  { href: "/lab/ascii-text", label: "ASCII Text" },
+  { href: "/lab/fashion-scan", label: "Fashion Scan" },
+];
 
 export function MoreMenu() {
   const [open, setOpen] = React.useState(false);
   const panelRef = React.useRef<HTMLDivElement | null>(null);
+  const pathname = usePathname();
 
   React.useEffect(() => {
     function onDocClick(e: MouseEvent) {
@@ -44,7 +52,7 @@ export function MoreMenu() {
         <div
           ref={panelRef}
           role="menu"
-          aria-label="More actions"
+          aria-label="Lab pages"
           className="absolute right-0 mt-2 w-48 rounded-lg border border-black/10 bg-white shadow-sm
                      will-change:opacity,transform
                      transition-all duration-200 ease-out"
@@ -54,25 +62,27 @@ export function MoreMenu() {
           }}
         >
           <ul className="py-2">
-            {[
-              { label: "discover more", onClick: () => console.log("discover") },
-              { label: "download all", onClick: () => console.log("download") },
-            ].map((item) => (
-              <li key={item.label}>
-                <button
-                  role="menuitem"
-                  onClick={() => {
-                    item.onClick();
-                    setOpen(false);
-                  }}
-                  className="w-full text-left px-3 py-2 text-black/50 hover:text-black hover:bg-black/5
-                             transition-colors duration-150 ease-out
-                             focus:outline-none focus-visible:bg-black/5"
-                >
-                  {item.label}
-                </button>
-              </li>
-            ))}
+            {labPages.map((page) => {
+              const isActive = pathname === page.href;
+              return (
+                <li key={page.href}>
+                  <Link
+                    href={page.href}
+                    role="menuitem"
+                    onClick={() => setOpen(false)}
+                    className={`w-full block text-left px-3 py-2 transition-colors duration-150 ease-out
+                               focus:outline-none focus-visible:bg-black/5
+                               ${
+                                 isActive
+                                   ? "text-black font-medium bg-black/5"
+                                   : "text-black/50 hover:text-black hover:bg-black/5"
+                               }`}
+                  >
+                    {page.label}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}
