@@ -16,11 +16,12 @@ export default function ConnectorLayer({ anchors }: ConnectorLayerProps) {
       {anchors.map((anchor) => (
         <line
           key={anchor.itemId}
+          className="fs-connector"
           x1={anchor.boxAnchor.x}
           y1={anchor.boxAnchor.y}
           x2={anchor.cardAnchor.x}
           y2={anchor.cardAnchor.y}
-          stroke="#a3ff47"
+          stroke="#d9fc69"
           strokeWidth={1}
           strokeOpacity={0.9}
         />
@@ -28,4 +29,3 @@ export default function ConnectorLayer({ anchors }: ConnectorLayerProps) {
     </svg>
   );
 }
-

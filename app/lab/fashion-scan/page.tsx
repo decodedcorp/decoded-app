@@ -87,15 +87,15 @@ export default async function Page({ searchParams }: PageProps) {
             href={`?mock=${id}`}
             className={`px-4 py-2 rounded border ${
               mockId === id
-                ? "bg-lime-400 text-black border-lime-400"
-                : "bg-zinc-800 text-white border-zinc-600 hover:border-lime-400/50"
+                ? "bg-[#d9fc69] text-black border-[#d9fc69]"
+                : "bg-zinc-800 text-white border-zinc-600 hover:border-[#d9fc69]/50"
             } transition-colors`}
           >
             Mock {id}
           </Link>
         ))}
       </div>
-      <FashionScanScene data={mockData} />
+      <FashionScanScene data={mockData} mockId={mockId} />
     </div>
   );
 }

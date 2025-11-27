@@ -45,11 +45,11 @@ function CalloutCard({
   photoUrl: string;
 }) {
   return (
-    <div className="bg-zinc-900/90 backdrop-blur-sm border border-lime-400/30 rounded-lg p-4 hover:border-lime-400/60 hover:bg-zinc-900 transition-all duration-200">
+    <div className="bg-zinc-900/90 backdrop-blur-sm border border-[#d9fc69]/30 rounded-lg p-4 hover:border-[#d9fc69]/60 hover:bg-zinc-900 transition-all duration-200">
       <div className="flex items-start gap-4">
         {/* 줌 썸네일 */}
         <div
-          className="w-20 h-20 rounded-md bg-zinc-800 border border-lime-400/20 flex-shrink-0 overflow-hidden relative"
+          className="w-20 h-20 rounded-md bg-zinc-800 border border-[#d9fc69]/20 flex-shrink-0 overflow-hidden relative"
           style={{
             backgroundImage: `url(${photoUrl})`,
             backgroundSize: `${ZOOM * 100}%`,
@@ -69,11 +69,11 @@ function CalloutCard({
 
         {/* 텍스트 정보 */}
         <div className="flex-1 min-w-0">
-          <h3 className="text-lime-400 font-mono text-sm font-semibold mb-1 uppercase tracking-wide">
+          <h3 className="text-[#d9fc69] font-mono text-sm font-semibold mb-1 uppercase tracking-wide">
             {item.name}
           </h3>
           <p className="text-zinc-400 text-xs font-mono">
-            Confidence: <span className="text-lime-400/80">{item.confidence}%</span>
+            Confidence: <span className="text-[#d9fc69]/80">{item.confidence}%</span>
           </p>
         </div>
       </div>
@@ -114,7 +114,7 @@ export default function CalloutLayer({
                 onCardRefsChange(cardRefs.current);
               }
             }}
-            className="absolute"
+            className="fs-card absolute opacity-0 transition-none"
             style={style}
           >
             <CalloutCard item={item} photoUrl={data.photoUrl} />

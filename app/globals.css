@@ -57,3 +57,22 @@
     transition: none !important;
   }
 }
+
+/* Fashion Scan Connector Data Flow Animation */
+@keyframes dash-flow {
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+
+.fs-connector {
+  stroke-dasharray: 4 6;
+  stroke-dashoffset: 0;
+  animation: dash-flow 3s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fs-connector {
+    animation: none;
+  }
+}
