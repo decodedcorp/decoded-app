@@ -13,7 +13,7 @@ git fetch origin "$BRANCH"
 git reset --hard "origin/$BRANCH"
 
 echo "📦 Installing dependencies..."
-yarn install --frozen-lockfile
+yarn install
 
 echo "🔨 Building application..."
 yarn build
