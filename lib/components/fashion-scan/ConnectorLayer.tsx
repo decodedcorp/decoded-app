@@ -9,7 +9,7 @@ interface ConnectorLayerProps {
 export default function ConnectorLayer({ anchors }: ConnectorLayerProps) {
   return (
     <svg
-      className="pointer-events-none fixed inset-0 z-10"
+      className="pointer-events-none absolute inset-0 z-10"
       aria-hidden="true"
       role="presentation"
     >

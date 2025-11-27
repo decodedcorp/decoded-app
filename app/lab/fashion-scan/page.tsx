@@ -44,6 +44,29 @@ const MOCK_DATAS: Record<string, ScanData> = {
       },
     ],
   },
+  "3": {
+    photoUrl: "/images/mock_fashion_003.jpg",
+    items: [
+      {
+        id: "item_1",
+        name: "OVERSIZED VARSITY JACKET",
+        confidence: 98,
+        box: { top: 19.0, left: 29.0, width: 39.0, height: 28.0 },
+      },
+      {
+        id: "item_2",
+        name: "BLACK RUNNING SHORTS",
+        confidence: 95,
+        box: { top: 46.5, left: 32.0, width: 25.0, height: 10.0 },
+      },
+      {
+        id: "item_3",
+        name: "KNEE-HIGH LEATHER BOOTS",
+        confidence: 97,
+        box: { top: 67.0, left: 37.0, width: 28.0, height: 27.0 },
+      },
+    ],
+  },
 };
 
 interface PageProps {

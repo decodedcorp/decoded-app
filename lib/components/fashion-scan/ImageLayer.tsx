@@ -26,12 +26,12 @@ export default function ImageLayer({
   return (
     <div
       ref={containerRef}
-      className="relative w-full max-w-[540px] bg-zinc-900"
+      className="relative w-full h-full bg-zinc-900"
     >
       <img
         src={photoUrl}
         alt="scan target"
-        className="w-full h-auto opacity-80"
+        className="w-full h-full object-contain opacity-80"
       />
 
       {items.map((item) => (

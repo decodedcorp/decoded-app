@@ -3,8 +3,9 @@
 import { useState, useRef, useLayoutEffect, useEffect, useCallback } from "react";
 import type { ScanData, ConnectorAnchor } from "./types";
 import ImageLayer from "./ImageLayer";
-import DetailPanel from "./DetailPanel";
+import CalloutLayer from "./CalloutLayer";
 import ConnectorLayer from "./ConnectorLayer";
+import { getBoxAnchor, getCardAnchor, inferCallout } from "./callout-utils";
 
 interface FashionScanSceneProps {
   data: ScanData;
@@ -12,82 +13,105 @@ interface FashionScanSceneProps {
 
 export default function FashionScanScene({ data }: FashionScanSceneProps) {
   const [anchors, setAnchors] = useState<ConnectorAnchor[]>([]);
+  const [sceneRect, setSceneRect] = useState<DOMRect | null>(null);
+  const sceneRef = useRef<HTMLDivElement | null>(null);
   const boxRefs = useRef<Partial<Record<string, HTMLDivElement>>>({});
   const cardRefs = useRef<Partial<Record<string, HTMLDivElement>>>({});
 
-  const calculateAnchors = useCallback(() => {
-    if (typeof window === "undefined") return;
+  // Scene rect 계산 함수 (순환 참조 방지를 위해 useCallback 제거)
+  const recalcSceneRect = () => {
+    if (!sceneRef.current) return null;
+    const rect = sceneRef.current.getBoundingClientRect();
+    setSceneRect(rect);
+    return rect;
+  };
 
-    const newAnchors: ConnectorAnchor[] = [];
+  // 앵커 계산 함수 (sceneRect를 파라미터로 받아서 dependency 순환 방지)
+  const calculateAnchors = useCallback(
+    (currentSceneRect: DOMRect) => {
+      if (typeof window === "undefined") return;
 
-    data.items.forEach((item) => {
-      const boxEl = boxRefs.current[item.id];
-      const cardEl = cardRefs.current[item.id];
+      const newAnchors: ConnectorAnchor[] = [];
 
-      if (!boxEl || !cardEl) {
-        return;
+      data.items.forEach((item) => {
+        const boxEl = boxRefs.current[item.id];
+        const cardEl = cardRefs.current[item.id];
+
+        if (!boxEl || !cardEl) {
+          return;
+        }
+
+        const boxRect = boxEl.getBoundingClientRect();
+        const cardRect = cardEl.getBoundingClientRect();
+        const layout = item.callout ?? inferCallout(item.box);
+
+        // Scene-relative coordinates with side-aware anchors
+        const boxAnchor = getBoxAnchor(boxRect, currentSceneRect, layout.side);
+        const cardAnchor = getCardAnchor(cardRect, currentSceneRect, layout.side);
+
+        newAnchors.push({
+          itemId: item.id,
+          boxAnchor,
+          cardAnchor,
+        });
+      });
+
+      // 개발 단계에서 디버깅용 로그
+      if (process.env.NODE_ENV === "development") {
+        console.log("Anchors calculated:", newAnchors);
       }
 
-      const boxRect = boxEl.getBoundingClientRect();
-      const cardRect = cardEl.getBoundingClientRect();
+      setAnchors(newAnchors);
+    },
+    [data.items]
+  );
 
-      // 박스 우측 중앙점
-      const boxAnchor = {
-        x: boxRect.right,
-        y: boxRect.top + boxRect.height / 2,
-      };
-
-      // 카드 좌측 중앙점
-      const cardAnchor = {
-        x: cardRect.left,
-        y: cardRect.top + cardRect.height / 2,
-      };
-
-      newAnchors.push({
-        itemId: item.id,
-        boxAnchor,
-        cardAnchor,
-      });
-    });
-
-    // 개발 단계에서 디버깅용 로그
-    if (process.env.NODE_ENV === "development") {
-      console.log("Anchors calculated:", newAnchors);
-    }
-
-    setAnchors(newAnchors);
-  }, [data.items]);
-
-  // 앵커 계산 (useLayoutEffect로 깜빡임 방지)
+  // Scene rect 계산 (useLayoutEffect로 깜빡임 방지)
   useLayoutEffect(() => {
-    calculateAnchors();
+    const rect = recalcSceneRect();
+    if (rect) {
+      calculateAnchors(rect);
+    }
   }, [calculateAnchors]);
+
+  // sceneRect가 변경될 때 앵커 재계산
+  useEffect(() => {
+    if (sceneRect) {
+      calculateAnchors(sceneRect);
+    }
+  }, [sceneRect, calculateAnchors]);
 
   // 리사이즈 및 스크롤 이벤트 처리
   useEffect(() => {
     const handleResize = () => {
-      calculateAnchors();
+      const rect = recalcSceneRect();
+      if (rect) {
+        calculateAnchors(rect);
+      }
     };
 
     const handleScroll = () => {
-      calculateAnchors();
+      const rect = recalcSceneRect();
+      if (rect) {
+        calculateAnchors(rect);
+      }
     };
 
     window.addEventListener("resize", handleResize);
-    window.addEventListener("scroll", handleScroll, true); // capture phase로 모든 스크롤 감지
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
       window.removeEventListener("resize", handleResize);
-      window.removeEventListener("scroll", handleScroll, true);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, [calculateAnchors]);
 
   const handleBoxRefsChange = (map: Partial<Record<string, HTMLDivElement>>) => {
     boxRefs.current = map;
     // ref 변경 시 즉시 재계산
-    if (typeof window !== "undefined") {
+    if (typeof window !== "undefined" && sceneRect) {
       requestAnimationFrame(() => {
-        calculateAnchors();
+        calculateAnchors(sceneRect);
       });
     }
   };
@@ -95,9 +119,9 @@ export default function FashionScanScene({ data }: FashionScanSceneProps) {
   const handleCardRefsChange = (map: Partial<Record<string, HTMLDivElement>>) => {
     cardRefs.current = map;
     // ref 변경 시 즉시 재계산
-    if (typeof window !== "undefined") {
+    if (typeof window !== "undefined" && sceneRect) {
       requestAnimationFrame(() => {
-        calculateAnchors();
+        calculateAnchors(sceneRect);
       });
     }
   };
@@ -105,28 +129,29 @@ export default function FashionScanScene({ data }: FashionScanSceneProps) {
   return (
     <div className="min-h-screen p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start lg:items-start">
-          {/* 좌측: 이미지 레이어 */}
-          <div className="flex-shrink-0 w-full lg:w-auto">
-            <ImageLayer
-              photoUrl={data.photoUrl}
-              items={data.items}
-              onBoxRefsChange={handleBoxRefsChange}
-            />
-          </div>
+        {/* Scene container */}
+        <div
+          ref={sceneRef}
+          className="relative aspect-[3/4] max-w-2xl mx-auto"
+        >
+          {/* 이미지 레이어 */}
+          <ImageLayer
+            photoUrl={data.photoUrl}
+            items={data.items}
+            onBoxRefsChange={handleBoxRefsChange}
+          />
 
-          {/* 우측: 카드 패널 */}
-          <div className="flex-1 w-full lg:w-auto lg:max-w-md">
-            <DetailPanel
-              data={data}
-              onCardRefsChange={handleCardRefsChange}
-            />
-          </div>
+          {/* Callout 레이어 (카드들) */}
+          <CalloutLayer
+            items={data.items}
+            data={data}
+            onCardRefsChange={handleCardRefsChange}
+          />
+
+          {/* SVG 연결선 레이어 */}
+          <ConnectorLayer anchors={anchors} />
         </div>
       </div>
-
-      {/* SVG 연결선 레이어 */}
-      <ConnectorLayer anchors={anchors} />
     </div>
   );
 }
