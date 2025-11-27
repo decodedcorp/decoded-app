@@ -59,6 +59,17 @@ You'll see a green bar at the bottom of the screen, indicating you're inside a t
 
 ### Option A: Development Server Mode (Hot Reload)
 
+**When using nginx as reverse proxy** (recommended for domain access):
+
+```bash
+HOST=127.0.0.1 PORT=3000 yarn dev
+```
+
+- `HOST=127.0.0.1`: Only accepts local connections (via nginx)
+- `PORT=3000`: Internal port (nginx proxies external port 80 to this)
+
+**When accessing directly via IP:3000** (without nginx):
+
 ```bash
 HOST=0.0.0.0 PORT=3000 yarn dev
 ```
@@ -68,7 +79,14 @@ HOST=0.0.0.0 PORT=3000 yarn dev
 
 ### Option B: Production Server Mode
 
-For a more production-like environment:
+**When using nginx as reverse proxy** (recommended):
+
+```bash
+yarn build
+HOST=127.0.0.1 PORT=3000 yarn start
+```
+
+**When accessing directly via IP:3000** (without nginx):
 
 ```bash
 yarn build
@@ -143,6 +161,14 @@ This runs in the background but makes management, stopping, and log checking mor
 ## Quick Reference
 
 The essential routine:
+
+**With nginx (recommended):**
+
+```bash
+tmux new -s frontend → HOST=127.0.0.1 PORT=3000 yarn dev → Ctrl+b, d
+```
+
+**Without nginx (direct access):**
 
 ```bash
 tmux new -s frontend → HOST=0.0.0.0 PORT=3000 yarn dev → Ctrl+b, d
