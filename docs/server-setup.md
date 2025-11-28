@@ -216,7 +216,7 @@ HOST=0.0.0.0 PORT=4000 ./scripts/start-persistent-server.sh dev
 
 ## Updating the Dev Server
 
-For the Mac Mini shared dev server (dev.decoded.style), use the automated update script to pull latest code, build, and restart the server:
+For the Mac Mini shared dev server (preview.decoded.style), use the automated update script to pull latest code, build, and restart the server:
 
 ```bash
 # Update server with current branch
@@ -235,4 +235,4 @@ This single command will:
 
 The script uses `git reset --hard` to ensure the server matches the remote branch exactly, making it ideal for shared dev environments where no local modifications should exist.
 
-**Note**: The server runs in production mode (`yarn start`) for a stable preview environment accessible at dev.decoded.style.
+**Note**: The server runs in production mode (`yarn start`) for a stable preview environment accessible at preview.decoded.style.

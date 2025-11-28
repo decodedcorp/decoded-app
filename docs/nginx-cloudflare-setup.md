@@ -1,12 +1,12 @@
 # nginx + Cloudflare SSL Setup Guide
 
-This guide explains how to set up nginx as a reverse proxy with Cloudflare to enable domain name access (e.g., `dev.decoded.style`) instead of direct IP:3000 access. Initially configured for HTTP, with HTTPS support available via Cloudflare Origin certificates.
+This guide explains how to set up nginx as a reverse proxy with Cloudflare to enable domain name access (e.g., `preview.decoded.style`) instead of direct IP:3000 access. Initially configured for HTTP, with HTTPS support available via Cloudflare Origin certificates.
 
 ## Overview
 
 The setup enables:
 
-- **Domain name access** via domain name (e.g., `http://dev.decoded.style`, later `https://dev.decoded.style`)
+- **Domain name access** via domain name (e.g., `http://preview.decoded.style`, later `https://preview.decoded.style`)
 - **End-to-end encryption** between browser ↔ Cloudflare ↔ Mac Mini
 - **Standard ports** (80/443) instead of custom port 3000
 - **Production-ready structure** that can be reused when migrating to a dedicated server
@@ -108,23 +108,23 @@ cd /path/to/decoded-app
 
 # Copy template to nginx servers directory
 # For Intel Mac:
-sudo cp nginx/dev.decoded.style.conf /usr/local/etc/nginx/servers/
+sudo cp nginx/preview.decoded.style.conf /usr/local/etc/nginx/servers/
 
 # For Apple Silicon (M1/M2/M3):
-sudo cp nginx/dev.decoded.style.conf /opt/homebrew/etc/nginx/servers/
+sudo cp nginx/preview.decoded.style.conf /opt/homebrew/etc/nginx/servers/
 ```
 
-**Note**: The configuration file is set up for `dev.decoded.style`. If you're using a different domain, edit the configuration file:
+**Note**: The configuration file is set up for `preview.decoded.style`. If you're using a different domain, edit the configuration file:
 
 ```bash
 # For Intel Mac:
-sudo nano /usr/local/etc/nginx/servers/dev.decoded.style.conf
+sudo nano /usr/local/etc/nginx/servers/preview.decoded.style.conf
 
 # For Apple Silicon:
-sudo nano /opt/homebrew/etc/nginx/servers/dev.decoded.style.conf
+sudo nano /opt/homebrew/etc/nginx/servers/preview.decoded.style.conf
 ```
 
-Replace all occurrences of `dev.decoded.style` with your actual domain name.
+Replace all occurrences of `preview.decoded.style` with your actual domain name.
 
 ### 3-3. Verify nginx Configuration Includes Servers Directory
 
@@ -189,7 +189,7 @@ Generate and install Cloudflare Origin certificate to enable HTTPS between Cloud
 4. Click **Create Certificate**
 5. Select **"Let Cloudflare generate a private key and a CSR"**
 6. Configure:
-   - **Hostnames**: `dev.decoded.style` (or `*.decoded.style` for wildcard)
+   - **Hostnames**: `preview.decoded.style` (or `*.decoded.style` for wildcard)
    - **Private key type**: RSA (2048)
    - **Certificate Validity**: 15 years (default)
 7. Click **Create**
@@ -206,19 +206,19 @@ Create SSL directory and save certificate files:
 sudo mkdir -p /etc/nginx/ssl
 
 # Save Origin Certificate
-sudo nano /etc/nginx/ssl/dev.decoded.style.crt
+sudo nano /etc/nginx/ssl/preview.decoded.style.crt
 # Paste the Origin Certificate content, save and exit (Ctrl+X, Y, Enter)
 
 # Save Private Key
-sudo nano /etc/nginx/ssl/dev.decoded.style.key
+sudo nano /etc/nginx/ssl/preview.decoded.style.key
 # Paste the Private Key content, save and exit
 
 # Set proper permissions
-sudo chmod 600 /etc/nginx/ssl/dev.decoded.style.crt
-sudo chmod 600 /etc/nginx/ssl/dev.decoded.style.key
+sudo chmod 600 /etc/nginx/ssl/preview.decoded.style.crt
+sudo chmod 600 /etc/nginx/ssl/preview.decoded.style.key
 ```
 
-**Important**: Replace `dev.decoded.style` with your actual domain name in file paths.
+**Important**: Replace `preview.decoded.style` with your actual domain name in file paths.
 
 ### 4-3. Update nginx Configuration
 
@@ -226,17 +226,17 @@ Ensure the nginx configuration file has the correct certificate paths:
 
 ```bash
 # For Intel Mac:
-sudo nano /usr/local/etc/nginx/servers/dev.decoded.style.conf
+sudo nano /usr/local/etc/nginx/servers/preview.decoded.style.conf
 
 # For Apple Silicon:
-sudo nano /opt/homebrew/etc/nginx/servers/dev.decoded.style.conf
+sudo nano /opt/homebrew/etc/nginx/servers/preview.decoded.style.conf
 ```
 
 Verify these lines match your certificate file paths (when HTTPS is enabled):
 
 ```
-ssl_certificate     /etc/nginx/ssl/dev.decoded.style.crt;
-ssl_certificate_key /etc/nginx/ssl/dev.decoded.style.key;
+ssl_certificate     /etc/nginx/ssl/preview.decoded.style.crt;
+ssl_certificate_key /etc/nginx/ssl/preview.decoded.style.key;
 ```
 
 ### 4-4. Reload nginx
@@ -268,11 +268,11 @@ This ensures:
 
 ### 6-1. Test HTTP Redirect
 
-Visit `http://dev.decoded.style` (replace with your domain). The Next.js application should load correctly.
+Visit `http://preview.decoded.style` (replace with your domain). The Next.js application should load correctly.
 
 ### 6-2. Test HTTPS Access (when enabled)
 
-After setting up Cloudflare Origin Certificate and enabling HTTPS, visit `https://dev.decoded.style`. You should see:
+After setting up Cloudflare Origin Certificate and enabling HTTPS, visit `https://preview.decoded.style`. You should see:
 
 - ✅ Green padlock in browser (valid SSL)
 - ✅ Next.js application loads correctly
@@ -333,7 +333,7 @@ sudo lsof -i :443
 - Verify certificate files exist: `ls -la /etc/nginx/ssl/`
 - Check file permissions: `sudo chmod 600 /etc/nginx/ssl/*`
 - Verify certificate paths in nginx config match actual file paths
-- Test certificate: `openssl x509 -in /etc/nginx/ssl/dev.decoded.style.crt -text -noout`
+- Test certificate: `openssl x509 -in /etc/nginx/ssl/preview.decoded.style.crt -text -noout`
 
 ### 502 Bad Gateway
 
@@ -344,7 +344,7 @@ sudo lsof -i :443
 ### Domain Not Resolving
 
 - Verify Cloudflare DNS A record points to correct IP
-- Check DNS propagation: `dig dev.decoded.style` or `nslookup dev.decoded.style`
+- Check DNS propagation: `dig preview.decoded.style` or `nslookup preview.decoded.style`
 - Ensure Cloudflare proxy is enabled (orange cloud icon)
 
 ### Port Forwarding Not Working
