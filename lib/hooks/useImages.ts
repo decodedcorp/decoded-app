@@ -38,3 +38,19 @@ export function useLatestImages(limit = 20) {
   });
 }
 
+import { fetchImageById } from "@/lib/supabase/queries/images";
+
+/**
+ * React Query hook for fetching a single image by ID
+ *
+ * @param id - Image ID to fetch
+ * @returns React Query result with data, loading, error states
+ */
+export function useImageById(id: string) {
+  return useQuery<ImageRow | null>({
+    queryKey: ['images', 'detail', id],
+    queryFn: () => fetchImageById(id),
+    enabled: !!id,
+  });
+}
+

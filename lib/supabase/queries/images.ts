@@ -34,3 +34,28 @@ export async function fetchLatestImages(limit = 20): Promise<ImageRow[]> {
   return data ?? [];
 }
 
+/**
+ * Fetches a single image by ID from the database (client-side)
+ *
+ * @param id - Image ID to fetch
+ * @returns Image row or null if not found
+ * @throws Error if the query fails
+ */
+export async function fetchImageById(id: string): Promise<ImageRow | null> {
+  const { data, error } = await supabaseBrowserClient
+    .from('image')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') {
+      // No rows returned
+      return null;
+    }
+    throw error;
+  }
+
+  return data;
+}
+

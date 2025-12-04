@@ -1,6 +1,9 @@
 "use client";
 
 import { memo, useState } from "react";
+import Link from "next/link";
+import { gsap } from "gsap";
+import { Flip } from "gsap/Flip";
 import type { ImageRow } from "@/lib/supabase/types";
 import { useLatestImages } from "@/lib/hooks/useImages";
 import ThiingsGrid, {
@@ -9,6 +12,12 @@ import ThiingsGrid, {
 } from "@/lib/components/ThiingsGrid";
 import { useFilterStore } from "@/lib/stores/filterStore";
 import { useSearchStore } from "@/lib/stores/searchStore";
+import { useTransitionStore } from "@/lib/stores/transitionStore";
+
+// Register GSAP Flip plugin
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(Flip);
+}
 
 type Props = {
   initialImages: ImageRow[];
@@ -17,11 +26,33 @@ type Props = {
 // Card cell component with actual image data
 const CardCell = memo(({ gridIndex, position, isMoving, item }: ItemConfig) => {
   const [imageError, setImageError] = useState(false);
+  const setTransition = useTransitionStore((state) => state.setTransition);
+
   // Top 6 images get high priority for faster initial load
   const isTopImage = gridIndex < 6;
   const imageUrl = item?.imageUrl;
   const status = item?.status;
   const hasItems = item?.hasItems;
+  const imageId = item?.id;
+
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!imageId) return;
+
+    const target = e.currentTarget.querySelector("article") as HTMLElement;
+    if (!target) return;
+
+    // Capture FLIP state before navigation
+    try {
+      const state = Flip.getState(target);
+      const rect = target.getBoundingClientRect();
+
+      setTransition(imageId, state, rect);
+    } catch (error) {
+      // Fallback: just store rect if Flip.getState fails
+      const rect = target.getBoundingClientRect();
+      setTransition(imageId, null, rect);
+    }
+  };
 
   // Status badge colors
   const getStatusBadgeStyle = (status?: string) => {
@@ -43,8 +74,11 @@ const CardCell = memo(({ gridIndex, position, isMoving, item }: ItemConfig) => {
     return "bg-zinc-100 text-zinc-900 dark:bg-zinc-800/80 dark:text-zinc-100";
   };
 
-  return (
-    <article className="absolute inset-1 flex flex-col overflow-hidden rounded-xl border border-border bg-card/60 transition-shadow">
+  const cardContent = (
+    <article
+      data-flip-id={imageId ? `card-${imageId}` : undefined}
+      className="absolute inset-1 flex flex-col overflow-hidden rounded-xl border border-border bg-card/60 transition-shadow hover:shadow-lg"
+    >
       {/* Image container with fixed aspect ratio */}
       <div className="relative aspect-[3/4] bg-muted">
         {/* Optimized image loading */}
@@ -91,6 +125,21 @@ const CardCell = memo(({ gridIndex, position, isMoving, item }: ItemConfig) => {
         </div>
       )}
     </article>
+  );
+
+  if (!imageId) {
+    return cardContent;
+  }
+
+  return (
+    <Link
+      href={`/images/${imageId}`}
+      scroll={false}
+      onClick={handleClick}
+      className="absolute inset-0"
+    >
+      {cardContent}
+    </Link>
   );
 });
 
