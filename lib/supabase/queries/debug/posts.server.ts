@@ -23,7 +23,7 @@ type PostRow = Database['public']['Tables']['post']['Row'];
  * @throws Error if the query fails
  */
 export async function fetchLatestPostsServer(limit = 10): Promise<PostRow[]> {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from('post')
     .select('id, account, ts, created_at')

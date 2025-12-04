@@ -23,6 +23,7 @@ export async function fetchLatestImages(limit = 20): Promise<ImageRow[]> {
     .from('image')
     // TODO: narrow down selected fields once UI is finalized
     .select('*')
+    .not('image_url', 'is', null) // Only fetch records with images
     .order('created_at', { ascending: false })
     .limit(limit);
 

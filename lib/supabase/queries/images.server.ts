@@ -18,11 +18,12 @@ import type { ImageRow } from '../types';
  * @throws Error if the query fails
  */
 export async function fetchLatestImagesServer(limit = 20): Promise<ImageRow[]> {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from('image')
     // TODO: narrow down selected fields once UI is finalized
     .select('*')
+    .not('image_url', 'is', null) // Only fetch records with images
     .order('created_at', { ascending: false })
     .limit(limit);
 

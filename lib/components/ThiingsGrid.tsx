@@ -92,7 +92,8 @@ export type Position = {
 export type GridItem = {
   id: string;
   imageUrl?: string | null;
-  // 기타 표시용 필드 (label, tags 등) - 필요시 확장
+  status?: 'pending' | 'extracted' | 'skipped' | string;
+  hasItems?: boolean;
 };
 
 type GridItemInternal = {

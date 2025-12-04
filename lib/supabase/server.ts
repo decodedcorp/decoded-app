@@ -12,44 +12,34 @@ const supabaseAnonKey = getEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY');
  *
  * Usage in Server Components:
  * ```tsx
- * const supabase = createSupabaseServerClient();
+ * const supabase = await createSupabaseServerClient();
  * const { data } = await supabase.from('table').select('*');
  * ```
  *
  * Usage in Route Handlers:
  * ```tsx
  * export async function GET() {
- *   const supabase = createSupabaseServerClient();
+ *   const supabase = await createSupabaseServerClient();
  *   const { data } = await supabase.from('table').select('*');
  *   return Response.json(data);
  * }
  * ```
  */
-export function createSupabaseServerClient() {
-  const cookieStore = cookies();
-  
-  // Type assertion for Next.js 16 compatibility
-  // In Next.js 16, cookies() is synchronous but types may show Promise
-  // This works correctly at runtime
-  const cookieStoreTyped = cookieStore as unknown as {
-    getAll(): Array<{ name: string; value: string }>;
-    set?: (name: string, value: string, options?: any) => void;
-  };
+export async function createSupabaseServerClient() {
+  const cookieStore = await cookies();
   
   return createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll() {
-        return cookieStoreTyped.getAll();
+        return cookieStore.getAll();
       },
       setAll(cookiesToSet) {
         try {
           cookiesToSet.forEach(({ name, value, options }) => {
-            // In Next.js 16, cookies() returns ReadonlyRequestCookies in Server Components
+            // In Next.js 15+, cookies() returns ReadonlyRequestCookies in Server Components
             // which doesn't have set() method. This is expected behavior.
             // Cookie setting should be handled in Route Handlers or Middleware.
-            if (cookieStoreTyped.set) {
-              cookieStoreTyped.set(name, value, options);
-            }
+            cookieStore.set(name, value, options);
           });
         } catch {
           // The `setAll` method was called from a Server Component.
