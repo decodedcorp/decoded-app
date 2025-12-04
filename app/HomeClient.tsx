@@ -5,7 +5,7 @@ import Link from "next/link";
 import { gsap } from "gsap";
 import { Flip } from "gsap/Flip";
 import type { ImageRow } from "@/lib/supabase/types";
-import { useLatestImages } from "@/lib/hooks/useImages";
+import { useFilteredImages } from "@/lib/hooks/useImages";
 import ThiingsGrid, {
   type ItemConfig,
   type GridItem,
@@ -171,11 +171,18 @@ SkeletonCell.displayName = "SkeletonCell";
  * - React Query fetches in CSR → replaces with data when available
  */
 export function HomeClient({ initialImages }: Props) {
-  const { data, isLoading, isError, error, refetch } = useLatestImages(50);
   const activeFilter = useFilterStore((state) => state.activeFilter);
   const debouncedQuery = useSearchStore((state) => state.debouncedQuery);
 
+  // Use filtered images hook with current filter and search state
+  const { data, isLoading, isError, error, refetch } = useFilteredImages(
+    activeFilter,
+    debouncedQuery,
+    50
+  );
+
   // Merge SSR and CSR data: use CSR data if available, fallback to SSR initial data
+  // Note: When filter/search is active, SSR initial data may not match, so CSR data takes precedence
   const images = data ?? initialImages;
 
   // Normalize status values from database enum to consistent format
@@ -209,8 +216,6 @@ export function HomeClient({ initialImages }: Props) {
           gridSize={{ width: 400, height: 500 }}
           renderItem={(config) => <SkeletonCell {...config} />}
           initialPosition={{ x: 0, y: 0 }}
-          filter={activeFilter}
-          searchQuery={debouncedQuery}
           items={[]}
         />
       </div>
@@ -245,15 +250,22 @@ export function HomeClient({ initialImages }: Props) {
 
   // Empty state: show empty state message
   if (!images || images.length === 0) {
+    const hasActiveFilter = activeFilter !== "all";
+    const hasSearchQuery = debouncedQuery.trim().length > 0;
+
     return (
       <div className="absolute inset-0 z-0 flex items-center justify-center pt-14 md:pt-16">
         <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
           <div className="mb-4 text-4xl">📷</div>
           <h2 className="mb-2 text-xl font-semibold text-foreground">
-            No images found yet.
+            {hasActiveFilter || hasSearchQuery
+              ? "No images found"
+              : "No images found yet."}
           </h2>
           <p className="text-sm text-muted-foreground">
-            Check back later or try adjusting your filters.
+            {hasActiveFilter || hasSearchQuery
+              ? "Try adjusting your filters or search query."
+              : "Check back later or try adjusting your filters."}
           </p>
         </div>
       </div>
@@ -261,14 +273,14 @@ export function HomeClient({ initialImages }: Props) {
   }
 
   // Success state: show grid with actual images
+  // Note: filter and searchQuery props are kept for backward compatibility
+  // but ThiingsGrid no longer uses them for filtering (filtering is now server-side)
   return (
     <div className="absolute inset-0 z-0 pt-14 md:pt-16">
       <ThiingsGrid
         gridSize={{ width: 400, height: 500 }}
         renderItem={(config) => <CardCell {...config} />}
         initialPosition={{ x: 0, y: 0 }}
-        filter={activeFilter}
-        searchQuery={debouncedQuery}
         items={gridItems}
       />
     </div>

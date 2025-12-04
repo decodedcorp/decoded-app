@@ -126,9 +126,18 @@ export type ThiingsGridProps = {
   renderItem: (itemConfig: ItemConfig) => React.ReactNode;
   className?: string;
   initialPosition?: Position;
+  /**
+   * @deprecated Filtering is now handled server-side. This prop is kept for backward compatibility but ignored.
+   */
   filter?: 'all' | 'latest' | 'clothing' | 'accessories' | 'shoes' | 'bags';
+  /**
+   * @deprecated Search is now handled server-side. This prop is kept for backward compatibility but ignored.
+   */
   searchQuery?: string;
-  items?: GridItem[]; // Optional: actual data items (Supabase-independent)
+  /**
+   * Array of items to display in the grid. Filtering/searching should be done before passing items to this component.
+   */
+  items?: GridItem[];
 };
 
 class ThiingsGrid extends Component<ThiingsGridProps, State> {
@@ -198,12 +207,9 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
   }
 
   componentDidUpdate(prevProps: ThiingsGridProps) {
-    // Re-observe elements when filter or search changes
-    if (
-      prevProps.filter !== this.props.filter ||
-      prevProps.searchQuery !== this.props.searchQuery
-    ) {
-      // Recalculate grid items with new filter/search
+    // Re-observe elements when items prop changes (filtering/searching is now server-side)
+    if (prevProps.items !== this.props.items) {
+      // Recalculate grid items when items prop changes
       this.updateGridItems();
     }
 
@@ -455,53 +461,13 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
     this.setState({ isMoving: false, restPos: { ...this.state.offset } });
   }, 200);
 
-  // Filter items based on filter type and search query
-  private filterItems = (items: GridItemInternal[]): GridItemInternal[] => {
-    const { filter = 'all', searchQuery = '' } = this.props;
-    let filtered = items;
-
-    // Apply filter
-    if (filter !== 'all') {
-      // For now, we'll filter by gridIndex modulo for demo purposes
-      // In production, this would filter based on actual item metadata
-      filtered = filtered.filter((item) => {
-        const mod = item.gridIndex % 6;
-        switch (filter) {
-          case 'latest':
-            return mod === 0;
-          case 'clothing':
-            return mod === 1;
-          case 'accessories':
-            return mod === 2;
-          case 'shoes':
-            return mod === 3;
-          case 'bags':
-            return mod === 4;
-          default:
-            return true;
-        }
-      });
-    }
-
-    // Apply search query
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase().trim();
-      filtered = filtered.filter((item) => {
-        // For now, search by gridIndex
-        // In production, this would search actual item metadata
-        return item.gridIndex.toString().includes(query);
-      });
-    }
-
-    return filtered;
-  };
-
   private updateGridItems = () => {
     if (!this.isComponentMounted) return;
 
     const positions = this.calculateVisiblePositions();
-    const { items } = this.props;
     
+    // Generate grid positions - filtering/searching is now handled server-side
+    // The grid simply renders the positions and maps them to items from props
     const allItems = positions.map((position) => {
       const gridIndex = this.getItemIndexForPosition(position.x, position.y);
       return {
@@ -510,12 +476,9 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
       };
     });
 
-    // Apply filtering
-    const filteredItems = this.filterItems(allItems);
-
     const distanceFromRest = getDistance(this.state.offset, this.state.restPos);
 
-    this.setState({ gridItems: filteredItems, isMoving: distanceFromRest > 5 }, () => {
+    this.setState({ gridItems: allItems, isMoving: distanceFromRest > 5 }, () => {
       // Observe images immediately after state update
       this.observeImages();
     });
