@@ -31,9 +31,9 @@ export function ImageCard({ image }: Props) {
   };
 
   return (
-    <article className="border border-gray-200 rounded-xl overflow-hidden relative shadow-md hover:shadow-lg transition-shadow">
+    <article className="border border-border rounded-xl overflow-hidden relative shadow-md hover:shadow-lg transition-shadow">
       {/* Image thumbnail */}
-      <div className="aspect-square bg-gray-100 relative">
+      <div className="aspect-square bg-muted relative">
         {image.image_url && !imageError ? (
           <img
             src={image.image_url}
@@ -43,7 +43,7 @@ export function ImageCard({ image }: Props) {
             onError={() => setImageError(true)}
           />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-50">
+          <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground bg-muted">
             <div className="text-2xl mb-1">📷</div>
             <div className="text-xs">No image</div>
           </div>
@@ -71,13 +71,13 @@ export function ImageCard({ image }: Props) {
       )}
 
       {/* Card footer with metadata */}
-      <div className="p-2 bg-white border-t border-gray-100">
+      <div className="p-2 bg-card border-t border-border">
         <div className="flex items-center justify-between">
-          <div className="text-xs text-gray-500">
+          <div className="text-xs text-muted-foreground">
             {formatRelativeTime(image.created_at)}
           </div>
           {process.env.NODE_ENV === "development" && (
-            <div className="text-xs text-gray-400 font-mono">
+            <div className="text-xs text-muted-foreground font-mono">
               #{image.id.slice(0, 8)}
             </div>
           )}

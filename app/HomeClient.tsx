@@ -31,9 +31,9 @@ const CardCell = memo(({ gridIndex, position, isMoving, item }: ItemConfig) => {
   };
 
   return (
-    <article className="absolute inset-1 flex flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950/60 transition-shadow">
+    <article className="absolute inset-1 flex flex-col overflow-hidden rounded-xl border border-border bg-card/60 transition-shadow">
       {/* Image container with fixed aspect ratio */}
-      <div className="relative aspect-[3/4] bg-zinc-900">
+      <div className="relative aspect-[3/4] bg-muted">
         {/* Optimized image loading */}
         {imageUrl && !imageError ? (
           <img
@@ -46,7 +46,7 @@ const CardCell = memo(({ gridIndex, position, isMoving, item }: ItemConfig) => {
             onError={() => setImageError(true)}
           />
         ) : (
-          <div className="flex h-full w-full flex-col items-center justify-center bg-zinc-900 text-zinc-500">
+          <div className="flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground">
             <div className="mb-1 text-2xl">📷</div>
             <div className="text-xs">No image</div>
           </div>
@@ -71,8 +71,8 @@ const CardCell = memo(({ gridIndex, position, isMoving, item }: ItemConfig) => {
 
       {/* Metadata footer */}
       {process.env.NODE_ENV === 'development' && (
-        <div className="flex items-center justify-between border-t border-zinc-800 px-2 py-1">
-          <span className="text-[10px] font-mono text-zinc-500">
+        <div className="flex items-center justify-between border-t border-border px-2 py-1">
+          <span className="text-[10px] font-mono text-muted-foreground">
             {item?.id ? `#${item.id.slice(0, 8)}` : `#${gridIndex}`}
           </span>
         </div>
@@ -86,8 +86,8 @@ CardCell.displayName = 'CardCell';
 // Skeleton card for loading state
 const SkeletonCard = memo(() => {
   return (
-    <article className="absolute inset-1 flex flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950/60">
-      <div className="relative aspect-[3/4] animate-pulse bg-zinc-900" />
+    <article className="absolute inset-1 flex flex-col overflow-hidden rounded-xl border border-border bg-card/60">
+      <div className="relative aspect-[3/4] animate-pulse bg-muted" />
     </article>
   );
 });
@@ -159,13 +159,13 @@ export function HomeClient({ initialImages }: Props) {
       <div className="absolute inset-0 z-0 flex items-center justify-center pt-14 md:pt-16">
         <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
           <div className="mb-4 text-4xl">⚠️</div>
-          <h2 className="mb-2 text-xl font-semibold text-zinc-200">Failed to load images</h2>
-          <p className="mb-6 text-sm text-zinc-400">
+          <h2 className="mb-2 text-xl font-semibold text-foreground">Failed to load images</h2>
+          <p className="mb-6 text-sm text-muted-foreground">
             {error instanceof Error ? error.message : 'Something went wrong while loading images.'}
           </p>
           <button
             onClick={() => refetch()}
-            className="rounded-full border border-zinc-700 bg-zinc-900/80 px-4 py-2 text-sm font-medium text-zinc-200 transition-colors hover:bg-zinc-800"
+            className="rounded-full border border-border bg-card/80 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
             type="button"
           >
             Retry
@@ -181,8 +181,8 @@ export function HomeClient({ initialImages }: Props) {
       <div className="absolute inset-0 z-0 flex items-center justify-center pt-14 md:pt-16">
         <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
           <div className="mb-4 text-4xl">📷</div>
-          <h2 className="mb-2 text-xl font-semibold text-zinc-200">No images found yet.</h2>
-          <p className="text-sm text-zinc-400">Check back later or try adjusting your filters.</p>
+          <h2 className="mb-2 text-xl font-semibold text-foreground">No images found yet.</h2>
+          <p className="text-sm text-muted-foreground">Check back later or try adjusting your filters.</p>
         </div>
       </div>
     );

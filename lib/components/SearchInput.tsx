@@ -15,7 +15,7 @@ export function SearchInput() {
   }, [debounced, setDebouncedQuery]);
 
   return (
-    <div className="flex items-center gap-2 rounded-full px-4 py-2 backdrop-blur-sm bg-black/10">
+    <div className="flex items-center gap-2 rounded-full px-4 py-2 backdrop-blur-sm bg-muted/50 border border-input">
       <input
         aria-label="Search 8000 Thiings"
         placeholder="Search 8000 Thiings"
@@ -27,11 +27,11 @@ export function SearchInput() {
             (e.target as HTMLInputElement).blur();
           }
         }}
-        className="w-40 bg-transparent outline-none md:text-sm text-black placeholder-black/50"
+        className="w-40 bg-transparent outline-none md:text-sm text-foreground placeholder-muted-foreground"
         type="text"
       />
       <button
-        className={`rounded-full p-1.5 transition-all hover:scale-110 text-black hover:bg-black/20 ${
+        className={`rounded-full p-1.5 transition-all hover:scale-110 text-foreground hover:bg-accent ${
           query ? "visible" : "invisible"
         }`}
         aria-label="Share search"

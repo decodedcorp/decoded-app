@@ -41,9 +41,9 @@ export function MoreMenu() {
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="h-9 px-3 rounded-lg bg-white hover:bg-black/5 text-black/50 hover:text-black
+        className="h-9 px-3 rounded-lg bg-background hover:bg-accent text-muted-foreground hover:text-foreground border border-input
                    transition-colors duration-150 ease-out
-                   focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1"
+                   focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
       >
         more
       </button>
@@ -53,7 +53,7 @@ export function MoreMenu() {
           ref={panelRef}
           role="menu"
           aria-label="Lab pages"
-          className="absolute right-0 mt-2 w-48 rounded-lg border border-black/10 bg-white shadow-sm
+          className="absolute right-0 mt-2 w-48 rounded-lg border border-border bg-popover shadow-md text-popover-foreground
                      will-change:opacity,transform
                      transition-all duration-200 ease-out"
           style={{
@@ -71,11 +71,11 @@ export function MoreMenu() {
                     role="menuitem"
                     onClick={() => setOpen(false)}
                     className={`w-full block text-left px-3 py-2 transition-colors duration-150 ease-out
-                               focus:outline-none focus-visible:bg-black/5
+                               focus:outline-none focus-visible:bg-accent
                                ${
                                  isActive
-                                   ? "text-black font-medium bg-black/5"
-                                   : "text-black/50 hover:text-black hover:bg-black/5"
+                                   ? "text-foreground font-medium bg-accent"
+                                   : "text-muted-foreground hover:text-foreground hover:bg-accent"
                                }`}
                   >
                     {page.label}
@@ -89,4 +89,3 @@ export function MoreMenu() {
     </div>
   );
 }
-
