@@ -88,7 +88,14 @@ export type Position = {
   y: number;
 };
 
-type GridItem = {
+// Generic grid item type for ThiingsGrid (Supabase-independent)
+export type GridItem = {
+  id: string;
+  imageUrl?: string | null;
+  // 기타 표시용 필드 (label, tags 등) - 필요시 확장
+};
+
+type GridItemInternal = {
   position: Position;
   gridIndex: number;
 };
@@ -99,7 +106,7 @@ type State = {
   startPos: Position;
   restPos: Position;
   velocity: Position;
-  gridItems: GridItem[];
+  gridItems: GridItemInternal[];
   isMoving: boolean;
   lastMoveTime: number;
   velocityHistory: Position[];
@@ -109,6 +116,7 @@ export type ItemConfig = {
   isMoving: boolean;
   position: Position;
   gridIndex: number;
+  item?: GridItem; // Optional: actual data item (Supabase-independent)
 };
 
 // Props 타입 변경
@@ -119,6 +127,7 @@ export type ThiingsGridProps = {
   initialPosition?: Position;
   filter?: 'all' | 'latest' | 'clothing' | 'accessories' | 'shoes' | 'bags';
   searchQuery?: string;
+  items?: GridItem[]; // Optional: actual data items (Supabase-independent)
 };
 
 class ThiingsGrid extends Component<ThiingsGridProps, State> {
@@ -446,7 +455,7 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
   }, 200);
 
   // Filter items based on filter type and search query
-  private filterItems = (items: GridItem[]): GridItem[] => {
+  private filterItems = (items: GridItemInternal[]): GridItemInternal[] => {
     const { filter = 'all', searchQuery = '' } = this.props;
     let filtered = items;
 
@@ -490,6 +499,8 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
     if (!this.isComponentMounted) return;
 
     const positions = this.calculateVisiblePositions();
+    const { items } = this.props;
+    
     const allItems = positions.map((position) => {
       const gridIndex = this.getItemIndexForPosition(position.x, position.y);
       return {
@@ -748,6 +759,9 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
                       gridIndex: item.gridIndex,
                       position: item.position,
                       isMoving,
+                      item: this.props.items
+                        ? this.props.items[item.gridIndex % this.props.items.length]
+                        : undefined,
                     })
                   : null}
               </div>
