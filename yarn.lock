@@ -1157,12 +1157,122 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@supabase/auth-helpers-nextjs@npm:^0.15.0":
+  version: 0.15.0
+  resolution: "@supabase/auth-helpers-nextjs@npm:0.15.0"
+  dependencies:
+    cookie: "npm:^1.0.2"
+  peerDependencies:
+    "@supabase/supabase-js": ^2.76.1
+  checksum: 10c0/4a70240858d25a1d301cbb22d94ded50a45ba33e9e0375782e89268667f91f5cbdd50234d1b5a2ca8c67f22333ae11862e7d05cbb55f98e6899cf98ff19f5dd3
+  languageName: node
+  linkType: hard
+
+"@supabase/auth-js@npm:2.86.0":
+  version: 2.86.0
+  resolution: "@supabase/auth-js@npm:2.86.0"
+  dependencies:
+    tslib: "npm:2.8.1"
+  checksum: 10c0/a70fd3156535bd9d7d57da9cfbdad305f01c3d17c0442559af50f57b2409c734825db8749986982b69f8107864592551442518c73da909a7e03c8d9ca4bef45d
+  languageName: node
+  linkType: hard
+
+"@supabase/functions-js@npm:2.86.0":
+  version: 2.86.0
+  resolution: "@supabase/functions-js@npm:2.86.0"
+  dependencies:
+    tslib: "npm:2.8.1"
+  checksum: 10c0/24cc3271cf1c2b315b4eb5e79a9d9e478da74c6a2f8dc01a097d211f7d5ac596c003e8ee5f8c74041c94f455eb6c3e2aaf6809892f8d8b04ab3ab7bafc5a186d
+  languageName: node
+  linkType: hard
+
+"@supabase/postgrest-js@npm:2.86.0":
+  version: 2.86.0
+  resolution: "@supabase/postgrest-js@npm:2.86.0"
+  dependencies:
+    tslib: "npm:2.8.1"
+  checksum: 10c0/066ee3dc8e24c8658c93c3b89346542bd4c58e4e14df21ef21d4b5597f01a710f8088c3705fb30791314028de5ca55db6cfee339c707e6b585085c4e9e35742a
+  languageName: node
+  linkType: hard
+
+"@supabase/realtime-js@npm:2.86.0":
+  version: 2.86.0
+  resolution: "@supabase/realtime-js@npm:2.86.0"
+  dependencies:
+    "@types/phoenix": "npm:^1.6.6"
+    "@types/ws": "npm:^8.18.1"
+    tslib: "npm:2.8.1"
+    ws: "npm:^8.18.2"
+  checksum: 10c0/5c18c79422436900540243f06bf64e15523ae2eaaf7111b7ee243d803b00f4d85e148cb03b686f03519bb97505b716fbb3aebf70e0adf187b464a6193cf477ce
+  languageName: node
+  linkType: hard
+
+"@supabase/storage-js@npm:2.86.0":
+  version: 2.86.0
+  resolution: "@supabase/storage-js@npm:2.86.0"
+  dependencies:
+    iceberg-js: "npm:^0.8.0"
+    tslib: "npm:2.8.1"
+  checksum: 10c0/e8fe6b838d3ff64daa144f4e393f5f02caf8c10d5c0657832656cc2d3f864fb46ae6a44665ed932ba231f768b8a5e6d14f66ed354070676f64ee1430c43f4210
+  languageName: node
+  linkType: hard
+
+"@supabase/supabase-js@npm:^2.86.0":
+  version: 2.86.0
+  resolution: "@supabase/supabase-js@npm:2.86.0"
+  dependencies:
+    "@supabase/auth-js": "npm:2.86.0"
+    "@supabase/functions-js": "npm:2.86.0"
+    "@supabase/postgrest-js": "npm:2.86.0"
+    "@supabase/realtime-js": "npm:2.86.0"
+    "@supabase/storage-js": "npm:2.86.0"
+  checksum: 10c0/dbb58383f3d03d9b13e594674989fdd17931236f68e1d4036b34be49876e0f3f2cf41087e8d88ab578ca0291411d9b7e520179b4ed3be6e056ee02bf0aac3554
+  languageName: node
+  linkType: hard
+
 "@swc/helpers@npm:0.5.15":
   version: 0.5.15
   resolution: "@swc/helpers@npm:0.5.15"
   dependencies:
     tslib: "npm:^2.8.0"
   checksum: 10c0/33002f74f6f885f04c132960835fdfc474186983ea567606db62e86acd0680ca82f34647e8e610f4e1e422d1c16fce729dde22cd3b797ab1fd9061a825dabca4
+  languageName: node
+  linkType: hard
+
+"@tanstack/query-core@npm:5.90.11":
+  version: 5.90.11
+  resolution: "@tanstack/query-core@npm:5.90.11"
+  checksum: 10c0/c2e44f36cec8957ec382ebcacb955bbb2112d03d475414f041194d05b7256d9ea1cc813eca7095033d36af0ba02c397aa646d976b428ff15b897b025ac53b3e9
+  languageName: node
+  linkType: hard
+
+"@tanstack/query-devtools@npm:5.91.1":
+  version: 5.91.1
+  resolution: "@tanstack/query-devtools@npm:5.91.1"
+  checksum: 10c0/856d85d249fd46a9f191a345f4446dcfb11a6b48d664f18f5bf480d0802fde5089ca7ae39e26e3445256a13f12f9b77b8639c33ad26c9d1e4b4c56a00fdb9b8c
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-query-devtools@npm:^5.91.1":
+  version: 5.91.1
+  resolution: "@tanstack/react-query-devtools@npm:5.91.1"
+  dependencies:
+    "@tanstack/query-devtools": "npm:5.91.1"
+  peerDependencies:
+    "@tanstack/react-query": ^5.90.10
+    react: ^18 || ^19
+  checksum: 10c0/be19d04a292168bf9404f0f98a0e3f95f0340c0e88c838028805578da5c49b014275b1014f7a04f9c865788d96112be001eb72fa8253cadd83b6905f6bd6331e
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-query@npm:^5.90.11":
+  version: 5.90.11
+  resolution: "@tanstack/react-query@npm:5.90.11"
+  dependencies:
+    "@tanstack/query-core": "npm:5.90.11"
+  peerDependencies:
+    react: ^18 || ^19
+  checksum: 10c0/2e4b73903c2445672996cfeca69985e92055870594a8b64cc8b960d756d199a023b6cceb9548525ea8cf3f3a1986b5bc3e3ec8d0722615c6ac9ed1478c604b02
   languageName: node
   linkType: hard
 
@@ -1214,12 +1324,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/node@npm:*":
+  version: 24.10.1
+  resolution: "@types/node@npm:24.10.1"
+  dependencies:
+    undici-types: "npm:~7.16.0"
+  checksum: 10c0/d6bca7a78f550fbb376f236f92b405d676003a8a09a1b411f55920ef34286ee3ee51f566203920e835478784df52662b5b2af89159d9d319352e9ea21801c002
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:^20.19.25":
   version: 20.19.25
   resolution: "@types/node@npm:20.19.25"
   dependencies:
     undici-types: "npm:~6.21.0"
   checksum: 10c0/992f18cb03264e8dc2fd3cb64f428ee4997cb6d928dad68bf4b752eacac73062697ce7ce6a0e71a6d15af510814397a20597a72332dfec638e02fb3a382ad014
+  languageName: node
+  linkType: hard
+
+"@types/phoenix@npm:^1.6.6":
+  version: 1.6.6
+  resolution: "@types/phoenix@npm:1.6.6"
+  checksum: 10c0/4dfcb3fd36341ed5500de030291af14163c599857e00d2d4ff065d4c4600317d5d20aa170913fb9609747a09436e3add44db7d0c709bdf80f36cddcc67a42021
   languageName: node
   linkType: hard
 
@@ -1282,6 +1408,15 @@ __metadata:
   version: 0.5.24
   resolution: "@types/webxr@npm:0.5.24"
   checksum: 10c0/ff59ffd390d06ca3f89ab2531d583ac10bc5e2ab82e5a01ecc40fbc365224a3375e7caa5b14649cf6141db21fb024940da7ad2bd8faa3cd497a6665257cb53b5
+  languageName: node
+  linkType: hard
+
+"@types/ws@npm:^8.18.1":
+  version: 8.18.1
+  resolution: "@types/ws@npm:8.18.1"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10c0/61aff1129143fcc4312f083bc9e9e168aa3026b7dd6e70796276dcfb2c8211c4292603f9c4864fae702f2ed86e4abd4d38aa421831c2fd7f856c931a481afbab
   languageName: node
   linkType: hard
 
@@ -2369,6 +2504,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "decoded-app@workspace:."
   dependencies:
+    "@supabase/auth-helpers-nextjs": "npm:^0.15.0"
+    "@supabase/supabase-js": "npm:^2.86.0"
+    "@tanstack/react-query": "npm:^5.90.11"
+    "@tanstack/react-query-devtools": "npm:^5.91.1"
     "@types/node": "npm:^20.19.25"
     "@types/react": "npm:^18.3.27"
     "@types/react-dom": "npm:^18.3.7"
@@ -2380,7 +2519,9 @@ __metadata:
     eslint-config-prettier: "npm:^10.1.8"
     eslint-plugin-prettier: "npm:^5.5.4"
     gsap: "npm:^3.13.0"
+    lucide-react: "npm:^0.555.0"
     next: "npm:^16.0.3"
+    next-themes: "npm:^0.4.6"
     postcss: "npm:^8.5.6"
     prettier: "npm:^3.6.2"
     react: "npm:^18.3.1"
@@ -3821,6 +3962,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"iceberg-js@npm:^0.8.0":
+  version: 0.8.0
+  resolution: "iceberg-js@npm:0.8.0"
+  checksum: 10c0/ffacf0b939a85dde35a5728aed4abf0780de8b83e76d9b3b173566862015723cc6092d919dbfba0c1b72b725b77be41cfb3938b03d2058714e8407253020990a
+  languageName: node
+  linkType: hard
+
 "iconv-lite@npm:^0.6.2":
   version: 0.6.3
   resolution: "iconv-lite@npm:0.6.3"
@@ -4513,6 +4661,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lucide-react@npm:^0.555.0":
+  version: 0.555.0
+  resolution: "lucide-react@npm:0.555.0"
+  peerDependencies:
+    react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: 10c0/18f0870307fe2a37cf62473de88845a78107295de1efcf599a8662be3af4239c0b661a57f8e29815e424773e4aad04d199ad4d94d7ae977b7ce7a61be7f64e04
+  languageName: node
+  linkType: hard
+
 "make-fetch-happen@npm:^15.0.0":
   version: 15.0.3
   resolution: "make-fetch-happen@npm:15.0.3"
@@ -4811,6 +4968,16 @@ __metadata:
   version: 1.0.0
   resolution: "negotiator@npm:1.0.0"
   checksum: 10c0/4c559dd52669ea48e1914f9d634227c561221dd54734070791f999c52ed0ff36e437b2e07d5c1f6e32909fc625fe46491c16e4a8f0572567d4dd15c3a4fda04b
+  languageName: node
+  linkType: hard
+
+"next-themes@npm:^0.4.6":
+  version: 0.4.6
+  resolution: "next-themes@npm:0.4.6"
+  peerDependencies:
+    react: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
+  checksum: 10c0/83590c11d359ce7e4ced14f6ea9dd7a691d5ce6843fe2dc520fc27e29ae1c535118478d03e7f172609c41b1ef1b8da6b8dd2d2acd6cd79cac1abbdbd5b99f2c4
   languageName: node
   linkType: hard
 
@@ -6639,7 +6806,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.0.1, tslib@npm:^2.4.0, tslib@npm:^2.8.0":
+"tslib@npm:2.8.1, tslib@npm:^2.0.1, tslib@npm:^2.4.0, tslib@npm:^2.8.0":
   version: 2.8.1
   resolution: "tslib@npm:2.8.1"
   checksum: 10c0/9c4759110a19c53f992d9aae23aac5ced636e99887b51b9e61def52611732872ff7668757d4e4c61f19691e36f4da981cd9485e869b4a7408d689f6bf1f14e62
@@ -6779,6 +6946,13 @@ __metadata:
   version: 6.21.0
   resolution: "undici-types@npm:6.21.0"
   checksum: 10c0/c01ed51829b10aa72fc3ce64b747f8e74ae9b60eafa19a7b46ef624403508a54c526ffab06a14a26b3120d055e1104d7abe7c9017e83ced038ea5cf52f8d5e04
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~7.16.0":
+  version: 7.16.0
+  resolution: "undici-types@npm:7.16.0"
+  checksum: 10c0/3033e2f2b5c9f1504bdc5934646cb54e37ecaca0f9249c983f7b1fc2e87c6d18399ebb05dc7fd5419e02b2e915f734d872a65da2e3eeed1813951c427d33cc9a
   languageName: node
   linkType: hard
 
@@ -7086,6 +7260,21 @@ __metadata:
   version: 1.0.2
   resolution: "wrappy@npm:1.0.2"
   checksum: 10c0/56fece1a4018c6a6c8e28fbc88c87e0fbf4ea8fd64fc6c63b18f4acc4bd13e0ad2515189786dd2c30d3eec9663d70f4ecf699330002f8ccb547e4a18231fc9f0
+  languageName: node
+  linkType: hard
+
+"ws@npm:^8.18.2":
+  version: 8.18.3
+  resolution: "ws@npm:8.18.3"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ">=5.0.2"
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: 10c0/eac918213de265ef7cb3d4ca348b891a51a520d839aa51cdb8ca93d4fa7ff9f6ccb339ccee89e4075324097f0a55157c89fa3f7147bde9d8d7e90335dc087b53
   languageName: node
   linkType: hard
 
