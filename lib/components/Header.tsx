@@ -10,7 +10,7 @@ import { ThemeToggle } from "./ThemeToggle";
 export function Header() {
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-[9999] w-full bg-background/80 backdrop-blur-md border-b border-border"
+      className="fixed top-0 left-0 right-0 z-[9999] w-full bg-transparent"
       aria-label="Thiings controls"
     >
       <div className="w-full px-2 md:px-3 h-14 md:h-16 flex items-center justify-between gap-2 md:gap-3">

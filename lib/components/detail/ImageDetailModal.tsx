@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { X } from 'lucide-react';
+import { X, Share2 } from 'lucide-react';
 import { useImageById } from '@/lib/hooks/useImages';
 import { useFlipEnter, useFlipExit } from '@/lib/hooks/useFlipTransition';
 import { ImageDetailContent } from './ImageDetailContent';
@@ -39,11 +39,39 @@ export function ImageDetailModal({ imageId }: Props) {
     await playExitAnimation();
   };
 
+  const handleShare = async () => {
+    const url = window.location.href;
+    
+    // Try Web Share API first (mobile/desktop)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Image Details',
+          url: url,
+        });
+        return;
+      } catch (err) {
+        // User cancelled or error occurred, fallback to clipboard
+        if ((err as Error).name !== 'AbortError') {
+          console.error('Error sharing:', err);
+        }
+      }
+    }
+
+    // Fallback to clipboard copy
+    try {
+      await navigator.clipboard.writeText(url);
+      // You might want to show a toast notification here
+    } catch (err) {
+      console.error('Failed to copy URL to clipboard:', err);
+    }
+  };
+
   if (isLoading) {
     return (
       <div
         ref={modalRef}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm"
+        className="fixed inset-0 z-[10000] flex items-center justify-center bg-background/95 backdrop-blur-sm"
       >
         <div className="text-muted-foreground">Loading...</div>
       </div>
@@ -54,7 +82,7 @@ export function ImageDetailModal({ imageId }: Props) {
     return (
       <div
         ref={modalRef}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm"
+        className="fixed inset-0 z-[10000] flex items-center justify-center bg-background/95 backdrop-blur-sm"
       >
         <div className="text-center">
           <p className="mb-4 text-lg text-destructive">
@@ -74,16 +102,25 @@ export function ImageDetailModal({ imageId }: Props) {
   return (
     <div
       ref={modalRef}
-      className="fixed inset-0 z-50 overflow-y-auto bg-background"
+      className="fixed inset-0 z-[10000] overflow-y-auto bg-background"
     >
-      {/* Close Button */}
-      <button
-        onClick={handleClose}
-        className="fixed right-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm transition-colors hover:bg-background/90"
-        aria-label="Close"
-      >
-        <X className="h-5 w-5" />
-      </button>
+      {/* Action Buttons */}
+      <div className="fixed right-4 top-4 z-[10001] flex gap-2">
+        <button
+          onClick={handleShare}
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm transition-colors hover:bg-background/90"
+          aria-label="Share"
+        >
+          <Share2 className="h-5 w-5" />
+        </button>
+        <button
+          onClick={handleClose}
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm transition-colors hover:bg-background/90"
+          aria-label="Close"
+        >
+          <X className="h-5 w-5" />
+        </button>
+      </div>
 
       {/* Content */}
       <ImageDetailContent image={image} />
