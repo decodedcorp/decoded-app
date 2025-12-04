@@ -1,11 +1,14 @@
-'use client';
+"use client";
 
-import { memo, useState } from 'react';
-import type { ImageRow } from '@/lib/supabase/types';
-import { useLatestImages } from '@/lib/hooks/useImages';
-import ThiingsGrid, { type ItemConfig, type GridItem } from '@/lib/components/ThiingsGrid';
-import { useFilterStore } from '@/lib/stores/filterStore';
-import { useSearchStore } from '@/lib/stores/searchStore';
+import { memo, useState } from "react";
+import type { ImageRow } from "@/lib/supabase/types";
+import { useLatestImages } from "@/lib/hooks/useImages";
+import ThiingsGrid, {
+  type ItemConfig,
+  type GridItem,
+} from "@/lib/components/ThiingsGrid";
+import { useFilterStore } from "@/lib/stores/filterStore";
+import { useSearchStore } from "@/lib/stores/searchStore";
 
 type Props = {
   initialImages: ImageRow[];
@@ -22,12 +25,22 @@ const CardCell = memo(({ gridIndex, position, isMoving, item }: ItemConfig) => {
 
   // Status badge colors
   const getStatusBadgeStyle = (status?: string) => {
-    if (!status) return '';
+    if (!status) return "";
     const lower = status.toLowerCase();
-    if (lower === 'pending') return 'bg-yellow-500/80 text-yellow-100';
-    if (lower === 'extracted') return 'bg-green-500/80 text-green-100';
-    if (lower === 'skipped') return 'bg-zinc-600/80 text-zinc-200';
-    return 'bg-zinc-700/80 text-zinc-200';
+
+    if (lower === "pending") {
+      return "bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-100";
+    }
+
+    if (lower === "extracted") {
+      return "bg-emerald-100 text-emerald-900 dark:bg-emerald-900/40 dark:text-emerald-100";
+    }
+
+    if (lower === "skipped") {
+      return "bg-slate-100 text-slate-900 dark:bg-slate-800/80 dark:text-slate-100";
+    }
+
+    return "bg-zinc-100 text-zinc-900 dark:bg-zinc-800/80 dark:text-zinc-100";
   };
 
   return (
@@ -38,9 +51,9 @@ const CardCell = memo(({ gridIndex, position, isMoving, item }: ItemConfig) => {
         {imageUrl && !imageError ? (
           <img
             src={imageUrl}
-            loading={isTopImage ? 'eager' : 'lazy'}
+            loading={isTopImage ? "eager" : "lazy"}
             decoding="async"
-            fetchPriority={isTopImage ? 'high' : 'auto'}
+            fetchPriority={isTopImage ? "high" : "auto"}
             alt={item?.id ? `Image ${item.id}` : `Card ${gridIndex} image`}
             className="h-full w-full object-cover"
             onError={() => setImageError(true)}
@@ -70,7 +83,7 @@ const CardCell = memo(({ gridIndex, position, isMoving, item }: ItemConfig) => {
       </div>
 
       {/* Metadata footer */}
-      {process.env.NODE_ENV === 'development' && (
+      {process.env.NODE_ENV === "development" && (
         <div className="flex items-center justify-between border-t border-border px-2 py-1">
           <span className="text-[10px] font-mono text-muted-foreground">
             {item?.id ? `#${item.id.slice(0, 8)}` : `#${gridIndex}`}
@@ -81,7 +94,7 @@ const CardCell = memo(({ gridIndex, position, isMoving, item }: ItemConfig) => {
   );
 });
 
-CardCell.displayName = 'CardCell';
+CardCell.displayName = "CardCell";
 
 // Skeleton card for loading state
 const SkeletonCard = memo(() => {
@@ -92,14 +105,14 @@ const SkeletonCard = memo(() => {
   );
 });
 
-SkeletonCard.displayName = 'SkeletonCard';
+SkeletonCard.displayName = "SkeletonCard";
 
 // Skeleton cell component for loading state
 const SkeletonCell = memo(({ gridIndex, position, isMoving }: ItemConfig) => {
   return <SkeletonCard />;
 });
 
-SkeletonCell.displayName = 'SkeletonCell';
+SkeletonCell.displayName = "SkeletonCell";
 
 /**
  * Client Component for home page
@@ -117,12 +130,14 @@ export function HomeClient({ initialImages }: Props) {
   const images = data ?? initialImages;
 
   // Normalize status values from database enum to consistent format
-  const normalizeStatus = (raw: string | null): 'pending' | 'extracted' | 'skipped' | string | undefined => {
+  const normalizeStatus = (
+    raw: string | null
+  ): "pending" | "extracted" | "skipped" | string | undefined => {
     if (!raw) return undefined;
     const lower = raw.toLowerCase();
-    if (lower === 'pending') return 'pending';
-    if (lower === 'extracted') return 'extracted';
-    if (lower === 'skipped') return 'skipped';
+    if (lower === "pending") return "pending";
+    if (lower === "extracted") return "extracted";
+    if (lower === "skipped") return "skipped";
     return raw; // fallback for any other values
   };
 
@@ -159,9 +174,13 @@ export function HomeClient({ initialImages }: Props) {
       <div className="absolute inset-0 z-0 flex items-center justify-center pt-14 md:pt-16">
         <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
           <div className="mb-4 text-4xl">⚠️</div>
-          <h2 className="mb-2 text-xl font-semibold text-foreground">Failed to load images</h2>
+          <h2 className="mb-2 text-xl font-semibold text-foreground">
+            Failed to load images
+          </h2>
           <p className="mb-6 text-sm text-muted-foreground">
-            {error instanceof Error ? error.message : 'Something went wrong while loading images.'}
+            {error instanceof Error
+              ? error.message
+              : "Something went wrong while loading images."}
           </p>
           <button
             onClick={() => refetch()}
@@ -181,8 +200,12 @@ export function HomeClient({ initialImages }: Props) {
       <div className="absolute inset-0 z-0 flex items-center justify-center pt-14 md:pt-16">
         <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
           <div className="mb-4 text-4xl">📷</div>
-          <h2 className="mb-2 text-xl font-semibold text-foreground">No images found yet.</h2>
-          <p className="text-sm text-muted-foreground">Check back later or try adjusting your filters.</p>
+          <h2 className="mb-2 text-xl font-semibold text-foreground">
+            No images found yet.
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Check back later or try adjusting your filters.
+          </p>
         </div>
       </div>
     );
@@ -202,4 +225,3 @@ export function HomeClient({ initialImages }: Props) {
     </div>
   );
 }
-
