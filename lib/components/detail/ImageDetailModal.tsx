@@ -45,8 +45,15 @@ export function ImageDetailModal({ imageId }: Props) {
   const drawerRef = useRef<HTMLElement>(null);
   const floatingImageRef = useRef<HTMLImageElement>(null);
 
+  // Ref for scroll container to checking scroll position for swipe gesture
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
   // State to track if we are currently closing to prevent multiple triggers
   const [isClosing, setIsClosing] = useState(false);
+
+  // Swipe gesture state
+  const touchStartY = useRef<number>(0);
+  const touchCurrentY = useRef<number>(0);
 
   // GSAP Context for cleanup
   const ctxRef = useRef<gsap.Context>();
@@ -74,6 +81,12 @@ export function ImageDetailModal({ imageId }: Props) {
         },
       });
 
+      // Ensure floating image is visible for exit animation (desktop only)
+      // On mobile, floating image is not rendered, so skip this
+      if (isDesktop && floatingImageRef.current) {
+        tl.set(floatingImageRef.current, { opacity: 1 }, 0);
+      }
+
       // 1. Fade out UI
       tl.to(
         [backdropRef.current, drawerRef.current],
@@ -86,7 +99,8 @@ export function ImageDetailModal({ imageId }: Props) {
       );
 
       // 2. Fly image back to grid (if we have origin info)
-      if (originRect && floatingImageRef.current) {
+      // Only animate floating image on desktop (it's hidden on mobile)
+      if (isDesktop && originRect && floatingImageRef.current) {
         // FLIP animation back to grid
         tl.to(
           floatingImageRef.current,
@@ -96,11 +110,25 @@ export function ImageDetailModal({ imageId }: Props) {
             width: originRect.width,
             height: originRect.height,
             borderRadius: "0.75rem", // Match grid card radius
+            boxShadow: "none", // Remove shadow
+            scale: 1, // Reset scale
             duration: 0.5,
             ease: "power3.inOut",
           },
           0
         )
+          // Scale pulse for return trip
+          .to(
+            floatingImageRef.current,
+            {
+              scale: 0.98,
+              duration: 0.25,
+              ease: "sine.inOut",
+              yoyo: true,
+              repeat: 1,
+            },
+            0
+          )
           // After image reaches grid position, fade it out
           .to(
             floatingImageRef.current,
@@ -108,11 +136,13 @@ export function ImageDetailModal({ imageId }: Props) {
               opacity: 0,
               duration: 0.1,
               ease: "power2.in",
+              yoyo: true,
+              repeat: 1,
             },
             "-=0.05" // Start fading slightly before position animation completes
           );
-      } else {
-        // Fallback: fade out floating image
+      } else if (isDesktop && floatingImageRef.current) {
+        // Fallback: fade out floating image (desktop only)
         tl.to(
           floatingImageRef.current,
           {
@@ -124,6 +154,65 @@ export function ImageDetailModal({ imageId }: Props) {
       }
     });
   }, [isClosing, router, originRect, reset]);
+
+  // Swipe gesture handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+    if (isDesktop) return;
+
+    // Only allow swipe if we are at the top of the scroll container
+    if (
+      scrollContainerRef.current &&
+      scrollContainerRef.current.scrollTop > 0
+    ) {
+      touchStartY.current = -1; // Invalid start
+      return;
+    }
+
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartY.current === -1) return;
+
+    const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+    if (isDesktop) return;
+
+    touchCurrentY.current = e.touches[0].clientY;
+    const diff = touchCurrentY.current - touchStartY.current;
+
+    // Only allow dragging down
+    if (diff > 0 && drawerRef.current) {
+      // Provide visual feedback - transform the drawer down
+      // Use GSAP set for performance
+      gsap.set(drawerRef.current, { y: diff });
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartY.current === -1) return;
+
+    const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+    if (isDesktop) return;
+
+    const diff = touchCurrentY.current - touchStartY.current;
+
+    if (diff > 100) {
+      // Threshold passed, close
+      handleClose();
+    } else if (diff > 0 && drawerRef.current) {
+      // Reset position if not passed threshold
+      gsap.to(drawerRef.current, {
+        y: 0,
+        duration: 0.3,
+        ease: "power2.out",
+      });
+    }
+
+    // Reset trackers
+    touchStartY.current = 0;
+    touchCurrentY.current = 0;
+  };
 
   const handleMaximize = useCallback(() => {
     // Hard navigation to force full page reload and break out of interception
@@ -139,12 +228,15 @@ export function ImageDetailModal({ imageId }: Props) {
     // Initialize GSAP context
     ctxRef.current = gsap.context(() => {
       const isDesktop = window.matchMedia("(min-width: 768px)").matches;
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
 
       // Initial States
       gsap.set(backdropRef.current, { opacity: 0 });
-      gsap.set(drawerRef.current, { x: "100%" }); // Always slide in from right
+
+      if (isDesktop) {
+        gsap.set(drawerRef.current, { x: "100%", y: 0 }); // Slide in from right
+      } else {
+        gsap.set(drawerRef.current, { x: 0, y: "100%" }); // Slide in from bottom
+      }
 
       // Animate Drawer & Backdrop
       const tl = gsap.timeline();
@@ -161,6 +253,7 @@ export function ImageDetailModal({ imageId }: Props) {
         drawerRef.current,
         {
           x: "0%",
+          y: "0%",
           duration: 0.5,
           ease: "power3.out",
         },
@@ -278,10 +371,15 @@ export function ImageDetailModal({ imageId }: Props) {
   }, [activeImageSrc, imgSrc, image?.image_url]);
 
   // Floating Image Animation (runs when image source becomes available)
+  // Skip on mobile - Floating Image is not rendered on mobile
   useEffect(() => {
     if (!activeImageSrc || !floatingImageRef.current) return;
 
     const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+
+    // Skip animation on mobile - Floating Image is hidden on mobile
+    if (!isDesktop) return;
+
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
 
@@ -301,72 +399,64 @@ export function ImageDetailModal({ imageId }: Props) {
       // Calculate Target Position
       let targetProps = {};
 
-      if (isDesktop) {
-        // Desktop: Center of Left 50%
-        const drawerWidth = Math.min(672, viewportWidth * 0.5);
-        const leftSpace = viewportWidth - drawerWidth;
+      // Desktop: Center of Left 50%
+      // (Mobile: Floating Image is not rendered, so no animation needed)
+      const drawerWidth = Math.min(672, viewportWidth * 0.5);
+      const leftSpace = viewportWidth - drawerWidth;
 
-        const targetWidth = Math.min(leftSpace * 0.8, 600);
-        const targetHeight = Math.min(viewportHeight * 0.8, targetWidth * 1.5);
+      const targetWidth = Math.min(leftSpace * 0.8, 600);
+      const targetHeight = Math.min(viewportHeight * 0.8, targetWidth * 1.5);
 
-        targetProps = {
-          top: (viewportHeight - targetHeight) / 2,
-          left: (leftSpace - targetWidth) / 2,
-          width: targetWidth,
-          height: targetHeight,
-          borderRadius: "0.5rem",
-        };
-      } else {
-        // Mobile: Top area (Hero position)
-        const targetHeight = viewportHeight * 0.4;
-        targetProps = {
-          top: 0,
-          left: 0,
-          width: viewportWidth,
-          height: targetHeight,
-          borderRadius: "0px",
-        };
-      }
+      targetProps = {
+        top: (viewportHeight - targetHeight) / 2,
+        left: (leftSpace - targetWidth) / 2,
+        width: targetWidth,
+        height: targetHeight,
+        borderRadius: "0.5rem",
+      };
 
       // Animate Image from grid to target position
-      gsap.to(floatingImageRef.current, {
+      const tl = gsap.timeline();
+
+      // Main flight animation with 3D depth effects
+      tl.to(floatingImageRef.current, {
         ...targetProps,
         duration: 0.6,
         ease: "power3.inOut",
+        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)", // Lift effect shadow
       });
+
+      // Add scale pulse for 3D "lift" feel
+      // This creates a subtle parabolic motion on the Z-axis
+      tl.to(
+        floatingImageRef.current,
+        {
+          scale: 1.02,
+          duration: 0.3,
+          ease: "power1.out",
+          yoyo: true,
+          repeat: 1,
+        },
+        0
+      );
     } else {
-      // No originRect: Show image directly at target position (fallback)
-      let targetProps = {};
+      // No originRect: Show image directly at target position (fallback, desktop only)
+      const drawerWidth = Math.min(672, viewportWidth * 0.5);
+      const leftSpace = viewportWidth - drawerWidth;
+      const targetWidth = Math.min(leftSpace * 0.8, 600);
+      const targetHeight = Math.min(viewportHeight * 0.8, targetWidth * 1.5);
 
-      if (isDesktop) {
-        const drawerWidth = Math.min(672, viewportWidth * 0.5);
-        const leftSpace = viewportWidth - drawerWidth;
-        const targetWidth = Math.min(leftSpace * 0.8, 600);
-        const targetHeight = Math.min(viewportHeight * 0.8, targetWidth * 1.5);
-
-        targetProps = {
-          position: "fixed",
-          top: (viewportHeight - targetHeight) / 2,
-          left: (leftSpace - targetWidth) / 2,
-          width: targetWidth,
-          height: targetHeight,
-          borderRadius: "0.5rem",
-          zIndex: 60,
-          opacity: 1,
-        };
-      } else {
-        const targetHeight = viewportHeight * 0.4;
-        targetProps = {
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: viewportWidth,
-          height: targetHeight,
-          borderRadius: "0px",
-          zIndex: 60,
-          opacity: 1,
-        };
-      }
+      const targetProps = {
+        position: "fixed",
+        top: (viewportHeight - targetHeight) / 2,
+        left: (leftSpace - targetWidth) / 2,
+        width: targetWidth,
+        height: targetHeight,
+        borderRadius: "0.5rem",
+        zIndex: 60,
+        opacity: 1,
+        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
+      };
 
       gsap.set(floatingImageRef.current, targetProps);
     }
@@ -375,9 +465,10 @@ export function ImageDetailModal({ imageId }: Props) {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-[10000] flex items-stretch justify-end"
+      className="fixed inset-0 z-[10000] flex items-end md:items-stretch md:justify-end"
       role="dialog"
       aria-modal="true"
+      style={{ perspective: "1200px" }} // Enable 3D perspective
     >
       {/* Backdrop (z-40) */}
       <div
@@ -387,13 +478,14 @@ export function ImageDetailModal({ imageId }: Props) {
         aria-hidden="true"
       />
 
-      {/* Floating Image (z-60) - The Star of the Show */}
+      {/* Floating Image (z-60) - Desktop Only */}
+      {/* On mobile, this is hidden - Drawer fills the screen instead */}
       {activeImageSrc && (
         <img
           ref={floatingImageRef}
           src={activeImageSrc}
           alt="Highlight"
-          className="fixed object-cover shadow-2xl pointer-events-none"
+          className="hidden md:block fixed object-cover shadow-2xl pointer-events-none"
           style={{
             opacity: 0, // Initially hidden, will be set by GSAP
             zIndex: 60,
@@ -405,15 +497,21 @@ export function ImageDetailModal({ imageId }: Props) {
       {/* Drawer (z-50) */}
       <aside
         ref={drawerRef}
-        className="relative z-50 flex h-full w-full flex-col bg-background shadow-2xl md:max-w-2xl translate-x-full"
+        className="relative z-50 flex h-full w-full flex-col bg-background shadow-2xl md:max-w-2xl translate-y-full md:translate-x-full md:translate-y-0"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         {/* Scrollable Content Area */}
-        <div className="relative flex-1 overflow-y-auto overscroll-contain">
+        <div
+          ref={scrollContainerRef}
+          className="relative flex-1 overflow-y-auto overscroll-contain"
+        >
           {renderContent()}
         </div>
 
-        {/* Floating Controls (Bottom Left) */}
-        <div className="absolute bottom-6 left-6 z-20 flex gap-3">
+        {/* Floating Controls */}
+        <div className="absolute top-4 right-4 md:top-auto md:right-auto md:bottom-6 md:left-6 z-20 flex gap-3">
           <button
             onClick={handleMaximize}
             className="flex h-12 w-12 items-center justify-center rounded-full bg-black/80 text-white backdrop-blur-sm transition-transform hover:scale-105 hover:bg-black active:scale-95 dark:bg-white/80 dark:text-black dark:hover:bg-white"
