@@ -54,6 +54,7 @@ const CardCell = memo(({ gridIndex, position, isMoving, item }: ItemConfig) => {
     }
   };
 
+
   // Status badge colors
   const getStatusBadgeStyle = (status?: string) => {
     if (!status) return "";

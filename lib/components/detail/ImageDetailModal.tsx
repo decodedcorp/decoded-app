@@ -61,12 +61,16 @@ export function ImageDetailModal({ imageId }: Props) {
       // Exit Animation
       const tl = gsap.timeline({
         onComplete: () => {
-          reset();
-          if (window.history.length > 1) {
-            router.back();
-          } else {
-            router.push("/");
-          }
+          // Small delay to ensure floating image is completely hidden
+          // before resetting state and showing grid image
+          setTimeout(() => {
+            reset();
+            if (window.history.length > 1) {
+              router.back();
+            } else {
+              router.push("/");
+            }
+          }, 50); // 50ms delay to ensure smooth transition
         },
       });
 
@@ -96,7 +100,17 @@ export function ImageDetailModal({ imageId }: Props) {
             ease: "power3.inOut",
           },
           0
-        );
+        )
+          // After image reaches grid position, fade it out
+          .to(
+            floatingImageRef.current,
+            {
+              opacity: 0,
+              duration: 0.1,
+              ease: "power2.in",
+            },
+            "-=0.05" // Start fading slightly before position animation completes
+          );
       } else {
         // Fallback: fade out floating image
         tl.to(
