@@ -10,6 +10,16 @@ type Props = {
  */
 export default async function ModalImageDetailPage({ params }: Props) {
   const { id } = await params;
+  
+  // Debug: Log the imageId being passed
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[ModalImageDetailPage] Received imageId:', id);
+  }
+  
+  if (!id) {
+    console.error('[ModalImageDetailPage] imageId is missing!');
+  }
+  
   return <ImageDetailModal imageId={id} />;
 }
 

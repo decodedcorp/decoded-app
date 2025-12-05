@@ -19,12 +19,11 @@ export function HeroSection({ image }: Props) {
   const heroRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
-
   useGSAP(() => {
     if (!heroRef.current || !imageRef.current || !titleRef.current) return;
 
     const ctx = gsap.context(() => {
-      // Ken Burns effect: Image scales from 1.2 to 1.0
+      // Standard Ken Burns effect
       gsap.fromTo(
         imageRef.current,
         { scale: 1.2 },
@@ -56,6 +55,7 @@ export function HeroSection({ image }: Props) {
     <div ref={heroRef} className="relative h-screen w-full overflow-hidden">
       {image.image_url && (
         <img
+          id={`hero-image-${image.id}`}
           ref={imageRef}
           src={image.image_url}
           alt={`Image ${image.id}`}

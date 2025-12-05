@@ -10,7 +10,8 @@ type TransitionState = {
   selectedId: string | null;
   originState: FlipState | null;
   originRect: DOMRect | null;
-  setTransition: (id: string, state: FlipState | null, rect: DOMRect | null) => void;
+  imgSrc: string | null;
+  setTransition: (id: string, state: FlipState | null, rect: DOMRect | null, imgSrc?: string) => void;
   reset: () => void;
 };
 
@@ -18,17 +19,21 @@ export const useTransitionStore = create<TransitionState>((set) => ({
   selectedId: null,
   originState: null,
   originRect: null,
-  setTransition: (id: string, state: FlipState | null, rect: DOMRect | null) =>
+  imgSrc: null,
+  setTransition: (id: string, state: FlipState | null, rect: DOMRect | null, imgSrc?: string) =>
     set({
       selectedId: id,
       originState: state,
       originRect: rect,
+      imgSrc: imgSrc || null,
     }),
   reset: () =>
     set({
       selectedId: null,
       originState: null,
       originRect: null,
+      imgSrc: null,
     }),
 }));
+
 

@@ -46,11 +46,11 @@ const CardCell = memo(({ gridIndex, position, isMoving, item }: ItemConfig) => {
       const state = Flip.getState(target);
       const rect = target.getBoundingClientRect();
 
-      setTransition(imageId, state, rect);
+      setTransition(imageId, state, rect, imageUrl ?? undefined);
     } catch (error) {
       // Fallback: just store rect if Flip.getState fails
       const rect = target.getBoundingClientRect();
-      setTransition(imageId, null, rect);
+      setTransition(imageId, null, rect, imageUrl ?? undefined);
     }
   };
 
