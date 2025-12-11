@@ -189,7 +189,7 @@ export function HomeClient({ initialImages }: Props) {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteFilteredImages({
-    limit: 20, // Reduced from 80 to prevent DB timeouts and waterfall fetching
+    limit: 40, // Increased from 20 to 40 to reduce fetch frequency
     filter: activeFilter,
     search: debouncedQuery,
   });
