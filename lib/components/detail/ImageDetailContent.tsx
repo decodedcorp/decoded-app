@@ -1,5 +1,6 @@
 "use client";
 
+import { RefObject } from "react";
 import type { ImageDetail } from "@/lib/supabase/queries/images";
 import { normalizeItem } from "./types";
 import { HeroSection } from "./HeroSection";
@@ -9,6 +10,8 @@ import Link from "next/link";
 
 type Props = {
   image: ImageDetail;
+  isModal?: boolean;
+  scrollContainerRef?: RefObject<HTMLElement>;
 };
 
 /**
@@ -20,7 +23,11 @@ type Props = {
  * 2. Interactive Showcase - Sticky layout with item highlights (if items exist)
  * 3. Shop Grid - Grid of items (if items exist)
  */
-export function ImageDetailContent({ image }: Props) {
+export function ImageDetailContent({
+  image,
+  isModal = false,
+  scrollContainerRef,
+}: Props) {
   // Items are now pre-fetched via post.item_ids (if post_image exists)
   // Fallback to item.image_id if no post_image found
   const items = image.items || [];
@@ -75,7 +82,7 @@ export function ImageDetailContent({ image }: Props) {
   return (
     <div className="detail-content">
       {/* Section 1: Hero */}
-      <HeroSection image={image} />
+      <HeroSection image={image} isModal={isModal} />
 
       {/* Featured In Section */}
       {(image.postImages?.length > 0 || image.posts?.length > 0) && (
@@ -119,7 +126,12 @@ export function ImageDetailContent({ image }: Props) {
 
       {/* Section 2: Interactive Showcase (only if items with coordinates exist) */}
       {hasItemsWithCoordinates && (
-        <InteractiveShowcase image={image} items={normalizedItems} />
+        <InteractiveShowcase
+          image={image}
+          items={normalizedItems}
+          isModal={isModal}
+          scrollContainerRef={scrollContainerRef}
+        />
       )}
 
       {/* Section 3: Shop Grid (show if any items exist, even without coordinates) */}

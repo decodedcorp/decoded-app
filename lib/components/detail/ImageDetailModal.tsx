@@ -350,7 +350,13 @@ export function ImageDetailModal({ imageId }: Props) {
       );
     }
 
-    return <ImageDetailContent image={image} />;
+    return (
+      <ImageDetailContent
+        image={image}
+        isModal={true}
+        scrollContainerRef={scrollContainerRef}
+      />
+    );
   };
 
   // Image Source Resolution: Priority -> Store (Immediate) -> Fetched Data

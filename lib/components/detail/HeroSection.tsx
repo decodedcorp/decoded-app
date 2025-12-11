@@ -7,6 +7,7 @@ import gsap from "gsap";
 
 type Props = {
   image: ImageRow;
+  isModal?: boolean;
 };
 
 /**
@@ -15,7 +16,7 @@ type Props = {
  * Full-screen hero image with dramatic typography and entrance animations.
  * Uses GSAP for Ken Burns effect (scale) and title reveal animation.
  */
-export function HeroSection({ image }: Props) {
+export function HeroSection({ image, isModal = false }: Props) {
   const heroRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
@@ -52,7 +53,10 @@ export function HeroSection({ image }: Props) {
   }, []);
 
   return (
-    <div ref={heroRef} className="relative h-screen w-full overflow-hidden">
+    <div
+      ref={heroRef}
+      className={`relative w-full overflow-hidden ${isModal ? "h-[50vh] min-h-[300px]" : "h-screen"}`}
+    >
       {image.image_url && (
         <img
           id={`hero-image-${image.id}`}
@@ -65,11 +69,15 @@ export function HeroSection({ image }: Props) {
       )}
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-      
+
       {/* Hero Title */}
-      <div className="absolute inset-0 flex items-end justify-center pb-20 px-4">
+      <div
+        className={`absolute inset-0 flex items-end justify-center px-4 ${isModal ? "pb-10" : "pb-20"}`}
+      >
         <div ref={titleRef} className="overflow-hidden">
-          <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl font-bold text-white tracking-tight">
+          <h1
+            className={`font-serif font-bold text-white tracking-tight ${isModal ? "text-4xl md:text-5xl" : "text-5xl md:text-7xl lg:text-8xl"}`}
+          >
             Editorial
           </h1>
         </div>
@@ -77,4 +85,3 @@ export function HeroSection({ image }: Props) {
     </div>
   );
 }
-

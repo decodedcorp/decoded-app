@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useState, useCallback, RefObject } from "react";
 import type { UiItem } from "./types";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
@@ -18,6 +18,7 @@ type Props = {
   activeIndex: number | null;
   imageContainerRef: React.RefObject<HTMLDivElement>;
   cardsContainerRef: React.RefObject<HTMLDivElement>;
+  scrollContainerRef?: RefObject<HTMLElement>;
 };
 
 /**
@@ -33,6 +34,7 @@ export function ConnectorLayer({
   activeIndex,
   imageContainerRef,
   cardsContainerRef,
+  scrollContainerRef,
 }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const [connectors, setConnectors] = useState<ConnectorData[]>([]);
@@ -86,17 +88,32 @@ export function ConnectorLayer({
     setConnectors(newConnectors);
   }, [items, imageContainerRef, cardsContainerRef]);
 
-  // Recalculate on resize
+  // Recalculate on resize and scroll
   useEffect(() => {
     calculateConnectors();
 
-    const handleResize = () => {
-      calculateConnectors();
+    let ticking = false;
+    const handleUpdate = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          calculateConnectors();
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [calculateConnectors]);
+    window.addEventListener("resize", handleUpdate);
+
+    // Add scroll listener to specific container or window
+    const scroller = scrollContainerRef?.current || window;
+    scroller.addEventListener("scroll", handleUpdate as EventListener);
+
+    return () => {
+      window.removeEventListener("resize", handleUpdate);
+      scroller.removeEventListener("scroll", handleUpdate as EventListener);
+    };
+  }, [calculateConnectors, scrollContainerRef]);
 
   // Animate connector lines with GSAP
   useGSAP(
