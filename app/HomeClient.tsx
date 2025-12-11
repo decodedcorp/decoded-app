@@ -198,9 +198,18 @@ export function HomeClient({ initialImages }: Props) {
   // Flatten pages into a single items array
   // Use CSR data if available, fallback to SSR initial data for first page
   // Note: CSR data is ImageWithPostId[], SSR initialImages is ImageRow[]
+
+  // Logic to determine if we should use initialImages
+  // Only use initialImages (SSR data) if we are on the default view (All + No Search)
+  // Otherwise, we want to show a loading state while fetching the specific filter data
+  const shouldUseInitialData =
+    !data && activeFilter === "all" && debouncedQuery === "";
+
   const items: (ImageRow | ImageWithPostId)[] = data
     ? data.pages.flatMap((page) => page.items)
-    : initialImages;
+    : shouldUseInitialData
+      ? initialImages
+      : [];
 
   // Normalize status values from database enum to consistent format
   const normalizeStatus = (
@@ -230,7 +239,7 @@ export function HomeClient({ initialImages }: Props) {
     });
 
   // Loading state: show skeleton grid (only on initial load)
-  if (isLoading && !data && initialImages.length === 0) {
+  if (isLoading && !data && !shouldUseInitialData) {
     return (
       <div className="absolute inset-0 z-0 pt-14 md:pt-16">
         <ThiingsGrid
@@ -238,6 +247,7 @@ export function HomeClient({ initialImages }: Props) {
           renderItem={(config) => <SkeletonCell {...config} />}
           initialPosition={{ x: 0, y: 0 }}
           items={[]}
+          hasMore={true}
         />
       </div>
     );
@@ -297,6 +307,7 @@ export function HomeClient({ initialImages }: Props) {
   return (
     <div className="absolute inset-0 z-0 pt-14 md:pt-16">
       <ThiingsGrid
+        key={`${activeFilter}-${debouncedQuery}`}
         gridSize={{ width: 400, height: 500 }}
         renderItem={(config) => <CardCell {...config} />}
         initialPosition={{ x: 0, y: 0 }}

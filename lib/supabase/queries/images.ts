@@ -404,6 +404,7 @@ export async function fetchImagesByPostImage(
   params: FetchFilteredImagesParams
 ): Promise<ImagePageWithPostId> {
   const { limit = 50, cursor, filter = "all", search = "" } = params;
+
   const hasAccountFilter = filter !== "all";
   const hasSearchQuery = search.trim().length > 0;
 
