@@ -5,6 +5,7 @@ import { normalizeItem } from "./types";
 import { HeroSection } from "./HeroSection";
 import { InteractiveShowcase } from "./InteractiveShowcase";
 import { ShopGrid } from "./ShopGrid";
+import Link from "next/link";
 
 type Props = {
   image: ImageDetail;
@@ -80,13 +81,14 @@ export function ImageDetailContent({ image }: Props) {
               Featured in:
             </span>
             {image.posts.map((post) => (
-              <span
+              <Link
                 key={post.id}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-background border border-border/50 shadow-sm shrink-0"
+                href={`/posts/${post.id}`}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-background border border-border/50 shadow-sm shrink-0 hover:bg-background/80 hover:shadow-md transition-all cursor-pointer"
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/80" />@
                 {post.account}
-              </span>
+              </Link>
             ))}
           </div>
         </div>
