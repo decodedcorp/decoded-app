@@ -29,7 +29,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${playfairDisplay.variable} ${inter.variable} font-sans`}>
+      <body
+        className={`${playfairDisplay.variable} ${inter.variable} font-sans`}
+        suppressHydrationWarning
+      >
         <AppProviders>
           {children}
           {modal}

@@ -21,8 +21,12 @@ type Props = {
  * 3. Shop Grid - Grid of items (if items exist)
  */
 export function ImageDetailContent({ image }: Props) {
-  // Items are now pre-fetched with the image
+  // Items are now pre-fetched via post.item_ids (if post_image exists)
+  // Fallback to item.image_id if no post_image found
   const items = image.items || [];
+
+  // Check if items were fetched via post (postImages exist)
+  const itemsFromPost = image.postImages && image.postImages.length > 0;
 
   // #region agent log
   fetch("http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671", {
@@ -74,22 +78,41 @@ export function ImageDetailContent({ image }: Props) {
       <HeroSection image={image} />
 
       {/* Featured In Section */}
-      {image.posts && image.posts.length > 0 && (
+      {(image.postImages?.length > 0 || image.posts?.length > 0) && (
         <div className="bg-muted/10 border-b border-border">
           <div className="mx-auto max-w-6xl px-5 py-6 flex items-center gap-4 text-sm text-muted-foreground overflow-x-auto">
             <span className="font-serif italic font-medium shrink-0">
               Featured in:
             </span>
-            {image.posts.map((post) => (
-              <Link
-                key={post.id}
-                href={`/posts/${post.id}`}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-background border border-border/50 shadow-sm shrink-0 hover:bg-background/80 hover:shadow-md transition-all cursor-pointer"
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/80" />@
-                {post.account}
-              </Link>
-            ))}
+            {/* Use postImages if available (with metadata), fallback to posts (backward compatibility) */}
+            {image.postImages && image.postImages.length > 0
+              ? image.postImages
+                  .sort(
+                    (a, b) =>
+                      new Date(b.created_at).getTime() -
+                      new Date(a.created_at).getTime()
+                  )
+                  .map((postImage) => (
+                    <Link
+                      key={postImage.post.id}
+                      href={`/posts/${postImage.post.id}`}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-background border border-border/50 shadow-sm shrink-0 hover:bg-background/80 hover:shadow-md transition-all cursor-pointer"
+                      title={`Connected on ${new Date(postImage.created_at).toLocaleDateString()}`}
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/80" />
+                      @{postImage.post.account}
+                    </Link>
+                  ))
+              : image.posts?.map((post) => (
+                  <Link
+                    key={post.id}
+                    href={`/posts/${post.id}`}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-background border border-border/50 shadow-sm shrink-0 hover:bg-background/80 hover:shadow-md transition-all cursor-pointer"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/80" />
+                    @{post.account}
+                  </Link>
+                ))}
           </div>
         </div>
       )}
@@ -100,7 +123,18 @@ export function ImageDetailContent({ image }: Props) {
       )}
 
       {/* Section 3: Shop Grid (show if any items exist, even without coordinates) */}
-      {hasItems && <ShopGrid items={normalizedItems} />}
+      {hasItems && (
+        <div>
+          {itemsFromPost && image.postImages && image.postImages.length > 0 && (
+            <div className="mx-auto max-w-6xl px-4 py-3 md:px-8">
+              <p className="text-sm text-muted-foreground">
+                Items from post: @{image.postImages[0].post.account}
+              </p>
+            </div>
+          )}
+          <ShopGrid items={normalizedItems} />
+        </div>
+      )}
 
       {/* Fallback: Show basic info if no items */}
       {!hasItems && (

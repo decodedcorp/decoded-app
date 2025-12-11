@@ -6,9 +6,11 @@ import {
 import {
   fetchLatestImages,
   fetchFilteredImages,
+  fetchImagesByPostImage,
   fetchImageById,
   type CategoryFilter,
   type ImagePage,
+  type ImagePageWithPostId,
   type ImageDetail,
 } from "@/lib/supabase/queries/images";
 import type { ImageRow } from "@/lib/supabase/types";
@@ -83,9 +85,10 @@ export function useFilteredImages(
 
 /**
  * React Query hook for fetching infinite filtered images with cursor-based pagination
+ * Now uses post_image table to ensure post context is available
  *
  * @param params - Fetch params
- * @returns Infinite Query result
+ * @returns Infinite Query result with images including postId
  */
 export function useInfiniteFilteredImages(params: {
   limit: number;
@@ -94,10 +97,10 @@ export function useInfiniteFilteredImages(params: {
 }) {
   const { limit, filter = "all", search = "" } = params;
 
-  return useInfiniteQuery<ImagePage>({
+  return useInfiniteQuery<ImagePageWithPostId>({
     queryKey: ["images", "infinite", { filter, search, limit }],
     queryFn: ({ pageParam }) =>
-      fetchFilteredImages({
+      fetchImagesByPostImage({
         limit,
         cursor: (pageParam as string) ?? null,
         filter,

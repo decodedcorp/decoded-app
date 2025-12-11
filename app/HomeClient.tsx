@@ -6,6 +6,7 @@ import { gsap } from "gsap";
 import { Flip } from "gsap/Flip";
 import type { ImageRow } from "@/lib/supabase/types";
 import { useInfiniteFilteredImages } from "@/lib/hooks/useImages";
+import type { ImageWithPostId } from "@/lib/supabase/queries/images";
 import ThiingsGrid, {
   type ItemConfig,
   type GridItem,
@@ -196,7 +197,10 @@ export function HomeClient({ initialImages }: Props) {
 
   // Flatten pages into a single items array
   // Use CSR data if available, fallback to SSR initial data for first page
-  const items = data ? data.pages.flatMap((page) => page.items) : initialImages;
+  // Note: CSR data is ImageWithPostId[], SSR initialImages is ImageRow[]
+  const items: (ImageRow | ImageWithPostId)[] = data
+    ? data.pages.flatMap((page) => page.items)
+    : initialImages;
 
   // Normalize status values from database enum to consistent format
   const normalizeStatus = (
@@ -210,16 +214,20 @@ export function HomeClient({ initialImages }: Props) {
     return raw; // fallback for any other values
   };
 
-  // Map ImageRow[] to GridItem[]
+  // Map ImageRow[] | ImageWithPostId[] to GridItem[]
   // Filter out any records without image_url as a safety guard
   const gridItems: GridItem[] = items
     .filter((image) => image.image_url != null)
-    .map((image) => ({
-      id: image.id,
-      imageUrl: image.image_url,
-      status: normalizeStatus(image.status),
-      hasItems: image.with_items,
-    }));
+    .map((image) => {
+      const imageWithPostId = image as ImageWithPostId;
+      return {
+        id: image.id,
+        imageUrl: image.image_url,
+        status: normalizeStatus(image.status),
+        hasItems: image.with_items,
+        postId: imageWithPostId.postId, // Include postId if available (will be undefined for SSR initialImages)
+      };
+    });
 
   // Loading state: show skeleton grid (only on initial load)
   if (isLoading && !data && initialImages.length === 0) {

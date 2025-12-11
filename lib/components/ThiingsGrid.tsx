@@ -97,6 +97,7 @@ export type GridItem = {
   imageUrl?: string | null;
   status?: "pending" | "extracted" | "skipped" | string;
   hasItems?: boolean;
+  postId?: string; // post_image를 통해 가져온 이미지의 경우 post_id 포함
 };
 
 type GridItemInternal = {
