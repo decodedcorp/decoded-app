@@ -107,6 +107,35 @@ const { data } = await supabase
   .order("created_at", { ascending: true });
 ```
 
+### 2.4 Item Image Field Mapping
+
+**Critical**: The `cropped_image_path` field must be explicitly mapped when transforming database items to UI components.
+
+| DB Column            | TypeScript Type (DbItem) | Transform Function | UI Type (UiItem)           | Component Prop  |
+| -------------------- | ------------------------ | ------------------ | -------------------------- | --------------- |
+| `cropped_image_path` | `string \| null`         | `normalizeItem()`  | `imageUrl: string \| null` | `item.imageUrl` |
+
+**Transformation Location**: `lib/components/detail/types.ts:normalizeItem()`
+
+```typescript
+export function normalizeItem(item: DbItem): UiItem {
+  return {
+    ...item,
+    imageUrl: item.cropped_image_path || null, // Explicit mapping
+    // ... other normalized fields
+  };
+}
+```
+
+**Why This Matters**:
+
+- Database uses `snake_case` (`cropped_image_path`)
+- UI components use `camelCase` (`imageUrl`)
+- The mapping must happen in `normalizeItem()` to ensure data flows correctly
+- If this mapping is missing, item images won't display
+
+**See Also**: `docs/database/03-data-flow.md` for complete data flow documentation
+
 ---
 
 ## 3. Table: `post`

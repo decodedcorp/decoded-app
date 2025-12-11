@@ -4,7 +4,8 @@ import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
-import type { NormalizedItem } from "./types";
+import type { UiItem } from "./types";
+import Image from "next/image";
 
 // Register GSAP ScrollTrigger plugin
 if (typeof window !== "undefined") {
@@ -12,7 +13,7 @@ if (typeof window !== "undefined") {
 }
 
 type Props = {
-  items: NormalizedItem[];
+  items: UiItem[];
 };
 
 /**
@@ -24,33 +25,36 @@ type Props = {
 export function ShopGrid({ items }: Props) {
   const gridRef = useRef<HTMLDivElement>(null);
 
-  useGSAP(() => {
-    if (!gridRef.current) return;
+  useGSAP(
+    () => {
+      if (!gridRef.current) return;
 
-    const cards = gsap.utils.toArray<HTMLElement>(
-      gridRef.current.querySelectorAll(".shop-card")
-    );
+      const cards = gsap.utils.toArray<HTMLElement>(
+        gridRef.current.querySelectorAll(".shop-card")
+      );
 
-    gsap.fromTo(
-      cards,
-      {
-        y: 50,
-        opacity: 0,
-      },
-      {
-        y: 0,
-        opacity: 1,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: gridRef.current,
-          start: "top 80%",
-          toggleActions: "play none none reverse",
+      gsap.fromTo(
+        cards,
+        {
+          y: 50,
+          opacity: 0,
         },
-      }
-    );
-  }, { scope: gridRef });
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          stagger: 0.1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: gridRef.current,
+            start: "top 80%",
+            toggleActions: "play none none reverse",
+          },
+        }
+      );
+    },
+    { scope: gridRef }
+  );
 
   if (items.length === 0) {
     return null;
@@ -70,21 +74,43 @@ export function ShopGrid({ items }: Props) {
           {items.map((item) => (
             <div
               key={item.id}
-              className="shop-card bg-card border border-border rounded-lg p-6 hover:shadow-lg transition-shadow"
+              className="shop-card bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg transition-shadow flex flex-col"
             >
-              <h3 className="font-serif text-xl font-semibold mb-2">
-                {item.product_name || "Item"}
-              </h3>
-              {item.brand && (
-                <p className="text-sm text-muted-foreground uppercase tracking-wide mb-2">
-                  {item.brand}
-                </p>
+              {/* Item Image */}
+              {item.imageUrl ? (
+                <div className="relative w-full aspect-square bg-muted">
+                  <Image
+                    src={item.imageUrl}
+                    alt={item.product_name || "Item"}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                </div>
+              ) : (
+                <div className="w-full aspect-square bg-muted flex items-center justify-center">
+                  <span className="text-muted-foreground text-sm">
+                    No Image
+                  </span>
+                </div>
               )}
-              {item.price && (
-                <p className="text-lg font-semibold text-scanner-green">
-                  {item.price}
-                </p>
-              )}
+
+              {/* Item Details */}
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="font-serif text-xl font-semibold mb-2">
+                  {item.product_name || "Item"}
+                </h3>
+                {item.brand && (
+                  <p className="text-sm text-muted-foreground uppercase tracking-wide mb-2">
+                    {item.brand}
+                  </p>
+                )}
+                {item.price && (
+                  <p className="text-lg font-semibold text-scanner-green mt-auto">
+                    {item.price}
+                  </p>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -92,4 +118,3 @@ export function ShopGrid({ items }: Props) {
     </section>
   );
 }
-

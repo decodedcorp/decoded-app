@@ -5,7 +5,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import type { ImageRow } from "@/lib/supabase/types";
-import type { NormalizedItem } from "./types";
+import type { UiItem } from "./types";
 import { ImageCanvas } from "./ImageCanvas";
 import { ItemDetailCard } from "./ItemDetailCard";
 import { ConnectorLayer } from "./ConnectorLayer";
@@ -17,7 +17,7 @@ if (typeof window !== "undefined") {
 
 type Props = {
   image: ImageRow;
-  items: NormalizedItem[];
+  items: UiItem[];
 };
 
 /**
@@ -35,42 +35,45 @@ export function InteractiveShowcase({ image, items }: Props) {
   const cardsContainerRef = useRef<HTMLDivElement>(null);
 
   // Setup ScrollTrigger for each card
-  useGSAP(() => {
-    if (!sectionRef.current || items.length === 0) return;
+  useGSAP(
+    () => {
+      if (!sectionRef.current || items.length === 0) return;
 
-    const cards = gsap.utils.toArray<HTMLElement>(
-      sectionRef.current.querySelectorAll("[data-item-index]")
-    );
+      const cards = gsap.utils.toArray<HTMLElement>(
+        sectionRef.current.querySelectorAll("[data-item-index]")
+      );
 
-    cards.forEach((card, index) => {
-      ScrollTrigger.create({
-        trigger: card,
-        start: "top center",
-        end: "bottom center",
-        onEnter: () => setActiveIndex(index),
-        onEnterBack: () => setActiveIndex(index),
-        onLeave: () => {
-          // Only clear if scrolling past (not when entering previous)
-          if (index < (activeIndex ?? 0)) {
-            setActiveIndex(null);
-          }
-        },
-        onLeaveBack: () => {
-          if (index > (activeIndex ?? 0)) {
-            setActiveIndex(null);
-          }
-        },
+      cards.forEach((card, index) => {
+        ScrollTrigger.create({
+          trigger: card,
+          start: "top center",
+          end: "bottom center",
+          onEnter: () => setActiveIndex(index),
+          onEnterBack: () => setActiveIndex(index),
+          onLeave: () => {
+            // Only clear if scrolling past (not when entering previous)
+            if (index < (activeIndex ?? 0)) {
+              setActiveIndex(null);
+            }
+          },
+          onLeaveBack: () => {
+            if (index > (activeIndex ?? 0)) {
+              setActiveIndex(null);
+            }
+          },
+        });
       });
-    });
 
-    return () => {
-      ScrollTrigger.getAll().forEach((trigger) => {
-        if (cards.includes(trigger.vars.trigger as HTMLElement)) {
-          trigger.kill();
-        }
-      });
-    };
-  }, { scope: sectionRef, dependencies: [items.length] });
+      return () => {
+        ScrollTrigger.getAll().forEach((trigger) => {
+          if (cards.includes(trigger.vars.trigger as HTMLElement)) {
+            trigger.kill();
+          }
+        });
+      };
+    },
+    { scope: sectionRef, dependencies: [items.length] }
+  );
 
   if (items.length === 0) {
     return null;
@@ -86,11 +89,7 @@ export function InteractiveShowcase({ image, items }: Props) {
         ref={imageContainerRef}
         className="sticky top-0 h-[40vh] lg:h-screen w-full lg:w-1/2 z-10"
       >
-        <ImageCanvas
-          image={image}
-          items={items}
-          activeIndex={activeIndex}
-        />
+        <ImageCanvas image={image} items={items} activeIndex={activeIndex} />
       </div>
 
       {/* Right: Scrollable Item Details (Desktop) / Bottom: Scrollable (Mobile) */}
@@ -119,4 +118,3 @@ export function InteractiveShowcase({ image, items }: Props) {
     </section>
   );
 }
-

@@ -19,6 +19,28 @@ type Props = {
 export function ImageDetailPage({ imageId }: Props) {
   const router = useRouter();
   const { data: image, isLoading, error } = useImageById(imageId);
+  // #region agent log
+  useEffect(() => {
+    fetch("http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        location: "ImageDetailPage.tsx:25",
+        message: "Data received from hook",
+        data: {
+          imageId,
+          hasImage: !!image,
+          itemCount: image?.items?.length,
+          isLoading,
+          error: error?.message,
+        },
+        timestamp: Date.now(),
+        sessionId: "debug-session",
+        hypothesisId: "H1",
+      }),
+    }).catch(() => {});
+  }, [image, isLoading, error, imageId]);
+  // #endregion
   const pageRef = useRef<HTMLDivElement>(null);
 
   // Fade-in animation for direct access

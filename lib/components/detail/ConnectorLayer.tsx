@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState, useCallback } from "react";
-import type { NormalizedItem } from "./types";
+import type { UiItem } from "./types";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 
@@ -14,7 +14,7 @@ type ConnectorData = {
 };
 
 type Props = {
-  items: NormalizedItem[];
+  items: UiItem[];
   activeIndex: number | null;
   imageContainerRef: React.RefObject<HTMLDivElement>;
   cardsContainerRef: React.RefObject<HTMLDivElement>;
@@ -39,7 +39,11 @@ export function ConnectorLayer({
 
   // Calculate connector coordinates (cached, only recalculated on resize)
   const calculateConnectors = useCallback(() => {
-    if (!imageContainerRef.current || !cardsContainerRef.current || !svgRef.current) {
+    if (
+      !imageContainerRef.current ||
+      !cardsContainerRef.current ||
+      !svgRef.current
+    ) {
       return;
     }
 
@@ -95,48 +99,53 @@ export function ConnectorLayer({
   }, [calculateConnectors]);
 
   // Animate connector lines with GSAP
-  useGSAP(() => {
-    if (!svgRef.current) return;
+  useGSAP(
+    () => {
+      if (!svgRef.current) return;
 
-    connectors.forEach((connector) => {
-      const line = svgRef.current?.querySelector(
-        `[data-connector-id="${connector.itemId}"]`
-      ) as SVGLineElement;
+      connectors.forEach((connector) => {
+        const line = svgRef.current?.querySelector(
+          `[data-connector-id="${connector.itemId}"]`
+        ) as SVGLineElement;
 
-      if (!line) return;
+        if (!line) return;
 
-      const isActive = items.findIndex((item) => item.id === connector.itemId) === activeIndex;
+        const isActive =
+          items.findIndex((item) => item.id === connector.itemId) ===
+          activeIndex;
 
-      if (isActive) {
-        // Draw line animation
-        const length = Math.sqrt(
-          Math.pow(connector.endX - connector.startX, 2) +
-            Math.pow(connector.endY - connector.startY, 2)
-        );
+        if (isActive) {
+          // Draw line animation
+          const length = Math.sqrt(
+            Math.pow(connector.endX - connector.startX, 2) +
+              Math.pow(connector.endY - connector.startY, 2)
+          );
 
-        gsap.fromTo(
-          line,
-          {
-            strokeDasharray: length,
-            strokeDashoffset: length,
+          gsap.fromTo(
+            line,
+            {
+              strokeDasharray: length,
+              strokeDashoffset: length,
+              opacity: 0,
+            },
+            {
+              strokeDashoffset: 0,
+              opacity: 1,
+              duration: 0.6,
+              ease: "power2.out",
+            }
+          );
+        } else {
+          // Hide line
+          gsap.to(line, {
             opacity: 0,
-          },
-          {
-            strokeDashoffset: 0,
-            opacity: 1,
-            duration: 0.6,
-            ease: "power2.out",
-          }
-        );
-      } else {
-        // Hide line
-        gsap.to(line, {
-          opacity: 0,
-          duration: 0.3,
-        });
-      }
-    });
-  }, { scope: svgRef, dependencies: [connectors, activeIndex] });
+            duration: 0.3,
+          });
+        }
+      });
+    },
+    { scope: svgRef, dependencies: [connectors, activeIndex] }
+  );
 
   if (connectors.length === 0) {
     return null;
@@ -145,31 +154,49 @@ export function ConnectorLayer({
   return (
     <svg
       ref={svgRef}
-      className="absolute inset-0 pointer-events-none z-10"
+      className="absolute inset-0 pointer-events-none z-50" // z-10 -> z-50으로 변경
       style={{ width: "100%", height: "100%" }}
     >
+      <defs>
+        <marker
+          id="dot"
+          viewBox="0 0 10 10"
+          refX="5"
+          refY="5"
+          markerWidth="4"
+          markerHeight="4"
+        >
+          <circle
+            cx="5"
+            cy="5"
+            r="5"
+            fill="currentColor"
+            className="text-foreground"
+          />
+        </marker>
+      </defs>
       {connectors.map((connector) => {
         const isActive =
-          items.findIndex((item) => item.id === connector.itemId) === activeIndex;
+          items.findIndex((item) => item.id === connector.itemId) ===
+          activeIndex;
 
-        if (!isActive) return null;
-
+        // Use visibility hidden instead of null to keep DOM node for GSAP
         return (
-          <line
-            key={connector.itemId}
-            data-connector-id={connector.itemId}
-            x1={connector.startX}
-            y1={connector.startY}
-            x2={connector.endX}
-            y2={connector.endY}
-            stroke="#00FF00"
-            strokeWidth="2"
-            strokeDasharray="5,5"
-            opacity={0}
-          />
+          <g key={connector.itemId} style={{ opacity: isActive ? 1 : 0 }}>
+            <line
+              data-connector-id={connector.itemId}
+              x1={connector.startX}
+              y1={connector.startY}
+              x2={connector.endX}
+              y2={connector.endY}
+              stroke="currentColor"
+              className="text-foreground/80 dark:text-white/90"
+              strokeWidth="1.5"
+              markerEnd="url(#dot)"
+            />
+          </g>
         );
       })}
     </svg>
   );
 }
-

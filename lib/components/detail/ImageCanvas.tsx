@@ -2,14 +2,14 @@
 
 import { useRef, useEffect } from "react";
 import type { ImageRow } from "@/lib/supabase/types";
-import type { NormalizedItem } from "./types";
+import type { UiItem } from "./types";
 import { getHighlightStyle } from "./types";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 
 type Props = {
   image: ImageRow;
-  items: NormalizedItem[];
+  items: UiItem[];
   activeIndex: number | null;
 };
 
@@ -27,48 +27,51 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
   const overlayRef = useRef<HTMLDivElement>(null);
 
   // Pan & Zoom effect: Calculate scale and translation
-  useGSAP(() => {
-    if (!imageRef.current || activeIndex === null) {
-      // Reset to default state
-      if (imageRef.current) {
+  useGSAP(
+    () => {
+      if (!imageRef.current || activeIndex === null) {
+        // Reset to default state
+        if (imageRef.current) {
+          gsap.to(imageRef.current, {
+            scale: 1,
+            x: 0,
+            y: 0,
+            duration: 0.8,
+            ease: "power2.out",
+          });
+        }
+        return;
+      }
+
+      const activeItem = items[activeIndex];
+      if (!activeItem?.normalizedCenter || !activeItem?.normalizedBox) {
+        return;
+      }
+
+      const center = activeItem.normalizedCenter;
+      const scale = 1.5; // Zoom level
+
+      // Calculate translation to center the item
+      // When scaled, we need to offset by (center - 0.5) * (scale - 1) * containerSize
+      if (containerRef.current && imageRef.current) {
+        const containerRect = containerRef.current.getBoundingClientRect();
+        const imageRect = imageRef.current.getBoundingClientRect();
+
+        // Calculate offset needed to center the item
+        const offsetX = (center.x - 0.5) * (scale - 1) * imageRect.width;
+        const offsetY = (center.y - 0.5) * (scale - 1) * imageRect.height;
+
         gsap.to(imageRef.current, {
-          scale: 1,
-          x: 0,
-          y: 0,
+          scale,
+          x: -offsetX,
+          y: -offsetY,
           duration: 0.8,
           ease: "power2.out",
         });
       }
-      return;
-    }
-
-    const activeItem = items[activeIndex];
-    if (!activeItem?.normalizedCenter || !activeItem?.normalizedBox) {
-      return;
-    }
-
-    const center = activeItem.normalizedCenter;
-    const scale = 1.5; // Zoom level
-
-    // Calculate translation to center the item
-    // When scaled, we need to offset by (center - 0.5) * (scale - 1) * containerSize
-    if (containerRef.current && imageRef.current) {
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const imageRect = imageRef.current.getBoundingClientRect();
-
-      // Calculate offset needed to center the item
-      const offsetX = (center.x - 0.5) * (scale - 1) * imageRect.width;
-      const offsetY = (center.y - 0.5) * (scale - 1) * imageRect.height;
-
-      gsap.to(imageRef.current, {
-        scale,
-        x: -offsetX,
-        y: -offsetY,
-        duration: 0.8,
-        ease: "power2.out",
-      });
-    }
-  }, { scope: containerRef, dependencies: [activeIndex] });
+    },
+    { scope: containerRef, dependencies: [activeIndex] }
+  );
 
   // Spotlight effect: Update overlay mask
   useEffect(() => {
@@ -102,7 +105,8 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
     )`;
 
     overlayRef.current.style.clipPath = clipPath;
-    overlayRef.current.style.filter = "grayscale(100%) brightness(0.5)";
+    // Softer spotlight effect
+    overlayRef.current.style.filter = "grayscale(60%) brightness(0.6)";
     overlayRef.current.style.opacity = "1";
   }, [activeIndex, items]);
 
@@ -123,7 +127,7 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
           {/* Spotlight Overlay (grayscale mask) */}
           <div
             ref={overlayRef}
-            className="absolute inset-0 bg-black/30 transition-opacity duration-500 pointer-events-none"
+            className="absolute inset-0 bg-black/40 transition-opacity duration-500 pointer-events-none"
             style={{ opacity: 0 }}
           />
 
@@ -137,13 +141,20 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
             return (
               <div
                 key={item.id}
-                className={`absolute border-2 transition-all duration-300 pointer-events-none ${
+                className={`absolute transition-all duration-300 pointer-events-none ${
                   isActive
-                    ? "border-scanner-green shadow-[0_0_20px_rgba(0,255,0,0.5)]"
-                    : "border-transparent"
+                    ? "border border-white/90 shadow-sm opacity-100"
+                    : "border-0 opacity-0"
                 }`}
                 style={style}
-              />
+              >
+                {/* Index Label */}
+                {isActive && (
+                  <div className="absolute -top-6 left-0 bg-white text-black text-[10px] font-bold px-1.5 py-0.5 uppercase tracking-wider">
+                    {String(index + 1).padStart(2, "0")}
+                  </div>
+                )}
+              </div>
             );
           })}
         </>
@@ -151,4 +162,3 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
     </div>
   );
 }
-

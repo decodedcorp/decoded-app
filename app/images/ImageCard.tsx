@@ -22,12 +22,14 @@ export function ImageCard({ image }: Props) {
     pending: "bg-yellow-100 text-yellow-800",
     extracted: "bg-green-100 text-green-800",
     skipped: "bg-gray-100 text-gray-800",
+    extracted_metadata: "bg-blue-100 text-blue-800",
   };
 
   const statusLabels = {
     pending: "Pending",
     extracted: "Extracted",
     skipped: "Skipped",
+    extracted_metadata: "Metadata",
   };
 
   return (

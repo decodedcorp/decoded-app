@@ -1,14 +1,13 @@
 "use client";
 
-import type { ImageRow } from '@/lib/supabase/types';
-import { useItemsByImageId } from '@/lib/hooks/useItems';
-import { normalizeItem } from './types';
-import { HeroSection } from './HeroSection';
-import { InteractiveShowcase } from './InteractiveShowcase';
-import { ShopGrid } from './ShopGrid';
+import type { ImageDetail } from "@/lib/supabase/queries/images";
+import { normalizeItem } from "./types";
+import { HeroSection } from "./HeroSection";
+import { InteractiveShowcase } from "./InteractiveShowcase";
+import { ShopGrid } from "./ShopGrid";
 
 type Props = {
-  image: ImageRow;
+  image: ImageDetail;
 };
 
 /**
@@ -21,44 +20,95 @@ type Props = {
  * 3. Shop Grid - Grid of items (if items exist)
  */
 export function ImageDetailContent({ image }: Props) {
-  const { data: items = [], isLoading: itemsLoading } = useItemsByImageId(
-    image.id
-  );
+  // Items are now pre-fetched with the image
+  const items = image.items || [];
+
+  // #region agent log
+  fetch("http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      location: "ImageDetailContent.tsx:25",
+      message: "Processing items",
+      data: { rawItemsCount: items.length, firstItem: items[0] },
+      timestamp: Date.now(),
+      sessionId: "debug-session",
+      hypothesisId: "H2",
+    }),
+  }).catch(() => {});
+  // #endregion
 
   // Normalize items with coordinates
   const normalizedItems = items.map((item) => normalizeItem(item));
 
   // Check if we have items with valid coordinates
-  const hasItems = normalizedItems.some(
-    (item) => item.normalizedBox !== null
-  );
+  const hasItems = normalizedItems.some((item) => item.normalizedBox !== null);
+
+  // #region agent log
+  fetch("http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      location: "ImageDetailContent.tsx:32",
+      message: "Render condition check",
+      data: {
+        normalizedCount: normalizedItems.length,
+        hasItems,
+        sampleNormalizedBox: normalizedItems[0]?.normalizedBox,
+      },
+      timestamp: Date.now(),
+      sessionId: "debug-session",
+      hypothesisId: "H3",
+    }),
+  }).catch(() => {});
+  // #endregion
 
   return (
     <div className="detail-content">
       {/* Section 1: Hero */}
       <HeroSection image={image} />
 
+      {/* Featured In Section */}
+      {image.posts && image.posts.length > 0 && (
+        <div className="bg-muted/10 border-b border-border">
+          <div className="mx-auto max-w-6xl px-5 py-6 flex items-center gap-4 text-sm text-muted-foreground overflow-x-auto">
+            <span className="font-serif italic font-medium shrink-0">
+              Featured in:
+            </span>
+            {image.posts.map((post) => (
+              <span
+                key={post.id}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-background border border-border/50 shadow-sm shrink-0"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/80" />@
+                {post.account}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Section 2: Interactive Showcase (only if items exist) */}
-      {!itemsLoading && hasItems && (
+      {hasItems && (
         <InteractiveShowcase image={image} items={normalizedItems} />
       )}
 
       {/* Section 3: Shop Grid (only if items exist) */}
-      {!itemsLoading && hasItems && <ShopGrid items={normalizedItems} />}
+      {hasItems && <ShopGrid items={normalizedItems} />}
 
       {/* Fallback: Show basic info if no items */}
-      {!itemsLoading && !hasItems && (
+      {!hasItems && (
         <div className="mx-auto max-w-4xl px-4 py-16 md:px-8">
           <div className="mb-8">
             <div className="mb-4 flex flex-wrap gap-2">
               {image.status && (
                 <span
                   className={`rounded-full px-3 py-1 text-xs font-medium uppercase tracking-wide ${
-                    image.status === 'pending'
-                      ? 'bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-100'
-                      : image.status === 'extracted'
-                        ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-900/40 dark:text-emerald-100'
-                        : 'bg-slate-100 text-slate-900 dark:bg-slate-800/80 dark:text-slate-100'
+                    image.status === "pending"
+                      ? "bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-100"
+                      : image.status === "extracted"
+                        ? "bg-emerald-100 text-emerald-900 dark:bg-emerald-900/40 dark:text-emerald-100"
+                        : "bg-slate-100 text-slate-900 dark:bg-slate-800/80 dark:text-slate-100"
                   }`}
                 >
                   {image.status}
@@ -80,7 +130,10 @@ export function ImageDetailContent({ image }: Props) {
               Image Details
             </h1>
             <p className="text-lg text-muted-foreground">
-              Image ID: <code className="rounded bg-muted px-2 py-1 text-sm">{image.id}</code>
+              Image ID:{" "}
+              <code className="rounded bg-muted px-2 py-1 text-sm">
+                {image.id}
+              </code>
             </p>
           </div>
 

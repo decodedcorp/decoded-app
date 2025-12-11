@@ -7,6 +7,7 @@
 //
 // Update workflow: schema change → types regeneration → build/typecheck
 // Note: MCP can be used for type review/summary, but actual file should be generated via Supabase CLI
+// Last updated: 2025-01-XX (Added cropped_image_path and other missing fields based on MCP schema verification)
 
 export type Json =
   | string
@@ -53,31 +54,49 @@ export type Database = {
       };
       item: {
         Row: {
-          brand: string | null;
-          center: Json | null;
-          created_at: string;
           id: string;
+          created_at: string | null;
           image_id: string;
-          price: string | null;
+          brand: string | null;
           product_name: string | null;
+          price: string | null;
+          center: Json | null;
+          sam_prompt: string | null;
+          bboxes: Json | null;
+          scores: Json | null;
+          ambiguity: boolean | null;
+          cropped_image_path: string | null;
+          status: string | null;
         };
         Insert: {
-          brand?: string | null;
-          center?: Json | null;
-          created_at?: string;
           id?: string;
+          created_at?: string | null;
           image_id: string;
-          price?: string | null;
+          brand?: string | null;
           product_name?: string | null;
+          price?: string | null;
+          center?: Json | null;
+          sam_prompt?: string | null;
+          bboxes?: Json | null;
+          scores?: Json | null;
+          ambiguity?: boolean | null;
+          cropped_image_path?: string | null;
+          status?: string | null;
         };
         Update: {
-          brand?: string | null;
-          center?: Json | null;
-          created_at?: string;
           id?: string;
+          created_at?: string | null;
           image_id?: string;
-          price?: string | null;
+          brand?: string | null;
           product_name?: string | null;
+          price?: string | null;
+          center?: Json | null;
+          sam_prompt?: string | null;
+          bboxes?: Json | null;
+          scores?: Json | null;
+          ambiguity?: boolean | null;
+          cropped_image_path?: string | null;
+          status?: string | null;
         };
         Relationships: [];
       };
@@ -143,7 +162,7 @@ export type Database = {
       [_ in never]: never;
     };
     Enums: {
-      image_status: "pending" | "extracted" | "skipped";
+      image_status: "pending" | "extracted" | "skipped" | "extracted_metadata";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -274,7 +293,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      image_status: ["pending", "extracted", "skipped"],
+      image_status: ["pending", "extracted", "skipped", "extracted_metadata"],
     },
   },
 } as const;

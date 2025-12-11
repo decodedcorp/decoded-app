@@ -9,7 +9,15 @@
  */
 
 import { supabaseBrowserClient } from "../client";
-import type { ImageRow } from "../types";
+import type { Database, ImageRow } from "../types";
+
+type ItemRow = Database["public"]["Tables"]["item"]["Row"];
+type PostRow = Database["public"]["Tables"]["post"]["Row"];
+
+export type ImageDetail = ImageRow & {
+  items: ItemRow[];
+  posts: PostRow[];
+};
 
 export type CategoryFilter = "all" | "newjeanscloset" | "blackpinkk.style";
 
@@ -69,13 +77,21 @@ export async function fetchLatestImages(limit = 20): Promise<ImageRow[]> {
  * Fetches a single image by ID from the database (client-side)
  *
  * @param id - Image ID to fetch
- * @returns Image row or null if not found
+ * @returns Image detail with items and posts, or null if not found
  * @throws Error if the query fails
  */
-export async function fetchImageById(id: string): Promise<ImageRow | null> {
+export async function fetchImageById(id: string): Promise<ImageDetail | null> {
   const { data, error } = await supabaseBrowserClient
     .from("image")
-    .select("*")
+    .select(
+      `
+      *,
+      items:item(*),
+      post_images:post_image(
+        post(*)
+      )
+    `
+    )
     .eq("id", id)
     .single();
 
@@ -87,7 +103,28 @@ export async function fetchImageById(id: string): Promise<ImageRow | null> {
     throw error;
   }
 
-  return data;
+  // Transform post_images join table to flat posts array
+  const posts = data.post_images
+    ? (data.post_images as any[]).map((pi) => pi.post).filter(Boolean)
+    : [];
+
+  // Ensure items is always an array (Supabase may return different types)
+  const items = Array.isArray(data.items)
+    ? data.items
+    : data.items
+      ? [data.items]
+      : [];
+
+  return {
+    id: data.id,
+    created_at: data.created_at,
+    image_hash: data.image_hash,
+    image_url: data.image_url,
+    status: data.status,
+    with_items: data.with_items,
+    items: items as ItemRow[],
+    posts: posts,
+  };
 }
 
 /**

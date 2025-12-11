@@ -119,6 +119,7 @@ type State = {
   gridItems: GridItemInternal[];
   isMoving: boolean;
   maxVisibleIndex: number;
+  isDragging: boolean;
 };
 
 export type ItemConfig = {
@@ -191,6 +192,7 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
       gridItems: [],
       isMoving: false,
       maxVisibleIndex: 0,
+      isDragging: false,
     };
 
     this.containerRef = React.createRef();
@@ -885,7 +887,7 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
         onTouchCancel={this.handleTouchEnd}
       >
         <div
-          ref={this.contentRef}
+          ref={this.contentRef as React.RefObject<HTMLDivElement>}
           style={{
             position: "absolute",
             inset: 0,
