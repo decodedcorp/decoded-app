@@ -9,6 +9,7 @@
 
 This document outlines the **current usage patterns** for the `image`, `item`, and `post` tables.
 It focuses on:
+
 - Which pipelines populate the data
 - How the frontend/backend consumes it
 - The semantic meaning of `enum` and `jsonb` fields
@@ -51,10 +52,10 @@ Primary table for storing uploaded fashion images and their processing status.
 
 // Fetch latest images that have items or are processed
 const { data, error } = await supabase
-  .from('image')
-  .select('*, item(*)') // Join with items
-  .not('image_url', 'is', null)
-  .order('created_at', { ascending: false })
+  .from("image")
+  .select("*, item(*)") // Join with items
+  .not("image_url", "is", null)
+  .order("created_at", { ascending: false })
   .limit(20);
 ```
 
@@ -88,7 +89,7 @@ export interface BBox {
   h: number;
 }
 
-export type ItemWithParsedData = Database['public']['Tables']['item']['Row'] & {
+export type ItemWithParsedData = Database["public"]["Tables"]["item"]["Row"] & {
   bboxes: BBox[] | null;
   scores: number[] | null;
 };
@@ -100,10 +101,10 @@ export type ItemWithParsedData = Database['public']['Tables']['item']['Row'] & {
 // lib/supabase/queries/items.ts
 
 const { data } = await supabase
-  .from('item')
-  .select('*')
-  .eq('image_id', imageId)
-  .order('created_at', { ascending: true });
+  .from("item")
+  .select("*")
+  .eq("image_id", imageId)
+  .order("created_at", { ascending: true });
 ```
 
 ---
@@ -117,7 +118,7 @@ Represents social posts that may feature multiple items.
 - **`item_ids`**: `jsonb`
   - Stores references to `item` records displayed in this post.
   - Structure: `number[]` (Array of `item.id`s) or `string[]` depending on ID type.
-  - *Note: Check if `item.id` is `bigint` or `uuid`. Current schema uses `bigint` for item keys.*
+  - _Note: Check if `item.id` is `bigint` or `uuid`. Current schema uses `bigint` for item keys._
 
 ### 3.2 Usage
 
@@ -160,6 +161,7 @@ erDiagram
 When in doubt about the current schema state, use the MCP tool to check the live database definition.
 
 **Instructions:**
+
 1.  Ask Cursor Agent: "List tables image, item, post using db mcp"
     - Tool: `mcp_supabase-decoded-ai_list_tables`
 2.  Review the output for:

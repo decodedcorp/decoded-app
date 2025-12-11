@@ -11,34 +11,16 @@ const filters = [
       "bg-secondary text-secondary-foreground hover:bg-secondary/80 dark:bg-secondary/50",
   },
   {
-    key: "latest",
-    label: "Latest",
+    key: "newjeanscloset",
+    label: "NewJeans",
     className:
-      "bg-amber-100 text-amber-900 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-100",
+      "bg-blue-100 text-blue-900 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-100",
   },
   {
-    key: "clothing",
-    label: "Clothing",
+    key: "blackpinkk.style",
+    label: "BLACKPINK",
     className:
-      "bg-rose-100 text-rose-900 hover:bg-rose-200 dark:bg-rose-900/30 dark:text-rose-100",
-  },
-  {
-    key: "accessories",
-    label: "Accessories",
-    className:
-      "bg-purple-100 text-purple-900 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-100",
-  },
-  {
-    key: "shoes",
-    label: "Shoes",
-    className:
-      "bg-sky-100 text-sky-900 hover:bg-sky-200 dark:bg-sky-900/30 dark:text-sky-100",
-  },
-  {
-    key: "bags",
-    label: "Bags",
-    className:
-      "bg-stone-100 text-stone-900 hover:bg-stone-200 dark:bg-stone-900/30 dark:text-stone-100",
+      "bg-pink-100 text-pink-900 hover:bg-pink-200 dark:bg-pink-900/30 dark:text-pink-100",
   },
 ] as const;
 

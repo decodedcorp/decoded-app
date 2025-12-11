@@ -24,6 +24,7 @@ export async function fetchLatestImagesServer(limit = 20): Promise<ImageRow[]> {
     // TODO: narrow down selected fields once UI is finalized
     .select('*')
     .not('image_url', 'is', null) // Only fetch records with images
+    .eq('with_items', false) // Only fetch original images
     .order('created_at', { ascending: false })
     .limit(limit);
 
