@@ -8,6 +8,9 @@ const UPDATE_INTERVAL = 16;
 const VELOCITY_HISTORY_SIZE = 5;
 const FRICTION = 0.9;
 const VELOCITY_THRESHOLD = 0.3;
+const INFINITE_SCROLL_THRESHOLD = 50; // Items before end to trigger load
+const VIEWPORT_BUFFER = 1.2; // Render 1.5x viewport for smooth scrolling
+const MAX_RENDER_CELLS = 300; // Limit rendering DOM nodes for performance
 
 // Custom debounce implementation
 function debounce<T extends (...args: unknown[]) => unknown>(
@@ -92,7 +95,7 @@ export type Position = {
 export type GridItem = {
   id: string;
   imageUrl?: string | null;
-  status?: 'pending' | 'extracted' | 'skipped' | string;
+  status?: "pending" | "extracted" | "skipped" | string;
   hasItems?: boolean;
 };
 
@@ -101,16 +104,21 @@ type GridItemInternal = {
   gridIndex: number;
 };
 
-type State = {
+// Physics state separated from React state
+type PhysicsState = {
   offset: Position;
-  isDragging: boolean;
   startPos: Position;
-  restPos: Position;
   velocity: Position;
-  gridItems: GridItemInternal[];
-  isMoving: boolean;
+  isDragging: boolean;
   lastMoveTime: number;
   velocityHistory: Position[];
+};
+
+type State = {
+  // Only state that affects rendering remains here
+  gridItems: GridItemInternal[];
+  isMoving: boolean;
+  maxVisibleIndex: number;
 };
 
 export type ItemConfig = {
@@ -127,21 +135,26 @@ export type ThiingsGridProps = {
   className?: string;
   initialPosition?: Position;
   /**
-   * @deprecated Filtering is now handled server-side. This prop is kept for backward compatibility but ignored.
-   */
-  filter?: 'all' | 'latest' | 'clothing' | 'accessories' | 'shoes' | 'bags';
-  /**
-   * @deprecated Search is now handled server-side. This prop is kept for backward compatibility but ignored.
-   */
-  searchQuery?: string;
-  /**
-   * Array of items to display in the grid. Filtering/searching should be done before passing items to this component.
+   * Array of items to display in the grid.
    */
   items?: GridItem[];
+  /**
+   * Callback triggers when scrolling nears end of loaded items
+   */
+  onReachEnd?: () => void;
+  /**
+   * Whether more items are available to load
+   */
+  hasMore?: boolean;
+  /**
+   * Whether items are currently loading
+   */
+  isLoadingMore?: boolean;
 };
 
 class ThiingsGrid extends Component<ThiingsGridProps, State> {
   private containerRef: React.RefObject<HTMLElement | null>;
+  private contentRef: React.RefObject<HTMLDivElement | null>;
   private lastPos: Position;
   private animationFrame: number | null;
   private isComponentMounted: boolean;
@@ -153,21 +166,35 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
   private staggerDelayMap: WeakMap<Element, number>; // Cache stagger delay value
   private staggerTick: number; // Counter for stagger assignment
 
+  // Physics state stored in a ref-like property to avoid re-renders
+  private physics: PhysicsState;
+
+  // Cache for spiral positions
+  private spiralPositions: Position[] = [];
+
   constructor(props: ThiingsGridProps) {
     super(props);
     const offset = this.props.initialPosition || { x: 0, y: 0 };
-    this.state = {
+
+    // Initialize physics state
+    this.physics = {
       offset: { ...offset },
-      restPos: { ...offset },
       startPos: { ...offset },
       velocity: { x: 0, y: 0 },
       isDragging: false,
-      gridItems: [],
-      isMoving: false,
       lastMoveTime: 0,
       velocityHistory: [],
     };
+
+    // Minimal React state
+    this.state = {
+      gridItems: [],
+      isMoving: false,
+      maxVisibleIndex: 0,
+    };
+
     this.containerRef = React.createRef();
+    this.contentRef = React.createRef();
     this.lastPos = { x: 0, y: 0 };
     this.animationFrame = null;
     this.isComponentMounted = false;
@@ -177,9 +204,13 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
     this.staggerPositionCache = new WeakMap();
     this.staggerDelayMap = new WeakMap();
     this.staggerTick = 0;
+
+    // Precompute initial batch of spiral positions
+    this.ensureSpiralPositions(1000);
+
     this.debouncedUpdateGridItems = throttle(
       this.updateGridItems,
-      UPDATE_INTERVAL,
+      UPDATE_INTERVAL * 2, // Slow down React updates further
       {
         leading: true,
         trailing: true,
@@ -204,13 +235,23 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
         { passive: false }
       );
     }
+
+    // Start the physics loop
+    this.startPhysicsLoop();
   }
 
-  componentDidUpdate(prevProps: ThiingsGridProps) {
-    // Re-observe elements when items prop changes (filtering/searching is now server-side)
+  componentDidUpdate(prevProps: ThiingsGridProps, prevState: State) {
+    // Re-observe elements when items prop changes
     if (prevProps.items !== this.props.items) {
-      // Recalculate grid items when items prop changes
       this.updateGridItems();
+    }
+
+    // Check for infinite scroll trigger on state update or props update
+    if (
+      prevState.maxVisibleIndex !== this.state.maxVisibleIndex ||
+      prevProps.items?.length !== this.props.items?.length
+    ) {
+      this.checkInfiniteScroll();
     }
 
     // Observe new card elements when grid items update
@@ -247,64 +288,137 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
   }
 
   public publicGetCurrentPosition = () => {
-    return this.state.offset;
+    return this.physics.offset;
+  };
+
+  // Precompute/Cache spiral positions
+  private ensureSpiralPositions = (count: number) => {
+    if (this.spiralPositions.length >= count) return;
+
+    for (let i = this.spiralPositions.length; i < count; i++) {
+      this.spiralPositions.push(this.computeSpiralPosition(i));
+    }
+  };
+
+  // Pure math calculation for spiral position
+  private computeSpiralPosition = (n: number): Position => {
+    if (n === 0) return { x: 0, y: 0 };
+
+    // Approximation of inverse spiral mapping (index -> x,y)
+    // This is computationally expensive, so we cache it
+
+    // Layer calculation
+    const layer = Math.floor((Math.sqrt(n) + 1) / 2);
+    const sideLen = 2 * layer;
+    const layerArea = (2 * layer - 1) ** 2;
+    const posInLayer = n - layerArea;
+    const side = Math.floor(posInLayer / sideLen);
+    const offset = posInLayer % sideLen;
+
+    let x = 0,
+      y = 0;
+
+    switch (side) {
+      case 0: // Right side
+        x = layer;
+        y = offset - layer + 1;
+        break;
+      case 1: // Top side
+        x = layer - offset - 1;
+        y = layer;
+        break;
+      case 2: // Left side
+        x = -layer;
+        y = layer - offset - 1;
+        break;
+      case 3: // Bottom side
+        x = -layer + offset + 1;
+        y = -layer;
+        break;
+    }
+
+    return { x, y };
+  };
+
+  // Check if we need to load more items
+  private checkInfiniteScroll = () => {
+    const { items, hasMore, isLoadingMore, onReachEnd } = this.props;
+    const { maxVisibleIndex } = this.state;
+
+    if (!items || !hasMore || isLoadingMore || !onReachEnd) return;
+
+    // Use PRELOAD_MARGIN (approx 0.7 * PAGE_SIZE, where PAGE_SIZE is 80)
+    const PRELOAD_MARGIN = 56;
+    const loadedMaxIndex = items.length - 1;
+
+    // Trigger if we are approaching the end of the list based on visible index
+    if (loadedMaxIndex - maxVisibleIndex < PRELOAD_MARGIN) {
+      onReachEnd();
+    }
   };
 
   // Initialize IntersectionObserver for scroll animations
   private initializeIntersectionObserver = () => {
-    if (typeof IntersectionObserver === 'undefined') {
+    if (typeof IntersectionObserver === "undefined") {
       return; // Fallback for browsers without IntersectionObserver support
     }
 
     this.intersectionObserver = new IntersectionObserver(
       (entries) => {
-        // First pass: cache positions for new entries (only on first appearance)
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && !this.staggerPositionCache.has(entry.target)) {
-            const rect = entry.target.getBoundingClientRect();
-            this.staggerPositionCache.set(entry.target, rect.top);
-          }
-        });
-
-        // Second pass: sort by cached position and assign stagger delays
-        const intersectingEntries = entries
-          .filter(e => e.isIntersecting)
-          .sort((a, b) => {
-            const topA = this.staggerPositionCache.get(a.target) ?? 0;
-            const topB = this.staggerPositionCache.get(b.target) ?? 0;
-            return topA - topB;
+        // Use requestAnimationFrame to batch DOM updates
+        requestAnimationFrame(() => {
+          // First pass: cache positions for new entries (only on first appearance)
+          entries.forEach((entry) => {
+            if (
+              entry.isIntersecting &&
+              !this.staggerPositionCache.has(entry.target)
+            ) {
+              const rect = entry.target.getBoundingClientRect();
+              this.staggerPositionCache.set(entry.target, rect.top);
+            }
           });
 
-        // Assign stagger delays (max 240ms)
-        intersectingEntries.forEach((entry) => {
-          const el = entry.target as HTMLElement;
-          if (!this.staggerDelayMap.has(el)) {
-            const delay = Math.min((this.staggerTick++ % 6) * 40, 240); // Max 240ms
-            this.staggerDelayMap.set(el, delay);
-          }
-          const delay = this.staggerDelayMap.get(el) ?? 0;
-          el.style.setProperty('--stagger', `${delay}ms`);
-        });
+          // Second pass: sort by cached position and assign stagger delays
+          // Limit processing to visible entries to reduce work
+          const intersectingEntries = entries
+            .filter((e) => e.isIntersecting)
+            .sort((a, b) => {
+              const topA = this.staggerPositionCache.get(a.target) ?? 0;
+              const topB = this.staggerPositionCache.get(b.target) ?? 0;
+              return topA - topB;
+            });
 
-        // Third pass: handle visibility classes with hysteresis
-        entries.forEach((entry) => {
-          const el = entry.target as HTMLElement;
-          const intersectionRatio = entry.intersectionRatio;
-          
-          if (entry.isIntersecting && intersectionRatio >= 0.15) {
-            // Entry: only trigger at 0.15 threshold
-            el.classList.add('is-visible');
-            el.classList.remove('is-hidden');
-          } else if (!entry.isIntersecting || intersectionRatio < 0.05) {
-            // Exit: trigger at 0.0 threshold (or very low ratio)
-            el.classList.add('is-hidden');
-            el.classList.remove('is-visible');
-          }
+          // Assign stagger delays (max 240ms)
+          intersectingEntries.forEach((entry) => {
+            const el = entry.target as HTMLElement;
+            if (!this.staggerDelayMap.has(el)) {
+              const delay = Math.min((this.staggerTick++ % 6) * 40, 240); // Max 240ms
+              this.staggerDelayMap.set(el, delay);
+            }
+            const delay = this.staggerDelayMap.get(el) ?? 0;
+            el.style.setProperty("--stagger", `${delay}ms`);
+          });
+
+          // Third pass: handle visibility classes with hysteresis
+          entries.forEach((entry) => {
+            const el = entry.target as HTMLElement;
+            const intersectionRatio = entry.intersectionRatio;
+
+            if (entry.isIntersecting && intersectionRatio >= 0.15) {
+              // Entry: only trigger at 0.15 threshold
+              el.classList.add("is-visible");
+              el.classList.remove("is-hidden");
+            } else if (!entry.isIntersecting || intersectionRatio < 0.05) {
+              // Exit: trigger at 0.0 threshold (or very low ratio)
+              el.classList.add("is-hidden");
+              el.classList.remove("is-visible");
+            }
+          });
         });
       },
       {
         threshold: [0, 0.15, 0.3], // Multiple thresholds for hysteresis
-        rootMargin: '10% 0px -15% 0px', // Asymmetric: early entry (top 10%), late exit (bottom -15%)
+        rootMargin: "20% 0px -20% 0px", // Increased buffer for earlier triggering
       }
     );
 
@@ -314,34 +428,40 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
 
   // Initialize separate IntersectionObserver for faster image loading
   private initializeImageObserver = () => {
-    if (typeof IntersectionObserver === 'undefined') {
+    if (typeof IntersectionObserver === "undefined") {
       return;
     }
 
     // Calculate viewport height in pixels for rootMargin (0.8-1.2x range, default 1.0x)
     // Tune based on WebPageTest/DevTools Network waterfall: if concurrent requests > 6-8, reduce to 0.6-0.8x
-    const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 1000;
+    const viewportHeight =
+      typeof window !== "undefined" ? window.innerHeight : 1000;
     const rootMarginMultiplier = 1.0; // Tune between 0.6-1.2 based on network/main thread balance
     const rootMarginValue = `${Math.round(viewportHeight * rootMarginMultiplier)}px`;
 
     this.imageObserver = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const img = entry.target as HTMLImageElement;
-            const alreadyLoaded = img.dataset.loaded === 'true' || img.getAttribute('data-loaded') === 'true';
-            if (!alreadyLoaded && img.dataset.src) {
-              img.src = img.dataset.src;
-              img.dataset.loaded = 'true';
-              // Stop observing once loaded
-              this.imageObserver?.unobserve(img);
+        // Use requestAnimationFrame to optimize image loading triggers
+        requestAnimationFrame(() => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const img = entry.target as HTMLImageElement;
+              const alreadyLoaded =
+                img.dataset.loaded === "true" ||
+                img.getAttribute("data-loaded") === "true";
+              if (!alreadyLoaded && img.dataset.src) {
+                img.src = img.dataset.src;
+                img.dataset.loaded = "true";
+                // Stop observing once loaded to reduce observer overhead
+                this.imageObserver?.unobserve(img);
+              }
             }
-          }
+          });
         });
       },
       {
         threshold: 0, // Trigger immediately when any pixel enters
-        rootMargin: rootMarginValue, // Start loading 3x viewport height before entering
+        rootMargin: "50% 0px", // Load images well before they appear (50% viewport height buffer)
       }
     );
 
@@ -355,13 +475,15 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
       return;
     }
 
-    // Use setTimeout to ensure DOM is updated after render
-    setTimeout(() => {
-      const cardElements = this.containerRef.current?.querySelectorAll('.js-observe');
+    // Use requestAnimationFrame instead of setTimeout for better rendering sync
+    requestAnimationFrame(() => {
+      const cardElements =
+        this.containerRef.current?.querySelectorAll(".js-observe");
+      // Batch observations if there are many elements
       cardElements?.forEach((el) => {
         this.intersectionObserver?.observe(el);
       });
-    }, 0);
+    });
   };
 
   // Observe all images with data-src for faster loading
@@ -372,9 +494,10 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
 
     // Use requestAnimationFrame batching for performance
     requestAnimationFrame(() => {
-      const images = this.containerRef.current?.querySelectorAll('img[data-src]');
+      const images =
+        this.containerRef.current?.querySelectorAll("img[data-src]");
       images?.forEach((img) => {
-        const alreadyLoaded = img.getAttribute('data-loaded') === 'true';
+        const alreadyLoaded = img.getAttribute("data-loaded") === "true";
         if (!alreadyLoaded) {
           // Let IntersectionObserver handle visibility check (no getBoundingClientRect)
           this.imageObserver?.observe(img);
@@ -386,7 +509,7 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
   // Helper method 추가
   private getGridSize = () => {
     const { gridSize } = this.props;
-    if (typeof gridSize === 'number') {
+    if (typeof gridSize === "number") {
       return { width: gridSize, height: gridSize };
     }
     return gridSize;
@@ -395,18 +518,19 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
   // calculateVisiblePositions 수정
   private calculateVisiblePositions = (): Position[] => {
     if (!this.containerRef.current) return [];
-    
+
     const rect = this.containerRef.current.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
+    const width = rect.width * VIEWPORT_BUFFER; // Apply buffer
+    const height = rect.height * VIEWPORT_BUFFER; // Apply buffer
     const { width: gridWidth, height: gridHeight } = this.getGridSize();
-    
+
     const cellsX = Math.ceil(width / gridWidth);
     const cellsY = Math.ceil(height / gridHeight);
-    
-    const centerX = -Math.round(this.state.offset.x / gridWidth);
-    const centerY = -Math.round(this.state.offset.y / gridHeight);
-    
+
+    // Use physics offset instead of state offset
+    const centerX = -Math.round(this.physics.offset.x / gridWidth);
+    const centerY = -Math.round(this.physics.offset.y / gridHeight);
+
     const positions: Position[] = [];
     const halfCellsX = Math.ceil(cellsX / 2);
     const halfCellsY = Math.ceil(cellsY / 2);
@@ -420,6 +544,10 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
     return positions;
   };
 
+  // getItemIndexForPosition is now deprecated in favor of using precomputed spiralPositions
+  // But we need inverse mapping (pos -> index) for spiral.
+  // Since we iterate positions (x,y) and want index, we can use the math formula from getItemIndexForPosition.
+  // Let's keep it but optimize if possible. For now, it's simple arithmetic.
   private getItemIndexForPosition = (x: number, y: number): number => {
     // Special case for center
     if (x === 0 && y === 0) return 0;
@@ -457,140 +585,197 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
     return index;
   };
 
-  private debouncedStopMoving = debounce(() => {
-    this.setState({ isMoving: false, restPos: { ...this.state.offset } });
-  }, 200);
-
   private updateGridItems = () => {
     if (!this.isComponentMounted) return;
 
     const positions = this.calculateVisiblePositions();
-    
-    // Generate grid positions - filtering/searching is now handled server-side
+    let maxVisibleIndex = 0;
+
+    // Generate grid positions
     // The grid simply renders the positions and maps them to items from props
-    const allItems = positions.map((position) => {
-      const gridIndex = this.getItemIndexForPosition(position.x, position.y);
-      return {
-        position,
-        gridIndex,
-      };
-    });
+    let allItems = positions
+      .map((position) => {
+        // Use cached spiral position mapping if available, otherwise compute (and cache if needed)
+        // Here we need inverse: (x,y) -> index
+        // Since we iterate viewport positions, we calculate index on the fly.
+        // Caching (x,y) -> index is also possible but maybe less critical than index -> (x,y)
+        // However, we can optimize getItemIndexForPosition later.
 
-    const distanceFromRest = getDistance(this.state.offset, this.state.restPos);
+        const gridIndex = this.getItemIndexForPosition(position.x, position.y);
 
-    this.setState({ gridItems: allItems, isMoving: distanceFromRest > 5 }, () => {
-      // Observe images immediately after state update
-      this.observeImages();
-    });
+        // Skip indices that are out of bounds if items are provided
+        // This stops the infinite spiral from rendering empty cells or repeating
+        // But allow rendering "future" items as skeletons if hasMore is true
+        if (this.props.items) {
+          const isItemLoaded = gridIndex < this.props.items.length;
+          const isPendingItem = this.props.hasMore && !isItemLoaded;
 
-    this.debouncedStopMoving();
-  };
+          if (!isItemLoaded && !isPendingItem) {
+            return null;
+          }
+        }
 
-  private animate = () => {
-    if (!this.isComponentMounted) return;
+        maxVisibleIndex = Math.max(maxVisibleIndex, gridIndex);
 
-    const currentTime = performance.now();
-    const deltaTime = currentTime - this.lastUpdateTime;
+        return {
+          position,
+          gridIndex,
+        };
+      })
+      .filter((item): item is GridItemInternal => item !== null);
 
-    if (deltaTime >= UPDATE_INTERVAL) {
-      const { velocity } = this.state;
-      const speed = Math.sqrt(
-        velocity.x * velocity.x + velocity.y * velocity.y
-      );
+    // Limit rendered items to avoid excessive DOM nodes
+    if (allItems.length > MAX_RENDER_CELLS) {
+      // Sort by distance from center (approximate prioritization)
+      // Use offset to calculate relative distance to viewport center
+      // Center of viewport in grid coords:
+      const centerX = -this.physics.offset.x / this.getGridSize().width;
+      const centerY = -this.physics.offset.y / this.getGridSize().height;
 
-      if (speed < MIN_VELOCITY) {
-        this.setState({ velocity: { x: 0, y: 0 } });
-        return;
-      }
-
-      // Apply non-linear deceleration based on speed
-      let deceleration = FRICTION;
-      if (speed < VELOCITY_THRESHOLD) {
-        // Apply stronger deceleration at lower speeds for more natural stopping
-        deceleration = FRICTION * (speed / VELOCITY_THRESHOLD);
-      }
-
-      this.setState(
-        (prevState) => ({
-          offset: {
-            x: prevState.offset.x + prevState.velocity.x,
-            y: prevState.offset.y + prevState.velocity.y,
-          },
-          velocity: {
-            x: prevState.velocity.x * deceleration,
-            y: prevState.velocity.y * deceleration,
-          },
-        }),
-        this.debouncedUpdateGridItems
-      );
-
-      this.lastUpdateTime = currentTime;
+      allItems.sort((a, b) => {
+        const distA =
+          Math.pow(a.position.x - centerX, 2) +
+          Math.pow(a.position.y - centerY, 2);
+        const distB =
+          Math.pow(b.position.x - centerX, 2) +
+          Math.pow(b.position.y - centerY, 2);
+        return distA - distB;
+      });
+      allItems = allItems.slice(0, MAX_RENDER_CELLS);
     }
 
-    this.animationFrame = requestAnimationFrame(this.animate);
+    // Only update state if grid items changed significantly
+    // This reduces re-renders during high-frequency scroll events
+    // We check length or a sample of indices
+    // For now, simpler equality check is skipped for performance, assuming throttle handles it
+
+    // Check if we need to update state
+    const isStateUpdateNeeded =
+      allItems.length !== this.state.gridItems.length ||
+      maxVisibleIndex !== this.state.maxVisibleIndex ||
+      this.physics.isDragging !== this.state.isDragging; // Sync dragging state if needed
+
+    if (isStateUpdateNeeded) {
+      this.setState(
+        {
+          gridItems: allItems,
+          isMoving:
+            Math.abs(this.physics.velocity.x) > 0.01 ||
+            Math.abs(this.physics.velocity.y) > 0.01,
+          maxVisibleIndex,
+        },
+        () => {
+          // Observe images immediately after state update
+          this.observeImages();
+        }
+      );
+    }
+  };
+
+  private startPhysicsLoop = () => {
+    if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
+    this.loop();
+  };
+
+  private loop = () => {
+    if (!this.isComponentMounted) return;
+
+    // Apply physics
+    const { velocity, offset } = this.physics;
+
+    // Friction
+    velocity.x *= FRICTION;
+    velocity.y *= FRICTION;
+
+    // Stop if velocity is negligible and not dragging
+    const speed = Math.sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
+    if (speed < 0.01 && !this.physics.isDragging) {
+      // Clean stop
+      this.physics.velocity = { x: 0, y: 0 };
+      // One last render update if needed? handled by debounced update
+    } else {
+      // Update position
+      offset.x += velocity.x;
+      offset.y += velocity.y;
+
+      // Direct DOM manipulation for high performance
+      if (this.contentRef.current) {
+        this.contentRef.current.style.transform = `translate3d(${offset.x}px, ${offset.y}px, 0)`;
+      }
+
+      // Schedule React state update (throttled)
+      this.debouncedUpdateGridItems();
+
+      // Continue loop
+      this.animationFrame = requestAnimationFrame(this.loop);
+    }
   };
 
   private handleDown = (p: Position) => {
-    if (this.animationFrame) {
-      cancelAnimationFrame(this.animationFrame);
+    // Resume loop if stopped
+    if (!this.animationFrame) {
+      this.startPhysicsLoop();
     }
 
-    this.setState({
-      isDragging: true,
-      startPos: {
-        x: p.x - this.state.offset.x,
-        y: p.y - this.state.offset.y,
-      },
-      velocity: { x: 0, y: 0 },
-    });
-
+    this.physics.isDragging = true;
+    this.physics.startPos = {
+      x: p.x - this.physics.offset.x,
+      y: p.y - this.physics.offset.y,
+    };
+    this.physics.velocity = { x: 0, y: 0 };
     this.lastPos = { x: p.x, y: p.y };
+    this.physics.lastMoveTime = performance.now();
+
+    // Force restart loop if it was idle
+    this.startPhysicsLoop();
   };
+
   private handleMove = (p: Position) => {
-    if (!this.state.isDragging) return;
+    if (!this.physics.isDragging) return;
 
     const currentTime = performance.now();
-    const timeDelta = currentTime - this.state.lastMoveTime;
+    const timeDelta = currentTime - this.physics.lastMoveTime;
 
     // Calculate raw velocity based on position and time
     const rawVelocity = {
-      x: (p.x - this.lastPos.x) / (timeDelta || 1),
-      y: (p.y - this.lastPos.y) / (timeDelta || 1),
+      x: (p.x - this.lastPos.x) / (timeDelta || 16),
+      y: (p.y - this.lastPos.y) / (timeDelta || 16),
     };
 
     // Add to velocity history and maintain fixed size
-    const velocityHistory = [...this.state.velocityHistory, rawVelocity];
-    if (velocityHistory.length > VELOCITY_HISTORY_SIZE) {
-      velocityHistory.shift();
+    this.physics.velocityHistory.push(rawVelocity);
+    if (this.physics.velocityHistory.length > VELOCITY_HISTORY_SIZE) {
+      this.physics.velocityHistory.shift();
     }
 
     // Calculate smoothed velocity using moving average
-    const smoothedVelocity = velocityHistory.reduce(
+    const smoothedVelocity = this.physics.velocityHistory.reduce(
       (acc, vel) => ({
-        x: acc.x + vel.x / velocityHistory.length,
-        y: acc.y + vel.y / velocityHistory.length,
+        x: acc.x + vel.x / this.physics.velocityHistory.length,
+        y: acc.y + vel.y / this.physics.velocityHistory.length,
       }),
       { x: 0, y: 0 }
     );
 
-    this.setState(
-      {
-        velocity: smoothedVelocity,
-        offset: {
-          x: p.x - this.state.startPos.x,
-          y: p.y - this.state.startPos.y,
-        },
-        lastMoveTime: currentTime,
-        velocityHistory,
-      },
-      this.updateGridItems
-    );
+    this.physics.velocity = smoothedVelocity;
+    this.physics.offset = {
+      x: p.x - this.physics.startPos.x,
+      y: p.y - this.physics.startPos.y,
+    };
+    this.physics.lastMoveTime = currentTime;
+
+    // Direct update during drag
+    if (this.contentRef.current) {
+      this.contentRef.current.style.transform = `translate3d(${this.physics.offset.x}px, ${this.physics.offset.y}px, 0)`;
+    }
 
     this.lastPos = { x: p.x, y: p.y };
+    this.debouncedUpdateGridItems();
   };
+
   private handleUp = () => {
-    this.setState({ isDragging: false });
-    this.animationFrame = requestAnimationFrame(this.animate);
+    this.physics.isDragging = false;
+    // Loop continues to handle momentum
   };
 
   private handleMouseDown = (e: React.MouseEvent) => {
@@ -646,20 +831,27 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
     const deltaX = e.deltaX;
     const deltaY = e.deltaY;
 
-    this.setState(
-      (prevState) => ({
-        offset: {
-          x: prevState.offset.x - deltaX,
-          y: prevState.offset.y - deltaY,
-        },
-        velocity: { x: 0, y: 0 }, // Reset velocity when scrolling
-      }),
-      this.debouncedUpdateGridItems
-    );
+    this.physics.offset.x -= deltaX;
+    this.physics.offset.y -= deltaY;
+
+    // Reset velocity on wheel to avoid conflict
+    this.physics.velocity = { x: 0, y: 0 };
+
+    // Direct update
+    if (this.contentRef.current) {
+      this.contentRef.current.style.transform = `translate3d(${this.physics.offset.x}px, ${this.physics.offset.y}px, 0)`;
+    }
+
+    this.debouncedUpdateGridItems();
+
+    // Ensure loop is running to apply any lingering effects if needed (or minimal overhead)
+    this.startPhysicsLoop();
   };
 
   render() {
-    const { offset, isDragging, gridItems, isMoving } = this.state;
+    // offset is no longer used from state for the main container transform
+    // But we use it for initial render or fallback
+    const { gridItems, isMoving } = this.state;
     const { className } = this.props;
     const { width: gridWidth, height: gridHeight } = this.getGridSize();
 
@@ -677,7 +869,7 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
           inset: 0,
           touchAction: "none",
           overflow: "hidden",
-          cursor: isDragging ? "grabbing" : "grab",
+          cursor: this.physics?.isDragging ? "grabbing" : "grab",
           zIndex: 0,
         }}
         onMouseDown={this.handleMouseDown}
@@ -689,10 +881,12 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
         onTouchCancel={this.handleTouchEnd}
       >
         <div
+          ref={this.contentRef}
           style={{
             position: "absolute",
             inset: 0,
-            transform: `translate3d(${offset.x}px, ${offset.y}px, 0)`,
+            // Initial transform, subsequent updates via direct DOM manipulation
+            transform: `translate3d(${this.physics.offset.x}px, ${this.physics.offset.y}px, 0)`,
             willChange: "transform",
           }}
         >
@@ -705,6 +899,8 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
                 key={`${item.position.x}-${item.position.y}`}
                 className="js-observe"
                 style={{
+                  contentVisibility: "auto",
+                  containIntrinsicSize: `${gridWidth}px ${gridHeight}px`,
                   position: "absolute",
                   display: "flex",
                   alignItems: "center",
@@ -723,8 +919,9 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
                       gridIndex: item.gridIndex,
                       position: item.position,
                       isMoving,
+                      // Access items safely without modulo looping
                       item: this.props.items
-                        ? this.props.items[item.gridIndex % this.props.items.length]
+                        ? this.props.items[item.gridIndex]
                         : undefined,
                     })
                   : null}

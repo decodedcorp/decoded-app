@@ -13,6 +13,33 @@ import type { ImageRow } from '../types';
 
 export type CategoryFilter = 'all' | 'newjeanscloset' | 'blackpinkk.style';
 
+export type ImagePage = {
+  items: ImageRow[];
+  nextCursor: string | null;
+  hasMore: boolean;
+};
+
+export type FetchFilteredImagesParams = {
+  limit?: number;
+  cursor?: string | null;
+  filter?: CategoryFilter;
+  search?: string;
+};
+
+// Helper to encode composite cursor
+function encodeCursor(createdAt: string, id: string): string {
+  return btoa(JSON.stringify({ createdAt, id }));
+}
+
+// Helper to decode composite cursor
+function decodeCursor(cursor: string): { createdAt: string; id: string } | null {
+  try {
+    return JSON.parse(atob(cursor));
+  } catch (e) {
+    return null;
+  }
+}
+
 /**
  * Fetches the latest images from the database (client-side)
  *
@@ -62,21 +89,18 @@ export async function fetchImageById(id: string): Promise<ImageRow | null> {
 }
 
 /**
- * Fetches filtered images based on category filter and search query (client-side)
+ * Fetches filtered images based on category filter and search query with cursor-based pagination
  *
- * @param filter - Category filter key ('all', 'newjeanscloset', 'blackpinkk.style')
- * @param searchQuery - User-entered search query (debounced)
- * @param limit - Maximum number of images to fetch (default: 50)
- * @returns Array of image rows matching the filter/search criteria, ordered by created_at descending
+ * @param params - Fetch parameters including limit, cursor, filter, and search query
+ * @returns ImagePage object with items, nextCursor, and hasMore
  * @throws Error if the query fails
  */
 export async function fetchFilteredImages(
-  filter: CategoryFilter = 'all',
-  searchQuery: string = '',
-  limit: number = 50
-): Promise<ImageRow[]> {
+  params: FetchFilteredImagesParams
+): Promise<ImagePage> {
+  const { limit = 50, cursor, filter = 'all', search = '' } = params;
   const hasAccountFilter = filter !== 'all';
-  const hasSearchQuery = searchQuery.trim().length > 0;
+  const hasSearchQuery = search.trim().length > 0;
 
   // Build the query
   // Start with 'image' and basic filters
@@ -93,32 +117,57 @@ export async function fetchFilteredImages(
 
   // Apply account filter if active
   if (hasAccountFilter) {
-    // Filter by the account in the joined post table
-    // Note: The !inner join above ensures we only get images that have a matching post
     queryBuilder = queryBuilder.eq('post_image.post.account', filter);
   }
 
   // Apply search query if active
-  // Note: Searching items while with_items=false might be contradictory if that flag means "no items"
-  // But we'll keep the search capability in case "with_items=false" just means "display as raw"
   if (hasSearchQuery) {
-    // We need to join items to search them
-    // If we already joined post_image, we add item join to the select
     const selectQuery = hasAccountFilter
       ? '*, post_image!inner(post!inner(account)), item!inner(*)'
       : '*, item!inner(*)';
     
     queryBuilder = queryBuilder.select(selectQuery);
-
-    const searchTerm = searchQuery.trim();
+    const searchTerm = search.trim();
     queryBuilder = queryBuilder.or(`product_name.ilike.%${searchTerm}%,brand.ilike.%${searchTerm}%`, { foreignTable: 'item' });
   }
 
-  // Order by created_at descending
-  queryBuilder = queryBuilder.order('created_at', { ascending: false });
+  // Apply cursor pagination
+  if (cursor) {
+    const decoded = decodeCursor(cursor);
+    if (decoded) {
+      // Composite cursor condition: (created_at < cursorTime) OR (created_at = cursorTime AND id < cursorId)
+      // Since Supabase doesn't support complex OR conditions easily across fields in a single .or() string without raw SQL,
+      // and we want to keep using the query builder for type safety as much as possible,
+      // we'll stick to a simpler approach first or use a raw filter if needed.
+      // However, typical reliable pagination uses just one field if unique, or filter.
+      // For strictly correct cursor pagination with (created_at desc, id desc):
+      // row(created_at, id) < row(cursorTime, cursorId)
+      
+      // Let's rely on filter composition which Supabase handles well for simple cases.
+      // But for composite keys, we need to be careful.
+      // A common simplification is to trust created_at implies order, but duplicates can happen.
+      // We will try to filter strictly less than created_at for simplicity in this MVP step, 
+      // but the Plan asked for composite logic.
+      // Supabase-js syntax for composite comparison is tricky without RPC.
+      // We will filter: created_at <= cursorTime.
+      // Then if created_at == cursorTime, filter id < cursorId.
+      // Since .or() is powerful, let's try to construct the composite logic string.
+      
+      const { createdAt, id } = decoded;
+      // Note: we need to verify timestamp format safe for URL/Query
+      
+      // OR syntax: .or('and(created_at.eq.time,id.lt.uuid),created_at.lt.time')
+      queryBuilder = queryBuilder.or(`and(created_at.eq.${createdAt},id.lt.${id}),created_at.lt.${createdAt}`);
+    }
+  }
 
-  // Apply limit
-  queryBuilder = queryBuilder.limit(limit);
+  // Order by created_at descending, then id descending for stability
+  queryBuilder = queryBuilder
+    .order('created_at', { ascending: false })
+    .order('id', { ascending: false });
+
+  // Limit + 1 to check hasMore
+  queryBuilder = queryBuilder.limit(limit + 1);
 
   const { data, error } = await queryBuilder;
 
@@ -126,7 +175,7 @@ export async function fetchFilteredImages(
     throw error;
   }
 
-  // Extract unique images and clean up nested data
+  // Extract unique images
   const uniqueImages = new Map<string, ImageRow>();
   if (data) {
     for (const row of data) {
@@ -134,7 +183,6 @@ export async function fetchFilteredImages(
       const imageId = imageRow.id;
 
       if (imageId && !uniqueImages.has(imageId)) {
-        // Extract just the image fields
         const image: ImageRow = {
           id: imageRow.id,
           image_hash: imageRow.image_hash,
@@ -148,5 +196,15 @@ export async function fetchFilteredImages(
     }
   }
 
-  return Array.from(uniqueImages.values());
+  const allItems = Array.from(uniqueImages.values());
+  const hasMore = allItems.length > limit;
+  const items = hasMore ? allItems.slice(0, limit) : allItems;
+  
+  let nextCursor = null;
+  if (hasMore && items.length > 0) {
+    const lastItem = items[items.length - 1];
+    nextCursor = encodeCursor(lastItem.created_at, lastItem.id);
+  }
+
+  return { items, nextCursor, hasMore };
 }

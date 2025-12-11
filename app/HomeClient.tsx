@@ -5,7 +5,7 @@ import Link from "next/link";
 import { gsap } from "gsap";
 import { Flip } from "gsap/Flip";
 import type { ImageRow } from "@/lib/supabase/types";
-import { useFilteredImages } from "@/lib/hooks/useImages";
+import { useInfiniteFilteredImages } from "@/lib/hooks/useImages";
 import ThiingsGrid, {
   type ItemConfig,
   type GridItem,
@@ -26,6 +26,7 @@ type Props = {
 // Card cell component with actual image data
 const CardCell = memo(({ gridIndex, position, isMoving, item }: ItemConfig) => {
   const [imageError, setImageError] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   const setTransition = useTransitionStore((state) => state.setTransition);
 
   // Top 6 images get high priority for faster initial load
@@ -89,8 +90,11 @@ const CardCell = memo(({ gridIndex, position, isMoving, item }: ItemConfig) => {
             decoding="async"
             fetchPriority={isTopImage ? "high" : "auto"}
             alt={item?.id ? `Image ${item.id}` : `Card ${gridIndex} image`}
-            className="h-full w-full object-cover"
+            className={`h-full w-full object-cover transition-opacity duration-150 ease-out ${
+              isLoaded ? "opacity-100" : "opacity-0"
+            }`}
             onError={() => setImageError(true)}
+            onLoad={() => setIsLoaded(true)}
           />
         ) : (
           <div className="flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground">
@@ -166,24 +170,33 @@ SkeletonCell.displayName = "SkeletonCell";
 /**
  * Client Component for home page
  *
- * Uses SSR + React Query pattern:
+ * Uses SSR + React Query infinite scroll pattern:
  * - First render: Uses SSR initialImages
- * - React Query fetches in CSR → replaces with data when available
+ * - React Query fetches in CSR → appends data as user scrolls
  */
 export function HomeClient({ initialImages }: Props) {
   const activeFilter = useFilterStore((state) => state.activeFilter);
   const debouncedQuery = useSearchStore((state) => state.debouncedQuery);
 
-  // Use filtered images hook with current filter and search state
-  const { data, isLoading, isError, error, refetch } = useFilteredImages(
-    activeFilter,
-    debouncedQuery,
-    50
-  );
+  // Use infinite query hook
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteFilteredImages({
+    limit: 80,
+    filter: activeFilter,
+    search: debouncedQuery,
+  });
 
-  // Merge SSR and CSR data: use CSR data if available, fallback to SSR initial data
-  // Note: When filter/search is active, SSR initial data may not match, so CSR data takes precedence
-  const images = data ?? initialImages;
+  // Flatten pages into a single items array
+  // Use CSR data if available, fallback to SSR initial data for first page
+  const items = data ? data.pages.flatMap((page) => page.items) : initialImages;
 
   // Normalize status values from database enum to consistent format
   const normalizeStatus = (
@@ -199,7 +212,7 @@ export function HomeClient({ initialImages }: Props) {
 
   // Map ImageRow[] to GridItem[]
   // Filter out any records without image_url as a safety guard
-  const gridItems: GridItem[] = images
+  const gridItems: GridItem[] = items
     .filter((image) => image.image_url != null)
     .map((image) => ({
       id: image.id,
@@ -208,8 +221,8 @@ export function HomeClient({ initialImages }: Props) {
       hasItems: image.with_items,
     }));
 
-  // Loading state: show skeleton grid
-  if (isLoading && !data) {
+  // Loading state: show skeleton grid (only on initial load)
+  if (isLoading && !data && initialImages.length === 0) {
     return (
       <div className="absolute inset-0 z-0 pt-14 md:pt-16">
         <ThiingsGrid
@@ -249,7 +262,7 @@ export function HomeClient({ initialImages }: Props) {
   }
 
   // Empty state: show empty state message
-  if (!images || images.length === 0) {
+  if (!items || items.length === 0) {
     const hasActiveFilter = activeFilter !== "all";
     const hasSearchQuery = debouncedQuery.trim().length > 0;
 
@@ -273,8 +286,6 @@ export function HomeClient({ initialImages }: Props) {
   }
 
   // Success state: show grid with actual images
-  // Note: filter and searchQuery props are kept for backward compatibility
-  // but ThiingsGrid no longer uses them for filtering (filtering is now server-side)
   return (
     <div className="absolute inset-0 z-0 pt-14 md:pt-16">
       <ThiingsGrid
@@ -282,7 +293,22 @@ export function HomeClient({ initialImages }: Props) {
         renderItem={(config) => <CardCell {...config} />}
         initialPosition={{ x: 0, y: 0 }}
         items={gridItems}
+        onReachEnd={() => {
+          if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+          }
+        }}
+        hasMore={!!hasNextPage}
+        isLoadingMore={isFetchingNextPage}
       />
+
+      {/* Loading indicator for next page */}
+      {isFetchingNextPage && (
+        <div className="pointer-events-none absolute bottom-8 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-background/80 px-4 py-2 text-sm font-medium text-foreground shadow-lg backdrop-blur-sm">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          Loading more...
+        </div>
+      )}
     </div>
   );
 }
