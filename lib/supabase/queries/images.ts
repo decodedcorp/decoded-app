@@ -8,10 +8,10 @@
  * Note: For server-side queries, use images.server.ts instead.
  */
 
-import { supabaseBrowserClient } from '../client';
-import type { ImageRow } from '../types';
+import { supabaseBrowserClient } from "../client";
+import type { ImageRow } from "../types";
 
-export type CategoryFilter = 'all' | 'newjeanscloset' | 'blackpinkk.style';
+export type CategoryFilter = "all" | "newjeanscloset" | "blackpinkk.style";
 
 export type ImagePage = {
   items: ImageRow[];
@@ -32,7 +32,9 @@ function encodeCursor(createdAt: string, id: string): string {
 }
 
 // Helper to decode composite cursor
-function decodeCursor(cursor: string): { createdAt: string; id: string } | null {
+function decodeCursor(
+  cursor: string
+): { createdAt: string; id: string } | null {
   try {
     return JSON.parse(atob(cursor));
   } catch (e) {
@@ -49,11 +51,11 @@ function decodeCursor(cursor: string): { createdAt: string; id: string } | null 
  */
 export async function fetchLatestImages(limit = 20): Promise<ImageRow[]> {
   const { data, error } = await supabaseBrowserClient
-    .from('image')
-    .select('*')
-    .not('image_url', 'is', null) // Only fetch records with images
-    .eq('with_items', false) // Only fetch original images
-    .order('created_at', { ascending: false })
+    .from("image")
+    .select("*")
+    .not("image_url", "is", null) // Only fetch records with images
+    .eq("with_items", false) // Only fetch original images
+    .order("created_at", { ascending: false })
     .limit(limit);
 
   if (error) {
@@ -72,13 +74,13 @@ export async function fetchLatestImages(limit = 20): Promise<ImageRow[]> {
  */
 export async function fetchImageById(id: string): Promise<ImageRow | null> {
   const { data, error } = await supabaseBrowserClient
-    .from('image')
-    .select('*')
-    .eq('id', id)
+    .from("image")
+    .select("*")
+    .eq("id", id)
     .single();
 
   if (error) {
-    if (error.code === 'PGRST116') {
+    if (error.code === "PGRST116") {
       // No rows returned
       return null;
     }
@@ -98,100 +100,135 @@ export async function fetchImageById(id: string): Promise<ImageRow | null> {
 export async function fetchFilteredImages(
   params: FetchFilteredImagesParams
 ): Promise<ImagePage> {
-  const { limit = 50, cursor, filter = 'all', search = '' } = params;
-  const hasAccountFilter = filter !== 'all';
+  const { limit = 50, cursor, filter = "all", search = "" } = params;
+  const hasAccountFilter = filter !== "all";
   const hasSearchQuery = search.trim().length > 0;
 
-  // Build the query
-  // Start with 'image' and basic filters
-  let queryBuilder = supabaseBrowserClient.from('image').select(
-    hasAccountFilter
-      ? '*, post_image!inner(post!inner(account))' // Join post for account filtering
-      : '*'
-  );
+  let data: any[] | null = null;
+  let error: any = null;
 
-  // Always apply these base filters
-  queryBuilder = queryBuilder
-    .not('image_url', 'is', null)
-    .eq('with_items', false);
-
-  // Apply account filter if active
+  // Strategy: Use different query base depending on filter to optimize DB performance
   if (hasAccountFilter) {
-    queryBuilder = queryBuilder.eq('post_image.post.account', filter);
-  }
+    // Strategy A: Filter by Account -> Query 'post_image' table to use index
+    let queryBuilder = supabaseBrowserClient
+      .from("post_image")
+      .select(
+        hasSearchQuery
+          ? "created_at, image!inner(id, image_url, status, with_items, image_hash, created_at, item!inner(product_name, brand)), post!inner(account)"
+          : "created_at, image!inner(id, image_url, status, with_items, image_hash, created_at), post!inner(account)"
+      )
+      .eq("post.account", filter);
 
-  // Apply search query if active
-  if (hasSearchQuery) {
-    const selectQuery = hasAccountFilter
-      ? '*, post_image!inner(post!inner(account)), item!inner(*)'
-      : '*, item!inner(*)';
-    
-    queryBuilder = queryBuilder.select(selectQuery);
-    const searchTerm = search.trim();
-    queryBuilder = queryBuilder.or(`product_name.ilike.%${searchTerm}%,brand.ilike.%${searchTerm}%`, { foreignTable: 'item' });
-  }
+    // Apply basic filters on the joined image table
+    // Note: Supabase/Postgrest syntax for nested filtering
+    queryBuilder = queryBuilder
+      .not("image.image_url", "is", null)
+      .eq("image.with_items", false);
 
-  // Apply cursor pagination
-  if (cursor) {
-    const decoded = decodeCursor(cursor);
-    if (decoded) {
-      // Composite cursor condition: (created_at < cursorTime) OR (created_at = cursorTime AND id < cursorId)
-      // Since Supabase doesn't support complex OR conditions easily across fields in a single .or() string without raw SQL,
-      // and we want to keep using the query builder for type safety as much as possible,
-      // we'll stick to a simpler approach first or use a raw filter if needed.
-      // However, typical reliable pagination uses just one field if unique, or filter.
-      // For strictly correct cursor pagination with (created_at desc, id desc):
-      // row(created_at, id) < row(cursorTime, cursorId)
-      
-      // Let's rely on filter composition which Supabase handles well for simple cases.
-      // But for composite keys, we need to be careful.
-      // A common simplification is to trust created_at implies order, but duplicates can happen.
-      // We will try to filter strictly less than created_at for simplicity in this MVP step, 
-      // but the Plan asked for composite logic.
-      // Supabase-js syntax for composite comparison is tricky without RPC.
-      // We will filter: created_at <= cursorTime.
-      // Then if created_at == cursorTime, filter id < cursorId.
-      // Since .or() is powerful, let's try to construct the composite logic string.
-      
-      const { createdAt, id } = decoded;
-      // Note: we need to verify timestamp format safe for URL/Query
-      
-      // OR syntax: .or('and(created_at.eq.time,id.lt.uuid),created_at.lt.time')
-      queryBuilder = queryBuilder.or(`and(created_at.eq.${createdAt},id.lt.${id}),created_at.lt.${createdAt}`);
+    if (hasSearchQuery) {
+      const searchTerm = search.trim();
+      // Complex OR filter across joined tables is tricky in Supabase
+      // Simplified: Filter on item fields
+      queryBuilder = queryBuilder.or(
+        `product_name.ilike.%${searchTerm}%,brand.ilike.%${searchTerm}%`,
+        { foreignTable: "image.item" }
+      );
     }
+
+    // Cursor pagination (using post_image.created_at)
+    if (cursor) {
+      const decoded = decodeCursor(cursor);
+      if (decoded) {
+        const { createdAt } = decoded;
+        // Using only created_at for cursor in join query for simplicity
+        // ideally should be (created_at, id) tuple
+        queryBuilder = queryBuilder.lt("created_at", createdAt);
+      }
+    }
+
+    queryBuilder = queryBuilder
+      .order("created_at", { ascending: false })
+      .limit(limit + 1);
+
+    const result = await queryBuilder;
+    data = result.data;
+    error = result.error;
+  } else {
+    // Strategy B: No Filter -> Query 'image' table directly
+    const selectColumns =
+      "id, image_url, created_at, status, with_items, image_hash";
+
+    let queryBuilder = supabaseBrowserClient
+      .from("image")
+      .select(
+        hasSearchQuery
+          ? `${selectColumns}, item!inner(product_name, brand)`
+          : selectColumns
+      )
+      .not("image_url", "is", null)
+      .eq("with_items", false);
+
+    if (hasSearchQuery) {
+      const searchTerm = search.trim();
+      queryBuilder = queryBuilder.or(
+        `product_name.ilike.%${searchTerm}%,brand.ilike.%${searchTerm}%`,
+        { foreignTable: "item" }
+      );
+    }
+
+    if (cursor) {
+      const decoded = decodeCursor(cursor);
+      if (decoded) {
+        const { createdAt, id } = decoded;
+        queryBuilder = queryBuilder.or(
+          `and(created_at.eq.${createdAt},id.lt.${id}),created_at.lt.${createdAt}`
+        );
+      }
+    }
+
+    queryBuilder = queryBuilder
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: false })
+      .limit(limit + 1);
+
+    const result = await queryBuilder;
+    data = result.data;
+    error = result.error;
   }
-
-  // Order by created_at descending, then id descending for stability
-  queryBuilder = queryBuilder
-    .order('created_at', { ascending: false })
-    .order('id', { ascending: false });
-
-  // Limit + 1 to check hasMore
-  queryBuilder = queryBuilder.limit(limit + 1);
-
-  const { data, error } = await queryBuilder;
 
   if (error) {
     throw error;
   }
 
-  // Extract unique images
+  // Extract and Normalize images
   const uniqueImages = new Map<string, ImageRow>();
   if (data) {
     for (const row of data) {
-      const imageRow = row as any;
-      const imageId = imageRow.id;
+      // Handle different structures from Strategy A (post_image) and Strategy B (image)
+      let imageRow: any;
+      let sortTime: string;
 
-      if (imageId && !uniqueImages.has(imageId)) {
+      if (hasAccountFilter) {
+        // Strategy A: row is post_image, contains image object
+        if (!row.image) continue;
+        imageRow = Array.isArray(row.image) ? row.image[0] : row.image;
+        sortTime = row.created_at; // Use post_image creation time for cursor
+      } else {
+        // Strategy B: row is image
+        imageRow = row;
+        sortTime = row.created_at;
+      }
+
+      if (imageRow && imageRow.id && !uniqueImages.has(imageRow.id)) {
         const image: ImageRow = {
           id: imageRow.id,
           image_hash: imageRow.image_hash,
           image_url: imageRow.image_url,
           with_items: imageRow.with_items,
           status: imageRow.status,
-          created_at: imageRow.created_at,
+          created_at: sortTime, // Use the sort time for cursor consistency
         };
-        uniqueImages.set(imageId, image);
+        uniqueImages.set(imageRow.id, image);
       }
     }
   }
@@ -199,7 +236,7 @@ export async function fetchFilteredImages(
   const allItems = Array.from(uniqueImages.values());
   const hasMore = allItems.length > limit;
   const items = hasMore ? allItems.slice(0, limit) : allItems;
-  
+
   let nextCursor = null;
   if (hasMore && items.length > 0) {
     const lastItem = items[items.length - 1];

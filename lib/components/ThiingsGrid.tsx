@@ -210,7 +210,7 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
 
     this.debouncedUpdateGridItems = throttle(
       this.updateGridItems,
-      UPDATE_INTERVAL * 2, // Slow down React updates further
+      64, // 64ms for better performance
       {
         leading: true,
         trailing: true,
@@ -348,7 +348,8 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
     if (!items || !hasMore || isLoadingMore || !onReachEnd) return;
 
     // Use PRELOAD_MARGIN (approx 0.7 * PAGE_SIZE, where PAGE_SIZE is 80)
-    const PRELOAD_MARGIN = 56;
+    // Reduced to avoid aggressive prefetching
+    const PRELOAD_MARGIN = 20;
     const loadedMaxIndex = items.length - 1;
 
     // Trigger if we are approaching the end of the list based on visible index
@@ -676,6 +677,9 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
     if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
     this.loop();
   };
+
+  // #region agent log
+  // #endregion
 
   private loop = () => {
     if (!this.isComponentMounted) return;
