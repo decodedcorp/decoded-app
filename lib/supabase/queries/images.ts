@@ -10,6 +10,7 @@
 
 import { supabaseBrowserClient } from "../client";
 import type { Database, ImageRow } from "../types";
+import { fetchItemsByImageId } from "./items";
 
 type ItemRow = Database["public"]["Tables"]["item"]["Row"];
 type PostRow = Database["public"]["Tables"]["post"]["Row"];
@@ -109,11 +110,39 @@ export async function fetchImageById(id: string): Promise<ImageDetail | null> {
     : [];
 
   // Ensure items is always an array (Supabase may return different types)
-  const items = Array.isArray(data.items)
+  let items = Array.isArray(data.items)
     ? data.items
     : data.items
       ? [data.items]
       : [];
+
+  // Fallback: If join query didn't return items, fetch them separately
+  // This can happen if the relationship isn't properly configured or RLS blocks the join
+  // This ensures all images with items can display them, regardless of join query success
+  if (items.length === 0) {
+    try {
+      const fetchedItems = await fetchItemsByImageId(id);
+      items = fetchedItems;
+
+      if (process.env.NODE_ENV === "development" && fetchedItems.length > 0) {
+        console.log(
+          "[fetchImageById] Fallback: Fetched items separately:",
+          fetchedItems.length,
+          "for image:",
+          id
+        );
+      }
+    } catch (err) {
+      // If separate fetch also fails, log but don't throw (items will be empty array)
+      if (process.env.NODE_ENV === "development") {
+        console.warn(
+          "[fetchImageById] Failed to fetch items separately for image:",
+          id,
+          err
+        );
+      }
+    }
+  }
 
   return {
     id: data.id,

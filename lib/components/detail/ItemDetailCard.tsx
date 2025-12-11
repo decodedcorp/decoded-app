@@ -92,7 +92,7 @@ export function ItemDetailCard({
           {item.id && (
             <div className="mt-8 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
               <p className="font-mono text-xs text-muted-foreground/50">
-                ID: {item.id.slice(0, 8)}
+                ID: {String(item.id).slice(0, 8)}
               </p>
             </div>
           )}

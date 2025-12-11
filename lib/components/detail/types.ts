@@ -55,6 +55,7 @@ export function getRelativePos(val: number, max: number): number {
  * Normalize coordinates from various formats to BoundingBox (0.0 ~ 1.0)
  *
  * Supports multiple input formats:
+ * - [x, y] - Array format with normalized coordinates (0.0-1.0)
  * - { x: 0.5, y: 0.3 } - Already normalized center point
  * - { top: 22, left: 33.5, width: 21, height: 13 } - Percentage values (0-100)
  * - { x: 500, y: 300, width: 200, height: 150 } - Pixel values (requires imageSize)
@@ -63,7 +64,33 @@ export function normalizeCoordinates(
   center: Json | null,
   imageSize?: { width: number; height: number }
 ): BoundingBox | null {
-  if (!center || typeof center !== "object") {
+  if (!center) {
+    return null;
+  }
+
+  // Case 0: Array format [x, y] - normalized coordinates
+  if (Array.isArray(center) && center.length >= 2) {
+    const x = typeof center[0] === "number" ? center[0] : null;
+    const y = typeof center[1] === "number" ? center[1] : null;
+
+    if (x !== null && y !== null) {
+      const normalizedX = Math.max(0, Math.min(1, x));
+      const normalizedY = Math.max(0, Math.min(1, y));
+
+      // Default box size: 10% width and height
+      const width = 0.1;
+      const height = 0.1;
+
+      return {
+        top: Math.max(0, Math.min(1, normalizedY - height / 2)),
+        left: Math.max(0, Math.min(1, normalizedX - width / 2)),
+        width,
+        height,
+      };
+    }
+  }
+
+  if (typeof center !== "object") {
     return null;
   }
 

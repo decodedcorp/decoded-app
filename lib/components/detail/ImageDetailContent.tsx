@@ -41,8 +41,12 @@ export function ImageDetailContent({ image }: Props) {
   // Normalize items with coordinates
   const normalizedItems = items.map((item) => normalizeItem(item));
 
-  // Check if we have items with valid coordinates
-  const hasItems = normalizedItems.some((item) => item.normalizedBox !== null);
+  // Check if we have items (with or without coordinates)
+  // Items without coordinates can still be displayed in ShopGrid
+  const hasItems = normalizedItems.length > 0;
+  const hasItemsWithCoordinates = normalizedItems.some(
+    (item) => item.normalizedBox !== null
+  );
 
   // #region agent log
   fetch("http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671", {
@@ -88,12 +92,12 @@ export function ImageDetailContent({ image }: Props) {
         </div>
       )}
 
-      {/* Section 2: Interactive Showcase (only if items exist) */}
-      {hasItems && (
+      {/* Section 2: Interactive Showcase (only if items with coordinates exist) */}
+      {hasItemsWithCoordinates && (
         <InteractiveShowcase image={image} items={normalizedItems} />
       )}
 
-      {/* Section 3: Shop Grid (only if items exist) */}
+      {/* Section 3: Shop Grid (show if any items exist, even without coordinates) */}
       {hasItems && <ShopGrid items={normalizedItems} />}
 
       {/* Fallback: Show basic info if no items */}

@@ -146,8 +146,10 @@ Represents social posts that may feature multiple items.
 
 - **`item_ids`**: `jsonb`
   - Stores references to `item` records displayed in this post.
-  - Structure: `number[]` (Array of `item.id`s) or `string[]` depending on ID type.
-  - _Note: Check if `item.id` is `bigint` or `uuid`. Current schema uses `bigint` for item keys._
+  - Structure: `string[]` (Array of `item.id`s). Current schema uses `string` for item keys.
+  - **Denormalized Helper Column**: `post.item_ids`는 post가 직접 다루는 대표 item id 목록을 denormalized 형태로 저장한 컬럼이다.
+  - **Source of Truth**: 실제 정규 관계는 `post_image`, `image`, `item`으로 표현된다. 이 컬럼은 쿼리 최적화를 위한 편의 컬럼이며, `post_image`가 source of truth로 사용될 수 있다.
+  - **Data Consistency**: 따라서 Post 생성/수정 로직 구현 시 `item_ids`와 실제 관계 테이블 간의 데이터 정합성을 맞추는 작업이 필수적이다.
 
 ### 3.2 Usage
 

@@ -106,18 +106,21 @@ export type Database = {
           created_at: string;
           id: string;
           ts: string;
+          item_ids: Json | null;
         };
         Insert: {
           account: string;
           created_at?: string;
           id?: string;
           ts: string;
+          item_ids?: Json | null;
         };
         Update: {
           account?: string;
           created_at?: string;
           id?: string;
           ts?: string;
+          item_ids?: Json | null;
         };
         Relationships: [];
       };
