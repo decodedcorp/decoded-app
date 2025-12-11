@@ -90,7 +90,7 @@ export function InteractiveShowcase({
   return (
     <section
       ref={sectionRef}
-      className={`flex flex-col relative h-auto ${isModal ? "" : "lg:flex-row lg:h-[300vh]"}`}
+      className={`flex flex-col relative h-auto ${isModal ? "" : "lg:flex-row lg:min-h-screen"}`}
     >
       {/* Left: Sticky Image Canvas (Desktop) / Top: Fixed Image (Mobile) */}
       <div
