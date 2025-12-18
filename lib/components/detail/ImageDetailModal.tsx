@@ -575,7 +575,6 @@ export function ImageDetailModal({ imageId }: Props) {
                 image={image} 
                 items={normalizedItems} 
                 activeIndex={activeIndex}
-                onItemClick={handleItemClick}
               />
             </div>
           ) : (
