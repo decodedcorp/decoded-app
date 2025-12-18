@@ -91,13 +91,20 @@ export type Position = {
   y: number;
 };
 
-// Generic grid item type for ThiingsGrid (Supabase-independent)
+// Post source discriminator for type-safe UI logic
+export type PostSource = "post" | "legacy";
+
+// Generic grid item type for ThiingsGrid (now post-centric)
 export type GridItem = {
   id: string;
   imageUrl?: string | null;
   status?: "pending" | "extracted" | "skipped" | string;
   hasItems?: boolean;
-  postId?: string; // post_image를 통해 가져온 이미지의 경우 post_id 포함
+  // Post metadata (REQUIRED for post-centric architecture)
+  postId: string; // Required: either real post ID or synthetic "legacy:${imageId}"
+  postSource: PostSource; // Discriminator: "post" | "legacy"
+  postAccount: string; // Account name for badge display (e.g., "newjeanscloset", "Legacy")
+  postCreatedAt: string; // Post timestamp for context/sorting
 };
 
 type GridItemInternal = {

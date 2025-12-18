@@ -11,6 +11,9 @@
 import { supabaseBrowserClient } from "../client";
 import type { Database, ImageRow } from "../types";
 import { fetchItemsByImageId } from "./items";
+// Re-export orphan query and unified adapter
+export { fetchOrphanImages } from "./images-orphan";
+export { fetchUnifiedImages } from "./images-adapter";
 
 type ItemRow = Database["public"]["Tables"]["item"]["Row"];
 type PostRow = Database["public"]["Tables"]["post"]["Row"];
@@ -30,6 +33,8 @@ export type ImageDetail = ImageRow & {
 
 export type CategoryFilter = "all" | "newjeanscloset" | "blackpinkk.style";
 
+export type PostSource = "post" | "legacy";
+
 export type ImagePage = {
   items: ImageRow[];
   nextCursor: string | null;
@@ -37,13 +42,21 @@ export type ImagePage = {
 };
 
 export type ImageWithPostId = ImageRow & {
-  postId?: string;
+  postId: string; // Required (no longer optional)
+  postSource: PostSource; // Discriminator for UI logic
+  postAccount: string; // Required: account name for badge display
+  postImageCreatedAt: string; // Aliased from post_image.created_at (sorting baseline)
+  postCreatedAt: string; // Aliased from post.created_at (context)
 };
 
 export type ImagePageWithPostId = {
   items: ImageWithPostId[];
   nextCursor: string | null;
   hasMore: boolean;
+  stats?: {
+    fromPostImage: number;
+    fromOrphans: number;
+  };
 };
 
 export type FetchFilteredImagesParams = {
@@ -419,8 +432,8 @@ export async function fetchImagesByPostImage(
     .from("post_image")
     .select(
       hasSearchQuery
-        ? "created_at, post_id, image!inner(id, image_url, status, with_items, image_hash, created_at, item!inner(product_name, brand)), post!inner(account, id)"
-        : "created_at, post_id, image!inner(id, image_url, status, with_items, image_hash, created_at), post!inner(account, id)"
+        ? "created_at, post_id, image!inner(id, image_url, status, with_items, image_hash, created_at, item!inner(product_name, brand)), post!inner(account, id, created_at)"
+        : "created_at, post_id, image!inner(id, image_url, status, with_items, image_hash, created_at), post!inner(account, id, created_at)"
     );
 
   // Apply account filter if specified
@@ -461,25 +474,29 @@ export async function fetchImagesByPostImage(
     throw error;
   }
 
-  // Extract and normalize images with post_id
+  // Extract and normalize images with full post metadata
   const uniqueImages = new Map<string, ImageWithPostId>();
   if (data) {
     for (const row of data) {
-      // row is post_image, contains image object
+      // row is post_image, contains image and post objects
       if (!row.image) continue;
       const imageRow = Array.isArray(row.image) ? row.image[0] : row.image;
-      const postId = row.post_id;
-      const sortTime = row.created_at; // Use post_image creation time for cursor
-
-      if (imageRow && imageRow.id && !uniqueImages.has(imageRow.id)) {
+      const postRow = Array.isArray(row.post) ? row.post[0] : row.post;
+      const postImageCreatedAt = row.created_at; // post_image.created_at
+      
+      if (imageRow && imageRow.id && postRow && !uniqueImages.has(imageRow.id)) {
         const image: ImageWithPostId = {
           id: imageRow.id,
           image_hash: imageRow.image_hash,
           image_url: imageRow.image_url,
           with_items: imageRow.with_items,
           status: imageRow.status,
-          created_at: sortTime,
-          postId: postId, // Include post_id
+          created_at: postImageCreatedAt, // Use post_image timestamp for sorting
+          postId: row.post_id,
+          postSource: "post" as const,
+          postAccount: postRow.account,
+          postImageCreatedAt: postImageCreatedAt,
+          postCreatedAt: postRow.created_at, // post.created_at
         };
         uniqueImages.set(imageRow.id, image);
       }

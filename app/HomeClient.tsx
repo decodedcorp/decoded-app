@@ -14,6 +14,7 @@ import ThiingsGrid, {
 import { useFilterStore } from "@/lib/stores/filterStore";
 import { useSearchStore } from "@/lib/stores/searchStore";
 import { useTransitionStore } from "@/lib/stores/transitionStore";
+import { PostBadge } from "@/lib/components/PostBadge";
 
 // Register GSAP Flip plugin
 if (typeof window !== "undefined") {
@@ -104,8 +105,21 @@ const CardCell = memo(({ gridIndex, position, isMoving, item }: ItemConfig) => {
           </div>
         )}
 
-        {/* Status and hasItems badges */}
+        {/* Post badge, Status, and hasItems badges */}
         <div className="absolute left-2 top-2 flex flex-col gap-1">
+          {item?.postAccount && item?.postSource && (
+            <PostBadge
+              account={item.postAccount}
+              source={item.postSource}
+              onClick={() => {
+                // TODO: Filter by account or navigate to post
+                if (item.postSource === "post") {
+                  // Future: Navigate to /posts/${item.postId}
+                  console.log("Navigate to post:", item.postId);
+                }
+              }}
+            />
+          )}
           {status && (
             <span
               className={`rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${getStatusBadgeStyle(status)}`}
@@ -154,7 +168,12 @@ CardCell.displayName = "CardCell";
 const SkeletonCard = memo(() => {
   return (
     <article className="absolute inset-1 flex flex-col overflow-hidden rounded-xl border border-border bg-card/60">
-      <div className="relative aspect-[3/4] animate-pulse bg-muted" />
+      <div className="relative aspect-[3/4] animate-pulse bg-muted">
+        {/* Skeleton badge placeholder */}
+        <div className="absolute left-2 top-2 flex flex-col gap-1">
+          <div className="h-5 w-20 animate-pulse rounded-full bg-muted-foreground/20" />
+        </div>
+      </div>
     </article>
   );
 });
@@ -196,20 +215,11 @@ export function HomeClient({ initialImages }: Props) {
   });
 
   // Flatten pages into a single items array
-  // Use CSR data if available, fallback to SSR initial data for first page
-  // Note: CSR data is ImageWithPostId[], SSR initialImages is ImageRow[]
-
-  // Logic to determine if we should use initialImages
-  // Only use initialImages (SSR data) if we are on the default view (All + No Search)
-  // Otherwise, we want to show a loading state while fetching the specific filter data
-  const shouldUseInitialData =
-    !data && activeFilter === "all" && debouncedQuery === "";
-
-  const items: (ImageRow | ImageWithPostId)[] = data
+  // CSR data is always ImageWithPostId[] (via unified adapter)
+  // SSR initialImages fallback is no longer compatible, show loading instead
+  const items: ImageWithPostId[] = data
     ? data.pages.flatMap((page) => page.items)
-    : shouldUseInitialData
-      ? initialImages
-      : [];
+    : [];
 
   // Normalize status values from database enum to consistent format
   const normalizeStatus = (
@@ -223,23 +233,26 @@ export function HomeClient({ initialImages }: Props) {
     return raw; // fallback for any other values
   };
 
-  // Map ImageRow[] | ImageWithPostId[] to GridItem[]
-  // Filter out any records without image_url as a safety guard
+  // Map ImageWithPostId[] to GridItem[]
+  // All items now include post metadata (adapter ensures this)
   const gridItems: GridItem[] = items
     .filter((image) => image.image_url != null)
     .map((image) => {
-      const imageWithPostId = image as ImageWithPostId;
       return {
         id: image.id,
         imageUrl: image.image_url,
         status: normalizeStatus(image.status),
         hasItems: image.with_items,
-        postId: imageWithPostId.postId, // Include postId if available (will be undefined for SSR initialImages)
+        // Post metadata (now always present via unified adapter)
+        postId: image.postId,
+        postSource: image.postSource,
+        postAccount: image.postAccount,
+        postCreatedAt: image.postCreatedAt,
       };
     });
 
   // Loading state: show skeleton grid (only on initial load)
-  if (isLoading && !data && !shouldUseInitialData) {
+  if (isLoading && !data) {
     return (
       <div className="absolute inset-0 z-0 pt-14 md:pt-16">
         <ThiingsGrid

@@ -8,6 +8,7 @@ import {
   fetchFilteredImages,
   fetchImagesByPostImage,
   fetchImageById,
+  fetchUnifiedImages,
   type CategoryFilter,
   type ImagePage,
   type ImagePageWithPostId,
@@ -16,35 +17,20 @@ import {
 import type { ImageRow } from "@/lib/supabase/types";
 
 /**
- * React Query hook for fetching latest images
- *
- * This hook wraps the Supabase query function with React Query,
- * providing caching, refetching, and loading/error states.
- *
- * Query key pattern: ['도메인명', '뷰타입', filters...]
- * Example: ['images', 'latest', limit]
- * Future filters can extend this pattern: ['images', 'latest', { withItems: true, status: 'extracted' }]
- *
+ * @deprecated Use useInfiniteFilteredImages with unified adapter instead.
+ * This hook does not include post context (postId, account).
+ * 
+ * Migration guide:
+ * - Replace: useLatestImages(20)
+ * - With: useInfiniteFilteredImages({ limit: 20, filter: "all", search: "" })
+ * 
  * @param limit - Maximum number of images to fetch (default: 20)
  * @returns React Query result with data, loading, error states
- *
- * @example
- * ```tsx
- * function ImagesList() {
- *   const { data: images, isLoading, error } = useLatestImages(20);
- *
- *   if (isLoading) return <div>Loading...</div>;
- *   if (error) return <div>Error: {error.message}</div>;
- *
- *   return (
- *     <div className="grid">
- *       {images?.map(image => <ImageCard key={image.id} image={image} />)}
- *     </div>
- *   );
- * }
- * ```
  */
 export function useLatestImages(limit = 20) {
+  if (process.env.NODE_ENV === "development") {
+    console.warn("[useLatestImages] Deprecated: Use useInfiniteFilteredImages instead");
+  }
   return useQuery<ImageRow[]>({
     queryKey: ["images", "latest", limit],
     queryFn: () => fetchLatestImages(limit),
@@ -85,26 +71,32 @@ export function useFilteredImages(
 
 /**
  * React Query hook for fetching infinite filtered images with cursor-based pagination
- * Now uses post_image table to ensure post context is available
+ * Now uses unified adapter (post_image + orphan fallback) to ensure all images are visible
  *
  * @param params - Fetch params
- * @returns Infinite Query result with images including postId
+ * @param params.limit - Items per page
+ * @param params.filter - Category filter
+ * @param params.search - Search query
+ * @param params.deduplicateByImageId - Deduplicate by image.id (default: false for feed, true for gallery)
+ * @returns Infinite Query result with images including full post metadata
  */
 export function useInfiniteFilteredImages(params: {
   limit: number;
   filter?: CategoryFilter;
   search?: string;
+  deduplicateByImageId?: boolean;
 }) {
-  const { limit, filter = "all", search = "" } = params;
+  const { limit, filter = "all", search = "", deduplicateByImageId = false } = params;
 
   return useInfiniteQuery<ImagePageWithPostId>({
-    queryKey: ["images", "infinite", { filter, search, limit }],
+    queryKey: ["images", "infinite", { filter, search, limit, deduplicateByImageId }],
     queryFn: ({ pageParam }) =>
-      fetchImagesByPostImage({
+      fetchUnifiedImages({
         limit,
         cursor: (pageParam as string) ?? null,
         filter,
         search,
+        deduplicateByImageId,
       }),
     getNextPageParam: (lastPage) =>
       lastPage.hasMore ? lastPage.nextCursor : undefined,
