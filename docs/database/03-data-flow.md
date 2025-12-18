@@ -1,6 +1,6 @@
 # Image Detail Page Data Flow
 
-> **Last updated:** 2025-01-XX  
+> **Last updated:** 2025-12-18  
 > **Purpose:** Document the complete data flow from image click to item/post display, including field mappings
 
 ## Overview
@@ -297,4 +297,5 @@ When schema changes:
 
 ## Changelog
 
+- **2025-12-18**: Updated to reflect new schema fields (item.description, post.article, post_image.item_locations/item_locations_updated_at)
 - **2025-01-XX**: Initial version documenting complete data flow and field mappings

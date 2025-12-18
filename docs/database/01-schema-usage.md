@@ -1,6 +1,6 @@
 # Database Schema Usage Guide
 
-> **Last updated:** 2025-12-11
+> **Last updated:** 2025-12-18
 > **Source of truth:** `db MCP` snapshot + `Supabase` migrations
 
 ## 0. Scope & Purpose
@@ -76,6 +76,7 @@ Stores individual fashion items detected within an `image`.
 - **`ambiguity`**: `boolean` - `true` if the AI was uncertain about the detection.
 - **`cropped_image_path`**: `text` - Path to the cropped version of this specific item.
 - **`status`**: `text` (default: `'active'`) - Status of the item (e.g., could be used for moderation).
+- **`description`**: `text` - Optional description or notes about the item.
 
 ### 2.2 TypeScript Type Definition (App-Level)
 
@@ -150,6 +151,7 @@ Represents social posts that may feature multiple items.
   - **Denormalized Helper Column**: `post.item_ids`는 post가 직접 다루는 대표 item id 목록을 denormalized 형태로 저장한 컬럼이다.
   - **Source of Truth**: 실제 정규 관계는 `post_image`, `image`, `item`으로 표현된다. 이 컬럼은 쿼리 최적화를 위한 편의 컬럼이며, `post_image`가 source of truth로 사용될 수 있다.
   - **Data Consistency**: 따라서 Post 생성/수정 로직 구현 시 `item_ids`와 실제 관계 테이블 간의 데이터 정합성을 맞추는 작업이 필수적이다.
+- **`article`**: `text` - Optional article content or description for the post.
 
 ### 3.2 Usage
 
@@ -157,7 +159,27 @@ Represents social posts that may feature multiple items.
 
 ---
 
-## 4. Entity Relationship Diagram (ERD)
+## 4. Table: `post_image`
+
+Join table linking posts to images, with additional metadata about item locations.
+
+### 4.1 Key Columns
+
+- **`post_id`**: `uuid` (FK -> `post.id`) - References the post.
+- **`image_id`**: `uuid` (FK -> `image.id`) - References the image.
+- **`created_at`**: `timestamptz` - When this post-image association was created.
+- **`item_locations`**: `jsonb` - Stores location/coordinate data for items within this specific image in the context of the post. This may differ from the item's original detection coordinates.
+- **`item_locations_updated_at`**: `timestamptz` - When the item locations were last updated.
+
+### 4.2 Usage
+
+- **Primary Purpose**: Many-to-many relationship between posts and images.
+- **Item Locations**: When a post curator adjusts or confirms item positions for display, these coordinates are stored in `item_locations` rather than modifying the original `item.center` data.
+- **Timestamp Tracking**: `item_locations_updated_at` tracks when manual adjustments were made.
+
+---
+
+## 5. Entity Relationship Diagram (ERD)
 
 ```mermaid
 erDiagram
@@ -187,7 +209,7 @@ erDiagram
 
 ---
 
-## 5. Using `db MCP` for Verification
+## 6. Using `db MCP` for Verification
 
 When in doubt about the current schema state, use the MCP tool to check the live database definition.
 
@@ -204,6 +226,12 @@ When in doubt about the current schema state, use the MCP tool to check the live
 
 ---
 
-## Changelog
+## 7. Changelog
 
+- **2025-12-18**: Added missing fields discovered via MCP verification:
+  - `item.description` (text, nullable)
+  - `post.article` (text, nullable)
+  - `post_image.item_locations` (jsonb, nullable)
+  - `post_image.item_locations_updated_at` (timestamptz, nullable)
+  - Added dedicated section for `post_image` table documentation
 - **2025-12-11**: Initial version (Snapshot based on `db MCP` for `image`, `item`, `post`).

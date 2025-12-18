@@ -11,10 +11,10 @@
  * Note: For server-side queries, use posts.server.ts instead.
  */
 
-import { supabaseBrowserClient } from '../../client';
-import type { Database } from '../../types';
+import { supabaseBrowserClient } from "../../client";
+import type { Database } from "../../types";
 
-type PostRow = Database['public']['Tables']['post']['Row'];
+type PostRow = Database["public"]["Tables"]["post"]["Row"];
 
 /**
  * Fetches the latest posts from the database (client-side)
@@ -25,9 +25,9 @@ type PostRow = Database['public']['Tables']['post']['Row'];
  */
 export async function fetchLatestPosts(limit = 10): Promise<PostRow[]> {
   const { data, error } = await supabaseBrowserClient
-    .from('post')
-    .select('id, account, ts, created_at')
-    .order('created_at', { ascending: false })
+    .from("post")
+    .select("*")
+    .order("created_at", { ascending: false })
     .limit(limit);
 
   if (error) {
@@ -36,4 +36,3 @@ export async function fetchLatestPosts(limit = 10): Promise<PostRow[]> {
 
   return data ?? [];
 }
-

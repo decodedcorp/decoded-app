@@ -7,7 +7,7 @@
 //
 // Update workflow: schema change → types regeneration → build/typecheck
 // Note: MCP can be used for type review/summary, but actual file should be generated via Supabase CLI
-// Last updated: 2025-01-XX (Added cropped_image_path and other missing fields based on MCP schema verification)
+// Last updated: 2025-12-18 (Added missing fields: item.description, post.article, post_image.item_locations, post_image.item_locations_updated_at)
 
 export type Json =
   | string
@@ -67,6 +67,7 @@ export type Database = {
           ambiguity: boolean | null;
           cropped_image_path: string | null;
           status: string | null;
+          description: string | null;
         };
         Insert: {
           id?: string;
@@ -82,6 +83,7 @@ export type Database = {
           ambiguity?: boolean | null;
           cropped_image_path?: string | null;
           status?: string | null;
+          description?: string | null;
         };
         Update: {
           id?: string;
@@ -97,6 +99,7 @@ export type Database = {
           ambiguity?: boolean | null;
           cropped_image_path?: string | null;
           status?: string | null;
+          description?: string | null;
         };
         Relationships: [];
       };
@@ -107,6 +110,7 @@ export type Database = {
           id: string;
           ts: string;
           item_ids: Json | null;
+          article: string | null;
         };
         Insert: {
           account: string;
@@ -114,6 +118,7 @@ export type Database = {
           id?: string;
           ts: string;
           item_ids?: Json | null;
+          article?: string | null;
         };
         Update: {
           account?: string;
@@ -121,6 +126,7 @@ export type Database = {
           id?: string;
           ts?: string;
           item_ids?: Json | null;
+          article?: string | null;
         };
         Relationships: [];
       };
@@ -129,16 +135,22 @@ export type Database = {
           created_at: string;
           image_id: string;
           post_id: string;
+          item_locations: Json | null;
+          item_locations_updated_at: string | null;
         };
         Insert: {
           created_at?: string;
           image_id: string;
           post_id: string;
+          item_locations?: Json | null;
+          item_locations_updated_at?: string | null;
         };
         Update: {
           created_at?: string;
           image_id?: string;
           post_id?: string;
+          item_locations?: Json | null;
+          item_locations_updated_at?: string | null;
         };
         Relationships: [
           {

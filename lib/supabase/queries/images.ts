@@ -18,6 +18,8 @@ type PostRow = Database["public"]["Tables"]["post"]["Row"];
 export type PostImageRow = {
   post: PostRow;
   created_at: string;
+  item_locations: any | null;
+  item_locations_updated_at: string | null;
 };
 
 export type ImageDetail = ImageRow & {
@@ -106,6 +108,8 @@ export async function fetchImageById(id: string): Promise<ImageDetail | null> {
       items:item(*),
       post_images:post_image(
         created_at,
+        item_locations,
+        item_locations_updated_at,
         post(*)
       )
     `
@@ -126,12 +130,14 @@ export async function fetchImageById(id: string): Promise<ImageDetail | null> {
     ? (data.post_images as any[]).map((pi) => pi.post).filter(Boolean)
     : [];
 
-  // Extract post_image metadata (post + created_at)
+  // Extract post_image metadata (post + created_at + item_locations)
   const postImages = data.post_images
     ? (data.post_images as any[])
         .map((pi) => ({
           post: pi.post,
           created_at: pi.created_at,
+          item_locations: pi.item_locations || null,
+          item_locations_updated_at: pi.item_locations_updated_at || null,
         }))
         .filter((pi) => pi.post !== null)
     : [];
@@ -188,11 +194,11 @@ export async function fetchImageById(id: string): Promise<ImageDetail | null> {
   // Fallback: If post-based fetch didn't work, use traditional item.image_id approach
   if (!itemsFetchedViaPost) {
     // Ensure items is always an array (Supabase may return different types)
-    items = Array.isArray(data.items)
+    items = (Array.isArray(data.items)
       ? data.items
       : data.items
         ? [data.items]
-        : [];
+        : []) as ItemRow[];
 
     // Fallback: If join query didn't return items, fetch them separately
     // This can happen if the relationship isn't properly configured or RLS blocks the join
