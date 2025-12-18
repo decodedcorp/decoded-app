@@ -476,9 +476,20 @@ export function ImageDetailModal({ imageId }: Props) {
       // Calculate Target Position
       let targetProps = {};
 
-      // Desktop: Center of Left 50%
-      // (Mobile: Floating Image is not rendered, so no animation needed)
-      const drawerWidth = Math.min(672, viewportWidth * 0.5);
+      // Desktop: Center of Left Area
+      // Drawer Width Logic (must match CSS classes):
+      // - xl (1280px+): 700px
+      // - lg (1024px+): 600px
+      // - md (768px+): 50vw
+      let drawerWidth;
+      if (viewportWidth >= 1280) {
+        drawerWidth = 700;
+      } else if (viewportWidth >= 1024) {
+        drawerWidth = 600;
+      } else {
+        drawerWidth = viewportWidth * 0.5;
+      }
+
       const leftSpace = viewportWidth - drawerWidth;
 
       const targetWidth = Math.min(leftSpace * 0.8, 600);
@@ -518,7 +529,15 @@ export function ImageDetailModal({ imageId }: Props) {
       );
     } else {
       // No originRect: Show image directly at target position (fallback, desktop only)
-      const drawerWidth = Math.min(672, viewportWidth * 0.5);
+      let drawerWidth;
+      if (viewportWidth >= 1280) {
+        drawerWidth = 700;
+      } else if (viewportWidth >= 1024) {
+        drawerWidth = 600;
+      } else {
+        drawerWidth = viewportWidth * 0.5;
+      }
+
       const leftSpace = viewportWidth - drawerWidth;
       const targetWidth = Math.min(leftSpace * 0.8, 600);
       const targetHeight = Math.min(viewportHeight * 0.8, targetWidth * 1.5);
@@ -592,7 +611,7 @@ export function ImageDetailModal({ imageId }: Props) {
       {/* Drawer (z-50) */}
       <aside
         ref={drawerRef}
-        className="relative z-50 flex h-full w-full flex-col bg-background shadow-2xl md:max-w-[calc(100vw-350px)] lg:max-w-4xl translate-y-full md:translate-x-full md:translate-y-0"
+        className="relative z-50 flex h-full w-full flex-col bg-background shadow-2xl md:w-[50vw] lg:w-[600px] xl:w-[700px] translate-y-full md:translate-x-full md:translate-y-0"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
