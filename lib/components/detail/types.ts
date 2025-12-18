@@ -202,13 +202,18 @@ export function getBoxCenter(box: BoundingBox): NormalizedCoord {
  *
  * @param item - Raw item from database (DbItem)
  * @param imageSize - Optional image dimensions for coordinate normalization
+ * @param overrideCenter - Optional coordinate override (e.g. from post_image.item_locations)
  * @returns Normalized item with UI-friendly field names (UiItem)
  */
 export function normalizeItem(
   item: DbItem,
-  imageSize?: { width: number; height: number }
+  imageSize?: { width: number; height: number },
+  overrideCenter?: Json | null
 ): UiItem {
-  const normalizedBox = normalizeCoordinates(item.center, imageSize);
+  // Use overrideCenter if provided, otherwise fallback to item.center
+  const centerToUse = overrideCenter !== undefined ? overrideCenter : item.center;
+  
+  const normalizedBox = normalizeCoordinates(centerToUse, imageSize);
   const normalizedCenter = normalizedBox ? getBoxCenter(normalizedBox) : null;
 
   return {

@@ -77,7 +77,7 @@ export function ConnectorLayer({
       const endY = cardRect.top + cardRect.height / 2 - svgRect.top;
 
       newConnectors.push({
-        itemId: item.id,
+        itemId: item.id.toString(),
         startX,
         startY,
         endX,
@@ -128,7 +128,7 @@ export function ConnectorLayer({
         if (!line) return;
 
         const isActive =
-          items.findIndex((item) => item.id === connector.itemId) ===
+          items.findIndex((item) => item.id.toString() === connector.itemId) ===
           activeIndex;
 
         if (isActive) {
@@ -194,7 +194,7 @@ export function ConnectorLayer({
       </defs>
       {connectors.map((connector) => {
         const isActive =
-          items.findIndex((item) => item.id === connector.itemId) ===
+          items.findIndex((item) => item.id.toString() === connector.itemId) ===
           activeIndex;
 
         // Use visibility hidden instead of null to keep DOM node for GSAP

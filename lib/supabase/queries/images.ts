@@ -170,11 +170,14 @@ export async function fetchImageById(id: string): Promise<ImageDetail | null> {
           : [];
 
         if (itemIds.length > 0) {
+          // Convert string IDs to numbers (item.id is bigint/number in DB)
+          const itemIdsAsNumbers = itemIds.map((id) => parseInt(id, 10));
+
           const { data: itemsData, error: itemsError } =
             await supabaseBrowserClient
               .from("item")
               .select("*")
-              .in("id", itemIds);
+              .in("id", itemIdsAsNumbers);
 
           if (!itemsError && itemsData) {
             items = itemsData as ItemRow[];

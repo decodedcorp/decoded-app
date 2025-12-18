@@ -68,10 +68,13 @@ export async function fetchPostWithImagesAndItems(
   }
 
   // 3. Items 조회
+  // Convert string IDs to numbers (item.id is bigint/number in DB)
+  const itemIdsAsNumbers = itemIds.map((id) => parseInt(id, 10));
+
   const { data: itemsData, error: itemsError } = await supabaseBrowserClient
     .from("item")
     .select("*")
-    .in("id", itemIds);
+    .in("id", itemIdsAsNumbers);
 
   if (itemsError) {
     if (process.env.NODE_ENV === "development") {
@@ -92,7 +95,7 @@ export async function fetchPostWithImagesAndItems(
   // SQL의 .in() 쿼리는 입력 배열의 순서를 보장하지 않으므로,
   // JavaScript 레벨에서 post.item_ids의 순서에 맞춰 재정렬
   const itemsMap = new Map<string, ItemRow>(
-    (itemsData || []).map((item) => [item.id, item])
+    (itemsData || []).map((item) => [item.id.toString(), item])
   );
   const sortedItems = itemIds
     .map((id) => itemsMap.get(id))

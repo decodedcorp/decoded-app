@@ -39,23 +39,36 @@ export function ImageDetailContent({
   // Extract article from the first post
   const article = image.postImages?.[0]?.post?.article?.trim();
 
-  // #region agent log
-  fetch("http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      location: "ImageDetailContent.tsx:25",
-      message: "Processing items",
-      data: { rawItemsCount: items.length, firstItem: items[0] },
-      timestamp: Date.now(),
-      sessionId: "debug-session",
-      hypothesisId: "H2",
-    }),
-  }).catch(() => {});
-  // #endregion
-
   // Normalize items with coordinates
-  const normalizedItems = items.map((item) => normalizeItem(item));
+  // Use item_locations from the first post_image if available to override item centers
+  const firstPostImage = image.postImages?.[0];
+  const itemLocations = firstPostImage?.item_locations;
+
+  // Convert item_locations to a map for easy lookup if it's an array
+  // Support both Array format (existing data) and Record format (new data)
+  const itemLocationsMap: Record<string, any> = {};
+
+  if (Array.isArray(itemLocations)) {
+    itemLocations.forEach((loc: any) => {
+      if (loc && loc.item_id) {
+        // Extract center/box from location object
+        // Data format: { item_id: 123, center: [...], bbox: [...] }
+        // We pass the whole location object or just the center part depending on what normalizeCoordinates expects
+        // normalizeCoordinates handles { x, y } or [x, y] or { top, left... }
+        // The DB data has 'center' as [x, y] or {x, y} inside the location object
+        // So we should map item_id -> center data
+        itemLocationsMap[loc.item_id.toString()] = loc.center || loc;
+      }
+    });
+  } else if (itemLocations && typeof itemLocations === "object") {
+    Object.assign(itemLocationsMap, itemLocations);
+  }
+
+  const normalizedItems = items.map((item) => {
+    // Check if we have an override for this item ID (convert ID to string for lookup)
+    const overrideLocation = itemLocationsMap[item.id.toString()];
+    return normalizeItem(item, undefined, overrideLocation);
+  });
 
   // Check if we have items (with or without coordinates)
   // Items without coordinates can still be displayed in ShopGrid
@@ -63,25 +76,6 @@ export function ImageDetailContent({
   const hasItemsWithCoordinates = normalizedItems.some(
     (item) => item.normalizedBox !== null
   );
-
-  // #region agent log
-  fetch("http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      location: "ImageDetailContent.tsx:32",
-      message: "Render condition check",
-      data: {
-        normalizedCount: normalizedItems.length,
-        hasItems,
-        sampleNormalizedBox: normalizedItems[0]?.normalizedBox,
-      },
-      timestamp: Date.now(),
-      sessionId: "debug-session",
-      hypothesisId: "H3",
-    }),
-  }).catch(() => {});
-  // #endregion
 
   return (
     <div className="detail-content">
