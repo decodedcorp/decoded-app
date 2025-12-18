@@ -25,6 +25,12 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const boxesRef = useRef<HTMLDivElement>(null);
+  const transformRef = useRef<{ scale: number; x: number; y: number }>({
+    scale: 1,
+    x: 0,
+    y: 0,
+  });
 
   // Pan & Zoom effect: Calculate scale and translation
   useGSAP(
@@ -39,6 +45,12 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
             duration: 0.8,
             ease: "power2.out",
           });
+          if (boxesRef.current) {
+            gsap.to(boxesRef.current, {
+              scale: 1,
+            });
+          }
+          transformRef.current = { scale: 1, x: 0, y: 0 };
         }
         return;
       }
@@ -58,8 +70,28 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
         const imageRect = imageRef.current.getBoundingClientRect();
 
         // Calculate offset needed to center the item
-        const offsetX = (center.x - 0.5) * (scale - 1) * imageRect.width;
-        const offsetY = (center.y - 0.5) * (scale - 1) * imageRect.height;
+        // Use natural image dimensions for accurate calculation
+        const imageNaturalWidth = imageRef.current.naturalWidth || imageRect.width;
+        const imageNaturalHeight = imageRef.current.naturalHeight || imageRect.height;
+        
+        // Calculate the actual displayed image size (considering object-cover)
+        const containerAspect = containerRect.width / containerRect.height;
+        const imageAspect = imageNaturalWidth / imageNaturalHeight;
+        
+        let displayedWidth, displayedHeight;
+        if (imageAspect > containerAspect) {
+          // Image is wider - height fits, width is cropped
+          displayedHeight = containerRect.height;
+          displayedWidth = containerRect.height * imageAspect;
+        } else {
+          // Image is taller - width fits, height is cropped
+          displayedWidth = containerRect.width;
+          displayedHeight = containerRect.width / imageAspect;
+        }
+
+        // Calculate offset based on normalized coordinates and displayed size
+        const offsetX = (center.x - 0.5) * (scale - 1) * displayedWidth;
+        const offsetY = (center.y - 0.5) * (scale - 1) * displayedHeight;
 
         gsap.to(imageRef.current, {
           scale,
@@ -68,6 +100,19 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
           duration: 0.8,
           ease: "power2.out",
         });
+
+        // Apply same transform to boxes container
+        if (boxesRef.current) {
+          gsap.to(boxesRef.current, {
+            scale,
+            x: -offsetX,
+            y: -offsetY,
+            duration: 0.8,
+            ease: "power2.out",
+          });
+        }
+
+        transformRef.current = { scale, x: -offsetX, y: -offsetY };
       }
     },
     { scope: containerRef, dependencies: [activeIndex] }
@@ -81,6 +126,7 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
       // No active item: remove spotlight
       overlayRef.current.style.filter = "none";
       overlayRef.current.style.opacity = "0";
+      overlayRef.current.style.transform = "none";
       return;
     }
 
@@ -105,6 +151,12 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
     )`;
 
     overlayRef.current.style.clipPath = clipPath;
+    // Apply same transform as image to keep spotlight aligned with zoomed image
+    const scale = transformRef.current.scale;
+    const x = transformRef.current.x;
+    const y = transformRef.current.y;
+    overlayRef.current.style.transform = `scale(${scale}) translate(${x / scale}px, ${y / scale}px)`;
+    overlayRef.current.style.transformOrigin = "center center";
     // Softer spotlight effect
     overlayRef.current.style.filter = "grayscale(60%) brightness(0.6)";
     overlayRef.current.style.opacity = "1";
@@ -131,32 +183,38 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
             style={{ opacity: 0 }}
           />
 
-          {/* Highlight Boxes */}
-          {items.map((item, index) => {
-            if (!item.normalizedBox) return null;
+          {/* Highlight Boxes Container - Applies same transform as image */}
+          <div
+            ref={boxesRef}
+            className="absolute inset-0 pointer-events-none"
+            style={{ transformOrigin: "center center" }}
+          >
+            {items.map((item, index) => {
+              if (!item.normalizedBox) return null;
 
-            const isActive = index === activeIndex;
-            const style = getHighlightStyle(item.normalizedBox);
+              const isActive = index === activeIndex;
+              const style = getHighlightStyle(item.normalizedBox);
 
-            return (
-              <div
-                key={item.id}
-                className={`absolute transition-all duration-300 pointer-events-none ${
-                  isActive
-                    ? "border border-white/90 shadow-sm opacity-100"
-                    : "border-0 opacity-0"
-                }`}
-                style={style}
-              >
-                {/* Index Label */}
-                {isActive && (
-                  <div className="absolute -top-6 left-0 bg-white text-black text-[10px] font-bold px-1.5 py-0.5 uppercase tracking-wider">
-                    {String(index + 1).padStart(2, "0")}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+              return (
+                <div
+                  key={item.id}
+                  className={`absolute transition-all duration-300 pointer-events-none ${
+                    isActive
+                      ? "border border-white/90 shadow-sm opacity-100"
+                      : "border-0 opacity-0"
+                  }`}
+                  style={style}
+                >
+                  {/* Index Label */}
+                  {isActive && (
+                    <div className="absolute -top-6 left-0 bg-white text-black text-[10px] font-bold px-1.5 py-0.5 uppercase tracking-wider">
+                      {String(index + 1).padStart(2, "0")}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </>
       )}
     </div>
