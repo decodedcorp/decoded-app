@@ -16,6 +16,7 @@ if (typeof window !== "undefined") {
 
 type Props = {
   items: UiItem[];
+  isModal?: boolean;
 };
 
 /**
@@ -25,7 +26,7 @@ type Props = {
  * Uses stagger animation for sequential card appearance.
  * Features ReactBits Spotlight Card effect.
  */
-export function ShopGrid({ items }: Props) {
+export function ShopGrid({ items, isModal = false }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -63,7 +64,8 @@ export function ShopGrid({ items }: Props) {
 
   useGSAP(
     () => {
-      if (!containerRef.current) return;
+      // Skip GSAP animations in modal to avoid ScrollTrigger issues
+      if (isModal || !containerRef.current) return;
 
       const cards = gsap.utils.toArray<HTMLElement>(
         containerRef.current.querySelectorAll(".shop-card")
@@ -89,7 +91,7 @@ export function ShopGrid({ items }: Props) {
         }
       );
     },
-    { scope: containerRef }
+    { scope: containerRef, dependencies: [isModal] }
   );
 
   if (items.length === 0) {
@@ -97,13 +99,20 @@ export function ShopGrid({ items }: Props) {
   }
 
   return (
-    <section ref={containerRef} className="py-24 border-t border-border/40 overflow-hidden w-full">
-      <div className="mx-auto max-w-7xl px-6 md:px-8">
-        <div className="flex flex-col items-center mb-12">
-          <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground mb-4">
+    <section 
+      ref={containerRef} 
+      className={`border-t border-border/40 overflow-hidden w-full ${
+        isModal ? "py-12 md:py-16" : "py-24"
+      }`}
+    >
+      <div className={`mx-auto ${isModal ? "max-w-full px-4 md:px-6" : "max-w-7xl px-6 md:px-8"}`}>
+        <div className="flex flex-col items-center mb-8 md:mb-12">
+          <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground mb-3 md:mb-4">
             Curated Selection
           </span>
-          <h2 className="font-serif text-5xl md:text-6xl text-center tracking-tight">
+          <h2 className={`font-serif text-center tracking-tight ${
+            isModal ? "text-3xl md:text-4xl" : "text-4xl md:text-5xl lg:text-6xl"
+          }`}>
             Shop the Look
           </h2>
         </div>
@@ -141,18 +150,28 @@ export function ShopGrid({ items }: Props) {
         <div
           ref={scrollRef}
           onScroll={checkScroll}
-          className="flex gap-6 overflow-x-auto px-6 md:px-8 pb-12 scrollbar-hide snap-x snap-mandatory pt-4 w-full"
+          className={`flex overflow-x-auto scrollbar-hide snap-x snap-mandatory w-full ${
+            isModal 
+              ? "gap-3 md:gap-4 px-4 md:px-6 pb-8 md:pb-10 pt-2 md:pt-4" 
+              : "gap-4 md:gap-6 px-6 md:px-8 pb-12 pt-4"
+          }`}
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {items.map((item) => (
             <div
               key={item.id}
-              className="shop-card flex-none w-[220px] md:w-[260px] snap-center group flex flex-col"
+              className={`shop-card flex-none snap-center group flex flex-col ${
+                isModal 
+                  ? "w-[160px] sm:w-[180px] md:w-[200px]" 
+                  : "w-[180px] sm:w-[200px] md:w-[220px] lg:w-[260px]"
+              }`}
             >
               <SpotlightCard className="h-full flex flex-col bg-card/50 backdrop-blur-sm">
-                <div className="flex flex-col h-full p-4">
+                <div className={`flex flex-col h-full ${isModal ? "p-3" : "p-3 md:p-4"}`}>
                   {/* Item Image */}
-                  <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg bg-muted mb-4">
+                  <div className={`relative w-full aspect-[3/4] overflow-hidden rounded-lg bg-muted ${
+                    isModal ? "mb-2 md:mb-3" : "mb-3 md:mb-4"
+                  }`}>
                     {item.imageUrl ? (
                       <Image
                         src={item.imageUrl}
@@ -173,20 +192,28 @@ export function ShopGrid({ items }: Props) {
                   {/* Item Details */}
                   <div className="flex flex-col items-center text-center flex-grow">
                     {item.brand && (
-                      <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-2">
+                      <p className={`font-medium uppercase tracking-widest text-muted-foreground ${
+                        isModal ? "text-[9px] mb-1" : "text-[10px] mb-2"
+                      }`}>
                         {item.brand}
                       </p>
                     )}
-                    <h3 className="font-serif text-lg font-medium mb-2 leading-tight group-hover:text-foreground/80 transition-colors">
+                    <h3 className={`font-serif font-medium leading-tight group-hover:text-foreground/80 transition-colors ${
+                      isModal ? "text-sm md:text-base mb-1 md:mb-2" : "text-base md:text-lg mb-2"
+                    }`}>
                       {item.product_name || "Untitled Item"}
                     </h3>
                     {item.price && (
-                      <p className="text-sm font-medium text-primary mt-auto font-mono pt-1">
+                      <p className={`font-medium text-primary mt-auto font-mono ${
+                        isModal ? "text-xs pt-0.5 md:pt-1" : "text-sm pt-1"
+                      }`}>
                         {item.price}
                       </p>
                     )}
 
-                    <button className="mt-4 w-full py-2 border border-border/50 bg-background/50 hover:bg-foreground hover:text-background transition-all duration-300 text-[10px] uppercase tracking-widest rounded-sm">
+                    <button className={`w-full border border-border/50 bg-background/50 hover:bg-foreground hover:text-background transition-all duration-300 text-[9px] md:text-[10px] uppercase tracking-widest rounded-sm ${
+                      isModal ? "mt-2 md:mt-3 py-1.5 md:py-2" : "mt-3 md:mt-4 py-2"
+                    }`}>
                       View Details
                     </button>
                   </div>

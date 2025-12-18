@@ -205,7 +205,7 @@ export function ImageDetailContent({
               </p>
             </div>
           )}
-          <ShopGrid items={normalizedItems} />
+          <ShopGrid items={normalizedItems} isModal={isModal} />
         </div>
       )}
 
