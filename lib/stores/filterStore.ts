@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-type FilterKey = "all" | "latest" | "clothing" | "accessories" | "shoes" | "bags";
+type FilterKey = "all" | "newjeanscloset" | "blackpinkk.style";
 
 export const useFilterStore = create<{
   activeFilter: FilterKey;

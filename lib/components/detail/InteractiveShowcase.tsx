@@ -1,0 +1,179 @@
+"use client";
+
+import { useState, useRef, useEffect, RefObject } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
+import type { ImageRow } from "@/lib/supabase/types";
+import type { UiItem } from "./types";
+import { ImageCanvas } from "./ImageCanvas";
+import { ItemDetailCard } from "./ItemDetailCard";
+import { ConnectorLayer } from "./ConnectorLayer";
+
+// Register GSAP ScrollTrigger plugin
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
+type Props = {
+  image: ImageRow;
+  items: UiItem[];
+  isModal?: boolean;
+  scrollContainerRef?: RefObject<HTMLElement>;
+  // Controlled mode props
+  activeIndex?: number | null;
+  onActiveIndexChange?: (index: number | null) => void;
+  renderImage?: boolean;
+};
+
+/**
+ * Interactive Showcase - The Core Feature
+ *
+ * Desktop: Sticky split layout (left image fixed / right text scrolls)
+ * Mobile: Stack layout (top image fixed ~40vh / bottom text scrolls)
+ *
+ * Uses ScrollTrigger to sync active item with scroll position.
+ */
+export function InteractiveShowcase({
+  image,
+  items,
+  isModal = false,
+  scrollContainerRef,
+  activeIndex: controlledActiveIndex,
+  onActiveIndexChange,
+  renderImage = true,
+}: Props) {
+  const [internalActiveIndex, setInternalActiveIndex] = useState<number | null>(
+    null
+  );
+
+  // Use controlled or internal state
+  const isControlled = controlledActiveIndex !== undefined;
+  const activeIndex = isControlled
+    ? controlledActiveIndex
+    : internalActiveIndex;
+
+  // Track activeIndex in ref to prevent stale closures in GSAP callbacks
+  // while keeping dependency array clean (only items.length)
+  const activeIndexRef = useRef<number | null>(null);
+  useEffect(() => {
+    activeIndexRef.current = activeIndex;
+  }, [activeIndex]);
+
+  const handleActiveIndexChange = (index: number | null) => {
+    if (!isControlled) {
+      setInternalActiveIndex(index);
+    }
+    onActiveIndexChange?.(index);
+  };
+
+  const sectionRef = useRef<HTMLElement>(null);
+  const imageContainerRef = useRef<HTMLDivElement>(null);
+  const cardsContainerRef = useRef<HTMLDivElement>(null);
+
+  // Setup ScrollTrigger for each card
+  useGSAP(
+    () => {
+      if (!sectionRef.current || items.length === 0) return;
+
+      console.count("ScrollTrigger:create");
+
+      const cards = gsap.utils.toArray<HTMLElement>(
+        sectionRef.current.querySelectorAll("[data-item-index]")
+      );
+
+      cards.forEach((card, index) => {
+        ScrollTrigger.create({
+          scroller: scrollContainerRef?.current || window,
+          trigger: card,
+          start: "top center",
+          end: "bottom center",
+          onEnter: () => {
+            console.count("ScrollTrigger:onUpdate");
+            handleActiveIndexChange(index);
+          },
+          onEnterBack: () => {
+            console.count("ScrollTrigger:onUpdate");
+            handleActiveIndexChange(index);
+          },
+          onLeave: () => {
+            // Check ref to avoid stale closure issues
+            // Only clear if we are currently active on this item
+            // This prevents clearing when quickly scrolling through multiple items
+            if (activeIndexRef.current === index) {
+              handleActiveIndexChange(null);
+            }
+          },
+          onLeaveBack: () => {
+            if (activeIndexRef.current === index) {
+              handleActiveIndexChange(null);
+            }
+          },
+        });
+      });
+
+      return () => {
+        ScrollTrigger.getAll().forEach((trigger) => {
+          if (cards.includes(trigger.vars.trigger as HTMLElement)) {
+            trigger.kill();
+          }
+        });
+      };
+    },
+    { scope: sectionRef, dependencies: [items.length] } // Only recreate when items structure changes
+  );
+
+  if (items.length === 0) {
+    return null;
+  }
+
+  return (
+    <section
+      ref={sectionRef}
+      className={`flex flex-col relative h-auto ${isModal ? "" : "lg:flex-row lg:min-h-screen"}`}
+    >
+      {/* Left: Sticky Image Canvas (Desktop) / Top: Fixed Image (Mobile) */}
+      {renderImage && (
+        <div
+          ref={imageContainerRef}
+          className={`sticky top-0 w-full z-10 ${isModal ? "h-[40vh]" : "h-[40vh] lg:h-screen lg:w-1/2"}`}
+        >
+          <ImageCanvas image={image} items={items} activeIndex={activeIndex} />
+        </div>
+      )}
+
+      {/* Right: Scrollable Item Details (Desktop) / Bottom: Scrollable (Mobile) */}
+      <div
+        ref={cardsContainerRef}
+        className={`w-full px-5 py-10 bg-background relative z-20 ${
+          isModal
+            ? renderImage
+              ? ""
+              : "w-full pt-0" // Remove top padding if image is hidden (modal split view)
+            : "lg:w-1/2 lg:pl-10 lg:pt-20"
+        }`}
+      >
+        {items.map((item, index) => (
+          <ItemDetailCard
+            key={item.id}
+            item={item}
+            index={index}
+            onActivate={() => handleActiveIndexChange(index)}
+            onDeactivate={() => handleActiveIndexChange(null)}
+          />
+        ))}
+      </div>
+
+      {/* Connector Lines Layer - Only show if image is rendered internally */}
+      {renderImage && (
+        <ConnectorLayer
+          items={items}
+          activeIndex={activeIndex}
+          imageContainerRef={imageContainerRef}
+          cardsContainerRef={cardsContainerRef}
+          scrollContainerRef={scrollContainerRef}
+        />
+      )}
+    </section>
+  );
+}

@@ -6,4 +6,5 @@ export { FilterTabs } from "./FilterTabs";
 export { SearchInput } from "./SearchInput";
 export { SponsorBanner } from "./SponsorBanner";
 export { MoreMenu } from "./MoreMenu";
+export { default as DecodedLogo } from "./DecodedLogo";
 

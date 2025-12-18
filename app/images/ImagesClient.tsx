@@ -1,7 +1,7 @@
 'use client';
 
 import type { ImageRow } from '@/lib/supabase/types';
-import { useLatestImages } from '@/lib/hooks/useImages';
+import { useInfiniteFilteredImages } from '@/lib/hooks/useImages';
 import { ImageCard } from './ImageCard';
 import { ImageCardSkeleton } from './ImageCardSkeleton';
 import { ErrorState } from './ErrorState';
@@ -14,16 +14,32 @@ type Props = {
 /**
  * Client Component for images feed
  *
- * Uses SSR + React Query pattern:
- * - First render: Uses SSR initialImages
- * - React Query fetches in CSR → replaces with data when available
- * - Future optimization: Consider using initialData or dehydrate to avoid duplicate fetches
+ * Now uses unified adapter with deduplication for gallery mode:
+ * - Uses fetchUnifiedImages with deduplicateByImageId=true
+ * - Ensures all images visible (post-based + orphans)
+ * - Prevents showing same image multiple times
  */
 export function ImagesClient({ initialImages }: Props) {
-  const { data, isLoading, isError, error, refetch } = useLatestImages(20);
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteFilteredImages({
+    limit: 40,
+    filter: "all",
+    search: "",
+    deduplicateByImageId: true, // Gallery mode: dedupe
+  });
 
-  // Merge SSR and CSR data: use CSR data if available, fallback to SSR initial data
-  const images = data ?? initialImages;
+  // Flatten pages and use CSR data if available, fallback to SSR initial data
+  const images = data
+    ? data.pages.flatMap((page) => page.items)
+    : initialImages;
 
   // Loading state: show skeleton grid
   if (isLoading && !data) {
@@ -51,13 +67,29 @@ export function ImagesClient({ initialImages }: Props) {
     return <EmptyState />;
   }
 
-  // Success state: show image grid
+  // Success state: show image grid with infinite scroll
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {images.map((image) => (
-        <ImageCard key={image.id} image={image} />
-      ))}
-    </div>
+    <>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {images.map((image) => (
+          <ImageCard key={image.id} image={image} />
+        ))}
+      </div>
+      
+      {/* Load more button or auto-load */}
+      {hasNextPage && (
+        <div className="mt-8 flex justify-center">
+          <button
+            onClick={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
+            className="rounded-full border border-border bg-card/80 px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-accent disabled:opacity-50"
+            type="button"
+          >
+            {isFetchingNextPage ? "Loading..." : "Load More"}
+          </button>
+        </div>
+      )}
+    </>
   );
 }
 

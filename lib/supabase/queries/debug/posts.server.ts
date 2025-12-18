@@ -26,7 +26,7 @@ export async function fetchLatestPostsServer(limit = 10): Promise<PostRow[]> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from('post')
-    .select('id, account, ts, created_at')
+    .select('*')
     .order('created_at', { ascending: false })
     .limit(limit);
 
