@@ -214,6 +214,7 @@ export function ImageDetailContent({
         <RelatedImages
           currentImageId={image.id}
           account={image.postImages[0].post.account}
+          isModal={isModal}
         />
       )}
 

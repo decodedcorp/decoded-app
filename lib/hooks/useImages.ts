@@ -117,7 +117,7 @@ export function useInfiniteFilteredImages(params: {
 export function useRelatedImagesByAccount(
   imageId: string,
   account: string | null | undefined,
-  limit: number = 6
+  limit: number = 24
 ) {
   return useQuery<ImageRow[]>({
     queryKey: ["images", "related", account, imageId],
