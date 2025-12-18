@@ -9,6 +9,7 @@ import {
   fetchImagesByPostImage,
   fetchImageById,
   fetchUnifiedImages,
+  fetchRelatedImagesByAccount,
   type CategoryFilter,
   type ImagePage,
   type ImagePageWithPostId,
@@ -103,5 +104,25 @@ export function useInfiniteFilteredImages(params: {
     initialPageParam: null,
     staleTime: 1000 * 60, // 1 minute
     gcTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
+
+/**
+ * React Query hook for fetching related images from the same account
+ *
+ * @param imageId - Current image ID (to exclude)
+ * @param account - Account name
+ * @param limit - Number of images to fetch
+ */
+export function useRelatedImagesByAccount(
+  imageId: string,
+  account: string | null | undefined,
+  limit: number = 6
+) {
+  return useQuery<ImageRow[]>({
+    queryKey: ["images", "related", account, imageId],
+    queryFn: () => fetchRelatedImagesByAccount(imageId, account!, limit),
+    enabled: !!account && !!imageId,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }

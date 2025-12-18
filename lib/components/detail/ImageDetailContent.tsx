@@ -6,8 +6,11 @@ import { normalizeItem } from "./types";
 import { HeroSection } from "./HeroSection";
 import { InteractiveShowcase } from "./InteractiveShowcase";
 import { ShopGrid } from "./ShopGrid";
+import { RelatedImages } from "./RelatedImages";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
+import { useMemo } from "react";
+import { createElement, Fragment } from "react";
 
 type Props = {
   image: ImageDetail;
@@ -46,6 +49,14 @@ export function ImageDetailContent({
 
   // Extract article from the first post
   const article = image.postImages?.[0]?.post?.article?.trim();
+
+  // Preprocess article to handle **{}** pattern for bold formatting
+  // Replace **{}** with a placeholder that markdown can parse, then restore in components
+  const preprocessArticle = useMemo(() => {
+    if (!article) return "";
+    // Replace **{}** with **BRACE_BOLD_PLACEHOLDER** so markdown parser can recognize it
+    return article.replace(/\*\*\{\}\*\*/g, "**BRACE_BOLD_PLACEHOLDER**");
+  }, [article]);
 
   // Normalize items with coordinates
   // Use item_locations from the first post_image if available to override item centers
@@ -90,12 +101,12 @@ export function ImageDetailContent({
       {/* Section 1: Hero - Hidden if hideImage is true */}
       {!hideImage && <HeroSection image={image} isModal={isModal} />}
 
-      {/* Featured In Section */}
+      {/* Featured In Section - Redesigned as Credits Bar */}
       {(image.postImages?.length > 0 || image.posts?.length > 0) && (
-        <div className="bg-muted/10 border-b border-border">
-          <div className="mx-auto max-w-6xl px-5 py-6 flex items-center gap-4 text-sm text-muted-foreground overflow-x-auto">
-            <span className="font-serif italic font-medium shrink-0">
-              Featured in:
+        <div className="border-b border-border/40">
+          <div className="mx-auto max-w-4xl px-6 py-4 flex items-center justify-center gap-6 text-sm text-muted-foreground overflow-x-auto">
+            <span className="font-serif text-xs uppercase tracking-widest text-muted-foreground/60 shrink-0">
+              As Seen In
             </span>
             {/* Use postImages if available (with metadata), fallback to posts (backward compatibility) */}
             {image.postImages && image.postImages.length > 0
@@ -109,39 +120,65 @@ export function ImageDetailContent({
                     <Link
                       key={postImage.post.id}
                       href={`/posts/${postImage.post.id}`}
-                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-background border border-border/50 shadow-sm shrink-0 hover:bg-background/80 hover:shadow-md transition-all cursor-pointer"
+                      className="group flex items-center gap-2 hover:text-foreground transition-colors"
                       title={`Connected on ${new Date(postImage.created_at).toLocaleDateString()}`}
                     >
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/80" />
-                      @{postImage.post.account}
+                      <span className="font-medium underline decoration-border/50 underline-offset-4 group-hover:decoration-foreground/50 transition-all">
+                        @{postImage.post.account}
+                      </span>
                     </Link>
                   ))
               : image.posts?.map((post) => (
                   <Link
                     key={post.id}
                     href={`/posts/${post.id}`}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-background border border-border/50 shadow-sm shrink-0 hover:bg-background/80 hover:shadow-md transition-all cursor-pointer"
+                    className="group flex items-center gap-2 hover:text-foreground transition-colors"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/80" />
-                    @{post.account}
+                    <span className="font-medium underline decoration-border/50 underline-offset-4 group-hover:decoration-foreground/50 transition-all">
+                      @{post.account}
+                    </span>
                   </Link>
                 ))}
           </div>
         </div>
       )}
 
-      {/* About this Look Section */}
+      {/* About this Look Section - Magazine Style */}
       {article && (
-        <section className="mx-auto max-w-6xl px-5 py-8 border-b border-border">
-          <h3
-            id="about-this-look"
-            className="text-lg font-serif font-medium mb-4"
-          >
-            About this Look
-          </h3>
-          <article className="prose prose-sm dark:prose-invert w-full max-w-none break-words text-muted-foreground leading-relaxed">
-            <ReactMarkdown>{article}</ReactMarkdown>
-          </article>
+        <section className="mx-auto max-w-3xl px-6 py-20">
+          <div className="flex flex-col items-center text-center">
+            <div className="w-12 h-0.5 bg-primary mb-8" />
+            <h3
+              id="about-this-look"
+              className="font-serif text-3xl md:text-4xl font-medium mb-10 tracking-tight"
+            >
+              The Editorial
+            </h3>
+            <article className="prose prose-lg dark:prose-invert font-serif leading-loose text-muted-foreground/90 max-w-none">
+              <ReactMarkdown
+                components={{
+                  p: ({ children }) => <p>{children}</p>,
+                  strong: ({ children }) => {
+                    // Replace placeholder back to {}
+                    const childrenStr = Array.isArray(children)
+                      ? children.join("")
+                      : String(children);
+                    if (childrenStr === "BRACE_BOLD_PLACEHOLDER") {
+                      return <strong>{}</strong>;
+                    }
+                    return <strong>{children}</strong>;
+                  },
+                }}
+              >
+                {preprocessArticle}
+              </ReactMarkdown>
+            </article>
+            <div className="mt-12 flex items-center gap-4">
+              <div className="h-px w-16 bg-border" />
+              <div className="w-2 h-2 rounded-full bg-border" />
+              <div className="h-px w-16 bg-border" />
+            </div>
+          </div>
         </section>
       )}
 
@@ -170,6 +207,14 @@ export function ImageDetailContent({
           )}
           <ShopGrid items={normalizedItems} />
         </div>
+      )}
+
+      {/* Related Images Section - Always show if account is available */}
+      {image.postImages?.[0]?.post?.account && (
+        <RelatedImages
+          currentImageId={image.id}
+          account={image.postImages[0].post.account}
+        />
       )}
 
       {/* Fallback: Show basic info if no items */}

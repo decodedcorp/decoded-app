@@ -518,3 +518,59 @@ export async function fetchImagesByPostImage(
 
   return { items, nextCursor, hasMore };
 }
+
+/**
+ * Fetches related images from the same account
+ *
+ * @param currentImageId - ID of the current image (to exclude)
+ * @param account - Account name to fetch images for
+ * @param limit - Maximum number of images to fetch (default: 6)
+ * @returns Array of image rows
+ */
+export async function fetchRelatedImagesByAccount(
+  currentImageId: string,
+  account: string,
+  limit: number = 6
+): Promise<ImageRow[]> {
+  const { data, error } = await supabaseBrowserClient
+    .from("post_image")
+    .select(
+      "created_at, image!inner(id, image_url, status, with_items, image_hash, created_at), post!inner(account)"
+    )
+    .eq("post.account", account)
+    .not("image.id", "eq", currentImageId) // Exclude current image
+    .not("image.image_url", "is", null)
+    .eq("image.with_items", false)
+    .order("created_at", { ascending: false })
+    .limit(limit * 2); // Fetch more to handle potential duplicates
+
+  if (error) {
+    throw error;
+  }
+
+  // Deduplicate and extract images
+  const uniqueImages = new Map<string, ImageRow>();
+  if (data) {
+    for (const row of data) {
+      // row is post_image, contains image object
+      if (!row.image) continue;
+      const imageRow = Array.isArray(row.image) ? row.image[0] : row.image;
+      
+      if (imageRow && imageRow.id && !uniqueImages.has(imageRow.id)) {
+        const image: ImageRow = {
+          id: imageRow.id,
+          image_hash: imageRow.image_hash,
+          image_url: imageRow.image_url,
+          with_items: imageRow.with_items,
+          status: imageRow.status,
+          created_at: row.created_at, // Use post_image time
+        };
+        uniqueImages.set(imageRow.id, image);
+        
+        if (uniqueImages.size >= limit) break;
+      }
+    }
+  }
+
+  return Array.from(uniqueImages.values());
+}
