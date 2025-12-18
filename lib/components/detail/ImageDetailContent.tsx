@@ -13,6 +13,11 @@ type Props = {
   image: ImageDetail;
   isModal?: boolean;
   scrollContainerRef?: RefObject<HTMLElement>;
+  // Controlled active index state (optional, for lifting state up)
+  activeIndex?: number | null;
+  onActiveIndexChange?: (index: number | null) => void;
+  // If true, hides the hero/interactive image (useful for modal split layout where image is external)
+  hideImage?: boolean;
 };
 
 /**
@@ -28,6 +33,9 @@ export function ImageDetailContent({
   image,
   isModal = false,
   scrollContainerRef,
+  activeIndex,
+  onActiveIndexChange,
+  hideImage = false,
 }: Props) {
   // Items are now pre-fetched via post.item_ids (if post_image exists)
   // Fallback to item.image_id if no post_image found
@@ -79,8 +87,8 @@ export function ImageDetailContent({
 
   return (
     <div className="detail-content">
-      {/* Section 1: Hero */}
-      <HeroSection image={image} isModal={isModal} />
+      {/* Section 1: Hero - Hidden if hideImage is true */}
+      {!hideImage && <HeroSection image={image} isModal={isModal} />}
 
       {/* Featured In Section */}
       {(image.postImages?.length > 0 || image.posts?.length > 0) && (
@@ -144,6 +152,9 @@ export function ImageDetailContent({
           items={normalizedItems}
           isModal={isModal}
           scrollContainerRef={scrollContainerRef}
+          activeIndex={activeIndex}
+          onActiveIndexChange={onActiveIndexChange}
+          renderImage={!hideImage}
         />
       )}
 

@@ -8,6 +8,8 @@ import { Flip } from "gsap/Flip";
 import { useImageById } from "@/lib/hooks/useImages";
 import { ImageDetailContent } from "./ImageDetailContent";
 import { useTransitionStore } from "@/lib/stores/transitionStore";
+import { ImageCanvas } from "./ImageCanvas"; // Import ImageCanvas
+import { normalizeItem } from "./types"; // Import normalizeItem
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(Flip);
@@ -26,6 +28,33 @@ export function ImageDetailModal({ imageId }: Props) {
   const { data: image, isLoading, error } = useImageById(imageId);
   const { originRect, reset, imgSrc } = useTransitionStore();
 
+  // State for active item in split view (Desktop Modal)
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  // Normalize items for ImageCanvas if image is available
+  const items = image?.items || [];
+  const itemsFromPost = image?.postImages && image.postImages.length > 0;
+  
+  // Normalize items logic (copied from ImageDetailContent for the modal-level image)
+  const firstPostImage = image?.postImages?.[0];
+  const itemLocations = firstPostImage?.item_locations;
+  const itemLocationsMap: Record<string, any> = {};
+  
+  if (Array.isArray(itemLocations)) {
+    itemLocations.forEach((loc: any) => {
+      if (loc && loc.item_id) {
+        itemLocationsMap[loc.item_id.toString()] = loc.center || loc;
+      }
+    });
+  } else if (itemLocations && typeof itemLocations === "object") {
+    Object.assign(itemLocationsMap, itemLocations);
+  }
+
+  const normalizedItems = items.map((item) => {
+    const overrideLocation = itemLocationsMap[item.id.toString()];
+    return normalizeItem(item, undefined, overrideLocation);
+  });
+
   // Debug: Log imageId and data state
   useEffect(() => {
     if (imageId) {
@@ -39,11 +68,50 @@ export function ImageDetailModal({ imageId }: Props) {
     }
   }, [imageId, image, error]);
 
+  // Scroll Forwarding: Image -> Content
+  // This enables scrolling the drawer content by scrolling over the fixed image
+  useEffect(() => {
+    const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+    if (!isDesktop || !floatingImageRef.current || !scrollContainerRef.current) return;
+
+    // Use a wrapper or the floating image ref itself if it's the ImageCanvas container
+    // Since we're rendering ImageCanvas in the "floating" area, we need to target its container
+    // However, floatingImageRef currently points to an <img> tag.
+    // We'll update the render logic to use a container for the Left Side Image.
+  }, []);
+
+  const handleImageScroll = useCallback((e: React.WheelEvent) => {
+    const target = scrollContainerRef.current;
+    if (target) {
+      target.scrollBy({
+        top: e.deltaY,
+        behavior: "auto",
+      });
+    }
+  }, []);
+
+  const handleItemClick = useCallback((index: number) => {
+    // Scroll to the item in the drawer
+    const targetCard = scrollContainerRef.current?.querySelector(
+      `[data-item-index="${index}"]`
+    );
+
+    if (targetCard) {
+      targetCard.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      // Update active state
+      setActiveIndex(index);
+    }
+  }, []);
+
   // Refs for animation targets
   const containerRef = useRef<HTMLDivElement>(null);
   const backdropRef = useRef<HTMLDivElement>(null);
   const drawerRef = useRef<HTMLElement>(null);
   const floatingImageRef = useRef<HTMLImageElement>(null);
+  const leftImageContainerRef = useRef<HTMLDivElement>(null); // New container for interactive image
 
   // Ref for scroll container to checking scroll position for swipe gesture
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -83,8 +151,8 @@ export function ImageDetailModal({ imageId }: Props) {
 
       // Ensure floating image is visible for exit animation (desktop only)
       // On mobile, floating image is not rendered, so skip this
-      if (isDesktop && floatingImageRef.current) {
-        tl.set(floatingImageRef.current, { opacity: 1 }, 0);
+      if (isDesktop && leftImageContainerRef.current) {
+        tl.set(leftImageContainerRef.current, { opacity: 1 }, 0);
       }
 
       // 1. Fade out UI
@@ -100,10 +168,10 @@ export function ImageDetailModal({ imageId }: Props) {
 
       // 2. Fly image back to grid (if we have origin info)
       // Only animate floating image on desktop (it's hidden on mobile)
-      if (isDesktop && originRect && floatingImageRef.current) {
+      if (isDesktop && originRect && leftImageContainerRef.current) {
         // FLIP animation back to grid
         tl.to(
-          floatingImageRef.current,
+          leftImageContainerRef.current,
           {
             top: originRect.top,
             left: originRect.left,
@@ -119,7 +187,7 @@ export function ImageDetailModal({ imageId }: Props) {
         )
           // Scale pulse for return trip
           .to(
-            floatingImageRef.current,
+            leftImageContainerRef.current,
             {
               scale: 0.98,
               duration: 0.25,
@@ -131,7 +199,7 @@ export function ImageDetailModal({ imageId }: Props) {
           )
           // After image reaches grid position, fade it out
           .to(
-            floatingImageRef.current,
+            leftImageContainerRef.current,
             {
               opacity: 0,
               duration: 0.1,
@@ -141,10 +209,10 @@ export function ImageDetailModal({ imageId }: Props) {
             },
             "-=0.05" // Start fading slightly before position animation completes
           );
-      } else if (isDesktop && floatingImageRef.current) {
+      } else if (isDesktop && leftImageContainerRef.current) {
         // Fallback: fade out floating image (desktop only)
         tl.to(
-          floatingImageRef.current,
+          leftImageContainerRef.current,
           {
             opacity: 0,
             duration: 0.3,
@@ -355,6 +423,9 @@ export function ImageDetailModal({ imageId }: Props) {
         image={image}
         isModal={true}
         scrollContainerRef={scrollContainerRef}
+        activeIndex={activeIndex}
+        onActiveIndexChange={setActiveIndex}
+        hideImage={true} // Hide internal image, using Modal's left image instead
       />
     );
   };
@@ -379,7 +450,7 @@ export function ImageDetailModal({ imageId }: Props) {
   // Floating Image Animation (runs when image source becomes available)
   // Skip on mobile - Floating Image is not rendered on mobile
   useEffect(() => {
-    if (!activeImageSrc || !floatingImageRef.current) return;
+    if (!activeImageSrc || !leftImageContainerRef.current) return;
 
     const isDesktop = window.matchMedia("(min-width: 768px)").matches;
 
@@ -391,7 +462,7 @@ export function ImageDetailModal({ imageId }: Props) {
 
     if (originRect) {
       // Start at grid position (FLIP animation)
-      gsap.set(floatingImageRef.current, {
+      gsap.set(leftImageContainerRef.current, {
         position: "fixed",
         top: originRect.top,
         left: originRect.left,
@@ -425,7 +496,7 @@ export function ImageDetailModal({ imageId }: Props) {
       const tl = gsap.timeline();
 
       // Main flight animation with 3D depth effects
-      tl.to(floatingImageRef.current, {
+      tl.to(leftImageContainerRef.current, {
         ...targetProps,
         duration: 0.6,
         ease: "power3.inOut",
@@ -435,7 +506,7 @@ export function ImageDetailModal({ imageId }: Props) {
       // Add scale pulse for 3D "lift" feel
       // This creates a subtle parabolic motion on the Z-axis
       tl.to(
-        floatingImageRef.current,
+        leftImageContainerRef.current,
         {
           scale: 1.02,
           duration: 0.3,
@@ -464,7 +535,7 @@ export function ImageDetailModal({ imageId }: Props) {
         boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
       };
 
-      gsap.set(floatingImageRef.current, targetProps);
+      gsap.set(leftImageContainerRef.current, targetProps);
     }
   }, [activeImageSrc, originRect]);
 
@@ -484,26 +555,45 @@ export function ImageDetailModal({ imageId }: Props) {
         aria-hidden="true"
       />
 
-      {/* Floating Image (z-60) - Desktop Only */}
+      {/* Floating Image / Left Side Interactive Image (z-60) - Desktop Only */}
       {/* On mobile, this is hidden - Drawer fills the screen instead */}
       {activeImageSrc && (
-        <img
-          ref={floatingImageRef}
-          src={activeImageSrc}
-          alt="Highlight"
-          className="hidden md:block fixed object-cover shadow-2xl pointer-events-none"
+        <div
+          ref={leftImageContainerRef}
+          className="hidden md:block fixed z-60 shadow-2xl"
           style={{
-            opacity: 0, // Initially hidden, will be set by GSAP
-            zIndex: 60,
-            willChange: "transform, top, left, width, height, opacity",
+            opacity: 0, // Initially hidden, set by GSAP
+            // Initial positioning will be handled by GSAP based on originRect
           }}
-        />
+          onWheel={handleImageScroll} // Forward scroll events
+        >
+          {/* Use ImageCanvas for interactive features (highlights, zoom) */}
+          {/* We only render ImageCanvas if we have the full image data */}
+          {image ? (
+            <div className="w-full h-full relative">
+              <ImageCanvas 
+                image={image} 
+                items={normalizedItems} 
+                activeIndex={activeIndex}
+                onItemClick={handleItemClick}
+              />
+            </div>
+          ) : (
+            /* Fallback to simple img during transition or loading */
+            <img
+              ref={floatingImageRef}
+              src={activeImageSrc}
+              alt="Highlight"
+              className="w-full h-full object-cover pointer-events-none"
+            />
+          )}
+        </div>
       )}
 
       {/* Drawer (z-50) */}
       <aside
         ref={drawerRef}
-        className="relative z-50 flex h-full w-full flex-col bg-background shadow-2xl md:max-w-2xl translate-y-full md:translate-x-full md:translate-y-0"
+        className="relative z-50 flex h-full w-full flex-col bg-background shadow-2xl md:max-w-[calc(100vw-350px)] lg:max-w-4xl translate-y-full md:translate-x-full md:translate-y-0"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}

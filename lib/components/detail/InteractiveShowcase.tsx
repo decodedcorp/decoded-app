@@ -20,6 +20,10 @@ type Props = {
   items: UiItem[];
   isModal?: boolean;
   scrollContainerRef?: RefObject<HTMLElement>;
+  // Controlled mode props
+  activeIndex?: number | null;
+  onActiveIndexChange?: (index: number | null) => void;
+  renderImage?: boolean;
 };
 
 /**
@@ -35,8 +39,25 @@ export function InteractiveShowcase({
   items,
   isModal = false,
   scrollContainerRef,
+  activeIndex: controlledActiveIndex,
+  onActiveIndexChange,
+  renderImage = true,
 }: Props) {
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [internalActiveIndex, setInternalActiveIndex] = useState<number | null>(
+    null
+  );
+  
+  // Use controlled or internal state
+  const isControlled = controlledActiveIndex !== undefined;
+  const activeIndex = isControlled ? controlledActiveIndex : internalActiveIndex;
+  
+  const handleActiveIndexChange = (index: number | null) => {
+    if (!isControlled) {
+      setInternalActiveIndex(index);
+    }
+    onActiveIndexChange?.(index);
+  };
+
   const sectionRef = useRef<HTMLElement>(null);
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const cardsContainerRef = useRef<HTMLDivElement>(null);
@@ -56,17 +77,17 @@ export function InteractiveShowcase({
           trigger: card,
           start: "top center",
           end: "bottom center",
-          onEnter: () => setActiveIndex(index),
-          onEnterBack: () => setActiveIndex(index),
+          onEnter: () => handleActiveIndexChange(index),
+          onEnterBack: () => handleActiveIndexChange(index),
           onLeave: () => {
             // Only clear if scrolling past (not when entering previous)
             if (index < (activeIndex ?? 0)) {
-              setActiveIndex(null);
+              handleActiveIndexChange(null);
             }
           },
           onLeaveBack: () => {
             if (index > (activeIndex ?? 0)) {
-              setActiveIndex(null);
+              handleActiveIndexChange(null);
             }
           },
         });
@@ -80,7 +101,7 @@ export function InteractiveShowcase({
         });
       };
     },
-    { scope: sectionRef, dependencies: [items.length] }
+    { scope: sectionRef, dependencies: [items.length, activeIndex] }
   );
 
   if (items.length === 0) {
@@ -93,37 +114,45 @@ export function InteractiveShowcase({
       className={`flex flex-col relative h-auto ${isModal ? "" : "lg:flex-row lg:min-h-screen"}`}
     >
       {/* Left: Sticky Image Canvas (Desktop) / Top: Fixed Image (Mobile) */}
-      <div
-        ref={imageContainerRef}
-        className={`sticky top-0 w-full z-10 ${isModal ? "h-[40vh]" : "h-[40vh] lg:h-screen lg:w-1/2"}`}
-      >
-        <ImageCanvas image={image} items={items} activeIndex={activeIndex} />
-      </div>
+      {renderImage && (
+        <div
+          ref={imageContainerRef}
+          className={`sticky top-0 w-full z-10 ${isModal ? "h-[40vh]" : "h-[40vh] lg:h-screen lg:w-1/2"}`}
+        >
+          <ImageCanvas image={image} items={items} activeIndex={activeIndex} />
+        </div>
+      )}
 
       {/* Right: Scrollable Item Details (Desktop) / Bottom: Scrollable (Mobile) */}
       <div
         ref={cardsContainerRef}
-        className={`w-full px-5 py-10 bg-background relative z-20 ${isModal ? "" : "lg:w-1/2 lg:pl-10 lg:pt-20"}`}
+        className={`w-full px-5 py-10 bg-background relative z-20 ${
+          isModal 
+            ? renderImage ? "" : "w-full pt-10" // Full width if image is hidden (handled externally)
+            : "lg:w-1/2 lg:pl-10 lg:pt-20"
+        }`}
       >
         {items.map((item, index) => (
           <ItemDetailCard
             key={item.id}
             item={item}
             index={index}
-            onActivate={() => setActiveIndex(index)}
-            onDeactivate={() => setActiveIndex(null)}
+            onActivate={() => handleActiveIndexChange(index)}
+            onDeactivate={() => handleActiveIndexChange(null)}
           />
         ))}
       </div>
 
-      {/* Connector Lines Layer */}
-      <ConnectorLayer
-        items={items}
-        activeIndex={activeIndex}
-        imageContainerRef={imageContainerRef}
-        cardsContainerRef={cardsContainerRef}
-        scrollContainerRef={scrollContainerRef}
-      />
+      {/* Connector Lines Layer - Only show if image is rendered internally */}
+      {renderImage && (
+        <ConnectorLayer
+          items={items}
+          activeIndex={activeIndex}
+          imageContainerRef={imageContainerRef}
+          cardsContainerRef={cardsContainerRef}
+          scrollContainerRef={scrollContainerRef}
+        />
+      )}
     </section>
   );
 }
