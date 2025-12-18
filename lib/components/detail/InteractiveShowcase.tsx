@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, RefObject } from "react";
+import { useState, useRef, useEffect, RefObject } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
@@ -46,11 +46,20 @@ export function InteractiveShowcase({
   const [internalActiveIndex, setInternalActiveIndex] = useState<number | null>(
     null
   );
-  
+
   // Use controlled or internal state
   const isControlled = controlledActiveIndex !== undefined;
-  const activeIndex = isControlled ? controlledActiveIndex : internalActiveIndex;
-  
+  const activeIndex = isControlled
+    ? controlledActiveIndex
+    : internalActiveIndex;
+
+  // Track activeIndex in ref to prevent stale closures in GSAP callbacks
+  // while keeping dependency array clean (only items.length)
+  const activeIndexRef = useRef<number | null>(null);
+  useEffect(() => {
+    activeIndexRef.current = activeIndex;
+  }, [activeIndex]);
+
   const handleActiveIndexChange = (index: number | null) => {
     if (!isControlled) {
       setInternalActiveIndex(index);
@@ -67,6 +76,8 @@ export function InteractiveShowcase({
     () => {
       if (!sectionRef.current || items.length === 0) return;
 
+      console.count("ScrollTrigger:create");
+
       const cards = gsap.utils.toArray<HTMLElement>(
         sectionRef.current.querySelectorAll("[data-item-index]")
       );
@@ -77,16 +88,24 @@ export function InteractiveShowcase({
           trigger: card,
           start: "top center",
           end: "bottom center",
-          onEnter: () => handleActiveIndexChange(index),
-          onEnterBack: () => handleActiveIndexChange(index),
+          onEnter: () => {
+            console.count("ScrollTrigger:onUpdate");
+            handleActiveIndexChange(index);
+          },
+          onEnterBack: () => {
+            console.count("ScrollTrigger:onUpdate");
+            handleActiveIndexChange(index);
+          },
           onLeave: () => {
-            // Only clear if scrolling past (not when entering previous)
-            if (index < (activeIndex ?? 0)) {
+            // Check ref to avoid stale closure issues
+            // Only clear if we are currently active on this item
+            // This prevents clearing when quickly scrolling through multiple items
+            if (activeIndexRef.current === index) {
               handleActiveIndexChange(null);
             }
           },
           onLeaveBack: () => {
-            if (index > (activeIndex ?? 0)) {
+            if (activeIndexRef.current === index) {
               handleActiveIndexChange(null);
             }
           },
@@ -101,7 +120,7 @@ export function InteractiveShowcase({
         });
       };
     },
-    { scope: sectionRef, dependencies: [items.length, activeIndex] }
+    { scope: sectionRef, dependencies: [items.length] } // Only recreate when items structure changes
   );
 
   if (items.length === 0) {
@@ -127,8 +146,10 @@ export function InteractiveShowcase({
       <div
         ref={cardsContainerRef}
         className={`w-full px-5 py-10 bg-background relative z-20 ${
-          isModal 
-            ? renderImage ? "" : "w-full pt-10" // Full width if image is hidden (handled externally)
+          isModal
+            ? renderImage
+              ? ""
+              : "w-full pt-0" // Remove top padding if image is hidden (modal split view)
             : "lg:w-1/2 lg:pl-10 lg:pt-20"
         }`}
       >

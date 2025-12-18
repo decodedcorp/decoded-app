@@ -38,18 +38,24 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
       if (!imageRef.current || activeIndex === null) {
         // Reset to default state
         if (imageRef.current) {
-          gsap.to(imageRef.current, {
+          const resetVars = {
             scale: 1,
             x: 0,
             y: 0,
             duration: 0.8,
             ease: "power2.out",
-          });
+          };
+          
+          gsap.to(imageRef.current, resetVars);
+          
           if (boxesRef.current) {
-            gsap.to(boxesRef.current, {
-              scale: 1,
-            });
+            gsap.to(boxesRef.current, resetVars);
           }
+          
+          if (overlayRef.current) {
+            gsap.to(overlayRef.current, resetVars);
+          }
+          
           transformRef.current = { scale: 1, x: 0, y: 0 };
         }
         return;
@@ -93,23 +99,24 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
         const offsetX = (center.x - 0.5) * (scale - 1) * displayedWidth;
         const offsetY = (center.y - 0.5) * (scale - 1) * displayedHeight;
 
-        gsap.to(imageRef.current, {
+        const animVars = {
           scale,
           x: -offsetX,
           y: -offsetY,
           duration: 0.8,
           ease: "power2.out",
-        });
+        };
+
+        gsap.to(imageRef.current, animVars);
 
         // Apply same transform to boxes container
         if (boxesRef.current) {
-          gsap.to(boxesRef.current, {
-            scale,
-            x: -offsetX,
-            y: -offsetY,
-            duration: 0.8,
-            ease: "power2.out",
-          });
+          gsap.to(boxesRef.current, animVars);
+        }
+        
+        // Apply same transform to overlay to keep spotlight aligned
+        if (overlayRef.current) {
+          gsap.to(overlayRef.current, animVars);
         }
 
         transformRef.current = { scale, x: -offsetX, y: -offsetY };
@@ -126,7 +133,7 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
       // No active item: remove spotlight
       overlayRef.current.style.filter = "none";
       overlayRef.current.style.opacity = "0";
-      overlayRef.current.style.transform = "none";
+      // No transform reset here - GSAP handles it
       return;
     }
 
@@ -151,16 +158,11 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
     )`;
 
     overlayRef.current.style.clipPath = clipPath;
-    // Apply same transform as image to keep spotlight aligned with zoomed image
-    const scale = transformRef.current.scale;
-    const x = transformRef.current.x;
-    const y = transformRef.current.y;
-    overlayRef.current.style.transform = `scale(${scale}) translate(${x / scale}px, ${y / scale}px)`;
-    overlayRef.current.style.transformOrigin = "center center";
+    // NO transform set here - GSAP handles it via animation
     // Softer spotlight effect
     overlayRef.current.style.filter = "grayscale(60%) brightness(0.6)";
     overlayRef.current.style.opacity = "1";
-  }, [activeIndex, items]);
+  }, [activeIndex]); // Only activeIndex dependency (items removed)
 
   return (
     <div ref={containerRef} className="relative w-full h-full overflow-hidden">
@@ -179,8 +181,8 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
           {/* Spotlight Overlay (grayscale mask) */}
           <div
             ref={overlayRef}
-            className="absolute inset-0 bg-black/40 transition-opacity duration-500 pointer-events-none"
-            style={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/40 transition-opacity duration-500 pointer-events-none will-change-transform"
+            style={{ opacity: 0, transformOrigin: "center center" }}
           />
 
           {/* Highlight Boxes Container - Applies same transform as image */}
