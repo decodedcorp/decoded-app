@@ -14,7 +14,6 @@ import ThiingsGrid, {
 import { useFilterStore } from "@/lib/stores/filterStore";
 import { useSearchStore } from "@/lib/stores/searchStore";
 import { useTransitionStore } from "@/lib/stores/transitionStore";
-import { PostBadge } from "@/lib/components/PostBadge";
 
 // Register GSAP Flip plugin
 if (typeof window !== "undefined") {
@@ -57,26 +56,6 @@ const CardCell = memo(({ gridIndex, position, isMoving, item }: ItemConfig) => {
     }
   };
 
-  // Status badge colors
-  const getStatusBadgeStyle = (status?: string) => {
-    if (!status) return "";
-    const lower = status.toLowerCase();
-
-    if (lower === "pending") {
-      return "bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-100";
-    }
-
-    if (lower === "extracted") {
-      return "bg-emerald-100 text-emerald-900 dark:bg-emerald-900/40 dark:text-emerald-100";
-    }
-
-    if (lower === "skipped") {
-      return "bg-slate-100 text-slate-900 dark:bg-slate-800/80 dark:text-slate-100";
-    }
-
-    return "bg-zinc-100 text-zinc-900 dark:bg-zinc-800/80 dark:text-zinc-100";
-  };
-
   const cardContent = (
     <article
       data-flip-id={imageId ? `card-${imageId}` : undefined}
@@ -104,35 +83,6 @@ const CardCell = memo(({ gridIndex, position, isMoving, item }: ItemConfig) => {
             <div className="text-xs">No image</div>
           </div>
         )}
-
-        {/* Post badge, Status, and hasItems badges */}
-        <div className="absolute left-2 top-2 flex flex-col gap-1">
-          {item?.postAccount && item?.postSource && (
-            <PostBadge
-              account={item.postAccount}
-              source={item.postSource}
-              onClick={() => {
-                // TODO: Filter by account or navigate to post
-                if (item.postSource === "post") {
-                  // Future: Navigate to /posts/${item.postId}
-                  console.log("Navigate to post:", item.postId);
-                }
-              }}
-            />
-          )}
-          {status && (
-            <span
-              className={`rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${getStatusBadgeStyle(status)}`}
-            >
-              {status}
-            </span>
-          )}
-          {hasItems && (
-            <span className="rounded-full bg-blue-500/80 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-blue-100">
-              Items
-            </span>
-          )}
-        </div>
       </div>
 
       {/* Metadata footer */}

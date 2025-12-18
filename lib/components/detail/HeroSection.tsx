@@ -55,7 +55,7 @@ export function HeroSection({ image, isModal = false }: Props) {
   return (
     <div
       ref={heroRef}
-      className={`relative w-full overflow-hidden ${isModal ? "h-[50vh] min-h-[300px]" : "h-screen"}`}
+      className={`relative w-full overflow-hidden ${isModal ? "h-[45vh] min-h-[250px]" : "h-screen"}`}
     >
       {image.image_url && (
         <img
@@ -72,7 +72,7 @@ export function HeroSection({ image, isModal = false }: Props) {
 
       {/* Hero Title */}
       <div
-        className={`absolute inset-0 flex items-end justify-center px-4 ${isModal ? "pb-10" : "pb-20"}`}
+        className={`absolute inset-0 flex items-end justify-center px-4 ${isModal ? "pb-8" : "pb-20"}`}
       >
         <div ref={titleRef} className="overflow-hidden">
           <h1
