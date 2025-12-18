@@ -10,6 +10,7 @@ import { ImageDetailContent } from "./ImageDetailContent";
 import { useTransitionStore } from "@/lib/stores/transitionStore";
 import { ImageCanvas } from "./ImageCanvas"; // Import ImageCanvas
 import { normalizeItem } from "./types"; // Import normalizeItem
+import { useNormalizedItems } from "@/lib/hooks/useNormalizedItems";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(Flip);
@@ -31,29 +32,8 @@ export function ImageDetailModal({ imageId }: Props) {
   // State for active item in split view (Desktop Modal)
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
-  // Normalize items for ImageCanvas if image is available
-  const items = image?.items || [];
-  const itemsFromPost = image?.postImages && image.postImages.length > 0;
-  
-  // Normalize items logic (copied from ImageDetailContent for the modal-level image)
-  const firstPostImage = image?.postImages?.[0];
-  const itemLocations = firstPostImage?.item_locations;
-  const itemLocationsMap: Record<string, any> = {};
-  
-  if (Array.isArray(itemLocations)) {
-    itemLocations.forEach((loc: any) => {
-      if (loc && loc.item_id) {
-        itemLocationsMap[loc.item_id.toString()] = loc.center || loc;
-      }
-    });
-  } else if (itemLocations && typeof itemLocations === "object") {
-    Object.assign(itemLocationsMap, itemLocations);
-  }
-
-  const normalizedItems = items.map((item) => {
-    const overrideLocation = itemLocationsMap[item.id.toString()];
-    return normalizeItem(item, undefined, overrideLocation);
-  });
+  // Use shared hook for item normalization
+  const normalizedItems = useNormalizedItems(image);
 
   // Debug: Log imageId and data state
   useEffect(() => {
@@ -290,8 +270,11 @@ export function ImageDetailModal({ imageId }: Props) {
   // Mount/Enter Animation
   useEffect(() => {
     // Lock body scroll
-    const originalOverflow = document.body.style.overflow;
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
 
     // Initialize GSAP context
     ctxRef.current = gsap.context(() => {
@@ -330,7 +313,8 @@ export function ImageDetailModal({ imageId }: Props) {
     }, containerRef);
 
     return () => {
-      document.body.style.overflow = originalOverflow;
+      document.body.style.overflow = originalBodyOverflow;
+      document.documentElement.style.overflow = originalHtmlOverflow;
       ctxRef.current?.revert();
     };
   }, []);
@@ -615,6 +599,7 @@ export function ImageDetailModal({ imageId }: Props) {
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
+        data-lenis-prevent // Prevent Lenis from hijacking scroll inside the drawer
       >
         {/* Scrollable Content Area */}
         <div
