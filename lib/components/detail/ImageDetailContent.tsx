@@ -7,6 +7,7 @@ import { HeroSection } from "./HeroSection";
 import { InteractiveShowcase } from "./InteractiveShowcase";
 import { ShopGrid } from "./ShopGrid";
 import Link from "next/link";
+import ReactMarkdown from "react-markdown";
 
 type Props = {
   image: ImageDetail;
@@ -34,6 +35,9 @@ export function ImageDetailContent({
 
   // Check if items were fetched via post (postImages exist)
   const itemsFromPost = image.postImages && image.postImages.length > 0;
+
+  // Extract article from the first post
+  const article = image.postImages?.[0]?.post?.article?.trim();
 
   // #region agent log
   fetch("http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671", {
@@ -122,6 +126,21 @@ export function ImageDetailContent({
                 ))}
           </div>
         </div>
+      )}
+
+      {/* About this Look Section */}
+      {article && (
+        <section className="mx-auto max-w-6xl px-5 py-8 border-b border-border">
+          <h3
+            id="about-this-look"
+            className="text-lg font-serif font-medium mb-4"
+          >
+            About this Look
+          </h3>
+          <article className="prose prose-sm dark:prose-invert w-full max-w-none break-words text-muted-foreground leading-relaxed">
+            <ReactMarkdown>{article}</ReactMarkdown>
+          </article>
+        </section>
       )}
 
       {/* Section 2: Interactive Showcase (only if items with coordinates exist) */}

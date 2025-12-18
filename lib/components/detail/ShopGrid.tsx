@@ -101,8 +101,13 @@ export function ShopGrid({ items }: Props) {
                   {item.product_name || "Item"}
                 </h3>
                 {item.brand && (
-                  <p className="text-sm text-muted-foreground uppercase tracking-wide mb-2">
+                  <p className="text-sm font-bold text-foreground mb-1">
                     {item.brand}
+                  </p>
+                )}
+                {item.description && (
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
+                    {item.description}
                   </p>
                 )}
                 {item.price && (
