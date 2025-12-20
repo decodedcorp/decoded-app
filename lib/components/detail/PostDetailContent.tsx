@@ -5,6 +5,8 @@ import { normalizeItem } from "./types";
 import { ShopGrid } from "./ShopGrid";
 import Link from "next/link";
 import Image from "next/image";
+import { ArticleContent } from "./ArticleContent";
+import { MetadataTags } from "./MetadataTags";
 
 type Props = {
   postDetail: PostDetail;
@@ -15,8 +17,9 @@ type Props = {
  *
  * Sections:
  * 1. Hero Section - Post info with account
- * 2. Images Grid - Grid of images from items
- * 3. Shop Grid - Grid of items
+ * 2. Article & Metadata - Markdown content and tags
+ * 3. Images Grid - Grid of images from items
+ * 4. Shop Grid - Grid of items
  */
 export function PostDetailContent({ postDetail }: Props) {
   const { post, items, images } = postDetail;
@@ -30,7 +33,7 @@ export function PostDetailContent({ postDetail }: Props) {
   return (
     <div className="detail-content">
       {/* Section 1: Hero */}
-      <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted/20">
+      <div className="relative min-h-[50vh] flex items-center justify-center bg-gradient-to-b from-background to-muted/20">
         <div className="mx-auto max-w-4xl px-4 py-16 md:px-8 text-center">
           <div className="mb-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 shadow-sm mb-6">
@@ -39,9 +42,12 @@ export function PostDetailContent({ postDetail }: Props) {
                 @{post.account}
               </span>
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold mb-4">
-              Post Details
-            </h1>
+            {/* Title is usually part of article markdown, but we keep this as backup or for pure aesthetic */}
+            {!post.article && (
+              <h1 className="text-4xl md:text-6xl font-bold mb-4">
+                Post Details
+              </h1>
+            )}
             <p className="text-muted-foreground">
               {items.length} {items.length === 1 ? "item" : "items"} featured
               {images.length > 0 && ` • ${images.length} ${images.length === 1 ? "image" : "images"}`}
@@ -55,7 +61,11 @@ export function PostDetailContent({ postDetail }: Props) {
         </div>
       </div>
 
-      {/* Section 2: Images Grid */}
+      {/* Section 2: Article & Metadata */}
+      {post.metadata && <MetadataTags tags={post.metadata} />}
+      {post.article && <ArticleContent content={post.article} />}
+
+      {/* Section 3: Images Grid */}
       {hasImages && (
         <div className="bg-muted/10 border-b border-border">
           <div className="mx-auto max-w-6xl px-4 py-12 md:px-8">
@@ -87,7 +97,7 @@ export function PostDetailContent({ postDetail }: Props) {
         </div>
       )}
 
-      {/* Section 3: Shop Grid */}
+      {/* Section 4: Shop Grid */}
       {hasItems && <ShopGrid items={normalizedItems} />}
 
       {/* Fallback: Show basic info if no items */}

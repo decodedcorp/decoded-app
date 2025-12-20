@@ -444,6 +444,9 @@ export async function fetchImagesByPostImage(
     queryBuilder = queryBuilder.eq("post.account", filter);
   }
 
+  // Apply timestamp filter (posts after 2024-01-01)
+  queryBuilder = queryBuilder.gte("post.ts", "2024-01-01");
+
   // Apply basic filters on the joined image table
   queryBuilder = queryBuilder
     .not("image.image_url", "is", null)

@@ -1,14 +1,3 @@
-// Supabase Database Types
-// Generated from Supabase project: pdgvuwrxsfwrypadwdlu
-//
-// Type Update Rule:
-// When Supabase schema changes, regenerate types using:
-//   supabase gen types typescript --project-id pdgvuwrxsfwrypadwdlu > lib/supabase/types.ts
-//
-// Update workflow: schema change → types regeneration → build/typecheck
-// Note: MCP can be used for type review/summary, but actual file should be generated via Supabase CLI
-// Last updated: 2025-12-18 (Reverted to use post.item_ids)
-
 export type Json =
   | string
   | number
@@ -118,6 +107,7 @@ export type Database = {
           created_at: string
           id: string
           item_ids: Json | null
+          metadata: string[] | null
           ts: string
         }
         Insert: {
@@ -126,6 +116,7 @@ export type Database = {
           created_at?: string
           id?: string
           item_ids?: Json | null
+          metadata?: string[] | null
           ts: string
         }
         Update: {
@@ -134,6 +125,7 @@ export type Database = {
           created_at?: string
           id?: string
           item_ids?: Json | null
+          metadata?: string[] | null
           ts?: string
         }
         Relationships: []
@@ -321,5 +313,5 @@ export const Constants = {
   },
 } as const
 
-// Main frontend feed source
+// Type aliases for convenience
 export type ImageRow = Database["public"]["Tables"]["image"]["Row"]

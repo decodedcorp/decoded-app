@@ -11,6 +11,7 @@ import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import { useMemo } from "react";
 import { createElement, Fragment } from "react";
+import { MetadataTags } from "./MetadataTags";
 
 type Props = {
   image: ImageDetail;
@@ -48,7 +49,9 @@ export function ImageDetailContent({
   const itemsFromPost = image.postImages && image.postImages.length > 0;
 
   // Extract article from the first post
-  const article = image.postImages?.[0]?.post?.article?.trim();
+  const firstPost = image.postImages?.[0]?.post || image.posts?.[0];
+  const article = firstPost?.article?.trim();
+  const metadata = firstPost?.metadata;
 
   // Preprocess article to handle **{}** pattern for bold formatting
   // Replace **{}** with a placeholder that markdown can parse, then restore in components
@@ -147,6 +150,13 @@ export function ImageDetailContent({
       {article && (
         <section className="mx-auto max-w-3xl px-6 py-20">
           <div className="flex flex-col items-center text-center">
+            {/* Metadata Section - Placed above article as requested */}
+            {metadata && (
+              <div className="mb-10 w-full">
+                <MetadataTags tags={metadata} />
+              </div>
+            )}
+
             <div className="w-12 h-0.5 bg-primary mb-8" />
             <h3
               id="about-this-look"
@@ -205,7 +215,7 @@ export function ImageDetailContent({
               </p>
             </div>
           )}
-          <ShopGrid items={normalizedItems} />
+          <ShopGrid items={normalizedItems} isModal={isModal} />
         </div>
       )}
 
