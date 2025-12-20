@@ -52,8 +52,8 @@ export async function fetchUnifiedImages(
   
   // Sort by post_image.created_at (primary), image.created_at (fallback)
   allItems.sort((a, b) => {
-    const timeA = new Date(a.postImageCreatedAt).getTime();
-    const timeB = new Date(b.postImageCreatedAt).getTime();
+    const timeA = new Date(a.postImageCreatedAt || a.created_at).getTime();
+    const timeB = new Date(b.postImageCreatedAt || b.created_at).getTime();
     if (timeB !== timeA) {
       return timeB - timeA; // Descending
     }
@@ -65,14 +65,24 @@ export async function fetchUnifiedImages(
   const items = allItems.slice(0, finalLimit);
   const hasMore = allItems.length > finalLimit || postBasedResult.hasMore || orphanResult.hasMore;
   
-  // Generate cursor from last item
+  // Generate cursor: prefer postBasedResult cursor (for proper pagination)
+  // Only use sorted result cursor if postBasedResult has no more pages
   let nextCursor = null;
-  if (hasMore && items.length > 0) {
-    const lastItem = items[items.length - 1];
-    nextCursor = btoa(JSON.stringify({
-      createdAt: lastItem.postImageCreatedAt,
-      id: lastItem.id,
-    }));
+  if (hasMore) {
+    // Use postBasedResult cursor if available (maintains DB pagination consistency)
+    if (postBasedResult.hasMore && postBasedResult.nextCursor) {
+      nextCursor = postBasedResult.nextCursor;
+    } else if (orphanResult.hasMore && orphanResult.nextCursor) {
+      // Fallback to orphan cursor if post-based is exhausted
+      nextCursor = orphanResult.nextCursor;
+    } else if (items.length > 0) {
+      // Last resort: generate from sorted result (shouldn't happen in normal flow)
+      const lastItem = items[items.length - 1];
+      nextCursor = btoa(JSON.stringify({
+        createdAt: lastItem.postImageCreatedAt || lastItem.created_at,
+        id: lastItem.id,
+      }));
+    }
   }
   
   // Log stats in development
