@@ -1,22 +1,33 @@
 # Color System & Design Guidelines
 
-**Last Updated:** December 4, 2025
+**Last Updated:** December 24, 2025
 
 This document outlines the color system used in the project, including the semantic theme colors and the categorical color palette used for tags and filters.
 
-## 1. Semantic Theme Colors
+## 1. Semantic Theme Colors (OKLCH)
 
-Our application uses a semantic color system defined in `app/globals.css` and mapped in `tailwind.config.ts`. These colors automatically adapt to Light and Dark modes.
+Our application uses a modern **OKLCH** color system defined in `app/globals.css` and mapped in `tailwind.config.ts`. These colors automatically adapt to Light and Dark modes. We use `color-mix` to support opacity modifiers with CSS variables.
 
 | Token | Usage | Description |
 |-------|-------|-------------|
-| **Background** | Page backgrounds | Clean white (Light) or dark slate (Dark). |
+| **Background** | Page backgrounds | Clean white (Light) or dark gray (Dark). |
 | **Foreground** | Default text | High contrast text color. |
 | **Primary** | Main actions (Buttons) | Strong brand color. Inverted in dark mode for visibility. |
 | **Secondary** | Secondary actions, inactive states | Subtle gray/slate. Used for "All" filters or neutral tags. |
 | **Accent** | Highlights, hover states | Used for interactive elements' hover states. |
 | **Muted** | Subtitles, disabled text | Low priority information. |
 | **Border** | Dividers, inputs | Subtle borders. |
+| **Destructive** | Error states, delete actions | Red/Orange warning color. |
+| **Sidebar** | Sidebar specific | Specific tokens for sidebar background, foreground, accent, etc. |
+| **Chart** | Data visualization | Series of colors (`chart-1` to `chart-5`) for graphs. |
+
+### Sidebar Specific Tokens
+The sidebar has its own dedicated tokens to allow for independent theming:
+- `sidebar`: Background
+- `sidebar-foreground`: Text
+- `sidebar-primary`: Primary element in sidebar
+- `sidebar-accent`: Hover/active state in sidebar
+- `sidebar-border`: Sidebar border
 
 ## 2. Categorical Color Palette (Pastel/Soft)
 
@@ -58,4 +69,3 @@ We use a soft, pastel-based color palette for categories, tags, and filters to d
 ### Accessibility
 - Always ensure sufficient contrast ratio between text and background.
 - In Dark Mode, avoid fully saturated backgrounds for large areas; use opacity modifiers (e.g., `/30`, `/50`) to blend with the dark background.
-

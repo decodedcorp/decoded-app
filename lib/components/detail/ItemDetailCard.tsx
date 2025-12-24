@@ -72,48 +72,75 @@ export function ItemDetailCard({
     <div
       ref={cardRef}
       data-item-index={index}
-      className="group relative mb-16 md:mb-24 flex min-h-auto md:min-h-[60vh] flex-col justify-center py-8 md:py-16 lg:mb-32"
+      className="group relative mb-12 md:mb-20 flex min-h-auto md:min-h-[50vh] flex-col justify-center py-6 md:py-12 lg:mb-24"
       onMouseEnter={onActivate}
       onMouseLeave={onDeactivate}
     >
       {/* Decorative Background Index */}
       <div
-        className="absolute -left-6 -top-4 z-0 select-none font-serif text-[6rem] md:text-[8rem] lg:text-[12rem] font-bold leading-none text-muted/20 md:-left-12 lg:-left-20"
+        className="absolute -left-4 -top-2 z-0 select-none font-serif text-[4rem] md:text-[6rem] lg:text-[9rem] font-bold leading-none text-muted/20 md:-left-10 lg:-left-16"
         aria-hidden="true"
       >
         {formattedIndex}
       </div>
 
-      <div className="relative z-10 flex flex-col lg:flex-row gap-6 lg:gap-12">
+      <div className="relative z-10 flex flex-col gap-6 md:gap-8">
+        {/* Item Image - Full Width on Mobile, Compact on Desktop */}
+        <div className="w-full relative aspect-[4/3] md:aspect-video lg:aspect-[2/1] bg-muted/5 rounded-xl overflow-hidden border border-border/10 shadow-sm">
+           {/* Ambient Background (Blurred) */}
+           <div className="absolute inset-0 z-0">
+              <Image
+                src={item.imageUrl || ""}
+                alt=""
+                fill
+                className="object-cover blur-3xl opacity-20 scale-110"
+                aria-hidden="true"
+              />
+            </div>
+            
+            {/* Main Image (Contained) */}
+            {item.imageUrl && (
+              <Image
+                src={item.imageUrl}
+                alt={item.product_name || `Item ${formattedIndex}`}
+                fill
+                className="object-contain relative z-10 p-4 md:p-6"
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, 800px"
+              />
+            )}
+        </div>
+
         {/* Text Content */}
-        <div className="flex-1 order-2 lg:order-1">
-          {/* Brand Label */}
-          {displayBrand && (
-            <p className="mb-2 md:mb-4 font-sans text-xs md:text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
-              {displayBrand}
-            </p>
-          )}
+        <div className="flex flex-col">
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+            <div className="flex-1">
+              {/* Brand Label */}
+              {displayBrand && (
+                <p className="mb-2 font-sans text-[10px] md:text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                  {displayBrand}
+                </p>
+              )}
 
-          {/* Product Name */}
-          <h2 className="mb-4 md:mb-6 font-serif text-2xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tight text-foreground">
-            {displayName || `Item ${formattedIndex}`}
-          </h2>
+              {/* Product Name */}
+              <h2 className="font-serif text-xl md:text-2xl lg:text-3xl font-bold leading-tight tracking-tight text-foreground">
+                {displayName || `Item ${formattedIndex}`}
+              </h2>
+            </div>
 
-          {/* Price & Details Row */}
-          <div className="flex items-center gap-4 md:gap-6">
+            {/* Price */}
             {displayPrice && (
-              <p className="font-sans text-xl md:text-2xl font-light text-foreground/90 lg:text-3xl">
+              <p className="font-sans text-lg md:text-xl font-light text-foreground/90 whitespace-nowrap pt-1">
                 {displayPrice.split('|')[0].trim()}
               </p>
             )}
-
-            <div className="h-px flex-1 bg-border" />
           </div>
+
+          <div className="h-px w-full bg-border/50 my-4 md:my-6" />
 
           {/* Description - Refined Typography */}
           {displayDescription && (
-            <div className="mt-6 md:mt-8 border-l-2 border-primary/20 pl-4 md:pl-6">
-              <p className="font-serif text-base md:text-lg leading-relaxed text-muted-foreground whitespace-pre-wrap font-light">
+            <div className="prose prose-sm dark:prose-invert max-w-none">
+              <p className="font-serif text-sm md:text-base leading-relaxed text-muted-foreground whitespace-pre-wrap font-light">
                 {displayDescription}
               </p>
             </div>
@@ -121,62 +148,96 @@ export function ItemDetailCard({
 
           {/* Details / Metadata - Collapsible Technical Specs */}
           {parsedMetadata.length > 0 && (
-            <div className="mt-8 md:mt-10">
-              <button
-                onClick={() => setShowSpecs(!showSpecs)}
-                className="flex items-center gap-2 group/specs focus:outline-none"
-                aria-expanded={showSpecs}
-              >
-                <span className="font-sans text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground/80 group-hover/specs:text-foreground transition-colors">
-                  Technical Specs
-                </span>
-                {showSpecs ? (
-                  <ChevronUp className="w-3 h-3 text-muted-foreground group-hover/specs:text-foreground" />
-                ) : (
-                  <ChevronDown className="w-3 h-3 text-muted-foreground group-hover/specs:text-foreground" />
-                )}
-              </button>
-
-              <AnimatePresence>
-                {showSpecs && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.2, ease: "easeInOut" }}
-                    className="overflow-hidden"
+            <div className="mt-6 md:mt-8 pt-6 border-t border-border/30">
+              <h5 className="mb-4 font-sans text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground/80">
+                Technical Specs
+              </h5>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
+                {/* Always show first 2 items */}
+                {parsedMetadata.slice(0, 2).map((meta, i) => (
+                  <div
+                    key={i}
+                    className="flex flex-col border-b border-border/40 pb-2 last:border-0 md:last:border-b"
                   >
-                    <div className="pt-6 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
-                      {parsedMetadata.map((meta, i) => (
-                        <div
-                          key={i}
-                          className="flex flex-col border-b border-border/40 pb-2 last:border-0"
-                        >
-                          {meta.key ? (
-                            <>
-                              <span className="font-sans text-[9px] md:text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">
-                                {meta.key}
-                              </span>
-                              <span className="font-serif text-sm md:text-base text-foreground">
-                                {meta.value}
-                              </span>
-                            </>
-                          ) : (
-                            <span className="font-serif text-sm md:text-base text-foreground">
-                              {meta.value}
-                            </span>
-                          )}
+                    {meta.key ? (
+                      <>
+                        <span className="font-sans text-[9px] md:text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">
+                          {meta.key}
+                        </span>
+                        <span className="font-serif text-sm md:text-base text-foreground">
+                          {meta.value}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="font-serif text-sm md:text-base text-foreground">
+                        {meta.value}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Collapsible remaining items */}
+              {parsedMetadata.length > 2 && (
+                <>
+                  <AnimatePresence>
+                    {showSpecs && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                      >
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 pt-3">
+                          {parsedMetadata.slice(2).map((meta, i) => (
+                            <div
+                              key={i + 2}
+                              className="flex flex-col border-b border-border/40 pb-2 last:border-0 md:last:border-b"
+                            >
+                              {meta.key ? (
+                                <>
+                                  <span className="font-sans text-[9px] md:text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">
+                                    {meta.key}
+                                  </span>
+                                  <span className="font-serif text-sm md:text-base text-foreground">
+                                    {meta.value}
+                                  </span>
+                                </>
+                              ) : (
+                                <span className="font-serif text-sm md:text-base text-foreground">
+                                  {meta.value}
+                                </span>
+                              )}
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <button
+                    onClick={() => setShowSpecs(!showSpecs)}
+                    className="mt-4 flex items-center gap-2 group/specs focus:outline-none"
+                    aria-expanded={showSpecs}
+                  >
+                    <span className="font-sans text-[9px] font-bold uppercase tracking-[0.1em] text-muted-foreground/70 group-hover/specs:text-foreground transition-colors">
+                      {showSpecs ? "Show Less" : `+ ${parsedMetadata.length - 2} More Specs`}
+                    </span>
+                    {showSpecs ? (
+                      <ChevronUp className="w-3 h-3 text-muted-foreground group-hover/specs:text-foreground" />
+                    ) : (
+                      <ChevronDown className="w-3 h-3 text-muted-foreground group-hover/specs:text-foreground" />
+                    )}
+                  </button>
+                </>
+              )}
             </div>
           )}
 
           {/* Source Data Footer - Grouped Citations & ID */}
-          <div className="mt-12 md:mt-16 pt-6 border-t border-border/30">
+          <div className="mt-8 md:mt-12 pt-6 border-t border-border/30">
             <h5 className="mb-4 font-sans text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/40">
               Source Data
             </h5>
@@ -249,19 +310,6 @@ export function ItemDetailCard({
             </div>
           </div>
         </div>
-
-        {/* Item Image */}
-        {item.imageUrl && (
-          <div className="relative w-full aspect-square lg:w-64 lg:shrink-0 bg-muted rounded-lg overflow-hidden order-1 lg:order-2 mb-6 lg:mb-0">
-            <Image
-              src={item.imageUrl}
-              alt={item.product_name || `Item ${formattedIndex}`}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 256px"
-            />
-          </div>
-        )}
       </div>
     </div>
   );

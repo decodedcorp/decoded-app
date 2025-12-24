@@ -67,7 +67,7 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
       }
 
       const center = activeItem.normalizedCenter;
-      const scale = 1.5; // Zoom level
+      const scale = 1.2; // Zoom level
 
       // Calculate translation to center the item
       // When scaled, we need to offset by (center - 0.5) * (scale - 1) * containerSize
