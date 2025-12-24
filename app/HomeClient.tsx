@@ -78,10 +78,7 @@ const CardCell = memo(({ gridIndex, position, isMoving, item }: ItemConfig) => {
             onLoad={() => setIsLoaded(true)}
           />
         ) : (
-          <div className="flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground">
-            <div className="mb-1 text-2xl">📷</div>
-            <div className="text-xs">No image</div>
-          </div>
+          <div className="h-full w-full bg-muted" />
         )}
       </div>
 
@@ -267,10 +264,12 @@ export function HomeClient({ initialImages }: Props) {
   }
 
   // Success state: show grid with actual images
+  // Note: We don't use key prop here because React Query already handles
+  // filter/search changes via query key. Remounting ThiingsGrid would reset
+  // scroll position and break infinite scroll continuity.
   return (
     <div className="absolute inset-0 z-0 pt-14 md:pt-16">
       <ThiingsGrid
-        key={`${activeFilter}-${debouncedQuery}`}
         gridSize={{ width: 400, height: 500 }}
         renderItem={(config) => <CardCell {...config} />}
         initialPosition={{ x: 0, y: 0 }}

@@ -47,11 +47,13 @@ export type Database = {
           bboxes: Json | null
           brand: string | null
           center: Json | null
+          citations: string[] | null
           created_at: string | null
           cropped_image_path: string | null
           description: string | null
           id: number
           image_id: string
+          metadata: string[] | null
           price: string | null
           product_name: string | null
           sam_prompt: string | null
@@ -63,11 +65,13 @@ export type Database = {
           bboxes?: Json | null
           brand?: string | null
           center?: Json | null
+          citations?: string[] | null
           created_at?: string | null
           cropped_image_path?: string | null
           description?: string | null
           id?: number
           image_id: string
+          metadata?: string[] | null
           price?: string | null
           product_name?: string | null
           sam_prompt?: string | null
@@ -79,11 +83,13 @@ export type Database = {
           bboxes?: Json | null
           brand?: string | null
           center?: Json | null
+          citations?: string[] | null
           created_at?: string | null
           cropped_image_path?: string | null
           description?: string | null
           id?: number
           image_id?: string
+          metadata?: string[] | null
           price?: string | null
           product_name?: string | null
           sam_prompt?: string | null
