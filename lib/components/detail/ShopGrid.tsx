@@ -203,13 +203,13 @@ export function ShopGrid({ items, isModal = false }: Props) {
                     }`}>
                       {item.product_name || "Untitled Item"}
                     </h3>
-                    {item.price && (
-                      <p className={`font-medium text-primary mt-auto font-mono ${
-                        isModal ? "text-xs pt-0.5 md:pt-1" : "text-sm pt-1"
-                      }`}>
-                        {item.price}
-                      </p>
-                    )}
+                  {item.price && (
+                    <p className={`font-medium text-primary mt-auto font-mono ${
+                      isModal ? "text-xs pt-0.5 md:pt-1" : "text-sm pt-1"
+                    }`}>
+                      {item.price.split('|')[0].trim()}
+                    </p>
+                  )}
 
                     <button className={`w-full border border-border/50 bg-background/50 hover:bg-foreground hover:text-background transition-all duration-300 text-[9px] md:text-[10px] uppercase tracking-widest rounded-sm ${
                       isModal ? "mt-2 md:mt-3 py-1.5 md:py-2" : "mt-3 md:mt-4 py-2"

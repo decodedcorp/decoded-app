@@ -1,5 +1,15 @@
 import type { Config } from 'tailwindcss'
 
+// Helper function to support opacity with CSS variables using color-mix
+function withOpacity(variableName: string) {
+  return ({ opacityValue }: { opacityValue: string | undefined }) => {
+    if (opacityValue !== undefined) {
+      return `color-mix(in srgb, var(${variableName}) calc(${opacityValue} * 100%), transparent)`
+    }
+    return `var(${variableName})`
+  }
+}
+
 const config: Config = {
   darkMode: ["class"],
   content: [
@@ -12,38 +22,55 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        border: withOpacity("--border"),
+        input: withOpacity("--input"),
+        ring: withOpacity("--ring"),
+        background: withOpacity("--background"),
+        foreground: withOpacity("--foreground"),
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: withOpacity("--primary"),
+          foreground: withOpacity("--primary-foreground"),
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: withOpacity("--secondary"),
+          foreground: withOpacity("--secondary-foreground"),
         },
         destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+          DEFAULT: withOpacity("--destructive"),
+          foreground: withOpacity("--destructive-foreground"),
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: withOpacity("--muted"),
+          foreground: withOpacity("--muted-foreground"),
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: withOpacity("--accent"),
+          foreground: withOpacity("--accent-foreground"),
         },
         popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
+          DEFAULT: withOpacity("--popover"),
+          foreground: withOpacity("--popover-foreground"),
         },
         card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          DEFAULT: withOpacity("--card"),
+          foreground: withOpacity("--card-foreground"),
+        },
+        sidebar: {
+            DEFAULT: withOpacity("--sidebar"),
+            foreground: withOpacity("--sidebar-foreground"),
+            primary: withOpacity("--sidebar-primary"),
+            "primary-foreground": withOpacity("--sidebar-primary-foreground"),
+            accent: withOpacity("--sidebar-accent"),
+            "accent-foreground": withOpacity("--sidebar-accent-foreground"),
+            border: withOpacity("--sidebar-border"),
+            ring: withOpacity("--sidebar-ring"),
+        },
+        chart: {
+            1: withOpacity("--chart-1"),
+            2: withOpacity("--chart-2"),
+            3: withOpacity("--chart-3"),
+            4: withOpacity("--chart-4"),
+            5: withOpacity("--chart-5"),
         },
         "scanner-green": "#00FF00",
         "neon-orange": "#FF4500",
@@ -52,6 +79,16 @@ const config: Config = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      boxShadow: {
+        "2xs": "var(--shadow-2xs)",
+        xs: "var(--shadow-xs)",
+        sm: "var(--shadow-sm)",
+        DEFAULT: "var(--shadow)",
+        md: "var(--shadow-md)",
+        lg: "var(--shadow-lg)",
+        xl: "var(--shadow-xl)",
+        "2xl": "var(--shadow-2xl)",
       },
       fontFamily: {
         serif: ["Playfair Display", "serif"],
