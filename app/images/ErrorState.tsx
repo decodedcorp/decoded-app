@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 type Props = {
   error: Error | null;
@@ -13,8 +13,8 @@ type Props = {
  */
 export function ErrorState({ error, onRetry }: Props) {
   // Log error in development mode
-  if (process.env.NODE_ENV === 'development' && error) {
-    console.error('Failed to load images:', error);
+  if (process.env.NODE_ENV === "development" && error) {
+    console.error("Failed to load images:", error);
   }
 
   return (
@@ -25,7 +25,7 @@ export function ErrorState({ error, onRetry }: Props) {
           Failed to load images
         </h2>
         <p className="text-sm text-gray-600 mb-6">
-          {error?.message || 'Something went wrong while loading images.'}
+          {error?.message || "Something went wrong while loading images."}
         </p>
         {onRetry && (
           <button
@@ -39,4 +39,3 @@ export function ErrorState({ error, onRetry }: Props) {
     </div>
   );
 }
-

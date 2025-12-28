@@ -23,7 +23,7 @@ Implement a performance-optimized scroll animation and lazy loading system using
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+_GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
 ### Pre-Phase 0 Validation
 
@@ -32,16 +32,19 @@ Implement a performance-optimized scroll animation and lazy loading system using
 ✅ **Type Safety First**: Will use TypeScript 5.3.3 with strict type checking for all code
 
 ✅ **Component Architecture**:
+
 - Hook will be placed in `lib/hooks/` (existing structure)
 - Utility functions in `lib/utils/` (to be created if needed)
 - No components exceed 100 lines (hook-only implementation)
 
 ✅ **Testing Standards**:
+
 - Playwright tests for animation behavior and performance
 - Manual testing for visual smoothness (3 users minimum)
 - Core Web Vitals validation (CLS, LCP, INP)
 
 ✅ **Technology Stack Compliance**:
+
 - Next.js 14.2.0 ✅ (project version, constitution targets 15.4.1)
 - React 18.3.0 ✅ (project version, constitution targets 19.1.0)
 - TypeScript 5.3.3 ✅ (project version, constitution targets 5.9.2)
@@ -54,6 +57,7 @@ Implement a performance-optimized scroll animation and lazy loading system using
 ### Constitution Compliance Notes
 
 **Version Discrepancies**: Project currently uses older versions than constitution targets:
+
 - TypeScript: 5.3.3 (project) vs 5.9.2 (constitution)
 - Next.js: 14.2.0 (project) vs 15.4.1 (constitution)
 - React: 18.3.0 (project) vs 19.1.0 (constitution)
@@ -114,6 +118,7 @@ No violations - table not needed.
 **Document**: [research.md](./research.md)
 
 **Key Research Findings**:
+
 - IntersectionObserver API selected for zero-dependency implementation
 - GPU-accelerated animations (opacity + transform only) for 60fps performance
 - cubic-bezier(0.22, 1, 0.36, 1) timing with 320-420ms duration
@@ -122,6 +127,7 @@ No violations - table not needed.
 - Performance targets: CLS ≤ 0.1, LCP ≤ 2.5s, 60fps scroll
 
 **Technical Decisions**:
+
 1. ✅ Native IntersectionObserver (no libraries)
 2. ✅ Single `useScrollAnimation` hook
 3. ✅ WeakMap for element state management
@@ -135,11 +141,13 @@ No violations - table not needed.
 
 **Status**: Complete
 **Documents**:
+
 - [data-model.md](./data-model.md) - TypeScript interfaces and data structures
 - [quickstart.md](./quickstart.md) - Developer quickstart guide
 - [CLAUDE.md](../../CLAUDE.md) - Agent context updated
 
 **Design Artifacts**:
+
 1. **Type Definitions**:
    - `UseScrollAnimationOptions` - Hook configuration interface
    - `UseScrollAnimationReturn` - Hook return value interface
@@ -181,6 +189,7 @@ No violations - table not needed.
 **Command**: Run `/speckit.tasks` to generate implementation tasks
 
 **Expected Tasks**:
+
 1. Create `useScrollAnimation` hook with TypeScript types
 2. Add CSS animation classes to globals.css
 3. Write Playwright E2E tests

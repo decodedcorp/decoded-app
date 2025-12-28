@@ -1,5 +1,10 @@
 import type { CSSProperties } from "react";
-import type { BoxPercent, CalloutLayout, CalloutSide, AnchorPoint } from "./types";
+import type {
+  BoxPercent,
+  CalloutLayout,
+  CalloutSide,
+  AnchorPoint,
+} from "./types";
 
 /**
  * Auto-determine callout side - only left or right
@@ -147,4 +152,3 @@ export function getCardAnchor(
     y: cardRect.top - sceneRect.top,
   };
 }
-

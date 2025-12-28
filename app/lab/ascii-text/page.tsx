@@ -85,7 +85,9 @@ export default function ASCIITextPage() {
 
             {/* Text Color */}
             <div>
-              <label className="block text-sm font-medium mb-2">Text Color</label>
+              <label className="block text-sm font-medium mb-2">
+                Text Color
+              </label>
               <input
                 type="color"
                 value={textColor}
@@ -104,7 +106,10 @@ export default function ASCIITextPage() {
               onChange={(e) => setEnableWaves(e.target.checked)}
               className="w-4 h-4 rounded border-zinc-700 bg-zinc-900 text-[#d9fc69] focus:ring-[#d9fc69]"
             />
-            <label htmlFor="enableWaves" className="text-sm font-medium cursor-pointer">
+            <label
+              htmlFor="enableWaves"
+              className="text-sm font-medium cursor-pointer"
+            >
               Enable Waves Animation
             </label>
           </div>
@@ -113,4 +118,3 @@ export default function ASCIITextPage() {
     </div>
   );
 }
-

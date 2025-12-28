@@ -57,9 +57,9 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [x] T007 [P] [US1] Create Playwright E2E test for basic card animation in __tests__/e2e/scroll-animation.spec.ts - verify .is-visible class added on scroll
-- [x] T008 [P] [US1] Create Playwright E2E test for staggered animation timing in __tests__/e2e/scroll-animation.spec.ts - verify cascading effect with multiple cards
-- [x] T009 [P] [US1] Create Playwright E2E test for exit animation in __tests__/e2e/scroll-animation.spec.ts - verify .is-hidden class added when scrolling away
+- [x] T007 [P] [US1] Create Playwright E2E test for basic card animation in **tests**/e2e/scroll-animation.spec.ts - verify .is-visible class added on scroll
+- [x] T008 [P] [US1] Create Playwright E2E test for staggered animation timing in **tests**/e2e/scroll-animation.spec.ts - verify cascading effect with multiple cards
+- [x] T009 [P] [US1] Create Playwright E2E test for exit animation in **tests**/e2e/scroll-animation.spec.ts - verify .is-hidden class added when scrolling away
 
 ### Implementation for User Story 1
 
@@ -84,9 +84,9 @@
 
 ### Tests for User Story 2
 
-- [x] T018 [P] [US2] Create Playwright E2E test for lazy image loading in __tests__/e2e/scroll-animation.spec.ts - verify images load only when scrolled near
-- [x] T019 [P] [US2] Create Playwright E2E test for preventing image reload in __tests__/e2e/scroll-animation.spec.ts - verify data-loaded="true" prevents redundant loads
-- [x] T020 [P] [US2] Create Playwright E2E test for above-the-fold images in __tests__/e2e/scroll-animation.spec.ts - verify hero images load immediately
+- [x] T018 [P] [US2] Create Playwright E2E test for lazy image loading in **tests**/e2e/scroll-animation.spec.ts - verify images load only when scrolled near
+- [x] T019 [P] [US2] Create Playwright E2E test for preventing image reload in **tests**/e2e/scroll-animation.spec.ts - verify data-loaded="true" prevents redundant loads
+- [x] T020 [P] [US2] Create Playwright E2E test for above-the-fold images in **tests**/e2e/scroll-animation.spec.ts - verify hero images load immediately
 
 ### Implementation for User Story 2
 
@@ -110,9 +110,9 @@
 
 ### Tests for User Story 3
 
-- [x] T028 [P] [US3] Create Playwright test for 60fps performance in __tests__/e2e/scroll-animation.spec.ts using performance.now() to measure frame times
-- [x] T029 [P] [US3] Create Playwright test for Core Web Vitals in __tests__/e2e/scroll-animation.spec.ts - measure CLS, LCP, INP using web-vitals library
-- [x] T030 [P] [US3] Create Playwright test for mobile performance in __tests__/e2e/scroll-animation.spec.ts using device emulation (iPhone 12, Galaxy S21)
+- [x] T028 [P] [US3] Create Playwright test for 60fps performance in **tests**/e2e/scroll-animation.spec.ts using performance.now() to measure frame times
+- [x] T029 [P] [US3] Create Playwright test for Core Web Vitals in **tests**/e2e/scroll-animation.spec.ts - measure CLS, LCP, INP using web-vitals library
+- [x] T030 [P] [US3] Create Playwright test for mobile performance in **tests**/e2e/scroll-animation.spec.ts using device emulation (iPhone 12, Galaxy S21)
 
 ### Implementation for User Story 3
 
@@ -250,21 +250,25 @@ With multiple developers:
 ## Task Breakdown by User Story
 
 ### User Story 1 (P1): Smooth Content Appearance - 11 tasks
+
 - Tests: 3 tasks (T007-T009)
 - Implementation: 8 tasks (T010-T017)
 - **Can deliver as MVP**: YES ✅
 
 ### User Story 2 (P2): Progressive Image Loading - 10 tasks
+
 - Tests: 3 tasks (T018-T020)
 - Implementation: 7 tasks (T021-T027)
 - **Can deliver independently**: YES ✅
 
 ### User Story 3 (P3): Performance-Optimized Scrolling - 11 tasks
+
 - Tests: 3 tasks (T028-T030)
 - Implementation: 8 tasks (T031-T038)
 - **Can deliver independently**: NO ⚠️ (requires US1 & US2 for testing)
 
 ### Total Tasks: 50 tasks
+
 - Setup: 3 tasks
 - Foundational: 3 tasks
 - User Stories: 32 tasks

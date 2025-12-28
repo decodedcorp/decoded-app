@@ -148,8 +148,8 @@ export function InteractiveShowcase({
         className={`w-full px-5 py-10 bg-background relative z-20 ${
           isModal
             ? renderImage
-              ? ""
-              : "w-full pt-0" // Remove top padding if image is hidden (modal split view)
+              ? "overflow-visible"
+              : "w-full pt-0"
             : "lg:w-1/2 lg:pl-10 lg:pt-20"
         }`}
       >
@@ -158,6 +158,7 @@ export function InteractiveShowcase({
             key={item.id}
             item={item}
             index={index}
+            isModal={isModal}
             onActivate={() => handleActiveIndexChange(index)}
             onDeactivate={() => handleActiveIndexChange(null)}
           />

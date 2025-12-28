@@ -67,12 +67,12 @@ export type FetchFilteredImagesParams = {
 };
 
 // Helper to encode composite cursor
-function encodeCursor(createdAt: string, id: string): string {
+export function encodeCursor(createdAt: string, id: string): string {
   return btoa(JSON.stringify({ createdAt, id }));
 }
 
 // Helper to decode composite cursor
-function decodeCursor(
+export function decodeCursor(
   cursor: string
 ): { createdAt: string; id: string } | null {
   try {
@@ -95,6 +95,7 @@ export async function fetchLatestImages(limit = 20): Promise<ImageRow[]> {
     .select("*")
     .not("image_url", "is", null) // Only fetch records with images
     .eq("with_items", false) // Only fetch original images
+    .gte("created_at", "2024-01-01") // Only include data from 2024-01-01 onwards
     .order("created_at", { ascending: false })
     .limit(limit);
 
@@ -210,11 +211,9 @@ export async function fetchImageById(id: string): Promise<ImageDetail | null> {
   // Fallback: If post-based fetch didn't work, use traditional item.image_id approach
   if (!itemsFetchedViaPost) {
     // Ensure items is always an array (Supabase may return different types)
-    items = (Array.isArray(data.items)
-      ? data.items
-      : data.items
-        ? [data.items]
-        : []) as ItemRow[];
+    items = (
+      Array.isArray(data.items) ? data.items : data.items ? [data.items] : []
+    ) as ItemRow[];
 
     // Fallback: If join query didn't return items, fetch them separately
     // This can happen if the relationship isn't properly configured or RLS blocks the join
@@ -278,6 +277,7 @@ export async function fetchFilteredImages(
   // Strategy: Use different query base depending on filter to optimize DB performance
   if (hasAccountFilter) {
     // Strategy A: Filter by Account -> Query 'post_image' table to use index
+    // Note: We use post(*) to get all post fields, then extract ts as string in JavaScript
     let queryBuilder = supabaseBrowserClient
       .from("post_image")
       .select(
@@ -303,20 +303,12 @@ export async function fetchFilteredImages(
       );
     }
 
-    // Cursor pagination (using post_image.created_at)
-    if (cursor) {
-      const decoded = decodeCursor(cursor);
-      if (decoded) {
-        const { createdAt } = decoded;
-        // Using only created_at for cursor in join query for simplicity
-        // ideally should be (created_at, id) tuple
-        queryBuilder = queryBuilder.lt("created_at", createdAt);
-      }
-    }
-
+    // Note: We don't use cursor pagination here because we need to filter by post.ts
+    // Instead, we fetch a larger batch and filter/sort by post.ts in memory
     queryBuilder = queryBuilder
       .order("created_at", { ascending: false })
-      .limit(limit + 1);
+      .order("image_id", { ascending: false })
+      .limit(limit * 5); // Fetch more to account for post.ts filtering and pagination
 
     const result = await queryBuilder;
     data = result.data;
@@ -334,7 +326,8 @@ export async function fetchFilteredImages(
           : selectColumns
       )
       .not("image_url", "is", null)
-      .eq("with_items", false);
+      .eq("with_items", false)
+      .gte("created_at", "2024-01-01"); // Only include data from 2024-01-01 onwards
 
     if (hasSearchQuery) {
       const searchTerm = search.trim();
@@ -371,37 +364,123 @@ export async function fetchFilteredImages(
   // Extract and Normalize images
   const uniqueImages = new Map<string, ImageRow>();
   if (data) {
-    for (const row of data) {
-      // Handle different structures from Strategy A (post_image) and Strategy B (image)
-      let imageRow: any;
-      let sortTime: string;
-
-      if (hasAccountFilter) {
-        // Strategy A: row is post_image, contains image object
+    if (hasAccountFilter) {
+      // Strategy A: Fetch post.ts values in batch for filtering
+      const postIds = new Set<string>();
+      const rowData = new Map<string, any>();
+      
+      for (const row of data) {
         if (!row.image) continue;
-        imageRow = Array.isArray(row.image) ? row.image[0] : row.image;
-        sortTime = row.created_at; // Use post_image creation time for cursor
-      } else {
-        // Strategy B: row is image
-        imageRow = row;
-        sortTime = row.created_at;
+        const postRow = Array.isArray(row.post) ? row.post[0] : row.post;
+        if (postRow?.id) {
+          postIds.add(postRow.id);
+          rowData.set(postRow.id, row);
+        }
       }
 
-      if (imageRow && imageRow.id && !uniqueImages.has(imageRow.id)) {
-        const image: ImageRow = {
-          id: imageRow.id,
-          image_hash: imageRow.image_hash,
-          image_url: imageRow.image_url,
-          with_items: imageRow.with_items,
-          status: imageRow.status,
-          created_at: sortTime, // Use the sort time for cursor consistency
-        };
-        uniqueImages.set(imageRow.id, image);
+      // Fetch post.ts values in batch (as text to avoid timestamp parsing errors)
+      const postTsMap = new Map<string, string>();
+      if (postIds.size > 0) {
+        const { data: postsData, error: postsError } = await supabaseBrowserClient
+          .from("post")
+          .select("id, ts")
+          .in("id", Array.from(postIds));
+
+        if (!postsError && postsData) {
+          for (const post of postsData) {
+            // Convert ts to string (it may come as Date or string)
+            const tsValue = post.ts ? (typeof post.ts === 'string' ? post.ts : String(post.ts)) : null;
+            if (tsValue) {
+              postTsMap.set(post.id, tsValue);
+            }
+          }
+        }
+      }
+
+      // Decode cursor if provided (cursor contains post.ts value from previous page)
+      let cursorPostTs: string | null = null;
+      let cursorImageId: string | null = null;
+      if (cursor) {
+        const decoded = decodeCursor(cursor);
+        if (decoded) {
+          cursorPostTs = decoded.createdAt; // This is post.ts from previous page
+          cursorImageId = decoded.id;
+        }
+      }
+
+      // Process rows using post.ts for filtering
+      for (const row of data) {
+        if (!row.image) continue;
+        const imageRow = Array.isArray(row.image) ? row.image[0] : row.image;
+        const postRow = Array.isArray(row.post) ? row.post[0] : row.post;
+        
+        if (!postRow?.id) continue;
+
+        // Get post.ts value (fallback to post_image.created_at if not available)
+        const postTs = postTsMap.get(postRow.id) || row.created_at;
+
+        // Filter by post.ts >= 2024-01-01
+        if (!postTs || postTs < "2024-01-01") continue;
+
+        // Apply cursor pagination filter (post.ts based)
+        if (cursorPostTs) {
+          // Skip items with post.ts >= cursorPostTs (already shown in previous page)
+          if (postTs > cursorPostTs) continue;
+          if (postTs === cursorPostTs && imageRow.id >= cursorImageId!) continue;
+        }
+
+        if (imageRow && imageRow.id && !uniqueImages.has(imageRow.id)) {
+          const image: ImageRow = {
+            id: imageRow.id,
+            image_hash: imageRow.image_hash,
+            image_url: imageRow.image_url,
+            with_items: imageRow.with_items,
+            status: imageRow.status,
+            created_at: postTs, // Use post.ts for sorting
+          };
+          uniqueImages.set(imageRow.id, image);
+        }
+      }
+    } else {
+      // Strategy B: row is image
+      for (const row of data) {
+        const imageRow = row;
+        const sortTime = row.created_at;
+
+        // Filter by created_at >= 2024-01-01
+        if (!sortTime || sortTime < "2024-01-01") continue;
+
+        if (imageRow && imageRow.id && !uniqueImages.has(imageRow.id)) {
+          const image: ImageRow = {
+            id: imageRow.id,
+            image_hash: imageRow.image_hash,
+            image_url: imageRow.image_url,
+            with_items: imageRow.with_items,
+            status: imageRow.status,
+            created_at: sortTime,
+          };
+          uniqueImages.set(imageRow.id, image);
+        }
       }
     }
   }
 
-  const allItems = Array.from(uniqueImages.values());
+  // Sort by created_at (post.ts for Strategy A, image.created_at for Strategy B) descending
+  const allItems = Array.from(uniqueImages.values()).sort((a, b) => {
+    let timeA: number;
+    let timeB: number;
+    try {
+      timeA = new Date(a.created_at).getTime();
+      timeB = new Date(b.created_at).getTime();
+    } catch (e) {
+      return 0; // Fallback: maintain order
+    }
+    if (timeB !== timeA) {
+      return timeB - timeA; // Descending
+    }
+    return b.id.localeCompare(a.id);
+  });
+
   const hasMore = allItems.length > limit;
   const items = hasMore ? allItems.slice(0, limit) : allItems;
 
@@ -431,6 +510,8 @@ export async function fetchImagesByPostImage(
   const hasSearchQuery = search.trim().length > 0;
 
   // Always query post_image table to get post context
+  // Note: We exclude post.ts from select to avoid PostgreSQL timestamp parsing errors
+  // We'll use post_image.created_at for sorting/filtering instead (should be close to post.ts)
   let queryBuilder = supabaseBrowserClient
     .from("post_image")
     .select(
@@ -443,9 +524,6 @@ export async function fetchImagesByPostImage(
   if (hasAccountFilter) {
     queryBuilder = queryBuilder.eq("post.account", filter);
   }
-
-  // Apply timestamp filter (posts after 2024-01-01)
-  queryBuilder = queryBuilder.gte("post.ts", "2024-01-01");
 
   // Apply basic filters on the joined image table
   queryBuilder = queryBuilder
@@ -461,18 +539,13 @@ export async function fetchImagesByPostImage(
     );
   }
 
-  // Cursor pagination (using post_image.created_at)
-  if (cursor) {
-    const decoded = decodeCursor(cursor);
-    if (decoded) {
-      const { createdAt } = decoded;
-      queryBuilder = queryBuilder.lt("created_at", createdAt);
-    }
-  }
-
+  // Note: We don't use cursor pagination here because we need to filter by post.ts
+  // Instead, we fetch a larger batch and filter/sort by post.ts in memory
+  // Cursor will be generated based on post.ts after filtering
   queryBuilder = queryBuilder
     .order("created_at", { ascending: false })
-    .limit(limit + 1);
+    .order("image_id", { ascending: false })
+    .limit(limit * 5); // Fetch more to account for post.ts filtering and pagination
 
   const { data, error } = await queryBuilder;
 
@@ -482,26 +555,88 @@ export async function fetchImagesByPostImage(
 
   // Extract and normalize images with full post metadata
   const uniqueImages = new Map<string, ImageWithPostId>();
+  const postIdToRowMap = new Map<string, any>(); // Map to store row data by post_id
+  
   if (data) {
+    // First pass: collect all post_ids and row data
+    const postIds = new Set<string>();
     for (const row of data) {
-      // row is post_image, contains image and post objects
+      if (!row.image) continue;
+      const postRow = Array.isArray(row.post) ? row.post[0] : row.post;
+      if (postRow?.id) {
+        postIds.add(postRow.id);
+        postIdToRowMap.set(postRow.id, row);
+      }
+    }
+
+    // Fetch post.ts values in batch (as text to avoid timestamp parsing errors)
+    const postTsMap = new Map<string, string>();
+    if (postIds.size > 0) {
+      const { data: postsData, error: postsError } = await supabaseBrowserClient
+        .from("post")
+        .select("id, ts")
+        .in("id", Array.from(postIds));
+
+      if (!postsError && postsData) {
+        for (const post of postsData) {
+          // Convert ts to string (it may come as Date or string)
+          const tsValue = post.ts ? (typeof post.ts === 'string' ? post.ts : String(post.ts)) : null;
+          if (tsValue) {
+            postTsMap.set(post.id, tsValue);
+          }
+        }
+      }
+    }
+
+    // Decode cursor if provided (cursor contains post.ts value from previous page)
+    let cursorPostTs: string | null = null;
+    let cursorImageId: string | null = null;
+    if (cursor) {
+      const decoded = decodeCursor(cursor);
+      if (decoded) {
+        cursorPostTs = decoded.createdAt; // This is post.ts from previous page
+        cursorImageId = decoded.id;
+      }
+    }
+
+    // Second pass: filter and process rows using post.ts
+    for (const row of data) {
       if (!row.image) continue;
       const imageRow = Array.isArray(row.image) ? row.image[0] : row.image;
       const postRow = Array.isArray(row.post) ? row.post[0] : row.post;
-      const postImageCreatedAt = row.created_at; // post_image.created_at
       
-      if (imageRow && imageRow.id && postRow && !uniqueImages.has(imageRow.id)) {
+      if (!postRow?.id) continue;
+
+      // Get post.ts value (fallback to post_image.created_at if not available)
+      const postTs = postTsMap.get(postRow.id) || row.created_at;
+
+      // Filter by post.ts >= 2024-01-01
+      if (!postTs || postTs < "2024-01-01") continue;
+
+      // Apply cursor pagination filter (post.ts based)
+      if (cursorPostTs) {
+        // Skip items with post.ts >= cursorPostTs (already shown in previous page)
+        if (postTs > cursorPostTs) continue;
+        if (postTs === cursorPostTs && imageRow.id >= cursorImageId!) continue;
+      }
+
+      if (
+        imageRow &&
+        imageRow.id &&
+        postRow &&
+        !uniqueImages.has(imageRow.id)
+      ) {
         const image: ImageWithPostId = {
           id: imageRow.id,
           image_hash: imageRow.image_hash,
           image_url: imageRow.image_url,
           with_items: imageRow.with_items,
           status: imageRow.status,
-          created_at: postImageCreatedAt, // Use post_image timestamp for sorting
+          created_at: postTs, // Use post.ts for sorting
           postId: row.post_id,
           postSource: "post" as const,
           postAccount: postRow.account,
-          postImageCreatedAt: postImageCreatedAt,
+          postImageCreatedAt: postTs, // Use post.ts
           postCreatedAt: postRow.created_at, // post.created_at
         };
         uniqueImages.set(imageRow.id, image);
@@ -509,7 +644,22 @@ export async function fetchImagesByPostImage(
     }
   }
 
-  const allItems = Array.from(uniqueImages.values());
+  // Sort by post.ts descending, then by image id
+  const allItems = Array.from(uniqueImages.values()).sort((a, b) => {
+    let timeA: number;
+    let timeB: number;
+    try {
+      timeA = new Date(a.created_at).getTime();
+      timeB = new Date(b.created_at).getTime();
+    } catch (e) {
+      return 0; // Fallback: maintain order
+    }
+    if (timeB !== timeA) {
+      return timeB - timeA; // Descending
+    }
+    return b.id.localeCompare(a.id);
+  });
+
   const hasMore = allItems.length > limit;
   const items = hasMore ? allItems.slice(0, limit) : allItems;
 
@@ -545,7 +695,7 @@ export async function fetchRelatedImagesByAccount(
     .not("image.image_url", "is", null)
     .eq("image.with_items", false)
     .order("created_at", { ascending: false })
-    .limit(limit * 2); // Fetch more to handle potential duplicates
+    .limit(limit * 3); // Fetch more to handle potential duplicates and post.ts filtering
 
   if (error) {
     throw error;
@@ -554,11 +704,50 @@ export async function fetchRelatedImagesByAccount(
   // Deduplicate and extract images
   const uniqueImages = new Map<string, ImageRow>();
   if (data) {
+    // First pass: collect all post_ids
+    const postIds = new Set<string>();
+    for (const row of data) {
+      if (!row.image) continue;
+      const postRow = Array.isArray(row.post) ? row.post[0] : row.post;
+      if (postRow?.id) {
+        postIds.add(postRow.id);
+      }
+    }
+
+    // Fetch post.ts values in batch (as text to avoid timestamp parsing errors)
+    const postTsMap = new Map<string, string>();
+    if (postIds.size > 0) {
+      const { data: postsData, error: postsError } = await supabaseBrowserClient
+        .from("post")
+        .select("id, ts")
+        .in("id", Array.from(postIds));
+
+      if (!postsError && postsData) {
+        for (const post of postsData) {
+          // Convert ts to string (it may come as Date or string)
+          const tsValue = post.ts ? (typeof post.ts === 'string' ? post.ts : String(post.ts)) : null;
+          if (tsValue) {
+            postTsMap.set(post.id, tsValue);
+          }
+        }
+      }
+    }
+
+    // Second pass: filter and process rows using post.ts
     for (const row of data) {
       // row is post_image, contains image object
       if (!row.image) continue;
       const imageRow = Array.isArray(row.image) ? row.image[0] : row.image;
+      const postRow = Array.isArray(row.post) ? row.post[0] : row.post;
       
+      if (!postRow?.id) continue;
+
+      // Get post.ts value (fallback to post_image.created_at if not available)
+      const postTs = postTsMap.get(postRow.id) || row.created_at;
+
+      // Filter by post.ts >= 2024-01-01
+      if (!postTs || postTs < "2024-01-01") continue;
+
       if (imageRow && imageRow.id && !uniqueImages.has(imageRow.id)) {
         const image: ImageRow = {
           id: imageRow.id,
@@ -566,14 +755,24 @@ export async function fetchRelatedImagesByAccount(
           image_url: imageRow.image_url,
           with_items: imageRow.with_items,
           status: imageRow.status,
-          created_at: row.created_at, // Use post_image time
+          created_at: postTs, // Use post.ts
         };
         uniqueImages.set(imageRow.id, image);
-        
+
         if (uniqueImages.size >= limit) break;
       }
     }
   }
+  
+  // Sort by post.ts descending
+  const sortedImages = Array.from(uniqueImages.values()).sort((a, b) => {
+    const timeA = new Date(a.created_at).getTime();
+    const timeB = new Date(b.created_at).getTime();
+    if (timeB !== timeA) {
+      return timeB - timeA; // Descending
+    }
+    return b.id.localeCompare(a.id);
+  });
 
-  return Array.from(uniqueImages.values());
+  return sortedImages.slice(0, limit);
 }

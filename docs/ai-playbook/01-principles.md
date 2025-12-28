@@ -30,4 +30,3 @@
 
 - **Treat AI workflows as experiments**: Define hypothesis, measure, and adjust.
 - **It is okay to say "unknown"**; always propose next small experiment.
-

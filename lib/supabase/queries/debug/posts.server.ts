@@ -8,10 +8,10 @@
  * These functions can only be used in Server Components and Route Handlers.
  */
 
-import { createSupabaseServerClient } from '../../server';
-import type { Database } from '../../types';
+import { createSupabaseServerClient } from "../../server";
+import type { Database } from "../../types";
 
-type PostRow = Database['public']['Tables']['post']['Row'];
+type PostRow = Database["public"]["Tables"]["post"]["Row"];
 
 /**
  * Fetches the latest posts from the database (server-side)
@@ -25,10 +25,9 @@ type PostRow = Database['public']['Tables']['post']['Row'];
 export async function fetchLatestPostsServer(limit = 10): Promise<PostRow[]> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
-    .from('post')
-    .select('*')
-    .gte('ts', '2024-01-01')
-    .order('created_at', { ascending: false })
+    .from("post")
+    .select("*")
+    .order("created_at", { ascending: false })
     .limit(limit);
 
   if (error) {
@@ -37,4 +36,3 @@ export async function fetchLatestPostsServer(limit = 10): Promise<PostRow[]> {
 
   return data ?? [];
 }
-

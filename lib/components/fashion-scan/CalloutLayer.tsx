@@ -37,13 +37,7 @@ function getBackgroundPositionFromBox(
   return `${posX}% ${posY}%`;
 }
 
-function CalloutCard({
-  item,
-  photoUrl,
-}: {
-  item: ScanItem;
-  photoUrl: string;
-}) {
+function CalloutCard({ item, photoUrl }: { item: ScanItem; photoUrl: string }) {
   return (
     <div className="bg-zinc-900/90 backdrop-blur-sm border border-[#d9fc69]/30 rounded-lg p-4 hover:border-[#d9fc69]/60 hover:bg-zinc-900 transition-all duration-200">
       <div className="flex items-start gap-4">
@@ -73,7 +67,8 @@ function CalloutCard({
             {item.name}
           </h3>
           <p className="text-zinc-400 text-xs font-mono">
-            Confidence: <span className="text-[#d9fc69]/80">{item.confidence}%</span>
+            Confidence:{" "}
+            <span className="text-[#d9fc69]/80">{item.confidence}%</span>
           </p>
         </div>
       </div>
@@ -124,4 +119,3 @@ export default function CalloutLayer({
     </>
   );
 }
-

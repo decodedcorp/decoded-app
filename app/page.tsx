@@ -1,6 +1,6 @@
-import { Header } from '@/lib/components/Header';
-import { fetchLatestImagesServer } from '@/lib/supabase/queries/images.server';
-import { HomeClient } from './HomeClient';
+import { Header } from "@/lib/components/Header";
+import { fetchLatestImagesServer } from "@/lib/supabase/queries/images.server";
+import { HomeClient } from "./HomeClient";
 
 export default async function Home() {
   // Fetch initial images server-side

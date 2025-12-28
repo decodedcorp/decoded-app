@@ -688,9 +688,6 @@ class ThiingsGrid extends Component<ThiingsGridProps, State> {
     this.loop();
   };
 
-  // #region agent log
-  // #endregion
-
   private loop = () => {
     if (!this.isComponentMounted) return;
 

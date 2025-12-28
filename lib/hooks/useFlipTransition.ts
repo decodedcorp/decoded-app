@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useRef, RefObject } from 'react';
-import { gsap } from 'gsap';
-import { Flip } from 'gsap/Flip';
-import { useTransitionStore } from '@/lib/stores/transitionStore';
+import { useEffect, useRef, RefObject } from "react";
+import { gsap } from "gsap";
+import { Flip } from "gsap/Flip";
+import { useTransitionStore } from "@/lib/stores/transitionStore";
 
 // Register GSAP Flip plugin
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   gsap.registerPlugin(Flip);
 }
 
@@ -16,7 +16,10 @@ if (typeof window !== 'undefined') {
  * @param targetRef - Ref to the modal element that should animate
  * @param imageId - Image ID to match with stored transition state
  */
-export function useFlipEnter(targetRef: RefObject<HTMLElement>, imageId: string) {
+export function useFlipEnter(
+  targetRef: RefObject<HTMLElement>,
+  imageId: string
+) {
   const { originState, originRect } = useTransitionStore();
 
   useEffect(() => {
@@ -42,11 +45,11 @@ export function useFlipEnter(targetRef: RefObject<HTMLElement>, imageId: string)
       // Animate from origin to current
       Flip.from(originState, {
         duration: 0.6,
-        ease: 'power2.inOut',
+        ease: "power2.inOut",
         scale: true,
         onComplete: () => {
           // Clean up inline styles after animation
-          gsap.set(element, { clearProps: 'all' });
+          gsap.set(element, { clearProps: "all" });
         },
       });
     } else {
@@ -61,7 +64,7 @@ export function useFlipEnter(targetRef: RefObject<HTMLElement>, imageId: string)
           opacity: 1,
           scale: 1,
           duration: 0.4,
-          ease: 'power2.out',
+          ease: "power2.out",
         }
       );
     }
@@ -97,7 +100,7 @@ export function useFlipExit(
         // Animate back to origin
         Flip.to(state, {
           duration: 0.5,
-          ease: 'power2.inOut',
+          ease: "power2.inOut",
           scale: true,
           onComplete: () => {
             reset();
@@ -111,7 +114,7 @@ export function useFlipExit(
           opacity: 0,
           scale: 0.95,
           duration: 0.3,
-          ease: 'power2.in',
+          ease: "power2.in",
           onComplete: () => {
             reset();
             onComplete?.();
@@ -137,12 +140,11 @@ export function useFlipExit(
       }
     };
 
-    window.addEventListener('popstate', handlePopState);
+    window.addEventListener("popstate", handlePopState);
     return () => {
-      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener("popstate", handlePopState);
     };
   }, [targetRef, reset]);
 
   return playExitAnimation;
 }
-

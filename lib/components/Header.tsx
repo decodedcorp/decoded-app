@@ -16,14 +16,14 @@ export function Header() {
       aria-label="Thiings controls"
     >
       <div className="w-full px-2 md:px-3 h-14 md:h-16 flex items-center justify-between gap-2 md:gap-3 pointer-events-auto">
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-1 flex-shrink-0 overflow-visible">
           <Link
             href="/"
-            className="relative w-48 md:w-56 h-16 md:h-18 flex items-center justify-center hover:opacity-80 transition-opacity"
+            className="relative w-64 md:w-72 h-16 md:h-18 flex items-center justify-center -ml-6 hover:opacity-80 transition-opacity overflow-visible"
             aria-label="Go to home"
           >
             <DecodedLogo
-              asciiFontSize={2}
+              asciiFontSize={3}
               textFontSize={200}
               planeBaseHeight={12}
               enableWaves={false}

@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import type { ImageRow } from "@/lib/supabase/types";
-import type { UiItem } from "./types";
+import type { UiItem, BoundingBox } from "./types";
 import { getHighlightStyle } from "./types";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
@@ -20,6 +20,7 @@ type Props = {
  * - Spotlight effect: Active item stays in color, rest is grayscale
  * - Coordinate-based highlighting boxes
  * - Pan & Zoom effect (scale + translation, not transform-origin)
+ * - Object-fit: cover coordinate correction
  */
 export function ImageCanvas({ image, items, activeIndex }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -31,6 +32,76 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
     x: 0,
     y: 0,
   });
+
+  // State for coordinate correction (object-fit: cover)
+  const [naturalSize, setNaturalSize] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
+  const [containerSize, setContainerSize] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
+
+  // ResizeObserver for container
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const updateSize = () => {
+      if (containerRef.current) {
+        const { width, height } = containerRef.current.getBoundingClientRect();
+        setContainerSize({ width, height });
+      }
+    };
+
+    updateSize();
+    const observer = new ResizeObserver(updateSize);
+    observer.observe(containerRef.current);
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Helper: Calculate displayed image rect (px) considering object-fit: cover
+  const getDisplayedRect = () => {
+    if (!naturalSize || !containerSize) return null;
+
+    const containerAspect = containerSize.width / containerSize.height;
+    const imageAspect = naturalSize.width / naturalSize.height;
+
+    let width, height, left, top;
+
+    if (imageAspect > containerAspect) {
+      // Image is wider than container (height fits, width cropped)
+      height = containerSize.height;
+      width = height * imageAspect;
+      top = 0;
+      left = (containerSize.width - width) / 2; // Center horizontally
+    } else {
+      // Image is taller than container (width fits, height cropped)
+      width = containerSize.width;
+      height = width / imageAspect;
+      left = 0;
+      top = (containerSize.height - height) / 2; // Center vertically
+    }
+
+    return { width, height, left, top };
+  };
+
+  // Helper: Get corrected box style (px)
+  const getCorrectedBoxStyle = (box: BoundingBox) => {
+    const rect = getDisplayedRect();
+    if (!rect) {
+      // Fallback to simple percent if not ready (might be inaccurate for object-cover)
+      return getHighlightStyle(box);
+    }
+
+    return {
+      left: `${rect.left + box.left * rect.width}px`,
+      top: `${rect.top + box.top * rect.height}px`,
+      width: `${box.width * rect.width}px`,
+      height: `${box.height * rect.height}px`,
+    };
+  };
 
   // Pan & Zoom effect: Calculate scale and translation
   useGSAP(
@@ -45,17 +116,17 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
             duration: 0.8,
             ease: "power2.out",
           };
-          
+
           gsap.to(imageRef.current, resetVars);
-          
+
           if (boxesRef.current) {
             gsap.to(boxesRef.current, resetVars);
           }
-          
+
           if (overlayRef.current) {
             gsap.to(overlayRef.current, resetVars);
           }
-          
+
           transformRef.current = { scale: 1, x: 0, y: 0 };
         }
         return;
@@ -67,62 +138,51 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
       }
 
       const center = activeItem.normalizedCenter;
-      const scale = 1.5; // Zoom level
+      const scale = 1.2; // Zoom level
 
       // Calculate translation to center the item
-      // When scaled, we need to offset by (center - 0.5) * (scale - 1) * containerSize
-      if (containerRef.current && imageRef.current) {
-        const containerRect = containerRef.current.getBoundingClientRect();
-        const imageRect = imageRef.current.getBoundingClientRect();
+      // We reuse logic similar to getDisplayedRect but within the GSAP context
+      if (
+        containerRef.current &&
+        imageRef.current &&
+        naturalSize &&
+        containerSize
+      ) {
+        const rect = getDisplayedRect();
 
-        // Calculate offset needed to center the item
-        // Use natural image dimensions for accurate calculation
-        const imageNaturalWidth = imageRef.current.naturalWidth || imageRect.width;
-        const imageNaturalHeight = imageRef.current.naturalHeight || imageRect.height;
-        
-        // Calculate the actual displayed image size (considering object-cover)
-        const containerAspect = containerRect.width / containerRect.height;
-        const imageAspect = imageNaturalWidth / imageNaturalHeight;
-        
-        let displayedWidth, displayedHeight;
-        if (imageAspect > containerAspect) {
-          // Image is wider - height fits, width is cropped
-          displayedHeight = containerRect.height;
-          displayedWidth = containerRect.height * imageAspect;
-        } else {
-          // Image is taller - width fits, height is cropped
-          displayedWidth = containerRect.width;
-          displayedHeight = containerRect.width / imageAspect;
+        if (rect) {
+          // Calculate offset needed to center the item based on displayed dimensions
+          const offsetX = (center.x - 0.5) * (scale - 1) * rect.width;
+          const offsetY = (center.y - 0.5) * (scale - 1) * rect.height;
+
+          const animVars = {
+            scale,
+            x: -offsetX,
+            y: -offsetY,
+            duration: 0.8,
+            ease: "power2.out",
+          };
+
+          gsap.to(imageRef.current, animVars);
+
+          // Apply same transform to boxes container
+          if (boxesRef.current) {
+            gsap.to(boxesRef.current, animVars);
+          }
+
+          // Apply same transform to overlay to keep spotlight aligned
+          if (overlayRef.current) {
+            gsap.to(overlayRef.current, animVars);
+          }
+
+          transformRef.current = { scale, x: -offsetX, y: -offsetY };
         }
-
-        // Calculate offset based on normalized coordinates and displayed size
-        const offsetX = (center.x - 0.5) * (scale - 1) * displayedWidth;
-        const offsetY = (center.y - 0.5) * (scale - 1) * displayedHeight;
-
-        const animVars = {
-          scale,
-          x: -offsetX,
-          y: -offsetY,
-          duration: 0.8,
-          ease: "power2.out",
-        };
-
-        gsap.to(imageRef.current, animVars);
-
-        // Apply same transform to boxes container
-        if (boxesRef.current) {
-          gsap.to(boxesRef.current, animVars);
-        }
-        
-        // Apply same transform to overlay to keep spotlight aligned
-        if (overlayRef.current) {
-          gsap.to(overlayRef.current, animVars);
-        }
-
-        transformRef.current = { scale, x: -offsetX, y: -offsetY };
       }
     },
-    { scope: containerRef, dependencies: [activeIndex] }
+    {
+      scope: containerRef,
+      dependencies: [activeIndex, naturalSize, containerSize],
+    }
   );
 
   // Spotlight effect: Update overlay mask
@@ -130,10 +190,8 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
     if (!overlayRef.current) return;
 
     if (activeIndex === null) {
-      // No active item: remove spotlight
       overlayRef.current.style.filter = "none";
       overlayRef.current.style.opacity = "0";
-      // No transform reset here - GSAP handles it
       return;
     }
 
@@ -142,27 +200,60 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
       return;
     }
 
-    // Create clip-path for spotlight effect
     const box = activeItem.normalizedBox;
+    const rect = getDisplayedRect();
+
+    // Calculate clip path points (px or %)
+    let points = {
+      tl: { x: box.left * 100, y: box.top * 100 },
+      tr: { x: (box.left + box.width) * 100, y: box.top * 100 },
+      br: { x: (box.left + box.width) * 100, y: (box.top + box.height) * 100 },
+      bl: { x: box.left * 100, y: (box.top + box.height) * 100 },
+      unit: "%",
+    };
+
+    if (rect) {
+      // Use pixel values relative to container if we have rect info
+      // This accounts for object-fit: cover offsets
+      points = {
+        tl: {
+          x: rect.left + box.left * rect.width,
+          y: rect.top + box.top * rect.height,
+        },
+        tr: {
+          x: rect.left + (box.left + box.width) * rect.width,
+          y: rect.top + box.top * rect.height,
+        },
+        br: {
+          x: rect.left + (box.left + box.width) * rect.width,
+          y: rect.top + (box.top + box.height) * rect.height,
+        },
+        bl: {
+          x: rect.left + box.left * rect.width,
+          y: rect.top + (box.top + box.height) * rect.height,
+        },
+        unit: "px",
+      };
+    }
+
     const clipPath = `polygon(
       0% 0%,
       0% 100%,
-      ${box.left * 100}% 100%,
-      ${box.left * 100}% ${box.top * 100}%,
-      ${(box.left + box.width) * 100}% ${box.top * 100}%,
-      ${(box.left + box.width) * 100}% ${(box.top + box.height) * 100}%,
-      ${box.left * 100}% ${(box.top + box.height) * 100}%,
-      ${box.left * 100}% 100%,
+      ${points.bl.x}${points.unit} 100%,
+      ${points.bl.x}${points.unit} ${points.bl.y}${points.unit},
+      ${points.br.x}${points.unit} ${points.br.y}${points.unit},
+      ${points.tr.x}${points.unit} ${points.tr.y}${points.unit},
+      ${points.tl.x}${points.unit} ${points.tl.y}${points.unit},
+      ${points.bl.x}${points.unit} ${points.bl.y}${points.unit},
+      ${points.bl.x}${points.unit} 100%,
       100% 100%,
       100% 0%
     )`;
 
     overlayRef.current.style.clipPath = clipPath;
-    // NO transform set here - GSAP handles it via animation
-    // Softer spotlight effect
     overlayRef.current.style.filter = "grayscale(60%) brightness(0.6)";
     overlayRef.current.style.opacity = "1";
-  }, [activeIndex]); // Only activeIndex dependency (items removed)
+  }, [activeIndex, naturalSize, containerSize]);
 
   return (
     <div ref={containerRef} className="relative w-full h-full overflow-hidden">
@@ -176,6 +267,12 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
             className="h-full w-full object-cover will-change-transform"
             style={{ transformOrigin: "center center" }}
             loading="lazy"
+            onLoad={(e) => {
+              setNaturalSize({
+                width: e.currentTarget.naturalWidth,
+                height: e.currentTarget.naturalHeight,
+              });
+            }}
           />
 
           {/* Spotlight Overlay (grayscale mask) */}
@@ -195,7 +292,8 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
               if (!item.normalizedBox) return null;
 
               const isActive = index === activeIndex;
-              const style = getHighlightStyle(item.normalizedBox);
+              // Use corrected style for object-fit: cover
+              const style = getCorrectedBoxStyle(item.normalizedBox);
 
               return (
                 <div

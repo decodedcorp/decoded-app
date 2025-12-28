@@ -7,6 +7,7 @@ You are helping document a new feature that has been implemented. Use this templ
 ## Input Format
 
 You will receive:
+
 - **Spec file (YAML)**: Feature specification from `specs/feature/`
 - **Implementation summary (bullet list)**: Summary of changes from Cursor/Claude
 - **Key files touched**: List of modified files
@@ -20,22 +21,26 @@ Transform the input into comprehensive documentation:
 Create `docs/features/<feature-id>.md` with:
 
 #### Overview
+
 - Brief description of what the feature does
 - Why it was added
 - Who benefits from it
 
 #### User Impact
+
 - How this affects end users
 - What they can now do
 - Any UI/UX changes
 
 #### Technical Details (Lightweight)
+
 - High-level technical approach
 - Key components/files involved
 - Dependencies or requirements
 - Performance considerations (if relevant)
 
 #### How to Use / Examples
+
 - Step-by-step usage instructions
 - Code examples (if applicable)
 - Screenshots or diagrams (if helpful)
@@ -44,6 +49,7 @@ Create `docs/features/<feature-id>.md` with:
 ### 2. Release Notes Summary
 
 Create a short summary (max 5 lines) for release notes:
+
 - Focus on user-facing changes
 - Use clear, non-technical language
 - Highlight key benefits
@@ -72,10 +78,12 @@ Create a short summary (max 5 lines) for release notes:
 [Lightweight technical explanation - keep it accessible]
 
 ### Key Components
+
 - [Component 1]
 - [Component 2]
 
 ### Dependencies
+
 - [Dependency 1]
 - [Dependency 2]
 
@@ -158,10 +166,12 @@ Buttons now support multiple visual variants to improve UI consistency and provi
 The Button component now accepts a `variant` prop that controls its visual style. The implementation uses CSS classes for styling and maintains backward compatibility by defaulting to 'primary'.
 
 ### Key Components
+
 - `Button.tsx`: Main component with variant support
 - `button.css`: Styles for primary and secondary variants
 
 ### Dependencies
+
 - None (uses existing styling system)
 
 ## How to Use
@@ -183,6 +193,7 @@ The Button component now accepts a `variant` prop that controls its visual style
 ```
 
 **Release Notes**:
+
 ```markdown
 ## Button Variants
 
@@ -192,4 +203,3 @@ Buttons now support primary and secondary variants for clearer visual hierarchy.
 - Secondary buttons for less critical actions
 - Improved UI consistency across the app
 ```
-

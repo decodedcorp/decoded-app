@@ -11,4 +11,3 @@ export const useSearchStore = create<{
   setQuery: (query) => set({ query }),
   setDebouncedQuery: (debouncedQuery) => set({ debouncedQuery }),
 }));
-

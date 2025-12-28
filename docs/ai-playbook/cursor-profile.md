@@ -27,4 +27,3 @@
 ## Next.js / React Query / Zustand Specifics
 
 (To be added based on project needs - add framework-specific patterns here as you discover them)
-

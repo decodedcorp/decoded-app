@@ -11,6 +11,8 @@ type ConnectorData = {
   startY: number;
   endX: number;
   endY: number;
+  path: string;
+  length: number;
 };
 
 type Props = {
@@ -22,12 +24,7 @@ type Props = {
 };
 
 /**
- * ConnectorLayer - SVG lines connecting image items to cards
- *
- * Performance optimization:
- * - Coordinates are calculated only on resize events (cached)
- * - During scroll, cached coordinates are used
- * - SVG line drawing with GSAP drawSVG effect
+ * ConnectorLayer - SVG Bezier curves connecting image items to cards
  */
 export function ConnectorLayer({
   items,
@@ -39,7 +36,7 @@ export function ConnectorLayer({
   const svgRef = useRef<SVGSVGElement>(null);
   const [connectors, setConnectors] = useState<ConnectorData[]>([]);
 
-  // Calculate connector coordinates (cached, only recalculated on resize)
+  // Calculate connector coordinates and Bezier paths
   const calculateConnectors = useCallback(() => {
     if (
       !imageContainerRef.current ||
@@ -50,7 +47,6 @@ export function ConnectorLayer({
     }
 
     const imageRect = imageContainerRef.current.getBoundingClientRect();
-    const cardsRect = cardsContainerRef.current.getBoundingClientRect();
     const svgRect = svgRef.current.getBoundingClientRect();
 
     const newConnectors: ConnectorData[] = [];
@@ -72,9 +68,25 @@ export function ConnectorLayer({
       const startX = imageRect.left + center.x * imageRect.width - svgRect.left;
       const startY = imageRect.top + center.y * imageRect.height - svgRect.top;
 
-      // Calculate end point (card center)
-      const endX = cardRect.left + cardRect.width / 2 - svgRect.left;
-      const endY = cardRect.top + cardRect.height / 2 - svgRect.top;
+      // Calculate end point (card left edge or center depending on layout)
+      // For desktop split layout, we connect to the left edge of the card
+      const isDesktop = window.innerWidth >= 1024;
+      const endX = isDesktop 
+        ? cardRect.left - svgRect.left 
+        : cardRect.left + cardRect.width / 2 - svgRect.left;
+      const endY = cardRect.top + 40 - svgRect.top; // Connect slightly below the top of the card
+
+      // Create a smooth Bezier curve
+      // Control points are offset horizontally to create a nice "S" curve
+      const cp1x = startX + (endX - startX) * 0.5;
+      const cp1y = startY;
+      const cp2x = startX + (endX - startX) * 0.5;
+      const cp2y = endY;
+
+      const path = `M ${startX} ${startY} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${endX} ${endY}`;
+      
+      // Approximate length for animation
+      const length = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2)) * 1.2;
 
       newConnectors.push({
         itemId: item.id.toString(),
@@ -82,6 +94,8 @@ export function ConnectorLayer({
         startY,
         endX,
         endY,
+        path,
+        length,
       });
     });
 
@@ -115,31 +129,27 @@ export function ConnectorLayer({
     };
   }, [calculateConnectors, scrollContainerRef]);
 
-  // Animate connector lines with GSAP
+  // Animate connector paths with GSAP
   useGSAP(
     () => {
       if (!svgRef.current) return;
 
       connectors.forEach((connector) => {
-        const line = svgRef.current?.querySelector(
+        const path = svgRef.current?.querySelector(
           `[data-connector-id="${connector.itemId}"]`
-        ) as SVGLineElement;
+        ) as SVGPathElement;
 
-        if (!line) return;
+        if (!path) return;
 
         const isActive =
           items.findIndex((item) => item.id.toString() === connector.itemId) ===
           activeIndex;
 
         if (isActive) {
-          // Draw line animation
-          const length = Math.sqrt(
-            Math.pow(connector.endX - connector.startX, 2) +
-              Math.pow(connector.endY - connector.startY, 2)
-          );
-
+          const length = path.getTotalLength();
+          
           gsap.fromTo(
-            line,
+            path,
             {
               strokeDasharray: length,
               strokeDashoffset: length,
@@ -148,15 +158,15 @@ export function ConnectorLayer({
             {
               strokeDashoffset: 0,
               opacity: 1,
-              duration: 0.6,
-              ease: "power2.out",
+              duration: 0.8,
+              ease: "power2.inOut",
             }
           );
         } else {
-          // Hide line
-          gsap.to(line, {
+          gsap.to(path, {
             opacity: 0,
-            duration: 0.3,
+            duration: 0.4,
+            ease: "power2.out",
           });
         }
       });
@@ -171,45 +181,54 @@ export function ConnectorLayer({
   return (
     <svg
       ref={svgRef}
-      className="absolute inset-0 pointer-events-none z-50" // z-10 -> z-50으로 변경
+      className="absolute inset-0 pointer-events-none z-50"
       style={{ width: "100%", height: "100%" }}
     >
       <defs>
+        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="2" result="blur" />
+          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
         <marker
           id="dot"
           viewBox="0 0 10 10"
           refX="5"
           refY="5"
-          markerWidth="4"
-          markerHeight="4"
+          markerWidth="5"
+          markerHeight="5"
         >
           <circle
             cx="5"
             cy="5"
-            r="5"
+            r="4"
             fill="currentColor"
-            className="text-foreground"
+            className="text-primary"
           />
         </marker>
+        <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="currentColor" stopOpacity="1" />
+          <stop offset="100%" stopColor="currentColor" stopOpacity="0.4" />
+        </linearGradient>
       </defs>
       {connectors.map((connector) => {
         const isActive =
           items.findIndex((item) => item.id.toString() === connector.itemId) ===
           activeIndex;
 
-        // Use visibility hidden instead of null to keep DOM node for GSAP
         return (
-          <g key={connector.itemId} style={{ opacity: isActive ? 1 : 0 }}>
-            <line
+          <g key={connector.itemId} style={{ opacity: isActive ? 1 : 0 }} filter={isActive ? "url(#glow)" : undefined}>
+            <path
               data-connector-id={connector.itemId}
-              x1={connector.startX}
-              y1={connector.startY}
-              x2={connector.endX}
-              y2={connector.endY}
-              stroke="currentColor"
-              className="text-foreground/80 dark:text-white/90"
-              strokeWidth="1.5"
-              markerEnd="url(#dot)"
+              d={connector.path}
+              fill="none"
+              stroke="url(#lineGradient)"
+              className="text-primary/60 dark:text-primary/80"
+              strokeWidth="2"
+              strokeLinecap="round"
+              markerStart="url(#dot)"
+              style={{
+                filter: isActive ? 'drop-shadow(0 0 8px rgba(var(--primary), 0.5))' : 'none'
+              }}
             />
           </g>
         );

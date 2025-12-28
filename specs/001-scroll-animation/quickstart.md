@@ -26,72 +26,72 @@ This feature uses native browser APIs - no npm packages needed! Just create the 
 Create `lib/hooks/useScrollAnimation.ts`:
 
 ```typescript
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback } from "react";
 
 export interface UseScrollAnimationOptions {
-  threshold?: number | number[]
-  rootMargin?: string
-  onEnter?: (element: Element) => void
-  onExit?: (element: Element) => void
+  threshold?: number | number[];
+  rootMargin?: string;
+  onEnter?: (element: Element) => void;
+  onExit?: (element: Element) => void;
 }
 
 export function useScrollAnimation(options: UseScrollAnimationOptions = {}) {
   const {
     threshold = 0.15,
-    rootMargin = '0px 0px -10% 0px',
+    rootMargin = "0px 0px -10% 0px",
     onEnter,
-    onExit
-  } = options
+    onExit,
+  } = options;
 
-  const observerRef = useRef<IntersectionObserver | null>(null)
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
     observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          const element = entry.target
+          const element = entry.target;
 
           // Set stagger delay from data attribute
-          const delay = element.getAttribute('data-delay') || '0'
-          element.style.setProperty('--stagger', `${delay}ms`)
+          const delay = element.getAttribute("data-delay") || "0";
+          element.style.setProperty("--stagger", `${delay}ms`);
 
           if (entry.isIntersecting) {
             // Handle image lazy loading
-            const img = element.querySelector('img[data-src]')
-            if (img && !img.getAttribute('data-loaded')) {
-              const src = img.getAttribute('data-src')
+            const img = element.querySelector("img[data-src]");
+            if (img && !img.getAttribute("data-loaded")) {
+              const src = img.getAttribute("data-src");
               if (src) {
-                img.setAttribute('src', src)
-                img.setAttribute('data-loaded', 'true')
+                img.setAttribute("src", src);
+                img.setAttribute("data-loaded", "true");
               }
             }
 
             // Toggle animation classes
-            element.classList.add('is-visible')
-            element.classList.remove('is-hidden')
-            onEnter?.(element)
+            element.classList.add("is-visible");
+            element.classList.remove("is-hidden");
+            onEnter?.(element);
           } else {
-            element.classList.add('is-hidden')
-            element.classList.remove('is-visible')
-            onExit?.(element)
+            element.classList.add("is-hidden");
+            element.classList.remove("is-visible");
+            onExit?.(element);
           }
-        })
+        });
       },
       { threshold, rootMargin }
-    )
+    );
 
     return () => {
-      observerRef.current?.disconnect()
-    }
-  }, [threshold, rootMargin, onEnter, onExit])
+      observerRef.current?.disconnect();
+    };
+  }, [threshold, rootMargin, onEnter, onExit]);
 
   const observeRef = useCallback((element: Element | null) => {
     if (element) {
-      observerRef.current?.observe(element)
+      observerRef.current?.observe(element);
     }
-  }, [])
+  }, []);
 
-  return { observeRef }
+  return { observeRef };
 }
 ```
 
@@ -104,8 +104,9 @@ Add to your global CSS or Tailwind config:
 .js-observe {
   opacity: 0;
   transform: translateY(12px) scale(0.98);
-  transition: opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
   transition-delay: var(--stagger, 0ms);
   will-change: opacity, transform;
 }
@@ -126,40 +127,28 @@ Add to your global CSS or Tailwind config:
 ### Step 4: Use in Your Component
 
 ```tsx
-import { useScrollAnimation } from '@/lib/hooks/useScrollAnimation'
+import { useScrollAnimation } from "@/lib/hooks/useScrollAnimation";
 
 export default function MyPage() {
-  const { observeRef } = useScrollAnimation()
+  const { observeRef } = useScrollAnimation();
 
   return (
     <div>
       <h1>My Content</h1>
 
       {/* Animated card with stagger */}
-      <div
-        ref={observeRef}
-        className="js-observe"
-        data-delay="0"
-      >
+      <div ref={observeRef} className="js-observe" data-delay="0">
         <h2>Card 1</h2>
         <p>This card will fade in when scrolled into view</p>
       </div>
 
-      <div
-        ref={observeRef}
-        className="js-observe"
-        data-delay="80"
-      >
+      <div ref={observeRef} className="js-observe" data-delay="80">
         <h2>Card 2</h2>
         <p>This card will fade in 80ms after Card 1</p>
       </div>
 
       {/* Card with lazy-loaded image */}
-      <div
-        ref={observeRef}
-        className="js-observe"
-        data-delay="160"
-      >
+      <div ref={observeRef} className="js-observe" data-delay="160">
         <img
           data-src="/images/photo.jpg"
           loading="lazy"
@@ -170,7 +159,7 @@ export default function MyPage() {
         />
       </div>
     </div>
-  )
+  );
 }
 ```
 
@@ -190,7 +179,7 @@ Open your browser and scroll down - watch the cards animate in! 🎉
 
 ```tsx
 function AnimatedCard({ title, children, delay = 0 }) {
-  const { observeRef } = useScrollAnimation()
+  const { observeRef } = useScrollAnimation();
 
   return (
     <div
@@ -201,7 +190,7 @@ function AnimatedCard({ title, children, delay = 0 }) {
       <h3 className="text-xl font-bold">{title}</h3>
       {children}
     </div>
-  )
+  );
 }
 ```
 
@@ -209,7 +198,7 @@ function AnimatedCard({ title, children, delay = 0 }) {
 
 ```tsx
 function CardGrid({ items }) {
-  const { observeRef } = useScrollAnimation()
+  const { observeRef } = useScrollAnimation();
 
   return (
     <div className="grid grid-cols-3 gap-4">
@@ -231,7 +220,7 @@ function CardGrid({ items }) {
         </div>
       ))}
     </div>
-  )
+  );
 }
 ```
 
@@ -241,19 +230,19 @@ function CardGrid({ items }) {
 function TrackedAnimation() {
   const { observeRef } = useScrollAnimation({
     onEnter: (el) => {
-      console.log('Element entered:', el)
+      console.log("Element entered:", el);
       // Track analytics
     },
     onExit: (el) => {
-      console.log('Element exited:', el)
-    }
-  })
+      console.log("Element exited:", el);
+    },
+  });
 
   return (
     <div ref={observeRef} className="js-observe">
       Content with tracking
     </div>
-  )
+  );
 }
 ```
 
@@ -263,14 +252,14 @@ function TrackedAnimation() {
 function EarlyAnimation() {
   const { observeRef } = useScrollAnimation({
     threshold: 0.25, // Trigger at 25% visibility
-    rootMargin: '0px 0px -20% 0px' // Earlier trigger
-  })
+    rootMargin: "0px 0px -20% 0px", // Earlier trigger
+  });
 
   return (
     <div ref={observeRef} className="js-observe">
       Animates earlier
     </div>
-  )
+  );
 }
 ```
 
@@ -291,8 +280,9 @@ Add the CSS classes to `app/globals.css`:
 .js-observe {
   opacity: 0;
   transform: translateY(12px) scale(0.98);
-  transition: opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
   transition-delay: var(--stagger, 0ms);
   will-change: opacity, transform;
 }
@@ -316,19 +306,20 @@ Create custom utilities in `tailwind.config.ts`:
 // Future enhancement - requires Tailwind plugin
 export default {
   plugins: [
-    function({ addUtilities }) {
+    function ({ addUtilities }) {
       addUtilities({
-        '.animate-scroll': {
-          opacity: '0',
-          transform: 'translateY(12px) scale(0.98)',
-          transition: 'opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1), transform 0.38s cubic-bezier(0.22, 1, 0.36, 1)',
-          transitionDelay: 'var(--stagger, 0ms)',
-          willChange: 'opacity, transform'
-        }
-      })
-    }
-  ]
-}
+        ".animate-scroll": {
+          opacity: "0",
+          transform: "translateY(12px) scale(0.98)",
+          transition:
+            "opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1), transform 0.38s cubic-bezier(0.22, 1, 0.36, 1)",
+          transitionDelay: "var(--stagger, 0ms)",
+          willChange: "opacity, transform",
+        },
+      });
+    },
+  ],
+};
 ```
 
 ---
@@ -392,7 +383,7 @@ data-delay="2000" ❌
 
 ```tsx
 // Ensure in app/layout.tsx or app/globals.css
-import './globals.css'
+import "./globals.css";
 ```
 
 ### Images Not Loading
@@ -403,9 +394,9 @@ import './globals.css'
 ```tsx
 // Correct structure
 <img
-  data-src="/path.jpg"  // ✅ data-src not src
-  loading="lazy"         // ✅ fallback
-  className="lazy"       // ✅ optional but recommended
+  data-src="/path.jpg" // ✅ data-src not src
+  loading="lazy" // ✅ fallback
+  className="lazy" // ✅ optional but recommended
 />
 ```
 
@@ -451,36 +442,37 @@ export function useScrollAnimation(...) { ... }
 
 ```typescript
 // __tests__/e2e/scroll-animation.spec.ts
-import { test, expect } from '@playwright/test'
+import { test, expect } from "@playwright/test";
 
-test('cards animate on scroll', async ({ page }) => {
-  await page.goto('/')
+test("cards animate on scroll", async ({ page }) => {
+  await page.goto("/");
 
   // Scroll to trigger animation
-  await page.evaluate(() => window.scrollBy(0, 500))
+  await page.evaluate(() => window.scrollBy(0, 500));
 
   // Wait for animation
-  await page.waitForTimeout(500)
+  await page.waitForTimeout(500);
 
   // Check class was added
-  const card = page.locator('.js-observe').first()
-  await expect(card).toHaveClass(/is-visible/)
-})
+  const card = page.locator(".js-observe").first();
+  await expect(card).toHaveClass(/is-visible/);
+});
 ```
 
 ---
 
 ## Browser Support
 
-| Browser | Version | Support |
-|---------|---------|---------|
-| Chrome | 51+ | ✅ Full |
-| Firefox | 55+ | ✅ Full |
-| Safari | 12.1+ | ✅ Full |
-| Edge | 15+ | ✅ Full |
-| IE 11 | - | ⚠️ Graceful degradation (no animations, native lazy loading only) |
+| Browser | Version | Support                                                           |
+| ------- | ------- | ----------------------------------------------------------------- |
+| Chrome  | 51+     | ✅ Full                                                           |
+| Firefox | 55+     | ✅ Full                                                           |
+| Safari  | 12.1+   | ✅ Full                                                           |
+| Edge    | 15+     | ✅ Full                                                           |
+| IE 11   | -       | ⚠️ Graceful degradation (no animations, native lazy loading only) |
 
 **Graceful Degradation**: On older browsers without IntersectionObserver:
+
 - Images use native `loading="lazy"` (if supported)
 - Content visible immediately (no animations)
 - No JavaScript errors
@@ -512,6 +504,7 @@ test('cards animate on scroll', async ({ page }) => {
 ## Support
 
 For issues or questions:
+
 1. Check [research.md](./research.md) for technical details
 2. Review [data-model.md](./data-model.md) for type definitions
 3. Open issue in project repository

@@ -1,10 +1,10 @@
-import { cookies } from 'next/headers';
-import { createServerClient } from '@supabase/auth-helpers-nextjs';
-import type { Database } from './types';
-import { getEnv } from './env';
+import { cookies } from "next/headers";
+import { createServerClient } from "@supabase/auth-helpers-nextjs";
+import type { Database } from "./types";
+import { getEnv } from "./env";
 
-const supabaseUrl = getEnv('NEXT_PUBLIC_SUPABASE_URL');
-const supabaseAnonKey = getEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY');
+const supabaseUrl = getEnv("NEXT_PUBLIC_SUPABASE_URL");
+const supabaseAnonKey = getEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY");
 
 /**
  * Creates a Supabase client for Server Components and Route Handlers.
@@ -27,7 +27,7 @@ const supabaseAnonKey = getEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY');
  */
 export async function createSupabaseServerClient() {
   const cookieStore = await cookies();
-  
+
   return createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll() {
@@ -49,4 +49,3 @@ export async function createSupabaseServerClient() {
     },
   });
 }
-

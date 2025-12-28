@@ -40,7 +40,12 @@ export function RelatedImages({
   useGSAP(
     () => {
       // Skip GSAP animations in modal to avoid ScrollTrigger issues
-      if (isModal || !sectionRef.current || !visibleImages || visibleImages.length === 0)
+      if (
+        isModal ||
+        !sectionRef.current ||
+        !visibleImages ||
+        visibleImages.length === 0
+      )
         return;
 
       const cards = gsap.utils.toArray<HTMLElement>(
@@ -78,17 +83,25 @@ export function RelatedImages({
 
   if (isLoading) {
     return (
-      <section className={`bg-muted/10 ${isModal ? "py-12 md:py-16 px-4 md:px-6" : "py-24 px-6 md:px-8"}`}>
+      <section
+        className={`bg-muted/10 ${isModal ? "py-12 md:py-16 px-4 md:px-6" : "py-24 px-6 md:px-8"}`}
+      >
         <div className={`mx-auto ${isModal ? "max-w-full" : "max-w-7xl"}`}>
           <div className={`text-center ${isModal ? "mb-8 md:mb-10" : "mb-12"}`}>
             <div className="h-4 w-32 bg-muted rounded mx-auto mb-3 md:mb-4 animate-pulse" />
-            <div className={`bg-muted rounded mx-auto animate-pulse ${
-              isModal ? "h-8 w-48 md:h-10 md:w-64" : "h-10 w-64"
-            }`} />
+            <div
+              className={`bg-muted rounded mx-auto animate-pulse ${
+                isModal ? "h-8 w-48 md:h-10 md:w-64" : "h-10 w-64"
+              }`}
+            />
           </div>
-          <div className={`grid gap-3 md:gap-4 ${
-            isModal ? "grid-cols-2 md:grid-cols-3" : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:gap-8"
-          }`}>
+          <div
+            className={`grid gap-3 md:gap-4 ${
+              isModal
+                ? "grid-cols-2 md:grid-cols-3"
+                : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:gap-8"
+            }`}
+          >
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="aspect-[3/4] bg-muted animate-pulse" />
             ))}
@@ -103,26 +116,39 @@ export function RelatedImages({
   }
 
   return (
-    <section className={`bg-muted/10 border-t border-border/40 ${
-      isModal ? "py-12 md:py-16 px-4 md:px-6" : "py-24 px-6 md:px-8"
-    }`}>
-      <div ref={sectionRef} className={`mx-auto ${isModal ? "max-w-full" : "max-w-7xl"}`}>
-        <div className={`flex flex-col items-center ${isModal ? "mb-8 md:mb-10" : "mb-12"}`}>
+    <section
+      className={`bg-muted/10 border-t border-border/40 ${
+        isModal ? "py-12 md:py-16 px-4 md:px-6" : "py-24 px-6 md:px-8"
+      }`}
+    >
+      <div
+        ref={sectionRef}
+        className={`mx-auto ${isModal ? "max-w-full" : "max-w-7xl"}`}
+      >
+        <div
+          className={`flex flex-col items-center ${isModal ? "mb-8 md:mb-10" : "mb-12"}`}
+        >
           <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground mb-3 md:mb-4">
             More from
           </span>
-          <h2 className={`font-serif text-center tracking-tight ${
-            isModal ? "text-2xl md:text-3xl" : "text-3xl md:text-4xl lg:text-5xl"
-          }`}>
+          <h2
+            className={`font-serif text-center tracking-tight ${
+              isModal
+                ? "text-2xl md:text-3xl"
+                : "text-3xl md:text-4xl lg:text-5xl"
+            }`}
+          >
             @{account}
           </h2>
         </div>
 
-        <div className={`grid mb-8 md:mb-10 lg:mb-12 ${
-          isModal 
-            ? "grid-cols-2 md:grid-cols-3 gap-3 md:gap-4" 
-            : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8"
-        }`}>
+        <div
+          className={`grid mb-8 md:mb-10 lg:mb-12 ${
+            isModal
+              ? "grid-cols-2 md:grid-cols-3 gap-3 md:gap-4"
+              : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8"
+          }`}
+        >
           {visibleImages?.map((image) => {
             if (isModal) {
               return (

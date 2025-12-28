@@ -7,6 +7,7 @@ You are helping convert a GitHub issue into a structured specification that can 
 ## Input Format
 
 You will receive:
+
 - **Raw issue text**: Full GitHub issue description
 - **Labels**: Issue labels (feature/bugfix/experiment)
 - **Title**: Issue title
@@ -239,9 +240,9 @@ The application currently only supports light mode, which can be uncomfortable i
 ## Output Location
 
 Save the spec file to:
+
 - `specs/feature/FEATURE-XXX-<kebab-case-name>.yml` for features
 - `specs/bugfix/BUGFIX-XXX-<kebab-case-name>.yml` for bugfixes
 - `specs/experiment/EXPERIMENT-XXX-<kebab-case-name>.yml` for experiments
 
 Use kebab-case for filenames (e.g., `FEATURE-001-dark-mode-support.yml`).
-

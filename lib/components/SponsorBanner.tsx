@@ -10,7 +10,11 @@ export function SponsorBanner() {
                  bg-black/30 text-white hover:bg-black/40
                  focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1"
       onClick={() => {
-        window.open("https://example.com/request", "_blank", "noopener,noreferrer");
+        window.open(
+          "https://example.com/request",
+          "_blank",
+          "noopener,noreferrer"
+        );
       }}
     >
       <svg
@@ -33,4 +37,3 @@ export function SponsorBanner() {
     </button>
   );
 }
-

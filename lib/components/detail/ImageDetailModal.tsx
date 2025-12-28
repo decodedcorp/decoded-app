@@ -11,6 +11,7 @@ import { useTransitionStore } from "@/lib/stores/transitionStore";
 import { ImageCanvas } from "./ImageCanvas"; // Import ImageCanvas
 import { normalizeItem } from "./types"; // Import normalizeItem
 import { useNormalizedItems } from "@/lib/hooks/useNormalizedItems";
+import { ReportErrorButton } from "./ReportErrorButton"; // Import ReportErrorButton
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(Flip);
@@ -52,7 +53,8 @@ export function ImageDetailModal({ imageId }: Props) {
   // This enables scrolling the drawer content by scrolling over the fixed image
   useEffect(() => {
     const isDesktop = window.matchMedia("(min-width: 768px)").matches;
-    if (!isDesktop || !floatingImageRef.current || !scrollContainerRef.current) return;
+    if (!isDesktop || !floatingImageRef.current || !scrollContainerRef.current)
+      return;
 
     // Use a wrapper or the floating image ref itself if it's the ImageCanvas container
     // Since we're rendering ImageCanvas in the "floating" area, we need to target its container
@@ -267,6 +269,33 @@ export function ImageDetailModal({ imageId }: Props) {
     window.location.href = `/images/${imageId}`;
   }, [imageId]);
 
+  // #region agent log
+  useEffect(() => {
+    if (drawerRef.current) {
+      const style = window.getComputedStyle(drawerRef.current);
+      fetch(
+        "http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            location: "ImageDetailModal.tsx:useEffect",
+            message: "Drawer computed styles",
+            data: {
+              zIndex: style.zIndex,
+              overflow: style.overflow,
+              overflowX: style.overflowX,
+              display: style.display,
+            },
+            timestamp: Date.now(),
+            sessionId: "debug-peeking-issue",
+            hypothesisId: "B",
+          }),
+        }
+      ).catch(() => {});
+    }
+  }, [drawerRef.current]);
+  // #endregion
   // Mount/Enter Animation
   useEffect(() => {
     // Lock body scroll
@@ -574,9 +603,9 @@ export function ImageDetailModal({ imageId }: Props) {
           {/* We only render ImageCanvas if we have the full image data */}
           {image ? (
             <div className="w-full h-full relative">
-              <ImageCanvas 
-                image={image} 
-                items={normalizedItems} 
+              <ImageCanvas
+                image={image}
+                items={normalizedItems}
                 activeIndex={activeIndex}
               />
             </div>
@@ -592,28 +621,29 @@ export function ImageDetailModal({ imageId }: Props) {
         </div>
       )}
 
-      {/* Drawer (z-50) */}
+      {/* Drawer (z-70) - 이미지가 z-60이므로 그 위로 올라와야 숫자가 겹쳐 보임 */}
       <aside
         ref={drawerRef}
-        className="relative z-50 flex h-full w-full flex-col bg-background shadow-2xl md:w-[50vw] lg:w-[600px] xl:w-[700px] translate-y-full md:translate-x-full md:translate-y-0"
+        className="relative z-[70] flex h-full w-full flex-col bg-background shadow-2xl md:w-[50vw] lg:w-[600px] xl:w-[700px] translate-y-full md:translate-x-full md:translate-y-0 overflow-visible"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        data-lenis-prevent // Prevent Lenis from hijacking scroll inside the drawer
+        data-lenis-prevent
       >
         {/* Scrollable Content Area */}
         <div
           ref={scrollContainerRef}
-          className="relative flex-1 overflow-y-auto overscroll-contain"
+          className="relative flex-1 overflow-y-auto overflow-x-visible overscroll-contain"
         >
           {renderContent()}
         </div>
 
         {/* Floating Controls */}
         <div className="absolute top-4 right-4 md:top-auto md:right-auto md:bottom-6 md:left-6 z-20 flex gap-3">
+          <ReportErrorButton postId={image?.id} size="md" />
           <button
             onClick={handleMaximize}
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-black/80 text-white backdrop-blur-sm transition-transform hover:scale-105 hover:bg-black active:scale-95 dark:bg-white/80 dark:text-black dark:hover:bg-white"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-black/80 text-white backdrop-blur-sm transition-transform hover:scale-105 hover:bg-black active:scale-95 dark:bg-white/80 dark:text-black dark:hover:bg-white"
             aria-label="View Full Page"
             title="Open in full page"
           >
@@ -621,7 +651,7 @@ export function ImageDetailModal({ imageId }: Props) {
           </button>
           <button
             onClick={handleClose}
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background/80 text-foreground backdrop-blur-sm transition-transform hover:scale-105 hover:bg-accent active:scale-95"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background/80 text-foreground backdrop-blur-sm transition-transform hover:scale-105 hover:bg-accent active:scale-95"
             aria-label="Close"
             title="Close"
           >

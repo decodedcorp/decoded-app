@@ -72,7 +72,10 @@ export default function DetailPanel({
               style={{
                 backgroundImage: `url(${data.photoUrl})`,
                 backgroundSize: `${ZOOM * 100}%`,
-                backgroundPosition: getBackgroundPositionFromBox(item.box, ZOOM),
+                backgroundPosition: getBackgroundPositionFromBox(
+                  item.box,
+                  ZOOM
+                ),
                 backgroundRepeat: "no-repeat",
               }}
               aria-hidden="true"
@@ -85,14 +88,15 @@ export default function DetailPanel({
                 </>
               )}
             </div>
-            
+
             {/* 텍스트 정보 */}
             <div className="flex-1 min-w-0">
               <h3 className="text-lime-400 font-mono text-sm font-semibold mb-1 uppercase tracking-wide">
                 {item.name}
               </h3>
               <p className="text-zinc-400 text-xs font-mono">
-                Confidence: <span className="text-lime-400/80">{item.confidence}%</span>
+                Confidence:{" "}
+                <span className="text-lime-400/80">{item.confidence}%</span>
               </p>
             </div>
           </div>
@@ -101,4 +105,3 @@ export default function DetailPanel({
     </div>
   );
 }
-

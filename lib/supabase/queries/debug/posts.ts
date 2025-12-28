@@ -27,7 +27,6 @@ export async function fetchLatestPosts(limit = 10): Promise<PostRow[]> {
   const { data, error } = await supabaseBrowserClient
     .from("post")
     .select("*")
-    .gte("ts", "2024-01-01")
     .order("created_at", { ascending: false })
     .limit(limit);
 
