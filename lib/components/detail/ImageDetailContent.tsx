@@ -11,7 +11,6 @@ import { RelatedImages } from "./RelatedImages";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import { useMemo } from "react";
-import { createElement, Fragment } from "react";
 import { MetadataTags } from "./MetadataTags";
 
 type Props = {
@@ -117,8 +116,27 @@ export function ImageDetailContent({
     (item) => item.normalizedBox !== null
   );
 
+  // Extract primary category from metadata
+  const category = useMemo(() => {
+    if (!metadata) return "Editorial";
+    const catTag = metadata.find(
+      (tag) =>
+        tag.includes("Closet") ||
+        tag.includes("Style") ||
+        tag.includes("Fashion")
+    );
+    return catTag || "Fashion Analysis";
+  }, [metadata]);
+
   return (
-    <div className="detail-content">
+    <div className="detail-content relative">
+      {/* Decorative Vertical Typography - Shown on desktop (Full Page & Modal) */}
+      <div className="absolute left-4 top-1/2 -translate-y-1/2 hidden lg:block pointer-events-none select-none">
+        <span className="font-serif text-[10px] uppercase tracking-[1em] text-primary/5 writing-mode-vertical-rl rotate-180 opacity-50">
+          Decoded Editorial Archive — {new Date(image.created_at).getFullYear()}
+        </span>
+      </div>
+
       {/* Section 1: Hero - Hidden if hideImage is true */}
       {!hideImage && <HeroSection image={image} isModal={isModal} />}
 
@@ -166,63 +184,228 @@ export function ImageDetailContent({
 
       {/* About this Look Section - Magazine Style */}
       {article && (
-        <section className="mx-auto max-w-3xl px-6 pt-24 pb-12">
-          <div className="flex flex-col items-center text-center">
-            {/* Metadata Section - Placed above article as requested */}
-            {metadata && (
-              <div className="mb-12 w-full">
-                <MetadataTags tags={metadata} />
-              </div>
-            )}
-
-            {/* Anchor Section - Always Visible */}
-            <div className="mb-16 w-full max-w-2xl">
-              {anchor ? (
-                <p className="font-serif text-xl md:text-2xl italic leading-relaxed text-foreground/90">
-                  &ldquo;{anchor}&rdquo;
-                </p>
-              ) : (
-                <div className="flex flex-col items-center gap-3 select-none opacity-40 hover:opacity-70 transition-opacity">
-                  <span className="font-sans text-[10px] uppercase tracking-[0.2em] text-muted-foreground border-b border-border pb-1">
-                    Decoded Insight
+        <section
+          className={`mx-auto px-6 ${isModal ? "max-w-5xl pt-12 pb-10" : "max-w-6xl pt-32 pb-24"}`}
+        >
+          <div
+            className={`grid grid-cols-1 ${isModal ? "lg:grid-cols-11" : "lg:grid-cols-12"} gap-10 lg:gap-16 items-start`}
+          >
+            {/* Left Column: Metadata & Anchor (Desktop) / Top (Mobile) */}
+            <div
+              className={`${isModal ? "lg:col-span-4" : "lg:col-span-5"} flex flex-col items-center lg:items-start text-center lg:text-left`}
+            >
+              <div className={`${isModal ? "mb-8" : "mb-12"} w-full`}>
+                <div
+                  className={`flex flex-col gap-1 ${isModal ? "mb-6" : "mb-8"}`}
+                >
+                  <span className="font-sans text-[9px] md:text-[10px] uppercase tracking-[0.3em] text-primary/60 font-bold">
+                    Editorial Analysis
                   </span>
-                  <p className="font-serif text-lg italic text-muted-foreground">
-                    This look, decoded.
-                  </p>
+                  <h4
+                    className={`font-serif font-bold text-foreground ${isModal ? "text-xl md:text-2xl" : "text-3xl md:text-4xl"}`}
+                  >
+                    @{firstPost?.account || "System"}
+                  </h4>
+                </div>
+
+                {/* Look Summary Box - More compact in modal */}
+                <div
+                  className={`border border-border/40 rounded-sm bg-muted/5 relative overflow-hidden ${isModal ? "p-5" : "p-8"}`}
+                >
+                  <div className="absolute top-0 right-0 p-3 opacity-[0.03] pointer-events-none">
+                    <span
+                      className={`font-serif font-black italic ${isModal ? "text-5xl" : "text-8xl"}`}
+                    >
+                      {String(image.id).slice(-2).toUpperCase()}
+                    </span>
+                  </div>
+
+                  <div
+                    className={`flex flex-col ${isModal ? "gap-4" : "gap-6"} relative z-10`}
+                  >
+                    <div className="flex flex-col gap-1">
+                      <span className="font-sans text-[8px] md:text-[9px] uppercase tracking-widest text-muted-foreground/60">
+                        Look Identity
+                      </span>
+                      <p
+                        className={`font-serif text-foreground/80 italic ${isModal ? "text-sm md:text-base" : "text-lg"}`}
+                      >
+                        {category}
+                      </p>
+                    </div>
+
+                    <div
+                      className={`grid grid-cols-2 ${isModal ? "gap-4" : "gap-6"}`}
+                    >
+                      <div className="flex flex-col gap-1">
+                        <span className="font-sans text-[8px] md:text-[9px] uppercase tracking-widest text-muted-foreground/60">
+                          Items
+                        </span>
+                        <p
+                          className={`font-serif text-foreground ${isModal ? "text-base md:text-lg" : "text-xl"}`}
+                        >
+                          {items.length.toString().padStart(2, "0")}
+                        </p>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <span className="font-sans text-[8px] md:text-[9px] uppercase tracking-widest text-muted-foreground/60">
+                          Decoded
+                        </span>
+                        <p
+                          className={`font-serif text-foreground ${isModal ? "text-[10px]" : "text-xs"}`}
+                        >
+                          {new Date(image.created_at)
+                            .toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })
+                            .toUpperCase()}
+                        </p>
+                      </div>
+                    </div>
+
+                    {!isModal && (
+                      <div className="pt-6 border-t border-border/20">
+                        <div className="flex flex-col gap-3">
+                          <span className="font-sans text-[9px] uppercase tracking-widest text-muted-foreground/60">
+                            Featured Labels
+                          </span>
+                          <div className="flex flex-wrap gap-1.5">
+                            {metadata?.slice(0, 5).map((tag, i) => (
+                              <span
+                                key={i}
+                                className="font-serif text-[11px] italic text-primary/70"
+                              >
+                                #{tag.split(":").pop()?.trim()}
+                                {i < metadata.slice(0, 5).length - 1 ? "," : ""}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Metadata Section (Simplified in modal) */}
+              {metadata && (
+                <div className={`${isModal ? "mb-8" : "mb-12"} w-full`}>
+                  <MetadataTags tags={metadata} />
                 </div>
               )}
+
+              {/* Anchor Section - Always Visible */}
+              <div className={`${isModal ? "mb-8" : "mb-12"} w-full`}>
+                {anchor ? (
+                  <div className="relative">
+                    <span
+                      className={`absolute -left-3 -top-6 font-serif text-primary/10 select-none ${isModal ? "text-4xl" : "text-8xl"}`}
+                    >
+                      &ldquo;
+                    </span>
+                    <p
+                      className={`font-serif italic leading-tight text-foreground/90 ${isModal ? "text-lg md:text-xl" : "text-2xl md:text-3xl lg:text-4xl"}`}
+                    >
+                      {anchor}
+                    </p>
+                    <span
+                      className={`absolute -right-3 -bottom-3 font-serif text-primary/10 select-none ${isModal ? "text-4xl" : "text-8xl"}`}
+                    >
+                      &rdquo;
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center lg:items-start gap-3 select-none opacity-40 hover:opacity-70 transition-opacity">
+                    <span className="font-sans text-[10px] uppercase tracking-[0.2em] text-muted-foreground border-b border-border pb-1">
+                      Decoded Insight
+                    </span>
+                    <p className="font-serif text-lg italic text-muted-foreground">
+                      This look, decoded.
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="w-12 h-0.5 bg-primary mb-10" />
-            <h3
-              id="about-this-look"
-              className="font-serif text-5xl md:text-7xl font-medium mb-12 tracking-tight leading-[1.1]"
-            >
-              The Editorial
-            </h3>
-            <article className="prose prose-lg dark:prose-invert font-serif leading-loose text-muted-foreground/90 max-w-none">
-              <ReactMarkdown
-                components={{
-                  p: ({ children }) => <p>{children}</p>,
-                  strong: ({ children }) => {
-                    // Replace placeholder back to {}
-                    const childrenStr = Array.isArray(children)
-                      ? children.join("")
-                      : String(children);
-                    if (childrenStr === "BRACE_BOLD_PLACEHOLDER") {
-                      return <strong>{}</strong>;
-                    }
-                    return <strong>{children}</strong>;
-                  },
-                }}
+            {/* Right Column: Article (Desktop) / Bottom (Mobile) */}
+            <div className={`${isModal ? "lg:col-span-7" : "lg:col-span-7"}`}>
+              <div className="flex flex-col items-center lg:items-start text-center lg:text-left mb-8 md:mb-10">
+                <div
+                  className={`w-12 h-0.5 bg-primary/40 mb-8 hidden lg:block`}
+                />
+                <h3
+                  id="about-this-look"
+                  className={`font-serif font-medium mb-8 md:mb-12 tracking-tight leading-[1.0] text-foreground ${
+                    isModal
+                      ? "text-3xl md:text-4xl"
+                      : "text-5xl md:text-7xl lg:text-8xl"
+                  }`}
+                >
+                  The Editorial
+                </h3>
+              </div>
+
+              <article
+                className={`prose dark:prose-invert font-serif leading-loose text-muted-foreground/90 max-w-none
+                ${isModal ? "prose-base" : "prose-lg"}
+                [&>p:first-of-type]:first-letter:font-serif 
+                [&>p:first-of-type]:first-letter:font-bold 
+                [&>p:first-of-type]:first-letter:mr-4 
+                [&>p:first-of-type]:first-letter:float-left 
+                [&>p:first-of-type]:first-letter:text-foreground
+                [&>p:first-of-type]:first-letter:leading-[0.8]
+                [&>p:first-of-type]:first-letter:mt-2
+                ${isModal ? "[&>p:first-of-type]:first-letter:text-6xl" : "[&>p:first-of-type]:first-letter:text-8xl"}
+                prose-blockquote:border-none
+                prose-blockquote:italic
+                prose-blockquote:font-serif
+                prose-blockquote:text-foreground/80
+                prose-blockquote:relative
+                prose-blockquote:py-8
+                prose-blockquote:my-12
+                ${isModal ? "prose-blockquote:text-xl" : "prose-blockquote:text-2xl"}
+                prose-blockquote:before:content-['']
+                prose-blockquote:before:absolute
+                prose-blockquote:before:top-0
+                prose-blockquote:before:left-0
+                prose-blockquote:before:w-16
+                prose-blockquote:before:h-px
+                prose-blockquote:before:bg-primary/20
+                prose-blockquote:after:content-['']
+                prose-blockquote:after:absolute
+                prose-blockquote:after:bottom-0
+                prose-blockquote:after:right-0
+                prose-blockquote:after:w-16
+                prose-blockquote:after:h-px
+                prose-blockquote:after:bg-primary/20
+              `}
               >
-                {preprocessArticle}
-              </ReactMarkdown>
-            </article>
-            <div className="mt-12 flex items-center gap-4">
-              <div className="h-px w-16 bg-border" />
-              <div className="w-2 h-2 rounded-full bg-border" />
-              <div className="h-px w-16 bg-border" />
+                <ReactMarkdown
+                  components={{
+                    p: ({ children }) => <p>{children}</p>,
+                    strong: ({ children }) => {
+                      // Replace placeholder back to {}
+                      const childrenStr = Array.isArray(children)
+                        ? children.join("")
+                        : String(children);
+                      if (childrenStr === "BRACE_BOLD_PLACEHOLDER") {
+                        return <strong>{}</strong>;
+                      }
+                      return <strong>{children}</strong>;
+                    },
+                  }}
+                >
+                  {preprocessArticle}
+                </ReactMarkdown>
+              </article>
+
+              <div className="mt-16 flex items-center justify-center lg:justify-start gap-4">
+                <div className="h-px w-16 bg-border/40" />
+                <div className="w-2 h-2 rounded-full bg-border/40" />
+                <div className="h-px w-16 bg-border/40" />
+              </div>
             </div>
           </div>
         </section>

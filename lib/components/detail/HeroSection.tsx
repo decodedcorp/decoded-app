@@ -4,6 +4,12 @@ import type { ImageRow } from "@/lib/supabase/types";
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
+
+// Register GSAP ScrollTrigger plugin
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 type Props = {
   image: ImageRow;
@@ -14,43 +20,70 @@ type Props = {
  * Hero Section - The Hook
  *
  * Full-screen hero image with dramatic typography and entrance animations.
- * Uses GSAP for Ken Burns effect (scale) and title reveal animation.
+ * Features parallax effect on scroll for deep spatial feel.
  */
 export function HeroSection({ image, isModal = false }: Props) {
   const heroRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
+
   useGSAP(() => {
     if (!heroRef.current || !imageRef.current || !titleRef.current) return;
 
     const ctx = gsap.context(() => {
-      // Standard Ken Burns effect
+      // Entrance Ken Burns
       gsap.fromTo(
         imageRef.current,
-        { scale: 1.2 },
+        { scale: 1.15 },
         {
           scale: 1.0,
-          duration: 1.5,
+          duration: 2,
           ease: "power2.out",
         }
       );
 
-      // Title reveal: Slides up from below
+      // Title reveal
       gsap.fromTo(
         titleRef.current,
-        { y: "100%", opacity: 0 },
+        { y: "60%", opacity: 0 },
         {
           y: 0,
           opacity: 1,
-          duration: 1.2,
-          delay: 0.3,
-          ease: "power3.out",
+          duration: 1.5,
+          delay: 0.5,
+          ease: "expo.out",
         }
       );
+
+      // Parallax effect on scroll
+      if (!isModal) {
+        gsap.to(titleRef.current, {
+          y: -150,
+          ease: "none",
+          scrollTrigger: {
+            trigger: heroRef.current,
+            start: "top top",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
+
+        gsap.to(imageRef.current, {
+          y: 100,
+          scale: 1.1,
+          ease: "none",
+          scrollTrigger: {
+            trigger: heroRef.current,
+            start: "top top",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
+      }
     }, heroRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [isModal]);
 
   return (
     <div
