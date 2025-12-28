@@ -26,7 +26,7 @@ if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
 fi
 
 tmux new-session -d -s "$SESSION_NAME" \
-  "cd $(pwd) && HOST=0.0.0.0 PORT=3000 yarn start"
+  "cd $(pwd) && HOST=0.0.0.0 PORT=3000 yarn dev"
 
 echo "✅ Dev server restarted on PORT 3000 (session: $SESSION_NAME)"
 
