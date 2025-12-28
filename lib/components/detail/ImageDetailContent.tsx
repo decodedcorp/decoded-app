@@ -2,6 +2,7 @@
 
 import { RefObject } from "react";
 import type { ImageDetail } from "@/lib/supabase/queries/images";
+import type { Json } from "@/lib/supabase/types";
 import { normalizeItem } from "./types";
 import { HeroSection } from "./HeroSection";
 import { InteractiveShowcase } from "./InteractiveShowcase";
@@ -53,6 +54,19 @@ export function ImageDetailContent({
   const article = firstPost?.article?.trim();
   const metadata = firstPost?.metadata;
 
+  // Extract Anchor from metadata
+  const anchor = useMemo(() => {
+    if (!metadata) return null;
+    const anchorTag = metadata.find(
+      (tag) =>
+        tag.toLowerCase().startsWith("anchor:") ||
+        tag.toLowerCase().startsWith("summary:")
+    );
+    if (!anchorTag) return null;
+    // Remove "Anchor:" or "Summary:" prefix and trim
+    return anchorTag.replace(/^(anchor|summary):\s*/i, "").trim();
+  }, [metadata]);
+
   // Preprocess article to handle **{}** pattern for bold formatting
   // Replace **{}** with a placeholder that markdown can parse, then restore in components
   const preprocessArticle = useMemo(() => {
@@ -68,21 +82,25 @@ export function ImageDetailContent({
 
   // Convert item_locations to a map for easy lookup if it's an array
   // Support both Array format (existing data) and Record format (new data)
-  const itemLocationsMap: Record<string, any> = {};
+  const itemLocationsMap: Record<
+    string,
+    { bbox?: number[] | null; center?: Json | null; score?: number | null }
+  > = {};
 
   if (Array.isArray(itemLocations)) {
     itemLocations.forEach((loc: any) => {
       if (loc && loc.item_id) {
-        // Extract center/box from location object
-        // Data format: { item_id: 123, center: [...], bbox: [...] }
-        // We pass the whole location object or just the center part depending on what normalizeCoordinates expects
-        // normalizeCoordinates handles { x, y } or [x, y] or { top, left... }
-        // The DB data has 'center' as [x, y] or {x, y} inside the location object
-        // So we should map item_id -> center data
-        itemLocationsMap[loc.item_id.toString()] = loc.center || loc;
+        // Extract bbox/center/score from location object
+        // Data format: { item_id: 123, center: [...], bbox: [...], score: 0.95 }
+        itemLocationsMap[loc.item_id.toString()] = {
+          bbox: loc.bbox,
+          center: loc.center || loc, // Fallback for backward compatibility where loc itself might be center
+          score: loc.score,
+        };
       }
     });
   } else if (itemLocations && typeof itemLocations === "object") {
+    // If it's an object map, we assume it matches the structure or we cast it
     Object.assign(itemLocationsMap, itemLocations);
   }
 
@@ -148,19 +166,37 @@ export function ImageDetailContent({
 
       {/* About this Look Section - Magazine Style */}
       {article && (
-        <section className="mx-auto max-w-3xl px-6 py-20">
+        <section className="mx-auto max-w-3xl px-6 pt-24 pb-12">
           <div className="flex flex-col items-center text-center">
             {/* Metadata Section - Placed above article as requested */}
             {metadata && (
-              <div className="mb-10 w-full">
+              <div className="mb-12 w-full">
                 <MetadataTags tags={metadata} />
               </div>
             )}
 
-            <div className="w-12 h-0.5 bg-primary mb-8" />
+            {/* Anchor Section - Always Visible */}
+            <div className="mb-16 w-full max-w-2xl">
+              {anchor ? (
+                <p className="font-serif text-xl md:text-2xl italic leading-relaxed text-foreground/90">
+                  &ldquo;{anchor}&rdquo;
+                </p>
+              ) : (
+                <div className="flex flex-col items-center gap-3 select-none opacity-40 hover:opacity-70 transition-opacity">
+                  <span className="font-sans text-[10px] uppercase tracking-[0.2em] text-muted-foreground border-b border-border pb-1">
+                    Decoded Insight
+                  </span>
+                  <p className="font-serif text-lg italic text-muted-foreground">
+                    This look, decoded.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="w-12 h-0.5 bg-primary mb-10" />
             <h3
               id="about-this-look"
-              className="font-serif text-3xl md:text-4xl font-medium mb-10 tracking-tight"
+              className="font-serif text-5xl md:text-7xl font-medium mb-12 tracking-tight leading-[1.1]"
             >
               The Editorial
             </h3>

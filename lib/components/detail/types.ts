@@ -41,6 +41,7 @@ export type NormalizedItem = ItemRow & {
  */
 export type UiItem = NormalizedItem & {
   imageUrl: string | null; // cropped_image_path mapped to camelCase
+  bboxSource: 'override' | 'item' | 'center'; // Source of the bounding box logic
 };
 
 /**
@@ -49,6 +50,65 @@ export type UiItem = NormalizedItem & {
 export function getRelativePos(val: number, max: number): number {
   if (max === 0) return 0;
   return Math.max(0, Math.min(1, val / max));
+}
+
+/**
+ * Convert bbox array [x1, y1, x2, y2] to BoundingBox with validation
+ * Assumption: bbox is normalized (0~1) relative to ORIGINAL IMAGE DIMENSIONS
+ * 
+ * @param bbox - Array format [x1, y1, x2, y2] (normalized 0-1)
+ */
+export function bboxArrayToBoundingBox(bbox: number[]): BoundingBox | null {
+  if (!Array.isArray(bbox) || bbox.length < 4) return null;
+  
+  const [x1, y1, x2, y2] = bbox;
+  
+  // 1. Ordering Validation (x2 must be > x1, y2 must be > y1)
+  if (x2 <= x1 || y2 <= y1) return null;
+  
+  // 2. Boundary Clamp (0.0 ~ 1.0)
+  const left = Math.max(0, Math.min(1, x1));
+  const top = Math.max(0, Math.min(1, y1));
+  const right = Math.max(0, Math.min(1, x2));
+  const bottom = Math.max(0, Math.min(1, y2));
+  
+  const width = right - left;
+  const height = bottom - top;
+  
+  // 3. Min Size Guardrail (UX Protection)
+  // If too small (e.g., < 2%), return null to trigger center fallback
+  if (width < 0.02 || height < 0.02) return null;
+
+  return { left, top, width, height };
+}
+
+/**
+ * Select best bbox from item.bboxes array based on scores
+ */
+export function selectBestBbox(
+  bboxes: Json | null,
+  scores: Json | null
+): number[] | null {
+  if (!Array.isArray(bboxes) || bboxes.length === 0) return null;
+  
+  // If scores missing or length mismatch, safely return first bbox
+  if (!Array.isArray(scores) || scores.length !== bboxes.length) {
+    return bboxes[0] as number[];
+  }
+  
+  // Find index of highest score
+  let maxIndex = 0;
+  let maxScore = -1;
+  
+  scores.forEach((score, i) => {
+    if (typeof score === 'number' && score > maxScore) {
+      maxScore = score;
+      maxIndex = i;
+    }
+  });
+  
+  // Return bbox at max index (or fallback to first if something went wrong)
+  return (bboxes[maxIndex] as number[]) || (bboxes[0] as number[]);
 }
 
 /**
@@ -202,16 +262,33 @@ export function getBoxCenter(box: BoundingBox): NormalizedCoord {
  *
  * @param item - Raw item from database (DbItem)
  * @param imageSize - Optional image dimensions for coordinate normalization
- * @param overrideCenter - Optional coordinate override (e.g. from post_image.item_locations)
+ * @param overrideLocation - Optional coordinate override (e.g. from post_image.item_locations)
+ *                          Can be { bbox, center, score } or just center/bbox data
  * @returns Normalized item with UI-friendly field names (UiItem)
  */
 export function normalizeItem(
   item: DbItem,
   imageSize?: { width: number; height: number },
-  overrideCenter?: Json | null
+  overrideLocation?: Json | null
 ): UiItem {
-  // Use overrideCenter if provided, otherwise fallback to item.center
-  const centerToUse = overrideCenter !== undefined ? overrideCenter : item.center;
+  // User requested to revert to Center-based logic
+  // Bbox data is currently unreliable for positioning
+  
+  let centerToUse = item.center;
+  
+  // Check override for center
+  if (overrideLocation !== undefined && overrideLocation !== null) {
+    if (typeof overrideLocation === 'object' && !Array.isArray(overrideLocation)) {
+      const loc = overrideLocation as Record<string, unknown>;
+      if (loc.center) {
+        centerToUse = loc.center as Json;
+      } else if (typeof loc.x === 'number' && typeof loc.y === 'number') {
+        centerToUse = overrideLocation; // The object itself is the center
+      }
+    } else if (Array.isArray(overrideLocation)) {
+      centerToUse = overrideLocation; // Array [x, y]
+    }
+  }
   
   const normalizedBox = normalizeCoordinates(centerToUse, imageSize);
   const normalizedCenter = normalizedBox ? getBoxCenter(normalizedBox) : null;
@@ -220,6 +297,7 @@ export function normalizeItem(
     ...item,
     normalizedBox,
     normalizedCenter,
-    imageUrl: item.cropped_image_path || null, // Explicit mapping: DB snake_case → UI camelCase
+    imageUrl: item.cropped_image_path || null,
+    bboxSource: 'center', // Always center
   };
 }
