@@ -10,8 +10,11 @@ import { ShopGrid } from "./ShopGrid";
 import { RelatedImages } from "./RelatedImages";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { MetadataTags } from "./MetadataTags";
+import { extractDominantColors, ColorResult } from "@/lib/utils/color";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 
 type Props = {
   image: ImageDetail;
@@ -127,6 +130,62 @@ export function ImageDetailContent({
     );
     return catTag || "Fashion Analysis";
   }, [metadata]);
+
+  // Extract style markers from metadata
+  const styleMarkers = useMemo(() => {
+    if (!metadata) return [];
+    // Filter out tags with colons (technical specs) and long ones
+    return metadata
+      .filter((tag) => !tag.includes(":") && tag.length < 15)
+      .slice(0, 3);
+  }, [metadata]);
+
+  const [colors, setColors] = useState<ColorResult[]>([]);
+  const [isColorLoading, setIsColorLoading] = useState(false);
+
+  useEffect(() => {
+    if (!image.image_url) return;
+
+    const fetchColors = async () => {
+      setIsColorLoading(true);
+      try {
+        // Simple client-side cache
+        const cacheKey = `colors-${image.id}`;
+        const cached = sessionStorage.getItem(cacheKey);
+        if (cached) {
+          setColors(JSON.parse(cached));
+          setIsColorLoading(false);
+          return;
+        }
+
+        const extracted = await extractDominantColors(image.image_url || "", 4);
+        setColors(extracted);
+        sessionStorage.setItem(cacheKey, JSON.stringify(extracted));
+      } catch (err) {
+        console.warn("Color extraction failed:", err);
+      } finally {
+        setIsColorLoading(false);
+      }
+    };
+
+    fetchColors();
+  }, [image.image_url, image.id]);
+
+  useGSAP(() => {
+    if (colors.length > 0) {
+      gsap.fromTo(
+        ".color-swatch",
+        { scale: 0, opacity: 0 },
+        {
+          scale: 1,
+          opacity: 1,
+          duration: 0.6,
+          stagger: 0.1,
+          ease: "back.out(1.7)",
+        }
+      );
+    }
+  }, [colors]);
 
   return (
     <div className="detail-content relative">
@@ -299,7 +358,7 @@ export function ImageDetailContent({
               {/* Anchor Section - Always Visible */}
               <div className={`${isModal ? "mb-8" : "mb-12"} w-full`}>
                 {anchor ? (
-                  <div className="relative">
+                  <div className="relative mb-10">
                     <span
                       className={`absolute -left-3 -top-6 font-serif text-primary/10 select-none ${isModal ? "text-4xl" : "text-8xl"}`}
                     >
@@ -317,7 +376,7 @@ export function ImageDetailContent({
                     </span>
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center lg:items-start gap-3 select-none opacity-40 hover:opacity-70 transition-opacity">
+                  <div className="flex flex-col items-center lg:items-start gap-3 select-none opacity-40 hover:opacity-70 transition-opacity mb-10">
                     <span className="font-sans text-[10px] uppercase tracking-[0.2em] text-muted-foreground border-b border-border pb-1">
                       Decoded Insight
                     </span>
@@ -326,21 +385,127 @@ export function ImageDetailContent({
                     </p>
                   </div>
                 )}
+
+                {/* Chromatic & Style Analysis Section */}
+                <div
+                  className={`mt-8 md:mt-12 pt-8 border-t border-border/20 ${isModal ? "text-center lg:text-left" : ""}`}
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    {/* Color Palette */}
+                    <div className="flex flex-col">
+                      <span className="font-sans text-[9px] uppercase tracking-[0.3em] text-primary/60 font-bold mb-6 block">
+                        Chromatic Analysis
+                      </span>
+
+                      <div
+                        className={`flex flex-wrap ${isModal ? "justify-center lg:justify-start" : "justify-start"} gap-5`}
+                      >
+                        {isColorLoading
+                          ? Array.from({ length: 4 }).map((_, i) => (
+                              <div
+                                key={i}
+                                className="flex flex-col gap-2 items-center lg:items-start animate-pulse"
+                              >
+                                <div className="w-8 h-8 rounded-full bg-muted" />
+                                <div className="w-10 h-2 bg-muted rounded" />
+                              </div>
+                            ))
+                          : colors.map((color, i) => (
+                              <div
+                                key={i}
+                                className="color-swatch flex flex-col gap-2 items-center lg:items-start group cursor-default"
+                              >
+                                <div
+                                  className={`rounded-full border border-border/20 shadow-inner transition-transform duration-300 group-hover:scale-110 ${isModal ? "w-8 h-8" : "w-10 h-10"}`}
+                                  style={{ backgroundColor: color.hex }}
+                                  title={color.hex}
+                                />
+                                <div className="flex flex-col gap-0.5">
+                                  <span className="font-serif text-[10px] italic text-foreground/70">
+                                    {color.name}
+                                  </span>
+                                  <span className="font-mono text-[8px] uppercase text-muted-foreground/50 tracking-tighter">
+                                    {color.hex}
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                      </div>
+                    </div>
+
+                    {/* Style Markers */}
+                    <div className="flex flex-col">
+                      <span className="font-sans text-[9px] uppercase tracking-[0.3em] text-primary/60 font-bold mb-6 block">
+                        Style Radar
+                      </span>
+                      <div
+                        className={`flex flex-col gap-4 ${isModal ? "items-center lg:items-start" : "items-start"}`}
+                      >
+                        {styleMarkers.length > 0 ? (
+                          styleMarkers.map((marker, i) => (
+                            <div
+                              key={i}
+                              className="flex flex-col gap-1 w-full max-w-[150px]"
+                            >
+                              <div className="flex justify-between items-end mb-1">
+                                <span className="font-serif text-[11px] italic text-foreground/80">
+                                  {marker}
+                                </span>
+                                <span className="font-sans text-[8px] text-muted-foreground/40 uppercase">
+                                  Strong
+                                </span>
+                              </div>
+                              <div className="h-[1px] w-full bg-border/20 relative">
+                                <div
+                                  className="absolute inset-0 bg-primary/40"
+                                  style={{ width: `${85 - i * 15}%` }}
+                                />
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="font-serif text-[11px] italic text-muted-foreground/40">
+                            Visual analysis ongoing
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Editor's Footnote */}
+                <div
+                  className={`mt-10 pt-6 border-t border-dashed border-border/20 ${isModal ? "text-center lg:text-left" : ""}`}
+                >
+                  <div className="flex flex-col gap-2">
+                    <p className="font-serif text-[11px] italic text-muted-foreground/60 leading-relaxed">
+                      &mdash; Tip:{" "}
+                      {colors.length > 0
+                        ? `The ${colors[0].name.toLowerCase()} base provides a perfect canvas for high-contrast layering.`
+                        : "Focus on the silhouette balance to achieve this curated editorial look."}
+                    </p>
+                    <span className="font-sans text-[8px] uppercase tracking-[0.2em] text-muted-foreground/30">
+                      Curated by Decoded Editorial Team
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Right Column: Article (Desktop) / Bottom (Mobile) */}
             <div className={`${isModal ? "lg:col-span-7" : "lg:col-span-7"}`}>
-              <div className="flex flex-col items-center lg:items-start text-center lg:text-left mb-8 md:mb-10">
+              <div
+                className={`flex flex-col items-center lg:items-start text-center lg:text-left ${isModal ? "mb-6" : "mb-8 md:mb-10"}`}
+              >
                 <div
-                  className={`w-12 h-0.5 bg-primary/40 mb-8 hidden lg:block`}
+                  className={`w-12 h-0.5 bg-primary/40 hidden lg:block ${isModal ? "mb-6" : "mb-8"}`}
                 />
                 <h3
                   id="about-this-look"
-                  className={`font-serif font-medium mb-8 md:mb-12 tracking-tight leading-[1.0] text-foreground ${
+                  className={`font-serif font-medium tracking-tight leading-[1.0] text-foreground ${
                     isModal
-                      ? "text-3xl md:text-4xl"
-                      : "text-5xl md:text-7xl lg:text-8xl"
+                      ? "text-3xl md:text-4xl mb-6"
+                      : "text-5xl md:text-7xl lg:text-8xl mb-8 md:mb-12"
                   }`}
                 >
                   The Editorial
