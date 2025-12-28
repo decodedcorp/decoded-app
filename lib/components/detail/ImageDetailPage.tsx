@@ -7,6 +7,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { useRouter } from "next/navigation";
 import { X, Share2 } from "lucide-react";
+import { ReportErrorButton } from "./ReportErrorButton"; // Import ReportErrorButton
 
 type Props = {
   imageId: string;
@@ -115,6 +116,7 @@ export function ImageDetailPage({ imageId }: Props) {
       <div ref={pageRef} className="relative">
         {/* Action Buttons */}
         <div className="fixed right-4 top-4 z-50 flex gap-2">
+          <ReportErrorButton postId={image.id} size="md" />
           <button
             onClick={handleShare}
             className="flex h-10 w-10 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm transition-colors hover:bg-background/90"

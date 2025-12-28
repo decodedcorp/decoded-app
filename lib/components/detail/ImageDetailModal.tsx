@@ -11,6 +11,7 @@ import { useTransitionStore } from "@/lib/stores/transitionStore";
 import { ImageCanvas } from "./ImageCanvas"; // Import ImageCanvas
 import { normalizeItem } from "./types"; // Import normalizeItem
 import { useNormalizedItems } from "@/lib/hooks/useNormalizedItems";
+import { ReportErrorButton } from "./ReportErrorButton"; // Import ReportErrorButton
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(Flip);
@@ -611,6 +612,7 @@ export function ImageDetailModal({ imageId }: Props) {
 
         {/* Floating Controls */}
         <div className="absolute top-4 right-4 md:top-auto md:right-auto md:bottom-6 md:left-6 z-20 flex gap-3">
+          <ReportErrorButton postId={image?.id} size="md" />
           <button
             onClick={handleMaximize}
             className="flex h-12 w-12 items-center justify-center rounded-full bg-black/80 text-white backdrop-blur-sm transition-transform hover:scale-105 hover:bg-black active:scale-95 dark:bg-white/80 dark:text-black dark:hover:bg-white"
