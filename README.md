@@ -29,6 +29,7 @@ For running the server persistently on Mac Mini (survives SSH disconnection):
 **Quick Reference**: `tmux new -s frontend → HOST=0.0.0.0 PORT=3000 yarn dev → Ctrl+b, d`
 
 See **[Server Setup Guide](docs/server-setup.md)** for detailed instructions including:
+
 - tmux session management
 - Development vs production server modes
 - Team access configuration
@@ -51,20 +52,23 @@ This project includes a comprehensive AI development boilerplate for multi-AI wo
 ### Quick Start for Spec-Driven Development
 
 1. **Install SpecKit/Specify CLI** (separate installation required):
+
    ```bash
    # Via uvx (recommended)
    uvx specify
-   
+
    # Or via specify init
    specify init
    ```
+
    Note: This boilerplate provides directory structure and templates only. SpecKit CLI installation is separate.
 
 2. **Create a spec**:
+
    ```bash
    # Using SpecKit CLI (if installed)
    specify new feature FEATURE-my-feature
-   
+
    # Or manually copy from template
    cp specs/feature/FEATURE-sample-feature.yml specs/feature/FEATURE-my-feature.yml
    ```
@@ -74,10 +78,11 @@ This project includes a comprehensive AI development boilerplate for multi-AI wo
    - Reference spec IDs in code: `// spec: FEATURE-xxx - description`
 
 4. **Use Codex CLI** for terminal-based work:
+
    ```bash
    # Copy config to global location first
    cp .codex/config.toml ~/.codex/config.toml
-   
+
    # Run workflow script
    scripts/run-spec-workflow.sh FEATURE-my-feature
    ```
@@ -90,6 +95,7 @@ This project includes a comprehensive AI development boilerplate for multi-AI wo
 ### Phase 1 vs Phase 2 Setup
 
 #### Phase 1: Core Skeleton (Essential)
+
 - ✅ Specs directory structure (`specs/`)
 - ✅ ADR templates (`docs/adr/`)
 - ✅ Cursor spec-workflow rule (`.cursor/rules/spec-workflow.mdc`)
@@ -97,6 +103,7 @@ This project includes a comprehensive AI development boilerplate for multi-AI wo
 - ✅ Workflow script (`scripts/run-spec-workflow.sh`)
 
 #### Phase 2: Advanced AI Integration (Optional)
+
 - Claude configuration (`CLAUDE.md`, `.claude/settings.json`)
 - Cursor MCP configuration (`.cursor/mcp.json`, `.cursor/cli-config.json`)
 - MCP reference template (`.mcp.json`)
@@ -107,6 +114,7 @@ This project includes a comprehensive AI development boilerplate for multi-AI wo
 ### Codex CLI Setup
 
 1. **Copy config to global location**:
+
    ```bash
    mkdir -p ~/.codex
    cp .codex/config.toml ~/.codex/config.toml
@@ -274,4 +282,3 @@ yarn test
 ## 📝 License
 
 [Add your license information here]
-

@@ -2,12 +2,16 @@
   "name": "frontend-rules",
   "description": "Frontend-specific rules for React/Next.js development",
   "priority": 10,
-  "patterns": ["src/**/*.{ts,tsx}", "app/**/*.{ts,tsx}", "components/**/*.{ts,tsx}"],
+  "patterns": [
+    "src/**/*.{ts,tsx}",
+    "app/**/*.{ts,tsx}",
+    "components/**/*.{ts,tsx}",
+  ],
   "config": {
     "framework": {
       "name": "Next.js",
       "version": "latest",
-      "language": "TypeScript"
+      "language": "TypeScript",
     },
     "instructions": [
       "Use React + TypeScript with strict typing.",
@@ -19,14 +23,13 @@
       "Use Next.js conventions: App Router, Server Components when appropriate.",
       "Ensure responsive design and mobile optimization.",
       "Add proper error boundaries for error handling.",
-      "Use proper semantic HTML elements."
+      "Use proper semantic HTML elements.",
     ],
     "code_quality": {
       "strict_mode": true,
       "no_any": true,
       "small_functions": true,
-      "composable_components": true
-    }
-  }
+      "composable_components": true,
+    },
+  },
 }
-

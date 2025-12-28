@@ -6,9 +6,9 @@
   :root {
     --background: oklch(0.9842 0.0034 247.8575);
     --foreground: oklch(0.2077 0.0398 265.7549);
-    --card: oklch(1.0000 0 0);
+    --card: oklch(1 0 0);
     --card-foreground: oklch(0.2077 0.0398 265.7549);
-    --popover: oklch(1.0000 0 0);
+    --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.2077 0.0398 265.7549);
     --primary: oklch(0.9519 0.1739 115.8446);
     --primary-foreground: oklch(0.2257 0.0038 106.6998);
@@ -28,7 +28,7 @@
     --chart-3: oklch(0.7049 0.1867 47.6044);
     --chart-4: oklch(0.6959 0.1491 162.4796);
     --chart-5: oklch(0.6368 0.2078 25.3313);
-    --sidebar: oklch(1.0000 0 0);
+    --sidebar: oklch(1 0 0);
     --sidebar-foreground: oklch(0.2077 0.0398 265.7549);
     --sidebar-primary: oklch(0.9519 0.1739 115.8446);
     --sidebar-primary-foreground: oklch(0.2257 0.0038 106.6998);
@@ -48,11 +48,17 @@
     --shadow-color: #000000;
     --shadow-2xs: 0px 4px 10px 0px hsl(0 0% 0% / 0.03);
     --shadow-xs: 0px 4px 10px 0px hsl(0 0% 0% / 0.03);
-    --shadow-sm: 0px 4px 10px 0px hsl(0 0% 0% / 0.05), 0px 1px 2px -1px hsl(0 0% 0% / 0.05);
-    --shadow: 0px 4px 10px 0px hsl(0 0% 0% / 0.05), 0px 1px 2px -1px hsl(0 0% 0% / 0.05);
-    --shadow-md: 0px 4px 10px 0px hsl(0 0% 0% / 0.05), 0px 2px 4px -1px hsl(0 0% 0% / 0.05);
-    --shadow-lg: 0px 4px 10px 0px hsl(0 0% 0% / 0.05), 0px 4px 6px -1px hsl(0 0% 0% / 0.05);
-    --shadow-xl: 0px 4px 10px 0px hsl(0 0% 0% / 0.05), 0px 8px 10px -1px hsl(0 0% 0% / 0.05);
+    --shadow-sm:
+      0px 4px 10px 0px hsl(0 0% 0% / 0.05), 0px 1px 2px -1px hsl(0 0% 0% / 0.05);
+    --shadow:
+      0px 4px 10px 0px hsl(0 0% 0% / 0.05), 0px 1px 2px -1px hsl(0 0% 0% / 0.05);
+    --shadow-md:
+      0px 4px 10px 0px hsl(0 0% 0% / 0.05), 0px 2px 4px -1px hsl(0 0% 0% / 0.05);
+    --shadow-lg:
+      0px 4px 10px 0px hsl(0 0% 0% / 0.05), 0px 4px 6px -1px hsl(0 0% 0% / 0.05);
+    --shadow-xl:
+      0px 4px 10px 0px hsl(0 0% 0% / 0.05),
+      0px 8px 10px -1px hsl(0 0% 0% / 0.05);
     --shadow-2xl: 0px 4px 10px 0px hsl(0 0% 0% / 0.13);
     --tracking-normal: normal;
     --spacing: 0.25rem;
@@ -79,7 +85,7 @@
     --input: oklch(0.2768 0 0);
     --ring: oklch(0.9519 0.1739 115.8446);
     --chart-1: oklch(0.9519 0.1739 115.8446);
-    --chart-2: oklch(0.6190 0.0325 248.3513);
+    --chart-2: oklch(0.619 0.0325 248.3513);
     --chart-3: oklch(0.7049 0.1867 47.6044);
     --chart-4: oklch(0.6959 0.1491 162.4796);
     --chart-5: oklch(0.6368 0.2078 25.3313);
@@ -101,14 +107,19 @@
     --shadow-spread: 0px;
     --shadow-opacity: 0.4;
     --shadow-color: #000000;
-    --shadow-2xs: 0px 8px 20px 0px hsl(0 0% 0% / 0.20);
-    --shadow-xs: 0px 8px 20px 0px hsl(0 0% 0% / 0.20);
-    --shadow-sm: 0px 8px 20px 0px hsl(0 0% 0% / 0.40), 0px 1px 2px -1px hsl(0 0% 0% / 0.40);
-    --shadow: 0px 8px 20px 0px hsl(0 0% 0% / 0.40), 0px 1px 2px -1px hsl(0 0% 0% / 0.40);
-    --shadow-md: 0px 8px 20px 0px hsl(0 0% 0% / 0.40), 0px 2px 4px -1px hsl(0 0% 0% / 0.40);
-    --shadow-lg: 0px 8px 20px 0px hsl(0 0% 0% / 0.40), 0px 4px 6px -1px hsl(0 0% 0% / 0.40);
-    --shadow-xl: 0px 8px 20px 0px hsl(0 0% 0% / 0.40), 0px 8px 10px -1px hsl(0 0% 0% / 0.40);
-    --shadow-2xl: 0px 8px 20px 0px hsl(0 0% 0% / 1.00);
+    --shadow-2xs: 0px 8px 20px 0px hsl(0 0% 0% / 0.2);
+    --shadow-xs: 0px 8px 20px 0px hsl(0 0% 0% / 0.2);
+    --shadow-sm:
+      0px 8px 20px 0px hsl(0 0% 0% / 0.4), 0px 1px 2px -1px hsl(0 0% 0% / 0.4);
+    --shadow:
+      0px 8px 20px 0px hsl(0 0% 0% / 0.4), 0px 1px 2px -1px hsl(0 0% 0% / 0.4);
+    --shadow-md:
+      0px 8px 20px 0px hsl(0 0% 0% / 0.4), 0px 2px 4px -1px hsl(0 0% 0% / 0.4);
+    --shadow-lg:
+      0px 8px 20px 0px hsl(0 0% 0% / 0.4), 0px 4px 6px -1px hsl(0 0% 0% / 0.4);
+    --shadow-xl:
+      0px 8px 20px 0px hsl(0 0% 0% / 0.4), 0px 8px 10px -1px hsl(0 0% 0% / 0.4);
+    --shadow-2xl: 0px 8px 20px 0px hsl(0 0% 0% / 1);
   }
 }
 
@@ -126,8 +137,9 @@
 .js-observe {
   opacity: 0;
   transform: translateY(10px) scale(1);
-  transition: opacity 0.34s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    opacity 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
   transition-delay: var(--stagger, 0ms);
   will-change: opacity, transform;
 }
@@ -163,7 +175,7 @@
     transform: none;
     opacity: 1;
   }
-  
+
   .js-observe.is-visible,
   .js-observe.is-hidden {
     opacity: 1;

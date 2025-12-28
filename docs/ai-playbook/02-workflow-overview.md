@@ -59,4 +59,3 @@ This single workflow covers most feature work. See tool profiles for specific us
 - **Speckit** (`.specify/`): Existing infrastructure preserved. Claude uses `.claude/commands/speckit.*` for spec review.
 - **Cursor Rules** (`.cursor/rules/`): Automatically applied when using Cursor.
 - **Templates**: Located in `docs/prompts/` for Gemini and Codex.
-

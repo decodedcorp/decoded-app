@@ -16,6 +16,7 @@
 ### From Cursor/Claude
 
 Gemini receives:
+
 - **Diffs**: Code changes with context
 - **PR summaries**: Bullet-point summaries of changes
 - **Short bullet notes**: Key points from implementation
@@ -26,14 +27,17 @@ Gemini receives:
 ## Changes Summary
 
 ### Files Modified
+
 - `src/components/Button.tsx`: Added variant prop
 - `src/utils/calculations.ts`: Extracted calculateTotal function
 
 ### Key Changes
+
 - Added Button variant support (primary/secondary)
 - Extracted calculation logic for better testability
 
 ### Breaking Changes
+
 - None
 ```
 
@@ -47,15 +51,19 @@ Output to `docs/features/<feature-id>.md`:
 # Feature: [Feature Name]
 
 ## Overview
+
 [Brief description of what the feature does]
 
 ## User Impact
+
 [How this affects users]
 
 ## Technical Details
+
 [Lightweight technical explanation]
 
 ## How to Use
+
 [Examples and usage instructions]
 ```
 
@@ -100,6 +108,7 @@ Use templates from `docs/prompts/gemini/`:
 **Purpose**: Explain new features to users and developers
 
 **Structure**:
+
 - Overview
 - User impact
 - Technical details (lightweight)
@@ -112,6 +121,7 @@ Use templates from `docs/prompts/gemini/`:
 **Purpose**: Document architectural decisions
 
 **Structure**:
+
 - Context
 - Decision
 - Consequences
@@ -124,6 +134,7 @@ Use templates from `docs/prompts/gemini/`:
 **Purpose**: Step-by-step tutorials
 
 **Structure**:
+
 - Prerequisites
 - Steps
 - Examples
@@ -138,6 +149,7 @@ Use templates from `docs/prompts/gemini/`:
 **Format**: Mermaid diagrams
 
 **Types**:
+
 - Architecture diagrams
 - Flow charts
 - Sequence diagrams
@@ -166,12 +178,15 @@ Use templates from `docs/prompts/gemini/`:
 # Feature: Button Variants
 
 ## Overview
+
 Buttons now support multiple visual variants (primary and secondary) to improve UI consistency.
 
 ## User Impact
+
 Users will see more consistent button styling across the application, with primary actions clearly distinguished from secondary actions.
 
 ## Technical Details
+
 - Added `variant` prop to Button component
 - Uses CSS classes for styling
 - Defaults to 'primary' for backward compatibility
@@ -197,17 +212,21 @@ Users will see more consistent button styling across the application, with prima
 # ADR-0002: Extract Calculation Logic
 
 ## Context
+
 Calculation logic was embedded in components, making testing difficult.
 
 ## Decision
+
 Extract calculation logic into separate utility functions.
 
 ## Consequences
+
 - ✅ Easier to test
 - ✅ Better code organization
 - ⚠️ Additional file to maintain
 
 ## Alternatives Considered
+
 - Keep logic in components (rejected: hard to test)
 - Create service class (rejected: over-engineering)
 ```
@@ -226,4 +245,3 @@ Extract calculation logic into separate utility functions.
 - **Output**: Save to `docs/features/`, `docs/adr/`, `docs/how-to/`
 - **Input**: Receive summaries from Cursor/Claude
 - **Format**: Markdown with mermaid diagrams
-

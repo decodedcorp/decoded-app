@@ -67,12 +67,12 @@ export type FetchFilteredImagesParams = {
 };
 
 // Helper to encode composite cursor
-function encodeCursor(createdAt: string, id: string): string {
+export function encodeCursor(createdAt: string, id: string): string {
   return btoa(JSON.stringify({ createdAt, id }));
 }
 
 // Helper to decode composite cursor
-function decodeCursor(
+export function decodeCursor(
   cursor: string
 ): { createdAt: string; id: string } | null {
   try {
@@ -210,11 +210,9 @@ export async function fetchImageById(id: string): Promise<ImageDetail | null> {
   // Fallback: If post-based fetch didn't work, use traditional item.image_id approach
   if (!itemsFetchedViaPost) {
     // Ensure items is always an array (Supabase may return different types)
-    items = (Array.isArray(data.items)
-      ? data.items
-      : data.items
-        ? [data.items]
-        : []) as ItemRow[];
+    items = (
+      Array.isArray(data.items) ? data.items : data.items ? [data.items] : []
+    ) as ItemRow[];
 
     // Fallback: If join query didn't return items, fetch them separately
     // This can happen if the relationship isn't properly configured or RLS blocks the join
@@ -307,15 +305,16 @@ export async function fetchFilteredImages(
     if (cursor) {
       const decoded = decodeCursor(cursor);
       if (decoded) {
-        const { createdAt } = decoded;
-        // Using only created_at for cursor in join query for simplicity
-        // ideally should be (created_at, id) tuple
-        queryBuilder = queryBuilder.lt("created_at", createdAt);
+        const { createdAt, id } = decoded;
+        queryBuilder = queryBuilder.or(
+          `and(created_at.eq.${createdAt},image_id.lt.${id}),created_at.lt.${createdAt}`
+        );
       }
     }
 
     queryBuilder = queryBuilder
       .order("created_at", { ascending: false })
+      .order("image_id", { ascending: false })
       .limit(limit + 1);
 
     const result = await queryBuilder;
@@ -444,9 +443,6 @@ export async function fetchImagesByPostImage(
     queryBuilder = queryBuilder.eq("post.account", filter);
   }
 
-  // Apply timestamp filter (posts after 2024-01-01)
-  queryBuilder = queryBuilder.gte("post.ts", "2024-01-01");
-
   // Apply basic filters on the joined image table
   queryBuilder = queryBuilder
     .not("image.image_url", "is", null)
@@ -465,13 +461,16 @@ export async function fetchImagesByPostImage(
   if (cursor) {
     const decoded = decodeCursor(cursor);
     if (decoded) {
-      const { createdAt } = decoded;
-      queryBuilder = queryBuilder.lt("created_at", createdAt);
+      const { createdAt, id } = decoded;
+      queryBuilder = queryBuilder.or(
+        `and(created_at.eq.${createdAt},image_id.lt.${id}),created_at.lt.${createdAt}`
+      );
     }
   }
 
   queryBuilder = queryBuilder
     .order("created_at", { ascending: false })
+    .order("image_id", { ascending: false })
     .limit(limit + 1);
 
   const { data, error } = await queryBuilder;
@@ -489,8 +488,13 @@ export async function fetchImagesByPostImage(
       const imageRow = Array.isArray(row.image) ? row.image[0] : row.image;
       const postRow = Array.isArray(row.post) ? row.post[0] : row.post;
       const postImageCreatedAt = row.created_at; // post_image.created_at
-      
-      if (imageRow && imageRow.id && postRow && !uniqueImages.has(imageRow.id)) {
+
+      if (
+        imageRow &&
+        imageRow.id &&
+        postRow &&
+        !uniqueImages.has(imageRow.id)
+      ) {
         const image: ImageWithPostId = {
           id: imageRow.id,
           image_hash: imageRow.image_hash,
@@ -558,7 +562,7 @@ export async function fetchRelatedImagesByAccount(
       // row is post_image, contains image object
       if (!row.image) continue;
       const imageRow = Array.isArray(row.image) ? row.image[0] : row.image;
-      
+
       if (imageRow && imageRow.id && !uniqueImages.has(imageRow.id)) {
         const image: ImageRow = {
           id: imageRow.id,
@@ -569,7 +573,7 @@ export async function fetchRelatedImagesByAccount(
           created_at: row.created_at, // Use post_image time
         };
         uniqueImages.set(imageRow.id, image);
-        
+
         if (uniqueImages.size >= limit) break;
       }
     }

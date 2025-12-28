@@ -34,8 +34,14 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
   });
 
   // State for coordinate correction (object-fit: cover)
-  const [naturalSize, setNaturalSize] = useState<{ width: number; height: number } | null>(null);
-  const [containerSize, setContainerSize] = useState<{ width: number; height: number } | null>(null);
+  const [naturalSize, setNaturalSize] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
+  const [containerSize, setContainerSize] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
 
   // ResizeObserver for container
   useEffect(() => {
@@ -136,9 +142,14 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
 
       // Calculate translation to center the item
       // We reuse logic similar to getDisplayedRect but within the GSAP context
-      if (containerRef.current && imageRef.current && naturalSize && containerSize) {
+      if (
+        containerRef.current &&
+        imageRef.current &&
+        naturalSize &&
+        containerSize
+      ) {
         const rect = getDisplayedRect();
-        
+
         if (rect) {
           // Calculate offset needed to center the item based on displayed dimensions
           const offsetX = (center.x - 0.5) * (scale - 1) * rect.width;
@@ -168,7 +179,10 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
         }
       }
     },
-    { scope: containerRef, dependencies: [activeIndex, naturalSize, containerSize] }
+    {
+      scope: containerRef,
+      dependencies: [activeIndex, naturalSize, containerSize],
+    }
   );
 
   // Spotlight effect: Update overlay mask
@@ -195,18 +209,30 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
       tr: { x: (box.left + box.width) * 100, y: box.top * 100 },
       br: { x: (box.left + box.width) * 100, y: (box.top + box.height) * 100 },
       bl: { x: box.left * 100, y: (box.top + box.height) * 100 },
-      unit: "%"
+      unit: "%",
     };
 
     if (rect) {
       // Use pixel values relative to container if we have rect info
       // This accounts for object-fit: cover offsets
       points = {
-        tl: { x: rect.left + box.left * rect.width, y: rect.top + box.top * rect.height },
-        tr: { x: rect.left + (box.left + box.width) * rect.width, y: rect.top + box.top * rect.height },
-        br: { x: rect.left + (box.left + box.width) * rect.width, y: rect.top + (box.top + box.height) * rect.height },
-        bl: { x: rect.left + box.left * rect.width, y: rect.top + (box.top + box.height) * rect.height },
-        unit: "px"
+        tl: {
+          x: rect.left + box.left * rect.width,
+          y: rect.top + box.top * rect.height,
+        },
+        tr: {
+          x: rect.left + (box.left + box.width) * rect.width,
+          y: rect.top + box.top * rect.height,
+        },
+        br: {
+          x: rect.left + (box.left + box.width) * rect.width,
+          y: rect.top + (box.top + box.height) * rect.height,
+        },
+        bl: {
+          x: rect.left + box.left * rect.width,
+          y: rect.top + (box.top + box.height) * rect.height,
+        },
+        unit: "px",
       };
     }
 
@@ -244,7 +270,7 @@ export function ImageCanvas({ image, items, activeIndex }: Props) {
             onLoad={(e) => {
               setNaturalSize({
                 width: e.currentTarget.naturalWidth,
-                height: e.currentTarget.naturalHeight
+                height: e.currentTarget.naturalHeight,
               });
             }}
           />

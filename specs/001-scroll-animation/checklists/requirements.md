@@ -48,5 +48,6 @@ All validation checks passed successfully. The specification is complete and rea
 ## Notes
 
 The specification is production-ready and can proceed to either:
+
 - `/speckit.clarify` - If stakeholder input is needed on any aspect
 - `/speckit.plan` - To begin technical planning and task breakdown

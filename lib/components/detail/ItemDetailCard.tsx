@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
+import Markdown from "react-markdown";
 import { ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
 import {
   filterKoreanTags,
@@ -16,6 +17,7 @@ type Props = {
   index: number;
   onActivate: () => void;
   onDeactivate: () => void;
+  isModal?: boolean;
 };
 
 /**
@@ -32,9 +34,11 @@ export function ItemDetailCard({
   index,
   onActivate,
   onDeactivate,
+  isModal = false,
 }: Props) {
   const cardRef = useRef<HTMLDivElement>(null);
   const formattedIndex = String(index + 1).padStart(2, "0");
+
   const [sourcesExpanded, setSourcesExpanded] = useState(false);
   const [showSpecs, setShowSpecs] = useState(false);
 
@@ -52,11 +56,8 @@ export function ItemDetailCard({
   const displayPrice = item.price
     ? extractKoreanPart(item.price, { splitByComma: false }) || item.price
     : null;
-  // For description, disable comma splitting to avoid breaking sentences
-  const displayDescription = item.description
-    ? extractKoreanPart(item.description, { splitByComma: false }) ||
-      item.description
-    : null;
+  // For description, use raw markdown content without extraction
+  const displayDescription = item.description || null;
 
   // Parse metadata into key-value pairs if possible
   const parsedMetadata = displayTags.map((tag) => {
@@ -78,7 +79,11 @@ export function ItemDetailCard({
     >
       {/* Decorative Background Index */}
       <div
-        className="absolute -left-4 -top-2 z-0 select-none font-serif text-[4rem] md:text-[6rem] lg:text-[9rem] font-bold leading-none text-muted/20 md:-left-10 lg:-left-16"
+        className={`absolute z-0 select-none font-serif font-black leading-none text-foreground/[0.05] pointer-events-none transition-all duration-500 ${
+          isModal
+            ? "text-[6rem] md:text-[8rem] lg:text-[10rem] right-4 top-4"
+            : "text-[5rem] md:text-[8rem] lg:text-[11rem] -left-8 -top-6 md:-left-14 lg:-left-20"
+        }`}
         aria-hidden="true"
       >
         {formattedIndex}
@@ -87,39 +92,44 @@ export function ItemDetailCard({
       <div className="relative z-10 flex flex-col gap-6 md:gap-8">
         {/* Item Image - Full Width on Mobile, Compact on Desktop */}
         <div className="w-full relative aspect-[4/3] md:aspect-video lg:aspect-[2/1] bg-muted/5 rounded-xl overflow-hidden border border-border/10 shadow-sm">
-           {/* Ambient Background (Blurred) */}
-           <div className="absolute inset-0 z-0">
-              <Image
-                src={item.imageUrl || ""}
-                alt=""
-                fill
-                className="object-cover blur-3xl opacity-20 scale-110"
-                aria-hidden="true"
-              />
-            </div>
-            
-            {/* Main Image (Contained) */}
-            {item.imageUrl && (
-              <Image
-                src={item.imageUrl}
-                alt={item.product_name || `Item ${formattedIndex}`}
-                fill
-                className="object-contain relative z-10 p-4 md:p-6"
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, 800px"
-              />
-            )}
+          {/* Ambient Background (Blurred) */}
+          <div className="absolute inset-0 z-0">
+            <Image
+              src={item.imageUrl || ""}
+              alt=""
+              fill
+              className="object-cover blur-3xl opacity-20 scale-110"
+              aria-hidden="true"
+            />
+          </div>
+
+          {/* Main Image (Contained) */}
+          {item.imageUrl && (
+            <Image
+              src={item.imageUrl}
+              alt={item.product_name || `Item ${formattedIndex}`}
+              fill
+              className="object-contain relative z-10 p-4 md:p-6"
+              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, 800px"
+            />
+          )}
         </div>
 
         {/* Text Content */}
         <div className="flex flex-col">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
             <div className="flex-1">
-              {/* Brand Label */}
-              {displayBrand && (
-                <p className="mb-2 font-sans text-[10px] md:text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-                  {displayBrand}
-                </p>
-              )}
+              {/* Brand & Index Label */}
+              <div className="flex items-baseline gap-3 mb-2">
+                <span className="font-serif italic text-base md:text-lg text-muted-foreground/50 leading-none shrink-0">
+                  {formattedIndex}
+                </span>
+                {displayBrand && (
+                  <p className="font-sans text-[10px] md:text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                    {displayBrand}
+                  </p>
+                )}
+              </div>
 
               {/* Product Name */}
               <h2 className="font-serif text-xl md:text-2xl lg:text-3xl font-bold leading-tight tracking-tight text-foreground">
@@ -130,19 +140,17 @@ export function ItemDetailCard({
             {/* Price */}
             {displayPrice && (
               <p className="font-sans text-lg md:text-xl font-light text-foreground/90 whitespace-nowrap pt-1">
-                {displayPrice.split('|')[0].trim()}
+                {displayPrice.split("|")[0].trim()}
               </p>
             )}
           </div>
 
           <div className="h-px w-full bg-border/50 my-4 md:my-6" />
 
-          {/* Description - Refined Typography */}
+          {/* Description - Refined Typography with Markdown Support */}
           {displayDescription && (
-            <div className="prose prose-sm dark:prose-invert max-w-none">
-              <p className="font-serif text-sm md:text-base leading-relaxed text-muted-foreground whitespace-pre-wrap font-light">
-                {displayDescription}
-              </p>
+            <div className="prose prose-sm dark:prose-invert max-w-none font-serif text-muted-foreground font-light [&>p]:leading-relaxed [&>p]:mb-4 [&>ul]:list-disc [&>ul]:pl-4 [&>ol]:list-decimal [&>ol]:pl-4">
+              <Markdown>{displayDescription}</Markdown>
             </div>
           )}
 
@@ -152,7 +160,7 @@ export function ItemDetailCard({
               <h5 className="mb-4 font-sans text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground/80">
                 Technical Specs
               </h5>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
                 {/* Always show first 2 items */}
                 {parsedMetadata.slice(0, 2).map((meta, i) => (
@@ -223,7 +231,9 @@ export function ItemDetailCard({
                     aria-expanded={showSpecs}
                   >
                     <span className="font-sans text-[9px] font-bold uppercase tracking-[0.1em] text-muted-foreground/70 group-hover/specs:text-foreground transition-colors">
-                      {showSpecs ? "Show Less" : `+ ${parsedMetadata.length - 2} More Specs`}
+                      {showSpecs
+                        ? "Show Less"
+                        : `+ ${parsedMetadata.length - 2} More Specs`}
                     </span>
                     {showSpecs ? (
                       <ChevronUp className="w-3 h-3 text-muted-foreground group-hover/specs:text-foreground" />

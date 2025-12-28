@@ -10,9 +10,7 @@ Always use absolute positioning within your cell components for optimal performa
 
 ```tsx
 const MyCell = ({ gridIndex }: ItemConfig) => (
-  <div className="absolute inset-1 ...">
-    {gridIndex}
-  </div>
+  <div className="absolute inset-1 ...">{gridIndex}</div>
 );
 ```
 
@@ -22,9 +20,7 @@ Using `w-full h-full` can cause layout issues:
 
 ```tsx
 const MyCell = ({ gridIndex }: ItemConfig) => (
-  <div className="w-full h-full ...">
-    {gridIndex}
-  </div>
+  <div className="w-full h-full ...">{gridIndex}</div>
 );
 ```
 
@@ -42,11 +38,7 @@ const OptimizedCell = memo(({ gridIndex, isMoving }: ItemConfig) => {
     return expensiveCalculation(gridIndex);
   }, [gridIndex]);
 
-  return (
-    <div className="absolute inset-1 ...">
-      {computedValue}
-    </div>
-  );
+  return <div className="absolute inset-1 ...">{computedValue}</div>;
 });
 
 OptimizedCell.displayName = "OptimizedCell";
@@ -65,7 +57,7 @@ Ensure the ThiingsGrid has a defined container size.
 ### ✅ Good - Explicit Container Size
 
 ```tsx
-<div style={{ width: '100vw', height: '100vh' }}>
+<div style={{ width: "100vw", height: "100vh" }}>
   <ThiingsGrid gridSize={80} renderItem={MyCell} />
 </div>
 ```
@@ -163,4 +155,3 @@ export default function MyPage() {
 2. **Inline styles in cells**: Prefer className over inline styles for better performance
 3. **Undefined container size**: Grid won't render correctly without container dimensions
 4. **Using relative positioning**: Can cause layout shifts and performance issues
-

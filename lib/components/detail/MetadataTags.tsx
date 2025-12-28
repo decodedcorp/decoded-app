@@ -29,4 +29,3 @@ export function MetadataTags({ tags }: Props) {
     </div>
   );
 }
-

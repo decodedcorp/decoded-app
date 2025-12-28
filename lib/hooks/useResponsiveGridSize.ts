@@ -28,4 +28,3 @@ export const useResponsiveGridSize = () => {
 
   return gridSize;
 };
-

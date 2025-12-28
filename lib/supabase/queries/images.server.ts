@@ -5,8 +5,8 @@
  * These functions can only be used in Server Components and Route Handlers.
  */
 
-import { createSupabaseServerClient } from '../server';
-import type { ImageRow } from '../types';
+import { createSupabaseServerClient } from "../server";
+import type { ImageRow } from "../types";
 
 /**
  * Fetches the latest images from the database (server-side)
@@ -20,12 +20,12 @@ import type { ImageRow } from '../types';
 export async function fetchLatestImagesServer(limit = 20): Promise<ImageRow[]> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
-    .from('image')
+    .from("image")
     // TODO: narrow down selected fields once UI is finalized
-    .select('*')
-    .not('image_url', 'is', null) // Only fetch records with images
-    .eq('with_items', false) // Only fetch original images
-    .order('created_at', { ascending: false })
+    .select("*")
+    .not("image_url", "is", null) // Only fetch records with images
+    .eq("with_items", false) // Only fetch original images
+    .order("created_at", { ascending: false })
     .limit(limit);
 
   if (error) {
@@ -44,16 +44,18 @@ export async function fetchLatestImagesServer(limit = 20): Promise<ImageRow[]> {
  * @returns Image row or null if not found
  * @throws Error if the query fails
  */
-export async function fetchImageByIdServer(id: string): Promise<ImageRow | null> {
+export async function fetchImageByIdServer(
+  id: string
+): Promise<ImageRow | null> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
-    .from('image')
-    .select('*')
-    .eq('id', id)
+    .from("image")
+    .select("*")
+    .eq("id", id)
     .single();
 
   if (error) {
-    if (error.code === 'PGRST116') {
+    if (error.code === "PGRST116") {
       // No rows returned
       return null;
     }
@@ -62,4 +64,3 @@ export async function fetchImageByIdServer(id: string): Promise<ImageRow | null>
 
   return data;
 }
-

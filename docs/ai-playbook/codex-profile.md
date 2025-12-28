@@ -132,17 +132,20 @@ Use templates from `docs/prompts/codex/`:
 # Implementation Checklist: [Feature Name]
 
 ## Prerequisites
+
 - [ ] Spec reviewed and approved
 - [ ] Dependencies identified
 - [ ] Test plan created
 
 ## Implementation
+
 - [ ] Core functionality implemented
 - [ ] Tests written and passing
 - [ ] Documentation updated
 - [ ] Code reviewed
 
 ## Verification
+
 - [ ] Feature works as specified
 - [ ] Tests cover edge cases
 - [ ] No breaking changes (or documented)
@@ -155,18 +158,21 @@ Use templates from `docs/prompts/codex/`:
 # Review Checklist: [Spec Name]
 
 ## Completeness
+
 - [ ] Background clearly explained
 - [ ] Requirements are specific
 - [ ] Non-goals are explicit
 - [ ] Risks are identified
 
 ## Technical
+
 - [ ] Architecture is sound
 - [ ] Dependencies are clear
 - [ ] Test plan is adequate
 - [ ] Performance considered
 
 ## Process
+
 - [ ] Assumptions documented
 - [ ] Open questions listed
 - [ ] Stakeholders identified
@@ -189,6 +195,7 @@ Use templates from `docs/prompts/codex/`:
 **Input**: GitHub issue "Add dark mode support"
 
 **Process**:
+
 1. Identify as feature
 2. Parse issue description
 3. Generate spec using feature template
@@ -203,6 +210,7 @@ Use templates from `docs/prompts/codex/`:
 **Input**: Stakeholder requirements for "User authentication"
 
 **Process**:
+
 1. Parse requirements
 2. Create feature spec template
 3. Structure requirements into spec format
@@ -246,4 +254,3 @@ Use templates from `docs/prompts/codex/`:
 - **Generate spec**: Codex creates spec
 - **Gemini documents**: Gemini documents the feature
 - **Output**: Feature documentation
-

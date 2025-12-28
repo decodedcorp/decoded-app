@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import type { ImageRow } from '@/lib/supabase/types';
-import { useInfiniteFilteredImages } from '@/lib/hooks/useImages';
-import { ImageCard } from './ImageCard';
-import { ImageCardSkeleton } from './ImageCardSkeleton';
-import { ErrorState } from './ErrorState';
-import { EmptyState } from './EmptyState';
+import type { ImageRow } from "@/lib/supabase/types";
+import { useInfiniteFilteredImages } from "@/lib/hooks/useImages";
+import { ImageCard } from "./ImageCard";
+import { ImageCardSkeleton } from "./ImageCardSkeleton";
+import { ErrorState } from "./ErrorState";
+import { EmptyState } from "./EmptyState";
 
 type Props = {
   initialImages: ImageRow[];
@@ -56,7 +56,7 @@ export function ImagesClient({ initialImages }: Props) {
   if (isError) {
     return (
       <ErrorState
-        error={error instanceof Error ? error : new Error('Unknown error')}
+        error={error instanceof Error ? error : new Error("Unknown error")}
         onRetry={() => refetch()}
       />
     );
@@ -75,7 +75,7 @@ export function ImagesClient({ initialImages }: Props) {
           <ImageCard key={image.id} image={image} />
         ))}
       </div>
-      
+
       {/* Load more button or auto-load */}
       {hasNextPage && (
         <div className="mt-8 flex justify-center">
@@ -92,4 +92,3 @@ export function ImagesClient({ initialImages }: Props) {
     </>
   );
 }
-

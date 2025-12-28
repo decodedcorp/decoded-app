@@ -42,7 +42,6 @@ export async function fetchPostWithImagesAndItems(
     .from("post")
     .select("*")
     .eq("id", postId)
-    .gte("ts", "2024-01-01")
     .single<PostRow>();
 
   if (postError || !post) {

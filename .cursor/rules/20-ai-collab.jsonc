@@ -7,7 +7,7 @@
     "workflow": {
       "read_specs_first": true,
       "summarize_changes": true,
-      "document_for_other_tools": true
+      "document_for_other_tools": true,
     },
     "instructions": [
       "When refactoring existing code, list risks and add minimal tests.",
@@ -18,7 +18,7 @@
       "Reference docs/ai-playbook/02-workflow-overview.md for tool integration.",
       "When working with specs, ensure changes align with spec requirements.",
       "Document assumptions and open questions when implementing.",
-      "Maintain consistency with project rules and conventions."
+      "Maintain consistency with project rules and conventions.",
     ],
     "change_summary": {
       "required": true,
@@ -28,9 +28,8 @@
         "Key changes",
         "Breaking changes",
         "Tests added",
-        "Documentation needed"
-      ]
-    }
-  }
+        "Documentation needed",
+      ],
+    },
+  },
 }
-

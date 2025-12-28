@@ -19,11 +19,7 @@
     "checklistGeneration": {
       "enabled": true,
       "outputDir": "docs/checklists",
-      "types": [
-        "implementation",
-        "review",
-        "deployment"
-      ]
+      "types": ["implementation", "review", "deployment"]
     },
     "runbookGeneration": {
       "enabled": true,
@@ -46,4 +42,3 @@
     "runbooks": "markdown"
   }
 }
-

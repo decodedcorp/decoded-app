@@ -9,4 +9,3 @@ export const useFilterStore = create<{
   activeFilter: "all",
   setFilter: (f) => set({ activeFilter: f }),
 }));
-

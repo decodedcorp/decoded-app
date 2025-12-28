@@ -1,4 +1,4 @@
-import { PostDetailPage } from '@/lib/components/detail/PostDetailPage';
+import { PostDetailPage } from "@/lib/components/detail/PostDetailPage";
 
 type Props = {
   params: Promise<{ id: string }>;

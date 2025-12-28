@@ -7,12 +7,14 @@ Accepted (v1.0)
 ## Context
 
 We use multiple AI tools in our development workflow:
+
 - **Claude** (via Speckit): For small refactors, code analysis, and spec reviews
 - **Cursor**: Main coding assistant for feature implementation
 - **Gemini**: Documentation generation
 - **Codex**: Spec templates and checklists
 
 Each tool has different strengths and should be used intentionally. Without clear guidelines, developers may:
+
 - Use the wrong tool for a task
 - Waste time figuring out which tool to use
 - Create inconsistent workflows
@@ -89,6 +91,7 @@ We will create a dedicated AI playbook structure with:
 **Approach**: One `docs/ai-playbook/ai-roles.md` file with all rules
 
 **Rejected because**:
+
 - Less optimized for each tool's format
 - Harder to maintain tool-specific guidance
 - Doesn't leverage tool-specific configuration formats
@@ -98,6 +101,7 @@ We will create a dedicated AI playbook structure with:
 **Approach**: Separate profiles with shared principles
 
 **Selected because**:
+
 - Best balance of consistency and tool optimization
 - Easier to maintain tool-specific guidance
 - Supports tool-specific configuration formats
@@ -107,6 +111,7 @@ We will create a dedicated AI playbook structure with:
 **Approach**: Process-based documentation (e.g., "small-refactor-claude.md")
 
 **Rejected because**:
+
 - Harder to maintain when tools change
 - Less reusable across different tasks
 - Doesn't provide clear tool roles
@@ -114,22 +119,26 @@ We will create a dedicated AI playbook structure with:
 ## Implementation
 
 ### Phase 1: Structure Creation (v1.0)
+
 - Create directory structure
 - Write core principles and tool profiles
 - Create configuration files
 - Set up prompt templates
 
 ### Phase 2: Integration (v1.0)
+
 - Integrate with existing `.specify/` infrastructure
 - Update workflow overview with integration points
 - Create ADR document
 
 ### Phase 3: Experimentation (v1.1)
+
 - Track usage in `docs/ai-playbook/usage-log.md`
 - Gather feedback from team
 - Refine based on actual usage
 
 ### Phase 4: Refinement (v1.1+)
+
 - Update profiles based on learnings
 - Simplify if needed (kill-switch criteria)
 - Maintain version information
@@ -156,10 +165,10 @@ We will create a dedicated AI playbook structure with:
 ## Notes
 
 This ADR documents the decision to create a multi-AI development boilerplate. The structure is designed to be:
+
 - **Flexible**: Can adapt to tool changes
 - **Maintainable**: Clear version tracking and update process
 - **Practical**: Based on actual workflow needs
 - **Evolvable**: Can be simplified if needed (kill-switch criteria)
 
 The boilerplate complements, rather than replaces, existing infrastructure like `.specify/` and `.claude/commands/`.
-

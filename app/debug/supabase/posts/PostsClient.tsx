@@ -7,9 +7,9 @@
  * This demonstrates the React Query pattern:
  * Supabase query function → React Query hook → Component
  */
-'use client';
+"use client";
 
-import { useLatestPosts } from '@/lib/hooks/debug/usePosts';
+import { useLatestPosts } from "@/lib/hooks/debug/usePosts";
 
 export function PostsClient() {
   const { data: posts, isLoading, error, isFetching } = useLatestPosts(10);
@@ -20,8 +20,9 @@ export function PostsClient() {
         Client Component (React Query)
       </h2>
       <p className="text-sm text-gray-600 mb-4">
-        This section uses React Query hook (useLatestPosts) for client-side data fetching.
-        Data is cached and shared across components using the same query key.
+        This section uses React Query hook (useLatestPosts) for client-side data
+        fetching. Data is cached and shared across components using the same
+        query key.
       </p>
 
       {isLoading && (
@@ -34,7 +35,7 @@ export function PostsClient() {
 
       {error && (
         <div className="text-sm text-red-600 mb-4">
-          Error: {error instanceof Error ? error.message : 'Unknown error'}
+          Error: {error instanceof Error ? error.message : "Unknown error"}
         </div>
       )}
 
@@ -53,4 +54,3 @@ export function PostsClient() {
     </div>
   );
 }
-

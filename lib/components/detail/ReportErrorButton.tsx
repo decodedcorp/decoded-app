@@ -17,7 +17,10 @@ export function ReportErrorButton({ postId, size = "sm" }: Props) {
   // Close modal when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     }
@@ -82,7 +85,8 @@ export function ReportErrorButton({ postId, size = "sm" }: Props) {
 
             <h3 className="text-lg font-semibold mb-2">오류 신고</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              포스트 내용에 오류가 있나요? 내용을 남겨주시면 빠르게 수정하겠습니다.
+              포스트 내용에 오류가 있나요? 내용을 남겨주시면 빠르게
+              수정하겠습니다.
             </p>
 
             <form onSubmit={handleSubmit}>

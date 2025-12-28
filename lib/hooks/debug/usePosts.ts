@@ -39,4 +39,3 @@ export function useLatestPosts(limit = 10) {
     queryFn: () => fetchLatestPosts(limit),
   });
 }
-

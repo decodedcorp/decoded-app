@@ -1,5 +1,5 @@
-import { fetchLatestImagesServer } from '@/lib/supabase/queries/images.server';
-import { ImagesClient } from './ImagesClient';
+import { fetchLatestImagesServer } from "@/lib/supabase/queries/images.server";
+import { ImagesClient } from "./ImagesClient";
 
 export default async function ImagesPage() {
   const initialImages = await fetchLatestImagesServer(20);
@@ -11,4 +11,3 @@ export default async function ImagesPage() {
     </main>
   );
 }
-

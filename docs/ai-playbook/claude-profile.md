@@ -24,4 +24,3 @@
   2. Suggest refactor plan.
   3. Only then show example code changes.
 - **Keep suggestions minimally invasive and reversible**.
-

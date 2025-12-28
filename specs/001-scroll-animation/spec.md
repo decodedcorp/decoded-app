@@ -5,7 +5,7 @@
 **Status**: Draft
 **Input**: User description: "Use IntersectionObserver with opacity/transform transitions; lazy-load images via data-src"
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Smooth Content Appearance on Scroll (Priority: P1)
 
@@ -64,7 +64,7 @@ As a user scrolling through content-heavy pages, I want the page to remain smoot
 - What happens when users scroll back up? (Previously loaded images remain loaded, animations can re-trigger based on is-visible/is-hidden states)
 - How does the system handle viewport resize? (IntersectionObserver should automatically recalculate visibility based on new viewport dimensions)
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -90,7 +90,7 @@ As a user scrolling through content-heavy pages, I want the page to remain smoot
 - **Lazy Image**: Image element with `data-src` attribute containing actual image URL, `src` initially unset or placeholder, and `loading="lazy"` for native support
 - **Animation State**: Visual state of an element represented by CSS classes (`is-visible`, `is-hidden`) and inline CSS custom properties (`--stagger`)
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

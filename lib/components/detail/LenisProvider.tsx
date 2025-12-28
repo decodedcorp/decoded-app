@@ -52,4 +52,3 @@ export function LenisProvider({ children }: Props) {
 
   return <>{children}</>;
 }
-

@@ -99,20 +99,26 @@ export function ShopGrid({ items, isModal = false }: Props) {
   }
 
   return (
-    <section 
-      ref={containerRef} 
+    <section
+      ref={containerRef}
       className={`border-t border-border/40 overflow-hidden w-full ${
         isModal ? "py-12 md:py-16" : "py-24"
       }`}
     >
-      <div className={`mx-auto ${isModal ? "max-w-full px-4 md:px-6" : "max-w-7xl px-6 md:px-8"}`}>
+      <div
+        className={`mx-auto ${isModal ? "max-w-full px-4 md:px-6" : "max-w-7xl px-6 md:px-8"}`}
+      >
         <div className="flex flex-col items-center mb-8 md:mb-12">
           <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground mb-3 md:mb-4">
             Curated Selection
           </span>
-          <h2 className={`font-serif text-center tracking-tight ${
-            isModal ? "text-3xl md:text-4xl" : "text-4xl md:text-5xl lg:text-6xl"
-          }`}>
+          <h2
+            className={`font-serif text-center tracking-tight ${
+              isModal
+                ? "text-3xl md:text-4xl"
+                : "text-4xl md:text-5xl lg:text-6xl"
+            }`}
+          >
             Shop the Look
           </h2>
         </div>
@@ -151,8 +157,8 @@ export function ShopGrid({ items, isModal = false }: Props) {
           ref={scrollRef}
           onScroll={checkScroll}
           className={`flex overflow-x-auto scrollbar-hide snap-x snap-mandatory w-full ${
-            isModal 
-              ? "gap-3 md:gap-4 px-4 md:px-6 pb-8 md:pb-10 pt-2 md:pt-4" 
+            isModal
+              ? "gap-3 md:gap-4 px-4 md:px-6 pb-8 md:pb-10 pt-2 md:pt-4"
               : "gap-4 md:gap-6 px-6 md:px-8 pb-12 pt-4"
           }`}
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
@@ -161,17 +167,21 @@ export function ShopGrid({ items, isModal = false }: Props) {
             <div
               key={item.id}
               className={`shop-card flex-none snap-center group flex flex-col ${
-                isModal 
-                  ? "w-[160px] sm:w-[180px] md:w-[200px]" 
+                isModal
+                  ? "w-[160px] sm:w-[180px] md:w-[200px]"
                   : "w-[180px] sm:w-[200px] md:w-[220px] lg:w-[260px]"
               }`}
             >
               <SpotlightCard className="h-full flex flex-col bg-card/50 backdrop-blur-sm">
-                <div className={`flex flex-col h-full ${isModal ? "p-3" : "p-3 md:p-4"}`}>
+                <div
+                  className={`flex flex-col h-full ${isModal ? "p-3" : "p-3 md:p-4"}`}
+                >
                   {/* Item Image */}
-                  <div className={`relative w-full aspect-[3/4] overflow-hidden rounded-lg bg-muted ${
-                    isModal ? "mb-2 md:mb-3" : "mb-3 md:mb-4"
-                  }`}>
+                  <div
+                    className={`relative w-full aspect-[3/4] overflow-hidden rounded-lg bg-muted ${
+                      isModal ? "mb-2 md:mb-3" : "mb-3 md:mb-4"
+                    }`}
+                  >
                     {item.imageUrl ? (
                       <Image
                         src={item.imageUrl}
@@ -192,28 +202,40 @@ export function ShopGrid({ items, isModal = false }: Props) {
                   {/* Item Details */}
                   <div className="flex flex-col items-center text-center flex-grow">
                     {item.brand && (
-                      <p className={`font-medium uppercase tracking-widest text-muted-foreground ${
-                        isModal ? "text-[9px] mb-1" : "text-[10px] mb-2"
-                      }`}>
+                      <p
+                        className={`font-medium uppercase tracking-widest text-muted-foreground ${
+                          isModal ? "text-[9px] mb-1" : "text-[10px] mb-2"
+                        }`}
+                      >
                         {item.brand}
                       </p>
                     )}
-                    <h3 className={`font-serif font-medium leading-tight group-hover:text-foreground/80 transition-colors ${
-                      isModal ? "text-sm md:text-base mb-1 md:mb-2" : "text-base md:text-lg mb-2"
-                    }`}>
+                    <h3
+                      className={`font-serif font-medium leading-tight group-hover:text-foreground/80 transition-colors ${
+                        isModal
+                          ? "text-sm md:text-base mb-1 md:mb-2"
+                          : "text-base md:text-lg mb-2"
+                      }`}
+                    >
                       {item.product_name || "Untitled Item"}
                     </h3>
-                  {item.price && (
-                    <p className={`font-medium text-primary mt-auto font-mono ${
-                      isModal ? "text-xs pt-0.5 md:pt-1" : "text-sm pt-1"
-                    }`}>
-                      {item.price.split('|')[0].trim()}
-                    </p>
-                  )}
+                    {item.price && (
+                      <p
+                        className={`font-medium text-primary mt-auto font-mono ${
+                          isModal ? "text-xs pt-0.5 md:pt-1" : "text-sm pt-1"
+                        }`}
+                      >
+                        {item.price.split("|")[0].trim()}
+                      </p>
+                    )}
 
-                    <button className={`w-full border border-border/50 bg-background/50 hover:bg-foreground hover:text-background transition-all duration-300 text-[9px] md:text-[10px] uppercase tracking-widest rounded-sm ${
-                      isModal ? "mt-2 md:mt-3 py-1.5 md:py-2" : "mt-3 md:mt-4 py-2"
-                    }`}>
+                    <button
+                      className={`w-full border border-border/50 bg-background/50 hover:bg-foreground hover:text-background transition-all duration-300 text-[9px] md:text-[10px] uppercase tracking-widest rounded-sm ${
+                        isModal
+                          ? "mt-2 md:mt-3 py-1.5 md:py-2"
+                          : "mt-3 md:mt-4 py-2"
+                      }`}
+                    >
                       View Details
                     </button>
                   </div>

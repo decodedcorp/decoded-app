@@ -1,23 +1,23 @@
-import type { Config } from 'tailwindcss'
+import type { Config } from "tailwindcss";
 
 // Helper function to support opacity with CSS variables using color-mix
-function withOpacity(variableName: string) {
+function withOpacity(variableName: string): any {
   return ({ opacityValue }: { opacityValue: string | undefined }) => {
     if (opacityValue !== undefined) {
-      return `color-mix(in srgb, var(${variableName}) calc(${opacityValue} * 100%), transparent)`
+      return `color-mix(in srgb, var(${variableName}) calc(${opacityValue} * 100%), transparent)`;
     }
-    return `var(${variableName})`
-  }
+    return `var(${variableName})`;
+  };
 }
 
 const config: Config = {
   darkMode: ["class"],
   content: [
-    './pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/**/*.{js,ts,jsx,tsx,mdx}',
-    './lib/**/*.{js,ts,jsx,tsx,mdx}',
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/**/*.{js,ts,jsx,tsx,mdx}",
+    "./lib/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
@@ -56,21 +56,21 @@ const config: Config = {
           foreground: withOpacity("--card-foreground"),
         },
         sidebar: {
-            DEFAULT: withOpacity("--sidebar"),
-            foreground: withOpacity("--sidebar-foreground"),
-            primary: withOpacity("--sidebar-primary"),
-            "primary-foreground": withOpacity("--sidebar-primary-foreground"),
-            accent: withOpacity("--sidebar-accent"),
-            "accent-foreground": withOpacity("--sidebar-accent-foreground"),
-            border: withOpacity("--sidebar-border"),
-            ring: withOpacity("--sidebar-ring"),
+          DEFAULT: withOpacity("--sidebar"),
+          foreground: withOpacity("--sidebar-foreground"),
+          primary: withOpacity("--sidebar-primary"),
+          "primary-foreground": withOpacity("--sidebar-primary-foreground"),
+          accent: withOpacity("--sidebar-accent"),
+          "accent-foreground": withOpacity("--sidebar-accent-foreground"),
+          border: withOpacity("--sidebar-border"),
+          ring: withOpacity("--sidebar-ring"),
         },
         chart: {
-            1: withOpacity("--chart-1"),
-            2: withOpacity("--chart-2"),
-            3: withOpacity("--chart-3"),
-            4: withOpacity("--chart-4"),
-            5: withOpacity("--chart-5"),
+          1: withOpacity("--chart-1"),
+          2: withOpacity("--chart-2"),
+          3: withOpacity("--chart-3"),
+          4: withOpacity("--chart-4"),
+          5: withOpacity("--chart-5"),
         },
         "scanner-green": "#00FF00",
         "neon-orange": "#FF4500",
@@ -96,8 +96,6 @@ const config: Config = {
       },
     },
   },
-  plugins: [
-    require('@tailwindcss/typography'),
-  ],
-}
-export default config
+  plugins: [require("@tailwindcss/typography")],
+};
+export default config;

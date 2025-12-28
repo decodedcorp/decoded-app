@@ -1,16 +1,16 @@
-'use client'
+"use client";
 
-import { useScrollAnimation } from '@/lib/hooks/useScrollAnimation'
+import { useScrollAnimation } from "@/lib/hooks/useScrollAnimation";
 
 export default function ScrollAnimationExample() {
   const { observeRef } = useScrollAnimation({
     onEnter: (element) => {
-      console.log('Element entered viewport:', element)
+      console.log("Element entered viewport:", element);
     },
     onExit: (element) => {
-      console.log('Element exited viewport:', element)
-    }
-  })
+      console.log("Element exited viewport:", element);
+    },
+  });
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -18,8 +18,8 @@ export default function ScrollAnimationExample() {
       <header className="mb-16 text-center">
         <h1 className="text-4xl font-bold mb-4">Scroll Animation Demo</h1>
         <p className="text-gray-600 max-w-2xl mx-auto">
-          Scroll down to see cards animate smoothly into view with staggered delays.
-          Images lazy-load as you scroll near them.
+          Scroll down to see cards animate smoothly into view with staggered
+          delays. Images lazy-load as you scroll near them.
         </p>
         <img
           src="/api/placeholder/1200/400"
@@ -45,8 +45,8 @@ export default function ScrollAnimationExample() {
         >
           <h2 className="text-2xl font-bold mb-4">Card 1 - No Delay</h2>
           <p className="text-gray-700 mb-4">
-            This card animates immediately when it enters the viewport.
-            The animation uses GPU-accelerated properties (opacity and transform)
+            This card animates immediately when it enters the viewport. The
+            animation uses GPU-accelerated properties (opacity and transform)
             for smooth 60fps performance.
           </p>
           <img
@@ -68,7 +68,8 @@ export default function ScrollAnimationExample() {
           <h2 className="text-2xl font-bold mb-4">Card 2 - 80ms Delay</h2>
           <p className="text-gray-700 mb-4">
             This card animates 80ms after Card 1, creating a cascading effect.
-            The stagger delay is set via the data-delay attribute and CSS custom property.
+            The stagger delay is set via the data-delay attribute and CSS custom
+            property.
           </p>
           <img
             data-src="/api/placeholder/600/300"
@@ -109,8 +110,8 @@ export default function ScrollAnimationExample() {
         >
           <h2 className="text-2xl font-bold mb-4">Card 4 - 240ms Delay</h2>
           <p className="text-gray-700 mb-4">
-            The stagger pattern continues. Each card has fixed dimensions to prevent
-            Cumulative Layout Shift (CLS) when images load.
+            The stagger pattern continues. Each card has fixed dimensions to
+            prevent Cumulative Layout Shift (CLS) when images load.
           </p>
           <img
             data-src="/api/placeholder/600/300"
@@ -162,5 +163,5 @@ export default function ScrollAnimationExample() {
         <div className="h-screen" />
       </div>
     </div>
-  )
+  );
 }

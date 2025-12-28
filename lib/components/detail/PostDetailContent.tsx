@@ -50,7 +50,8 @@ export function PostDetailContent({ postDetail }: Props) {
             )}
             <p className="text-muted-foreground">
               {items.length} {items.length === 1 ? "item" : "items"} featured
-              {images.length > 0 && ` • ${images.length} ${images.length === 1 ? "image" : "images"}`}
+              {images.length > 0 &&
+                ` • ${images.length} ${images.length === 1 ? "image" : "images"}`}
             </p>
             {post.created_at && (
               <p className="text-sm text-muted-foreground mt-2">

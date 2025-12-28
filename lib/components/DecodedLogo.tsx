@@ -1,5 +1,5 @@
-import { useRef, useEffect } from 'react';
-import * as THREE from 'three';
+import { useRef, useEffect } from "react";
+import * as THREE from "three";
 
 const vertexShader = `
 varying vec2 vUv;
@@ -42,11 +42,17 @@ void main() {
 }
 `;
 
-function map(n: number, start: number, stop: number, start2: number, stop2: number) {
+function map(
+  n: number,
+  start: number,
+  stop: number,
+  start2: number,
+  stop2: number
+) {
   return ((n - start) / (stop - start)) * (stop2 - start2) + start2;
 }
 
-const PX_RATIO = typeof window !== 'undefined' ? window.devicePixelRatio : 1;
+const PX_RATIO = typeof window !== "undefined" ? window.devicePixelRatio : 1;
 
 interface AsciiFilterOptions {
   fontSize?: number;
@@ -75,27 +81,38 @@ class AsciiFilter {
   cols: number = 0;
   rows: number = 0;
 
-  constructor(renderer: THREE.WebGLRenderer, { fontSize, fontFamily, charset, invert, enableHueRotate }: AsciiFilterOptions = {}) {
+  constructor(
+    renderer: THREE.WebGLRenderer,
+    {
+      fontSize,
+      fontFamily,
+      charset,
+      invert,
+      enableHueRotate,
+    }: AsciiFilterOptions = {}
+  ) {
     this.renderer = renderer;
-    this.domElement = document.createElement('div');
-    this.domElement.style.position = 'absolute';
-    this.domElement.style.top = '0';
-    this.domElement.style.left = '0';
-    this.domElement.style.width = '100%';
-    this.domElement.style.height = '100%';
+    this.domElement = document.createElement("div");
+    this.domElement.style.position = "absolute";
+    this.domElement.style.top = "0";
+    this.domElement.style.left = "0";
+    this.domElement.style.width = "100%";
+    this.domElement.style.height = "100%";
 
-    this.pre = document.createElement('pre');
+    this.pre = document.createElement("pre");
     this.domElement.appendChild(this.pre);
 
-    this.canvas = document.createElement('canvas');
-    this.context = this.canvas.getContext('2d');
+    this.canvas = document.createElement("canvas");
+    this.context = this.canvas.getContext("2d");
     this.domElement.appendChild(this.canvas);
 
     this.deg = 0;
     this.invert = invert ?? true;
     this.fontSize = fontSize ?? 12;
     this.fontFamily = fontFamily ?? "'Courier New', monospace";
-    this.charset = charset ?? ' .\'`^",:;Il!i~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$';
+    this.charset =
+      charset ??
+      " .'`^\",:;Il!i~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
     this.enableHueRotate = enableHueRotate ?? false;
 
     if (this.context) {
@@ -104,7 +121,7 @@ class AsciiFilter {
     }
 
     this.onMouseMove = this.onMouseMove.bind(this);
-    document.addEventListener('mousemove', this.onMouseMove);
+    document.addEventListener("mousemove", this.onMouseMove);
   }
 
   setSize(width: number, height: number) {
@@ -117,28 +134,63 @@ class AsciiFilter {
     this.mouse = { x: this.center.x, y: this.center.y };
   }
 
+  resetCallCount = 0;
+
   reset() {
     if (this.context) {
+      this.resetCallCount++;
       this.context.font = `${this.fontSize}px ${this.fontFamily}`;
-      const charWidth = this.context.measureText('A').width;
+      const charWidth = this.context.measureText("A").width;
 
-      this.cols = Math.floor(this.width / (this.fontSize * (charWidth / this.fontSize)));
+      const prevCols = this.cols;
+      this.cols = Math.floor(
+        this.width / (this.fontSize * (charWidth / this.fontSize))
+      );
       this.rows = Math.floor(this.height / this.fontSize);
 
       this.canvas.width = this.cols;
       this.canvas.height = this.rows;
       this.pre.style.fontFamily = this.fontFamily;
       this.pre.style.fontSize = `${this.fontSize}px`;
-      this.pre.style.margin = '0';
-      this.pre.style.padding = '0';
-      this.pre.style.lineHeight = '1em';
-      this.pre.style.position = 'absolute';
-      this.pre.style.left = '50%';
-      this.pre.style.top = '50%';
-      this.pre.style.transform = 'translate(-50%, -50%)';
-      this.pre.style.zIndex = '9';
-      this.pre.style.backgroundAttachment = 'fixed';
-      this.pre.style.mixBlendMode = 'difference';
+      this.pre.style.margin = "0";
+      this.pre.style.padding = "0";
+      this.pre.style.lineHeight = "1em";
+      this.pre.style.position = "absolute";
+      this.pre.style.left = "50%";
+      this.pre.style.top = "50%";
+      this.pre.style.transform = "translate(-50%, -50%)";
+      this.pre.style.zIndex = "9";
+      this.pre.style.backgroundAttachment = "fixed";
+      this.pre.style.mixBlendMode = "difference";
+
+      // #region agent log
+      fetch(
+        "http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            location: "DecodedLogo.tsx:AsciiFilter.reset",
+            message: "AsciiFilter reset - TRACKING CHANGES",
+            data: {
+              resetCallCount: this.resetCallCount,
+              containerWidth: this.width,
+              containerHeight: this.height,
+              fontSize: this.fontSize,
+              fontFamily: this.fontFamily,
+              charWidth,
+              prevCols,
+              newCols: this.cols,
+              colsChanged: prevCols !== this.cols && prevCols !== 0,
+              rows: this.rows,
+            },
+            timestamp: Date.now(),
+            sessionId: "debug-session",
+            hypothesisId: "K",
+          }),
+        }
+      ).catch(() => {});
+      // #endregion
     }
   }
 
@@ -181,14 +233,19 @@ class AsciiFilter {
   asciify(ctx: CanvasRenderingContext2D, w: number, h: number) {
     if (w && h) {
       const imgData = ctx.getImageData(0, 0, w, h).data;
-      let str = '';
+      let str = "";
       for (let y = 0; y < h; y++) {
         for (let x = 0; x < w; x++) {
           const i = x * 4 + y * 4 * w;
-          const [r, g, b, a] = [imgData[i], imgData[i + 1], imgData[i + 2], imgData[i + 3]];
+          const [r, g, b, a] = [
+            imgData[i],
+            imgData[i + 1],
+            imgData[i + 2],
+            imgData[i + 3],
+          ];
 
           if (a === 0) {
-            str += ' ';
+            str += " ";
             continue;
           }
 
@@ -197,14 +254,69 @@ class AsciiFilter {
           if (this.invert) idx = this.charset.length - idx - 1;
           str += this.charset[idx];
         }
-        str += '\n';
+        str += "\n";
       }
       this.pre.innerHTML = str;
+
+      // #region agent log
+      const preRect = this.pre.getBoundingClientRect();
+      const domRect = this.domElement.getBoundingClientRect();
+      const lines = str.split("\n");
+      // Find middle line with actual text content
+      const midLineIdx = Math.floor(lines.length / 2);
+      const midLine = lines[midLineIdx] || "";
+      const midLeftSpaces = midLine.match(/^ */)?.[0]?.length || 0;
+      const midRightSpaces = midLine.match(/ *$/)?.[0]?.length || 0;
+      const midTrimmed = midLine.trim();
+      // Also check text-heavy line (find one with most non-space chars)
+      let maxTextLine = "";
+      let maxTextLen = 0;
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed.length > maxTextLen) {
+          maxTextLen = trimmed.length;
+          maxTextLine = line;
+        }
+      }
+      const maxLeftSpaces = maxTextLine.match(/^ */)?.[0]?.length || 0;
+      const maxRightSpaces = maxTextLine.match(/ *$/)?.[0]?.length || 0;
+      fetch(
+        "http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            location: "DecodedLogo.tsx:AsciiFilter.asciify",
+            message: "ASCII text - middle line space analysis",
+            data: {
+              preWidth: preRect.width,
+              preLeft: preRect.left,
+              preRight: preRect.right,
+              domElementWidth: domRect.width,
+              domElementRight: domRect.left + domRect.width,
+              overflowRight: preRect.right - (domRect.left + domRect.width),
+              midLineIdx,
+              midLeftSpaces,
+              midRightSpaces,
+              midTrimmedLen: midTrimmed.length,
+              midSpaceDiff: midLeftSpaces - midRightSpaces,
+              maxTextLineLen: maxTextLine.length,
+              maxLeftSpaces,
+              maxRightSpaces,
+              maxSpaceDiff: maxLeftSpaces - maxRightSpaces,
+            },
+            timestamp: Date.now(),
+            sessionId: "debug-session",
+            hypothesisId: "G2",
+          }),
+        }
+      ).catch(() => {});
+      // #endregion
     }
   }
 
   dispose() {
-    document.removeEventListener('mousemove', this.onMouseMove);
+    document.removeEventListener("mousemove", this.onMouseMove);
   }
 }
 
@@ -223,9 +335,16 @@ class CanvasTxt {
   color: string;
   font: string;
 
-  constructor(txt: string, { fontSize = 200, fontFamily = 'Arial', color = '#fdf9f3' }: CanvasTxtOptions = {}) {
-    this.canvas = document.createElement('canvas');
-    this.context = this.canvas.getContext('2d');
+  constructor(
+    txt: string,
+    {
+      fontSize = 200,
+      fontFamily = "Arial",
+      color = "#fdf9f3",
+    }: CanvasTxtOptions = {}
+  ) {
+    this.canvas = document.createElement("canvas");
+    this.context = this.canvas.getContext("2d");
     this.txt = txt;
     this.fontSize = fontSize;
     this.fontFamily = fontFamily;
@@ -240,7 +359,10 @@ class CanvasTxt {
       const metrics = this.context.measureText(this.txt);
 
       const textWidth = Math.ceil(metrics.width) + 20;
-      const textHeight = Math.ceil(metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent) + 20;
+      const textHeight =
+        Math.ceil(
+          metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent
+        ) + 20;
 
       this.canvas.width = textWidth;
       this.canvas.height = textHeight;
@@ -255,6 +377,35 @@ class CanvasTxt {
 
       const metrics = this.context.measureText(this.txt);
       const yPos = 10 + metrics.actualBoundingBoxAscent;
+      const textWidth = metrics.width;
+      const leftMargin = 10;
+      const rightMargin = this.canvas.width - leftMargin - textWidth;
+
+      // #region agent log
+      fetch(
+        "http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            location: "DecodedLogo.tsx:CanvasTxt.render",
+            message: "Text canvas rendering - margin analysis",
+            data: {
+              canvasWidth: this.canvas.width,
+              canvasHeight: this.canvas.height,
+              textWidth,
+              leftMargin,
+              rightMargin,
+              marginDiff: leftMargin - rightMargin,
+              textStartX: 10,
+            },
+            timestamp: Date.now(),
+            sessionId: "debug-session",
+            hypothesisId: "F",
+          }),
+        }
+      ).catch(() => {});
+      // #endregion
 
       this.context.fillText(this.txt, 10, yPos);
     }
@@ -308,9 +459,19 @@ class CanvAscii {
   filter!: AsciiFilter;
   center!: { x: number; y: number };
   animationFrameId: number = 0;
+  private isDisposed: boolean = false;
 
   constructor(
-    { text, asciiFontSize, textFontSize, textColor, planeBaseHeight, enableWaves, enableHueRotate, enableMouseInteraction }: CanvAsciiOptions,
+    {
+      text,
+      asciiFontSize,
+      textFontSize,
+      textColor,
+      planeBaseHeight,
+      enableWaves,
+      enableHueRotate,
+      enableMouseInteraction,
+    }: CanvAsciiOptions,
     containerElem: HTMLElement,
     width: number,
     height: number
@@ -327,13 +488,25 @@ class CanvAscii {
     this.enableHueRotate = enableHueRotate;
     this.enableMouseInteraction = enableMouseInteraction;
 
-    this.camera = new THREE.PerspectiveCamera(45, this.width / this.height, 1, 1000);
+    this.camera = new THREE.PerspectiveCamera(
+      45,
+      this.width / this.height,
+      1,
+      1000
+    );
     this.camera.position.z = 30;
 
     this.scene = new THREE.Scene();
     this.mouse = { x: 0, y: 0 };
 
     this.onMouseMove = this.onMouseMove.bind(this);
+  }
+
+  async init() {
+    // Wait for font to be loaded before measuring text
+    await document.fonts.ready;
+
+    if (this.isDisposed) return;
 
     this.setMesh();
     this.setRenderer();
@@ -342,8 +515,8 @@ class CanvAscii {
   setMesh() {
     this.textCanvas = new CanvasTxt(this.textString, {
       fontSize: this.textFontSize,
-      fontFamily: 'IBM Plex Mono',
-      color: this.textColor
+      fontFamily: "IBM Plex Mono",
+      color: this.textColor,
     });
     this.textCanvas.resize();
     this.textCanvas.render();
@@ -356,6 +529,29 @@ class CanvAscii {
     const planeW = baseH * textAspect;
     const planeH = baseH;
 
+    // #region agent log
+    fetch("http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        location: "DecodedLogo.tsx:CanvAscii.setMesh",
+        message: "Mesh setup - text canvas and plane dimensions",
+        data: {
+          textCanvasWidth: this.textCanvas.width,
+          textCanvasHeight: this.textCanvas.height,
+          textAspect,
+          planeW,
+          planeH,
+          containerWidth: this.width,
+          containerHeight: this.height,
+        },
+        timestamp: Date.now(),
+        sessionId: "debug-session",
+        hypothesisId: "D",
+      }),
+    }).catch(() => {});
+    // #endregion
+
     this.geometry = new THREE.PlaneGeometry(planeW, planeH, 36, 36);
     this.material = new THREE.ShaderMaterial({
       vertexShader,
@@ -365,12 +561,34 @@ class CanvAscii {
         uTime: { value: 0 },
         mouse: { value: 1.0 },
         uTexture: { value: this.texture },
-        uEnableWaves: { value: this.enableWaves ? 1.0 : 0.0 }
-      }
+        uEnableWaves: { value: this.enableWaves ? 1.0 : 0.0 },
+      },
     });
 
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.scene.add(this.mesh);
+
+    // #region agent log
+    fetch("http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        location: "DecodedLogo.tsx:CanvAscii.setMesh.afterAdd",
+        message: "Mesh position and camera info",
+        data: {
+          meshPositionX: this.mesh.position.x,
+          meshPositionY: this.mesh.position.y,
+          meshPositionZ: this.mesh.position.z,
+          cameraPositionZ: this.camera.position.z,
+          cameraFOV: this.camera.fov,
+          cameraAspect: this.camera.aspect,
+        },
+        timestamp: Date.now(),
+        sessionId: "debug-session",
+        hypothesisId: "H",
+      }),
+    }).catch(() => {});
+    // #endregion
   }
 
   setRenderer() {
@@ -379,18 +597,18 @@ class CanvAscii {
     this.renderer.setClearColor(0x000000, 0);
 
     this.filter = new AsciiFilter(this.renderer, {
-      fontFamily: 'IBM Plex Mono',
+      fontFamily: "IBM Plex Mono",
       fontSize: this.asciiFontSize,
       invert: true,
-      enableHueRotate: this.enableHueRotate
+      enableHueRotate: this.enableHueRotate,
     });
 
     this.container.appendChild(this.filter.domElement);
     this.setSize(this.width, this.height);
 
     if (this.enableMouseInteraction) {
-      this.container.addEventListener('mousemove', this.onMouseMove);
-      this.container.addEventListener('touchmove', this.onMouseMove);
+      this.container.addEventListener("mousemove", this.onMouseMove);
+      this.container.addEventListener("touchmove", this.onMouseMove);
     }
   }
 
@@ -398,20 +616,28 @@ class CanvAscii {
     this.width = w;
     this.height = h;
 
-    this.camera.aspect = w / h;
-    this.camera.updateProjectionMatrix();
+    if (this.camera) {
+      this.camera.aspect = w / h;
+      this.camera.updateProjectionMatrix();
+    }
 
-    this.filter.setSize(w, h);
+    if (this.filter) {
+      this.filter.setSize(w, h);
+    }
 
     this.center = { x: w / 2, y: h / 2 };
   }
 
-  load() {
+  async load() {
+    await this.init();
+    if (this.isDisposed) return;
     this.animate();
   }
 
   onMouseMove(evt: MouseEvent | TouchEvent) {
-    const e = (evt as TouchEvent).touches ? (evt as TouchEvent).touches[0] : (evt as MouseEvent);
+    const e = (evt as TouchEvent).touches
+      ? (evt as TouchEvent).touches[0]
+      : (evt as MouseEvent);
     const bounds = this.container.getBoundingClientRect();
     const x = e.clientX - bounds.left;
     const y = e.clientY - bounds.top;
@@ -427,12 +653,20 @@ class CanvAscii {
   }
 
   render() {
+    if (this.isDisposed || !this.textCanvas || !this.filter || !this.mesh)
+      return;
+
     const time = new Date().getTime() * 0.001;
 
     this.textCanvas.render();
-    this.texture.needsUpdate = true;
+    if (this.texture) {
+      this.texture.needsUpdate = true;
+    }
 
-    (this.mesh.material as THREE.ShaderMaterial).uniforms.uTime.value = Math.sin(time);
+    if (this.mesh.material) {
+      (this.mesh.material as THREE.ShaderMaterial).uniforms.uTime.value =
+        Math.sin(time);
+    }
 
     if (this.enableMouseInteraction) {
       this.updateRotation();
@@ -449,14 +683,19 @@ class CanvAscii {
   }
 
   clear() {
-    this.scene.traverse(object => {
+    this.scene.traverse((object) => {
       const obj = object as unknown as THREE.Mesh;
       if (!obj.isMesh) return;
-      [obj.material].flat().forEach(material => {
+      [obj.material].flat().forEach((material) => {
         material.dispose();
-        Object.keys(material).forEach(key => {
+        Object.keys(material).forEach((key) => {
           const matProp = material[key as keyof typeof material];
-          if (matProp && typeof matProp === 'object' && 'dispose' in matProp && typeof matProp.dispose === 'function') {
+          if (
+            matProp &&
+            typeof matProp === "object" &&
+            "dispose" in matProp &&
+            typeof matProp.dispose === "function"
+          ) {
             matProp.dispose();
           }
         });
@@ -467,15 +706,29 @@ class CanvAscii {
   }
 
   dispose() {
+    this.isDisposed = true;
     cancelAnimationFrame(this.animationFrameId);
-    this.filter.dispose();
-    this.container.removeChild(this.filter.domElement);
-    if (this.enableMouseInteraction) {
-      this.container.removeEventListener('mousemove', this.onMouseMove);
-      this.container.removeEventListener('touchmove', this.onMouseMove);
+
+    if (this.filter) {
+      this.filter.dispose();
+      if (
+        this.filter.domElement &&
+        this.container.contains(this.filter.domElement)
+      ) {
+        this.container.removeChild(this.filter.domElement);
+      }
     }
+
+    if (this.enableMouseInteraction) {
+      this.container.removeEventListener("mousemove", this.onMouseMove);
+      this.container.removeEventListener("touchmove", this.onMouseMove);
+    }
+
     this.clear();
-    this.renderer.dispose();
+
+    if (this.renderer) {
+      this.renderer.dispose();
+    }
   }
 }
 
@@ -494,23 +747,70 @@ export default function DecodedLogo({
   planeBaseHeight = 8,
   enableWaves = true,
   enableHueRotate = false,
-  enableMouseInteraction = false
+  enableMouseInteraction = false,
 }: DecodedLogoProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const asciiRef = useRef<CanvAscii | null>(null);
 
-  const text = 'decoded';
-  const textColor = '#d9fc69';
+  const text = "decoded";
+  const textColor = "#d9fc69";
 
   useEffect(() => {
     if (!containerRef.current) return;
 
+    // Clean up any existing instance first
+    if (asciiRef.current) {
+      asciiRef.current.dispose();
+      asciiRef.current = null;
+    }
+    // Also clear container children to ensure clean state
+    while (containerRef.current.firstChild) {
+      if (containerRef.current.firstChild.nodeName !== "STYLE") {
+        containerRef.current.removeChild(containerRef.current.firstChild);
+      } else {
+        break;
+      }
+    }
+
+    let disposed = false;
+
     const { width, height } = containerRef.current.getBoundingClientRect();
+
+    // #region agent log
+    const parentRect =
+      containerRef.current.parentElement?.getBoundingClientRect();
+    const parentStyles = containerRef.current.parentElement
+      ? window.getComputedStyle(containerRef.current.parentElement)
+      : null;
+    fetch("http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        location: "DecodedLogo.tsx:useEffect",
+        message: "Container initialization",
+        data: {
+          containerWidth: width,
+          containerHeight: height,
+          parentWidth: parentRect?.width,
+          parentHeight: parentRect?.height,
+          parentOverflow: parentStyles?.overflow,
+          parentOverflowX: parentStyles?.overflowX,
+        },
+        timestamp: Date.now(),
+        sessionId: "debug-session",
+        hypothesisId: "E",
+      }),
+    }).catch(() => {});
+    // #endregion
 
     if (width === 0 || height === 0) {
       const observer = new IntersectionObserver(
         ([entry]) => {
-          if (entry.isIntersecting && entry.boundingClientRect.width > 0 && entry.boundingClientRect.height > 0) {
+          if (
+            entry.isIntersecting &&
+            entry.boundingClientRect.width > 0 &&
+            entry.boundingClientRect.height > 0
+          ) {
             const { width: w, height: h } = entry.boundingClientRect;
 
             asciiRef.current = new CanvAscii(
@@ -522,7 +822,7 @@ export default function DecodedLogo({
                 planeBaseHeight,
                 enableWaves,
                 enableHueRotate,
-                enableMouseInteraction
+                enableMouseInteraction,
               },
               containerRef.current!,
               w,
@@ -555,7 +855,7 @@ export default function DecodedLogo({
         planeBaseHeight,
         enableWaves,
         enableHueRotate,
-        enableMouseInteraction
+        enableMouseInteraction,
       },
       containerRef.current,
       width,
@@ -563,9 +863,70 @@ export default function DecodedLogo({
     );
     asciiRef.current.load();
 
-    const ro = new ResizeObserver(entries => {
+    // #region agent log
+    setTimeout(() => {
+      const preEl = containerRef.current?.querySelector("pre");
+      if (preEl) {
+        const preStyles = window.getComputedStyle(preEl);
+        const preRect = preEl.getBoundingClientRect();
+        const containerRect = containerRef.current?.getBoundingClientRect();
+        fetch(
+          "http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              location: "DecodedLogo.tsx:afterLoad",
+              message: "Pre element computed styles after load",
+              data: {
+                preComputedLeft: preStyles.left,
+                preComputedTransform: preStyles.transform,
+                preActualLeft: preRect.left,
+                preActualRight: preRect.right,
+                preActualWidth: preRect.width,
+                containerLeft: containerRect?.left,
+                containerRight: containerRect?.right,
+                containerWidth: containerRect?.width,
+                clipDiff: preRect.right - (containerRect?.right || 0),
+              },
+              timestamp: Date.now(),
+              sessionId: "debug-session",
+              hypothesisId: "B",
+            }),
+          }
+        ).catch(() => {});
+      }
+    }, 500);
+    // #endregion
+
+    const ro = new ResizeObserver((entries) => {
       if (!entries[0] || !asciiRef.current) return;
       const { width: w, height: h } = entries[0].contentRect;
+
+      // #region agent log
+      fetch(
+        "http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            location: "DecodedLogo.tsx:ResizeObserver",
+            message: "ResizeObserver triggered",
+            data: {
+              newWidth: w,
+              newHeight: h,
+              prevWidth: asciiRef.current.width,
+              prevHeight: asciiRef.current.height,
+              widthChanged: w !== asciiRef.current.width,
+            },
+            timestamp: Date.now(),
+            sessionId: "debug-session",
+            hypothesisId: "L",
+          }),
+        }
+      ).catch(() => {});
+      // #endregion
+
       if (w > 0 && h > 0) {
         asciiRef.current.setSize(w, h);
       }
@@ -578,16 +939,23 @@ export default function DecodedLogo({
         asciiRef.current.dispose();
       }
     };
-  }, [asciiFontSize, textFontSize, planeBaseHeight, enableWaves, enableHueRotate, enableMouseInteraction]);
+  }, [
+    asciiFontSize,
+    textFontSize,
+    planeBaseHeight,
+    enableWaves,
+    enableHueRotate,
+    enableMouseInteraction,
+  ]);
 
   return (
     <div
       ref={containerRef}
       className="decoded-logo-container"
       style={{
-        position: 'absolute',
-        width: '100%',
-        height: '100%'
+        position: "absolute",
+        width: "100%",
+        height: "100%",
       }}
     >
       <style>{`
@@ -618,10 +986,11 @@ export default function DecodedLogo({
           user-select: none;
           padding: 0;
           line-height: 1em;
-          text-align: left;
+          text-align: center;
           position: absolute;
-          left: 0;
-          top: 0;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
           background-image: radial-gradient(circle, #d9fc69 0%, #b8d855 50%, #9ab842 100%);
           background-attachment: fixed;
           -webkit-text-fill-color: transparent;
@@ -633,4 +1002,3 @@ export default function DecodedLogo({
     </div>
   );
 }
-

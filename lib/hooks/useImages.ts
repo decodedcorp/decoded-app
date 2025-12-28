@@ -20,17 +20,19 @@ import type { ImageRow } from "@/lib/supabase/types";
 /**
  * @deprecated Use useInfiniteFilteredImages with unified adapter instead.
  * This hook does not include post context (postId, account).
- * 
+ *
  * Migration guide:
  * - Replace: useLatestImages(20)
  * - With: useInfiniteFilteredImages({ limit: 20, filter: "all", search: "" })
- * 
+ *
  * @param limit - Maximum number of images to fetch (default: 20)
  * @returns React Query result with data, loading, error states
  */
 export function useLatestImages(limit = 20) {
   if (process.env.NODE_ENV === "development") {
-    console.warn("[useLatestImages] Deprecated: Use useInfiniteFilteredImages instead");
+    console.warn(
+      "[useLatestImages] Deprecated: Use useInfiniteFilteredImages instead"
+    );
   }
   return useQuery<ImageRow[]>({
     queryKey: ["images", "latest", limit],
@@ -87,10 +89,19 @@ export function useInfiniteFilteredImages(params: {
   search?: string;
   deduplicateByImageId?: boolean;
 }) {
-  const { limit, filter = "all", search = "", deduplicateByImageId = false } = params;
+  const {
+    limit,
+    filter = "all",
+    search = "",
+    deduplicateByImageId = false,
+  } = params;
 
   return useInfiniteQuery<ImagePageWithPostId>({
-    queryKey: ["images", "infinite", { filter, search, limit, deduplicateByImageId }],
+    queryKey: [
+      "images",
+      "infinite",
+      { filter, search, limit, deduplicateByImageId },
+    ],
     queryFn: ({ pageParam }) =>
       fetchUnifiedImages({
         limit,

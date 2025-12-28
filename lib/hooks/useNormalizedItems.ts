@@ -7,18 +7,20 @@ import { normalizeItem, type UiItem } from "@/lib/components/detail/types";
  * Hook to normalize items with their locations from post metadata
  * Centralizes the logic used in both ImageDetailContent and ImageDetailModal
  */
-export function useNormalizedItems(image: ImageDetail | ImageRow | null | undefined): UiItem[] {
+export function useNormalizedItems(
+  image: ImageDetail | ImageRow | null | undefined
+): UiItem[] {
   return useMemo(() => {
     if (!image) return [];
 
     // Cast to ImageDetail to access relations safely (runtime check via optional chaining handles missing props)
     const img = image as ImageDetail;
     const items = img.items || [];
-    
+
     // Check for postImages and locations
     const firstPostImage = img.postImages?.[0];
     const itemLocations = firstPostImage?.item_locations;
-    
+
     const itemLocationsMap: Record<string, any> = {};
 
     if (Array.isArray(itemLocations)) {
@@ -40,4 +42,3 @@ export function useNormalizedItems(image: ImageDetail | ImageRow | null | undefi
     });
   }, [image]);
 }
-
