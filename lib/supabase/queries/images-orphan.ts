@@ -33,7 +33,8 @@ export async function fetchOrphanImages(params: {
     `
     )
     .not("image_url", "is", null)
-    .eq("with_items", false);
+    .eq("with_items", false)
+    .gte("created_at", "2024-01-01"); // Only include data from 2024-01-01 onwards
 
   const { data: allImages, error: imagesError } = await query;
 

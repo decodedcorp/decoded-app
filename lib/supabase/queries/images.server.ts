@@ -25,6 +25,7 @@ export async function fetchLatestImagesServer(limit = 20): Promise<ImageRow[]> {
     .select("*")
     .not("image_url", "is", null) // Only fetch records with images
     .eq("with_items", false) // Only fetch original images
+    .gte("created_at", "2024-01-01") // Only include data from 2024-01-01 onwards
     .order("created_at", { ascending: false })
     .limit(limit);
 
