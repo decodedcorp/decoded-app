@@ -20,7 +20,7 @@ export async function fetchOrphanImages(params: {
   const { limit, cursor } = params;
 
   // Fetch all images
-  let query = supabaseBrowserClient
+  const query = supabaseBrowserClient
     .from("image")
     .select(
       `

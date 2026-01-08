@@ -368,7 +368,7 @@ export async function fetchFilteredImages(
       // Strategy A: Fetch post.ts values in batch for filtering
       const postIds = new Set<string>();
       const rowData = new Map<string, any>();
-      
+
       for (const row of data) {
         if (!row.image) continue;
         const postRow = Array.isArray(row.post) ? row.post[0] : row.post;
@@ -381,15 +381,20 @@ export async function fetchFilteredImages(
       // Fetch post.ts values in batch (as text to avoid timestamp parsing errors)
       const postTsMap = new Map<string, string>();
       if (postIds.size > 0) {
-        const { data: postsData, error: postsError } = await supabaseBrowserClient
-          .from("post")
-          .select("id, ts")
-          .in("id", Array.from(postIds));
+        const { data: postsData, error: postsError } =
+          await supabaseBrowserClient
+            .from("post")
+            .select("id, ts")
+            .in("id", Array.from(postIds));
 
         if (!postsError && postsData) {
           for (const post of postsData) {
             // Convert ts to string (it may come as Date or string)
-            const tsValue = post.ts ? (typeof post.ts === 'string' ? post.ts : String(post.ts)) : null;
+            const tsValue = post.ts
+              ? typeof post.ts === "string"
+                ? post.ts
+                : String(post.ts)
+              : null;
             if (tsValue) {
               postTsMap.set(post.id, tsValue);
             }
@@ -413,7 +418,7 @@ export async function fetchFilteredImages(
         if (!row.image) continue;
         const imageRow = Array.isArray(row.image) ? row.image[0] : row.image;
         const postRow = Array.isArray(row.post) ? row.post[0] : row.post;
-        
+
         if (!postRow?.id) continue;
 
         // Get post.ts value (fallback to post_image.created_at if not available)
@@ -426,7 +431,8 @@ export async function fetchFilteredImages(
         if (cursorPostTs) {
           // Skip items with post.ts >= cursorPostTs (already shown in previous page)
           if (postTs > cursorPostTs) continue;
-          if (postTs === cursorPostTs && imageRow.id >= cursorImageId!) continue;
+          if (postTs === cursorPostTs && imageRow.id >= cursorImageId!)
+            continue;
         }
 
         if (imageRow && imageRow.id && !uniqueImages.has(imageRow.id)) {
@@ -556,7 +562,7 @@ export async function fetchImagesByPostImage(
   // Extract and normalize images with full post metadata
   const uniqueImages = new Map<string, ImageWithPostId>();
   const postIdToRowMap = new Map<string, any>(); // Map to store row data by post_id
-  
+
   if (data) {
     // First pass: collect all post_ids and row data
     const postIds = new Set<string>();
@@ -580,7 +586,11 @@ export async function fetchImagesByPostImage(
       if (!postsError && postsData) {
         for (const post of postsData) {
           // Convert ts to string (it may come as Date or string)
-          const tsValue = post.ts ? (typeof post.ts === 'string' ? post.ts : String(post.ts)) : null;
+          const tsValue = post.ts
+            ? typeof post.ts === "string"
+              ? post.ts
+              : String(post.ts)
+            : null;
           if (tsValue) {
             postTsMap.set(post.id, tsValue);
           }
@@ -604,7 +614,7 @@ export async function fetchImagesByPostImage(
       if (!row.image) continue;
       const imageRow = Array.isArray(row.image) ? row.image[0] : row.image;
       const postRow = Array.isArray(row.post) ? row.post[0] : row.post;
-      
+
       if (!postRow?.id) continue;
 
       // Get post.ts value (fallback to post_image.created_at if not available)
@@ -725,7 +735,11 @@ export async function fetchRelatedImagesByAccount(
       if (!postsError && postsData) {
         for (const post of postsData) {
           // Convert ts to string (it may come as Date or string)
-          const tsValue = post.ts ? (typeof post.ts === 'string' ? post.ts : String(post.ts)) : null;
+          const tsValue = post.ts
+            ? typeof post.ts === "string"
+              ? post.ts
+              : String(post.ts)
+            : null;
           if (tsValue) {
             postTsMap.set(post.id, tsValue);
           }
@@ -739,7 +753,7 @@ export async function fetchRelatedImagesByAccount(
       if (!row.image) continue;
       const imageRow = Array.isArray(row.image) ? row.image[0] : row.image;
       const postRow = Array.isArray(row.post) ? row.post[0] : row.post;
-      
+
       if (!postRow?.id) continue;
 
       // Get post.ts value (fallback to post_image.created_at if not available)
@@ -763,7 +777,7 @@ export async function fetchRelatedImagesByAccount(
       }
     }
   }
-  
+
   // Sort by post.ts descending
   const sortedImages = Array.from(uniqueImages.values()).sort((a, b) => {
     const timeA = new Date(a.created_at).getTime();

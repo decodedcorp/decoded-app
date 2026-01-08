@@ -71,8 +71,8 @@ export function ConnectorLayer({
       // Calculate end point (card left edge or center depending on layout)
       // For desktop split layout, we connect to the left edge of the card
       const isDesktop = window.innerWidth >= 1024;
-      const endX = isDesktop 
-        ? cardRect.left - svgRect.left 
+      const endX = isDesktop
+        ? cardRect.left - svgRect.left
         : cardRect.left + cardRect.width / 2 - svgRect.left;
       const endY = cardRect.top + 40 - svgRect.top; // Connect slightly below the top of the card
 
@@ -84,9 +84,11 @@ export function ConnectorLayer({
       const cp2y = endY;
 
       const path = `M ${startX} ${startY} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${endX} ${endY}`;
-      
+
       // Approximate length for animation
-      const length = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2)) * 1.2;
+      const length =
+        Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2)) *
+        1.2;
 
       newConnectors.push({
         itemId: item.id.toString(),
@@ -147,7 +149,7 @@ export function ConnectorLayer({
 
         if (isActive) {
           const length = path.getTotalLength();
-          
+
           gsap.fromTo(
             path,
             {
@@ -216,7 +218,11 @@ export function ConnectorLayer({
           activeIndex;
 
         return (
-          <g key={connector.itemId} style={{ opacity: isActive ? 1 : 0 }} filter={isActive ? "url(#glow)" : undefined}>
+          <g
+            key={connector.itemId}
+            style={{ opacity: isActive ? 1 : 0 }}
+            filter={isActive ? "url(#glow)" : undefined}
+          >
             <path
               data-connector-id={connector.itemId}
               d={connector.path}
@@ -227,7 +233,9 @@ export function ConnectorLayer({
               strokeLinecap="round"
               markerStart="url(#dot)"
               style={{
-                filter: isActive ? 'drop-shadow(0 0 8px rgba(var(--primary), 0.5))' : 'none'
+                filter: isActive
+                  ? "drop-shadow(0 0 8px rgba(var(--primary), 0.5))"
+                  : "none",
               }}
             />
           </g>

@@ -14,7 +14,8 @@ export function ArticleContent({ content }: Props) {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 md:py-16 md:px-8">
-      <article className="prose prose-base md:prose-lg dark:prose-invert prose-headings:font-serif prose-p:font-serif prose-p:leading-loose mx-auto
+      <article
+        className="prose prose-base md:prose-lg dark:prose-invert prose-headings:font-serif prose-p:font-serif prose-p:leading-loose mx-auto
         [&>p:first-of-type]:first-letter:text-6xl 
         md:[&>p:first-of-type]:first-letter:text-7xl 
         [&>p:first-of-type]:first-letter:font-serif 
@@ -48,7 +49,8 @@ export function ArticleContent({ content }: Props) {
         prose-blockquote:after:w-12
         prose-blockquote:after:h-0.5
         prose-blockquote:after:bg-primary/30
-      ">
+      "
+      >
         <ReactMarkdown>{content}</ReactMarkdown>
       </article>
 

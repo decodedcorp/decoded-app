@@ -4,10 +4,7 @@ import { useRef, useEffect } from "react";
 import Image from "next/image";
 import Markdown from "react-markdown";
 import { ExternalLink } from "lucide-react";
-import {
-  extractKoreanPart,
-  filterKoreanTags,
-} from "@/lib/utils/locale";
+import { extractKoreanPart, filterKoreanTags } from "@/lib/utils/locale";
 import type { UiItem } from "./types";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
@@ -40,37 +37,40 @@ export function ItemDetailCard({
   const contentRef = useRef<HTMLDivElement>(null);
   const formattedIndex = String(index + 1).padStart(2, "0");
 
-  useGSAP(() => {
-    if (!contentRef.current || isModal) return;
+  useGSAP(
+    () => {
+      if (!contentRef.current || isModal) return;
 
-    gsap.fromTo(
-      contentRef.current,
-      { 
-        y: 60, 
-        opacity: 0,
-        scale: 0.98 
-      },
-      {
-        y: 0,
-        opacity: 1,
-        scale: 1,
-        duration: 1.2,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: cardRef.current,
-          start: "top 85%",
-          end: "top 50%",
-          toggleActions: "play none none reverse",
+      gsap.fromTo(
+        contentRef.current,
+        {
+          y: 60,
+          opacity: 0,
+          scale: 0.98,
+        },
+        {
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          duration: 1.2,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: cardRef.current,
+            start: "top 85%",
+            end: "top 50%",
+            toggleActions: "play none none reverse",
+          },
         }
-      }
-    );
-  }, { scope: cardRef });
+      );
+    },
+    { scope: cardRef }
+  );
 
   // Filter metadata tags to only show Korean ones (or strictly locale-matching)
   // This matches the project's strategy to prioritize Korean content
   // Note: We use raw metadata for specs below, so we don't necessarily need displayTags here
   // unless we want to filter them. For now, let's keep the spec logic simple.
-  
+
   // Parse multi-language fields
   const displayBrand = item.brand
     ? extractKoreanPart(item.brand) || item.brand
@@ -87,7 +87,7 @@ export function ItemDetailCard({
   // Parse metadata into key-value pairs if possible
   // Filter to only show Korean parts of metadata
   const displayMetadata = filterKoreanTags(item.metadata);
-  
+
   const parsedMetadata = displayMetadata.map((tag) => {
     // Check for "Key: Value" pattern
     const match = tag.match(/^([^:]+):\s*(.+)$/);
@@ -117,15 +117,18 @@ export function ItemDetailCard({
         {formattedIndex}
       </div>
 
-      <div ref={contentRef} className="relative z-10 flex flex-col gap-6 md:gap-10">
+      <div
+        ref={contentRef}
+        className="relative z-10 flex flex-col gap-6 md:gap-10"
+      >
         {/* Item Image - Layered Collage Style */}
         <div className="group/image relative w-full aspect-[4/3] md:aspect-video lg:aspect-[3/2] rounded-2xl overflow-visible">
           {/* Ambient Background Blur Layer */}
           <div className="absolute inset-4 z-0 bg-primary/5 blur-3xl rounded-full" />
-          
+
           {/* Main Container with subtle border */}
           <div className="absolute inset-0 z-10 bg-muted/5 rounded-2xl border border-border/10 backdrop-blur-[2px] overflow-hidden">
-             {/* Subtle scanline or texture effect if desired */}
+            {/* Subtle scanline or texture effect if desired */}
           </div>
 
           {/* Floating Image Layer - Breaks boundaries slightly */}
@@ -167,7 +170,9 @@ export function ItemDetailCard({
             {/* Price */}
             {displayPrice && (
               <div className="flex flex-col items-start md:items-end">
-                <span className="font-sans text-[9px] uppercase tracking-widest text-muted-foreground/40 mb-1">Price Reference</span>
+                <span className="font-sans text-[9px] uppercase tracking-widest text-muted-foreground/40 mb-1">
+                  Price Reference
+                </span>
                 <p className="font-serif text-xl md:text-2xl font-medium text-foreground/80 whitespace-nowrap">
                   {displayPrice.split("|")[0].trim()}
                 </p>
