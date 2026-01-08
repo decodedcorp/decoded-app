@@ -27,6 +27,7 @@ Decoded is a K-content fashion discovery platform that helps fans identify and p
 | [04-creation-ai.md](./04-creation-ai.md) | Creation & AI | C-01 ~ C-04 | 10% implemented |
 | [05-system-backend.md](./05-system-backend.md) | System & Backend | S-01 ~ S-08 | 20% implemented |
 | [06-admin.md](./06-admin.md) | Admin Panel | A-01 ~ A-03 | 0% implemented |
+| [07-mobile-platform.md](./07-mobile-platform.md) | Mobile Platform | M-01 ~ M-06 | 30% implemented |
 | [data-models.md](./data-models.md) | Data Models | TypeScript types | Reference |
 
 ---
@@ -52,6 +53,10 @@ Decoded is a K-content fashion discovery platform that helps fans identify and p
 | C-02 | AI Object Recognition | Creation | Partial |
 | C-03 | Metadata Tagging | Creation | Not Started |
 | C-04 | Spot Registration (URL Parsing) | Creation | Not Started |
+| M-01 | Shared Code Layer | Mobile | **Implemented** |
+| M-02 | Expo Project Setup | Mobile | **Implemented** |
+| M-03 | Home Screen (Image Grid) | Mobile | **Implemented** |
+| M-04 | Image Detail Screen | Mobile | **Implemented** |
 
 ### P1 - Important
 
@@ -60,6 +65,8 @@ Decoded is a K-content fashion discovery platform that helps fans identify and p
 | U-02 | Multi-language (KO/EN) | User | Not Started |
 | U-04 | Activity History | User | Not Started |
 | D-03 | Media Gallery | Discovery | Not Started |
+| M-05 | Push Notifications | Mobile | Pending |
+| M-06 | Camera/Gallery Integration | Mobile | Pending |
 
 ### P2 - Nice to Have
 
@@ -126,6 +133,7 @@ USER
 
 ## Technical Stack
 
+### Web
 | Layer | Technology |
 |-------|------------|
 | Frontend | Next.js 16, React 18, TypeScript |
@@ -133,6 +141,25 @@ USER
 | State | Zustand, React Query |
 | Backend | Supabase (PostgreSQL, Auth, Storage) |
 | AI | Vision API (TBD), Scraper Engine |
+
+### Mobile (Cross-Platform)
+| Layer | Technology |
+|-------|------------|
+| Framework | Expo SDK 54, React Native 0.81 |
+| Routing | Expo Router 6 |
+| Animation | React Native Reanimated 4 |
+| State | Zustand, React Query (shared) |
+| Native | expo-notifications, expo-image-picker |
+
+### Monorepo Structure
+```
+decoded-monorepo/
+├── packages/
+│   ├── shared/    # 공유 코드 (hooks, stores, queries)
+│   ├── web/       # Next.js 웹 앱 (SSR)
+│   └── mobile/    # Expo 네이티브 앱
+└── package.json   # Yarn workspaces
+```
 
 ---
 
@@ -145,6 +172,7 @@ USER
   - `C-##`: Creation features
   - `S-##`: System features
   - `A-##`: Admin features
+  - `M-##`: Mobile platform features
 
 - Priority levels:
   - `P0`: Critical for MVP
