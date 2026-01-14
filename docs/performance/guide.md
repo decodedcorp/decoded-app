@@ -1,18 +1,18 @@
-# Performance Guide
+# 성능 가이드
 
-> Version: 1.0.0
-> Last Updated: 2026-01-14
-> Purpose: 성능 최적화 전략 및 모니터링 가이드
+> 버전: 1.0.0
+> 최종 업데이트: 2026-01-14
+> 목적: 성능 최적화 전략 및 모니터링 가이드
 
 ---
 
-## Overview
+## 개요
 
 이 문서는 Decoded 앱의 성능 최적화 전략과 모니터링 방법을 정리합니다. Core Web Vitals 목표와 각 영역별 최적화 기법을 다룹니다.
 
 ---
 
-## 1. Performance Targets
+## 1. 성능 목표
 
 ### 1.1 Core Web Vitals
 
@@ -24,7 +24,7 @@
 | **INP** (Interaction to Next Paint) | 상호작용 반응 시간 | <200ms | 측정 필요 |
 | **TTFB** (Time to First Byte) | 첫 바이트 도착 시간 | <800ms | 측정 필요 |
 
-### 1.2 Custom Metrics
+### 1.2 커스텀 메트릭
 
 | 지표 | 목표 | 측정 방법 |
 |------|------|----------|
@@ -36,9 +36,9 @@
 
 ---
 
-## 2. Current Optimizations
+## 2. 현재 최적화
 
-### 2.1 DOM Optimization
+### 2.1 DOM 최적화
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
@@ -71,7 +71,7 @@
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### 2.2 Image Loading Strategy
+### 2.2 이미지 로딩 전략
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
@@ -116,7 +116,7 @@
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### 2.3 React Query Caching
+### 2.3 React Query 캐싱
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
@@ -158,7 +158,7 @@
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### 2.4 Animation Performance
+### 2.4 애니메이션 성능
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
@@ -204,9 +204,9 @@
 
 ---
 
-## 3. Bottleneck Analysis
+## 3. 병목 분석
 
-### 3.1 Known Bottlenecks
+### 3.1 알려진 병목
 
 | 영역 | 문제 | 원인 | 해결 상태 |
 |------|------|------|----------|
@@ -216,7 +216,7 @@
 | 상세 모달 | FLIP 지연 | GSAP 계산 시간 | 🔶 최적화 필요 |
 | 검색 | 잦은 refetch | 디바운스 없음 | ✅ 해결 (250ms) |
 
-### 3.2 Planned Optimizations
+### 3.2 계획된 최적화
 
 | 영역 | 최적화 | 예상 효과 | 우선순위 |
 |------|--------|----------|---------|
@@ -228,9 +228,9 @@
 
 ---
 
-## 4. Monitoring & Measurement
+## 4. 모니터링 & 측정
 
-### 4.1 Measurement Tools
+### 4.1 측정 도구
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
@@ -268,7 +268,7 @@
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### 4.2 Lighthouse CI Setup
+### 4.2 Lighthouse CI 설정
 
 ```yaml
 # .github/workflows/lighthouse.yml
@@ -292,7 +292,7 @@ jobs:
           uploadArtifacts: true
 ```
 
-### 4.3 Web Vitals Integration
+### 4.3 Web Vitals 통합
 
 ```typescript
 // lib/analytics/webVitals.ts
@@ -324,9 +324,9 @@ export function reportWebVitals() {
 
 ---
 
-## 5. Performance Budget
+## 5. 성능 예산
 
-### 5.1 Budget Definition
+### 5.1 예산 정의
 
 ```json
 // lighthouse-budget.json
@@ -351,7 +351,7 @@ export function reportWebVitals() {
 ]
 ```
 
-### 5.2 Bundle Size Limits
+### 5.2 번들 크기 제한
 
 | 청크 | 제한 | 현재 | 상태 |
 |------|------|------|------|
@@ -362,7 +362,7 @@ export function reportWebVitals() {
 
 ---
 
-## 6. Optimization Checklist
+## 6. 최적화 체크리스트
 
 ### 6.1 개발 시 체크리스트
 
@@ -407,7 +407,7 @@ export function reportWebVitals() {
 
 ---
 
-## 7. Common Performance Issues
+## 7. 일반적인 성능 문제
 
 ### 7.1 문제 해결 가이드
 
@@ -422,7 +422,7 @@ export function reportWebVitals() {
 
 ---
 
-## Related Documents
+## 관련 문서
 
 - [../testing/scenarios.md](../testing/scenarios.md) - 테스트 시나리오
 - [../architecture/README.md](../architecture/README.md) - 시스템 아키텍처

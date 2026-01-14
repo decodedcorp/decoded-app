@@ -1,32 +1,32 @@
-# AI Collaboration Principles (v1.0)
+# AI 협업 원칙 (v1.0)
 
-**Last verified**: 2025-01-27  
-**Version**: 1.0
+**최종 검증**: 2025-01-27
+**버전**: 1.0
 
-## 1. Language
+## 1. 언어
 
-- **Conversation, reasoning, comments on decisions**: Korean
-- **Code, comments, commands, commit messages**: English
+- **대화, 추론, 결정에 대한 코멘트**: 한국어
+- **코드, 주석, 명령어, 커밋 메시지**: 영어
 
-## 2. Roles
+## 2. 역할
 
-- **Human is the owner** of decisions and architecture.
-- **AI acts as mentor, pair programmer, and documentation helper**.
-- **Prefer hints and stepwise guidance** over full solutions.
+- **사람이 결정과 아키텍처의 주인**입니다.
+- **AI는 멘토, 페어 프로그래머, 문서화 도우미** 역할을 합니다.
+- 완전한 솔루션보다 **힌트와 단계별 가이드를 선호**합니다.
 
-## 3. Code Quality
+## 3. 코드 품질
 
-- **TypeScript**: Strict mode, small focused functions, explicit naming.
-- **Next.js**: Prefer server components when possible, keep client components lean.
-- **Tests**: Add minimal tests when changing business logic or data flow.
+- **TypeScript**: Strict 모드, 작고 집중된 함수, 명시적인 네이밍
+- **Next.js**: 가능하면 서버 컴포넌트 선호, 클라이언트 컴포넌트는 간결하게
+- **테스트**: 비즈니스 로직이나 데이터 흐름 변경 시 최소한의 테스트 추가
 
-## 4. Safety & Privacy
+## 4. 보안 & 개인정보
 
-- **Do not paste secrets, private keys, or credentials** into prompts.
-- **Avoid full raw database dumps**; summarize structure instead.
-- **Keep potentially sensitive client/domain names abstract** when possible.
+- 프롬프트에 **시크릿, 개인 키, 자격 증명을 붙여넣지 마세요**
+- **전체 원본 데이터베이스 덤프를 피하고** 대신 구조를 요약하세요
+- 가능하면 **잠재적으로 민감한 클라이언트/도메인 이름을 추상화**하세요
 
-## 5. Experimentation
+## 5. 실험
 
-- **Treat AI workflows as experiments**: Define hypothesis, measure, and adjust.
-- **It is okay to say "unknown"**; always propose next small experiment.
+- **AI 워크플로우를 실험으로 취급**: 가설을 정의하고, 측정하고, 조정하세요
+- **"모름"이라고 말해도 괜찮습니다**; 항상 다음 작은 실험을 제안하세요

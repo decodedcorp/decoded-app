@@ -1,26 +1,26 @@
-# Claude Profile – Small Refactor & Code Analysis (v1.0)
+# Claude 프로필 – 간단한 리팩토링 & 코드 분석 (v1.0)
 
-**Last verified**: 2025-01-27
+**최종 검증**: 2025-01-27
 
-## When to Use Claude
+## Claude 사용 시점
 
-- Reading and summarizing unfamiliar modules.
-- Designing or reviewing refactor plans.
-- Validating spec coverage against implementation (with Speckit).
+- 익숙하지 않은 모듈을 읽고 요약할 때
+- 리팩토링 계획을 설계하거나 검토할 때
+- 스펙 커버리지와 구현을 검증할 때 (Speckit과 함께)
 
-## Expectations
+## 기대사항
 
-- **For refactors**:
-  - Explain what changes and why.
-  - List risks and how to test quickly.
-- **For analysis**:
-  - Provide high-level maps: "data flow", "component tree", "responsibility split".
-  - Point out smells (e.g. duplication, god components, hidden coupling).
+- **리팩토링의 경우**:
+  - 무엇이 왜 변경되는지 설명합니다.
+  - 위험 요소와 빠르게 테스트하는 방법을 나열합니다.
+- **분석의 경우**:
+  - 고수준 맵을 제공합니다: "데이터 흐름", "컴포넌트 트리", "책임 분리".
+  - 코드 스멜을 지적합니다 (예: 중복, 거대 컴포넌트, 숨겨진 결합).
 
-## Working Style
+## 작업 스타일
 
-- **Prefer "plan first, code later"**:
-  1. Summarize current state.
-  2. Suggest refactor plan.
-  3. Only then show example code changes.
-- **Keep suggestions minimally invasive and reversible**.
+- **"계획 먼저, 코드는 나중에"를 선호**:
+  1. 현재 상태를 요약합니다.
+  2. 리팩토링 계획을 제안합니다.
+  3. 그 다음에야 예시 코드 변경을 보여줍니다.
+- **최소 침습적이고 되돌릴 수 있는 제안을 유지합니다**.

@@ -1,76 +1,76 @@
-# Color System & Design Guidelines
+# 색상 시스템 & 디자인 가이드라인
 
-**Last Updated:** December 24, 2025
+**최종 업데이트:** 2025년 12월 24일
 
-This document outlines the color system used in the project, including the semantic theme colors and the categorical color palette used for tags and filters.
+이 문서는 프로젝트에서 사용하는 색상 시스템을 설명합니다. 시맨틱 테마 색상과 태그 및 필터에 사용되는 카테고리 색상 팔레트를 포함합니다.
 
-## 1. Semantic Theme Colors (OKLCH)
+## 1. 시맨틱 테마 색상 (OKLCH)
 
-Our application uses a modern **OKLCH** color system defined in `app/globals.css` and mapped in `tailwind.config.ts`. These colors automatically adapt to Light and Dark modes. We use `color-mix` to support opacity modifiers with CSS variables.
+우리 애플리케이션은 `app/globals.css`에 정의되고 `tailwind.config.ts`에 매핑된 현대적인 **OKLCH** 색상 시스템을 사용합니다. 이 색상들은 라이트 모드와 다크 모드에 자동으로 적응합니다. CSS 변수와 함께 투명도 수정자를 지원하기 위해 `color-mix`를 사용합니다.
 
-| Token           | Usage                              | Description                                                      |
+| 토큰            | 용도                               | 설명                                                             |
 | --------------- | ---------------------------------- | ---------------------------------------------------------------- |
-| **Background**  | Page backgrounds                   | Clean white (Light) or dark gray (Dark).                         |
-| **Foreground**  | Default text                       | High contrast text color.                                        |
-| **Primary**     | Main actions (Buttons)             | Strong brand color. Inverted in dark mode for visibility.        |
-| **Secondary**   | Secondary actions, inactive states | Subtle gray/slate. Used for "All" filters or neutral tags.       |
-| **Accent**      | Highlights, hover states           | Used for interactive elements' hover states.                     |
-| **Muted**       | Subtitles, disabled text           | Low priority information.                                        |
-| **Border**      | Dividers, inputs                   | Subtle borders.                                                  |
-| **Destructive** | Error states, delete actions       | Red/Orange warning color.                                        |
-| **Sidebar**     | Sidebar specific                   | Specific tokens for sidebar background, foreground, accent, etc. |
-| **Chart**       | Data visualization                 | Series of colors (`chart-1` to `chart-5`) for graphs.            |
+| **Background**  | 페이지 배경                        | 깨끗한 흰색(라이트) 또는 어두운 회색(다크)                       |
+| **Foreground**  | 기본 텍스트                        | 고대비 텍스트 색상                                               |
+| **Primary**     | 주요 액션 (버튼)                   | 강한 브랜드 색상. 다크 모드에서는 가시성을 위해 반전됨           |
+| **Secondary**   | 보조 액션, 비활성 상태             | 미묘한 회색/슬레이트. "All" 필터나 중립 태그에 사용              |
+| **Accent**      | 하이라이트, 호버 상태              | 인터랙티브 요소의 호버 상태에 사용                               |
+| **Muted**       | 부제목, 비활성 텍스트              | 우선순위가 낮은 정보                                             |
+| **Border**      | 구분선, 입력 필드                  | 미묘한 테두리                                                    |
+| **Destructive** | 에러 상태, 삭제 액션               | 빨강/주황 경고 색상                                              |
+| **Sidebar**     | 사이드바 전용                      | 사이드바 배경, 전경, 액센트 등을 위한 전용 토큰                  |
+| **Chart**       | 데이터 시각화                      | 그래프용 색상 시리즈 (`chart-1`부터 `chart-5`)                   |
 
-### Sidebar Specific Tokens
+### 사이드바 전용 토큰
 
-The sidebar has its own dedicated tokens to allow for independent theming:
+사이드바는 독립적인 테마 적용을 위한 전용 토큰을 가지고 있습니다:
 
-- `sidebar`: Background
-- `sidebar-foreground`: Text
-- `sidebar-primary`: Primary element in sidebar
-- `sidebar-accent`: Hover/active state in sidebar
-- `sidebar-border`: Sidebar border
+- `sidebar`: 배경
+- `sidebar-foreground`: 텍스트
+- `sidebar-primary`: 사이드바 내 주요 요소
+- `sidebar-accent`: 사이드바 내 호버/활성 상태
+- `sidebar-border`: 사이드바 테두리
 
-## 2. Categorical Color Palette (Pastel/Soft)
+## 2. 카테고리 색상 팔레트 (파스텔/소프트)
 
-We use a soft, pastel-based color palette for categories, tags, and filters to distinguish content types without overwhelming the UI. These are designed to be "too noticeable" but distinct.
+UI를 압도하지 않으면서 콘텐츠 유형을 구분하기 위해 부드러운 파스텔 기반 색상 팔레트를 카테고리, 태그, 필터에 사용합니다. 이 색상들은 "너무 눈에 띄지" 않으면서도 구별 가능하도록 설계되었습니다.
 
-### Principles
+### 원칙
 
-- **Light Mode:** Use `{color}-100` for backgrounds and `{color}-900` for text.
-- **Dark Mode:** Use `{color}-900` with opacity (e.g., `/30`) for backgrounds and `{color}-100` for text to ensure readability and reduce eye strain.
-- **Interaction:** Hover states should slightly darken the background (e.g., `hover:bg-{color}-200`).
+- **라이트 모드:** 배경에 `{color}-100`, 텍스트에 `{color}-900` 사용
+- **다크 모드:** 가독성과 눈의 피로를 줄이기 위해 배경에 투명도가 적용된 `{color}-900` (예: `/30`), 텍스트에 `{color}-100` 사용
+- **인터랙션:** 호버 상태에서는 배경을 약간 어둡게 (예: `hover:bg-{color}-200`)
 
-### Palette Map
+### 팔레트 맵
 
-| Category          | Tailwind Color Family  | Light Mode Classes                       | Dark Mode Classes                            |
-| ----------------- | ---------------------- | ---------------------------------------- | -------------------------------------------- |
-| **Neutral / All** | `secondary`            | `bg-secondary text-secondary-foreground` | `dark:bg-secondary/50`                       |
-| **Latest / New**  | `amber` (Gold)         | `bg-amber-100 text-amber-900`            | `dark:bg-amber-900/30 dark:text-amber-100`   |
-| **Clothing**      | `rose` (Pink)          | `bg-rose-100 text-rose-900`              | `dark:bg-rose-900/30 dark:text-rose-100`     |
-| **Accessories**   | `purple` (Soft Purple) | `bg-purple-100 text-purple-900`          | `dark:bg-purple-900/30 dark:text-purple-100` |
-| **Shoes**         | `sky` (Light Blue)     | `bg-sky-100 text-sky-900`                | `dark:bg-sky-900/30 dark:text-sky-100`       |
-| **Bags**          | `stone` (Tan/Beige)    | `bg-stone-100 text-stone-900`            | `dark:bg-stone-900/30 dark:text-stone-100`   |
+| 카테고리          | Tailwind 색상 계열       | 라이트 모드 클래스                       | 다크 모드 클래스                             |
+| ----------------- | ----------------------- | ---------------------------------------- | -------------------------------------------- |
+| **중립 / 전체**   | `secondary`             | `bg-secondary text-secondary-foreground` | `dark:bg-secondary/50`                       |
+| **최신 / 신규**   | `amber` (골드)          | `bg-amber-100 text-amber-900`            | `dark:bg-amber-900/30 dark:text-amber-100`   |
+| **의류**          | `rose` (핑크)           | `bg-rose-100 text-rose-900`              | `dark:bg-rose-900/30 dark:text-rose-100`     |
+| **액세서리**      | `purple` (소프트 퍼플)  | `bg-purple-100 text-purple-900`          | `dark:bg-purple-900/30 dark:text-purple-100` |
+| **신발**          | `sky` (라이트 블루)     | `bg-sky-100 text-sky-900`                | `dark:bg-sky-900/30 dark:text-sky-100`       |
+| **가방**          | `stone` (탄/베이지)     | `bg-stone-100 text-stone-900`            | `dark:bg-stone-900/30 dark:text-stone-100`   |
 
-### Code Example (React/Tailwind)
+### 코드 예시 (React/Tailwind)
 
 ```tsx
-// Example of applying category styles
+// 카테고리 스타일 적용 예시
 <span className="bg-rose-100 text-rose-900 dark:bg-rose-900/30 dark:text-rose-100 px-2 py-1 rounded">
-  Clothing
+  의류
 </span>
 ```
 
-## 3. Design Guidelines
+## 3. 디자인 가이드라인
 
-### When to use what?
+### 언제 무엇을 사용해야 하나요?
 
-- **Primary Actions:** Use the **Primary** color (e.g., "Save", "Submit", "Buy").
-- **Navigation/Tabs:** Use **Secondary** or **Ghost** styles unless active.
-- **Status/Categories:** Use the **Categorical Palette** above.
-  - Avoid using these colors for text only; always use them as a pair (background + text) for better accessibility and visual weight.
+- **주요 액션:** **Primary** 색상 사용 (예: "저장", "제출", "구매")
+- **네비게이션/탭:** 활성화되지 않은 경우 **Secondary** 또는 **Ghost** 스타일 사용
+- **상태/카테고리:** 위의 **카테고리 팔레트** 사용
+  - 텍스트에만 이 색상들을 사용하지 마세요; 더 나은 접근성과 시각적 무게감을 위해 항상 쌍(배경 + 텍스트)으로 사용하세요
 
-### Accessibility
+### 접근성
 
-- Always ensure sufficient contrast ratio between text and background.
-- In Dark Mode, avoid fully saturated backgrounds for large areas; use opacity modifiers (e.g., `/30`, `/50`) to blend with the dark background.
+- 텍스트와 배경 사이에 항상 충분한 대비율을 확보하세요
+- 다크 모드에서는 넓은 영역에 완전히 채도가 높은 배경을 피하세요; 어두운 배경과 조화롭게 투명도 수정자(예: `/30`, `/50`)를 사용하세요

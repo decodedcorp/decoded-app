@@ -1,20 +1,20 @@
-# Test Scenarios
+# 테스트 시나리오
 
-> Version: 1.0.0
-> Last Updated: 2026-01-14
-> Purpose: 기능별 테스트 케이스 및 E2E 시나리오 문서화
+> 버전: 1.0.0
+> 최종 업데이트: 2026-01-14
+> 목적: 기능별 테스트 케이스 및 E2E 시나리오 문서화
 
 ---
 
-## Overview
+## 개요
 
 이 문서는 Decoded 앱의 테스트 시나리오를 정리합니다. 각 기능별 테스트 케이스와 E2E 테스트 시나리오를 포함합니다.
 
 ---
 
-## 1. Test Strategy
+## 1. 테스트 전략
 
-### 1.1 Test Pyramid
+### 1.1 테스트 피라미드
 
 ```
                     ┌───────────────┐
@@ -34,7 +34,7 @@
           └────────────────────────────────────┘
 ```
 
-### 1.2 Test Tools
+### 1.2 테스트 도구
 
 | Tool | Purpose | Files |
 |------|---------|-------|
@@ -44,7 +44,7 @@
 
 ---
 
-## 2. Feature Test Cases
+## 2. 기능별 테스트 케이스
 
 ### 2.1 D-01: Responsive Magazine Feed
 
@@ -227,9 +227,9 @@ test.describe('V-01: Detail View', () => {
 
 ---
 
-## 3. E2E Test Scenarios
+## 3. E2E 테스트 시나리오
 
-### 3.1 Critical User Flows
+### 3.1 핵심 사용자 흐름
 
 #### Flow 1: 발견 → 상세 → 구매
 
@@ -346,9 +346,9 @@ test('E2E-01: Discovery to Purchase Flow', async ({ page, context }) => {
 
 ---
 
-## 4. Visual Regression Tests
+## 4. 비주얼 리그레션 테스트
 
-### 4.1 Critical Visual Tests
+### 4.1 핵심 비주얼 테스트
 
 | ID | 화면 | 설명 | 상태 |
 |----|------|------|------|
@@ -362,9 +362,9 @@ test('E2E-01: Discovery to Purchase Flow', async ({ page, context }) => {
 
 ---
 
-## 5. Performance Tests
+## 5. 성능 테스트
 
-### 5.1 Performance Metrics
+### 5.1 성능 메트릭
 
 | 지표 | 목표 | 측정 방법 |
 |------|------|----------|
@@ -374,7 +374,7 @@ test('E2E-01: Discovery to Purchase Flow', async ({ page, context }) => {
 | TTI | <3.8s | Lighthouse CI |
 | 초기 로드 | <3s | E2E timing |
 
-### 5.2 Performance Test Scenarios
+### 5.2 성능 테스트 시나리오
 
 ```typescript
 test('PERF-01: Initial page load time', async ({ page }) => {
@@ -403,9 +403,9 @@ test('PERF-02: Infinite scroll performance', async ({ page }) => {
 
 ---
 
-## 6. Test Data Setup
+## 6. 테스트 데이터 설정
 
-### 6.1 Mock Data
+### 6.1 Mock 데이터
 
 ```typescript
 // __tests__/fixtures/images.ts
@@ -423,7 +423,7 @@ export const mockImages = [
 ];
 ```
 
-### 6.2 Test Environment Setup
+### 6.2 테스트 환경 설정
 
 ```typescript
 // playwright.config.ts
@@ -444,7 +444,7 @@ export default defineConfig({
 
 ---
 
-## Related Documents
+## 관련 문서
 
 - [../performance/guide.md](../performance/guide.md) - 성능 가이드
 - [../../specs/feature-spec/workflows.md](../../specs/feature-spec/workflows.md) - 워크플로우
