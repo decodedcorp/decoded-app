@@ -16,6 +16,7 @@
 - **선행 조건**: 이 화면에 접근하기 위한 조건 (예: 로그인 필요, 특정 권한 필요)
 - **후속 화면**: 이 화면에서 이동 가능한 화면들
 - **관련 기능 ID**: [U-01](../../feature-spec/01-user-system.md#u-01) (기존 기능 명세 참조)
+- **관련 다이어그램**: [Navigation Flow](../../docs/diagrams/navigation-flow.excalidraw) (해당 시)
 
 ---
 
@@ -76,6 +77,17 @@
 └────────────────────────────────┘
 ```
 
+### 2.3 디자인 토큰 참조
+
+| 요소 | 토큰 | 값 | 참조 |
+|:---|:---|:---|:---|
+| 배경색 | `--background` | `#ffffff` | [colors.md](../../docs/design-system/colors.md) |
+| 기본 텍스트 | `text-base` | 16px / 1.5 | [typography.md](../../docs/design-system/typography.md) |
+| 제목 텍스트 | `text-2xl` | 24px / 1.25 | typography.md |
+| 버튼 기본 | `--primary` | oklch(0.21 0.006 285.75) | colors.md |
+| 카드 간격 | `gap-4` | 16px | [spacing.md](../../docs/design-system/spacing.md) |
+| 섹션 패딩 | `p-6` | 24px | spacing.md |
+
 ---
 
 ## 3. UI 요소 정의
@@ -101,16 +113,33 @@
 
 ---
 
-## 5. 데이터 요구사항
+## 5. 애니메이션/전환 _(if applicable)_
 
-### 5.1 API 호출
+> 이 섹션은 화면에 애니메이션이 필요한 경우에만 작성합니다.
+
+| 트리거 | 애니메이션 | 라이브러리 | 설정 |
+|:---|:---|:---|:---|
+| 페이지 진입 | Fade In | Motion | duration: 0.3s |
+| 카드 클릭 | FLIP 확대 | GSAP Flip | duration: 0.5s, ease: power2.inOut |
+| 스크롤 | Parallax | Lenis | smooth: true |
+
+**성능 고려사항:**
+- GPU 가속: `transform`, `opacity`만 사용
+- `will-change` 적용 요소: [해당 요소 나열]
+- `prefers-reduced-motion` 대응 필요
+
+---
+
+## 6. 데이터 요구사항
+
+### 6.1 API 호출
 
 | API | Method | Endpoint | 호출 시점 | 응답 |
 |:---|:---:|:---|:---|:---|
 | 데이터 조회 | GET | `/api/resource` | 화면 진입 시 | `{ data: T[] }` |
 | 데이터 생성 | POST | `/api/resource` | BTN-01 클릭 시 | `{ id: string }` |
 
-### 5.2 상태 관리
+### 6.2 상태 관리
 
 | 스토어 | 키 | 타입 | 설명 |
 |:---|:---|:---|:---|
@@ -119,7 +148,20 @@
 
 ---
 
-## 6. 에러 처리
+## 7. 성능 최적화 _(if applicable)_
+
+> 이 섹션은 리스트, 무한스크롤, 대용량 미디어가 있는 화면에만 작성합니다.
+
+| 기법 | 적용 대상 | 설명 |
+|:---|:---|:---|
+| 가상화 | 리스트 | react-virtual로 화면 내 보이는 항목만 렌더링 |
+| 지연 로딩 | 이미지 | Intersection Observer로 뷰포트 진입 시 로드 |
+| 메모이제이션 | 컴포넌트 | React.memo, useMemo로 불필요한 리렌더 방지 |
+| 디바운스 | 검색 입력 | 250ms 디바운스로 API 호출 최소화 |
+
+---
+
+## 8. 에러 처리
 
 | 에러 코드 | 상황 | 사용자 메시지 | 처리 방법 |
 |:---:|:---|:---|:---|
@@ -130,7 +172,7 @@
 
 ---
 
-## 7. 접근성 (A11y)
+## 9. 접근성 (A11y)
 
 - **키보드 네비게이션**: Tab으로 모든 인터랙티브 요소 접근 가능
 - **스크린 리더**: 모든 이미지에 alt 텍스트 제공
@@ -139,25 +181,64 @@
 
 ---
 
-## 8. 컴포넌트 매핑
+## 10. i18n 고려사항 _(if applicable)_
 
-| UI 영역 | 컴포넌트 | 파일 경로 |
-|:---|:---|:---|
-| 헤더 | Header | `packages/web/lib/components/Header.tsx` |
-| 메인 컨텐츠 | PageComponent | `packages/web/app/route/page.tsx` |
-| 버튼 | Button | `packages/web/lib/components/ui/Button.tsx` |
+> 이 섹션은 다국어 대응이 필요한 화면에 작성합니다.
+
+| 요소 | 키 | 기본값 (KO) | 비고 |
+|:---|:---|:---|:---|
+| TXT-01 | `page.title` | "화면 제목" | 최대 30자 |
+| BTN-01 | `action.submit` | "확인" | 최대 10자 |
+| INP-01 placeholder | `input.search` | "검색어 입력" | 최대 20자 |
+
+**주의사항:**
+- 텍스트 길이 변동 고려 (EN은 KO 대비 1.3배)
+- RTL 언어 지원 시 레이아웃 미러링 필요
 
 ---
 
-## 9. 구현 체크리스트
+## 11. 테스트 시나리오
+
+### 11.1 기능 테스트
+
+| ID | 시나리오 | 기대 결과 | 우선순위 |
+|:---|:---|:---|:---:|
+| T-01 | 빈 상태에서 BTN-01 클릭 | 비활성화 상태 유지 | High |
+| T-02 | 유효한 입력 후 BTN-01 클릭 | API 호출 후 성공 토스트 | High |
+| T-03 | API 실패 시 | 에러 토스트 표시 + 재시도 버튼 | High |
+| T-04 | 로딩 중 버튼 재클릭 | 중복 요청 방지 | Medium |
+
+### 11.2 에지 케이스
+
+- 네트워크 끊김 상태에서 동작 확인
+- 매우 긴 텍스트 입력 시 UI 깨짐 여부
+- 동시 다중 요청 시 상태 관리
+
+---
+
+## 12. 컴포넌트 매핑
+
+| UI 영역 | 컴포넌트 | 파일 경로 |
+|:---|:---|:---|
+| 헤더 | Header | `lib/components/Header.tsx` |
+| 메인 컨텐츠 | PageComponent | `app/route/page.tsx` |
+| 버튼 | Button | `lib/components/ui/Button.tsx` |
+
+---
+
+## 13. 구현 체크리스트
 
 - [ ] UI 레이아웃 구현
 - [ ] 인터랙션 구현
 - [ ] API 연동
 - [ ] 에러 처리
 - [ ] 반응형 대응
+- [ ] 애니메이션 구현 _(if applicable)_
+- [ ] 성능 최적화 _(if applicable)_
 - [ ] 접근성 테스트
-- [ ] 다국어 대응 (i18n)
+- [ ] i18n 대응 _(if applicable)_
+- [ ] 단위 테스트 작성
+- [ ] E2E 테스트 작성
 
 ---
 
