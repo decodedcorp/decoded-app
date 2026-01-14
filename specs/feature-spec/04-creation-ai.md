@@ -1,53 +1,53 @@
-# Creation & AI
+# 생성 & AI
 
-> Features: C-01 ~ C-04
-> Status: 10% implemented
-> Dependencies: Vision API, Scraper infrastructure
-
----
-
-## Overview
-
-Creation features allow users to contribute content to the platform. AI features assist in automatically detecting items and extracting metadata, reducing manual effort and improving accuracy.
-
-### Related Screens
-- `/create` - Post creation flow
-- `/create/upload` - Image upload step
-- `/create/detect` - AI detection step
-- `/create/tag` - Metadata tagging step
-- `/create/spot` - Spot registration
-
-### Current Implementation
-- `app/lab/fashion-scan/` - Experimental AI visualization
-- Backend pipeline exists for item detection
-- No user-facing upload flow
+> 기능: C-01 ~ C-04
+> 상태: 10% 구현됨
+> 의존성: Vision API, Scraper 인프라
 
 ---
 
-## Features
+## 개요
 
-### C-01 Image Upload
+생성 기능은 사용자가 플랫폼에 콘텐츠를 기여할 수 있게 합니다. AI 기능은 자동으로 아이템을 감지하고 메타데이터를 추출하여 수동 작업을 줄이고 정확도를 향상시킵니다.
 
-- **Description**: Allow users to upload images from mobile or web
-- **Priority**: P0
-- **Status**: Not Started
-- **Dependencies**: U-01 (Authentication), Supabase Storage
+### 관련 화면
+- `/create` - 게시물 생성 플로우
+- `/create/upload` - 이미지 업로드 단계
+- `/create/detect` - AI 감지 단계
+- `/create/tag` - 메타데이터 태깅 단계
+- `/create/spot` - 스팟 등록
 
-#### Acceptance Criteria
-- [ ] User can select image from device gallery
-- [ ] User can drag-and-drop image on web
-- [ ] User can paste image from clipboard (web)
-- [ ] Multiple image upload supported (up to 5)
-- [ ] Image preview before submission
-- [ ] Progress indicator during upload
-- [ ] Image validation (size, format, dimensions)
-- [ ] Automatic image compression if needed
-- [ ] Cancel upload in progress
-- [ ] Error handling with retry option
+### 현재 구현 상태
+- `app/lab/fashion-scan/` - 실험적 AI 시각화
+- 아이템 감지용 백엔드 파이프라인 존재
+- 사용자용 업로드 플로우 없음
 
-#### UI/UX Requirements
+---
 
-**Upload Screen (Step 1)**:
+## 기능
+
+### C-01 이미지 업로드
+
+- **설명**: 사용자가 모바일 또는 웹에서 이미지 업로드
+- **우선순위**: P0
+- **상태**: 미시작
+- **의존성**: U-01 (인증), Supabase Storage
+
+#### 인수 조건
+- [ ] 사용자가 기기 갤러리에서 이미지 선택 가능
+- [ ] 웹에서 드래그 앤 드롭 가능
+- [ ] 웹에서 클립보드 붙여넣기 가능
+- [ ] 다중 이미지 업로드 지원 (최대 5개)
+- [ ] 제출 전 이미지 미리보기
+- [ ] 업로드 중 진행률 표시
+- [ ] 이미지 검증 (크기, 형식, 해상도)
+- [ ] 필요시 자동 이미지 압축
+- [ ] 진행 중인 업로드 취소
+- [ ] 재시도 옵션이 있는 에러 처리
+
+#### UI/UX 요구사항
+
+**업로드 화면 (1단계)**:
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  Create New Post                              [Cancel]      │
@@ -76,7 +76,7 @@ Creation features allow users to contribute content to the platform. AI features
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Mobile Upload**:
+**모바일 업로드**:
 ```
 ┌─────────────────────────────┐
 │  Create New Post      [✕]   │
@@ -100,12 +100,12 @@ Creation features allow users to contribute content to the platform. AI features
 └─────────────────────────────┘
 ```
 
-#### Data Requirements
-- Supabase Storage bucket for uploads
-- Image table entry for each upload
-- Temporary upload directory for processing
+#### 데이터 요구사항
+- 업로드용 Supabase Storage 버킷
+- 각 업로드에 대한 이미지 테이블 항목
+- 처리용 임시 업로드 디렉토리
 
-#### Implementation Notes
+#### 구현 노트
 ```typescript
 // lib/hooks/useImageUpload.ts
 interface UploadProgress {
@@ -115,16 +115,16 @@ interface UploadProgress {
 }
 
 async function uploadImage(file: File): Promise<UploadResult> {
-  // Validate
+  // 검증
   if (file.size > 10 * 1024 * 1024) throw new Error('File too large');
   if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
     throw new Error('Invalid file type');
   }
 
-  // Compress if needed
+  // 필요시 압축
   const processedFile = await compressImage(file);
 
-  // Upload to Supabase Storage
+  // Supabase Storage에 업로드
   const { data, error } = await supabase.storage
     .from('uploads')
     .upload(`${userId}/${Date.now()}-${file.name}`, processedFile);
@@ -133,9 +133,9 @@ async function uploadImage(file: File): Promise<UploadResult> {
 }
 ```
 
-#### Files to Create/Modify
-- `app/create/page.tsx` - Creation flow entry
-- `app/create/upload/page.tsx` - Upload step
+#### 생성/수정할 파일
+- `app/create/page.tsx` - 생성 플로우 진입점
+- `app/create/upload/page.tsx` - 업로드 단계
 - `lib/components/create/ImageUploader.tsx`
 - `lib/components/create/ImagePreviewGrid.tsx`
 - `lib/components/create/DropZone.tsx`
@@ -144,28 +144,28 @@ async function uploadImage(file: File): Promise<UploadResult> {
 
 ---
 
-### C-02 AI Object Recognition
+### C-02 AI 객체 인식
 
-- **Description**: Automatically detect and crop fashion items in uploaded images
-- **Priority**: P0
-- **Status**: Partial (backend exists, no UI)
-- **Dependencies**: C-01, Vision API Module (S-01)
+- **설명**: 업로드된 이미지에서 패션 아이템을 자동으로 감지하고 크롭
+- **우선순위**: P0
+- **상태**: 부분 구현 (백엔드 존재, UI 없음)
+- **의존성**: C-01, Vision API 모듈 (S-01)
 
-#### Acceptance Criteria
-- [ ] Uploaded image sent to detection API
-- [ ] Loading state shows "Analyzing image..."
-- [ ] Detected items displayed with bounding boxes
-- [ ] User can adjust bounding boxes manually
-- [ ] User can remove false detections
-- [ ] User can add missed items manually
-- [ ] Cropped images generated for each item
-- [ ] Category auto-suggested for each item
-- [ ] Confidence score displayed
-- [ ] Handles images with no detectable items
+#### 인수 조건
+- [ ] 업로드된 이미지를 감지 API로 전송
+- [ ] "이미지 분석 중..." 로딩 상태 표시
+- [ ] 감지된 아이템을 바운딩 박스와 함께 표시
+- [ ] 사용자가 바운딩 박스를 수동으로 조정 가능
+- [ ] 사용자가 잘못된 감지 제거 가능
+- [ ] 사용자가 누락된 아이템 수동 추가 가능
+- [ ] 각 아이템에 대해 크롭된 이미지 생성
+- [ ] 각 아이템에 대해 카테고리 자동 제안
+- [ ] 신뢰도 점수 표시
+- [ ] 감지 가능한 아이템이 없는 이미지 처리
 
-#### UI/UX Requirements
+#### UI/UX 요구사항
 
-**Detection Screen (Step 2)**:
+**감지 화면 (2단계)**:
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  Detect Items                                 [← Back]      │
@@ -204,9 +204,9 @@ async function uploadImage(file: File): Promise<UploadResult> {
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Manual Box Drawing**:
+**수동 박스 그리기**:
 ```
-Click and drag to draw bounding box:
+클릭하고 드래그하여 바운딩 박스 그리기:
 ┌─────────────────────────────────────┐
 │                                     │
 │     ┌ ─ ─ ─ ─ ─ ─ ┐               │
@@ -219,12 +219,12 @@ Click and drag to draw bounding box:
 └─────────────────────────────────────┘
 ```
 
-#### Data Requirements
-- Vision API endpoint
-- Detection result schema
-- Cropped image storage
+#### 데이터 요구사항
+- Vision API 엔드포인트
+- 감지 결과 스키마
+- 크롭된 이미지 저장소
 
-#### API Endpoints
+#### API 엔드포인트
 ```
 POST /api/ai/detect
   body: { imageUrl: string }
@@ -238,7 +238,7 @@ POST /api/ai/detect
   }
 ```
 
-#### Implementation Notes
+#### 구현 노트
 ```typescript
 // lib/components/create/DetectionOverlay.tsx
 interface DetectionResult {
@@ -259,12 +259,12 @@ function DetectionOverlay({ imageUrl, detections, onUpdate }) {
     ));
   };
 
-  // ... render bounding boxes with drag handles
+  // ... 드래그 핸들이 있는 바운딩 박스 렌더링
 }
 ```
 
-#### Files to Create/Modify
-- `app/create/detect/page.tsx` - Detection step
+#### 생성/수정할 파일
+- `app/create/detect/page.tsx` - 감지 단계
 - `lib/components/create/DetectionOverlay.tsx`
 - `lib/components/create/BoundingBox.tsx`
 - `lib/components/create/DetectedItemList.tsx`
@@ -273,26 +273,26 @@ function DetectionOverlay({ imageUrl, detections, onUpdate }) {
 
 ---
 
-### C-03 Metadata Tagging
+### C-03 메타데이터 태깅
 
-- **Description**: User selects Media, Cast, and Context tags for the post
-- **Priority**: P0
-- **Status**: Not Started
-- **Dependencies**: C-01, D-02 (Hierarchical Filter), Database structure
+- **설명**: 사용자가 게시물에 Media, Cast, Context 태그 선택
+- **우선순위**: P0
+- **상태**: 미시작
+- **의존성**: C-01, D-02 (계층적 필터), 데이터베이스 구조
 
-#### Acceptance Criteria
-- [ ] Step to select Media (required)
-- [ ] Step to select Cast members (optional, multi-select)
-- [ ] Step to select Context (optional)
-- [ ] Autocomplete search for Media/Cast
-- [ ] Can request new tag if not found
-- [ ] Clear indication of required vs optional
-- [ ] Summary of selected tags before submission
-- [ ] Tags persist if user goes back to edit
+#### 인수 조건
+- [ ] Media 선택 단계 (필수)
+- [ ] Cast 멤버 선택 단계 (선택, 다중 선택)
+- [ ] Context 선택 단계 (선택)
+- [ ] Media/Cast 자동완성 검색
+- [ ] 찾을 수 없는 경우 새 태그 요청 가능
+- [ ] 필수 vs 선택 필드 명확한 표시
+- [ ] 제출 전 선택한 태그 요약
+- [ ] 사용자가 돌아가서 편집해도 태그 유지
 
-#### UI/UX Requirements
+#### UI/UX 요구사항
 
-**Tagging Screen (Step 3)**:
+**태깅 화면 (3단계)**:
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  Add Tags                                     [← Back]      │
@@ -328,7 +328,7 @@ function DetectionOverlay({ imageUrl, detections, onUpdate }) {
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Request New Tag Modal**:
+**새 태그 요청 모달**:
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  Request New Tag                              [✕]          │
@@ -348,12 +348,12 @@ function DetectionOverlay({ imageUrl, detections, onUpdate }) {
 └─────────────────────────────────────────────────────────────┘
 ```
 
-#### Data Requirements
-- Media search API
-- Cast search API (filterable by media)
-- Tag request table for admin review
+#### 데이터 요구사항
+- Media 검색 API
+- Cast 검색 API (media로 필터 가능)
+- 관리자 검토용 태그 요청 테이블
 
-#### API Endpoints
+#### API 엔드포인트
 ```
 GET /api/tags/media/search?q=black
 GET /api/tags/cast/search?q=jisoo&mediaId=xxx
@@ -361,8 +361,8 @@ POST /api/tags/request
   body: { type: 'media' | 'cast', name: string, nameKo: string, ... }
 ```
 
-#### Files to Create/Modify
-- `app/create/tag/page.tsx` - Tagging step
+#### 생성/수정할 파일
+- `app/create/tag/page.tsx` - 태깅 단계
 - `lib/components/create/MediaSelector.tsx`
 - `lib/components/create/CastSelector.tsx`
 - `lib/components/create/ContextSelector.tsx`
@@ -371,26 +371,26 @@ POST /api/tags/request
 
 ---
 
-### C-04 Spot Registration (URL Parsing)
+### C-04 스팟 등록 (URL 파싱)
 
-- **Description**: User enters shopping URL and system extracts product info
-- **Priority**: P0
-- **Status**: Not Started
-- **Dependencies**: C-02, S-02 (Scraper Engine)
+- **설명**: 사용자가 쇼핑 URL을 입력하면 시스템이 제품 정보 추출
+- **우선순위**: P0
+- **상태**: 미시작
+- **의존성**: C-02, S-02 (Scraper Engine)
 
-#### Acceptance Criteria
-- [ ] User can paste shopping URL for each detected item
-- [ ] System scrapes: product name, brand, price, image
-- [ ] Preview of scraped data before confirmation
-- [ ] Manual override for any field
-- [ ] Support for major Korean/international shopping sites
-- [ ] Fallback to manual entry if scraping fails
-- [ ] Multiple URLs per item (original + vibe alternatives)
-- [ ] Affiliate link handling
+#### 인수 조건
+- [ ] 감지된 각 아이템에 쇼핑 URL 붙여넣기 가능
+- [ ] 시스템이 스크래핑: 제품명, 브랜드, 가격, 이미지
+- [ ] 확인 전 스크래핑된 데이터 미리보기
+- [ ] 모든 필드에 대해 수동 재정의 가능
+- [ ] 주요 한국/해외 쇼핑 사이트 지원
+- [ ] 스크래핑 실패 시 수동 입력으로 대체
+- [ ] 아이템당 여러 URL (original + vibe 대안)
+- [ ] 어필리에이트 링크 처리
 
-#### UI/UX Requirements
+#### UI/UX 요구사항
 
-**Spot Registration (Step 4)**:
+**스팟 등록 (4단계)**:
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  Add Product Links                            [← Back]      │
@@ -426,23 +426,23 @@ POST /api/tags/request
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**URL Parsing Flow**:
+**URL 파싱 흐름**:
 ```
-User pastes URL
+사용자가 URL 붙여넣기
     ↓
 [Loading: Fetching product info...]
     ↓
-Success → Show parsed data, user confirms
+성공 → 파싱된 데이터 표시, 사용자 확인
     ↓
-Failure → Show manual entry form
+실패 → 수동 입력 폼 표시
 ```
 
-#### Data Requirements
-- Scraper API endpoint
-- Supported site configurations
-- Product metadata schema
+#### 데이터 요구사항
+- Scraper API 엔드포인트
+- 지원 사이트 설정
+- 제품 메타데이터 스키마
 
-#### API Endpoints
+#### API 엔드포인트
 ```
 POST /api/scrape
   body: { url: string }
@@ -459,12 +459,12 @@ POST /api/scrape
   }
 ```
 
-#### Supported Sites (Initial)
-- Korean: Musinsa, 29CM, W Concept, SSF Shop
-- International: Farfetch, SSENSE, Net-a-Porter
-- General: Amazon, Coupang
+#### 지원 사이트 (초기)
+- 한국: Musinsa, 29CM, W Concept, SSF Shop
+- 해외: Farfetch, SSENSE, Net-a-Porter
+- 일반: Amazon, Coupang
 
-#### Implementation Notes
+#### 구현 노트
 ```typescript
 // lib/hooks/useScrapeUrl.ts
 interface ScrapeResult {
@@ -498,8 +498,8 @@ function useScrapeUrl() {
 }
 ```
 
-#### Files to Create/Modify
-- `app/create/spot/page.tsx` - Spot registration step
+#### 생성/수정할 파일
+- `app/create/spot/page.tsx` - 스팟 등록 단계
 - `lib/components/create/SpotRegistration.tsx`
 - `lib/components/create/UrlInput.tsx`
 - `lib/components/create/ParsedProductCard.tsx`
@@ -509,11 +509,11 @@ function useScrapeUrl() {
 
 ---
 
-## Data Models
+## 데이터 모델
 
-See [data-models.md](./data-models.md) for full type definitions.
+전체 타입 정의는 [data-models.md](./data-models.md)를 참조하세요.
 
-### Key Types for Creation & AI
+### 생성 & AI의 주요 타입
 
 ```typescript
 interface CreatePostState {
@@ -564,61 +564,61 @@ interface ProductData {
 
 ---
 
-## Creation Flow State Machine
+## 생성 플로우 상태 머신
 
 ```
 START
   ↓
-[Upload Images] → images selected
+[Upload Images] → 이미지 선택됨
   ↓
-[AI Detection] → items detected, can edit
+[AI Detection] → 아이템 감지됨, 편집 가능
   ↓
-[Metadata Tagging] → tags selected
+[Metadata Tagging] → 태그 선택됨
   ↓
-[Spot Registration] → product URLs added
+[Spot Registration] → 제품 URL 추가됨
   ↓
-[Review & Publish] → confirm all data
+[Review & Publish] → 모든 데이터 확인
   ↓
 PUBLISHED
 ```
 
 ---
 
-## Migration Path
+## 마이그레이션 경로
 
-### Phase 1: Basic Upload
-1. Set up Supabase Storage
-2. Build upload UI
-3. Image validation and compression
+### 1단계: 기본 업로드
+1. Supabase Storage 설정
+2. 업로드 UI 구축
+3. 이미지 검증 및 압축
 
-### Phase 2: AI Detection
-1. Connect to Vision API
-2. Build detection overlay UI
-3. Manual editing tools
+### 2단계: AI 감지
+1. Vision API 연결
+2. 감지 오버레이 UI 구축
+3. 수동 편집 도구
 
-### Phase 3: Tagging
-1. Build tag selector components
-2. Tag search APIs
-3. Tag request flow
+### 3단계: 태깅
+1. 태그 선택자 컴포넌트 구축
+2. 태그 검색 API
+3. 태그 요청 플로우
 
-### Phase 4: Spot Registration
-1. Scraper integration
-2. URL parsing UI
-3. Manual fallback form
-
----
-
-## Security Considerations
-
-- File type validation (magic bytes, not just extension)
-- Image size limits enforced server-side
-- Rate limiting on upload endpoints
-- Scraper should not follow arbitrary redirects
-- User-uploaded content moderation queue
+### 4단계: 스팟 등록
+1. Scraper 통합
+2. URL 파싱 UI
+3. 수동 대체 폼
 
 ---
 
-## Component Mapping (상세 구현 참조)
+## 보안 고려사항
+
+- 파일 타입 검증 (확장자가 아닌 magic bytes)
+- 이미지 크기 제한 서버측 적용
+- 업로드 엔드포인트 레이트 리미팅
+- Scraper는 임의 리다이렉트 따르지 않음
+- 사용자 업로드 콘텐츠 모더레이션 큐
+
+---
+
+## 컴포넌트 매핑 (상세 구현 참조)
 
 > 이 섹션은 AI 파이프라인과 각 UI 요소가 실제 코드에서 어떻게 구현되는지 매핑합니다.
 
@@ -788,7 +788,7 @@ PUBLISHED
 
 ---
 
-### C-01 Image Upload - 컴포넌트 매핑
+### C-01 이미지 업로드 - 컴포넌트 매핑
 
 #### 업로드 UI 구조
 
@@ -1139,7 +1139,7 @@ PUBLISHED
 
 ---
 
-### C-04 Spot Registration - 컴포넌트 매핑
+### C-04 스팟 등록 - 컴포넌트 매핑
 
 #### URL 파싱 이벤트 흐름
 
@@ -1224,7 +1224,7 @@ PUBLISHED
 
 ---
 
-### createStore (Creation Flow State)
+### createStore (생성 플로우 상태)
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
@@ -1289,7 +1289,7 @@ PUBLISHED
 
 ## 에지 케이스 및 에러 처리
 
-### C-01 Image Upload
+### C-01 이미지 업로드
 
 | 상황 | 처리 방법 | 구현 위치 |
 |------|----------|----------|
@@ -1309,7 +1309,7 @@ PUBLISHED
 | 박스 겹침 | NMS로 중복 제거 | /api/ai/detect |
 | 이미지 로드 실패 | placeholder + 에러 메시지 | DetectionCanvas.tsx |
 
-### C-03 Metadata Tagging
+### C-03 메타데이터 태깅
 
 | 상황 | 처리 방법 | 구현 위치 |
 |------|----------|----------|
@@ -1317,7 +1317,7 @@ PUBLISHED
 | 필수 필드 미선택 | Next 버튼 비활성화 + 안내 | CreateTagPage.tsx |
 | 네트워크 오류 | 검색 결과 캐시 사용 + 재시도 | useTagSearch.ts |
 
-### C-04 Spot Registration
+### C-04 스팟 등록
 
 | 상황 | 처리 방법 | 구현 위치 |
 |------|----------|----------|
@@ -1330,7 +1330,7 @@ PUBLISHED
 
 ## 구현 상태 체크리스트
 
-### C-01 Image Upload
+### C-01 이미지 업로드
 - [ ] DropZone 컴포넌트
 - [ ] 파일 검증 (타입, 크기)
 - [ ] 이미지 압축
@@ -1339,7 +1339,7 @@ PUBLISHED
 - [ ] 프리뷰 그리드
 - [ ] 다중 이미지 지원
 
-### C-02 AI Object Recognition
+### C-02 AI 객체 인식
 - [x] Backend detection pipeline
 - [ ] Detection Canvas UI
 - [ ] BoundingBox 컴포넌트
@@ -1348,14 +1348,14 @@ PUBLISHED
 - [ ] 카테고리 변경 UI
 - [ ] Crop 이미지 생성
 
-### C-03 Metadata Tagging
+### C-03 메타데이터 태깅
 - [ ] MediaSelector 컴포넌트
 - [ ] CastSelector 컴포넌트
 - [ ] ContextSelector 컴포넌트
 - [ ] 태그 검색 API
 - [ ] 태그 요청 모달
 
-### C-04 Spot Registration
+### C-04 스팟 등록
 - [ ] UrlInput 컴포넌트
 - [ ] Scraper API 엔드포인트
 - [ ] ParsedProductCard 컴포넌트

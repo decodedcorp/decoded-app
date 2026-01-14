@@ -1,107 +1,107 @@
-# Detail & Interaction
+# 상세 & 인터랙션
 
-> Features: V-01 ~ V-06
-> Status: 40% implemented
-> Dependencies: Item detection pipeline
-
----
-
-## Overview
-
-Detail features handle the presentation of posts and items, including the pin system that connects visual elements to product information. Interaction features enable community engagement through voting and comments.
-
-### Related Screens
-- `/images/[id]` - Full page detail view
-- `/@modal/(.)images/[id]` - Modal detail view (intercepting route)
-
-### Current Implementation
-- `app/images/[id]/page.tsx` - Full page route
-- `app/@modal/(.)images/[id]/page.tsx` - Modal route
-- `lib/components/detail/ImageDetailContent.tsx` - Shared detail logic
-- `lib/components/detail/ItemDetailCard.tsx` - Item card
-- `lib/components/detail/ConnectorLayer.tsx` - Pin connection lines
+> 기능: V-01 ~ V-06
+> 상태: 40% 구현됨
+> 의존성: 아이템 감지 파이프라인
 
 ---
 
-## Features
+## 개요
 
-### V-01 Responsive Detail View
+상세 기능은 게시물과 아이템의 표시를 처리하며, 시각적 요소를 제품 정보와 연결하는 핀 시스템을 포함합니다. 인터랙션 기능은 투표와 댓글을 통해 커뮤니티 참여를 가능하게 합니다.
 
-- **Description**: Mobile shows bottom sheet; Web shows split modal view
-- **Priority**: P0
-- **Status**: **Implemented** ✅
-- **Dependencies**: None
+### 관련 화면
+- `/images/[id]` - 풀페이지 상세 뷰
+- `/@modal/(.)images/[id]` - 모달 상세 뷰 (intercepting route)
 
-#### Current Implementation
-- Modal intercepting route for web
-- Full page for direct navigation/mobile
-- Shared content component
+### 현재 구현 상태
+- `app/images/[id]/page.tsx` - 풀페이지 라우트
+- `app/@modal/(.)images/[id]/page.tsx` - 모달 라우트
+- `lib/components/detail/ImageDetailContent.tsx` - 공유 상세 로직
+- `lib/components/detail/ItemDetailCard.tsx` - 아이템 카드
+- `lib/components/detail/ConnectorLayer.tsx` - 핀 연결선
 
-#### Acceptance Criteria
-- [x] Mobile: Full page view with scrollable content
-- [x] Web: Modal overlay with image left, details right
-- [x] Swipe/click to navigate between images
-- [x] Close button returns to feed
-- [x] URL updates when viewing detail
-- [x] Back button works correctly
+---
 
-#### Related Files
+## 기능
+
+### V-01 반응형 상세 뷰
+
+- **설명**: 모바일은 바텀 시트로 표시; 웹은 분할 모달 뷰로 표시
+- **우선순위**: P0
+- **상태**: **구현됨** ✅
+- **의존성**: 없음
+
+#### 현재 구현 상태
+- 웹용 모달 intercepting route
+- 직접 네비게이션/모바일용 풀페이지
+- 공유 컨텐츠 컴포넌트
+
+#### 인수 조건
+- [x] 모바일: 스크롤 가능한 콘텐츠의 풀페이지 뷰
+- [x] 웹: 왼쪽에 이미지, 오른쪽에 상세 정보가 있는 모달 오버레이
+- [x] 스와이프/클릭으로 이미지 간 네비게이션
+- [x] 닫기 버튼으로 피드로 돌아가기
+- [x] 상세 보기 시 URL 업데이트
+- [x] 뒤로가기 버튼 정상 동작
+
+#### 관련 파일
 - `app/images/[id]/page.tsx`
 - `app/@modal/(.)images/[id]/page.tsx`
 - `lib/components/detail/ImageDetailPage.tsx`
 - `lib/components/detail/ImageDetailModal.tsx`
 - `lib/components/detail/ImageDetailContent.tsx`
 
-#### Future Improvements
-- [ ] Swipe gestures on mobile
-- [ ] Keyboard navigation (←/→)
-- [ ] Preload adjacent images
+#### 향후 개선사항
+- [ ] 모바일 스와이프 제스처
+- [ ] 키보드 네비게이션 (←/→)
+- [ ] 인접 이미지 프리로드
 
 ---
 
-### V-02 Pin Interaction
+### V-02 핀 인터랙션
 
-- **Description**: Display pins on image at item coordinates; clicking pin highlights item card
-- **Priority**: P0
-- **Status**: Partial (coordinate system exists, interaction incomplete)
-- **Dependencies**: Item detection with bounding boxes
+- **설명**: 아이템 좌표에 핀을 이미지에 표시; 핀 클릭 시 아이템 카드 하이라이트
+- **우선순위**: P0
+- **상태**: 부분 구현 (좌표 시스템 존재, 인터랙션 미완성)
+- **의존성**: 바운딩 박스가 있는 아이템 감지
 
-#### Current Implementation
-- `ConnectorLayer.tsx` - Draws lines from pins to cards
-- Items have `center` coordinate (normalized 0-1)
-- Basic visual display exists
+#### 현재 구현 상태
+- `ConnectorLayer.tsx` - 핀에서 카드로 연결선 그리기
+- 아이템에 `center` 좌표 있음 (정규화 0-1)
+- 기본 시각적 표시 존재
 
-#### Acceptance Criteria
-- [ ] Pins display at correct positions on image
-- [ ] Pins use numbered labels matching item list
-- [ ] Clicking pin scrolls to and highlights corresponding item card
-- [ ] Clicking item card highlights corresponding pin
-- [ ] Hover states on both pins and cards
-- [ ] Mobile: Tap interaction works smoothly
-- [ ] Connection lines animate on hover/select
-- [ ] Pins scale appropriately at different image sizes
+#### 인수 조건
+- [ ] 이미지의 정확한 위치에 핀 표시
+- [ ] 아이템 목록과 일치하는 번호 레이블 사용
+- [ ] 핀 클릭 시 해당 아이템 카드로 스크롤 및 하이라이트
+- [ ] 아이템 카드 클릭 시 해당 핀 하이라이트
+- [ ] 핀과 카드 모두에 호버 상태
+- [ ] 모바일: 탭 인터랙션 부드럽게 동작
+- [ ] 호버/선택 시 연결선 애니메이션
+- [ ] 다양한 이미지 크기에서 핀 적절히 스케일
 
-#### UI/UX Requirements
+#### UI/UX 요구사항
 
-**Pin Design**:
+**핀 디자인**:
 ```
     ┌───┐
-    │ 1 │  ← numbered circle (24px)
+    │ 1 │  ← 번호가 있는 원 (24px)
     └─┬─┘
-      │    ← connector line
+      │    ← 연결선
       ▼
    [item]
 ```
 
-**Interaction States**:
+**인터랙션 상태**:
 ```
-Default:     ●1 (white fill, dark border)
-Hover:       ●1 (primary color fill)
-Selected:    ●1 (primary fill, glow effect)
-Connected:   ●1──────[Card highlighted]
+Default:     ●1 (흰색 채우기, 어두운 테두리)
+Hover:       ●1 (primary 색상 채우기)
+Selected:    ●1 (primary 채우기, glow 효과)
+Connected:   ●1──────[카드 하이라이트됨]
 ```
 
-**Split View Layout**:
+**분할 뷰 레이아웃**:
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                                                                  │
@@ -122,17 +122,17 @@ Connected:   ●1──────[Card highlighted]
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-#### Data Requirements
-- Item `center` coordinate (already exists)
-- Item ordering/numbering
+#### 데이터 요구사항
+- 아이템 `center` 좌표 (이미 존재)
+- 아이템 순서/번호 매기기
 
-#### Implementation Notes
+#### 구현 노트
 ```typescript
 // lib/components/detail/PinOverlay.tsx
 interface Pin {
   itemId: string;
   index: number;
-  position: { x: number; y: number }; // normalized 0-1
+  position: { x: number; y: number }; // 정규화 0-1
 }
 
 function PinOverlay({ pins, selectedPinId, onPinClick }: Props) {
@@ -155,33 +155,33 @@ function PinOverlay({ pins, selectedPinId, onPinClick }: Props) {
 }
 ```
 
-#### Files to Create/Modify
-- `lib/components/detail/PinOverlay.tsx` - Pin container
-- `lib/components/detail/PinMarker.tsx` - Individual pin
-- `lib/components/detail/ConnectorLayer.tsx` - Update connection logic
-- `lib/components/detail/ItemDetailCard.tsx` - Add highlight state
+#### 생성/수정할 파일
+- `lib/components/detail/PinOverlay.tsx` - 핀 컨테이너
+- `lib/components/detail/PinMarker.tsx` - 개별 핀
+- `lib/components/detail/ConnectorLayer.tsx` - 연결 로직 업데이트
+- `lib/components/detail/ItemDetailCard.tsx` - 하이라이트 상태 추가
 
 ---
 
-### V-03 Dual Match List
+### V-03 듀얼 매치 리스트
 
-- **Description**: Show "The Original" (exact match) vs "The Vibe" (similar affordable alternative)
-- **Priority**: P0
-- **Status**: Not Started
-- **Dependencies**: V-02 (Pin System), Item match_type field
+- **설명**: "The Original" (정확한 매치) vs "The Vibe" (비슷하면서 저렴한 대안) 표시
+- **우선순위**: P0
+- **상태**: 미시작
+- **의존성**: V-02 (핀 시스템), 아이템 match_type 필드
 
-#### Acceptance Criteria
-- [ ] Items grouped into "Original" and "Vibe" sections
-- [ ] Clear visual distinction between sections
-- [ ] "Original" shows exact product with brand/price
-- [ ] "Vibe" shows similar alternatives (usually cheaper)
-- [ ] Price comparison visible
-- [ ] User can submit "Vibe" suggestions
-- [ ] Voting determines best "Vibe" match
+#### 인수 조건
+- [ ] "Original"과 "Vibe" 섹션으로 아이템 그룹화
+- [ ] 섹션 간 명확한 시각적 구분
+- [ ] "Original"에 정확한 제품과 브랜드/가격 표시
+- [ ] "Vibe"에 유사 대안 표시 (보통 더 저렴)
+- [ ] 가격 비교 표시
+- [ ] 사용자가 "Vibe" 제안 제출 가능
+- [ ] 투표로 최고의 "Vibe" 매치 결정
 
-#### UI/UX Requirements
+#### UI/UX 요구사항
 
-**Dual Match Layout**:
+**듀얼 매치 레이아웃**:
 ```
 ┌─────────────────────────────────────────┐
 │  👗 Item #1: Jacket                     │
@@ -208,19 +208,19 @@ function PinOverlay({ pins, selectedPinId, onPinClick }: Props) {
 └─────────────────────────────────────────┘
 ```
 
-#### Data Requirements
-- Item `match_type`: 'original' | 'vibe'
-- Items linked by `original_item_id` (vibe references original)
-- Vote counts per vibe item
+#### 데이터 요구사항
+- 아이템 `match_type`: 'original' | 'vibe'
+- `original_item_id`로 아이템 연결 (vibe가 original 참조)
+- vibe 아이템별 투표 수
 
-#### Implementation Notes
+#### 구현 노트
 ```typescript
 interface ItemGroup {
   original: Item;
   vibes: ItemWithVotes[];
 }
 
-// Group items by original
+// original로 아이템 그룹화
 function groupItems(items: Item[]): ItemGroup[] {
   const originals = items.filter(i => i.matchType === 'original');
   return originals.map(original => ({
@@ -233,7 +233,7 @@ function groupItems(items: Item[]): ItemGroup[] {
 }
 ```
 
-#### Files to Create/Modify
+#### 생성/수정할 파일
 - `lib/components/detail/DualMatchSection.tsx`
 - `lib/components/detail/OriginalItemCard.tsx`
 - `lib/components/detail/VibeItemCard.tsx`
@@ -241,42 +241,42 @@ function groupItems(items: Item[]): ItemGroup[] {
 
 ---
 
-### V-04 Smart Tags (Breadcrumb)
+### V-04 스마트 태그 (브레드크럼)
 
-- **Description**: Display context tags like "Squid Game > Sae-byeok > Training Suit" at top of detail view
-- **Priority**: P0
-- **Status**: Not Started
-- **Dependencies**: D-02 (Hierarchical Filter), Post metadata
+- **설명**: 상세 뷰 상단에 "Squid Game > Sae-byeok > Training Suit" 같은 컨텍스트 태그 표시
+- **우선순위**: P0
+- **상태**: 미시작
+- **의존성**: D-02 (계층적 필터), 게시물 메타데이터
 
-#### Acceptance Criteria
-- [ ] Tags display at top of detail view
-- [ ] Shows: Media > Cast > Context
-- [ ] Each tag is clickable (navigates to filtered feed)
-- [ ] Tags adapt based on available metadata
-- [ ] Visual styling matches design system
+#### 인수 조건
+- [ ] 상세 뷰 상단에 태그 표시
+- [ ] 표시: Media > Cast > Context
+- [ ] 각 태그 클릭 가능 (필터링된 피드로 네비게이션)
+- [ ] 가용 메타데이터에 따라 태그 적응
+- [ ] 디자인 시스템과 일치하는 비주얼 스타일링
 
-#### UI/UX Requirements
+#### UI/UX 요구사항
 
-**Tag Display**:
+**태그 표시**:
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  🎬 Squid Game  ›  👤 Jung Ho-yeon  ›  🏃 Training Scene   │
-│  ↑ clickable      ↑ clickable          ↑ clickable          │
+│  ↑ 클릭 가능      ↑ 클릭 가능          ↑ 클릭 가능          │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Partial Tags** (when not all metadata available):
+**부분 태그** (모든 메타데이터가 없을 때):
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  🎵 BLACKPINK  ›  👤 Jisoo                                  │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-#### Data Requirements
-- Post with `media_id`, `cast_ids`, `context_type`
-- Joined media and cast data
+#### 데이터 요구사항
+- `media_id`, `cast_ids`, `context_type`이 있는 게시물
+- 조인된 media와 cast 데이터
 
-#### Implementation Notes
+#### 구현 노트
 ```typescript
 // lib/components/detail/SmartTags.tsx
 interface SmartTagsProps {
@@ -316,56 +316,56 @@ function SmartTags({ media, cast, contextType }: SmartTagsProps) {
 }
 ```
 
-#### Files to Create/Modify
+#### 생성/수정할 파일
 - `lib/components/detail/SmartTags.tsx`
 - `lib/components/detail/TagBreadcrumb.tsx`
-- Add to `ImageDetailContent.tsx`
+- `ImageDetailContent.tsx`에 추가
 
 ---
 
-### V-05 Purchase Link (Outlink)
+### V-05 구매 링크 (아웃링크)
 
-- **Description**: "Buy" button opens affiliate link in new tab with tracking
-- **Priority**: P0
-- **Status**: Not Started
-- **Dependencies**: S-05 (Click Tracker), S-03 (Deep Link Generator)
+- **설명**: "Buy" 버튼이 추적이 포함된 어필리에이트 링크를 새 탭에서 열기
+- **우선순위**: P0
+- **상태**: 미시작
+- **의존성**: S-05 (클릭 트래커), S-03 (딥 링크 생성기)
 
-#### Acceptance Criteria
-- [ ] "Buy" button visible on each item card
-- [ ] Click opens affiliate link in new tab
-- [ ] Click event logged for analytics
-- [ ] User attribution tracked (if logged in)
-- [ ] Loading state while generating tracked link
-- [ ] Error handling if link generation fails
-- [ ] Mobile: Opens in-app browser or external browser
+#### 인수 조건
+- [ ] 각 아이템 카드에 "Buy" 버튼 표시
+- [ ] 클릭 시 새 탭에서 어필리에이트 링크 열기
+- [ ] 분석용 클릭 이벤트 로깅
+- [ ] 사용자 귀속 추적 (로그인 시)
+- [ ] 추적 링크 생성 중 로딩 상태
+- [ ] 링크 생성 실패 시 에러 처리
+- [ ] 모바일: 인앱 브라우저 또는 외부 브라우저에서 열기
 
-#### UI/UX Requirements
+#### UI/UX 요구사항
 
-**Buy Button**:
+**Buy 버튼**:
 ```
 ┌────────────────────────────────────┐
-│ [Buy Now →]    or    [View Item →] │
+│ [Buy Now →]    또는    [View Item →] │
 └────────────────────────────────────┘
 
-States:
-- Default: Primary color, "Buy Now →"
-- Hover: Darker shade
-- Loading: Spinner + "Opening..."
-- No link: "View Item" (opens product page without affiliate)
+상태:
+- Default: Primary 색상, "Buy Now →"
+- Hover: 더 어두운 색조
+- Loading: 스피너 + "Opening..."
+- 링크 없음: "View Item" (어필리에이트 없이 제품 페이지 열기)
 ```
 
-**Price Display**:
+**가격 표시**:
 ```
 ₩ 299,000
-$299.00 USD  ← show both if available
+$299.00 USD  ← 가능하면 둘 다 표시
 ```
 
-#### Data Requirements
-- Item `purchase_url`
-- Affiliate code injection
-- Click event logging
+#### 데이터 요구사항
+- 아이템 `purchase_url`
+- 어필리에이트 코드 주입
+- 클릭 이벤트 로깅
 
-#### Implementation Notes
+#### 구현 노트
 ```typescript
 // lib/utils/affiliateLink.ts
 async function generateAffiliateLink(item: Item, userId?: string): Promise<string> {
@@ -377,7 +377,7 @@ async function generateAffiliateLink(item: Item, userId?: string): Promise<strin
     ...(userId && { user_id: userId })
   });
 
-  // Log click event
+  // 클릭 이벤트 로깅
   await logClickEvent({
     itemId: item.id,
     userId,
@@ -388,43 +388,43 @@ async function generateAffiliateLink(item: Item, userId?: string): Promise<strin
 }
 ```
 
-#### Files to Create/Modify
+#### 생성/수정할 파일
 - `lib/components/detail/BuyButton.tsx`
 - `lib/utils/affiliateLink.ts`
 - `lib/hooks/useTrackClick.ts`
-- `app/api/track/click/route.ts` - Click logging endpoint
+- `app/api/track/click/route.ts` - 클릭 로깅 엔드포인트
 
 ---
 
-### V-06 Voting & Comments
+### V-06 투표 & 댓글
 
-- **Description**: Users can vote on item accuracy and leave comments
-- **Priority**: P0
-- **Status**: Not Started
-- **Dependencies**: U-01 (Authentication)
+- **설명**: 사용자가 아이템 정확도에 투표하고 댓글 남기기
+- **우선순위**: P0
+- **상태**: 미시작
+- **의존성**: U-01 (인증)
 
-#### Acceptance Criteria
+#### 인수 조건
 
-**Voting**:
-- [ ] "Accurate" / "Inaccurate" vote buttons on each item
-- [ ] User can vote once per item
-- [ ] Vote counts displayed
-- [ ] Accuracy percentage calculated
-- [ ] Can change vote
-- [ ] Requires login to vote
+**투표**:
+- [ ] 각 아이템에 "Accurate" / "Inaccurate" 투표 버튼
+- [ ] 사용자당 아이템별 한 번만 투표 가능
+- [ ] 투표 수 표시
+- [ ] 정확도 퍼센트 계산
+- [ ] 투표 변경 가능
+- [ ] 투표에 로그인 필요
 
-**Comments**:
-- [ ] Comment section below items
-- [ ] Threaded replies supported
-- [ ] Markdown formatting (basic)
-- [ ] Edit own comments
-- [ ] Delete own comments
-- [ ] Report inappropriate comments
-- [ ] Requires login to comment
+**댓글**:
+- [ ] 아이템 아래 댓글 섹션
+- [ ] 스레드 답글 지원
+- [ ] 마크다운 포맷팅 (기본)
+- [ ] 본인 댓글 수정
+- [ ] 본인 댓글 삭제
+- [ ] 부적절한 댓글 신고
+- [ ] 댓글에 로그인 필요
 
-#### UI/UX Requirements
+#### UI/UX 요구사항
 
-**Voting UI**:
+**투표 UI**:
 ```
 ┌────────────────────────────────────────────┐
 │ Is this identification accurate?           │
@@ -434,13 +434,13 @@ async function generateAffiliateLink(item: Item, userId?: string): Promise<strin
 │ 94% accuracy                               │
 └────────────────────────────────────────────┘
 
-Voted state:
+투표 후 상태:
 ┌────────────────────────────────────────────┐
 │ [👍 Accurate (48)] ✓   [👎 Inaccurate (3)]│
 └────────────────────────────────────────────┘
 ```
 
-**Comments UI**:
+**댓글 UI**:
 ```
 ┌────────────────────────────────────────────┐
 │ 💬 Comments (12)                           │
@@ -462,9 +462,9 @@ Voted state:
 └────────────────────────────────────────────┘
 ```
 
-#### Data Requirements
+#### 데이터 요구사항
 
-**Vote Table**:
+**Vote 테이블**:
 ```sql
 CREATE TABLE vote (
   id UUID PRIMARY KEY,
@@ -476,7 +476,7 @@ CREATE TABLE vote (
 );
 ```
 
-**Comment Table**:
+**Comment 테이블**:
 ```sql
 CREATE TABLE comment (
   id UUID PRIMARY KEY,
@@ -491,7 +491,7 @@ CREATE TABLE comment (
 );
 ```
 
-#### API Endpoints
+#### API 엔드포인트
 ```
 POST /api/items/:id/vote
   body: { type: 'accurate' | 'inaccurate' }
@@ -511,7 +511,7 @@ POST /api/comments/:id/report
   body: { reason: string }
 ```
 
-#### Files to Create/Modify
+#### 생성/수정할 파일
 - `lib/components/detail/VotingSection.tsx`
 - `lib/components/detail/VoteButton.tsx`
 - `lib/components/detail/CommentSection.tsx`
@@ -525,11 +525,11 @@ POST /api/comments/:id/report
 
 ---
 
-## Data Models
+## 데이터 모델
 
-See [data-models.md](./data-models.md) for full type definitions.
+전체 타입 정의는 [data-models.md](./data-models.md)를 참조하세요.
 
-### Key Types for Detail & Interaction
+### 상세 & 인터랙션의 주요 타입
 
 ```typescript
 interface ItemWithVotes extends Item {
@@ -561,45 +561,45 @@ interface Vote {
 
 ---
 
-## Migration Path
+## 마이그레이션 경로
 
-### Phase 1: Complete Pin System
-1. Finalize PinOverlay component
-2. Add click-to-scroll interaction
-3. Test on various image sizes
+### 1단계: 핀 시스템 완성
+1. PinOverlay 컴포넌트 완성
+2. 클릭-투-스크롤 인터랙션 추가
+3. 다양한 이미지 크기에서 테스트
 
-### Phase 2: Smart Tags
-1. Add metadata to posts
-2. Build SmartTags component
-3. Add navigation links
+### 2단계: 스마트 태그
+1. 게시물에 메타데이터 추가
+2. SmartTags 컴포넌트 구축
+3. 네비게이션 링크 추가
 
-### Phase 3: Dual Match
-1. Add match_type to items
-2. Build grouped item display
-3. Add "Add Vibe" flow
+### 3단계: 듀얼 매치
+1. 아이템에 match_type 추가
+2. 그룹화된 아이템 표시 구축
+3. "Add Vibe" 흐름 추가
 
-### Phase 4: Purchase & Voting
-1. Implement click tracking
-2. Build buy button with affiliate links
-3. Implement voting system
-4. Add comment section
-
----
-
-## Performance Considerations
-
-- Pin positions should be calculated once and cached
-- Comments should be paginated
-- Vote counts can be eventually consistent (use optimistic updates)
-- Image should have priority loading in detail view
+### 4단계: 구매 & 투표
+1. 클릭 추적 구현
+2. 어필리에이트 링크가 있는 buy 버튼 구축
+3. 투표 시스템 구현
+4. 댓글 섹션 추가
 
 ---
 
-## Component Mapping (상세 구현 참조)
+## 성능 고려사항
+
+- 핀 위치는 한 번 계산하고 캐시해야 함
+- 댓글은 페이지네이션되어야 함
+- 투표 수는 eventually consistent 가능 (optimistic update 사용)
+- 상세 뷰에서 이미지는 priority 로딩 필요
+
+---
+
+## 컴포넌트 매핑 (상세 구현 참조)
 
 > 이 섹션은 각 UI 요소가 실제 코드에서 어떻게 구현되는지 매핑합니다.
 
-### V-01 Responsive Detail View - 컴포넌트 매핑
+### V-01 반응형 상세 뷰 - 컴포넌트 매핑
 
 #### 모달 vs 풀페이지 라우팅 구조
 
@@ -842,7 +842,7 @@ transitionStore 상태:
 
 ---
 
-### V-02 Pin Interaction - 컴포넌트 매핑
+### V-02 핀 인터랙션 - 컴포넌트 매핑
 
 #### 핀 시스템 상세 구조
 
@@ -1035,9 +1035,9 @@ transitionStore 상태:
 
 ---
 
-### V-03 Dual Match - 컴포넌트 매핑
+### V-03 듀얼 매치 - 컴포넌트 매핑
 
-#### Dual Match 레이아웃 상세
+#### 듀얼 매치 레이아웃 상세
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
@@ -1111,7 +1111,7 @@ transitionStore 상태:
 
 ---
 
-### V-05 Purchase Link - 컴포넌트 매핑
+### V-05 구매 링크 - 컴포넌트 매핑
 
 #### 구매 버튼 이벤트 흐름
 
@@ -1187,7 +1187,7 @@ transitionStore 상태:
 
 ---
 
-### V-06 Voting & Comments - 컴포넌트 매핑
+### V-06 투표 & 댓글 - 컴포넌트 매핑
 
 #### 투표 시스템 상세
 
@@ -1319,7 +1319,7 @@ transitionStore 상태:
 
 ## 에지 케이스 및 에러 처리
 
-### V-01 Detail View
+### V-01 상세 뷰
 
 | 상황 | 처리 방법 | 구현 위치 |
 |------|----------|----------|
@@ -1329,7 +1329,7 @@ transitionStore 상태:
 | 브라우저 뒤로가기 | FLIP 역방향 애니메이션 | transitionStore |
 | 데이터 로딩 중 | Skeleton UI | ImageDetailSkeleton.tsx |
 
-### V-02 Pin System
+### V-02 핀 시스템
 
 | 상황 | 처리 방법 | 구현 위치 |
 |------|----------|----------|
@@ -1338,7 +1338,7 @@ transitionStore 상태:
 | 이미지 크기 변경 | ResizeObserver로 재계산 | InteractiveShowcase.tsx |
 | 핀 겹침 | z-index 조정 (선택된 핀 최상위) | PinMarker.tsx |
 
-### V-05 Purchase Link
+### V-05 구매 링크
 
 | 상황 | 처리 방법 | 구현 위치 |
 |------|----------|----------|
@@ -1347,7 +1347,7 @@ transitionStore 상태:
 | 트래킹 실패 | fire-and-forget (무시) | useTrackClick.ts |
 | 네트워크 오류 | 원본 URL로 fallback | affiliateLink.ts |
 
-### V-06 Voting & Comments
+### V-06 투표 & 댓글
 
 | 상황 | 처리 방법 | 구현 위치 |
 |------|----------|----------|
@@ -1361,7 +1361,7 @@ transitionStore 상태:
 
 ## 구현 상태 체크리스트
 
-### V-01 Responsive Detail View
+### V-01 반응형 상세 뷰
 - [x] 모달 라우팅 (intercepting route)
 - [x] 풀페이지 라우팅
 - [x] 공유 컨텐츠 컴포넌트
@@ -1370,7 +1370,7 @@ transitionStore 상태:
 - [ ] 모바일 스와이프 제스처
 - [ ] 인접 이미지 프리로드
 
-### V-02 Pin Interaction
+### V-02 핀 인터랙션
 - [x] 기본 핀 렌더링
 - [x] 좌표 기반 위치 지정
 - [x] 연결선 (ConnectorLayer)
@@ -1379,7 +1379,7 @@ transitionStore 상태:
 - [ ] 호버 애니메이션
 - [ ] 모바일 터치 지원
 
-### V-03 Dual Match List
+### V-03 듀얼 매치 리스트
 - [ ] Original/Vibe 그룹핑
 - [ ] OriginalItemCard 컴포넌트
 - [ ] VibeItemCard 컴포넌트
@@ -1387,19 +1387,19 @@ transitionStore 상태:
 - [ ] Vibe 투표 시스템
 - [ ] 가격 비교 표시
 
-### V-04 Smart Tags
+### V-04 스마트 태그
 - [ ] SmartTags 컴포넌트
 - [ ] Media 태그 연결
 - [ ] Cast 태그 연결
 - [ ] Context 태그 연결
 
-### V-05 Purchase Link
+### V-05 구매 링크
 - [ ] BuyButton 컴포넌트
 - [ ] Affiliate 링크 생성
 - [ ] 클릭 트래킹 API
 - [ ] 에러 핸들링
 
-### V-06 Voting & Comments
+### V-06 투표 & 댓글
 - [ ] VotingSection 컴포넌트
 - [ ] VoteButton 컴포넌트
 - [ ] CommentSection 컴포넌트

@@ -1,129 +1,129 @@
-# Phase 1: Data Model - Scroll Animation & Lazy Loading System
+# 1단계: 데이터 모델 - 스크롤 애니메이션 & 레이지 로딩 시스템
 
-**Feature**: 001-scroll-animation
-**Date**: 2025-11-20
-**Status**: Complete
+**기능**: 001-scroll-animation
+**날짜**: 2025-11-20
+**상태**: 완료
 
-## Overview
+## 개요
 
-This feature is primarily a UI animation system with minimal data modeling requirements. The data model focuses on TypeScript interfaces for hook configuration, element state, and callback signatures rather than persistent data structures.
+이 기능은 최소한의 데이터 모델링 요구사항을 가진 UI 애니메이션 시스템입니다. 데이터 모델은 영구 데이터 구조보다 훅 설정, 요소 상태, 콜백 시그니처를 위한 TypeScript 인터페이스에 초점을 맞춥니다.
 
-## Type Definitions
+## 타입 정의
 
-### 1. Animation Configuration
+### 1. 애니메이션 설정
 
-**Interface**: `UseScrollAnimationOptions`
+**인터페이스**: `UseScrollAnimationOptions`
 
-**Purpose**: Configuration options for the `useScrollAnimation` hook
+**목적**: `useScrollAnimation` 훅의 설정 옵션
 
 ```typescript
 interface UseScrollAnimationOptions {
   /**
-   * Threshold at which observer callback fires (0.0 to 1.0)
-   * @default 0.15 (15% visibility)
+   * observer 콜백이 발생하는 임계값 (0.0 ~ 1.0)
+   * @default 0.15 (15% 가시성)
    */
   threshold?: number | number[];
 
   /**
-   * Margin around root element for early/late triggering
+   * 조기/지연 트리거를 위한 root 요소 주변 마진
    * @default "0px 0px -10% 0px"
    */
   rootMargin?: string;
 
   /**
-   * Root element for intersection observation
-   * @default null (viewport)
+   * intersection 관찰을 위한 root 요소
+   * @default null (뷰포트)
    */
   root?: Element | null;
 
   /**
-   * Callback fired when element enters viewport
+   * 요소가 뷰포트에 진입할 때 발생하는 콜백
    */
   onEnter?: (element: Element, entry: IntersectionObserverEntry) => void;
 
   /**
-   * Callback fired when element exits viewport
+   * 요소가 뷰포트에서 나갈 때 발생하는 콜백
    */
   onExit?: (element: Element, entry: IntersectionObserverEntry) => void;
 
   /**
-   * Enable/disable lazy image loading
+   * 레이지 이미지 로딩 활성화/비활성화
    * @default true
    */
   enableLazyLoad?: boolean;
 
   /**
-   * Enable/disable animation classes
+   * 애니메이션 클래스 활성화/비활성화
    * @default true
    */
   enableAnimation?: boolean;
 }
 ```
 
-**Validation Rules**:
+**검증 규칙**:
 
-- `threshold`: Must be between 0.0 and 1.0 (inclusive), or array of such values
-- `rootMargin`: Must be valid CSS margin string (e.g., "0px 0px -10% 0px")
-- `root`: Must be a valid DOM Element or null
-- Callbacks must not throw uncaught errors
+- `threshold`: 0.0과 1.0 사이 (포함)여야 함, 또는 해당 값들의 배열
+- `rootMargin`: 유효한 CSS margin 문자열이어야 함 (예: "0px 0px -10% 0px")
+- `root`: 유효한 DOM Element 또는 null이어야 함
+- 콜백은 잡히지 않는 에러를 발생시키면 안 됨
 
-**Default Values**:
+**기본값**:
 
 - `threshold: 0.15`
 - `rootMargin: "0px 0px -10% 0px"`
-- `root: null` (viewport)
+- `root: null` (뷰포트)
 - `enableLazyLoad: true`
 - `enableAnimation: true`
 
 ---
 
-### 2. Hook Return Value
+### 2. 훅 반환값
 
-**Interface**: `UseScrollAnimationReturn`
+**인터페이스**: `UseScrollAnimationReturn`
 
-**Purpose**: Return value from `useScrollAnimation` hook
+**목적**: `useScrollAnimation` 훅의 반환값
 
 ```typescript
 interface UseScrollAnimationReturn {
   /**
-   * Ref callback to attach to observable elements
+   * 관찰 가능한 요소에 연결할 Ref 콜백
    */
   observeRef: (element: Element | null) => void;
 
   /**
-   * Manually trigger observation of an element
+   * 요소의 관찰을 수동으로 트리거
    */
   observe: (element: Element) => void;
 
   /**
-   * Manually stop observing an element
+   * 요소의 관찰을 수동으로 중지
    */
   unobserve: (element: Element) => void;
 
   /**
-   * Disconnect all observations
+   * 모든 관찰 연결 해제
    */
   disconnect: () => void;
 
   /**
-   * Check if an element is currently being observed
+   * 요소가 현재 관찰되고 있는지 확인
    */
   isObserving: (element: Element) => boolean;
 }
 ```
 
-**Usage Pattern**:
+**사용 패턴**:
 
 ```typescript
 const { observeRef, disconnect } = useScrollAnimation({
   threshold: 0.15,
-  onEnter: (el) => console.log('Element entered:', el)
+  onEnter: (el) => console.log('요소 진입:', el)
 })
 
-// Attach via ref
+// ref를 통해 연결
 <div ref={observeRef} className="js-observe">...</div>
 
-// Manual cleanup (optional - auto cleanup on unmount)
+// 수동 정리 (선택적 - 언마운트 시 자동 정리)
 useEffect(() => {
   return () => disconnect()
 }, [disconnect])
@@ -131,90 +131,90 @@ useEffect(() => {
 
 ---
 
-### 3. Element State
+### 3. 요소 상태
 
-**Interface**: `AnimationState` (internal)
+**인터페이스**: `AnimationState` (내부)
 
-**Purpose**: Track animation state for each observed element
+**목적**: 각 관찰 요소의 애니메이션 상태 추적
 
 ```typescript
 interface AnimationState {
   /**
-   * DOM element being observed
+   * 관찰되는 DOM 요소
    */
   element: Element;
 
   /**
-   * Current visibility state
+   * 현재 가시성 상태
    */
   isVisible: boolean;
 
   /**
-   * Whether image has been loaded (if element contains lazy image)
+   * 이미지가 로드되었는지 여부 (요소에 레이지 이미지가 포함된 경우)
    */
   imageLoaded: boolean;
 
   /**
-   * Stagger delay extracted from data-delay attribute
+   * data-delay 속성에서 추출한 시차 지연
    */
   staggerDelay: number;
 
   /**
-   * IntersectionObserver entry for this element
+   * 이 요소의 IntersectionObserver entry
    */
   entry: IntersectionObserverEntry | null;
 }
 ```
 
-**State Transitions**:
+**상태 전이**:
 
-- Initial: `isVisible: false, imageLoaded: false`
-- On enter: `isVisible: true`, trigger image load if needed
-- On exit: `isVisible: false`
-- Image loaded: `imageLoaded: true` (permanent)
+- 초기: `isVisible: false, imageLoaded: false`
+- 진입 시: `isVisible: true`, 필요시 이미지 로드 트리거
+- 종료 시: `isVisible: false`
+- 이미지 로드됨: `imageLoaded: true` (영구적)
 
-**State Management**:
+**상태 관리**:
 
-- Stored in WeakMap for automatic garbage collection
-- No manual cleanup required when elements removed from DOM
+- 자동 가비지 컬렉션을 위해 WeakMap에 저장
+- DOM에서 요소 제거 시 수동 정리 불필요
 
 ---
 
-### 4. Lazy Image Configuration
+### 4. 레이지 이미지 설정
 
-**Interface**: `LazyImageConfig` (internal)
+**인터페이스**: `LazyImageConfig` (내부)
 
-**Purpose**: Configuration for lazy image loading behavior
+**목적**: 레이지 이미지 로딩 동작 설정
 
 ```typescript
 interface LazyImageConfig {
   /**
-   * Attribute name for image source
+   * 이미지 소스용 속성명
    * @default "data-src"
    */
   sourceAttribute: string;
 
   /**
-   * Attribute name to mark loaded state
+   * 로드됨 상태를 표시할 속성명
    * @default "data-loaded"
    */
   loadedAttribute: string;
 
   /**
-   * CSS selector for lazy images within observed element
+   * 관찰 요소 내 레이지 이미지용 CSS 선택자
    * @default ".lazy, img[data-src]"
    */
   imageSelector: string;
 
   /**
-   * Whether to use native loading="lazy" as fallback
+   * 네이티브 loading="lazy"를 폴백으로 사용할지 여부
    * @default true
    */
   useNativeLazy: boolean;
 }
 ```
 
-**Default Configuration**:
+**기본 설정**:
 
 ```typescript
 const DEFAULT_LAZY_CONFIG: LazyImageConfig = {
@@ -227,53 +227,53 @@ const DEFAULT_LAZY_CONFIG: LazyImageConfig = {
 
 ---
 
-### 5. Animation Timing
+### 5. 애니메이션 타이밍
 
-**Interface**: `AnimationTimingConfig` (internal)
+**인터페이스**: `AnimationTimingConfig` (내부)
 
-**Purpose**: CSS animation timing configuration
+**목적**: CSS 애니메이션 타이밍 설정
 
 ```typescript
 interface AnimationTimingConfig {
   /**
-   * Animation duration in milliseconds
+   * 애니메이션 지속 시간 (밀리초)
    * @default 380
    */
   duration: number;
 
   /**
-   * CSS cubic-bezier easing function
+   * CSS cubic-bezier 이징 함수
    * @default "cubic-bezier(0.22, 1, 0.36, 1)"
    */
   easing: string;
 
   /**
-   * Base stagger delay in milliseconds
+   * 기본 시차 지연 (밀리초)
    * @default 0
    */
   baseStagger: number;
 
   /**
-   * Maximum stagger delay to prevent excessively long cascades
+   * 과도하게 긴 캐스케이드 방지를 위한 최대 시차 지연
    * @default 1000
    */
   maxStagger: number;
 
   /**
-   * Initial transform offset
+   * 초기 transform 오프셋
    * @default "translateY(12px) scale(0.98)"
    */
   initialTransform: string;
 
   /**
-   * Initial opacity
+   * 초기 opacity
    * @default 0
    */
   initialOpacity: number;
 }
 ```
 
-**Default Configuration**:
+**기본 설정**:
 
 ```typescript
 const DEFAULT_TIMING: AnimationTimingConfig = {
@@ -288,29 +288,29 @@ const DEFAULT_TIMING: AnimationTimingConfig = {
 
 ---
 
-## HTML Attributes
+## HTML 속성
 
-### Observable Element Attributes
+### 관찰 가능한 요소 속성
 
-**Element**: Any element to be observed for scroll animation
+**요소**: 스크롤 애니메이션을 위해 관찰될 모든 요소
 
 ```html
-<div class="js-observe" data-delay="80" role="listitem" aria-label="Card title">
-  <!-- content -->
+<div class="js-observe" data-delay="80" role="listitem" aria-label="카드 제목">
+  <!-- 콘텐츠 -->
 </div>
 ```
 
-**Attributes**:
+**속성**:
 
-- `class="js-observe"`: Marker class for IntersectionObserver target
-- `data-delay="80"`: Stagger delay in milliseconds (optional, default: 0)
-- Standard accessibility attributes (`role`, `aria-label`, etc.)
+- `class="js-observe"`: IntersectionObserver 대상을 위한 마커 클래스
+- `data-delay="80"`: 밀리초 단위 시차 지연 (선택적, 기본값: 0)
+- 표준 접근성 속성 (`role`, `aria-label` 등)
 
 ---
 
-### Lazy Image Attributes
+### 레이지 이미지 속성
 
-**Element**: Image element with lazy loading
+**요소**: 레이지 로딩이 적용되는 이미지 요소
 
 ```html
 <img
@@ -320,40 +320,40 @@ const DEFAULT_TIMING: AnimationTimingConfig = {
   loading="lazy"
   width="400"
   height="300"
-  alt="Descriptive text"
+  alt="설명 텍스트"
   decoding="async"
 />
 ```
 
-**Attributes**:
+**속성**:
 
-- `class="lazy"`: Marker class for lazy images
-- `data-src`: Actual image URL (loaded on intersection)
-- `data-loaded`: Loading state ("true" after load, prevents reload)
-- `loading="lazy"`: Native browser lazy loading (fallback)
-- `width` & `height`: Required for layout stability (CLS prevention)
-- `alt`: Required for accessibility
-- `decoding="async"`: Improve initial page load performance
+- `class="lazy"`: 레이지 이미지를 위한 마커 클래스
+- `data-src`: 실제 이미지 URL (intersection 시 로드)
+- `data-loaded`: 로딩 상태 (로드 후 "true", 재로드 방지)
+- `loading="lazy"`: 네이티브 브라우저 레이지 로딩 (폴백)
+- `width` & `height`: 레이아웃 안정성을 위해 필수 (CLS 방지)
+- `alt`: 접근성을 위해 필수
+- `decoding="async"`: 초기 페이지 로드 성능 향상
 
 ---
 
-## CSS Custom Properties
+## CSS 사용자 정의 속성
 
-### Animation Variables
+### 애니메이션 변수
 
-**Element**: Observable elements with animation
+**요소**: 애니메이션이 적용되는 관찰 가능한 요소
 
 ```css
 .js-observe {
-  --stagger: 0ms; /* Set dynamically via JavaScript */
+  --stagger: 0ms; /* JavaScript를 통해 동적으로 설정 */
 }
 ```
 
-**Custom Properties**:
+**사용자 정의 속성**:
 
-- `--stagger`: Transition delay in milliseconds (set from `data-delay` attribute)
+- `--stagger`: 밀리초 단위 transition 지연 (`data-delay` 속성에서 설정)
 
-**Usage**:
+**사용법**:
 
 ```javascript
 element.style.setProperty("--stagger", `${element.dataset.delay || 0}ms`);
@@ -361,21 +361,21 @@ element.style.setProperty("--stagger", `${element.dataset.delay || 0}ms`);
 
 ---
 
-## State Management
+## 상태 관리
 
-### Element State Storage
+### 요소 상태 저장소
 
-**Storage**: WeakMap for automatic memory management
+**저장소**: 자동 메모리 관리를 위한 WeakMap
 
 ```typescript
-// Internal storage (not exported)
+// 내부 저장소 (내보내지 않음)
 const elementStates = new WeakMap<Element, AnimationState>();
 ```
 
-**Operations**:
+**연산**:
 
 ```typescript
-// Set state
+// 상태 설정
 elementStates.set(element, {
   element,
   isVisible: false,
@@ -384,67 +384,67 @@ elementStates.set(element, {
   entry: null,
 });
 
-// Get state
+// 상태 가져오기
 const state = elementStates.get(element);
 
-// Delete state (automatic when element removed from DOM)
-// No manual cleanup needed
+// 상태 삭제 (DOM에서 요소 제거 시 자동)
+// 수동 정리 불필요
 ```
 
 ---
 
-## CSS Class States
+## CSS 클래스 상태
 
-### Animation States
+### 애니메이션 상태
 
-**Classes**: State classes toggled by IntersectionObserver
+**클래스**: IntersectionObserver에 의해 토글되는 상태 클래스
 
 ```css
-/* Initial state - applied via CSS */
+/* 초기 상태 - CSS를 통해 적용 */
 .js-observe {
   opacity: 0;
   transform: translateY(12px) scale(0.98);
 }
 
-/* Visible state - added by JavaScript */
+/* 표시 상태 - JavaScript에 의해 추가 */
 .js-observe.is-visible {
   opacity: 1;
   transform: translateY(0) scale(1);
 }
 
-/* Hidden state - added by JavaScript */
+/* 숨김 상태 - JavaScript에 의해 추가 */
 .js-observe.is-hidden {
   opacity: 0;
   transform: translateY(12px) scale(0.98);
 }
 ```
 
-**State Transitions**:
+**상태 전이**:
 
-1. Initial: `.js-observe` only
-2. Enter viewport: Add `.is-visible`, remove `.is-hidden`
-3. Exit viewport: Add `.is-hidden`, remove `.is-visible`
+1. 초기: `.js-observe`만
+2. 뷰포트 진입: `.is-visible` 추가, `.is-hidden` 제거
+3. 뷰포트 종료: `.is-hidden` 추가, `.is-visible` 제거
 
 ---
 
-## Validation Rules
+## 검증 규칙
 
-### Input Validation
+### 입력 검증
 
-**Hook Options**:
+**훅 옵션**:
 
-- `threshold`: 0.0 ≤ value ≤ 1.0
-- `rootMargin`: Valid CSS margin string (px, %, em units)
-- `root`: Must be Element or null
-- Callbacks: Must be functions (optional)
+- `threshold`: 0.0 ≤ 값 ≤ 1.0
+- `rootMargin`: 유효한 CSS margin 문자열 (px, %, em 단위)
+- `root`: Element 또는 null이어야 함
+- 콜백: 함수여야 함 (선택적)
 
-**HTML Attributes**:
+**HTML 속성**:
 
-- `data-delay`: Must be non-negative integer (milliseconds)
-- `data-src`: Must be valid URL string
-- `width`/`height`: Must be positive integers
+- `data-delay`: 음이 아닌 정수여야 함 (밀리초)
+- `data-src`: 유효한 URL 문자열이어야 함
+- `width`/`height`: 양의 정수여야 함
 
-**Runtime Checks**:
+**런타임 검사**:
 
 ```typescript
 function validateOptions(options: UseScrollAnimationOptions): void {
@@ -455,14 +455,14 @@ function validateOptions(options: UseScrollAnimationOptions): void {
 
     for (const t of thresholds) {
       if (t < 0 || t > 1) {
-        throw new Error(`Invalid threshold: ${t}. Must be between 0 and 1.`);
+        throw new Error(`유효하지 않은 threshold: ${t}. 0과 1 사이여야 합니다.`);
       }
     }
   }
 
   if (options.root !== undefined && options.root !== null) {
     if (!(options.root instanceof Element)) {
-      throw new Error("Invalid root: must be Element or null.");
+      throw new Error("유효하지 않은 root: Element 또는 null이어야 합니다.");
     }
   }
 }
@@ -470,43 +470,43 @@ function validateOptions(options: UseScrollAnimationOptions): void {
 
 ---
 
-## Performance Considerations
+## 성능 고려사항
 
-### Memory Management
+### 메모리 관리
 
-**Strategy**: Use WeakMap for element state storage
+**전략**: 요소 상태 저장에 WeakMap 사용
 
-- Automatic garbage collection when elements removed
-- No memory leaks from orphaned references
-- O(1) lookup performance
+- 요소 제거 시 자동 가비지 컬렉션
+- 고아 참조로 인한 메모리 누수 없음
+- O(1) 조회 성능
 
-**Cleanup**:
+**정리**:
 
-- IntersectionObserver.disconnect() on component unmount
-- WeakMap entries automatically freed
-- No manual cleanup required
+- 컴포넌트 언마운트 시 IntersectionObserver.disconnect()
+- WeakMap 항목 자동 해제
+- 수동 정리 불필요
 
-### Animation Performance
+### 애니메이션 성능
 
-**Optimization Strategies**:
+**최적화 전략**:
 
-1. **GPU Acceleration**: Only animate opacity and transform
-2. **Layer Promotion**: Use `will-change: opacity, transform` on observed elements
-3. **Minimal Callbacks**: O(1) complexity in IntersectionObserver callback
-4. **No Layout Queries**: Avoid getBoundingClientRect, offsetWidth in callbacks
-5. **CSS-Driven**: Animations run on compositor thread
+1. **GPU 가속**: opacity와 transform만 애니메이션
+2. **레이어 승격**: 관찰되는 요소에 `will-change: opacity, transform` 사용
+3. **최소 콜백**: IntersectionObserver 콜백에서 O(1) 복잡도
+4. **레이아웃 쿼리 없음**: 콜백에서 getBoundingClientRect, offsetWidth 회피
+5. **CSS 기반**: 애니메이션이 컴포지터 스레드에서 실행
 
-**Performance Targets**:
+**성능 목표**:
 
-- Observer callback: <0.5ms per execution
-- Animation frame time: <16.67ms (60fps)
-- Total memory overhead: <100KB for 100 observed elements
+- Observer 콜백: 실행당 <0.5ms
+- 애니메이션 프레임 시간: <16.67ms (60fps)
+- 총 메모리 오버헤드: 관찰 요소 100개당 <100KB
 
 ---
 
-## Type Exports
+## 타입 내보내기
 
-**Public API** (exported from `lib/hooks/useScrollAnimation.ts`):
+**Public API** (`lib/hooks/useScrollAnimation.ts`에서 내보냄):
 
 ```typescript
 export type { UseScrollAnimationOptions, UseScrollAnimationReturn };
@@ -514,26 +514,26 @@ export type { UseScrollAnimationOptions, UseScrollAnimationReturn };
 export { useScrollAnimation };
 ```
 
-**Internal Types** (not exported):
+**내부 타입** (내보내지 않음):
 
 ```typescript
 // AnimationState, LazyImageConfig, AnimationTimingConfig
-// Kept internal to allow implementation changes
+// 구현 변경을 허용하기 위해 내부에 유지
 ```
 
 ---
 
-## Browser API Integration
+## 브라우저 API 통합
 
-### IntersectionObserver Configuration
+### IntersectionObserver 설정
 
-**Creation**:
+**생성**:
 
 ```typescript
 const observer = new IntersectionObserver(
   (entries) => {
     entries.forEach((entry) => {
-      // Handle intersection
+      // intersection 처리
     });
   },
   {
@@ -544,22 +544,22 @@ const observer = new IntersectionObserver(
 );
 ```
 
-**Lifecycle**:
+**라이프사이클**:
 
-- Created once per hook instance
-- Observes multiple elements
-- Disconnected on component unmount
+- 훅 인스턴스당 한 번 생성
+- 여러 요소 관찰
+- 컴포넌트 언마운트 시 연결 해제
 
 ---
 
-## No Persistent Data
+## 영구 데이터 없음
 
-**Note**: This feature does not require:
+**참고**: 이 기능은 다음을 필요로 하지 않습니다:
 
-- Database storage
-- Server-side state
+- 데이터베이스 저장
+- 서버 측 상태
 - localStorage/sessionStorage
-- Cookies
+- 쿠키
 - IndexedDB
 
-All state is transient and exists only during component lifecycle. No data persists across page reloads or sessions.
+모든 상태는 일시적이며 컴포넌트 라이프사이클 동안만 존재합니다. 페이지 새로고침이나 세션 간에 데이터가 유지되지 않습니다.

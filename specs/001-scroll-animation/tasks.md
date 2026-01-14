@@ -1,301 +1,301 @@
-# Tasks: Scroll Animation & Lazy Loading System
+# 작업 목록: 스크롤 애니메이션 & 레이지 로딩 시스템
 
-**Input**: Design documents from `/specs/001-scroll-animation/`
-**Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, quickstart.md
+**입력**: `/specs/001-scroll-animation/` 설계 문서
+**사전 요구사항**: plan.md (필수), spec.md (사용자 스토리에 필수), research.md, data-model.md, quickstart.md
 
-**Tests**: Test tasks are included based on constitution requirements for Playwright E2E testing and manual testing.
+**테스트**: 테스트 작업은 컨스티튜션 요구사항에 따라 Playwright E2E 테스트 및 수동 테스트를 포함합니다.
 
-**Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
+**구성**: 작업은 각 스토리의 독립적인 구현 및 테스트를 가능하게 하기 위해 사용자 스토리별로 그룹화됩니다.
 
-## Format: `[ID] [P?] [Story] Description`
+## 형식: `[ID] [P?] [Story] 설명`
 
-- **[P]**: Can run in parallel (different files, no dependencies)
-- **[Story]**: Which user story this task belongs to (e.g., US1, US2, US3)
-- Include exact file paths in descriptions
+- **[P]**: 병렬 실행 가능 (다른 파일, 의존성 없음)
+- **[Story]**: 이 작업이 속한 사용자 스토리 (예: US1, US2, US3)
+- 설명에 정확한 파일 경로 포함
 
-## Path Conventions
+## 경로 규칙
 
-- **Project Type**: Web application (Next.js with App Router)
-- **Structure**: `lib/hooks/`, `lib/utils/`, `app/`, `__tests__/e2e/`
-- All paths relative to repository root: `/Users/kiyeol/development/decoded/decoded-app/`
-
----
-
-## Phase 1: Setup (Shared Infrastructure)
-
-**Purpose**: Project initialization and basic CSS infrastructure
-
-- [x] T001 Create CSS animation classes in app/globals.css with .js-observe, .is-visible, .is-hidden styles using GPU-accelerated properties (opacity, transform)
-- [x] T002 [P] Add CSS custom property support for --stagger variable in app/globals.css
-- [x] T003 [P] Verify TypeScript configuration supports React hooks and strict type checking in tsconfig.json
-
-**Checkpoint**: CSS infrastructure ready for animation implementation
+- **프로젝트 유형**: 웹 애플리케이션 (App Router가 있는 Next.js)
+- **구조**: `lib/hooks/`, `lib/utils/`, `app/`, `__tests__/e2e/`
+- 모든 경로는 저장소 루트 기준: `/Users/kiyeol/development/decoded/decoded-app/`
 
 ---
 
-## Phase 2: Foundational (Blocking Prerequisites)
+## 1단계: 설정 (공유 인프라)
 
-**Purpose**: Core TypeScript types and interfaces that ALL user stories depend on
+**목적**: 프로젝트 초기화 및 기본 CSS 인프라
 
-**⚠️ CRITICAL**: No user story work can begin until this phase is complete
+- [x] T001 app/globals.css에 GPU 가속 속성(opacity, transform)을 사용하여 .js-observe, .is-visible, .is-hidden 스타일이 포함된 CSS 애니메이션 클래스 생성
+- [x] T002 [P] app/globals.css에 --stagger 변수용 CSS 사용자 정의 속성 지원 추가
+- [x] T003 [P] tsconfig.json에서 TypeScript 설정이 React 훅과 strict 타입 검사를 지원하는지 확인
 
-- [x] T004 Create UseScrollAnimationOptions interface in lib/hooks/useScrollAnimation.ts with threshold, rootMargin, onEnter, onExit properties
-- [x] T005 [P] Create UseScrollAnimationReturn interface in lib/hooks/useScrollAnimation.ts with observeRef, observe, unobserve, disconnect, isObserving methods
-- [x] T006 [P] Create internal AnimationState interface for element state tracking (isVisible, imageLoaded, staggerDelay)
-
-**Checkpoint**: Foundation ready - user story implementation can now begin in parallel
+**체크포인트**: 애니메이션 구현을 위한 CSS 인프라 준비 완료
 
 ---
 
-## Phase 3: User Story 1 - Smooth Content Appearance on Scroll (Priority: P1) 🎯 MVP
+## 2단계: 기반 (블로킹 사전 요구사항)
 
-**Goal**: Implement core scroll animation system using IntersectionObserver with smooth opacity/transform transitions and staggered delays
+**목적**: 모든 사용자 스토리가 의존하는 핵심 TypeScript 타입 및 인터페이스
 
-**Independent Test**: Can be fully tested by scrolling a page with multiple card elements and verifying that each card transitions from invisible to visible with smooth opacity and transform animations over 320-420ms
+**⚠️ 중요**: 이 단계가 완료될 때까지 어떤 사용자 스토리 작업도 시작할 수 없음
 
-### Tests for User Story 1
+- [x] T004 lib/hooks/useScrollAnimation.ts에 threshold, rootMargin, onEnter, onExit 속성이 포함된 UseScrollAnimationOptions 인터페이스 생성
+- [x] T005 [P] lib/hooks/useScrollAnimation.ts에 observeRef, observe, unobserve, disconnect, isObserving 메서드가 포함된 UseScrollAnimationReturn 인터페이스 생성
+- [x] T006 [P] 요소 상태 추적용 내부 AnimationState 인터페이스 생성 (isVisible, imageLoaded, staggerDelay)
 
-> **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
-
-- [x] T007 [P] [US1] Create Playwright E2E test for basic card animation in **tests**/e2e/scroll-animation.spec.ts - verify .is-visible class added on scroll
-- [x] T008 [P] [US1] Create Playwright E2E test for staggered animation timing in **tests**/e2e/scroll-animation.spec.ts - verify cascading effect with multiple cards
-- [x] T009 [P] [US1] Create Playwright E2E test for exit animation in **tests**/e2e/scroll-animation.spec.ts - verify .is-hidden class added when scrolling away
-
-### Implementation for User Story 1
-
-- [x] T010 [US1] Implement IntersectionObserver initialization in useScrollAnimation hook in lib/hooks/useScrollAnimation.ts with threshold 0.15 and rootMargin "0px 0px -10% 0px"
-- [x] T011 [US1] Implement observer callback logic in lib/hooks/useScrollAnimation.ts to handle intersection entries and toggle is-visible/is-hidden classes
-- [x] T012 [US1] Implement stagger delay extraction from data-delay attribute in lib/hooks/useScrollAnimation.ts and set --stagger CSS custom property
-- [x] T013 [US1] Implement observeRef callback function in lib/hooks/useScrollAnimation.ts using useCallback for element observation
-- [x] T014 [US1] Implement cleanup and disconnect logic in lib/hooks/useScrollAnimation.ts using useEffect cleanup function
-- [x] T015 [US1] Add proper TypeScript type exports for UseScrollAnimationOptions and UseScrollAnimationReturn in lib/hooks/useScrollAnimation.ts
-- [x] T016 [US1] Create example usage page in app/examples/scroll-animation/page.tsx demonstrating basic card animation with 3-5 cards and varying stagger delays
-- [ ] T017 [US1] Verify animations run at 60fps using Chrome DevTools Performance panel - no layout thrashing or paint operations
-
-**Checkpoint**: At this point, User Story 1 should be fully functional - cards animate smoothly on scroll with staggered delays
+**체크포인트**: 기반 준비 완료 - 이제 사용자 스토리 구현을 병렬로 시작 가능
 
 ---
 
-## Phase 4: User Story 2 - Progressive Image Loading (Priority: P2)
+## 3단계: 사용자 스토리 1 - 스크롤 시 부드러운 콘텐츠 등장 (우선순위: P1) 🎯 MVP
 
-**Goal**: Add lazy loading functionality for images using data-src attribute swapping with IntersectionObserver
+**목표**: 시차 지연이 있는 부드러운 opacity/transform 전환과 함께 IntersectionObserver를 사용하는 핵심 스크롤 애니메이션 시스템 구현
 
-**Independent Test**: Can be tested by loading a page with images, monitoring network requests, and verifying that below-the-fold images don't load until scrolled near
+**독립 테스트**: 여러 카드 요소가 있는 페이지를 스크롤하고 각 카드가 320-420ms에 걸쳐 부드러운 opacity 및 transform 애니메이션과 함께 보이지 않는 상태에서 보이는 상태로 전환되는지 확인하여 완전히 테스트 가능
 
-### Tests for User Story 2
+### 사용자 스토리 1 테스트
 
-- [x] T018 [P] [US2] Create Playwright E2E test for lazy image loading in **tests**/e2e/scroll-animation.spec.ts - verify images load only when scrolled near
-- [x] T019 [P] [US2] Create Playwright E2E test for preventing image reload in **tests**/e2e/scroll-animation.spec.ts - verify data-loaded="true" prevents redundant loads
-- [x] T020 [P] [US2] Create Playwright E2E test for above-the-fold images in **tests**/e2e/scroll-animation.spec.ts - verify hero images load immediately
+> **참고: 구현 전에 이 테스트를 먼저 작성하고 실패하는지 확인**
 
-### Implementation for User Story 2
+- [x] T007 [P] [US1] __tests__/e2e/scroll-animation.spec.ts에 기본 카드 애니메이션용 Playwright E2E 테스트 생성 - 스크롤 시 .is-visible 클래스 추가 확인
+- [x] T008 [P] [US1] __tests__/e2e/scroll-animation.spec.ts에 시차 애니메이션 타이밍용 Playwright E2E 테스트 생성 - 여러 카드에서 캐스케이딩 효과 확인
+- [x] T009 [P] [US1] __tests__/e2e/scroll-animation.spec.ts에 종료 애니메이션용 Playwright E2E 테스트 생성 - 스크롤로 나갈 때 .is-hidden 클래스 추가 확인
 
-- [x] T021 [US2] Add image lazy loading logic to observer callback in lib/hooks/useScrollAnimation.ts - query for img[data-src] elements
-- [x] T022 [US2] Implement data-src to src attribute swapping in lib/hooks/useScrollAnimation.ts when element enters viewport
-- [x] T023 [US2] Implement data-loaded="true" marking in lib/hooks/useScrollAnimation.ts to prevent reload on re-entry
-- [x] T024 [US2] Add enableLazyLoad option to UseScrollAnimationOptions interface in lib/hooks/useScrollAnimation.ts (default: true)
-- [x] T025 [US2] Update example page in app/examples/scroll-animation/page.tsx to demonstrate lazy image loading with multiple images and proper dimensions (width/height)
-- [x] T026 [US2] Verify images have fixed dimensions (width/height or aspect-ratio) in example page to prevent CLS
-- [x] T027 [US2] Add native loading="lazy" attribute to all example images in app/examples/scroll-animation/page.tsx for progressive enhancement
+### 사용자 스토리 1 구현
 
-**Checkpoint**: At this point, User Stories 1 AND 2 should both work independently - animations work AND images lazy load
+- [x] T010 [US1] lib/hooks/useScrollAnimation.ts에서 threshold 0.15와 rootMargin "0px 0px -10% 0px"로 IntersectionObserver 초기화 구현
+- [x] T011 [US1] lib/hooks/useScrollAnimation.ts에서 intersection 엔트리를 처리하고 is-visible/is-hidden 클래스를 토글하는 observer 콜백 로직 구현
+- [x] T012 [US1] lib/hooks/useScrollAnimation.ts에서 data-delay 속성에서 시차 지연 추출하고 --stagger CSS 사용자 정의 속성 설정
+- [x] T013 [US1] lib/hooks/useScrollAnimation.ts에서 요소 관찰용 useCallback을 사용한 observeRef 콜백 함수 구현
+- [x] T014 [US1] lib/hooks/useScrollAnimation.ts에서 useEffect 정리 함수를 사용한 정리 및 disconnect 로직 구현
+- [x] T015 [US1] lib/hooks/useScrollAnimation.ts에서 UseScrollAnimationOptions 및 UseScrollAnimationReturn에 대한 적절한 TypeScript 타입 내보내기 추가
+- [x] T016 [US1] app/examples/scroll-animation/page.tsx에 3-5개 카드와 다양한 시차 지연을 보여주는 기본 카드 애니메이션 예시 사용 페이지 생성
+- [ ] T017 [US1] Chrome DevTools Performance 패널을 사용하여 60fps에서 애니메이션 실행 확인 - 레이아웃 스래싱이나 페인트 연산 없음
 
----
-
-## Phase 5: User Story 3 - Performance-Optimized Scrolling (Priority: P3)
-
-**Goal**: Optimize animation performance to maintain 60fps on mid-range devices and achieve Core Web Vitals compliance
-
-**Independent Test**: Can be tested by measuring frame rates during scroll on various devices, checking Core Web Vitals (CLS ≤ 0.1, LCP ≤ 2.5s), and verifying GPU-accelerated rendering
-
-### Tests for User Story 3
-
-- [x] T028 [P] [US3] Create Playwright test for 60fps performance in **tests**/e2e/scroll-animation.spec.ts using performance.now() to measure frame times
-- [x] T029 [P] [US3] Create Playwright test for Core Web Vitals in **tests**/e2e/scroll-animation.spec.ts - measure CLS, LCP, INP using web-vitals library
-- [x] T030 [P] [US3] Create Playwright test for mobile performance in **tests**/e2e/scroll-animation.spec.ts using device emulation (iPhone 12, Galaxy S21)
-
-### Implementation for User Story 3
-
-- [x] T031 [US3] Add will-change: opacity, transform CSS hint to .js-observe class in app/globals.css (scoped to animated elements only)
-- [x] T032 [US3] Implement O(1) complexity validation in observer callback in lib/hooks/useScrollAnimation.ts - no DOM queries or measurements
-- [x] T033 [US3] Add input validation for threshold (0.0-1.0) and rootMargin (valid CSS string) in lib/hooks/useScrollAnimation.ts
-- [x] T034 [US3] Optimize observer callback to avoid layout queries (getBoundingClientRect, offsetWidth) in lib/hooks/useScrollAnimation.ts
-- [x] T035 [US3] Add WeakMap for element state storage in lib/hooks/useScrollAnimation.ts for automatic garbage collection
-- [ ] T036 [US3] Profile animation performance using Chrome DevTools Performance panel - verify compositor thread usage and <16.67ms frame times
-- [ ] T037 [US3] Test on mobile devices (real devices or BrowserStack) - verify 60fps on iPhone 12 and Samsung Galaxy S21
-- [ ] T038 [US3] Run Lighthouse audit on example page - verify Core Web Vitals scores (LCP ≤ 2.5s, CLS ≤ 0.1, INP ≤ 200ms)
-
-**Checkpoint**: All user stories should now be independently functional with performance targets met
+**체크포인트**: 이 시점에서 사용자 스토리 1이 완전히 작동해야 함 - 스크롤 시 시차 지연과 함께 카드가 부드럽게 애니메이션
 
 ---
 
-## Phase 6: Polish & Cross-Cutting Concerns
+## 4단계: 사용자 스토리 2 - 점진적 이미지 로딩 (우선순위: P2)
 
-**Purpose**: Improvements that affect multiple user stories and final validation
+**목표**: IntersectionObserver와 함께 data-src 속성 교체를 사용하는 이미지 레이지 로딩 기능 추가
 
-- [ ] T039 [P] Add JSDoc documentation to useScrollAnimation hook in lib/hooks/useScrollAnimation.ts with usage examples
-- [ ] T040 [P] Create README.md in specs/001-scroll-animation/ documenting API usage and examples
-- [ ] T041 [P] Add error handling for invalid options (threshold, rootMargin) in lib/hooks/useScrollAnimation.ts with descriptive error messages
-- [ ] T042 [P] Add accessibility considerations documentation - note that animations respect prefers-reduced-motion (future enhancement)
-- [ ] T043 Create comprehensive example page in app/examples/scroll-animation/page.tsx demonstrating all features (animation, lazy loading, stagger, performance)
-- [ ] T044 Run quickstart.md validation - follow 5-minute quick start guide and verify all steps work
-- [ ] T045 Cross-browser testing - verify functionality in Chrome, Firefox, Safari, Edge (latest versions)
-- [ ] T046 Manual user testing - recruit 3 users to test animation smoothness and provide feedback (per constitution requirement)
-- [ ] T047 Update CLAUDE.md agent context with final implementation notes and usage patterns
-- [ ] T048 Code review and refactoring - ensure hook is <100 lines and follows React best practices
-- [ ] T049 [P] Optimize bundle size - verify zero external dependencies and minimal code footprint
-- [ ] T050 Final performance validation - run full Lighthouse audit and verify all Core Web Vitals targets met
+**독립 테스트**: 이미지가 있는 페이지를 로드하고 네트워크 요청을 모니터링하여 스크롤 없이 보이지 않는 이미지가 근처로 스크롤할 때까지 로드되지 않는지 확인하여 테스트 가능
 
----
+### 사용자 스토리 2 테스트
 
-## Dependencies & Execution Order
+- [x] T018 [P] [US2] __tests__/e2e/scroll-animation.spec.ts에 레이지 이미지 로딩용 Playwright E2E 테스트 생성 - 근처로 스크롤할 때만 이미지 로드 확인
+- [x] T019 [P] [US2] __tests__/e2e/scroll-animation.spec.ts에 이미지 재로드 방지용 Playwright E2E 테스트 생성 - data-loaded="true"가 중복 로드 방지 확인
+- [x] T020 [P] [US2] __tests__/e2e/scroll-animation.spec.ts에 스크롤 없이 보이는 이미지용 Playwright E2E 테스트 생성 - 히어로 이미지 즉시 로드 확인
 
-### Phase Dependencies
+### 사용자 스토리 2 구현
 
-- **Setup (Phase 1)**: No dependencies - can start immediately
-- **Foundational (Phase 2)**: Depends on Setup completion - BLOCKS all user stories
-- **User Stories (Phase 3-5)**: All depend on Foundational phase completion
-  - User Story 1 (P1): Can start after Foundational - No dependencies on other stories
-  - User Story 2 (P2): Can start after Foundational - No dependencies on US1 (can run in parallel)
-  - User Story 3 (P3): Depends on US1 and US2 implementation for performance testing
-- **Polish (Phase 6)**: Depends on all user stories being complete
+- [x] T021 [US2] lib/hooks/useScrollAnimation.ts의 observer 콜백에 이미지 레이지 로딩 로직 추가 - img[data-src] 요소 쿼리
+- [x] T022 [US2] lib/hooks/useScrollAnimation.ts에서 요소가 뷰포트에 진입할 때 data-src에서 src 속성으로 교체 구현
+- [x] T023 [US2] lib/hooks/useScrollAnimation.ts에서 재진입 시 재로드 방지를 위한 data-loaded="true" 표시 구현
+- [x] T024 [US2] lib/hooks/useScrollAnimation.ts의 UseScrollAnimationOptions 인터페이스에 enableLazyLoad 옵션 추가 (기본값: true)
+- [x] T025 [US2] app/examples/scroll-animation/page.tsx의 예시 페이지 업데이트하여 적절한 치수(width/height)가 있는 여러 이미지로 레이지 이미지 로딩 시연
+- [x] T026 [US2] 예시 페이지에서 이미지에 고정 치수(width/height 또는 aspect-ratio)가 있어 CLS 방지 확인
+- [x] T027 [US2] 점진적 향상을 위해 app/examples/scroll-animation/page.tsx의 모든 예시 이미지에 네이티브 loading="lazy" 속성 추가
 
-### User Story Dependencies
-
-- **User Story 1 (P1)**: Can start after Foundational (Phase 2) - No dependencies on other stories ✅ Independent
-- **User Story 2 (P2)**: Can start after Foundational (Phase 2) - No dependencies on US1 ✅ Independent (can run in parallel with US1)
-- **User Story 3 (P3)**: Requires US1 and US2 implementation for performance testing ⚠️ Sequential
-
-### Within Each User Story
-
-- Tests MUST be written and FAIL before implementation
-- Core hook logic before example pages
-- Animation system before lazy loading integration
-- Implementation before performance optimization
-- Story complete before moving to next priority
-
-### Parallel Opportunities
-
-- **Setup Phase**: T001, T002, T003 can run in parallel
-- **Foundational Phase**: T005, T006 can run in parallel (after T004 interface created)
-- **User Story 1 Tests**: T007, T008, T009 can run in parallel
-- **User Story 2 Tests**: T018, T019, T020 can run in parallel
-- **User Story 3 Tests**: T028, T029, T030 can run in parallel
-- **User Stories 1 & 2**: Can be implemented in parallel by different developers (after Foundational phase)
-- **Polish Phase**: T039, T040, T041, T042, T049 can run in parallel
+**체크포인트**: 이 시점에서 사용자 스토리 1과 2가 모두 독립적으로 작동해야 함 - 애니메이션 작동 및 이미지 레이지 로드
 
 ---
 
-## Parallel Example: User Story 1
+## 5단계: 사용자 스토리 3 - 성능 최적화 스크롤링 (우선순위: P3)
+
+**목표**: 중급 기기에서 60fps 유지 및 Core Web Vitals 준수 달성을 위한 애니메이션 성능 최적화
+
+**독립 테스트**: 다양한 기기에서 스크롤 중 프레임 레이트 측정, Core Web Vitals(CLS ≤ 0.1, LCP ≤ 2.5s) 확인, GPU 가속 렌더링 확인으로 테스트 가능
+
+### 사용자 스토리 3 테스트
+
+- [x] T028 [P] [US3] __tests__/e2e/scroll-animation.spec.ts에서 performance.now()를 사용하여 프레임 시간 측정하는 60fps 성능용 Playwright 테스트 생성
+- [x] T029 [P] [US3] __tests__/e2e/scroll-animation.spec.ts에서 web-vitals 라이브러리를 사용하여 CLS, LCP, INP 측정하는 Core Web Vitals용 Playwright 테스트 생성
+- [x] T030 [P] [US3] __tests__/e2e/scroll-animation.spec.ts에서 기기 에뮬레이션(iPhone 12, Galaxy S21)을 사용하는 모바일 성능용 Playwright 테스트 생성
+
+### 사용자 스토리 3 구현
+
+- [x] T031 [US3] app/globals.css의 .js-observe 클래스에 will-change: opacity, transform CSS 힌트 추가 (애니메이션 요소에만 범위 지정)
+- [x] T032 [US3] lib/hooks/useScrollAnimation.ts의 observer 콜백에서 O(1) 복잡도 검증 구현 - DOM 쿼리나 측정 없음
+- [x] T033 [US3] lib/hooks/useScrollAnimation.ts에서 threshold(0.0-1.0) 및 rootMargin(유효한 CSS 문자열)에 대한 입력 검증 추가
+- [x] T034 [US3] lib/hooks/useScrollAnimation.ts에서 레이아웃 쿼리(getBoundingClientRect, offsetWidth) 회피하도록 observer 콜백 최적화
+- [x] T035 [US3] lib/hooks/useScrollAnimation.ts에서 자동 가비지 컬렉션을 위한 요소 상태 저장용 WeakMap 추가
+- [ ] T036 [US3] Chrome DevTools Performance 패널을 사용하여 애니메이션 성능 프로파일링 - 컴포지터 스레드 사용 및 <16.67ms 프레임 시간 확인
+- [ ] T037 [US3] 모바일 기기(실제 기기 또는 BrowserStack)에서 테스트 - iPhone 12 및 Samsung Galaxy S21에서 60fps 확인
+- [ ] T038 [US3] 예시 페이지에서 Lighthouse 감사 실행 - Core Web Vitals 점수 확인(LCP ≤ 2.5s, CLS ≤ 0.1, INP ≤ 200ms)
+
+**체크포인트**: 이제 모든 사용자 스토리가 성능 목표와 함께 독립적으로 작동해야 함
+
+---
+
+## 6단계: 마무리 & 교차 관심사
+
+**목적**: 여러 사용자 스토리에 영향을 미치는 개선 및 최종 검증
+
+- [ ] T039 [P] lib/hooks/useScrollAnimation.ts의 useScrollAnimation 훅에 사용 예시가 포함된 JSDoc 문서 추가
+- [ ] T040 [P] specs/001-scroll-animation/에 API 사용법 및 예시를 문서화하는 README.md 생성
+- [ ] T041 [P] lib/hooks/useScrollAnimation.ts에서 유효하지 않은 옵션(threshold, rootMargin)에 대한 설명적 오류 메시지와 함께 오류 처리 추가
+- [ ] T042 [P] 접근성 고려사항 문서 추가 - 애니메이션이 prefers-reduced-motion을 존중함을 명시(향후 개선)
+- [ ] T043 app/examples/scroll-animation/page.tsx에 모든 기능(애니메이션, 레이지 로딩, 시차, 성능)을 시연하는 종합 예시 페이지 생성
+- [ ] T044 quickstart.md 검증 실행 - 5분 퀵 스타트 가이드를 따라하고 모든 단계가 작동하는지 확인
+- [ ] T045 크로스 브라우저 테스트 - Chrome, Firefox, Safari, Edge(최신 버전)에서 기능 확인
+- [ ] T046 수동 사용자 테스트 - 애니메이션 부드러움 테스트 및 피드백 제공을 위해 3명 사용자 모집(컨스티튜션 요구사항에 따라)
+- [ ] T047 최종 구현 노트 및 사용 패턴으로 CLAUDE.md 에이전트 컨텍스트 업데이트
+- [ ] T048 코드 리뷰 및 리팩토링 - 훅이 100줄 미만이고 React 모범 사례를 따르는지 확인
+- [ ] T049 [P] 번들 크기 최적화 - 외부 의존성이 없고 최소한의 코드 크기 확인
+- [ ] T050 최종 성능 검증 - 전체 Lighthouse 감사 실행 및 모든 Core Web Vitals 목표 달성 확인
+
+---
+
+## 의존성 & 실행 순서
+
+### 단계 의존성
+
+- **설정 (1단계)**: 의존성 없음 - 즉시 시작 가능
+- **기반 (2단계)**: 설정 완료에 의존 - 모든 사용자 스토리 블로킹
+- **사용자 스토리 (3-5단계)**: 모두 기반 단계 완료에 의존
+  - 사용자 스토리 1 (P1): 기반 후 시작 가능 - 다른 스토리에 의존성 없음
+  - 사용자 스토리 2 (P2): 기반 후 시작 가능 - US1에 의존성 없음 (병렬 실행 가능)
+  - 사용자 스토리 3 (P3): 성능 테스트를 위해 US1 및 US2 구현에 의존
+- **마무리 (6단계)**: 모든 사용자 스토리 완료에 의존
+
+### 사용자 스토리 의존성
+
+- **사용자 스토리 1 (P1)**: 기반(2단계) 후 시작 가능 - 다른 스토리에 의존성 없음 ✅ 독립적
+- **사용자 스토리 2 (P2)**: 기반(2단계) 후 시작 가능 - US1에 의존성 없음 ✅ 독립적 (US1과 병렬 실행 가능)
+- **사용자 스토리 3 (P3)**: 성능 테스트를 위해 US1 및 US2 구현 필요 ⚠️ 순차적
+
+### 각 사용자 스토리 내에서
+
+- 구현 전에 테스트를 작성하고 실패해야 함
+- 예시 페이지 전에 핵심 훅 로직
+- 레이지 로딩 통합 전에 애니메이션 시스템
+- 성능 최적화 전에 구현
+- 다음 우선순위로 이동하기 전에 스토리 완료
+
+### 병렬 기회
+
+- **설정 단계**: T001, T002, T003 병렬 실행 가능
+- **기반 단계**: T005, T006 병렬 실행 가능 (T004 인터페이스 생성 후)
+- **사용자 스토리 1 테스트**: T007, T008, T009 병렬 실행 가능
+- **사용자 스토리 2 테스트**: T018, T019, T020 병렬 실행 가능
+- **사용자 스토리 3 테스트**: T028, T029, T030 병렬 실행 가능
+- **사용자 스토리 1 & 2**: 다른 개발자가 병렬로 구현 가능 (기반 단계 후)
+- **마무리 단계**: T039, T040, T041, T042, T049 병렬 실행 가능
+
+---
+
+## 병렬 예시: 사용자 스토리 1
 
 ```bash
-# Launch all tests for User Story 1 together:
-Task T007: "Create Playwright E2E test for basic card animation in __tests__/e2e/scroll-animation.spec.ts"
-Task T008: "Create Playwright E2E test for staggered animation timing in __tests__/e2e/scroll-animation.spec.ts"
-Task T009: "Create Playwright E2E test for exit animation in __tests__/e2e/scroll-animation.spec.ts"
+# 사용자 스토리 1의 모든 테스트를 함께 시작:
+작업 T007: "__tests__/e2e/scroll-animation.spec.ts에 기본 카드 애니메이션용 Playwright E2E 테스트 생성"
+작업 T008: "__tests__/e2e/scroll-animation.spec.ts에 시차 애니메이션 타이밍용 Playwright E2E 테스트 생성"
+작업 T009: "__tests__/e2e/scroll-animation.spec.ts에 종료 애니메이션용 Playwright E2E 테스트 생성"
 
-# After tests fail, implement core hook (sequential):
-Task T010 → T011 → T012 → T013 → T014 → T015
-# Then create example page and validate:
-Task T016 → T017
+# 테스트 실패 후, 핵심 훅 구현 (순차적):
+작업 T010 → T011 → T012 → T013 → T014 → T015
+# 그 다음 예시 페이지 생성 및 검증:
+작업 T016 → T017
 ```
 
-## Parallel Example: User Story 1 & 2 (Multi-developer)
+## 병렬 예시: 사용자 스토리 1 & 2 (다중 개발자)
 
 ```bash
-# Developer A: User Story 1 (Animation)
-Phase 3: T007-T017
+# 개발자 A: 사용자 스토리 1 (애니메이션)
+3단계: T007-T017
 
-# Developer B: User Story 2 (Lazy Loading) - can start at same time after Foundational
-Phase 4: T018-T027
+# 개발자 B: 사용자 스토리 2 (레이지 로딩) - 기반 후 동시에 시작 가능
+4단계: T018-T027
 
-# Both stories can be implemented independently and merged without conflicts
+# 두 스토리 모두 독립적으로 구현하고 충돌 없이 병합 가능
 ```
 
 ---
 
-## Implementation Strategy
+## 구현 전략
 
-### MVP First (User Story 1 Only)
+### MVP 우선 (사용자 스토리 1만)
 
-1. Complete Phase 1: Setup (T001-T003)
-2. Complete Phase 2: Foundational (T004-T006) - CRITICAL - blocks all stories
-3. Complete Phase 3: User Story 1 (T007-T017)
-4. **STOP and VALIDATE**: Test User Story 1 independently
-5. Deploy/demo basic scroll animations ✅ MVP Delivered!
+1. 1단계 완료: 설정 (T001-T003)
+2. 2단계 완료: 기반 (T004-T006) - 중요 - 모든 스토리 블로킹
+3. 3단계 완료: 사용자 스토리 1 (T007-T017)
+4. **중지 및 검증**: 사용자 스토리 1 독립적으로 테스트
+5. 기본 스크롤 애니메이션 배포/데모 ✅ MVP 전달!
 
-**MVP Deliverable**: Working scroll animation system with smooth opacity/transform transitions and staggered delays
+**MVP 결과물**: 부드러운 opacity/transform 전환과 시차 지연이 있는 작동하는 스크롤 애니메이션 시스템
 
-### Incremental Delivery
+### 점진적 전달
 
-1. Complete Setup + Foundational → Foundation ready
-2. Add User Story 1 (T007-T017) → Test independently → Deploy/Demo ✅ MVP!
-3. Add User Story 2 (T018-T027) → Test independently → Deploy/Demo ✅ Lazy Loading!
-4. Add User Story 3 (T028-T038) → Test independently → Deploy/Demo ✅ Performance Optimized!
-5. Polish (T039-T050) → Final validation → Production Ready ✅
+1. 설정 + 기반 완료 → 기반 준비
+2. 사용자 스토리 1 추가 (T007-T017) → 독립 테스트 → 배포/데모 ✅ MVP!
+3. 사용자 스토리 2 추가 (T018-T027) → 독립 테스트 → 배포/데모 ✅ 레이지 로딩!
+4. 사용자 스토리 3 추가 (T028-T038) → 독립 테스트 → 배포/데모 ✅ 성능 최적화!
+5. 마무리 (T039-T050) → 최종 검증 → 프로덕션 준비 ✅
 
-### Parallel Team Strategy
+### 병렬 팀 전략
 
-With multiple developers:
+여러 개발자가 있는 경우:
 
-1. Team completes Setup + Foundational together (T001-T006)
-2. Once Foundational is done:
-   - Developer A: User Story 1 (T007-T017) - Animation system
-   - Developer B: User Story 2 (T018-T027) - Lazy loading (can start in parallel!)
-3. Developer C: User Story 3 (T028-T038) - Performance optimization (requires US1 & US2)
-4. Team: Polish phase together (T039-T050)
-
----
-
-## Task Breakdown by User Story
-
-### User Story 1 (P1): Smooth Content Appearance - 11 tasks
-
-- Tests: 3 tasks (T007-T009)
-- Implementation: 8 tasks (T010-T017)
-- **Can deliver as MVP**: YES ✅
-
-### User Story 2 (P2): Progressive Image Loading - 10 tasks
-
-- Tests: 3 tasks (T018-T020)
-- Implementation: 7 tasks (T021-T027)
-- **Can deliver independently**: YES ✅
-
-### User Story 3 (P3): Performance-Optimized Scrolling - 11 tasks
-
-- Tests: 3 tasks (T028-T030)
-- Implementation: 8 tasks (T031-T038)
-- **Can deliver independently**: NO ⚠️ (requires US1 & US2 for testing)
-
-### Total Tasks: 50 tasks
-
-- Setup: 3 tasks
-- Foundational: 3 tasks
-- User Stories: 32 tasks
-- Polish: 12 tasks
+1. 팀이 함께 설정 + 기반 완료 (T001-T006)
+2. 기반 완료 후:
+   - 개발자 A: 사용자 스토리 1 (T007-T017) - 애니메이션 시스템
+   - 개발자 B: 사용자 스토리 2 (T018-T027) - 레이지 로딩 (병렬 시작 가능!)
+3. 개발자 C: 사용자 스토리 3 (T028-T038) - 성능 최적화 (US1 & US2 필요)
+4. 팀: 함께 마무리 단계 (T039-T050)
 
 ---
 
-## Notes
+## 사용자 스토리별 작업 분류
 
-- [P] tasks = different files, no dependencies, can run in parallel
-- [Story] label maps task to specific user story for traceability
-- Each user story should be independently completable and testable (US1 and US2 are fully independent)
-- Verify tests fail before implementing (TDD approach)
-- Commit after each task or logical group
-- Stop at any checkpoint to validate story independently
-- Constitution requires: Playwright E2E testing ✅, Manual testing with 3 users ✅, Type safety ✅
-- Zero external dependencies - uses only native browser APIs ✅
-- Performance targets: 60fps, CLS ≤ 0.1, LCP ≤ 2.5s ✅
+### 사용자 스토리 1 (P1): 부드러운 콘텐츠 등장 - 11개 작업
+
+- 테스트: 3개 작업 (T007-T009)
+- 구현: 8개 작업 (T010-T017)
+- **MVP로 전달 가능**: 예 ✅
+
+### 사용자 스토리 2 (P2): 점진적 이미지 로딩 - 10개 작업
+
+- 테스트: 3개 작업 (T018-T020)
+- 구현: 7개 작업 (T021-T027)
+- **독립적으로 전달 가능**: 예 ✅
+
+### 사용자 스토리 3 (P3): 성능 최적화 스크롤링 - 11개 작업
+
+- 테스트: 3개 작업 (T028-T030)
+- 구현: 8개 작업 (T031-T038)
+- **독립적으로 전달 가능**: 아니오 ⚠️ (테스트를 위해 US1 & US2 필요)
+
+### 총 작업: 50개
+
+- 설정: 3개 작업
+- 기반: 3개 작업
+- 사용자 스토리: 32개 작업
+- 마무리: 12개 작업
 
 ---
 
-## Format Validation
+## 참고
 
-✅ All tasks follow checklist format: `- [ ] [TaskID] [P?] [Story?] Description with file path`
-✅ All user story tasks include [US1], [US2], or [US3] labels
-✅ All tasks include specific file paths for implementation
-✅ Sequential task IDs (T001-T050)
-✅ Parallel opportunities marked with [P]
-✅ Tests included per constitution requirements
-✅ Independent test criteria defined for each user story
+- [P] 작업 = 다른 파일, 의존성 없음, 병렬 실행 가능
+- [Story] 라벨은 추적성을 위해 작업을 특정 사용자 스토리에 매핑
+- 각 사용자 스토리는 독립적으로 완료하고 테스트 가능해야 함 (US1과 US2는 완전히 독립적)
+- 구현 전에 테스트 실패 확인 (TDD 접근법)
+- 각 작업 또는 논리적 그룹 후 커밋
+- 스토리를 독립적으로 검증하기 위해 모든 체크포인트에서 중지
+- 컨스티튜션 요구사항: Playwright E2E 테스트 ✅, 3명 사용자와 수동 테스트 ✅, 타입 안전성 ✅
+- 외부 의존성 없음 - 네이티브 브라우저 API만 사용 ✅
+- 성능 목표: 60fps, CLS ≤ 0.1, LCP ≤ 2.5s ✅
+
+---
+
+## 형식 검증
+
+✅ 모든 작업이 체크리스트 형식 준수: `- [ ] [TaskID] [P?] [Story?] 파일 경로가 포함된 설명`
+✅ 모든 사용자 스토리 작업에 [US1], [US2], 또는 [US3] 라벨 포함
+✅ 모든 작업에 구현을 위한 구체적인 파일 경로 포함
+✅ 순차적 작업 ID (T001-T050)
+✅ 병렬 기회가 [P]로 표시됨
+✅ 컨스티튜션 요구사항에 따라 테스트 포함
+✅ 각 사용자 스토리에 대한 독립 테스트 기준 정의됨

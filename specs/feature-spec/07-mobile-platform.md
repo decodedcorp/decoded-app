@@ -1,16 +1,16 @@
-# Mobile Platform (Cross-Platform)
+# 모바일 플랫폼 (크로스 플랫폼)
 
-> Features: M-01 ~ M-06
-> Status: 30% implemented (Foundation complete)
-> Dependencies: Shared code layer, Supabase
+> 기능: M-01 ~ M-06
+> 상태: 30% 구현됨 (기반 완료)
+> 의존성: 공유 코드 레이어, Supabase
 
 ---
 
-## Overview
+## 개요
 
 크로스플랫폼 모바일 앱 개발을 위한 하이브리드 모노레포 아키텍처. 웹(Next.js)과 모바일(Expo)이 공유 코드 레이어를 통해 비즈니스 로직을 재사용합니다.
 
-### Architecture Decision
+### 아키텍처 결정
 
 | 옵션 | SSR 지원 | App Store | 네이티브 성능 | 선택 이유 |
 |------|----------|-----------|---------------|-----------|
@@ -27,7 +27,7 @@
 
 ---
 
-## Project Structure
+## 프로젝트 구조
 
 ```
 decoded-monorepo/
@@ -66,17 +66,17 @@ decoded-monorepo/
 
 ---
 
-## Features
+## 기능 목록
 
-### M-01 Shared Code Layer
+### M-01 공유 코드 레이어
 
-- **Description**: 웹/모바일 공유 코드 패키지 (@decoded/shared)
-- **Priority**: P0 (Foundation)
-- **Status**: ✅ Implemented
+- **설명**: 웹/모바일 공유 코드 패키지 (@decoded/shared)
+- **우선순위**: P0 (기반)
+- **상태**: ✅ 구현됨
 
-#### Implementation Details
+#### 구현 세부사항
 
-**Supabase Client Abstraction**:
+**Supabase 클라이언트 추상화**:
 ```typescript
 // packages/shared/supabase/client.ts
 let supabaseClient: SupabaseClient<Database> | null = null;
@@ -96,7 +96,7 @@ export function getSupabaseClient(): SupabaseClient<Database> {
 }
 ```
 
-**Shared Exports**:
+**공유 Export**:
 ```typescript
 // packages/shared/index.ts
 export { initSupabase, getSupabaseClient } from "./supabase/client";
@@ -105,7 +105,7 @@ export { useFilterStore } from "./stores/filterStore";
 export { useSearchStore } from "./stores/searchStore";
 ```
 
-#### Files Created
+#### 생성된 파일
 - `packages/shared/package.json`
 - `packages/shared/supabase/client.ts`
 - `packages/shared/supabase/queries/images.ts`
@@ -115,25 +115,25 @@ export { useSearchStore } from "./stores/searchStore";
 
 ---
 
-### M-02 Expo Project Setup
+### M-02 Expo 프로젝트 설정
 
-- **Description**: Expo SDK 54 기반 모바일 앱 초기 설정
-- **Priority**: P0 (Foundation)
-- **Status**: ✅ Implemented
+- **설명**: Expo SDK 54 기반 모바일 앱 초기 설정
+- **우선순위**: P0 (기반)
+- **상태**: ✅ 구현됨
 
-#### Technical Stack
+#### 기술 스택
 
-| Layer | Technology | Version |
+| 레이어 | 기술 | 버전 |
 |-------|------------|---------|
-| Framework | Expo SDK | 54.0.31 |
-| Routing | Expo Router | 6.0.21 |
+| 프레임워크 | Expo SDK | 54.0.31 |
+| 라우팅 | Expo Router | 6.0.21 |
 | UI | React Native | 0.81.5 |
-| Animation | Reanimated | 4.1.1 |
-| State (Server) | React Query | 5.90.11 |
-| State (Client) | Zustand | 4.5.7 |
+| 애니메이션 | Reanimated | 4.1.1 |
+| 상태 (서버) | React Query | 5.90.11 |
+| 상태 (클라이언트) | Zustand | 4.5.7 |
 | API | Supabase JS | 2.86.0 |
 
-#### Configuration
+#### 설정
 
 **app.json**:
 ```json
@@ -153,13 +153,13 @@ export { useSearchStore } from "./stores/searchStore";
 }
 ```
 
-**Environment Variables** (`.env`):
+**환경 변수** (`.env`):
 ```bash
 EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
 EXPO_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 ```
 
-#### Files Created
+#### 생성된 파일
 - `packages/mobile/package.json`
 - `packages/mobile/app.json`
 - `packages/mobile/app/_layout.tsx`
@@ -168,13 +168,13 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 
 ---
 
-### M-03 Home Screen (Image Grid)
+### M-03 홈 화면 (이미지 그리드)
 
-- **Description**: FlatList 기반 이미지 그리드 (무한 스크롤)
-- **Priority**: P0
-- **Status**: ✅ Implemented
+- **설명**: FlatList 기반 이미지 그리드 (무한 스크롤)
+- **우선순위**: P0
+- **상태**: ✅ 구현됨
 
-#### Acceptance Criteria
+#### 수락 기준
 - [x] 2열 그리드 레이아웃
 - [x] 무한 스크롤 (onEndReached)
 - [x] 로딩/빈 상태 UI
@@ -182,7 +182,7 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 - [ ] 필터 탭 UI
 - [ ] 검색 기능
 
-#### Implementation
+#### 구현
 
 ```typescript
 // packages/mobile/app/(tabs)/index.tsx
@@ -216,13 +216,13 @@ export default function HomeScreen() {
 
 ---
 
-### M-04 Image Detail Screen
+### M-04 이미지 상세 화면
 
-- **Description**: 이미지 상세 정보 및 아이템 목록
-- **Priority**: P0
-- **Status**: ✅ Implemented (Basic)
+- **설명**: 이미지 상세 정보 및 아이템 목록
+- **우선순위**: P0
+- **상태**: ✅ 구현됨 (기본)
 
-#### Acceptance Criteria
+#### 수락 기준
 - [x] 이미지 히어로 섹션
 - [x] 계정 정보 표시
 - [x] 아이템 목록 (브랜드, 제품명, 가격)
@@ -230,7 +230,7 @@ export default function HomeScreen() {
 - [ ] 구매 링크 연동
 - [ ] 공유 기능
 
-#### Implementation
+#### 구현
 
 ```typescript
 // packages/mobile/app/images/[id].tsx
@@ -255,21 +255,21 @@ export default function ImageDetailScreen() {
 
 ---
 
-### M-05 Push Notifications
+### M-05 푸시 알림
 
-- **Description**: 푸시 알림 등록 및 수신
-- **Priority**: P1
-- **Status**: 🚧 Pending (Package not installed)
+- **설명**: 푸시 알림 등록 및 수신
+- **우선순위**: P1
+- **상태**: 🚧 대기 중 (패키지 미설치)
 
-#### Acceptance Criteria
+#### 수락 기준
 - [ ] 권한 요청 UI
 - [ ] Expo Push Token 등록
 - [ ] 알림 수신 핸들러
 - [ ] 알림 탭 시 딥링크 처리
 
-#### Technical Specification
+#### 기술 명세
 
-**Dependencies** (추가 예정):
+**의존성** (추가 예정):
 ```json
 {
   "expo-notifications": "~0.29.x",
@@ -277,7 +277,7 @@ export default function ImageDetailScreen() {
 }
 ```
 
-**Implementation** (예정):
+**구현** (예정):
 ```typescript
 // packages/mobile/utils/notifications.ts
 export async function registerPushToken(): Promise<string | null> {
@@ -291,34 +291,34 @@ export async function registerPushToken(): Promise<string | null> {
 }
 ```
 
-#### Files to Create
+#### 생성할 파일
 - `packages/mobile/utils/notifications.ts`
-- Server-side: `app/api/push/register/route.ts`
+- 서버 측: `app/api/push/register/route.ts`
 
 ---
 
-### M-06 Camera/Gallery Integration
+### M-06 카메라/갤러리 연동
 
-- **Description**: 이미지 촬영 및 갤러리 선택
-- **Priority**: P1
-- **Status**: 🚧 Pending (Package not installed)
+- **설명**: 이미지 촬영 및 갤러리 선택
+- **우선순위**: P1
+- **상태**: 🚧 대기 중 (패키지 미설치)
 
-#### Acceptance Criteria
+#### 수락 기준
 - [ ] 갤러리에서 이미지 선택
 - [ ] 카메라로 사진 촬영
 - [ ] 이미지 크롭/편집
 - [ ] 업로드 전 미리보기
 
-#### Technical Specification
+#### 기술 명세
 
-**Dependencies** (추가 예정):
+**의존성** (추가 예정):
 ```json
 {
   "expo-image-picker": "~16.0.x"
 }
 ```
 
-**Implementation** (예정):
+**구현** (예정):
 ```typescript
 // packages/mobile/utils/imagePicker.ts
 export async function pickImage(): Promise<PickedImage | null> {
@@ -333,13 +333,13 @@ export async function pickImage(): Promise<PickedImage | null> {
 }
 ```
 
-#### Files to Create
+#### 생성할 파일
 - `packages/mobile/utils/imagePicker.ts`
 - `packages/mobile/components/ImageUploader.tsx`
 
 ---
 
-## Development Commands
+## 개발 명령어
 
 ```bash
 # 루트에서 웹 개발 서버
@@ -366,9 +366,9 @@ eas build --platform android
 
 ---
 
-## Migration Notes
+## 마이그레이션 노트
 
-### Web App Compatibility
+### 웹 앱 호환성
 
 기존 웹 앱의 import 경로는 re-export를 통해 하위 호환성을 유지합니다:
 
@@ -384,42 +384,41 @@ export {
 
 | 플랫폼 | 렌더링 | 초기 데이터 |
 |--------|--------|-------------|
-| Web | SSR + Hydration | `initialImages` prop |
-| Mobile | CSR Only | React Query fetching |
+| 웹 | SSR + Hydration | `initialImages` prop |
+| 모바일 | CSR Only | React Query fetching |
 
 웹은 SSR을 유지하고, 모바일은 React Query의 클라이언트 사이드 페칭을 사용합니다.
 
 ---
 
-## Roadmap
+## 로드맵
 
-### Phase 1: Foundation ✅
+### 1단계: 기반 ✅
 - [x] 모노레포 설정 (Yarn workspaces)
 - [x] 공유 코드 분리 (@decoded/shared)
 - [x] Expo 프로젝트 초기화
 - [x] 홈 화면 (이미지 그리드)
 - [x] 상세 화면 (기본)
 
-### Phase 2: Core Features
+### 2단계: 핵심 기능
 - [ ] 필터/검색 UI
 - [ ] 핀 인터랙션
 - [ ] 구매 링크 연동
 
-### Phase 3: Native Features
+### 3단계: 네이티브 기능
 - [ ] 푸시 알림 (expo-notifications)
 - [ ] 카메라/갤러리 (expo-image-picker)
 - [ ] 오프라인 지원 (AsyncStorage + RQ persist)
 
-### Phase 4: Production
+### 4단계: 프로덕션
 - [ ] EAS Build 설정
 - [ ] App Store / Play Store 제출
 - [ ] 성능 최적화 (FlatList, Image caching)
 
 ---
 
-## Related Documentation
+## 관련 문서
 
 - [Expo Router Docs](https://docs.expo.dev/router/)
 - [React Query Docs](https://tanstack.com/query/latest)
 - [Zustand Docs](https://zustand.docs.pmnd.rs/)
-- Plan file: `/Users/kiyeol/.claude/plans/mellow-coalescing-eclipse.md`

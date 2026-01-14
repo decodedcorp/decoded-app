@@ -1,29 +1,29 @@
-# Quickstart Guide: Scroll Animation & Lazy Loading System
+# 퀵스타트 가이드: 스크롤 애니메이션 & 레이지 로딩 시스템
 
-**Feature**: 001-scroll-animation
-**Last Updated**: 2025-11-20
+**기능**: 001-scroll-animation
+**최종 업데이트**: 2025-11-20
 
-## Overview
+## 개요
 
-This guide provides step-by-step instructions for implementing and using the scroll animation and lazy loading system in your Next.js application.
+이 가이드는 Next.js 애플리케이션에서 스크롤 애니메이션 및 레이지 로딩 시스템을 구현하고 사용하기 위한 단계별 지침을 제공합니다.
 
-## Prerequisites
+## 사전 요구사항
 
 - Next.js 14.2.0+
 - React 18.3.0+
 - TypeScript 5.3.3+
 - Tailwind CSS 3.4.1+
-- Modern browser with IntersectionObserver support
+- IntersectionObserver를 지원하는 최신 브라우저
 
-## 5-Minute Quick Start
+## 5분 퀵 스타트
 
-### Step 1: Install (No Dependencies Required)
+### 1단계: 설치 (의존성 불필요)
 
-This feature uses native browser APIs - no npm packages needed! Just create the hook file.
+이 기능은 네이티브 브라우저 API를 사용합니다 - npm 패키지가 필요 없습니다! 훅 파일만 생성하면 됩니다.
 
-### Step 2: Create the Hook
+### 2단계: 훅 생성
 
-Create `lib/hooks/useScrollAnimation.ts`:
+`lib/hooks/useScrollAnimation.ts` 생성:
 
 ```typescript
 import { useEffect, useRef, useCallback } from "react";
@@ -51,12 +51,12 @@ export function useScrollAnimation(options: UseScrollAnimationOptions = {}) {
         entries.forEach((entry) => {
           const element = entry.target;
 
-          // Set stagger delay from data attribute
+          // data 속성에서 시차 지연 설정
           const delay = element.getAttribute("data-delay") || "0";
           element.style.setProperty("--stagger", `${delay}ms`);
 
           if (entry.isIntersecting) {
-            // Handle image lazy loading
+            // 이미지 레이지 로딩 처리
             const img = element.querySelector("img[data-src]");
             if (img && !img.getAttribute("data-loaded")) {
               const src = img.getAttribute("data-src");
@@ -66,7 +66,7 @@ export function useScrollAnimation(options: UseScrollAnimationOptions = {}) {
               }
             }
 
-            // Toggle animation classes
+            // 애니메이션 클래스 토글
             element.classList.add("is-visible");
             element.classList.remove("is-hidden");
             onEnter?.(element);
@@ -95,12 +95,12 @@ export function useScrollAnimation(options: UseScrollAnimationOptions = {}) {
 }
 ```
 
-### Step 3: Add CSS Classes
+### 3단계: CSS 클래스 추가
 
-Add to your global CSS or Tailwind config:
+전역 CSS 또는 Tailwind 설정에 추가:
 
 ```css
-/* Initial state */
+/* 초기 상태 */
 .js-observe {
   opacity: 0;
   transform: translateY(12px) scale(0.98);
@@ -111,20 +111,20 @@ Add to your global CSS or Tailwind config:
   will-change: opacity, transform;
 }
 
-/* Visible state */
+/* 표시 상태 */
 .js-observe.is-visible {
   opacity: 1;
   transform: translateY(0) scale(1);
 }
 
-/* Hidden state */
+/* 숨김 상태 */
 .js-observe.is-hidden {
   opacity: 0;
   transform: translateY(12px) scale(0.98);
 }
 ```
 
-### Step 4: Use in Your Component
+### 4단계: 컴포넌트에서 사용
 
 ```tsx
 import { useScrollAnimation } from "@/lib/hooks/useScrollAnimation";
@@ -134,27 +134,27 @@ export default function MyPage() {
 
   return (
     <div>
-      <h1>My Content</h1>
+      <h1>내 콘텐츠</h1>
 
-      {/* Animated card with stagger */}
+      {/* 시차가 있는 애니메이션 카드 */}
       <div ref={observeRef} className="js-observe" data-delay="0">
-        <h2>Card 1</h2>
-        <p>This card will fade in when scrolled into view</p>
+        <h2>카드 1</h2>
+        <p>이 카드는 스크롤로 뷰에 들어올 때 페이드인됩니다</p>
       </div>
 
       <div ref={observeRef} className="js-observe" data-delay="80">
-        <h2>Card 2</h2>
-        <p>This card will fade in 80ms after Card 1</p>
+        <h2>카드 2</h2>
+        <p>이 카드는 카드 1보다 80ms 후에 페이드인됩니다</p>
       </div>
 
-      {/* Card with lazy-loaded image */}
+      {/* 레이지 로드 이미지가 있는 카드 */}
       <div ref={observeRef} className="js-observe" data-delay="160">
         <img
           data-src="/images/photo.jpg"
           loading="lazy"
           width="400"
           height="300"
-          alt="Descriptive text"
+          alt="설명 텍스트"
           className="w-full h-auto"
         />
       </div>
@@ -163,19 +163,19 @@ export default function MyPage() {
 }
 ```
 
-### Step 5: Test It!
+### 5단계: 테스트하기!
 
 ```bash
 yarn dev
 ```
 
-Open your browser and scroll down - watch the cards animate in! 🎉
+브라우저를 열고 아래로 스크롤하세요 - 카드들이 애니메이션되는 것을 확인할 수 있습니다!
 
 ---
 
-## Common Use Cases
+## 일반적인 사용 사례
 
-### Basic Card Animation
+### 기본 카드 애니메이션
 
 ```tsx
 function AnimatedCard({ title, children, delay = 0 }) {
@@ -194,7 +194,7 @@ function AnimatedCard({ title, children, delay = 0 }) {
 }
 ```
 
-### Grid of Cards with Stagger
+### 시차가 있는 카드 그리드
 
 ```tsx
 function CardGrid({ items }) {
@@ -207,7 +207,7 @@ function CardGrid({ items }) {
           key={item.id}
           ref={observeRef}
           className="js-observe"
-          data-delay={index * 40} // 40ms stagger per card
+          data-delay={index * 40} // 카드당 40ms 시차
         >
           <img
             data-src={item.imageUrl}
@@ -224,40 +224,40 @@ function CardGrid({ items }) {
 }
 ```
 
-### With Callbacks
+### 콜백 사용
 
 ```tsx
 function TrackedAnimation() {
   const { observeRef } = useScrollAnimation({
     onEnter: (el) => {
-      console.log("Element entered:", el);
-      // Track analytics
+      console.log("요소 진입:", el);
+      // 분석 추적
     },
     onExit: (el) => {
-      console.log("Element exited:", el);
+      console.log("요소 종료:", el);
     },
   });
 
   return (
     <div ref={observeRef} className="js-observe">
-      Content with tracking
+      추적이 있는 콘텐츠
     </div>
   );
 }
 ```
 
-### Custom Threshold
+### 커스텀 임계값
 
 ```tsx
 function EarlyAnimation() {
   const { observeRef } = useScrollAnimation({
-    threshold: 0.25, // Trigger at 25% visibility
-    rootMargin: "0px 0px -20% 0px", // Earlier trigger
+    threshold: 0.25, // 25% 가시성에서 트리거
+    rootMargin: "0px 0px -20% 0px", // 더 일찍 트리거
   });
 
   return (
     <div ref={observeRef} className="js-observe">
-      Animates earlier
+      더 일찍 애니메이션됨
     </div>
   );
 }
@@ -265,18 +265,18 @@ function EarlyAnimation() {
 
 ---
 
-## Tailwind Integration
+## Tailwind 통합
 
-### Option 1: Global CSS
+### 옵션 1: 전역 CSS
 
-Add the CSS classes to `app/globals.css`:
+`app/globals.css`에 CSS 클래스 추가:
 
 ```css
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Scroll animation classes */
+/* 스크롤 애니메이션 클래스 */
 .js-observe {
   opacity: 0;
   transform: translateY(12px) scale(0.98);
@@ -298,12 +298,12 @@ Add the CSS classes to `app/globals.css`:
 }
 ```
 
-### Option 2: Tailwind Utilities (Future Enhancement)
+### 옵션 2: Tailwind 유틸리티 (향후 개선)
 
-Create custom utilities in `tailwind.config.ts`:
+`tailwind.config.ts`에서 커스텀 유틸리티 생성:
 
 ```typescript
-// Future enhancement - requires Tailwind plugin
+// 향후 개선 - Tailwind 플러그인 필요
 export default {
   plugins: [
     function ({ addUtilities }) {
@@ -324,136 +324,136 @@ export default {
 
 ---
 
-## Performance Tips
+## 성능 팁
 
-### ✅ Do
+### ✅ 해야 할 것
 
-- **Set image dimensions**: Always specify `width` and `height` to prevent CLS
-- **Use above-the-fold optimization**: Add `loading="eager"` to hero images
-- **Limit stagger**: Keep total cascade time under 1 second
-- **Test on mobile**: Verify 60fps on mid-range devices
+- **이미지 치수 설정**: CLS 방지를 위해 항상 `width`와 `height` 지정
+- **스크롤 없이 보이는 영역 최적화**: 히어로 이미지에 `loading="eager"` 추가
+- **시차 제한**: 총 캐스케이드 시간을 1초 미만으로 유지
+- **모바일 테스트**: 중급 기기에서 60fps 확인
 
 ```tsx
-// Good - dimensions specified
+// 좋음 - 치수 지정됨
 <img
   data-src="/image.jpg"
   loading="lazy"
   width="400"
   height="300"
-  alt="Description"
+  alt="설명"
 />
 
-// Good - hero image optimized
+// 좋음 - 히어로 이미지 최적화
 <img
   src="/hero.jpg"
   loading="eager"
   fetchpriority="high"
   width="1200"
   height="600"
-  alt="Hero image"
+  alt="히어로 이미지"
 />
 ```
 
-### ❌ Don't
+### ❌ 하지 말아야 할 것
 
-- **Don't animate layout properties**: Only use opacity and transform
-- **Don't query DOM in callbacks**: Keep observer callback O(1)
-- **Don't overuse will-change**: Only on `.js-observe` elements
-- **Don't exceed 1s total stagger**: Prevents perceived slowness
+- **레이아웃 속성 애니메이션 금지**: opacity와 transform만 사용
+- **콜백에서 DOM 쿼리 금지**: observer 콜백을 O(1)로 유지
+- **will-change 과용 금지**: `.js-observe` 요소에만 사용
+- **1초 이상 시차 금지**: 인지되는 느림 방지
 
 ```tsx
-// Bad - will cause layout thrashing
+// 나쁨 - 레이아웃 스래싱 발생
 <div className="animate-width"> ❌
 
-// Bad - too much stagger
+// 나쁨 - 시차가 너무 김
 data-delay="2000" ❌
 
-// Good - GPU-accelerated only
+// 좋음 - GPU 가속만
 <div className="js-observe"> ✅
 ```
 
 ---
 
-## Troubleshooting
+## 문제 해결
 
-### Animations Not Working
+### 애니메이션이 작동하지 않음
 
-**Problem**: Cards aren't animating
-**Solution**: Check CSS classes are imported in global CSS
+**문제**: 카드가 애니메이션되지 않음
+**해결**: 전역 CSS에 CSS 클래스가 임포트되었는지 확인
 
 ```tsx
-// Ensure in app/layout.tsx or app/globals.css
+// app/layout.tsx 또는 app/globals.css에 있어야 함
 import "./globals.css";
 ```
 
-### Images Not Loading
+### 이미지가 로드되지 않음
 
-**Problem**: Images remain with data-src
-**Solution**: Verify image selector and attributes
+**문제**: 이미지가 data-src 상태로 유지됨
+**해결**: 이미지 선택자와 속성 확인
 
 ```tsx
-// Correct structure
+// 올바른 구조
 <img
-  data-src="/path.jpg" // ✅ data-src not src
-  loading="lazy" // ✅ fallback
-  className="lazy" // ✅ optional but recommended
+  data-src="/path.jpg" // ✅ src가 아닌 data-src
+  loading="lazy" // ✅ 폴백
+  className="lazy" // ✅ 선택적이지만 권장
 />
 ```
 
-### Performance Issues
+### 성능 문제
 
-**Problem**: Scroll feels janky
-**Solution**: Check for non-GPU properties
+**문제**: 스크롤이 버벅거림
+**해결**: GPU가 아닌 속성 확인
 
 ```bash
-# Open Chrome DevTools > Performance
-# Record scroll session
-# Look for "Recalculate Style" or "Layout" in timeline
-# Should see only "Composite Layers"
+# Chrome DevTools > Performance 열기
+# 스크롤 세션 녹화
+# 타임라인에서 "Recalculate Style" 또는 "Layout" 찾기
+# "Composite Layers"만 보여야 함
 ```
 
-### TypeScript Errors
+### TypeScript 오류
 
-**Problem**: Type errors with useScrollAnimation
-**Solution**: Ensure types are exported
+**문제**: useScrollAnimation 타입 오류
+**해결**: 타입이 내보내졌는지 확인
 
 ```typescript
-// In lib/hooks/useScrollAnimation.ts
+// lib/hooks/useScrollAnimation.ts에서
 export interface UseScrollAnimationOptions { ... }
 export function useScrollAnimation(...) { ... }
 ```
 
 ---
 
-## Testing
+## 테스트
 
-### Manual Testing Checklist
+### 수동 테스트 체크리스트
 
-- [ ] Cards animate in when scrolled into view
-- [ ] Stagger effect visible on multiple cards
-- [ ] Images load only when near viewport
-- [ ] No layout shift when images load
-- [ ] Smooth 60fps animation
-- [ ] Works on mobile devices
-- [ ] Animations replay on scroll up then down
-- [ ] No JavaScript errors in console
+- [ ] 스크롤로 뷰에 들어올 때 카드 애니메이션
+- [ ] 여러 카드에서 시차 효과 확인
+- [ ] 뷰포트 근처에서만 이미지 로드
+- [ ] 이미지 로드 시 레이아웃 시프트 없음
+- [ ] 부드러운 60fps 애니메이션
+- [ ] 모바일 기기에서 작동
+- [ ] 위로 스크롤 후 아래로 스크롤 시 애니메이션 재생
+- [ ] 콘솔에 JavaScript 오류 없음
 
-### Playwright E2E Test (Coming Soon)
+### Playwright E2E 테스트 (예정)
 
 ```typescript
 // __tests__/e2e/scroll-animation.spec.ts
 import { test, expect } from "@playwright/test";
 
-test("cards animate on scroll", async ({ page }) => {
+test("스크롤 시 카드 애니메이션", async ({ page }) => {
   await page.goto("/");
 
-  // Scroll to trigger animation
+  // 스크롤하여 애니메이션 트리거
   await page.evaluate(() => window.scrollBy(0, 500));
 
-  // Wait for animation
+  // 애니메이션 대기
   await page.waitForTimeout(500);
 
-  // Check class was added
+  // 클래스가 추가되었는지 확인
   const card = page.locator(".js-observe").first();
   await expect(card).toHaveClass(/is-visible/);
 });
@@ -461,51 +461,51 @@ test("cards animate on scroll", async ({ page }) => {
 
 ---
 
-## Browser Support
+## 브라우저 지원
 
-| Browser | Version | Support                                                           |
+| 브라우저 | 버전 | 지원 |
 | ------- | ------- | ----------------------------------------------------------------- |
-| Chrome  | 51+     | ✅ Full                                                           |
-| Firefox | 55+     | ✅ Full                                                           |
-| Safari  | 12.1+   | ✅ Full                                                           |
-| Edge    | 15+     | ✅ Full                                                           |
-| IE 11   | -       | ⚠️ Graceful degradation (no animations, native lazy loading only) |
+| Chrome  | 51+     | ✅ 완전 |
+| Firefox | 55+     | ✅ 완전 |
+| Safari  | 12.1+   | ✅ 완전 |
+| Edge    | 15+     | ✅ 완전 |
+| IE 11   | -       | ⚠️ 점진적 향상 (애니메이션 없음, 네이티브 레이지 로딩만) |
 
-**Graceful Degradation**: On older browsers without IntersectionObserver:
+**점진적 향상**: IntersectionObserver가 없는 구형 브라우저에서:
 
-- Images use native `loading="lazy"` (if supported)
-- Content visible immediately (no animations)
-- No JavaScript errors
-
----
-
-## Next Steps
-
-- [ ] Implement the hook in `lib/hooks/useScrollAnimation.ts`
-- [ ] Add CSS classes to `app/globals.css`
-- [ ] Create example page demonstrating the feature
-- [ ] Write Playwright E2E tests
-- [ ] Performance profiling with Chrome DevTools
-- [ ] Cross-browser testing
-- [ ] User testing with 3+ users
+- 이미지는 네이티브 `loading="lazy"` 사용 (지원되는 경우)
+- 콘텐츠가 즉시 표시됨 (애니메이션 없음)
+- JavaScript 오류 없음
 
 ---
 
-## Resources
+## 다음 단계
 
-- [IntersectionObserver MDN Docs](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
+- [ ] `lib/hooks/useScrollAnimation.ts`에 훅 구현
+- [ ] `app/globals.css`에 CSS 클래스 추가
+- [ ] 기능을 시연하는 예시 페이지 생성
+- [ ] Playwright E2E 테스트 작성
+- [ ] Chrome DevTools로 성능 프로파일링
+- [ ] 크로스 브라우저 테스트
+- [ ] 3명 이상 사용자와 사용자 테스트
+
+---
+
+## 리소스
+
+- [IntersectionObserver MDN 문서](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
 - [Core Web Vitals](https://web.dev/vitals/)
-- [Next.js Image Optimization](https://nextjs.org/docs/app/building-your-application/optimizing/images)
-- [Research Document](./research.md) - Full technical research and decisions
-- [Data Model](./data-model.md) - TypeScript interfaces and type definitions
+- [Next.js 이미지 최적화](https://nextjs.org/docs/app/building-your-application/optimizing/images)
+- [리서치 문서](./research.md) - 전체 기술 리서치 및 결정
+- [데이터 모델](./data-model.md) - TypeScript 인터페이스 및 타입 정의
 
 ---
 
-## Support
+## 지원
 
-For issues or questions:
+문제나 질문이 있으면:
 
-1. Check [research.md](./research.md) for technical details
-2. Review [data-model.md](./data-model.md) for type definitions
-3. Open issue in project repository
-4. Tag with `001-scroll-animation` label
+1. [research.md](./research.md)에서 기술 세부사항 확인
+2. [data-model.md](./data-model.md)에서 타입 정의 검토
+3. 프로젝트 저장소에 이슈 열기
+4. `001-scroll-animation` 라벨 태그

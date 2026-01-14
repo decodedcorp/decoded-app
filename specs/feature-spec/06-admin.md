@@ -1,108 +1,108 @@
-# Admin Panel
+# 관리자 패널
 
-> Features: A-01 ~ A-03
-> Status: 0% implemented
-> Dependencies: U-01 (Authentication with admin role)
-
----
-
-## Overview
-
-The Admin Panel provides tools for content moderation, tag management, and business analytics. It's a separate interface accessible only to users with admin privileges.
-
-### Related Screens
-- `/admin` - Admin dashboard
-- `/admin/tags` - Tag/keyword management
-- `/admin/content` - Content moderation
-- `/admin/payouts` - Payout management
-- `/admin/analytics` - Analytics dashboard
-
-### Current Implementation
-- None - Admin panel not yet built
+> 기능: A-01 ~ A-03
+> 상태: 0% 구현됨
+> 의존성: U-01 (관리자 역할 인증)
 
 ---
 
-## Features
+## 개요
 
-### A-01 Tag/Keyword Management
+관리자 패널은 콘텐츠 모더레이션, 태그 관리, 비즈니스 분석 도구를 제공합니다. 관리자 권한이 있는 사용자만 접근할 수 있는 별도의 인터페이스입니다.
 
-- **Description**: CMS for managing Media, Cast, and Context tags
-- **Priority**: P1
-- **Status**: Not Started
-- **Dependencies**: Database hierarchical structure (S-04)
+### 관련 화면
+- `/admin` - 관리자 대시보드
+- `/admin/tags` - 태그/키워드 관리
+- `/admin/content` - 콘텐츠 모더레이션
+- `/admin/payouts` - 지급 관리
+- `/admin/analytics` - 분석 대시보드
 
-#### Acceptance Criteria
-- [ ] List all tags with filtering and search
-- [ ] Add new Media (group, show, drama)
-- [ ] Add new Cast member
-- [ ] Link Cast to Media
-- [ ] Edit existing tags
-- [ ] Soft delete (archive) tags
-- [ ] Review user-submitted tag requests
-- [ ] Approve/reject tag requests
-- [ ] Bulk operations (merge, reparent)
-- [ ] Import/export functionality
+### 현재 구현 상태
+- 없음 - 관리자 패널 미구축
 
-#### UI/UX Requirements
+---
 
-**Tag Management Dashboard**:
+## 기능 목록
+
+### A-01 태그/키워드 관리
+
+- **설명**: Media, Cast, Context 태그 관리를 위한 CMS
+- **우선순위**: P1
+- **상태**: 미시작
+- **의존성**: 데이터베이스 계층 구조 (S-04)
+
+#### 수락 기준
+- [ ] 필터링 및 검색이 가능한 모든 태그 목록
+- [ ] 새 Media 추가 (그룹, 프로그램, 드라마)
+- [ ] 새 Cast 멤버 추가
+- [ ] Cast를 Media에 연결
+- [ ] 기존 태그 편집
+- [ ] 소프트 삭제 (아카이브) 태그
+- [ ] 사용자 제출 태그 요청 검토
+- [ ] 태그 요청 승인/거부
+- [ ] 대량 작업 (병합, 상위 변경)
+- [ ] 가져오기/내보내기 기능
+
+#### UI/UX 요구사항
+
+**태그 관리 대시보드**:
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  Tag Management                                  [+ Add New]    │
+│  태그 관리                                        [+ 새로 추가]  │
 │                                                                  │
-│  [Media] [Cast] [Pending Requests (5)]                         │
+│  [Media] [Cast] [대기 중인 요청 (5)]                            │
 ├─────────────────────────────────────────────────────────────────┤
-│  🔍 Search tags...                    Type: [All ▼]            │
+│  🔍 태그 검색...                        유형: [전체 ▼]          │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
 │  ┌─────────────────────────────────────────────────────────┐   │
 │  │ 🎵 BLACKPINK                                             │   │
-│  │    Category: K-POP • Type: Group                         │   │
-│  │    Cast: Jisoo, Jennie, Rosé, Lisa                      │   │
-│  │    Posts: 1,234 • Items: 3,456                          │   │
-│  │    [Edit] [View Posts] [Archive]                        │   │
+│  │    카테고리: K-POP • 유형: 그룹                          │   │
+│  │    출연진: 지수, 제니, 로제, 리사                        │   │
+│  │    게시물: 1,234 • 아이템: 3,456                        │   │
+│  │    [편집] [게시물 보기] [아카이브]                      │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                                                                  │
 │  ┌─────────────────────────────────────────────────────────┐   │
-│  │ 🎬 Squid Game                                            │   │
-│  │    Category: K-Drama • Type: Drama                       │   │
-│  │    Cast: Lee Jung-jae, Jung Ho-yeon, +12 more           │   │
-│  │    Posts: 567 • Items: 1,890                            │   │
-│  │    [Edit] [View Posts] [Archive]                        │   │
+│  │ 🎬 오징어 게임                                           │   │
+│  │    카테고리: K-Drama • 유형: 드라마                      │   │
+│  │    출연진: 이정재, 정호연, +12명                        │   │
+│  │    게시물: 567 • 아이템: 1,890                          │   │
+│  │    [편집] [게시물 보기] [아카이브]                      │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                                                                  │
-│  [1] [2] [3] ... [15]                    Showing 1-20 of 289   │
+│  [1] [2] [3] ... [15]                    289개 중 1-20 표시     │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**Add/Edit Media Form**:
+**Media 추가/편집 폼**:
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  Add New Media                                          [✕]    │
+│  새 Media 추가                                            [✕]   │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│  Name (English) *                                               │
+│  이름 (영어) *                                                  │
 │  ┌─────────────────────────────────────────────────────────┐   │
 │  │ BLACKPINK                                                │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                                                                  │
-│  Name (Korean) *                                                │
+│  이름 (한국어) *                                                │
 │  ┌─────────────────────────────────────────────────────────┐   │
 │  │ 블랙핑크                                                  │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                                                                  │
-│  Category *                                                     │
+│  카테고리 *                                                     │
 │  [K-POP ▼]                                                     │
 │                                                                  │
-│  Type *                                                         │
-│  [Group ▼]  (Group / Show / Drama / Movie / Variety)          │
+│  유형 *                                                         │
+│  [그룹 ▼]  (그룹 / 프로그램 / 드라마 / 영화 / 예능)            │
 │                                                                  │
-│  Image                                                          │
+│  이미지                                                         │
 │  ┌─────────────────────────────────────────────────────────┐   │
-│  │ [Upload Image]                                           │   │
+│  │ [이미지 업로드]                                          │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                                                                  │
-│  Metadata (JSON)                                                │
+│  메타데이터 (JSON)                                              │
 │  ┌─────────────────────────────────────────────────────────┐   │
 │  │ {                                                        │   │
 │  │   "agency": "YG Entertainment",                         │   │
@@ -110,39 +110,39 @@ The Admin Panel provides tools for content moderation, tag management, and busin
 │  │ }                                                        │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                                                                  │
-│                              [Cancel] [Save Media]              │
+│                              [취소] [Media 저장]               │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**Tag Request Review**:
+**태그 요청 검토**:
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  Pending Tag Requests                                           │
+│  대기 중인 태그 요청                                            │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
 │  ┌─────────────────────────────────────────────────────────┐   │
-│  │ Request #127                           Jan 8, 2026      │   │
+│  │ 요청 #127                           2026년 1월 8일       │   │
 │  │                                                          │   │
-│  │ Type: Cast                                               │   │
-│  │ Name: Kim Chaewon                                        │   │
-│  │ Korean: 김채원                                           │   │
-│  │ Related Media: LE SSERAFIM                              │   │
+│  │ 유형: Cast                                               │   │
+│  │ 이름: Kim Chaewon                                        │   │
+│  │ 한국어: 김채원                                           │   │
+│  │ 관련 Media: 르세라핌                                     │   │
 │  │                                                          │   │
-│  │ Submitted by: user@example.com                          │   │
-│  │ Reason: "New member added to group"                     │   │
+│  │ 제출자: user@example.com                                │   │
+│  │ 사유: "그룹에 새 멤버 추가됨"                           │   │
 │  │                                                          │   │
-│  │ [✓ Approve] [✗ Reject] [Edit & Approve]                │   │
+│  │ [✓ 승인] [✗ 거부] [수정 후 승인]                       │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-#### Data Requirements
-- Tag request table for pending submissions
-- Audit log for tag changes
-- Admin user permissions
+#### 데이터 요구사항
+- 대기 중인 제출을 위한 태그 요청 테이블
+- 태그 변경에 대한 감사 로그
+- 관리자 사용자 권한
 
-#### API Endpoints
+#### API 엔드포인트
 ```
 GET /api/admin/tags?type=media&page=1&search=
 POST /api/admin/tags/media
@@ -157,8 +157,8 @@ POST /api/admin/tags/bulk
   body: { action: 'merge' | 'archive', ids: string[] }
 ```
 
-#### Files to Create/Modify
-- `app/admin/layout.tsx` - Admin layout
+#### 생성/수정할 파일
+- `app/admin/layout.tsx` - 관리자 레이아웃
 - `app/admin/tags/page.tsx`
 - `lib/components/admin/TagTable.tsx`
 - `lib/components/admin/TagForm.tsx`
@@ -166,102 +166,102 @@ POST /api/admin/tags/bulk
 
 ---
 
-### A-02 Content/Payout Management
+### A-02 콘텐츠/지급 관리
 
-- **Description**: Review and moderate user-submitted content; process payouts
-- **Priority**: P1
-- **Status**: Not Started
-- **Dependencies**: A-01, S-06 (Reward Batch)
+- **설명**: 사용자 제출 콘텐츠 검토 및 모더레이션; 지급 처리
+- **우선순위**: P1
+- **상태**: 미시작
+- **의존성**: A-01, S-06 (리워드 배치)
 
-#### Acceptance Criteria
+#### 수락 기준
 
-**Content Moderation**:
-- [ ] List all posts with status filter
-- [ ] View post details with all items
-- [ ] Approve/reject posts
-- [ ] Flag inappropriate content
-- [ ] Edit post metadata
-- [ ] Remove specific items from post
-- [ ] Ban/suspend users
+**콘텐츠 모더레이션**:
+- [ ] 상태 필터가 있는 모든 게시물 목록
+- [ ] 모든 아이템이 포함된 게시물 상세 보기
+- [ ] 게시물 승인/거부
+- [ ] 부적절한 콘텐츠 플래그
+- [ ] 게시물 메타데이터 편집
+- [ ] 게시물에서 특정 아이템 제거
+- [ ] 사용자 차단/정지
 
-**Payout Management**:
-- [ ] List pending withdrawal requests
-- [ ] View user earnings history
-- [ ] Approve/reject withdrawals
-- [ ] Mark as paid
-- [ ] Generate payout reports
-- [ ] Handle disputes
+**지급 관리**:
+- [ ] 대기 중인 출금 요청 목록
+- [ ] 사용자 수익 내역 보기
+- [ ] 출금 승인/거부
+- [ ] 지급 완료로 표시
+- [ ] 지급 보고서 생성
+- [ ] 분쟁 처리
 
-#### UI/UX Requirements
+#### UI/UX 요구사항
 
-**Content Moderation Queue**:
+**콘텐츠 모더레이션 큐**:
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  Content Moderation                                             │
+│  콘텐츠 모더레이션                                               │
 │                                                                  │
-│  [Pending (23)] [Published] [Rejected] [Flagged]               │
+│  [대기 중 (23)] [게시됨] [거부됨] [플래그됨]                    │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
 │  ┌─────────────────────────────────────────────────────────┐   │
-│  │ [Image]  Post #4521                    Jan 8, 2:34 PM   │   │
-│  │          By: user123                                     │   │
-│  │          Tags: BLACKPINK > Jennie > Airport             │   │
-│  │          Items: 3                                        │   │
+│  │ [이미지]  게시물 #4521               1월 8일 오후 2:34   │   │
+│  │           작성자: user123                                │   │
+│  │           태그: BLACKPINK > 제니 > 공항                 │   │
+│  │           아이템: 3                                      │   │
 │  │                                                          │   │
-│  │ [View Details] [✓ Approve] [✗ Reject] [🚩 Flag]        │   │
+│  │ [상세 보기] [✓ 승인] [✗ 거부] [🚩 플래그]             │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                                                                  │
 │  ┌─────────────────────────────────────────────────────────┐   │
-│  │ [Image]  Post #4520                    Jan 8, 2:12 PM   │   │
-│  │          By: fashionista                                 │   │
-│  │          Tags: IVE > Wonyoung > Stage                   │   │
-│  │          Items: 5                                        │   │
+│  │ [이미지]  게시물 #4520               1월 8일 오후 2:12   │   │
+│  │           작성자: fashionista                            │   │
+│  │           태그: IVE > 원영 > 무대                        │   │
+│  │           아이템: 5                                      │   │
 │  │                                                          │   │
-│  │ [View Details] [✓ Approve] [✗ Reject] [🚩 Flag]        │   │
+│  │ [상세 보기] [✓ 승인] [✗ 거부] [🚩 플래그]             │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**Payout Management**:
+**지급 관리**:
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  Payout Management                                              │
+│  지급 관리                                                       │
 │                                                                  │
-│  [Pending (8)] [Processing] [Completed] [Rejected]             │
+│  [대기 중 (8)] [처리 중] [완료됨] [거부됨]                      │
 │                                                                  │
-│  Summary:                                                        │
-│  Total Pending: ₩1,234,500                                      │
-│  This Month Paid: ₩5,678,000                                    │
+│  요약:                                                           │
+│  대기 중 총액: ₩1,234,500                                       │
+│  이번 달 지급: ₩5,678,000                                       │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
 │  ┌─────────────────────────────────────────────────────────┐   │
-│  │ Request #891                           Jan 7, 2026      │   │
-│  │ User: top_contributor                                    │   │
-│  │ Amount: ₩150,000                                        │   │
-│  │ Method: Bank Transfer (신한 xxx-xxx-123456)             │   │
+│  │ 요청 #891                           2026년 1월 7일       │   │
+│  │ 사용자: top_contributor                                  │   │
+│  │ 금액: ₩150,000                                          │   │
+│  │ 방법: 은행 이체 (신한 xxx-xxx-123456)                   │   │
 │  │                                                          │   │
-│  │ User Stats:                                              │   │
-│  │ • Total Earnings: ₩450,000                              │   │
-│  │ • Previous Payouts: 2 (all successful)                  │   │
-│  │ • Account Age: 8 months                                 │   │
+│  │ 사용자 통계:                                            │   │
+│  │ • 총 수익: ₩450,000                                     │   │
+│  │ • 이전 지급: 2회 (모두 성공)                            │   │
+│  │ • 계정 나이: 8개월                                      │   │
 │  │                                                          │   │
-│  │ [View History] [✓ Approve] [✗ Reject]                  │   │
+│  │ [내역 보기] [✓ 승인] [✗ 거부]                         │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                                                                  │
-│  Bulk Actions: [ ] Select All  [Process Selected]              │
+│  대량 작업: [ ] 전체 선택  [선택 항목 처리]                     │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-#### Data Requirements
-- Post status field (pending, published, rejected, flagged)
-- Moderation audit log
-- Withdrawal request table
-- Payout history
+#### 데이터 요구사항
+- 게시물 상태 필드 (pending, published, rejected, flagged)
+- 모더레이션 감사 로그
+- 출금 요청 테이블
+- 지급 내역
 
-#### API Endpoints
+#### API 엔드포인트
 ```
-# Content
+# 콘텐츠
 GET /api/admin/posts?status=pending&page=1
 GET /api/admin/posts/:id
 PUT /api/admin/posts/:id/status
@@ -269,7 +269,7 @@ PUT /api/admin/posts/:id/status
 POST /api/admin/posts/:id/flag
 POST /api/admin/users/:id/ban
 
-# Payouts
+# 지급
 GET /api/admin/withdrawals?status=pending
 GET /api/admin/withdrawals/:id
 PUT /api/admin/withdrawals/:id/approve
@@ -278,7 +278,7 @@ PUT /api/admin/withdrawals/:id/complete
 GET /api/admin/payouts/report?month=2026-01
 ```
 
-#### Files to Create/Modify
+#### 생성/수정할 파일
 - `app/admin/content/page.tsx`
 - `app/admin/payouts/page.tsx`
 - `lib/components/admin/PostModerationCard.tsx`
@@ -287,107 +287,107 @@ GET /api/admin/payouts/report?month=2026-01
 
 ---
 
-### A-03 Analytics Dashboard
+### A-03 분석 대시보드
 
-- **Description**: Monitor key metrics and KPIs
-- **Priority**: P1
-- **Status**: Not Started
-- **Dependencies**: All tracking systems
+- **설명**: 주요 지표 및 KPI 모니터링
+- **우선순위**: P1
+- **상태**: 미시작
+- **의존성**: 모든 추적 시스템
 
-#### Acceptance Criteria
-- [ ] Real-time visitor count
-- [ ] Daily/weekly/monthly active users
-- [ ] Post creation metrics
-- [ ] Click-through rates
-- [ ] Conversion rates
-- [ ] Revenue metrics
-- [ ] Top contributors
-- [ ] Popular content
-- [ ] Engagement trends
-- [ ] Export reports
+#### 수락 기준
+- [ ] 실시간 방문자 수
+- [ ] 일간/주간/월간 활성 사용자
+- [ ] 게시물 생성 지표
+- [ ] 클릭률
+- [ ] 전환율
+- [ ] 수익 지표
+- [ ] 상위 기여자
+- [ ] 인기 콘텐츠
+- [ ] 참여 추세
+- [ ] 보고서 내보내기
 
-#### UI/UX Requirements
+#### UI/UX 요구사항
 
-**Analytics Dashboard**:
+**분석 대시보드**:
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  Analytics Dashboard                    [Jan 1 - Jan 8, 2026 ▼]│
+│  분석 대시보드                      [2026년 1월 1일 - 1월 8일 ▼]│
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│  Key Metrics                                                     │
+│  주요 지표                                                       │
 │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐              │
 │  │ 12,345  │ │  1,234  │ │  5.2%   │ │ ₩1.2M  │              │
-│  │  DAU    │ │  Posts  │ │  CTR    │ │Revenue │              │
+│  │  DAU    │ │ 게시물  │ │  CTR    │ │  수익  │              │
 │  │ +12%    │ │ +8%     │ │ +0.3%   │ │ +15%   │              │
 │  └─────────┘ └─────────┘ └─────────┘ └─────────┘              │
 │                                                                  │
 │  ┌─────────────────────────────────────────────────────────┐   │
-│  │  User Activity Trend                                     │   │
+│  │  사용자 활동 추세                                        │   │
 │  │  ▁▂▃▄▅▆▇█▇▆▅▄▃▂▁                                       │   │
-│  │  Jan 1  Jan 2  Jan 3  Jan 4  Jan 5  Jan 6  Jan 7  Jan 8│   │
+│  │  1/1    1/2    1/3    1/4    1/5    1/6    1/7    1/8   │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                                                                  │
 │  ┌────────────────────────┐ ┌────────────────────────────┐    │
-│  │ Top Content (Week)     │ │ Top Contributors           │    │
+│  │ 인기 콘텐츠 (주간)      │ │ 상위 기여자               │    │
 │  │                        │ │                            │    │
-│  │ 1. BLACKPINK Airport  │ │ 1. user123 (127 posts)    │    │
-│  │    1,234 views         │ │ 2. fashionista (89 posts)│    │
-│  │ 2. IVE Music Bank     │ │ 3. kpop_fan (76 posts)   │    │
-│  │    987 views           │ │                            │    │
-│  │ 3. NewJeans Photoshoot│ │                            │    │
-│  │    876 views           │ │                            │    │
+│  │ 1. BLACKPINK 공항     │ │ 1. user123 (127 게시물)   │    │
+│  │    1,234 조회          │ │ 2. fashionista (89 게시물)│    │
+│  │ 2. IVE 뮤직뱅크       │ │ 3. kpop_fan (76 게시물)  │    │
+│  │    987 조회            │ │                            │    │
+│  │ 3. NewJeans 화보      │ │                            │    │
+│  │    876 조회            │ │                            │    │
 │  └────────────────────────┘ └────────────────────────────┘    │
 │                                                                  │
 │  ┌─────────────────────────────────────────────────────────┐   │
-│  │ Revenue Breakdown                                        │   │
+│  │ 수익 분석                                                │   │
 │  │                                                          │   │
-│  │ By Source:              By Category:                    │   │
-│  │ ████████ Musinsa 45%    ████████ K-POP 62%             │   │
+│  │ 출처별:                  카테고리별:                     │   │
+│  │ ████████ 무신사 45%     ████████ K-POP 62%             │   │
 │  │ ██████ Farfetch 28%     ████ K-Drama 23%               │   │
-│  │ ████ 29CM 18%           ██ Other 15%                    │   │
-│  │ ██ Other 9%                                              │   │
+│  │ ████ 29CM 18%           ██ 기타 15%                     │   │
+│  │ ██ 기타 9%                                               │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                                                                  │
-│  [Export PDF] [Export CSV]                                      │
+│  [PDF 내보내기] [CSV 내보내기]                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-#### Data Requirements
-- Aggregated metrics tables (materialized views)
-- Time-series data storage
-- Real-time event streaming (optional)
+#### 데이터 요구사항
+- 집계된 지표 테이블 (materialized views)
+- 시계열 데이터 저장소
+- 실시간 이벤트 스트리밍 (선택)
 
-#### Metrics to Track
+#### 추적할 지표
 
-**User Metrics**:
-- Daily/Weekly/Monthly Active Users (DAU/WAU/MAU)
-- New user signups
-- User retention (D1, D7, D30)
-- Session duration
-- Bounce rate
+**사용자 지표**:
+- 일간/주간/월간 활성 사용자 (DAU/WAU/MAU)
+- 신규 사용자 가입
+- 사용자 리텐션 (D1, D7, D30)
+- 세션 지속 시간
+- 이탈률
 
-**Content Metrics**:
-- Posts created (per day/week)
-- Posts per user
-- Items identified
-- Average items per post
-- Content moderation rate
+**콘텐츠 지표**:
+- 생성된 게시물 (일별/주별)
+- 사용자별 게시물
+- 식별된 아이템
+- 게시물당 평균 아이템
+- 콘텐츠 모더레이션 비율
 
-**Engagement Metrics**:
-- Page views
-- Detail view opens
-- Comments per post
-- Votes per item
-- Favorites added
+**참여 지표**:
+- 페이지 조회수
+- 상세 뷰 오픈
+- 게시물당 댓글
+- 아이템당 투표
+- 즐겨찾기 추가
 
-**Business Metrics**:
-- Click-through rate (CTR)
-- Conversion rate
-- Revenue per user
-- Average order value
-- Commission earned
+**비즈니스 지표**:
+- 클릭률 (CTR)
+- 전환율
+- 사용자당 수익
+- 평균 주문 금액
+- 획득 커미션
 
-#### API Endpoints
+#### API 엔드포인트
 ```
 GET /api/admin/analytics/overview?period=7d
 GET /api/admin/analytics/users?period=30d
@@ -398,11 +398,11 @@ GET /api/admin/analytics/top-contributors?period=7d&limit=10
 GET /api/admin/analytics/export?type=pdf&period=30d
 ```
 
-#### Implementation Notes
+#### 구현 노트
 
-**Materialized Views for Metrics**:
+**지표용 Materialized Views**:
 ```sql
--- Daily metrics snapshot
+-- 일일 지표 스냅샷
 CREATE MATERIALIZED VIEW daily_metrics AS
 SELECT
   DATE(created_at) as date,
@@ -413,15 +413,15 @@ SELECT
 FROM events
 GROUP BY DATE(created_at);
 
--- Refresh daily
+-- 매일 갱신
 SELECT cron.schedule('refresh-daily-metrics', '0 1 * * *', $$
   REFRESH MATERIALIZED VIEW daily_metrics;
 $$);
 ```
 
-**Chart Library**:
+**차트 라이브러리**:
 ```typescript
-// Using Recharts or Chart.js
+// Recharts 또는 Chart.js 사용
 import { LineChart, Line, BarChart, Bar, PieChart, Pie } from 'recharts';
 
 function UserActivityChart({ data }) {
@@ -434,9 +434,9 @@ function UserActivityChart({ data }) {
 }
 ```
 
-#### Files to Create/Modify
-- `app/admin/page.tsx` - Dashboard home
-- `app/admin/analytics/page.tsx` - Detailed analytics
+#### 생성/수정할 파일
+- `app/admin/page.tsx` - 대시보드 홈
+- `app/admin/analytics/page.tsx` - 상세 분석
 - `lib/components/admin/MetricCard.tsx`
 - `lib/components/admin/ActivityChart.tsx`
 - `lib/components/admin/RevenueChart.tsx`
@@ -446,9 +446,9 @@ function UserActivityChart({ data }) {
 
 ---
 
-## Admin Authentication
+## 관리자 인증
 
-### Role-based Access Control
+### 역할 기반 접근 제어
 
 ```typescript
 // lib/auth/roles.ts
@@ -461,7 +461,7 @@ const rolePermissions: Record<AdminRole, string[]> = {
   viewer: ['*.view'],
 };
 
-// Middleware
+// 미들웨어
 export function requireAdmin(permission: string) {
   return async (req: Request) => {
     const user = await getUser(req);
@@ -475,7 +475,7 @@ export function requireAdmin(permission: string) {
 }
 ```
 
-### Admin Layout
+### 관리자 레이아웃
 
 ```typescript
 // app/admin/layout.tsx
@@ -496,11 +496,11 @@ export default function AdminLayout({ children }) {
 
 ---
 
-## Data Models
+## 데이터 모델
 
-See [data-models.md](./data-models.md) for full type definitions.
+전체 타입 정의는 [data-models.md](./data-models.md) 참조.
 
-### Key Types for Admin
+### 관리자용 주요 타입
 
 ```typescript
 interface AdminUser {
@@ -546,35 +546,35 @@ interface PayoutAction {
 
 ---
 
-## Migration Path
+## 마이그레이션 경로
 
-### Phase 1: Basic Admin Setup
-1. Create admin role system
-2. Build admin layout and navigation
-3. Implement authentication middleware
+### 1단계: 기본 관리자 설정
+1. 관리자 역할 시스템 생성
+2. 관리자 레이아웃 및 네비게이션 구축
+3. 인증 미들웨어 구현
 
-### Phase 2: Tag Management
-1. Build tag CRUD interfaces
-2. Implement tag request review
-3. Add bulk operations
+### 2단계: 태그 관리
+1. 태그 CRUD 인터페이스 구축
+2. 태그 요청 검토 구현
+3. 대량 작업 추가
 
-### Phase 3: Content Moderation
-1. Build post moderation queue
-2. Implement approve/reject flow
-3. Add user management
+### 3단계: 콘텐츠 모더레이션
+1. 게시물 모더레이션 큐 구축
+2. 승인/거부 흐름 구현
+3. 사용자 관리 추가
 
-### Phase 4: Payouts & Analytics
-1. Build payout management interface
-2. Create analytics dashboard
-3. Add export functionality
+### 4단계: 지급 & 분석
+1. 지급 관리 인터페이스 구축
+2. 분석 대시보드 생성
+3. 내보내기 기능 추가
 
 ---
 
-## Security Considerations
+## 보안 고려사항
 
-- Admin panel on separate subdomain (admin.decoded.app)
-- Additional 2FA required for admin access
-- All admin actions logged with full audit trail
-- IP allowlisting for admin access (optional)
-- Rate limiting on admin APIs
-- Session timeout after inactivity
+- 관리자 패널은 별도 서브도메인에 배치 (admin.decoded.app)
+- 관리자 접근에 추가 2FA 필요
+- 모든 관리자 작업은 전체 감사 추적으로 로깅
+- 관리자 접근을 위한 IP 화이트리스팅 (선택)
+- 관리자 API에 Rate limiting
+- 비활성 후 세션 타임아웃

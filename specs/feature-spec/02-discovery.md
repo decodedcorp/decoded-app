@@ -1,99 +1,99 @@
-# Discovery
+# 디스커버리
 
-> Features: D-01 ~ D-04
-> Status: 30% implemented
-> Dependencies: Database hierarchical structure
-
----
-
-## Overview
-
-Discovery features enable users to explore and find fashion items through an immersive, drill-down experience. The goal is to facilitate deep-dive exploration from broad categories to specific items.
-
-### Related Screens
-- `/` - Home feed
-- `/search` - Search results
-- `/media/[id]` - Media gallery (drama, group)
-- `/cast/[id]` - Cast page
-
-### Current Implementation
-- `app/page.tsx` - Home with infinite scroll feed
-- `app/HomeClient.tsx` - Client-side feed logic
-- `lib/components/grid/ThiingsGrid.tsx` - Masonry grid
-- `lib/stores/filterStore.ts` - Basic filter state (2-level only)
+> 기능: D-01 ~ D-04
+> 상태: 30% 구현
+> 의존성: 데이터베이스 계층 구조
 
 ---
 
-## Features
+## 개요
 
-### D-01 Responsive Magazine Feed
+디스커버리 기능은 몰입형 드릴다운 경험을 통해 사용자가 패션 아이템을 탐색하고 찾을 수 있게 합니다. 목표는 넓은 카테고리에서 특정 아이템까지 딥다이브 탐색을 촉진하는 것입니다.
 
-- **Description**: Mobile shows short-form vertical scroll; Web shows Pinterest-style masonry grid
-- **Priority**: P0
-- **Status**: **Implemented** ✅
-- **Dependencies**: None
+### 관련 화면
+- `/` - 홈 피드
+- `/search` - 검색 결과
+- `/media/[id]` - 미디어 갤러리 (드라마, 그룹)
+- `/cast/[id]` - 출연진 페이지
 
-#### Current Implementation
-- `ThiingsGrid.tsx` - Custom masonry grid with dynamic sizing
-- `CardCell.tsx` - Individual feed cards
-- `useInfiniteFilteredImages()` - Infinite scroll data fetching
+### 현재 구현
+- `app/page.tsx` - 무한 스크롤 피드가 있는 홈
+- `app/HomeClient.tsx` - 클라이언트 사이드 피드 로직
+- `lib/components/grid/ThiingsGrid.tsx` - Masonry 그리드
+- `lib/stores/filterStore.ts` - 기본 필터 상태 (2단계만)
 
-#### Acceptance Criteria
-- [x] Mobile: Vertical scroll with full-width cards
-- [x] Web: Multi-column masonry layout
-- [x] Infinite scroll pagination
-- [x] Loading states and skeletons
-- [x] Smooth scroll performance (60fps)
-- [x] Image lazy loading
+---
 
-#### Related Files
+## 기능
+
+### D-01 반응형 매거진 피드
+
+- **설명**: 모바일은 세로 스크롤 숏폼; 웹은 Pinterest 스타일 Masonry 그리드
+- **우선순위**: P0
+- **상태**: **구현됨** ✅
+- **의존성**: 없음
+
+#### 현재 구현
+- `ThiingsGrid.tsx` - 동적 사이징이 적용된 커스텀 Masonry 그리드
+- `CardCell.tsx` - 개별 피드 카드
+- `useInfiniteFilteredImages()` - 무한 스크롤 데이터 페칭
+
+#### 인수 조건
+- [x] 모바일: 전체 너비 카드로 세로 스크롤
+- [x] 웹: 멀티 컬럼 Masonry 레이아웃
+- [x] 무한 스크롤 페이지네이션
+- [x] 로딩 상태 및 스켈레톤
+- [x] 부드러운 스크롤 성능 (60fps)
+- [x] 이미지 지연 로딩
+
+#### 관련 파일
 - `lib/components/grid/ThiingsGrid.tsx`
 - `lib/components/grid/CardCell.tsx`
 - `lib/hooks/useInfiniteFilteredImages.ts`
 - `app/HomeClient.tsx`
 
-#### Future Improvements
-- [ ] Skeleton loading animations
-- [ ] Pull-to-refresh on mobile
-- [ ] Grid layout persistence
+#### 향후 개선사항
+- [ ] 스켈레톤 로딩 애니메이션
+- [ ] 모바일 당겨서 새로고침
+- [ ] 그리드 레이아웃 유지
 
 ---
 
-### D-02 Hierarchical Filter (Deep Filter)
+### D-02 계층적 필터 (딥 필터)
 
-- **Description**: Drill-down filtering from Category → Media → Cast → Context
-- **Priority**: P0
-- **Status**: Not Started (only 2-level filter exists)
-- **Dependencies**: Media/Cast database tables
+- **설명**: Category → Media → Cast → Context 순으로 드릴다운 필터링
+- **우선순위**: P0
+- **상태**: 미시작 (2단계 필터만 존재)
+- **의존성**: Media/Cast 데이터베이스 테이블
 
-#### Acceptance Criteria
-- [ ] Level 1: Category selection (K-POP, K-Drama, etc.)
-- [ ] Level 2: Media/Group selection (shows list based on category)
-- [ ] Level 3: Cast selection (people in selected media)
-- [ ] Level 4: Context selection (airport, stage, etc.)
-- [ ] Breadcrumb navigation showing current filter path
-- [ ] "Clear all" resets to no filter
-- [ ] Each level click updates feed immediately
-- [ ] URL reflects filter state (shareable links)
-- [ ] Mobile: Bottom sheet filter UI
-- [ ] Web: Sidebar or horizontal filter bar
+#### 인수 조건
+- [ ] 레벨 1: 카테고리 선택 (K-POP, K-Drama 등)
+- [ ] 레벨 2: Media/Group 선택 (카테고리 기반 목록 표시)
+- [ ] 레벨 3: 출연진 선택 (선택된 미디어의 인물)
+- [ ] 레벨 4: 컨텍스트 선택 (공항, 무대 등)
+- [ ] 현재 필터 경로를 보여주는 Breadcrumb 네비게이션
+- [ ] "전체 초기화"로 필터 없음 상태로 리셋
+- [ ] 각 레벨 클릭 시 피드 즉시 업데이트
+- [ ] URL이 필터 상태를 반영 (공유 가능한 링크)
+- [ ] 모바일: 바텀시트 필터 UI
+- [ ] 웹: 사이드바 또는 가로 필터바
 
-#### UI/UX Requirements
+#### UI/UX 요구사항
 
-**Desktop Filter Bar**:
+**데스크톱 필터바**:
 ```
 ┌──────────────────────────────────────────────────────────────────┐
 │  Category ▼  │  Media/Group ▼  │  Cast ▼  │  Context ▼  │ ✕ Clear│
 └──────────────────────────────────────────────────────────────────┘
 
 Selected: K-POP > BTS > Jungkook > Airport
-          ↑ clickable breadcrumb to go back
+          ↑ 클릭 가능한 breadcrumb으로 뒤로 이동
 ```
 
-**Mobile Filter (Bottom Sheet)**:
+**모바일 필터 (바텀시트)**:
 ```
 ┌─────────────────────────────────┐
-│  ═══════════════════           │  ← drag handle
+│  ═══════════════════           │  ← 드래그 핸들
 │                                 │
 │  🔥 K-POP                      │
 │     └─ BTS                     │
@@ -106,7 +106,7 @@ Selected: K-POP > BTS > Jungkook > Airport
 └─────────────────────────────────┘
 ```
 
-**Filter Dropdown (Level 2 - Media)**:
+**필터 드롭다운 (레벨 2 - Media)**:
 ```
 ┌─────────────────────────────────┐
 │ Select Media/Group              │
@@ -118,52 +118,52 @@ Selected: K-POP > BTS > Jungkook > Airport
 │ 📺 Squid Game               43   │
 │ 📺 Crash Course in Romance  28   │
 └─────────────────────────────────┘
-   ^ Shows count of items in each
+   ^ 각 항목의 아이템 개수 표시
 ```
 
-#### Data Requirements
+#### 데이터 요구사항
 
-**New Tables/Columns**:
-- `media` table with category reference
-- `cast` table
-- `media_cast` junction table
-- `post.media_id` foreign key
+**새 테이블/컬럼**:
+- `media` 테이블 (category 참조)
+- `cast` 테이블
+- `media_cast` 연결 테이블
+- `post.media_id` 외래키
 - `post.context_type` enum
 
-**Filter API**:
+**필터 API**:
 ```
 GET /api/filters/categories
-  → Returns category list with counts
+  → 카운트와 함께 카테고리 목록 반환
 
 GET /api/filters/media?category=K-POP
-  → Returns media list filtered by category
+  → 카테고리별 필터링된 미디어 목록 반환
 
 GET /api/filters/cast?mediaId=xxx
-  → Returns cast list for specific media
+  → 특정 미디어의 출연진 목록 반환
 
 GET /api/filters/contexts
-  → Returns context type list with counts
+  → 카운트와 함께 컨텍스트 타입 목록 반환
 ```
 
-#### State Management
+#### 상태 관리
 
 ```typescript
-// lib/stores/filterStore.ts (updated)
+// lib/stores/filterStore.ts (업데이트)
 interface FilterState {
-  // Current selections
+  // 현재 선택
   category: CategoryType | null;
   mediaId: string | null;
   castId: string | null;
   contextType: ContextType | null;
 
-  // Computed breadcrumb
+  // 계산된 breadcrumb
   breadcrumb: FilterBreadcrumb[];
 
-  // Available options at each level
+  // 각 레벨의 사용 가능한 옵션
   availableMedia: Media[];
   availableCast: Cast[];
 
-  // Actions
+  // 액션
   setCategory: (cat: CategoryType | null) => void;
   setMedia: (id: string | null) => void;
   setCast: (id: string | null) => void;
@@ -173,7 +173,7 @@ interface FilterState {
 }
 ```
 
-#### URL Schema
+#### URL 스키마
 ```
 /?category=K-POP
 /?category=K-POP&media=bts-uuid
@@ -181,34 +181,34 @@ interface FilterState {
 /?category=K-POP&media=bts-uuid&cast=jungkook-uuid&context=airport
 ```
 
-#### Files to Create/Modify
-- `lib/stores/filterStore.ts` - Expand to 4 levels
-- `lib/components/filter/HierarchicalFilter.tsx` - New component
-- `lib/components/filter/FilterDropdown.tsx` - Dropdown for each level
-- `lib/components/filter/FilterBreadcrumb.tsx` - Breadcrumb nav
-- `lib/components/filter/MobileFilterSheet.tsx` - Bottom sheet
-- `lib/hooks/useFilterOptions.ts` - Fetch filter options
+#### 생성/수정할 파일
+- `lib/stores/filterStore.ts` - 4단계로 확장
+- `lib/components/filter/HierarchicalFilter.tsx` - 새 컴포넌트
+- `lib/components/filter/FilterDropdown.tsx` - 각 레벨용 드롭다운
+- `lib/components/filter/FilterBreadcrumb.tsx` - Breadcrumb 네비게이션
+- `lib/components/filter/MobileFilterSheet.tsx` - 바텀시트
+- `lib/hooks/useFilterOptions.ts` - 필터 옵션 페치
 
 ---
 
-### D-03 Media Gallery
+### D-03 미디어 갤러리
 
-- **Description**: Dedicated page for a specific show/drama/group showing all related content
-- **Priority**: P1
-- **Status**: Not Started
-- **Dependencies**: D-02 (Hierarchical Filter), Media table
+- **설명**: 특정 쇼/드라마/그룹의 관련 콘텐츠를 보여주는 전용 페이지
+- **우선순위**: P1
+- **상태**: 미시작
+- **의존성**: D-02 (계층적 필터), Media 테이블
 
-#### Acceptance Criteria
-- [ ] `/media/[id]` route displays media details
-- [ ] Hero section with media poster/logo
-- [ ] "Featured Cast" section with member grid
-- [ ] All posts filtered to this media
-- [ ] Popular items from this media
-- [ ] Related media suggestions
+#### 인수 조건
+- [ ] `/media/[id]` 라우트가 미디어 상세 표시
+- [ ] 미디어 포스터/로고가 있는 Hero 섹션
+- [ ] 멤버 그리드가 있는 "주요 출연진" 섹션
+- [ ] 이 미디어로 필터링된 모든 게시물
+- [ ] 이 미디어의 인기 아이템
+- [ ] 관련 미디어 추천
 
-#### UI/UX Requirements
+#### UI/UX 요구사항
 
-**Media Gallery Layout**:
+**미디어 갤러리 레이아웃**:
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  [Hero Image]                                               │
@@ -225,7 +225,7 @@ interface FilterState {
 │  │Jung │ │Lee  │ │Park │ │Wi   │                          │
 │  │Ho-  │ │Jung-│ │Hae- │ │Ha-  │                          │
 │  │yeon │ │jae  │ │soo  │ │joon │                          │
-│  │(67) │ │(45) │ │(32) │ │(28) │ ← item counts             │
+│  │(67) │ │(45) │ │(32) │ │(28) │ ← 아이템 개수             │
 │  └─────┘ └─────┘ └─────┘ └─────┘                          │
 └─────────────────────────────────────────────────────────────┘
 
@@ -238,63 +238,63 @@ interface FilterState {
 └─────────────────────────────────────────────────────────────┘
 ```
 
-#### Data Requirements
-- Media details (name, type, year, platform, image)
-- Cast associated with media
-- Posts filtered by media_id
-- Aggregate stats
+#### 데이터 요구사항
+- 미디어 상세 (이름, 타입, 연도, 플랫폼, 이미지)
+- 미디어 관련 출연진
+- media_id로 필터링된 게시물
+- 집계 통계
 
-#### API Endpoints
+#### API 엔드포인트
 ```
 GET /api/media/:id
-  → Media details with cast list
+  → 출연진 목록과 함께 미디어 상세
 
 GET /api/media/:id/posts?page=1
-  → Paginated posts for this media
+  → 이 미디어의 페이지네이션된 게시물
 
 GET /api/media/:id/stats
-  → Item counts, contributor counts
+  → 아이템 개수, 기여자 수
 ```
 
-#### Files to Create/Modify
-- `app/media/[id]/page.tsx` - Media gallery page
+#### 생성/수정할 파일
+- `app/media/[id]/page.tsx` - 미디어 갤러리 페이지
 - `lib/components/media/MediaHero.tsx`
 - `lib/components/media/CastGrid.tsx`
 - `lib/hooks/useMediaDetail.ts`
 
 ---
 
-### D-04 Unified Search
+### D-04 통합 검색
 
-- **Description**: Search across People, Media, and Items with tabbed results
-- **Priority**: P0
-- **Status**: Partial (keyword search exists, no tabs)
-- **Dependencies**: None
+- **설명**: 인물, 미디어, 아이템을 탭 결과로 통합 검색
+- **우선순위**: P0
+- **상태**: 부분 구현 (키워드 검색 존재, 탭 없음)
+- **의존성**: 없음
 
-#### Current Implementation
-- `lib/stores/searchStore.ts` - Search query state
-- `lib/components/header/SearchInput.tsx` - Search input
+#### 현재 구현
+- `lib/stores/searchStore.ts` - 검색 쿼리 상태
+- `lib/components/header/SearchInput.tsx` - 검색 입력
 
-#### Acceptance Criteria
-- [ ] Single search input in header
-- [ ] Results page with tabs: [All] [People] [Media] [Items]
-- [ ] "All" tab shows mixed results with section headers
-- [ ] Each tab shows filtered results
-- [ ] Search highlights matching text
-- [ ] Recent searches stored locally
-- [ ] Search suggestions as user types
-- [ ] Empty state with popular searches
+#### 인수 조건
+- [ ] 헤더에 단일 검색 입력
+- [ ] 탭이 있는 결과 페이지: [전체] [인물] [미디어] [아이템]
+- [ ] "전체" 탭은 섹션 헤더와 함께 혼합 결과 표시
+- [ ] 각 탭은 필터링된 결과 표시
+- [ ] 매칭 텍스트 검색 하이라이트
+- [ ] 최근 검색 로컬 저장
+- [ ] 타이핑 중 검색 제안
+- [ ] 인기 검색어가 있는 빈 상태
 
-#### UI/UX Requirements
+#### UI/UX 요구사항
 
-**Search Input (Header)**:
+**검색 입력 (헤더)**:
 ```
 ┌─────────────────────────────────────┐
 │ 🔍 Search people, shows, items...  │
 └─────────────────────────────────────┘
 ```
 
-**Search Suggestions Dropdown**:
+**검색 제안 드롭다운**:
 ```
 ┌─────────────────────────────────────┐
 │ Recent Searches                     │
@@ -308,7 +308,7 @@ GET /api/media/:id/stats
 └─────────────────────────────────────┘
 ```
 
-**Search Results Page**:
+**검색 결과 페이지**:
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Results for "jisoo"                                         │
@@ -334,26 +334,26 @@ GET /api/media/:id/stats
 └─────────────────────────────────────────────────────────────┘
 ```
 
-#### Data Requirements
-- Full-text search on: `cast.name`, `cast.name_ko`, `media.name`, `media.name_ko`, `item.product_name`, `item.brand`
-- Search index for performance
+#### 데이터 요구사항
+- 전문 검색 대상: `cast.name`, `cast.name_ko`, `media.name`, `media.name_ko`, `item.product_name`, `item.brand`
+- 성능을 위한 검색 인덱스
 
-#### API Endpoints
+#### API 엔드포인트
 ```
 GET /api/search?q=jisoo&type=all
-  → Returns mixed results: { people: [], media: [], items: [] }
+  → 혼합 결과 반환: { people: [], media: [], items: [] }
 
 GET /api/search?q=jisoo&type=people
-  → Returns only people results
+  → 인물 결과만 반환
 
 GET /api/search/suggestions?q=ji
-  → Returns autocomplete suggestions
+  → 자동완성 제안 반환
 
 GET /api/search/popular
-  → Returns trending search terms
+  → 트렌딩 검색어 반환
 ```
 
-#### Implementation Notes
+#### 구현 노트
 ```typescript
 // lib/hooks/useSearch.ts
 export function useSearch(query: string, type: 'all' | 'people' | 'media' | 'items') {
@@ -366,8 +366,8 @@ export function useSearch(query: string, type: 'all' | 'people' | 'media' | 'ite
 }
 ```
 
-#### Files to Create/Modify
-- `app/search/page.tsx` - Search results page
+#### 생성/수정할 파일
+- `app/search/page.tsx` - 검색 결과 페이지
 - `lib/components/search/SearchResults.tsx`
 - `lib/components/search/SearchTabs.tsx`
 - `lib/components/search/SearchSuggestions.tsx`
@@ -378,11 +378,11 @@ export function useSearch(query: string, type: 'all' | 'people' | 'media' | 'ite
 
 ---
 
-## Data Models
+## 데이터 모델
 
-See [data-models.md](./data-models.md) for full type definitions.
+전체 타입 정의는 [data-models.md](./data-models.md) 참조.
 
-### Key Types for Discovery
+### 디스커버리 핵심 타입
 
 ```typescript
 type CategoryType = 'K-POP' | 'K-Drama' | 'K-Movie' | 'K-Variety' | 'K-Fashion';
@@ -421,47 +421,47 @@ interface SearchResults {
 
 ---
 
-## Migration Path
+## 마이그레이션 경로
 
-### Phase 1: Database Setup
-1. Create `media` table with seed data
-2. Create `cast` table with seed data
-3. Create `media_cast` junction
-4. Add `media_id` to existing posts
-5. Backfill existing data
+### 1단계: 데이터베이스 설정
+1. 시드 데이터와 함께 `media` 테이블 생성
+2. 시드 데이터와 함께 `cast` 테이블 생성
+3. `media_cast` 연결 테이블 생성
+4. 기존 게시물에 `media_id` 추가
+5. 기존 데이터 백필
 
-### Phase 2: Filter UI
-1. Update filterStore to 4 levels
-2. Build filter components
-3. Implement filter API endpoints
-4. Connect to feed
+### 2단계: 필터 UI
+1. filterStore를 4단계로 업데이트
+2. 필터 컴포넌트 빌드
+3. 필터 API 엔드포인트 구현
+4. 피드에 연결
 
-### Phase 3: Search
-1. Create search API with full-text
-2. Build search results page
-3. Add suggestions feature
+### 3단계: 검색
+1. 전문 검색이 포함된 검색 API 생성
+2. 검색 결과 페이지 빌드
+3. 제안 기능 추가
 
-### Phase 4: Media Gallery
-1. Create media detail page
-2. Build cast grid component
-3. Add related media logic
-
----
-
-## Performance Considerations
-
-- Filter counts should be cached/materialized
-- Search should use PostgreSQL full-text indexes
-- Infinite scroll should use cursor pagination
-- Images should be lazy loaded with blur placeholder
+### 4단계: 미디어 갤러리
+1. 미디어 상세 페이지 생성
+2. 출연진 그리드 컴포넌트 빌드
+3. 관련 미디어 로직 추가
 
 ---
 
-## Component Mapping (상세 구현 참조)
+## 성능 고려사항
+
+- 필터 카운트는 캐시/구체화되어야 함
+- 검색은 PostgreSQL 전문 인덱스 사용해야 함
+- 무한 스크롤은 커서 페이지네이션 사용해야 함
+- 이미지는 블러 placeholder와 함께 지연 로딩되어야 함
+
+---
+
+## 컴포넌트 매핑 (상세 구현 참조)
 
 > 이 섹션은 각 UI 요소가 실제 코드에서 어떻게 구현되는지 매핑합니다.
 
-### D-01 Magazine Feed - 컴포넌트 매핑
+### D-01 매거진 피드 - 컴포넌트 매핑
 
 #### UI 다이어그램 + 컴포넌트 매핑
 
@@ -539,7 +539,7 @@ interface SearchResults {
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
-│                        D-01 Feed Event Flow                              │
+│                        D-01 피드 이벤트 흐름                              │
 ├──────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
 │  [페이지 로드]                                                           │
@@ -612,7 +612,7 @@ ThiingsGrid → CardCell[] 업데이트
 
 ---
 
-### D-02 Hierarchical Filter - 컴포넌트 매핑
+### D-02 계층적 필터 - 컴포넌트 매핑
 
 #### 데스크톱 필터바 상세
 
@@ -688,7 +688,7 @@ ThiingsGrid → CardCell[] 업데이트
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
-│                    D-02 Filter Event Flow                                │
+│                    D-02 필터 이벤트 흐름                                  │
 ├──────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
 │  [사용자 액션: 필터 드롭다운 클릭]                                        │
@@ -746,7 +746,7 @@ ThiingsGrid → CardCell[] 업데이트
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
-│                    filterStore State Transitions                        │
+│                    filterStore 상태 전이                                │
 ├────────────────────────────────────────────────────────────────────────┤
 │                                                                        │
 │  [초기 상태]                                                           │
@@ -799,7 +799,7 @@ ThiingsGrid → CardCell[] 업데이트
 
 ---
 
-### D-04 Unified Search - 컴포넌트 매핑
+### D-04 통합 검색 - 컴포넌트 매핑
 
 #### 검색 UI 컴포넌트 상세
 
@@ -899,7 +899,7 @@ ThiingsGrid → CardCell[] 업데이트
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
-│                    D-04 Search Event Flow                                │
+│                    D-04 검색 이벤트 흐름                                  │
 ├──────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
 │  [사용자 입력: 검색어 타이핑]                                            │
@@ -963,9 +963,9 @@ ThiingsGrid → CardCell[] 업데이트
 
 ---
 
-## 에지 케이스 및 에러 처리
+## 엣지 케이스 및 에러 처리
 
-### D-01 Magazine Feed
+### D-01 매거진 피드
 
 | 상황 | 처리 방법 | 구현 위치 |
 |------|----------|----------|
@@ -974,7 +974,7 @@ ThiingsGrid → CardCell[] 업데이트
 | 이미지 로드 실패 | placeholder 이미지 표시 | CardCell.tsx:112 |
 | 무한 스크롤 끝 | "No more items" 표시 | ThiingsGrid.tsx:134 |
 
-### D-02 Hierarchical Filter
+### D-02 계층적 필터
 
 | 상황 | 처리 방법 | 구현 위치 |
 |------|----------|----------|
@@ -982,7 +982,7 @@ ThiingsGrid → CardCell[] 업데이트
 | 옵션 로딩 지연 | 스피너 표시 | FilterDropdown.tsx |
 | URL 파라미터 무효 | 기본값으로 fallback | useFilterFromURL.ts |
 
-### D-04 Unified Search
+### D-04 통합 검색
 
 | 상황 | 처리 방법 | 구현 위치 |
 |------|----------|----------|
@@ -994,7 +994,7 @@ ThiingsGrid → CardCell[] 업데이트
 
 ## 구현 상태 체크리스트
 
-### D-01 Magazine Feed
+### D-01 매거진 피드
 - [x] 기본 그리드 렌더링
 - [x] 무한 스크롤
 - [x] 이미지 lazy loading
@@ -1002,7 +1002,7 @@ ThiingsGrid → CardCell[] 업데이트
 - [ ] Pull-to-refresh (모바일)
 - [ ] 스켈레톤 애니메이션
 
-### D-02 Hierarchical Filter
+### D-02 계층적 필터
 - [ ] 4-level 필터 UI
 - [ ] 드롭다운 컴포넌트
 - [ ] Breadcrumb 네비게이션
@@ -1010,13 +1010,13 @@ ThiingsGrid → CardCell[] 업데이트
 - [ ] URL 상태 동기화
 - [ ] 필터 카운트 표시
 
-### D-03 Media Gallery
+### D-03 미디어 갤러리
 - [ ] 미디어 상세 페이지
 - [ ] Hero 섹션
 - [ ] Cast 그리드
 - [ ] 관련 미디어
 
-### D-04 Unified Search
+### D-04 통합 검색
 - [x] 기본 검색 입력
 - [x] 검색 쿼리 상태
 - [ ] 탭 기반 결과 분류

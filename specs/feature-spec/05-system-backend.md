@@ -1,44 +1,44 @@
-# System & Backend
+# 시스템 & 백엔드
 
-> Features: S-01 ~ S-08
-> Status: 20% implemented
-> Dependencies: Infrastructure setup
-
----
-
-## Overview
-
-System features handle the backend infrastructure including AI processing, data scraping, link generation, rewards calculation, and gamification. These are primarily server-side components that power the user-facing features.
-
-### Current Implementation
-- Basic database schema exists
-- Image processing pipeline (partial)
-- No user/reward system yet
+> 기능: S-01 ~ S-08
+> 상태: 20% 구현됨
+> 의존성: 인프라 설정
 
 ---
 
-## Features
+## 개요
 
-### S-01 Vision API Module
+시스템 기능은 AI 처리, 데이터 스크래핑, 링크 생성, 리워드 계산, 게이미피케이션을 포함한 백엔드 인프라를 담당합니다. 이러한 기능들은 주로 사용자 대면 기능을 지원하는 서버 측 컴포넌트입니다.
 
-- **Description**: Image analysis and labeling service for item detection
-- **Priority**: P0 (Internal)
-- **Status**: Partial (backend pipeline exists)
-- **Dependencies**: Cloud Vision API or custom model
+### 현재 구현 상태
+- 기본 데이터베이스 스키마 존재
+- 이미지 처리 파이프라인 (부분)
+- 사용자/리워드 시스템 미구현
 
-#### Acceptance Criteria
-- [ ] Accept image URL or base64 input
-- [ ] Return detected objects with bounding boxes
-- [ ] Return category classification for each object
-- [ ] Return confidence scores
-- [ ] Support batch processing
-- [ ] Response time < 5 seconds
-- [ ] Handle various image sizes and formats
-- [ ] Error handling for unsupported images
+---
 
-#### Technical Specification
+## 기능 목록
 
-**API Contract**:
+### S-01 Vision API 모듈
+
+- **설명**: 아이템 감지를 위한 이미지 분석 및 라벨링 서비스
+- **우선순위**: P0 (내부)
+- **상태**: 부분 (백엔드 파이프라인 존재)
+- **의존성**: Cloud Vision API 또는 커스텀 모델
+
+#### 수락 기준
+- [ ] 이미지 URL 또는 base64 입력 수용
+- [ ] 감지된 객체와 바운딩 박스 반환
+- [ ] 각 객체의 카테고리 분류 반환
+- [ ] 신뢰도 점수 반환
+- [ ] 배치 처리 지원
+- [ ] 응답 시간 < 5초
+- [ ] 다양한 이미지 크기 및 포맷 처리
+- [ ] 지원되지 않는 이미지에 대한 에러 처리
+
+#### 기술 명세
+
+**API 계약**:
 ```typescript
 // POST /api/ai/detect
 interface DetectionRequest {
@@ -74,34 +74,34 @@ interface DetectionResponse {
 }
 ```
 
-**Processing Pipeline**:
+**처리 파이프라인**:
 ```
-Image Input
+이미지 입력
     ↓
-[Pre-processing]
-- Resize if too large (max 2048px)
-- Normalize format (JPEG)
-- Generate thumbnail
+[전처리]
+- 너무 크면 리사이즈 (max 2048px)
+- 포맷 정규화 (JPEG)
+- 썸네일 생성
     ↓
-[Object Detection]
-- Fashion item detection model
-- Bounding box extraction
+[객체 감지]
+- 패션 아이템 감지 모델
+- 바운딩 박스 추출
     ↓
-[Classification]
-- Category classification
-- Attribute extraction (color, pattern)
+[분류]
+- 카테고리 분류
+- 속성 추출 (색상, 패턴)
     ↓
-[Post-processing]
+[후처리]
 - Non-max suppression
-- Confidence filtering
-- Coordinate normalization
+- 신뢰도 필터링
+- 좌표 정규화
     ↓
-Detection Results
+감지 결과
 ```
 
-#### Implementation Options
+#### 구현 옵션
 
-**Option A: Google Cloud Vision + Custom Model**
+**옵션 A: Google Cloud Vision + 커스텀 모델**
 ```typescript
 // lib/ai/visionApi.ts
 import vision from '@google-cloud/vision';
@@ -126,7 +126,7 @@ async function detectFashionItems(imageUrl: string): Promise<DetectionResponse> 
 }
 ```
 
-**Option B: Custom TensorFlow Model**
+**옵션 B: 커스텀 TensorFlow 모델**
 ```typescript
 // lib/ai/customModel.ts
 import * as tf from '@tensorflow/tfjs-node';
@@ -149,7 +149,7 @@ async function detectFashionItems(imageBuffer: Buffer): Promise<DetectionRespons
 }
 ```
 
-#### Files to Create/Modify
+#### 생성/수정할 파일
 - `lib/ai/visionApi.ts`
 - `lib/ai/detection.ts`
 - `lib/ai/classification.ts`
@@ -157,26 +157,26 @@ async function detectFashionItems(imageBuffer: Buffer): Promise<DetectionRespons
 
 ---
 
-### S-02 Scraper Engine
+### S-02 스크래퍼 엔진
 
-- **Description**: Parse product metadata from shopping site URLs
-- **Priority**: P0 (Internal)
-- **Status**: Not Started
-- **Dependencies**: None
+- **설명**: 쇼핑 사이트 URL에서 상품 메타데이터 파싱
+- **우선순위**: P0 (내부)
+- **상태**: 미시작
+- **의존성**: 없음
 
-#### Acceptance Criteria
-- [ ] Accept shopping URL input
-- [ ] Extract: product name, brand, price, currency, image
-- [ ] Support 10+ major shopping sites
-- [ ] Handle JavaScript-rendered pages
-- [ ] Respect robots.txt
-- [ ] Rate limiting per domain
-- [ ] Caching for repeated URLs
-- [ ] Graceful degradation on failure
+#### 수락 기준
+- [ ] 쇼핑 URL 입력 수용
+- [ ] 추출: 상품명, 브랜드, 가격, 통화, 이미지
+- [ ] 10개 이상의 주요 쇼핑 사이트 지원
+- [ ] JavaScript 렌더링 페이지 처리
+- [ ] robots.txt 준수
+- [ ] 도메인별 Rate limiting
+- [ ] 반복 URL에 대한 캐싱
+- [ ] 실패 시 Graceful degradation
 
-#### Technical Specification
+#### 기술 명세
 
-**API Contract**:
+**API 계약**:
 ```typescript
 // POST /api/scrape
 interface ScrapeRequest {
@@ -201,7 +201,7 @@ interface ScrapeResponse {
 }
 ```
 
-**Site Configurations**:
+**사이트 설정**:
 ```typescript
 // lib/scraper/sites/musinsa.ts
 const musinsaConfig: SiteConfig = {
@@ -225,7 +225,7 @@ const siteConfigs: Record<string, SiteConfig> = {
 };
 ```
 
-**Scraper Implementation**:
+**스크래퍼 구현**:
 ```typescript
 // lib/scraper/index.ts
 import puppeteer from 'puppeteer';
@@ -278,48 +278,48 @@ async function scrapeUrl(url: string): Promise<ScrapeResponse> {
 }
 ```
 
-#### Supported Sites
+#### 지원 사이트
 
-| Site | Region | Status |
+| 사이트 | 지역 | 상태 |
 |------|--------|--------|
-| Musinsa | Korea | Planned |
-| 29CM | Korea | Planned |
-| W Concept | Korea | Planned |
-| SSF Shop | Korea | Planned |
-| Coupang | Korea | Planned |
-| Farfetch | Global | Planned |
-| SSENSE | Global | Planned |
-| Net-a-Porter | Global | Planned |
-| Shopbop | Global | Planned |
-| Amazon | Global | Planned |
+| Musinsa | 한국 | 계획됨 |
+| 29CM | 한국 | 계획됨 |
+| W Concept | 한국 | 계획됨 |
+| SSF Shop | 한국 | 계획됨 |
+| Coupang | 한국 | 계획됨 |
+| Farfetch | 글로벌 | 계획됨 |
+| SSENSE | 글로벌 | 계획됨 |
+| Net-a-Porter | 글로벌 | 계획됨 |
+| Shopbop | 글로벌 | 계획됨 |
+| Amazon | 글로벌 | 계획됨 |
 
-#### Files to Create/Modify
+#### 생성/수정할 파일
 - `lib/scraper/index.ts`
-- `lib/scraper/sites/*.ts` - Per-site configs
+- `lib/scraper/sites/*.ts` - 사이트별 설정
 - `lib/scraper/cache.ts`
 - `lib/scraper/rateLimiter.ts`
 - `app/api/scrape/route.ts`
 
 ---
 
-### S-03 Deep Link Generator
+### S-03 Deep Link 생성기
 
-- **Description**: Convert shopping URLs to affiliate tracked links
-- **Priority**: P0 (Internal)
-- **Status**: Not Started
-- **Dependencies**: Affiliate network partnerships
+- **설명**: 쇼핑 URL을 어필리에이트 추적 링크로 변환
+- **우선순위**: P0 (내부)
+- **상태**: 미시작
+- **의존성**: 어필리에이트 네트워크 파트너십
 
-#### Acceptance Criteria
-- [ ] Convert direct URLs to affiliate URLs
-- [ ] Support multiple affiliate networks
-- [ ] Track click attribution (user, item)
-- [ ] Generate short URLs
-- [ ] Handle expired/invalid affiliate links
-- [ ] Fallback to direct link if affiliate unavailable
+#### 수락 기준
+- [ ] 직접 URL을 어필리에이트 URL로 변환
+- [ ] 다중 어필리에이트 네트워크 지원
+- [ ] 클릭 귀속 추적 (사용자, 아이템)
+- [ ] 단축 URL 생성
+- [ ] 만료/무효 어필리에이트 링크 처리
+- [ ] 어필리에이트 불가 시 직접 링크로 Fallback
 
-#### Technical Specification
+#### 기술 명세
 
-**API Contract**:
+**API 계약**:
 ```typescript
 interface GenerateLinkRequest {
   originalUrl: string;
@@ -336,7 +336,7 @@ interface GenerateLinkResponse {
 }
 ```
 
-**Affiliate Network Integration**:
+**어필리에이트 네트워크 통합**:
 ```typescript
 // lib/affiliate/networks/index.ts
 interface AffiliateNetwork {
@@ -357,7 +357,7 @@ const networks: AffiliateNetwork[] = [
 ];
 ```
 
-#### Files to Create/Modify
+#### 생성/수정할 파일
 - `lib/affiliate/index.ts`
 - `lib/affiliate/networks/*.ts`
 - `lib/affiliate/shortener.ts`
@@ -365,28 +365,28 @@ const networks: AffiliateNetwork[] = [
 
 ---
 
-### S-04 Hierarchical DB Management
+### S-04 계층적 DB 관리
 
-- **Description**: Maintain Category-Media-Cast-Item relationships
-- **Priority**: P0 (Internal)
-- **Status**: Partial (basic tables exist)
-- **Dependencies**: Database setup
+- **설명**: Category-Media-Cast-Item 관계 유지
+- **우선순위**: P0 (내부)
+- **상태**: 부분 (기본 테이블 존재)
+- **의존성**: 데이터베이스 설정
 
-#### Acceptance Criteria
-- [ ] Category table with enum types
-- [ ] Media table with category FK
-- [ ] Cast table with media junction
-- [ ] Context type enum
-- [ ] Post metadata columns (media_id, context_type)
-- [ ] Post-Cast junction table
-- [ ] Efficient queries for hierarchical filtering
-- [ ] Materialized views for filter counts
+#### 수락 기준
+- [ ] Category 테이블과 enum 타입
+- [ ] Media 테이블과 category FK
+- [ ] Cast 테이블과 media junction
+- [ ] Context 타입 enum
+- [ ] Post 메타데이터 컬럼 (media_id, context_type)
+- [ ] Post-Cast junction 테이블
+- [ ] 계층적 필터링을 위한 효율적 쿼리
+- [ ] 필터 카운트를 위한 Materialized views
 
-#### Database Schema
+#### 데이터베이스 스키마
 
-See [data-models.md](./data-models.md) for complete schema.
+전체 스키마는 [data-models.md](./data-models.md) 참조.
 
-**Key Relationships**:
+**주요 관계**:
 ```
 Category (enum)
     ↓ 1:N
@@ -403,7 +403,7 @@ Item
 
 **Materialized Views**:
 ```sql
--- Filter counts by category
+-- 카테고리별 필터 카운트
 CREATE MATERIALIZED VIEW filter_counts_category AS
 SELECT
   m.category,
@@ -416,7 +416,7 @@ JOIN image img ON img.id = pi.image_id
 JOIN item i ON i.image_id = img.id
 GROUP BY m.category;
 
--- Refresh periodically
+-- 주기적 갱신
 CREATE OR REPLACE FUNCTION refresh_filter_counts()
 RETURNS void AS $$
 BEGIN
@@ -427,31 +427,31 @@ END;
 $$ LANGUAGE plpgsql;
 ```
 
-#### Files to Create/Modify
+#### 생성/수정할 파일
 - `lib/supabase/migrations/xxx_hierarchical_structure.sql`
 - `lib/supabase/views/filter_counts.sql`
 - `lib/supabase/functions/refresh_counts.sql`
 
 ---
 
-### S-05 Click Tracker
+### S-05 클릭 트래커
 
-- **Description**: Log and analyze affiliate link clicks
-- **Priority**: P1 (Internal)
-- **Status**: Not Started
-- **Dependencies**: S-03 (Deep Link Generator)
+- **설명**: 어필리에이트 링크 클릭 로깅 및 분석
+- **우선순위**: P1 (내부)
+- **상태**: 미시작
+- **의존성**: S-03 (Deep Link 생성기)
 
-#### Acceptance Criteria
-- [ ] Log all affiliate link clicks
-- [ ] Track: user, item, timestamp, source
-- [ ] Detect and filter bot/fraud clicks
-- [ ] Real-time click counting
-- [ ] Attribution to contributors
-- [ ] Conversion tracking webhook
+#### 수락 기준
+- [ ] 모든 어필리에이트 링크 클릭 로깅
+- [ ] 추적: 사용자, 아이템, 타임스탬프, 출처
+- [ ] 봇/사기 클릭 감지 및 필터링
+- [ ] 실시간 클릭 카운팅
+- [ ] 기여자 귀속
+- [ ] 전환 추적 웹훅
 
-#### Technical Specification
+#### 기술 명세
 
-**Click Event Schema**:
+**클릭 이벤트 스키마**:
 ```typescript
 interface ClickEvent {
   id: string;
@@ -470,28 +470,28 @@ interface ClickEvent {
 }
 ```
 
-**Click Flow**:
+**클릭 흐름**:
 ```
-User clicks "Buy" button
+사용자가 "구매" 버튼 클릭
     ↓
-Client calls /api/track/click
+클라이언트가 /api/track/click 호출
     ↓
-Server logs click event
+서버가 클릭 이벤트 로깅
     ↓
-Server generates tracked redirect URL
+서버가 추적 리다이렉트 URL 생성
     ↓
-Client redirects to affiliate link
+클라이언트가 어필리에이트 링크로 리다이렉트
     ↓
-[Later] Affiliate sends conversion webhook
+[이후] 어필리에이트가 전환 웹훅 전송
     ↓
-Server updates click with conversion data
+서버가 전환 데이터로 클릭 업데이트
 ```
 
-**Fraud Detection**:
+**사기 감지**:
 ```typescript
 // lib/tracking/fraudDetection.ts
 interface FraudSignals {
-  rapidClicks: boolean;        // > 5 clicks in 1 minute
+  rapidClicks: boolean;        // 1분에 5회 이상 클릭
   knownBotUserAgent: boolean;
   suspiciousIpPattern: boolean;
   noReferrer: boolean;
@@ -505,7 +505,7 @@ async function isLikelyFraud(click: ClickEvent): Promise<boolean> {
 }
 ```
 
-#### API Endpoints
+#### API 엔드포인트
 ```
 POST /api/track/click
   body: { itemId, sourcePostId }
@@ -515,7 +515,7 @@ POST /api/webhooks/affiliate
   body: { clickId, orderValue, commission }
 ```
 
-#### Files to Create/Modify
+#### 생성/수정할 파일
 - `lib/tracking/clickTracker.ts`
 - `lib/tracking/fraudDetection.ts`
 - `app/api/track/click/route.ts`
@@ -523,24 +523,24 @@ POST /api/webhooks/affiliate
 
 ---
 
-### S-06 Reward Batch
+### S-06 리워드 배치
 
-- **Description**: Calculate and distribute earnings to contributors
-- **Priority**: P2 (Internal)
-- **Status**: Not Started
-- **Dependencies**: S-05 (Click Tracker), U-01 (User System)
+- **설명**: 기여자에게 수익 계산 및 분배
+- **우선순위**: P2 (내부)
+- **상태**: 미시작
+- **의존성**: S-05 (클릭 트래커), U-01 (사용자 시스템)
 
-#### Acceptance Criteria
-- [ ] Daily batch job to calculate rewards
-- [ ] Revenue share rules (e.g., 70% to contributor)
-- [ ] Minimum payout threshold
-- [ ] Pending period for conversions (e.g., 30 days)
-- [ ] Handle refunds/chargebacks
-- [ ] Audit trail for all calculations
+#### 수락 기준
+- [ ] 리워드 계산을 위한 일일 배치 작업
+- [ ] 수익 분배 규칙 (예: 70%를 기여자에게)
+- [ ] 최소 지급 임계값
+- [ ] 전환에 대한 보류 기간 (예: 30일)
+- [ ] 환불/차지백 처리
+- [ ] 모든 계산에 대한 감사 추적
 
-#### Technical Specification
+#### 기술 명세
 
-**Reward Calculation**:
+**리워드 계산**:
 ```typescript
 // lib/rewards/calculator.ts
 interface RewardConfig {
@@ -550,16 +550,16 @@ interface RewardConfig {
 }
 
 async function calculateDailyRewards(date: Date) {
-  // Get all conversions from (date - pendingDays)
+  // (date - pendingDays)의 모든 전환 가져오기
   const conversions = await getConfirmedConversions(
     subDays(date, config.pendingDays)
   );
 
   for (const conversion of conversions) {
-    // Find contributor (item uploader)
+    // 기여자 찾기 (아이템 업로더)
     const contributor = await getItemContributor(conversion.itemId);
 
-    // Calculate share
+    // 분배 계산
     const reward = {
       userId: contributor.id,
       type: 'conversion',
@@ -575,9 +575,9 @@ async function calculateDailyRewards(date: Date) {
 }
 ```
 
-**Batch Job Schedule**:
+**배치 작업 스케줄**:
 ```typescript
-// Run daily at 3 AM KST
+// 매일 KST 오전 3시에 실행
 const CRON_SCHEDULE = '0 3 * * *';
 
 // lib/rewards/batch.ts
@@ -599,7 +599,7 @@ async function runDailyRewardBatch() {
 }
 ```
 
-#### Files to Create/Modify
+#### 생성/수정할 파일
 - `lib/rewards/calculator.ts`
 - `lib/rewards/batch.ts`
 - `lib/rewards/notifications.ts`
@@ -607,25 +607,25 @@ async function runDailyRewardBatch() {
 
 ---
 
-### S-07 Context-based Badge System
+### S-07 컨텍스트 기반 뱃지 시스템
 
-- **Description**: Award badges to users based on contribution to specific tags
-- **Priority**: P1 (Internal)
-- **Status**: Not Started
-- **Dependencies**: S-06 (Reward Batch), Contribution tracking
+- **설명**: 특정 태그에 대한 기여를 기반으로 사용자에게 뱃지 수여
+- **우선순위**: P1 (내부)
+- **상태**: 미시작
+- **의존성**: S-06 (리워드 배치), 기여 추적
 
-#### Acceptance Criteria
-- [ ] Define badge criteria per tag
-- [ ] Track user contributions per tag
-- [ ] Award badges when criteria met
-- [ ] Badge types: Expert, Master, Pioneer
-- [ ] Weekly/Monthly recalculation
-- [ ] Badge display on profile
-- [ ] Notification when badge earned
+#### 수락 기준
+- [ ] 태그별 뱃지 기준 정의
+- [ ] 태그별 사용자 기여 추적
+- [ ] 기준 충족 시 뱃지 수여
+- [ ] 뱃지 유형: Expert, Master, Pioneer
+- [ ] 주간/월간 재계산
+- [ ] 프로필에 뱃지 표시
+- [ ] 뱃지 획득 시 알림
 
-#### Technical Specification
+#### 기술 명세
 
-**Badge Criteria**:
+**뱃지 기준**:
 ```typescript
 interface BadgeCriteria {
   type: 'expert' | 'master' | 'pioneer';
@@ -633,14 +633,14 @@ interface BadgeCriteria {
   targetId?: string;
 
   rules: {
-    minContributions: number;     // Minimum posts/answers
-    minAcceptRate?: number;       // Minimum accuracy (0-1)
+    minContributions: number;     // 최소 게시물/답변
+    minAcceptRate?: number;       // 최소 정확도 (0-1)
     timeWindow?: 'weekly' | 'monthly' | 'allTime';
-    rankPosition?: number;        // Top N position
+    rankPosition?: number;        // 상위 N위
   };
 }
 
-// Example badges
+// 예시 뱃지
 const badgeDefinitions: BadgeCriteria[] = [
   {
     type: 'expert',
@@ -669,7 +669,7 @@ const badgeDefinitions: BadgeCriteria[] = [
 ];
 ```
 
-**Badge Calculation**:
+**뱃지 계산**:
 ```typescript
 // lib/badges/calculator.ts
 async function calculateBadges(userId: string) {
@@ -689,7 +689,7 @@ async function calculateBadges(userId: string) {
 }
 ```
 
-#### Files to Create/Modify
+#### 생성/수정할 파일
 - `lib/badges/definitions.ts`
 - `lib/badges/calculator.ts`
 - `lib/badges/notifications.ts`
@@ -697,31 +697,31 @@ async function calculateBadges(userId: string) {
 
 ---
 
-### S-08 Contributor Ranking
+### S-08 기여자 랭킹
 
-- **Description**: Calculate and display rankings globally and per-tag
-- **Priority**: P1 (Internal)
-- **Status**: Not Started
-- **Dependencies**: Contribution tracking
+- **설명**: 전역 및 태그별 랭킹 계산 및 표시
+- **우선순위**: P1 (내부)
+- **상태**: 미시작
+- **의존성**: 기여 추적
 
-#### Acceptance Criteria
-- [ ] Global ranking by total contributions
-- [ ] Per-media ranking (e.g., "This week's BTS #1")
-- [ ] Per-cast ranking
-- [ ] Weekly and monthly periods
-- [ ] Points calculation (posts, answers, votes received)
-- [ ] Tie-breaking rules
-- [ ] Historical ranking data
+#### 수락 기준
+- [ ] 총 기여에 의한 전역 랭킹
+- [ ] 미디어별 랭킹 (예: "이번 주 BTS 1위")
+- [ ] 캐스트별 랭킹
+- [ ] 주간 및 월간 기간
+- [ ] 포인트 계산 (게시물, 답변, 받은 투표)
+- [ ] 동점 처리 규칙
+- [ ] 과거 랭킹 데이터
 
-#### Technical Specification
+#### 기술 명세
 
-**Ranking Calculation**:
+**랭킹 계산**:
 ```typescript
 interface RankingConfig {
   points: {
-    post: number;           // 10 points per post
-    acceptedAnswer: number; // 5 points per accepted answer
-    voteReceived: number;   // 1 point per vote
+    post: number;           // 게시물당 10점
+    acceptedAnswer: number; // 채택된 답변당 5점
+    voteReceived: number;   // 받은 투표당 1점
   };
   periods: ('weekly' | 'monthly' | 'allTime')[];
   scopes: ('global' | 'media' | 'cast')[];
@@ -736,7 +736,7 @@ async function calculateRankings(period: string, scope: string, scopeId?: string
     scopeId,
   });
 
-  // Calculate points per user
+  // 사용자별 포인트 계산
   const userPoints = contributions.reduce((acc, c) => {
     const points =
       c.type === 'post' ? config.points.post :
@@ -747,7 +747,7 @@ async function calculateRankings(period: string, scope: string, scopeId?: string
     return acc;
   }, {});
 
-  // Sort and assign ranks
+  // 정렬 및 순위 할당
   const ranked = Object.entries(userPoints)
     .sort(([, a], [, b]) => b - a)
     .map(([userId, points], index) => ({
@@ -760,12 +760,12 @@ async function calculateRankings(period: string, scope: string, scopeId?: string
       calculatedAt: new Date(),
     }));
 
-  // Store rankings
+  // 랭킹 저장
   await upsertRankings(ranked);
 }
 ```
 
-**Ranking Display**:
+**랭킹 표시**:
 ```typescript
 // GET /api/rankings?scope=media&scopeId=xxx&period=weekly
 interface RankingResponse {
@@ -788,7 +788,7 @@ interface RankingResponse {
 }
 ```
 
-#### Files to Create/Modify
+#### 생성/수정할 파일
 - `lib/rankings/calculator.ts`
 - `lib/rankings/points.ts`
 - `app/api/rankings/route.ts`
@@ -796,7 +796,7 @@ interface RankingResponse {
 
 ---
 
-## System Architecture
+## 시스템 아키텍처
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -834,34 +834,34 @@ interface RankingResponse {
 
 ---
 
-## Migration Path
+## 마이그레이션 경로
 
-### Phase 1: Database Structure
-1. Create media, cast, junction tables
-2. Add metadata columns to post
-3. Create materialized views
+### 1단계: 데이터베이스 구조
+1. media, cast, junction 테이블 생성
+2. post에 메타데이터 컬럼 추가
+3. Materialized views 생성
 
-### Phase 2: AI & Scraping
-1. Set up Vision API integration
-2. Build scraper with initial sites
-3. Create detection pipeline
+### 2단계: AI & 스크래핑
+1. Vision API 통합 설정
+2. 초기 사이트로 스크래퍼 구축
+3. 감지 파이프라인 생성
 
-### Phase 3: Tracking & Links
-1. Implement click tracker
-2. Build affiliate link generator
-3. Set up conversion webhooks
+### 3단계: 추적 & 링크
+1. 클릭 트래커 구현
+2. 어필리에이트 링크 생성기 구축
+3. 전환 웹훅 설정
 
-### Phase 4: Gamification
-1. Implement reward batch
-2. Build badge system
-3. Create ranking calculations
+### 4단계: 게이미피케이션
+1. 리워드 배치 구현
+2. 뱃지 시스템 구축
+3. 랭킹 계산 생성
 
 ---
 
-## Monitoring & Alerts
+## 모니터링 & 알림
 
-- Vision API latency/error rate
-- Scraper success rate per site
-- Click fraud detection rate
-- Reward calculation anomalies
-- Ranking job completion
+- Vision API 지연 시간/에러율
+- 사이트별 스크래퍼 성공률
+- 클릭 사기 감지율
+- 리워드 계산 이상 징후
+- 랭킹 작업 완료 여부

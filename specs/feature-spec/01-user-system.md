@@ -1,48 +1,48 @@
-# User System
+# 사용자 시스템
 
-> Features: U-01 ~ U-05
-> Status: 0% implemented
-> Dependencies: Supabase Auth
-
----
-
-## Overview
-
-The User System handles authentication, profiles, and user-related features. It enables personalized experiences, contribution tracking, and the gamification/reward system.
-
-### Related Screens
-- `/login` - Login page
-- `/profile` - User profile dashboard
-- `/profile/settings` - Settings page
-- `/profile/activity` - Activity history
-- `/profile/earnings` - Earnings dashboard
-
-### Dependencies
-- Supabase Auth (already configured)
-- `@supabase/auth-helpers-nextjs` (installed)
+> 기능: U-01 ~ U-05
+> 상태: 0% 구현
+> 의존성: Supabase Auth
 
 ---
 
-## Features
+## 개요
 
-### U-01 Social Login
+사용자 시스템은 인증, 프로필, 사용자 관련 기능을 처리합니다. 개인화된 경험, 기여 추적, 게이미피케이션/리워드 시스템을 가능하게 합니다.
 
-- **Description**: Allow users to sign in using Kakao, Google, or Apple accounts
-- **Priority**: P0
-- **Status**: Not Started
-- **Dependencies**: None
+### 관련 화면
+- `/login` - 로그인 페이지
+- `/profile` - 사용자 프로필 대시보드
+- `/profile/settings` - 설정 페이지
+- `/profile/activity` - 활동 내역
+- `/profile/earnings` - 수익 대시보드
 
-#### Acceptance Criteria
-- [ ] User can click "Login with Kakao" and complete OAuth flow
-- [ ] User can click "Login with Google" and complete OAuth flow
-- [ ] User can click "Login with Apple" and complete OAuth flow
-- [ ] New users are automatically registered on first login
-- [ ] Returning users are recognized and signed in
-- [ ] User session persists across page refreshes
-- [ ] User can log out from any page
+### 의존성
+- Supabase Auth (이미 설정됨)
+- `@supabase/auth-helpers-nextjs` (설치됨)
 
-#### UI/UX Requirements
-- **Login Page Layout**:
+---
+
+## 기능
+
+### U-01 소셜 로그인
+
+- **설명**: Kakao, Google, Apple 계정을 사용하여 로그인할 수 있도록 함
+- **우선순위**: P0
+- **상태**: 미시작
+- **의존성**: 없음
+
+#### 인수 조건
+- [ ] 사용자가 "카카오로 로그인"을 클릭하고 OAuth 플로우 완료 가능
+- [ ] 사용자가 "Google로 로그인"을 클릭하고 OAuth 플로우 완료 가능
+- [ ] 사용자가 "Apple로 로그인"을 클릭하고 OAuth 플로우 완료 가능
+- [ ] 신규 사용자는 첫 로그인 시 자동 등록
+- [ ] 기존 사용자는 인식되어 로그인됨
+- [ ] 사용자 세션이 페이지 새로고침 후에도 유지됨
+- [ ] 사용자가 어느 페이지에서든 로그아웃 가능
+
+#### UI/UX 요구사항
+- **로그인 페이지 레이아웃**:
   ```
   ┌─────────────────────────────┐
   │        [Logo]               │
@@ -63,16 +63,16 @@ The User System handles authentication, profiles, and user-related features. It 
   │   to our Terms & Privacy    │
   └─────────────────────────────┘
   ```
-- Kakao button: Yellow (#FEE500) background
-- Google button: White background with Google colors
-- Apple button: Black background
+- Kakao 버튼: 노란색 (#FEE500) 배경
+- Google 버튼: 흰색 배경에 Google 색상
+- Apple 버튼: 검정색 배경
 
-#### Data Requirements
-- Supabase Auth configuration for each provider
-- OAuth redirect URLs configured
-- User profile auto-creation trigger
+#### 데이터 요구사항
+- 각 제공자에 대한 Supabase Auth 설정
+- OAuth 리다이렉트 URL 설정
+- 사용자 프로필 자동 생성 트리거
 
-#### Implementation Notes
+#### 구현 노트
 ```typescript
 // lib/supabase/auth.ts
 export async function signInWithKakao() {
@@ -89,43 +89,43 @@ export async function signInWithKakao() {
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
-  // Exchange code for session
+  // 코드를 세션으로 교환
 }
 ```
 
-#### Files to Create/Modify
-- `app/login/page.tsx` - Login page
-- `app/auth/callback/route.ts` - OAuth callback handler
-- `lib/supabase/auth.ts` - Auth helper functions
-- `lib/components/auth/LoginButton.tsx` - Social login buttons
+#### 생성/수정할 파일
+- `app/login/page.tsx` - 로그인 페이지
+- `app/auth/callback/route.ts` - OAuth 콜백 핸들러
+- `lib/supabase/auth.ts` - Auth 헬퍼 함수
+- `lib/components/auth/LoginButton.tsx` - 소셜 로그인 버튼
 
 ---
 
-### U-02 Multi-language Settings
+### U-02 다국어 설정
 
-- **Description**: Support Korean and English UI throughout the app
-- **Priority**: P1
-- **Status**: Not Started
-- **Dependencies**: U-01 (for preference persistence)
+- **설명**: 앱 전체에서 한국어와 영어 UI 지원
+- **우선순위**: P1
+- **상태**: 미시작
+- **의존성**: U-01 (설정 저장용)
 
-#### Acceptance Criteria
-- [ ] User can switch between Korean and English
-- [ ] Language preference persists across sessions
-- [ ] All UI text respects language setting
-- [ ] Date/number formats adapt to locale
-- [ ] Guest users can change language (stored in localStorage)
-- [ ] Logged-in users have preference saved to profile
+#### 인수 조건
+- [ ] 사용자가 한국어와 영어 간 전환 가능
+- [ ] 언어 설정이 세션 간 유지됨
+- [ ] 모든 UI 텍스트가 언어 설정을 따름
+- [ ] 날짜/숫자 형식이 로케일에 맞게 적용됨
+- [ ] 게스트 사용자도 언어 변경 가능 (localStorage에 저장)
+- [ ] 로그인한 사용자는 프로필에 설정 저장
 
-#### UI/UX Requirements
-- Language toggle in header (simple dropdown or icon toggle)
-- Settings page has explicit language selection
-- Language codes: `ko` (Korean), `en` (English)
+#### UI/UX 요구사항
+- 헤더에 언어 토글 (간단한 드롭다운 또는 아이콘 토글)
+- 설정 페이지에 명시적 언어 선택
+- 언어 코드: `ko` (한국어), `en` (영어)
 
-#### Data Requirements
-- Translation files for all UI strings
-- User preference field: `preferred_language`
+#### 데이터 요구사항
+- 모든 UI 문자열의 번역 파일
+- 사용자 설정 필드: `preferred_language`
 
-#### Implementation Notes
+#### 구현 노트
 ```typescript
 // lib/i18n/index.ts
 export const translations = {
@@ -150,7 +150,7 @@ export function useTranslation() {
 }
 ```
 
-#### Files to Create/Modify
+#### 생성/수정할 파일
 - `lib/i18n/translations/ko.json`
 - `lib/i18n/translations/en.json`
 - `lib/i18n/index.ts`
@@ -159,25 +159,25 @@ export function useTranslation() {
 
 ---
 
-### U-03 Profile Dashboard
+### U-03 프로필 대시보드
 
-- **Description**: Display user's ranking, earnings, and fandom badges
-- **Priority**: P0
-- **Status**: Not Started
-- **Dependencies**: U-01, S-07 (Badge System), S-08 (Ranking)
+- **설명**: 사용자의 랭킹, 수익, 팬덤 뱃지 표시
+- **우선순위**: P0
+- **상태**: 미시작
+- **의존성**: U-01, S-07 (뱃지 시스템), S-08 (랭킹)
 
-#### Acceptance Criteria
-- [ ] Display user avatar and display name
-- [ ] Show total contributions count
-- [ ] Show acceptance rate
-- [ ] Display earned badges with visual icons
-- [ ] Show current ranking (global and per-fandom)
-- [ ] Display earnings summary
-- [ ] Link to detailed activity history
-- [ ] Link to settings page
+#### 인수 조건
+- [ ] 사용자 아바타와 표시 이름 표시
+- [ ] 총 기여 수 표시
+- [ ] 채택률 표시
+- [ ] 획득한 뱃지를 시각적 아이콘과 함께 표시
+- [ ] 현재 랭킹 표시 (전체 및 팬덤별)
+- [ ] 수익 요약 표시
+- [ ] 상세 활동 내역 링크
+- [ ] 설정 페이지 링크
 
-#### UI/UX Requirements
-- **Profile Page Layout**:
+#### UI/UX 요구사항
+- **프로필 페이지 레이아웃**:
   ```
   ┌─────────────────────────────────────────┐
   │  [Avatar]  Display Name                 │
@@ -204,13 +204,13 @@ export function useTranslation() {
   └─────────────────────────────────────────┘
   ```
 
-#### Data Requirements
-- User profile data
-- Badge assignments
-- Ranking data (current period)
-- Earnings summary
+#### 데이터 요구사항
+- 사용자 프로필 데이터
+- 뱃지 할당
+- 랭킹 데이터 (현재 기간)
+- 수익 요약
 
-#### API Endpoints
+#### API 엔드포인트
 ```
 GET /api/profile
 GET /api/profile/badges
@@ -218,7 +218,7 @@ GET /api/profile/rankings
 GET /api/profile/earnings/summary
 ```
 
-#### Files to Create/Modify
+#### 생성/수정할 파일
 - `app/profile/page.tsx`
 - `lib/components/profile/ProfileHeader.tsx`
 - `lib/components/profile/StatsCards.tsx`
@@ -228,24 +228,24 @@ GET /api/profile/earnings/summary
 
 ---
 
-### U-04 Activity History
+### U-04 활동 내역
 
-- **Description**: View user's posts, answers, and favorited items
-- **Priority**: P1
-- **Status**: Not Started
-- **Dependencies**: U-01, U-03
+- **설명**: 사용자의 게시물, 답변, 즐겨찾기 항목 보기
+- **우선순위**: P1
+- **상태**: 미시작
+- **의존성**: U-01, U-03
 
-#### Acceptance Criteria
-- [ ] Tab view: "My Posts" | "My Answers" | "Favorites"
-- [ ] Each tab shows paginated list
-- [ ] Posts show thumbnail, title, date, status
-- [ ] Answers show related post, vote count
-- [ ] Favorites show item/post with quick actions
-- [ ] Can remove items from favorites
-- [ ] Can delete own posts (with confirmation)
+#### 인수 조건
+- [ ] 탭 뷰: "내 게시물" | "내 답변" | "즐겨찾기"
+- [ ] 각 탭에 페이지네이션된 목록 표시
+- [ ] 게시물에 썸네일, 제목, 날짜, 상태 표시
+- [ ] 답변에 관련 게시물, 투표 수 표시
+- [ ] 즐겨찾기에 아이템/게시물과 빠른 작업 표시
+- [ ] 즐겨찾기에서 항목 제거 가능
+- [ ] 자신의 게시물 삭제 가능 (확인 포함)
 
-#### UI/UX Requirements
-- **Activity Page Layout**:
+#### UI/UX 요구사항
+- **활동 페이지 레이아웃**:
   ```
   ┌─────────────────────────────────────────┐
   │  [My Posts] [My Answers] [Favorites]    │
@@ -265,12 +265,12 @@ GET /api/profile/earnings/summary
   └─────────────────────────────────────────┘
   ```
 
-#### Data Requirements
-- User's posts with status
-- User's item identifications (answers)
-- User's favorites (polymorphic)
+#### 데이터 요구사항
+- 사용자의 게시물 및 상태
+- 사용자의 아이템 식별 (답변)
+- 사용자의 즐겨찾기 (다형성)
 
-#### API Endpoints
+#### API 엔드포인트
 ```
 GET /api/profile/posts?page=1&limit=20
 GET /api/profile/answers?page=1&limit=20
@@ -279,7 +279,7 @@ DELETE /api/profile/posts/:id
 DELETE /api/profile/favorites/:id
 ```
 
-#### Files to Create/Modify
+#### 생성/수정할 파일
 - `app/profile/activity/page.tsx`
 - `lib/components/profile/ActivityTabs.tsx`
 - `lib/components/profile/PostList.tsx`
@@ -288,24 +288,24 @@ DELETE /api/profile/favorites/:id
 
 ---
 
-### U-05 Withdrawal Request
+### U-05 출금 요청
 
-- **Description**: Request payout of accumulated earnings
-- **Priority**: P2
-- **Status**: Not Started
-- **Dependencies**: U-01, S-05 (Click Tracker), S-06 (Reward Batch)
+- **설명**: 누적된 수익 출금 요청
+- **우선순위**: P2
+- **상태**: 미시작
+- **의존성**: U-01, S-05 (클릭 트래커), S-06 (리워드 배치)
 
-#### Acceptance Criteria
-- [ ] Display available balance
-- [ ] Show pending/processing amounts separately
-- [ ] Minimum withdrawal amount enforced (e.g., ₩10,000)
-- [ ] Bank account or PayPal input
-- [ ] Confirmation step before submission
-- [ ] View withdrawal history
-- [ ] Status tracking (pending → processing → completed)
+#### 인수 조건
+- [ ] 가용 잔액 표시
+- [ ] 대기/처리 중 금액 별도 표시
+- [ ] 최소 출금 금액 적용 (예: ₩10,000)
+- [ ] 은행 계좌 또는 PayPal 입력
+- [ ] 제출 전 확인 단계
+- [ ] 출금 내역 보기
+- [ ] 상태 추적 (대기 중 → 처리 중 → 완료)
 
-#### UI/UX Requirements
-- **Earnings Page Layout**:
+#### UI/UX 요구사항
+- **수익 페이지 레이아웃**:
   ```
   ┌─────────────────────────────────────────┐
   │  💰 My Earnings                         │
@@ -326,13 +326,13 @@ DELETE /api/profile/favorites/:id
   └─────────────────────────────────────────┘
   ```
 
-#### Data Requirements
-- Current balance calculation
-- Pending rewards (not yet confirmed)
-- Withdrawal request history
-- Payment method storage
+#### 데이터 요구사항
+- 현재 잔액 계산
+- 대기 중인 리워드 (아직 확정되지 않음)
+- 출금 요청 내역
+- 결제 방법 저장
 
-#### API Endpoints
+#### API 엔드포인트
 ```
 GET /api/profile/earnings
 GET /api/profile/earnings/history
@@ -340,13 +340,13 @@ POST /api/profile/earnings/withdraw
 GET /api/profile/withdrawals
 ```
 
-#### Business Rules
-- Minimum withdrawal: ₩10,000
-- Processing time: 5-7 business days
-- Payment methods: Korean bank transfer, PayPal
-- Tax withholding may apply (display notice)
+#### 비즈니스 규칙
+- 최소 출금: ₩10,000
+- 처리 시간: 5-7 영업일
+- 결제 방법: 한국 은행 송금, PayPal
+- 세금 원천징수 적용 가능 (안내 표시)
 
-#### Files to Create/Modify
+#### 생성/수정할 파일
 - `app/profile/earnings/page.tsx`
 - `lib/components/profile/EarningsCard.tsx`
 - `lib/components/profile/WithdrawalForm.tsx`
@@ -354,11 +354,11 @@ GET /api/profile/withdrawals
 
 ---
 
-## Data Models
+## 데이터 모델
 
-See [data-models.md](./data-models.md) for full type definitions.
+전체 타입 정의는 [data-models.md](./data-models.md) 참조.
 
-### Key Types for User System
+### 사용자 시스템 핵심 타입
 
 ```typescript
 interface User {
@@ -389,37 +389,37 @@ interface WithdrawalRequest {
 
 ---
 
-## Migration Path
+## 마이그레이션 경로
 
-### Phase 1: Basic Auth
-1. Configure Supabase OAuth providers
-2. Create login page with social buttons
-3. Implement callback handler
-4. Add auth context provider
+### 1단계: 기본 인증
+1. Supabase OAuth 제공자 설정
+2. 소셜 버튼이 있는 로그인 페이지 생성
+3. 콜백 핸들러 구현
+4. Auth 컨텍스트 프로바이더 추가
 
-### Phase 2: Profile
-1. Create user profile table trigger
-2. Build profile dashboard UI
-3. Add settings page
+### 2단계: 프로필
+1. 사용자 프로필 테이블 트리거 생성
+2. 프로필 대시보드 UI 구축
+3. 설정 페이지 추가
 
-### Phase 3: Activity & Earnings
-1. Implement activity tracking
-2. Build earnings dashboard
-3. Add withdrawal flow
-
----
-
-## Security Considerations
-
-- OAuth tokens must not be exposed to client
-- Sensitive user data encrypted at rest
-- Rate limiting on auth endpoints
-- CSRF protection on forms
-- Withdrawal requires email verification
+### 3단계: 활동 & 수익
+1. 활동 추적 구현
+2. 수익 대시보드 구축
+3. 출금 플로우 추가
 
 ---
 
-## Component Mapping (상세 구현 참조)
+## 보안 고려사항
+
+- OAuth 토큰은 클라이언트에 노출되면 안 됨
+- 민감한 사용자 데이터는 저장 시 암호화
+- 인증 엔드포인트에 Rate limiting
+- 폼에 CSRF 보호
+- 출금 시 이메일 확인 필요
+
+---
+
+## 컴포넌트 매핑 (상세 구현 참조)
 
 > 이 섹션은 인증 플로우와 각 UI 요소가 실제 코드에서 어떻게 구현되는지 매핑합니다.
 
@@ -627,7 +627,7 @@ interface WithdrawalRequest {
 
 ---
 
-### U-01 Social Login - 컴포넌트 매핑
+### U-01 소셜 로그인 - 컴포넌트 매핑
 
 #### 로그인 UI 구조
 
@@ -811,7 +811,7 @@ interface WithdrawalRequest {
 
 ---
 
-### U-03 Profile Dashboard - 컴포넌트 매핑
+### U-03 프로필 대시보드 - 컴포넌트 매핑
 
 #### 프로필 페이지 구조
 
@@ -967,9 +967,9 @@ CREATE TRIGGER on_auth_user_created
 
 ---
 
-## 에지 케이스 및 에러 처리
+## 엣지 케이스 및 에러 처리
 
-### U-01 Social Login
+### U-01 소셜 로그인
 
 | 상황 | 처리 방법 | 구현 위치 |
 |------|----------|----------|
@@ -979,7 +979,7 @@ CREATE TRIGGER on_auth_user_created
 | 세션 만료 | 자동 로그아웃 + 리다이렉트 | AuthProvider.tsx |
 | 쿠키 차단 | 경고 메시지 표시 | LoginPage.tsx |
 
-### U-02 Multi-language
+### U-02 다국어
 
 | 상황 | 처리 방법 | 구현 위치 |
 |------|----------|----------|
@@ -987,7 +987,7 @@ CREATE TRIGGER on_auth_user_created
 | 언어 변경 실패 | localStorage 사용 | LanguageToggle.tsx |
 | 숫자/날짜 포맷 | Intl API 사용 | formatters.ts |
 
-### U-03 Profile Dashboard
+### U-03 프로필 대시보드
 
 | 상황 | 처리 방법 | 구현 위치 |
 |------|----------|----------|
@@ -995,7 +995,7 @@ CREATE TRIGGER on_auth_user_created
 | 뱃지 0개 | "No badges yet" 메시지 | BadgeGrid.tsx |
 | 랭킹 데이터 없음 | "Start contributing" CTA | RankingList.tsx |
 
-### U-05 Withdrawal
+### U-05 출금
 
 | 상황 | 처리 방법 | 구현 위치 |
 |------|----------|----------|
@@ -1008,7 +1008,7 @@ CREATE TRIGGER on_auth_user_created
 
 ## 구현 상태 체크리스트
 
-### U-01 Social Login
+### U-01 소셜 로그인
 - [ ] Supabase OAuth 설정 (Kakao, Google, Apple)
 - [ ] 로그인 페이지 UI
 - [ ] OAuth 콜백 핸들러
@@ -1017,28 +1017,28 @@ CREATE TRIGGER on_auth_user_created
 - [ ] 로그아웃 기능
 - [ ] 세션 자동 갱신
 
-### U-02 Multi-language
+### U-02 다국어
 - [ ] 번역 파일 (ko.json, en.json)
 - [ ] useTranslation 훅
 - [ ] LanguageToggle 컴포넌트
 - [ ] 언어 설정 저장 (localStorage/DB)
 - [ ] 날짜/숫자 포매터
 
-### U-03 Profile Dashboard
+### U-03 프로필 대시보드
 - [ ] ProfileHeader 컴포넌트
 - [ ] StatsCards 컴포넌트
 - [ ] BadgeGrid 컴포넌트
 - [ ] RankingList 컴포넌트
 - [ ] 프로필 데이터 훅
 
-### U-04 Activity History
+### U-04 활동 내역
 - [ ] ActivityTabs 컴포넌트
 - [ ] PostList 컴포넌트
 - [ ] AnswerList 컴포넌트
 - [ ] FavoriteList 컴포넌트
 - [ ] 활동 데이터 API
 
-### U-05 Withdrawal
+### U-05 출금
 - [ ] EarningsCard 컴포넌트
 - [ ] WithdrawalForm 컴포넌트
 - [ ] WithdrawalHistory 컴포넌트
