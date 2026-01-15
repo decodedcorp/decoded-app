@@ -162,35 +162,6 @@ class AsciiFilter {
       this.pre.style.zIndex = "9";
       this.pre.style.backgroundAttachment = "fixed";
       this.pre.style.mixBlendMode = "difference";
-
-      // #region agent log
-      fetch(
-        "http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            location: "DecodedLogo.tsx:AsciiFilter.reset",
-            message: "AsciiFilter reset - TRACKING CHANGES",
-            data: {
-              resetCallCount: this.resetCallCount,
-              containerWidth: this.width,
-              containerHeight: this.height,
-              fontSize: this.fontSize,
-              fontFamily: this.fontFamily,
-              charWidth,
-              prevCols,
-              newCols: this.cols,
-              colsChanged: prevCols !== this.cols && prevCols !== 0,
-              rows: this.rows,
-            },
-            timestamp: Date.now(),
-            sessionId: "debug-session",
-            hypothesisId: "K",
-          }),
-        }
-      ).catch(() => {});
-      // #endregion
     }
   }
 
@@ -257,61 +228,6 @@ class AsciiFilter {
         str += "\n";
       }
       this.pre.innerHTML = str;
-
-      // #region agent log
-      const preRect = this.pre.getBoundingClientRect();
-      const domRect = this.domElement.getBoundingClientRect();
-      const lines = str.split("\n");
-      // Find middle line with actual text content
-      const midLineIdx = Math.floor(lines.length / 2);
-      const midLine = lines[midLineIdx] || "";
-      const midLeftSpaces = midLine.match(/^ */)?.[0]?.length || 0;
-      const midRightSpaces = midLine.match(/ *$/)?.[0]?.length || 0;
-      const midTrimmed = midLine.trim();
-      // Also check text-heavy line (find one with most non-space chars)
-      let maxTextLine = "";
-      let maxTextLen = 0;
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (trimmed.length > maxTextLen) {
-          maxTextLen = trimmed.length;
-          maxTextLine = line;
-        }
-      }
-      const maxLeftSpaces = maxTextLine.match(/^ */)?.[0]?.length || 0;
-      const maxRightSpaces = maxTextLine.match(/ *$/)?.[0]?.length || 0;
-      fetch(
-        "http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            location: "DecodedLogo.tsx:AsciiFilter.asciify",
-            message: "ASCII text - middle line space analysis",
-            data: {
-              preWidth: preRect.width,
-              preLeft: preRect.left,
-              preRight: preRect.right,
-              domElementWidth: domRect.width,
-              domElementRight: domRect.left + domRect.width,
-              overflowRight: preRect.right - (domRect.left + domRect.width),
-              midLineIdx,
-              midLeftSpaces,
-              midRightSpaces,
-              midTrimmedLen: midTrimmed.length,
-              midSpaceDiff: midLeftSpaces - midRightSpaces,
-              maxTextLineLen: maxTextLine.length,
-              maxLeftSpaces,
-              maxRightSpaces,
-              maxSpaceDiff: maxLeftSpaces - maxRightSpaces,
-            },
-            timestamp: Date.now(),
-            sessionId: "debug-session",
-            hypothesisId: "G2",
-          }),
-        }
-      ).catch(() => {});
-      // #endregion
     }
   }
 
@@ -380,32 +296,6 @@ class CanvasTxt {
       const textWidth = metrics.width;
       const leftMargin = 10;
       const rightMargin = this.canvas.width - leftMargin - textWidth;
-
-      // #region agent log
-      fetch(
-        "http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            location: "DecodedLogo.tsx:CanvasTxt.render",
-            message: "Text canvas rendering - margin analysis",
-            data: {
-              canvasWidth: this.canvas.width,
-              canvasHeight: this.canvas.height,
-              textWidth,
-              leftMargin,
-              rightMargin,
-              marginDiff: leftMargin - rightMargin,
-              textStartX: 10,
-            },
-            timestamp: Date.now(),
-            sessionId: "debug-session",
-            hypothesisId: "F",
-          }),
-        }
-      ).catch(() => {});
-      // #endregion
 
       this.context.fillText(this.txt, 10, yPos);
     }
@@ -529,29 +419,6 @@ class CanvAscii {
     const planeW = baseH * textAspect;
     const planeH = baseH;
 
-    // #region agent log
-    fetch("http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        location: "DecodedLogo.tsx:CanvAscii.setMesh",
-        message: "Mesh setup - text canvas and plane dimensions",
-        data: {
-          textCanvasWidth: this.textCanvas.width,
-          textCanvasHeight: this.textCanvas.height,
-          textAspect,
-          planeW,
-          planeH,
-          containerWidth: this.width,
-          containerHeight: this.height,
-        },
-        timestamp: Date.now(),
-        sessionId: "debug-session",
-        hypothesisId: "D",
-      }),
-    }).catch(() => {});
-    // #endregion
-
     this.geometry = new THREE.PlaneGeometry(planeW, planeH, 36, 36);
     this.material = new THREE.ShaderMaterial({
       vertexShader,
@@ -567,28 +434,6 @@ class CanvAscii {
 
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.scene.add(this.mesh);
-
-    // #region agent log
-    fetch("http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        location: "DecodedLogo.tsx:CanvAscii.setMesh.afterAdd",
-        message: "Mesh position and camera info",
-        data: {
-          meshPositionX: this.mesh.position.x,
-          meshPositionY: this.mesh.position.y,
-          meshPositionZ: this.mesh.position.z,
-          cameraPositionZ: this.camera.position.z,
-          cameraFOV: this.camera.fov,
-          cameraAspect: this.camera.aspect,
-        },
-        timestamp: Date.now(),
-        sessionId: "debug-session",
-        hypothesisId: "H",
-      }),
-    }).catch(() => {});
-    // #endregion
   }
 
   setRenderer() {
@@ -776,33 +621,6 @@ export default function DecodedLogo({
 
     const { width, height } = containerRef.current.getBoundingClientRect();
 
-    // #region agent log
-    const parentRect =
-      containerRef.current.parentElement?.getBoundingClientRect();
-    const parentStyles = containerRef.current.parentElement
-      ? window.getComputedStyle(containerRef.current.parentElement)
-      : null;
-    fetch("http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        location: "DecodedLogo.tsx:useEffect",
-        message: "Container initialization",
-        data: {
-          containerWidth: width,
-          containerHeight: height,
-          parentWidth: parentRect?.width,
-          parentHeight: parentRect?.height,
-          parentOverflow: parentStyles?.overflow,
-          parentOverflowX: parentStyles?.overflowX,
-        },
-        timestamp: Date.now(),
-        sessionId: "debug-session",
-        hypothesisId: "E",
-      }),
-    }).catch(() => {});
-    // #endregion
-
     if (width === 0 || height === 0) {
       const observer = new IntersectionObserver(
         ([entry]) => {
@@ -863,69 +681,9 @@ export default function DecodedLogo({
     );
     asciiRef.current.load();
 
-    // #region agent log
-    setTimeout(() => {
-      const preEl = containerRef.current?.querySelector("pre");
-      if (preEl) {
-        const preStyles = window.getComputedStyle(preEl);
-        const preRect = preEl.getBoundingClientRect();
-        const containerRect = containerRef.current?.getBoundingClientRect();
-        fetch(
-          "http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              location: "DecodedLogo.tsx:afterLoad",
-              message: "Pre element computed styles after load",
-              data: {
-                preComputedLeft: preStyles.left,
-                preComputedTransform: preStyles.transform,
-                preActualLeft: preRect.left,
-                preActualRight: preRect.right,
-                preActualWidth: preRect.width,
-                containerLeft: containerRect?.left,
-                containerRight: containerRect?.right,
-                containerWidth: containerRect?.width,
-                clipDiff: preRect.right - (containerRect?.right || 0),
-              },
-              timestamp: Date.now(),
-              sessionId: "debug-session",
-              hypothesisId: "B",
-            }),
-          }
-        ).catch(() => {});
-      }
-    }, 500);
-    // #endregion
-
     const ro = new ResizeObserver((entries) => {
       if (!entries[0] || !asciiRef.current) return;
       const { width: w, height: h } = entries[0].contentRect;
-
-      // #region agent log
-      fetch(
-        "http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            location: "DecodedLogo.tsx:ResizeObserver",
-            message: "ResizeObserver triggered",
-            data: {
-              newWidth: w,
-              newHeight: h,
-              prevWidth: asciiRef.current.width,
-              prevHeight: asciiRef.current.height,
-              widthChanged: w !== asciiRef.current.width,
-            },
-            timestamp: Date.now(),
-            sessionId: "debug-session",
-            hypothesisId: "L",
-          }),
-        }
-      ).catch(() => {});
-      // #endregion
 
       if (w > 0 && h > 0) {
         asciiRef.current.setSize(w, h);

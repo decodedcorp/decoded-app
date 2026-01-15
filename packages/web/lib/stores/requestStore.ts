@@ -23,10 +23,34 @@ export interface UploadedImage {
   error?: string;
 }
 
+// AI 감지 결과 - Spot 데이터
+export interface DetectedSpot {
+  id: string;
+  index: number; // 1, 2, 3...
+  center: {
+    x: number; // 0-1 (0=왼쪽, 1=오른쪽)
+    y: number; // 0-1 (0=위, 1=아래)
+  };
+  label?: string; // "상의", "하의" 등
+}
+
+// Mock 데이터 - AI 감지 결과 시뮬레이션
+const MOCK_SPOTS: DetectedSpot[] = [
+  { id: "spot_1", index: 1, center: { x: 0.3, y: 0.25 }, label: "상의" },
+  { id: "spot_2", index: 2, center: { x: 0.5, y: 0.6 }, label: "하의" },
+  { id: "spot_3", index: 3, center: { x: 0.7, y: 0.4 }, label: "액세서리" },
+];
+
 interface RequestState {
   // Step 1: Upload
   images: UploadedImage[];
   currentStep: RequestStep;
+
+  // Step 2: AI Detection
+  detectedSpots: DetectedSpot[];
+  isDetecting: boolean;
+  isRevealing: boolean; // reveal 애니메이션 진행 중
+  selectedSpotId: string | null;
 
   // Actions - Images
   addImage: (file: File) => string | null;
@@ -40,6 +64,11 @@ interface RequestState {
   ) => void;
   setImageUploadedUrl: (id: string, url: string) => void;
   clearImages: () => void;
+
+  // Actions - Detection
+  startDetection: () => void;
+  setDetectedSpots: (spots: DetectedSpot[]) => void;
+  selectSpot: (spotId: string | null) => void;
 
   // Actions - Navigation
   setStep: (step: RequestStep) => void;
@@ -56,6 +85,10 @@ function generateId(): string {
 const initialState = {
   images: [] as UploadedImage[],
   currentStep: 1 as RequestStep,
+  detectedSpots: [] as DetectedSpot[],
+  isDetecting: false,
+  isRevealing: false,
+  selectedSpotId: null as string | null,
 };
 
 export const useRequestStore = create<RequestState>((set, get) => ({
@@ -154,20 +187,47 @@ export const useRequestStore = create<RequestState>((set, get) => ({
     set({ images: [] });
   },
 
+  // Detection Actions
+  startDetection: () => {
+    set({ isDetecting: true, currentStep: 2 });
+
+    // Mock: 2초 딜레이로 AI 처리 시뮬레이션
+    setTimeout(() => {
+      set({
+        detectedSpots: MOCK_SPOTS,
+        isDetecting: false,
+        isRevealing: true,
+      });
+
+      // reveal 애니메이션 종료 (1.5초 후)
+      setTimeout(() => {
+        set({ isRevealing: false });
+      }, 1500);
+    }, 2000);
+  },
+
+  setDetectedSpots: (spots) => {
+    set({ detectedSpots: spots });
+  },
+
+  selectSpot: (spotId) => {
+    set({ selectedSpotId: spotId });
+  },
+
   setStep: (step) => {
     set({ currentStep: step });
   },
 
   canProceedToNextStep: () => {
-    const { images, currentStep } = get();
+    const { images, currentStep, detectedSpots } = get();
 
     switch (currentStep) {
       case 1:
         // Step 1: 최소 1장 이상의 이미지가 업로드 완료되어야 함
         return images.some((img) => img.status === "uploaded");
       case 2:
-        // Step 2: AI 감지 완료 (추후 구현)
-        return true;
+        // Step 2: AI 감지 완료 - spots가 있어야 함
+        return detectedSpots.length > 0;
       case 3:
         // Step 3: 태그 선택 완료 (추후 구현)
         return true;
@@ -195,3 +255,10 @@ export const selectImageCount = (state: RequestState) => state.images.length;
 export const selectHasImages = (state: RequestState) => state.images.length > 0;
 export const selectIsMaxImages = (state: RequestState) =>
   state.images.length >= UPLOAD_CONFIG.maxImages;
+
+// Detection selectors
+export const selectDetectedSpots = (state: RequestState) => state.detectedSpots;
+export const selectIsDetecting = (state: RequestState) => state.isDetecting;
+export const selectIsRevealing = (state: RequestState) => state.isRevealing;
+export const selectSelectedSpotId = (state: RequestState) =>
+  state.selectedSpotId;

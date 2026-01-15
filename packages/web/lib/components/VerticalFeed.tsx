@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback, memo } from "react";
+import { useEffect, useRef, memo } from "react";
 import { FeedCard, FeedCardSkeleton, type FeedCardItem } from "./FeedCard";
 
 interface VerticalFeedProps {
@@ -31,8 +31,11 @@ export const VerticalFeed = memo(
 
     // Infinite scroll using IntersectionObserver
     useEffect(() => {
-      if (!sentinelRef.current || !onReachEnd || !hasMore) return;
-      if (!scrollContainerRef.current) return;
+      const sentinel = sentinelRef.current;
+      const scrollContainer = scrollContainerRef.current;
+
+      if (!sentinel || !onReachEnd || !hasMore) return;
+      if (!scrollContainer) return;
 
       const observer = new IntersectionObserver(
         (entries) => {
@@ -42,13 +45,13 @@ export const VerticalFeed = memo(
           }
         },
         {
-          root: scrollContainerRef.current, // Observe within scroll container
-          rootMargin: "200px", // Trigger 200px before reaching the end
+          root: scrollContainer,
+          rootMargin: "200px",
           threshold: 0,
         }
       );
 
-      observer.observe(sentinelRef.current);
+      observer.observe(sentinel);
 
       return () => {
         observer.disconnect();

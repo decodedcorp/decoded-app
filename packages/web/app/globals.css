@@ -208,3 +208,139 @@
     animation: none;
   }
 }
+
+/* Hologram Scan Animation for Request Flow */
+@keyframes hologram-scan {
+  0% {
+    top: -10%;
+    opacity: 1;
+  }
+  100% {
+    top: 110%;
+    opacity: 0.8;
+  }
+}
+
+@keyframes hologram-pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes hologram-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 8px oklch(0.9519 0.1739 115.8446))
+      drop-shadow(0 0 16px oklch(0.9519 0.1739 115.8446 / 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px oklch(0.9519 0.1739 115.8446))
+      drop-shadow(0 0 24px oklch(0.9519 0.1739 115.8446 / 0.7));
+  }
+}
+
+@keyframes corner-pulse {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-hologram-scan {
+  animation: hologram-scan 2.5s ease-in-out infinite;
+}
+
+.animate-hologram-pulse {
+  animation: hologram-pulse 2s ease-in-out infinite;
+}
+
+.animate-hologram-glow {
+  animation: hologram-glow 1.5s ease-in-out infinite;
+}
+
+.animate-corner-pulse {
+  animation: corner-pulse 1s ease-in-out infinite;
+}
+
+/* Scanline pattern (CRT effect) */
+.hologram-scanlines {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    oklch(0.9519 0.1739 115.8446 / 0.03) 2px,
+    oklch(0.9519 0.1739 115.8446 / 0.03) 4px
+  );
+}
+
+/* Grid pattern */
+.hologram-grid {
+  background-image: linear-gradient(
+      oklch(0.9519 0.1739 115.8446 / 0.1) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      oklch(0.9519 0.1739 115.8446 / 0.1) 1px,
+      transparent 1px
+    );
+  background-size: 20px 20px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-hologram-scan,
+  .animate-hologram-pulse,
+  .animate-hologram-glow,
+  .animate-corner-pulse {
+    animation: none;
+  }
+}
+
+/* Spot Reveal Animation */
+@keyframes spot-reveal {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.3);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes reveal-scan {
+  0% {
+    top: 0%;
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0.5;
+  }
+}
+
+.animate-spot-reveal {
+  animation: spot-reveal 0.4s ease-out forwards;
+}
+
+.animate-reveal-scan {
+  animation: reveal-scan 1.2s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-spot-reveal,
+  .animate-reveal-scan {
+    animation: none;
+  }
+}

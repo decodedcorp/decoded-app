@@ -12,5 +12,8 @@
     "lint": "yarn workspace @decoded/web lint",
     "format": "yarn workspace @decoded/web format",
     "format:check": "yarn workspace @decoded/web format:check"
+  },
+  "dependencies": {
+    "class-variance-authority": "^0.7.1"
   }
 }

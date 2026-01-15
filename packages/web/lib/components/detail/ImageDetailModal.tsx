@@ -269,33 +269,6 @@ export function ImageDetailModal({ imageId }: Props) {
     window.location.href = `/images/${imageId}`;
   }, [imageId]);
 
-  // #region agent log
-  useEffect(() => {
-    if (drawerRef.current) {
-      const style = window.getComputedStyle(drawerRef.current);
-      fetch(
-        "http://127.0.0.1:7242/ingest/89712f27-6a22-414e-81e7-beea00d23671",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            location: "ImageDetailModal.tsx:useEffect",
-            message: "Drawer computed styles",
-            data: {
-              zIndex: style.zIndex,
-              overflow: style.overflow,
-              overflowX: style.overflowX,
-              display: style.display,
-            },
-            timestamp: Date.now(),
-            sessionId: "debug-peeking-issue",
-            hypothesisId: "B",
-          }),
-        }
-      ).catch(() => {});
-    }
-  }, [drawerRef.current]);
-  // #endregion
   // Mount/Enter Animation
   useEffect(() => {
     // Lock body scroll

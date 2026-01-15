@@ -16,8 +16,9 @@ import {
   extractImageFromClipboard,
   UPLOAD_CONFIG,
 } from "@/lib/utils/validation";
-import { compressImage } from "@/lib/utils/imageCompression";
-import { supabaseBrowserClient } from "@/lib/supabase/client";
+// TODO: 실제 Supabase 연동 시 주석 해제
+// import { compressImage } from "@/lib/utils/imageCompression";
+// import { supabaseBrowserClient } from "@/lib/supabase/client";
 
 export interface UseImageUploadOptions {
   autoUpload?: boolean;
@@ -37,49 +38,30 @@ export function useImageUpload(options: UseImageUploadOptions = {}) {
   const clearImages = useRequestStore((s) => s.clearImages);
 
   /**
-   * 단일 이미지 Supabase Storage 업로드
+   * 단일 이미지 업로드 (Mock - UI 테스트용)
+   * TODO: 실제 Supabase Storage 연동 시 주석 해제
    */
   const uploadToStorage = useCallback(
     async (id: string, file: File) => {
       updateImageStatus(id, "uploading", 0);
 
       try {
-        // 압축
-        const { file: compressedFile, wasCompressed } =
-          await compressImage(file);
-        if (wasCompressed) {
-          updateImageStatus(id, "uploading", 30);
-        }
+        // Mock: 압축 시뮬레이션
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        updateImageStatus(id, "uploading", 30);
 
-        // 파일 경로 생성
-        const timestamp = Date.now();
-        const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
-        const filePath = `uploads/${timestamp}_${safeName}`;
+        // Mock: 업로드 시뮬레이션
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        updateImageStatus(id, "uploading", 70);
 
-        updateImageStatus(id, "uploading", 50);
-
-        // Supabase Storage 업로드
-        const { data, error } = await supabaseBrowserClient.storage
-          .from("images")
-          .upload(filePath, compressedFile, {
-            cacheControl: "3600",
-            upsert: false,
-          });
-
-        if (error) {
-          throw new Error(error.message);
-        }
-
+        await new Promise((resolve) => setTimeout(resolve, 300));
         updateImageStatus(id, "uploading", 90);
 
-        // 공개 URL 가져오기
-        const { data: urlData } = supabaseBrowserClient.storage
-          .from("images")
-          .getPublicUrl(data.path);
-
-        setImageUploadedUrl(id, urlData.publicUrl);
-        onUploadComplete?.(id, urlData.publicUrl);
-        toast.success("Image uploaded successfully");
+        // Mock: previewUrl을 그대로 사용 (실제 업로드 없음)
+        const mockUrl = URL.createObjectURL(file);
+        setImageUploadedUrl(id, mockUrl);
+        onUploadComplete?.(id, mockUrl);
+        toast.success("이미지 준비 완료");
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : "Upload failed";

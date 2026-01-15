@@ -5,7 +5,7 @@
 
 export const UPLOAD_CONFIG = {
   maxFileSize: 10 * 1024 * 1024, // 10MB
-  maxImages: 5,
+  maxImages: 1, // 단일 이미지만 허용 (AI 감지용)
   supportedFormats: ["image/jpeg", "image/png", "image/webp"] as const,
   supportedExtensions: [".jpg", ".jpeg", ".png", ".webp"] as const,
 } as const;
