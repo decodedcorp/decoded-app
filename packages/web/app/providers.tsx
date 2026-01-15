@@ -5,6 +5,9 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { getQueryClient } from "@/lib/react-query/client";
 import { ThemeProvider } from "next-themes";
 
+// Supabase 브라우저 클라이언트 초기화 (side-effect import)
+import "@/lib/supabase/init";
+
 /**
  * App-level providers wrapper
  *
