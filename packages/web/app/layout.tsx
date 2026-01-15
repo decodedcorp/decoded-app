@@ -39,11 +39,11 @@ export default function RootLayout({
           {/* Desktop Sidebar */}
           <Sidebar />
 
-          {/* Main Content Area - offset by sidebar width on desktop */}
-          <div className="md:ml-[60px] lg:ml-[240px] min-h-screen transition-[margin] duration-300">
+          {/* Main Content Area - offset by sidebar width */}
+          <main className="md:ml-14 lg:ml-[200px] min-h-screen transition-[margin] duration-200">
             {children}
             {modal}
-          </div>
+          </main>
 
           {/* Mobile Bottom Nav */}
           <MobileNavBar />

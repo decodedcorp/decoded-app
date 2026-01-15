@@ -3,9 +3,17 @@
 import { memo, useState, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Compass, Search, Plus, User } from "lucide-react";
+import {
+  Home,
+  Compass,
+  Search,
+  SlidersHorizontal,
+  Plus,
+  User,
+} from "lucide-react";
 import DecodedLogo from "./DecodedLogo";
 import { SidebarSearchPanel } from "./SidebarSearchPanel";
+import { SidebarFilterPanel } from "./SidebarFilterPanel";
 
 interface NavItem {
   id: string;
@@ -20,6 +28,13 @@ const navItems: NavItem[] = [
   { id: "home", href: "/", icon: Home, label: "Home" },
   { id: "explore", href: "/explore", icon: Compass, label: "Explore" },
   { id: "search", href: "#", icon: Search, label: "Search", isAction: true },
+  {
+    id: "filter",
+    href: "#",
+    icon: SlidersHorizontal,
+    label: "Filter",
+    isAction: true,
+  },
   {
     id: "create",
     href: "/create",
@@ -39,11 +54,12 @@ const NavItemComponent = memo(
   ({ item, isActive, onClick }: NavItemComponentProps) => {
     const Icon = item.icon;
 
+    // Reddit-style: minimal, clean design
     const baseClasses =
-      "flex items-center gap-4 p-3 rounded-xl transition-all duration-200 w-full";
+      "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors duration-150 w-full";
     const activeClasses = isActive
-      ? "bg-sidebar-accent text-sidebar-accent-foreground"
-      : "text-sidebar-foreground hover:bg-sidebar-accent/50";
+      ? "bg-accent/80 text-foreground font-medium"
+      : "text-muted-foreground hover:bg-accent/40 hover:text-foreground";
     const disabledClasses = item.disabled
       ? "opacity-40 cursor-not-allowed"
       : "";
@@ -51,11 +67,11 @@ const NavItemComponent = memo(
     const content = (
       <>
         <Icon
-          className={`h-6 w-6 flex-shrink-0 ${
-            isActive ? "stroke-[2.5]" : "stroke-[1.5]"
+          className={`h-5 w-5 flex-shrink-0 ${
+            isActive ? "stroke-[2]" : "stroke-[1.5]"
           }`}
         />
-        <span className="hidden lg:block truncate text-base">{item.label}</span>
+        <span className="hidden lg:block truncate text-sm">{item.label}</span>
       </>
     );
 
@@ -101,58 +117,68 @@ const NavItemComponent = memo(
 NavItemComponent.displayName = "NavItemComponent";
 
 /**
- * Sidebar - Instagram-style left navigation bar
+ * Sidebar - Reddit-style minimal left navigation
  *
  * Features:
  * - Fixed on left side for desktop/tablet (md+)
  * - Hidden on mobile (<768px)
- * - Collapsed (icons only) on tablet (768-1023px): 60px width
- * - Expanded (icons + text) on desktop (1024px+): 240px width
- * - Search panel slides out on Search click
- * - Uses existing CSS variables (--sidebar-*)
+ * - Collapsed (icons only) on tablet (768-1023px): 56px width
+ * - Expanded (icons + text) on desktop (1024px+): 200px width
+ * - Clean, minimal design inspired by Reddit
  */
 export const Sidebar = memo(() => {
   const pathname = usePathname();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const handleSearchToggle = useCallback(() => {
     setIsSearchOpen((prev) => !prev);
+    setIsFilterOpen(false); // Close filter when opening search
   }, []);
 
   const handleSearchClose = useCallback(() => {
     setIsSearchOpen(false);
   }, []);
 
+  const handleFilterToggle = useCallback(() => {
+    setIsFilterOpen((prev) => !prev);
+    setIsSearchOpen(false); // Close search when opening filter
+  }, []);
+
+  const handleFilterClose = useCallback(() => {
+    setIsFilterOpen(false);
+  }, []);
+
   return (
     <>
-      {/* Main Sidebar */}
+      {/* Main Sidebar - Reddit style: clean, minimal */}
       <aside
         role="navigation"
         aria-label="Main navigation"
         className="fixed left-0 top-0 h-screen z-50 hidden md:flex flex-col
-                   w-[60px] lg:w-[240px]
-                   bg-sidebar border-r border-sidebar-border
-                   transition-[width] duration-300"
+                   w-14 lg:w-[200px]
+                   bg-background
+                   transition-[width] duration-200"
       >
-        {/* Logo Section */}
-        <div className="h-16 lg:h-20 flex items-center justify-center lg:justify-start px-3 lg:px-4">
+        {/* Logo Section - larger logo */}
+        <div className="h-20 lg:h-24 flex items-center justify-center lg:justify-start lg:px-3">
           <Link
             href="/"
             className="flex items-center"
             aria-label="decoded home"
           >
-            {/* Collapsed: Text "D" */}
-            <div className="lg:hidden w-10 h-10 flex items-center justify-center">
-              <span className="text-primary text-2xl font-bold font-serif">
+            {/* Collapsed: Text "D" - larger */}
+            <div className="lg:hidden w-14 h-14 flex items-center justify-center">
+              <span className="text-primary text-3xl font-bold font-serif">
                 D
               </span>
             </div>
-            {/* Expanded: ASCII Logo */}
-            <div className="hidden lg:block relative w-32 h-14 overflow-visible">
+            {/* Expanded: ASCII Logo - larger */}
+            <div className="hidden lg:block relative w-44 h-20 overflow-visible">
               <DecodedLogo
-                asciiFontSize={2}
-                textFontSize={100}
-                planeBaseHeight={6}
+                asciiFontSize={3}
+                textFontSize={140}
+                planeBaseHeight={8}
                 enableWaves={false}
                 enableHueRotate={false}
               />
@@ -160,28 +186,37 @@ export const Sidebar = memo(() => {
           </Link>
         </div>
 
-        {/* Navigation Section */}
-        <nav className="flex-1 flex flex-col gap-1 px-2 py-4">
+        {/* Navigation Section - minimal spacing */}
+        <nav className="flex-1 flex flex-col gap-0.5 px-2 py-2">
           {navItems.map((item) => {
             const isActive =
               item.id === "search"
                 ? isSearchOpen
-                : pathname === item.href ||
-                  (item.href !== "/" && pathname.startsWith(item.href));
+                : item.id === "filter"
+                  ? isFilterOpen
+                  : pathname === item.href ||
+                    (item.href !== "/" && pathname.startsWith(item.href));
+
+            const handleClick =
+              item.id === "search"
+                ? handleSearchToggle
+                : item.id === "filter"
+                  ? handleFilterToggle
+                  : undefined;
 
             return (
               <NavItemComponent
                 key={item.id}
                 item={item}
                 isActive={isActive}
-                onClick={item.isAction ? handleSearchToggle : undefined}
+                onClick={item.isAction ? handleClick : undefined}
               />
             );
           })}
         </nav>
 
-        {/* Profile Section (Bottom) */}
-        <div className="px-2 py-4 border-t border-sidebar-border">
+        {/* Profile Section (Bottom) - no border for cleaner look */}
+        <div className="px-2 py-3">
           <NavItemComponent
             item={{
               id: "profile",
@@ -197,6 +232,9 @@ export const Sidebar = memo(() => {
 
       {/* Search Panel (Slide out) */}
       <SidebarSearchPanel isOpen={isSearchOpen} onClose={handleSearchClose} />
+
+      {/* Filter Panel (Slide out) */}
+      <SidebarFilterPanel isOpen={isFilterOpen} onClose={handleFilterClose} />
     </>
   );
 });

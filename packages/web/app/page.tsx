@@ -9,7 +9,7 @@ export default async function Home() {
   return (
     <>
       <Header />
-      <main className="relative w-screen h-screen overflow-hidden">
+      <main className="relative w-full h-screen overflow-hidden">
         <HomeClient initialImages={initialImages} />
       </main>
     </>

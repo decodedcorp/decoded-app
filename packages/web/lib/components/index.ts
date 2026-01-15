@@ -8,4 +8,5 @@ export { SimpleFilterDropdown } from "./SimpleFilterDropdown";
 export { MobileNavBar } from "./MobileNavBar";
 export { Sidebar } from "./Sidebar";
 export { SidebarSearchPanel } from "./SidebarSearchPanel";
+export { SidebarFilterPanel } from "./SidebarFilterPanel";
 export { default as DecodedLogo } from "./DecodedLogo";

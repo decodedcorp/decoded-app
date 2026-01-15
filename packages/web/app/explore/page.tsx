@@ -9,7 +9,7 @@ export default async function ExplorePage() {
   return (
     <>
       <Header />
-      <main className="relative w-screen h-screen overflow-hidden">
+      <main className="relative w-full h-screen overflow-hidden">
         <ExploreClient initialImages={initialImages} />
       </main>
     </>
