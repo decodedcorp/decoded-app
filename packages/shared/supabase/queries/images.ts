@@ -419,6 +419,9 @@ export async function fetchFilteredImages(
 
 /**
  * Fetches images via post_image table with post_id information
+ *
+ * Uses post.ts for sorting and filtering to ensure proper cursor-based pagination.
+ * Applies 2024-01-01 filter at DB level via post.ts comparison.
  */
 export async function fetchImagesByPostImage(
   params: FetchFilteredImagesParams
@@ -429,12 +432,24 @@ export async function fetchImagesByPostImage(
   const hasAccountFilter = filter !== "all";
   const hasSearchQuery = search.trim().length > 0;
 
+  // Decode cursor for DB-level filtering
+  let cursorTs: string | null = null;
+  let cursorImageId: string | null = null;
+  if (cursor) {
+    const decoded = decodeCursor(cursor);
+    if (decoded) {
+      cursorTs = decoded.createdAt;
+      cursorImageId = decoded.id;
+    }
+  }
+
+  // Build query with post.ts included for filtering
   let queryBuilder = supabase
     .from("post_image")
     .select(
       hasSearchQuery
-        ? "created_at, post_id, image!inner(id, image_url, status, with_items, image_hash, created_at, item!inner(product_name, brand)), post!inner(account, id, created_at)"
-        : "created_at, post_id, image!inner(id, image_url, status, with_items, image_hash, created_at), post!inner(account, id, created_at)"
+        ? "created_at, post_id, image!inner(id, image_url, status, with_items, image_hash, created_at, item!inner(product_name, brand)), post!inner(account, id, created_at, ts)"
+        : "created_at, post_id, image!inner(id, image_url, status, with_items, image_hash, created_at), post!inner(account, id, created_at, ts)"
     );
 
   if (hasAccountFilter) {
@@ -445,6 +460,15 @@ export async function fetchImagesByPostImage(
     .not("image.image_url", "is", null)
     .eq("image.with_items", false);
 
+  // Apply 2024-01-01 filter at DB level
+  queryBuilder = queryBuilder.gte("post.ts", "2024-01-01");
+
+  // Apply cursor filter at DB level - only filter by post.ts
+  // image_id filtering will be done client-side since it's on post_image table
+  if (cursorTs) {
+    queryBuilder = queryBuilder.lte("post.ts", cursorTs);
+  }
+
   if (hasSearchQuery) {
     const searchTerm = search.trim();
     queryBuilder = queryBuilder.or(
@@ -453,10 +477,11 @@ export async function fetchImagesByPostImage(
     );
   }
 
+  // Request more to account for deduplication, order by post.ts for consistent pagination
   queryBuilder = queryBuilder
-    .order("created_at", { ascending: false })
+    .order("ts", { ascending: false, referencedTable: "post" })
     .order("image_id", { ascending: false })
-    .limit(limit * 5);
+    .limit((limit + 1) * 3);
 
   const { data, error } = await queryBuilder;
 
@@ -467,60 +492,19 @@ export async function fetchImagesByPostImage(
   const uniqueImages = new Map<string, ImageWithPostId>();
 
   if (data) {
-    const postIds = new Set<string>();
-    for (const row of data) {
-      if (!row.image) continue;
-      const postRow = Array.isArray(row.post) ? row.post[0] : row.post;
-      if (postRow?.id) {
-        postIds.add(postRow.id);
-      }
-    }
-
-    const postTsMap = new Map<string, string>();
-    if (postIds.size > 0) {
-      const { data: postsData, error: postsError } = await supabase
-        .from("post")
-        .select("id, ts")
-        .in("id", Array.from(postIds));
-
-      if (!postsError && postsData) {
-        for (const post of postsData) {
-          const tsValue = post.ts
-            ? typeof post.ts === "string"
-              ? post.ts
-              : String(post.ts)
-            : null;
-          if (tsValue) {
-            postTsMap.set(post.id, tsValue);
-          }
-        }
-      }
-    }
-
-    let cursorPostTs: string | null = null;
-    let cursorImageId: string | null = null;
-    if (cursor) {
-      const decoded = decodeCursor(cursor);
-      if (decoded) {
-        cursorPostTs = decoded.createdAt;
-        cursorImageId = decoded.id;
-      }
-    }
-
     for (const row of data) {
       if (!row.image) continue;
       const imageRow = Array.isArray(row.image) ? row.image[0] : row.image;
       const postRow = Array.isArray(row.post) ? row.post[0] : row.post;
 
-      if (!postRow?.id) continue;
+      if (!postRow?.id || !postRow?.ts) continue;
 
-      const postTs = postTsMap.get(postRow.id) || row.created_at;
+      const postTs = postRow.ts;
 
-      if (!postTs || postTs < "2024-01-01") continue;
-
-      if (cursorPostTs) {
-        if (postTs > cursorPostTs) continue;
-        if (postTs === cursorPostTs && imageRow.id >= cursorImageId!) continue;
+      // Client-side cursor filtering for exact position
+      // DB already filtered by post.ts <= cursorTs, now filter by exact cursor position
+      if (cursorTs && cursorImageId) {
+        if (postTs === cursorTs && imageRow.id >= cursorImageId) continue;
       }
 
       if (
@@ -548,22 +532,17 @@ export async function fetchImagesByPostImage(
   }
 
   const allItems = Array.from(uniqueImages.values()).sort((a, b) => {
-    let timeA: number;
-    let timeB: number;
-    try {
-      timeA = new Date(a.created_at).getTime();
-      timeB = new Date(b.created_at).getTime();
-    } catch {
-      return 0;
-    }
-    if (timeB !== timeA) {
-      return timeB - timeA;
+    // Sort by post.ts (string comparison works for YYYY-MM-DD format)
+    if (b.created_at !== a.created_at) {
+      return b.created_at.localeCompare(a.created_at);
     }
     return b.id.localeCompare(a.id);
   });
 
+  // hasMore is true if we have more items than the requested limit
   const hasMore = allItems.length > limit;
-  const items = hasMore ? allItems.slice(0, limit) : allItems;
+  // Always slice to ensure we return exactly `limit` items (or fewer if not enough data)
+  const items = allItems.slice(0, limit);
 
   let nextCursor = null;
   if (hasMore && items.length > 0) {

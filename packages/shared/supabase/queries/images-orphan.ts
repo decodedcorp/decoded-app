@@ -1,13 +1,28 @@
 /**
  * Orphan image fallback query (shared across web and mobile)
+ *
+ * Uses RPC function for efficient database-level filtering with NOT EXISTS pattern.
+ * This avoids loading entire tables into memory.
  */
 
 import { getSupabaseClient } from "../client";
 import type { ImagePageWithPostId, ImageWithPostId } from "./images";
 import { encodeCursor, decodeCursor } from "./images";
 
+type OrphanImageRow = {
+  id: string;
+  image_url: string | null;
+  status: string | null;
+  with_items: boolean;
+  image_hash: string | null;
+  created_at: string;
+};
+
 /**
  * Fallback query for images without post_image entries
+ *
+ * Uses the get_orphan_images RPC function for efficient DB-level filtering.
+ * The function uses NOT EXISTS pattern which is optimized by PostgreSQL.
  */
 export async function fetchOrphanImages(params: {
   limit: number;
@@ -16,61 +31,44 @@ export async function fetchOrphanImages(params: {
   const supabase = getSupabaseClient();
   const { limit, cursor } = params;
 
-  const query = supabase
-    .from("image")
-    .select(
-      `
-      id,
-      image_url,
-      status,
-      with_items,
-      image_hash,
-      created_at
-    `
-    )
-    .not("image_url", "is", null)
-    .eq("with_items", false)
-    .gte("created_at", "2024-01-01");
-
-  const { data: allImages, error: imagesError } = await query;
-
-  if (imagesError) {
-    throw imagesError;
-  }
-
-  const { data: linkedImages, error: linkedError } = await supabase
-    .from("post_image")
-    .select("image_id");
-
-  if (linkedError) {
-    throw linkedError;
-  }
-
-  const linkedIds = new Set(linkedImages?.map((pi) => pi.image_id) || []);
-  const orphans = allImages?.filter((img) => !linkedIds.has(img.id)) || [];
-
-  let filteredOrphans = orphans;
+  // Decode cursor for pagination
+  let cursorCreatedAt: string | null = null;
+  let cursorId: string | null = null;
   if (cursor) {
     const decoded = decodeCursor(cursor);
     if (decoded) {
-      const { createdAt, id } = decoded;
-      filteredOrphans = orphans.filter((img) => {
-        if (img.created_at < createdAt) return true;
-        if (img.created_at === createdAt && img.id < id) return true;
-        return false;
-      });
+      cursorCreatedAt = decoded.createdAt;
+      cursorId = decoded.id;
     }
   }
 
-  filteredOrphans.sort((a, b) => {
-    if (b.created_at !== a.created_at) {
-      return b.created_at.localeCompare(a.created_at);
-    }
-    return b.id.localeCompare(a.id);
+  // Call RPC function - cast to any to bypass strict typing for custom RPC
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase.rpc as any)("get_orphan_images", {
+    p_limit: limit,
+    p_cursor_created_at: cursorCreatedAt,
+    p_cursor_id: cursorId,
   });
 
-  const items: ImageWithPostId[] = filteredOrphans.slice(0, limit).map((img) => ({
-    ...img,
+  if (error) {
+    throw error;
+  }
+
+  const orphanImages = (data as OrphanImageRow[]) || [];
+
+  // hasMore is determined by receiving more than limit items
+  // (the RPC function requests limit + 1)
+  const hasMore = orphanImages.length > limit;
+
+  // Transform to ImageWithPostId format
+  // Handle nullable fields by providing defaults
+  const items: ImageWithPostId[] = orphanImages.slice(0, limit).map((img) => ({
+    id: img.id,
+    image_url: img.image_url,
+    status: (img.status as "pending" | "extracted" | "skipped" | "extracted_metadata") || "pending",
+    with_items: img.with_items,
+    image_hash: img.image_hash || "",
+    created_at: img.created_at,
     postId: `legacy:${img.id}`,
     postSource: "legacy" as const,
     postAccount: "Legacy",
@@ -78,7 +76,7 @@ export async function fetchOrphanImages(params: {
     postCreatedAt: img.created_at,
   }));
 
-  const hasMore = filteredOrphans.length > limit;
+  // Generate next cursor if there are more items
   let nextCursor = null;
   if (hasMore && items.length > 0) {
     const lastItem = items[items.length - 1];

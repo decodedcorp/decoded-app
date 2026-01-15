@@ -12,14 +12,21 @@ import { fetchOrphanImages } from "./images-orphan";
 
 /**
  * Unified adapter: merges post-based and orphan images
+ *
+ * Post-based images (from post_image table) are prioritized.
+ * Orphan images (images not linked to any post) fill remaining slots.
+ * Uses RPC function for efficient orphan fetching (NOT EXISTS pattern).
  */
 export async function fetchUnifiedImages(
   params: FetchFilteredImagesParams & { deduplicateByImageId?: boolean }
 ): Promise<ImagePageWithPostId> {
   const { deduplicateByImageId = true, ...queryParams } = params;
+  const finalLimit = queryParams.limit || 50;
 
+  // Fetch post-based images first (primary source)
   const postBasedResult = await fetchImagesByPostImage(queryParams);
 
+  // Initialize orphan result
   let orphanResult: ImagePageWithPostId = {
     items: [],
     nextCursor: null,
@@ -27,14 +34,30 @@ export async function fetchUnifiedImages(
     stats: { fromPostImage: 0, fromOrphans: 0 },
   };
 
-  if (postBasedResult.items.length < (queryParams.limit || 50)) {
-    const remainingSlots =
-      (queryParams.limit || 50) - postBasedResult.items.length;
-    orphanResult = await fetchOrphanImages({ limit: remainingSlots });
+  // Fetch orphan images to fill remaining slots if needed
+  // Only fetch orphans when filter is "all" and no search query
+  const shouldFetchOrphans =
+    (!queryParams.filter || queryParams.filter === "all") &&
+    (!queryParams.search || queryParams.search.trim() === "") &&
+    postBasedResult.items.length < finalLimit;
+
+  if (shouldFetchOrphans) {
+    const remainingSlots = finalLimit - postBasedResult.items.length;
+    try {
+      orphanResult = await fetchOrphanImages({
+        limit: remainingSlots,
+        cursor: null, // Always start fresh for orphans in unified context
+      });
+    } catch (error) {
+      // Log error but don't fail the entire request
+      console.warn("Failed to fetch orphan images:", error);
+    }
   }
 
+  // Merge results
   let allItems = [...postBasedResult.items, ...orphanResult.items];
 
+  // Deduplicate by image ID if requested
   if (deduplicateByImageId) {
     const seen = new Map<string, ImageWithPostId>();
     allItems.forEach((item) => {
@@ -45,6 +68,7 @@ export async function fetchUnifiedImages(
     allItems = Array.from(seen.values());
   }
 
+  // Sort by time (newest first)
   allItems.sort((a, b) => {
     const timeA = new Date(a.postImageCreatedAt || a.created_at).getTime();
     const timeB = new Date(b.postImageCreatedAt || b.created_at).getTime();
@@ -54,20 +78,23 @@ export async function fetchUnifiedImages(
     return b.id.localeCompare(a.id);
   });
 
-  const finalLimit = queryParams.limit || 50;
+  // Slice to final limit
   const items = allItems.slice(0, finalLimit);
+
+  // Determine hasMore - prioritize post-based pagination
   const hasMore =
     allItems.length > finalLimit ||
     postBasedResult.hasMore ||
     orphanResult.hasMore;
 
+  // Generate next cursor
   let nextCursor = null;
   if (hasMore) {
     if (postBasedResult.hasMore && postBasedResult.nextCursor) {
+      // Continue with post-based pagination
       nextCursor = postBasedResult.nextCursor;
-    } else if (orphanResult.hasMore && orphanResult.nextCursor) {
-      nextCursor = orphanResult.nextCursor;
     } else if (items.length > 0) {
+      // Generate cursor from last item
       const lastItem = items[items.length - 1];
       nextCursor = encodeCursor(
         lastItem.postImageCreatedAt || lastItem.created_at,
