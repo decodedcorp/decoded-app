@@ -3,6 +3,7 @@ import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
 import { AppProviders } from "./providers";
 import { MobileNavBar } from "@/lib/components/MobileNavBar";
+import { Sidebar } from "@/lib/components/Sidebar";
 
 const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
@@ -35,8 +36,16 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <AppProviders>
-          {children}
-          {modal}
+          {/* Desktop Sidebar */}
+          <Sidebar />
+
+          {/* Main Content Area - offset by sidebar width on desktop */}
+          <div className="md:ml-[60px] lg:ml-[240px] min-h-screen transition-[margin] duration-300">
+            {children}
+            {modal}
+          </div>
+
+          {/* Mobile Bottom Nav */}
           <MobileNavBar />
         </AppProviders>
       </body>
