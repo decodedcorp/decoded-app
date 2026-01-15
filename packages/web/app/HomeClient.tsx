@@ -1,0 +1,166 @@
+"use client";
+
+import { useMemo, useCallback } from "react";
+import type { ImageRow } from "@/lib/supabase/types";
+import { useInfiniteFilteredImages } from "@/lib/hooks/useImages";
+import type { ImageWithPostId } from "@/lib/supabase/queries/images";
+import {
+  VerticalFeed,
+  VerticalFeedSkeleton,
+} from "@/lib/components/VerticalFeed";
+import type { FeedCardItem } from "@/lib/components/FeedCard";
+import { useFilterStore } from "@/lib/stores/filterStore";
+import { useSearchStore } from "@/lib/stores/searchStore";
+
+type Props = {
+  initialImages: ImageRow[];
+};
+
+/**
+ * Home Client Component - Instagram-style Vertical Feed
+ *
+ * Uses SSR + React Query infinite scroll pattern:
+ * - First render: Uses SSR initialImages
+ * - React Query fetches in CSR -> appends data as user scrolls
+ */
+export function HomeClient({ initialImages: _initialImages }: Props) {
+  const activeFilter = useFilterStore((state) => state.activeFilter);
+  const debouncedQuery = useSearchStore((state) => state.debouncedQuery);
+
+  // Use infinite query hook
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteFilteredImages({
+    limit: 20, // Smaller batch for vertical feed (full-width cards)
+    filter: activeFilter,
+    search: debouncedQuery,
+  });
+
+  // Flatten pages into a single items array with cross-page deduplication
+  const items: ImageWithPostId[] = useMemo(() => {
+    if (!data) return [];
+    const seen = new Set<string>();
+    return data.pages
+      .flatMap((page) => page.items)
+      .filter((item) => {
+        if (seen.has(item.id)) return false;
+        seen.add(item.id);
+        return true;
+      });
+  }, [data]);
+
+  // Normalize status values from database enum to consistent format
+  const normalizeStatus = (
+    raw: string | null
+  ): "pending" | "extracted" | "skipped" | string | undefined => {
+    if (!raw) return undefined;
+    const lower = raw.toLowerCase();
+    if (lower === "pending") return "pending";
+    if (lower === "extracted") return "extracted";
+    if (lower === "skipped") return "skipped";
+    return raw;
+  };
+
+  // Map ImageWithPostId[] to FeedCardItem[]
+  const feedItems: FeedCardItem[] = useMemo(
+    () =>
+      items
+        .filter((image) => image.image_url != null)
+        .map((image) => ({
+          id: image.id,
+          imageUrl: image.image_url,
+          status: normalizeStatus(image.status),
+          hasItems: image.with_items,
+          postId: image.postId,
+          postSource: image.postSource,
+          postAccount: image.postAccount,
+          postCreatedAt: image.postCreatedAt,
+        })),
+    [items]
+  );
+
+  // Memoize onReachEnd callback to prevent unnecessary re-renders
+  const handleReachEnd = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  // Loading state: show skeleton feed (only on initial load)
+  if (isLoading && !data) {
+    return (
+      <div className="absolute inset-0 z-0 pt-14 pb-16 md:pt-4 md:pb-0">
+        <VerticalFeedSkeleton />
+      </div>
+    );
+  }
+
+  // Error state: show error message with retry button
+  if (isError) {
+    return (
+      <div className="absolute inset-0 z-0 flex items-center justify-center pt-14 pb-16 md:pt-4 md:pb-0">
+        <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
+          <div className="mb-4 text-4xl">⚠️</div>
+          <h2 className="mb-2 text-xl font-semibold text-foreground">
+            Failed to load images
+          </h2>
+          <p className="mb-6 text-sm text-muted-foreground">
+            {error instanceof Error
+              ? error.message
+              : "Something went wrong while loading images."}
+          </p>
+          <button
+            onClick={() => refetch()}
+            className="rounded-full border border-border bg-card/80 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            type="button"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Empty state: show empty state message
+  if (!items || items.length === 0) {
+    const hasActiveFilter = activeFilter !== "all";
+    const hasSearchQuery = debouncedQuery.trim().length > 0;
+
+    return (
+      <div className="absolute inset-0 z-0 flex items-center justify-center pt-14 pb-16 md:pt-4 md:pb-0">
+        <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
+          <div className="mb-4 text-4xl">📷</div>
+          <h2 className="mb-2 text-xl font-semibold text-foreground">
+            {hasActiveFilter || hasSearchQuery
+              ? "No images found"
+              : "No images found yet."}
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            {hasActiveFilter || hasSearchQuery
+              ? "Try adjusting your filters or search query."
+              : "Check back later or try adjusting your filters."}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Success state: show vertical feed with actual images
+  return (
+    <div className="absolute inset-0 z-0 pt-14 pb-16 md:pt-4 md:pb-0">
+      <VerticalFeed
+        items={feedItems}
+        onReachEnd={handleReachEnd}
+        hasMore={!!hasNextPage}
+        isLoadingMore={isFetchingNextPage}
+      />
+    </div>
+  );
+}
