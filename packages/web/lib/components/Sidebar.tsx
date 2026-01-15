@@ -8,12 +8,13 @@ import {
   Compass,
   Search,
   SlidersHorizontal,
-  Plus,
+  HelpCircle,
   User,
 } from "lucide-react";
 import DecodedLogo from "./DecodedLogo";
 import { SidebarSearchPanel } from "./SidebarSearchPanel";
 import { SidebarFilterPanel } from "./SidebarFilterPanel";
+import { RequestModal } from "./request/RequestModal";
 
 interface NavItem {
   id: string;
@@ -36,11 +37,11 @@ const navItems: NavItem[] = [
     isAction: true,
   },
   {
-    id: "create",
-    href: "/create",
-    icon: Plus,
-    label: "Create",
-    disabled: true,
+    id: "request",
+    href: "#",
+    icon: HelpCircle,
+    label: "Create Request",
+    isAction: true,
   },
 ];
 
@@ -130,6 +131,7 @@ export const Sidebar = memo(() => {
   const pathname = usePathname();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
 
   const handleSearchToggle = useCallback(() => {
     setIsSearchOpen((prev) => !prev);
@@ -147,6 +149,17 @@ export const Sidebar = memo(() => {
 
   const handleFilterClose = useCallback(() => {
     setIsFilterOpen(false);
+  }, []);
+
+  const handleRequestModalOpen = useCallback(() => {
+    setIsRequestModalOpen(true);
+    // Close other panels
+    setIsSearchOpen(false);
+    setIsFilterOpen(false);
+  }, []);
+
+  const handleRequestModalClose = useCallback(() => {
+    setIsRequestModalOpen(false);
   }, []);
 
   return (
@@ -202,7 +215,9 @@ export const Sidebar = memo(() => {
                 ? handleSearchToggle
                 : item.id === "filter"
                   ? handleFilterToggle
-                  : undefined;
+                  : item.id === "request"
+                    ? handleRequestModalOpen
+                    : undefined;
 
             return (
               <NavItemComponent
@@ -235,6 +250,12 @@ export const Sidebar = memo(() => {
 
       {/* Filter Panel (Slide out) */}
       <SidebarFilterPanel isOpen={isFilterOpen} onClose={handleFilterClose} />
+
+      {/* Request Modal */}
+      <RequestModal
+        isOpen={isRequestModalOpen}
+        onClose={handleRequestModalClose}
+      />
     </>
   );
 });
