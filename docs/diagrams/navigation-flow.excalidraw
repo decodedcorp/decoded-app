@@ -236,7 +236,7 @@
       "containerId": "rect_detail"
     },
     {
-      "id": "rect_pins",
+      "id": "rect_spots",
       "type": "rectangle",
       "x": 280,
       "y": 210,
@@ -251,13 +251,13 @@
       "roundness": { "type": 3 }
     },
     {
-      "id": "text_pins",
+      "id": "text_spots",
       "type": "text",
       "x": 300,
       "y": 225,
       "width": 100,
       "height": 30,
-      "text": "Pin System\nSCR-VIEW-02",
+      "text": "Spot System\nSCR-VIEW-02",
       "fontSize": 12,
       "fontFamily": 1,
       "textAlign": "center",
@@ -268,7 +268,7 @@
       "strokeWidth": 1,
       "roughness": 1,
       "opacity": 100,
-      "containerId": "rect_pins"
+      "containerId": "rect_spots"
     },
     {
       "id": "rect_items",
@@ -857,7 +857,7 @@
       "roundness": { "type": 2 }
     },
     {
-      "id": "arrow_detail_pins",
+      "id": "arrow_detail_spots",
       "type": "arrow",
       "x": 350,
       "y": 180,
@@ -875,7 +875,7 @@
       "roundness": { "type": 2 }
     },
     {
-      "id": "arrow_pins_items",
+      "id": "arrow_spots_items",
       "type": "arrow",
       "x": 350,
       "y": 270,

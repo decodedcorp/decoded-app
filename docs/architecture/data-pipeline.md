@@ -16,6 +16,8 @@
 
 ### 1.1 Ingestion Flow
 
+![AI Creation Pipeline](../diagrams/ai-creation-pipeline.excalidraw.png)
+
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
 │                          DATA INGESTION PIPELINE                                 │
@@ -73,6 +75,8 @@
 ```
 
 ### 1.2 Database Schema Relationships
+
+![Entity Relationship Diagram](../diagrams/entity-relationship.excalidraw.png)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
@@ -309,6 +313,8 @@ interface UiItem {
 ---
 
 ## 4. React Query Caching Strategy
+
+![Filter Data Flow](../diagrams/filter-data-flow.excalidraw.png)
 
 ### 4.1 Cache Configuration
 

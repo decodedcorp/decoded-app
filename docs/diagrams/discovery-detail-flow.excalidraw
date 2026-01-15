@@ -133,7 +133,7 @@
       "y": 140,
       "width": 150,
       "height": 110,
-      "text": "ImageDetailModal\n/@modal/(.)images/[id]\n─────────────────\n\nInteractiveShowcase\n├─ ImageCanvas\n├─ PinOverlay\n├─ ConnectorLayer\n└─ ItemList",
+      "text": "ImageDetailModal\n/@modal/(.)images/[id]\n─────────────────\n\nInteractiveShowcase\n├─ ImageCanvas\n├─ SpotOverlay\n├─ ConnectorLayer\n└─ ItemList",
       "fontSize": 10,
       "fontFamily": 1,
       "textAlign": "left",
@@ -399,7 +399,7 @@
       "containerId": "transition_store"
     },
     {
-      "id": "pin_store",
+      "id": "spot_store",
       "type": "rectangle",
       "x": 630,
       "y": 330,
@@ -414,13 +414,13 @@
       "roundness": { "type": 3 }
     },
     {
-      "id": "text_pin",
+      "id": "text_spot",
       "type": "text",
       "x": 645,
       "y": 340,
       "width": 150,
       "height": 75,
-      "text": "pinStore (optional)\n─────────────────\n\nselectedPinId\nhighlightedItemId\nshowConnectors",
+      "text": "spotStore (optional)\n─────────────────\n\nselectedSpotId\nhighlightedItemId\nshowConnectors",
       "fontSize": 10,
       "fontFamily": 1,
       "textAlign": "left",
@@ -431,7 +431,7 @@
       "strokeWidth": 1,
       "roughness": 1,
       "opacity": 100,
-      "containerId": "pin_store"
+      "containerId": "spot_store"
     },
     {
       "id": "arrow_home_filter",
@@ -488,7 +488,7 @@
       "roundness": { "type": 2 }
     },
     {
-      "id": "arrow_modal_pin",
+      "id": "arrow_modal_spot",
       "type": "arrow",
       "x": 520,
       "y": 260,

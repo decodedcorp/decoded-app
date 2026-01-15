@@ -14,6 +14,8 @@ Decoded는 K-콘텐츠 패션 발견 플랫폼으로, 모노레포 구조의 Nex
 
 ## 1. System Architecture Diagram
 
+![System Architecture](../diagrams/system-architecture.excalidraw.png)
+
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
 │                              CLIENT LAYER                                        │
@@ -195,6 +197,8 @@ decoded-app/
 ---
 
 ## 3. Component Dependency Graph
+
+![Navigation Flow](../diagrams/navigation-flow.excalidraw.png)
 
 ### 3.1 Home Page Dependencies
 
