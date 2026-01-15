@@ -208,7 +208,7 @@ export function ExploreClient({ initialImages: _initialImages }: Props) {
   // Loading state: show skeleton grid (only on initial load)
   if (isLoading && !data) {
     return (
-      <div className="absolute inset-0 z-0 pt-14 md:pt-16">
+      <div className="absolute inset-0 z-0 pt-14 pb-16 md:pt-16 md:pb-0">
         <ThiingsGrid
           gridSize={{ width: 400, height: 500 }}
           renderItem={(config) => <SkeletonCell {...config} />}
@@ -223,7 +223,7 @@ export function ExploreClient({ initialImages: _initialImages }: Props) {
   // Error state: show error message with retry button
   if (isError) {
     return (
-      <div className="absolute inset-0 z-0 flex items-center justify-center pt-14 md:pt-16">
+      <div className="absolute inset-0 z-0 flex items-center justify-center pt-14 pb-16 md:pt-16 md:pb-0">
         <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
           <div className="mb-4 text-4xl">⚠️</div>
           <h2 className="mb-2 text-xl font-semibold text-foreground">
@@ -252,7 +252,7 @@ export function ExploreClient({ initialImages: _initialImages }: Props) {
     const hasSearchQuery = debouncedQuery.trim().length > 0;
 
     return (
-      <div className="absolute inset-0 z-0 flex items-center justify-center pt-14 md:pt-16">
+      <div className="absolute inset-0 z-0 flex items-center justify-center pt-14 pb-16 md:pt-16 md:pb-0">
         <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
           <div className="mb-4 text-4xl">📷</div>
           <h2 className="mb-2 text-xl font-semibold text-foreground">
@@ -272,7 +272,7 @@ export function ExploreClient({ initialImages: _initialImages }: Props) {
 
   // Success state: show grid with actual images
   return (
-    <div className="absolute inset-0 z-0 pt-14 md:pt-16">
+    <div className="absolute inset-0 z-0 pt-14 pb-16 md:pt-16 md:pb-0">
       <ThiingsGrid
         gridSize={{ width: 400, height: 500 }}
         renderItem={(config) => <CardCell {...config} />}

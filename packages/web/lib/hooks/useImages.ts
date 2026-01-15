@@ -76,7 +76,7 @@ export function useInfiniteFilteredImages(params: {
     limit,
     filter = "all",
     search = "",
-    deduplicateByImageId = false,
+    deduplicateByImageId = true,
   } = params;
 
   return useInfiniteQuery<ImagePageWithPostId>({

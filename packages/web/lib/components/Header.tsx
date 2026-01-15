@@ -57,10 +57,10 @@ export function Header() {
             />
           </Link>
 
-          {/* Navigation links */}
+          {/* Navigation links - hidden on mobile (use MobileNavBar instead) */}
           <nav
             aria-label="Main navigation"
-            className="hidden sm:flex items-center gap-1 ml-2"
+            className="hidden md:flex items-center gap-1 ml-2"
           >
             <NavLink href="/" isActive={pathname === "/"}>
               Home
@@ -70,11 +70,15 @@ export function Header() {
             </NavLink>
           </nav>
 
-          <SearchInput />
-          <SponsorBanner />
+          {/* Search & Sponsor - hidden on mobile */}
+          <div className="hidden md:flex items-center gap-2">
+            <SearchInput />
+            <SponsorBanner />
+          </div>
         </div>
         <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
-          <nav aria-label="Filters" className="flex items-center">
+          {/* Filters - hidden on mobile */}
+          <nav aria-label="Filters" className="hidden md:flex items-center">
             <HierarchicalFilter />
           </nav>
           <ThemeToggle />

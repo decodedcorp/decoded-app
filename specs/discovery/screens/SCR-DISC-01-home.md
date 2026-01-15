@@ -168,6 +168,19 @@
 8. 반복 (3-7)
 ```
 
+### 데이터 병합 규칙
+
+무한 스크롤에서 여러 페이지를 병합할 때 중복 제거 적용:
+
+| 단계 | 처리 | 설명 |
+|:---|:---|:---|
+| 페이지 단위 | `deduplicateByImageId` | 어댑터 레벨에서 단일 페이지 내 중복 제거 (기본 활성화) |
+| 클라이언트 병합 | `Set<id>` 필터링 | `flatMap` 후 ID 기반 중복 필터링 |
+
+**구현 위치**:
+- 페이지 단위: `packages/shared/supabase/queries/images-adapter.ts`
+- 클라이언트 병합: `packages/web/app/HomeClient.tsx`
+
 ---
 
 ## 5. 데이터 요구사항

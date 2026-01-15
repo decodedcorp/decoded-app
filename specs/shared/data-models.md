@@ -815,6 +815,18 @@ interface PaginatedResponse<T> {
   };
 }
 
+// Deduplication config for infinite scroll
+interface DeduplicationConfig {
+  strategy: 'id' | 'composite';  // 'id' = image.id only, 'composite' = image.id + postId
+  scope: 'page' | 'accumulated'; // 'page' = single page, 'accumulated' = all pages
+}
+
+/**
+ * 무한 스크롤 중복 제거 전략:
+ * - page 단위: fetchUnifiedImages의 deduplicateByImageId 옵션 (어댑터 레벨)
+ * - accumulated 단위: 클라이언트에서 flatMap 후 Set<id> 필터링
+ */
+
 // Error response
 interface ApiError {
   code: string;

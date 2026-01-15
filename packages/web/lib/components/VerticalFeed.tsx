@@ -26,11 +26,13 @@ export const VerticalFeed = memo(
     hasMore = false,
     isLoadingMore = false,
   }: VerticalFeedProps) => {
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
     const sentinelRef = useRef<HTMLDivElement>(null);
 
     // Infinite scroll using IntersectionObserver
     useEffect(() => {
       if (!sentinelRef.current || !onReachEnd || !hasMore) return;
+      if (!scrollContainerRef.current) return;
 
       const observer = new IntersectionObserver(
         (entries) => {
@@ -40,6 +42,7 @@ export const VerticalFeed = memo(
           }
         },
         {
+          root: scrollContainerRef.current, // Observe within scroll container
           rootMargin: "200px", // Trigger 200px before reaching the end
           threshold: 0,
         }
@@ -53,8 +56,8 @@ export const VerticalFeed = memo(
     }, [onReachEnd, hasMore, isLoadingMore]);
 
     return (
-      <div className="h-full overflow-y-auto">
-        <div className="mx-auto max-w-lg px-4 py-4">
+      <div ref={scrollContainerRef} className="h-full overflow-y-auto">
+        <div className="mx-auto max-w-lg px-4 py-4 pb-20 md:pb-4">
           {/* Feed cards */}
           <div className="flex flex-col gap-4">
             {items.map((item, index) => (

@@ -42,9 +42,18 @@ export function HomeClient({ initialImages: _initialImages }: Props) {
     search: debouncedQuery,
   });
 
-  // Flatten pages into a single items array
+  // Flatten pages into a single items array with cross-page deduplication
   const items: ImageWithPostId[] = data
-    ? data.pages.flatMap((page) => page.items)
+    ? (() => {
+        const seen = new Set<string>();
+        return data.pages
+          .flatMap((page) => page.items)
+          .filter((item) => {
+            if (seen.has(item.id)) return false;
+            seen.add(item.id);
+            return true;
+          });
+      })()
     : [];
 
   // Normalize status values from database enum to consistent format
@@ -76,7 +85,7 @@ export function HomeClient({ initialImages: _initialImages }: Props) {
   // Loading state: show skeleton feed (only on initial load)
   if (isLoading && !data) {
     return (
-      <div className="absolute inset-0 z-0 pt-14 md:pt-16">
+      <div className="absolute inset-0 z-0 pt-14 pb-16 md:pt-16 md:pb-0">
         <VerticalFeedSkeleton />
       </div>
     );
@@ -85,7 +94,7 @@ export function HomeClient({ initialImages: _initialImages }: Props) {
   // Error state: show error message with retry button
   if (isError) {
     return (
-      <div className="absolute inset-0 z-0 flex items-center justify-center pt-14 md:pt-16">
+      <div className="absolute inset-0 z-0 flex items-center justify-center pt-14 pb-16 md:pt-16 md:pb-0">
         <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
           <div className="mb-4 text-4xl">⚠️</div>
           <h2 className="mb-2 text-xl font-semibold text-foreground">
@@ -114,7 +123,7 @@ export function HomeClient({ initialImages: _initialImages }: Props) {
     const hasSearchQuery = debouncedQuery.trim().length > 0;
 
     return (
-      <div className="absolute inset-0 z-0 flex items-center justify-center pt-14 md:pt-16">
+      <div className="absolute inset-0 z-0 flex items-center justify-center pt-14 pb-16 md:pt-16 md:pb-0">
         <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
           <div className="mb-4 text-4xl">📷</div>
           <h2 className="mb-2 text-xl font-semibold text-foreground">
@@ -134,7 +143,7 @@ export function HomeClient({ initialImages: _initialImages }: Props) {
 
   // Success state: show vertical feed with actual images
   return (
-    <div className="absolute inset-0 z-0 pt-14 md:pt-16">
+    <div className="absolute inset-0 z-0 pt-14 pb-16 md:pt-16 md:pb-0">
       <VerticalFeed
         items={feedItems}
         onReachEnd={() => {
