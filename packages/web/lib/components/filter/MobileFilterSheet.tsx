@@ -1,7 +1,12 @@
 "use client";
 
 import React from "react";
-import { motion, AnimatePresence, useDragControls, PanInfo } from "motion/react";
+import {
+  motion,
+  AnimatePresence,
+  useDragControls,
+  PanInfo,
+} from "motion/react";
 import { useHierarchicalFilterStore } from "@decoded/shared/stores/hierarchicalFilterStore";
 import {
   getMockCategories,

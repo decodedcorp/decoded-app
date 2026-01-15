@@ -47,7 +47,9 @@ export function FilterOption({
       <div className="flex-1 text-left min-w-0">
         <div className="font-medium text-sm truncate">{label}</div>
         {labelKo && labelKo !== label && (
-          <div className="text-xs text-muted-foreground truncate">{labelKo}</div>
+          <div className="text-xs text-muted-foreground truncate">
+            {labelKo}
+          </div>
         )}
       </div>
 
@@ -67,7 +69,11 @@ export function FilterOption({
           stroke="currentColor"
           strokeWidth={2}
         >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M5 13l4 4L19 7"
+          />
         </svg>
       )}
     </button>

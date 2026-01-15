@@ -118,4 +118,10 @@ export function useRelatedImagesByAccount(
 }
 
 // Re-export types for convenience
-export type { CategoryFilter, ImagePage, ImagePageWithPostId, ImageDetail, ImageRow };
+export type {
+  CategoryFilter,
+  ImagePage,
+  ImagePageWithPostId,
+  ImageDetail,
+  ImageRow,
+};

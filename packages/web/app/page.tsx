@@ -3,8 +3,8 @@ import { fetchLatestImagesServer } from "@/lib/supabase/queries/images.server";
 import { HomeClient } from "./HomeClient";
 
 export default async function Home() {
-  // Fetch initial images server-side
-  const initialImages = await fetchLatestImagesServer(50);
+  // Fetch initial images server-side (fewer for vertical feed)
+  const initialImages = await fetchLatestImagesServer(20);
 
   return (
     <>

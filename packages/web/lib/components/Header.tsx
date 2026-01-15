@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { HierarchicalFilter } from "./filter";
 import { SearchInput } from "./SearchInput";
 import { SponsorBanner } from "./SponsorBanner";
@@ -9,7 +10,32 @@ import { MoreMenu } from "./MoreMenu";
 import { ThemeToggle } from "./ThemeToggle";
 import DecodedLogo from "./DecodedLogo";
 
+function NavLink({
+  href,
+  children,
+  isActive,
+}: {
+  href: string;
+  children: React.ReactNode;
+  isActive: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      className={`px-3 py-1.5 text-sm font-medium rounded-full transition-colors ${
+        isActive
+          ? "bg-foreground text-background"
+          : "text-muted-foreground hover:text-foreground hover:bg-muted"
+      }`}
+    >
+      {children}
+    </Link>
+  );
+}
+
 export function Header() {
+  const pathname = usePathname();
+
   return (
     <header
       className="fixed top-0 left-0 right-0 z-[9999] w-full bg-transparent pointer-events-none"
@@ -30,6 +56,20 @@ export function Header() {
               enableHueRotate={true}
             />
           </Link>
+
+          {/* Navigation links */}
+          <nav
+            aria-label="Main navigation"
+            className="hidden sm:flex items-center gap-1 ml-2"
+          >
+            <NavLink href="/" isActive={pathname === "/"}>
+              Home
+            </NavLink>
+            <NavLink href="/explore" isActive={pathname === "/explore"}>
+              Explore
+            </NavLink>
+          </nav>
+
           <SearchInput />
           <SponsorBanner />
         </div>
