@@ -686,7 +686,7 @@ PUBLISHED
 │       │           bbox: { x, y, width, height },  // 정규화된 0-1 값       │
 │       │           category: string,                                          │
 │       │           confidence: number,  // 0-1                               │
-│       │           center: { x, y }     // 핀 위치용                         │
+│       │           center: { x, y }     // 스팟 위치용                         │
 │       │         }                                                            │
 │       │                                                                      │
 │       ▼                                                                      │

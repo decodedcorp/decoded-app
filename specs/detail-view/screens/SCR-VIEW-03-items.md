@@ -6,7 +6,7 @@
 | **경로** | (이미지 상세 내 컴포넌트) |
 | **작성일** | 2026-01-14 |
 | **버전** | v1.0 |
-| **상태** | Draft |
+| **상태** | 초안 |
 
 ---
 
@@ -28,7 +28,7 @@
 │ DualMatchSection.tsx                                                        │
 │                                                                            │
 │ ┌────────────────────────────────────────────────────────────────────────┐ │
-│ │ 👗 Item #1: Jacket                                          [Pin #1]  │ │
+│ │ 👗 Item #1: Jacket                                         [Spot #1]  │ │
 │ │                                                                        │ │
 │ │ ┌────────────────────────────────────────────────────────────────────┐│ │
 │ │ │ THE ORIGINAL                                                       ││ │
@@ -190,7 +190,7 @@
 
 | UI ID | 구분 | 요소명 | 속성/상태 | 인터랙션/로직 |
 |:---:|:---:|:---|:---|:---|
-| **ORIGINAL-CARD** | 카드 | Original 아이템 | - BG: `surface-primary`<br>- Border: 1px `border-muted` | 핀과 연동 하이라이트 |
+| **ORIGINAL-CARD** | 카드 | Original 아이템 | - BG: `surface-primary`<br>- Border: 1px `border-muted` | 스팟과 연동 하이라이트 |
 | **ITEM-IMG** | 이미지 | 아이템 썸네일 | - Size: 80×80px<br>- Border-radius: 8px | **Click**: 이미지 확대 (선택적) |
 | **ITEM-NAME** | 텍스트 | 상품명 | - Font: Body Bold (16px)<br>- Max: 2줄 ellipsis | - |
 | **ITEM-BRAND** | 텍스트 | 브랜드 | - Font: Caption<br>- Color: `text-muted` | - |
@@ -225,7 +225,7 @@
 | 상태 | 조건 | UI 변화 |
 |:---|:---|:---|
 | **기본** | 아이템 표시 | Original + Vibe 목록 |
-| **선택됨** | 핀/카드 클릭 | 해당 카드 ring 하이라이트 |
+| **선택됨** | 스팟/카드 클릭 | 해당 카드 ring 하이라이트 |
 | **투표 완료** | 사용자 투표 | 버튼에 ✓ 표시, 카운트 업데이트 |
 | **구매 로딩** | Buy 클릭 | 버튼 "Opening..." + 스피너 |
 | **Vibe 추가 중** | 모달 제출 | 로딩 상태 → 목록에 추가 |

@@ -6,7 +6,7 @@
 | **경로** | `/route/path` |
 | **작성일** | YYYY-MM-DD |
 | **버전** | v1.0 |
-| **상태** | Draft / Review / Approved |
+| **상태** | 초안 / 검토중 / 구현됨 |
 
 ---
 

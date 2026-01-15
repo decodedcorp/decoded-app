@@ -6,7 +6,7 @@
 | **경로** | `/` |
 | **작성일** | 2026-01-14 |
 | **버전** | v1.0 |
-| **상태** | Draft |
+| **상태** | 초안 |
 
 ---
 
@@ -100,7 +100,7 @@
 | UI ID | 구분 | 요소명 | 속성/상태 | 인터랙션/로직 |
 |:---:|:---:|:---|:---|:---|
 | **GRID** | 컨테이너 | ThiingsGrid | - Layout: Masonry (Pinterest style)<br>- Columns: 2 (mobile), 4-6 (desktop)<br>- Gap: 16px | GSAP 물리 기반 레이아웃<br>스크롤 시 가상화 (최대 300 노드) |
-| **CARD** | 카드 | ImageCard | - BG: `surface-primary`<br>- Border-radius: 12px<br>- Aspect: dynamic (이미지 비율 유지) | **Click**: 이미지 상세 모달 열기<br>`/(.)images/[id]` (Intercepting Route)<br>**Hover**: 살짝 확대 (scale: 1.02) |
+| **CARD-IMAGE** | 카드 | ImageCard | - BG: `surface-primary`<br>- Border-radius: 12px<br>- Aspect: dynamic (이미지 비율 유지) | **Click**: 이미지 상세 모달 열기<br>`/(.)images/[id]` (Intercepting Route)<br>**Hover**: 살짝 확대 (scale: 1.02) |
 | **CARD-IMG** | 이미지 | 카드 이미지 | - Loading: eager (상위 6개), lazy (나머지)<br>- Placeholder: blur | 이미지 로드 완료 시 fade-in |
 | **BADGE** | 뱃지 | 아이템 수 표시 | - Position: Bottom-right<br>- BG: `rgba(0,0,0,0.6)`<br>- Text: white | 아이템 개수 표시 (예: "3 items") |
 | **SKELETON** | 스켈레톤 | 로딩 플레이스홀더 | - Animation: shimmer<br>- Shape: 카드와 동일 | 초기 로딩 및 추가 로딩 시 표시 |

@@ -7,7 +7,7 @@
 | **경로** | `/create/edit` |
 | **작성일** | 2025-01-14 |
 | **버전** | v1.0 |
-| **상태** | Draft |
+| **상태** | 초안 |
 
 ---
 
@@ -343,7 +343,7 @@
 │  │   Preview                                                             │ │
 │  │   ┌────────────────────────────────────────────────────────────────┐  │ │
 │  │   │                                                                │  │ │
-│  │   │              [Image with pin markers]                          │  │ │
+│  │   │              [Image with spot markers]                          │  │ │
 │  │   │                                                                │  │ │
 │  │   │                    ●① Top                                      │  │ │
 │  │   │                                                                │  │ │
@@ -445,7 +445,7 @@
 
 | UI ID | 구분 | 요소명 | 속성/상태 | 인터랙션/로직 |
 |:---:|:---:|:---:|:---|:---|
-| PREVIEW-IMAGE | 이미지 | 프리뷰 | 핀 마커 오버레이 | 각 아이템 위치 표시 |
+| PREVIEW-IMAGE | 이미지 | 프리뷰 | 스팟 마커 오버레이 | 각 아이템 위치 표시 |
 | SUMMARY-TAGS | 요약 | 태그 요약 | Media, Cast, Context | Edit Tags 클릭 시 탭 이동 |
 | SUMMARY-ITEMS | 요약 | 아이템 요약 | 각 아이템별 Original/Vibe 정보 | Edit Items 클릭 시 탭 이동 |
 | BTN-DRAFT | 버튼 | 임시 저장 | variant: outline | 임시 저장 후 내 활동으로 |
@@ -607,7 +607,7 @@ type ContextType = 'airport' | 'stage' | 'mv' | 'photoshoot' | 'daily' | 'event'
 - [ ] ParsedProductCard (파싱 결과 표시)
 - [ ] ManualProductForm (수동 입력 폼)
 - [ ] Vibe 제품 추가 기능
-- [ ] ReviewPreview (핀 마커 + 요약)
+- [ ] ReviewPreview (스팟 마커 + 요약)
 - [ ] 게시/임시저장 기능
 - [ ] 에러 처리 및 재시도 UI
 - [ ] 반응형 레이아웃

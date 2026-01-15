@@ -13,7 +13,7 @@
 | [shared/](./shared/) | 공통 컴포넌트, 템플릿, 데이터 모델 | - | 4 components | - |
 | [user-system/](./user-system/) | 사용자 인증, 프로필, 활동 | U-01~U-05 | 5 screens | 0% |
 | [discovery/](./discovery/) | 피드, 필터, 검색, 갤러리 | D-01~D-04 | 4 screens | 50% |
-| [detail-view/](./detail-view/) | 상세 뷰, 핀, 아이템, 관련 콘텐츠 | V-01~V-06 | 4 screens | 70% |
+| [detail-view/](./detail-view/) | 상세 뷰, 스팟, 아이템, 관련 콘텐츠 | V-01~V-06 | 4 screens | 70% |
 | [creation-ai/](./creation-ai/) | 업로드, AI 인식, 태깅 | C-01~C-04 | 3 screens | 10% |
 | [system-backend/](./system-backend/) | 백엔드 시스템 | S-01~S-08 | - | 7% |
 | [admin/](./admin/) | 관리자 패널 | A-01~A-03 | 3 screens | 0% |

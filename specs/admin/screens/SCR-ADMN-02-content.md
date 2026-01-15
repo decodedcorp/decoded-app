@@ -7,7 +7,7 @@
 | **경로** | `/admin/content` |
 | **작성일** | 2025-01-14 |
 | **버전** | v1.0 |
-| **상태** | Draft |
+| **상태** | 초안 |
 
 ---
 
@@ -90,7 +90,7 @@
 │  ┌──────────────────────────────────┐  Submitted: Jan 8, 2026, 2:34 PM     │
 │  │                                  │  User: user123                        │
 │  │                                  │  Email: user123@email.com             │
-│  │      [Main Image with Pins]      │  Account Age: 3 months                │
+│  │      [Main Image with Spots]     │  Account Age: 3 months                │
 │  │                                  │  Previous Posts: 47 (45 approved)     │
 │  │          ●① Top                  │                                       │
 │  │                                  │  ───────────────────────────────────  │
@@ -316,7 +316,7 @@
 | UI ID | 구분 | 요소명 | 속성/상태 | 인터랙션/로직 |
 |:---:|:---:|:---:|:---|:---|
 | MODAL-DETAIL | 모달 | 상세 모달 | max-width: 800px | - |
-| IMG-MAIN | 이미지 | 메인 이미지 | 핀 마커 오버레이 | 핀 클릭 시 아이템 포커스 |
+| IMG-MAIN | 이미지 | 메인 이미지 | 스팟 마커 오버레이 | 스팟 클릭 시 아이템 포커스 |
 | SECTION-USER | 섹션 | 사용자 정보 | 가입일, 이전 포스트 통계 | 위험 신호 표시 |
 | SECTION-TAGS | 섹션 | 태그 정보 | Media, Cast, Context | 수정 가능 |
 | SECTION-ITEMS | 섹션 | 아이템 목록 | 각 아이템별 상세 | 개별 수정/삭제 |

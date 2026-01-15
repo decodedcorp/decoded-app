@@ -62,7 +62,7 @@
 └────────────────────────────────┘
 ```
 
-### 2.2 핀 시스템 적용 시 (미구현)
+### 2.2 스팟 시스템 적용 시 (미구현)
 
 ```
 ┌────────────────────────────────┐
@@ -139,12 +139,12 @@
 외부 브라우저로 이동
 ```
 
-### 4.3 핀 탭 (미구현)
+### 4.3 스팟 탭 (미구현)
 
 ```
-사용자가 핀 마커 탭
+사용자가 스팟 마커 탭
     │
-    ▼ setSelectedPinId(pin.id)
+    ▼ setSelectedSpotId(spot.id)
     │
     ▼ 해당 아이템 카드로 스크롤
     │
@@ -171,16 +171,16 @@
 |:---|:---|:---:|:---|:---|
 | `item` | `ItemRow` | Y | - | 아이템 데이터 |
 | `index` | `number` | Y | - | 아이템 순서 (1-based) |
-| `isSelected` | `boolean` | N | false | 선택 상태 (핀 연동용) |
+| `isSelected` | `boolean` | N | false | 선택 상태 (스팟 연동용) |
 | `onPress` | `() => void` | N | - | 탭 핸들러 |
 | `testID` | `string` | N | - | E2E 테스트 식별자 |
 
-### 5.3 PinMarker Props (미구현)
+### 5.3 SpotMarker Props (미구현)
 
 | Prop | 타입 | 필수 | 기본값 | 설명 |
 |:---|:---|:---:|:---|:---|
 | `position` | `{ x: number; y: number }` | Y | - | 정규화 좌표 (0-1) |
-| `number` | `number` | Y | - | 핀 번호 |
+| `number` | `number` | Y | - | 스팟 번호 |
 | `isSelected` | `boolean` | N | false | 선택 상태 |
 | `onPress` | `() => void` | Y | - | 탭 핸들러 |
 
@@ -224,8 +224,8 @@ interface ItemRow {
 | `--text-primary` | `#1A1A1A` | `#FAFAFA` | 기본 텍스트 |
 | `--text-muted` | `rgba(0,0,0,0.6)` | `rgba(255,255,255,0.6)` | 날짜, 브랜드 |
 | `--price-color` | `#007AFF` | `#0A84FF` | 가격 텍스트 |
-| `--pin-bg` | `#007AFF` | `#0A84FF` | 핀 마커 배경 |
-| `--pin-selected` | `#FF3B30` | `#FF453A` | 선택된 핀 |
+| `--spot-bg` | `#007AFF` | `#0A84FF` | 스팟 마커 배경 |
+| `--spot-selected` | `#FF3B30` | `#FF453A` | 선택된 스팟 |
 
 ### 6.2 타이포그래피
 
@@ -237,7 +237,7 @@ interface ItemRow {
 | 아이템명 | 15 | 500 | text-primary |
 | 브랜드 | 13 | 400 | text-muted |
 | 가격 | 14 | 600 | price-color |
-| 핀 번호 | 12 | 700 | white |
+| 스팟 번호 | 12 | 700 | white |
 
 ### 6.3 간격
 
@@ -249,7 +249,7 @@ interface ItemRow {
 | 아이템 카드 패딩 | 12px | 내부 여백 |
 | 아이템 카드 간격 | 8px | 카드 사이 간격 |
 | 카드 border-radius | 8px | 모서리 둥글기 |
-| 핀 마커 크기 | 28px | 지름 |
+| 스팟 마커 크기 | 28px | 지름 |
 
 ---
 
@@ -265,11 +265,11 @@ interface ItemRow {
 const { data: image, isLoading, error } = useImageById(id ?? "");
 ```
 
-### 7.2 로컬 상태 (미구현 - 핀 시스템용)
+### 7.2 로컬 상태 (미구현 - 스팟 시스템용)
 
 | 상태 | 타입 | 초기값 | 용도 |
 |:---|:---|:---|:---|
-| `selectedPinId` | `string \| null` | `null` | 선택된 핀/아이템 |
+| `selectedSpotId` | `string \| null` | `null` | 선택된 스팟/아이템 |
 | `isImageLoaded` | `boolean` | `false` | 이미지 로드 완료 여부 |
 | `scrollRef` | `RefObject<ScrollView>` | - | 스크롤 제어 |
 
@@ -403,7 +403,7 @@ queryClient.prefetchQuery({
 | 히어로 이미지 | "이미지 상세" | `image` | - |
 | 계정명 | "@{account}" | `text` | - |
 | 아이템 카드 | "{product_name}, {brand}, {price}" | `button` | "탭하여 구매 페이지로 이동" |
-| 핀 마커 (미구현) | "아이템 {number}" | `button` | "탭하여 상세 정보 보기" |
+| 스팟 마커 (미구현) | "아이템 {number}" | `button` | "탭하여 상세 정보 보기" |
 
 ### 10.2 포커스 순서
 
@@ -424,7 +424,7 @@ queryClient.prefetchQuery({
 |:---|:---|:---|:---:|
 | 뒤로가기 버튼 | 44×44px | 44×44px | ✅ |
 | 아이템 카드 | 44×44px | 전체 너비 × ~60px | ✅ |
-| 핀 마커 (미구현) | 44×44px | 28×28px (터치 영역 44px) | - |
+| 스팟 마커 (미구현) | 44×44px | 28×28px (터치 영역 44px) | - |
 
 ### 10.4 스크린 리더 지원
 
@@ -457,7 +457,7 @@ queryClient.prefetchQuery({
 |:---|:---:|:---|
 | 아이템 목록 | `map` | 10개 이상 시 `FlatList` |
 | 컴포넌트 | 일반 | `React.memo` 적용 |
-| 이미지 onLoad | ❌ | 로드 완료 후 핀 표시 |
+| 이미지 onLoad | ❌ | 로드 완료 후 스팟 표시 |
 
 ### 11.3 데이터 프리페칭
 
@@ -484,7 +484,7 @@ const prefetchImage = (id: string) => {
 
 ## 12. 미구현 항목 상세
 
-### 12.1 핀 시스템 (P1)
+### 12.1 스팟 시스템 (P1)
 
 **구현 방안**:
 - 이미지 위 절대 위치 오버레이
@@ -504,16 +504,16 @@ const prefetchImage = (id: string) => {
 
 **좌표 변환**:
 ```typescript
-const pinStyle = {
+const spotStyle = {
   position: 'absolute',
-  left: position.x * imageWidth - PIN_SIZE / 2,
-  top: position.y * imageHeight - PIN_SIZE / 2,
+  left: position.x * imageWidth - SPOT_SIZE / 2,
+  top: position.y * imageHeight - SPOT_SIZE / 2,
 };
 ```
 
 **Props**:
 ```typescript
-interface PinMarkerProps {
+interface SpotMarkerProps {
   position: { x: number; y: number };
   number: number;
   isSelected: boolean;
@@ -632,8 +632,8 @@ const itemCardStyle = {
   marginBottom: 8,
 };
 
-// Pin Marker
-const PIN_SIZE = 28;
+// Spot Marker
+const SPOT_SIZE = 28;
 ```
 
 ---
@@ -643,7 +643,7 @@ const PIN_SIZE = 28;
 | 기능 | 웹 (SCR-VIEW-01) | 모바일 (SCR-MOBL-02) |
 |:---|:---|:---|
 | 레이아웃 | 50/50 Split (Sticky) | 세로 ScrollView |
-| 핀 시스템 | ✅ 구현됨 | ❌ 미구현 |
+| 스팟 시스템 | ✅ 구현됨 | ❌ 미구현 |
 | 연결선 | ✅ SVG Bezier | ❌ 미구현 (불필요) |
 | 아이템 카드 | 상세 정보 + 인터랙션 | 기본 정보만 |
 | 구매 링크 | ❌ 미구현 | ❌ 미구현 |
@@ -660,7 +660,7 @@ const PIN_SIZE = 28;
 | `packages/mobile/app/images/[id].tsx` | 상세 화면 컴포넌트 |
 | `packages/shared/hooks/useImages.ts` | useImageById 훅 |
 | `packages/mobile/components/ItemCard.tsx` | 아이템 카드 (예정) |
-| `packages/mobile/components/PinMarker.tsx` | 핀 마커 (예정) |
+| `packages/mobile/components/SpotMarker.tsx` | 스팟 마커 (예정) |
 
 ---
 
@@ -668,5 +668,5 @@ const PIN_SIZE = 28;
 
 - [M-04 기능 명세](../spec.md#m-04-이미지-상세-화면)
 - [웹 상세 화면 (SCR-VIEW-01)](../../detail-view/screens/SCR-VIEW-01-detail.md)
-- [핀 시스템 (SCR-VIEW-02)](../../detail-view/screens/SCR-VIEW-02-pins.md)
+- [스팟 시스템 (SCR-VIEW-02)](../../detail-view/screens/SCR-VIEW-02-spots.md)
 - [모바일 홈 화면 (SCR-MOBL-01)](./SCR-MOBL-01-home.md)

@@ -6,7 +6,7 @@
 | **경로** | `/media/[id]` |
 | **작성일** | 2026-01-14 |
 | **버전** | v1.0 |
-| **상태** | Draft |
+| **상태** | 초안 |
 
 ---
 
@@ -204,7 +204,7 @@
 | **SECTION-ITEMS** | 섹션 | 아이템 그리드 | - Header: "All Items" | 무한 스크롤 |
 | **SEL-FILTER** | 셀렉트 | 필터 드롭다운 | - Options: Latest, Popular, Cast별 | **Change**: 그리드 필터링 |
 | **GRID** | 그리드 | ThiingsGrid | - Columns: 2 (Mobile), 4-5 (Desktop) | 무한 스크롤 지원 |
-| **CARD** | 카드 | 이미지 카드 | - 홈 피드와 동일 | **Click**: 상세 모달 |
+| **CARD-IMAGE** | 카드 | 이미지 카드 | - 홈 피드와 동일 | **Click**: 상세 모달 |
 
 ### Related Media 섹션
 

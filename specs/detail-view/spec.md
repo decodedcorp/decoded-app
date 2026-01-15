@@ -8,7 +8,7 @@
 
 ## 개요
 
-상세 기능은 게시물과 아이템의 표시를 처리하며, 시각적 요소를 제품 정보와 연결하는 핀 시스템을 포함합니다. 인터랙션 기능은 투표와 댓글을 통해 커뮤니티 참여를 가능하게 합니다.
+상세 기능은 게시물과 아이템의 표시를 처리하며, 시각적 요소를 제품 정보와 연결하는 스팟 시스템을 포함합니다. 인터랙션 기능은 투표와 댓글을 통해 커뮤니티 참여를 가능하게 합니다.
 
 ### 관련 화면
 - `/images/[id]` - 풀페이지 상세 뷰
@@ -19,7 +19,7 @@
 - `app/@modal/(.)images/[id]/page.tsx` - 모달 라우트
 - `lib/components/detail/ImageDetailContent.tsx` - 공유 상세 로직
 - `lib/components/detail/ItemDetailCard.tsx` - 아이템 카드
-- `lib/components/detail/ConnectorLayer.tsx` - 핀 연결선
+- `lib/components/detail/ConnectorLayer.tsx` - 스팟 연결선
 
 ---
 
@@ -59,38 +59,38 @@
 
 ---
 
-### V-02 핀 인터랙션
+### V-02 스팟 인터랙션
 
-- **설명**: 아이템 좌표에 핀을 이미지에 표시; 핀 클릭 시 아이템 카드 하이라이트
+- **설명**: 아이템 좌표에 스팟을 이미지에 표시; 스팟 클릭 시 아이템 카드 하이라이트
 - **우선순위**: P0
 - **상태**: **구현됨** ✅
 - **의존성**: 바운딩 박스가 있는 아이템 감지
 
 #### 현재 구현 상태
-- `ImageCanvas.tsx` - 핀 렌더링 + 스포트라이트 효과
-- `ConnectorLayer.tsx` - 핀에서 카드로 SVG 베지에 곡선 연결선
+- `ImageCanvas.tsx` - 스팟 렌더링 + 스포트라이트 효과
+- `ConnectorLayer.tsx` - 스팟에서 카드로 SVG 베지에 곡선 연결선
 - `ItemDetailCard.tsx` - 호버/클릭 인터랙션 핸들러
 - `InteractiveShowcase.tsx` - 전체 조합 및 ScrollTrigger 연동
 - `useNormalizedItems.ts` - 좌표 정규화 훅
 - 아이템에 `center` 좌표 있음 (정규화 0-1)
 
 #### 인수 조건
-- [x] 이미지의 정확한 위치에 핀 표시 (`ImageCanvas.tsx` - 정규화 좌표 기반)
+- [x] 이미지의 정확한 위치에 스팟 표시 (`ImageCanvas.tsx` - 정규화 좌표 기반)
 - [x] 아이템 목록과 일치하는 번호 레이블 사용 (인덱스 라벨 01, 02, 03...)
-- [x] 핀 클릭 시 해당 아이템 카드로 스크롤 및 하이라이트 (ScrollTrigger 연동)
-- [x] 아이템 카드 클릭 시 해당 핀 하이라이트 (`onActivate`/`onDeactivate`)
-- [x] 핀과 카드 모두에 호버 상태 (스포트라이트 효과)
+- [x] 스팟 클릭 시 해당 아이템 카드로 스크롤 및 하이라이트 (ScrollTrigger 연동)
+- [x] 아이템 카드 클릭 시 해당 스팟 하이라이트 (`onActivate`/`onDeactivate`)
+- [x] 스팟과 카드 모두에 호버 상태 (스포트라이트 효과)
 - [x] 모바일: 탭 인터랙션 부드럽게 동작 (40vh fixed + scrolling cards)
 - [x] 호버/선택 시 연결선 애니메이션 (`ConnectorLayer.tsx` - dash array + glow)
-- [x] 다양한 이미지 크기에서 핀 적절히 스케일 (`object-fit: cover` 보정)
+- [x] 다양한 이미지 크기에서 스팟 적절히 스케일 (`object-fit: cover` 보정)
 
 #### 향후 개선사항
-- [ ] 핀 개수 제한 (10개 초과 시 UI 처리)
-- [ ] 핀 겹침 방지 알고리즘
+- [ ] 스팟 개수 제한 (10개 초과 시 UI 처리)
+- [ ] 스팟 겹침 방지 알고리즘
 
 #### UI/UX 요구사항
 
-**핀 디자인**:
+**스팟 디자인**:
 ```
     ┌───┐
     │ 1 │  ← 번호가 있는 원 (24px)
@@ -135,26 +135,26 @@ Connected:   ●1──────[카드 하이라이트됨]
 
 #### 구현 노트
 ```typescript
-// lib/components/detail/PinOverlay.tsx
-interface Pin {
+// lib/components/detail/SpotOverlay.tsx
+interface Spot {
   itemId: string;
   index: number;
   position: { x: number; y: number }; // 정규화 0-1
 }
 
-function PinOverlay({ pins, selectedPinId, onPinClick }: Props) {
+function SpotOverlay({ spots, selectedSpotId, onSpotClick }: Props) {
   return (
     <div className="absolute inset-0">
-      {pins.map(pin => (
-        <PinMarker
-          key={pin.itemId}
-          index={pin.index}
+      {spots.map(spot => (
+        <SpotMarker
+          key={spot.itemId}
+          index={spot.index}
           style={{
-            left: `${pin.position.x * 100}%`,
-            top: `${pin.position.y * 100}%`,
+            left: `${spot.position.x * 100}%`,
+            top: `${spot.position.y * 100}%`,
           }}
-          isSelected={pin.itemId === selectedPinId}
-          onClick={() => onPinClick(pin.itemId)}
+          isSelected={spot.itemId === selectedSpotId}
+          onClick={() => onSpotClick(spot.itemId)}
         />
       ))}
     </div>
@@ -163,7 +163,7 @@ function PinOverlay({ pins, selectedPinId, onPinClick }: Props) {
 ```
 
 #### 구현된 파일
-- `lib/components/detail/ImageCanvas.tsx` - 핀 렌더링 + 스포트라이트 + Pan/Zoom
+- `lib/components/detail/ImageCanvas.tsx` - 스팟 렌더링 + 스포트라이트 + Pan/Zoom
 - `lib/components/detail/ConnectorLayer.tsx` - SVG 베지에 곡선 연결선
 - `lib/components/detail/ItemDetailCard.tsx` - 인터랙션 핸들러 + 매거진 스타일 카드
 - `lib/components/detail/InteractiveShowcase.tsx` - 전체 조합 (sticky split)
@@ -177,7 +177,7 @@ function PinOverlay({ pins, selectedPinId, onPinClick }: Props) {
 - **설명**: "The Original" (정확한 매치) vs "The Vibe" (비슷하면서 저렴한 대안) 표시
 - **우선순위**: P0
 - **상태**: 미시작
-- **의존성**: V-02 (핀 시스템), 아이템 match_type 필드
+- **의존성**: V-02 (스팟 시스템), 아이템 match_type 필드
 
 #### 인수 조건
 - [ ] "Original"과 "Vibe" 섹션으로 아이템 그룹화
@@ -572,8 +572,8 @@ interface Vote {
 
 ## 마이그레이션 경로
 
-### 1단계: 핀 시스템 완성
-1. PinOverlay 컴포넌트 완성
+### 1단계: 스팟 시스템 완성
+1. SpotOverlay 컴포넌트 완성
 2. 클릭-투-스크롤 인터랙션 추가
 3. 다양한 이미지 크기에서 테스트
 
@@ -597,7 +597,7 @@ interface Vote {
 
 ## 성능 고려사항
 
-- 핀 위치는 한 번 계산하고 캐시해야 함
+- 스팟 위치는 한 번 계산하고 캐시해야 함
 - 댓글은 페이지네이션되어야 함
 - 투표 수는 eventually consistent 가능 (optimistic update 사용)
 - 상세 뷰에서 이미지는 priority 로딩 필요
@@ -717,13 +717,13 @@ interface Vote {
 │ │ │  └───────────────────┘  │ │  │ │ ┌────────────────────────────┐││ │ │
 │ │ │                         │ │  │ │ │ [Img] Celine Jacket        │││ │ │
 │ │ │  ┌───────────────────┐  │ │  │ │ │       $2,850               │││ │ │
-│ │ │  │ PinOverlay.tsx    │  │ │  │ │ │       [Buy →]              │││ │ │
-│ │ │  │ (핀 오버레이)     │  │ │  │ │ └────────────────────────────┘││ │ │
+│ │ │  │ SpotOverlay.tsx    │  │ │  │ │ │       [Buy →]              │││ │ │
+│ │ │  │ (스팟 오버레이)     │  │ │  │ │ └────────────────────────────┘││ │ │
 │ │ │  └───────────────────┘  │ │  │ └────────────────────────────────┘│ │ │
 │ │ │                         │ │  │                                    │ │ │
 │ │ │  ┌───────────────────┐  │ │  │ ┌────────────────────────────────┐│ │ │
 │ │ │  │ ConnectorLayer    │  │ │  │ │ 2. ItemDetailCard.tsx          ││ │ │
-│ │ │  │ (핀-카드 연결선)  │  │ │  │ │ ┌────────────────────────────┐││ │ │
+│ │ │  │ (스팟-카드 연결선)  │  │ │  │ │ ┌────────────────────────────┐││ │ │
 │ │ │  └───────────────────┘  │ │  │ │ │ [Img] Prada Bag            │││ │ │
 │ │ │                         │ │  │ │ │       $1,950               │││ │ │
 │ │ └─────────────────────────┘ │  │ │ └────────────────────────────┘││ │ │
@@ -736,10 +736,10 @@ interface Vote {
 │                                                                            │
 │ 컴포넌트 트리:                                                             │
 │ ImageDetailContent.tsx                                                     │
-│ ├── InteractiveShowcase.tsx (이미지 + 핀 + 연결선)                        │
+│ ├── InteractiveShowcase.tsx (이미지 + 스팟 + 연결선)                        │
 │ │   ├── Image (next/image)                                                │
-│ │   ├── PinOverlay.tsx                                                    │
-│ │   │   └── PinMarker.tsx (×N)                                           │
+│ │   ├── SpotOverlay.tsx                                                    │
+│ │   │   └── SpotMarker.tsx (×N)                                           │
 │ │   └── ConnectorLayer.tsx (SVG)                                         │
 │ │                                                                          │
 │ └── ItemSection.tsx (아이템 목록)                                         │
@@ -752,7 +752,7 @@ interface Vote {
 │             └── BuyButton.tsx                                              │
 │                                                                            │
 │ 상태 관리:                                                                 │
-│ - selectedPinId: 로컬 state (useState)                                    │
+│ - selectedSpotId: 로컬 state (useState)                                    │
 │ - imageData: React Query cache                                             │
 │ - items: useNormalizedItems() 훅                                          │
 │ - transitionState: transitionStore (GSAP 애니메이션)                      │
@@ -851,13 +851,13 @@ transitionStore 상태:
 
 ---
 
-### V-02 핀 인터랙션 - 컴포넌트 매핑
+### V-02 스팟 인터랙션 - 컴포넌트 매핑
 
-#### 핀 시스템 상세 구조
+#### 스팟 시스템 상세 구조
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│ PIN INTERACTION SYSTEM                                                      │
+│ SPOT INTERACTION SYSTEM                                                      │
 │                                                                            │
 │ ┌────────────────────────────────────────────────────────────────────────┐ │
 │ │ InteractiveShowcase.tsx                                                │ │
@@ -872,18 +872,18 @@ transitionStore 상태:
 │ │  │  └─────────────────────────────────┘   │                           │ │
 │ │  │                                         │                           │ │
 │ │  │  ┌─────────────────────────────────┐   │                           │ │
-│ │  │  │ PinOverlay.tsx                  │   │  ← position: absolute    │ │
+│ │  │  │ SpotOverlay.tsx                  │   │  ← position: absolute    │ │
 │ │  │  │ (inset: 0)                      │   │     pointer-events: none │ │
-│ │  │  │                                  │   │     (개별 핀만 이벤트)   │ │
-│ │  │  │  ●1 ──────────────────────────────────▶ PinMarker #1          │ │
+│ │  │  │                                  │   │     (개별 스팟만 이벤트)   │ │
+│ │  │  │  ●1 ──────────────────────────────────▶ SpotMarker #1          │ │
 │ │  │  │       left: 32%                  │   │    onClick → select(1)  │ │
 │ │  │  │       top: 45%                   │   │                          │ │
 │ │  │  │                                  │   │                          │ │
-│ │  │  │            ●2 ────────────────────────▶ PinMarker #2          │ │
+│ │  │  │            ●2 ────────────────────────▶ SpotMarker #2          │ │
 │ │  │  │                 left: 67%        │   │    onClick → select(2)  │ │
 │ │  │  │                 top: 28%         │   │                          │ │
 │ │  │  │                                  │   │                          │ │
-│ │  │  │    ●3 ────────────────────────────────▶ PinMarker #3          │ │
+│ │  │  │    ●3 ────────────────────────────────▶ SpotMarker #3          │ │
 │ │  │  │         left: 23%                │   │    onClick → select(3)  │ │
 │ │  │  │         top: 72%                 │   │                          │ │
 │ │  │  │                                  │   │                          │ │
@@ -896,7 +896,7 @@ transitionStore 상태:
 │ │  │                                         │     pointer-events: none │ │
 │ │  │  <svg viewBox="0 0 100 100">           │                           │ │
 │ │  │    <path                               │                           │ │
-│ │  │      d="M 32,45 Q 50,45 68,45"         │  ← 핀1 → 카드1 연결      │ │
+│ │  │      d="M 32,45 Q 50,45 68,45"         │  ← 스팟1 → 카드1 연결      │ │
 │ │  │      stroke={selected ? 'primary' :    │                           │ │
 │ │  │              'gray'}                   │                           │ │
 │ │  │      strokeDasharray={selected ?       │                           │ │
@@ -912,7 +912,7 @@ transitionStore 상태:
 │ 컴포넌트 파일 위치 (실제 구현):                                            │
 │ packages/web/lib/components/detail/                                        │
 │ ├── InteractiveShowcase.tsx  - 전체 조합 + ScrollTrigger                  │
-│ ├── ImageCanvas.tsx          - 핀 렌더링 + 스포트라이트 (PinOverlay 통합) │
+│ ├── ImageCanvas.tsx          - 스팟 렌더링 + 스포트라이트 (SpotOverlay 통합) │
 │ ├── ItemDetailCard.tsx       - 인터랙션 핸들러                            │
 │ ├── ConnectorLayer.tsx       - SVG 베지에 곡선 연결선                     │
 │ └── types.ts                 - 좌표 정규화 유틸리티                        │
@@ -923,11 +923,11 @@ transitionStore 상태:
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-#### 핀 상태 및 스타일 (ImageCanvas.tsx에서 구현)
+#### 스팟 상태 및 스타일 (ImageCanvas.tsx에서 구현)
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│ PIN STATES (ImageCanvas.tsx)                                               │
+│ SPOT STATES (ImageCanvas.tsx)                                               │
 │                                                                            │
 │ ┌────────────────────────────────────────────────────────────────────────┐ │
 │ │ STATE: default                                                         │ │
@@ -984,25 +984,25 @@ transitionStore 상태:
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-#### 핀-카드 인터랙션 이벤트 흐름
+#### 스팟-카드 인터랙션 이벤트 흐름
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
-│                    PIN-CARD INTERACTION EVENT FLOW                        │
+│                    SPOT-CARD INTERACTION EVENT FLOW                        │
 ├──────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
-│  [FLOW A: 핀 클릭 → 카드 하이라이트]                                     │
+│  [FLOW A: 스팟 클릭 → 카드 하이라이트]                                     │
 │                                                                          │
-│  PinMarker #2 onClick                                                    │
+│  SpotMarker #2 onClick                                                    │
 │       │                                                                  │
 │       ▼                                                                  │
 │  InteractiveShowcase.tsx                                                 │
 │       │                                                                  │
-│       ├─── setSelectedPinId(item2.id) ──────────────────────┐            │
+│       ├─── setSelectedSpotId(item2.id) ──────────────────────┐            │
 │       │                                                      │            │
 │       │    상태 변경으로 인한 리렌더링:                        │            │
 │       │                                                      │            │
-│       ├─── PinMarker #2: isSelected={true}                   │            │
+│       ├─── SpotMarker #2: isSelected={true}                   │            │
 │       │         └─── selected 스타일 적용                     │            │
 │       │                                                      │            │
 │       ├─── ConnectorLayer: 연결선 #2 활성화                  │            │
@@ -1018,21 +1018,21 @@ transitionStore 상태:
 │             └─── className: ring-2 ring-primary              │            │
 │                                                              │            │
 │                                                                          │
-│  [FLOW B: 카드 클릭 → 핀 하이라이트]                                     │
+│  [FLOW B: 카드 클릭 → 스팟 하이라이트]                                     │
 │                                                                          │
 │  ItemDetailCard #3 onClick                                               │
 │       │                                                                  │
 │       ▼                                                                  │
 │  InteractiveShowcase.tsx                                                 │
 │       │                                                                  │
-│       ├─── setSelectedPinId(item3.id) ──────────────────────┐            │
+│       ├─── setSelectedSpotId(item3.id) ──────────────────────┐            │
 │       │                                                      │            │
 │       │    상태 변경:                                         │            │
 │       │                                                      │            │
-│       ├─── PinMarker #3: isSelected={true}                   │            │
+│       ├─── SpotMarker #3: isSelected={true}                   │            │
 │       │         │                                            │            │
 │       │         └─── GSAP 펄스 애니메이션                     │            │
-│       │              gsap.to(pin, {                          │            │
+│       │              gsap.to(spot, {                         │            │
 │       │                scale: 1.3,                           │            │
 │       │                boxShadow: '0 0 0 8px primary/30',    │            │
 │       │                repeat: 2,                            │            │
@@ -1060,7 +1060,7 @@ transitionStore 상태:
 │ │ DualMatchSection.tsx                                                   │ │
 │ │                                                                        │ │
 │ │ ┌────────────────────────────────────────────────────────────────────┐│ │
-│ │ │ 👗 Item #1: Jacket                                      [Pin #1]  ││ │
+│ │ │ 👗 Item #1: Jacket                                     [Spot #1]  ││ │
 │ │ │                                                                    ││ │
 │ │ │ ┌────────────────────────────────────────────────────────────────┐││ │
 │ │ │ │ THE ORIGINAL                                                   │││ │
@@ -1342,14 +1342,14 @@ transitionStore 상태:
 | 브라우저 뒤로가기 | FLIP 역방향 애니메이션 | transitionStore |
 | 데이터 로딩 중 | Skeleton UI | ImageDetailSkeleton.tsx |
 
-### V-02 핀 시스템
+### V-02 스팟 시스템
 
 | 상황 | 처리 방법 | 구현 위치 |
 |------|----------|----------|
-| 좌표 없는 아이템 | 기본 위치 (0.5, 0.5) | PinOverlay.tsx |
-| 핀 10개 초과 | 화면에 최대 10개만 표시, 나머지는 리스트에만 | PinOverlay.tsx |
+| 좌표 없는 아이템 | 기본 위치 (0.5, 0.5) | SpotOverlay.tsx |
+| 스팟 10개 초과 | 화면에 최대 10개만 표시, 나머지는 리스트에만 | SpotOverlay.tsx |
 | 이미지 크기 변경 | ResizeObserver로 재계산 | InteractiveShowcase.tsx |
-| 핀 겹침 | z-index 조정 (선택된 핀 최상위) | PinMarker.tsx |
+| 스팟 겹침 | z-index 조정 (선택된 스팟 최상위) | SpotMarker.tsx |
 
 ### V-05 구매 링크
 
@@ -1383,18 +1383,18 @@ transitionStore 상태:
 - [ ] 모바일 스와이프 제스처
 - [ ] 인접 이미지 프리로드
 
-### V-02 핀 인터랙션
-- [x] 기본 핀 렌더링 (`ImageCanvas.tsx`)
+### V-02 스팟 인터랙션
+- [x] 기본 스팟 렌더링 (`ImageCanvas.tsx`)
 - [x] 좌표 기반 위치 지정 (`useNormalizedItems.ts`)
 - [x] 연결선 (`ConnectorLayer.tsx` - SVG 베지에 곡선)
-- [x] 핀 클릭 → 카드 스크롤 (ScrollTrigger 연동)
-- [x] 카드 클릭 → 핀 하이라이트 (`onActivate`/`onDeactivate`)
+- [x] 스팟 클릭 → 카드 스크롤 (ScrollTrigger 연동)
+- [x] 카드 클릭 → 스팟 하이라이트 (`onActivate`/`onDeactivate`)
 - [x] 호버 애니메이션 (스포트라이트 + Pan/Zoom)
 - [x] 모바일 터치 지원 (40vh fixed + scrolling cards)
 
 #### 향후 개선사항 (선택)
-- [ ] 핀 개수 제한 (10개 초과 시 UI 처리)
-- [ ] 핀 겹침 방지 알고리즘
+- [ ] 스팟 개수 제한 (10개 초과 시 UI 처리)
+- [ ] 스팟 겹침 방지 알고리즘
 
 ### V-03 듀얼 매치 리스트
 - [ ] Original/Vibe 그룹핑

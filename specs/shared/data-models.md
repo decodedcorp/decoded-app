@@ -171,7 +171,7 @@ interface Item {
   // Visual data
   croppedImagePath?: string;
   bboxes: BoundingBox[];              // Multiple bounding boxes possible
-  center: Point;                       // Pin position
+  center: Point;                       // Spot position (정규화 좌표)
 
   // Classification
   category: ItemCategory;
