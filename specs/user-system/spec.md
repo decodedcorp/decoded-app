@@ -1006,12 +1006,815 @@ CREATE TRIGGER on_auth_user_created
 
 ---
 
+## 모바일 UI 명세
+
+> 이 섹션은 모바일 앱(Expo/React Native)에서의 사용자 시스템 UI를 정의합니다.
+
+### 모바일 로그인 페이지
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ MOBILE LOGIN PAGE                                                             │
+│                                                                              │
+│ ┌──────────────────────────────────────────────────────────────────────────┐ │
+│ │ LoginScreen.tsx (packages/mobile/app/(auth)/login.tsx)                   │ │
+│ │                                                                          │ │
+│ │ ┌────────────────────────────────────────────────────────────────────┐  │ │
+│ │ │                                                                    │  │ │
+│ │ │                          [DECODED Logo]                            │  │ │
+│ │ │                                                                    │  │ │
+│ │ │                                                                    │  │ │
+│ │ │                    Discover what they're wearing                   │  │ │
+│ │ │                                                                    │  │ │
+│ │ │                                                                    │  │ │
+│ │ │                                                                    │  │ │
+│ │ │                                                                    │  │ │
+│ │ │                                                                    │  │ │
+│ │ │                         flex: 1 (공백)                             │  │ │
+│ │ │                                                                    │  │ │
+│ │ │                                                                    │  │ │
+│ │ │                                                                    │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ ┌────────────────────────────────────────────────────────────┐    │  │ │
+│ │ │ │ SocialLoginButtons.tsx                                     │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │ ┌────────────────────────────────────────────────────────┐│    │  │ │
+│ │ │ │ │ LoginButton.native.tsx  provider="kakao"               ││    │  │ │
+│ │ │ │ │ height: 52px, borderRadius: 12px                       ││    │  │ │
+│ │ │ │ │ 🟡 카카오로 로그인                                      ││    │  │ │
+│ │ │ │ │                                                        ││    │  │ │
+│ │ │ │ │ onPress → Linking.openURL(kakaoOAuthUrl)              ││    │  │ │
+│ │ │ │ │ 또는 expo-auth-session 사용                            ││    │  │ │
+│ │ │ │ └────────────────────────────────────────────────────────┘│    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │ ┌────────────────────────────────────────────────────────┐│    │  │ │
+│ │ │ │ │ LoginButton.native.tsx  provider="google"              ││    │  │ │
+│ │ │ │ │ 🔵 Continue with Google                                ││    │  │ │
+│ │ │ │ │                                                        ││    │  │ │
+│ │ │ │ │ onPress → Google.logInAsync() (expo-google-sign-in)   ││    │  │ │
+│ │ │ │ └────────────────────────────────────────────────────────┘│    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │ ┌────────────────────────────────────────────────────────┐│    │  │ │
+│ │ │ │ │ LoginButton.native.tsx  provider="apple"               ││    │  │ │
+│ │ │ │ │ ⚫ Sign in with Apple                                  ││    │  │ │
+│ │ │ │ │                                                        ││    │  │ │
+│ │ │ │ │ onPress → Apple.signInAsync() (expo-apple-authentication)│   │  │ │
+│ │ │ │ │ iOS 전용: Android에서는 숨김                           ││    │  │ │
+│ │ │ │ └────────────────────────────────────────────────────────┘│    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │ ┌────────────────────────────────────────────────────────┐│    │  │ │
+│ │ │ │ │ BiometricLoginButton.tsx (조건부 렌더링)               ││    │  │ │
+│ │ │ │ │                                                        ││    │  │ │
+│ │ │ │ │ 🔐 Face ID / 지문으로 로그인                           ││    │  │ │
+│ │ │ │ │                                                        ││    │  │ │
+│ │ │ │ │ 조건: 기존 로그인 이력 + 바이오메트릭 활성화          ││    │  │ │
+│ │ │ │ │ onPress → LocalAuthentication.authenticateAsync()     ││    │  │ │
+│ │ │ │ │ 성공 → SecureStore에서 토큰 복원                      ││    │  │ │
+│ │ │ │ └────────────────────────────────────────────────────────┘│    │  │ │
+│ │ │ └────────────────────────────────────────────────────────────┘    │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ <Text style={styles.terms}>                                       │  │ │
+│ │ │   By continuing, you agree to our Terms and Privacy Policy       │  │ │
+│ │ │ </Text>                                                           │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ SafeAreaView padding: bottom inset                                │  │ │
+│ │ └────────────────────────────────────────────────────────────────────┘  │ │
+│ │                                                                          │ │
+│ └──────────────────────────────────────────────────────────────────────────┘ │
+│                                                                              │
+│ 파일 위치:                                                                   │
+│ packages/mobile/app/(auth)/login.tsx                                        │
+│ packages/mobile/components/auth/                                            │
+│ ├── SocialLoginButtons.tsx                                                  │
+│ ├── LoginButton.native.tsx                                                  │
+│ └── BiometricLoginButton.tsx                                                │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### 모바일 OAuth 플로우 (딥링크)
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ MOBILE OAUTH FLOW WITH DEEP LINKING                                          │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  [1. 로그인 버튼 클릭]                                                       │
+│       │                                                                      │
+│       ▼                                                                      │
+│  expo-auth-session 또는 Linking.openURL()                                   │
+│       │                                                                      │
+│       ├─── Kakao:                                                           │
+│       │    WebBrowser.openAuthSessionAsync(                                 │
+│       │      `https://kauth.kakao.com/oauth/authorize?...`,                │
+│       │      'decoded://auth/callback'                                      │
+│       │    )                                                                │
+│       │                                                                      │
+│       ├─── Google:                                                          │
+│       │    Google.logInAsync({                                              │
+│       │      iosClientId: GOOGLE_IOS_CLIENT_ID,                            │
+│       │      androidClientId: GOOGLE_ANDROID_CLIENT_ID,                    │
+│       │      scopes: ['profile', 'email']                                  │
+│       │    })                                                               │
+│       │                                                                      │
+│       └─── Apple (iOS only):                                                │
+│            AppleAuthentication.signInAsync({                                │
+│              requestedScopes: [                                             │
+│                AppleAuthentication.AppleAuthenticationScope.FULL_NAME,     │
+│                AppleAuthentication.AppleAuthenticationScope.EMAIL          │
+│              ]                                                              │
+│            })                                                               │
+│                                                                              │
+│  [2. Provider 앱/웹 브라우저에서 인증]                                       │
+│       │                                                                      │
+│       ▼                                                                      │
+│  [3. 딥링크로 앱 복귀]                                                       │
+│       │                                                                      │
+│       ├─── URL: decoded://auth/callback?code=xxx                           │
+│       │                                                                      │
+│       ▼                                                                      │
+│  [4. 앱 내 처리]                                                             │
+│       │                                                                      │
+│       ├─── app/(auth)/callback.tsx에서 code 추출                           │
+│       │                                                                      │
+│       ├─── Supabase에 code 전송하여 세션 교환                              │
+│       │    supabase.auth.exchangeCodeForSession(code)                      │
+│       │                                                                      │
+│       ├─── 세션을 SecureStore에 저장 (자동 로그인용)                        │
+│       │    SecureStore.setItemAsync('session', JSON.stringify(session))    │
+│       │                                                                      │
+│       └─── 메인 화면으로 이동                                               │
+│            router.replace('/(tabs)/')                                       │
+│                                                                              │
+│  app.json 설정:                                                              │
+│  {                                                                           │
+│    "expo": {                                                                 │
+│      "scheme": "decoded",                                                   │
+│      "ios": {                                                               │
+│        "bundleIdentifier": "com.decoded.app",                              │
+│        "associatedDomains": ["applinks:decoded.app"]                       │
+│      },                                                                     │
+│      "android": {                                                           │
+│        "intentFilters": [{                                                  │
+│          "action": "VIEW",                                                  │
+│          "data": [{ "scheme": "decoded", "host": "auth" }]                │
+│        }]                                                                   │
+│      }                                                                      │
+│    }                                                                        │
+│  }                                                                          │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### 모바일 프로필 페이지
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ MOBILE PROFILE PAGE                                                           │
+│                                                                              │
+│ ┌──────────────────────────────────────────────────────────────────────────┐ │
+│ │ ProfileScreen.tsx (packages/mobile/app/(tabs)/profile/index.tsx)         │ │
+│ │                                                                          │ │
+│ │ ┌────────────────────────────────────────────────────────────────────┐  │ │
+│ │ │ Animated.ScrollView with onScroll                                  │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ ┌──────────────────────────────────────────────────────────────┐  │  │ │
+│ │ │ │ ProfileHeaderMobile.tsx                                      │  │  │ │
+│ │ │ │                                                              │  │  │ │
+│ │ │ │ 스크롤 시 축소 애니메이션:                                   │  │  │ │
+│ │ │ │ - 기본: height 200px, Avatar 80px                           │  │  │ │
+│ │ │ │ - 축소: height 60px, Avatar 40px, 이름만 표시              │  │  │ │
+│ │ │ │                                                              │  │  │ │
+│ │ │ │ ┌────────────────────────────────────────────────────────┐  │  │  │ │
+│ │ │ │ │         [Avatar 80px]                                  │  │  │  │ │
+│ │ │ │ │                                                        │  │  │  │ │
+│ │ │ │ │         Display Name                                   │  │  │  │ │
+│ │ │ │ │         @username                                      │  │  │  │ │
+│ │ │ │ │         "Bio text..."                                  │  │  │  │ │
+│ │ │ │ │                                                        │  │  │  │ │
+│ │ │ │ │         [Edit Profile]  [Settings ⚙]                  │  │  │  │ │
+│ │ │ │ └────────────────────────────────────────────────────────┘  │  │  │ │
+│ │ │ └──────────────────────────────────────────────────────────────┘  │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ ┌──────────────────────────────────────────────────────────────┐  │  │ │
+│ │ │ │ StatsCardsMobile.tsx                                         │  │  │ │
+│ │ │ │                                                              │  │  │ │
+│ │ │ │ <ScrollView horizontal showsHorizontalScrollIndicator={false}>│ │  │ │
+│ │ │ │                                                              │  │  │ │
+│ │ │ │ ┌──────────┐ ┌──────────┐ ┌──────────┐                     │  │  │ │
+│ │ │ │ │StatCard  │ │StatCard  │ │StatCard  │                     │  │  │ │
+│ │ │ │ │Mobile.tsx│ │Mobile.tsx│ │Mobile.tsx│                     │  │  │ │
+│ │ │ │ │          │ │          │ │          │                     │  │  │ │
+│ │ │ │ │   127    │ │   89%    │ │ ₩45,000  │                     │  │  │ │
+│ │ │ │ │  Posts   │ │ Accepted │ │ Earnings │                     │  │  │ │
+│ │ │ │ │          │ │          │ │          │                     │  │  │ │
+│ │ │ │ │ width:   │ │          │ │          │                     │  │  │ │
+│ │ │ │ │ 120px    │ │          │ │          │                     │  │  │ │
+│ │ │ │ └──────────┘ └──────────┘ └──────────┘                     │  │  │ │
+│ │ │ │                                                              │  │  │ │
+│ │ │ │ </ScrollView>                                                │  │  │ │
+│ │ │ └──────────────────────────────────────────────────────────────┘  │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ ┌──────────────────────────────────────────────────────────────┐  │  │ │
+│ │ │ │ BadgeGridMobile.tsx                                          │  │  │ │
+│ │ │ │                                                              │  │  │ │
+│ │ │ │ 🏆 My Badges                              [View All →]       │  │  │ │
+│ │ │ │                                                              │  │  │ │
+│ │ │ │ <FlatList numColumns={2} />                                  │  │  │ │
+│ │ │ │                                                              │  │  │ │
+│ │ │ │ ┌──────────────────┐ ┌──────────────────┐                   │  │  │ │
+│ │ │ │ │ BadgeCard        │ │ BadgeCard        │                   │  │  │ │
+│ │ │ │ │ Mobile.tsx       │ │ Mobile.tsx       │                   │  │  │ │
+│ │ │ │ │                  │ │                  │                   │  │  │ │
+│ │ │ │ │ [IVE Expert]     │ │ [BTS Fan]        │                   │  │  │ │
+│ │ │ │ │ 획득: 2026-01-05 │ │ 획득: 2025-12-20 │                   │  │  │ │
+│ │ │ │ └──────────────────┘ └──────────────────┘                   │  │  │ │
+│ │ │ │ ┌──────────────────┐ ┌──────────────────┐                   │  │  │ │
+│ │ │ │ │ [Early Adopter]  │ │ [+3 more]        │                   │  │  │ │
+│ │ │ │ └──────────────────┘ └──────────────────┘                   │  │  │ │
+│ │ │ └──────────────────────────────────────────────────────────────┘  │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ ┌──────────────────────────────────────────────────────────────┐  │  │ │
+│ │ │ │ RankingListMobile.tsx                                        │  │  │ │
+│ │ │ │                                                              │  │  │ │
+│ │ │ │ 📊 My Rankings                                               │  │  │ │
+│ │ │ │                                                              │  │  │ │
+│ │ │ │ ┌────────────────────────────────────────────────────────┐  │  │  │ │
+│ │ │ │ │ • Global: #42 overall                                  │  │  │  │ │
+│ │ │ │ └────────────────────────────────────────────────────────┘  │  │  │ │
+│ │ │ │ ┌────────────────────────────────────────────────────────┐  │  │  │ │
+│ │ │ │ │ • IVE: #3 this week  (↑2)                             │  │  │  │ │
+│ │ │ │ └────────────────────────────────────────────────────────┘  │  │  │ │
+│ │ │ │ ┌────────────────────────────────────────────────────────┐  │  │  │ │
+│ │ │ │ │ • BLACKPINK: #12 this month                           │  │  │  │ │
+│ │ │ │ └────────────────────────────────────────────────────────┘  │  │  │ │
+│ │ │ └──────────────────────────────────────────────────────────────┘  │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ ┌──────────────────────────────────────────────────────────────┐  │  │ │
+│ │ │ │ QuickActionsMobile.tsx                                       │  │  │ │
+│ │ │ │                                                              │  │  │ │
+│ │ │ │ ┌────────────────────┐ ┌────────────────────┐               │  │  │ │
+│ │ │ │ │ 📝 View Activity   │ │ 💰 My Earnings     │               │  │  │ │
+│ │ │ │ │                    │ │                    │               │  │  │ │
+│ │ │ │ │ onPress →          │ │ onPress →          │               │  │  │ │
+│ │ │ │ │ router.push(       │ │ router.push(       │               │  │  │ │
+│ │ │ │ │   '/profile/       │ │   '/profile/       │               │  │  │ │
+│ │ │ │ │    activity')      │ │    earnings')      │               │  │  │ │
+│ │ │ │ └────────────────────┘ └────────────────────┘               │  │  │ │
+│ │ │ └──────────────────────────────────────────────────────────────┘  │  │ │
+│ │ └────────────────────────────────────────────────────────────────────┘  │ │
+│ │                                                                          │ │
+│ └──────────────────────────────────────────────────────────────────────────┘ │
+│                                                                              │
+│ 파일 위치:                                                                   │
+│ packages/mobile/app/(tabs)/profile/index.tsx                                │
+│ packages/mobile/components/profile/                                         │
+│ ├── ProfileHeaderMobile.tsx                                                 │
+│ ├── StatsCardsMobile.tsx                                                    │
+│ ├── StatCardMobile.tsx                                                      │
+│ ├── BadgeGridMobile.tsx                                                     │
+│ ├── BadgeCardMobile.tsx                                                     │
+│ ├── RankingListMobile.tsx                                                   │
+│ └── QuickActionsMobile.tsx                                                  │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### U-04 활동 내역 - 컴포넌트 매핑
+
+#### 활동 페이지 구조 (웹)
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ ACTIVITY PAGE COMPONENT STRUCTURE (WEB)                                       │
+│                                                                              │
+│ ┌──────────────────────────────────────────────────────────────────────────┐ │
+│ │ ActivityPage.tsx (packages/web/app/profile/activity/page.tsx)            │ │
+│ │                                                                          │ │
+│ │ ┌────────────────────────────────────────────────────────────────────┐  │ │
+│ │ │ ActivityTabs.tsx                                                   │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ interface ActivityTabsProps {                                      │  │ │
+│ │ │   activeTab: 'posts' | 'answers' | 'favorites';                   │  │ │
+│ │ │   onTabChange: (tab: ActiveTab) => void;                          │  │ │
+│ │ │   counts: { posts: number; answers: number; favorites: number };  │  │ │
+│ │ │ }                                                                  │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ ┌──────────────────┐┌──────────────────┐┌──────────────────┐     │  │ │
+│ │ │ │  My Posts (127)  ││ My Answers (89)  ││ Favorites (45)   │     │  │ │
+│ │ │ │                  ││                  ││                  │     │  │ │
+│ │ │ │  active: border- ││                  ││                  │     │  │ │
+│ │ │ │  bottom-2        ││                  ││                  │     │  │ │
+│ │ │ └──────────────────┘└──────────────────┘└──────────────────┘     │  │ │
+│ │ └────────────────────────────────────────────────────────────────────┘  │ │
+│ │                                                                          │ │
+│ │ {activeTab === 'posts' && (                                             │ │
+│ │ ┌────────────────────────────────────────────────────────────────────┐  │ │
+│ │ │ PostList.tsx                                                       │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ interface PostListProps {                                          │  │ │
+│ │ │   posts: Post[];                                                   │  │ │
+│ │ │   isLoading: boolean;                                              │  │ │
+│ │ │   hasNextPage: boolean;                                            │  │ │
+│ │ │   onLoadMore: () => void;                                          │  │ │
+│ │ │   onDelete: (id: string) => void;                                  │  │ │
+│ │ │   onEdit: (id: string) => void;                                    │  │ │
+│ │ │ }                                                                  │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ ┌────────────────────────────────────────────────────────────┐    │  │ │
+│ │ │ │ PostListItem.tsx                                           │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │ interface PostListItemProps {                              │    │  │ │
+│ │ │ │   post: {                                                  │    │  │ │
+│ │ │ │     id: string;                                            │    │  │ │
+│ │ │ │     thumbnailUrl: string;                                  │    │  │ │
+│ │ │ │     title: string;                                         │    │  │ │
+│ │ │ │     status: 'draft' | 'pending' | 'published' | 'rejected';│    │  │ │
+│ │ │ │     createdAt: Date;                                       │    │  │ │
+│ │ │ │     viewCount: number;                                     │    │  │ │
+│ │ │ │     commentCount: number;                                  │    │  │ │
+│ │ │ │   };                                                       │    │  │ │
+│ │ │ │   onEdit?: () => void;                                     │    │  │ │
+│ │ │ │   onDelete?: () => void;                                   │    │  │ │
+│ │ │ │ }                                                          │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │ ┌────────┐ Post Title                                     │    │  │ │
+│ │ │ │ │        │ Jan 5, 2026 • Published                        │    │  │ │
+│ │ │ │ │ Thumb  │ 15 views • 3 comments                          │    │  │ │
+│ │ │ │ │        │                        [Edit] [Delete]         │    │  │ │
+│ │ │ │ └────────┘                                                 │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │ states:                                                    │    │  │ │
+│ │ │ │ - draft: 회색 배지                                         │    │  │ │
+│ │ │ │ - pending: 노란 배지                                       │    │  │ │
+│ │ │ │ - published: 초록 배지                                     │    │  │ │
+│ │ │ │ - rejected: 빨간 배지 + 사유 툴팁                         │    │  │ │
+│ │ │ └────────────────────────────────────────────────────────────┘    │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ {isLoading && <PostListSkeleton count={3} />}                     │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ {hasNextPage && (                                                  │  │ │
+│ │ │   <LoadMoreButton onClick={onLoadMore} />                          │  │ │
+│ │ │ )}                                                                 │  │ │
+│ │ └────────────────────────────────────────────────────────────────────┘  │ │
+│ │ )}                                                                      │ │
+│ │                                                                          │ │
+│ │ {activeTab === 'answers' && (                                           │ │
+│ │ ┌────────────────────────────────────────────────────────────────────┐  │ │
+│ │ │ AnswerList.tsx                                                     │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ interface AnswerListProps {                                        │  │ │
+│ │ │   answers: Answer[];                                               │  │ │
+│ │ │   isLoading: boolean;                                              │  │ │
+│ │ │   hasNextPage: boolean;                                            │  │ │
+│ │ │   onLoadMore: () => void;                                          │  │ │
+│ │ │ }                                                                  │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ ┌────────────────────────────────────────────────────────────┐    │  │ │
+│ │ │ │ AnswerListItem.tsx                                         │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │ interface AnswerListItemProps {                            │    │  │ │
+│ │ │ │   answer: {                                                │    │  │ │
+│ │ │ │     id: string;                                            │    │  │ │
+│ │ │ │     itemCropUrl: string;                                   │    │  │ │
+│ │ │ │     relatedPost: { title: string; thumbnailUrl: string };  │    │  │ │
+│ │ │ │     upvoteCount: number;                                   │    │  │ │
+│ │ │ │     isAccepted: boolean;                                   │    │  │ │
+│ │ │ │     createdAt: Date;                                       │    │  │ │
+│ │ │ │   };                                                       │    │  │ │
+│ │ │ │ }                                                          │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │ ┌────────┐ On: "Post Title"                               │    │  │ │
+│ │ │ │ │        │ Item: Celine Jacket                            │    │  │ │
+│ │ │ │ │ Crop   │ ▲ 23 upvotes  ✓ Accepted                       │    │  │ │
+│ │ │ │ │        │ Jan 3, 2026                                    │    │  │ │
+│ │ │ │ └────────┘                                                 │    │  │ │
+│ │ │ └────────────────────────────────────────────────────────────┘    │  │ │
+│ │ └────────────────────────────────────────────────────────────────────┘  │ │
+│ │ )}                                                                      │ │
+│ │                                                                          │ │
+│ │ {activeTab === 'favorites' && (                                         │ │
+│ │ ┌────────────────────────────────────────────────────────────────────┐  │ │
+│ │ │ FavoriteList.tsx                                                   │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ interface FavoriteListProps {                                      │  │ │
+│ │ │   favorites: Favorite[];                                           │  │ │
+│ │ │   isLoading: boolean;                                              │  │ │
+│ │ │   hasNextPage: boolean;                                            │  │ │
+│ │ │   onLoadMore: () => void;                                          │  │ │
+│ │ │   onRemove: (id: string) => void;                                  │  │ │
+│ │ │ }                                                                  │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ ┌────────────────────────────────────────────────────────────┐    │  │ │
+│ │ │ │ FavoriteListItem.tsx                                       │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │ interface FavoriteListItemProps {                          │    │  │ │
+│ │ │ │   favorite: {                                              │    │  │ │
+│ │ │ │     id: string;                                            │    │  │ │
+│ │ │ │     type: 'post' | 'item';                                 │    │  │ │
+│ │ │ │     thumbnailUrl: string;                                  │    │  │ │
+│ │ │ │     title: string;                                         │    │  │ │
+│ │ │ │     savedAt: Date;                                         │    │  │ │
+│ │ │ │   };                                                       │    │  │ │
+│ │ │ │   onRemove: () => void;                                    │    │  │ │
+│ │ │ │ }                                                          │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │ ┌────────┐ Item Name                         [♥] [✕]      │    │  │ │
+│ │ │ │ │        │ Brand: Celine                                  │    │  │ │
+│ │ │ │ │ Thumb  │ Saved: Jan 2, 2026                             │    │  │ │
+│ │ │ │ │        │                                                 │    │  │ │
+│ │ │ │ └────────┘                                                 │    │  │ │
+│ │ │ └────────────────────────────────────────────────────────────┘    │  │ │
+│ │ └────────────────────────────────────────────────────────────────────┘  │ │
+│ │ )}                                                                      │ │
+│ │                                                                          │ │
+│ └──────────────────────────────────────────────────────────────────────────┘ │
+│                                                                              │
+│ 훅:                                                                          │
+│ packages/web/lib/hooks/                                                     │
+│ ├── useMyPosts.ts     → useInfiniteQuery('/api/profile/posts')             │
+│ ├── useMyAnswers.ts   → useInfiniteQuery('/api/profile/answers')           │
+│ └── useMyFavorites.ts → useInfiniteQuery('/api/profile/favorites')         │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### 활동 페이지 (모바일)
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ ACTIVITY PAGE (MOBILE)                                                        │
+│                                                                              │
+│ ┌──────────────────────────────────────────────────────────────────────────┐ │
+│ │ ActivityScreen.tsx (packages/mobile/app/(tabs)/profile/activity.tsx)     │ │
+│ │                                                                          │ │
+│ │ ┌────────────────────────────────────────────────────────────────────┐  │ │
+│ │ │ TabBarMobile.tsx (상단 고정)                                       │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ ┌────────────┐ ┌────────────┐ ┌────────────┐                     │  │ │
+│ │ │ │ Posts (127)│ │Answers (89)│ │ Favs (45)  │                     │  │ │
+│ │ │ │ ━━━━━━━━━━ │ │            │ │            │                     │  │ │
+│ │ │ └────────────┘ └────────────┘ └────────────┘                     │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ animated underline indicator                                       │  │ │
+│ │ └────────────────────────────────────────────────────────────────────┘  │ │
+│ │                                                                          │ │
+│ │ <PagerView> (스와이프로 탭 전환)                                        │ │
+│ │                                                                          │ │
+│ │ [Page 0: Posts]                                                          │ │
+│ │ ┌────────────────────────────────────────────────────────────────────┐  │ │
+│ │ │ PostListMobile.tsx                                                 │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ <FlashList                                                         │  │ │
+│ │ │   data={posts}                                                     │  │ │
+│ │ │   renderItem={({ item }) => (                                     │  │ │
+│ │ │     <Swipeable                                                     │  │ │
+│ │ │       renderRightActions={() => (                                  │  │ │
+│ │ │         <DeleteAction onPress={() => onDelete(item.id)} />         │  │ │
+│ │ │       )}                                                           │  │ │
+│ │ │     >                                                              │  │ │
+│ │ │       <PostListItemMobile post={item} />                          │  │ │
+│ │ │     </Swipeable>                                                   │  │ │
+│ │ │   )}                                                               │  │ │
+│ │ │   onEndReached={onLoadMore}                                        │  │ │
+│ │ │   estimatedItemSize={100}                                          │  │ │
+│ │ │ />                                                                 │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ 스와이프 제스처:                                                   │  │ │
+│ │ │ - 좌 스와이프: 삭제 버튼 노출 (빨간색)                            │  │ │
+│ │ │ - 롱프레스: Context Menu (편집, 삭제, 공유)                       │  │ │
+│ │ └────────────────────────────────────────────────────────────────────┘  │ │
+│ │                                                                          │ │
+│ │ [Page 1: Answers]                                                        │ │
+│ │ ┌────────────────────────────────────────────────────────────────────┐  │ │
+│ │ │ AnswerListMobile.tsx                                               │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ <FlashList />                                                      │  │ │
+│ │ │ (삭제 불가 → 스와이프 없음)                                       │  │ │
+│ │ └────────────────────────────────────────────────────────────────────┘  │ │
+│ │                                                                          │ │
+│ │ [Page 2: Favorites]                                                      │ │
+│ │ ┌────────────────────────────────────────────────────────────────────┐  │ │
+│ │ │ FavoriteListMobile.tsx                                             │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ <FlashList>                                                        │  │ │
+│ │ │   스와이프: 즐겨찾기 해제 (하트 아이콘)                           │  │ │
+│ │ │ />                                                                 │  │ │
+│ │ └────────────────────────────────────────────────────────────────────┘  │ │
+│ │                                                                          │ │
+│ └──────────────────────────────────────────────────────────────────────────┘ │
+│                                                                              │
+│ 파일 위치:                                                                   │
+│ packages/mobile/app/(tabs)/profile/activity.tsx                             │
+│ packages/mobile/components/activity/                                        │
+│ ├── TabBarMobile.tsx                                                        │
+│ ├── PostListMobile.tsx                                                      │
+│ ├── PostListItemMobile.tsx                                                  │
+│ ├── AnswerListMobile.tsx                                                    │
+│ ├── AnswerListItemMobile.tsx                                                │
+│ ├── FavoriteListMobile.tsx                                                  │
+│ └── FavoriteListItemMobile.tsx                                              │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### U-05 수익/출금 - 컴포넌트 매핑
+
+#### 수익 페이지 구조 (웹)
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ EARNINGS PAGE COMPONENT STRUCTURE (WEB)                                       │
+│                                                                              │
+│ ┌──────────────────────────────────────────────────────────────────────────┐ │
+│ │ EarningsPage.tsx (packages/web/app/profile/earnings/page.tsx)            │ │
+│ │                                                                          │ │
+│ │ ┌────────────────────────────────────────────────────────────────────┐  │ │
+│ │ │ EarningsCard.tsx                                                   │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ interface EarningsCardProps {                                      │  │ │
+│ │ │   availableBalance: number;                                        │  │ │
+│ │ │   pendingAmount: number;                                           │  │ │
+│ │ │   processingAmount: number;                                        │  │ │
+│ │ │   currency: 'KRW' | 'USD';                                         │  │ │
+│ │ │   onWithdrawClick: () => void;                                     │  │ │
+│ │ │   canWithdraw: boolean;  // >= 최소 출금액                         │  │ │
+│ │ │ }                                                                  │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ ┌────────────────────────────────────────────────────────────┐    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │  💰 My Earnings                                            │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │  Available Balance                                         │    │  │ │
+│ │ │ │  ┌────────────────────────────────────────────────┐       │    │  │ │
+│ │ │ │  │  ₩ 45,320                                      │       │    │  │ │
+│ │ │ │  │  (formatCurrency(availableBalance))            │       │    │  │ │
+│ │ │ │  └────────────────────────────────────────────────┘       │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │  ┌────────────────────┐ ┌────────────────────┐            │    │  │ │
+│ │ │ │  │ Pending            │ │ Processing         │            │    │  │ │
+│ │ │ │  │ ₩12,000            │ │ ₩0                 │            │    │  │ │
+│ │ │ │  │ (Jan clicks)       │ │                    │            │    │  │ │
+│ │ │ │  │                    │ │                    │            │    │  │ │
+│ │ │ │  │ Tooltip: 클릭 후   │ │ Tooltip: 출금     │            │    │  │ │
+│ │ │ │  │ 30일 뒤 확정      │ │ 요청 처리 중      │            │    │  │ │
+│ │ │ │  └────────────────────┘ └────────────────────┘            │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │  ┌────────────────────────────────────────────────┐       │    │  │ │
+│ │ │ │  │ [Request Withdrawal]                           │       │    │  │ │
+│ │ │ │  │                                                │       │    │  │ │
+│ │ │ │  │ disabled={!canWithdraw}                        │       │    │  │ │
+│ │ │ │  │ disabledReason="최소 ₩10,000 이상 필요"       │       │    │  │ │
+│ │ │ │  └────────────────────────────────────────────────┘       │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ └────────────────────────────────────────────────────────────┘    │  │ │
+│ │ └────────────────────────────────────────────────────────────────────┘  │ │
+│ │                                                                          │ │
+│ │ ┌────────────────────────────────────────────────────────────────────┐  │ │
+│ │ │ WithdrawalHistory.tsx                                              │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ interface WithdrawalHistoryProps {                                 │  │ │
+│ │ │   withdrawals: Withdrawal[];                                       │  │ │
+│ │ │   isLoading: boolean;                                              │  │ │
+│ │ │ }                                                                  │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ 📋 Withdrawal History                                              │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ ┌────────────────────────────────────────────────────────────┐    │  │ │
+│ │ │ │ WithdrawalHistoryItem.tsx                                  │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │ interface WithdrawalHistoryItemProps {                     │    │  │ │
+│ │ │ │   withdrawal: {                                            │    │  │ │
+│ │ │ │     id: string;                                            │    │  │ │
+│ │ │ │     amount: number;                                        │    │  │ │
+│ │ │ │     status: 'pending' | 'processing' | 'completed' | 'rejected';│ │  │ │
+│ │ │ │     requestedAt: Date;                                     │    │  │ │
+│ │ │ │     completedAt?: Date;                                    │    │  │ │
+│ │ │ │     paymentMethod: string;                                 │    │  │ │
+│ │ │ │     rejectionReason?: string;                              │    │  │ │
+│ │ │ │   };                                                       │    │  │ │
+│ │ │ │ }                                                          │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │ ₩30,000 • Completed ✓ • Dec 15, 2025                      │    │  │ │
+│ │ │ │ 신한은행 xxx-xxx-1234로 입금                              │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │ 상태 배지:                                                 │    │  │ │
+│ │ │ │ - pending: 노란색 "대기 중"                               │    │  │ │
+│ │ │ │ - processing: 파란색 "처리 중"                            │    │  │ │
+│ │ │ │ - completed: 초록색 "완료"                                │    │  │ │
+│ │ │ │ - rejected: 빨간색 "거부됨" + 사유 표시                   │    │  │ │
+│ │ │ └────────────────────────────────────────────────────────────┘    │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ (withdrawals.length === 0 && <EmptyState message="출금 내역 없음"/>)│ │ │
+│ │ └────────────────────────────────────────────────────────────────────┘  │ │
+│ │                                                                          │ │
+│ │ {showWithdrawalModal && (                                               │ │
+│ │ ┌────────────────────────────────────────────────────────────────────┐  │ │
+│ │ │ WithdrawalModal.tsx                                                │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ ┌────────────────────────────────────────────────────────────┐    │  │ │
+│ │ │ │ WithdrawalForm.tsx                                         │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │ interface WithdrawalFormProps {                            │    │  │ │
+│ │ │ │   maxAmount: number;                                       │    │  │ │
+│ │ │ │   minAmount: number;  // 10000                             │    │  │ │
+│ │ │ │   savedPaymentMethods: PaymentMethod[];                    │    │  │ │
+│ │ │ │   onSubmit: (data: WithdrawalRequest) => Promise<void>;   │    │  │ │
+│ │ │ │   onCancel: () => void;                                    │    │  │ │
+│ │ │ │ }                                                          │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │ ┌────────────────────────────────────────────────────┐    │    │  │ │
+│ │ │ │ │ 출금 금액                                          │    │    │  │ │
+│ │ │ │ │                                                    │    │    │  │ │
+│ │ │ │ │ ┌──────────────────────────────────────────┐      │    │    │  │ │
+│ │ │ │ │ │ ₩ [      45,320     ]                    │      │    │    │  │ │
+│ │ │ │ │ └──────────────────────────────────────────┘      │    │    │  │ │
+│ │ │ │ │                                                    │    │    │  │ │
+│ │ │ │ │ [전액 출금]  최소 ₩10,000 / 최대 ₩45,320        │    │    │  │ │
+│ │ │ │ │                                                    │    │    │  │ │
+│ │ │ │ │ Validation:                                        │    │    │  │ │
+│ │ │ │ │ - amount >= 10000: "최소 출금액 미달"             │    │    │  │ │
+│ │ │ │ │ - amount <= maxAmount: "잔액 초과"                │    │    │  │ │
+│ │ │ │ │ - isNumber: "올바른 금액 입력"                    │    │    │  │ │
+│ │ │ │ └────────────────────────────────────────────────────┘    │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │ ┌────────────────────────────────────────────────────┐    │    │  │ │
+│ │ │ │ │ 결제 방법                                          │    │    │  │ │
+│ │ │ │ │                                                    │    │    │  │ │
+│ │ │ │ │ ┌──────────────────────────────────────────┐      │    │    │  │ │
+│ │ │ │ │ │ PaymentMethodSelector.tsx                │      │    │    │  │ │
+│ │ │ │ │ │                                          │      │    │    │  │ │
+│ │ │ │ │ │ (●) 신한은행 xxx-xxx-1234 (저장됨)       │      │    │    │  │ │
+│ │ │ │ │ │ ( ) PayPal: user@email.com (저장됨)     │      │    │    │  │ │
+│ │ │ │ │ │ ( ) + 새 계좌 추가                       │      │    │    │  │ │
+│ │ │ │ │ └──────────────────────────────────────────┘      │    │    │  │ │
+│ │ │ │ │                                                    │    │    │  │ │
+│ │ │ │ │ [+ 새 계좌 추가] 클릭 시:                         │    │    │  │ │
+│ │ │ │ │ ┌──────────────────────────────────────────┐      │    │    │  │ │
+│ │ │ │ │ │ NewPaymentMethodForm.tsx                 │      │    │    │  │ │
+│ │ │ │ │ │                                          │      │    │    │  │ │
+│ │ │ │ │ │ 방법: [은행 송금 ▼] / [PayPal]           │      │    │    │  │ │
+│ │ │ │ │ │                                          │      │    │    │  │ │
+│ │ │ │ │ │ 은행 선택:                               │      │    │    │  │ │
+│ │ │ │ │ │ [신한은행  ▼]                            │      │    │    │  │ │
+│ │ │ │ │ │                                          │      │    │    │  │ │
+│ │ │ │ │ │ 계좌번호:                                │      │    │    │  │ │
+│ │ │ │ │ │ [___-___-______]                         │      │    │    │  │ │
+│ │ │ │ │ │                                          │      │    │    │  │ │
+│ │ │ │ │ │ 예금주: [        ]                       │      │    │    │  │ │
+│ │ │ │ │ │                                          │      │    │    │  │ │
+│ │ │ │ │ │ [✓] 다음에도 이 계좌 사용                │      │    │    │  │ │
+│ │ │ │ │ └──────────────────────────────────────────┘      │    │    │  │ │
+│ │ │ │ └────────────────────────────────────────────────────┘    │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │ ┌────────────────────────────────────────────────────┐    │    │  │ │
+│ │ │ │ │ 출금 요약 (확인 단계)                              │    │    │  │ │
+│ │ │ │ │                                                    │    │    │  │ │
+│ │ │ │ │ 출금 금액: ₩45,320                                │    │    │  │ │
+│ │ │ │ │ 수수료: ₩0 (무료)                                 │    │    │  │ │
+│ │ │ │ │ ─────────────────                                  │    │    │  │ │
+│ │ │ │ │ 실 입금액: ₩45,320                                │    │    │  │ │
+│ │ │ │ │                                                    │    │    │  │ │
+│ │ │ │ │ 입금 예정: 신한은행 xxx-xxx-1234                  │    │    │  │ │
+│ │ │ │ │ 처리 기간: 5-7 영업일                             │    │    │  │ │
+│ │ │ │ │                                                    │    │    │  │ │
+│ │ │ │ │ ⚠️ 세금 관련 안내                                 │    │    │  │ │
+│ │ │ │ │ 연간 소득에 따라 원천징수가 적용될 수 있습니다   │    │    │  │ │
+│ │ │ │ └────────────────────────────────────────────────────┘    │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │             [Cancel]  [Confirm Withdrawal]                 │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ └────────────────────────────────────────────────────────────┘    │  │ │
+│ │ └────────────────────────────────────────────────────────────────────┘  │ │
+│ │ )}                                                                      │ │
+│ │                                                                          │ │
+│ └──────────────────────────────────────────────────────────────────────────┘ │
+│                                                                              │
+│ 훅:                                                                          │
+│ packages/web/lib/hooks/                                                     │
+│ ├── useEarnings.ts        → useQuery('/api/profile/earnings')              │
+│ ├── useWithdrawals.ts     → useQuery('/api/profile/withdrawals')           │
+│ ├── usePaymentMethods.ts  → useQuery('/api/profile/payment-methods')       │
+│ └── useWithdrawal.ts      → useMutation('/api/profile/earnings/withdraw')  │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### 수익 페이지 (모바일)
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ EARNINGS PAGE (MOBILE)                                                        │
+│                                                                              │
+│ ┌──────────────────────────────────────────────────────────────────────────┐ │
+│ │ EarningsScreen.tsx (packages/mobile/app/(tabs)/profile/earnings.tsx)     │ │
+│ │                                                                          │ │
+│ │ ┌────────────────────────────────────────────────────────────────────┐  │ │
+│ │ │ EarningsCardMobile.tsx                                             │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ ┌────────────────────────────────────────────────────────────┐    │  │ │
+│ │ │ │             💰 My Earnings                                 │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │              ₩ 45,320                                      │    │  │ │
+│ │ │ │             Available                                      │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │  ┌──────────────────┐ ┌──────────────────┐                │    │  │ │
+│ │ │ │  │ ₩12,000         │ │ ₩0               │                │    │  │ │
+│ │ │ │  │ Pending         │ │ Processing       │                │    │  │ │
+│ │ │ │  └──────────────────┘ └──────────────────┘                │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │  ┌────────────────────────────────────────────────────┐  │    │  │ │
+│ │ │ │  │           [💳 Request Withdrawal]                  │  │    │  │ │
+│ │ │ │  │                                                    │  │    │  │ │
+│ │ │ │  │           onPress → bottomSheet.expand()          │  │    │  │ │
+│ │ │ │  └────────────────────────────────────────────────────┘  │    │  │ │
+│ │ │ └────────────────────────────────────────────────────────────┘    │  │ │
+│ │ └────────────────────────────────────────────────────────────────────┘  │ │
+│ │                                                                          │ │
+│ │ ┌────────────────────────────────────────────────────────────────────┐  │ │
+│ │ │ 📋 Withdrawal History                                              │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ <FlashList                                                         │  │ │
+│ │ │   data={withdrawals}                                               │  │ │
+│ │ │   renderItem={WithdrawalHistoryItemMobile}                        │  │ │
+│ │ │ />                                                                 │  │ │
+│ │ └────────────────────────────────────────────────────────────────────┘  │ │
+│ │                                                                          │ │
+│ │ ┌────────────────────────────────────────────────────────────────────┐  │ │
+│ │ │ WithdrawalBottomSheet.tsx (BottomSheetModal)                       │  │ │
+│ │ │                                                                    │  │ │
+│ │ │ ┌────────────────────────────────────────────────────────────┐    │  │ │
+│ │ │ │ 출금 금액                                                  │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │ ┌──────────────────────────────────────────────────────┐  │    │  │ │
+│ │ │ │ │ NumericKeypad.tsx                                    │  │    │  │ │
+│ │ │ │ │                                                      │  │    │  │ │
+│ │ │ │ │ 표시: ₩ 45,320                                       │  │    │  │ │
+│ │ │ │ │                                                      │  │    │  │ │
+│ │ │ │ │ ┌─────┐ ┌─────┐ ┌─────┐                            │  │    │  │ │
+│ │ │ │ │ │  1  │ │  2  │ │  3  │                            │  │    │  │ │
+│ │ │ │ │ └─────┘ └─────┘ └─────┘                            │  │    │  │ │
+│ │ │ │ │ ┌─────┐ ┌─────┐ ┌─────┐                            │  │    │  │ │
+│ │ │ │ │ │  4  │ │  5  │ │  6  │                            │  │    │  │ │
+│ │ │ │ │ └─────┘ └─────┘ └─────┘                            │  │    │  │ │
+│ │ │ │ │ ┌─────┐ ┌─────┐ ┌─────┐                            │  │    │  │ │
+│ │ │ │ │ │  7  │ │  8  │ │  9  │                            │  │    │  │ │
+│ │ │ │ │ └─────┘ └─────┘ └─────┘                            │  │    │  │ │
+│ │ │ │ │ ┌─────┐ ┌─────┐ ┌─────┐                            │  │    │  │ │
+│ │ │ │ │ │전액 │ │  0  │ │  ⌫  │                            │  │    │  │ │
+│ │ │ │ │ └─────┘ └─────┘ └─────┘                            │  │    │  │ │
+│ │ │ │ │                                                      │  │    │  │ │
+│ │ │ │ │ haptic feedback on key press                         │  │    │  │ │
+│ │ │ │ └──────────────────────────────────────────────────────┘  │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │ 결제 방법:                                                 │    │  │ │
+│ │ │ │ ┌──────────────────────────────────────────────────────┐  │    │  │ │
+│ │ │ │ │ [신한은행 xxx-xxx-1234]              [변경 >]        │  │    │  │ │
+│ │ │ │ └──────────────────────────────────────────────────────┘  │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │ [변경 >] 클릭 시:                                         │    │  │ │
+│ │ │ │ → PaymentMethodSheet.tsx (별도 바텀시트)                 │    │  │ │
+│ │ │ │                                                            │    │  │ │
+│ │ │ │ ┌──────────────────────────────────────────────────────┐  │    │  │ │
+│ │ │ │ │ [Confirm Withdrawal]                                 │  │    │  │ │
+│ │ │ │ │                                                      │  │    │  │ │
+│ │ │ │ │ disabled={amount < 10000}                           │  │    │  │ │
+│ │ │ │ └──────────────────────────────────────────────────────┘  │    │  │ │
+│ │ │ └────────────────────────────────────────────────────────────┘    │  │ │
+│ │ └────────────────────────────────────────────────────────────────────┘  │ │
+│ │                                                                          │ │
+│ └──────────────────────────────────────────────────────────────────────────┘ │
+│                                                                              │
+│ 파일 위치:                                                                   │
+│ packages/mobile/app/(tabs)/profile/earnings.tsx                             │
+│ packages/mobile/components/earnings/                                        │
+│ ├── EarningsCardMobile.tsx                                                  │
+│ ├── WithdrawalHistoryMobile.tsx                                             │
+│ ├── WithdrawalHistoryItemMobile.tsx                                         │
+│ ├── WithdrawalBottomSheet.tsx                                               │
+│ ├── NumericKeypad.tsx                                                       │
+│ └── PaymentMethodSheet.tsx                                                  │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
 ## 구현 상태 체크리스트
 
 ### U-01 소셜 로그인
 - [ ] Supabase OAuth 설정 (Kakao, Google, Apple)
-- [ ] 로그인 페이지 UI
+- [ ] 로그인 페이지 UI (웹)
+- [ ] 로그인 화면 UI (모바일)
 - [ ] OAuth 콜백 핸들러
+- [ ] 모바일 딥링크 설정
+- [ ] 바이오메트릭 로그인 (모바일)
 - [ ] AuthProvider 컨텍스트
 - [ ] useAuth 훅
 - [ ] 로그아웃 기능
@@ -1025,22 +1828,30 @@ CREATE TRIGGER on_auth_user_created
 - [ ] 날짜/숫자 포매터
 
 ### U-03 프로필 대시보드
-- [ ] ProfileHeader 컴포넌트
-- [ ] StatsCards 컴포넌트
-- [ ] BadgeGrid 컴포넌트
-- [ ] RankingList 컴포넌트
+- [ ] ProfileHeader 컴포넌트 (웹)
+- [ ] ProfileHeaderMobile 컴포넌트
+- [ ] StatsCards 컴포넌트 (웹)
+- [ ] StatsCardsMobile 컴포넌트
+- [ ] BadgeGrid 컴포넌트 (웹/모바일)
+- [ ] RankingList 컴포넌트 (웹/모바일)
 - [ ] 프로필 데이터 훅
 
 ### U-04 활동 내역
-- [ ] ActivityTabs 컴포넌트
-- [ ] PostList 컴포넌트
-- [ ] AnswerList 컴포넌트
-- [ ] FavoriteList 컴포넌트
+- [ ] ActivityTabs 컴포넌트 (웹)
+- [ ] TabBarMobile + PagerView (모바일)
+- [ ] PostList 컴포넌트 (웹)
+- [ ] PostListMobile + 스와이프 삭제 (모바일)
+- [ ] AnswerList 컴포넌트 (웹/모바일)
+- [ ] FavoriteList 컴포넌트 (웹/모바일)
 - [ ] 활동 데이터 API
 
 ### U-05 출금
-- [ ] EarningsCard 컴포넌트
-- [ ] WithdrawalForm 컴포넌트
-- [ ] WithdrawalHistory 컴포넌트
+- [ ] EarningsCard 컴포넌트 (웹)
+- [ ] EarningsCardMobile 컴포넌트
+- [ ] WithdrawalForm 컴포넌트 (웹)
+- [ ] WithdrawalBottomSheet (모바일)
+- [ ] NumericKeypad 컴포넌트 (모바일)
+- [ ] PaymentMethodSelector 컴포넌트
+- [ ] WithdrawalHistory 컴포넌트 (웹/모바일)
 - [ ] 결제 정보 입력 UI
 - [ ] 출금 요청 API

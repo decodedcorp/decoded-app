@@ -1341,37 +1341,1292 @@ PUBLISHED
 
 ---
 
+---
+
+## 모바일 UI 명세
+
+> 모바일 앱 (packages/mobile)에서의 생성 플로우 상세 명세
+
+### 모바일 vs 웹 차이점 요약
+
+| 기능 | 웹 (packages/web) | 모바일 (packages/mobile) |
+|------|------------------|------------------------|
+| 이미지 소스 | 파일 선택, 드래그&드롭, 클립보드 | 카메라, 갤러리, 클립보드 |
+| 권한 | 없음 | 카메라, 갤러리 접근 권한 |
+| 박스 조작 | 마우스 드래그/리사이즈 | 터치 제스처 (드래그, 핀치 줌, 롱프레스) |
+| 태그 선택 | 드롭다운 with 검색 | 풀스크린 검색 시트 |
+| URL 입력 | 텍스트 필드 | 공유 시트 수신 + 텍스트 필드 |
+| 레이아웃 | 2컬럼 (이미지 좌, 패널 우) | 단일 컬럼 + 스텝 네비게이션 |
+
+---
+
+### C-01 모바일 이미지 업로드
+
+#### 모바일 업로드 화면 구조
+
+```
+┌─────────────────────────────────────────┐
+│  Create Post                      [✕]   │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │       Step 1 of 4: Upload       │   │
+│  │  ●───○───○───○                   │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │                                 │   │
+│  │          📷                     │   │
+│  │                                 │   │
+│  │    Take Photo                   │   │
+│  │                                 │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │                                 │   │
+│  │          🖼️                     │   │
+│  │                                 │   │
+│  │    Choose from Gallery          │   │
+│  │                                 │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │                                 │   │
+│  │          📋                     │   │
+│  │                                 │   │
+│  │    Paste from Clipboard         │   │
+│  │                                 │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  Selected (0/5):                        │
+│  ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐       │
+│  │ + │ │   │ │   │ │   │ │   │       │
+│  └───┘ └───┘ └───┘ └───┘ └───┘       │
+│                                         │
+│         [Next: Detect Items]            │
+│         (disabled until 1+ selected)    │
+└─────────────────────────────────────────┘
+```
+
+#### 권한 요청 플로우
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                    MOBILE PERMISSION FLOW                                 │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  [카메라 버튼 탭]                                                         │
+│       │                                                                  │
+│       ▼                                                                  │
+│  Permissions.getAsync(Permissions.CAMERA)                                │
+│       │                                                                  │
+│       ├─── status === 'granted' ────────────────────────────────────┐    │
+│       │         └─── 카메라 실행                                    │    │
+│       │                                                              │    │
+│       ├─── status === 'undetermined' ───────────────────────────────┤    │
+│       │         │                                                   │    │
+│       │         ▼                                                   │    │
+│       │    ┌─────────────────────────────────────┐                  │    │
+│       │    │  Camera Access Required              │                  │    │
+│       │    │                                      │                  │    │
+│       │    │  Decoded needs camera access to      │                  │    │
+│       │    │  take photos of fashion items.       │                  │    │
+│       │    │                                      │                  │    │
+│       │    │  [Not Now]        [Allow Access]     │                  │    │
+│       │    └─────────────────────────────────────┘                  │    │
+│       │         │                                                   │    │
+│       │         └─── Permissions.requestAsync(CAMERA)              │    │
+│       │                   │                                         │    │
+│       │              granted → 카메라 실행                          │    │
+│       │              denied → Toast "카메라 권한 필요"              │    │
+│       │                                                              │    │
+│       └─── status === 'denied' ─────────────────────────────────────┤    │
+│                 │                                                   │    │
+│                 ▼                                                   │    │
+│            ┌─────────────────────────────────────┐                  │    │
+│            │  Camera Access Denied                │                  │    │
+│            │                                      │                  │    │
+│            │  Please enable camera access in      │                  │    │
+│            │  your device settings.               │                  │    │
+│            │                                      │                  │    │
+│            │  [Cancel]         [Open Settings]    │                  │    │
+│            └─────────────────────────────────────┘                  │    │
+│                 │                                                   │    │
+│                 └─── Linking.openSettings()                        │    │
+│                                                                          │
+│  [갤러리 버튼 탭] - 동일한 플로우 (MEDIA_LIBRARY 권한)                   │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+#### 모바일 업로드 컴포넌트 매핑
+
+##### CreateUploadScreen.tsx
+
+```
+packages/mobile/app/(main)/create/upload.tsx
+
+┌────────────────────────────────────────────────────────────────────────┐
+│ CreateUploadScreen                                                      │
+│                                                                         │
+│ Props: (Screen Component - no props, uses route params)                 │
+│                                                                         │
+│ State (Zustand - createStore):                                          │
+│ ├─── images: UploadedImage[]                                           │
+│ ├─── isUploading: boolean                                              │
+│ └─── uploadProgress: Record<string, number>                            │
+│                                                                         │
+│ Local State:                                                            │
+│ ├─── showPermissionModal: boolean                                      │
+│ └─── permissionType: 'camera' | 'gallery' | null                       │
+│                                                                         │
+│ 자식 컴포넌트:                                                          │
+│ ├─── <CreateStepIndicator step={1} totalSteps={4} />                   │
+│ ├─── <SourceOptionCard type="camera" onPress={handleCameraPress} />    │
+│ ├─── <SourceOptionCard type="gallery" onPress={handleGalleryPress} />  │
+│ ├─── <SourceOptionCard type="clipboard" onPress={handleClipboard} />   │
+│ ├─── <ImageThumbnailStrip images={images} onRemove={handleRemove} />   │
+│ └─── <NextStepButton disabled={!canProceed} onPress={goToDetect} />    │
+│                                                                         │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+##### SourceOptionCard.tsx
+
+```typescript
+// packages/mobile/lib/components/create/SourceOptionCard.tsx
+
+interface SourceOptionCardProps {
+  type: 'camera' | 'gallery' | 'clipboard';
+  onPress: () => void;
+  disabled?: boolean;
+}
+
+interface SourceOptionCardState {
+  isPressed: boolean;
+}
+
+// 렌더링
+// - Pressable 카드 (터치 피드백)
+// - 아이콘 + 텍스트
+// - disabled 시 회색 처리
+```
+
+##### ImageThumbnailStrip.tsx
+
+```typescript
+// packages/mobile/lib/components/create/ImageThumbnailStrip.tsx
+
+interface ImageThumbnailStripProps {
+  images: UploadedImage[];
+  maxImages: number; // default: 5
+  onRemove: (id: string) => void;
+  onAdd: () => void;
+}
+
+// 렌더링
+// - FlatList horizontal
+// - 각 이미지: 썸네일 + 삭제 버튼 + 업로드 상태
+// - 마지막: "+" 버튼 (maxImages 미만일 때)
+```
+
+#### 카메라 촬영 플로우
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                    CAMERA CAPTURE FLOW                                    │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  [카메라 화면 진입]                                                       │
+│       │                                                                  │
+│       ▼                                                                  │
+│  ┌─────────────────────────────────────────────────────────────────────┐│
+│  │                                                                     ││
+│  │                    [Camera Preview - Full Screen]                   ││
+│  │                                                                     ││
+│  │                                                                     ││
+│  │                                                                     ││
+│  │                                                                     ││
+│  │                                                                     ││
+│  │  ┌─────────────────────────────────────────────────────────────┐   ││
+│  │  │  [Flash]    [Capture Button]    [Flip Camera]               │   ││
+│  │  │    💡             ⚪              🔄                        │   ││
+│  │  └─────────────────────────────────────────────────────────────┘   ││
+│  │                                                                     ││
+│  └─────────────────────────────────────────────────────────────────────┘│
+│       │                                                                  │
+│       ▼                                                                  │
+│  [셔터 버튼 탭]                                                           │
+│       │                                                                  │
+│       ├─── takePictureAsync({ quality: 0.8 })                           │
+│       │                                                                  │
+│       ▼                                                                  │
+│  [촬영 확인 화면]                                                         │
+│  ┌─────────────────────────────────────────────────────────────────────┐│
+│  │                                                                     ││
+│  │                    [Captured Image Preview]                         ││
+│  │                                                                     ││
+│  │  ┌─────────────────────────────────────────────────────────────┐   ││
+│  │  │  [Retake]                               [Use Photo]          │   ││
+│  │  │    ↩️                                      ✓                 │   ││
+│  │  └─────────────────────────────────────────────────────────────┘   ││
+│  │                                                                     ││
+│  └─────────────────────────────────────────────────────────────────────┘│
+│       │                                                                  │
+│       ├─── [Retake] → 카메라 화면으로 돌아가기                          │
+│       │                                                                  │
+│       └─── [Use Photo] → createStore.addImage(capturedImage)            │
+│                        → 업로드 화면으로 돌아가기                       │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+#### 갤러리 선택 플로우
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                    GALLERY PICKER FLOW                                    │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  [갤러리 버튼 탭]                                                         │
+│       │                                                                  │
+│       ▼                                                                  │
+│  ImagePicker.launchImageLibraryAsync({                                   │
+│    mediaTypes: ImagePicker.MediaTypeOptions.Images,                      │
+│    allowsMultipleSelection: true,                                        │
+│    selectionLimit: remainingSlots,  // 5 - 현재 선택된 이미지 수        │
+│    quality: 0.8,                                                         │
+│    exif: false,                                                          │
+│  })                                                                      │
+│       │                                                                  │
+│       ├─── canceled: true                                                │
+│       │         └─── return (아무 동작 없음)                             │
+│       │                                                                  │
+│       └─── assets: ImagePickerAsset[]                                    │
+│                 │                                                        │
+│                 ▼                                                        │
+│            for (const asset of assets) {                                 │
+│                 │                                                        │
+│                 ├─── 파일 크기 검증                                      │
+│                 │    asset.fileSize > 10MB → Toast 경고, skip            │
+│                 │                                                        │
+│                 ├─── 이미지 압축 (manipulateAsync)                       │
+│                 │    resize: { width: 1920 }                             │
+│                 │    compress: 0.8                                       │
+│                 │                                                        │
+│                 └─── createStore.addImage({                              │
+│                        id: uuid(),                                       │
+│                        uri: compressedUri,                               │
+│                        status: 'pending'                                 │
+│                      })                                                  │
+│            }                                                             │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### C-02 모바일 AI Detection
+
+#### 모바일 Detection 화면 구조
+
+```
+┌─────────────────────────────────────────┐
+│  Detect Items                     [←]   │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │       Step 2 of 4: Detect       │   │
+│  │  ○───●───○───○                   │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │                                 │   │
+│  │  [Image with Bounding Boxes]    │   │
+│  │                                 │   │
+│  │     ┌─────────┐                 │   │
+│  │     │ Item 1  │ ← 드래그 가능   │   │
+│  │     │  93%    │                 │   │
+│  │     └─────────┘                 │   │
+│  │                                 │   │
+│  │          ┌───────┐              │   │
+│  │          │Item 2 │              │   │
+│  │          └───────┘              │   │
+│  │                                 │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  Pinch to zoom • Drag boxes to adjust   │
+│                                         │
+│  Found 2 items:                         │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │ [crop] Top (93%)          [···] │   │
+│  └─────────────────────────────────┘   │
+│  ┌─────────────────────────────────┐   │
+│  │ [crop] Bag (87%)          [···] │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  [+ Add Item Manually]                  │
+│                                         │
+│         [Next: Add Tags]                │
+└─────────────────────────────────────────┘
+```
+
+#### 모바일 터치 제스처
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                    MOBILE GESTURE HANDLING                                │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  라이브러리: react-native-gesture-handler + react-native-reanimated      │
+│                                                                          │
+│  [1. 이미지 줌/팬]                                                        │
+│       │                                                                  │
+│       ├─── PinchGestureHandler                                          │
+│       │    └─── 두 손가락 핀치 → scale 조절 (0.5 ~ 3.0)                │
+│       │                                                                  │
+│       ├─── PanGestureHandler (이미지용)                                  │
+│       │    └─── 두 손가락 드래그 → translateX, translateY               │
+│       │                                                                  │
+│       └─── DoubleTapGestureHandler                                      │
+│            └─── 더블탭 → 원래 크기로 리셋                               │
+│                                                                          │
+│  [2. 박스 선택]                                                           │
+│       │                                                                  │
+│       └─── TapGestureHandler (박스 영역)                                 │
+│            └─── 탭 → setSelectedBoxId(box.id)                           │
+│                 └─── 선택된 박스: 파란 테두리 + 리사이즈 핸들           │
+│                                                                          │
+│  [3. 박스 이동]                                                           │
+│       │                                                                  │
+│       └─── PanGestureHandler (선택된 박스)                               │
+│            └─── 한 손가락 드래그 → box.center 업데이트                  │
+│            └─── onEnd → createStore.updateDetection(id, { bbox })       │
+│                                                                          │
+│  [4. 박스 리사이즈]                                                       │
+│       │                                                                  │
+│       └─── PanGestureHandler (코너 핸들)                                 │
+│            ├─── 우하단 핸들 드래그 → width, height 조절                  │
+│            ├─── 최소 크기 제한: 50x50 px                                │
+│            └─── 종횡비 유지 옵션 (shift 대체: 두 손가락)                │
+│                                                                          │
+│  [5. 박스 삭제]                                                           │
+│       │                                                                  │
+│       └─── LongPressGestureHandler (선택된 박스)                         │
+│            └─── 1초 롱프레스 → 삭제 확인 ActionSheet                    │
+│                 ├─── "Delete this item"                                 │
+│                 └─── "Cancel"                                           │
+│                                                                          │
+│  [6. 수동 박스 그리기]                                                    │
+│       │                                                                  │
+│       └─── [+ Add Manually] 버튼 탭 → 그리기 모드 진입                   │
+│            └─── PanGestureHandler (전체 캔버스)                          │
+│                 └─── 한 손가락 드래그 → 새 박스 생성                    │
+│                 └─── onEnd → 카테고리 선택 ActionSheet                  │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+#### 모바일 Detection 컴포넌트
+
+##### DetectionScreen.tsx
+
+```typescript
+// packages/mobile/app/(main)/create/detect.tsx
+
+interface DetectionScreenState {
+  // Zustand
+  images: UploadedImage[];
+  detections: DetectionResult[];
+
+  // Local
+  selectedBoxId: string | null;
+  mode: 'select' | 'draw';
+  scale: number;
+  translateX: number;
+  translateY: number;
+  isLoading: boolean;
+}
+
+// 자식 컴포넌트
+// - CreateStepIndicator
+// - DetectionCanvasMobile (GestureHandlerRootView)
+// - DetectedItemListMobile (FlatList)
+// - AddManuallyButton
+// - NextStepButton
+```
+
+##### DetectionCanvasMobile.tsx
+
+```typescript
+// packages/mobile/lib/components/create/DetectionCanvasMobile.tsx
+
+interface DetectionCanvasMobileProps {
+  image: UploadedImage;
+  detections: DetectionResult[];
+  selectedId: string | null;
+  mode: 'select' | 'draw';
+  onSelectBox: (id: string | null) => void;
+  onUpdateBox: (id: string, bbox: BoundingBox) => void;
+  onDeleteBox: (id: string) => void;
+  onAddBox: (bbox: BoundingBox) => void;
+}
+
+// 내부 컴포넌트
+// - GestureDetector (핀치 줌)
+// - Animated.Image (이미지)
+// - BoundingBoxMobile[] (각 detection)
+```
+
+##### BoundingBoxMobile.tsx
+
+```typescript
+// packages/mobile/lib/components/create/BoundingBoxMobile.tsx
+
+interface BoundingBoxMobileProps {
+  detection: DetectionResult;
+  isSelected: boolean;
+  imageScale: number;
+  onSelect: () => void;
+  onUpdate: (bbox: BoundingBox) => void;
+  onDelete: () => void;
+}
+
+interface BoundingBoxMobileState {
+  position: Animated.ValueXY;
+  size: { width: Animated.Value; height: Animated.Value };
+}
+
+// 렌더링
+// - Animated.View (박스)
+// - 라벨 (카테고리 + 신뢰도)
+// - isSelected일 때: 리사이즈 핸들 4개
+```
+
+---
+
+### C-03 모바일 메타데이터 태깅
+
+#### 모바일 태깅 화면 구조
+
+```
+┌─────────────────────────────────────────┐
+│  Add Tags                         [←]   │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │       Step 3 of 4: Tags         │   │
+│  │  ○───○───●───○                   │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  Where is this from? *                  │
+│  ┌─────────────────────────────────┐   │
+│  │ 🔍 Search show, drama, group... │   │
+│  │                              [>]│   │
+│  └─────────────────────────────────┘   │
+│  → 탭 시 풀스크린 검색 시트 열림        │
+│                                         │
+│  Selected: BLACKPINK              [✕]   │
+│                                         │
+│  ─────────────────────────────────────  │
+│                                         │
+│  Who is wearing this?                   │
+│  ┌─────────────────────────────────┐   │
+│  │ Select cast members...       [>]│   │
+│  └─────────────────────────────────┘   │
+│  → 탭 시 풀스크린 검색 시트 열림        │
+│                                         │
+│  Selected:                              │
+│  ┌──────┐ ┌──────┐                     │
+│  │Jisoo │ │Jennie│                     │
+│  │  ✕   │ │  ✕   │                     │
+│  └──────┘ └──────┘                     │
+│                                         │
+│  ─────────────────────────────────────  │
+│                                         │
+│  Context                                │
+│  ┌────────────────────────────────┐    │
+│  │ [Airport✓] [Stage] [MV]       │    │
+│  │ [Photoshoot] [Daily] [Event]  │    │
+│  └────────────────────────────────┘    │
+│                                         │
+│         [Next: Add Links]               │
+└─────────────────────────────────────────┘
+```
+
+#### 풀스크린 검색 시트 (Media)
+
+```
+┌─────────────────────────────────────────┐
+│  ← Select Media                         │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │ 🔍 Search...                    │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  Recent:                                │
+│  ┌─────────────────────────────────┐   │
+│  │ 🎵 BLACKPINK                    │   │
+│  │ 🎵 NewJeans                     │   │
+│  │ 📺 Squid Game                   │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  Popular:                               │
+│  ┌─────────────────────────────────┐   │
+│  │ 🎵 IVE                          │   │
+│  │ 🎵 aespa                        │   │
+│  │ 📺 Lovely Runner                │   │
+│  │ ...                             │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  ─────────────────────────────────────  │
+│                                         │
+│  Can't find it?                         │
+│  [Request New Tag]                      │
+│                                         │
+└─────────────────────────────────────────┘
+
+검색 입력 시:
+┌─────────────────────────────────────────┐
+│  ← Select Media                         │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │ 🔍 black                      ✕ │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  Results:                               │
+│  ┌─────────────────────────────────┐   │
+│  │ 🎵 BLACKPINK         Group      │   │
+│  │ 🎵 Black Pink (debut)           │   │
+│  │ 📺 Black Knight      Drama      │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  탭 → 선택 후 자동으로 시트 닫힘        │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## C-03 메타데이터 태깅 - 컴포넌트 상세 매핑
+
+> 웹/모바일 공통 및 플랫폼별 구현 상세
+
+### MediaSelector 컴포넌트
+
+#### 웹 버전 (MediaSelector.tsx)
+
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│ MediaSelector.tsx (Web)                                                     │
+│ packages/web/lib/components/create/MediaSelector.tsx                       │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│ Props:                                                                     │
+│ interface MediaSelectorProps {                                             │
+│   selectedMediaId: string | null;                                          │
+│   onSelect: (mediaId: string | null) => void;                             │
+│   disabled?: boolean;                                                      │
+│   error?: string;                                                          │
+│ }                                                                          │
+│                                                                            │
+│ State:                                                                     │
+│ interface MediaSelectorState {                                             │
+│   isOpen: boolean;                        // 드롭다운 열림 상태            │
+│   searchQuery: string;                    // 검색어                        │
+│   searchResults: MediaItem[];             // 검색 결과                     │
+│   recentItems: MediaItem[];               // 최근 선택 항목                │
+│   popularItems: MediaItem[];              // 인기 항목                     │
+│   isLoading: boolean;                     // 검색 로딩 상태                │
+│   showRequestModal: boolean;              // 태그 요청 모달                │
+│ }                                                                          │
+│                                                                            │
+│ 렌더링 구조:                                                               │
+│ ┌────────────────────────────────────────────────────────────────────────┐│
+│ │ <div className="relative">                                             ││
+│ │                                                                        ││
+│ │   <!-- Trigger Button -->                                              ││
+│ │   ┌────────────────────────────────────────────────────────────────┐  ││
+│ │   │ <button onClick={() => setIsOpen(!isOpen)}>                    │  ││
+│ │   │   {selectedMedia ? (                                           │  ││
+│ │   │     <SelectedMediaChip media={selectedMedia} onClear={...} /> │  ││
+│ │   │   ) : (                                                        │  ││
+│ │   │     <SearchPlaceholder text="Search show, drama..." />        │  ││
+│ │   │   )}                                                           │  ││
+│ │   │   <ChevronIcon />                                              │  ││
+│ │   │ </button>                                                      │  ││
+│ │   └────────────────────────────────────────────────────────────────┘  ││
+│ │                                                                        ││
+│ │   <!-- Dropdown Panel (isOpen일 때) -->                                ││
+│ │   ┌────────────────────────────────────────────────────────────────┐  ││
+│ │   │ <div className="absolute top-full left-0 w-full z-50">         │  ││
+│ │   │                                                                │  ││
+│ │   │   <!-- Search Input -->                                        │  ││
+│ │   │   <input                                                       │  ││
+│ │   │     value={searchQuery}                                        │  ││
+│ │   │     onChange={(e) => handleSearch(e.target.value)}            │  ││
+│ │   │     placeholder="Search..."                                    │  ││
+│ │   │     autoFocus                                                  │  ││
+│ │   │   />                                                           │  ││
+│ │   │                                                                │  ││
+│ │   │   <!-- Results List -->                                        │  ││
+│ │   │   {searchQuery ? (                                             │  ││
+│ │   │     <SearchResults items={searchResults} onSelect={...} />    │  ││
+│ │   │   ) : (                                                        │  ││
+│ │   │     <>                                                         │  ││
+│ │   │       <SectionHeader title="Recent" />                        │  ││
+│ │   │       <MediaList items={recentItems} onSelect={...} />        │  ││
+│ │   │       <SectionHeader title="Popular" />                       │  ││
+│ │   │       <MediaList items={popularItems} onSelect={...} />       │  ││
+│ │   │     </>                                                        │  ││
+│ │   │   )}                                                           │  ││
+│ │   │                                                                │  ││
+│ │   │   <!-- Request New Tag -->                                     │  ││
+│ │   │   <button onClick={() => setShowRequestModal(true)}>          │  ││
+│ │   │     Can't find it? Request new tag                            │  ││
+│ │   │   </button>                                                    │  ││
+│ │   │                                                                │  ││
+│ │   │ </div>                                                         │  ││
+│ │   └────────────────────────────────────────────────────────────────┘  ││
+│ │                                                                        ││
+│ │ </div>                                                                 ││
+│ └────────────────────────────────────────────────────────────────────────┘│
+│                                                                            │
+│ Events:                                                                    │
+│ ├─── onClick (trigger) → setIsOpen(true)                                  │
+│ ├─── onChange (search input) → debounce(fetchResults, 300ms)              │
+│ ├─── onClick (result item) → onSelect(item.id), setIsOpen(false)          │
+│ ├─── onClick (clear button) → onSelect(null)                              │
+│ └─── onClickOutside → setIsOpen(false)                                    │
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### 모바일 버전 (MediaSelectorMobile.tsx)
+
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│ MediaSelectorMobile.tsx                                                     │
+│ packages/mobile/lib/components/create/MediaSelectorMobile.tsx              │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│ Props:                                                                     │
+│ interface MediaSelectorMobileProps {                                       │
+│   selectedMediaId: string | null;                                          │
+│   onSelect: (mediaId: string | null) => void;                             │
+│   disabled?: boolean;                                                      │
+│   error?: string;                                                          │
+│ }                                                                          │
+│                                                                            │
+│ State:                                                                     │
+│ interface MediaSelectorMobileState {                                       │
+│   isSheetOpen: boolean;                   // 풀스크린 시트 열림            │
+│   searchQuery: string;                                                     │
+│   searchResults: MediaItem[];                                              │
+│   isLoading: boolean;                                                      │
+│ }                                                                          │
+│                                                                            │
+│ 렌더링 구조:                                                               │
+│ ┌────────────────────────────────────────────────────────────────────────┐│
+│ │ <View>                                                                 ││
+│ │                                                                        ││
+│ │   <!-- Trigger Pressable -->                                           ││
+│ │   <Pressable onPress={() => setIsSheetOpen(true)}>                    ││
+│ │     <SearchIcon />                                                     ││
+│ │     <Text>                                                             ││
+│ │       {selectedMedia?.name || "Search show, drama..."}                ││
+│ │     </Text>                                                            ││
+│ │     <ChevronRightIcon />                                               ││
+│ │   </Pressable>                                                         ││
+│ │                                                                        ││
+│ │   <!-- Selected Chip (선택된 경우) -->                                  ││
+│ │   {selectedMedia && (                                                  ││
+│ │     <SelectedChip                                                      ││
+│ │       media={selectedMedia}                                            ││
+│ │       onRemove={() => onSelect(null)}                                 ││
+│ │     />                                                                  ││
+│ │   )}                                                                    ││
+│ │                                                                        ││
+│ │   <!-- Full Screen Search Sheet -->                                    ││
+│ │   <Modal visible={isSheetOpen} animationType="slide">                 ││
+│ │     <SafeAreaView>                                                     ││
+│ │       <MediaSearchSheet                                                ││
+│ │         onSelect={(id) => {                                           ││
+│ │           onSelect(id);                                                ││
+│ │           setIsSheetOpen(false);                                       ││
+│ │         }}                                                             ││
+│ │         onClose={() => setIsSheetOpen(false)}                         ││
+│ │         onRequestNew={() => {                                         ││
+│ │           setIsSheetOpen(false);                                       ││
+│ │           navigation.navigate('TagRequest', { type: 'media' });       ││
+│ │         }}                                                             ││
+│ │       />                                                               ││
+│ │     </SafeAreaView>                                                    ││
+│ │   </Modal>                                                             ││
+│ │                                                                        ││
+│ │ </View>                                                                ││
+│ └────────────────────────────────────────────────────────────────────────┘│
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+##### MediaSearchSheet.tsx (모바일 전용)
+
+```typescript
+// packages/mobile/lib/components/create/MediaSearchSheet.tsx
+
+interface MediaSearchSheetProps {
+  onSelect: (mediaId: string) => void;
+  onClose: () => void;
+  onRequestNew: () => void;
+}
+
+interface MediaSearchSheetState {
+  searchQuery: string;
+  searchResults: MediaItem[];
+  recentItems: MediaItem[];
+  popularItems: MediaItem[];
+  isLoading: boolean;
+}
+
+// 렌더링
+// - 상단: 검색 입력 + 뒤로가기 버튼
+// - 검색어 없을 때: Recent + Popular 섹션
+// - 검색어 있을 때: 검색 결과 리스트 (FlashList)
+// - 하단: "Request New Tag" 버튼
+```
+
+### CastSelector 컴포넌트
+
+#### 웹 버전 (CastSelector.tsx)
+
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│ CastSelector.tsx (Web)                                                      │
+│ packages/web/lib/components/create/CastSelector.tsx                        │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│ Props:                                                                     │
+│ interface CastSelectorProps {                                              │
+│   mediaId: string | null;                 // 선택된 미디어 (필터링용)      │
+│   selectedCastIds: string[];              // 선택된 캐스트 목록            │
+│   onToggle: (castId: string) => void;     // 캐스트 선택/해제             │
+│   disabled?: boolean;                                                      │
+│   maxSelections?: number;                 // 최대 선택 가능 수 (default: 5)│
+│ }                                                                          │
+│                                                                            │
+│ State:                                                                     │
+│ interface CastSelectorState {                                              │
+│   isOpen: boolean;                                                         │
+│   searchQuery: string;                                                     │
+│   availableCasts: CastItem[];             // mediaId에 속한 캐스트         │
+│   searchResults: CastItem[];                                               │
+│   isLoading: boolean;                                                      │
+│ }                                                                          │
+│                                                                            │
+│ 렌더링 구조:                                                               │
+│ ┌────────────────────────────────────────────────────────────────────────┐│
+│ │ <div>                                                                  ││
+│ │                                                                        ││
+│ │   <!-- 선택된 캐스트 칩들 -->                                           ││
+│ │   <div className="flex flex-wrap gap-2">                               ││
+│ │     {selectedCasts.map(cast => (                                       ││
+│ │       <CastChip                                                        ││
+│ │         key={cast.id}                                                  ││
+│ │         cast={cast}                                                    ││
+│ │         onRemove={() => onToggle(cast.id)}                            ││
+│ │       />                                                               ││
+│ │     ))}                                                                ││
+│ │   </div>                                                               ││
+│ │                                                                        ││
+│ │   <!-- 드롭다운 트리거 -->                                              ││
+│ │   <button onClick={() => setIsOpen(true)}>                            ││
+│ │     <PlusIcon /> Add cast member                                       ││
+│ │   </button>                                                            ││
+│ │                                                                        ││
+│ │   <!-- 드롭다운 패널 -->                                                ││
+│ │   {isOpen && (                                                         ││
+│ │     <div className="absolute ...">                                     ││
+│ │       <input                                                           ││
+│ │         value={searchQuery}                                            ││
+│ │         onChange={handleSearch}                                        ││
+│ │         placeholder="Search cast..."                                   ││
+│ │       />                                                               ││
+│ │                                                                        ││
+│ │       {/* mediaId가 있으면 해당 미디어의 멤버들 먼저 표시 */}           ││
+│ │       {mediaId && (                                                    ││
+│ │         <>                                                             ││
+│ │           <SectionHeader title={`Members of ${mediaName}`} />         ││
+│ │           <CastGrid                                                    ││
+│ │             items={availableCasts}                                     ││
+│ │             selectedIds={selectedCastIds}                              ││
+│ │             onToggle={onToggle}                                        ││
+│ │           />                                                           ││
+│ │         </>                                                            ││
+│ │       )}                                                               ││
+│ │                                                                        ││
+│ │       {/* 검색 결과 */}                                                 ││
+│ │       {searchQuery && (                                                ││
+│ │         <SearchResults                                                 ││
+│ │           items={searchResults}                                        ││
+│ │           selectedIds={selectedCastIds}                                ││
+│ │           onToggle={onToggle}                                          ││
+│ │         />                                                             ││
+│ │       )}                                                               ││
+│ │     </div>                                                             ││
+│ │   )}                                                                    ││
+│ │                                                                        ││
+│ │ </div>                                                                 ││
+│ └────────────────────────────────────────────────────────────────────────┘│
+│                                                                            │
+│ API 호출:                                                                  │
+│ ├─── mediaId 변경 시 → GET /api/cast?mediaId={mediaId}                    │
+│ └─── searchQuery 변경 시 → GET /api/cast/search?q={query}&mediaId={id}    │
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### 모바일 버전 (CastSelectorMobile.tsx)
+
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│ CastSelectorMobile.tsx                                                      │
+│ packages/mobile/lib/components/create/CastSelectorMobile.tsx               │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│ Props: (웹과 동일)                                                          │
+│                                                                            │
+│ State:                                                                     │
+│ interface CastSelectorMobileState {                                        │
+│   isSheetOpen: boolean;                                                    │
+│   searchQuery: string;                                                     │
+│   availableCasts: CastItem[];                                              │
+│   searchResults: CastItem[];                                               │
+│   isLoading: boolean;                                                      │
+│ }                                                                          │
+│                                                                            │
+│ 렌더링 구조:                                                               │
+│ ┌────────────────────────────────────────────────────────────────────────┐│
+│ │ <View>                                                                 ││
+│ │                                                                        ││
+│ │   <!-- 트리거 -->                                                       ││
+│ │   <Pressable onPress={() => setIsSheetOpen(true)}>                    ││
+│ │     <Text>Select cast members...</Text>                                ││
+│ │     <ChevronRightIcon />                                               ││
+│ │   </Pressable>                                                         ││
+│ │                                                                        ││
+│ │   <!-- 선택된 캐스트 (수평 스크롤) -->                                   ││
+│ │   <FlatList                                                            ││
+│ │     horizontal                                                         ││
+│ │     data={selectedCasts}                                               ││
+│ │     renderItem={({ item }) => (                                        ││
+│ │       <CastChipMobile                                                  ││
+│ │         cast={item}                                                    ││
+│ │         onRemove={() => onToggle(item.id)}                            ││
+│ │       />                                                               ││
+│ │     )}                                                                  ││
+│ │   />                                                                    ││
+│ │                                                                        ││
+│ │   <!-- 풀스크린 선택 시트 -->                                           ││
+│ │   <Modal visible={isSheetOpen} animationType="slide">                 ││
+│ │     <CastSearchSheet                                                   ││
+│ │       mediaId={mediaId}                                                ││
+│ │       selectedIds={selectedCastIds}                                    ││
+│ │       onToggle={onToggle}                                              ││
+│ │       onClose={() => setIsSheetOpen(false)}                           ││
+│ │     />                                                                  ││
+│ │   </Modal>                                                             ││
+│ │                                                                        ││
+│ │ </View>                                                                ││
+│ └────────────────────────────────────────────────────────────────────────┘│
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+### ContextSelector 컴포넌트
+
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│ ContextSelector.tsx (Web) / ContextSelectorMobile.tsx (Mobile)              │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│ Props:                                                                     │
+│ interface ContextSelectorProps {                                           │
+│   selectedContext: ContextType | null;                                     │
+│   onSelect: (context: ContextType | null) => void;                        │
+│   disabled?: boolean;                                                      │
+│ }                                                                          │
+│                                                                            │
+│ Context Types:                                                             │
+│ type ContextType = 'airport' | 'stage' | 'mv' | 'photoshoot' |            │
+│                    'daily' | 'event' | 'drama' | 'variety';               │
+│                                                                            │
+│ 렌더링 (단순 칩 그리드 - 웹/모바일 동일):                                   │
+│ ┌────────────────────────────────────────────────────────────────────────┐│
+│ │ <div className="flex flex-wrap gap-2">                                 ││
+│ │   {CONTEXT_OPTIONS.map(option => (                                     ││
+│ │     <ContextChip                                                       ││
+│ │       key={option.value}                                               ││
+│ │       label={option.label}                                             ││
+│ │       icon={option.icon}                                               ││
+│ │       isSelected={selectedContext === option.value}                   ││
+│ │       onPress={() => onSelect(                                        ││
+│ │         selectedContext === option.value ? null : option.value        ││
+│ │       )}                                                               ││
+│ │     />                                                                  ││
+│ │   ))}                                                                   ││
+│ │ </div>                                                                 ││
+│ └────────────────────────────────────────────────────────────────────────┘│
+│                                                                            │
+│ CONTEXT_OPTIONS:                                                           │
+│ [                                                                          │
+│   { value: 'airport', label: 'Airport', icon: '✈️' },                     │
+│   { value: 'stage', label: 'Stage', icon: '🎤' },                         │
+│   { value: 'mv', label: 'Music Video', icon: '🎬' },                      │
+│   { value: 'photoshoot', label: 'Photoshoot', icon: '📸' },               │
+│   { value: 'daily', label: 'Daily', icon: '👕' },                         │
+│   { value: 'event', label: 'Event', icon: '🎉' },                         │
+│   { value: 'drama', label: 'Drama', icon: '📺' },                         │
+│   { value: 'variety', label: 'Variety', icon: '🎭' },                     │
+│ ]                                                                          │
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 태그 검색 자동완성 이벤트 흐름
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                    TAG SEARCH AUTOCOMPLETE FLOW                           │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  [사용자 입력]                                                            │
+│       │                                                                  │
+│       ▼                                                                  │
+│  onChange → setSearchQuery(value)                                        │
+│       │                                                                  │
+│       ▼                                                                  │
+│  useEffect (debounced, 300ms)                                            │
+│       │                                                                  │
+│       ├─── value.length < 2 → 검색 안 함, 기본 목록 표시                 │
+│       │                                                                  │
+│       └─── value.length >= 2 → fetchSearchResults()                      │
+│                 │                                                        │
+│                 ▼                                                        │
+│            setIsLoading(true)                                            │
+│                 │                                                        │
+│                 ▼                                                        │
+│            GET /api/tags/{type}/search?q={query}                         │
+│                 │                                                        │
+│                 ├─── type: 'media' | 'cast'                              │
+│                 │                                                        │
+│                 ├─── 추가 params (cast 검색 시):                         │
+│                 │    mediaId: string  // 해당 미디어 멤버 우선 표시      │
+│                 │                                                        │
+│                 ▼                                                        │
+│            Response:                                                     │
+│            {                                                             │
+│              results: [                                                  │
+│                {                                                         │
+│                  id: string,                                             │
+│                  name: string,                                           │
+│                  nameKo: string,                                         │
+│                  type: 'group' | 'solo' | 'drama' | 'show',             │
+│                  imageUrl?: string,                                      │
+│                  memberCount?: number,  // group인 경우                  │
+│                },                                                        │
+│                ...                                                       │
+│              ],                                                          │
+│              hasMore: boolean,                                           │
+│            }                                                             │
+│                 │                                                        │
+│                 ▼                                                        │
+│            setSearchResults(results)                                     │
+│            setIsLoading(false)                                           │
+│                 │                                                        │
+│                 ▼                                                        │
+│            [결과 렌더링]                                                  │
+│                 │                                                        │
+│                 ├─── 결과 있음 → 리스트 표시                             │
+│                 │                                                        │
+│                 └─── 결과 없음 → "No results" + "Request new tag" 표시  │
+│                                                                          │
+│  [항목 선택]                                                              │
+│       │                                                                  │
+│       ▼                                                                  │
+│  onClick (result item)                                                   │
+│       │                                                                  │
+│       ├─── localStorage에 최근 선택 저장                                 │
+│       │    recentMedias / recentCasts (최대 5개)                         │
+│       │                                                                  │
+│       ├─── onSelect(item.id)                                             │
+│       │                                                                  │
+│       └─── 드롭다운/시트 닫기                                            │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+### useTagSearch 훅
+
+```typescript
+// packages/shared/lib/hooks/useTagSearch.ts
+
+interface UseTagSearchOptions {
+  type: 'media' | 'cast';
+  mediaId?: string;         // cast 검색 시 필터링용
+  debounceMs?: number;      // default: 300
+}
+
+interface UseTagSearchReturn {
+  query: string;
+  setQuery: (q: string) => void;
+  results: TagSearchResult[];
+  isLoading: boolean;
+  error: Error | null;
+  recentItems: TagSearchResult[];
+  popularItems: TagSearchResult[];
+  clearQuery: () => void;
+}
+
+// 구현
+export function useTagSearch(options: UseTagSearchOptions): UseTagSearchReturn {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<TagSearchResult[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  // 최근 항목 (localStorage)
+  const recentItems = useRecentItems(options.type);
+
+  // 인기 항목 (React Query)
+  const { data: popularItems } = useQuery({
+    queryKey: ['popular-tags', options.type],
+    queryFn: () => fetchPopularTags(options.type),
+    staleTime: 5 * 60 * 1000, // 5분
+  });
+
+  // Debounced 검색
+  useEffect(() => {
+    if (query.length < 2) {
+      setResults([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsLoading(true);
+      try {
+        const res = await searchTags(options.type, query, options.mediaId);
+        setResults(res.results);
+      } catch (e) {
+        setError(e as Error);
+      } finally {
+        setIsLoading(false);
+      }
+    }, options.debounceMs ?? 300);
+
+    return () => clearTimeout(timer);
+  }, [query, options.type, options.mediaId]);
+
+  return {
+    query,
+    setQuery,
+    results,
+    isLoading,
+    error,
+    recentItems,
+    popularItems: popularItems ?? [],
+    clearQuery: () => setQuery(''),
+  };
+}
+```
+
+---
+
+### C-04 모바일 스팟 등록
+
+#### 모바일 스팟 화면 구조
+
+```
+┌─────────────────────────────────────────┐
+│  Add Links                        [←]   │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │       Step 4 of 4: Links        │   │
+│  │  ○───○───○───●                   │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  Item 1: Top                            │
+│  ┌─────────────────────────────────┐   │
+│  │ [crop image]  Category: Top     │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  THE ORIGINAL                           │
+│  ┌─────────────────────────────────┐   │
+│  │ 🔗 Paste shopping URL...        │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  또는                                    │
+│                                         │
+│  [Share from other app]                 │
+│  → 다른 앱에서 공유 시트로 URL 전달     │
+│                                         │
+│  ─────────────────────────────────────  │
+│                                         │
+│  Parsed: ✓                              │
+│  ┌─────────────────────────────────┐   │
+│  │ [Product Image]                 │   │
+│  │ Brand: Celine                   │   │
+│  │ Name: Triomphe Jacket           │   │
+│  │ Price: ₩2,850,000               │   │
+│  │ [Edit]                    [✓]   │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  THE VIBE                    [+ Add]    │
+│                                         │
+│         [Publish Post]                  │
+└─────────────────────────────────────────┘
+```
+
+#### 공유 시트 수신 (모바일 전용)
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                    SHARE SHEET INTEGRATION (Mobile)                       │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  [다른 앱에서 URL 공유]                                                   │
+│       │                                                                  │
+│       ▼                                                                  │
+│  iOS: Share Extension / Android: Intent Filter                           │
+│       │                                                                  │
+│       ▼                                                                  │
+│  App Scheme: decoded://share?url={encodedUrl}                            │
+│       │                                                                  │
+│       ▼                                                                  │
+│  Linking.getInitialURL() 또는 Linking.addEventListener('url')            │
+│       │                                                                  │
+│       ▼                                                                  │
+│  현재 생성 플로우 중인지 확인                                            │
+│       │                                                                  │
+│       ├─── 생성 플로우 중 (Step 4)                                       │
+│       │         └─── 현재 선택된 아이템에 URL 자동 입력                  │
+│       │              useScrapeUrl().scrape(sharedUrl)                    │
+│       │                                                                  │
+│       └─── 생성 플로우 아님                                              │
+│                 └─── Alert: "스팟 등록 단계에서 사용해주세요"            │
+│                                                                          │
+│  app.json 설정:                                                          │
+│  {                                                                       │
+│    "expo": {                                                             │
+│      "scheme": "decoded",                                                │
+│      "ios": {                                                            │
+│        "associatedDomains": ["applinks:decoded.style"],                 │
+│        "infoPlist": {                                                    │
+│          "CFBundleDocumentTypes": [                                     │
+│            {                                                             │
+│              "CFBundleTypeName": "URL",                                 │
+│              "CFBundleTypeRole": "Viewer",                              │
+│              "LSItemContentTypes": ["public.url"]                       │
+│            }                                                             │
+│          ]                                                               │
+│        }                                                                 │
+│      },                                                                  │
+│      "android": {                                                        │
+│        "intentFilters": [                                                │
+│          {                                                               │
+│            "action": "android.intent.action.SEND",                      │
+│            "data": [{ "mimeType": "text/plain" }],                      │
+│            "category": ["android.intent.category.DEFAULT"]              │
+│          }                                                               │
+│        ]                                                                 │
+│      }                                                                   │
+│    }                                                                     │
+│  }                                                                       │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
 ## 구현 상태 체크리스트
 
 ### C-01 이미지 업로드
+
+#### 웹 (packages/web)
 - [ ] DropZone 컴포넌트
 - [ ] 파일 검증 (타입, 크기)
-- [ ] 이미지 압축
+- [ ] 이미지 압축 (browser-image-compression)
 - [ ] Supabase Storage 업로드
 - [ ] 업로드 진행률 표시
 - [ ] 프리뷰 그리드
 - [ ] 다중 이미지 지원
+- [ ] 클립보드 붙여넣기
+
+#### 모바일 (packages/mobile)
+- [ ] 카메라 권한 요청 플로우
+- [ ] 갤러리 권한 요청 플로우
+- [ ] expo-camera 연동
+- [ ] expo-image-picker 연동
+- [ ] 이미지 압축 (expo-image-manipulator)
+- [ ] 촬영 확인 화면
+- [ ] ImageThumbnailStrip 컴포넌트
+- [ ] 업로드 진행률 표시
 
 ### C-02 AI 객체 인식
+
+#### 공통
 - [x] Backend detection pipeline
-- [ ] Detection Canvas UI
+
+#### 웹 (packages/web)
+- [ ] DetectionCanvas UI (마우스 인터랙션)
 - [ ] BoundingBox 컴포넌트
-- [ ] 박스 드래그/리사이즈
+- [ ] 박스 드래그/리사이즈 (마우스)
 - [ ] 수동 박스 그리기
 - [ ] 카테고리 변경 UI
 - [ ] Crop 이미지 생성
 
+#### 모바일 (packages/mobile)
+- [ ] DetectionCanvasMobile (터치 인터랙션)
+- [ ] BoundingBoxMobile 컴포넌트
+- [ ] 핀치 줌 (react-native-gesture-handler)
+- [ ] 박스 드래그/리사이즈 (터치)
+- [ ] 롱프레스 삭제
+- [ ] 수동 박스 그리기
+
 ### C-03 메타데이터 태깅
-- [ ] MediaSelector 컴포넌트
-- [ ] CastSelector 컴포넌트
+
+#### 웹 (packages/web)
+- [ ] MediaSelector 컴포넌트 (드롭다운)
+- [ ] CastSelector 컴포넌트 (드롭다운 + 다중선택)
 - [ ] ContextSelector 컴포넌트
-- [ ] 태그 검색 API
-- [ ] 태그 요청 모달
+- [ ] TagRequestModal 컴포넌트
+- [ ] useTagSearch 훅
+
+#### 모바일 (packages/mobile)
+- [ ] MediaSelectorMobile 컴포넌트
+- [ ] MediaSearchSheet 풀스크린 시트
+- [ ] CastSelectorMobile 컴포넌트
+- [ ] CastSearchSheet 풀스크린 시트
+- [ ] ContextSelectorMobile 컴포넌트
+
+#### 공통 API
+- [ ] GET /api/tags/media/search
+- [ ] GET /api/tags/cast/search
+- [ ] GET /api/tags/popular
+- [ ] POST /api/tags/request
 
 ### C-04 스팟 등록
+
+#### 웹 (packages/web)
 - [ ] UrlInput 컴포넌트
-- [ ] Scraper API 엔드포인트
 - [ ] ParsedProductCard 컴포넌트
 - [ ] ManualProductForm 컴포넌트
 - [ ] Vibe 추가 기능
-- [ ] 지원 사이트 목록
+
+#### 모바일 (packages/mobile)
+- [ ] UrlInputMobile 컴포넌트
+- [ ] ParsedProductCardMobile 컴포넌트
+- [ ] ManualProductFormMobile (BottomSheet)
+- [ ] 공유 시트 수신 (intent filter)
+
+#### 공통 API
+- [ ] POST /api/scrape
+- [ ] 지원 사이트 목록 설정

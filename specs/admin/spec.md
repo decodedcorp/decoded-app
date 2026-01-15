@@ -578,3 +578,1243 @@ interface PayoutAction {
 - 관리자 접근을 위한 IP 화이트리스팅 (선택)
 - 관리자 API에 Rate limiting
 - 비활성 후 세션 타임아웃
+
+---
+
+## 모바일 Admin 명세
+
+> 모바일 앱 (packages/mobile)에서의 관리자 패널 상세 명세
+
+### 모바일 vs 웹 차이점 요약
+
+| 기능 | 웹 (packages/web) | 모바일 (packages/mobile) |
+|------|------------------|------------------------|
+| 레이아웃 | 사이드바 + 컨텐츠 영역 | 바텀 탭 네비게이션 |
+| 태그 관리 | 테이블 뷰 | 리스트 + 스와이프 액션 |
+| 모더레이션 | 카드 그리드 | 틴더 스타일 스와이프 |
+| 분석 | 풀 차트 | 간소화된 미니 차트 |
+| 대량 작업 | 체크박스 선택 | 롱프레스 다중 선택 |
+| 푸시 알림 | 없음 | 긴급 알림 + 빠른 액션 |
+
+---
+
+### 모바일 Admin 네비게이션 구조
+
+```
+┌─────────────────────────────────────────┐
+│  Decoded Admin                    [👤]   │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │                                 │   │
+│  │         [Main Content]          │   │
+│  │                                 │   │
+│  │                                 │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+├─────────────────────────────────────────┤
+│  [📊]     [✅]     [💰]     [🏷️]       │
+│ Dashboard Moderate  Payouts   Tags       │
+└─────────────────────────────────────────┘
+```
+
+---
+
+### A-01 모바일 태그 관리
+
+#### 모바일 태그 목록 화면
+
+```
+┌─────────────────────────────────────────┐
+│  ← Tags                         [+] [🔍] │
+│                                         │
+│  [Media] [Cast] [Requests (5)]         │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │ ← Swipe                         │   │
+│  │ 🎵 BLACKPINK                    │   │
+│  │    K-POP • Group • 4 members    │   │
+│  │    1,234 posts                  │   │
+│  │                          → Edit │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │ 🎬 Squid Game                   │   │
+│  │    K-Drama • Drama • 14 cast    │   │
+│  │    567 posts                    │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │ 🎵 NewJeans                     │   │
+│  │    K-POP • Group • 5 members    │   │
+│  │    890 posts                    │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│          [Load More...]                 │
+└─────────────────────────────────────────┘
+```
+
+#### 스와이프 액션
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                    TAG LIST SWIPE ACTIONS                                 │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  [왼쪽 스와이프 → 삭제/아카이브]                                          │
+│                                                                          │
+│  ┌─────────────────────────────────────────────────────────────────────┐│
+│  │                                         ┌─────────┐┌─────────┐      ││
+│  │  🎵 BLACKPINK                           │ Archive ││  Delete │      ││
+│  │     K-POP • Group                       │   🗄️    ││   🗑️    │      ││
+│  │                              ←←←←←←←←←  │ (Gray)  ││  (Red)  │      ││
+│  │                                         └─────────┘└─────────┘      ││
+│  └─────────────────────────────────────────────────────────────────────┘│
+│                                                                          │
+│  [오른쪽 스와이프 → 편집]                                                 │
+│                                                                          │
+│  ┌─────────────────────────────────────────────────────────────────────┐│
+│  │  ┌─────────┐                                                        ││
+│  │  │  Edit   │  🎵 BLACKPINK                                          ││
+│  │  │   ✏️    │     K-POP • Group                                      ││
+│  │  │ (Blue)  │                              →→→→→→→→→                 ││
+│  │  └─────────┘                                                        ││
+│  └─────────────────────────────────────────────────────────────────────┘│
+│                                                                          │
+│  라이브러리: react-native-swipeable-list 또는 react-native-gesture-handler│
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+#### 모바일 태그 요청 검토
+
+```
+┌─────────────────────────────────────────┐
+│  ← Tag Requests                    (5)   │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │ Request #127                    │   │
+│  │                                 │   │
+│  │ Type: Cast                      │   │
+│  │ Name: Kim Chaewon              │   │
+│  │ Korean: 김채원                  │   │
+│  │ Related: LE SSERAFIM           │   │
+│  │                                 │   │
+│  │ By: user@example.com           │   │
+│  │ "Adding new member to group"   │   │
+│  │                                 │   │
+│  │ ┌─────────┐ ┌─────────┐       │   │
+│  │ │    ✓    │ │    ✗    │       │   │
+│  │ │ Approve │ │  Reject │       │   │
+│  │ └─────────┘ └─────────┘       │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │ Request #126                    │   │
+│  │ ...                             │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+---
+
+### A-02 모바일 콘텐츠 모더레이션
+
+#### 틴더 스타일 모더레이션 UI
+
+```
+┌─────────────────────────────────────────┐
+│  Moderate                 23 pending     │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │                                 │   │
+│  │                                 │   │
+│  │      [Post Image Preview]       │   │
+│  │                                 │   │
+│  │                                 │   │
+│  │                                 │   │
+│  ├─────────────────────────────────┤   │
+│  │ Post #4521                      │   │
+│  │ By: user123                     │   │
+│  │ Tags: BLACKPINK > Jennie        │   │
+│  │ Context: Airport                │   │
+│  │ Items: 3                        │   │
+│  │                                 │   │
+│  │ [View Details]                  │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  ┌─────────┐         ┌─────────┐       │
+│  │    ✗    │         │    ✓    │       │
+│  │  Reject │         │ Approve │       │
+│  │  (Red)  │         │ (Green) │       │
+│  └─────────┘         └─────────┘       │
+│                                         │
+│  ← Swipe left to reject                 │
+│  → Swipe right to approve               │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+#### 모더레이션 제스처 흐름
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                    MODERATION GESTURE FLOW                                │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  [카드 스와이프 제스처]                                                   │
+│       │                                                                  │
+│       ├─── 오른쪽 스와이프 (>50% 화면 너비)                              │
+│       │         │                                                        │
+│       │         ├─── 카드 애니메이션: 오른쪽으로 날아감 + ✓ 아이콘      │
+│       │         ├─── Haptic feedback (success)                          │
+│       │         ├─── PUT /api/admin/posts/:id/status { status: 'published' }
+│       │         └─── 다음 카드 표시                                      │
+│       │                                                                  │
+│       ├─── 왼쪽 스와이프 (>50% 화면 너비)                                │
+│       │         │                                                        │
+│       │         ├─── 카드 애니메이션: 왼쪽으로 날아감 + ✗ 아이콘        │
+│       │         ├─── 거부 사유 입력 모달 표시                           │
+│       │         │    ┌─────────────────────────────────────┐           │
+│       │         │    │ Rejection Reason                    │           │
+│       │         │    │                                     │           │
+│       │         │    │ [Inappropriate content]             │           │
+│       │         │    │ [Wrong tags]                        │           │
+│       │         │    │ [Low quality]                       │           │
+│       │         │    │ [Other: ____________]              │           │
+│       │         │    │                                     │           │
+│       │         │    │           [Confirm Reject]          │           │
+│       │         │    └─────────────────────────────────────┘           │
+│       │         └─── PUT /api/admin/posts/:id/status { status: 'rejected', reason }
+│       │                                                                  │
+│       ├─── 위로 스와이프                                                 │
+│       │         └─── 상세 보기 바텀시트 열기                            │
+│       │                                                                  │
+│       └─── 아래로 스와이프                                               │
+│                 └─── 플래그 옵션 표시                                    │
+│                      ├─── "Flag for review"                             │
+│                      ├─── "Flag as spam"                                │
+│                      └─── "Flag user"                                   │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+#### 게시물 상세 바텀시트
+
+```
+┌─────────────────────────────────────────┐
+│  ─────────────────────────────────────  │
+│                                         │
+│  Post #4521 Details                     │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │ [Full Image]                    │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  Author: user123                        │
+│  Posted: Jan 8, 2026 at 2:34 PM        │
+│                                         │
+│  Tags:                                  │
+│  Media: BLACKPINK                       │
+│  Cast: Jennie                           │
+│  Context: Airport                       │
+│                                         │
+│  Items (3):                             │
+│  ┌────┐ ┌────┐ ┌────┐                  │
+│  │top │ │bag │ │shoe│                  │
+│  └────┘ └────┘ └────┘                  │
+│                                         │
+│  User History:                          │
+│  • 45 approved posts                    │
+│  • 2 rejected posts                     │
+│  • Member since: Mar 2025               │
+│                                         │
+│  ┌─────────┐ ┌─────────┐ ┌─────────┐  │
+│  │ Reject  │ │  Flag   │ │ Approve │  │
+│  └─────────┘ └─────────┘ └─────────┘  │
+└─────────────────────────────────────────┘
+```
+
+---
+
+### A-02 모바일 지급 관리
+
+#### 지급 대기 목록
+
+```
+┌─────────────────────────────────────────┐
+│  ← Payouts                  8 pending    │
+│                                         │
+│  Summary:                               │
+│  ┌────────────┐ ┌────────────┐         │
+│  │ ₩1,234,500 │ │ ₩5,678,000 │         │
+│  │  Pending   │ │ This Month │         │
+│  └────────────┘ └────────────┘         │
+│                                         │
+│  [Pending] [Processing] [Completed]     │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │ Request #891           Jan 7    │   │
+│  │                                 │   │
+│  │ 👤 top_contributor              │   │
+│  │ 💰 ₩150,000                     │   │
+│  │ 🏦 Shinhan xxx-xxx-123456       │   │
+│  │                                 │   │
+│  │ • Total earned: ₩450,000       │   │
+│  │ • Previous payouts: 2 (100%)   │   │
+│  │                                 │   │
+│  │ ┌─────────┐     ┌─────────┐   │   │
+│  │ │  Reject │     │ Approve │   │   │
+│  │ └─────────┘     └─────────┘   │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │ Request #890           Jan 7    │   │
+│  │ ...                             │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+#### 지급 승인 확인 모달
+
+```
+┌─────────────────────────────────────────┐
+│                                         │
+│          Confirm Payout                 │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │                                 │   │
+│  │  Amount: ₩150,000               │   │
+│  │  To: top_contributor            │   │
+│  │  Bank: Shinhan xxx-xxx-123456   │   │
+│  │                                 │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  ⚠️ This action cannot be undone       │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │      [Cancel]    [Approve]      │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  Face ID required for approval          │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+---
+
+### A-03 모바일 분석 대시보드
+
+#### 간소화된 대시보드 홈
+
+```
+┌─────────────────────────────────────────┐
+│  Dashboard                        [⚙️]   │
+│                                         │
+│  Jan 1 - Jan 8, 2026              [▼]  │
+│                                         │
+│  ┌────────┐ ┌────────┐ ┌────────┐      │
+│  │ 12,345 │ │  1,234 │ │  5.2%  │      │
+│  │  DAU   │ │ Posts  │ │  CTR   │      │
+│  │  +12%  │ │  +8%   │ │ +0.3%  │      │
+│  └────────┘ └────────┘ └────────┘      │
+│                                         │
+│  ┌────────────────────────────────┐    │
+│  │ ₩1.2M                          │    │
+│  │ Revenue  +15%                   │    │
+│  └────────────────────────────────┘    │
+│                                         │
+│  Activity                               │
+│  ┌─────────────────────────────────┐   │
+│  │ ▁▂▃▄▅▆▇█▇▆▅▄▃▂▁               │   │
+│  │ 1/1         1/4         1/8     │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  Quick Actions                          │
+│  ┌────────┐ ┌────────┐ ┌────────┐      │
+│  │  23    │ │   8    │ │   5    │      │
+│  │Moderate│ │Payouts │ │Tags Req│      │
+│  └────────┘ └────────┘ └────────┘      │
+│                                         │
+│  Top Content This Week                  │
+│  1. BLACKPINK Airport - 1,234 views    │
+│  2. IVE Music Bank - 987 views         │
+│  3. NewJeans Photoshoot - 876 views    │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+#### 상세 분석 화면
+
+```
+┌─────────────────────────────────────────┐
+│  ← Analytics                            │
+│                                         │
+│  [Users] [Content] [Revenue]            │
+│                                         │
+│  Users - Last 30 days                   │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │ DAU                             │   │
+│  │ ▁▂▃▄▅▆▇█▇▆▅▄▃▂▁▁▂▃▄▅▆▇█▇▆▅▄▃▂▁│   │
+│  │ Dec 9                   Jan 8   │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  ┌──────────────┐ ┌──────────────┐     │
+│  │    45,678    │ │     3,456    │     │
+│  │     MAU      │ │  New Users   │     │
+│  │    +8%       │ │    +12%      │     │
+│  └──────────────┘ └──────────────┘     │
+│                                         │
+│  Retention                              │
+│  D1: 65% | D7: 42% | D30: 28%          │
+│                                         │
+│  Top Contributors                       │
+│  ┌─────────────────────────────────┐   │
+│  │ 1. user123        127 posts     │   │
+│  │ 2. fashionista     89 posts     │   │
+│  │ 3. kpop_fan        76 posts     │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│        [Export Report]                  │
+└─────────────────────────────────────────┘
+```
+
+---
+
+### 모바일 푸시 알림 & 빠른 액션
+
+#### 푸시 알림 유형
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                    ADMIN PUSH NOTIFICATIONS                               │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  [1. 긴급 모더레이션 알림]                                                │
+│                                                                          │
+│  ┌─────────────────────────────────────────────────────────────────────┐│
+│  │ 🚨 Decoded Admin                                           now      ││
+│  │                                                                     ││
+│  │ Flagged Content Alert                                               ││
+│  │ Post #4521 was flagged by 3 users for "inappropriate content"      ││
+│  │                                                                     ││
+│  │ [View Post]  [Quick Reject]  [Dismiss]                             ││
+│  └─────────────────────────────────────────────────────────────────────┘│
+│                                                                          │
+│  → "View Post" 탭: 앱 열림 → 해당 게시물 상세                            │
+│  → "Quick Reject" 탭: 바로 거부 처리 (확인 알림 표시)                    │
+│                                                                          │
+│  [2. 지급 요청 알림]                                                      │
+│                                                                          │
+│  ┌─────────────────────────────────────────────────────────────────────┐│
+│  │ 💰 Decoded Admin                                           5m ago   ││
+│  │                                                                     ││
+│  │ New Payout Request                                                  ││
+│  │ user123 requested ₩150,000 withdrawal                              ││
+│  │                                                                     ││
+│  │ [Review]  [Quick Approve]                                          ││
+│  └─────────────────────────────────────────────────────────────────────┘│
+│                                                                          │
+│  → "Quick Approve" 탭: Face ID 인증 후 바로 승인                         │
+│                                                                          │
+│  [3. 태그 요청 알림]                                                      │
+│                                                                          │
+│  ┌─────────────────────────────────────────────────────────────────────┐│
+│  │ 🏷️ Decoded Admin                                          1h ago   ││
+│  │                                                                     ││
+│  │ 5 New Tag Requests                                                  ││
+│  │ Pending review in Tags section                                      ││
+│  │                                                                     ││
+│  │ [View All]                                                          ││
+│  └─────────────────────────────────────────────────────────────────────┘│
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+#### 알림 설정
+
+```typescript
+// packages/mobile/lib/notifications/adminNotifications.ts
+
+interface AdminNotificationConfig {
+  // 알림 유형별 설정
+  moderation: {
+    enabled: boolean;
+    urgentOnly: boolean;  // 플래그된 콘텐츠만
+    quietHours: { start: string; end: string }; // "22:00" - "08:00"
+  };
+  payouts: {
+    enabled: boolean;
+    minAmount: number;  // 이 금액 이상만 알림
+  };
+  tagRequests: {
+    enabled: boolean;
+    batchInterval: number; // 분 단위, 묶어서 알림
+  };
+}
+
+// 기본값
+const defaultConfig: AdminNotificationConfig = {
+  moderation: {
+    enabled: true,
+    urgentOnly: true,
+    quietHours: { start: "22:00", end: "08:00" }
+  },
+  payouts: {
+    enabled: true,
+    minAmount: 50000
+  },
+  tagRequests: {
+    enabled: true,
+    batchInterval: 60
+  }
+};
+```
+
+---
+
+## 컴포넌트 상세 매핑
+
+> 웹/모바일 공통 및 플랫폼별 구현 상세
+
+### TagTable 컴포넌트 (웹)
+
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│ TagTable.tsx                                                                │
+│ packages/web/lib/components/admin/TagTable.tsx                             │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│ Props:                                                                     │
+│ interface TagTableProps {                                                  │
+│   type: 'media' | 'cast';                                                 │
+│   initialData?: TagItem[];                                                │
+│   onEdit: (id: string) => void;                                           │
+│   onArchive: (id: string) => void;                                        │
+│   onBulkAction: (ids: string[], action: BulkAction) => void;             │
+│ }                                                                          │
+│                                                                            │
+│ State:                                                                     │
+│ interface TagTableState {                                                  │
+│   data: TagItem[];                                                         │
+│   pagination: { page: number; pageSize: number; total: number };          │
+│   sorting: { column: string; direction: 'asc' | 'desc' };                 │
+│   filters: { search: string; category?: string; status?: string };       │
+│   selectedIds: string[];                                                   │
+│   isLoading: boolean;                                                      │
+│ }                                                                          │
+│                                                                            │
+│ 열 정의:                                                                   │
+│ const columns: ColumnDef<TagItem>[] = [                                   │
+│   { id: 'select', header: <Checkbox />, cell: <RowCheckbox /> },         │
+│   {                                                                        │
+│     id: 'name',                                                            │
+│     header: 'Name',                                                        │
+│     accessorKey: 'name',                                                   │
+│     sortable: true,                                                        │
+│     cell: ({ row }) => (                                                   │
+│       <div className="flex items-center gap-2">                           │
+│         <TagIcon type={row.original.type} />                              │
+│         <span>{row.original.name}</span>                                  │
+│         <span className="text-muted">{row.original.nameKo}</span>        │
+│       </div>                                                               │
+│     )                                                                      │
+│   },                                                                       │
+│   {                                                                        │
+│     id: 'category',                                                        │
+│     header: 'Category',                                                    │
+│     accessorKey: 'category',                                               │
+│     sortable: true,                                                        │
+│     filterOptions: ['K-POP', 'K-Drama', 'K-Movie', 'Variety']            │
+│   },                                                                       │
+│   {                                                                        │
+│     id: 'type',                                                            │
+│     header: 'Type',                                                        │
+│     accessorKey: 'mediaType',                                              │
+│     sortable: true,                                                        │
+│     filterOptions: ['group', 'solo', 'drama', 'movie', 'show']           │
+│   },                                                                       │
+│   {                                                                        │
+│     id: 'stats',                                                           │
+│     header: 'Stats',                                                       │
+│     cell: ({ row }) => (                                                   │
+│       <div>                                                                │
+│         <span>{row.original.postCount} posts</span>                       │
+│         <span>{row.original.itemCount} items</span>                       │
+│       </div>                                                               │
+│     )                                                                      │
+│   },                                                                       │
+│   {                                                                        │
+│     id: 'actions',                                                         │
+│     header: '',                                                            │
+│     cell: ({ row }) => (                                                   │
+│       <DropdownMenu>                                                       │
+│         <DropdownItem onClick={() => onEdit(row.id)}>Edit</DropdownItem> │
+│         <DropdownItem onClick={() => onViewPosts(row.id)}>             │
+│           View Posts                                                       │
+│         </DropdownItem>                                                    │
+│         <DropdownItem onClick={() => onArchive(row.id)} variant="danger">│
+│           Archive                                                          │
+│         </DropdownItem>                                                    │
+│       </DropdownMenu>                                                      │
+│     )                                                                      │
+│   }                                                                        │
+│ ];                                                                         │
+│                                                                            │
+│ Events:                                                                    │
+│ ├─── onSort(column) → setSorting({ column, direction: toggle })          │
+│ ├─── onFilter(filters) → setFilters(filters), refetch()                  │
+│ ├─── onPageChange(page) → setPagination({ ...pagination, page })         │
+│ ├─── onSelectRow(id) → toggleSelectedId(id)                              │
+│ ├─── onSelectAll() → setSelectedIds(allIds or [])                        │
+│ └─── onBulkAction(action) → onBulkAction(selectedIds, action)            │
+│                                                                            │
+│ 라이브러리: @tanstack/react-table                                          │
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+### TagListMobile 컴포넌트 (모바일)
+
+```typescript
+// packages/mobile/lib/components/admin/TagListMobile.tsx
+
+interface TagListMobileProps {
+  type: 'media' | 'cast';
+  onEdit: (id: string) => void;
+  onArchive: (id: string) => void;
+}
+
+interface TagListMobileState {
+  data: TagItem[];
+  isLoading: boolean;
+  isRefreshing: boolean;
+  hasMore: boolean;
+  selectedForBulk: string[];
+  isMultiSelectMode: boolean;
+}
+
+// 렌더링
+// - FlashList for performance
+// - Swipeable rows (react-native-gesture-handler)
+// - Pull-to-refresh
+// - Infinite scroll (onEndReached)
+// - Long press to enter multi-select mode
+```
+
+### PostModerationCard 컴포넌트
+
+#### 웹 버전
+
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│ PostModerationCard.tsx (Web)                                                │
+│ packages/web/lib/components/admin/PostModerationCard.tsx                   │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│ Props:                                                                     │
+│ interface PostModerationCardProps {                                        │
+│   post: PendingPost;                                                       │
+│   onApprove: (id: string) => Promise<void>;                               │
+│   onReject: (id: string, reason: string) => Promise<void>;                │
+│   onFlag: (id: string, flagType: FlagType) => Promise<void>;              │
+│   onViewDetails: (id: string) => void;                                    │
+│   isProcessing?: boolean;                                                  │
+│ }                                                                          │
+│                                                                            │
+│ State:                                                                     │
+│ interface PostModerationCardState {                                        │
+│   showRejectModal: boolean;                                                │
+│   rejectReason: string;                                                    │
+│   isSubmitting: boolean;                                                   │
+│ }                                                                          │
+│                                                                            │
+│ 렌더링 구조:                                                               │
+│ ┌────────────────────────────────────────────────────────────────────────┐│
+│ │ <Card className="flex">                                                ││
+│ │                                                                        ││
+│ │   <!-- 이미지 프리뷰 -->                                                ││
+│ │   <div className="w-32 h-32">                                          ││
+│ │     <Image src={post.thumbnailUrl} />                                  ││
+│ │   </div>                                                               ││
+│ │                                                                        ││
+│ │   <!-- 정보 영역 -->                                                    ││
+│ │   <div className="flex-1">                                             ││
+│ │     <div className="flex justify-between">                            ││
+│ │       <span>Post #{post.id}</span>                                    ││
+│ │       <span>{formatDate(post.createdAt)}</span>                       ││
+│ │     </div>                                                             ││
+│ │     <div>By: {post.author.username}</div>                             ││
+│ │     <div>Tags: {post.media?.name} > {post.cast?.name}</div>          ││
+│ │     <div>Items: {post.itemCount}</div>                                ││
+│ │   </div>                                                               ││
+│ │                                                                        ││
+│ │   <!-- 액션 버튼 -->                                                    ││
+│ │   <div className="flex gap-2">                                        ││
+│ │     <Button variant="ghost" onClick={() => onViewDetails(post.id)}>  ││
+│ │       View Details                                                     ││
+│ │     </Button>                                                          ││
+│ │     <Button variant="success" onClick={() => onApprove(post.id)}>    ││
+│ │       ✓ Approve                                                        ││
+│ │     </Button>                                                          ││
+│ │     <Button variant="danger" onClick={() => setShowRejectModal(true)}>││
+│ │       ✗ Reject                                                         ││
+│ │     </Button>                                                          ││
+│ │     <DropdownMenu>                                                     ││
+│ │       <DropdownItem onClick={() => onFlag(post.id, 'review')}>       ││
+│ │         🚩 Flag for Review                                            ││
+│ │       </DropdownItem>                                                  ││
+│ │       <DropdownItem onClick={() => onFlag(post.id, 'spam')}>         ││
+│ │         🚩 Flag as Spam                                               ││
+│ │       </DropdownItem>                                                  ││
+│ │     </DropdownMenu>                                                    ││
+│ │   </div>                                                               ││
+│ │                                                                        ││
+│ │ </Card>                                                                ││
+│ └────────────────────────────────────────────────────────────────────────┘│
+│                                                                            │
+│ PendingPost 타입:                                                          │
+│ interface PendingPost {                                                    │
+│   id: string;                                                              │
+│   thumbnailUrl: string;                                                    │
+│   author: { id: string; username: string };                               │
+│   media?: { id: string; name: string };                                   │
+│   cast?: { id: string; name: string };                                    │
+│   context?: ContextType;                                                   │
+│   itemCount: number;                                                       │
+│   createdAt: Date;                                                         │
+│   status: 'pending';                                                       │
+│ }                                                                          │
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### 모바일 버전 (SwipeablePostCard)
+
+```typescript
+// packages/mobile/lib/components/admin/SwipeablePostCard.tsx
+
+interface SwipeablePostCardProps {
+  post: PendingPost;
+  onApprove: () => Promise<void>;
+  onReject: (reason: string) => Promise<void>;
+  onFlag: (flagType: FlagType) => Promise<void>;
+  onViewDetails: () => void;
+}
+
+interface SwipeablePostCardState {
+  translateX: Animated.Value;
+  isAnimating: boolean;
+}
+
+// 제스처 핸들링
+// - PanGestureHandler로 스와이프 감지
+// - 50% 이상 스와이프 시 액션 트리거
+// - 스프링 애니메이션으로 카드 날아가는 효과
+// - Haptic feedback on action
+```
+
+### MetricCard 컴포넌트
+
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│ MetricCard.tsx (Web + Mobile)                                               │
+│ packages/shared/lib/components/admin/MetricCard.tsx                        │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│ Props:                                                                     │
+│ interface MetricCardProps {                                                │
+│   title: string;                       // "DAU", "Revenue", etc.          │
+│   value: number | string;              // 12345, "₩1.2M"                  │
+│   change?: {                           // 변화량                          │
+│     value: number;                     // +12, -5                         │
+│     type: 'percent' | 'absolute';                                         │
+│   };                                                                       │
+│   trend?: 'up' | 'down' | 'neutral';   // 화살표 방향                     │
+│   format?: 'number' | 'currency' | 'percent';                             │
+│   currency?: string;                   // "KRW", "USD"                    │
+│   sparkline?: number[];                // 미니 차트 데이터                │
+│   onClick?: () => void;                // 클릭 시 상세 페이지 이동        │
+│   size?: 'sm' | 'md' | 'lg';           // 카드 크기                       │
+│ }                                                                          │
+│                                                                            │
+│ 렌더링 (웹):                                                               │
+│ ┌────────────────────────────────────────────────────────────────────────┐│
+│ │ <Card onClick={onClick} className={sizeClasses[size]}>                 ││
+│ │                                                                        ││
+│ │   <div className="text-sm text-muted">{title}</div>                   ││
+│ │                                                                        ││
+│ │   <div className="text-2xl font-bold">                                ││
+│ │     {formatValue(value, format, currency)}                            ││
+│ │   </div>                                                               ││
+│ │                                                                        ││
+│ │   {change && (                                                         ││
+│ │     <div className={cn(                                               ││
+│ │       'text-sm',                                                       ││
+│ │       trend === 'up' && 'text-green-500',                             ││
+│ │       trend === 'down' && 'text-red-500'                              ││
+│ │     )}>                                                                ││
+│ │       {trend === 'up' ? '↑' : trend === 'down' ? '↓' : '→'}          ││
+│ │       {change.type === 'percent' ? `${change.value}%` : change.value}││
+│ │     </div>                                                             ││
+│ │   )}                                                                    ││
+│ │                                                                        ││
+│ │   {sparkline && (                                                      ││
+│ │     <Sparkline data={sparkline} height={32} />                        ││
+│ │   )}                                                                    ││
+│ │                                                                        ││
+│ │ </Card>                                                                ││
+│ └────────────────────────────────────────────────────────────────────────┘│
+│                                                                            │
+│ Sparkline 컴포넌트:                                                        │
+│ - 웹: recharts의 <AreaChart> 또는 <SparklineChart>                        │
+│ - 모바일: react-native-svg + d3-shape로 직접 구현                         │
+│                                                                            │
+│ formatValue 함수:                                                          │
+│ function formatValue(value, format, currency) {                           │
+│   switch (format) {                                                        │
+│     case 'currency':                                                       │
+│       return new Intl.NumberFormat('ko-KR', {                             │
+│         style: 'currency',                                                 │
+│         currency: currency || 'KRW',                                      │
+│         notation: value >= 1000000 ? 'compact' : 'standard'              │
+│       }).format(value);                                                    │
+│     case 'percent':                                                        │
+│       return `${value}%`;                                                  │
+│     default:                                                               │
+│       return value.toLocaleString();                                      │
+│   }                                                                        │
+│ }                                                                          │
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+### ActivityChart 컴포넌트
+
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│ ActivityChart.tsx                                                           │
+│ packages/web/lib/components/admin/ActivityChart.tsx                        │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│ Props:                                                                     │
+│ interface ActivityChartProps {                                             │
+│   data: DailyMetric[];                                                     │
+│   metrics: ('dau' | 'newUsers' | 'posts' | 'clicks')[];                   │
+│   period: '7d' | '30d' | '90d';                                           │
+│   height?: number;                                                         │
+│   showLegend?: boolean;                                                    │
+│ }                                                                          │
+│                                                                            │
+│ interface DailyMetric {                                                    │
+│   date: string;     // "2026-01-08"                                       │
+│   dau: number;                                                             │
+│   newUsers: number;                                                        │
+│   posts: number;                                                           │
+│   clicks: number;                                                          │
+│ }                                                                          │
+│                                                                            │
+│ 웹 렌더링 (recharts):                                                      │
+│ ┌────────────────────────────────────────────────────────────────────────┐│
+│ │ <ResponsiveContainer height={height || 300}>                           ││
+│ │   <LineChart data={data}>                                              ││
+│ │     <CartesianGrid strokeDasharray="3 3" />                           ││
+│ │     <XAxis dataKey="date" tickFormatter={formatDate} />               ││
+│ │     <YAxis />                                                          ││
+│ │     <Tooltip content={<CustomTooltip />} />                           ││
+│ │     {showLegend && <Legend />}                                        ││
+│ │                                                                        ││
+│ │     {metrics.includes('dau') && (                                      ││
+│ │       <Line                                                            ││
+│ │         type="monotone"                                                ││
+│ │         dataKey="dau"                                                  ││
+│ │         stroke="#8884d8"                                               ││
+│ │         name="Daily Active Users"                                      ││
+│ │       />                                                               ││
+│ │     )}                                                                  ││
+│ │     {metrics.includes('newUsers') && (                                 ││
+│ │       <Line                                                            ││
+│ │         type="monotone"                                                ││
+│ │         dataKey="newUsers"                                             ││
+│ │         stroke="#82ca9d"                                               ││
+│ │         name="New Users"                                               ││
+│ │       />                                                               ││
+│ │     )}                                                                  ││
+│ │     ...                                                                ││
+│ │   </LineChart>                                                         ││
+│ │ </ResponsiveContainer>                                                 ││
+│ └────────────────────────────────────────────────────────────────────────┘│
+│                                                                            │
+│ 모바일 렌더링 (react-native-svg-charts):                                   │
+│ - LineChart 대신 단순화된 Path 기반 차트                                   │
+│ - 터치 시 해당 데이터포인트 툴팁 표시                                      │
+│ - 차트 높이 축소 (200px)                                                   │
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 관리자 권한 상세화
+
+### 역할별 접근 가능 화면
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                    ADMIN ROLE PERMISSIONS MATRIX                          │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  역할 (AdminRole)                                                         │
+│  ├─── super_admin: 모든 권한                                             │
+│  ├─── content_moderator: 콘텐츠 및 태그 관리                            │
+│  ├─── payout_manager: 지급 관리                                          │
+│  └─── viewer: 읽기 전용                                                  │
+│                                                                          │
+│  ┌────────────────────────────────────────────────────────────────────┐ │
+│  │ 화면/기능            │ super │ moderator │ payout │ viewer │      │ │
+│  ├──────────────────────┼───────┼───────────┼────────┼────────┤      │ │
+│  │ Dashboard (읽기)     │   ✓   │     ✓     │   ✓    │   ✓    │      │ │
+│  │ Dashboard (내보내기) │   ✓   │     ✗     │   ✓    │   ✗    │      │ │
+│  ├──────────────────────┼───────┼───────────┼────────┼────────┤      │ │
+│  │ Tags (읽기)          │   ✓   │     ✓     │   ✗    │   ✓    │      │ │
+│  │ Tags (추가/편집)     │   ✓   │     ✓     │   ✗    │   ✗    │      │ │
+│  │ Tags (삭제)          │   ✓   │     ✗     │   ✗    │   ✗    │      │ │
+│  │ Tag Requests (검토)  │   ✓   │     ✓     │   ✗    │   ✗    │      │ │
+│  ├──────────────────────┼───────┼───────────┼────────┼────────┤      │ │
+│  │ Content (읽기)       │   ✓   │     ✓     │   ✗    │   ✓    │      │ │
+│  │ Content (승인/거부)  │   ✓   │     ✓     │   ✗    │   ✗    │      │ │
+│  │ Content (플래그)     │   ✓   │     ✓     │   ✗    │   ✗    │      │ │
+│  │ User Ban             │   ✓   │     ✗     │   ✗    │   ✗    │      │ │
+│  ├──────────────────────┼───────┼───────────┼────────┼────────┤      │ │
+│  │ Payouts (읽기)       │   ✓   │     ✗     │   ✓    │   ✓    │      │ │
+│  │ Payouts (승인/거부)  │   ✓   │     ✗     │   ✓    │   ✗    │      │ │
+│  │ Payouts (완료 처리)  │   ✓   │     ✗     │   ✓    │   ✗    │      │ │
+│  ├──────────────────────┼───────┼───────────┼────────┼────────┤      │ │
+│  │ Analytics (읽기)     │   ✓   │     ✓     │   ✓    │   ✓    │      │ │
+│  │ Analytics (내보내기) │   ✓   │     ✗     │   ✓    │   ✗    │      │ │
+│  ├──────────────────────┼───────┼───────────┼────────┼────────┤      │ │
+│  │ Admin Users 관리     │   ✓   │     ✗     │   ✗    │   ✗    │      │ │
+│  │ Settings             │   ✓   │     ✗     │   ✗    │   ✗    │      │ │
+│  └────────────────────────────────────────────────────────────────────┘ │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+### 권한 체크 컴포넌트
+
+```typescript
+// packages/shared/lib/components/admin/RequirePermission.tsx
+
+interface RequirePermissionProps {
+  permission: string;  // "tags.edit", "payouts.approve", etc.
+  children: React.ReactNode;
+  fallback?: React.ReactNode;  // 권한 없을 때 표시
+}
+
+// 사용 예시
+function TagsPage() {
+  return (
+    <div>
+      <h1>Tags</h1>
+
+      {/* 읽기 권한 - 모든 역할 */}
+      <RequirePermission permission="tags.view">
+        <TagTable />
+      </RequirePermission>
+
+      {/* 편집 권한 - moderator 이상 */}
+      <RequirePermission
+        permission="tags.edit"
+        fallback={<DisabledButton>Edit (No Permission)</DisabledButton>}
+      >
+        <Button onClick={openEditModal}>Edit Tag</Button>
+      </RequirePermission>
+
+      {/* 삭제 권한 - super_admin만 */}
+      <RequirePermission permission="tags.delete">
+        <Button variant="danger" onClick={handleDelete}>Delete</Button>
+      </RequirePermission>
+    </div>
+  );
+}
+```
+
+```typescript
+// packages/shared/lib/hooks/useAdminPermission.ts
+
+interface UseAdminPermissionReturn {
+  role: AdminRole | null;
+  hasPermission: (permission: string) => boolean;
+  can: {
+    viewTags: boolean;
+    editTags: boolean;
+    deleteTags: boolean;
+    moderateContent: boolean;
+    approvePayouts: boolean;
+    exportData: boolean;
+    manageAdmins: boolean;
+  };
+  isLoading: boolean;
+}
+
+export function useAdminPermission(): UseAdminPermissionReturn {
+  const { user } = useAuth();
+  const role = user?.adminRole;
+
+  const hasPermission = useCallback((permission: string) => {
+    if (!role) return false;
+    if (role === 'super_admin') return true;
+
+    const rolePermissions = ROLE_PERMISSION_MAP[role];
+    return rolePermissions.includes(permission) ||
+           rolePermissions.includes(permission.split('.')[0] + '.view');
+  }, [role]);
+
+  return {
+    role,
+    hasPermission,
+    can: {
+      viewTags: hasPermission('tags.view'),
+      editTags: hasPermission('tags.edit'),
+      deleteTags: hasPermission('tags.delete'),
+      moderateContent: hasPermission('content.moderate'),
+      approvePayouts: hasPermission('payouts.approve'),
+      exportData: hasPermission('analytics.export'),
+      manageAdmins: hasPermission('admin.manage'),
+    },
+    isLoading: !user,
+  };
+}
+```
+
+### 2FA 플로우 상세
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                    ADMIN 2FA AUTHENTICATION FLOW                          │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  [1. 관리자 로그인]                                                       │
+│       │                                                                  │
+│       ▼                                                                  │
+│  일반 로그인 (Supabase Auth)                                             │
+│       │                                                                  │
+│       ▼                                                                  │
+│  adminRole 확인                                                          │
+│       │                                                                  │
+│       ├─── adminRole 없음 → 일반 사용자 화면으로 리다이렉트              │
+│       │                                                                  │
+│       └─── adminRole 있음 → 2FA 필요 여부 확인                           │
+│                 │                                                        │
+│                 ├─── 2FA 미설정 → 2FA 설정 강제 화면                     │
+│                 │                                                        │
+│                 └─── 2FA 설정됨 → 2FA 인증 요청                          │
+│                           │                                              │
+│                           ▼                                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐│
+│  │                                                                     ││
+│  │  Two-Factor Authentication                                          ││
+│  │                                                                     ││
+│  │  [웹] TOTP 코드 입력                                                ││
+│  │  ┌─────────────────────────────────────────────────────────────┐   ││
+│  │  │  Enter 6-digit code from your authenticator app            │   ││
+│  │  │                                                             │   ││
+│  │  │  ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐                      │   ││
+│  │  │  │   │ │   │ │   │ │   │ │   │ │   │                      │   ││
+│  │  │  └───┘ └───┘ └───┘ └───┘ └───┘ └───┘                      │   ││
+│  │  │                                                             │   ││
+│  │  │  [Verify]                                                   │   ││
+│  │  │                                                             │   ││
+│  │  │  Use backup code instead                                    │   ││
+│  │  └─────────────────────────────────────────────────────────────┘   ││
+│  │                                                                     ││
+│  │  [모바일] 바이오메트릭 또는 TOTP                                     ││
+│  │  ┌─────────────────────────────────────────────────────────────┐   ││
+│  │  │                                                             │   ││
+│  │  │            [Face ID / Fingerprint]                         │   ││
+│  │  │                   👆                                       │   ││
+│  │  │                                                             │   ││
+│  │  │  or enter code manually                                     │   ││
+│  │  │                                                             │   ││
+│  │  └─────────────────────────────────────────────────────────────┘   ││
+│  │                                                                     ││
+│  └─────────────────────────────────────────────────────────────────────┘│
+│                 │                                                        │
+│                 ▼                                                        │
+│  2FA 검증                                                                │
+│       │                                                                  │
+│       ├─── 실패 → 에러 메시지 + 재시도                                   │
+│       │    (5회 실패 시 15분 잠금)                                       │
+│       │                                                                  │
+│       └─── 성공 → admin_sessions 테이블에 세션 생성                     │
+│                 │                                                        │
+│                 └─── 관리자 대시보드로 이동                              │
+│                                                                          │
+│  [2. 세션 관리]                                                          │
+│                                                                          │
+│  admin_sessions 테이블:                                                  │
+│  {                                                                       │
+│    id: string,                                                           │
+│    user_id: string,                                                      │
+│    device_info: { platform, browser, ip },                              │
+│    created_at: timestamp,                                                │
+│    expires_at: timestamp,  // 24시간 후                                  │
+│    last_activity: timestamp,                                             │
+│    is_active: boolean                                                    │
+│  }                                                                       │
+│                                                                          │
+│  세션 만료 조건:                                                         │
+│  - 24시간 경과                                                           │
+│  - 30분 비활성                                                           │
+│  - 다른 기기에서 로그인 (기존 세션 무효화)                               │
+│  - 명시적 로그아웃                                                       │
+│                                                                          │
+│  [3. 민감한 작업 재인증]                                                  │
+│                                                                          │
+│  다음 작업 시 2FA 재인증 필요:                                           │
+│  - 지급 승인 (₩100,000 이상)                                            │
+│  - 사용자 차단                                                           │
+│  - 태그 삭제                                                             │
+│  - 관리자 권한 변경                                                      │
+│  - 데이터 내보내기                                                       │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+### 2FA 설정 화면
+
+```
+┌─────────────────────────────────────────┐
+│  ← Security Settings                    │
+│                                         │
+│  Two-Factor Authentication              │
+│                                         │
+│  Status: ✓ Enabled                      │
+│                                         │
+│  ─────────────────────────────────────  │
+│                                         │
+│  Authenticator App                      │
+│  Google Authenticator, Authy, etc.      │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │                                 │   │
+│  │         [QR Code]               │   │
+│  │                                 │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  Manual entry key:                      │
+│  ABCD EFGH IJKL MNOP               [📋] │
+│                                         │
+│  Enter verification code:               │
+│  ┌─────────────────────────────────┐   │
+│  │                                 │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│           [Verify & Enable]             │
+│                                         │
+│  ─────────────────────────────────────  │
+│                                         │
+│  Backup Codes                           │
+│  Save these codes in a safe place       │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │ XXXX-XXXX-XXXX                  │   │
+│  │ YYYY-YYYY-YYYY                  │   │
+│  │ ZZZZ-ZZZZ-ZZZZ                  │   │
+│  │ ...                             │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  [Generate New Codes]   [Download]      │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## 구현 상태 체크리스트
+
+### A-01 태그 관리
+
+#### 웹 (packages/web)
+- [ ] AdminLayout 컴포넌트
+- [ ] AdminSidebar 네비게이션
+- [ ] TagTable 컴포넌트 (정렬, 필터, 페이지네이션)
+- [ ] TagForm 모달 (추가/편집)
+- [ ] TagRequestList 컴포넌트
+- [ ] 대량 작업 UI (병합, 아카이브)
+- [ ] 가져오기/내보내기 기능
+
+#### 모바일 (packages/mobile)
+- [ ] 바텀탭 네비게이션
+- [ ] TagListMobile 컴포넌트 (FlashList)
+- [ ] 스와이프 액션 (편집, 삭제)
+- [ ] TagFormSheet 바텀시트
+- [ ] TagRequestCard 컴포넌트
+- [ ] 롱프레스 다중 선택
+
+### A-02 콘텐츠/지급 관리
+
+#### 웹 (packages/web)
+- [ ] PostModerationCard 컴포넌트
+- [ ] 게시물 상세 모달
+- [ ] 거부 사유 입력 모달
+- [ ] WithdrawalRequestCard 컴포넌트
+- [ ] 지급 승인 확인 모달
+- [ ] PayoutReport 컴포넌트
+
+#### 모바일 (packages/mobile)
+- [ ] SwipeablePostCard (틴더 스타일)
+- [ ] 스와이프 제스처 핸들링
+- [ ] 게시물 상세 바텀시트
+- [ ] 거부 사유 선택 액션시트
+- [ ] PayoutRequestCard 컴포넌트
+- [ ] Face ID 인증 연동
+
+### A-03 분석 대시보드
+
+#### 웹 (packages/web)
+- [ ] MetricCard 컴포넌트
+- [ ] ActivityChart (recharts)
+- [ ] RevenueChart (도넛/바 차트)
+- [ ] TopContentList 컴포넌트
+- [ ] TopContributorsList 컴포넌트
+- [ ] DateRangePicker
+- [ ] PDF/CSV 내보내기
+
+#### 모바일 (packages/mobile)
+- [ ] MetricCardMobile 컴포넌트
+- [ ] 간소화된 미니 차트 (sparkline)
+- [ ] QuickActionCards (대시보드)
+- [ ] AnalyticsDetailScreen
+- [ ] 날짜 범위 선택 바텀시트
+
+### 인증 & 권한
+
+#### 공통
+- [ ] AdminAuthProvider 컨텍스트
+- [ ] useAdminPermission 훅
+- [ ] RequirePermission 컴포넌트
+- [ ] 역할별 권한 매트릭스
+
+#### 2FA
+- [ ] TOTP 설정 화면
+- [ ] 2FA 검증 화면 (웹)
+- [ ] 바이오메트릭 인증 (모바일)
+- [ ] 백업 코드 생성/관리
+- [ ] 민감한 작업 재인증
+
+#### API
+- [ ] 관리자 인증 미들웨어
+- [ ] 2FA 검증 엔드포인트
+- [ ] 세션 관리 API
+- [ ] 감사 로그 기록
+
+### 푸시 알림 (모바일)
+
+- [ ] 알림 권한 요청
+- [ ] FCM 토큰 등록
+- [ ] 알림 유형별 설정 화면
+- [ ] 긴급 알림 (플래그된 콘텐츠)
+- [ ] 빠른 액션 (알림에서 바로 처리)
