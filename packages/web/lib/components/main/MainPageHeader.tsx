@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Home, Compass, Search, HelpCircle } from "lucide-react";
 import DecodedLogo from "../DecodedLogo";
 
 const navItems = [
-  { id: "home", label: "HOME", href: "/" },
-  { id: "artist", label: "ARTIST", href: "/artist" },
-  { id: "brand", label: "BRAND", href: "/brand" },
-  { id: "explore", label: "EXPLORE", href: "/explore" },
+  { id: "home", label: "Home", href: "/", icon: Home },
+  { id: "explore", label: "Explore", href: "/explore", icon: Compass },
+  { id: "search", label: "Search", href: "/feed", icon: Search },
+  { id: "request", label: "Request", href: "/request", icon: HelpCircle },
 ];
 
 export function MainPageHeader() {
@@ -34,20 +35,24 @@ export function MainPageHeader() {
           </Link>
 
           {/* Navigation */}
-          <nav className="flex items-center gap-4 md:gap-8">
+          <nav className="flex items-center gap-1 md:gap-2">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
+              const Icon = item.icon;
               return (
                 <Link
                   key={item.id}
                   href={item.href}
-                  className={`text-xs md:text-sm font-medium tracking-wide transition-colors ${
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
                     isActive
-                      ? "text-black"
-                      : "text-gray-400 hover:text-gray-600"
+                      ? "bg-accent/80 text-foreground"
+                      : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
                   }`}
                 >
-                  {item.label}
+                  <Icon className={`h-5 w-5 ${isActive ? "stroke-[2]" : "stroke-[1.5]"}`} />
+                  <span className="hidden md:block text-sm font-medium">
+                    {item.label}
+                  </span>
                 </Link>
               );
             })}

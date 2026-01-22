@@ -1,6 +1,5 @@
 import {
   MainPageHeader,
-  SearchSection,
   HeroSection,
   DecodedPickSection,
   ArtistSpotlightSection,
@@ -18,9 +17,6 @@ export default function Home() {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <MainPageHeader />
-
-      {/* Search Section */}
-      <SearchSection />
 
       {/* Hero Section */}
       <HeroSection />
