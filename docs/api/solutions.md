@@ -14,8 +14,8 @@
 | `PATCH` | `/api/v1/solutions/{solution_id}` | Solution 수정 | O |
 | `DELETE` | `/api/v1/solutions/{solution_id}` | Solution 삭제 | O |
 | `POST` | `/api/v1/solutions/{solution_id}/adopt` | Solution 채택 | O |
-| `POST` | `/api/v1/links/metadata` | 링크 메타데이터 추출 | - |
-| `POST` | `/api/v1/links/affiliate` | 제휴 링크 변환 | - |
+| `POST` | `/api/v1/solutions/extract-metadata` | 메타데이터 추출 | - |
+| `POST` | `/api/v1/solutions/convert-affiliate` | 제휴 링크 변환 | - |
 
 ---
 
@@ -306,14 +306,14 @@ Content-Type: application/json
 
 ---
 
-## 링크 메타데이터 추출
+## 메타데이터 추출
 
 상품 URL에서 메타데이터를 추출합니다.
 
 ### Request
 
 ```http
-POST /api/v1/links/metadata
+POST /api/v1/solutions/extract-metadata
 Content-Type: application/json
 ```
 
@@ -351,7 +351,7 @@ Content-Type: application/json
 ### Request
 
 ```http
-POST /api/v1/links/affiliate
+POST /api/v1/solutions/convert-affiliate
 Content-Type: application/json
 ```
 
@@ -380,7 +380,7 @@ Content-Type: application/json
 
 ```
 1. 상품 URL 메타데이터 추출 (선택)
-   POST /api/v1/links/metadata
+   POST /api/v1/solutions/extract-metadata
    → product_name, brand, price 자동 획득
 
 2. Solution 등록
@@ -408,4 +408,5 @@ Content-Type: application/json
 
 ## 변경 이력
 
+- **2026-01-22**: API 경로 동기화 (`/api/v1/links/*` → `/api/v1/solutions/*`)
 - **2025-01-15**: 초기 문서 생성

@@ -27,7 +27,7 @@
 | `GET /api/v1/spots/{spot_id}/solutions` | Solution 목록 | [solutions.md](../../docs/api/solutions.md) |
 | `POST /api/v1/spots/{spot_id}/solutions` | Solution 등록 | [solutions.md](../../docs/api/solutions.md) |
 | `POST /api/v1/solutions/{id}/adopt` | Solution 채택 | [solutions.md](../../docs/api/solutions.md) |
-| `POST /api/v1/links/metadata` | URL 메타데이터 | [solutions.md](../../docs/api/solutions.md) |
+| `POST /api/v1/solutions/extract-metadata` | URL 메타데이터 | [solutions.md](../../docs/api/solutions.md) |
 
 ### 투표 관련
 
@@ -71,7 +71,7 @@ const [spot, solutions] = await Promise.all([
 ]);
 
 // Solution 등록 시
-const metadata = await fetch('/api/v1/links/metadata', {
+const metadata = await fetch('/api/v1/solutions/extract-metadata', {
   method: 'POST',
   body: JSON.stringify({ url: productUrl })
 });
@@ -140,4 +140,5 @@ interface SpotDetailData {
 
 ## 변경 이력
 
+- **2026-01-22**: API 경로 동기화 (`/api/v1/links/*` → `/api/v1/solutions/*`)
 - **2025-01-15**: 초기 문서 생성

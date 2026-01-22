@@ -69,7 +69,7 @@
 | Spot 조회 | `GET /api/v1/spots/{spot_id}` | Spot 정보 |
 | Solution 목록 | `GET /api/v1/spots/{spot_id}/solutions` | 상품 답변들 |
 | Solution 등록 | `POST /api/v1/spots/{spot_id}/solutions` | 새 답변 |
-| 메타데이터 추출 | `POST /api/v1/links/metadata` | URL 분석 |
+| 메타데이터 추출 | `POST /api/v1/solutions/extract-metadata` | URL 분석 |
 
 ### SCR-VIEW-03: Solution 상세
 
@@ -195,7 +195,7 @@
 ```
 [Spot 선택] → GET /api/v1/spots/{spot_id}/solutions
        ↓
-[URL 입력] → POST /api/v1/links/metadata
+[URL 입력] → POST /api/v1/solutions/extract-metadata
        ↓
 [Solution 등록] → POST /api/v1/spots/{spot_id}/solutions
        ↓
@@ -216,4 +216,5 @@
 
 ## 변경 이력
 
+- **2026-01-22**: API 경로 동기화 (`/api/v1/links/*` → `/api/v1/solutions/*`)
 - **2025-01-15**: 초기 문서 생성
