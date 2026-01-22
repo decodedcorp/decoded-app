@@ -11,6 +11,12 @@ const nextConfig = {
         hostname: "**.r2.dev",
         pathname: "/**",
       },
+      // Placeholder images for mock data
+      {
+        protocol: "https",
+        hostname: "picsum.photos",
+        pathname: "/**",
+      },
     ],
   },
 };

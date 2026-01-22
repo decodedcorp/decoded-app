@@ -74,6 +74,18 @@ const config: Config = {
         },
         "scanner-green": "#00FF00",
         "neon-orange": "#FF4500",
+        // Main page colors
+        "main-bg": "var(--main-bg)",
+        "main-cta-bg": "var(--main-cta-bg)",
+        "main-accent": "var(--main-accent)",
+      },
+      fontSize: {
+        // Main page typography
+        "hero": "var(--text-hero)",
+        "heading-xl": "var(--text-heading-xl)",
+        "heading-lg": "var(--text-heading-lg)",
+        "heading-md": "var(--text-heading-md)",
+        "heading-sm": "var(--text-heading-sm)",
       },
       borderRadius: {
         lg: "var(--radius)",

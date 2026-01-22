@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
 import { AppProviders } from "./providers";
-import { MobileNavBar } from "@/lib/components/MobileNavBar";
-import { Sidebar } from "@/lib/components/Sidebar";
+import {
+  ConditionalNav,
+  MainContentWrapper,
+} from "@/lib/components/ConditionalNav";
 
 const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
@@ -36,17 +38,14 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <AppProviders>
-          {/* Desktop Sidebar */}
-          <Sidebar />
+          {/* Conditional Navigation (Sidebar + MobileNav) */}
+          <ConditionalNav />
 
-          {/* Main Content Area - offset by sidebar width */}
-          <main className="md:ml-14 lg:ml-[200px] min-h-screen transition-[margin] duration-200">
+          {/* Main Content Area - conditionally offset by sidebar width */}
+          <MainContentWrapper>
             {children}
             {modal}
-          </main>
-
-          {/* Mobile Bottom Nav */}
-          <MobileNavBar />
+          </MainContentWrapper>
         </AppProviders>
       </body>
     </html>

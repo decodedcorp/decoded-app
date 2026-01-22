@@ -32,13 +32,50 @@ export interface DetectedSpot {
     y: number; // 0-1 (0=위, 1=아래)
   };
   label?: string; // "상의", "하의" 등
+
+  // Card display fields
+  title: string;
+  description: string;
+  brand?: string;
+  priceRange?: string;
+  imageUrl?: string; // 아이템 썸네일 이미지
 }
 
 // Mock 데이터 - AI 감지 결과 시뮬레이션
 const MOCK_SPOTS: DetectedSpot[] = [
-  { id: "spot_1", index: 1, center: { x: 0.3, y: 0.25 }, label: "상의" },
-  { id: "spot_2", index: 2, center: { x: 0.5, y: 0.6 }, label: "하의" },
-  { id: "spot_3", index: 3, center: { x: 0.7, y: 0.4 }, label: "액세서리" },
+  {
+    id: "spot_1",
+    index: 1,
+    center: { x: 0.3, y: 0.25 },
+    label: "TOP",
+    title: "Classic White Cotton Shirt",
+    description: "Premium cotton blend with relaxed fit.",
+    brand: "DECODED",
+    priceRange: "₩89,000",
+    imageUrl: "https://picsum.photos/seed/shirt/200/200",
+  },
+  {
+    id: "spot_2",
+    index: 2,
+    center: { x: 0.5, y: 0.6 },
+    label: "BOTTOM",
+    title: "High-Waisted Wide Leg Pants",
+    description: "Elegant wide-leg silhouette.",
+    brand: "DECODED",
+    priceRange: "₩129,000",
+    imageUrl: "https://picsum.photos/seed/pants/200/200",
+  },
+  {
+    id: "spot_3",
+    index: 3,
+    center: { x: 0.7, y: 0.4 },
+    label: "ACC",
+    title: "Minimalist Gold Necklace",
+    description: "Delicate chain with subtle pendant.",
+    brand: "DECODED",
+    priceRange: "₩59,000",
+    imageUrl: "https://picsum.photos/seed/necklace/200/200",
+  },
 ];
 
 interface RequestState {

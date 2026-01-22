@@ -1,17 +1,56 @@
-import { Header } from "@/lib/components/Header";
-import { fetchLatestImagesServer } from "@/lib/supabase/queries/images.server";
-import { HomeClient } from "./HomeClient";
+import {
+  MainPageHeader,
+  SearchSection,
+  HeroSection,
+  DecodedPickSection,
+  ArtistSpotlightSection,
+  WhatsNewSection,
+  DiscoverItemsSection,
+  DiscoverProductsSection,
+  BestItemSection,
+  WeeklyBestSection,
+  TrendingNowSection,
+  MainFooter,
+} from "@/lib/components/main";
 
-export default async function Home() {
-  // Fetch initial images server-side (fewer for vertical feed)
-  const initialImages = await fetchLatestImagesServer(20);
-
+export default function Home() {
   return (
-    <>
-      <Header />
-      <main className="relative w-full h-screen overflow-hidden">
-        <HomeClient initialImages={initialImages} />
-      </main>
-    </>
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <MainPageHeader />
+
+      {/* Search Section */}
+      <SearchSection />
+
+      {/* Hero Section */}
+      <HeroSection />
+
+      {/* DECODED'S PICK Section */}
+      <DecodedPickSection />
+
+      {/* Artist Spotlight Section */}
+      <ArtistSpotlightSection />
+
+      {/* What's New Section */}
+      <WhatsNewSection />
+
+      {/* Discover Items Section */}
+      <DiscoverItemsSection />
+
+      {/* Discover Products Section */}
+      <DiscoverProductsSection />
+
+      {/* Best Item Section */}
+      <BestItemSection />
+
+      {/* Weekly Best Section */}
+      <WeeklyBestSection />
+
+      {/* Trending Now Section */}
+      <TrendingNowSection />
+
+      {/* Footer */}
+      <MainFooter />
+    </div>
   );
 }
