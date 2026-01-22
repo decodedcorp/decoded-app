@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useState } from "react";
+import { memo, useState, useEffect } from "react";
 import Link from "next/link";
 import { gsap } from "gsap";
 import { Flip } from "gsap/Flip";
@@ -156,6 +156,24 @@ export function ExploreClient({ initialImages: _initialImages }: Props) {
   const activeFilter = useFilterStore((state) => state.activeFilter);
   const debouncedQuery = useSearchStore((state) => state.debouncedQuery);
 
+  // Responsive grid size: smaller on mobile, larger on desktop
+  const [gridSize, setGridSize] = useState({ width: 400, height: 500 });
+
+  useEffect(() => {
+    const updateGridSize = () => {
+      const isMobile = window.innerWidth < 768; // md breakpoint
+      setGridSize(
+        isMobile
+          ? { width: 180, height: 225 } // Mobile: smaller cells
+          : { width: 400, height: 500 } // Desktop: original size
+      );
+    };
+
+    updateGridSize();
+    window.addEventListener("resize", updateGridSize);
+    return () => window.removeEventListener("resize", updateGridSize);
+  }, []);
+
   // Use infinite query hook
   const {
     data,
@@ -210,7 +228,7 @@ export function ExploreClient({ initialImages: _initialImages }: Props) {
     return (
       <div className="absolute inset-0 z-0 pt-14 pb-16 md:pt-16 md:pb-0">
         <ThiingsGrid
-          gridSize={{ width: 400, height: 500 }}
+          gridSize={gridSize}
           renderItem={(config) => <SkeletonCell {...config} />}
           initialPosition={{ x: 0, y: 0 }}
           items={[]}
@@ -274,7 +292,7 @@ export function ExploreClient({ initialImages: _initialImages }: Props) {
   return (
     <div className="absolute inset-0 z-0 pt-14 pb-16 md:pt-16 md:pb-0">
       <ThiingsGrid
-        gridSize={{ width: 400, height: 500 }}
+        gridSize={gridSize}
         renderItem={(config) => <CardCell {...config} />}
         initialPosition={{ x: 0, y: 0 }}
         items={gridItems}
