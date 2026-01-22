@@ -49,9 +49,7 @@ function NewsletterForm() {
         </button>
       </form>
       {isSuccess && (
-        <p className="mt-2 text-xs text-green-500">
-          구독해 주셔서 감사합니다!
-        </p>
+        <p className="mt-2 text-xs text-green-500">구독해 주셔서 감사합니다!</p>
       )}
       <p className="mt-2 text-xs text-muted-foreground">
         본 뉴스레터 구독 신청에 따라 자사의 개인정보수집 관련 이용약관에 동의한

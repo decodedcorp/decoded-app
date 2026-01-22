@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { SectionHeader } from "./SectionHeader";
@@ -79,7 +80,7 @@ export function BestItemSection({
 }
 
 // Weekly Best Styles
-interface WeeklyBestStyle {
+export interface WeeklyBestStyle {
   id: string;
   artistName: string;
   imageUrl?: string;
@@ -178,8 +179,18 @@ export function WeeklyBestSection({
                 transition={{ delay: index * 0.1 }}
                 className="group block"
               >
-                <div className="aspect-[3/4] bg-muted rounded-xl overflow-hidden mb-2">
-                  <div className="w-full h-full bg-gradient-to-br from-muted to-card group-hover:scale-105 transition-transform duration-300" />
+                <div className="aspect-[3/4] bg-muted rounded-xl overflow-hidden mb-2 relative">
+                  {style.imageUrl ? (
+                    <Image
+                      src={style.imageUrl}
+                      alt={style.artistName}
+                      fill
+                      sizes="(max-width: 768px) 50vw, 25vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-muted to-card group-hover:scale-105 transition-transform duration-300" />
+                  )}
                 </div>
                 <p className="text-sm font-medium text-foreground text-center">
                   {style.artistName}

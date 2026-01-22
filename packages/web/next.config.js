@@ -17,6 +17,12 @@ const nextConfig = {
         hostname: "picsum.photos",
         pathname: "/**",
       },
+      // DiceBear avatars for profile mock data
+      {
+        protocol: "https",
+        hostname: "api.dicebear.com",
+        pathname: "/**",
+      },
     ],
   },
 };

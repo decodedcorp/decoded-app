@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "motion/react";
 
 export interface ItemCardData {
@@ -31,8 +32,17 @@ export function ItemCard({ data, index = 0 }: ItemCardProps) {
         <div className="bg-card rounded-xl overflow-hidden border border-border hover:shadow-md transition-shadow">
           {/* Image */}
           <div className="relative aspect-square bg-muted">
-            {/* Placeholder */}
-            <div className="absolute inset-0 bg-gradient-to-br from-muted to-card" />
+            {data.imageUrl ? (
+              <Image
+                src={data.imageUrl}
+                alt={data.name}
+                fill
+                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 16vw"
+                className="object-cover"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-br from-muted to-card" />
+            )}
 
             {/* Badge */}
             {data.badge && (

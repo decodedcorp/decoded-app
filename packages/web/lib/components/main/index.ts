@@ -1,6 +1,6 @@
 // Layout components
-export { MainPageHeader } from "./MainPageHeader";
 export { MainFooter } from "./MainFooter";
+export { HomeAnimatedContent } from "./HomeAnimatedContent";
 
 // Section components
 export { SearchSection } from "./SearchSection";

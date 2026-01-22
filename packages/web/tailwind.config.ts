@@ -81,7 +81,7 @@ const config: Config = {
       },
       fontSize: {
         // Main page typography
-        "hero": "var(--text-hero)",
+        hero: "var(--text-hero)",
         "heading-xl": "var(--text-heading-xl)",
         "heading-lg": "var(--text-heading-lg)",
         "heading-md": "var(--text-heading-md)",
