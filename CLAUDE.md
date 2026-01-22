@@ -49,10 +49,13 @@ yarn format:check     # Check Prettier formatting
 - Commands: /speckit.* (in Claude Code)
 
 ## Documentation
+- **[docs/README.md](docs/README.md)** - 전체 문서 인덱스
 - docs/adr/ - Architecture Decision Records
 - docs/api/ - API integration guides
 - docs/ai-playbook/ - AI tool usage guides
 - docs/design-system/ - Design tokens
+
+<!-- Last Updated: 2026-01-22 -->
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

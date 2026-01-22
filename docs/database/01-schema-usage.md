@@ -3,6 +3,9 @@
 > **최종 업데이트:** 2025-12-18
 > **정보 출처:** `db MCP` 스냅샷 + `Supabase` 마이그레이션
 
+> **Related Documentation**
+> - TypeScript 타입 정의: [specs/shared/data-models.md](../../specs/shared/data-models.md)
+
 ## 0. 범위 & 목적
 
 > **참고:** 이 문서는 `image`, `item`, `post`의 **도메인 레벨 사용법**을 요약합니다. 모든 컬럼을 나열하지 않고 파이프라인과 프론트엔드에 중요한 필드에 집중합니다.
