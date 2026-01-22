@@ -2,6 +2,9 @@
 export { initSupabase, getSupabaseClient, isSupabaseInitialized } from "./supabase/client";
 export type { Database } from "./supabase/types";
 
+// API functions
+export * from "./api/search";
+
 // Hooks
 export {
   useLatestImages,
@@ -16,6 +19,9 @@ export { useDebounce } from "./hooks/useDebounce";
 export { useFilterStore } from "./stores/filterStore";
 export type { FilterKey } from "./stores/filterStore";
 export { useSearchStore } from "./stores/searchStore";
+export type { SearchTab, SearchFilters, SearchStore } from "./stores/searchStore";
+export { useRecentSearchesStore } from "./stores/recentSearchesStore";
+export type { RecentSearchesStore } from "./stores/recentSearchesStore";
 export {
   useHierarchicalFilterStore,
   CATEGORY_LABELS,
@@ -25,6 +31,7 @@ export type { HierarchicalFilterState } from "./stores/hierarchicalFilterStore";
 
 // Types
 export * from "./types/filter";
+export * from "./types/search";
 
 // Mock data (for development)
 export {

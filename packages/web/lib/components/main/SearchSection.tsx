@@ -1,30 +1,34 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
-import { useSearchStore } from "@/lib/stores/searchStore";
+import { useRecentSearchesStore } from "@decoded/shared";
+import { useSearchNavigation } from "../../hooks/useSearchURLSync";
+import { usePopularKeywords } from "../../hooks/useSearch";
 
-const trendingKeywords = [
-  { id: "1", label: "뉴진스 다니엘" },
-  { id: "2", label: "나이키" },
-  { id: "3", label: "뉴진스 혜인" },
-  { id: "4", label: "블랙핑크 지수" },
-  { id: "5", label: "아디다스" },
-  { id: "6", label: "RON ARAD STUDIO" },
-  { id: "7", label: "뉴발란스" },
+// Fallback keywords if API fails
+const fallbackKeywords = [
+  { keyword: "뉴진스 다니엘", count: 0 },
+  { keyword: "나이키", count: 0 },
+  { keyword: "뉴진스 혜인", count: 0 },
+  { keyword: "블랙핑크 지수", count: 0 },
+  { keyword: "아디다스", count: 0 },
 ];
 
 export function SearchSection() {
   const [searchQuery, setSearchQuery] = useState("");
-  const router = useRouter();
-  const { setQuery, setDebouncedQuery } = useSearchStore();
+  const { navigateToSearch } = useSearchNavigation();
+  const addRecentSearch = useRecentSearchesStore((s) => s.addSearch);
+
+  // Fetch popular keywords from API
+  const { data: keywordsData } = usePopularKeywords();
+  const keywords = keywordsData?.keywords?.slice(0, 7) || fallbackKeywords;
 
   const handleSearch = (query: string) => {
-    if (query.trim()) {
-      setQuery(query.trim());
-      setDebouncedQuery(query.trim());
-      router.push("/explore");
+    const trimmed = query.trim();
+    if (trimmed) {
+      addRecentSearch(trimmed);
+      navigateToSearch(trimmed);
     }
   };
 
@@ -57,15 +61,15 @@ export function SearchSection() {
 
         {/* Trending Keywords */}
         <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3">
-          {trendingKeywords.map((keyword) => (
+          {keywords.map((item) => (
             <button
-              key={keyword.id}
+              key={item.keyword}
               type="button"
-              onClick={() => handleKeywordClick(keyword.label)}
+              onClick={() => handleKeywordClick(item.keyword)}
               className="px-4 py-2 bg-muted text-muted-foreground text-sm rounded-full
                        hover:bg-accent hover:text-accent-foreground transition-colors"
             >
-              {keyword.label}
+              {item.keyword}
             </button>
           ))}
         </div>

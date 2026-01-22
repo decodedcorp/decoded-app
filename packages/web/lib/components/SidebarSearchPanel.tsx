@@ -1,21 +1,14 @@
 "use client";
 
 import { memo, useEffect, useRef, useCallback } from "react";
-import { X, Search } from "lucide-react";
-import { useDebounce } from "../hooks/useDebounce";
-import { useSearchStore } from "../stores/searchStore";
-import { useFilterStore, type FilterKey } from "../stores/filterStore";
-
-interface FilterOption {
-  id: FilterKey;
-  label: string;
-}
-
-const filterOptions: FilterOption[] = [
-  { id: "all", label: "All" },
-  { id: "newjeanscloset", label: "NewJeans" },
-  { id: "blackpinkk.style", label: "BLACKPINK" },
-];
+import { X, Search, Clock, TrendingUp } from "lucide-react";
+import {
+  useSearchStore,
+  useRecentSearchesStore,
+  useDebounce,
+} from "@decoded/shared";
+import { useSearchNavigation } from "../hooks/useSearchURLSync";
+import { usePopularSearches } from "../hooks/useSearch";
 
 interface SidebarSearchPanelProps {
   isOpen: boolean;
@@ -28,9 +21,9 @@ interface SidebarSearchPanelProps {
  * Features:
  * - Slides out from sidebar on Search click
  * - Integrated search input with debounce
- * - Filter options as list (not dropdown)
+ * - Recent and popular searches
+ * - Enter to navigate to /search page
  * - Click outside / ESC to close
- * - Positioned next to sidebar (left-14 lg:left-[200px])
  */
 export const SidebarSearchPanel = memo(
   ({ isOpen, onClose }: SidebarSearchPanelProps) => {
@@ -43,9 +36,16 @@ export const SidebarSearchPanel = memo(
     const setDebouncedQuery = useSearchStore((s) => s.setDebouncedQuery);
     const debounced = useDebounce(query, 250);
 
-    // Filter store
-    const activeFilter = useFilterStore((state) => state.activeFilter);
-    const setFilter = useFilterStore((state) => state.setFilter);
+    // Recent searches
+    const recentSearches = useRecentSearchesStore((s) => s.searches);
+    const clearRecentSearches = useRecentSearchesStore((s) => s.clearAll);
+
+    // Popular searches
+    const { data: popularData } = usePopularSearches(isOpen);
+    const popularSearches = popularData?.data || [];
+
+    // Navigation
+    const { navigateToSearch } = useSearchNavigation();
 
     // Update debounced query
     useEffect(() => {
@@ -57,14 +57,13 @@ export const SidebarSearchPanel = memo(
       if (isOpen && inputRef.current) {
         setTimeout(() => {
           inputRef.current?.focus();
-        }, 200); // Wait for animation
+        }, 200);
       }
     }, [isOpen]);
 
     // Click outside handler
     useEffect(() => {
       const handleClickOutside = (e: MouseEvent) => {
-        // Don't close if clicking inside the sidebar (parent handles toggle)
         const sidebar = document.querySelector(
           '[aria-label="Main navigation"]'
         );
@@ -78,7 +77,6 @@ export const SidebarSearchPanel = memo(
       };
 
       if (isOpen) {
-        // Use setTimeout to avoid immediate close on the same click that opens
         const timeoutId = setTimeout(() => {
           document.addEventListener("mousedown", handleClickOutside);
         }, 0);
@@ -108,6 +106,31 @@ export const SidebarSearchPanel = memo(
       setQuery("");
       inputRef.current?.focus();
     }, [setQuery]);
+
+    const handleSearch = useCallback(
+      (searchQuery: string) => {
+        if (searchQuery.trim()) {
+          navigateToSearch(searchQuery.trim());
+          onClose();
+        }
+      },
+      [navigateToSearch, onClose]
+    );
+
+    const handleKeyDown = useCallback(
+      (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter" && query.trim()) {
+          handleSearch(query);
+        } else if (e.key === "Escape") {
+          if (query) {
+            setQuery("");
+          } else {
+            onClose();
+          }
+        }
+      },
+      [query, handleSearch, setQuery, onClose]
+    );
 
     return (
       <div
@@ -139,18 +162,10 @@ export const SidebarSearchPanel = memo(
             <input
               ref={inputRef}
               aria-label="Search"
-              placeholder="Search..."
+              placeholder="Search people, shows, items..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Escape") {
-                  if (query) {
-                    setQuery("");
-                  } else {
-                    onClose();
-                  }
-                }
-              }}
+              onKeyDown={handleKeyDown}
               className="flex-1 bg-transparent outline-none text-sm text-foreground placeholder-muted-foreground"
               type="text"
             />
@@ -166,27 +181,60 @@ export const SidebarSearchPanel = memo(
           </div>
         </div>
 
-        {/* Filter Options */}
-        <div className="p-3">
-          <h3 className="text-xs font-medium text-muted-foreground mb-2 px-2 uppercase tracking-wide">
-            Filter
-          </h3>
-          <div className="space-y-0.5">
-            {filterOptions.map((option) => (
+        {/* Recent Searches */}
+        {recentSearches.length > 0 && (
+          <div className="p-3 border-b border-border">
+            <div className="flex items-center justify-between mb-2 px-2">
+              <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Recent
+              </h3>
               <button
-                key={option.id}
-                onClick={() => setFilter(option.id)}
-                className={`w-full px-3 py-2 text-left text-sm rounded-md transition-colors ${
-                  activeFilter === option.id
-                    ? "bg-accent font-medium text-foreground"
-                    : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
-                }`}
+                onClick={clearRecentSearches}
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
               >
-                {option.label}
+                Clear
               </button>
-            ))}
+            </div>
+            <div className="space-y-0.5">
+              {recentSearches.slice(0, 5).map((search) => (
+                <button
+                  key={search}
+                  onClick={() => handleSearch(search)}
+                  className="w-full flex items-center gap-3 px-3 py-2 text-left text-sm rounded-md text-muted-foreground hover:bg-accent/50 hover:text-foreground transition-colors"
+                >
+                  <Clock className="h-4 w-4 flex-shrink-0" />
+                  <span className="truncate">{search}</span>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Popular Searches */}
+        {popularSearches.length > 0 && (
+          <div className="p-3">
+            <h3 className="text-xs font-medium text-muted-foreground mb-2 px-2 uppercase tracking-wide">
+              Popular
+            </h3>
+            <div className="space-y-0.5">
+              {popularSearches
+                .slice(0, 5)
+                .map(({ rank, query: searchQuery }) => (
+                  <button
+                    key={searchQuery}
+                    onClick={() => handleSearch(searchQuery)}
+                    className="w-full flex items-center gap-3 px-3 py-2 text-left text-sm rounded-md text-muted-foreground hover:bg-accent/50 hover:text-foreground transition-colors"
+                  >
+                    <TrendingUp className="h-4 w-4 flex-shrink-0 text-orange-500" />
+                    <span className="flex-1 truncate">{searchQuery}</span>
+                    <span className="text-xs text-muted-foreground">
+                      #{rank}
+                    </span>
+                  </button>
+                ))}
+            </div>
+          </div>
+        )}
       </div>
     );
   }
