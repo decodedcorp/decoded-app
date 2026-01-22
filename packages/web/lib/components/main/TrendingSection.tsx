@@ -3,12 +3,7 @@
 import Link from "next/link";
 import { motion } from "motion/react";
 import { SectionHeader } from "./SectionHeader";
-
-interface TrendingKeyword {
-  id: string;
-  label: string;
-  href: string;
-}
+import type { TrendingKeyword } from "@/lib/utils/main-page-mapper";
 
 const sampleKeywords: TrendingKeyword[] = [
   { id: "1", label: "뉴진스 다니엘", href: "/search?q=뉴진스+다니엘" },

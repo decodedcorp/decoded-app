@@ -15,7 +15,10 @@ import {
 import type { HeroData } from "./HeroSection";
 import type { ItemCardData } from "./ItemCard";
 import type { StyleCardData } from "./StyleCard";
-import type { WeeklyBestStyle, TrendingKeyword } from "@/lib/utils/main-page-mapper";
+import type {
+  WeeklyBestStyle,
+  TrendingKeyword,
+} from "@/lib/utils/main-page-mapper";
 
 interface HomeAnimatedContentProps {
   heroData?: HeroData;

@@ -57,8 +57,12 @@ export default async function Home() {
   const decodedPickStyle = decodedPickData.style
     ? whatsNewStyleToStyleCardData(decodedPickData.style)
     : undefined;
-  const decodedPickItems = decodedPickData.items.map(itemWithImageToItemCardData);
-  const artistSpotlightStyles = artistSpotlightData.map(whatsNewStyleToStyleCardData);
+  const decodedPickItems = decodedPickData.items.map(
+    itemWithImageToItemCardData
+  );
+  const artistSpotlightStyles = artistSpotlightData.map(
+    whatsNewStyleToStyleCardData
+  );
   const discoverItemsByTab = {
     newjeans: newjeansItems.map(itemWithImageToItemCardData),
     blackpink: blackpinkItems.map(itemWithImageToItemCardData),

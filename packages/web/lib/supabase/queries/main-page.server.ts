@@ -314,13 +314,15 @@ export async function fetchDecodedPickServer(
         );
       }
 
-      const styleItems: StyleItemData[] = (items ?? []).map((dbItem, index) => ({
-        id: dbItem.id,
-        label: String.fromCharCode(65 + index),
-        brand: dbItem.brand ?? "Unknown Brand",
-        name: dbItem.product_name ?? "Unknown Item",
-        imageUrl: dbItem.cropped_image_path ?? undefined,
-      }));
+      const styleItems: StyleItemData[] = (items ?? []).map(
+        (dbItem, index) => ({
+          id: dbItem.id,
+          label: String.fromCharCode(65 + index),
+          brand: dbItem.brand ?? "Unknown Brand",
+          name: dbItem.product_name ?? "Unknown Item",
+          imageUrl: dbItem.cropped_image_path ?? undefined,
+        })
+      );
 
       style = {
         image,
@@ -468,7 +470,7 @@ export async function fetchItemsByAccountServer(
           .includes(account.toLowerCase())
     )
     .map((pi) => pi.image_id)
-    .filter((id): id is number => id !== null);
+    .filter((id) => id !== null) as string[];
 
   if (imageIds.length === 0) {
     return [];

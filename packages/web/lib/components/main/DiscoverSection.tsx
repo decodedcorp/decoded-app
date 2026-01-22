@@ -68,13 +68,18 @@ const sampleItems: ItemCardData[] = [
 interface DiscoverItemsSectionProps {
   tabs?: CategoryTab[];
   items?: ItemCardData[];
+  itemsByTab?: Record<string, ItemCardData[]>;
 }
 
 export function DiscoverItemsSection({
   tabs = itemTabs,
   items = sampleItems,
+  itemsByTab,
 }: DiscoverItemsSectionProps) {
   const [activeTab, setActiveTab] = useState(tabs[0].id);
+
+  // Use itemsByTab if provided, otherwise fall back to items
+  const displayItems = itemsByTab?.[activeTab] ?? items;
 
   return (
     <section className="py-10 md:py-16 px-4 md:px-6 lg:px-8 bg-card">
@@ -111,7 +116,7 @@ export function DiscoverItemsSection({
             transition={{ duration: 0.3 }}
             className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4"
           >
-            {items.map((item, index) => (
+            {displayItems.map((item, index) => (
               <ItemCard key={item.id} data={item} index={index} />
             ))}
           </motion.div>
