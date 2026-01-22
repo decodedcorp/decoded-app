@@ -77,7 +77,7 @@ export function DiscoverItemsSection({
   const [activeTab, setActiveTab] = useState(tabs[0].id);
 
   return (
-    <section className="py-10 md:py-16 px-4 md:px-6 lg:px-8 bg-white">
+    <section className="py-10 md:py-16 px-4 md:px-6 lg:px-8 bg-card">
       <div className="max-w-7xl mx-auto">
         <SectionHeader
           title="DISCOVER ITEMS"
@@ -92,8 +92,8 @@ export function DiscoverItemsSection({
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
                 activeTab === tab.id
-                  ? "bg-black text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-accent"
               }`}
             >
               {tab.label}
@@ -133,7 +133,7 @@ export function DiscoverProductsSection({
   const [activeTab, setActiveTab] = useState(tabs[0].id);
 
   return (
-    <section className="py-10 md:py-16 px-4 md:px-6 lg:px-8 bg-gray-50">
+    <section className="py-10 md:py-16 px-4 md:px-6 lg:px-8 bg-background">
       <div className="max-w-7xl mx-auto">
         <SectionHeader
           title="DISCOVER PRODUCTS"
@@ -148,8 +148,8 @@ export function DiscoverProductsSection({
               onClick={() => setActiveTab(tab.id)}
               className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
                 activeTab === tab.id
-                  ? "bg-black text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-accent"
               }`}
             >
               {tab.label}

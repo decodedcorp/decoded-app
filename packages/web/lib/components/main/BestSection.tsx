@@ -57,9 +57,11 @@ interface BestItemSectionProps {
   items?: ItemCardData[];
 }
 
-export function BestItemSection({ items = sampleBestItems }: BestItemSectionProps) {
+export function BestItemSection({
+  items = sampleBestItems,
+}: BestItemSectionProps) {
   return (
-    <section className="py-10 md:py-16 px-4 md:px-6 lg:px-8 bg-white">
+    <section className="py-10 md:py-16 px-4 md:px-6 lg:px-8 bg-card">
       <div className="max-w-7xl mx-auto">
         <SectionHeader
           title="BEST ITEM"
@@ -121,34 +123,34 @@ export function WeeklyBestSection({
   };
 
   return (
-    <section className="py-10 md:py-16 px-4 md:px-6 lg:px-8 bg-gray-50">
+    <section className="py-10 md:py-16 px-4 md:px-6 lg:px-8 bg-background">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-end justify-between mb-6">
           <div>
-            <h2 className="text-xl md:text-2xl font-bold text-gray-900">
+            <h2 className="text-xl md:text-2xl font-bold text-foreground">
               WEEKLY BEST
             </h2>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               일주일간 가장 관심을 많이 받은 스타일을 확인해보세요
             </p>
           </div>
 
           {/* Pagination Controls */}
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-muted-foreground">
               {currentPage + 1} / {totalPages}
             </span>
             <div className="flex gap-2">
               <button
                 onClick={goToPrevious}
-                className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                className="p-2 rounded-full bg-muted hover:bg-accent transition-colors"
                 aria-label="Previous page"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
               <button
                 onClick={goToNext}
-                className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                className="p-2 rounded-full bg-muted hover:bg-accent transition-colors"
                 aria-label="Next page"
               >
                 <ChevronRight className="w-5 h-5" />
@@ -176,10 +178,10 @@ export function WeeklyBestSection({
                 transition={{ delay: index * 0.1 }}
                 className="group block"
               >
-                <div className="aspect-[3/4] bg-gray-200 rounded-xl overflow-hidden mb-2">
-                  <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 group-hover:scale-105 transition-transform duration-300" />
+                <div className="aspect-[3/4] bg-muted rounded-xl overflow-hidden mb-2">
+                  <div className="w-full h-full bg-gradient-to-br from-muted to-card group-hover:scale-105 transition-transform duration-300" />
                 </div>
-                <p className="text-sm font-medium text-gray-900 text-center">
+                <p className="text-sm font-medium text-foreground text-center">
                   {style.artistName}
                 </p>
               </motion.a>

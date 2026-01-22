@@ -53,11 +53,11 @@ export function StyleCard({
       className={`group ${sizeClasses[variant]}`}
     >
       <Link href={data.link} className="block h-full">
-        <div className="h-full flex flex-col bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow">
+        <div className="h-full flex flex-col bg-card rounded-2xl overflow-hidden border border-border hover:shadow-lg transition-shadow">
           {/* Image */}
-          <div className={`relative ${aspectClasses[variant]} bg-gray-100`}>
+          <div className={`relative ${aspectClasses[variant]} bg-muted`}>
             {/* Placeholder gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200" />
+            <div className="absolute inset-0 bg-gradient-to-br from-muted via-card to-muted" />
 
             {/* Item Labels Overlay */}
             {showItems && data.items && data.items.length > 0 && (
@@ -65,7 +65,7 @@ export function StyleCard({
                 {data.items.slice(0, 3).map((item, i) => (
                   <div
                     key={item.id}
-                    className="absolute bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-medium"
+                    className="absolute bg-background/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-medium text-foreground"
                     style={{
                       top: `${20 + i * 25}%`,
                       left: i % 2 === 0 ? "10%" : "auto",
@@ -81,13 +81,13 @@ export function StyleCard({
 
           {/* Content */}
           <div className="flex-1 p-4">
-            <h3 className="text-base font-semibold text-gray-900 mb-1 line-clamp-1">
+            <h3 className="text-base font-semibold text-foreground mb-1 line-clamp-1">
               {data.title}
             </h3>
-            <p className="text-sm text-gray-500 line-clamp-2 mb-2">
+            <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
               {data.description}
             </p>
-            <p className="text-xs text-gray-400">{data.artistName}</p>
+            <p className="text-xs text-muted-foreground">{data.artistName}</p>
           </div>
         </div>
       </Link>

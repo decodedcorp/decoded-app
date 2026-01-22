@@ -25,15 +25,15 @@ export function SectionHeader({
       className="flex items-end justify-between mb-6"
     >
       <div>
-        <h2 className="text-xl md:text-2xl font-bold text-gray-900">{title}</h2>
+        <h2 className="text-xl md:text-2xl font-bold text-foreground">{title}</h2>
         {subtitle && (
-          <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
+          <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
         )}
       </div>
       {viewMoreLink && (
         <Link
           href={viewMoreLink}
-          className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
+          className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
         >
           {viewMoreText}
         </Link>

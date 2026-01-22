@@ -28,7 +28,7 @@ export function TrendingNowSection({
   keywords = sampleKeywords,
 }: TrendingNowSectionProps) {
   return (
-    <section className="py-10 md:py-16 px-4 md:px-6 lg:px-8 bg-white">
+    <section className="py-10 md:py-16 px-4 md:px-6 lg:px-8 bg-card">
       <div className="max-w-7xl mx-auto">
         <SectionHeader
           title="TRENDING NOW"
@@ -46,8 +46,8 @@ export function TrendingNowSection({
             >
               <Link
                 href={keyword.href}
-                className="inline-block px-5 py-2.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-full
-                         hover:bg-gray-200 hover:text-gray-900 transition-colors"
+                className="inline-block px-5 py-2.5 bg-muted text-muted-foreground text-sm font-medium rounded-full
+                         hover:bg-accent hover:text-foreground transition-colors"
               >
                 {keyword.label}
               </Link>

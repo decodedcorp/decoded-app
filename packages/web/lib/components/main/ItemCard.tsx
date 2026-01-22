@@ -28,21 +28,21 @@ export function ItemCard({ data, index = 0 }: ItemCardProps) {
       className="group"
     >
       <Link href={data.link} className="block">
-        <div className="bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-md transition-shadow">
+        <div className="bg-card rounded-xl overflow-hidden border border-border hover:shadow-md transition-shadow">
           {/* Image */}
-          <div className="relative aspect-square bg-gray-50">
+          <div className="relative aspect-square bg-muted">
             {/* Placeholder */}
-            <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200" />
+            <div className="absolute inset-0 bg-gradient-to-br from-muted to-card" />
 
             {/* Badge */}
             {data.badge && (
               <div
-                className={`absolute top-2 left-2 px-2 py-0.5 rounded text-xs font-bold text-white ${
+                className={`absolute top-2 left-2 px-2 py-0.5 rounded text-xs font-bold ${
                   data.badge === "TOP"
-                    ? "bg-black"
+                    ? "bg-primary text-primary-foreground"
                     : data.badge === "NEW"
-                      ? "bg-blue-500"
-                      : "bg-red-500"
+                      ? "bg-blue-500 text-white"
+                      : "bg-destructive text-destructive-foreground"
                 }`}
               >
                 {data.badge}
@@ -52,12 +52,12 @@ export function ItemCard({ data, index = 0 }: ItemCardProps) {
 
           {/* Content */}
           <div className="p-3">
-            <p className="text-xs text-gray-500 mb-0.5">{data.brand}</p>
-            <h4 className="text-sm font-medium text-gray-900 line-clamp-1 mb-1">
+            <p className="text-xs text-muted-foreground mb-0.5">{data.brand}</p>
+            <h4 className="text-sm font-medium text-foreground line-clamp-1 mb-1">
               {data.name}
             </h4>
             {data.relatedStyles !== undefined && (
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-muted-foreground">
                 관련 스타일 {data.relatedStyles}
               </p>
             )}
