@@ -39,21 +39,21 @@
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| DOC-01 | TBD | — |
-| DOC-02 | TBD | — |
-| DOC-03 | TBD | — |
-| DOC-04 | TBD | — |
-| SPEC-01 | TBD | — |
-| SPEC-02 | TBD | — |
-| SPEC-03 | TBD | — |
-| SPEC-04 | TBD | — |
-| DOC-05 | TBD | — |
-| DOC-06 | TBD | — |
-| DOC-07 | TBD | — |
-| DOC-08 | TBD | — |
-| INTG-01 | TBD | — |
-| INTG-02 | TBD | — |
-| INTG-03 | TBD | — |
+| DOC-01 | Phase 1 | Pending |
+| DOC-02 | Phase 1 | Pending |
+| DOC-03 | Phase 1 | Pending |
+| DOC-04 | Phase 1 | Pending |
+| SPEC-01 | Phase 2 | Pending |
+| SPEC-02 | Phase 2 | Pending |
+| SPEC-03 | Phase 2 | Pending |
+| SPEC-04 | Phase 2 | Pending |
+| DOC-05 | Phase 3 | Pending |
+| DOC-06 | Phase 3 | Pending |
+| DOC-07 | Phase 3 | Pending |
+| DOC-08 | Phase 3 | Pending |
+| INTG-01 | Phase 4 | Pending |
+| INTG-02 | Phase 4 | Pending |
+| INTG-03 | Phase 5 | Pending |
 
 ---
 
