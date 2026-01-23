@@ -1,10 +1,12 @@
 # DECODED API 문서
 
 > **버전**: 1.0.0
-> **최종 업데이트**: 2025-01-15
+> **최종 업데이트**: 2026-01-23
 > **정보 출처**: `docs/database/open_api.json` (OpenAPI 3.1.0)
 
 > **Design Reference**: Screen-to-API 매핑은 [specs/shared/api-contracts.md](../../specs/shared/api-contracts.md) 참조
+>
+> **현재 구현 상태**: 아래 테이블에서 ✅ 표시된 API만 실제 구현됨
 
 ## 개요
 
@@ -115,20 +117,34 @@ const response = await fetch('https://api.decoded.co/api/v1/users/me', {
 
 ## API 도메인
 
-| 도메인 | 문서 | 설명 |
-|--------|------|------|
-| [Posts](./posts.md) | posts.md | Post(이미지 게시물) 관리 |
-| [Spots](./spots.md) | spots.md | Spot(아이템 위치 표시) 관리 |
-| [Solutions](./solutions.md) | solutions.md | Solution(상품 정보 답변) 관리 |
-| [Votes](./votes.md) | votes.md | 투표 및 채택 시스템 |
-| [Comments](./comments.md) | comments.md | 댓글 시스템 |
-| [Search](./search.md) | search.md | 통합 검색 기능 |
-| [Users](./users.md) | users.md | 사용자 프로필 및 활동 |
-| [Categories](./categories.md) | categories.md | 카테고리 관리 |
-| [Rankings](./rankings.md) | rankings.md | 랭킹 시스템 |
-| [Badges](./badges.md) | badges.md | 뱃지/업적 시스템 |
-| [Earnings](./earnings.md) | earnings.md | 수익 및 정산 |
-| [Admin](./admin.md) | admin.md | 관리자 기능 |
+| 도메인 | 문서 | 설명 | 구현 |
+|--------|------|------|:---:|
+| [Posts](./posts.md) | posts.md | Post(이미지 게시물) 관리 | ✅ |
+| [Categories](./categories.md) | categories.md | 카테고리 관리 | ✅ |
+| [Spots](./spots.md) | spots.md | Spot(아이템 위치 표시) 관리 | 📋 |
+| [Solutions](./solutions.md) | solutions.md | Solution(상품 정보 답변) 관리 | 📋 |
+| [Votes](./votes.md) | votes.md | 투표 및 채택 시스템 | 📋 |
+| [Comments](./comments.md) | comments.md | 댓글 시스템 | 📋 |
+| [Search](./search.md) | search.md | 통합 검색 기능 | 📋 |
+| [Users](./users.md) | users.md | 사용자 프로필 및 활동 | 📋 |
+| [Rankings](./rankings.md) | rankings.md | 랭킹 시스템 | 📋 |
+| [Badges](./badges.md) | badges.md | 뱃지/업적 시스템 | 📋 |
+| [Earnings](./earnings.md) | earnings.md | 수익 및 정산 | 📋 |
+| [Admin](./admin.md) | admin.md | 관리자 기능 | 📋 |
+
+> ✅ = 구현됨 (`packages/web/app/api/v1/`), 📋 = 설계 단계
+
+### 실제 API 라우트 (Next.js)
+
+```
+packages/web/app/api/v1/
+├── categories/
+│   └── route.ts          # GET /api/v1/categories
+└── posts/
+    ├── route.ts          # GET, POST /api/v1/posts
+    ├── upload/route.ts   # POST /api/v1/posts/upload
+    └── analyze/route.ts  # POST /api/v1/posts/analyze
+```
 
 ---
 

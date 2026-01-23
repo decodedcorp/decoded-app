@@ -11,7 +11,7 @@
 |-------|------|--------|----------|
 | 1 | CLAUDE.md 최적화 | ✅ Complete | 100% |
 | 2 | Specs 구조 정리 | ✅ Complete | 100% |
-| 3 | Docs 구조 정리 | Pending | 0% |
+| 3 | Docs 구조 정리 | ✅ Complete | 100% |
 | 4 | 크로스 레퍼런스 | Pending | 0% |
 | 5 | SSOT 원칙 | Pending | 0% |
 
@@ -22,10 +22,10 @@
 - [x] DOC-02: 오래된 정보 업데이트
 - [x] DOC-03: 핵심 파일 위치 섹션 추가
 - [x] DOC-04: GSD 명령어 가이드 추가
-- [ ] DOC-05: docs/README.md 업데이트
-- [ ] DOC-06: API 문서 동기화
-- [ ] DOC-07: ADR 정리
-- [ ] DOC-08: 중복 문서 통합
+- [x] DOC-05: docs/README.md 업데이트
+- [x] DOC-06: API 문서 동기화
+- [x] DOC-07: ADR 정리 (현재 1개, 추가 필요시 별도)
+- [x] DOC-08: 중복 문서 통합 (SSOT 원칙으로 해결)
 
 ### SPEC (Specs)
 - [x] SPEC-01: 빈 폴더 정리
