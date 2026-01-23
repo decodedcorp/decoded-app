@@ -10,7 +10,7 @@
 | Phase | Name | Status | Progress |
 |-------|------|--------|----------|
 | 1 | CLAUDE.md 최적화 | ✅ Complete | 100% |
-| 2 | Specs 구조 정리 | Pending | 0% |
+| 2 | Specs 구조 정리 | ✅ Complete | 100% |
 | 3 | Docs 구조 정리 | Pending | 0% |
 | 4 | 크로스 레퍼런스 | Pending | 0% |
 | 5 | SSOT 원칙 | Pending | 0% |
@@ -28,10 +28,10 @@
 - [ ] DOC-08: 중복 문서 통합
 
 ### SPEC (Specs)
-- [ ] SPEC-01: 빈 폴더 정리
-- [ ] SPEC-02: specs/README.md 업데이트
-- [ ] SPEC-03: shared/templates/ 최신화
-- [ ] SPEC-04: 네이밍 통일
+- [x] SPEC-01: 빈 폴더 정리
+- [x] SPEC-02: specs/README.md 업데이트
+- [x] SPEC-03: shared/templates/ 최신화 (이미 최신)
+- [x] SPEC-04: 네이밍 통일 (이미 일관성 있음)
 
 ### INTG (Integration)
 - [ ] INTG-01: codebase ↔ specs 크로스 레퍼런스

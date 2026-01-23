@@ -1,12 +1,21 @@
 # DECODED Specifications
 
-> 버전: 2.0.0 | 최종 업데이트: 2026-01-15
+> 버전: 2.1.0 | 최종 업데이트: 2026-01-23
+
+## 개요
+
+이 폴더는 decoded-app의 **기능 명세(설계 의도)**를 담고 있습니다.
+
+- **specs/**: 설계 의도 (WHAT SHOULD BE)
+- **docs/**: 구현된 것 (WHAT IS)
+- **.planning/codebase/**: 현재 코드 분석
 
 ## 번들 구조
 
-각 번들은 SpecKit 스타일로 구성되어 있습니다:
+각 번들은 SpecKit 스타일로 구성:
 - `spec.md`: 기능 명세
-- `screens/`: 화면 설계서
+- `screens/`: 화면 설계서 (SCR-* ID)
+- `api-endpoints.md`: API 계약 (선택)
 
 | 번들 | 설명 | 기능 ID | 화면 수 | 구현 상태 |
 |------|------|---------|---------|----------|
@@ -18,9 +27,9 @@
 | [system-backend/](./system-backend/) | 백엔드 시스템 | S-01~S-08 | - | 7% |
 | [admin/](./admin/) | 관리자 패널 | A-01~A-03 | 3 screens | 0% |
 | [mobile-platform/](./mobile-platform/) | 모바일 앱 | M-01~M-06 | - | 42% |
-| [scroll-animation/](./scroll-animation/) | 스크롤 애니메이션 (SpecKit) | - | In Progress | WIP |
+| [scroll-animation/](./scroll-animation/) | 스크롤 애니메이션 | - | - | WIP |
 
-> 📊 **전체 진행률**: ~25% (2026-01-15 기준)
+> 📊 **전체 진행률**: ~25% (2026-01-23 기준)
 
 ## ID 체계
 
@@ -45,6 +54,25 @@
 | SCR-ADMN- | 관리자 화면 | SCR-ADMN-01-dashboard |
 | CMN- | 공통 컴포넌트 | CMN-01-header |
 
+## 관련 문서
+
+### 코드베이스 분석 (최신)
+- [.planning/codebase/ARCHITECTURE.md](../.planning/codebase/ARCHITECTURE.md) - 현재 아키텍처
+- [.planning/codebase/STRUCTURE.md](../.planning/codebase/STRUCTURE.md) - 디렉토리 구조
+- [.planning/codebase/CONVENTIONS.md](../.planning/codebase/CONVENTIONS.md) - 코딩 컨벤션
+
+### Specs 내부
+- [데이터 모델](./shared/data-models.md)
+- [워크플로우](./shared/workflows.md)
+- [API 계약](./shared/api-contracts.md)
+- [화면 템플릿](./shared/templates/screen-template.md)
+- [UI ID 컨벤션](./shared/ui-id-convention.md)
+
+### 구현 문서
+- [docs/api/](../docs/api/) - 구현된 API
+- [docs/database/](../docs/database/) - DB 스키마
+- [docs/design-system/](../docs/design-system/) - 디자인 토큰
+
 ## 빠른 시작
 
 ```bash
@@ -58,8 +86,10 @@ cat specs/user-system/screens/SCR-USER-01-login.md
 cat specs/shared/components/CMN-01-header.md
 ```
 
-## 관련 문서
+## GSD 워크플로우
 
-- [데이터 모델](./shared/data-models.md)
-- [워크플로우](./shared/workflows.md)
-- [화면 템플릿](./shared/templates/screen-template.md)
+```bash
+/gsd:progress          # 진행 상황 확인
+/gsd:plan-phase N      # 페이즈 N 계획
+/gsd:execute-phase N   # 페이즈 N 실행
+```
