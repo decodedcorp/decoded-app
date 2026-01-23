@@ -1,8 +1,19 @@
-# Codebase Quality Documentation
+# Codebase Documentation
 
 **Project**: decoded-app
 **Analysis Date**: 2026-01-23
-**Focus**: Code conventions, testing patterns, and quality standards
+**Focus**: 현재 코드베이스 분석 (AI 자동 생성)
+
+## 관련 문서
+
+| 유형 | 위치 | 설명 |
+|------|------|------|
+| **코드 분석 (현재)** | `.planning/codebase/` | 이 폴더 - AI 생성 |
+| **설계 의도** | `specs/` | 기능 명세 및 화면 설계 |
+| **구현 문서** | `docs/` | 구현된 API, 스키마, 가이드 |
+| **빠른 참조** | `CLAUDE.md` | 프로젝트 개요 및 진입점 |
+
+---
 
 ## Documents Generated
 
