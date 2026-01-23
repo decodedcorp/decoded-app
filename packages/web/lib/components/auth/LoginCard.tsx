@@ -7,11 +7,13 @@ import { useAuthStore, type OAuthProvider } from "@/lib/stores/authStore";
 
 export function LoginCard() {
   const router = useRouter();
-  const { mockLogin, guestLogin, loadingProvider, isLoading } = useAuthStore();
+  const { signInWithOAuth, guestLogin, loadingProvider, isLoading, error } =
+    useAuthStore();
 
   const handleLogin = async (provider: OAuthProvider) => {
-    await mockLogin(provider);
-    router.push("/");
+    await signInWithOAuth(provider);
+    // OAuth는 리다이렉트 방식이므로 여기서 router.push 하지 않음
+    // 로그인 성공 후 redirectTo에서 설정한 URL로 이동
   };
 
   const handleGuestLogin = () => {
@@ -34,6 +36,13 @@ export function LoginCard() {
             Discover what they&apos;re wearing
           </p>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+            <p className="text-sm text-red-400 text-center">{error}</p>
+          </div>
+        )}
 
         {/* OAuth Buttons */}
         <div className="space-y-3">

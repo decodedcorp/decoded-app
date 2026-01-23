@@ -235,11 +235,11 @@ export const Sidebar = memo(() => {
           <NavItemComponent
             item={{
               id: "profile",
-              href: "/login",
+              href: "/profile",
               icon: User,
               label: "Profile",
             }}
-            isActive={pathname === "/login"}
+            isActive={pathname === "/profile"}
           />
         </div>
       </aside>

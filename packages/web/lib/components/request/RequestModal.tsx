@@ -19,6 +19,8 @@ import { SingleImagePreview } from "./SingleImagePreview";
 import { StepIndicator } from "./StepIndicator";
 import { DetectionView } from "./DetectionView";
 import { DetectedItemCard } from "./DetectedItemCard";
+import { DetailsStep } from "./DetailsStep";
+import { SubmitStep } from "./SubmitStep";
 
 interface RequestModalProps {
   isOpen: boolean;
@@ -196,23 +198,30 @@ export function RequestModal({ isOpen, onClose }: RequestModalProps) {
 
           {/* Step 2: Detection */}
           {currentStep === 2 && images[0] && (
-            <div className="flex-1 min-h-0 flex flex-col gap-4">
-              {/* Image with SpotMarkers */}
-              <DetectionView
-                image={images[0]}
-                spots={detectedSpots}
-                isDetecting={isDetecting}
-                isRevealing={isRevealing}
-                selectedSpotId={selectedSpotId}
-                onSpotClick={(spot) => selectSpot(spot.id)}
-              />
+            <div className="space-y-4">
+              {/* Image with SpotMarkers - 최대한 크게 */}
+              <div className="flex-shrink-0">
+                <DetectionView
+                  image={images[0]}
+                  spots={detectedSpots}
+                  isDetecting={isDetecting}
+                  isRevealing={isRevealing}
+                  selectedSpotId={selectedSpotId}
+                  onSpotClick={(spot) => selectSpot(spot.id)}
+                />
+              </div>
 
-              {/* Item Cards */}
+              {/* Item Cards - 스크롤해서 볼 수 있음 */}
               {!isDetecting && detectedSpots.length > 0 && (
-                <div className="space-y-3">
-                  <h3 className="text-sm font-semibold text-foreground">
-                    Detected Items ({detectedSpots.length})
-                  </h3>
+                <div className="space-y-2 pb-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold text-foreground">
+                      Detected Items ({detectedSpots.length})
+                    </h3>
+                    <span className="text-xs text-muted-foreground">
+                      Scroll to see more
+                    </span>
+                  </div>
                   <div className="space-y-2">
                     {detectedSpots.map((spot) => (
                       <DetectedItemCard
@@ -228,47 +237,36 @@ export function RequestModal({ isOpen, onClose }: RequestModalProps) {
             </div>
           )}
 
-          {/* Step 3: Details (추후 구현) */}
-          {currentStep === 3 && (
-            <div className="flex flex-col items-center justify-center min-h-[300px] text-foreground/50">
-              <p>Step 3: Details</p>
-              <p className="text-sm mt-1">추후 구현 예정</p>
-            </div>
-          )}
+          {/* Step 3: Details */}
+          {currentStep === 3 && <DetailsStep />}
 
-          {/* Step 4: Submit (추후 구현) */}
-          {currentStep === 4 && (
-            <div className="flex flex-col items-center justify-center min-h-[300px] text-foreground/50">
-              <p>Step 4: Submit</p>
-              <p className="text-sm mt-1">추후 구현 예정</p>
-            </div>
-          )}
+          {/* Step 4: Submit */}
+          {currentStep === 4 && <SubmitStep onClose={handleClose} />}
         </main>
 
-        {/* Footer */}
-        {(hasImages || currentStep > 1) && !isDetecting && !isRevealing && (
-          <footer className="flex justify-end px-4 py-3 border-t border-border flex-shrink-0">
-            <button
-              type="button"
-              onClick={handleNext}
-              disabled={!canProceed}
-              className={`
-                px-6 py-2.5 rounded-lg font-medium transition-all
-                ${
-                  canProceed
-                    ? "bg-primary text-primary-foreground hover:shadow-[0_0_20px_oklch(0.9519_0.1739_115.8446_/_0.5)]"
-                    : "bg-primary/20 text-primary/40 cursor-not-allowed"
-                }
-              `}
-            >
-              {currentStep === 1
-                ? "Analyze"
-                : currentStep === 4
-                  ? "Submit"
-                  : "Next"}
-            </button>
-          </footer>
-        )}
+        {/* Footer - Step 4 has its own submit button */}
+        {(hasImages || currentStep > 1) &&
+          currentStep !== 4 &&
+          !isDetecting &&
+          !isRevealing && (
+            <footer className="flex justify-end px-4 py-3 border-t border-border flex-shrink-0">
+              <button
+                type="button"
+                onClick={handleNext}
+                disabled={!canProceed}
+                className={`
+                  px-6 py-2.5 rounded-lg font-medium transition-all
+                  ${
+                    canProceed
+                      ? "bg-primary text-primary-foreground hover:shadow-[0_0_20px_oklch(0.9519_0.1739_115.8446_/_0.5)]"
+                      : "bg-primary/20 text-primary/40 cursor-not-allowed"
+                  }
+                `}
+              >
+                {currentStep === 1 ? "Analyze" : "Next"}
+              </button>
+            </footer>
+          )}
       </div>
     </div>
   );

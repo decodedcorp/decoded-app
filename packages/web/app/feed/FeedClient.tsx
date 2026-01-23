@@ -132,21 +132,51 @@ export function FeedClient({ initialImages: _initialImages }: Props) {
   if (!items || items.length === 0) {
     const hasActiveFilter = activeFilter !== "all";
     const hasSearchQuery = debouncedQuery.trim().length > 0;
+    const hasFiltersApplied = hasActiveFilter || hasSearchQuery;
+
+    const handleResetFilters = () => {
+      useFilterStore.getState().setFilter("all");
+      useSearchStore.getState().setQuery("");
+      useSearchStore.getState().setDebouncedQuery("");
+    };
 
     return (
       <div className="absolute inset-0 z-0 flex items-center justify-center pt-14 pb-16 md:pt-4 md:pb-0">
         <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
-          <div className="mb-4 text-4xl">Camera</div>
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+            <svg
+              className="h-8 w-8 text-muted-foreground"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+              />
+            </svg>
+          </div>
           <h2 className="mb-2 text-xl font-semibold text-foreground">
-            {hasActiveFilter || hasSearchQuery
-              ? "No images found"
-              : "No images found yet."}
+            {hasFiltersApplied
+              ? "검색 결과가 없습니다"
+              : "아직 이미지가 없습니다"}
           </h2>
-          <p className="text-sm text-muted-foreground">
-            {hasActiveFilter || hasSearchQuery
-              ? "Try adjusting your filters or search query."
-              : "Check back later or try adjusting your filters."}
+          <p className="mb-6 text-sm text-muted-foreground">
+            {hasFiltersApplied
+              ? "다른 검색어나 필터를 사용해보세요."
+              : "나중에 다시 확인해주세요."}
           </p>
+          {hasFiltersApplied && (
+            <button
+              onClick={handleResetFilters}
+              className="rounded-full border border-border bg-card/80 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+              type="button"
+            >
+              필터 초기화
+            </button>
+          )}
         </div>
       </div>
     );

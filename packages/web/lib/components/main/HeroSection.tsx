@@ -27,7 +27,7 @@ export function HeroSection({ data = defaultHeroData }: HeroSectionProps) {
   return (
     <section className="relative w-full min-h-[70vh] md:min-h-[85vh] overflow-hidden bg-black flex items-center">
       {/* Background Image with parallax effect */}
-      <motion.div 
+      <motion.div
         initial={{ scale: 1.1 }}
         animate={{ scale: 1 }}
         transition={{ duration: 1.5, ease: "easeOut" }}
@@ -52,11 +52,11 @@ export function HeroSection({ data = defaultHeroData }: HeroSectionProps) {
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40 z-10" />
 
       {/* Decorative vertical line */}
-      <motion.div 
+      <motion.div
         initial={{ height: 0 }}
         animate={{ height: "100px" }}
         transition={{ duration: 0.8, delay: 0.5 }}
-        className="absolute left-6 md:left-12 top-0 w-[1px] bg-white/30 z-20 hidden md:block" 
+        className="absolute left-6 md:left-12 top-0 w-[1px] bg-white/30 z-20 hidden md:block"
       />
 
       {/* Content */}
@@ -87,7 +87,7 @@ export function HeroSection({ data = defaultHeroData }: HeroSectionProps) {
               <p className="text-xl md:text-2xl text-white/80 font-light leading-relaxed mb-8">
                 {data.title}
               </p>
-              
+
               {/* CTA Button */}
               <Link
                 href={data.link}
@@ -117,9 +117,13 @@ export function HeroSection({ data = defaultHeroData }: HeroSectionProps) {
                 Scroll Down
               </span>
               <div className="w-[1px] h-12 bg-white/20 relative overflow-hidden">
-                <motion.div 
+                <motion.div
                   animate={{ y: ["-100%", "100%"] }}
-                  transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+                  transition={{
+                    repeat: Infinity,
+                    duration: 1.5,
+                    ease: "linear",
+                  }}
                   className="absolute top-0 left-0 w-full h-full bg-primary"
                 />
               </div>
