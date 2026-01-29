@@ -14,7 +14,7 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 
 **v1.1 Status:** SHIPPED (2026-01-29) - All 4 tracks merged to main
 **v2.0 Status:** Phase v2-04 IN PROGRESS (2/3 plans done)
-**Last activity:** 2026-01-29 - Completed v2-04-02-PLAN.md (DesktopFooter component)
+**Last activity:** 2026-01-29 - Completed v2-04-01-PLAN.md (Header Components)
 
 ### Execution Flow
 
@@ -123,6 +123,9 @@ See: .planning/ROADMAP-v2.md
 - **FeedCard Base/Feature Separation (v2-03-03):** Design-system provides base FeedCard for composition, feature component adds GSAP Flip animations
 - **ProfileHeaderCard Layout (v2-03-03):** Avatar + info in flex row, optional stats row below with dividers for clean separation
 - **Refactoring Preservation (v2-03-03):** Maintain GSAP Flip animations and store integrations while migrating to Card base
+- **Desktop Header Pattern (v2-04-01):** Replace sidebar navigation with top header (64px) for modern UX, more screen space for content
+- **Separate Header Components (v2-04-01):** Desktop (DesktopHeader, md+) and mobile (MobileHeader, <md) as distinct components for clean separation
+- **Header Height Tokens (v2-04-01):** Desktop 64px, Mobile 56px from decoded.pen design system
 - **Footer Logo Approach (v2-04-02):** Use simple text logo (font-mono) in footer instead of complex 3D ASCII logo
 - **Selective Mobile Accordion (v2-04-02):** Only Company and Support sections collapse on mobile, Brand and Connect always visible
 
@@ -139,7 +142,7 @@ See: .planning/ROADMAP-v2.md
 ## Session Continuity
 
 **Last session:** 2026-01-29
-**Stopped at:** Completed v2-04-02-PLAN.md - DesktopFooter component
+**Stopped at:** Completed v2-04-01-PLAN.md - Header Components
 **Resume file:** None
 
 **Next Steps:**
@@ -154,4 +157,4 @@ npm run dev  # Test footer component
 
 ---
 
-*Last updated: 2026-01-29 after v2-04-02 plan completion (DesktopFooter)*
+*Last updated: 2026-01-29 after v2-04-01 plan completion (Header Components)*
