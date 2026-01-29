@@ -37,7 +37,7 @@ See archived roadmap for v1.0 phase details.
 - [x] **Phase 6: API Foundation & Profile** - API client patterns + Profile APIs (Complete, 06-03 verification pending)
 
 #### Parallel Tracks (Git Worktrees) - After Phase 6
-- [ ] **Track A: Content CRUD** - Posts, Spots, Solutions (worktree: `decoded-track-a`)
+- [x] **Track A: Content CRUD** - Posts, Spots, Solutions (worktree: `decoded-track-a`) ✓
 - [ ] **Track B: Engagement** - Votes, Comments (worktree: `decoded-track-b`)
 - [ ] **Track C: Gamification** - Rankings, Badges (worktree: `decoded-track-c`)
 - [ ] **Track D: Monetization & Search** - Earnings, Search (worktree: `decoded-track-d`)
@@ -81,10 +81,10 @@ See archived roadmap for v1.0 phase details.
   4. User can submit solutions with auto-extracted metadata
   5. User can edit/delete their solutions
 
-**Plans:** 3 plans (1 wave - all parallel)
-- [ ] A-01-PLAN.md - Post edit/delete operations (updatePost, deletePost, hooks) [Wave 1]
-- [ ] A-02-PLAN.md - Spot CRUD operations (fetchSpots, createSpot, updateSpot, deleteSpot, hooks) [Wave 1]
-- [ ] A-03-PLAN.md - Solution CRUD with metadata extraction (6 API functions, hooks) [Wave 1]
+**Plans:** 3 plans (1 wave - all parallel) — COMPLETE
+- [x] A-01-PLAN.md - Post edit/delete operations (updatePost, deletePost, hooks) [Wave 1]
+- [x] A-02-PLAN.md - Spot CRUD operations (fetchSpots, createSpot, updateSpot, deleteSpot, hooks) [Wave 1]
+- [x] A-03-PLAN.md - Solution CRUD with metadata extraction (6 API functions, hooks) [Wave 1]
 
 ---
 
@@ -164,7 +164,7 @@ Plans:
 
 | Track | Worktree | Branch | Plans | Status |
 |-------|----------|--------|-------|--------|
-| A. Content CRUD | `../decoded-track-a` | `feature/track-a-content` | 3/3 | **Planned** |
+| A. Content CRUD | `../decoded-track-a` | `feature/track-a-content` | 3/3 | **Complete** ✓ |
 | B. Engagement | `../decoded-track-b` | `feature/track-b-engagement` | 0/2 | **Ready** |
 | C. Gamification | `../decoded-track-c` | `feature/track-c-gamification` | 0/2 | **Ready** |
 | D. Monetization | `../decoded-track-d` | `feature/track-d-monetization` | 0/3 | **Ready** |
@@ -199,4 +199,4 @@ git merge feature/track-d-monetization
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-01-29 (Track A planned)*
+*Last updated: 2026-01-29 (Track A complete)*

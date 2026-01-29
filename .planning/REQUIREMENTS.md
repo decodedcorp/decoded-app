@@ -17,24 +17,24 @@
 
 ### Posts
 
-- [ ] **POST-01**: 포스트 수정 (PATCH /posts/{post_id})
-- [ ] **POST-02**: 포스트 삭제 (DELETE /posts/{post_id})
+- [x] **POST-01**: 포스트 수정 (PATCH /posts/{post_id})
+- [x] **POST-02**: 포스트 삭제 (DELETE /posts/{post_id})
 
 ### Spots
 
-- [ ] **SPOT-01**: 스팟 목록 조회 (GET /posts/{post_id}/spots)
-- [ ] **SPOT-02**: 스팟 추가 (POST /posts/{post_id}/spots)
-- [ ] **SPOT-03**: 스팟 수정 (PATCH /spots/{spot_id})
-- [ ] **SPOT-04**: 스팟 삭제 (DELETE /spots/{spot_id})
+- [x] **SPOT-01**: 스팟 목록 조회 (GET /posts/{post_id}/spots)
+- [x] **SPOT-02**: 스팟 추가 (POST /posts/{post_id}/spots)
+- [x] **SPOT-03**: 스팟 수정 (PATCH /spots/{spot_id})
+- [x] **SPOT-04**: 스팟 삭제 (DELETE /spots/{spot_id})
 
 ### Solutions
 
-- [ ] **SOLN-01**: 솔루션 목록 조회 (GET /spots/{spot_id}/solutions)
-- [ ] **SOLN-02**: 솔루션 제출 (POST /spots/{spot_id}/solutions)
-- [ ] **SOLN-03**: 솔루션 수정 (PATCH /solutions/{solution_id})
-- [ ] **SOLN-04**: 솔루션 삭제 (DELETE /solutions/{solution_id})
-- [ ] **SOLN-05**: 메타데이터 추출 (POST /solutions/extract-metadata)
-- [ ] **SOLN-06**: 어필리에이트 링크 변환 (POST /solutions/convert-affiliate)
+- [x] **SOLN-01**: 솔루션 목록 조회 (GET /spots/{spot_id}/solutions)
+- [x] **SOLN-02**: 솔루션 제출 (POST /spots/{spot_id}/solutions)
+- [x] **SOLN-03**: 솔루션 수정 (PATCH /solutions/{solution_id})
+- [x] **SOLN-04**: 솔루션 삭제 (DELETE /solutions/{solution_id})
+- [x] **SOLN-05**: 메타데이터 추출 (POST /solutions/extract-metadata)
+- [x] **SOLN-06**: 어필리에이트 링크 변환 (POST /solutions/convert-affiliate)
 
 ### Votes
 
@@ -119,18 +119,18 @@ Deferred to future release.
 
 | Requirement | Status |
 |-------------|--------|
-| POST-01 | Pending |
-| POST-02 | Pending |
-| SPOT-01 | Pending |
-| SPOT-02 | Pending |
-| SPOT-03 | Pending |
-| SPOT-04 | Pending |
-| SOLN-01 | Pending |
-| SOLN-02 | Pending |
-| SOLN-03 | Pending |
-| SOLN-04 | Pending |
-| SOLN-05 | Pending |
-| SOLN-06 | Pending |
+| POST-01 | Complete |
+| POST-02 | Complete |
+| SPOT-01 | Complete |
+| SPOT-02 | Complete |
+| SPOT-03 | Complete |
+| SPOT-04 | Complete |
+| SOLN-01 | Complete |
+| SOLN-02 | Complete |
+| SOLN-03 | Complete |
+| SOLN-04 | Complete |
+| SOLN-05 | Complete |
+| SOLN-06 | Complete |
 
 ### Track B: Engagement (Worktree)
 
@@ -179,4 +179,4 @@ Deferred to future release.
 
 ---
 *Requirements defined: 2026-01-29*
-*Last updated: 2026-01-29 after parallel track restructure*
+*Last updated: 2026-01-29 after Track A completion*
