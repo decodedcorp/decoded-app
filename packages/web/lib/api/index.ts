@@ -38,3 +38,6 @@ export { fetchEarnings } from "./earnings";
 
 // Search API
 export { fetchPopularSearchTerms, fetchRecentSearchTerms, deleteRecentSearch } from "./search";
+
+// Settlements API
+export { fetchSettlements, requestWithdrawal } from "./settlements";
