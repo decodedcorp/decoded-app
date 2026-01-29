@@ -11,13 +11,13 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Milestone:** v1.1 Full API Integration
 **Structure:** Phase 6 (Foundation) → Tracks A-D (Parallel)
-**Status:** Phase 6 in progress (1/3 plans complete)
-**Last activity:** 2026-01-29 - Completed 06-01-PLAN.md
+**Status:** Phase 6 in progress (2/3 plans complete)
+**Last activity:** 2026-01-29 - Completed 06-02-PLAN.md
 
 ### Execution Flow
 
 ```
-1. Phase 6 (Main Branch) ─── Currently Here (1/3 complete)
+1. Phase 6 (Main Branch) ─── Currently Here (2/3 complete)
    │
    └─ After completion, create 4 worktrees:
       ├── Track A: Content CRUD
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-01-29)
       └── Track D: Monetization
 ```
 
-**Progress:** █░░ (33% - 1 of 3 plans complete)
+**Progress:** ██░ (67% - 2 of 3 plans complete)
 
 ## Milestones
 
@@ -41,7 +41,7 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 
 | Phase | Plans | Status |
 |-------|-------|--------|
-| Phase 6: API Foundation & Profile | 1/3 | **In Progress** (06-01 complete) |
+| Phase 6: API Foundation & Profile | 2/3 | **In Progress** (06-01, 06-02 complete) |
 
 ### Parallel Tracks (After Phase 6)
 
@@ -65,6 +65,9 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 - Phase 6 establishes API client patterns, then 4 tracks run in parallel
 - **API Client Pattern (06-01):** All endpoints use shared apiClient with auth injection
 - **Type Safety:** All API types match OpenAPI spec exactly
+- **Naming Convention (06-02):** Use fetch* for API functions (fetchMe, fetchUserStats)
+- **Store Sync (06-02):** Keep mock data as fallback, sync from API via explicit actions
+- **Points Mapping (06-02):** Map API points to earnings until Track C implements full gamification
 
 ### Open Items
 - v2 deferred: Admin dashboard, real-time notifications
@@ -78,9 +81,9 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 
 ## Session Continuity
 
-**Last session:** 2026-01-29 14:12 UTC
-**Stopped at:** Completed 06-01-PLAN.md
-**Resume file:** None - continue to 06-02
+**Last session:** 2026-01-29 09:14 UTC
+**Stopped at:** Completed 06-02-PLAN.md
+**Resume file:** None - continue to 06-03
 
 ## Worktree Commands
 
