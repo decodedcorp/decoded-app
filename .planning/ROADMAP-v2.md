@@ -127,12 +127,12 @@ Plans:
   3. User viewing profile sees ProfileHeaderCard with stats, avatar, and actions
   4. User can switch between profile activity tabs (Posts, Spots, Solutions, Saved)
   5. Feed cards support engagement actions (like, comment, share) with design system styling
-**Plans**: TBD
+**Plans:** 3 plans (2 waves)
 
 Plans:
-- [ ] v2-06-01: Implement Feed page mobile and desktop layouts
-- [ ] v2-06-02: Implement Profile page with ProfileHeaderCard integration
-- [ ] v2-06-03: Connect activity tabs and feed cards to existing data stores
+- [ ] v2-06-01-PLAN.md — Feed page with responsive grid and decoded.pen card styling [Wave 1]
+- [ ] v2-06-02-PLAN.md — Profile page with 2-column desktop layout and ProfileHeaderCard [Wave 1]
+- [ ] v2-06-03-PLAN.md — Activity tabs with fade transitions and engagement actions [Wave 2]
 
 ### v2-Phase 7: Search & Image Detail
 **Goal**: Search and detailed content views match decoded.pen design with functional interactions
