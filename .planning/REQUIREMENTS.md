@@ -38,18 +38,18 @@
 
 ### Votes
 
-- [ ] **VOTE-01**: 투표 현황 조회 (GET /solutions/{solution_id}/votes)
-- [ ] **VOTE-02**: 투표하기 (POST /solutions/{solution_id}/votes)
-- [ ] **VOTE-03**: 투표 취소 (DELETE /solutions/{solution_id}/votes)
-- [ ] **VOTE-04**: 솔루션 채택 (POST /solutions/{solution_id}/adopt)
-- [ ] **VOTE-05**: 채택 취소 (DELETE /solutions/{solution_id}/adopt)
+- [x] **VOTE-01**: 투표 현황 조회 (GET /solutions/{solution_id}/votes) ✓
+- [x] **VOTE-02**: 투표하기 (POST /solutions/{solution_id}/votes) ✓
+- [x] **VOTE-03**: 투표 취소 (DELETE /solutions/{solution_id}/votes) ✓
+- [x] **VOTE-04**: 솔루션 채택 (POST /solutions/{solution_id}/adopt) ✓
+- [x] **VOTE-05**: 채택 취소 (DELETE /solutions/{solution_id}/adopt) ✓
 
 ### Comments
 
-- [ ] **CMNT-01**: 댓글 목록 조회 (GET /posts/{post_id}/comments)
-- [ ] **CMNT-02**: 댓글 작성 (POST /posts/{post_id}/comments)
-- [ ] **CMNT-03**: 댓글 수정 (PATCH /comments/{comment_id})
-- [ ] **CMNT-04**: 댓글 삭제 (DELETE /comments/{comment_id})
+- [x] **CMNT-01**: 댓글 목록 조회 (GET /posts/{post_id}/comments) ✓
+- [x] **CMNT-02**: 댓글 작성 (POST /posts/{post_id}/comments) ✓
+- [x] **CMNT-03**: 댓글 수정 (PATCH /comments/{comment_id}) ✓
+- [x] **CMNT-04**: 댓글 삭제 (DELETE /comments/{comment_id}) ✓
 
 ### Rankings
 
@@ -136,15 +136,15 @@ Deferred to future release.
 
 | Requirement | Status |
 |-------------|--------|
-| VOTE-01 | Pending |
-| VOTE-02 | Pending |
-| VOTE-03 | Pending |
-| VOTE-04 | Pending |
-| VOTE-05 | Pending |
-| CMNT-01 | Pending |
-| CMNT-02 | Pending |
-| CMNT-03 | Pending |
-| CMNT-04 | Pending |
+| VOTE-01 | Complete |
+| VOTE-02 | Complete |
+| VOTE-03 | Complete |
+| VOTE-04 | Complete |
+| VOTE-05 | Complete |
+| CMNT-01 | Complete |
+| CMNT-02 | Complete |
+| CMNT-03 | Complete |
+| CMNT-04 | Complete |
 
 ### Track C: Gamification (Worktree)
 
@@ -179,4 +179,4 @@ Deferred to future release.
 
 ---
 *Requirements defined: 2026-01-29*
-*Last updated: 2026-01-29 after Track A completion*
+*Last updated: 2026-01-29 after Track A+B completion*

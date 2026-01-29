@@ -38,7 +38,7 @@ See archived roadmap for v1.0 phase details.
 
 #### Parallel Tracks (Git Worktrees) - After Phase 6
 - [x] **Track A: Content CRUD** - Posts, Spots, Solutions (worktree: `decoded-track-a`) ✓
-- [ ] **Track B: Engagement** - Votes, Comments (worktree: `decoded-track-b`)
+- [x] **Track B: Engagement** - Votes, Comments (worktree: `decoded-track-b`) ✓
 - [ ] **Track C: Gamification** - Rankings, Badges (worktree: `decoded-track-c`)
 - [ ] **Track D: Monetization & Search** - Earnings, Search (worktree: `decoded-track-d`)
 
@@ -101,9 +101,9 @@ See archived roadmap for v1.0 phase details.
   4. Post owner can adopt a solution
   5. User can view/write/edit/delete comments
 
-Plans:
-- [ ] B-01: Vote system (vote, retract, adopt)
-- [ ] B-02: Comment CRUD operations
+**Plans:** 2 plans (1 wave)
+- [x] B-01-PLAN.md - Vote system (types, API, hooks, proxy routes) [Wave 1] ✓
+- [x] B-02-PLAN.md - Comment CRUD operations (types, API, hooks, proxy routes) [Wave 1] ✓
 
 ---
 
@@ -165,7 +165,7 @@ Plans:
 | Track | Worktree | Branch | Plans | Status |
 |-------|----------|--------|-------|--------|
 | A. Content CRUD | `../decoded-track-a` | `feature/track-a-content` | 3/3 | **Complete** ✓ |
-| B. Engagement | `../decoded-track-b` | `feature/track-b-engagement` | 0/2 | **Ready** |
+| B. Engagement | `../decoded-track-b` | `feature/track-b-engagement` | 2/2 | **Complete** ✓ |
 | C. Gamification | `../decoded-track-c` | `feature/track-c-gamification` | 0/2 | **Ready** |
 | D. Monetization | `../decoded-track-d` | `feature/track-d-monetization` | 0/3 | **Ready** |
 
@@ -199,4 +199,4 @@ git merge feature/track-d-monetization
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-01-29 (Track A complete)*
+*Last updated: 2026-01-29 (Tracks A+B complete)*

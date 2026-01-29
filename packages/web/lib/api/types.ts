@@ -381,3 +381,92 @@ export interface ConvertAffiliateResponse {
   affiliate_url: string;
   original_url: string;
 }
+
+// ============================================================
+// Comment API Types
+// GET /api/v1/posts/{post_id}/comments
+// POST /api/v1/posts/{post_id}/comments
+// PATCH /api/v1/comments/{comment_id}
+// DELETE /api/v1/comments/{comment_id}
+// ============================================================
+
+export interface CommentUser {
+  id: string;
+  username: string;
+  avatar_url: string | null;
+}
+
+export interface CommentResponse {
+  id: string;
+  post_id: string;
+  user_id: string;
+  content: string;
+  user: CommentUser;
+  created_at: string;
+  updated_at: string;
+  parent_id: string | null;
+  replies?: CommentResponse[];
+}
+
+export interface CreateCommentDto {
+  content: string;
+  parent_id?: string;
+}
+
+export interface UpdateCommentDto {
+  content: string;
+}
+
+// ============================================================
+// Vote API Types
+// GET /api/v1/solutions/{solution_id}/votes - Get vote stats
+// POST /api/v1/solutions/{solution_id}/votes - Create vote
+// DELETE /api/v1/solutions/{solution_id}/votes - Delete vote
+// ============================================================
+
+export type VoteType = "accurate" | "different";
+
+export interface VoteStatsResponse {
+  solution_id: string;
+  accurate_count: number;
+  different_count: number;
+  total_count: number;
+  accuracy_rate: number; // 0.0 ~ 1.0
+}
+
+export interface CreateVoteDto {
+  vote_type: VoteType;
+}
+
+export interface VoteResponse {
+  id: string;
+  solution_id: string;
+  user_id: string;
+  vote_type: VoteType;
+  created_at: string;
+}
+
+// ============================================================
+// Adopt API Types
+// POST /api/v1/solutions/{solution_id}/adopt - Adopt solution
+// DELETE /api/v1/solutions/{solution_id}/adopt - Unadopt solution
+// ============================================================
+
+export type MatchType = "perfect" | "close";
+
+export interface AdoptSolutionDto {
+  match_type: MatchType;
+}
+
+export interface UpdatedSpotInfo {
+  spot_id: string;
+  updated_fields: string[];
+}
+
+export interface AdoptResponse {
+  solution_id: string;
+  is_adopted: boolean;
+  match_type: string;
+  adopted_at: string;
+  updated_spot: UpdatedSpotInfo | null;
+}

@@ -11,22 +11,22 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Milestone:** v1.1 Full API Integration
 **Structure:** Phase 6 Complete → Tracks A-D (Parallel)
-**Status:** Track A complete
-**Last activity:** 2026-01-29 - Completed A-03-PLAN.md execution
+**Status:** Tracks A+B complete, C+D pending
+**Last activity:** 2026-01-29 - Track A+B merged to dev
 
 ### Execution Flow
 
 ```
 1. Phase 6 (Main Branch) ─── COMPLETE ✓
    │
-   └─ Ready to create 4 worktrees:
-      ├── Track A: Content CRUD
-      ├── Track B: Engagement
-      ├── Track C: Gamification
-      └── Track D: Monetization
+   └─ Parallel Tracks:
+      ├── Track A: Content CRUD      - Not started
+      ├── Track B: Engagement        - COMPLETE ✓
+      ├── Track C: Gamification      - Not started
+      └── Track D: Monetization      - Not started
 ```
 
-**Progress:** ███ (100% - 3 of 3 plans complete)
+**Track B Progress:** ██████████ (100% - 2 of 2 plans complete)
 
 ## Milestones
 
@@ -43,12 +43,12 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 |-------|-------|--------|
 | Phase 6: API Foundation & Profile | 3/3 | **Complete** (06-03 verification pending) |
 
-### Parallel Tracks (Ready to Start)
+### Parallel Tracks
 
 | Track | Worktree | Plans | Status |
 |-------|----------|-------|--------|
-| A: Content CRUD | `feature/track-a-content` | 3/3 | **Complete** |
-| B: Engagement | `../decoded-track-b` | 0/2 | Ready |
+| A: Content CRUD | `../decoded-track-a` | 3/3 | **Complete** |
+| B: Engagement | `../decoded-track-b` | 2/2 | **Complete** |
 | C: Gamification | `../decoded-track-c` | 0/2 | Ready |
 | D: Monetization | `../decoded-track-d` | 0/3 | Ready |
 
@@ -70,6 +70,10 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 - **Points Mapping (06-02):** Map API points to earnings until Track C implements full gamification
 - **API Proxy (06-03):** Use Next.js API routes to proxy backend calls, avoiding CORS
 - **Dual State Sync (06-03):** React Query cache + Zustand store for immediate UI updates
+- **Vote Stats Cache (B-01):** Vote stats have 30s staleTime (more frequent changes than profile)
+- **Vote Mutations (B-01):** All vote/adopt mutations invalidate vote stats cache for immediate UI feedback
+- **Comment Access (B-02):** Comments are public (fetch), create/update/delete require auth
+- **Optimistic Updates (B-02):** Mutation hooks use recursive transformations for nested replies
 
 ### Decisions Made (Track A - Content CRUD)
 - **Cache Strategy (A-01, A-02, A-03):** Use optimistic updates in mutation hooks for immediate UI feedback
@@ -95,7 +99,7 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Session Continuity
 
 **Last session:** 2026-01-29
-**Stopped at:** Completed Track A (A-03-PLAN.md execution)
+**Stopped at:** Tracks A+B complete, merging to dev
 **Resume file:** None
 
 ## Worktree Commands
@@ -131,4 +135,4 @@ git worktree remove ../decoded-track-d
 
 ---
 
-*Last updated: 2026-01-29 after Track A completion*
+*Last updated: 2026-01-29 after Track A+B completion*
