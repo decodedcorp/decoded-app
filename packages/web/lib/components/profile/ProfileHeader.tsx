@@ -11,14 +11,22 @@ function getInitials(name: string): string {
   return name.charAt(0).toUpperCase();
 }
 
-export function ProfileHeader() {
+interface ProfileHeaderProps {
+  onEditClick?: () => void;
+}
+
+export function ProfileHeader({ onEditClick }: ProfileHeaderProps) {
   const user = useProfileStore(selectUser);
   const router = useRouter();
   const { logout, isLoading } = useAuthStore();
 
   const handleSettingsClick = () => {
-    console.log("Navigate to /profile/settings - not yet implemented");
-    alert("설정 페이지는 아직 구현되지 않았습니다.");
+    if (onEditClick) {
+      onEditClick();
+    } else {
+      console.log("Navigate to /profile/settings - not yet implemented");
+      alert("설정 페이지는 아직 구현되지 않았습니다.");
+    }
   };
 
   const handleLogout = async () => {

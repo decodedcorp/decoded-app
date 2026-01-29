@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "motion/react";
 import { Header } from "@/lib/components";
 import {
@@ -8,6 +9,7 @@ import {
   BadgeGrid,
   RankingList,
   BadgeModal,
+  ProfileEditModal,
 } from "@/lib/components/profile";
 
 function ViewAllActivityButton() {
@@ -33,6 +35,8 @@ function ViewAllActivityButton() {
 }
 
 export default function ProfilePage() {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-0">
       {/* Header */}
@@ -42,7 +46,7 @@ export default function ProfilePage() {
       <main className="pt-16 md:pt-20 px-4 md:px-8">
         <div className="max-w-4xl mx-auto space-y-4 md:space-y-6 py-6">
           {/* Profile Header */}
-          <ProfileHeader />
+          <ProfileHeader onEditClick={() => setIsEditModalOpen(true)} />
 
           {/* Stats Cards */}
           <StatsCards />
@@ -60,6 +64,12 @@ export default function ProfilePage() {
 
       {/* Badge Modal (Portal) */}
       <BadgeModal />
+
+      {/* Profile Edit Modal */}
+      <ProfileEditModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+      />
     </div>
   );
 }
