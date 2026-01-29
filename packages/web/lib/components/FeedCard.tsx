@@ -223,7 +223,9 @@ export const FeedCard = memo(
                   )}
                 />
                 {engagement.likeCount > 0 && (
-                  <span className="text-xs font-medium">{engagement.likeCount}</span>
+                  <span className="text-xs font-medium">
+                    {engagement.likeCount}
+                  </span>
                 )}
               </button>
 
@@ -235,7 +237,9 @@ export const FeedCard = memo(
               >
                 <MessageCircle className="h-5 w-5 hover:scale-110 transition-transform" />
                 {engagement.commentCount > 0 && (
-                  <span className="text-xs font-medium">{engagement.commentCount}</span>
+                  <span className="text-xs font-medium">
+                    {engagement.commentCount}
+                  </span>
                 )}
               </button>
 

@@ -123,7 +123,10 @@ export default function ProfilePage() {
               <RankingList />
               {/* Activity Tabs */}
               <div className="bg-card rounded-xl border border-border overflow-hidden">
-                <ActivityTabs activeTab={activeTab} onTabChange={setActiveTab} />
+                <ActivityTabs
+                  activeTab={activeTab}
+                  onTabChange={setActiveTab}
+                />
                 <ActivityContent activeTab={activeTab} className="p-6">
                   {renderTabContent()}
                 </ActivityContent>

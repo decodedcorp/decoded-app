@@ -32,9 +32,7 @@ export function ActivityTabs({
             className={cn(
               "relative px-4 py-3 text-sm font-medium transition-colors",
               "hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-              activeTab === tab.id
-                ? "text-foreground"
-                : "text-muted-foreground"
+              activeTab === tab.id ? "text-foreground" : "text-muted-foreground"
             )}
             aria-selected={activeTab === tab.id}
             role="tab"
