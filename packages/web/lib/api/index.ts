@@ -29,3 +29,15 @@ export {
   fetchUserById,
   fetchUserActivities,
 } from "./users";
+
+// Comment APIs
+export * from "./comments";
+
+// Vote and Adopt APIs
+export {
+  fetchVoteStats,
+  createVote,
+  deleteVote,
+  adoptSolution,
+  unadoptSolution,
+} from "./votes";
