@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "motion/react";
+import { Card, CardContent } from "@/lib/design-system";
+import { cn } from "@/lib/utils";
 
 export interface StyleCardData {
   id: string;
@@ -50,14 +53,28 @@ export function StyleCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className={`group ${sizeClasses[variant]}`}
+      className={cn("group", sizeClasses[variant])}
     >
       <Link href={data.link} className="block h-full">
-        <div className="h-full flex flex-col bg-card rounded-2xl overflow-hidden border border-border hover:shadow-lg transition-shadow">
+        <Card
+          variant="default"
+          size="sm"
+          interactive
+          className="h-full flex flex-col overflow-hidden"
+        >
           {/* Image */}
-          <div className={`relative ${aspectClasses[variant]} bg-muted`}>
-            {/* Placeholder gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-muted via-card to-muted" />
+          <div className={cn("relative bg-muted", aspectClasses[variant])}>
+            {data.imageUrl ? (
+              <Image
+                src={data.imageUrl}
+                alt={data.title}
+                fill
+                sizes="(max-width: 768px) 50vw, 25vw"
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-br from-muted via-card to-muted" />
+            )}
 
             {/* Item Labels Overlay */}
             {showItems && data.items && data.items.length > 0 && (
@@ -80,7 +97,7 @@ export function StyleCard({
           </div>
 
           {/* Content */}
-          <div className="flex-1 p-4">
+          <CardContent className="flex-1 p-4">
             <h3 className="text-base font-semibold text-foreground mb-1 line-clamp-1">
               {data.title}
             </h3>
@@ -88,8 +105,8 @@ export function StyleCard({
               {data.description}
             </p>
             <p className="text-xs text-muted-foreground">{data.artistName}</p>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </Link>
     </motion.div>
   );
