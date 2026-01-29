@@ -6,8 +6,11 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 
 **v1.0 (2026-01-29 shipped):** 문서화 최적화
 **v1.1 (진행중):** 전체 API 연결 — 백엔드 API를 프론트엔드에 연결하여 실제 데이터로 동작
+**v2.0 (계획됨):** 디자인 오버홀 — decoded.pen 디자인을 코드로 구현
 
-## Current Milestone: v1.1 Full API Integration
+## Active Milestones
+
+### v1.1 Full API Integration (진행중)
 
 **Goal:** 백엔드에 구현된 모든 API를 프론트엔드에 연결하여 완전한 기능 제공
 
@@ -19,6 +22,19 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 - 랭킹 시스템 (글로벌, 카테고리별)
 - 배지 시스템 (획득 배지 표시)
 - 수익 대시보드 (클릭 통계, 정산)
+
+### v2.0 Design Overhaul (계획됨, 병렬 진행)
+
+**Goal:** decoded.pen 디자인을 Pencil MCP로 코드로 변환하여 디자인-코드 일관성 확보
+
+**Target features:**
+- 디자인 시스템 컴포넌트 (Buttons, Cards, Inputs, Tags, Typography)
+- 데스크탑 인프라 (Header, Footer, Sidebar, Layouts)
+- 8개 페이지 (Home, Feed, Profile, Search, Image Detail, Request Flow, Explore, Login)
+- 모바일 + 데스크탑 반응형 레이아웃
+- 문서 업데이트 (docs, specs, codebase)
+
+**Branch:** `feature/v2-design-overhaul` (v1.1과 별도 브랜치)
 
 ## Core Value
 
@@ -94,6 +110,8 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 
 | Supabase MCP 연결 | API 탐색 및 타입 생성 용이 | — Pending |
 
+| Pencil MCP로 디자인 → 코드 | decoded.pen 디자인 시스템 구현 | — Pending |
+
 ---
 
-*Last updated: 2026-01-29 after v1.1 milestone start*
+*Last updated: 2026-01-29 after v2.0 milestone creation*
