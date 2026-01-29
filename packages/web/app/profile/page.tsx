@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { motion } from "motion/react";
+import { ArrowLeft, Settings } from "lucide-react";
+import Link from "next/link";
 import { Header } from "@/lib/components";
 import {
   ProfileHeader,
@@ -10,6 +12,7 @@ import {
   RankingList,
   BadgeModal,
   ProfileEditModal,
+  ProfileDesktopLayout,
 } from "@/lib/components/profile";
 
 function ViewAllActivityButton() {
@@ -39,33 +42,55 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-0">
-      {/* Header */}
-      <Header />
+      {/* Mobile Header - back button + title + settings */}
+      <header className="md:hidden flex items-center justify-between px-4 py-3 border-b border-border bg-background sticky top-0 z-10">
+        <Link href="/" className="p-2 -ml-2 hover:bg-accent rounded-lg">
+          <ArrowLeft className="w-5 h-5" />
+        </Link>
+        <h1 className="font-semibold text-lg">Profile</h1>
+        <button
+          onClick={() => setIsEditModalOpen(true)}
+          className="p-2 -mr-2 hover:bg-accent rounded-lg"
+        >
+          <Settings className="w-5 h-5" />
+        </button>
+      </header>
 
-      {/* Main Content */}
-      <main className="pt-16 md:pt-20 px-4 md:px-8">
-        <div className="max-w-4xl mx-auto space-y-4 md:space-y-6 py-6">
-          {/* Profile Header */}
-          <ProfileHeader onEditClick={() => setIsEditModalOpen(true)} />
+      {/* Desktop Header */}
+      <div className="hidden md:block">
+        <Header />
+      </div>
 
-          {/* Stats Cards */}
-          <StatsCards />
+      {/* Mobile Layout - stacked */}
+      <div className="md:hidden px-4 py-4 space-y-4">
+        <ProfileHeader onEditClick={() => setIsEditModalOpen(true)} />
+        <StatsCards />
+        <BadgeGrid />
+        <RankingList />
+        <ViewAllActivityButton />
+      </div>
 
-          {/* Badge Section */}
-          <BadgeGrid />
+      {/* Desktop Layout - 2 column */}
+      <div className="hidden md:block pt-16">
+        <ProfileDesktopLayout
+          profileSection={
+            <>
+              <ProfileHeader onEditClick={() => setIsEditModalOpen(true)} />
+              {/* Stats are now inside ProfileHeader via ProfileHeaderCard */}
+            </>
+          }
+          activitySection={
+            <>
+              <BadgeGrid />
+              <RankingList />
+              <ViewAllActivityButton />
+            </>
+          }
+        />
+      </div>
 
-          {/* Ranking Section */}
-          <RankingList />
-
-          {/* View All Activity Button */}
-          <ViewAllActivityButton />
-        </div>
-      </main>
-
-      {/* Badge Modal (Portal) */}
+      {/* Modals */}
       <BadgeModal />
-
-      {/* Profile Edit Modal */}
       <ProfileEditModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
