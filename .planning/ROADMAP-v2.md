@@ -76,12 +76,12 @@ Plans:
   3. User sees profile header card with avatar, username, stats, and actions
   4. User sees grid cards in gallery layouts maintaining decoded.pen spacing and proportions
   5. All card hover/press states match design system specifications
-**Plans**: TBD
+**Plans:** 3 plans (2 waves)
 
 Plans:
-- [ ] v2-03-01: Implement base Card component with flexible slots
-- [ ] v2-03-02: Implement ProductCard, ItemCard, and GridCard
-- [ ] v2-03-03: Implement FeedCard and ProfileHeaderCard
+- [ ] v2-03-01-PLAN.md - Base Card component with cva variants, slots, and skeleton [Wave 1]
+- [ ] v2-03-02-PLAN.md - ProductCard, ItemCard, and GridCard [Wave 2]
+- [ ] v2-03-03-PLAN.md - FeedCard and ProfileHeaderCard [Wave 2]
 
 ### v2-Phase 4: Desktop Infrastructure
 **Goal**: Desktop users see responsive layouts with navigation, header, footer, and multi-column structures
