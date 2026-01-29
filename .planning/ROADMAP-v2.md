@@ -59,12 +59,12 @@ Plans:
   3. User can see and interact with category tags (All, Latest, Clothing, Accessories, Shoes, Bags)
   4. User can trigger actions via ActionButton variants (Default, Solid, Outline)
   5. All interactive states (hover, active, disabled, focus) work correctly
-**Plans**: TBD
+**Plans:** 3 plans (1 wave)
 
 Plans:
-- [ ] v2-02-01: Implement Button component with all variants and sizes
-- [ ] v2-02-02: Implement Input and SearchInput components
-- [ ] v2-02-03: Implement Tag and ActionButton components
+- [ ] v2-02-01-PLAN.md - Extend Button with icon sizes and loading state [Wave 1]
+- [ ] v2-02-02-PLAN.md - Create Input and SearchInput components [Wave 1]
+- [ ] v2-02-03-PLAN.md - Create Tag and TagGroup components [Wave 1]
 
 ### v2-Phase 3: Card Components
 **Goal**: All content card types render with decoded.pen styling and maintain existing data bindings
