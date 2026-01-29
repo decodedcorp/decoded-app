@@ -318,3 +318,94 @@ export interface MyBadgesResponse {
   data: EarnedBadgeItem[];
   available_badges: AvailableBadgeItem[];
 }
+
+// ============================================================
+// Rankings API Types
+// GET /api/v1/rankings, GET /api/v1/rankings/me, GET /api/v1/rankings/{category}
+// ============================================================
+
+export type RankingPeriod = 'weekly' | 'monthly' | 'all_time';
+
+export interface RankingUser {
+  id: string;
+  username: string;
+  rank: string | null;
+  avatar_url: string | null;
+}
+
+export interface RankingItem {
+  rank: number;
+  user: RankingUser;
+  total_points: number;
+  weekly_points: number;
+  solution_count: number;
+  adopted_count: number;
+  verified_count: number;
+}
+
+export interface MyRanking {
+  overall_rank: number;
+  total_points: number;
+  weekly_points: number;
+}
+
+export interface PaginationMeta {
+  current_page: number;
+  per_page: number;
+  total_items: number;
+  total_pages: number;
+}
+
+// GET /api/v1/rankings response
+export interface RankingListResponse {
+  data: RankingItem[];
+  my_ranking?: MyRanking;  // Only present for authenticated users
+  pagination: PaginationMeta;
+}
+
+export interface RankingsListParams {
+  period?: RankingPeriod;
+  page?: number;
+  per_page?: number;
+}
+
+// GET /api/v1/rankings/me response
+export interface SolutionStats {
+  total: number;
+  adopted: number;
+  verified: number;
+}
+
+export interface CategoryRank {
+  category_code: string;
+  rank: number;
+  points: number;
+}
+
+export interface MyRankingDetailResponse {
+  overall_rank: number;
+  total_points: number;
+  weekly_points: number;
+  monthly_points: number;
+  solution_stats: SolutionStats;
+  category_rankings: CategoryRank[];
+}
+
+// GET /api/v1/rankings/{category} response
+export interface CategoryRankingItem {
+  rank: number;
+  user: RankingUser;
+  points: number;
+  solution_count: number;
+}
+
+export interface CategoryRankingResponse {
+  category_code: string;
+  data: CategoryRankingItem[];
+  pagination: PaginationMeta;
+}
+
+export interface CategoryRankingsParams {
+  page?: number;
+  per_page?: number;
+}
