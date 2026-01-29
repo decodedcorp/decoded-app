@@ -107,51 +107,51 @@ Deferred to future release.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PROF-01 | TBD | Pending |
-| PROF-02 | TBD | Pending |
-| PROF-03 | TBD | Pending |
-| PROF-04 | TBD | Pending |
-| PROF-05 | TBD | Pending |
-| POST-01 | TBD | Pending |
-| POST-02 | TBD | Pending |
-| SPOT-01 | TBD | Pending |
-| SPOT-02 | TBD | Pending |
-| SPOT-03 | TBD | Pending |
-| SPOT-04 | TBD | Pending |
-| SOLN-01 | TBD | Pending |
-| SOLN-02 | TBD | Pending |
-| SOLN-03 | TBD | Pending |
-| SOLN-04 | TBD | Pending |
-| SOLN-05 | TBD | Pending |
-| SOLN-06 | TBD | Pending |
-| VOTE-01 | TBD | Pending |
-| VOTE-02 | TBD | Pending |
-| VOTE-03 | TBD | Pending |
-| VOTE-04 | TBD | Pending |
-| VOTE-05 | TBD | Pending |
-| CMNT-01 | TBD | Pending |
-| CMNT-02 | TBD | Pending |
-| CMNT-03 | TBD | Pending |
-| CMNT-04 | TBD | Pending |
-| RANK-01 | TBD | Pending |
-| RANK-02 | TBD | Pending |
-| RANK-03 | TBD | Pending |
-| BDGE-01 | TBD | Pending |
-| BDGE-02 | TBD | Pending |
-| BDGE-03 | TBD | Pending |
-| EARN-01 | TBD | Pending |
-| EARN-02 | TBD | Pending |
-| EARN-03 | TBD | Pending |
-| EARN-04 | TBD | Pending |
-| EARN-05 | TBD | Pending |
-| SRCH-01 | TBD | Pending |
-| SRCH-02 | TBD | Pending |
+| PROF-01 | Phase 6 | Pending |
+| PROF-02 | Phase 6 | Pending |
+| PROF-03 | Phase 6 | Pending |
+| PROF-04 | Phase 6 | Pending |
+| PROF-05 | Phase 6 | Pending |
+| POST-01 | Phase 7 | Pending |
+| POST-02 | Phase 7 | Pending |
+| SPOT-01 | Phase 7 | Pending |
+| SPOT-02 | Phase 7 | Pending |
+| SPOT-03 | Phase 7 | Pending |
+| SPOT-04 | Phase 7 | Pending |
+| SOLN-01 | Phase 7 | Pending |
+| SOLN-02 | Phase 7 | Pending |
+| SOLN-03 | Phase 7 | Pending |
+| SOLN-04 | Phase 7 | Pending |
+| SOLN-05 | Phase 7 | Pending |
+| SOLN-06 | Phase 7 | Pending |
+| VOTE-01 | Phase 8 | Pending |
+| VOTE-02 | Phase 8 | Pending |
+| VOTE-03 | Phase 8 | Pending |
+| VOTE-04 | Phase 8 | Pending |
+| VOTE-05 | Phase 8 | Pending |
+| CMNT-01 | Phase 8 | Pending |
+| CMNT-02 | Phase 8 | Pending |
+| CMNT-03 | Phase 8 | Pending |
+| CMNT-04 | Phase 8 | Pending |
+| RANK-01 | Phase 9 | Pending |
+| RANK-02 | Phase 9 | Pending |
+| RANK-03 | Phase 9 | Pending |
+| BDGE-01 | Phase 9 | Pending |
+| BDGE-02 | Phase 9 | Pending |
+| BDGE-03 | Phase 9 | Pending |
+| EARN-01 | Phase 10 | Pending |
+| EARN-02 | Phase 10 | Pending |
+| EARN-03 | Phase 10 | Pending |
+| EARN-04 | Phase 10 | Pending |
+| EARN-05 | Phase 10 | Pending |
+| SRCH-01 | Phase 10 | Pending |
+| SRCH-02 | Phase 10 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 37 total
-- Mapped to phases: 0
-- Unmapped: 37
+- Mapped to phases: 37
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-29*
-*Last updated: 2026-01-29 after initial definition*
+*Last updated: 2026-01-29 after roadmap creation*
