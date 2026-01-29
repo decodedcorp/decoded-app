@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 **Active Milestones:**
-- **v2.0 Design Overhaul** - Phase v2-05 IN PROGRESS (2/3 plans done)
+- **v2.0 Design Overhaul** - Phase v2-05 COMPLETE (3/3 plans done)
 
 **v1.1 Status:** SHIPPED (2026-01-29) - All 4 tracks merged to main
-**v2.0 Status:** Phase v2-05 IN PROGRESS (2/3 plans done)
-**Last activity:** 2026-01-29 - Completed v2-05-02-PLAN.md (Explore Page Category Filters)
+**v2.0 Status:** Phase v2-05 COMPLETE (3/3 plans done)
+**Last activity:** 2026-01-29 - Completed v2-05-03-PLAN.md (Card Component Integration)
 
 ### Execution Flow
 
@@ -32,11 +32,13 @@ v2.0 (feature/v2-design-overhaul):
    │
    ├─ v2-Phase 4: Desktop Infrastructure ─── COMPLETE ✓
    │
-   └─ v2-Phase 5: Home & Explore Pages ─── IN PROGRESS (2/3)
+   ├─ v2-Phase 5: Home & Explore Pages ─── COMPLETE ✓
+   │
+   └─ v2-Phase 6: Feed & Profile Pages ─── NOT STARTED
 ```
 
 **v1.1 Progress:** ██████████ (100% - SHIPPED)
-**v2.0 Progress:** █████░░░░░ (52% - 14 of 27 plans complete)
+**v2.0 Progress:** █████░░░░░ (56% - 15 of 27 plans complete)
 
 ## Milestones
 
@@ -69,7 +71,7 @@ See: .planning/ROADMAP-v2.md
 | v2-2: Core Interactive Components | 3/3 | **Complete** (v2-02-01, v2-02-02, v2-02-03 done) |
 | v2-3: Card Components | 3/3 | **Complete** (v2-03-01, v2-03-02, v2-03-03 done) |
 | v2-4: Desktop Infrastructure | 3/3 | **Complete** (v2-04-01, v2-04-02, v2-04-03 done) |
-| v2-5: Home & Explore Pages | 2/3 | **In Progress** (v2-05-01, v2-05-02 done) |
+| v2-5: Home & Explore Pages | 3/3 | **Complete** (v2-05-01, v2-05-02, v2-05-03 done) |
 | v2-6: Feed & Profile Pages | 0/3 | Not started |
 | v2-7: Search & Image Detail | 0/3 | Not started |
 | v2-8: Request Flow & Login | 0/3 | Not started |
@@ -140,6 +142,9 @@ See: .planning/ROADMAP-v2.md
 - **Section Wrapper Pattern (v2-05-01):** py-10 md:py-16, px-4 md:px-6 lg:px-8, max-w-7xl mx-auto for all sections
 - **Alternating Backgrounds (v2-05-01):** card/background pattern for visual section separation on Home page
 - **Reduced DecodedPickSection Padding (v2-05-01):** Changed from py-20 md:py-32 to py-10 md:py-16 for consistency
+- **Card Component Integration (v2-05-03):** All Home and Explore page cards use design-system Card components for consistent styling
+- **Dedicated Cell Components (v2-05-03):** Extract grid cells into dedicated components (ExploreCardCell pattern) for reusability
+- **FLIP with Custom Wrappers (v2-05-03):** Wrap Card in Link when FLIP animation control needed, use Card's built-in link prop otherwise
 
 ### Open Items
 - v2 deferred: Admin dashboard, real-time notifications
@@ -154,19 +159,18 @@ See: .planning/ROADMAP-v2.md
 ## Session Continuity
 
 **Last session:** 2026-01-29
-**Stopped at:** Completed v2-05-02-PLAN.md (Explore Page Category Filters)
+**Stopped at:** Completed v2-05-03-PLAN.md (Card Component Integration)
 **Resume file:** None
 
 **Next Steps:**
 
 ```bash
-# Phase v2-05: Home & Explore Pages - IN PROGRESS (2/3)
-# Plan v2-05-02: Explore Page Category Filters - COMPLETE ✅
-# Ready for v2-05-02: Explore Page Layouts
+# Phase v2-05: Home & Explore Pages - COMPLETE ✅ (3/3)
+# Phase v2-06: Feed & Profile Pages - NOT STARTED
 git checkout feature/v2-design-overhaul  # 현재 브랜치
-/gsd:execute-phase v2-05 v2-05-02  # Execute plan v2-05-02
+/gsd:discuss-phase v2-06  # Discuss next phase
 # Or test current changes
-npm run dev  # Verify Home page with decoded.pen styling
+npm run dev  # Verify Home and Explore pages with design-system cards
 ```
 
 ### Quick Tasks Completed
