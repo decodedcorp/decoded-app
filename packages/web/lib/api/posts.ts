@@ -5,7 +5,7 @@
  * - Post 생성
  */
 
-import { supabaseBrowserClient } from "@/lib/supabase/client";
+import { apiClient, getAuthToken } from "./client";
 import {
   UploadResponse,
   AnalyzeRequest,
@@ -14,35 +14,9 @@ import {
   CreatePostResponse,
   PostsListResponse,
   PostsListParams,
-  ApiError,
 } from "./types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-
-/**
- * Supabase Auth에서 JWT 토큰 획득
- */
-async function getAuthToken(): Promise<string | null> {
-  const {
-    data: { session },
-  } = await supabaseBrowserClient.auth.getSession();
-  return session?.access_token ?? null;
-}
-
-/**
- * API 에러 처리
- */
-async function handleApiError(response: Response): Promise<never> {
-  let errorData: ApiError;
-
-  try {
-    errorData = await response.json();
-  } catch {
-    errorData = { message: `HTTP ${response.status}: ${response.statusText}` };
-  }
-
-  throw new Error(errorData.message || `API Error: ${response.status}`);
-}
 
 // ============================================================
 // Image Upload
@@ -99,19 +73,12 @@ export async function uploadImage({
 export async function analyzeImage(imageUrl: string): Promise<AnalyzeResponse> {
   const request: AnalyzeRequest = { image_url: imageUrl };
 
-  const response = await fetch(`${API_BASE_URL}/api/v1/posts/analyze`, {
+  return apiClient<AnalyzeResponse>({
+    path: "/api/v1/posts/analyze",
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(request),
+    body: request,
+    requiresAuth: false,
   });
-
-  if (!response.ok) {
-    await handleApiError(response);
-  }
-
-  return response.json();
 }
 
 // ============================================================
@@ -123,26 +90,12 @@ export async function analyzeImage(imageUrl: string): Promise<AnalyzeResponse> {
 export async function createPost(
   request: CreatePostRequest
 ): Promise<CreatePostResponse> {
-  const token = await getAuthToken();
-
-  if (!token) {
-    throw new Error("로그인이 필요합니다.");
-  }
-
-  const response = await fetch(`${API_BASE_URL}/api/v1/posts`, {
+  return apiClient<CreatePostResponse>({
+    path: "/api/v1/posts",
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(request),
+    body: request,
+    requiresAuth: true,
   });
-
-  if (!response.ok) {
-    await handleApiError(response);
-  }
-
-  return response.json();
 }
 
 // ============================================================
@@ -181,18 +134,11 @@ export async function fetchPosts(
 ): Promise<PostsListResponse> {
   const queryString = buildPostsQueryString(params);
 
-  const response = await fetch(`${API_BASE_URL}/api/v1/posts${queryString}`, {
+  return apiClient<PostsListResponse>({
+    path: `/api/v1/posts${queryString}`,
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    requiresAuth: false,
   });
-
-  if (!response.ok) {
-    await handleApiError(response);
-  }
-
-  return response.json();
 }
 
 /**

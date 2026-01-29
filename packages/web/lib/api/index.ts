@@ -3,6 +3,10 @@
  * Re-export all API functions and types
  */
 
+// Client
+export { apiClient, getAuthToken } from "./client";
+export type { ApiClientOptions } from "./client";
+
 // Types
 export * from "./types";
 
