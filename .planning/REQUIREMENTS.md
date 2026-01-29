@@ -53,15 +53,15 @@
 
 ### Rankings
 
-- [ ] **RANK-01**: 글로벌 랭킹 조회 (GET /rankings)
-- [ ] **RANK-02**: 내 랭킹 조회 (GET /rankings/me)
-- [ ] **RANK-03**: 카테고리별 랭킹 조회 (GET /rankings/{category})
+- [x] **RANK-01**: 글로벌 랭킹 조회 (GET /rankings) ✓
+- [x] **RANK-02**: 내 랭킹 조회 (GET /rankings/me) ✓
+- [x] **RANK-03**: 카테고리별 랭킹 조회 (GET /rankings/{category}) ✓
 
 ### Badges
 
-- [ ] **BDGE-01**: 전체 배지 목록 (GET /badges)
-- [ ] **BDGE-02**: 내 배지 목록 (GET /badges/me)
-- [ ] **BDGE-03**: 배지 상세 조회 (GET /badges/{badge_id})
+- [x] **BDGE-01**: 전체 배지 목록 (GET /badges) ✓
+- [x] **BDGE-02**: 내 배지 목록 (GET /badges/me) ✓
+- [x] **BDGE-03**: 배지 상세 조회 (GET /badges/{badge_id}) ✓
 
 ### Earnings
 
@@ -146,16 +146,16 @@ Deferred to future release.
 | CMNT-03 | Pending |
 | CMNT-04 | Pending |
 
-### Track C: Gamification (Worktree)
+### Track C: Gamification (Worktree) ✓ Complete
 
 | Requirement | Status |
 |-------------|--------|
-| RANK-01 | Pending |
-| RANK-02 | Pending |
-| RANK-03 | Pending |
-| BDGE-01 | Pending |
-| BDGE-02 | Pending |
-| BDGE-03 | Pending |
+| RANK-01 | Complete |
+| RANK-02 | Complete |
+| RANK-03 | Complete |
+| BDGE-01 | Complete |
+| BDGE-02 | Complete |
+| BDGE-03 | Complete |
 
 ### Track D: Monetization & Search (Worktree)
 
@@ -179,4 +179,4 @@ Deferred to future release.
 
 ---
 *Requirements defined: 2026-01-29*
-*Last updated: 2026-01-29 after parallel track restructure*
+*Last updated: 2026-01-29 after Track C completion*

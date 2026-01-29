@@ -39,7 +39,7 @@ See archived roadmap for v1.0 phase details.
 #### Parallel Tracks (Git Worktrees) - After Phase 6
 - [ ] **Track A: Content CRUD** - Posts, Spots, Solutions (worktree: `decoded-track-a`)
 - [ ] **Track B: Engagement** - Votes, Comments (worktree: `decoded-track-b`)
-- [ ] **Track C: Gamification** - Rankings, Badges (worktree: `decoded-track-c`)
+- [x] **Track C: Gamification** - Rankings, Badges (worktree: `decoded-track-c`) ✓ Complete
 - [ ] **Track D: Monetization & Search** - Earnings, Search (worktree: `decoded-track-d`)
 
 ## Phase Details
@@ -120,9 +120,9 @@ Plans:
   4. User can view all available badges
   5. User can see their earned badges on profile
 
-**Plans:** 2 plans (1 wave)
-- [ ] C-01-PLAN.md - Rankings display (types, API, hooks, proxy routes) [Wave 1]
-- [ ] C-02-PLAN.md - Badge system integration (types, API, hooks, proxy routes) [Wave 1]
+**Plans:** 2 plans (1 wave) ✓ Complete
+- [x] C-01-PLAN.md - Rankings display (types, API, hooks, proxy routes) [Wave 1]
+- [x] C-02-PLAN.md - Badge system integration (types, API, hooks, proxy routes) [Wave 1]
 
 ---
 
@@ -166,7 +166,7 @@ Plans:
 |-------|----------|--------|-------|--------|
 | A. Content CRUD | `../decoded-track-a` | `feature/track-a-content` | 0/3 | **Ready** |
 | B. Engagement | `../decoded-track-b` | `feature/track-b-engagement` | 0/2 | **Ready** |
-| C. Gamification | `../decoded-track-c` | `feature/track-c-gamification` | 2/2 | **Planned** |
+| C. Gamification | `../decoded-track-c` | `feature/track-c-gamification` | 2/2 | **Complete** ✓ |
 | D. Monetization | `../decoded-track-d` | `feature/track-d-monetization` | 0/3 | **Ready** |
 
 ## Worktree Setup (After Phase 6)
@@ -199,4 +199,4 @@ git merge feature/track-d-monetization
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-01-29 (Phase 6 planned)*
+*Last updated: 2026-01-29 (Track C complete)*
