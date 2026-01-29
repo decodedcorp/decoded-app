@@ -29,3 +29,9 @@ export {
   fetchUserById,
   fetchUserActivities,
 } from "./users";
+
+// Clicks API
+export { fetchClickStats, recordClick } from "./clicks";
+
+// Earnings API
+export { fetchEarnings } from "./earnings";
