@@ -11,6 +11,7 @@ import {
 import type { FeedCardItem } from "@/lib/components/FeedCard";
 import { useFilterStore } from "@/lib/stores/filterStore";
 import { useSearchStore } from "@/lib/stores/searchStore";
+import { FeedHeader } from "@/lib/components/feed";
 
 type Props = {
   initialImages: ImageRow[];
@@ -96,8 +97,13 @@ export function FeedClient({ initialImages: _initialImages }: Props) {
   // Loading state: show skeleton feed (only on initial load)
   if (isLoading && !data) {
     return (
-      <div className="absolute inset-0 z-0 pt-14 pb-16 md:pt-4 md:pb-0">
-        <VerticalFeedSkeleton />
+      <div className="flex flex-col h-full">
+        <FeedHeader />
+        <div className="flex-1 relative">
+          <div className="h-full">
+            <VerticalFeedSkeleton />
+          </div>
+        </div>
       </div>
     );
   }
@@ -105,24 +111,29 @@ export function FeedClient({ initialImages: _initialImages }: Props) {
   // Error state: show error message with retry button
   if (isError) {
     return (
-      <div className="absolute inset-0 z-0 flex items-center justify-center pt-14 pb-16 md:pt-4 md:pb-0">
-        <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
-          <div className="mb-4 text-4xl">Warning</div>
-          <h2 className="mb-2 text-xl font-semibold text-foreground">
-            Failed to load images
-          </h2>
-          <p className="mb-6 text-sm text-muted-foreground">
-            {error instanceof Error
-              ? error.message
-              : "Something went wrong while loading images."}
-          </p>
-          <button
-            onClick={() => refetch()}
-            className="rounded-full border border-border bg-card/80 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
-            type="button"
-          >
-            Retry
-          </button>
+      <div className="flex flex-col h-full">
+        <FeedHeader />
+        <div className="flex-1 relative">
+          <div className="h-full flex items-center justify-center">
+            <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
+              <div className="mb-4 text-4xl">Warning</div>
+              <h2 className="mb-2 text-xl font-semibold text-foreground">
+                Failed to load images
+              </h2>
+              <p className="mb-6 text-sm text-muted-foreground">
+                {error instanceof Error
+                  ? error.message
+                  : "Something went wrong while loading images."}
+              </p>
+              <button
+                onClick={() => refetch()}
+                className="rounded-full border border-border bg-card/80 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+                type="button"
+              >
+                Retry
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -141,42 +152,47 @@ export function FeedClient({ initialImages: _initialImages }: Props) {
     };
 
     return (
-      <div className="absolute inset-0 z-0 flex items-center justify-center pt-14 pb-16 md:pt-4 md:pb-0">
-        <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-            <svg
-              className="h-8 w-8 text-muted-foreground"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={1.5}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-              />
-            </svg>
+      <div className="flex flex-col h-full">
+        <FeedHeader />
+        <div className="flex-1 relative">
+          <div className="h-full flex items-center justify-center">
+            <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+                <svg
+                  className="h-8 w-8 text-muted-foreground"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                  />
+                </svg>
+              </div>
+              <h2 className="mb-2 text-xl font-semibold text-foreground">
+                {hasFiltersApplied
+                  ? "검색 결과가 없습니다"
+                  : "아직 이미지가 없습니다"}
+              </h2>
+              <p className="mb-6 text-sm text-muted-foreground">
+                {hasFiltersApplied
+                  ? "다른 검색어나 필터를 사용해보세요."
+                  : "나중에 다시 확인해주세요."}
+              </p>
+              {hasFiltersApplied && (
+                <button
+                  onClick={handleResetFilters}
+                  className="rounded-full border border-border bg-card/80 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+                  type="button"
+                >
+                  필터 초기화
+                </button>
+              )}
+            </div>
           </div>
-          <h2 className="mb-2 text-xl font-semibold text-foreground">
-            {hasFiltersApplied
-              ? "검색 결과가 없습니다"
-              : "아직 이미지가 없습니다"}
-          </h2>
-          <p className="mb-6 text-sm text-muted-foreground">
-            {hasFiltersApplied
-              ? "다른 검색어나 필터를 사용해보세요."
-              : "나중에 다시 확인해주세요."}
-          </p>
-          {hasFiltersApplied && (
-            <button
-              onClick={handleResetFilters}
-              className="rounded-full border border-border bg-card/80 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
-              type="button"
-            >
-              필터 초기화
-            </button>
-          )}
         </div>
       </div>
     );
@@ -184,13 +200,18 @@ export function FeedClient({ initialImages: _initialImages }: Props) {
 
   // Success state: show vertical feed with actual images
   return (
-    <div className="absolute inset-0 z-0 pt-14 pb-16 md:pt-4 md:pb-0">
-      <VerticalFeed
-        items={feedItems}
-        onReachEnd={handleReachEnd}
-        hasMore={!!hasNextPage}
-        isLoadingMore={isFetchingNextPage}
-      />
+    <div className="flex flex-col h-full">
+      <FeedHeader />
+      <div className="flex-1 relative">
+        <div className="h-full">
+          <VerticalFeed
+            items={feedItems}
+            onReachEnd={handleReachEnd}
+            hasMore={!!hasNextPage}
+            isLoadingMore={isFetchingNextPage}
+          />
+        </div>
+      </div>
     </div>
   );
 }
