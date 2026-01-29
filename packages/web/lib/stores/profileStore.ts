@@ -4,6 +4,7 @@
  */
 
 import { create } from "zustand";
+import type { UserResponse, UserStatsResponse } from "@/lib/api/types";
 
 // Types
 export interface ProfileUser {
@@ -147,6 +148,10 @@ interface ProfileState {
   // Actions
   openBadgeModal: (mode: "single" | "all", badge?: Badge) => void;
   closeBadgeModal: () => void;
+
+  // New actions for API sync
+  setUserFromApi: (apiUser: UserResponse) => void;
+  setStatsFromApi: (apiStats: UserStatsResponse) => void;
 }
 
 export const useProfileStore = create<ProfileState>((set) => ({
@@ -172,6 +177,29 @@ export const useProfileStore = create<ProfileState>((set) => ({
     set({
       badgeModalMode: null,
       selectedBadge: null,
+    });
+  },
+
+  setUserFromApi: (apiUser) => {
+    set({
+      user: {
+        id: apiUser.id,
+        displayName: apiUser.display_name || apiUser.username,
+        username: `@${apiUser.username}`,
+        avatarUrl: apiUser.avatar_url || undefined,
+        bio: apiUser.bio || undefined,
+      },
+    });
+  },
+
+  setStatsFromApi: (apiStats) => {
+    set({
+      stats: {
+        totalContributions: apiStats.total_posts,
+        totalAnswers: apiStats.total_comments,
+        totalAccepted: apiStats.total_likes_received,
+        totalEarnings: apiStats.total_points, // Map points to earnings display
+      },
     });
   },
 }));
