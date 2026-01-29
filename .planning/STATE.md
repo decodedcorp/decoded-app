@@ -11,8 +11,8 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Milestone:** v1.1 Full API Integration
 **Structure:** Phase 6 Complete → Tracks A-D (Parallel)
-**Status:** Phase 6 complete, ready for parallel tracks
-**Last activity:** 2026-01-29 - Completed Phase 6 (06-03 verification pending)
+**Status:** Track C in progress - C-02 complete
+**Last activity:** 2026-01-29 - Completed C-02 Badge System Integration
 
 ### Execution Flow
 
@@ -49,7 +49,7 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 |-------|----------|-------|--------|
 | A: Content CRUD | `../decoded-track-a` | 0/3 | Ready |
 | B: Engagement | `../decoded-track-b` | 0/2 | Ready |
-| C: Gamification | `../decoded-track-c` | 0/2 | Ready |
+| C: Gamification | `../decoded-track-c` | 2/4 | **In Progress** |
 | D: Monetization | `../decoded-track-d` | 0/3 | Ready |
 
 ## Accumulated Context
@@ -70,6 +70,8 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 - **Points Mapping (06-02):** Map API points to earnings until Track C implements full gamification
 - **API Proxy (06-03):** Use Next.js API routes to proxy backend calls, avoiding CORS
 - **Dual State Sync (06-03):** React Query cache + Zustand store for immediate UI updates
+- **Badge API Public Access (C-02):** Badge list and details are public, only /me requires auth
+- **Badge Data Transformation (C-02):** transformToUnifiedBadges helper merges earned/available badges for UI
 
 ### Pending Verification
 - **06-03 Profile Edit:** Code complete, verification blocked by backend DB error
@@ -88,8 +90,8 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Session Continuity
 
 **Last session:** 2026-01-29
-**Stopped at:** Phase 6 complete
-**Resume file:** None - ready for parallel tracks
+**Stopped at:** Track C - Completed C-02 Badge System Integration
+**Resume file:** None - Track C in progress
 
 ## Worktree Commands
 
