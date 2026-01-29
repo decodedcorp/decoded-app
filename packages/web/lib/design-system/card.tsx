@@ -1,6 +1,6 @@
-import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@/lib/utils';
-import { forwardRef } from 'react';
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
+import { forwardRef } from "react";
 
 /**
  * Card Variants
@@ -11,28 +11,28 @@ import { forwardRef } from 'react';
  * @see docs/design-system/decoded.pen
  */
 export const cardVariants = cva(
-  'rounded-lg transition-shadow', // Base styles for all cards
+  "rounded-lg transition-shadow", // Base styles for all cards
   {
     variants: {
       variant: {
-        default: 'bg-card border border-border shadow-sm',
-        elevated: 'bg-card border border-border shadow-md',
-        outline: 'bg-card border-2 border-border',
-        ghost: 'bg-transparent',
+        default: "bg-card border border-border shadow-sm",
+        elevated: "bg-card border border-border shadow-md",
+        outline: "bg-card border-2 border-border",
+        ghost: "bg-transparent",
       },
       size: {
-        sm: 'p-3',
-        md: 'p-4',
-        lg: 'p-6',
+        sm: "p-3",
+        md: "p-4",
+        lg: "p-6",
       },
       interactive: {
-        true: 'cursor-pointer hover:shadow-lg',
-        false: '',
+        true: "cursor-pointer hover:shadow-lg",
+        false: "",
       },
     },
     defaultVariants: {
-      variant: 'default',
-      size: 'md',
+      variant: "default",
+      size: "md",
       interactive: false,
     },
   }
@@ -74,9 +74,9 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
   }
 );
 
-Card.displayName = 'Card';
+Card.displayName = "Card";
 
-export interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type CardHeaderProps = React.HTMLAttributes<HTMLDivElement>;
 
 /**
  * CardHeader Component
@@ -93,16 +93,20 @@ export interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
 export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
   ({ className, children, ...props }, ref) => {
     return (
-      <div ref={ref} className={cn('flex flex-col space-y-1.5 pb-4', className)} {...props}>
+      <div
+        ref={ref}
+        className={cn("flex flex-col space-y-1.5 pb-4", className)}
+        {...props}
+      >
         {children}
       </div>
     );
   }
 );
 
-CardHeader.displayName = 'CardHeader';
+CardHeader.displayName = "CardHeader";
 
-export interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type CardContentProps = React.HTMLAttributes<HTMLDivElement>;
 
 /**
  * CardContent Component
@@ -117,16 +121,16 @@ export interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {
 export const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
   ({ className, children, ...props }, ref) => {
     return (
-      <div ref={ref} className={cn('flex-1', className)} {...props}>
+      <div ref={ref} className={cn("flex-1", className)} {...props}>
         {children}
       </div>
     );
   }
 );
 
-CardContent.displayName = 'CardContent';
+CardContent.displayName = "CardContent";
 
-export interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type CardFooterProps = React.HTMLAttributes<HTMLDivElement>;
 
 /**
  * CardFooter Component
@@ -143,20 +147,24 @@ export interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
 export const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
   ({ className, children, ...props }, ref) => {
     return (
-      <div ref={ref} className={cn('flex items-center pt-4', className)} {...props}>
+      <div
+        ref={ref}
+        className={cn("flex items-center pt-4", className)}
+        {...props}
+      >
         {children}
       </div>
     );
   }
 );
 
-CardFooter.displayName = 'CardFooter';
+CardFooter.displayName = "CardFooter";
 
 export interface CardSkeletonProps extends VariantProps<typeof cardVariants> {
   showHeader?: boolean;
   showContent?: boolean;
   showFooter?: boolean;
-  aspectRatio?: '4/5' | '1/1' | '16/9';
+  aspectRatio?: "4/5" | "1/1" | "16/9";
   className?: string;
 }
 
@@ -173,8 +181,8 @@ export interface CardSkeletonProps extends VariantProps<typeof cardVariants> {
  * <CardSkeleton showHeader={false} showFooter={false} />
  */
 export const CardSkeleton = ({
-  variant = 'default',
-  size = 'md',
+  variant = "default",
+  size = "md",
   showHeader = true,
   showContent = true,
   showFooter = true,
@@ -182,9 +190,9 @@ export const CardSkeleton = ({
   className,
 }: CardSkeletonProps) => {
   const aspectRatioClasses = {
-    '4/5': 'aspect-[4/5]',
-    '1/1': 'aspect-square',
-    '16/9': 'aspect-video',
+    "4/5": "aspect-[4/5]",
+    "1/1": "aspect-square",
+    "16/9": "aspect-video",
   };
 
   return (
@@ -192,7 +200,7 @@ export const CardSkeleton = ({
       {aspectRatio && (
         <div
           className={cn(
-            'mb-4 animate-pulse rounded-md bg-muted',
+            "mb-4 animate-pulse rounded-md bg-muted",
             aspectRatioClasses[aspectRatio]
           )}
         />
