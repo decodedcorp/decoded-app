@@ -11,8 +11,8 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Milestone:** v1.1 Full API Integration
 **Structure:** Phase 6 Complete → Tracks A-D (Parallel)
-**Status:** Track C in progress - C-02 complete
-**Last activity:** 2026-01-29 - Completed C-02 Badge System Integration
+**Status:** Track C in progress - C-01 complete
+**Last activity:** 2026-01-29 - Completed C-01 Rankings Display
 
 ### Execution Flow
 
@@ -49,7 +49,7 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 |-------|----------|-------|--------|
 | A: Content CRUD | `../decoded-track-a` | 0/3 | Ready |
 | B: Engagement | `../decoded-track-b` | 0/2 | Ready |
-| C: Gamification | `../decoded-track-c` | 2/4 | **In Progress** |
+| C: Gamification | `../decoded-track-c` | 1/4 | **In Progress** |
 | D: Monetization | `../decoded-track-d` | 0/3 | Ready |
 
 ## Accumulated Context
@@ -72,6 +72,8 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 - **Dual State Sync (06-03):** React Query cache + Zustand store for immediate UI updates
 - **Badge API Public Access (C-02):** Badge list and details are public, only /me requires auth
 - **Badge Data Transformation (C-02):** transformToUnifiedBadges helper merges earned/available badges for UI
+- **Rankings Infinite Query (C-01):** Use infinite query for rankings lists (better UX for long leaderboards)
+- **Rankings Public Access (C-01):** Rankings are public, but include my_ranking if authenticated
 
 ### Pending Verification
 - **06-03 Profile Edit:** Code complete, verification blocked by backend DB error
@@ -90,7 +92,7 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Session Continuity
 
 **Last session:** 2026-01-29
-**Stopped at:** Track C - Completed C-02 Badge System Integration
+**Stopped at:** Track C - Completed C-01 Rankings Display
 **Resume file:** None - Track C in progress
 
 ## Worktree Commands
