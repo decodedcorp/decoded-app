@@ -42,12 +42,12 @@ v2.0 transforms the decoded-app UI by implementing the decoded.pen design system
   2. Design tokens file exists with color palette, spacing scale, and breakpoints from decoded.pen
   3. Typography components can be imported and used in any page or component
   4. Base Tailwind configuration extends with custom design tokens
-**Plans**: TBD
+**Plans:** 3 plans (2 waves)
 
 Plans:
-- [ ] v2-01-01: Extract design tokens from decoded.pen (colors, spacing, typography scales)
-- [ ] v2-01-02: Implement typography components and utility classes
-- [ ] v2-01-03: Configure Tailwind with custom design system tokens
+- [ ] v2-01-01-PLAN.md - Extract design tokens from decoded.pen [Wave 1]
+- [ ] v2-01-02-PLAN.md - Implement typography components (Heading, Text) [Wave 2]
+- [ ] v2-01-03-PLAN.md - Configure Tailwind with design system tokens [Wave 2]
 
 ### v2-Phase 2: Core Interactive Components
 **Goal**: Users can interact with all basic UI elements (buttons, inputs, tags) using consistent design system patterns
