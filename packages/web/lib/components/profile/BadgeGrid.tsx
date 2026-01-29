@@ -12,6 +12,7 @@ import {
   Crown,
   Medal,
   Award,
+  Lock,
 } from "lucide-react";
 import {
   useProfileStore,
@@ -40,10 +41,32 @@ interface BadgeItemProps {
   badge: Badge;
   onClick: () => void;
   delay?: number;
+  isLocked?: boolean;
 }
 
-function BadgeItem({ badge, onClick, delay = 0 }: BadgeItemProps) {
+function BadgeItem({ badge, onClick, delay = 0, isLocked = false }: BadgeItemProps) {
   const IconComponent = BADGE_ICONS[badge.icon] || Trophy;
+
+  if (isLocked) {
+    return (
+      <motion.button
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3, delay }}
+        onClick={onClick}
+        className="flex flex-col items-center gap-1 p-3 rounded-xl bg-secondary border border-border hover:bg-secondary/80 transition-colors"
+        aria-label={`${badge.name} badge (locked)`}
+      >
+        <div className="relative">
+          <IconComponent className="w-7 h-7 md:w-8 md:h-8 text-muted-foreground/40" />
+          <Lock className="absolute -bottom-1 -right-1 w-3 h-3 text-muted-foreground" />
+        </div>
+        <span className="text-xs font-medium text-muted-foreground text-center line-clamp-1">
+          {badge.name}
+        </span>
+      </motion.button>
+    );
+  }
 
   return (
     <motion.button
@@ -52,7 +75,7 @@ function BadgeItem({ badge, onClick, delay = 0 }: BadgeItemProps) {
       transition={{ duration: 0.3, delay }}
       onClick={onClick}
       className="flex flex-col items-center gap-1 p-3 rounded-xl bg-accent/30 hover:bg-accent transition-colors"
-      aria-label={`${badge.name} 뱃지`}
+      aria-label={`${badge.name} badge`}
     >
       <IconComponent className="w-7 h-7 md:w-8 md:h-8 text-primary" />
       <span className="text-xs font-medium text-foreground text-center line-clamp-1">
@@ -143,6 +166,9 @@ export function BadgeGrid() {
         <h3 className="text-base md:text-lg font-semibold text-foreground flex items-center gap-2">
           <Trophy className="w-5 h-5 text-primary" />
           My Badges
+          <span className="text-sm text-muted-foreground font-normal">
+            ({badges.length}/{badges.length})
+          </span>
         </h3>
         <button
           onClick={handleViewAllClick}
