@@ -95,7 +95,9 @@ export const FeedCard = forwardRef<HTMLDivElement, FeedCardProps>(
         {...props}
       >
         {/* Image container with aspect ratio */}
-        <div className={cn("relative bg-muted", aspectRatioClasses[aspectRatio])}>
+        <div
+          className={cn("relative bg-muted", aspectRatioClasses[aspectRatio])}
+        >
           {imageUrl ? (
             <Image
               src={imageUrl}

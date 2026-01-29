@@ -85,7 +85,9 @@ export const ProductCard = forwardRef<HTMLDivElement, ProductCardProps>(
         {...props}
       >
         {/* Image Area */}
-        <div className={cn("relative bg-muted", aspectRatioClasses[aspectRatio])}>
+        <div
+          className={cn("relative bg-muted", aspectRatioClasses[aspectRatio])}
+        >
           {imageUrl ? (
             <Image
               src={imageUrl}
@@ -121,7 +123,9 @@ export const ProductCard = forwardRef<HTMLDivElement, ProductCardProps>(
             <div className="flex items-center gap-2 pt-0.5">
               {price !== undefined && (
                 <span className="text-sm font-bold text-foreground">
-                  {typeof price === "number" ? `₩${price.toLocaleString()}` : price}
+                  {typeof price === "number"
+                    ? `₩${price.toLocaleString()}`
+                    : price}
                 </span>
               )}
               {originalPrice !== undefined && (
@@ -184,7 +188,11 @@ export const ProductCardSkeleton = ({
   };
 
   return (
-    <Card variant="default" size="sm" className={cn("overflow-hidden", className)}>
+    <Card
+      variant="default"
+      size="sm"
+      className={cn("overflow-hidden", className)}
+    >
       {/* Image Placeholder */}
       <div
         className={cn(

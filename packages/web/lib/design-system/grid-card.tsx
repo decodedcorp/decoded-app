@@ -85,7 +85,9 @@ export const GridCard = forwardRef<HTMLDivElement, GridCardProps>(
         className={cn("overflow-hidden p-0", className)}
         {...props}
       >
-        <div className={cn("relative bg-muted", aspectRatioClasses[aspectRatio])}>
+        <div
+          className={cn("relative bg-muted", aspectRatioClasses[aspectRatio])}
+        >
           {imageUrl ? (
             <Image
               src={imageUrl}
@@ -149,7 +151,9 @@ export const GridCardSkeleton = ({
     <CardSkeleton
       variant="default"
       size="sm"
-      aspectRatio={aspectRatio === "4/5" ? "4/5" : aspectRatio === "16/9" ? "16/9" : "1/1"}
+      aspectRatio={
+        aspectRatio === "4/5" ? "4/5" : aspectRatio === "16/9" ? "16/9" : "1/1"
+      }
       showHeader={false}
       showContent={false}
       showFooter={false}
