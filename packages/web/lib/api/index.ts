@@ -29,3 +29,17 @@ export {
   fetchUserById,
   fetchUserActivities,
 } from "./users";
+
+// Badge APIs
+export {
+  fetchBadges,
+  fetchMyBadges,
+  fetchBadgeById,
+} from "./badges";
+
+// Ranking APIs
+export {
+  fetchRankings,
+  fetchMyRanking,
+  fetchCategoryRankings,
+} from "./rankings";
