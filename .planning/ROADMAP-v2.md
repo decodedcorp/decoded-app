@@ -26,7 +26,7 @@ v2.0 transforms the decoded-app UI by implementing the decoded.pen design system
 - [x] **v2-Phase 3: Card Components** - All card variants from simple to complex
 - [x] **v2-Phase 4: Desktop Infrastructure** - Header, footer, navigation, layouts
 - [x] **v2-Phase 5: Home & Explore Pages** - Landing and discovery experiences
-- [ ] **v2-Phase 6: Feed & Profile Pages** - Content streams and user profiles
+- [x] **v2-Phase 6: Feed & Profile Pages** - Content streams and user profiles
 - [ ] **v2-Phase 7: Search & Image Detail** - Discovery and detailed views
 - [ ] **v2-Phase 8: Request Flow & Login** - Multi-step flows and authentication
 - [ ] **v2-Phase 9: Documentation & Polish** - Design system docs, final adjustments
@@ -130,9 +130,9 @@ Plans:
 **Plans:** 3 plans (2 waves)
 
 Plans:
-- [ ] v2-06-01-PLAN.md — Feed page with responsive grid and decoded.pen card styling [Wave 1]
-- [ ] v2-06-02-PLAN.md — Profile page with 2-column desktop layout and ProfileHeaderCard [Wave 1]
-- [ ] v2-06-03-PLAN.md — Activity tabs with fade transitions and engagement actions [Wave 2]
+- [x] v2-06-01-PLAN.md — Feed page with responsive grid and decoded.pen card styling [Wave 1]
+- [x] v2-06-02-PLAN.md — Profile page with 2-column desktop layout and ProfileHeaderCard [Wave 1]
+- [x] v2-06-03-PLAN.md — Activity tabs with fade transitions and engagement actions [Wave 2]
 
 ### v2-Phase 7: Search & Image Detail
 **Goal**: Search and detailed content views match decoded.pen design with functional interactions
@@ -202,7 +202,7 @@ v2-Phases execute sequentially: v2-Phase 1 → v2-Phase 2 → ... → v2-Phase 9
 | v2-3. Card Components | 3/3 | **Complete** | 2026-01-29 |
 | v2-4. Desktop Infrastructure | 3/3 | **Complete** | 2026-01-29 |
 | v2-5. Home & Explore Pages | 3/3 | **Complete** | 2026-01-29 |
-| v2-6. Feed & Profile Pages | 0/3 | Not started | - |
+| v2-6. Feed & Profile Pages | 3/3 | **Complete** | 2026-01-29 |
 | v2-7. Search & Image Detail | 0/3 | Not started | - |
 | v2-8. Request Flow & Login | 0/3 | Not started | - |
 | v2-9. Documentation & Polish | 0/3 | Not started | - |
@@ -210,4 +210,4 @@ v2-Phases execute sequentially: v2-Phase 1 → v2-Phase 2 → ... → v2-Phase 9
 ---
 
 *Created: 2026-01-29*
-*Last updated: 2026-01-29 (Phase v2-5 complete)*
+*Last updated: 2026-01-29 (Phase v2-6 complete)*

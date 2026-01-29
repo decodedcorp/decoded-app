@@ -193,14 +193,14 @@ Pencil MCP를 활용하여 decoded.pen 디자인을 React 컴포넌트로 변환
 | HOME-02 | v2-Phase 5 | Pending |
 | HOME-03 | v2-Phase 5 | Pending |
 | HOME-04 | v2-Phase 5 | Pending |
-| FEED-01 | v2-Phase 6 | Pending |
-| FEED-02 | v2-Phase 6 | Pending |
-| FEED-03 | v2-Phase 6 | Pending |
-| FEED-04 | v2-Phase 6 | Pending |
-| PROF-01 | v2-Phase 6 | Pending |
-| PROF-02 | v2-Phase 6 | Pending |
-| PROF-03 | v2-Phase 6 | Pending |
-| PROF-04 | v2-Phase 6 | Pending |
+| FEED-01 | v2-Phase 6 | Complete |
+| FEED-02 | v2-Phase 6 | Complete |
+| FEED-03 | v2-Phase 6 | Complete |
+| FEED-04 | v2-Phase 6 | Complete |
+| PROF-01 | v2-Phase 6 | Complete |
+| PROF-02 | v2-Phase 6 | Complete |
+| PROF-03 | v2-Phase 6 | Complete |
+| PROF-04 | v2-Phase 6 | Complete |
 | SRCH-01 | v2-Phase 7 | Pending |
 | SRCH-02 | v2-Phase 7 | Pending |
 | SRCH-03 | v2-Phase 7 | Pending |
@@ -232,4 +232,4 @@ Pencil MCP를 활용하여 decoded.pen 디자인을 React 컴포넌트로 변환
 
 ---
 *Requirements defined: 2026-01-29*
-*Last updated: 2026-01-29 after v2-Phase 2 completion*
+*Last updated: 2026-01-29 after v2-Phase 6 completion*
