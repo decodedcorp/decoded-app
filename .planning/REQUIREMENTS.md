@@ -65,16 +65,16 @@
 
 ### Earnings
 
-- [ ] **EARN-01**: 클릭 통계 조회 (GET /clicks/stats)
-- [ ] **EARN-02**: 클릭 기록 (POST /clicks)
-- [ ] **EARN-03**: 수익 요약 조회 (GET /earnings)
-- [ ] **EARN-04**: 정산 내역 조회 (GET /settlements)
-- [ ] **EARN-05**: 출금 요청 (POST /settlements/withdraw)
+- [x] **EARN-01**: 클릭 통계 조회 (GET /clicks/stats) ✓
+- [x] **EARN-02**: 클릭 기록 (POST /clicks) ✓
+- [x] **EARN-03**: 수익 요약 조회 (GET /earnings) ✓
+- [x] **EARN-04**: 정산 내역 조회 (GET /settlements) ✓
+- [x] **EARN-05**: 출금 요청 (POST /settlements/withdraw) ✓
 
 ### Search
 
-- [ ] **SRCH-01**: 인기 검색어 조회 (GET /search/popular)
-- [ ] **SRCH-02**: 최근 검색어 조회 (GET /search/recent)
+- [x] **SRCH-01**: 인기 검색어 조회 (GET /search/popular) ✓
+- [x] **SRCH-02**: 최근 검색어 조회 (GET /search/recent) ✓
 
 ## v2 Requirements
 
@@ -157,30 +157,34 @@ Deferred to future release.
 | BDGE-02 | Complete |
 | BDGE-03 | Complete |
 
-### Track D: Monetization & Search (Worktree)
+### Track D: Monetization & Search (Worktree) ✓
 
 | Requirement | Status |
 |-------------|--------|
-| EARN-01 | Pending |
-| EARN-02 | Pending |
-| EARN-03 | Pending |
-| EARN-04 | Pending |
-| EARN-05 | Pending |
-| SRCH-01 | Pending |
-| SRCH-02 | Pending |
+| EARN-01 | **Complete** |
+| EARN-02 | **Complete** |
+| EARN-03 | **Complete** |
+| EARN-04 | **Complete** |
+| EARN-05 | **Complete** |
+| SRCH-01 | **Complete** |
+| SRCH-02 | **Complete** |
 
 **Coverage:**
-- v1.1 requirements: 37 total
+- v1.1 requirements: 37 total (7 complete)
 - Phase 6 (Foundation): 5
 - Track A (Content): 12
 - Track B (Engagement): 9
 - Track C (Gamification): 6
-- Track D (Monetization): 7
+- Track D (Monetization): 7 ✓
 
 ---
 *Requirements defined: 2026-01-29*
 
+
 *Last updated: 2026-01-29 after Track A+B completion*
 
 *Last updated: 2026-01-29 after Track C completion*
+
+
+*Last updated: 2026-01-29 (Track D complete)*
 

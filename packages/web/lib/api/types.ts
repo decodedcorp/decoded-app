@@ -623,3 +623,118 @@ export interface CategoryRankingsParams {
   page?: number;
   per_page?: number;
 }
+
+// ============================================================
+// Popular Search API Types
+// GET /api/v1/search/popular
+// ============================================================
+
+export interface PopularSearchTerm {
+  keyword: string;
+  count: number;
+}
+
+export interface PopularSearchResponse {
+  data: PopularSearchTerm[];
+}
+
+// ============================================================
+// Recent Search API Types
+// GET /api/v1/search/recent
+// DELETE /api/v1/search/recent/{id}
+// ============================================================
+
+export interface RecentSearchTerm {
+  id: string;
+  query: string;
+  searched_at: string;
+}
+
+export interface RecentSearchResponse {
+  data: RecentSearchTerm[];
+}
+
+export interface RecentSearchParams {
+  limit?: number;  // max 20
+}
+
+// ============================================================
+// Click Stats API Types
+// GET /api/v1/clicks/stats
+// ============================================================
+
+export interface MonthlyClickStat {
+  month: string;  // YYYY-MM format
+  clicks: number;
+  unique_clicks: number;
+}
+
+export interface ClickStatsResponse {
+  total_clicks: number;
+  unique_clicks: number;
+  monthly_stats: MonthlyClickStat[];
+}
+
+// ============================================================
+// Record Click API Types
+// POST /api/v1/clicks
+// ============================================================
+
+export interface CreateClickDto {
+  solution_id: string;
+  referrer?: string;
+}
+
+// ============================================================
+// Earnings API Types
+// GET /api/v1/earnings
+// ============================================================
+
+export interface MonthlyEarning {
+  month: string;  // YYYY-MM format
+  earnings: number;
+}
+
+export interface EarningsResponse {
+  total_earnings: number;
+  available_balance: number;
+  pending_settlement: number;
+  monthly_earnings: MonthlyEarning[];
+}
+
+// ============================================================
+// Settlements API Types
+// GET /api/v1/settlements
+// ============================================================
+
+export type SettlementStatus = "pending" | "processing" | "completed" | "failed";
+
+export interface Settlement {
+  id: string;
+  amount: number;
+  currency: string;  // e.g., "KRW"
+  status: SettlementStatus;
+  created_at: string;
+  completed_at?: string;
+}
+
+export interface SettlementsResponse {
+  data: Settlement[];
+}
+
+// ============================================================
+// Withdrawal Request API Types
+// POST /api/v1/settlements/withdraw
+// ============================================================
+
+export interface WithdrawRequest {
+  amount: number;
+  bank_code: string;
+  account_number: string;
+  account_holder: string;
+}
+
+export interface WithdrawResponse {
+  id?: string;
+  message?: string;  // Backend returns error message for unsupported operation
+}

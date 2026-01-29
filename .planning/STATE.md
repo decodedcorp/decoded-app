@@ -12,11 +12,16 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 **Milestone:** v1.1 Full API Integration
 **Structure:** Phase 6 Complete → Tracks A-D (Parallel)
 
+
 **Status:** Tracks A+B complete, C+D pending
 **Last activity:** 2026-01-29 - Track A+B merged to dev
 
 **Status:** Track C complete - ready to merge to main
 **Last activity:** 2026-01-29 - Completed Track C: Gamification (C-01, C-02)
+
+
+**Status:** Track D complete (all 3 plans)
+**Last activity:** 2026-01-29 - Completed D-02-PLAN.md (Settlements API)
 
 
 ### Execution Flow
@@ -70,9 +75,16 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 
 | A: Content CRUD | `../decoded-track-a` | 0/3 | Ready |
 | B: Engagement | `../decoded-track-b` | 0/2 | Ready |
+
 | C: Gamification | `../decoded-track-c` | 2/2 | **Complete** ✓ |
 
 | D: Monetization | `../decoded-track-d` | 0/3 | Ready |
+
+| C: Gamification | `../decoded-track-c` | 0/2 | Ready |
+| D: Monetization | `../decoded-track-d` | 3/3 | **Complete** |
+
+**Track D Progress:** ███ (100% - 3 of 3 plans complete)
+
 
 ## Accumulated Context
 
@@ -92,6 +104,7 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 - **Points Mapping (06-02):** Map API points to earnings until Track C implements full gamification
 - **API Proxy (06-03):** Use Next.js API routes to proxy backend calls, avoiding CORS
 - **Dual State Sync (06-03):** React Query cache + Zustand store for immediate UI updates
+
 - **Vote Stats Cache (B-01):** Vote stats have 30s staleTime (more frequent changes than profile)
 - **Vote Mutations (B-01):** All vote/adopt mutations invalidate vote stats cache for immediate UI feedback
 - **Comment Access (B-02):** Comments are public (fetch), create/update/delete require auth
@@ -110,6 +123,14 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 - **Badge API Public Access (C-02):** Badge list and details are public, only /badges/me requires auth
 - **Badge Data Transformation (C-02):** transformToUnifiedBadges helper merges earned/available badges for UI
 
+- **Click Tracking (D-01):** Anonymous click recording without authentication
+- **Earnings Caching (D-01):** 5-minute stale time for earnings data (doesn't change rapidly)
+- **Search Suggestions (D-03):** Popular searches public, recent searches authenticated
+- **Query Key Separation (D-03):** Use searchSuggestionsKeys namespace to avoid conflicts
+- **Settlement History (D-02):** Settlement API with fetchSettlements and withdrawal request flow
+- **Withdrawal Status (D-02):** Backend returns "not yet supported" but client flow is complete
+
+
 ### Pending Verification
 - **06-03 Profile Edit:** Code complete, verification blocked by backend DB error
 - Action: Re-test when backend is restored
@@ -127,6 +148,11 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Session Continuity
 
 **Last session:** 2026-01-29
+
+
+**Stopped at:** Completed D-02-PLAN.md (Track D complete)
+**Resume file:** None - Track D finished, ready to merge
+
 
 **Stopped at:** Tracks A+B complete, merging to dev
 **Resume file:** None
@@ -150,7 +176,11 @@ git merge feature/track-c-gamification
 ---
 
 
+
 *Last updated: 2026-01-29 after Track A+B completion*
 
 *Last updated: 2026-01-29 after Track C completion*
+
+
+*Last updated: 2026-01-29 after Track D completion*
 

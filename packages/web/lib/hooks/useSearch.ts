@@ -298,3 +298,77 @@ export type {
   GroupedSearchResults,
   SearchTab,
 };
+
+// ============================================================
+// Search Suggestions API Hooks (Track D - Phase 3)
+// These hooks use the new API client pattern for popular/recent search terms
+// ============================================================
+
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  fetchPopularSearchTerms,
+  fetchRecentSearchTerms,
+  deleteRecentSearch,
+} from "@/lib/api";
+import type {
+  PopularSearchResponse,
+  RecentSearchResponse,
+  RecentSearchParams,
+} from "@/lib/api/types";
+
+// Query Keys
+export const searchSuggestionsKeys = {
+  all: ["search-suggestions"] as const,
+  popular: () => [...searchSuggestionsKeys.all, "popular"] as const,
+  recent: (params?: RecentSearchParams) => [...searchSuggestionsKeys.all, "recent", params] as const,
+};
+
+/**
+ * Hook for popular/trending search terms
+ * GET /api/v1/search/popular (no auth required)
+ */
+export function usePopularSearchTerms(
+  options?: Omit<Parameters<typeof useQuery>[0], "queryKey" | "queryFn">
+) {
+  return useQuery({
+    queryKey: searchSuggestionsKeys.popular(),
+    queryFn: fetchPopularSearchTerms,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    ...options,
+  });
+}
+
+/**
+ * Hook for user's recent search history
+ * GET /api/v1/search/recent (auth required)
+ */
+export function useRecentSearchTerms(
+  params?: RecentSearchParams,
+  options?: Omit<Parameters<typeof useQuery>[0], "queryKey" | "queryFn">
+) {
+  return useQuery({
+    queryKey: searchSuggestionsKeys.recent(params),
+    queryFn: () => fetchRecentSearchTerms(params),
+    staleTime: 1000 * 60, // 1 minute
+    ...options,
+  });
+}
+
+/**
+ * Hook for deleting a search history entry
+ * DELETE /api/v1/search/recent/{id} (auth required)
+ */
+export function useDeleteRecentSearch() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => deleteRecentSearch(id),
+    onSuccess: () => {
+      // Invalidate recent searches to refetch after deletion
+      queryClient.invalidateQueries({ queryKey: searchSuggestionsKeys.recent() });
+    },
+    onError: (error) => {
+      console.error("[useDeleteRecentSearch] Failed to delete search:", error);
+    },
+  });
+}
