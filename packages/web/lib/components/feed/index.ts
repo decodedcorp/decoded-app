@@ -1,1 +1,1 @@
-export { FeedHeader } from './FeedHeader';
+export { FeedHeader } from "./FeedHeader";

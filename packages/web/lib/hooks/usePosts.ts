@@ -1,13 +1,15 @@
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import {
+  fetchPostWithSpotsAndSolutions,
   fetchPostWithImagesAndItems,
   type PostDetail,
+  type LegacyPostDetail,
 } from "@/lib/supabase/queries/posts";
 import { fetchPosts } from "@/lib/api/posts";
 import type { Post, PostsListResponse, PostsListParams } from "@/lib/api/types";
 
 /**
- * React Query hook for fetching a single post with its items and images
+ * React Query hook for fetching a single post with its spots and solutions
  *
  * @param id - Post ID to fetch
  * @returns React Query result with data, loading, error states
@@ -15,6 +17,21 @@ import type { Post, PostsListResponse, PostsListParams } from "@/lib/api/types";
 export function usePostById(id: string) {
   return useQuery<PostDetail | null>({
     queryKey: ["posts", "detail", id],
+    queryFn: () => fetchPostWithSpotsAndSolutions(id),
+    enabled: !!id,
+  });
+}
+
+/**
+ * React Query hook for fetching a single post in legacy format
+ * @deprecated Use usePostById instead
+ *
+ * @param id - Post ID to fetch
+ * @returns React Query result with legacy data format
+ */
+export function usePostByIdLegacy(id: string) {
+  return useQuery<LegacyPostDetail | null>({
+    queryKey: ["posts", "detail", "legacy", id],
     queryFn: () => fetchPostWithImagesAndItems(id),
     enabled: !!id,
   });
@@ -95,4 +112,10 @@ export function useInfinitePosts(params: UseInfinitePostsParams = {}) {
 }
 
 // Re-export types for convenience
-export type { Post, PostsListResponse, PostsListParams };
+export type {
+  Post,
+  PostsListResponse,
+  PostsListParams,
+  PostDetail,
+  LegacyPostDetail,
+};

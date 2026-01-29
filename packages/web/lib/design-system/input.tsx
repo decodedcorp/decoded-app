@@ -1,7 +1,7 @@
-import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@/lib/utils';
-import { forwardRef } from 'react';
-import { Search, X } from 'lucide-react';
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
+import { forwardRef } from "react";
+import { Search, X } from "lucide-react";
 
 /**
  * Input Variants
@@ -12,17 +12,17 @@ import { Search, X } from 'lucide-react';
  * @see docs/design-system/decoded.pen
  */
 export const inputVariants = cva(
-  'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+  "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: '',
-        error: 'border-destructive focus-visible:ring-destructive',
-        search: 'rounded-full pl-10 pr-10',
+        default: "",
+        error: "border-destructive focus-visible:ring-destructive",
+        search: "rounded-full pl-10 pr-10",
       },
     },
     defaultVariants: {
-      variant: 'default',
+      variant: "default",
     },
   }
 );
@@ -58,13 +58,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       label,
       helperText,
       error,
-      type = 'text',
+      type = "text",
       ...props
     },
     ref
   ) => {
     const hasError = !!error;
-    const effectiveVariant = hasError ? 'error' : variant;
+    const effectiveVariant = hasError ? "error" : variant;
 
     return (
       <div className="w-full">
@@ -86,8 +86,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             type={type}
             className={cn(
               inputVariants({ variant: effectiveVariant }),
-              leftIcon && 'pl-10',
-              rightIcon && 'pr-10',
+              leftIcon && "pl-10",
+              rightIcon && "pr-10",
               className
             )}
             {...props}
@@ -110,10 +110,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
   }
 );
 
-Input.displayName = 'Input';
+Input.displayName = "Input";
 
 export interface SearchInputProps
-  extends Omit<InputProps, 'leftIcon' | 'rightIcon' | 'variant'> {
+  extends Omit<InputProps, "leftIcon" | "rightIcon" | "variant"> {
   onClear?: () => void;
 }
 
@@ -131,8 +131,8 @@ export interface SearchInputProps
  * />
  */
 export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
-  ({ value, onClear, placeholder = 'Search...', className, ...props }, ref) => {
-    const hasValue = value !== undefined && value !== '';
+  ({ value, onClear, placeholder = "Search...", className, ...props }, ref) => {
+    const hasValue = value !== undefined && value !== "";
 
     const handleClear = (e: React.MouseEvent) => {
       e.preventDefault();
@@ -168,4 +168,4 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
   }
 );
 
-SearchInput.displayName = 'SearchInput';
+SearchInput.displayName = "SearchInput";

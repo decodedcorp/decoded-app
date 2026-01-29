@@ -2,19 +2,13 @@
  * DEBUG ONLY: Query layer for posts table (client-side)
  *
  * This module is for debugging/reference purposes only.
- * Production code should use image-based queries instead.
+ * Production code should use the main queries module instead.
  *
- * This module establishes the pattern: "Supabase direct access only happens in this layer"
- * When RLS policies change, only these query functions need to be updated,
- * keeping frontend code changes minimal.
- *
- * Note: For server-side queries, use posts.server.ts instead.
+ * Schema update (2026-01-29): 'post' table → 'posts' table
  */
 
 import { supabaseBrowserClient } from "../../client";
-import type { Database } from "../../types";
-
-type PostRow = Database["public"]["Tables"]["post"]["Row"];
+import type { PostRow } from "../../types";
 
 /**
  * Fetches the latest posts from the database (client-side)
@@ -25,8 +19,9 @@ type PostRow = Database["public"]["Tables"]["post"]["Row"];
  */
 export async function fetchLatestPosts(limit = 10): Promise<PostRow[]> {
   const { data, error } = await supabaseBrowserClient
-    .from("post")
+    .from("posts")
     .select("*")
+    .eq("status", "active")
     .order("created_at", { ascending: false })
     .limit(limit);
 

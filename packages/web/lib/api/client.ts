@@ -51,7 +51,13 @@ export interface ApiClientOptions {
  * });
  */
 export async function apiClient<T>(options: ApiClientOptions): Promise<T> {
-  const { path, method = "GET", body, requiresAuth = false, headers = {} } = options;
+  const {
+    path,
+    method = "GET",
+    body,
+    requiresAuth = false,
+    headers = {},
+  } = options;
 
   // Build headers
   const requestHeaders: Record<string, string> = {
@@ -76,7 +82,8 @@ export async function apiClient<T>(options: ApiClientOptions): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     method,
     headers: requestHeaders,
-    body: body instanceof FormData ? body : body ? JSON.stringify(body) : undefined,
+    body:
+      body instanceof FormData ? body : body ? JSON.stringify(body) : undefined,
   });
 
   // Handle errors
@@ -86,7 +93,9 @@ export async function apiClient<T>(options: ApiClientOptions): Promise<T> {
     try {
       errorData = await response.json();
     } catch {
-      errorData = { message: `HTTP ${response.status}: ${response.statusText}` };
+      errorData = {
+        message: `HTTP ${response.status}: ${response.statusText}`,
+      };
     }
 
     throw new Error(errorData.message || `API Error: ${response.status}`);

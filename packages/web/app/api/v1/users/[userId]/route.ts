@@ -29,7 +29,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   const { userId } = await params;
 
   if (!userId) {
-    return NextResponse.json({ message: "User ID is required" }, { status: 400 });
+    return NextResponse.json(
+      { message: "User ID is required" },
+      { status: 400 }
+    );
   }
 
   try {

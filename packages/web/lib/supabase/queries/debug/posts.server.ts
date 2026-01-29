@@ -2,16 +2,13 @@
  * DEBUG ONLY: Server-side query functions for posts table
  *
  * This module is for debugging/reference purposes only.
- * Production code should use image-based queries instead.
+ * Production code should use the main queries module instead.
  *
- * This module contains server-only query functions that use createSupabaseServerClient.
- * These functions can only be used in Server Components and Route Handlers.
+ * Schema update (2026-01-29): 'post' table → 'posts' table
  */
 
 import { createSupabaseServerClient } from "../../server";
-import type { Database } from "../../types";
-
-type PostRow = Database["public"]["Tables"]["post"]["Row"];
+import type { PostRow } from "../../types";
 
 /**
  * Fetches the latest posts from the database (server-side)
@@ -25,8 +22,9 @@ type PostRow = Database["public"]["Tables"]["post"]["Row"];
 export async function fetchLatestPostsServer(limit = 10): Promise<PostRow[]> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
-    .from("post")
+    .from("posts")
     .select("*")
+    .eq("status", "active")
     .order("created_at", { ascending: false })
     .limit(limit);
 

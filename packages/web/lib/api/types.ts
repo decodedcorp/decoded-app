@@ -231,7 +231,7 @@ export interface UserStatsResponse {
 // GET /api/v1/users/me/activities
 // ============================================================
 
-export type UserActivityType = 'post' | 'spot' | 'solution';
+export type UserActivityType = "post" | "spot" | "solution";
 
 export interface UserActivityItem {
   id: string;

@@ -5,15 +5,15 @@
  */
 
 // Tokens
-export * from './tokens';
+export * from "./tokens";
 
 // Typography Components
-export { Heading, headingVariants, Text, textVariants } from './typography';
-export type { HeadingProps, TextProps } from './typography';
+export { Heading, headingVariants, Text, textVariants } from "./typography";
+export type { HeadingProps, TextProps } from "./typography";
 
 // Input Components
-export { Input, inputVariants, SearchInput } from './input';
-export type { InputProps, SearchInputProps } from './input';
+export { Input, inputVariants, SearchInput } from "./input";
+export type { InputProps, SearchInputProps } from "./input";
 
 // Card Components
 export {
@@ -23,38 +23,47 @@ export {
   CardFooter,
   CardSkeleton,
   cardVariants,
-} from './card';
+} from "./card";
 export type {
   CardProps,
   CardHeaderProps,
   CardContentProps,
   CardFooterProps,
   CardSkeletonProps,
-} from './card';
+} from "./card";
 
 // Product Cards
-export { ProductCard, ProductCardSkeleton } from './product-card';
-export type { ProductCardProps, ProductCardSkeletonProps } from './product-card';
+export { ProductCard, ProductCardSkeleton } from "./product-card";
+export type {
+  ProductCardProps,
+  ProductCardSkeletonProps,
+} from "./product-card";
 
 // Grid Cards
-export { GridCard, GridCardSkeleton } from './grid-card';
-export type { GridCardProps, GridCardSkeletonProps } from './grid-card';
+export { GridCard, GridCardSkeleton } from "./grid-card";
+export type { GridCardProps, GridCardSkeletonProps } from "./grid-card";
 
 // Feed Card (design-system base)
-export { FeedCard as FeedCardBase, FeedCardSkeleton as FeedCardBaseSkeleton } from './feed-card';
-export type { FeedCardProps as FeedCardBaseProps } from './feed-card';
+export {
+  FeedCard as FeedCardBase,
+  FeedCardSkeleton as FeedCardBaseSkeleton,
+} from "./feed-card";
+export type { FeedCardProps as FeedCardBaseProps } from "./feed-card";
 
 // Profile Header Card
-export { ProfileHeaderCard, ProfileHeaderCardSkeleton } from './profile-header-card';
-export type { ProfileHeaderCardProps } from './profile-header-card';
+export {
+  ProfileHeaderCard,
+  ProfileHeaderCardSkeleton,
+} from "./profile-header-card";
+export type { ProfileHeaderCardProps } from "./profile-header-card";
 
 // Header Components
-export { DesktopHeader, desktopHeaderVariants } from './desktop-header';
-export type { DesktopHeaderProps } from './desktop-header';
+export { DesktopHeader, desktopHeaderVariants } from "./desktop-header";
+export type { DesktopHeaderProps } from "./desktop-header";
 
-export { MobileHeader, mobileHeaderVariants } from './mobile-header';
-export type { MobileHeaderProps } from './mobile-header';
+export { MobileHeader, mobileHeaderVariants } from "./mobile-header";
+export type { MobileHeaderProps } from "./mobile-header";
 
 // Footer Components
-export { DesktopFooter } from './desktop-footer';
-export type { DesktopFooterProps } from './desktop-footer';
+export { DesktopFooter } from "./desktop-footer";
+export type { DesktopFooterProps } from "./desktop-footer";

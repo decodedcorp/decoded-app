@@ -1,3 +1,21 @@
+/**
+ * Supabase Database Types
+ *
+ * Auto-generated from actual database schema inspection.
+ * Last updated: 2026-01-29
+ *
+ * Tables:
+ * - posts (591 records) - Main content posts with images
+ * - users (3 records) - User profiles and stats
+ * - categories (5 records) - Item categories (i18n)
+ * - subcategories (23 records) - Item subcategories (i18n)
+ * - badges (20 records) - Achievement badges
+ * - user_badges (3 records) - User-badge assignments
+ * - spots (2 records) - Item locations in images
+ * - solutions (12 records) - Product matches for spots
+ * - comments (0 records) - Post comments
+ */
+
 export type Json =
   | string
   | number
@@ -6,192 +24,38 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[];
 
+/**
+ * Internationalized text (Korean/English)
+ */
+export interface I18nText {
+  ko: string;
+  en: string;
+}
+
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "13.0.5";
-  };
   public: {
     Tables: {
-      image: {
-        Row: {
-          created_at: string;
-          id: string;
-          image_hash: string;
-          image_url: string | null;
-          status: Database["public"]["Enums"]["image_status"];
-          with_items: boolean;
-        };
-        Insert: {
-          created_at?: string;
-          id?: string;
-          image_hash: string;
-          image_url?: string | null;
-          status?: Database["public"]["Enums"]["image_status"];
-          with_items?: boolean;
-        };
-        Update: {
-          created_at?: string;
-          id?: string;
-          image_hash?: string;
-          image_url?: string | null;
-          status?: Database["public"]["Enums"]["image_status"];
-          with_items?: boolean;
-        };
-        Relationships: [];
-      };
-      item: {
-        Row: {
-          ambiguity: boolean | null;
-          bboxes: Json | null;
-          brand: string | null;
-          center: Json | null;
-          citations: string[] | null;
-          created_at: string | null;
-          cropped_image_path: string | null;
-          description: string | null;
-          id: number;
-          image_id: string;
-          metadata: string[] | null;
-          price: string | null;
-          product_name: string | null;
-          sam_prompt: string | null;
-          scores: Json | null;
-          status: string | null;
-        };
-        Insert: {
-          ambiguity?: boolean | null;
-          bboxes?: Json | null;
-          brand?: string | null;
-          center?: Json | null;
-          citations?: string[] | null;
-          created_at?: string | null;
-          cropped_image_path?: string | null;
-          description?: string | null;
-          id?: number;
-          image_id: string;
-          metadata?: string[] | null;
-          price?: string | null;
-          product_name?: string | null;
-          sam_prompt?: string | null;
-          scores?: Json | null;
-          status?: string | null;
-        };
-        Update: {
-          ambiguity?: boolean | null;
-          bboxes?: Json | null;
-          brand?: string | null;
-          center?: Json | null;
-          citations?: string[] | null;
-          created_at?: string | null;
-          cropped_image_path?: string | null;
-          description?: string | null;
-          id?: number;
-          image_id?: string;
-          metadata?: string[] | null;
-          price?: string | null;
-          product_name?: string | null;
-          sam_prompt?: string | null;
-          scores?: Json | null;
-          status?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "item_image_id_fkey";
-            columns: ["image_id"];
-            isOneToOne: false;
-            referencedRelation: "image";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      post: {
-        Row: {
-          account: string;
-          article: string | null;
-          created_at: string;
-          id: string;
-          item_ids: Json | null;
-          metadata: string[] | null;
-          ts: string;
-        };
-        Insert: {
-          account: string;
-          article?: string | null;
-          created_at?: string;
-          id?: string;
-          item_ids?: Json | null;
-          metadata?: string[] | null;
-          ts: string;
-        };
-        Update: {
-          account?: string;
-          article?: string | null;
-          created_at?: string;
-          id?: string;
-          item_ids?: Json | null;
-          metadata?: string[] | null;
-          ts?: string;
-        };
-        Relationships: [];
-      };
-      post_image: {
-        Row: {
-          created_at: string;
-          curated_item_ids: Json | null;
-          image_id: string;
-          item_locations: Json | null;
-          item_locations_updated_at: string | null;
-          post_id: string;
-        };
-        Insert: {
-          created_at?: string;
-          curated_item_ids?: Json | null;
-          image_id: string;
-          item_locations?: Json | null;
-          item_locations_updated_at?: string | null;
-          post_id: string;
-        };
-        Update: {
-          created_at?: string;
-          curated_item_ids?: Json | null;
-          image_id?: string;
-          item_locations?: Json | null;
-          item_locations_updated_at?: string | null;
-          post_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "post_image_image_id_fkey";
-            columns: ["image_id"];
-            isOneToOne: false;
-            referencedRelation: "image";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "post_image_post_id_fkey";
-            columns: ["post_id"];
-            isOneToOne: false;
-            referencedRelation: "post";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      // New schema tables (actual database)
+      // =================================================================
+      // CORE CONTENT
+      // =================================================================
+
+      /**
+       * Posts - Main content with images
+       * 591 records
+       */
       posts: {
         Row: {
           id: string;
           user_id: string;
           image_url: string | null;
-          media_type: string | null;
+          media_type: string | null; // 'event', 'paparazzi', etc.
           media_title: string | null;
           media_metadata: Json;
           group_name: string | null;
           artist_name: string | null;
-          context: string | null;
+          context: string | null; // 'street style', 'street', etc.
           view_count: number;
-          status: string;
+          status: string; // 'active', 'inactive', etc.
           created_at: string;
           updated_at: string;
           trending_score: number | null;
@@ -228,8 +92,69 @@ export type Database = {
           updated_at?: string;
           trending_score?: number | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "posts_user_id_fkey";
+            columns: ["user_id"];
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
       };
+
+      /**
+       * Comments - Post comments
+       * 0 records (empty)
+       */
+      comments: {
+        Row: {
+          id: string;
+          post_id: string;
+          user_id: string;
+          content: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          post_id: string;
+          user_id: string;
+          content: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          post_id?: string;
+          user_id?: string;
+          content?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "comments_post_id_fkey";
+            columns: ["post_id"];
+            referencedRelation: "posts";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "comments_user_id_fkey";
+            columns: ["user_id"];
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+
+      // =================================================================
+      // USER MANAGEMENT
+      // =================================================================
+
+      /**
+       * Users - User profiles and stats
+       * 3 records
+       */
       users: {
         Row: {
           id: string;
@@ -238,7 +163,7 @@ export type Database = {
           display_name: string | null;
           avatar_url: string | null;
           bio: string | null;
-          rank: string | null;
+          rank: string | null; // 'Member', etc.
           total_points: number;
           is_admin: boolean;
           created_at: string;
@@ -272,6 +197,348 @@ export type Database = {
         };
         Relationships: [];
       };
+
+      /**
+       * User Badges - Badge assignments
+       * 3 records
+       */
+      user_badges: {
+        Row: {
+          user_id: string;
+          badge_id: string;
+          earned_at: string;
+        };
+        Insert: {
+          user_id: string;
+          badge_id: string;
+          earned_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          badge_id?: string;
+          earned_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_user_id_fkey";
+            columns: ["user_id"];
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "user_badges_badge_id_fkey";
+            columns: ["badge_id"];
+            referencedRelation: "badges";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+
+      // =================================================================
+      // CATEGORIES & CLASSIFICATION
+      // =================================================================
+
+      /**
+       * Categories - Item categories (i18n)
+       * 5 records: wearables, accessories, beauty, lifestyle, other
+       */
+      categories: {
+        Row: {
+          id: string;
+          code: string; // 'wearables', 'accessories', etc.
+          name: I18nText; // { ko: '패션 아이템', en: 'Wearables' }
+          icon_url: string | null;
+          color_hex: string | null;
+          description: string | null;
+          display_order: number;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          code: string;
+          name: I18nText;
+          icon_url?: string | null;
+          color_hex?: string | null;
+          description?: string | null;
+          display_order?: number;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          code?: string;
+          name?: I18nText;
+          icon_url?: string | null;
+          color_hex?: string | null;
+          description?: string | null;
+          display_order?: number;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+
+      /**
+       * Subcategories - Item subcategories (i18n)
+       * 23 records: headwear, eyewear, tops, bottoms, etc.
+       */
+      subcategories: {
+        Row: {
+          id: string;
+          category_id: string;
+          code: string; // 'headwear', 'eyewear', etc.
+          name: I18nText; // { ko: '모자', en: 'Headwear' }
+          description: string | null;
+          display_order: number;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          category_id: string;
+          code: string;
+          name: I18nText;
+          description?: string | null;
+          display_order?: number;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          category_id?: string;
+          code?: string;
+          name?: I18nText;
+          description?: string | null;
+          display_order?: number;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "subcategories_category_id_fkey";
+            columns: ["category_id"];
+            referencedRelation: "categories";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+
+      /**
+       * Badges - Achievement badges
+       * 20 records
+       */
+      badges: {
+        Row: {
+          id: string;
+          type: string; // 'achievement', etc.
+          name: string;
+          description: string;
+          icon_url: string | null;
+          criteria: Json; // { type: 'count', threshold: 1 }
+          rarity: string; // 'common', 'rare', 'epic', 'legendary'
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          type: string;
+          name: string;
+          description: string;
+          icon_url?: string | null;
+          criteria?: Json;
+          rarity?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          type?: string;
+          name?: string;
+          description?: string;
+          icon_url?: string | null;
+          criteria?: Json;
+          rarity?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+
+      // =================================================================
+      // SPOTS & SOLUTIONS (Item Detection/Matching)
+      // =================================================================
+
+      /**
+       * Spots - Item locations in images
+       * 2 records
+       */
+      spots: {
+        Row: {
+          id: string;
+          post_id: string;
+          user_id: string;
+          position_left: string; // Percentage (e.g., "26.26788036410923")
+          position_top: string; // Percentage (e.g., "30.54806828391734")
+          subcategory_id: string;
+          status: string; // 'open', 'solved', etc.
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          post_id: string;
+          user_id: string;
+          position_left: string;
+          position_top: string;
+          subcategory_id: string;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          post_id?: string;
+          user_id?: string;
+          position_left?: string;
+          position_top?: string;
+          subcategory_id?: string;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "spots_post_id_fkey";
+            columns: ["post_id"];
+            referencedRelation: "posts";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "spots_user_id_fkey";
+            columns: ["user_id"];
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "spots_subcategory_id_fkey";
+            columns: ["subcategory_id"];
+            referencedRelation: "subcategories";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+
+      /**
+       * Solutions - Product matches for spots
+       * 12 records
+       */
+      solutions: {
+        Row: {
+          id: string;
+          spot_id: string;
+          user_id: string;
+          match_type: string | null;
+          product_name: string;
+          brand: string;
+          price_amount: number | null;
+          price_currency: string; // 'KRW', 'USD', etc.
+          original_url: string;
+          affiliate_url: string | null;
+          thumbnail_url: string | null;
+          description: string;
+          accurate_count: number;
+          different_count: number;
+          is_verified: boolean;
+          is_adopted: boolean;
+          adopted_at: string | null;
+          click_count: number;
+          purchase_count: number;
+          status: string; // 'active', 'inactive', etc.
+          created_at: string;
+          updated_at: string;
+          metadata: Json | null;
+          comment: string | null;
+          qna: Json | null;
+          keywords: string[] | null;
+        };
+        Insert: {
+          id?: string;
+          spot_id: string;
+          user_id: string;
+          match_type?: string | null;
+          product_name: string;
+          brand: string;
+          price_amount?: number | null;
+          price_currency?: string;
+          original_url: string;
+          affiliate_url?: string | null;
+          thumbnail_url?: string | null;
+          description?: string;
+          accurate_count?: number;
+          different_count?: number;
+          is_verified?: boolean;
+          is_adopted?: boolean;
+          adopted_at?: string | null;
+          click_count?: number;
+          purchase_count?: number;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+          metadata?: Json | null;
+          comment?: string | null;
+          qna?: Json | null;
+          keywords?: string[] | null;
+        };
+        Update: {
+          id?: string;
+          spot_id?: string;
+          user_id?: string;
+          match_type?: string | null;
+          product_name?: string;
+          brand?: string;
+          price_amount?: number | null;
+          price_currency?: string;
+          original_url?: string;
+          affiliate_url?: string | null;
+          thumbnail_url?: string | null;
+          description?: string;
+          accurate_count?: number;
+          different_count?: number;
+          is_verified?: boolean;
+          is_adopted?: boolean;
+          adopted_at?: string | null;
+          click_count?: number;
+          purchase_count?: number;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+          metadata?: Json | null;
+          comment?: string | null;
+          qna?: Json | null;
+          keywords?: string[] | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "solutions_spot_id_fkey";
+            columns: ["spot_id"];
+            referencedRelation: "spots";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "solutions_user_id_fkey";
+            columns: ["user_id"];
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -280,7 +547,11 @@ export type Database = {
       [_ in never]: never;
     };
     Enums: {
-      image_status: "pending" | "extracted" | "skipped" | "extracted_metadata";
+      // Note: These are inferred from data, not from actual DB enums
+      post_status: "active" | "inactive" | "pending" | "deleted";
+      spot_status: "open" | "solved" | "closed";
+      solution_status: "active" | "inactive" | "pending" | "deleted";
+      badge_rarity: "common" | "rare" | "epic" | "legendary";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -288,138 +559,98 @@ export type Database = {
   };
 };
 
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
+// =============================================================================
+// TYPE ALIASES
+// =============================================================================
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<
-  keyof Database,
-  "public"
->];
-
-export type Tables<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
-  }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
-}
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-      Row: infer R;
-    }
-    ? R
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R;
-      }
-      ? R
-      : never
-    : never;
-
-export type TablesInsert<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I;
-    }
-    ? I
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I;
-      }
-      ? I
-      : never
-    : never;
-
-export type TablesUpdate<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U;
-    }
-    ? U
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U;
-      }
-      ? U
-      : never
-    : never;
-
-export type Enums<
-  DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
-    | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
-> = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
-}
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-    : never;
-
-export type CompositeTypes<
-  PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
-  }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
-> = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
-}
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never;
-
-export const Constants = {
-  public: {
-    Enums: {
-      image_status: ["pending", "extracted", "skipped", "extracted_metadata"],
-    },
-  },
-} as const;
-
-// Type aliases for convenience
-export type ImageRow = Database["public"]["Tables"]["image"]["Row"];
+// Core content
 export type PostRow = Database["public"]["Tables"]["posts"]["Row"];
-export type UserRow = Database["public"]["Tables"]["users"]["Row"];
+export type PostInsert = Database["public"]["Tables"]["posts"]["Insert"];
+export type PostUpdate = Database["public"]["Tables"]["posts"]["Update"];
 
-// Re-export from shared for convenience
-export type { ItemRow } from "@decoded/shared";
+export type CommentRow = Database["public"]["Tables"]["comments"]["Row"];
+export type CommentInsert = Database["public"]["Tables"]["comments"]["Insert"];
+export type CommentUpdate = Database["public"]["Tables"]["comments"]["Update"];
+
+// User management
+export type UserRow = Database["public"]["Tables"]["users"]["Row"];
+export type UserInsert = Database["public"]["Tables"]["users"]["Insert"];
+export type UserUpdate = Database["public"]["Tables"]["users"]["Update"];
+
+export type UserBadgeRow = Database["public"]["Tables"]["user_badges"]["Row"];
+
+// Categories
+export type CategoryRow = Database["public"]["Tables"]["categories"]["Row"];
+export type SubcategoryRow =
+  Database["public"]["Tables"]["subcategories"]["Row"];
+export type BadgeRow = Database["public"]["Tables"]["badges"]["Row"];
+
+// Spots & Solutions
+export type SpotRow = Database["public"]["Tables"]["spots"]["Row"];
+export type SpotInsert = Database["public"]["Tables"]["spots"]["Insert"];
+export type SpotUpdate = Database["public"]["Tables"]["spots"]["Update"];
+
+export type SolutionRow = Database["public"]["Tables"]["solutions"]["Row"];
+export type SolutionInsert =
+  Database["public"]["Tables"]["solutions"]["Insert"];
+export type SolutionUpdate =
+  Database["public"]["Tables"]["solutions"]["Update"];
+
+// =============================================================================
+// UTILITY TYPES
+// =============================================================================
+
+/**
+ * Generic table row type extractor
+ */
+export type Tables<T extends keyof Database["public"]["Tables"]> =
+  Database["public"]["Tables"][T]["Row"];
+
+/**
+ * Generic table insert type extractor
+ */
+export type TablesInsert<T extends keyof Database["public"]["Tables"]> =
+  Database["public"]["Tables"][T]["Insert"];
+
+/**
+ * Generic table update type extractor
+ */
+export type TablesUpdate<T extends keyof Database["public"]["Tables"]> =
+  Database["public"]["Tables"][T]["Update"];
+
+/**
+ * Enum type extractor
+ */
+export type Enums<T extends keyof Database["public"]["Enums"]> =
+  Database["public"]["Enums"][T];
+
+// =============================================================================
+// LEGACY COMPATIBILITY (deprecated, will be removed)
+// =============================================================================
+
+/**
+ * @deprecated Use PostRow instead - Legacy image type for backward compatibility
+ */
+export interface ImageRow {
+  id: string;
+  image_url: string | null;
+  created_at: string;
+  image_hash: string;
+  status: "pending" | "extracted" | "skipped" | "extracted_metadata";
+  with_items: boolean;
+}
+
+/**
+ * @deprecated Use SolutionRow instead - Legacy item type for backward compatibility
+ */
+export interface ItemRow {
+  id: number;
+  image_id: string;
+  brand: string | null;
+  product_name: string | null;
+  cropped_image_path: string | null;
+  price: string | null;
+  description: string | null;
+  status: string | null;
+  created_at: string | null;
+}

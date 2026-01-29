@@ -44,7 +44,12 @@ interface BadgeItemProps {
   isLocked?: boolean;
 }
 
-function BadgeItem({ badge, onClick, delay = 0, isLocked = false }: BadgeItemProps) {
+function BadgeItem({
+  badge,
+  onClick,
+  delay = 0,
+  isLocked = false,
+}: BadgeItemProps) {
   const IconComponent = BADGE_ICONS[badge.icon] || Trophy;
 
   if (isLocked) {

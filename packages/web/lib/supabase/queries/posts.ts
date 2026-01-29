@@ -5,136 +5,241 @@
  * When RLS policies change, only these query functions need to be updated,
  * keeping frontend code changes minimal.
  *
- * Note: For server-side queries, use posts.server.ts instead.
+ * Schema update (2026-01-29):
+ * - 'post' table → 'posts' table
+ * - 'item' table → 'solutions' table
+ * - 'post_image' junction → spots (item locations in images)
  */
 
 import { supabaseBrowserClient } from "../client";
-import type { Database, ImageRow } from "../types";
+import type { PostRow, SpotRow, SolutionRow } from "../types";
 
-type ItemRow = Database["public"]["Tables"]["item"]["Row"];
-type PostRow = Database["public"]["Tables"]["post"]["Row"];
-
+/**
+ * Post detail including spots and solutions
+ */
 export type PostDetail = {
   post: PostRow;
-  items: ItemRow[];
-  images: ImageRow[];
+  spots: SpotRow[];
+  solutions: SolutionRow[];
 };
 
 /**
- * Fetches a post with its associated items and images (client-side)
+ * Legacy compatible post detail type
+ * Maps new schema to old structure for backward compatibility
+ */
+export type LegacyPostDetail = {
+  post: {
+    id: string;
+    account: string;
+    article: string | null;
+    created_at: string;
+    item_ids: unknown[] | null;
+    metadata: string[] | null;
+    ts: string;
+  };
+  items: Array<{
+    id: number;
+    image_id: string;
+    brand: string | null;
+    product_name: string | null;
+    cropped_image_path: string | null;
+    price: string | null;
+    description: string | null;
+    status: string | null;
+    created_at: string | null;
+  }>;
+  images: Array<{
+    id: string;
+    image_url: string | null;
+    created_at: string;
+    image_hash: string;
+    status: string;
+    with_items: boolean;
+  }>;
+};
+
+/**
+ * Fetches a post with its associated spots and solutions (client-side)
  *
- * This function uses a 3-step query pattern:
- * 1. Fetch post (with item_ids)
- * 2. Fetch items using item_ids
- * 3. Fetch images using items' image_id
- *
- * Note: Items are sorted according to the order in post.item_ids to preserve
- * the curation order intended by the post author.
+ * New schema structure:
+ * 1. Fetch post
+ * 2. Fetch spots (item locations) for the post
+ * 3. Fetch solutions for each spot
  *
  * @param postId - Post ID to fetch
- * @returns PostDetail object containing post, items, and images, or null if post not found
+ * @returns PostDetail object or null if post not found
  */
-export async function fetchPostWithImagesAndItems(
+export async function fetchPostWithSpotsAndSolutions(
   postId: string
 ): Promise<PostDetail | null> {
-  // 1. Post 조회 (item_ids 포함)
+  // 1. Fetch post
   const { data: post, error: postError } = await supabaseBrowserClient
-    .from("post")
+    .from("posts")
     .select("*")
     .eq("id", postId)
-    .single<PostRow>();
+    .single();
 
   if (postError || !post) {
     if (process.env.NODE_ENV === "development") {
       console.error(
-        "[fetchPostWithImagesAndItems] Error fetching post:",
-        postError
+        "[fetchPostWithSpotsAndSolutions] Error fetching post:",
+        JSON.stringify(postError, null, 2)
       );
     }
     return null;
   }
 
-  // 2. item_ids 타입 안전성 처리 및 검증
-  const itemIds = Array.isArray(post.item_ids)
-    ? (post.item_ids as string[])
-    : [];
-
-  if (itemIds.length === 0) {
-    return {
-      post,
-      items: [],
-      images: [],
-    };
-  }
-
-  // 3. Items 조회
-  // Convert string IDs to numbers (item.id is bigint/number in DB)
-  const itemIdsAsNumbers = itemIds.map((id) => parseInt(id, 10));
-
-  const { data: itemsData, error: itemsError } = await supabaseBrowserClient
-    .from("item")
+  // 2. Fetch spots for this post
+  const { data: spots, error: spotsError } = await supabaseBrowserClient
+    .from("spots")
     .select("*")
-    .in("id", itemIdsAsNumbers);
+    .eq("post_id", postId);
 
-  if (itemsError) {
+  if (spotsError) {
     if (process.env.NODE_ENV === "development") {
       console.error(
-        "[fetchPostWithImagesAndItems] Error fetching items:",
-        itemsError
+        "[fetchPostWithSpotsAndSolutions] Error fetching spots:",
+        JSON.stringify(spotsError, null, 2)
       );
     }
-    // 에러 발생 시에도 post 정보는 반환 (Graceful Degradation)
-    return {
-      post,
-      items: [],
-      images: [],
-    };
+    return { post, spots: [], solutions: [] };
   }
 
-  // 4. 순서 보장: 조회된 items를 post.item_ids 순서대로 재정렬
-  // SQL의 .in() 쿼리는 입력 배열의 순서를 보장하지 않으므로,
-  // JavaScript 레벨에서 post.item_ids의 순서에 맞춰 재정렬
-  const itemsMap = new Map<string, ItemRow>(
-    (itemsData || []).map((item) => [item.id.toString(), item])
-  );
-  const sortedItems = itemIds
-    .map((id) => itemsMap.get(id))
-    .filter((item): item is ItemRow => item !== undefined);
+  // 3. Fetch solutions for all spots
+  const spotIds = (spots || []).map((s) => s.id);
+  let solutions: SolutionRow[] = [];
 
-  // 5. Images 조회
-  // items에서 image_id 추출 및 중복 제거
-  const imageIds = Array.from(
-    new Set(
-      sortedItems
-        .map((item) => item.image_id)
-        .filter((id): id is string => Boolean(id))
-    )
-  );
+  if (spotIds.length > 0) {
+    const { data: solutionsData, error: solutionsError } =
+      await supabaseBrowserClient
+        .from("solutions")
+        .select("*")
+        .in("spot_id", spotIds)
+        .eq("status", "active");
 
-  let images: ImageRow[] = [];
-
-  if (imageIds.length > 0) {
-    const { data: imagesData, error: imagesError } = await supabaseBrowserClient
-      .from("image")
-      .select("*")
-      .in("id", imageIds);
-
-    if (imagesError) {
+    if (solutionsError) {
       if (process.env.NODE_ENV === "development") {
         console.error(
-          "[fetchPostWithImagesAndItems] Error fetching images:",
-          imagesError
+          "[fetchPostWithSpotsAndSolutions] Error fetching solutions:",
+          JSON.stringify(solutionsError, null, 2)
         );
       }
-      // 이미지만 실패했다면 아이템까지는 반환 (Graceful Degradation)
     } else {
-      images = imagesData || [];
+      solutions = solutionsData || [];
     }
   }
 
   return {
     post,
-    items: sortedItems,
-    images,
+    spots: spots || [],
+    solutions,
   };
+}
+
+/**
+ * Legacy function - Fetches a post with its associated items and images
+ *
+ * @deprecated Use fetchPostWithSpotsAndSolutions instead
+ * This function maps new schema to old structure for backward compatibility
+ *
+ * @param postId - Post ID to fetch
+ * @returns LegacyPostDetail object or null if post not found
+ */
+export async function fetchPostWithImagesAndItems(
+  postId: string
+): Promise<LegacyPostDetail | null> {
+  const result = await fetchPostWithSpotsAndSolutions(postId);
+  if (!result) return null;
+
+  // Map new schema to legacy structure
+  return {
+    post: {
+      id: result.post.id,
+      account: result.post.artist_name || result.post.group_name || "",
+      article: result.post.media_title,
+      created_at: result.post.created_at,
+      item_ids: result.solutions.map((s) => s.id),
+      metadata: null,
+      ts: result.post.created_at,
+    },
+    items: result.solutions.map((solution, index) => ({
+      id: index + 1, // Generate sequential ID
+      image_id: result.post.id,
+      brand: solution.brand || null,
+      product_name: solution.product_name || null,
+      cropped_image_path: solution.thumbnail_url || null,
+      price: solution.price_amount?.toString() || null,
+      description: solution.description || null,
+      status: solution.status || null,
+      created_at: solution.created_at || null,
+    })),
+    images: [
+      {
+        id: result.post.id,
+        image_url: result.post.image_url,
+        created_at: result.post.created_at,
+        image_hash: "",
+        status: "extracted",
+        with_items: result.spots.length > 0,
+      },
+    ],
+  };
+}
+
+/**
+ * Fetches posts by user ID (client-side)
+ *
+ * @param userId - User ID to filter by
+ * @param limit - Maximum number of posts to fetch (default: 20)
+ * @returns Array of PostRow
+ */
+export async function fetchPostsByUser(
+  userId: string,
+  limit = 20
+): Promise<PostRow[]> {
+  const { data, error } = await supabaseBrowserClient
+    .from("posts")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("status", "active")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    if (process.env.NODE_ENV === "development") {
+      console.error(
+        "[fetchPostsByUser] Error:",
+        JSON.stringify(error, null, 2)
+      );
+    }
+    return [];
+  }
+
+  return data || [];
+}
+
+/**
+ * Fetches a single post by ID (client-side)
+ *
+ * @param postId - Post ID to fetch
+ * @returns PostRow or null if not found
+ */
+export async function fetchPostById(postId: string): Promise<PostRow | null> {
+  const { data, error } = await supabaseBrowserClient
+    .from("posts")
+    .select("*")
+    .eq("id", postId)
+    .single();
+
+  if (error) {
+    if (error.code === "PGRST116") {
+      return null;
+    }
+    if (process.env.NODE_ENV === "development") {
+      console.error("[fetchPostById] Error:", JSON.stringify(error, null, 2));
+    }
+    return null;
+  }
+
+  return data;
 }

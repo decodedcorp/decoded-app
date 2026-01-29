@@ -133,7 +133,9 @@ export function whatsNewStyleToStyleCardData(
   data: WhatsNewStyleData
 ): StyleCardData {
   const artistName = data.account ?? "Unknown";
-  const itemNames = data.items.map((item: StyleItemData) => item.name).slice(0, 2);
+  const itemNames = data.items
+    .map((item: StyleItemData) => item.name)
+    .slice(0, 2);
 
   const description =
     data.items.length > 0

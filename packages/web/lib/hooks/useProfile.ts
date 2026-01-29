@@ -3,7 +3,13 @@
  * React Query hooks for user profile data
  */
 
-import { useQuery, useInfiniteQuery, useMutation, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
+import {
+  useQuery,
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+  UseQueryOptions,
+} from "@tanstack/react-query";
 import {
   fetchMe,
   updateMe,
@@ -53,7 +59,10 @@ export function useMe(
 // ============================================================
 
 export function useUserStats(
-  options?: Omit<UseQueryOptions<UserStatsResponse, Error>, "queryKey" | "queryFn">
+  options?: Omit<
+    UseQueryOptions<UserStatsResponse, Error>,
+    "queryKey" | "queryFn"
+  >
 ) {
   return useQuery({
     queryKey: profileKeys.stats(),

@@ -1,12 +1,35 @@
-import type { Json, Database } from "@/lib/supabase/types";
-import type { ItemRow } from "@/lib/supabase/queries/items";
+import type { Json, SolutionRow, SpotRow } from "@/lib/supabase/types";
 import type { CSSProperties } from "react";
 
 /**
- * Database item type (raw from Supabase)
- * This represents the exact structure from the database
+ * Legacy ItemRow type for backward compatibility
+ * This represents the old item structure, mapped from solutions
  */
-export type DbItem = Database["public"]["Tables"]["item"]["Row"];
+export interface ItemRow {
+  id: number;
+  image_id: string;
+  brand: string | null;
+  product_name: string | null;
+  cropped_image_path: string | null;
+  price: string | null;
+  description: string | null;
+  status: string | null;
+  created_at: string | null;
+  // Legacy fields (may be null)
+  bboxes: Json | null;
+  center: Json | null;
+  scores: Json | null;
+  ambiguity: boolean | null;
+  citations: string[] | null;
+  metadata: string[] | null;
+  sam_prompt: string | null;
+}
+
+/**
+ * Database item type (for backward compatibility)
+ * @deprecated Use SolutionRow from types.ts instead
+ */
+export type DbItem = ItemRow;
 
 /**
  * Normalized coordinate (0.0 ~ 1.0)
@@ -43,6 +66,30 @@ export type UiItem = NormalizedItem & {
   imageUrl: string | null; // cropped_image_path mapped to camelCase
   bboxSource: "override" | "item" | "center"; // Source of the bounding box logic
 };
+
+/**
+ * Convert a SpotRow to ItemRow for legacy compatibility
+ */
+export function spotToItemRow(spot: SpotRow, solution?: SolutionRow): ItemRow {
+  return {
+    id: parseInt(spot.id.substring(0, 8), 16) || 0,
+    image_id: spot.post_id,
+    brand: solution?.brand || null,
+    product_name: solution?.product_name || null,
+    cropped_image_path: solution?.thumbnail_url || null,
+    price: solution?.price_amount?.toString() || null,
+    description: solution?.description || null,
+    status: solution?.status || spot.status || null,
+    created_at: spot.created_at || null,
+    bboxes: null,
+    center: [parseFloat(spot.position_left), parseFloat(spot.position_top)],
+    scores: null,
+    ambiguity: null,
+    citations: null,
+    metadata: null,
+    sam_prompt: null,
+  };
+}
 
 /**
  * Helper: Convert pixel value to relative position (0.0 ~ 1.0)

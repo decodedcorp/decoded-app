@@ -1,12 +1,18 @@
-'use client';
+"use client";
 
-import { cn } from '@/lib/utils';
-import { forwardRef, useState } from 'react';
-import Link from 'next/link';
-import { Instagram, Twitter, Facebook, ChevronDown, ArrowRight } from 'lucide-react';
-import { Text } from './typography';
-import { Input } from './input';
-import { Button } from '@/lib/components/ui/button';
+import { cn } from "@/lib/utils";
+import { forwardRef, useState } from "react";
+import Link from "next/link";
+import {
+  Instagram,
+  Twitter,
+  Facebook,
+  ChevronDown,
+  ArrowRight,
+} from "lucide-react";
+import { Text } from "./typography";
+import { Input } from "./input";
+import { Button } from "@/lib/components/ui/button";
 
 /**
  * DesktopFooter Component
@@ -19,29 +25,37 @@ import { Button } from '@/lib/components/ui/button';
  */
 
 const companyLinks = [
-  { label: 'About', href: '/about' },
-  { label: 'Careers', href: '/careers' },
-  { label: 'Press', href: '/press' },
-  { label: 'Blog', href: '/blog' },
+  { label: "About", href: "/about" },
+  { label: "Careers", href: "/careers" },
+  { label: "Press", href: "/press" },
+  { label: "Blog", href: "/blog" },
 ];
 
 const supportLinks = [
-  { label: 'Help Center', href: '/help' },
-  { label: 'Contact', href: '/contact' },
-  { label: 'FAQ', href: '/faq' },
-  { label: 'Report Issue', href: '/report' },
+  { label: "Help Center", href: "/help" },
+  { label: "Contact", href: "/contact" },
+  { label: "FAQ", href: "/faq" },
+  { label: "Report Issue", href: "/report" },
 ];
 
 const socialLinks = [
-  { icon: Instagram, href: 'https://instagram.com/decoded_app', label: 'Instagram' },
-  { icon: Twitter, href: 'https://twitter.com/decoded_app', label: 'Twitter' },
-  { icon: Facebook, href: 'https://facebook.com/decoded_app', label: 'Facebook' },
+  {
+    icon: Instagram,
+    href: "https://instagram.com/decoded_app",
+    label: "Instagram",
+  },
+  { icon: Twitter, href: "https://twitter.com/decoded_app", label: "Twitter" },
+  {
+    icon: Facebook,
+    href: "https://facebook.com/decoded_app",
+    label: "Facebook",
+  },
 ];
 
 const legalLinks = [
-  { label: 'Privacy Policy', href: '/privacy' },
-  { label: 'Terms of Service', href: '/terms' },
-  { label: 'Cookie Policy', href: '/cookies' },
+  { label: "Privacy Policy", href: "/privacy" },
+  { label: "Terms of Service", href: "/terms" },
+  { label: "Cookie Policy", href: "/cookies" },
 ];
 
 export interface DesktopFooterProps {
@@ -78,7 +92,11 @@ interface FooterLinkSectionProps {
  *
  * Reusable link section with optional accordion behavior for mobile.
  */
-const FooterLinkSection = ({ title, links, collapsible = false }: FooterLinkSectionProps) => {
+const FooterLinkSection = ({
+  title,
+  links,
+  collapsible = false,
+}: FooterLinkSectionProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   if (collapsible) {
@@ -92,8 +110,8 @@ const FooterLinkSection = ({ title, links, collapsible = false }: FooterLinkSect
           {title}
           <ChevronDown
             className={cn(
-              'h-4 w-4 transition-transform duration-200',
-              isOpen && 'rotate-180'
+              "h-4 w-4 transition-transform duration-200",
+              isOpen && "rotate-180"
             )}
           />
         </button>
@@ -168,13 +186,13 @@ interface FooterNewsletterProps {
 }
 
 const FooterNewsletter = ({ onSubscribe }: FooterNewsletterProps) => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email && onSubscribe) {
       onSubscribe(email);
-      setEmail('');
+      setEmail("");
     }
   };
 
@@ -259,7 +277,11 @@ const FooterBottom = () => {
 export const DesktopFooter = forwardRef<HTMLElement, DesktopFooterProps>(
   ({ className, onNewsletterSubscribe }, ref) => {
     return (
-      <footer ref={ref} className={cn('bg-muted', className)} role="contentinfo">
+      <footer
+        ref={ref}
+        className={cn("bg-muted", className)}
+        role="contentinfo"
+      >
         {/* Main Content */}
         <div className="container mx-auto px-6 py-12">
           {/* Desktop: 4-column grid */}
@@ -276,8 +298,16 @@ export const DesktopFooter = forwardRef<HTMLElement, DesktopFooterProps>(
           {/* Mobile: Stacked with accordions */}
           <div className="flex flex-col gap-6 md:hidden">
             <FooterBrand />
-            <FooterLinkSection title="Company" links={companyLinks} collapsible />
-            <FooterLinkSection title="Support" links={supportLinks} collapsible />
+            <FooterLinkSection
+              title="Company"
+              links={companyLinks}
+              collapsible
+            />
+            <FooterLinkSection
+              title="Support"
+              links={supportLinks}
+              collapsible
+            />
             <div className="flex flex-col gap-4">
               <FooterSocialLinks />
               <FooterNewsletter onSubscribe={onNewsletterSubscribe} />
@@ -292,4 +322,4 @@ export const DesktopFooter = forwardRef<HTMLElement, DesktopFooterProps>(
   }
 );
 
-DesktopFooter.displayName = 'DesktopFooter';
+DesktopFooter.displayName = "DesktopFooter";

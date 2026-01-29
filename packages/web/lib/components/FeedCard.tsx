@@ -18,12 +18,12 @@ if (typeof window !== "undefined") {
  */
 function getSourceBadgeStyles(source?: string): string {
   switch (source?.toLowerCase()) {
-    case 'instagram':
-      return 'bg-gradient-to-r from-[#F58529] via-[#DD2A7B] to-[#8134AF]';
-    case 'tiktok':
-      return 'bg-black';
+    case "instagram":
+      return "bg-gradient-to-r from-[#F58529] via-[#DD2A7B] to-[#8134AF]";
+    case "tiktok":
+      return "bg-black";
     default:
-      return 'bg-muted-foreground/60';
+      return "bg-muted-foreground/60";
   }
 }
 
@@ -31,15 +31,15 @@ function getSourceBadgeStyles(source?: string): string {
  * Format date as relative time
  */
 function formatRelativeTime(date?: Date | string): string {
-  if (!date) return '';
-  const d = typeof date === 'string' ? new Date(date) : date;
+  if (!date) return "";
+  const d = typeof date === "string" ? new Date(date) : date;
   const now = new Date();
   const diffMs = now.getTime() - d.getTime();
   const diffMins = Math.floor(diffMs / 60000);
   const diffHours = Math.floor(diffMins / 60);
   const diffDays = Math.floor(diffHours / 24);
 
-  if (diffMins < 1) return 'Just now';
+  if (diffMins < 1) return "Just now";
   if (diffMins < 60) return `${diffMins}m`;
   if (diffHours < 24) return `${diffHours}h`;
   if (diffDays < 7) return `${diffDays}d`;
@@ -126,10 +126,12 @@ export const FeedCard = memo(
           <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
             {/* Source badge */}
             {item.postSource && (
-              <span className={cn(
-                "rounded-full px-2 py-0.5 text-xs font-medium text-white",
-                getSourceBadgeStyles(item.postSource)
-              )}>
+              <span
+                className={cn(
+                  "rounded-full px-2 py-0.5 text-xs font-medium text-white",
+                  getSourceBadgeStyles(item.postSource)
+                )}
+              >
                 {item.postSource}
               </span>
             )}

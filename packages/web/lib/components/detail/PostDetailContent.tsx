@@ -1,7 +1,7 @@
 "use client";
 
 import type { PostDetail } from "@/lib/supabase/queries/posts";
-import { normalizeItem } from "./types";
+import { spotToItemRow, normalizeItem } from "./types";
 import { ShopGrid } from "./ShopGrid";
 import Link from "next/link";
 import Image from "next/image";
@@ -15,20 +15,37 @@ type Props = {
 /**
  * Content component for post detail view
  *
+ * New schema structure:
+ * - post: PostRow (main content)
+ * - spots: SpotRow[] (item locations in image)
+ * - solutions: SolutionRow[] (product matches for spots)
+ *
  * Sections:
- * 1. Hero Section - Post info with account
- * 2. Article & Metadata - Markdown content and tags
- * 3. Images Grid - Grid of images from items
- * 4. Shop Grid - Grid of items
+ * 1. Hero Section - Post info with artist/group name
+ * 2. Article & Metadata - media_title and media_metadata
+ * 3. Main Image - Post's primary image
+ * 4. Shop Grid - Items from solutions
  */
 export function PostDetailContent({ postDetail }: Props) {
-  const { post, items, images } = postDetail;
+  const { post, spots, solutions } = postDetail;
 
-  // Normalize items
+  // Map spots to legacy item format for ShopGrid compatibility
+  const items = spots.map((spot) => {
+    const solution = solutions.find((s) => s.spot_id === spot.id);
+    return spotToItemRow(spot, solution);
+  });
+
+  // Normalize items for UI
   const normalizedItems = items.map((item) => normalizeItem(item));
 
   const hasItems = normalizedItems.length > 0;
-  const hasImages = images.length > 0;
+  const hasImage = !!post.image_url;
+
+  // Display name: prefer artist_name, fallback to group_name
+  const displayName = post.artist_name || post.group_name || "Unknown";
+
+  // Extract metadata tags from media_metadata if available
+  const metadataTags = extractMetadataTags(post.media_metadata);
 
   return (
     <div className="detail-content">
@@ -39,19 +56,24 @@ export function PostDetailContent({ postDetail }: Props) {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 shadow-sm mb-6">
               <span className="w-2 h-2 rounded-full bg-emerald-500/80" />
               <span className="text-sm font-medium text-foreground">
-                @{post.account}
+                @{displayName}
               </span>
             </div>
-            {/* Title is usually part of article markdown, but we keep this as backup or for pure aesthetic */}
-            {!post.article && (
+            {/* Title from media_title */}
+            {post.media_title ? (
+              <h1 className="text-4xl md:text-6xl font-bold mb-4">
+                {post.media_title}
+              </h1>
+            ) : (
               <h1 className="text-4xl md:text-6xl font-bold mb-4">
                 Post Details
               </h1>
             )}
             <p className="text-muted-foreground">
-              {items.length} {items.length === 1 ? "item" : "items"} featured
-              {images.length > 0 &&
-                ` • ${images.length} ${images.length === 1 ? "image" : "images"}`}
+              {solutions.length} {solutions.length === 1 ? "item" : "items"}{" "}
+              featured
+              {spots.length > 0 &&
+                ` • ${spots.length} ${spots.length === 1 ? "spot" : "spots"} marked`}
             </p>
             {post.created_at && (
               <p className="text-sm text-muted-foreground mt-2">
@@ -62,43 +84,47 @@ export function PostDetailContent({ postDetail }: Props) {
         </div>
       </div>
 
-      {/* Section 2: Article & Metadata */}
-      {post.metadata && <MetadataTags tags={post.metadata} />}
-      {post.article && <ArticleContent content={post.article} />}
+      {/* Section 2: Metadata Tags */}
+      {metadataTags.length > 0 && <MetadataTags tags={metadataTags} />}
 
-      {/* Section 3: Images Grid */}
-      {hasImages && (
+      {/* Section 3: Article Content (if media_title exists as detailed content) */}
+      {post.context && <ArticleContent content={post.context} />}
+
+      {/* Section 4: Main Image */}
+      {hasImage && (
         <div className="bg-muted/10 border-b border-border">
           <div className="mx-auto max-w-6xl px-4 py-12 md:px-8">
-            <h2 className="text-2xl font-bold mb-6">Images</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {images.map((image) => (
-                <Link
-                  key={image.id}
-                  href={`/images/${image.id}`}
-                  className="group relative aspect-[3/4] overflow-hidden rounded-lg border border-border bg-muted hover:shadow-lg transition-shadow"
-                >
-                  {image.image_url ? (
-                    <Image
-                      src={image.image_url}
-                      alt={`Image ${image.id}`}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
-                      <span className="text-sm">No image</span>
-                    </div>
-                  )}
-                </Link>
+            <h2 className="text-2xl font-bold mb-6">Image</h2>
+            <div className="relative aspect-[3/4] max-w-2xl mx-auto overflow-hidden rounded-lg border border-border bg-muted">
+              <Image
+                src={post.image_url!}
+                alt={post.media_title || `Post ${post.id}`}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+                priority
+              />
+              {/* Render spot markers on the image */}
+              {spots.map((spot) => (
+                <div
+                  key={spot.id}
+                  className="absolute w-6 h-6 -translate-x-1/2 -translate-y-1/2 bg-emerald-500/80 rounded-full border-2 border-white shadow-lg cursor-pointer hover:scale-110 transition-transform"
+                  style={{
+                    left: `${parseFloat(spot.position_left)}%`,
+                    top: `${parseFloat(spot.position_top)}%`,
+                  }}
+                  title={
+                    solutions.find((s) => s.spot_id === spot.id)
+                      ?.product_name || "Item"
+                  }
+                />
               ))}
             </div>
           </div>
         </div>
       )}
 
-      {/* Section 4: Shop Grid */}
+      {/* Section 5: Shop Grid */}
       {hasItems && <ShopGrid items={normalizedItems} />}
 
       {/* Fallback: Show basic info if no items */}
@@ -107,11 +133,45 @@ export function PostDetailContent({ postDetail }: Props) {
           <div className="text-center">
             <h2 className="mb-4 text-2xl font-semibold">No Items</h2>
             <p className="text-muted-foreground">
-              This post doesn't have any items yet.
+              This post doesn&apos;t have any items yet.
             </p>
           </div>
         </div>
       )}
     </div>
   );
+}
+
+/**
+ * Extract metadata tags from media_metadata JSON
+ */
+function extractMetadataTags(metadata: unknown): string[] {
+  if (!metadata || typeof metadata !== "object") return [];
+
+  // Try common metadata patterns
+  if (Array.isArray(metadata)) {
+    return metadata.filter((item): item is string => typeof item === "string");
+  }
+
+  // Check for tags array in metadata
+  if (
+    "tags" in metadata &&
+    Array.isArray((metadata as { tags?: unknown }).tags)
+  ) {
+    return (metadata as { tags: unknown[] }).tags.filter(
+      (item): item is string => typeof item === "string"
+    );
+  }
+
+  // Check for keywords
+  if (
+    "keywords" in metadata &&
+    Array.isArray((metadata as { keywords?: unknown }).keywords)
+  ) {
+    return (metadata as { keywords: unknown[] }).keywords.filter(
+      (item): item is string => typeof item === "string"
+    );
+  }
+
+  return [];
 }

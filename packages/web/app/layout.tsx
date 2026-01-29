@@ -44,10 +44,10 @@ export default function RootLayout({
             <ConditionalNav />
 
             {/* Main Content Area - with header padding */}
-            <MainContentWrapper>
-              {children}
-              {modal}
-            </MainContentWrapper>
+            <MainContentWrapper>{children}</MainContentWrapper>
+
+            {/* Modal slot - rendered outside MainContentWrapper */}
+            {modal}
 
             {/* Footer - after main content */}
             <DesktopFooter className="mt-auto" />

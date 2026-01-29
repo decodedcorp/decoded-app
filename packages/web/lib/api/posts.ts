@@ -62,7 +62,9 @@ export async function uploadImage({
     try {
       errorData = await response.json();
     } catch {
-      errorData = { message: `HTTP ${response.status}: ${response.statusText}` };
+      errorData = {
+        message: `HTTP ${response.status}: ${response.statusText}`,
+      };
     }
 
     throw new Error(errorData.message || `API Error: ${response.status}`);
