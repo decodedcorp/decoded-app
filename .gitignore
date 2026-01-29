@@ -64,3 +64,5 @@ next-env.d.ts
 .cache/
 
 .DS_Store
+# MCP config (contains API tokens)
+.mcp.json

@@ -15,6 +15,7 @@ interface DetectionViewProps {
   isRevealing?: boolean;
   selectedSpotId?: string | null;
   onSpotClick?: (spot: DetectedSpot) => void;
+  layout?: "default" | "fullscreen";
 }
 
 /**
@@ -32,9 +33,15 @@ export const DetectionView = memo(
     isRevealing = false,
     selectedSpotId,
     onSpotClick,
+    layout = "default",
   }: DetectionViewProps) => {
+    const containerClasses =
+      layout === "fullscreen"
+        ? "relative w-full h-full overflow-hidden bg-foreground/5"
+        : "relative w-full aspect-[3/4] max-w-md mx-auto rounded-xl overflow-hidden bg-foreground/5";
+
     return (
-      <div className="relative w-full aspect-[3/4] max-w-md mx-auto rounded-xl overflow-hidden bg-foreground/5">
+      <div className={containerClasses}>
         {/* 이미지 */}
         <Image
           src={image.previewUrl}

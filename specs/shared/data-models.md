@@ -2,6 +2,10 @@
 
 > TypeScript interfaces and database schemas for Decoded App
 
+> **Related Documentation**
+> - 실제 DB 사용 가이드: [docs/database/01-schema-usage.md](../../docs/database/01-schema-usage.md)
+> - API 스키마: [docs/api/schemas.md](../../docs/api/schemas.md)
+
 ---
 
 ## Core Domain Types

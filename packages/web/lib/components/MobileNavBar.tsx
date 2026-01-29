@@ -18,8 +18,14 @@ interface NavItem {
 const navItems: NavItem[] = [
   { id: "home", href: "/", icon: Home, label: "Home" },
   { id: "explore", href: "/explore", icon: Search, label: "Explore" },
-  { id: "request", href: "#", icon: HelpCircle, label: "Request", isAction: true },
-  { id: "profile", href: "/profile", icon: User, label: "Profile", disabled: true },
+  {
+    id: "request",
+    href: "#",
+    icon: HelpCircle,
+    label: "Request",
+    isAction: true,
+  },
+  { id: "profile", href: "/profile", icon: User, label: "Profile" },
 ];
 
 /**

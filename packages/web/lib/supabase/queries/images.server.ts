@@ -14,8 +14,7 @@ import type { ImageRow } from "../types";
  * Use this function in Server Components and Route Handlers.
  *
  * @param limit - Maximum number of images to fetch (default: 20)
- * @returns Array of image rows, ordered by created_at descending
- * @throws Error if the query fails
+ * @returns Array of image rows, ordered by created_at descending (empty array on error)
  */
 export async function fetchLatestImagesServer(limit = 20): Promise<ImageRow[]> {
   const supabase = await createSupabaseServerClient();
@@ -30,7 +29,8 @@ export async function fetchLatestImagesServer(limit = 20): Promise<ImageRow[]> {
     .limit(limit);
 
   if (error) {
-    throw error;
+    console.error("Error fetching latest images:", error);
+    return [];
   }
 
   return data ?? [];
@@ -42,8 +42,7 @@ export async function fetchLatestImagesServer(limit = 20): Promise<ImageRow[]> {
  * Use this function in Server Components and Route Handlers.
  *
  * @param id - Image ID to fetch
- * @returns Image row or null if not found
- * @throws Error if the query fails
+ * @returns Image row or null if not found (null on error)
  */
 export async function fetchImageByIdServer(
   id: string
@@ -60,7 +59,8 @@ export async function fetchImageByIdServer(
       // No rows returned
       return null;
     }
-    throw error;
+    console.error("Error fetching image by id:", error);
+    return null;
   }
 
   return data;

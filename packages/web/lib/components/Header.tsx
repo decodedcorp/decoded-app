@@ -17,7 +17,7 @@ import DecodedLogo from "./DecodedLogo";
 export function Header() {
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-[9999] w-full bg-transparent pointer-events-none md:hidden"
+      className="fixed top-0 left-0 right-0 z-[9999] w-full bg-background/80 backdrop-blur-md pointer-events-none md:hidden"
       aria-label="Mobile header"
     >
       <div className="w-full px-2 h-14 flex items-center justify-between gap-2 pointer-events-auto">

@@ -4,6 +4,21 @@
 
 @layer base {
   :root {
+    /* Main Page Design Tokens (from Figma) */
+    --main-bg: #1f1f1f;
+    --main-cta-bg: #242424;
+    --main-accent: #ff6767;
+    --main-text-white: #ffffff;
+    --main-text-gray: #666666;
+    --main-border-radius: 20px;
+
+    /* Main Page Typography */
+    --text-hero: clamp(40px, 8vw, 100px);
+    --text-heading-xl: clamp(32px, 6vw, 80px);
+    --text-heading-lg: clamp(28px, 5vw, 60px);
+    --text-heading-md: clamp(24px, 4vw, 40px);
+    --text-heading-sm: clamp(20px, 3vw, 30px);
+
     --background: oklch(0.9842 0.0034 247.8575);
     --foreground: oklch(0.2077 0.0398 265.7549);
     --card: oklch(1 0 0);
@@ -282,10 +297,8 @@
 
 /* Grid pattern */
 .hologram-grid {
-  background-image: linear-gradient(
-      oklch(0.9519 0.1739 115.8446 / 0.1) 1px,
-      transparent 1px
-    ),
+  background-image:
+    linear-gradient(oklch(0.9519 0.1739 115.8446 / 0.1) 1px, transparent 1px),
     linear-gradient(
       90deg,
       oklch(0.9519 0.1739 115.8446 / 0.1) 1px,
@@ -341,6 +354,63 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-spot-reveal,
   .animate-reveal-scan {
+    animation: none;
+  }
+}
+
+/* Bottom Sheet Animation */
+@keyframes slide-up {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out forwards;
+}
+
+/* Card Selection Glow Animation */
+@keyframes card-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 12px oklch(0.9519 0.1739 115.8446),
+      0 0 24px oklch(0.9519 0.1739 115.8446 / 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 16px oklch(0.9519 0.1739 115.8446),
+      0 0 32px oklch(0.9519 0.1739 115.8446 / 0.4);
+  }
+}
+
+.animate-card-glow {
+  animation: card-glow 2s ease-in-out infinite;
+}
+
+/* Line clamp utility for descriptions */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-slide-up,
+  .animate-card-glow {
     animation: none;
   }
 }

@@ -1,6 +1,8 @@
 /**
  * 이미지 업로드 로직 훅
  * 파일 검증, 압축, Supabase Storage 업로드를 처리합니다.
+ *
+ * 플로우: 이미지 선택 → 압축 → Supabase Storage 업로드 → AI 분석 자동 실행
  */
 
 import { useCallback, useEffect } from "react";
@@ -16,18 +18,23 @@ import {
   extractImageFromClipboard,
   UPLOAD_CONFIG,
 } from "@/lib/utils/validation";
-// TODO: 실제 Supabase 연동 시 주석 해제
-// import { compressImage } from "@/lib/utils/imageCompression";
-// import { supabaseBrowserClient } from "@/lib/supabase/client";
+import { compressImage } from "@/lib/utils/imageCompression";
+import { uploadToSupabaseStorage } from "@/lib/supabase/storage";
 
 export interface UseImageUploadOptions {
   autoUpload?: boolean;
+  autoAnalyze?: boolean;
   onUploadComplete?: (id: string, url: string) => void;
   onUploadError?: (id: string, error: string) => void;
 }
 
 export function useImageUpload(options: UseImageUploadOptions = {}) {
-  const { autoUpload = true, onUploadComplete, onUploadError } = options;
+  const {
+    autoUpload = true,
+    autoAnalyze = true,
+    onUploadComplete,
+    onUploadError,
+  } = options;
 
   const images = useRequestStore(selectImages);
   const isMaxImages = useRequestStore(selectIsMaxImages);
@@ -36,32 +43,44 @@ export function useImageUpload(options: UseImageUploadOptions = {}) {
   const updateImageStatus = useRequestStore((s) => s.updateImageStatus);
   const setImageUploadedUrl = useRequestStore((s) => s.setImageUploadedUrl);
   const clearImages = useRequestStore((s) => s.clearImages);
+  const startDetection = useRequestStore((s) => s.startDetection);
 
   /**
-   * 단일 이미지 업로드 (Mock - UI 테스트용)
-   * TODO: 실제 Supabase Storage 연동 시 주석 해제
+   * 단일 이미지 업로드 (Supabase Storage)
+   * 업로드 완료 후 자동으로 AI 분석 시작
    */
   const uploadToStorage = useCallback(
     async (id: string, file: File) => {
       updateImageStatus(id, "uploading", 0);
 
       try {
-        // Mock: 압축 시뮬레이션
-        await new Promise((resolve) => setTimeout(resolve, 300));
+        // 1. 이미지 압축
+        updateImageStatus(id, "uploading", 10);
+        const { file: compressedFile, wasCompressed } =
+          await compressImage(file);
+
+        if (wasCompressed) {
+          console.log(`Image compressed: ${file.name}`);
+        }
         updateImageStatus(id, "uploading", 30);
 
-        // Mock: 업로드 시뮬레이션
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        updateImageStatus(id, "uploading", 70);
+        // 2. Supabase Storage에 업로드
+        updateImageStatus(id, "uploading", 50);
+        const publicUrl = await uploadToSupabaseStorage(compressedFile);
 
-        await new Promise((resolve) => setTimeout(resolve, 300));
+        // 3. 업로드 완료
         updateImageStatus(id, "uploading", 90);
+        setImageUploadedUrl(id, publicUrl);
+        onUploadComplete?.(id, publicUrl);
+        updateImageStatus(id, "uploaded", 100);
 
-        // Mock: previewUrl을 그대로 사용 (실제 업로드 없음)
-        const mockUrl = URL.createObjectURL(file);
-        setImageUploadedUrl(id, mockUrl);
-        onUploadComplete?.(id, mockUrl);
-        toast.success("이미지 준비 완료");
+        // 4. 자동 AI 분석 시작
+        if (autoAnalyze) {
+          // 약간의 딜레이 후 분석 시작 (UI 업데이트 대기)
+          setTimeout(() => {
+            startDetection();
+          }, 100);
+        }
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : "Upload failed";
@@ -70,7 +89,14 @@ export function useImageUpload(options: UseImageUploadOptions = {}) {
         toast.error(errorMessage);
       }
     },
-    [updateImageStatus, setImageUploadedUrl, onUploadComplete, onUploadError]
+    [
+      updateImageStatus,
+      setImageUploadedUrl,
+      onUploadComplete,
+      onUploadError,
+      autoAnalyze,
+      startDetection,
+    ]
   );
 
   /**

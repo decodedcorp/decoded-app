@@ -1,4 +1,10 @@
+/**
+ * Auth Store - Supabase OAuth 인증 상태 관리
+ */
+
 import { create } from "zustand";
+import { type User as SupabaseUser } from "@supabase/supabase-js";
+import { supabaseBrowserClient } from "@/lib/supabase/client";
 
 export type OAuthProvider = "kakao" | "google" | "apple";
 
@@ -14,54 +20,179 @@ interface AuthState {
   user: User | null;
   isGuest: boolean;
   isLoading: boolean;
+  isInitialized: boolean;
   loadingProvider: OAuthProvider | null;
   error: string | null;
 
   // Actions
-  mockLogin: (provider: OAuthProvider) => Promise<void>;
+  initialize: () => Promise<void>;
+  signInWithOAuth: (provider: OAuthProvider) => Promise<void>;
   guestLogin: () => void;
-  logout: () => void;
+  logout: () => Promise<void>;
   clearError: () => void;
+  setUser: (supabaseUser: SupabaseUser | null) => void;
 }
 
-const mockUser: User = {
-  id: "mock-user-001",
-  email: "user@example.com",
-  name: "Mock User",
-  avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=mock",
-  createdAt: new Date().toISOString(),
-};
+/**
+ * Supabase User를 앱 User 형식으로 변환
+ */
+function mapSupabaseUser(supabaseUser: SupabaseUser): User {
+  const metadata = supabaseUser.user_metadata || {};
 
-export const useAuthStore = create<AuthState>((set) => ({
+  return {
+    id: supabaseUser.id,
+    email: supabaseUser.email || "",
+    name:
+      metadata.full_name ||
+      metadata.name ||
+      metadata.nickname ||
+      supabaseUser.email?.split("@")[0] ||
+      "User",
+    avatarUrl: metadata.avatar_url || metadata.picture,
+    createdAt: supabaseUser.created_at,
+  };
+}
+
+export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   isGuest: false,
   isLoading: false,
+  isInitialized: false,
   loadingProvider: null,
   error: null,
 
-  mockLogin: async (provider: OAuthProvider) => {
-    set({ isLoading: true, loadingProvider: provider, error: null });
+  /**
+   * 앱 시작 시 세션 확인
+   */
+  initialize: async () => {
+    if (get().isInitialized) return;
 
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const {
+        data: { session },
+        error,
+      } = await supabaseBrowserClient.auth.getSession();
 
-    set({
-      user: mockUser,
-      isGuest: false,
-      isLoading: false,
-      loadingProvider: null,
-    });
+      if (error) {
+        console.error("Failed to get session:", error);
+        set({ isInitialized: true, user: null });
+        return;
+      }
+
+      if (session?.user) {
+        set({
+          user: mapSupabaseUser(session.user),
+          isInitialized: true,
+          isGuest: false,
+        });
+      } else {
+        set({ isInitialized: true, user: null });
+      }
+    } catch (error) {
+      console.error("Auth initialization error:", error);
+      set({ isInitialized: true, user: null });
+    }
   },
 
+  /**
+   * OAuth 로그인
+   */
+  signInWithOAuth: async (provider: OAuthProvider) => {
+    set({ isLoading: true, loadingProvider: provider, error: null });
+
+    try {
+      const { error } = await supabaseBrowserClient.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      // OAuth는 리다이렉트되므로 여기서 loading 상태는 유지됨
+      // 실제 로그인 완료는 onAuthStateChange에서 처리
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "로그인에 실패했습니다.";
+      set({
+        error: message,
+        isLoading: false,
+        loadingProvider: null,
+      });
+    }
+  },
+
+  /**
+   * 게스트 로그인
+   */
   guestLogin: () => {
     set({ isGuest: true, user: null, error: null });
   },
 
-  logout: () => {
-    set({ user: null, isGuest: false, error: null });
+  /**
+   * 로그아웃
+   */
+  logout: async () => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const { error } = await supabaseBrowserClient.auth.signOut();
+
+      if (error) {
+        throw error;
+      }
+
+      set({
+        user: null,
+        isGuest: false,
+        isLoading: false,
+      });
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "로그아웃에 실패했습니다.";
+      set({
+        error: message,
+        isLoading: false,
+      });
+    }
   },
 
+  /**
+   * 에러 초기화
+   */
   clearError: () => {
     set({ error: null });
   },
+
+  /**
+   * Supabase auth state change에서 호출
+   */
+  setUser: (supabaseUser: SupabaseUser | null) => {
+    if (supabaseUser) {
+      set({
+        user: mapSupabaseUser(supabaseUser),
+        isGuest: false,
+        isLoading: false,
+        loadingProvider: null,
+      });
+    } else {
+      set({
+        user: null,
+        isLoading: false,
+        loadingProvider: null,
+      });
+    }
+  },
 }));
+
+// Selectors
+export const selectUser = (state: AuthState) => state.user;
+export const selectIsAuthenticated = (state: AuthState) =>
+  !!state.user || state.isGuest;
+export const selectIsLoggedIn = (state: AuthState) => !!state.user;
+export const selectIsGuest = (state: AuthState) => state.isGuest;
+export const selectIsLoading = (state: AuthState) => state.isLoading;
+export const selectIsInitialized = (state: AuthState) => state.isInitialized;

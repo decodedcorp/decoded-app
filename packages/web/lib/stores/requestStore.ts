@@ -4,11 +4,19 @@
  */
 
 import { create } from "zustand";
+import { toast } from "sonner";
 import {
   createPreviewUrl,
   revokePreviewUrl,
 } from "@/lib/utils/imageCompression";
 import { UPLOAD_CONFIG } from "@/lib/utils/validation";
+import {
+  analyzeImage,
+  apiToStoreCoord,
+  type DetectedItem,
+  type MediaSource,
+  type ContextType,
+} from "@/lib/api";
 
 export type UploadStatus = "pending" | "uploading" | "uploaded" | "error";
 export type RequestStep = 1 | 2 | 3 | 4;
@@ -31,15 +39,23 @@ export interface DetectedSpot {
     x: number; // 0-1 (0=왼쪽, 1=오른쪽)
     y: number; // 0-1 (0=위, 1=아래)
   };
-  label?: string; // "상의", "하의" 등
+  label?: string; // "TOP", "BOTTOM" 등
+  categoryCode?: string; // "fashion", "beauty" 등
+
+  // Card display fields
+  title: string;
+  description: string;
+  brand?: string;
+  priceRange?: string;
+  imageUrl?: string; // 아이템 썸네일 이미지
+  confidence?: number; // AI 신뢰도
 }
 
-// Mock 데이터 - AI 감지 결과 시뮬레이션
-const MOCK_SPOTS: DetectedSpot[] = [
-  { id: "spot_1", index: 1, center: { x: 0.3, y: 0.25 }, label: "상의" },
-  { id: "spot_2", index: 2, center: { x: 0.5, y: 0.6 }, label: "하의" },
-  { id: "spot_3", index: 3, center: { x: 0.7, y: 0.4 }, label: "액세서리" },
-];
+// AI 메타데이터 (Step 3 초기값으로 사용)
+export interface AiMetadata {
+  artistName?: string;
+  context?: string;
+}
 
 interface RequestState {
   // Step 1: Upload
@@ -51,6 +67,18 @@ interface RequestState {
   isDetecting: boolean;
   isRevealing: boolean; // reveal 애니메이션 진행 중
   selectedSpotId: string | null;
+  aiMetadata: AiMetadata;
+  detectionError: string | null;
+
+  // Step 3: Details
+  mediaSource: MediaSource | null;
+  artistName: string;
+  groupName: string;
+  context: ContextType | null;
+
+  // Step 4: Submit
+  isSubmitting: boolean;
+  submitError: string | null;
 
   // Actions - Images
   addImage: (file: File) => string | null;
@@ -66,9 +94,19 @@ interface RequestState {
   clearImages: () => void;
 
   // Actions - Detection
-  startDetection: () => void;
+  startDetection: () => Promise<void>;
   setDetectedSpots: (spots: DetectedSpot[]) => void;
   selectSpot: (spotId: string | null) => void;
+
+  // Actions - Details (Step 3)
+  setMediaSource: (source: MediaSource | null) => void;
+  setArtistName: (name: string) => void;
+  setGroupName: (name: string) => void;
+  setContext: (context: ContextType | null) => void;
+
+  // Actions - Submit (Step 4)
+  setSubmitting: (submitting: boolean) => void;
+  setSubmitError: (error: string | null) => void;
 
   // Actions - Navigation
   setStep: (step: RequestStep) => void;
@@ -82,6 +120,25 @@ function generateId(): string {
   return `img_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 }
 
+/**
+ * API 응답을 DetectedSpot으로 변환
+ */
+function convertApiToSpot(item: DetectedItem, index: number): DetectedSpot {
+  return {
+    id: `spot_${index + 1}`,
+    index: index + 1,
+    center: {
+      x: apiToStoreCoord(item.left),
+      y: apiToStoreCoord(item.top),
+    },
+    label: item.label.toUpperCase(),
+    categoryCode: item.category,
+    title: item.label,
+    description: `Detected with ${Math.round(item.confidence * 100)}% confidence`,
+    confidence: item.confidence,
+  };
+}
+
 const initialState = {
   images: [] as UploadedImage[],
   currentStep: 1 as RequestStep,
@@ -89,6 +146,16 @@ const initialState = {
   isDetecting: false,
   isRevealing: false,
   selectedSpotId: null as string | null,
+  aiMetadata: {} as AiMetadata,
+  detectionError: null as string | null,
+  // Step 3
+  mediaSource: null as MediaSource | null,
+  artistName: "",
+  groupName: "",
+  context: null as ContextType | null,
+  // Step 4
+  isSubmitting: false,
+  submitError: null as string | null,
 };
 
 export const useRequestStore = create<RequestState>((set, get) => ({
@@ -188,22 +255,58 @@ export const useRequestStore = create<RequestState>((set, get) => ({
   },
 
   // Detection Actions
-  startDetection: () => {
-    set({ isDetecting: true, currentStep: 2 });
+  startDetection: async () => {
+    const { images } = get();
+    const uploadedImage = images.find((img) => img.status === "uploaded");
 
-    // Mock: 2초 딜레이로 AI 처리 시뮬레이션
-    setTimeout(() => {
+    if (!uploadedImage?.uploadedUrl) {
+      toast.error("업로드된 이미지가 없습니다.");
+      return;
+    }
+
+    set({
+      isDetecting: true,
+      currentStep: 2,
+      detectionError: null,
+    });
+
+    try {
+      const response = await analyzeImage(uploadedImage.uploadedUrl);
+
+      // API 응답을 DetectedSpot으로 변환
+      const spots = response.detected_items.map((item, index) =>
+        convertApiToSpot(item, index)
+      );
+
+      // AI 메타데이터 저장 (Step 3 초기값)
+      const aiMetadata: AiMetadata = {
+        artistName: response.metadata.artist_name,
+        context: response.metadata.context,
+      };
+
       set({
-        detectedSpots: MOCK_SPOTS,
+        detectedSpots: spots,
         isDetecting: false,
         isRevealing: true,
+        aiMetadata,
+        // AI 추천값으로 Step 3 초기화
+        artistName: response.metadata.artist_name || "",
+        context: (response.metadata.context as ContextType) || null,
       });
 
       // reveal 애니메이션 종료 (1.5초 후)
       setTimeout(() => {
         set({ isRevealing: false });
       }, 1500);
-    }, 2000);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "AI 분석에 실패했습니다.";
+      set({
+        isDetecting: false,
+        detectionError: errorMessage,
+      });
+      toast.error(errorMessage);
+    }
   },
 
   setDetectedSpots: (spots) => {
@@ -214,12 +317,38 @@ export const useRequestStore = create<RequestState>((set, get) => ({
     set({ selectedSpotId: spotId });
   },
 
+  // Step 3 Actions
+  setMediaSource: (source) => {
+    set({ mediaSource: source });
+  },
+
+  setArtistName: (name) => {
+    set({ artistName: name });
+  },
+
+  setGroupName: (name) => {
+    set({ groupName: name });
+  },
+
+  setContext: (context) => {
+    set({ context: context });
+  },
+
+  // Step 4 Actions
+  setSubmitting: (submitting) => {
+    set({ isSubmitting: submitting });
+  },
+
+  setSubmitError: (error) => {
+    set({ submitError: error });
+  },
+
   setStep: (step) => {
     set({ currentStep: step });
   },
 
   canProceedToNextStep: () => {
-    const { images, currentStep, detectedSpots } = get();
+    const { images, currentStep, detectedSpots, mediaSource } = get();
 
     switch (currentStep) {
       case 1:
@@ -229,8 +358,8 @@ export const useRequestStore = create<RequestState>((set, get) => ({
         // Step 2: AI 감지 완료 - spots가 있어야 함
         return detectedSpots.length > 0;
       case 3:
-        // Step 3: 태그 선택 완료 (추후 구현)
-        return true;
+        // Step 3: 필수 필드 검증 - media_source의 type과 title이 있어야 함
+        return !!(mediaSource?.type && mediaSource?.title);
       case 4:
         // Step 4: 최종 단계
         return true;
@@ -262,3 +391,16 @@ export const selectIsDetecting = (state: RequestState) => state.isDetecting;
 export const selectIsRevealing = (state: RequestState) => state.isRevealing;
 export const selectSelectedSpotId = (state: RequestState) =>
   state.selectedSpotId;
+export const selectDetectionError = (state: RequestState) =>
+  state.detectionError;
+export const selectAiMetadata = (state: RequestState) => state.aiMetadata;
+
+// Step 3 selectors
+export const selectMediaSource = (state: RequestState) => state.mediaSource;
+export const selectArtistName = (state: RequestState) => state.artistName;
+export const selectGroupName = (state: RequestState) => state.groupName;
+export const selectContext = (state: RequestState) => state.context;
+
+// Step 4 selectors
+export const selectIsSubmitting = (state: RequestState) => state.isSubmitting;
+export const selectSubmitError = (state: RequestState) => state.submitError;

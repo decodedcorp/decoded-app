@@ -1,12 +1,11 @@
 "use client";
 
-import { memo, useState } from "react";
+import { memo, useState, useEffect } from "react";
 import Link from "next/link";
 import { gsap } from "gsap";
 import { Flip } from "gsap/Flip";
-import type { ImageRow } from "@/lib/supabase/types";
-import { useInfiniteFilteredImages } from "@/lib/hooks/useImages";
-import type { ImageWithPostId } from "@/lib/supabase/queries/images";
+import { useInfinitePosts } from "@/lib/hooks/usePosts";
+import type { Post } from "@/lib/api/types";
 import ThiingsGrid, {
   type ItemConfig,
   type GridItem,
@@ -21,7 +20,7 @@ if (typeof window !== "undefined") {
 }
 
 type Props = {
-  initialImages: ImageRow[];
+  initialPosts?: Post[];
 };
 
 // Card cell component with actual image data
@@ -149,14 +148,35 @@ SkeletonCell.displayName = "SkeletonCell";
  * Explore Client Component - Pinterest-style Masonry Grid
  *
  * Uses SSR + React Query infinite scroll pattern:
- * - First render: Uses SSR initialImages
- * - React Query fetches in CSR -> appends data as user scrolls
+ * - First render: Uses SSR initialPosts (if provided)
+ * - React Query fetches from REST API -> appends data as user scrolls
  */
-export function ExploreClient({ initialImages: _initialImages }: Props) {
+export function ExploreClient({ initialPosts: _initialPosts }: Props) {
   const activeFilter = useFilterStore((state) => state.activeFilter);
   const debouncedQuery = useSearchStore((state) => state.debouncedQuery);
 
-  // Use infinite query hook
+  // Responsive grid size: smaller on mobile, larger on desktop
+  const [gridSize, setGridSize] = useState({ width: 400, height: 500 });
+
+  useEffect(() => {
+    const updateGridSize = () => {
+      const isMobile = window.innerWidth < 768; // md breakpoint
+      setGridSize(
+        isMobile
+          ? { width: 180, height: 225 } // Mobile: smaller cells
+          : { width: 400, height: 500 } // Desktop: original size
+      );
+    };
+
+    updateGridSize();
+    window.addEventListener("resize", updateGridSize);
+    return () => window.removeEventListener("resize", updateGridSize);
+  }, []);
+
+  // Map filter store value to API category parameter
+  const categoryParam = activeFilter !== "all" ? activeFilter : undefined;
+
+  // Use infinite posts query hook (REST API)
   const {
     data,
     isLoading,
@@ -166,42 +186,29 @@ export function ExploreClient({ initialImages: _initialImages }: Props) {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useInfiniteFilteredImages({
-    limit: 40,
-    filter: activeFilter,
-    search: debouncedQuery,
+  } = useInfinitePosts({
+    perPage: 40,
+    sort: "recent",
+    category: categoryParam,
+    // Note: search functionality would require API support for text search
   });
 
   // Flatten pages into a single items array
-  const items: ImageWithPostId[] = data
-    ? data.pages.flatMap((page) => page.items)
-    : [];
+  const items: Post[] = data ? data.pages.flatMap((page) => page.items) : [];
 
-  // Normalize status values from database enum to consistent format
-  const normalizeStatus = (
-    raw: string | null
-  ): "pending" | "extracted" | "skipped" | string | undefined => {
-    if (!raw) return undefined;
-    const lower = raw.toLowerCase();
-    if (lower === "pending") return "pending";
-    if (lower === "extracted") return "extracted";
-    if (lower === "skipped") return "skipped";
-    return raw;
-  };
-
-  // Map ImageWithPostId[] to GridItem[]
+  // Map Post[] to GridItem[]
   const gridItems: GridItem[] = items
-    .filter((image) => image.image_url != null)
-    .map((image) => {
+    .filter((post) => post.image_url != null)
+    .map((post) => {
       return {
-        id: image.id,
-        imageUrl: image.image_url,
-        status: normalizeStatus(image.status),
-        hasItems: image.with_items,
-        postId: image.postId,
-        postSource: image.postSource,
-        postAccount: image.postAccount,
-        postCreatedAt: image.postCreatedAt,
+        id: post.id,
+        imageUrl: post.image_url,
+        status: post.spot_count > 0 ? "extracted" : undefined,
+        hasItems: post.spot_count > 0,
+        postId: post.id,
+        postSource: "post" as const,
+        postAccount: post.user?.username ?? "Unknown",
+        postCreatedAt: post.created_at,
       };
     });
 
@@ -210,7 +217,7 @@ export function ExploreClient({ initialImages: _initialImages }: Props) {
     return (
       <div className="absolute inset-0 z-0 pt-14 pb-16 md:pt-16 md:pb-0">
         <ThiingsGrid
-          gridSize={{ width: 400, height: 500 }}
+          gridSize={gridSize}
           renderItem={(config) => <SkeletonCell {...config} />}
           initialPosition={{ x: 0, y: 0 }}
           items={[]}
@@ -274,7 +281,7 @@ export function ExploreClient({ initialImages: _initialImages }: Props) {
   return (
     <div className="absolute inset-0 z-0 pt-14 pb-16 md:pt-16 md:pb-0">
       <ThiingsGrid
-        gridSize={{ width: 400, height: 500 }}
+        gridSize={gridSize}
         renderItem={(config) => <CardCell {...config} />}
         initialPosition={{ x: 0, y: 0 }}
         items={gridItems}

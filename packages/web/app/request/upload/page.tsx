@@ -34,52 +34,52 @@ export default function RequestUploadPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-[100dvh] flex flex-col bg-background">
       <RequestFlowHeader
         title="Upload Images"
         currentStep={currentStep}
         onClose={handleClose}
       />
 
-      <main className="container max-w-4xl mx-auto px-4 py-6">
-        <div className="space-y-6">
-          {!hasImages && (
-            <DropZone
-              onFilesSelected={handleFilesSelected}
-              disabled={isMaxImages}
-              className="min-h-[300px]"
-            />
-          )}
+      <main className="flex-1 min-h-0 flex flex-col px-4 py-4 md:py-6">
+        {!hasImages && (
+          <DropZone
+            onFilesSelected={handleFilesSelected}
+            disabled={isMaxImages}
+            className="flex-1 h-full"
+          />
+        )}
 
-          {hasImages && (
-            <>
+        {hasImages && (
+          <div className="flex-1 min-h-0 flex flex-col space-y-4 max-w-4xl mx-auto w-full">
+            <div className="flex-1 min-h-0 overflow-y-auto">
               <ImagePreviewGrid
                 images={images}
                 onRemove={removeImage}
                 onRetry={retryUpload}
                 onAddMore={handleFilesSelected}
               />
+            </div>
 
-              <div className="flex justify-end pt-4 border-t border-border">
-                <button
-                  type="button"
-                  onClick={handleNext}
-                  disabled={!canProceed}
-                  className={`
-                    px-6 py-2.5 rounded-lg font-medium transition-all
-                    ${
-                      canProceed
-                        ? "bg-foreground text-background hover:bg-foreground/90"
-                        : "bg-foreground/20 text-foreground/40 cursor-not-allowed"
-                    }
-                  `}
-                >
-                  Next
-                </button>
-              </div>
-            </>
-          )}
-        </div>
+            <div className="flex justify-end pt-4 border-t border-border flex-shrink-0">
+              <button
+                type="button"
+                onClick={handleNext}
+                disabled={!canProceed}
+                className={`
+                  px-6 py-2.5 rounded-lg font-medium transition-all
+                  ${
+                    canProceed
+                      ? "bg-foreground text-background hover:bg-foreground/90"
+                      : "bg-foreground/20 text-foreground/40 cursor-not-allowed"
+                  }
+                `}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
