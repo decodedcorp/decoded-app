@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "motion/react";
+import { Heading, Text } from "@/lib/design-system";
 
 interface SectionHeaderProps {
   title: string;
@@ -25,19 +26,25 @@ export function SectionHeader({
       className="flex items-end justify-between mb-6"
     >
       <div>
-        <h2 className="text-xl md:text-2xl font-bold text-foreground">
+        <Heading variant="h2" className="text-xl md:text-2xl">
           {title}
-        </h2>
+        </Heading>
         {subtitle && (
-          <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
+          <Text variant="small" textColor="muted" className="mt-1">
+            {subtitle}
+          </Text>
         )}
       </div>
       {viewMoreLink && (
-        <Link
-          href={viewMoreLink}
-          className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-        >
-          {viewMoreText}
+        <Link href={viewMoreLink}>
+          <Text
+            variant="small"
+            textColor="muted"
+            as="span"
+            className="font-medium hover:text-foreground transition-colors"
+          >
+            {viewMoreText}
+          </Text>
         </Link>
       )}
     </motion.div>
