@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 **Active Milestones:**
-- **v2.0 Design Overhaul** - Phase v2-05 IN PROGRESS (1/3 plans done)
+- **v2.0 Design Overhaul** - Phase v2-05 IN PROGRESS (2/3 plans done)
 
 **v1.1 Status:** SHIPPED (2026-01-29) - All 4 tracks merged to main
-**v2.0 Status:** Phase v2-05 IN PROGRESS (1/3 plans done)
-**Last activity:** 2026-01-29 - Completed v2-05-01-PLAN.md (Home Page Layouts)
+**v2.0 Status:** Phase v2-05 IN PROGRESS (2/3 plans done)
+**Last activity:** 2026-01-29 - Completed v2-05-02-PLAN.md (Explore Page Category Filters)
 
 ### Execution Flow
 
@@ -32,11 +32,11 @@ v2.0 (feature/v2-design-overhaul):
    │
    ├─ v2-Phase 4: Desktop Infrastructure ─── COMPLETE ✓
    │
-   └─ v2-Phase 5: Home & Explore Pages ─── IN PROGRESS (1/3)
+   └─ v2-Phase 5: Home & Explore Pages ─── IN PROGRESS (2/3)
 ```
 
 **v1.1 Progress:** ██████████ (100% - SHIPPED)
-**v2.0 Progress:** █████░░░░░ (48% - 13 of 27 plans complete)
+**v2.0 Progress:** █████░░░░░ (52% - 14 of 27 plans complete)
 
 ## Milestones
 
@@ -69,7 +69,7 @@ See: .planning/ROADMAP-v2.md
 | v2-2: Core Interactive Components | 3/3 | **Complete** (v2-02-01, v2-02-02, v2-02-03 done) |
 | v2-3: Card Components | 3/3 | **Complete** (v2-03-01, v2-03-02, v2-03-03 done) |
 | v2-4: Desktop Infrastructure | 3/3 | **Complete** (v2-04-01, v2-04-02, v2-04-03 done) |
-| v2-5: Home & Explore Pages | 1/3 | **In Progress** (v2-05-01 done) |
+| v2-5: Home & Explore Pages | 2/3 | **In Progress** (v2-05-01, v2-05-02 done) |
 | v2-6: Feed & Profile Pages | 0/3 | Not started |
 | v2-7: Search & Image Detail | 0/3 | Not started |
 | v2-8: Request Flow & Login | 0/3 | Not started |
@@ -133,6 +133,9 @@ See: .planning/ROADMAP-v2.md
 - **Flex Column Layout (v2-04-03):** Wrap layout in flex column container with mt-auto footer for proper bottom positioning
 - **Sidebar Preservation (v2-04-03):** Keep deprecated Sidebar file for reference during transition, safe to delete after v2.0 launch
 - **Header Padding Strategy (v2-04-03):** Desktop 64px top (pt-16), Mobile 56px top + 56px bottom (pt-14 pb-14)
+- **Filter State Management (v2-05-02):** Extended FilterKey type to include fashion/beauty/lifestyle/accessories categories for explore page filtering
+- **Filter Animation Pattern (v2-05-02):** Use AnimatePresence with mode="wait" for filter changes to create smooth 0.2s fade transitions
+- **Explore Layout Structure (v2-05-02):** Flex column layout with header/filter in flex-shrink-0 and grid in flex-1 for proper height allocation
 - **SectionHeader Typography (v2-05-01):** Use design-system Heading variant="h2" for titles, Text variant="small" for subtitles
 - **Section Wrapper Pattern (v2-05-01):** py-10 md:py-16, px-4 md:px-6 lg:px-8, max-w-7xl mx-auto for all sections
 - **Alternating Backgrounds (v2-05-01):** card/background pattern for visual section separation on Home page
@@ -151,14 +154,14 @@ See: .planning/ROADMAP-v2.md
 ## Session Continuity
 
 **Last session:** 2026-01-29
-**Stopped at:** Completed v2-05-01-PLAN.md (Home Page Layouts)
+**Stopped at:** Completed v2-05-02-PLAN.md (Explore Page Category Filters)
 **Resume file:** None
 
 **Next Steps:**
 
 ```bash
-# Phase v2-05: Home & Explore Pages - IN PROGRESS (1/3)
-# Plan v2-05-01: Home Page Layouts - COMPLETE ✅
+# Phase v2-05: Home & Explore Pages - IN PROGRESS (2/3)
+# Plan v2-05-02: Explore Page Category Filters - COMPLETE ✅
 # Ready for v2-05-02: Explore Page Layouts
 git checkout feature/v2-design-overhaul  # 현재 브랜치
 /gsd:execute-phase v2-05 v2-05-02  # Execute plan v2-05-02
