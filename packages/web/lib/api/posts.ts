@@ -14,6 +14,7 @@ import {
   CreatePostResponse,
   PostsListResponse,
   PostsListParams,
+  ApiError,
 } from "./types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
@@ -56,7 +57,15 @@ export async function uploadImage({
   onProgress?.(70);
 
   if (!response.ok) {
-    await handleApiError(response);
+    let errorData: ApiError;
+
+    try {
+      errorData = await response.json();
+    } catch {
+      errorData = { message: `HTTP ${response.status}: ${response.statusText}` };
+    }
+
+    throw new Error(errorData.message || `API Error: ${response.status}`);
   }
 
   onProgress?.(100);
