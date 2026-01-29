@@ -6,6 +6,7 @@ import {
   ConditionalNav,
   MainContentWrapper,
 } from "@/lib/components/ConditionalNav";
+import { DesktopFooter } from "@/lib/design-system";
 
 const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
@@ -38,14 +39,19 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <AppProviders>
-          {/* Conditional Navigation (Sidebar + MobileNav) */}
-          <ConditionalNav />
+          <div className="flex flex-col min-h-screen">
+            {/* Conditional Navigation (Headers + MobileNav) */}
+            <ConditionalNav />
 
-          {/* Main Content Area - conditionally offset by sidebar width */}
-          <MainContentWrapper>
-            {children}
-            {modal}
-          </MainContentWrapper>
+            {/* Main Content Area - with header padding */}
+            <MainContentWrapper>
+              {children}
+              {modal}
+            </MainContentWrapper>
+
+            {/* Footer - after main content */}
+            <DesktopFooter className="mt-auto" />
+          </div>
         </AppProviders>
       </body>
     </html>
