@@ -7,6 +7,7 @@ import { Flip } from "gsap/Flip";
 import { useTransitionStore } from "@/lib/stores/transitionStore";
 import { Card } from "@/lib/design-system";
 import { cn } from "@/lib/utils";
+import { Heart, MessageCircle, Share2 } from "lucide-react";
 
 // Register GSAP Flip plugin
 if (typeof window !== "undefined") {
@@ -55,6 +56,10 @@ export interface FeedCardItem {
   postSource?: string;
   postAccount?: string;
   postCreatedAt?: Date | string;
+  // Engagement fields
+  likeCount?: number;
+  commentCount?: number;
+  isLiked?: boolean;
 }
 
 interface FeedCardProps {
@@ -76,6 +81,13 @@ export const FeedCard = memo(
     const [isLoaded, setIsLoaded] = useState(false);
     const setTransition = useTransitionStore((state) => state.setTransition);
 
+    // Engagement state
+    const [engagement, setEngagement] = useState({
+      isLiked: item.isLiked ?? false,
+      likeCount: item.likeCount ?? 0,
+      commentCount: item.commentCount ?? 0,
+    });
+
     const { id, imageUrl, hasItems } = item;
 
     const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -94,6 +106,42 @@ export const FeedCard = memo(
       } catch (_error) {
         const rect = target.getBoundingClientRect();
         setTransition(id, null, rect, imageUrl ?? undefined);
+      }
+    };
+
+    const handleLike = (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setEngagement((prev) => ({
+        ...prev,
+        isLiked: !prev.isLiked,
+        likeCount: prev.isLiked ? prev.likeCount - 1 : prev.likeCount + 1,
+      }));
+      // TODO: API call to like/unlike
+    };
+
+    const handleComment = (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      // Navigate to comments or open modal
+      console.log("Open comments for:", item.id);
+    };
+
+    const handleShare = async (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const url = `${window.location.origin}/images/${item.id}`;
+
+      if (navigator.share) {
+        try {
+          await navigator.share({ url });
+        } catch (err) {
+          // User cancelled or error
+        }
+      } else {
+        // Fallback: copy to clipboard
+        await navigator.clipboard.writeText(url);
+        // TODO: Show toast notification
       }
     };
 
@@ -157,6 +205,49 @@ export const FeedCard = memo(
                 {formatRelativeTime(item.postCreatedAt)}
               </p>
             )}
+
+            {/* Engagement actions overlay */}
+            <div className="flex items-center gap-4 mt-3">
+              {/* Like button */}
+              <button
+                onClick={handleLike}
+                className="flex items-center gap-1 text-white transition-transform"
+                aria-label={engagement.isLiked ? "Unlike" : "Like"}
+              >
+                <Heart
+                  className={cn(
+                    "h-5 w-5 transition-all",
+                    engagement.isLiked
+                      ? "fill-primary text-primary scale-110"
+                      : "text-white hover:scale-110"
+                  )}
+                />
+                {engagement.likeCount > 0 && (
+                  <span className="text-xs font-medium">{engagement.likeCount}</span>
+                )}
+              </button>
+
+              {/* Comment button */}
+              <button
+                onClick={handleComment}
+                className="flex items-center gap-1 text-white"
+                aria-label="Comments"
+              >
+                <MessageCircle className="h-5 w-5 hover:scale-110 transition-transform" />
+                {engagement.commentCount > 0 && (
+                  <span className="text-xs font-medium">{engagement.commentCount}</span>
+                )}
+              </button>
+
+              {/* Share button */}
+              <button
+                onClick={handleShare}
+                className="ml-auto text-white"
+                aria-label="Share"
+              >
+                <Share2 className="h-5 w-5 hover:scale-110 transition-transform" />
+              </button>
+            </div>
           </div>
         </div>
       </Card>
