@@ -1,150 +1,22 @@
 "use client";
 
-import { memo, useState, useEffect } from "react";
-import Link from "next/link";
-import { gsap } from "gsap";
-import { Flip } from "gsap/Flip";
+import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useInfinitePosts } from "@/lib/hooks/usePosts";
 import type { Post } from "@/lib/api/types";
-import ThiingsGrid, {
-  type ItemConfig,
-  type GridItem,
-} from "@/lib/components/ThiingsGrid";
+import ThiingsGrid, { type GridItem } from "@/lib/components/ThiingsGrid";
 import { useFilterStore } from "@/lib/stores/filterStore";
 import { useSearchStore } from "@/lib/stores/searchStore";
-import { useTransitionStore } from "@/lib/stores/transitionStore";
-import { ExploreHeader, CategoryFilter } from "@/lib/components/explore";
-
-// Register GSAP Flip plugin
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(Flip);
-}
+import {
+  ExploreHeader,
+  CategoryFilter,
+  ExploreCardCell,
+  ExploreSkeletonCell,
+} from "@/lib/components/explore";
 
 type Props = {
   initialPosts?: Post[];
 };
-
-// Card cell component with actual image data
-const CardCell = memo(
-  ({
-    gridIndex,
-    position: _position,
-    isMoving: _isMoving,
-    item,
-  }: ItemConfig) => {
-    const [imageError, setImageError] = useState(false);
-    const [isLoaded, setIsLoaded] = useState(false);
-    const setTransition = useTransitionStore((state) => state.setTransition);
-
-    // Top 6 images get high priority for faster initial load
-    const isTopImage = gridIndex < 6;
-    const imageUrl = item?.imageUrl;
-    const imageId = item?.id;
-
-    const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-      if (!imageId) return;
-
-      const target = e.currentTarget.querySelector("article") as HTMLElement;
-      if (!target) return;
-
-      // Capture FLIP state before navigation
-      try {
-        const state = Flip.getState(target);
-        const rect = target.getBoundingClientRect();
-
-        setTransition(imageId, state, rect, imageUrl ?? undefined);
-      } catch (_error) {
-        // Fallback: just store rect if Flip.getState fails
-        const rect = target.getBoundingClientRect();
-        setTransition(imageId, null, rect, imageUrl ?? undefined);
-      }
-    };
-
-    const cardContent = (
-      <article
-        data-flip-id={imageId ? `card-${imageId}` : undefined}
-        className="absolute inset-1 flex flex-col overflow-hidden rounded-xl border border-border bg-card/60 transition-shadow hover:shadow-lg"
-      >
-        {/* Image container with fixed aspect ratio */}
-        <div className="relative aspect-[3/4] bg-muted">
-          {/* Optimized image loading */}
-          {imageUrl && !imageError ? (
-            <img
-              src={imageUrl}
-              loading={isTopImage ? "eager" : "lazy"}
-              decoding="async"
-              fetchPriority={isTopImage ? "high" : "auto"}
-              alt={item?.id ? `Image ${item.id}` : `Card ${gridIndex} image`}
-              className={`h-full w-full object-cover transition-opacity duration-150 ease-out ${
-                isLoaded ? "opacity-100" : "opacity-0"
-              }`}
-              onError={() => setImageError(true)}
-              onLoad={() => setIsLoaded(true)}
-            />
-          ) : (
-            <div className="h-full w-full bg-muted" />
-          )}
-        </div>
-
-        {/* Metadata footer */}
-        {process.env.NODE_ENV === "development" && (
-          <div className="flex items-center justify-between border-t border-border px-2 py-1">
-            <span className="text-[10px] font-mono text-muted-foreground">
-              {item?.id ? `#${item.id.slice(0, 8)}` : `#${gridIndex}`}
-            </span>
-          </div>
-        )}
-      </article>
-    );
-
-    if (!imageId) {
-      return cardContent;
-    }
-
-    return (
-      <Link
-        href={`/images/${imageId}`}
-        scroll={false}
-        onClick={handleClick}
-        className="absolute inset-0"
-      >
-        {cardContent}
-      </Link>
-    );
-  }
-);
-
-CardCell.displayName = "CardCell";
-
-// Skeleton card for loading state
-const SkeletonCard = memo(() => {
-  return (
-    <article className="absolute inset-1 flex flex-col overflow-hidden rounded-xl border border-border bg-card/60">
-      <div className="relative aspect-[3/4] animate-pulse bg-muted">
-        {/* Skeleton badge placeholder */}
-        <div className="absolute left-2 top-2 flex flex-col gap-1">
-          <div className="h-5 w-20 animate-pulse rounded-full bg-muted-foreground/20" />
-        </div>
-      </div>
-    </article>
-  );
-});
-
-SkeletonCard.displayName = "SkeletonCard";
-
-// Skeleton cell component for loading state
-const SkeletonCell = memo(
-  ({
-    gridIndex: _gridIndex,
-    position: _position,
-    isMoving: _isMoving,
-  }: ItemConfig) => {
-    return <SkeletonCard />;
-  }
-);
-
-SkeletonCell.displayName = "SkeletonCell";
 
 /**
  * Explore Client Component - Pinterest-style Masonry Grid
@@ -239,7 +111,7 @@ export function ExploreClient({ initialPosts: _initialPosts }: Props) {
               <div className="absolute inset-0 z-0">
                 <ThiingsGrid
                   gridSize={gridSize}
-                  renderItem={(config) => <SkeletonCell {...config} />}
+                  renderItem={() => <ExploreSkeletonCell />}
                   initialPosition={{ x: 0, y: 0 }}
                   items={[]}
                   hasMore={true}
@@ -295,7 +167,7 @@ export function ExploreClient({ initialPosts: _initialPosts }: Props) {
               <div className="absolute inset-0 z-0">
                 <ThiingsGrid
                   gridSize={gridSize}
-                  renderItem={(config) => <CardCell {...config} />}
+                  renderItem={(config) => <ExploreCardCell {...config} />}
                   initialPosition={{ x: 0, y: 0 }}
                   items={gridItems}
                   onReachEnd={() => {
