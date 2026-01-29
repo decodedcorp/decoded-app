@@ -24,7 +24,7 @@ v2.0 transforms the decoded-app UI by implementing the decoded.pen design system
 - [x] **v2-Phase 1: Design System Foundation** - Typography, design tokens, base styles
 - [x] **v2-Phase 2: Core Interactive Components** - Buttons, inputs, tags, action buttons
 - [x] **v2-Phase 3: Card Components** - All card variants from simple to complex
-- [ ] **v2-Phase 4: Desktop Infrastructure** - Header, footer, navigation, layouts
+- [x] **v2-Phase 4: Desktop Infrastructure** - Header, footer, navigation, layouts
 - [ ] **v2-Phase 5: Home & Explore Pages** - Landing and discovery experiences
 - [ ] **v2-Phase 6: Feed & Profile Pages** - Content streams and user profiles
 - [ ] **v2-Phase 7: Search & Image Detail** - Discovery and detailed views
@@ -96,9 +96,9 @@ Plans:
 **Plans:** 3 plans (2 waves)
 
 Plans:
-- [ ] v2-04-01-PLAN.md - DesktopHeader and MobileHeader components [Wave 1]
-- [ ] v2-04-02-PLAN.md - DesktopFooter with responsive layout [Wave 1]
-- [ ] v2-04-03-PLAN.md - Layout integration (replace Sidebar with header navigation) [Wave 2]
+- [x] v2-04-01-PLAN.md - DesktopHeader and MobileHeader components [Wave 1]
+- [x] v2-04-02-PLAN.md - DesktopFooter with responsive layout [Wave 1]
+- [x] v2-04-03-PLAN.md - Layout integration (replace Sidebar with header navigation) [Wave 2]
 
 ### v2-Phase 5: Home & Explore Pages
 **Goal**: Landing and discovery pages display with decoded.pen design on mobile and desktop
@@ -200,7 +200,7 @@ v2-Phases execute sequentially: v2-Phase 1 → v2-Phase 2 → ... → v2-Phase 9
 | v2-1. Design System Foundation | 3/3 | **Complete** | 2026-01-29 |
 | v2-2. Core Interactive Components | 3/3 | **Complete** | 2026-01-29 |
 | v2-3. Card Components | 3/3 | **Complete** | 2026-01-29 |
-| v2-4. Desktop Infrastructure | 0/3 | Not started | - |
+| v2-4. Desktop Infrastructure | 3/3 | **Complete** | 2026-01-29 |
 | v2-5. Home & Explore Pages | 0/3 | Not started | - |
 | v2-6. Feed & Profile Pages | 0/3 | Not started | - |
 | v2-7. Search & Image Detail | 0/3 | Not started | - |
@@ -210,4 +210,4 @@ v2-Phases execute sequentially: v2-Phase 1 → v2-Phase 2 → ... → v2-Phase 9
 ---
 
 *Created: 2026-01-29*
-*Last updated: 2026-01-29 (Phase v2-3 complete)*
+*Last updated: 2026-01-29 (Phase v2-4 complete)*
