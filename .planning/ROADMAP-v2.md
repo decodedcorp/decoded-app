@@ -25,7 +25,7 @@ v2.0 transforms the decoded-app UI by implementing the decoded.pen design system
 - [x] **v2-Phase 2: Core Interactive Components** - Buttons, inputs, tags, action buttons
 - [x] **v2-Phase 3: Card Components** - All card variants from simple to complex
 - [x] **v2-Phase 4: Desktop Infrastructure** - Header, footer, navigation, layouts
-- [ ] **v2-Phase 5: Home & Explore Pages** - Landing and discovery experiences
+- [x] **v2-Phase 5: Home & Explore Pages** - Landing and discovery experiences
 - [ ] **v2-Phase 6: Feed & Profile Pages** - Content streams and user profiles
 - [ ] **v2-Phase 7: Search & Image Detail** - Discovery and detailed views
 - [ ] **v2-Phase 8: Request Flow & Login** - Multi-step flows and authentication
@@ -110,12 +110,12 @@ Plans:
   3. User on explore page sees category-filtered grid of items
   4. Category filters on explore page work and maintain design system styling
   5. All images, cards, and spacing match decoded.pen specifications
-**Plans**: TBD
+**Plans:** 3 plans (2 waves)
 
 Plans:
-- [ ] v2-05-01: Implement Home page mobile and desktop layouts
-- [ ] v2-05-02: Implement Explore page with category filters
-- [ ] v2-05-03: Integrate cards and grid components
+- [x] v2-05-01-PLAN.md — Home page mobile/desktop layouts with decoded.pen styling [Wave 1]
+- [x] v2-05-02-PLAN.md — Explore page with category filters and fade transitions [Wave 1]
+- [x] v2-05-03-PLAN.md — Card integration for Home and Explore pages [Wave 2]
 
 ### v2-Phase 6: Feed & Profile Pages
 **Goal**: Content streams and user profiles render with decoded.pen design, maintaining all existing functionality
@@ -201,7 +201,7 @@ v2-Phases execute sequentially: v2-Phase 1 → v2-Phase 2 → ... → v2-Phase 9
 | v2-2. Core Interactive Components | 3/3 | **Complete** | 2026-01-29 |
 | v2-3. Card Components | 3/3 | **Complete** | 2026-01-29 |
 | v2-4. Desktop Infrastructure | 3/3 | **Complete** | 2026-01-29 |
-| v2-5. Home & Explore Pages | 0/3 | Not started | - |
+| v2-5. Home & Explore Pages | 3/3 | **Complete** | 2026-01-29 |
 | v2-6. Feed & Profile Pages | 0/3 | Not started | - |
 | v2-7. Search & Image Detail | 0/3 | Not started | - |
 | v2-8. Request Flow & Login | 0/3 | Not started | - |
@@ -210,4 +210,4 @@ v2-Phases execute sequentially: v2-Phase 1 → v2-Phase 2 → ... → v2-Phase 9
 ---
 
 *Created: 2026-01-29*
-*Last updated: 2026-01-29 (Phase v2-4 complete)*
+*Last updated: 2026-01-29 (Phase v2-5 complete)*
