@@ -5,6 +5,7 @@ import Link from "next/link";
 import { gsap } from "gsap";
 import { Flip } from "gsap/Flip";
 import { useTransitionStore } from "@/lib/stores/transitionStore";
+import { Card } from "@/lib/design-system";
 
 // Register GSAP Flip plugin
 if (typeof window !== "undefined") {
@@ -33,6 +34,7 @@ interface FeedCardProps {
  *
  * Minimal design with image and item count badge
  * Used in vertical feed layout (VerticalFeed)
+ * Uses design-system Card component with GSAP Flip animations
  */
 export const FeedCard = memo(
   ({ item, index: _index, priority = false }: FeedCardProps) => {
@@ -45,7 +47,9 @@ export const FeedCard = memo(
     const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
       if (!id) return;
 
-      const target = e.currentTarget.querySelector("article") as HTMLElement;
+      const target = e.currentTarget.querySelector(
+        "[data-flip-id]"
+      ) as HTMLElement;
       if (!target) return;
 
       // Capture FLIP state before navigation
@@ -60,9 +64,10 @@ export const FeedCard = memo(
     };
 
     const cardContent = (
-      <article
+      <Card
         data-flip-id={id ? `feed-card-${id}` : undefined}
-        className="relative w-full overflow-hidden rounded-xl border border-border bg-card/60 transition-shadow hover:shadow-lg"
+        interactive
+        className="relative w-full overflow-hidden p-0"
       >
         {/* Image container - 4:5 aspect ratio like Instagram */}
         <div className="relative aspect-[4/5] bg-muted">
@@ -104,7 +109,7 @@ export const FeedCard = memo(
             )}
           </div>
         )}
-      </article>
+      </Card>
     );
 
     if (!id) {
@@ -131,12 +136,12 @@ FeedCard.displayName = "FeedCard";
  */
 export const FeedCardSkeleton = memo(() => {
   return (
-    <article className="relative w-full overflow-hidden rounded-xl border border-border bg-card/60">
+    <Card className="relative w-full overflow-hidden p-0">
       <div className="relative aspect-[4/5] animate-pulse bg-muted">
         {/* Skeleton badge placeholder */}
         <div className="absolute bottom-3 right-3 h-6 w-14 animate-pulse rounded-full bg-muted-foreground/20" />
       </div>
-    </article>
+    </Card>
   );
 });
 
