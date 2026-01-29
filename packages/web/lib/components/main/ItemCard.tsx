@@ -3,6 +3,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "motion/react";
+import { Card, CardContent } from "@/lib/design-system";
+import { cn } from "@/lib/utils";
 
 export interface ItemCardData {
   id: string;
@@ -19,6 +21,12 @@ interface ItemCardProps {
   index?: number;
 }
 
+const badgeStyles = {
+  TOP: "bg-primary text-primary-foreground",
+  NEW: "bg-blue-500 text-white",
+  BEST: "bg-destructive text-destructive-foreground",
+} as const;
+
 export function ItemCard({ data, index = 0 }: ItemCardProps) {
   return (
     <motion.div
@@ -29,7 +37,12 @@ export function ItemCard({ data, index = 0 }: ItemCardProps) {
       className="group"
     >
       <Link href={data.link} className="block">
-        <div className="bg-card rounded-xl overflow-hidden border border-border hover:shadow-md transition-shadow">
+        <Card
+          variant="default"
+          size="sm"
+          interactive
+          className="overflow-hidden"
+        >
           {/* Image */}
           <div className="relative aspect-square bg-muted">
             {data.imageUrl ? (
@@ -47,13 +60,10 @@ export function ItemCard({ data, index = 0 }: ItemCardProps) {
             {/* Badge */}
             {data.badge && (
               <div
-                className={`absolute top-2 left-2 px-2 py-0.5 rounded text-xs font-bold ${
-                  data.badge === "TOP"
-                    ? "bg-primary text-primary-foreground"
-                    : data.badge === "NEW"
-                      ? "bg-blue-500 text-white"
-                      : "bg-destructive text-destructive-foreground"
-                }`}
+                className={cn(
+                  "absolute top-2 left-2 px-2 py-0.5 rounded text-xs font-bold",
+                  badgeStyles[data.badge]
+                )}
               >
                 {data.badge}
               </div>
@@ -61,7 +71,7 @@ export function ItemCard({ data, index = 0 }: ItemCardProps) {
           </div>
 
           {/* Content */}
-          <div className="p-3">
+          <CardContent className="p-3">
             <p className="text-xs text-muted-foreground mb-0.5">{data.brand}</p>
             <h4 className="text-sm font-medium text-foreground line-clamp-1 mb-1">
               {data.name}
@@ -71,8 +81,8 @@ export function ItemCard({ data, index = 0 }: ItemCardProps) {
                 관련 스타일 {data.relatedStyles}
               </p>
             )}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </Link>
     </motion.div>
   );
