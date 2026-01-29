@@ -256,3 +256,38 @@ export interface ActivitiesListParams {
   page?: number;
   per_page?: number;
 }
+
+// ============================================================
+// Comment API Types
+// GET /api/v1/posts/{post_id}/comments
+// POST /api/v1/posts/{post_id}/comments
+// PATCH /api/v1/comments/{comment_id}
+// DELETE /api/v1/comments/{comment_id}
+// ============================================================
+
+export interface CommentUser {
+  id: string;
+  username: string;
+  avatar_url: string | null;
+}
+
+export interface CommentResponse {
+  id: string;
+  post_id: string;
+  user_id: string;
+  content: string;
+  user: CommentUser;
+  created_at: string;
+  updated_at: string;
+  parent_id: string | null;
+  replies?: CommentResponse[];
+}
+
+export interface CreateCommentDto {
+  content: string;
+  parent_id?: string;
+}
+
+export interface UpdateCommentDto {
+  content: string;
+}
