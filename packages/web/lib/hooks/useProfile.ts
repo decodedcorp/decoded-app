@@ -1,11 +1,24 @@
 /**
  * Profile Hooks
- * React Query hooks for user profile and stats
+ * React Query hooks for user profile data
  */
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getMe, updateMe, getMyStats } from "@/lib/api/users";
-import { UpdateUserDto } from "@/lib/api/types";
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
+import {
+  fetchMe,
+  updateMe,
+  fetchUserStats,
+  fetchUserActivities,
+  fetchUserById,
+} from "@/lib/api/users";
+import {
+  UpdateUserDto,
+  UserResponse,
+  UserStatsResponse,
+  PaginatedActivitiesResponse,
+  ActivitiesListParams,
+  UserActivityType,
+} from "@/lib/api/types";
 
 // ============================================================
 // Query Keys
@@ -15,31 +28,84 @@ export const profileKeys = {
   all: ["profile"] as const,
   me: () => [...profileKeys.all, "me"] as const,
   stats: () => [...profileKeys.all, "stats"] as const,
+  activities: (params?: ActivitiesListParams) =>
+    [...profileKeys.all, "activities", params] as const,
+  user: (userId: string) => [...profileKeys.all, "user", userId] as const,
 };
 
 // ============================================================
-// useMe - Fetch current user profile
+// useMe - Current user's profile
 // ============================================================
 
-export function useMe() {
+export function useMe(
+  options?: Omit<UseQueryOptions<UserResponse, Error>, "queryKey" | "queryFn">
+) {
   return useQuery({
     queryKey: profileKeys.me(),
-    queryFn: getMe,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: 1,
+    queryFn: fetchMe,
+    staleTime: 1000 * 60 * 5, // 5 minutes (profile changes less frequently)
+    ...options,
   });
 }
 
 // ============================================================
-// useMyStats - Fetch current user stats
+// useUserStats - Current user's statistics
 // ============================================================
 
-export function useMyStats() {
+export function useUserStats(
+  options?: Omit<UseQueryOptions<UserStatsResponse, Error>, "queryKey" | "queryFn">
+) {
   return useQuery({
     queryKey: profileKeys.stats(),
-    queryFn: getMyStats,
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    retry: 1,
+    queryFn: fetchUserStats,
+    staleTime: 1000 * 60 * 2, // 2 minutes
+    ...options,
+  });
+}
+
+// ============================================================
+// useUserActivities - Paginated activities
+// ============================================================
+
+interface UseUserActivitiesParams {
+  type?: UserActivityType;
+  perPage?: number;
+}
+
+export function useUserActivities(params?: UseUserActivitiesParams) {
+  return useInfiniteQuery({
+    queryKey: profileKeys.activities(params),
+    queryFn: async ({ pageParam }): Promise<PaginatedActivitiesResponse> => {
+      const page = (pageParam as number) ?? 1;
+      return fetchUserActivities({
+        type: params?.type,
+        page,
+        per_page: params?.perPage ?? 20,
+      });
+    },
+    getNextPageParam: (lastPage) =>
+      lastPage.pagination.current_page < lastPage.pagination.total_pages
+        ? lastPage.pagination.current_page + 1
+        : undefined,
+    initialPageParam: 1,
+    staleTime: 1000 * 60, // 1 minute
+  });
+}
+
+// ============================================================
+// useUser - Another user's public profile
+// ============================================================
+
+export function useUser(
+  userId: string,
+  options?: Omit<UseQueryOptions<UserResponse, Error>, "queryKey" | "queryFn">
+) {
+  return useQuery({
+    queryKey: profileKeys.user(userId),
+    queryFn: () => fetchUserById(userId),
+    enabled: !!userId,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    ...options,
   });
 }
 

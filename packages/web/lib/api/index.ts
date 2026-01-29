@@ -22,4 +22,10 @@ export {
 } from "./categories";
 
 // User APIs
-export { getMe, updateMe, getMyStats, getUserById } from "./users";
+export {
+  fetchMe,
+  updateMe,
+  fetchUserStats,
+  fetchUserById,
+  fetchUserActivities,
+} from "./users";

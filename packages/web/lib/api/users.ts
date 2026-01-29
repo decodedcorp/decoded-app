@@ -77,7 +77,8 @@ function buildActivitiesQueryString(params?: ActivitiesListParams): string {
   const searchParams = new URLSearchParams();
   if (params.type) searchParams.set("type", params.type);
   if (params.page !== undefined) searchParams.set("page", String(params.page));
-  if (params.per_page !== undefined) searchParams.set("per_page", String(params.per_page));
+  if (params.per_page !== undefined)
+    searchParams.set("per_page", String(params.per_page));
 
   const queryString = searchParams.toString();
   return queryString ? `?${queryString}` : "";
