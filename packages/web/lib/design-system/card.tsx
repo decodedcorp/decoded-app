@@ -151,3 +151,74 @@ export const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
 );
 
 CardFooter.displayName = 'CardFooter';
+
+export interface CardSkeletonProps extends VariantProps<typeof cardVariants> {
+  showHeader?: boolean;
+  showContent?: boolean;
+  showFooter?: boolean;
+  aspectRatio?: '4/5' | '1/1' | '16/9';
+  className?: string;
+}
+
+/**
+ * CardSkeleton Component
+ *
+ * Loading state for card with animated shimmer effect.
+ * Optionally displays header, content, footer, and image placeholders.
+ *
+ * @example
+ * <CardSkeleton variant="elevated" aspectRatio="4/5" />
+ *
+ * @example
+ * <CardSkeleton showHeader={false} showFooter={false} />
+ */
+export const CardSkeleton = ({
+  variant = 'default',
+  size = 'md',
+  showHeader = true,
+  showContent = true,
+  showFooter = true,
+  aspectRatio,
+  className,
+}: CardSkeletonProps) => {
+  const aspectRatioClasses = {
+    '4/5': 'aspect-[4/5]',
+    '1/1': 'aspect-square',
+    '16/9': 'aspect-video',
+  };
+
+  return (
+    <div className={cn(cardVariants({ variant, size }), className)}>
+      {aspectRatio && (
+        <div
+          className={cn(
+            'mb-4 animate-pulse rounded-md bg-muted',
+            aspectRatioClasses[aspectRatio]
+          )}
+        />
+      )}
+
+      {showHeader && (
+        <div className="mb-4 space-y-2">
+          <div className="h-6 w-32 animate-pulse rounded bg-muted" />
+          <div className="h-4 w-24 animate-pulse rounded bg-muted" />
+        </div>
+      )}
+
+      {showContent && (
+        <div className="space-y-2">
+          <div className="h-4 w-full animate-pulse rounded bg-muted" />
+          <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
+          <div className="h-4 w-1/2 animate-pulse rounded bg-muted" />
+        </div>
+      )}
+
+      {showFooter && (
+        <div className="mt-4 flex gap-2">
+          <div className="h-8 w-20 animate-pulse rounded bg-muted" />
+          <div className="h-8 w-20 animate-pulse rounded bg-muted" />
+        </div>
+      )}
+    </div>
+  );
+};
