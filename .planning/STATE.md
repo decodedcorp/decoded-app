@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 **Active Milestones:**
-- **v2.0 Design Overhaul** - Phase v2-05 COMPLETE (3/3 plans done)
+- **v2.0 Design Overhaul** - Phase v2-06 IN PROGRESS (2/3 plans done)
 
 **v1.1 Status:** SHIPPED (2026-01-29) - All 4 tracks merged to main
-**v2.0 Status:** Phase v2-05 COMPLETE (3/3 plans done)
-**Last activity:** 2026-01-29 - Completed v2-05-03-PLAN.md (Card Component Integration)
+**v2.0 Status:** Phase v2-06 IN PROGRESS (2/3 plans done)
+**Last activity:** 2026-01-29 - Completed v2-06-02-PLAN.md (Profile Desktop & Mobile Layouts)
 
 ### Execution Flow
 
@@ -34,11 +34,11 @@ v2.0 (feature/v2-design-overhaul):
    │
    ├─ v2-Phase 5: Home & Explore Pages ─── COMPLETE ✓
    │
-   └─ v2-Phase 6: Feed & Profile Pages ─── NOT STARTED
+   └─ v2-Phase 6: Feed & Profile Pages ─── IN PROGRESS (2/3)
 ```
 
 **v1.1 Progress:** ██████████ (100% - SHIPPED)
-**v2.0 Progress:** █████░░░░░ (56% - 15 of 27 plans complete)
+**v2.0 Progress:** ██████░░░░ (63% - 17 of 27 plans complete)
 
 ## Milestones
 
@@ -72,7 +72,7 @@ See: .planning/ROADMAP-v2.md
 | v2-3: Card Components | 3/3 | **Complete** (v2-03-01, v2-03-02, v2-03-03 done) |
 | v2-4: Desktop Infrastructure | 3/3 | **Complete** (v2-04-01, v2-04-02, v2-04-03 done) |
 | v2-5: Home & Explore Pages | 3/3 | **Complete** (v2-05-01, v2-05-02, v2-05-03 done) |
-| v2-6: Feed & Profile Pages | 0/3 | Not started |
+| v2-6: Feed & Profile Pages | 2/3 | **In Progress** (v2-06-01, v2-06-02 done) |
 | v2-7: Search & Image Detail | 0/3 | Not started |
 | v2-8: Request Flow & Login | 0/3 | Not started |
 | v2-9: Documentation & Polish | 0/3 | Not started |
@@ -145,6 +145,10 @@ See: .planning/ROADMAP-v2.md
 - **Card Component Integration (v2-05-03):** All Home and Explore page cards use design-system Card components for consistent styling
 - **Dedicated Cell Components (v2-05-03):** Extract grid cells into dedicated components (ExploreCardCell pattern) for reusability
 - **FLIP with Custom Wrappers (v2-05-03):** Wrap Card in Link when FLIP animation control needed, use Card's built-in link prop otherwise
+- **Profile Stats Integration (v2-06-02):** Stats integrated into ProfileHeaderCard on desktop, separate StatsCards on mobile for optimal UX
+- **Mobile Profile Header (v2-06-02):** Custom sticky header with back button, title, settings for profile-specific actions
+- **Badge Locked State Prep (v2-06-02):** Badge styling ready for locked state (secondary bg, lock icon) pending API data
+- **Desktop Profile Layout (v2-06-02):** 2-column layout (320px profile + flex activity) via ProfileDesktopLayout component
 
 ### Open Items
 - v2 deferred: Admin dashboard, real-time notifications
@@ -159,18 +163,17 @@ See: .planning/ROADMAP-v2.md
 ## Session Continuity
 
 **Last session:** 2026-01-29
-**Stopped at:** Completed v2-05-03-PLAN.md (Card Component Integration)
+**Stopped at:** Completed v2-06-02-PLAN.md (Profile Desktop & Mobile Layouts)
 **Resume file:** None
 
 **Next Steps:**
 
 ```bash
-# Phase v2-05: Home & Explore Pages - COMPLETE ✅ (3/3)
-# Phase v2-06: Feed & Profile Pages - NOT STARTED
+# Phase v2-06: Feed & Profile Pages - IN PROGRESS (2/3)
 git checkout feature/v2-design-overhaul  # 현재 브랜치
-/gsd:discuss-phase v2-06  # Discuss next phase
+/gsd:execute-phase v2-06-03  # Execute final plan (Feed & Profile Polish)
 # Or test current changes
-npm run dev  # Verify Home and Explore pages with design-system cards
+npm run dev  # Verify Feed and Profile pages with design-system integration
 ```
 
 ### Quick Tasks Completed
@@ -181,4 +184,4 @@ npm run dev  # Verify Home and Explore pages with design-system cards
 
 ---
 
-*Last updated: 2026-01-29 after v2-05-01 completion*
+*Last updated: 2026-01-29 after v2-06-02 completion*
