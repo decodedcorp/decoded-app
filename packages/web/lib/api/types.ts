@@ -256,3 +256,65 @@ export interface ActivitiesListParams {
   page?: number;
   per_page?: number;
 }
+
+// ============================================================
+// Badges API Types
+// GET /api/v1/badges, GET /api/v1/badges/me, GET /api/v1/badges/{badge_id}
+// ============================================================
+
+export type BadgeType =
+  | 'specialist'
+  | 'category'
+  | 'achievement'
+  | 'milestone'
+  | 'explorer'
+  | 'shopper';
+
+export type BadgeRarity = 'common' | 'rare' | 'epic' | 'legendary';
+
+export interface BadgeCriteria {
+  type: string;
+  threshold: number;
+  category_code?: string;
+  description?: string;
+}
+
+export interface BadgeResponse {
+  id: string;
+  type: BadgeType;
+  name: string;
+  criteria: BadgeCriteria;
+  rarity: BadgeRarity;
+  description?: string;
+  icon_url?: string;
+  created_at: string;
+}
+
+// GET /api/v1/badges response
+export interface BadgeListResponse {
+  data: BadgeResponse[];
+}
+
+// GET /api/v1/badges/me response - earned badges
+export interface EarnedBadgeItem {
+  id: string;
+  badge: BadgeResponse;
+  earned_at: string;
+}
+
+// GET /api/v1/badges/me response - available/in-progress badges
+export interface BadgeProgress {
+  current: number;
+  target: number;
+  percentage: number;
+}
+
+export interface AvailableBadgeItem {
+  badge: BadgeResponse;
+  progress: BadgeProgress;
+}
+
+export interface MyBadgesResponse {
+  data: EarnedBadgeItem[];
+  available_badges: AvailableBadgeItem[];
+}
