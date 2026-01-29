@@ -6,3 +6,6 @@ export { RankingList } from "./RankingList";
 export { BadgeModal } from "./BadgeModal";
 export { ProfileEditModal } from "./ProfileEditModal";
 export { ProfileDesktopLayout } from "./ProfileDesktopLayout";
+export { ActivityTabs, type ActivityTab } from "./ActivityTabs";
+export { ActivityContent } from "./ActivityContent";
+export { EmptyState } from "./EmptyState";

@@ -13,6 +13,10 @@ import {
   BadgeModal,
   ProfileEditModal,
   ProfileDesktopLayout,
+  ActivityTabs,
+  ActivityContent,
+  EmptyState,
+  type ActivityTab,
 } from "@/lib/components/profile";
 
 function ViewAllActivityButton() {
@@ -39,6 +43,35 @@ function ViewAllActivityButton() {
 
 export default function ProfilePage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<ActivityTab>("posts");
+
+  // Placeholder data - would come from API
+  const tabHasContent: Record<ActivityTab, boolean> = {
+    posts: false, // For demo, show empty state
+    spots: false,
+    solutions: false,
+    saved: false,
+  };
+
+  const renderTabContent = () => {
+    if (!tabHasContent[activeTab]) {
+      return <EmptyState tab={activeTab} />;
+    }
+
+    // Render actual content based on tab
+    switch (activeTab) {
+      case "posts":
+        return <div>Posts content...</div>;
+      case "spots":
+        return <div>Spots content...</div>;
+      case "solutions":
+        return <div>Solutions content...</div>;
+      case "saved":
+        return <div>Saved content...</div>;
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-0">
@@ -66,8 +99,13 @@ export default function ProfilePage() {
         <ProfileHeader onEditClick={() => setIsEditModalOpen(true)} />
         <StatsCards />
         <BadgeGrid />
-        <RankingList />
-        <ViewAllActivityButton />
+        {/* Activity Tabs */}
+        <div className="mt-6">
+          <ActivityTabs activeTab={activeTab} onTabChange={setActiveTab} />
+          <ActivityContent activeTab={activeTab} className="pt-4">
+            {renderTabContent()}
+          </ActivityContent>
+        </div>
       </div>
 
       {/* Desktop Layout - 2 column */}
@@ -83,7 +121,13 @@ export default function ProfilePage() {
             <>
               <BadgeGrid />
               <RankingList />
-              <ViewAllActivityButton />
+              {/* Activity Tabs */}
+              <div className="bg-card rounded-xl border border-border overflow-hidden">
+                <ActivityTabs activeTab={activeTab} onTabChange={setActiveTab} />
+                <ActivityContent activeTab={activeTab} className="p-6">
+                  {renderTabContent()}
+                </ActivityContent>
+              </div>
             </>
           }
         />
