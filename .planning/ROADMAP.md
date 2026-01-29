@@ -3,7 +3,7 @@
 ## Milestones
 
 - [x] **v1.0 Documentation Optimization** - Phases 1-5 (shipped 2026-01-29)
-- [ ] **v1.1 Full API Integration** - Phase 6 + Tracks A-D (in progress)
+- [x] **v1.1 Full API Integration** - Phase 6 + Tracks A-D (shipped 2026-01-29)
 
 ## Overview
 
@@ -34,13 +34,13 @@ See archived roadmap for v1.0 phase details.
 **Milestone Goal:** Connect all backend APIs to frontend for complete user experience
 
 #### Sequential (Main Branch)
-- [x] **Phase 6: API Foundation & Profile** - API client patterns + Profile APIs (Complete, 06-03 verification pending)
+- [x] **Phase 6: API Foundation & Profile** - API client patterns + Profile APIs ✅
 
-#### Parallel Tracks (Git Worktrees) - After Phase 6
-- [ ] **Track A: Content CRUD** - Posts, Spots, Solutions (worktree: `decoded-track-a`)
-- [ ] **Track B: Engagement** - Votes, Comments (worktree: `decoded-track-b`)
-- [ ] **Track C: Gamification** - Rankings, Badges (worktree: `decoded-track-c`)
-- [ ] **Track D: Monetization & Search** - Earnings, Search (worktree: `decoded-track-d`)
+#### Parallel Tracks (Git Worktrees) - All Merged
+- [x] **Track A: Content CRUD** - Posts, Spots, Solutions ✅
+- [x] **Track B: Engagement** - Votes, Comments ✅
+- [x] **Track C: Gamification** - Rankings, Badges ✅
+- [x] **Track D: Monetization & Search** - Earnings, Search ✅
 
 ## Phase Details
 
@@ -151,50 +151,17 @@ Plans:
 2. Tracks A-D - Parallel via worktrees
 3. Merge all tracks to main
 
-### Sequential Phase (Main)
+### All Phases Complete
 
-| Phase | Plans | Status | Completed |
-|-------|-------|--------|-----------|
-| 1-5. Documentation (v1.0) | 5/5 | Complete | 2026-01-29 |
-| 6. API Foundation & Profile | 3/3 | **Complete** ⚠️ | 2026-01-29 |
-
-⚠️ 06-03 verification pending (backend DB error)
-
-### Parallel Tracks (Worktrees)
-
-| Track | Worktree | Branch | Plans | Status |
-|-------|----------|--------|-------|--------|
-| A. Content CRUD | `../decoded-track-a` | `feature/track-a-content` | 0/3 | **Ready** |
-| B. Engagement | `../decoded-track-b` | `feature/track-b-engagement` | 0/2 | **Ready** |
-| C. Gamification | `../decoded-track-c` | `feature/track-c-gamification` | 0/2 | **Ready** |
-| D. Monetization | `../decoded-track-d` | `feature/track-d-monetization` | 0/3 | **Ready** |
-
-## Worktree Setup (After Phase 6)
-
-```bash
-# Phase 6 완료 후 실행
-git worktree add ../decoded-track-a -b feature/track-a-content
-git worktree add ../decoded-track-b -b feature/track-b-engagement
-git worktree add ../decoded-track-c -b feature/track-c-gamification
-git worktree add ../decoded-track-d -b feature/track-d-monetization
-
-# 각 워크트리에서 Claude Code 실행
-cd ../decoded-track-a && claude  # /gsd:plan-phase A
-cd ../decoded-track-b && claude  # /gsd:plan-phase B
-cd ../decoded-track-c && claude  # /gsd:plan-phase C
-cd ../decoded-track-d && claude  # /gsd:plan-phase D
-```
-
-## Merge Strategy
-
-```bash
-# 모든 트랙 완료 후
-git checkout main
-git merge feature/track-a-content
-git merge feature/track-b-engagement
-git merge feature/track-c-gamification
-git merge feature/track-d-monetization
-```
+| Phase/Track | Plans | Status | Completed |
+|-------------|-------|--------|-----------|
+| 1-5. Documentation (v1.0) | 5/5 | ✅ Shipped | 2026-01-29 |
+| 6. API Foundation & Profile | 3/3 | ✅ Complete | 2026-01-29 |
+| A. Content CRUD | 3/3 | ✅ Merged | 2026-01-29 |
+| B. Engagement | 2/2 | ✅ Merged | 2026-01-29 |
+| C. Gamification | 2/2 | ✅ Merged | 2026-01-29 |
+| D. Monetization | 3/3 | ✅ Merged | 2026-01-29 |
+| **Total** | **18/18** | **SHIPPED** | 2026-01-29 |
 
 ---
 

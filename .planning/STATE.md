@@ -5,67 +5,55 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** 완전한 사용자 경험 — 모든 페이지가 실제 데이터로 동작
-**Current focus:** v1.1 Full API Integration (Parallel Tracks) + v2.0 Design Overhaul (Parallel Branch)
+**Current focus:** v2.0 Design Overhaul
 
 ## Current Position
 
 **Active Milestones:**
-- **v1.1 Full API Integration** - Phase 6 Complete, Tracks A-D Ready
-- **v2.0 Design Overhaul** - Roadmap Created, Ready to Start
+- **v2.0 Design Overhaul** - Phase v2-01 Complete, Phase v2-02 Ready
 
-**v1.1 Status:** Phase 6 complete, ready for parallel tracks
+**v1.1 Status:** SHIPPED (2026-01-29) - All 4 tracks merged to main
 **v2.0 Status:** Phase v2-01 complete (All 3 plans done)
-**Last activity:** 2026-01-29 - Completed v2-01-03-PLAN.md (Tailwind CSS Configuration)
+**Last activity:** 2026-01-29 - v1.1 마일스톤 완료, v2.0 Phase 2 준비
 
 ### Execution Flow
 
 ```
-v1.1 (main branch):
-1. Phase 6 (Main Branch) ─── COMPLETE ✓
-   │
-   └─ Ready to create 4 worktrees:
-      ├── Track A: Content CRUD
-      ├── Track B: Engagement
-      ├── Track C: Gamification
-      └── Track D: Monetization
+v1.1 (main branch): ─── SHIPPED ✓
+   Phase 6 + Tracks A-D merged
 
-v2.0 (parallel branch):
-feature/v2-design-overhaul
+v2.0 (feature/v2-design-overhaul):
    │
-   └─ v2-Phase 1: Design System Foundation ─── COMPLETE ✓
-      │
-      └─ v2-Phase 2: Core Interactive Components (Ready)
+   ├─ v2-Phase 1: Design System Foundation ─── COMPLETE ✓
+   │
+   └─ v2-Phase 2: Core Interactive Components ─── READY
 ```
 
-**v1.1 Progress:** ███ (100% - 3 of 3 plans complete for Phase 6)
-**v2.0 Progress:** █░░ (11% - 1 of 9 phases complete, 3 of 3 plans in v2-01 done)
+**v1.1 Progress:** ██████████ (100% - SHIPPED)
+**v2.0 Progress:** █░░░░░░░░░ (11% - 1 of 9 phases complete)
 
 ## Milestones
 
 | Version | Name | Status | Date |
 |---------|------|--------|------|
 | v1.0 | Documentation Optimization | SHIPPED | 2026-01-29 |
-| v1.1 | Full API Integration | IN PROGRESS | 2026-01-29 |
-| v2.0 | Design Overhaul | PLANNED | 2026-01-29 |
+| v1.1 | Full API Integration | SHIPPED | 2026-01-29 |
+| v2.0 | Design Overhaul | IN PROGRESS | 2026-01-29 |
 
 ## Phase Progress
 
-### v1.1 Sequential (Main Branch)
+### v1.1 Full API Integration (SHIPPED)
 
-| Phase | Plans | Status |
-|-------|-------|--------|
-| Phase 6: API Foundation & Profile | 3/3 | **Complete** (06-03 verification pending) |
+| Phase/Track | Plans | Status |
+|-------------|-------|--------|
+| Phase 6: API Foundation | 3/3 | ✅ Complete |
+| Track A: Content CRUD | 3/3 | ✅ Merged |
+| Track B: Engagement | 2/2 | ✅ Merged |
+| Track C: Gamification | 2/2 | ✅ Merged |
+| Track D: Monetization | 3/3 | ✅ Merged |
+| **Total** | **13/13** | **SHIPPED** |
 
-### v1.1 Parallel Tracks (Ready to Start)
-
-| Track | Worktree | Plans | Status |
-|-------|----------|-------|--------|
-| A: Content CRUD | `../decoded-track-a` | 0/3 | Ready |
-| B: Engagement | `../decoded-track-b` | 0/2 | Ready |
-| C: Gamification | `../decoded-track-c` | 0/2 | Ready |
-| D: Monetization | `../decoded-track-d` | 0/3 | Ready |
-
-### v2.0 Sequential (Separate Branch)
+### v2.0 Design Overhaul (IN PROGRESS)
 
 See: .planning/ROADMAP-v2.md
 
@@ -118,10 +106,6 @@ See: .planning/ROADMAP-v2.md
 - **CSS Variable Naming (v2-01-03):** Use semantic names (--text-h1) instead of scale names (--text-3xl) for clearer intent
 - **Utility Class Approach (v2-01-03):** Create @layer utilities with responsive typography presets for quick application
 
-### Pending Verification
-- **06-03 Profile Edit:** Code complete, verification blocked by backend DB error
-- Action: Re-test when backend is restored
-
 ### Open Items
 - v2 deferred: Admin dashboard, real-time notifications
 
@@ -135,60 +119,17 @@ See: .planning/ROADMAP-v2.md
 ## Session Continuity
 
 **Last session:** 2026-01-29
-**Stopped at:** Completed Phase v2-1 (Design System Foundation)
-**Resume file:** None (phase complete)
+**Stopped at:** v1.1 마일스톤 완료 처리
+**Resume file:** None
 
 **Next Steps:**
 
-For v1.1:
 ```bash
-# Create worktrees for parallel tracks
-git worktree add ../decoded-track-a -b feature/track-a-content
-git worktree add ../decoded-track-b -b feature/track-b-engagement
-git worktree add ../decoded-track-c -b feature/track-c-gamification
-git worktree add ../decoded-track-d -b feature/track-d-monetization
-```
-
-For v2.0:
-```bash
-# v2-Phase 1 (Design System Foundation) - COMPLETE ✓
-# Ready to start v2-Phase 2 (Core Interactive Components)
-
-git checkout feature/v2-design-overhaul
-/gsd:plan-phase v2-2
-```
-
-## Worktree Commands (v1.1)
-
-Phase 6 complete. Ready to create worktrees:
-
-```bash
-# Create worktrees
-git worktree add ../decoded-track-a -b feature/track-a-content
-git worktree add ../decoded-track-b -b feature/track-b-engagement
-git worktree add ../decoded-track-c -b feature/track-c-gamification
-git worktree add ../decoded-track-d -b feature/track-d-monetization
-
-# Run Claude in each (separate terminals)
-cd ../decoded-track-a && claude  # /gsd:plan-phase A
-cd ../decoded-track-b && claude  # /gsd:plan-phase B
-cd ../decoded-track-c && claude  # /gsd:plan-phase C
-cd ../decoded-track-d && claude  # /gsd:plan-phase D
-
-# After all complete, merge
-git checkout main
-git merge feature/track-a-content
-git merge feature/track-b-engagement
-git merge feature/track-c-gamification
-git merge feature/track-d-monetization
-
-# Cleanup
-git worktree remove ../decoded-track-a
-git worktree remove ../decoded-track-b
-git worktree remove ../decoded-track-c
-git worktree remove ../decoded-track-d
+# v2.0 Phase 2 시작
+git checkout feature/v2-design-overhaul  # 현재 브랜치
+/gsd:discuss-phase v2-2  # 또는 /gsd:plan-phase v2-2
 ```
 
 ---
 
-*Last updated: 2026-01-29 after v2-Phase 1 completion*
+*Last updated: 2026-01-29 after v1.1 milestone completion*

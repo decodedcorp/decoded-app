@@ -5,25 +5,12 @@
 AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패션 아이템을 발견하고 공유하는 서비스.
 
 **v1.0 (2026-01-29 shipped):** 문서화 최적화
-**v1.1 (진행중):** 전체 API 연결 — 백엔드 API를 프론트엔드에 연결하여 실제 데이터로 동작
-**v2.0 (계획됨):** 디자인 오버홀 — decoded.pen 디자인을 코드로 구현
+**v1.1 (2026-01-29 shipped):** 전체 API 연결 — 백엔드 API를 프론트엔드에 연결하여 실제 데이터로 동작
+**v2.0 (진행중):** 디자인 오버홀 — decoded.pen 디자인을 코드로 구현
 
 ## Active Milestones
 
-### v1.1 Full API Integration (진행중)
-
-**Goal:** 백엔드에 구현된 모든 API를 프론트엔드에 연결하여 완전한 기능 제공
-
-**Target features:**
-- 프로필 페이지 실제 데이터 연결 (통계, 배지, 랭킹, 활동)
-- Posts/Spots/Solutions CRUD (수정, 삭제)
-- 투표 시스템 (정확/다름)
-- 댓글 시스템 (CRUD)
-- 랭킹 시스템 (글로벌, 카테고리별)
-- 배지 시스템 (획득 배지 표시)
-- 수익 대시보드 (클릭 통계, 정산)
-
-### v2.0 Design Overhaul (계획됨, 병렬 진행)
+### v2.0 Design Overhaul (진행중)
 
 **Goal:** decoded.pen 디자인을 Pencil MCP로 코드로 변환하여 디자인-코드 일관성 확보
 
@@ -63,20 +50,23 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 - 빈 스펙 폴더 정리 — v1.0
 - 크로스 레퍼런스 추가 — v1.0
 - SSOT 원칙 문서화 — v1.0
+- 프로필 API 연결 (GET/PATCH, activities, stats) — v1.1
+- Posts/Spots/Solutions CRUD API — v1.1
+- 투표/댓글 시스템 API — v1.1
+- 랭킹/배지 시스템 API — v1.1
+- 수익 대시보드/정산 API — v1.1
+- 검색 API (popular, recent) — v1.1
 
 ### Active
 
-**v1.1 API Integration:**
-- [ ] 프로필 API 연결 (GET/PATCH /users/me, activities, stats)
-- [ ] 포스트 CRUD API 연결 (PATCH/DELETE /posts)
-- [ ] Spots API 연결 (CRUD)
-- [ ] Solutions API 연결 (CRUD + metadata)
-- [ ] 투표 API 연결 (votes, adopt)
-- [ ] 댓글 API 연결 (CRUD)
-- [ ] 랭킹 API 연결 (rankings, me, category)
-- [ ] 배지 API 연결 (badges, me)
-- [ ] 수익 API 연결 (clicks, earnings, settlements)
-- [ ] 검색 API 완전 연결 (popular, recent)
+**v2.0 Design Overhaul:**
+- [x] 디자인 토큰 추출 (색상, 타이포그래피, 간격)
+- [x] 타이포그래피 컴포넌트 구현 (Heading, Text)
+- [x] Tailwind CSS 설정 확장
+- [ ] 버튼, 입력, 태그 컴포넌트
+- [ ] 카드 컴포넌트 (Product, Feed, Profile)
+- [ ] 데스크탑 레이아웃 (Header, Footer, Sidebar)
+- [ ] 페이지별 디자인 적용 (8개 페이지)
 
 ### Out of Scope
 
@@ -88,10 +78,11 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 
 - **프로젝트 초기화**: 2026-01-23
 - **v1.0 shipped**: 2026-01-29
-- **v1.1 started**: 2026-01-29
+- **v1.1 shipped**: 2026-01-29
+- **v2.0 started**: 2026-01-29
 - **코드베이스**: Next.js 16 + React 18 + TypeScript 5.9 + Supabase
 - **백엔드 API**: https://dev.decoded.style (OpenAPI spec 완비)
-- **상태**: v1.1 API 통합 진행중
+- **상태**: v2.0 Design Overhaul 진행중
 
 ## Constraints
 
@@ -114,4 +105,4 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 
 ---
 
-*Last updated: 2026-01-29 after v2.0 milestone creation*
+*Last updated: 2026-01-29 after v1.1 milestone completion*
