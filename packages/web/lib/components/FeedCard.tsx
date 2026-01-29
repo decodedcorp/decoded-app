@@ -6,10 +6,44 @@ import { gsap } from "gsap";
 import { Flip } from "gsap/Flip";
 import { useTransitionStore } from "@/lib/stores/transitionStore";
 import { Card } from "@/lib/design-system";
+import { cn } from "@/lib/utils";
 
 // Register GSAP Flip plugin
 if (typeof window !== "undefined") {
   gsap.registerPlugin(Flip);
+}
+
+/**
+ * Get badge styles based on source
+ */
+function getSourceBadgeStyles(source?: string): string {
+  switch (source?.toLowerCase()) {
+    case 'instagram':
+      return 'bg-gradient-to-r from-[#F58529] via-[#DD2A7B] to-[#8134AF]';
+    case 'tiktok':
+      return 'bg-black';
+    default:
+      return 'bg-muted-foreground/60';
+  }
+}
+
+/**
+ * Format date as relative time
+ */
+function formatRelativeTime(date?: Date | string): string {
+  if (!date) return '';
+  const d = typeof date === 'string' ? new Date(date) : date;
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins}m`;
+  if (diffHours < 24) return `${diffHours}h`;
+  if (diffDays < 7) return `${diffDays}d`;
+  return d.toLocaleDateString();
 }
 
 export interface FeedCardItem {
@@ -88,27 +122,41 @@ export const FeedCard = memo(
             <div className="h-full w-full bg-muted" />
           )}
 
-          {/* Item count badge - bottom right */}
-          {hasItems && (
-            <div className="absolute bottom-3 right-3 rounded-full bg-black/60 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
-              Items
-            </div>
-          )}
-        </div>
-
-        {/* Metadata footer - only in development */}
-        {process.env.NODE_ENV === "development" && (
-          <div className="flex items-center justify-between border-t border-border px-3 py-2">
-            <span className="text-[10px] font-mono text-muted-foreground">
-              #{id?.slice(0, 8)}
-            </span>
-            {item.postAccount && (
-              <span className="text-[10px] text-muted-foreground">
-                @{item.postAccount}
+          {/* Top overlay: Source badge + Item count */}
+          <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
+            {/* Source badge */}
+            {item.postSource && (
+              <span className={cn(
+                "rounded-full px-2 py-0.5 text-xs font-medium text-white",
+                getSourceBadgeStyles(item.postSource)
+              )}>
+                {item.postSource}
+              </span>
+            )}
+            {/* Item count badge */}
+            {hasItems && (
+              <span className="rounded-full bg-black/60 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                Items
               </span>
             )}
           </div>
-        )}
+
+          {/* Bottom gradient overlay */}
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent p-4 pt-12">
+            {/* Account name */}
+            {item.postAccount && (
+              <p className="font-semibold text-white text-base">
+                @{item.postAccount}
+              </p>
+            )}
+            {/* Relative time */}
+            {item.postCreatedAt && (
+              <p className="text-xs text-white/70 mt-0.5">
+                {formatRelativeTime(item.postCreatedAt)}
+              </p>
+            )}
+          </div>
+        </div>
       </Card>
     );
 
@@ -138,8 +186,16 @@ export const FeedCardSkeleton = memo(() => {
   return (
     <Card className="relative w-full overflow-hidden p-0">
       <div className="relative aspect-[4/5] animate-pulse bg-muted">
-        {/* Skeleton badge placeholder */}
-        <div className="absolute bottom-3 right-3 h-6 w-14 animate-pulse rounded-full bg-muted-foreground/20" />
+        {/* Top badges skeleton */}
+        <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
+          <div className="h-5 w-16 animate-pulse rounded-full bg-muted-foreground/20" />
+          <div className="h-6 w-14 animate-pulse rounded-full bg-muted-foreground/20" />
+        </div>
+        {/* Bottom info skeleton */}
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent p-4 pt-12">
+          <div className="h-4 w-24 animate-pulse rounded bg-white/20 mb-1" />
+          <div className="h-3 w-16 animate-pulse rounded bg-white/10" />
+        </div>
       </div>
     </Card>
   );
