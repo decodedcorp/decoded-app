@@ -4,6 +4,7 @@ import { memo, useState, useEffect } from "react";
 import Link from "next/link";
 import { gsap } from "gsap";
 import { Flip } from "gsap/Flip";
+import { AnimatePresence, motion } from "motion/react";
 import { useInfinitePosts } from "@/lib/hooks/usePosts";
 import type { Post } from "@/lib/api/types";
 import ThiingsGrid, {
@@ -13,6 +14,7 @@ import ThiingsGrid, {
 import { useFilterStore } from "@/lib/stores/filterStore";
 import { useSearchStore } from "@/lib/stores/searchStore";
 import { useTransitionStore } from "@/lib/stores/transitionStore";
+import { ExploreHeader, CategoryFilter } from "@/lib/components/explore";
 
 // Register GSAP Flip plugin
 if (typeof window !== "undefined") {
@@ -212,95 +214,111 @@ export function ExploreClient({ initialPosts: _initialPosts }: Props) {
       };
     });
 
-  // Loading state: show skeleton grid (only on initial load)
-  if (isLoading && !data) {
-    return (
-      <div className="absolute inset-0 z-0 pt-14 pb-16 md:pt-16 md:pb-0">
-        <ThiingsGrid
-          gridSize={gridSize}
-          renderItem={(config) => <SkeletonCell {...config} />}
-          initialPosition={{ x: 0, y: 0 }}
-          items={[]}
-          hasMore={true}
-        />
-      </div>
-    );
-  }
-
-  // Error state: show error message with retry button
-  if (isError) {
-    return (
-      <div className="absolute inset-0 z-0 flex items-center justify-center pt-14 pb-16 md:pt-16 md:pb-0">
-        <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
-          <div className="mb-4 text-4xl">⚠️</div>
-          <h2 className="mb-2 text-xl font-semibold text-foreground">
-            Failed to load images
-          </h2>
-          <p className="mb-6 text-sm text-muted-foreground">
-            {error instanceof Error
-              ? error.message
-              : "Something went wrong while loading images."}
-          </p>
-          <button
-            onClick={() => refetch()}
-            className="rounded-full border border-border bg-card/80 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
-            type="button"
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Empty state: show empty state message
-  if (!items || items.length === 0) {
-    const hasActiveFilter = activeFilter !== "all";
-    const hasSearchQuery = debouncedQuery.trim().length > 0;
-
-    return (
-      <div className="absolute inset-0 z-0 flex items-center justify-center pt-14 pb-16 md:pt-16 md:pb-0">
-        <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
-          <div className="mb-4 text-4xl">📷</div>
-          <h2 className="mb-2 text-xl font-semibold text-foreground">
-            {hasActiveFilter || hasSearchQuery
-              ? "No images found"
-              : "No images found yet."}
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            {hasActiveFilter || hasSearchQuery
-              ? "Try adjusting your filters or search query."
-              : "Check back later or try adjusting your filters."}
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // Success state: show grid with actual images
+  // Render with header and filter components
   return (
-    <div className="absolute inset-0 z-0 pt-14 pb-16 md:pt-16 md:pb-0">
-      <ThiingsGrid
-        gridSize={gridSize}
-        renderItem={(config) => <CardCell {...config} />}
-        initialPosition={{ x: 0, y: 0 }}
-        items={gridItems}
-        onReachEnd={() => {
-          if (hasNextPage && !isFetchingNextPage) {
-            fetchNextPage();
-          }
-        }}
-        hasMore={!!hasNextPage}
-        isLoadingMore={isFetchingNextPage}
-      />
+    <div className="flex flex-col h-full">
+      {/* Header area - fixed above grid */}
+      <div className="flex-shrink-0">
+        <ExploreHeader />
+        <CategoryFilter />
+      </div>
 
-      {/* Loading indicator for next page */}
-      {isFetchingNextPage && (
-        <div className="pointer-events-none absolute bottom-8 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-background/80 px-4 py-2 text-sm font-medium text-foreground shadow-lg backdrop-blur-sm">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          Loading more...
-        </div>
-      )}
+      {/* Grid container - takes remaining space */}
+      <div className="flex-1 relative">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeFilter}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0"
+          >
+            {/* Loading state: show skeleton grid (only on initial load) */}
+            {isLoading && !data && (
+              <div className="absolute inset-0 z-0">
+                <ThiingsGrid
+                  gridSize={gridSize}
+                  renderItem={(config) => <SkeletonCell {...config} />}
+                  initialPosition={{ x: 0, y: 0 }}
+                  items={[]}
+                  hasMore={true}
+                />
+              </div>
+            )}
+
+            {/* Error state: show error message with retry button */}
+            {isError && (
+              <div className="absolute inset-0 z-0 flex items-center justify-center">
+                <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
+                  <div className="mb-4 text-4xl">⚠️</div>
+                  <h2 className="mb-2 text-xl font-semibold text-foreground">
+                    Failed to load images
+                  </h2>
+                  <p className="mb-6 text-sm text-muted-foreground">
+                    {error instanceof Error
+                      ? error.message
+                      : "Something went wrong while loading images."}
+                  </p>
+                  <button
+                    onClick={() => refetch()}
+                    className="rounded-full border border-border bg-card/80 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+                    type="button"
+                  >
+                    Retry
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Empty state: show empty state message */}
+            {!isError && !isLoading && (!items || items.length === 0) && (
+              <div className="absolute inset-0 z-0 flex items-center justify-center">
+                <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
+                  <div className="mb-4 text-4xl">📷</div>
+                  <h2 className="mb-2 text-xl font-semibold text-foreground">
+                    {activeFilter !== "all" || debouncedQuery.trim().length > 0
+                      ? "No images found"
+                      : "No images found yet."}
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    {activeFilter !== "all" || debouncedQuery.trim().length > 0
+                      ? "Try adjusting your filters or search query."
+                      : "Check back later or try adjusting your filters."}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Success state: show grid with actual images */}
+            {!isError && items && items.length > 0 && (
+              <div className="absolute inset-0 z-0">
+                <ThiingsGrid
+                  gridSize={gridSize}
+                  renderItem={(config) => <CardCell {...config} />}
+                  initialPosition={{ x: 0, y: 0 }}
+                  items={gridItems}
+                  onReachEnd={() => {
+                    if (hasNextPage && !isFetchingNextPage) {
+                      fetchNextPage();
+                    }
+                  }}
+                  hasMore={!!hasNextPage}
+                  isLoadingMore={isFetchingNextPage}
+                />
+
+                {/* Loading indicator for next page */}
+                {isFetchingNextPage && (
+                  <div className="pointer-events-none absolute bottom-8 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-background/80 px-4 py-2 text-sm font-medium text-foreground shadow-lg backdrop-blur-sm">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                    Loading more...
+                  </div>
+                )}
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
