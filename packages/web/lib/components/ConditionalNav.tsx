@@ -29,9 +29,9 @@ export function ConditionalNav() {
 /**
  * MainContentWrapper - Wrapper for main content area
  *
- * Applies padding for top header and bottom nav:
- * - pt-14 md:pt-16: Top padding for header height (56px mobile, 64px desktop)
- * - pb-14 md:pb-0: Bottom padding for MobileNavBar on mobile only
+ * Applies padding for top header and bottom nav per decoded.pen:
+ * - pt-14 md:pt-[72px]: Top padding (56px mobile header, 72px desktop header)
+ * - pb-16 md:pb-0: Bottom padding (64px mobile nav bar, none on desktop)
  */
 export function MainContentWrapper({
   children,
@@ -39,7 +39,7 @@ export function MainContentWrapper({
   children: React.ReactNode;
 }) {
   return (
-    <main className="min-h-screen pt-14 md:pt-16 pb-14 md:pb-0">
+    <main className="min-h-screen pt-14 md:pt-[72px] pb-16 md:pb-0">
       {children}
     </main>
   );

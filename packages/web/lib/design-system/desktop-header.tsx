@@ -6,7 +6,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Search, Bell } from "lucide-react";
 import DecodedLogo from "@/lib/components/DecodedLogo";
-import { Button } from "@/lib/components/ui/button";
 import { useAuthStore } from "@/lib/stores/authStore";
 
 /**
@@ -41,11 +40,13 @@ export interface DesktopHeaderProps
 
 /**
  * Navigation items configuration
+ * @see decoded.pen Desktop Header: Home, Feed, Explore, Request
  */
 const NAV_ITEMS = [
   { href: "/", label: "Home" },
-  { href: "/discover", label: "Discover" },
-  { href: "/create", label: "Create" },
+  { href: "/feed", label: "Feed" },
+  { href: "/explore", label: "Explore" },
+  { href: "/request", label: "Request" },
 ] as const;
 
 /**
@@ -71,10 +72,10 @@ export function DesktopHeader({
   return (
     <header
       className={cn(desktopHeaderVariants({ variant }), className)}
-      style={{ height: "64px" }}
+      style={{ height: "72px" }}
       {...props}
     >
-      <div className="container flex items-center justify-between h-full px-4">
+      <div className="container relative flex items-center h-full px-16">
         {/* Left Section: Logo */}
         <div className="flex items-center flex-shrink-0">
           <Link
@@ -92,8 +93,11 @@ export function DesktopHeader({
           </Link>
         </div>
 
-        {/* Center Section: Navigation */}
-        <nav className="flex items-center gap-8" aria-label="Main navigation">
+        {/* Center Section: Navigation - Absolute center */}
+        <nav
+          className="absolute left-1/2 -translate-x-1/2 flex items-center gap-8"
+          aria-label="Main navigation"
+        >
           {NAV_ITEMS.map(({ href, label }) => {
             const isActive = pathname === href;
             return (
@@ -103,8 +107,8 @@ export function DesktopHeader({
                 className={cn(
                   "text-sm transition-colors",
                   isActive
-                    ? "text-foreground font-medium"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "text-primary font-semibold"
+                    : "text-muted-foreground hover:text-foreground font-medium"
                 )}
               >
                 {label}
@@ -114,7 +118,7 @@ export function DesktopHeader({
         </nav>
 
         {/* Right Section: Search + Auth UI */}
-        <div className="flex items-center gap-4">
+        <div className="ml-auto flex items-center gap-4">
           {/* Search Icon Button */}
           <button
             onClick={onSearchClick}
@@ -146,9 +150,12 @@ export function DesktopHeader({
               </button>
             </div>
           ) : (
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/login">Login</Link>
-            </Button>
+            <Link
+              href="/login"
+              className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              Login
+            </Link>
           )}
         </div>
       </div>
