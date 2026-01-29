@@ -145,7 +145,7 @@ See: .planning/ROADMAP-v2.md
 ## Session Continuity
 
 **Last session:** 2026-01-29
-**Stopped at:** Completed v2-04-03-PLAN.md - Layout Integration (Phase v2-04 COMPLETE)
+**Stopped at:** Completed quick task 001 - Fix header/mobile nav design
 **Resume file:** None
 
 **Next Steps:**
@@ -159,6 +159,12 @@ git checkout feature/v2-design-overhaul  # 현재 브랜치
 npm run dev  # Test integrated header/footer layout
 ```
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 001 | Fix header and mobile nav design to match decoded.pen | 2026-01-29 | 76f9be1 | [001-fix-header-mobile-nav-design](./quick/001-fix-header-mobile-nav-design/) |
+
 ---
 
-*Last updated: 2026-01-29 after v2-04-03 plan completion (Phase v2-04 COMPLETE)*
+*Last updated: 2026-01-29 after quick task 001 completion*
