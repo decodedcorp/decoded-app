@@ -9,8 +9,10 @@ export default async function FeedPage() {
   return (
     <>
       <Header />
-      <main className="relative w-full h-screen overflow-hidden">
-        <FeedClient initialImages={initialImages} />
+      <main className="min-h-screen bg-background pt-14 pb-14 md:pt-16 md:pb-0">
+        <div className="h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)]">
+          <FeedClient initialImages={initialImages} />
+        </div>
       </main>
     </>
   );
