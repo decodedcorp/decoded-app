@@ -69,7 +69,7 @@ export default async function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-16 md:pb-0">
+    <div className="min-h-screen bg-background pt-14 pb-14 md:pt-16 md:pb-0">
       {/* Mobile Header - only visible on mobile */}
       <Header />
 
