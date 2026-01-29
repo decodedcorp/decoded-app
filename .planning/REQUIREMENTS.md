@@ -105,53 +105,78 @@ Deferred to future release.
 
 ## Traceability
 
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| PROF-01 | Phase 6 | Pending |
-| PROF-02 | Phase 6 | Pending |
-| PROF-03 | Phase 6 | Pending |
-| PROF-04 | Phase 6 | Pending |
-| PROF-05 | Phase 6 | Pending |
-| POST-01 | Phase 7 | Pending |
-| POST-02 | Phase 7 | Pending |
-| SPOT-01 | Phase 7 | Pending |
-| SPOT-02 | Phase 7 | Pending |
-| SPOT-03 | Phase 7 | Pending |
-| SPOT-04 | Phase 7 | Pending |
-| SOLN-01 | Phase 7 | Pending |
-| SOLN-02 | Phase 7 | Pending |
-| SOLN-03 | Phase 7 | Pending |
-| SOLN-04 | Phase 7 | Pending |
-| SOLN-05 | Phase 7 | Pending |
-| SOLN-06 | Phase 7 | Pending |
-| VOTE-01 | Phase 8 | Pending |
-| VOTE-02 | Phase 8 | Pending |
-| VOTE-03 | Phase 8 | Pending |
-| VOTE-04 | Phase 8 | Pending |
-| VOTE-05 | Phase 8 | Pending |
-| CMNT-01 | Phase 8 | Pending |
-| CMNT-02 | Phase 8 | Pending |
-| CMNT-03 | Phase 8 | Pending |
-| CMNT-04 | Phase 8 | Pending |
-| RANK-01 | Phase 9 | Pending |
-| RANK-02 | Phase 9 | Pending |
-| RANK-03 | Phase 9 | Pending |
-| BDGE-01 | Phase 9 | Pending |
-| BDGE-02 | Phase 9 | Pending |
-| BDGE-03 | Phase 9 | Pending |
-| EARN-01 | Phase 10 | Pending |
-| EARN-02 | Phase 10 | Pending |
-| EARN-03 | Phase 10 | Pending |
-| EARN-04 | Phase 10 | Pending |
-| EARN-05 | Phase 10 | Pending |
-| SRCH-01 | Phase 10 | Pending |
-| SRCH-02 | Phase 10 | Pending |
+### Phase 6: API Foundation & Profile (Main Branch)
+
+| Requirement | Status |
+|-------------|--------|
+| PROF-01 | Pending |
+| PROF-02 | Pending |
+| PROF-03 | Pending |
+| PROF-04 | Pending |
+| PROF-05 | Pending |
+
+### Track A: Content CRUD (Worktree)
+
+| Requirement | Status |
+|-------------|--------|
+| POST-01 | Pending |
+| POST-02 | Pending |
+| SPOT-01 | Pending |
+| SPOT-02 | Pending |
+| SPOT-03 | Pending |
+| SPOT-04 | Pending |
+| SOLN-01 | Pending |
+| SOLN-02 | Pending |
+| SOLN-03 | Pending |
+| SOLN-04 | Pending |
+| SOLN-05 | Pending |
+| SOLN-06 | Pending |
+
+### Track B: Engagement (Worktree)
+
+| Requirement | Status |
+|-------------|--------|
+| VOTE-01 | Pending |
+| VOTE-02 | Pending |
+| VOTE-03 | Pending |
+| VOTE-04 | Pending |
+| VOTE-05 | Pending |
+| CMNT-01 | Pending |
+| CMNT-02 | Pending |
+| CMNT-03 | Pending |
+| CMNT-04 | Pending |
+
+### Track C: Gamification (Worktree)
+
+| Requirement | Status |
+|-------------|--------|
+| RANK-01 | Pending |
+| RANK-02 | Pending |
+| RANK-03 | Pending |
+| BDGE-01 | Pending |
+| BDGE-02 | Pending |
+| BDGE-03 | Pending |
+
+### Track D: Monetization & Search (Worktree)
+
+| Requirement | Status |
+|-------------|--------|
+| EARN-01 | Pending |
+| EARN-02 | Pending |
+| EARN-03 | Pending |
+| EARN-04 | Pending |
+| EARN-05 | Pending |
+| SRCH-01 | Pending |
+| SRCH-02 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 37 total
-- Mapped to phases: 37
-- Unmapped: 0
+- Phase 6 (Foundation): 5
+- Track A (Content): 12
+- Track B (Engagement): 9
+- Track C (Gamification): 6
+- Track D (Monetization): 7
 
 ---
 *Requirements defined: 2026-01-29*
-*Last updated: 2026-01-29 after roadmap creation*
+*Last updated: 2026-01-29 after parallel track restructure*

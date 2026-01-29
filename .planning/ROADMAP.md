@@ -3,11 +3,22 @@
 ## Milestones
 
 - [x] **v1.0 Documentation Optimization** - Phases 1-5 (shipped 2026-01-29)
-- [ ] **v1.1 Full API Integration** - Phases 6-10 (in progress)
+- [ ] **v1.1 Full API Integration** - Phase 6 + Tracks A-D (in progress)
 
 ## Overview
 
-v1.1 connects all backend APIs to the frontend, transforming decoded-app from a partially-functional prototype into a production-ready service. The 37 requirements are grouped into 5 phases, progressing from foundational profile APIs through interactive features (CRUD, voting, comments) to engagement systems (rankings, badges, earnings).
+v1.1 connects all backend APIs to the frontend. **Parallel execution via git worktrees:**
+
+1. **Phase 6 (Foundation)** - API 클라이언트 패턴 확립 (순차, 먼저 완료)
+2. **Tracks A-D** - 4개 워크트리에서 병렬 실행
+
+```
+main (Phase 6 완료)
+    ├── worktree: decoded-track-a (Content CRUD)
+    ├── worktree: decoded-track-b (Engagement)
+    ├── worktree: decoded-track-c (Gamification)
+    └── worktree: decoded-track-d (Monetization)
+```
 
 ## Phases
 
@@ -22,112 +33,166 @@ See archived roadmap for v1.0 phase details.
 
 **Milestone Goal:** Connect all backend APIs to frontend for complete user experience
 
-- [ ] **Phase 6: Profile & API Foundation** - User profile APIs and shared API client patterns
-- [ ] **Phase 7: Content CRUD** - Posts, Spots, Solutions create/update/delete operations
-- [ ] **Phase 8: Interaction Systems** - Voting and commenting functionality
-- [ ] **Phase 9: Gamification** - Rankings and badges display
-- [ ] **Phase 10: Monetization & Search** - Earnings dashboard and search enhancements
+#### Sequential (Main Branch)
+- [ ] **Phase 6: API Foundation & Profile** - API client patterns + Profile APIs
+
+#### Parallel Tracks (Git Worktrees) - After Phase 6
+- [ ] **Track A: Content CRUD** - Posts, Spots, Solutions (worktree: `decoded-track-a`)
+- [ ] **Track B: Engagement** - Votes, Comments (worktree: `decoded-track-b`)
+- [ ] **Track C: Gamification** - Rankings, Badges (worktree: `decoded-track-c`)
+- [ ] **Track D: Monetization & Search** - Earnings, Search (worktree: `decoded-track-d`)
 
 ## Phase Details
 
-### Phase 6: Profile & API Foundation
-**Goal**: Users can view and edit their profiles with real data from the API
+---
+
+### Phase 6: API Foundation & Profile (Main Branch)
+**Goal**: Establish API client patterns and implement profile features
 **Depends on**: v1.0 completion
 **Requirements**: PROF-01, PROF-02, PROF-03, PROF-04, PROF-05
+**Branch**: `main` or `feature/phase-6-foundation`
 **Success Criteria** (what must be TRUE):
-  1. User can view their own profile page with real data (bio, avatar, display_name)
-  2. User can edit their profile and see changes persist after refresh
-  3. User can view their activity history (posts, solutions, votes)
-  4. User can see their stats (total posts, solutions, adoption rate)
-  5. User can view other users' public profiles
-**Plans**: TBD
+  1. Shared API client with auth token injection established
+  2. React Query hooks pattern for mutations established
+  3. User can view their own profile page with real data
+  4. User can edit their profile and see changes persist
+  5. User can view activity history and stats
+  6. User can view other users' public profiles
 
 Plans:
-- [ ] 06-01: API client setup and profile data fetching
-- [ ] 06-02: Profile edit form and mutation hooks
-- [ ] 06-03: Activity feed and stats components
+- [ ] 06-01: API client foundation (fetch wrapper, auth, error handling)
+- [ ] 06-02: Profile read APIs (me, stats, activities, public profile)
+- [ ] 06-03: Profile write APIs (update profile)
 
-### Phase 7: Content CRUD
+**After Phase 6 completes:** Create 4 worktrees for parallel execution
+
+---
+
+### Track A: Content CRUD (Parallel)
 **Goal**: Users can fully manage their posts, spots, and solutions
-**Depends on**: Phase 6
+**Depends on**: Phase 6 (API client patterns)
 **Requirements**: POST-01, POST-02, SPOT-01, SPOT-02, SPOT-03, SPOT-04, SOLN-01, SOLN-02, SOLN-03, SOLN-04, SOLN-05, SOLN-06
+**Worktree**: `../decoded-track-a`
+**Branch**: `feature/track-a-content`
 **Success Criteria** (what must be TRUE):
-  1. User can edit their own posts (title, description, tags)
+  1. User can edit their own posts
   2. User can delete their own posts
-  3. User can add/edit/delete spots on their posts
-  4. User can submit solutions to spots with product links
-  5. User can edit/delete their submitted solutions
-  6. Product metadata is auto-extracted when submitting solution URLs
-**Plans**: TBD
+  3. User can add/edit/delete spots on posts
+  4. User can submit solutions with auto-extracted metadata
+  5. User can edit/delete their solutions
 
 Plans:
-- [ ] 07-01: Post edit/delete operations
-- [ ] 07-02: Spot CRUD operations
-- [ ] 07-03: Solution CRUD with metadata extraction
+- [ ] A-01: Post edit/delete operations
+- [ ] A-02: Spot CRUD operations
+- [ ] A-03: Solution CRUD with metadata extraction
 
-### Phase 8: Interaction Systems
+---
+
+### Track B: Engagement (Parallel)
 **Goal**: Users can vote on solutions and engage through comments
-**Depends on**: Phase 7
+**Depends on**: Phase 6 (API client patterns)
 **Requirements**: VOTE-01, VOTE-02, VOTE-03, VOTE-04, VOTE-05, CMNT-01, CMNT-02, CMNT-03, CMNT-04
+**Worktree**: `../decoded-track-b`
+**Branch**: `feature/track-b-engagement`
 **Success Criteria** (what must be TRUE):
   1. User can see vote counts on solutions
-  2. User can vote (accurate/different) on solutions and see immediate UI update
+  2. User can vote (accurate/different) with immediate UI update
   3. User can retract their vote
-  4. Post owner can adopt a solution as the correct answer
-  5. User can view comments on posts
-  6. User can write, edit, and delete their own comments
-**Plans**: TBD
+  4. Post owner can adopt a solution
+  5. User can view/write/edit/delete comments
 
 Plans:
-- [ ] 08-01: Vote system (vote, retract, adopt)
-- [ ] 08-02: Comment CRUD operations
+- [ ] B-01: Vote system (vote, retract, adopt)
+- [ ] B-02: Comment CRUD operations
 
-### Phase 9: Gamification
-**Goal**: Users can see their standing and achievements in the community
-**Depends on**: Phase 8
+---
+
+### Track C: Gamification (Parallel)
+**Goal**: Users can see their standing and achievements
+**Depends on**: Phase 6 (API client patterns)
 **Requirements**: RANK-01, RANK-02, RANK-03, BDGE-01, BDGE-02, BDGE-03
+**Worktree**: `../decoded-track-c`
+**Branch**: `feature/track-c-gamification`
 **Success Criteria** (what must be TRUE):
   1. User can view global rankings leaderboard
   2. User can see their own rank position
   3. User can browse rankings by category
-  4. User can view all available badges and their requirements
+  4. User can view all available badges
   5. User can see their earned badges on profile
-**Plans**: TBD
 
 Plans:
-- [ ] 09-01: Rankings display (global, personal, category)
-- [ ] 09-02: Badge system integration
+- [ ] C-01: Rankings display (global, personal, category)
+- [ ] C-02: Badge system integration
 
-### Phase 10: Monetization & Search
-**Goal**: Users can track earnings and discover content efficiently
-**Depends on**: Phase 9
+---
+
+### Track D: Monetization & Search (Parallel)
+**Goal**: Users can track earnings and discover content
+**Depends on**: Phase 6 (API client patterns)
 **Requirements**: EARN-01, EARN-02, EARN-03, EARN-04, EARN-05, SRCH-01, SRCH-02
+**Worktree**: `../decoded-track-d`
+**Branch**: `feature/track-d-monetization`
 **Success Criteria** (what must be TRUE):
-  1. User can view click statistics on their solutions
-  2. Affiliate link clicks are tracked automatically
+  1. User can view click statistics on solutions
+  2. Affiliate link clicks are tracked
   3. User can see earnings summary and history
-  4. User can view settlement history and request withdrawals
-  5. User can see popular search terms for discovery
-  6. User can view their recent search history
-**Plans**: TBD
+  4. User can view settlements and request withdrawals
+  5. User can see popular/recent search terms
 
 Plans:
-- [ ] 10-01: Click tracking and earnings dashboard
-- [ ] 10-02: Settlement and withdrawal flow
-- [ ] 10-03: Search suggestions (popular/recent)
+- [ ] D-01: Click tracking and earnings dashboard
+- [ ] D-02: Settlement and withdrawal flow
+- [ ] D-03: Search suggestions (popular/recent)
 
 ## Progress
 
-**Execution Order:** Phases execute in numeric order: 6 -> 7 -> 8 -> 9 -> 10
+**Execution Order:**
+1. Phase 6 (Foundation) - Sequential on main
+2. Tracks A-D - Parallel via worktrees
+3. Merge all tracks to main
 
-| Phase | Milestone | Plans Complete | Status | Completed |
-|-------|-----------|----------------|--------|-----------|
-| 1-5. Documentation | v1.0 | 5/5 | Complete | 2026-01-29 |
-| 6. Profile & API | v1.1 | 0/3 | Not started | - |
-| 7. Content CRUD | v1.1 | 0/3 | Not started | - |
-| 8. Interaction | v1.1 | 0/2 | Not started | - |
-| 9. Gamification | v1.1 | 0/2 | Not started | - |
-| 10. Monetization | v1.1 | 0/3 | Not started | - |
+### Sequential Phase (Main)
+
+| Phase | Plans | Status | Completed |
+|-------|-------|--------|-----------|
+| 1-5. Documentation (v1.0) | 5/5 | Complete | 2026-01-29 |
+| 6. API Foundation & Profile | 0/3 | Not started | - |
+
+### Parallel Tracks (Worktrees)
+
+| Track | Worktree | Branch | Plans | Status |
+|-------|----------|--------|-------|--------|
+| A. Content CRUD | `../decoded-track-a` | `feature/track-a-content` | 0/3 | Blocked (Phase 6) |
+| B. Engagement | `../decoded-track-b` | `feature/track-b-engagement` | 0/2 | Blocked (Phase 6) |
+| C. Gamification | `../decoded-track-c` | `feature/track-c-gamification` | 0/2 | Blocked (Phase 6) |
+| D. Monetization | `../decoded-track-d` | `feature/track-d-monetization` | 0/3 | Blocked (Phase 6) |
+
+## Worktree Setup (After Phase 6)
+
+```bash
+# Phase 6 완료 후 실행
+git worktree add ../decoded-track-a -b feature/track-a-content
+git worktree add ../decoded-track-b -b feature/track-b-engagement
+git worktree add ../decoded-track-c -b feature/track-c-gamification
+git worktree add ../decoded-track-d -b feature/track-d-monetization
+
+# 각 워크트리에서 Claude Code 실행
+cd ../decoded-track-a && claude  # /gsd:plan-phase A
+cd ../decoded-track-b && claude  # /gsd:plan-phase B
+cd ../decoded-track-c && claude  # /gsd:plan-phase C
+cd ../decoded-track-d && claude  # /gsd:plan-phase D
+```
+
+## Merge Strategy
+
+```bash
+# 모든 트랙 완료 후
+git checkout main
+git merge feature/track-a-content
+git merge feature/track-b-engagement
+git merge feature/track-c-gamification
+git merge feature/track-d-monetization
+```
 
 ---
 

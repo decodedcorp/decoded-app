@@ -5,17 +5,25 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** 완전한 사용자 경험 — 모든 페이지가 실제 데이터로 동작
-**Current focus:** v1.1 Full API Integration
+**Current focus:** v1.1 Full API Integration (Parallel Tracks)
 
 ## Current Position
 
 **Milestone:** v1.1 Full API Integration
-**Phase:** 6 of 10 (Profile & API Foundation)
-**Plan:** 0 of 3 in current phase
-**Status:** Ready to plan
-**Last activity:** 2026-01-29 — Roadmap created for v1.1
+**Structure:** Phase 6 (Foundation) → Tracks A-D (Parallel)
+**Status:** Ready to start Phase 6
 
-Progress: [=====-----] 50% (v1.0 complete, v1.1 starting)
+### Execution Flow
+
+```
+1. Phase 6 (Main Branch) ─── Currently Here
+   │
+   └─ After completion, create 4 worktrees:
+      ├── Track A: Content CRUD
+      ├── Track B: Engagement
+      ├── Track C: Gamification
+      └── Track D: Monetization
+```
 
 ## Milestones
 
@@ -24,21 +32,22 @@ Progress: [=====-----] 50% (v1.0 complete, v1.1 starting)
 | v1.0 | Documentation Optimization | SHIPPED | 2026-01-29 |
 | v1.1 | Full API Integration | IN PROGRESS | 2026-01-29 |
 
-## Performance Metrics
+## Phase Progress
 
-**Velocity:**
-- Total plans completed: 5 (v1.0)
-- Average duration: N/A (v1.1 starting)
-- Total execution time: N/A
+### Sequential (Main Branch)
 
-**By Phase:**
+| Phase | Plans | Status |
+|-------|-------|--------|
+| Phase 6: API Foundation & Profile | 0/3 | Ready |
 
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 1-5 (v1.0) | 5 | - | - |
-| 6-10 (v1.1) | 0 | TBD | - |
+### Parallel Tracks (After Phase 6)
 
-*Updated after each plan completion*
+| Track | Worktree | Plans | Status |
+|-------|----------|-------|--------|
+| A: Content CRUD | `../decoded-track-a` | 0/3 | Blocked |
+| B: Engagement | `../decoded-track-b` | 0/2 | Blocked |
+| C: Gamification | `../decoded-track-c` | 0/2 | Blocked |
+| D: Monetization | `../decoded-track-d` | 0/3 | Blocked |
 
 ## Accumulated Context
 
@@ -49,7 +58,8 @@ Progress: [=====-----] 50% (v1.0 complete, v1.1 starting)
 ### Decisions Made (v1.1)
 - Backend API: https://dev.decoded.style/api/v1
 - OpenAPI spec available at /api-docs/openapi.json
-- Phases 6-10 for full API integration
+- **Parallel execution via git worktrees** for independent tracks
+- Phase 6 establishes API client patterns, then 4 tracks run in parallel
 
 ### Open Items
 - v2 deferred: Admin dashboard, real-time notifications
@@ -61,12 +71,37 @@ Progress: [=====-----] 50% (v1.0 complete, v1.1 starting)
 - OpenAPI: https://dev.decoded.style/api-docs/openapi.json
 - Base URL: https://dev.decoded.style/api/v1
 
-## Session Continuity
+## Worktree Commands
 
-Last session: 2026-01-29
-Stopped at: Roadmap created for v1.1 milestone
-Resume file: None
+After Phase 6 completes:
+
+```bash
+# Create worktrees
+git worktree add ../decoded-track-a -b feature/track-a-content
+git worktree add ../decoded-track-b -b feature/track-b-engagement
+git worktree add ../decoded-track-c -b feature/track-c-gamification
+git worktree add ../decoded-track-d -b feature/track-d-monetization
+
+# Run Claude in each (separate terminals)
+cd ../decoded-track-a && claude
+cd ../decoded-track-b && claude
+cd ../decoded-track-c && claude
+cd ../decoded-track-d && claude
+
+# After all complete, merge
+git checkout main
+git merge feature/track-a-content
+git merge feature/track-b-engagement
+git merge feature/track-c-gamification
+git merge feature/track-d-monetization
+
+# Cleanup
+git worktree remove ../decoded-track-a
+git worktree remove ../decoded-track-b
+git worktree remove ../decoded-track-c
+git worktree remove ../decoded-track-d
+```
 
 ---
 
-*Last updated: 2026-01-29 after roadmap creation*
+*Last updated: 2026-01-29 after parallel track restructure*
