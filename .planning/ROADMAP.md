@@ -40,7 +40,7 @@ See archived roadmap for v1.0 phase details.
 - [ ] **Track A: Content CRUD** - Posts, Spots, Solutions (worktree: `decoded-track-a`)
 - [ ] **Track B: Engagement** - Votes, Comments (worktree: `decoded-track-b`)
 - [ ] **Track C: Gamification** - Rankings, Badges (worktree: `decoded-track-c`)
-- [ ] **Track D: Monetization & Search** - Earnings, Search (worktree: `decoded-track-d`)
+- [x] **Track D: Monetization & Search** - Earnings, Search (worktree: `decoded-track-d`) ✓
 
 ## Phase Details
 
@@ -139,10 +139,10 @@ Plans:
   4. User can view settlements and request withdrawals
   5. User can see popular/recent search terms
 
-**Plans:** 3 plans (1 wave)
-- [ ] D-01-PLAN.md - Click tracking and earnings API (types, functions, hooks) [Wave 1]
-- [ ] D-02-PLAN.md - Settlement and withdrawal API (types, functions, hooks) [Wave 1]
-- [ ] D-03-PLAN.md - Search suggestions API (popular/recent terms) [Wave 1]
+**Plans:** 3 plans (1 wave) ✓
+- [x] D-01-PLAN.md - Click tracking and earnings API (types, functions, hooks) [Wave 1]
+- [x] D-02-PLAN.md - Settlement and withdrawal API (types, functions, hooks) [Wave 1]
+- [x] D-03-PLAN.md - Search suggestions API (popular/recent terms) [Wave 1]
 
 ## Progress
 
@@ -167,7 +167,7 @@ Plans:
 | A. Content CRUD | `../decoded-track-a` | `feature/track-a-content` | 0/3 | **Ready** |
 | B. Engagement | `../decoded-track-b` | `feature/track-b-engagement` | 0/2 | **Ready** |
 | C. Gamification | `../decoded-track-c` | `feature/track-c-gamification` | 0/2 | **Ready** |
-| D. Monetization | `../decoded-track-d` | `feature/track-d-monetization` | 0/3 | **Planned** |
+| D. Monetization | `../decoded-track-d` | `feature/track-d-monetization` | 3/3 | **Complete** ✓ |
 
 ## Worktree Setup (After Phase 6)
 
@@ -199,4 +199,4 @@ git merge feature/track-d-monetization
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-01-29 (Track D planned)*
+*Last updated: 2026-01-29 (Track D complete)*
