@@ -146,37 +146,37 @@ Pencil MCP를 활용하여 decoded.pen 디자인을 React 컴포넌트로 변환
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BTN-01 | v2-Phase 2 | Pending |
-| BTN-02 | v2-Phase 2 | Pending |
-| BTN-03 | v2-Phase 2 | Pending |
-| BTN-04 | v2-Phase 2 | Pending |
-| BTN-05 | v2-Phase 2 | Pending |
-| BTN-06 | v2-Phase 2 | Pending |
-| BTN-07 | v2-Phase 2 | Pending |
-| BTN-08 | v2-Phase 2 | Pending |
-| BTN-09 | v2-Phase 2 | Pending |
+| BTN-01 | v2-Phase 2 | Complete |
+| BTN-02 | v2-Phase 2 | Complete |
+| BTN-03 | v2-Phase 2 | Complete |
+| BTN-04 | v2-Phase 2 | Complete |
+| BTN-05 | v2-Phase 2 | Complete |
+| BTN-06 | v2-Phase 2 | Complete |
+| BTN-07 | v2-Phase 2 | Complete |
+| BTN-08 | v2-Phase 2 | Complete |
+| BTN-09 | v2-Phase 2 | Complete |
 | CARD-01 | v2-Phase 3 | Pending |
 | CARD-02 | v2-Phase 3 | Pending |
 | CARD-03 | v2-Phase 3 | Pending |
 | CARD-04 | v2-Phase 3 | Pending |
 | CARD-05 | v2-Phase 3 | Pending |
 | CARD-06 | v2-Phase 3 | Pending |
-| INP-01 | v2-Phase 2 | Pending |
-| INP-02 | v2-Phase 2 | Pending |
-| INP-03 | v2-Phase 2 | Pending |
-| TAG-01 | v2-Phase 2 | Pending |
-| TAG-02 | v2-Phase 2 | Pending |
-| TAG-03 | v2-Phase 2 | Pending |
-| TAG-04 | v2-Phase 2 | Pending |
-| TAG-05 | v2-Phase 2 | Pending |
-| TAG-06 | v2-Phase 2 | Pending |
+| INP-01 | v2-Phase 2 | Complete |
+| INP-02 | v2-Phase 2 | Complete |
+| INP-03 | v2-Phase 2 | Complete |
+| TAG-01 | v2-Phase 2 | Complete |
+| TAG-02 | v2-Phase 2 | Complete |
+| TAG-03 | v2-Phase 2 | Complete |
+| TAG-04 | v2-Phase 2 | Complete |
+| TAG-05 | v2-Phase 2 | Complete |
+| TAG-06 | v2-Phase 2 | Complete |
 | TYPO-01 | v2-Phase 1 | Pending |
 | TYPO-02 | v2-Phase 1 | Pending |
 | TYPO-03 | v2-Phase 1 | Pending |
 | TYPO-04 | v2-Phase 1 | Pending |
-| ACT-01 | v2-Phase 2 | Pending |
-| ACT-02 | v2-Phase 2 | Pending |
-| ACT-03 | v2-Phase 2 | Pending |
+| ACT-01 | v2-Phase 2 | Complete |
+| ACT-02 | v2-Phase 2 | Complete |
+| ACT-03 | v2-Phase 2 | Complete |
 | DSK-01 | v2-Phase 4 | Pending |
 | DSK-02 | v2-Phase 4 | Pending |
 | DSK-03 | v2-Phase 4 | Pending |
@@ -232,4 +232,4 @@ Pencil MCP를 활용하여 decoded.pen 디자인을 React 컴포넌트로 변환
 
 ---
 *Requirements defined: 2026-01-29*
-*Last updated: 2026-01-29 after roadmap creation*
+*Last updated: 2026-01-29 after v2-Phase 2 completion*

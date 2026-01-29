@@ -22,7 +22,7 @@ v2.0 transforms the decoded-app UI by implementing the decoded.pen design system
 **Milestone Goal:** Implement decoded.pen design system across all pages while maintaining existing functionality
 
 - [x] **v2-Phase 1: Design System Foundation** - Typography, design tokens, base styles
-- [ ] **v2-Phase 2: Core Interactive Components** - Buttons, inputs, tags, action buttons
+- [x] **v2-Phase 2: Core Interactive Components** - Buttons, inputs, tags, action buttons
 - [ ] **v2-Phase 3: Card Components** - All card variants from simple to complex
 - [ ] **v2-Phase 4: Desktop Infrastructure** - Header, footer, navigation, layouts
 - [ ] **v2-Phase 5: Home & Explore Pages** - Landing and discovery experiences
@@ -62,9 +62,9 @@ Plans:
 **Plans:** 3 plans (1 wave)
 
 Plans:
-- [ ] v2-02-01-PLAN.md - Extend Button with icon sizes and loading state [Wave 1]
-- [ ] v2-02-02-PLAN.md - Create Input and SearchInput components [Wave 1]
-- [ ] v2-02-03-PLAN.md - Create Tag and TagGroup components [Wave 1]
+- [x] v2-02-01-PLAN.md - Extend Button with icon sizes and loading state [Wave 1]
+- [x] v2-02-02-PLAN.md - Create Input and SearchInput components [Wave 1]
+- [x] v2-02-03-PLAN.md - Create Tag and TagGroup components [Wave 1]
 
 ### v2-Phase 3: Card Components
 **Goal**: All content card types render with decoded.pen styling and maintain existing data bindings
@@ -198,7 +198,7 @@ v2-Phases execute sequentially: v2-Phase 1 → v2-Phase 2 → ... → v2-Phase 9
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | v2-1. Design System Foundation | 3/3 | **Complete** | 2026-01-29 |
-| v2-2. Core Interactive Components | 0/3 | Not started | - |
+| v2-2. Core Interactive Components | 3/3 | **Complete** | 2026-01-29 |
 | v2-3. Card Components | 0/3 | Not started | - |
 | v2-4. Desktop Infrastructure | 0/3 | Not started | - |
 | v2-5. Home & Explore Pages | 0/3 | Not started | - |
@@ -210,4 +210,4 @@ v2-Phases execute sequentially: v2-Phase 1 → v2-Phase 2 → ... → v2-Phase 9
 ---
 
 *Created: 2026-01-29*
-*Last updated: 2026-01-29 (Phase v2-1 complete)*
+*Last updated: 2026-01-29 (Phase v2-2 complete)*
