@@ -120,9 +120,9 @@ Plans:
   4. User can view all available badges
   5. User can see their earned badges on profile
 
-Plans:
-- [ ] C-01: Rankings display (global, personal, category)
-- [ ] C-02: Badge system integration
+**Plans:** 2 plans (1 wave)
+- [ ] C-01-PLAN.md - Rankings display (types, API, hooks, proxy routes) [Wave 1]
+- [ ] C-02-PLAN.md - Badge system integration (types, API, hooks, proxy routes) [Wave 1]
 
 ---
 
@@ -166,7 +166,7 @@ Plans:
 |-------|----------|--------|-------|--------|
 | A. Content CRUD | `../decoded-track-a` | `feature/track-a-content` | 0/3 | **Ready** |
 | B. Engagement | `../decoded-track-b` | `feature/track-b-engagement` | 0/2 | **Ready** |
-| C. Gamification | `../decoded-track-c` | `feature/track-c-gamification` | 0/2 | **Ready** |
+| C. Gamification | `../decoded-track-c` | `feature/track-c-gamification` | 2/2 | **Planned** |
 | D. Monetization | `../decoded-track-d` | `feature/track-d-monetization` | 0/3 | **Ready** |
 
 ## Worktree Setup (After Phase 6)
