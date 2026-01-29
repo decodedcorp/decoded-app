@@ -101,9 +101,9 @@ Plans:
   4. Post owner can adopt a solution
   5. User can view/write/edit/delete comments
 
-Plans:
-- [ ] B-01: Vote system (vote, retract, adopt)
-- [ ] B-02: Comment CRUD operations
+**Plans:** 2 plans (1 wave)
+- [ ] B-01-PLAN.md - Vote system (types, API, hooks, proxy routes) [Wave 1]
+- [ ] B-02-PLAN.md - Comment CRUD operations (types, API, hooks, proxy routes) [Wave 1]
 
 ---
 
@@ -165,7 +165,7 @@ Plans:
 | Track | Worktree | Branch | Plans | Status |
 |-------|----------|--------|-------|--------|
 | A. Content CRUD | `../decoded-track-a` | `feature/track-a-content` | 0/3 | **Ready** |
-| B. Engagement | `../decoded-track-b` | `feature/track-b-engagement` | 0/2 | **Ready** |
+| B. Engagement | `../decoded-track-b` | `feature/track-b-engagement` | 2/2 | **Planned** |
 | C. Gamification | `../decoded-track-c` | `feature/track-c-gamification` | 0/2 | **Ready** |
 | D. Monetization | `../decoded-track-d` | `feature/track-d-monetization` | 0/3 | **Ready** |
 
@@ -199,4 +199,4 @@ git merge feature/track-d-monetization
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-01-29 (Phase 6 planned)*
+*Last updated: 2026-01-29 (Track B planned)*
