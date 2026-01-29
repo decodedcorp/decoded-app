@@ -256,3 +256,128 @@ export interface ActivitiesListParams {
   page?: number;
   per_page?: number;
 }
+
+// ============================================================
+// Spot API Types
+// GET /api/v1/posts/{post_id}/spots
+// POST /api/v1/posts/{post_id}/spots
+// PATCH /api/v1/spots/{spot_id}
+// DELETE /api/v1/spots/{spot_id}
+// ============================================================
+
+export interface Spot {
+  id: string;
+  post_id: string;
+  position_left: string;  // e.g., "45.5%"
+  position_top: string;   // e.g., "30.2%"
+  category_id: string;
+  category?: Category;    // Populated on GET
+  solution_count: number;
+  created_at: string;
+}
+
+export interface SpotListResponse {
+  data: Spot[];
+}
+
+export interface CreateSpotDto {
+  position_left: string;
+  position_top: string;
+  category_id: string;
+}
+
+export interface UpdateSpotDto {
+  position_left?: string;
+  position_top?: string;
+  category_id?: string;
+}
+
+// ============================================================
+// Post Update/Delete API Types
+// PATCH /api/v1/posts/{post_id}, DELETE /api/v1/posts/{post_id}
+// ============================================================
+
+export interface UpdatePostDto {
+  artist_name?: string;
+  group_name?: string;
+  context?: ContextType;
+  media_source?: MediaSource;
+}
+
+export interface PostResponse extends Post {
+  // Full post response after update (same as Post type)
+}
+
+// ============================================================
+// Solution API Types
+// GET /api/v1/spots/{spot_id}/solutions
+// POST /api/v1/spots/{spot_id}/solutions
+// PATCH /api/v1/solutions/{solution_id}
+// DELETE /api/v1/solutions/{solution_id}
+// POST /api/v1/solutions/extract-metadata
+// POST /api/v1/solutions/convert-affiliate
+// ============================================================
+
+export interface Solution {
+  id: string;
+  spot_id: string;
+  user_id: string;
+  user?: PostUser;           // Populated on GET
+  product_url: string;
+  affiliate_url: string | null;
+  product_name: string | null;
+  brand: string | null;
+  price: number | null;
+  currency: string | null;
+  image_url: string | null;
+  vote_count: number;
+  is_adopted: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SolutionListResponse {
+  data: Solution[];
+}
+
+export interface CreateSolutionDto {
+  product_url: string;
+  product_name?: string;
+  brand?: string;
+  price?: number;
+  currency?: string;
+  image_url?: string;
+}
+
+export interface UpdateSolutionDto {
+  product_url?: string;
+  product_name?: string;
+  brand?: string;
+  price?: number;
+  currency?: string;
+  image_url?: string;
+}
+
+// Metadata extraction
+export interface ExtractMetadataRequest {
+  url: string;
+}
+
+export interface ExtractMetadataResponse {
+  product_name: string | null;
+  brand: string | null;
+  price: number | null;
+  currency: string | null;
+  image_url: string | null;
+  description: string | null;
+}
+
+// Affiliate link conversion
+export interface ConvertAffiliateRequest {
+  url: string;
+}
+
+export interface ConvertAffiliateResponse {
+  affiliate_url: string;
+  original_url: string;
+}
