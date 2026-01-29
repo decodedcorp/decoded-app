@@ -14,7 +14,7 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 
 **v1.1 Status:** SHIPPED (2026-01-29) - All 4 tracks merged to main
 **v2.0 Status:** Phase v2-06 IN PROGRESS (2/3 plans done)
-**Last activity:** 2026-01-29 - Completed v2-06-02-PLAN.md (Profile Desktop & Mobile Layouts)
+**Last activity:** 2026-01-29 - Completed v2-06-01-PLAN.md (Feed Page Layout & Styling)
 
 ### Execution Flow
 
@@ -145,6 +145,10 @@ See: .planning/ROADMAP-v2.md
 - **Card Component Integration (v2-05-03):** All Home and Explore page cards use design-system Card components for consistent styling
 - **Dedicated Cell Components (v2-05-03):** Extract grid cells into dedicated components (ExploreCardCell pattern) for reusability
 - **FLIP with Custom Wrappers (v2-05-03):** Wrap Card in Link when FLIP animation control needed, use Card's built-in link prop otherwise
+- **Feed Header Desktop-Only (v2-06-01):** Feed header hidden on mobile for space efficiency (hidden md:block pattern)
+- **Grid Layout Responsive (v2-06-01):** Responsive grid layout (1/2/3 columns) for feed cards following decoded.pen design
+- **Source Badge Gradient (v2-06-01):** Instagram/TikTok source badges with platform-specific gradients for brand recognition
+- **Relative Time Format (v2-06-01):** Relative time format (1m, 2h, 3d) matching social media conventions
 - **Profile Stats Integration (v2-06-02):** Stats integrated into ProfileHeaderCard on desktop, separate StatsCards on mobile for optimal UX
 - **Mobile Profile Header (v2-06-02):** Custom sticky header with back button, title, settings for profile-specific actions
 - **Badge Locked State Prep (v2-06-02):** Badge styling ready for locked state (secondary bg, lock icon) pending API data
@@ -163,7 +167,7 @@ See: .planning/ROADMAP-v2.md
 ## Session Continuity
 
 **Last session:** 2026-01-29
-**Stopped at:** Completed v2-06-02-PLAN.md (Profile Desktop & Mobile Layouts)
+**Stopped at:** Completed v2-06-01-PLAN.md (Feed Page Layout & Styling)
 **Resume file:** None
 
 **Next Steps:**
@@ -173,7 +177,7 @@ See: .planning/ROADMAP-v2.md
 git checkout feature/v2-design-overhaul  # 현재 브랜치
 /gsd:execute-phase v2-06-03  # Execute final plan (Feed & Profile Polish)
 # Or test current changes
-npm run dev  # Verify Feed and Profile pages with design-system integration
+npm run dev  # Verify Feed page with responsive grid layout and decoded.pen styling
 ```
 
 ### Quick Tasks Completed
@@ -184,4 +188,4 @@ npm run dev  # Verify Feed and Profile pages with design-system integration
 
 ---
 
-*Last updated: 2026-01-29 after v2-06-02 completion*
+*Last updated: 2026-01-29 after v2-06-01 completion*
