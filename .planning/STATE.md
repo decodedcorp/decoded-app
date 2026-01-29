@@ -11,14 +11,20 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Milestone:** v1.1 Full API Integration
 **Structure:** Phase 6 Complete → Tracks A-D (Parallel)
+
 **Status:** Tracks A+B complete, C+D pending
 **Last activity:** 2026-01-29 - Track A+B merged to dev
+
+**Status:** Track C complete - ready to merge to main
+**Last activity:** 2026-01-29 - Completed Track C: Gamification (C-01, C-02)
+
 
 ### Execution Flow
 
 ```
 1. Phase 6 (Main Branch) ─── COMPLETE ✓
    │
+
    └─ Parallel Tracks:
       ├── Track A: Content CRUD      - Not started
       ├── Track B: Engagement        - COMPLETE ✓
@@ -27,6 +33,16 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ```
 
 **Track B Progress:** ██████████ (100% - 2 of 2 plans complete)
+
+   └─ 4 worktrees:
+      ├── Track A: Content CRUD     (Ready)
+      ├── Track B: Engagement       (Ready)
+      ├── Track C: Gamification     ─── COMPLETE ✓
+      └── Track D: Monetization     (Ready)
+```
+
+**Track C Progress:** ██████████ (100% - 2 of 2 plans complete)
+
 
 ## Milestones
 
@@ -47,9 +63,15 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 
 | Track | Worktree | Plans | Status |
 |-------|----------|-------|--------|
+
 | A: Content CRUD | `../decoded-track-a` | 3/3 | **Complete** |
 | B: Engagement | `../decoded-track-b` | 2/2 | **Complete** |
 | C: Gamification | `../decoded-track-c` | 0/2 | Ready |
+
+| A: Content CRUD | `../decoded-track-a` | 0/3 | Ready |
+| B: Engagement | `../decoded-track-b` | 0/2 | Ready |
+| C: Gamification | `../decoded-track-c` | 2/2 | **Complete** ✓ |
+
 | D: Monetization | `../decoded-track-d` | 0/3 | Ready |
 
 ## Accumulated Context
@@ -82,6 +104,12 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 - **Solution Metadata (A-03):** Metadata extraction is optional; users can provide manually or use auto-extraction
 - **Solution Visibility (A-03):** Solutions are public by default (no auth for GET endpoints)
 
+### Decisions Made (Track C)
+- **Rankings Infinite Query (C-01):** Use infinite query for rankings lists (better UX for long leaderboards)
+- **Rankings Public + Optional Auth (C-01):** Rankings are public, but include my_ranking if authenticated
+- **Badge API Public Access (C-02):** Badge list and details are public, only /badges/me requires auth
+- **Badge Data Transformation (C-02):** transformToUnifiedBadges helper merges earned/available badges for UI
+
 ### Pending Verification
 - **06-03 Profile Edit:** Code complete, verification blocked by backend DB error
 - Action: Re-test when backend is restored
@@ -99,40 +127,30 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Session Continuity
 
 **Last session:** 2026-01-29
+
 **Stopped at:** Tracks A+B complete, merging to dev
 **Resume file:** None
 
-## Worktree Commands
+**Stopped at:** Track C complete
+**Resume file:** None - ready to merge
 
-Phase 6 complete. Ready to create worktrees:
+
+## Next Steps
+
+Track C is complete. To merge:
 
 ```bash
-# Create worktrees
-git worktree add ../decoded-track-a -b feature/track-a-content
-git worktree add ../decoded-track-b -b feature/track-b-engagement
-git worktree add ../decoded-track-c -b feature/track-c-gamification
-git worktree add ../decoded-track-d -b feature/track-d-monetization
-
-# Run Claude in each (separate terminals)
-cd ../decoded-track-a && claude  # /gsd:plan-phase A
-cd ../decoded-track-b && claude  # /gsd:plan-phase B
-cd ../decoded-track-c && claude  # /gsd:plan-phase C
-cd ../decoded-track-d && claude  # /gsd:plan-phase D
-
-# After all complete, merge
+# From main branch
 git checkout main
-git merge feature/track-a-content
-git merge feature/track-b-engagement
 git merge feature/track-c-gamification
-git merge feature/track-d-monetization
 
-# Cleanup
-git worktree remove ../decoded-track-a
-git worktree remove ../decoded-track-b
-git worktree remove ../decoded-track-c
-git worktree remove ../decoded-track-d
+# Or wait for all tracks to complete, then merge all
 ```
 
 ---
 
+
 *Last updated: 2026-01-29 after Track A+B completion*
+
+*Last updated: 2026-01-29 after Track C completion*
+

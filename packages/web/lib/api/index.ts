@@ -54,3 +54,17 @@ export {
   adoptSolution,
   unadoptSolution,
 } from "./votes";
+
+// Badge APIs
+export {
+  fetchBadges,
+  fetchMyBadges,
+  fetchBadgeById,
+} from "./badges";
+
+// Ranking APIs
+export {
+  fetchRankings,
+  fetchMyRanking,
+  fetchCategoryRankings,
+} from "./rankings";

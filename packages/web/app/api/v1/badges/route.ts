@@ -1,0 +1,42 @@
+/**
+ * Badges Proxy API Route
+ * GET /api/v1/badges - Fetch all available badges
+ *
+ * Proxies requests to the backend API to avoid CORS issues.
+ */
+
+import { NextRequest, NextResponse } from "next/server";
+
+const API_BASE_URL = process.env.API_BASE_URL;
+
+/**
+ * GET /api/v1/badges
+ * Fetch all available badges (no auth required)
+ */
+export async function GET(request: NextRequest) {
+  if (!API_BASE_URL) {
+    console.error("API_BASE_URL environment variable is not configured");
+    return NextResponse.json(
+      { message: "Server configuration error" },
+      { status: 500 }
+    );
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/badges`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+    return NextResponse.json(data, { status: response.status });
+  } catch (error) {
+    console.error("Badges GET proxy error:", error);
+    return NextResponse.json(
+      { message: "Failed to fetch badges" },
+      { status: 500 }
+    );
+  }
+}

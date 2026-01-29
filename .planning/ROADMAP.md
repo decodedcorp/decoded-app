@@ -37,9 +37,15 @@ See archived roadmap for v1.0 phase details.
 - [x] **Phase 6: API Foundation & Profile** - API client patterns + Profile APIs (Complete, 06-03 verification pending)
 
 #### Parallel Tracks (Git Worktrees) - After Phase 6
+
 - [x] **Track A: Content CRUD** - Posts, Spots, Solutions (worktree: `decoded-track-a`) ✓
 - [x] **Track B: Engagement** - Votes, Comments (worktree: `decoded-track-b`) ✓
 - [ ] **Track C: Gamification** - Rankings, Badges (worktree: `decoded-track-c`)
+
+- [ ] **Track A: Content CRUD** - Posts, Spots, Solutions (worktree: `decoded-track-a`)
+- [ ] **Track B: Engagement** - Votes, Comments (worktree: `decoded-track-b`)
+- [x] **Track C: Gamification** - Rankings, Badges (worktree: `decoded-track-c`) ✓ Complete
+
 - [ ] **Track D: Monetization & Search** - Earnings, Search (worktree: `decoded-track-d`)
 
 ## Phase Details
@@ -120,9 +126,9 @@ See archived roadmap for v1.0 phase details.
   4. User can view all available badges
   5. User can see their earned badges on profile
 
-Plans:
-- [ ] C-01: Rankings display (global, personal, category)
-- [ ] C-02: Badge system integration
+**Plans:** 2 plans (1 wave) ✓ Complete
+- [x] C-01-PLAN.md - Rankings display (types, API, hooks, proxy routes) [Wave 1]
+- [x] C-02-PLAN.md - Badge system integration (types, API, hooks, proxy routes) [Wave 1]
 
 ---
 
@@ -164,9 +170,15 @@ Plans:
 
 | Track | Worktree | Branch | Plans | Status |
 |-------|----------|--------|-------|--------|
+
 | A. Content CRUD | `../decoded-track-a` | `feature/track-a-content` | 3/3 | **Complete** ✓ |
 | B. Engagement | `../decoded-track-b` | `feature/track-b-engagement` | 2/2 | **Complete** ✓ |
 | C. Gamification | `../decoded-track-c` | `feature/track-c-gamification` | 0/2 | **Ready** |
+
+| A. Content CRUD | `../decoded-track-a` | `feature/track-a-content` | 0/3 | **Ready** |
+| B. Engagement | `../decoded-track-b` | `feature/track-b-engagement` | 0/2 | **Ready** |
+| C. Gamification | `../decoded-track-c` | `feature/track-c-gamification` | 2/2 | **Complete** ✓ |
+
 | D. Monetization | `../decoded-track-d` | `feature/track-d-monetization` | 0/3 | **Ready** |
 
 ## Worktree Setup (After Phase 6)
@@ -199,4 +211,8 @@ git merge feature/track-d-monetization
 ---
 
 *Roadmap created: 2026-01-29*
+
 *Last updated: 2026-01-29 (Tracks A+B complete)*
+
+*Last updated: 2026-01-29 (Track C complete)*
+
