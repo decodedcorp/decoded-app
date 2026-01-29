@@ -35,3 +35,6 @@ export { fetchClickStats, recordClick } from "./clicks";
 
 // Earnings API
 export { fetchEarnings } from "./earnings";
+
+// Search API
+export { fetchPopularSearchTerms, fetchRecentSearchTerms, deleteRecentSearch } from "./search";
