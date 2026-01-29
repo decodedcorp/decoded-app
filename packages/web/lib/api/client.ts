@@ -6,7 +6,9 @@
 import { supabaseBrowserClient } from "@/lib/supabase/client";
 import { ApiError } from "./types";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+// Use empty string to route through Next.js API proxy (avoids CORS issues)
+// The proxy routes forward requests to the actual backend via server-side API_BASE_URL
+const API_BASE_URL = "";
 
 /**
  * Get JWT token from Supabase Auth session
