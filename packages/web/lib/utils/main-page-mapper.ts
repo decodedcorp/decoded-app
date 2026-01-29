@@ -1,12 +1,16 @@
 /**
  * Data mappers for transforming DB types to main page UI types
+ *
+ * Updated to use new schema with 'posts' table
  */
 
 import type {
-  ImageWithPost,
-  ItemWithImage,
-  WhatsNewStyleData,
+  PostData,
+  StyleCardServerData,
   TrendingKeyword,
+  ImageWithPost,
+  WhatsNewStyleData,
+  StyleItemData,
 } from "../supabase/queries/main-page.server";
 import type { ItemCardData } from "../components/main/ItemCard";
 import type { HeroData } from "../components/main/HeroSection";
@@ -26,8 +30,82 @@ export interface WeeklyBestStyle {
 }
 
 /**
- * Transforms an ImageWithPost to WeeklyBestStyle for UI display
+ * Transforms PostData to WeeklyBestStyle for UI display
  */
+export function postToWeeklyBestStyle(post: PostData): WeeklyBestStyle {
+  return {
+    id: post.id,
+    artistName: post.artistName || post.groupName || "Unknown",
+    imageUrl: post.imageUrl ?? undefined,
+    link: `/feed/${post.id}`,
+  };
+}
+
+/**
+ * Transforms PostData to ItemCardData for UI display
+ * Note: In new schema, posts don't have item details, so we adapt
+ */
+export function postToItemCardData(post: PostData): ItemCardData {
+  return {
+    id: post.id,
+    brand: post.context || "Style",
+    name: post.mediaTitle || `${post.artistName || "Unknown"}'s Style`,
+    imageUrl: post.imageUrl ?? undefined,
+    link: `/feed/${post.id}`,
+    relatedStyles: undefined,
+    badge: undefined,
+  };
+}
+
+/**
+ * Transforms PostData to HeroData for UI display
+ */
+export function postToHeroData(post: PostData): HeroData {
+  return {
+    artistName: post.artistName || post.groupName || "Featured",
+    title: post.mediaTitle || "오늘의 스타일을 확인해보세요",
+    subtitle: post.context || "",
+    imageUrl: post.imageUrl ?? undefined,
+    link: `/feed/${post.id}`,
+  };
+}
+
+/**
+ * Transforms StyleCardServerData to StyleCardData for UI display
+ */
+export function styleCardServerToStyleCardData(
+  data: StyleCardServerData
+): StyleCardData {
+  const artistName = data.post.artistName || data.post.groupName || "Unknown";
+
+  // Generate description
+  const description = data.post.mediaTitle
+    ? `${artistName} - ${data.post.mediaTitle}`
+    : `${artistName}의 새로운 스타일을 확인해보세요.`;
+
+  return {
+    id: data.post.id,
+    title: `${artistName}의 스타일`,
+    description,
+    artistName,
+    imageUrl: data.post.imageUrl ?? undefined,
+    link: `/feed/${data.post.id}`,
+    items: data.items.map((item) => ({
+      id: String(item.id),
+      label: item.label,
+      brand: item.brand,
+      name: item.name,
+      imageUrl: item.imageUrl,
+    })),
+  };
+}
+
+// =============================================================================
+// Legacy function aliases for backward compatibility
+// These map old function names to new implementations
+// =============================================================================
+
+/** @deprecated Use postToWeeklyBestStyle instead */
 export function imageWithPostToWeeklyBestStyle(
   data: ImageWithPost
 ): WeeklyBestStyle {
@@ -39,25 +117,7 @@ export function imageWithPostToWeeklyBestStyle(
   };
 }
 
-/**
- * Transforms an ItemWithImage to ItemCardData for UI display
- */
-export function itemWithImageToItemCardData(data: ItemWithImage): ItemCardData {
-  return {
-    id: String(data.item.id),
-    brand: data.item.brand ?? "Unknown Brand",
-    name: data.item.product_name ?? "Unknown Item",
-    imageUrl: data.imageUrl ?? undefined,
-    link: `/items/${data.item.id}`,
-    // Note: relatedStyles would need additional query to count
-    relatedStyles: undefined,
-    badge: undefined, // Could be computed based on ranking/metrics
-  };
-}
-
-/**
- * Transforms an ImageWithPost to HeroData for UI display
- */
+/** @deprecated Use postToHeroData instead */
 export function imageWithPostToHeroData(data: ImageWithPost): HeroData {
   return {
     artistName: data.account ?? "Featured",
@@ -68,16 +128,13 @@ export function imageWithPostToHeroData(data: ImageWithPost): HeroData {
   };
 }
 
-/**
- * Transforms WhatsNewStyleData to StyleCardData for UI display
- */
+/** @deprecated Use styleCardServerToStyleCardData instead */
 export function whatsNewStyleToStyleCardData(
   data: WhatsNewStyleData
 ): StyleCardData {
   const artistName = data.account ?? "Unknown";
-  const itemNames = data.items.map((item) => item.name).slice(0, 2);
+  const itemNames = data.items.map((item: StyleItemData) => item.name).slice(0, 2);
 
-  // Generate description based on items
   const description =
     data.items.length > 0
       ? `${artistName}의 스타일에서 ${itemNames.join(", ")}을 확인해보세요.`
@@ -90,7 +147,7 @@ export function whatsNewStyleToStyleCardData(
     artistName,
     imageUrl: data.image.image_url ?? undefined,
     link: `/feed/${data.image.id}`,
-    items: data.items.map((item) => ({
+    items: data.items.map((item: StyleItemData) => ({
       id: String(item.id),
       label: item.label,
       brand: item.brand,
@@ -100,12 +157,28 @@ export function whatsNewStyleToStyleCardData(
   };
 }
 
-/**
- * Transforms ItemWithImage to ItemCardData for What's New section
- * Optionally marks the item as new
- */
+/** @deprecated Items not available in new schema */
+export function itemWithImageToItemCardData(data: {
+  item: { id: number; brand: string | null; product_name: string | null };
+  imageUrl: string | null;
+}): ItemCardData {
+  return {
+    id: String(data.item.id),
+    brand: data.item.brand ?? "Unknown Brand",
+    name: data.item.product_name ?? "Unknown Item",
+    imageUrl: data.imageUrl ?? undefined,
+    link: `/items/${data.item.id}`,
+    relatedStyles: undefined,
+    badge: undefined,
+  };
+}
+
+/** @deprecated Items not available in new schema */
 export function whatsNewItemToItemCardData(
-  data: ItemWithImage,
+  data: {
+    item: { id: number; brand: string | null; product_name: string | null };
+    imageUrl: string | null;
+  },
   isNew = true
 ): ItemCardData {
   return {

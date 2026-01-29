@@ -178,6 +178,100 @@ export type Database = {
           },
         ];
       };
+      // New schema tables (actual database)
+      posts: {
+        Row: {
+          id: string;
+          user_id: string;
+          image_url: string | null;
+          media_type: string | null;
+          media_title: string | null;
+          media_metadata: Json;
+          group_name: string | null;
+          artist_name: string | null;
+          context: string | null;
+          view_count: number;
+          status: string;
+          created_at: string;
+          updated_at: string;
+          trending_score: number | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          image_url?: string | null;
+          media_type?: string | null;
+          media_title?: string | null;
+          media_metadata?: Json;
+          group_name?: string | null;
+          artist_name?: string | null;
+          context?: string | null;
+          view_count?: number;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+          trending_score?: number | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          image_url?: string | null;
+          media_type?: string | null;
+          media_title?: string | null;
+          media_metadata?: Json;
+          group_name?: string | null;
+          artist_name?: string | null;
+          context?: string | null;
+          view_count?: number;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+          trending_score?: number | null;
+        };
+        Relationships: [];
+      };
+      users: {
+        Row: {
+          id: string;
+          email: string;
+          username: string | null;
+          display_name: string | null;
+          avatar_url: string | null;
+          bio: string | null;
+          rank: string | null;
+          total_points: number;
+          is_admin: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          email: string;
+          username?: string | null;
+          display_name?: string | null;
+          avatar_url?: string | null;
+          bio?: string | null;
+          rank?: string | null;
+          total_points?: number;
+          is_admin?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          email?: string;
+          username?: string | null;
+          display_name?: string | null;
+          avatar_url?: string | null;
+          bio?: string | null;
+          rank?: string | null;
+          total_points?: number;
+          is_admin?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -324,6 +418,8 @@ export const Constants = {
 
 // Type aliases for convenience
 export type ImageRow = Database["public"]["Tables"]["image"]["Row"];
+export type PostRow = Database["public"]["Tables"]["posts"]["Row"];
+export type UserRow = Database["public"]["Tables"]["users"]["Row"];
 
 // Re-export from shared for convenience
 export type { ItemRow } from "@decoded/shared";

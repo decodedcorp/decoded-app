@@ -3,21 +3,30 @@
  *
  * This module contains server-only query functions for fetching data
  * displayed on the main page. Uses createSupabaseServerClient.
+ *
+ * Updated to use the new schema with 'posts' table.
  */
 
 import { createSupabaseServerClient } from "../server";
-import type { ImageRow, ItemRow } from "../types";
+import type { PostRow } from "../types";
 
 /**
- * Image with associated post account information
+ * Post data for main page sections
  */
-export interface ImageWithPost {
-  image: ImageRow;
-  account: string | null;
+export interface PostData {
+  id: string;
+  imageUrl: string | null;
+  artistName: string | null;
+  groupName: string | null;
+  mediaTitle: string | null;
+  mediaType: string | null;
+  context: string | null;
+  viewCount: number;
+  createdAt: string;
 }
 
 /**
- * Item data for style card display
+ * Item data for style card display (placeholder for compatibility)
  */
 export interface StyleItemData {
   id: number;
@@ -28,473 +37,12 @@ export interface StyleItemData {
 }
 
 /**
- * Style data for What's New section
- * Includes image, post account info, and associated items
+ * Style data for style card display
  */
-export interface WhatsNewStyleData {
-  image: ImageRow;
-  account: string | null;
+export interface StyleCardServerData {
+  post: PostData;
+  // Items are not available in new schema, will be empty
   items: StyleItemData[];
-}
-
-/**
- * Item with its associated image
- */
-export interface ItemWithImage {
-  item: ItemRow;
-  imageUrl: string | null;
-}
-
-/**
- * Fetches images for Weekly Best section (server-side)
- * Gets recent images with their associated post account names
- *
- * @param limit - Maximum number of images to fetch (default: 8)
- * @returns Array of images with account information
- */
-export async function fetchWeeklyBestImagesServer(
-  limit = 8
-): Promise<ImageWithPost[]> {
-  const supabase = await createSupabaseServerClient();
-
-  // Fetch images joined with post_image and post to get account names
-  const { data, error } = await supabase
-    .from("post_image")
-    .select(
-      `
-      image:image_id(id, image_url, created_at, image_hash, status, with_items),
-      post:post_id(account)
-    `
-    )
-    .not("image.image_url", "is", null)
-    .order("created_at", { ascending: false })
-    .limit(limit);
-
-  if (error) {
-    console.error("Error fetching weekly best images:", error);
-    return [];
-  }
-
-  // Transform and filter the data
-  return (data ?? [])
-    .filter((item) => item.image && item.image.image_url)
-    .map((item) => ({
-      image: item.image as ImageRow,
-      account: (item.post as { account: string } | null)?.account ?? null,
-    }));
-}
-
-/**
- * Fetches items for Best Item section (server-side)
- * Gets recent items with their cropped images
- *
- * @param limit - Maximum number of items to fetch (default: 6)
- * @returns Array of items with image URLs
- */
-export async function fetchBestItemsServer(
-  limit = 6
-): Promise<ItemWithImage[]> {
-  const supabase = await createSupabaseServerClient();
-
-  const { data, error } = await supabase
-    .from("item")
-    .select("*")
-    .not("cropped_image_path", "is", null)
-    .not("product_name", "is", null)
-    .order("created_at", { ascending: false })
-    .limit(limit);
-
-  if (error) {
-    console.error("Error fetching best items:", error);
-    return [];
-  }
-
-  return (data ?? []).map((item) => ({
-    item,
-    imageUrl: item.cropped_image_path,
-  }));
-}
-
-/**
- * Fetches a single featured image for Hero section (server-side)
- * Gets the most recent image with post account information
- *
- * @returns Featured image with account info or null
- */
-export async function fetchFeaturedImageServer(): Promise<ImageWithPost | null> {
-  const supabase = await createSupabaseServerClient();
-
-  const { data, error } = await supabase
-    .from("post_image")
-    .select(
-      `
-      image:image_id(id, image_url, created_at, image_hash, status, with_items),
-      post:post_id(account, article)
-    `
-    )
-    .not("image.image_url", "is", null)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .single();
-
-  if (error) {
-    if (error.code === "PGRST116") {
-      // No rows returned
-      return null;
-    }
-    console.error("Error fetching featured image:", error);
-    return null;
-  }
-
-  if (!data?.image || !(data.image as ImageRow).image_url) {
-    return null;
-  }
-
-  return {
-    image: data.image as ImageRow,
-    account: (data.post as { account: string } | null)?.account ?? null,
-  };
-}
-
-/**
- * Fetches styles for What's New section (server-side)
- * Gets recent images with their associated post account names and items
- *
- * @param limit - Maximum number of styles to fetch (default: 2)
- * @returns Array of styles with account info and items
- */
-export async function fetchWhatsNewStylesServer(
-  limit = 2
-): Promise<WhatsNewStyleData[]> {
-  const supabase = await createSupabaseServerClient();
-
-  // Fetch images joined with post_image and post to get account names
-  const { data: postImages, error: postImagesError } = await supabase
-    .from("post_image")
-    .select(
-      `
-      image:image_id(id, image_url, created_at, image_hash, status, with_items),
-      post:post_id(account)
-    `
-    )
-    .not("image.image_url", "is", null)
-    .order("created_at", { ascending: false })
-    .limit(limit);
-
-  if (postImagesError) {
-    console.error("Error fetching what's new styles:", postImagesError);
-    return [];
-  }
-
-  // Transform and filter the data, then fetch items for each image
-  const stylesWithItems: WhatsNewStyleData[] = [];
-
-  for (const item of postImages ?? []) {
-    if (!item.image || !(item.image as ImageRow).image_url) {
-      continue;
-    }
-
-    const image = item.image as ImageRow;
-
-    // Fetch items for this image
-    const { data: items, error: itemsError } = await supabase
-      .from("item")
-      .select("id, brand, product_name, cropped_image_path")
-      .eq("image_id", image.id)
-      .not("product_name", "is", null)
-      .limit(3);
-
-    if (itemsError) {
-      console.error(`Error fetching items for image ${image.id}:`, itemsError);
-    }
-
-    const styleItems: StyleItemData[] = (items ?? []).map((dbItem, index) => ({
-      id: dbItem.id,
-      label: String.fromCharCode(65 + index), // A, B, C...
-      brand: dbItem.brand ?? "Unknown Brand",
-      name: dbItem.product_name ?? "Unknown Item",
-      imageUrl: dbItem.cropped_image_path ?? undefined,
-    }));
-
-    stylesWithItems.push({
-      image,
-      account: (item.post as { account: string } | null)?.account ?? null,
-      items: styleItems,
-    });
-  }
-
-  return stylesWithItems;
-}
-
-/**
- * Fetches items for What's New section (server-side)
- * Gets recent items with their cropped images
- *
- * @param limit - Maximum number of items to fetch (default: 4)
- * @returns Array of items with image URLs
- */
-export async function fetchWhatsNewItemsServer(
-  limit = 4
-): Promise<ItemWithImage[]> {
-  const supabase = await createSupabaseServerClient();
-
-  const { data, error } = await supabase
-    .from("item")
-    .select("*")
-    .not("cropped_image_path", "is", null)
-    .not("product_name", "is", null)
-    .order("created_at", { ascending: false })
-    .limit(limit);
-
-  if (error) {
-    console.error("Error fetching what's new items:", error);
-    return [];
-  }
-
-  return (data ?? []).map((item) => ({
-    item,
-    imageUrl: item.cropped_image_path,
-  }));
-}
-
-/**
- * Fetches data for Decoded Pick section (server-side)
- * Gets a style and items that are different from What's New section
- *
- * @param styleOffset - Number of styles to skip (default: 2 to skip What's New styles)
- * @param itemOffset - Number of items to skip (default: 4 to skip What's New items)
- * @returns Object with style and items data
- */
-export async function fetchDecodedPickServer(
-  styleOffset = 2,
-  itemOffset = 4
-): Promise<{
-  style: WhatsNewStyleData | null;
-  items: ItemWithImage[];
-}> {
-  const supabase = await createSupabaseServerClient();
-
-  // Fetch a single style (skipping the ones used in What's New)
-  const { data: postImages, error: postImagesError } = await supabase
-    .from("post_image")
-    .select(
-      `
-      image:image_id(id, image_url, created_at, image_hash, status, with_items),
-      post:post_id(account)
-    `
-    )
-    .not("image.image_url", "is", null)
-    .order("created_at", { ascending: false })
-    .range(styleOffset, styleOffset);
-
-  if (postImagesError) {
-    console.error("Error fetching decoded pick style:", postImagesError);
-    return { style: null, items: [] };
-  }
-
-  let style: WhatsNewStyleData | null = null;
-
-  if (postImages && postImages.length > 0) {
-    const item = postImages[0];
-    if (item.image && (item.image as ImageRow).image_url) {
-      const image = item.image as ImageRow;
-
-      // Fetch items for this image
-      const { data: items, error: itemsError } = await supabase
-        .from("item")
-        .select("id, brand, product_name, cropped_image_path")
-        .eq("image_id", image.id)
-        .not("product_name", "is", null)
-        .limit(3);
-
-      if (itemsError) {
-        console.error(
-          `Error fetching items for image ${image.id}:`,
-          itemsError
-        );
-      }
-
-      const styleItems: StyleItemData[] = (items ?? []).map(
-        (dbItem, index) => ({
-          id: dbItem.id,
-          label: String.fromCharCode(65 + index),
-          brand: dbItem.brand ?? "Unknown Brand",
-          name: dbItem.product_name ?? "Unknown Item",
-          imageUrl: dbItem.cropped_image_path ?? undefined,
-        })
-      );
-
-      style = {
-        image,
-        account: (item.post as { account: string } | null)?.account ?? null,
-        items: styleItems,
-      };
-    }
-  }
-
-  // Fetch 2 items (skipping the ones used in What's New)
-  const { data: itemsData, error: itemsError } = await supabase
-    .from("item")
-    .select("*")
-    .not("cropped_image_path", "is", null)
-    .not("product_name", "is", null)
-    .order("created_at", { ascending: false })
-    .range(itemOffset, itemOffset + 1);
-
-  if (itemsError) {
-    console.error("Error fetching decoded pick items:", itemsError);
-    return { style, items: [] };
-  }
-
-  const items: ItemWithImage[] = (itemsData ?? []).map((item) => ({
-    item,
-    imageUrl: item.cropped_image_path,
-  }));
-
-  return { style, items };
-}
-
-/**
- * Fetches styles for Artist Spotlight section (server-side)
- * Gets recent images with their associated post account names
- *
- * @param limit - Maximum number of styles to fetch (default: 2)
- * @param offset - Number of styles to skip (default: 3 to skip What's New and Decoded Pick)
- * @returns Array of styles with account info
- */
-export async function fetchArtistSpotlightServer(
-  limit = 2,
-  offset = 3
-): Promise<WhatsNewStyleData[]> {
-  const supabase = await createSupabaseServerClient();
-
-  // Fetch images joined with post_image and post to get account names
-  const { data: postImages, error: postImagesError } = await supabase
-    .from("post_image")
-    .select(
-      `
-      image:image_id(id, image_url, created_at, image_hash, status, with_items),
-      post:post_id(account)
-    `
-    )
-    .not("image.image_url", "is", null)
-    .order("created_at", { ascending: false })
-    .range(offset, offset + limit - 1);
-
-  if (postImagesError) {
-    console.error("Error fetching artist spotlight styles:", postImagesError);
-    return [];
-  }
-
-  // Transform and filter the data
-  const styles: WhatsNewStyleData[] = [];
-
-  for (const item of postImages ?? []) {
-    if (!item.image || !(item.image as ImageRow).image_url) {
-      continue;
-    }
-
-    const image = item.image as ImageRow;
-
-    // Fetch items for this image
-    const { data: items, error: itemsError } = await supabase
-      .from("item")
-      .select("id, brand, product_name, cropped_image_path")
-      .eq("image_id", image.id)
-      .not("product_name", "is", null)
-      .limit(3);
-
-    if (itemsError) {
-      console.error(`Error fetching items for image ${image.id}:`, itemsError);
-    }
-
-    const styleItems: StyleItemData[] = (items ?? []).map((dbItem, index) => ({
-      id: dbItem.id,
-      label: String.fromCharCode(65 + index),
-      brand: dbItem.brand ?? "Unknown Brand",
-      name: dbItem.product_name ?? "Unknown Item",
-      imageUrl: dbItem.cropped_image_path ?? undefined,
-    }));
-
-    styles.push({
-      image,
-      account: (item.post as { account: string } | null)?.account ?? null,
-      items: styleItems,
-    });
-  }
-
-  return styles;
-}
-
-/**
- * Fetches items by account for Discover Items section (server-side)
- * Gets items from posts matching the given account name
- *
- * @param account - The account name to filter by
- * @param limit - Maximum number of items to fetch (default: 6)
- * @returns Array of items with image URLs
- */
-export async function fetchItemsByAccountServer(
-  account: string,
-  limit = 6
-): Promise<ItemWithImage[]> {
-  const supabase = await createSupabaseServerClient();
-
-  // First, get image IDs from posts matching the account
-  const { data: postImages, error: postImagesError } = await supabase
-    .from("post_image")
-    .select(
-      `
-      image_id,
-      post:post_id(account)
-    `
-    )
-    .ilike("post.account", `%${account}%`)
-    .limit(50);
-
-  if (postImagesError) {
-    console.error(
-      `Error fetching post images for account ${account}:`,
-      postImagesError
-    );
-    return [];
-  }
-
-  // Get unique image IDs where account matches
-  const imageIds = (postImages ?? [])
-    .filter(
-      (pi) =>
-        pi.post &&
-        (pi.post as { account: string }).account
-          ?.toLowerCase()
-          .includes(account.toLowerCase())
-    )
-    .map((pi) => pi.image_id)
-    .filter((id) => id !== null) as string[];
-
-  if (imageIds.length === 0) {
-    return [];
-  }
-
-  // Fetch items for these images
-  const { data: items, error: itemsError } = await supabase
-    .from("item")
-    .select("*")
-    .in("image_id", imageIds)
-    .not("cropped_image_path", "is", null)
-    .not("product_name", "is", null)
-    .order("created_at", { ascending: false })
-    .limit(limit);
-
-  if (itemsError) {
-    console.error(`Error fetching items for account ${account}:`, itemsError);
-    return [];
-  }
-
-  return (items ?? []).map((item) => ({
-    item,
-    imageUrl: item.cropped_image_path,
-  }));
 }
 
 /**
@@ -507,7 +55,230 @@ export interface TrendingKeyword {
 }
 
 /**
- * Fetches trending keywords derived from popular accounts and brands (server-side)
+ * Transforms a raw post row to PostData
+ */
+function toPostData(row: PostRow): PostData {
+  return {
+    id: row.id,
+    imageUrl: row.image_url,
+    artistName: row.artist_name,
+    groupName: row.group_name,
+    mediaTitle: row.media_title,
+    mediaType: row.media_type,
+    context: row.context,
+    viewCount: row.view_count,
+    createdAt: row.created_at,
+  };
+}
+
+/**
+ * Fetches posts for Weekly Best section (server-side)
+ * Gets recent posts ordered by view_count
+ *
+ * @param limit - Maximum number of posts to fetch (default: 8)
+ * @returns Array of post data
+ */
+export async function fetchWeeklyBestPostsServer(
+  limit = 8
+): Promise<PostData[]> {
+  const supabase = await createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("posts")
+    .select("*")
+    .eq("status", "active")
+    .not("image_url", "is", null)
+    .order("view_count", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error(
+      "Error fetching weekly best posts:",
+      JSON.stringify(error, null, 2)
+    );
+    return [];
+  }
+
+  return (data ?? []).map(toPostData);
+}
+
+/**
+ * Fetches a single featured post for Hero section (server-side)
+ * Gets the most viewed active post
+ *
+ * @returns Featured post or null
+ */
+export async function fetchFeaturedPostServer(): Promise<PostData | null> {
+  const supabase = await createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("posts")
+    .select("*")
+    .eq("status", "active")
+    .not("image_url", "is", null)
+    .order("view_count", { ascending: false })
+    .limit(1)
+    .single();
+
+  if (error) {
+    if (error.code === "PGRST116") {
+      // No rows returned
+      return null;
+    }
+    console.error(
+      "Error fetching featured post:",
+      JSON.stringify(error, null, 2)
+    );
+    return null;
+  }
+
+  return data ? toPostData(data) : null;
+}
+
+/**
+ * Fetches posts for What's New section (server-side)
+ * Gets recently created posts
+ *
+ * @param limit - Maximum number of posts to fetch (default: 2)
+ * @returns Array of style card data
+ */
+export async function fetchWhatsNewPostsServer(
+  limit = 2
+): Promise<StyleCardServerData[]> {
+  const supabase = await createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("posts")
+    .select("*")
+    .eq("status", "active")
+    .not("image_url", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error(
+      "Error fetching what's new posts:",
+      JSON.stringify(error, null, 2)
+    );
+    return [];
+  }
+
+  return (data ?? []).map((row) => ({
+    post: toPostData(row),
+    items: [], // Items not available in new schema
+  }));
+}
+
+/**
+ * Fetches data for Decoded Pick section (server-side)
+ * Gets a style that is different from What's New section
+ *
+ * @param offset - Number of posts to skip (default: 2 to skip What's New)
+ * @returns Style card data or null
+ */
+export async function fetchDecodedPickServer(
+  offset = 2
+): Promise<StyleCardServerData | null> {
+  const supabase = await createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("posts")
+    .select("*")
+    .eq("status", "active")
+    .not("image_url", "is", null)
+    .order("created_at", { ascending: false })
+    .range(offset, offset);
+
+  if (error) {
+    console.error(
+      "Error fetching decoded pick:",
+      JSON.stringify(error, null, 2)
+    );
+    return null;
+  }
+
+  if (!data || data.length === 0) {
+    return null;
+  }
+
+  return {
+    post: toPostData(data[0]),
+    items: [],
+  };
+}
+
+/**
+ * Fetches posts for Artist Spotlight section (server-side)
+ * Gets posts from different artists
+ *
+ * @param limit - Maximum number of posts to fetch (default: 2)
+ * @param offset - Number of posts to skip (default: 3)
+ * @returns Array of style card data
+ */
+export async function fetchArtistSpotlightServer(
+  limit = 2,
+  offset = 3
+): Promise<StyleCardServerData[]> {
+  const supabase = await createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("posts")
+    .select("*")
+    .eq("status", "active")
+    .not("image_url", "is", null)
+    .not("artist_name", "is", null)
+    .order("view_count", { ascending: false })
+    .range(offset, offset + limit - 1);
+
+  if (error) {
+    console.error(
+      "Error fetching artist spotlight:",
+      JSON.stringify(error, null, 2)
+    );
+    return [];
+  }
+
+  return (data ?? []).map((row) => ({
+    post: toPostData(row),
+    items: [],
+  }));
+}
+
+/**
+ * Fetches posts by artist name for Discover section (server-side)
+ *
+ * @param artistName - The artist name to filter by
+ * @param limit - Maximum number of posts to fetch (default: 6)
+ * @returns Array of post data
+ */
+export async function fetchPostsByArtistServer(
+  artistName: string,
+  limit = 6
+): Promise<PostData[]> {
+  const supabase = await createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("posts")
+    .select("*")
+    .eq("status", "active")
+    .not("image_url", "is", null)
+    .ilike("artist_name", `%${artistName}%`)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error(
+      `Error fetching posts for artist ${artistName}:`,
+      JSON.stringify(error, null, 2)
+    );
+    return [];
+  }
+
+  return (data ?? []).map(toPostData);
+}
+
+/**
+ * Fetches trending keywords derived from popular artists (server-side)
  *
  * @param limit - Maximum number of keywords to fetch (default: 7)
  * @returns Array of trending keywords
@@ -518,73 +289,205 @@ export async function fetchTrendingKeywordsServer(
   const supabase = await createSupabaseServerClient();
   const keywords: TrendingKeyword[] = [];
 
-  // Get popular accounts (most recent posts)
-  const { data: recentPosts, error: postsError } = await supabase
-    .from("post")
-    .select("account")
-    .not("account", "is", null)
-    .order("created_at", { ascending: false })
-    .limit(20);
+  // Get popular artists (most posts/views)
+  const { data: posts, error } = await supabase
+    .from("posts")
+    .select("artist_name, group_name")
+    .eq("status", "active")
+    .not("artist_name", "is", null)
+    .order("view_count", { ascending: false })
+    .limit(50);
 
-  if (!postsError && recentPosts) {
-    // Count account occurrences
-    const accountCounts = new Map<string, number>();
-    for (const post of recentPosts) {
-      if (post.account) {
-        accountCounts.set(
-          post.account,
-          (accountCounts.get(post.account) || 0) + 1
-        );
+  if (!error && posts) {
+    // Count artist occurrences
+    const artistCounts = new Map<string, number>();
+    for (const post of posts) {
+      const name = post.artist_name || post.group_name;
+      if (name) {
+        artistCounts.set(name, (artistCounts.get(name) || 0) + 1);
       }
     }
 
     // Sort by count and take top entries
-    const topAccounts = [...accountCounts.entries()]
+    const topArtists = [...artistCounts.entries()]
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 4)
-      .map(([account]) => account);
+      .slice(0, limit)
+      .map(([artist]) => artist);
 
-    for (const account of topAccounts) {
+    for (const artist of topArtists) {
       keywords.push({
-        id: `account-${account}`,
-        label: account,
-        href: `/search?q=${encodeURIComponent(account)}`,
-      });
-    }
-  }
-
-  // Get popular brands
-  const { data: items, error: itemsError } = await supabase
-    .from("item")
-    .select("brand")
-    .not("brand", "is", null)
-    .order("created_at", { ascending: false })
-    .limit(50);
-
-  if (!itemsError && items) {
-    // Count brand occurrences
-    const brandCounts = new Map<string, number>();
-    for (const item of items) {
-      if (item.brand) {
-        brandCounts.set(item.brand, (brandCounts.get(item.brand) || 0) + 1);
-      }
-    }
-
-    // Sort by count and take remaining slots
-    const remainingSlots = limit - keywords.length;
-    const topBrands = [...brandCounts.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, remainingSlots)
-      .map(([brand]) => brand);
-
-    for (const brand of topBrands) {
-      keywords.push({
-        id: `brand-${brand}`,
-        label: brand,
-        href: `/search?q=${encodeURIComponent(brand)}`,
+        id: `artist-${artist}`,
+        label: artist,
+        href: `/search?q=${encodeURIComponent(artist)}`,
       });
     }
   }
 
   return keywords.slice(0, limit);
+}
+
+// =============================================================================
+// Legacy type exports for backward compatibility
+// =============================================================================
+
+/** Legacy ImageWithPost type */
+export interface ImageWithPost {
+  image: {
+    id: string;
+    image_url: string | null;
+    created_at: string;
+    image_hash: string;
+    status: "extracted";
+    with_items: boolean;
+  };
+  account: string | null;
+}
+
+/** Legacy WhatsNewStyleData type */
+export interface WhatsNewStyleData {
+  image: {
+    id: string;
+    image_url: string | null;
+    created_at: string;
+    image_hash: string;
+    status: "extracted";
+    with_items: boolean;
+  };
+  account: string | null;
+  items: StyleItemData[];
+}
+
+/** Legacy ItemWithImage type */
+export interface ItemWithImage {
+  item: { id: number; brand: string | null; product_name: string | null };
+  imageUrl: string | null;
+}
+
+// =============================================================================
+// Legacy function aliases for backward compatibility
+// These map old function names to new implementations
+// =============================================================================
+
+/** @deprecated Use fetchWeeklyBestPostsServer instead */
+export async function fetchWeeklyBestImagesServer(
+  limit = 8
+): Promise<ImageWithPost[]> {
+  const posts = await fetchWeeklyBestPostsServer(limit);
+  return posts.map((post) => ({
+    image: {
+      id: post.id,
+      image_url: post.imageUrl,
+      created_at: post.createdAt,
+      image_hash: "",
+      status: "extracted" as const,
+      with_items: false,
+    },
+    account: post.artistName || post.groupName,
+  }));
+}
+
+/** @deprecated Use fetchFeaturedPostServer instead */
+export async function fetchFeaturedImageServer(): Promise<ImageWithPost | null> {
+  const post = await fetchFeaturedPostServer();
+  if (!post) return null;
+  return {
+    image: {
+      id: post.id,
+      image_url: post.imageUrl,
+      created_at: post.createdAt,
+      image_hash: "",
+      status: "extracted" as const,
+      with_items: false,
+    },
+    account: post.artistName || post.groupName,
+  };
+}
+
+/** @deprecated Use fetchWhatsNewPostsServer instead */
+export async function fetchWhatsNewStylesServer(
+  limit = 2
+): Promise<WhatsNewStyleData[]> {
+  const styles = await fetchWhatsNewPostsServer(limit);
+  return styles.map((style) => ({
+    image: {
+      id: style.post.id,
+      image_url: style.post.imageUrl,
+      created_at: style.post.createdAt,
+      image_hash: "",
+      status: "extracted" as const,
+      with_items: false,
+    },
+    account: style.post.artistName || style.post.groupName,
+    items: style.items,
+  }));
+}
+
+/** @deprecated Items not available in new schema, returns empty array */
+export async function fetchWhatsNewItemsServer(
+  _limit = 4
+): Promise<ItemWithImage[]> {
+  return [];
+}
+
+/** @deprecated Items not available in new schema, returns empty array */
+export async function fetchBestItemsServer(
+  _limit = 6
+): Promise<ItemWithImage[]> {
+  return [];
+}
+
+/** @deprecated Use fetchDecodedPickServer instead */
+export async function fetchDecodedPickStyleServer(
+  offset = 2
+): Promise<{ style: WhatsNewStyleData | null; items: ItemWithImage[] }> {
+  const pick = await fetchDecodedPickServer(offset);
+  if (!pick)
+    return {
+      style: null,
+      items: [],
+    };
+  return {
+    style: {
+      image: {
+        id: pick.post.id,
+        image_url: pick.post.imageUrl,
+        created_at: pick.post.createdAt,
+        image_hash: "",
+        status: "extracted" as const,
+        with_items: false,
+      },
+      account: pick.post.artistName || pick.post.groupName,
+      items: [],
+    },
+    items: [],
+  };
+}
+
+/** @deprecated Use fetchArtistSpotlightServer instead */
+export async function fetchArtistSpotlightStylesServer(
+  limit = 2,
+  offset = 3
+): Promise<WhatsNewStyleData[]> {
+  const styles = await fetchArtistSpotlightServer(limit, offset);
+  return styles.map((style) => ({
+    image: {
+      id: style.post.id,
+      image_url: style.post.imageUrl,
+      created_at: style.post.createdAt,
+      image_hash: "",
+      status: "extracted" as const,
+      with_items: false,
+    },
+    account: style.post.artistName || style.post.groupName,
+    items: [],
+  }));
+}
+
+/** @deprecated Use fetchPostsByArtistServer instead */
+export async function fetchItemsByAccountServer(
+  _account: string,
+  _limit = 6
+): Promise<ItemWithImage[]> {
+  // Items not available, return empty
+  return [];
 }
