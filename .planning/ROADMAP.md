@@ -34,7 +34,7 @@ See archived roadmap for v1.0 phase details.
 **Milestone Goal:** Connect all backend APIs to frontend for complete user experience
 
 #### Sequential (Main Branch)
-- [ ] **Phase 6: API Foundation & Profile** - API client patterns + Profile APIs
+- [x] **Phase 6: API Foundation & Profile** - API client patterns + Profile APIs (Complete, 06-03 verification pending)
 
 #### Parallel Tracks (Git Worktrees) - After Phase 6
 - [ ] **Track A: Content CRUD** - Posts, Spots, Solutions (worktree: `decoded-track-a`)
@@ -60,9 +60,9 @@ See archived roadmap for v1.0 phase details.
   6. User can view other users' public profiles
 
 **Plans:** 3 plans (2 waves)
-- [ ] 06-01-PLAN.md - API client foundation (fetch wrapper, auth, error handling) [Wave 1]
-- [ ] 06-02-PLAN.md - Profile read APIs (me, stats, activities, public profile) [Wave 2]
-- [ ] 06-03-PLAN.md - Profile write APIs (update profile) [Wave 2]
+- [x] 06-01-PLAN.md - API client foundation (fetch wrapper, auth, error handling) [Wave 1]
+- [x] 06-02-PLAN.md - Profile read APIs (me, stats, activities, public profile) [Wave 2]
+- [x] 06-03-PLAN.md - Profile write APIs (update profile) [Wave 2] ⚠️ verification pending
 
 **After Phase 6 completes:** Create 4 worktrees for parallel execution
 
@@ -156,16 +156,18 @@ Plans:
 | Phase | Plans | Status | Completed |
 |-------|-------|--------|-----------|
 | 1-5. Documentation (v1.0) | 5/5 | Complete | 2026-01-29 |
-| 6. API Foundation & Profile | 0/3 | **Planned** | - |
+| 6. API Foundation & Profile | 3/3 | **Complete** ⚠️ | 2026-01-29 |
+
+⚠️ 06-03 verification pending (backend DB error)
 
 ### Parallel Tracks (Worktrees)
 
 | Track | Worktree | Branch | Plans | Status |
 |-------|----------|--------|-------|--------|
-| A. Content CRUD | `../decoded-track-a` | `feature/track-a-content` | 0/3 | Blocked (Phase 6) |
-| B. Engagement | `../decoded-track-b` | `feature/track-b-engagement` | 0/2 | Blocked (Phase 6) |
-| C. Gamification | `../decoded-track-c` | `feature/track-c-gamification` | 0/2 | Blocked (Phase 6) |
-| D. Monetization | `../decoded-track-d` | `feature/track-d-monetization` | 0/3 | Blocked (Phase 6) |
+| A. Content CRUD | `../decoded-track-a` | `feature/track-a-content` | 0/3 | **Ready** |
+| B. Engagement | `../decoded-track-b` | `feature/track-b-engagement` | 0/2 | **Ready** |
+| C. Gamification | `../decoded-track-c` | `feature/track-c-gamification` | 0/2 | **Ready** |
+| D. Monetization | `../decoded-track-d` | `feature/track-d-monetization` | 0/3 | **Ready** |
 
 ## Worktree Setup (After Phase 6)
 
