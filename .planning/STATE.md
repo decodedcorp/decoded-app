@@ -47,7 +47,7 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 
 | Track | Worktree | Plans | Status |
 |-------|----------|-------|--------|
-| A: Content CRUD | `feature/track-a-content` | 1/3 | **In Progress** |
+| A: Content CRUD | `feature/track-a-content` | 3/3 | **Complete** |
 | B: Engagement | `../decoded-track-b` | 0/2 | Ready |
 | C: Gamification | `../decoded-track-c` | 0/2 | Ready |
 | D: Monetization | `../decoded-track-d` | 0/3 | Ready |
@@ -72,9 +72,11 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 - **Dual State Sync (06-03):** React Query cache + Zustand store for immediate UI updates
 
 ### Decisions Made (Track A - Content CRUD)
-- **Cache Strategy (A-01, A-02):** Use optimistic updates in mutation hooks for immediate UI feedback
-- **Query Keys (A-01, A-02):** Hierarchical query key factory pattern (postKeys, spotKeys) for efficient cache invalidation
-- **Delete Cache Strategy (A-01):** Remove deleted items from cache instead of invalidation (more efficient)
+- **Cache Strategy (A-01, A-02, A-03):** Use optimistic updates in mutation hooks for immediate UI feedback
+- **Query Keys (A-01, A-02, A-03):** Hierarchical query key factory pattern (postKeys, spotKeys, solutionKeys) for efficient cache invalidation
+- **Delete Cache Strategy (A-01, A-03):** Remove deleted items from cache instead of invalidation (more efficient)
+- **Solution Metadata (A-03):** Metadata extraction is optional; users can provide manually or use auto-extraction
+- **Solution Visibility (A-03):** Solutions are public by default (no auth for GET endpoints)
 
 ### Pending Verification
 - **06-03 Profile Edit:** Code complete, verification blocked by backend DB error
@@ -93,7 +95,7 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Session Continuity
 
 **Last session:** 2026-01-29
-**Stopped at:** Completed A-01-PLAN.md execution
+**Stopped at:** Completed Track A (A-03-PLAN.md execution)
 **Resume file:** None
 
 ## Worktree Commands
@@ -129,4 +131,4 @@ git worktree remove ../decoded-track-d
 
 ---
 
-*Last updated: 2026-01-29 after Phase 6 completion*
+*Last updated: 2026-01-29 after Track A completion*
