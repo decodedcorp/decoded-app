@@ -58,7 +58,7 @@ export function HomeAnimatedContent({
     <>
       <HeroSection data={heroData} />
 
-      <main className="space-y-0">
+      <main>
         {/* DECODED'S PICK Section */}
         <motion.div
           initial="hidden"
