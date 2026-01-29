@@ -19,6 +19,33 @@
     --text-heading-md: clamp(24px, 4vw, 40px);
     --text-heading-sm: clamp(20px, 3vw, 30px);
 
+    /* Typography - Semantic Heading Sizes (from decoded.pen) */
+    --text-h1: 3rem; /* 48px */
+    --text-h2: 2.25rem; /* 36px */
+    --text-h3: 1.75rem; /* 28px */
+    --text-h4: 1.5rem; /* 24px */
+
+    /* Typography - Body Sizes */
+    --text-body-lg: 1.125rem; /* 18px */
+    --text-body: 1rem; /* 16px */
+    --text-body-sm: 0.875rem; /* 14px */
+    --text-caption: 0.75rem; /* 12px */
+
+    /* Typography - Line Heights */
+    --leading-hero: 1.1;
+    --leading-h1: 1.15;
+    --leading-h2: 1.2;
+    --leading-h3: 1.25;
+    --leading-h4: 1.3;
+    --leading-body: 1.5;
+    --leading-caption: 1.4;
+
+    /* Typography - Font Weights */
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
     --background: oklch(0.9842 0.0034 247.8575);
     --foreground: oklch(0.2077 0.0398 265.7549);
     --card: oklch(1 0 0);
