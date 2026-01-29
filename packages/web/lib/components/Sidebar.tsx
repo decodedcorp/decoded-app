@@ -1,6 +1,15 @@
+/**
+ * @deprecated This component is deprecated as of v2-04.
+ * Desktop navigation has moved to DesktopHeader.
+ * This file is kept for reference during transition.
+ * Safe to delete after v2.0 launch.
+ *
+ * @see packages/web/lib/design-system/desktop-header.tsx
+ */
+
 "use client";
 
-import { memo, useState, useCallback } from "react";
+import { memo, useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -120,6 +129,8 @@ NavItemComponent.displayName = "NavItemComponent";
 /**
  * Sidebar - Reddit-style minimal left navigation
  *
+ * @deprecated Use DesktopHeader instead (as of v2-04)
+ *
  * Features:
  * - Fixed on left side for desktop/tablet (md+)
  * - Hidden on mobile (<768px)
@@ -128,6 +139,15 @@ NavItemComponent.displayName = "NavItemComponent";
  * - Clean, minimal design inspired by Reddit
  */
 export const Sidebar = memo(() => {
+  // Development warning for deprecated component
+  useEffect(() => {
+    if (process.env.NODE_ENV === "development") {
+      console.warn(
+        "[DEPRECATED] Sidebar component is deprecated. Use DesktopHeader instead."
+      );
+    }
+  }, []);
+
   const pathname = usePathname();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
