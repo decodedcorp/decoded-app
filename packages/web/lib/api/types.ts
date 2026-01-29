@@ -189,3 +189,70 @@ export function apiToStoreCoord(value: number): number {
 export function storeToApiCoord(value: number): string {
   return `${(value * 100).toFixed(1)}%`;
 }
+
+// ============================================================
+// User API Types
+// GET /api/v1/users/me, PATCH /api/v1/users/me, GET /api/v1/users/{user_id}
+// ============================================================
+
+export interface UserResponse {
+  id: string;
+  email: string;
+  username: string;
+  rank: string | null;
+  total_points: number;
+  is_admin: boolean;
+  avatar_url: string | null;
+  bio: string | null;
+  display_name: string | null;
+}
+
+export interface UpdateUserDto {
+  avatar_url?: string;
+  bio?: string;
+  display_name?: string;
+}
+
+// ============================================================
+// User Stats API Types
+// GET /api/v1/users/me/stats
+// ============================================================
+
+export interface UserStatsResponse {
+  total_posts: number;
+  total_comments: number;
+  total_likes_received: number;
+  total_points: number;
+  rank: string | null;
+}
+
+// ============================================================
+// User Activity API Types
+// GET /api/v1/users/me/activities
+// ============================================================
+
+export type UserActivityType = 'post' | 'spot' | 'solution';
+
+export interface UserActivityItem {
+  id: string;
+  type: UserActivityType;
+  title: string;
+  created_at: string;
+  // Add other fields as needed based on actual API response
+}
+
+export interface PaginatedActivitiesResponse {
+  data: UserActivityItem[];
+  pagination: {
+    current_page: number;
+    per_page: number;
+    total_items: number;
+    total_pages: number;
+  };
+}
+
+export interface ActivitiesListParams {
+  type?: UserActivityType;
+  page?: number;
+  per_page?: number;
+}
