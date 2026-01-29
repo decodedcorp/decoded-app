@@ -47,3 +47,14 @@ export type { FeedCardProps as FeedCardBaseProps } from './feed-card';
 // Profile Header Card
 export { ProfileHeaderCard, ProfileHeaderCardSkeleton } from './profile-header-card';
 export type { ProfileHeaderCardProps } from './profile-header-card';
+
+// Header Components
+export { DesktopHeader, desktopHeaderVariants } from './desktop-header';
+export type { DesktopHeaderProps } from './desktop-header';
+
+export { MobileHeader, mobileHeaderVariants } from './mobile-header';
+export type { MobileHeaderProps } from './mobile-header';
+
+// Footer Components
+export { DesktopFooter } from './desktop-footer';
+export type { DesktopFooterProps } from './desktop-footer';
