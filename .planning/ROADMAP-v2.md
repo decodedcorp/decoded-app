@@ -84,21 +84,21 @@ Plans:
 - [x] v2-03-03-PLAN.md - FeedCard and ProfileHeaderCard [Wave 2]
 
 ### v2-Phase 4: Desktop Infrastructure
-**Goal**: Desktop users see responsive layouts with navigation, header, footer, and multi-column structures
+**Goal**: Desktop users see responsive layouts with top header navigation and footer (sidebar removed per v2-04-CONTEXT decisions)
 **Depends on**: v2-Phase 3
-**Requirements**: DSK-01, DSK-02, DSK-03, DSK-04, DSK-05, DSK-06, DSK-07, DSK-08, DSK-09, DSK-10, DSK-11, DSK-12
+**Requirements**: DSK-01, DSK-02, DSK-03 (header/footer focus; sidebar requirements deferred)
 **Success Criteria** (what must be TRUE):
   1. User on desktop sees persistent header with navigation items and search
   2. User on desktop sees footer with links and branding
-  3. User can navigate between pages via desktop sidebar with active state indicators
-  4. Desktop layouts adapt to 2-column and 3-column structures based on page requirements
-  5. Desktop search, tabs, and hero components match decoded.pen specifications
-**Plans**: TBD
+  3. User can navigate between pages via desktop header navigation with active state indicators
+  4. Mobile users see MobileHeader at top and MobileNavBar at bottom
+  5. Footer displays 4-column layout on desktop, accordion on mobile
+**Plans:** 3 plans (2 waves)
 
 Plans:
-- [ ] v2-04-01: Implement DesktopHeader, DesktopFooter, and DesktopNavItem
-- [ ] v2-04-02: Implement DesktopSidebar and DesktopLayout variants
-- [ ] v2-04-03: Implement DesktopCard, DesktopHero, DesktopSearch, DesktopTab components
+- [ ] v2-04-01-PLAN.md - DesktopHeader and MobileHeader components [Wave 1]
+- [ ] v2-04-02-PLAN.md - DesktopFooter with responsive layout [Wave 1]
+- [ ] v2-04-03-PLAN.md - Layout integration (replace Sidebar with header navigation) [Wave 2]
 
 ### v2-Phase 5: Home & Explore Pages
 **Goal**: Landing and discovery pages display with decoded.pen design on mobile and desktop
