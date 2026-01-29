@@ -20,3 +20,6 @@ export {
   findCategoryIdByCode,
   findCategoryById,
 } from "./categories";
+
+// User APIs
+export { getMe, updateMe, getMyStats, getUserById } from "./users";
