@@ -88,18 +88,33 @@ export function StatsCards() {
         delay={0.1}
       />
       <StatCard
-        value={`${acceptRate}%`}
-        label="Accepted"
-        ariaLabel={`채택률 ${acceptRate}%`}
+        value={stats.totalAnswers}
+        label="Solutions"
+        ariaLabel={`솔루션 ${stats.totalAnswers}개`}
         delay={0.2}
       />
       <StatCard
         value={formatCurrency(stats.totalEarnings)}
-        label="Earnings"
-        ariaLabel={`수익금 ${formatCurrency(stats.totalEarnings)}`}
+        label="Points"
+        ariaLabel={`포인트 ${formatCurrency(stats.totalEarnings)}`}
         onClick={handleEarningsClick}
         delay={0.3}
       />
     </div>
   );
+}
+
+export interface ProfileStatItem {
+  label: string;
+  value: string | number;
+}
+
+export function ProfileStats(): ProfileStatItem[] {
+  const stats = useProfileStore(selectStats);
+
+  return [
+    { label: "Posts", value: stats.totalContributions },
+    { label: "Solutions", value: stats.totalAnswers },
+    { label: "Points", value: formatCurrency(stats.totalEarnings) },
+  ];
 }
