@@ -75,9 +75,9 @@ export function DesktopHeader({
       style={{ height: "72px" }}
       {...props}
     >
-      <div className="container relative flex items-center h-full px-16">
-        {/* Left Section: Logo */}
-        <div className="flex items-center flex-shrink-0">
+      <div className="w-full flex items-center justify-between h-full px-16">
+        {/* Left Section: Logo - flex-1 for equal width with right */}
+        <div className="flex-1 flex items-center">
           <Link
             href="/"
             className="relative w-48 h-16 flex items-center justify-center hover:opacity-80 transition-opacity"
@@ -93,9 +93,9 @@ export function DesktopHeader({
           </Link>
         </div>
 
-        {/* Center Section: Navigation - Absolute center */}
+        {/* Center Section: Navigation - True center with flex-none */}
         <nav
-          className="absolute left-1/2 -translate-x-1/2 flex items-center gap-8"
+          className="flex-none flex items-center gap-8"
           aria-label="Main navigation"
         >
           {NAV_ITEMS.map(({ href, label }) => {
@@ -117,8 +117,8 @@ export function DesktopHeader({
           })}
         </nav>
 
-        {/* Right Section: Search + Auth UI */}
-        <div className="ml-auto flex items-center gap-4">
+        {/* Right Section: Search + Auth UI - flex-1 for equal width with left */}
+        <div className="flex-1 flex items-center justify-end gap-4">
           {/* Search Icon Button */}
           <button
             onClick={onSearchClick}
