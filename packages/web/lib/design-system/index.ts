@@ -10,3 +10,7 @@ export * from './tokens';
 // Typography Components
 export { Heading, headingVariants, Text, textVariants } from './typography';
 export type { HeadingProps, TextProps } from './typography';
+
+// Input Components
+export { Input, inputVariants, SearchInput } from './input';
+export type { InputProps, SearchInputProps } from './input';
