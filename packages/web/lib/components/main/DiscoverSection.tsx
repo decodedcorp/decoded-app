@@ -82,7 +82,7 @@ export function DiscoverItemsSection({
   const displayItems = itemsByTab?.[activeTab] ?? items;
 
   return (
-    <section className="py-10 md:py-16 px-4 md:px-6 lg:px-8 bg-card">
+    <section className="py-10 md:py-16 px-4 md:px-6 lg:px-8 bg-background">
       <div className="max-w-7xl mx-auto">
         <SectionHeader
           title="DISCOVER ITEMS"
@@ -138,7 +138,7 @@ export function DiscoverProductsSection({
   const [activeTab, setActiveTab] = useState(tabs[0].id);
 
   return (
-    <section className="py-10 md:py-16 px-4 md:px-6 lg:px-8 bg-background">
+    <section className="py-10 md:py-16 px-4 md:px-6 lg:px-8 bg-card">
       <div className="max-w-7xl mx-auto">
         <SectionHeader
           title="DISCOVER PRODUCTS"

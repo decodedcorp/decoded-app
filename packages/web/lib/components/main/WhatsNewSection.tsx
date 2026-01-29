@@ -19,7 +19,7 @@ export function WhatsNewSection({
   }
 
   return (
-    <section className="py-10 md:py-16 px-4 md:px-6 lg:px-8 bg-background">
+    <section className="py-10 md:py-16 px-4 md:px-6 lg:px-8 bg-card">
       <div className="max-w-7xl mx-auto">
         <SectionHeader
           title="WHAT'S NEW"

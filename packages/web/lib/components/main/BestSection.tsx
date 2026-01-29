@@ -62,7 +62,7 @@ export function BestItemSection({
   items = sampleBestItems,
 }: BestItemSectionProps) {
   return (
-    <section className="py-10 md:py-16 px-4 md:px-6 lg:px-8 bg-card">
+    <section className="py-10 md:py-16 px-4 md:px-6 lg:px-8 bg-background">
       <div className="max-w-7xl mx-auto">
         <SectionHeader
           title="BEST ITEM"
@@ -124,7 +124,7 @@ export function WeeklyBestSection({
   };
 
   return (
-    <section className="py-10 md:py-16 px-4 md:px-6 lg:px-8 bg-background">
+    <section className="py-10 md:py-16 px-4 md:px-6 lg:px-8 bg-card">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-end justify-between mb-6">
           <div>

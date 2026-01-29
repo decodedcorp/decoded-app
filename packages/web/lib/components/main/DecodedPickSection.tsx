@@ -47,7 +47,7 @@ export function DecodedPickSection({
   items = sampleItems,
 }: DecodedPickSectionProps) {
   return (
-    <section className="py-20 md:py-32 px-4 md:px-6 lg:px-8 bg-background overflow-hidden">
+    <section className="py-10 md:py-16 px-4 md:px-6 lg:px-8 bg-card overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <motion.div

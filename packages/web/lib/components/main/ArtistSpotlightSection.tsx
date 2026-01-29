@@ -29,7 +29,7 @@ export function ArtistSpotlightSection({
   data = sampleSpotlightData,
 }: ArtistSpotlightSectionProps) {
   return (
-    <section className="py-10 md:py-16 px-4 md:px-6 lg:px-8 bg-card">
+    <section className="py-10 md:py-16 px-4 md:px-6 lg:px-8 bg-background">
       <div className="max-w-7xl mx-auto">
         <SectionHeader
           title="ARTIST SPOTLIGHT"
