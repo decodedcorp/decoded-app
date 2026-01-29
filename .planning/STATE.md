@@ -11,8 +11,8 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Milestone:** v1.1 Full API Integration
 **Structure:** Phase 6 Complete → Tracks A-D (Parallel)
-**Status:** Track D in progress (D-03 complete)
-**Last activity:** 2026-01-29 - Completed D-03-PLAN.md (Search Suggestions API)
+**Status:** Track D complete (all 3 plans)
+**Last activity:** 2026-01-29 - Completed D-02-PLAN.md (Settlements API)
 
 ### Execution Flow
 
@@ -76,6 +76,8 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 - **Earnings Caching (D-01):** 5-minute stale time for earnings data (doesn't change rapidly)
 - **Search Suggestions (D-03):** Popular searches public, recent searches authenticated
 - **Query Key Separation (D-03):** Use searchSuggestionsKeys namespace to avoid conflicts
+- **Settlement History (D-02):** Settlement API with fetchSettlements and withdrawal request flow
+- **Withdrawal Status (D-02):** Backend returns "not yet supported" but client flow is complete
 
 ### Pending Verification
 - **06-03 Profile Edit:** Code complete, verification blocked by backend DB error
@@ -94,7 +96,7 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Session Continuity
 
 **Last session:** 2026-01-29
-**Stopped at:** Completed D-03-PLAN.md (Track D complete)
+**Stopped at:** Completed D-02-PLAN.md (Track D complete)
 **Resume file:** None - Track D finished, ready to merge
 
 ## Worktree Commands
