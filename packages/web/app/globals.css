@@ -175,6 +175,54 @@
   }
 }
 
+@layer utilities {
+  /* Heading typography presets */
+  .typography-hero {
+    @apply font-serif text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[1.1] tracking-tight;
+  }
+
+  .typography-h1 {
+    @apply font-serif text-4xl md:text-5xl lg:text-6xl font-semibold leading-[1.15] tracking-tight;
+  }
+
+  .typography-h2 {
+    @apply font-serif text-3xl md:text-4xl lg:text-5xl font-semibold leading-[1.2] tracking-tight;
+  }
+
+  .typography-h3 {
+    @apply font-serif text-2xl md:text-3xl font-semibold leading-[1.25];
+  }
+
+  .typography-h4 {
+    @apply font-serif text-xl md:text-2xl font-semibold leading-[1.3];
+  }
+
+  /* Body typography presets */
+  .typography-body {
+    @apply font-sans text-sm md:text-base leading-relaxed;
+  }
+
+  .typography-body-lg {
+    @apply font-sans text-base md:text-lg leading-relaxed;
+  }
+
+  .typography-small {
+    @apply font-sans text-sm leading-normal;
+  }
+
+  .typography-caption {
+    @apply font-sans text-xs leading-snug text-muted-foreground;
+  }
+
+  .typography-overline {
+    @apply font-sans text-xs uppercase tracking-widest font-medium;
+  }
+
+  .typography-label {
+    @apply font-sans text-sm font-medium;
+  }
+}
+
 /* Scroll Animation Classes */
 .js-observe {
   opacity: 0;
