@@ -119,10 +119,17 @@ export function useUpdateProfile() {
   return useMutation({
     mutationFn: (data: UpdateUserDto) => updateMe(data),
     onSuccess: (updatedUser) => {
-      // Invalidate and refetch profile queries
-      queryClient.invalidateQueries({ queryKey: profileKeys.me() });
-      // Optionally update cache directly for instant UI update
+      // Update React Query cache
       queryClient.setQueryData(profileKeys.me(), updatedUser);
+
+      // Sync with profileStore for immediate UI update
+      // Import store dynamically to avoid circular dependency
+      import("@/lib/stores/profileStore").then(({ useProfileStore }) => {
+        useProfileStore.getState().setUserFromApi(updatedUser);
+      });
+
+      // Invalidate to trigger refetch in background
+      queryClient.invalidateQueries({ queryKey: profileKeys.me() });
     },
     onError: (error) => {
       console.error("[useUpdateProfile] Failed to update profile:", error);
