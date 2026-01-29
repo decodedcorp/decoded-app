@@ -30,7 +30,7 @@ export type ImageDetail = ImageRow & {
   postImages: PostImageRow[];
 };
 
-export type CategoryFilter = "all" | "newjeanscloset" | "blackpinkk.style";
+export type CategoryFilter = "all" | "fashion" | "beauty" | "lifestyle" | "accessories" | "newjeanscloset" | "blackpinkk.style";
 
 export type PostSource = "post" | "legacy";
 

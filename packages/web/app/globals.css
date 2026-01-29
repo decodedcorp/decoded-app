@@ -176,6 +176,15 @@
 }
 
 @layer utilities {
+  /* Scrollbar hiding for horizontal scroll containers */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
   /* Heading typography presets */
   .typography-hero {
     @apply font-serif text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[1.1] tracking-tight;
