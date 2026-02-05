@@ -234,7 +234,8 @@ open docs/design-system/README.md  # View updated v2.0 documentation
 | 004 | Fix feed page footer overlap and responsive grid | 2026-02-05 | 960d37d | [004-fix-feed-page-footer-overlap-responsive-grid](./quick/004-fix-feed-page-footer-overlap-responsive-grid/) |
 | 005 | Fix explore page ThiingsGrid not visible | 2026-02-05 | e95ce37 | [005-fix-explore-page-things-grid-not-visible](./quick/005-fix-explore-page-things-grid-not-visible/) |
 | 006 | Desktop request page modal (intercepting routes) | 2026-02-05 | ab7c9c1 | [006-desktop-request-page-modal](./quick/006-desktop-request-page-modal/) |
+| 007 | Fix explore page "Failed to load images" error | 2026-02-05 | 6cc6cb2 | [007-fix-explore-page-failed-to-load-images-e](./quick/007-fix-explore-page-failed-to-load-images-e/) |
 
 ---
 
-*Last updated: 2026-02-05 after quick task 006*
+*Last updated: 2026-02-05 after quick task 007*
