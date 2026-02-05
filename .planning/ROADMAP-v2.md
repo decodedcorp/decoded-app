@@ -27,7 +27,7 @@ v2.0 transforms the decoded-app UI by implementing the decoded.pen design system
 - [x] **v2-Phase 4: Desktop Infrastructure** - Header, footer, navigation, layouts
 - [x] **v2-Phase 5: Home & Explore Pages** - Landing and discovery experiences
 - [x] **v2-Phase 6: Feed & Profile Pages** - Content streams and user profiles
-- [ ] **v2-Phase 7: Search & Image Detail** - Discovery and detailed views
+- [x] **v2-Phase 7: Search & Image Detail** - Discovery and detailed views
 - [ ] **v2-Phase 8: Request Flow & Login** - Multi-step flows and authentication
 - [ ] **v2-Phase 9: Documentation & Polish** - Design system docs, final adjustments
 
@@ -147,9 +147,9 @@ Plans:
 **Plans:** 3 plans (2 waves)
 
 Plans:
-- [ ] v2-07-01-PLAN.md — Search overlay with recent searches and sliding tab underline [Wave 1]
-- [ ] v2-07-02-PLAN.md — Image Detail with decoded.pen hero, parallax, and lightbox [Wave 1]
-- [ ] v2-07-03-PLAN.md — Item Cards and related content grid integration [Wave 2]
+- [x] v2-07-01-PLAN.md — Search overlay with recent searches and sliding tab underline [Wave 1]
+- [x] v2-07-02-PLAN.md — Image Detail with decoded.pen hero, parallax, and lightbox [Wave 1]
+- [x] v2-07-03-PLAN.md — Item Cards and related content grid integration [Wave 2]
 
 ### v2-Phase 8: Request Flow & Login
 **Goal**: Multi-step request flow and authentication pages render with decoded.pen design
@@ -203,11 +203,11 @@ v2-Phases execute sequentially: v2-Phase 1 → v2-Phase 2 → ... → v2-Phase 9
 | v2-4. Desktop Infrastructure | 3/3 | **Complete** | 2026-01-29 |
 | v2-5. Home & Explore Pages | 3/3 | **Complete** | 2026-01-29 |
 | v2-6. Feed & Profile Pages | 3/3 | **Complete** | 2026-01-29 |
-| v2-7. Search & Image Detail | 0/3 | Not started | - |
+| v2-7. Search & Image Detail | 3/3 | **Complete** | 2026-02-05 |
 | v2-8. Request Flow & Login | 0/3 | Not started | - |
 | v2-9. Documentation & Polish | 0/3 | Not started | - |
 
 ---
 
 *Created: 2026-01-29*
-*Last updated: 2026-01-29 (Phase v2-6 complete)*
+*Last updated: 2026-02-05 (Phase v2-7 complete)*
