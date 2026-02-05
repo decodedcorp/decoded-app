@@ -5,33 +5,33 @@
 See: .planning/PROJECT.md (updated 2026-02-05)
 
 **Core value:** 완전한 사용자 경험 — decoded.pen 디자인 시스템 100% 구현
-**Current focus:** v2.1-Phase-1 Core Interactive Components
+**Current focus:** v2.1-Phase-1 Core Interactive Components (COMPLETE)
 
 ## Current Position
 
 Phase: 1 of 6 (Core Interactive Components)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-02-05 — Completed v2.1-01-01-PLAN.md (Tag & ActionButton)
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-02-05 — Completed v2.1-01-02-PLAN.md (StepIndicator & Hotspot)
 
-Progress: [█░░░░░░░░░] 7.7% (1/13 plans)
+Progress: [██░░░░░░░░] 15.4% (2/13 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 94s
-- Total execution time: 0.03 hours
+- Total plans completed: 2
+- Average duration: 3m 2s
+- Total execution time: 0.1 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| v2.1-01 | 1 | 94s | 94s |
+| v2.1-01 | 2 | 6m 4s | 3m 2s |
 
 **Recent Trend:**
-- Last 5 plans: 94s
-- Trend: First plan baseline
+- Last 5 plans: 94s, 5m
+- Trend: Stable
 
 ## Accumulated Context
 
@@ -44,6 +44,7 @@ Recent decisions affecting current work:
 - v2.0: decoded.pen as single source of truth for design system
 - v2.1: 6-phase structure grouping 26 components by function
 - v2.1-01-01: Use CVA pattern for Tag and ActionButton variants (consistent with existing)
+- v2.1-01-02: Custom pulse-soft keyframe in tailwind config for centered hotspot animation
 
 ### Pending Todos
 
@@ -51,13 +52,23 @@ None yet.
 
 ### Blockers/Concerns
 
-None yet.
+- Pre-existing TypeScript error in requestStore.ts (setSpotSolution, clearSpotSolution missing)
 
 ## Session Continuity
 
 Last session: 2026-02-05
-Stopped at: Completed v2.1-01-01-PLAN.md (Tag & ActionButton)
+Stopped at: Completed v2.1-01-02-PLAN.md (StepIndicator & Hotspot)
 Resume file: None
+
+## Phase 1 Complete
+
+All 4 Core Interactive Components delivered:
+- Tag (6 category variants)
+- ActionButton (3 interaction variants)
+- StepIndicator (3 size, 3 visual variants)
+- Hotspot (3 variants with pulse animation)
+
+Ready to proceed to Phase 2: Navigation & Discovery
 
 ## Quick Tasks Completed
 
@@ -68,4 +79,4 @@ Resume file: None
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-05 after v2.1-01-01 plan completion*
+*Last updated: 2026-02-05 after v2.1-01-02 plan completion*
