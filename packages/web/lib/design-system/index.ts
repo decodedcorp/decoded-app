@@ -75,3 +75,11 @@ export type { TagProps } from "./tag";
 // ActionButton Component
 export { ActionButton, actionButtonVariants } from "./action-button";
 export type { ActionButtonProps } from "./action-button";
+
+// StepIndicator Component
+export { StepIndicator, stepIndicatorVariants } from "./step-indicator";
+export type { StepIndicatorProps } from "./step-indicator";
+
+// Hotspot Component
+export { Hotspot, hotspotVariants } from "./hotspot";
+export type { HotspotProps, HotspotPosition } from "./hotspot";
