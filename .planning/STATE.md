@@ -211,7 +211,7 @@ See: .planning/ROADMAP-v2.md
 ## Session Continuity
 
 **Last session:** 2026-02-05
-**Stopped at:** Completed quick task 008 (Feed page API migration)
+**Stopped at:** Completed quick task 011 (Desktop header avatar profile link)
 **Resume file:** None
 
 **Next Steps:**
@@ -238,7 +238,8 @@ open docs/design-system/README.md  # View updated v2.0 documentation
 | 008 | Feed 페이지 Supabase → REST API 마이그레이션 | 2026-02-05 | 5467cf2 | [008-fix-feed-page-use-api-instead-of-sup](./quick/008-fix-feed-page-use-api-instead-of-sup/) |
 | 009 | Request 모달 이미지 크기 확대 | 2026-02-05 | 04b5c4f | [009-fix-request-modal-image-not-filling-screen](./quick/009-fix-request-modal-image-not-filling-screen/) |
 | 010 | Request 이미지 업로드 API 사용 (Supabase Storage 대체) | 2026-02-05 | 1b23b3c | [010-fix-request-use-api-instead-of-sup](./quick/010-fix-request-use-api-instead-of-sup/) |
+| 011 | Desktop header avatar links to /profile | 2026-02-05 | af8a5f2 | [011-header-avatar-profile-link](./quick/011-header-avatar-profile-link/) |
 
 ---
 
-*Last updated: 2026-02-05 after quick task 010*
+*Last updated: 2026-02-05 after quick task 011*
