@@ -9,29 +9,30 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 
 ## Current Position
 
-Phase: 1 of 6 (Core Interactive Components)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-02-05 — Completed quick task 020 (Upload direct spot UI)
+Phase: 2 of 6 (Navigation Components)
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2026-02-05 — Completed v2.1-02-01-PLAN.md (NavBar & NavItem)
 
-Progress: [██░░░░░░░░] 15.4% (2/13 plans)
+Progress: [███░░░░░░░] 23.1% (3/13 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: 3m 2s
-- Total execution time: 0.1 hours
+- Total plans completed: 3
+- Average duration: 2m 42s
+- Total execution time: 0.13 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | v2.1-01 | 2 | 6m 4s | 3m 2s |
+| v2.1-02 | 1 | 2m 10s | 2m 10s |
 
 **Recent Trend:**
-- Last 5 plans: 94s, 5m
-- Trend: Stable
+- Last 5 plans: 94s, 5m, 2m 10s
+- Trend: Improving (faster execution)
 
 ## Accumulated Context
 
@@ -45,6 +46,8 @@ Recent decisions affecting current work:
 - v2.1: 6-phase structure grouping 26 components by function
 - v2.1-01-01: Use CVA pattern for Tag and ActionButton variants (consistent with existing)
 - v2.1-01-02: Custom pulse-soft keyframe in tailwind config for centered hotspot animation
+- v2.1-02-01: NavItem supports both Link (href) and button (onClick) rendering for navigation flexibility
+- v2.1-02-01: Use @media(hover:hover) to avoid sticky hover on touch devices
 
 ### Pending Todos
 
@@ -57,18 +60,21 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-05
-Stopped at: Completed v2.1-01-02-PLAN.md (StepIndicator & Hotspot)
+Stopped at: Completed v2.1-02-01-PLAN.md (NavBar & NavItem)
 Resume file: None
 
-## Phase 1 Complete
+## Phase Progress
 
-All 4 Core Interactive Components delivered:
+**Phase 1 Complete:**
 - Tag (6 category variants)
 - ActionButton (3 interaction variants)
 - StepIndicator (3 size, 3 visual variants)
 - Hotspot (3 variants with pulse animation)
 
-Ready to proceed to Phase 2: Navigation & Discovery
+**Phase 2 In Progress (1/3 plans):**
+- ✅ NavBar & NavItem (mobile navigation)
+- ⏳ SectionHeader (pending)
+- ⏳ SearchTabs (pending)
 
 ## Quick Tasks Completed
 
@@ -83,4 +89,4 @@ Ready to proceed to Phase 2: Navigation & Discovery
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-05 after quick task 020*
+*Last updated: 2026-02-05 after v2.1-02-01-PLAN.md*
