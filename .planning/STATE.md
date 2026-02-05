@@ -228,7 +228,8 @@ grep "design-system" .planning/codebase/STACK.md  # Check updated docs
 | 002 | Add optional description field with AI metadata extraction to post creation | 2026-02-05 | e66645a | [002-post-optional-fields-media-metadata](./quick/002-post-optional-fields-media-metadata/) |
 | 003 | Explore 페이지 things 그리드 + footer 제거 | 2026-02-05 | c19e536 | [003-explore-things-grid-no-footer](./quick/003-explore-things-grid-no-footer/) |
 | 004 | Fix feed page footer overlap and responsive grid | 2026-02-05 | 960d37d | [004-fix-feed-page-footer-overlap-responsive-grid](./quick/004-fix-feed-page-footer-overlap-responsive-grid/) |
+| 005 | Fix explore page ThiingsGrid not visible | 2026-02-05 | e95ce37 | [005-fix-explore-page-things-grid-not-visible](./quick/005-fix-explore-page-things-grid-not-visible/) |
 
 ---
 
-*Last updated: 2026-02-05 after v2-09-02*
+*Last updated: 2026-02-05 after quick task 005*
