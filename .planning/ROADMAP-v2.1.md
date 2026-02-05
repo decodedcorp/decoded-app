@@ -27,11 +27,11 @@ This milestone completes the decoded.pen design system implementation by buildin
 3. User sees current progress through 3-step indicator during upload flow
 4. User can click hotspots on images to view item details (Default, Numbered, Inactive states)
 
-**Plans**: 2 plans
+**Plans**: 2 plans (1 wave)
 
 Plans:
-- [ ] v2.1-01-01: Tag + ActionButton components
-- [ ] v2.1-01-02: StepIndicator + Hotspot components
+- [ ] v2.1-01-01-PLAN.md — Tag + ActionButton components [Wave 1]
+- [ ] v2.1-01-02-PLAN.md — StepIndicator + Hotspot components [Wave 1]
 
 ---
 
@@ -154,7 +154,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| v2.1-1. Core Interactive | 0/2 | Not started | - |
+| v2.1-1. Core Interactive | 0/2 | Planned | - |
 | v2.1-2. Navigation | 0/2 | Not started | - |
 | v2.1-3. Cards | 0/2 | Not started | - |
 | v2.1-4. Profile & Detail | 0/2 | Not started | - |
@@ -166,4 +166,4 @@ Plans:
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-05*
+*Last updated: 2026-02-05 (Phase 1 planned)*
