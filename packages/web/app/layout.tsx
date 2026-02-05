@@ -6,7 +6,7 @@ import {
   ConditionalNav,
   MainContentWrapper,
 } from "@/lib/components/ConditionalNav";
-import { DesktopFooter } from "@/lib/design-system";
+import { ConditionalFooter } from "@/lib/components/ConditionalFooter";
 
 const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
@@ -49,8 +49,8 @@ export default function RootLayout({
             {/* Modal slot - rendered outside MainContentWrapper */}
             {modal}
 
-            {/* Footer - after main content */}
-            <DesktopFooter className="mt-auto" />
+            {/* Footer - conditionally hidden on some routes */}
+            <ConditionalFooter className="mt-auto" />
           </div>
         </AppProviders>
       </body>
