@@ -75,8 +75,9 @@ Ready to proceed to Phase 2: Navigation & Discovery
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 016 | Fix upload page excessive re-renders | 2026-02-05 | ccab256 | [016-fix-upload-page-excessive-rerenders](./quick/016-fix-upload-page-excessive-rerenders/) |
+| 017 | Split request API by solution knowledge | 2026-02-05 | d7de2d9 | [017-request-api-split-by-solution](./quick/017-request-api-split-by-solution/) |
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-05 after v2.1-01-02 plan completion*
+*Last updated: 2026-02-05 after quick task 017*
