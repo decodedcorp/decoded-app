@@ -270,3 +270,23 @@ const SOCIAL_LINKS = {
   --footer-padding: 48px 0;
 }
 ```
+
+---
+
+## 10. v2.0 Implementation Notes
+
+**구현 파일:**
+- `lib/design-system/desktop-footer.tsx` (DesktopFooter)
+
+**변경 사항 (v2.0):**
+- 4-column 레이아웃 (Desktop), Accordion (Mobile)
+- Simple text logo (font-mono) - 이미지 대신 텍스트 "DECODED"
+- Company/Support 섹션만 모바일에서 접힘 (Accordion)
+- Connect 섹션은 항상 표시 (소셜 + 뉴스레터)
+
+**레이아웃 통합:**
+- `flex flex-col min-h-screen` 패턴으로 하단 고정
+- Footer는 `mt-auto`로 푸시되어 하단에 배치
+- 일부 페이지(Explore, Feed)에서 Footer 숨김 처리
+
+**Last Updated:** 2026-02-05

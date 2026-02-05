@@ -351,3 +351,24 @@ useEffect(() => {
   --header-height-mobile: 56px;
 }
 ```
+
+---
+
+## 10. v2.0 Implementation Notes
+
+**구현 파일:**
+- Desktop: `lib/design-system/desktop-header.tsx` (DesktopHeader)
+- Mobile: `lib/design-system/mobile-header.tsx` (MobileHeader)
+
+**변경 사항 (v2.0):**
+- Sidebar 제거, Top header 패턴 채택
+- Desktop: 64px 높이, 검색/네비게이션 통합
+- Mobile: 56px 높이, 백 버튼 + 타이틀 + 액션 레이아웃
+- 간소화된 모바일 헤더 (로고 + 테마 토글 + 더보기 메뉴)
+
+**토큰 참조:**
+- Height: Desktop 64px, Mobile 56px
+- z-index: header (30)
+- 모바일에서 주요 네비게이션은 MobileNavBar(하단)로 이동
+
+**Last Updated:** 2026-02-05

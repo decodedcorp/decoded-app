@@ -113,3 +113,24 @@
 ## 9. 관련 문서
 
 - [CMN-01 헤더](./CMN-01-header.md) - 모바일에서 간소화된 헤더와 함께 사용
+
+---
+
+## 10. v2.0 Implementation Notes
+
+**구현 파일:**
+- `lib/components/ui/mobile-nav-bar.tsx` (MobileNavBar)
+
+**변경 사항 (v2.0):**
+- Bottom navigation 유지 (Instagram 스타일)
+- 56px 높이 (h-14)
+- 4개 탭: Home, Explore, Create(disabled), Profile(disabled)
+- Active 상태: stroke-[2.5], text-foreground
+- 구현 상태: Home, Explore만 활성화
+
+**Header와 조합:**
+- MobileHeader (상단) + MobileNavBar (하단)
+- 페이지 콘텐츠에 pt-14 pb-14 padding 적용 필요
+- safe-area-inset-bottom 지원으로 iPhone 노치 대응
+
+**Last Updated:** 2026-02-05
