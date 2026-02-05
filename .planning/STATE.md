@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 **Active Milestones:**
-- **v2.0 Design Overhaul** - Phase v2-08 IN PROGRESS (1/3 plans done)
+- **v2.0 Design Overhaul** - Phase v2-08 IN PROGRESS (2/3 plans done)
 
 **v1.1 Status:** SHIPPED (2026-01-29) - All 4 tracks merged to main
-**v2.0 Status:** Phase v2-08 IN PROGRESS (1/3 plans done)
-**Last activity:** 2026-02-05 - Completed v2-08-01-PLAN.md (Request Flow Design System)
+**v2.0 Status:** Phase v2-08 IN PROGRESS (2/3 plans done)
+**Last activity:** 2026-02-05 - Completed v2-08-02-PLAN.md (Request Flow Step Transitions)
 
 ### Execution Flow
 
@@ -38,13 +38,13 @@ v2.0 (feature/v2-design-overhaul):
    │
    ├─ v2-Phase 7: Search & Image Detail ─── COMPLETE ✓
    │
-   ├─ v2-Phase 8: Request Flow & Login ─── IN PROGRESS (1/3)
+   ├─ v2-Phase 8: Request Flow & Login ─── IN PROGRESS (2/3)
    │
    └─ v2-Phase 9: Documentation & Polish ─── NOT STARTED
 ```
 
 **v1.1 Progress:** ██████████ (100% - SHIPPED)
-**v2.0 Progress:** █████████░ (81% - 22 of 27 plans complete)
+**v2.0 Progress:** █████████░ (85% - 23 of 27 plans complete)
 
 ## Milestones
 
@@ -80,7 +80,7 @@ See: .planning/ROADMAP-v2.md
 | v2-5: Home & Explore Pages | 3/3 | **Complete** (v2-05-01, v2-05-02, v2-05-03 done) |
 | v2-6: Feed & Profile Pages | 3/3 | **Complete** (v2-06-01, v2-06-02, v2-06-03 done) |
 | v2-7: Search & Image Detail | 3/3 | **Complete** (v2-07-01, v2-07-02, v2-07-03 done) |
-| v2-8: Request Flow & Login | 1/3 | **In Progress** (v2-08-01 done) |
+| v2-8: Request Flow & Login | 2/3 | **In Progress** (v2-08-01, v2-08-02 done) |
 | v2-9: Documentation & Polish | 0/3 | Not started |
 
 ## Accumulated Context
@@ -183,6 +183,9 @@ See: .planning/ROADMAP-v2.md
 - **StepIndicator Simplification (v2-08-01):** Remove connecting lines, fixed 8px dots with 8px gap, Primary color for active/completed
 - **RequestFlowHeader Layout (v2-08-01):** 56px height with centered StepIndicator, no title text
 - **DropZone Design Tokens (v2-08-01):** Use design system tokens (border-border, bg-muted), Upload icon instead of Camera
+- **Step Transition Pattern (v2-08-02):** Direction-aware slide animations (forward: right-to-left, backward: left-to-right) with 0.2s ease-out
+- **Direction Tracking (v2-08-02):** Use useRef to track previous step for direction calculation without triggering re-renders
+- **AnimatePresence mode="wait" (v2-08-02):** Prevent content overlap during transitions, old content exits before new enters
 
 ### Open Items
 - v2 deferred: Admin dashboard, real-time notifications
@@ -197,18 +200,18 @@ See: .planning/ROADMAP-v2.md
 ## Session Continuity
 
 **Last session:** 2026-02-05
-**Stopped at:** Completed v2-08-01-PLAN.md (Request Flow Design System)
+**Stopped at:** Completed v2-08-02-PLAN.md (Request Flow Step Transitions)
 **Resume file:** None
 
 **Next Steps:**
 
 ```bash
-# Phase v2-08: Request Flow & Login - IN PROGRESS (1/3 done)
+# Phase v2-08: Request Flow & Login - IN PROGRESS (2/3 done)
 git checkout feature/v2-design-overhaul  # 현재 브랜치
-# Next: v2-08-02 (Detection & Details refinement) or v2-08-03 (Login Page)
-/gsd:execute-phase v2-08  # Execute next plan
+# Next: v2-08-03 (Login Page simplification)
+/gsd:execute-phase v2-08  # Execute final plan
 # Or test current changes
-npm run dev  # Verify 3-step flow, StepIndicator styling, DropZone design
+npm run dev  # Verify step transitions slide correctly (forward: right-to-left, backward: left-to-right)
 ```
 
 ### Quick Tasks Completed
