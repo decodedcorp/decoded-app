@@ -5,16 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** 완전한 사용자 경험 — 모든 페이지가 실제 데이터로 동작
-**Current focus:** v2.0 Design Overhaul
+**Current focus:** v2.1 Design System Expansion
 
 ## Current Position
 
 **Active Milestones:**
-- **v2.0 Design Overhaul** - Phase v2-09 IN PROGRESS (1/3 plans done)
+- **v2.1 Design System Expansion** - Defining requirements
 
 **v1.1 Status:** SHIPPED (2026-01-29) - All 4 tracks merged to main
-**v2.0 Status:** Phase v2-09 IN PROGRESS (1/3 plans done)
-**Last activity:** 2026-02-05 - Completed v2-09-01-PLAN.md (Design System Documentation)
+**v2.0 Status:** SHIPPED (2026-02-05) - 26 plans complete, Visual QA deferred to v2.1
+**v2.1 Status:** Defining requirements
+**Last activity:** 2026-02-05 - Milestone v2.1 started
 
 ### Execution Flow
 
@@ -22,32 +23,20 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 v1.1 (main branch): ─── SHIPPED ✓
    Phase 6 + Tracks A-D merged
 
-v2.0 (feature/v2-design-overhaul):
+v2.0 (feature/v2-design-overhaul): ─── SHIPPED ✓
    │
-   ├─ v2-Phase 1: Design System Foundation ─── COMPLETE ✓
+   ├─ v2-Phase 1-8 ─── COMPLETE ✓
    │
-   ├─ v2-Phase 2: Core Interactive Components ─── COMPLETE ✓
+   └─ v2-Phase 9: Documentation & Polish ─── COMPLETE (Visual QA deferred)
+
+v2.1 (feature/v2-design-overhaul):
    │
-   ├─ v2-Phase 3: Card Components ─── COMPLETE ✓
-   │
-   ├─ v2-Phase 4: Desktop Infrastructure ─── COMPLETE ✓
-   │
-   ├─ v2-Phase 5: Home & Explore Pages ─── COMPLETE ✓
-   │
-   ├─ v2-Phase 6: Feed & Profile Pages ─── COMPLETE ✓
-   │
-   ├─ v2-Phase 7: Search & Image Detail ─── COMPLETE ✓
-   │
-   ├─ v2-Phase 8: Request Flow & Login ─── COMPLETE ✓
-   │
-   └─ v2-Phase 9: Documentation & Polish ─── IN PROGRESS
-       ├─ 01: Design System Docs ─── COMPLETE ✓
-       ├─ 02: Project Docs Update ─── NOT STARTED
-       └─ 03: Final Polish ─── NOT STARTED
+   └─ Defining requirements...
 ```
 
 **v1.1 Progress:** ██████████ (100% - SHIPPED)
-**v2.0 Progress:** █████████░ (93% - 25 of 27 plans complete)
+**v2.0 Progress:** ██████████ (100% - SHIPPED)
+**v2.1 Progress:** ░░░░░░░░░░ (0% - Defining requirements)
 
 ## Milestones
 
@@ -70,21 +59,25 @@ v2.0 (feature/v2-design-overhaul):
 | Track D: Monetization | 3/3 | ✅ Merged |
 | **Total** | **13/13** | **SHIPPED** |
 
-### v2.0 Design Overhaul (IN PROGRESS)
+### v2.0 Design Overhaul (SHIPPED)
 
 See: .planning/ROADMAP-v2.md
 
 | Phase | Plans | Status |
 |-------|-------|--------|
-| v2-1: Design System Foundation | 3/3 | **Complete** (v2-01-01, v2-01-02, v2-01-03 done) |
-| v2-2: Core Interactive Components | 3/3 | **Complete** (v2-02-01, v2-02-02, v2-02-03 done) |
-| v2-3: Card Components | 3/3 | **Complete** (v2-03-01, v2-03-02, v2-03-03 done) |
-| v2-4: Desktop Infrastructure | 3/3 | **Complete** (v2-04-01, v2-04-02, v2-04-03 done) |
-| v2-5: Home & Explore Pages | 3/3 | **Complete** (v2-05-01, v2-05-02, v2-05-03 done) |
-| v2-6: Feed & Profile Pages | 3/3 | **Complete** (v2-06-01, v2-06-02, v2-06-03 done) |
-| v2-7: Search & Image Detail | 3/3 | **Complete** (v2-07-01, v2-07-02, v2-07-03 done) |
-| v2-8: Request Flow & Login | 3/3 | **Complete** (v2-08-01, v2-08-02, v2-08-03 done) |
-| v2-9: Documentation & Polish | 1/3 | **In Progress** (v2-09-01 done) |
+| v2-1: Design System Foundation | 3/3 | ✅ Complete |
+| v2-2: Core Interactive Components | 3/3 | ✅ Complete |
+| v2-3: Card Components | 3/3 | ✅ Complete |
+| v2-4: Desktop Infrastructure | 3/3 | ✅ Complete |
+| v2-5: Home & Explore Pages | 3/3 | ✅ Complete |
+| v2-6: Feed & Profile Pages | 3/3 | ✅ Complete |
+| v2-7: Search & Image Detail | 3/3 | ✅ Complete |
+| v2-8: Request Flow & Login | 3/3 | ✅ Complete |
+| v2-9: Documentation & Polish | 2/3 | ✅ Complete (Visual QA deferred) |
+
+### v2.1 Design System Expansion (Defining Requirements)
+
+Remaining decoded.pen components to implement. Requirements TBD.
 
 ## Accumulated Context
 
@@ -211,17 +204,15 @@ See: .planning/ROADMAP-v2.md
 ## Session Continuity
 
 **Last session:** 2026-02-05
-**Stopped at:** Completed quick task 014 (Fix upload 502 error handling)
+**Stopped at:** v2.0 shipped, starting v2.1 Design System Expansion
 **Resume file:** None
 
 **Next Steps:**
 
 ```bash
-# Phase v2-09: Documentation & Polish - IN PROGRESS (1/3 done)
+# v2.1 Design System Expansion - Defining requirements
 git checkout feature/v2-design-overhaul  # 현재 브랜치
-/gsd:plan-phase v2-09  # Next: Plan remaining phase tasks (v2-09-02, v2-09-03)
-# Or view completed design system docs
-open docs/design-system/README.md  # View updated v2.0 documentation
+# Continue /gsd:new-milestone flow to define requirements and create roadmap
 ```
 
 ### Quick Tasks Completed

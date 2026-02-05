@@ -6,22 +6,23 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 
 **v1.0 (2026-01-29 shipped):** 문서화 최적화
 **v1.1 (2026-01-29 shipped):** 전체 API 연결 — 백엔드 API를 프론트엔드에 연결하여 실제 데이터로 동작
-**v2.0 (진행중):** 디자인 오버홀 — decoded.pen 디자인을 코드로 구현
+**v2.0 (2026-02-05 shipped):** 디자인 오버홀 — decoded.pen 디자인을 코드로 구현
+**v2.1 (진행중):** 디자인 시스템 확장 — decoded.pen 미구현 컴포넌트 완성
 
 ## Active Milestones
 
-### v2.0 Design Overhaul (진행중)
+### v2.1 Design System Expansion (진행중)
 
-**Goal:** decoded.pen 디자인을 Pencil MCP로 코드로 변환하여 디자인-코드 일관성 확보
+**Goal:** decoded.pen에 정의된 미구현 컴포넌트 60+개 완성으로 디자인 시스템 100% 구현
 
 **Target features:**
-- 디자인 시스템 컴포넌트 (Buttons, Cards, Inputs, Tags, Typography)
-- 데스크탑 인프라 (Header, Footer, Sidebar, Layouts)
-- 8개 페이지 (Home, Feed, Profile, Search, Image Detail, Request Flow, Explore, Login)
-- 모바일 + 데스크탑 반응형 레이아웃
-- 문서 업데이트 (docs, specs, codebase)
+- High Priority: Tag 컴포넌트, StepIndicator, Hotspot, ActionButton 변형
+- Medium Priority: NavBar, ArtistCard, StatCard, Badge, LeaderItem, SearchTabs
+- Login: OAuthButton (Kakao, Google, Apple), GuestButton, Divider, LoginCard
+- States: EmptyState, ErrorState, LoadingSpinner, SkeletonCard
+- Detail: SpotCard 변형, SpotDetail, ShopCarouselCard, RankingItem
 
-**Branch:** `feature/v2-design-overhaul` (v1.1과 별도 브랜치)
+**Branch:** `feature/v2-design-overhaul` (계속 사용)
 
 ## Core Value
 
@@ -59,14 +60,24 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 
 ### Active
 
-**v2.0 Design Overhaul:**
+**v2.0 Design Overhaul (완료):**
 - [x] 디자인 토큰 추출 (색상, 타이포그래피, 간격)
 - [x] 타이포그래피 컴포넌트 구현 (Heading, Text)
 - [x] Tailwind CSS 설정 확장
-- [ ] 버튼, 입력, 태그 컴포넌트
-- [ ] 카드 컴포넌트 (Product, Feed, Profile)
-- [ ] 데스크탑 레이아웃 (Header, Footer, Sidebar)
-- [ ] 페이지별 디자인 적용 (8개 페이지)
+- [x] 버튼, 입력, 태그 컴포넌트
+- [x] 카드 컴포넌트 (Product, Feed, Profile)
+- [x] 데스크탑 레이아웃 (Header, Footer)
+- [x] 페이지별 디자인 적용 (8개 페이지)
+
+**v2.1 Design System Expansion:**
+- [ ] Tag 컴포넌트 (All, Latest, Clothing, Accessories, Shoes, Bags)
+- [ ] StepIndicator (3-step progress)
+- [ ] Hotspot 컴포넌트 (Default, Numbered, Inactive)
+- [ ] EmptyState, ErrorState, LoadingSpinner
+- [ ] OAuthButton (Kakao, Google, Apple), LoginCard
+- [ ] ArtistCard, StatCard, Badge, LeaderItem
+- [ ] SpotCard 변형, SpotDetail, ShopCarouselCard
+- [ ] Visual QA with Playwright
 
 ### Out of Scope
 
@@ -105,4 +116,4 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 
 ---
 
-*Last updated: 2026-01-29 after v1.1 milestone completion*
+*Last updated: 2026-02-05 after v2.0 milestone completion, starting v2.1*

@@ -79,3 +79,72 @@
 **What's next:** v2.0 Design Overhaul (병렬 진행 중)
 
 ---
+
+## v2.0 Design Overhaul (Shipped: 2026-02-05)
+
+**Delivered:** decoded.pen 디자인 시스템을 코드로 구현하여 일관된 UI/UX 제공
+
+**Phases completed:** v2-Phase 1-9 (9 phases, 26 plans total)
+
+**Branch:** `feature/v2-design-overhaul`
+
+**Key accomplishments:**
+
+- **Design System Foundation (v2-Phase 1):**
+  - Typography components (Heading, Text with variants)
+  - Design tokens (colors, spacing, typography, shadows)
+  - Tailwind CSS configuration extension
+
+- **Core Interactive Components (v2-Phase 2):**
+  - Button with 9 variants (Primary, Secondary, Outline, Ghost, Destructive) + 3 sizes
+  - Input and SearchInput with icons, validation states
+  - Tag components for category filtering
+
+- **Card Components (v2-Phase 3):**
+  - Base Card with cva variants and slots
+  - ProductCard, GridCard for product display
+  - FeedCard, ProfileHeaderCard for social features
+
+- **Desktop Infrastructure (v2-Phase 4):**
+  - DesktopHeader with navigation (replacing sidebar)
+  - MobileHeader with bottom navigation
+  - DesktopFooter with responsive 4-column layout
+
+- **Page Implementations (v2-Phase 5-8):**
+  - Home: Hero, trending, best sections with celebrity grid
+  - Explore: Category filter grid with fade transitions
+  - Feed: Responsive grid with engagement actions
+  - Profile: 2-column desktop layout with activity tabs
+  - Search: Full-screen overlay with multi-tab results
+  - Image Detail: Hero parallax, lightbox, shop grid
+  - Request Flow: 3-step indicator, direction-aware transitions
+  - Login: Google OAuth simplification
+
+- **Documentation (v2-Phase 9):**
+  - Design system docs (tokens, components, patterns)
+  - Codebase analysis updates
+  - CLAUDE.md design system guidelines
+
+**Components implemented:** 25+ design system components
+- Typography: Heading, Text
+- Inputs: Input, SearchInput
+- Cards: Card, ProductCard, GridCard, FeedCard, ProfileHeaderCard
+- Headers: DesktopHeader, MobileHeader
+- Footer: DesktopFooter
+
+**Components deferred to v2.1:** ~60 (from decoded.pen analysis)
+- Tags, StepIndicator, Hotspot, EmptyState, ErrorState
+- OAuthButton variants, ArtistCard, StatCard, Badge
+- And more specialized components
+
+**Stats:**
+
+- 9 phases, 26 plans executed
+- 8 pages redesigned (Home, Explore, Feed, Profile, Search, Image Detail, Request, Login)
+- 7 days (2026-01-29 → 2026-02-05)
+
+**Git range:** `f8c7afe` → (current)
+
+**What's next:** v2.1 Design System Expansion
+
+---

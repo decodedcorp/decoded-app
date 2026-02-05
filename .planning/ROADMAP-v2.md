@@ -29,7 +29,7 @@ v2.0 transforms the decoded-app UI by implementing the decoded.pen design system
 - [x] **v2-Phase 6: Feed & Profile Pages** - Content streams and user profiles
 - [x] **v2-Phase 7: Search & Image Detail** - Discovery and detailed views
 - [x] **v2-Phase 8: Request Flow & Login** - Multi-step flows and authentication
-- [ ] **v2-Phase 9: Documentation & Polish** - Design system docs, final adjustments
+- [x] **v2-Phase 9: Documentation & Polish** - Design system docs, final adjustments (Visual QA deferred)
 
 ## Phase Details
 
@@ -181,9 +181,9 @@ Plans:
 **Plans:** 3 plans (2 waves)
 
 Plans:
-- [ ] v2-09-01-PLAN.md — Design system documentation (tokens, components, patterns) [Wave 1]
-- [ ] v2-09-02-PLAN.md — Codebase docs, CLAUDE.md, and specs update [Wave 1]
-- [ ] v2-09-03-PLAN.md — Visual QA with Playwright screenshots and polish [Wave 2]
+- [x] v2-09-01-PLAN.md — Design system documentation (tokens, components, patterns) [Wave 1]
+- [x] v2-09-02-PLAN.md — Codebase docs, CLAUDE.md, and specs update [Wave 1]
+- [ ] v2-09-03-PLAN.md — Visual QA with Playwright screenshots and polish [Wave 2] ⏸️ Deferred to v2.1
 
 ## Progress
 
@@ -205,7 +205,7 @@ v2-Phases execute sequentially: v2-Phase 1 → v2-Phase 2 → ... → v2-Phase 9
 | v2-6. Feed & Profile Pages | 3/3 | **Complete** | 2026-01-29 |
 | v2-7. Search & Image Detail | 3/3 | **Complete** | 2026-02-05 |
 | v2-8. Request Flow & Login | 3/3 | **Complete** | 2026-02-05 |
-| v2-9. Documentation & Polish | 0/3 | **Planned** | - |
+| v2-9. Documentation & Polish | 2/3 | **Complete** | 2026-02-05 |
 
 ---
 
