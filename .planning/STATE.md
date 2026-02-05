@@ -240,7 +240,8 @@ open docs/design-system/README.md  # View updated v2.0 documentation
 | 010 | Request 이미지 업로드 API 사용 (Supabase Storage 대체) | 2026-02-05 | 1b23b3c | [010-fix-request-use-api-instead-of-sup](./quick/010-fix-request-use-api-instead-of-sup/) |
 | 011 | Desktop header avatar links to /profile | 2026-02-05 | af8a5f2 | [011-header-avatar-profile-link](./quick/011-header-avatar-profile-link/) |
 | 012 | Profile 페이지 REST API 연결 | 2026-02-05 | 867bf97 | [012-profile-page-api-connection](./quick/012-profile-page-api-connection/) |
+| 013 | Fix request page excessive re-renders | 2026-02-05 | a591e1e | [013-fix-request-page-excessive-rerenders](./quick/013-fix-request-page-excessive-rerenders/) |
 
 ---
 
-*Last updated: 2026-02-05 after quick task 012*
+*Last updated: 2026-02-05 after quick task 013*
