@@ -17,6 +17,12 @@ const nextConfig = {
         hostname: "picsum.photos",
         pathname: "/**",
       },
+      // Unsplash images for Today's Decoded
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
       // DiceBear avatars for profile mock data
       {
         protocol: "https",
