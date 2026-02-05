@@ -32,6 +32,16 @@ export interface UploadedImage {
   error?: string;
 }
 
+// Solution 정보 (사용자가 알고 있는 상품 정보)
+export interface SpotSolutionData {
+  title: string;
+  originalUrl: string;
+  thumbnailUrl?: string;
+  priceAmount?: number;
+  priceCurrency?: string; // default: 'KRW'
+  description?: string;
+}
+
 // AI 감지 결과 - Spot 데이터
 export interface DetectedSpot {
   id: string;
@@ -50,6 +60,9 @@ export interface DetectedSpot {
   priceRange?: string;
   imageUrl?: string; // 아이템 썸네일 이미지
   confidence?: number; // AI 신뢰도
+
+  // Solution (사용자가 알고 있는 상품 정보)
+  solution?: SpotSolutionData;
 }
 
 // AI 메타데이터 (Step 3 초기값으로 사용)
@@ -101,6 +114,10 @@ interface RequestState {
   startDetection: () => Promise<void>;
   setDetectedSpots: (spots: DetectedSpot[]) => void;
   selectSpot: (spotId: string | null) => void;
+
+  // Actions - Solution
+  setSpotSolution: (spotId: string, solution: SpotSolutionData) => void;
+  clearSpotSolution: (spotId: string) => void;
 
   // Actions - Details (Step 3)
   setDescription: (description: string) => void;
@@ -327,6 +344,23 @@ export const useRequestStore = create<RequestState>((set, get) => ({
     set({ selectedSpotId: spotId });
   },
 
+  // Solution Actions
+  setSpotSolution: (spotId, solution) => {
+    set((state) => ({
+      detectedSpots: state.detectedSpots.map((spot) =>
+        spot.id === spotId ? { ...spot, solution } : spot
+      ),
+    }));
+  },
+
+  clearSpotSolution: (spotId) => {
+    set((state) => ({
+      detectedSpots: state.detectedSpots.map((spot) =>
+        spot.id === spotId ? { ...spot, solution: undefined } : spot
+      ),
+    }));
+  },
+
   // Step 3 Actions
   setDescription: (description) => {
     set({ description });
@@ -435,6 +469,12 @@ export const selectDetectionError = (state: RequestState) =>
   state.detectionError;
 export const selectAiMetadata = (state: RequestState) => state.aiMetadata;
 
+// Solution selectors
+export const selectHasSolutions = (state: RequestState): boolean =>
+  state.detectedSpots.some((spot) => spot.solution !== undefined);
+export const selectSpotsWithSolutions = (state: RequestState) =>
+  state.detectedSpots.filter((spot) => spot.solution !== undefined);
+
 // Step 3 selectors
 export const selectDescription = (state: RequestState) => state.description;
 export const selectExtractedMetadata = (state: RequestState) =>
@@ -466,6 +506,8 @@ export const getRequestActions = () => {
     startDetection: state.startDetection,
     setDetectedSpots: state.setDetectedSpots,
     selectSpot: state.selectSpot,
+    setSpotSolution: state.setSpotSolution,
+    clearSpotSolution: state.clearSpotSolution,
     setDescription: state.setDescription,
     setExtractedMetadata: state.setExtractedMetadata,
     setIsExtractingMetadata: state.setIsExtractingMetadata,

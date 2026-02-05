@@ -16,6 +16,7 @@ export {
   analyzeImage,
   extractMetadata,
   createPost,
+  createPostWithSolution,
 } from "./posts";
 export type { UploadImageOptions } from "./posts";
 

@@ -8,9 +8,12 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   createPost,
+  createPostWithSolution,
   storeToApiCoord,
   type CreatePostRequest,
+  type CreatePostWithSolutionRequest,
   type CreatePostResponse,
+  type SpotWithSolutionRequest,
 } from "@/lib/api";
 import {
   useRequestStore,
@@ -62,41 +65,89 @@ export function useCreatePost(options: UseCreatePostOptions = {}) {
         throw new Error("미디어 소스 정보가 필요합니다.");
       }
 
-      // Spots를 API 형식으로 변환
-      const spots = detectedSpots.map((spot) => {
-        const categoryId = spot.categoryCode
-          ? categoryCodeMap.get(spot.categoryCode)
-          : undefined;
+      // Solution이 있는 spot이 하나라도 있는지 확인
+      const hasSolutions = detectedSpots.some((spot) => spot.solution);
 
-        if (!categoryId) {
-          // 카테고리 ID를 찾을 수 없으면 기본값 사용 또는 에러
-          console.warn(
-            `Category not found for code: ${spot.categoryCode}, using first available`
-          );
-        }
+      if (hasSolutions) {
+        // Solution을 아는 유저 → /api/v1/posts/with-solution
+        const spotsWithSolution: SpotWithSolutionRequest[] = detectedSpots
+          .filter((spot) => spot.solution)
+          .map((spot) => {
+            const categoryId = spot.categoryCode
+              ? categoryCodeMap.get(spot.categoryCode)
+              : undefined;
 
-        return {
-          position_left: storeToApiCoord(spot.center.x),
-          position_top: storeToApiCoord(spot.center.y),
-          category_id: categoryId || "", // 빈 문자열은 서버에서 처리
+            if (!categoryId) {
+              console.warn(
+                `Category not found for code: ${spot.categoryCode}, using first available`
+              );
+            }
+
+            return {
+              position_left: storeToApiCoord(spot.center.x),
+              position_top: storeToApiCoord(spot.center.y),
+              category_id: categoryId || "",
+              solution: {
+                title: spot.solution!.title,
+                original_url: spot.solution!.originalUrl,
+                thumbnail_url: spot.solution!.thumbnailUrl,
+                price_amount: spot.solution!.priceAmount,
+                price_currency: spot.solution!.priceCurrency || "KRW",
+                description: spot.solution!.description,
+              },
+            };
+          })
+          .filter((s) => s.category_id);
+
+        const request: CreatePostWithSolutionRequest = {
+          image_url: uploadedImage.uploadedUrl,
+          media_source: mediaSource,
+          spots: spotsWithSolution,
+          ...(description && { description }),
+          ...(extractedMetadata.length > 0 && {
+            media_metadata: extractedMetadata,
+          }),
+          ...(artistName && { artist_name: artistName }),
+          ...(groupName && { group_name: groupName }),
+          ...(context && { context }),
         };
-      });
 
-      // 요청 데이터 구성
-      const request: CreatePostRequest = {
-        image_url: uploadedImage.uploadedUrl,
-        media_source: mediaSource,
-        spots: spots.filter((s) => s.category_id), // 유효한 카테고리만 포함
-        ...(description && { description }),
-        ...(extractedMetadata.length > 0 && {
-          media_metadata: extractedMetadata,
-        }),
-        ...(artistName && { artist_name: artistName }),
-        ...(groupName && { group_name: groupName }),
-        ...(context && { context }),
-      };
+        return createPostWithSolution(request);
+      } else {
+        // Solution을 모르는 유저 → /api/v1/posts (기존)
+        const spots = detectedSpots.map((spot) => {
+          const categoryId = spot.categoryCode
+            ? categoryCodeMap.get(spot.categoryCode)
+            : undefined;
 
-      return createPost(request);
+          if (!categoryId) {
+            console.warn(
+              `Category not found for code: ${spot.categoryCode}, using first available`
+            );
+          }
+
+          return {
+            position_left: storeToApiCoord(spot.center.x),
+            position_top: storeToApiCoord(spot.center.y),
+            category_id: categoryId || "",
+          };
+        });
+
+        const request: CreatePostRequest = {
+          image_url: uploadedImage.uploadedUrl,
+          media_source: mediaSource,
+          spots: spots.filter((s) => s.category_id),
+          ...(description && { description }),
+          ...(extractedMetadata.length > 0 && {
+            media_metadata: extractedMetadata,
+          }),
+          ...(artistName && { artist_name: artistName }),
+          ...(groupName && { group_name: groupName }),
+          ...(context && { context }),
+        };
+
+        return createPost(request);
+      }
     },
     onMutate: () => {
       setSubmitting(true);

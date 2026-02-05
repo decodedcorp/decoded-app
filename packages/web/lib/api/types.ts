@@ -124,6 +124,49 @@ export interface CreatePostResponse {
 }
 
 // ============================================================
+// Create Post with Solution API
+// POST /api/v1/posts/with-solution
+// Solution을 아는 유저용
+// ============================================================
+
+/**
+ * Solution 정보 (spot과 함께 제출)
+ */
+export interface SpotSolution {
+  title: string;
+  original_url: string;
+  thumbnail_url?: string;
+  price_amount?: number;
+  price_currency?: string; // default: 'KRW'
+  description?: string;
+}
+
+/**
+ * Spot with solution request
+ */
+export interface SpotWithSolutionRequest {
+  position_left: string; // 백분율 문자열 (예: "45.5%")
+  position_top: string; // 백분율 문자열 (예: "30.2%")
+  category_id: string; // UUID
+  solution: SpotSolution;
+}
+
+/**
+ * Create post with solutions request
+ * Solution을 아는 유저가 spot과 함께 solution을 제출
+ */
+export interface CreatePostWithSolutionRequest {
+  image_url: string;
+  media_source: MediaSource;
+  spots: SpotWithSolutionRequest[];
+  artist_name?: string;
+  group_name?: string;
+  context?: ContextType;
+  description?: string;
+  media_metadata?: MediaMetadataItem[];
+}
+
+// ============================================================
 // Posts List API
 // GET /api/v1/posts
 // ============================================================

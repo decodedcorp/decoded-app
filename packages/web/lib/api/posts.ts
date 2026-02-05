@@ -14,6 +14,7 @@ import {
   ExtractMetadataResponse,
   CreatePostRequest,
   CreatePostResponse,
+  CreatePostWithSolutionRequest,
   PostsListResponse,
   PostsListParams,
   ApiError,
@@ -203,6 +204,23 @@ export async function createPost(
 ): Promise<CreatePostResponse> {
   return apiClient<CreatePostResponse>({
     path: "/api/v1/posts",
+    method: "POST",
+    body: request,
+    requiresAuth: true,
+  });
+}
+
+// ============================================================
+// Create Post with Solution
+// POST /api/v1/posts/with-solution
+// Solution을 아는 유저용
+// ============================================================
+
+export async function createPostWithSolution(
+  request: CreatePostWithSolutionRequest
+): Promise<CreatePostResponse> {
+  return apiClient<CreatePostResponse>({
+    path: "/api/v1/posts/with-solution",
     method: "POST",
     body: request,
     requiresAuth: true,
