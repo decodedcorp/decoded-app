@@ -13,6 +13,7 @@ import {
   type DetectedSpot,
 } from "@/lib/stores/requestStore";
 import { useImageUpload } from "@/lib/hooks/useImageUpload";
+import { useCategoryCodeMap } from "@/lib/hooks/useCategories";
 import { uploadImage, createPost } from "@/lib/api/posts";
 import { compressImage } from "@/lib/utils/imageCompression";
 import { RequestFlowHeader } from "@/lib/components/request/RequestFlowHeader";
@@ -31,12 +32,16 @@ export default function RequestUploadPage() {
   const detectedSpots = useRequestStore(selectDetectedSpots);
   const selectedSpotId = useRequestStore(selectSelectedSpotId);
 
-  // canProceed를 spots 기반으로 계산
-  const canProceed = detectedSpots.length > 0 && !isSubmitting;
-
   // autoUpload: false, autoAnalyze: false - 자동 업로드/분석 비활성화
   const { images, isMaxImages, handleFilesSelected, removeImage } =
     useImageUpload({ autoUpload: false, autoAnalyze: false });
+
+  // 카테고리 코드 → UUID 매핑
+  const categoryCodeMap = useCategoryCodeMap();
+
+  // canProceed를 spots 기반으로 계산 (카테고리 로드 필요)
+  const canProceed =
+    detectedSpots.length > 0 && !isSubmitting && categoryCodeMap.size > 0;
 
   // Action은 getRequestActions()로 접근 (구독 없이)
   const handleClose = useCallback(() => {
@@ -64,11 +69,18 @@ export default function RequestUploadPage() {
       toast.dismiss("upload");
 
       // 2. spots를 API 형식으로 변환 (solution 없이)
-      const spotsPayload = detectedSpots.map((spot) => ({
-        position_left: `${(spot.center.x * 100).toFixed(1)}%`,
-        position_top: `${(spot.center.y * 100).toFixed(1)}%`,
-        category_id: spot.categoryCode || "fashion", // TODO: Map to actual UUID
-      }));
+      const spotsPayload = detectedSpots.map((spot) => {
+        const categoryCode = spot.categoryCode || "fashion";
+        const categoryId = categoryCodeMap.get(categoryCode);
+        if (!categoryId) {
+          throw new Error(`카테고리를 찾을 수 없습니다: ${categoryCode}`);
+        }
+        return {
+          position_left: `${(spot.center.x * 100).toFixed(1)}%`,
+          position_top: `${(spot.center.y * 100).toFixed(1)}%`,
+          category_id: categoryId,
+        };
+      });
 
       // 3. POST API 호출
       toast.loading("포스트 생성 중...", { id: "create" });
