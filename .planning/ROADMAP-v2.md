@@ -144,12 +144,12 @@ Plans:
   3. User viewing image detail sees full-size image with metadata and related items
   4. Scroll actions trigger animations matching decoded.pen specifications
   5. Desktop and mobile layouts adapt correctly for both search and image detail pages
-**Plans**: TBD
+**Plans:** 3 plans (2 waves)
 
 Plans:
-- [ ] v2-07-01: Implement Search page with SearchInput and SearchTabs
-- [ ] v2-07-02: Implement Image Detail page with scroll animations
-- [ ] v2-07-03: Connect Item Cards and related content displays
+- [ ] v2-07-01-PLAN.md — Search overlay with recent searches and sliding tab underline [Wave 1]
+- [ ] v2-07-02-PLAN.md — Image Detail with decoded.pen hero, parallax, and lightbox [Wave 1]
+- [ ] v2-07-03-PLAN.md — Item Cards and related content grid integration [Wave 2]
 
 ### v2-Phase 8: Request Flow & Login
 **Goal**: Multi-step request flow and authentication pages render with decoded.pen design
