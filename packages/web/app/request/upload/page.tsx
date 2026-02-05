@@ -39,9 +39,8 @@ export default function RequestUploadPage() {
   // 카테고리 코드 → UUID 매핑
   const categoryCodeMap = useCategoryCodeMap();
 
-  // canProceed를 spots 기반으로 계산 (카테고리 로드 필요)
-  const canProceed =
-    detectedSpots.length > 0 && !isSubmitting && categoryCodeMap.size > 0;
+  // canProceed를 spots 기반으로 계산
+  const canProceed = detectedSpots.length > 0 && !isSubmitting;
 
   // Action은 getRequestActions()로 접근 (구독 없이)
   const handleClose = useCallback(() => {
@@ -56,6 +55,12 @@ export default function RequestUploadPage() {
     const localImage = images[0];
     if (!localImage?.file) {
       toast.error("이미지를 선택해주세요.");
+      return;
+    }
+
+    // 카테고리 로드 확인
+    if (categoryCodeMap.size === 0) {
+      toast.error("카테고리를 불러오는 중입니다. 잠시 후 다시 시도해주세요.");
       return;
     }
 
