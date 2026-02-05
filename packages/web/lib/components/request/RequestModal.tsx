@@ -20,7 +20,6 @@ import { StepIndicator } from "./StepIndicator";
 import { DetectionView } from "./DetectionView";
 import { DetectedItemCard } from "./DetectedItemCard";
 import { DetailsStep } from "./DetailsStep";
-import { SubmitStep } from "./SubmitStep";
 
 interface RequestModalProps {
   isOpen: boolean;
@@ -31,7 +30,6 @@ const STEP_TITLES: Record<number, string> = {
   1: "Upload Image",
   2: "Detected Items",
   3: "Details",
-  4: "Submit",
 };
 
 export function RequestModal({ isOpen, onClose }: RequestModalProps) {
@@ -96,7 +94,7 @@ export function RequestModal({ isOpen, onClose }: RequestModalProps) {
 
   const handleBack = useCallback(() => {
     if (currentStep > 1) {
-      setStep((currentStep - 1) as 1 | 2 | 3 | 4);
+      setStep((currentStep - 1) as 1 | 2 | 3);
     }
   }, [currentStep, setStep]);
 
@@ -109,9 +107,6 @@ export function RequestModal({ isOpen, onClose }: RequestModalProps) {
     } else if (currentStep === 2) {
       // Step 2 → Step 3: 다음 단계로 이동
       setStep(3);
-    } else if (currentStep === 3) {
-      // Step 3 → Step 4: 최종 단계
-      setStep(4);
     }
   }, [canProceed, currentStep, startDetection, setStep]);
 
@@ -238,15 +233,12 @@ export function RequestModal({ isOpen, onClose }: RequestModalProps) {
           )}
 
           {/* Step 3: Details */}
-          {currentStep === 3 && <DetailsStep />}
-
-          {/* Step 4: Submit */}
-          {currentStep === 4 && <SubmitStep onClose={handleClose} />}
+          {currentStep === 3 && <DetailsStep onClose={handleClose} />}
         </main>
 
-        {/* Footer - Step 4 has its own submit button */}
+        {/* Footer */}
         {(hasImages || currentStep > 1) &&
-          currentStep !== 4 &&
+          currentStep !== 3 &&
           !isDetecting &&
           !isRevealing && (
             <footer className="flex justify-end px-4 py-3 border-t border-border flex-shrink-0">
