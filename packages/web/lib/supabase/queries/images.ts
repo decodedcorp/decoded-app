@@ -11,7 +11,6 @@ export {
   fetchImagesByPostImage,
   fetchRelatedImagesByAccount,
   fetchUnifiedImages,
-  fetchOrphanImages,
   encodeCursor,
   decodeCursor,
 } from "@decoded/shared";

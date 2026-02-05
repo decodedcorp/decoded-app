@@ -55,7 +55,6 @@ export {
   fetchImagesByPostImage,
   fetchRelatedImagesByAccount,
   fetchUnifiedImages,
-  fetchOrphanImages,
   encodeCursor,
   decodeCursor,
 } from "./supabase/queries/images";
