@@ -16,6 +16,8 @@ import {
   useRequestStore,
   selectImages,
   selectDetectedSpots,
+  selectDescription,
+  selectExtractedMetadata,
   selectMediaSource,
   selectArtistName,
   selectGroupName,
@@ -35,6 +37,8 @@ export function useCreatePost(options: UseCreatePostOptions = {}) {
   // Store selectors
   const images = useRequestStore(selectImages);
   const detectedSpots = useRequestStore(selectDetectedSpots);
+  const description = useRequestStore(selectDescription);
+  const extractedMetadata = useRequestStore(selectExtractedMetadata);
   const mediaSource = useRequestStore(selectMediaSource);
   const artistName = useRequestStore(selectArtistName);
   const groupName = useRequestStore(selectGroupName);
@@ -83,6 +87,10 @@ export function useCreatePost(options: UseCreatePostOptions = {}) {
         image_url: uploadedImage.uploadedUrl,
         media_source: mediaSource,
         spots: spots.filter((s) => s.category_id), // 유효한 카테고리만 포함
+        ...(description && { description }),
+        ...(extractedMetadata.length > 0 && {
+          media_metadata: extractedMetadata,
+        }),
         ...(artistName && { artist_name: artistName }),
         ...(groupName && { group_name: groupName }),
         ...(context && { context }),

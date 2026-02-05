@@ -8,6 +8,7 @@ import {
   selectContext,
   selectAiMetadata,
 } from "@/lib/stores/requestStore";
+import { DescriptionInput } from "./DescriptionInput";
 import { MediaSourceInput } from "./MediaSourceInput";
 import { ArtistInput } from "./ArtistInput";
 import { ContextSelector } from "./ContextSelector";
@@ -32,6 +33,11 @@ export function DetailsStep() {
         <p className="text-sm text-muted-foreground">
           Add details about where this image is from
         </p>
+      </div>
+
+      {/* Description (Optional) - AI extracts metadata */}
+      <div className="p-4 rounded-xl bg-foreground/[0.02] border border-border">
+        <DescriptionInput />
       </div>
 
       {/* Media Source (Required) */}
