@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 **Active Milestones:**
-- **v2.0 Design Overhaul** - Phase v2-08 IN PROGRESS (2/3 plans done)
+- **v2.0 Design Overhaul** - Phase v2-08 COMPLETE (3/3 plans done)
 
 **v1.1 Status:** SHIPPED (2026-01-29) - All 4 tracks merged to main
-**v2.0 Status:** Phase v2-08 IN PROGRESS (2/3 plans done)
-**Last activity:** 2026-02-05 - Completed v2-08-02-PLAN.md (Request Flow Step Transitions)
+**v2.0 Status:** Phase v2-08 COMPLETE (3/3 plans done)
+**Last activity:** 2026-02-05 - Completed v2-08-03-PLAN.md (Login Page Google-Only OAuth)
 
 ### Execution Flow
 
@@ -38,13 +38,13 @@ v2.0 (feature/v2-design-overhaul):
    │
    ├─ v2-Phase 7: Search & Image Detail ─── COMPLETE ✓
    │
-   ├─ v2-Phase 8: Request Flow & Login ─── IN PROGRESS (2/3)
+   ├─ v2-Phase 8: Request Flow & Login ─── COMPLETE ✓
    │
    └─ v2-Phase 9: Documentation & Polish ─── NOT STARTED
 ```
 
 **v1.1 Progress:** ██████████ (100% - SHIPPED)
-**v2.0 Progress:** █████████░ (85% - 23 of 27 plans complete)
+**v2.0 Progress:** █████████░ (89% - 24 of 27 plans complete)
 
 ## Milestones
 
@@ -80,7 +80,7 @@ See: .planning/ROADMAP-v2.md
 | v2-5: Home & Explore Pages | 3/3 | **Complete** (v2-05-01, v2-05-02, v2-05-03 done) |
 | v2-6: Feed & Profile Pages | 3/3 | **Complete** (v2-06-01, v2-06-02, v2-06-03 done) |
 | v2-7: Search & Image Detail | 3/3 | **Complete** (v2-07-01, v2-07-02, v2-07-03 done) |
-| v2-8: Request Flow & Login | 2/3 | **In Progress** (v2-08-01, v2-08-02 done) |
+| v2-8: Request Flow & Login | 3/3 | **Complete** (v2-08-01, v2-08-02, v2-08-03 done) |
 | v2-9: Documentation & Polish | 0/3 | Not started |
 
 ## Accumulated Context
@@ -186,6 +186,8 @@ See: .planning/ROADMAP-v2.md
 - **Step Transition Pattern (v2-08-02):** Direction-aware slide animations (forward: right-to-left, backward: left-to-right) with 0.2s ease-out
 - **Direction Tracking (v2-08-02):** Use useRef to track previous step for direction calculation without triggering re-renders
 - **AnimatePresence mode="wait" (v2-08-02):** Prevent content overlap during transitions, old content exits before new enters
+- **Google-Only OAuth (v2-08-03):** Simplified Login to single Google button for v2.0 launch, Kakao/Apple deferred
+- **OAuth Button Dimensions (v2-08-03):** 320px width, 52px height, 12px border-radius per decoded.pen spec
 
 ### Open Items
 - v2 deferred: Admin dashboard, real-time notifications
@@ -200,18 +202,17 @@ See: .planning/ROADMAP-v2.md
 ## Session Continuity
 
 **Last session:** 2026-02-05
-**Stopped at:** Completed v2-08-02-PLAN.md (Request Flow Step Transitions)
+**Stopped at:** Completed v2-08-03-PLAN.md (Login Page Google-Only OAuth)
 **Resume file:** None
 
 **Next Steps:**
 
 ```bash
-# Phase v2-08: Request Flow & Login - IN PROGRESS (2/3 done)
+# Phase v2-08: Request Flow & Login - COMPLETE (3/3 done)
 git checkout feature/v2-design-overhaul  # 현재 브랜치
-# Next: v2-08-03 (Login Page simplification)
-/gsd:execute-phase v2-08  # Execute final plan
+/gsd:discuss-phase v2-09  # Next: Discuss Documentation & Polish phase
 # Or test current changes
-npm run dev  # Verify step transitions slide correctly (forward: right-to-left, backward: left-to-right)
+yarn dev  # Verify request flow (3 steps, slide transitions), login (Google-only OAuth)
 ```
 
 ### Quick Tasks Completed
@@ -223,4 +224,4 @@ npm run dev  # Verify step transitions slide correctly (forward: right-to-left, 
 
 ---
 
-*Last updated: 2026-02-05 after v2-08-01 completion*
+*Last updated: 2026-02-05 after v2-08 phase completion*
