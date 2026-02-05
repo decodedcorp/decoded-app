@@ -42,18 +42,26 @@ export function RequestFlowModal({ children }: RequestFlowModalProps) {
       });
 
       // Fade out backdrop and scale down modal
-      tl.to(backdropRef.current, {
-        opacity: 0,
-        duration: 0.2,
-        ease: "power2.in",
-      }, 0);
+      tl.to(
+        backdropRef.current,
+        {
+          opacity: 0,
+          duration: 0.2,
+          ease: "power2.in",
+        },
+        0
+      );
 
-      tl.to(modalRef.current, {
-        opacity: 0,
-        scale: 0.95,
-        duration: 0.2,
-        ease: "power2.in",
-      }, 0);
+      tl.to(
+        modalRef.current,
+        {
+          opacity: 0,
+          scale: 0.95,
+          duration: 0.2,
+          ease: "power2.in",
+        },
+        0
+      );
     });
   }, [router, resetRequestFlow]);
 
@@ -75,18 +83,26 @@ export function RequestFlowModal({ children }: RequestFlowModalProps) {
       // Animate in
       const tl = gsap.timeline();
 
-      tl.to(backdropRef.current, {
-        opacity: 1,
-        duration: 0.3,
-        ease: "power2.out",
-      }, 0);
+      tl.to(
+        backdropRef.current,
+        {
+          opacity: 1,
+          duration: 0.3,
+          ease: "power2.out",
+        },
+        0
+      );
 
-      tl.to(modalRef.current, {
-        opacity: 1,
-        scale: 1,
-        duration: 0.3,
-        ease: "power2.out",
-      }, 0.1);
+      tl.to(
+        modalRef.current,
+        {
+          opacity: 1,
+          scale: 1,
+          duration: 0.3,
+          ease: "power2.out",
+        },
+        0.1
+      );
     }, containerRef);
 
     return () => {
@@ -125,7 +141,7 @@ export function RequestFlowModal({ children }: RequestFlowModalProps) {
       {/* Modal Container */}
       <div
         ref={modalRef}
-        className="relative z-10 flex flex-col w-full max-w-xl max-h-[90vh] bg-background rounded-2xl shadow-2xl overflow-hidden"
+        className="relative z-10 flex flex-col w-full max-w-4xl max-h-[90vh] bg-background rounded-2xl shadow-2xl overflow-hidden"
       >
         {/* Close Button */}
         <button
@@ -138,9 +154,7 @@ export function RequestFlowModal({ children }: RequestFlowModalProps) {
         </button>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto">
-          {children}
-        </div>
+        <div className="flex-1 overflow-y-auto">{children}</div>
       </div>
     </div>
   );

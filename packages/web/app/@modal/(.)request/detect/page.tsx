@@ -40,7 +40,11 @@ export default function ModalRequestDetectPage() {
   const uploadedImage = images.find((img) => img.status === "uploaded");
 
   // Spot-card sync for modal layout
-  const { cardRefs, scrollContainerRef, selectSpot: syncSelectSpot } = useSpotCardSync({
+  const {
+    cardRefs,
+    scrollContainerRef,
+    selectSpot: syncSelectSpot,
+  } = useSpotCardSync({
     spots,
     selectedSpotId,
     onSelectSpot: selectSpot,
@@ -110,7 +114,7 @@ export default function ModalRequestDetectPage() {
           <div className="flex h-full">
             {/* Left: Image */}
             <div className="w-1/2 p-4 flex items-center justify-center">
-              <div className="w-full max-w-[280px]">
+              <div className="w-full max-w-[400px]">
                 <DetectionView
                   image={uploadedImage}
                   spots={spots}
@@ -137,7 +141,10 @@ export default function ModalRequestDetectPage() {
               {isDetecting && (
                 <div className="space-y-3">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+                    <div
+                      key={i}
+                      className="h-24 rounded-lg bg-muted animate-pulse"
+                    />
                   ))}
                 </div>
               )}
