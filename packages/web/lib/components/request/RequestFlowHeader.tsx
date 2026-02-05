@@ -39,8 +39,8 @@ export function RequestFlowHeader({
   };
 
   return (
-    <header className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+    <header className="sticky top-0 z-10 bg-background border-b border-border h-14">
+      <div className="flex items-center justify-between h-full px-4">
         <button
           type="button"
           onClick={handleBack}
@@ -50,10 +50,7 @@ export function RequestFlowHeader({
           <ArrowLeft className="h-5 w-5" />
         </button>
 
-        <div className="flex flex-col items-center">
-          <h1 className="text-base font-medium">{title}</h1>
-          <StepIndicator currentStep={currentStep} className="mt-1" />
-        </div>
+        <StepIndicator currentStep={currentStep} />
 
         {showClose ? (
           <button

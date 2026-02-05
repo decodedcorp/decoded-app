@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
-import { Upload, Camera, Image as ImageIcon } from "lucide-react";
+import { Upload, Image as ImageIcon } from "lucide-react";
 import { UPLOAD_CONFIG } from "@/lib/utils/validation";
 
 interface DropZoneProps {
@@ -94,9 +94,9 @@ export function DropZone({
         disabled={disabled}
         className={`
           flex items-center justify-center w-full h-full min-h-[80px]
-          border-2 border-dashed rounded-lg transition-all duration-200
-          ${isDragging ? "border-primary bg-primary/5" : "border-foreground/20"}
-          ${disabled ? "opacity-50 cursor-not-allowed" : "hover:border-foreground/40 hover:bg-foreground/5 cursor-pointer"}
+          border-2 border-dashed rounded-xl transition-all duration-200
+          ${isDragging ? "border-primary bg-primary/5" : "border-border"}
+          ${disabled ? "opacity-50 cursor-not-allowed" : "hover:border-primary/60 hover:bg-background cursor-pointer"}
           ${className}
         `}
         onDragEnter={handleDragEnter}
@@ -131,8 +131,8 @@ export function DropZone({
       className={`
         relative flex flex-col items-center justify-center
         p-8 border-2 border-dashed rounded-xl transition-all duration-200
-        ${isDragging ? "border-primary bg-primary/5 scale-[1.02]" : "border-foreground/20"}
-        ${disabled ? "opacity-50 cursor-not-allowed" : "hover:border-foreground/40 hover:bg-foreground/5 cursor-pointer"}
+        ${isDragging ? "border-primary bg-primary/5 scale-[1.02]" : "border-border"}
+        ${disabled ? "opacity-50 cursor-not-allowed" : "hover:border-primary/60 hover:bg-background cursor-pointer"}
         ${className}
       `}
       aria-label="Drop images here or click to select"
@@ -150,24 +150,20 @@ export function DropZone({
       <div
         className={`
           p-4 rounded-full mb-4 transition-colors duration-200
-          ${isDragging ? "bg-primary/10" : "bg-foreground/5"}
+          ${isDragging ? "bg-primary/10" : "bg-muted"}
         `}
       >
-        {isDragging ? (
-          <Upload className="h-8 w-8 text-primary" />
-        ) : (
-          <Camera className="h-8 w-8 text-foreground/50" />
-        )}
+        <Upload className={`h-8 w-8 ${isDragging ? "text-primary" : "text-muted-foreground"}`} />
       </div>
 
       <p className="text-base font-medium text-foreground mb-1">
         {isDragging ? "Drop images here" : "Drag and drop images"}
       </p>
-      <p className="text-sm text-foreground/60 mb-4">
+      <p className="text-sm text-muted-foreground mb-4">
         or click to select files
       </p>
 
-      <div className="flex items-center gap-4 text-xs text-foreground/40">
+      <div className="flex items-center gap-4 text-xs text-muted-foreground">
         <span className="flex items-center gap-1">
           <ImageIcon className="h-3 w-3" />
           JPG, PNG, WebP
@@ -175,18 +171,6 @@ export function DropZone({
         <span>Max {UPLOAD_CONFIG.maxFileSize / (1024 * 1024)}MB</span>
         <span>Up to {UPLOAD_CONFIG.maxImages} images</span>
       </div>
-
-      <p className="text-xs text-foreground/40 mt-4">
-        Tip: Press{" "}
-        <kbd className="px-1.5 py-0.5 bg-foreground/10 rounded text-foreground/60">
-          Ctrl
-        </kbd>
-        +
-        <kbd className="px-1.5 py-0.5 bg-foreground/10 rounded text-foreground/60">
-          V
-        </kbd>{" "}
-        to paste from clipboard
-      </p>
     </div>
   );
 }
