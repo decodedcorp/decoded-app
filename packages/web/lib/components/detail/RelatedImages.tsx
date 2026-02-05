@@ -32,8 +32,8 @@ export function RelatedImages({
   const sectionRef = useRef<HTMLDivElement>(null);
   const [expanded, setExpanded] = useState(false);
 
-  // Initial visible count
-  const INITIAL_COUNT = 8;
+  // Initial visible count - show 6-9 items
+  const INITIAL_COUNT = 9;
   const visibleImages = expanded ? images : images?.slice(0, INITIAL_COUNT);
   const hasMore = images && images.length > INITIAL_COUNT;
 
@@ -84,26 +84,17 @@ export function RelatedImages({
   if (isLoading) {
     return (
       <section
-        className={`bg-muted/10 ${isModal ? "py-12 md:py-16 px-4 md:px-6" : "py-24 px-6 md:px-8"}`}
+        className={`py-12 md:py-16 ${
+          isModal ? "px-4 md:px-6" : "px-4 md:px-6"
+        }`}
       >
-        <div className={`mx-auto ${isModal ? "max-w-full" : "max-w-7xl"}`}>
-          <div className={`text-center ${isModal ? "mb-8 md:mb-10" : "mb-12"}`}>
-            <div className="h-4 w-32 bg-muted rounded mx-auto mb-3 md:mb-4 animate-pulse" />
-            <div
-              className={`bg-muted rounded mx-auto animate-pulse ${
-                isModal ? "h-8 w-48 md:h-10 md:w-64" : "h-10 w-64"
-              }`}
-            />
+        <div className={`mx-auto max-w-6xl`}>
+          <div className="text-center mb-6">
+            <div className="h-8 w-48 bg-muted rounded mx-auto animate-pulse" />
           </div>
-          <div
-            className={`grid gap-3 md:gap-4 ${
-              isModal
-                ? "grid-cols-2 md:grid-cols-3"
-                : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:gap-8"
-            }`}
-          >
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="aspect-[3/4] bg-muted animate-pulse" />
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="aspect-[4/5] bg-muted animate-pulse rounded-lg" />
             ))}
           </div>
         </div>
@@ -112,78 +103,51 @@ export function RelatedImages({
   }
 
   if (!images || images.length === 0) {
-    return null;
+    return (
+      <section
+        className={`py-12 md:py-16 ${
+          isModal ? "px-4 md:px-6" : "px-4 md:px-6"
+        }`}
+      >
+        <div className="mx-auto max-w-6xl">
+          <h2 className="text-2xl font-serif mb-6">More from this look</h2>
+          <p className="text-sm text-muted-foreground text-center py-12">
+            No related content yet
+          </p>
+        </div>
+      </section>
+    );
   }
 
   return (
     <section
-      className={`bg-muted/10 border-t border-border/40 ${
-        isModal ? "py-12 md:py-16 px-4 md:px-6" : "py-24 px-6 md:px-8"
+      className={`py-12 md:py-16 ${
+        isModal ? "px-4 md:px-6" : "px-4 md:px-6"
       }`}
     >
       <div
         ref={sectionRef}
-        className={`mx-auto ${isModal ? "max-w-full" : "max-w-7xl"}`}
+        className="mx-auto max-w-6xl"
       >
-        <div
-          className={`flex flex-col items-center ${isModal ? "mb-8 md:mb-10" : "mb-12"}`}
-        >
-          <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground mb-3 md:mb-4">
-            More from
-          </span>
-          <h2
-            className={`font-serif text-center tracking-tight ${
-              isModal
-                ? "text-2xl md:text-3xl"
-                : "text-3xl md:text-4xl lg:text-5xl"
-            }`}
-          >
-            @{account}
-          </h2>
-        </div>
+        <h2 className="text-2xl font-serif mb-6">
+          More from this look
+        </h2>
+        <p className="text-sm text-muted-foreground mb-6">
+          From @{account}
+        </p>
 
-        <div
-          className={`grid mb-8 md:mb-10 lg:mb-12 ${
-            isModal
-              ? "grid-cols-2 md:grid-cols-3 gap-3 md:gap-4"
-              : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8"
-          }`}
-        >
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-8">
           {visibleImages?.map((image) => {
-            if (isModal) {
-              return (
-                <a
-                  key={image.id}
-                  href={`/images/${image.id}`}
-                  className="related-card group block relative aspect-[3/4] overflow-hidden bg-muted"
-                >
-                  {image.image_url ? (
-                    <Image
-                      src={image.image_url}
-                      alt={`Post by @${account}`}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
-                      sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-muted-foreground text-xs">
-                        No Image
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Overlay */}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-                </a>
-              );
-            }
+            const CardWrapper = isModal ? "a" : Link;
+            const cardProps = isModal
+              ? { href: `/images/${image.id}` }
+              : { href: `/images/${image.id}` };
 
             return (
-              <Link
+              <CardWrapper
                 key={image.id}
-                href={`/images/${image.id}`}
-                className="related-card group block relative aspect-[3/4] overflow-hidden bg-muted"
+                {...cardProps}
+                className="related-card group block relative aspect-[4/5] overflow-hidden rounded-lg bg-muted"
               >
                 {image.image_url ? (
                   <Image
@@ -191,7 +155,7 @@ export function RelatedImages({
                     alt={`Post by @${account}`}
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 33vw"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
@@ -201,19 +165,23 @@ export function RelatedImages({
                   </div>
                 )}
 
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-              </Link>
+                {/* Overlay with account name on hover */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="absolute bottom-3 left-3 text-white text-sm font-medium">
+                    @{account}
+                  </div>
+                </div>
+              </CardWrapper>
             );
           })}
         </div>
 
-        {/* Load More Button */}
+        {/* View all / Show less button */}
         {hasMore && (
           <div className="flex justify-center">
             <button
               onClick={() => setExpanded(!expanded)}
-              className="group flex items-center gap-2 px-8 py-3 border border-border bg-background hover:bg-foreground hover:text-background transition-all duration-300 text-xs uppercase tracking-widest"
+              className="group flex items-center gap-2 px-8 py-3 border border-border bg-background hover:bg-foreground hover:text-background transition-all duration-300 text-xs uppercase tracking-widest rounded-sm"
             >
               {expanded ? (
                 <>
@@ -221,7 +189,7 @@ export function RelatedImages({
                 </>
               ) : (
                 <>
-                  Load More <ChevronDown className="w-4 h-4" />
+                  View All <ChevronDown className="w-4 h-4" />
                 </>
               )}
             </button>
