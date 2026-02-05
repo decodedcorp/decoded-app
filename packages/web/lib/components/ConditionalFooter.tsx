@@ -8,8 +8,9 @@ import { DesktopFooter } from "@/lib/design-system";
  *
  * Hides footer on:
  * - /explore - Full-screen ThiingsGrid experience
+ * - /feed - Full-screen feed experience
  */
-const HIDDEN_FOOTER_PATHS = ["/explore"];
+const HIDDEN_FOOTER_PATHS = ["/explore", "/feed"];
 
 export function ConditionalFooter({ className }: { className?: string }) {
   const pathname = usePathname();
