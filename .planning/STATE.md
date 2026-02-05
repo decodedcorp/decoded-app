@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-05)
 
 **Core value:** 완전한 사용자 경험 — decoded.pen 디자인 시스템 100% 구현
-**Current focus:** v2.1-Phase-3 Card Components (COMPLETE)
+**Current focus:** v2.1-Phase-4 Profile & Detail Components (IN PROGRESS)
 
 ## Current Position
 
-Phase: 3 of 6 (Card Components)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-02-06 — Completed v2.1-03-02-PLAN.md (SpotCard & ShopCarouselCard)
+Phase: 4 of 6 (Profile & Detail Components)
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-02-06 — Completed v2.1-04-01-PLAN.md (Badge & LeaderItem)
 
-Progress: [█████░░░░░] 46.2% (6/13 plans)
+Progress: [█████░░░░░] 53.8% (7/13 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 2m 43s
-- Total execution time: 0.27 hours
+- Total plans completed: 7
+- Average duration: 2m 35s
+- Total execution time: 0.30 hours
 
 **By Phase:**
 
@@ -30,9 +30,10 @@ Progress: [█████░░░░░] 46.2% (6/13 plans)
 | v2.1-01 | 2 | 6m 4s | 3m 2s |
 | v2.1-02 | 2 | 6m 10s | 3m 5s |
 | v2.1-03 | 2 | 4m 16s | 2m 8s |
+| v2.1-04 | 1 | 2m 11s | 2m 11s |
 
 **Recent Trend:**
-- Last 5 plans: 2m 10s, 4m, 1m 57s, 2m 19s
+- Last 5 plans: 4m, 1m 57s, 2m 19s, 2m 11s
 - Trend: Consistent (stable execution times)
 
 ## Accumulated Context
@@ -57,6 +58,9 @@ Recent decisions affecting current work:
 - v2.1-03-01: Stat card trend colors: green (up), red (down), gray (neutral)
 - v2.1-03-02: SpotCard uses onClick for modal trigger, not Link for navigation
 - v2.1-03-02: ShopCarouselCard has no page indicator dots (relies on native scroll-snap)
+- v2.1-04-01: Badge locked state uses CSS filter (grayscale + brightness-50) for silhouette effect
+- v2.1-04-01: Podium medal colors - yellow-500 (gold), gray-400 (silver), orange-600 (bronze)
+- v2.1-04-01: Rank change indicator inline in LeaderItem (will extract to RankingItem in Plan 02)
 
 ### Pending Todos
 
@@ -69,7 +73,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Completed phase v2.1-03 (Card Components)
+Stopped at: Completed v2.1-04-01-PLAN.md (Badge & LeaderItem)
 Resume file: None
 
 ## Phase Progress
@@ -88,7 +92,9 @@ Resume file: None
 - ✅ ArtistCard & StatCard (avatar cards, stat display, formatStatValue utility)
 - ✅ SpotCard & ShopCarouselCard (product spots, shopping carousel)
 
-Ready to proceed to Phase 4: Profile & Detail Components
+**Phase 4 In Progress (1/2 plans):**
+- ✅ Badge & LeaderItem (badge earned/locked states, leaderboard with podium medals)
+- ⏳ RankingItem & SpotDetail (next)
 
 ## Quick Tasks Completed
 
