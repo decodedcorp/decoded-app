@@ -244,7 +244,7 @@ export async function createPostWithFile(
 
   // Send file directly via FormData to local proxy
   const formData = new FormData();
-  formData.append("file", request.file);
+  formData.append("image", request.file); // Try "image" field name
   formData.append("spots", JSON.stringify(request.spots));
   formData.append("media_source", JSON.stringify(request.media_source));
   if (request.artist_name) formData.append("artist_name", request.artist_name);
