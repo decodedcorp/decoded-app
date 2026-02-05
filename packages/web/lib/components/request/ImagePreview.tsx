@@ -9,19 +9,30 @@ interface ImagePreviewProps {
   image: UploadedImage;
   onRemove: () => void;
   onRetry?: () => void;
+  /** Large mode for single image display - fills container */
+  large?: boolean;
 }
 
-export function ImagePreview({ image, onRemove, onRetry }: ImagePreviewProps) {
+export function ImagePreview({
+  image,
+  onRemove,
+  onRetry,
+  large = false,
+}: ImagePreviewProps) {
   const { previewUrl, status, progress, error, file } = image;
 
   return (
-    <div className="relative group aspect-square rounded-lg overflow-hidden bg-foreground/5">
+    <div
+      className={`relative group rounded-lg overflow-hidden bg-foreground/5 ${
+        large ? "w-full h-full" : "aspect-square"
+      }`}
+    >
       <Image
         src={previewUrl}
         alt={file.name}
         fill
         className="object-cover"
-        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+        sizes={large ? "400px" : "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"}
       />
 
       {/* Overlay based on status */}
@@ -64,11 +75,13 @@ export function ImagePreview({ image, onRemove, onRetry }: ImagePreviewProps) {
         </div>
       )}
 
-      {/* File info on hover */}
-      <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-        <p className="text-xs text-white truncate">{file.name}</p>
-        <p className="text-xs text-white/70">{formatFileSize(file.size)}</p>
-      </div>
+      {/* File info on hover (hidden in large mode - shown separately) */}
+      {!large && (
+        <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+          <p className="text-xs text-white truncate">{file.name}</p>
+          <p className="text-xs text-white/70">{formatFileSize(file.size)}</p>
+        </div>
+      )}
 
       {/* Remove button */}
       {status !== "uploading" && (

@@ -25,6 +25,29 @@ export function ImagePreviewGrid({
     return null;
   }
 
+  // Single image layout - centered, large preview
+  const isSingleImage = images.length === 1 && UPLOAD_CONFIG.maxImages === 1;
+
+  if (isSingleImage) {
+    const image = images[0];
+    return (
+      <div className="flex flex-col items-center justify-center h-full space-y-4">
+        <div className="relative w-full max-w-md aspect-[3/4]">
+          <ImagePreview
+            image={image}
+            onRemove={() => onRemove(image.id)}
+            onRetry={onRetry ? () => onRetry(image.id) : undefined}
+            large
+          />
+        </div>
+        <p className="text-sm text-muted-foreground">
+          {image.file.name} · {(image.file.size / 1024).toFixed(1)} KB
+        </p>
+      </div>
+    );
+  }
+
+  // Multi-image grid layout
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
