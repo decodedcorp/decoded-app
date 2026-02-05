@@ -80,8 +80,10 @@ export function OAuthButton({
       onClick={onClick}
       disabled={disabled || isLoading}
       className={cn(
-        "relative flex w-full items-center justify-center gap-3 rounded-xl px-4 py-3.5 text-sm font-medium transition-all",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+        "relative flex w-full max-w-[320px] items-center justify-center gap-3",
+        "h-[52px] rounded-xl px-4 text-sm font-medium transition-all",
+        "hover:opacity-90 active:opacity-80",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary",
         "disabled:cursor-not-allowed disabled:opacity-50",
         config.className
       )}
