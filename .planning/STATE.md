@@ -14,7 +14,7 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 
 **v1.1 Status:** SHIPPED (2026-01-29) - All 4 tracks merged to main
 **v2.0 Status:** Phase v2-09 IN PROGRESS (1/3 plans done)
-**Last activity:** 2026-02-05 - Completed v2-09-02-PLAN.md (Documentation Polish - Design System)
+**Last activity:** 2026-02-05 - Completed v2-09-01-PLAN.md (Design System Documentation)
 
 ### Execution Flow
 
@@ -41,8 +41,8 @@ v2.0 (feature/v2-design-overhaul):
    ├─ v2-Phase 8: Request Flow & Login ─── COMPLETE ✓
    │
    └─ v2-Phase 9: Documentation & Polish ─── IN PROGRESS
-       ├─ 01: Project Docs Update ─── NOT STARTED
-       ├─ 02: Design System Docs ─── COMPLETE ✓
+       ├─ 01: Design System Docs ─── COMPLETE ✓
+       ├─ 02: Project Docs Update ─── NOT STARTED
        └─ 03: Final Polish ─── NOT STARTED
 ```
 
@@ -84,7 +84,7 @@ See: .planning/ROADMAP-v2.md
 | v2-6: Feed & Profile Pages | 3/3 | **Complete** (v2-06-01, v2-06-02, v2-06-03 done) |
 | v2-7: Search & Image Detail | 3/3 | **Complete** (v2-07-01, v2-07-02, v2-07-03 done) |
 | v2-8: Request Flow & Login | 3/3 | **Complete** (v2-08-01, v2-08-02, v2-08-03 done) |
-| v2-9: Documentation & Polish | 1/3 | **In Progress** (v2-09-02 done) |
+| v2-9: Documentation & Polish | 1/3 | **In Progress** (v2-09-01 done) |
 
 ## Accumulated Context
 
@@ -191,6 +191,10 @@ See: .planning/ROADMAP-v2.md
 - **AnimatePresence mode="wait" (v2-08-02):** Prevent content overlap during transitions, old content exits before new enters
 - **Google-Only OAuth (v2-08-03):** Simplified Login to single Google button for v2.0 launch, Kakao/Apple deferred
 - **OAuth Button Dimensions (v2-08-03):** 320px width, 52px height, 12px border-radius per decoded.pen spec
+- **Unified Tokens Documentation (v2-09-01):** Single tokens.md file consolidates all token types for easier navigation than separate files
+- **Component Docs Per Category (v2-09-01):** Group related components (typography, inputs, cards, headers) instead of one file per component
+- **Korean Documentation Language (v2-09-01):** All design system documentation in Korean for team's primary language comprehension
+- **Anti-Pattern Documentation (v2-09-01):** Include "Correct vs Incorrect" examples in patterns.md to prevent common mistakes
 - **Design System Import Pattern (v2-09-02):** Use single barrel export from @/lib/design-system for all design system imports
 - **Consistent Documentation Dates (v2-09-02):** Update all codebase analysis dates to 2026-02-05 for freshness clarity
 
@@ -207,7 +211,7 @@ See: .planning/ROADMAP-v2.md
 ## Session Continuity
 
 **Last session:** 2026-02-05
-**Stopped at:** Completed v2-09-02-PLAN.md (Documentation Polish - Design System)
+**Stopped at:** Completed v2-09-01-PLAN.md (Design System Documentation)
 **Resume file:** None
 
 **Next Steps:**
@@ -215,9 +219,9 @@ See: .planning/ROADMAP-v2.md
 ```bash
 # Phase v2-09: Documentation & Polish - IN PROGRESS (1/3 done)
 git checkout feature/v2-design-overhaul  # 현재 브랜치
-/gsd:plan-phase v2-09  # Next: Plan remaining phase tasks (v2-09-01, v2-09-03)
-# Or verify documentation updates
-grep "design-system" .planning/codebase/STACK.md  # Check updated docs
+/gsd:plan-phase v2-09  # Next: Plan remaining phase tasks (v2-09-02, v2-09-03)
+# Or view completed design system docs
+open docs/design-system/README.md  # View updated v2.0 documentation
 ```
 
 ### Quick Tasks Completed
