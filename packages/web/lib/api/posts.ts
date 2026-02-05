@@ -243,7 +243,7 @@ export async function createPostWithFile(
   }
 
   const formData = new FormData();
-  formData.append("file", request.file);
+  formData.append("image", request.file); // 백엔드가 "image" 필드명을 기대할 수 있음
   formData.append("spots", JSON.stringify(request.spots));
   formData.append("media_source", JSON.stringify(request.media_source));
   if (request.artist_name) formData.append("artist_name", request.artist_name);
