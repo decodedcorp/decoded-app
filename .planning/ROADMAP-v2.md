@@ -178,12 +178,12 @@ Plans:
   3. .planning/codebase/ analysis reflects new design system structure
   4. CLAUDE.md includes design system import paths and usage guidelines
   5. All pages display consistently with decoded.pen on mobile and desktop breakpoints
-**Plans**: TBD
+**Plans:** 3 plans (2 waves)
 
 Plans:
-- [ ] v2-09-01: Write design system documentation (tokens, components, patterns)
-- [ ] v2-09-02: Update specs and codebase analysis documents
-- [ ] v2-09-03: Final visual QA and responsive testing
+- [ ] v2-09-01-PLAN.md — Design system documentation (tokens, components, patterns) [Wave 1]
+- [ ] v2-09-02-PLAN.md — Codebase docs, CLAUDE.md, and specs update [Wave 1]
+- [ ] v2-09-03-PLAN.md — Visual QA with Playwright screenshots and polish [Wave 2]
 
 ## Progress
 
@@ -205,9 +205,9 @@ v2-Phases execute sequentially: v2-Phase 1 → v2-Phase 2 → ... → v2-Phase 9
 | v2-6. Feed & Profile Pages | 3/3 | **Complete** | 2026-01-29 |
 | v2-7. Search & Image Detail | 3/3 | **Complete** | 2026-02-05 |
 | v2-8. Request Flow & Login | 3/3 | **Complete** | 2026-02-05 |
-| v2-9. Documentation & Polish | 0/3 | Not started | - |
+| v2-9. Documentation & Polish | 0/3 | **Planned** | - |
 
 ---
 
 *Created: 2026-01-29*
-*Last updated: 2026-02-05 (Phase v2-8 complete)*
+*Last updated: 2026-02-05 (Phase v2-9 planned)*
