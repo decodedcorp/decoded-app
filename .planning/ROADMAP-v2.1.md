@@ -93,11 +93,11 @@ Plans:
 3. User sees ranking changes visualized (up arrow, down arrow, neutral dash)
 4. User can view comprehensive spot details including brand, price, and purchase links
 
-**Plans**: 2 plans
+**Plans**: 2 plans (1 wave - parallel)
 
 Plans:
-- [ ] v2.1-04-01: Badge + LeaderItem components
-- [ ] v2.1-04-02: RankingItem + SpotDetail components
+- [ ] v2.1-04-01-PLAN.md — Badge + LeaderItem components [Wave 1]
+- [ ] v2.1-04-02-PLAN.md — RankingItem + SpotDetail components [Wave 1]
 
 ---
 
@@ -157,7 +157,7 @@ Plans:
 | v2.1-1. Core Interactive | 2/2 | ✅ Complete | 2026-02-05 |
 | v2.1-2. Navigation | 2/2 | ✅ Complete | 2026-02-06 |
 | v2.1-3. Cards | 2/2 | ✅ Complete | 2026-02-06 |
-| v2.1-4. Profile & Detail | 0/2 | Not started | - |
+| v2.1-4. Profile & Detail | 0/2 | 🚧 Planned | - |
 | v2.1-5. Login & State | 0/3 | Not started | - |
 | v2.1-6. Visual QA | 0/2 | Not started | - |
 
@@ -166,4 +166,4 @@ Plans:
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-06 (Phase 3 complete)*
+*Last updated: 2026-02-06 (Phase 4 planned)*
