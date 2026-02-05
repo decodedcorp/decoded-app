@@ -31,8 +31,8 @@ function solutionToItemRow(solution: SolutionRow, spotId: string): ItemRow {
   return {
     id: parseInt(solution.id.substring(0, 8), 16) || 0, // Generate numeric ID from UUID
     image_id: spotId, // Use spot_id as proxy for image_id
-    brand: solution.brand || null,
-    product_name: solution.product_name || null,
+    brand: null, // SolutionRow doesn't have brand field
+    product_name: solution.title || null, // Use title as product_name
     cropped_image_path: solution.thumbnail_url || null,
     price: solution.price_amount?.toString() || null,
     description: solution.description || null,

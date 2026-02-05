@@ -74,8 +74,8 @@ export function spotToItemRow(spot: SpotRow, solution?: SolutionRow): ItemRow {
   return {
     id: parseInt(spot.id.substring(0, 8), 16) || 0,
     image_id: spot.post_id,
-    brand: solution?.brand || null,
-    product_name: solution?.product_name || null,
+    brand: null, // SolutionRow doesn't have brand field
+    product_name: solution?.title || null, // Use title as product_name
     cropped_image_path: solution?.thumbnail_url || null,
     price: solution?.price_amount?.toString() || null,
     description: solution?.description || null,

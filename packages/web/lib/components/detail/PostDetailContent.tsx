@@ -115,7 +115,7 @@ export function PostDetailContent({ postDetail }: Props) {
                   }}
                   title={
                     solutions.find((s) => s.spot_id === spot.id)
-                      ?.product_name || "Item"
+                      ?.title || "Item"
                   }
                 />
               ))}

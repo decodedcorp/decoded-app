@@ -97,6 +97,12 @@ export function styleCardServerToStyleCardData(
       name: item.name,
       imageUrl: item.imageUrl,
     })),
+    spots: data.spots?.map((spot) => ({
+      id: spot.id,
+      x: parseFloat(spot.position_left),
+      y: parseFloat(spot.position_top),
+      label: spot.solutions?.[0]?.title || undefined,
+    })),
   };
 }
 
@@ -156,12 +162,22 @@ export function whatsNewStyleToStyleCardData(
       name: item.name,
       imageUrl: item.imageUrl,
     })),
+    spots: data.spots?.map((spot) => ({
+      id: spot.id,
+      x: parseFloat(spot.position_left),
+      y: parseFloat(spot.position_top),
+      label: spot.solutions?.[0]?.title || undefined,
+    })),
   };
 }
 
 /** @deprecated Items not available in new schema */
 export function itemWithImageToItemCardData(data: {
-  item: { id: number; brand: string | null; product_name: string | null };
+  item: {
+    id: string | number;
+    brand: string | null;
+    product_name: string | null;
+  };
   imageUrl: string | null;
 }): ItemCardData {
   return {
@@ -178,7 +194,11 @@ export function itemWithImageToItemCardData(data: {
 /** @deprecated Items not available in new schema */
 export function whatsNewItemToItemCardData(
   data: {
-    item: { id: number; brand: string | null; product_name: string | null };
+    item: {
+      id: string | number;
+      brand: string | null;
+      product_name: string | null;
+    };
     imageUrl: string | null;
   },
   isNew = true

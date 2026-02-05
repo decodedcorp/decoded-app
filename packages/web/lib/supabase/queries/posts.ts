@@ -165,8 +165,8 @@ export async function fetchPostWithImagesAndItems(
     items: result.solutions.map((solution, index) => ({
       id: index + 1, // Generate sequential ID
       image_id: result.post.id,
-      brand: solution.brand || null,
-      product_name: solution.product_name || null,
+      brand: null, // SolutionRow doesn't have brand field
+      product_name: solution.title || null, // Use title as product_name
       cropped_image_path: solution.thumbnail_url || null,
       price: solution.price_amount?.toString() || null,
       description: solution.description || null,

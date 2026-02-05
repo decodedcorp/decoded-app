@@ -2,60 +2,33 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
+import { cn } from "@/lib/utils";
 import type { StyleCardData } from "./StyleCard";
 import type { ItemCardData } from "./ItemCard";
+import { useState, useMemo } from "react";
 
-// Sample data - will be replaced with real data later
+// Sample data
 const sampleStyleData: StyleCardData = {
-  id: "1",
-  title: "Casual Street\nLook",
+  id: "dp-1",
+  title: "Modern Minimalist\nNarrative",
   description: "",
   artistName: "Blackpink Lisa",
   link: "/feed",
-  imageUrl:
-    "https://images.unsplash.com/photo-1699847061593-188987efcd3e?w=600",
-  items: [],
+  imageUrl: "https://images.unsplash.com/photo-1699847061593-188987efcd3e?w=800",
+  spots: [
+    { id: "dp-s1", x: 42, y: 35, label: "Shoulder Bag" },
+    { id: "dp-s2", x: 58, y: 25, label: "Oversized Shades" },
+    { id: "dp-s3", x: 45, y: 85, label: "Leather Boots" },
+    { id: "dp-s4", x: 52, y: 15, label: "Gold Chain" },
+  ],
+  items: [
+    { id: "dp-i1", label: "ACC", brand: "Prada", name: "Leather Tote", imageUrl: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400" },
+    { id: "dp-i2", label: "ACC", brand: "Celine", name: "Cat-eye Shades", imageUrl: "https://images.unsplash.com/photo-1564848005333-590727c99921?w=400" },
+    { id: "dp-i3", label: "SHOES", brand: "Saint Laurent", name: "Chelsea Boots", imageUrl: "https://images.unsplash.com/photo-1518738458435-19149697112a?w=400" },
+    { id: "dp-i4", label: "ACC", brand: "Cartier", name: "Love Necklace", imageUrl: "https://images.unsplash.com/photo-1641206189215-9533ceb7a1df?w=400" },
+  ]
 };
-
-const sampleItems: ItemCardData[] = [
-  {
-    id: "1",
-    brand: "Prada",
-    name: "Prada Bag",
-    link: "/items/1",
-    price: "$2,450",
-    imageUrl:
-      "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400",
-  },
-  {
-    id: "2",
-    brand: "Celine",
-    name: "Celine Shades",
-    link: "/items/2",
-    price: "$580",
-    imageUrl:
-      "https://images.unsplash.com/photo-1564848005333-590727c99921?w=400",
-  },
-  {
-    id: "3",
-    brand: "Nike",
-    name: "Nike AF1",
-    link: "/items/3",
-    price: "$120",
-    imageUrl:
-      "https://images.unsplash.com/photo-1518738458435-19149697112a?w=400",
-  },
-  {
-    id: "4",
-    brand: "Gold",
-    name: "Gold Chain",
-    link: "/items/4",
-    price: "$890",
-    imageUrl:
-      "https://images.unsplash.com/photo-1641206189215-9533ceb7a1df?w=400",
-  },
-];
 
 interface DecodedPickSectionProps {
   styleData?: StyleCardData;
@@ -64,101 +37,216 @@ interface DecodedPickSectionProps {
 
 export function DecodedPickSection({
   styleData = sampleStyleData,
-  items = sampleItems,
+  items,
 }: DecodedPickSectionProps) {
-  // Limit items to 4 for mobile 2x2 grid, desktop shows all
-  const displayItems = items.slice(0, 4);
+  const [activeSpotId, setActiveSpotId] = useState<string | null>(null);
+
+  // Convert StyleCard items to ItemCardData with required link field
+  const itemCards: ItemCardData[] = items || (sampleStyleData.items?.map(item => ({
+    ...item,
+    link: `/items/${item.id}`,
+  })) ?? []);
 
   return (
-    <section className="bg-card rounded-t-2xl p-6 md:p-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-5 md:mb-8">
-        <h2 className="text-2xl md:text-[32px] font-serif font-bold">
-          Decoded's Pick
-        </h2>
-        <Link
-          href="/feed"
-          className="text-[13px] md:text-sm font-medium text-primary"
-        >
-          View All
-        </Link>
-      </div>
-
-      {/* Content: Featured Card + Item Grid */}
-      <div className="flex gap-3 md:gap-6">
-        {/* Featured Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <Link
-            href={styleData.link}
-            className="block relative w-[180px] h-[240px] md:w-[320px] md:h-[400px] rounded-xl overflow-hidden"
-          >
-            {styleData.imageUrl ? (
-              <Image
-                src={styleData.imageUrl}
-                alt={styleData.title}
-                fill
-                className="object-cover"
-              />
-            ) : (
-              <div className="absolute inset-0 bg-neutral-700" />
-            )}
-            {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-            {/* Content */}
-            <div className="absolute bottom-0 left-0 right-0 p-3 md:p-5 flex flex-col gap-1 md:gap-2">
-              <span className="text-sm md:text-lg font-semibold text-white leading-[1.2] whitespace-pre-line">
-                {styleData.title}
-              </span>
-              <span className="text-[11px] md:text-sm text-neutral-400">
-                {styleData.artistName}
-              </span>
-            </div>
-          </Link>
-        </motion.div>
-
-        {/* Item Grid - 2x2 on mobile, horizontal row on desktop */}
-        <div className="flex-1 grid grid-cols-2 gap-3 md:flex md:gap-4">
-          {displayItems.map((item, index) => (
+    <section className="bg-black text-white py-24 md:py-40 px-6 md:px-12 rounded-t-[60px] md:rounded-t-[100px] -mt-20 relative z-30 shadow-[0_-30px_100px_rgba(0,0,0,0.8)] border-t border-white/5">
+      <div className="max-w-7xl mx-auto">
+        {/* Section Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-24 md:mb-32 gap-10">
+          <div className="max-w-2xl">
             <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.1 * (index + 1) }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             >
-              <Link
-                href={item.link}
-                className="block relative h-[114px] md:h-[200px] md:w-full rounded-lg overflow-hidden"
-              >
-                {item.imageUrl ? (
+              <span className="text-primary font-sans font-bold tracking-[0.4em] text-[10px] md:text-xs uppercase mb-6 block">
+                Editor's Choice
+              </span>
+              <h2 className="text-6xl md:text-8xl font-serif font-bold italic tracking-tighter leading-[0.85]">
+                Decoded's<br />Pick
+              </h2>
+            </motion.div>
+          </div>
+          <Link
+            href="/feed"
+            className="group flex items-center gap-4 text-xs font-sans font-bold tracking-[0.3em] text-white/30 hover:text-white transition-all uppercase"
+          >
+            <span>View all narratives</span>
+            <div className="w-12 h-[1px] bg-white/10 group-hover:bg-primary transition-all group-hover:w-16" />
+          </Link>
+        </div>
+
+        {/* Content Explorer */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 md:gap-24 items-start">
+          {/* Left: Spotlight Image Section */}
+          <div className="lg:col-span-7 relative group">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.98 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+              className="relative aspect-[3/4] md:aspect-[4/5] rounded-[48px] overflow-hidden cursor-crosshair bg-neutral-900 shadow-3xl"
+            >
+              {/* Grayscale Base Layer */}
+              <div className="absolute inset-0 z-0">
+                {styleData.imageUrl && (
                   <Image
-                    src={item.imageUrl}
-                    alt={item.name}
+                    src={styleData.imageUrl}
+                    alt={styleData.title}
+                    fill
+                    className="object-cover grayscale brightness-40 contrast-[1.1]"
+                  />
+                )}
+              </div>
+
+              {/* Spotlight Color Layer (Clipping Mask) */}
+              <motion.div 
+                className="absolute inset-0 z-10 pointer-events-none"
+                animate={{
+                  clipPath: activeSpotId 
+                    ? `circle(140px at ${styleData.spots?.find(s => s.id === activeSpotId)?.x ?? 50}% ${styleData.spots?.find(s => s.id === activeSpotId)?.y ?? 50}%)`
+                    : "circle(0% at 50% 50%)"
+                }}
+                transition={{ type: "spring", stiffness: 120, damping: 24 }}
+              >
+                {styleData.imageUrl && (
+                  <Image
+                    src={styleData.imageUrl}
+                    alt={styleData.title}
                     fill
                     className="object-cover"
                   />
-                ) : (
-                  <div className="absolute inset-0 bg-neutral-600" />
                 )}
-                {/* Content overlay */}
-                <div className="absolute bottom-0 left-0 right-0 p-2 md:p-3 flex flex-col gap-0.5 md:gap-1">
-                  <span className="text-[11px] md:text-[13px] font-medium text-white">
-                    {item.name}
-                  </span>
-                  {item.price && (
-                    <span className="text-[10px] md:text-xs text-primary">
-                      {item.price}
-                    </span>
-                  )}
-                </div>
-              </Link>
+              </motion.div>
+
+              {/* Interactive Spots */}
+              <div className="absolute inset-0 z-20">
+                {styleData.spots?.map((spot) => (
+                  <button
+                    key={spot.id}
+                    onMouseEnter={() => setActiveSpotId(spot.id)}
+                    onMouseLeave={() => setActiveSpotId(null)}
+                    onClick={() => setActiveSpotId(spot.id === activeSpotId ? null : spot.id)}
+                    className="absolute w-14 h-14 -ml-7 -mt-7 flex items-center justify-center group/spot"
+                    style={{ left: `${spot.x}%`, top: `${spot.y}%` }}
+                  >
+                    <div className={cn(
+                      "w-4 h-4 rounded-full border-2 border-white transition-all duration-300 shadow-2xl",
+                      activeSpotId === spot.id ? "bg-primary scale-125" : "bg-white/20 backdrop-blur-md group-hover/spot:bg-white/50"
+                    )} />
+                    
+                    <AnimatePresence>
+                      {activeSpotId === spot.id && (
+                        <>
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0 }}
+                            className="absolute inset-0 rounded-full bg-primary/30 animate-ping z-[-1]"
+                          />
+                          <motion.div
+                            initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 10, scale: 0.9 }}
+                            className="absolute bottom-full mb-4 px-5 py-2.5 bg-black/90 backdrop-blur-2xl border border-white/10 rounded-full whitespace-nowrap z-30"
+                          >
+                            <span className="text-[10px] font-sans font-bold tracking-[0.25em] text-white uppercase">
+                              {spot.label}
+                            </span>
+                          </motion.div>
+                        </>
+                      )}
+                    </AnimatePresence>
+                  </button>
+                ))}
+              </div>
+
+              {/* Static Content Overlay */}
+              <div className="absolute bottom-0 left-0 right-0 p-10 md:p-14 z-30 pointer-events-none">
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.6 }}
+                >
+                  <p className="text-white/50 font-sans font-bold tracking-[0.3em] text-[10px] uppercase mb-3">
+                    {styleData.artistName}
+                  </p>
+                  <h3 className="text-3xl md:text-5xl font-serif font-bold italic leading-[1.1] max-w-lg tracking-tighter">
+                    {styleData.title}
+                  </h3>
+                </motion.div>
+              </div>
             </motion.div>
-          ))}
+          </div>
+
+          {/* Right: Featured Items List */}
+          <div className="lg:col-span-5 flex flex-col gap-12">
+            <div className="space-y-6">
+              <h4 className="text-[10px] font-sans font-bold tracking-[0.3em] text-white/30 uppercase">
+                Product Breakdown
+              </h4>
+              <div className="h-[1px] w-full bg-white/5" />
+            </div>
+
+            <div className="grid grid-cols-1 gap-10">
+              {itemCards.map((item, index) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, x: 40 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: 0.1 * index, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <Link
+                    href={item.link}
+                    className={cn(
+                      "group flex items-center gap-8 p-5 rounded-[32px] transition-all duration-700 hover:bg-white/5 border border-transparent hover:border-white/5",
+                      activeSpotId && styleData.items?.find(si => si.id === item.id) ? "bg-white/10 border-white/10 scale-[1.02]" : ""
+                    )}
+                  >
+                    <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-2xl overflow-hidden flex-shrink-0 bg-neutral-900 shadow-lg">
+                      {item.imageUrl ? (
+                        <Image
+                          src={item.imageUrl}
+                          alt={item.name}
+                          fill
+                          className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 bg-neutral-800" />
+                      )}
+                    </div>
+                    
+                    <div className="flex-1">
+                      <span className="text-[9px] md:text-[10px] font-sans font-bold tracking-[0.2em] text-primary mb-2 block uppercase">
+                        {item.brand}
+                      </span>
+                      <h5 className="text-xl md:text-2xl font-sans font-medium text-white group-hover:text-primary transition-colors line-clamp-1 mb-3 tracking-tight">
+                        {item.name}
+                      </h5>
+                      <div className="flex items-center justify-between">
+                        <span className="text-lg md:text-xl font-serif italic text-white/40 group-hover:text-white/60 transition-colors">
+                          {item.price}
+                        </span>
+                        <div className="opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-x-4 group-hover:translate-x-0">
+                          <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+
+            <Link
+              href={styleData.link}
+              className="mt-6 py-7 w-full border border-white/10 rounded-[24px] text-center text-[10px] font-sans font-bold tracking-[0.3em] text-white/30 hover:text-white hover:border-white/40 hover:bg-white/[0.02] transition-all uppercase"
+            >
+              Discover full aesthetic
+            </Link>
+          </div>
         </div>
       </div>
     </section>
