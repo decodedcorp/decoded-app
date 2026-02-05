@@ -3,6 +3,8 @@ export { SearchInput } from "./SearchInput";
 export { SearchSuggestions } from "./SearchSuggestions";
 export { SearchTabs } from "./SearchTabs";
 export { SearchResults } from "./SearchResults";
+export { SearchOverlay } from "./SearchOverlay";
+export { RecentSearches } from "./RecentSearches";
 export { PeopleResultSection } from "./PeopleResultSection";
 export { MediaResultSection } from "./MediaResultSection";
 export { ItemResultSection } from "./ItemResultSection";

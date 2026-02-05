@@ -1,6 +1,7 @@
 "use client";
 
 import { memo } from "react";
+import { motion } from "motion/react";
 import { useSearchStore } from "@decoded/shared";
 import type { SearchTab, SearchFacets } from "@decoded/shared/types/search";
 
@@ -43,12 +44,13 @@ const TABS: TabConfig[] = [
 ];
 
 /**
- * Search result tabs
+ * Search result tabs with animated sliding underline
  *
  * Features:
  * - All, People, Media, Items tabs
- * - Badge with result count from facets
- * - Active state styling
+ * - Result counts in "Label (count)" format
+ * - Animated sliding underline indicator between active tabs
+ * - Active state styling per decoded.pen spec
  */
 export const SearchTabs = memo(function SearchTabs({
   facets,
@@ -68,6 +70,12 @@ export const SearchTabs = memo(function SearchTabs({
         const count =
           facets && tab.getCount ? tab.getCount(facets, totalCount) : undefined;
 
+        // Format count display: "Label (count)"
+        const displayLabel =
+          count !== undefined && count > 0
+            ? `${tab.label} (${count > 999 ? "999+" : count})`
+            : tab.label;
+
         return (
           <button
             key={tab.id}
@@ -80,23 +88,14 @@ export const SearchTabs = memo(function SearchTabs({
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            <span className="flex items-center gap-2">
-              {tab.label}
-              {count !== undefined && count > 0 && (
-                <span
-                  className={`text-xs px-1.5 py-0.5 rounded-full ${
-                    isActive
-                      ? "bg-primary/10 text-primary"
-                      : "bg-muted text-muted-foreground"
-                  }`}
-                >
-                  {count > 999 ? "999+" : count}
-                </span>
-              )}
-            </span>
-            {/* Active indicator */}
+            {displayLabel}
+            {/* Animated sliding underline indicator */}
             {isActive && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+              <motion.span
+                layoutId="search-tab-underline"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
+                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+              />
             )}
           </button>
         );
