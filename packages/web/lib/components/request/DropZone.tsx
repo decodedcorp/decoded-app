@@ -153,7 +153,9 @@ export function DropZone({
           ${isDragging ? "bg-primary/10" : "bg-muted"}
         `}
       >
-        <Upload className={`h-8 w-8 ${isDragging ? "text-primary" : "text-muted-foreground"}`} />
+        <Upload
+          className={`h-8 w-8 ${isDragging ? "text-primary" : "text-muted-foreground"}`}
+        />
       </div>
 
       <p className="text-base font-medium text-foreground mb-1">

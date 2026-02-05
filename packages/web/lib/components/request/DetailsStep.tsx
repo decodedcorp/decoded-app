@@ -52,7 +52,8 @@ export function DetailsStep({ onClose }: DetailsStepProps) {
     submit();
   };
 
-  const canSubmit = !!(mediaSource?.type && mediaSource?.title) && !isSubmitting;
+  const canSubmit =
+    !!(mediaSource?.type && mediaSource?.title) && !isSubmitting;
 
   return (
     <div className="space-y-6">
@@ -112,7 +113,9 @@ export function DetailsStep({ onClose }: DetailsStepProps) {
       {categoriesError && (
         <div className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
           <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
-          <p className="text-sm text-red-500">Failed to load categories. Please try again.</p>
+          <p className="text-sm text-red-500">
+            Failed to load categories. Please try again.
+          </p>
         </div>
       )}
 
