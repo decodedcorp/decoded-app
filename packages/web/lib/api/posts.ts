@@ -251,6 +251,12 @@ export async function createPostWithFile(
   if (request.context) formData.append("context", request.context);
   if (request.description) formData.append("description", request.description);
 
+  console.log("createPostWithFile - Sending to:", `${API_BASE_URL}/api/v1/posts`);
+  console.log("createPostWithFile - FormData entries:");
+  for (const [key, value] of formData.entries()) {
+    console.log(`  ${key}:`, typeof value === "string" ? value : "(file)");
+  }
+
   const response = await fetch(`${API_BASE_URL}/api/v1/posts`, {
     method: "POST",
     headers: {
@@ -260,19 +266,23 @@ export async function createPostWithFile(
     body: formData,
   });
 
+  console.log("createPostWithFile - Response status:", response.status);
+
+  const responseText = await response.text();
+  console.log("createPostWithFile - Response body:", responseText);
+
   if (!response.ok) {
-    const errorText = await response.text();
     let errorMessage = "포스트 생성에 실패했습니다.";
     try {
-      const errorJson = JSON.parse(errorText);
+      const errorJson = JSON.parse(responseText);
       errorMessage = errorJson.message || errorJson.error?.message || errorMessage;
     } catch {
-      errorMessage = errorText || errorMessage;
+      errorMessage = responseText || errorMessage;
     }
     throw new Error(errorMessage);
   }
 
-  return response.json();
+  return JSON.parse(responseText);
 }
 
 // ============================================================
