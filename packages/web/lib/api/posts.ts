@@ -243,14 +243,19 @@ export async function createPostWithFile(
   }
 
   // Send file directly via FormData to local proxy
+  // Backend expects: "image" (file) + "data" (JSON with spots, media_source, etc.)
   const formData = new FormData();
-  formData.append("image", request.file); // Try "image" field name
-  formData.append("spots", JSON.stringify(request.spots));
-  formData.append("media_source", JSON.stringify(request.media_source));
-  if (request.artist_name) formData.append("artist_name", request.artist_name);
-  if (request.group_name) formData.append("group_name", request.group_name);
-  if (request.context) formData.append("context", request.context);
-  if (request.description) formData.append("description", request.description);
+  formData.append("image", request.file);
+
+  const data = {
+    spots: request.spots,
+    media_source: request.media_source,
+    artist_name: request.artist_name,
+    group_name: request.group_name,
+    context: request.context,
+    description: request.description,
+  };
+  formData.append("data", JSON.stringify(data));
 
   console.log("createPostWithFile - Sending FormData to proxy...");
   console.log("createPostWithFile - FormData entries:");
