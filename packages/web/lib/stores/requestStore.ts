@@ -20,7 +20,7 @@ import {
 } from "@/lib/api";
 
 export type UploadStatus = "pending" | "uploading" | "uploaded" | "error";
-export type RequestStep = 1 | 2 | 3 | 4;
+export type RequestStep = 1 | 2 | 3;
 
 export interface UploadedImage {
   id: string;
@@ -380,11 +380,8 @@ export const useRequestStore = create<RequestState>((set, get) => ({
         // Step 2: AI 감지 완료 - spots가 있어야 함
         return detectedSpots.length > 0;
       case 3:
-        // Step 3: 필수 필드 검증 - media_source의 type과 title이 있어야 함
+        // Step 3: 필수 필드 검증 - media_source의 type과 title이 있어야 함 (Submit merged into Details)
         return !!(mediaSource?.type && mediaSource?.title);
-      case 4:
-        // Step 4: 최종 단계
-        return true;
       default:
         return false;
     }
