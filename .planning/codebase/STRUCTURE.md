@@ -1,522 +1,301 @@
-# Decoded App - Directory Structure & Conventions
+# Codebase Structure
 
-## Monorepo Layout
+**Analysis Date:** 2026-02-05
 
-```
-decoded-app/
-├── package.json              # Root workspace config (Yarn 4.9.2)
-├── packages/
-│   ├── web/                  # Main Next.js application
-│   └── shared/               # Shared types, hooks, utilities
-├── docs/                     # Documentation & design system
-├── .claude/                  # Claude Code configuration
-├── .cursor/                  # Cursor IDE rules
-├── .specify/                 # SpecKit templates
-├── .planning/                # Architecture & planning docs
-└── .vscode/                  # VS Code settings
-```
-
-## Web Package Structure
-
-### `packages/web/app/` - Next.js App Router
-
-#### Page Organization
-```
-app/
-├── page.tsx                  # Home page (/)
-├── layout.tsx                # Root layout wrapper
-├── providers.tsx             # App providers (React Query, Theme, Auth)
-├── globals.css               # Global styles
-│
-├── api/v1/                   # API routes
-│   ├── posts/
-│   │   ├── route.ts         # POST /api/v1/posts - Fetch posts
-│   │   ├── upload/route.ts  # POST /api/v1/posts/upload - Upload images
-│   │   └── analyze/route.ts # POST /api/v1/posts/analyze - AI analysis
-│   └── categories/route.ts  # GET /api/v1/categories - Fetch categories
-│
-├── @modal/                   # Parallel route for modals
-│   └── (.)images/[id]/page.tsx
-│
-├── debug/                    # Debug/development pages
-│   └── supabase/posts/page.tsx
-│
-├── images/
-│   ├── page.tsx             # Image gallery browse
-│   ├── [id]/page.tsx        # Image detail view
-│   ├── ImagesClient.tsx      # Client component with hooks
-│   ├── ImageCard.tsx         # Card component
-│   ├── ImageCardSkeleton.tsx
-│   ├── EmptyState.tsx
-│   └── ErrorState.tsx
-│
-├── posts/
-│   └── [id]/page.tsx        # Post detail view
-│
-├── explore/
-│   ├── page.tsx             # Explore page
-│   └── ExploreClient.tsx     # Client component
-│
-├── search/
-│   ├── page.tsx             # Search results page
-│   └── SearchPageClient.tsx  # Search UI logic
-│
-├── feed/
-│   ├── page.tsx             # Social feed
-│   └── FeedClient.tsx        # Feed client logic
-│
-├── request/                 # Post creation workflow
-│   ├── page.tsx             # Upload step
-│   ├── upload/page.tsx      # Image selection
-│   ├── detect/page.tsx      # AI detection results
-│   └── [...slug]/page.tsx   # Catch-all for flow
-│
-├── profile/
-│   └── page.tsx             # User profile
-│
-├── login/
-│   ├── layout.tsx           # Auth layout
-│   └── page.tsx             # Login page
-│
-├── lab/                     # Experimental features
-│   ├── fashion-scan/page.tsx
-│   └── ascii-text/page.tsx
-│
-└── examples/
-    └── scroll-animation/page.tsx
-```
-
-#### File Naming Conventions
-
-| File Type | Convention | Example |
-|-----------|-----------|---------|
-| Pages | lowercase, kebab-case | `page.tsx`, `[id]/page.tsx` |
-| Client Markers | "Client" suffix | `ExploreClient.tsx`, `FeedClient.tsx` |
-| Server Markers | "Server" suffix | `main-page.server.ts` (queries only) |
-| Components | PascalCase | `ImageCard.tsx`, `Header.tsx` |
-| Utilities | camelCase | `imageCompression.ts`, `fallbackImages.ts` |
-| Hooks | camelCase with "use" prefix | `usePosts.ts`, `useImageUpload.ts` |
-| Stores | camelCase with "Store" suffix | `authStore.ts`, `requestStore.ts` |
-| Types | camelCase | `types.ts`, `api/types.ts` |
-| Tests | match source + ".test" or ".spec" | `Component.test.tsx` |
-
----
-
-## `packages/web/lib/` - Application Logic Layer
-
-### Directory Structure
+## Directory Layout
 
 ```
-lib/
-├── api/                      # API client functions
-│   ├── index.ts             # Export barrel (re-exports)
-│   ├── posts.ts             # POST APIs (upload, analyze, create)
-│   ├── categories.ts        # Category endpoints
-│   └── types.ts             # API request/response types
+packages/web/
+├── app/                      # Next.js App Router pages and API routes
+│   ├── @modal/              # Parallel routes for modals (layout slots)
+│   ├── api/v1/              # Next.js API proxy routes (/api/v1/posts, /users, etc)
+│   ├── debug/               # Debug utilities (supabase debug pages)
+│   ├── examples/            # Feature examples (scroll-animation)
+│   ├── explore/             # Explore/browse feature
+│   ├── feed/                # User feed
+│   ├── images/              # Image detail pages ([id])
+│   ├── lab/                 # Experimental features (fashion-scan, ascii-text)
+│   ├── login/               # Authentication pages
+│   ├── posts/               # Post-related pages
+│   ├── profile/             # User profile pages
+│   ├── request/             # Request submission flow (multi-step form)
+│   ├── search/              # Search results page
+│   ├── globals.css          # Global styles (Tailwind + custom CSS)
+│   ├── layout.tsx           # Root layout wrapping entire app
+│   ├── page.tsx             # Home page
+│   ├── providers.tsx        # App-level providers (QueryClient, Theme, Auth)
+│   └── not-found.tsx        # 404 page
 │
-├── components/              # React components (organized by feature)
-│   ├── index.ts             # Main barrel export
-│   ├── auth/                # Authentication components
-│   │   ├── index.ts
-│   │   ├── AuthProvider.tsx # OAuth setup + session listener
-│   │   └── LoginCard.tsx    # Login UI
+├── lib/                      # Shared utilities and components
+│   ├── api/                 # API client functions
+│   │   ├── client.ts        # Base HTTP client with auth headers
+│   │   ├── posts.ts         # POST endpoints (upload, analyze, create post)
+│   │   ├── users.ts         # User profile endpoints
+│   │   ├── categories.ts    # Category fetching
+│   │   ├── types.ts         # API request/response types (DTO)
+│   │   └── index.ts         # Public exports
 │   │
-│   ├── ui/                  # Atomic UI components (shadcn/ui based)
-│   │   ├── button.tsx
-│   │   ├── modal.tsx
-│   │   ├── card.tsx
-│   │   └── ...more
+│   ├── components/          # React components organized by feature
+│   │   ├── auth/            # Auth components (AuthProvider, LoginCard, OAuthButton)
+│   │   ├── detail/          # Image/Post detail components
+│   │   │   ├── ImageDetailContent.tsx      # Main image display
+│   │   │   ├── ImageDetailModal.tsx        # Modal wrapper
+│   │   │   ├── ImageCanvas.tsx             # Interactive image overlay
+│   │   │   ├── RelatedImages.tsx           # "More from this" gallery
+│   │   │   ├── ShopGrid.tsx                # Product grid
+│   │   │   └── ... (18 files total)
+│   │   ├── explore/         # Explore page components
+│   │   ├── search/          # Search page components
+│   │   ├── feed/            # Feed components
+│   │   ├── profile/         # Profile page components
+│   │   ├── request/         # Multi-step request form
+│   │   ├── fashion-scan/    # AI fashion detection
+│   │   ├── main/            # Home page sections
+│   │   ├── ui/              # Base UI components (buttons, cards, etc)
+│   │   ├── ConditionalNav.tsx       # Responsive header/nav
+│   │   ├── MobileNavBar.tsx         # Mobile navigation
+│   │   ├── FeedCard.tsx             # Card component
+│   │   └── index.ts         # Public component exports
 │   │
-│   ├── main/                # Home page components
-│   │   ├── index.ts
-│   │   ├── HomeAnimatedContent.tsx
-│   │   ├── MainFooter.tsx
-│   │   ├── HeroSection.tsx
-│   │   └── ...feature sections
+│   ├── hooks/               # Custom React hooks
+│   │   ├── useImages.ts             # Image fetching (infinite scroll)
+│   │   ├── usePosts.ts              # Post queries
+│   │   ├── useProfile.ts            # User profile data
+│   │   ├── useSearch.ts             # Search logic
+│   │   ├── useSearchURLSync.ts      # Sync search to URL params
+│   │   ├── useImageUpload.ts        # Upload progress tracking
+│   │   ├── useCreatePost.ts         # Request submission flow
+│   │   ├── useMediaQuery.ts         # Responsive breakpoints
+│   │   ├── useScrollAnimation.ts    # GSAP scroll animations
+│   │   ├── useDebounce.ts           # Debounce utility
+│   │   └── debug/           # Debug hooks
 │   │
-│   ├── search/              # Search page components
-│   │   ├── index.ts
-│   │   ├── SidebarSearchPanel.tsx
-│   │   └── ...search UI
+│   ├── stores/              # Zustand state management
+│   │   ├── authStore.ts             # User auth state + OAuth
+│   │   ├── requestStore.ts          # Multi-step request form state (1-4)
+│   │   ├── profileStore.ts          # User profile state
+│   │   ├── filterStore.ts           # Filter/category state
+│   │   ├── searchStore.ts           # Search UI state
+│   │   ├── transitionStore.ts       # Page transition state
+│   │   └── example-store.ts         # Template for new stores
 │   │
-│   ├── request/             # Post creation workflow components
-│   │   ├── RequestModal.tsx    # Main modal container
-│   │   ├── ArtistInput.tsx
-│   │   ├── ContextSelector.tsx
-│   │   ├── DetailsStep.tsx     # Step 2: Details form
-│   │   ├── SubmitStep.tsx      # Step 3: Review form
-│   │   ├── SubmitPreview.tsx
-│   │   ├── MediaSourceInput.tsx
-│   │   └── ...form components
+│   ├── supabase/            # Supabase database & auth
+│   │   ├── client.ts                # Browser Supabase client (typed)
+│   │   ├── server.ts                # Server Supabase client
+│   │   ├── env.ts                   # Environment variable validation
+│   │   ├── init.ts                  # Supabase client initialization
+│   │   ├── storage.ts               # File storage operations
+│   │   ├── types.ts                 # Auto-generated DB schema types
+│   │   └── queries/         # Server-side query functions
+│   │       ├── main-page.server.ts  # Home page queries
+│   │       ├── search.server.ts     # Search queries
+│   │       ├── explore.server.ts    # Explore queries
+│   │       └── debug/       # Debug utilities
 │   │
-│   ├── detail/              # Detail view components
-│   │   ├── index.ts
-│   │   ├── types.ts
-│   │   └── ...detail UI
+│   ├── react-query/         # React Query configuration
+│   │   └── client.ts                # QueryClient singleton with defaults
 │   │
-│   ├── profile/             # User profile components
-│   │   ├── index.ts
-│   │   └── ...profile UI
+│   ├── utils/               # Utility functions
+│   │   ├── validation.ts            # UPLOAD_CONFIG (file size/type limits)
+│   │   ├── imageCompression.ts      # Image preview URL creation
+│   │   ├── main-page-mapper.ts      # DTO -> UI data transformers
+│   │   └── ... (other utilities)
 │   │
-│   ├── fashion-scan/        # Fashion scanning feature
-│   │   ├── types.ts
-│   │   ├── callout-utils.ts
-│   │   └── ...components
+│   ├── data/                # Static data (constants, enums)
 │   │
-│   ├── dome/                # Visualization components
-│   │   └── index.ts
+│   ├── design-system/       # Design tokens & UI primitives
+│   │   └── ... (design system components)
 │   │
-│   ├── ConditionalNav.tsx   # Responsive nav (sidebar + mobile)
-│   ├── Header.tsx           # Mobile header
-│   ├── Sidebar.tsx          # Main sidebar navigation
-│   ├── MobileNavBar.tsx     # Mobile bottom nav
-│   ├── DecodedLogo.tsx      # Logo with animation
-│   ├── ThiingsGrid.tsx      # Main grid component
-│   ├── FeedCard.tsx         # Social-like card
-│   ├── FilterTabs.tsx
-│   ├── SearchInput.tsx
-│   ├── SidebarFilterPanel.tsx
-│   ├── SimpleFilterDropdown.tsx
-│   ├── VerticalFeed.tsx
-│   ├── ASCIIText.tsx        # ASCII text component
-│   ├── PostBadge.tsx
-│   └── ThiingsGrid.best-practices.md
+│   └── react-query/         # React Query setup
 │
-├── hooks/                   # Custom React hooks
-│   ├── debug/               # Debug-specific hooks
-│   │   └── usePosts.ts
-│   │
-│   ├── useImages.ts         # Fetch images with filtering
-│   ├── usePosts.ts          # Fetch posts (single + infinite)
-│   ├── useItems.ts          # Fetch items from images
-│   ├── useImageById.ts      # Single image query
-│   ├── useCreatePost.ts     # Post creation workflow
-│   ├── useImageUpload.ts    # Image upload to storage
-│   ├── useCategories.ts     # Fetch categories
-│   ├── useSearch.ts         # Search logic + debouncing
-│   ├── useSearchURLSync.ts  # Sync search to URL params
-│   ├── useScrollAnimation.ts # GSAP scroll animations
-│   ├── useFlipTransition.ts # Flip animation state
-│   ├── useMediaQuery.ts     # Responsive breakpoints
-│   ├── useResponsiveGridSize.ts
-│   ├── useNormalizedItems.ts
-│   ├── useDebounce.ts
-│   ├── useSpotCardSync.ts
-│   └── debug/usePosts.ts
+├── public/                  # Static assets
+├── .next/                   # Next.js build output (git-ignored)
+├── node_modules/            # Dependencies (git-ignored)
 │
-├── stores/                  # Zustand state stores
-│   ├── authStore.ts         # OAuth + auth state
-│   ├── requestStore.ts      # Multi-step post creation
-│   ├── profileStore.ts      # User profile data
-│   ├── searchStore.ts       # Search state
-│   ├── filterStore.ts       # Category filters (re-export from shared)
-│   ├── transitionStore.ts   # Page transition animations
-│   └── example-store.ts
-│
-├── supabase/                # Supabase client + queries
-│   ├── init.ts             # Browser client init (side-effect)
-│   ├── server.ts           # Server-side admin client
-│   ├── client.ts           # Re-exports (backward compatibility)
-│   ├── env.ts              # Environment config
-│   ├── types.ts            # Generated TypeScript types from DB
-│   ├── storage.ts          # File storage operations
-│   │
-│   └── queries/
-│       ├── main-page.server.ts    # SSR: home page content
-│       ├── images.ts              # Client: image queries
-│       ├── images.server.ts       # Server: image queries for SSR
-│       ├── posts.ts               # Client: post queries with joins
-│       ├── posts.server.ts        # Server: post SSR queries
-│       ├── items.ts               # Client: item queries
-│       ├── debug/
-│       │   ├── posts.ts
-│       │   └── posts.server.ts
-│       └── [more query files]
-│
-├── react-query/             # React Query configuration
-│   └── client.ts            # QueryClient singleton + defaults
-│
-├── utils/                   # Utility functions
-│   ├── main-page-mapper.ts  # Transform DB records → UI props
-│   ├── color.ts             # Color utilities
-│   ├── imageCompression.ts  # Client-side image compression
-│   ├── validation.ts        # Input validation functions
-│   ├── fallbackImages.ts    # Fallback image URLs
-│   ├── locale.ts            # Localization utilities
-│   └── utils.ts             # General utilities
-│
-└── data/                    # Static data
-    └── heroSlides.ts        # Hero carousel data
+├── tsconfig.json            # TypeScript config (paths: @/*, @decoded/shared/*)
+├── next.config.js           # Next.js config
+├── tailwind.config.ts       # Tailwind CSS config
+├── package.json             # Dependencies & scripts
+├── eslint.config.mjs        # ESLint rules
+└── .prettierrc              # Prettier formatting rules
 ```
 
-### Import Path Aliases
+## Directory Purposes
 
-```json
-{
-  "paths": {
-    "@/*": ["./*"],                    // Relative to packages/web/
-    "@decoded/shared": ["../shared/index.ts"],
-    "@decoded/shared/*": ["../shared/*"]
-  }
-}
-```
+**app/ - Next.js Pages & Routes:**
+- Purpose: Server-side page components and API route handlers
+- Contains: Page layouts, server-side queries, metadata
+- Key files: `layout.tsx`, `providers.tsx`, `page.tsx`, `api/v1/*/route.ts`
+
+**lib/components/ - React Components:**
+- Purpose: Reusable UI components organized by feature domain
+- Contains: Interactive components, animations, form controls
+- Key files: Feature folders (explore/, detail/, search/), ui/ base components
+- Organization: Each feature folder is self-contained (explore page owns its components)
+
+**lib/hooks/ - Custom Hooks:**
+- Purpose: Business logic encapsulation and state management
+- Contains: React Query hooks, Zustand store selectors, DOM interactions
+- Key files: useImages.ts (infinite scroll), useSearch.ts, useProfile.ts
+- Pattern: Each hook is single-responsibility, can be composed
+
+**lib/stores/ - State Management:**
+- Purpose: Client-side state (auth, forms, UI state)
+- Contains: Zustand store definitions with actions and selectors
+- Key files: authStore.ts, requestStore.ts (complex 4-step form)
+- Pattern: Stores export both hooks (useStore) and selectors (selectUser)
+
+**lib/api/ - API Client Functions:**
+- Purpose: Typed HTTP communication with backend API
+- Contains: Fetch functions, error handling, auth token injection
+- Key files: client.ts (base HTTP), posts.ts (upload/analyze), users.ts
+- Pattern: Each function handles one API endpoint, returns typed response
+
+**lib/supabase/ - Database Access:**
+- Purpose: Supabase client initialization and server-side queries
+- Contains: Typed Supabase client, query functions, RLS-secured data access
+- Key files: client.ts (browser), server.ts (SSR), queries/* (feature queries)
+- Pattern: Queries return typed rows, used in both server components and React Query
+
+**lib/utils/ - Utilities:**
+- Purpose: Pure functions and constants
+- Contains: Validators, formatters, mappers, helpers
+- Key files: validation.ts (upload rules), main-page-mapper.ts (data transform)
+- Pattern: Utilities are imported as needed, no state mutations
+
+**lib/design-system/ - Design Tokens:**
+- Purpose: Reusable design primitives and theme components
+- Contains: Button, Input, Card, Modal, Footer components
+- Key files: Components matching design system specification
+- Pattern: Follows shadcn/ui conventions with Tailwind CSS
+
+## Key File Locations
+
+**Entry Points:**
+- `app/layout.tsx`: Root layout wrapping entire app with providers
+- `app/providers.tsx`: App-level provider initialization (React Query, Theme, Auth)
+- `app/page.tsx`: Home page entry point
+- `app/providers.tsx`: Client providers configuration
+
+**Authentication:**
+- `lib/stores/authStore.ts`: Zustand store for user state
+- `lib/components/auth/AuthProvider.tsx`: Subscribes to auth changes
+- `lib/components/auth/OAuthButton.tsx`: OAuth login UI
+- `lib/api/client.ts`: Injects auth token in API requests
+
+**Data Fetching:**
+- `lib/hooks/useImages.ts`: Infinite scroll for images
+- `lib/hooks/usePosts.ts`: Post queries with React Query
+- `lib/api/posts.ts`: Upload, analyze, create POST endpoints
+- `lib/supabase/queries/main-page.server.ts`: SSR data loading
+
+**Request Submission (4-Step):**
+- `lib/stores/requestStore.ts`: State machine for 4-step workflow
+- `lib/hooks/useImageUpload.ts`: Upload progress tracking
+- `lib/hooks/useCreatePost.ts`: Form submission + API calls
+- `app/request/`: Request form pages
+
+**Image Detail View:**
+- `app/images/[id]/page.tsx`: Full-screen detail page
+- `app/@modal/(.)images/[id]/page.tsx`: Modal intercepted route
+- `lib/components/detail/ImageDetailContent.tsx`: Main detail view
+- `lib/components/detail/RelatedImages.tsx`: Related items gallery
+
+**Search:**
+- `app/search/page.tsx`: Server page component (parse URL params)
+- `app/search/SearchPageClient.tsx`: Client component (infinite scroll, filters)
+- `lib/hooks/useSearch.ts`: Search logic and state
+- `lib/hooks/useInfiniteFilteredImages`: Cursor-based pagination
+
+**Profile:**
+- `app/profile/page.tsx`: User profile page
+- `lib/stores/profileStore.ts`: Profile state
+- `lib/hooks/useProfile.ts`: Profile data fetching
+
+## Naming Conventions
+
+**Files:**
+- Components: PascalCase (e.g., `ImageDetailContent.tsx`, `AuthProvider.tsx`)
+- Hooks: camelCase with `use` prefix (e.g., `useImages.ts`, `useSearch.ts`)
+- Utils/Functions: camelCase (e.g., `imageCompression.ts`, `validation.ts`)
+- Stores: camelCase with `Store` suffix (e.g., `authStore.ts`, `requestStore.ts`)
+- API functions: camelCase with `api` in module (e.g., `posts.ts`, `users.ts`)
+
+**Directories:**
+- Feature folders: lowercase (e.g., `explore/`, `detail/`, `search/`, `profile/`)
+- Nested components: PascalCase in component names only
+- Utilities: lowercase (e.g., `utils/`, `hooks/`, `stores/`)
+
+**Variables & Functions:**
+- Store hooks: `useAuthStore`, `useRequestStore` (Zustand naming)
+- Selectors: `selectUser`, `selectIsLoading` (select prefix)
+- React Query hooks: `useInfiniteFilteredImages`, `useImageById`
+- Constants: SCREAMING_SNAKE_CASE (e.g., `UPLOAD_CONFIG`, `API_BASE_URL`)
+- Event handlers: `handleClick`, `handleChange`, `onSubmit`
+
+**Types & Interfaces:**
+- PascalCase (e.g., `User`, `ImageDetail`, `UploadResponse`)
+- Prefix for enums: `RequestStep`, `UploadStatus`
+- Interfaces ending in `State` for Zustand (e.g., `AuthState`, `RequestState`)
+
+## Where to Add New Code
+
+**New Feature (e.g., "Wishlist"):**
+- Primary code: `lib/components/wishlist/` (components for the feature)
+- State: `lib/stores/wishlistStore.ts` (Zustand store)
+- Hooks: `lib/hooks/useWishlist.ts` (data fetching/logic)
+- API: `lib/api/wishlist.ts` (endpoint functions)
+- Pages: `app/wishlist/page.tsx` (routes for the feature)
+- Tests: `./__tests__/wishlist/` (feature tests)
+
+**New Component/Module (e.g., "WishlistCard"):**
+- Location: `lib/components/[feature]/WishlistCard.tsx`
+- If shared across features: `lib/components/ui/WishlistCard.tsx`
+- Props file: Same file as component (inline interface definition)
+
+**Utilities:**
+- Shared helpers: `lib/utils/[name].ts`
+- If logic-heavy: Create dedicated utils file, import in hooks
+- Data mappers: `lib/utils/[feature]-mapper.ts`
+
+**API Endpoints:**
+- Client functions: `lib/api/[feature].ts`
+- Types: `lib/api/types.ts` (all API types in one file)
+- New route: `app/api/v1/[feature]/route.ts` (if proxy needed)
+
+**Server Queries:**
+- Location: `lib/supabase/queries/[feature].server.ts`
+- Used by: Server components in `app/[feature]/page.tsx`
+- Pattern: Export async functions returning typed rows
+
+**Stores:**
+- Location: `lib/stores/[feature]Store.ts`
+- Template: Copy from `lib/stores/example-store.ts`
+- Exports: Both hook (useFeatureStore) and selectors (selectX)
+
+## Special Directories
+
+**@modal/ (Parallel Routes):**
+- Purpose: Modal/intercepted routes for full-screen overlays
+- Generated: No (hand-written)
+- Committed: Yes
+- Pattern: `@modal/(.)path/` intercepts `/path/` from child routes
+
+**.next/ (Build Output):**
+- Purpose: Next.js build artifacts
+- Generated: Yes (yarn build)
+- Committed: No (.gitignore)
+
+**node_modules/ (Dependencies):**
+- Purpose: Installed packages
+- Generated: Yes (yarn install)
+- Committed: No (.gitignore)
+
+**lib/design-system/ (Design System):**
+- Purpose: Reusable UI primitives from design spec
+- Generated: Partially (shadcn/ui generators create base, then customized)
+- Committed: Yes
 
 ---
 
-## `packages/shared/` - Shared Code
-
-### Structure
-
-```
-shared/
-├── index.ts                 # Main barrel export
-├── package.json
-├── tsconfig.json
-│
-├── api/                     # Shared API utilities
-│   └── ...types/functions
-│
-├── hooks/                   # Shared React hooks
-│   └── useFilterStore.ts
-│
-├── stores/                  # Shared Zustand stores
-│   └── filterStore.ts       # Category/filter state
-│
-├── supabase/                # Shared Supabase logic
-│   ├── queries/
-│   │   ├── images.ts        # Image queries (used by web)
-│   │   ├── posts.ts
-│   │   └── items.ts
-│   └── types.ts
-│
-├── types/                   # TypeScript type definitions
-│   ├── index.ts
-│   ├── api.ts
-│   ├── database.ts
-│   └── domain.ts
-│
-├── data/                    # Shared static data
-│   └── ...data files
-│
-└── react-query/             # Shared React Query config
-    └── client.ts
-```
-
----
-
-## `docs/` - Documentation
-
-```
-docs/
-├── README.md                # Documentation index
-├── adr/                     # Architecture Decision Records
-├── api/                     # API documentation
-├── ai-playbook/             # AI tool usage guides
-├── design-system/           # Design tokens & guidelines
-│   ├── components/          # Component specifications
-│   └── tokens.md            # Design tokens
-├── database/                # Database schemas & migrations
-├── architecture/            # Architecture diagrams
-└── diagrams/                # Visual diagrams (PNG, SVG)
-```
-
----
-
-## Key File Locations by Feature
-
-### Authentication
-- **Store**: `lib/stores/authStore.ts`
-- **Provider**: `lib/components/auth/AuthProvider.tsx`
-- **UI**: `lib/components/auth/LoginCard.tsx`
-- **Client Init**: `lib/supabase/init.ts`
-- **Page**: `app/login/page.tsx`
-
-### Image Upload & Analysis
-- **API**: `lib/api/posts.ts` (uploadImage, analyzeImage)
-- **Hook**: `lib/hooks/useImageUpload.ts`
-- **Store**: `lib/stores/requestStore.ts`
-- **Routes**: `app/api/v1/posts/{upload,analyze}/`
-- **Page**: `app/request/upload/page.tsx`
-
-### Post Creation Workflow
-- **Store**: `lib/stores/requestStore.ts` (steps 1-4)
-- **Components**: `lib/components/request/DetailsStep.tsx`, etc.
-- **Hook**: `lib/hooks/useCreatePost.ts`
-- **Modal**: `lib/components/request/RequestModal.tsx`
-- **API**: `lib/api/posts.ts` (createPost)
-
-### Search & Discovery
-- **Pages**: `app/search/`, `app/explore/`, `app/images/`
-- **Store**: `lib/stores/searchStore.ts`, `@decoded/shared` filterStore
-- **Hooks**: `useSearch()`, `useSearchURLSync()`, `useImages()`
-- **Components**: `lib/components/search/*`
-
-### Image & Post Browsing
-- **Gallery**: `app/images/page.tsx` + `ImagesClient.tsx`
-- **Grid**: `lib/components/ThiingsGrid.tsx`
-- **Card**: `lib/components/ImageCard.tsx`, `FeedCard.tsx`
-- **Detail**: `app/images/[id]/page.tsx`, `app/posts/[id]/page.tsx`
-- **Hooks**: `useImages()`, `useImageById()`, `usePosts()`
-
-### Animations
-- **Hooks**: `lib/hooks/useScrollAnimation.ts`, `useFlipTransition.ts`
-- **Stores**: `lib/stores/transitionStore.ts`
-- **Example**: `app/examples/scroll-animation/page.tsx`
-- **Libraries**: GSAP 3.13.0, Motion 12.23.12, Lenis 1.3.15
-
----
-
-## Database & Backend
-
-### Supabase Tables
-- **image**: `{ id, image_url, status, image_hash, with_items }`
-- **item**: `{ id, image_id, product_name, brand, price, bboxes, center, ... }`
-- **post**: `{ id, account, ts, article, item_ids, metadata }`
-- **post_image**: `{ post_id, image_id, item_locations, curated_item_ids }`
-
-### Type Generation
-- Types auto-generated from Supabase schema
-- Location: `lib/supabase/types.ts`
-- Command: (via Supabase CLI)
-
-### Query Patterns
-```typescript
-// Server-side (SSR)
-const data = await fetchWeeklyBestImagesServer(limit);
-
-// Client-side (React Query)
-const { data } = useInfinitePosts({ sort: "recent" });
-```
-
----
-
-## Configuration Files
-
-| File | Purpose |
-|------|---------|
-| `tsconfig.json` | TypeScript compiler options, path aliases |
-| `eslint.config.mjs` | ESLint 9 flat config |
-| `.prettierrc` | Prettier formatting rules |
-| `next.config.ts` | Next.js build configuration |
-| `.env.local` | Local environment variables (gitignored) |
-| `.env.local.example` | Template for environment variables |
-| `.gitignore` | Git exclusions |
-
----
-
-## Testing & Quality
-
-```
-__tests__/
-├── e2e/                     # End-to-end tests
-└── [test files by feature]
-```
-
-- **Testing Framework**: Playwright (for E2E)
-- **Linting**: ESLint 9 with Next.js plugin
-- **Formatting**: Prettier 3.6.2
-- **Type Checking**: TypeScript strict mode
-
----
-
-## Build Output
-
-```
-.next/
-├── dev/                     # Development build
-├── static/                  # Static assets
-├── server/                  # Server components
-└── types/                   # Generated type files
-```
-
----
-
-## Naming & Code Organization Conventions
-
-### Component Organization
-- One component per file (unless very small)
-- File name matches component name (PascalCase)
-- Related components in feature folder
-- Shared components in `lib/components/ui/` or at root
-
-### Hook Organization
-- Custom hooks in `lib/hooks/` directory
-- File name matches hook name (camelCase with "use" prefix)
-- Grouped by type: query, UI, action, debug
-
-### Store Organization
-- One store per file in `lib/stores/`
-- Zustand pattern with selector functions
-- File name matches store name (camelCase with "Store" suffix)
-- Example: `useAuthStore` in `authStore.ts`
-
-### Query Organization
-- Server queries: `queries/*.server.ts` suffix
-- Client queries: `queries/*.ts` (no suffix)
-- Query function naming: `fetch{Entity}ByX` pattern
-
-### Type Definitions
-- Inline types in source files when possible
-- Separate `types.ts` for shared/complex types
-- Database types: `lib/supabase/types.ts` (auto-generated)
-- API types: `lib/api/types.ts`
-
-### Utility Functions
-- Group related utilities in files: `color.ts`, `validation.ts`, etc.
-- Descriptive names: `imageCompression`, `fallbackImages`
-- No default exports; use named exports
-
----
-
-## Startup & Development
-
-### Required Setup
-1. Node.js 18+ (recommended 20+)
-2. Yarn 4.9.2
-3. `.env.local` file with Supabase credentials
-4. Supabase project created
-
-### Start Commands
-```bash
-yarn dev              # Development server (localhost:3000)
-yarn build            # Production build
-yarn start            # Start production server
-yarn lint             # ESLint check
-yarn format           # Prettier format
-yarn format:check     # Check formatting
-```
-
-### Environment Variables
-See `.env.local.example` for required variables:
-- Supabase URL & API keys
-- Next.js API base URL
-- OAuth provider credentials
-
----
-
-## Performance & Optimization Patterns
-
-### Image Optimization
-- Use Next.js `Image` component
-- Client-side compression before upload
-- Lazy loading with intersection observer
-
-### Code Splitting
-- Dynamic imports for heavy components
-- Modal routes via `@modal` parallel slots
-- Automatic by Next.js App Router
-
-### Data Fetching
-- SSR for home page via `page.tsx`
-- Client-side React Query for pagination/filtering
-- Zustand for UI state (non-persisted)
-- Supabase for persistence
-
-### Caching
-- React Query: 1 min stale time, 5 min cache time
-- Browser cache via HTTP headers
-- Static generation where possible
-
----
-
-**Last Updated**: 2026-01-23
+*Structure analysis: 2026-02-05*

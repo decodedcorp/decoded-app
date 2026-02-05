@@ -1,378 +1,573 @@
 # Codebase Concerns
-**Analysis Date:** 2026-01-23
+
+**Analysis Date:** 2026-02-05
 
 ## Executive Summary
-The codebase is well-structured with clear separation of concerns, but several technical debt items and fragile patterns exist that should be addressed for production stability. Primary concerns involve error handling gaps, client/server boundary confusion, resource cleanup issues, and external API dependency risks.
+
+The codebase is well-structured with clear separation of concerns and solid architectural patterns. However, several technical debt items and fragile patterns exist that should be addressed for production stability. Primary concerns involve error handling consistency, component complexity in large UI files, state management validation, and upstream external API dependencies.
 
 ---
 
 ## Tech Debt
 
-### 1. Error Handling Asymmetry in API Routes
-**Issue:** API proxy routes (`/app/api/v1/**`) silently catch errors and return generic error messages without error context propagation.
+### 1. Large Component Files Nearing Complexity Limits
+
+**Issue:** Several UI components exceed 900+ lines of code with complex state management and animation logic intertwined.
 
 **Files:**
-- `packages/web/app/api/v1/posts/upload/route.ts` (lines 50-55)
-- `packages/web/app/api/v1/posts/analyze/route.ts` (lines 41-47)
-- `packages/web/app/api/v1/posts/route.ts` (lines 48-53, 100-105)
+- `packages/web/lib/components/ThiingsGrid.tsx` (948 lines) - Custom grid physics engine with scroll handling
+- `packages/web/lib/components/DecodedLogo.tsx` (764 lines) - Three.js + ASCII filter rendering
+- `packages/web/lib/components/detail/ImageDetailContent.tsx` (671 lines) - Multi-section layout with interactive showcase
+- `packages/web/lib/components/detail/ImageDetailModal.tsx` (637 lines) - GSAP animations, drawer state, scroll forwarding
 
 **Impact:**
-- Client-side error handling receives only `"Failed to upload image"` or `"Failed to create post"` without context
-- Backend error details (validation failures, rate limits, auth errors) are lost
-- Difficult debugging for API integration issues
+- High cognitive load for modifications
+- Animation logic tightly coupled with component rendering
+- Difficult to test individual features
+- Refactoring carries high regression risk
 
 **Fix approach:**
-- Parse backend error responses and extract meaningful error messages
-- Preserve HTTP status codes and error structures from backend
-- Create standardized error response envelope with details
+- Extract animation logic to custom hooks (`useGSAPAnimation`, `useDrawerAnimation`)
+- Create smaller presentational components from sections
+- Move physics engine to separate utility class for `ThiingsGrid`
+- Separate concerns: rendering, animation, state management
 
-### 2. Graceful Degradation Vs Proper Error Handling
-**Issue:** `fetchPostsServer()` in `packages/web/lib/api/posts.ts` (lines 216-227) returns empty response on error instead of propagating failures.
+### 2. Debug Logging Left in Production Code
 
-**Impact:**
-- Server components silently fail to load content
-- No visibility into data loading failures
-- Poor user experience (blank content appears to be "no data")
+**Issue:** `ImageDetailModal.tsx` (lines 40-50) contains debug logging that should be removed or wrapped in development-only guards.
 
-**Fix approach:**
-- Distinguish between "no data" and "fetch failure"
-- Use fallback UI to indicate load failure
-- Implement retry mechanisms with exponential backoff
-
-### 3. Supabase Storage URL Parsing Is Fragile
-**Issue:** `deleteFromSupabaseStorage()` in `packages/web/lib/supabase/storage.ts` (lines 52-60) uses string splitting to extract file path from URL.
-
-**Problem:**
 ```typescript
-const urlParts = url.split(`${BUCKET_NAME}/`);
-if (urlParts.length < 2) {
-  console.warn("Invalid storage URL format:", url);
-  return;  // Silent failure
-}
+useEffect(() => {
+  if (imageId) {
+    console.log("[ImageDetailModal] imageId:", imageId);
+  }
+  if (image) {
+    console.log("[ImageDetailModal] image loaded:", image);
+  }
+  if (error) {
+    console.error("[ImageDetailModal] error:", error);
+  }
+}, [imageId, image, error]);
 ```
 
 **Impact:**
-- If URL format changes, deletion silently fails
-- Orphaned files accumulate in storage (costs increase)
-- No error thrown, so calling code doesn't know about failure
+- Verbose console output in production
+- Information leakage about internal state
+- Makes debugging harder, not easier
 
 **Fix approach:**
-- Use URL parsing API instead of string splitting
-- Store file paths alongside URLs in database
-- Implement file cleanup audit logs
+- Use `process.env.NODE_ENV === 'development'` guards
+- Consider using proper logging library (winston, pino) with log levels
+- Remove or centralize debug logging at build time
 
----
+### 3. Inconsistent Error Handling in API Routes
 
-## Security Considerations
+**Issue:** API proxy routes (`/app/api/v1/**`) have inconsistent error handling:
+- `route.ts` (lines 19-24, 63-68): Check `API_BASE_URL`, log with `console.error()`
+- Some routes don't validate environment variables
+- Error responses all return generic 500 status
 
-### 1. Authentication Token Exposure in Browser Client
-**Issue:** `packages/web/lib/api/posts.ts` calls `getAuthToken()` to retrieve JWT from Supabase session every request (line 62).
-
-**Risk:**
-- Multiple token retrievals increase XSS attack surface
-- Token stored in browser memory/session storage
-- No token refresh strategy documented
-
-**Mitigation:**
-- Consider token caching with expiration
-- Use httpOnly cookies if possible
-- Document token refresh behavior
-
-### 2. Unauthenticated AI Analysis Endpoint
-**Issue:** `POST /api/v1/posts/analyze` doesn't require authentication (file `packages/web/app/api/v1/posts/analyze/route.ts`).
-
-**Risk:**
-- Potential for abuse/DoS via unlimited analysis requests
-- Backend API costs not controlled
-- No rate limiting visible in Next.js routes
-
-**Mitigation:**
-- Implement rate limiting middleware
-- Add backend rate limits
-- Consider auth requirement for production
-
-### 3. Missing Environment Variable Validation
-**Issue:** Environment variable availability checked at initialization time (`packages/web/lib/supabase/init.ts`) but no runtime validation for API_BASE_URL in route handlers.
+**Files:**
+- `packages/web/app/api/v1/posts/route.ts` (lines 20-24, 49-53)
+- `packages/web/app/api/v1/users/me/route.ts` (likely similar pattern)
 
 **Impact:**
-- Routes fail with vague 500 errors if API_BASE_URL is missing
-- Difficult to debug in production
+- Inconsistent error contract makes debugging harder
+- Backend errors get swallowed (validation, auth, rate limit)
+- Difficult to distinguish client vs server errors
 
 **Fix approach:**
-- Create centralized env validation utility
-- Fail fast with clear error messages at startup
-
-### 4. No CORS Headers Configured
-**Issue:** API proxy routes don't set explicit CORS headers; relying on Next.js defaults.
-
-**Impact:**
-- Unclear CORS behavior if frontend and backend are on different origins
-- Potential credential handling issues
-
----
-
-## Performance Bottlenecks
-
-### 1. Image Compression Progress Simulation
-**Issue:** `useImageUpload.ts` (lines 71-82) simulates progress with hardcoded timeouts:
-```typescript
-onProgress?.(10);  // Line 72
-// ... do actual work
-onProgress?.(70);  // Line 82
-```
-
-**Impact:**
-- Progress bar doesn't reflect actual upload speed
-- Poor UX for slow networks (appears done quickly then hangs)
-- User might retry thinking upload failed
-
-**Fix approach:**
-- Use XMLHttpRequest or fetch with streaming to get real upload progress
-- Implement actual compression progress tracking
-
-### 2. Sequential Image Upload in Loop
-**Issue:** `useImageUpload.ts` (lines 139-144) uploads images sequentially in a loop.
-
-**Impact:**
-- Single large image upload blocks others
-- Slower throughput (especially with latency)
-- Suboptimal resource utilization
-
-**Fix approach:**
-- Implement parallel uploads with configurable concurrency limit
-- Add Promise.allSettled() for batch handling
-
-### 3. Missing Cache Control Headers
-**Issue:** `fetchPostsServer()` uses `{ revalidate: 60 }` but returns empty array on failure - no way to distinguish cached misses from errors.
-
-**Impact:**
-- Stale cache entries served indefinitely on persistent failures
-- Memory waste from failed requests
+- Create middleware for env validation and error formatting
+- Parse backend error responses and forward structured errors
+- Use consistent HTTP status codes (401 for auth, 422 for validation, 429 for rate limits)
 
 ---
 
 ## Fragile Areas
 
-### 1. Image File Handling - Memory Leaks
-**Issue:** `createPreviewUrl()` and `revokePreviewUrl()` in `packages/web/lib/utils/imageCompression.ts` use `URL.createObjectURL()`.
+### 1. State Machine Complexity in RequestStore
 
-**Fragile Scenarios:**
-- User navigates away before `removeImage()` is called
-- Component unmounts without cleanup
-- Multiple uploads aborted - revoke calls may not execute
+**Issue:** `requestStore.ts` (433 lines) manages 4-step request flow with complex state transitions.
 
-**Fix approach:**
-- Wrap in try-finally to guarantee revoke
-- Use cleanup ref in React components
-- Add warning logs for orphaned URLs
+**Fragile patterns:**
+- Step transitions triggered by side effects (lines 268-320): `startDetection()` sets `currentStep: 2`
+- No guard against invalid state transitions (can set step 4 without completing steps 1-3)
+- `setTimeout(() => { set({ isRevealing: false }) }, 1500)` (line 308) magic timeout for animation
+- Multiple state update sources (UI components, API responses, timers)
 
-### 2. Zustand Store Missing Validation
-**Issue:** `requestStore.ts` initializes DetectedSpot array and coordinates without type safety on updates.
-
-**Fragile Scenarios:**
-- `setDetectedSpots()` (line 312) accepts any array without validation
-- `selectSpot()` (line 316) doesn't verify spotId exists
-- No schema validation on state updates
-
-**Fix approach:**
-- Add zod/yup schema validation on store updates
-- Implement selector guards
-
-### 3. Missing Race Condition Handling
-**Issue:** In `useImageUpload.ts`, simultaneous uploads of same file ID could cause state conflicts.
-
-**Scenario:**
+**Example fragile scenario:**
 ```
-User clicks upload → uploadToStorage(id, file) starts
-  ↓
-User clicks upload same file again → uploadToStorage(id, file) starts again
-  ↓
-Both update same image ID concurrently → state race condition
+User skips Step 2 → Step 3 UI rendered with no detected spots
+  or
+User navigates away → setTimeout still updates unmounted store
 ```
 
 **Fix approach:**
-- Use AbortController to cancel pending uploads
-- Lock per-image during upload
+- Implement state machine (xstate) with explicit transitions
+- Make step advancement guarded by conditions
+- Replace setTimeout with properly cleaned AbortController
+- Add validation on state updates
 
-### 4. AI Analysis Timing Assumptions
-**Issue:** `requestStore.ts` (lines 79-82) assumes `uploadToStorage()` completes before `startDetection()` is called via setTimeout.
+### 2. Memory Leaks in Image URL Management
 
-**Fragile Scenarios:**
+**Issue:** `createPreviewUrl()` and `revokePreviewUrl()` in `requestStore.ts` (lines 206, 223) use `URL.createObjectURL()`.
+
+**Fragile scenarios:**
+- User navigates away before `clearImages()` called → Preview URL leaked
+- Component unmount during image removal → revoke() doesn't execute
+- Error during upload → cleanup skipped
+- Multiple rapid uploads → revoke race conditions
+
+**Fix approach:**
+- Wrap URL.createObjectURL in try-finally
+- Use React useEffect cleanup to guarantee revoke on unmount
+- Add tracking of all created URLs with warning if leaked
+
+### 3. GSAP Context Management in Modal
+
+**Issue:** `ImageDetailModal.tsx` (lines 282-321) creates GSAP context in useEffect without guaranteed cleanup.
+
+**Fragile scenario:**
+```
+User opens modal → GSAP context created
+  ↓
+Navigation happens → useEffect cleanup runs → revert() called
+  ↓
+New component mounts while animations still running → conflicts
+```
+
+**Fix approach:**
+- Use useGSAP hook from @gsap/react consistently
+- Ensure animations complete or are killed on unmount
+- Test rapid open/close cycles
+
+### 4. Scroll Forwarding Implementation Incomplete
+
+**Issue:** `ImageDetailModal.tsx` (lines 52-63) has scroll forwarding logic that's partially implemented.
+
 ```typescript
-setTimeout(() => {
-  startDetection();
-}, 100);  // Magic number - not guaranteed to be enough
+useEffect(() => {
+  const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+  if (!isDesktop || !floatingImageRef.current || !scrollContainerRef.current)
+    return;
+
+  // Use a wrapper or the floating image ref itself if it's the ImageCanvas container
+  // Since we're rendering ImageCanvas in the "floating" area, we need to target its container
+  // However, floatingImageRef currently points to an <img> tag.
+  // We'll update the render logic to use a container for the Left Side Image.
+}, []);
 ```
 
 **Impact:**
-- Analysis might run on non-uploaded images
-- Race condition with server-side storage
+- Desktop users can't scroll content by scrolling over image
+- Incomplete implementation suggests missing test coverage
 
 **Fix approach:**
-- Use Promise-based flow instead of setTimeout
-- Verify image uploaded before analysis
+- Complete scroll forwarding implementation
+- Test scroll behavior on desktop/mobile
+- Document expected behavior
 
 ---
 
-## Test Coverage Gaps
+## Performance Bottlenecks
 
-### Critical Areas Without Tests
-1. **API proxy error handling** - No tests for backend error propagation
-2. **Image upload retry logic** - `retryUpload()` in `useImageUpload.ts` untested
-3. **Coordinate conversion** - `apiToStoreCoord()` and `storeToApiCoord()` in `packages/web/lib/api/types.ts` untested
-4. **Supabase storage deletion** - `deleteFromSupabaseStorage()` untested; silent failures not caught
-5. **Auth state transitions** - OAuth redirect flow in `authStore.ts` untested
-6. **Zustand store validation** - No tests for invalid state transitions
-7. **File format validation** - Edge cases in `validateImageFile()` untested
+### 1. ThiingsGrid Component - Physics Engine Overhead
 
-### Recommended Test Additions
-- Unit tests for all validation functions
-- Integration tests for API proxy routes with mocked backends
-- E2E tests for upload flow (happy path + error scenarios)
-- Mock tests for Supabase client interactions
+**Issue:** Custom grid implementation with physics simulation runs on every scroll/resize.
 
----
+**File:** `packages/web/lib/components/ThiingsGrid.tsx` (lines 6-14 constants)
 
-## Environmental Concerns
+```typescript
+const MIN_VELOCITY = 0.2;
+const UPDATE_INTERVAL = 16;
+const VELOCITY_HISTORY_SIZE = 5;
+const FRICTION = 0.9;
+```
 
-### Missing `.env.local.example` Values
-**File:** `.env.local.example` (modified in current branch)
+**Impact:**
+- High frame rate requirement (16ms = 60fps target)
+- On lower-end devices, scrolling may jank
+- Large number of DOM nodes (MAX_RENDER_CELLS = 300) impact layout
 
-**Check:** Verify all required env vars are documented:
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `API_BASE_URL` (backend URL)
-- `NEXT_PUBLIC_API_BASE_URL` (browser-side override)
+**Fix approach:**
+- Profile with DevTools to identify bottlenecks
+- Consider virtualization further up the scroll
+- Add frame rate adaptive tuning
+- Test on lower-end devices (e.g., mid-range Android)
 
-**Risk:** Developers might miss environment setup, causing hard-to-debug failures.
+### 2. Coordinate Conversion Overhead
+
+**Issue:** `apiToStoreCoord()` and `storeToApiCoord()` called frequently during rendering.
+
+**Files:**
+- `packages/web/lib/api/types.ts` (lines 189-198)
+- `packages/web/lib/stores/requestStore.ts` (lines 127-140 usage)
+
+**Impact:**
+- Math operations repeated for every item render
+- No memoization of converted coordinates
+
+**Fix approach:**
+- Convert once during data fetch, store normalized values
+- Memoize coordinate transforms in custom hooks
+- Consider typed wrapper class instead of raw numbers
 
 ---
 
 ## Dependency Risks
 
-### 1. Browser Image Compression Library
-**File:** `packages/web/lib/utils/imageCompression.ts`
+### 1. External API_BASE_URL Configuration Risk
 
-**Issue:** External dependency `browser-image-compression` with fallback:
-```typescript
-catch {
-  console.warn("이미지 압축 실패, 원본 파일 사용:", file.name);
-  return { file, originalSize, compressedSize: originalSize, wasCompressed: false };
-}
-```
+**Issue:** Two different env var names used for same purpose:
+- Browser: `NEXT_PUBLIC_API_BASE_URL` (`packages/web/lib/api/posts.ts`, line 20)
+- Server: `API_BASE_URL` (`packages/web/app/api/v1/posts/route.ts`, line 11)
 
 **Risk:**
-- Compression failure doesn't throw error; silently uploads large files
-- Could bypass intended file size limits
+- Easy to misconfigure - set one and not the other
+- Default empty string means silent failures instead of loud errors
+- Different values could cause API inconsistencies
+
+**Files:**
+- `packages/web/lib/api/posts.ts` (line 20): Defaults to empty string
+- `packages/web/app/api/v1/posts/route.ts` (line 11): Checks but defaults to empty
 
 **Fix approach:**
-- Make compression optional with explicit config
-- Don't skip compression without explicit user confirmation
+- Standardize to single env var name
+- Throw error at build time if missing
+- Create `lib/config/api.ts` with validated configuration
 
-### 2. Supabase Client Version
-**Files:** `packages/web/lib/supabase/init.ts`, `packages/web/lib/supabase/client.ts`
+### 2. Three.js Version and Browser Support
 
-**Note:** Supabase client imported from `@decoded/shared` (monorepo).
-- Ensure shared package keeps dependencies in sync
-- Version mismatch could cause subtle auth bugs
+**Issue:** `DecodedLogo.tsx` uses Three.js with WebGL rendering, no fallback for older browsers.
+
+**Files:**
+- `packages/web/lib/components/DecodedLogo.tsx` (lines 67-140+)
+
+**Risk:**
+- WebGL not supported on older browsers or in-app browsers (WebView)
+- No error boundary or fallback
+- Memory leaks possible if canvas not cleaned up
+
+**Fix approach:**
+- Add WebGL capability detection
+- Provide SVG fallback for unsupported browsers
+- Add error boundary around Three.js component
+
+### 3. Zustand Store Serialization Risk
+
+**Issue:** `requestStore.ts` stores complex objects (DetectedSpot, File objects, etc.) without serialization strategy.
+
+**Risk:**
+- File objects in state can't be persisted
+- Zustand default persistence would fail
+- No clear serialization for debugging
+
+**Fix approach:**
+- Document what's serializable vs. not
+- If persistence needed, implement custom serializer
+- Consider extracting file IDs only, load from IndexedDB
 
 ---
 
-## Configuration Issues
+## Testing Gaps
 
-### 1. API Base URL Configuration
-**Files:**
-- `packages/web/lib/api/posts.ts` (line 20): `process.env.NEXT_PUBLIC_API_BASE_URL || ""`
-- `packages/web/app/api/v1/posts/route.ts` (line 11): `process.env.API_BASE_URL`
+### Critical Untested Paths
 
-**Issue:** Two different env var names used:
-- Browser: `NEXT_PUBLIC_API_BASE_URL`
-- Server: `API_BASE_URL`
+**No test directory exists** (`__tests__/` folder is missing)
 
-**Risk:**
-- Easy to misconfigure one
-- Default empty string means silent failures instead of loud errors
+1. **API proxy error handling** - No tests for backend error propagation
+   - What if backend returns 400? Does it propagate to client?
+   - What if backend times out?
 
-**Fix approach:**
-- Standardize env var names
-- Throw if missing instead of defaulting to ""
+2. **Image upload flow** - No tests for happy path or error cases
+   - Compression failure scenarios
+   - Storage upload retry logic
+   - Progress tracking accuracy
 
-### 2. Upload Config Constraints
-**File:** `packages/web/lib/utils/validation.ts` (line 8)
+3. **Modal animation sequences** - No tests for GSAP animations
+   - Open → Close → Reopen cycles
+   - Escape key handling during animation
+   - Maximize button during animation
 
-```typescript
-maxImages: 1,  // 단일 이미지만 허용 (AI 감지용)
+4. **Coordinate system conversions** - No tests for API ↔ Store conversions
+   - Edge cases (0%, 100%, decimal precision)
+   - Floating point rounding errors
+
+5. **Auth store state transitions** - No tests for OAuth flow
+   - Session check on init
+   - Error recovery
+   - Guest login vs. authenticated state
+
+6. **RequestStore step transitions** - No tests for state machine
+   - Can only advance steps in order?
+   - What if user goes back?
+   - Timeout handling on unmount
+
+### Test Infrastructure Missing
+
+- **Test framework:** No jest, vitest, or other test runner configured
+- **Test files:** No test files present in codebase
+- **Mocking:** No mock factories for API responses, Supabase
+- **Test coverage:** 0% coverage
+
+**Recommended additions:**
+```bash
+packages/web/__tests__/
+├── api/
+│   ├── posts.test.ts         # API client tests
+│   └── types.test.ts         # Coordinate conversion tests
+├── stores/
+│   ├── requestStore.test.ts  # State machine validation
+│   └── authStore.test.ts     # OAuth flow
+├── hooks/
+│   ├── useImageUpload.test.ts
+│   └── useSearch.test.ts
+└── components/
+    └── ThiingsGrid.test.tsx  # Grid physics
 ```
 
-**Concern:** Only 1 image allowed, but UI flow supports multi-image workflows. Verify this is intentional and not a configuration error.
+---
+
+## Security Considerations
+
+### 1. Console Error Output May Expose Sensitive Info
+
+**Issue:** Error messages logged to console include potentially sensitive details.
+
+**Files:**
+- `packages/web/lib/stores/authStore.ts` (lines 77, 92)
+- `packages/web/app/api/v1/posts/route.ts` (lines 20, 49, 64, 100)
+
+**Example:**
+```typescript
+console.error("Failed to get session:", error);  // May include token/auth details
+console.error("Posts GET proxy error:", error);  // May include backend URLs
+```
+
+**Risk:**
+- Sensitive information visible in browser console
+- Can be captured by user analytics tools
+- Replay attacks if error logs include URLs
+
+**Fix approach:**
+- Never log full error objects in production
+- Log structured errors without sensitive details
+- Use error tracking service with proper sanitization
+
+### 2. Missing Rate Limiting on Public Endpoints
+
+**Issue:** `POST /api/v1/posts/analyze` doesn't require authentication and has no rate limiting.
+
+**Risk:**
+- DoS attacks via repeated analysis requests
+- Uncontrolled backend API costs
+- No visibility into abuse patterns
+
+**Files:**
+- `packages/web/app/api/v1/posts/analyze/route.ts`
+
+**Fix approach:**
+- Add authentication requirement
+- Implement rate limiting middleware
+- Consider backend rate limits and request quotas
+
+### 3. Image URL Exposure in Unencrypted Form
+
+**Issue:** Image URLs stored in Supabase and passed in API responses without encryption.
+
+**Files:**
+- `packages/web/lib/supabase/types.ts` (image_url fields)
+- API response types
+
+**Risk:**
+- URLs predictable if stored with sequential naming
+- Metadata leakage about which items are in which images
+- No expiring URLs (if using public storage)
+
+**Fix approach:**
+- Use signed/expiring URLs from Supabase
+- Consider obfuscating file names
+- Add access control checks for sensitive images
 
 ---
 
 ## Data Consistency Risks
 
-### 1. Coordinate System Mismatch
-**Files:**
-- `packages/web/lib/api/types.ts` (lines 182-191): Conversion functions
-- `packages/web/lib/stores/requestStore.ts` (lines 127-140): DetectedSpot creation
+### 1. Image Upload URL Mutation During Retry
 
-**Risk:** If coordinate systems get out of sync between API and store:
-```typescript
-// API returns 0-100 percentages
-// Store expects 0-1 normalized coords
-// If conversion skipped, objects render at wrong positions
+**Issue:** `setImageUploadedUrl()` in `requestStore.ts` (lines 246-258) updates URL if retry happens.
+
+**Fragile scenario:**
+```
+User uploads image → uploadedUrl = "https://storage.../image-1"
+  ↓
+AI detection starts using image-1
+  ↓
+User clicks retry → uploadedUrl = "https://storage.../image-1-retry"
+  ↓
+Detection reference now points to wrong image
 ```
 
 **Fix approach:**
-- Add unit tests for coordinate conversion
-- Create type-safe coordinate wrapper class
+- Never mutate uploaded URL during retry
+- Keep detection reference separate from upload state
+- Use unique detection session IDs
 
-### 2. Image URL Mutation During Upload
-**Issue:** `setImageUploadedUrl()` in `requestStore.ts` updates existing image object (lines 236-248).
+### 2. Spot Coordinate Mutation Risk
 
-**Risk:** If upload is retried, old URL might still be used in detections, pointing to stale Supabase storage.
+**Issue:** `setDetectedSpots()` in `requestStore.ts` (line 322) accepts spots without immutability guarantee.
+
+```typescript
+setDetectedSpots: (spots) => {
+  set({ detectedSpots: spots });
+},
+```
+
+**Risk:**
+- Caller could mutate spot objects after setting
+- Store doesn't prevent coordinate changes
+- Can cause rendering artifacts
+
+**Fix approach:**
+- Deep clone spots on store update
+- Add readonly modifier to coordinate objects
+- Use Immer middleware in Zustand for immutability
+
+---
+
+## Environmental Concerns
+
+### 1. Missing `.env.local.example` Documentation
+
+**Issue:** `.env.local.example` may not document all required variables clearly.
+
+**Required variables:**
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `API_BASE_URL` (backend URL for server-side)
+- `NEXT_PUBLIC_API_BASE_URL` (browser-side, if different)
+
+**Risk:**
+- New developers miss environment setup
+- Hard-to-debug failures when variables missing
+
+**Fix approach:**
+- Create `.env.local.example` with all variables
+- Add script to validate env vars on startup
+- Document purpose of each variable
+
+### 2. TypeScript Strict Mode Checks
+
+**Issue:** Build compiles successfully but TypeScript may have loose checking in some areas.
+
+**Risk:**
+- Type errors slip through, caught only at runtime
+- `any` types may hide bugs
+
+**Fix approach:**
+- Verify `tsconfig.json` has strict mode enabled
+- Run `tsc --noEmit` in CI/CD
+- Add pre-commit hook to check types
 
 ---
 
 ## Monitoring Gaps
 
-### 1. No Error Metrics Collection
-- API errors logged to console only
-- No error tracking (Sentry, etc.)
-- No visibility into error rates in production
+### 1. No Error Tracking or Observability
 
-### 2. No Upload Instrumentation
-- No tracking of upload success/failure rates
-- No visibility into compression effectiveness
-- No metrics on AI analysis latency
+**Issue:** Errors logged to console only; no centralized error tracking.
 
-### 3. Silent Failures
-- Storage deletion failures silently ignored
-- Fetch failures return empty data instead of error
-- Compression failures don't bubble up
+**Missing:**
+- Error tracking service (Sentry, LogRocket, etc.)
+- Error reporting pipeline
+- Performance monitoring
+
+**Impact:**
+- Production errors invisible to team
+- Can't track error trends or regression patterns
+- Difficult to prioritize fixes
+
+**Fix approach:**
+- Integrate Sentry or similar service
+- Add performance monitoring (Web Vitals)
+- Set up error alerts for critical endpoints
+
+### 2. No Upload Metrics Collection
+
+**Issue:** Image uploads have no instrumentation or metrics.
+
+**Missing:**
+- Upload success/failure rates
+- Compression effectiveness tracking
+- AI analysis latency metrics
+- Storage usage metrics
+
+**Impact:**
+- Can't optimize upload performance
+- Can't track user issues with uploads
+- Can't predict storage costs
+
+---
+
+## Deployment Considerations
+
+### 1. Build Size Not Monitored
+
+**Issue:** No mention of bundle size analysis or optimization.
+
+**Risk:**
+- Component libraries bundled entirely (lucide-react, react-icons)
+- Three.js (DecodedLogo) adds significant size
+- No tree-shaking verification
+
+**Fix approach:**
+- Add bundle size analysis to CI (e.g., bundlesize, size-limit)
+- Profile with next/image optimization
+- Lazy load heavy components (Three.js, GSAP)
+
+### 2. Missing Graceful Degradation for Missing Features
+
+**Issue:** Some features have no fallback if dependencies fail.
+
+**Examples:**
+- ThiingsGrid.physics requires high frame rate
+- DecodedLogo requires WebGL
+- GSAP animations may fail on older browsers
+
+**Fix approach:**
+- Add feature detection for each heavy dependency
+- Provide lightweight alternatives
+- Test on minimum supported browser versions
 
 ---
 
 ## Recommendations Priority
 
-### High Priority (Blocking Issues)
-1. **Fix API error handling** - Return actual backend errors to client
-2. **Add storage cleanup audit** - Prevent orphaned files
-3. **Implement upload race condition protection** - Use AbortController
-4. **Add env var validation** - Fail fast with clear errors
+### Critical (Blocking Issues)
+1. **Add test infrastructure** - Zero test coverage is untenable for production
+2. **Fix environment variable validation** - Prevent misconfiguration
+3. **Complete scroll forwarding** - Unfinished features can break
+4. **Implement rate limiting** - Prevent abuse of public endpoints
 
-### Medium Priority (Technical Debt)
-1. **Add test coverage** for critical paths (upload, auth, validation)
-2. **Fix memory leaks** in preview URL management
-3. **Implement real upload progress** tracking
-4. **Standardize env var naming** across browser/server
+### High (Technical Debt)
+1. **Refactor large components** - Reduce cognitive load and improve maintainability
+2. **Remove debug logging** - Clean up production code
+3. **Fix state machine transitions** - Prevent invalid state combinations
+4. **Add error tracking** - Gain visibility into production issues
 
-### Low Priority (Nice to Have)
-1. **Parallel upload optimization** - Batch multiple images
-2. **Add error tracking** (Sentry integration)
-3. **Implement rate limiting** on public endpoints
-4. **Create shared error types** across API boundary
+### Medium (Improvements)
+1. **Implement image URL cleanup** - Prevent memory leaks
+2. **Add GSAP safety guards** - Ensure animations clean up properly
+3. **Optimize ThiingsGrid performance** - Test on low-end devices
+4. **Add serialization strategy** - Document what's persistable in stores
+
+### Low (Polish)
+1. **Add bundle size monitoring** - Track performance regressions
+2. **Optimize dependencies** - Lazy load heavy libraries
+3. **Add Web Vitals monitoring** - Track user experience
+4. **Implement feature detection** - Graceful degradation for older browsers
 
 ---
 
-*Concerns audit: 2026-01-23*
-*Analysis covered: 1926 TS/TSX files, 21 API/storage/hook files reviewed*
+*Concerns audit: 2026-02-05*
+*Analysis scope: 183 TS/TSX files, 7 major store/API layers, 4 complex UI components reviewed*

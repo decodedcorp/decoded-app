@@ -1,126 +1,175 @@
 # Technology Stack
-**Analysis Date:** 2026-01-23
+
+**Analysis Date:** 2026-02-05
 
 ## Languages
+
 **Primary:**
-- TypeScript 5.9.3 - All source code, type-safe development
-- JavaScript (ESM) - Configuration files (next.config.js, postcss.config.js, eslint.config.mjs)
-- HTML5 - Markup via React JSX
-- CSS3 - Via Tailwind CSS utility classes
+- TypeScript 5.9.3 - Strict mode enabled, all source code and configuration
+- JavaScript - Build tooling and Next.js configuration (next.config.js, postcss.config.js, eslint.config.mjs)
+
+**Secondary:**
+- CSS/SCSS - Tailwind CSS preprocessed styles
 
 ## Runtime
-**Environment:**
-- Node.js (via Yarn 4.9.2 with node-modules linker)
-- Next.js 16.0.7 - Full-stack React framework with App Router
 
-## Frameworks & Libraries
+**Environment:**
+- Node.js (version not pinned, managed via Yarn)
+- Next.js 16.0.7 runtime (React Server Components)
+
+**Package Manager:**
+- Yarn 4.9.2 (configured as packageManager in `package.json`)
+- Node-modules linker enabled in `.yarnrc.yml`
+- Lockfile: `yarn.lock` present
+
+## Frameworks
+
 **Core:**
-- React 18.3.1 - UI component library
-- Next.js 16.0.7 - React framework with SSR, SSG, API routes, and middleware
-- TypeScript 5.9.3 - Static type checking
+- Next.js 16.0.7 - Full-stack React framework with App Router
+  - Server Components and Route Handlers for backend
+  - API routes for proxying to backend
+  - Built-in image optimization with remote patterns
+  - React Strict Mode enabled
+
+**Frontend:**
+- React 18.3.1 - UI library with React DOM 18.3.1
+- Tailwind CSS 3.4.18 - Utility-first CSS framework
+  - @tailwindcss/typography plugin for prose styling
+  - Custom design tokens via CSS variables in `tailwind.config.ts`
+  - Opacity support via color-mix() function
+  - Dark mode support via class strategy
 
 **State Management:**
-- Zustand 4.5.7 - Lightweight state management for authStore, requestStore, profileStore, transitionStore
-- TanStack React Query 5.90.11 - Server state management, data fetching, caching
-- TanStack React Query DevTools 5.91.1 - Development debugging
+- Zustand 4.5.7 - Lightweight state management
+  - Stores: `authStore`, `requestStore`, `filterStore`, `searchStore`, `profileStore`, `transitionStore`
+  - Location: `lib/stores/*.ts`
 
-**Styling & UI:**
-- Tailwind CSS 3.4.18 - Utility-first CSS framework
-- @tailwindcss/typography 0.5.19 - Prose styling plugin
-- Tailwind Merge 3.4.0 - Merge conflicting Tailwind classes
-- Class Variance Authority 0.7.1 - Component design system helper
-- Shadcn 3.5.0 - Accessible component library
-- Lucide React 0.555.0 - Icon component library
+**Data Fetching & Caching:**
+- React Query (TanStack) 5.90.11 - Server state management
+  - @tanstack/react-query-devtools 5.91.1 for development
+  - Query caching and synchronization
+  - Configuration: 5-minute default stale time
+
+**Animation & Interaction:**
+- GSAP 3.13.0 + @gsap/react 2.1.2 - DOM animation and timeline orchestration
+- Motion 12.23.12 - Declarative component animations
+- Lenis 1.3.15 - Smooth scroll library
+- @use-gesture/react 10.3.1 - React gesture handling
+- Three.js 0.167.1 + @types/three 0.181.0 - 3D graphics library
+
+**UI Components & Icons:**
+- Radix UI primitives (@radix-ui/react-slot 1.2.4)
+- Lucide React 0.555.0 - Icon library
 - React Icons 5.5.0 - Additional icon sets
-
-**Animations & Motion:**
-- GSAP 3.13.0 - Professional animation library
-- @gsap/react 2.1.2 - GSAP React integration
-- Motion 12.23.12 - Declarative animation library
-- Lenis 1.3.15 - Smooth scrolling library
-- @use-gesture/react 10.3.1 - Gesture recognition
-
-**3D Graphics:**
-- Three.js 0.167.1 - 3D JavaScript library
-- @types/three 0.181.0 - TypeScript definitions
-
-**Media & Image Processing:**
-- browser-image-compression 2.0.2 - Client-side image compression
-- next-themes 0.4.6 - Dark mode theming
-- react-markdown 10.1.0 - Markdown rendering
-
-**Notifications:**
 - Sonner 2.0.7 - Toast notification library
+- class-variance-authority 0.7.1 - Component variant system
+- shadcn 3.5.0 - Component library generator
 
-**UI Component Utilities:**
-- @radix-ui/react-slot 1.2.4 - Render delegation utility
-- clsx 2.1.1 - Conditional className utility
+**Utilities:**
+- clsx 2.1.1 - Classname builder
+- tailwind-merge 3.4.0 - Tailwind class conflict resolution
+- browser-image-compression 2.0.2 - Client-side image compression for uploads
+- react-markdown 10.1.0 - Parse and render Markdown
+- next-themes 0.4.6 - Dark mode theme management
 
-## Backend & Data
-**Database:**
-- PostgreSQL (via Supabase)
-- Supabase @supabase/supabase-js 2.86.0 - PostgreSQL database client
+**Database & Auth:**
+- @supabase/supabase-js 2.86.0 - PostgreSQL and auth client
+- @supabase/auth-helpers-nextjs 0.15.0 - Server-side auth utilities with cookie handling
 
-**Authentication:**
-- Supabase Auth - Built-in authentication system
-- @supabase/auth-helpers-nextjs 0.15.0 - Next.js authentication middleware
+**Monorepo:**
+- @decoded/web - Main web application (packages/web)
+- @decoded/shared - Shared types, hooks, utilities (packages/shared)
+  - Exports: supabase/*, hooks/*, stores/*, data/*, react-query/*, types
 
-**Storage:**
-- Supabase Storage - File storage backend
-- Cloudflare R2 - Image CDN (configured in next.config.js via r2.dev domain)
+## Build Tools & Code Quality
 
-## Build Tools & Linting
 **Build:**
 - Next.js 16.0.7 - Built-in webpack-based build system
-- PostCSS 8.5.6 - CSS processing
-- Autoprefixer 10.4.22 - Vendor prefixes
+- PostCSS 8.5.6 - CSS processing pipeline
+- Autoprefixer 10.4.22 - CSS vendor prefixes
 
-**Code Quality:**
+**Linting & Formatting:**
 - ESLint 9.39.1 - JavaScript/TypeScript linter
-- ESLint Config Next 16.0.3 - Next.js ESLint config
-- ESLint Config Prettier 10.1.8 - Disable conflicting rules
-- ESLint Plugin Prettier 5.5.4 - Run Prettier as ESLint rule
-- ESLint Plugin React - React best practices
-- ESLint Plugin React Hooks - Hooks best practices
+  - Config: `packages/web/eslint.config.mjs` (flat config format)
+  - Plugins: @next/eslint-plugin-next, eslint-plugin-react, eslint-plugin-react-hooks, eslint-plugin-prettier
+  - Extends: @eslint/js, typescript-eslint recommended, Next.js core-web-vitals
+  - Rules: prettier/prettier as error, unused vars warning (leading underscore allowed)
+
 - Prettier 3.6.2 - Code formatter
+  - Config: `packages/web/.prettierrc`
+  - Settings: semi true, trailingComma es5, singleQuote false, printWidth 80, tabWidth 2, useTabs false, arrowParens always
+
+**TypeScript Configuration (tsconfig.json):**
+- Strict mode: enabled
+- Module resolution: bundler
+- Target: ES2017
+- Path aliases:
+  - `@/*` → workspace root
+  - `@decoded/shared` → `../shared/index.ts`
+  - `@decoded/shared/*` → `../shared/*`
+
+## Key Dependencies
+
+**Critical (Direct Integration):**
+- Next.js 16.0.7 - Runtime framework
+- @supabase/supabase-js 2.86.0 - PostgreSQL + Auth
+- @supabase/auth-helpers-nextjs 0.15.0 - Server-side auth
 - TypeScript 5.9.3 - Type checking
 
-**Package Management:**
-- Yarn 4.9.2 - Package manager with workspaces (monorepo)
+**Infrastructure & Build:**
+- PostCSS 8.5.6 - CSS processing
+- Autoprefixer 10.4.22 - CSS vendor prefixes
+- Tailwind CSS 3.4.18 - CSS framework
 
-## Development Dependencies
-**Type Definitions:**
-- @types/node 20.19.25
-- @types/react 18.3.27
-- @types/react-dom 18.3.7
-- @types/three 0.181.0
-
-## Monorepo Structure
-**Workspaces:**
-- @decoded/web (packages/web) - Main web application
-- @decoded/shared (packages/shared) - Shared utilities, types, queries, hooks
+**State & Data:**
+- Zustand 4.5.7 - Client state
+- @tanstack/react-query 5.90.11 - Server state
+- @tanstack/react-query-devtools 5.91.1 - Query debugging
 
 ## Configuration
-**Environment:**
-- .env.local - Local environment variables (gitignored)
-- .env.local.example - Template for environment variables
-- NEXT_PUBLIC_SUPABASE_URL - Supabase project URL
-- NEXT_PUBLIC_SUPABASE_ANON_KEY - Supabase public key
-- SUPABASE_SERVICE_ROLE_KEY - Supabase admin key (server-only)
-- API_BASE_URL - Backend API URL (server-only)
-- NEXT_PUBLIC_API_BASE_URL - Client-side API URL (empty for proxy mode)
 
-**TypeScript:**
-- Strict mode enabled
-- ES2017 target
-- ESNext module system
-- Bundler module resolution
+**Environment Files:**
+- `.env.local` - Local development (gitignored)
+- `.env.local.example` - Template
+- `.yarnrc.yml` - Yarn v4 configuration
 
-**Next.js:**
-- App Router (next/app directory)
-- React Strict Mode enabled
-- Remote image patterns: **.r2.dev, picsum.photos, api.dicebear.com
-- Transpiled packages: @decoded/shared
+**Environment Variables:**
+- `NEXT_PUBLIC_SUPABASE_URL` - Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Public anon key
+- `SUPABASE_SERVICE_ROLE_KEY` - Server-only admin key
+- `API_BASE_URL` - Backend API base URL (server-only)
+- `NEXT_PUBLIC_API_BASE_URL` - Client API override (optional, defaults to empty for proxy mode)
+- `NEXT_PUBLIC_USE_MOCK_SEARCH` - Enable mock search data (optional)
+
+**TypeScript & Build Config:**
+- `packages/web/tsconfig.json` - TypeScript strict config
+- `packages/web/next.config.js` - Next.js config with remote image patterns
+- `packages/web/tailwind.config.ts` - Design token system with CSS variables
+- `packages/web/eslint.config.mjs` - ESLint flat config
+
+**Image Remote Patterns (next.config.js):**
+- `**.r2.dev` - Cloudflare R2 buckets
+- `picsum.photos` - Placeholder images
+- `api.dicebear.com` - Avatar generation
+
+## Platform Requirements
+
+**Development:**
+- Node.js (no specific version pinned)
+- Yarn 4.9.2 (must use Yarn, not npm)
+
+**Production:**
+- Node.js 18+ (recommended)
+- Deployment target: Vercel or Node.js runtime supporting Next.js 16
+
+**External Services (Required):**
+- Supabase project (PostgreSQL, Auth)
+- Backend API server at `API_BASE_URL`
+
+**Optional Services:**
+- Cloudflare R2 (image storage)
+- OAuth providers: Google, Apple, Kakao (via Supabase)
 
 ---
-*Stack analysis: 2026-01-23*
+
+*Stack analysis: 2026-02-05*
