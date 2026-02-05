@@ -258,12 +258,6 @@ export async function createPostWithFile(
   };
   formData.append("data", JSON.stringify(data));
 
-  console.log("createPostWithFile - Sending FormData to proxy...");
-  console.log("createPostWithFile - FormData entries:");
-  for (const [key, value] of formData.entries()) {
-    console.log(`  ${key}:`, typeof value === "string" ? value : "(file)");
-  }
-
   // Use local proxy to forward FormData directly
   const response = await fetch("/api/v1/posts", {
     method: "POST",
@@ -274,12 +268,8 @@ export async function createPostWithFile(
     body: formData,
   });
 
-  console.log("createPostWithFile - Response status:", response.status);
-
-  const responseText = await response.text();
-  console.log("createPostWithFile - Response body:", responseText);
-
   if (!response.ok) {
+    const responseText = await response.text();
     let errorMessage = "포스트 생성에 실패했습니다.";
     try {
       const errorJson = JSON.parse(responseText);
@@ -290,7 +280,7 @@ export async function createPostWithFile(
     throw new Error(errorMessage);
   }
 
-  return JSON.parse(responseText);
+  return response.json();
 }
 
 // ============================================================

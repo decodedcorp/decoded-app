@@ -81,12 +81,7 @@ export async function POST(request: NextRequest) {
     // Get FormData from request and forward directly
     const incomingFormData = await request.formData();
 
-    console.log("POST /api/v1/posts - Forwarding FormData:");
-    for (const [key, value] of incomingFormData.entries()) {
-      console.log(`  ${key}:`, typeof value === "string" ? value : "(file)");
-    }
-
-    // Create new FormData for backend (can't forward Blob directly in some cases)
+    // Create new FormData for backend
     const formData = new FormData();
     for (const [key, value] of incomingFormData.entries()) {
       formData.append(key, value);
@@ -104,11 +99,6 @@ export async function POST(request: NextRequest) {
 
     // Parse response - handle both JSON and text responses
     const responseText = await response.text();
-    console.log(
-      "POST /api/v1/posts - Backend response:",
-      response.status,
-      responseText
-    );
 
     // Try to parse as JSON, fallback to text error
     let data;
