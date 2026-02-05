@@ -107,3 +107,11 @@ export type { ArtistCardProps, ArtistCardSkeletonProps } from "./artist-card";
 // StatCard Component
 export { StatCard, StatCardSkeleton } from "./stat-card";
 export type { StatCardProps, StatCardSkeletonProps } from "./stat-card";
+
+// SpotCard Component
+export { SpotCard, SpotCardSkeleton, spotCardVariants } from "./spot-card";
+export type { SpotCardProps } from "./spot-card";
+
+// ShopCarouselCard Component
+export { ShopCarouselCard, ShopCarouselCardSkeleton } from "./shop-carousel-card";
+export type { ShopCarouselCardProps } from "./shop-carousel-card";
