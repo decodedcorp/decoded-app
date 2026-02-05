@@ -99,3 +99,11 @@ export type { SectionHeaderProps } from "./section-header";
 // Tabs Components
 export { Tabs, TabItem, tabItemVariants } from "./tabs";
 export type { TabsProps, TabItemProps } from "./tabs";
+
+// ArtistCard Component
+export { ArtistCard, ArtistCardSkeleton } from "./artist-card";
+export type { ArtistCardProps, ArtistCardSkeletonProps } from "./artist-card";
+
+// StatCard Component
+export { StatCard, StatCardSkeleton } from "./stat-card";
+export type { StatCardProps, StatCardSkeletonProps } from "./stat-card";
