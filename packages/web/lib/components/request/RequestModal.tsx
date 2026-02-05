@@ -20,6 +20,7 @@ import { StepIndicator } from "./StepIndicator";
 import { DetectionView } from "./DetectionView";
 import { DetectedItemCard } from "./DetectedItemCard";
 import { DetailsStep } from "./DetailsStep";
+import { StepContent } from "./StepContent";
 
 interface RequestModalProps {
   isOpen: boolean;
@@ -167,73 +168,77 @@ export function RequestModal({ isOpen, onClose }: RequestModalProps) {
         </header>
 
         {/* Body */}
-        <main className="flex-1 min-h-0 flex flex-col overflow-y-auto p-4 md:p-6">
-          {/* Step 1: Upload */}
-          {currentStep === 1 && (
-            <div className="flex-1 min-h-0 flex flex-col">
-              {!hasImages && (
-                <DropZone
-                  onFilesSelected={handleFilesSelected}
-                  disabled={isMaxImages}
-                  className="flex-1 min-h-[250px] md:min-h-[300px]"
-                />
-              )}
+        <main className="flex-1 min-h-0 flex flex-col overflow-hidden">
+          <StepContent currentStep={currentStep}>
+            <div className="flex-1 min-h-0 flex flex-col overflow-y-auto p-4 md:p-6">
+              {/* Step 1: Upload */}
+              {currentStep === 1 && (
+                <div className="flex-1 min-h-0 flex flex-col">
+                  {!hasImages && (
+                    <DropZone
+                      onFilesSelected={handleFilesSelected}
+                      disabled={isMaxImages}
+                      className="flex-1 min-h-[250px] md:min-h-[300px]"
+                    />
+                  )}
 
-              {hasImages && images[0] && (
-                <div className="flex-1 flex items-center justify-center">
-                  <SingleImagePreview
-                    image={images[0]}
-                    onRemove={() => removeImage(images[0].id)}
-                    onRetry={() => retryUpload(images[0].id)}
-                  />
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Step 2: Detection */}
-          {currentStep === 2 && images[0] && (
-            <div className="space-y-4">
-              {/* Image with SpotMarkers - 최대한 크게 */}
-              <div className="flex-shrink-0">
-                <DetectionView
-                  image={images[0]}
-                  spots={detectedSpots}
-                  isDetecting={isDetecting}
-                  isRevealing={isRevealing}
-                  selectedSpotId={selectedSpotId}
-                  onSpotClick={(spot) => selectSpot(spot.id)}
-                />
-              </div>
-
-              {/* Item Cards - 스크롤해서 볼 수 있음 */}
-              {!isDetecting && detectedSpots.length > 0 && (
-                <div className="space-y-2 pb-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-semibold text-foreground">
-                      Detected Items ({detectedSpots.length})
-                    </h3>
-                    <span className="text-xs text-muted-foreground">
-                      Scroll to see more
-                    </span>
-                  </div>
-                  <div className="space-y-2">
-                    {detectedSpots.map((spot) => (
-                      <DetectedItemCard
-                        key={spot.id}
-                        spot={spot}
-                        isSelected={selectedSpotId === spot.id}
-                        onClick={() => selectSpot(spot.id)}
+                  {hasImages && images[0] && (
+                    <div className="flex-1 flex items-center justify-center">
+                      <SingleImagePreview
+                        image={images[0]}
+                        onRemove={() => removeImage(images[0].id)}
+                        onRetry={() => retryUpload(images[0].id)}
                       />
-                    ))}
-                  </div>
+                    </div>
+                  )}
                 </div>
               )}
-            </div>
-          )}
 
-          {/* Step 3: Details */}
-          {currentStep === 3 && <DetailsStep onClose={handleClose} />}
+              {/* Step 2: Detection */}
+              {currentStep === 2 && images[0] && (
+                <div className="space-y-4">
+                  {/* Image with SpotMarkers - 최대한 크게 */}
+                  <div className="flex-shrink-0">
+                    <DetectionView
+                      image={images[0]}
+                      spots={detectedSpots}
+                      isDetecting={isDetecting}
+                      isRevealing={isRevealing}
+                      selectedSpotId={selectedSpotId}
+                      onSpotClick={(spot) => selectSpot(spot.id)}
+                    />
+                  </div>
+
+                  {/* Item Cards - 스크롤해서 볼 수 있음 */}
+                  {!isDetecting && detectedSpots.length > 0 && (
+                    <div className="space-y-2 pb-4">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-semibold text-foreground">
+                          Detected Items ({detectedSpots.length})
+                        </h3>
+                        <span className="text-xs text-muted-foreground">
+                          Scroll to see more
+                        </span>
+                      </div>
+                      <div className="space-y-2">
+                        {detectedSpots.map((spot) => (
+                          <DetectedItemCard
+                            key={spot.id}
+                            spot={spot}
+                            isSelected={selectedSpotId === spot.id}
+                            onClick={() => selectSpot(spot.id)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Step 3: Details */}
+              {currentStep === 3 && <DetailsStep onClose={handleClose} />}
+            </div>
+          </StepContent>
         </main>
 
         {/* Footer */}
