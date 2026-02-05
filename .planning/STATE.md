@@ -211,7 +211,7 @@ See: .planning/ROADMAP-v2.md
 ## Session Continuity
 
 **Last session:** 2026-02-05
-**Stopped at:** Completed quick task 011 (Desktop header avatar profile link)
+**Stopped at:** Completed quick task 014 (Fix upload 502 error handling)
 **Resume file:** None
 
 **Next Steps:**
@@ -241,7 +241,8 @@ open docs/design-system/README.md  # View updated v2.0 documentation
 | 011 | Desktop header avatar links to /profile | 2026-02-05 | af8a5f2 | [011-header-avatar-profile-link](./quick/011-header-avatar-profile-link/) |
 | 012 | Profile 페이지 REST API 연결 | 2026-02-05 | 867bf97 | [012-profile-page-api-connection](./quick/012-profile-page-api-connection/) |
 | 013 | Fix request page excessive re-renders | 2026-02-05 | a591e1e | [013-fix-request-page-excessive-rerenders](./quick/013-fix-request-page-excessive-rerenders/) |
+| 014 | Fix upload 502 error handling with retry | 2026-02-05 | 49c288b | [014-fix-upload-502-error-handling](./quick/014-fix-upload-502-error-handling/) |
 
 ---
 
-*Last updated: 2026-02-05 after quick task 013*
+*Last updated: 2026-02-05 after quick task 014*
