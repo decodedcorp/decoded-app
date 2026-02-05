@@ -52,7 +52,7 @@ None yet.
 
 ### Blockers/Concerns
 
-- Pre-existing TypeScript error in requestStore.ts (setSpotSolution, clearSpotSolution missing)
+None.
 
 ## Session Continuity
 

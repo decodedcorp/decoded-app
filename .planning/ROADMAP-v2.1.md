@@ -30,8 +30,8 @@ This milestone completes the decoded.pen design system implementation by buildin
 **Plans**: 2 plans (1 wave)
 
 Plans:
-- [ ] v2.1-01-01-PLAN.md — Tag + ActionButton components [Wave 1]
-- [ ] v2.1-01-02-PLAN.md — StepIndicator + Hotspot components [Wave 1]
+- [x] v2.1-01-01-PLAN.md — Tag + ActionButton components [Wave 1] ✅
+- [x] v2.1-01-02-PLAN.md — StepIndicator + Hotspot components [Wave 1] ✅
 
 ---
 
@@ -154,14 +154,14 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| v2.1-1. Core Interactive | 0/2 | Planned | - |
+| v2.1-1. Core Interactive | 2/2 | ✅ Complete | 2026-02-05 |
 | v2.1-2. Navigation | 0/2 | Not started | - |
 | v2.1-3. Cards | 0/2 | Not started | - |
 | v2.1-4. Profile & Detail | 0/2 | Not started | - |
 | v2.1-5. Login & State | 0/3 | Not started | - |
 | v2.1-6. Visual QA | 0/2 | Not started | - |
 
-**Total:** 0/13 plans complete
+**Total:** 2/13 plans complete
 
 ---
 
