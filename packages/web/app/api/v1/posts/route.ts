@@ -93,14 +93,22 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify(body),
     });
 
-    // Parse response data
-    const data = await response.json();
-
+    // Parse response - handle both JSON and text responses
+    const responseText = await response.text();
     console.log(
       "POST /api/v1/posts - Backend response:",
       response.status,
-      JSON.stringify(data)
+      responseText
     );
+
+    // Try to parse as JSON, fallback to text error
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      // Backend returned non-JSON response (likely an error message)
+      data = { message: responseText || "Unknown backend error" };
+    }
 
     // Return the response with the same status code
     return NextResponse.json(data, { status: response.status });
