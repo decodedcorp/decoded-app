@@ -34,12 +34,20 @@ export default function RequestDetectPage() {
   // Get the first uploaded image
   const uploadedImage = images.find((img) => img.status === "uploaded");
 
-  // Redirect to upload if no images
+  // Redirect to upload if no images (with a small safety check)
   useEffect(() => {
-    if (images.length === 0) {
-      router.push("/request/upload");
+    // 만약 이미지가 없고, 이미 업로드된 이미지도 없다면 업로드 페이지로 이동
+    // 단, 페이지가 로드되자마자 즉시 리다이렉트하는 대신 약간의 유예를 둘 수도 있지만
+    // 현재는 단순 이미지가 비어있는지 체크
+    if (images.length === 0 && !isDetecting) {
+      const timer = setTimeout(() => {
+        if (useRequestStore.getState().images.length === 0) {
+          router.push("/request/upload");
+        }
+      }, 500); // 500ms 유예를 두어 마운트 시점의 일시적 빈 상태 대응
+      return () => clearTimeout(timer);
     }
-  }, [images, router]);
+  }, [images.length, isDetecting, router]);
 
   // Start detection when page loads (only once)
   useEffect(() => {

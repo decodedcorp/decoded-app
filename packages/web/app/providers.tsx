@@ -6,8 +6,7 @@ import { getQueryClient } from "@/lib/react-query/client";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/lib/components/auth";
 
-// Supabase 브라우저 클라이언트 초기화 (side-effect import)
-import "@/lib/supabase/init";
+// Supabase 브라우저 클라이언트 초기화는 "@/lib/supabase/client"에서 수행됨
 
 /**
  * App-level providers wrapper

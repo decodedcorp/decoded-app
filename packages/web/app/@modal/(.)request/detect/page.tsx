@@ -50,12 +50,18 @@ export default function ModalRequestDetectPage() {
     onSelectSpot: selectSpot,
   });
 
-  // Redirect to upload if no images (within modal context)
+  // Redirect to upload if no images (with a small safety check)
   useEffect(() => {
-    if (images.length === 0) {
-      router.push("/request/upload");
+    // 만약 이미지가 없고, 이미 업로드된 이미지도 없다면 업로드 페이지로 이동
+    if (images.length === 0 && !isDetecting) {
+      const timer = setTimeout(() => {
+        if (useRequestStore.getState().images.length === 0) {
+          router.push("/request/upload");
+        }
+      }, 500); // 500ms 유예를 두어 마운트 시점의 일시적 빈 상태 대응
+      return () => clearTimeout(timer);
     }
-  }, [images, router]);
+  }, [images.length, isDetecting, router]);
 
   // Start detection when page loads (only once)
   useEffect(() => {

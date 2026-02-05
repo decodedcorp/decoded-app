@@ -1,6 +1,7 @@
 "use client";
 
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { SupabaseClient } from "@supabase/supabase-js";
+import { initSupabase } from "@decoded/shared";
 import type { Database } from "./types";
 
 // Environment variables
@@ -15,10 +16,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 /**
  * Typed Supabase client for browser use
- * Uses the new Database schema with posts, users, spots, solutions tables
+ * Uses singleton pattern from @decoded/shared to prevent multiple instances
  */
-export const supabaseBrowserClient: SupabaseClient<Database> =
-  createClient<Database>(supabaseUrl, supabaseAnonKey);
+export const supabaseBrowserClient: SupabaseClient<Database> = initSupabase(
+  supabaseUrl,
+  supabaseAnonKey
+) as unknown as SupabaseClient<Database>;
 
 /**
  * Get the Supabase client instance
