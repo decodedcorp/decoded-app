@@ -1,8 +1,8 @@
 /**
  * 이미지 업로드 로직 훅
- * 파일 검증, 압축, Supabase Storage 업로드를 처리합니다.
+ * 파일 검증, 압축, API를 통한 업로드를 처리합니다.
  *
- * 플로우: 이미지 선택 → 압축 → Supabase Storage 업로드 → AI 분석 자동 실행
+ * 플로우: 이미지 선택 → 압축 → API 업로드 → AI 분석 자동 실행
  */
 
 import { useCallback, useEffect } from "react";
@@ -19,7 +19,7 @@ import {
   UPLOAD_CONFIG,
 } from "@/lib/utils/validation";
 import { compressImage } from "@/lib/utils/imageCompression";
-import { uploadToSupabaseStorage } from "@/lib/supabase/storage";
+import { uploadImage } from "@/lib/api/posts";
 
 export interface UseImageUploadOptions {
   autoUpload?: boolean;
@@ -46,7 +46,7 @@ export function useImageUpload(options: UseImageUploadOptions = {}) {
   const startDetection = useRequestStore((s) => s.startDetection);
 
   /**
-   * 단일 이미지 업로드 (Supabase Storage)
+   * 단일 이미지 업로드 (API)
    * 업로드 완료 후 자동으로 AI 분석 시작
    */
   const uploadToStorage = useCallback(
@@ -62,16 +62,16 @@ export function useImageUpload(options: UseImageUploadOptions = {}) {
         if (wasCompressed) {
           console.log(`Image compressed: ${file.name}`);
         }
-        updateImageStatus(id, "uploading", 30);
 
-        // 2. Supabase Storage에 업로드
-        updateImageStatus(id, "uploading", 50);
-        const publicUrl = await uploadToSupabaseStorage(compressedFile);
+        // 2. API를 통해 백엔드에 업로드
+        const { image_url } = await uploadImage({
+          file: compressedFile,
+          onProgress: (progress) => updateImageStatus(id, "uploading", progress),
+        });
 
         // 3. 업로드 완료
-        updateImageStatus(id, "uploading", 90);
-        setImageUploadedUrl(id, publicUrl);
-        onUploadComplete?.(id, publicUrl);
+        setImageUploadedUrl(id, image_url);
+        onUploadComplete?.(id, image_url);
         updateImageStatus(id, "uploaded", 100);
 
         // 4. 자동 AI 분석 시작
