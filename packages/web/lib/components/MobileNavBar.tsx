@@ -1,9 +1,9 @@
 "use client";
 
 import { memo, useState, useCallback } from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Search, PlusCircle, LayoutGrid, User } from "lucide-react";
+import { NavBar, NavItem } from "@/lib/design-system";
 import { RequestModal } from "./request/RequestModal";
 
 interface NavItem {
@@ -64,63 +64,24 @@ export const MobileNavBar = memo(() => {
 
   return (
     <>
-      <nav
-        role="navigation"
-        aria-label="Main navigation"
-        className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
-      >
-        <div className="flex h-16 items-center justify-between border-t border-border bg-card px-6 py-2 pb-[calc(8px+env(safe-area-inset-bottom,0px))]">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            const Icon = item.icon;
+      <NavBar>
+        {navItems.map((item) => {
+          const isActive = pathname === item.href;
+          const Icon = item.icon;
 
-            if (item.disabled) {
-              return (
-                <button
-                  key={item.id}
-                  disabled
-                  className="flex flex-col items-center gap-1 opacity-40 cursor-not-allowed"
-                  aria-label={`${item.label} (coming soon)`}
-                  aria-disabled="true"
-                >
-                  <Icon className="h-[22px] w-[22px]" />
-                  <span className="text-[10px] font-medium">{item.label}</span>
-                </button>
-              );
-            }
-
-            if (item.isAction) {
-              return (
-                <button
-                  key={item.id}
-                  onClick={handleRequestOpen}
-                  className="flex flex-col items-center gap-1 transition-colors text-muted-foreground hover:text-foreground"
-                  aria-label={item.label}
-                >
-                  <Icon className="h-[22px] w-[22px]" />
-                  <span className="text-[10px] font-medium">{item.label}</span>
-                </button>
-              );
-            }
-
-            return (
-              <Link
-                key={item.id}
-                href={item.href}
-                className={`flex flex-col items-center gap-1 transition-colors ${
-                  isActive
-                    ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-                aria-current={isActive ? "page" : undefined}
-              >
-                <Icon className="h-[22px] w-[22px]" />
-                <span className="text-[10px] font-medium">{item.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
+          return (
+            <NavItem
+              key={item.id}
+              icon={<Icon className="h-[22px] w-[22px]" />}
+              label={item.label}
+              href={item.isAction ? undefined : item.href}
+              onClick={item.isAction ? handleRequestOpen : undefined}
+              active={isActive}
+              disabled={item.disabled}
+            />
+          );
+        })}
+      </NavBar>
 
       {/* Request Modal */}
       <RequestModal isOpen={isRequestModalOpen} onClose={handleRequestClose} />

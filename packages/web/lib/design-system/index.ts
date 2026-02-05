@@ -83,3 +83,11 @@ export type { StepIndicatorProps } from "./step-indicator";
 // Hotspot Component
 export { Hotspot, hotspotVariants } from "./hotspot";
 export type { HotspotProps, HotspotPosition } from "./hotspot";
+
+// NavItem Component
+export { NavItem, navItemVariants } from "./nav-item";
+export type { NavItemProps } from "./nav-item";
+
+// NavBar Component
+export { NavBar, navBarVariants } from "./nav-bar";
+export type { NavBarProps } from "./nav-bar";
