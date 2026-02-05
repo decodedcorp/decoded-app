@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 **Active Milestones:**
-- **v2.0 Design Overhaul** - Phase v2-07 IN PROGRESS (2/3 plans done)
+- **v2.0 Design Overhaul** - Phase v2-07 COMPLETE (3/3 plans done)
 
 **v1.1 Status:** SHIPPED (2026-01-29) - All 4 tracks merged to main
-**v2.0 Status:** Phase v2-07 IN PROGRESS (2/3 plans done)
-**Last activity:** 2026-02-05 - Completed v2-07-02-PLAN.md (Image Detail Hero & Animations)
+**v2.0 Status:** Phase v2-07 COMPLETE (3/3 plans done)
+**Last activity:** 2026-02-05 - Completed v2-07-03-PLAN.md (Item Cards & Related Content)
 
 ### Execution Flow
 
@@ -36,11 +36,15 @@ v2.0 (feature/v2-design-overhaul):
    │
    ├─ v2-Phase 6: Feed & Profile Pages ─── COMPLETE ✓
    │
-   └─ v2-Phase 7: Search & Image Detail ─── IN PROGRESS (1/3)
+   ├─ v2-Phase 7: Search & Image Detail ─── COMPLETE ✓
+   │
+   ├─ v2-Phase 8: Request Flow & Login ─── NOT STARTED
+   │
+   └─ v2-Phase 9: Documentation & Polish ─── NOT STARTED
 ```
 
 **v1.1 Progress:** ██████████ (100% - SHIPPED)
-**v2.0 Progress:** ████████░░ (74% - 20 of 27 plans complete)
+**v2.0 Progress:** █████████░ (78% - 21 of 27 plans complete)
 
 ## Milestones
 
@@ -75,7 +79,7 @@ See: .planning/ROADMAP-v2.md
 | v2-4: Desktop Infrastructure | 3/3 | **Complete** (v2-04-01, v2-04-02, v2-04-03 done) |
 | v2-5: Home & Explore Pages | 3/3 | **Complete** (v2-05-01, v2-05-02, v2-05-03 done) |
 | v2-6: Feed & Profile Pages | 3/3 | **Complete** (v2-06-01, v2-06-02, v2-06-03 done) |
-| v2-7: Search & Image Detail | 2/3 | **In progress** (v2-07-01, v2-07-02 done) |
+| v2-7: Search & Image Detail | 3/3 | **Complete** (v2-07-01, v2-07-02, v2-07-03 done) |
 | v2-8: Request Flow & Login | 0/3 | Not started |
 | v2-9: Documentation & Polish | 0/3 | Not started |
 
@@ -170,6 +174,11 @@ See: .planning/ROADMAP-v2.md
 - **Title Fade Timing (v2-07-02):** Fade completes at 30% scroll for smooth transition before user scrolls past hero
 - **Lightbox z-index (v2-07-02):** z-[60] to stack above header (z-50), z-[70] for close button
 - **Simple Zoom Pattern (v2-07-02):** Toggle between scale 1 and 1.5 instead of complex zoom library for MVP
+- **Shop Grid Spotted First (v2-07-03):** Prioritize spotted items (with normalizedCenter) before suggested items in shop carousel
+- **Shop Grid Responsive Layout (v2-07-03):** Mobile carousel with snap points, desktop 3-4 column grid for optimal browsing
+- **Related Images Gallery Title (v2-07-03):** "More from this look" with subtitle "From @account" more engaging than generic title
+- **Search Page Overlay Pattern (v2-07-03):** Full-screen fixed overlay (inset-0 z-50) with router.back() for consistent mobile/desktop UX
+- **Search Grid Layouts (v2-07-03):** Grid layouts for all tabs (People: 1-2 col, Media: 2-4 col, Items: 3-6 col) for uniform browsing
 
 ### Open Items
 - v2 deferred: Admin dashboard, real-time notifications
@@ -184,17 +193,17 @@ See: .planning/ROADMAP-v2.md
 ## Session Continuity
 
 **Last session:** 2026-02-05
-**Stopped at:** Completed v2-07-02-PLAN.md (Image Detail Hero & Animations)
+**Stopped at:** Completed v2-07-03-PLAN.md (Item Cards & Related Content)
 **Resume file:** None
 
 **Next Steps:**
 
 ```bash
-# Phase v2-07: Search & Image Detail - IN PROGRESS (2/3 done)
+# Phase v2-07: Search & Image Detail - COMPLETE (3/3 done)
 git checkout feature/v2-design-overhaul  # 현재 브랜치
-/gsd:execute-phase v2-07-03  # Next: Complete Search & Image Detail
+/gsd:discuss-phase v2-08  # Next: Discuss Request Flow & Login phase
 # Or test current changes
-npm run dev  # Verify hero animations (parallax, fade), lightbox zoom
+npm run dev  # Verify shop grid (spotted first), related images gallery, search overlay
 ```
 
 ### Quick Tasks Completed
