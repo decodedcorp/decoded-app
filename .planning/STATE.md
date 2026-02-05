@@ -202,7 +202,7 @@ See: .planning/ROADMAP-v2.md
 ## Session Continuity
 
 **Last session:** 2026-02-05
-**Stopped at:** Completed v2-08-03-PLAN.md (Login Page Google-Only OAuth)
+**Stopped at:** Completed quick task 003 (Explore footer 제거)
 **Resume file:** None
 
 **Next Steps:**
@@ -221,7 +221,8 @@ yarn dev  # Verify request flow (3 steps, slide transitions), login (Google-only
 |---|-------------|------|--------|-----------|
 | 001 | Fix header and mobile nav design to match decoded.pen | 2026-01-29 | 76f9be1 | [001-fix-header-mobile-nav-design](./quick/001-fix-header-mobile-nav-design/) |
 | 002 | Add optional description field with AI metadata extraction to post creation | 2026-02-05 | e66645a | [002-post-optional-fields-media-metadata](./quick/002-post-optional-fields-media-metadata/) |
+| 003 | Explore 페이지 things 그리드 + footer 제거 | 2026-02-05 | c19e536 | [003-explore-things-grid-no-footer](./quick/003-explore-things-grid-no-footer/) |
 
 ---
 
-*Last updated: 2026-02-05 after v2-08 phase completion*
+*Last updated: 2026-02-05 after quick task 003*
