@@ -116,6 +116,21 @@ const config: Config = {
         serif: ["Playfair Display", "serif"],
         sans: ["Inter", "system-ui", "sans-serif"],
       },
+      animation: {
+        "pulse-soft": "pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+      },
+      keyframes: {
+        "pulse-soft": {
+          "0%, 100%": {
+            transform: "translate(-50%, -50%) scale(1)",
+            opacity: "1",
+          },
+          "50%": {
+            transform: "translate(-50%, -50%) scale(1.15)",
+            opacity: "0.8",
+          },
+        },
+      },
     },
   },
   plugins: [require("@tailwindcss/typography")],
