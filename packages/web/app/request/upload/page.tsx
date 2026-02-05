@@ -74,12 +74,24 @@ export default function RequestUploadPage() {
       toast.dismiss("upload");
 
       // 2. spots를 API 형식으로 변환 (solution 없이)
+      // 디버깅: 카테고리 맵 상태 확인
+      console.log("categoryCodeMap:", Object.fromEntries(categoryCodeMap));
+
       const spotsPayload = detectedSpots.map((spot) => {
         const categoryCode = spot.categoryCode || "fashion";
-        const categoryId = categoryCodeMap.get(categoryCode);
+        let categoryId = categoryCodeMap.get(categoryCode);
+
+        // fallback: fashion 카테고리가 없으면 첫번째 카테고리 사용
         if (!categoryId) {
-          throw new Error(`카테고리를 찾을 수 없습니다: ${categoryCode}`);
+          console.warn(`카테고리 코드 "${categoryCode}" 없음, fallback 사용`);
+          const firstEntry = categoryCodeMap.entries().next().value;
+          categoryId = firstEntry?.[1];
         }
+
+        if (!categoryId) {
+          throw new Error("사용 가능한 카테고리가 없습니다.");
+        }
+
         return {
           position_left: `${(spot.center.x * 100).toFixed(1)}%`,
           position_top: `${(spot.center.y * 100).toFixed(1)}%`,
