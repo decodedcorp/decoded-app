@@ -397,8 +397,29 @@ export const useRequestStore = create<RequestState>((set, get) => ({
 // Selector helpers
 export const selectImages = (state: RequestState) => state.images;
 export const selectCurrentStep = (state: RequestState) => state.currentStep;
-export const selectCanProceed = (state: RequestState) =>
-  state.canProceedToNextStep();
+
+/**
+ * canProceed를 상태 기반으로 직접 계산 (함수 호출 대신)
+ * 함수 호출은 매번 새 참조를 만들어 불필요한 리렌더링 유발
+ */
+export const selectCanProceed = (state: RequestState): boolean => {
+  const { images, currentStep, detectedSpots, mediaSource } = state;
+
+  switch (currentStep) {
+    case 1:
+      // Step 1: 최소 1장 이상의 이미지가 업로드 완료되어야 함
+      return images.some((img) => img.status === "uploaded");
+    case 2:
+      // Step 2: AI 감지 완료 - spots가 있어야 함
+      return detectedSpots.length > 0;
+    case 3:
+      // Step 3: 필수 필드 검증 - media_source의 type과 title이 있어야 함
+      return !!(mediaSource?.type && mediaSource?.title);
+    default:
+      return false;
+  }
+};
+
 export const selectImageCount = (state: RequestState) => state.images.length;
 export const selectHasImages = (state: RequestState) => state.images.length > 0;
 export const selectIsMaxImages = (state: RequestState) =>
@@ -428,3 +449,33 @@ export const selectContext = (state: RequestState) => state.context;
 // Step 4 selectors
 export const selectIsSubmitting = (state: RequestState) => state.isSubmitting;
 export const selectSubmitError = (state: RequestState) => state.submitError;
+
+/**
+ * Action들을 렌더링 없이 직접 접근
+ * 컴포넌트에서 action만 필요할 때 사용 (구독 없음)
+ */
+export const getRequestActions = () => {
+  const state = useRequestStore.getState();
+  return {
+    addImage: state.addImage,
+    addImages: state.addImages,
+    removeImage: state.removeImage,
+    updateImageStatus: state.updateImageStatus,
+    setImageUploadedUrl: state.setImageUploadedUrl,
+    clearImages: state.clearImages,
+    startDetection: state.startDetection,
+    setDetectedSpots: state.setDetectedSpots,
+    selectSpot: state.selectSpot,
+    setDescription: state.setDescription,
+    setExtractedMetadata: state.setExtractedMetadata,
+    setIsExtractingMetadata: state.setIsExtractingMetadata,
+    setMediaSource: state.setMediaSource,
+    setArtistName: state.setArtistName,
+    setGroupName: state.setGroupName,
+    setContext: state.setContext,
+    setSubmitting: state.setSubmitting,
+    setSubmitError: state.setSubmitError,
+    setStep: state.setStep,
+    resetRequestFlow: state.resetRequestFlow,
+  };
+};

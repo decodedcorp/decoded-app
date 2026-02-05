@@ -1,8 +1,10 @@
 "use client";
 
+import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   useRequestStore,
+  getRequestActions,
   selectCurrentStep,
   selectHasImages,
   selectCanProceed,
@@ -14,18 +16,20 @@ import { ImagePreviewGrid } from "@/lib/components/request/ImagePreviewGrid";
 
 export default function RequestUploadPage() {
   const router = useRouter();
+
+  // 상태만 구독 (렌더링에 필요한 것만)
   const currentStep = useRequestStore(selectCurrentStep);
   const hasImages = useRequestStore(selectHasImages);
   const canProceed = useRequestStore(selectCanProceed);
-  const resetRequestFlow = useRequestStore((s) => s.resetRequestFlow);
 
   const { images, isMaxImages, handleFilesSelected, removeImage, retryUpload } =
     useImageUpload();
 
-  const handleClose = () => {
-    resetRequestFlow();
+  // Action은 getRequestActions()로 접근 (구독 없이)
+  const handleClose = useCallback(() => {
+    getRequestActions().resetRequestFlow();
     router.push("/");
-  };
+  }, [router]);
 
   const handleNext = () => {
     if (canProceed) {

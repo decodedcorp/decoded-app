@@ -4,7 +4,7 @@ import { useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
 import { gsap } from "gsap";
-import { useRequestStore } from "@/lib/stores/requestStore";
+import { getRequestActions } from "@/lib/stores/requestStore";
 
 interface RequestFlowModalProps {
   children: React.ReactNode;
@@ -16,7 +16,6 @@ interface RequestFlowModalProps {
  */
 export function RequestFlowModal({ children }: RequestFlowModalProps) {
   const router = useRouter();
-  const resetRequestFlow = useRequestStore((s) => s.resetRequestFlow);
 
   // Refs for animation
   const containerRef = useRef<HTMLDivElement>(null);
@@ -32,7 +31,7 @@ export function RequestFlowModal({ children }: RequestFlowModalProps) {
     ctxRef.current.add(() => {
       const tl = gsap.timeline({
         onComplete: () => {
-          resetRequestFlow();
+          getRequestActions().resetRequestFlow();
           if (window.history.length > 1) {
             router.back();
           } else {
@@ -63,7 +62,7 @@ export function RequestFlowModal({ children }: RequestFlowModalProps) {
         0
       );
     });
-  }, [router, resetRequestFlow]);
+  }, [router]);
 
   // Mount/Enter Animation
   useEffect(() => {
