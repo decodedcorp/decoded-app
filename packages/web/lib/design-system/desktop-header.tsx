@@ -140,14 +140,15 @@ export function DesktopHeader({
               </button>
 
               {/* User Avatar Placeholder */}
-              <button
+              <Link
+                href="/profile"
                 className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
-                aria-label="User menu"
+                aria-label="Go to profile"
               >
                 <span className="text-sm font-medium text-primary">
                   {user.name.charAt(0).toUpperCase()}
                 </span>
-              </button>
+              </Link>
             </div>
           ) : (
             <Link
