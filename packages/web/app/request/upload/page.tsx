@@ -13,7 +13,7 @@ import {
   type DetectedSpot,
 } from "@/lib/stores/requestStore";
 import { useImageUpload } from "@/lib/hooks/useImageUpload";
-import { uploadImage, createPostWithSolution } from "@/lib/api/posts";
+import { uploadImage, createPost } from "@/lib/api/posts";
 import { compressImage } from "@/lib/utils/imageCompression";
 import { RequestFlowHeader } from "@/lib/components/request/RequestFlowHeader";
 import { DropZone } from "@/lib/components/request/DropZone";
@@ -63,29 +63,16 @@ export default function RequestUploadPage() {
       const { image_url } = await uploadImage({ file: compressedFile });
       toast.dismiss("upload");
 
-      // 2. spots를 API 형식으로 변환
+      // 2. spots를 API 형식으로 변환 (solution 없이)
       const spotsPayload = detectedSpots.map((spot) => ({
         position_left: `${(spot.center.x * 100).toFixed(1)}%`,
         position_top: `${(spot.center.y * 100).toFixed(1)}%`,
         category_id: spot.categoryCode || "fashion", // TODO: Map to actual UUID
-        solution: spot.solution
-          ? {
-              title: spot.solution.title,
-              original_url: spot.solution.originalUrl || "",
-              thumbnail_url: spot.solution.thumbnailUrl,
-              price_amount: spot.solution.priceAmount,
-              price_currency: spot.solution.priceCurrency || "KRW",
-              description: spot.solution.description,
-            }
-          : {
-              title: spot.title || `Spot ${spot.index}`,
-              original_url: "",
-            },
       }));
 
       // 3. POST API 호출
       toast.loading("포스트 생성 중...", { id: "create" });
-      const response = await createPostWithSolution({
+      const response = await createPost({
         image_url,
         media_source: { type: "other", title: "User Upload" },
         spots: spotsPayload,
