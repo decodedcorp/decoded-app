@@ -477,9 +477,10 @@ export async function fetchImagesByPostImage(
     );
   }
 
-  // Request more to account for deduplication, order by post.ts for consistent pagination
+  // Request more to account for deduplication
+  // NOTE: Cannot order by post.ts at DB level (referencedTable generates invalid REST query)
+  // Client-side sorting by post.ts is done below after fetching
   queryBuilder = queryBuilder
-    .order("ts", { ascending: false, referencedTable: "post" })
     .order("image_id", { ascending: false })
     .limit((limit + 1) * 3);
 
