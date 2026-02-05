@@ -6,7 +6,7 @@ import { Home, Search, PlusCircle, LayoutGrid, User } from "lucide-react";
 import { NavBar, NavItem } from "@/lib/design-system";
 import { RequestModal } from "./request/RequestModal";
 
-interface NavItem {
+interface NavItemConfig {
   id: string;
   href: string;
   icon: React.ComponentType<{ className?: string }>;
@@ -19,7 +19,7 @@ interface NavItem {
  * Navigation items per decoded.pen Mobile Nav Bar spec:
  * Home, Search, Request, Feed, Profile (5 items)
  */
-const navItems: NavItem[] = [
+const navItems: NavItemConfig[] = [
   { id: "home", href: "/", icon: Home, label: "Home" },
   { id: "search", href: "/search", icon: Search, label: "Search" },
   {
