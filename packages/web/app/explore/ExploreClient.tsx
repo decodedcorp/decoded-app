@@ -1,24 +1,24 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { useInfinitePosts } from "@/lib/hooks/usePosts";
-import type { Post } from "@/lib/api/types";
+import { useInfiniteFilteredImages } from "@/lib/hooks/useImages";
+import type { ImageWithPostId } from "@decoded/shared/supabase/queries/images";
 import ThiingsGrid, { type GridItem } from "@/lib/components/ThiingsGrid";
 import { useFilterStore } from "@/lib/stores/filterStore";
 import { useSearchStore } from "@/lib/stores/searchStore";
 import { ExploreCardCell, ExploreSkeletonCell } from "@/lib/components/explore";
 
 type Props = {
-  initialPosts?: Post[];
+  initialPosts?: ImageWithPostId[];
 };
 
 /**
  * Explore Client Component - Pinterest-style Masonry Grid
  *
- * Uses SSR + React Query infinite scroll pattern:
- * - First render: Uses SSR initialPosts (if provided)
- * - React Query fetches from REST API -> appends data as user scrolls
+ * Uses Direct Supabase Query Pattern:
+ * - Bypasses failed REST API proxy
+ * - Supports robust category filtering via spots/solutions join
  */
 export function ExploreClient({ initialPosts: _initialPosts }: Props) {
   const activeFilter = useFilterStore((state) => state.activeFilter);
@@ -42,10 +42,7 @@ export function ExploreClient({ initialPosts: _initialPosts }: Props) {
     return () => window.removeEventListener("resize", updateGridSize);
   }, []);
 
-  // Map filter store value to API category parameter
-  const categoryParam = activeFilter !== "all" ? activeFilter : undefined;
-
-  // Use infinite posts query hook (REST API)
+  // Use the direct query hook for robust filtering
   const {
     data,
     isLoading,
@@ -55,38 +52,39 @@ export function ExploreClient({ initialPosts: _initialPosts }: Props) {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useInfinitePosts({
-    perPage: 40,
-    sort: "recent",
-    category: categoryParam,
-    // Note: search functionality would require API support for text search
+  } = useInfiniteFilteredImages({
+    limit: 40,
+    filter: activeFilter,
+    search: debouncedQuery,
   });
 
   // Flatten pages into a single items array
-  const items: Post[] = data ? data.pages.flatMap((page) => page.items) : [];
+  const items: ImageWithPostId[] = useMemo(() => {
+    return data ? data.pages.flatMap((page) => page.items) : [];
+  }, [data]);
 
-  // Map Post[] to GridItem[]
-  const gridItems: GridItem[] = items
-    .filter((post) => post.image_url != null)
-    .map((post) => {
-      return {
-        id: post.id,
-        imageUrl: post.image_url,
-        status: post.spot_count > 0 ? "extracted" : undefined,
-        hasItems: post.spot_count > 0,
-        postId: post.id,
-        postSource: "post" as const,
-        postAccount: post.user?.username ?? "Unknown",
-        postCreatedAt: post.created_at,
-      };
-    });
+  // Map ImageWithPostId to GridItem[]
+  const gridItems: GridItem[] = useMemo(() => {
+    return items
+      .filter((item) => item.image_url != null)
+      .map((item) => ({
+        id: item.id,
+        imageUrl: item.image_url,
+        status: item.status === "extracted" ? "extracted" : undefined,
+        hasItems: item.with_items,
+        postId: item.postId,
+        postSource: item.postSource,
+        postAccount: item.postAccount,
+        postCreatedAt: item.postCreatedAt,
+      }));
+  }, [items]);
 
   // Render full-screen ThiingsGrid (no header/filter)
   return (
-    <div className="h-full relative">
+    <div className="relative h-[calc(100dvh-120px)] md:h-[calc(100dvh-72px)]">
       <AnimatePresence mode="wait">
         <motion.div
-          key={activeFilter}
+          key={activeFilter + debouncedQuery}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -131,7 +129,7 @@ export function ExploreClient({ initialPosts: _initialPosts }: Props) {
           )}
 
           {/* Empty state: show empty state message */}
-          {!isError && !isLoading && (!items || items.length === 0) && (
+          {!isError && !isLoading && items.length === 0 && (
             <div className="absolute inset-0 z-0 flex items-center justify-center">
               <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
                 <div className="mb-4 text-4xl">📷</div>
@@ -150,7 +148,7 @@ export function ExploreClient({ initialPosts: _initialPosts }: Props) {
           )}
 
           {/* Success state: show grid with actual images */}
-          {!isError && items && items.length > 0 && (
+          {!isError && items.length > 0 && (
             <div className="absolute inset-0 z-0">
               <ThiingsGrid
                 gridSize={gridSize}

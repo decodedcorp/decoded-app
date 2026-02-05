@@ -61,20 +61,23 @@ export async function fetchOrphanImages(params: {
   const hasMore = orphanImages.length > limit;
 
   // Transform to ImageWithPostId format
-  // Handle nullable fields by providing defaults
-  const items: ImageWithPostId[] = orphanImages.slice(0, limit).map((img) => ({
-    id: img.id,
-    image_url: img.image_url,
-    status: (img.status as "pending" | "extracted" | "skipped" | "extracted_metadata") || "pending",
-    with_items: img.with_items,
-    image_hash: img.image_hash || "",
-    created_at: img.created_at,
-    postId: `legacy:${img.id}`,
-    postSource: "legacy" as const,
-    postAccount: "Legacy",
-    postImageCreatedAt: img.created_at,
-    postCreatedAt: img.created_at,
-  }));
+  // Filter out items with null image_url since they can't be displayed
+  const items: ImageWithPostId[] = orphanImages
+    .slice(0, limit)
+    .filter((img): img is OrphanImageRow & { image_url: string } => img.image_url != null)
+    .map((img) => ({
+      id: img.id,
+      image_url: img.image_url,
+      status: (img.status as "pending" | "extracted" | "skipped" | "extracted_metadata") || "pending",
+      with_items: img.with_items,
+      image_hash: img.image_hash || "",
+      created_at: img.created_at,
+      postId: `legacy:${img.id}`,
+      postSource: "legacy" as const,
+      postAccount: "Legacy",
+      postImageCreatedAt: img.created_at,
+      postCreatedAt: img.created_at,
+    }));
 
   // Generate next cursor if there are more items
   let nextCursor = null;
