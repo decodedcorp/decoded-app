@@ -22,6 +22,31 @@
 - Depends on: Zustand stores, React Query hooks, custom hooks, design system
 - Used by: Page components in `app/`
 
+**Component Hierarchy:**
+- **Level 1: Design System** (`lib/design-system/`) - Primitive UI components with design tokens
+  - Tokens: `tokens.ts` defines spacing, colors, typography, shadows, borderRadius, zIndex
+  - Typography: `Heading`, `Text` with responsive variants
+  - Inputs: `Input`, `SearchInput` with CVA pattern
+  - Cards: Base `Card` + specialized variants (`ProductCard`, `GridCard`, `FeedCardBase`)
+  - Layout: `DesktopHeader`, `MobileHeader`, `DesktopFooter`
+
+- **Level 2: Base UI** (`lib/components/ui/`) - Feature-agnostic reusable components
+  - Examples: `Button`, `BottomSheet`, modal wrappers
+  - May compose design system primitives
+
+- **Level 3: Feature Components** (`lib/components/[feature]/`) - Page-specific implementations
+  - Examples: `explore/`, `search/`, `detail/`, `profile/`
+  - Compose both design system and base UI components
+
+**Design Token Flow:**
+```
+tokens.ts → Tailwind config → globals.css → components
+```
+- `tokens.ts` exports TypeScript constants
+- Tailwind config reads tokens for theme customization
+- `globals.css` defines CSS variables for runtime theming
+- Components reference via Tailwind utility classes
+
 **State Management Layer:**
 - Purpose: Client state (user auth, form state) and server state (cached API responses)
 - Location: `lib/stores/` (Zustand) and React Query client (`lib/react-query/`)

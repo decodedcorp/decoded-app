@@ -108,6 +108,25 @@
   - `@decoded/shared` → `../shared/index.ts`
   - `@decoded/shared/*` → `../shared/*`
 
+## Design System
+
+**v2.0 Design System** (`lib/design-system/`):
+- class-variance-authority 0.7.1 - Component variant system (CVA pattern)
+- Radix UI primitives (@radix-ui/react-slot) - Headless UI components
+- Design tokens in `tokens.ts` - Centralized spacing, colors, typography, shadows
+- Component library:
+  - Typography: `Heading`, `Text` with responsive size variants
+  - Inputs: `Input`, `SearchInput` with CVA variants
+  - Card family: `Card`, `CardHeader`, `CardContent`, `CardFooter`, `CardSkeleton`
+  - Specialized cards: `ProductCard`, `GridCard`, `FeedCardBase`, `ProfileHeaderCard`
+  - Layout: `DesktopHeader`, `MobileHeader`, `DesktopFooter`
+- Integration: CSS variables → Tailwind config → `globals.css` → components
+
+**Pattern:**
+- Barrel exports from `index.ts` for clean imports: `import { Card } from "@/lib/design-system"`
+- CVA for variant management with `componentVariants` pattern
+- Skeleton states for all major components (e.g., `CardSkeleton`)
+
 ## Key Dependencies
 
 **Critical (Direct Integration):**

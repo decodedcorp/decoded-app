@@ -35,6 +35,20 @@ packages/web/
 │   │   ├── types.ts         # API request/response types (DTO)
 │   │   └── index.ts         # Public exports
 │   │
+│   ├── design-system/       # v2.0 Design System primitives
+│   │   ├── index.ts         # Barrel exports for clean imports
+│   │   ├── tokens.ts        # Design tokens (spacing, colors, typography, shadows)
+│   │   ├── typography.tsx   # Heading, Text components
+│   │   ├── input.tsx        # Input, SearchInput
+│   │   ├── card.tsx         # Card, CardHeader, CardContent, CardFooter, CardSkeleton
+│   │   ├── product-card.tsx # ProductCard
+│   │   ├── grid-card.tsx    # GridCard
+│   │   ├── feed-card.tsx    # FeedCardBase
+│   │   ├── profile-header-card.tsx  # ProfileHeaderCard
+│   │   ├── desktop-header.tsx       # DesktopHeader
+│   │   ├── mobile-header.tsx        # MobileHeader
+│   │   └── desktop-footer.tsx       # DesktopFooter
+│   │
 │   ├── components/          # React components organized by feature
 │   │   ├── auth/            # Auth components (AuthProvider, LoginCard, OAuthButton)
 │   │   ├── detail/          # Image/Post detail components
@@ -163,11 +177,24 @@ packages/web/
 - Key files: validation.ts (upload rules), main-page-mapper.ts (data transform)
 - Pattern: Utilities are imported as needed, no state mutations
 
-**lib/design-system/ - Design Tokens:**
-- Purpose: Reusable design primitives and theme components
-- Contains: Button, Input, Card, Modal, Footer components
-- Key files: Components matching design system specification
-- Pattern: Follows shadcn/ui conventions with Tailwind CSS
+**lib/design-system/ - v2.0 Design System:**
+- Purpose: Primitive UI components with centralized design tokens
+- Contains: Typography, inputs, card family, layout components (headers, footer)
+- Key files:
+  - `tokens.ts`: Design token constants (spacing, colors, typography, shadows, borderRadius, zIndex)
+  - `typography.tsx`: `Heading`, `Text` with responsive size variants
+  - `input.tsx`: `Input`, `SearchInput` with CVA variants
+  - `card.tsx`: Base `Card` + composable parts (Header, Content, Footer, Skeleton)
+  - Specialized cards: `product-card.tsx`, `grid-card.tsx`, `feed-card.tsx`, `profile-header-card.tsx`
+  - Layout: `desktop-header.tsx`, `mobile-header.tsx`, `desktop-footer.tsx`
+- Pattern:
+  - CVA (Class Variance Authority) for variant management
+  - Barrel exports from `index.ts` → `import { Card } from "@/lib/design-system"`
+  - Props naming: `ComponentNameProps` (e.g., `ProductCardProps`)
+  - Skeleton naming: `ComponentNameSkeleton` (e.g., `CardSkeleton`)
+- Relationship with `lib/components/ui/`:
+  - Design system = primitive tokens + base components
+  - UI folder = feature-agnostic reusable components (may compose design-system)
 
 ## Key File Locations
 

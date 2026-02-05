@@ -1,7 +1,7 @@
 # Code Conventions & Standards
 
 **Project**: decoded-app
-**Last Updated**: 2026-01-23
+**Last Updated**: 2026-02-05
 **Focus**: Quality & consistency across the codebase
 
 ## Table of Contents
@@ -627,6 +627,69 @@ chore(deps): update react to 18.3.1
 
 ---
 
+## Design System Component Conventions
+
+**File Naming (lib/design-system/):**
+```
+kebab-case.tsx      # product-card.tsx, desktop-header.tsx
+```
+
+**Component & Export Naming:**
+```typescript
+// Component: PascalCase
+export const ProductCard = ({ ... }) => { ... }
+
+// Props type: ComponentNameProps
+interface ProductCardProps { ... }
+
+// Variants: CVA pattern with componentVariants constant
+const productCardVariants = cva(...)
+
+// Skeleton: ComponentNameSkeleton
+export const ProductCardSkeleton = () => { ... }
+```
+
+**Import Pattern:**
+```typescript
+// Barrel export from index.ts
+import { Card, ProductCard, Heading, Text } from "@/lib/design-system"
+
+// Individual import (if needed)
+import { Card } from "@/lib/design-system/card"
+```
+
+**CVA Variant Pattern:**
+```typescript
+import { cva, type VariantProps } from "class-variance-authority"
+
+const cardVariants = cva(
+  "base-classes",
+  {
+    variants: {
+      variant: { default: "...", elevated: "..." },
+      size: { sm: "...", md: "...", lg: "..." }
+    },
+    defaultVariants: { variant: "default", size: "md" }
+  }
+)
+
+interface CardProps extends VariantProps<typeof cardVariants> {
+  children: ReactNode
+}
+```
+
+**Design Token Reference:**
+```typescript
+// Import tokens
+import { typography, spacing, colors } from "@/lib/design-system/tokens"
+
+// Usage
+const fontSize = typography.sizes.h2
+const padding = spacing[4]  // 16px
+```
+
+---
+
 ## Summary Checklist
 
 - [ ] TypeScript strict mode - all files
@@ -641,4 +704,6 @@ chore(deps): update react to 18.3.1
 - [ ] Unused params prefixed with `_`
 - [ ] Type definitions explicit and exported
 - [ ] React Query hooks configured with stale/cache times
+- [ ] Design system components follow CVA pattern with variants
+- [ ] Design system imports use barrel export from `@/lib/design-system`
 
