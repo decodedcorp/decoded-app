@@ -248,6 +248,7 @@ export async function createPostWithFile(
   formData.append("image", request.file);
 
   const data = {
+    image_url: "", // Placeholder - backend will use uploaded image
     spots: request.spots,
     media_source: request.media_source,
     artist_name: request.artist_name,
