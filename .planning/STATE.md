@@ -194,7 +194,8 @@ npm run dev  # Verify Profile with activity tabs and Feed with engagement action
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 001 | Fix header and mobile nav design to match decoded.pen | 2026-01-29 | 76f9be1 | [001-fix-header-mobile-nav-design](./quick/001-fix-header-mobile-nav-design/) |
+| 002 | Add optional description field with AI metadata extraction to post creation | 2026-02-05 | e66645a | [002-post-optional-fields-media-metadata](./quick/002-post-optional-fields-media-metadata/) |
 
 ---
 
-*Last updated: 2026-01-29 after v2-06-03 completion*
+*Last updated: 2026-02-05 after quick-002 completion*
