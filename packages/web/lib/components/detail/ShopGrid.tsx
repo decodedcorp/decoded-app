@@ -23,14 +23,27 @@ type Props = {
  * ShopGrid - "Shop the Look" section
  *
  * Horizontal carousel displaying items extracted from the image.
+ * Prioritizes spotted items (items with confirmed spots) first.
  * Uses stagger animation for sequential card appearance.
  * Features ReactBits Spotlight Card effect.
+ *
+ * Layout:
+ * - Mobile: horizontal scroll carousel with snap points
+ * - Desktop: responsive grid (3-4 columns)
  */
 export function ShopGrid({ items, isModal = false }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+
+  // Sort items - spotted items first, then related suggestions
+  const sortedItems = [...items].sort((a, b) => {
+    // Assume items are spotted if they have valid coordinates/center
+    const aSpotted = a.normalizedCenter ? 1 : 0;
+    const bSpotted = b.normalizedCenter ? 1 : 0;
+    return bSpotted - aSpotted;
+  });
 
   const checkScroll = () => {
     if (scrollRef.current) {
@@ -44,7 +57,7 @@ export function ShopGrid({ items, isModal = false }: Props) {
     checkScroll();
     window.addEventListener("resize", checkScroll);
     return () => window.removeEventListener("resize", checkScroll);
-  }, [items]);
+  }, [sortedItems]);
 
   const scroll = (direction: "left" | "right") => {
     if (!scrollRef.current) return;
@@ -94,7 +107,7 @@ export function ShopGrid({ items, isModal = false }: Props) {
     { scope: containerRef, dependencies: [isModal] }
   );
 
-  if (items.length === 0) {
+  if (sortedItems.length === 0) {
     return null;
   }
 
@@ -110,13 +123,13 @@ export function ShopGrid({ items, isModal = false }: Props) {
       >
         <div className="flex flex-col items-center mb-8 md:mb-12">
           <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground mb-3 md:mb-4">
-            Curated Selection
+            Featured Items
           </span>
           <h2
-            className={`font-serif text-center tracking-tight ${
+            className={`text-lg font-medium text-foreground ${
               isModal
-                ? "text-3xl md:text-4xl"
-                : "text-4xl md:text-5xl lg:text-6xl"
+                ? "text-2xl md:text-3xl"
+                : "text-3xl md:text-4xl lg:text-5xl"
             }`}
           >
             Shop the Look
@@ -152,99 +165,104 @@ export function ShopGrid({ items, isModal = false }: Props) {
           <ChevronRight className="w-6 h-6" />
         </button>
 
-        {/* Carousel Container */}
+        {/* Carousel Container - Mobile: scroll, Desktop: grid */}
         <div
           ref={scrollRef}
           onScroll={checkScroll}
-          className={`flex overflow-x-auto scrollbar-hide snap-x snap-mandatory w-full ${
+          className={`flex md:grid md:grid-cols-3 lg:grid-cols-4 overflow-x-auto md:overflow-visible scrollbar-hide snap-x snap-mandatory md:snap-none w-full ${
             isModal
               ? "gap-3 md:gap-4 px-4 md:px-6 pb-8 md:pb-10 pt-2 md:pt-4"
               : "gap-4 md:gap-6 px-6 md:px-8 pb-12 pt-4"
           }`}
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          {items.map((item) => (
-            <div
-              key={item.id}
-              className={`shop-card flex-none snap-center group flex flex-col ${
-                isModal
-                  ? "w-[160px] sm:w-[180px] md:w-[200px]"
-                  : "w-[180px] sm:w-[200px] md:w-[220px] lg:w-[260px]"
-              }`}
-            >
-              <SpotlightCard className="h-full flex flex-col bg-card/50 backdrop-blur-sm">
-                <div
-                  className={`flex flex-col h-full ${isModal ? "p-3" : "p-3 md:p-4"}`}
-                >
-                  {/* Item Image */}
+          {sortedItems.map((item, index) => {
+            const isSpotted = !!item.normalizedCenter;
+            return (
+              <div
+                key={item.id}
+                className={`shop-card flex-none md:flex-auto snap-center md:snap-start group flex flex-col ${
+                  isModal
+                    ? "w-[45%] sm:w-[30%] md:w-auto"
+                    : "w-[45%] sm:w-[30%] md:w-auto"
+                }`}
+              >
+                <SpotlightCard className="h-full flex flex-col bg-card/50 backdrop-blur-sm">
                   <div
-                    className={`relative w-full aspect-[3/4] overflow-hidden rounded-lg bg-muted ${
-                      isModal ? "mb-2 md:mb-3" : "mb-3 md:mb-4"
-                    }`}
+                    className={`flex flex-col h-full ${isModal ? "p-3" : "p-3 md:p-4"}`}
                   >
-                    {item.imageUrl ? (
-                      <Image
-                        src={item.imageUrl}
-                        alt={item.product_name || "Item"}
-                        fill
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-muted/30">
-                        <span className="text-muted-foreground text-sm font-serif italic">
-                          No Image
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Item Details */}
-                  <div className="flex flex-col items-center text-center flex-grow">
-                    {item.brand && (
-                      <p
-                        className={`font-medium uppercase tracking-widest text-muted-foreground ${
-                          isModal ? "text-[9px] mb-1" : "text-[10px] mb-2"
-                        }`}
-                      >
-                        {item.brand}
-                      </p>
-                    )}
-                    <h3
-                      className={`font-serif font-medium leading-tight group-hover:text-foreground/80 transition-colors ${
-                        isModal
-                          ? "text-sm md:text-base mb-1 md:mb-2"
-                          : "text-base md:text-lg mb-2"
+                    {/* Item Image */}
+                    <div
+                      className={`relative w-full aspect-square overflow-hidden rounded-lg bg-muted ${
+                        isModal ? "mb-2 md:mb-3" : "mb-3 md:mb-4"
                       }`}
                     >
-                      {item.product_name || "Untitled Item"}
-                    </h3>
-                    {item.price && (
-                      <p
-                        className={`font-medium text-primary mt-auto font-mono ${
-                          isModal ? "text-xs pt-0.5 md:pt-1" : "text-sm pt-1"
+                      {item.imageUrl ? (
+                        <>
+                          <Image
+                            src={item.imageUrl}
+                            alt={item.product_name || "Item"}
+                            fill
+                            className="object-cover transition-transform duration-700 group-hover:scale-105"
+                            sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                          />
+                          {/* Spotted badge */}
+                          {isSpotted && (
+                            <div className="absolute top-2 right-2 bg-primary text-primary-foreground text-[9px] font-medium uppercase tracking-wider px-2 py-1 rounded-sm">
+                              Spotted
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-muted/30">
+                          <span className="text-muted-foreground text-sm font-serif italic">
+                            No Image
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Item Details */}
+                    <div className="flex flex-col items-center text-center flex-grow">
+                      {item.brand && (
+                        <p
+                          className={`text-xs uppercase tracking-wide text-muted-foreground ${
+                            isModal ? "mb-1" : "mb-2"
+                          }`}
+                        >
+                          {item.brand}
+                        </p>
+                      )}
+                      <h3
+                        className={`text-sm font-medium truncate w-full ${
+                          isModal ? "mb-1 md:mb-2" : "mb-2"
                         }`}
                       >
-                        {item.price.split("|")[0].trim()}
-                      </p>
-                    )}
+                        {item.product_name || "Untitled Item"}
+                      </h3>
+                      {item.price && (
+                        <p className={`text-sm text-foreground mt-auto`}>
+                          {item.price.split("|")[0].trim()}
+                        </p>
+                      )}
 
-                    <button
-                      className={`w-full border border-border/50 bg-background/50 hover:bg-foreground hover:text-background transition-all duration-300 text-[9px] md:text-[10px] uppercase tracking-widest rounded-sm ${
-                        isModal
-                          ? "mt-2 md:mt-3 py-1.5 md:py-2"
-                          : "mt-3 md:mt-4 py-2"
-                      }`}
-                    >
-                      View Details
-                    </button>
+                      <button
+                        className={`w-full border border-border/50 bg-background/50 hover:bg-foreground hover:text-background transition-all duration-300 text-[9px] md:text-[10px] uppercase tracking-widest rounded-sm ${
+                          isModal
+                            ? "mt-2 md:mt-3 py-1.5 md:py-2"
+                            : "mt-3 md:mt-4 py-2"
+                        }`}
+                      >
+                        View Details
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </SpotlightCard>
-            </div>
-          ))}
-          {/* End spacer for smooth scrolling */}
-          <div className="w-2 flex-none" />
+                </SpotlightCard>
+              </div>
+            );
+          })}
+          {/* End spacer for smooth scrolling on mobile */}
+          <div className="w-2 flex-none md:hidden" />
         </div>
       </div>
     </section>
