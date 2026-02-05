@@ -83,14 +83,24 @@ export async function POST(request: NextRequest) {
 
     console.log("POST /api/v1/posts - Request body:", JSON.stringify(body));
 
-    // Forward the request to the backend
+    // Convert JSON to FormData (backend expects multipart/form-data)
+    const formData = new FormData();
+    formData.append("image_url", body.image_url);
+    formData.append("media_source", JSON.stringify(body.media_source));
+    formData.append("spots", JSON.stringify(body.spots));
+    if (body.artist_name) formData.append("artist_name", body.artist_name);
+    if (body.group_name) formData.append("group_name", body.group_name);
+    if (body.context) formData.append("context", body.context);
+    if (body.description) formData.append("description", body.description);
+
+    // Forward the request to the backend as multipart/form-data
     const response = await fetch(`${API_BASE_URL}/api/v1/posts`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        // Don't set Content-Type - let fetch set it with boundary
         Authorization: authHeader,
       },
-      body: JSON.stringify(body),
+      body: formData,
     });
 
     // Parse response - handle both JSON and text responses
