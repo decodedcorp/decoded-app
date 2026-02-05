@@ -211,7 +211,7 @@ See: .planning/ROADMAP-v2.md
 ## Session Continuity
 
 **Last session:** 2026-02-05
-**Stopped at:** Completed v2-09-01-PLAN.md (Design System Documentation)
+**Stopped at:** Completed quick task 008 (Feed page API migration)
 **Resume file:** None
 
 **Next Steps:**
@@ -235,7 +235,8 @@ open docs/design-system/README.md  # View updated v2.0 documentation
 | 005 | Fix explore page ThiingsGrid not visible | 2026-02-05 | e95ce37 | [005-fix-explore-page-things-grid-not-visible](./quick/005-fix-explore-page-things-grid-not-visible/) |
 | 006 | Desktop request page modal (intercepting routes) | 2026-02-05 | ab7c9c1 | [006-desktop-request-page-modal](./quick/006-desktop-request-page-modal/) |
 | 007 | Fix explore page "Failed to load images" error | 2026-02-05 | 6cc6cb2 | [007-fix-explore-page-failed-to-load-images-e](./quick/007-fix-explore-page-failed-to-load-images-e/) |
+| 008 | Feed 페이지 Supabase → REST API 마이그레이션 | 2026-02-05 | 5467cf2 | [008-fix-feed-page-use-api-instead-of-sup](./quick/008-fix-feed-page-use-api-instead-of-sup/) |
 
 ---
 
-*Last updated: 2026-02-05 after quick task 007*
+*Last updated: 2026-02-05 after quick task 008*
