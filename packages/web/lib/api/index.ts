@@ -11,7 +11,12 @@ export type { ApiClientOptions } from "./client";
 export * from "./types";
 
 // Post APIs
-export { uploadImage, analyzeImage, createPost } from "./posts";
+export {
+  uploadImage,
+  analyzeImage,
+  extractMetadata,
+  createPost,
+} from "./posts";
 export type { UploadImageOptions } from "./posts";
 
 // Category APIs

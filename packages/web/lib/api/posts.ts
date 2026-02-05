@@ -10,6 +10,8 @@ import {
   UploadResponse,
   AnalyzeRequest,
   AnalyzeResponse,
+  ExtractMetadataRequest,
+  ExtractMetadataResponse,
   CreatePostRequest,
   CreatePostResponse,
   PostsListResponse,
@@ -86,6 +88,25 @@ export async function analyzeImage(imageUrl: string): Promise<AnalyzeResponse> {
 
   return apiClient<AnalyzeResponse>({
     path: "/api/v1/posts/analyze",
+    method: "POST",
+    body: request,
+    requiresAuth: false,
+  });
+}
+
+// ============================================================
+// AI Metadata Extraction
+// POST /api/v1/posts/extract-metadata
+// 인증 불필요
+// ============================================================
+
+export async function extractMetadata(
+  description: string
+): Promise<ExtractMetadataResponse> {
+  const request: ExtractMetadataRequest = { description };
+
+  return apiClient<ExtractMetadataResponse>({
+    path: "/api/v1/posts/extract-metadata",
     method: "POST",
     body: request,
     requiresAuth: false,
