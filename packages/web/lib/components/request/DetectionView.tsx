@@ -15,6 +15,7 @@ interface DetectionViewProps {
   isRevealing?: boolean;
   selectedSpotId?: string | null;
   onSpotClick?: (spot: DetectedSpot) => void;
+  onImageClick?: (x: number, y: number) => void; // 이미지 클릭 시 normalized 좌표 전달
   layout?: "default" | "fullscreen";
 }
 
@@ -33,8 +34,23 @@ export const DetectionView = memo(
     isRevealing = false,
     selectedSpotId,
     onSpotClick,
+    onImageClick,
     layout = "default",
   }: DetectionViewProps) => {
+    // 이미지 클릭 핸들러 - normalized 좌표로 변환
+    const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
+      if (!onImageClick || isDetecting) return;
+
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
+
+      // 클램프 0-1
+      const clampedX = Math.max(0, Math.min(1, x));
+      const clampedY = Math.max(0, Math.min(1, y));
+
+      onImageClick(clampedX, clampedY);
+    };
     const containerClasses =
       layout === "fullscreen"
         ? "relative w-full h-full overflow-hidden bg-foreground/5"
@@ -50,6 +66,14 @@ export const DetectionView = memo(
           className="object-cover"
           sizes="(max-width: 768px) 100vw, 400px"
         />
+
+        {/* 클릭 영역 (spot 추가용) */}
+        {onImageClick && !isDetecting && (
+          <div
+            className="absolute inset-0 z-5 cursor-crosshair"
+            onClick={handleImageClick}
+          />
+        )}
 
         {/* 홀로그램 스캔 오버레이 */}
         {isDetecting && (
@@ -156,11 +180,13 @@ export const DetectionView = memo(
             />
           ))}
 
-        {/* 감지 완료 후 안내 메시지 */}
-        {!isDetecting && spots.length > 0 && (
+        {/* 안내 메시지 */}
+        {!isDetecting && (
           <div className="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/60 to-transparent">
             <p className="text-xs text-white text-center">
-              {spots.length}개의 아이템이 감지되었습니다
+              {spots.length > 0
+                ? `${spots.length}개의 스팟이 추가됨`
+                : "이미지를 탭하여 아이템 위치를 표시하세요"}
             </p>
           </div>
         )}

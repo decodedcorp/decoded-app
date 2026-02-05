@@ -18,6 +18,7 @@ interface DesktopDetectionLayoutProps {
   selectedSpotId: string | null;
   onSelectSpot: (spotId: string | null) => void;
   onSaveSolution?: (spotId: string, solution: SpotSolutionData) => void;
+  onAddSpot?: (x: number, y: number) => void;
 }
 
 /**
@@ -36,6 +37,7 @@ export function DesktopDetectionLayout({
   selectedSpotId,
   onSelectSpot,
   onSaveSolution,
+  onAddSpot,
 }: DesktopDetectionLayoutProps) {
   const { cardRefs, scrollContainerRef, selectSpot } = useSpotCardSync({
     spots,
@@ -76,6 +78,7 @@ export function DesktopDetectionLayout({
             isRevealing={isRevealing}
             selectedSpotId={selectedSpotId}
             onSpotClick={handleSpotClick}
+            onImageClick={onAddSpot}
             layout="default"
           />
         </div>
@@ -85,10 +88,10 @@ export function DesktopDetectionLayout({
       <div className="flex-1 max-w-md">
         <div className="mb-4">
           <h2 className="text-lg font-semibold">
-            Detected Items ({spots.length})
+            Spots ({spots.length})
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Click on items to view details
+            Click on image to add spots
           </p>
         </div>
 

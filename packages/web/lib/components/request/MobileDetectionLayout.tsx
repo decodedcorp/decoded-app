@@ -19,6 +19,7 @@ interface MobileDetectionLayoutProps {
   selectedSpotId: string | null;
   onSelectSpot: (spotId: string | null) => void;
   onSaveSolution?: (spotId: string, solution: SpotSolutionData) => void;
+  onAddSpot?: (x: number, y: number) => void;
 }
 
 /**
@@ -36,6 +37,7 @@ export function MobileDetectionLayout({
   selectedSpotId,
   onSelectSpot,
   onSaveSolution,
+  onAddSpot,
 }: MobileDetectionLayoutProps) {
   const { cardRefs, scrollContainerRef, selectSpot } = useSpotCardSync({
     spots,
@@ -82,6 +84,7 @@ export function MobileDetectionLayout({
           isRevealing={isRevealing}
           selectedSpotId={selectedSpotId}
           onSpotClick={handleSpotClick}
+          onImageClick={onAddSpot}
           layout="fullscreen"
         />
       </div>
@@ -94,7 +97,7 @@ export function MobileDetectionLayout({
         header={
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold">
-              Detected Items ({spots.length})
+              Spots ({spots.length})
             </h2>
           </div>
         }

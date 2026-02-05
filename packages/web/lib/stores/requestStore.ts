@@ -110,10 +110,12 @@ interface RequestState {
   setImageUploadedUrl: (id: string, url: string) => void;
   clearImages: () => void;
 
-  // Actions - Detection
+  // Actions - Detection / Manual Spot Creation
   startDetection: () => Promise<void>;
   setDetectedSpots: (spots: DetectedSpot[]) => void;
   selectSpot: (spotId: string | null) => void;
+  addSpot: (x: number, y: number, categoryCode?: string) => void;
+  removeSpot: (spotId: string) => void;
 
   // Actions - Solution
   setSpotSolution: (spotId: string, solution: SpotSolutionData) => void;
@@ -344,6 +346,42 @@ export const useRequestStore = create<RequestState>((set, get) => ({
     set({ selectedSpotId: spotId });
   },
 
+  // Manual Spot Creation
+  addSpot: (x, y, categoryCode) => {
+    const { detectedSpots } = get();
+    const newIndex = detectedSpots.length + 1;
+    const newSpot: DetectedSpot = {
+      id: `spot_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
+      index: newIndex,
+      center: { x, y },
+      categoryCode: categoryCode || "fashion", // 기본 카테고리
+      title: `Spot ${newIndex}`,
+      description: "Tap to add product info",
+    };
+
+    set((state) => ({
+      detectedSpots: [...state.detectedSpots, newSpot],
+      selectedSpotId: newSpot.id, // 새로 추가된 spot 자동 선택
+    }));
+  },
+
+  removeSpot: (spotId) => {
+    set((state) => {
+      const filteredSpots = state.detectedSpots.filter((s) => s.id !== spotId);
+      // Re-index spots
+      const reindexedSpots = filteredSpots.map((spot, idx) => ({
+        ...spot,
+        index: idx + 1,
+        title: spot.solution?.title || `Spot ${idx + 1}`,
+      }));
+      return {
+        detectedSpots: reindexedSpots,
+        selectedSpotId:
+          state.selectedSpotId === spotId ? null : state.selectedSpotId,
+      };
+    });
+  },
+
   // Solution Actions
   setSpotSolution: (spotId, solution) => {
     set((state) => ({
@@ -506,6 +544,8 @@ export const getRequestActions = () => {
     startDetection: state.startDetection,
     setDetectedSpots: state.setDetectedSpots,
     selectSpot: state.selectSpot,
+    addSpot: state.addSpot,
+    removeSpot: state.removeSpot,
     setSpotSolution: state.setSpotSolution,
     clearSpotSolution: state.clearSpotSolution,
     setDescription: state.setDescription,

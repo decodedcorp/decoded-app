@@ -6,8 +6,6 @@ import {
   useRequestStore,
   selectImages,
   selectDetectedSpots,
-  selectIsDetecting,
-  selectIsRevealing,
   selectSelectedSpotId,
   selectCurrentStep,
   type DetectedSpot,
@@ -27,15 +25,14 @@ export default function ModalRequestDetectPage() {
 
   const images = useRequestStore(selectImages);
   const spots = useRequestStore(selectDetectedSpots);
-  const isDetecting = useRequestStore(selectIsDetecting);
-  const isRevealing = useRequestStore(selectIsRevealing);
   const selectedSpotId = useRequestStore(selectSelectedSpotId);
   const currentStep = useRequestStore(selectCurrentStep);
 
-  const startDetection = useRequestStore((s) => s.startDetection);
   const selectSpot = useRequestStore((s) => s.selectSpot);
+  const addSpot = useRequestStore((s) => s.addSpot);
   const setSpotSolution = useRequestStore((s) => s.setSpotSolution);
   const resetRequestFlow = useRequestStore((s) => s.resetRequestFlow);
+  const setStep = useRequestStore((s) => s.setStep);
 
   // Get the first uploaded image
   const uploadedImage = images.find((img) => img.status === "uploaded");
@@ -51,25 +48,22 @@ export default function ModalRequestDetectPage() {
     onSelectSpot: selectSpot,
   });
 
-  // Redirect to upload if no images (with a small safety check)
+  // Redirect to upload if no images
   useEffect(() => {
-    // 만약 이미지가 없고, 이미 업로드된 이미지도 없다면 업로드 페이지로 이동
-    if (images.length === 0 && !isDetecting) {
+    if (images.length === 0) {
       const timer = setTimeout(() => {
         if (useRequestStore.getState().images.length === 0) {
           router.push("/request/upload");
         }
-      }, 500); // 500ms 유예를 두어 마운트 시점의 일시적 빈 상태 대응
+      }, 500);
       return () => clearTimeout(timer);
     }
-  }, [images.length, isDetecting, router]);
+  }, [images.length, router]);
 
-  // Start detection when page loads (only once)
+  // Set step to 2 when entering this page
   useEffect(() => {
-    if (uploadedImage && spots.length === 0 && !isDetecting) {
-      startDetection();
-    }
-  }, [uploadedImage, spots.length, isDetecting, startDetection]);
+    setStep(2);
+  }, [setStep]);
 
   const handleClose = () => {
     resetRequestFlow();
@@ -94,6 +88,13 @@ export default function ModalRequestDetectPage() {
     [selectSpot]
   );
 
+  const handleAddSpot = useCallback(
+    (x: number, y: number) => {
+      addSpot(x, y);
+    },
+    [addSpot]
+  );
+
   const setCardRef = useCallback(
     (spotId: string) => (el: HTMLDivElement | null) => {
       cardRefs.current.set(spotId, el);
@@ -110,7 +111,7 @@ export default function ModalRequestDetectPage() {
     <RequestFlowModal>
       <div className="flex flex-col h-full min-h-[70vh]">
         <RequestFlowHeader
-          title="Detecting Items"
+          title="Add Spots"
           currentStep={currentStep}
           onClose={handleClose}
           onBack={handleBack}
@@ -125,10 +126,11 @@ export default function ModalRequestDetectPage() {
                 <DetectionView
                   image={uploadedImage}
                   spots={spots}
-                  isDetecting={isDetecting}
-                  isRevealing={isRevealing}
+                  isDetecting={false}
+                  isRevealing={false}
                   selectedSpotId={selectedSpotId}
                   onSpotClick={handleSpotClick}
+                  onImageClick={handleAddSpot}
                   layout="default"
                 />
               </div>
@@ -138,25 +140,14 @@ export default function ModalRequestDetectPage() {
             <div className="w-1/2 p-4 flex flex-col border-l border-border">
               <div className="mb-3">
                 <h2 className="text-base font-semibold">
-                  Detected Items ({spots.length})
+                  Spots ({spots.length})
                 </h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Click to view details
+                  Click on image to add spots
                 </p>
               </div>
 
-              {isDetecting && (
-                <div className="space-y-3">
-                  {[1, 2, 3].map((i) => (
-                    <div
-                      key={i}
-                      className="h-24 rounded-lg bg-muted animate-pulse"
-                    />
-                  ))}
-                </div>
-              )}
-
-              {!isDetecting && spots.length > 0 && (
+              {spots.length > 0 && (
                 <div
                   ref={scrollContainerRef}
                   className="flex-1 overflow-y-auto space-y-3 pr-1"
@@ -174,9 +165,9 @@ export default function ModalRequestDetectPage() {
                 </div>
               )}
 
-              {!isDetecting && spots.length === 0 && (
+              {spots.length === 0 && (
                 <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
-                  No items detected
+                  Click on image to add spots
                 </div>
               )}
             </div>
