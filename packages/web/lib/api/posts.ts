@@ -211,6 +211,71 @@ export async function createPost(
 }
 
 // ============================================================
+// Create Post with File (multipart/form-data)
+// POST /api/v1/posts
+// 이미지 파일과 함께 포스트 생성
+// ============================================================
+
+export interface CreatePostWithFileRequest {
+  file: File;
+  spots: Array<{
+    position_left: string;
+    position_top: string;
+    category_id: string;
+  }>;
+  media_source: {
+    type: string;
+    title: string;
+  };
+  artist_name?: string;
+  group_name?: string;
+  context?: string;
+  description?: string;
+}
+
+export async function createPostWithFile(
+  request: CreatePostWithFileRequest
+): Promise<CreatePostResponse> {
+  const token = await getAuthToken();
+
+  if (!token) {
+    throw new Error("로그인이 필요합니다.");
+  }
+
+  const formData = new FormData();
+  formData.append("file", request.file);
+  formData.append("spots", JSON.stringify(request.spots));
+  formData.append("media_source", JSON.stringify(request.media_source));
+  if (request.artist_name) formData.append("artist_name", request.artist_name);
+  if (request.group_name) formData.append("group_name", request.group_name);
+  if (request.context) formData.append("context", request.context);
+  if (request.description) formData.append("description", request.description);
+
+  const response = await fetch(`${API_BASE_URL}/api/v1/posts`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      // Don't set Content-Type - let browser set it with boundary
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    let errorMessage = "포스트 생성에 실패했습니다.";
+    try {
+      const errorJson = JSON.parse(errorText);
+      errorMessage = errorJson.message || errorJson.error?.message || errorMessage;
+    } catch {
+      errorMessage = errorText || errorMessage;
+    }
+    throw new Error(errorMessage);
+  }
+
+  return response.json();
+}
+
+// ============================================================
 // Create Post with Solution
 // POST /api/v1/posts/with-solution
 // Solution을 아는 유저용

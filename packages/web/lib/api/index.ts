@@ -16,9 +16,10 @@ export {
   analyzeImage,
   extractMetadata,
   createPost,
+  createPostWithFile,
   createPostWithSolution,
 } from "./posts";
-export type { UploadImageOptions } from "./posts";
+export type { UploadImageOptions, CreatePostWithFileRequest } from "./posts";
 
 // Category APIs
 export {

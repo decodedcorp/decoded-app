@@ -14,7 +14,7 @@ import {
 } from "@/lib/stores/requestStore";
 import { useImageUpload } from "@/lib/hooks/useImageUpload";
 import { useCategoryCodeMap } from "@/lib/hooks/useCategories";
-import { uploadImage, createPost } from "@/lib/api/posts";
+import { createPostWithFile } from "@/lib/api/posts";
 import { compressImage } from "@/lib/utils/imageCompression";
 import { RequestFlowHeader } from "@/lib/components/request/RequestFlowHeader";
 import { DropZone } from "@/lib/components/request/DropZone";
@@ -67,23 +67,18 @@ export default function RequestUploadPage() {
     setIsSubmitting(true);
 
     try {
-      // 1. 이미지 압축 및 업로드
-      toast.loading("이미지 업로드 중...", { id: "upload" });
+      // 1. 이미지 압축
+      toast.loading("이미지 준비 중...", { id: "prepare" });
       const { file: compressedFile } = await compressImage(localImage.file);
-      const { image_url } = await uploadImage({ file: compressedFile });
-      toast.dismiss("upload");
+      toast.dismiss("prepare");
 
-      // 2. spots를 API 형식으로 변환 (solution 없이)
-      // 디버깅: 카테고리 맵 상태 확인
-      console.log("categoryCodeMap:", Object.fromEntries(categoryCodeMap));
-
+      // 2. spots를 API 형식으로 변환
       const spotsPayload = detectedSpots.map((spot) => {
         const categoryCode = spot.categoryCode || "fashion";
         let categoryId = categoryCodeMap.get(categoryCode);
 
         // fallback: fashion 카테고리가 없으면 첫번째 카테고리 사용
         if (!categoryId) {
-          console.warn(`카테고리 코드 "${categoryCode}" 없음, fallback 사용`);
           const firstEntry = categoryCodeMap.entries().next().value;
           categoryId = firstEntry?.[1];
         }
@@ -99,10 +94,10 @@ export default function RequestUploadPage() {
         };
       });
 
-      // 3. POST API 호출
+      // 3. POST API 호출 (파일과 함께)
       toast.loading("포스트 생성 중...", { id: "create" });
-      const response = await createPost({
-        image_url,
+      const response = await createPostWithFile({
+        file: compressedFile,
         media_source: { type: "other", title: "User Upload" },
         spots: spotsPayload,
       });
