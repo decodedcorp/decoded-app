@@ -1,26 +1,29 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   useRequestStore,
   getRequestActions,
   selectCurrentStep,
   selectHasImages,
-  selectCanProceed,
   selectDetectedSpots,
   selectSelectedSpotId,
   type DetectedSpot,
 } from "@/lib/stores/requestStore";
 import { useImageUpload } from "@/lib/hooks/useImageUpload";
+import { uploadImage, createPostWithSolution } from "@/lib/api/posts";
+import { compressImage } from "@/lib/utils/imageCompression";
 import { RequestFlowHeader } from "@/lib/components/request/RequestFlowHeader";
 import { DropZone } from "@/lib/components/request/DropZone";
 import { DetectionView } from "@/lib/components/request/DetectionView";
 import { SolutionInputForm } from "@/lib/components/request/SolutionInputForm";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, Loader2 } from "lucide-react";
 
 export default function RequestUploadPage() {
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 상태만 구독 (렌더링에 필요한 것만)
   const currentStep = useRequestStore(selectCurrentStep);
@@ -29,10 +32,11 @@ export default function RequestUploadPage() {
   const selectedSpotId = useRequestStore(selectSelectedSpotId);
 
   // canProceed를 spots 기반으로 계산
-  const canProceed = detectedSpots.length > 0;
+  const canProceed = detectedSpots.length > 0 && !isSubmitting;
 
-  const { images, isMaxImages, handleFilesSelected, removeImage, retryUpload } =
-    useImageUpload({ autoAnalyze: false });
+  // autoUpload: false, autoAnalyze: false - 자동 업로드/분석 비활성화
+  const { images, isMaxImages, handleFilesSelected, removeImage } =
+    useImageUpload({ autoUpload: false, autoAnalyze: false });
 
   // Action은 getRequestActions()로 접근 (구독 없이)
   const handleClose = useCallback(() => {
@@ -40,11 +44,67 @@ export default function RequestUploadPage() {
     router.push("/");
   }, [router]);
 
-  const handleNext = () => {
-    if (canProceed) {
-      // TODO: Navigate to next step (e.g., /request/details)
-      // For now, proceed to details page
-      router.push("/request/details");
+  // Next 버튼: 이미지 업로드 + POST API 호출
+  const handleNext = async () => {
+    if (!canProceed) return;
+
+    const localImage = images[0];
+    if (!localImage?.file) {
+      toast.error("이미지를 선택해주세요.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // 1. 이미지 압축 및 업로드
+      toast.loading("이미지 업로드 중...", { id: "upload" });
+      const { file: compressedFile } = await compressImage(localImage.file);
+      const { image_url } = await uploadImage({ file: compressedFile });
+      toast.dismiss("upload");
+
+      // 2. spots를 API 형식으로 변환
+      const spotsPayload = detectedSpots.map((spot) => ({
+        position_left: `${(spot.center.x * 100).toFixed(1)}%`,
+        position_top: `${(spot.center.y * 100).toFixed(1)}%`,
+        category_id: spot.categoryCode || "fashion", // TODO: Map to actual UUID
+        solution: spot.solution
+          ? {
+              title: spot.solution.title,
+              original_url: spot.solution.originalUrl || "",
+              thumbnail_url: spot.solution.thumbnailUrl,
+              price_amount: spot.solution.priceAmount,
+              price_currency: spot.solution.priceCurrency || "KRW",
+              description: spot.solution.description,
+            }
+          : {
+              title: spot.title || `Spot ${spot.index}`,
+              original_url: "",
+            },
+      }));
+
+      // 3. POST API 호출
+      toast.loading("포스트 생성 중...", { id: "create" });
+      const response = await createPostWithSolution({
+        image_url,
+        media_source: { type: "other", title: "User Upload" },
+        spots: spotsPayload,
+      });
+      toast.dismiss("create");
+
+      toast.success("포스트가 생성되었습니다!");
+
+      // 4. 완료 후 리다이렉트
+      getRequestActions().resetRequestFlow();
+      router.push(`/posts/${response.id}`);
+    } catch (error) {
+      toast.dismiss("upload");
+      toast.dismiss("create");
+      const message =
+        error instanceof Error ? error.message : "포스트 생성에 실패했습니다.";
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -74,8 +134,8 @@ export default function RequestUploadPage() {
     getRequestActions().selectSpot(null);
   }, []);
 
-  // Check if image is uploaded
-  const uploadedImage = images.find((img) => img.status === "uploaded");
+  // 로컬 프리뷰 이미지 사용 (previewUrl)
+  const localImage = images[0];
 
   return (
     <div className="h-[100dvh] flex flex-col bg-background">
@@ -94,22 +154,18 @@ export default function RequestUploadPage() {
           />
         )}
 
-        {hasImages && !uploadedImage && (
-          <div className="flex-1 min-h-0 flex items-center justify-center">
-            <div className="text-center space-y-2">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto" />
-              <p className="text-sm text-muted-foreground">Uploading image...</p>
-            </div>
-          </div>
-        )}
-
-        {uploadedImage && (
+        {localImage && (
           <div className="flex-1 min-h-0 flex flex-col space-y-4 max-w-6xl mx-auto w-full">
             <div className="flex-1 min-h-0 flex flex-col md:flex-row gap-4 overflow-hidden">
               {/* Image with spot markers */}
               <div className="flex-1 min-h-0 flex items-center justify-center">
                 <DetectionView
-                  image={uploadedImage}
+                  image={{
+                    ...localImage,
+                    // previewUrl을 uploadedUrl로 사용 (DetectionView 호환)
+                    uploadedUrl: localImage.previewUrl,
+                    status: "uploaded" as const,
+                  }}
                   spots={detectedSpots}
                   isDetecting={false}
                   selectedSpotId={selectedSpotId}
@@ -215,6 +271,7 @@ export default function RequestUploadPage() {
                 disabled={!canProceed}
                 className={`
                   px-6 py-2.5 rounded-lg font-medium transition-all
+                  flex items-center gap-2
                   ${
                     canProceed
                       ? "bg-foreground text-background hover:bg-foreground/90"
@@ -222,7 +279,8 @@ export default function RequestUploadPage() {
                   }
                 `}
               >
-                Next
+                {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                {isSubmitting ? "Posting..." : "Post"}
               </button>
             </div>
           </div>
