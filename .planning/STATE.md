@@ -76,8 +76,9 @@ Ready to proceed to Phase 2: Navigation & Discovery
 |---|-------------|------|--------|-----------|
 | 016 | Fix upload page excessive re-renders | 2026-02-05 | ccab256 | [016-fix-upload-page-excessive-rerenders](./quick/016-fix-upload-page-excessive-rerenders/) |
 | 017 | Split request API by solution knowledge | 2026-02-05 | d7de2d9 | [017-request-api-split-by-solution](./quick/017-request-api-split-by-solution/) |
+| 018 | Add solution input UI for detected items | 2026-02-05 | 22888dd | [018-solution-input-ui](./quick/018-solution-input-ui/) |
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-05 after quick task 017*
+*Last updated: 2026-02-05 after quick task 018*
