@@ -102,6 +102,11 @@ export type ContextType =
   | "event"
   | "other";
 
+export interface MediaMetadataItem {
+  key: string; // e.g., "platform", "season", "episode"
+  value: string; // e.g., "Netflix", "2", "3"
+}
+
 export interface CreatePostRequest {
   image_url: string;
   media_source: MediaSource;
@@ -109,6 +114,8 @@ export interface CreatePostRequest {
   artist_name?: string;
   group_name?: string;
   context?: ContextType;
+  description?: string;
+  media_metadata?: MediaMetadataItem[];
 }
 
 export interface CreatePostResponse {
@@ -255,4 +262,18 @@ export interface ActivitiesListParams {
   type?: UserActivityType;
   page?: number;
   per_page?: number;
+}
+
+// ============================================================
+// Extract Metadata API
+// POST /api/v1/posts/extract-metadata
+// ============================================================
+
+export interface ExtractMetadataRequest {
+  description: string;
+}
+
+export interface ExtractMetadataResponse {
+  title?: string;
+  media_metadata: MediaMetadataItem[];
 }

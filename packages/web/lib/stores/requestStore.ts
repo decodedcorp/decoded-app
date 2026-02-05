@@ -15,6 +15,7 @@ import {
   apiToStoreCoord,
   type DetectedItem,
   type MediaSource,
+  type MediaMetadataItem,
   type ContextType,
 } from "@/lib/api";
 
@@ -71,6 +72,9 @@ interface RequestState {
   detectionError: string | null;
 
   // Step 3: Details
+  description: string;
+  extractedMetadata: MediaMetadataItem[];
+  isExtractingMetadata: boolean;
   mediaSource: MediaSource | null;
   artistName: string;
   groupName: string;
@@ -99,6 +103,9 @@ interface RequestState {
   selectSpot: (spotId: string | null) => void;
 
   // Actions - Details (Step 3)
+  setDescription: (description: string) => void;
+  setExtractedMetadata: (metadata: MediaMetadataItem[]) => void;
+  setIsExtractingMetadata: (extracting: boolean) => void;
   setMediaSource: (source: MediaSource | null) => void;
   setArtistName: (name: string) => void;
   setGroupName: (name: string) => void;
@@ -149,6 +156,9 @@ const initialState = {
   aiMetadata: {} as AiMetadata,
   detectionError: null as string | null,
   // Step 3
+  description: "",
+  extractedMetadata: [] as MediaMetadataItem[],
+  isExtractingMetadata: false,
   mediaSource: null as MediaSource | null,
   artistName: "",
   groupName: "",
@@ -318,6 +328,18 @@ export const useRequestStore = create<RequestState>((set, get) => ({
   },
 
   // Step 3 Actions
+  setDescription: (description) => {
+    set({ description });
+  },
+
+  setExtractedMetadata: (metadata) => {
+    set({ extractedMetadata: metadata });
+  },
+
+  setIsExtractingMetadata: (extracting) => {
+    set({ isExtractingMetadata: extracting });
+  },
+
   setMediaSource: (source) => {
     set({ mediaSource: source });
   },
@@ -396,6 +418,11 @@ export const selectDetectionError = (state: RequestState) =>
 export const selectAiMetadata = (state: RequestState) => state.aiMetadata;
 
 // Step 3 selectors
+export const selectDescription = (state: RequestState) => state.description;
+export const selectExtractedMetadata = (state: RequestState) =>
+  state.extractedMetadata;
+export const selectIsExtractingMetadata = (state: RequestState) =>
+  state.isExtractingMetadata;
 export const selectMediaSource = (state: RequestState) => state.mediaSource;
 export const selectArtistName = (state: RequestState) => state.artistName;
 export const selectGroupName = (state: RequestState) => state.groupName;
