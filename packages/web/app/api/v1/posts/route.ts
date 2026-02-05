@@ -78,20 +78,19 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    // Get the JSON body from the request
-    const body = await request.json();
+    // Get FormData from request and forward directly
+    const incomingFormData = await request.formData();
 
-    console.log("POST /api/v1/posts - Request body:", JSON.stringify(body));
+    console.log("POST /api/v1/posts - Forwarding FormData:");
+    for (const [key, value] of incomingFormData.entries()) {
+      console.log(`  ${key}:`, typeof value === "string" ? value : "(file)");
+    }
 
-    // Convert JSON to FormData (backend expects multipart/form-data)
+    // Create new FormData for backend (can't forward Blob directly in some cases)
     const formData = new FormData();
-    formData.append("image_url", body.image_url);
-    formData.append("media_source", JSON.stringify(body.media_source));
-    formData.append("spots", JSON.stringify(body.spots));
-    if (body.artist_name) formData.append("artist_name", body.artist_name);
-    if (body.group_name) formData.append("group_name", body.group_name);
-    if (body.context) formData.append("context", body.context);
-    if (body.description) formData.append("description", body.description);
+    for (const [key, value] of incomingFormData.entries()) {
+      formData.append(key, value);
+    }
 
     // Forward the request to the backend as multipart/form-data
     const response = await fetch(`${API_BASE_URL}/api/v1/posts`, {

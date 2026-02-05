@@ -242,33 +242,30 @@ export async function createPostWithFile(
     throw new Error("로그인이 필요합니다.");
   }
 
-  // Step 1: Upload image first
-  console.log("createPostWithFile - Step 1: Uploading image...");
-  const { image_url } = await uploadImage({ file: request.file });
-  console.log("createPostWithFile - Image uploaded:", image_url);
+  // Send file directly via FormData to local proxy
+  const formData = new FormData();
+  formData.append("file", request.file);
+  formData.append("spots", JSON.stringify(request.spots));
+  formData.append("media_source", JSON.stringify(request.media_source));
+  if (request.artist_name) formData.append("artist_name", request.artist_name);
+  if (request.group_name) formData.append("group_name", request.group_name);
+  if (request.context) formData.append("context", request.context);
+  if (request.description) formData.append("description", request.description);
 
-  // Step 2: Create post with image_url via local proxy (to get proper error messages)
-  const requestBody = {
-    image_url,
-    spots: request.spots,
-    media_source: request.media_source,
-    artist_name: request.artist_name,
-    group_name: request.group_name,
-    context: request.context,
-    description: request.description,
-  };
+  console.log("createPostWithFile - Sending FormData to proxy...");
+  console.log("createPostWithFile - FormData entries:");
+  for (const [key, value] of formData.entries()) {
+    console.log(`  ${key}:`, typeof value === "string" ? value : "(file)");
+  }
 
-  console.log("createPostWithFile - Step 2: Creating post via proxy...");
-  console.log("createPostWithFile - Request body:", JSON.stringify(requestBody, null, 2));
-
-  // Use local proxy to forward request - it handles the multipart conversion
+  // Use local proxy to forward FormData directly
   const response = await fetch("/api/v1/posts", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
+      // Don't set Content-Type - browser will set multipart/form-data with boundary
     },
-    body: JSON.stringify(requestBody),
+    body: formData,
   });
 
   console.log("createPostWithFile - Response status:", response.status);
