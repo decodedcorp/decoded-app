@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
 import { useSearchStore } from "@decoded/shared";
 import type { SearchTab } from "@decoded/shared/types/search";
 import { useSearchURLSync } from "../../lib/hooks/useSearchURLSync";
@@ -11,6 +11,7 @@ import {
   SearchInput,
   SearchTabs,
   SearchResults,
+  RecentSearches,
 } from "../../lib/components/search";
 
 interface SearchPageClientProps {
@@ -22,7 +23,10 @@ export function SearchPageClient({
   initialQuery,
   initialTab,
 }: SearchPageClientProps) {
+  const router = useRouter();
+
   // Initialize store with URL params on mount
+  const query = useSearchStore((s) => s.query);
   const setQuery = useSearchStore((s) => s.setQuery);
   const setDebouncedQuery = useSearchStore((s) => s.setDebouncedQuery);
   const setActiveTab = useSearchStore((s) => s.setActiveTab);
@@ -47,6 +51,11 @@ export function SearchPageClient({
     }
   }, []); // Only run once on mount
 
+  // Handle recent search selection
+  const handleRecentSelect = (searchQuery: string) => {
+    setQuery(searchQuery);
+  };
+
   // Fetch search results
   const { data, groupedData, isLoading, isError } = useGroupedSearch({
     query: debouncedQuery,
@@ -60,56 +69,66 @@ export function SearchPageClient({
   });
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        {/* Header */}
-        <header className="flex items-center gap-4 mb-6">
-          <Link
-            href="/"
-            className="p-2 -ml-2 rounded-lg hover:bg-accent transition-colors"
-            aria-label="Go back"
-          >
-            <ArrowLeft className="w-5 h-5 text-muted-foreground" />
-          </Link>
-          <div className="flex-1">
-            <SearchInput
-              autoFocus={!initialQuery}
-              showSuggestions={false}
-              placeholder="Search people, shows, items..."
-            />
-          </div>
-        </header>
+    <div className="fixed inset-0 z-50 bg-background">
+      {/* Header: back button + search input */}
+      <header className="flex items-center gap-4 px-4 py-4 border-b border-border">
+        <button
+          onClick={() => router.back()}
+          className="p-2 -ml-2 rounded-lg hover:bg-accent transition-colors"
+          aria-label="Go back"
+        >
+          <ArrowLeft className="w-5 h-5 text-muted-foreground" />
+        </button>
+        <div className="flex-1">
+          <SearchInput
+            autoFocus={!initialQuery}
+            showSuggestions={false}
+            placeholder="Search people, shows, items..."
+          />
+        </div>
+      </header>
 
-        {/* Query Display */}
-        {debouncedQuery && (
-          <div className="mb-4">
-            <h1 className="text-xl font-semibold text-foreground">
-              Results for &ldquo;{debouncedQuery}&rdquo;
-            </h1>
-            {data?.pagination && (
-              <p className="text-sm text-muted-foreground mt-1">
-                {data.pagination.total_items} results found
-                {data.took_ms && ` in ${data.took_ms}ms`}
-              </p>
-            )}
-          </div>
-        )}
+      {/* Content: recent searches or results */}
+      <div className="overflow-y-auto" style={{ height: "calc(100vh - 72px)" }}>
+        <div className="max-w-4xl mx-auto px-4 py-6">
+          {!query ? (
+            // Show recent searches when no query
+            <RecentSearches onSelect={handleRecentSelect} />
+          ) : (
+            <>
+              {/* Query Display */}
+              {debouncedQuery && (
+                <div className="mb-4">
+                  <h1 className="text-xl font-semibold text-foreground">
+                    Results for &ldquo;{debouncedQuery}&rdquo;
+                  </h1>
+                  {data?.pagination && (
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {data.pagination.total_items} results found
+                      {data.took_ms && ` in ${data.took_ms}ms`}
+                    </p>
+                  )}
+                </div>
+              )}
 
-        {/* Tabs */}
-        <SearchTabs
-          facets={data?.facets}
-          totalCount={data?.pagination?.total_items}
-          className="mb-4"
-        />
+              {/* Tabs */}
+              <SearchTabs
+                facets={data?.facets}
+                totalCount={data?.pagination?.total_items}
+                className="mb-4"
+              />
 
-        {/* Results */}
-        <SearchResults
-          data={data}
-          groupedData={groupedData}
-          isLoading={isLoading}
-          isError={isError}
-          query={debouncedQuery}
-        />
+              {/* Results */}
+              <SearchResults
+                data={data}
+                groupedData={groupedData}
+                isLoading={isLoading}
+                isError={isError}
+                query={debouncedQuery}
+              />
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

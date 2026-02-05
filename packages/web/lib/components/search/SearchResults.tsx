@@ -149,14 +149,16 @@ const PeopleTabResults = memo(function PeopleTabResults({
   }
 
   return (
-    <div className="py-4 space-y-1">
-      {people.map((person) => (
-        <PersonResultCard
-          key={person.id}
-          person={person}
-          highlight={person.highlight?.artist_name}
-        />
-      ))}
+    <div className="py-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        {people.map((person) => (
+          <PersonResultCard
+            key={person.id}
+            person={person}
+            highlight={person.highlight?.artist_name}
+          />
+        ))}
+      </div>
     </div>
   );
 });
@@ -177,14 +179,16 @@ const MediaTabResults = memo(function MediaTabResults({
   }
 
   return (
-    <div className="py-4 space-y-1">
-      {media.map((item) => (
-        <MediaResultCard
-          key={item.id}
-          media={item}
-          highlight={item.highlight?.title}
-        />
-      ))}
+    <div className="py-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {media.map((item) => (
+          <MediaResultCard
+            key={item.id}
+            media={item}
+            highlight={item.highlight?.title}
+          />
+        ))}
+      </div>
     </div>
   );
 });
