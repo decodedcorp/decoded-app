@@ -67,3 +67,11 @@ export type { MobileHeaderProps } from "./mobile-header";
 // Footer Components
 export { DesktopFooter } from "./desktop-footer";
 export type { DesktopFooterProps } from "./desktop-footer";
+
+// Tag Component
+export { Tag, tagVariants } from "./tag";
+export type { TagProps } from "./tag";
+
+// ActionButton Component
+export { ActionButton, actionButtonVariants } from "./action-button";
+export type { ActionButtonProps } from "./action-button";
