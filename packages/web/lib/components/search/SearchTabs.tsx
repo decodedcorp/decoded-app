@@ -1,9 +1,9 @@
 "use client";
 
 import { memo } from "react";
-import { motion } from "motion/react";
 import { useSearchStore } from "@decoded/shared";
 import type { SearchTab, SearchFacets } from "@decoded/shared/types/search";
+import { Tabs, TabItem } from "@/lib/design-system";
 
 interface SearchTabsProps {
   facets?: SearchFacets;
@@ -61,45 +61,22 @@ export const SearchTabs = memo(function SearchTabs({
   const setActiveTab = useSearchStore((s) => s.setActiveTab);
 
   return (
-    <div
-      role="tablist"
-      className={`flex items-center gap-1 border-b border-border ${className}`}
+    <Tabs
+      value={activeTab}
+      onValueChange={(v) => setActiveTab(v as SearchTab)}
+      layoutId="search-tab-underline"
+      className={className}
     >
       {TABS.map((tab) => {
-        const isActive = activeTab === tab.id;
         const count =
           facets && tab.getCount ? tab.getCount(facets, totalCount) : undefined;
 
-        // Format count display: "Label (count)"
-        const displayLabel =
-          count !== undefined && count > 0
-            ? `${tab.label} (${count > 999 ? "999+" : count})`
-            : tab.label;
-
         return (
-          <button
-            key={tab.id}
-            role="tab"
-            aria-selected={isActive}
-            onClick={() => setActiveTab(tab.id)}
-            className={`relative px-4 py-3 text-sm font-medium transition-colors ${
-              isActive
-                ? "text-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {displayLabel}
-            {/* Animated sliding underline indicator */}
-            {isActive && (
-              <motion.span
-                layoutId="search-tab-underline"
-                className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
-                transition={{ type: "spring", stiffness: 500, damping: 30 }}
-              />
-            )}
-          </button>
+          <TabItem key={tab.id} value={tab.id} count={count}>
+            {tab.label}
+          </TabItem>
         );
       })}
-    </div>
+    </Tabs>
   );
 });

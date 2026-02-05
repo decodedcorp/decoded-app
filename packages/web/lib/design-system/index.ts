@@ -91,3 +91,11 @@ export type { NavItemProps } from "./nav-item";
 // NavBar Component
 export { NavBar, navBarVariants } from "./nav-bar";
 export type { NavBarProps } from "./nav-bar";
+
+// SectionHeader Component
+export { SectionHeader } from "./section-header";
+export type { SectionHeaderProps } from "./section-header";
+
+// Tabs Components
+export { Tabs, TabItem, tabItemVariants } from "./tabs";
+export type { TabsProps, TabItemProps } from "./tabs";
