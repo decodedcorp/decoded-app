@@ -229,7 +229,8 @@ grep "design-system" .planning/codebase/STACK.md  # Check updated docs
 | 003 | Explore 페이지 things 그리드 + footer 제거 | 2026-02-05 | c19e536 | [003-explore-things-grid-no-footer](./quick/003-explore-things-grid-no-footer/) |
 | 004 | Fix feed page footer overlap and responsive grid | 2026-02-05 | 960d37d | [004-fix-feed-page-footer-overlap-responsive-grid](./quick/004-fix-feed-page-footer-overlap-responsive-grid/) |
 | 005 | Fix explore page ThiingsGrid not visible | 2026-02-05 | e95ce37 | [005-fix-explore-page-things-grid-not-visible](./quick/005-fix-explore-page-things-grid-not-visible/) |
+| 006 | Desktop request page modal (intercepting routes) | 2026-02-05 | ab7c9c1 | [006-desktop-request-page-modal](./quick/006-desktop-request-page-modal/) |
 
 ---
 
-*Last updated: 2026-02-05 after quick task 005*
+*Last updated: 2026-02-05 after quick task 006*
