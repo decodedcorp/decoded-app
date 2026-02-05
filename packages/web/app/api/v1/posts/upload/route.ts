@@ -42,6 +42,34 @@ export async function POST(request: NextRequest) {
       body: formData,
     });
 
+    // Handle gateway errors (502, 503, 504)
+    if (response.status >= 502 && response.status <= 504) {
+      console.error(`Backend gateway error: ${response.status}`);
+      return NextResponse.json(
+        {
+          message:
+            "서버가 일시적으로 응답하지 않습니다. 잠시 후 다시 시도해주세요.",
+          code: "GATEWAY_ERROR",
+          retryable: true,
+        },
+        { status: response.status }
+      );
+    }
+
+    // Check content-type before parsing as JSON
+    const contentType = response.headers.get("content-type") || "";
+    if (!contentType.includes("application/json")) {
+      console.error(`Unexpected content-type: ${contentType}`);
+      return NextResponse.json(
+        {
+          message: "서버 응답 형식이 올바르지 않습니다.",
+          code: "INVALID_RESPONSE",
+          retryable: true,
+        },
+        { status: 502 }
+      );
+    }
+
     // Parse response data
     const data = await response.json();
 
@@ -50,7 +78,11 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Upload proxy error:", error);
     return NextResponse.json(
-      { message: "Failed to upload image" },
+      {
+        message: "이미지 업로드에 실패했습니다.",
+        code: "UPLOAD_ERROR",
+        retryable: true,
+      },
       { status: 500 }
     );
   }

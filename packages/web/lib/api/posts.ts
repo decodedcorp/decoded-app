@@ -21,6 +21,20 @@ import {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
+// Upload retry configuration
+const UPLOAD_RETRY_CONFIG = {
+  maxRetries: 2,
+  baseDelay: 1000, // 1 second
+  retryableStatuses: [502, 503, 504],
+};
+
+/**
+ * Sleep utility for retry delays
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 // ============================================================
 // Image Upload
 // POST /api/v1/posts/upload
@@ -30,11 +44,13 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 export interface UploadImageOptions {
   file: File;
   onProgress?: (progress: number) => void;
+  maxRetries?: number;
 }
 
 export async function uploadImage({
   file,
   onProgress,
+  maxRetries = UPLOAD_RETRY_CONFIG.maxRetries,
 }: UploadImageOptions): Promise<UploadResponse> {
   const token = await getAuthToken();
 
@@ -45,36 +61,99 @@ export async function uploadImage({
   const formData = new FormData();
   formData.append("file", file);
 
-  // Progress 시뮬레이션 (XMLHttpRequest로 변경하면 실제 progress 가능)
-  onProgress?.(10);
+  let lastError: Error | null = null;
+  let attempt = 0;
 
-  const response = await fetch(`${API_BASE_URL}/api/v1/posts/upload`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    body: formData,
-  });
-
-  onProgress?.(70);
-
-  if (!response.ok) {
-    let errorData: ApiError;
-
+  while (attempt <= maxRetries) {
     try {
-      errorData = await response.json();
-    } catch {
-      errorData = {
-        message: `HTTP ${response.status}: ${response.statusText}`,
-      };
-    }
+      // Progress: 10% start, add attempt offset for retry visibility
+      const baseProgress = attempt > 0 ? 5 : 10;
+      onProgress?.(baseProgress);
 
-    throw new Error(errorData.message || `API Error: ${response.status}`);
+      const response = await fetch(`${API_BASE_URL}/api/v1/posts/upload`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      onProgress?.(70);
+
+      // Check if response is retryable
+      if (UPLOAD_RETRY_CONFIG.retryableStatuses.includes(response.status)) {
+        let errorData: ApiError & { retryable?: boolean };
+
+        try {
+          errorData = await response.json();
+        } catch {
+          errorData = {
+            message: "서버가 일시적으로 응답하지 않습니다.",
+            retryable: true,
+          };
+        }
+
+        // If we have retries left and error is retryable, retry
+        if (attempt < maxRetries && errorData.retryable !== false) {
+          const delay = UPLOAD_RETRY_CONFIG.baseDelay * Math.pow(2, attempt);
+          console.log(
+            `Upload failed with ${response.status}, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`
+          );
+          await sleep(delay);
+          attempt++;
+          continue;
+        }
+
+        // No more retries, throw the error
+        throw new Error(
+          errorData.message ||
+            "서버가 일시적으로 응답하지 않습니다. 잠시 후 다시 시도해주세요."
+        );
+      }
+
+      // Non-retryable error
+      if (!response.ok) {
+        let errorData: ApiError;
+
+        try {
+          errorData = await response.json();
+        } catch {
+          errorData = {
+            message: `HTTP ${response.status}: ${response.statusText}`,
+          };
+        }
+
+        throw new Error(errorData.message || `API Error: ${response.status}`);
+      }
+
+      onProgress?.(100);
+
+      return response.json();
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+
+      // Network errors are retryable
+      if (
+        attempt < maxRetries &&
+        (lastError.message.includes("fetch") ||
+          lastError.message.includes("network") ||
+          lastError.message.includes("Failed to fetch"))
+      ) {
+        const delay = UPLOAD_RETRY_CONFIG.baseDelay * Math.pow(2, attempt);
+        console.log(
+          `Network error, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`
+        );
+        await sleep(delay);
+        attempt++;
+        continue;
+      }
+
+      throw lastError;
+    }
   }
 
-  onProgress?.(100);
-
-  return response.json();
+  // Should not reach here, but just in case
+  throw lastError || new Error("업로드에 실패했습니다.");
 }
 
 // ============================================================

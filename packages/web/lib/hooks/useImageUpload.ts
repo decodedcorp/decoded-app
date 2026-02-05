@@ -61,8 +61,7 @@ export function useImageUpload(options: UseImageUploadOptions = {}) {
     try {
       // 1. 이미지 압축
       updateImageStatus(id, "uploading", 10);
-      const { file: compressedFile, wasCompressed } =
-        await compressImage(file);
+      const { file: compressedFile, wasCompressed } = await compressImage(file);
 
       if (wasCompressed) {
         console.log(`Image compressed: ${file.name}`);
@@ -87,8 +86,16 @@ export function useImageUpload(options: UseImageUploadOptions = {}) {
         }, 100);
       }
     } catch (error) {
-      const errorMessage =
+      const rawMessage =
         error instanceof Error ? error.message : "Upload failed";
+      // Translate common error messages for better UX
+      const isServerError =
+        rawMessage.includes("502") ||
+        rawMessage.includes("503") ||
+        rawMessage.includes("504");
+      const errorMessage = isServerError
+        ? "서버가 일시적으로 응답하지 않습니다. 다시 시도해주세요."
+        : rawMessage;
       updateImageStatus(id, "error", 0, errorMessage);
       onUploadError?.(id, errorMessage);
       toast.error(errorMessage);
