@@ -81,6 +81,8 @@ export async function POST(request: NextRequest) {
     // Get the JSON body from the request
     const body = await request.json();
 
+    console.log("POST /api/v1/posts - Request body:", JSON.stringify(body));
+
     // Forward the request to the backend
     const response = await fetch(`${API_BASE_URL}/api/v1/posts`, {
       method: "POST",
@@ -93,6 +95,12 @@ export async function POST(request: NextRequest) {
 
     // Parse response data
     const data = await response.json();
+
+    console.log(
+      "POST /api/v1/posts - Backend response:",
+      response.status,
+      JSON.stringify(data)
+    );
 
     // Return the response with the same status code
     return NextResponse.json(data, { status: response.status });
