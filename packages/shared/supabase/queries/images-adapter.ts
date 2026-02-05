@@ -2,6 +2,7 @@
  * Unified adapter layer for post-centric image fetching (shared across web and mobile)
  */
 
+import { isSupabaseInitialized } from "../client";
 import type {
   FetchFilteredImagesParams,
   ImagePageWithPostId,
@@ -20,11 +21,31 @@ import { fetchOrphanImages } from "./images-orphan";
 export async function fetchUnifiedImages(
   params: FetchFilteredImagesParams & { deduplicateByImageId?: boolean }
 ): Promise<ImagePageWithPostId> {
+  // Check Supabase initialization before making queries
+  if (!isSupabaseInitialized()) {
+    throw new Error(
+      "Supabase client not initialized. Ensure the app providers are loaded before fetching images."
+    );
+  }
+
   const { deduplicateByImageId = true, ...queryParams } = params;
   const finalLimit = queryParams.limit || 50;
 
   // Fetch post-based images first (primary source)
-  const postBasedResult = await fetchImagesByPostImage(queryParams);
+  let postBasedResult: ImagePageWithPostId;
+  try {
+    postBasedResult = await fetchImagesByPostImage(queryParams);
+  } catch (error) {
+    // Log detailed error for debugging
+    console.error("[fetchUnifiedImages] Failed to fetch post-based images:", {
+      error,
+      params: queryParams,
+    });
+    // Re-throw with context
+    throw new Error(
+      `Failed to fetch images: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
 
   // Initialize orphan result
   let orphanResult: ImagePageWithPostId = {

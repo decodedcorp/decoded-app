@@ -112,10 +112,19 @@ export function ExploreClient({ initialPosts: _initialPosts }: Props) {
                 <h2 className="mb-2 text-xl font-semibold text-foreground">
                   Failed to load images
                 </h2>
-                <p className="mb-6 text-sm text-muted-foreground">
-                  {error instanceof Error
-                    ? error.message
-                    : "Something went wrong while loading images."}
+                <p className="mb-6 max-w-md text-sm text-muted-foreground">
+                  {(() => {
+                    // Log error for debugging
+                    console.error("[ExploreClient] Image fetch error:", error);
+                    // Display appropriate error message
+                    if (error instanceof Error) {
+                      return error.message;
+                    }
+                    if (typeof error === "object" && error !== null) {
+                      return JSON.stringify(error);
+                    }
+                    return "Something went wrong while loading images.";
+                  })()}
                 </p>
                 <button
                   onClick={() => refetch()}
