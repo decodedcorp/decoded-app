@@ -94,38 +94,38 @@ Deferred to future release.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| COMP-01 | TBD | Pending |
-| COMP-02 | TBD | Pending |
-| COMP-03 | TBD | Pending |
-| COMP-04 | TBD | Pending |
-| NAV-01 | TBD | Pending |
-| NAV-02 | TBD | Pending |
-| NAV-03 | TBD | Pending |
-| NAV-04 | TBD | Pending |
-| CARD-01 | TBD | Pending |
-| CARD-02 | TBD | Pending |
-| CARD-03 | TBD | Pending |
-| CARD-04 | TBD | Pending |
-| PROF-01 | TBD | Pending |
-| PROF-02 | TBD | Pending |
-| PROF-03 | TBD | Pending |
-| DETL-01 | TBD | Pending |
-| AUTH-01 | TBD | Pending |
-| AUTH-02 | TBD | Pending |
-| AUTH-03 | TBD | Pending |
-| AUTH-04 | TBD | Pending |
-| STATE-01 | TBD | Pending |
-| STATE-02 | TBD | Pending |
-| UI-01 | TBD | Pending |
-| QA-01 | TBD | Pending |
-| QA-02 | TBD | Pending |
-| QA-03 | TBD | Pending |
+| COMP-01 | v2.1-Phase-1 | Pending |
+| COMP-02 | v2.1-Phase-1 | Pending |
+| COMP-03 | v2.1-Phase-1 | Pending |
+| COMP-04 | v2.1-Phase-1 | Pending |
+| NAV-01 | v2.1-Phase-2 | Pending |
+| NAV-02 | v2.1-Phase-2 | Pending |
+| NAV-03 | v2.1-Phase-2 | Pending |
+| NAV-04 | v2.1-Phase-2 | Pending |
+| CARD-01 | v2.1-Phase-3 | Pending |
+| CARD-02 | v2.1-Phase-3 | Pending |
+| CARD-03 | v2.1-Phase-3 | Pending |
+| CARD-04 | v2.1-Phase-3 | Pending |
+| PROF-01 | v2.1-Phase-4 | Pending |
+| PROF-02 | v2.1-Phase-4 | Pending |
+| PROF-03 | v2.1-Phase-4 | Pending |
+| DETL-01 | v2.1-Phase-4 | Pending |
+| AUTH-01 | v2.1-Phase-5 | Pending |
+| AUTH-02 | v2.1-Phase-5 | Pending |
+| AUTH-03 | v2.1-Phase-5 | Pending |
+| AUTH-04 | v2.1-Phase-5 | Pending |
+| STATE-01 | v2.1-Phase-5 | Pending |
+| STATE-02 | v2.1-Phase-5 | Pending |
+| UI-01 | v2.1-Phase-5 | Pending |
+| QA-01 | v2.1-Phase-6 | Pending |
+| QA-02 | v2.1-Phase-6 | Pending |
+| QA-03 | v2.1-Phase-6 | Pending |
 
 **Coverage:**
 - v2.1 requirements: 26 total
-- Mapped to phases: 0
-- Unmapped: 26 ⚠️
+- Mapped to phases: 26 ✓
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-02-05*
-*Last updated: 2026-02-05 after scoping*
+*Last updated: 2026-02-05 after roadmap creation*
