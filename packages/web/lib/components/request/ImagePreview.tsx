@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { X, RefreshCw, Check, AlertCircle } from "lucide-react";
 import Image from "next/image";
 import { type UploadedImage } from "@/lib/stores/requestStore";
@@ -13,7 +14,7 @@ interface ImagePreviewProps {
   large?: boolean;
 }
 
-export function ImagePreview({
+function ImagePreviewComponent({
   image,
   onRemove,
   onRetry,
@@ -101,3 +102,15 @@ export function ImagePreview({
     </div>
   );
 }
+
+// Memo with custom comparator to only re-render when image data changes
+export const ImagePreview = memo(ImagePreviewComponent, (prev, next) => {
+  // Compare image fields that affect rendering
+  return (
+    prev.image.id === next.image.id &&
+    prev.image.status === next.image.status &&
+    prev.image.progress === next.image.progress &&
+    prev.image.error === next.image.error &&
+    prev.large === next.large
+  );
+});

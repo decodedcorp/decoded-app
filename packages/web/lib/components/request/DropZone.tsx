@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { memo, useState, useCallback, useRef } from "react";
 import { Upload, Image as ImageIcon } from "lucide-react";
 import { UPLOAD_CONFIG } from "@/lib/utils/validation";
 
@@ -11,7 +11,7 @@ interface DropZoneProps {
   className?: string;
 }
 
-export function DropZone({
+function DropZoneComponent({
   onFilesSelected,
   disabled = false,
   compact = false,
@@ -176,3 +176,6 @@ export function DropZone({
     </div>
   );
 }
+
+// Memo to prevent re-renders when parent re-renders
+export const DropZone = memo(DropZoneComponent);
