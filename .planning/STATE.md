@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 Phase: 1 of 6 (Core Interactive Components)
 Plan: 2 of 2 in current phase
 Status: Phase complete
-Last activity: 2026-02-05 — Completed v2.1-01-02-PLAN.md (StepIndicator & Hotspot)
+Last activity: 2026-02-05 — Completed quick task 020 (Upload direct spot UI)
 
 Progress: [██░░░░░░░░] 15.4% (2/13 plans)
 
@@ -78,8 +78,9 @@ Ready to proceed to Phase 2: Navigation & Discovery
 | 017 | Split request API by solution knowledge | 2026-02-05 | d7de2d9 | [017-request-api-split-by-solution](./quick/017-request-api-split-by-solution/) |
 | 018 | Add solution input UI for detected items | 2026-02-05 | 22888dd | [018-solution-input-ui](./quick/018-solution-input-ui/) |
 | 019 | Switch to manual spot creation flow | 2026-02-05 | e418240 | [019-manual-spot-creation](./quick/019-manual-spot-creation/) |
+| 020 | Unified upload + spot creation UI | 2026-02-05 | 8b08a6c | [020-request-upload-direct-spot-ui](./quick/020-request-upload-direct-spot-ui/) |
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-05 after quick task 019*
+*Last updated: 2026-02-05 after quick task 020*
