@@ -23,10 +23,10 @@ decoded.pen에 정의된 미구현 컴포넌트 완성.
 
 ### Card Components
 
-- [ ] **CARD-01**: ArtistCard 아티스트 카드
-- [ ] **CARD-02**: StatCard 통계 카드
-- [ ] **CARD-03**: SpotCard 3개 변형 (Default, Active, Compact)
-- [ ] **CARD-04**: ShopCarouselCard 쇼핑 캐러셀 카드
+- [x] **CARD-01**: ArtistCard 아티스트 카드 ✅
+- [x] **CARD-02**: StatCard 통계 카드 ✅
+- [x] **CARD-03**: SpotCard 3개 변형 (Default, Active, Compact) ✅
+- [x] **CARD-04**: ShopCarouselCard 쇼핑 캐러셀 카드 ✅
 
 ### Profile Components
 
@@ -102,10 +102,10 @@ Deferred to future release.
 | NAV-02 | v2.1-Phase-2 | Pending |
 | NAV-03 | v2.1-Phase-2 | Pending |
 | NAV-04 | v2.1-Phase-2 | Pending |
-| CARD-01 | v2.1-Phase-3 | Pending |
-| CARD-02 | v2.1-Phase-3 | Pending |
-| CARD-03 | v2.1-Phase-3 | Pending |
-| CARD-04 | v2.1-Phase-3 | Pending |
+| CARD-01 | v2.1-Phase-3 | Complete |
+| CARD-02 | v2.1-Phase-3 | Complete |
+| CARD-03 | v2.1-Phase-3 | Complete |
+| CARD-04 | v2.1-Phase-3 | Complete |
 | PROF-01 | v2.1-Phase-4 | Pending |
 | PROF-02 | v2.1-Phase-4 | Pending |
 | PROF-03 | v2.1-Phase-4 | Pending |
@@ -128,4 +128,4 @@ Deferred to future release.
 
 ---
 *Requirements defined: 2026-02-05*
-*Last updated: 2026-02-05 after roadmap creation*
+*Last updated: 2026-02-06 after phase v2.1-03 completion*
