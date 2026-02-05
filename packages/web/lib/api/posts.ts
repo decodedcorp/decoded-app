@@ -247,29 +247,28 @@ export async function createPostWithFile(
   const { image_url } = await uploadImage({ file: request.file });
   console.log("createPostWithFile - Image uploaded:", image_url);
 
-  // Step 2: Create post with image_url (multipart/form-data)
-  const formData = new FormData();
-  formData.append("image_url", image_url);
-  formData.append("spots", JSON.stringify(request.spots));
-  formData.append("media_source", JSON.stringify(request.media_source));
-  if (request.artist_name) formData.append("artist_name", request.artist_name);
-  if (request.group_name) formData.append("group_name", request.group_name);
-  if (request.context) formData.append("context", request.context);
-  if (request.description) formData.append("description", request.description);
+  // Step 2: Create post with image_url via local proxy (to get proper error messages)
+  const requestBody = {
+    image_url,
+    spots: request.spots,
+    media_source: request.media_source,
+    artist_name: request.artist_name,
+    group_name: request.group_name,
+    context: request.context,
+    description: request.description,
+  };
 
-  console.log("createPostWithFile - Step 2: Creating post...");
-  console.log("createPostWithFile - FormData entries:");
-  for (const [key, value] of formData.entries()) {
-    console.log(`  ${key}:`, value);
-  }
+  console.log("createPostWithFile - Step 2: Creating post via proxy...");
+  console.log("createPostWithFile - Request body:", JSON.stringify(requestBody, null, 2));
 
-  const response = await fetch(`${API_BASE_URL}/api/v1/posts`, {
+  // Use local proxy to forward request - it handles the multipart conversion
+  const response = await fetch("/api/v1/posts", {
     method: "POST",
     headers: {
+      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
-      // Don't set Content-Type - let browser set it with boundary
     },
-    body: formData,
+    body: JSON.stringify(requestBody),
   });
 
   console.log("createPostWithFile - Response status:", response.status);
