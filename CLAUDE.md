@@ -111,7 +111,7 @@ yarn format:check     # Check Prettier formatting
 - docs/ai-playbook/ - AI tool usage guides
 - docs/design-system/ - Design tokens
 
-<!-- Last Updated: 2026-01-23 -->
+<!-- Last Updated: 2026-02-05 -->
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->
