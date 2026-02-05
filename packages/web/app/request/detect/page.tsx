@@ -29,6 +29,7 @@ export default function RequestDetectPage() {
 
   const startDetection = useRequestStore((s) => s.startDetection);
   const selectSpot = useRequestStore((s) => s.selectSpot);
+  const setSpotSolution = useRequestStore((s) => s.setSpotSolution);
   const resetRequestFlow = useRequestStore((s) => s.resetRequestFlow);
 
   // Get the first uploaded image
@@ -95,6 +96,7 @@ export default function RequestDetectPage() {
           isRevealing={isRevealing}
           selectedSpotId={selectedSpotId}
           onSelectSpot={handleSelectSpot}
+          onSaveSolution={setSpotSolution}
         />
       )}
 
@@ -108,6 +110,7 @@ export default function RequestDetectPage() {
             isRevealing={isRevealing}
             selectedSpotId={selectedSpotId}
             onSelectSpot={handleSelectSpot}
+            onSaveSolution={setSpotSolution}
           />
         </main>
       )}

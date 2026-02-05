@@ -8,7 +8,7 @@ interface UseSpotCardSyncOptions {
 }
 
 interface UseSpotCardSyncReturn {
-  cardRefs: React.MutableRefObject<Map<string, HTMLButtonElement | null>>;
+  cardRefs: React.MutableRefObject<Map<string, HTMLElement | null>>;
   scrollContainerRef: React.RefCallback<HTMLDivElement>;
   selectSpot: (spotId: string | null) => void;
   scrollToCard: (spotId: string) => void;
@@ -27,7 +27,7 @@ export function useSpotCardSync({
   selectedSpotId,
   onSelectSpot,
 }: UseSpotCardSyncOptions): UseSpotCardSyncReturn {
-  const cardRefs = useRef<Map<string, HTMLButtonElement | null>>(new Map());
+  const cardRefs = useRef<Map<string, HTMLElement | null>>(new Map());
   const scrollContainerElementRef = useRef<HTMLDivElement | null>(null);
   const [visibleSpotId, setVisibleSpotId] = useState<string | null>(null);
 

@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import {
   type UploadedImage,
   type DetectedSpot,
+  type SpotSolutionData,
 } from "@/lib/stores/requestStore";
 import { DetectionView } from "./DetectionView";
 import { DetectedItemCard } from "./DetectedItemCard";
@@ -16,6 +17,7 @@ interface DesktopDetectionLayoutProps {
   isRevealing: boolean;
   selectedSpotId: string | null;
   onSelectSpot: (spotId: string | null) => void;
+  onSaveSolution?: (spotId: string, solution: SpotSolutionData) => void;
 }
 
 /**
@@ -33,6 +35,7 @@ export function DesktopDetectionLayout({
   isRevealing,
   selectedSpotId,
   onSelectSpot,
+  onSaveSolution,
 }: DesktopDetectionLayoutProps) {
   const { cardRefs, scrollContainerRef, selectSpot } = useSpotCardSync({
     spots,
@@ -55,7 +58,7 @@ export function DesktopDetectionLayout({
   );
 
   const setCardRef = useCallback(
-    (spotId: string) => (el: HTMLButtonElement | null) => {
+    (spotId: string) => (el: HTMLDivElement | null) => {
       cardRefs.current.set(spotId, el);
     },
     [cardRefs]
@@ -109,6 +112,7 @@ export function DesktopDetectionLayout({
                 spot={spot}
                 isSelected={selectedSpotId === spot.id}
                 onClick={() => handleCardClick(spot)}
+                onSaveSolution={onSaveSolution}
               />
             ))}
           </div>

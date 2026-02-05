@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import {
   type UploadedImage,
   type DetectedSpot,
+  type SpotSolutionData,
 } from "@/lib/stores/requestStore";
 import { DetectionView } from "./DetectionView";
 import { DetectedItemCard } from "./DetectedItemCard";
@@ -17,6 +18,7 @@ interface MobileDetectionLayoutProps {
   isRevealing: boolean;
   selectedSpotId: string | null;
   onSelectSpot: (spotId: string | null) => void;
+  onSaveSolution?: (spotId: string, solution: SpotSolutionData) => void;
 }
 
 /**
@@ -33,6 +35,7 @@ export function MobileDetectionLayout({
   isRevealing,
   selectedSpotId,
   onSelectSpot,
+  onSaveSolution,
 }: MobileDetectionLayoutProps) {
   const { cardRefs, scrollContainerRef, selectSpot } = useSpotCardSync({
     spots,
@@ -55,7 +58,7 @@ export function MobileDetectionLayout({
   );
 
   const setCardRef = useCallback(
-    (spotId: string) => (el: HTMLButtonElement | null) => {
+    (spotId: string) => (el: HTMLDivElement | null) => {
       cardRefs.current.set(spotId, el);
     },
     [cardRefs]
@@ -107,6 +110,7 @@ export function MobileDetectionLayout({
               spot={spot}
               isSelected={selectedSpotId === spot.id}
               onClick={() => handleCardClick(spot)}
+              onSaveSolution={onSaveSolution}
             />
           ))}
         </div>

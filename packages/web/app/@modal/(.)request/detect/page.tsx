@@ -34,6 +34,7 @@ export default function ModalRequestDetectPage() {
 
   const startDetection = useRequestStore((s) => s.startDetection);
   const selectSpot = useRequestStore((s) => s.selectSpot);
+  const setSpotSolution = useRequestStore((s) => s.setSpotSolution);
   const resetRequestFlow = useRequestStore((s) => s.resetRequestFlow);
 
   // Get the first uploaded image
@@ -94,7 +95,7 @@ export default function ModalRequestDetectPage() {
   );
 
   const setCardRef = useCallback(
-    (spotId: string) => (el: HTMLButtonElement | null) => {
+    (spotId: string) => (el: HTMLDivElement | null) => {
       cardRefs.current.set(spotId, el);
     },
     [cardRefs]
@@ -167,6 +168,7 @@ export default function ModalRequestDetectPage() {
                       spot={spot}
                       isSelected={selectedSpotId === spot.id}
                       onClick={() => handleCardClick(spot)}
+                      onSaveSolution={setSpotSolution}
                     />
                   ))}
                 </div>
