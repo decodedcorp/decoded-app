@@ -25,6 +25,8 @@ type Props = {
   onActiveIndexChange?: (index: number | null) => void;
   // If true, hides the hero/interactive image (useful for modal split layout where image is external)
   hideImage?: boolean;
+  // Callback when hero image is clicked (for opening lightbox)
+  onHeroClick?: () => void;
 };
 
 /**
@@ -43,6 +45,7 @@ export function ImageDetailContent({
   activeIndex,
   onActiveIndexChange,
   hideImage = false,
+  onHeroClick,
 }: Props) {
   // Items are now pre-fetched via post.item_ids (if post_image exists)
   // Fallback to item.image_id if no post_image found
@@ -197,7 +200,9 @@ export function ImageDetailContent({
       </div>
 
       {/* Section 1: Hero - Hidden if hideImage is true */}
-      {!hideImage && <HeroSection image={image} isModal={isModal} />}
+      {!hideImage && (
+        <HeroSection image={image} isModal={isModal} onClick={onHeroClick} />
+      )}
 
       {/* Featured In Section - Redesigned as Credits Bar */}
       {(image.postImages?.length > 0 || image.posts?.length > 0) && (

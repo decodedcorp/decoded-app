@@ -3,11 +3,12 @@
 import { useImageById } from "@/lib/hooks/useImages";
 import { ImageDetailContent } from "./ImageDetailContent";
 import { LenisProvider } from "./LenisProvider";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { useRouter } from "next/navigation";
 import { X, Share2 } from "lucide-react";
 import { ReportErrorButton } from "./ReportErrorButton"; // Import ReportErrorButton
+import { Lightbox } from "./Lightbox";
 
 type Props = {
   imageId: string;
@@ -21,6 +22,7 @@ export function ImageDetailPage({ imageId }: Props) {
   const router = useRouter();
   const { data: image, isLoading, error } = useImageById(imageId);
   const pageRef = useRef<HTMLDivElement>(null);
+  const [showLightbox, setShowLightbox] = useState(false);
 
   // Fade-in animation for direct access
   useEffect(() => {
@@ -97,21 +99,32 @@ export function ImageDetailPage({ imageId }: Props) {
           <ReportErrorButton postId={image.id} size="md" />
           <button
             onClick={handleShare}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm transition-colors hover:bg-background/90"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm transition-transform transition-colors hover:scale-105 hover:bg-background/90"
             aria-label="Share"
           >
             <Share2 className="h-5 w-5" />
           </button>
           <button
             onClick={handleClose}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm transition-colors hover:bg-background/90"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm transition-transform transition-colors hover:scale-105 hover:bg-background/90"
             aria-label="Close"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <ImageDetailContent image={image} />
+        <ImageDetailContent
+          image={image}
+          onHeroClick={() => setShowLightbox(true)}
+        />
+
+        {/* Lightbox */}
+        <Lightbox
+          isOpen={showLightbox}
+          onClose={() => setShowLightbox(false)}
+          imageUrl={image.image_url || ""}
+          alt={`Image ${image.id}`}
+        />
       </div>
     </LenisProvider>
   );
