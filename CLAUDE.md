@@ -1,49 +1,137 @@
 # decoded-app Development Guidelines
 
 ## Overview
-Modern web application for image/item discovery and curation with advanced filtering, detail views, and scroll animations.
+Modern web application for image/item discovery and curation with advanced filtering, detail views, and scroll animations. Features AI-powered item detection, social feed, and comprehensive design system (v2.0).
 
 ## Tech Stack
 - **Frontend**: Next.js 16.0.7, React 18.3.1, TypeScript 5.9.3
-- **Styling**: Tailwind CSS 3.4.18 + custom design system
-- **State**: Zustand 4.5.7, React Query 5.90.11
-- **Backend**: Supabase (PostgreSQL, Auth)
-- **Animations**: GSAP 3.13.0, Motion 12.23.12, Lenis 1.3.15
-- **Linting**: ESLint 9.39.1, Prettier 3.6.2
+- **Styling**: Tailwind CSS 3.4.18, CVA 0.7.1, tailwind-merge 3.4.0
+- **State**: Zustand 4.5.7, React Query 5.90.11, React Query DevTools 5.91.1
+- **Backend**: Supabase 2.86.0, Auth Helpers 0.15.0
+- **Animations**: GSAP 3.13.0, Motion 12.23.12, Lenis 1.3.15, @use-gesture/react 10.3.1
+- **UI Libraries**: Lucide React 0.555.0, React Icons 5.5.0, Radix UI, Sonner 2.0.7
+- **3D/Media**: Three.js 0.167.1, browser-image-compression 2.0.2
+- **Theme**: next-themes 0.4.6
+- **Linting**: ESLint 9.39.1 (flat config), Prettier 3.6.2
 - **Package Manager**: Yarn 4.9.2 (node-modules linker)
 
 ## Project Structure
 ```text
 packages/web/
-├── app/              # Next.js App Router pages
-├── lib/              # Utilities, hooks, Supabase, Zustand stores
-│   ├── api/          # API client functions
-│   ├── components/   # React components (by feature)
-│   ├── hooks/        # Custom React hooks
-│   ├── stores/       # Zustand stores
-│   ├── supabase/     # Supabase client + queries
-│   └── utils/        # Utility functions
-└── __tests__/        # Test files
+├── app/                    # Next.js App Router pages
+│   ├── @modal/             # Parallel route for modals
+│   ├── api/v1/             # API routes (posts, users, categories)
+│   ├── explore/            # Explore grid view
+│   ├── feed/               # Social feed
+│   ├── images/             # Image discovery & detail
+│   ├── login/              # OAuth authentication
+│   ├── posts/              # Post detail
+│   ├── profile/            # User profile
+│   ├── request/            # Upload & AI detection flow
+│   ├── search/             # Full-screen search overlay
+│   └── lab/                # Experimental features
+├── lib/
+│   ├── api/                # API client functions
+│   ├── components/         # Feature-based components
+│   │   ├── ui/             # Primitive UI (Card, Button, BottomSheet)
+│   │   ├── design-system/  # v2.0 Design System
+│   │   ├── main/           # Home page sections
+│   │   ├── search/         # Search overlay & results
+│   │   ├── detail/         # Image/post detail views
+│   │   ├── request/        # Upload flow components
+│   │   ├── explore/        # Explore grid
+│   │   ├── feed/           # Feed components
+│   │   ├── profile/        # Profile sections
+│   │   └── auth/           # Auth components
+│   ├── hooks/              # Custom React hooks
+│   ├── stores/             # Zustand state stores
+│   ├── supabase/           # Supabase client + queries
+│   └── utils/              # Utility functions
+└── __tests__/              # Test files
 
-packages/shared/      # Shared types, hooks, utilities
-
-specs/                # Feature specifications
-docs/                 # Implementation documentation
-.planning/            # GSD workflow artifacts
-.claude/              # Claude Code settings
+packages/shared/            # Shared types, hooks, utilities
+specs/                      # Feature specifications
+docs/                       # Documentation
+.planning/                  # GSD workflow artifacts
 ```
+
+## Implemented Features
+
+### Core Pages & Routes
+| Route | Description |
+|-------|-------------|
+| `/` | Home - Hero carousel, trending, best sections, celebrity grid |
+| `/explore` | Grid view with category filtering |
+| `/feed` | Social feed timeline |
+| `/search` | Full-screen overlay search with multi-tab results |
+| `/images` | Image discovery grid with infinite scroll |
+| `/images/[id]` | Image detail with Lightbox, hero, related items, shop grid |
+| `/posts/[id]` | Post detail view with metadata |
+| `/profile` | User profile with activity, badges, stats, rankings |
+| `/request/upload` | Image upload with DropZone |
+| `/request/detect` | AI detection results with item spotting |
+| `/login` | OAuth authentication (Kakao, Google, Apple) |
+| `/lab/*` | Experimental (ascii-text, fashion-scan) |
+
+### v2.0 Design Overhaul Status (78% Complete)
+- Search Overlay with responsive grid layouts
+- Lightbox fullscreen image viewer
+- Hero animations with GSAP scroll triggers
+- Responsive 2-4 column grids
+- Item spotting with shop integration
+- "More from this Look" related content gallery
+
+## v2.0 Design System Components
+
+Located in `lib/design-system/`:
+
+| Component | Purpose |
+|-----------|---------|
+| **tokens.ts** | Design tokens (colors, spacing, typography, shadows) |
+| **Heading, Text** | Typography components with size variants |
+| **Input, SearchInput** | Form inputs with variants |
+| **Card Family** | Base card + Header/Content/Footer + Skeleton |
+| **ProductCard** | Product card with image & description |
+| **GridCard** | Grid layout card variant |
+| **FeedCard** | Social feed card variant |
+| **ProfileHeaderCard** | Profile header card |
+| **DesktopHeader** | Desktop navigation header |
+| **MobileHeader** | Mobile navigation with bottom sheet |
+| **DesktopFooter** | Desktop footer with links |
 
 ## Key File Locations
 
-| 영역 | 위치 | 설명 |
-|------|------|------|
-| **Auth** | `lib/stores/authStore.ts` | OAuth + 세션 관리 |
-| **API Client** | `lib/api/posts.ts` | 백엔드 API 호출 |
-| **API Routes** | `app/api/v1/` | Next.js API 프록시 |
-| **Supabase** | `lib/supabase/queries/` | DB 쿼리 (server/client) |
-| **Components** | `lib/components/` | 기능별 컴포넌트 |
-| **Hooks** | `lib/hooks/` | 커스텀 훅 (useImages, usePosts) |
-| **Stores** | `lib/stores/` | Zustand 상태 (auth, request, profile) |
+| Area | Location | Description |
+|------|----------|-------------|
+| **Auth** | `lib/stores/authStore.ts` | OAuth (Kakao, Google, Apple) + session |
+| **Search State** | `lib/stores/searchStore.ts` | Search query, filters, results |
+| **API Client** | `lib/api/` | Backend API calls (posts, users, categories) |
+| **API Routes** | `app/api/v1/` | Next.js API proxy & server logic |
+| **Supabase** | `lib/supabase/queries/` | DB queries (server/client) |
+| **Design System** | `lib/design-system/` | v2.0 components & tokens |
+| **Components** | `lib/components/` | Feature components |
+| **Hooks** | `lib/hooks/` | Custom hooks |
+| **Stores** | `lib/stores/` | Zustand stores |
+
+## Custom Hooks
+
+### Data Fetching
+- `useImages()` - Fetch and paginate images with filters
+- `usePosts()` - Fetch and manage posts
+- `useProfile()` - Fetch user profile data
+- `useCategories()` - Fetch category list
+
+### Form & Input
+- `useCreatePost()` - Multi-step post creation flow
+- `useImageUpload()` - Image uploads with compression
+- `useSearch()` - Search with debouncing
+- `useSearchURLSync()` - URL-based search state sync
+
+### UI & Animation
+- `useResponsiveGridSize()` - Calculate grid columns
+- `useScrollAnimation()` - Scroll-triggered animations
+- `useFlipTransition()` - Flip card animations
+- `useMediaQuery()` - Responsive breakpoint detection
 
 ## Commands
 ```bash
