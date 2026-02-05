@@ -45,23 +45,11 @@ export function LoginCard() {
         )}
 
         {/* OAuth Buttons */}
-        <div className="space-y-3">
-          <OAuthButton
-            provider="kakao"
-            onClick={() => handleLogin("kakao")}
-            isLoading={loadingProvider === "kakao"}
-            disabled={isLoading}
-          />
+        <div className="flex flex-col items-center space-y-3">
           <OAuthButton
             provider="google"
             onClick={() => handleLogin("google")}
             isLoading={loadingProvider === "google"}
-            disabled={isLoading}
-          />
-          <OAuthButton
-            provider="apple"
-            onClick={() => handleLogin("apple")}
-            isLoading={loadingProvider === "apple"}
             disabled={isLoading}
           />
         </div>
