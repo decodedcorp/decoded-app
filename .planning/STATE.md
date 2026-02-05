@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-05)
 
 **Core value:** 완전한 사용자 경험 — decoded.pen 디자인 시스템 100% 구현
-**Current focus:** v2.1-Phase-2 Navigation Components (COMPLETE)
+**Current focus:** v2.1-Phase-3 Card Components (IN PROGRESS)
 
 ## Current Position
 
-Phase: 2 of 6 (Navigation Components)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-02-06 — Completed v2.1-02-02-PLAN.md (SectionHeader & Tabs)
+Phase: 3 of 6 (Card Components)
+Plan: 2 of 4 in current phase
+Status: In progress
+Last activity: 2026-02-05 — Completed v2.1-03-02-PLAN.md (SpotCard & ShopCarouselCard)
 
-Progress: [███░░░░░░░] 30.8% (4/13 plans)
+Progress: [████░░░░░░] 38.5% (5/13 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 3m 4s
-- Total execution time: 0.20 hours
+- Total plans completed: 5
+- Average duration: 2m 48s
+- Total execution time: 0.23 hours
 
 **By Phase:**
 
@@ -29,10 +29,11 @@ Progress: [███░░░░░░░] 30.8% (4/13 plans)
 |-------|-------|-------|----------|
 | v2.1-01 | 2 | 6m 4s | 3m 2s |
 | v2.1-02 | 2 | 6m 10s | 3m 5s |
+| v2.1-03 | 1 | 1m 57s | 1m 57s |
 
 **Recent Trend:**
-- Last 5 plans: 94s, 5m, 2m 10s, 4m
-- Trend: Consistent (stable execution times)
+- Last 5 plans: 5m, 2m 10s, 4m, 1m 57s
+- Trend: Improving (faster execution times)
 
 ## Accumulated Context
 
@@ -51,6 +52,8 @@ Recent decisions affecting current work:
 - v2.1-02-02: SectionHeader supports conditional animation via animate prop (default: true)
 - v2.1-02-02: Generic Tabs component with React Context for state sharing between Tabs and TabItem
 - v2.1-02-02: TabItem count display format "Label (count)", "999+" for counts over 999
+- v2.1-03-02: SpotCard uses onClick for modal trigger, not Link for navigation
+- v2.1-03-02: ShopCarouselCard has no page indicator dots (relies on native scroll-snap)
 
 ### Pending Todos
 
@@ -62,8 +65,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-06
-Stopped at: Completed phase v2.1-02 (Navigation Components)
+Last session: 2026-02-05
+Stopped at: Completed v2.1-03-02-PLAN.md (SpotCard & ShopCarouselCard)
 Resume file: None
 
 ## Phase Progress
@@ -78,7 +81,11 @@ Resume file: None
 - ✅ NavBar & NavItem (mobile navigation)
 - ✅ SectionHeader & Tabs (section headers, tab navigation)
 
-Ready to proceed to Phase 3: Card Components
+**Phase 3 In Progress (2/4 plans):**
+- ✅ ArtistCard & StatCard (avatar cards, stat display)
+- ✅ SpotCard & ShopCarouselCard (product spots, shopping carousel)
+- ⏳ ImageCarouselCard & VideoCarouselCard
+- ⏳ RankCard & BadgeCard
 
 ## Quick Tasks Completed
 
@@ -93,4 +100,4 @@ Ready to proceed to Phase 3: Card Components
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-06 after phase v2.1-02 completion*
+*Last updated: 2026-02-05 after plan v2.1-03-02 completion*
