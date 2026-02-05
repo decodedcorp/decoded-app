@@ -98,7 +98,7 @@ export default function RequestUploadPage() {
       toast.loading("포스트 생성 중...", { id: "create" });
       const response = await createPostWithFile({
         file: compressedFile,
-        media_source: { type: "other", title: "User Upload" },
+        media_source: { type: "youtube", title: "User Upload" },
         spots: spotsPayload,
       });
       toast.dismiss("create");
