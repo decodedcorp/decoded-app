@@ -115,3 +115,19 @@ export type { SpotCardProps } from "./spot-card";
 // ShopCarouselCard Component
 export { ShopCarouselCard, ShopCarouselCardSkeleton } from "./shop-carousel-card";
 export type { ShopCarouselCardProps } from "./shop-carousel-card";
+
+// Badge Component
+export { Badge, BadgeSkeleton, badgeVariants } from "./badge";
+export type { BadgeProps, BadgeSkeletonProps } from "./badge";
+
+// LeaderItem Component
+export { LeaderItem, LeaderItemSkeleton } from "./leader-item";
+export type { LeaderItemProps, LeaderItemSkeletonProps } from "./leader-item";
+
+// RankingItem Component
+export { RankingItem, rankingItemVariants } from "./ranking-item";
+export type { RankingItemProps } from "./ranking-item";
+
+// SpotDetail Component
+export { SpotDetail, SpotDetailSkeleton } from "./spot-detail";
+export type { SpotDetailProps, SpotDetailSkeletonProps, SpotDetailShopLink, SpotDetailRelatedItem } from "./spot-detail";
