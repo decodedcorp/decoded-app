@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 **Active Milestones:**
-- **v2.0 Design Overhaul** - Phase v2-07 COMPLETE (3/3 plans done)
+- **v2.0 Design Overhaul** - Phase v2-08 IN PROGRESS (1/3 plans done)
 
 **v1.1 Status:** SHIPPED (2026-01-29) - All 4 tracks merged to main
-**v2.0 Status:** Phase v2-07 COMPLETE (3/3 plans done)
-**Last activity:** 2026-02-05 - Completed v2-07-03-PLAN.md (Item Cards & Related Content)
+**v2.0 Status:** Phase v2-08 IN PROGRESS (1/3 plans done)
+**Last activity:** 2026-02-05 - Completed v2-08-03-PLAN.md (Login Page Google-Only OAuth)
 
 ### Execution Flow
 
@@ -38,13 +38,13 @@ v2.0 (feature/v2-design-overhaul):
    │
    ├─ v2-Phase 7: Search & Image Detail ─── COMPLETE ✓
    │
-   ├─ v2-Phase 8: Request Flow & Login ─── NOT STARTED
+   ├─ v2-Phase 8: Request Flow & Login ─── IN PROGRESS (1/3)
    │
    └─ v2-Phase 9: Documentation & Polish ─── NOT STARTED
 ```
 
 **v1.1 Progress:** ██████████ (100% - SHIPPED)
-**v2.0 Progress:** █████████░ (78% - 21 of 27 plans complete)
+**v2.0 Progress:** █████████░ (81% - 22 of 27 plans complete)
 
 ## Milestones
 
@@ -80,7 +80,7 @@ See: .planning/ROADMAP-v2.md
 | v2-5: Home & Explore Pages | 3/3 | **Complete** (v2-05-01, v2-05-02, v2-05-03 done) |
 | v2-6: Feed & Profile Pages | 3/3 | **Complete** (v2-06-01, v2-06-02, v2-06-03 done) |
 | v2-7: Search & Image Detail | 3/3 | **Complete** (v2-07-01, v2-07-02, v2-07-03 done) |
-| v2-8: Request Flow & Login | 0/3 | Not started |
+| v2-8: Request Flow & Login | 1/3 | **In Progress** (v2-08-03 done) |
 | v2-9: Documentation & Polish | 0/3 | Not started |
 
 ## Accumulated Context
@@ -179,6 +179,9 @@ See: .planning/ROADMAP-v2.md
 - **Related Images Gallery Title (v2-07-03):** "More from this look" with subtitle "From @account" more engaging than generic title
 - **Search Page Overlay Pattern (v2-07-03):** Full-screen fixed overlay (inset-0 z-50) with router.back() for consistent mobile/desktop UX
 - **Search Grid Layouts (v2-07-03):** Grid layouts for all tabs (People: 1-2 col, Media: 2-4 col, Items: 3-6 col) for uniform browsing
+- **Google-Only OAuth (v2-08-03):** Login simplified to Google OAuth only, Kakao/Apple deferred to reduce decision fatigue
+- **OAuth Button Dimensions (v2-08-03):** 320px width, 52px height, 12px border-radius per decoded.pen specs
+- **RequestModal 3-Step Flow (v2-08-03):** Submit merged into Details step, RequestStep type is 1 | 2 | 3
 
 ### Open Items
 - v2 deferred: Admin dashboard, real-time notifications
@@ -193,17 +196,18 @@ See: .planning/ROADMAP-v2.md
 ## Session Continuity
 
 **Last session:** 2026-02-05
-**Stopped at:** Completed v2-07-03-PLAN.md (Item Cards & Related Content)
+**Stopped at:** Completed v2-08-03-PLAN.md (Login Page Google-Only OAuth)
 **Resume file:** None
 
 **Next Steps:**
 
 ```bash
-# Phase v2-07: Search & Image Detail - COMPLETE (3/3 done)
+# Phase v2-08: Request Flow & Login - IN PROGRESS (1/3 done)
 git checkout feature/v2-design-overhaul  # 현재 브랜치
-/gsd:discuss-phase v2-08  # Next: Discuss Request Flow & Login phase
+# Next: Plan v2-08-01 (Request Upload) and v2-08-02 (Detection/Details)
+/gsd:plan-phase v2-08  # Plan remaining Request Flow pages
 # Or test current changes
-npm run dev  # Verify shop grid (spotted first), related images gallery, search overlay
+npm run dev  # Verify Google-only login, OAuth button styling
 ```
 
 ### Quick Tasks Completed
