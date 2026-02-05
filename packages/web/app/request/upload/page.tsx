@@ -32,7 +32,7 @@ export default function RequestUploadPage() {
   const canProceed = detectedSpots.length > 0;
 
   const { images, isMaxImages, handleFilesSelected, removeImage, retryUpload } =
-    useImageUpload();
+    useImageUpload({ autoAnalyze: false });
 
   // Action은 getRequestActions()로 접근 (구독 없이)
   const handleClose = useCallback(() => {
