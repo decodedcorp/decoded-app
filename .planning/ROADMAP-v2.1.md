@@ -49,11 +49,11 @@ Plans:
 3. User sees section headers that visually separate content areas
 4. User can switch between search result tabs (All, Images, Posts, Users)
 
-**Plans**: 2 plans
+**Plans**: 2 plans (1 wave - parallel)
 
 Plans:
-- [ ] v2.1-02-01: NavBar + NavItem components
-- [ ] v2.1-02-02: SectionHeader + SearchTabs components
+- [ ] v2.1-02-01-PLAN.md — NavBar + NavItem components [Wave 1]
+- [ ] v2.1-02-02-PLAN.md — SectionHeader + Tabs components [Wave 1]
 
 ---
 
