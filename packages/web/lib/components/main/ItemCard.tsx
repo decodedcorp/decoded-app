@@ -14,6 +14,7 @@ export interface ItemCardData {
   link: string;
   relatedStyles?: number;
   badge?: "TOP" | "NEW" | "BEST";
+  price?: string;
 }
 
 interface ItemCardProps {

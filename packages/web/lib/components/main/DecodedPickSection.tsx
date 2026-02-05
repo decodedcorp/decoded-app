@@ -1,39 +1,59 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "motion/react";
-import { StyleCard, type StyleCardData } from "./StyleCard";
-import { ItemCard, type ItemCardData } from "./ItemCard";
+import type { StyleCardData } from "./StyleCard";
+import type { ItemCardData } from "./ItemCard";
 
 // Sample data - will be replaced with real data later
 const sampleStyleData: StyleCardData = {
   id: "1",
-  title: "How Sweet 뮤비 속 다니엘",
-  description:
-    "뉴진스의 다니엘이 'How Sweet' 뮤비에서 Nike Cortes Nylon Midnight Navy, 핑크 아노락, Neighborhood 브라운 비니, North Works 악세서리, BIG BOY JEAN PALE TAUPE를 매치해 스타일을 완성했다.",
-  artistName: "뉴진스_다니엘",
+  title: "Casual Street\nLook",
+  description: "",
+  artistName: "Blackpink Lisa",
   link: "/feed",
-  items: [
-    { id: "a", label: "A", brand: "Nike", name: "Cortez" },
-    { id: "b", label: "B", brand: "Neighborhood", name: "Beanie" },
-  ],
+  imageUrl:
+    "https://images.unsplash.com/photo-1699847061593-188987efcd3e?w=600",
+  items: [],
 };
 
 const sampleItems: ItemCardData[] = [
   {
     id: "1",
-    brand: "RON ARAD STUDIO",
-    name: "Bookworm Table",
+    brand: "Prada",
+    name: "Prada Bag",
     link: "/items/1",
-    badge: "TOP",
-    relatedStyles: 5,
+    price: "$2,450",
+    imageUrl:
+      "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400",
   },
   {
     id: "2",
-    brand: "RON ARAD STUDIO",
-    name: "Bookworm Table",
+    brand: "Celine",
+    name: "Celine Shades",
     link: "/items/2",
-    relatedStyles: 3,
+    price: "$580",
+    imageUrl:
+      "https://images.unsplash.com/photo-1564848005333-590727c99921?w=400",
+  },
+  {
+    id: "3",
+    brand: "Nike",
+    name: "Nike AF1",
+    link: "/items/3",
+    price: "$120",
+    imageUrl:
+      "https://images.unsplash.com/photo-1518738458435-19149697112a?w=400",
+  },
+  {
+    id: "4",
+    brand: "Gold",
+    name: "Gold Chain",
+    link: "/items/4",
+    price: "$890",
+    imageUrl:
+      "https://images.unsplash.com/photo-1641206189215-9533ceb7a1df?w=400",
   },
 ];
 
@@ -46,87 +66,99 @@ export function DecodedPickSection({
   styleData = sampleStyleData,
   items = sampleItems,
 }: DecodedPickSectionProps) {
+  // Limit items to 4 for mobile 2x2 grid, desktop shows all
+  const displayItems = items.slice(0, 4);
+
   return (
-    <section className="py-10 md:py-16 px-4 md:px-6 lg:px-8 bg-card overflow-hidden">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-4xl md:text-6xl font-serif font-bold italic mb-2">
-              DECODED'S <span className="text-primary not-italic">PICK</span>
-            </h2>
-            <p className="text-muted-foreground text-lg max-w-md">
-              디코디드가 큐레이션한 이달의 가장 감각적인 스타일과 아이코닉한
-              아이템.
-            </p>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="hidden md:block"
-          >
-            <div className="flex items-center gap-4 text-xs tracking-[0.2em] font-bold text-muted-foreground uppercase">
-              <span className="w-12 h-[1px] bg-muted-foreground/30" />
-              CURATED SELECTION
-            </div>
-          </motion.div>
-        </div>
+    <section className="bg-card rounded-t-2xl p-6 md:p-8">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-5 md:mb-8">
+        <h2 className="text-2xl md:text-[32px] font-serif font-bold">
+          Decoded's Pick
+        </h2>
+        <Link
+          href="/feed"
+          className="text-[13px] md:text-sm font-medium text-primary"
+        >
+          View All
+        </Link>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-          {/* Main Style Card - Elevated with shadow and offset */}
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            className="lg:col-span-7 relative z-10"
+      {/* Content: Featured Card + Item Grid */}
+      <div className="flex gap-3 md:gap-6">
+        {/* Featured Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <Link
+            href={styleData.link}
+            className="block relative w-[180px] h-[240px] md:w-[320px] md:h-[400px] rounded-xl overflow-hidden"
           >
-            <div className="relative group">
-              <div className="absolute -inset-4 bg-primary/5 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-              <StyleCard data={styleData} variant="large" showItems={true} />
+            {styleData.imageUrl ? (
+              <Image
+                src={styleData.imageUrl}
+                alt={styleData.title}
+                fill
+                className="object-cover"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-neutral-700" />
+            )}
+            {/* Gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+            {/* Content */}
+            <div className="absolute bottom-0 left-0 right-0 p-3 md:p-5 flex flex-col gap-1 md:gap-2">
+              <span className="text-sm md:text-lg font-semibold text-white leading-[1.2] whitespace-pre-line">
+                {styleData.title}
+              </span>
+              <span className="text-[11px] md:text-sm text-neutral-400">
+                {styleData.artistName}
+              </span>
             </div>
-          </motion.div>
+          </Link>
+        </motion.div>
 
-          {/* Item Cards - Stacked with staggered scroll effect */}
-          <div className="lg:col-span-5 flex flex-col gap-6 lg:mt-24">
-            {items.map((item, index) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, x: 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.2 + index * 0.2 }}
-              >
-                <div className="transform hover:-translate-y-2 transition-transform duration-500">
-                  <ItemCard data={item} index={index} />
-                </div>
-              </motion.div>
-            ))}
+        {/* Item Grid - 2x2 on mobile, horizontal row on desktop */}
+        <div className="flex-1 grid grid-cols-2 gap-3 md:flex md:gap-4">
+          {displayItems.map((item, index) => (
             <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
+              key={item.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-              className="mt-4"
+              transition={{ duration: 0.6, delay: 0.1 * (index + 1) }}
             >
               <Link
-                href="/feed"
-                className="inline-flex items-center gap-4 group text-sm font-bold tracking-widest uppercase"
+                href={item.link}
+                className="block relative h-[114px] md:h-[200px] md:w-full rounded-lg overflow-hidden"
               >
-                <span>VIEW ALL PICKS</span>
-                <div className="w-10 h-[10px] relative overflow-hidden">
-                  <div className="absolute top-1/2 left-0 w-full h-[1px] bg-foreground group-hover:translate-x-full transition-transform duration-500" />
-                  <div className="absolute top-1/2 -left-full w-full h-[1px] bg-primary group-hover:left-0 transition-all duration-500" />
+                {item.imageUrl ? (
+                  <Image
+                    src={item.imageUrl}
+                    alt={item.name}
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-neutral-600" />
+                )}
+                {/* Content overlay */}
+                <div className="absolute bottom-0 left-0 right-0 p-2 md:p-3 flex flex-col gap-0.5 md:gap-1">
+                  <span className="text-[11px] md:text-[13px] font-medium text-white">
+                    {item.name}
+                  </span>
+                  {item.price && (
+                    <span className="text-[10px] md:text-xs text-primary">
+                      {item.price}
+                    </span>
+                  )}
                 </div>
               </Link>
             </motion.div>
-          </div>
+          ))}
         </div>
       </div>
     </section>
