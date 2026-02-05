@@ -35,8 +35,8 @@ export function ImagePreviewGrid({
         <div className="relative w-full max-w-md aspect-[3/4]">
           <ImagePreview
             image={image}
-            onRemove={() => onRemove(image.id)}
-            onRetry={onRetry ? () => onRetry(image.id) : undefined}
+            onRemove={onRemove}
+            onRetry={onRetry}
             large
           />
         </div>
@@ -64,8 +64,8 @@ export function ImagePreviewGrid({
           <ImagePreview
             key={image.id}
             image={image}
-            onRemove={() => onRemove(image.id)}
-            onRetry={onRetry ? () => onRetry(image.id) : undefined}
+            onRemove={onRemove}
+            onRetry={onRetry}
           />
         ))}
 

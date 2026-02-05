@@ -7,8 +7,8 @@ import { formatFileSize } from "@/lib/utils/imageCompression";
 
 interface ImagePreviewProps {
   image: UploadedImage;
-  onRemove: () => void;
-  onRetry?: () => void;
+  onRemove: (id: string) => void;
+  onRetry?: (id: string) => void;
   /** Large mode for single image display - fills container */
   large?: boolean;
 }
@@ -32,7 +32,11 @@ export function ImagePreview({
         alt={file.name}
         fill
         className="object-cover"
-        sizes={large ? "400px" : "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"}
+        sizes={
+          large
+            ? "400px"
+            : "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+        }
       />
 
       {/* Overlay based on status */}
@@ -57,7 +61,7 @@ export function ImagePreview({
           {onRetry && (
             <button
               type="button"
-              onClick={onRetry}
+              onClick={() => onRetry(image.id)}
               className="mt-2 px-3 py-1 text-xs bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors flex items-center gap-1"
             >
               <RefreshCw className="h-3 w-3" />
@@ -87,7 +91,7 @@ export function ImagePreview({
       {status !== "uploading" && (
         <button
           type="button"
-          onClick={onRemove}
+          onClick={() => onRemove(image.id)}
           className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/80 rounded-full transition-colors opacity-0 group-hover:opacity-100"
           aria-label={`Remove ${file.name}`}
         >
