@@ -161,12 +161,12 @@ Plans:
   3. User can fill item details in Request Details page
   4. Page transitions between request flow steps use smooth animations
   5. Login page (mobile and desktop) matches decoded.pen auth screen design
-**Plans**: TBD
+**Plans:** 3 plans (2 waves)
 
 Plans:
-- [ ] v2-08-01: Implement Request Upload, Detection, and Details pages
-- [ ] v2-08-02: Implement page transition animations for request flow
-- [ ] v2-08-03: Implement Login page mobile and desktop layouts
+- [ ] v2-08-01-PLAN.md — Request flow UI updates (3-step indicator, header, DropZone, Submit in Details) [Wave 1]
+- [ ] v2-08-02-PLAN.md — Page transition animations for request flow [Wave 2]
+- [ ] v2-08-03-PLAN.md — Login page OAuth simplification (Google only) [Wave 1]
 
 ### v2-Phase 9: Documentation & Polish
 **Goal**: Design system is fully documented and all visual issues are resolved
@@ -204,10 +204,10 @@ v2-Phases execute sequentially: v2-Phase 1 → v2-Phase 2 → ... → v2-Phase 9
 | v2-5. Home & Explore Pages | 3/3 | **Complete** | 2026-01-29 |
 | v2-6. Feed & Profile Pages | 3/3 | **Complete** | 2026-01-29 |
 | v2-7. Search & Image Detail | 3/3 | **Complete** | 2026-02-05 |
-| v2-8. Request Flow & Login | 0/3 | Not started | - |
+| v2-8. Request Flow & Login | 0/3 | **Planned** | - |
 | v2-9. Documentation & Polish | 0/3 | Not started | - |
 
 ---
 
 *Created: 2026-01-29*
-*Last updated: 2026-02-05 (Phase v2-7 complete)*
+*Last updated: 2026-02-05 (Phase v2-8 planned)*
