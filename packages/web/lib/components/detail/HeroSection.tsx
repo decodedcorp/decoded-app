@@ -14,6 +14,7 @@ if (typeof window !== "undefined") {
 type Props = {
   image: ImageRow;
   isModal?: boolean;
+  onClick?: () => void;
 };
 
 /**
@@ -22,7 +23,7 @@ type Props = {
  * Full-screen hero image with dramatic typography and entrance animations.
  * Features parallax effect on scroll for deep spatial feel.
  */
-export function HeroSection({ image, isModal = false }: Props) {
+export function HeroSection({ image, isModal = false, onClick }: Props) {
   const heroRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
@@ -55,10 +56,11 @@ export function HeroSection({ image, isModal = false }: Props) {
         }
       );
 
-      // Parallax effect on scroll
+      // Enhanced scroll animations
       if (!isModal) {
-        gsap.to(titleRef.current, {
-          y: -150,
+        // Hero image parallax (moves slower than scroll)
+        gsap.to(imageRef.current, {
+          y: 100,
           ease: "none",
           scrollTrigger: {
             trigger: heroRef.current,
@@ -68,14 +70,15 @@ export function HeroSection({ image, isModal = false }: Props) {
           },
         });
 
-        gsap.to(imageRef.current, {
-          y: 100,
-          scale: 1.1,
+        // Title fade-out as user scrolls past
+        gsap.to(titleRef.current, {
+          opacity: 0,
+          y: -50,
           ease: "none",
           scrollTrigger: {
             trigger: heroRef.current,
             start: "top top",
-            end: "bottom top",
+            end: "30% top",
             scrub: true,
           },
         });
@@ -88,7 +91,11 @@ export function HeroSection({ image, isModal = false }: Props) {
   return (
     <div
       ref={heroRef}
-      className={`relative w-full overflow-hidden ${isModal ? "h-[45vh] min-h-[250px]" : "h-screen"}`}
+      className={`relative w-full overflow-hidden ${
+        isModal
+          ? "h-[45vh] min-h-[250px]"
+          : "h-[426px] md:h-[60vh] md:max-h-[600px]"
+      }`}
     >
       {image.image_url && (
         <img
@@ -96,8 +103,12 @@ export function HeroSection({ image, isModal = false }: Props) {
           ref={imageRef}
           src={image.image_url}
           alt={`Image ${image.id}`}
-          className="h-full w-full object-cover will-change-transform"
+          className={`h-full w-full object-cover will-change-transform ${
+            onClick ? "cursor-pointer" : ""
+          }`}
           loading="eager"
+          onClick={onClick}
+          aria-label={onClick ? "View fullscreen" : undefined}
         />
       )}
       {/* Gradient overlay */}
@@ -109,7 +120,11 @@ export function HeroSection({ image, isModal = false }: Props) {
       >
         <div ref={titleRef} className="overflow-hidden">
           <h1
-            className={`font-serif font-bold text-white tracking-tight ${isModal ? "text-4xl md:text-5xl" : "text-5xl md:text-7xl lg:text-8xl"}`}
+            className={`font-serif font-bold text-white tracking-tight ${
+              isModal
+                ? "text-4xl md:text-5xl"
+                : "text-5xl md:text-6xl lg:text-7xl"
+            }`}
           >
             Editorial
           </h1>
