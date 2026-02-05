@@ -211,7 +211,7 @@ export async function createPost(
 }
 
 // ============================================================
-// Create Post with File (multipart/form-data)
+// Create Post with File (2-step: upload + create)
 // POST /api/v1/posts
 // 이미지 파일과 함께 포스트 생성
 // ============================================================
@@ -242,8 +242,14 @@ export async function createPostWithFile(
     throw new Error("로그인이 필요합니다.");
   }
 
+  // Step 1: Upload image first
+  console.log("createPostWithFile - Step 1: Uploading image...");
+  const { image_url } = await uploadImage({ file: request.file });
+  console.log("createPostWithFile - Image uploaded:", image_url);
+
+  // Step 2: Create post with image_url (multipart/form-data)
   const formData = new FormData();
-  formData.append("image", request.file); // 백엔드가 "image" 필드명을 기대할 수 있음
+  formData.append("image_url", image_url);
   formData.append("spots", JSON.stringify(request.spots));
   formData.append("media_source", JSON.stringify(request.media_source));
   if (request.artist_name) formData.append("artist_name", request.artist_name);
@@ -251,10 +257,10 @@ export async function createPostWithFile(
   if (request.context) formData.append("context", request.context);
   if (request.description) formData.append("description", request.description);
 
-  console.log("createPostWithFile - Sending to:", `${API_BASE_URL}/api/v1/posts`);
+  console.log("createPostWithFile - Step 2: Creating post...");
   console.log("createPostWithFile - FormData entries:");
   for (const [key, value] of formData.entries()) {
-    console.log(`  ${key}:`, typeof value === "string" ? value : "(file)");
+    console.log(`  ${key}:`, value);
   }
 
   const response = await fetch(`${API_BASE_URL}/api/v1/posts`, {
