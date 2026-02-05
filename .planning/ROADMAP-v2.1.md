@@ -96,8 +96,8 @@ Plans:
 **Plans**: 2 plans (1 wave - parallel)
 
 Plans:
-- [ ] v2.1-04-01-PLAN.md — Badge + LeaderItem components [Wave 1]
-- [ ] v2.1-04-02-PLAN.md — RankingItem + SpotDetail components [Wave 1]
+- [x] v2.1-04-01-PLAN.md — Badge + LeaderItem components [Wave 1] ✅
+- [x] v2.1-04-02-PLAN.md — RankingItem + SpotDetail components [Wave 1] ✅
 
 ---
 
@@ -157,13 +157,13 @@ Plans:
 | v2.1-1. Core Interactive | 2/2 | ✅ Complete | 2026-02-05 |
 | v2.1-2. Navigation | 2/2 | ✅ Complete | 2026-02-06 |
 | v2.1-3. Cards | 2/2 | ✅ Complete | 2026-02-06 |
-| v2.1-4. Profile & Detail | 0/2 | 🚧 Planned | - |
+| v2.1-4. Profile & Detail | 2/2 | ✅ Complete | 2026-02-06 |
 | v2.1-5. Login & State | 0/3 | Not started | - |
 | v2.1-6. Visual QA | 0/2 | Not started | - |
 
-**Total:** 6/13 plans complete
+**Total:** 8/13 plans complete
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-06 (Phase 4 planned)*
+*Last updated: 2026-02-06 (Phase 4 complete)*

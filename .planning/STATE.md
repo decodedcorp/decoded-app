@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-02-05)
 
 **Core value:** 완전한 사용자 경험 — decoded.pen 디자인 시스템 100% 구현
-**Current focus:** v2.1-Phase-4 Profile & Detail Components (IN PROGRESS)
+**Current focus:** v2.1-Phase-4 Profile & Detail Components (COMPLETE)
 
 ## Current Position
 
@@ -99,7 +99,7 @@ Resume file: None
 - ✅ Badge & LeaderItem (badge earned/locked states, leaderboard with podium medals)
 - ✅ RankingItem & SpotDetail (rank change display, spot detail with shop links)
 
-Ready to proceed to Phase 5: Modal & Overlay Components
+Ready to proceed to Phase 5: Login & State Components
 
 ## Quick Tasks Completed
 
