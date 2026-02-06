@@ -33,8 +33,21 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify(body),
     });
 
-    // Parse response data
-    const data = await response.json();
+    // Get response as text first to handle non-JSON error responses
+    const responseText = await response.text();
+
+    // Try to parse as JSON
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      // Backend returned non-JSON response (likely an error message)
+      console.error("Backend returned non-JSON response:", responseText);
+      return NextResponse.json(
+        { message: responseText || "Backend error" },
+        { status: response.status || 500 }
+      );
+    }
 
     // Return the response with the same status code
     return NextResponse.json(data, { status: response.status });
