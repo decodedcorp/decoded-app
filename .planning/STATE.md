@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-05)
 
 **Core value:** 완전한 사용자 경험 — decoded.pen 디자인 시스템 100% 구현
-**Current focus:** v2.1-Phase-4 Profile & Detail Components (COMPLETE)
+**Current focus:** v2.1-Phase-5 Login & State Components (IN PROGRESS)
 
 ## Current Position
 
-Phase: 4 of 6 (Profile & Detail Components)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-02-06 — Completed v2.1-04-02-PLAN.md (RankingItem & SpotDetail)
+Phase: 5 of 6 (Login & State Components)
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-02-06 — Completed v2.1-05-01-PLAN.md (OAuthButton, GuestButton & Divider)
 
-Progress: [██████░░░░] 61.5% (8/13 plans)
+Progress: [███████░░░] 69.2% (9/13 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
-- Average duration: 2m 35s
-- Total execution time: 0.34 hours
+- Total plans completed: 9
+- Average duration: 2m 33s
+- Total execution time: 0.38 hours
 
 **By Phase:**
 
@@ -31,9 +31,10 @@ Progress: [██████░░░░] 61.5% (8/13 plans)
 | v2.1-02 | 2 | 6m 10s | 3m 5s |
 | v2.1-03 | 2 | 4m 16s | 2m 8s |
 | v2.1-04 | 2 | 4m 46s | 2m 23s |
+| v2.1-05 | 1 | 2m 15s | 2m 15s |
 
 **Recent Trend:**
-- Last 5 plans: 1m 57s, 2m 19s, 2m 11s, 2m 35s
+- Last 5 plans: 2m 19s, 2m 11s, 2m 35s, 2m 15s
 - Trend: Consistent (stable execution times ~2min)
 
 ## Accumulated Context
@@ -64,6 +65,7 @@ Recent decisions affecting current work:
 - v2.1-04-02: SpotDetail uses image overlay layout with gradient for info visibility
 - v2.1-04-02: Shop links open in new tab with external link icon
 - v2.1-04-02: Related items reuse existing SpotCard compact variant
+- v2.1-05-01: Inline SVG icons for OAuth providers rather than external icon library
 
 ### Pending Todos
 
@@ -76,7 +78,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Completed v2.1-04-02-PLAN.md (RankingItem & SpotDetail)
+Stopped at: Completed v2.1-05-01-PLAN.md (OAuthButton, GuestButton & Divider)
 Resume file: None
 
 ## Phase Progress
@@ -99,7 +101,9 @@ Resume file: None
 - ✅ Badge & LeaderItem (badge earned/locked states, leaderboard with podium medals)
 - ✅ RankingItem & SpotDetail (rank change display, spot detail with shop links)
 
-Ready to proceed to Phase 5: Login & State Components
+**Phase 5 In Progress (1/2 plans):**
+- ✅ OAuthButton, GuestButton & Divider (OAuth buttons, guest continuation, divider)
+- LoginModal & LoginModalTrigger (pending)
 
 ## Quick Tasks Completed
 
@@ -114,4 +118,4 @@ Ready to proceed to Phase 5: Login & State Components
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-06 after phase v2.1-04 completion*
+*Last updated: 2026-02-06 after v2.1-05-01 completion*
