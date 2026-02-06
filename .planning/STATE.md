@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 6 of 6 (Visual QA Automation)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-02-06 — Completed v2.1-06-01-PLAN.md
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-02-06 — Completed v2.1-06-02-PLAN.md
 
-Progress: [█████████░] 92.3% (12/13 plans)
+Progress: [██████████] 100% (13/13 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
-- Average duration: 2m 18s
-- Total execution time: 0.46 hours
+- Total plans completed: 13
+- Average duration: 2m 30s
+- Total execution time: 0.54 hours
 
 **By Phase:**
 
@@ -32,11 +32,11 @@ Progress: [█████████░] 92.3% (12/13 plans)
 | v2.1-03 | 2 | 4m 16s | 2m 8s |
 | v2.1-04 | 2 | 4m 46s | 2m 23s |
 | v2.1-05 | 3 | 5m 34s | 1m 51s |
-| v2.1-06 | 1 | 2m 0s | 2m 0s |
+| v2.1-06 | 2 | 27m 0s | 13m 30s |
 
 **Recent Trend:**
-- Last 5 plans: 2m 15s, 1m 34s, 1m 45s, 2m 0s
-- Trend: Consistent (stable execution times ~2min)
+- Last 5 plans: 1m 34s, 1m 45s, 2m 0s, 25m 0s
+- Trend: Visual QA tasks longer due to human checkpoint workflow
 
 ## Accumulated Context
 
@@ -77,6 +77,9 @@ Recent decisions affecting current work:
 - v2.1-06-01: Use 4 breakpoints: mobile (375x812), tablet (768x1024), desktop (1280x800), desktop-lg (1440x900)
 - v2.1-06-01: 30s timeout per test to accommodate page animations
 - v2.1-06-01: Screenshot-only mode (video disabled) for efficiency
+- v2.1-06-02: Human checkpoint workflow for visual approval (automate → review → document)
+- v2.1-06-02: Store screenshots in docs/qa-screenshots/ for easy access
+- v2.1-06-02: README catalog with route-to-screenshot mapping for navigation
 
 ### Pending Todos
 
@@ -89,7 +92,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Completed v2.1-06-01-PLAN.md (Visual QA Infrastructure)
+Stopped at: Completed v2.1-06-02-PLAN.md (Design Validation Workflow)
 Resume file: None
 
 ## Phase Progress
@@ -117,9 +120,9 @@ Resume file: None
 - ✅ LoginCard & LoadingSpinner (login card with glassmorphism, loading indicator)
 - ✅ SkeletonCard & BottomSheet (loading states, bottom sheet)
 
-**Phase 6 In Progress (1/2 plans):**
+**Phase 6 Complete (2/2 plans):**
 - ✅ Visual QA Infrastructure (40 automated tests covering 10 core pages at 4 breakpoints)
-- ⏳ Next: Design validation workflow
+- ✅ Design Validation Workflow (36 screenshots captured, reviewed, and approved via human checkpoint)
 
 ## Quick Tasks Completed
 
