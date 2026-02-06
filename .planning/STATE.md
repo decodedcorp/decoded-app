@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 6 of 6 (Visual QA Automation)
-Plan: 2 of 2 in current phase
+Plan: 3 of 3 in current phase
 Status: Phase complete
-Last activity: 2026-02-06 — Completed v2.1-06-02-PLAN.md
+Last activity: 2026-02-06 — Completed v2.1-06-03-PLAN.md
 
-Progress: [██████████] 100% (13/13 plans)
+Progress: [██████████] 100% (14/14 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
-- Average duration: 2m 30s
-- Total execution time: 0.54 hours
+- Total plans completed: 14
+- Average duration: 2m 17s
+- Total execution time: 0.56 hours
 
 **By Phase:**
 
@@ -32,11 +32,11 @@ Progress: [██████████] 100% (13/13 plans)
 | v2.1-03 | 2 | 4m 16s | 2m 8s |
 | v2.1-04 | 2 | 4m 46s | 2m 23s |
 | v2.1-05 | 3 | 5m 34s | 1m 51s |
-| v2.1-06 | 2 | 27m 0s | 13m 30s |
+| v2.1-06 | 3 | 28m 0s | 9m 20s |
 
 **Recent Trend:**
-- Last 5 plans: 1m 34s, 1m 45s, 2m 0s, 25m 0s
-- Trend: Visual QA tasks longer due to human checkpoint workflow
+- Last 5 plans: 1m 45s, 2m 0s, 25m 0s, 2m 0s, 1m 0s
+- Trend: Mix of quick automation and human checkpoint reviews
 
 ## Accumulated Context
 
@@ -80,6 +80,10 @@ Recent decisions affecting current work:
 - v2.1-06-02: Human checkpoint workflow for visual approval (automate → review → document)
 - v2.1-06-02: Store screenshots in docs/qa-screenshots/ for easy access
 - v2.1-06-02: README catalog with route-to-screenshot mapping for navigation
+- v2.1-06-03: PR path filtering to trigger CI only on web package changes
+- v2.1-06-03: Upload screenshots as artifacts even on success for PR review
+- v2.1-06-03: Chromium-only CI testing for consistent results
+- v2.1-06-03: 30-day screenshot retention, 7-day test result retention
 
 ### Pending Todos
 
@@ -92,7 +96,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Completed v2.1-06-02-PLAN.md (Design Validation Workflow)
+Stopped at: Completed v2.1-06-03-PLAN.md (CI Pipeline Integration)
 Resume file: None
 
 ## Phase Progress
@@ -120,9 +124,10 @@ Resume file: None
 - ✅ LoginCard & LoadingSpinner (login card with glassmorphism, loading indicator)
 - ✅ SkeletonCard & BottomSheet (loading states, bottom sheet)
 
-**Phase 6 Complete (2/2 plans):**
+**Phase 6 Complete (3/3 plans):**
 - ✅ Visual QA Infrastructure (40 automated tests covering 10 core pages at 4 breakpoints)
 - ✅ Design Validation Workflow (36 screenshots captured, reviewed, and approved via human checkpoint)
+- ✅ CI Pipeline Integration (GitHub Actions workflow for automated visual QA on PRs)
 
 ## Quick Tasks Completed
 
@@ -137,4 +142,4 @@ Resume file: None
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-06 after v2.1-06-01 plan completion*
+*Last updated: 2026-02-06 after v2.1-06-03 plan completion*
