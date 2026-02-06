@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { motion } from "motion/react";
 
 function NewsletterForm() {
   const [email, setEmail] = useState("");
@@ -13,7 +14,6 @@ function NewsletterForm() {
     if (!email) return;
 
     setIsSubmitting(true);
-    // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000));
     setIsSuccess(true);
     setEmail("");
@@ -22,84 +22,109 @@ function NewsletterForm() {
   };
 
   return (
-    <div className="max-w-md">
-      <h3 className="text-sm font-medium text-foreground mb-2">
-        뉴스레터를 구독하고 최신 뉴스를 놓치지 마세요
+    <div className="w-full max-w-sm">
+      <h3 className="text-[10px] font-sans font-bold tracking-[0.2em] text-white/40 uppercase mb-4">
+        Stay Connected
       </h3>
-      <form onSubmit={handleSubmit} className="flex gap-2">
+      <form onSubmit={handleSubmit} className="relative group">
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="이메일 주소"
-          className="flex-1 px-4 py-2.5 bg-card border border-border rounded-lg
-                   text-sm text-foreground placeholder:text-muted-foreground
-                   focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary
-                   transition-colors"
+          placeholder="EMAIL ADDRESS"
+          className="w-full bg-transparent border-b border-white/10 py-4 text-xs font-sans tracking-[0.1em] text-white placeholder:text-white/20 focus:outline-none focus:border-primary transition-all pr-12"
           disabled={isSubmitting}
         />
         <button
           type="submit"
           disabled={isSubmitting || !email}
-          className="px-5 py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-lg
-                   hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed
-                   transition-colors"
+          className="absolute right-0 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors p-2"
         >
-          {isSubmitting ? "..." : "구독"}
+          {isSubmitting ? "..." : (
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          )}
         </button>
       </form>
       {isSuccess && (
-        <p className="mt-2 text-xs text-green-500">구독해 주셔서 감사합니다!</p>
+        <p className="mt-4 text-[10px] uppercase font-bold tracking-widest text-primary">Subscription Confirmed</p>
       )}
-      <p className="mt-2 text-xs text-muted-foreground">
-        본 뉴스레터 구독 신청에 따라 자사의 개인정보수집 관련 이용약관에 동의한
-        것으로 간주됩니다.
-      </p>
     </div>
   );
 }
 
 export function MainFooter() {
   return (
-    <footer className="py-12 px-4 md:px-6 lg:px-8 bg-background border-t border-border">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
-          {/* Company Info */}
-          <div>
-            <h2 className="text-lg font-bold text-foreground mb-4">
-              디코디드(주)
+    <footer className="bg-black pt-32 pb-16 px-6 md:px-12 border-t border-white/5 relative z-10 overflow-hidden">
+      {/* Dynamic Background Texture/Texture Overlay */}
+      <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 md:gap-24 items-start mb-32">
+          {/* Brand Presence */}
+          <div className="lg:col-span-5">
+            <h2 className="text-4xl md:text-6xl font-serif font-bold italic tracking-tighter text-white mb-8">
+              DECODED
             </h2>
-            <div className="space-y-1 text-sm text-muted-foreground">
-              <p>서울시 강남구 도산대로 | 대표자: 정소윤, 곽동호</p>
-              <p>사업자등록번호: 123-45-65890</p>
-              <p>이메일: decodedapp@gmail.com | 전화번호: 010-1234-5678</p>
+            <p className="text-white/40 font-sans font-light text-sm md:text-base leading-relaxed max-w-md">
+              A curated narrative of global style, culture, and creation. We decode the visual language of the present to document the style of the future.
+            </p>
+            <div className="flex gap-8 mt-12">
+              {['Instagram', 'Twitter', 'Vimeo', 'Archive'].map((social) => (
+                <Link 
+                  key={social} 
+                  href="#" 
+                  className="text-[10px] font-sans font-bold tracking-[0.2em] text-white/20 hover:text-white transition-colors uppercase"
+                >
+                  {social}
+                </Link>
+              ))}
             </div>
           </div>
 
-          {/* Newsletter */}
-          <div className="flex justify-start md:justify-end">
+          {/* Navigation Matrix */}
+          <div className="lg:col-span-3 grid grid-cols-2 gap-8 lg:gap-16">
+            <div className="space-y-6">
+              <h4 className="text-[10px] font-sans font-bold tracking-[0.2em] text-white/40 uppercase">Journal</h4>
+              <ul className="space-y-4">
+                {['Narratives', 'Editorials', 'Interviews', 'Features'].map((item) => (
+                  <li key={item}><Link href="#" className="text-xs font-sans text-white/50 hover:text-primary transition-colors">{item}</Link></li>
+                ))}
+              </ul>
+            </div>
+            <div className="space-y-6">
+              <h4 className="text-[10px] font-sans font-bold tracking-[0.2em] text-white/40 uppercase">Platform</h4>
+              <ul className="space-y-4">
+                {['Directory', 'Collective', 'Collaborations', 'About'].map((item) => (
+                  <li key={item}><Link href="#" className="text-xs font-sans text-white/50 hover:text-primary transition-colors">{item}</Link></li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Engagement */}
+          <div className="lg:col-span-4 flex justify-start lg:justify-end">
             <NewsletterForm />
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-6 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} DECODED
-          </p>
-          <div className="flex items-center gap-6 text-sm text-muted-foreground">
-            <Link
-              href="/privacy"
-              className="hover:text-foreground transition-colors"
-            >
-              개인정보처리방침
-            </Link>
-            <Link
-              href="/terms"
-              className="hover:text-foreground transition-colors"
-            >
-              이용약관
-            </Link>
+        {/* Legal & Architectural Metadata */}
+        <div className="pt-16 border-t border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+          <div className="space-y-2">
+            <p className="text-[9px] font-sans font-medium tracking-[0.2em] text-white/10 uppercase">
+              DECODED INC. ALL RIGHTS RESERVED &copy; {new Date().getFullYear()}
+            </p>
+            <div className="flex gap-6 text-[9px] font-sans font-medium tracking-[0.2em] text-white/10 uppercase">
+              <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+              <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+            </div>
+          </div>
+          
+          <div className="text-right">
+             <span className="block text-[8px] font-sans font-bold tracking-[0.4em] text-white/5 uppercase">
+               Architecture Version 3.1.0-Release
+             </span>
           </div>
         </div>
       </div>

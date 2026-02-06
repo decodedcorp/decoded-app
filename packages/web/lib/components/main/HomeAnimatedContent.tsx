@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, type Variants } from "motion/react";
+import type { BadgeRow } from "@/lib/supabase/types";
 import {
   HeroSection,
   DecodedPickSection,
@@ -11,6 +12,8 @@ import {
   BestItemSection,
   WeeklyBestSection,
   TrendingNowSection,
+  BadgeGridSection,
+  TodayDecodedSection,
 } from "./";
 import type { HeroData } from "./HeroSection";
 import type { ItemCardData } from "./ItemCard";
@@ -31,6 +34,7 @@ interface HomeAnimatedContentProps {
   artistSpotlightStyles: StyleCardData[];
   discoverItemsByTab: Record<string, ItemCardData[]>;
   trendingKeywords: TrendingKeyword[];
+  badges: BadgeRow[];
 }
 
 export function HomeAnimatedContent({
@@ -44,6 +48,7 @@ export function HomeAnimatedContent({
   artistSpotlightStyles,
   discoverItemsByTab,
   trendingKeywords,
+  badges,
 }: HomeAnimatedContentProps) {
   const sectionVariants: Variants = {
     hidden: { opacity: 0, y: 50 },
@@ -72,6 +77,16 @@ export function HomeAnimatedContent({
           />
         </motion.div>
 
+        {/* TODAY'S DECODED Section */}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={sectionVariants}
+        >
+          <TodayDecodedSection />
+        </motion.div>
+
         {/* Artist Spotlight Section */}
         <motion.div
           initial="hidden"
@@ -90,6 +105,16 @@ export function HomeAnimatedContent({
           variants={sectionVariants}
         >
           <WhatsNewSection styles={whatsNewStyles} items={whatsNewItems} />
+        </motion.div>
+
+        {/* Achievement Badges Section */}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={sectionVariants}
+        >
+          <BadgeGridSection badges={badges} />
         </motion.div>
 
         {/* Discover Items Section */}

@@ -25,12 +25,12 @@ const defaultHeroData: HeroData = {
 
 export function HeroSection({ data = defaultHeroData }: HeroSectionProps) {
   return (
-    <section className="relative w-full min-h-[70vh] md:min-h-[85vh] overflow-hidden bg-black flex items-center">
-      {/* Background Image with parallax effect */}
+    <section className="relative w-full min-h-[85vh] md:min-h-screen overflow-hidden bg-black flex items-center">
+      {/* Background Image with Parallax & Mask */}
       <motion.div
-        initial={{ scale: 1.1 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 1.5, ease: "easeOut" }}
+        initial={{ scale: 1.1, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
         className="absolute inset-0 z-0"
       >
         {data.imageUrl ? (
@@ -40,38 +40,46 @@ export function HeroSection({ data = defaultHeroData }: HeroSectionProps) {
             fill
             priority
             sizes="100vw"
-            className="object-cover opacity-60 grayscale-[30%]"
+            className="object-cover opacity-70 grayscale-[10%]"
           />
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/40 via-blue-900/40 to-black/80" />
+          <div className="absolute inset-0 bg-gradient-to-br from-neutral-900 via-black to-neutral-900" />
         )}
       </motion.div>
 
-      {/* Overlays */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/20 to-transparent z-10" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40 z-10" />
+      {/* Premium Gradient Overlays */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent z-10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/30 z-10" />
+
+      {/* Texture/Grain Overlay */}
+      <div className="absolute inset-0 opacity-[0.04] pointer-events-none z-10 mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
       {/* Decorative vertical line */}
       <motion.div
-        initial={{ height: 0 }}
-        animate={{ height: "100px" }}
-        transition={{ duration: 0.8, delay: 0.5 }}
-        className="absolute left-6 md:left-12 top-0 w-[1px] bg-white/30 z-20 hidden md:block"
+        initial={{ height: 0, opacity: 0 }}
+        animate={{ height: "140px", opacity: 1 }}
+        transition={{ duration: 1.2, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="absolute left-8 md:left-16 top-0 w-[1px] bg-primary/40 z-20 hidden md:block"
       />
 
-      {/* Content */}
-      <div className="container mx-auto px-6 md:px-12 relative z-20 pt-20">
-        <div className="max-w-5xl">
+      {/* Content Container */}
+      <div className="container mx-auto px-6 md:px-16 lg:px-24 relative z-20">
+        <div className="max-w-[1200px]">
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
           >
-            {/* Artist Name - Large font-serif */}
-            <span className="block text-primary font-medium tracking-[0.2em] mb-4 text-sm md:text-base">
-              FEATURED ARTIST
-            </span>
-            <h2 className="text-6xl md:text-8xl lg:text-[10rem] font-serif font-bold text-white leading-[0.9] tracking-tighter mb-8 italic">
+            {/* Top Label */}
+            <div className="flex items-center gap-4 mb-8">
+              <span className="w-10 h-[1px] bg-primary" />
+              <span className="text-primary font-sans font-bold tracking-[0.4em] text-[10px] md:text-xs uppercase">
+                Featured Narrative
+              </span>
+            </div>
+
+            {/* Big Artist Name */}
+            <h2 className="text-[15vw] md:text-[12vw] lg:text-[10vw] xl:text-[14rem] font-serif font-bold text-white leading-[0.8] tracking-tighter mb-12 italic drop-shadow-2xl">
               {data.artistName}
             </h2>
           </motion.div>
@@ -79,49 +87,55 @@ export function HeroSection({ data = defaultHeroData }: HeroSectionProps) {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-            className="flex flex-col md:flex-row md:items-end gap-8"
+            transition={{ duration: 1.2, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col md:flex-row md:items-end justify-between gap-12"
           >
-            {/* Title */}
-            <div className="max-w-xl">
-              <p className="text-xl md:text-2xl text-white/80 font-light leading-relaxed mb-8">
+            {/* Title & Description */}
+            <div className="max-w-2xl">
+              <p className="text-2xl md:text-3xl lg:text-4xl text-white/95 font-sans font-light leading-snug mb-14 tracking-tight">
                 {data.title}
               </p>
 
-              {/* CTA Button */}
+              {/* Action Button */}
               <Link
                 href={data.link}
-                className="group relative inline-flex items-center gap-4 px-10 py-5 bg-white text-black font-semibold overflow-hidden transition-all hover:pr-12"
+                className="group relative inline-flex items-center gap-10 px-16 py-8 bg-white text-black font-sans font-bold text-xs md:text-sm tracking-[0.25em] overflow-hidden transition-all hover:scale-[1.02] active:scale-95 shadow-2xl"
               >
-                <span className="relative z-10">EXPLORE THE STORY</span>
-                <svg
-                  className="w-5 h-5 transition-transform group-hover:translate-x-2"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+                <span className="relative z-10 transition-colors duration-500 group-hover:text-white">VIEW EDITORIAL</span>
+                <motion.div
+                  animate={{ x: [0, 10, 0] }}
+                  transition={{ repeat: Infinity, duration: 1.5 }}
+                  className="relative z-10 transition-colors duration-500 group-hover:text-white"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
-                </svg>
-                <div className="absolute top-0 left-0 w-0 h-full bg-primary transition-all duration-300 group-hover:w-full z-0 opacity-10" />
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2.5}
+                      d="M17 8l4 4m0 0l-4 4m4-4H3"
+                    />
+                  </svg>
+                </motion.div>
+                <div className="absolute top-0 left-0 w-0 h-full bg-black transition-all duration-700 ease-[0.16,1,0.3,1] group-hover:w-full z-0" />
               </Link>
             </div>
 
-            {/* Scroll Indicator */}
-            <div className="hidden lg:flex flex-col items-center gap-4 ml-auto pb-4">
-              <span className="text-[10px] tracking-[0.3em] font-medium text-white/40 uppercase vertical-text">
-                Scroll Down
+            {/* Scroll Indicator - Premium Minimalism */}
+            <div className="hidden lg:flex flex-col items-center gap-8 ml-auto group cursor-pointer">
+              <span className="text-[10px] tracking-[0.5em] font-bold text-white/40 uppercase vertical-text group-hover:text-primary transition-colors">
+                Discover More
               </span>
-              <div className="w-[1px] h-12 bg-white/20 relative overflow-hidden">
+              <div className="w-[1px] h-24 bg-white/10 relative overflow-hidden">
                 <motion.div
                   animate={{ y: ["-100%", "100%"] }}
                   transition={{
                     repeat: Infinity,
-                    duration: 1.5,
+                    duration: 3,
                     ease: "linear",
                   }}
                   className="absolute top-0 left-0 w-full h-full bg-primary"
