@@ -94,7 +94,10 @@ export function RelatedImages({
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="aspect-[4/5] bg-muted animate-pulse rounded-lg" />
+              <div
+                key={i}
+                className="aspect-[4/5] bg-muted animate-pulse rounded-lg"
+              />
             ))}
           </div>
         </div>
@@ -121,20 +124,11 @@ export function RelatedImages({
 
   return (
     <section
-      className={`py-12 md:py-16 ${
-        isModal ? "px-4 md:px-6" : "px-4 md:px-6"
-      }`}
+      className={`py-12 md:py-16 ${isModal ? "px-4 md:px-6" : "px-4 md:px-6"}`}
     >
-      <div
-        ref={sectionRef}
-        className="mx-auto max-w-6xl"
-      >
-        <h2 className="text-2xl font-serif mb-6">
-          More from this look
-        </h2>
-        <p className="text-sm text-muted-foreground mb-6">
-          From @{account}
-        </p>
+      <div ref={sectionRef} className="mx-auto max-w-6xl">
+        <h2 className="text-2xl font-serif mb-6">More from this look</h2>
+        <p className="text-sm text-muted-foreground mb-6">From @{account}</p>
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-8">
           {visibleImages?.map((image) => {

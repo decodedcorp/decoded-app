@@ -2,23 +2,22 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { useInfiniteFilteredImages } from "@/lib/hooks/useImages";
-import type { ImageWithPostId } from "@decoded/shared/supabase/queries/images";
+import { useInfinitePosts, type PostGridItem } from "@/lib/hooks/useImages";
 import ThiingsGrid, { type GridItem } from "@/lib/components/ThiingsGrid";
 import { useFilterStore } from "@/lib/stores/filterStore";
 import { useSearchStore } from "@/lib/stores/searchStore";
 import { ExploreCardCell, ExploreSkeletonCell } from "@/lib/components/explore";
 
 type Props = {
-  initialPosts?: ImageWithPostId[];
+  initialPosts?: PostGridItem[];
 };
 
 /**
  * Explore Client Component - Pinterest-style Masonry Grid
  *
- * Uses Direct Supabase Query Pattern:
- * - Bypasses failed REST API proxy
- * - Supports robust category filtering via spots/solutions join
+ * Uses REST API for data fetching:
+ * - GET /api/v1/posts with pagination
+ * - Supports category filtering via API params
  */
 export function ExploreClient({ initialPosts: _initialPosts }: Props) {
   const activeFilter = useFilterStore((state) => state.activeFilter);
@@ -42,7 +41,7 @@ export function ExploreClient({ initialPosts: _initialPosts }: Props) {
     return () => window.removeEventListener("resize", updateGridSize);
   }, []);
 
-  // Use the direct query hook for robust filtering
+  // Use the REST API hook for fetching posts
   const {
     data,
     isLoading,
@@ -52,26 +51,25 @@ export function ExploreClient({ initialPosts: _initialPosts }: Props) {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useInfiniteFilteredImages({
+  } = useInfinitePosts({
     limit: 40,
-    filter: activeFilter,
-    search: debouncedQuery,
+    category: activeFilter,
+    // Note: search is not directly supported by Posts API
+    // If needed, we can add artist_name or group_name filter
   });
 
   // Flatten pages into a single items array
-  const items: ImageWithPostId[] = useMemo(() => {
+  const items: PostGridItem[] = useMemo(() => {
     return data ? data.pages.flatMap((page) => page.items) : [];
   }, [data]);
 
-  // Map ImageWithPostId to GridItem[]
+  // Map PostGridItem to GridItem[]
   const gridItems: GridItem[] = useMemo(() => {
     return items
-      .filter((item) => item.image_url != null)
+      .filter((item) => item.imageUrl != null)
       .map((item) => ({
         id: item.id,
-        imageUrl: item.image_url,
-        status: item.status === "extracted" ? "extracted" : undefined,
-        hasItems: item.with_items,
+        imageUrl: item.imageUrl,
         postId: item.postId,
         postSource: item.postSource,
         postAccount: item.postAccount,
@@ -110,12 +108,12 @@ export function ExploreClient({ initialPosts: _initialPosts }: Props) {
               <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
                 <div className="mb-4 text-4xl">⚠️</div>
                 <h2 className="mb-2 text-xl font-semibold text-foreground">
-                  Failed to load images
+                  Failed to load posts
                 </h2>
                 <p className="mb-6 max-w-md text-sm text-muted-foreground">
                   {(() => {
                     // Log error for debugging
-                    console.error("[ExploreClient] Image fetch error:", error);
+                    console.error("[ExploreClient] Posts fetch error:", error);
                     // Display appropriate error message
                     if (error instanceof Error) {
                       return error.message;
@@ -123,7 +121,7 @@ export function ExploreClient({ initialPosts: _initialPosts }: Props) {
                     if (typeof error === "object" && error !== null) {
                       return JSON.stringify(error);
                     }
-                    return "Something went wrong while loading images.";
+                    return "Something went wrong while loading posts.";
                   })()}
                 </p>
                 <button
@@ -144,8 +142,8 @@ export function ExploreClient({ initialPosts: _initialPosts }: Props) {
                 <div className="mb-4 text-4xl">📷</div>
                 <h2 className="mb-2 text-xl font-semibold text-foreground">
                   {activeFilter !== "all" || debouncedQuery.trim().length > 0
-                    ? "No images found"
-                    : "No images found yet."}
+                    ? "No posts found"
+                    : "No posts found yet."}
                 </h2>
                 <p className="text-sm text-muted-foreground">
                   {activeFilter !== "all" || debouncedQuery.trim().length > 0
@@ -156,7 +154,7 @@ export function ExploreClient({ initialPosts: _initialPosts }: Props) {
             </div>
           )}
 
-          {/* Success state: show grid with actual images */}
+          {/* Success state: show grid with actual posts */}
           {!isError && items.length > 0 && (
             <div className="absolute inset-0 z-0">
               <ThiingsGrid
