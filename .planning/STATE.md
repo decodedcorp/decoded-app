@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 5 of 6 (Login & State Components)
-Plan: 2 of 3 in current phase
-Status: In progress
-Last activity: 2026-02-06 — Completed v2.1-05-03-PLAN.md (SkeletonCard & BottomSheet)
+Plan: 3 of 3 in current phase
+Status: Phase complete
+Last activity: 2026-02-06 — Completed v2.1-05-02-PLAN.md (LoginCard & LoadingSpinner)
 
-Progress: [████████░░] 71.4% (10/14 plans)
+Progress: [████████░░] 78.6% (11/14 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
-- Average duration: 2m 27s
-- Total execution time: 0.41 hours
+- Total plans completed: 11
+- Average duration: 2m 23s
+- Total execution time: 0.44 hours
 
 **By Phase:**
 
@@ -31,10 +31,10 @@ Progress: [████████░░] 71.4% (10/14 plans)
 | v2.1-02 | 2 | 6m 10s | 3m 5s |
 | v2.1-03 | 2 | 4m 16s | 2m 8s |
 | v2.1-04 | 2 | 4m 46s | 2m 23s |
-| v2.1-05 | 2 | 3m 49s | 1m 55s |
+| v2.1-05 | 3 | 5m 34s | 1m 51s |
 
 **Recent Trend:**
-- Last 5 plans: 2m 11s, 2m 35s, 2m 15s, 1m 34s
+- Last 5 plans: 2m 35s, 2m 15s, 1m 34s, 1m 45s
 - Trend: Consistent (stable execution times ~2min)
 
 ## Accumulated Context
@@ -69,6 +69,9 @@ Recent decisions affecting current work:
 - v2.1-05-03: SkeletonCard uses fixed #3D3D3D for image placeholder per decoded.pen
 - v2.1-05-03: BottomSheet handle is 40x4px with rounded-sm (2px radius)
 - v2.1-05-03: BottomSheet includes backdrop overlay with click-to-close
+- v2.1-05-02: LoginCard uses bg-white/5 backdrop-blur-xl for glassmorphism effect
+- v2.1-05-02: LoadingSpinner uses pill shape with bg-neutral-900/80
+- v2.1-05-02: LoginCard composes OAuthButton, GuestButton, Divider from design-system
 
 ### Pending Todos
 
@@ -81,7 +84,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Completed v2.1-05-03-PLAN.md (SkeletonCard & BottomSheet)
+Stopped at: Completed v2.1-05-02-PLAN.md (LoginCard & LoadingSpinner)
 Resume file: None
 
 ## Phase Progress
@@ -104,9 +107,9 @@ Resume file: None
 - ✅ Badge & LeaderItem (badge earned/locked states, leaderboard with podium medals)
 - ✅ RankingItem & SpotDetail (rank change display, spot detail with shop links)
 
-**Phase 5 In Progress (2/3 plans):**
+**Phase 5 Complete (3/3 plans):**
 - ✅ OAuthButton, GuestButton & Divider (OAuth buttons, guest continuation, divider)
-- LoginModal & LoginModalTrigger (pending - v2.1-05-02)
+- ✅ LoginCard & LoadingSpinner (login card with glassmorphism, loading indicator)
 - ✅ SkeletonCard & BottomSheet (loading states, bottom sheet)
 
 ## Quick Tasks Completed
@@ -122,4 +125,4 @@ Resume file: None
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-06 after v2.1-05-03 completion*
+*Last updated: 2026-02-06 after v2.1-05-02 completion*
