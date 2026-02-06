@@ -120,9 +120,9 @@ Plans:
 **Plans**: 3 plans (2 waves)
 
 Plans:
-- [ ] v2.1-05-01-PLAN.md — OAuthButton + GuestButton + Divider components [Wave 1]
-- [ ] v2.1-05-02-PLAN.md — LoginCard + LoadingSpinner components [Wave 2]
-- [ ] v2.1-05-03-PLAN.md — SkeletonCard extensions + BottomSheet upgrade [Wave 1]
+- [x] v2.1-05-01-PLAN.md — OAuthButton + GuestButton + Divider components [Wave 1] ✅
+- [x] v2.1-05-02-PLAN.md — LoginCard + LoadingSpinner components [Wave 2] ✅
+- [x] v2.1-05-03-PLAN.md — SkeletonCard + BottomSheet components [Wave 1] ✅
 
 ---
 
@@ -158,12 +158,12 @@ Plans:
 | v2.1-2. Navigation | 2/2 | ✅ Complete | 2026-02-06 |
 | v2.1-3. Cards | 2/2 | ✅ Complete | 2026-02-06 |
 | v2.1-4. Profile & Detail | 2/2 | ✅ Complete | 2026-02-06 |
-| v2.1-5. Login & State | 0/3 | 📋 Planned | - |
-| v2.1-6. Visual QA | 0/2 | Not started | - |
+| v2.1-5. Login & State | 3/3 | ✅ Complete | 2026-02-06 |
+| v2.1-6. Visual QA | 0/2 | 📋 Planned | - |
 
-**Total:** 8/13 plans complete
+**Total:** 11/13 plans complete
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-06 (Phase 5 planned)*
+*Last updated: 2026-02-06 (Phase 5 complete)*

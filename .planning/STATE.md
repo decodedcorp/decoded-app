@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-05)
 
 **Core value:** 완전한 사용자 경험 — decoded.pen 디자인 시스템 100% 구현
-**Current focus:** v2.1-Phase-5 Login & State Components (IN PROGRESS)
+**Current focus:** v2.1-Phase-5 Login & State Components (COMPLETE)
 
 ## Current Position
 
 Phase: 5 of 6 (Login & State Components)
 Plan: 3 of 3 in current phase
 Status: Phase complete
-Last activity: 2026-02-06 — Completed v2.1-05-02-PLAN.md (LoginCard & LoadingSpinner)
+Last activity: 2026-02-06 — Completed v2.1-05 phase (all 3 plans)
 
-Progress: [████████░░] 78.6% (11/14 plans)
+Progress: [████████░░] 84.6% (11/13 plans)
 
 ## Performance Metrics
 
@@ -112,6 +112,8 @@ Resume file: None
 - ✅ LoginCard & LoadingSpinner (login card with glassmorphism, loading indicator)
 - ✅ SkeletonCard & BottomSheet (loading states, bottom sheet)
 
+Ready to proceed to Phase 6: Visual QA Automation
+
 ## Quick Tasks Completed
 
 | # | Description | Date | Commit | Directory |
@@ -125,4 +127,4 @@ Resume file: None
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-06 after v2.1-05-02 completion*
+*Last updated: 2026-02-06 after v2.1-05 phase completion*
