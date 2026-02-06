@@ -8,13 +8,23 @@ const VIEWPORTS = [
 ];
 
 const PAGES = [
-  { name: "home", path: "/" },
-  { name: "explore", path: "/explore" },
-  { name: "feed", path: "/feed" },
-  { name: "search", path: "/search?q=dress" },
-  { name: "profile", path: "/profile" },
-  { name: "login", path: "/login" },
-  { name: "request-upload", path: "/request/upload" },
+  // Core navigation pages
+  { name: "home", path: "/", waitFor: null }, // Hero carousel + trending sections
+  { name: "explore", path: "/explore", waitFor: null }, // Category filtering grid
+  { name: "feed", path: "/feed", waitFor: null }, // Social feed timeline
+  { name: "search", path: "/search?q=dress", waitFor: null }, // Full-screen search overlay
+
+  // Discovery & browsing
+  { name: "images", path: "/images", waitFor: null }, // Image discovery grid
+
+  // Request flow
+  { name: "request", path: "/request", waitFor: null }, // Request landing page
+  { name: "request-upload", path: "/request/upload", waitFor: null }, // Image upload with DropZone
+  { name: "request-detect", path: "/request/detect", waitFor: null }, // AI detection results (requires mock)
+
+  // User pages
+  { name: "profile", path: "/profile", waitFor: null }, // User profile with activity/badges
+  { name: "login", path: "/login", waitFor: null }, // OAuth authentication
 ];
 
 for (const viewport of VIEWPORTS) {
