@@ -10,10 +10,22 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: "list",
+
+  // Visual QA optimizations
+  timeout: 30 * 1000, // 30 seconds per test (pages may have animations)
+  expect: {
+    timeout: 10 * 1000, // 10 seconds for assertions
+  },
+
   use: {
     baseURL: "http://localhost:3000",
     trace: "on-first-retry",
+    // Screenshot optimizations
+    screenshot: "only-on-failure",
+    video: "off", // Disable video for screenshot-only tests
   },
+
+  outputDir: "test-results/",
 
   projects: [
     {
