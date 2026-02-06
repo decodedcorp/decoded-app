@@ -32,7 +32,7 @@ export const SpotMarker = memo(
         type="button"
         onClick={onClick}
         className={`
-          absolute w-7 h-7
+          absolute z-10 w-7 h-7
           flex items-center justify-center
           rounded-full text-xs font-bold
           ${isRevealing ? "" : "transition-all duration-200 ease-out"}

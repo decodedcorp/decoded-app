@@ -67,10 +67,10 @@ export const DetectionView = memo(
           sizes="(max-width: 768px) 100vw, 400px"
         />
 
-        {/* 클릭 영역 (spot 추가용) */}
+        {/* 클릭 영역 (spot 추가용) - z-[1]로 SpotMarker(z-10)보다 낮게 */}
         {onImageClick && !isDetecting && (
           <div
-            className="absolute inset-0 z-5 cursor-crosshair"
+            className="absolute inset-0 z-[1] cursor-crosshair"
             onClick={handleImageClick}
           />
         )}
