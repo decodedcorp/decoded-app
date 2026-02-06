@@ -1,6 +1,6 @@
 # Visual QA Screenshots
 
-**Generated:** 2026-02-05
+**Generated:** 2026-02-06
 **Reference:** docs/design-system/decoded.pen
 **Test Automation:** packages/web/tests/visual-qa.spec.ts
 
@@ -26,6 +26,9 @@
 | Profile | [mobile-profile.png](./mobile-profile.png) | [tablet-profile.png](./tablet-profile.png) | [desktop-profile.png](./desktop-profile.png) | [desktop-lg-profile.png](./desktop-lg-profile.png) |
 | Login | [mobile-login.png](./mobile-login.png) | [tablet-login.png](./tablet-login.png) | [desktop-login.png](./desktop-login.png) | [desktop-lg-login.png](./desktop-lg-login.png) |
 | Request Upload | [mobile-request-upload.png](./mobile-request-upload.png) | [tablet-request-upload.png](./tablet-request-upload.png) | [desktop-request-upload.png](./desktop-request-upload.png) | [desktop-lg-request-upload.png](./desktop-lg-request-upload.png) |
+| Images | [mobile-images.png](./mobile-images.png) | [tablet-images.png](./tablet-images.png) | [desktop-images.png](./desktop-images.png) | [desktop-lg-images.png](./desktop-lg-images.png) |
+| Request | [mobile-request.png](./mobile-request.png) | [tablet-request.png](./tablet-request.png) | [desktop-request.png](./desktop-request.png) | [desktop-lg-request.png](./desktop-lg-request.png) |
+| Request Detect | [mobile-request-detect.png](./mobile-request-detect.png) | [tablet-request-detect.png](./tablet-request-detect.png) | [desktop-request-detect.png](./desktop-request-detect.png) | [desktop-lg-request-detect.png](./desktop-lg-request-detect.png) |
 
 ## Findings
 
