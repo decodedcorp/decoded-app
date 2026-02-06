@@ -143,3 +143,11 @@ export type { GuestButtonProps } from "./guest-button";
 // Divider Component
 export { Divider } from "./divider";
 export type { DividerProps } from "./divider";
+
+// SkeletonCard Component
+export { SkeletonCard, skeletonCardVariants } from "./skeleton-card";
+export type { SkeletonCardProps } from "./skeleton-card";
+
+// BottomSheet Component
+export { BottomSheet } from "./bottom-sheet";
+export type { BottomSheetProps } from "./bottom-sheet";
