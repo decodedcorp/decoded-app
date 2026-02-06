@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { extractMetadata } from "@/lib/api";
+import { extractPostMetadata } from "@/lib/api";
 import {
   useRequestStore,
   selectDescription,
@@ -44,7 +44,7 @@ export function DescriptionInput() {
       setIsExtractingMetadata(true);
 
       try {
-        const response = await extractMetadata(text);
+        const response = await extractPostMetadata(text);
 
         // Update store with extracted metadata
         setExtractedMetadata(response.media_metadata);

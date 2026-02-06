@@ -10,8 +10,8 @@ import {
   UploadResponse,
   AnalyzeRequest,
   AnalyzeResponse,
-  ExtractMetadataRequest,
-  ExtractMetadataResponse,
+  ExtractPostMetadataRequest,
+  ExtractPostMetadataResponse,
   CreatePostRequest,
   CreatePostResponse,
   CreatePostWithSolutionRequest,
@@ -182,12 +182,12 @@ export async function analyzeImage(imageUrl: string): Promise<AnalyzeResponse> {
 // 인증 불필요
 // ============================================================
 
-export async function extractMetadata(
+export async function extractPostMetadata(
   description: string
-): Promise<ExtractMetadataResponse> {
-  const request: ExtractMetadataRequest = { description };
+): Promise<ExtractPostMetadataResponse> {
+  const request: ExtractPostMetadataRequest = { description };
 
-  return apiClient<ExtractMetadataResponse>({
+  return apiClient<ExtractPostMetadataResponse>({
     path: "/api/v1/posts/extract-metadata",
     method: "POST",
     body: request,

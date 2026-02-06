@@ -105,7 +105,7 @@ export async function deleteSolution(solutionId: string): Promise<void> {
 /**
  * Extract product metadata from a URL
  */
-export async function extractMetadata(
+export async function extractSolutionMetadata(
   url: string
 ): Promise<ExtractMetadataResponse> {
   const request: ExtractMetadataRequest = { url };

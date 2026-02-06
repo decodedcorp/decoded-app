@@ -14,7 +14,7 @@ import {
   createSolution,
   updateSolution,
   deleteSolution,
-  extractMetadata,
+  extractSolutionMetadata,
   convertAffiliate,
 } from "@/lib/api/solutions";
 import type {
@@ -150,7 +150,7 @@ export function useDeleteSolution() {
 
 export function useExtractMetadata() {
   return useMutation<ExtractMetadataResponse, Error, string>({
-    mutationFn: (url: string) => extractMetadata(url),
+    mutationFn: (url: string) => extractSolutionMetadata(url),
     onError: (error) => {
       console.error("[useExtractMetadata] Failed to extract metadata:", error);
     },

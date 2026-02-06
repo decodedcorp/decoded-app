@@ -14,7 +14,7 @@ export * from "./types";
 export {
   uploadImage,
   analyzeImage,
-  extractMetadata,
+  extractPostMetadata,
   createPost,
   createPostWithFile,
   createPostWithSolution,
@@ -46,6 +46,6 @@ export {
   createSolution,
   updateSolution,
   deleteSolution,
-  extractMetadata,
+  extractSolutionMetadata,
   convertAffiliate,
 } from "./solutions";
