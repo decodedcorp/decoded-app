@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 5 of 6 (Login & State Components)
-Plan: 1 of 2 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-02-06 — Completed v2.1-05-01-PLAN.md (OAuthButton, GuestButton & Divider)
+Last activity: 2026-02-06 — Completed v2.1-05-03-PLAN.md (SkeletonCard & BottomSheet)
 
-Progress: [███████░░░] 69.2% (9/13 plans)
+Progress: [████████░░] 71.4% (10/14 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
-- Average duration: 2m 33s
-- Total execution time: 0.38 hours
+- Total plans completed: 10
+- Average duration: 2m 27s
+- Total execution time: 0.41 hours
 
 **By Phase:**
 
@@ -31,10 +31,10 @@ Progress: [███████░░░] 69.2% (9/13 plans)
 | v2.1-02 | 2 | 6m 10s | 3m 5s |
 | v2.1-03 | 2 | 4m 16s | 2m 8s |
 | v2.1-04 | 2 | 4m 46s | 2m 23s |
-| v2.1-05 | 1 | 2m 15s | 2m 15s |
+| v2.1-05 | 2 | 3m 49s | 1m 55s |
 
 **Recent Trend:**
-- Last 5 plans: 2m 19s, 2m 11s, 2m 35s, 2m 15s
+- Last 5 plans: 2m 11s, 2m 35s, 2m 15s, 1m 34s
 - Trend: Consistent (stable execution times ~2min)
 
 ## Accumulated Context
@@ -66,6 +66,9 @@ Recent decisions affecting current work:
 - v2.1-04-02: Shop links open in new tab with external link icon
 - v2.1-04-02: Related items reuse existing SpotCard compact variant
 - v2.1-05-01: Inline SVG icons for OAuth providers rather than external icon library
+- v2.1-05-03: SkeletonCard uses fixed #3D3D3D for image placeholder per decoded.pen
+- v2.1-05-03: BottomSheet handle is 40x4px with rounded-sm (2px radius)
+- v2.1-05-03: BottomSheet includes backdrop overlay with click-to-close
 
 ### Pending Todos
 
@@ -78,7 +81,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Completed v2.1-05-01-PLAN.md (OAuthButton, GuestButton & Divider)
+Stopped at: Completed v2.1-05-03-PLAN.md (SkeletonCard & BottomSheet)
 Resume file: None
 
 ## Phase Progress
@@ -101,9 +104,10 @@ Resume file: None
 - ✅ Badge & LeaderItem (badge earned/locked states, leaderboard with podium medals)
 - ✅ RankingItem & SpotDetail (rank change display, spot detail with shop links)
 
-**Phase 5 In Progress (1/2 plans):**
+**Phase 5 In Progress (2/3 plans):**
 - ✅ OAuthButton, GuestButton & Divider (OAuth buttons, guest continuation, divider)
-- LoginModal & LoginModalTrigger (pending)
+- LoginModal & LoginModalTrigger (pending - v2.1-05-02)
+- ✅ SkeletonCard & BottomSheet (loading states, bottom sheet)
 
 ## Quick Tasks Completed
 
@@ -118,4 +122,4 @@ Resume file: None
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-06 after v2.1-05-01 completion*
+*Last updated: 2026-02-06 after v2.1-05-03 completion*
