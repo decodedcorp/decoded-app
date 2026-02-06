@@ -37,13 +37,19 @@ export async function fetchUnifiedImages(
     postBasedResult = await fetchImagesByPostImage(queryParams);
   } catch (error) {
     // Log detailed error for debugging
-    console.error("[fetchUnifiedImages] Failed to fetch post-based images:", {
-      error,
-      params: queryParams,
-    });
+    console.error("[fetchUnifiedImages] Caught error from fetchImagesByPostImage:");
+    console.error("[fetchUnifiedImages] Error type:", typeof error);
+    console.error("[fetchUnifiedImages] Error constructor:", error?.constructor?.name);
+    if (error instanceof Error) {
+      console.error("[fetchUnifiedImages] Error message:", error.message);
+      console.error("[fetchUnifiedImages] Error stack:", error.stack);
+    } else {
+      console.error("[fetchUnifiedImages] Non-Error object:", error);
+      console.error("[fetchUnifiedImages] JSON:", JSON.stringify(error));
+    }
     // Re-throw with context
     throw new Error(
-      `Failed to fetch images: ${error instanceof Error ? error.message : String(error)}`
+      `Failed to fetch images: ${error instanceof Error ? error.message : JSON.stringify(error)}`
     );
   }
 

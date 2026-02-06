@@ -8,7 +8,10 @@
  */
 
 import { createSupabaseServerClient } from "../server";
-import type { PostRow } from "../types";
+import type { PostRow, SpotRow, SolutionRow, BadgeRow } from "../types";
+
+type SpotWithSolutions = SpotRow & { solutions: SolutionRow[] };
+type PostWithSpots = PostRow & { spots: SpotWithSolutions[] };
 
 /**
  * Post data for main page sections
@@ -29,7 +32,7 @@ export interface PostData {
  * Item data for style card display (placeholder for compatibility)
  */
 export interface StyleItemData {
-  id: number;
+  id: string | number;
   label: string;
   brand: string;
   name: string;
@@ -41,8 +44,8 @@ export interface StyleItemData {
  */
 export interface StyleCardServerData {
   post: PostData;
-  // Items are not available in new schema, will be empty
   items: StyleItemData[];
+  spots?: SpotWithSolutions[];
 }
 
 /**
@@ -135,13 +138,6 @@ export async function fetchFeaturedPostServer(): Promise<PostData | null> {
   return data ? toPostData(data) : null;
 }
 
-/**
- * Fetches posts for What's New section (server-side)
- * Gets recently created posts
- *
- * @param limit - Maximum number of posts to fetch (default: 2)
- * @returns Array of style card data
- */
 export async function fetchWhatsNewPostsServer(
   limit = 2
 ): Promise<StyleCardServerData[]> {
@@ -149,7 +145,7 @@ export async function fetchWhatsNewPostsServer(
 
   const { data, error } = await supabase
     .from("posts")
-    .select("*")
+    .select("*, spots(*, solutions(*))")
     .eq("status", "active")
     .not("image_url", "is", null)
     .order("created_at", { ascending: false })
@@ -163,15 +159,24 @@ export async function fetchWhatsNewPostsServer(
     return [];
   }
 
-  return (data ?? []).map((row) => ({
+  return (data ?? []).map((row: PostWithSpots) => ({
     post: toPostData(row),
-    items: [], // Items not available in new schema
+    items: (row.spots || []).flatMap((spot) =>
+      (spot.solutions || []).map((sol) => ({
+        id: sol.id,
+        label: sol.title,
+        brand: (sol.metadata as any)?.brand || "Unknown",
+        name: sol.title,
+        imageUrl: sol.thumbnail_url || undefined,
+      }))
+    ),
+    spots: row.spots || [],
   }));
 }
 
 /**
  * Fetches data for Decoded Pick section (server-side)
- * Gets a style that is different from What's New section
+ * Gets a style with its spots and solutions
  *
  * @param offset - Number of posts to skip (default: 2 to skip What's New)
  * @returns Style card data or null
@@ -183,7 +188,7 @@ export async function fetchDecodedPickServer(
 
   const { data, error } = await supabase
     .from("posts")
-    .select("*")
+    .select("*, spots(*, solutions(*))")
     .eq("status", "active")
     .not("image_url", "is", null)
     .order("created_at", { ascending: false })
@@ -201,20 +206,22 @@ export async function fetchDecodedPickServer(
     return null;
   }
 
+  const row = data[0] as PostWithSpots;
   return {
-    post: toPostData(data[0]),
-    items: [],
+    post: toPostData(row),
+    items: (row.spots || []).flatMap((spot) =>
+      (spot.solutions || []).map((sol) => ({
+        id: sol.id,
+        label: sol.title,
+        brand: (sol.metadata as any)?.brand || "Unknown",
+        name: sol.title,
+        imageUrl: sol.thumbnail_url || undefined,
+      }))
+    ),
+    spots: row.spots || [],
   };
 }
 
-/**
- * Fetches posts for Artist Spotlight section (server-side)
- * Gets posts from different artists
- *
- * @param limit - Maximum number of posts to fetch (default: 2)
- * @param offset - Number of posts to skip (default: 3)
- * @returns Array of style card data
- */
 export async function fetchArtistSpotlightServer(
   limit = 2,
   offset = 3
@@ -223,7 +230,7 @@ export async function fetchArtistSpotlightServer(
 
   const { data, error } = await supabase
     .from("posts")
-    .select("*")
+    .select("*, spots(*, solutions(*))")
     .eq("status", "active")
     .not("image_url", "is", null)
     .not("artist_name", "is", null)
@@ -238,9 +245,18 @@ export async function fetchArtistSpotlightServer(
     return [];
   }
 
-  return (data ?? []).map((row) => ({
+  return (data ?? []).map((row: PostWithSpots) => ({
     post: toPostData(row),
-    items: [],
+    items: (row.spots || []).flatMap((spot) =>
+      (spot.solutions || []).map((sol) => ({
+        id: sol.id,
+        label: sol.title,
+        brand: (sol.metadata as any)?.brand || "Unknown",
+        name: sol.title,
+        imageUrl: sol.thumbnail_url || undefined,
+      }))
+    ),
+    spots: row.spots || [],
   }));
 }
 
@@ -355,11 +371,16 @@ export interface WhatsNewStyleData {
   };
   account: string | null;
   items: StyleItemData[];
+  spots?: SpotWithSolutions[];
 }
 
 /** Legacy ItemWithImage type */
 export interface ItemWithImage {
-  item: { id: number; brand: string | null; product_name: string | null };
+  item: {
+    id: string | number;
+    brand: string | null;
+    product_name: string | null;
+  };
   imageUrl: string | null;
 }
 
@@ -422,18 +443,136 @@ export async function fetchWhatsNewStylesServer(
   }));
 }
 
-/** @deprecated Items not available in new schema, returns empty array */
+/**
+ * Fetches recently uploaded items (solutions) for home page display
+ *
+ * @param limit - Maximum number of items to fetch (default: 4)
+ * @returns Array of item data with associated post images
+ */
 export async function fetchWhatsNewItemsServer(
-  _limit = 4
+  limit = 4
 ): Promise<ItemWithImage[]> {
-  return [];
+  const supabase = await createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("solutions")
+    .select(
+      `
+      id,
+      title,
+      metadata,
+      spot:spots(
+        post:posts(image_url)
+      )
+    `
+    )
+    .eq("status", "active")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error(
+      "Error fetching what's new items:",
+      JSON.stringify(error, null, 2)
+    );
+    return [];
+  }
+
+  interface SolutionRowResult {
+    id: string;
+    title: string | null;
+    metadata: any;
+    spot: {
+      post: {
+        image_url: string | null;
+      } | null;
+    } | null;
+  }
+
+  return ((data as unknown as SolutionRowResult[]) ?? []).map((row) => ({
+    item: {
+      id: row.id,
+      brand: row.metadata?.brand || "Unknown",
+      product_name: row.title,
+    },
+    imageUrl: row.spot?.post?.image_url || null,
+  }));
 }
 
-/** @deprecated Items not available in new schema, returns empty array */
+/**
+ * Fetches best performing items (most clicked/purchased solutions)
+ *
+ * @param limit - Maximum number of items to fetch (default: 6)
+ * @returns Array of item data with associated post images
+ */
 export async function fetchBestItemsServer(
-  _limit = 6
+  limit = 6
 ): Promise<ItemWithImage[]> {
-  return [];
+  const supabase = await createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("solutions")
+    .select(
+      `
+      id,
+      title,
+      metadata,
+      click_count,
+      spot:spots(
+        post:posts(image_url)
+      )
+    `
+    )
+    .eq("status", "active")
+    .order("click_count", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("Error fetching best items:", JSON.stringify(error, null, 2));
+    return [];
+  }
+
+  interface BestSolutionRowResult {
+    id: string;
+    title: string | null;
+    metadata: any; // Type as any for now to handle JSONB safely
+    click_count: number;
+    spot: {
+      post: {
+        image_url: string | null;
+      } | null;
+    } | null;
+  }
+
+  return ((data as unknown as BestSolutionRowResult[]) ?? []).map((row) => ({
+    item: {
+      id: row.id,
+      brand: (row.metadata as any)?.brand || "Unknown",
+      product_name: row.title,
+    },
+    imageUrl: row.spot?.post?.image_url || null,
+  }));
+}
+
+/**
+ * Fetches all available achievement badges (server-side)
+ *
+ * @returns Array of badge records
+ */
+export async function fetchAllBadgesServer(): Promise<BadgeRow[]> {
+  const supabase = await createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("badges")
+    .select("*")
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching all badges:", JSON.stringify(error, null, 2));
+    return [];
+  }
+
+  return data ?? [];
 }
 
 /** @deprecated Use fetchDecodedPickServer instead */
@@ -457,7 +596,7 @@ export async function fetchDecodedPickStyleServer(
         with_items: false,
       },
       account: pick.post.artistName || pick.post.groupName,
-      items: [],
+      items: pick.items,
     },
     items: [],
   };
@@ -479,7 +618,7 @@ export async function fetchArtistSpotlightStylesServer(
       with_items: false,
     },
     account: style.post.artistName || style.post.groupName,
-    items: [],
+    items: style.items,
   }));
 }
 

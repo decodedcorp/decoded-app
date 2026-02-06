@@ -484,11 +484,31 @@ export async function fetchImagesByPostImage(
     .order("image_id", { ascending: false })
     .limit((limit + 1) * 3);
 
-  const { data, error } = await queryBuilder;
+  // Debug: Log the query for troubleshooting
+  console.log("[fetchImagesByPostImage] Executing query...", {
+    filter,
+    search,
+    cursor,
+    limit,
+  });
+
+  const { data, error, status, statusText } = await queryBuilder;
+
+  console.log("[fetchImagesByPostImage] Response status:", status, statusText);
 
   if (error) {
+    console.error("[fetchImagesByPostImage] Error type:", typeof error);
+    console.error("[fetchImagesByPostImage] Error constructor:", error?.constructor?.name);
+    console.error("[fetchImagesByPostImage] Error keys:", Object.keys(error));
+    console.error("[fetchImagesByPostImage] Error entries:", Object.entries(error));
+    console.error("[fetchImagesByPostImage] Error message:", (error as { message?: string }).message);
+    console.error("[fetchImagesByPostImage] Error code:", (error as { code?: string }).code);
+    console.error("[fetchImagesByPostImage] Full error:", error);
+    console.error("[fetchImagesByPostImage] HTTP status:", status, statusText);
     throw error;
   }
+
+  console.log("[fetchImagesByPostImage] Success! Data count:", data?.length ?? 0);
 
   const uniqueImages = new Map<string, ImageWithPostId>();
 

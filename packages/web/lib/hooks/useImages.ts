@@ -24,6 +24,8 @@ import type {
   ImageDetail,
   ImageRow,
 } from "@decoded/shared/supabase/queries/images";
+import { fetchPosts } from "@/lib/api/posts";
+import type { Post, PostsListParams } from "@/lib/api/types";
 
 /**
  * @deprecated Use useInfiniteFilteredImages with unified adapter instead.
@@ -117,6 +119,104 @@ export function useRelatedImagesByAccount(
   });
 }
 
+// ============================================================
+// Posts API Hook (Replaces Supabase direct queries)
+// ============================================================
+
+/**
+ * Post mapped to grid-compatible format
+ */
+export type PostGridItem = {
+  id: string;
+  imageUrl: string;
+  postId: string;
+  postSource: "post";
+  postAccount: string;
+  postCreatedAt: string;
+  spotCount: number;
+  viewCount: number;
+};
+
+/**
+ * Infinite query result for posts
+ */
+export type PostsPage = {
+  items: PostGridItem[];
+  nextPage: number | null;
+  hasMore: boolean;
+};
+
+/**
+ * React Query hook for fetching infinite posts via REST API
+ * This replaces the Supabase-based useInfiniteFilteredImages
+ */
+export function useInfinitePosts(params: {
+  limit?: number;
+  category?: string;
+  search?: string;
+  artistName?: string;
+  groupName?: string;
+  sort?: "recent" | "popular" | "trending";
+}) {
+  const {
+    limit = 40,
+    category,
+    search,
+    artistName,
+    groupName,
+    sort = "recent",
+  } = params;
+
+  return useInfiniteQuery<PostsPage>({
+    queryKey: [
+      "posts",
+      "infinite",
+      { category, search, artistName, groupName, sort, limit },
+    ],
+    queryFn: async ({ pageParam }) => {
+      const apiParams: PostsListParams = {
+        page: (pageParam as number) ?? 1,
+        per_page: limit,
+        sort,
+      };
+
+      if (category && category !== "all") {
+        apiParams.category = category;
+      }
+      if (artistName) {
+        apiParams.artist_name = artistName;
+      }
+      if (groupName) {
+        apiParams.group_name = groupName;
+      }
+
+      const response = await fetchPosts(apiParams);
+
+      // Map Post[] to PostGridItem[]
+      const items: PostGridItem[] = response.data.map((post: Post) => ({
+        id: post.id,
+        imageUrl: post.image_url,
+        postId: post.id,
+        postSource: "post" as const,
+        postAccount: post.user.username,
+        postCreatedAt: post.created_at,
+        spotCount: post.spot_count,
+        viewCount: post.view_count,
+      }));
+
+      const { pagination } = response;
+      const hasMore = pagination.current_page < pagination.total_pages;
+      const nextPage = hasMore ? pagination.current_page + 1 : null;
+
+      return { items, nextPage, hasMore };
+    },
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+    initialPageParam: 1,
+    staleTime: 1000 * 60,
+    gcTime: 1000 * 60 * 5,
+  });
+}
+
 // Re-export types for convenience
 export type {
   CategoryFilter,
@@ -124,4 +224,5 @@ export type {
   ImagePageWithPostId,
   ImageDetail,
   ImageRow,
+  Post,
 };
