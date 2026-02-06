@@ -1,5 +1,50 @@
 # Project Milestones: decoded-app
 
+## v2.1 Design System Expansion (Shipped: 2026-02-06)
+
+**Delivered:** decoded.pen 디자인 시스템의 23개 추가 컴포넌트 구현 및 Visual QA 자동화 인프라 구축
+
+**Phases completed:** v2.1-01 to v2.1-06 (6 phases, 14 plans total)
+
+**Branch:** `feature/v2-design-overhaul` (계속 사용)
+
+**Key accomplishments:**
+
+- **23 Design System Components Created:**
+  - Core Interactive: Tag, ActionButton, StepIndicator, Hotspot
+  - Navigation: NavBar, NavItem, SectionHeader, Tabs
+  - Cards: ArtistCard, StatCard, SpotCard, ShopCarouselCard
+  - Profile/Detail: Badge, LeaderItem, RankingItem, SpotDetail
+  - Login/State: OAuthButton, GuestButton, Divider, LoginCard, LoadingSpinner, SkeletonCard, BottomSheet
+
+- **Visual QA Automation:**
+  - 40 Playwright tests covering 10 core pages at 4 breakpoints
+  - 36 baseline screenshots captured and approved
+  - GitHub Actions CI workflow for automated visual regression testing
+
+- **CVA Pattern Consistency:**
+  - All components use CVA (class-variance-authority) for variants
+  - forwardRef pattern for component refs
+  - Type-safe exports from design-system barrel
+
+**Tech Debt Accepted:**
+- 15 orphaned components (exported but not integrated into app pages)
+- Integration score: 35% (8/23 actively used)
+- Duplicate implementations for some components (LoginCard, StepIndicator)
+
+**Stats:**
+
+- 6 phases, 14 plans executed
+- 149 files changed, +12,290 / -590 lines
+- 5,924 lines TypeScript in design-system
+- 1 day (2026-02-05 → 2026-02-06)
+
+**Git range:** `b1a1362` → `a313700`
+
+**What's next:** v2.2 (component integration or new features)
+
+---
+
 ## v1.0 Documentation Optimization (Shipped: 2026-01-29)
 
 **Delivered:** AI 에이전트가 프로젝트 컨텍스트를 최소한의 토큰으로 빠르게 이해할 수 있도록 문서화 최적화

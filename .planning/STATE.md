@@ -2,88 +2,57 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-05)
+See: .planning/PROJECT.md (updated 2026-02-06)
 
-**Core value:** 완전한 사용자 경험 — decoded.pen 디자인 시스템 100% 구현
-**Current focus:** v2.1-Phase-5 Login & State Components (COMPLETE)
+**Core value:** 완전한 사용자 경험 — 일관된 디자인 시스템과 실제 데이터
+**Current focus:** v2.1 complete, planning next milestone
 
 ## Current Position
 
-Phase: 6 of 6 (Visual QA Automation)
-Plan: 3 of 3 in current phase
-Status: Phase complete
-Last activity: 2026-02-06 — Completed v2.1-06-03-PLAN.md
+Phase: All phases complete
+Plan: N/A
+Status: Ready for next milestone
+Last activity: 2026-02-06 — v2.1 milestone complete
 
-Progress: [██████████] 100% (14/14 plans)
+Progress: All milestones shipped (v1.0, v1.1, v2.0, v2.1)
 
-## Performance Metrics
+## Milestone Summary
 
-**Velocity:**
-- Total plans completed: 14
-- Average duration: 2m 17s
-- Total execution time: 0.56 hours
-
-**By Phase:**
-
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| v2.1-01 | 2 | 6m 4s | 3m 2s |
-| v2.1-02 | 2 | 6m 10s | 3m 5s |
-| v2.1-03 | 2 | 4m 16s | 2m 8s |
-| v2.1-04 | 2 | 4m 46s | 2m 23s |
-| v2.1-05 | 3 | 5m 34s | 1m 51s |
-| v2.1-06 | 3 | 28m 0s | 9m 20s |
-
-**Recent Trend:**
-- Last 5 plans: 1m 45s, 2m 0s, 25m 0s, 2m 0s, 1m 0s
-- Trend: Mix of quick automation and human checkpoint reviews
+| Milestone | Phases | Plans | Status | Date |
+|-----------|--------|-------|--------|------|
+| v1.0 Documentation | 5 | 5 | Shipped | 2026-01-29 |
+| v1.1 API Integration | 5 | 13 | Shipped | 2026-01-29 |
+| v2.0 Design Overhaul | 9 | 26 | Shipped | 2026-02-05 |
+| v2.1 Design System | 6 | 14 | Shipped | 2026-02-06 |
+| **Total** | **25** | **58** | **Complete** | - |
 
 ## Accumulated Context
 
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
+Key decisions affecting future work:
 
-- v2.0: Pencil MCP for design → code workflow
-- v2.0: decoded.pen as single source of truth for design system
-- v2.1: 6-phase structure grouping 26 components by function
-- v2.1-01-01: Use CVA pattern for Tag and ActionButton variants (consistent with existing)
-- v2.1-01-02: Custom pulse-soft keyframe in tailwind config for centered hotspot animation
-- v2.1-02-01: NavItem supports both Link (href) and button (onClick) rendering for navigation flexibility
-- v2.1-02-01: Use @media(hover:hover) to avoid sticky hover on touch devices
-- v2.1-02-02: SectionHeader supports conditional animation via animate prop (default: true)
-- v2.1-02-02: Generic Tabs component with React Context for state sharing between Tabs and TabItem
-- v2.1-02-02: TabItem count display format "Label (count)", "999+" for counts over 999
-- v2.1-03-01: Use Intl.NumberFormat with compact notation for K/M abbreviations in formatStatValue
-- v2.1-03-01: Artist card avatar fallback shows first letter in gradient circle (not generic icon)
-- v2.1-03-01: Stat card trend colors: green (up), red (down), gray (neutral)
-- v2.1-03-02: SpotCard uses onClick for modal trigger, not Link for navigation
-- v2.1-03-02: ShopCarouselCard has no page indicator dots (relies on native scroll-snap)
-- v2.1-04-01: Badge locked state uses CSS filter (grayscale + brightness-50) for silhouette effect
-- v2.1-04-01: Podium medal colors - yellow-500 (gold), gray-400 (silver), orange-600 (bronze)
-- v2.1-04-02: RankingItem uses actual numbers (+5, -12) not percentages
-- v2.1-04-02: SpotDetail uses image overlay layout with gradient for info visibility
-- v2.1-04-02: Shop links open in new tab with external link icon
-- v2.1-04-02: Related items reuse existing SpotCard compact variant
-- v2.1-05-01: Inline SVG icons for OAuth providers rather than external icon library
-- v2.1-05-03: SkeletonCard uses fixed #3D3D3D for image placeholder per decoded.pen
-- v2.1-05-03: BottomSheet handle is 40x4px with rounded-sm (2px radius)
-- v2.1-05-03: BottomSheet includes backdrop overlay with click-to-close
-- v2.1-05-02: LoginCard uses bg-white/5 backdrop-blur-xl for glassmorphism effect
-- v2.1-05-02: LoadingSpinner uses pill shape with bg-neutral-900/80
-- v2.1-05-02: LoginCard composes OAuthButton, GuestButton, Divider from design-system
-- v2.1-06-01: Test 10 core static pages (excluded dynamic routes, modals, debug/lab pages)
-- v2.1-06-01: Use 4 breakpoints: mobile (375x812), tablet (768x1024), desktop (1280x800), desktop-lg (1440x900)
-- v2.1-06-01: 30s timeout per test to accommodate page animations
-- v2.1-06-01: Screenshot-only mode (video disabled) for efficiency
-- v2.1-06-02: Human checkpoint workflow for visual approval (automate → review → document)
-- v2.1-06-02: Store screenshots in docs/qa-screenshots/ for easy access
-- v2.1-06-02: README catalog with route-to-screenshot mapping for navigation
-- v2.1-06-03: PR path filtering to trigger CI only on web package changes
-- v2.1-06-03: Upload screenshots as artifacts even on success for PR review
-- v2.1-06-03: Chromium-only CI testing for consistent results
-- v2.1-06-03: 30-day screenshot retention, 7-day test result retention
+- v2.1: Tech debt accepted (15 orphaned components, 35% integration)
+- v2.1: Visual QA infrastructure established for regression testing
+- v2.1: CVA pattern standard for all design-system components
+
+### Tech Debt (from v2.1)
+
+**Orphaned Components (15):**
+- Tag, ActionButton, StepIndicator, Hotspot (Phase 1)
+- ArtistCard (Phase 3)
+- Badge, LeaderItem, RankingItem (Phase 4)
+- OAuthButton, GuestButton, Divider, LoginCard, LoadingSpinner, SkeletonCard, BottomSheet (Phase 5)
+
+**Missing Components (2):**
+- EmptyState (custom exists in profile/images)
+- ErrorState (custom exists in images)
+
+**Duplicate Implementations:**
+- LoginCard: design-system vs lib/components/auth
+- StepIndicator: design-system vs lib/components/request
+- Hotspot vs SpotMarker: different use cases
 
 ### Pending Todos
 
@@ -96,38 +65,8 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Completed v2.1-06-03-PLAN.md (CI Pipeline Integration)
+Stopped at: v2.1 milestone completion
 Resume file: None
-
-## Phase Progress
-
-**Phase 1 Complete:**
-- Tag (6 category variants)
-- ActionButton (3 interaction variants)
-- StepIndicator (3 size, 3 visual variants)
-- Hotspot (3 variants with pulse animation)
-
-**Phase 2 Complete (2/2 plans):**
-- ✅ NavBar & NavItem (mobile navigation)
-- ✅ SectionHeader & Tabs (section headers, tab navigation)
-
-**Phase 3 Complete (2/2 plans):**
-- ✅ ArtistCard & StatCard (avatar cards, stat display, formatStatValue utility)
-- ✅ SpotCard & ShopCarouselCard (product spots, shopping carousel)
-
-**Phase 4 Complete (2/2 plans):**
-- ✅ Badge & LeaderItem (badge earned/locked states, leaderboard with podium medals)
-- ✅ RankingItem & SpotDetail (rank change display, spot detail with shop links)
-
-**Phase 5 Complete (3/3 plans):**
-- ✅ OAuthButton, GuestButton & Divider (OAuth buttons, guest continuation, divider)
-- ✅ LoginCard & LoadingSpinner (login card with glassmorphism, loading indicator)
-- ✅ SkeletonCard & BottomSheet (loading states, bottom sheet)
-
-**Phase 6 Complete (3/3 plans):**
-- ✅ Visual QA Infrastructure (40 automated tests covering 10 core pages at 4 breakpoints)
-- ✅ Design Validation Workflow (36 screenshots captured, reviewed, and approved via human checkpoint)
-- ✅ CI Pipeline Integration (GitHub Actions workflow for automated visual QA on PRs)
 
 ## Quick Tasks Completed
 
@@ -142,4 +81,4 @@ Resume file: None
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-06 after v2.1-06-03 plan completion*
+*Last updated: 2026-02-06 after v2.1 milestone completion*
