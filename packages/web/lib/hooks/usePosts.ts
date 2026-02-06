@@ -1,12 +1,39 @@
-import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import {
+  useQuery,
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import {
   fetchPostWithSpotsAndSolutions,
   fetchPostWithImagesAndItems,
   type PostDetail,
   type LegacyPostDetail,
 } from "@/lib/supabase/queries/posts";
-import { fetchPosts } from "@/lib/api/posts";
-import type { Post, PostsListResponse, PostsListParams } from "@/lib/api/types";
+import { fetchPosts, updatePost, deletePost } from "@/lib/api/posts";
+import type {
+  Post,
+  PostsListResponse,
+  PostsListParams,
+  UpdatePostDto,
+  PostResponse,
+} from "@/lib/api/types";
+
+// ============================================================
+// Query Keys
+// ============================================================
+
+export const postKeys = {
+  all: ["posts"] as const,
+  lists: () => [...postKeys.all, "list"] as const,
+  list: (params: UseInfinitePostsParams) => [...postKeys.lists(), params] as const,
+  details: () => [...postKeys.all, "detail"] as const,
+  detail: (id: string) => [...postKeys.details(), id] as const,
+};
+
+// ============================================================
+// Query Hooks
+// ============================================================
 
 /**
  * React Query hook for fetching a single post with its spots and solutions
@@ -16,7 +43,7 @@ import type { Post, PostsListResponse, PostsListParams } from "@/lib/api/types";
  */
 export function usePostById(id: string) {
   return useQuery<PostDetail | null>({
-    queryKey: ["posts", "detail", id],
+    queryKey: postKeys.detail(id),
     queryFn: () => fetchPostWithSpotsAndSolutions(id),
     enabled: !!id,
   });
@@ -108,6 +135,53 @@ export function useInfinitePosts(params: UseInfinitePostsParams = {}) {
     initialPageParam: 1,
     staleTime: 1000 * 60, // 1 minute
     gcTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
+
+// ============================================================
+// Mutation Hooks
+// ============================================================
+
+/**
+ * Mutation hook for updating a post
+ * Invalidates both post detail and lists after success
+ */
+export function useUpdatePost() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ postId, data }: { postId: string; data: UpdatePostDto }) =>
+      updatePost(postId, data),
+    onSuccess: (updatedPost, { postId }) => {
+      // Update cache with new data
+      queryClient.setQueryData(postKeys.detail(postId), updatedPost);
+      // Invalidate lists to reflect changes
+      queryClient.invalidateQueries({ queryKey: postKeys.lists() });
+    },
+    onError: (error) => {
+      console.error("[useUpdatePost] Failed to update post:", error);
+    },
+  });
+}
+
+/**
+ * Mutation hook for deleting a post
+ * Invalidates lists after success, removes detail from cache
+ */
+export function useDeletePost() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (postId: string) => deletePost(postId),
+    onSuccess: (_, postId) => {
+      // Remove from detail cache
+      queryClient.removeQueries({ queryKey: postKeys.detail(postId) });
+      // Invalidate lists
+      queryClient.invalidateQueries({ queryKey: postKeys.lists() });
+    },
+    onError: (error) => {
+      console.error("[useDeletePost] Failed to delete post:", error);
+    },
   });
 }
 

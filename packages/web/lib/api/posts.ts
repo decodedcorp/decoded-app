@@ -17,6 +17,8 @@ import {
   CreatePostWithSolutionRequest,
   PostsListResponse,
   PostsListParams,
+  UpdatePostDto,
+  PostResponse,
   ApiError,
 } from "./types";
 
@@ -375,4 +377,46 @@ export async function fetchPostsServer(
   }
 
   return response.json();
+}
+
+// ============================================================
+// Update Post
+// PATCH /api/v1/posts/{postId}
+// 인증 필요
+// ============================================================
+
+/**
+ * Update a post
+ * PATCH /api/v1/posts/{postId}
+ * Requires authentication
+ */
+export async function updatePost(
+  postId: string,
+  data: UpdatePostDto
+): Promise<PostResponse> {
+  return apiClient<PostResponse>({
+    path: `/api/v1/posts/${postId}`,
+    method: "PATCH",
+    body: data,
+    requiresAuth: true,
+  });
+}
+
+// ============================================================
+// Delete Post
+// DELETE /api/v1/posts/{postId}
+// 인증 필요
+// ============================================================
+
+/**
+ * Delete a post
+ * DELETE /api/v1/posts/{postId}
+ * Requires authentication
+ */
+export async function deletePost(postId: string): Promise<void> {
+  await apiClient<void>({
+    path: `/api/v1/posts/${postId}`,
+    method: "DELETE",
+    requiresAuth: true,
+  });
 }
