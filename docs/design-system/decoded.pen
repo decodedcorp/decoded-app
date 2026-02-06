@@ -1,5 +1,5 @@
 {
-  "version": "2.6",
+  "version": "2.7",
   "children": [
     {
       "type": "frame",
@@ -1392,10 +1392,10 @@
                         {
                           "type": "icon_font",
                           "id": "wjxWl",
-                          "name": "searchIcon",
+                          "name": "menuIcon",
                           "width": 24,
                           "height": 24,
-                          "iconFontName": "search",
+                          "iconFontName": "menu",
                           "iconFontFamily": "lucide",
                           "fill": "$--foreground"
                         }
@@ -1456,10 +1456,10 @@
                         {
                           "type": "icon_font",
                           "id": "Jd46F",
-                          "name": "searchIcon",
+                          "name": "menuIcon",
                           "width": 24,
                           "height": 24,
-                          "iconFontName": "search",
+                          "iconFontName": "menu",
                           "iconFontFamily": "lucide",
                           "fill": "#FFFFFF"
                         }
@@ -1666,7 +1666,7 @@
                           "name": "icon",
                           "width": 22,
                           "height": 22,
-                          "iconFontName": "search",
+                          "iconFontName": "compass",
                           "iconFontFamily": "lucide",
                           "fill": "#737373"
                         },
@@ -1675,7 +1675,7 @@
                           "id": "672lc",
                           "name": "label",
                           "fill": "#737373",
-                          "content": "Search",
+                          "content": "Explore",
                           "fontFamily": "Inter",
                           "fontSize": 10,
                           "fontWeight": "500"
@@ -6030,6 +6030,143 @@
         },
         {
           "type": "frame",
+          "id": "Kb0GW",
+          "name": "Featured Spots Section",
+          "width": "fill_container",
+          "fill": "$--card",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            24,
+            0,
+            24,
+            24
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "WW92j",
+              "name": "header",
+              "width": "fill_container",
+              "padding": [
+                0,
+                24,
+                0,
+                0
+              ],
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "HGDcz",
+                  "name": "headerLeft",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "TRMuY",
+                      "name": "mSpotLabel",
+                      "fill": "$--muted",
+                      "content": "FEATURED SPOTS",
+                      "fontFamily": "Inter",
+                      "fontSize": 9,
+                      "fontWeight": "600",
+                      "letterSpacing": 3
+                    },
+                    {
+                      "type": "text",
+                      "id": "QVJ98",
+                      "name": "mSpotTitle",
+                      "fill": "$--foreground",
+                      "content": "Today's Decoded",
+                      "fontFamily": "Playfair Display",
+                      "fontSize": 24,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "oHyxN",
+                  "name": "mSpotViewAll",
+                  "fill": "$--primary",
+                  "content": "View All",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "0zEJD",
+              "name": "spotScroll",
+              "width": "fill_container",
+              "gap": 12,
+              "children": [
+                {
+                  "id": "iXvVV",
+                  "type": "ref",
+                  "ref": "eG29H",
+                  "width": 280,
+                  "name": "mSpotCard1",
+                  "descendants": {
+                    "1Qigl": {
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "https://images.unsplash.com/photo-1617687445812-f21eff24d53c?w=600",
+                        "mode": "fill"
+                      }
+                    },
+                    "jvFjX": {
+                      "content": "Lavender Blazer Look"
+                    },
+                    "BYdl5": {
+                      "content": "NewJeans Hanni · $129"
+                    },
+                    "o10K2": {
+                      "content": "The ultimate airport style - effortlessly chic with a touch of color."
+                    }
+                  }
+                },
+                {
+                  "id": "ZhOnk",
+                  "type": "ref",
+                  "ref": "eG29H",
+                  "width": 280,
+                  "name": "mSpotCard2",
+                  "descendants": {
+                    "1Qigl": {
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "https://images.unsplash.com/photo-1676219250396-6bde732661e9?w=600",
+                        "mode": "fill"
+                      }
+                    },
+                    "7qwVo": {
+                      "content": "2"
+                    },
+                    "jvFjX": {
+                      "content": "Y2K Denim Jacket"
+                    },
+                    "BYdl5": {
+                      "content": "IVE Wonyoung · $89"
+                    },
+                    "o10K2": {
+                      "content": "Retro vibes meet modern streetwear in this iconic denim piece."
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
           "id": "6aO9t",
           "name": "Artist Spotlight Section",
           "width": "fill_container",
@@ -8914,267 +9051,6 @@
         },
         {
           "type": "frame",
-          "id": "sWF4I",
-          "name": "Ranking List",
-          "width": "fill_container",
-          "fill": "$--background",
-          "layout": "vertical",
-          "gap": 16,
-          "padding": 24,
-          "children": [
-            {
-              "type": "text",
-              "id": "JLXJC",
-              "name": "leaderHeader",
-              "fill": "$--foreground",
-              "content": "Leaderboard",
-              "fontFamily": "Playfair Display",
-              "fontSize": 20,
-              "fontWeight": "700"
-            },
-            {
-              "type": "frame",
-              "id": "ep9H1",
-              "name": "leaderList",
-              "width": "fill_container",
-              "layout": "vertical",
-              "gap": 12,
-              "children": [
-                {
-                  "type": "frame",
-                  "id": "kP4DG",
-                  "name": "leaderItem1",
-                  "width": "fill_container",
-                  "fill": "$--card",
-                  "cornerRadius": "$--radius-xl",
-                  "gap": 12,
-                  "padding": 12,
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "text",
-                      "id": "0jXsq",
-                      "name": "leaderRank1",
-                      "fill": "$--primary",
-                      "content": "1",
-                      "fontFamily": "Inter",
-                      "fontSize": 16,
-                      "fontWeight": "700"
-                    },
-                    {
-                      "type": "ellipse",
-                      "id": "aeP6A",
-                      "name": "leaderAvatar1",
-                      "metadata": {
-                        "type": "unsplash",
-                        "username": "rcsalbum",
-                        "link": "https://unsplash.com/@rcsalbum",
-                        "author": "Debashis RC Biswas"
-                      },
-                      "fill": {
-                        "type": "image",
-                        "enabled": true,
-                        "url": "https://images.unsplash.com/photo-1621095012731-c43fe206a337?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3Njk2NzU0MDV8&ixlib=rb-4.1.0&q=80&w=1080",
-                        "mode": "fill"
-                      },
-                      "width": 40,
-                      "height": 40
-                    },
-                    {
-                      "type": "frame",
-                      "id": "LVwZh",
-                      "name": "leaderInfo1",
-                      "width": "fill_container",
-                      "layout": "vertical",
-                      "gap": 2,
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "u4EYx",
-                          "name": "leaderName1",
-                          "fill": "$--foreground",
-                          "content": "style_queen",
-                          "fontFamily": "Inter",
-                          "fontSize": 14,
-                          "fontWeight": "600"
-                        },
-                        {
-                          "type": "text",
-                          "id": "Ywna9",
-                          "name": "leaderPoints1",
-                          "fill": "$--muted",
-                          "content": "15.2K points",
-                          "fontFamily": "Inter",
-                          "fontSize": 12,
-                          "fontWeight": "normal"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "text",
-                      "id": "aZBwS",
-                      "name": "leaderTrophy1",
-                      "content": "👑",
-                      "fontFamily": "Inter",
-                      "fontSize": 20,
-                      "fontWeight": "normal"
-                    }
-                  ]
-                },
-                {
-                  "type": "frame",
-                  "id": "yaBt3",
-                  "name": "leaderItem2",
-                  "width": "fill_container",
-                  "fill": "$--card",
-                  "cornerRadius": "$--radius-xl",
-                  "gap": 12,
-                  "padding": 12,
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "text",
-                      "id": "EwjS5",
-                      "name": "leaderRank2",
-                      "fill": "$--muted",
-                      "content": "2",
-                      "fontFamily": "Inter",
-                      "fontSize": 16,
-                      "fontWeight": "700"
-                    },
-                    {
-                      "type": "ellipse",
-                      "id": "TIiko",
-                      "name": "leaderAvatar2",
-                      "metadata": {
-                        "type": "unsplash",
-                        "username": "nfsbd",
-                        "link": "https://unsplash.com/@nfsbd",
-                        "author": "NAFIS HASAN"
-                      },
-                      "fill": {
-                        "type": "image",
-                        "enabled": true,
-                        "url": "https://images.unsplash.com/photo-1759567066672-4b9f48000096?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3Njk2NzU0MDh8&ixlib=rb-4.1.0&q=80&w=1080",
-                        "mode": "fill"
-                      },
-                      "width": 40,
-                      "height": 40
-                    },
-                    {
-                      "type": "frame",
-                      "id": "mst5G",
-                      "name": "leaderInfo2",
-                      "width": "fill_container",
-                      "layout": "vertical",
-                      "gap": 2,
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "f2qeO",
-                          "name": "leaderName2",
-                          "fill": "$--foreground",
-                          "content": "fashion_hunter",
-                          "fontFamily": "Inter",
-                          "fontSize": 14,
-                          "fontWeight": "600"
-                        },
-                        {
-                          "type": "text",
-                          "id": "J5zkN",
-                          "name": "leaderPoints2",
-                          "fill": "$--muted",
-                          "content": "12.8K points",
-                          "fontFamily": "Inter",
-                          "fontSize": 12,
-                          "fontWeight": "normal"
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "frame",
-                  "id": "2ljNf",
-                  "name": "leaderItem3",
-                  "width": "fill_container",
-                  "fill": "$--secondary",
-                  "cornerRadius": "$--radius-xl",
-                  "stroke": {
-                    "thickness": 2,
-                    "fill": "$--primary"
-                  },
-                  "gap": 12,
-                  "padding": 12,
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "text",
-                      "id": "PgEMP",
-                      "name": "leaderRank3",
-                      "fill": "$--primary",
-                      "content": "24",
-                      "fontFamily": "Inter",
-                      "fontSize": 16,
-                      "fontWeight": "700"
-                    },
-                    {
-                      "type": "ellipse",
-                      "id": "9fFoY",
-                      "name": "leaderAvatar3",
-                      "metadata": {
-                        "type": "unsplash",
-                        "username": "marwan15",
-                        "link": "https://unsplash.com/@marwan15",
-                        "author": "Marwan Ahmed"
-                      },
-                      "fill": {
-                        "type": "image",
-                        "enabled": true,
-                        "url": "https://images.unsplash.com/photo-1636822501247-854074fda72d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3Njk2NzU0MTF8&ixlib=rb-4.1.0&q=80&w=1080",
-                        "mode": "fill"
-                      },
-                      "width": 40,
-                      "height": 40
-                    },
-                    {
-                      "type": "frame",
-                      "id": "q8WYr",
-                      "name": "leaderInfo3",
-                      "width": "fill_container",
-                      "layout": "vertical",
-                      "gap": 2,
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "zXtLB",
-                          "name": "leaderName3",
-                          "fill": "$--primary",
-                          "content": "fashionista_kim (You)",
-                          "fontFamily": "Inter",
-                          "fontSize": 14,
-                          "fontWeight": "600"
-                        },
-                        {
-                          "type": "text",
-                          "id": "MnLBo",
-                          "name": "leaderPoints3",
-                          "fill": "$--muted",
-                          "content": "1.2K points",
-                          "fontFamily": "Inter",
-                          "fontSize": 12,
-                          "fontWeight": "normal"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "frame",
           "id": "iT8d3",
           "name": "View All Activity Button",
           "width": "fill_container",
@@ -9830,7 +9706,7 @@
     {
       "type": "frame",
       "id": "dAGvP",
-      "x": 1772,
+      "x": 1771,
       "y": 0,
       "name": "Page 5: Image Detail",
       "clip": true,
@@ -9993,6 +9869,45 @@
                   ]
                 }
               ]
+            },
+            {
+              "id": "8ocmn",
+              "type": "ref",
+              "ref": "oicK0",
+              "x": 180,
+              "y": 140,
+              "name": "hotspot1",
+              "descendants": {
+                "GgY8x": {
+                  "content": "1"
+                }
+              }
+            },
+            {
+              "id": "0DlXN",
+              "type": "ref",
+              "ref": "oicK0",
+              "x": 120,
+              "y": 260,
+              "name": "hotspot2",
+              "descendants": {
+                "GgY8x": {
+                  "content": "2"
+                }
+              }
+            },
+            {
+              "id": "vI7tl",
+              "type": "ref",
+              "ref": "oicK0",
+              "x": 220,
+              "y": 350,
+              "name": "hotspot3",
+              "descendants": {
+                "GgY8x": {
+                  "content": "3"
+                }
+              }
             }
           ]
         },
@@ -10134,6 +10049,352 @@
                   "fontFamily": "Inter",
                   "fontSize": 14,
                   "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "JvqSa",
+          "name": "Spot Solutions Section",
+          "width": "fill_container",
+          "fill": "$--card",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": 24,
+          "children": [
+            {
+              "type": "frame",
+              "id": "rV7fI",
+              "name": "header",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "OPN2K",
+                  "name": "headerLeft",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "DrLlz",
+                      "name": "ssLabel",
+                      "fill": "$--muted",
+                      "content": "SPOT SOLUTIONS",
+                      "fontFamily": "Inter",
+                      "fontSize": 9,
+                      "fontWeight": "600",
+                      "letterSpacing": 3
+                    },
+                    {
+                      "type": "text",
+                      "id": "NFA7E",
+                      "name": "ssTitle",
+                      "fill": "$--foreground",
+                      "content": "Decoded Items",
+                      "fontFamily": "Playfair Display",
+                      "fontSize": 24,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "RUvWY",
+                  "name": "ssViewAll",
+                  "fill": "$--primary",
+                  "content": "View All",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "OVwzb",
+              "name": "spotList",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 12,
+              "children": [
+                {
+                  "id": "Iaviv",
+                  "type": "ref",
+                  "ref": "vttFv",
+                  "width": "fill_container",
+                  "name": "ssItem1",
+                  "descendants": {
+                    "Mbgnw": {
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=200",
+                        "mode": "fill"
+                      }
+                    },
+                    "1aHQ0": {
+                      "content": "Lavender Oversized Blazer"
+                    },
+                    "bMApy": {
+                      "content": "ZARA · $129"
+                    }
+                  }
+                },
+                {
+                  "id": "gNVeY",
+                  "type": "ref",
+                  "ref": "vttFv",
+                  "width": "fill_container",
+                  "name": "ssItem2",
+                  "descendants": {
+                    "Mbgnw": {
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "https://images.unsplash.com/photo-1542272604-787c3835535d?w=200",
+                        "mode": "fill"
+                      }
+                    },
+                    "1aHQ0": {
+                      "content": "High-Waist Wide Pants"
+                    },
+                    "bMApy": {
+                      "content": "Uniqlo · $49"
+                    }
+                  }
+                },
+                {
+                  "id": "XOTzQ",
+                  "type": "ref",
+                  "ref": "vttFv",
+                  "width": "fill_container",
+                  "name": "ssItem3",
+                  "descendants": {
+                    "Mbgnw": {
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=200",
+                        "mode": "fill"
+                      }
+                    },
+                    "1aHQ0": {
+                      "content": "White Leather Sneakers"
+                    },
+                    "bMApy": {
+                      "content": "Nike Air Force 1 · $110"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Gy6jZ",
+              "name": "expandedSpot",
+              "width": "fill_container",
+              "fill": "$--secondary",
+              "cornerRadius": "$--radius-xl",
+              "layout": "vertical",
+              "gap": 12,
+              "padding": 16,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "SbaZG",
+                  "name": "expandedHeader",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "UP4bY",
+                      "name": "expandedImg",
+                      "width": 80,
+                      "height": 100,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=200",
+                        "mode": "fill"
+                      },
+                      "cornerRadius": "$--radius-lg"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "chYIP",
+                      "name": "expandedInfo",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 6,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "tzK13",
+                          "name": "badge",
+                          "fill": "$--primary",
+                          "cornerRadius": 4,
+                          "padding": [
+                            3,
+                            6
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "0Qogn",
+                              "name": "ssExpandedBadgeText",
+                              "fill": "$--primary-foreground",
+                              "content": "EXACT MATCH",
+                              "fontFamily": "Inter",
+                              "fontSize": 8,
+                              "fontWeight": "700",
+                              "letterSpacing": 0.5
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "4gKlJ",
+                          "name": "ssExpandedTitle",
+                          "fill": "$--foreground",
+                          "content": "Lavender Oversized Blazer",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "X41pD",
+                          "name": "ssExpandedBrand",
+                          "fill": "$--muted",
+                          "content": "ZARA",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "0Ru5p",
+                          "name": "ssExpandedPrice",
+                          "fill": "$--primary",
+                          "content": "$129.00",
+                          "fontFamily": "Inter",
+                          "fontSize": 16,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "edYzU",
+                  "name": "tipBox",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "jp5gZ",
+                      "name": "ssExpandedTipLabel",
+                      "fill": "$--muted",
+                      "content": "STYLING TIP",
+                      "fontFamily": "Inter",
+                      "fontSize": 9,
+                      "fontWeight": "600",
+                      "letterSpacing": 1
+                    },
+                    {
+                      "type": "text",
+                      "id": "4uNdD",
+                      "name": "ssExpandedTipText",
+                      "fill": "$--foreground",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Pair with high-waisted wide-leg pants and minimal gold accessories for an effortlessly chic airport look.",
+                      "lineHeight": 1.4,
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "1nC1n",
+                  "name": "actions",
+                  "width": "fill_container",
+                  "gap": 8,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "MaOBR",
+                      "name": "shopBtn",
+                      "width": "fill_container",
+                      "fill": "$--primary",
+                      "cornerRadius": "$--radius-lg",
+                      "gap": 6,
+                      "padding": [
+                        10,
+                        14
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "5by7b",
+                          "name": "ssExpandedShopIcon",
+                          "width": 16,
+                          "height": 16,
+                          "iconFontName": "shopping-bag",
+                          "iconFontFamily": "lucide",
+                          "fill": "$--primary-foreground"
+                        },
+                        {
+                          "type": "text",
+                          "id": "n1QXb",
+                          "name": "ssExpandedShopText",
+                          "fill": "$--primary-foreground",
+                          "content": "Shop Now",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "JBnJp",
+                      "name": "saveBtn",
+                      "fill": "$--card",
+                      "cornerRadius": "$--radius-lg",
+                      "padding": [
+                        10,
+                        14
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "N4sFv",
+                          "name": "ssExpandedSaveIcon",
+                          "width": 16,
+                          "height": 16,
+                          "iconFontName": "bookmark",
+                          "iconFontFamily": "lucide",
+                          "fill": "$--foreground"
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             }
@@ -10967,79 +11228,6 @@
                   "fontWeight": "normal"
                 }
               ]
-            },
-            {
-              "type": "frame",
-              "id": "stxag",
-              "name": "orDivider",
-              "width": "fill_container",
-              "gap": 12,
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "frame",
-                  "id": "dKQWV",
-                  "name": "orLine1",
-                  "width": "fill_container",
-                  "height": 1,
-                  "fill": "#3D3D3D"
-                },
-                {
-                  "type": "text",
-                  "id": "3y8EN",
-                  "name": "orText",
-                  "fill": "$--muted",
-                  "content": "or",
-                  "fontFamily": "Inter",
-                  "fontSize": 13,
-                  "fontWeight": "normal"
-                },
-                {
-                  "type": "frame",
-                  "id": "I3LTe",
-                  "name": "orLine2",
-                  "width": "fill_container",
-                  "height": 1,
-                  "fill": "#3D3D3D"
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "AlTp4",
-              "name": "pasteUrlInput",
-              "width": "fill_container",
-              "height": 48,
-              "fill": "$--card",
-              "cornerRadius": "$--radius-xl",
-              "gap": 12,
-              "padding": [
-                0,
-                16
-              ],
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "icon_font",
-                  "id": "IJWZD",
-                  "name": "pasteIcon",
-                  "width": 20,
-                  "height": 20,
-                  "iconFontName": "link",
-                  "iconFontFamily": "lucide",
-                  "fill": "$--muted"
-                },
-                {
-                  "type": "text",
-                  "id": "DITGE",
-                  "name": "pasteText",
-                  "fill": "$--muted",
-                  "content": "Paste Instagram or TikTok URL",
-                  "fontFamily": "Inter",
-                  "fontSize": 14,
-                  "fontWeight": "normal"
-                }
-              ]
             }
           ]
         }
@@ -11811,88 +11999,194 @@
             {
               "type": "frame",
               "id": "ukUlx",
-              "name": "Submit Preview",
+              "name": "OG Preview Card",
               "width": "fill_container",
               "fill": "$--card",
               "cornerRadius": "$--radius-xl",
-              "gap": 16,
+              "layout": "vertical",
+              "gap": 12,
               "padding": 16,
               "children": [
                 {
                   "type": "frame",
-                  "id": "8CHAw",
-                  "name": "previewImg",
-                  "metadata": {
-                    "type": "unsplash",
-                    "username": "luandmario",
-                    "link": "https://unsplash.com/@luandmario",
-                    "author": "Maria Lupan"
-                  },
-                  "width": 80,
-                  "height": 100,
-                  "fill": {
-                    "type": "image",
-                    "enabled": true,
-                    "url": "https://images.unsplash.com/photo-1615538785945-6625ccdb4b25?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3Njk2NzU2MDF8&ixlib=rb-4.1.0&q=80&w=1080",
-                    "mode": "fill"
-                  },
-                  "cornerRadius": "$--radius-lg"
-                },
-                {
-                  "type": "frame",
-                  "id": "YoouB",
-                  "name": "previewInfo",
+                  "id": "B1yD1",
+                  "name": "ogHeader",
                   "width": "fill_container",
-                  "layout": "vertical",
-                  "gap": 8,
-                  "justifyContent": "center",
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
                   "children": [
                     {
                       "type": "text",
-                      "id": "DT7VG",
-                      "name": "previewTitle",
+                      "id": "Zsbiw",
+                      "name": "ogTitle",
                       "fill": "$--foreground",
-                      "content": "Airport Fashion",
+                      "content": "Post Preview",
                       "fontFamily": "Inter",
-                      "fontSize": 15,
+                      "fontSize": 14,
                       "fontWeight": "600"
                     },
                     {
-                      "type": "text",
-                      "id": "CvZ7Y",
-                      "name": "previewArtist",
-                      "fill": "$--muted",
-                      "content": "NewJeans Hanni",
-                      "fontFamily": "Inter",
-                      "fontSize": 13,
-                      "fontWeight": "normal"
-                    },
-                    {
                       "type": "frame",
-                      "id": "8hNCn",
-                      "name": "previewItems",
+                      "id": "Lc9Vc",
+                      "name": "aiBtn",
+                      "fill": "$--primary",
+                      "cornerRadius": "$--radius-full",
                       "gap": 6,
+                      "padding": [
+                        6,
+                        12
+                      ],
                       "alignItems": "center",
                       "children": [
                         {
                           "type": "icon_font",
-                          "id": "KrTjj",
-                          "name": "previewItemsIcon",
+                          "id": "Ijdok",
+                          "name": "aiIcon",
                           "width": 14,
                           "height": 14,
-                          "iconFontName": "package",
+                          "iconFontName": "sparkles",
                           "iconFontFamily": "lucide",
-                          "fill": "$--primary"
+                          "fill": "$--primary-foreground"
                         },
                         {
                           "type": "text",
-                          "id": "jqpId",
-                          "name": "previewItemsText",
-                          "fill": "$--primary",
-                          "content": "3 items detected",
+                          "id": "BATWO",
+                          "name": "aiBtnText",
+                          "fill": "$--primary-foreground",
+                          "content": "AI Generate",
                           "fontFamily": "Inter",
                           "fontSize": 12,
-                          "fontWeight": "normal"
+                          "fontWeight": "600"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "zboJe",
+                  "name": "ogContent",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "8CHAw",
+                      "name": "previewImg",
+                      "metadata": {
+                        "type": "unsplash",
+                        "username": "luandmario",
+                        "link": "https://unsplash.com/@luandmario",
+                        "author": "Maria Lupan"
+                      },
+                      "width": 100,
+                      "height": 100,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "https://images.unsplash.com/photo-1615538785945-6625ccdb4b25?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3Njk2NzU2MDF8&ixlib=rb-4.1.0&q=80&w=1080",
+                        "mode": "fill"
+                      },
+                      "cornerRadius": "$--radius-lg"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "XyFzo",
+                      "name": "ogInfo",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 8,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "g2xB7",
+                          "name": "ogTitleInput",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "MM0KX",
+                              "name": "ogTitleLabel",
+                              "fill": "$--muted",
+                              "content": "Title",
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "500"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "pwDxN",
+                              "name": "ogTitleField",
+                              "width": "fill_container",
+                              "fill": "$--secondary",
+                              "cornerRadius": "$--radius-md",
+                              "padding": [
+                                8,
+                                12
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "G89JX",
+                                  "name": "ogTitleText",
+                                  "fill": "$--foreground",
+                                  "content": "NewJeans Hanni Airport Style",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "QfQFy",
+                          "name": "ogDescInput",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "qMTA7",
+                              "name": "ogDescLabel",
+                              "fill": "$--muted",
+                              "content": "Description",
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "500"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "YTCJj",
+                              "name": "ogDescField",
+                              "width": "fill_container",
+                              "height": 48,
+                              "fill": "$--secondary",
+                              "cornerRadius": "$--radius-md",
+                              "padding": [
+                                8,
+                                12
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "o0yFR",
+                                  "name": "ogDescText",
+                                  "fill": "$--muted",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Casual chic look featuring...",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
                         }
                       ]
                     }
@@ -12464,7 +12758,7 @@
       "type": "frame",
       "id": "Hh1dw",
       "x": 0,
-      "y": 3400,
+      "y": 3900,
       "name": "Page 1: Home (Desktop)",
       "clip": true,
       "width": 1440,
@@ -12476,7 +12770,9 @@
           "type": "ref",
           "ref": "NF2zm",
           "width": "fill_container",
-          "name": "newHeader1"
+          "name": "newHeader1",
+          "x": 0,
+          "y": 0
         },
         {
           "type": "frame",
@@ -12922,6 +13218,778 @@
                                   "fontFamily": "Inter",
                                   "fontSize": 12,
                                   "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "dUGTK",
+              "name": "Featured Spots Section",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 32,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "hOUc1",
+                  "name": "header",
+                  "width": "fill_container",
+                  "justifyContent": "space_between",
+                  "alignItems": "end",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "pt3Td",
+                      "name": "headerLeft",
+                      "layout": "vertical",
+                      "gap": 6,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "TQQQk",
+                          "name": "dSpotFeatLabel",
+                          "fill": "$--muted",
+                          "content": "FEATURED SPOTS",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "600",
+                          "letterSpacing": 3
+                        },
+                        {
+                          "type": "text",
+                          "id": "a3vFF",
+                          "name": "dSpotFeatTitle",
+                          "fill": "$--foreground",
+                          "content": "Today's Decoded",
+                          "fontFamily": "Playfair Display",
+                          "fontSize": 36,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "SCNWT",
+                      "name": "viewAllBtn",
+                      "fill": "$--secondary",
+                      "cornerRadius": "$--radius-lg",
+                      "gap": 8,
+                      "padding": [
+                        12,
+                        20
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "vUFrO",
+                          "name": "dSpotFeatViewAllText",
+                          "fill": "$--foreground",
+                          "content": "View All Spots",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "icon_font",
+                          "id": "mxGUb",
+                          "name": "dSpotFeatViewAllIcon",
+                          "width": 16,
+                          "height": 16,
+                          "iconFontName": "arrow-right",
+                          "iconFontFamily": "lucide",
+                          "fill": "$--foreground"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "NI1T5",
+                  "name": "spotGrid",
+                  "width": "fill_container",
+                  "gap": 24,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "K8mQJ",
+                      "name": "spotCard1",
+                      "clip": true,
+                      "width": "fill_container",
+                      "fill": "$--card",
+                      "cornerRadius": "$--radius-card",
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "nl2dG",
+                          "name": "imageContainer",
+                          "width": "fill_container",
+                          "height": 280,
+                          "layout": "none",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "xuLq9",
+                              "x": 0,
+                              "y": 0,
+                              "name": "imgBg",
+                              "width": 420,
+                              "height": 280,
+                              "fill": {
+                                "type": "image",
+                                "enabled": true,
+                                "url": "https://images.unsplash.com/photo-1617687445812-f21eff24d53c?w=800",
+                                "mode": "fill"
+                              }
+                            },
+                            {
+                              "type": "frame",
+                              "id": "PwqRg",
+                              "x": 0,
+                              "y": 0,
+                              "name": "overlay",
+                              "width": 420,
+                              "height": 280,
+                              "fill": {
+                                "type": "gradient",
+                                "gradientType": "linear",
+                                "enabled": true,
+                                "rotation": 0,
+                                "size": {
+                                  "height": 1
+                                },
+                                "colors": [
+                                  {
+                                    "color": "#00000000",
+                                    "position": 0.5
+                                  },
+                                  {
+                                    "color": "#00000080",
+                                    "position": 1
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "id": "yTMrW",
+                              "type": "ref",
+                              "ref": "oicK0",
+                              "x": 180,
+                              "y": 120,
+                              "name": "dSpotFeatCard1Hotspot",
+                              "descendants": {
+                                "GgY8x": {
+                                  "content": "1"
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "TQbQ4",
+                          "name": "infoContainer",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 12,
+                          "padding": 20,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "gStp3",
+                              "name": "itemRow",
+                              "width": "fill_container",
+                              "gap": 12,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "j6Jtb",
+                                  "name": "number",
+                                  "width": 32,
+                                  "height": 32,
+                                  "fill": "$--primary",
+                                  "cornerRadius": 16,
+                                  "justifyContent": "center",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "zZjHi",
+                                      "name": "dSpotFeatCard1NumText",
+                                      "fill": "$--primary-foreground",
+                                      "content": "1",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 14,
+                                      "fontWeight": "700"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "tREww",
+                                  "name": "itemInfo",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 2,
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "Cqy92",
+                                      "name": "dSpotFeatCard1ItemTitle",
+                                      "fill": "$--foreground",
+                                      "content": "Lavender Oversized Blazer",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 16,
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "7qjRR",
+                                      "name": "dSpotFeatCard1ItemBrand",
+                                      "fill": "$--muted",
+                                      "content": "NewJeans Hanni · ZARA · $129",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 13,
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "wIHDL",
+                              "name": "tipBox",
+                              "width": "fill_container",
+                              "fill": "$--secondary",
+                              "cornerRadius": "$--radius-lg",
+                              "layout": "vertical",
+                              "gap": 6,
+                              "padding": 12,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "3hZyn",
+                                  "name": "dSpotFeatCard1TipLabel",
+                                  "fill": "$--muted",
+                                  "content": "STYLING TIP",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 9,
+                                  "fontWeight": "600",
+                                  "letterSpacing": 1
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "utpKG",
+                                  "name": "dSpotFeatCard1TipText",
+                                  "fill": "$--foreground",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Perfect for layering over a simple white tee for that effortless airport look.",
+                                  "lineHeight": 1.4,
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "ujESA",
+                              "name": "actionBtn",
+                              "width": "fill_container",
+                              "fill": "$--primary",
+                              "cornerRadius": "$--radius-lg",
+                              "gap": 8,
+                              "padding": [
+                                12,
+                                20
+                              ],
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon_font",
+                                  "id": "5Idqb",
+                                  "name": "dSpotFeatCard1ActionIcon",
+                                  "width": 16,
+                                  "height": 16,
+                                  "iconFontName": "external-link",
+                                  "iconFontFamily": "lucide",
+                                  "fill": "$--primary-foreground"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "bZNvW",
+                                  "name": "dSpotFeatCard1ActionText",
+                                  "fill": "$--primary-foreground",
+                                  "content": "View Solution",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "yR4Q6",
+                      "name": "spotCard2",
+                      "clip": true,
+                      "width": "fill_container",
+                      "fill": "$--card",
+                      "cornerRadius": "$--radius-card",
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "odrXG",
+                          "name": "imageContainer",
+                          "width": "fill_container",
+                          "height": 280,
+                          "layout": "none",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "93AUK",
+                              "x": 0,
+                              "y": 0,
+                              "name": "imgBg",
+                              "width": 420,
+                              "height": 280,
+                              "fill": {
+                                "type": "image",
+                                "enabled": true,
+                                "url": "https://images.unsplash.com/photo-1676219250396-6bde732661e9?w=800",
+                                "mode": "fill"
+                              }
+                            },
+                            {
+                              "type": "frame",
+                              "id": "At8F6",
+                              "x": 0,
+                              "y": 0,
+                              "name": "overlay",
+                              "width": 420,
+                              "height": 280,
+                              "fill": {
+                                "type": "gradient",
+                                "gradientType": "linear",
+                                "enabled": true,
+                                "rotation": 0,
+                                "size": {
+                                  "height": 1
+                                },
+                                "colors": [
+                                  {
+                                    "color": "#00000000",
+                                    "position": 0.5
+                                  },
+                                  {
+                                    "color": "#00000080",
+                                    "position": 1
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "id": "nhyIJ",
+                              "type": "ref",
+                              "ref": "oicK0",
+                              "x": 140,
+                              "y": 150,
+                              "name": "dSpotFeatCard2Hotspot",
+                              "descendants": {
+                                "GgY8x": {
+                                  "content": "2"
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "pjdqU",
+                          "name": "infoContainer",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 12,
+                          "padding": 20,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "lHXDb",
+                              "name": "itemRow",
+                              "width": "fill_container",
+                              "gap": 12,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "cExvF",
+                                  "name": "number",
+                                  "width": 32,
+                                  "height": 32,
+                                  "fill": "$--primary",
+                                  "cornerRadius": 16,
+                                  "justifyContent": "center",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "M0EoN",
+                                      "name": "dSpotFeatCard2NumText",
+                                      "fill": "$--primary-foreground",
+                                      "content": "2",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 14,
+                                      "fontWeight": "700"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "WFWYo",
+                                  "name": "itemInfo",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 2,
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "qOnNE",
+                                      "name": "dSpotFeatCard2ItemTitle",
+                                      "fill": "$--foreground",
+                                      "content": "Y2K Denim Jacket",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 16,
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "kEyWG",
+                                      "name": "dSpotFeatCard2ItemBrand",
+                                      "fill": "$--muted",
+                                      "content": "IVE Wonyoung · Levi's · $89",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 13,
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "CHy2o",
+                              "name": "tipBox",
+                              "width": "fill_container",
+                              "fill": "$--secondary",
+                              "cornerRadius": "$--radius-lg",
+                              "layout": "vertical",
+                              "gap": 6,
+                              "padding": 12,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "0z8D8",
+                                  "name": "dSpotFeatCard2TipLabel",
+                                  "fill": "$--muted",
+                                  "content": "STYLING TIP",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 9,
+                                  "fontWeight": "600",
+                                  "letterSpacing": 1
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "x8qCO",
+                                  "name": "dSpotFeatCard2TipText",
+                                  "fill": "$--foreground",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Retro vibes meet modern streetwear. Layer over a cropped top for the perfect Y2K moment.",
+                                  "lineHeight": 1.4,
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "BAfCQ",
+                              "name": "actionBtn",
+                              "width": "fill_container",
+                              "fill": "$--primary",
+                              "cornerRadius": "$--radius-lg",
+                              "gap": 8,
+                              "padding": [
+                                12,
+                                20
+                              ],
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon_font",
+                                  "id": "KfTRH",
+                                  "name": "dSpotFeatCard2ActionIcon",
+                                  "width": 16,
+                                  "height": 16,
+                                  "iconFontName": "external-link",
+                                  "iconFontFamily": "lucide",
+                                  "fill": "$--primary-foreground"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "mjPnq",
+                                  "name": "dSpotFeatCard2ActionText",
+                                  "fill": "$--primary-foreground",
+                                  "content": "View Solution",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "cmBER",
+                      "name": "spotCard3",
+                      "clip": true,
+                      "width": "fill_container",
+                      "fill": "$--card",
+                      "cornerRadius": "$--radius-card",
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "v3jMY",
+                          "name": "imageContainer",
+                          "width": "fill_container",
+                          "height": 280,
+                          "layout": "none",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "i7Jiz",
+                              "x": 0,
+                              "y": 0,
+                              "name": "imgBg",
+                              "width": 420,
+                              "height": 280,
+                              "fill": {
+                                "type": "image",
+                                "enabled": true,
+                                "url": "https://images.unsplash.com/photo-1699847061593-188987efcd3e?w=800",
+                                "mode": "fill"
+                              }
+                            },
+                            {
+                              "type": "frame",
+                              "id": "nmnWV",
+                              "x": 0,
+                              "y": 0,
+                              "name": "overlay",
+                              "width": 420,
+                              "height": 280,
+                              "fill": {
+                                "type": "gradient",
+                                "gradientType": "linear",
+                                "enabled": true,
+                                "rotation": 0,
+                                "size": {
+                                  "height": 1
+                                },
+                                "colors": [
+                                  {
+                                    "color": "#00000000",
+                                    "position": 0.5
+                                  },
+                                  {
+                                    "color": "#00000080",
+                                    "position": 1
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "id": "iSEcP",
+                              "type": "ref",
+                              "ref": "oicK0",
+                              "x": 200,
+                              "y": 100,
+                              "name": "dSpotFeatCard3Hotspot",
+                              "descendants": {
+                                "GgY8x": {
+                                  "content": "3"
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "TrlVR",
+                          "name": "infoContainer",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 12,
+                          "padding": 20,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "akRNE",
+                              "name": "itemRow",
+                              "width": "fill_container",
+                              "gap": 12,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "s7RIS",
+                                  "name": "number",
+                                  "width": 32,
+                                  "height": 32,
+                                  "fill": "$--primary",
+                                  "cornerRadius": 16,
+                                  "justifyContent": "center",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "A86kC",
+                                      "name": "dSpotFeatCard3NumText",
+                                      "fill": "$--primary-foreground",
+                                      "content": "3",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 14,
+                                      "fontWeight": "700"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "q2jNa",
+                                  "name": "itemInfo",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 2,
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "33lUE",
+                                      "name": "dSpotFeatCard3ItemTitle",
+                                      "fill": "$--foreground",
+                                      "content": "Minimal White Sneakers",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 16,
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "Lcwix",
+                                      "name": "dSpotFeatCard3ItemBrand",
+                                      "fill": "$--muted",
+                                      "content": "aespa Karina · Nike · $110",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 13,
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "9Szc2",
+                              "name": "tipBox",
+                              "width": "fill_container",
+                              "fill": "$--secondary",
+                              "cornerRadius": "$--radius-lg",
+                              "layout": "vertical",
+                              "gap": 6,
+                              "padding": 12,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "BuVRK",
+                                  "name": "dSpotFeatCard3TipLabel",
+                                  "fill": "$--muted",
+                                  "content": "STYLING TIP",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 9,
+                                  "fontWeight": "600",
+                                  "letterSpacing": 1
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "YDx1M",
+                                  "name": "dSpotFeatCard3TipText",
+                                  "fill": "$--foreground",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Clean, classic, and versatile. The foundation of any minimalist wardrobe.",
+                                  "lineHeight": 1.4,
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "XzEHr",
+                              "name": "actionBtn",
+                              "width": "fill_container",
+                              "fill": "$--primary",
+                              "cornerRadius": "$--radius-lg",
+                              "gap": 8,
+                              "padding": [
+                                12,
+                                20
+                              ],
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon_font",
+                                  "id": "8vtHr",
+                                  "name": "dSpotFeatCard3ActionIcon",
+                                  "width": 16,
+                                  "height": 16,
+                                  "iconFontName": "external-link",
+                                  "iconFontFamily": "lucide",
+                                  "fill": "$--primary-foreground"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "N7SQa",
+                                  "name": "dSpotFeatCard3ActionText",
+                                  "fill": "$--primary-foreground",
+                                  "content": "View Solution",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "600"
                                 }
                               ]
                             }
@@ -14214,7 +15282,9 @@
           "type": "ref",
           "ref": "k8d7s",
           "width": "fill_container",
-          "name": "newFooter1"
+          "name": "newFooter1",
+          "x": 0,
+          "y": 3214
         }
       ]
     },
@@ -14222,7 +15292,7 @@
       "type": "frame",
       "id": "0TQA4",
       "x": 1540,
-      "y": 3400,
+      "y": 3900,
       "name": "Page 2: Feed (Desktop)",
       "clip": true,
       "width": 1440,
@@ -14782,7 +15852,7 @@
       "type": "frame",
       "id": "Z2oLo",
       "x": 3080,
-      "y": 3400,
+      "y": 3900,
       "name": "Page 3: Profile (Desktop)",
       "clip": true,
       "width": 1440,
@@ -15295,246 +16365,6 @@
                       ]
                     }
                   ]
-                },
-                {
-                  "type": "frame",
-                  "id": "jgi3B",
-                  "name": "Leaderboard Section",
-                  "width": "fill_container",
-                  "layout": "vertical",
-                  "gap": 24,
-                  "children": [
-                    {
-                      "type": "text",
-                      "id": "a1Hs1",
-                      "name": "leaderTitle",
-                      "fill": "$--foreground",
-                      "content": "Leaderboard",
-                      "fontFamily": "Playfair Display",
-                      "fontSize": 24,
-                      "fontWeight": "700"
-                    },
-                    {
-                      "type": "frame",
-                      "id": "mVT40",
-                      "name": "leaderList",
-                      "width": "fill_container",
-                      "gap": 16,
-                      "children": [
-                        {
-                          "type": "frame",
-                          "id": "SDAH3",
-                          "name": "leaderItem1",
-                          "width": "fill_container",
-                          "fill": "$--card",
-                          "cornerRadius": "$--radius-xl",
-                          "gap": 16,
-                          "padding": 16,
-                          "alignItems": "center",
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "js7Zq",
-                              "name": "leaderRank1",
-                              "fill": "$--primary",
-                              "content": "1",
-                              "fontFamily": "Inter",
-                              "fontSize": 20,
-                              "fontWeight": "700"
-                            },
-                            {
-                              "type": "ellipse",
-                              "id": "ogAE5",
-                              "name": "leaderAvatar1",
-                              "fill": {
-                                "type": "image",
-                                "enabled": true,
-                                "url": "https://images.unsplash.com/photo-1621095012731-c43fe206a337?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3Njk2NzU0MDV8&ixlib=rb-4.1.0&q=80&w=1080",
-                                "mode": "fill"
-                              },
-                              "width": 48,
-                              "height": 48
-                            },
-                            {
-                              "type": "frame",
-                              "id": "OuOQE",
-                              "name": "leaderInfo1",
-                              "width": "fill_container",
-                              "layout": "vertical",
-                              "gap": 4,
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "xgM6o",
-                                  "name": "leaderName1",
-                                  "fill": "$--foreground",
-                                  "content": "style_guru",
-                                  "fontFamily": "Inter",
-                                  "fontSize": 15,
-                                  "fontWeight": "600"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "Zw8lM",
-                                  "name": "leaderPoints1",
-                                  "fill": "$--muted",
-                                  "content": "24,500 points",
-                                  "fontFamily": "Inter",
-                                  "fontSize": 13,
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "text",
-                              "id": "qFeq1",
-                              "name": "leaderTrophy1",
-                              "content": "👑",
-                              "fontFamily": "Inter",
-                              "fontSize": 24,
-                              "fontWeight": "normal"
-                            }
-                          ]
-                        },
-                        {
-                          "type": "frame",
-                          "id": "4ccPc",
-                          "name": "leaderItem2",
-                          "width": "fill_container",
-                          "fill": "$--card",
-                          "cornerRadius": "$--radius-xl",
-                          "gap": 16,
-                          "padding": 16,
-                          "alignItems": "center",
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "VXweI",
-                              "name": "leaderRank2",
-                              "fill": "$--muted",
-                              "content": "2",
-                              "fontFamily": "Inter",
-                              "fontSize": 20,
-                              "fontWeight": "700"
-                            },
-                            {
-                              "type": "ellipse",
-                              "id": "MdMyB",
-                              "name": "leaderAvatar2",
-                              "fill": {
-                                "type": "image",
-                                "enabled": true,
-                                "url": "https://images.unsplash.com/photo-1759567066672-4b9f48000096?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3Njk2NzU0MDh8&ixlib=rb-4.1.0&q=80&w=1080",
-                                "mode": "fill"
-                              },
-                              "width": 48,
-                              "height": 48
-                            },
-                            {
-                              "type": "frame",
-                              "id": "y6G8b",
-                              "name": "leaderInfo2",
-                              "width": "fill_container",
-                              "layout": "vertical",
-                              "gap": 4,
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "SGgmw",
-                                  "name": "leaderName2",
-                                  "fill": "$--foreground",
-                                  "content": "fashion_hunter",
-                                  "fontFamily": "Inter",
-                                  "fontSize": 15,
-                                  "fontWeight": "600"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "ECLnZ",
-                                  "name": "leaderPoints2",
-                                  "fill": "$--muted",
-                                  "content": "18,200 points",
-                                  "fontFamily": "Inter",
-                                  "fontSize": 13,
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "frame",
-                          "id": "Lqdtn",
-                          "name": "leaderItem3",
-                          "width": "fill_container",
-                          "fill": "$--secondary",
-                          "cornerRadius": "$--radius-xl",
-                          "stroke": {
-                            "thickness": 2,
-                            "fill": "$--primary"
-                          },
-                          "gap": 16,
-                          "padding": 16,
-                          "alignItems": "center",
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "LKJ9r",
-                              "name": "leaderRank3",
-                              "fill": "$--primary",
-                              "content": "24",
-                              "fontFamily": "Inter",
-                              "fontSize": 20,
-                              "fontWeight": "700"
-                            },
-                            {
-                              "type": "ellipse",
-                              "id": "lm2X0",
-                              "name": "leaderAvatar3",
-                              "fill": {
-                                "type": "image",
-                                "enabled": true,
-                                "url": "https://images.unsplash.com/photo-1626554658375-d6d083905102?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3Njk2NzUzNzl8&ixlib=rb-4.1.0&q=80&w=1080",
-                                "mode": "fill"
-                              },
-                              "width": 48,
-                              "height": 48
-                            },
-                            {
-                              "type": "frame",
-                              "id": "Tgj9Y",
-                              "name": "leaderInfo3",
-                              "width": "fill_container",
-                              "layout": "vertical",
-                              "gap": 4,
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "kJH0E",
-                                  "name": "leaderName3",
-                                  "fill": "$--foreground",
-                                  "content": "You",
-                                  "fontFamily": "Inter",
-                                  "fontSize": 15,
-                                  "fontWeight": "600"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "40h1I",
-                                  "name": "leaderPoints3",
-                                  "fill": "$--muted",
-                                  "content": "1,200 points",
-                                  "fontFamily": "Inter",
-                                  "fontSize": 13,
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
                 }
               ]
             }
@@ -15546,7 +16376,7 @@
       "type": "frame",
       "id": "7lNMo",
       "x": 4620,
-      "y": 3400,
+      "y": 3900,
       "name": "Page 4: Search (Desktop)",
       "clip": true,
       "width": 1440,
@@ -16125,8 +16955,8 @@
     {
       "type": "frame",
       "id": "BJFrN",
-      "x": 6160,
-      "y": 3400,
+      "x": 6159,
+      "y": 3900,
       "name": "Page 5: Image Detail (Desktop)",
       "clip": true,
       "width": 1440,
@@ -16464,6 +17294,45 @@
                   ]
                 }
               ]
+            },
+            {
+              "id": "73JYD",
+              "type": "ref",
+              "ref": "oicK0",
+              "x": 650,
+              "y": 180,
+              "name": "dhotspot1",
+              "descendants": {
+                "GgY8x": {
+                  "content": "1"
+                }
+              }
+            },
+            {
+              "id": "SqeHH",
+              "type": "ref",
+              "ref": "oicK0",
+              "x": 580,
+              "y": 320,
+              "name": "dhotspot2",
+              "descendants": {
+                "GgY8x": {
+                  "content": "2"
+                }
+              }
+            },
+            {
+              "id": "ydtqh",
+              "type": "ref",
+              "ref": "oicK0",
+              "x": 720,
+              "y": 450,
+              "name": "dhotspot3",
+              "descendants": {
+                "GgY8x": {
+                  "content": "3"
+                }
+              }
             }
           ]
         },
@@ -16730,6 +17599,475 @@
               "fontFamily": "Inter",
               "fontSize": 18,
               "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "sUHl7",
+          "name": "Spot Solutions Section",
+          "width": "fill_container",
+          "fill": "$--card",
+          "gap": 48,
+          "padding": [
+            48,
+            64
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "lji9D",
+              "name": "spotListSection",
+              "width": 400,
+              "layout": "vertical",
+              "gap": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "4jEth",
+                  "name": "header",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 6,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "EhzSd",
+                      "name": "dSpotLabel",
+                      "fill": "$--muted",
+                      "content": "SPOT SOLUTIONS",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600",
+                      "letterSpacing": 3
+                    },
+                    {
+                      "type": "text",
+                      "id": "Jq9Pm",
+                      "name": "dSpotTitle",
+                      "fill": "$--foreground",
+                      "content": "Decoded Items",
+                      "fontFamily": "Playfair Display",
+                      "fontSize": 32,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "EilRr",
+                      "name": "dSpotSubtitle",
+                      "fill": "$--muted",
+                      "content": "3 items identified in this look",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "mWDQW",
+                  "name": "spotList",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "children": [
+                    {
+                      "id": "7VcJy",
+                      "type": "ref",
+                      "ref": "l4UF1",
+                      "width": "fill_container",
+                      "name": "dSpotItem1",
+                      "descendants": {
+                        "b4N6o": {
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=200",
+                            "mode": "fill"
+                          }
+                        },
+                        "fjmr5": {
+                          "content": "Lavender Oversized Blazer"
+                        },
+                        "wKKG8": {
+                          "content": "ZARA · $129"
+                        }
+                      }
+                    },
+                    {
+                      "id": "XX01p",
+                      "type": "ref",
+                      "ref": "vttFv",
+                      "width": "fill_container",
+                      "name": "dSpotItem2",
+                      "descendants": {
+                        "Mbgnw": {
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1542272604-787c3835535d?w=200",
+                            "mode": "fill"
+                          }
+                        },
+                        "1aHQ0": {
+                          "content": "High-Waist Wide Pants"
+                        },
+                        "bMApy": {
+                          "content": "Uniqlo · $49"
+                        }
+                      }
+                    },
+                    {
+                      "id": "CCJie",
+                      "type": "ref",
+                      "ref": "vttFv",
+                      "width": "fill_container",
+                      "name": "dSpotItem3",
+                      "descendants": {
+                        "Mbgnw": {
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=200",
+                            "mode": "fill"
+                          }
+                        },
+                        "1aHQ0": {
+                          "content": "White Leather Sneakers"
+                        },
+                        "bMApy": {
+                          "content": "Nike Air Force 1 · $110"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "hls2v",
+              "name": "spotDetailSection",
+              "width": "fill_container",
+              "fill": "$--secondary",
+              "cornerRadius": "$--radius-card",
+              "layout": "vertical",
+              "gap": 20,
+              "padding": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "jFaBd",
+                  "name": "detailHeader",
+                  "width": "fill_container",
+                  "gap": 20,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "ZIUo8",
+                      "name": "detailImg",
+                      "width": 140,
+                      "height": 180,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400",
+                        "mode": "fill"
+                      },
+                      "cornerRadius": "$--radius-xl"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "KNWLD",
+                      "name": "detailInfo",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 12,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "SQASR",
+                          "name": "badge",
+                          "fill": "$--primary",
+                          "cornerRadius": 4,
+                          "padding": [
+                            4,
+                            10
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "ux3bR",
+                              "name": "dSpotDetailBadgeText",
+                              "fill": "$--primary-foreground",
+                              "content": "EXACT MATCH",
+                              "fontFamily": "Inter",
+                              "fontSize": 10,
+                              "fontWeight": "700",
+                              "letterSpacing": 1
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "KeTVY",
+                          "name": "dSpotDetailTitle",
+                          "fill": "$--foreground",
+                          "content": "Lavender Oversized Blazer",
+                          "fontFamily": "Inter",
+                          "fontSize": 20,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "QgrgM",
+                          "name": "dSpotDetailBrand",
+                          "fill": "$--muted",
+                          "content": "ZARA",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "IDv2d",
+                          "name": "dSpotDetailPrice",
+                          "fill": "$--primary",
+                          "content": "$129.00",
+                          "fontFamily": "Inter",
+                          "fontSize": 24,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "1HzMO",
+                  "name": "tipSection",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 8,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Go7LO",
+                      "name": "dSpotTipLabel",
+                      "fill": "$--muted",
+                      "content": "STYLING TIP",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600",
+                      "letterSpacing": 1
+                    },
+                    {
+                      "type": "text",
+                      "id": "QCor2",
+                      "name": "dSpotTipText",
+                      "fill": "$--foreground",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "This oversized lavender blazer is the statement piece that ties the entire airport look together. Pair with high-waisted wide-leg pants and minimal gold accessories for an effortlessly chic ensemble. The relaxed silhouette balances comfort with high-fashion sensibility.",
+                      "lineHeight": 1.6,
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "WL9LK",
+                  "name": "altsSection",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "KiQfg",
+                      "name": "dSpotAltsLabel",
+                      "fill": "$--muted",
+                      "content": "SIMILAR OPTIONS",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600",
+                      "letterSpacing": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "vLiWy",
+                      "name": "altsRow",
+                      "width": "fill_container",
+                      "gap": 12,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "LkHpG",
+                          "name": "alt1",
+                          "width": 80,
+                          "height": 80,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1583339522870-0d9f28cef33f?w=200",
+                            "mode": "fill"
+                          },
+                          "cornerRadius": "$--radius-lg"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "eJctp",
+                          "name": "alt2",
+                          "width": 80,
+                          "height": 80,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=200",
+                            "mode": "fill"
+                          },
+                          "cornerRadius": "$--radius-lg"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "pTmvz",
+                          "name": "alt3",
+                          "width": 80,
+                          "height": 80,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=200",
+                            "mode": "fill"
+                          },
+                          "cornerRadius": "$--radius-lg"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "zKn3E",
+                          "name": "altMore",
+                          "width": 80,
+                          "height": 80,
+                          "fill": "$--card",
+                          "cornerRadius": "$--radius-lg",
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "s3m62",
+                              "name": "dAltMoreText",
+                              "fill": "$--muted",
+                              "content": "+8",
+                              "fontFamily": "Inter",
+                              "fontSize": 18,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Q9o9x",
+                  "name": "actions",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "6cPxN",
+                      "name": "shopBtn",
+                      "width": "fill_container",
+                      "fill": "$--primary",
+                      "cornerRadius": "$--radius-lg",
+                      "gap": 8,
+                      "padding": [
+                        14,
+                        24
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "aSZl6",
+                          "name": "dSpotShopIcon",
+                          "width": 20,
+                          "height": 20,
+                          "iconFontName": "shopping-bag",
+                          "iconFontFamily": "lucide",
+                          "fill": "$--primary-foreground"
+                        },
+                        {
+                          "type": "text",
+                          "id": "Mxrv3",
+                          "name": "dSpotShopText",
+                          "fill": "$--primary-foreground",
+                          "content": "Shop Now",
+                          "fontFamily": "Inter",
+                          "fontSize": 15,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ulcv0",
+                      "name": "saveBtn",
+                      "fill": "$--card",
+                      "cornerRadius": "$--radius-lg",
+                      "padding": [
+                        14,
+                        20
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "mU5Qr",
+                          "name": "dSpotSaveIcon",
+                          "width": 20,
+                          "height": 20,
+                          "iconFontName": "bookmark",
+                          "iconFontFamily": "lucide",
+                          "fill": "$--foreground"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "pJunZ",
+                      "name": "shareBtn",
+                      "fill": "$--card",
+                      "cornerRadius": "$--radius-lg",
+                      "padding": [
+                        14,
+                        20
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "IJ0i4",
+                          "name": "dSpotShareIcon",
+                          "width": 20,
+                          "height": 20,
+                          "iconFontName": "share-2",
+                          "iconFontFamily": "lucide",
+                          "fill": "$--foreground"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -17980,7 +19318,7 @@
       "type": "frame",
       "id": "iVAEJ",
       "x": 7700,
-      "y": 3400,
+      "y": 3900,
       "name": "Page 8: Login (Desktop)",
       "clip": true,
       "width": 1440,
@@ -18460,6 +19798,993 @@
               "ref": "A30cq",
               "width": 400,
               "name": "loginCardInstDesktop"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "1PdE1",
+      "x": 10999,
+      "y": -2100,
+      "name": "Spot/Solution Components",
+      "width": 800,
+      "fill": "$--background",
+      "layout": "vertical",
+      "gap": 32,
+      "padding": 32,
+      "children": [
+        {
+          "type": "text",
+          "id": "EmY6R",
+          "name": "sectionTitle",
+          "fill": "$--foreground",
+          "content": "Spot / Solution Components",
+          "fontFamily": "$--font-heading",
+          "fontSize": 28,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "zwe5H",
+          "name": "sectionDesc",
+          "fill": "$--muted",
+          "textGrowth": "fixed-width",
+          "width": 600,
+          "content": "Interactive item markers that expand into content cards with styling tips, alternatives, and shopping links",
+          "lineHeight": 1.5,
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "D4Ncy",
+          "name": "SpotCard Variants",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "children": [
+            {
+              "type": "text",
+              "id": "paBbt",
+              "name": "label1",
+              "fill": "$--muted",
+              "content": "SpotCard/Default",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "600",
+              "letterSpacing": 1
+            },
+            {
+              "type": "frame",
+              "id": "vttFv",
+              "name": "SpotCard/Default",
+              "reusable": true,
+              "width": 320,
+              "fill": "$--card",
+              "cornerRadius": "$--radius-xl",
+              "gap": 12,
+              "padding": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Mbgnw",
+                  "name": "thumbnail",
+                  "width": 64,
+                  "height": 64,
+                  "fill": "$--secondary",
+                  "cornerRadius": "$--radius-lg"
+                },
+                {
+                  "type": "frame",
+                  "id": "lQ9WA",
+                  "name": "content",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "1aHQ0",
+                      "name": "title",
+                      "fill": "$--foreground",
+                      "content": "Oversized Lavender Blazer",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "bMApy",
+                      "name": "brand",
+                      "fill": "$--muted",
+                      "content": "ZARA · $129",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "icon_font",
+                  "id": "Lc056",
+                  "name": "arrow",
+                  "width": 20,
+                  "height": 20,
+                  "iconFontName": "chevron-right",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--muted"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "jdw5Z",
+              "name": "label2",
+              "fill": "$--muted",
+              "content": "SpotCard/Active",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "600",
+              "letterSpacing": 1
+            },
+            {
+              "type": "frame",
+              "id": "l4UF1",
+              "name": "SpotCard/Active",
+              "reusable": true,
+              "width": 320,
+              "fill": "$--primary",
+              "cornerRadius": "$--radius-xl",
+              "gap": 12,
+              "padding": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "b4N6o",
+                  "name": "thumbnail",
+                  "width": 64,
+                  "height": 64,
+                  "fill": "#1A1A2E20",
+                  "cornerRadius": "$--radius-lg"
+                },
+                {
+                  "type": "frame",
+                  "id": "hkVyx",
+                  "name": "content",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "fjmr5",
+                      "name": "title",
+                      "fill": "$--primary-foreground",
+                      "content": "Oversized Lavender Blazer",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "wKKG8",
+                      "name": "brand",
+                      "fill": "#1A1A2E80",
+                      "content": "ZARA · $129",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "icon_font",
+                  "id": "EfxY0",
+                  "name": "arrow",
+                  "width": 20,
+                  "height": 20,
+                  "iconFontName": "chevron-right",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--primary-foreground"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "QuKIC",
+              "name": "label3",
+              "fill": "$--muted",
+              "content": "SpotCard/Compact (for lists)",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "600",
+              "letterSpacing": 1
+            },
+            {
+              "type": "frame",
+              "id": "vTeud",
+              "name": "SpotCard/Compact",
+              "reusable": true,
+              "width": 280,
+              "fill": "$--secondary",
+              "cornerRadius": "$--radius-lg",
+              "gap": 10,
+              "padding": 10,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "H2g41",
+                  "name": "number",
+                  "width": 28,
+                  "height": 28,
+                  "fill": "$--primary",
+                  "cornerRadius": 14,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "mUip8",
+                      "name": "numText",
+                      "fill": "$--primary-foreground",
+                      "content": "1",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "hor7I",
+                  "name": "content",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "FidcS",
+                      "name": "title",
+                      "fill": "$--foreground",
+                      "content": "White Sneakers",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "dlB8B",
+                      "name": "brand",
+                      "fill": "$--muted",
+                      "content": "Nike Air Force 1",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "4aVw4",
+          "name": "SpotDetail Variants",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "children": [
+            {
+              "type": "text",
+              "id": "4WJlM",
+              "name": "label4",
+              "fill": "$--muted",
+              "content": "SpotDetail/Default (Expanded Card)",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "600",
+              "letterSpacing": 1
+            },
+            {
+              "type": "frame",
+              "id": "n2HBL",
+              "name": "SpotDetail/Default",
+              "reusable": true,
+              "width": 360,
+              "fill": "$--card",
+              "cornerRadius": "$--radius-card",
+              "layout": "vertical",
+              "gap": 16,
+              "padding": 16,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "5AeAZ",
+                  "name": "header",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "JWfSg",
+                      "name": "image",
+                      "width": 100,
+                      "height": 120,
+                      "fill": "$--secondary",
+                      "cornerRadius": "$--radius-lg"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "CbjAw",
+                      "name": "info",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 8,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "RxlvR",
+                          "name": "badge",
+                          "fill": "$--primary",
+                          "cornerRadius": 4,
+                          "padding": [
+                            4,
+                            8
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "XUKFk",
+                              "name": "badgeText",
+                              "fill": "$--primary-foreground",
+                              "content": "EXACT MATCH",
+                              "fontFamily": "Inter",
+                              "fontSize": 9,
+                              "fontWeight": "700",
+                              "letterSpacing": 1
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "gcfPu",
+                          "name": "title",
+                          "fill": "$--foreground",
+                          "content": "Oversized Lavender Blazer",
+                          "fontFamily": "Inter",
+                          "fontSize": 16,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "SDktq",
+                          "name": "brand",
+                          "fill": "$--muted",
+                          "content": "ZARA",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "vB48y",
+                          "name": "price",
+                          "fill": "$--primary",
+                          "content": "$129.00",
+                          "fontFamily": "Inter",
+                          "fontSize": 18,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "DgfRg",
+                  "name": "description",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 8,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "CR9Ij",
+                      "name": "descLabel",
+                      "fill": "$--muted",
+                      "content": "STYLING TIP",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600",
+                      "letterSpacing": 1
+                    },
+                    {
+                      "type": "text",
+                      "id": "XNBal",
+                      "name": "descText",
+                      "fill": "$--foreground",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Pair this with high-waisted wide-leg pants and minimal gold accessories for an effortlessly chic airport look.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "cLcJt",
+                  "name": "alternatives",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 10,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "63niL",
+                      "name": "altsLabel",
+                      "fill": "$--muted",
+                      "content": "SIMILAR OPTIONS",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600",
+                      "letterSpacing": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Xwepz",
+                      "name": "altsRow",
+                      "width": "fill_container",
+                      "gap": 8,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "8h2Dm",
+                          "name": "alt1",
+                          "width": 56,
+                          "height": 56,
+                          "fill": "$--secondary",
+                          "cornerRadius": "$--radius-md"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "2SR5z",
+                          "name": "alt2",
+                          "width": 56,
+                          "height": 56,
+                          "fill": "$--secondary",
+                          "cornerRadius": "$--radius-md"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "V4NCR",
+                          "name": "alt3",
+                          "width": 56,
+                          "height": 56,
+                          "fill": "$--secondary",
+                          "cornerRadius": "$--radius-md"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "GViIm",
+                          "name": "altMore",
+                          "width": 56,
+                          "height": 56,
+                          "fill": "$--secondary",
+                          "cornerRadius": "$--radius-md",
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "gj2DJ",
+                              "name": "altMoreText",
+                              "fill": "$--muted",
+                              "content": "+5",
+                              "fontFamily": "Inter",
+                              "fontSize": 14,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "mvhx5",
+                  "name": "actions",
+                  "width": "fill_container",
+                  "gap": 10,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "Mzs0y",
+                      "name": "shopBtn",
+                      "width": "fill_container",
+                      "fill": "$--primary",
+                      "cornerRadius": "$--radius-lg",
+                      "gap": 8,
+                      "padding": [
+                        12,
+                        16
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "dmmPy",
+                          "name": "shopIcon",
+                          "width": 18,
+                          "height": 18,
+                          "iconFontName": "shopping-bag",
+                          "iconFontFamily": "lucide",
+                          "fill": "$--primary-foreground"
+                        },
+                        {
+                          "type": "text",
+                          "id": "KWrJI",
+                          "name": "shopText",
+                          "fill": "$--primary-foreground",
+                          "content": "Shop Now",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "0LIO3",
+                      "name": "saveBtn",
+                      "fill": "$--secondary",
+                      "cornerRadius": "$--radius-lg",
+                      "gap": 8,
+                      "padding": [
+                        12,
+                        16
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "9XUmR",
+                          "name": "saveIcon",
+                          "width": 18,
+                          "height": 18,
+                          "iconFontName": "bookmark",
+                          "iconFontFamily": "lucide",
+                          "fill": "$--foreground"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "uOoFV",
+          "name": "SpotSolution Section",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "children": [
+            {
+              "type": "text",
+              "id": "MVZJK",
+              "name": "label5",
+              "fill": "$--muted",
+              "content": "SpotSolution/Section (Mobile)",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "600",
+              "letterSpacing": 1
+            },
+            {
+              "type": "frame",
+              "id": "h72f8",
+              "name": "SpotSolution/Section",
+              "reusable": true,
+              "width": 393,
+              "fill": "$--card",
+              "layout": "vertical",
+              "gap": 16,
+              "padding": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "JgOnw",
+                  "name": "sectionHeader",
+                  "width": "fill_container",
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "y5g1o",
+                      "name": "headerLeft",
+                      "layout": "vertical",
+                      "gap": 4,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "36F2W",
+                          "name": "label",
+                          "fill": "$--muted",
+                          "content": "SPOT SOLUTIONS",
+                          "fontFamily": "Inter",
+                          "fontSize": 9,
+                          "fontWeight": "600",
+                          "letterSpacing": 3
+                        },
+                        {
+                          "type": "text",
+                          "id": "fUYBZ",
+                          "name": "title",
+                          "fill": "$--foreground",
+                          "content": "Decoded Items",
+                          "fontFamily": "Playfair Display",
+                          "fontSize": 24,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "9a3o1",
+                      "name": "viewAll",
+                      "fill": "$--primary",
+                      "content": "View All",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "37OoS",
+                  "name": "spotList",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "children": [
+                    {
+                      "id": "yNfoA",
+                      "type": "ref",
+                      "ref": "vttFv",
+                      "name": "spotItem1",
+                      "width": "fill_container",
+                      "descendants": {
+                        "Mbgnw": {
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=200",
+                            "mode": "fill"
+                          }
+                        },
+                        "1aHQ0": {
+                          "content": "Lavender Oversized Blazer"
+                        },
+                        "bMApy": {
+                          "content": "ZARA · $129"
+                        }
+                      }
+                    },
+                    {
+                      "id": "mFbuC",
+                      "type": "ref",
+                      "ref": "vttFv",
+                      "name": "spotItem2",
+                      "width": "fill_container",
+                      "descendants": {
+                        "Mbgnw": {
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1542272604-787c3835535d?w=200",
+                            "mode": "fill"
+                          }
+                        },
+                        "1aHQ0": {
+                          "content": "Wide-Leg Trousers"
+                        },
+                        "bMApy": {
+                          "content": "Uniqlo · $49"
+                        }
+                      }
+                    },
+                    {
+                      "id": "kXKKk",
+                      "type": "ref",
+                      "ref": "vttFv",
+                      "name": "spotItem3",
+                      "width": "fill_container",
+                      "descendants": {
+                        "Mbgnw": {
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=200",
+                            "mode": "fill"
+                          }
+                        },
+                        "1aHQ0": {
+                          "content": "White Leather Sneakers"
+                        },
+                        "bMApy": {
+                          "content": "Nike · $110"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "4fqIA",
+          "name": "SpotContent Cards",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "children": [
+            {
+              "type": "text",
+              "id": "mzvfh",
+              "name": "label6",
+              "fill": "$--muted",
+              "content": "SpotContent/Card (Featured Spot as Content)",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "600",
+              "letterSpacing": 1
+            },
+            {
+              "type": "frame",
+              "id": "eG29H",
+              "name": "SpotContent/Card",
+              "reusable": true,
+              "clip": true,
+              "width": 320,
+              "fill": "$--card",
+              "cornerRadius": "$--radius-card",
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "jFasJ",
+                  "name": "imageContainer",
+                  "width": "fill_container",
+                  "height": 200,
+                  "layout": "none",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "1Qigl",
+                      "x": 0,
+                      "y": 0,
+                      "name": "imageBg",
+                      "width": 320,
+                      "height": 200,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "https://images.unsplash.com/photo-1617687445812-f21eff24d53c?w=600",
+                        "mode": "fill"
+                      }
+                    },
+                    {
+                      "type": "frame",
+                      "id": "E64rZ",
+                      "x": 0,
+                      "y": 0,
+                      "name": "overlay",
+                      "width": 320,
+                      "height": 200,
+                      "fill": {
+                        "type": "gradient",
+                        "gradientType": "linear",
+                        "enabled": true,
+                        "rotation": 0,
+                        "size": {
+                          "height": 1
+                        },
+                        "colors": [
+                          {
+                            "color": "#00000000",
+                            "position": 0
+                          },
+                          {
+                            "color": "#00000080",
+                            "position": 1
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "id": "n2fY4",
+                      "type": "ref",
+                      "ref": "oicK0",
+                      "x": 120,
+                      "y": 80,
+                      "name": "spotContentHotspot",
+                      "descendants": {
+                        "GgY8x": {
+                          "content": "1"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Q6JPb",
+                  "name": "infoContainer",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "padding": 16,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "V4WCO",
+                      "name": "itemRow",
+                      "width": "fill_container",
+                      "gap": 10,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "GrxUZ",
+                          "name": "number",
+                          "width": 28,
+                          "height": 28,
+                          "fill": "$--primary",
+                          "cornerRadius": 14,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "7qwVo",
+                              "name": "spotContentItemNumText",
+                              "fill": "$--primary-foreground",
+                              "content": "1",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "700"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "oRXxU",
+                          "name": "itemInfo",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 2,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "jvFjX",
+                              "name": "itemTitle",
+                              "fill": "$--foreground",
+                              "content": "Lavender Oversized Blazer",
+                              "fontFamily": "Inter",
+                              "fontSize": 14,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "BYdl5",
+                              "name": "itemBrand",
+                              "fill": "$--muted",
+                              "content": "ZARA · $129",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "deani",
+                      "name": "tipSection",
+                      "width": "fill_container",
+                      "fill": "$--secondary",
+                      "cornerRadius": "$--radius-lg",
+                      "layout": "vertical",
+                      "gap": 6,
+                      "padding": 12,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "OoBda",
+                          "name": "tipLabel",
+                          "fill": "$--muted",
+                          "content": "STYLING TIP",
+                          "fontFamily": "Inter",
+                          "fontSize": 9,
+                          "fontWeight": "600",
+                          "letterSpacing": 1
+                        },
+                        {
+                          "type": "text",
+                          "id": "o10K2",
+                          "name": "tipText",
+                          "fill": "$--foreground",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Perfect for layering over a simple white tee for that effortless airport look.",
+                          "lineHeight": 1.4,
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "EJ415",
+                      "name": "actionBtn",
+                      "width": "fill_container",
+                      "fill": "$--primary",
+                      "cornerRadius": "$--radius-lg",
+                      "gap": 8,
+                      "padding": [
+                        10,
+                        16
+                      ],
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "zQArY",
+                          "name": "actionIcon",
+                          "width": 16,
+                          "height": 16,
+                          "iconFontName": "external-link",
+                          "iconFontFamily": "lucide",
+                          "fill": "$--primary-foreground"
+                        },
+                        {
+                          "type": "text",
+                          "id": "BJxF1",
+                          "name": "actionText",
+                          "fill": "$--primary-foreground",
+                          "content": "View Solution",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
