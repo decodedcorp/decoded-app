@@ -46,7 +46,7 @@ const NAV_ITEMS = [
   { href: "/", label: "Home" },
   { href: "/feed", label: "Feed" },
   { href: "/explore", label: "Explore" },
-  { href: "/request", label: "Request" },
+  { href: "/request/upload", label: "Request" },
 ] as const;
 
 /**

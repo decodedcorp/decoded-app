@@ -445,8 +445,8 @@ export type Database = {
           spot_id: string;
           user_id: string;
           match_type: string | null;
-          product_name: string;
-          brand: string;
+          title: string;
+
           price_amount: number | null;
           price_currency: string; // 'KRW', 'USD', etc.
           original_url: string;
@@ -473,8 +473,8 @@ export type Database = {
           spot_id: string;
           user_id: string;
           match_type?: string | null;
-          product_name: string;
-          brand: string;
+          title: string;
+
           price_amount?: number | null;
           price_currency?: string;
           original_url: string;
@@ -501,8 +501,8 @@ export type Database = {
           spot_id?: string;
           user_id?: string;
           match_type?: string | null;
-          product_name?: string;
-          brand?: string;
+          title?: string;
+
           price_amount?: number | null;
           price_currency?: string;
           original_url?: string;
@@ -646,8 +646,8 @@ export interface ImageRow {
 export interface ItemRow {
   id: number;
   image_id: string;
-  brand: string | null;
-  product_name: string | null;
+
+  title: string | null;
   cropped_image_path: string | null;
   price: string | null;
   description: string | null;
