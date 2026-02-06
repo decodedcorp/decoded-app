@@ -140,11 +140,11 @@ Plans:
 3. Documentation clearly identifies visual differences between implementation and decoded.pen designs
 4. CI pipeline can run visual regression tests on PR creation
 
-**Plans**: 2 plans
+**Plans**: 2 plans (2 waves)
 
 Plans:
-- [ ] v2.1-06-01: Playwright visual testing setup
-- [ ] v2.1-06-02: Screenshot capture automation + documentation
+- [ ] v2.1-06-01-PLAN.md — Playwright visual testing setup (infrastructure, page routes, breakpoints) [Wave 1]
+- [ ] v2.1-06-02-PLAN.md — Screenshot capture automation + documentation [Wave 2]
 
 ---
 
@@ -166,4 +166,4 @@ Plans:
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-06 (Phase 5 complete)*
+*Last updated: 2026-02-06 (Phase 6 planned)*
