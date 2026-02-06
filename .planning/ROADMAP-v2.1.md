@@ -112,17 +112,17 @@ Plans:
 **Success Criteria** (what must be TRUE):
 1. User can sign in with Kakao, Google, or Apple using branded OAuth buttons
 2. User can continue as guest with dedicated guest button
-3. User sees clear "또는" divider between OAuth and guest options
+3. User sees clear "or" divider between OAuth and guest options
 4. User sees decoded.pen styled loading spinner during async operations
 5. User sees skeleton cards while content is loading
 6. User interacts with bottom sheet that follows decoded.pen motion design
 
-**Plans**: 3 plans
+**Plans**: 3 plans (2 waves)
 
 Plans:
-- [ ] v2.1-05-01: OAuthButton + GuestButton + Divider components
-- [ ] v2.1-05-02: LoginCard + LoadingSpinner components
-- [ ] v2.1-05-03: SkeletonCard extensions + BottomSheet upgrade
+- [ ] v2.1-05-01-PLAN.md — OAuthButton + GuestButton + Divider components [Wave 1]
+- [ ] v2.1-05-02-PLAN.md — LoginCard + LoadingSpinner components [Wave 2]
+- [ ] v2.1-05-03-PLAN.md — SkeletonCard extensions + BottomSheet upgrade [Wave 1]
 
 ---
 
@@ -158,7 +158,7 @@ Plans:
 | v2.1-2. Navigation | 2/2 | ✅ Complete | 2026-02-06 |
 | v2.1-3. Cards | 2/2 | ✅ Complete | 2026-02-06 |
 | v2.1-4. Profile & Detail | 2/2 | ✅ Complete | 2026-02-06 |
-| v2.1-5. Login & State | 0/3 | Not started | - |
+| v2.1-5. Login & State | 0/3 | 📋 Planned | - |
 | v2.1-6. Visual QA | 0/2 | Not started | - |
 
 **Total:** 8/13 plans complete
@@ -166,4 +166,4 @@ Plans:
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-06 (Phase 4 complete)*
+*Last updated: 2026-02-06 (Phase 5 planned)*
