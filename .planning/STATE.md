@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 
 ## Current Position
 
-Phase: 5 of 6 (Login & State Components)
-Plan: 3 of 3 in current phase
-Status: Phase complete
-Last activity: 2026-02-06 — Completed v2.1-05 phase (all 3 plans)
+Phase: 6 of 6 (Visual QA Automation)
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-02-06 — Completed v2.1-06-01-PLAN.md
 
-Progress: [████████░░] 84.6% (11/13 plans)
+Progress: [█████████░] 92.3% (12/13 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
-- Average duration: 2m 23s
-- Total execution time: 0.44 hours
+- Total plans completed: 12
+- Average duration: 2m 18s
+- Total execution time: 0.46 hours
 
 **By Phase:**
 
@@ -32,9 +32,10 @@ Progress: [████████░░] 84.6% (11/13 plans)
 | v2.1-03 | 2 | 4m 16s | 2m 8s |
 | v2.1-04 | 2 | 4m 46s | 2m 23s |
 | v2.1-05 | 3 | 5m 34s | 1m 51s |
+| v2.1-06 | 1 | 2m 0s | 2m 0s |
 
 **Recent Trend:**
-- Last 5 plans: 2m 35s, 2m 15s, 1m 34s, 1m 45s
+- Last 5 plans: 2m 15s, 1m 34s, 1m 45s, 2m 0s
 - Trend: Consistent (stable execution times ~2min)
 
 ## Accumulated Context
@@ -72,6 +73,10 @@ Recent decisions affecting current work:
 - v2.1-05-02: LoginCard uses bg-white/5 backdrop-blur-xl for glassmorphism effect
 - v2.1-05-02: LoadingSpinner uses pill shape with bg-neutral-900/80
 - v2.1-05-02: LoginCard composes OAuthButton, GuestButton, Divider from design-system
+- v2.1-06-01: Test 10 core static pages (excluded dynamic routes, modals, debug/lab pages)
+- v2.1-06-01: Use 4 breakpoints: mobile (375x812), tablet (768x1024), desktop (1280x800), desktop-lg (1440x900)
+- v2.1-06-01: 30s timeout per test to accommodate page animations
+- v2.1-06-01: Screenshot-only mode (video disabled) for efficiency
 
 ### Pending Todos
 
@@ -84,7 +89,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Completed v2.1-05-02-PLAN.md (LoginCard & LoadingSpinner)
+Stopped at: Completed v2.1-06-01-PLAN.md (Visual QA Infrastructure)
 Resume file: None
 
 ## Phase Progress
@@ -112,7 +117,9 @@ Resume file: None
 - ✅ LoginCard & LoadingSpinner (login card with glassmorphism, loading indicator)
 - ✅ SkeletonCard & BottomSheet (loading states, bottom sheet)
 
-Ready to proceed to Phase 6: Visual QA Automation
+**Phase 6 In Progress (1/2 plans):**
+- ✅ Visual QA Infrastructure (40 automated tests covering 10 core pages at 4 breakpoints)
+- ⏳ Next: Design validation workflow
 
 ## Quick Tasks Completed
 
@@ -127,4 +134,4 @@ Ready to proceed to Phase 6: Visual QA Automation
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-06 after v2.1-05 phase completion*
+*Last updated: 2026-02-06 after v2.1-06-01 plan completion*
