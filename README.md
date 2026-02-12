@@ -195,55 +195,62 @@ yarn type-check
 ## 📦 Project Structure
 
 ```
-src/
-├── app/           # Next.js app router pages
-├── domains/       # Feature-based modules (auth, channels, profile, etc.)
-├── shared/        # Shared components and utilities
-├── styles/        # Global styles and design tokens
-├── lib/           # Library utilities and hooks
-├── store/         # Zustand state management
-├── constants/     # Application constants
-└── types/         # TypeScript type definitions
+packages/web/
+├── app/                    # Next.js App Router pages
+│   ├── @modal/             # Parallel route for modals
+│   ├── api/v1/             # API routes
+│   ├── explore/            # Explore grid view
+│   ├── feed/               # Social feed
+│   ├── images/             # Image discovery & detail
+│   ├── login/              # OAuth authentication
+│   ├── posts/              # Post detail
+│   ├── profile/            # User profile
+│   ├── request/            # Upload & AI detection flow
+│   ├── search/             # Full-screen search overlay
+│   └── lab/                # Experimental features
+├── lib/
+│   ├── api/                # API client functions
+│   ├── components/         # Feature-based components
+│   ├── design-system/      # v2.0 Design System (35 components)
+│   ├── hooks/              # Custom React hooks
+│   ├── stores/             # Zustand state stores
+│   ├── supabase/           # Supabase client + queries
+│   └── utils/              # Utility functions
+└── __tests__/              # Test files
 
-specs/             # Spec-driven development specs
-├── feature/       # Feature specifications
-├── bugfix/        # Bugfix specifications
-└── experiment/    # Experiment specifications
+packages/shared/            # Shared types, hooks, utilities
+
+specs/                      # Spec-driven development specs
+├── feature/                # Feature specifications
+├── bugfix/                 # Bugfix specifications
+└── experiment/             # Experiment specifications
 
 docs/
-├── adr/           # Architecture Decision Records
-└── ai-playbook/   # AI tool usage guides
+├── adr/                    # Architecture Decision Records
+└── ai-playbook/            # AI tool usage guides
 
 .cursor/
-├── rules/         # Cursor AI rules
-├── cli-config.json # Cursor CLI configuration
-└── mcp.json       # MCP server configuration
+├── rules/                  # Cursor AI rules
+├── cli-config.json         # Cursor CLI configuration
+└── mcp.json                # MCP server configuration
 
 .codex/
-└── config.toml   # Codex CLI configuration template
+└── config.toml             # Codex CLI configuration template
 
 .claude/
 ├── settings.json           # Claude Code settings
 └── settings.local.json.example # Local settings template
 ```
 
-## 📦 Package Management: Yarn Berry PnP
+## 📦 Package Management: Yarn 4 (node-modules)
 
-This project uses **Yarn Berry (v4.9.2) with Plug'n'Play (PnP)** mode, following [Toss's best practices](https://toss.tech/article/node-modules-and-yarn-berry).
-
-### Key Benefits
-
-- **Zero-Install**: Dependencies are version-controlled (`.pnp.cjs`, `.yarn/cache/`) - no `yarn install` needed after clone
-- **Faster CI/CD**: Saves 60-90 seconds per build (no dependency installation step)
-- **Guaranteed Correctness**: No phantom dependencies, strict dependency validation
-- **Smaller Repository**: ~139MB vs ~1.2GB with node_modules (2,000 zip files vs 135,000 files)
-- **Better Performance**: Faster dependency resolution, no deep directory traversal
+This project uses **Yarn 4.9.2** with the `node-modules` linker.
 
 ### Configuration
 
-- **PnP Mode**: `nodeLinker: pnp` in `.yarnrc.yml`
-- **Loose Mode**: `pnpMode: loose` for compatibility
-- **Zero-Install**: `.pnp.cjs` and `.yarn/cache/` are committed to Git
+- **Node Modules Linker**: `nodeLinker: node-modules` in `.yarnrc.yml`
+- **Standard npm-style layout**: Dependencies installed to `node_modules/` directory
+- **Local Cache**: `enableGlobalCache: false` for development
 
 ### Usage
 
@@ -257,7 +264,7 @@ yarn add -D <package-name>
 # Update dependencies
 yarn upgrade
 
-# Run scripts (no node_modules needed!)
+# Run scripts
 yarn dev
 yarn build
 yarn test
@@ -266,18 +273,21 @@ yarn test
 ### Important Notes
 
 - **Never use `npm`** - Always use `yarn` commands
-- **No `node_modules` directory** - Dependencies resolved via PnP
 - **For CLI tools**: Use `yarn dlx` instead of `npx`
-- **IDE Support**: Install [ZipFS extension](https://marketplace.visualstudio.com/items?itemName=arcanis.vscode-zipfs) for VS Code/Cursor
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: Next.js 15.4.1, React 19.1.0, TypeScript 5.9.2
-- **Styling**: Tailwind CSS 4.1.11 with custom design system
-- **State Management**: Zustand 5.0.6, React Query 5.83.0
-- **Testing**: Playwright 1.55.0
-- **Build Tools**: Yarn 4.9.2 (PnP), ESLint, TypeScript
-- **Deployment**: Vercel
+- **Frontend**: Next.js 16.0.7, React 18.3.1, TypeScript 5.9.3
+- **Styling**: Tailwind CSS 3.4.18, CVA 0.7.1, tailwind-merge 3.4.0
+- **State Management**: Zustand 4.5.7, React Query 5.90.11, React Query DevTools 5.91.1
+- **Backend**: Supabase 2.86.0, Auth Helpers 0.15.0
+- **Animations**: GSAP 3.13.0, Motion 12.23.12, Lenis 1.3.15
+- **UI Libraries**: Lucide React 0.555.0, React Icons 5.5.0, Radix UI, Sonner 2.0.7
+- **3D/Media**: Three.js 0.167.1, browser-image-compression 2.0.2
+- **Theme**: next-themes 0.4.6
+- **Testing**: Playwright 1.58.1
+- **Linting**: ESLint 9.39.1, Prettier 3.6.2
+- **Package Manager**: Yarn 4.9.2 (node-modules linker)
 
 ## 📝 License
 
