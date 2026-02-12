@@ -10,7 +10,7 @@ import { SocialActions } from "@/lib/components/shared/SocialActions";
 import { CommentSection } from "@/lib/components/shared/CommentSection";
 import { AccountAvatar } from "@/lib/components/shared/AccountAvatar";
 import { FollowButton } from "@/lib/components/shared/FollowButton";
-import { useRelatedImagesByAccount } from "@/lib/hooks/useImages";
+import { useInfinitePosts } from "@/lib/hooks/usePosts";
 import { Heading, Text } from "@/lib/design-system";
 import { Package } from "lucide-react";
 import { useRef } from "react";
@@ -54,15 +54,26 @@ export function PostDetailContent({ postDetail }: Props) {
   // Display name: prefer artist_name, fallback to group_name
   const displayName = post.artist_name || post.group_name || "Unknown";
 
-  // Fetch related images from same account for Gallery + Related Looks
-  const { data: relatedImages } = useRelatedImagesByAccount(
-    post.id,
-    displayName
-  );
+  // Fetch related posts from same artist for Gallery + Related Looks
+  const { data: relatedPostsData } = useInfinitePosts({
+    perPage: 12,
+    artistName: displayName,
+  });
 
-  // Derive gallery and related look images
-  const galleryImages = relatedImages?.slice(0, 5) ?? [];
-  const relatedLookImages = relatedImages?.slice(5) ?? [];
+  // Flatten and filter out current post
+  const allRelatedPosts =
+    relatedPostsData?.pages.flatMap((page) => page.items) ?? [];
+  const relatedPosts = allRelatedPosts.filter((p) => p.id !== post.id);
+
+  // Derive gallery and related look images (map to expected format)
+  const galleryImages = relatedPosts.slice(0, 5).map((p) => ({
+    id: p.id,
+    image_url: p.image_url,
+  }));
+  const relatedLookImages = relatedPosts.slice(5).map((p) => ({
+    id: p.id,
+    image_url: p.image_url,
+  }));
 
   // Extract metadata tags from media_metadata if available
   const metadataTags = extractMetadataTags(post.media_metadata);

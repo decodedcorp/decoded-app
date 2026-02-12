@@ -124,7 +124,7 @@ function RelatedLookCard({
 }) {
   return (
     <Link
-      href={`/images/${image.id}`}
+      href={`/posts/${image.id}`}
       className={`related-look-card block relative ${heightClass} rounded-xl overflow-hidden bg-muted group`}
     >
       {image.image_url ? (

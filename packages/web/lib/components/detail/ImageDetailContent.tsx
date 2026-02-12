@@ -613,7 +613,7 @@ export function ImageDetailContent({
       {/* Related Images Section - Always show if account is available */}
       {image.postImages?.[0]?.post?.account && (
         <RelatedImages
-          currentImageId={image.id}
+          currentPostId={image.id}
           account={image.postImages[0].post.account}
           isModal={isModal}
         />

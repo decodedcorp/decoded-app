@@ -158,7 +158,7 @@ function GalleryImageCard({
 
   if (image.id) {
     return (
-      <Link href={`/images/${image.id}`} className="block">
+      <Link href={`/posts/${image.id}`} className="block">
         {content}
       </Link>
     );

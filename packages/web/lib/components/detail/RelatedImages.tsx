@@ -1,6 +1,6 @@
 "use client";
 
-import { useRelatedImagesByAccount } from "@/lib/hooks/useImages";
+import { useInfinitePosts } from "@/lib/hooks/usePosts";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
@@ -15,27 +15,32 @@ if (typeof window !== "undefined") {
 }
 
 type Props = {
-  currentImageId: string;
+  currentPostId: string;
   account: string;
   isModal?: boolean;
 };
 
 export function RelatedImages({
-  currentImageId,
+  currentPostId,
   account,
   isModal = false,
 }: Props) {
-  const { data: images, isLoading } = useRelatedImagesByAccount(
-    currentImageId,
-    account
-  );
+  const { data: postsData, isLoading } = useInfinitePosts({
+    perPage: 12,
+    artistName: account,
+  });
+
   const sectionRef = useRef<HTMLDivElement>(null);
   const [expanded, setExpanded] = useState(false);
 
+  // Flatten and filter out current post
+  const allPosts = postsData?.pages.flatMap((page) => page.items) ?? [];
+  const posts = allPosts.filter((p) => p.id !== currentPostId);
+
   // Initial visible count - show 6-9 items
   const INITIAL_COUNT = 9;
-  const visibleImages = expanded ? images : images?.slice(0, INITIAL_COUNT);
-  const hasMore = images && images.length > INITIAL_COUNT;
+  const visiblePosts = expanded ? posts : posts?.slice(0, INITIAL_COUNT);
+  const hasMore = posts && posts.length > INITIAL_COUNT;
 
   useGSAP(
     () => {
@@ -43,8 +48,8 @@ export function RelatedImages({
       if (
         isModal ||
         !sectionRef.current ||
-        !visibleImages ||
-        visibleImages.length === 0
+        !visiblePosts ||
+        visiblePosts.length === 0
       )
         return;
 
@@ -78,7 +83,7 @@ export function RelatedImages({
         );
       }
     },
-    { scope: sectionRef, dependencies: [visibleImages, expanded, isModal] }
+    { scope: sectionRef, dependencies: [visiblePosts, expanded, isModal] }
   );
 
   if (isLoading) {
@@ -105,7 +110,7 @@ export function RelatedImages({
     );
   }
 
-  if (!images || images.length === 0) {
+  if (!posts || posts.length === 0) {
     return (
       <section
         className={`py-12 md:py-16 ${
@@ -131,21 +136,21 @@ export function RelatedImages({
         <p className="text-sm text-muted-foreground mb-6">From @{account}</p>
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-8">
-          {visibleImages?.map((image) => {
+          {visiblePosts?.map((post) => {
             const CardWrapper = isModal ? "a" : Link;
             const cardProps = isModal
-              ? { href: `/images/${image.id}` }
-              : { href: `/images/${image.id}` };
+              ? { href: `/posts/${post.id}` }
+              : { href: `/posts/${post.id}` };
 
             return (
               <CardWrapper
-                key={image.id}
+                key={post.id}
                 {...cardProps}
                 className="related-card group block relative aspect-[4/5] overflow-hidden rounded-lg bg-muted"
               >
-                {image.image_url ? (
+                {post.image_url ? (
                   <Image
-                    src={image.image_url}
+                    src={post.image_url}
                     alt={`Post by @${account}`}
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
