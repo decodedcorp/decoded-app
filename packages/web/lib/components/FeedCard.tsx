@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 import Link from "next/link";
 import { gsap } from "gsap";
 import { Flip } from "gsap/Flip";
@@ -97,6 +97,24 @@ export const FeedCard = memo(
     const { data: spotsData } = useSpots(item.postId!, {
       enabled: !!item.hasItems && !!item.postId,
     });
+
+    // Generate mockup spots when no real data exists
+    const spots = useMemo(() => {
+      if (spotsData && spotsData.length > 0) return spotsData;
+      if (!hasItems) return [];
+
+      // Deterministic pseudo-random from id
+      const seed = id
+        ? id.split("").reduce((acc, ch) => acc + ch.charCodeAt(0), 0)
+        : 0;
+      const count = (seed % 3) + 1; // 1-3 spots
+      return Array.from({ length: count }, (_, i) => ({
+        id: `mock-${id}-${i}`,
+        position_left: String(20 + (((seed * (i + 1) * 37) % 60))),
+        position_top: String(25 + (((seed * (i + 1) * 53) % 50))),
+        category: null as null,
+      }));
+    }, [spotsData, hasItems, id]);
 
     const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
       if (!id) return;
@@ -204,9 +222,9 @@ export const FeedCard = memo(
           )}
 
           {/* Subtle spot indicators */}
-          {spotsData && spotsData.length > 0 && (
+          {spots.length > 0 && (
             <div className="absolute inset-0 pointer-events-none z-10">
-              {spotsData.map((spot) => (
+              {spots.map((spot) => (
                 <Hotspot
                   key={spot.id}
                   variant="inactive"
