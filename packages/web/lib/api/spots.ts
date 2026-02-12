@@ -26,7 +26,7 @@ export async function fetchSpots(postId: string): Promise<Spot[]> {
   const response = await apiClient<SpotListResponse>({
     path: `/api/v1/posts/${postId}/spots`,
     method: "GET",
-    requiresAuth: false,  // Public data
+    requiresAuth: false, // Public data
   });
   return response.data;
 }

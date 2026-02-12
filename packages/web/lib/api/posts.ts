@@ -275,7 +275,8 @@ export async function createPostWithFile(
     let errorMessage = "포스트 생성에 실패했습니다.";
     try {
       const errorJson = JSON.parse(responseText);
-      errorMessage = errorJson.message || errorJson.error?.message || errorMessage;
+      errorMessage =
+        errorJson.message || errorJson.error?.message || errorMessage;
     } catch {
       errorMessage = responseText || errorMessage;
     }

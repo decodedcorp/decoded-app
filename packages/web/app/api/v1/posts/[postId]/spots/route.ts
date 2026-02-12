@@ -30,12 +30,15 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   const { postId } = await params;
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/posts/${postId}/spots`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/api/v1/posts/${postId}/spots`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     const data = await response.json();
     return NextResponse.json(data, { status: response.status });
@@ -74,14 +77,17 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
     const body = await request.json();
 
-    const response = await fetch(`${API_BASE_URL}/api/v1/posts/${postId}/spots`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: authHeader,
-      },
-      body: JSON.stringify(body),
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/api/v1/posts/${postId}/spots`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: authHeader,
+        },
+        body: JSON.stringify(body),
+      }
+    );
 
     const data = await response.json();
     return NextResponse.json(data, { status: response.status });

@@ -332,10 +332,10 @@ export interface ExtractPostMetadataResponse {
 export interface Spot {
   id: string;
   post_id: string;
-  position_left: string;  // e.g., "45.5%"
-  position_top: string;   // e.g., "30.2%"
+  position_left: string; // e.g., "45.5%"
+  position_top: string; // e.g., "30.2%"
   category_id: string;
-  category?: Category;    // Populated on GET
+  category?: Category; // Populated on GET
   solution_count: number;
   created_at: string;
 }
@@ -386,7 +386,7 @@ export interface Solution {
   id: string;
   spot_id: string;
   user_id: string;
-  user?: PostUser;           // Populated on GET
+  user?: PostUser; // Populated on GET
   product_url: string;
   affiliate_url: string | null;
   product_name: string | null;

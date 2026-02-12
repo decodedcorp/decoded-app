@@ -93,9 +93,7 @@ export function useUpdateSpot() {
       // Update in cache
       queryClient.setQueryData<Spot[]>(spotKeys.list(postId), (old) =>
         old
-          ? old.map((spot) =>
-              spot.id === updatedSpot.id ? updatedSpot : spot
-            )
+          ? old.map((spot) => (spot.id === updatedSpot.id ? updatedSpot : spot))
           : [updatedSpot]
       );
     },

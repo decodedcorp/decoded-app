@@ -69,9 +69,8 @@ export function useCreateSolution() {
       createSolution(spotId, data),
     onSuccess: (newSolution, { spotId }) => {
       // Add to cache
-      queryClient.setQueryData<Solution[]>(
-        solutionKeys.list(spotId),
-        (old) => (old ? [...old, newSolution] : [newSolution])
+      queryClient.setQueryData<Solution[]>(solutionKeys.list(spotId), (old) =>
+        old ? [...old, newSolution] : [newSolution]
       );
       // Invalidate to ensure fresh data
       queryClient.invalidateQueries({ queryKey: solutionKeys.list(spotId) });
@@ -100,14 +99,12 @@ export function useUpdateSolution() {
       updateSolution(solutionId, data),
     onSuccess: (updatedSolution, { spotId }) => {
       // Update in cache
-      queryClient.setQueryData<Solution[]>(
-        solutionKeys.list(spotId),
-        (old) =>
-          old
-            ? old.map((sol) =>
-                sol.id === updatedSolution.id ? updatedSolution : sol
-              )
-            : [updatedSolution]
+      queryClient.setQueryData<Solution[]>(solutionKeys.list(spotId), (old) =>
+        old
+          ? old.map((sol) =>
+              sol.id === updatedSolution.id ? updatedSolution : sol
+            )
+          : [updatedSolution]
       );
     },
     onError: (error) => {
@@ -133,9 +130,8 @@ export function useDeleteSolution() {
       deleteSolution(solutionId),
     onSuccess: (_, { solutionId, spotId }) => {
       // Remove from cache
-      queryClient.setQueryData<Solution[]>(
-        solutionKeys.list(spotId),
-        (old) => (old ? old.filter((sol) => sol.id !== solutionId) : [])
+      queryClient.setQueryData<Solution[]>(solutionKeys.list(spotId), (old) =>
+        old ? old.filter((sol) => sol.id !== solutionId) : []
       );
     },
     onError: (error) => {
