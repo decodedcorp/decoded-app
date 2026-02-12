@@ -3,6 +3,21 @@ import { cn } from "@/lib/utils";
 import { forwardRef } from "react";
 
 /**
+ * Generate consistent brand color from brand name using deterministic hash
+ *
+ * @param brand - Brand name string
+ * @returns HSL color string (e.g., "hsl(210, 70%, 50%)")
+ */
+export function brandToColor(brand: string): string {
+  let hash = 0;
+  for (let i = 0; i < brand.length; i++) {
+    hash = brand.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const hue = Math.abs(hash) % 360;
+  return `hsl(${hue}, 70%, 50%)`;
+}
+
+/**
  * Hotspot Variants
  *
  * Interactive marker component for identifying items on images.
@@ -12,6 +27,11 @@ import { forwardRef } from "react";
  * - Hotspot/Default: 24x24px, primary fill (#CFFF4C), circle, pulsing animation
  * - Hotspot/Numbered: 32x32px, primary fill, shows number (Inter 14px fontWeight 600)
  * - Hotspot/Inactive: 24x24px, primary at 50% opacity, no animation
+ *
+ * Enhanced features:
+ * - Selected state with scale and glow
+ * - Reveal animation with delay for staggered entry
+ * - Brand color glow effect
  *
  * @see docs/design-system/decoded.pen
  */
@@ -58,6 +78,14 @@ export interface HotspotProps
   label?: string;
   /** Optional brand color override (CSS color value, e.g., '#FF0000', 'rgb(...)', 'hsl(...)') */
   color?: string;
+  /** Selected state - applies scale-125 and enhanced glow */
+  selected?: boolean;
+  /** Trigger spot-reveal entry animation */
+  revealing?: boolean;
+  /** Animation delay in milliseconds (for stagger based on Y position) */
+  revealDelay?: number;
+  /** Enable glow boxShadow effect */
+  glow?: boolean;
 }
 
 /**
@@ -80,30 +108,37 @@ export interface HotspotProps
  * </div>
  *
  * @example
- * // Numbered hotspot
+ * // Numbered hotspot with brand color and glow
  * <Hotspot
  *   variant="numbered"
  *   number={1}
  *   position={{ x: 20, y: 40 }}
+ *   color={brandToColor("NIKE")}
+ *   glow={true}
  *   onClick={handleClick}
  *   label="Item 1: Sneakers"
  * />
  *
  * @example
- * // Inactive (already selected) hotspot
+ * // Selected hotspot with enhanced glow
  * <Hotspot
- *   variant="inactive"
+ *   variant="numbered"
+ *   number={2}
  *   position={{ x: 50, y: 50 }}
+ *   selected={true}
+ *   glow={true}
  *   label="Selected item"
  * />
  *
  * @example
- * // Numbered hotspot with brand color
+ * // Revealing hotspot with staggered animation
  * <Hotspot
  *   variant="numbered"
- *   number={1}
- *   position={{ x: 30, y: 50 }}
- *   color="hsl(210, 70%, 50%)"
+ *   number={3}
+ *   position={{ x: 30, y: 70 }}
+ *   revealing={true}
+ *   revealDelay={700}
+ *   glow={true}
  *   label="NIKE: Air Max 90"
  *   onClick={handleClick}
  * />
@@ -117,6 +152,10 @@ export const Hotspot = forwardRef<HTMLButtonElement, HotspotProps>(
       number,
       label,
       color,
+      selected = false,
+      revealing = false,
+      revealDelay = 0,
+      glow = false,
       style,
       ...props
     },
@@ -130,17 +169,40 @@ export const Hotspot = forwardRef<HTMLButtonElement, HotspotProps>(
     const displayNumber =
       number !== undefined ? Math.max(1, Math.min(99, number)) : undefined;
 
+    // Set CSS custom property for glow color
+    const hotspotColor = color || "oklch(0.9519 0.1739 115.8446)";
+
+    // Calculate glow shadow
+    const glowShadow = glow
+      ? selected
+        ? `0 0 12px ${hotspotColor}, 0 0 24px color-mix(in oklch, ${hotspotColor} 50%, transparent)`
+        : `0 0 8px color-mix(in oklch, ${hotspotColor} 50%, transparent)`
+      : undefined;
+
     return (
       <button
         ref={ref}
         type="button"
-        className={cn(hotspotVariants({ variant }), className)}
+        className={cn(
+          hotspotVariants({ variant }),
+          revealing && "animate-spot-reveal",
+          selected && "scale-125",
+          className
+        )}
         style={{
           left: `${clampedX}%`,
           top: `${clampedY}%`,
           // Center the hotspot on the position point
           transform: "translate(-50%, -50%)",
           ...(color ? { backgroundColor: color } : {}),
+          ...(revealing
+            ? {
+                opacity: 0,
+                animationDelay: `${revealDelay}ms`,
+              }
+            : {}),
+          ...(glowShadow ? { boxShadow: glowShadow } : {}),
+          ["--hotspot-color" as string]: hotspotColor,
           ...style,
         }}
         aria-label={

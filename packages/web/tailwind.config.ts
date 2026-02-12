@@ -118,6 +118,7 @@ const config: Config = {
       },
       animation: {
         "pulse-soft": "pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "spot-reveal": "spot-reveal 0.4s ease-out forwards",
       },
       keyframes: {
         "pulse-soft": {
@@ -128,6 +129,20 @@ const config: Config = {
           "50%": {
             transform: "translate(-50%, -50%) scale(1.15)",
             opacity: "0.8",
+          },
+        },
+        "spot-reveal": {
+          "0%": {
+            opacity: "0",
+            transform: "translate(-50%, -50%) scale(0)",
+          },
+          "50%": {
+            opacity: "1",
+            transform: "translate(-50%, -50%) scale(1.3)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translate(-50%, -50%) scale(1)",
           },
         },
       },
