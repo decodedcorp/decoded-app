@@ -14,7 +14,6 @@ import {
   ProfileDesktopLayout,
   ActivityTabs,
   ActivityContent,
-  EmptyState,
   type ActivityTab,
   ProfileBio,
   FollowStats,
@@ -212,15 +211,6 @@ export function ProfileClient() {
     return <ProfileError error={error} onRetry={handleRetry} />;
   }
 
-  // Placeholder data for activity tabs
-  // TODO: Connect to useUserActivities hook when implementing activity tabs
-  const tabHasContent: Record<ActivityTab, boolean> = {
-    posts: false,
-    spots: false,
-    solutions: false,
-    saved: false,
-  };
-
   const renderTabContent = () => {
     switch (activeTab) {
       case "posts":
@@ -249,7 +239,9 @@ export function ProfileClient() {
             onClick={async () => {
               try {
                 await navigator.clipboard.writeText(window.location.href);
-              } catch {}
+              } catch (_) {
+                // Clipboard API not available
+              }
             }}
             className="p-2 rounded-lg hover:bg-accent"
             aria-label="Share profile"

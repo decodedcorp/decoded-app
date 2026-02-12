@@ -88,6 +88,19 @@ export function DesktopHeader({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [dropdownOpen]);
 
+  // Close dropdown on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && dropdownOpen) {
+        setDropdownOpen(false);
+      }
+    };
+    if (dropdownOpen) {
+      document.addEventListener("keydown", handleKeyDown);
+    }
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [dropdownOpen]);
+
   return (
     <header
       className={cn(desktopHeaderVariants({ variant }), className)}
@@ -156,7 +169,10 @@ export function DesktopHeader({
                 aria-label="Notifications"
               >
                 <Bell className="h-5 w-5 text-muted-foreground" />
-                <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500" />
+                <span
+                  className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500"
+                  aria-hidden="true"
+                />
               </button>
 
               {/* User Avatar with Dropdown */}
@@ -166,6 +182,7 @@ export function DesktopHeader({
                   className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
                   aria-label="User menu"
                   aria-expanded={dropdownOpen}
+                  aria-haspopup="menu"
                 >
                   <span className="text-sm font-medium text-primary">
                     {user.name.charAt(0).toUpperCase()}
@@ -174,7 +191,10 @@ export function DesktopHeader({
 
                 {/* Dropdown menu */}
                 {dropdownOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-48 rounded-lg border border-border bg-card shadow-lg py-1 z-50">
+                  <div
+                    role="menu"
+                    className="absolute right-0 top-full mt-2 w-48 rounded-lg border border-border bg-card shadow-lg py-1 z-50"
+                  >
                     <div className="px-3 py-2 border-b border-border">
                       <p className="text-sm font-medium truncate">
                         {user.name}
@@ -185,6 +205,7 @@ export function DesktopHeader({
                     </div>
                     <Link
                       href="/profile"
+                      role="menuitem"
                       className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-accent transition-colors"
                       onClick={() => setDropdownOpen(false)}
                     >
@@ -193,6 +214,7 @@ export function DesktopHeader({
                     </Link>
                     <Link
                       href="/profile?tab=activity"
+                      role="menuitem"
                       className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-accent transition-colors"
                       onClick={() => setDropdownOpen(false)}
                     >
@@ -201,6 +223,7 @@ export function DesktopHeader({
                     </Link>
                     <Link
                       href="/profile?tab=settings"
+                      role="menuitem"
                       className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-accent transition-colors"
                       onClick={() => setDropdownOpen(false)}
                     >
@@ -209,6 +232,7 @@ export function DesktopHeader({
                     </Link>
                     <div className="border-t border-border my-1" />
                     <button
+                      role="menuitem"
                       onClick={() => {
                         setDropdownOpen(false);
                         useAuthStore.getState().logout();

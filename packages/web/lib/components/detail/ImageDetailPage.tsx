@@ -7,8 +7,9 @@ import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { useRouter } from "next/navigation";
 import { X, Share2, Heart, Bookmark } from "lucide-react";
-import { ReportErrorButton } from "./ReportErrorButton"; // Import ReportErrorButton
+import { ReportErrorButton } from "./ReportErrorButton";
 import { Lightbox } from "./Lightbox";
+import { ErrorState } from "@/lib/components/shared";
 
 type Props = {
   imageId: string;
@@ -73,20 +74,29 @@ export function ImageDetailPage({ imageId }: Props) {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-muted-foreground">Loading...</div>
+      <div
+        className="flex min-h-screen items-center justify-center"
+        aria-busy="true"
+      >
+        <div className="space-y-4 w-full max-w-2xl px-4">
+          <div className="aspect-[3/4] w-full animate-pulse rounded-2xl bg-muted" />
+          <div className="space-y-2">
+            <div className="h-6 w-3/4 animate-pulse rounded bg-muted" />
+            <div className="h-4 w-1/2 animate-pulse rounded bg-muted" />
+          </div>
+        </div>
       </div>
     );
   }
 
   if (error || !image) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <p className="mb-4 text-lg text-destructive">
-            {error instanceof Error ? error.message : "Failed to load image"}
-          </p>
-        </div>
+      <div className="flex min-h-screen items-center justify-center p-4">
+        <ErrorState
+          message="Failed to load image"
+          details={error instanceof Error ? error.message : undefined}
+          onRetry={() => window.location.reload()}
+        />
       </div>
     );
   }

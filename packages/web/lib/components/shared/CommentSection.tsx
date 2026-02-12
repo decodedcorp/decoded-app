@@ -85,10 +85,16 @@ function CommentItem({
         </div>
         <p className="text-sm text-foreground/90 mt-0.5">{comment.text}</p>
         <div className="flex items-center gap-3 mt-1.5">
-          <button className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+          <button
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            aria-label={`Like comment by ${comment.author.name}`}
+          >
             Like ({comment.likes})
           </button>
-          <button className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+          <button
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            aria-label={`Reply to ${comment.author.name}`}
+          >
             Reply
           </button>
           <button

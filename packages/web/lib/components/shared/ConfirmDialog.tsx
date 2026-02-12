@@ -32,9 +32,17 @@ export function ConfirmDialog({
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       onClick={onClose}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") {
+          onClose();
+        }
+      }}
     >
-      <div className="absolute inset-0 bg-black/60" />
+      <div className="absolute inset-0 bg-black/60" aria-hidden="true" />
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="confirm-dialog-title"
         className={cn(
           "relative w-full max-w-sm bg-card rounded-2xl p-6 space-y-4",
           className
@@ -42,7 +50,9 @@ export function ConfirmDialog({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between">
-          <h3 className="text-lg font-semibold pr-8">{title}</h3>
+          <h3 id="confirm-dialog-title" className="text-lg font-semibold pr-8">
+            {title}
+          </h3>
           <button
             onClick={onClose}
             className="p-1 rounded-full hover:bg-accent transition-colors"

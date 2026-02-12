@@ -90,6 +90,8 @@ export function ExploreFilterBar({
         <div className="relative flex-shrink-0">
           <button
             onClick={() => toggleDropdown(1)}
+            aria-expanded={openDropdown === 1}
+            aria-haspopup="listbox"
             className={cn(
               "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors border",
               category
@@ -106,10 +108,15 @@ export function ExploreFilterBar({
             />
           </button>
           {openDropdown === 1 && (
-            <div className="absolute top-full left-0 mt-1 z-50 min-w-[160px] rounded-lg border border-border bg-card shadow-lg py-1">
+            <div
+              role="listbox"
+              className="absolute top-full left-0 mt-1 z-50 min-w-[160px] rounded-lg border border-border bg-card shadow-lg py-1"
+            >
               {categories.map((cat) => (
                 <button
                   key={cat.id}
+                  role="option"
+                  aria-selected={category === cat.id}
                   onClick={() => handleCategorySelect(cat.id)}
                   className={cn(
                     "w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors flex items-center justify-between",
@@ -131,6 +138,8 @@ export function ExploreFilterBar({
           <div className="relative flex-shrink-0">
             <button
               onClick={() => toggleDropdown(2)}
+              aria-expanded={openDropdown === 2}
+              aria-haspopup="listbox"
               className={cn(
                 "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors border",
                 mediaId
@@ -147,10 +156,15 @@ export function ExploreFilterBar({
               />
             </button>
             {openDropdown === 2 && (
-              <div className="absolute top-full left-0 mt-1 z-50 min-w-[180px] rounded-lg border border-border bg-card shadow-lg py-1 max-h-[240px] overflow-y-auto">
+              <div
+                role="listbox"
+                className="absolute top-full left-0 mt-1 z-50 min-w-[180px] rounded-lg border border-border bg-card shadow-lg py-1 max-h-[240px] overflow-y-auto"
+              >
                 {mediaOptions.map((m) => (
                   <button
                     key={m.id}
+                    role="option"
+                    aria-selected={mediaId === m.id}
                     onClick={() => handleMediaSelect(m.id, m.name, m.nameKo)}
                     className={cn(
                       "w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors flex items-center justify-between",
@@ -173,6 +187,8 @@ export function ExploreFilterBar({
           <div className="relative flex-shrink-0">
             <button
               onClick={() => toggleDropdown(3)}
+              aria-expanded={openDropdown === 3}
+              aria-haspopup="listbox"
               className={cn(
                 "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors border",
                 castId
@@ -189,10 +205,15 @@ export function ExploreFilterBar({
               />
             </button>
             {openDropdown === 3 && (
-              <div className="absolute top-full left-0 mt-1 z-50 min-w-[160px] rounded-lg border border-border bg-card shadow-lg py-1 max-h-[240px] overflow-y-auto">
+              <div
+                role="listbox"
+                className="absolute top-full left-0 mt-1 z-50 min-w-[160px] rounded-lg border border-border bg-card shadow-lg py-1 max-h-[240px] overflow-y-auto"
+              >
                 {castOptions.map((c) => (
                   <button
                     key={c.id}
+                    role="option"
+                    aria-selected={castId === c.id}
                     onClick={() => handleCastSelect(c.id, c.name, c.nameKo)}
                     className={cn(
                       "w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors flex items-center justify-between",
@@ -215,6 +236,8 @@ export function ExploreFilterBar({
           <div className="relative flex-shrink-0">
             <button
               onClick={() => toggleDropdown(4)}
+              aria-expanded={openDropdown === 4}
+              aria-haspopup="listbox"
               className={cn(
                 "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors border",
                 contextType
@@ -231,10 +254,15 @@ export function ExploreFilterBar({
               />
             </button>
             {openDropdown === 4 && (
-              <div className="absolute top-full left-0 mt-1 z-50 min-w-[160px] rounded-lg border border-border bg-card shadow-lg py-1">
+              <div
+                role="listbox"
+                className="absolute top-full left-0 mt-1 z-50 min-w-[160px] rounded-lg border border-border bg-card shadow-lg py-1"
+              >
                 {contextOptions.map((ct) => (
                   <button
                     key={ct.id}
+                    role="option"
+                    aria-selected={contextType === ct.id}
                     onClick={() => handleContextSelect(ct.id, ct.label)}
                     className={cn(
                       "w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors",

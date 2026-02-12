@@ -71,9 +71,18 @@ export default function RequestDetectPage() {
     [addSpot]
   );
 
-  // Show nothing while redirecting
+  // Show loading state while redirecting
   if (!uploadedImage) {
-    return null;
+    return (
+      <div
+        className="flex min-h-screen items-center justify-center"
+        aria-busy="true"
+      >
+        <div className="text-sm text-muted-foreground animate-pulse">
+          Loading...
+        </div>
+      </div>
+    );
   }
 
   return (
