@@ -1,15 +1,16 @@
 # Components Index
 
-> Version: 2.0.0
-> Last Updated: 2026-02-05
+> Version: 2.1.0
+> Last Updated: 2026-02-12
 
 ---
 
 ## Overview
 
-Decoded Design System v2.0 컴포넌트 라이브러리입니다.
+Decoded Design System v2.1 컴포넌트 라이브러리입니다.
 모든 컴포넌트는 `packages/web/lib/design-system/`에서 관리되며, CVA (class-variance-authority)를 사용한 variant 시스템을 지원합니다.
 
+**Total Components**: 35 files (including tokens.ts and index.ts)
 **Import Path**: `@/lib/design-system`
 
 ---
@@ -87,6 +88,85 @@ import {
 **Quick Import**:
 ```tsx
 import { DesktopHeader, MobileHeader, DesktopFooter } from "@/lib/design-system";
+```
+
+---
+
+### Navigation Components
+
+네비게이션 UI 컴포넌트입니다.
+
+| Component | Purpose | Status |
+|-----------|---------|--------|
+| NavBar | 네비게이션 바 컨테이너 | ✅ Complete |
+| NavItem | 네비게이션 아이템 | ✅ Complete |
+| SectionHeader | 섹션 헤더 | ✅ Complete |
+
+**Quick Import**:
+```tsx
+import { NavBar, NavItem, SectionHeader } from "@/lib/design-system";
+```
+
+---
+
+### Button Components
+
+액션 버튼 컴포넌트입니다.
+
+| Component | Purpose | Status |
+|-----------|---------|--------|
+| ActionButton | 액션 버튼 (variant 지원) | ✅ Complete |
+| OAuthButton | OAuth 로그인 버튼 | ✅ Complete |
+| GuestButton | 게스트 로그인 버튼 | ✅ Complete |
+
+**Quick Import**:
+```tsx
+import { ActionButton, OAuthButton, GuestButton } from "@/lib/design-system";
+```
+
+---
+
+### Domain Cards
+
+도메인 특화 카드 컴포넌트입니다.
+
+| Component | Purpose | Status |
+|-----------|---------|--------|
+| ArtistCard | 아티스트/셀러브리티 카드 | ✅ Complete |
+| SpotCard | 감지된 아이템 스팟 카드 | ✅ Complete |
+| SpotDetail | 스팟 상세 패널 | ✅ Complete |
+| ShopCarouselCard | 쇼핑 캐러셀 아이템 | ✅ Complete |
+| StatCard | 통계 디스플레이 카드 | ✅ Complete |
+| RankingItem | 랭킹 리스트 아이템 | ✅ Complete |
+| LeaderItem | 리더보드 아이템 | ✅ Complete |
+| SkeletonCard | 범용 스켈레톤 로더 | ✅ Complete |
+
+**Quick Import**:
+```tsx
+import { ArtistCard, SpotCard, SpotDetail, ShopCarouselCard, StatCard, RankingItem, LeaderItem, SkeletonCard } from "@/lib/design-system";
+```
+
+---
+
+### Feedback & Utility
+
+피드백 및 유틸리티 컴포넌트입니다.
+
+| Component | Purpose | Status |
+|-----------|---------|--------|
+| Tag | 태그/칩 컴포넌트 | ✅ Complete |
+| Badge | 뱃지/인디케이터 | ✅ Complete |
+| Divider | 섹션 구분선 | ✅ Complete |
+| Tabs | 탭 네비게이션 | ✅ Complete |
+| StepIndicator | 멀티스텝 진행 표시 | ✅ Complete |
+| LoadingSpinner | 로딩 인디케이터 | ✅ Complete |
+| LoginCard | 로그인 카드 UI | ✅ Complete |
+| BottomSheet | 바텀 시트 드로어 | ✅ Complete |
+| Hotspot | 인터랙티브 스팟 마커 (브랜드 컬러) | ✅ Complete |
+
+**Quick Import**:
+```tsx
+import { Tag, Badge, Divider, Tabs, StepIndicator, LoadingSpinner, LoginCard, BottomSheet, Hotspot } from "@/lib/design-system";
 ```
 
 ---
@@ -305,9 +385,32 @@ packages/web/lib/design-system/
 ├── grid-card.tsx               # GridCard
 ├── feed-card.tsx               # FeedCardBase
 ├── profile-header-card.tsx     # ProfileHeaderCard
+├── artist-card.tsx             # ArtistCard
+├── spot-card.tsx               # SpotCard
+├── spot-detail.tsx             # SpotDetail
+├── shop-carousel-card.tsx      # ShopCarouselCard
+├── stat-card.tsx               # StatCard
+├── ranking-item.tsx            # RankingItem
+├── leader-item.tsx             # LeaderItem
+├── skeleton-card.tsx           # SkeletonCard
 ├── desktop-header.tsx          # DesktopHeader
 ├── mobile-header.tsx           # MobileHeader
-└── desktop-footer.tsx          # DesktopFooter
+├── desktop-footer.tsx          # DesktopFooter
+├── nav-bar.tsx                 # NavBar
+├── nav-item.tsx                # NavItem
+├── section-header.tsx          # SectionHeader
+├── action-button.tsx           # ActionButton
+├── oauth-button.tsx            # OAuthButton
+├── guest-button.tsx            # GuestButton
+├── tag.tsx                     # Tag
+├── badge.tsx                   # Badge
+├── divider.tsx                 # Divider
+├── tabs.tsx                    # Tabs
+├── step-indicator.tsx          # StepIndicator
+├── loading-spinner.tsx         # LoadingSpinner
+├── login-card.tsx              # LoginCard
+├── bottom-sheet.tsx            # BottomSheet
+└── hotspot.tsx                 # Hotspot (spot marker with brand color)
 ```
 
 ---

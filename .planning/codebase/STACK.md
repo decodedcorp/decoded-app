@@ -1,6 +1,6 @@
 # Technology Stack
 
-**Analysis Date:** 2026-02-05
+**Analysis Date:** 2026-02-12
 
 ## Languages
 
@@ -114,18 +114,20 @@
 - class-variance-authority 0.7.1 - Component variant system (CVA pattern)
 - Radix UI primitives (@radix-ui/react-slot) - Headless UI components
 - Design tokens in `tokens.ts` - Centralized spacing, colors, typography, shadows
-- Component library:
+- Component library (35 components total including tokens.ts and index.ts):
   - Typography: `Heading`, `Text` with responsive size variants
   - Inputs: `Input`, `SearchInput` with CVA variants
-  - Card family: `Card`, `CardHeader`, `CardContent`, `CardFooter`, `CardSkeleton`
-  - Specialized cards: `ProductCard`, `GridCard`, `FeedCardBase`, `ProfileHeaderCard`
-  - Layout: `DesktopHeader`, `MobileHeader`, `DesktopFooter`
+  - Card family: `Card`, `CardHeader`, `CardContent`, `CardFooter`, `CardSkeleton`, `ProductCard`, `GridCard`, `FeedCardBase`, `ProfileHeaderCard`, `ArtistCard`, `SpotCard`, `SpotDetail`, `ShopCarouselCard`, `StatCard`, `RankingItem`, `LeaderItem`, `SkeletonCard`
+  - Navigation: `NavBar`, `NavItem`, `SectionHeader`, `DesktopHeader`, `MobileHeader`, `DesktopFooter`
+  - Buttons: `ActionButton`, `OAuthButton`, `GuestButton`
+  - Feedback: `Tag`, `Badge`, `Divider`, `Tabs`, `StepIndicator`, `LoadingSpinner`, `LoginCard`, `BottomSheet`, `Hotspot`
 - Integration: CSS variables → Tailwind config → `globals.css` → components
 
 **Pattern:**
 - Barrel exports from `index.ts` for clean imports: `import { Card } from "@/lib/design-system"`
 - CVA for variant management with `componentVariants` pattern
 - Skeleton states for all major components (e.g., `CardSkeleton`)
+- Brand color utility: `brandToColor` for deterministic color generation via string hash
 
 ## Key Dependencies
 
@@ -191,4 +193,4 @@
 
 ---
 
-*Stack analysis: 2026-02-05*
+*Stack analysis: 2026-02-12*

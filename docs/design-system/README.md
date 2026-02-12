@@ -1,13 +1,13 @@
 # Decoded Design System
 
-> Version: 2.0.0
-> Last Updated: 2026-02-05
+> Version: 2.1.0
+> Last Updated: 2026-02-12
 
 ---
 
 ## Overview
 
-Decoded Design System v2.0은 웹과 모바일 앱 전반에 걸쳐 일관된 사용자 경험을 제공하기 위한 디자인 토큰, 컴포넌트, 패턴을 정의합니다.
+Decoded Design System v2.1은 웹과 모바일 앱 전반에 걸쳐 일관된 사용자 경험을 제공하기 위한 디자인 토큰, 컴포넌트, 패턴을 정의합니다.
 
 **v2.0 주요 변경사항**:
 - Typography 컴포넌트 (Heading, Text) 추가
@@ -15,6 +15,13 @@ Decoded Design System v2.0은 웹과 모바일 앱 전반에 걸쳐 일관된 �
 - Desktop/Mobile Header 컴포넌트
 - 통합 Design Tokens 문서 (tokens.md)
 - 디자인 패턴 가이드 (patterns.md)
+
+**v2.1 추가 변경사항**:
+- 35개 컴포넌트 라이브러리 완성
+- Hotspot/SpotCard/ArtistCard 등 도메인 특화 컴포넌트 추가
+- Navigation 컴포넌트 (NavBar, NavItem, SectionHeader)
+- Button 컴포넌트 (ActionButton, OAuthButton, GuestButton)
+- Feedback 컴포넌트 (Tag, Badge, Divider, Tabs, StepIndicator, LoadingSpinner, LoginCard, BottomSheet)
 
 **시각적 참고**: [decoded.pen](./decoded.pen)
 
@@ -43,6 +50,15 @@ Decoded Design System v2.0은 웹과 모바일 앱 전반에 걸쳐 일관된 �
 | [components/inputs.md](./components/inputs.md) | Input, SearchInput 컴포넌트 | ✅ Complete |
 | [components/cards.md](./components/cards.md) | Card 패밀리 (Card, ProductCard, GridCard, FeedCard, ProfileHeaderCard) | ✅ Complete |
 | [components/headers.md](./components/headers.md) | DesktopHeader, MobileHeader, DesktopFooter | ✅ Complete |
+
+### v2.1 Components
+
+| Component Category | Files | Status |
+|-------------------|-------|--------|
+| **Navigation** | nav-bar.tsx, nav-item.tsx, section-header.tsx | ✅ Complete |
+| **Buttons** | action-button.tsx, oauth-button.tsx, guest-button.tsx | ✅ Complete |
+| **Domain Cards** | artist-card.tsx, spot-card.tsx, spot-detail.tsx, shop-carousel-card.tsx, stat-card.tsx, ranking-item.tsx, leader-item.tsx, skeleton-card.tsx | ✅ Complete |
+| **Feedback** | tag.tsx, badge.tsx, divider.tsx, tabs.tsx, step-indicator.tsx, loading-spinner.tsx, login-card.tsx, bottom-sheet.tsx, hotspot.tsx | ✅ Complete |
 
 ### Patterns
 

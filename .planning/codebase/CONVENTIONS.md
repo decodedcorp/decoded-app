@@ -1,7 +1,7 @@
 # Code Conventions & Standards
 
 **Project**: decoded-app
-**Last Updated**: 2026-02-05
+**Last Updated**: 2026-02-12
 **Focus**: Quality & consistency across the codebase
 
 ## Table of Contents
@@ -686,6 +686,28 @@ import { typography, spacing, colors } from "@/lib/design-system/tokens"
 // Usage
 const fontSize = typography.sizes.h2
 const padding = spacing[4]  // 16px
+```
+
+**Brand Color Utility (Shared Pattern):**
+```typescript
+// Brand color utility (shared across design system)
+import { brandToColor } from "@/lib/utils/brandToColor"
+
+// Returns deterministic CSS color for brand name via string hash
+const color = brandToColor("Nike")  // Always same color for "Nike"
+```
+
+**Hotspot Component Pattern:**
+```typescript
+// Hotspot absorbs SpotMarker functionality (single source of truth)
+// SpotMarker is deprecated re-export for backward compatibility
+// Glow effects use CSS custom property --hotspot-color
+import { Hotspot } from "@/lib/design-system"
+
+// Usage with brand color override
+<Hotspot brand="Nike" size="md" />
+// Or with direct color override
+<Hotspot color="rgb(255, 100, 50)" size="md" />
 ```
 
 ---

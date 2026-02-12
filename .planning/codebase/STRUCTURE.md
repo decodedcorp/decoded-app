@@ -1,6 +1,6 @@
 # Codebase Structure
 
-**Analysis Date:** 2026-02-05
+**Analysis Date:** 2026-02-12
 
 ## Directory Layout
 
@@ -35,19 +35,42 @@ packages/web/
 │   │   ├── types.ts         # API request/response types (DTO)
 │   │   └── index.ts         # Public exports
 │   │
-│   ├── design-system/       # v2.0 Design System primitives
-│   │   ├── index.ts         # Barrel exports for clean imports
-│   │   ├── tokens.ts        # Design tokens (spacing, colors, typography, shadows)
-│   │   ├── typography.tsx   # Heading, Text components
-│   │   ├── input.tsx        # Input, SearchInput
-│   │   ├── card.tsx         # Card, CardHeader, CardContent, CardFooter, CardSkeleton
-│   │   ├── product-card.tsx # ProductCard
-│   │   ├── grid-card.tsx    # GridCard
-│   │   ├── feed-card.tsx    # FeedCardBase
-│   │   ├── profile-header-card.tsx  # ProfileHeaderCard
-│   │   ├── desktop-header.tsx       # DesktopHeader
-│   │   ├── mobile-header.tsx        # MobileHeader
-│   │   └── desktop-footer.tsx       # DesktopFooter
+│   ├── design-system/       # v2.0 Design System primitives (35 components)
+│   │   ├── index.ts                    # Barrel exports
+│   │   ├── tokens.ts                   # Design tokens
+│   │   ├── typography.tsx              # Heading, Text
+│   │   ├── input.tsx                   # Input, SearchInput
+│   │   ├── card.tsx                    # Card family (Card, Header, Content, Footer, Skeleton)
+│   │   ├── product-card.tsx            # ProductCard
+│   │   ├── grid-card.tsx               # GridCard
+│   │   ├── feed-card.tsx               # FeedCardBase
+│   │   ├── profile-header-card.tsx     # ProfileHeaderCard
+│   │   ├── artist-card.tsx             # ArtistCard
+│   │   ├── spot-card.tsx               # SpotCard
+│   │   ├── spot-detail.tsx             # SpotDetail
+│   │   ├── shop-carousel-card.tsx      # ShopCarouselCard
+│   │   ├── stat-card.tsx               # StatCard
+│   │   ├── ranking-item.tsx            # RankingItem
+│   │   ├── leader-item.tsx             # LeaderItem
+│   │   ├── skeleton-card.tsx           # SkeletonCard
+│   │   ├── desktop-header.tsx          # DesktopHeader
+│   │   ├── mobile-header.tsx           # MobileHeader
+│   │   ├── desktop-footer.tsx          # DesktopFooter
+│   │   ├── nav-bar.tsx                 # NavBar
+│   │   ├── nav-item.tsx                # NavItem
+│   │   ├── section-header.tsx          # SectionHeader
+│   │   ├── action-button.tsx           # ActionButton
+│   │   ├── oauth-button.tsx            # OAuthButton
+│   │   ├── guest-button.tsx            # GuestButton
+│   │   ├── tag.tsx                     # Tag
+│   │   ├── badge.tsx                   # Badge
+│   │   ├── divider.tsx                 # Divider
+│   │   ├── tabs.tsx                    # Tabs
+│   │   ├── step-indicator.tsx          # StepIndicator
+│   │   ├── loading-spinner.tsx         # LoadingSpinner
+│   │   ├── login-card.tsx              # LoginCard
+│   │   ├── bottom-sheet.tsx            # BottomSheet
+│   │   └── hotspot.tsx                 # Hotspot (spot marker with brand color)
 │   │
 │   ├── components/          # React components organized by feature
 │   │   ├── auth/            # Auth components (AuthProvider, LoginCard, OAuthButton)
@@ -64,6 +87,8 @@ packages/web/
 │   │   ├── profile/         # Profile page components
 │   │   ├── request/         # Multi-step request form
 │   │   ├── fashion-scan/    # AI fashion detection
+│   │   ├── dome/            # Dome experiment
+│   │   ├── shared/          # Shared components
 │   │   ├── main/            # Home page sections
 │   │   ├── ui/              # Base UI components (buttons, cards, etc)
 │   │   ├── ConditionalNav.tsx       # Responsive header/nav
@@ -79,6 +104,11 @@ packages/web/
 │   │   ├── useSearchURLSync.ts      # Sync search to URL params
 │   │   ├── useImageUpload.ts        # Upload progress tracking
 │   │   ├── useCreatePost.ts         # Request submission flow
+│   │   ├── useItems.ts              # Item fetching
+│   │   ├── useNormalizedItems.ts    # Item normalization
+│   │   ├── useSolutions.ts          # Solution queries
+│   │   ├── useSpots.ts              # Spot data fetching
+│   │   ├── useSpotCardSync.ts       # Spot card selection sync
 │   │   ├── useMediaQuery.ts         # Responsive breakpoints
 │   │   ├── useScrollAnimation.ts    # GSAP scroll animations
 │   │   ├── useDebounce.ts           # Debounce utility
@@ -179,19 +209,20 @@ packages/web/
 
 **lib/design-system/ - v2.0 Design System:**
 - Purpose: Primitive UI components with centralized design tokens
-- Contains: Typography, inputs, card family, layout components (headers, footer)
-- Key files:
-  - `tokens.ts`: Design token constants (spacing, colors, typography, shadows, borderRadius, zIndex)
-  - `typography.tsx`: `Heading`, `Text` with responsive size variants
-  - `input.tsx`: `Input`, `SearchInput` with CVA variants
-  - `card.tsx`: Base `Card` + composable parts (Header, Content, Footer, Skeleton)
-  - Specialized cards: `product-card.tsx`, `grid-card.tsx`, `feed-card.tsx`, `profile-header-card.tsx`
-  - Layout: `desktop-header.tsx`, `mobile-header.tsx`, `desktop-footer.tsx`
+- Contains: 35 components total including tokens and barrel exports
+- Component categories:
+  - Typography: `Heading`, `Text` with responsive size variants
+  - Inputs: `Input`, `SearchInput` with CVA variants
+  - Card family: Base `Card` + composable parts (Header, Content, Footer, Skeleton) + specialized cards (ProductCard, GridCard, FeedCardBase, ProfileHeaderCard, ArtistCard, SpotCard, SpotDetail, ShopCarouselCard, StatCard, RankingItem, LeaderItem, SkeletonCard)
+  - Navigation: `NavBar`, `NavItem`, `SectionHeader`, `DesktopHeader`, `MobileHeader`, `DesktopFooter`
+  - Buttons: `ActionButton`, `OAuthButton`, `GuestButton`
+  - Feedback: `Tag`, `Badge`, `Divider`, `Tabs`, `StepIndicator`, `LoadingSpinner`, `LoginCard`, `BottomSheet`, `Hotspot`
 - Pattern:
   - CVA (Class Variance Authority) for variant management
   - Barrel exports from `index.ts` → `import { Card } from "@/lib/design-system"`
   - Props naming: `ComponentNameProps` (e.g., `ProductCardProps`)
   - Skeleton naming: `ComponentNameSkeleton` (e.g., `CardSkeleton`)
+  - Brand color utility: `brandToColor` for deterministic color via string hash
 - Relationship with `lib/components/ui/`:
   - Design system = primitive tokens + base components
   - UI folder = feature-agnostic reusable components (may compose design-system)
