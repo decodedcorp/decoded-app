@@ -28,13 +28,15 @@ export function ImageDetailModal({ imageId }: Props) {
   const { data: postDetail, isLoading, error } = usePostById(imageId);
   const { originRect, reset, imgSrc } = useTransitionStore();
 
-  // Debug: Log imageId and data state
+  // Debug: Log imageId and data state (development only)
   useEffect(() => {
-    if (imageId) {
-      console.log("[ImageDetailModal] imageId:", imageId);
-    }
-    if (postDetail) {
-      console.log("[ImageDetailModal] post loaded:", postDetail);
+    if (process.env.NODE_ENV === 'development') {
+      if (imageId) {
+        console.log("[ImageDetailModal] imageId:", imageId);
+      }
+      if (postDetail) {
+        console.log("[ImageDetailModal] post loaded:", postDetail);
+      }
     }
     if (error) {
       console.error("[ImageDetailModal] error:", error);
@@ -381,23 +383,31 @@ export function ImageDetailModal({ imageId }: Props) {
       );
     }
 
-    return <PostDetailContent postDetail={postDetail} />;
+    return (
+      <PostDetailContent
+        postDetail={postDetail}
+        isModal={true}
+        scrollContainerRef={scrollContainerRef as React.RefObject<HTMLElement>}
+      />
+    );
   };
 
   // Image Source Resolution: Priority -> Store (Immediate) -> Fetched Data
   const activeImageSrc = imgSrc || postDetail?.post.image_url;
 
-  // Debug: Log image source
+  // Debug: Log image source (development only)
   useEffect(() => {
-    if (activeImageSrc) {
-      console.log("[ImageDetailModal] activeImageSrc:", activeImageSrc);
-    } else {
-      console.warn(
-        "[ImageDetailModal] No image source available. imgSrc:",
-        imgSrc,
-        "postDetail?.post.image_url:",
-        postDetail?.post.image_url
-      );
+    if (process.env.NODE_ENV === 'development') {
+      if (activeImageSrc) {
+        console.log("[ImageDetailModal] activeImageSrc:", activeImageSrc);
+      } else {
+        console.warn(
+          "[ImageDetailModal] No image source available. imgSrc:",
+          imgSrc,
+          "postDetail?.post.image_url:",
+          postDetail?.post.image_url
+        );
+      }
     }
   }, [activeImageSrc, imgSrc, postDetail?.post.image_url]);
 
