@@ -12,6 +12,7 @@ import {
   SearchTabs,
   SearchResults,
   RecentSearches,
+  TrendingSearches,
 } from "../../lib/components/search";
 
 interface SearchPageClientProps {
@@ -92,8 +93,11 @@ export function SearchPageClient({
       <div className="overflow-y-auto" style={{ height: "calc(100vh - 72px)" }}>
         <div className="max-w-4xl mx-auto px-4 py-6">
           {!query ? (
-            // Show recent searches when no query
-            <RecentSearches onSelect={handleRecentSelect} />
+            // Show recent searches + trending when no query
+            <div className="space-y-8">
+              <RecentSearches onSelect={handleRecentSelect} />
+              <TrendingSearches onSelect={handleRecentSelect} />
+            </div>
           ) : (
             <>
               {/* Query Display */}

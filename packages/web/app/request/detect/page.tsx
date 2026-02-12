@@ -13,6 +13,8 @@ import { useIsMobile } from "@/lib/hooks/useMediaQuery";
 import { RequestFlowHeader } from "@/lib/components/request/RequestFlowHeader";
 import { MobileDetectionLayout } from "@/lib/components/request/MobileDetectionLayout";
 import { DesktopDetectionLayout } from "@/lib/components/request/DesktopDetectionLayout";
+import { StepProgress } from "@/lib/components/request/StepProgress";
+import { DetectionToolbar } from "@/lib/components/request/DetectionToolbar";
 
 export default function RequestDetectPage() {
   const router = useRouter();
@@ -83,6 +85,11 @@ export default function RequestDetectPage() {
         onClose={handleClose}
         onBack={handleBack}
       />
+
+      <div className="px-4 pt-4">
+        <StepProgress currentStep={2} className="py-4" />
+        <DetectionToolbar className="mb-4 mx-auto" />
+      </div>
 
       {/* Mobile Layout */}
       {isMobile && (

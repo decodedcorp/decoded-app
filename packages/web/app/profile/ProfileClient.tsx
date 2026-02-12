@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ArrowLeft, Settings, RefreshCw } from "lucide-react";
+import { ArrowLeft, Settings, RefreshCw, Share2 } from "lucide-react";
 import Link from "next/link";
 import { Header } from "@/lib/components";
 import {
@@ -16,6 +16,12 @@ import {
   ActivityContent,
   EmptyState,
   type ActivityTab,
+  ProfileBio,
+  FollowStats,
+  PostsGrid,
+  SpotsList,
+  SolutionsList,
+  SavedGrid,
 } from "@/lib/components/profile";
 import { useMe, useUserStats } from "@/lib/hooks/useProfile";
 import { useProfileStore } from "@/lib/stores/profileStore";
@@ -216,21 +222,17 @@ export function ProfileClient() {
   };
 
   const renderTabContent = () => {
-    if (!tabHasContent[activeTab]) {
-      return <EmptyState tab={activeTab} />;
-    }
-
     switch (activeTab) {
       case "posts":
-        return <div>Posts content...</div>;
+        return <PostsGrid />;
       case "spots":
-        return <div>Spots content...</div>;
+        return <SpotsList />;
       case "solutions":
-        return <div>Solutions content...</div>;
+        return <SolutionsList />;
       case "saved":
-        return <div>Saved content...</div>;
+        return <SavedGrid />;
       default:
-        return null;
+        return <PostsGrid />;
     }
   };
 
@@ -242,12 +244,25 @@ export function ProfileClient() {
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <h1 className="font-semibold text-lg">Profile</h1>
-        <button
-          onClick={() => setIsEditModalOpen(true)}
-          className="p-2 -mr-2 hover:bg-accent rounded-lg"
-        >
-          <Settings className="w-5 h-5" />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(window.location.href);
+              } catch {}
+            }}
+            className="p-2 rounded-lg hover:bg-accent"
+            aria-label="Share profile"
+          >
+            <Share2 className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => setIsEditModalOpen(true)}
+            className="p-2 -mr-2 hover:bg-accent rounded-lg"
+          >
+            <Settings className="w-5 h-5" />
+          </button>
+        </div>
       </header>
 
       {/* Desktop Header */}
@@ -258,6 +273,8 @@ export function ProfileClient() {
       {/* Mobile Layout - stacked */}
       <div className="md:hidden px-4 py-4 space-y-4">
         <ProfileHeader onEditClick={() => setIsEditModalOpen(true)} />
+        <ProfileBio className="px-4" />
+        <FollowStats className="px-4" />
         <StatsCards />
         <BadgeGrid />
         {/* Activity Tabs */}

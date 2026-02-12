@@ -8,6 +8,8 @@ import { useTransitionStore } from "@/lib/stores/transitionStore";
 import { Card } from "@/lib/design-system";
 import { cn } from "@/lib/utils";
 import { Heart, MessageCircle, Share2 } from "lucide-react";
+import { AccountAvatar } from "@/lib/components/shared/AccountAvatar";
+import { FollowButton } from "@/lib/components/shared/FollowButton";
 
 // Register GSAP Flip plugin
 if (typeof window !== "undefined") {
@@ -151,6 +153,31 @@ export const FeedCard = memo(
         interactive
         className="relative w-full overflow-hidden p-0"
       >
+        {/* Author header */}
+        {item.postAccount && (
+          <div className="flex items-center gap-3 px-3 py-2.5">
+            <AccountAvatar name={item.postAccount} size="sm" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">
+                @{item.postAccount}
+              </p>
+              {item.postCreatedAt && (
+                <p className="text-xs text-muted-foreground">
+                  {formatRelativeTime(item.postCreatedAt)}
+                </p>
+              )}
+            </div>
+            <div
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+            >
+              <FollowButton size="sm" />
+            </div>
+          </div>
+        )}
+
         {/* Image container - 4:5 aspect ratio like Instagram */}
         <div className="relative aspect-[4/5] bg-muted">
           {imageUrl && !imageError ? (

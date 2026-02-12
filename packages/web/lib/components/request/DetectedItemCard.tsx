@@ -31,13 +31,10 @@ export const DetectedItemCard = memo(
         // 선택 시 자동으로 편집 모드 열지 않음 (토글 버튼으로만)
       }, [onClick]);
 
-      const handleToggleEdit = useCallback(
-        (e: React.MouseEvent) => {
-          e.stopPropagation();
-          setIsEditing((prev) => !prev);
-        },
-        []
-      );
+      const handleToggleEdit = useCallback((e: React.MouseEvent) => {
+        e.stopPropagation();
+        setIsEditing((prev) => !prev);
+      }, []);
 
       const handleSaveSolution = useCallback(
         (spotId: string, solution: SpotSolutionData) => {

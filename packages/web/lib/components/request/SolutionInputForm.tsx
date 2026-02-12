@@ -38,7 +38,15 @@ export const SolutionInputForm = memo(
       };
 
       onSave(spotId, solution);
-    }, [spotId, title, originalUrl, priceAmount, priceCurrency, isValid, onSave]);
+    }, [
+      spotId,
+      title,
+      originalUrl,
+      priceAmount,
+      priceCurrency,
+      isValid,
+      onSave,
+    ]);
 
     return (
       <div className="mt-3 pt-3 border-t border-border/50 space-y-3">

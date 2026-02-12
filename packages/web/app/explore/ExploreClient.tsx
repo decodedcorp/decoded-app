@@ -6,7 +6,13 @@ import { useInfinitePosts, type PostGridItem } from "@/lib/hooks/useImages";
 import ThiingsGrid, { type GridItem } from "@/lib/components/ThiingsGrid";
 import { useFilterStore } from "@/lib/stores/filterStore";
 import { useSearchStore } from "@/lib/stores/searchStore";
-import { ExploreCardCell, ExploreSkeletonCell } from "@/lib/components/explore";
+import {
+  ExploreCardCell,
+  ExploreSkeletonCell,
+  ExploreFilterBar,
+  ExploreFilterSheet,
+} from "@/lib/components/explore";
+import { SlidersHorizontal } from "lucide-react";
 
 type Props = {
   initialPosts?: PostGridItem[];
@@ -22,6 +28,7 @@ type Props = {
 export function ExploreClient({ initialPosts: _initialPosts }: Props) {
   const activeFilter = useFilterStore((state) => state.activeFilter);
   const debouncedQuery = useSearchStore((state) => state.debouncedQuery);
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false);
 
   // Responsive grid size: smaller on mobile, larger on desktop
   const [gridSize, setGridSize] = useState({ width: 400, height: 500 });
@@ -77,111 +84,138 @@ export function ExploreClient({ initialPosts: _initialPosts }: Props) {
       }));
   }, [items]);
 
-  // Render full-screen ThiingsGrid (no header/filter)
+  // Render full-screen ThiingsGrid with filter bar
   return (
-    <div className="relative h-[calc(100dvh-120px)] md:h-[calc(100dvh-72px)]">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeFilter + debouncedQuery}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="absolute inset-0"
+    <div className="relative h-[calc(100dvh-120px)] md:h-[calc(100dvh-72px)] flex flex-col">
+      {/* Desktop filter bar */}
+      <div className="hidden md:block px-4 py-3 border-b border-border flex-shrink-0">
+        <ExploreFilterBar />
+      </div>
+
+      {/* Mobile filter toggle button */}
+      <div className="md:hidden flex items-center justify-between px-4 py-2 border-b border-border flex-shrink-0">
+        <button
+          onClick={() => setFilterSheetOpen(true)}
+          className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent transition-colors"
         >
-          {/* Loading state: show skeleton grid (only on initial load) */}
-          {isLoading && !data && (
-            <div className="absolute inset-0 z-0">
-              <ThiingsGrid
-                gridSize={gridSize}
-                renderItem={() => <ExploreSkeletonCell />}
-                initialPosition={{ x: 0, y: 0 }}
-                items={[]}
-                hasMore={true}
-              />
-            </div>
-          )}
+          <SlidersHorizontal className="h-3.5 w-3.5" />
+          Filters
+        </button>
+      </div>
 
-          {/* Error state: show error message with retry button */}
-          {isError && (
-            <div className="absolute inset-0 z-0 flex items-center justify-center">
-              <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
-                <div className="mb-4 text-4xl">⚠️</div>
-                <h2 className="mb-2 text-xl font-semibold text-foreground">
-                  Failed to load posts
-                </h2>
-                <p className="mb-6 max-w-md text-sm text-muted-foreground">
-                  {(() => {
-                    // Log error for debugging
-                    console.error("[ExploreClient] Posts fetch error:", error);
-                    // Display appropriate error message
-                    if (error instanceof Error) {
-                      return error.message;
-                    }
-                    if (typeof error === "object" && error !== null) {
-                      return JSON.stringify(error);
-                    }
-                    return "Something went wrong while loading posts.";
-                  })()}
-                </p>
-                <button
-                  onClick={() => refetch()}
-                  className="rounded-full border border-border bg-card/80 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
-                  type="button"
-                >
-                  Retry
-                </button>
+      {/* Mobile filter sheet */}
+      <ExploreFilterSheet
+        open={filterSheetOpen}
+        onClose={() => setFilterSheetOpen(false)}
+      />
+
+      <div className="relative flex-1">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeFilter + debouncedQuery}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0"
+          >
+            {/* Loading state: show skeleton grid (only on initial load) */}
+            {isLoading && !data && (
+              <div className="absolute inset-0 z-0">
+                <ThiingsGrid
+                  gridSize={gridSize}
+                  renderItem={() => <ExploreSkeletonCell />}
+                  initialPosition={{ x: 0, y: 0 }}
+                  items={[]}
+                  hasMore={true}
+                />
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Empty state: show empty state message */}
-          {!isError && !isLoading && items.length === 0 && (
-            <div className="absolute inset-0 z-0 flex items-center justify-center">
-              <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
-                <div className="mb-4 text-4xl">📷</div>
-                <h2 className="mb-2 text-xl font-semibold text-foreground">
-                  {activeFilter !== "all" || debouncedQuery.trim().length > 0
-                    ? "No posts found"
-                    : "No posts found yet."}
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                  {activeFilter !== "all" || debouncedQuery.trim().length > 0
-                    ? "Try adjusting your filters or search query."
-                    : "Check back later or try adjusting your filters."}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Success state: show grid with actual posts */}
-          {!isError && items.length > 0 && (
-            <div className="absolute inset-0 z-0">
-              <ThiingsGrid
-                gridSize={gridSize}
-                renderItem={(config) => <ExploreCardCell {...config} />}
-                initialPosition={{ x: 0, y: 0 }}
-                items={gridItems}
-                onReachEnd={() => {
-                  if (hasNextPage && !isFetchingNextPage) {
-                    fetchNextPage();
-                  }
-                }}
-                hasMore={!!hasNextPage}
-                isLoadingMore={isFetchingNextPage}
-              />
-
-              {/* Loading indicator for next page */}
-              {isFetchingNextPage && (
-                <div className="pointer-events-none absolute bottom-8 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-background/80 px-4 py-2 text-sm font-medium text-foreground shadow-lg backdrop-blur-sm">
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                  Loading more...
+            {/* Error state: show error message with retry button */}
+            {isError && (
+              <div className="absolute inset-0 z-0 flex items-center justify-center">
+                <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
+                  <div className="mb-4 text-4xl">⚠️</div>
+                  <h2 className="mb-2 text-xl font-semibold text-foreground">
+                    Failed to load posts
+                  </h2>
+                  <p className="mb-6 max-w-md text-sm text-muted-foreground">
+                    {(() => {
+                      // Log error for debugging
+                      console.error(
+                        "[ExploreClient] Posts fetch error:",
+                        error
+                      );
+                      // Display appropriate error message
+                      if (error instanceof Error) {
+                        return error.message;
+                      }
+                      if (typeof error === "object" && error !== null) {
+                        return JSON.stringify(error);
+                      }
+                      return "Something went wrong while loading posts.";
+                    })()}
+                  </p>
+                  <button
+                    onClick={() => refetch()}
+                    className="rounded-full border border-border bg-card/80 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+                    type="button"
+                  >
+                    Retry
+                  </button>
                 </div>
-              )}
-            </div>
-          )}
-        </motion.div>
-      </AnimatePresence>
+              </div>
+            )}
+
+            {/* Empty state: show empty state message */}
+            {!isError && !isLoading && items.length === 0 && (
+              <div className="absolute inset-0 z-0 flex items-center justify-center">
+                <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
+                  <div className="mb-4 text-4xl">📷</div>
+                  <h2 className="mb-2 text-xl font-semibold text-foreground">
+                    {activeFilter !== "all" || debouncedQuery.trim().length > 0
+                      ? "No posts found"
+                      : "No posts found yet."}
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    {activeFilter !== "all" || debouncedQuery.trim().length > 0
+                      ? "Try adjusting your filters or search query."
+                      : "Check back later or try adjusting your filters."}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Success state: show grid with actual posts */}
+            {!isError && items.length > 0 && (
+              <div className="absolute inset-0 z-0">
+                <ThiingsGrid
+                  gridSize={gridSize}
+                  renderItem={(config) => <ExploreCardCell {...config} />}
+                  initialPosition={{ x: 0, y: 0 }}
+                  items={gridItems}
+                  onReachEnd={() => {
+                    if (hasNextPage && !isFetchingNextPage) {
+                      fetchNextPage();
+                    }
+                  }}
+                  hasMore={!!hasNextPage}
+                  isLoadingMore={isFetchingNextPage}
+                />
+
+                {/* Loading indicator for next page */}
+                {isFetchingNextPage && (
+                  <div className="pointer-events-none absolute bottom-8 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-background/80 px-4 py-2 text-sm font-medium text-foreground shadow-lg backdrop-blur-sm">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                    Loading more...
+                  </div>
+                )}
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

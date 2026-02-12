@@ -87,9 +87,7 @@ export function DesktopDetectionLayout({
       {/* Right: Cards Panel (scrollable) */}
       <div className="flex-1 max-w-md">
         <div className="mb-4">
-          <h2 className="text-lg font-semibold">
-            Spots ({spots.length})
-          </h2>
+          <h2 className="text-lg font-semibold">Spots ({spots.length})</h2>
           <p className="text-sm text-muted-foreground mt-1">
             Click on image to add spots
           </p>

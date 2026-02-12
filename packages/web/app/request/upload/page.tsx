@@ -20,6 +20,8 @@ import { RequestFlowHeader } from "@/lib/components/request/RequestFlowHeader";
 import { DropZone } from "@/lib/components/request/DropZone";
 import { DetectionView } from "@/lib/components/request/DetectionView";
 import { SolutionInputForm } from "@/lib/components/request/SolutionInputForm";
+import { StepProgress } from "@/lib/components/request/StepProgress";
+import { MobileUploadOptions } from "@/lib/components/request/MobileUploadOptions";
 import { Trash2, Plus, Loader2 } from "lucide-react";
 
 export default function RequestUploadPage() {
@@ -157,12 +159,28 @@ export default function RequestUploadPage() {
       />
 
       <main className="flex-1 min-h-0 flex flex-col px-4 py-4 md:py-6">
+        <StepProgress currentStep={1} className="py-4" />
+
         {!hasImages && (
-          <DropZone
-            onFilesSelected={handleFilesSelected}
-            disabled={isMaxImages}
-            className="flex-1 h-full"
-          />
+          <>
+            {/* Mobile upload options */}
+            <div className="md:hidden mb-4">
+              <MobileUploadOptions
+                onGalleryClick={() => {
+                  const input = document.querySelector(
+                    'input[type="file"]'
+                  ) as HTMLInputElement;
+                  input?.click();
+                }}
+              />
+            </div>
+
+            <DropZone
+              onFilesSelected={handleFilesSelected}
+              disabled={isMaxImages}
+              className="flex-1 h-full"
+            />
+          </>
         )}
 
         {localImage && (

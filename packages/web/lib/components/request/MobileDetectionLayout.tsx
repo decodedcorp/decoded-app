@@ -96,9 +96,7 @@ export function MobileDetectionLayout({
         defaultSnapPoint={0.3}
         header={
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold">
-              Spots ({spots.length})
-            </h2>
+            <h2 className="text-sm font-semibold">Spots ({spots.length})</h2>
           </div>
         }
       >

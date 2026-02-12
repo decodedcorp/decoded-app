@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useInfinitePosts, type PostGridItem } from "@/lib/hooks/useImages";
 import {
   VerticalFeed,
@@ -9,7 +9,12 @@ import {
 import type { FeedCardItem } from "@/lib/components/FeedCard";
 import { useFilterStore } from "@/lib/stores/filterStore";
 import { useSearchStore } from "@/lib/stores/searchStore";
-import { FeedHeader } from "@/lib/components/feed";
+import {
+  FeedHeader,
+  FeedTabs,
+  NewPostsIndicator,
+  type FeedTabValue,
+} from "@/lib/components/feed";
 
 /**
  * Feed Client Component - Instagram-style Vertical Feed
@@ -21,6 +26,8 @@ import { FeedHeader } from "@/lib/components/feed";
 export function FeedClient() {
   const activeFilter = useFilterStore((state) => state.activeFilter);
   const debouncedQuery = useSearchStore((state) => state.debouncedQuery);
+  const [activeTab, setActiveTab] = useState<FeedTabValue>("foryou");
+  const [newPostCount] = useState(0);
 
   // Use infinite query hook with REST API
   const {
@@ -185,6 +192,13 @@ export function FeedClient() {
   return (
     <div className="flex flex-col h-full">
       <FeedHeader />
+      <div className="px-4 md:px-12 lg:px-16">
+        <FeedTabs value={activeTab} onChange={setActiveTab} />
+      </div>
+      <NewPostsIndicator
+        count={newPostCount}
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      />
       <div className="flex-1 relative">
         <div className="h-full">
           <VerticalFeed
