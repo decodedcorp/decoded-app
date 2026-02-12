@@ -252,7 +252,7 @@ export const zIndex = {
   base: 0,
   floating: 10,
   dropdown: 20,
-  header: 30,
+  header: 40,
   sidebar: 40,
   modalBackdrop: 50,
   modal: 60,
