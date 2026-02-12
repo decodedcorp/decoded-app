@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-06)
 Phase: v2-09 (documentation-polish) of 9 phases in v2.0 milestone
 Plan: 03 of 03 complete
 Status: Phase v2-09 complete
-Last activity: 2026-02-12 — Completed quick-031 (Fix Feed Card Image Top Crop)
+Last activity: 2026-02-12 — Completed quick-032 (Fix activeImageSrc TDZ Reference Error)
 
 Progress: v2.0 milestone complete (all phases shipped)
 
@@ -98,8 +98,9 @@ Resume file: None
 | 028 | Remove Achievements section from home page | 2026-02-12 | d807df3 | [028-remove-achievements-challenge-achieve-ma](./quick/028-remove-achievements-challenge-achieve-ma/) |
 | 029 | Fix header scroll disappear | 2026-02-12 | c8ff602 | [029-fix-header-scroll-disappear](./quick/029-fix-header-scroll-disappear/) |
 | 031 | Fix feed card image top crop | 2026-02-12 | 8b22163 | [031-fix-feed-card-image-top-crop](./quick/031-fix-feed-card-image-top-crop/) |
+| 032 | Fix activeImageSrc TDZ reference error | 2026-02-12 | f6fc515 | [032-fix-activeimagesrc-tdz-reference-error](./quick/032-fix-activeimagesrc-tdz-reference-error/) |
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-12 after quick-031 completion*
+*Last updated: 2026-02-12 after quick-032 completion*
