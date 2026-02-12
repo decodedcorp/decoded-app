@@ -197,8 +197,24 @@ export const FeedCard = memo(
             <div className="h-full w-full bg-muted" />
           )}
 
+          {/* Spot indicators (matching StyleCard white dot style) */}
+          {hasItems && (
+            <div className="absolute inset-0 pointer-events-none z-10">
+              {/* Center spot */}
+              <div className="absolute w-6 h-6 flex items-center justify-center" style={{ left: '45%', top: '40%' }}>
+                <div className="absolute inset-0 bg-white rounded-full animate-ping opacity-20 duration-[2000ms]" />
+                <div className="relative w-2.5 h-2.5 bg-white rounded-full shadow-[0_0_20px_rgba(255,255,255,0.8)] border border-black/20" />
+              </div>
+              {/* Secondary spot */}
+              <div className="absolute w-6 h-6 flex items-center justify-center" style={{ left: '60%', top: '55%' }}>
+                <div className="absolute inset-0 bg-white rounded-full animate-ping opacity-20 duration-[2500ms]" style={{ animationDelay: '0.5s' }} />
+                <div className="relative w-2 h-2 bg-white rounded-full shadow-[0_0_15px_rgba(255,255,255,0.6)] border border-black/20" />
+              </div>
+            </div>
+          )}
+
           {/* Top overlay: Source badge + Item count */}
-          <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
+          <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-20">
             {/* Source badge */}
             {item.postSource && (
               <span

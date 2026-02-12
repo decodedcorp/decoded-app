@@ -234,36 +234,41 @@ export function PostDetailContent({ postDetail, isModal = false, scrollContainer
         {/* Gradient overlay (matching decoded.pen heroImageOverlay) */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
-        {/* Spot markers on hero image */}
-        {spots.map((spot) => {
-          const imageRect = getContainedImageRect();
-          const spotLeft = imageRect
-            ? imageRect.left + (parseFloat(spot.position_left) / 100) * imageRect.width
-            : undefined;
-          const spotTop = imageRect
-            ? imageRect.top + (parseFloat(spot.position_top) / 100) * imageRect.height
-            : undefined;
+        {/* Spot markers on hero image (matching StyleCard design) */}
+        {spots.length > 0 && (
+          <div className="absolute inset-0 pointer-events-none z-20">
+            {spots.map((spot) => {
+              const imageRect = getContainedImageRect();
+              const spotLeft = imageRect
+                ? imageRect.left + (parseFloat(spot.position_left) / 100) * imageRect.width
+                : undefined;
+              const spotTop = imageRect
+                ? imageRect.top + (parseFloat(spot.position_top) / 100) * imageRect.height
+                : undefined;
 
-          return (
-            <div
-              key={spot.id}
-              className="absolute w-6 h-6 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white/80 bg-emerald-500/70 shadow-lg cursor-pointer hover:scale-125 transition-transform z-20"
-              style={
-                imageRect && spotLeft !== undefined && spotTop !== undefined
-                  ? { left: `${spotLeft}px`, top: `${spotTop}px` }
-                  : {
-                      left: `${parseFloat(spot.position_left)}%`,
-                      top: `${parseFloat(spot.position_top)}%`,
-                    }
-              }
-              title={
-                solutions.find((s) => s.spot_id === spot.id)?.title || "Item"
-              }
-            >
-              <span className="absolute inset-0 rounded-full animate-ping bg-emerald-400/30" />
-            </div>
-          );
-        })}
+              return (
+                <div
+                  key={spot.id}
+                  className="absolute w-8 h-8 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center"
+                  style={
+                    imageRect && spotLeft !== undefined && spotTop !== undefined
+                      ? { left: `${spotLeft}px`, top: `${spotTop}px` }
+                      : {
+                          left: `${parseFloat(spot.position_left)}%`,
+                          top: `${parseFloat(spot.position_top)}%`,
+                        }
+                  }
+                  title={
+                    solutions.find((s) => s.spot_id === spot.id)?.title || "Item"
+                  }
+                >
+                  <div className="absolute inset-0 bg-white rounded-full animate-ping opacity-30 duration-[2000ms]" />
+                  <div className="relative w-3 h-3 bg-white rounded-full shadow-[0_0_25px_rgba(255,255,255,1)] border border-black/20" />
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* Hero bottom content (justify-end pattern) */}
         <div
