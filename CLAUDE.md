@@ -20,7 +20,7 @@ Modern web application for image/item discovery and curation with advanced filte
 packages/web/
 ├── app/                    # Next.js App Router pages
 │   ├── @modal/             # Parallel route for modals
-│   ├── api/v1/             # API routes (posts, users, categories)
+│   ├── api/v1/             # API routes (posts, solutions, users, categories, spots)
 │   ├── explore/            # Explore grid view
 │   ├── feed/               # Social feed
 │   ├── images/             # Image discovery & detail
@@ -34,7 +34,6 @@ packages/web/
 │   ├── api/                # API client functions
 │   ├── components/         # Feature-based components
 │   │   ├── ui/             # Primitive UI (Card, Button, BottomSheet)
-│   │   ├── design-system/  # v2.0 Design System
 │   │   ├── main/           # Home page sections
 │   │   ├── search/         # Search overlay & results
 │   │   ├── detail/         # Image/post detail views
@@ -42,7 +41,11 @@ packages/web/
 │   │   ├── explore/        # Explore grid
 │   │   ├── feed/           # Feed components
 │   │   ├── profile/        # Profile sections
-│   │   └── auth/           # Auth components
+│   │   ├── auth/           # Auth components
+│   │   ├── dome/           # Dome experiment
+│   │   ├── fashion-scan/   # AI fashion detection
+│   │   └── shared/         # Shared components
+│   ├── design-system/      # v2.0 Design System (35 components)
 │   ├── hooks/              # Custom React hooks
 │   ├── stores/             # Zustand state stores
 │   ├── supabase/           # Supabase client + queries
@@ -73,13 +76,14 @@ docs/                       # Documentation
 | `/login` | OAuth authentication (Kakao, Google, Apple) |
 | `/lab/*` | Experimental (ascii-text, fashion-scan) |
 
-### v2.0 Design Overhaul Status (78% Complete)
+### v2.0 Design Overhaul (Shipped)
 - Search Overlay with responsive grid layouts
 - Lightbox fullscreen image viewer
 - Hero animations with GSAP scroll triggers
 - Responsive 2-4 column grids
 - Item spotting with shop integration
 - "More from this Look" related content gallery
+- Complete design system with 35 components
 
 ## v2.0 Design System
 
@@ -96,8 +100,16 @@ import {
   // Cards
   Card, CardHeader, CardContent, CardFooter, CardSkeleton,
   ProductCard, GridCard, FeedCardBase, ProfileHeaderCard,
-  // Headers & Footer
+  ArtistCard, SpotCard, SpotDetail, ShopCarouselCard,
+  StatCard, RankingItem, LeaderItem, SkeletonCard,
+  // Navigation & Layout
   DesktopHeader, MobileHeader, DesktopFooter,
+  NavBar, NavItem, SectionHeader,
+  // Buttons & Actions
+  ActionButton, OAuthButton, GuestButton,
+  // Indicators & Feedback
+  Tag, Badge, Divider, Tabs, StepIndicator,
+  LoadingSpinner, LoginCard, BottomSheet, Hotspot,
   // Tokens
   typography, colors, spacing, shadows, borderRadius, zIndex
 } from "@/lib/design-system"
@@ -143,19 +155,42 @@ For detailed design specifications and usage patterns:
 
 Located in `lib/design-system/`:
 
-| Component | Purpose |
-|-----------|---------|
-| **tokens.ts** | Design tokens (colors, spacing, typography, shadows) |
-| **Heading, Text** | Typography components with size variants |
-| **Input, SearchInput** | Form inputs with variants |
-| **Card Family** | Base card + Header/Content/Footer + Skeleton |
-| **ProductCard** | Product card with image & description |
-| **GridCard** | Grid layout card variant |
-| **FeedCardBase** | Social feed card variant |
-| **ProfileHeaderCard** | Profile header card |
-| **DesktopHeader** | Desktop navigation header |
-| **MobileHeader** | Mobile navigation with bottom sheet |
-| **DesktopFooter** | Desktop footer with links |
+| Component | File | Purpose |
+|-----------|------|---------|
+| **tokens.ts** | tokens.ts | Design tokens (colors, spacing, typography, shadows) |
+| **Heading, Text** | typography.tsx | Typography with responsive size variants |
+| **Input, SearchInput** | input.tsx | Form inputs with CVA variants |
+| **Card, CardHeader, CardContent, CardFooter, CardSkeleton** | card.tsx | Base card with composable slots |
+| **ProductCard** | product-card.tsx | Product display card |
+| **GridCard** | grid-card.tsx | Grid layout card |
+| **FeedCardBase** | feed-card.tsx | Social feed card |
+| **ProfileHeaderCard** | profile-header-card.tsx | Profile header card |
+| **ArtistCard** | artist-card.tsx | Artist/celebrity card |
+| **SpotCard** | spot-card.tsx | Detected item spot card |
+| **SpotDetail** | spot-detail.tsx | Spot detail panel |
+| **ShopCarouselCard** | shop-carousel-card.tsx | Shop carousel item |
+| **StatCard** | stat-card.tsx | Statistics display card |
+| **RankingItem** | ranking-item.tsx | Ranking list item |
+| **LeaderItem** | leader-item.tsx | Leaderboard item |
+| **SkeletonCard** | skeleton-card.tsx | Generic skeleton loader |
+| **DesktopHeader** | desktop-header.tsx | Desktop navigation header |
+| **MobileHeader** | mobile-header.tsx | Mobile navigation header |
+| **DesktopFooter** | desktop-footer.tsx | Desktop footer |
+| **NavBar** | nav-bar.tsx | Navigation bar |
+| **NavItem** | nav-item.tsx | Navigation item |
+| **SectionHeader** | section-header.tsx | Section header with title |
+| **ActionButton** | action-button.tsx | Action button with variants |
+| **OAuthButton** | oauth-button.tsx | OAuth provider button |
+| **GuestButton** | guest-button.tsx | Guest login button |
+| **Tag** | tag.tsx | Tag/chip component |
+| **Badge** | badge.tsx | Badge/indicator |
+| **Divider** | divider.tsx | Section divider |
+| **Tabs** | tabs.tsx | Tab navigation |
+| **StepIndicator** | step-indicator.tsx | Multi-step progress |
+| **LoadingSpinner** | loading-spinner.tsx | Loading indicator |
+| **LoginCard** | login-card.tsx | Login card UI |
+| **BottomSheet** | bottom-sheet.tsx | Bottom sheet drawer |
+| **Hotspot** | hotspot.tsx | Interactive spot marker with brand colors |
 
 ## Key File Locations
 
@@ -163,6 +198,8 @@ Located in `lib/design-system/`:
 |------|----------|-------------|
 | **Auth** | `lib/stores/authStore.ts` | OAuth (Kakao, Google, Apple) + session |
 | **Search State** | `lib/stores/searchStore.ts` | Search query, filters, results |
+| **Filter State** | `lib/stores/filterStore.ts` | Category and filter state |
+| **Transition State** | `lib/stores/transitionStore.ts` | Page transition state |
 | **API Client** | `lib/api/` | Backend API calls (posts, users, categories) |
 | **API Routes** | `app/api/v1/` | Next.js API proxy & server logic |
 | **Supabase** | `lib/supabase/queries/` | DB queries (server/client) |
@@ -171,6 +208,28 @@ Located in `lib/design-system/`:
 | **Hooks** | `lib/hooks/` | Custom hooks |
 | **Stores** | `lib/stores/` | Zustand stores |
 
+## API Routes
+
+| Route | Methods | Description |
+|-------|---------|-------------|
+| `/api/v1/posts` | GET | List posts with pagination |
+| `/api/v1/posts/with-solution` | GET | Posts with solution data |
+| `/api/v1/posts/extract-metadata` | POST | Extract metadata from URL |
+| `/api/v1/posts/analyze` | POST | AI image analysis |
+| `/api/v1/posts/upload` | POST | Upload post image |
+| `/api/v1/posts/[postId]` | GET | Single post detail |
+| `/api/v1/posts/[postId]/spots` | GET/POST | Spots for a post |
+| `/api/v1/solutions/convert-affiliate` | POST | Convert affiliate links |
+| `/api/v1/solutions/[solutionId]` | GET/PATCH | Solution CRUD |
+| `/api/v1/solutions/extract-metadata` | POST | Solution metadata extraction |
+| `/api/v1/users/me` | GET | Current user profile |
+| `/api/v1/users/me/activities` | GET | User activities |
+| `/api/v1/users/me/stats` | GET | User statistics |
+| `/api/v1/users/[userId]` | GET | User by ID |
+| `/api/v1/categories` | GET | Category list |
+| `/api/v1/spots/[spotId]` | GET/PATCH | Spot CRUD |
+| `/api/v1/spots/[spotId]/solutions` | GET/POST | Solutions for spot |
+
 ## Custom Hooks
 
 ### Data Fetching
@@ -178,6 +237,10 @@ Located in `lib/design-system/`:
 - `usePosts()` - Fetch and manage posts
 - `useProfile()` - Fetch user profile data
 - `useCategories()` - Fetch category list
+- `useItems()` - Fetch items for posts
+- `useNormalizedItems()` - Normalize item data structure
+- `useSolutions()` - Fetch solutions for items
+- `useSpots()` - Fetch spot data for images
 
 ### Form & Input
 - `useCreatePost()` - Multi-step post creation flow
@@ -190,6 +253,8 @@ Located in `lib/design-system/`:
 - `useScrollAnimation()` - Scroll-triggered animations
 - `useFlipTransition()` - Flip card animations
 - `useMediaQuery()` - Responsive breakpoint detection
+- `useSpotCardSync()` - Sync spot selection with card UI
+- `useDebounce()` - Debounce value changes
 
 ## Commands
 ```bash
@@ -257,7 +322,7 @@ yarn format:check     # Check Prettier formatting
 - docs/ai-playbook/ - AI tool usage guides
 - docs/design-system/ - Design tokens
 
-<!-- Last Updated: 2026-02-05 -->
+<!-- Last Updated: 2026-02-12 -->
 
 <!-- MANUAL ADDITIONS START -->
 - [Antigravity Rules](file:///Users/kiyeol/development/decoded/decoded-app/.antigravity/rules.md) - Autonomous execution policy and language preferences.
