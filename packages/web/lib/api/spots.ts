@@ -28,7 +28,7 @@ export async function fetchSpots(postId: string): Promise<Spot[]> {
     method: "GET",
     requiresAuth: false, // Public data
   });
-  return response.data;
+  return response.data ?? [];
 }
 
 // ============================================================
