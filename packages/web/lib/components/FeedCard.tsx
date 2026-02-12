@@ -187,7 +187,7 @@ export const FeedCard = memo(
               decoding="async"
               fetchPriority={priority ? "high" : "auto"}
               alt={`Image ${id}`}
-              className={`h-full w-full object-cover transition-opacity duration-200 ease-out ${
+              className={`h-full w-full object-cover object-top transition-opacity duration-200 ease-out ${
                 isLoaded ? "opacity-100" : "opacity-0"
               }`}
               onError={() => setImageError(true)}
