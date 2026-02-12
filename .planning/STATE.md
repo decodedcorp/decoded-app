@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-06)
 Phase: v2-09 (documentation-polish) of 9 phases in v2.0 milestone
 Plan: 03 of 03 complete
 Status: Phase v2-09 complete
-Last activity: 2026-02-12 — Completed quick-035 (Replace empty main sections with mockup data)
+Last activity: 2026-02-12 — Completed quick-036 (Feed card subtle spot overlay)
 
 Progress: v2.0 milestone complete (all phases shipped)
 
@@ -52,6 +52,8 @@ Key decisions affecting future work:
 - quick-033: brandToColor utility shared across design system for consistent brand colors
 - quick-033: Glow effects use CSS custom property --hotspot-color for flexible color overrides
 - quick-033: spot-reveal animation in both Tailwind config and globals.css for compatibility
+- quick-036: Conditional spot fetching pattern with enabled option prevents unnecessary API calls
+- quick-036: Context-specific Hotspot sizing using important prefix (!w-3 !h-3) overrides CVA defaults
 
 ### Tech Debt (from v2.1)
 
@@ -83,7 +85,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Completed quick-035 (Replace empty main sections with mockup data)
+Stopped at: Completed quick-036 (Feed card subtle spot overlay)
 Resume file: None
 
 ## Quick Tasks Completed
@@ -110,8 +112,9 @@ Resume file: None
 | 033 | Unify spot brand color animation design | 2026-02-12 | 034312f | [033-unify-spot-brand-color-animation-design](./quick/033-unify-spot-brand-color-animation-design/) |
 | 034 | Remove post detail x-axis scroll | 2026-02-12 | c2265ea | [034-remove-post-detail-x-axis-scroll](./quick/034-remove-post-detail-x-axis-scroll/) |
 | 035 | Replace empty main sections with mockup data | 2026-02-12 | 708cc70 | [035-replace-empty-main-sections-with-mockup](./quick/035-replace-empty-main-sections-with-mockup/) |
+| 036 | Feed card subtle spot overlay | 2026-02-12 | 59834da | [036-feed-card-subtle-spot-overlay](./quick/036-feed-card-subtle-spot-overlay/) |
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-12 after quick-033 completion*
+*Last updated: 2026-02-12 after quick-036 completion*
