@@ -45,6 +45,8 @@ Key decisions affecting future work:
 - quick-027: Pixel-based spot positioning with ResizeObserver + natural dimensions tracking
 - quick-027: isModal prop pattern for conditional ScrollTrigger animations in different contexts
 - quick-029: Clear z-index hierarchy: headers z-40, content sections z-20 or below, modals z-50+
+- quick-030: Deterministic brand color via string hash for consistent visual identity
+- quick-030: Hotspot design system component supports optional color override
 
 ### Tech Debt (from v2.1)
 
@@ -76,7 +78,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Completed quick-031 (Fix Feed Card Image Top Crop)
+Stopped at: Completed quick-030 (Fix Desktop Sidebar Image Spot Brand)
 Resume file: None
 
 ## Quick Tasks Completed
@@ -97,10 +99,11 @@ Resume file: None
 | 027 | Fix post detail image clip and spots | 2026-02-12 | ad09695 | [027-fix-post-detail-image-clip-and-spots](./quick/027-fix-post-detail-image-clip-and-spots/) |
 | 028 | Remove Achievements section from home page | 2026-02-12 | d807df3 | [028-remove-achievements-challenge-achieve-ma](./quick/028-remove-achievements-challenge-achieve-ma/) |
 | 029 | Fix header scroll disappear | 2026-02-12 | c8ff602 | [029-fix-header-scroll-disappear](./quick/029-fix-header-scroll-disappear/) |
+| 030 | Fix desktop sidebar image spot brand | 2026-02-12 | 4c99cb3 | [030-fix-desktop-sidebar-image-spot-brand](./quick/030-fix-desktop-sidebar-image-spot-brand/) |
 | 031 | Fix feed card image top crop | 2026-02-12 | 8b22163 | [031-fix-feed-card-image-top-crop](./quick/031-fix-feed-card-image-top-crop/) |
 | 032 | Fix activeImageSrc TDZ reference error | 2026-02-12 | f6fc515 | [032-fix-activeimagesrc-tdz-reference-error](./quick/032-fix-activeimagesrc-tdz-reference-error/) |
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-12 after quick-032 completion*
+*Last updated: 2026-02-12 after quick-030 completion*
