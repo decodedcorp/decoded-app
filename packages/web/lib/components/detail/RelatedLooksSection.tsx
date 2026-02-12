@@ -53,22 +53,16 @@ export function RelatedLooksSection({ images, displayName }: Props) {
       );
 
       if (cards.length > 0) {
-        gsap.fromTo(
-          cards,
-          { y: 40, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.7,
-            stagger: 0.12,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top 85%",
-              toggleActions: "play none none reverse",
-            },
-          }
-        );
+        gsap.from(cards, {
+          y: 25,
+          duration: 0.6,
+          stagger: 0.1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 90%",
+          },
+        });
       }
     },
     { scope: sectionRef, dependencies: [images.length] }

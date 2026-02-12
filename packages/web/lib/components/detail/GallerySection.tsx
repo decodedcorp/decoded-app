@@ -52,22 +52,16 @@ export function GallerySection({ images }: Props) {
       );
 
       if (galleryImages.length > 0) {
-        gsap.fromTo(
-          galleryImages,
-          { y: 30, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.7,
-            stagger: 0.1,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top 85%",
-              toggleActions: "play none none reverse",
-            },
-          }
-        );
+        gsap.from(galleryImages, {
+          y: 20,
+          duration: 0.6,
+          stagger: 0.08,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 90%",
+          },
+        });
       }
     },
     { scope: sectionRef, dependencies: [images.length] }

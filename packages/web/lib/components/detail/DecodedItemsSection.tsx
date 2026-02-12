@@ -92,7 +92,7 @@ export function DecodedItemsSection({ spots, solutions }: Props) {
     };
   });
 
-  // GSAP stagger animation on scroll
+  // GSAP stagger animation on scroll (y only, keep items visible)
   useGSAP(
     () => {
       if (!sectionRef.current) return;
@@ -102,22 +102,16 @@ export function DecodedItemsSection({ spots, solutions }: Props) {
       );
 
       if (itemRows.length > 0) {
-        gsap.fromTo(
-          itemRows,
-          { y: 30, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.6,
-            stagger: 0.08,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top 85%",
-              toggleActions: "play none none reverse",
-            },
-          }
-        );
+        gsap.from(itemRows, {
+          y: 20,
+          duration: 0.5,
+          stagger: 0.06,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 90%",
+          },
+        });
       }
     },
     { scope: sectionRef, dependencies: [items.length] }
