@@ -83,7 +83,7 @@ export function PostDetailPage({ postId }: Props) {
   // Loading state: full-page skeleton
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background -mt-14 md:-mt-[72px]">
         {/* Skeleton Hero */}
         <div className="relative h-[426px] md:h-[60vh] md:max-h-[600px] w-full bg-muted animate-pulse">
           {/* Skeleton gradient overlay */}
@@ -143,7 +143,7 @@ export function PostDetailPage({ postId }: Props) {
   // Error state: design system Card with destructive styling
   if (error || !postDetail) {
     return (
-      <div className="flex min-h-screen items-center justify-center px-4 bg-background">
+      <div className="flex min-h-screen items-center justify-center px-4 bg-background -mt-14 md:-mt-[72px]">
         <Card className="max-w-md w-full text-center p-8">
           <div className="flex justify-center mb-4">
             <div className="h-16 w-16 rounded-full bg-destructive/10 flex items-center justify-center">
@@ -173,7 +173,7 @@ export function PostDetailPage({ postId }: Props) {
 
   return (
     <LenisProvider>
-      <div ref={pageRef} className="relative">
+      <div ref={pageRef} className="relative -mt-14 md:-mt-[72px]">
         {/* Action Buttons - matching decoded.pen design */}
         <div className="fixed right-4 top-4 z-50 flex gap-2">
           <button
