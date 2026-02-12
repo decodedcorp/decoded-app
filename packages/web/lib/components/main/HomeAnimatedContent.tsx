@@ -46,6 +46,12 @@ export function HomeAnimatedContent({
   discoverItemsByTab,
   trendingKeywords,
 }: HomeAnimatedContentProps) {
+  // Convert empty arrays to undefined so component default sample data kicks in
+  const orUndef = <T,>(arr: T[]): T[] | undefined =>
+    arr.length > 0 ? arr : undefined;
+  const hasItems = (obj: Record<string, ItemCardData[]>): boolean =>
+    Object.values(obj).some((arr) => arr.length > 0);
+
   const sectionVariants: Variants = {
     hidden: { opacity: 0, y: 50 },
     visible: {
@@ -69,7 +75,7 @@ export function HomeAnimatedContent({
         >
           <DecodedPickSection
             styleData={decodedPickStyle}
-            items={decodedPickItems}
+            items={orUndef(decodedPickItems)}
           />
         </motion.div>
 
@@ -90,7 +96,7 @@ export function HomeAnimatedContent({
           viewport={{ once: true, margin: "-100px" }}
           variants={sectionVariants}
         >
-          <ArtistSpotlightSection data={artistSpotlightStyles} />
+          <ArtistSpotlightSection data={orUndef(artistSpotlightStyles)} />
         </motion.div>
 
         {/* What's New Section */}
@@ -100,7 +106,10 @@ export function HomeAnimatedContent({
           viewport={{ once: true, margin: "-100px" }}
           variants={sectionVariants}
         >
-          <WhatsNewSection styles={whatsNewStyles} items={whatsNewItems} />
+          <WhatsNewSection
+            styles={orUndef(whatsNewStyles)}
+            items={orUndef(whatsNewItems)}
+          />
         </motion.div>
 
         {/* Discover Items Section */}
@@ -110,7 +119,9 @@ export function HomeAnimatedContent({
           viewport={{ once: true, margin: "-100px" }}
           variants={sectionVariants}
         >
-          <DiscoverItemsSection itemsByTab={discoverItemsByTab} />
+          <DiscoverItemsSection
+            itemsByTab={hasItems(discoverItemsByTab) ? discoverItemsByTab : undefined}
+          />
         </motion.div>
 
         {/* Discover Products Section */}
@@ -120,7 +131,7 @@ export function HomeAnimatedContent({
           viewport={{ once: true, margin: "-100px" }}
           variants={sectionVariants}
         >
-          <DiscoverProductsSection items={bestItems} />
+          <DiscoverProductsSection items={orUndef(bestItems)} />
         </motion.div>
 
         {/* Best Item Section */}
@@ -130,7 +141,7 @@ export function HomeAnimatedContent({
           viewport={{ once: true, margin: "-100px" }}
           variants={sectionVariants}
         >
-          <BestItemSection items={bestItems} />
+          <BestItemSection items={orUndef(bestItems)} />
         </motion.div>
 
         {/* Weekly Best Section */}
@@ -140,7 +151,7 @@ export function HomeAnimatedContent({
           viewport={{ once: true, margin: "-100px" }}
           variants={sectionVariants}
         >
-          <WeeklyBestSection styles={weeklyBestStyles} />
+          <WeeklyBestSection styles={orUndef(weeklyBestStyles)} />
         </motion.div>
 
         {/* Trending Now Section */}
@@ -150,7 +161,7 @@ export function HomeAnimatedContent({
           viewport={{ once: true, margin: "-100px" }}
           variants={sectionVariants}
         >
-          <TrendingNowSection keywords={trendingKeywords} />
+          <TrendingNowSection keywords={orUndef(trendingKeywords)} />
         </motion.div>
       </main>
     </>

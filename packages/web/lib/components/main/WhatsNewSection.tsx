@@ -5,19 +5,80 @@ import Link from "next/link";
 import { StyleCard, type StyleCardData } from "./StyleCard";
 import { ItemCard, type ItemCardData } from "./ItemCard";
 
+const sampleStyles: StyleCardData[] = [
+  {
+    id: "wn-s1",
+    title: "Newjeans Minji Airport Look",
+    description:
+      "뉴진스 민지의 공항 패션. 캐주얼하면서도 세련된 레이어링 스타일링.",
+    artistName: "Newjeans Minji",
+    link: "/feed",
+    imageUrl:
+      "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800",
+  },
+  {
+    id: "wn-s2",
+    title: "aespa Karina Streetwear",
+    description: "에스파 카리나의 스트릿 패션. 유니크한 컬러 매치가 돋보이는 룩.",
+    artistName: "aespa Karina",
+    link: "/feed",
+    imageUrl:
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800",
+  },
+];
+
+const sampleItems: ItemCardData[] = [
+  {
+    id: "wn-i1",
+    brand: "Nike",
+    name: "Air Force 1 '07",
+    price: "$110",
+    link: "/items/1",
+    badge: "NEW",
+    imageUrl:
+      "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400",
+  },
+  {
+    id: "wn-i2",
+    brand: "Miu Miu",
+    name: "Wander Mini Bag",
+    price: "$1,950",
+    link: "/items/2",
+    badge: "NEW",
+    imageUrl:
+      "https://images.unsplash.com/photo-1564848005333-590727c99921?w=400",
+  },
+  {
+    id: "wn-i3",
+    brand: "Gentle Monster",
+    name: "Jentle Garden",
+    price: "$320",
+    link: "/items/3",
+    badge: "NEW",
+    imageUrl:
+      "https://images.unsplash.com/photo-1518738458435-19149697112a?w=400",
+  },
+  {
+    id: "wn-i4",
+    brand: "Acne Studios",
+    name: "Musubi Mini Bag",
+    price: "$890",
+    link: "/items/4",
+    badge: "NEW",
+    imageUrl:
+      "https://images.unsplash.com/photo-1641206189215-9533ceb7a1df?w=400",
+  },
+];
+
 interface WhatsNewSectionProps {
   styles?: StyleCardData[];
   items?: ItemCardData[];
 }
 
 export function WhatsNewSection({
-  styles = [],
-  items = [],
+  styles = sampleStyles,
+  items = sampleItems,
 }: WhatsNewSectionProps) {
-  // Hide section if no data
-  if (styles.length === 0 && items.length === 0) {
-    return null;
-  }
 
   return (
     <section className="py-24 md:py-40 bg-[#050505] px-6 md:px-12 relative overflow-hidden">
