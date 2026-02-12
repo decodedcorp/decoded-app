@@ -1,9 +1,12 @@
 "use client";
 
 import type { PostDetail } from "@/lib/supabase/queries/posts";
-import { spotToItemRow, normalizeItem } from "./types";
-import { ShopGrid } from "./ShopGrid";
 import { ArticleContent } from "./ArticleContent";
+import { DecodedItemsSection } from "./DecodedItemsSection";
+import { GallerySection } from "./GallerySection";
+import { ShopCarouselSection } from "./ShopCarouselSection";
+import { RelatedLooksSection } from "./RelatedLooksSection";
+import { useRelatedImagesByAccount } from "@/lib/hooks/useImages";
 import { Heading, Text } from "@/lib/design-system";
 import { Package } from "lucide-react";
 import { useRef } from "react";
@@ -28,8 +31,11 @@ type Props = {
  * Sections:
  * 1. Hero Section - Full-bleed image with gradient overlay, account badge, title
  * 2. Tags + Article - Metadata tags in pills + magazine-style drop cap article
- * 3. Spot Solutions - "Decoded Items" header with ShopGrid carousel
- * 4. Empty State - Design system empty state when no items
+ * 3. Decoded Items - Selectable item list with expandable detail card
+ * 4. Gallery - "More from this Look" image grid
+ * 5. Shop the Look - Product carousel
+ * 6. Related Looks - Masonry grid of related posts
+ * 7. Empty State - Design system empty state when no items
  */
 export function PostDetailContent({ postDetail }: Props) {
   const { post, spots, solutions } = postDetail;
@@ -38,20 +44,21 @@ export function PostDetailContent({ postDetail }: Props) {
   const imageRef = useRef<HTMLImageElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
 
-  // Map spots to legacy item format for ShopGrid compatibility
-  const items = spots.map((spot) => {
-    const solution = solutions.find((s) => s.spot_id === spot.id);
-    return spotToItemRow(spot, solution);
-  });
-
-  // Normalize items for UI
-  const normalizedItems = items.map((item) => normalizeItem(item));
-
-  const hasItems = normalizedItems.length > 0;
+  const hasItems = spots.length > 0 || solutions.length > 0;
   const hasImage = !!post.image_url;
 
   // Display name: prefer artist_name, fallback to group_name
   const displayName = post.artist_name || post.group_name || "Unknown";
+
+  // Fetch related images from same account for Gallery + Related Looks
+  const { data: relatedImages } = useRelatedImagesByAccount(
+    post.id,
+    displayName
+  );
+
+  // Derive gallery and related look images
+  const galleryImages = relatedImages?.slice(0, 5) ?? [];
+  const relatedLookImages = relatedImages?.slice(5) ?? [];
 
   // Extract metadata tags from media_metadata if available
   const metadataTags = extractMetadataTags(post.media_metadata);
@@ -231,36 +238,40 @@ export function PostDetailContent({ postDetail }: Props) {
       </div>
 
       {/* ============================================================ */}
-      {/* Section 3: Spot Solutions                                     */}
+      {/* Section 3: Decoded Items                                      */}
       {/* ============================================================ */}
-      {hasItems ? (
-        <div className="bg-card/50">
-          {/* Section header matching decoded.pen pattern */}
-          <div className="mx-auto max-w-7xl px-6 pt-10 md:px-8 md:pt-14">
-            <div className="flex items-end justify-between mb-2">
-              <div className="flex flex-col gap-1.5">
-                <span className="font-sans text-[9px] font-semibold uppercase tracking-[3px] text-muted-foreground">
-                  SPOT SOLUTIONS
-                </span>
-                <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground">
-                  Decoded Items
-                </h2>
-              </div>
-              {normalizedItems.length > 3 && (
-                <span className="text-sm font-medium font-sans text-primary cursor-pointer hover:underline">
-                  View All
-                </span>
-              )}
-            </div>
-          </div>
+      {hasItems && (
+        <DecodedItemsSection spots={spots} solutions={solutions} />
+      )}
 
-          {/* ShopGrid carousel/grid */}
-          <ShopGrid items={normalizedItems} />
-        </div>
-      ) : (
-        /* ============================================================ */
-        /* Section 4: Empty State                                       */
-        /* ============================================================ */
+      {/* ============================================================ */}
+      {/* Section 4: Gallery                                            */}
+      {/* ============================================================ */}
+      {galleryImages.length > 0 && (
+        <GallerySection images={galleryImages} />
+      )}
+
+      {/* ============================================================ */}
+      {/* Section 5: Shop the Look Carousel                             */}
+      {/* ============================================================ */}
+      {solutions.length > 0 && (
+        <ShopCarouselSection solutions={solutions} />
+      )}
+
+      {/* ============================================================ */}
+      {/* Section 6: Related Looks                                      */}
+      {/* ============================================================ */}
+      {relatedLookImages.length > 0 && (
+        <RelatedLooksSection
+          images={relatedLookImages}
+          displayName={displayName}
+        />
+      )}
+
+      {/* ============================================================ */}
+      {/* Empty State (when no items at all)                            */}
+      {/* ============================================================ */}
+      {!hasItems && (
         <div className="flex flex-col items-center justify-center py-16 text-center px-6">
           <div className="h-20 w-20 rounded-full bg-muted flex items-center justify-center mb-4">
             <Package className="h-10 w-10 text-muted-foreground" />
