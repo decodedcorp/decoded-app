@@ -5,11 +5,12 @@ import Link from "next/link";
 import { gsap } from "gsap";
 import { Flip } from "gsap/Flip";
 import { useTransitionStore } from "@/lib/stores/transitionStore";
-import { Card } from "@/lib/design-system";
+import { Card, Hotspot } from "@/lib/design-system";
 import { cn } from "@/lib/utils";
 import { Heart, MessageCircle, Share2 } from "lucide-react";
 import { AccountAvatar } from "@/lib/components/shared/AccountAvatar";
 import { FollowButton } from "@/lib/components/shared/FollowButton";
+import { useSpots } from "@/lib/hooks/useSpots";
 
 // Register GSAP Flip plugin
 if (typeof window !== "undefined") {
@@ -91,6 +92,11 @@ export const FeedCard = memo(
     });
 
     const { id, imageUrl, hasItems } = item;
+
+    // Fetch spots for cards with items
+    const { data: spotsData } = useSpots(item.postId!, {
+      enabled: !!item.hasItems && !!item.postId,
+    });
 
     const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
       if (!id) return;
@@ -197,19 +203,23 @@ export const FeedCard = memo(
             <div className="h-full w-full bg-muted" />
           )}
 
-          {/* Spot indicators (matching StyleCard white dot style) */}
-          {hasItems && (
+          {/* Subtle spot indicators */}
+          {spotsData && spotsData.length > 0 && (
             <div className="absolute inset-0 pointer-events-none z-10">
-              {/* Center spot */}
-              <div className="absolute w-6 h-6 flex items-center justify-center" style={{ left: '45%', top: '40%' }}>
-                <div className="absolute inset-0 bg-white rounded-full animate-ping opacity-20 duration-[2000ms]" />
-                <div className="relative w-2.5 h-2.5 bg-white rounded-full shadow-[0_0_20px_rgba(255,255,255,0.8)] border border-black/20" />
-              </div>
-              {/* Secondary spot */}
-              <div className="absolute w-6 h-6 flex items-center justify-center" style={{ left: '60%', top: '55%' }}>
-                <div className="absolute inset-0 bg-white rounded-full animate-ping opacity-20 duration-[2500ms]" style={{ animationDelay: '0.5s' }} />
-                <div className="relative w-2 h-2 bg-white rounded-full shadow-[0_0_15px_rgba(255,255,255,0.6)] border border-black/20" />
-              </div>
+              {spotsData.map((spot) => (
+                <Hotspot
+                  key={spot.id}
+                  variant="inactive"
+                  position={{
+                    x: parseFloat(spot.position_left),
+                    y: parseFloat(spot.position_top),
+                  }}
+                  className="pointer-events-none !w-3 !h-3 opacity-50"
+                  label={
+                    spot.category?.name?.en || spot.category?.name?.ko || "Item"
+                  }
+                />
+              ))}
             </div>
           )}
 
