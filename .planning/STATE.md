@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-06)
 Phase: v2-09 (documentation-polish) of 9 phases in v2.0 milestone
 Plan: 03 of 03 complete
 Status: Phase v2-09 complete
-Last activity: 2026-02-12 — Completed quick-029 (Fix Header Scroll Disappear)
+Last activity: 2026-02-12 — Completed quick-031 (Fix Feed Card Image Top Crop)
 
 Progress: v2.0 milestone complete (all phases shipped)
 
@@ -76,7 +76,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Completed quick-029 (Fix Header Scroll Disappear)
+Stopped at: Completed quick-031 (Fix Feed Card Image Top Crop)
 Resume file: None
 
 ## Quick Tasks Completed
@@ -97,8 +97,9 @@ Resume file: None
 | 027 | Fix post detail image clip and spots | 2026-02-12 | ad09695 | [027-fix-post-detail-image-clip-and-spots](./quick/027-fix-post-detail-image-clip-and-spots/) |
 | 028 | Remove Achievements section from home page | 2026-02-12 | d807df3 | [028-remove-achievements-challenge-achieve-ma](./quick/028-remove-achievements-challenge-achieve-ma/) |
 | 029 | Fix header scroll disappear | 2026-02-12 | c8ff602 | [029-fix-header-scroll-disappear](./quick/029-fix-header-scroll-disappear/) |
+| 031 | Fix feed card image top crop | 2026-02-12 | 8b22163 | [031-fix-feed-card-image-top-crop](./quick/031-fix-feed-card-image-top-crop/) |
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-12 after quick-029 completion*
+*Last updated: 2026-02-12 after quick-031 completion*
