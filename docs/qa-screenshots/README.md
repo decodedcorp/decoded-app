@@ -1,10 +1,12 @@
 # Visual QA Screenshots
 
-**Generated:** 2026-02-06
+**Generated:** 2026-02-12
 **Reference:** docs/design-system/decoded.pen
 **Test Automation:** packages/web/tests/visual-qa.spec.ts
 
 이 문서는 v2.0 디자인 시스템 구현이 decoded.pen 디자인 참조와 일치하는지 검증하기 위한 시각적 QA 스크린샷을 포함합니다.
+
+**Total Screenshots:** 40 (4 viewports × 10 pages)
 
 ## Breakpoints Tested
 
