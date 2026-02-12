@@ -614,8 +614,8 @@ export function ImageDetailModal({ imageId }: Props) {
                         transform: "translate(-50%, -50%)",
                       }}
                     >
-                      <div className="absolute inset-0 bg-white rounded-full animate-ping opacity-30 duration-[2000ms]" />
-                      <div className="relative w-3 h-3 bg-white rounded-full shadow-[0_0_25px_rgba(255,255,255,1)] border border-black/20" />
+                      <div className="absolute inset-0 bg-primary rounded-full animate-ping opacity-30 duration-[2000ms]" />
+                      <div className="relative w-3 h-3 bg-primary rounded-full shadow-[0_0_25px_oklch(0.9519_0.1739_115.8446)] border border-black/20" />
                     </div>
                   );
                 })}

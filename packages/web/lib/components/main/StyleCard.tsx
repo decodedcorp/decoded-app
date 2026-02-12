@@ -124,8 +124,8 @@ export function StyleCard({
                 className="absolute w-8 h-8 -ml-4 -mt-4 flex items-center justify-center"
                 style={{ left: `${spot.x}%`, top: `${spot.y}%` }}
               >
-                <div className="absolute inset-0 bg-white rounded-full animate-ping opacity-30 duration-[2000ms]" />
-                <div className="relative w-3 h-3 bg-white rounded-full shadow-[0_0_25px_rgba(255,255,255,1)] border border-black/20" />
+                <div className="absolute inset-0 bg-primary rounded-full animate-ping opacity-30 duration-[2000ms]" />
+                <div className="relative w-3 h-3 bg-primary rounded-full shadow-[0_0_25px_hsl(var(--primary))] border border-black/20" />
               </motion.div>
             ))}
           </div>
