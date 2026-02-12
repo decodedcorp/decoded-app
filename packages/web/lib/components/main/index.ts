@@ -9,7 +9,6 @@ export type { HeroData } from "./HeroSection";
 export { DecodedPickSection } from "./DecodedPickSection";
 export { ArtistSpotlightSection } from "./ArtistSpotlightSection";
 export { WhatsNewSection } from "./WhatsNewSection";
-export { BadgeGridSection } from "./BadgeGridSection";
 export {
   DiscoverItemsSection,
   DiscoverProductsSection,

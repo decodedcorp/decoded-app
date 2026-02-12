@@ -10,7 +10,6 @@ import {
   fetchArtistSpotlightStylesServer,
   fetchItemsByAccountServer,
   fetchTrendingKeywordsServer,
-  fetchAllBadgesServer,
 } from "@/lib/supabase/queries/main-page.server";
 import {
   imageWithPostToWeeklyBestStyle,
@@ -33,7 +32,6 @@ export default async function Home() {
     newjeansItems,
     blackpinkItems,
     trendingKeywords,
-    badgesData,
   ] = await Promise.all([
     fetchWeeklyBestImagesServer(8),
     fetchBestItemsServer(6),
@@ -45,7 +43,6 @@ export default async function Home() {
     fetchItemsByAccountServer("뉴진스", 6),
     fetchItemsByAccountServer("블랙핑크", 6),
     fetchTrendingKeywordsServer(7),
-    fetchAllBadgesServer(),
   ]);
 
   const weeklyBestStyles = weeklyBestData.map(imageWithPostToWeeklyBestStyle);
@@ -87,7 +84,6 @@ export default async function Home() {
         artistSpotlightStyles={artistSpotlightStyles}
         discoverItemsByTab={discoverItemsByTab}
         trendingKeywords={trendingKeywords}
-        badges={badgesData}
       />
 
       {/* Footer */}
