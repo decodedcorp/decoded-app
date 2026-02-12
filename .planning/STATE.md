@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-06)
 Phase: v2-09 (documentation-polish) of 9 phases in v2.0 milestone
 Plan: 03 of 03 complete
 Status: Phase v2-09 complete
-Last activity: 2026-02-12 — Completed quick-025 (Replace Unconnected Image Sections with Post)
+Last activity: 2026-02-12 — Completed quick-026 (Fix Feed Header Clip and Post Detail Scroll)
 
 Progress: v2.0 milestone complete (all phases shipped)
 
@@ -39,6 +39,8 @@ Key decisions affecting future work:
 - v2-09-03: Playwright for visual QA automation over manual capture
 - v2-09-03: 4 breakpoints (375/768/1280/1440px) for responsive coverage
 - v2-09-03: API error handling issues deferred to quick tasks (out of visual QA scope)
+- quick-026: Negative margin technique for full-bleed content under fixed headers
+- quick-026: Child pages must NOT duplicate global layout headers/padding
 
 ### Tech Debt (from v2.1)
 
@@ -70,7 +72,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Completed quick-025 (Replace Unconnected Image Sections with Post)
+Stopped at: Completed quick-026 (Fix Feed Header Clip and Post Detail Scroll)
 Resume file: None
 
 ## Quick Tasks Completed
@@ -87,8 +89,9 @@ Resume file: None
 | 023 | Post detail page completion (editorial redesign) | 2026-02-12 | d5099ef | [023-post-detail-page-completion](./quick/023-post-detail-page-completion/) |
 | 024 | Post detail remaining sections (Decoded Items, Gallery, Shop, Related) | 2026-02-12 | 3f90d6a | [024-post-detail-remaining-sections](./quick/024-post-detail-remaining-sections/) |
 | 025 | Replace unconnected image sections with post data | 2026-02-12 | a420e82 | [025-replace-unconnected-image-sections-with-post](./quick/025-replace-unconnected-image-sections-with-post/) |
+| 026 | Fix feed header clip and post detail scroll | 2026-02-12 | 8afb9c0 | [026-fix-feed-header-clip-and-post-detail-scroll](./quick/026-fix-feed-header-clip-and-post-detail-scroll/) |
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-12 after quick-025 completion*
+*Last updated: 2026-02-12 after quick-026 completion*
