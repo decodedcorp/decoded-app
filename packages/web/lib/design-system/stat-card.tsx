@@ -144,7 +144,11 @@ export interface StatCardSkeletonProps {
 
 export const StatCardSkeleton = ({ className }: StatCardSkeletonProps) => {
   return (
-    <Card variant="default" size="md" className={cn("overflow-hidden", className)}>
+    <Card
+      variant="default"
+      size="md"
+      className={cn("overflow-hidden", className)}
+    >
       <CardContent className="flex flex-col gap-2 p-4 md:p-6">
         {/* Label Placeholder */}
         <div className="h-3 w-24 animate-pulse rounded bg-muted" />

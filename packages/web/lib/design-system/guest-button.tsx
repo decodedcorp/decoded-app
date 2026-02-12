@@ -30,7 +30,13 @@ export interface GuestButtonProps
  */
 export const GuestButton = forwardRef<HTMLButtonElement, GuestButtonProps>(
   (
-    { className, children = "Continue as Guest", isLoading = false, disabled, ...props },
+    {
+      className,
+      children = "Continue as Guest",
+      isLoading = false,
+      disabled,
+      ...props
+    },
     ref
   ) => {
     return (

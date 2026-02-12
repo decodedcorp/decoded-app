@@ -16,8 +16,7 @@ export const actionButtonVariants = cva(
     variants: {
       variant: {
         // ActionButton/Default: fill rgba(0,0,0,0.5), icon white
-        default:
-          "bg-black/50 text-white hover:bg-black/70 active:bg-black/80",
+        default: "bg-black/50 text-white hover:bg-black/70 active:bg-black/80",
         // ActionButton/Solid: fill primary color, icon white
         solid:
           "bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/80",

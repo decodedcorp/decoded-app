@@ -27,26 +27,23 @@ export const stepIndicatorVariants = cva("inline-flex items-center gap-2", {
   },
 });
 
-const stepCircleVariants = cva(
-  "rounded-full transition-colors duration-200",
-  {
-    variants: {
-      size: {
-        sm: "h-4 w-4",
-        md: "h-6 w-6",
-        lg: "h-8 w-8",
-      },
-      state: {
-        active: "bg-primary",
-        inactive: "bg-muted",
-      },
+const stepCircleVariants = cva("rounded-full transition-colors duration-200", {
+  variants: {
+    size: {
+      sm: "h-4 w-4",
+      md: "h-6 w-6",
+      lg: "h-8 w-8",
     },
-    defaultVariants: {
-      size: "md",
-      state: "inactive",
+    state: {
+      active: "bg-primary",
+      inactive: "bg-muted",
     },
-  }
-);
+  },
+  defaultVariants: {
+    size: "md",
+    state: "inactive",
+  },
+});
 
 const stepNumberVariants = cva(
   "flex items-center justify-center rounded-full font-semibold transition-colors duration-200",

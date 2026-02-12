@@ -27,7 +27,8 @@ export const spotCardVariants = cva(
         active:
           "w-full rounded-lg overflow-hidden shadow-lg ring-2 ring-primary",
         // Compact: List context - horizontal layout with small thumbnail
-        compact: "flex flex-row items-center gap-3 rounded-md p-2 hover:bg-muted/50",
+        compact:
+          "flex flex-row items-center gap-3 rounded-md p-2 hover:bg-muted/50",
       },
     },
     defaultVariants: {
@@ -102,7 +103,16 @@ export interface SpotCardProps
  */
 export const SpotCard = forwardRef<HTMLDivElement, SpotCardProps>(
   (
-    { imageUrl, brand, name, price, variant = "default", onClick, className, ...props },
+    {
+      imageUrl,
+      brand,
+      name,
+      price,
+      variant = "default",
+      onClick,
+      className,
+      ...props
+    },
     ref
   ) => {
     // Compact variant: horizontal layout
@@ -131,7 +141,9 @@ export const SpotCard = forwardRef<HTMLDivElement, SpotCardProps>(
 
           {/* Text: Beside image */}
           <div className="flex-1 min-w-0 space-y-0.5">
-            <p className="text-xs text-muted-foreground line-clamp-1">{brand}</p>
+            <p className="text-xs text-muted-foreground line-clamp-1">
+              {brand}
+            </p>
             <h4 className="text-sm font-medium text-foreground line-clamp-1">
               {name}
             </h4>
@@ -176,12 +188,7 @@ export const SpotCard = forwardRef<HTMLDivElement, SpotCardProps>(
         </div>
 
         {/* Product Info */}
-        <div
-          className={cn(
-            "space-y-0.5",
-            isActive ? "p-4" : "p-3"
-          )}
-        >
+        <div className={cn("space-y-0.5", isActive ? "p-4" : "p-3")}>
           <p
             className={cn(
               "text-muted-foreground line-clamp-1",
@@ -264,13 +271,22 @@ export const SpotCardSkeleton = ({
       {/* Text Placeholders */}
       <div className={cn("space-y-2", isActive ? "p-4" : "p-3")}>
         <div
-          className={cn("animate-pulse rounded bg-muted", isActive ? "h-4 w-20" : "h-3 w-16")}
+          className={cn(
+            "animate-pulse rounded bg-muted",
+            isActive ? "h-4 w-20" : "h-3 w-16"
+          )}
         />
         <div
-          className={cn("animate-pulse rounded bg-muted", isActive ? "h-5 w-40" : "h-4 w-32")}
+          className={cn(
+            "animate-pulse rounded bg-muted",
+            isActive ? "h-5 w-40" : "h-4 w-32"
+          )}
         />
         <div
-          className={cn("animate-pulse rounded bg-muted", isActive ? "h-4 w-24" : "h-3 w-20")}
+          className={cn(
+            "animate-pulse rounded bg-muted",
+            isActive ? "h-4 w-24" : "h-3 w-20"
+          )}
         />
       </div>
     </div>

@@ -35,8 +35,7 @@ export interface SpotDetailRelatedItem {
   onClick?: () => void;
 }
 
-export interface SpotDetailProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+export interface SpotDetailProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Main spot image URL */
   imageUrl?: string;
   /** Brand name */
@@ -206,10 +205,7 @@ export const SpotDetail = forwardRef<HTMLDivElement, SpotDetailProps>(
             {/* Horizontal Scroll Container */}
             <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
               {relatedItems.map((item, index) => (
-                <div
-                  key={index}
-                  className="flex-shrink-0 w-40 snap-start"
-                >
+                <div key={index} className="flex-shrink-0 w-40 snap-start">
                   <SpotCard
                     variant="compact"
                     imageUrl={item.imageUrl}

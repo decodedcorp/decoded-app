@@ -240,9 +240,7 @@ export interface LeaderItemSkeletonProps {
   className?: string;
 }
 
-export const LeaderItemSkeleton = ({
-  className,
-}: LeaderItemSkeletonProps) => {
+export const LeaderItemSkeleton = ({ className }: LeaderItemSkeletonProps) => {
   return (
     <div
       className={cn(

@@ -25,10 +25,7 @@ export const hotspotVariants = cva(
   {
     variants: {
       variant: {
-        default: [
-          "h-6 w-6 bg-primary",
-          "animate-pulse-soft",
-        ],
+        default: ["h-6 w-6 bg-primary", "animate-pulse-soft"],
         numbered: [
           "h-8 w-8 bg-primary",
           "flex items-center justify-center",
@@ -100,7 +97,15 @@ export interface HotspotProps
  */
 export const Hotspot = forwardRef<HTMLButtonElement, HotspotProps>(
   (
-    { className, variant = "default", position, number, label, style, ...props },
+    {
+      className,
+      variant = "default",
+      position,
+      number,
+      label,
+      style,
+      ...props
+    },
     ref
   ) => {
     // Clamp position values to valid range
@@ -123,7 +128,9 @@ export const Hotspot = forwardRef<HTMLButtonElement, HotspotProps>(
           transform: "translate(-50%, -50%)",
           ...style,
         }}
-        aria-label={label || `Hotspot${displayNumber ? ` ${displayNumber}` : ""}`}
+        aria-label={
+          label || `Hotspot${displayNumber ? ` ${displayNumber}` : ""}`
+        }
         {...props}
       >
         {variant === "numbered" && displayNumber !== undefined && displayNumber}

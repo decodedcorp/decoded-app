@@ -113,7 +113,10 @@ export { SpotCard, SpotCardSkeleton, spotCardVariants } from "./spot-card";
 export type { SpotCardProps } from "./spot-card";
 
 // ShopCarouselCard Component
-export { ShopCarouselCard, ShopCarouselCardSkeleton } from "./shop-carousel-card";
+export {
+  ShopCarouselCard,
+  ShopCarouselCardSkeleton,
+} from "./shop-carousel-card";
 export type { ShopCarouselCardProps } from "./shop-carousel-card";
 
 // Badge Component
@@ -130,7 +133,12 @@ export type { RankingItemProps } from "./ranking-item";
 
 // SpotDetail Component
 export { SpotDetail, SpotDetailSkeleton } from "./spot-detail";
-export type { SpotDetailProps, SpotDetailSkeletonProps, SpotDetailShopLink, SpotDetailRelatedItem } from "./spot-detail";
+export type {
+  SpotDetailProps,
+  SpotDetailSkeletonProps,
+  SpotDetailShopLink,
+  SpotDetailRelatedItem,
+} from "./spot-detail";
 
 // OAuthButton Component
 export { OAuthButton, oauthButtonVariants } from "./oauth-button";

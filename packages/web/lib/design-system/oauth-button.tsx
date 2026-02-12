@@ -19,7 +19,8 @@ export const oauthButtonVariants = cva(
     variants: {
       provider: {
         // Kakao: fill #FEE500, text #191919
-        kakao: "bg-[#FEE500] text-[#191919] hover:bg-[#FDD800] active:bg-[#FAC800]",
+        kakao:
+          "bg-[#FEE500] text-[#191919] hover:bg-[#FDD800] active:bg-[#FAC800]",
         // Google: fill #FFFFFF, text #374151, border
         google:
           "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 active:bg-gray-100",
@@ -121,11 +122,7 @@ export const OAuthButton = forwardRef<HTMLButtonElement, OAuthButtonProps>(
         className={cn(oauthButtonVariants({ provider }), className)}
         {...props}
       >
-        {isLoading ? (
-          <Loader2 className="h-5 w-5 animate-spin" />
-        ) : (
-          config.icon
-        )}
+        {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : config.icon}
         <span>{config.label}</span>
       </button>
     );

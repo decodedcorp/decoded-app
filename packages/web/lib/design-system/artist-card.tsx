@@ -89,8 +89,7 @@ export const ArtistCard = forwardRef<HTMLDivElement, ArtistCardProps>(
               {name}
             </h4>
             <p className="text-xs text-muted-foreground">
-              {postCount.toLocaleString()}{" "}
-              {postCount === 1 ? "post" : "posts"}
+              {postCount.toLocaleString()} {postCount === 1 ? "post" : "posts"}
             </p>
           </div>
         </CardContent>
@@ -122,7 +121,11 @@ export interface ArtistCardSkeletonProps {
 
 export const ArtistCardSkeleton = ({ className }: ArtistCardSkeletonProps) => {
   return (
-    <Card variant="default" size="sm" className={cn("overflow-hidden", className)}>
+    <Card
+      variant="default"
+      size="sm"
+      className={cn("overflow-hidden", className)}
+    >
       <CardContent className="flex flex-col items-center gap-3 p-4 min-w-[120px]">
         {/* Avatar Placeholder */}
         <div className="w-16 h-16 rounded-full animate-pulse bg-muted" />

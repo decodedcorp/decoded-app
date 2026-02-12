@@ -108,7 +108,10 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(
         const deltaPercent = deltaY / viewportHeight;
 
         let newSnap = startSnapRef.current + deltaPercent;
-        newSnap = Math.max(snapPoints[0], Math.min(snapPoints.at(-1)!, newSnap));
+        newSnap = Math.max(
+          snapPoints[0],
+          Math.min(snapPoints.at(-1)!, newSnap)
+        );
 
         setCurrentSnap(newSnap);
       },
@@ -128,7 +131,14 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(
       if (currentSnap < snapPoints[0] * 0.5) {
         onClose?.();
       }
-    }, [isDragging, currentSnap, findNearestSnap, onSnapChange, snapPoints, onClose]);
+    }, [
+      isDragging,
+      currentSnap,
+      findNearestSnap,
+      onSnapChange,
+      snapPoints,
+      onClose,
+    ]);
 
     // Touch event handlers
     const handleTouchStart = useCallback(

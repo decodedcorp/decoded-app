@@ -99,7 +99,10 @@ export function Tabs({
     <TabsContext.Provider value={{ value, onValueChange, layoutId }}>
       <div
         role="tablist"
-        className={cn("flex items-center gap-1 border-b border-border", className)}
+        className={cn(
+          "flex items-center gap-1 border-b border-border",
+          className
+        )}
       >
         {children}
       </div>
