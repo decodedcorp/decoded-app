@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-06)
 Phase: v2-09 (documentation-polish) of 9 phases in v2.0 milestone
 Plan: 03 of 03 complete
 Status: Phase v2-09 complete
-Last activity: 2026-02-12 — Completed quick-034 (Remove post detail x-axis scroll)
+Last activity: 2026-02-12 — Completed quick-033 (Unify Spot Brand Color Animation Design)
 
 Progress: v2.0 milestone complete (all phases shipped)
 
@@ -47,6 +47,11 @@ Key decisions affecting future work:
 - quick-029: Clear z-index hierarchy: headers z-40, content sections z-20 or below, modals z-50+
 - quick-030: Deterministic brand color via string hash for consistent visual identity
 - quick-030: Hotspot design system component supports optional color override
+- quick-033: Hotspot absorbs SpotMarker functionality, single source of truth for spot/marker UI
+- quick-033: SpotMarker deprecated re-export maintains backward compatibility during migration
+- quick-033: brandToColor utility shared across design system for consistent brand colors
+- quick-033: Glow effects use CSS custom property --hotspot-color for flexible color overrides
+- quick-033: spot-reveal animation in both Tailwind config and globals.css for compatibility
 
 ### Tech Debt (from v2.1)
 
@@ -78,7 +83,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Completed quick-030 (Fix Desktop Sidebar Image Spot Brand)
+Stopped at: Completed quick-033 (Unify Spot Brand Color Animation Design)
 Resume file: None
 
 ## Quick Tasks Completed
@@ -102,6 +107,7 @@ Resume file: None
 | 030 | Fix desktop sidebar image spot brand | 2026-02-12 | 4c99cb3 | [030-fix-desktop-sidebar-image-spot-brand](./quick/030-fix-desktop-sidebar-image-spot-brand/) |
 | 031 | Fix feed card image top crop | 2026-02-12 | 8b22163 | [031-fix-feed-card-image-top-crop](./quick/031-fix-feed-card-image-top-crop/) |
 | 032 | Fix activeImageSrc TDZ reference error | 2026-02-12 | f6fc515 | [032-fix-activeimagesrc-tdz-reference-error](./quick/032-fix-activeimagesrc-tdz-reference-error/) |
+| 033 | Unify spot brand color animation design | 2026-02-12 | 034312f | [033-unify-spot-brand-color-animation-design](./quick/033-unify-spot-brand-color-animation-design/) |
 | 034 | Remove post detail x-axis scroll | 2026-02-12 | c2265ea | [034-remove-post-detail-x-axis-scroll](./quick/034-remove-post-detail-x-axis-scroll/) |
 
 ---
