@@ -685,7 +685,7 @@ export function ImageDetailModal({ imageId }: Props) {
         {/* Scrollable Content Area */}
         <div
           ref={scrollContainerRef}
-          className="relative flex-1 overflow-y-auto overflow-x-visible overscroll-contain"
+          className="relative flex-1 overflow-y-auto overflow-x-hidden overscroll-contain"
         >
           {renderContent()}
         </div>

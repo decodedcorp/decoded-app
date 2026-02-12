@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-06)
 Phase: v2-09 (documentation-polish) of 9 phases in v2.0 milestone
 Plan: 03 of 03 complete
 Status: Phase v2-09 complete
-Last activity: 2026-02-12 — Completed quick-032 (Fix activeImageSrc TDZ Reference Error)
+Last activity: 2026-02-12 — Completed quick-034 (Remove post detail x-axis scroll)
 
 Progress: v2.0 milestone complete (all phases shipped)
 
@@ -102,6 +102,7 @@ Resume file: None
 | 030 | Fix desktop sidebar image spot brand | 2026-02-12 | 4c99cb3 | [030-fix-desktop-sidebar-image-spot-brand](./quick/030-fix-desktop-sidebar-image-spot-brand/) |
 | 031 | Fix feed card image top crop | 2026-02-12 | 8b22163 | [031-fix-feed-card-image-top-crop](./quick/031-fix-feed-card-image-top-crop/) |
 | 032 | Fix activeImageSrc TDZ reference error | 2026-02-12 | f6fc515 | [032-fix-activeimagesrc-tdz-reference-error](./quick/032-fix-activeimagesrc-tdz-reference-error/) |
+| 034 | Remove post detail x-axis scroll | 2026-02-12 | c2265ea | [034-remove-post-detail-x-axis-scroll](./quick/034-remove-post-detail-x-axis-scroll/) |
 
 ---
 
