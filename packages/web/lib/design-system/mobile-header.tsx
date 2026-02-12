@@ -3,7 +3,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Search, SlidersHorizontal, Bell } from "lucide-react";
 import DecodedLogo from "@/lib/components/DecodedLogo";
 
 /**
@@ -82,8 +82,8 @@ export function MobileHeader({
           </Link>
         </div>
 
-        {/* Right Section: Search + Filter */}
-        <div className="flex items-center gap-2 flex-shrink-0">
+        {/* Right Section: Search + Notifications + Filter */}
+        <div className="flex items-center gap-1 flex-shrink-0">
           {/* Search Icon Button */}
           <button
             onClick={onSearchClick}
@@ -91,6 +91,15 @@ export function MobileHeader({
             aria-label="Search"
           >
             <Search className="h-5 w-5 text-muted-foreground" />
+          </button>
+
+          {/* Notification Bell with badge */}
+          <button
+            className="relative p-2 rounded-md hover:bg-accent transition-colors"
+            aria-label="Notifications"
+          >
+            <Bell className="h-5 w-5 text-muted-foreground" />
+            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500" />
           </button>
 
           {/* Filter Icon Button */}

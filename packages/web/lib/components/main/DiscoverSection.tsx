@@ -23,12 +23,58 @@ const productTabs: CategoryTab[] = [
 ];
 
 const sampleItems: ItemCardData[] = [
-  { id: "1", brand: "RON ARAD STUDIO", name: "Bookworm Table", price: "$450", link: "/items/1", imageUrl: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400" },
-  { id: "2", brand: "RON ARAD STUDIO", name: "Bookworm Chair", price: "$650", link: "/items/2", imageUrl: "https://images.unsplash.com/photo-1564848005333-590727c99921?w=400" },
-  { id: "3", brand: "RON ARAD STUDIO", name: "Bookworm Lamp", price: "$180", link: "/items/3", imageUrl: "https://images.unsplash.com/photo-1518738458435-19149697112a?w=400" },
-  { id: "4", brand: "RON ARAD STUDIO", name: "Bookworm Shelf", price: "$550", link: "/items/4", imageUrl: "https://images.unsplash.com/photo-1641206189215-9533ceb7a1df?w=400" },
-  { id: "5", brand: "RON ARAD STUDIO", name: "Bookworm Desk", price: "$1,200", link: "/items/5", imageUrl: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400" },
-  { id: "6", brand: "RON ARAD STUDIO", name: "Bookworm Sofa", price: "$3,800", link: "/items/6", imageUrl: "https://images.unsplash.com/photo-1547949003-9792a18a2601?w=400" },
+  {
+    id: "1",
+    brand: "RON ARAD STUDIO",
+    name: "Bookworm Table",
+    price: "$450",
+    link: "/items/1",
+    imageUrl:
+      "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400",
+  },
+  {
+    id: "2",
+    brand: "RON ARAD STUDIO",
+    name: "Bookworm Chair",
+    price: "$650",
+    link: "/items/2",
+    imageUrl:
+      "https://images.unsplash.com/photo-1564848005333-590727c99921?w=400",
+  },
+  {
+    id: "3",
+    brand: "RON ARAD STUDIO",
+    name: "Bookworm Lamp",
+    price: "$180",
+    link: "/items/3",
+    imageUrl:
+      "https://images.unsplash.com/photo-1518738458435-19149697112a?w=400",
+  },
+  {
+    id: "4",
+    brand: "RON ARAD STUDIO",
+    name: "Bookworm Shelf",
+    price: "$550",
+    link: "/items/4",
+    imageUrl:
+      "https://images.unsplash.com/photo-1641206189215-9533ceb7a1df?w=400",
+  },
+  {
+    id: "5",
+    brand: "RON ARAD STUDIO",
+    name: "Bookworm Desk",
+    price: "$1,200",
+    link: "/items/5",
+    imageUrl: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400",
+  },
+  {
+    id: "6",
+    brand: "RON ARAD STUDIO",
+    name: "Bookworm Sofa",
+    price: "$3,800",
+    link: "/items/6",
+    imageUrl: "https://images.unsplash.com/photo-1547949003-9792a18a2601?w=400",
+  },
 ];
 
 interface DiscoverItemsSectionProps {
@@ -57,7 +103,7 @@ export function DiscoverItemsSection({
               Discover Items
             </h2>
           </div>
-          
+
           {/* Tabs - Minimalist Architectural Style */}
           <div className="flex gap-8 overflow-x-auto no-scrollbar pb-2">
             {tabs.map((tab) => (
@@ -66,14 +112,16 @@ export function DiscoverItemsSection({
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
                   "relative text-xs font-sans font-bold tracking-[0.2em] uppercase transition-all duration-500 py-2 whitespace-nowrap",
-                  activeTab === tab.id ? "text-primary" : "text-white/20 hover:text-white/60"
+                  activeTab === tab.id
+                    ? "text-primary"
+                    : "text-white/20 hover:text-white/60"
                 )}
               >
                 {tab.label}
                 {activeTab === tab.id && (
-                  <motion.div 
+                  <motion.div
                     layoutId="activeTabUnderlineItems"
-                    className="absolute bottom-0 left-0 w-full h-[1px] bg-primary" 
+                    className="absolute bottom-0 left-0 w-full h-[1px] bg-primary"
                   />
                 )}
               </button>
@@ -129,14 +177,16 @@ export function DiscoverProductsSection({
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
                   "relative text-xs font-sans font-bold tracking-[0.2em] uppercase transition-all duration-500 py-2 whitespace-nowrap",
-                  activeTab === tab.id ? "text-primary" : "text-white/20 hover:text-white/60"
+                  activeTab === tab.id
+                    ? "text-primary"
+                    : "text-white/20 hover:text-white/60"
                 )}
               >
                 {tab.label}
                 {activeTab === tab.id && (
-                  <motion.div 
+                  <motion.div
                     layoutId="activeTabUnderlineProducts"
-                    className="absolute bottom-0 left-0 w-full h-[1px] bg-primary" 
+                    className="absolute bottom-0 left-0 w-full h-[1px] bg-primary"
                   />
                 )}
               </button>

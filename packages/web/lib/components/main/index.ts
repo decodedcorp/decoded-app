@@ -18,7 +18,6 @@ export { BestItemSection, WeeklyBestSection } from "./BestSection";
 export { TrendingNowSection } from "./TrendingSection";
 export { TodayDecodedSection } from "./TodayDecodedSection";
 
-
 // Shared components
 export { SectionHeader } from "./SectionHeader";
 export { StyleCard } from "./StyleCard";

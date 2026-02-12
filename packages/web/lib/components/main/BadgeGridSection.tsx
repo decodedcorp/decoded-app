@@ -35,17 +35,17 @@ function BadgeItem({ badge, delay = 0 }: BadgeItemProps) {
           </div>
         ) : (
           <div className="relative">
-              <Trophy className="h-7 w-7 text-white/10 transition-colors duration-700 group-hover:text-primary" />
-             <Star className="absolute -top-1 -right-1 h-4 w-4 text-primary/20 group-hover:text-primary animate-pulse" />
+            <Trophy className="h-7 w-7 text-white/10 transition-colors duration-700 group-hover:text-primary" />
+            <Star className="absolute -top-1 -right-1 h-4 w-4 text-primary/20 group-hover:text-primary animate-pulse" />
           </div>
         )}
-        
+
         {/* Status Overlay */}
         <div className="absolute -bottom-0.5 -right-0.5 h-6 w-6 rounded-full border border-white/10 bg-black flex items-center justify-center shadow-lg group-hover:border-primary/20 transition-colors">
           <Lock className="h-2.5 w-2.5 text-white/30 group-hover:text-primary/50 transition-colors" />
         </div>
       </div>
-      
+
       <div className="text-center space-y-2">
         <h4 className="line-clamp-1 text-xs font-sans font-bold tracking-[0.15em] text-white/80 group-hover:text-white transition-colors uppercase">
           {badge.name}
@@ -85,7 +85,8 @@ export function BadgeGridSection({ badges }: BadgeGridSectionProps) {
                 Achievements
               </span>
               <h2 className="text-4xl md:text-5xl font-serif font-bold italic tracking-tighter text-white leading-[0.9]">
-                Challenge<br />& Achieve
+                Challenge
+                <br />& Achieve
               </h2>
             </motion.div>
           </div>
@@ -98,7 +99,11 @@ export function BadgeGridSection({ badges }: BadgeGridSectionProps) {
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
           {badges.map((badge, index) => (
-            <BadgeItem key={badge.id} badge={badge} delay={0.05 * (index % 6)} />
+            <BadgeItem
+              key={badge.id}
+              badge={badge}
+              delay={0.05 * (index % 6)}
+            />
           ))}
         </div>
       </div>

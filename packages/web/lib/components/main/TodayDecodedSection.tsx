@@ -6,7 +6,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
-
 interface SpotDetail {
   id: string;
   number: number;
@@ -43,8 +42,7 @@ const sampleSpots: SpotDetail[] = [
     price: "$89",
     stylingTip:
       "Retro vibes meet modern streetwear. Layer over a cropped top for the perfect Y2K moment.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800",
+    imageUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800",
     link: "/items/2",
     x: 55,
     y: 25,
@@ -65,12 +63,13 @@ const sampleSpots: SpotDetail[] = [
   },
 ];
 
-
 interface TodayDecodedSectionProps {
   spots?: SpotDetail[];
 }
 
-export function TodayDecodedSection({ spots = sampleSpots }: TodayDecodedSectionProps) {
+export function TodayDecodedSection({
+  spots = sampleSpots,
+}: TodayDecodedSectionProps) {
   const [hoveredSpotId, setHoveredSpotId] = useState<string | null>(null);
 
   return (
@@ -88,17 +87,29 @@ export function TodayDecodedSection({ spots = sampleSpots }: TodayDecodedSection
               Featured Spots
             </span>
             <h2 className="text-6xl md:text-8xl font-serif font-bold italic tracking-tighter leading-[0.85]">
-              Today's<br />Decoded
+              Today's
+              <br />
+              Decoded
             </h2>
           </motion.div>
-          
+
           <Link
             href="/explore"
             className="group flex items-center gap-4 py-4 px-8 border border-white/10 rounded-full text-[10px] font-sans font-bold tracking-[0.2em] text-white/50 hover:text-white hover:border-white/30 transition-all uppercase"
           >
             <span>View All Spots</span>
-            <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            <svg
+              className="w-4 h-4 text-primary"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M14 5l7 7m0 0l-7 7m7-7H3"
+              />
             </svg>
           </Link>
         </div>
@@ -111,7 +122,11 @@ export function TodayDecodedSection({ spots = sampleSpots }: TodayDecodedSection
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 1, delay: index * 0.2, ease: [0.16, 1, 0.3, 1] }}
+              transition={{
+                duration: 1,
+                delay: index * 0.2,
+                ease: [0.16, 1, 0.3, 1],
+              }}
               className="flex flex-col gap-8 group"
               onMouseEnter={() => setHoveredSpotId(spot.id)}
               onMouseLeave={() => setHoveredSpotId(null)}
@@ -124,18 +139,22 @@ export function TodayDecodedSection({ spots = sampleSpots }: TodayDecodedSection
                   fill
                   className={cn(
                     "object-cover transition-all duration-1000",
-                    hoveredSpotId === spot.id ? "scale-110" : "scale-100 grayscale-[0.3]"
+                    hoveredSpotId === spot.id
+                      ? "scale-110"
+                      : "scale-100 grayscale-[0.3]"
                   )}
                 />
-                
+
                 {/* Spotlight Mask Pattern */}
-                <div className={cn(
-                  "absolute inset-0 bg-black/40 transition-opacity duration-700 pointer-events-none",
-                  hoveredSpotId === spot.id ? "opacity-0" : "opacity-100"
-                )} />
+                <div
+                  className={cn(
+                    "absolute inset-0 bg-black/40 transition-opacity duration-700 pointer-events-none",
+                    hoveredSpotId === spot.id ? "opacity-0" : "opacity-100"
+                  )}
+                />
 
                 {/* Numbered Spot Marker */}
-                <div 
+                <div
                   className="absolute"
                   style={{ left: `${spot.x}%`, top: `${spot.y}%` }}
                 >
@@ -185,8 +204,18 @@ export function TodayDecodedSection({ spots = sampleSpots }: TodayDecodedSection
                   <span className="relative z-10 text-black font-sans font-bold text-xs tracking-[0.2em] uppercase">
                     View Solution
                   </span>
-                  <svg className="relative z-10 w-5 h-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  <svg
+                    className="relative z-10 w-5 h-5 text-black"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
                   </svg>
                   <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover/btn:translate-x-0 transition-transform duration-500" />
                 </Link>

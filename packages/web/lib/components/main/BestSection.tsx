@@ -14,7 +14,8 @@ const sampleBestItems: ItemCardData[] = [
     name: "Re-Edition 2005 Bag",
     link: "/items/1",
     price: "$1,850",
-    imageUrl: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400",
+    imageUrl:
+      "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400",
   },
   {
     id: "bi-2",
@@ -22,7 +23,8 @@ const sampleBestItems: ItemCardData[] = [
     name: "Triomphe Belt",
     link: "/items/2",
     price: "$650",
-    imageUrl: "https://images.unsplash.com/photo-1564848005333-590727c99921?w=400",
+    imageUrl:
+      "https://images.unsplash.com/photo-1564848005333-590727c99921?w=400",
   },
   {
     id: "bi-3",
@@ -30,7 +32,8 @@ const sampleBestItems: ItemCardData[] = [
     name: "Air Jordan 1 Retro",
     link: "/items/3",
     price: "$180",
-    imageUrl: "https://images.unsplash.com/photo-1518738458435-19149697112a?w=400",
+    imageUrl:
+      "https://images.unsplash.com/photo-1518738458435-19149697112a?w=400",
   },
   {
     id: "bi-4",
@@ -38,7 +41,8 @@ const sampleBestItems: ItemCardData[] = [
     name: "Le Chiquito",
     link: "/items/4",
     price: "$550",
-    imageUrl: "https://images.unsplash.com/photo-1641206189215-9533ceb7a1df?w=400",
+    imageUrl:
+      "https://images.unsplash.com/photo-1641206189215-9533ceb7a1df?w=400",
   },
   {
     id: "bi-5",
@@ -66,10 +70,33 @@ export interface WeeklyBestStyle {
 }
 
 const sampleWeeklyStyles: WeeklyBestStyle[] = [
-  { id: "ws-1", artistName: "Newjeans Danielle", link: "/feed", imageUrl: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800" },
-  { id: "ws-2", artistName: "Newjeans Haerin", link: "/feed", imageUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800" },
-  { id: "ws-3", artistName: "IVE Wonyoung", link: "/feed", imageUrl: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800" },
-  { id: "ws-4", artistName: "Blackpink Jennie", link: "/feed", imageUrl: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800" },
+  {
+    id: "ws-1",
+    artistName: "Newjeans Danielle",
+    link: "/feed",
+    imageUrl:
+      "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800",
+  },
+  {
+    id: "ws-2",
+    artistName: "Newjeans Haerin",
+    link: "/feed",
+    imageUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800",
+  },
+  {
+    id: "ws-3",
+    artistName: "IVE Wonyoung",
+    link: "/feed",
+    imageUrl:
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800",
+  },
+  {
+    id: "ws-4",
+    artistName: "Blackpink Jennie",
+    link: "/feed",
+    imageUrl:
+      "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800",
+  },
 ];
 
 export function BestItemSection({
@@ -81,7 +108,7 @@ export function BestItemSection({
     <section className="py-24 md:py-40 bg-black px-6 md:px-12 border-t border-white/5 relative overflow-hidden">
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-      
+
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-24 md:mb-32 gap-10">
           <div className="max-w-2xl">
@@ -115,12 +142,16 @@ export function BestItemSection({
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+              transition={{
+                duration: 0.8,
+                delay: index * 0.1,
+                ease: [0.16, 1, 0.3, 1],
+              }}
               className="group flex gap-8 items-center"
             >
               {/* Ranking Number */}
               <div className="text-7xl md:text-9xl font-serif font-bold italic text-white/[0.03] group-hover:text-primary transition-all duration-1000 select-none">
-                {String(index + 1).padStart(2, '0')}
+                {String(index + 1).padStart(2, "0")}
               </div>
 
               <Link href={item.link} className="flex gap-8 items-center flex-1">
@@ -200,7 +231,9 @@ export function WeeklyBestSection({
                 Editor's Weekly Roll
               </span>
               <h2 className="text-6xl md:text-8xl font-serif font-bold italic tracking-tighter text-white leading-[0.85]">
-                Weekly<br />Best
+                Weekly
+                <br />
+                Best
               </h2>
             </motion.div>
           </div>
@@ -211,7 +244,9 @@ export function WeeklyBestSection({
                 onClick={() => setActiveIdx(i)}
                 className={cn(
                   "w-12 h-[2px] transition-all duration-700 rounded-full",
-                  activeIdx === i ? "bg-primary w-20" : "bg-white/10 hover:bg-white/20"
+                  activeIdx === i
+                    ? "bg-primary w-20"
+                    : "bg-white/10 hover:bg-white/20"
                 )}
               />
             ))}
@@ -227,7 +262,11 @@ export function WeeklyBestSection({
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+              transition={{
+                duration: 0.8,
+                delay: index * 0.1,
+                ease: [0.16, 1, 0.3, 1],
+              }}
             >
               <Link href={style.link} className="block">
                 <div
@@ -252,7 +291,7 @@ export function WeeklyBestSection({
 
                   {/* Ranking Overlay */}
                   <div className="absolute top-8 left-8 text-5xl font-serif font-bold italic text-white/30 tracking-tighter group-hover:text-primary/50 transition-colors">
-                    #{String(index + 1).padStart(2, '0')}
+                    #{String(index + 1).padStart(2, "0")}
                   </div>
                 </div>
 

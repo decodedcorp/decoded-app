@@ -51,7 +51,11 @@ export function StyleCard({
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: index * 0.1 }}
+      transition={{
+        duration: 0.8,
+        ease: [0.16, 1, 0.3, 1],
+        delay: index * 0.1,
+      }}
       className={cn(
         "group relative overflow-hidden rounded-[24px] md:rounded-[40px] bg-neutral-900 transition-all duration-700 hover:shadow-[0_30px_60px_rgba(0,0,0,0.6)]",
         aspectClasses[variant]
@@ -112,7 +116,11 @@ export function StyleCard({
                 key={spot.id}
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                transition={{
+                  duration: 0.8,
+                  delay: 0.6,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
                 className="absolute w-8 h-8 -ml-4 -mt-4 flex items-center justify-center"
                 style={{ left: `${spot.x}%`, top: `${spot.y}%` }}
               >

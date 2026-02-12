@@ -40,15 +40,29 @@ function NewsletterForm() {
           disabled={isSubmitting || !email}
           className="absolute right-0 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors p-2"
         >
-          {isSubmitting ? "..." : (
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          {isSubmitting ? (
+            "..."
+          ) : (
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M14 5l7 7m0 0l-7 7m7-7H3"
+              />
             </svg>
           )}
         </button>
       </form>
       {isSuccess && (
-        <p className="mt-4 text-[10px] uppercase font-bold tracking-widest text-primary">Subscription Confirmed</p>
+        <p className="mt-4 text-[10px] uppercase font-bold tracking-widest text-primary">
+          Subscription Confirmed
+        </p>
       )}
     </div>
   );
@@ -68,13 +82,15 @@ export function MainFooter() {
               DECODED
             </h2>
             <p className="text-white/40 font-sans font-light text-sm md:text-base leading-relaxed max-w-md">
-              A curated narrative of global style, culture, and creation. We decode the visual language of the present to document the style of the future.
+              A curated narrative of global style, culture, and creation. We
+              decode the visual language of the present to document the style of
+              the future.
             </p>
             <div className="flex gap-8 mt-12">
-              {['Instagram', 'Twitter', 'Vimeo', 'Archive'].map((social) => (
-                <Link 
-                  key={social} 
-                  href="#" 
+              {["Instagram", "Twitter", "Vimeo", "Archive"].map((social) => (
+                <Link
+                  key={social}
+                  href="#"
                   className="text-[10px] font-sans font-bold tracking-[0.2em] text-white/20 hover:text-white transition-colors uppercase"
                 >
                   {social}
@@ -86,19 +102,41 @@ export function MainFooter() {
           {/* Navigation Matrix */}
           <div className="lg:col-span-3 grid grid-cols-2 gap-8 lg:gap-16">
             <div className="space-y-6">
-              <h4 className="text-[10px] font-sans font-bold tracking-[0.2em] text-white/40 uppercase">Journal</h4>
+              <h4 className="text-[10px] font-sans font-bold tracking-[0.2em] text-white/40 uppercase">
+                Journal
+              </h4>
               <ul className="space-y-4">
-                {['Narratives', 'Editorials', 'Interviews', 'Features'].map((item) => (
-                  <li key={item}><Link href="#" className="text-xs font-sans text-white/50 hover:text-primary transition-colors">{item}</Link></li>
-                ))}
+                {["Narratives", "Editorials", "Interviews", "Features"].map(
+                  (item) => (
+                    <li key={item}>
+                      <Link
+                        href="#"
+                        className="text-xs font-sans text-white/50 hover:text-primary transition-colors"
+                      >
+                        {item}
+                      </Link>
+                    </li>
+                  )
+                )}
               </ul>
             </div>
             <div className="space-y-6">
-              <h4 className="text-[10px] font-sans font-bold tracking-[0.2em] text-white/40 uppercase">Platform</h4>
+              <h4 className="text-[10px] font-sans font-bold tracking-[0.2em] text-white/40 uppercase">
+                Platform
+              </h4>
               <ul className="space-y-4">
-                {['Directory', 'Collective', 'Collaborations', 'About'].map((item) => (
-                  <li key={item}><Link href="#" className="text-xs font-sans text-white/50 hover:text-primary transition-colors">{item}</Link></li>
-                ))}
+                {["Directory", "Collective", "Collaborations", "About"].map(
+                  (item) => (
+                    <li key={item}>
+                      <Link
+                        href="#"
+                        className="text-xs font-sans text-white/50 hover:text-primary transition-colors"
+                      >
+                        {item}
+                      </Link>
+                    </li>
+                  )
+                )}
               </ul>
             </div>
           </div>
@@ -116,15 +154,25 @@ export function MainFooter() {
               DECODED INC. ALL RIGHTS RESERVED &copy; {new Date().getFullYear()}
             </p>
             <div className="flex gap-6 text-[9px] font-sans font-medium tracking-[0.2em] text-white/10 uppercase">
-              <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-              <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+              <Link
+                href="/privacy"
+                className="hover:text-white transition-colors"
+              >
+                Privacy Policy
+              </Link>
+              <Link
+                href="/terms"
+                className="hover:text-white transition-colors"
+              >
+                Terms of Service
+              </Link>
             </div>
           </div>
-          
+
           <div className="text-right">
-             <span className="block text-[8px] font-sans font-bold tracking-[0.4em] text-white/5 uppercase">
-               Architecture Version 3.1.0-Release
-             </span>
+            <span className="block text-[8px] font-sans font-bold tracking-[0.4em] text-white/5 uppercase">
+              Architecture Version 3.1.0-Release
+            </span>
           </div>
         </div>
       </div>

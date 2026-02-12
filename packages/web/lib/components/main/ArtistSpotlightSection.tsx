@@ -12,7 +12,8 @@ const sampleSpotlightData: StyleCardData[] = [
       "뉴진스의 다니엘이 'How Sweet' 뮤비에서 Nike Cortes Nylon Midnight Navy, 핑크 아노락을 매치해 스타일을 완성했다.",
     artistName: "Newjeans Danielle",
     link: "/feed",
-    imageUrl: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800",
+    imageUrl:
+      "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800",
   },
   {
     id: "2",
@@ -64,7 +65,10 @@ export function ArtistSpotlightSection({
           style={{ scrollbarWidth: "none" }}
         >
           {data.map((item, index) => (
-            <div key={item.id} className="min-w-[300px] md:min-w-[450px] snap-center">
+            <div
+              key={item.id}
+              className="min-w-[300px] md:min-w-[450px] snap-center"
+            >
               <StyleCard data={item} variant="medium" index={index} />
             </div>
           ))}

@@ -42,7 +42,8 @@ export function WhatsNewSection({
                 What's New
               </h2>
               <p className="text-white/40 font-sans font-light text-xl md:text-2xl leading-relaxed max-w-xl">
-                Fresh narratives, captures, and curated styles from our global collective of visual storytellers.
+                Fresh narratives, captures, and curated styles from our global
+                collective of visual storytellers.
               </p>
             </motion.div>
           </div>
@@ -57,13 +58,17 @@ export function WhatsNewSection({
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-24">
           {styles.map((style, index) => (
-            <motion.div 
-              key={style.id} 
+            <motion.div
+              key={style.id}
               className="group/container"
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 1, delay: index * 0.2, ease: [0.16, 1, 0.3, 1] }}
+              transition={{
+                duration: 1,
+                delay: index * 0.2,
+                ease: [0.16, 1, 0.3, 1],
+              }}
             >
               <div className="relative mb-12 overflow-hidden rounded-[40px] shadow-[0_40px_100px_rgba(0,0,0,0.6)] transition-all duration-700 group-hover/container:-translate-y-3 group-hover/container:shadow-[0_50px_120px_rgba(0,0,0,0.8)]">
                 <StyleCard
@@ -73,7 +78,7 @@ export function WhatsNewSection({
                   index={index}
                 />
               </div>
-              
+
               <div className="grid grid-cols-2 gap-8 px-2">
                 {items.slice(index * 2, index * 2 + 2).map((item, i) => (
                   <motion.div
@@ -81,7 +86,11 @@ export function WhatsNewSection({
                     initial={{ opacity: 0, scale: 0.95 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.3 + (i * 0.1), ease: [0.16, 1, 0.3, 1] }}
+                    transition={{
+                      duration: 0.6,
+                      delay: 0.3 + i * 0.1,
+                      ease: [0.16, 1, 0.3, 1],
+                    }}
                   >
                     <ItemCard data={item} index={i} />
                   </motion.div>

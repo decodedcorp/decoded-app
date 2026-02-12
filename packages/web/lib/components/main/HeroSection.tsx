@@ -101,7 +101,9 @@ export function HeroSection({ data = defaultHeroData }: HeroSectionProps) {
                 href={data.link}
                 className="group relative inline-flex items-center gap-10 px-16 py-8 bg-white text-black font-sans font-bold text-xs md:text-sm tracking-[0.25em] overflow-hidden transition-all hover:scale-[1.02] active:scale-95 shadow-2xl"
               >
-                <span className="relative z-10 transition-colors duration-500 group-hover:text-white">VIEW EDITORIAL</span>
+                <span className="relative z-10 transition-colors duration-500 group-hover:text-white">
+                  VIEW EDITORIAL
+                </span>
                 <motion.div
                   animate={{ x: [0, 10, 0] }}
                   transition={{ repeat: Infinity, duration: 1.5 }}

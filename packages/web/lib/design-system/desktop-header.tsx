@@ -4,9 +4,10 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, Bell } from "lucide-react";
+import { Search, Bell, User, Settings, Activity, LogOut } from "lucide-react";
 import DecodedLogo from "@/lib/components/DecodedLogo";
 import { useAuthStore } from "@/lib/stores/authStore";
+import { useState, useRef, useEffect } from "react";
 
 /**
  * Desktop Header Variants
@@ -68,6 +69,24 @@ export function DesktopHeader({
 }: DesktopHeaderProps) {
   const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
+        setDropdownOpen(false);
+      }
+    };
+    if (dropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [dropdownOpen]);
 
   return (
     <header
@@ -131,24 +150,77 @@ export function DesktopHeader({
           {/* Conditional Auth UI */}
           {user ? (
             <div className="flex items-center gap-3">
-              {/* Notification Bell */}
+              {/* Notification Bell with badge */}
               <button
-                className="p-2 rounded-md hover:bg-accent transition-colors"
+                className="relative p-2 rounded-md hover:bg-accent transition-colors"
                 aria-label="Notifications"
               >
                 <Bell className="h-5 w-5 text-muted-foreground" />
+                <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500" />
               </button>
 
-              {/* User Avatar Placeholder */}
-              <Link
-                href="/profile"
-                className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
-                aria-label="Go to profile"
-              >
-                <span className="text-sm font-medium text-primary">
-                  {user.name.charAt(0).toUpperCase()}
-                </span>
-              </Link>
+              {/* User Avatar with Dropdown */}
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+                  aria-label="User menu"
+                  aria-expanded={dropdownOpen}
+                >
+                  <span className="text-sm font-medium text-primary">
+                    {user.name.charAt(0).toUpperCase()}
+                  </span>
+                </button>
+
+                {/* Dropdown menu */}
+                {dropdownOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-48 rounded-lg border border-border bg-card shadow-lg py-1 z-50">
+                    <div className="px-3 py-2 border-b border-border">
+                      <p className="text-sm font-medium truncate">
+                        {user.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {user.email}
+                      </p>
+                    </div>
+                    <Link
+                      href="/profile"
+                      className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-accent transition-colors"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      <User className="h-4 w-4" />
+                      Profile
+                    </Link>
+                    <Link
+                      href="/profile?tab=activity"
+                      className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-accent transition-colors"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      <Activity className="h-4 w-4" />
+                      Activity
+                    </Link>
+                    <Link
+                      href="/profile?tab=settings"
+                      className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-accent transition-colors"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      <Settings className="h-4 w-4" />
+                      Settings
+                    </Link>
+                    <div className="border-t border-border my-1" />
+                    <button
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        useAuthStore.getState().logout();
+                      }}
+                      className="flex items-center gap-2 px-3 py-2 text-sm w-full text-left text-destructive hover:bg-accent transition-colors"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           ) : (
             <Link

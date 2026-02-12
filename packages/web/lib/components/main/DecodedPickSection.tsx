@@ -15,7 +15,8 @@ const sampleStyleData: StyleCardData = {
   description: "",
   artistName: "Blackpink Lisa",
   link: "/feed",
-  imageUrl: "https://images.unsplash.com/photo-1699847061593-188987efcd3e?w=800",
+  imageUrl:
+    "https://images.unsplash.com/photo-1699847061593-188987efcd3e?w=800",
   spots: [
     { id: "dp-s1", x: 42, y: 35, label: "Shoulder Bag" },
     { id: "dp-s2", x: 58, y: 25, label: "Oversized Shades" },
@@ -23,11 +24,39 @@ const sampleStyleData: StyleCardData = {
     { id: "dp-s4", x: 52, y: 15, label: "Gold Chain" },
   ],
   items: [
-    { id: "dp-i1", label: "ACC", brand: "Prada", name: "Leather Tote", imageUrl: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400" },
-    { id: "dp-i2", label: "ACC", brand: "Celine", name: "Cat-eye Shades", imageUrl: "https://images.unsplash.com/photo-1564848005333-590727c99921?w=400" },
-    { id: "dp-i3", label: "SHOES", brand: "Saint Laurent", name: "Chelsea Boots", imageUrl: "https://images.unsplash.com/photo-1518738458435-19149697112a?w=400" },
-    { id: "dp-i4", label: "ACC", brand: "Cartier", name: "Love Necklace", imageUrl: "https://images.unsplash.com/photo-1641206189215-9533ceb7a1df?w=400" },
-  ]
+    {
+      id: "dp-i1",
+      label: "ACC",
+      brand: "Prada",
+      name: "Leather Tote",
+      imageUrl:
+        "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400",
+    },
+    {
+      id: "dp-i2",
+      label: "ACC",
+      brand: "Celine",
+      name: "Cat-eye Shades",
+      imageUrl:
+        "https://images.unsplash.com/photo-1564848005333-590727c99921?w=400",
+    },
+    {
+      id: "dp-i3",
+      label: "SHOES",
+      brand: "Saint Laurent",
+      name: "Chelsea Boots",
+      imageUrl:
+        "https://images.unsplash.com/photo-1518738458435-19149697112a?w=400",
+    },
+    {
+      id: "dp-i4",
+      label: "ACC",
+      brand: "Cartier",
+      name: "Love Necklace",
+      imageUrl:
+        "https://images.unsplash.com/photo-1641206189215-9533ceb7a1df?w=400",
+    },
+  ],
 };
 
 interface DecodedPickSectionProps {
@@ -42,10 +71,13 @@ export function DecodedPickSection({
   const [activeSpotId, setActiveSpotId] = useState<string | null>(null);
 
   // Convert StyleCard items to ItemCardData with required link field
-  const itemCards: ItemCardData[] = items || (sampleStyleData.items?.map(item => ({
-    ...item,
-    link: `/items/${item.id}`,
-  })) ?? []);
+  const itemCards: ItemCardData[] =
+    items ||
+    (sampleStyleData.items?.map((item) => ({
+      ...item,
+      link: `/items/${item.id}`,
+    })) ??
+      []);
 
   return (
     <section className="bg-black text-white py-24 md:py-40 px-6 md:px-12 rounded-t-[60px] md:rounded-t-[100px] -mt-20 relative z-30 shadow-[0_-30px_100px_rgba(0,0,0,0.8)] border-t border-white/5">
@@ -63,7 +95,9 @@ export function DecodedPickSection({
                 Editor's Choice
               </span>
               <h2 className="text-6xl md:text-8xl font-serif font-bold italic tracking-tighter leading-[0.85]">
-                Decoded's<br />Pick
+                Decoded's
+                <br />
+                Pick
               </h2>
             </motion.div>
           </div>
@@ -100,12 +134,12 @@ export function DecodedPickSection({
               </div>
 
               {/* Spotlight Color Layer (Clipping Mask) */}
-              <motion.div 
+              <motion.div
                 className="absolute inset-0 z-10 pointer-events-none"
                 animate={{
-                  clipPath: activeSpotId 
-                    ? `circle(140px at ${styleData.spots?.find(s => s.id === activeSpotId)?.x ?? 50}% ${styleData.spots?.find(s => s.id === activeSpotId)?.y ?? 50}%)`
-                    : "circle(0% at 50% 50%)"
+                  clipPath: activeSpotId
+                    ? `circle(140px at ${styleData.spots?.find((s) => s.id === activeSpotId)?.x ?? 50}% ${styleData.spots?.find((s) => s.id === activeSpotId)?.y ?? 50}%)`
+                    : "circle(0% at 50% 50%)",
                 }}
                 transition={{ type: "spring", stiffness: 120, damping: 24 }}
               >
@@ -126,15 +160,21 @@ export function DecodedPickSection({
                     key={spot.id}
                     onMouseEnter={() => setActiveSpotId(spot.id)}
                     onMouseLeave={() => setActiveSpotId(null)}
-                    onClick={() => setActiveSpotId(spot.id === activeSpotId ? null : spot.id)}
+                    onClick={() =>
+                      setActiveSpotId(spot.id === activeSpotId ? null : spot.id)
+                    }
                     className="absolute w-14 h-14 -ml-7 -mt-7 flex items-center justify-center group/spot"
                     style={{ left: `${spot.x}%`, top: `${spot.y}%` }}
                   >
-                    <div className={cn(
-                      "w-4 h-4 rounded-full border-2 border-white transition-all duration-300 shadow-2xl",
-                      activeSpotId === spot.id ? "bg-primary scale-125" : "bg-white/20 backdrop-blur-md group-hover/spot:bg-white/50"
-                    )} />
-                    
+                    <div
+                      className={cn(
+                        "w-4 h-4 rounded-full border-2 border-white transition-all duration-300 shadow-2xl",
+                        activeSpotId === spot.id
+                          ? "bg-primary scale-125"
+                          : "bg-white/20 backdrop-blur-md group-hover/spot:bg-white/50"
+                      )}
+                    />
+
                     <AnimatePresence>
                       {activeSpotId === spot.id && (
                         <>
@@ -195,13 +235,20 @@ export function DecodedPickSection({
                   initial={{ opacity: 0, x: 40 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: 0.1 * index, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{
+                    duration: 0.8,
+                    delay: 0.1 * index,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
                 >
                   <Link
                     href={item.link}
                     className={cn(
                       "group flex items-center gap-8 p-5 rounded-[32px] transition-all duration-700 hover:bg-white/5 border border-transparent hover:border-white/5",
-                      activeSpotId && styleData.items?.find(si => si.id === item.id) ? "bg-white/10 border-white/10 scale-[1.02]" : ""
+                      activeSpotId &&
+                        styleData.items?.find((si) => si.id === item.id)
+                        ? "bg-white/10 border-white/10 scale-[1.02]"
+                        : ""
                     )}
                   >
                     <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-2xl overflow-hidden flex-shrink-0 bg-neutral-900 shadow-lg">
@@ -216,7 +263,7 @@ export function DecodedPickSection({
                         <div className="absolute inset-0 bg-neutral-800" />
                       )}
                     </div>
-                    
+
                     <div className="flex-1">
                       <span className="text-[9px] md:text-[10px] font-sans font-bold tracking-[0.2em] text-primary mb-2 block uppercase">
                         {item.brand}
@@ -229,8 +276,18 @@ export function DecodedPickSection({
                           {item.price}
                         </span>
                         <div className="opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-x-4 group-hover:translate-x-0">
-                          <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                          <svg
+                            className="w-6 h-6 text-primary"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M14 5l7 7m0 0l-7 7m7-7H3"
+                            />
                           </svg>
                         </div>
                       </div>
