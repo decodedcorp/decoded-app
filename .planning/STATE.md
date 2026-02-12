@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-06)
 Phase: v2-09 (documentation-polish) of 9 phases in v2.0 milestone
 Plan: 03 of 03 complete
 Status: Phase v2-09 complete
-Last activity: 2026-02-12 — Completed quick-024 (Post Detail Remaining Sections)
+Last activity: 2026-02-12 — Completed quick-025 (Replace Unconnected Image Sections with Post)
 
 Progress: v2.0 milestone complete (all phases shipped)
 
@@ -70,7 +70,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Completed quick-024 (Post Detail Remaining Sections)
+Stopped at: Completed quick-025 (Replace Unconnected Image Sections with Post)
 Resume file: None
 
 ## Quick Tasks Completed
@@ -86,8 +86,9 @@ Resume file: None
 | 022 | Fix analyze proxy JSON error | 2026-02-06 | 4f7e896 | [022-fix-analyze-proxy-json-error](./quick/022-fix-analyze-proxy-json-error/) |
 | 023 | Post detail page completion (editorial redesign) | 2026-02-12 | d5099ef | [023-post-detail-page-completion](./quick/023-post-detail-page-completion/) |
 | 024 | Post detail remaining sections (Decoded Items, Gallery, Shop, Related) | 2026-02-12 | 3f90d6a | [024-post-detail-remaining-sections](./quick/024-post-detail-remaining-sections/) |
+| 025 | Replace unconnected image sections with post data | 2026-02-12 | a420e82 | [025-replace-unconnected-image-sections-with-post](./quick/025-replace-unconnected-image-sections-with-post/) |
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-12 after quick-024 completion*
+*Last updated: 2026-02-12 after quick-025 completion*
