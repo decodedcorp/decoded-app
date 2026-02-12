@@ -84,7 +84,10 @@ export function DecodedItemsSection({ spots, solutions }: Props) {
       solution,
       title: solution?.title || "Unknown Item",
       brand: extractBrand(solution),
-      price: formatPrice(solution?.price_amount ?? null, solution?.price_currency || "USD"),
+      price: formatPrice(
+        solution?.price_amount ?? null,
+        solution?.price_currency || "USD"
+      ),
       thumbnailUrl: solution?.thumbnail_url || null,
       description: solution?.description || "",
       matchType: solution?.match_type || "EXACT MATCH",
@@ -154,9 +157,7 @@ export function DecodedItemsSection({ spots, solutions }: Props) {
                     key={item.spot.id}
                     onClick={() => setSelectedIndex(index)}
                     className={`decoded-item-row w-full rounded-xl p-3 flex flex-row items-center gap-3 transition-colors duration-200 text-left ${
-                      isSelected
-                        ? "bg-primary"
-                        : "bg-card hover:bg-card/80"
+                      isSelected ? "bg-primary" : "bg-card hover:bg-card/80"
                     }`}
                   >
                     {/* Thumbnail */}
@@ -269,9 +270,7 @@ function ExpandedDetailCard({ item }: { item: DecodedItem }) {
           </h3>
 
           {/* Brand */}
-          <span className="text-xs text-muted-foreground">
-            {item.brand}
-          </span>
+          <span className="text-xs text-muted-foreground">{item.brand}</span>
 
           {/* Price */}
           {item.price && (

@@ -6,7 +6,7 @@ import { LenisProvider } from "./LenisProvider";
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { useRouter } from "next/navigation";
-import { X, Share2 } from "lucide-react";
+import { X, Share2, Heart, Bookmark } from "lucide-react";
 import { ReportErrorButton } from "./ReportErrorButton"; // Import ReportErrorButton
 import { Lightbox } from "./Lightbox";
 
@@ -96,6 +96,18 @@ export function ImageDetailPage({ imageId }: Props) {
       <div ref={pageRef} className="relative">
         {/* Action Buttons */}
         <div className="fixed right-4 top-4 z-50 flex gap-2">
+          <button
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm transition-transform transition-colors hover:scale-105 hover:bg-background/90"
+            aria-label="Like"
+          >
+            <Heart className="h-5 w-5" />
+          </button>
+          <button
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm transition-transform transition-colors hover:scale-105 hover:bg-background/90"
+            aria-label="Save"
+          >
+            <Bookmark className="h-5 w-5" />
+          </button>
           <ReportErrorButton postId={image.id} size="md" />
           <button
             onClick={handleShare}

@@ -6,6 +6,10 @@ import { DecodedItemsSection } from "./DecodedItemsSection";
 import { GallerySection } from "./GallerySection";
 import { ShopCarouselSection } from "./ShopCarouselSection";
 import { RelatedLooksSection } from "./RelatedLooksSection";
+import { SocialActions } from "@/lib/components/shared/SocialActions";
+import { CommentSection } from "@/lib/components/shared/CommentSection";
+import { AccountAvatar } from "@/lib/components/shared/AccountAvatar";
+import { FollowButton } from "@/lib/components/shared/FollowButton";
 import { useRelatedImagesByAccount } from "@/lib/hooks/useImages";
 import { Heading, Text } from "@/lib/design-system";
 import { Package } from "lucide-react";
@@ -202,8 +206,8 @@ export function PostDetailContent({ postDetail }: Props) {
           {/* Hero meta row */}
           <div className="flex items-center gap-2 text-sm font-sans text-white/60">
             <span>
-              {solutions.length}{" "}
-              {solutions.length === 1 ? "item" : "items"} featured
+              {solutions.length} {solutions.length === 1 ? "item" : "items"}{" "}
+              featured
             </span>
             {formattedDate && (
               <>
@@ -211,6 +215,11 @@ export function PostDetailContent({ postDetail }: Props) {
                 <span>Posted: {formattedDate}</span>
               </>
             )}
+          </div>
+
+          {/* Follow button */}
+          <div className="mt-4">
+            <FollowButton size="md" />
           </div>
         </div>
       </div>
@@ -240,23 +249,17 @@ export function PostDetailContent({ postDetail }: Props) {
       {/* ============================================================ */}
       {/* Section 3: Decoded Items                                      */}
       {/* ============================================================ */}
-      {hasItems && (
-        <DecodedItemsSection spots={spots} solutions={solutions} />
-      )}
+      {hasItems && <DecodedItemsSection spots={spots} solutions={solutions} />}
 
       {/* ============================================================ */}
       {/* Section 4: Gallery                                            */}
       {/* ============================================================ */}
-      {galleryImages.length > 0 && (
-        <GallerySection images={galleryImages} />
-      )}
+      {galleryImages.length > 0 && <GallerySection images={galleryImages} />}
 
       {/* ============================================================ */}
       {/* Section 5: Shop the Look Carousel                             */}
       {/* ============================================================ */}
-      {solutions.length > 0 && (
-        <ShopCarouselSection solutions={solutions} />
-      )}
+      {solutions.length > 0 && <ShopCarouselSection solutions={solutions} />}
 
       {/* ============================================================ */}
       {/* Section 6: Related Looks                                      */}
@@ -267,6 +270,26 @@ export function PostDetailContent({ postDetail }: Props) {
           displayName={displayName}
         />
       )}
+
+      {/* ============================================================ */}
+      {/* Social Actions & Comments                                     */}
+      {/* ============================================================ */}
+      <div className="px-6 py-6 md:px-10 border-t border-border">
+        <div className="flex items-center gap-3 mb-4">
+          <AccountAvatar name={displayName} size="md" />
+          <div className="flex-1">
+            <p className="text-sm font-medium">@{displayName}</p>
+            <p className="text-xs text-muted-foreground">
+              {solutions.length} items decoded
+            </p>
+          </div>
+          <FollowButton size="sm" />
+        </div>
+        <SocialActions likeCount={128} commentCount={3} showComment />
+      </div>
+      <div className="px-6 py-8 md:px-10 border-t border-border">
+        <CommentSection />
+      </div>
 
       {/* ============================================================ */}
       {/* Empty State (when no items at all)                            */}
@@ -281,8 +304,8 @@ export function PostDetailContent({ postDetail }: Props) {
             No Items Yet
           </Heading>
           <Text textColor="muted" className="max-w-md">
-            This post hasn&apos;t been decoded yet. Items will appear here
-            once they&apos;re identified and matched.
+            This post hasn&apos;t been decoded yet. Items will appear here once
+            they&apos;re identified and matched.
           </Text>
         </div>
       )}

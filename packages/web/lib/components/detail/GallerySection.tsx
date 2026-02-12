@@ -68,10 +68,7 @@ export function GallerySection({ images }: Props) {
   );
 
   return (
-    <section
-      ref={sectionRef}
-      className="bg-card p-6 md:py-12 md:px-16"
-    >
+    <section ref={sectionRef} className="bg-card p-6 md:py-12 md:px-16">
       {/* Section header */}
       <div className="flex flex-col gap-1.5 mb-4 md:mb-8">
         <span className="font-sans text-[9px] md:text-[10px] font-semibold uppercase tracking-[3px] text-muted-foreground">

@@ -3,12 +3,13 @@
 import { usePostById } from "@/lib/hooks/usePosts";
 import { PostDetailContent } from "./PostDetailContent";
 import { LenisProvider } from "./LenisProvider";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { useRouter } from "next/navigation";
 import { X, Share2, Flag } from "lucide-react";
 import { Card, Heading, Text } from "@/lib/design-system";
 import { AlertCircle } from "lucide-react";
+import { ReportModal } from "@/lib/components/shared/ReportModal";
 
 type Props = {
   postId: string;
@@ -29,6 +30,7 @@ export function PostDetailPage({ postId }: Props) {
   const router = useRouter();
   const { data: postDetail, isLoading, error } = usePostById(postId);
   const pageRef = useRef<HTMLDivElement>(null);
+  const [reportOpen, setReportOpen] = useState(false);
 
   // Fade-in animation for direct access
   useEffect(() => {
@@ -75,8 +77,7 @@ export function PostDetailPage({ postId }: Props) {
   };
 
   const handleReport = () => {
-    // Report functionality placeholder
-    // Could open a modal or navigate to a report form
+    setReportOpen(true);
   };
 
   // Loading state: full-page skeleton
@@ -199,6 +200,12 @@ export function PostDetailPage({ postId }: Props) {
         </div>
 
         <PostDetailContent postDetail={postDetail} />
+
+        <ReportModal
+          open={reportOpen}
+          onClose={() => setReportOpen(false)}
+          targetType="post"
+        />
       </div>
     </LenisProvider>
   );

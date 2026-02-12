@@ -15,6 +15,8 @@ import { MetadataTags } from "./MetadataTags";
 import { extractDominantColors, ColorResult } from "@/lib/utils/color";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import { SocialActions } from "@/lib/components/shared/SocialActions";
+import { ImageCommentSection } from "./ImageCommentSection";
 
 type Props = {
   image: ImageDetail;
@@ -616,6 +618,19 @@ export function ImageDetailContent({
           isModal={isModal}
         />
       )}
+
+      {/* ============================================================ */}
+      {/* Social Actions & Comments                                     */}
+      {/* ============================================================ */}
+      <div className="px-6 py-6 md:px-10 border-t border-border">
+        <SocialActions
+          likeCount={42}
+          commentCount={3}
+          showComment
+          variant="default"
+        />
+      </div>
+      <ImageCommentSection imageId={image.id} />
 
       {/* Fallback: Show basic info if no items */}
       {!hasItems && (
