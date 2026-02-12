@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-06)
 Phase: v2-09 (documentation-polish) of 9 phases in v2.0 milestone
 Plan: 03 of 03 complete
 Status: Phase v2-09 complete
-Last activity: 2026-02-12 — Completed quick-027 (Fix Post Detail Image Clip and Spots)
+Last activity: 2026-02-12 — Completed quick-028 (Remove Achievements Section)
 
 Progress: v2.0 milestone complete (all phases shipped)
 
@@ -75,7 +75,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Completed quick-027 (Fix Post Detail Image Clip and Spots)
+Stopped at: Completed quick-028 (Remove Achievements Section)
 Resume file: None
 
 ## Quick Tasks Completed
@@ -94,8 +94,9 @@ Resume file: None
 | 025 | Replace unconnected image sections with post data | 2026-02-12 | a420e82 | [025-replace-unconnected-image-sections-with-post](./quick/025-replace-unconnected-image-sections-with-post/) |
 | 026 | Fix feed header clip and post detail scroll | 2026-02-12 | 8afb9c0 | [026-fix-feed-header-clip-and-post-detail-scroll](./quick/026-fix-feed-header-clip-and-post-detail-scroll/) |
 | 027 | Fix post detail image clip and spots | 2026-02-12 | ad09695 | [027-fix-post-detail-image-clip-and-spots](./quick/027-fix-post-detail-image-clip-and-spots/) |
+| 028 | Remove Achievements section from home page | 2026-02-12 | d807df3 | [028-remove-achievements-challenge-achieve-ma](./quick/028-remove-achievements-challenge-achieve-ma/) |
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-12 after quick-027 completion*
+*Last updated: 2026-02-12 after quick-028 completion*
