@@ -56,6 +56,8 @@ export interface HotspotProps
   number?: number;
   /** Item label for accessibility */
   label?: string;
+  /** Optional brand color override (CSS color value, e.g., '#FF0000', 'rgb(...)', 'hsl(...)') */
+  color?: string;
 }
 
 /**
@@ -94,6 +96,17 @@ export interface HotspotProps
  *   position={{ x: 50, y: 50 }}
  *   label="Selected item"
  * />
+ *
+ * @example
+ * // Numbered hotspot with brand color
+ * <Hotspot
+ *   variant="numbered"
+ *   number={1}
+ *   position={{ x: 30, y: 50 }}
+ *   color="hsl(210, 70%, 50%)"
+ *   label="NIKE: Air Max 90"
+ *   onClick={handleClick}
+ * />
  */
 export const Hotspot = forwardRef<HTMLButtonElement, HotspotProps>(
   (
@@ -103,6 +116,7 @@ export const Hotspot = forwardRef<HTMLButtonElement, HotspotProps>(
       position,
       number,
       label,
+      color,
       style,
       ...props
     },
@@ -126,6 +140,7 @@ export const Hotspot = forwardRef<HTMLButtonElement, HotspotProps>(
           top: `${clampedY}%`,
           // Center the hotspot on the position point
           transform: "translate(-50%, -50%)",
+          ...(color ? { backgroundColor: color } : {}),
           ...style,
         }}
         aria-label={
