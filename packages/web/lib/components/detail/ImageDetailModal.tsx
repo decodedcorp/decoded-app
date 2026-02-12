@@ -5,13 +5,10 @@ import { useRouter } from "next/navigation";
 import { X, Maximize2 } from "lucide-react";
 import { gsap } from "gsap";
 import { Flip } from "gsap/Flip";
-import { useImageById } from "@/lib/hooks/useImages";
-import { ImageDetailContent } from "./ImageDetailContent";
+import { usePostById } from "@/lib/hooks/usePosts";
+import { PostDetailContent } from "./PostDetailContent";
 import { useTransitionStore } from "@/lib/stores/transitionStore";
-import { ImageCanvas } from "./ImageCanvas"; // Import ImageCanvas
-import { normalizeItem } from "./types"; // Import normalizeItem
-import { useNormalizedItems } from "@/lib/hooks/useNormalizedItems";
-import { ReportErrorButton } from "./ReportErrorButton"; // Import ReportErrorButton
+import { ReportErrorButton } from "./ReportErrorButton";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(Flip);
@@ -24,30 +21,25 @@ type Props = {
 /**
  * Side Drawer version of image detail page
  * Used when navigating from grid (intercepting route)
+ * Now renders post data instead of old image data
  */
 export function ImageDetailModal({ imageId }: Props) {
   const router = useRouter();
-  const { data: image, isLoading, error } = useImageById(imageId);
+  const { data: postDetail, isLoading, error } = usePostById(imageId);
   const { originRect, reset, imgSrc } = useTransitionStore();
-
-  // State for active item in split view (Desktop Modal)
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
-
-  // Use shared hook for item normalization
-  const normalizedItems = useNormalizedItems(image);
 
   // Debug: Log imageId and data state
   useEffect(() => {
     if (imageId) {
       console.log("[ImageDetailModal] imageId:", imageId);
     }
-    if (image) {
-      console.log("[ImageDetailModal] image loaded:", image);
+    if (postDetail) {
+      console.log("[ImageDetailModal] post loaded:", postDetail);
     }
     if (error) {
       console.error("[ImageDetailModal] error:", error);
     }
-  }, [imageId, image, error]);
+  }, [imageId, postDetail, error]);
 
   // Scroll Forwarding: Image -> Content
   // This enables scrolling the drawer content by scrolling over the fixed image
@@ -72,21 +64,6 @@ export function ImageDetailModal({ imageId }: Props) {
     }
   }, []);
 
-  const handleItemClick = useCallback((index: number) => {
-    // Scroll to the item in the drawer
-    const targetCard = scrollContainerRef.current?.querySelector(
-      `[data-item-index="${index}"]`
-    );
-
-    if (targetCard) {
-      targetCard.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-      // Update active state
-      setActiveIndex(index);
-    }
-  }, []);
 
   // Refs for animation targets
   const containerRef = useRef<HTMLDivElement>(null);
@@ -266,7 +243,7 @@ export function ImageDetailModal({ imageId }: Props) {
 
   const handleMaximize = useCallback(() => {
     // Hard navigation to force full page reload and break out of interception
-    window.location.href = `/images/${imageId}`;
+    window.location.href = `/posts/${imageId}`;
   }, [imageId]);
 
   // Mount/Enter Animation
@@ -364,7 +341,7 @@ export function ImageDetailModal({ imageId }: Props) {
         <div className="flex h-full items-center justify-center">
           <div className="text-center px-6">
             <p className="mb-2 text-lg text-destructive">
-              Failed to load image
+              Failed to load post
             </p>
             <p className="mb-4 text-sm text-muted-foreground">
               {error instanceof Error
@@ -372,7 +349,7 @@ export function ImageDetailModal({ imageId }: Props) {
                 : "Unknown error occurred"}
             </p>
             <p className="mb-4 text-xs text-muted-foreground">
-              Image ID: {imageId}
+              Post ID: {imageId}
             </p>
             <button
               onClick={() => handleClose()}
@@ -385,13 +362,13 @@ export function ImageDetailModal({ imageId }: Props) {
       );
     }
 
-    if (!image) {
+    if (!postDetail) {
       return (
         <div className="flex h-full items-center justify-center">
           <div className="text-center px-6">
-            <p className="mb-4 text-lg text-destructive">Image not found</p>
+            <p className="mb-4 text-lg text-destructive">Post not found</p>
             <p className="mb-4 text-xs text-muted-foreground">
-              Image ID: {imageId}
+              Post ID: {imageId}
             </p>
             <button
               onClick={() => handleClose()}
@@ -404,20 +381,11 @@ export function ImageDetailModal({ imageId }: Props) {
       );
     }
 
-    return (
-      <ImageDetailContent
-        image={image}
-        isModal={true}
-        scrollContainerRef={scrollContainerRef}
-        activeIndex={activeIndex}
-        onActiveIndexChange={setActiveIndex}
-        hideImage={true} // Hide internal image, using Modal's left image instead
-      />
-    );
+    return <PostDetailContent postDetail={postDetail} />;
   };
 
   // Image Source Resolution: Priority -> Store (Immediate) -> Fetched Data
-  const activeImageSrc = imgSrc || image?.image_url;
+  const activeImageSrc = imgSrc || postDetail?.post.image_url;
 
   // Debug: Log image source
   useEffect(() => {
@@ -427,11 +395,11 @@ export function ImageDetailModal({ imageId }: Props) {
       console.warn(
         "[ImageDetailModal] No image source available. imgSrc:",
         imgSrc,
-        "image?.image_url:",
-        image?.image_url
+        "postDetail?.post.image_url:",
+        postDetail?.post.image_url
       );
     }
-  }, [activeImageSrc, imgSrc, image?.image_url]);
+  }, [activeImageSrc, imgSrc, postDetail?.post.image_url]);
 
   // Floating Image Animation (runs when image source becomes available)
   // Skip on mobile - Floating Image is not rendered on mobile
@@ -560,7 +528,7 @@ export function ImageDetailModal({ imageId }: Props) {
         aria-hidden="true"
       />
 
-      {/* Floating Image / Left Side Interactive Image (z-60) - Desktop Only */}
+      {/* Floating Image / Left Side Image (z-60) - Desktop Only */}
       {/* On mobile, this is hidden - Drawer fills the screen instead */}
       {activeImageSrc && (
         <div
@@ -572,25 +540,12 @@ export function ImageDetailModal({ imageId }: Props) {
           }}
           onWheel={handleImageScroll} // Forward scroll events
         >
-          {/* Use ImageCanvas for interactive features (highlights, zoom) */}
-          {/* We only render ImageCanvas if we have the full image data */}
-          {image ? (
-            <div className="w-full h-full relative">
-              <ImageCanvas
-                image={image}
-                items={normalizedItems}
-                activeIndex={activeIndex}
-              />
-            </div>
-          ) : (
-            /* Fallback to simple img during transition or loading */
-            <img
-              ref={floatingImageRef}
-              src={activeImageSrc}
-              alt="Highlight"
-              className="w-full h-full object-cover pointer-events-none"
-            />
-          )}
+          <img
+            ref={floatingImageRef}
+            src={activeImageSrc}
+            alt="Post image"
+            className="w-full h-full object-cover pointer-events-none"
+          />
         </div>
       )}
 
@@ -613,7 +568,7 @@ export function ImageDetailModal({ imageId }: Props) {
 
         {/* Floating Controls */}
         <div className="absolute top-4 right-4 md:top-auto md:right-auto md:bottom-6 md:left-6 z-20 flex gap-3">
-          <ReportErrorButton postId={image?.id} size="md" />
+          <ReportErrorButton postId={postDetail?.post.id} size="md" />
           <button
             onClick={handleMaximize}
             className="flex h-10 w-10 items-center justify-center rounded-full bg-black/80 text-white backdrop-blur-sm transition-transform hover:scale-105 hover:bg-black active:scale-95 dark:bg-white/80 dark:text-black dark:hover:bg-white"

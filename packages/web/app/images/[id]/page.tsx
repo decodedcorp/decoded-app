@@ -1,4 +1,4 @@
-import { ImageDetailPage } from "@/lib/components/detail/ImageDetailPage";
+import { redirect } from "next/navigation";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -6,9 +6,9 @@ type Props = {
 
 /**
  * Full page route for /images/[id]
- * Used when directly accessing URL or refreshing page
+ * Redirects to /posts/[id] since image table is deprecated
  */
 export default async function ImageDetailPageRoute({ params }: Props) {
   const { id } = await params;
-  return <ImageDetailPage imageId={id} />;
+  redirect(`/posts/${id}`);
 }

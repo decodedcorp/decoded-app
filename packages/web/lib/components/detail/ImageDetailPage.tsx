@@ -1,7 +1,7 @@
 "use client";
 
-import { useImageById } from "@/lib/hooks/useImages";
-import { ImageDetailContent } from "./ImageDetailContent";
+import { usePostById } from "@/lib/hooks/usePosts";
+import { PostDetailContent } from "./PostDetailContent";
 import { LenisProvider } from "./LenisProvider";
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
@@ -18,10 +18,11 @@ type Props = {
 /**
  * Full page version of image detail
  * Used when directly accessing URL or refreshing page
+ * Now renders post data instead of old image data
  */
 export function ImageDetailPage({ imageId }: Props) {
   const router = useRouter();
-  const { data: image, isLoading, error } = useImageById(imageId);
+  const { data: postDetail, isLoading, error } = usePostById(imageId);
   const pageRef = useRef<HTMLDivElement>(null);
   const [showLightbox, setShowLightbox] = useState(false);
 
@@ -89,11 +90,11 @@ export function ImageDetailPage({ imageId }: Props) {
     );
   }
 
-  if (error || !image) {
+  if (error || !postDetail) {
     return (
       <div className="flex min-h-screen items-center justify-center p-4">
         <ErrorState
-          message="Failed to load image"
+          message="Failed to load post"
           details={error instanceof Error ? error.message : undefined}
           onRetry={() => window.location.reload()}
         />
@@ -118,7 +119,7 @@ export function ImageDetailPage({ imageId }: Props) {
           >
             <Bookmark className="h-5 w-5" />
           </button>
-          <ReportErrorButton postId={image.id} size="md" />
+          <ReportErrorButton postId={postDetail.post.id} size="md" />
           <button
             onClick={handleShare}
             className="flex h-10 w-10 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm transition-transform transition-colors hover:scale-105 hover:bg-background/90"
@@ -135,17 +136,14 @@ export function ImageDetailPage({ imageId }: Props) {
           </button>
         </div>
 
-        <ImageDetailContent
-          image={image}
-          onHeroClick={() => setShowLightbox(true)}
-        />
+        <PostDetailContent postDetail={postDetail} />
 
         {/* Lightbox */}
         <Lightbox
           isOpen={showLightbox}
           onClose={() => setShowLightbox(false)}
-          imageUrl={image.image_url || ""}
-          alt={`Image ${image.id}`}
+          imageUrl={postDetail.post.image_url || ""}
+          alt={`Post ${postDetail.post.id}`}
         />
       </div>
     </LenisProvider>
