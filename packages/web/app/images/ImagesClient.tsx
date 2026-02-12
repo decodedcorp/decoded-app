@@ -1,25 +1,20 @@
 "use client";
 
-import type { ImageRow } from "@/lib/supabase/types";
-import { useInfiniteFilteredImages } from "@/lib/hooks/useImages";
+import { useInfinitePosts } from "@/lib/hooks/usePosts";
 import { ImageCard } from "./ImageCard";
 import { ImageCardSkeleton } from "./ImageCardSkeleton";
 import { ErrorState } from "./ErrorState";
 import { EmptyState } from "./EmptyState";
 
-type Props = {
-  initialImages: ImageRow[];
-};
-
 /**
  * Client Component for images feed
  *
- * Now uses unified adapter with deduplication for gallery mode:
- * - Uses fetchUnifiedImages with deduplicateByImageId=true
- * - Ensures all images visible (post-based + orphans)
- * - Prevents showing same image multiple times
+ * Uses post-based data fetching via REST API:
+ * - Uses useInfinitePosts from @/lib/hooks/usePosts
+ * - Displays posts from the posts table
+ * - Cards link to /posts/[id] instead of /images/[id]
  */
-export function ImagesClient({ initialImages }: Props) {
+export function ImagesClient() {
   const {
     data,
     isLoading,
@@ -29,17 +24,13 @@ export function ImagesClient({ initialImages }: Props) {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useInfiniteFilteredImages({
-    limit: 40,
-    filter: "all",
-    search: "",
-    deduplicateByImageId: true, // Gallery mode: dedupe
+  } = useInfinitePosts({
+    perPage: 40,
+    sort: "recent",
   });
 
-  // Flatten pages and use CSR data if available, fallback to SSR initial data
-  const images = data
-    ? data.pages.flatMap((page) => page.items)
-    : initialImages;
+  // Flatten pages
+  const posts = data ? data.pages.flatMap((page) => page.items) : [];
 
   // Loading state: show skeleton grid
   if (isLoading && !data) {
@@ -63,16 +54,16 @@ export function ImagesClient({ initialImages }: Props) {
   }
 
   // Empty state: show empty state component
-  if (!images || images.length === 0) {
+  if (!posts || posts.length === 0) {
     return <EmptyState />;
   }
 
-  // Success state: show image grid with infinite scroll
+  // Success state: show post grid with infinite scroll
   return (
     <>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {images.map((image) => (
-          <ImageCard key={image.id} image={image} />
+        {posts.map((post) => (
+          <ImageCard key={post.id} post={post} />
         ))}
       </div>
 
