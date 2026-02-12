@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 export const stepIndicatorVariants = cva("inline-flex items-center gap-2", {
   variants: {
     size: {
+      xs: "gap-1.5",
       sm: "gap-1.5",
       md: "gap-2",
       lg: "gap-3",
@@ -30,6 +31,7 @@ export const stepIndicatorVariants = cva("inline-flex items-center gap-2", {
 const stepCircleVariants = cva("rounded-full transition-colors duration-200", {
   variants: {
     size: {
+      xs: "h-2 w-2",
       sm: "h-4 w-4",
       md: "h-6 w-6",
       lg: "h-8 w-8",
@@ -50,6 +52,7 @@ const stepNumberVariants = cva(
   {
     variants: {
       size: {
+        xs: "h-2 w-2 text-[8px]",
         sm: "h-4 w-4 text-[10px]",
         md: "h-6 w-6 text-xs",
         lg: "h-8 w-8 text-sm",
@@ -69,6 +72,7 @@ const stepNumberVariants = cva(
 const connectorVariants = cva("transition-colors duration-200", {
   variants: {
     size: {
+      xs: "h-0.5 w-3",
       sm: "h-0.5 w-4",
       md: "h-0.5 w-6",
       lg: "h-0.5 w-8",

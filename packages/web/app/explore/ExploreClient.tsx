@@ -13,6 +13,7 @@ import {
   ExploreFilterSheet,
 } from "@/lib/components/explore";
 import { SlidersHorizontal } from "lucide-react";
+import { LoadingSpinner } from "@/lib/design-system";
 
 type Props = {
   initialPosts?: PostGridItem[];
@@ -206,9 +207,8 @@ export function ExploreClient({ initialPosts: _initialPosts }: Props) {
 
                 {/* Loading indicator for next page */}
                 {isFetchingNextPage && (
-                  <div className="pointer-events-none absolute bottom-8 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-background/80 px-4 py-2 text-sm font-medium text-foreground shadow-lg backdrop-blur-sm">
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                    Loading more...
+                  <div className="pointer-events-none absolute bottom-8 left-1/2 -translate-x-1/2 shadow-lg">
+                    <LoadingSpinner text="Loading more..." />
                   </div>
                 )}
               </div>

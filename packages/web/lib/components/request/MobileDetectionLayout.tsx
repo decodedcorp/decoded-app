@@ -8,7 +8,7 @@ import {
 } from "@/lib/stores/requestStore";
 import { DetectionView } from "./DetectionView";
 import { DetectedItemCard } from "./DetectedItemCard";
-import { BottomSheet } from "@/lib/components/ui/BottomSheet";
+import { BottomSheet } from "@/lib/design-system";
 import { useSpotCardSync } from "@/lib/hooks/useSpotCardSync";
 
 interface MobileDetectionLayoutProps {

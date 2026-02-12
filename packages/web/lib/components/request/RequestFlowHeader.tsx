@@ -3,7 +3,7 @@
 import { ArrowLeft, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type RequestStep } from "@/lib/stores/requestStore";
-import { StepIndicator } from "./StepIndicator";
+import { StepIndicator } from "@/lib/design-system";
 
 interface RequestFlowHeaderProps {
   title?: string;
@@ -50,7 +50,7 @@ export function RequestFlowHeader({
           <ArrowLeft className="h-5 w-5" />
         </button>
 
-        <StepIndicator currentStep={currentStep} />
+        <StepIndicator currentStep={currentStep} size="xs" />
 
         {showClose ? (
           <button

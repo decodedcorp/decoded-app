@@ -16,7 +16,7 @@ import {
 import { useImageUpload } from "@/lib/hooks/useImageUpload";
 import { DropZone } from "./DropZone";
 import { SingleImagePreview } from "./SingleImagePreview";
-import { StepIndicator } from "./StepIndicator";
+import { StepIndicator } from "@/lib/design-system";
 import { DetectionView } from "./DetectionView";
 import { DetectedItemCard } from "./DetectedItemCard";
 import { DetailsStep } from "./DetailsStep";
@@ -154,7 +154,7 @@ export function RequestModal({ isOpen, onClose }: RequestModalProps) {
             <h1 id="request-modal-title" className="text-base font-medium">
               {STEP_TITLES[currentStep]}
             </h1>
-            <StepIndicator currentStep={currentStep} className="mt-1" />
+            <StepIndicator currentStep={currentStep} size="xs" className="mt-1" />
           </div>
 
           <button
