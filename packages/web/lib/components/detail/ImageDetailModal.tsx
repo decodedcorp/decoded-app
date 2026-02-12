@@ -9,7 +9,6 @@ import { usePostById } from "@/lib/hooks/usePosts";
 import { PostDetailContent } from "./PostDetailContent";
 import { useTransitionStore } from "@/lib/stores/transitionStore";
 import { ReportErrorButton } from "./ReportErrorButton";
-import { Hotspot, brandToColor } from "@/lib/design-system";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(Flip);
@@ -358,21 +357,6 @@ export function ImageDetailModal({ imageId }: Props) {
     return { width, height, left, top };
   };
 
-  // Extract brand from solution
-  const extractBrand = (solution: NonNullable<typeof postDetail>["solutions"][0] | undefined): string => {
-    if (!solution) return "Unknown";
-    if (solution.keywords && solution.keywords.length > 0) {
-      return solution.keywords[0].toUpperCase();
-    }
-    if (solution.title) {
-      const firstWord = solution.title.split(" ")[0];
-      if (firstWord && firstWord.length > 1) {
-        return firstWord.toUpperCase();
-      }
-    }
-    return "BRAND";
-  };
-
   // Content Rendering Logic
   const renderContent = () => {
     // Check if imageId is missing
@@ -607,53 +591,31 @@ export function ImageDetailModal({ imageId }: Props) {
             }}
           />
 
-          {/* Spot Markers on Floating Image */}
+          {/* Spot Markers on Floating Image (matching StyleCard white dot style) */}
           {postDetail?.spots && postDetail.spots.length > 0 && (() => {
             const imageRect = getContainedImageRect();
             if (!imageRect) return null;
 
             return (
-              <div className="absolute inset-0 pointer-events-none">
-                {postDetail.spots.map((spot, index) => {
-                  const matchingSolution = postDetail.solutions?.find(
-                    (s) => s.spot_id === spot.id
-                  );
-                  const brand = extractBrand(matchingSolution);
-
-                  // Convert percentage positions to pixel positions within the contained image
+              <div className="absolute inset-0 pointer-events-none z-20">
+                {postDetail.spots.map((spot) => {
                   const percentX = parseFloat(spot.position_left);
                   const percentY = parseFloat(spot.position_top);
-
                   const pixelLeft = imageRect.left + (imageRect.width * percentX) / 100;
                   const pixelTop = imageRect.top + (imageRect.height * percentY) / 100;
 
                   return (
                     <div
                       key={spot.id}
-                      className="absolute pointer-events-auto"
+                      className="absolute w-8 h-8 flex items-center justify-center"
                       style={{
                         left: `${pixelLeft}px`,
                         top: `${pixelTop}px`,
                         transform: "translate(-50%, -50%)",
                       }}
                     >
-                      <Hotspot
-                        variant="numbered"
-                        number={index + 1}
-                        position={{ x: 50, y: 50 }}
-                        color={brandToColor(brand)}
-                        label={`${brand}: ${matchingSolution?.title || "Item"}`}
-                        onClick={() => {
-                          // Future: scroll to decoded items section
-                          console.log("Clicked spot:", spot.id);
-                        }}
-                        style={{
-                          position: "relative",
-                          left: 0,
-                          top: 0,
-                          transform: "none",
-                        }}
-                      />
+                      <div className="absolute inset-0 bg-white rounded-full animate-ping opacity-30 duration-[2000ms]" />
+                      <div className="relative w-3 h-3 bg-white rounded-full shadow-[0_0_25px_rgba(255,255,255,1)] border border-black/20" />
                     </div>
                   );
                 })}
