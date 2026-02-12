@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint app lib",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test:visual": "playwright test tests/visual-qa.spec.ts"
   },
   "dependencies": {
     "@decoded/shared": "workspace:*",
