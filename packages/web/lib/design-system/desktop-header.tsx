@@ -19,7 +19,7 @@ import { useState, useRef, useEffect } from "react";
  * @see docs/design-system/decoded.pen
  */
 export const desktopHeaderVariants = cva(
-  "fixed top-0 left-0 right-0 z-30 w-full backdrop-blur-md transition-all hidden md:flex",
+  "fixed top-0 left-0 right-0 z-40 w-full backdrop-blur-md transition-all hidden md:flex",
   {
     variants: {
       variant: {

@@ -80,7 +80,7 @@ export function DecodedPickSection({
       []);
 
   return (
-    <section className="bg-black text-white py-24 md:py-40 px-6 md:px-12 rounded-t-[60px] md:rounded-t-[100px] -mt-20 relative z-30 shadow-[0_-30px_100px_rgba(0,0,0,0.8)] border-t border-white/5">
+    <section className="bg-black text-white py-24 md:py-40 px-6 md:px-12 rounded-t-[60px] md:rounded-t-[100px] -mt-20 relative z-20 shadow-[0_-30px_100px_rgba(0,0,0,0.8)] border-t border-white/5">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-24 md:mb-32 gap-10">

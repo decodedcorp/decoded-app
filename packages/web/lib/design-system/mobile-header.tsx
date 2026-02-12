@@ -16,7 +16,7 @@ import DecodedLogo from "@/lib/components/DecodedLogo";
  * @see docs/design-system/decoded.pen
  */
 export const mobileHeaderVariants = cva(
-  "fixed top-0 left-0 right-0 z-30 w-full backdrop-blur-md md:hidden",
+  "fixed top-0 left-0 right-0 z-40 w-full backdrop-blur-md md:hidden",
   {
     variants: {
       variant: {
