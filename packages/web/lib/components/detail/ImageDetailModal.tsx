@@ -9,6 +9,7 @@ import { usePostById } from "@/lib/hooks/usePosts";
 import { PostDetailContent } from "./PostDetailContent";
 import { useTransitionStore } from "@/lib/stores/transitionStore";
 import { ReportErrorButton } from "./ReportErrorButton";
+import { Hotspot } from "@/lib/design-system";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(Flip);
@@ -80,12 +81,19 @@ export function ImageDetailModal({ imageId }: Props) {
   // State to track if we are currently closing to prevent multiple triggers
   const [isClosing, setIsClosing] = useState(false);
 
+  // Floating image sizing state (for spot positioning with object-contain)
+  const [naturalSize, setNaturalSize] = useState<{ width: number; height: number } | null>(null);
+  const [containerSize, setContainerSize] = useState<{ width: number; height: number } | null>(null);
+
   // Swipe gesture state
   const touchStartY = useRef<number>(0);
   const touchCurrentY = useRef<number>(0);
 
   // GSAP Context for cleanup
   const ctxRef = useRef<gsap.Context>();
+
+  // Image Source Resolution: Priority -> Store (Immediate) -> Fetched Data
+  const activeImageSrc = imgSrc || postDetail?.post.image_url;
 
   const handleClose = useCallback(() => {
     if (isClosing || !ctxRef.current) return;
@@ -311,6 +319,70 @@ export function ImageDetailModal({ imageId }: Props) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleClose]);
 
+  // Track floating image container size with ResizeObserver
+  useEffect(() => {
+    if (!leftImageContainerRef.current) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        setContainerSize({ width, height });
+      }
+    });
+
+    resizeObserver.observe(leftImageContainerRef.current);
+
+    return () => resizeObserver.disconnect();
+  }, [activeImageSrc]);
+
+  // Calculate the actual displayed image rect when using object-contain
+  const getContainedImageRect = () => {
+    if (!naturalSize || !containerSize) return null;
+    const containerAspect = containerSize.width / containerSize.height;
+    const imageAspect = naturalSize.width / naturalSize.height;
+
+    let width, height, left, top;
+    if (imageAspect > containerAspect) {
+      // Image is wider - fits width, letterboxed top/bottom
+      width = containerSize.width;
+      height = width / imageAspect;
+      left = 0;
+      top = (containerSize.height - height) / 2;
+    } else {
+      // Image is taller - fits height, letterboxed left/right
+      height = containerSize.height;
+      width = height * imageAspect;
+      top = 0;
+      left = (containerSize.width - width) / 2;
+    }
+    return { width, height, left, top };
+  };
+
+  // Extract brand from solution
+  const extractBrand = (solution: typeof postDetail.solutions[0] | undefined): string => {
+    if (!solution) return "Unknown";
+    if (solution.keywords && solution.keywords.length > 0) {
+      return solution.keywords[0].toUpperCase();
+    }
+    if (solution.title) {
+      const firstWord = solution.title.split(" ")[0];
+      if (firstWord && firstWord.length > 1) {
+        return firstWord.toUpperCase();
+      }
+    }
+    return "BRAND";
+  };
+
+  // Generate consistent color from brand name
+  const brandToColor = (brand: string): string => {
+    let hash = 0;
+    for (let i = 0; i < brand.length; i++) {
+      hash = brand.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const hue = Math.abs(hash) % 360;
+    return `hsl(${hue}, 70%, 50%)`;
+  };
+
   // Content Rendering Logic
   const renderContent = () => {
     // Check if imageId is missing
@@ -392,25 +464,6 @@ export function ImageDetailModal({ imageId }: Props) {
     );
   };
 
-  // Image Source Resolution: Priority -> Store (Immediate) -> Fetched Data
-  const activeImageSrc = imgSrc || postDetail?.post.image_url;
-
-  // Debug: Log image source (development only)
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      if (activeImageSrc) {
-        console.log("[ImageDetailModal] activeImageSrc:", activeImageSrc);
-      } else {
-        console.warn(
-          "[ImageDetailModal] No image source available. imgSrc:",
-          imgSrc,
-          "postDetail?.post.image_url:",
-          postDetail?.post.image_url
-        );
-      }
-    }
-  }, [activeImageSrc, imgSrc, postDetail?.post.image_url]);
-
   // Floating Image Animation (runs when image source becomes available)
   // Skip on mobile - Floating Image is not rendered on mobile
   useEffect(() => {
@@ -456,8 +509,8 @@ export function ImageDetailModal({ imageId }: Props) {
 
       const leftSpace = viewportWidth - drawerWidth;
 
-      const targetWidth = Math.min(leftSpace * 0.8, 600);
-      const targetHeight = Math.min(viewportHeight * 0.8, targetWidth * 1.5);
+      const targetWidth = Math.min(leftSpace * 0.7, 500);
+      const targetHeight = viewportHeight * 0.75;
 
       targetProps = {
         top: (viewportHeight - targetHeight) / 2,
@@ -503,8 +556,8 @@ export function ImageDetailModal({ imageId }: Props) {
       }
 
       const leftSpace = viewportWidth - drawerWidth;
-      const targetWidth = Math.min(leftSpace * 0.8, 600);
-      const targetHeight = Math.min(viewportHeight * 0.8, targetWidth * 1.5);
+      const targetWidth = Math.min(leftSpace * 0.7, 500);
+      const targetHeight = viewportHeight * 0.75;
 
       const targetProps = {
         position: "fixed",
@@ -543,7 +596,7 @@ export function ImageDetailModal({ imageId }: Props) {
       {activeImageSrc && (
         <div
           ref={leftImageContainerRef}
-          className="hidden md:block fixed z-60 shadow-2xl"
+          className="hidden md:block fixed z-60 shadow-2xl bg-black rounded-lg overflow-hidden"
           style={{
             opacity: 0, // Initially hidden, set by GSAP
             // Initial positioning will be handled by GSAP based on originRect
@@ -554,15 +607,76 @@ export function ImageDetailModal({ imageId }: Props) {
             ref={floatingImageRef}
             src={activeImageSrc}
             alt="Post image"
-            className="w-full h-full object-cover pointer-events-none"
+            className="w-full h-full object-contain pointer-events-none"
+            onLoad={(e) => {
+              const img = e.currentTarget;
+              setNaturalSize({
+                width: img.naturalWidth,
+                height: img.naturalHeight,
+              });
+            }}
           />
+
+          {/* Spot Markers on Floating Image */}
+          {postDetail?.spots && postDetail.spots.length > 0 && (() => {
+            const imageRect = getContainedImageRect();
+            if (!imageRect) return null;
+
+            return (
+              <div className="absolute inset-0 pointer-events-none">
+                {postDetail.spots.map((spot, index) => {
+                  const matchingSolution = postDetail.solutions?.find(
+                    (s) => s.spot_id === spot.id
+                  );
+                  const brand = extractBrand(matchingSolution);
+
+                  // Convert percentage positions to pixel positions within the contained image
+                  const percentX = parseFloat(spot.position_left);
+                  const percentY = parseFloat(spot.position_top);
+
+                  const pixelLeft = imageRect.left + (imageRect.width * percentX) / 100;
+                  const pixelTop = imageRect.top + (imageRect.height * percentY) / 100;
+
+                  return (
+                    <div
+                      key={spot.id}
+                      className="absolute pointer-events-auto"
+                      style={{
+                        left: `${pixelLeft}px`,
+                        top: `${pixelTop}px`,
+                        transform: "translate(-50%, -50%)",
+                      }}
+                    >
+                      <Hotspot
+                        variant="numbered"
+                        number={index + 1}
+                        position={{ x: 50, y: 50 }}
+                        color={brandToColor(brand)}
+                        label={`${brand}: ${matchingSolution?.title || "Item"}`}
+                        onClick={() => {
+                          // Future: scroll to decoded items section
+                          console.log("Clicked spot:", spot.id);
+                        }}
+                        style={{
+                          position: "relative",
+                          left: 0,
+                          top: 0,
+                          transform: "none",
+                        }}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
         </div>
       )}
 
       {/* Drawer (z-70) - 이미지가 z-60이므로 그 위로 올라와야 숫자가 겹쳐 보임 */}
       <aside
         ref={drawerRef}
-        className="relative z-[70] flex h-full w-full flex-col bg-background shadow-2xl md:w-[50vw] lg:w-[600px] xl:w-[700px] translate-y-full md:translate-x-full md:translate-y-0 overflow-visible"
+        className="relative z-[70] flex h-full w-full flex-col bg-background shadow-2xl md:w-[50vw] lg:w-[600px] xl:w-[700px] translate-y-full md:translate-x-full md:translate-y-0 overflow-hidden"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
