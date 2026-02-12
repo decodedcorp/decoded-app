@@ -9,7 +9,7 @@ import { usePostById } from "@/lib/hooks/usePosts";
 import { PostDetailContent } from "./PostDetailContent";
 import { useTransitionStore } from "@/lib/stores/transitionStore";
 import { ReportErrorButton } from "./ReportErrorButton";
-import { Hotspot } from "@/lib/design-system";
+import { Hotspot, brandToColor } from "@/lib/design-system";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(Flip);
@@ -371,16 +371,6 @@ export function ImageDetailModal({ imageId }: Props) {
       }
     }
     return "BRAND";
-  };
-
-  // Generate consistent color from brand name
-  const brandToColor = (brand: string): string => {
-    let hash = 0;
-    for (let i = 0; i < brand.length; i++) {
-      hash = brand.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    const hue = Math.abs(hash) % 360;
-    return `hsl(${hue}, 70%, 50%)`;
   };
 
   // Content Rendering Logic

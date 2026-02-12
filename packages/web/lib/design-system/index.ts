@@ -81,7 +81,7 @@ export { StepIndicator, stepIndicatorVariants } from "./step-indicator";
 export type { StepIndicatorProps } from "./step-indicator";
 
 // Hotspot Component
-export { Hotspot, hotspotVariants } from "./hotspot";
+export { Hotspot, hotspotVariants, brandToColor } from "./hotspot";
 export type { HotspotProps, HotspotPosition } from "./hotspot";
 
 // NavItem Component

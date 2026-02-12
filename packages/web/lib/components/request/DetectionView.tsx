@@ -6,7 +6,7 @@ import {
   type UploadedImage,
   type DetectedSpot,
 } from "@/lib/stores/requestStore";
-import { SpotMarker } from "./SpotMarker";
+import { Hotspot } from "@/lib/design-system";
 
 interface DetectionViewProps {
   image: UploadedImage;
@@ -170,13 +170,17 @@ export const DetectionView = memo(
         {/* 스팟 마커들 */}
         {!isDetecting &&
           spots.map((spot) => (
-            <SpotMarker
+            <Hotspot
               key={spot.id}
-              spot={spot}
-              isSelected={selectedSpotId === spot.id}
-              onClick={() => onSpotClick?.(spot)}
-              isRevealing={isRevealing}
+              variant="numbered"
+              number={spot.index}
+              position={{ x: spot.center.x * 100, y: spot.center.y * 100 }}
+              selected={selectedSpotId === spot.id}
+              revealing={isRevealing}
               revealDelay={spot.center.y * 1000}
+              glow={true}
+              label={`Spot ${spot.index}${spot.label ? `: ${spot.label}` : ""}`}
+              onClick={() => onSpotClick?.(spot)}
             />
           ))}
 
