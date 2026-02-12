@@ -109,7 +109,7 @@ Resume file: None
 | 032 | Fix activeImageSrc TDZ reference error | 2026-02-12 | f6fc515 | [032-fix-activeimagesrc-tdz-reference-error](./quick/032-fix-activeimagesrc-tdz-reference-error/) |
 | 033 | Unify spot brand color animation design | 2026-02-12 | 034312f | [033-unify-spot-brand-color-animation-design](./quick/033-unify-spot-brand-color-animation-design/) |
 | 034 | Remove post detail x-axis scroll | 2026-02-12 | c2265ea | [034-remove-post-detail-x-axis-scroll](./quick/034-remove-post-detail-x-axis-scroll/) |
-| 035 | Replace empty main sections with mockup data | 2026-02-12 | pending | [035-replace-empty-main-sections-with-mockup](./quick/035-replace-empty-main-sections-with-mockup/) |
+| 035 | Replace empty main sections with mockup data | 2026-02-12 | 708cc70 | [035-replace-empty-main-sections-with-mockup](./quick/035-replace-empty-main-sections-with-mockup/) |
 
 ---
 
