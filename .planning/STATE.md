@@ -113,7 +113,7 @@ Resume file: None
 | 034 | Remove post detail x-axis scroll | 2026-02-12 | c2265ea | [034-remove-post-detail-x-axis-scroll](./quick/034-remove-post-detail-x-axis-scroll/) |
 | 035 | Replace empty main sections with mockup data | 2026-02-12 | 708cc70 | [035-replace-empty-main-sections-with-mockup](./quick/035-replace-empty-main-sections-with-mockup/) |
 | 036 | Feed card subtle spot overlay | 2026-02-12 | 59834da | [036-feed-card-subtle-spot-overlay](./quick/036-feed-card-subtle-spot-overlay/) |
-| 037 | Update specs/docs to match codebase | 2026-02-12 | ef50b55 | [037-update-specs-docs-to-match-codebase](./quick/037-update-specs-docs-to-match-codebase/) |
+| 037 | Update specs/docs to match codebase | 2026-02-12 | 7594c92 | [037-update-specs-docs-to-match-codebase](./quick/037-update-specs-docs-to-match-codebase/) |
 
 ---
 
