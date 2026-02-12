@@ -13,7 +13,7 @@ import { FollowButton } from "@/lib/components/shared/FollowButton";
 import { useInfinitePosts } from "@/lib/hooks/usePosts";
 import { Heading, Text } from "@/lib/design-system";
 import { Package } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
@@ -25,6 +25,8 @@ if (typeof window !== "undefined") {
 
 type Props = {
   postDetail: PostDetail;
+  isModal?: boolean;
+  scrollContainerRef?: React.RefObject<HTMLElement>;
 };
 
 /**
@@ -41,12 +43,16 @@ type Props = {
  * 6. Related Looks - Masonry grid of related posts
  * 7. Empty State - Design system empty state when no items
  */
-export function PostDetailContent({ postDetail }: Props) {
+export function PostDetailContent({ postDetail, isModal = false, scrollContainerRef }: Props) {
   const { post, spots, solutions } = postDetail;
 
   const heroRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
+
+  // State for tracking image dimensions for spot positioning
+  const [naturalSize, setNaturalSize] = useState<{width: number; height: number} | null>(null);
+  const [containerSize, setContainerSize] = useState<{width: number; height: number} | null>(null);
 
   const hasItems = spots.length > 0 || solutions.length > 0;
   const hasImage = !!post.image_url;
@@ -90,12 +96,51 @@ export function PostDetailContent({ postDetail }: Props) {
   // Hero title
   const heroTitle = post.media_title || "Post Details";
 
+  // Track container size with ResizeObserver
+  useEffect(() => {
+    if (!heroRef.current) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        setContainerSize({ width, height });
+      }
+    });
+
+    resizeObserver.observe(heroRef.current);
+
+    return () => resizeObserver.disconnect();
+  }, []);
+
+  // Calculate the actual displayed image rect when using object-contain
+  const getContainedImageRect = () => {
+    if (!naturalSize || !containerSize) return null;
+    const containerAspect = containerSize.width / containerSize.height;
+    const imageAspect = naturalSize.width / naturalSize.height;
+
+    let width, height, left, top;
+    if (imageAspect > containerAspect) {
+      // Image is wider - fits width, letterboxed top/bottom
+      width = containerSize.width;
+      height = width / imageAspect;
+      left = 0;
+      top = (containerSize.height - height) / 2;
+    } else {
+      // Image is taller - fits height, letterboxed left/right
+      height = containerSize.height;
+      width = height * imageAspect;
+      top = 0;
+      left = (containerSize.width - width) / 2;
+    }
+    return { width, height, left, top };
+  };
+
   // Ken Burns + parallax animations (matching HeroSection pattern)
   useGSAP(() => {
     if (!heroRef.current || !imageRef.current || !titleRef.current) return;
 
     const ctx = gsap.context(() => {
-      // Entrance Ken Burns: scale from 1.15 to 1.0
+      // Entrance Ken Burns: scale from 1.15 to 1.0 (always)
       gsap.fromTo(
         imageRef.current,
         { scale: 1.15 },
@@ -106,7 +151,7 @@ export function PostDetailContent({ postDetail }: Props) {
         }
       );
 
-      // Title reveal animation
+      // Title reveal animation (always)
       gsap.fromTo(
         titleRef.current,
         { y: "60%", opacity: 0 },
@@ -119,34 +164,36 @@ export function PostDetailContent({ postDetail }: Props) {
         }
       );
 
-      // Parallax on scroll (full-page only, not modal)
-      gsap.to(imageRef.current, {
-        y: 100,
-        ease: "none",
-        scrollTrigger: {
-          trigger: heroRef.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: true,
-        },
-      });
+      // Parallax on scroll - only when NOT in modal
+      if (!isModal) {
+        gsap.to(imageRef.current, {
+          y: 100,
+          ease: "none",
+          scrollTrigger: {
+            trigger: heroRef.current,
+            start: "top top",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
 
-      // Title fade-out on scroll
-      gsap.to(titleRef.current, {
-        opacity: 0,
-        y: -50,
-        ease: "none",
-        scrollTrigger: {
-          trigger: heroRef.current,
-          start: "top top",
-          end: "30% top",
-          scrub: true,
-        },
-      });
+        // Title fade-out on scroll
+        gsap.to(titleRef.current, {
+          opacity: 0,
+          y: -50,
+          ease: "none",
+          scrollTrigger: {
+            trigger: heroRef.current,
+            start: "top top",
+            end: "30% top",
+            scrub: true,
+          },
+        });
+      }
     }, heroRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [isModal]);
 
   return (
     <div className="detail-content">
@@ -155,7 +202,11 @@ export function PostDetailContent({ postDetail }: Props) {
       {/* ============================================================ */}
       <div
         ref={heroRef}
-        className="relative w-full overflow-hidden h-[426px] md:h-[60vh] md:max-h-[600px]"
+        className={`relative w-full overflow-hidden bg-black ${
+          isModal
+            ? "h-[300px] md:h-[45vh]"
+            : "h-[426px] md:h-[60vh] md:max-h-[600px]"
+        }`}
       >
         {/* Hero Image */}
         {hasImage ? (
@@ -163,8 +214,14 @@ export function PostDetailContent({ postDetail }: Props) {
             ref={imageRef}
             src={post.image_url!}
             alt={heroTitle}
-            className="h-full w-full object-cover will-change-transform"
+            className="h-full w-full object-contain will-change-transform"
             loading="eager"
+            onLoad={(e) => {
+              setNaturalSize({
+                width: e.currentTarget.naturalWidth,
+                height: e.currentTarget.naturalHeight,
+              });
+            }}
           />
         ) : (
           <div className="h-full w-full bg-muted flex items-center justify-center">
@@ -178,26 +235,40 @@ export function PostDetailContent({ postDetail }: Props) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
         {/* Spot markers on hero image */}
-        {spots.map((spot) => (
-          <div
-            key={spot.id}
-            className="absolute w-6 h-6 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white/80 bg-emerald-500/70 shadow-lg cursor-pointer hover:scale-125 transition-transform z-10"
-            style={{
-              left: `${parseFloat(spot.position_left)}%`,
-              top: `${parseFloat(spot.position_top)}%`,
-            }}
-            title={
-              solutions.find((s) => s.spot_id === spot.id)?.title || "Item"
-            }
-          >
-            <span className="absolute inset-0 rounded-full animate-ping bg-emerald-400/30" />
-          </div>
-        ))}
+        {spots.map((spot) => {
+          const imageRect = getContainedImageRect();
+          const spotLeft = imageRect
+            ? imageRect.left + (parseFloat(spot.position_left) / 100) * imageRect.width
+            : undefined;
+          const spotTop = imageRect
+            ? imageRect.top + (parseFloat(spot.position_top) / 100) * imageRect.height
+            : undefined;
+
+          return (
+            <div
+              key={spot.id}
+              className="absolute w-6 h-6 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white/80 bg-emerald-500/70 shadow-lg cursor-pointer hover:scale-125 transition-transform z-20"
+              style={
+                imageRect && spotLeft !== undefined && spotTop !== undefined
+                  ? { left: `${spotLeft}px`, top: `${spotTop}px` }
+                  : {
+                      left: `${parseFloat(spot.position_left)}%`,
+                      top: `${parseFloat(spot.position_top)}%`,
+                    }
+              }
+              title={
+                solutions.find((s) => s.spot_id === spot.id)?.title || "Item"
+              }
+            >
+              <span className="absolute inset-0 rounded-full animate-ping bg-emerald-400/30" />
+            </div>
+          );
+        })}
 
         {/* Hero bottom content (justify-end pattern) */}
         <div
           ref={titleRef}
-          className="absolute inset-0 flex flex-col justify-end px-6 pb-8 md:px-10 md:pb-12"
+          className="absolute inset-0 flex flex-col justify-end px-6 pb-8 md:px-10 md:pb-12 z-10"
         >
           {/* Account badge pill */}
           <div className="mb-4">
