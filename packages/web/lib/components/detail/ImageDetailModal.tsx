@@ -359,7 +359,7 @@ export function ImageDetailModal({ imageId }: Props) {
   };
 
   // Extract brand from solution
-  const extractBrand = (solution: typeof postDetail.solutions[0] | undefined): string => {
+  const extractBrand = (solution: NonNullable<typeof postDetail>["solutions"][0] | undefined): string => {
     if (!solution) return "Unknown";
     if (solution.keywords && solution.keywords.length > 0) {
       return solution.keywords[0].toUpperCase();
