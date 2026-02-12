@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-06)
 Phase: v2-09 (documentation-polish) of 9 phases in v2.0 milestone
 Plan: 03 of 03 complete
 Status: Phase v2-09 complete
-Last activity: 2026-02-12 — Completed quick-036 (Feed card subtle spot overlay)
+Last activity: 2026-02-12 — Completed quick-037 (Update specs/docs to match codebase)
 
 Progress: v2.0 milestone complete (all phases shipped)
 
@@ -85,7 +85,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Completed quick-036 (Feed card subtle spot overlay)
+Stopped at: Completed quick-037 (Update specs/docs to match codebase)
 Resume file: None
 
 ## Quick Tasks Completed
@@ -113,8 +113,9 @@ Resume file: None
 | 034 | Remove post detail x-axis scroll | 2026-02-12 | c2265ea | [034-remove-post-detail-x-axis-scroll](./quick/034-remove-post-detail-x-axis-scroll/) |
 | 035 | Replace empty main sections with mockup data | 2026-02-12 | 708cc70 | [035-replace-empty-main-sections-with-mockup](./quick/035-replace-empty-main-sections-with-mockup/) |
 | 036 | Feed card subtle spot overlay | 2026-02-12 | 59834da | [036-feed-card-subtle-spot-overlay](./quick/036-feed-card-subtle-spot-overlay/) |
+| 037 | Update specs/docs to match codebase | 2026-02-12 | ef50b55 | [037-update-specs-docs-to-match-codebase](./quick/037-update-specs-docs-to-match-codebase/) |
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-12 after quick-036 completion*
+*Last updated: 2026-02-12 after quick-037 completion*
