@@ -81,4 +81,4 @@ Mobile pages require padding to avoid content overlap:
 
 ## Related
 
-- CMN-01: MobileHeader (top header, used alongside NavBar on mobile) — `specs/shared/components/CMN-01-header.md`
+- CMN-01: MobileHeader (top header, used alongside NavBar on mobile) — `specs/_shared/components/CMN-01-header.md`

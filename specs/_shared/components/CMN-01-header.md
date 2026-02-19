@@ -94,5 +94,5 @@ Both headers call an `onSearchClick` prop callback. The parent (layout or page) 
 
 ## Related
 
-- CMN-03: Mobile nav bar (replaces desktop nav on mobile) — `specs/shared/components/CMN-03-mobile-nav.md`
+- CMN-03: Mobile nav bar (replaces desktop nav on mobile) — `specs/_shared/components/CMN-03-mobile-nav.md`
 - authStore: `→ specs/_shared/store-map.md`
