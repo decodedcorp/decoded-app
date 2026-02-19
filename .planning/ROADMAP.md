@@ -251,7 +251,7 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] v4-08-01-PLAN.md — Write all NEXT-01~04 draft documents in `specs/_next/`
+- [ ] v4-08-01-PLAN.md — Write NEXT-01~04 draft documents in `specs/_next/` + add NEXT-* guardrail to injection guide
 
 **Status:** [ ] Not started
 
@@ -302,7 +302,7 @@ Plans:
 | v4-05 | Screen Specs: Discovery — home, search, feed, explore | DISC-01~04 | 2/2 | Complete (2026-02-19) |
 | v4-06 | Screen Specs: Creation-AI — upload, detect, edit/solution | CREA-01~03 | 1/1 | Complete (2026-02-19) |
 | v4-07 | Screen Specs: User System — login, profile, earnings | USER-01~03 | 1/1 | Complete (2026-02-20) |
-| v4-08 | Next Version Draft — service identity, VTON, dynamic UI, commerce | NEXT-01~04 | 0/1 | Not started |
+| v4-08 | Next Version Draft — service identity, VTON, dynamic UI, commerce | NEXT-01~04 | 1/1 | Planned |
 | v4-09 | Cleanup — retire old bundle files, verify new structure | CLEN-01 | 0/1 | Not started |
 
 **v4.0 Coverage:** 29/29 requirements mapped (100%)
