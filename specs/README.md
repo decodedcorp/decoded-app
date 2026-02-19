@@ -1,95 +1,91 @@
 # DECODED Specifications
 
-> 버전: 2.1.0 | 최종 업데이트: 2026-01-23
+> Version: 4.0 | Updated: 2026-02-19
 
-## 개요
+## Overview
 
-이 폴더는 decoded-app의 **기능 명세(설계 의도)**를 담고 있습니다.
+This directory contains feature specifications (design intent) for decoded-app.
 
-- **specs/**: 설계 의도 (WHAT SHOULD BE)
-- **docs/**: 구현된 것 (WHAT IS)
-- **.planning/codebase/**: 현재 코드 분석
+- **specs/**: Design intent — what should exist and how it should behave
+- **docs/**: Implementation records — what is currently built
+- **.planning/codebase/**: Current code analysis — how it actually works
 
-## 번들 구조
+Specs are optimized for AI agent context injection: compact, structured, verified paths.
 
-각 번들은 SpecKit 스타일로 구성:
-- `spec.md`: 기능 명세
-- `screens/`: 화면 설계서 (SCR-* ID)
-- `api-endpoints.md`: API 계약 (선택)
+## Directory Structure
 
-| 번들 | 설명 | 기능 ID | 화면 수 | 구현 상태 |
-|------|------|---------|---------|----------|
-| [shared/](./shared/) | 공통 컴포넌트, 템플릿, 데이터 모델 | - | 4 components | - |
-| [user-system/](./user-system/) | 사용자 인증, 프로필, 활동 | U-01~U-05 | 5 screens | 0% |
-| [discovery/](./discovery/) | 피드, 필터, 검색, 갤러리 | D-01~D-04 | 4 screens | 50% |
-| [detail-view/](./detail-view/) | 상세 뷰, 스팟, 아이템, 관련 콘텐츠 | V-01~V-06 | 4 screens | 70% |
-| [creation-ai/](./creation-ai/) | 업로드, AI 인식, 태깅 | C-01~C-04 | 3 screens | 10% |
-| [system-backend/](./system-backend/) | 백엔드 시스템 | S-01~S-08 | - | 7% |
-| [admin/](./admin/) | 관리자 패널 | A-01~A-03 | 3 screens | 0% |
-| [mobile-platform/](./mobile-platform/) | 모바일 앱 | M-01~M-06 | - | 42% |
-| [scroll-animation/](./scroll-animation/) | 스크롤 애니메이션 | - | - | WIP |
-
-> 📊 **전체 진행률**: ~25% (2026-01-23 기준)
-
-## ID 체계
-
-### 기능 ID
-| 접두사 | 카테고리 | 예시 |
-|--------|----------|------|
-| U- | 사용자 시스템 | U-01 소셜 로그인 |
-| D- | 디스커버리 | D-01 피드 |
-| V- | 상세 뷰 | V-01 반응형 상세 뷰 |
-| C- | 콘텐츠 생성 | C-01 이미지 업로드 |
-| S- | 시스템/백엔드 | S-01 API 게이트웨이 |
-| A- | 관리자 | A-01 대시보드 |
-| M- | 모바일 | M-01 PWA |
-
-### 화면 ID
-| 접두사 | 카테고리 | 예시 |
-|--------|----------|------|
-| SCR-USER- | 사용자 화면 | SCR-USER-01-login |
-| SCR-DISC- | 디스커버리 화면 | SCR-DISC-01-home |
-| SCR-VIEW- | 상세 뷰 화면 | SCR-VIEW-01-detail |
-| SCR-CREA- | 생성 화면 | SCR-CREA-01-upload |
-| SCR-ADMN- | 관리자 화면 | SCR-ADMN-01-dashboard |
-| CMN- | 공통 컴포넌트 | CMN-01-header |
-
-## 관련 문서
-
-### 코드베이스 분석 (최신)
-- [.planning/codebase/ARCHITECTURE.md](../.planning/codebase/ARCHITECTURE.md) - 현재 아키텍처
-- [.planning/codebase/STRUCTURE.md](../.planning/codebase/STRUCTURE.md) - 디렉토리 구조
-- [.planning/codebase/CONVENTIONS.md](../.planning/codebase/CONVENTIONS.md) - 코딩 컨벤션
-
-### Specs 내부
-- [데이터 모델](./shared/data-models.md)
-- [워크플로우](./shared/workflows.md)
-- [API 계약](./shared/api-contracts.md)
-- [화면 템플릿](./shared/templates/screen-template.md)
-- [UI ID 컨벤션](./shared/ui-id-convention.md)
-
-### 구현 문서
-- [docs/api/](../docs/api/) - 구현된 API
-- [docs/database/](../docs/database/) - DB 스키마
-- [docs/design-system/](../docs/design-system/) - 디자인 토큰
-
-## 빠른 시작
-
-```bash
-# 특정 번들의 기능 명세 확인
-cat specs/user-system/spec.md
-
-# 특정 화면 설계 확인
-cat specs/user-system/screens/SCR-USER-01-login.md
-
-# 공통 컴포넌트 확인
-cat specs/shared/components/CMN-01-header.md
+```
+specs/
+├── _archive/v2.1.0/       # Previous version snapshot (read-only)
+├── _shared/               # Shared foundation
+│   ├── component-registry.md    # All components with verified file paths
+│   ├── data-models.md           # Canonical data shapes
+│   ├── api-contracts.md         # API endpoint contracts
+│   ├── store-map.md             # Zustand store inventory
+│   └── injection-guide.md       # How to inject specs into AI prompts
+├── _next/                 # Future feature drafts (DRAFT status)
+├── flows/                 # User journey flows (FLW-*)
+├── screens/               # Screen specs by bundle
+│   ├── detail/            # SCR-VIEW-* (detail view screens)
+│   ├── discovery/         # SCR-DISC-* (home, search, feed)
+│   ├── creation/          # SCR-CREA-* (upload, AI tagging)
+│   └── user/              # SCR-USER-* (login, profile, settings)
+├── shared/                # Legacy shared (templates, conventions)
+│   └── templates/         # Spec templates
+└── README.md
 ```
 
-## GSD 워크플로우
+> Note: `_shared/`, `flows/`, and `screens/` will be populated in v4-02 through v4-07.
+> Do not create empty directories.
 
-```bash
-/gsd:progress          # 진행 상황 확인
-/gsd:plan-phase N      # 페이즈 N 계획
-/gsd:execute-phase N   # 페이즈 N 실행
-```
+## ID Scheme
+
+| Prefix | Category | Format | Example |
+|--------|----------|--------|---------|
+| SCR-VIEW- | Detail view screens | SCR-VIEW-NN | SCR-VIEW-01 |
+| SCR-DISC- | Discovery screens | SCR-DISC-NN | SCR-DISC-01 |
+| SCR-CREA- | Creation screens | SCR-CREA-NN | SCR-CREA-01 |
+| SCR-USER- | User system screens | SCR-USER-NN | SCR-USER-01 |
+| FLW- | User journey flows | FLW-NN | FLW-01 |
+| CMN- | Shared components | CMN-NN | CMN-01 |
+
+## Spec Format Rules
+
+1. **200-line target** (300-line max with written justification in frontmatter)
+2. **EARS syntax** for requirements: "When [trigger], the system shall [behavior]"
+3. **Mobile-first** layout: mobile wireframe is the primary design, desktop is adaptation
+4. **Verified file paths**: every component path checked against filesystem before publishing
+5. **No anti-features**:
+   - No i18n sections (handled separately)
+   - No version history tables (use git log)
+   - No copied TypeScript type definitions (reference the source file)
+   - No placeholder sections (omit sections that don't apply)
+   - No implementation checklists (not design intent)
+   - No test scenario tables (separate test docs)
+
+## AI Agent Injection Guide
+
+Quick reference for loading specs into AI agent prompts:
+
+| Task | Load These Files |
+|------|-----------------|
+| Modifying a screen | Screen spec + `_shared/component-registry.md` + `_shared/store-map.md` |
+| Adding a feature | Flow spec + affected screen specs + `_shared/api-contracts.md` |
+| Fixing a bug | Screen spec + `_shared/component-registry.md` + `_shared/store-map.md` |
+| Understanding data | `_shared/data-models.md` + `_shared/api-contracts.md` |
+| New screen from scratch | `shared/templates/screen-spec-template.md` + `_shared/component-registry.md` |
+
+> Full injection guide: `_shared/injection-guide.md` (created in v4-02)
+
+## Templates
+
+- [Screen spec template](./shared/templates/screen-spec-template.md) — for SCR-* documents
+- [Flow spec template](./shared/templates/flow-spec-template.md) — for FLW-* documents
+
+## Related Docs
+
+- [.planning/codebase/ARCHITECTURE.md](../.planning/codebase/ARCHITECTURE.md) — system architecture
+- [.planning/codebase/STRUCTURE.md](../.planning/codebase/STRUCTURE.md) — directory structure
+- [.planning/codebase/CONVENTIONS.md](../.planning/codebase/CONVENTIONS.md) — coding conventions
+- [docs/design-system/](../docs/design-system/) — design tokens
+- [docs/api/](../docs/api/) — implemented API docs
