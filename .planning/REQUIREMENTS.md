@@ -1,106 +1,138 @@
-# Requirements: decoded-app v3.0
+# Requirements: decoded-app v4.0
 
 **Defined:** 2026-02-19
-**Core Value:** 완전한 사용자 경험 — 모든 페이지가 실제 데이터로 동작하며 일관된 디자인 시스템 적용
+**Core Value:** AI 에이전트가 정확한 코드를 생성할 수 있는 수준의 고품질 spec — 화면별 컴포넌트 매핑 + 유저 플로우 + 상태 전이
 
-## v3.0 Requirements
+## v4.0 Requirements
 
-Requirements for Admin Panel — AI Management. 목업 데이터 우선, 백엔드 연결은 후속 마일스톤.
+Requirements for Spec Overhaul — AI-Ready Documentation. 코드 변경 없이 문서/spec만 재작성.
 
-### Admin Auth
+### Archive & Foundation
 
-- [x] **AAUTH-01**: 관리자 권한 체크 미들웨어 (`is_admin` 기반)
-- [x] **AAUTH-02**: `/admin` 라우트 보호 (비관리자 접근 차단)
-- [x] **AAUTH-03**: 관리자 전용 레이아웃 (사이드바 네비게이션)
+- [ ] **ARCH-01**: 현재 specs/를 specs/_archive/v2.1.0/으로 복사하여 버전 스냅샷 보존
+- [ ] **ARCH-02**: 새로운 화면 spec 템플릿 설계 (EARS 구문, 모바일 퍼스트, 200라인 제한, AI 컨텍스트 최적화)
+- [ ] **ARCH-03**: 새로운 플로우 spec 템플릿 설계 (FLW-* 형식, 상태 전이, 데이터 흐름)
+- [ ] **ARCH-04**: specs/README.md 재작성 (새 구조, ID 체계, injection 가이드 포함)
 
-### Dashboard
+### Shared Foundation
 
-- [x] **DASH-01**: KPI 통계 카드 (DAU, MAU, 총 유저, 포스트, 솔루션)
-- [x] **DASH-02**: 트래픽 차트 (일별 DAU, 검색, 클릭 추이)
-- [x] **DASH-03**: 오늘 요약 (오늘 포스트, 솔루션, 클릭)
+- [ ] **SHRD-01**: 디자인 시스템 컴포넌트 카탈로그 (35+ 컴포넌트의 props/variants/사용법/파일경로)
+- [ ] **SHRD-02**: 데이터 모델 문서 동기화 (현재 코드베이스 TypeScript 타입 기준)
+- [ ] **SHRD-03**: API 계약 문서 동기화 (현재 구현된 API routes 기준)
+- [ ] **SHRD-04**: 공통 컴포넌트 spec 갱신 (CMN-* header, footer, nav — 현재 디자인 시스템 기준)
+- [ ] **SHRD-05**: AI 에이전트 injection-guide 작성 (작업 유형별 어떤 spec 파일을 로드해야 하는지)
 
-### AI Audit
+### Flow Documents
 
-- [x] **AUDIT-01**: AI 분석 요청 목록 (이미지, 상태, 결과 요약)
-- [x] **AUDIT-02**: 개별 분석 결과 상세 뷰 (감지된 아이템, 신뢰도)
-- [x] **AUDIT-03**: 분석 결과 수정 기능 (아이템 추가/삭제/수정)
-- [x] **AUDIT-04**: 분석 상태 필터링 (대기/완료/오류/수정됨)
+- [ ] **FLOW-01**: 콘텐츠 탐색 플로우 (홈 → 검색/필터 → 피드 → 상세)
+- [ ] **FLOW-02**: 콘텐츠 상세 플로우 (포스트/이미지 상세 → 스팟 → 아이템 → 쇼핑)
+- [ ] **FLOW-03**: 콘텐츠 생성 플로우 (업로드 → AI 감지 → 스팟 생성 → 솔루션 입력)
+- [ ] **FLOW-04**: 사용자 인증 플로우 (로그인 → 프로필 → 활동 → 수익)
+- [ ] **FLOW-05**: [DRAFT] VTON 피팅 플로우 (Pick&Drop → Chic Blur → Blueprint → Magic Flip → Morphing Loop)
 
-### AI Cost
+### Screen Specs — Detail View
 
-- [x] **COST-01**: AI API 호출 통계 (일별/월별 호출 수)
-- [x] **COST-02**: 토큰 사용량 차트 (입력/출력 토큰)
-- [x] **COST-03**: 비용 추정 대시보드 (모델별, 기간별)
+- [ ] **DETL-01**: 포스트 상세 화면 spec (SCR-VIEW-01) — 현재 코드 기준 재작성
+- [ ] **DETL-02**: 스팟/핫스팟 상세 spec (SCR-VIEW-02) — 컴포넌트 매핑 + 인터랙션
+- [ ] **DETL-03**: 아이템/솔루션 상세 spec (SCR-VIEW-03) — 쇼핑 연결 포함
+- [ ] **DETL-04**: 관련 콘텐츠 spec (SCR-VIEW-04) — 추천 로직 + UI
 
-### Pipeline Log
+### Screen Specs — Discovery
 
-- [x] **PIPE-01**: 파이프라인 실행 목록 (업로드→분석→감지 플로우)
-- [x] **PIPE-02**: 단계별 상세 로그 (각 단계 소요 시간, 결과)
-- [x] **PIPE-03**: 에러 파이프라인 필터링 및 재시도 UI
+- [ ] **DISC-01**: 홈 화면 spec (SCR-DISC-01) — 현재 v2.0 디자인 기준 재작성
+- [ ] **DISC-02**: 검색 화면 spec (SCR-DISC-03) — 풀스크린 오버레이 검색
+- [ ] **DISC-03**: 피드 화면 spec — 소셜 피드 타임라인
+- [ ] **DISC-04**: 탐색(Explore) 화면 spec — 카테고리 필터 그리드
 
-### Server Log
+### Screen Specs — Creation-AI
 
-- [x] **SLOG-01**: API 요청 로그 뷰어 (엔드포인트, 상태코드, 응답시간)
-- [x] **SLOG-02**: 에러 로그 필터링 (에러 레벨, 기간, 검색)
-- [x] **SLOG-03**: 실시간 로그 스트리밍 UI (tail -f 스타일)
+- [ ] **CREA-01**: 업로드 화면 spec (SCR-CREA-01) — DropZone + 이미지 압축
+- [ ] **CREA-02**: AI 감지 결과 화면 spec (SCR-CREA-02) — 아이템 스팟팅
+- [ ] **CREA-03**: 편집/솔루션 입력 화면 spec (SCR-CREA-03)
+
+### Screen Specs — User System
+
+- [ ] **USER-01**: 로그인 화면 spec (SCR-USER-01) — OAuth 플로우
+- [ ] **USER-02**: 프로필 화면 spec (SCR-USER-02) — 활동 탭, 뱃지, 스탯
+- [ ] **USER-03**: 수익 대시보드 화면 spec (SCR-USER-04) — 정산/클릭 추적
+
+### Next Version Draft
+
+- [ ] **NEXT-01**: [DRAFT] 새 서비스 아이덴티티 문서 (PRD 요약, 타겟 전략, 톤앤매너)
+- [ ] **NEXT-02**: [DRAFT] VTON 기능 spec 초안 (Phase 1~3 기술 아키텍처)
+- [ ] **NEXT-03**: [DRAFT] 동적 UI 시나리오 spec 초안 (5단계 인터랙션 상세)
+- [ ] **NEXT-04**: [DRAFT] 커머스 브릿지 spec 초안 (Visual Search + 제휴 쇼핑몰 연동)
+
+### Cleanup
+
+- [ ] **CLEN-01**: 기존 번들 spec.md 파일 retire + README 업데이트
 
 ## Future Requirements
 
-### Tag Management (A-01) — v3.1
-- **TAG-01**: 태그 목록 (필터링, 검색, 페이지네이션)
-- **TAG-02**: Media/Cast 추가/편집 폼
-- **TAG-03**: 태그 요청 검토/승인/거부
-- **TAG-04**: 대량 작업 (병합, 상위 변경)
+### v4.1 — Spec Maintenance
+- **MAINT-01**: spec-code 동기화 자동 검증 (파일 경로 유효성 체크)
+- **MAINT-02**: 컴포넌트 카탈로그 자동 생성 (ts-morph 기반)
 
-### Content Moderation (A-02) — v3.1
-- **MOD-01**: 콘텐츠 모더레이션 큐
-- **MOD-02**: Post/Solution 상태 변경
-- **MOD-03**: 신고 관리
-
-### Payments (A-03) — v3.1
-- **PAY-01**: 지급 관리 대시보드
-- **PAY-02**: 정산 처리
-- **PAY-03**: 수익 리포트
+### v5.0 — VTON Implementation (PoC 승인 후)
+- **VTON-01**: 아이템 추출 → VTON 파이프라인 구현
+- **VTON-02**: Visual Search 매칭 엔진
+- **VTON-03**: 동적 UI 5단계 구현
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| 태그/키워드 관리 (A-01) | v3.1로 미루기 — AI 관리 우선 |
-| 콘텐츠 모더레이션 (A-02) | v3.1로 미루기 |
-| 지급 관리 (A-03) | v3.1로 미루기 |
-| 실시간 알림 | 별도 마일스톤 |
-| 실제 백엔드 연결 (AI audit/pipeline) | 백엔드 API 설계 후 연결 |
+| 코드 변경 | v4.0은 문서 전용 마일스톤 |
+| admin 번들 spec | v3.0에서 별도 진행 중 |
+| system-backend spec | 백엔드는 별도 팀 관할 |
+| mobile-platform spec | 모바일 앱은 별도 마일스톤 |
+| scroll-animation spec | 현재 코드에 이미 구현됨, 별도 정리 |
+| VTON 기능 구현 | PoC 결과 후 v5.0에서 진행 |
+| spec 자동 검증 도구 | v4.1로 미루기 |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AAUTH-01 | v3-01 | Pending |
-| AAUTH-02 | v3-01 | Pending |
-| AAUTH-03 | v3-01 | Pending |
-| DASH-01 | v3-02 | Pending |
-| DASH-02 | v3-02 | Pending |
-| DASH-03 | v3-02 | Pending |
-| AUDIT-01 | v3-03 | Pending |
-| AUDIT-02 | v3-03 | Pending |
-| AUDIT-03 | v3-03 | Pending |
-| AUDIT-04 | v3-03 | Pending |
-| COST-01 | v3-04 | Complete |
-| COST-02 | v3-04 | Complete |
-| COST-03 | v3-04 | Complete |
-| PIPE-01 | v3-05 | Complete |
-| PIPE-02 | v3-05 | Complete |
-| PIPE-03 | v3-05 | Complete |
-| SLOG-01 | v3-05 | Complete |
-| SLOG-02 | v3-05 | Complete |
-| SLOG-03 | v3-05 | Complete |
+| ARCH-01 | v4-01 | Pending |
+| ARCH-02 | v4-01 | Pending |
+| ARCH-03 | v4-01 | Pending |
+| ARCH-04 | v4-01 | Pending |
+| SHRD-01 | v4-02 | Pending |
+| SHRD-02 | v4-02 | Pending |
+| SHRD-03 | v4-02 | Pending |
+| SHRD-04 | v4-02 | Pending |
+| SHRD-05 | v4-02 | Pending |
+| FLOW-01 | v4-03 | Pending |
+| FLOW-02 | v4-03 | Pending |
+| FLOW-03 | v4-03 | Pending |
+| FLOW-04 | v4-03 | Pending |
+| FLOW-05 | v4-03 | Pending |
+| DETL-01 | v4-04 | Pending |
+| DETL-02 | v4-04 | Pending |
+| DETL-03 | v4-04 | Pending |
+| DETL-04 | v4-04 | Pending |
+| DISC-01 | v4-05 | Pending |
+| DISC-02 | v4-05 | Pending |
+| DISC-03 | v4-05 | Pending |
+| DISC-04 | v4-05 | Pending |
+| CREA-01 | v4-06 | Pending |
+| CREA-02 | v4-06 | Pending |
+| CREA-03 | v4-06 | Pending |
+| USER-01 | v4-07 | Pending |
+| USER-02 | v4-07 | Pending |
+| USER-03 | v4-07 | Pending |
+| NEXT-01 | v4-08 | Pending |
+| NEXT-02 | v4-08 | Pending |
+| NEXT-03 | v4-08 | Pending |
+| NEXT-04 | v4-08 | Pending |
+| CLEN-01 | v4-09 | Pending |
 
 **Coverage:**
-- v3.0 requirements: 18 total
-- Mapped to phases: 18
+- v4.0 requirements: 29 total
+- Mapped to phases: 29
 - Unmapped: 0 (100% coverage)
 
 ---
 *Requirements defined: 2026-02-19*
-*Last updated: 2026-02-19 (v3-05 PIPE-01~03, SLOG-01~03 complete)*
+*Last updated: 2026-02-19 after initial definition*
