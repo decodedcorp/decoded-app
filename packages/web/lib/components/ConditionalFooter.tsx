@@ -9,8 +9,9 @@ import { DesktopFooter } from "@/lib/design-system";
  * Hides footer on:
  * - /explore - Full-screen ThiingsGrid experience
  * - /feed - Full-screen feed experience
+ * - /admin/* - Admin panel has its own layout (no main-app footer)
  */
-const HIDDEN_FOOTER_PATHS = ["/explore", "/feed"];
+const HIDDEN_FOOTER_PATHS = ["/explore", "/feed", "/admin"];
 
 export function ConditionalFooter({ className }: { className?: string }) {
   const pathname = usePathname();

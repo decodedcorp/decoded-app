@@ -18,6 +18,7 @@ export interface User {
 
 interface AuthState {
   user: User | null;
+  isAdmin: boolean;
   isGuest: boolean;
   isLoading: boolean;
   isInitialized: boolean;
@@ -30,7 +31,7 @@ interface AuthState {
   guestLogin: () => void;
   logout: () => Promise<void>;
   clearError: () => void;
-  setUser: (supabaseUser: SupabaseUser | null) => void;
+  setUser: (supabaseUser: SupabaseUser | null) => Promise<void>;
 }
 
 /**
@@ -53,8 +54,28 @@ function mapSupabaseUser(supabaseUser: SupabaseUser): User {
   };
 }
 
+/**
+ * Fetches is_admin flag for the given user ID from the users table.
+ * Returns false on any error or missing record.
+ */
+async function fetchIsAdmin(userId: string): Promise<boolean> {
+  try {
+    const { data, error } = await supabaseBrowserClient
+      .from("users")
+      .select("is_admin")
+      .eq("id", userId)
+      .single();
+
+    if (error) return false;
+    return data?.is_admin === true;
+  } catch {
+    return false;
+  }
+}
+
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
+  isAdmin: false,
   isGuest: false,
   isLoading: false,
   isInitialized: false,
@@ -75,22 +96,24 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       if (error) {
         console.error("Failed to get session:", error);
-        set({ isInitialized: true, user: null });
+        set({ isInitialized: true, user: null, isAdmin: false });
         return;
       }
 
       if (session?.user) {
+        const isAdmin = await fetchIsAdmin(session.user.id);
         set({
           user: mapSupabaseUser(session.user),
+          isAdmin,
           isInitialized: true,
           isGuest: false,
         });
       } else {
-        set({ isInitialized: true, user: null });
+        set({ isInitialized: true, user: null, isAdmin: false });
       }
     } catch (error) {
       console.error("Auth initialization error:", error);
-      set({ isInitialized: true, user: null });
+      set({ isInitialized: true, user: null, isAdmin: false });
     }
   },
 
@@ -129,7 +152,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
    * 게스트 로그인
    */
   guestLogin: () => {
-    set({ isGuest: true, user: null, error: null });
+    set({ isGuest: true, user: null, isAdmin: false, error: null });
   },
 
   /**
@@ -147,6 +170,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       set({
         user: null,
+        isAdmin: false,
         isGuest: false,
         isLoading: false,
       });
@@ -169,11 +193,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   /**
    * Supabase auth state change에서 호출
+   * Now async to fetch is_admin status from users table.
    */
-  setUser: (supabaseUser: SupabaseUser | null) => {
+  setUser: async (supabaseUser: SupabaseUser | null) => {
     if (supabaseUser) {
+      const isAdmin = await fetchIsAdmin(supabaseUser.id);
       set({
         user: mapSupabaseUser(supabaseUser),
+        isAdmin,
         isGuest: false,
         isLoading: false,
         loadingProvider: null,
@@ -181,6 +208,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } else {
       set({
         user: null,
+        isAdmin: false,
         isLoading: false,
         loadingProvider: null,
       });
@@ -190,6 +218,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
 // Selectors
 export const selectUser = (state: AuthState) => state.user;
+export const selectIsAdmin = (state: AuthState) => state.isAdmin;
 export const selectIsAuthenticated = (state: AuthState) =>
   !!state.user || state.isGuest;
 export const selectIsLoggedIn = (state: AuthState) => !!state.user;
