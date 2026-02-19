@@ -141,10 +141,10 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — AI cost mock data generators, types, data layer, 2 API routes
-- [ ] 04-02-PLAN.md — AI cost UI (KPI cards, token usage chart, API calls chart, model cost table, page assembly)
+- [x] 04-01-PLAN.md — AI cost mock data generators, types, data layer, 2 API routes
+- [x] 04-02-PLAN.md — AI cost UI (KPI cards, token usage chart, API calls chart, model cost table, page assembly)
 
-**Status:** [ ] Not started
+**Status:** [x] Complete (2026-02-19)
 
 ---
 
@@ -186,7 +186,7 @@ Plans:
 | v3-01 | Admin Foundation — auth middleware, layout, routing | AAUTH-01~03 | ✓ Complete (2026-02-19) |
 | v3-02 | Dashboard — KPI cards, traffic charts, today summary | DASH-01~03 | ✓ Complete (2026-02-19) |
 | v3-03 | AI Audit — request list, detail view, edit, filter | AUDIT-01~04 | ✓ Complete (2026-02-19) |
-| v3-04 | AI Cost Monitoring — call stats, token charts, cost estimate | COST-01~03 | Not started |
+| v3-04 | AI Cost Monitoring — call stats, token charts, cost estimate | COST-01~03 | ✓ Complete (2026-02-19) |
 | v3-05 | Pipeline & Server Logs — pipeline viewer, server log, streaming | PIPE-01~03, SLOG-01~03 | Not started |
 
 **v3.0 Coverage:** 18/18 requirements mapped (100%)
@@ -194,4 +194,4 @@ Plans:
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-02-19 (v3-03 AI Audit complete)*
+*Last updated: 2026-02-19 (v3-04 AI Cost Monitoring complete)*

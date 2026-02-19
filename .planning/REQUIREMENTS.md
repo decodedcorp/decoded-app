@@ -28,9 +28,9 @@ Requirements for Admin Panel — AI Management. 목업 데이터 우선, 백엔�
 
 ### AI Cost
 
-- [ ] **COST-01**: AI API 호출 통계 (일별/월별 호출 수)
-- [ ] **COST-02**: 토큰 사용량 차트 (입력/출력 토큰)
-- [ ] **COST-03**: 비용 추정 대시보드 (모델별, 기간별)
+- [x] **COST-01**: AI API 호출 통계 (일별/월별 호출 수)
+- [x] **COST-02**: 토큰 사용량 차트 (입력/출력 토큰)
+- [x] **COST-03**: 비용 추정 대시보드 (모델별, 기간별)
 
 ### Pipeline Log
 
@@ -86,9 +86,9 @@ Requirements for Admin Panel — AI Management. 목업 데이터 우선, 백엔�
 | AUDIT-02 | v3-03 | Pending |
 | AUDIT-03 | v3-03 | Pending |
 | AUDIT-04 | v3-03 | Pending |
-| COST-01 | v3-04 | Pending |
-| COST-02 | v3-04 | Pending |
-| COST-03 | v3-04 | Pending |
+| COST-01 | v3-04 | Complete |
+| COST-02 | v3-04 | Complete |
+| COST-03 | v3-04 | Complete |
 | PIPE-01 | v3-05 | Pending |
 | PIPE-02 | v3-05 | Pending |
 | PIPE-03 | v3-05 | Pending |
@@ -103,4 +103,4 @@ Requirements for Admin Panel — AI Management. 목업 데이터 우선, 백엔�
 
 ---
 *Requirements defined: 2026-02-19*
-*Last updated: 2026-02-19 after roadmap creation (traceability filled)*
+*Last updated: 2026-02-19 (v3-04 COST-01~03 complete)*
