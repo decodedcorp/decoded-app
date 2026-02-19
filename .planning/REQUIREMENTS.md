@@ -46,9 +46,9 @@ Requirements for Spec Overhaul — AI-Ready Documentation. 코드 변경 없이 
 
 ### Screen Specs — Creation-AI
 
-- [ ] **CREA-01**: 업로드 화면 spec (SCR-CREA-01) — DropZone + 이미지 압축
-- [ ] **CREA-02**: AI 감지 결과 화면 spec (SCR-CREA-02) — 아이템 스팟팅
-- [ ] **CREA-03**: 편집/솔루션 입력 화면 spec (SCR-CREA-03)
+- [x] **CREA-01**: 업로드 화면 spec (SCR-CREA-01) — DropZone + 이미지 압축
+- [x] **CREA-02**: AI 감지 결과 화면 spec (SCR-CREA-02) — 아이템 스팟팅
+- [x] **CREA-03**: 편집/솔루션 입력 화면 spec (SCR-CREA-03)
 
 ### Screen Specs — User System
 
@@ -116,9 +116,9 @@ Requirements for Spec Overhaul — AI-Ready Documentation. 코드 변경 없이 
 | DISC-02 | v4-05 | Complete |
 | DISC-03 | v4-05 | Complete |
 | DISC-04 | v4-05 | Complete |
-| CREA-01 | v4-06 | Pending |
-| CREA-02 | v4-06 | Pending |
-| CREA-03 | v4-06 | Pending |
+| CREA-01 | v4-06 | Complete |
+| CREA-02 | v4-06 | Complete |
+| CREA-03 | v4-06 | Complete |
 | USER-01 | v4-07 | Pending |
 | USER-02 | v4-07 | Pending |
 | USER-03 | v4-07 | Pending |
