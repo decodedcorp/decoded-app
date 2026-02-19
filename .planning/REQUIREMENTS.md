@@ -32,10 +32,10 @@ Requirements for Spec Overhaul — AI-Ready Documentation. 코드 변경 없이 
 
 ### Screen Specs — Detail View
 
-- [ ] **DETL-01**: 포스트 상세 화면 spec (SCR-VIEW-01) — 현재 코드 기준 재작성
-- [ ] **DETL-02**: 스팟/핫스팟 상세 spec (SCR-VIEW-02) — 컴포넌트 매핑 + 인터랙션
-- [ ] **DETL-03**: 아이템/솔루션 상세 spec (SCR-VIEW-03) — 쇼핑 연결 포함
-- [ ] **DETL-04**: 관련 콘텐츠 spec (SCR-VIEW-04) — 추천 로직 + UI
+- [x] **DETL-01**: 포스트 상세 화면 spec (SCR-VIEW-01) — 현재 코드 기준 재작성
+- [x] **DETL-02**: 스팟/핫스팟 상세 spec (SCR-VIEW-02) — 컴포넌트 매핑 + 인터랙션
+- [x] **DETL-03**: 아이템/솔루션 상세 spec (SCR-VIEW-03) — 쇼핑 연결 포함
+- [x] **DETL-04**: 관련 콘텐츠 spec (SCR-VIEW-04) — 추천 로직 + UI
 
 ### Screen Specs — Discovery
 
@@ -108,10 +108,10 @@ Requirements for Spec Overhaul — AI-Ready Documentation. 코드 변경 없이 
 | FLOW-03 | v4-03 | Complete |
 | FLOW-04 | v4-03 | Complete |
 | FLOW-05 | v4-03 | Complete |
-| DETL-01 | v4-04 | Pending |
-| DETL-02 | v4-04 | Pending |
-| DETL-03 | v4-04 | Pending |
-| DETL-04 | v4-04 | Pending |
+| DETL-01 | v4-04 | Complete |
+| DETL-02 | v4-04 | Complete |
+| DETL-03 | v4-04 | Complete |
+| DETL-04 | v4-04 | Complete |
 | DISC-01 | v4-05 | Pending |
 | DISC-02 | v4-05 | Pending |
 | DISC-03 | v4-05 | Pending |
