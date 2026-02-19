@@ -138,6 +138,12 @@ Plans:
 3. 모델별(예: GPT-4o, Claude 3.5) 비용 추정이 기간 선택에 따라 계산되어 표시된다
 4. 모든 비용/사용량 데이터는 mock 데이터로 동작하며 현실적인 수치 범위를 제공한다
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — AI cost mock data generators, types, data layer, 2 API routes
+- [ ] 04-02-PLAN.md — AI cost UI (KPI cards, token usage chart, API calls chart, model cost table, page assembly)
+
 **Status:** [ ] Not started
 
 ---
