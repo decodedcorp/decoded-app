@@ -133,7 +133,7 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] v4-03-01-PLAN.md — Write FLW-01~04 flow files + FLW-05 DRAFT file
+- [ ] v4-03-01-PLAN.md — Write FLW-01~05 flow documents (4 finalized + 1 DRAFT VTON)
 
 **Status:** [ ] Not started
 
