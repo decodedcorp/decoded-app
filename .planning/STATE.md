@@ -59,6 +59,8 @@ Key decisions affecting v4.0 work:
 - v4-01-02: EARS syntax adopted as requirement format standard ("When [trigger], the system shall [behavior]")
 - v4-01-02: Mobile-first ordering enforced in screen spec template (mobile wireframe primary, desktop is adaptation delta)
 - v4-01-02: AI injection guide quick-reference table in README; full guide deferred to _shared/injection-guide.md (v4-02)
+- v4-01-01: specs/_archive/v2.1.0/ is read-only snapshot; 60 stale paths documented in STALE-PATHS-AUDIT.md for v4-04 through v4-07 reference
+- v4-01-01: grid/ThiingsGrid.tsx and lib/components/HomeClient.tsx are path renames not deletions; most unimplemented feature components (voting, comments, filter) have no filesystem counterpart
 
 ### Pending Todos
 
