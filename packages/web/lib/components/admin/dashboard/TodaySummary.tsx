@@ -69,25 +69,19 @@ export function TodaySummary({ data }: TodaySummaryProps) {
       {/* Metrics row */}
       <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
         <MetricItem
-          icon={
-            <FileImage className="w-4 h-4 text-blue-500" />
-          }
+          icon={<FileImage className="w-4 h-4 text-blue-500" />}
           iconBgClass="bg-blue-50 dark:bg-blue-950"
           label="New Posts"
           value={data.newPosts}
         />
         <MetricItem
-          icon={
-            <ShoppingBag className="w-4 h-4 text-emerald-500" />
-          }
+          icon={<ShoppingBag className="w-4 h-4 text-emerald-500" />}
           iconBgClass="bg-emerald-50 dark:bg-emerald-950"
           label="New Solutions"
           value={data.newSolutions}
         />
         <MetricItem
-          icon={
-            <MousePointerClick className="w-4 h-4 text-amber-500" />
-          }
+          icon={<MousePointerClick className="w-4 h-4 text-amber-500" />}
           iconBgClass="bg-amber-50 dark:bg-amber-950"
           label="Clicks"
           value={data.clicks}

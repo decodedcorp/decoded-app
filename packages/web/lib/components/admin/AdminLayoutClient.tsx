@@ -17,7 +17,10 @@ interface AdminLayoutClientProps {
  *
  * Content area: bg-gray-50 / dark:bg-gray-950 with p-6 md:p-8 padding
  */
-export function AdminLayoutClient({ children, adminName }: AdminLayoutClientProps) {
+export function AdminLayoutClient({
+  children,
+  adminName,
+}: AdminLayoutClientProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   function openSidebar() {
@@ -56,9 +59,7 @@ export function AdminLayoutClient({ children, adminName }: AdminLayoutClientProp
         <div className="h-14 md:hidden" aria-hidden="true" />
 
         {/* Page content */}
-        <main className="p-6 md:p-8">
-          {children}
-        </main>
+        <main className="p-6 md:p-8">{children}</main>
       </div>
     </div>
   );

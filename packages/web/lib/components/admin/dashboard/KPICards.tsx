@@ -51,9 +51,7 @@ function KPICard({ label, value, delta, icon }: KPICardData) {
       {hasDelta ? (
         <div
           className={`flex items-center gap-1 text-xs font-medium ${
-            isPositive
-              ? "text-emerald-500"
-              : "text-red-500"
+            isPositive ? "text-emerald-500" : "text-red-500"
           }`}
         >
           {isPositive ? (

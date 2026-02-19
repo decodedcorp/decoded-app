@@ -42,7 +42,11 @@ interface AdminSidebarProps {
  * Theme: Dark (bg-gray-900) with light text
  * Features: Active route detection, logout, back-to-app link
  */
-export function AdminSidebar({ isOpen, onClose, adminName }: AdminSidebarProps) {
+export function AdminSidebar({
+  isOpen,
+  onClose,
+  adminName,
+}: AdminSidebarProps) {
   const pathname = usePathname();
   const logout = useAuthStore((state) => state.logout);
 
@@ -94,7 +98,10 @@ export function AdminSidebar({ isOpen, onClose, adminName }: AdminSidebarProps) 
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 py-4 overflow-y-auto" aria-label="Admin navigation">
+        <nav
+          className="flex-1 py-4 overflow-y-auto"
+          aria-label="Admin navigation"
+        >
           <ul className="space-y-0.5 px-2">
             {NAV_ITEMS.map((item) => {
               const active = isActive(item);

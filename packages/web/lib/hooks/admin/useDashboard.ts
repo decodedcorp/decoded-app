@@ -11,7 +11,11 @@
  */
 
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
-import type { KPIStats, DailyMetric, TodaySummary } from "@/lib/api/admin/dashboard";
+import type {
+  KPIStats,
+  DailyMetric,
+  TodaySummary,
+} from "@/lib/api/admin/dashboard";
 
 // ─── Shared fetcher ───────────────────────────────────────────────────────────
 

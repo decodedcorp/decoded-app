@@ -101,14 +101,10 @@ export function TrafficChart({
   const interval = tickInterval(currentPeriod);
 
   // Compute date range subtitle
-  const startDate =
-    data.length > 0 ? formatDateLabel(data[0].date) : "";
+  const startDate = data.length > 0 ? formatDateLabel(data[0].date) : "";
   const endDate =
-    data.length > 0
-      ? formatDateLabel(data[data.length - 1].date)
-      : "";
-  const subtitle =
-    startDate && endDate ? `${startDate} – ${endDate}` : "";
+    data.length > 0 ? formatDateLabel(data[data.length - 1].date) : "";
+  const subtitle = startDate && endDate ? `${startDate} – ${endDate}` : "";
 
   return (
     <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5">
@@ -189,7 +185,11 @@ export function TrafficChart({
 
           <Tooltip
             content={<CustomTooltip />}
-            cursor={{ stroke: "#6b7280", strokeWidth: 1, strokeDasharray: "4 4" }}
+            cursor={{
+              stroke: "#6b7280",
+              strokeWidth: 1,
+              strokeDasharray: "4 4",
+            }}
           />
 
           <Legend
