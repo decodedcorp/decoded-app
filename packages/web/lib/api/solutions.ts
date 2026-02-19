@@ -11,7 +11,7 @@
 import { apiClient } from "./client";
 import type {
   Solution,
-  SolutionListResponse,
+  SolutionListItem,
   CreateSolutionDto,
   UpdateSolutionDto,
   ExtractMetadataRequest,
@@ -25,16 +25,15 @@ import type {
 // GET /api/v1/spots/{spot_id}/solutions
 // ============================================================
 
-/**
- * Fetch all solutions for a spot
- */
-export async function fetchSolutions(spotId: string): Promise<Solution[]> {
-  const response = await apiClient<SolutionListResponse>({
+/** Backend returns array directly (Vec<SolutionListItem>) */
+export async function fetchSolutions(
+  spotId: string
+): Promise<SolutionListItem[]> {
+  return apiClient<SolutionListItem[]>({
     path: `/api/v1/spots/${spotId}/solutions`,
     method: "GET",
     requiresAuth: false, // Public data
   });
-  return response.data;
 }
 
 // ============================================================
@@ -91,6 +90,54 @@ export async function updateSolution(
 export async function deleteSolution(solutionId: string): Promise<void> {
   await apiClient<void>({
     path: `/api/v1/solutions/${solutionId}`,
+    method: "DELETE",
+    requiresAuth: true,
+  });
+}
+
+// ============================================================
+// Adopt Solution (Post/Spot owner only)
+// POST /api/v1/solutions/{solution_id}/adopt
+// DELETE /api/v1/solutions/{solution_id}/adopt
+// ============================================================
+
+export interface AdoptSolutionDto {
+  match_type: "perfect" | "close";
+}
+
+export interface AdoptResponse {
+  solution_id: string;
+  is_adopted: boolean;
+  match_type: string;
+  adopted_at: number;
+  updated_spot?: {
+    spot_id: string;
+    title: string;
+    metadata?: Record<string, unknown>;
+  };
+}
+
+/**
+ * Adopt a solution (post owner picks one solution among many)
+ */
+export async function adoptSolution(
+  solutionId: string,
+  data: AdoptSolutionDto
+): Promise<AdoptResponse> {
+  return apiClient<AdoptResponse>({
+    path: `/api/v1/solutions/${solutionId}/adopt`,
+    method: "POST",
+    body: data,
+    requiresAuth: true,
+  });
+}
+
+/**
+ * Unadopt a solution
+ */
+export async function unadoptSolution(solutionId: string): Promise<void> {
+  await apiClient<void>({
+    path: `/api/v1/solutions/${solutionId}/adopt`,
     method: "DELETE",
     requiresAuth: true,
   });

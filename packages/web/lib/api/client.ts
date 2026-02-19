@@ -101,6 +101,11 @@ export async function apiClient<T>(options: ApiClientOptions): Promise<T> {
     throw new Error(errorData.message || `API Error: ${response.status}`);
   }
 
+  // 204 No Content
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
   // Return typed response
   return response.json();
 }

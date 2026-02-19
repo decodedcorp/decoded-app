@@ -21,14 +21,15 @@ import type {
 
 /**
  * Fetch all spots for a post
+ * Backend returns array directly; support both array and { data: Spot[] } for compatibility.
  */
 export async function fetchSpots(postId: string): Promise<Spot[]> {
-  const response = await apiClient<SpotListResponse>({
+  const response = await apiClient<SpotListResponse | Spot[]>({
     path: `/api/v1/posts/${postId}/spots`,
     method: "GET",
     requiresAuth: false, // Public data
   });
-  return response.data ?? [];
+  return Array.isArray(response) ? response : (response as SpotListResponse).data ?? [];
 }
 
 // ============================================================
