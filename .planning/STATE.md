@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-19)
 
 **Core value:** 완전한 사용자 경험 — 일관된 디자인 시스템과 실제 데이터
-**Current focus:** v4.0 Spec Overhaul — AI-Ready Documentation
+**Current focus:** v4.0 Spec Overhaul — COMPLETE
 
 ## Current Position
 
-Phase: v4-08 Next Version Draft — Complete
+Phase: v4-09 Cleanup — Complete
 Plan: 1/1 plans complete
-Status: v4-08-01 complete — 4 NEXT-* draft documents written (NEXT-01 through NEXT-04) + injection guardrail added
-Last activity: 2026-02-20 — Completed v4-08-01-PLAN.md (NEXT-01 Service Identity, NEXT-02 VTON, NEXT-03 Dynamic UI, NEXT-04 Commerce Bridge)
+Status: v4-09-01 complete — 8 old bundle dirs retired, CMN/template files relocated to _shared/, all stale references fixed
+Last activity: 2026-02-20 — Completed 09-01-PLAN.md (specs/ cleanup, directory structure finalized)
 
-Progress: v4.0 [████████░░] 8/9 phases (12/13 plans complete)
+Progress: v4.0 [██████████] 9/9 phases (13/13 plans complete)
 
 ## Milestone Summary
 
@@ -25,7 +25,7 @@ Progress: v4.0 [████████░░] 8/9 phases (12/13 plans complete
 | v2.0 Design Overhaul | 9 | 26 | Shipped | 2026-02-05 |
 | v2.1 Design System | 6 | 14 | Shipped | 2026-02-06 |
 | v3.0 Admin Panel | 6 | 12 | Shipped | 2026-02-19 |
-| **v4.0 Spec Overhaul** | **9** | **12/13** | **In progress** | - |
+| **v4.0 Spec Overhaul** | **9** | **13/13** | **Shipped** | **2026-02-20** |
 
 ## v4.0 Roadmap
 
@@ -39,7 +39,7 @@ Progress: v4.0 [████████░░] 8/9 phases (12/13 plans complete
 | v4-06 | Screen Specs: Creation-AI | CREA-01~03 | 1/1 | Complete |
 | v4-07 | Screen Specs: User System | USER-01~03 | 1/1 | Complete |
 | v4-08 | Next Version Draft | NEXT-01~04 | 1/1 | Complete |
-| v4-09 | Cleanup | CLEN-01 | 0/1 | Not started |
+| v4-09 | Cleanup | CLEN-01 | 1/1 | Complete |
 
 ## Accumulated Context
 
@@ -100,6 +100,9 @@ Key decisions affecting v4.0 work:
 - v4-07-01: selectIsAuthenticated (!!user || isGuest) vs selectIsLoggedIn (!!user) — key distinction for browse vs account-required features
 - v4-07-01: StatsCards renders 3 cards (Posts/Solutions/Points), not 4 — both Posts and Points cards trigger alert (NOT-IMPL)
 - v4-07-01: isEditModalOpen and activeTab are local useState in ProfileClient — NOT in profileStore; profileStore only holds badgeModalMode + selectedBadge
+- v4-09-01: specs/ root now contains exactly 7 items: _archive/, _shared/, _next/, admin/, flows/, screens/, README.md — no old bundle dirs
+- v4-09-01: specs/admin/ is a permanent v3.0-format exception — documented in injection-guide as loadable bundle for admin feature work
+- v4-09-01: All CMN component specs (CMN-01~04) and spec templates now live in specs/_shared/components/ and specs/_shared/templates/ respectively
 
 ### Pending Todos
 
@@ -117,11 +120,11 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-20T15:47Z
-Stopped at: Completed v4-08-01-PLAN.md (NEXT-01 Service Identity, NEXT-02 VTON, NEXT-03 Dynamic UI, NEXT-04 Commerce Bridge)
+Last session: 2026-02-20T16:41Z
+Stopped at: Completed 09-01-PLAN.md — v4.0 Spec Overhaul milestone complete
 Resume file: None
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-20 after v4-08-01 completion*
+*Last updated: 2026-02-20 after 09-01 completion (v4.0 milestone shipped)*
