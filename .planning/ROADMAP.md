@@ -6,7 +6,7 @@
 - [x] **v1.1 Full API Integration** - Phase 6 + Tracks A-D (shipped 2026-01-29)
 - [x] **v2.0 Design Overhaul** - v2-Phases 1-9 (shipped 2026-02-05)
 - [x] **v2.1 Design System Expansion** - v2.1-Phases 1-6 (shipped 2026-02-06)
-- [ ] **v3.0 Admin Panel — AI Management** - v3-Phases 01-06 (gap closure in progress)
+- [x] **v3.0 Admin Panel — AI Management** - v3-Phases 01-06 (shipped 2026-02-19)
 - [ ] **v4.0 Spec Overhaul — AI-Ready Documentation** - v4-Phases 01-09 (in progress)
 
 ## Phases
@@ -194,9 +194,9 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 06-01-PLAN.md — Fix pipeline detail response shape + remove dev auth bypass in 2 routes
+- [x] 06-01-PLAN.md — Fix pipeline detail response shape + remove dev auth bypass in 5 routes
 
-**Status:** [ ] Not started
+**Status:** [x] Complete (2026-02-19)
 
 ---
 
@@ -430,9 +430,9 @@ Plans:
 | v1.1 API Integration | 6 + A-D | 13/13 | Shipped | 2026-01-29 |
 | v2.0 Design Overhaul | v2-1~9 | 26/26 | Shipped | 2026-02-05 |
 | v2.1 Design System | v2.1-1~6 | 14/14 | Shipped | 2026-02-06 |
-| **v3.0 Admin Panel** | **v3-01~06** | **11/12** | **Gap closure** | 2026-02-19 |
+| **v3.0 Admin Panel** | **v3-01~06** | **12/12** | **Shipped** | 2026-02-19 |
 | **v4.0 Spec Overhaul** | **v4-01~09** | **0/13** | **In progress** | - |
-| **Total** | **6 milestones** | **69/82** | **Ongoing** | - |
+| **Total** | **6 milestones** | **70/82** | **Ongoing** | - |
 
 ### v3.0 Phase Progress
 
@@ -443,7 +443,7 @@ Plans:
 | v3-03 | AI Audit — request list, detail view, edit, filter | AUDIT-01~04 | Complete (2026-02-19) |
 | v3-04 | AI Cost Monitoring — call stats, token charts, cost estimate | COST-01~03 | Complete (2026-02-19) |
 | v3-05 | Pipeline & Server Logs — pipeline viewer, server log, streaming | PIPE-01~03, SLOG-01~03 | Complete (2026-02-19) |
-| v3-06 | Pipeline Bug Fix + Auth Consistency — response shape fix, dev bypass removal | PIPE-02, PIPE-03 (fix) | Not started |
+| v3-06 | Pipeline Bug Fix + Auth Consistency — response shape fix, dev bypass removal | PIPE-02, PIPE-03 (fix) | Complete (2026-02-19) |
 
 **v3.0 Coverage:** 18/18 requirements mapped (100%)
 
