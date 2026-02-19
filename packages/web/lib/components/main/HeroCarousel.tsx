@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 import { heroSlides, type HeroSlide } from "@/lib/data/heroSlides";
 
@@ -76,24 +77,41 @@ export function HeroCarousel({
           transition={{ duration: 0.7, ease: "easeInOut" }}
           className="absolute inset-0"
         >
-          {/* Placeholder gradient while image loads */}
-          <div className="absolute inset-0 bg-gradient-to-b from-main-bg/20 via-transparent to-main-bg" />
+          {/* 1) Blurred background: 같은 이미지로 여백 채움 */}
+          {currentSlide.imageUrl ? (
+            <div className="absolute inset-0 overflow-hidden">
+              <Image
+                src={currentSlide.imageUrl}
+                alt=""
+                fill
+                className="object-cover blur-2xl scale-110 opacity-80"
+                priority={currentIndex === 0}
+                sizes="100vw"
+                unoptimized={currentSlide.imageUrl.startsWith("http")}
+                aria-hidden
+              />
+            </div>
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black" />
+          )}
 
-          {/* Actual image - using placeholder for now */}
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black">
-            {/* Uncomment when actual images are available */}
-            {/* <Image
-              src={currentSlide.imageUrl}
-              alt={currentSlide.title}
-              fill
-              className="object-cover"
-              priority
-              sizes="100vw"
-            /> */}
+          {/* 2) 실제 이미지: 비율 유지 (object-contain) */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            {currentSlide.imageUrl ? (
+              <Image
+                src={currentSlide.imageUrl}
+                alt={currentSlide.title}
+                fill
+                className="object-contain"
+                priority={currentIndex === 0}
+                sizes="100vw"
+                unoptimized={currentSlide.imageUrl.startsWith("http")}
+              />
+            ) : null}
           </div>
 
-          {/* Overlay gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+          {/* 3) 하단 그라데이션 (텍스트 가독) */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
         </motion.div>
       </AnimatePresence>
 

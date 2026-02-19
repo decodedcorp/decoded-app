@@ -4,6 +4,8 @@
  * Updated to use new schema with 'posts' table
  */
 
+import type { Post } from "@/lib/api/types";
+import type { HeroSlide } from "@/lib/data/heroSlides";
 import type {
   PostData,
   StyleCardServerData,
@@ -18,6 +20,76 @@ import type { StyleCardData } from "../components/main/StyleCard";
 
 // Re-export TrendingKeyword type for use in page.tsx
 export type { TrendingKeyword };
+
+// =============================================================================
+// API Post (GET /api/v1/posts) → UI types (decoded-api only)
+// =============================================================================
+
+export function apiPostToHeroData(post: Post): HeroData {
+  return {
+    artistName: post.artist_name || post.group_name || "Featured",
+    title: post.context || "오늘의 스타일을 확인해보세요",
+    subtitle: "",
+    imageUrl: post.image_url ?? undefined,
+    link: `/posts/${post.id}`,
+  };
+}
+
+export function apiPostToHeroSlide(post: Post): HeroSlide {
+  return {
+    id: post.id,
+    imageUrl: post.image_url,
+    title: post.artist_name || post.group_name || "Featured",
+    subtitle: post.title ?? undefined,
+    link: `/posts/${post.id}`,
+  };
+}
+
+export function apiPostToWeeklyBestStyle(post: Post): WeeklyBestStyle {
+  return {
+    id: post.id,
+    artistName: post.artist_name || post.group_name || "Unknown",
+    imageUrl: post.image_url ?? undefined,
+    link: `/posts/${post.id}`,
+  };
+}
+
+export function apiPostToStyleCardData(post: Post): StyleCardData {
+  const artistName = post.artist_name || post.group_name || "Unknown";
+  return {
+    id: post.id,
+    title: `${artistName}의 스타일`,
+    description: post.context
+      ? `${artistName} - ${post.context}`
+      : `${artistName}의 새로운 스타일을 확인해보세요.`,
+    artistName,
+    imageUrl: post.image_url ?? undefined,
+    link: `/posts/${post.id}`,
+    spotCount: post.spot_count ?? 0,
+    items: [],
+    spots: [],
+  };
+}
+
+/** Artist Spotlight 섹션용 subtitle: 스타일 목록에서 아티스트 이름을 모아 문구 생성 */
+export function formatArtistSpotlightSubtitle(
+  styles: StyleCardData[],
+  maxNames = 3
+): string {
+  const names = [
+    ...new Set(
+      styles
+        .map((s) => s.artistName?.trim())
+        .filter((n): n is string => !!n && n !== "Unknown")
+    ),
+  ];
+  if (names.length === 0) return "다양한 아티스트의 스타일을 만나보세요.";
+  if (names.length === 1) return `${names[0]}의 스타일을 만나보세요.`;
+  const show = names.slice(0, maxNames);
+  const rest = names.length - show.length;
+  if (rest <= 0) return `${show.join(", ")}의 스타일을 만나보세요.`;
+  return `${show.join(", ")} 외 ${rest}명의 스타일을 만나보세요.`;
+}
 
 /**
  * Weekly Best section style type
@@ -37,7 +109,7 @@ export function postToWeeklyBestStyle(post: PostData): WeeklyBestStyle {
     id: post.id,
     artistName: post.artistName || post.groupName || "Unknown",
     imageUrl: post.imageUrl ?? undefined,
-    link: `/feed/${post.id}`,
+    link: `/posts/${post.id}`,
   };
 }
 
@@ -51,7 +123,7 @@ export function postToItemCardData(post: PostData): ItemCardData {
     brand: post.context || "Style",
     name: post.mediaTitle || `${post.artistName || "Unknown"}'s Style`,
     imageUrl: post.imageUrl ?? undefined,
-    link: `/feed/${post.id}`,
+    link: `/posts/${post.id}`,
     relatedStyles: undefined,
     badge: undefined,
   };
@@ -66,7 +138,7 @@ export function postToHeroData(post: PostData): HeroData {
     title: post.mediaTitle || "오늘의 스타일을 확인해보세요",
     subtitle: post.context || "",
     imageUrl: post.imageUrl ?? undefined,
-    link: `/feed/${post.id}`,
+    link: `/posts/${post.id}`,
   };
 }
 
@@ -89,7 +161,7 @@ export function styleCardServerToStyleCardData(
     description,
     artistName,
     imageUrl: data.post.imageUrl ?? undefined,
-    link: `/feed/${data.post.id}`,
+    link: `/posts/${data.post.id}`,
     items: data.items.map((item) => ({
       id: String(item.id),
       label: item.label,
@@ -119,7 +191,7 @@ export function imageWithPostToWeeklyBestStyle(
     id: data.image.id,
     artistName: data.account ?? "Unknown",
     imageUrl: data.image.image_url ?? undefined,
-    link: `/feed/${data.image.id}`,
+    link: `/posts/${data.image.id}`,
   };
 }
 
@@ -130,7 +202,7 @@ export function imageWithPostToHeroData(data: ImageWithPost): HeroData {
     title: "오늘의 스타일을 확인해보세요",
     subtitle: "",
     imageUrl: data.image.image_url ?? undefined,
-    link: `/feed/${data.image.id}`,
+    link: `/posts/${data.image.id}`,
   };
 }
 
@@ -154,7 +226,7 @@ export function whatsNewStyleToStyleCardData(
     description,
     artistName,
     imageUrl: data.image.image_url ?? undefined,
-    link: `/feed/${data.image.id}`,
+    link: `/posts/${data.image.id}`,
     items: data.items.map((item: StyleItemData) => ({
       id: String(item.id),
       label: item.label,

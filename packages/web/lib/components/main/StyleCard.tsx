@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
+import { useSpots } from "@/lib/hooks/useSpots";
 
 export interface StyleCardData {
   id: string;
@@ -12,6 +14,10 @@ export interface StyleCardData {
   artistName: string;
   imageUrl?: string;
   link: string;
+  /** true = post has at least one spot with solution; false = spots but no solutions */
+  hasSolutions?: boolean;
+  /** number of spots (for solution badge when emphasizeSolutions) */
+  spotCount?: number;
   items?: {
     id: string;
     label: string;
@@ -24,6 +30,7 @@ export interface StyleCardData {
     x: number;
     y: number;
     label?: string;
+    hasSolution?: boolean;
   }[];
 }
 
@@ -31,6 +38,12 @@ interface StyleCardProps {
   data: StyleCardData;
   variant?: "large" | "medium" | "small";
   showItems?: boolean;
+  /** show solution count badge (e.g. "N solutions") */
+  showSolutionBadge?: boolean;
+  /** solution 섹션용: primary 링 + 항상 스팟 표시 */
+  solutionCard?: boolean;
+  /** 스팟을 호버 없이 항상 로드·표시 */
+  alwaysShowSpots?: boolean;
   index?: number;
 }
 
@@ -38,8 +51,27 @@ export function StyleCard({
   data,
   variant = "medium",
   showItems = true,
+  showSolutionBadge = false,
+  solutionCard = false,
+  alwaysShowSpots = false,
   index = 0,
 }: StyleCardProps) {
+  const [hovered, setHovered] = useState(false);
+  const { data: spotsFromApi } = useSpots(data.id, {
+    enabled: alwaysShowSpots || hovered,
+    staleTime: 1000 * 60 * 5,
+  });
+  const spotsVisible = alwaysShowSpots ? true : hovered;
+  const displaySpots =
+    spotsVisible && spotsFromApi && spotsFromApi.length > 0
+      ? spotsFromApi.map((s) => ({
+          id: s.id,
+          x: parseFloat(s.position_left) || 0,
+          y: parseFloat(s.position_top) || 0,
+          hasSolution: (s.solution_count ?? 0) > 0,
+        }))
+      : data.spots;
+
   const aspectClasses = {
     large: "aspect-[4/3]",
     medium: "aspect-[3/4]",
@@ -58,10 +90,17 @@ export function StyleCard({
       }}
       className={cn(
         "group relative overflow-hidden rounded-[24px] md:rounded-[40px] bg-neutral-900 transition-all duration-700 hover:shadow-[0_30px_60px_rgba(0,0,0,0.6)]",
+        solutionCard &&
+          "ring-2 ring-primary/40 hover:ring-primary/60",
         aspectClasses[variant]
       )}
     >
-      <Link href={data.link} className="absolute inset-0 block">
+      <Link
+        href={data.link}
+        className="absolute inset-0 block"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
         {/* Background Image with Hover Zoom */}
         <div className="absolute inset-0 overflow-hidden">
           {data.imageUrl ? (
@@ -75,6 +114,28 @@ export function StyleCard({
             <div className="absolute inset-0 bg-neutral-800" />
           )}
         </div>
+
+        {/* Solution badge – 솔루션 강조 */}
+        {showSolutionBadge && (data.spotCount ?? 0) > 0 && (
+          <div className="absolute top-4 right-4 z-10">
+            <span className="inline-flex items-center gap-2 rounded-full bg-primary px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-black shadow-lg">
+              <svg
+                className="h-3.5 w-3.5 shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+              {data.spotCount} solution{data.spotCount !== 1 ? "s" : ""}
+            </span>
+          </div>
+        )}
 
         {/* Premium Gradient Overlays */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent opacity-90 group-hover:opacity-100 transition-opacity" />
@@ -108,26 +169,82 @@ export function StyleCard({
           </div>
         </div>
 
-        {/* Spot Markers (Enhanced Pulse Overlay) */}
-        {data.spots && data.spots.length > 0 && (
-          <div className="absolute inset-0 pointer-events-none z-20">
-            {data.spots.map((spot) => (
-              <motion.div
-                key={spot.id}
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{
-                  duration: 0.8,
-                  delay: 0.6,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-                className="absolute w-8 h-8 -ml-4 -mt-4 flex items-center justify-center"
-                style={{ left: `${spot.x}%`, top: `${spot.y}%` }}
-              >
-                <div className="absolute inset-0 bg-primary rounded-full animate-ping opacity-30 duration-[2000ms]" />
-                <div className="relative w-3 h-3 bg-primary rounded-full shadow-[0_0_25px_hsl(var(--primary))] border border-black/20" />
-              </motion.div>
-            ))}
+        {/* Spot Markers – visible on hover only; filled = has solution, ring = no solution */}
+        {displaySpots && displaySpots.length > 0 && (
+          <div
+            className={cn(
+              "absolute inset-0 pointer-events-none z-20 transition-opacity duration-200",
+              spotsVisible ? "opacity-100" : "opacity-0"
+            )}
+          >
+            {displaySpots.map((spot, spotIndex) => {
+              const hasSol = "hasSolution" in spot ? spot.hasSolution : false;
+              return (
+                <motion.div
+                  key={spot.id}
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={
+                    spotsVisible
+                      ? { opacity: 1, scale: 1 }
+                      : { opacity: 0, scale: 0 }
+                  }
+                  transition={{
+                    duration: 0.25,
+                    delay: spotIndex * 0.06,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
+                  className="absolute w-10 h-10 -ml-5 -mt-5 flex items-center justify-center"
+                  style={{ left: `${spot.x}%`, top: `${spot.y}%` }}
+                >
+                  {hasSol ? (
+                    <>
+                      <motion.div
+                        className="absolute inset-0 bg-white rounded-full"
+                        animate={{ scale: [1, 1.8, 1.8], opacity: [0.4, 0, 0] }}
+                        transition={{
+                          duration: 1.5,
+                          repeat: Infinity,
+                          repeatDelay: 0.3,
+                        }}
+                      />
+                      <motion.div
+                        className="relative w-4 h-4 bg-white rounded-full shadow-[0_0_20px_rgba(255,255,255,0.9)] border-2 border-white"
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{
+                          duration: 1.2,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <motion.div
+                        className="absolute inset-0 rounded-full border-2 border-white/60"
+                        animate={{
+                          scale: [1, 2, 2],
+                          opacity: [0.5, 0, 0],
+                        }}
+                        transition={{
+                          duration: 1.8,
+                          repeat: Infinity,
+                          repeatDelay: 0.4,
+                        }}
+                      />
+                      <motion.div
+                        className="relative w-5 h-5 rounded-full border-2 border-white bg-white/10 shadow-[0_0_16px_rgba(255,255,255,0.5)]"
+                        animate={{ scale: [1, 1.15, 1] }}
+                        transition={{
+                          duration: 1.4,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }}
+                      />
+                    </>
+                  )}
+                </motion.div>
+              );
+            })}
           </div>
         )}
       </Link>

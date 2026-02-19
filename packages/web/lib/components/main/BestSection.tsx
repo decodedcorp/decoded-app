@@ -110,7 +110,7 @@ export function BestItemSection({
       <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-24 md:mb-32 gap-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16 gap-10">
           <div className="max-w-2xl">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -196,7 +196,7 @@ export function WeeklyBestSection({
   const [activeIdx, setActiveIdx] = useState(0);
 
   return (
-    <section className="py-24 md:py-40 bg-[#020202] px-6 md:px-12 relative overflow-hidden">
+    <section className="py-12 md:py-16 bg-[#020202] px-6 md:px-12 relative overflow-hidden">
       {/* Dynamic Background Spotlight */}
       <AnimatePresence mode="wait">
         <motion.div
@@ -219,7 +219,7 @@ export function WeeklyBestSection({
       </AnimatePresence>
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-24 md:mb-32 gap-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16 gap-10">
           <div className="max-w-2xl">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
