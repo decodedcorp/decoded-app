@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 
 ## Current Position
 
-Phase: v3-04 (AI Cost Monitoring) — In Progress
-Plan: 1/2 plans complete
-Status: In progress
-Last activity: 2026-02-19 — Completed 04-01-PLAN.md (AI cost data layer + API routes)
+Phase: v3-04 (AI Cost Monitoring) — Complete
+Plan: 2/2 plans complete
+Status: Phase complete
+Last activity: 2026-02-19 — Completed 04-02-PLAN.md (AI cost UI: KPI cards, charts, model table)
 
-Progress: [███████---] 3.5/5 phases complete (v3.0)
+Progress: [████████--] 4/5 phases complete (v3.0)
 
 ## Milestone Summary
 
@@ -34,7 +34,7 @@ Progress: [███████---] 3.5/5 phases complete (v3.0)
 | v3-01 | Admin Foundation | AAUTH-01~03 | ✓ Complete (2/2 plans) |
 | v3-02 | Dashboard | DASH-01~03 | ✓ Complete (2/2 plans) |
 | v3-03 | AI Audit | AUDIT-01~04 | ✓ Complete (2/2 plans) |
-| v3-04 | AI Cost Monitoring | COST-01~03 | In Progress (1/2 plans) |
+| v3-04 | AI Cost Monitoring | COST-01~03 | ✓ Complete (2/2 plans) |
 | v3-05 | Pipeline & Server Logs | PIPE-01~03, SLOG-01~03 | Not started |
 
 ## Accumulated Context
@@ -96,6 +96,11 @@ Key decisions affecting future work:
 - 04-01: Chart endpoint bundles daily metrics + model breakdown in AiCostChartResponse for single UI fetch
 - 04-01: Previous period computed by shifting date window back by `days` — same deterministic formula applied to prior dates
 - 04-01: deterministicInt reimplemented locally in each mock-data file (not shared import)
+- 04-02: Page-level period selector (7D/30D/90D) updates all sections simultaneously via React Query queryKey
+- 04-02: Skeleton fallback on both loading AND error states — avoids empty/broken states for internal admin users
+- 04-02: useAiCostChart bundles daily + modelBreakdown in one fetch (AiCostChartResponse) so three components share one request
+- 04-02: formatCostPrecise uses 4 decimal places for avg cost per call — sub-cent precision required
+- 04-02: Recharts stacked AreaChart for tokens (composition), BarChart for API calls (discrete counts) — intentional visual metaphor distinction
 
 ### Tech Debt (from v2.1)
 
@@ -131,7 +136,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 04-01-PLAN.md — AI cost data layer, mock generators, 2 API routes
+Stopped at: Completed 04-02-PLAN.md — AI cost UI (KPI cards, token chart, API calls chart, model table), phase v3-04 done
 Resume file: None
 
 ## Quick Tasks Completed
@@ -164,4 +169,4 @@ Resume file: None
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-19 after completing phase v3-03 (AI Audit)*
+*Last updated: 2026-02-19 after completing phase v3-04 (AI Cost Monitoring)*
