@@ -55,19 +55,24 @@ function formatDate(date: Date): string {
 
 function SingleBadgeContent({ badge }: { badge: Badge }) {
   const IconComponent = BADGE_ICONS[badge.icon] || Trophy;
+  const isLocked = badge.isLocked || badge.earnedAt.getTime() === 0;
 
   return (
     <div className="text-center">
       <div className="flex justify-center mb-4">
-        <IconComponent className="w-16 h-16 text-primary" />
+        <IconComponent
+          className={`w-16 h-16 ${isLocked ? "text-muted-foreground/40" : "text-primary"}`}
+        />
       </div>
       <h3 className="text-xl font-bold text-foreground mb-2">{badge.name}</h3>
       <p className="text-sm text-muted-foreground mb-4">
         {badge.description || `${badge.category} 카테고리 뱃지`}
       </p>
-      <p className="text-xs text-muted-foreground">
-        획득일: {formatDate(badge.earnedAt)}
-      </p>
+      {!isLocked && (
+        <p className="text-xs text-muted-foreground">
+          획득일: {formatDate(badge.earnedAt)}
+        </p>
+      )}
     </div>
   );
 }

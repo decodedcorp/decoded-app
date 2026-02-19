@@ -1,92 +1,72 @@
 import { Header } from "@/lib/components";
 import { MainFooter, HomeAnimatedContent } from "@/lib/components/main";
+import { fetchPostsServer } from "@/lib/api/posts";
 import {
-  fetchWeeklyBestImagesServer,
-  fetchBestItemsServer,
-  fetchFeaturedImageServer,
-  fetchWhatsNewStylesServer,
-  fetchWhatsNewItemsServer,
-  fetchDecodedPickStyleServer,
-  fetchArtistSpotlightStylesServer,
-  fetchItemsByAccountServer,
-  fetchTrendingKeywordsServer,
-} from "@/lib/supabase/queries/main-page.server";
-import {
-  imageWithPostToWeeklyBestStyle,
-  itemWithImageToItemCardData,
-  imageWithPostToHeroData,
-  whatsNewStyleToStyleCardData,
-  whatsNewItemToItemCardData,
+  apiPostToHeroData,
+  apiPostToHeroSlide,
+  apiPostToWeeklyBestStyle,
+  apiPostToStyleCardData,
+  formatArtistSpotlightSubtitle,
 } from "@/lib/utils/main-page-mapper";
 
 export default async function Home() {
-  // Fetch data in parallel for better performance
   const [
-    weeklyBestData,
-    bestItemsData,
-    featuredData,
-    whatsNewStylesData,
-    whatsNewItemsData,
-    decodedPickData,
-    artistSpotlightData,
-    newjeansItems,
-    blackpinkItems,
-    trendingKeywords,
+    heroRes,
+    artistSpotlightRes,
+    decodedStylesRes,
+    needDecodingRes,
+    weeklyBestRes,
   ] = await Promise.all([
-    fetchWeeklyBestImagesServer(8),
-    fetchBestItemsServer(6),
-    fetchFeaturedImageServer(),
-    fetchWhatsNewStylesServer(2),
-    fetchWhatsNewItemsServer(4),
-    fetchDecodedPickStyleServer(),
-    fetchArtistSpotlightStylesServer(2, 3),
-    fetchItemsByAccountServer("뉴진스", 6),
-    fetchItemsByAccountServer("블랙핑크", 6),
-    fetchTrendingKeywordsServer(7),
+    fetchPostsServer({ sort: "popular", per_page: 5 }),
+    fetchPostsServer({ sort: "popular", per_page: 4 }),
+    fetchPostsServer({
+      has_solutions: true,
+      sort: "recent",
+      per_page: 6,
+    }),
+    fetchPostsServer({
+      has_solutions: false,
+      sort: "recent",
+      per_page: 6,
+    }),
+    fetchPostsServer({ sort: "popular", per_page: 8 }),
   ]);
 
-  const weeklyBestStyles = weeklyBestData.map(imageWithPostToWeeklyBestStyle);
-  const bestItems = bestItemsData.map(itemWithImageToItemCardData);
-  const heroData = featuredData
-    ? imageWithPostToHeroData(featuredData)
-    : undefined;
-  const whatsNewStyles = whatsNewStylesData.map(whatsNewStyleToStyleCardData);
-  const whatsNewItems = whatsNewItemsData.map((item) =>
-    whatsNewItemToItemCardData(item, true)
+  const heroData =
+    heroRes.data.length > 0 ? apiPostToHeroData(heroRes.data[0]) : undefined;
+  const heroSlides = heroRes.data.slice(0, 5).map(apiPostToHeroSlide);
+  const artistSpotlightStyles = artistSpotlightRes.data.map(
+    apiPostToStyleCardData
   );
-  const decodedPickStyle = decodedPickData.style
-    ? whatsNewStyleToStyleCardData(decodedPickData.style)
-    : undefined;
-  const decodedPickItems = decodedPickData.items.map(
-    itemWithImageToItemCardData
+  const artistSpotlightSubtitle = formatArtistSpotlightSubtitle(
+    artistSpotlightStyles
   );
-  const artistSpotlightStyles = artistSpotlightData.map(
-    whatsNewStyleToStyleCardData
-  );
-  const discoverItemsByTab = {
-    newjeans: newjeansItems.map(itemWithImageToItemCardData),
-    blackpink: blackpinkItems.map(itemWithImageToItemCardData),
-  };
+  const solvedPostStyles = decodedStylesRes.data.map((p) => ({
+    ...apiPostToStyleCardData(p),
+    hasSolutions: true,
+  }));
+  const curiousItemsStyles = needDecodingRes.data.map((p) => ({
+    ...apiPostToStyleCardData(p),
+    hasSolutions: false,
+  }));
+  const whatsNewStyles = solvedPostStyles;
+  const weeklyBestStyles = weeklyBestRes.data.map(apiPostToWeeklyBestStyle);
 
   return (
-    <div className="min-h-screen bg-background pt-14 pb-14 md:pt-16 md:pb-0">
-      {/* Mobile Header - only visible on mobile */}
+    <div className="min-h-screen bg-background">
       <Header />
 
       <HomeAnimatedContent
         heroData={heroData}
-        weeklyBestStyles={weeklyBestStyles}
-        bestItems={bestItems}
-        whatsNewStyles={whatsNewStyles}
-        whatsNewItems={whatsNewItems}
-        decodedPickStyle={decodedPickStyle}
-        decodedPickItems={decodedPickItems}
+        heroSlides={heroSlides}
         artistSpotlightStyles={artistSpotlightStyles}
-        discoverItemsByTab={discoverItemsByTab}
-        trendingKeywords={trendingKeywords}
+        artistSpotlightSubtitle={artistSpotlightSubtitle}
+        solvedPostStyles={solvedPostStyles}
+        curiousItemsStyles={curiousItemsStyles}
+        whatsNewStyles={whatsNewStyles}
+        weeklyBestStyles={weeklyBestStyles}
       />
 
-      {/* Footer */}
       <MainFooter />
     </div>
   );
