@@ -69,6 +69,12 @@ See archived roadmap: `.planning/milestones/v2.1-ROADMAP.md`
 3. 사이드바 네비게이션 링크가 대시보드, AI 감사, AI 비용, 파이프라인 로그, 서버 로그 섹션으로 이동한다
 4. `is_admin` 체크 로직이 미들웨어 레벨에서 동작하며 클라이언트 사이드 우회가 불가능하다
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Middleware + admin auth infrastructure (is_admin check, route protection)
+- [ ] 01-02-PLAN.md — Admin layout, sidebar, placeholder pages, header admin link
+
 **Status:** [ ] Not started
 
 ---
