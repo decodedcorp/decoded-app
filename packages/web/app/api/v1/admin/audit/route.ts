@@ -18,7 +18,20 @@ import type { AuditStatus } from "@/lib/api/admin/audit";
  * Response shape: AuditListResponse
  */
 export async function GET(request: NextRequest) {
-  // Admin auth check
+  if (process.env.NODE_ENV === "development") {
+    const { searchParams } = request.nextUrl;
+    const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
+    const perPage = Math.min(
+      50,
+      Math.max(1, parseInt(searchParams.get("perPage") ?? "10", 10))
+    );
+    const statusParam = searchParams.get("status") as AuditStatus | null;
+    const validStatuses: AuditStatus[] = ["pending", "completed", "error", "modified"];
+    const status = statusParam && validStatuses.includes(statusParam) ? statusParam : undefined;
+    const result = await fetchAuditList({ page, perPage, status });
+    return NextResponse.json(result);
+  }
+
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },

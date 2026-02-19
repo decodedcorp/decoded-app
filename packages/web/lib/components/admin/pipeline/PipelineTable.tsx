@@ -1,5 +1,6 @@
 "use client";
 
+import { Fragment } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
 import type { PipelineListItem, PipelineStatus } from "@/lib/api/admin/pipeline";
@@ -144,9 +145,8 @@ export function PipelineTable({
             const isFailed = pipeline.status === "failed";
 
             return (
-              <>
+              <Fragment key={pipeline.id}>
                 <tr
-                  key={pipeline.id}
                   onClick={() => onSelectPipeline(pipeline.id)}
                   aria-expanded={isExpanded}
                   className={[
@@ -215,7 +215,7 @@ export function PipelineTable({
 
                 {/* Accordion: step detail row */}
                 {isExpanded && (
-                  <tr key={`${pipeline.id}-detail`}>
+                  <tr>
                     <td
                       colSpan={7}
                       className="p-0 border-b border-gray-100 dark:border-gray-800"
@@ -224,7 +224,7 @@ export function PipelineTable({
                     </td>
                   </tr>
                 )}
-              </>
+              </Fragment>
             );
           })}
         </tbody>

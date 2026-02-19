@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, Suspense } from "react";
+import { useCallback, Suspense, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useServerLogs } from "@/lib/hooks/admin/useServerLogs";
 import { LogFilters, timeRangeToFrom } from "@/lib/components/admin/server-logs/LogFilters";
@@ -25,8 +25,9 @@ function ServerLogsContent() {
   const searchParam = searchParams.get("search") ?? "";
   const timeRange = searchParams.get("timeRange") ?? DEFAULT_TIME_RANGE;
 
-  // Compute from ISO from time range preset
-  const fromIso = timeRangeToFrom(timeRange);
+  // Compute from ISO from time range preset - memoized to prevent infinite re-fetches
+  // because timeRangeToFrom uses new Date() internally.
+  const fromIso = useMemo(() => timeRangeToFrom(timeRange), [timeRange]);
 
   // Fetch log data via React Query
   const logsQuery = useServerLogs({
