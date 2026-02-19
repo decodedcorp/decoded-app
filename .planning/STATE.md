@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 
 ## Current Position
 
-Phase: v3-05 (Pipeline & Server Logs) — Complete
-Plan: 3/3 plans complete
-Status: v3.0 Milestone complete
-Last activity: 2026-02-19 — Completed 05-03-PLAN.md (server logs UI: terminal streaming, filters, log table)
+Phase: 06-pipeline-fix-auth-consistency — Complete
+Plan: 1/1 plans complete
+Status: Gap closure complete — v3.0 milestone fully clean; ready to begin v4.0
+Last activity: 2026-02-19 — Completed 06-01-PLAN.md (pipeline fix + auth consistency)
 
-Progress: v3.0 [██████████] 5/5 phases complete (milestone shipped)
+Progress: v4.0 [░░░░░░░░░░] 0/9 phases (0/13 plans complete)
 
 ## Milestone Summary
 
@@ -25,121 +25,51 @@ Progress: v3.0 [██████████] 5/5 phases complete (milestone s
 | v2.0 Design Overhaul | 9 | 26 | Shipped | 2026-02-05 |
 | v2.1 Design System | 6 | 14 | Shipped | 2026-02-06 |
 | **v3.0 Admin Panel** | **5** | **11** | **Shipped** | 2026-02-19 |
-| **v4.0 Spec Overhaul** | **?** | **0** | **Defining** | - |
-| **Total** | **30+** | **69+** | **Ongoing** | - |
+| **v4.0 Spec Overhaul** | **9** | **0/13** | **In progress** | - |
 
-## v3.0 Roadmap
+## v4.0 Roadmap
 
-| Phase | Goal | Requirements | Status |
-|-------|------|--------------|--------|
-| v3-01 | Admin Foundation | AAUTH-01~03 | ✓ Complete (2/2 plans) |
-| v3-02 | Dashboard | DASH-01~03 | ✓ Complete (2/2 plans) |
-| v3-03 | AI Audit | AUDIT-01~04 | ✓ Complete (2/2 plans) |
-| v3-04 | AI Cost Monitoring | COST-01~03 | ✓ Complete (2/2 plans) |
-| v3-05 | Pipeline & Server Logs | PIPE-01~03, SLOG-01~03 | ✓ Complete (3/3 plans) |
+| Phase | Goal | Requirements | Plans | Status |
+|-------|------|--------------|-------|--------|
+| v4-01 | Archive & Foundation | ARCH-01~04 | 0/2 | Not started |
+| v4-02 | Shared Foundation | SHRD-01~05 | 0/2 | Not started |
+| v4-03 | Flow Documents | FLOW-01~05 | 0/1 | Not started |
+| v4-04 | Screen Specs: Detail View | DETL-01~04 | 0/2 | Not started |
+| v4-05 | Screen Specs: Discovery | DISC-01~04 | 0/2 | Not started |
+| v4-06 | Screen Specs: Creation-AI | CREA-01~03 | 0/1 | Not started |
+| v4-07 | Screen Specs: User System | USER-01~03 | 0/1 | Not started |
+| v4-08 | Next Version Draft | NEXT-01~04 | 0/1 | Not started |
+| v4-09 | Cleanup | CLEN-01 | 0/1 | Not started |
 
 ## Accumulated Context
 
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
-Key decisions affecting future work:
 
-- v2.1: Tech debt accepted (15 orphaned components, 35% integration)
-- v2.1: Visual QA infrastructure established for regression testing
-- v2.1: CVA pattern standard for all design-system components
-- v2-09-03: Playwright for visual QA automation over manual capture
-- v2-09-03: 4 breakpoints (375/768/1280/1440px) for responsive coverage
-- v2-09-03: API error handling issues deferred to quick tasks (out of visual QA scope)
-- quick-026: Negative margin technique for full-bleed content under fixed headers
-- quick-026: Child pages must NOT duplicate global layout headers/padding
-- quick-027: object-contain with fixed hero height for consistent layout (vs dynamic height)
-- quick-027: Pixel-based spot positioning with ResizeObserver + natural dimensions tracking
-- quick-027: isModal prop pattern for conditional ScrollTrigger animations in different contexts
-- quick-029: Clear z-index hierarchy: headers z-40, content sections z-20 or below, modals z-50+
-- quick-030: Deterministic brand color via string hash for consistent visual identity
-- quick-030: Hotspot design system component supports optional color override
-- quick-033: Hotspot absorbs SpotMarker functionality, single source of truth for spot/marker UI
-- quick-033: SpotMarker deprecated re-export maintains backward compatibility during migration
-- quick-033: brandToColor utility shared across design system for consistent brand colors
-- quick-033: Glow effects use CSS custom property --hotspot-color for flexible color overrides
-- quick-033: spot-reveal animation in both Tailwind config and globals.css for compatibility
-- quick-036: Conditional spot fetching pattern with enabled option prevents unnecessary API calls
-- quick-036: Context-specific Hotspot sizing using important prefix (!w-3 !h-3) overrides CVA defaults
-- v3.0: Mock data first approach — AI audit, pipeline, server log use mock data; dashboard uses existing admin APIs
-- v3.0: Admin auth based on `is_admin` field in Supabase users table (confirmed: users not profiles)
-- 01-01: createServerClient used for middleware (not deprecated createMiddlewareClient) with getAll/setAll cookie adapters
-- 01-01: checkIsAdmin in separate admin.ts for reuse in layout-level server components
-- 01-01: Silent redirect to / for both unauthenticated and non-admin users (no admin panel disclosure)
-- 01-02: Admin layout completely separate from main app (no shared header/footer/navbar)
-- 01-02: Server-side double-check in admin layout.tsx as defense-in-depth with middleware
-- 01-02: isAdmin in authStore queried from users.is_admin via fetchIsAdmin helper
-- v3.0: Charts will require a chart library (recharts or similar) — decide at v3-02 planning
-- 02-01: recharts@3.7.0 installed with react-is peer dependency
-- 02-01: Deterministic hash-based mock data (djb2 seed on date string) — same date = same values, no flickering
-- 02-01: Real-data-first for post/item counts with graceful mock fallback
-- 02-01: Supabase uses singular table names (post, item) vs plural in TypeScript types — use `as any` cast
-- 02-01: Dashboard types (DailyMetric, KPIStats, TodaySummary) importable from @/lib/api/admin/dashboard
-- 02-02: Recharts AreaChart with gradient fills for dark/light mode compatibility
-- 02-02: Period selector state at page level, useChartData refetches on key change
-- 02-02: Skeleton fallback on both loading and error states
-- 02-02: Admin component pattern: data hook + display component + skeleton variant
-- 03-01: Module-level cache singleton (_cachedRequests) ensures stable audit mock data across requests
-- 03-01: Audit status distribution by index range (not hash) guarantees exact 2/16/3/4 pending/completed/error/modified split
-- 03-01: List endpoint uses Omit<AuditRequest, 'items'> for performance; detail endpoint returns full data
-- 03-01: All audit types re-exported from audit.ts as single-source import for UI consumers
-- 03-02: URL-synced pagination via useSearchParams + router.replace for shareable audit URLs
-- 03-02: Inline editing with click-to-edit pattern (no separate edit modal)
-- 03-02: Instant delete with sonner toast undo (no confirmation dialog)
-- 03-02: Bidirectional hotspot-item sync via shared highlightedItemId state
-- 03-02: Reusable Pagination component with ellipsis algorithm for admin pages
-- 04-01: Blended weighted pricing for daily cost: sum(model.inputPricePerK * model.weight) — simpler than per-model daily tracking
-- 04-01: Chart endpoint bundles daily metrics + model breakdown in AiCostChartResponse for single UI fetch
-- 04-01: Previous period computed by shifting date window back by `days` — same deterministic formula applied to prior dates
-- 04-01: deterministicInt reimplemented locally in each mock-data file (not shared import)
-- 04-02: Page-level period selector (7D/30D/90D) updates all sections simultaneously via React Query queryKey
-- 04-02: Skeleton fallback on both loading AND error states — avoids empty/broken states for internal admin users
-- 04-02: useAiCostChart bundles daily + modelBreakdown in one fetch (AiCostChartResponse) so three components share one request
-- 04-02: formatCostPrecise uses 4 decimal places for avg cost per call — sub-cent precision required
-- 04-02: Recharts stacked AreaChart for tokens (composition), BarChart for API calls (discrete counts) — intentional visual metaphor distinction
-- 05-01: Pipeline status distribution by index range (not hash): 0-21 = completed, 22-24 = failed, 25-29 = running
-- 05-01: PipelineListItem = Omit<PipelineExecution, 'steps'> — list endpoint strips heavy nested arrays for performance
-- 05-01: generateStreamLogs intentionally non-deterministic (Date.now() + Math.random()) for realistic polling UX
-- 05-01: Server log level distribution: 60% info / 20% warn / 12% error / 8% debug via levelForValue threshold mapping
-- 05-02: Pipeline accordion uses colSpan tr insertion for inline expansion (no separate detail page)
-- 05-02: Running status badge uses animate-pulse for visual activity indication
-- 05-02: Retry button uses e.stopPropagation() + sonner toast (mock only, no real API call)
-- 05-03: useLogStream custom hook with setInterval polling (2500ms), not React Query — streaming state is ephemeral
-- 05-03: Terminal console bg-gray-950 + font-mono text-xs for authentic tail -f feel
-- 05-03: Auto-scroll detection: scrollTop + clientHeight < scrollHeight - 50px threshold, jump-to-bottom pill on manual scroll
-- 05-03: Time range presets (1h/6h/24h/7d/All) compute from ISO string from current time, stored as URL param
+**From 06-01 (Pipeline Fix + Auth Consistency):**
+- Admin API routes must enforce auth in all environments (no NODE_ENV conditional) — middleware/layout dev bypasses are intentional (page-level) and remain
+- API detail routes return bare entity objects — no `{ data: }` wrapper — to match TypeScript generic on hook consumers
 
-### Tech Debt (from v2.1)
+Key decisions affecting v4.0 work:
 
-**Orphaned Components (15):**
-- Tag, ActionButton, StepIndicator, Hotspot (Phase 1)
-- ArtistCard (Phase 3)
-- Badge, LeaderItem, RankingItem (Phase 4)
-- OAuthButton, GuestButton, Divider, LoginCard, LoadingSpinner, SkeletonCard, BottomSheet (Phase 5)
-
-**Missing Components (2):**
-- EmptyState (custom exists in profile/images)
-- ErrorState (custom exists in images)
-
-**Duplicate Implementations:**
-- LoginCard: design-system vs lib/components/auth
-- StepIndicator: design-system vs lib/components/request
-- Hotspot vs SpotMarker: different use cases
+- v4.0: Documentation-only milestone — no code changes
+- v4.0: Archive first, then shared foundation, then screens (strict dependency order)
+- v4.0: Screen spec limit is 200 lines (300 max with justification)
+- v4.0: Every component file path must be verified against actual filesystem before publishing spec
+- v4.0: FLOW-05 (VTON) and NEXT-01~04 are DRAFT — pending service direction approval
+- v4.0: Detail View (v4-04) precedes Discovery (v4-05) per user priority
+- v4.0: Anti-features to remove from specs: i18n sections, version history tables, copied TypeScript types, placeholder sections
 
 ### Pending Todos
 
 **From v2-09-03 Visual QA:**
 1. Quick task: Fix images page raw JSON error exposure (API error handling - major UX/security)
-2. Re-run visual QA when API stable for complete decoded.pen comparison
 
-**From v3.0 Planning:**
-1. ~~Decide chart library at v3-02 planning~~ — RESOLVED: recharts@3.7.0 installed (02-01)
-2. ~~Confirm which admin APIs are available for DASH-01~03~~ — RESOLVED: 3 API routes created (02-01)
+**For v4.0 execution:**
+1. Before v4-04: Verify `transitionStore` shape + `useFlipTransition.ts` (FLIP animation pattern underdocumented)
+2. Before v4-06: Verify `requestStore` step enum values + `POST /api/v1/posts/analyze` response shape
+3. Before v4-07: Verify `authStore` user/session type + auth-conditional rendering patterns
 
 ### Blockers/Concerns
 
@@ -148,37 +78,10 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed all 3 plans in v3-05 — pipeline logs UI + server logs UI + terminal streaming. v3.0 milestone shipped.
+Stopped at: Completed 06-01-PLAN.md — pipeline fix + auth consistency (gap closure)
 Resume file: None
-
-## Quick Tasks Completed
-
-| # | Description | Date | Commit | Directory |
-|---|-------------|------|--------|-----------|
-| 016 | Fix upload page excessive re-renders | 2026-02-05 | ccab256 | [016-fix-upload-page-excessive-rerenders](./quick/016-fix-upload-page-excessive-rerenders/) |
-| 017 | Split request API by solution knowledge | 2026-02-05 | d7de2d9 | [017-request-api-split-by-solution](./quick/017-request-api-split-by-solution/) |
-| 018 | Add solution input UI for detected items | 2026-02-05 | 22888dd | [018-solution-input-ui](./quick/018-solution-input-ui/) |
-| 019 | Switch to manual spot creation flow | 2026-02-05 | e418240 | [019-manual-spot-creation](./quick/019-manual-spot-creation/) |
-| 020 | Unified upload + spot creation UI | 2026-02-05 | 8b08a6c | [020-request-upload-direct-spot-ui](./quick/020-request-upload-direct-spot-ui/) |
-| 021 | Fix request upload spot creation missing | 2026-02-06 | 72dee3c | [021-fix-request-upload-spot-creation-missing](./quick/021-fix-request-upload-spot-creation-missing/) |
-| 022 | Fix analyze proxy JSON error | 2026-02-06 | 4f7e896 | [022-fix-analyze-proxy-json-error](./quick/022-fix-analyze-proxy-json-error/) |
-| 023 | Post detail page completion (editorial redesign) | 2026-02-12 | d5099ef | [023-post-detail-page-completion](./quick/023-post-detail-page-completion/) |
-| 024 | Post detail remaining sections (Decoded Items, Gallery, Shop, Related) | 2026-02-12 | 3f90d6a | [024-post-detail-remaining-sections](./quick/024-post-detail-remaining-sections/) |
-| 025 | Replace unconnected image sections with post data | 2026-02-12 | a420e82 | [025-replace-unconnected-image-sections-with-post](./quick/025-replace-unconnected-image-sections-with-post/) |
-| 026 | Fix feed header clip and post detail scroll | 2026-02-12 | 8afb9c0 | [026-fix-feed-header-clip-and-post-detail-scroll](./quick/026-fix-feed-header-clip-and-post-detail-scroll/) |
-| 027 | Fix post detail image clip and spots | 2026-02-12 | ad09695 | [027-fix-post-detail-image-clip-and-spots](./quick/027-fix-post-detail-image-clip-and-spots/) |
-| 028 | Remove Achievements section from home page | 2026-02-12 | d807df3 | [028-remove-achievements-challenge-achieve-ma](./quick/028-remove-achievements-challenge-achieve-ma/) |
-| 029 | Fix header scroll disappear | 2026-02-12 | c8ff602 | [029-fix-header-scroll-disappear](./quick/029-fix-header-scroll-disappear/) |
-| 030 | Fix desktop sidebar image spot brand | 2026-02-12 | 4c99cb3 | [030-fix-desktop-sidebar-image-spot-brand](./quick/030-fix-desktop-sidebar-image-spot-brand/) |
-| 031 | Fix feed card image top crop | 2026-02-12 | 8b22163 | [031-fix-feed-card-image-top-crop](./quick/031-fix-feed-card-image-top-crop/) |
-| 032 | Fix activeImageSrc TDZ reference error | 2026-02-12 | f6fc515 | [032-fix-activeimagesrc-tdz-reference-error](./quick/032-fix-activeimagesrc-tdz-reference-error/) |
-| 033 | Unify spot brand color animation design | 2026-02-12 | 034312f | [033-unify-spot-brand-color-animation-design](./quick/033-unify-spot-brand-color-animation-design/) |
-| 034 | Remove post detail x-axis scroll | 2026-02-12 | c2265ea | [034-remove-post-detail-x-axis-scroll](./quick/034-remove-post-detail-x-axis-scroll/) |
-| 035 | Replace empty main sections with mockup data | 2026-02-12 | 708cc70 | [035-replace-empty-main-sections-with-mockup](./quick/035-replace-empty-main-sections-with-mockup/) |
-| 036 | Feed card subtle spot overlay | 2026-02-12 | 59834da | [036-feed-card-subtle-spot-overlay](./quick/036-feed-card-subtle-spot-overlay/) |
-| 037 | Update specs/docs to match codebase | 2026-02-12 | 7594c92 | [037-update-specs-docs-to-match-codebase](./quick/037-update-specs-docs-to-match-codebase/) |
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-19 after starting milestone v4.0 Spec Overhaul*
+*Last updated: 2026-02-19 after 06-01 gap closure (pipeline fix + auth consistency)*
