@@ -15,9 +15,9 @@ Requirements for Admin Panel — AI Management. 목업 데이터 우선, 백엔�
 
 ### Dashboard
 
-- [ ] **DASH-01**: KPI 통계 카드 (DAU, MAU, 총 유저, 포스트, 솔루션)
-- [ ] **DASH-02**: 트래픽 차트 (일별 DAU, 검색, 클릭 추이)
-- [ ] **DASH-03**: 오늘 요약 (오늘 포스트, 솔루션, 클릭)
+- [x] **DASH-01**: KPI 통계 카드 (DAU, MAU, 총 유저, 포스트, 솔루션)
+- [x] **DASH-02**: 트래픽 차트 (일별 DAU, 검색, 클릭 추이)
+- [x] **DASH-03**: 오늘 요약 (오늘 포스트, 솔루션, 클릭)
 
 ### AI Audit
 

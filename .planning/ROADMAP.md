@@ -93,7 +93,11 @@ Plans:
 3. 오늘의 요약 섹션에 당일 신규 포스트, 솔루션, 클릭 수가 표시된다
 4. 대시보드 데이터가 기존 admin API 또는 mock 데이터로 로딩되며 빈 화면 없이 표시된다
 
-**Status:** [ ] Not started
+Plans:
+- [x] 02-01-PLAN.md — Dashboard API routes, mock data generators, Recharts install
+- [x] 02-02-PLAN.md — Dashboard UI (KPI cards, traffic chart, today summary, skeletons)
+
+**Status:** [x] Complete (2026-02-19)
 
 ---
 
@@ -162,15 +166,15 @@ Plans:
 | v1.1 API Integration | 6 + A-D | 13/13 | Shipped | 2026-01-29 |
 | v2.0 Design Overhaul | v2-1~9 | 26/26 | Shipped | 2026-02-05 |
 | v2.1 Design System | v2.1-1~6 | 14/14 | Shipped | 2026-02-06 |
-| **v3.0 Admin Panel** | **v3-01~05** | **0/?** | **In Progress** | - |
-| **Total** | **5 milestones** | **58+ plans** | **Ongoing** | - |
+| **v3.0 Admin Panel** | **v3-01~05** | **4/?** | **In Progress** | - |
+| **Total** | **5 milestones** | **62+ plans** | **Ongoing** | - |
 
 ### v3.0 Phase Progress
 
 | Phase | Goal | Requirements | Status |
 |-------|------|--------------|--------|
 | v3-01 | Admin Foundation — auth middleware, layout, routing | AAUTH-01~03 | ✓ Complete (2026-02-19) |
-| v3-02 | Dashboard — KPI cards, traffic charts, today summary | DASH-01~03 | Not started |
+| v3-02 | Dashboard — KPI cards, traffic charts, today summary | DASH-01~03 | ✓ Complete (2026-02-19) |
 | v3-03 | AI Audit — request list, detail view, edit, filter | AUDIT-01~04 | Not started |
 | v3-04 | AI Cost Monitoring — call stats, token charts, cost estimate | COST-01~03 | Not started |
 | v3-05 | Pipeline & Server Logs — pipeline viewer, server log, streaming | PIPE-01~03, SLOG-01~03 | Not started |
@@ -180,4 +184,4 @@ Plans:
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-02-19 (v3.0 milestone added)*
+*Last updated: 2026-02-19 (v3-02 Dashboard complete)*
