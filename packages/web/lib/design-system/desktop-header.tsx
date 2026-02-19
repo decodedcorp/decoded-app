@@ -4,9 +4,17 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, Bell, User, Settings, Activity, LogOut } from "lucide-react";
+import {
+  Search,
+  Bell,
+  User,
+  Settings,
+  Activity,
+  LogOut,
+  Shield,
+} from "lucide-react";
 import DecodedLogo from "@/lib/components/DecodedLogo";
-import { useAuthStore } from "@/lib/stores/authStore";
+import { useAuthStore, selectIsAdmin } from "@/lib/stores/authStore";
 import { useState, useRef, useEffect } from "react";
 
 /**
@@ -69,6 +77,7 @@ export function DesktopHeader({
 }: DesktopHeaderProps) {
   const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
+  const isAdmin = useAuthStore(selectIsAdmin);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -159,6 +168,18 @@ export function DesktopHeader({
           >
             <Search className="h-5 w-5 text-muted-foreground" />
           </button>
+
+          {/* Admin Panel Link - only visible to admin users */}
+          {user && isAdmin && (
+            <Link
+              href="/admin"
+              className="p-2 rounded-md opacity-60 hover:opacity-100 transition-opacity"
+              aria-label="Admin Panel"
+              title="Admin Panel"
+            >
+              <Shield className="h-4 w-4 text-muted-foreground" />
+            </Link>
+          )}
 
           {/* Conditional Auth UI */}
           {user ? (

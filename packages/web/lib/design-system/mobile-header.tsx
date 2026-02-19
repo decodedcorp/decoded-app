@@ -3,8 +3,9 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { Search, SlidersHorizontal, Bell } from "lucide-react";
+import { Search, SlidersHorizontal, Bell, Shield } from "lucide-react";
 import DecodedLogo from "@/lib/components/DecodedLogo";
+import { useAuthStore, selectIsAdmin } from "@/lib/stores/authStore";
 
 /**
  * Mobile Header Variants
@@ -58,6 +59,9 @@ export function MobileHeader({
   className,
   ...props
 }: MobileHeaderProps) {
+  const user = useAuthStore((state) => state.user);
+  const isAdmin = useAuthStore(selectIsAdmin);
+
   return (
     <header
       className={cn(mobileHeaderVariants({ variant }), className)}
@@ -104,6 +108,18 @@ export function MobileHeader({
               aria-hidden="true"
             />
           </button>
+
+          {/* Admin Panel Link - only visible to admin users */}
+          {user && isAdmin && (
+            <Link
+              href="/admin"
+              className="p-2 rounded-md opacity-60 hover:opacity-100 transition-opacity"
+              aria-label="Admin Panel"
+              title="Admin Panel"
+            >
+              <Shield className="h-5 w-5 text-muted-foreground" />
+            </Link>
+          )}
 
           {/* Filter Icon Button */}
           {showFilter && (
