@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 
 ## Current Position
 
-Phase: v4-01 Archive & Foundation — In progress
-Plan: 2/2 plans complete
-Status: Phase v4-01 complete — ready for v4-02 Shared Foundation
-Last activity: 2026-02-19 — Completed v4-01-02-PLAN.md (spec templates + README)
+Phase: v4-02 Shared Foundation — In progress
+Plan: 1/2 plans complete
+Status: v4-02-01 complete — 3 shared reference docs created
+Last activity: 2026-02-19 — Completed v4-02-01-PLAN.md (component-registry, data-models, api-contracts)
 
-Progress: v4.0 [█░░░░░░░░░] 1/9 phases (2/13 plans complete)
+Progress: v4.0 [█░░░░░░░░░] 1/9 phases (3/13 plans complete)
 
 ## Milestone Summary
 
@@ -32,7 +32,7 @@ Progress: v4.0 [█░░░░░░░░░] 1/9 phases (2/13 plans complete)
 | Phase | Goal | Requirements | Plans | Status |
 |-------|------|--------------|-------|--------|
 | v4-01 | Archive & Foundation | ARCH-01~04 | 2/2 | Complete |
-| v4-02 | Shared Foundation | SHRD-01~05 | 0/2 | Not started |
+| v4-02 | Shared Foundation | SHRD-01~05 | 1/2 | In progress |
 | v4-03 | Flow Documents | FLOW-01~05 | 0/1 | Not started |
 | v4-04 | Screen Specs: Detail View | DETL-01~04 | 0/2 | Not started |
 | v4-05 | Screen Specs: Discovery | DISC-01~04 | 0/2 | Not started |
@@ -61,6 +61,9 @@ Key decisions affecting v4.0 work:
 - v4-01-02: AI injection guide quick-reference table in README; full guide deferred to _shared/injection-guide.md (v4-02)
 - v4-01-01: specs/_archive/v2.1.0/ is read-only snapshot; 60 stale paths documented in STALE-PATHS-AUDIT.md for v4-04 through v4-07 reference
 - v4-01-01: grid/ThiingsGrid.tsx and lib/components/HomeClient.tsx are path renames not deletions; most unimplemented feature components (voting, comments, filter) have no filesystem counterpart
+- v4-02-01: component-registry uses compact prop tables (not TS interface copies); data-models uses TypeScript code blocks as primary format — these formats are locked
+- v4-02-01: API vs DB type differences documented explicitly (spots.subcategory_id→API category_id abstraction; SolutionRow has more fields than API Solution)
+- v4-02-01: debug-env route exists at /api/v1/debug-env but is not env-guarded and is not user-facing
 
 ### Pending Todos
 
@@ -78,11 +81,11 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-19T11:02:07Z
-Stopped at: Completed v4-01-02-PLAN.md (spec templates + README rewrite)
+Last session: 2026-02-19T11:41:36Z
+Stopped at: Completed v4-02-01-PLAN.md (component-registry, data-models, api-contracts)
 Resume file: None
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-19 after v4-01-02 completion*
+*Last updated: 2026-02-19 after v4-02-01 completion*

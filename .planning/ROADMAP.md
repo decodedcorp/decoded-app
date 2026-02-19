@@ -102,16 +102,16 @@ Plans:
 1. `specs/_shared/component-registry.md` 에 35+ 디자인 시스템 컴포넌트의 props, variants, 파일경로, 사용 예시가 기록되어 있다
 2. `specs/_shared/data-models.md` 가 현재 코드베이스 TypeScript 타입 기준으로 동기화되어 있다
 3. `specs/_shared/api-contracts.md` 가 현재 구현된 API routes 기준으로 동기화되어 있다
-4. `specs/_shared/store-map.md` 에 5개 Zustand 스토어의 파일경로, 핵심 필드, 사용 화면이 기록되어 있다
+4. `specs/_shared/store-map.md` 에 6개 Zustand 스토어의 파일경로, 핵심 필드, 사용 화면이 기록되어 있다
 5. `specs/_shared/injection-guide.md` 에 작업 유형별 어떤 spec 파일을 로드해야 하는지 프로토콜이 정의되어 있다
 
 **Plans:** 2 plans
 
 Plans:
-- [ ] v4-02-01-PLAN.md — Component registry (35+ components), data models, API contracts
-- [ ] v4-02-02-PLAN.md — Store map (5 Zustand stores), injection guide, CMN shared component specs
+- [x] v4-02-01-PLAN.md — Component registry (35+ components), data models, API contracts
+- [ ] v4-02-02-PLAN.md — Store map (6 Zustand stores), injection guide, CMN shared component specs
 
-**Status:** [ ] Not started
+**Status:** [ ] In progress (1/2 plans complete)
 
 ---
 
@@ -288,7 +288,7 @@ Plans:
 | v2.0 Design Overhaul | v2-1~9 | 26/26 | Shipped | 2026-02-05 |
 | v2.1 Design System | v2.1-1~6 | 14/14 | Shipped | 2026-02-06 |
 | **v3.0 Admin Panel** | **v3-01~06** | **12/12** | **Shipped** | 2026-02-19 |
-| **v4.0 Spec Overhaul** | **v4-01~09** | **2/13** | **In progress** | - |
+| **v4.0 Spec Overhaul** | **v4-01~09** | **3/13** | **In progress** | - |
 | **Total** | **6 milestones** | **72/82** | **Ongoing** | - |
 
 ### v4.0 Phase Progress
@@ -296,7 +296,7 @@ Plans:
 | Phase | Goal | Requirements | Plans | Status |
 |-------|------|--------------|-------|--------|
 | v4-01 | Archive & Foundation — snapshot, templates, README | ARCH-01~04 | 2/2 | Complete (2026-02-19) |
-| v4-02 | Shared Foundation — component registry, data models, API contracts, stores, injection guide | SHRD-01~05 | 0/2 | Not started |
+| v4-02 | Shared Foundation — component registry, data models, API contracts, stores, injection guide | SHRD-01~05 | 1/2 | In progress |
 | v4-03 | Flow Documents — 4 user journey flows + VTON draft | FLOW-01~05 | 0/1 | Not started |
 | v4-04 | Screen Specs: Detail View — post detail, spot, item, related | DETL-01~04 | 0/2 | Not started |
 | v4-05 | Screen Specs: Discovery — home, search, feed, explore | DISC-01~04 | 0/2 | Not started |
@@ -310,4 +310,4 @@ Plans:
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-02-19 (v4.0 Spec Overhaul roadmap added — 9 phases, 13 plans, 29 requirements)*
+*Last updated: 2026-02-19 (v4-02-01 complete — component-registry, data-models, api-contracts created)*
