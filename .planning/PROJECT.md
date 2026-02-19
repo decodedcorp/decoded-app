@@ -2,28 +2,14 @@
 
 ## What This Is
 
-AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패션 아이템을 발견하고 공유하는 서비스.
+AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패션 아이템을 발견하고 공유하는 서비스. AI 에이전트 최적화 spec 시스템 구축 완료.
 
 **v1.0 (2026-01-29 shipped):** 문서화 최적화
 **v1.1 (2026-01-29 shipped):** 전체 API 연결 — 백엔드 API를 프론트엔드에 연결하여 실제 데이터로 동작
 **v2.0 (2026-02-05 shipped):** 디자인 오버홀 — decoded.pen 디자인을 코드로 구현
 **v2.1 (2026-02-06 shipped):** 디자인 시스템 확장 — 23개 추가 컴포넌트 + Visual QA 자동화
 **v3.0 (2026-02-19 shipped):** Admin Panel — AI Management — 대시보드, AI 감사, 비용 모니터링, 파이프라인/서버 로그 5개 섹션
-
-## Current Milestone: v4.0 Spec Overhaul — AI-Ready Documentation
-
-**Goal:** 사용자 화면 중심의 spec/docs를 현재 코드베이스 기준으로 재작성하고, AI 에이전트 컨텍스트 주입에 최적화된 포맷으로 고도화
-
-**Target features:**
-- 기존 spec v2.1.0 아카이빙 (버전 스냅샷)
-- Mobile-first 화면별 spec 재작성 (컴포넌트 매핑 + 파일경로)
-- 유저 플로우/시나리오 기반 문서 구조 (상태 전이, 데이터 흐름)
-- AI 에이전트 컨텍스트 주입 최적화 (Claude, Gemini, Cursor 호환)
-- shared 기반 문서 (데이터 모델, API 계약, 공통 컴포넌트) 동기화
-- 추후 서비스 기조 변경 반영을 위한 확장 가능한 구조
-
-**대상 번들:** discovery, detail-view, creation-ai, user-system, shared
-**제외:** admin (v3.0에서 별도 진행), system-backend, mobile-platform
+**v4.0 (2026-02-20 shipped):** Spec Overhaul — AI-Ready Documentation — 14개 화면 spec, 5개 플로우 문서, 5개 공유 기반 문서
 
 ## Core Value
 
@@ -37,56 +23,58 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 - **Design System**: 45+ components in `lib/design-system/` (5,924 LOC)
 - **Codebase Map**: `.planning/codebase/` (8 files, 3,250+ lines)
 
+### Spec System (v4.0 shipped)
+- **14 screen specs** across 4 bundles (detail, discovery, creation-AI, user)
+- **5 flow documents** (discovery, detail, creation, user, VTON draft)
+- **5 shared foundation docs** (component-registry, data-models, api-contracts, store-map, injection-guide)
+- **4 next-version drafts** (service identity, VTON, dynamic UI, commerce bridge)
+- **Spec format**: EARS syntax, mobile-first, 200-line target, verified file paths
+
 ### Visual QA
 - **Playwright Tests**: 40 tests covering 10 pages at 4 breakpoints
 - **Baseline Screenshots**: 36 approved
 - **CI Pipeline**: GitHub Actions workflow on PRs
-
-### Documentation (v1.0 shipped)
-- **CLAUDE.md**: AI 에이전트용 최적화 완료
-- **specs/**: 9개 번들 (빈 폴더 정리됨)
-- **docs/**: SSOT 테이블, codebase 연결 완료
 
 ## Requirements
 
 ### Validated
 
 **v1.0 Documentation:**
-- CLAUDE.md에 codebase 참조 추가 — v1.0
-- specs/README.md 업데이트 — v1.0
-- docs/README.md 업데이트 — v1.0
-- 빈 스펙 폴더 정리 — v1.0
-- 크로스 레퍼런스 추가 — v1.0
-- SSOT 원칙 문서화 — v1.0
+- ✓ CLAUDE.md에 codebase 참조 추가 — v1.0
+- ✓ specs/README.md 업데이트 — v1.0
+- ✓ docs/README.md 업데이트 — v1.0
+- ✓ 빈 스펙 폴더 정리 — v1.0
+- ✓ 크로스 레퍼런스 추가 — v1.0
+- ✓ SSOT 원칙 문서화 — v1.0
 
 **v1.1 API Integration:**
-- 프로필 API 연결 (GET/PATCH, activities, stats) — v1.1
-- Posts/Spots/Solutions CRUD API — v1.1
-- 투표/댓글 시스템 API — v1.1
-- 랭킹/배지 시스템 API — v1.1
-- 수익 대시보드/정산 API — v1.1
-- 검색 API (popular, recent) — v1.1
+- ✓ 프로필 API 연결 (GET/PATCH, activities, stats) — v1.1
+- ✓ Posts/Spots/Solutions CRUD API — v1.1
+- ✓ 투표/댓글 시스템 API — v1.1
+- ✓ 랭킹/배지 시스템 API — v1.1
+- ✓ 수익 대시보드/정산 API — v1.1
+- ✓ 검색 API (popular, recent) — v1.1
 
 **v2.0 Design Overhaul:**
-- 디자인 토큰 추출 (색상, 타이포그래피, 간격) — v2.0
-- 타이포그래피 컴포넌트 구현 (Heading, Text) — v2.0
-- Tailwind CSS 설정 확장 — v2.0
-- 버튼, 입력, 태그 컴포넌트 — v2.0
-- 카드 컴포넌트 (Product, Feed, Profile) — v2.0
-- 데스크탑 레이아웃 (Header, Footer) — v2.0
-- 페이지별 디자인 적용 (8개 페이지) — v2.0
+- ✓ 디자인 토큰 추출 (색상, 타이포그래피, 간격) — v2.0
+- ✓ 타이포그래피 컴포넌트 구현 (Heading, Text) — v2.0
+- ✓ Tailwind CSS 설정 확장 — v2.0
+- ✓ 버튼, 입력, 태그 컴포넌트 — v2.0
+- ✓ 카드 컴포넌트 (Product, Feed, Profile) — v2.0
+- ✓ 데스크탑 레이아웃 (Header, Footer) — v2.0
+- ✓ 페이지별 디자인 적용 (8개 페이지) — v2.0
 
 **v2.1 Design System Expansion:**
-- Tag 컴포넌트 (6 category variants) — v2.1
-- ActionButton 컴포넌트 (3 variants) — v2.1
-- StepIndicator (3 size, 3 visual variants) — v2.1
-- Hotspot 컴포넌트 (3 variants with animation) — v2.1
-- NavBar, NavItem, SectionHeader, Tabs — v2.1
-- ArtistCard, StatCard, SpotCard, ShopCarouselCard — v2.1
-- Badge, LeaderItem, RankingItem, SpotDetail — v2.1
-- OAuthButton, GuestButton, Divider, LoginCard — v2.1
-- LoadingSpinner, SkeletonCard, BottomSheet — v2.1
-- Visual QA with Playwright — v2.1
+- ✓ Tag 컴포넌트 (6 category variants) — v2.1
+- ✓ ActionButton 컴포넌트 (3 variants) — v2.1
+- ✓ StepIndicator (3 size, 3 visual variants) — v2.1
+- ✓ Hotspot 컴포넌트 (3 variants with animation) — v2.1
+- ✓ NavBar, NavItem, SectionHeader, Tabs — v2.1
+- ✓ ArtistCard, StatCard, SpotCard, ShopCarouselCard — v2.1
+- ✓ Badge, LeaderItem, RankingItem, SpotDetail — v2.1
+- ✓ OAuthButton, GuestButton, Divider, LoginCard — v2.1
+- ✓ LoadingSpinner, SkeletonCard, BottomSheet — v2.1
+- ✓ Visual QA with Playwright — v2.1
 
 **v3.0 Admin Panel:**
 - ✓ Admin route protection (middleware + is_admin) — v3.0
@@ -97,16 +85,18 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 - ✓ Pipeline Logs (accordion detail, retry, status filter) — v3.0
 - ✓ Server Logs (log table, filters, terminal streaming) — v3.0
 
+**v4.0 Spec Overhaul — AI-Ready Documentation:**
+- ✓ 기존 spec 아카이빙 (specs/_archive/v2.1.0/) — v4.0
+- ✓ spec 포맷/구조 재설계 (EARS 구문, mobile-first, 200-line limit) — v4.0
+- ✓ 5개 공유 기반 문서 (component-registry, data-models, api-contracts, store-map, injection-guide) — v4.0
+- ✓ 5개 유저 플로우 문서 (discovery, detail, creation, user, VTON draft) — v4.0
+- ✓ 14개 화면 spec 재작성 (detail 4, discovery 4, creation 3, user 3) — v4.0
+- ✓ 4개 차기 버전 초안 (service identity, VTON, dynamic UI, commerce bridge) — v4.0
+- ✓ 기존 번들 spec 파일 retire + clean structure — v4.0
+
 ### Active
 
-**v4.0 Spec Overhaul — AI-Ready Documentation:**
-- [ ] 기존 spec 아카이빙 (specs/v2.1.0/)
-- [ ] spec 포맷/구조 재설계 (AI 컨텍스트 최적화)
-- [ ] discovery 번들 spec 재작성
-- [ ] detail-view 번들 spec 재작성
-- [ ] creation-ai 번들 spec 재작성
-- [ ] user-system 번들 spec 재작성
-- [ ] shared 기반 문서 동기화
+(None — planning next milestone)
 
 ### Out of Scope
 
@@ -115,6 +105,8 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 - 지급 관리 (A-03) — v3.1로 미루기
 - 실시간 알림 — 별도 마일스톤
 - 컴포넌트 통합 (15 orphaned) — v2.2로 미루기
+- spec 자동 검증 도구 — v4.1로 미루기
+- VTON 기능 구현 — PoC 결과 후 v5.0에서 진행
 
 ## Context
 
@@ -124,6 +116,7 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 - **v2.0 shipped**: 2026-02-05
 - **v2.1 shipped**: 2026-02-06
 - **v3.0 shipped**: 2026-02-19
+- **v4.0 shipped**: 2026-02-20
 - **코드베이스**: Next.js 16 + React 18 + TypeScript 5.9 + Supabase
 - **백엔드 API**: https://dev.decoded.style (OpenAPI spec 완비)
 
@@ -137,14 +130,13 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| .planning/codebase/를 진실 소스로 | AI 생성, 최신 상태 유지 | Good |
-| 빈 스펙 폴더 정리 | 혼란 감소, 유지보수성 향상 | Good |
-| CLAUDE.md 간결화 | 토큰 효율성 | Good |
-| SSOT 원칙 확립 | 문서 충돌 방지 | Good |
-| CVA 패턴 사용 | 일관된 컴포넌트 variant 시스템 | Good |
-| Playwright Visual QA | 디자인 일관성 자동 검증 | Good |
-| Tech debt 수용 (v2.1) | 컴포넌트 생성이 주 목표, 통합은 점진적 | Pending |
-
+| .planning/codebase/를 진실 소스로 | AI 생성, 최신 상태 유지 | ✓ Good |
+| 빈 스펙 폴더 정리 | 혼란 감소, 유지보수성 향상 | ✓ Good |
+| CLAUDE.md 간결화 | 토큰 효율성 | ✓ Good |
+| SSOT 원칙 확립 | 문서 충돌 방지 | ✓ Good |
+| CVA 패턴 사용 | 일관된 컴포넌트 variant 시스템 | ✓ Good |
+| Playwright Visual QA | 디자인 일관성 자동 검증 | ✓ Good |
+| Tech debt 수용 (v2.1) | 컴포넌트 생성이 주 목표, 통합은 점진적 | ⚠️ Revisit |
 | Admin layout separate from main app | 독립 레이아웃 — 공유 header/footer 없음 | ✓ Good |
 | Defense-in-depth admin auth | Middleware + layout server-side double-check | ✓ Good |
 | djb2 deterministic mock data | 새로고침 시 flickering 방지 | ✓ Good |
@@ -153,7 +145,13 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 | Recharts for admin charts | AreaChart, BarChart 시각화 | ✓ Good |
 | Supabase MCP 연결 | API 탐색 및 타입 생성 용이 | — Pending |
 | Pencil MCP로 디자인 → 코드 | decoded.pen 디자인 시스템 구현 | — Pending |
+| EARS syntax for spec requirements | 일관된 요구사항 표현 ("When/the system shall") | ✓ Good |
+| Mobile-first spec ordering | 모바일 와이어프레임 우선, 데스크탑은 delta | ✓ Good |
+| 200-line spec limit | 컨텍스트 윈도우 효율성, 300 max with justification | ✓ Good |
+| injection-guide as SSOT for AI loading | README와 중복 없이 단일 소스 | ✓ Good |
+| NEXT-* DRAFT guardrail | 미승인 spec의 실수 구현 방지 | ✓ Good |
+| Verified file paths in all specs | Stale path 참조 오류 원천 방지 | ✓ Good |
 
 ---
 
-*Last updated: 2026-02-19 after v3.0 milestone*
+*Last updated: 2026-02-20 after v4.0 milestone*

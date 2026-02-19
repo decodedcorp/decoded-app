@@ -1,5 +1,31 @@
 # Project Milestones: decoded-app
 
+## v4.0 Spec Overhaul — AI-Ready Documentation (Shipped: 2026-02-20)
+
+**Delivered:** 사용자 화면 중심의 spec/docs를 현재 코드베이스 기준으로 재작성하고, AI 에이전트 컨텍스트 주입에 최적화된 포맷으로 고도화 — 14개 화면 spec, 5개 플로우 문서, 5개 공유 기반 문서, 4개 차기 버전 초안
+
+**Phases completed:** v4-01 to v4-09 (13 plans total)
+
+**Key accomplishments:**
+- Archived v2.1.0 spec snapshot (56 files) + stale path audit (60 issues documented)
+- Built 5 shared foundation docs (component-registry, data-models, api-contracts, store-map, injection-guide)
+- Delivered 14 screen specs across 4 bundles (detail, discovery, creation-AI, user) with verified file paths
+- Wrote 5 flow documents defining navigation contracts and state machines
+- Drafted 4 next-version direction memos (VTON, Dynamic UI, Commerce Bridge, Service Identity) with guardrails
+- Consolidated clean spec structure — 7-entry root, retired 8 legacy bundle dirs
+
+**Stats:**
+- 173 files created/modified
+- +22,277 lines of documentation (0 code changes)
+- 9 phases, 13 plans, 29 requirements (100% coverage)
+- 2 days (2026-02-19 → 2026-02-20)
+
+**Git range:** `91f2cbe` → `3657def` (88 commits)
+
+**What's next:** Planning next milestone
+
+---
+
 ## v3.0 Admin Panel — AI Management (Shipped: 2026-02-19)
 
 **Delivered:** AI 분석 파이프라인을 모니터링하고 결과를 감사할 수 있는 관리자 패널 — 대시보드, AI 감사, 비용 모니터링, 파이프라인 로그, 서버 로그 5개 섹션 구축
