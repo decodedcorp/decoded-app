@@ -72,10 +72,10 @@ See archived roadmap: `.planning/milestones/v2.1-ROADMAP.md`
 **Plans:** 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Middleware + admin auth infrastructure (is_admin check, route protection)
-- [ ] 01-02-PLAN.md — Admin layout, sidebar, placeholder pages, header admin link
+- [x] 01-01-PLAN.md — Middleware + admin auth infrastructure (is_admin check, route protection)
+- [x] 01-02-PLAN.md — Admin layout, sidebar, placeholder pages, header admin link
 
-**Status:** [ ] Not started
+**Status:** [x] Complete (2026-02-19)
 
 ---
 
@@ -169,7 +169,7 @@ Plans:
 
 | Phase | Goal | Requirements | Status |
 |-------|------|--------------|--------|
-| v3-01 | Admin Foundation — auth middleware, layout, routing | AAUTH-01~03 | Not started |
+| v3-01 | Admin Foundation — auth middleware, layout, routing | AAUTH-01~03 | ✓ Complete (2026-02-19) |
 | v3-02 | Dashboard — KPI cards, traffic charts, today summary | DASH-01~03 | Not started |
 | v3-03 | AI Audit — request list, detail view, edit, filter | AUDIT-01~04 | Not started |
 | v3-04 | AI Cost Monitoring — call stats, token charts, cost estimate | COST-01~03 | Not started |

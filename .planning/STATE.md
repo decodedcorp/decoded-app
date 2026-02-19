@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 
 ## Current Position
 
-Phase: v3-01 (Admin Foundation)
-Plan: 01-01 of 03 in phase
-Status: In progress
-Last activity: 2026-02-19 — Completed 01-01-PLAN.md (admin route protection middleware)
+Phase: v3-01 (Admin Foundation) — COMPLETE
+Plan: 2/2 plans complete
+Status: Phase complete
+Last activity: 2026-02-19 — Completed phase v3-01 (Admin Foundation)
 
-Progress: [----------] 0/5 phases complete (v3.0) | Plan 01-01 complete
+Progress: [██--------] 1/5 phases complete (v3.0)
 
 ## Milestone Summary
 
@@ -31,7 +31,7 @@ Progress: [----------] 0/5 phases complete (v3.0) | Plan 01-01 complete
 
 | Phase | Goal | Requirements | Status |
 |-------|------|--------------|--------|
-| v3-01 | Admin Foundation | AAUTH-01~03 | In progress (1/3 plans done) |
+| v3-01 | Admin Foundation | AAUTH-01~03 | ✓ Complete (2/2 plans) |
 | v3-02 | Dashboard | DASH-01~03 | Not started |
 | v3-03 | AI Audit | AUDIT-01~04 | Not started |
 | v3-04 | AI Cost Monitoring | COST-01~03 | Not started |
@@ -70,6 +70,9 @@ Key decisions affecting future work:
 - 01-01: createServerClient used for middleware (not deprecated createMiddlewareClient) with getAll/setAll cookie adapters
 - 01-01: checkIsAdmin in separate admin.ts for reuse in layout-level server components
 - 01-01: Silent redirect to / for both unauthenticated and non-admin users (no admin panel disclosure)
+- 01-02: Admin layout completely separate from main app (no shared header/footer/navbar)
+- 01-02: Server-side double-check in admin layout.tsx as defense-in-depth with middleware
+- 01-02: isAdmin in authStore queried from users.is_admin via fetchIsAdmin helper
 - v3.0: Charts will require a chart library (recharts or similar) — decide at v3-02 planning
 
 ### Tech Debt (from v2.1)
@@ -105,8 +108,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-19T02:26:54Z
-Stopped at: Completed 01-01-PLAN.md (admin route middleware + supabase middleware client + checkIsAdmin)
+Last session: 2026-02-19
+Stopped at: Completed phase v3-01 (Admin Foundation) — all 2 plans executed
 Resume file: None
 
 ## Quick Tasks Completed

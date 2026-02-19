@@ -9,9 +9,9 @@ Requirements for Admin Panel — AI Management. 목업 데이터 우선, 백엔�
 
 ### Admin Auth
 
-- [ ] **AAUTH-01**: 관리자 권한 체크 미들웨어 (`is_admin` 기반)
-- [ ] **AAUTH-02**: `/admin` 라우트 보호 (비관리자 접근 차단)
-- [ ] **AAUTH-03**: 관리자 전용 레이아웃 (사이드바 네비게이션)
+- [x] **AAUTH-01**: 관리자 권한 체크 미들웨어 (`is_admin` 기반)
+- [x] **AAUTH-02**: `/admin` 라우트 보호 (비관리자 접근 차단)
+- [x] **AAUTH-03**: 관리자 전용 레이아웃 (사이드바 네비게이션)
 
 ### Dashboard
 
