@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 
 ## Current Position
 
-Phase: v3-01 (Admin Foundation) — COMPLETE
-Plan: 2/2 plans complete
-Status: Phase complete
-Last activity: 2026-02-19 — Completed phase v3-01 (Admin Foundation)
+Phase: v3-02 (Dashboard) — In Progress
+Plan: 1/2 plans complete
+Status: In progress
+Last activity: 2026-02-19 — Completed 02-01-PLAN.md (Dashboard Data Layer)
 
-Progress: [██--------] 1/5 phases complete (v3.0)
+Progress: [███-------] 1/5 phases complete (v3.0), v3-02 Plan 1/2 done
 
 ## Milestone Summary
 
@@ -32,7 +32,7 @@ Progress: [██--------] 1/5 phases complete (v3.0)
 | Phase | Goal | Requirements | Status |
 |-------|------|--------------|--------|
 | v3-01 | Admin Foundation | AAUTH-01~03 | ✓ Complete (2/2 plans) |
-| v3-02 | Dashboard | DASH-01~03 | Not started |
+| v3-02 | Dashboard | DASH-01~03 | In progress (1/2 plans) |
 | v3-03 | AI Audit | AUDIT-01~04 | Not started |
 | v3-04 | AI Cost Monitoring | COST-01~03 | Not started |
 | v3-05 | Pipeline & Server Logs | PIPE-01~03, SLOG-01~03 | Not started |
@@ -74,6 +74,11 @@ Key decisions affecting future work:
 - 01-02: Server-side double-check in admin layout.tsx as defense-in-depth with middleware
 - 01-02: isAdmin in authStore queried from users.is_admin via fetchIsAdmin helper
 - v3.0: Charts will require a chart library (recharts or similar) — decide at v3-02 planning
+- 02-01: recharts@3.7.0 installed with react-is peer dependency
+- 02-01: Deterministic hash-based mock data (djb2 seed on date string) — same date = same values, no flickering
+- 02-01: Real-data-first for post/item counts with graceful mock fallback
+- 02-01: Supabase uses singular table names (post, item) vs plural in TypeScript types — use `as any` cast
+- 02-01: Dashboard types (DailyMetric, KPIStats, TodaySummary) importable from @/lib/api/admin/dashboard
 
 ### Tech Debt (from v2.1)
 
@@ -99,8 +104,8 @@ Key decisions affecting future work:
 2. Re-run visual QA when API stable for complete decoded.pen comparison
 
 **From v3.0 Planning:**
-1. Decide chart library at v3-02 planning (recharts recommended for React ecosystem)
-2. Confirm which admin APIs are available for DASH-01~03 before v3-02 execution
+1. ~~Decide chart library at v3-02 planning~~ — RESOLVED: recharts@3.7.0 installed (02-01)
+2. ~~Confirm which admin APIs are available for DASH-01~03~~ — RESOLVED: 3 API routes created (02-01)
 
 ### Blockers/Concerns
 
@@ -109,7 +114,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed phase v3-01 (Admin Foundation) — all 2 plans executed
+Stopped at: Completed 02-01-PLAN.md (Dashboard Data Layer) — recharts installed, 3 API routes created
 Resume file: None
 
 ## Quick Tasks Completed
@@ -142,4 +147,4 @@ Resume file: None
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-19 after v3.0 roadmap creation*
+*Last updated: 2026-02-19 after completing 02-01-PLAN.md (Dashboard Data Layer)*
