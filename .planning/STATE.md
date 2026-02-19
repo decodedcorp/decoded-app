@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 
 ## Current Position
 
-Phase: v4-03 Flow Documents — Complete
-Plan: 1/1 plans complete
-Status: v4-03-01 complete — all 5 flow documents written (FLW-01 through FLW-05)
-Last activity: 2026-02-19 — Completed v4-03-01-PLAN.md (FLW-01~05 flow documents)
+Phase: v4-04 Screen Specs: Detail View — In progress
+Plan: 1/2 plans complete
+Status: v4-04-01 complete — SCR-VIEW-01 (post detail) and SCR-VIEW-02 (spot/hotspot) specs written
+Last activity: 2026-02-19 — Completed v4-04-01-PLAN.md (SCR-VIEW-01 and SCR-VIEW-02)
 
-Progress: v4.0 [███░░░░░░░] 3/9 phases (5/13 plans complete)
+Progress: v4.0 [███░░░░░░░] 3.5/9 phases (6/13 plans complete)
 
 ## Milestone Summary
 
@@ -34,7 +34,7 @@ Progress: v4.0 [███░░░░░░░] 3/9 phases (5/13 plans complete)
 | v4-01 | Archive & Foundation | ARCH-01~04 | 2/2 | Complete |
 | v4-02 | Shared Foundation | SHRD-01~05 | 2/2 | Complete |
 | v4-03 | Flow Documents | FLOW-01~05 | 1/1 | Complete |
-| v4-04 | Screen Specs: Detail View | DETL-01~04 | 0/2 | Not started |
+| v4-04 | Screen Specs: Detail View | DETL-01~04 | 1/2 | In progress |
 | v4-05 | Screen Specs: Discovery | DISC-01~04 | 0/2 | Not started |
 | v4-06 | Screen Specs: Creation-AI | CREA-01~03 | 0/1 | Not started |
 | v4-07 | Screen Specs: User System | USER-01~03 | 0/1 | Not started |
@@ -70,6 +70,10 @@ Key decisions affecting v4.0 work:
 - v4-03-01: Flow diagram type chosen per flow nature — flowchart for navigation-heavy (FLW-01/03), stateDiagram for interaction-state-heavy (FLW-02/04)
 - v4-03-01: Transition tables use 5 columns (From | Trigger | To | Store Changes | Data Fetched) — established as flow format standard
 - v4-03-01: FLW-02 framed as interaction-state flow within a single page (not route navigation sequence)
+- v4-04-01: /images/[id] server-redirects to /posts/[id] — ImageDetailPage component only serves intercepted parallel modal route (@modal/(.)images/[id])
+- v4-04-01: PostDetailContent uses inline spot dot markers (animate-ping), not DS Hotspot — DS Hotspot is used only in ImageCanvas (legacy image flow); Hotspot→BottomSheet panel for post flow is ⚠️ NOT-IMPL
+- v4-04-01: transitionStore.selectedId tracks the image being FLIP-transitioned (not per-spot selection); per-spot state is local activeIndex in InteractiveShowcase
+- v4-04-01: useSpotCardSync is for request/detect flow only (takes DetectedSpot from requestStore); not used in detail view components
 
 ### Pending Todos
 
@@ -77,7 +81,7 @@ Key decisions affecting v4.0 work:
 1. Quick task: Fix images page raw JSON error exposure (API error handling - major UX/security)
 
 **For v4.0 execution:**
-1. Before v4-04: Verify `transitionStore` shape + `useFlipTransition.ts` (FLIP animation pattern — state shape documented in store-map; integration details remain)
+1. ~~Before v4-04: Verify `transitionStore` shape + `useFlipTransition.ts`~~ — DONE in v4-04-01
 2. Before v4-06: Verify `requestStore` step enum values + `POST /api/v1/posts/analyze` response shape
 3. Before v4-07: Verify `authStore` user/session type + auth-conditional rendering patterns
 
@@ -87,11 +91,11 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-19T12:37:11Z
-Stopped at: Completed v4-03-01-PLAN.md (FLW-01~05 flow documents)
+Last session: 2026-02-19T13:08:17Z
+Stopped at: Completed v4-04-01-PLAN.md (SCR-VIEW-01 and SCR-VIEW-02 screen specs)
 Resume file: None
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-19 after v4-03-01 completion*
+*Last updated: 2026-02-19 after v4-04-01 completion*
