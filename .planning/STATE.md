@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 
 ## Current Position
 
-Phase: v4-07 Screen Specs: User System — Complete
+Phase: v4-08 Next Version Draft — Complete
 Plan: 1/1 plans complete
-Status: v4-07-01 complete — all 3 User System screen specs written (SCR-USER-01 through SCR-USER-03)
-Last activity: 2026-02-20 — Completed v4-07-01-PLAN.md (SCR-USER-01 Login, SCR-USER-02 Profile, SCR-USER-03 Earnings)
+Status: v4-08-01 complete — 4 NEXT-* draft documents written (NEXT-01 through NEXT-04) + injection guardrail added
+Last activity: 2026-02-20 — Completed v4-08-01-PLAN.md (NEXT-01 Service Identity, NEXT-02 VTON, NEXT-03 Dynamic UI, NEXT-04 Commerce Bridge)
 
-Progress: v4.0 [███████░░░] 7/9 phases (11/13 plans complete)
+Progress: v4.0 [████████░░] 8/9 phases (12/13 plans complete)
 
 ## Milestone Summary
 
@@ -25,7 +25,7 @@ Progress: v4.0 [███████░░░] 7/9 phases (11/13 plans complete
 | v2.0 Design Overhaul | 9 | 26 | Shipped | 2026-02-05 |
 | v2.1 Design System | 6 | 14 | Shipped | 2026-02-06 |
 | v3.0 Admin Panel | 6 | 12 | Shipped | 2026-02-19 |
-| **v4.0 Spec Overhaul** | **9** | **11/13** | **In progress** | - |
+| **v4.0 Spec Overhaul** | **9** | **12/13** | **In progress** | - |
 
 ## v4.0 Roadmap
 
@@ -38,7 +38,7 @@ Progress: v4.0 [███████░░░] 7/9 phases (11/13 plans complete
 | v4-05 | Screen Specs: Discovery | DISC-01~04 | 2/2 | Complete |
 | v4-06 | Screen Specs: Creation-AI | CREA-01~03 | 1/1 | Complete |
 | v4-07 | Screen Specs: User System | USER-01~03 | 1/1 | Complete |
-| v4-08 | Next Version Draft | NEXT-01~04 | 0/1 | Not started |
+| v4-08 | Next Version Draft | NEXT-01~04 | 1/1 | Complete |
 | v4-09 | Cleanup | CLEN-01 | 0/1 | Not started |
 
 ## Accumulated Context
@@ -117,11 +117,11 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-20T00:22Z
-Stopped at: Completed v4-07-01-PLAN.md (SCR-USER-01 Login, SCR-USER-02 Profile, SCR-USER-03 Earnings)
+Last session: 2026-02-20T15:47Z
+Stopped at: Completed v4-08-01-PLAN.md (NEXT-01 Service Identity, NEXT-02 VTON, NEXT-03 Dynamic UI, NEXT-04 Commerce Bridge)
 Resume file: None
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-20 after v4-07-01 completion*
+*Last updated: 2026-02-20 after v4-08-01 completion*
