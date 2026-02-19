@@ -12,7 +12,7 @@ import { useImageById } from "@decoded/shared";
 
 const { width } = Dimensions.get("window");
 
-export default function ImageDetailScreen() {
+export default function PostDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: image, isLoading, error } = useImageById(id ?? "");
 

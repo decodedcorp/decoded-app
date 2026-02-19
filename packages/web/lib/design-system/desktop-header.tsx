@@ -3,7 +3,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Search,
   Bell,
@@ -48,14 +48,13 @@ export interface DesktopHeaderProps
 }
 
 /**
- * Navigation items configuration
- * @see decoded.pen Desktop Header: Home, Feed, Explore, Request
+ * Navigation items configuration.
+ * Feed 비활성화: 네비에서만 제거, /feed 경로·코드는 유지.
  */
 const NAV_ITEMS = [
   { href: "/", label: "Home" },
-  { href: "/feed", label: "Feed" },
   { href: "/explore", label: "Explore" },
-  { href: "/request/upload", label: "Request" },
+  { href: "/request/upload", label: "Upload", isUpload: true },
 ] as const;
 
 /**
@@ -76,6 +75,7 @@ export function DesktopHeader({
   ...props
 }: DesktopHeaderProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const isAdmin = useAuthStore(selectIsAdmin);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -110,13 +110,21 @@ export function DesktopHeader({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [dropdownOpen]);
 
+  const handleUploadClick = () => {
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    router.push("/request/upload");
+  };
+
   return (
     <header
       className={cn(desktopHeaderVariants({ variant }), className)}
       style={{ height: "72px" }}
       {...props}
     >
-      <div className="w-full flex items-center justify-between h-full px-16">
+      <div className="w-full flex items-center justify-between h-full px-6 md:px-8">
         {/* Left Section: Logo - flex-1 for equal width with right */}
         <div className="flex-1 flex items-center">
           <Link
@@ -139,20 +147,33 @@ export function DesktopHeader({
           className="flex-none flex items-center gap-8"
           aria-label="Main navigation"
         >
-          {NAV_ITEMS.map(({ href, label }) => {
-            const isActive = pathname === href;
+          {NAV_ITEMS.map((item) => {
+            const isActive = pathname === item.href;
+            const baseClass = cn(
+              "text-sm transition-colors",
+              isActive
+                ? "text-primary font-semibold"
+                : "text-muted-foreground hover:text-foreground font-medium"
+            );
+            if ("isUpload" in item && item.isUpload) {
+              return (
+                <button
+                  key={item.href}
+                  type="button"
+                  onClick={handleUploadClick}
+                  className={baseClass}
+                >
+                  {item.label}
+                </button>
+              );
+            }
             return (
               <Link
-                key={href}
-                href={href}
-                className={cn(
-                  "text-sm transition-colors",
-                  isActive
-                    ? "text-primary font-semibold"
-                    : "text-muted-foreground hover:text-foreground font-medium"
-                )}
+                key={item.href}
+                href={item.href}
+                className={baseClass}
               >
-                {label}
+                {item.label}
               </Link>
             );
           })}

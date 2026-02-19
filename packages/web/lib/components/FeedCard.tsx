@@ -156,7 +156,7 @@ export const FeedCard = memo(
     const handleShare = async (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      const url = `${window.location.origin}/images/${item.id}`;
+      const url = `${window.location.origin}/posts/${item.id}`;
 
       if (navigator.share) {
         try {
@@ -334,7 +334,7 @@ export const FeedCard = memo(
 
     return (
       <Link
-        href={`/images/${id}`}
+        href={`/posts/${id}`}
         scroll={false}
         onClick={handleClick}
         className="block"

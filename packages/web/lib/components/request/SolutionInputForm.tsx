@@ -1,8 +1,9 @@
 "use client";
 
 import { memo, useState, useCallback } from "react";
-import { Link2, Tag, DollarSign, X, Check } from "lucide-react";
+import { Link2, Tag, DollarSign, X, Check, Loader2 } from "lucide-react";
 import type { SpotSolutionData } from "@/lib/stores/requestStore";
+import { extractSolutionMetadata } from "@/lib/api/solutions";
 
 interface SolutionInputFormProps {
   spotId: string;
@@ -11,8 +12,18 @@ interface SolutionInputFormProps {
   onCancel: () => void;
 }
 
+function isValidUrl(str: string): boolean {
+  try {
+    new URL(str);
+    return str.startsWith("http://") || str.startsWith("https://");
+  } catch {
+    return false;
+  }
+}
+
 /**
  * SolutionInputForm - Spot에 대한 상품 정보 입력 폼
+ * 링크 입력 시 extract-metadata API로 제목/썸네일/가격 자동 채움
  */
 export const SolutionInputForm = memo(
   ({ spotId, initialData, onSave, onCancel }: SolutionInputFormProps) => {
@@ -20,12 +31,49 @@ export const SolutionInputForm = memo(
     const [originalUrl, setOriginalUrl] = useState(
       initialData?.originalUrl || ""
     );
+    const [thumbnailUrl, setThumbnailUrl] = useState(
+      initialData?.thumbnailUrl || ""
+    );
     const [priceAmount, setPriceAmount] = useState(
       initialData?.priceAmount?.toString() || ""
     );
-    const [priceCurrency] = useState(initialData?.priceCurrency || "KRW");
+    const [priceCurrency, setPriceCurrency] = useState(
+      initialData?.priceCurrency || "KRW"
+    );
+    const [description, setDescription] = useState(
+      initialData?.description || ""
+    );
+    const [isExtracting, setIsExtracting] = useState(false);
 
     const isValid = title.trim() && originalUrl.trim();
+
+    const handleUrlBlur = useCallback(async () => {
+      const url = originalUrl.trim();
+      if (!url || !isValidUrl(url) || isExtracting) return;
+
+      setIsExtracting(true);
+      try {
+        const meta = await extractSolutionMetadata(url);
+        if (meta.title) setTitle(meta.title);
+        if (meta.description) setDescription(meta.description);
+        const thumb = meta.thumbnail_url ?? meta.image;
+        if (thumb) setThumbnailUrl(thumb);
+        const priceVal = meta.price ?? meta.extra_metadata?.price;
+        const curr = meta.currency ?? meta.extra_metadata?.currency ?? "KRW";
+        if (priceVal != null) {
+          const num =
+            typeof priceVal === "number"
+              ? priceVal
+              : parseInt(String(priceVal).replace(/[^0-9]/g, ""), 10);
+          if (!isNaN(num)) setPriceAmount(String(num));
+        }
+        if (curr) setPriceCurrency(curr);
+      } catch {
+        // 실패 시 무시 (사용자가 수동 입력)
+      } finally {
+        setIsExtracting(false);
+      }
+    }, [originalUrl, isExtracting]);
 
     const handleSave = useCallback(() => {
       if (!isValid) return;
@@ -35,6 +83,8 @@ export const SolutionInputForm = memo(
         originalUrl: originalUrl.trim(),
         priceCurrency,
         ...(priceAmount && { priceAmount: parseInt(priceAmount, 10) }),
+        ...(thumbnailUrl && { thumbnailUrl }),
+        ...(description && { description }),
       };
 
       onSave(spotId, solution);
@@ -44,6 +94,8 @@ export const SolutionInputForm = memo(
       originalUrl,
       priceAmount,
       priceCurrency,
+      thumbnailUrl,
+      description,
       isValid,
       onSave,
     ]);
@@ -69,20 +121,23 @@ export const SolutionInputForm = memo(
           />
         </div>
 
-        {/* 구매 링크 */}
+        {/* 구매 링크 - blur 시 메타데이터 자동 추출 */}
         <div className="space-y-1">
           <label className="text-xs text-muted-foreground flex items-center gap-1">
             <Link2 className="w-3 h-3" />
             구매 링크 *
+            {isExtracting && <Loader2 className="w-3 h-3 animate-spin ml-1" />}
           </label>
           <input
             type="url"
             value={originalUrl}
             onChange={(e) => setOriginalUrl(e.target.value)}
+            onBlur={handleUrlBlur}
             placeholder="https://..."
+            disabled={isExtracting}
             className="w-full px-3 py-2 text-sm bg-background border border-border rounded-lg
                        focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary
-                       placeholder:text-muted-foreground/50"
+                       placeholder:text-muted-foreground/50 disabled:opacity-70"
           />
         </div>
 

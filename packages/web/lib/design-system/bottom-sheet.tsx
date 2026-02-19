@@ -29,6 +29,8 @@ export interface BottomSheetProps {
   onSnapChange?: (snapPoint: number) => void;
   /** Additional class name */
   className?: string;
+  /** Center content vertically and horizontally */
+  contentCenter?: boolean;
 }
 
 /**
@@ -68,6 +70,7 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(
       title,
       onSnapChange,
       className,
+      contentCenter = false,
     },
     ref
   ) => {
@@ -223,9 +226,10 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(
         <div
           ref={ref || sheetRef}
           className={cn(
-            "fixed bottom-0 left-0 right-0 z-50",
+            "fixed bottom-0 left-0 right-0 z-50 flex flex-col",
             "bg-[#242424] rounded-t-[20px]",
             "shadow-[0_-4px_20px_rgba(0,0,0,0.3)]",
+            "pb-[env(safe-area-inset-bottom,0px)]",
             isDragging ? "" : "transition-[height] duration-300 ease-out",
             className
           )}
@@ -238,7 +242,7 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(
         >
           {/* Drag handle - 40x4px #3D3D3D per decoded.pen */}
           <div
-            className="flex items-center justify-center py-3 cursor-grab active:cursor-grabbing touch-none select-none"
+            className="shrink-0 flex items-center justify-center py-3 cursor-grab active:cursor-grabbing touch-none select-none"
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
@@ -249,19 +253,22 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(
 
           {/* Header with title */}
           {(header || title) && (
-            <div className="px-5 pb-4 border-b border-border">
+            <div className="shrink-0 px-5 pb-4 border-b border-border">
               {header || (
                 <h2 className="text-lg font-semibold text-white">{title}</h2>
               )}
             </div>
           )}
 
-          {/* Content */}
+          {/* Content - flex-1 min-h-0 for proper overflow scroll */}
           <div
             ref={contentRef}
-            className="h-[calc(100%-48px)] overflow-y-auto overscroll-contain p-5"
+            className={cn(
+              "flex-1 min-h-0 overflow-y-auto overscroll-contain p-5",
+              contentCenter && "flex flex-col items-center justify-center"
+            )}
             style={{
-              paddingBottom: "env(safe-area-inset-bottom, 24px)",
+              paddingBottom: "max(2rem, env(safe-area-inset-bottom, 32px))",
             }}
           >
             {children}
