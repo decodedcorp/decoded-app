@@ -225,9 +225,9 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] v4-07-01-PLAN.md — SCR-USER-01~03 (login, profile, earnings) with authStore state verification
+- [ ] 07-01-PLAN.md — SCR-USER-01~03 (login, profile, earnings) with authStore state verification
 
-**Status:** [ ] Not started
+**Status:** [ ] Planned — ready for execution
 
 ---
 
@@ -301,7 +301,7 @@ Plans:
 | v4-04 | Screen Specs: Detail View — post detail, spot, item, related | DETL-01~04 | 2/2 | Complete (2026-02-19) |
 | v4-05 | Screen Specs: Discovery — home, search, feed, explore | DISC-01~04 | 2/2 | Complete (2026-02-19) |
 | v4-06 | Screen Specs: Creation-AI — upload, detect, edit/solution | CREA-01~03 | 1/1 | Complete (2026-02-19) |
-| v4-07 | Screen Specs: User System — login, profile, earnings | USER-01~03 | 0/1 | Not started |
+| v4-07 | Screen Specs: User System — login, profile, earnings | USER-01~03 | 0/1 | Planned |
 | v4-08 | Next Version Draft — service identity, VTON, dynamic UI, commerce | NEXT-01~04 | 0/1 | Not started |
 | v4-09 | Cleanup — retire old bundle files, verify new structure | CLEN-01 | 0/1 | Not started |
 
