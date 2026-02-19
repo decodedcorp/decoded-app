@@ -225,9 +225,9 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 07-01-PLAN.md — SCR-USER-01~03 (login, profile, earnings) with authStore state verification
+- [x] 07-01-PLAN.md — SCR-USER-01~03 (login, profile, earnings) with authStore state verification
 
-**Status:** [ ] Planned — ready for execution
+**Status:** [x] Complete (2026-02-20)
 
 ---
 
@@ -288,7 +288,7 @@ Plans:
 | v2.0 Design Overhaul | v2-1~9 | 26/26 | Shipped | 2026-02-05 |
 | v2.1 Design System | v2.1-1~6 | 14/14 | Shipped | 2026-02-06 |
 | **v3.0 Admin Panel** | **v3-01~06** | **12/12** | **Shipped** | 2026-02-19 |
-| **v4.0 Spec Overhaul** | **v4-01~09** | **10/13** | **In progress** | - |
+| **v4.0 Spec Overhaul** | **v4-01~09** | **11/13** | **In progress** | - |
 | **Total** | **6 milestones** | **77/83** | **Ongoing** | - |
 
 ### v4.0 Phase Progress
@@ -301,7 +301,7 @@ Plans:
 | v4-04 | Screen Specs: Detail View — post detail, spot, item, related | DETL-01~04 | 2/2 | Complete (2026-02-19) |
 | v4-05 | Screen Specs: Discovery — home, search, feed, explore | DISC-01~04 | 2/2 | Complete (2026-02-19) |
 | v4-06 | Screen Specs: Creation-AI — upload, detect, edit/solution | CREA-01~03 | 1/1 | Complete (2026-02-19) |
-| v4-07 | Screen Specs: User System — login, profile, earnings | USER-01~03 | 0/1 | Planned |
+| v4-07 | Screen Specs: User System — login, profile, earnings | USER-01~03 | 1/1 | Complete (2026-02-20) |
 | v4-08 | Next Version Draft — service identity, VTON, dynamic UI, commerce | NEXT-01~04 | 0/1 | Not started |
 | v4-09 | Cleanup — retire old bundle files, verify new structure | CLEN-01 | 0/1 | Not started |
 
@@ -310,4 +310,4 @@ Plans:
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-02-19 (v4-06 complete — 3 Creation-AI screen specs written; SCR-CREA-01~03)*
+*Last updated: 2026-02-20 (v4-07 complete — 3 User System screen specs written; SCR-USER-01~03)*

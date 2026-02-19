@@ -119,9 +119,9 @@ Requirements for Spec Overhaul — AI-Ready Documentation. 코드 변경 없이 
 | CREA-01 | v4-06 | Complete |
 | CREA-02 | v4-06 | Complete |
 | CREA-03 | v4-06 | Complete |
-| USER-01 | v4-07 | Pending |
-| USER-02 | v4-07 | Pending |
-| USER-03 | v4-07 | Pending |
+| USER-01 | v4-07 | Complete |
+| USER-02 | v4-07 | Complete |
+| USER-03 | v4-07 | Complete |
 | NEXT-01 | v4-08 | Pending |
 | NEXT-02 | v4-08 | Pending |
 | NEXT-03 | v4-08 | Pending |
