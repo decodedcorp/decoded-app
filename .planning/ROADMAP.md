@@ -180,10 +180,10 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] v4-05-01-PLAN.md — SCR-DISC-01 (home) + SCR-DISC-02 (search) with stale path fixes
-- [ ] v4-05-02-PLAN.md — SCR-DISC-03 (feed) + SCR-DISC-04 (explore)
+- [x] v4-05-01-PLAN.md — SCR-DISC-01 (home) + SCR-DISC-02 (search) with stale path fixes
+- [x] v4-05-02-PLAN.md — SCR-DISC-03 (feed) + SCR-DISC-04 (explore)
 
-**Status:** [ ] Planned (2026-02-19)
+**Status:** [x] Complete (2026-02-19)
 
 ---
 
@@ -288,8 +288,8 @@ Plans:
 | v2.0 Design Overhaul | v2-1~9 | 26/26 | Shipped | 2026-02-05 |
 | v2.1 Design System | v2.1-1~6 | 14/14 | Shipped | 2026-02-06 |
 | **v3.0 Admin Panel** | **v3-01~06** | **12/12** | **Shipped** | 2026-02-19 |
-| **v4.0 Spec Overhaul** | **v4-01~09** | **7/13** | **In progress** | - |
-| **Total** | **6 milestones** | **75/83** | **Ongoing** | - |
+| **v4.0 Spec Overhaul** | **v4-01~09** | **9/13** | **In progress** | - |
+| **Total** | **6 milestones** | **77/83** | **Ongoing** | - |
 
 ### v4.0 Phase Progress
 
@@ -299,7 +299,7 @@ Plans:
 | v4-02 | Shared Foundation — component registry, data models, API contracts, stores, injection guide | SHRD-01~05 | 2/2 | Complete (2026-02-19) |
 | v4-03 | Flow Documents — 4 user journey flows + VTON draft | FLOW-01~05 | 1/1 | Complete (2026-02-19) |
 | v4-04 | Screen Specs: Detail View — post detail, spot, item, related | DETL-01~04 | 2/2 | Complete (2026-02-19) |
-| v4-05 | Screen Specs: Discovery — home, search, feed, explore | DISC-01~04 | 0/2 | Not started |
+| v4-05 | Screen Specs: Discovery — home, search, feed, explore | DISC-01~04 | 2/2 | Complete (2026-02-19) |
 | v4-06 | Screen Specs: Creation-AI — upload, detect, edit/solution | CREA-01~03 | 0/1 | Not started |
 | v4-07 | Screen Specs: User System — login, profile, earnings | USER-01~03 | 0/1 | Not started |
 | v4-08 | Next Version Draft — service identity, VTON, dynamic UI, commerce | NEXT-01~04 | 0/1 | Not started |
@@ -310,4 +310,4 @@ Plans:
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-02-19 (v4-04 complete — 4 Detail View screen specs written; SCR-VIEW-01~04)*
+*Last updated: 2026-02-19 (v4-05 complete — 4 Discovery screen specs written; SCR-DISC-01~04)*

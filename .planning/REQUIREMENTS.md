@@ -39,10 +39,10 @@ Requirements for Spec Overhaul — AI-Ready Documentation. 코드 변경 없이 
 
 ### Screen Specs — Discovery
 
-- [ ] **DISC-01**: 홈 화면 spec (SCR-DISC-01) — 현재 v2.0 디자인 기준 재작성
-- [ ] **DISC-02**: 검색 화면 spec (SCR-DISC-03) — 풀스크린 오버레이 검색
-- [ ] **DISC-03**: 피드 화면 spec — 소셜 피드 타임라인
-- [ ] **DISC-04**: 탐색(Explore) 화면 spec — 카테고리 필터 그리드
+- [x] **DISC-01**: 홈 화면 spec (SCR-DISC-01) — 현재 v2.0 디자인 기준 재작성
+- [x] **DISC-02**: 검색 화면 spec (SCR-DISC-02) — 풀스크린 오버레이 검색
+- [x] **DISC-03**: 피드 화면 spec (SCR-DISC-03) — 소셜 피드 타임라인
+- [x] **DISC-04**: 탐색(Explore) 화면 spec (SCR-DISC-04) — 카테고리 필터 그리드
 
 ### Screen Specs — Creation-AI
 
@@ -112,10 +112,10 @@ Requirements for Spec Overhaul — AI-Ready Documentation. 코드 변경 없이 
 | DETL-02 | v4-04 | Complete |
 | DETL-03 | v4-04 | Complete |
 | DETL-04 | v4-04 | Complete |
-| DISC-01 | v4-05 | Pending |
-| DISC-02 | v4-05 | Pending |
-| DISC-03 | v4-05 | Pending |
-| DISC-04 | v4-05 | Pending |
+| DISC-01 | v4-05 | Complete |
+| DISC-02 | v4-05 | Complete |
+| DISC-03 | v4-05 | Complete |
+| DISC-04 | v4-05 | Complete |
 | CREA-01 | v4-06 | Pending |
 | CREA-02 | v4-06 | Pending |
 | CREA-03 | v4-06 | Pending |
