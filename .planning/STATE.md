@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 
 ## Current Position
 
-Phase: v4-06 Screen Specs: Creation-AI — Complete
+Phase: v4-07 Screen Specs: User System — Complete
 Plan: 1/1 plans complete
-Status: v4-06-01 complete — all 3 Creation-AI screen specs written (SCR-CREA-01 through SCR-CREA-03)
-Last activity: 2026-02-19 — Completed v4-06-01-PLAN.md (SCR-CREA-01 Upload, SCR-CREA-02 AI Detect, SCR-CREA-03 Edit/Solution)
+Status: v4-07-01 complete — all 3 User System screen specs written (SCR-USER-01 through SCR-USER-03)
+Last activity: 2026-02-20 — Completed v4-07-01-PLAN.md (SCR-USER-01 Login, SCR-USER-02 Profile, SCR-USER-03 Earnings)
 
-Progress: v4.0 [██████░░░░] 6/9 phases (10/13 plans complete)
+Progress: v4.0 [███████░░░] 7/9 phases (11/13 plans complete)
 
 ## Milestone Summary
 
@@ -37,7 +37,7 @@ Progress: v4.0 [██████░░░░] 6/9 phases (10/13 plans complete
 | v4-04 | Screen Specs: Detail View | DETL-01~04 | 2/2 | Complete |
 | v4-05 | Screen Specs: Discovery | DISC-01~04 | 2/2 | Complete |
 | v4-06 | Screen Specs: Creation-AI | CREA-01~03 | 1/1 | Complete |
-| v4-07 | Screen Specs: User System | USER-01~03 | 0/1 | Not started |
+| v4-07 | Screen Specs: User System | USER-01~03 | 1/1 | Complete |
 | v4-08 | Next Version Draft | NEXT-01~04 | 0/1 | Not started |
 | v4-09 | Cleanup | CLEN-01 | 0/1 | Not started |
 
@@ -95,6 +95,11 @@ Key decisions affecting v4.0 work:
 - v4-06-01: isSubmitting is local useState in upload page component, NOT stored in requestStore
 - v4-06-01: DetectionToolbar (Select/Draw/Zoom) is UI-ONLY — tool state not connected to any behavior
 - v4-06-01: COMPRESSION_CONFIG: maxSizeMB=2, maxWidthOrHeight=1920, initialQuality=0.85, useWebWorker=true
+- v4-07-01: Middleware only protects /admin/:path* — /login and /profile have no route-level auth guard
+- v4-07-01: Profile auth is API-response-driven: useMe() error → ProfileError component, not redirect to /login
+- v4-07-01: selectIsAuthenticated (!!user || isGuest) vs selectIsLoggedIn (!!user) — key distinction for browse vs account-required features
+- v4-07-01: StatsCards renders 3 cards (Posts/Solutions/Points), not 4 — both Posts and Points cards trigger alert (NOT-IMPL)
+- v4-07-01: isEditModalOpen and activeTab are local useState in ProfileClient — NOT in profileStore; profileStore only holds badgeModalMode + selectedBadge
 
 ### Pending Todos
 
@@ -104,7 +109,7 @@ Key decisions affecting v4.0 work:
 **For v4.0 execution:**
 1. ~~Before v4-04: Verify `transitionStore` shape + `useFlipTransition.ts`~~ — DONE in v4-04-01
 2. ~~Before v4-06: Verify `requestStore` step enum values + `POST /api/v1/posts/analyze` response shape~~ — DONE in v4-06-01
-3. Before v4-07: Verify `authStore` user/session type + auth-conditional rendering patterns
+3. ~~Before v4-07: Verify `authStore` user/session type + auth-conditional rendering patterns~~ — DONE in v4-07-01
 
 ### Blockers/Concerns
 
@@ -112,11 +117,11 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-19T14:25Z
-Stopped at: Completed v4-06-01-PLAN.md (SCR-CREA-01 Upload, SCR-CREA-02 AI Detect, SCR-CREA-03 Edit/Solution)
+Last session: 2026-02-20T00:22Z
+Stopped at: Completed v4-07-01-PLAN.md (SCR-USER-01 Login, SCR-USER-02 Profile, SCR-USER-03 Earnings)
 Resume file: None
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-19 after v4-06-01 completion*
+*Last updated: 2026-02-20 after v4-07-01 completion*
