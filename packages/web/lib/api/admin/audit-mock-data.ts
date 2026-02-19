@@ -199,7 +199,11 @@ function generateItemsForRequest(requestIndex: number): AuditItem[] {
  * Spreads 25 requests over the last 14 days (most recent index = most recent date).
  * Index 0 is most recent; index 24 is oldest.
  */
-function timestampForIndex(index: number): { requestedAt: string; completedAt: string | null; status: AuditStatus } {
+function timestampForIndex(index: number): {
+  requestedAt: string;
+  completedAt: string | null;
+  status: AuditStatus;
+} {
   const status = statusForIndex(index);
 
   // Index 0 = today, index 24 = 14 days ago (spread across 14 days)
@@ -219,7 +223,9 @@ function timestampForIndex(index: number): { requestedAt: string; completedAt: s
   if (status === "completed" || status === "modified" || status === "error") {
     // Completion is 5-60 minutes after request (deterministic)
     const processingMinutes = 5 + deterministicInt(`audit-${index}:proc`, 56);
-    const completedDate = new Date(requestedDate.getTime() + processingMinutes * 60 * 1000);
+    const completedDate = new Date(
+      requestedDate.getTime() + processingMinutes * 60 * 1000
+    );
     completedAt = completedDate.toISOString();
   }
 
@@ -268,7 +274,10 @@ export function generateAuditRequests(): AuditRequest[] {
     };
 
     if (status === "error") {
-      const errIndex = deterministicInt(`audit-${i}:err`, ERROR_MESSAGES.length);
+      const errIndex = deterministicInt(
+        `audit-${i}:err`,
+        ERROR_MESSAGES.length
+      );
       request.errorMessage = ERROR_MESSAGES[errIndex];
     }
 

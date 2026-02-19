@@ -66,7 +66,8 @@ export async function fetchAuditList(
 
   // Sort by requestedAt descending (most recent first)
   requests = [...requests].sort(
-    (a, b) => new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime()
+    (a, b) =>
+      new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime()
   );
 
   const total = requests.length;
