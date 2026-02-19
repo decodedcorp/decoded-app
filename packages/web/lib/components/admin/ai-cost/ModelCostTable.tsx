@@ -138,13 +138,17 @@ export function ModelCostTableSkeleton() {
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-gray-200 dark:border-gray-700">
-            {["Model", "Calls", "Input Tokens", "Output Tokens", "Est. Cost"].map(
-              (col) => (
-                <th key={col} className="pb-2.5">
-                  <div className="h-3 w-16 animate-pulse bg-gray-200 dark:bg-gray-800 rounded" />
-                </th>
-              )
-            )}
+            {[
+              "Model",
+              "Calls",
+              "Input Tokens",
+              "Output Tokens",
+              "Est. Cost",
+            ].map((col) => (
+              <th key={col} className="pb-2.5">
+                <div className="h-3 w-16 animate-pulse bg-gray-200 dark:bg-gray-800 rounded" />
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody>
