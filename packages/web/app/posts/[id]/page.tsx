@@ -6,7 +6,7 @@ type Props = {
 
 /**
  * Full page route for /posts/[id]
- * Used when directly accessing URL or refreshing page
+ * Uses ImageDetailPage (image-centric UI)
  */
 export default async function PostDetailPageRoute({ params }: Props) {
   const { id } = await params;

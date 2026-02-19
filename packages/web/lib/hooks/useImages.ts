@@ -17,6 +17,8 @@ import {
   fetchUnifiedImages,
   fetchRelatedImagesByAccount,
 } from "@decoded/shared/supabase/queries/images";
+import { fetchPostDetail } from "@/lib/api/posts";
+import { postDetailToImageDetail } from "@/lib/api/adapters/postDetailToImageDetail";
 import type {
   CategoryFilter,
   ImagePage,
@@ -39,7 +41,22 @@ export function useLatestImages(limit = 20) {
 }
 
 /**
- * React Query hook for fetching a single image by ID
+ * React Query hook for fetching post detail via 백엔드 API
+ * Explore/Feed는 post ID를 /posts/[id]로 전달하므로 API 사용
+ */
+export function usePostDetailForImage(postId: string) {
+  return useQuery<ImageDetail | null>({
+    queryKey: ["posts", "detail", "image-view", postId],
+    queryFn: async () => {
+      const post = await fetchPostDetail(postId);
+      return postDetailToImageDetail(post, postId);
+    },
+    enabled: !!postId,
+  });
+}
+
+/**
+ * @deprecated Supabase 직접 조회. usePostDetailForImage(백엔드 API) 사용 권장
  */
 export function useImageById(id: string) {
   return useQuery<ImageDetail | null>({
