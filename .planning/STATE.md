@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 
 ## Current Position
 
-Phase: v4-05 Screen Specs: Discovery — Complete
-Plan: 2/2 plans complete
-Status: v4-05-02 complete — all 4 Discovery screen specs written (SCR-DISC-01 through SCR-DISC-04)
-Last activity: 2026-02-19 — Completed v4-05-02-PLAN.md (SCR-DISC-03 Feed and SCR-DISC-04 Explore)
+Phase: v4-06 Screen Specs: Creation-AI — In progress
+Plan: 1/1 plans complete
+Status: v4-06-01 complete — all 3 Creation-AI screen specs written (SCR-CREA-01 through SCR-CREA-03)
+Last activity: 2026-02-19 — Completed v4-06-01-PLAN.md (SCR-CREA-01 Upload, SCR-CREA-02 AI Detect, SCR-CREA-03 Edit/Solution)
 
-Progress: v4.0 [█████░░░░░] 5/9 phases (9/13 plans complete)
+Progress: v4.0 [██████░░░░] 6/9 phases (10/13 plans complete)
 
 ## Milestone Summary
 
@@ -25,7 +25,7 @@ Progress: v4.0 [█████░░░░░] 5/9 phases (9/13 plans complete)
 | v2.0 Design Overhaul | 9 | 26 | Shipped | 2026-02-05 |
 | v2.1 Design System | 6 | 14 | Shipped | 2026-02-06 |
 | v3.0 Admin Panel | 6 | 12 | Shipped | 2026-02-19 |
-| **v4.0 Spec Overhaul** | **9** | **9/13** | **In progress** | - |
+| **v4.0 Spec Overhaul** | **9** | **10/13** | **In progress** | - |
 
 ## v4.0 Roadmap
 
@@ -36,7 +36,7 @@ Progress: v4.0 [█████░░░░░] 5/9 phases (9/13 plans complete)
 | v4-03 | Flow Documents | FLOW-01~05 | 1/1 | Complete |
 | v4-04 | Screen Specs: Detail View | DETL-01~04 | 2/2 | Complete |
 | v4-05 | Screen Specs: Discovery | DISC-01~04 | 2/2 | Complete |
-| v4-06 | Screen Specs: Creation-AI | CREA-01~03 | 0/1 | Not started |
+| v4-06 | Screen Specs: Creation-AI | CREA-01~03 | 1/1 | Complete |
 | v4-07 | Screen Specs: User System | USER-01~03 | 0/1 | Not started |
 | v4-08 | Next Version Draft | NEXT-01~04 | 0/1 | Not started |
 | v4-09 | Cleanup | CLEN-01 | 0/1 | Not started |
@@ -88,6 +88,13 @@ Key decisions affecting v4.0 work:
 - v4-05-02: ThiingsGrid is a physics-based spiral canvas (not CSS columns) — cell sizes are fixed px (mobile 180x225, desktop 400x500), not responsive columns
 - v4-05-02: FeedTabs (Following/ForYou/Trending) are UI-only — all tabs fetch identical data (sort:recent); per-tab filtering is NOT-IMPL
 - v4-05-02: ExploreSortControls (Trending/Recent/Popular) is UI-only — sort selection not passed to useInfinitePosts
+- v4-06-01: /request/upload is a COMBINED single-page flow (upload + spot tap + solution + submit) — does NOT navigate to /request/detect
+- v4-06-01: /request/detect is a separate alternative path, not triggered from upload page in current code
+- v4-06-01: autoUpload=false and autoAnalyze=false on upload page — user manually taps spots on local preview (no server upload until Post tapped)
+- v4-06-01: media_source is hardcoded to {type:"youtube",title:"User Upload"} — DetailsStep/ArtistInput/ContextSelector/MediaSourceInput exist on filesystem but are NOT rendered
+- v4-06-01: isSubmitting is local useState in upload page component, NOT stored in requestStore
+- v4-06-01: DetectionToolbar (Select/Draw/Zoom) is UI-ONLY — tool state not connected to any behavior
+- v4-06-01: COMPRESSION_CONFIG: maxSizeMB=2, maxWidthOrHeight=1920, initialQuality=0.85, useWebWorker=true
 
 ### Pending Todos
 
@@ -96,7 +103,7 @@ Key decisions affecting v4.0 work:
 
 **For v4.0 execution:**
 1. ~~Before v4-04: Verify `transitionStore` shape + `useFlipTransition.ts`~~ — DONE in v4-04-01
-2. Before v4-06: Verify `requestStore` step enum values + `POST /api/v1/posts/analyze` response shape
+2. ~~Before v4-06: Verify `requestStore` step enum values + `POST /api/v1/posts/analyze` response shape~~ — DONE in v4-06-01
 3. Before v4-07: Verify `authStore` user/session type + auth-conditional rendering patterns
 
 ### Blockers/Concerns
@@ -105,11 +112,11 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-19T14:02Z
-Stopped at: Completed v4-05-02-PLAN.md (SCR-DISC-03 Feed and SCR-DISC-04 Explore screen specs)
+Last session: 2026-02-19T14:25Z
+Stopped at: Completed v4-06-01-PLAN.md (SCR-CREA-01 Upload, SCR-CREA-02 AI Detect, SCR-CREA-03 Edit/Solution)
 Resume file: None
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-19 after v4-05-02 completion*
+*Last updated: 2026-02-19 after v4-06-01 completion*
