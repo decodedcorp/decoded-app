@@ -58,10 +58,10 @@ Requirements for Spec Overhaul — AI-Ready Documentation. 코드 변경 없이 
 
 ### Next Version Draft
 
-- [ ] **NEXT-01**: [DRAFT] 새 서비스 아이덴티티 문서 (PRD 요약, 타겟 전략, 톤앤매너)
-- [ ] **NEXT-02**: [DRAFT] VTON 기능 spec 초안 (Phase 1~3 기술 아키텍처)
-- [ ] **NEXT-03**: [DRAFT] 동적 UI 시나리오 spec 초안 (5단계 인터랙션 상세)
-- [ ] **NEXT-04**: [DRAFT] 커머스 브릿지 spec 초안 (Visual Search + 제휴 쇼핑몰 연동)
+- [x] **NEXT-01**: [DRAFT] 새 서비스 아이덴티티 문서 (PRD 요약, 타겟 전략, 톤앤매너)
+- [x] **NEXT-02**: [DRAFT] VTON 기능 spec 초안 (Phase 1~3 기술 아키텍처)
+- [x] **NEXT-03**: [DRAFT] 동적 UI 시나리오 spec 초안 (5단계 인터랙션 상세)
+- [x] **NEXT-04**: [DRAFT] 커머스 브릿지 spec 초안 (Visual Search + 제휴 쇼핑몰 연동)
 
 ### Cleanup
 
@@ -122,10 +122,10 @@ Requirements for Spec Overhaul — AI-Ready Documentation. 코드 변경 없이 
 | USER-01 | v4-07 | Complete |
 | USER-02 | v4-07 | Complete |
 | USER-03 | v4-07 | Complete |
-| NEXT-01 | v4-08 | Pending |
-| NEXT-02 | v4-08 | Pending |
-| NEXT-03 | v4-08 | Pending |
-| NEXT-04 | v4-08 | Pending |
+| NEXT-01 | v4-08 | Complete |
+| NEXT-02 | v4-08 | Complete |
+| NEXT-03 | v4-08 | Complete |
+| NEXT-04 | v4-08 | Complete |
 | CLEN-01 | v4-09 | Pending |
 
 **Coverage:**
