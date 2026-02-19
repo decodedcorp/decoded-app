@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 
 ## Current Position
 
-Phase: v4-02 Shared Foundation — In progress
-Plan: 1/2 plans complete
-Status: v4-02-01 complete — 3 shared reference docs created
-Last activity: 2026-02-19 — Completed v4-02-01-PLAN.md (component-registry, data-models, api-contracts)
+Phase: v4-02 Shared Foundation — Complete
+Plan: 2/2 plans complete
+Status: v4-02-02 complete — shared foundation fully established (5 _shared/ files + CMN updates)
+Last activity: 2026-02-19 — Completed v4-02-02-PLAN.md (store-map, injection-guide, CMN-01/02/03)
 
-Progress: v4.0 [█░░░░░░░░░] 1/9 phases (3/13 plans complete)
+Progress: v4.0 [██░░░░░░░░] 2/9 phases (5/13 plans complete)
 
 ## Milestone Summary
 
@@ -25,14 +25,14 @@ Progress: v4.0 [█░░░░░░░░░] 1/9 phases (3/13 plans complete)
 | v2.0 Design Overhaul | 9 | 26 | Shipped | 2026-02-05 |
 | v2.1 Design System | 6 | 14 | Shipped | 2026-02-06 |
 | v3.0 Admin Panel | 6 | 12 | Shipped | 2026-02-19 |
-| **v4.0 Spec Overhaul** | **9** | **2/13** | **In progress** | - |
+| **v4.0 Spec Overhaul** | **9** | **5/13** | **In progress** | - |
 
 ## v4.0 Roadmap
 
 | Phase | Goal | Requirements | Plans | Status |
 |-------|------|--------------|-------|--------|
 | v4-01 | Archive & Foundation | ARCH-01~04 | 2/2 | Complete |
-| v4-02 | Shared Foundation | SHRD-01~05 | 1/2 | In progress |
+| v4-02 | Shared Foundation | SHRD-01~05 | 2/2 | Complete |
 | v4-03 | Flow Documents | FLOW-01~05 | 0/1 | Not started |
 | v4-04 | Screen Specs: Detail View | DETL-01~04 | 0/2 | Not started |
 | v4-05 | Screen Specs: Discovery | DISC-01~04 | 0/2 | Not started |
@@ -64,6 +64,9 @@ Key decisions affecting v4.0 work:
 - v4-02-01: component-registry uses compact prop tables (not TS interface copies); data-models uses TypeScript code blocks as primary format — these formats are locked
 - v4-02-01: API vs DB type differences documented explicitly (spots.subcategory_id→API category_id abstraction; SolutionRow has more fields than API Solution)
 - v4-02-01: debug-env route exists at /api/v1/debug-env but is not env-guarded and is not user-facing
+- v4-02-02: searchStore and filterStore documented from packages/shared/stores/ (source of truth); web stubs are re-export only
+- v4-02-02: CMN specs fully rewritten (not appended) to comply with v4.0 spec rules — 693 lines removed across 3 files
+- v4-02-02: injection-guide.md is single source of truth for AI context loading; README links to it (not duplicated)
 
 ### Pending Todos
 
@@ -71,7 +74,7 @@ Key decisions affecting v4.0 work:
 1. Quick task: Fix images page raw JSON error exposure (API error handling - major UX/security)
 
 **For v4.0 execution:**
-1. Before v4-04: Verify `transitionStore` shape + `useFlipTransition.ts` (FLIP animation pattern underdocumented)
+1. Before v4-04: Verify `transitionStore` shape + `useFlipTransition.ts` (FLIP animation pattern — state shape documented in store-map; integration details remain)
 2. Before v4-06: Verify `requestStore` step enum values + `POST /api/v1/posts/analyze` response shape
 3. Before v4-07: Verify `authStore` user/session type + auth-conditional rendering patterns
 
@@ -81,11 +84,11 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-19T11:41:36Z
-Stopped at: Completed v4-02-01-PLAN.md (component-registry, data-models, api-contracts)
+Last session: 2026-02-19T12:09:47Z
+Stopped at: Completed v4-02-02-PLAN.md (store-map, injection-guide, CMN-01/02/03)
 Resume file: None
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-19 after v4-02-01 completion*
+*Last updated: 2026-02-19 after v4-02-02 completion*
