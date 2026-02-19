@@ -62,13 +62,6 @@ function deterministicInt(seed: string, modulo: number): number {
   return hash % modulo;
 }
 
-/**
- * Returns a float in [0, 1) derived deterministically from the seed.
- */
-function deterministicFloat(seed: string): number {
-  return deterministicInt(seed, 1_000_000) / 1_000_000;
-}
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /**

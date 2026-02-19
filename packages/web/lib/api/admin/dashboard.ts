@@ -78,7 +78,9 @@ export async function fetchDashboardStats(): Promise<KPIStats> {
  *
  * @param days - Number of days to return (default 30, max 90)
  */
-export async function fetchChartData(days: number = 30): Promise<DailyMetric[]> {
+export async function fetchChartData(
+  days: number = 30
+): Promise<DailyMetric[]> {
   const clampedDays = Math.min(Math.max(1, days), 90);
   return generateDailyMetrics(clampedDays);
 }
