@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 
 ## Current Position
 
-Phase: v4-05 Screen Specs: Discovery — In progress
-Plan: 1/2 plans complete
-Status: v4-05-01 complete — SCR-DISC-01 (Home) and SCR-DISC-02 (Search) screen specs written
-Last activity: 2026-02-19 — Completed v4-05-01-PLAN.md (SCR-DISC-01 and SCR-DISC-02)
+Phase: v4-05 Screen Specs: Discovery — Complete
+Plan: 2/2 plans complete
+Status: v4-05-02 complete — all 4 Discovery screen specs written (SCR-DISC-01 through SCR-DISC-04)
+Last activity: 2026-02-19 — Completed v4-05-02-PLAN.md (SCR-DISC-03 Feed and SCR-DISC-04 Explore)
 
-Progress: v4.0 [████░░░░░░] 4.5/9 phases (8/13 plans complete)
+Progress: v4.0 [█████░░░░░] 5/9 phases (9/13 plans complete)
 
 ## Milestone Summary
 
@@ -25,7 +25,7 @@ Progress: v4.0 [████░░░░░░] 4.5/9 phases (8/13 plans complet
 | v2.0 Design Overhaul | 9 | 26 | Shipped | 2026-02-05 |
 | v2.1 Design System | 6 | 14 | Shipped | 2026-02-06 |
 | v3.0 Admin Panel | 6 | 12 | Shipped | 2026-02-19 |
-| **v4.0 Spec Overhaul** | **9** | **7/13** | **In progress** | - |
+| **v4.0 Spec Overhaul** | **9** | **9/13** | **In progress** | - |
 
 ## v4.0 Roadmap
 
@@ -35,7 +35,7 @@ Progress: v4.0 [████░░░░░░] 4.5/9 phases (8/13 plans complet
 | v4-02 | Shared Foundation | SHRD-01~05 | 2/2 | Complete |
 | v4-03 | Flow Documents | FLOW-01~05 | 1/1 | Complete |
 | v4-04 | Screen Specs: Detail View | DETL-01~04 | 2/2 | Complete |
-| v4-05 | Screen Specs: Discovery | DISC-01~04 | 1/2 | In progress |
+| v4-05 | Screen Specs: Discovery | DISC-01~04 | 2/2 | Complete |
 | v4-06 | Screen Specs: Creation-AI | CREA-01~03 | 0/1 | Not started |
 | v4-07 | Screen Specs: User System | USER-01~03 | 0/1 | Not started |
 | v4-08 | Next Version Draft | NEXT-01~04 | 0/1 | Not started |
@@ -82,6 +82,12 @@ Key decisions affecting v4.0 work:
 - v4-05-01: HomeClient.tsx at app/HomeClient.tsx is a legacy vertical-feed component NOT used by the current home page; HomeAnimatedContent (lib/components/main/HomeAnimatedContent.tsx) is the actual client entry point for the SSR home page
 - v4-05-01: Search is a full-screen page route (/search), not a modal — SearchPageClient renders fixed inset-0 z-50 within the page
 - v4-05-01: Search tabs are All/People/Media/Items (actual implementation); useGroupedSearch enabled guard is debouncedQuery.length >= 2
+- v4-05-02: FeedCard in components/ (not DS FeedCardBase) is the actual feed card — wraps DS FeedCard and adds GSAP FLIP + social metadata (useSpots, AccountAvatar, FollowButton)
+- v4-05-02: ExploreClient does NOT render ExploreHeader or CategoryFilter — those components exist but are not rendered by the current page orchestrator
+- v4-05-02: hierarchicalFilterStore selections (category/media/cast/context) are NOT passed to useInfinitePosts — ExploreClient reads only filterStore.activeFilter; the two filter systems are disconnected
+- v4-05-02: ThiingsGrid is a physics-based spiral canvas (not CSS columns) — cell sizes are fixed px (mobile 180x225, desktop 400x500), not responsive columns
+- v4-05-02: FeedTabs (Following/ForYou/Trending) are UI-only — all tabs fetch identical data (sort:recent); per-tab filtering is NOT-IMPL
+- v4-05-02: ExploreSortControls (Trending/Recent/Popular) is UI-only — sort selection not passed to useInfinitePosts
 
 ### Pending Todos
 
@@ -99,11 +105,11 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-19T13:51Z
-Stopped at: Completed v4-05-01-PLAN.md (SCR-DISC-01 and SCR-DISC-02 screen specs)
+Last session: 2026-02-19T14:02Z
+Stopped at: Completed v4-05-02-PLAN.md (SCR-DISC-03 Feed and SCR-DISC-04 Explore screen specs)
 Resume file: None
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-19 after v4-05-01 completion*
+*Last updated: 2026-02-19 after v4-05-02 completion*
