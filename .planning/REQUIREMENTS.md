@@ -24,11 +24,11 @@ Requirements for Spec Overhaul — AI-Ready Documentation. 코드 변경 없이 
 
 ### Flow Documents
 
-- [ ] **FLOW-01**: 콘텐츠 탐색 플로우 (홈 → 검색/필터 → 피드 → 상세)
-- [ ] **FLOW-02**: 콘텐츠 상세 플로우 (포스트/이미지 상세 → 스팟 → 아이템 → 쇼핑)
-- [ ] **FLOW-03**: 콘텐츠 생성 플로우 (업로드 → AI 감지 → 스팟 생성 → 솔루션 입력)
-- [ ] **FLOW-04**: 사용자 인증 플로우 (로그인 → 프로필 → 활동 → 수익)
-- [ ] **FLOW-05**: [DRAFT] VTON 피팅 플로우 (Pick&Drop → Chic Blur → Blueprint → Magic Flip → Morphing Loop)
+- [x] **FLOW-01**: 콘텐츠 탐색 플로우 (홈 → 검색/필터 → 피드 → 상세)
+- [x] **FLOW-02**: 콘텐츠 상세 플로우 (포스트/이미지 상세 → 스팟 → 아이템 → 쇼핑)
+- [x] **FLOW-03**: 콘텐츠 생성 플로우 (업로드 → AI 감지 → 스팟 생성 → 솔루션 입력)
+- [x] **FLOW-04**: 사용자 인증 플로우 (로그인 → 프로필 → 활동 → 수익)
+- [x] **FLOW-05**: [DRAFT] VTON 피팅 플로우 (Pick&Drop → Chic Blur → Blueprint → Magic Flip → Morphing Loop)
 
 ### Screen Specs — Detail View
 
@@ -103,11 +103,11 @@ Requirements for Spec Overhaul — AI-Ready Documentation. 코드 변경 없이 
 | SHRD-03 | v4-02 | Complete |
 | SHRD-04 | v4-02 | Complete |
 | SHRD-05 | v4-02 | Complete |
-| FLOW-01 | v4-03 | Pending |
-| FLOW-02 | v4-03 | Pending |
-| FLOW-03 | v4-03 | Pending |
-| FLOW-04 | v4-03 | Pending |
-| FLOW-05 | v4-03 | Pending |
+| FLOW-01 | v4-03 | Complete |
+| FLOW-02 | v4-03 | Complete |
+| FLOW-03 | v4-03 | Complete |
+| FLOW-04 | v4-03 | Complete |
+| FLOW-05 | v4-03 | Complete |
 | DETL-01 | v4-04 | Pending |
 | DETL-02 | v4-04 | Pending |
 | DETL-03 | v4-04 | Pending |

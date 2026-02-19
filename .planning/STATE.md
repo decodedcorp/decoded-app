@@ -25,7 +25,7 @@ Progress: v4.0 [███░░░░░░░] 3/9 phases (5/13 plans complete)
 | v2.0 Design Overhaul | 9 | 26 | Shipped | 2026-02-05 |
 | v2.1 Design System | 6 | 14 | Shipped | 2026-02-06 |
 | v3.0 Admin Panel | 6 | 12 | Shipped | 2026-02-19 |
-| **v4.0 Spec Overhaul** | **9** | **4/13** | **In progress** | - |
+| **v4.0 Spec Overhaul** | **9** | **5/13** | **In progress** | - |
 
 ## v4.0 Roadmap
 
