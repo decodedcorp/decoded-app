@@ -180,6 +180,23 @@ All spec files with their purpose and location:
 |--------|------|-------|
 | FLW-* | `specs/flows/FLW-*.md` | Request creation, search, auth flows |
 
+**Future direction drafts** (DRAFT — do not inject for implementation tasks, see guardrail above):
+
+| Prefix | Path | Content |
+|--------|------|---------|
+| NEXT-* | `specs/_next/NEXT-*.md` | Service identity, VTON, dynamic UI, commerce bridge — pending approval |
+
+---
+
+## DRAFT Document Guardrail — Do Not Inject NEXT-* Files
+
+Files in `specs/_next/` (NEXT-01 through NEXT-04) are **future direction drafts**, not implementation specs. They are pending service direction approval and have no corresponding codebase implementation.
+
+**Rules:**
+- **Do NOT load NEXT-* files** when working on current codebase implementation tasks.
+- **Do NOT treat NEXT-* content as requirements** — they are direction memos, not approved specs.
+- **Only load NEXT-* files** when explicitly discussing future service direction, or when a NEXT-* item has been formally approved and promoted to a real spec (SCR-*, FLW-*, etc.).
+
 ---
 
 ## Loading Priority Rules
