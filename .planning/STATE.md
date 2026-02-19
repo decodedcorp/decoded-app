@@ -9,10 +9,10 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 
 ## Current Position
 
-Phase: 06-pipeline-fix-auth-consistency — Complete
-Plan: 1/1 plans complete
-Status: Gap closure complete — v3.0 milestone fully clean; ready to begin v4.0
-Last activity: 2026-02-19 — Completed 06-01-PLAN.md (pipeline fix + auth consistency)
+Phase: v4-01 Archive & Foundation — Not started
+Plan: 0/2 plans
+Status: v3.0 milestone archived; ready to begin v4.0
+Last activity: 2026-02-19 — v3.0 milestone completion
 
 Progress: v4.0 [░░░░░░░░░░] 0/9 phases (0/13 plans complete)
 
@@ -24,7 +24,7 @@ Progress: v4.0 [░░░░░░░░░░] 0/9 phases (0/13 plans complete)
 | v1.1 API Integration | 5 | 13 | Shipped | 2026-01-29 |
 | v2.0 Design Overhaul | 9 | 26 | Shipped | 2026-02-05 |
 | v2.1 Design System | 6 | 14 | Shipped | 2026-02-06 |
-| **v3.0 Admin Panel** | **6** | **12** | **Shipped** | 2026-02-19 |
+| v3.0 Admin Panel | 6 | 12 | Shipped | 2026-02-19 |
 | **v4.0 Spec Overhaul** | **9** | **0/13** | **In progress** | - |
 
 ## v4.0 Roadmap
@@ -46,10 +46,6 @@ Progress: v4.0 [░░░░░░░░░░] 0/9 phases (0/13 plans complete)
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
-
-**From 06-01 (Pipeline Fix + Auth Consistency):**
-- Admin API routes must enforce auth in all environments (no NODE_ENV conditional) — middleware/layout dev bypasses are intentional (page-level) and remain
-- API detail routes return bare entity objects — no `{ data: }` wrapper — to match TypeScript generic on hook consumers
 
 Key decisions affecting v4.0 work:
 
@@ -78,10 +74,10 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 06-01-PLAN.md — pipeline fix + auth consistency (gap closure)
+Stopped at: v3.0 milestone archived; ready for v4.0
 Resume file: None
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-19 after 06-01 gap closure (pipeline fix + auth consistency)*
+*Last updated: 2026-02-19 after v3.0 milestone completion*

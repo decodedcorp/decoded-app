@@ -1,5 +1,31 @@
 # Project Milestones: decoded-app
 
+## v3.0 Admin Panel — AI Management (Shipped: 2026-02-19)
+
+**Delivered:** AI 분석 파이프라인을 모니터링하고 결과를 감사할 수 있는 관리자 패널 — 대시보드, AI 감사, 비용 모니터링, 파이프라인 로그, 서버 로그 5개 섹션 구축
+
+**Phases completed:** v3-01 to v3-06 (12 plans total)
+
+**Key accomplishments:**
+- Admin route protection with Supabase middleware + is_admin defense-in-depth
+- Dashboard with 5 KPI cards, Recharts traffic chart, today summary (real + mock data)
+- AI Audit with paginated list, hotspot detail modal, inline editing
+- AI Cost Monitoring with token charts, API call stats, model cost breakdown
+- Pipeline execution viewer with accordion step timeline and retry
+- Server log viewer with filtering, URL-synced pagination, terminal streaming
+
+**Stats:**
+- 97 files created/modified
+- +14,605 lines of TypeScript/React
+- 6 phases, 12 plans, ~38 tasks
+- 1 day (2026-02-19, ~8 hours)
+
+**Git range:** `1f1f9ff` → `310ae95` (67 commits)
+
+**What's next:** v4.0 Spec Overhaul — AI-Ready Documentation
+
+---
+
 ## v2.1 Design System Expansion (Shipped: 2026-02-06)
 
 **Delivered:** decoded.pen 디자인 시스템의 23개 추가 컴포넌트 구현 및 Visual QA 자동화 인프라 구축

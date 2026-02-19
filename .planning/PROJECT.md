@@ -8,6 +8,7 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 **v1.1 (2026-01-29 shipped):** 전체 API 연결 — 백엔드 API를 프론트엔드에 연결하여 실제 데이터로 동작
 **v2.0 (2026-02-05 shipped):** 디자인 오버홀 — decoded.pen 디자인을 코드로 구현
 **v2.1 (2026-02-06 shipped):** 디자인 시스템 확장 — 23개 추가 컴포넌트 + Visual QA 자동화
+**v3.0 (2026-02-19 shipped):** Admin Panel — AI Management — 대시보드, AI 감사, 비용 모니터링, 파이프라인/서버 로그 5개 섹션
 
 ## Current Milestone: v4.0 Spec Overhaul — AI-Ready Documentation
 
@@ -87,11 +88,16 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 - LoadingSpinner, SkeletonCard, BottomSheet — v2.1
 - Visual QA with Playwright — v2.1
 
-### Active
+**v3.0 Admin Panel:**
+- ✓ Admin route protection (middleware + is_admin) — v3.0
+- ✓ Admin layout (dark sidebar, 5 nav links) — v3.0
+- ✓ Dashboard (KPI cards, traffic chart, today summary) — v3.0
+- ✓ AI Audit (list, detail modal, inline editing, status filter) — v3.0
+- ✓ AI Cost Monitoring (token charts, API calls, model cost table) — v3.0
+- ✓ Pipeline Logs (accordion detail, retry, status filter) — v3.0
+- ✓ Server Logs (log table, filters, terminal streaming) — v3.0
 
-**v3.0 Admin Panel — AI Management (병렬 진행):**
-- [ ] 요청 파이프라인 로그 뷰어
-- [ ] 서버 로그/에러 모니터링
+### Active
 
 **v4.0 Spec Overhaul — AI-Ready Documentation:**
 - [ ] 기존 spec 아카이빙 (specs/v2.1.0/)
@@ -117,6 +123,7 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 - **v1.1 shipped**: 2026-01-29
 - **v2.0 shipped**: 2026-02-05
 - **v2.1 shipped**: 2026-02-06
+- **v3.0 shipped**: 2026-02-19
 - **코드베이스**: Next.js 16 + React 18 + TypeScript 5.9 + Supabase
 - **백엔드 API**: https://dev.decoded.style (OpenAPI spec 완비)
 
@@ -138,9 +145,15 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 | Playwright Visual QA | 디자인 일관성 자동 검증 | Good |
 | Tech debt 수용 (v2.1) | 컴포넌트 생성이 주 목표, 통합은 점진적 | Pending |
 
+| Admin layout separate from main app | 독립 레이아웃 — 공유 header/footer 없음 | ✓ Good |
+| Defense-in-depth admin auth | Middleware + layout server-side double-check | ✓ Good |
+| djb2 deterministic mock data | 새로고침 시 flickering 방지 | ✓ Good |
+| Admin API: bare entity response | No { data: } wrapper — hook generic 매칭 | ✓ Good |
+| Admin API: no NODE_ENV bypass | 모든 환경에서 인증 강제 | ✓ Good |
+| Recharts for admin charts | AreaChart, BarChart 시각화 | ✓ Good |
 | Supabase MCP 연결 | API 탐색 및 타입 생성 용이 | — Pending |
 | Pencil MCP로 디자인 → 코드 | decoded.pen 디자인 시스템 구현 | — Pending |
 
 ---
 
-*Last updated: 2026-02-19 after v4.0 milestone start*
+*Last updated: 2026-02-19 after v3.0 milestone*
