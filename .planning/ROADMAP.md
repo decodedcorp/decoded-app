@@ -268,12 +268,12 @@ Plans:
 **Success Criteria:**
 1. 기존 번들별 `spec.md` 파일들이 삭제되거나 `_archive/v2.1.0/` 로 이동되어 있으며 현재 `specs/` 경로에는 존재하지 않는다
 2. `specs/README.md` 가 새 구조만 가리키며 구 번들 파일에 대한 참조가 없다
-3. `specs/` 루트의 파일 목록이 `_archive/`, `_shared/`, `_next/`, `flows/`, `screens/`, `README.md` 만으로 구성된다
+3. `specs/` 루트의 파일 목록이 `_archive/`, `_shared/`, `_next/`, `admin/`, `flows/`, `screens/`, `README.md` 만으로 구성된다
 
 **Plans:** 1 plan
 
 Plans:
-- [ ] v4-09-01-PLAN.md — Retire old bundle spec.md files, verify new structure, update all indexes
+- [ ] v4-09-01-PLAN.md — Relocate shared/ content to _shared/, delete 8 old bundle dirs, update stale references, verify final structure
 
 **Status:** [ ] Not started
 
