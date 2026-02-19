@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 
 ## Current Position
 
-Phase: v4-04 Screen Specs: Detail View — In progress
-Plan: 1/2 plans complete
-Status: v4-04-01 complete — SCR-VIEW-01 (post detail) and SCR-VIEW-02 (spot/hotspot) specs written
-Last activity: 2026-02-19 — Completed v4-04-01-PLAN.md (SCR-VIEW-01 and SCR-VIEW-02)
+Phase: v4-04 Screen Specs: Detail View — Complete
+Plan: 2/2 plans complete
+Status: v4-04-02 complete — all 4 Detail View screen specs written (SCR-VIEW-01 through SCR-VIEW-04)
+Last activity: 2026-02-19 — Completed v4-04-02-PLAN.md (SCR-VIEW-03 and SCR-VIEW-04)
 
-Progress: v4.0 [███░░░░░░░] 3.5/9 phases (6/13 plans complete)
+Progress: v4.0 [████░░░░░░] 4/9 phases (7/13 plans complete)
 
 ## Milestone Summary
 
@@ -25,7 +25,7 @@ Progress: v4.0 [███░░░░░░░] 3.5/9 phases (6/13 plans complet
 | v2.0 Design Overhaul | 9 | 26 | Shipped | 2026-02-05 |
 | v2.1 Design System | 6 | 14 | Shipped | 2026-02-06 |
 | v3.0 Admin Panel | 6 | 12 | Shipped | 2026-02-19 |
-| **v4.0 Spec Overhaul** | **9** | **5/13** | **In progress** | - |
+| **v4.0 Spec Overhaul** | **9** | **7/13** | **In progress** | - |
 
 ## v4.0 Roadmap
 
@@ -34,7 +34,7 @@ Progress: v4.0 [███░░░░░░░] 3.5/9 phases (6/13 plans complet
 | v4-01 | Archive & Foundation | ARCH-01~04 | 2/2 | Complete |
 | v4-02 | Shared Foundation | SHRD-01~05 | 2/2 | Complete |
 | v4-03 | Flow Documents | FLOW-01~05 | 1/1 | Complete |
-| v4-04 | Screen Specs: Detail View | DETL-01~04 | 1/2 | In progress |
+| v4-04 | Screen Specs: Detail View | DETL-01~04 | 2/2 | Complete |
 | v4-05 | Screen Specs: Discovery | DISC-01~04 | 0/2 | Not started |
 | v4-06 | Screen Specs: Creation-AI | CREA-01~03 | 0/1 | Not started |
 | v4-07 | Screen Specs: User System | USER-01~03 | 0/1 | Not started |
@@ -74,6 +74,11 @@ Key decisions affecting v4.0 work:
 - v4-04-01: PostDetailContent uses inline spot dot markers (animate-ping), not DS Hotspot — DS Hotspot is used only in ImageCanvas (legacy image flow); Hotspot→BottomSheet panel for post flow is ⚠️ NOT-IMPL
 - v4-04-01: transitionStore.selectedId tracks the image being FLIP-transitioned (not per-spot selection); per-spot state is local activeIndex in InteractiveShowcase
 - v4-04-01: useSpotCardSync is for request/detect flow only (takes DetectedSpot from requestStore); not used in detail view components
+- v4-04-02: Affiliate URL delivery is pre-stored in SolutionRow.affiliate_url at solution-creation time; useConvertAffiliate hook exists but is NOT called at tap time in current UI — runtime conversion is NOT-IMPL
+- v4-04-02: ItemVoting is a UI-only stub (itemId prop unused, hardcoded counts 24/3, no API persistence); VoteButton/VotingSection components do not exist on filesystem
+- v4-04-02: Related content recommendation is artist-based only (useInfinitePosts artistName filter); no ML/category/tag-based recommendation logic exists
+- v4-04-02: SmartTagsBreadcrumb is purely presentational (tags passed as props, no data fetching, no filtering query triggered on tag tap)
+- v4-04-02: CommentSection lives in shared/ with MOCK_COMMENTS; detail-specific CommentForm/Item/List/Section components confirmed missing
 
 ### Pending Todos
 
@@ -91,11 +96,11 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-19T13:08:17Z
-Stopped at: Completed v4-04-01-PLAN.md (SCR-VIEW-01 and SCR-VIEW-02 screen specs)
+Last session: 2026-02-19T13:00Z (approx)
+Stopped at: Completed v4-04-02-PLAN.md (SCR-VIEW-03 and SCR-VIEW-04 screen specs)
 Resume file: None
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-19 after v4-04-01 completion*
+*Last updated: 2026-02-19 after v4-04-02 completion*
