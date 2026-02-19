@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { X, Maximize2 } from "lucide-react";
 import { gsap } from "gsap";
 import { Flip } from "gsap/Flip";
-import { usePostById } from "@/lib/hooks/usePosts";
-import { PostDetailContent } from "./PostDetailContent";
+import { usePostDetailForImage } from "@/lib/hooks/useImages";
+import { ImageDetailContent } from "./ImageDetailContent";
 import { useTransitionStore } from "@/lib/stores/transitionStore";
 import { ReportErrorButton } from "./ReportErrorButton";
 
@@ -25,7 +25,7 @@ type Props = {
  */
 export function ImageDetailModal({ imageId }: Props) {
   const router = useRouter();
-  const { data: postDetail, isLoading, error } = usePostById(imageId);
+  const { data: image, isLoading, error } = usePostDetailForImage(imageId);
   const { originRect, reset, imgSrc } = useTransitionStore();
 
   // Debug: Log imageId and data state (development only)
@@ -34,14 +34,14 @@ export function ImageDetailModal({ imageId }: Props) {
       if (imageId) {
         console.log("[ImageDetailModal] imageId:", imageId);
       }
-      if (postDetail) {
-        console.log("[ImageDetailModal] post loaded:", postDetail);
+      if (image) {
+        console.log("[ImageDetailModal] image loaded:", image);
       }
     }
     if (error) {
       console.error("[ImageDetailModal] error:", error);
     }
-  }, [imageId, postDetail, error]);
+  }, [imageId, image, error]);
 
   // Scroll Forwarding: Image -> Content
   // This enables scrolling the drawer content by scrolling over the fixed image
@@ -92,7 +92,10 @@ export function ImageDetailModal({ imageId }: Props) {
   const ctxRef = useRef<gsap.Context>();
 
   // Image Source Resolution: Priority -> Store (Immediate) -> Fetched Data
-  const activeImageSrc = imgSrc || postDetail?.post.image_url;
+  const activeImageSrc =
+    imgSrc ||
+    (image as { image_url?: string })?.image_url ||
+    (image as any)?.postImages?.[0]?.post?.image_url;
 
   const handleClose = useCallback(() => {
     if (isClosing || !ctxRef.current) return;
@@ -410,13 +413,13 @@ export function ImageDetailModal({ imageId }: Props) {
       );
     }
 
-    if (!postDetail) {
+    if (!image) {
       return (
         <div className="flex h-full items-center justify-center">
           <div className="text-center px-6">
-            <p className="mb-4 text-lg text-destructive">Post not found</p>
+            <p className="mb-4 text-lg text-destructive">Image not found</p>
             <p className="mb-4 text-xs text-muted-foreground">
-              Post ID: {imageId}
+              Image ID: {imageId}
             </p>
             <button
               onClick={() => handleClose()}
@@ -430,8 +433,8 @@ export function ImageDetailModal({ imageId }: Props) {
     }
 
     return (
-      <PostDetailContent
-        postDetail={postDetail}
+      <ImageDetailContent
+        image={image}
         isModal={true}
         scrollContainerRef={scrollContainerRef as React.RefObject<HTMLElement>}
       />
@@ -592,21 +595,23 @@ export function ImageDetailModal({ imageId }: Props) {
           />
 
           {/* Spot Markers on Floating Image (matching StyleCard white dot style) */}
-          {postDetail?.spots && postDetail.spots.length > 0 && (() => {
+          {image?.items && image.items.length > 0 && (() => {
             const imageRect = getContainedImageRect();
             if (!imageRect) return null;
 
             return (
               <div className="absolute inset-0 pointer-events-none z-20">
-                {postDetail.spots.map((spot) => {
-                  const percentX = parseFloat(spot.position_left);
-                  const percentY = parseFloat(spot.position_top);
-                  const pixelLeft = imageRect.left + (imageRect.width * percentX) / 100;
-                  const pixelTop = imageRect.top + (imageRect.height * percentY) / 100;
+                {image.items.map((item, idx) => {
+                  const center = Array.isArray(item.center) ? item.center : null;
+                  if (!center || center.length < 2) return null;
+                  const fracX = typeof center[0] === "number" ? center[0] : parseFloat(String(center[0])) || 0;
+                  const fracY = typeof center[1] === "number" ? center[1] : parseFloat(String(center[1])) || 0;
+                  const pixelLeft = imageRect.left + imageRect.width * (fracX > 1 ? fracX / 100 : fracX);
+                  const pixelTop = imageRect.top + imageRect.height * (fracY > 1 ? fracY / 100 : fracY);
 
                   return (
                     <div
-                      key={spot.id}
+                      key={item.spot_id ?? idx}
                       className="absolute w-8 h-8 flex items-center justify-center"
                       style={{
                         left: `${pixelLeft}px`,
@@ -644,7 +649,7 @@ export function ImageDetailModal({ imageId }: Props) {
 
         {/* Floating Controls */}
         <div className="absolute top-4 right-4 md:top-auto md:right-auto md:bottom-6 md:left-6 z-20 flex gap-3">
-          <ReportErrorButton postId={postDetail?.post.id} size="md" />
+          <ReportErrorButton postId={image?.id} size="md" />
           <button
             onClick={handleMaximize}
             className="flex h-10 w-10 items-center justify-center rounded-full bg-black/80 text-white backdrop-blur-sm transition-transform hover:scale-105 hover:bg-black active:scale-95 dark:bg-white/80 dark:text-black dark:hover:bg-white"

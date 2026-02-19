@@ -1,7 +1,7 @@
 "use client";
 
-import { usePostById } from "@/lib/hooks/usePosts";
-import { PostDetailContent } from "./PostDetailContent";
+import { usePostDetailForImage } from "@/lib/hooks/useImages";
+import { ImageDetailContent } from "./ImageDetailContent";
 import { LenisProvider } from "./LenisProvider";
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
@@ -22,7 +22,7 @@ type Props = {
  */
 export function ImageDetailPage({ imageId }: Props) {
   const router = useRouter();
-  const { data: postDetail, isLoading, error } = usePostById(imageId);
+  const { data: image, isLoading, error } = usePostDetailForImage(imageId);
   const pageRef = useRef<HTMLDivElement>(null);
   const [showLightbox, setShowLightbox] = useState(false);
 
@@ -90,7 +90,7 @@ export function ImageDetailPage({ imageId }: Props) {
     );
   }
 
-  if (error || !postDetail) {
+  if (error || !image) {
     return (
       <div className="flex min-h-screen items-center justify-center p-4">
         <ErrorState
@@ -119,7 +119,7 @@ export function ImageDetailPage({ imageId }: Props) {
           >
             <Bookmark className="h-5 w-5" />
           </button>
-          <ReportErrorButton postId={postDetail.post.id} size="md" />
+          <ReportErrorButton postId={image.id} size="md" />
           <button
             onClick={handleShare}
             className="flex h-10 w-10 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm transition-transform transition-colors hover:scale-105 hover:bg-background/90"
@@ -136,14 +136,14 @@ export function ImageDetailPage({ imageId }: Props) {
           </button>
         </div>
 
-        <PostDetailContent postDetail={postDetail} />
+        <ImageDetailContent image={image} />
 
         {/* Lightbox */}
         <Lightbox
           isOpen={showLightbox}
           onClose={() => setShowLightbox(false)}
-          imageUrl={postDetail.post.image_url || ""}
-          alt={`Post ${postDetail.post.id}`}
+          imageUrl={(image as { image_url?: string }).image_url || ""}
+          alt={`Post ${image.id}`}
         />
       </div>
     </LenisProvider>

@@ -1,4 +1,4 @@
-import { PostDetailPage } from "@/lib/components/detail/PostDetailPage";
+import { ImageDetailPage } from "@/lib/components/detail/ImageDetailPage";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -10,5 +10,5 @@ type Props = {
  */
 export default async function PostDetailPageRoute({ params }: Props) {
   const { id } = await params;
-  return <PostDetailPage postId={id} />;
+  return <ImageDetailPage imageId={id} />;
 }

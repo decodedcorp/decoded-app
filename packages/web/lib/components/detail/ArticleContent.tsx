@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
 type Props = {
@@ -7,13 +8,25 @@ type Props = {
 };
 
 /**
- * Renders markdown content with magazine-style typography
+ * Renders markdown content (AI summary) with magazine-style typography.
+ * Reveal animation on mount for "AI가 생성 중" 같은 느낌.
  */
 export function ArticleContent({ content }: Props) {
+  const [isRevealed, setIsRevealed] = useState(false);
+
+  useEffect(() => {
+    const t = requestAnimationFrame(() => {
+      requestAnimationFrame(() => setIsRevealed(true));
+    });
+    return () => cancelAnimationFrame(t);
+  }, []);
+
   if (!content) return null;
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12 md:py-16 md:px-8">
+    <div
+      className={`mx-auto max-w-3xl px-4 py-12 md:py-16 md:px-8 overflow-hidden transition-opacity ${isRevealed ? "animate-ai-summary-reveal" : "opacity-0 invisible"}`}
+    >
       <article
         className="prose prose-base md:prose-lg dark:prose-invert prose-headings:font-serif prose-p:font-serif prose-p:leading-loose mx-auto
         [&>p:first-of-type]:first-letter:text-6xl 
