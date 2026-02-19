@@ -9,6 +9,18 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 **v2.0 (2026-02-05 shipped):** 디자인 오버홀 — decoded.pen 디자인을 코드로 구현
 **v2.1 (2026-02-06 shipped):** 디자인 시스템 확장 — 23개 추가 컴포넌트 + Visual QA 자동화
 
+## Current Milestone: v3.0 Admin Panel — AI Management
+
+**Goal:** AI 분석 파이프라인을 모니터링하고 결과를 감사할 수 있는 관리자 패널 구축
+
+**Target features:**
+- 관리자 인증 및 라우트 보호
+- 관리자 대시보드 (통계 개요)
+- AI 분석 결과 감사 (검토/수정)
+- AI 사용량/비용 모니터링
+- 요청 파이프라인 로그 뷰어
+- 서버 로그/에러 모니터링
+
 ## Core Value
 
 **완전한 사용자 경험** — 모든 페이지가 실제 데이터로 동작하며 일관된 디자인 시스템 적용
@@ -74,17 +86,21 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 
 ### Active
 
-**v2.2 (Planning):**
-- [ ] EmptyState, ErrorState design-system components
-- [ ] Component integration (15 orphaned components)
-- [ ] Migrate login page to design-system LoginCard
-- [ ] Migrate request flow to design-system StepIndicator/Hotspot
+**v3.0 Admin Panel — AI Management:**
+- [ ] 관리자 인증 및 라우트 보호
+- [ ] 관리자 대시보드 (통계 개요)
+- [ ] AI 분석 결과 감사 (검토/수정)
+- [ ] AI 사용량/비용 모니터링
+- [ ] 요청 파이프라인 로그 뷰어
+- [ ] 서버 로그/에러 모니터링
 
 ### Out of Scope
 
-- Admin 기능 — 관리자 대시보드는 별도 마일스톤
-- 실시간 알림 — v2로 미루기
-- 소셜 로그인 추가 — 현재 OAuth 유지
+- 태그/키워드 관리 (A-01) — v3.1로 미루기
+- 콘텐츠 모더레이션 (A-02) — v3.1로 미루기
+- 지급 관리 (A-03) — v3.1로 미루기
+- 실시간 알림 — 별도 마일스톤
+- 컴포넌트 통합 (15 orphaned) — v2.2로 미루기
 
 ## Context
 
@@ -119,4 +135,4 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 
 ---
 
-*Last updated: 2026-02-06 after v2.1 milestone completion*
+*Last updated: 2026-02-19 after v3.0 milestone start*

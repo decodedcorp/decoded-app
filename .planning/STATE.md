@@ -2,19 +2,19 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-06)
+See: .planning/PROJECT.md (updated 2026-02-19)
 
 **Core value:** 완전한 사용자 경험 — 일관된 디자인 시스템과 실제 데이터
-**Current focus:** v2.1 complete, planning next milestone
+**Current focus:** v3.0 Admin Panel — AI Management
 
 ## Current Position
 
-Phase: v2-09 (documentation-polish) of 9 phases in v2.0 milestone
-Plan: 03 of 03 complete
-Status: Phase v2-09 complete
-Last activity: 2026-02-12 — Completed quick-037 (Update specs/docs to match codebase)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-19 — Milestone v3.0 started
 
-Progress: v2.0 milestone complete (all phases shipped)
+Progress: Defining requirements for v3.0
 
 ## Milestone Summary
 
