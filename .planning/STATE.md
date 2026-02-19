@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 
 ## Current Position
 
-Phase: v3-02 (Dashboard) — COMPLETE
-Plan: 2/2 plans complete
-Status: Phase complete
-Last activity: 2026-02-19 — Completed phase v3-02 (Dashboard)
+Phase: v3-03 (AI Audit) — In Progress
+Plan: 1/2 plans complete
+Status: In progress
+Last activity: 2026-02-19 — Completed 03-01-PLAN.md (AI audit mock data and API routes)
 
-Progress: [████------] 2/5 phases complete (v3.0)
+Progress: [████░-----] 2.5/5 phases (v3.0 — Dashboard complete, AI Audit 1/2)
 
 ## Milestone Summary
 
@@ -33,7 +33,7 @@ Progress: [████------] 2/5 phases complete (v3.0)
 |-------|------|--------------|--------|
 | v3-01 | Admin Foundation | AAUTH-01~03 | ✓ Complete (2/2 plans) |
 | v3-02 | Dashboard | DASH-01~03 | ✓ Complete (2/2 plans) |
-| v3-03 | AI Audit | AUDIT-01~04 | Not started |
+| v3-03 | AI Audit | AUDIT-01~04 | In Progress (1/2 plans) |
 | v3-04 | AI Cost Monitoring | COST-01~03 | Not started |
 | v3-05 | Pipeline & Server Logs | PIPE-01~03, SLOG-01~03 | Not started |
 
@@ -83,6 +83,10 @@ Key decisions affecting future work:
 - 02-02: Period selector state at page level, useChartData refetches on key change
 - 02-02: Skeleton fallback on both loading and error states
 - 02-02: Admin component pattern: data hook + display component + skeleton variant
+- 03-01: Module-level cache singleton (_cachedRequests) ensures stable audit mock data across requests
+- 03-01: Audit status distribution by index range (not hash) guarantees exact 2/16/3/4 pending/completed/error/modified split
+- 03-01: List endpoint uses Omit<AuditRequest, 'items'> for performance; detail endpoint returns full data
+- 03-01: All audit types re-exported from audit.ts as single-source import for UI consumers
 
 ### Tech Debt (from v2.1)
 
@@ -118,7 +122,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed phase v3-02 (Dashboard) — all 2 plans executed, checkpoint approved
+Stopped at: Completed 03-01-PLAN.md (AI audit mock data and API routes)
 Resume file: None
 
 ## Quick Tasks Completed
