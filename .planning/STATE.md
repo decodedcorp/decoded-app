@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 ## Current Position
 
 Phase: v3-01 (Admin Foundation)
-Plan: —
-Status: Roadmap defined, ready to plan phase
-Last activity: 2026-02-19 — Roadmap created for v3.0
+Plan: 01-01 of 03 in phase
+Status: In progress
+Last activity: 2026-02-19 — Completed 01-01-PLAN.md (admin route protection middleware)
 
-Progress: [----------] 0/5 phases complete (v3.0)
+Progress: [----------] 0/5 phases complete (v3.0) | Plan 01-01 complete
 
 ## Milestone Summary
 
@@ -31,7 +31,7 @@ Progress: [----------] 0/5 phases complete (v3.0)
 
 | Phase | Goal | Requirements | Status |
 |-------|------|--------------|--------|
-| v3-01 | Admin Foundation | AAUTH-01~03 | Not started |
+| v3-01 | Admin Foundation | AAUTH-01~03 | In progress (1/3 plans done) |
 | v3-02 | Dashboard | DASH-01~03 | Not started |
 | v3-03 | AI Audit | AUDIT-01~04 | Not started |
 | v3-04 | AI Cost Monitoring | COST-01~03 | Not started |
@@ -66,7 +66,10 @@ Key decisions affecting future work:
 - quick-036: Conditional spot fetching pattern with enabled option prevents unnecessary API calls
 - quick-036: Context-specific Hotspot sizing using important prefix (!w-3 !h-3) overrides CVA defaults
 - v3.0: Mock data first approach — AI audit, pipeline, server log use mock data; dashboard uses existing admin APIs
-- v3.0: Admin auth based on `is_admin` field in Supabase profiles table
+- v3.0: Admin auth based on `is_admin` field in Supabase users table (confirmed: users not profiles)
+- 01-01: createServerClient used for middleware (not deprecated createMiddlewareClient) with getAll/setAll cookie adapters
+- 01-01: checkIsAdmin in separate admin.ts for reuse in layout-level server components
+- 01-01: Silent redirect to / for both unauthenticated and non-admin users (no admin panel disclosure)
 - v3.0: Charts will require a chart library (recharts or similar) — decide at v3-02 planning
 
 ### Tech Debt (from v2.1)
@@ -102,8 +105,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-19
-Stopped at: v3.0 roadmap created, ready to plan v3-01
+Last session: 2026-02-19T02:26:54Z
+Stopped at: Completed 01-01-PLAN.md (admin route middleware + supabase middleware client + checkIsAdmin)
 Resume file: None
 
 ## Quick Tasks Completed
