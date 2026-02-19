@@ -76,31 +76,31 @@ Requirements for Admin Panel — AI Management. 목업 데이터 우선, 백엔�
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AAUTH-01 | — | Pending |
-| AAUTH-02 | — | Pending |
-| AAUTH-03 | — | Pending |
-| DASH-01 | — | Pending |
-| DASH-02 | — | Pending |
-| DASH-03 | — | Pending |
-| AUDIT-01 | — | Pending |
-| AUDIT-02 | — | Pending |
-| AUDIT-03 | — | Pending |
-| AUDIT-04 | — | Pending |
-| COST-01 | — | Pending |
-| COST-02 | — | Pending |
-| COST-03 | — | Pending |
-| PIPE-01 | — | Pending |
-| PIPE-02 | — | Pending |
-| PIPE-03 | — | Pending |
-| SLOG-01 | — | Pending |
-| SLOG-02 | — | Pending |
-| SLOG-03 | — | Pending |
+| AAUTH-01 | v3-01 | Pending |
+| AAUTH-02 | v3-01 | Pending |
+| AAUTH-03 | v3-01 | Pending |
+| DASH-01 | v3-02 | Pending |
+| DASH-02 | v3-02 | Pending |
+| DASH-03 | v3-02 | Pending |
+| AUDIT-01 | v3-03 | Pending |
+| AUDIT-02 | v3-03 | Pending |
+| AUDIT-03 | v3-03 | Pending |
+| AUDIT-04 | v3-03 | Pending |
+| COST-01 | v3-04 | Pending |
+| COST-02 | v3-04 | Pending |
+| COST-03 | v3-04 | Pending |
+| PIPE-01 | v3-05 | Pending |
+| PIPE-02 | v3-05 | Pending |
+| PIPE-03 | v3-05 | Pending |
+| SLOG-01 | v3-05 | Pending |
+| SLOG-02 | v3-05 | Pending |
+| SLOG-03 | v3-05 | Pending |
 
 **Coverage:**
 - v3.0 requirements: 18 total
-- Mapped to phases: 0
-- Unmapped: 18 ⚠️
+- Mapped to phases: 18
+- Unmapped: 0 (100% coverage)
 
 ---
 *Requirements defined: 2026-02-19*
-*Last updated: 2026-02-19 after initial definition*
+*Last updated: 2026-02-19 after roadmap creation (traceability filled)*

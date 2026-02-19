@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: v3-01 (Admin Foundation)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-02-19 — Milestone v3.0 started
+Status: Roadmap defined, ready to plan phase
+Last activity: 2026-02-19 — Roadmap created for v3.0
 
-Progress: Defining requirements for v3.0
+Progress: [----------] 0/5 phases complete (v3.0)
 
 ## Milestone Summary
 
@@ -24,7 +24,18 @@ Progress: Defining requirements for v3.0
 | v1.1 API Integration | 5 | 13 | Shipped | 2026-01-29 |
 | v2.0 Design Overhaul | 9 | 26 | Shipped | 2026-02-05 |
 | v2.1 Design System | 6 | 14 | Shipped | 2026-02-06 |
-| **Total** | **25** | **58** | **Complete** | - |
+| **v3.0 Admin Panel** | **5** | **0** | **In Progress** | - |
+| **Total** | **30** | **58** | **Ongoing** | - |
+
+## v3.0 Roadmap
+
+| Phase | Goal | Requirements | Status |
+|-------|------|--------------|--------|
+| v3-01 | Admin Foundation | AAUTH-01~03 | Not started |
+| v3-02 | Dashboard | DASH-01~03 | Not started |
+| v3-03 | AI Audit | AUDIT-01~04 | Not started |
+| v3-04 | AI Cost Monitoring | COST-01~03 | Not started |
+| v3-05 | Pipeline & Server Logs | PIPE-01~03, SLOG-01~03 | Not started |
 
 ## Accumulated Context
 
@@ -54,6 +65,9 @@ Key decisions affecting future work:
 - quick-033: spot-reveal animation in both Tailwind config and globals.css for compatibility
 - quick-036: Conditional spot fetching pattern with enabled option prevents unnecessary API calls
 - quick-036: Context-specific Hotspot sizing using important prefix (!w-3 !h-3) overrides CVA defaults
+- v3.0: Mock data first approach — AI audit, pipeline, server log use mock data; dashboard uses existing admin APIs
+- v3.0: Admin auth based on `is_admin` field in Supabase profiles table
+- v3.0: Charts will require a chart library (recharts or similar) — decide at v3-02 planning
 
 ### Tech Debt (from v2.1)
 
@@ -78,14 +92,18 @@ Key decisions affecting future work:
 1. Quick task: Fix images page raw JSON error exposure (API error handling - major UX/security)
 2. Re-run visual QA when API stable for complete decoded.pen comparison
 
+**From v3.0 Planning:**
+1. Decide chart library at v3-02 planning (recharts recommended for React ecosystem)
+2. Confirm which admin APIs are available for DASH-01~03 before v3-02 execution
+
 ### Blockers/Concerns
 
 None.
 
 ## Session Continuity
 
-Last session: 2026-02-12
-Stopped at: Completed quick-037 (Update specs/docs to match codebase)
+Last session: 2026-02-19
+Stopped at: v3.0 roadmap created, ready to plan v3-01
 Resume file: None
 
 ## Quick Tasks Completed
@@ -118,4 +136,4 @@ Resume file: None
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-12 after quick-037 completion*
+*Last updated: 2026-02-19 after v3.0 roadmap creation*
