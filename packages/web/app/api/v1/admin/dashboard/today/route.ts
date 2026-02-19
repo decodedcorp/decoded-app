@@ -14,6 +14,11 @@ import { fetchTodaySummary } from "@/lib/api/admin/dashboard";
  * Response shape: TodaySummary
  */
 export async function GET() {
+  if (process.env.NODE_ENV === "development") {
+    const summary = await fetchTodaySummary();
+    return NextResponse.json(summary);
+  }
+
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },

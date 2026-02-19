@@ -22,6 +22,18 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
+  if (process.env.NODE_ENV === "development") {
+    return (
+      <AdminLayoutClient adminName="Dev Admin">{children}</AdminLayoutClient>
+    );
+  }
+
+  if (process.env.NODE_ENV === "development") {
+    return (
+      <AdminLayoutClient adminName="Dev Admin">{children}</AdminLayoutClient>
+    );
+  }
+
   const supabase = await createSupabaseServerClient();
 
   const {
