@@ -9,10 +9,10 @@ Requirements for Spec Overhaul — AI-Ready Documentation. 코드 변경 없이 
 
 ### Archive & Foundation
 
-- [ ] **ARCH-01**: 현재 specs/를 specs/_archive/v2.1.0/으로 복사하여 버전 스냅샷 보존
-- [ ] **ARCH-02**: 새로운 화면 spec 템플릿 설계 (EARS 구문, 모바일 퍼스트, 200라인 제한, AI 컨텍스트 최적화)
-- [ ] **ARCH-03**: 새로운 플로우 spec 템플릿 설계 (FLW-* 형식, 상태 전이, 데이터 흐름)
-- [ ] **ARCH-04**: specs/README.md 재작성 (새 구조, ID 체계, injection 가이드 포함)
+- [x] **ARCH-01**: 현재 specs/를 specs/_archive/v2.1.0/으로 복사하여 버전 스냅샷 보존
+- [x] **ARCH-02**: 새로운 화면 spec 템플릿 설계 (EARS 구문, 모바일 퍼스트, 200라인 제한, AI 컨텍스트 최적화)
+- [x] **ARCH-03**: 새로운 플로우 spec 템플릿 설계 (FLW-* 형식, 상태 전이, 데이터 흐름)
+- [x] **ARCH-04**: specs/README.md 재작성 (새 구조, ID 체계, injection 가이드 포함)
 
 ### Shared Foundation
 

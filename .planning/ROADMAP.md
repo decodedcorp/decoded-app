@@ -83,10 +83,10 @@ See archived roadmap: `.planning/milestones/v3.0-ROADMAP.md`
 **Plans:** 2 plans
 
 Plans:
-- [ ] v4-01-01-PLAN.md — Archive existing specs to `specs/_archive/v2.1.0/` + audit stale file paths
-- [ ] v4-01-02-PLAN.md — Design screen/flow spec templates + rewrite `specs/README.md`
+- [x] v4-01-01-PLAN.md — Archive existing specs to `specs/_archive/v2.1.0/` + audit stale file paths
+- [x] v4-01-02-PLAN.md — Design screen/flow spec templates + rewrite `specs/README.md`
 
-**Status:** [ ] Not started
+**Status:** [x] Complete (2026-02-19)
 
 ---
 
@@ -288,14 +288,14 @@ Plans:
 | v2.0 Design Overhaul | v2-1~9 | 26/26 | Shipped | 2026-02-05 |
 | v2.1 Design System | v2.1-1~6 | 14/14 | Shipped | 2026-02-06 |
 | **v3.0 Admin Panel** | **v3-01~06** | **12/12** | **Shipped** | 2026-02-19 |
-| **v4.0 Spec Overhaul** | **v4-01~09** | **0/13** | **In progress** | - |
-| **Total** | **6 milestones** | **70/82** | **Ongoing** | - |
+| **v4.0 Spec Overhaul** | **v4-01~09** | **2/13** | **In progress** | - |
+| **Total** | **6 milestones** | **72/82** | **Ongoing** | - |
 
 ### v4.0 Phase Progress
 
 | Phase | Goal | Requirements | Plans | Status |
 |-------|------|--------------|-------|--------|
-| v4-01 | Archive & Foundation — snapshot, templates, README | ARCH-01~04 | 0/2 | Not started |
+| v4-01 | Archive & Foundation — snapshot, templates, README | ARCH-01~04 | 2/2 | Complete (2026-02-19) |
 | v4-02 | Shared Foundation — component registry, data models, API contracts, stores, injection guide | SHRD-01~05 | 0/2 | Not started |
 | v4-03 | Flow Documents — 4 user journey flows + VTON draft | FLOW-01~05 | 0/1 | Not started |
 | v4-04 | Screen Specs: Detail View — post detail, spot, item, related | DETL-01~04 | 0/2 | Not started |
