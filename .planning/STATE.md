@@ -14,7 +14,7 @@ Plan: 2/2 plans complete
 Status: v4-02-02 complete — shared foundation fully established (5 _shared/ files + CMN updates)
 Last activity: 2026-02-19 — Completed v4-02-02-PLAN.md (store-map, injection-guide, CMN-01/02/03)
 
-Progress: v4.0 [██░░░░░░░░] 2/9 phases (5/13 plans complete)
+Progress: v4.0 [██░░░░░░░░] 2/9 phases (4/13 plans complete)
 
 ## Milestone Summary
 
@@ -25,7 +25,7 @@ Progress: v4.0 [██░░░░░░░░] 2/9 phases (5/13 plans complete)
 | v2.0 Design Overhaul | 9 | 26 | Shipped | 2026-02-05 |
 | v2.1 Design System | 6 | 14 | Shipped | 2026-02-06 |
 | v3.0 Admin Panel | 6 | 12 | Shipped | 2026-02-19 |
-| **v4.0 Spec Overhaul** | **9** | **5/13** | **In progress** | - |
+| **v4.0 Spec Overhaul** | **9** | **4/13** | **In progress** | - |
 
 ## v4.0 Roadmap
 

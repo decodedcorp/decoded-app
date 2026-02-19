@@ -16,11 +16,11 @@ Requirements for Spec Overhaul — AI-Ready Documentation. 코드 변경 없이 
 
 ### Shared Foundation
 
-- [ ] **SHRD-01**: 디자인 시스템 컴포넌트 카탈로그 (35+ 컴포넌트의 props/variants/사용법/파일경로)
-- [ ] **SHRD-02**: 데이터 모델 문서 동기화 (현재 코드베이스 TypeScript 타입 기준)
-- [ ] **SHRD-03**: API 계약 문서 동기화 (현재 구현된 API routes 기준)
-- [ ] **SHRD-04**: 공통 컴포넌트 spec 갱신 (CMN-* header, footer, nav — 현재 디자인 시스템 기준)
-- [ ] **SHRD-05**: AI 에이전트 injection-guide 작성 (작업 유형별 어떤 spec 파일을 로드해야 하는지)
+- [x] **SHRD-01**: 디자인 시스템 컴포넌트 카탈로그 (35+ 컴포넌트의 props/variants/사용법/파일경로)
+- [x] **SHRD-02**: 데이터 모델 문서 동기화 (현재 코드베이스 TypeScript 타입 기준)
+- [x] **SHRD-03**: API 계약 문서 동기화 (현재 구현된 API routes 기준)
+- [x] **SHRD-04**: 공통 컴포넌트 spec 갱신 (CMN-* header, footer, nav — 현재 디자인 시스템 기준)
+- [x] **SHRD-05**: AI 에이전트 injection-guide 작성 (작업 유형별 어떤 spec 파일을 로드해야 하는지)
 
 ### Flow Documents
 
@@ -94,15 +94,15 @@ Requirements for Spec Overhaul — AI-Ready Documentation. 코드 변경 없이 
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ARCH-01 | v4-01 | Pending |
-| ARCH-02 | v4-01 | Pending |
-| ARCH-03 | v4-01 | Pending |
-| ARCH-04 | v4-01 | Pending |
-| SHRD-01 | v4-02 | Pending |
-| SHRD-02 | v4-02 | Pending |
-| SHRD-03 | v4-02 | Pending |
-| SHRD-04 | v4-02 | Pending |
-| SHRD-05 | v4-02 | Pending |
+| ARCH-01 | v4-01 | Complete |
+| ARCH-02 | v4-01 | Complete |
+| ARCH-03 | v4-01 | Complete |
+| ARCH-04 | v4-01 | Complete |
+| SHRD-01 | v4-02 | Complete |
+| SHRD-02 | v4-02 | Complete |
+| SHRD-03 | v4-02 | Complete |
+| SHRD-04 | v4-02 | Complete |
+| SHRD-05 | v4-02 | Complete |
 | FLOW-01 | v4-03 | Pending |
 | FLOW-02 | v4-03 | Pending |
 | FLOW-03 | v4-03 | Pending |
@@ -135,4 +135,4 @@ Requirements for Spec Overhaul — AI-Ready Documentation. 코드 변경 없이 
 
 ---
 *Requirements defined: 2026-02-19*
-*Last updated: 2026-02-19 after initial definition*
+*Last updated: 2026-02-19 after v4-02 completion (ARCH-01~04, SHRD-01~05 → Complete)*

@@ -288,8 +288,8 @@ Plans:
 | v2.0 Design Overhaul | v2-1~9 | 26/26 | Shipped | 2026-02-05 |
 | v2.1 Design System | v2.1-1~6 | 14/14 | Shipped | 2026-02-06 |
 | **v3.0 Admin Panel** | **v3-01~06** | **12/12** | **Shipped** | 2026-02-19 |
-| **v4.0 Spec Overhaul** | **v4-01~09** | **5/13** | **In progress** | - |
-| **Total** | **6 milestones** | **72/82** | **Ongoing** | - |
+| **v4.0 Spec Overhaul** | **v4-01~09** | **4/13** | **In progress** | - |
+| **Total** | **6 milestones** | **74/83** | **Ongoing** | - |
 
 ### v4.0 Phase Progress
 
