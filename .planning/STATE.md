@@ -36,7 +36,7 @@ Progress: v3.0 [████████--] 4/5 phases | v4.0 [----------] 0/? p
 | v3-02 | Dashboard | DASH-01~03 | ✓ Complete (2/2 plans) |
 | v3-03 | AI Audit | AUDIT-01~04 | ✓ Complete (2/2 plans) |
 | v3-04 | AI Cost Monitoring | COST-01~03 | ✓ Complete (2/2 plans) |
-| v3-05 | Pipeline & Server Logs | PIPE-01~03, SLOG-01~03 | Not started |
+| v3-05 | Pipeline & Server Logs | PIPE-01~03, SLOG-01~03 | In progress (1/2 plans) |
 
 ## Accumulated Context
 
@@ -102,6 +102,10 @@ Key decisions affecting future work:
 - 04-02: useAiCostChart bundles daily + modelBreakdown in one fetch (AiCostChartResponse) so three components share one request
 - 04-02: formatCostPrecise uses 4 decimal places for avg cost per call — sub-cent precision required
 - 04-02: Recharts stacked AreaChart for tokens (composition), BarChart for API calls (discrete counts) — intentional visual metaphor distinction
+- 05-01: Pipeline status distribution by index range (not hash): 0-21 = completed, 22-24 = failed, 25-29 = running
+- 05-01: PipelineListItem = Omit<PipelineExecution, 'steps'> — list endpoint strips heavy nested arrays for performance
+- 05-01: generateStreamLogs intentionally non-deterministic (Date.now() + Math.random()) for realistic polling UX
+- 05-01: Server log level distribution: 60% info / 20% warn / 12% error / 8% debug via levelForValue threshold mapping
 
 ### Tech Debt (from v2.1)
 
@@ -137,7 +141,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Starting v4.0 Spec Overhaul milestone — defining requirements
+Stopped at: Completed 05-01-PLAN.md — pipeline + server log data layer and API routes (v3-05 in progress, 1/2 plans done)
 Resume file: None
 
 ## Quick Tasks Completed
