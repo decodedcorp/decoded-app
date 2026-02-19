@@ -1,12 +1,13 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import type { UiItem } from "./types";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { SpotlightCard } from "@/lib/components/ui/SpotlightCard";
 
 // Register GSAP ScrollTrigger plugin
@@ -17,6 +18,10 @@ if (typeof window !== "undefined") {
 type Props = {
   items: UiItem[];
   isModal?: boolean;
+  /** 포스트 ID – 솔루션 등록 시트용 */
+  postId?: string;
+  /** CTA 클릭 시 솔루션 등록 시트 열기 (postId 필요) */
+  onAddSolutionClick?: (spotId: string) => void;
 };
 
 /**
@@ -31,7 +36,13 @@ type Props = {
  * - Mobile: horizontal scroll carousel with snap points
  * - Desktop: responsive grid (3-4 columns)
  */
-export function ShopGrid({ items, isModal = false }: Props) {
+export function ShopGrid({
+  items,
+  isModal = false,
+  postId,
+  onAddSolutionClick,
+}: Props) {
+  const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -178,6 +189,11 @@ export function ShopGrid({ items, isModal = false }: Props) {
         >
           {sortedItems.map((item, index) => {
             const isSpotted = !!item.normalizedCenter;
+            const needsSolution = !item.imageUrl && !item.product_name;
+            const addSolutionHref = item.image_id
+              ? `${item.spot_id ? `/posts/${item.image_id}?spot=${item.spot_id}` : `/posts/${item.image_id}`}`
+              : "#";
+
             return (
               <div
                 key={item.id}
@@ -191,71 +207,120 @@ export function ShopGrid({ items, isModal = false }: Props) {
                   <div
                     className={`flex flex-col h-full ${isModal ? "p-3" : "p-3 md:p-4"}`}
                   >
-                    {/* Item Image */}
-                    <div
-                      className={`relative w-full aspect-square overflow-hidden rounded-lg bg-muted ${
-                        isModal ? "mb-2 md:mb-3" : "mb-3 md:mb-4"
-                      }`}
-                    >
-                      {item.imageUrl ? (
-                        <>
-                          <Image
-                            src={item.imageUrl}
-                            alt={item.product_name || "Item"}
-                            fill
-                            className="object-cover transition-transform duration-700 group-hover:scale-105"
-                            sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                          />
-                          {/* Spotted badge */}
-                          {isSpotted && (
-                            <div className="absolute top-2 right-2 bg-primary text-primary-foreground text-[9px] font-medium uppercase tracking-wider px-2 py-1 rounded-sm">
-                              Spotted
-                            </div>
-                          )}
-                        </>
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-muted/30">
-                          <span className="text-muted-foreground text-sm font-serif italic">
-                            No Image
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Item Details */}
-                    <div className="flex flex-col items-center text-center flex-grow">
-                      {item.brand && (
-                        <p
-                          className={`text-xs uppercase tracking-wide text-muted-foreground ${
-                            isModal ? "mb-1" : "mb-2"
+                    {needsSolution ? (
+                      /* CTA 카드: 솔루션 등록 유도 */
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (onAddSolutionClick && item.spot_id) {
+                            onAddSolutionClick(item.spot_id);
+                          } else if (
+                            addSolutionHref &&
+                            addSolutionHref !== "#"
+                          ) {
+                            router.push(addSolutionHref);
+                          }
+                        }}
+                        className="flex flex-col h-full gap-3 md:gap-4 group/cta w-full text-left cursor-pointer"
+                      >
+                        <div
+                          className={`relative w-full aspect-square overflow-hidden rounded-lg bg-muted/50 border-2 border-dashed border-muted-foreground/30 flex flex-col items-center justify-center ${
+                            isModal ? "mb-2 md:mb-3" : "mb-3 md:mb-4"
                           }`}
                         >
-                          {item.brand}
-                        </p>
-                      )}
-                      <h3
-                        className={`text-sm font-medium truncate w-full ${
-                          isModal ? "mb-1 md:mb-2" : "mb-2"
-                        }`}
-                      >
-                        {item.product_name || "Untitled Item"}
-                      </h3>
-                      {item.price && (
-                        <p className={`text-sm text-foreground mt-auto`}>
-                          {item.price.split("|")[0].trim()}
-                        </p>
-                      )}
-
-                      <button
-                        className={`w-full border border-border/50 bg-background/50 hover:bg-foreground hover:text-background transition-all duration-300 text-[9px] md:text-[10px] uppercase tracking-widest rounded-sm ${
-                          isModal
-                            ? "mt-2 md:mt-3 py-1.5 md:py-2"
-                            : "mt-3 md:mt-4 py-2"
-                        }`}
-                      >
-                        View Details
+                          {item.spot_index != null && (
+                            <span className="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 text-primary text-[10px] font-bold">
+                              {item.spot_index}
+                            </span>
+                          )}
+                          <Plus className="w-10 h-10 md:w-12 md:h-12 text-muted-foreground/60 group-hover/cta:text-primary transition-colors" />
+                          <p className="mt-2 text-xs md:text-sm font-medium text-muted-foreground group-hover/cta:text-foreground transition-colors text-center px-2">
+                            {item.spot_index != null
+                              ? `#${item.spot_index} 아이템을 알고 계신가요?`
+                              : "이 아이템을 알고 계신가요?"}
+                          </p>
+                        </div>
+                        <div className="flex flex-col items-center text-center flex-grow">
+                          <span
+                            className={`w-full inline-flex items-center justify-center gap-2 border border-primary bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 text-[9px] md:text-[10px] uppercase tracking-widest rounded-sm ${
+                              isModal
+                                ? "mt-auto py-1.5 md:py-2"
+                                : "mt-auto py-2"
+                            }`}
+                          >
+                            솔루션 등록하기
+                          </span>
+                        </div>
                       </button>
-                    </div>
+                    ) : (
+                      <>
+                        {/* Item Image */}
+                        <div
+                          className={`relative w-full aspect-square overflow-hidden rounded-lg bg-muted ${
+                            isModal ? "mb-2 md:mb-3" : "mb-3 md:mb-4"
+                          }`}
+                        >
+                          {item.imageUrl ? (
+                            <>
+                              <Image
+                                src={item.imageUrl}
+                                alt={item.product_name || "Item"}
+                                fill
+                                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                              />
+                              {/* Spotted badge */}
+                              {isSpotted && (
+                                <div className="absolute top-2 right-2 bg-primary text-primary-foreground text-[9px] font-medium uppercase tracking-wider px-2 py-1 rounded-sm">
+                                  Spotted
+                                </div>
+                              )}
+                            </>
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-muted/30">
+                              <span className="text-muted-foreground text-sm font-serif italic">
+                                No Image
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Item Details */}
+                        <div className="flex flex-col items-center text-center flex-grow">
+                          {item.brand && (
+                            <p
+                              className={`text-xs uppercase tracking-wide text-muted-foreground ${
+                                isModal ? "mb-1" : "mb-2"
+                              }`}
+                            >
+                              {item.brand}
+                            </p>
+                          )}
+                          <h3
+                            className={`text-sm font-medium truncate w-full ${
+                              isModal ? "mb-1 md:mb-2" : "mb-2"
+                            }`}
+                          >
+                            {item.product_name || "Untitled Item"}
+                          </h3>
+                          {item.price && (
+                            <p className={`text-sm text-foreground mt-auto`}>
+                              {item.price.split("|")[0].trim()}
+                            </p>
+                          )}
+
+                          <button
+                            className={`w-full border border-border/50 bg-background/50 hover:bg-foreground hover:text-background transition-all duration-300 text-[9px] md:text-[10px] uppercase tracking-widest rounded-sm ${
+                              isModal
+                                ? "mt-2 md:mt-3 py-1.5 md:py-2"
+                                : "mt-3 md:mt-4 py-2"
+                            }`}
+                          >
+                            View Details
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </SpotlightCard>
               </div>
