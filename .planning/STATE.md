@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-19)
 
 **Core value:** 완전한 사용자 경험 — 일관된 디자인 시스템과 실제 데이터
-**Current focus:** v3.0 Admin Panel — AI Management
+**Current focus:** v4.0 Spec Overhaul — AI-Ready Documentation
 
 ## Current Position
 
-Phase: v3-04 (AI Cost Monitoring) — Complete
-Plan: 2/2 plans complete
-Status: Phase complete
-Last activity: 2026-02-19 — Completed 04-02-PLAN.md (AI cost UI: KPI cards, charts, model table)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-19 — Milestone v4.0 started
 
-Progress: [████████--] 4/5 phases complete (v3.0)
+Progress: v3.0 [████████--] 4/5 phases | v4.0 [----------] 0/? phases
 
 ## Milestone Summary
 
@@ -24,8 +24,9 @@ Progress: [████████--] 4/5 phases complete (v3.0)
 | v1.1 API Integration | 5 | 13 | Shipped | 2026-01-29 |
 | v2.0 Design Overhaul | 9 | 26 | Shipped | 2026-02-05 |
 | v2.1 Design System | 6 | 14 | Shipped | 2026-02-06 |
-| **v3.0 Admin Panel** | **5** | **0** | **In Progress** | - |
-| **Total** | **30** | **58** | **Ongoing** | - |
+| **v3.0 Admin Panel** | **5** | **8** | **In Progress** | - |
+| **v4.0 Spec Overhaul** | **?** | **0** | **Defining** | - |
+| **Total** | **30+** | **66+** | **Ongoing** | - |
 
 ## v3.0 Roadmap
 
@@ -136,7 +137,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 04-02-PLAN.md — AI cost UI (KPI cards, token chart, API calls chart, model table), phase v3-04 done
+Stopped at: Starting v4.0 Spec Overhaul milestone — defining requirements
 Resume file: None
 
 ## Quick Tasks Completed
@@ -169,4 +170,4 @@ Resume file: None
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-19 after completing phase v3-04 (AI Cost Monitoring)*
+*Last updated: 2026-02-19 after starting milestone v4.0 Spec Overhaul*

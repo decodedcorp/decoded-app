@@ -9,17 +9,20 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 **v2.0 (2026-02-05 shipped):** 디자인 오버홀 — decoded.pen 디자인을 코드로 구현
 **v2.1 (2026-02-06 shipped):** 디자인 시스템 확장 — 23개 추가 컴포넌트 + Visual QA 자동화
 
-## Current Milestone: v3.0 Admin Panel — AI Management
+## Current Milestone: v4.0 Spec Overhaul — AI-Ready Documentation
 
-**Goal:** AI 분석 파이프라인을 모니터링하고 결과를 감사할 수 있는 관리자 패널 구축
+**Goal:** 사용자 화면 중심의 spec/docs를 현재 코드베이스 기준으로 재작성하고, AI 에이전트 컨텍스트 주입에 최적화된 포맷으로 고도화
 
 **Target features:**
-- 관리자 인증 및 라우트 보호
-- 관리자 대시보드 (통계 개요)
-- AI 분석 결과 감사 (검토/수정)
-- AI 사용량/비용 모니터링
-- 요청 파이프라인 로그 뷰어
-- 서버 로그/에러 모니터링
+- 기존 spec v2.1.0 아카이빙 (버전 스냅샷)
+- Mobile-first 화면별 spec 재작성 (컴포넌트 매핑 + 파일경로)
+- 유저 플로우/시나리오 기반 문서 구조 (상태 전이, 데이터 흐름)
+- AI 에이전트 컨텍스트 주입 최적화 (Claude, Gemini, Cursor 호환)
+- shared 기반 문서 (데이터 모델, API 계약, 공통 컴포넌트) 동기화
+- 추후 서비스 기조 변경 반영을 위한 확장 가능한 구조
+
+**대상 번들:** discovery, detail-view, creation-ai, user-system, shared
+**제외:** admin (v3.0에서 별도 진행), system-backend, mobile-platform
 
 ## Core Value
 
@@ -86,13 +89,18 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 
 ### Active
 
-**v3.0 Admin Panel — AI Management:**
-- [ ] 관리자 인증 및 라우트 보호
-- [ ] 관리자 대시보드 (통계 개요)
-- [ ] AI 분석 결과 감사 (검토/수정)
-- [ ] AI 사용량/비용 모니터링
+**v3.0 Admin Panel — AI Management (병렬 진행):**
 - [ ] 요청 파이프라인 로그 뷰어
 - [ ] 서버 로그/에러 모니터링
+
+**v4.0 Spec Overhaul — AI-Ready Documentation:**
+- [ ] 기존 spec 아카이빙 (specs/v2.1.0/)
+- [ ] spec 포맷/구조 재설계 (AI 컨텍스트 최적화)
+- [ ] discovery 번들 spec 재작성
+- [ ] detail-view 번들 spec 재작성
+- [ ] creation-ai 번들 spec 재작성
+- [ ] user-system 번들 spec 재작성
+- [ ] shared 기반 문서 동기화
 
 ### Out of Scope
 
@@ -135,4 +143,4 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 
 ---
 
-*Last updated: 2026-02-19 after v3.0 milestone start*
+*Last updated: 2026-02-19 after v4.0 milestone start*
