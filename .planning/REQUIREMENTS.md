@@ -52,9 +52,9 @@ Requirements for Spec Overhaul — AI-Ready Documentation. 코드 변경 없이 
 
 ### Screen Specs — User System
 
-- [ ] **USER-01**: 로그인 화면 spec (SCR-USER-01) — OAuth 플로우
-- [ ] **USER-02**: 프로필 화면 spec (SCR-USER-02) — 활동 탭, 뱃지, 스탯
-- [ ] **USER-03**: 수익 대시보드 화면 spec (SCR-USER-04) — 정산/클릭 추적
+- [x] **USER-01**: 로그인 화면 spec (SCR-USER-01) — OAuth 플로우
+- [x] **USER-02**: 프로필 화면 spec (SCR-USER-02) — 활동 탭, 뱃지, 스탯
+- [x] **USER-03**: 수익 대시보드 화면 spec (SCR-USER-04) — 정산/클릭 추적
 
 ### Next Version Draft
 
@@ -65,7 +65,7 @@ Requirements for Spec Overhaul — AI-Ready Documentation. 코드 변경 없이 
 
 ### Cleanup
 
-- [ ] **CLEN-01**: 기존 번들 spec.md 파일 retire + README 업데이트
+- [x] **CLEN-01**: 기존 번들 spec.md 파일 retire + README 업데이트
 
 ## Future Requirements
 

@@ -7,7 +7,7 @@
 - [x] **v2.0 Design Overhaul** - v2-Phases 1-9 (shipped 2026-02-05)
 - [x] **v2.1 Design System Expansion** - v2.1-Phases 1-6 (shipped 2026-02-06)
 - [x] **v3.0 Admin Panel — AI Management** — v3-Phases 01-06 (shipped 2026-02-19)
-- [ ] **v4.0 Spec Overhaul — AI-Ready Documentation** - v4-Phases 01-09 (in progress)
+- [x] **v4.0 Spec Overhaul — AI-Ready Documentation** - v4-Phases 01-09 (shipped 2026-02-20)
 
 ## Phases
 
@@ -273,9 +273,9 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] v4-09-01-PLAN.md — Relocate shared/ content to _shared/, delete 8 old bundle dirs, update stale references, verify final structure
+- [x] v4-09-01-PLAN.md — Relocate shared/ content to _shared/, delete 8 old bundle dirs, update stale references, verify final structure
 
-**Status:** [ ] Not started
+**Status:** [x] Complete (2026-02-20)
 
 ---
 
@@ -288,8 +288,8 @@ Plans:
 | v2.0 Design Overhaul | v2-1~9 | 26/26 | Shipped | 2026-02-05 |
 | v2.1 Design System | v2.1-1~6 | 14/14 | Shipped | 2026-02-06 |
 | **v3.0 Admin Panel** | **v3-01~06** | **12/12** | **Shipped** | 2026-02-19 |
-| **v4.0 Spec Overhaul** | **v4-01~09** | **12/13** | **In progress** | - |
-| **Total** | **6 milestones** | **78/83** | **Ongoing** | - |
+| **v4.0 Spec Overhaul** | **v4-01~09** | **13/13** | **Shipped** | 2026-02-20 |
+| **Total** | **6 milestones** | **83/83** | **Complete** | - |
 
 ### v4.0 Phase Progress
 
@@ -303,11 +303,11 @@ Plans:
 | v4-06 | Screen Specs: Creation-AI — upload, detect, edit/solution | CREA-01~03 | 1/1 | Complete (2026-02-19) |
 | v4-07 | Screen Specs: User System — login, profile, earnings | USER-01~03 | 1/1 | Complete (2026-02-20) |
 | v4-08 | Next Version Draft — service identity, VTON, dynamic UI, commerce | NEXT-01~04 | 1/1 | Complete (2026-02-20) |
-| v4-09 | Cleanup — retire old bundle files, verify new structure | CLEN-01 | 0/1 | Not started |
+| v4-09 | Cleanup — retire old bundle files, verify new structure | CLEN-01 | 1/1 | Complete (2026-02-20) |
 
 **v4.0 Coverage:** 29/29 requirements mapped (100%)
 
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-02-20 (v4-08 complete — 4 NEXT-* draft documents written; injection guide guardrail added)*
+*Last updated: 2026-02-20 (v4-09 complete — v4.0 Spec Overhaul milestone shipped)*
