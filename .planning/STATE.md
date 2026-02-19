@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 
 ## Current Position
 
-Phase: v4-01 Archive & Foundation — Not started
-Plan: 0/2 plans
-Status: v3.0 milestone archived; ready to begin v4.0
-Last activity: 2026-02-19 — v3.0 milestone completion
+Phase: v4-01 Archive & Foundation — In progress
+Plan: 2/2 plans complete
+Status: Phase v4-01 complete — ready for v4-02 Shared Foundation
+Last activity: 2026-02-19 — Completed v4-01-02-PLAN.md (spec templates + README)
 
-Progress: v4.0 [░░░░░░░░░░] 0/9 phases (0/13 plans complete)
+Progress: v4.0 [█░░░░░░░░░] 1/9 phases (2/13 plans complete)
 
 ## Milestone Summary
 
@@ -31,7 +31,7 @@ Progress: v4.0 [░░░░░░░░░░] 0/9 phases (0/13 plans complete)
 
 | Phase | Goal | Requirements | Plans | Status |
 |-------|------|--------------|-------|--------|
-| v4-01 | Archive & Foundation | ARCH-01~04 | 0/2 | Not started |
+| v4-01 | Archive & Foundation | ARCH-01~04 | 2/2 | Complete |
 | v4-02 | Shared Foundation | SHRD-01~05 | 0/2 | Not started |
 | v4-03 | Flow Documents | FLOW-01~05 | 0/1 | Not started |
 | v4-04 | Screen Specs: Detail View | DETL-01~04 | 0/2 | Not started |
@@ -56,6 +56,9 @@ Key decisions affecting v4.0 work:
 - v4.0: FLOW-05 (VTON) and NEXT-01~04 are DRAFT — pending service direction approval
 - v4.0: Detail View (v4-04) precedes Discovery (v4-05) per user priority
 - v4.0: Anti-features to remove from specs: i18n sections, version history tables, copied TypeScript types, placeholder sections
+- v4-01-02: EARS syntax adopted as requirement format standard ("When [trigger], the system shall [behavior]")
+- v4-01-02: Mobile-first ordering enforced in screen spec template (mobile wireframe primary, desktop is adaptation delta)
+- v4-01-02: AI injection guide quick-reference table in README; full guide deferred to _shared/injection-guide.md (v4-02)
 
 ### Pending Todos
 
@@ -73,11 +76,11 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-19
-Stopped at: v3.0 milestone archived; ready for v4.0
+Last session: 2026-02-19T11:02:07Z
+Stopped at: Completed v4-01-02-PLAN.md (spec templates + README rewrite)
 Resume file: None
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-19 after v3.0 milestone completion*
+*Last updated: 2026-02-19 after v4-01-02 completion*
