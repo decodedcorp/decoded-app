@@ -164,6 +164,13 @@ Plans:
 5. 에러 로그 필터(레벨, 기간, 검색어)를 적용하면 해당 조건의 로그만 필터링된다
 6. 실시간 로그 스트리밍 UI가 `tail -f` 스타일로 새 로그를 아래에 추가하며 표시된다 (mock polling)
 
+**Plans:** 3 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — Pipeline + server log mock data, types, data layer, 4 API routes
+- [ ] 05-02-PLAN.md — Pipeline Logs UI (table, accordion detail, status filter, retry, pagination)
+- [ ] 05-03-PLAN.md — Server Logs UI (log table, filters, terminal-style streaming console)
+
 **Status:** [ ] Not started
 
 ---
