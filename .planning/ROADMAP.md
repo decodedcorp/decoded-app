@@ -183,7 +183,7 @@ Plans:
 - [ ] v4-05-01-PLAN.md — SCR-DISC-01 (home) + SCR-DISC-02 (search) with stale path fixes
 - [ ] v4-05-02-PLAN.md — SCR-DISC-03 (feed) + SCR-DISC-04 (explore)
 
-**Status:** [ ] Not started
+**Status:** [ ] Planned (2026-02-19)
 
 ---
 
