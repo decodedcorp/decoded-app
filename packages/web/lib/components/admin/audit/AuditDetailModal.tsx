@@ -23,8 +23,7 @@ const STATUS_STYLES: Record<AuditStatus | "modified-local", string> = {
   completed:
     "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
   error: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-  modified:
-    "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+  modified: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
   "modified-local":
     "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
 };
@@ -57,13 +56,18 @@ function StatusBadge({ status }: { status: AuditStatus | "modified-local" }) {
  *
  * ESC key and backdrop click both close the modal.
  */
-export function AuditDetailModal({ requestId, onClose }: AuditDetailModalProps) {
+export function AuditDetailModal({
+  requestId,
+  onClose,
+}: AuditDetailModalProps) {
   const { data, isLoading, isError, refetch } = useAuditDetail(requestId);
 
   // Local items state — initialized from API data on first load
   const [localItems, setLocalItems] = useState<AuditItem[] | null>(null);
   const [isModified, setIsModified] = useState(false);
-  const [highlightedItemId, setHighlightedItemId] = useState<string | null>(null);
+  const [highlightedItemId, setHighlightedItemId] = useState<string | null>(
+    null
+  );
 
   // Initialize local items when data arrives
   useEffect(() => {

@@ -98,11 +98,12 @@ export function ItemEditor({
     setEditingField(null);
   }
 
-  function handleCategoryChange(itemId: string, category: AuditItem["category"]) {
+  function handleCategoryChange(
+    itemId: string,
+    category: AuditItem["category"]
+  ) {
     onItemsChange(
-      items.map((item) =>
-        item.id === itemId ? { ...item, category } : item
-      )
+      items.map((item) => (item.id === itemId ? { ...item, category } : item))
     );
   }
 

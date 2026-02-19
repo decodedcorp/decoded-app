@@ -8,7 +8,11 @@
  * Uses keepPreviousData to avoid layout shift during page navigation.
  */
 
-import { useQuery, keepPreviousData, type UseQueryResult } from "@tanstack/react-query";
+import {
+  useQuery,
+  keepPreviousData,
+  type UseQueryResult,
+} from "@tanstack/react-query";
 import type {
   AuditListResponse,
   AuditDetailResponse,

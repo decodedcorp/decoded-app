@@ -37,7 +37,11 @@ export function StatusFilter({
   counts,
 }: StatusFilterProps) {
   return (
-    <div className="flex gap-2 flex-wrap" role="group" aria-label="Filter by status">
+    <div
+      className="flex gap-2 flex-wrap"
+      role="group"
+      aria-label="Filter by status"
+    >
       {STATUS_OPTIONS.map(({ label, value, dotColor }) => {
         const isActive = currentStatus === value;
         const countKey = value ?? "all";
