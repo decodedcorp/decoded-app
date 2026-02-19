@@ -1,6 +1,6 @@
 # DECODED Specifications
 
-> Version: 4.0 | Updated: 2026-02-19
+> Version: 4.0 | Updated: 2026-02-20
 
 ## Overview
 
@@ -22,21 +22,26 @@ specs/
 │   ├── data-models.md           # Canonical data shapes
 │   ├── api-contracts.md         # API endpoint contracts
 │   ├── store-map.md             # Zustand store inventory
-│   └── injection-guide.md       # How to inject specs into AI prompts
+│   ├── injection-guide.md       # How to inject specs into AI prompts
+│   ├── components/              # Shared component specs (CMN-*)
+│   │   ├── CMN-01-header.md
+│   │   ├── CMN-02-footer.md
+│   │   ├── CMN-03-mobile-nav.md
+│   │   ├── CMN-03-modals.md
+│   │   └── CMN-04-toasts.md
+│   └── templates/               # Spec templates
+│       ├── screen-spec-template.md
+│       └── flow-spec-template.md
 ├── _next/                 # Future feature drafts (DRAFT status)
+├── admin/                 # v3.0 admin specs (exception — v3.0 format)
 ├── flows/                 # User journey flows (FLW-*)
 ├── screens/               # Screen specs by bundle
 │   ├── detail/            # SCR-VIEW-* (detail view screens)
 │   ├── discovery/         # SCR-DISC-* (home, search, feed)
 │   ├── creation/          # SCR-CREA-* (upload, AI tagging)
 │   └── user/              # SCR-USER-* (login, profile, settings)
-├── shared/                # Legacy shared (templates, conventions)
-│   └── templates/         # Spec templates
 └── README.md
 ```
-
-> Note: `_shared/`, `flows/`, and `screens/` will be populated in v4-02 through v4-07.
-> Do not create empty directories.
 
 ## ID Scheme
 
@@ -73,14 +78,15 @@ Quick reference for loading specs into AI agent prompts:
 | Adding a feature | Flow spec + affected screen specs + `_shared/api-contracts.md` |
 | Fixing a bug | Screen spec + `_shared/component-registry.md` + `_shared/store-map.md` |
 | Understanding data | `_shared/data-models.md` + `_shared/api-contracts.md` |
-| New screen from scratch | `shared/templates/screen-spec-template.md` + `_shared/component-registry.md` |
+| New screen from scratch | `_shared/templates/screen-spec-template.md` + `_shared/component-registry.md` |
+| Admin feature work | `admin/` + relevant screen spec |
 
-> Full injection guide: `_shared/injection-guide.md` (created in v4-02)
+> Full injection guide: `_shared/injection-guide.md`
 
 ## Templates
 
-- [Screen spec template](./shared/templates/screen-spec-template.md) — for SCR-* documents
-- [Flow spec template](./shared/templates/flow-spec-template.md) — for FLW-* documents
+- [Screen spec template](./_shared/templates/screen-spec-template.md) — for SCR-* documents
+- [Flow spec template](./_shared/templates/flow-spec-template.md) — for FLW-* documents
 
 ## Related Docs
 

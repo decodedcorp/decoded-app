@@ -22,7 +22,7 @@ What are you doing?
 │   → If data/API related, add: api-contracts.md + data-models.md
 │
 ├── Creating a new screen from scratch
-│   → shared/templates/screen-spec-template.md + component-registry.md + relevant flow spec
+│   → _shared/templates/screen-spec-template.md + component-registry.md + relevant flow spec
 │
 ├── Modifying data flow (API calls, store state, data transformations)
 │   → api-contracts.md + data-models.md + store-map.md
@@ -93,7 +93,7 @@ What are you doing?
 
 | Priority | File | Purpose |
 |----------|------|---------|
-| Required | `specs/shared/templates/screen-spec-template.md` | Spec format and structure |
+| Required | `specs/_shared/templates/screen-spec-template.md` | Spec format and structure |
 | Required | `specs/_shared/component-registry.md` | Available components to specify |
 | Optional | Relevant flow spec | User journey context for the screen |
 | Optional | `specs/_shared/api-contracts.md` | Endpoints the screen will call |
@@ -126,7 +126,7 @@ What are you doing?
 |----------|------|---------|
 | Required | `specs/_shared/component-registry.md` | Component's current props and usage |
 | Optional | 1–2 most relevant screen specs | How screens depend on this component |
-| Optional | CMN spec (`specs/shared/components/CMN-*.md`) | If it's a layout component (header/footer/nav) |
+| Optional | CMN spec (`specs/_shared/components/CMN-*.md`) | If it's a layout component (header/footer/nav) |
 
 **Loading order:** component-registry → CMN spec (if layout) → affected screens
 
@@ -148,6 +148,22 @@ What are you doing?
 
 ---
 
+### Admin feature work
+
+**Goal:** Build or modify features in the admin panel (`/admin` routes).
+
+| Priority | File | Purpose |
+|----------|------|---------|
+| Required | `specs/admin/` | v3.0 admin specs — entity management, UI patterns |
+| Optional | `specs/_shared/api-contracts.md` | API endpoints the admin feature calls |
+| Optional | `specs/_shared/data-models.md` | Entity types managed by admin |
+
+> Note: `specs/admin/` uses v3.0 spec format — it is a permanent exception and will not be rewritten to v4.0 format.
+
+**Loading order:** admin spec → api-contracts (if needed) → data-models (if needed)
+
+---
+
 ## File Inventory
 
 All spec files with their purpose and location:
@@ -159,11 +175,13 @@ All spec files with their purpose and location:
 | API Contracts | `specs/_shared/api-contracts.md` | Endpoint reference — 24 routes with params, body, response, auth | ~700 lines |
 | Store Map | `specs/_shared/store-map.md` | State management reference — 6 Zustand stores with state shapes, transitions, screen usage | ~330 lines |
 | Injection Guide | `specs/_shared/injection-guide.md` | This file — context loading protocol | ~200 lines |
-| Screen Spec Template | `specs/shared/templates/screen-spec-template.md` | Template for new screen specs | ~100 lines |
-| Flow Spec Template | `specs/shared/templates/flow-spec-template.md` | Template for new flow specs | ~100 lines |
-| CMN-01 Header | `specs/shared/components/CMN-01-header.md` | Header component spec (DesktopHeader + MobileHeader) | ~80 lines |
-| CMN-02 Footer | `specs/shared/components/CMN-02-footer.md` | Footer component spec (DesktopFooter) | ~80 lines |
-| CMN-03 Mobile Nav | `specs/shared/components/CMN-03-mobile-nav.md` | Mobile bottom nav spec (NavBar + NavItem) | ~80 lines |
+| Screen Spec Template | `specs/_shared/templates/screen-spec-template.md` | Template for new screen specs | ~100 lines |
+| Flow Spec Template | `specs/_shared/templates/flow-spec-template.md` | Template for new flow specs | ~100 lines |
+| CMN-01 Header | `specs/_shared/components/CMN-01-header.md` | Header component spec (DesktopHeader + MobileHeader) | ~80 lines |
+| CMN-02 Footer | `specs/_shared/components/CMN-02-footer.md` | Footer component spec (DesktopFooter) | ~80 lines |
+| CMN-03 Mobile Nav | `specs/_shared/components/CMN-03-mobile-nav.md` | Mobile bottom nav spec (NavBar + NavItem) | ~80 lines |
+| CMN-03 Modals | `specs/_shared/components/CMN-03-modals.md` | Modal component spec | ~80 lines |
+| CMN-04 Toasts | `specs/_shared/components/CMN-04-toasts.md` | Toast/notification spec | ~80 lines |
 
 **Screen specs** (populated in v4-04 through v4-07):
 
