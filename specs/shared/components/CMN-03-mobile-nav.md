@@ -1,136 +1,84 @@
-# [CMN-03] 모바일 하단 네비게이션 (Mobile Bottom Navigation)
+---
+id: CMN-03
+component: Mobile Bottom Navigation
+status: implemented
+updated: 2026-02-19
+---
 
-| 항목 | 내용 |
-|------|------|
-| **문서 ID** | CMN-03 |
-| **컴포넌트명** | 모바일 하단 네비게이션 |
-| **작성일** | 2025-01-15 |
-| **버전** | v1.0 |
-| **상태** | 구현됨 |
+# CMN-03: Mobile Bottom Navigation
+
+Fixed bottom navigation bar for mobile viewports. Hidden on desktop (`md:hidden`). Composed of `NavBar` (container) and `NavItem` (individual items).
+
+**Props reference:** `→ specs/_shared/component-registry.md` (NavBar, NavItem entries)
 
 ---
 
-## 1. 컴포넌트 개요
+## Component Map
 
-- **목적**: 모바일에서 주요 네비게이션 제공 (Instagram 스타일)
-- **사용 위치**: 모바일 화면(<768px) 하단에 고정
-- **표시 조건**: 모바일 뷰포트에서만 표시, 데스크톱에서 숨김
-
----
-
-## 2. UI 와이어프레임
-
-### 2.1 기본 레이아웃
-
-```
-┌─────────────────────────────────────────┐
-│                                         │
-│   [Home]  [Search]  [Plus]  [User]      │  ← Lucide React 아이콘
-│   (active)          (disabled)(disabled)│
-│                                         │
-└─────────────────────────────────────────┘
-```
-
-### 2.2 Active 상태
-
-```
-┌─────────────────────────────────────────┐
-│   [Home]  [Search]  [Plus]  [User]      │
-│   [■fill]  [□line]   [x]     [x]       │
-│   (active) (normal) (disabled)          │
-└─────────────────────────────────────────┘
-```
+| Component | File | Role |
+|-----------|------|------|
+| `NavBar` | `packages/web/lib/design-system/nav-bar.tsx` | Container — fixed bottom bar with safe-area support |
+| `NavItem` | `packages/web/lib/design-system/nav-item.tsx` | Individual nav item — icon + label, renders as Link or button |
 
 ---
 
-## 3. UI 요소 정의
+## NavBar
 
-| UI ID | 구분 | 요소명 | Lucide 아이콘 | 속성/상태 | 인터랙션/로직 |
-|:---:|:---:|:---:|:---:|:---|:---|
-| NAV-HOME | 링크 | Home | `Home` | active 시 stroke-[2.5] | `/` 이동 |
-| NAV-EXPLORE | 링크 | Explore | `Search` | active 시 stroke-[2.5] | `/explore` 이동 |
-| NAV-CREATE | 버튼 | Create | `Plus` | **disabled**, opacity-40 | 미구현 (클릭 불가) |
-| NAV-PROFILE | 버튼 | Profile | `User` | **disabled**, opacity-40 | 미구현 (클릭 불가) |
+**Height:** 64px (h-16) | **Position:** `fixed bottom-0 left-0 right-0` | **z-index:** 50
 
----
+Background: `bg-card` with `border-t border-border`. Safe-area padding: `pb-[calc(8px+env(safe-area-inset-bottom,0px))]` for iPhone notch support.
 
-## 4. 상태 정의
+`position` prop: `fixed` (default) | `static` (for testing).
 
-| 상태 | 조건 | UI 변화 |
-|------|------|--------|
-| Home 활성 | pathname === '/' | Home 아이콘 stroke-[2.5], text-foreground |
-| Explore 활성 | pathname === '/explore' | Explore 아이콘 stroke-[2.5], text-foreground |
-| 비활성 | pathname !== href | stroke-[1.5], text-muted-foreground |
-| Disabled | 미구현 탭 | opacity-40, cursor-not-allowed |
+`role="navigation"`, `aria-label="Main navigation"`.
 
 ---
 
-## 5. 디자인 토큰
+## NavItem
 
-| 토큰 | 값 | 설명 |
-|------|---|------|
-| 높이 | 56px (h-14) | safe-area 제외 |
-| 배경 | bg-background/95 | 반투명 |
-| Blur | backdrop-blur-lg | 배경 흐림 |
-| 아이콘 크기 | 24px (h-6 w-6) | - |
-| 터치 영역 | 전체 너비 / 4 | flex items-center justify-center |
-| z-index | 50 | 콘텐츠 위에 표시 |
-| safe-area | pb-[env(safe-area-inset-bottom,0px)] | iPhone 노치 대응 |
-| border | border-t border-border | 상단 구분선 |
+Renders as `<Link>` when `href` provided, `<button>` when `onClick` provided, disabled `<button>` when `disabled` prop set.
 
----
+**State variants:** `active` (text-primary) | `inactive` (text-muted-foreground)
 
-## 6. 접근성 (A11y)
+**Size variants:** `sm` (18px icon) | `md` (22px icon, default) | `lg` (26px icon)
 
-- `role="navigation"`, `aria-label="Main navigation"`
-- 활성 링크: `aria-current="page"`
-- Disabled 버튼: `aria-disabled="true"`, `aria-label="[탭명] (coming soon)"`
-- 모든 요소에 `aria-label` 제공
+Disabled state: `opacity-40 cursor-not-allowed`, `aria-disabled="true"`, `aria-label="{label} (coming soon)"`.
+
+Active link: `aria-current="page"`.
 
 ---
 
-## 7. 컴포넌트 매핑
+## Current Navigation Items
 
-| UI 영역 | 컴포넌트 | 파일 경로 |
-|--------|---------|----------|
-| 전체 | MobileNavBar | `lib/components/MobileNavBar.tsx` |
+| Label | Icon | Route | State |
+|-------|------|-------|-------|
+| Home | `Home` (Lucide) | `/` | Active when `pathname === '/'` |
+| Explore | `Search` (Lucide) | `/explore` | Active when `pathname === '/explore'` |
+| Request | `Plus` (Lucide) | — | Disabled (coming soon) |
+| Profile | `User` (Lucide) | — | Disabled (coming soon) |
 
----
-
-## 8. 구현 체크리스트
-
-- [x] MobileNavBar 컴포넌트 생성
-- [x] 4개 네비게이션 아이템 (Home, Explore, Create, Profile)
-- [x] Active 상태 스타일링 (stroke 두께)
-- [x] Disabled 상태 (Create, Profile)
-- [x] 반응형 (md:hidden)
-- [x] safe-area-inset-bottom 대응
-- [x] 접근성 속성 추가 (aria-*)
-- [x] layout.tsx에 전역 배치
+Active state determined by comparing `usePathname()` to each item's `href`.
 
 ---
 
-## 9. 관련 문서
+## Layout with Header
 
-- [CMN-01 헤더](./CMN-01-header.md) - 모바일에서 간소화된 헤더와 함께 사용
+Mobile pages require padding to avoid content overlap:
+- Top: `pt-14` (56px for MobileHeader)
+- Bottom: `pb-16` (64px for NavBar) + safe-area
 
 ---
 
-## 10. v2.0 Implementation Notes
+## Requirements
 
-**구현 파일:**
-- `lib/components/ui/mobile-nav-bar.tsx` (MobileNavBar)
+- When the viewport is below 768px, the system shall render the NavBar at the bottom of the screen.
+- When the viewport is 768px or wider, the system shall hide the NavBar (`md:hidden`).
+- When a NavItem's route matches the current pathname, the system shall apply the `active` state style.
+- When a NavItem is disabled, the system shall prevent navigation and show `opacity-40` styling.
+- When running on a device with a home indicator (iPhone), the system shall apply `safe-area-inset-bottom` padding.
 
-**변경 사항 (v2.0):**
-- Bottom navigation 유지 (Instagram 스타일)
-- 56px 높이 (h-14)
-- 4개 탭: Home, Explore, Create(disabled), Profile(disabled)
-- Active 상태: stroke-[2.5], text-foreground
-- 구현 상태: Home, Explore만 활성화
+---
 
-**Header와 조합:**
-- MobileHeader (상단) + MobileNavBar (하단)
-- 페이지 콘텐츠에 pt-14 pb-14 padding 적용 필요
-- safe-area-inset-bottom 지원으로 iPhone 노치 대응
+## Related
 
-**Last Updated:** 2026-02-05
+- CMN-01: MobileHeader (top header, used alongside NavBar on mobile) — `specs/shared/components/CMN-01-header.md`
