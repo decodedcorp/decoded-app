@@ -66,7 +66,7 @@ export function ItemEditor({
 
   function startEdit(
     itemId: string,
-    field: EditingField extends null ? never : EditingField["field"],
+    field: "name" | "brand" | "confidence",
     currentValue: string
   ) {
     setEditingField({ itemId, field });
