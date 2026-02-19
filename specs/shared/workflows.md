@@ -37,13 +37,13 @@
 
 ### 1.2 Detailed Flow Stages
 
-| Stage | 화면 | 주요 액션 | 다음 단계 트리거 |
-|-------|------|----------|-----------------|
-| 진입 | Home (`/`) | 피드 스크롤, 이미지 탐색 | 필터 클릭 or 이미지 클릭 |
-| 발견 | Home + Filter | 필터 선택, 검색 | 결과 확인 |
-| 탐색 | Grid View | 이미지 카드 스크롤 | 카드 클릭 |
-| 상세 | Detail Modal/Page | 스팟 확인, 아이템 탐색 | 구매 버튼 클릭 |
-| 액션 | External | 구매, 저장, 공유 | 완료 or 돌아가기 |
+| Stage | 화면              | 주요 액션                | 다음 단계 트리거         |
+| ----- | ----------------- | ------------------------ | ------------------------ |
+| 진입  | Home (`/`)        | 피드 스크롤, 이미지 탐색 | 필터 클릭 or 이미지 클릭 |
+| 발견  | Home + Filter     | 필터 선택, 검색          | 결과 확인                |
+| 탐색  | Grid View         | 이미지 카드 스크롤       | 카드 클릭                |
+| 상세  | Detail Modal/Page | 스팟 확인, 아이템 탐색   | 구매 버튼 클릭           |
+| 액션  | External          | 구매, 저장, 공유         | 완료 or 돌아가기         |
 
 ---
 
@@ -79,15 +79,15 @@
 
 ### 2.2 Screen Transition Matrix
 
-| From | To | Trigger | Animation | Route Pattern |
-|------|----|---------|-----------|--------------|
-| Home | Detail (Modal) | Card Click (Desktop) | FLIP + Fade | `/@modal/(.)images/[id]` |
-| Home | Detail (Page) | Card Click (Mobile) | Slide Right | `/images/[id]` |
-| Detail | Home | Back/Close | Reverse FLIP | `/` |
-| Home | Filtered Home | Filter Tab Click | Fade | `/?filter=xxx` |
-| Home | Search | Search Icon Click | Slide Down | `/search?q=xxx` |
-| Search | Detail | Result Click | FLIP | `/images/[id]` |
-| Detail | External | Buy Button | New Tab | External URL |
+| From   | To             | Trigger              | Animation    | Route Pattern            |
+| ------ | -------------- | -------------------- | ------------ | ------------------------ |
+| Home   | Detail (Modal) | Card Click (Desktop) | FLIP + Fade  | `/@modal/(.)images/[id]` |
+| Home   | Detail (Page)  | Card Click (Mobile)  | Slide Right  | `/images/[id]`           |
+| Detail | Home           | Back/Close           | Reverse FLIP | `/`                      |
+| Home   | Filtered Home  | Filter Tab Click     | Fade         | `/?filter=xxx`           |
+| Home   | Search         | Search Icon Click    | Slide Down   | `/search?q=xxx`          |
+| Search | Detail         | Result Click         | FLIP         | `/images/[id]`           |
+| Detail | External       | Buy Button           | New Tab      | External URL             |
 
 ### 2.3 FLIP Animation Flow
 
@@ -157,14 +157,14 @@
 
 ### 3.2 Component Behavior by Viewport
 
-| Component | Mobile (≤640px) | Desktop (>640px) | File |
-|-----------|----------------|------------------|------|
-| Header | 축소형 로고 + 햄버거 | 풀 로고 + 인라인 메뉴 | `Header.tsx` |
-| FilterTabs | 하단 고정 탭 | 상단 드롭다운 바 | `FilterTabs.tsx` |
-| ThiingsGrid | 1열 세로 스크롤 | 2-4열 Masonry | `ThiingsGrid.tsx` |
-| ImageDetail | 풀페이지 | 모달 오버레이 | `ImageDetailModal.tsx` |
-| ItemCards | 스와이프 캐러셀 | 수평 스크롤 그리드 | `ShopGrid.tsx` |
-| SearchInput | 풀스크린 오버레이 | 인라인 확장 | `SearchInput.tsx` |
+| Component   | Mobile (≤640px)      | Desktop (>640px)      | File                   |
+| ----------- | -------------------- | --------------------- | ---------------------- |
+| Header      | 축소형 로고 + 햄버거 | 풀 로고 + 인라인 메뉴 | `Header.tsx`           |
+| FilterTabs  | 하단 고정 탭         | 상단 드롭다운 바      | `FilterTabs.tsx`       |
+| ThiingsGrid | 1열 세로 스크롤      | 2-4열 Masonry         | `ThiingsGrid.tsx`      |
+| ImageDetail | 풀페이지             | 모달 오버레이         | `ImageDetailModal.tsx` |
+| ItemCards   | 스와이프 캐러셀      | 수평 스크롤 그리드    | `ShopGrid.tsx`         |
+| SearchInput | 풀스크린 오버레이    | 인라인 확장           | `SearchInput.tsx`      |
 
 ---
 
@@ -410,11 +410,11 @@
 
 ### 5.2 Query Key Dependencies
 
-| Query Key | 의존 Store | 트리거 액션 |
-|-----------|-----------|------------|
+| Query Key                       | 의존 Store               | 트리거 액션            |
+| ------------------------------- | ------------------------ | ---------------------- |
 | `["images", "infinite", {...}]` | filterStore, searchStore | 필터 변경, 검색어 입력 |
-| `["image", id]` | - | 상세 페이지 진입 |
-| `["related", account]` | - | 관련 이미지 로드 |
+| `["image", id]`                 | -                        | 상세 페이지 진입       |
+| `["related", account]`          | -                        | 관련 이미지 로드       |
 
 ---
 
@@ -447,13 +447,13 @@
 
 ### 6.2 Edge Cases
 
-| 상황 | 처리 방법 | 관련 파일 |
-|------|----------|----------|
-| 이미지 0개 | EmptyState 표시 | `EmptyState.tsx` |
+| 상황              | 처리 방법                  | 관련 파일                 |
+| ----------------- | -------------------------- | ------------------------- |
+| 이미지 0개        | EmptyState 표시            | `EmptyState.tsx`          |
 | 아이템 0개 (상세) | "No items detected" 메시지 | `InteractiveShowcase.tsx` |
-| 좌표 없는 아이템 | 기본 위치 (center) 사용 | `useNormalizedItems.ts` |
-| 매우 긴 스크롤 | 300 DOM 노드 제한 | `ThiingsGrid.tsx` |
-| 오프라인 | 캐시된 데이터 표시 | React Query gcTime |
+| 좌표 없는 아이템  | 기본 위치 (center) 사용    | `useNormalizedItems.ts`   |
+| 매우 긴 스크롤    | 300 DOM 노드 제한          | `ThiingsGrid.tsx`         |
+| 오프라인          | 캐시된 데이터 표시         | React Query gcTime        |
 
 ---
 
@@ -466,10 +466,10 @@
 ├── ?filter=xxx             # 필터 적용된 홈
 ├── ?q=xxx                  # 검색 결과
 │
-/images/[id]                # 이미지 상세 (풀페이지)
-/@modal/(.)images/[id]      # 이미지 상세 (인터셉션 모달)
+/posts/[id]                 # 포스트 상세 (이미지 중심 UI)
+/@modal/(.)posts/[id]       # 포스트 상세 (인터셉션 모달)
 │
-/posts/[id]                 # 포스트 상세
+/images/[id]                # [legacy] /posts/[id]로 리다이렉트
 │
 /search                     # 검색 결과 페이지 (미구현)
 │
@@ -499,14 +499,14 @@
 
 ### 7.2 Component → Route Mapping
 
-| Component | Route | 비고 |
-|-----------|-------|------|
-| `HomeClient.tsx` | `/` | 메인 피드 |
-| `ThiingsGrid.tsx` | `/` | 그리드 렌더링 |
-| `ImageDetailPage.tsx` | `/images/[id]` | 풀페이지 상세 |
-| `ImageDetailModal.tsx` | `/@modal/(.)images/[id]` | 모달 상세 |
-| `Header.tsx` | 전역 | 고정 헤더 |
-| `FilterTabs.tsx` | `/` | 필터 UI |
+| Component              | Route                   | 비고          |
+| ---------------------- | ----------------------- | ------------- |
+| `HomeClient.tsx`       | `/`                     | 메인 피드     |
+| `ThiingsGrid.tsx`      | `/`                     | 그리드 렌더링 |
+| `ImageDetailPage.tsx`  | `/posts/[id]`           | 풀페이지 상세 |
+| `ImageDetailModal.tsx` | `/@modal/(.)posts/[id]` | 모달 상세     |
+| `Header.tsx`           | 전역                    | 고정 헤더     |
+| `FilterTabs.tsx`       | `/`                     | 필터 UI       |
 
 ---
 
