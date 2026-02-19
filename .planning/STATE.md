@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 
 ## Current Position
 
-Phase: v4-04 Screen Specs: Detail View — Complete
-Plan: 2/2 plans complete
-Status: v4-04-02 complete — all 4 Detail View screen specs written (SCR-VIEW-01 through SCR-VIEW-04)
-Last activity: 2026-02-19 — Completed v4-04-02-PLAN.md (SCR-VIEW-03 and SCR-VIEW-04)
+Phase: v4-05 Screen Specs: Discovery — In progress
+Plan: 1/2 plans complete
+Status: v4-05-01 complete — SCR-DISC-01 (Home) and SCR-DISC-02 (Search) screen specs written
+Last activity: 2026-02-19 — Completed v4-05-01-PLAN.md (SCR-DISC-01 and SCR-DISC-02)
 
-Progress: v4.0 [████░░░░░░] 4/9 phases (7/13 plans complete)
+Progress: v4.0 [████░░░░░░] 4.5/9 phases (8/13 plans complete)
 
 ## Milestone Summary
 
@@ -35,7 +35,7 @@ Progress: v4.0 [████░░░░░░] 4/9 phases (7/13 plans complete)
 | v4-02 | Shared Foundation | SHRD-01~05 | 2/2 | Complete |
 | v4-03 | Flow Documents | FLOW-01~05 | 1/1 | Complete |
 | v4-04 | Screen Specs: Detail View | DETL-01~04 | 2/2 | Complete |
-| v4-05 | Screen Specs: Discovery | DISC-01~04 | 0/2 | Not started |
+| v4-05 | Screen Specs: Discovery | DISC-01~04 | 1/2 | In progress |
 | v4-06 | Screen Specs: Creation-AI | CREA-01~03 | 0/1 | Not started |
 | v4-07 | Screen Specs: User System | USER-01~03 | 0/1 | Not started |
 | v4-08 | Next Version Draft | NEXT-01~04 | 0/1 | Not started |
@@ -79,6 +79,9 @@ Key decisions affecting v4.0 work:
 - v4-04-02: Related content recommendation is artist-based only (useInfinitePosts artistName filter); no ML/category/tag-based recommendation logic exists
 - v4-04-02: SmartTagsBreadcrumb is purely presentational (tags passed as props, no data fetching, no filtering query triggered on tag tap)
 - v4-04-02: CommentSection lives in shared/ with MOCK_COMMENTS; detail-specific CommentForm/Item/List/Section components confirmed missing
+- v4-05-01: HomeClient.tsx at app/HomeClient.tsx is a legacy vertical-feed component NOT used by the current home page; HomeAnimatedContent (lib/components/main/HomeAnimatedContent.tsx) is the actual client entry point for the SSR home page
+- v4-05-01: Search is a full-screen page route (/search), not a modal — SearchPageClient renders fixed inset-0 z-50 within the page
+- v4-05-01: Search tabs are All/People/Media/Items (actual implementation); useGroupedSearch enabled guard is debouncedQuery.length >= 2
 
 ### Pending Todos
 
@@ -96,11 +99,11 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-19T13:00Z (approx)
-Stopped at: Completed v4-04-02-PLAN.md (SCR-VIEW-03 and SCR-VIEW-04 screen specs)
+Last session: 2026-02-19T13:51Z
+Stopped at: Completed v4-05-01-PLAN.md (SCR-DISC-01 and SCR-DISC-02 screen specs)
 Resume file: None
 
 ---
 
 *Created: 2026-02-05*
-*Last updated: 2026-02-19 after v4-04-02 completion*
+*Last updated: 2026-02-19 after v4-05-01 completion*
