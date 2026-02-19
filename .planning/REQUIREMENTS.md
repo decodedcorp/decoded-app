@@ -34,15 +34,15 @@ Requirements for Admin Panel — AI Management. 목업 데이터 우선, 백엔�
 
 ### Pipeline Log
 
-- [ ] **PIPE-01**: 파이프라인 실행 목록 (업로드→분석→감지 플로우)
-- [ ] **PIPE-02**: 단계별 상세 로그 (각 단계 소요 시간, 결과)
-- [ ] **PIPE-03**: 에러 파이프라인 필터링 및 재시도 UI
+- [x] **PIPE-01**: 파이프라인 실행 목록 (업로드→분석→감지 플로우)
+- [x] **PIPE-02**: 단계별 상세 로그 (각 단계 소요 시간, 결과)
+- [x] **PIPE-03**: 에러 파이프라인 필터링 및 재시도 UI
 
 ### Server Log
 
-- [ ] **SLOG-01**: API 요청 로그 뷰어 (엔드포인트, 상태코드, 응답시간)
-- [ ] **SLOG-02**: 에러 로그 필터링 (에러 레벨, 기간, 검색)
-- [ ] **SLOG-03**: 실시간 로그 스트리밍 UI (tail -f 스타일)
+- [x] **SLOG-01**: API 요청 로그 뷰어 (엔드포인트, 상태코드, 응답시간)
+- [x] **SLOG-02**: 에러 로그 필터링 (에러 레벨, 기간, 검색)
+- [x] **SLOG-03**: 실시간 로그 스트리밍 UI (tail -f 스타일)
 
 ## Future Requirements
 
@@ -89,12 +89,12 @@ Requirements for Admin Panel — AI Management. 목업 데이터 우선, 백엔�
 | COST-01 | v3-04 | Complete |
 | COST-02 | v3-04 | Complete |
 | COST-03 | v3-04 | Complete |
-| PIPE-01 | v3-05 | Pending |
-| PIPE-02 | v3-05 | Pending |
-| PIPE-03 | v3-05 | Pending |
-| SLOG-01 | v3-05 | Pending |
-| SLOG-02 | v3-05 | Pending |
-| SLOG-03 | v3-05 | Pending |
+| PIPE-01 | v3-05 | Complete |
+| PIPE-02 | v3-05 | Complete |
+| PIPE-03 | v3-05 | Complete |
+| SLOG-01 | v3-05 | Complete |
+| SLOG-02 | v3-05 | Complete |
+| SLOG-03 | v3-05 | Complete |
 
 **Coverage:**
 - v3.0 requirements: 18 total
@@ -103,4 +103,4 @@ Requirements for Admin Panel — AI Management. 목업 데이터 우선, 백엔�
 
 ---
 *Requirements defined: 2026-02-19*
-*Last updated: 2026-02-19 (v3-04 COST-01~03 complete)*
+*Last updated: 2026-02-19 (v3-05 PIPE-01~03, SLOG-01~03 complete)*

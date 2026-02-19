@@ -6,7 +6,7 @@
 - [x] **v1.1 Full API Integration** - Phase 6 + Tracks A-D (shipped 2026-01-29)
 - [x] **v2.0 Design Overhaul** - v2-Phases 1-9 (shipped 2026-02-05)
 - [x] **v2.1 Design System Expansion** - v2.1-Phases 1-6 (shipped 2026-02-06)
-- [ ] **v3.0 Admin Panel — AI Management** - v3-Phases 01-05 (in progress)
+- [x] **v3.0 Admin Panel — AI Management** - v3-Phases 01-05 (shipped 2026-02-19)
 
 ## Phases
 
@@ -167,11 +167,11 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — Pipeline + server log mock data, types, data layer, 4 API routes
-- [ ] 05-02-PLAN.md — Pipeline Logs UI (table, accordion detail, status filter, retry, pagination)
-- [ ] 05-03-PLAN.md — Server Logs UI (log table, filters, terminal-style streaming console)
+- [x] 05-01-PLAN.md — Pipeline + server log mock data, types, data layer, 4 API routes
+- [x] 05-02-PLAN.md — Pipeline Logs UI (table, accordion detail, status filter, retry, pagination)
+- [x] 05-03-PLAN.md — Server Logs UI (log table, filters, terminal-style streaming console)
 
-**Status:** [ ] Not started
+**Status:** [x] Complete (2026-02-19)
 
 ---
 
@@ -183,8 +183,8 @@ Plans:
 | v1.1 API Integration | 6 + A-D | 13/13 | Shipped | 2026-01-29 |
 | v2.0 Design Overhaul | v2-1~9 | 26/26 | Shipped | 2026-02-05 |
 | v2.1 Design System | v2.1-1~6 | 14/14 | Shipped | 2026-02-06 |
-| **v3.0 Admin Panel** | **v3-01~05** | **8/?** | **In Progress** | - |
-| **Total** | **5 milestones** | **66+ plans** | **Ongoing** | - |
+| **v3.0 Admin Panel** | **v3-01~05** | **11/11** | **Complete** | 2026-02-19 |
+| **Total** | **5 milestones** | **69 plans** | **Ongoing** | - |
 
 ### v3.0 Phase Progress
 
@@ -194,11 +194,11 @@ Plans:
 | v3-02 | Dashboard — KPI cards, traffic charts, today summary | DASH-01~03 | ✓ Complete (2026-02-19) |
 | v3-03 | AI Audit — request list, detail view, edit, filter | AUDIT-01~04 | ✓ Complete (2026-02-19) |
 | v3-04 | AI Cost Monitoring — call stats, token charts, cost estimate | COST-01~03 | ✓ Complete (2026-02-19) |
-| v3-05 | Pipeline & Server Logs — pipeline viewer, server log, streaming | PIPE-01~03, SLOG-01~03 | Not started |
+| v3-05 | Pipeline & Server Logs — pipeline viewer, server log, streaming | PIPE-01~03, SLOG-01~03 | ✓ Complete (2026-02-19) |
 
 **v3.0 Coverage:** 18/18 requirements mapped (100%)
 
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-02-19 (v3-04 AI Cost Monitoring complete)*
+*Last updated: 2026-02-19 (v3-05 Pipeline & Server Logs complete — v3.0 milestone shipped)*

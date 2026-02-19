@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-02-19 — Milestone v4.0 started
+Phase: v3-05 (Pipeline & Server Logs) — Complete
+Plan: 3/3 plans complete
+Status: v3.0 Milestone complete
+Last activity: 2026-02-19 — Completed 05-03-PLAN.md (server logs UI: terminal streaming, filters, log table)
 
-Progress: v3.0 [████████--] 4/5 phases | v4.0 [----------] 0/? phases
+Progress: v3.0 [██████████] 5/5 phases complete (milestone shipped)
 
 ## Milestone Summary
 
@@ -24,9 +24,9 @@ Progress: v3.0 [████████--] 4/5 phases | v4.0 [----------] 0/? p
 | v1.1 API Integration | 5 | 13 | Shipped | 2026-01-29 |
 | v2.0 Design Overhaul | 9 | 26 | Shipped | 2026-02-05 |
 | v2.1 Design System | 6 | 14 | Shipped | 2026-02-06 |
-| **v3.0 Admin Panel** | **5** | **8** | **In Progress** | - |
+| **v3.0 Admin Panel** | **5** | **11** | **Shipped** | 2026-02-19 |
 | **v4.0 Spec Overhaul** | **?** | **0** | **Defining** | - |
-| **Total** | **30+** | **66+** | **Ongoing** | - |
+| **Total** | **30+** | **69+** | **Ongoing** | - |
 
 ## v3.0 Roadmap
 
@@ -36,7 +36,7 @@ Progress: v3.0 [████████--] 4/5 phases | v4.0 [----------] 0/? p
 | v3-02 | Dashboard | DASH-01~03 | ✓ Complete (2/2 plans) |
 | v3-03 | AI Audit | AUDIT-01~04 | ✓ Complete (2/2 plans) |
 | v3-04 | AI Cost Monitoring | COST-01~03 | ✓ Complete (2/2 plans) |
-| v3-05 | Pipeline & Server Logs | PIPE-01~03, SLOG-01~03 | In progress (1/2 plans) |
+| v3-05 | Pipeline & Server Logs | PIPE-01~03, SLOG-01~03 | ✓ Complete (3/3 plans) |
 
 ## Accumulated Context
 
@@ -106,6 +106,13 @@ Key decisions affecting future work:
 - 05-01: PipelineListItem = Omit<PipelineExecution, 'steps'> — list endpoint strips heavy nested arrays for performance
 - 05-01: generateStreamLogs intentionally non-deterministic (Date.now() + Math.random()) for realistic polling UX
 - 05-01: Server log level distribution: 60% info / 20% warn / 12% error / 8% debug via levelForValue threshold mapping
+- 05-02: Pipeline accordion uses colSpan tr insertion for inline expansion (no separate detail page)
+- 05-02: Running status badge uses animate-pulse for visual activity indication
+- 05-02: Retry button uses e.stopPropagation() + sonner toast (mock only, no real API call)
+- 05-03: useLogStream custom hook with setInterval polling (2500ms), not React Query — streaming state is ephemeral
+- 05-03: Terminal console bg-gray-950 + font-mono text-xs for authentic tail -f feel
+- 05-03: Auto-scroll detection: scrollTop + clientHeight < scrollHeight - 50px threshold, jump-to-bottom pill on manual scroll
+- 05-03: Time range presets (1h/6h/24h/7d/All) compute from ISO string from current time, stored as URL param
 
 ### Tech Debt (from v2.1)
 
@@ -141,7 +148,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 05-01-PLAN.md — pipeline + server log data layer and API routes (v3-05 in progress, 1/2 plans done)
+Stopped at: Completed all 3 plans in v3-05 — pipeline logs UI + server logs UI + terminal streaming. v3.0 milestone shipped.
 Resume file: None
 
 ## Quick Tasks Completed
