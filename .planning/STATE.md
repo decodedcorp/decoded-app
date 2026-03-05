@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 Phase: None — between milestones
 Plan: Not started
 Status: Ready to plan next milestone
-Last activity: 2026-03-05 — Completed quick task 041: switch home page to Supabase direct queries
+Last activity: 2026-03-05 — Completed quick task 042: Excalidraw service journey scenario diagram
 
 Progress: 6 milestones shipped [██████████] 83/83 plans complete
 
@@ -49,6 +49,7 @@ None.
 | 039 | Fix fetchPostsServer 400 error (has_solutions param) | 2026-03-05 | e9303d8 | [039-fix-fetchpostsserver-400-has-solutions](./quick/039-fix-fetchpostsserver-400-has-solutions/) |
 | 040 | Fix posts proxy error handling for non-JSON responses | 2026-03-05 | c4e8b34 | [040-fix-explore-posts-fetch-error-handling](./quick/040-fix-explore-posts-fetch-error-handling/) |
 | 041 | Switch home page from external API to Supabase direct queries | 2026-03-05 | 8c68ec3 | [041-home-page-supabase-direct-queries](./quick/041-home-page-supabase-direct-queries/) |
+| 042 | Excalidraw service journey scenario diagram | 2026-03-05 | 49e971f | [042-excalidraw-service-journey-scenario](./quick/042-excalidraw-service-journey-scenario/) |
 
 ## Session Continuity
 
