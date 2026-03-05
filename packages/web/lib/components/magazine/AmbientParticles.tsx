@@ -7,7 +7,7 @@ interface AmbientParticlesProps {
   isActive: boolean;
 }
 
-const PARTICLE_COUNT = 18;
+const PARTICLE_COUNT = 10;
 
 /** Generate a random viewport position (percentage 0-100) */
 function randomPos() {

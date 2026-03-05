@@ -130,6 +130,9 @@ export function DailyEditorialClient() {
       <GrainOverlay />
       <AmbientParticles isActive={true} />
 
+      {/* Constrained content for editorial feel on wide screens */}
+      <div className="mx-auto max-w-lg">
+
       {/* Hero Section */}
       <EditorialHero
         title={title}
@@ -167,6 +170,8 @@ export function DailyEditorialClient() {
 
       {/* CTA */}
       <GenerateMyEdition />
+
+      </div>{/* end max-w-lg */}
     </div>
   );
 }
