@@ -40,13 +40,26 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const data = await response.json();
+    const responseText = await response.text();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      data = {
+        message: `Backend error: ${response.status} ${response.statusText}`,
+      };
+    }
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error("Users/me GET proxy error:", error);
     return NextResponse.json(
-      { message: "Failed to fetch user profile" },
-      { status: 500 }
+      {
+        message:
+          error instanceof Error
+            ? `Proxy error: ${error.message}`
+            : "Failed to fetch user profile",
+      },
+      { status: 502 }
     );
   }
 }
@@ -84,13 +97,26 @@ export async function PATCH(request: NextRequest) {
       body: JSON.stringify(body),
     });
 
-    const data = await response.json();
+    const responseText = await response.text();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      data = {
+        message: `Backend error: ${response.status} ${response.statusText}`,
+      };
+    }
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error("Users/me PATCH proxy error:", error);
     return NextResponse.json(
-      { message: "Failed to update user profile" },
-      { status: 500 }
+      {
+        message:
+          error instanceof Error
+            ? `Proxy error: ${error.message}`
+            : "Failed to update user profile",
+      },
+      { status: 502 }
     );
   }
 }
