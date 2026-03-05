@@ -33,13 +33,26 @@ export async function GET(request: NextRequest) {
 
     const response = await fetch(url, { method: "GET", headers });
 
-    const data = await response.json();
+    const responseText = await response.text();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      data = {
+        message: `Backend error: ${response.status} ${response.statusText}`,
+      };
+    }
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error("Rankings GET proxy error:", error);
     return NextResponse.json(
-      { message: "Failed to fetch rankings" },
-      { status: 500 }
+      {
+        message:
+          error instanceof Error
+            ? `Proxy error: ${error.message}`
+            : "Failed to fetch rankings",
+      },
+      { status: 502 }
     );
   }
 }

@@ -34,13 +34,26 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       }
     );
 
-    const data = await response.json();
+    const responseText = await response.text();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      data = {
+        message: `Backend error: ${response.status} ${response.statusText}`,
+      };
+    }
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error("Solutions GET proxy error:", error);
     return NextResponse.json(
-      { message: "Failed to fetch solutions" },
-      { status: 500 }
+      {
+        message:
+          error instanceof Error
+            ? `Proxy error: ${error.message}`
+            : "Failed to fetch solutions",
+      },
+      { status: 502 }
     );
   }
 }
@@ -79,13 +92,26 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       }
     );
 
-    const data = await response.json();
+    const responseText = await response.text();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      data = {
+        message: `Backend error: ${response.status} ${response.statusText}`,
+      };
+    }
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error("Solutions POST proxy error:", error);
     return NextResponse.json(
-      { message: "Failed to create solution" },
-      { status: 500 }
+      {
+        message:
+          error instanceof Error
+            ? `Proxy error: ${error.message}`
+            : "Failed to create solution",
+      },
+      { status: 502 }
     );
   }
 }

@@ -39,13 +39,26 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    const data = await response.json();
+    const responseText = await response.text();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      data = {
+        message: `Backend error: ${response.status} ${response.statusText}`,
+      };
+    }
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error("Convert affiliate proxy error:", error);
     return NextResponse.json(
-      { message: "Failed to convert affiliate link" },
-      { status: 500 }
+      {
+        message:
+          error instanceof Error
+            ? `Proxy error: ${error.message}`
+            : "Failed to convert affiliate link",
+      },
+      { status: 502 }
     );
   }
 }

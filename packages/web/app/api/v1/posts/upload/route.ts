@@ -70,8 +70,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Parse response data
-    const data = await response.json();
+    // Parse response - handle both JSON and non-JSON responses
+    const responseText = await response.text();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      data = {
+        message: `Backend error: ${response.status} ${response.statusText}`,
+        code: "PARSE_ERROR",
+        retryable: true,
+      };
+    }
 
     // Return the response with the same status code
     return NextResponse.json(data, { status: response.status });
@@ -79,11 +89,14 @@ export async function POST(request: NextRequest) {
     console.error("Upload proxy error:", error);
     return NextResponse.json(
       {
-        message: "이미지 업로드에 실패했습니다.",
+        message:
+          error instanceof Error
+            ? `Proxy error: ${error.message}`
+            : "이미지 업로드에 실패했습니다.",
         code: "UPLOAD_ERROR",
         retryable: true,
       },
-      { status: 500 }
+      { status: 502 }
     );
   }
 }

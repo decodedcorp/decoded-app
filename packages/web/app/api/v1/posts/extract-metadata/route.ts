@@ -43,16 +43,29 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    // Parse response data
-    const data = await response.json();
+    // Parse response - handle both JSON and non-JSON responses
+    const responseText = await response.text();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      data = {
+        message: `Backend error: ${response.status} ${response.statusText}`,
+      };
+    }
 
     // Return the response with the same status code
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error("Extract metadata proxy error:", error);
     return NextResponse.json(
-      { message: "Failed to extract metadata" },
-      { status: 500 }
+      {
+        message:
+          error instanceof Error
+            ? `Proxy error: ${error.message}`
+            : "Failed to extract metadata",
+      },
+      { status: 502 }
     );
   }
 }

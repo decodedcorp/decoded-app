@@ -34,13 +34,26 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       headers: { "Content-Type": "application/json" },
     });
 
-    const data = await response.json();
+    const responseText = await response.text();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      data = {
+        message: `Backend error: ${response.status} ${response.statusText}`,
+      };
+    }
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error("Posts GET detail proxy error:", error);
     return NextResponse.json(
-      { message: "Failed to fetch post detail" },
-      { status: 500 }
+      {
+        message:
+          error instanceof Error
+            ? `Proxy error: ${error.message}`
+            : "Failed to fetch post detail",
+      },
+      { status: 502 }
     );
   }
 }
@@ -80,13 +93,26 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       body: JSON.stringify(body),
     });
 
-    const data = await response.json();
+    const responseText = await response.text();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      data = {
+        message: `Backend error: ${response.status} ${response.statusText}`,
+      };
+    }
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error("Posts PATCH proxy error:", error);
     return NextResponse.json(
-      { message: "Failed to update post" },
-      { status: 500 }
+      {
+        message:
+          error instanceof Error
+            ? `Proxy error: ${error.message}`
+            : "Failed to update post",
+      },
+      { status: 502 }
     );
   }
 }
@@ -126,13 +152,26 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       return new NextResponse(null, { status: 204 });
     }
 
-    const data = await response.json();
+    const responseText = await response.text();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      data = {
+        message: `Backend error: ${response.status} ${response.statusText}`,
+      };
+    }
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error("Posts DELETE proxy error:", error);
     return NextResponse.json(
-      { message: "Failed to delete post" },
-      { status: 500 }
+      {
+        message:
+          error instanceof Error
+            ? `Proxy error: ${error.message}`
+            : "Failed to delete post",
+      },
+      { status: 502 }
     );
   }
 }

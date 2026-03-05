@@ -54,8 +54,13 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Analyze proxy error:", error);
     return NextResponse.json(
-      { message: "Failed to analyze image" },
-      { status: 500 }
+      {
+        message:
+          error instanceof Error
+            ? `Proxy error: ${error.message}`
+            : "Failed to analyze image",
+      },
+      { status: 502 }
     );
   }
 }
