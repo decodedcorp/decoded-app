@@ -20,10 +20,10 @@ interface EditorialItemShowcaseProps {
 
 /** Asymmetric positioning patterns — compact, editorial feel */
 const ITEM_LAYOUTS = [
-  { width: "w-[65%]", offset: "ml-[5%]", rotate: "-rotate-1" },
-  { width: "w-[55%]", offset: "ml-[38%]", rotate: "rotate-[1.5deg]" },
-  { width: "w-[60%]", offset: "ml-[10%]", rotate: "rotate-1" },
-  { width: "w-[50%]", offset: "ml-[42%]", rotate: "-rotate-[1.5deg]" },
+  { width: "w-[55%] md:w-[48%]", offset: "ml-[2%]", rotate: "-rotate-1" },
+  { width: "w-[50%] md:w-[45%]", offset: "ml-[45%] md:ml-[50%]", rotate: "rotate-[1.5deg]" },
+  { width: "w-[55%] md:w-[48%]", offset: "ml-[5%]", rotate: "rotate-1" },
+  { width: "w-[50%] md:w-[45%]", offset: "ml-[42%] md:ml-[48%]", rotate: "-rotate-[1.5deg]" },
 ];
 
 /**
@@ -68,7 +68,7 @@ export function EditorialItemShowcase({ items }: EditorialItemShowcaseProps) {
   if (!items.length) return null;
 
   return (
-    <section ref={sectionRef} className="px-5 py-12">
+    <section ref={sectionRef} className="px-6 py-12 md:px-10">
       {/* Section label */}
       <p className="mb-8 text-[10px] font-medium uppercase tracking-[0.3em] text-mag-accent/70">
         Curated Items

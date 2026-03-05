@@ -131,7 +131,7 @@ export function DailyEditorialClient() {
       <AmbientParticles isActive={true} />
 
       {/* Constrained content for editorial feel on wide screens */}
-      <div className="mx-auto max-w-lg">
+      <div className="mx-auto max-w-2xl">
 
       {/* Hero Section */}
       <EditorialHero

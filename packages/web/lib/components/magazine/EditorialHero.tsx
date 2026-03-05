@@ -15,8 +15,9 @@ interface EditorialHeroProps {
 
 /**
  * EditorialHero - Cinematic hero with text-behind-image depth layering.
- * No entry animations — hero content is immediately visible.
- * Only parallax scroll effect on images.
+ *
+ * Uses a single large cover image overlapping the title to create
+ * clean depth illusion without visual noise.
  */
 export function EditorialHero({
   title,
@@ -25,119 +26,83 @@ export function EditorialHero({
   images,
 }: EditorialHeroProps) {
   const sectionRef = useRef<HTMLElement>(null);
-  const imageRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const imageRef = useRef<HTMLDivElement>(null);
 
   const titleWords = title.split(" ");
   const frontWords = titleWords.slice(0, Math.ceil(titleWords.length / 2));
 
-  // Parallax only — no entry animations
+  // Parallax scroll on cover image
   useEffect(() => {
     const section = sectionRef.current;
-    if (!section) return;
+    const img = imageRef.current;
+    if (!section || !img) return;
 
     const ctx = gsap.context(() => {
-      imageRefs.current.forEach((img) => {
-        if (!img) return;
-        gsap.to(img, {
-          y: -30,
-          scrollTrigger: {
-            trigger: section,
-            start: "top top",
-            end: "bottom top",
-            scrub: true,
-          },
-        });
+      gsap.to(img, {
+        y: -40,
+        scrollTrigger: {
+          trigger: section,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+        },
       });
     }, section);
 
     return () => ctx.revert();
   }, []);
 
-  const heroImages = images.length > 0 ? images : [coverImageUrl];
+  const heroImage = images[0] || coverImageUrl;
 
   return (
     <section
       ref={sectionRef}
-      className="relative flex flex-col justify-center overflow-hidden px-5 py-16"
-      style={{ minHeight: "70vh" }}
+      className="relative overflow-hidden px-6 pb-10 pt-16 md:px-10 md:pt-24"
     >
       {/* Label */}
-      <p className="mb-4 text-[10px] font-medium uppercase tracking-[0.3em] text-mag-accent/70">
+      <p className="mb-5 text-[10px] font-medium uppercase tracking-[0.3em] text-mag-accent/70">
         Featured Narrative
       </p>
 
-      {/* Title + Image depth layering container */}
-      <div className="relative mb-6">
-        {/* Back title layer (z-10) */}
+      {/* Two-column layout: Title left, Image right */}
+      <div className="relative mb-8">
+        {/* Back title layer (z-10) — full width, overlaps into image zone */}
         <h1
           className="relative z-10 font-bold uppercase leading-[0.9] text-mag-text"
-          style={{ fontSize: "clamp(2.5rem, 10vw, 4.5rem)" }}
+          style={{ fontSize: "clamp(3rem, 8vw, 5.5rem)" }}
         >
           {title}
         </h1>
 
-        {/* Primary image (z-20) - overlapping title on right */}
-        {heroImages[0] && (
+        {/* Cover image (z-20) — overlaps right portion of title */}
+        <div
+          ref={imageRef}
+          className="absolute right-0 top-0 h-full w-[50%] md:w-[45%]"
+          style={{ zIndex: 20 }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={heroImage}
+            alt=""
+            className="h-full w-full rounded-sm object-cover"
+          />
+          {/* Fade edge into background */}
+          <div className="absolute inset-0 bg-gradient-to-r from-mag-bg via-transparent to-transparent" />
+          {/* Glitch accent line */}
           <div
-            ref={(el) => { imageRefs.current[0] = el; }}
-            className="absolute -right-2 top-1/2 w-[38%] max-w-[170px] -translate-y-[55%]"
-            style={{ zIndex: 20 }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={heroImages[0]}
-              alt=""
-              className="w-full rounded-sm object-cover"
-              style={{ aspectRatio: "3/4" }}
-            />
-          </div>
-        )}
+            className="absolute bottom-4 left-0 h-px w-[60%]"
+            style={{ background: "linear-gradient(to right, #eafd67, transparent)" }}
+          />
+        </div>
 
-        {/* Secondary image - small, top-left area with glitch offset */}
-        {heroImages[1] && (
-          <div
-            ref={(el) => { imageRefs.current[1] = el; }}
-            className="absolute left-[5%] top-[5%] w-[25%] max-w-[100px]"
-            style={{
-              zIndex: 20,
-              transform: "translate(3px, -2px)",
-              boxShadow: "-3px 2px 0 rgba(234,253,103,0.35)",
-            }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={heroImages[1]}
-              alt=""
-              className="w-full rounded-sm object-cover"
-              style={{ aspectRatio: "1/1" }}
-            />
-          </div>
-        )}
-
-        {/* Tertiary image - small, bottom-right */}
-        {heroImages[2] && (
-          <div
-            ref={(el) => { imageRefs.current[2] = el; }}
-            className="absolute -bottom-6 right-[25%] w-[18%] max-w-[75px]"
-            style={{ zIndex: 20 }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={heroImages[2]}
-              alt=""
-              className="w-full rounded-sm object-cover opacity-70"
-              style={{ aspectRatio: "3/4" }}
-            />
-          </div>
-        )}
-
-        {/* Front title layer (z-30) - partial words ON TOP of images for depth */}
+        {/* Front title layer (z-30) — first words appear ON TOP of image */}
         <h1
           aria-hidden="true"
-          className="pointer-events-none absolute left-0 top-0 z-30 font-bold uppercase leading-[0.9] text-mag-text/90"
+          className="pointer-events-none absolute left-0 top-0 z-30 font-bold uppercase leading-[0.9]"
           style={{
-            fontSize: "clamp(2.5rem, 10vw, 4.5rem)",
-            WebkitTextStroke: "1px rgba(234,253,103,0.15)",
+            fontSize: "clamp(3rem, 8vw, 5.5rem)",
+            color: "transparent",
+            WebkitTextStroke: "1.5px rgba(245,245,245,0.7)",
           }}
         >
           {frontWords.join(" ")}
@@ -146,7 +111,7 @@ export function EditorialHero({
 
       {/* Subtitle */}
       {subtitle && (
-        <p className="mb-8 max-w-xs text-xs leading-relaxed text-mag-text/50">
+        <p className="mb-8 max-w-md text-sm leading-relaxed text-mag-text/50">
           {subtitle}
         </p>
       )}
