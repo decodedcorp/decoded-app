@@ -1,54 +1,65 @@
 import { Header } from "@/lib/components";
 import { MainFooter, HomeAnimatedContent } from "@/lib/components/main";
-import { fetchPostsServer } from "@/lib/api/posts";
 import {
-  apiPostToHeroData,
-  apiPostToHeroSlide,
-  apiPostToWeeklyBestStyle,
-  apiPostToStyleCardData,
+  fetchWeeklyBestPostsServer,
+  fetchFeaturedPostServer,
+  fetchWhatsNewPostsServer,
+  fetchArtistSpotlightServer,
+} from "@/lib/supabase/queries/main-page.server";
+import {
+  postToHeroData,
+  postToWeeklyBestStyle,
+  styleCardServerToStyleCardData,
   formatArtistSpotlightSubtitle,
 } from "@/lib/utils/main-page-mapper";
+import type { HeroSlide } from "@/lib/data/heroSlides";
+import type { PostData } from "@/lib/supabase/queries/main-page.server";
+
+function postToHeroSlide(post: PostData): HeroSlide {
+  return {
+    id: post.id,
+    imageUrl: post.imageUrl ?? "",
+    title: post.artistName || post.groupName || "Featured",
+    subtitle: post.mediaTitle ?? undefined,
+    link: `/posts/${post.id}`,
+  };
+}
 
 export default async function Home() {
-  const [
-    heroRes,
-    artistSpotlightRes,
-    decodedStylesRes,
-    needDecodingRes,
-    weeklyBestRes,
-  ] = await Promise.all([
-    fetchPostsServer({ sort: "popular", per_page: 5 }),
-    fetchPostsServer({ sort: "popular", per_page: 4 }),
-    fetchPostsServer({
-      sort: "recent",
-      per_page: 6,
-    }),
-    fetchPostsServer({
-      sort: "recent",
-      per_page: 6,
-    }),
-    fetchPostsServer({ sort: "popular", per_page: 8 }),
-  ]);
+  const [featuredPost, artistSpotlightData, decodedStylesData, weeklyBestPosts] =
+    await Promise.all([
+      fetchFeaturedPostServer(),
+      fetchArtistSpotlightServer(4, 0),
+      fetchWhatsNewPostsServer(6),
+      fetchWeeklyBestPostsServer(8),
+    ]);
 
-  const heroData =
-    heroRes.data.length > 0 ? apiPostToHeroData(heroRes.data[0]) : undefined;
-  const heroSlides = heroRes.data.slice(0, 5).map(apiPostToHeroSlide);
-  const artistSpotlightStyles = artistSpotlightRes.data.map(
-    apiPostToStyleCardData
+  // Hero section
+  const heroData = featuredPost ? postToHeroData(featuredPost) : undefined;
+  const heroPosts = await fetchWeeklyBestPostsServer(5);
+  const heroSlides = heroPosts.map(postToHeroSlide);
+
+  // Artist spotlight
+  const artistSpotlightStyles = artistSpotlightData.map(
+    styleCardServerToStyleCardData
   );
   const artistSpotlightSubtitle = formatArtistSpotlightSubtitle(
     artistSpotlightStyles
   );
-  const solvedPostStyles = decodedStylesRes.data.map((p) => ({
-    ...apiPostToStyleCardData(p),
+
+  // Decoded styles & curious items
+  const solvedPostStyles = decodedStylesData.map((d) => ({
+    ...styleCardServerToStyleCardData(d),
     hasSolutions: true,
   }));
-  const curiousItemsStyles = needDecodingRes.data.map((p) => ({
-    ...apiPostToStyleCardData(p),
+  const curiousItemsStyles = decodedStylesData.map((d) => ({
+    ...styleCardServerToStyleCardData(d),
     hasSolutions: false,
   }));
   const whatsNewStyles = solvedPostStyles;
-  const weeklyBestStyles = weeklyBestRes.data.map(apiPostToWeeklyBestStyle);
+
+  // Weekly best
+  const weeklyBestStyles = weeklyBestPosts.map(postToWeeklyBestStyle);
 
   return (
     <div className="min-h-screen bg-background">
