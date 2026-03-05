@@ -1,6 +1,6 @@
 # DECODED Specifications
 
-> Version: 4.0 | Updated: 2026-02-20
+> Version: 4.1 | Updated: 2026-03-05
 
 ## Overview
 
@@ -86,6 +86,9 @@ Quick reference for loading specs into AI agent prompts:
 | Understanding data | `_shared/data-models.md` + `_shared/api-contracts.md` |
 | New screen from scratch | `_shared/templates/screen-spec-template.md` + `_shared/component-registry.md` |
 | Admin feature work | `admin/` + relevant screen spec |
+| Magazine implementation | SCR-MAG-01~05 + FLW-06 + FLW-07 + `_shared/api-contracts.md` |
+| Collection implementation | SCR-COL-01~03 + `_shared/store-map.md` |
+| VTON implementation | SCR-VTON-01~04 + FLW-05 + FLW-07 + NEXT-02 |
 
 > Full injection guide: `_shared/injection-guide.md`
 
