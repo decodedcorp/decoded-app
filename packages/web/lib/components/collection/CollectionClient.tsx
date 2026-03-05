@@ -1,92 +1,153 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
+import { useEffect, useState, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { useMagazineStore } from "@/lib/stores/magazineStore";
-import { BookshelfView } from "./BookshelfView";
+import { useStudioStore } from "@/lib/stores/studioStore";
+import { StudioHUD } from "./StudioHUD";
+import { StudioLoader } from "./StudioLoader";
+import { IssueDetailPanel } from "./IssueDetailPanel";
 import { EmptyBookshelf } from "./EmptyBookshelf";
 
-/**
- * Client orchestrator for the Collection page.
- * Loads collection from store, manages active spine state,
- * and renders bookshelf or empty state.
- */
-export function CollectionClient() {
-  const {
-    collectionIssues,
-    isLoading,
-    activeIssueId,
-    setActiveIssueId,
-    loadCollection,
-  } = useMagazineStore();
+// Dynamic import for Spline — SSR disabled (WebGL)
+const SplineStudio = dynamic(
+  () =>
+    import("./studio/SplineStudio").then((mod) => ({
+      default: mod.SplineStudio,
+    })),
+  {
+    ssr: false,
+    loading: () => <StudioLoader />,
+  }
+);
 
-  const [hasLoaded, setHasLoaded] = useState(false);
-
-  useEffect(() => {
-    loadCollection().then(() => setHasLoaded(true));
-  }, [loadCollection]);
-
-  return (
-    <div className="min-h-screen">
-      {/* Header */}
-      <header className="sticky top-0 z-40 flex items-center justify-between px-4 py-3 bg-mag-bg/80 backdrop-blur-sm border-b border-mag-text/5">
-        <Link
-          href="/"
-          className="flex items-center gap-1 text-mag-text/60 hover:text-mag-text transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Link>
-
-        <h1 className="text-sm font-bold tracking-wider text-mag-text uppercase">
-          My Collection
-        </h1>
-
-        {/* Issue count badge */}
-        <div className="min-w-[24px] text-right">
-          {collectionIssues.length > 0 && (
-            <span className="inline-flex items-center justify-center px-2 py-0.5 text-[10px] font-semibold rounded-full bg-mag-accent text-mag-bg">
-              {collectionIssues.length}
-            </span>
-          )}
-        </div>
-      </header>
-
-      {/* Content */}
-      {isLoading && !hasLoaded ? (
-        <LoadingSkeleton />
-      ) : collectionIssues.length === 0 ? (
-        <EmptyBookshelf />
-      ) : (
-        <BookshelfView
-          issues={collectionIssues}
-          activeIssueId={activeIssueId}
-          onSelectIssue={setActiveIssueId}
-        />
-      )}
-    </div>
-  );
+function hasWebGL(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const canvas = document.createElement("canvas");
+    return !!(canvas.getContext("webgl") || canvas.getContext("webgl2"));
+  } catch {
+    return false;
+  }
 }
 
-/**
- * Skeleton shelf rows with pulsing spine outlines.
- */
-function LoadingSkeleton() {
-  return (
-    <div className="px-4 py-8 md:px-8 space-y-6 max-w-3xl mx-auto">
-      {[0, 1, 2].map((row) => (
-        <div
-          key={row}
-          className="flex items-end justify-start gap-4 md:gap-6 min-h-[200px] md:min-h-[260px] px-6 md:px-10 pt-8 pb-0 border-b-[6px] border-[#2a2a2a]"
-        >
-          {[0, 1, 2, 3].map((spine) => (
-            <div
-              key={spine}
-              className="w-[56px] md:w-[70px] h-[170px] md:h-[210px] rounded-sm bg-mag-text/5 animate-pulse border-b-2 border-[#eafd67]/20"
-            />
-          ))}
+export function CollectionClient() {
+  const { collectionIssues, loadCollection } = useMagazineStore();
+  const {
+    splineLoaded,
+    focusedIssueId,
+    setFocusedIssueId,
+    setCameraState,
+    reset,
+  } = useStudioStore();
+
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const [webglSupported, setWebglSupported] = useState(true);
+
+  useEffect(() => {
+    setWebglSupported(hasWebGL());
+    loadCollection().then(() => setHasLoaded(true));
+    return () => reset();
+  }, [loadCollection, reset]);
+
+  const focusedIssue = focusedIssueId
+    ? collectionIssues.find((i) => i.id === focusedIssueId) ?? null
+    : null;
+
+  const handleBookClick = useCallback(
+    (index: number) => {
+      const issue = collectionIssues[index];
+      if (issue) {
+        setFocusedIssueId(issue.id);
+        setCameraState("focused");
+      }
+    },
+    [collectionIssues, setFocusedIssueId, setCameraState]
+  );
+
+  const handleClose = useCallback(() => {
+    setFocusedIssueId(null);
+    setCameraState("browse");
+  }, [setFocusedIssueId, setCameraState]);
+
+  const handleOpen = useCallback(() => {
+    if (focusedIssue) {
+      console.log("[Studio] Open magazine:", focusedIssue.id);
+      // TODO: router.push(`/magazine/issue/${focusedIssue.id}`)
+    }
+  }, [focusedIssue]);
+
+  // WebGL fallback: render old CSS bookshelf
+  if (!webglSupported || !hasLoaded) {
+    if (!hasLoaded) {
+      return (
+        <div className="min-h-screen bg-[#050505]">
+          <StudioLoader />
         </div>
-      ))}
+      );
+    }
+    // Lazy-load fallback only when needed
+    const FallbackView = dynamic(
+      () =>
+        import("./BookshelfViewFallback").then((mod) => ({
+          default: mod.BookshelfViewFallback,
+        })),
+      { ssr: false }
+    );
+    return (
+      <div className="min-h-screen">
+        <StudioHUD issueCount={collectionIssues.length} />
+        <div className="pt-12">
+          <p className="text-center text-white/30 text-xs py-2">
+            3D studio requires WebGL. Showing classic view.
+          </p>
+          <FallbackView
+            issues={collectionIssues}
+            activeIssueId={focusedIssueId}
+            onSelectIssue={setFocusedIssueId}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Empty state
+  if (collectionIssues.length === 0) {
+    return (
+      <div className="min-h-screen bg-[#050505] relative">
+        <StudioHUD issueCount={0} />
+        <div className="relative w-full h-screen">
+          <SplineStudio />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <EmptyBookshelf />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Main 3D Studio view
+  return (
+    <div
+      className="min-h-screen bg-[#050505] relative"
+      onClick={focusedIssueId ? handleClose : undefined}
+    >
+      <StudioHUD issueCount={collectionIssues.length} />
+
+      {/* Spline 3D scene */}
+      <div className="relative w-full h-screen">
+        {!splineLoaded && <StudioLoader />}
+        <SplineStudio onBookClick={handleBookClick} />
+      </div>
+
+      {/* Issue detail panel overlay */}
+      {focusedIssue && (
+        <IssueDetailPanel
+          issue={focusedIssue}
+          onOpen={handleOpen}
+          onClose={handleClose}
+        />
+      )}
     </div>
   );
 }
