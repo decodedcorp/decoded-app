@@ -121,7 +121,7 @@ export function PersonalIssueClient({ isOpen, onClose }: PersonalIssueClientProp
       <div className="fixed inset-0 z-[71] flex items-center justify-center p-4 md:p-8 pointer-events-none">
         <div
           ref={panelRef}
-          className="relative w-full max-w-lg max-h-[85vh] overflow-y-auto rounded-2xl border border-mag-accent/20 bg-mag-bg text-mag-text shadow-2xl pointer-events-auto"
+          className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl border border-mag-accent/20 bg-mag-bg text-mag-text shadow-2xl pointer-events-auto"
           style={{ opacity: 0 }}
           onClick={(e) => e.stopPropagation()}
         >
