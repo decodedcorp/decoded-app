@@ -1,82 +1,38 @@
-import { Header } from "@/lib/components";
-import { MainFooter, HomeAnimatedContent } from "@/lib/components/main";
 import {
-  fetchWeeklyBestPostsServer,
-  fetchFeaturedPostServer,
-  fetchWhatsNewPostsServer,
-  fetchArtistSpotlightServer,
-} from "@/lib/supabase/queries/main-page.server";
-import {
-  postToHeroData,
-  postToWeeklyBestStyle,
-  styleCardServerToStyleCardData,
-  formatArtistSpotlightSubtitle,
-} from "@/lib/utils/main-page-mapper";
-import type { HeroSlide } from "@/lib/data/heroSlides";
-import type { PostData } from "@/lib/supabase/queries/main-page.server";
+  MainHero,
+  MasonryGrid,
+  PersonalizeBanner,
+  SmartNav,
+} from "@/lib/components/main-renewal";
+import type {
+  MainHeroData,
+  GridItemData,
+  PersonalizeBannerData,
+} from "@/lib/components/main-renewal";
+import heroData from "@/lib/components/main-renewal/mock/main-hero.json";
+import gridItems from "@/lib/components/main-renewal/mock/main-grid-items.json";
+import bannerData from "@/lib/components/main-renewal/mock/personalize-banner.json";
 
-function postToHeroSlide(post: PostData): HeroSlide {
-  return {
-    id: post.id,
-    imageUrl: post.imageUrl ?? "",
-    title: post.artistName || post.groupName || "Featured",
-    subtitle: post.mediaTitle ?? undefined,
-    link: `/posts/${post.id}`,
-  };
-}
-
-export default async function Home() {
-  const [featuredPost, artistSpotlightData, decodedStylesData, weeklyBestPosts] =
-    await Promise.all([
-      fetchFeaturedPostServer(),
-      fetchArtistSpotlightServer(4, 0),
-      fetchWhatsNewPostsServer(6),
-      fetchWeeklyBestPostsServer(8),
-    ]);
-
-  // Hero section
-  const heroData = featuredPost ? postToHeroData(featuredPost) : undefined;
-  const heroPosts = await fetchWeeklyBestPostsServer(5);
-  const heroSlides = heroPosts.map(postToHeroSlide);
-
-  // Artist spotlight
-  const artistSpotlightStyles = artistSpotlightData.map(
-    styleCardServerToStyleCardData
-  );
-  const artistSpotlightSubtitle = formatArtistSpotlightSubtitle(
-    artistSpotlightStyles
-  );
-
-  // Decoded styles & curious items
-  const solvedPostStyles = decodedStylesData.map((d) => ({
-    ...styleCardServerToStyleCardData(d),
-    hasSolutions: true,
-  }));
-  const curiousItemsStyles = decodedStylesData.map((d) => ({
-    ...styleCardServerToStyleCardData(d),
-    hasSolutions: false,
-  }));
-  const whatsNewStyles = solvedPostStyles;
-
-  // Weekly best
-  const weeklyBestStyles = weeklyBestPosts.map(postToWeeklyBestStyle);
-
+export default function Home() {
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+    <div className="min-h-screen bg-[#050505]">
+      <SmartNav />
+      <MainHero data={heroData as MainHeroData} />
 
-      <HomeAnimatedContent
-        heroData={heroData}
-        heroSlides={heroSlides}
-        artistSpotlightStyles={artistSpotlightStyles}
-        artistSpotlightSubtitle={artistSpotlightSubtitle}
-        solvedPostStyles={solvedPostStyles}
-        curiousItemsStyles={curiousItemsStyles}
-        whatsNewStyles={whatsNewStyles}
-        weeklyBestStyles={weeklyBestStyles}
-      />
+      {/* Dynamic Grid Section */}
+      <section className="relative">
+        <MasonryGrid items={gridItems as GridItemData[]} />
+      </section>
 
-      <MainFooter />
+      {/* Personalize Banner - Soft Wall */}
+      <PersonalizeBanner data={bannerData as PersonalizeBannerData} />
+
+      {/* Minimal footer */}
+      <footer className="py-16 text-center bg-[#050505]">
+        <p className="text-[#f5f5f5]/30 text-xs tracking-[0.3em] uppercase">
+          Decoded Magazine &copy; 2026
+        </p>
+      </footer>
     </div>
   );
 }

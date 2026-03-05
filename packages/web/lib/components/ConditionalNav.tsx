@@ -16,8 +16,8 @@ import { MobileNavBar } from "./MobileNavBar";
 export function ConditionalNav() {
   const pathname = usePathname();
 
-  // Hide all main-app navigation on admin routes
-  if (pathname.startsWith("/admin")) {
+  // Hide all main-app navigation on admin routes and renewed main page
+  if (pathname.startsWith("/admin") || pathname === "/") {
     return null;
   }
 
@@ -49,8 +49,8 @@ export function MainContentWrapper({
 }) {
   const pathname = usePathname();
 
-  // Admin layout manages its own padding — no main-app header offset needed
-  if (pathname.startsWith("/admin")) {
+  // Admin and renewed main page manage their own padding — no main-app header offset needed
+  if (pathname.startsWith("/admin") || pathname === "/") {
     return <>{children}</>;
   }
 
