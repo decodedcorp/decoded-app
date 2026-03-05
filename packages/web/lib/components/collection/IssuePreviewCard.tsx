@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useEffect, useState } from "react";
 import type { MagazineIssue } from "../magazine/types";
 
 interface IssuePreviewCardProps {
@@ -10,13 +11,24 @@ interface IssuePreviewCardProps {
 
 /**
  * Expanded cover with metadata overlay, shown when a spine is popped out.
- * Absolutely positioned next to the active spine.
+ * Positioned to the right of the spine, or flipped left if near viewport edge.
  */
 export function IssuePreviewCard({
   issue,
   onOpen,
   onDelete,
 }: IssuePreviewCardProps) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [flipLeft, setFlipLeft] = useState(false);
+
+  useEffect(() => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    if (rect.right > window.innerWidth - 16) {
+      setFlipLeft(true);
+    }
+  }, []);
+
   const volumeLabel = `Vol.${String(issue.issue_number).padStart(2, "0")}`;
   const dateLabel = new Date(issue.generated_at).toLocaleDateString("en-US", {
     year: "numeric",
@@ -26,7 +38,10 @@ export function IssuePreviewCard({
 
   return (
     <div
-      className="absolute left-full top-0 ml-3 z-50 w-[200px] bg-[#111] border border-mag-accent/30 rounded-lg overflow-hidden shadow-2xl"
+      ref={cardRef}
+      className={`absolute top-0 z-50 w-[220px] bg-[#111] border border-mag-accent/30 rounded-lg overflow-hidden shadow-2xl ${
+        flipLeft ? "right-full mr-3" : "left-full ml-3"
+      }`}
       onClick={(e) => e.stopPropagation()}
     >
       {/* Cover image */}

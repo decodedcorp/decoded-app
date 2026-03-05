@@ -1,8 +1,9 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { DesktopHeader, MobileHeader } from "@/lib/design-system";
+import { MobileHeader } from "@/lib/design-system";
 import { MobileNavBar } from "./MobileNavBar";
+import { SmartNav } from "./main-renewal/SmartNav";
 
 /**
  * ConditionalNav - Renders header-based navigation and mobile nav
@@ -10,21 +11,24 @@ import { MobileNavBar } from "./MobileNavBar";
  * Hidden on /admin routes (admin has its own sidebar layout).
  *
  * Layout:
- * - Desktop (md+): DesktopHeader at top
+ * - Desktop (md+): SmartNav (dark theme, scroll-responsive)
  * - Mobile (<md): MobileHeader at top + MobileNavBar at bottom
  */
 export function ConditionalNav() {
   const pathname = usePathname();
 
-  // Hide all main-app navigation on admin routes and renewed main page
-  if (pathname.startsWith("/admin") || pathname === "/") {
+  // Hide all main-app navigation on admin and immersive routes
+  if (
+    pathname.startsWith("/admin") ||
+    pathname === "/magazine/personal"
+  ) {
     return null;
   }
 
   return (
     <>
       {/* Desktop Header - visible on md+ */}
-      <DesktopHeader />
+      <SmartNav />
       {/* Mobile Header - visible on <md */}
       <MobileHeader />
       {/* Mobile Bottom Nav - preserved */}
@@ -49,8 +53,12 @@ export function MainContentWrapper({
 }) {
   const pathname = usePathname();
 
-  // Admin and renewed main page manage their own padding — no main-app header offset needed
-  if (pathname.startsWith("/admin") || pathname === "/") {
+  // Admin, home, and immersive pages manage their own padding
+  if (
+    pathname.startsWith("/admin") ||
+    pathname === "/" ||
+    pathname === "/magazine/personal"
+  ) {
     return <>{children}</>;
   }
 

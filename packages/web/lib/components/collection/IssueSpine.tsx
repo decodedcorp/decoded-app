@@ -76,14 +76,17 @@ export function IssueSpine({ issue, isActive, onSelect }: IssueSpineProps) {
   });
 
   return (
-    <div className="relative flex-shrink-0" style={{ perspective: "600px" }}>
+    <div
+      className="relative flex-shrink-0"
+      style={{ perspective: "600px", zIndex: isActive ? 50 : 1 }}
+    >
       {/* Spine element */}
       <div
         ref={spineRef}
         onClick={handleClick}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className="relative w-[50px] md:w-[60px] h-[140px] md:h-[160px] rounded-sm cursor-pointer transition-shadow"
+        className="relative w-[56px] md:w-[70px] h-[170px] md:h-[210px] rounded-sm cursor-pointer transition-shadow"
         style={{
           backgroundColor: issue.theme_palette.accent,
           transform: "rotateY(-15deg) translateZ(0px)",

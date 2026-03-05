@@ -77,12 +77,12 @@ function LoadingSkeleton() {
       {[0, 1, 2].map((row) => (
         <div
           key={row}
-          className="flex items-end justify-center gap-3 md:gap-5 min-h-[180px] md:min-h-[220px] px-4 pt-6 pb-0 border-b-4 border-[#2a2a2a]"
+          className="flex items-end justify-start gap-4 md:gap-6 min-h-[200px] md:min-h-[260px] px-6 md:px-10 pt-8 pb-0 border-b-[6px] border-[#2a2a2a]"
         >
           {[0, 1, 2, 3].map((spine) => (
             <div
               key={spine}
-              className="w-[50px] md:w-[60px] h-[140px] md:h-[160px] rounded-sm bg-mag-text/5 animate-pulse"
+              className="w-[56px] md:w-[70px] h-[170px] md:h-[210px] rounded-sm bg-mag-text/5 animate-pulse"
             />
           ))}
         </div>
