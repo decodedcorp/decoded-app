@@ -15,17 +15,19 @@ import { fetchAiCostKPI } from "@/lib/api/admin/ai-cost";
  * Response shape: AiCostKPI
  */
 export async function GET(request: NextRequest) {
-  if (process.env.NODE_ENV === "development") {
-    const { searchParams } = request.nextUrl;
-    const days = Math.min(
-      90,
-      Math.max(7, parseInt(searchParams.get("days") ?? "30", 10))
-    );
-    const data = await fetchAiCostKPI(days);
-    return NextResponse.json(data);
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const supabase = await createSupabaseServerClient();
+  const isAdmin = await checkIsAdmin(supabase, user.id);
+  if (!isAdmin) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
   const { searchParams } = request.nextUrl;
   const days = Math.min(

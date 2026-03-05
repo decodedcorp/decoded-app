@@ -17,6 +17,8 @@ import {
   fetchUserActivities,
   fetchUserById,
 } from "@/lib/api/users";
+import { fetchMyBadges } from "@/lib/api/badges";
+import { fetchMyRanking } from "@/lib/api/rankings";
 import {
   UpdateUserDto,
   UserResponse,
@@ -37,6 +39,8 @@ export const profileKeys = {
   activities: (params?: ActivitiesListParams) =>
     [...profileKeys.all, "activities", params] as const,
   user: (userId: string) => [...profileKeys.all, "user", userId] as const,
+  badges: () => [...profileKeys.all, "badges"] as const,
+  rankings: () => [...profileKeys.all, "rankings"] as const,
 };
 
 // ============================================================
@@ -79,6 +83,7 @@ export function useUserStats(
 interface UseUserActivitiesParams {
   type?: UserActivityType;
   perPage?: number;
+  enabled?: boolean;
 }
 
 export function useUserActivities(params?: UseUserActivitiesParams) {
@@ -98,6 +103,7 @@ export function useUserActivities(params?: UseUserActivitiesParams) {
         : undefined,
     initialPageParam: 1,
     staleTime: 1000 * 60, // 1 minute
+    enabled: params?.enabled !== false,
   });
 }
 
@@ -114,6 +120,42 @@ export function useUser(
     queryFn: () => fetchUserById(userId),
     enabled: !!userId,
     staleTime: 1000 * 60 * 5, // 5 minutes
+    ...options,
+  });
+}
+
+// ============================================================
+// useMyBadges - Current user's badges
+// ============================================================
+
+export function useMyBadges(
+  options?: Omit<
+    UseQueryOptions<import("@/lib/api/types").MyBadgesResponse, Error>,
+    "queryKey" | "queryFn"
+  >
+) {
+  return useQuery({
+    queryKey: profileKeys.badges(),
+    queryFn: fetchMyBadges,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    ...options,
+  });
+}
+
+// ============================================================
+// useMyRanking - Current user's ranking detail
+// ============================================================
+
+export function useMyRanking(
+  options?: Omit<
+    UseQueryOptions<import("@/lib/api/types").ApiMyRankingDetail, Error>,
+    "queryKey" | "queryFn"
+  >
+) {
+  return useQuery({
+    queryKey: profileKeys.rankings(),
+    queryFn: fetchMyRanking,
+    staleTime: 1000 * 60 * 2, // 2 minutes
     ...options,
   });
 }

@@ -39,7 +39,7 @@ export default function HomeScreen() {
 
   const renderItem = useCallback(
     ({ item }: { item: ImageWithPostId }) => (
-      <Link href={`/images/${item.id}`} asChild>
+      <Link href={`/posts/${item.id}`} asChild>
         <Pressable style={styles.card}>
           <Image
             source={{ uri: item.image_url ?? undefined }}
@@ -49,7 +49,7 @@ export default function HomeScreen() {
         </Pressable>
       </Link>
     ),
-    []
+    [],
   );
 
   const handleEndReached = useCallback(() => {

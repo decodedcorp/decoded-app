@@ -5,6 +5,7 @@
 
 import {
   useQuery,
+  useQueries,
   useMutation,
   useQueryClient,
   UseQueryOptions,
@@ -14,11 +15,14 @@ import {
   createSolution,
   updateSolution,
   deleteSolution,
+  adoptSolution,
+  unadoptSolution,
   extractSolutionMetadata,
   convertAffiliate,
 } from "@/lib/api/solutions";
 import type {
   Solution,
+  SolutionListItem,
   CreateSolutionDto,
   UpdateSolutionDto,
   ExtractMetadataResponse,
@@ -41,7 +45,10 @@ export const solutionKeys = {
 
 export function useSolutions(
   spotId: string,
-  options?: Omit<UseQueryOptions<Solution[], Error>, "queryKey" | "queryFn">
+  options?: Omit<
+    UseQueryOptions<SolutionListItem[], Error>,
+    "queryKey" | "queryFn"
+  >
 ) {
   return useQuery({
     queryKey: solutionKeys.list(spotId),
@@ -50,6 +57,33 @@ export function useSolutions(
     staleTime: 1000 * 60, // 1 minute
     ...options,
   });
+}
+
+// ============================================================
+// useAllSolutionsForSpots - Fetch solutions for multiple spots
+// ============================================================
+
+/** Solutions grouped by spot ID */
+export function useAllSolutionsForSpots(spotIds: string[]) {
+  const results = useQueries({
+    queries: spotIds.map((spotId) => ({
+      queryKey: solutionKeys.list(spotId),
+      queryFn: () => fetchSolutions(spotId),
+      enabled: !!spotId,
+      staleTime: 1000 * 60,
+    })),
+  });
+  const isLoading = results.some((r) => r.isLoading);
+  const spotSolutionsMap = new Map<string, SolutionListItem[]>();
+  spotIds.forEach((spotId, i) => {
+    const data = results[i]?.data;
+    if (data?.length) spotSolutionsMap.set(spotId, data);
+  });
+  const allSolutionsWithSpot = spotIds.flatMap((spotId) => {
+    const sols = spotSolutionsMap.get(spotId) ?? [];
+    return sols.map((sol) => ({ spotId, solution: sol }));
+  });
+  return { isLoading, allSolutionsWithSpot, spotSolutionsMap, results };
 }
 
 // ============================================================
@@ -67,12 +101,8 @@ export function useCreateSolution() {
   return useMutation({
     mutationFn: ({ spotId, data }: CreateSolutionVariables) =>
       createSolution(spotId, data),
-    onSuccess: (newSolution, { spotId }) => {
-      // Add to cache
-      queryClient.setQueryData<Solution[]>(solutionKeys.list(spotId), (old) =>
-        old ? [...old, newSolution] : [newSolution]
-      );
-      // Invalidate to ensure fresh data
+    onSuccess: (_, { spotId }) => {
+      // Invalidate to refetch list (backend returns SolutionListItem, create returns Solution)
       queryClient.invalidateQueries({ queryKey: solutionKeys.list(spotId) });
     },
     onError: (error) => {
@@ -97,15 +127,8 @@ export function useUpdateSolution() {
   return useMutation({
     mutationFn: ({ solutionId, data }: UpdateSolutionVariables) =>
       updateSolution(solutionId, data),
-    onSuccess: (updatedSolution, { spotId }) => {
-      // Update in cache
-      queryClient.setQueryData<Solution[]>(solutionKeys.list(spotId), (old) =>
-        old
-          ? old.map((sol) =>
-              sol.id === updatedSolution.id ? updatedSolution : sol
-            )
-          : [updatedSolution]
-      );
+    onSuccess: (_, { spotId }) => {
+      queryClient.invalidateQueries({ queryKey: solutionKeys.list(spotId) });
     },
     onError: (error) => {
       console.error("[useUpdateSolution] Failed to update solution:", error);
@@ -128,14 +151,59 @@ export function useDeleteSolution() {
   return useMutation({
     mutationFn: ({ solutionId }: DeleteSolutionVariables) =>
       deleteSolution(solutionId),
-    onSuccess: (_, { solutionId, spotId }) => {
-      // Remove from cache
-      queryClient.setQueryData<Solution[]>(solutionKeys.list(spotId), (old) =>
-        old ? old.filter((sol) => sol.id !== solutionId) : []
-      );
+    onSuccess: (_, { spotId }) => {
+      queryClient.invalidateQueries({ queryKey: solutionKeys.list(spotId) });
     },
     onError: (error) => {
       console.error("[useDeleteSolution] Failed to delete solution:", error);
+    },
+  });
+}
+
+// ============================================================
+// useAdoptSolution - Adopt a solution (post/spot owner only)
+// ============================================================
+
+export interface AdoptSolutionVariables {
+  solutionId: string;
+  spotId: string;
+  matchType: "perfect" | "close";
+}
+
+export function useAdoptSolution() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ solutionId, matchType }: AdoptSolutionVariables) =>
+      adoptSolution(solutionId, { match_type: matchType }),
+    onSuccess: (_, { spotId }) => {
+      queryClient.invalidateQueries({ queryKey: solutionKeys.list(spotId) });
+      queryClient.invalidateQueries({ queryKey: ["posts", "detail"] });
+    },
+    onError: (error) => {
+      console.error("[useAdoptSolution] 채택 실패:", error);
+    },
+  });
+}
+
+// ============================================================
+// useUnadoptSolution - Unadopt a solution
+// ============================================================
+
+interface UnadoptSolutionVariables {
+  solutionId: string;
+  spotId: string;
+}
+
+export function useUnadoptSolution() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ solutionId }: UnadoptSolutionVariables) =>
+      unadoptSolution(solutionId),
+    onSuccess: (_, { spotId }) => {
+      queryClient.invalidateQueries({ queryKey: solutionKeys.list(spotId) });
+      queryClient.invalidateQueries({ queryKey: ["posts", "detail"] });
     },
   });
 }

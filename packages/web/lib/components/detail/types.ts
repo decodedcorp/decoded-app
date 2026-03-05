@@ -8,6 +8,10 @@ import type { CSSProperties } from "react";
 export interface ItemRow {
   id: number;
   image_id: string;
+  /** 스팟 ID – 솔루션 등록 링크용 (?spot=...) */
+  spot_id?: string;
+  /** 이미지 위 스팟 마커 번호 (1-based) – 표시용 */
+  spot_index?: number;
   brand: string | null;
   product_name: string | null;
   cropped_image_path: string | null;
@@ -67,6 +71,42 @@ export type UiItem = NormalizedItem & {
   bboxSource: "override" | "item" | "center"; // Source of the bounding box logic
 };
 
+/** SolutionListItem-like shape for solution-to-item conversion */
+export interface SolutionLike {
+  id: string;
+  title: string;
+  thumbnail_url?: string | null;
+  original_url?: string | null;
+  affiliate_url?: string | null;
+  metadata?: Record<string, unknown> | null;
+}
+
+/**
+ * Convert solution + base item to UiItem for ShopGrid (Shop the Look)
+ */
+export function solutionToShopItem(
+  solution: SolutionLike,
+  baseItem: UiItem,
+  _index?: number
+): UiItem {
+  const priceStr = (() => {
+    const m = solution.metadata as { price?: string | { amount?: string } } | undefined;
+    if (!m?.price) return null;
+    return typeof m.price === "string" ? m.price : (m.price?.amount ?? null);
+  })();
+  const citationUrl = solution.affiliate_url ?? solution.original_url ?? null;
+  const idNum = parseInt(solution.id.replace(/-/g, "").slice(0, 8), 16) || 0;
+  return {
+    ...baseItem,
+    id: idNum,
+    product_name: solution.title,
+    cropped_image_path: solution.thumbnail_url ?? null,
+    imageUrl: solution.thumbnail_url ?? null,
+    price: priceStr,
+    citations: citationUrl ? [citationUrl] : null,
+  };
+}
+
 /**
  * Convert a SpotRow to ItemRow for legacy compatibility
  */
@@ -74,6 +114,7 @@ export function spotToItemRow(spot: SpotRow, solution?: SolutionRow): ItemRow {
   return {
     id: parseInt(spot.id.substring(0, 8), 16) || 0,
     image_id: spot.post_id,
+    spot_id: spot.id,
     brand: null, // SolutionRow doesn't have brand field
     product_name: solution?.title || null, // Use title as product_name
     cropped_image_path: solution?.thumbnail_url || null,

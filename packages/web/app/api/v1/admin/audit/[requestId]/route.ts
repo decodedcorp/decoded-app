@@ -19,13 +19,7 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ requestId: string }> }
 ) {
-  if (process.env.NODE_ENV === "development") {
-    const { requestId } = await params;
-    const result = await fetchAuditDetail(requestId);
-    if (!result) return NextResponse.json({ error: "Not found" }, { status: 404 });
-    return NextResponse.json(result);
-  }
-
+  // Admin auth check
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },

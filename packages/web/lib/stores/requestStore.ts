@@ -76,6 +76,9 @@ interface RequestState {
   images: UploadedImage[];
   currentStep: RequestStep;
 
+  // User type (after image upload)
+  userKnowsItems: boolean | null;
+
   // Step 2: AI Detection
   detectedSpots: DetectedSpot[];
   isDetecting: boolean;
@@ -140,6 +143,9 @@ interface RequestState {
 
   // Actions - Reset
   resetRequestFlow: () => void;
+
+  // User type selection
+  setUserKnowsItems: (value: boolean) => void;
 }
 
 function generateId(): string {
@@ -168,6 +174,7 @@ function convertApiToSpot(item: DetectedItem, index: number): DetectedSpot {
 const initialState = {
   images: [] as UploadedImage[],
   currentStep: 1 as RequestStep,
+  userKnowsItems: null as boolean | null,
   detectedSpots: [] as DetectedSpot[],
   isDetecting: false,
   isRevealing: false,
@@ -464,6 +471,10 @@ export const useRequestStore = create<RequestState>((set, get) => ({
     images.forEach((img) => revokePreviewUrl(img.previewUrl));
     set(initialState);
   },
+
+  setUserKnowsItems: (value) => {
+    set({ userKnowsItems: value });
+  },
 }));
 
 // Selector helpers
@@ -492,6 +503,8 @@ export const selectCanProceed = (state: RequestState): boolean => {
   }
 };
 
+export const selectUserKnowsItems = (state: RequestState) =>
+  state.userKnowsItems;
 export const selectImageCount = (state: RequestState) => state.images.length;
 export const selectHasImages = (state: RequestState) => state.images.length > 0;
 export const selectIsMaxImages = (state: RequestState) =>
@@ -559,5 +572,6 @@ export const getRequestActions = () => {
     setSubmitError: state.setSubmitError,
     setStep: state.setStep,
     resetRequestFlow: state.resetRequestFlow,
+    setUserKnowsItems: state.setUserKnowsItems,
   };
 };

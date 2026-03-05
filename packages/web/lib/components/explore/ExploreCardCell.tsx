@@ -62,7 +62,7 @@ export const ExploreCardCell = memo(function ExploreCardCell({
 
   return (
     <Link
-      href={`/images/${imageId}`}
+      href={`/posts/${imageId}`}
       scroll={false}
       onClick={handleClick}
       className="absolute inset-1"

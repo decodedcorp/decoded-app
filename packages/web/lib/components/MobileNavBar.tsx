@@ -1,10 +1,11 @@
 "use client";
 
 import { memo, useState, useCallback } from "react";
-import { usePathname } from "next/navigation";
-import { Home, Search, PlusCircle, LayoutGrid, User } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Home, Search, PlusCircle, User } from "lucide-react";
 import { NavBar, NavItem } from "@/lib/design-system";
 import { RequestModal } from "./request/RequestModal";
+import { useAuthStore } from "@/lib/stores/authStore";
 
 interface NavItemConfig {
   id: string;
@@ -16,8 +17,8 @@ interface NavItemConfig {
 }
 
 /**
- * Navigation items per decoded.pen Mobile Nav Bar spec:
- * Home, Search, Request, Feed, Profile (5 items)
+ * Navigation items. Feed 비활성화: 네비에서만 제거, /feed 경로·코드는 유지.
+ * Home, Search, + (Request), Profile (4 items)
  */
 const navItems: NavItemConfig[] = [
   { id: "home", href: "/", icon: Home, label: "Home" },
@@ -26,10 +27,9 @@ const navItems: NavItemConfig[] = [
     id: "request",
     href: "#",
     icon: PlusCircle,
-    label: "Request",
+    label: "Upload",
     isAction: true,
   },
-  { id: "feed", href: "/feed", icon: LayoutGrid, label: "Feed" },
   { id: "profile", href: "/profile", icon: User, label: "Profile" },
 ];
 
@@ -52,11 +52,17 @@ const navItems: NavItemConfig[] = [
  */
 export const MobileNavBar = memo(() => {
   const pathname = usePathname();
+  const router = useRouter();
+  const user = useAuthStore((state) => state.user);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
 
   const handleRequestOpen = useCallback(() => {
+    if (!user) {
+      router.push("/login");
+      return;
+    }
     setIsRequestModalOpen(true);
-  }, []);
+  }, [user, router]);
 
   const handleRequestClose = useCallback(() => {
     setIsRequestModalOpen(false);

@@ -73,10 +73,13 @@ export type CategoriesResponse = Category[];
 // ============================================================
 
 export type MediaSourceType =
+  | "user_upload"
+  | "youtube"
   | "drama"
   | "movie"
   | "music_video"
   | "variety"
+  | "event"
   | "other";
 
 export interface MediaSource {
@@ -190,6 +193,7 @@ export interface Post {
   user: PostUser;
   image_url: string;
   media_source: PostMediaSource | null;
+  title: string | null;
   artist_name: string | null;
   group_name: string | null;
   context: string | null;
@@ -220,6 +224,8 @@ export interface PostsListParams {
   sort?: "recent" | "popular" | "trending";
   page?: number;
   per_page?: number;
+  /** true = 솔루션 있는 post만, false = spot은 있으나 솔루션 없는 post만 */
+  has_solutions?: boolean;
 }
 
 // ============================================================
@@ -283,12 +289,27 @@ export interface UserStatsResponse {
 
 export type UserActivityType = "post" | "spot" | "solution";
 
+export interface UserActivityPostMeta {
+  id: string;
+  image_url?: string;
+  artist_name?: string;
+  group_name?: string;
+}
+
+export interface UserActivitySpotMeta {
+  id: string;
+  post?: UserActivityPostMeta;
+}
+
 export interface UserActivityItem {
   id: string;
   type: UserActivityType;
-  title: string;
+  title?: string;
+  product_name?: string;
+  spot?: UserActivitySpotMeta;
+  is_adopted?: boolean;
+  is_verified?: boolean;
   created_at: string;
-  // Add other fields as needed based on actual API response
 }
 
 export interface PaginatedActivitiesResponse {
@@ -305,6 +326,107 @@ export interface ActivitiesListParams {
   type?: UserActivityType;
   page?: number;
   per_page?: number;
+}
+
+// ============================================================
+// Badges API Types
+// GET /api/v1/badges, GET /api/v1/badges/me
+// ============================================================
+
+export interface ApiBadgeCriteria {
+  type: string;
+  threshold: number;
+  target?: string;
+}
+
+export interface ApiBadgeResponse {
+  id: string;
+  type: string;
+  name: string;
+  criteria: ApiBadgeCriteria;
+  rarity: string;
+  description?: string;
+  icon_url?: string;
+  created_at?: string;
+}
+
+export interface ApiEarnedBadgeItem extends ApiBadgeResponse {
+  earned_at: string;
+  progress?: { current: number; threshold: number; completed: boolean };
+}
+
+export interface ApiAvailableBadgeItem {
+  id: string;
+  name: string;
+  rarity: string;
+  progress: { current: number; threshold: number; completed: boolean };
+  description?: string;
+  icon_url?: string;
+}
+
+export interface MyBadgesResponse {
+  data: ApiEarnedBadgeItem[];
+  available_badges: ApiAvailableBadgeItem[];
+}
+
+// ============================================================
+// Rankings API Types
+// GET /api/v1/rankings, GET /api/v1/rankings/me
+// ============================================================
+
+export interface ApiRankingUser {
+  id: string;
+  username: string;
+  avatar_url?: string;
+  rank?: string;
+}
+
+export interface ApiRankingItem {
+  rank: number;
+  user: ApiRankingUser;
+  total_points: number;
+  weekly_points: number;
+  solution_count: number;
+  adopted_count: number;
+  verified_count: number;
+}
+
+export interface ApiMyRanking {
+  rank: number;
+  total_points: number;
+  weekly_points: number;
+}
+
+export interface ApiCategoryRank {
+  category_code: string;
+  category_name: string;
+  rank: number;
+  points: number;
+}
+
+export interface ApiMyRankingDetail {
+  overall_rank: number;
+  total_points: number;
+  weekly_points: number;
+  monthly_points: number;
+  solution_stats: {
+    total_count: number;
+    adopted_count: number;
+    verified_count: number;
+    accurate_votes: number;
+  };
+  category_rankings: ApiCategoryRank[];
+}
+
+export interface RankingListResponse {
+  data: ApiRankingItem[];
+  my_ranking: ApiMyRanking | null;
+  pagination: {
+    current_page: number;
+    per_page: number;
+    total_items: number;
+    total_pages: number;
+  };
 }
 
 // ============================================================
@@ -373,6 +495,51 @@ export interface PostResponse extends Post {
 }
 
 // ============================================================
+// Post Detail (GET /api/v1/posts/{id}) – spots + top_solution per spot
+// ============================================================
+
+export interface TopSolutionSummary {
+  id: string;
+  title: string;
+  metadata?: Record<string, unknown>;
+  thumbnail_url?: string | null;
+  original_url?: string | null;
+  affiliate_url?: string | null;
+  is_verified: boolean;
+  is_adopted: boolean;
+}
+
+export interface SpotWithTopSolution {
+  id: string;
+  position_left: string;
+  position_top: string;
+  category?: unknown;
+  status: string;
+  solution_count: number;
+  top_solution?: TopSolutionSummary | null;
+  created_at: string;
+}
+
+export interface PostDetailResponse {
+  id: string;
+  image_url: string;
+  media_source: PostMediaSource | null;
+  title: string | null;
+  group_name: string | null;
+  artist_name: string | null;
+  context: string | null;
+  view_count: number;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  /** 포스트 생성 시 솔루션을 알고 등록했는지. true=with-solutions, false=without, null=기존 데이터 */
+  created_with_solutions?: boolean | null;
+  user: PostUser;
+  spots: SpotWithTopSolution[];
+  comment_count: number;
+}
+
+// ============================================================
 // Solution API Types
 // GET /api/v1/spots/{spot_id}/solutions
 // POST /api/v1/spots/{spot_id}/solutions
@@ -400,17 +567,32 @@ export interface Solution {
   updated_at: string;
 }
 
-export interface SolutionListResponse {
-  data: Solution[];
+/** GET /api/v1/spots/{spot_id}/solutions - Backend returns array directly */
+export interface SolutionListItem {
+  id: string;
+  user: PostUser;
+  match_type?: string | null;
+  link_type?: string | null;
+  title: string;
+  metadata?: Record<string, unknown> | null;
+  thumbnail_url?: string | null;
+  original_url?: string | null;
+  affiliate_url?: string | null;
+  vote_stats: { accurate: number; different: number };
+  is_verified: boolean;
+  is_adopted: boolean;
+  created_at: string;
 }
 
+/** Backend CreateSolutionDto - original_url, affiliate_url, title, metadata, description, thumbnail_url */
 export interface CreateSolutionDto {
-  product_url: string;
-  product_name?: string;
-  brand?: string;
-  price?: number;
-  currency?: string;
-  image_url?: string;
+  original_url: string;
+  affiliate_url?: string | null;
+  title?: string | null;
+  metadata?: Record<string, unknown> | null;
+  description?: string | null;
+  comment?: string | null;
+  thumbnail_url?: string | null;
 }
 
 export interface UpdateSolutionDto {
@@ -428,12 +610,25 @@ export interface ExtractMetadataRequest {
 }
 
 export interface ExtractMetadataResponse {
-  product_name: string | null;
-  brand: string | null;
-  price: number | null;
-  currency: string | null;
-  image_url: string | null;
-  description: string | null;
+  url?: string;
+  title?: string | null;
+  description?: string | null;
+  thumbnail_url?: string | null;
+  image?: string | null;
+  site_name?: string | null;
+  /** 제휴 링크 지원 여부 (백엔드 MetadataResponse) */
+  is_affiliate_supported?: boolean;
+  extra_metadata?: { price?: string; currency?: string; brand?: string } | null;
+  /** @deprecated use title */
+  product_name?: string | null;
+  /** @deprecated use title */
+  brand?: string | null;
+  /** @deprecated use extra_metadata.price */
+  price?: number | null;
+  /** @deprecated use extra_metadata.currency */
+  currency?: string | null;
+  /** @deprecated use thumbnail_url */
+  image_url?: string | null;
 }
 
 // Affiliate link conversion

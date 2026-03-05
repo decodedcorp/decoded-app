@@ -4,6 +4,7 @@ export { StatsCards, ProfileStats } from "./StatsCards";
 export { BadgeGrid } from "./BadgeGrid";
 export { RankingList } from "./RankingList";
 export { BadgeModal } from "./BadgeModal";
+export { ActivityItemCard } from "./ActivityItemCard";
 export { ProfileEditModal } from "./ProfileEditModal";
 export { ProfileDesktopLayout } from "./ProfileDesktopLayout";
 export { ActivityTabs, type ActivityTab } from "./ActivityTabs";

@@ -17,9 +17,14 @@ export {
   extractPostMetadata,
   createPost,
   createPostWithFile,
+  createPostWithFileAndSolutions,
   createPostWithSolution,
 } from "./posts";
-export type { UploadImageOptions, CreatePostWithFileRequest } from "./posts";
+export type {
+  UploadImageOptions,
+  CreatePostWithFileRequest,
+  CreatePostWithFileAndSolutionsRequest,
+} from "./posts";
 
 // Category APIs
 export {
@@ -46,6 +51,9 @@ export {
   createSolution,
   updateSolution,
   deleteSolution,
+  adoptSolution,
+  unadoptSolution,
   extractSolutionMetadata,
   convertAffiliate,
 } from "./solutions";
+export type { AdoptSolutionDto, AdoptResponse } from "./solutions";

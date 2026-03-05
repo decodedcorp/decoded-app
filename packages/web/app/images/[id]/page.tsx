@@ -8,7 +8,7 @@ type Props = {
  * Full page route for /images/[id]
  * Redirects to /posts/[id] since image table is deprecated
  */
-export default async function ImageDetailPageRoute({ params }: Props) {
+export default async function ImageDetailRedirect({ params }: Props) {
   const { id } = await params;
   redirect(`/posts/${id}`);
 }

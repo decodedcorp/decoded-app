@@ -66,7 +66,7 @@ const aspectRatioClasses = {
  * <FeedCard
  *   imageUrl="/image.jpg"
  *   alt="Product image"
- *   link="/images/123"
+ *   link="/posts/123"
  *   overlay={<span className="badge">5 items</span>}
  * />
  */

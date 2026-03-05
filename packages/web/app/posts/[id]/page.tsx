@@ -1,4 +1,4 @@
-import { PostDetailPage } from "@/lib/components/detail/PostDetailPage";
+import { ImageDetailPage } from "@/lib/components/detail/ImageDetailPage";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -6,9 +6,9 @@ type Props = {
 
 /**
  * Full page route for /posts/[id]
- * Used when directly accessing URL or refreshing page
+ * Uses ImageDetailPage (image-centric UI)
  */
 export default async function PostDetailPageRoute({ params }: Props) {
   const { id } = await params;
-  return <PostDetailPage postId={id} />;
+  return <ImageDetailPage imageId={id} />;
 }

@@ -17,17 +17,6 @@ import { fetchAiCostChart } from "@/lib/api/admin/ai-cost";
  *   { daily: AiCostDailyMetric[], modelBreakdown: ModelCostBreakdown[] }
  */
 export async function GET(request: NextRequest) {
-  if (process.env.NODE_ENV === "development") {
-    const { searchParams } = request.nextUrl;
-    const days = Math.min(
-      90,
-      Math.max(7, parseInt(searchParams.get("days") ?? "30", 10))
-    );
-
-    const data = await fetchAiCostChart(days);
-    return NextResponse.json(data);
-  }
-
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },

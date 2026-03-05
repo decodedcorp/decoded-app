@@ -19,6 +19,7 @@ import {
   PostsListParams,
   UpdatePostDto,
   PostResponse,
+  PostDetailResponse,
   ApiError,
 } from "./types";
 
@@ -223,11 +224,33 @@ export interface CreatePostWithFileRequest {
   spots: Array<{
     position_left: string;
     position_top: string;
-    category_id: string;
   }>;
   media_source: {
     type: string;
-    title: string;
+    description?: string;
+  };
+  artist_name?: string;
+  group_name?: string;
+  context?: string;
+  description?: string;
+}
+
+export interface CreatePostWithFileAndSolutionsRequest {
+  file: File;
+  spots: Array<{
+    position_left: string;
+    position_top: string;
+    solution?: {
+      original_url: string;
+      title?: string;
+      thumbnail_url?: string;
+      description?: string;
+      metadata?: Record<string, unknown>;
+    };
+  }>;
+  media_source: {
+    type: string;
+    description?: string;
   };
   artist_name?: string;
   group_name?: string;
@@ -287,7 +310,60 @@ export async function createPostWithFile(
 }
 
 // ============================================================
-// Create Post with Solution
+// Create Post with File and Solutions
+// POST /api/v1/posts/with-solutions
+// 솔루션(링크)을 아는 유저용
+// ============================================================
+
+export async function createPostWithFileAndSolutions(
+  request: CreatePostWithFileAndSolutionsRequest
+): Promise<CreatePostResponse> {
+  const token = await getAuthToken();
+
+  if (!token) {
+    throw new Error("로그인이 필요합니다.");
+  }
+
+  const formData = new FormData();
+  formData.append("image", request.file);
+
+  const data = {
+    image_url: "",
+    spots: request.spots,
+    media_source: request.media_source,
+    artist_name: request.artist_name,
+    group_name: request.group_name,
+    context: request.context,
+    description: request.description,
+  };
+  formData.append("data", JSON.stringify(data));
+
+  const response = await fetch("/api/v1/posts/with-solutions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const responseText = await response.text();
+    let errorMessage = "포스트 생성에 실패했습니다.";
+    try {
+      const errorJson = JSON.parse(responseText);
+      errorMessage =
+        errorJson.message || errorJson.error?.message || errorMessage;
+    } catch {
+      errorMessage = responseText || errorMessage;
+    }
+    throw new Error(errorMessage);
+  }
+
+  return response.json();
+}
+
+// ============================================================
+// Create Post with Solution (JSON - deprecated, use createPostWithFileAndSolutions)
 // POST /api/v1/posts/with-solution
 // Solution을 아는 유저용
 // ============================================================
@@ -326,6 +402,8 @@ function buildPostsQueryString(params?: PostsListParams): string {
   if (params.page !== undefined) searchParams.set("page", String(params.page));
   if (params.per_page !== undefined)
     searchParams.set("per_page", String(params.per_page));
+  if (params.has_solutions !== undefined)
+    searchParams.set("has_solutions", String(params.has_solutions));
 
   const queryString = searchParams.toString();
   return queryString ? `?${queryString}` : "";
@@ -378,6 +456,21 @@ export async function fetchPostsServer(
   }
 
   return response.json();
+}
+
+// ============================================================
+// Fetch Post Detail (spots + top_solution per spot)
+// GET /api/v1/posts/{postId}
+// ============================================================
+
+export async function fetchPostDetail(
+  postId: string
+): Promise<PostDetailResponse> {
+  return apiClient<PostDetailResponse>({
+    path: `/api/v1/posts/${postId}`,
+    method: "GET",
+    requiresAuth: false,
+  });
 }
 
 // ============================================================

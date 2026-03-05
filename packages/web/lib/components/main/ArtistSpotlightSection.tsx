@@ -27,14 +27,17 @@ const sampleSpotlightData: StyleCardData[] = [
 
 interface ArtistSpotlightSectionProps {
   data?: StyleCardData[];
+  /** 어떤 아티스트 스포트라이트인지 (예: "Justin Bieber, 뉴진스 등") */
+  subtitle?: string;
 }
 
 export function ArtistSpotlightSection({
   data = sampleSpotlightData,
+  subtitle,
 }: ArtistSpotlightSectionProps) {
   return (
-    <section className="py-24 md:py-32 bg-[#0a0a0a] overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 mb-12 md:mb-16">
+    <section className="py-12 md:py-16 bg-[#0a0a0a] overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 mb-8 md:mb-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -47,6 +50,11 @@ export function ArtistSpotlightSection({
             <h2 className="text-4xl md:text-6xl font-serif font-bold italic tracking-tighter text-white">
               Artist Spotlight
             </h2>
+            {subtitle && (
+              <p className="mt-3 text-white/60 font-sans text-base md:text-lg">
+                {subtitle}
+              </p>
+            )}
           </motion.div>
           <Link
             href="/artist"

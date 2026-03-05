@@ -16,15 +16,19 @@ import { fetchChartData } from "@/lib/api/admin/dashboard";
  * Response shape: DailyMetric[]
  */
 export async function GET(request: NextRequest) {
-  if (process.env.NODE_ENV === "development") {
-    const { searchParams } = new URL(request.url);
-    const daysParam = searchParams.get("days");
-    const days = daysParam ? parseInt(daysParam, 10) : 30;
-    const data = await fetchChartData(days);
-    return NextResponse.json(data);
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const supabase = await createSupabaseServerClient();
+  const isAdmin = await checkIsAdmin(supabase, user.id);
+  if (!isAdmin) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
   const { searchParams } = new URL(request.url);
   const daysParam = searchParams.get("days");

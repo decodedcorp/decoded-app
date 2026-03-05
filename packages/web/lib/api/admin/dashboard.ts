@@ -37,10 +37,6 @@ export type { DailyMetric, KPIStats, TodaySummary };
  * Falls back to fully mock data if Supabase queries fail.
  */
 export async function fetchDashboardStats(): Promise<KPIStats> {
-  if (process.env.NODE_ENV === "development") {
-    return generateMockKPIStats();
-  }
-
   try {
     const supabase = await createSupabaseServerClient();
 
@@ -97,10 +93,6 @@ export async function fetchChartData(
  */
 export async function fetchTodaySummary(): Promise<TodaySummary> {
   const summary = generateTodaySummary();
-
-  if (process.env.NODE_ENV === "development") {
-    return summary;
-  }
 
   try {
     const supabase = await createSupabaseServerClient();

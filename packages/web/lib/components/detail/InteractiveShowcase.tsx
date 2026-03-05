@@ -24,6 +24,10 @@ type Props = {
   activeIndex?: number | null;
   onActiveIndexChange?: (index: number | null) => void;
   renderImage?: boolean;
+  /** 솔루션 등록 시트 열기 (spotId 전달) */
+  onAddSolution?: (spotId: string) => void;
+  /** 포스트 작성자 ID - 채택 UI 표시 여부 판단 */
+  postOwnerId?: string | null;
 };
 
 /**
@@ -42,6 +46,8 @@ export function InteractiveShowcase({
   activeIndex: controlledActiveIndex,
   onActiveIndexChange,
   renderImage = true,
+  onAddSolution,
+  postOwnerId = null,
 }: Props) {
   const [internalActiveIndex, setInternalActiveIndex] = useState<number | null>(
     null
@@ -145,12 +151,12 @@ export function InteractiveShowcase({
       {/* Right: Scrollable Item Details (Desktop) / Bottom: Scrollable (Mobile) */}
       <div
         ref={cardsContainerRef}
-        className={`w-full px-5 py-10 bg-background relative z-20 ${
+        className={`w-full px-4 py-6 bg-background relative z-20 ${
           isModal
             ? renderImage
               ? "overflow-visible"
               : "w-full pt-0"
-            : "lg:w-1/2 lg:pl-10 lg:pt-20"
+            : "lg:w-1/2 lg:pl-8 lg:pt-12"
         }`}
       >
         {items.map((item, index) => (
@@ -161,6 +167,9 @@ export function InteractiveShowcase({
             isModal={isModal}
             onActivate={() => handleActiveIndexChange(index)}
             onDeactivate={() => handleActiveIndexChange(null)}
+            spotId={item.spot_id ?? null}
+            onAddSolution={onAddSolution}
+            postOwnerId={postOwnerId}
           />
         ))}
       </div>

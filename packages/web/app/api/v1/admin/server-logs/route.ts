@@ -21,20 +21,7 @@ import type { LogLevel } from "@/lib/api/admin/server-logs";
  * Response shape: ServerLogListResponse
  */
 export async function GET(request: NextRequest) {
-  if (process.env.NODE_ENV === "development") {
-    const { searchParams } = request.nextUrl;
-    const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
-    const pageSize = Math.min(200, Math.max(1, parseInt(searchParams.get("pageSize") ?? "50", 10)));
-    const levelParam = searchParams.get("level") as LogLevel | null;
-    const search = searchParams.get("search") ?? undefined;
-    const from = searchParams.get("from") ?? undefined;
-    const to = searchParams.get("to") ?? undefined;
-    const validLevels: LogLevel[] = ["info", "warn", "error", "debug"];
-    const level = levelParam && validLevels.includes(levelParam) ? levelParam : undefined;
-    const result = await fetchServerLogs({ page, pageSize, level, search, from, to });
-    return NextResponse.json(result);
-  }
-
+  // Admin auth check
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },

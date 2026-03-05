@@ -84,6 +84,14 @@ export type { StepIndicatorProps } from "./step-indicator";
 export { Hotspot, hotspotVariants, brandToColor } from "./hotspot";
 export type { HotspotProps, HotspotPosition } from "./hotspot";
 
+// SpotMarker Component (platform-wide spot marker)
+export { SpotMarker } from "./spot-marker";
+export type {
+  SpotMarkerProps,
+  SpotMarkerSize,
+  SpotPosition,
+} from "./spot-marker";
+
 // NavItem Component
 export { NavItem, navItemVariants } from "./nav-item";
 export type { NavItemProps } from "./nav-item";

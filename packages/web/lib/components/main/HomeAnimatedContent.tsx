@@ -3,54 +3,44 @@
 import { motion, type Variants } from "motion/react";
 import {
   HeroSection,
-  DecodedPickSection,
+  HeroCarousel,
   ArtistSpotlightSection,
-  WhatsNewSection,
-  DiscoverItemsSection,
-  DiscoverProductsSection,
-  BestItemSection,
   WeeklyBestSection,
-  TrendingNowSection,
-  TodayDecodedSection,
 } from "./";
+import { StyleListSection } from "./StyleListSection";
+import { DecodedSolutionsSection } from "./DecodedSolutionsSection";
+import { CuriousItemsSection } from "./CuriousItemsSection";
 import type { HeroData } from "./HeroSection";
-import type { ItemCardData } from "./ItemCard";
 import type { StyleCardData } from "./StyleCard";
-import type {
-  WeeklyBestStyle,
-  TrendingKeyword,
-} from "@/lib/utils/main-page-mapper";
+import type { WeeklyBestStyle } from "@/lib/utils/main-page-mapper";
+import type { HeroSlide } from "@/lib/data/heroSlides";
 
 interface HomeAnimatedContentProps {
   heroData?: HeroData;
-  weeklyBestStyles: WeeklyBestStyle[];
-  bestItems: ItemCardData[];
-  whatsNewStyles: StyleCardData[];
-  whatsNewItems: ItemCardData[];
-  decodedPickStyle?: StyleCardData;
-  decodedPickItems: ItemCardData[];
+  heroSlides?: HeroSlide[];
   artistSpotlightStyles: StyleCardData[];
-  discoverItemsByTab: Record<string, ItemCardData[]>;
-  trendingKeywords: TrendingKeyword[];
+  artistSpotlightSubtitle?: string;
+  /** 솔루션 있는 포스트만 – Decoded Community Solutions 섹션용 */
+  solvedPostStyles: StyleCardData[];
+  /** 아직 솔루션 없는 포스트 – 궁금해요 섹션용 */
+  curiousItemsStyles: StyleCardData[];
+  whatsNewStyles: StyleCardData[];
+  weeklyBestStyles: WeeklyBestStyle[];
 }
 
 export function HomeAnimatedContent({
   heroData,
-  weeklyBestStyles,
-  bestItems,
-  whatsNewStyles,
-  whatsNewItems,
-  decodedPickStyle,
-  decodedPickItems,
+  heroSlides = [],
   artistSpotlightStyles,
-  discoverItemsByTab,
-  trendingKeywords,
+  artistSpotlightSubtitle,
+  solvedPostStyles,
+  curiousItemsStyles,
+  whatsNewStyles,
+  weeklyBestStyles,
 }: HomeAnimatedContentProps) {
   // Convert empty arrays to undefined so component default sample data kicks in
   const orUndef = <T,>(arr: T[]): T[] | undefined =>
     arr.length > 0 ? arr : undefined;
-  const hasItems = (obj: Record<string, ItemCardData[]>): boolean =>
-    Object.values(obj).some((arr) => arr.length > 0);
 
   const sectionVariants: Variants = {
     hidden: { opacity: 0, y: 50 },
@@ -63,88 +53,62 @@ export function HomeAnimatedContent({
 
   return (
     <>
-      <HeroSection data={heroData} />
+      {heroSlides.length > 0 ? (
+        <HeroCarousel slides={heroSlides} />
+      ) : (
+        <HeroSection data={heroData} />
+      )}
 
       <main>
-        {/* DECODED'S PICK Section */}
+        {/* Artist Spotlight */}
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
           variants={sectionVariants}
         >
-          <DecodedPickSection
-            styleData={decodedPickStyle}
-            items={orUndef(decodedPickItems)}
+          <ArtistSpotlightSection
+            data={artistSpotlightStyles}
+            subtitle={artistSpotlightSubtitle}
           />
         </motion.div>
 
-        {/* TODAY'S DECODED Section */}
+        {/* Decoded – 솔루션 있는 포스트만, 그리드 + 브랜딩 + 솔루션 강조 */}
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
           variants={sectionVariants}
         >
-          <TodayDecodedSection />
+          <DecodedSolutionsSection styles={solvedPostStyles} />
         </motion.div>
 
-        {/* Artist Spotlight Section */}
+        {/* 궁금해요 – 아직 솔루션 없는 포스트, 디코딩 요청 유도 */}
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
           variants={sectionVariants}
         >
-          <ArtistSpotlightSection data={orUndef(artistSpotlightStyles)} />
+          <CuriousItemsSection styles={curiousItemsStyles} />
         </motion.div>
 
-        {/* What's New Section */}
+        {/* What's New – 솔루션 있는 포스트, 호버 시 스팟 표시 */}
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
           variants={sectionVariants}
         >
-          <WhatsNewSection
-            styles={orUndef(whatsNewStyles)}
-            items={orUndef(whatsNewItems)}
+          <StyleListSection
+            title="What's New"
+            subtitle="최근 업로드된 스타일이에요."
+            styles={whatsNewStyles}
+            linkHref="/feed"
           />
         </motion.div>
 
-        {/* Discover Items Section */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={sectionVariants}
-        >
-          <DiscoverItemsSection
-            itemsByTab={hasItems(discoverItemsByTab) ? discoverItemsByTab : undefined}
-          />
-        </motion.div>
-
-        {/* Discover Products Section */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={sectionVariants}
-        >
-          <DiscoverProductsSection items={orUndef(bestItems)} />
-        </motion.div>
-
-        {/* Best Item Section */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={sectionVariants}
-        >
-          <BestItemSection items={orUndef(bestItems)} />
-        </motion.div>
-
-        {/* Weekly Best Section */}
+        {/* Weekly Best */}
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -152,16 +116,6 @@ export function HomeAnimatedContent({
           variants={sectionVariants}
         >
           <WeeklyBestSection styles={orUndef(weeklyBestStyles)} />
-        </motion.div>
-
-        {/* Trending Now Section */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={sectionVariants}
-        >
-          <TrendingNowSection keywords={orUndef(trendingKeywords)} />
         </motion.div>
       </main>
     </>

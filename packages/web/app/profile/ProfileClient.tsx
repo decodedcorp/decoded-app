@@ -14,6 +14,8 @@ import {
   ProfileDesktopLayout,
   ActivityTabs,
   ActivityContent,
+  EmptyState,
+  ActivityItemCard,
   type ActivityTab,
   ProfileBio,
   FollowStats,
@@ -22,8 +24,19 @@ import {
   SolutionsList,
   SavedGrid,
 } from "@/lib/components/profile";
-import { useMe, useUserStats } from "@/lib/hooks/useProfile";
+import {
+  useMe,
+  useUserStats,
+  useMyBadges,
+  useMyRanking,
+  useUserActivities,
+} from "@/lib/hooks/useProfile";
 import { useProfileStore } from "@/lib/stores/profileStore";
+import {
+  apiEarnedBadgeToStoreBadge,
+  apiAvailableBadgeToStoreBadge,
+} from "@/lib/utils/badge-mapper";
+import { apiMyRankingDetailToStoreRankings } from "@/lib/utils/ranking-mapper";
 
 function ProfileSkeleton() {
   return (
@@ -172,26 +185,70 @@ export function ProfileClient() {
     refetch: refetchStats,
   } = useUserStats();
 
+  // Badges & Rankings (실제 API)
+  const { data: badgesData, refetch: refetchBadges } = useMyBadges();
+  const { data: rankingData, refetch: refetchRankings } = useMyRanking();
+
+  // Activities from API (saved 탭은 미구현) - 반드시 early return 전에 호출
+  const activitiesTypeMap: Record<
+    ActivityTab,
+    "post" | "spot" | "solution" | undefined
+  > = {
+    posts: "post",
+    spots: "spot",
+    solutions: "solution",
+    saved: undefined,
+  };
+  const activitiesType = activitiesTypeMap[activeTab];
+  const {
+    data: activitiesData,
+    isLoading: isActivitiesLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useUserActivities({
+    type: activitiesType ?? undefined,
+    perPage: 20,
+    enabled: activeTab !== "saved",
+  });
+
   // Sync API data to store
   const setUserFromApi = useProfileStore((state) => state.setUserFromApi);
   const setStatsFromApi = useProfileStore((state) => state.setStatsFromApi);
+  const setBadgesFromApi = useProfileStore((state) => state.setBadgesFromApi);
+  const setRankingsFromApi = useProfileStore(
+    (state) => state.setRankingsFromApi
+  );
 
   useEffect(() => {
-    if (userData) {
-      setUserFromApi(userData);
-    }
+    if (userData) setUserFromApi(userData);
   }, [userData, setUserFromApi]);
 
   useEffect(() => {
-    if (statsData) {
-      setStatsFromApi(statsData);
-    }
+    if (statsData) setStatsFromApi(statsData);
   }, [statsData, setStatsFromApi]);
 
-  // Loading state
+  useEffect(() => {
+    if (badgesData) {
+      const earned = badgesData.data.map(apiEarnedBadgeToStoreBadge);
+      const available = badgesData.available_badges.map(
+        apiAvailableBadgeToStoreBadge
+      );
+      setBadgesFromApi([...earned, ...available]);
+    }
+  }, [badgesData, setBadgesFromApi]);
+
+  useEffect(() => {
+    if (rankingData) {
+      const rankings = apiMyRankingDetailToStoreRankings(rankingData);
+      setRankingsFromApi(rankings);
+    }
+  }, [rankingData, setRankingsFromApi]);
+
+  // Loading state - user & stats만 블로킹 (badges/rankings는 개별 로딩)
   const isLoading = isUserLoading || isStatsLoading;
 
-  // Error state
+  // Error state - user & stats 실패 시에만 전체 에러
   const isError = isUserError || isStatsError;
   const error = userError || statsError;
 
@@ -199,6 +256,8 @@ export function ProfileClient() {
   const handleRetry = () => {
     refetchUser();
     refetchStats();
+    refetchBadges();
+    refetchRankings();
   };
 
   // Show skeleton during loading
@@ -211,19 +270,40 @@ export function ProfileClient() {
     return <ProfileError error={error} onRetry={handleRetry} />;
   }
 
+  const activityItems = activitiesData?.pages.flatMap((p) => p.data) ?? [];
+  const hasActivityContent = activityItems.length > 0;
+
   const renderTabContent = () => {
-    switch (activeTab) {
-      case "posts":
-        return <PostsGrid />;
-      case "spots":
-        return <SpotsList />;
-      case "solutions":
-        return <SolutionsList />;
-      case "saved":
-        return <SavedGrid />;
-      default:
-        return <PostsGrid />;
+    if (activeTab === "saved") {
+      return <EmptyState tab="saved" />;
     }
+    if (isActivitiesLoading && !activitiesData) {
+      return (
+        <div className="flex justify-center py-12">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        </div>
+      );
+    }
+    if (!hasActivityContent) {
+      return <EmptyState tab={activeTab} />;
+    }
+
+    return (
+      <div className="space-y-4">
+        {activityItems.map((item) => (
+          <ActivityItemCard key={item.id} item={item} />
+        ))}
+        {hasNextPage && (
+          <button
+            onClick={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
+            className="w-full py-2 text-sm text-muted-foreground hover:text-foreground disabled:opacity-50"
+          >
+            {isFetchingNextPage ? "로딩 중..." : "더 보기"}
+          </button>
+        )}
+      </div>
+    );
   };
 
   return (

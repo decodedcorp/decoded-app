@@ -172,7 +172,7 @@ export function BadgeGrid() {
           <Trophy className="w-5 h-5 text-primary" />
           My Badges
           <span className="text-sm text-muted-foreground font-normal">
-            ({badges.length}/{badges.length})
+            ({badges.filter((b) => !b.isLocked).length} 획득)
           </span>
         </h3>
         <button
@@ -191,6 +191,7 @@ export function BadgeGrid() {
             badge={badge}
             onClick={() => handleBadgeClick(badge)}
             delay={0.1 * (index + 1)}
+            isLocked={badge.isLocked}
           />
         ))}
         {remainingCountMobile > 0 && (
@@ -210,6 +211,7 @@ export function BadgeGrid() {
             badge={badge}
             onClick={() => handleBadgeClick(badge)}
             delay={0.1 * (index + 1)}
+            isLocked={badge.isLocked}
           />
         ))}
         {remainingCountDesktop > 0 && (

@@ -19,13 +19,7 @@ import { fetchLogStream } from "@/lib/api/admin/server-logs";
  *   { entries: ServerLogEntry[]; latestId: string }
  */
 export async function GET(request: NextRequest) {
-  if (process.env.NODE_ENV === "development") {
-    const { searchParams } = request.nextUrl;
-    const sinceId = searchParams.get("since_id") ?? undefined;
-    const result = await fetchLogStream(sinceId);
-    return NextResponse.json(result);
-  }
-
+  // Admin auth check
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },

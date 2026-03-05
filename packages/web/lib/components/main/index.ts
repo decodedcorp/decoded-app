@@ -8,6 +8,7 @@ export { HeroSection } from "./HeroSection";
 export type { HeroData } from "./HeroSection";
 export { DecodedPickSection } from "./DecodedPickSection";
 export { ArtistSpotlightSection } from "./ArtistSpotlightSection";
+export { CuriousItemsSection } from "./CuriousItemsSection";
 export { WhatsNewSection } from "./WhatsNewSection";
 export {
   DiscoverItemsSection,

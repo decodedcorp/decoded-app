@@ -1,9 +1,7 @@
 "use client";
 
 import { useMemo, useCallback } from "react";
-import type { ImageRow } from "@/lib/supabase/types";
-import { useInfiniteFilteredImages } from "@/lib/hooks/useImages";
-import type { ImageWithPostId } from "@/lib/supabase/queries/images";
+import { useInfinitePosts, type PostGridItem } from "@/lib/hooks/useImages";
 import {
   VerticalFeed,
   VerticalFeedSkeleton,
@@ -13,21 +11,19 @@ import { useFilterStore } from "@/lib/stores/filterStore";
 import { useSearchStore } from "@/lib/stores/searchStore";
 
 type Props = {
-  initialImages: ImageRow[];
+  initialImages?: unknown[];
 };
 
 /**
  * Home Client Component - Instagram-style Vertical Feed
  *
- * Uses SSR + React Query infinite scroll pattern:
- * - First render: Uses SSR initialImages
- * - React Query fetches in CSR -> appends data as user scrolls
+ * Uses 백엔드 API (GET /api/v1/posts)
  */
 export function HomeClient({ initialImages: _initialImages }: Props) {
   const activeFilter = useFilterStore((state) => state.activeFilter);
   const debouncedQuery = useSearchStore((state) => state.debouncedQuery);
 
-  // Use infinite query hook
+  // Use REST API
   const {
     data,
     isLoading,
@@ -37,14 +33,15 @@ export function HomeClient({ initialImages: _initialImages }: Props) {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useInfiniteFilteredImages({
-    limit: 20, // Smaller batch for vertical feed (full-width cards)
-    filter: activeFilter,
-    search: debouncedQuery,
+  } = useInfinitePosts({
+    limit: 20,
+    category: activeFilter !== "all" ? activeFilter : undefined,
+    search: debouncedQuery || undefined,
+    sort: "recent",
   });
 
-  // Flatten pages into a single items array with cross-page deduplication
-  const items: ImageWithPostId[] = useMemo(() => {
+  // Flatten pages with deduplication
+  const items: PostGridItem[] = useMemo(() => {
     if (!data) return [];
     const seen = new Set<string>();
     return data.pages
@@ -56,32 +53,19 @@ export function HomeClient({ initialImages: _initialImages }: Props) {
       });
   }, [data]);
 
-  // Normalize status values from database enum to consistent format
-  const normalizeStatus = (
-    raw: string | null
-  ): "pending" | "extracted" | "skipped" | string | undefined => {
-    if (!raw) return undefined;
-    const lower = raw.toLowerCase();
-    if (lower === "pending") return "pending";
-    if (lower === "extracted") return "extracted";
-    if (lower === "skipped") return "skipped";
-    return raw;
-  };
-
-  // Map ImageWithPostId[] to FeedCardItem[]
+  // Map PostGridItem[] to FeedCardItem[]
   const feedItems: FeedCardItem[] = useMemo(
     () =>
       items
-        .filter((image) => image.image_url != null)
-        .map((image) => ({
-          id: image.id,
-          imageUrl: image.image_url,
-          status: normalizeStatus(image.status),
-          hasItems: image.with_items,
-          postId: image.postId,
-          postSource: image.postSource,
-          postAccount: image.postAccount,
-          postCreatedAt: image.postCreatedAt,
+        .filter((post) => post.imageUrl != null)
+        .map((post) => ({
+          id: post.id,
+          imageUrl: post.imageUrl,
+          hasItems: post.spotCount > 0,
+          postId: post.postId,
+          postSource: post.postSource,
+          postAccount: post.postAccount,
+          postCreatedAt: post.postCreatedAt,
         })),
     [items]
   );

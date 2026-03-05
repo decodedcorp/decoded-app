@@ -18,17 +18,7 @@ import type { PipelineStatus } from "@/lib/api/admin/pipeline";
  * Response shape: PipelineListResponse
  */
 export async function GET(request: NextRequest) {
-  if (process.env.NODE_ENV === "development") {
-    const { searchParams } = request.nextUrl;
-    const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
-    const pageSize = Math.min(100, Math.max(1, parseInt(searchParams.get("pageSize") ?? "15", 10)));
-    const statusParam = searchParams.get("status") as PipelineStatus | null;
-    const validStatuses: PipelineStatus[] = ["completed", "running", "failed"];
-    const status = statusParam && validStatuses.includes(statusParam) ? statusParam : undefined;
-    const result = await fetchPipelines({ page, pageSize, status });
-    return NextResponse.json(result);
-  }
-
+  // Admin auth check
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
