@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 Phase: m7-02-main-page-renewal
 Plan: 02 of 3 (estimated)
 Status: In progress
-Last activity: 2026-03-05 — Completed m7-02-02-PLAN.md (MasonryGrid + PersonalizeBanner)
+Last activity: 2026-03-05 - Completed quick task 044: 컬렉션 페이지 과도한 너비 디자인 수정
 
 Progress: 6 milestones shipped + M7-01 complete + M7-02 in progress
 
