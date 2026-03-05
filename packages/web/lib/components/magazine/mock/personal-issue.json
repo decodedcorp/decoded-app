@@ -1,0 +1,92 @@
+{
+  "id": "personal-user-abc-007",
+  "issue_number": 7,
+  "title": "Your Style DNA: Vol.07",
+  "subtitle": "Curated from your saves, searches, and style fingerprint",
+  "cover_image_url": "https://picsum.photos/seed/mag-personal-cover/1200/800",
+  "generated_at": "2026-03-04T14:30:00Z",
+  "theme_keywords": ["Streetcore", "Minimal", "Cyberpunk"],
+  "theme_palette": {
+    "primary": "#0a0a0a",
+    "accent": "#ff6b35",
+    "bg": "#0a0a0a",
+    "text": "#e8e8e8"
+  },
+  "layout_json": {
+    "version": 1,
+    "viewport": "mobile",
+    "components": [
+      {
+        "type": "hero-image",
+        "x": 0,
+        "y": 0,
+        "w": 100,
+        "h": 50,
+        "animation_type": "parallax",
+        "animation_delay": 0,
+        "data": {
+          "image_url": "https://picsum.photos/seed/mag-personal-hero/1200/800",
+          "headline": "Your Style DNA",
+          "subheadline": "Vol.07 — March 2026",
+          "parallax_depth": 0.25
+        }
+      },
+      {
+        "type": "text-block",
+        "x": 5,
+        "y": 53,
+        "w": 90,
+        "h": 10,
+        "animation_type": "fade-up",
+        "animation_delay": 0.2,
+        "data": {
+          "variant": "body",
+          "content": "Based on your recent activity, we see a pattern: sharp silhouettes softened by oversized layers, monochrome palettes disrupted by a single neon accent. Here's your decoded style — distilled into pieces you haven't found yet."
+        }
+      },
+      {
+        "type": "text-block",
+        "x": 5,
+        "y": 65,
+        "w": 90,
+        "h": 8,
+        "animation_type": "fade-up",
+        "animation_delay": 0.4,
+        "data": {
+          "variant": "heading",
+          "content": "Picks for You"
+        }
+      },
+      {
+        "type": "item-card",
+        "x": 5,
+        "y": 75,
+        "w": 90,
+        "h": 22,
+        "animation_type": "slide-left",
+        "animation_delay": 0.5,
+        "data": {
+          "item_id": "item-techwear-jacket",
+          "image_url": "https://picsum.photos/seed/mag-personal-item/400/500",
+          "brand": "ACRONYM",
+          "name": "J1A-GTKR Death Stranding Jacket",
+          "price": "$1,850",
+          "post_id": "post-101"
+        }
+      },
+      {
+        "type": "quote",
+        "x": 10,
+        "y": 100,
+        "w": 80,
+        "h": 8,
+        "animation_type": "fade-up",
+        "animation_delay": 0.7,
+        "data": {
+          "text": "Your wardrobe tells a story. We just helped you read it.",
+          "attribution": "decoded AI"
+        }
+      }
+    ]
+  }
+}

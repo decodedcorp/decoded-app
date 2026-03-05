@@ -1,0 +1,172 @@
+[
+  {
+    "id": "issue-2026-w09",
+    "issue_number": 1,
+    "title": "Quiet Luxury Decoded",
+    "cover_image_url": "https://picsum.photos/seed/mag-col-1/600/800",
+    "generated_at": "2026-01-10T06:00:00Z",
+    "theme_keywords": ["Quiet Luxury", "Old Money", "Cashmere"],
+    "theme_palette": {
+      "primary": "#1a1a1a",
+      "accent": "#c9a96e",
+      "bg": "#1a1a1a",
+      "text": "#f0ece3"
+    },
+    "layout_json": {
+      "version": 1,
+      "viewport": "mobile",
+      "components": [
+        {
+          "type": "hero-image",
+          "x": 0,
+          "y": 0,
+          "w": 100,
+          "h": 55,
+          "animation_type": "scale-in",
+          "animation_delay": 0,
+          "data": {
+            "image_url": "https://picsum.photos/seed/mag-col-1-hero/1200/800",
+            "headline": "Quiet Luxury Decoded",
+            "parallax_depth": 0.2
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "issue-2026-w07",
+    "issue_number": 2,
+    "title": "Street Meets Atelier",
+    "cover_image_url": "https://picsum.photos/seed/mag-col-2/600/800",
+    "generated_at": "2026-01-24T06:00:00Z",
+    "theme_keywords": ["Streetwear", "High Fashion", "Contrast"],
+    "theme_palette": {
+      "primary": "#0d0d0d",
+      "accent": "#ff3366",
+      "bg": "#0d0d0d",
+      "text": "#ffffff"
+    },
+    "layout_json": {
+      "version": 1,
+      "viewport": "mobile",
+      "components": [
+        {
+          "type": "hero-image",
+          "x": 0,
+          "y": 0,
+          "w": 100,
+          "h": 55,
+          "animation_type": "parallax",
+          "animation_delay": 0,
+          "data": {
+            "image_url": "https://picsum.photos/seed/mag-col-2-hero/1200/800",
+            "headline": "Street Meets Atelier",
+            "parallax_depth": 0.3
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "issue-2026-w05",
+    "issue_number": 3,
+    "title": "The Denim Issue",
+    "cover_image_url": "https://picsum.photos/seed/mag-col-3/600/800",
+    "generated_at": "2026-02-07T06:00:00Z",
+    "theme_keywords": ["Denim", "Workwear", "Indigo"],
+    "theme_palette": {
+      "primary": "#0c1929",
+      "accent": "#4a90d9",
+      "bg": "#0c1929",
+      "text": "#e6edf5"
+    },
+    "layout_json": {
+      "version": 1,
+      "viewport": "mobile",
+      "components": [
+        {
+          "type": "hero-image",
+          "x": 0,
+          "y": 0,
+          "w": 100,
+          "h": 55,
+          "animation_type": "fade-up",
+          "animation_delay": 0,
+          "data": {
+            "image_url": "https://picsum.photos/seed/mag-col-3-hero/1200/800",
+            "headline": "The Denim Issue",
+            "parallax_depth": 0.15
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "issue-2026-w03",
+    "issue_number": 4,
+    "title": "Neon Noir",
+    "cover_image_url": "https://picsum.photos/seed/mag-col-4/600/800",
+    "generated_at": "2026-02-21T06:00:00Z",
+    "theme_keywords": ["Cyberpunk", "Neon", "Night"],
+    "theme_palette": {
+      "primary": "#050510",
+      "accent": "#00ff88",
+      "bg": "#050510",
+      "text": "#e0ffe0"
+    },
+    "layout_json": {
+      "version": 1,
+      "viewport": "mobile",
+      "components": [
+        {
+          "type": "hero-image",
+          "x": 0,
+          "y": 0,
+          "w": 100,
+          "h": 55,
+          "animation_type": "scale-in",
+          "animation_delay": 0,
+          "data": {
+            "image_url": "https://picsum.photos/seed/mag-col-4-hero/1200/800",
+            "headline": "Neon Noir",
+            "parallax_depth": 0.35
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "issue-2026-w01",
+    "issue_number": 5,
+    "title": "Soft Power",
+    "cover_image_url": "https://picsum.photos/seed/mag-col-5/600/800",
+    "generated_at": "2026-03-03T06:00:00Z",
+    "theme_keywords": ["Soft", "Pastel", "Gender Fluid"],
+    "theme_palette": {
+      "primary": "#1a1520",
+      "accent": "#d4a0ff",
+      "bg": "#1a1520",
+      "text": "#f0e8ff"
+    },
+    "layout_json": {
+      "version": 1,
+      "viewport": "mobile",
+      "components": [
+        {
+          "type": "hero-image",
+          "x": 0,
+          "y": 0,
+          "w": 100,
+          "h": 55,
+          "animation_type": "parallax",
+          "animation_delay": 0,
+          "data": {
+            "image_url": "https://picsum.photos/seed/mag-col-5-hero/1200/800",
+            "headline": "Soft Power",
+            "parallax_depth": 0.2
+          }
+        }
+      ]
+    }
+  }
+]

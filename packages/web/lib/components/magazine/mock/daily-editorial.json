@@ -1,0 +1,129 @@
+{
+  "id": "daily-2026-03-05",
+  "issue_number": 42,
+  "title": "The New Minimalism",
+  "subtitle": "Less noise, more intention — how restraint became fashion's most radical statement",
+  "cover_image_url": "https://picsum.photos/seed/mag-daily-cover/1200/800",
+  "generated_at": "2026-03-05T06:00:00Z",
+  "theme_keywords": ["Minimalism", "Clean Lines", "Monochrome"],
+  "theme_palette": {
+    "primary": "#050505",
+    "accent": "#eafd67",
+    "bg": "#050505",
+    "text": "#f5f5f5"
+  },
+  "layout_json": {
+    "version": 1,
+    "viewport": "mobile",
+    "components": [
+      {
+        "type": "hero-image",
+        "x": 0,
+        "y": 0,
+        "w": 100,
+        "h": 55,
+        "animation_type": "parallax",
+        "animation_delay": 0,
+        "data": {
+          "image_url": "https://picsum.photos/seed/mag-hero-min/1200/800",
+          "headline": "The New Minimalism",
+          "subheadline": "Spring 2026 Editorial",
+          "parallax_depth": 0.3
+        }
+      },
+      {
+        "type": "text-block",
+        "x": 5,
+        "y": 58,
+        "w": 90,
+        "h": 12,
+        "animation_type": "fade-up",
+        "animation_delay": 0.2,
+        "data": {
+          "variant": "body",
+          "content": "In an era of visual overload, the most powerful statement is silence. This season's defining looks strip away the excess — leaving only fabric, form, and the confidence to let simplicity speak. From Jil Sander's sculpted coats to Lemaire's fluid layering, minimalism isn't about having less. It's about choosing with precision."
+        }
+      },
+      {
+        "type": "item-card",
+        "x": 5,
+        "y": 72,
+        "w": 43,
+        "h": 20,
+        "animation_type": "slide-left",
+        "animation_delay": 0.4,
+        "data": {
+          "item_id": "item-jacket-cos",
+          "image_url": "https://picsum.photos/seed/mag-item-jacket/400/500",
+          "brand": "COS",
+          "name": "Wool-Blend Oversized Coat",
+          "price": "$289",
+          "post_id": "post-001"
+        }
+      },
+      {
+        "type": "item-card",
+        "x": 52,
+        "y": 72,
+        "w": 43,
+        "h": 20,
+        "animation_type": "slide-left",
+        "animation_delay": 0.6,
+        "data": {
+          "item_id": "item-sneakers-nb",
+          "image_url": "https://picsum.photos/seed/mag-item-sneaker/400/500",
+          "brand": "New Balance",
+          "name": "550 White Leather",
+          "price": "$195",
+          "post_id": "post-002"
+        }
+      },
+      {
+        "type": "divider",
+        "x": 10,
+        "y": 94,
+        "w": 80,
+        "h": 1,
+        "animation_type": "scale-in",
+        "animation_delay": 0.7,
+        "data": {
+          "style": "gradient"
+        }
+      },
+      {
+        "type": "quote",
+        "x": 10,
+        "y": 97,
+        "w": 80,
+        "h": 8,
+        "animation_type": "fade-up",
+        "animation_delay": 0.8,
+        "data": {
+          "text": "Less is the new luxury.",
+          "attribution": "Editorial Team"
+        }
+      },
+      {
+        "type": "grid-gallery",
+        "x": 0,
+        "y": 108,
+        "w": 100,
+        "h": 30,
+        "animation_type": "scale-in",
+        "animation_delay": 1.0,
+        "data": {
+          "columns": 3,
+          "gap": 4,
+          "images": [
+            "https://picsum.photos/seed/mag-grid-1/400/400",
+            "https://picsum.photos/seed/mag-grid-2/400/400",
+            "https://picsum.photos/seed/mag-grid-3/400/400",
+            "https://picsum.photos/seed/mag-grid-4/400/400",
+            "https://picsum.photos/seed/mag-grid-5/400/400",
+            "https://picsum.photos/seed/mag-grid-6/400/400"
+          ]
+        }
+      }
+    ]
+  }
+}
