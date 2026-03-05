@@ -1,6 +1,5 @@
 // Spline Studio (primary)
 export { CollectionClient } from "./CollectionClient";
-export { StudioHUD } from "./StudioHUD";
 export { StudioLoader } from "./StudioLoader";
 export { IssueDetailPanel } from "./IssueDetailPanel";
 export { EmptyBookshelf } from "./EmptyBookshelf";

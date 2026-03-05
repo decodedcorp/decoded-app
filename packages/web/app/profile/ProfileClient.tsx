@@ -31,6 +31,9 @@ import {
   useMyBadges,
   useMyRanking,
   useUserActivities,
+  useProfileExtras,
+  useSocialAccounts,
+  useTryOnCount,
 } from "@/lib/hooks/useProfile";
 import { useProfileStore } from "@/lib/stores/profileStore";
 import {
@@ -190,6 +193,12 @@ export function ProfileClient() {
   const { data: badgesData, refetch: refetchBadges } = useMyBadges();
   const { data: rankingData, refetch: refetchRankings } = useMyRanking();
 
+  // Profile dashboard data (Supabase direct)
+  const userId = userData?.id;
+  const { data: profileExtras } = useProfileExtras(userId);
+  const { data: socialAccounts } = useSocialAccounts(userId);
+  const { data: tryOnCount } = useTryOnCount(userId);
+
   // Activities from API (saved 탭은 미구현) - 반드시 early return 전에 호출
   const activitiesTypeMap: Record<
     ActivityTab,
@@ -348,10 +357,14 @@ export function ProfileClient() {
         <ProfileHeader onEditClick={() => setIsEditModalOpen(true)} />
         <ProfileBio bio={userData?.bio ?? undefined} className="px-4" />
         <FollowStats className="px-4" />
-        <StyleDNACard />
-        <ArchiveStats />
-        <InkEconomyCard />
-        <DataSourcesCard />
+        <StyleDNACard
+          keywords={profileExtras?.style_dna?.keywords}
+          colors={profileExtras?.style_dna?.colors}
+          progress={profileExtras?.style_dna?.progress}
+        />
+        <ArchiveStats tryOnCount={tryOnCount} />
+        <InkEconomyCard inkCredits={profileExtras?.ink_credits} />
+        <DataSourcesCard accounts={socialAccounts} />
         <BadgeGrid />
         {/* Activity Tabs */}
         <div className="mt-6">
@@ -368,14 +381,18 @@ export function ProfileClient() {
           profileSection={
             <>
               <ProfileHeader onEditClick={() => setIsEditModalOpen(true)} />
-              <StyleDNACard />
-              <InkEconomyCard />
-              <DataSourcesCard />
+              <StyleDNACard
+          keywords={profileExtras?.style_dna?.keywords}
+          colors={profileExtras?.style_dna?.colors}
+          progress={profileExtras?.style_dna?.progress}
+        />
+              <InkEconomyCard inkCredits={profileExtras?.ink_credits} />
+              <DataSourcesCard accounts={socialAccounts} />
             </>
           }
           activitySection={
             <>
-              <ArchiveStats />
+              <ArchiveStats tryOnCount={tryOnCount} />
               <BadgeGrid />
               <RankingList />
               {/* Activity Tabs */}

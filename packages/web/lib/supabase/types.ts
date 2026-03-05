@@ -166,6 +166,9 @@ export type Database = {
           rank: string | null; // 'Member', etc.
           total_points: number;
           is_admin: boolean;
+          ink_credits: number;
+          style_dna: Record<string, unknown> | null;
+          studio_config: Record<string, unknown> | null;
           created_at: string;
           updated_at: string;
         };
@@ -179,6 +182,9 @@ export type Database = {
           rank?: string | null;
           total_points?: number;
           is_admin?: boolean;
+          ink_credits?: number;
+          style_dna?: Record<string, unknown> | null;
+          studio_config?: Record<string, unknown> | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -192,8 +198,72 @@ export type Database = {
           rank?: string | null;
           total_points?: number;
           is_admin?: boolean;
+          ink_credits?: number;
+          style_dna?: Record<string, unknown> | null;
+          studio_config?: Record<string, unknown> | null;
           created_at?: string;
           updated_at?: string;
+        };
+        Relationships: [];
+      };
+
+      /**
+       * User Social Accounts - OAuth SNS connections
+       */
+      user_social_accounts: {
+        Row: {
+          id: string;
+          user_id: string;
+          provider: string;
+          provider_user_id: string;
+          access_token: string;
+          refresh_token: string | null;
+          last_synced_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          provider: string;
+          provider_user_id: string;
+          access_token: string;
+          refresh_token?: string | null;
+          last_synced_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          provider_user_id?: string;
+          access_token?: string;
+          refresh_token?: string | null;
+          last_synced_at?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+
+      /**
+       * User Try-on History - VTON history
+       */
+      user_tryon_history: {
+        Row: {
+          id: string;
+          user_id: string;
+          image_url: string;
+          style_combination: Record<string, unknown> | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          image_url: string;
+          style_combination?: Record<string, unknown> | null;
+          created_at?: string;
+        };
+        Update: {
+          image_url?: string;
+          style_combination?: Record<string, unknown> | null;
         };
         Relationships: [];
       };

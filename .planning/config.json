@@ -1,6 +1,5 @@
 {
   "mode": "yolo",
-  "depth": "comprehensive",
   "parallelization": true,
   "commit_docs": true,
   "model_profile": "balanced",
@@ -8,7 +7,9 @@
   "milestone_branch_template": "gsd/{milestone}-{slug}",
   "workflow": {
     "research": false,
-    "plan_check": false,
-    "verifier": false
-  }
+    "plan_check": true,
+    "verifier": false,
+    "_auto_chain_active": false
+  },
+  "granularity": "fine"
 }

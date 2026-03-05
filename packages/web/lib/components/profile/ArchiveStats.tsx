@@ -33,12 +33,17 @@ function ArchiveStat({ value, label, accent, delay = 0 }: ArchiveStatProps) {
   );
 }
 
-export function ArchiveStats() {
+interface ArchiveStatsProps {
+  tryOnCount: number;
+}
+
+export function ArchiveStats({ tryOnCount = 0 }: Partial<ArchiveStatsProps>) {
   const stats = useProfileStore(selectStats);
 
-  // TODO: Replace mock values with API data
-  const tryOnHistory = 24; // TODO: Wire to try-on history API
-  const socialRank = "TOP 12%"; // TODO: Calculate from total_points ranking
+  const totalPoints = stats.totalEarnings;
+  let socialRank = "Member";
+  if (totalPoints >= 1000) socialRank = "Expert";
+  else if (totalPoints >= 300) socialRank = "Contributor";
 
   return (
     <div className="grid grid-cols-3 gap-3">
@@ -48,7 +53,7 @@ export function ArchiveStats() {
         delay={0.1}
       />
       <ArchiveStat
-        value={tryOnHistory}
+        value={tryOnCount}
         label="Try-on History"
         delay={0.2}
       />

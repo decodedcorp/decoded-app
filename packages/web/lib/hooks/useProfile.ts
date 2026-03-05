@@ -161,6 +161,52 @@ export function useMyRanking(
 }
 
 // ============================================================
+// Profile Dashboard Hooks (Style DNA, Ink, Social, Try-on)
+// ============================================================
+
+import {
+  fetchUserProfileExtras,
+  fetchUserSocialAccounts,
+  fetchTryOnCount,
+  type UserProfileExtras,
+  type SocialAccount,
+} from "@/lib/supabase/queries/profile";
+
+export const profileDashboardKeys = {
+  extras: (userId: string) => [...profileKeys.all, "extras", userId] as const,
+  social: (userId: string) => [...profileKeys.all, "social", userId] as const,
+  tryOnCount: (userId: string) =>
+    [...profileKeys.all, "tryOnCount", userId] as const,
+};
+
+export function useProfileExtras(userId: string | undefined) {
+  return useQuery({
+    queryKey: profileDashboardKeys.extras(userId ?? ""),
+    queryFn: () => fetchUserProfileExtras(userId!),
+    enabled: !!userId,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useSocialAccounts(userId: string | undefined) {
+  return useQuery({
+    queryKey: profileDashboardKeys.social(userId ?? ""),
+    queryFn: () => fetchUserSocialAccounts(userId!),
+    enabled: !!userId,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useTryOnCount(userId: string | undefined) {
+  return useQuery({
+    queryKey: profileDashboardKeys.tryOnCount(userId ?? ""),
+    queryFn: () => fetchTryOnCount(userId!),
+    enabled: !!userId,
+    staleTime: 1000 * 60 * 2,
+  });
+}
+
+// ============================================================
 // useUpdateProfile - Mutation for updating profile
 // ============================================================
 

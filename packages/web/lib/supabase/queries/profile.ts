@@ -109,3 +109,78 @@ export async function fetchSolutionsByUser(
 
   return data || [];
 }
+
+// ============================================================
+// Profile Dashboard Queries (Style DNA, Ink, Social, Try-on)
+// ============================================================
+
+export interface UserProfileExtras {
+  ink_credits: number;
+  style_dna: {
+    keywords: string[];
+    colors: string[];
+    progress: number;
+  } | null;
+}
+
+export async function fetchUserProfileExtras(
+  userId: string
+): Promise<UserProfileExtras> {
+  const { data, error } = await supabaseBrowserClient
+    .from("users")
+    .select("ink_credits, style_dna")
+    .eq("id", userId)
+    .single();
+
+  if (error || !data) {
+    if (process.env.NODE_ENV === "development") {
+      console.error("[fetchUserProfileExtras] Error:", error);
+    }
+    return { ink_credits: 0, style_dna: null };
+  }
+
+  return {
+    ink_credits: data.ink_credits ?? 0,
+    style_dna: data.style_dna as UserProfileExtras["style_dna"],
+  };
+}
+
+export interface SocialAccount {
+  provider: string;
+  provider_user_id: string;
+  last_synced_at: string | null;
+}
+
+export async function fetchUserSocialAccounts(
+  userId: string
+): Promise<SocialAccount[]> {
+  const { data, error } = await supabaseBrowserClient
+    .from("user_social_accounts")
+    .select("provider, provider_user_id, last_synced_at")
+    .eq("user_id", userId);
+
+  if (error) {
+    if (process.env.NODE_ENV === "development") {
+      console.error("[fetchUserSocialAccounts] Error:", error);
+    }
+    return [];
+  }
+
+  return (data as SocialAccount[]) || [];
+}
+
+export async function fetchTryOnCount(userId: string): Promise<number> {
+  const { count, error } = await supabaseBrowserClient
+    .from("user_tryon_history")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId);
+
+  if (error) {
+    if (process.env.NODE_ENV === "development") {
+      console.error("[fetchTryOnCount] Error:", error);
+    }
+    return 0;
+  }
+
+  return count ?? 0;
+}

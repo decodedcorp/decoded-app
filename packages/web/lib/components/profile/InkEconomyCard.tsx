@@ -2,10 +2,11 @@
 
 import { motion } from "motion/react";
 
-// TODO: Wire to ink_credits API
-const MOCK_INK_BALANCE = 1250;
+interface InkEconomyCardProps {
+  inkCredits: number;
+}
 
-export function InkEconomyCard() {
+export function InkEconomyCard({ inkCredits = 0 }: Partial<InkEconomyCardProps>) {
   const handleSubscribe = () => {
     console.log("Subscribe button clicked - not yet implemented");
     alert("Coming soon");
@@ -23,17 +24,14 @@ export function InkEconomyCard() {
       transition={{ duration: 0.5, delay: 0.1 }}
       className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-5 md:p-6"
     >
-      {/* Section Title */}
       <h3 className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-400 mb-3">
         Ink Balance
       </h3>
 
-      {/* Balance */}
       <div className="text-2xl font-bold text-[#eafd67] mb-5">
-        {MOCK_INK_BALANCE.toLocaleString()} INK
+        {inkCredits.toLocaleString()} INK
       </div>
 
-      {/* CTA Buttons */}
       <div className="flex gap-3">
         <button
           onClick={handleSubscribe}
