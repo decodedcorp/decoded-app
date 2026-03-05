@@ -1,8 +1,10 @@
-> STATUS: DRAFT — not approved for implementation
+> STATUS: ACTIVE — Phase 1 promoted to Milestone 7 (AI Magazine & Archive Expansion)
+> Promoted: 2026-03-05 | Original draft: 2026-02-20
 
 # NEXT-02: Virtual Try-On (VTON) Technical Architecture
 
-> Direction: Phase 1–3 VTON rollout | Updated: 2026-02-20
+> Direction: Phase 1-3 VTON rollout | Updated: 2026-03-05
+> Implementation: SCR-VTON-01 (Try-on Studio), FLW-05 (cinematic sequence)
 > Audience: Internal decision-making + future AI agent context injection
 > Builds on: NEXT-01 (Service Identity)
 > User flow reference: [FLW-05 VTON](../flows/FLW-05-vton.md) — 5-stage cinematic fitting sequence

@@ -15,6 +15,7 @@
 | transitionStore | `packages/web/lib/stores/transitionStore.ts` | Image detail FLIP animation (grid -> detail transition) |
 | magazineStore | `packages/web/lib/stores/magazineStore.ts` | Magazine (`/magazine`, `/magazine/personal`) — **PROPOSED** |
 | creditStore | `packages/web/lib/stores/creditStore.ts` | Credit balance across magazine/VTON features — **PROPOSED** |
+| vtonStore | `packages/web/lib/stores/vtonStore.ts` | Try-on studio state — **PROPOSED** |
 | profileStore | `packages/web/lib/stores/profileStore.ts` | Profile (`/profile`) |
 
 ---
@@ -410,3 +411,47 @@ known -> deducted (deductLocally) -> confirmed (API success) | rolled back (refu
 ### Used By
 
 Magazine generation (SCR-MAG-02), VTON submit (SCR-VTON-01), credit display in profile/header.
+
+---
+
+## vtonStore (Proposed)
+
+**File:** `packages/web/lib/stores/vtonStore.ts` (not yet created)
+**Import:** `import { useVtonStore } from '@/lib/stores/vtonStore'`
+
+> STATUS: Proposed for Milestone 7. Store not yet implemented.
+
+### State
+
+| Field | Type | Description |
+|-------|------|-------------|
+| userPhoto | `string \| null` | User photo URL (compressed, ephemeral) |
+| selectedItem | `{ id: string, imageUrl: string, name: string, brand: string } \| null` | Item chosen for try-on |
+| taskId | `string \| null` | Backend task ID for polling |
+| resultImageUrl | `string \| null` | Generated try-on result image |
+| status | `'idle' \| 'confirming' \| 'generating' \| 'ready' \| 'error'` | Current studio state |
+| generationStage | `1 \| 2 \| 3 \| 4 \| 5 \| null` | Active cinematic stage during generation |
+
+### Actions
+
+| Action | Signature | Description |
+|--------|-----------|-------------|
+| setUserPhoto | `(url: string) => void` | Set compressed user photo |
+| setSelectedItem | `(item) => void` | Select item for try-on |
+| submitTryOn | `() => Promise<void>` | POST /api/v1/vton/apply, start polling |
+| setStage | `(stage: number) => void` | Update cinematic stage for animation sync |
+| reset | `() => void` | Clear all state (photo stays for "Try Another") |
+| fullReset | `() => void` | Clear everything including photo |
+
+### Transitions
+
+```
+idle -> confirming (item dropped/selected) -> generating (user confirms + API queued)
+generating -> stage 1-5 (cinematic sequence) -> ready (poll returns result)
+generating -> error (API failure) -> idle (after credit refund)
+ready -> idle (Try Another) -> confirming (new item selected)
+```
+
+### Used By
+
+VTON Studio page (`/vton`).

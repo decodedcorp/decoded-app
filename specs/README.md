@@ -41,6 +41,7 @@ specs/
 │   ├── creation/          # SCR-CREA-* (upload, AI tagging)
 │   ├── magazine/          # SCR-MAG-* (AI magazine, personal issue) -- M7
 │   ├── collection/        # SCR-COL-* (bookshelf, archive) -- M7
+│   ├── vton/              # SCR-VTON-* (virtual try-on studio) -- M7
 │   └── user/              # SCR-USER-* (login, profile, settings)
 └── README.md
 ```
@@ -55,6 +56,7 @@ specs/
 | SCR-USER- | User system screens | SCR-USER-NN | SCR-USER-01 |
 | SCR-MAG- | Magazine screens | SCR-MAG-NN | SCR-MAG-01 |
 | SCR-COL- | Collection screens | SCR-COL-NN | SCR-COL-01 |
+| SCR-VTON- | VTON screens | SCR-VTON-NN | SCR-VTON-01 |
 | FLW- | User journey flows | FLW-NN | FLW-01 |
 | CMN- | Shared components | CMN-NN | CMN-01 |
 

@@ -850,6 +850,78 @@ Token retrieved via `getAuthToken()` from `packages/web/lib/api/client.ts`.
 
 ---
 
+## VTON (Proposed — Frontend-led, pending backend alignment)
+
+> STATUS: Frontend proposal. Phase 1 MVP scope per NEXT-02.
+
+### POST /api/v1/vton/apply
+
+**Client:** TBD (`packages/web/lib/api/vton.ts`)
+**Auth:** Required
+**Description:** Submit a try-on request with user photo and item image. Async processing.
+**Credit cost:** 2 credits
+
+**Request body:**
+```json
+{
+  "user_photo_url": "https://...",
+  "item_image_url": "https://...",
+  "item_id": "uuid"
+}
+```
+
+**Response 202:**
+```json
+{
+  "task_id": "uuid",
+  "status": "queued",
+  "estimated_seconds": 45,
+  "credit_deducted": 2,
+  "remaining_credits": 3
+}
+```
+
+**Response 402:** `{ "message": "Insufficient credits", "required": 2, "available": 0 }`
+
+---
+
+### GET /api/v1/vton/result/[taskId]
+
+**Client:** TBD (`packages/web/lib/api/vton.ts`)
+**Auth:** Required
+**Description:** Poll for VTON generation result.
+
+**Response 200 (ready):**
+```json
+{
+  "task_id": "uuid",
+  "status": "ready",
+  "result_image_url": "https://...",
+  "created_at": "2026-03-05T00:00:00Z"
+}
+```
+
+**Response 200 (processing):**
+```json
+{
+  "task_id": "uuid",
+  "status": "processing",
+  "progress": 65
+}
+```
+
+**Response 200 (failed):**
+```json
+{
+  "task_id": "uuid",
+  "status": "failed",
+  "error": "Generation failed",
+  "credit_refunded": true
+}
+```
+
+---
+
 ## Common Error Responses
 
 All endpoints may return these errors:
