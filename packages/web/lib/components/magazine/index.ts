@@ -15,4 +15,8 @@ export { DecodingText } from "./DecodingText";
 export { PersonalIssueClient } from "./PersonalIssueClient";
 export { componentRegistry, getComponent } from "./componentRegistry";
 export * from "./types";
+export { EditorialHero } from "./EditorialHero";
+export { EditorialItemShowcase } from "./EditorialItemShowcase";
+export { AmbientParticles } from "./AmbientParticles";
+export { GrainOverlay } from "./GrainOverlay";
 export * from "./theme";

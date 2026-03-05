@@ -9,50 +9,72 @@ import { ArrowRight } from "lucide-react";
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * Scroll-triggered CTA at the bottom of the daily editorial page.
- * Fades up when the user scrolls to ~90% of the page and links
- * to /magazine/personal for generating a personal edition.
+ * GenerateMyEdition - CTA with pulsing neon chartreuse glow.
+ *
+ * Scroll-triggered fade-up on enter, then continuous GSAP box-shadow pulse
+ * animation for the neon border glow effect.
+ * Links to /magazine/personal for generating a personal edition.
  */
 export function GenerateMyEdition() {
-  const ref = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
 
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+    const container = containerRef.current;
+    const button = buttonRef.current;
+    if (!container || !button) return;
 
     const ctx = gsap.context(() => {
-      gsap.set(el, { opacity: 0, y: 20 });
+      // Initial hidden state
+      gsap.set(container, { opacity: 0, y: 20 });
 
+      // Scroll-triggered entrance
       ScrollTrigger.create({
-        trigger: el,
+        trigger: container,
         start: "top 90%",
-        onEnter: () => {
-          gsap.to(el, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" });
-        },
         once: true,
+        onEnter: () => {
+          gsap.to(container, {
+            opacity: 1,
+            y: 0,
+            duration: 0.5,
+            ease: "power2.out",
+          });
+        },
+      });
+
+      // Pulsing glow animation on the button
+      gsap.to(button, {
+        boxShadow: "0 0 30px rgba(234,253,103,0.5)",
+        repeat: -1,
+        yoyo: true,
+        duration: 1.5,
+        ease: "sine.inOut",
       });
     });
 
-    return () => {
-      ctx.revert();
-    };
+    return () => ctx.revert();
   }, []);
 
   return (
-    <div ref={ref} className="mx-auto max-w-2xl px-6 py-16">
+    <div ref={containerRef} className="mx-auto max-w-2xl px-6 py-16">
       <button
+        ref={buttonRef}
         type="button"
         onClick={() => router.push("/magazine/personal")}
-        className="group flex w-full items-center justify-between rounded-lg border border-mag-accent bg-mag-bg px-6 py-5 text-mag-accent transition-colors hover:bg-mag-accent/10"
+        className="group flex w-full items-center justify-between rounded-lg border border-[#eafd67] bg-mag-bg px-6 py-5 transition-colors hover:bg-mag-accent/10"
+        style={{ boxShadow: "0 0 10px rgba(234,253,103,0.3)" }}
       >
         <div className="text-left">
-          <p className="text-lg font-semibold">Generate My Edition</p>
-          <p className="mt-1 text-sm text-mag-text/60">
-            Get a personalized magazine curated just for you
+          <p className="text-lg font-bold text-mag-accent">
+            Generate My Edition
+          </p>
+          <p className="mt-1 text-sm text-mag-text/50">
+            AI가 큐레이션한 나만의 에디토리얼
           </p>
         </div>
-        <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+        <ArrowRight className="h-5 w-5 text-mag-accent transition-transform group-hover:translate-x-1" />
       </button>
     </div>
   );
