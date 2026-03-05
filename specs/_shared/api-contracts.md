@@ -36,6 +36,14 @@ Token retrieved via `getAuthToken()` from `packages/web/lib/api/client.ts`.
 | GET | /api/v1/users/me/stats | Required | `app/api/v1/users/me/stats/route.ts` |
 | GET | /api/v1/users/me/activities | Required | `app/api/v1/users/me/activities/route.ts` |
 | GET | /api/v1/users/[userId] | Public | `app/api/v1/users/[userId]/route.ts` |
+| GET | /api/v1/posts/[postId] | Public | `app/api/v1/posts/[postId]/route.ts` |
+| POST | /api/v1/posts/with-solutions | Required | `app/api/v1/posts/with-solutions/route.ts` |
+| POST | /api/v1/solutions/[solutionId]/adopt | Required | `app/api/v1/solutions/[solutionId]/adopt/route.ts` |
+| DELETE | /api/v1/solutions/[solutionId]/adopt | Required | `app/api/v1/solutions/[solutionId]/adopt/route.ts` |
+| GET | /api/v1/badges | Public | `app/api/v1/badges/route.ts` |
+| GET | /api/v1/badges/me | Required | `app/api/v1/badges/me/route.ts` |
+| GET | /api/v1/rankings | Public | `app/api/v1/rankings/route.ts` |
+| GET | /api/v1/rankings/me | Required | `app/api/v1/rankings/me/route.ts` |
 | GET | /api/v1/categories | Public | `app/api/v1/categories/route.ts` |
 
 > **debug-env route:** `GET /api/v1/debug-env` exists and returns `NODE_ENV`, `NEXT_PUBLIC_DEBUG`, and Supabase URL presence. Not env-guarded — available in all environments. Not documented as a user-facing API.
@@ -675,6 +683,102 @@ Token retrieved via `getAuthToken()` from `packages/web/lib/api/client.ts`.
 **Note:** Returns a flat array (not paginated). 5 categories total. Client utility functions:
 - `findCategoryIdByCode(categories, code)` → `string | undefined`
 - `findCategoryById(categories, id)` → `Category | undefined`
+
+---
+
+## Posts (additional)
+
+### GET /api/v1/posts/[postId]
+
+**Client:** `fetchPostDetail(postId)` in `packages/web/lib/api/posts.ts`
+**Handler:** `packages/web/app/api/v1/posts/[postId]/route.ts`
+**Auth:** Public
+
+| Path Param | Type | Description |
+|------------|------|-------------|
+| postId | string (UUID) | Post to fetch |
+
+**Response 200:** `Post` object with spots and solutions populated.
+
+---
+
+### POST /api/v1/posts/with-solutions
+
+**Client:** `createPostWithFileAndSolutions(request)` in `packages/web/lib/api/posts.ts`
+**Handler:** `packages/web/app/api/v1/posts/with-solutions/route.ts`
+**Auth:** Required
+**Content-Type:** `multipart/form-data`
+**Note:** Plural "solutions" variant — sends file + spots with solutions via FormData.
+
+---
+
+## Solution Adoption
+
+### POST /api/v1/solutions/[solutionId]/adopt
+
+**Client:** TBD
+**Handler:** `packages/web/app/api/v1/solutions/[solutionId]/adopt/route.ts`
+**Auth:** Required (post owner only)
+
+Adopts a solution as the accepted answer for a spot.
+
+**Response 200:** Updated solution object with `is_adopted: true`.
+
+---
+
+### DELETE /api/v1/solutions/[solutionId]/adopt
+
+**Client:** TBD
+**Handler:** `packages/web/app/api/v1/solutions/[solutionId]/adopt/route.ts`
+**Auth:** Required (post owner only)
+
+Unadopts a previously adopted solution.
+
+**Response 200:** Updated solution object with `is_adopted: false`.
+
+---
+
+## Badges
+
+### GET /api/v1/badges
+
+**Client:** (not individually exported — fetched via proxy)
+**Handler:** `packages/web/app/api/v1/badges/route.ts`
+**Auth:** Public
+
+Returns the full badge catalog.
+
+---
+
+### GET /api/v1/badges/me
+
+**Client:** `fetchMyBadges()` in `packages/web/lib/api/badges.ts`
+**Handler:** `packages/web/app/api/v1/badges/me/route.ts`
+**Auth:** Required
+
+Returns badges earned by the authenticated user.
+
+---
+
+## Rankings
+
+### GET /api/v1/rankings
+
+**Client:** `fetchRankings(params?)` in `packages/web/lib/api/rankings.ts`
+**Handler:** `packages/web/app/api/v1/rankings/route.ts`
+**Auth:** Public (optional auth for user context)
+
+Returns leaderboard rankings.
+
+---
+
+### GET /api/v1/rankings/me
+
+**Client:** `fetchMyRanking()` in `packages/web/lib/api/rankings.ts`
+**Handler:** `packages/web/app/api/v1/rankings/me/route.ts`
+**Auth:** Required
+
+Returns the authenticated user's ranking details.
 
 ---
 

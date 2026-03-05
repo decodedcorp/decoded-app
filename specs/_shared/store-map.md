@@ -13,7 +13,8 @@
 | filterStore | `packages/shared/stores/filterStore.ts` | Explore (`/explore`) |
 | requestStore | `packages/web/lib/stores/requestStore.ts` | Upload (`/request/upload`), AI Detect (`/request/detect`), Edit/Solution flow |
 | transitionStore | `packages/web/lib/stores/transitionStore.ts` | Image detail FLIP animation (grid -> detail transition) |
-| magazineStore | `packages/web/lib/stores/magazineStore.ts` | Magazine (`/magazine`, `/magazine/personal`) — **PROPOSED** |
+| magazineStore | `packages/web/lib/stores/magazineStore.ts` | Magazine (`/magazine`, `/magazine/personal`) — **IMPLEMENTED** |
+| studioStore | `packages/web/lib/stores/studioStore.ts` | Spline 3D camera states for studio/dome experience — **IMPLEMENTED** |
 | creditStore | `packages/web/lib/stores/creditStore.ts` | Credit balance across magazine/VTON features — **PROPOSED** |
 | vtonStore | `packages/web/lib/stores/vtonStore.ts` | Try-on studio state — **PROPOSED** |
 | profileStore | `packages/web/lib/stores/profileStore.ts` | Profile (`/profile`) |
@@ -329,12 +330,12 @@ Profile page (`/profile`) — all sections: header, stats, badges grid, rankings
 
 ---
 
-## magazineStore (Proposed)
+## magazineStore
 
-**File:** `packages/web/lib/stores/magazineStore.ts` (not yet created)
+**File:** `packages/web/lib/stores/magazineStore.ts`
 **Import:** `import { useMagazineStore } from '@/lib/stores/magazineStore'`
 
-> STATUS: Proposed for Milestone 7. Store not yet implemented.
+> STATUS: Implemented (M7). Manages daily editorial, personal issue, and collection bookshelf state.
 
 ### State
 
@@ -368,6 +369,26 @@ any -> error (network/timeout failure)
 ### Used By
 
 Magazine pages (`/magazine`, `/magazine/personal`), NavBar (magazine tab badge).
+
+---
+
+## studioStore
+
+**File:** `packages/web/lib/stores/studioStore.ts`
+**Import:** `import { useStudioStore } from '@/lib/stores/studioStore'`
+
+> STATUS: Implemented. Manages Spline 3D camera state for the studio/dome experience.
+
+### State
+
+| Field | Type | Description |
+|-------|------|-------------|
+| cameraState | `CameraState` | Current camera state: `"loading" \| "entry" \| "browse" \| "focused" \| "exit"` |
+| app | `Application \| null` | Spline runtime application reference |
+
+### Used By
+
+Login page (`/login`) DomeGallery background, Lab experiments.
 
 ---
 

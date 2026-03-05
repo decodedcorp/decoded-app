@@ -63,6 +63,7 @@
 | **NavBar** | `nav-bar.tsx` | Feature | Mobile bottom navigation bar (fixed, hidden on desktop) |
 | **NavItem** | `nav-item.tsx` | Feature | Individual navigation item with icon and label |
 | **SectionHeader** | `section-header.tsx` | Feature | Section header with title and optional action |
+| **SpotMarker** | `spot-marker.tsx` | Composite | Platform-wide spot marker with index-based accent colors |
 | **Tabs** | `tabs.tsx` | Feature | Tab navigation with TabItem children |
 | **TabItem** | `tabs.tsx` | Feature | Individual tab in a Tabs container |
 
@@ -587,6 +588,28 @@ Closes on backdrop click or Escape key. Supports touch drag and mouse drag.
   <FilterContent />
 </BottomSheet>
 ```
+
+---
+
+### SpotMarker
+
+**File:** `packages/web/lib/design-system/spot-marker.tsx`
+
+Platform-wide spot marker with index-based accent colors (emerald, blue, amber, rose, violet, teal). Used in DetectionView, DecodedSolutionsSection, ImageDetailContent.
+
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
+| `position` | `SpotPosition` | yes | Coordinates: `{ x, y }` (0-1) or `{ position_left, position_top }` (% strings) |
+| `index` | `number` | yes | Display number (1-based); determines accent color |
+| `isSelected` | `boolean` | no (`false`) | Glow animation + primary bg when selected |
+| `onClick` | `(e?: MouseEvent) => void` | no | Click handler; renders as `<button>` when provided |
+| `isRevealing` | `boolean` | no (`false`) | Entry animation (for DetectionView reveal) |
+| `revealDelay` | `number` | no | Animation delay in ms for stagger |
+| `size` | `"sm" \| "md" \| "lg"` | no (`"sm"`) | Marker size (10px / 24px / 32px) |
+| `showIndex` | `boolean` | no (`true`) | Show index number inside marker |
+| `label` | `string` | no | aria-label override |
+
+**SpotPosition type:** `{ x: number; y: number }` (0-1 normalized) or `{ position_left: string; position_top: string }` (percentage strings).
 
 ---
 
