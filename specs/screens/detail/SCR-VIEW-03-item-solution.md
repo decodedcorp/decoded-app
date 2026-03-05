@@ -1,5 +1,5 @@
 # [SCR-VIEW-03] Item / Solution Detail
-> Route: section within `/posts/[id]` and `@modal/(.)images/[id]` | Status: implemented (shopping core); partial (voting UI-only) | Updated: 2026-02-19
+> Route: section within `/posts/[id]` and `@modal/(.)images/[id]` | Status: implemented (shopping core); partial (voting UI-only) | Updated: 2026-03-05
 
 ## Purpose
 
@@ -90,7 +90,7 @@ Post detail page body (scroll):
 
 ### Data Loading
 
-- When `PostDetailContent` mounts, the system shall pass `spots` and `solutions` from `usePostById` result to `DecodedItemsSection` and `ShopCarouselSection`. `✅`
+- When `ImageDetailPage` mounts, the system shall pass `spots` and `solutions` from `usePostById` result to `DecodedItemsSection` and `ShopCarouselSection`. `✅`
 - When solutions are loaded, the system shall display brand, title, price, and thumbnail for each solution via `SolutionRow` fields. `✅`
 - When `spots.length === 0`, the system shall not render `DecodedItemsSection` (component returns null). `✅`
 - When `solutions.length === 0`, the system shall not render `ShopCarouselSection` (component returns null). `✅`

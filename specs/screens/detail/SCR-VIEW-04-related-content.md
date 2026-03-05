@@ -1,5 +1,5 @@
 # [SCR-VIEW-04] Related Content
-> Route: sections within `/posts/[id]` and `@modal/(.)images/[id]` | Status: partially implemented | Updated: 2026-02-19
+> Route: sections within `/posts/[id]` and `@modal/(.)images/[id]` | Status: partially implemented | Updated: 2026-03-05
 
 ## Purpose
 
@@ -98,7 +98,7 @@ RelatedImages: grid changes to `md:grid-cols-3`.
 
 ### Data Loading
 
-- When `PostDetailContent` mounts and `relatedPosts` from `usePostById` has images, the system shall render `GallerySection` with those images. `✅`
+- When `ImageDetailPage` mounts and `relatedPosts` from `usePostById` has images, the system shall render `GallerySection` with those images. `✅`
 - When `RelatedImages` mounts, the system shall call `useInfinitePosts({ perPage: 12, artistName: account })` via `GET /api/v1/posts?artist_name=...&per_page=12`. `✅`
 - When `RelatedImages` loads, the system shall filter out `currentPostId` client-side and display up to 9 posts initially. `✅`
 - When related posts count exceeds 9, the system shall show a "View All" expand button. `✅`

@@ -1,5 +1,5 @@
 # [SCR-DISC-04] Explore
-> Route: `/explore` | Status: implemented | Updated: 2026-02-19
+> Route: `/explore` | Status: implemented | Updated: 2026-03-05
 
 ## Purpose
 

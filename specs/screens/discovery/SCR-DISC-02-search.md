@@ -1,5 +1,5 @@
 # [SCR-DISC-02] Search
-> Route: `/search` | Status: implemented | Updated: 2026-02-19
+> Route: `/search` | Status: implemented | Updated: 2026-03-05
 
 ## Purpose
 

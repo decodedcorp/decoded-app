@@ -1,5 +1,5 @@
 # [SCR-DISC-01] Home
-> Route: `/` | Status: implemented | Updated: 2026-02-19
+> Route: `/` | Status: implemented | Updated: 2026-03-05
 
 ## Purpose
 

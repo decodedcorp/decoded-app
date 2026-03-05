@@ -1,5 +1,5 @@
 # [SCR-VIEW-02] Spot / Hotspot Interaction Layer
-> Route: overlay within `/posts/[id]` and legacy `/images/[id]` | Status: partially implemented | Updated: 2026-02-19
+> Route: overlay within `/posts/[id]` and legacy `/images/[id]` | Status: partially implemented | Updated: 2026-03-05
 
 ## Purpose
 
@@ -13,7 +13,7 @@ See: FLW-02 — Interaction states and transition table
 
 | Region | Component | File | Props/Notes |
 |--------|-----------|------|-------------|
-| Spot markers (post flow) | Inline div elements | `packages/web/lib/components/detail/PostDetailContent.tsx` | Custom pulse dots; DS Hotspot NOT used in PostDetailContent |
+| Spot markers (post flow) | Inline div elements | `packages/web/lib/components/detail/ImageDetailPage.tsx` | Custom pulse dots; DS Hotspot NOT used in post flow |
 | Spot markers (image flow) | DS: Hotspot | DS: component-registry | variant="numbered", position={x,y}, color=brandToColor(), glow, selected |
 | Item showcase | InteractiveShowcase | `packages/web/lib/components/detail/InteractiveShowcase.tsx` | image, items: UiItem[], ScrollTrigger-driven active index |
 | Image with spots | ImageCanvas | `packages/web/lib/components/detail/ImageCanvas.tsx` | image, items: UiItem[], activeIndex |

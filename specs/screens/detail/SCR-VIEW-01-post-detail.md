@@ -1,5 +1,5 @@
 # [SCR-VIEW-01] Post / Image Detail
-> Route: `/posts/[id]` (primary) | `/images/[id]` (redirects → `/posts/[id]`) | Status: implemented | Updated: 2026-02-19
+> Route: `/posts/[id]` (primary) | `/images/[id]` (redirects → `/posts/[id]`) | Status: implemented | Updated: 2026-03-05
 
 ## Purpose
 
@@ -16,20 +16,14 @@ See: FLW-02 — Content Detail Flow (navigation contract)
 
 `ImageDetailPage` (`packages/web/lib/components/detail/ImageDetailPage.tsx`) still exists as the page component for the intercepted parallel modal route (`@modal/(.)images/[id]`). It wraps `PostDetailContent` with a GSAP fade-in and action buttons (Like, Save, Report, Share, Close).
 
-`PostDetailPage` (`packages/web/lib/components/detail/PostDetailPage.tsx`) is used for `/posts/[id]` direct URL access. It provides the full-page loading skeleton, error card, action buttons (Report, Share, Close), and `LenisProvider`.
-
-Both pages render `PostDetailContent` as the shared content body.
+The `/posts/[id]` route (`packages/web/app/posts/[id]/page.tsx`) directly renders `ImageDetailPage` — there is no separate `PostDetailPage` component. `ImageDetailPage` handles both the modal and full-page rendering paths.
 
 ## Component Map
 
 | Region | Component | File | Props/Notes |
 |--------|-----------|------|-------------|
-| Page wrapper (post) | PostDetailPage | `packages/web/lib/components/detail/PostDetailPage.tsx` | postId: string |
-| Page wrapper (image modal) | ImageDetailPage | `packages/web/lib/components/detail/ImageDetailPage.tsx` | imageId: string |
+| Page wrapper (all paths) | ImageDetailPage | `packages/web/lib/components/detail/ImageDetailPage.tsx` | imageId: string; handles both `/posts/[id]` and `@modal/(.)images/[id]` |
 | Scroll | LenisProvider | `packages/web/lib/components/detail/LenisProvider.tsx` | Smooth scroll wrapper |
-| Content body | PostDetailContent | `packages/web/lib/components/detail/PostDetailContent.tsx` | postDetail, isModal?, scrollContainerRef? |
-| Hero | Inline in PostDetailContent | `packages/web/lib/components/detail/PostDetailContent.tsx` | GSAP Ken Burns + parallax; spot markers rendered inline |
-| Spot markers | Inline div elements | `packages/web/lib/components/detail/PostDetailContent.tsx` | Custom pulse dots at % coordinates; ⚠️ NOT-IMPL: DS Hotspot not used here |
 | Article text | ArticleContent | `packages/web/lib/components/detail/ArticleContent.tsx` | content: string (markdown) |
 | Decoded items | DecodedItemsSection | `packages/web/lib/components/detail/DecodedItemsSection.tsx` | spots: SpotRow[], solutions: SolutionRow[] |
 | Gallery | GallerySection | `packages/web/lib/components/detail/GallerySection.tsx` | images: {id, image_url}[] |
@@ -114,15 +108,15 @@ Content centered `max-w-4xl` with increased padding. Action buttons scale up (h-
 
 ### Data Loading
 
-- When `PostDetailPage` mounts, the system shall call `usePostById(postId)` to fetch `GET /api/v1/posts/[postId]` with spots and solutions. `✅`
+- When `ImageDetailPage` mounts, the system shall call `usePostById(postId)` to fetch `GET /api/v1/posts/[postId]` with spots and solutions. `✅`
 - When data is loading, the system shall display a full-page skeleton (hero placeholder + content blocks). `✅`
 - When the fetch fails or returns no data, the system shall show a DS Card error state with a "Go Back" button. `✅`
 - When spots exist, the system shall fetch related posts via `useInfinitePosts({ artistName })` for gallery and related looks sections. `✅`
 
 ### User Interactions
 
-- When the user taps the hero image, the system shall open `Lightbox` with the post image URL. `✅` (ImageDetailPage); `⚠️ NOT-IMPL` (PostDetailPage: showLightbox state exists in ImageDetailPage but PostDetailPage does not wire tap → Lightbox)
-- When the user taps a spot marker on the hero image, the system shall — `⚠️ NOT-IMPL` (current spot markers are not interactive; no tap handler on inline dots in PostDetailContent)
+- When the user taps the hero image, the system shall open `Lightbox` with the post image URL. `✅` (ImageDetailPage)
+- When the user taps a spot marker on the hero image, the system shall — `⚠️ NOT-IMPL` (current spot markers are not interactive in the post detail view)
 - When the user taps the Report button, the system shall open `ReportModal`. `✅`
 - When the user taps Share, the system shall invoke Web Share API with fallback to clipboard copy. `✅`
 - When the user taps Close/X, the system shall call `router.back()`. `✅`
