@@ -69,11 +69,12 @@ None.
 | 040 | Fix posts proxy error handling for non-JSON responses | 2026-03-05 | c4e8b34 | [040-fix-explore-posts-fetch-error-handling](./quick/040-fix-explore-posts-fetch-error-handling/) |
 | 041 | Switch home page from external API to Supabase direct queries | 2026-03-05 | 8c68ec3 | [041-home-page-supabase-direct-queries](./quick/041-home-page-supabase-direct-queries/) |
 | 042 | Excalidraw service journey scenario diagram | 2026-03-05 | 49e971f | [042-excalidraw-service-journey-scenario](./quick/042-excalidraw-service-journey-scenario/) |
+| 044 | Narrow collection bookshelf container from 1400px to 768px | 2026-03-05 | d03532a | [044-collection-page-width-fix](./quick/044-collection-page-width-fix/) |
 
 ## Session Continuity
 
 Last session: 2026-03-05
-Stopped at: Completed m7-02-02-PLAN.md (MasonryGrid + PersonalizeBanner)
+Stopped at: Completed quick-044 (Collection Page Width Fix)
 Resume file: None
 
 ---
