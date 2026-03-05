@@ -40,16 +40,31 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Parse response data
-    const data = await response.json();
+    // Parse response - handle both JSON and non-JSON (e.g., nginx HTML errors)
+    const responseText = await response.text();
 
-    // Return the response with the same status code
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      // Backend returned non-JSON response (e.g., nginx error page)
+      data = {
+        message: `Backend error: ${response.status} ${response.statusText}`,
+      };
+    }
+
+    // Return the response preserving the backend's status code
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error("Posts GET proxy error:", error);
     return NextResponse.json(
-      { message: "Failed to fetch posts" },
-      { status: 500 }
+      {
+        message:
+          error instanceof Error
+            ? `Proxy error: ${error.message}`
+            : "Failed to fetch posts",
+      },
+      { status: 502 }
     );
   }
 }
