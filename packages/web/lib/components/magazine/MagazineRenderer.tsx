@@ -25,10 +25,31 @@ export function MagazineRenderer({ issue, className }: MagazineRendererProps) {
 
   const components = issue.layout_json.components;
 
-  // Calculate container height from max(y + h) of all components
-  const containerHeight = useMemo(() => {
-    if (components.length === 0) return 100;
-    return Math.max(...components.map((c) => c.y + c.h));
+  // Group components into rows by y-coordinate for flow-based layout
+  const rows = useMemo(() => {
+    const Y_TOLERANCE = 2;
+    const groups: {
+      y: number;
+      items: { comp: LayoutComponent; origIndex: number }[];
+    }[] = [];
+
+    components.forEach((comp, i) => {
+      const existing = groups.find(
+        (g) => Math.abs(g.y - comp.y) <= Y_TOLERANCE,
+      );
+      if (existing) {
+        existing.items.push({ comp, origIndex: i });
+      } else {
+        groups.push({ y: comp.y, items: [{ comp, origIndex: i }] });
+      }
+    });
+
+    // Sort rows by y ascending
+    groups.sort((a, b) => a.y - b.y);
+    // Sort items within each row by x ascending
+    groups.forEach((g) => g.items.sort((a, b) => a.comp.x - b.comp.x));
+
+    return groups;
   }, [components]);
 
   // Inject theme on mount, remove on unmount
@@ -121,31 +142,59 @@ export function MagazineRenderer({ issue, className }: MagazineRendererProps) {
       className={`relative w-full bg-mag-bg text-mag-text ${className ?? ""}`}
       style={{ minHeight: "100vh" }}
     >
-      {/* Absolutely positioned layout components */}
-      <div
-        className="relative w-full"
-        style={{ height: `${containerHeight}vh` }}
-      >
-        {components.map((comp, i) => {
-          const Component = getComponent(comp.type);
-          if (!Component) return null;
+      {/* Flow-based layout: rows grouped by y-coordinate */}
+      <div className="flex w-full flex-col space-y-6">
+        {rows.map((row, rowIdx) => {
+          if (row.items.length === 1) {
+            // Single component row
+            const { comp, origIndex } = row.items[0];
+            const Component = getComponent(comp.type);
+            if (!Component) return null;
+            const isHero = rowIdx === 0 && comp.type === "hero-image";
+            return (
+              <div
+                key={`row-${rowIdx}`}
+                ref={(el) => {
+                  componentRefs.current[origIndex] = el;
+                }}
+                className={isHero ? "-mt-6" : ""}
+                style={{
+                  width: `${comp.w}%`,
+                  marginLeft: comp.x > 0 ? `${comp.x}%` : undefined,
+                  opacity: 0,
+                }}
+              >
+                <Component data={comp.data} />
+              </div>
+            );
+          }
 
+          // Multi-component row (side-by-side)
           return (
             <div
-              key={`${comp.type}-${i}`}
-              ref={(el) => {
-                componentRefs.current[i] = el;
-              }}
+              key={`row-${rowIdx}`}
+              className="flex w-full gap-4"
               style={{
-                position: "absolute",
-                left: `${comp.x}%`,
-                top: `${comp.y}%`,
-                width: `${comp.w}%`,
-                height: comp.h ? `${comp.h}%` : "auto",
-                opacity: 0, // hidden until GSAP animates
+                paddingLeft: `${Math.min(...row.items.map((it) => it.comp.x))}%`,
+                paddingRight: `${100 - Math.max(...row.items.map((it) => it.comp.x + it.comp.w))}%`,
               }}
             >
-              <Component data={comp.data} />
+              {row.items.map(({ comp, origIndex }) => {
+                const Component = getComponent(comp.type);
+                if (!Component) return null;
+                return (
+                  <div
+                    key={`comp-${origIndex}`}
+                    ref={(el) => {
+                      componentRefs.current[origIndex] = el;
+                    }}
+                    className="flex-1"
+                    style={{ opacity: 0 }}
+                  >
+                    <Component data={comp.data} />
+                  </div>
+                );
+              })}
             </div>
           );
         })}
