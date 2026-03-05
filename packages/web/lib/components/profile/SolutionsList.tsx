@@ -1,7 +1,9 @@
 "use client";
 
 import { CheckCircle } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
+import { fetchSolutionsByUser } from "@/lib/supabase/queries/profile";
 
 interface SolutionItem {
   id: string;
@@ -12,43 +14,55 @@ interface SolutionItem {
   verified: boolean;
 }
 
-const MOCK_SOLUTIONS: SolutionItem[] = [
-  {
-    id: "sol1",
-    imageUrl: "https://picsum.photos/seed/sol1/100/100",
-    itemName: "Oversized Blazer",
-    brand: "Miu Miu",
-    price: "$2,890",
-    verified: true,
-  },
-  {
-    id: "sol2",
-    imageUrl: "https://picsum.photos/seed/sol2/100/100",
-    itemName: "Mini Bag",
-    brand: "Chanel",
-    price: "$4,500",
-    verified: true,
-  },
-  {
-    id: "sol3",
-    imageUrl: "https://picsum.photos/seed/sol3/100/100",
-    itemName: "Platform Sneakers",
-    brand: "New Balance",
-    price: "$180",
-    verified: false,
-  },
-];
+function formatPrice(amount: number, currency: string): string {
+  if (currency === "KRW") {
+    return `${amount.toLocaleString()}`;
+  }
+  if (currency === "USD") {
+    return `$${amount.toLocaleString()}`;
+  }
+  return `${amount.toLocaleString()} ${currency}`;
+}
 
 export interface SolutionsListProps {
+  userId?: string;
   solutions?: SolutionItem[];
   className?: string;
 }
 
 export function SolutionsList({
-  solutions = MOCK_SOLUTIONS,
+  userId,
+  solutions,
   className,
 }: SolutionsListProps) {
-  if (solutions.length === 0) {
+  const { data: fetchedSolutions, isLoading } = useQuery({
+    queryKey: ["profile", "solutions", userId],
+    queryFn: () => fetchSolutionsByUser(userId!),
+    enabled: !!userId && !solutions,
+    select: (rows) =>
+      rows.map((row) => ({
+        id: row.id,
+        imageUrl: row.thumbnail_url || "",
+        itemName: row.title,
+        brand: row.description || "",
+        price: row.price_amount
+          ? formatPrice(row.price_amount, row.price_currency)
+          : undefined,
+        verified: row.is_verified,
+      })),
+  });
+
+  const displaySolutions = solutions ?? fetchedSolutions;
+
+  if (isLoading && !displaySolutions) {
+    return (
+      <div className="flex justify-center py-12">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (!displaySolutions || displaySolutions.length === 0) {
     return (
       <div className="py-12 text-center">
         <CheckCircle className="h-10 w-10 mx-auto text-muted-foreground/50 mb-3" />
@@ -61,7 +75,7 @@ export function SolutionsList({
 
   return (
     <div className={cn("space-y-3", className)}>
-      {solutions.map((solution) => (
+      {displaySolutions.map((solution) => (
         <div
           key={solution.id}
           className="flex items-center gap-3 p-3 rounded-lg bg-card border border-border hover:bg-accent/50 transition-colors cursor-pointer"

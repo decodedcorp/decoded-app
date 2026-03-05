@@ -1,7 +1,9 @@
 "use client";
 
 import { MapPin } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
+import { fetchSpotsByUser } from "@/lib/supabase/queries/profile";
 
 interface SpotItem {
   id: string;
@@ -11,37 +13,38 @@ interface SpotItem {
   createdAt: string;
 }
 
-const MOCK_SPOTS: SpotItem[] = [
-  {
-    id: "sp1",
-    imageUrl: "https://picsum.photos/seed/spot1/100/100",
-    label: "Jacket - NewJeans Minji",
-    category: "Outerwear",
-    createdAt: "2025-01-15",
-  },
-  {
-    id: "sp2",
-    imageUrl: "https://picsum.photos/seed/spot2/100/100",
-    label: "Bag - BLACKPINK Jennie",
-    category: "Accessories",
-    createdAt: "2025-01-10",
-  },
-  {
-    id: "sp3",
-    imageUrl: "https://picsum.photos/seed/spot3/100/100",
-    label: "Shoes - IVE Wonyoung",
-    category: "Footwear",
-    createdAt: "2025-01-05",
-  },
-];
-
 export interface SpotsListProps {
+  userId?: string;
   spots?: SpotItem[];
   className?: string;
 }
 
-export function SpotsList({ spots = MOCK_SPOTS, className }: SpotsListProps) {
-  if (spots.length === 0) {
+export function SpotsList({ userId, spots, className }: SpotsListProps) {
+  const { data: fetchedSpots, isLoading } = useQuery({
+    queryKey: ["profile", "spots", userId],
+    queryFn: () => fetchSpotsByUser(userId!),
+    enabled: !!userId && !spots,
+    select: (rows) =>
+      rows.map((row) => ({
+        id: row.id,
+        imageUrl: row.post?.image_url || "",
+        label: row.subcategory_id || "Spot",
+        category: row.status,
+        createdAt: row.created_at,
+      })),
+  });
+
+  const displaySpots = spots ?? fetchedSpots;
+
+  if (isLoading && !displaySpots) {
+    return (
+      <div className="flex justify-center py-12">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (!displaySpots || displaySpots.length === 0) {
     return (
       <div className="py-12 text-center">
         <MapPin className="h-10 w-10 mx-auto text-muted-foreground/50 mb-3" />
@@ -52,7 +55,7 @@ export function SpotsList({ spots = MOCK_SPOTS, className }: SpotsListProps) {
 
   return (
     <div className={cn("space-y-3", className)}>
-      {spots.map((spot) => (
+      {displaySpots.map((spot) => (
         <div
           key={spot.id}
           className="flex items-center gap-3 p-3 rounded-lg bg-card border border-border hover:bg-accent/50 transition-colors cursor-pointer"

@@ -1,8 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
+import { fetchPostsByUserProfile } from "@/lib/supabase/queries/profile";
 
 interface PostItem {
   id: string;
@@ -11,52 +12,37 @@ interface PostItem {
   itemCount: number;
 }
 
-const MOCK_POSTS: PostItem[] = [
-  {
-    id: "1",
-    imageUrl: "https://picsum.photos/seed/post1/400/500",
-    title: "Airport Fashion",
-    itemCount: 3,
-  },
-  {
-    id: "2",
-    imageUrl: "https://picsum.photos/seed/post2/400/500",
-    title: "Stage Outfit",
-    itemCount: 5,
-  },
-  {
-    id: "3",
-    imageUrl: "https://picsum.photos/seed/post3/400/500",
-    title: "Daily Look",
-    itemCount: 2,
-  },
-  {
-    id: "4",
-    imageUrl: "https://picsum.photos/seed/post4/400/500",
-    title: "Event Style",
-    itemCount: 4,
-  },
-  {
-    id: "5",
-    imageUrl: "https://picsum.photos/seed/post5/400/500",
-    title: "MV Outfit",
-    itemCount: 6,
-  },
-  {
-    id: "6",
-    imageUrl: "https://picsum.photos/seed/post6/400/500",
-    title: "Photoshoot",
-    itemCount: 3,
-  },
-];
-
 export interface PostsGridProps {
+  userId?: string;
   posts?: PostItem[];
   className?: string;
 }
 
-export function PostsGrid({ posts = MOCK_POSTS, className }: PostsGridProps) {
-  if (posts.length === 0) {
+export function PostsGrid({ userId, posts, className }: PostsGridProps) {
+  const { data: fetchedPosts, isLoading } = useQuery({
+    queryKey: ["profile", "posts", userId],
+    queryFn: () => fetchPostsByUserProfile(userId!),
+    enabled: !!userId && !posts,
+    select: (rows) =>
+      rows.map((row) => ({
+        id: row.id,
+        imageUrl: row.image_url || "",
+        title: row.media_title || row.artist_name || "Untitled",
+        itemCount: 0,
+      })),
+  });
+
+  const displayPosts = posts ?? fetchedPosts;
+
+  if (isLoading && !displayPosts) {
+    return (
+      <div className="flex justify-center py-12">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (!displayPosts || displayPosts.length === 0) {
     return (
       <div className="py-12 text-center">
         <p className="text-sm text-muted-foreground">No posts yet</p>
@@ -66,7 +52,7 @@ export function PostsGrid({ posts = MOCK_POSTS, className }: PostsGridProps) {
 
   return (
     <div className={cn("grid grid-cols-2 md:grid-cols-3 gap-3", className)}>
-      {posts.map((post) => (
+      {displayPosts.map((post) => (
         <Link
           key={post.id}
           href={`/posts/${post.id}`}
