@@ -16,12 +16,30 @@ export interface User {
   createdAt: string;
 }
 
+export interface UserProfile {
+  id: string;
+  email: string;
+  username: string | null;
+  display_name: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+  rank: string | null;
+  total_points: number;
+  is_admin: boolean;
+  style_dna?: Record<string, unknown> | null;
+  ink_credits?: number;
+  created_at: string;
+  updated_at: string;
+}
+
 interface AuthState {
   user: User | null;
+  profile: UserProfile | null;
   isAdmin: boolean;
   isGuest: boolean;
   isLoading: boolean;
   isInitialized: boolean;
+  needsOnboarding: boolean;
   loadingProvider: OAuthProvider | null;
   error: string | null;
 
@@ -32,6 +50,11 @@ interface AuthState {
   logout: () => Promise<void>;
   clearError: () => void;
   setUser: (supabaseUser: SupabaseUser | null) => Promise<void>;
+  fetchProfile: () => Promise<void>;
+  updateProfile: (
+    updates: Partial<Pick<UserProfile, "username" | "display_name" | "bio">>
+  ) => Promise<boolean>;
+  completeOnboarding: () => void;
 }
 
 /**
@@ -54,31 +77,14 @@ function mapSupabaseUser(supabaseUser: SupabaseUser): User {
   };
 }
 
-/**
- * Fetches is_admin flag for the given user ID from the users table.
- * Returns false on any error or missing record.
- */
-async function fetchIsAdmin(userId: string): Promise<boolean> {
-  try {
-    const { data, error } = await supabaseBrowserClient
-      .from("users")
-      .select("is_admin")
-      .eq("id", userId)
-      .single();
-
-    if (error) return false;
-    return data?.is_admin === true;
-  } catch {
-    return false;
-  }
-}
-
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
+  profile: null,
   isAdmin: false,
   isGuest: false,
   isLoading: false,
   isInitialized: false,
+  needsOnboarding: false,
   loadingProvider: null,
   error: null,
 
@@ -101,13 +107,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
 
       if (session?.user) {
-        const isAdmin = await fetchIsAdmin(session.user.id);
+        const mappedUser = mapSupabaseUser(session.user);
         set({
-          user: mapSupabaseUser(session.user),
-          isAdmin,
+          user: mappedUser,
           isInitialized: true,
           isGuest: false,
         });
+        await get().fetchProfile();
       } else {
         set({ isInitialized: true, user: null, isAdmin: false });
       }
@@ -170,9 +176,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       set({
         user: null,
+        profile: null,
         isAdmin: false,
         isGuest: false,
         isLoading: false,
+        needsOnboarding: false,
       });
     } catch (error) {
       const message =
@@ -193,31 +201,107 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   /**
    * Supabase auth state change에서 호출
-   * Now async to fetch is_admin status from users table.
    */
   setUser: async (supabaseUser: SupabaseUser | null) => {
     if (supabaseUser) {
-      const isAdmin = await fetchIsAdmin(supabaseUser.id);
       set({
         user: mapSupabaseUser(supabaseUser),
-        isAdmin,
         isGuest: false,
         isLoading: false,
         loadingProvider: null,
       });
+      await get().fetchProfile();
     } else {
       set({
         user: null,
+        profile: null,
         isAdmin: false,
         isLoading: false,
         loadingProvider: null,
+        needsOnboarding: false,
       });
     }
+  },
+
+  /**
+   * public.users 프로필 데이터 가져오기
+   */
+  fetchProfile: async () => {
+    const user = get().user;
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabaseBrowserClient
+        .from("users")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (error) {
+        console.error("Failed to fetch profile:", error);
+        return;
+      }
+
+      const profile = data as unknown as UserProfile;
+
+      // Detect first-time user: username and display_name are both email-prefix defaults
+      const emailPrefix = user.email.split("@")[0] || "";
+      const isDefault =
+        (profile.username ?? "") === emailPrefix &&
+        (profile.display_name ?? "") === emailPrefix;
+
+      set({
+        profile,
+        isAdmin: profile.is_admin === true,
+        needsOnboarding: isDefault,
+      });
+    } catch (error) {
+      console.error("Profile fetch error:", error);
+    }
+  },
+
+  /**
+   * public.users 프로필 업데이트
+   */
+  updateProfile: async (
+    updates: Partial<Pick<UserProfile, "username" | "display_name" | "bio">>
+  ): Promise<boolean> => {
+    const user = get().user;
+    if (!user) return false;
+
+    try {
+      const { error } = await supabaseBrowserClient
+        .from("users")
+        .update(updates)
+        .eq("id", user.id);
+
+      if (error) {
+        console.error("Failed to update profile:", error);
+        return false;
+      }
+
+      // Re-fetch profile to get updated data
+      await get().fetchProfile();
+      return true;
+    } catch (error) {
+      console.error("Profile update error:", error);
+      return false;
+    }
+  },
+
+  /**
+   * 온보딩 완료 처리
+   */
+  completeOnboarding: () => {
+    set({ needsOnboarding: false });
   },
 }));
 
 // Selectors
 export const selectUser = (state: AuthState) => state.user;
+export const selectProfile = (state: AuthState) => state.profile;
+export const selectNeedsOnboarding = (state: AuthState) =>
+  state.needsOnboarding;
 export const selectIsAdmin = (state: AuthState) => state.isAdmin;
 export const selectIsAuthenticated = (state: AuthState) =>
   !!state.user || state.isGuest;
