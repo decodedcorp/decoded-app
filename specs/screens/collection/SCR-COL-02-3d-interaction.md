@@ -1,210 +1,177 @@
-# [SCR-COL-02] R3F 3D Interaction Layer
+# [SCR-COL-02] Spline 3D Interaction Layer
 > Route: overlay within `/collection` | Status: redesign | Updated: 2026-03-05
 > Milestone: M7 (AI Magazine & Archive Expansion) — Phase m7-03
-> Parent: SCR-COL-01 — page structure, 3D scene setup
+> Parent: SCR-COL-01 — page structure, Spline scene setup
 
 ## Purpose
 
-Defines the React Three Fiber interaction mechanics for the Decoded Studio: camera rig behavior, magazine object interactions (hover glow, click-to-focus, cover flip), mouse parallax, and performance adaptation.
+Defines the Spline Runtime API interaction mechanics for the Decoded Studio: camera state transitions, magazine object interactions (hover glow, click-to-focus, cover flip), data bridge pattern, and performance considerations.
 
-See: SCR-COL-01 — scene setup, room environment, data loading
+See: SCR-COL-01 — scene setup, Spline architecture, data loading
 See: SCR-COL-03 — issue detail panel and action workflows
 
 ## Component Map
 
 | Region | Component | File | Props/Notes |
 |--------|-----------|------|-------------|
-| Camera rig | CameraRig | `lib/components/collection/studio/CameraRig.tsx` | `useFrame` for parallax; GSAP for entry/focus/exit |
-| Magazine object | MagazineBook | `lib/components/collection/studio/MagazineBook.tsx` | Hover glow, click handler, cover flip animation |
-| Magazine layout | MagazineRack | `lib/components/collection/studio/MagazineRack.tsx` | Arc/grid positioning algorithm for N issues |
-| Postprocessing | StudioEffects | `lib/components/collection/studio/StudioEffects.tsx` | Bloom, vignette, optional chromatic aberration |
-| Raycaster | Built-in R3F | — | `onPointerOver`, `onPointerOut`, `onClick` on meshes |
+| Spline embed | SplineStudio | `lib/components/collection/studio/SplineStudio.tsx` | `<Spline>` component with scene URL |
+| Data bridge | useSplineBridge | `lib/components/collection/studio/useSplineBridge.ts` | Pushes magazineStore data → Spline variables |
+| Event bridge | useSplineEvents | `lib/components/collection/studio/useSplineEvents.ts` | Maps Spline events → React actions |
+| Fallback | BookshelfViewFallback | `lib/components/collection/BookshelfViewFallback.tsx` | CSS/GSAP bookshelf (existing code) |
 
-## Camera States & Transitions
-
-### State Machine
+## Camera State Machine
 
 ```
-[entry] ---(animation complete)---> [browse] ---(click book)---> [focused]
-                                       ^                              |
-                                       |-----(click away / ESC)-------|
+[loading] ---(onLoad)---> [entry] ---(transition done)---> [browse]
+                                                              |
+                                         (click book)-------->|
+                                                              v
+                                                          [focused]
+                                                              |
+                                         (click away/ESC)---->|
+                                                              v
+                                                          [browse]
+
 [any] ---(back button)---> [exit] ---> navigate away
 ```
 
-### Entry Camera Path
+### State Transitions (via Spline Runtime API)
 
-```
-Camera starts at: (0, 1.5, -8)  — behind corridor
-Camera ends at:   (0, 3.0,  6)  — elevated isometric view
-LookAt target:    (0, 0.5,  0)  — center of room, slightly below eye
+```typescript
+// Entry → Browse (on scene load)
+const camera = spline.findObjectByName('Camera');
+camera.emitEvent('mouseDown'); // triggers Entry→Browse state transition in Spline
 
-Timeline:
-  0.0s — Black screen, camera at start
-  0.5s — Corridor ambient light fades in
-  1.0s — Camera begins dolly forward
-  1.8s — Neon lights flicker on (3 quick on/off then steady)
-  2.0s — Camera reaches final browse position
-  2.5s — Magazine float-in stagger begins
-```
+// Browse → Focus (on book click)
+spline.emitEvent('mouseDown', 'Focus_Trigger_3'); // camera moves to book 3
 
-### Browse Camera (Parallax)
+// Focus → Browse (on deselect)
+spline.emitEvent('mouseDown', 'Browse_Trigger'); // camera returns
 
-```
-useFrame callback:
-  target.x = mouse.x * parallaxIntensity  (0.3 default)
-  target.y = base.y + mouse.y * 0.15
-  camera.position.lerp(target, dampFactor)  (0.05)
-  camera.lookAt(roomCenter)
-```
-
-- Desktop: mouse-driven parallax
-- Mobile: optional gyroscope via `DeviceOrientationEvent` (with permission prompt), else static
-
-### Focus Camera (Zoom to Book)
-
-```
-On click MagazineBook:
-  1. Store current browse camera position
-  2. Calculate focus position: book.position + normal * 1.2m
-  3. GSAP tween camera.position to focus position (0.6s, power2.inOut)
-  4. GSAP tween lookAt to book.position (0.6s)
-  5. After camera arrives: trigger cover flip animation on book
-  6. Fade non-focused books to opacity 0.3
-```
-
-### Exit Camera
-
-```
-On back button or page leave:
-  1. If focused: reverse focus first (0.3s)
-  2. Reverse entry path: camera retreats to corridor
-  3. Neon lights dim (intensity 1 -> 0, 1.0s)
-  4. After 1.5s: trigger Next.js page navigation
+// Any → Exit (on back)
+spline.emitEvent('mouseDown', 'Exit_Trigger'); // camera retreats
 ```
 
 ## Requirements
 
-### Mouse Parallax (Browse State)
+### Data Bridge (useSplineBridge)
 
-- When in browse state on desktop, the system shall track normalized mouse position (-1 to 1) and apply it as camera position offset with lerp damping (factor 0.05).
-- When parallax intensity exceeds 5 degrees from center, the system shall clamp the offset.
-- When on mobile without gyroscope, the system shall keep the camera static at the browse position.
-- When on mobile with gyroscope permission granted, the system shall map device orientation beta/gamma to camera parallax with reduced intensity (0.15).
+- When Spline `onLoad` fires with the `spline` Application instance, the hook shall iterate over `magazineStore.collectionIssues` and set variables:
+  ```typescript
+  issues.forEach((issue, i) => {
+    spline.setVariable(`Cover_Texture_${i + 1}`, issue.cover_image_url);
+    spline.setVariable(`Vol_Label_${i + 1}`, `Vol.${String(issue.issue_number).padStart(2, '0')}`);
+    spline.setVariable(`Title_${i + 1}`, issue.title);
+    spline.setVariable(`Visible_${i + 1}`, true);
+  });
+  // Hide unused slots
+  for (let i = issues.length; i < MAX_SLOTS; i++) {
+    spline.setVariable(`Visible_${i + 1}`, false);
+  }
+  ```
+- When `cover_image_url` fails to load as texture, the system shall set a fallback solid color.
+- When `collectionIssues` updates after initial load (e.g., delete), the system shall re-run variable sync.
 
-### Magazine Hover Interaction
+### Dynamic Texture Swapping (HIGH RISK)
 
-- When the pointer enters a `MagazineBook` mesh (R3F `onPointerOver`), the system shall:
-  1. Scale the book to 1.08x over 0.2s
-  2. Increase the spine's #eafd67 emissive intensity from 1.0 to 2.5
-  3. Change cursor to pointer (`document.body.style.cursor = 'pointer'`)
-- When the pointer leaves (`onPointerOut`), the system shall reverse all hover effects over 0.2s.
-- When hovering on mobile (touch), the system shall skip hover effects (tap-to-focus only).
+- When setting cover textures, the system shall use `spline.setVariable()` with image URLs.
+- **Risk:** Dynamic texture swapping via variables is undocumented. If `setVariable` does not support Image type at runtime:
+  - **Fallback A:** Access `SPEObject.material.layers` directly to swap texture data
+  - **Fallback B:** Pre-bake N cover slots in Spline with placeholder UVs, swap via `findObjectByName` + material property mutation
+  - **Fallback C:** Use static covers baked in Spline; show real covers only in IssueDetailPanel (HTML)
+- When testing, the first plan should include a **texture swap spike** to validate the approach.
 
-### Click-to-Focus Interaction
+### Event Bridge (useSplineEvents)
 
-- When the user clicks a `MagazineBook` in browse state, the system shall transition camera to focus state targeting that book.
-- When the camera focus animation completes, the system shall:
-  1. Animate the book cover mesh (front face) to `rotateY(-30deg)` over 0.5s, revealing inner pages texture
-  2. Display `IssueDetailPanel` (HTML overlay) with issue metadata and action buttons
-  3. Set `studioStore.focusedIssueId` to the clicked issue's id
-- When another book is clicked while already focused, the system shall first close the current book (0.3s), then transition to the new book.
+- When `onSplineMouseDown` fires on a magazine object, the hook shall:
+  1. Parse the object name to extract issue index (e.g., `Magazine_3` → index 3)
+  2. Map index to `collectionIssues[index]` to get issue ID
+  3. Set `studioStore.focusedIssueId`
+  4. Set `studioStore.cameraState = 'focused'`
+  5. Trigger camera focus transition in Spline
 
-### Deselect / Unfocus
+- When `onSplineMouseHover` fires on a magazine object:
+  1. Set `document.body.style.cursor = 'pointer'`
+  2. (Hover scale/glow animation handled in Spline)
 
-- When the user clicks on empty space (no mesh hit) while focused, the system shall:
-  1. Close the book cover (reverse rotateY, 0.3s)
-  2. Hide `IssueDetailPanel`
-  3. Return camera to browse position (0.5s)
-  4. Restore all books to full opacity
-- When the user presses Escape while focused, the system shall trigger the same deselect sequence.
+- When `onSplineMouseHover` fires on non-magazine object or empty space:
+  1. Reset cursor to default
+
+### Camera Transitions
+
+- When transitioning Entry→Browse, the system shall:
+  1. Wait for Spline `onLoad`
+  2. Trigger entry animation state in Spline
+  3. Listen for animation completion (poll or timeout)
+  4. Set `studioStore.entryComplete = true`
+
+- When transitioning Browse→Focus, the system shall:
+  1. Determine target book's Spline focus state name
+  2. Trigger state transition
+  3. After transition (estimated 0.6s), show IssueDetailPanel
+
+- When transitioning Focus→Browse (unfocus), the system shall:
+  1. Hide IssueDetailPanel
+  2. Trigger browse state transition in Spline
+  3. Clear `studioStore.focusedIssueId`
+
+- When user clicks Escape key or clicks empty canvas area:
+  1. If focused: trigger unfocus sequence
+  2. If browse: no action
 
 ### Cover Flip Animation
 
-```
-Book mesh structure:
-  Group
-  ├── SpineMesh (box, narrow)  — always visible
-  ├── BackCover (plane)         — always visible
-  ├── FrontCover (plane)        — rotates on Y axis (hinge on left edge)
-  │   └── UV mapped to cover_image_url
-  └── PagesMesh (box, thin)     — visible when cover opens
+- When a book is focused, Spline shall animate the front cover rotation (designed in Spline States/Events).
+- When unfocused, Spline shall reverse the cover flip.
+- React does NOT control the flip — it's a Spline-side animation triggered by the focus state transition.
 
-Focus animation:
-  FrontCover.rotation.y: 0 -> -PI/6 (30deg open)
-  duration: 0.5s
-  ease: power2.out
+### Delete Animation
 
-Unfocus:
-  FrontCover.rotation.y: -PI/6 -> 0
-  duration: 0.3s
-```
+- When delete is confirmed (from SCR-COL-03), the system shall:
+  1. Find the book object: `spline.findObjectByName('Magazine_N')`
+  2. Use `SPEObject.transition()` to animate: scale 1→0, position.y +0.5, opacity→0 over 0.7s
+  3. After animation: set `Visible_N = false`, re-sync data bridge
 
-### Delete Animation (from SCR-COL-03)
+### Performance
 
-- When a delete is confirmed, the system shall animate the `MagazineBook`:
-  1. Float upward 0.5m (0.3s)
-  2. Dissolve with opacity 1->0 and scale 1->0.5 (0.4s)
-  3. Small particle burst in #eafd67 (optional, GPU budget permitting)
-  4. Remove from scene after animation
-
-### Performance Adaptation
-
-- When `StudioEffects` mounts, the system shall measure initial frame rate over 60 frames.
-- When average FPS drops below 30 for 2 consecutive seconds:
-  1. Disable Bloom postprocessing
-  2. Reduce Reflector resolution from 1024 to 256
-  3. Disable chromatic aberration and vignette
-  4. Set `studioStore.qualityLevel = 'low'`
-- When on mobile, the system shall default to `qualityLevel: 'medium'` (Bloom only, no vignette/chromatic).
-- When WebGL 2 is not available, the system shall fall back to the CSS/GSAP bookshelf (previous implementation preserved as `BookshelfViewFallback`).
+- When Spline scene file exceeds 5MB, consider splitting into base room (static) + magazine layer (dynamic).
+- When on mobile, load a mobile-optimized Spline export (fewer lights, simpler materials).
+- When WebGL is unavailable, render `BookshelfViewFallback` (existing CSS/GSAP bookshelf preserved).
 
 ## State
 
 | Store | Field | Usage |
 |-------|-------|-------|
-| studioStore (new) | `cameraState: 'entry' \| 'browse' \| 'focused' \| 'exit'` | Drives camera rig behavior |
+| studioStore (new) | `cameraState: 'loading' \| 'entry' \| 'browse' \| 'focused' \| 'exit'` | Camera state machine |
 | studioStore (new) | `focusedIssueId: string \| null` | Which book is focused |
-| studioStore (new) | `entryComplete: boolean` | Blocks interaction until entry animation done |
-| studioStore (new) | `qualityLevel: 'high' \| 'medium' \| 'low'` | Performance adaptation level |
-| magazineStore | `activeIssueId` | Synced with `focusedIssueId` for consistency |
+| studioStore (new) | `entryComplete: boolean` | Blocks interaction until entry done |
+| studioStore (new) | `splineLoaded: boolean` | Spline Application instance ready |
+| studioStore (new) | `splineApp: Application \| null` | Reference to Spline runtime instance |
+| magazineStore | `collectionIssues` | Source data for Spline variables |
+| magazineStore | `activeIssueId` | Synced with `focusedIssueId` |
 
 ## Interaction States
 
-| State | Camera | Books | UI Overlay |
-|-------|--------|-------|------------|
-| Entry | Dolly along spline | Not visible -> stagger in | StudioLoader -> HUD |
-| Browse | Parallax on mouse | Float animation, full opacity | HUD (header + count) |
-| Hover (browse) | No change | Hovered: scale 1.08, glow up | Cursor: pointer |
-| Focused | Zoomed to book | Selected: cover open; others: 30% opacity | IssueDetailPanel |
-| Exit | Retreat through corridor | Float away, fade out | HUD fades |
+| State | Camera (Spline) | Books (Spline) | UI Overlay (React) |
+|-------|----------------|----------------|-------------------|
+| Loading | — | — | StudioLoader |
+| Entry | Dolly animation | Float in with stagger | StudioHUD fading in |
+| Browse | Isometric + mouse tracking | Idle bobbing | StudioHUD |
+| Hover | No change | Scale 1.08, glow up | Cursor: pointer |
+| Focused | Zoomed to book | Selected: cover open | IssueDetailPanel |
+| Exit | Retreat to corridor | Fade out | HUD fades |
 
 ## Error States
 
 | State | Condition | Handling |
 |-------|-----------|---------|
-| WebGL not supported | `!renderer.capabilities.isWebGL2` | Render CSS fallback bookshelf |
-| Texture load failure | `cover_image_url` 404 | Use solid color plane with `theme_palette.accent` |
-| Camera animation interrupted | User clicks during transition | Queue action, execute after current tween completes |
-| Frame drop | Sustained <30fps | Auto-reduce quality level |
-| R3F context lost | GPU memory pressure | Attempt context restore; show error overlay if fails |
-
-## Animations Summary
-
-| Trigger | Type | Library | Details |
-|---------|------|---------|---------|
-| Mount | Entry camera dolly | GSAP Timeline | 2.5s spline path, skippable |
-| Entry done | Magazine float-in | GSAP stagger | translateY below->position, 0.8s each, 0.15s stagger |
-| Mouse move | Camera parallax | R3F useFrame | Damped lerp, 0.05 factor |
-| Hover book | Scale + glow | R3F/GSAP | Scale 1->1.08, emissive up, 0.2s |
-| Click book | Camera zoom | GSAP | 0.6s to book, power2.inOut |
-| Focus arrive | Cover flip | GSAP | rotateY 0 -> -30deg, 0.5s |
-| Click away | Unfocus reverse | GSAP | Close cover 0.3s, camera back 0.5s |
-| Delete | Dissolve up | GSAP | Float up + scale down + fade, 0.7s total |
-| Back button | Exit retreat | GSAP Timeline | Reverse entry, 1.5s |
-| Neon entry | Flicker on | GSAP | 3 flickers then steady, 0.8s |
-| Idle | Book bobbing | Drei Float | Continuous, speed 1.5 |
+| WebGL unsupported | No WebGL context | BookshelfViewFallback |
+| Spline load failure | Network error / CDN down | BookshelfViewFallback + retry button |
+| Texture swap failure | Variable type mismatch | Fallback to static covers |
+| Object not found | `findObjectByName` returns null | Log warning, skip interaction |
+| Event not received | Spline event system failure | Timeout → show fallback |
 
 ---
 
-See: [SCR-COL-01](./SCR-COL-01-bookshelf.md) -- Scene setup, room environment, data loading
+See: [SCR-COL-01](./SCR-COL-01-bookshelf.md) -- Spline scene setup, room design, data loading
 See: [SCR-COL-03](./SCR-COL-03-issue-actions.md) -- Issue detail panel and action workflows
