@@ -12,21 +12,18 @@ interface ShelfRowProps {
 
 /**
  * A single shelf row displaying issue spines in a flex layout.
- * Styled with a bottom border as the shelf edge and drop shadow.
- * Uses forwardRef for GSAP ScrollTrigger targeting from BookshelfView.
+ * Styled with a 3D wooden shelf edge and drop shadow.
  */
 export const ShelfRow = forwardRef<HTMLDivElement, ShelfRowProps>(
   function ShelfRow({ issues, activeIssueId, onSelectIssue }, ref) {
     return (
       <div
         ref={ref}
-        className="relative flex items-end justify-center gap-4 md:gap-6 min-h-[200px] md:min-h-[260px] px-6 md:px-10 pt-8 pb-0"
+        className="relative flex items-end justify-center gap-3 md:gap-5 min-h-[200px] md:min-h-[260px] px-6 md:px-10 pt-8 pb-0"
         style={{
-          borderBottom: "6px solid #2a2a2a",
-          boxShadow:
-            "0 6px 12px rgba(0,0,0,0.6), inset 0 -2px 4px rgba(0,0,0,0.3)",
           background:
             "linear-gradient(180deg, transparent 0%, rgba(30,28,24,0.4) 100%)",
+          perspective: "inherit",
           transformStyle: "preserve-3d",
         }}
       >
@@ -38,6 +35,17 @@ export const ShelfRow = forwardRef<HTMLDivElement, ShelfRowProps>(
             onSelect={onSelectIssue}
           />
         ))}
+
+        {/* 3D wooden shelf edge */}
+        <div
+          className="absolute bottom-0 left-0 right-0 h-[8px] rounded-b-sm"
+          style={{
+            background:
+              "linear-gradient(180deg, #3a3530 0%, #1e1c18 100%)",
+            boxShadow:
+              "0 6px 12px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05)",
+          }}
+        />
       </div>
     );
   }

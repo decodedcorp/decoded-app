@@ -16,9 +16,8 @@ interface BookshelfViewProps {
 }
 
 /**
- * 3D perspective bookshelf container with CSS perspective and GSAP ScrollTrigger.
- * Groups issues into shelf rows (3-4 mobile, 5-6 desktop) and animates
- * each row into view on scroll.
+ * 3D isometric bookshelf container with enhanced perspective and GSAP ScrollTrigger.
+ * Look-down perspective with rotateX tilt for isometric feel.
  */
 export function BookshelfView({
   issues,
@@ -29,10 +28,9 @@ export function BookshelfView({
   const rowRefs = useRef<(HTMLDivElement | null)[]>([]);
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
-  // Group issues into rows based on screen size
-  // We use a fixed grouping of 4 for mobile-first, CSS handles visual adaptation
+  // Group issues into rows
   const rows: MagazineIssue[][] = [];
-  const perRow = 4; // base grouping; desktop shows wider with CSS flex-wrap
+  const perRow = 4;
   for (let i = 0; i < issues.length; i += perRow) {
     rows.push(issues.slice(i, i + perRow));
   }
@@ -70,19 +68,24 @@ export function BookshelfView({
   return (
     <div
       ref={containerRef}
-      className="w-full min-h-screen bg-gradient-to-b from-[#1a1a1a] to-mag-bg px-4 py-8 md:px-8"
+      className="w-full min-h-screen bg-gradient-to-b from-[#0d0d0d] to-mag-bg px-4 py-8 md:px-8"
       style={{
-        perspective: isDesktop ? "1200px" : "800px",
+        perspective: isDesktop ? "1600px" : "1000px",
         transformStyle: "preserve-3d",
       }}
       onClick={(e) => {
-        // Click on bookshelf background clears selection
         if (e.target === e.currentTarget) {
           onSelectIssue(null);
         }
       }}
     >
-      <div className="max-w-3xl mx-auto space-y-2">
+      <div
+        className="max-w-3xl mx-auto space-y-2"
+        style={{
+          transform: "rotateX(8deg) translateY(-20px)",
+          transformStyle: "preserve-3d",
+        }}
+      >
         {rows.map((rowIssues, idx) => (
           <ShelfRow
             key={idx}

@@ -82,7 +82,7 @@ function LoadingSkeleton() {
           {[0, 1, 2, 3].map((spine) => (
             <div
               key={spine}
-              className="w-[56px] md:w-[70px] h-[170px] md:h-[210px] rounded-sm bg-mag-text/5 animate-pulse"
+              className="w-[56px] md:w-[70px] h-[170px] md:h-[210px] rounded-sm bg-mag-text/5 animate-pulse border-b-2 border-[#eafd67]/20"
             />
           ))}
         </div>
