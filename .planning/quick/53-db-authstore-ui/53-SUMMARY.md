@@ -77,9 +77,9 @@ Enhanced DB trigger captures OAuth metadata, authStore fetches public.users prof
 
 The SQL migration file is saved locally but needs to be applied to the Supabase project (fvxchskblyhuswzlcmql). Apply via Supabase Dashboard SQL Editor or `mcp__supabase__apply_migration`.
 
-## Checkpoint: Human Verification Pending
+## Checkpoint: Human Verification Approved
 
-Task 3 is a human-verify checkpoint. The automated tasks (1-2) are complete, awaiting manual verification of the full onboarding flow.
+Task 3 human-verify checkpoint approved. DB migration will be applied manually later.
 
 ## Self-Check: PASSED
 - [x] supabase/migrations/20260305113700_enhance_handle_new_user.sql exists
