@@ -40,6 +40,7 @@ specs/
 │   ├── discovery/         # SCR-DISC-* (home, search, feed)
 │   ├── creation/          # SCR-CREA-* (upload, AI tagging)
 │   ├── magazine/          # SCR-MAG-* (AI magazine, personal issue) -- M7
+│   ├── collection/        # SCR-COL-* (bookshelf, archive) -- M7
 │   └── user/              # SCR-USER-* (login, profile, settings)
 └── README.md
 ```

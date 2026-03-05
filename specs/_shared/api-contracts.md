@@ -808,6 +808,48 @@ Token retrieved via `getAuthToken()` from `packages/web/lib/api/client.ts`.
 
 ---
 
+### GET /api/v1/magazine/collection
+
+**Client:** TBD (`packages/web/lib/api/magazine.ts`)
+**Auth:** Required
+**Description:** Fetch all saved magazine issues for the authenticated user.
+
+| Query Param | Type | Required | Description |
+|-------------|------|----------|-------------|
+| sort | "recent" \| "volume" | no | Sort order (default: volume desc) |
+| mood | string | no | Filter by dominant theme color cluster |
+
+**Response 200:**
+```json
+{
+  "data": [
+    {
+      "id": "uuid",
+      "issue_number": 5,
+      "title": "Vol.5 — Neon Dreams",
+      "theme_palette": { "primary": "#...", "accent": "#...", "background": "#...", "text": "#..." },
+      "cover_image_url": "https://...",
+      "created_at": "2026-03-05T00:00:00Z"
+    }
+  ],
+  "total": 5
+}
+```
+
+> Note: `layout_json` is NOT included in list response (heavy payload). Fetched on demand via `GET /api/v1/magazine/personal?issue_id={id}`.
+
+---
+
+### DELETE /api/v1/magazine/collection/[issueId]
+
+**Client:** TBD (`packages/web/lib/api/magazine.ts`)
+**Auth:** Required
+**Description:** Remove a saved magazine issue from collection.
+
+**Response 204:** No content.
+
+---
+
 ## Common Error Responses
 
 All endpoints may return these errors:
