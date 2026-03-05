@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
+import dynamic from "next/dynamic";
 import "./globals.css";
 import { AppProviders } from "./providers";
 import {
   ConditionalNav,
   MainContentWrapper,
 } from "@/lib/components/ConditionalNav";
+
+const OnboardingSheet = dynamic(
+  () => import("@/lib/components/auth/OnboardingSheet"),
+  { ssr: false }
+);
 
 const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
@@ -48,6 +54,7 @@ export default function RootLayout({
             {/* Modal slot - rendered outside MainContentWrapper */}
             {modal}
           </div>
+          <OnboardingSheet />
         </AppProviders>
       </body>
     </html>
