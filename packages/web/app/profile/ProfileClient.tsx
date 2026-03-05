@@ -19,9 +19,6 @@ import {
   type ActivityTab,
   ProfileBio,
   FollowStats,
-  PostsGrid,
-  SpotsList,
-  SolutionsList,
   SavedGrid,
 } from "@/lib/components/profile";
 import {
@@ -345,7 +342,7 @@ export function ProfileClient() {
       {/* Mobile Layout - stacked */}
       <div className="md:hidden px-4 py-4 space-y-4">
         <ProfileHeader onEditClick={() => setIsEditModalOpen(true)} />
-        <ProfileBio className="px-4" />
+        <ProfileBio bio={userData?.bio ?? undefined} className="px-4" />
         <FollowStats className="px-4" />
         <StatsCards />
         <BadgeGrid />

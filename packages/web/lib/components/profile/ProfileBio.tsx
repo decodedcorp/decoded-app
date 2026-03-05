@@ -15,11 +15,6 @@ export interface ProfileBioProps {
   className?: string;
 }
 
-const MOCK_SOCIAL_LINKS: SocialLink[] = [
-  { platform: "instagram", url: "#", handle: "@decoded_style" },
-  { platform: "twitter", url: "#", handle: "@decoded" },
-];
-
 const iconMap = {
   instagram: Instagram,
   twitter: Twitter,
@@ -27,13 +22,17 @@ const iconMap = {
 };
 
 export function ProfileBio({
-  bio = "Fashion enthusiast & K-pop style decoder. Finding the exact items worn by your favorite idols.",
-  socialLinks = MOCK_SOCIAL_LINKS,
+  bio,
+  socialLinks = [],
   className,
 }: ProfileBioProps) {
   return (
     <div className={cn("space-y-3", className)}>
-      {bio && <p className="text-sm text-foreground/90">{bio}</p>}
+      {bio ? (
+        <p className="text-sm text-foreground/90">{bio}</p>
+      ) : (
+        <p className="text-sm text-muted-foreground italic">No bio yet</p>
+      )}
       {socialLinks.length > 0 && (
         <div className="flex items-center gap-3">
           {socialLinks.map((link) => {
