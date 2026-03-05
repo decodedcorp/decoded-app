@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 Phase: None — between milestones
 Plan: Not started
 Status: Ready to plan next milestone
-Last activity: 2026-03-05 — Completed quick task 040: fix posts proxy error handling
+Last activity: 2026-03-05 — Completed quick task 041: switch home page to Supabase direct queries
 
 Progress: 6 milestones shipped [██████████] 83/83 plans complete
 
@@ -48,11 +48,12 @@ None.
 |---|-------------|------|--------|-----------|
 | 039 | Fix fetchPostsServer 400 error (has_solutions param) | 2026-03-05 | e9303d8 | [039-fix-fetchpostsserver-400-has-solutions](./quick/039-fix-fetchpostsserver-400-has-solutions/) |
 | 040 | Fix posts proxy error handling for non-JSON responses | 2026-03-05 | c4e8b34 | [040-fix-explore-posts-fetch-error-handling](./quick/040-fix-explore-posts-fetch-error-handling/) |
+| 041 | Switch home page from external API to Supabase direct queries | 2026-03-05 | 8c68ec3 | [041-home-page-supabase-direct-queries](./quick/041-home-page-supabase-direct-queries/) |
 
 ## Session Continuity
 
 Last session: 2026-03-05
-Stopped at: Completed quick task 039: fix fetchPostsServer 400 error
+Stopped at: Completed quick task 041: switch home page to Supabase direct queries
 Resume file: None
 
 ---
