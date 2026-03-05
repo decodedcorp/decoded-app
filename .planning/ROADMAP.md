@@ -58,7 +58,7 @@ See archived roadmap: `.planning/milestones/v4.0-ROADMAP.md`
 
 **Goal:** Build the AI Magazine frontend with mock data — MagazineRenderer layout engine, 3D Bookshelf, Decoding Ritual animation, and #eafd67 theme system.
 
-**Plans:** 5 plans
+**Plans:** 5/5 plans complete
 
 Plans:
 - [x] m7-01-01-PLAN.md — Theme system + types + mock data + magazineStore
