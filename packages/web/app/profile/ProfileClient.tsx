@@ -20,6 +20,10 @@ import {
   ProfileBio,
   FollowStats,
   SavedGrid,
+  StyleDNACard,
+  ArchiveStats,
+  InkEconomyCard,
+  DataSourcesCard,
 } from "@/lib/components/profile";
 import {
   useMe,
@@ -344,7 +348,10 @@ export function ProfileClient() {
         <ProfileHeader onEditClick={() => setIsEditModalOpen(true)} />
         <ProfileBio bio={userData?.bio ?? undefined} className="px-4" />
         <FollowStats className="px-4" />
-        <StatsCards />
+        <StyleDNACard />
+        <ArchiveStats />
+        <InkEconomyCard />
+        <DataSourcesCard />
         <BadgeGrid />
         {/* Activity Tabs */}
         <div className="mt-6">
@@ -361,11 +368,14 @@ export function ProfileClient() {
           profileSection={
             <>
               <ProfileHeader onEditClick={() => setIsEditModalOpen(true)} />
-              {/* Stats are now inside ProfileHeader via ProfileHeaderCard */}
+              <StyleDNACard />
+              <InkEconomyCard />
+              <DataSourcesCard />
             </>
           }
           activitySection={
             <>
+              <ArchiveStats />
               <BadgeGrid />
               <RankingList />
               {/* Activity Tabs */}
