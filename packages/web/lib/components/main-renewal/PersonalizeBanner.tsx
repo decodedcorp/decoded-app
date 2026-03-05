@@ -1,9 +1,9 @@
 "use client";
 
-import { useRef, useEffect } from "react";
-import Image from "next/image";
+import { useRef, useEffect, useMemo, useState, useCallback } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { DomeGallery } from "@/lib/components/dome";
 
 import type { PersonalizeBannerData } from "./types";
 
@@ -15,60 +15,63 @@ interface PersonalizeBannerProps {
 }
 
 /**
- * Predefined scattered positions for the 5 suction-animation images.
- * Each entry: [x%, y%, rotation] -- spread around the banner edges.
- */
-const SCATTER_POSITIONS: [number, number, number][] = [
-  [8, 12, -12],
-  [78, 8, 10],
-  [5, 70, 8],
-  [82, 65, -15],
-  [45, 5, 5],
-];
-
-/**
  * PersonalizeBanner -- Soft Wall CTA section.
  *
- * Images scattered around edges converge toward center on scroll (suction effect).
- * Headline + CTA encourage login through compelling animation rather than hard gates.
+ * Uses DomeGallery (3D sphere gallery) as immersive background.
+ * Headline + CTA encourage login through compelling visual experience.
  */
+const SNS_NAMES = ["Instagram", "Facebook", "YouTube", "TikTok", "Pinterest", "X"];
+
 export default function PersonalizeBanner({ data, className }: PersonalizeBannerProps) {
   const sectionRef = useRef<HTMLElement>(null);
-  const imagesRef = useRef<(HTMLDivElement | null)[]>([]);
   const textRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLButtonElement>(null);
+  const slotRef = useRef<HTMLSpanElement>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  /* ---- Suction animation: images converge to center on scroll ---- */
+  const snsNames = data.snsNames ?? SNS_NAMES;
+
+  const galleryImages = useMemo(
+    () => data.images.map((src, i) => ({ src, alt: `Magazine image ${i + 1}` })),
+    [data.images],
+  );
+
+  // Slot machine animation -- cycles SNS names vertically
+  const animateSlot = useCallback(() => {
+    const el = slotRef.current;
+    if (!el) return;
+
+    // Slide current name up and fade out
+    gsap.to(el, {
+      yPercent: -100,
+      opacity: 0,
+      duration: 0.4,
+      ease: "power2.in",
+      onComplete: () => {
+        setCurrentIndex((prev) => (prev + 1) % snsNames.length);
+        // Position new name below, then slide up into view
+        gsap.set(el, { yPercent: 100, opacity: 0 });
+        gsap.to(el, {
+          yPercent: 0,
+          opacity: 1,
+          duration: 0.4,
+          ease: "power2.out",
+        });
+      },
+    });
+  }, [snsNames.length]);
+
+  // Start slot machine cycling
+  useEffect(() => {
+    const interval = setInterval(animateSlot, 2000);
+    return () => clearInterval(interval);
+  }, [animateSlot]);
+
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
 
     const ctx = gsap.context(() => {
-      // Animate each scattered image toward center
-      imagesRef.current.forEach((img, i) => {
-        if (!img) return;
-
-        const pos = SCATTER_POSITIONS[i] ?? SCATTER_POSITIONS[0];
-        // Starting position is the scattered position (set via CSS)
-        // Target: center of the banner, scaled down
-        gsap.to(img, {
-          left: "50%",
-          top: "50%",
-          xPercent: -50,
-          yPercent: -50,
-          scale: 0.3,
-          rotation: pos[2] * 1.5,
-          opacity: 0.6,
-          ease: "none",
-          scrollTrigger: {
-            trigger: section,
-            start: "top 60%",
-            end: "bottom 30%",
-            scrub: 1,
-          },
-        });
-      });
-
       // Text entry: fade up
       if (textRef.current) {
         gsap.fromTo(
@@ -113,53 +116,47 @@ export default function PersonalizeBanner({ data, className }: PersonalizeBanner
   }, []);
 
   const handleCtaClick = () => {
-    // Soft wall: log intent only in mock phase (no real auth gate)
     console.log("Soft wall: navigate to /magazine/personal");
   };
-
-  // Take up to 5 images
-  const displayImages = data.images.slice(0, 5);
 
   return (
     <section
       ref={sectionRef}
       className={`relative min-h-[80vh] overflow-hidden bg-mag-bg ${className ?? ""}`}
     >
-      {/* Subtle gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-mag-bg via-transparent to-mag-bg" />
+      {/* DomeGallery background -- 3D sphere of images */}
+      <div className="absolute inset-0 z-0">
+        <DomeGallery
+          images={galleryImages}
+          grayscale={true}
+          overlayBlurColor="#050505"
+          segments={25}
+          fit={0.6}
+          imageBorderRadius="12px"
+          dragDampening={1.5}
+          autoRotate={true}
+          autoRotateSpeed={0.015}
+        />
+      </div>
 
-      {/* Scattered images (suction animation targets) */}
-      {displayImages.map((src, i) => {
-        const pos = SCATTER_POSITIONS[i] ?? SCATTER_POSITIONS[0];
-        return (
-          <div
-            key={`suction-img-${i}`}
-            ref={(el) => {
-              imagesRef.current[i] = el;
-            }}
-            className="absolute h-32 w-24 overflow-hidden rounded-lg shadow-lg sm:h-44 sm:w-32"
-            style={{
-              left: `${pos[0]}%`,
-              top: `${pos[1]}%`,
-              transform: `rotate(${pos[2]}deg)`,
-            }}
-          >
-            <Image
-              src={src}
-              alt={`Magazine image ${i + 1}`}
-              fill
-              className="object-cover"
-              sizes="128px"
-            />
-          </div>
-        );
-      })}
+      {/* Dark overlay for text readability */}
+      <div className="absolute inset-0 z-[6] bg-black/40" />
 
       {/* Center content: headline + CTA */}
       <div className="relative z-10 flex min-h-[80vh] flex-col items-center justify-center px-4">
         <div ref={textRef} className="text-center opacity-0">
           <h2 className="font-serif text-3xl font-bold leading-tight text-mag-text sm:text-4xl lg:text-5xl">
-            {data.headline}
+            당신의{" "}
+            <span className="relative inline-block h-[1.2em] w-[5.5em] overflow-hidden align-bottom sm:w-[6em]">
+              <span
+                ref={slotRef}
+                className="absolute inset-0 flex items-center justify-center text-mag-accent"
+              >
+                {snsNames[currentIndex]}
+              </span>
+            </span>
+            를
+            <br />한 권의 잡지로
           </h2>
           {data.subtext && (
             <p className="mx-auto mt-4 max-w-md text-base text-mag-text/60">{data.subtext}</p>
