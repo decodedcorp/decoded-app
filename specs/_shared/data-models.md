@@ -582,6 +582,145 @@ export interface ConvertAffiliateResponse {
 
 ---
 
+## Social Domain (Proposed)
+
+> STATUS: Frontend proposal — types not yet in codebase. Target file: `packages/web/lib/api/types.ts`
+
+### SocialConnection (API Response)
+
+```typescript
+type SocialProvider = 'pinterest' | 'instagram';
+
+interface SocialConnection {
+  provider: SocialProvider;
+  provider_username: string;
+  connected_at: string;
+  last_synced_at: string | null;
+  is_active: boolean;
+  reference_count: number;       // number of images collected
+}
+
+interface SocialConnectionsResponse {
+  data: SocialConnection[];
+}
+```
+
+### StyleProfile (API Response)
+
+```typescript
+interface StyleProfile {
+  persona_keywords: string[];          // ['Minimal', 'Cyberpunk', 'StreetCore']
+  color_palette: string[];             // hex colors ['#1a1a1a', '#eafd67']
+  brand_affinities: Record<string, number>; // { "Nike": 0.8, "Zara": 0.6 }
+  source_count: number;                // total images analyzed
+  last_analyzed_at: string | null;
+}
+```
+
+### SyncRequest / SyncStatus (API)
+
+```typescript
+interface SocialSyncRequest {
+  provider: SocialProvider;
+  board_ids?: string[];                // Pinterest: selected board IDs
+  username?: string;                   // Instagram crawling: IG username
+  consent?: boolean;                   // Instagram crawling: explicit consent flag
+}
+
+type SyncStatusType = 'idle' | 'syncing' | 'analyzing' | 'complete' | 'error';
+
+interface SocialSyncStatus {
+  status: SyncStatusType;
+  progress: number;                    // 0-100
+  fetched_count: number;
+  total_count: number;
+  message: string;                     // "Fetching pin images..."
+}
+```
+
+### PinterestBoard (API Response)
+
+```typescript
+interface PinterestBoard {
+  id: string;
+  name: string;
+  description: string | null;
+  pin_count: number;
+  thumbnail_url: string | null;
+}
+
+interface PinterestBoardsResponse {
+  data: PinterestBoard[];
+}
+```
+
+### StyleReference (Internal)
+
+```typescript
+type StyleReferenceSource = 'pinterest' | 'instagram' | 'upload';
+
+interface StyleReference {
+  id: string;
+  source: StyleReferenceSource;
+  image_url: string;
+  caption: string | null;
+  tags: string[];
+  ai_analyzed: boolean;
+  ai_keywords: string[] | null;
+  created_at: string;
+}
+```
+
+### Database Tables
+
+```typescript
+// user_social_tokens (encrypted at rest)
+type UserSocialTokenRow = {
+  id: string;
+  user_id: string;
+  provider: string;              // 'pinterest' | 'instagram'
+  access_token: string;          // AES-256 encrypted
+  refresh_token: string | null;  // AES-256 encrypted
+  token_expires_at: string | null;
+  scopes: string[];
+  provider_user_id: string | null;
+  provider_username: string | null;
+  connected_at: string;
+  last_synced_at: string | null;
+  is_active: boolean;
+}
+
+// user_style_references
+type UserStyleReferenceRow = {
+  id: string;
+  user_id: string;
+  source: string;                // 'pinterest' | 'instagram' | 'upload'
+  source_id: string | null;      // original platform ID
+  image_url: string;
+  caption: string | null;
+  tags: string[] | null;
+  ai_analyzed: boolean;
+  ai_keywords: string[] | null;
+  created_at: string;
+}
+
+// user_style_profiles
+type UserStyleProfileRow = {
+  id: string;
+  user_id: string;               // UNIQUE
+  persona_keywords: string[];
+  style_vector: number[];        // 768-dim embedding
+  color_palette: string[];
+  brand_affinities: Json;
+  source_count: number;
+  last_analyzed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+```
+
+---
+
 ## Magazine Domain (Proposed)
 
 > STATUS: Frontend proposal — types not yet in codebase. Target file: `packages/web/lib/api/types.ts`
