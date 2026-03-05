@@ -61,11 +61,11 @@ See archived roadmap: `.planning/milestones/v4.0-ROADMAP.md`
 **Plans:** 5 plans
 
 Plans:
-- [ ] m7-01-01-PLAN.md — Theme system + types + mock data + magazineStore
-- [ ] m7-01-02-PLAN.md — MagazineRenderer layout engine + 6 magazine components
-- [ ] m7-01-03-PLAN.md — Daily editorial page (/magazine) + NavBar integration
+- [x] m7-01-01-PLAN.md — Theme system + types + mock data + magazineStore
+- [x] m7-01-02-PLAN.md — MagazineRenderer layout engine + 6 magazine components
+- [x] m7-01-03-PLAN.md — Daily editorial page (/magazine) + NavBar integration
 - [x] m7-01-04-PLAN.md — 3D Bookshelf collection page (/collection)
-- [ ] m7-01-05-PLAN.md — Decoding Ritual animation (/magazine/personal)
+- [x] m7-01-05-PLAN.md — Decoding Ritual animation (/magazine/personal)
 
 ### Phase m7-02: Main Page Renewal — Playful Magazine Landing
 
@@ -89,10 +89,10 @@ Plans:
 | v2.1 Design System | v2.1-1~6 | 14/14 | Shipped | 2026-02-06 |
 | v3.0 Admin Panel | v3-01~06 | 12/12 | Shipped | 2026-02-19 |
 | v4.0 Spec Overhaul | v4-01~09 | 13/13 | Shipped | 2026-02-20 |
-| M7 AI Magazine | m7-01, m7-02 | 0/8 | In Progress | - |
-| **Total** | **7 milestones** | **83/91** | **Active** | - |
+| M7 AI Magazine | m7-01, m7-02 | 5/8 | In Progress | - |
+| **Total** | **7 milestones** | **88/91** | **Active** | - |
 
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-03-05 (M7 phase m7-02 planned)*
+*Last updated: 2026-03-05 (m7-01 phase complete, 5/5 plans shipped)*
