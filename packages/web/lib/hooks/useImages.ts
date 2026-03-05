@@ -24,9 +24,9 @@ import type {
   ImageDetail,
   ImageRow,
 } from "@decoded/shared/supabase/queries/images";
-import { fetchPosts, fetchPostDetail } from "@/lib/api/posts";
+import { fetchPostDetail } from "@/lib/api/posts";
 import { postDetailToImageDetail } from "@/lib/api/adapters/postDetailToImageDetail";
-import type { Post, PostsListParams } from "@/lib/api/types";
+import { supabaseBrowserClient } from "@/lib/supabase/client";
 
 /**
  * @deprecated Use useInfiniteFilteredImages with unified adapter instead.
@@ -148,8 +148,7 @@ export type PostsPage = {
 };
 
 /**
- * React Query hook for fetching infinite posts via REST API
- * This replaces the Supabase-based useInfiniteFilteredImages
+ * React Query hook for fetching infinite posts via Supabase
  */
 export function useInfinitePosts(params: {
   limit?: number;
@@ -175,41 +174,59 @@ export function useInfinitePosts(params: {
       { category, search, artistName, groupName, sort, limit },
     ],
     queryFn: async ({ pageParam }) => {
-      const apiParams: PostsListParams = {
-        page: (pageParam as number) ?? 1,
-        per_page: limit,
-        sort,
-      };
+      const page = (pageParam as number) ?? 1;
+      const from = (page - 1) * limit;
+      const to = from + limit - 1;
+
+      let query = supabaseBrowserClient
+        .from("posts")
+        .select("*, users!posts_user_id_fkey(username)", { count: "exact" })
+        .eq("status", "active")
+        .not("image_url", "is", null);
 
       if (category && category !== "all") {
-        apiParams.category = category;
+        query = query.eq("context", category);
       }
       if (artistName) {
-        apiParams.artist_name = artistName;
+        query = query.ilike("artist_name", `%${artistName}%`);
       }
       if (groupName) {
-        apiParams.group_name = groupName;
+        query = query.ilike("group_name", `%${groupName}%`);
       }
 
-      const response = await fetchPosts(apiParams);
+      // Sort
+      if (sort === "popular") {
+        query = query.order("view_count", { ascending: false });
+      } else if (sort === "trending") {
+        query = query.order("trending_score", { ascending: false });
+      } else {
+        query = query.order("created_at", { ascending: false });
+      }
 
-      // Map Post[] to PostGridItem[]
-      const items: PostGridItem[] = response.data.map((post: Post) => ({
+      query = query.range(from, to);
+
+      const { data, count, error } = await query;
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      const totalItems = count ?? 0;
+      const totalPages = Math.ceil(totalItems / limit);
+      const hasMore = page < totalPages;
+
+      const items: PostGridItem[] = (data ?? []).map((post: any) => ({
         id: post.id,
         imageUrl: post.image_url,
         postId: post.id,
         postSource: "post" as const,
-        postAccount: post.user.username,
+        postAccount: post.users?.username ?? post.artist_name ?? "",
         postCreatedAt: post.created_at,
-        spotCount: post.spot_count,
+        spotCount: 0,
         viewCount: post.view_count,
       }));
 
-      const { pagination } = response;
-      const hasMore = pagination.current_page < pagination.total_pages;
-      const nextPage = hasMore ? pagination.current_page + 1 : null;
-
-      return { items, nextPage, hasMore };
+      return { items, nextPage: hasMore ? page + 1 : null, hasMore };
     },
     getNextPageParam: (lastPage) => lastPage.nextPage,
     initialPageParam: 1,
@@ -242,5 +259,4 @@ export type {
   ImagePageWithPostId,
   ImageDetail,
   ImageRow,
-  Post,
 };
