@@ -611,7 +611,7 @@ export function ImageDetailModal({ imageId }: Props) {
 
                   return (
                     <div
-                      key={item.spot_id ?? idx}
+                      key={item.id ?? idx}
                       className="absolute w-8 h-8 flex items-center justify-center"
                       style={{
                         left: `${pixelLeft}px`,
