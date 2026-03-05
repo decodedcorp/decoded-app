@@ -2,10 +2,7 @@
 
 import { useEffect } from "react";
 import { useMagazineStore } from "@/lib/stores/magazineStore";
-import {
-  MagazineRenderer,
-  MagazineSkeleton,
-} from "@/lib/components/magazine";
+import { MagazineRenderer, MagazineSkeleton } from "@/lib/components/magazine";
 import { GenerateMyEdition } from "@/lib/components/magazine/GenerateMyEdition";
 import { RefreshCw } from "lucide-react";
 

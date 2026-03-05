@@ -54,6 +54,8 @@ export interface DesktopHeaderProps
 const NAV_ITEMS = [
   { href: "/", label: "Home" },
   { href: "/explore", label: "Explore" },
+  { href: "/magazine", label: "Magazine" },
+  { href: "/collection", label: "Collection" },
   { href: "/request/upload", label: "Upload", isUpload: true },
 ] as const;
 
@@ -148,7 +150,10 @@ export function DesktopHeader({
           aria-label="Main navigation"
         >
           {NAV_ITEMS.map((item) => {
-            const isActive = pathname === item.href;
+            const isActive =
+              item.href === "/"
+                ? pathname === "/"
+                : pathname.startsWith(item.href);
             const baseClass = cn(
               "text-sm transition-colors",
               isActive
@@ -168,11 +173,7 @@ export function DesktopHeader({
               );
             }
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={baseClass}
-              >
+              <Link key={item.href} href={item.href} className={baseClass}>
                 {item.label}
               </Link>
             );

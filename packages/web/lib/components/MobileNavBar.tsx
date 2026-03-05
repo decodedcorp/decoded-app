@@ -2,7 +2,7 @@
 
 import { memo, useState, useCallback } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, Search, PlusCircle, User } from "lucide-react";
+import { Home, Search, PlusCircle, User, BookOpen } from "lucide-react";
 import { NavBar, NavItem } from "@/lib/design-system";
 import { RequestModal } from "./request/RequestModal";
 import { useAuthStore } from "@/lib/stores/authStore";
@@ -23,6 +23,7 @@ interface NavItemConfig {
 const navItems: NavItemConfig[] = [
   { id: "home", href: "/", icon: Home, label: "Home" },
   { id: "search", href: "/search", icon: Search, label: "Search" },
+  { id: "magazine", href: "/magazine", icon: BookOpen, label: "Magazine" },
   {
     id: "request",
     href: "#",
@@ -72,7 +73,10 @@ export const MobileNavBar = memo(() => {
     <>
       <NavBar>
         {navItems.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive =
+            item.href === "/"
+              ? pathname === "/"
+              : pathname.startsWith(item.href);
           const Icon = item.icon;
 
           return (
