@@ -64,8 +64,18 @@ Plans:
 - [ ] m7-01-01-PLAN.md — Theme system + types + mock data + magazineStore
 - [ ] m7-01-02-PLAN.md — MagazineRenderer layout engine + 6 magazine components
 - [ ] m7-01-03-PLAN.md — Daily editorial page (/magazine) + NavBar integration
-- [ ] m7-01-04-PLAN.md — 3D Bookshelf collection page (/collection)
+- [x] m7-01-04-PLAN.md — 3D Bookshelf collection page (/collection)
 - [ ] m7-01-05-PLAN.md — Decoding Ritual animation (/magazine/personal)
+
+### Phase m7-02: Main Page Renewal — Playful Magazine Landing
+
+**Goal:** 메인페이지(/)를 Cinema-to-Action 컨셉으로 리뉴얼. Zero-Template 레이아웃 엔진, Hero Tilt + Glow 애니메이션, Masonry Grid + Parallax, Soft Wall 로그인 유도, #eafd67 네온 테마. Mock 데이터 기반 프론트엔드 선행 구현.
+
+**Depends on:** m7-01 (theme system, MagazineRenderer 공유)
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase m7-02 to break down)
 
 ## Progress
 
@@ -77,7 +87,7 @@ Plans:
 | v2.1 Design System | v2.1-1~6 | 14/14 | Shipped | 2026-02-06 |
 | v3.0 Admin Panel | v3-01~06 | 12/12 | Shipped | 2026-02-19 |
 | v4.0 Spec Overhaul | v4-01~09 | 13/13 | Shipped | 2026-02-20 |
-| M7 AI Magazine | m7-01 | 0/5 | In Progress | - |
+| M7 AI Magazine | m7-01, m7-02 | 0/5 | In Progress | - |
 | **Total** | **7 milestones** | **83/88** | **Active** | - |
 
 ---
