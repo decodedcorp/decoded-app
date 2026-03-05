@@ -73,7 +73,7 @@ export function CollectionClient() {
  */
 function LoadingSkeleton() {
   return (
-    <div className="px-4 py-8 md:px-8 space-y-6 max-w-[1400px] mx-auto">
+    <div className="px-4 py-8 md:px-8 space-y-6 max-w-3xl mx-auto">
       {[0, 1, 2].map((row) => (
         <div
           key={row}

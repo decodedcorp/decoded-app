@@ -20,7 +20,7 @@ export const ShelfRow = forwardRef<HTMLDivElement, ShelfRowProps>(
     return (
       <div
         ref={ref}
-        className="relative flex items-end justify-start gap-4 md:gap-6 min-h-[200px] md:min-h-[260px] px-6 md:px-10 pt-8 pb-0"
+        className="relative flex items-end justify-center gap-4 md:gap-6 min-h-[200px] md:min-h-[260px] px-6 md:px-10 pt-8 pb-0"
         style={{
           borderBottom: "6px solid #2a2a2a",
           boxShadow:

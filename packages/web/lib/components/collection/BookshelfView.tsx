@@ -82,7 +82,7 @@ export function BookshelfView({
         }
       }}
     >
-      <div className="max-w-[1400px] mx-auto space-y-2">
+      <div className="max-w-3xl mx-auto space-y-2">
         {rows.map((rowIssues, idx) => (
           <ShelfRow
             key={idx}
