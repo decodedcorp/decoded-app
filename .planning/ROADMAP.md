@@ -72,11 +72,11 @@ Plans:
 **Goal:** 메인페이지(/)를 Cinema-to-Action 컨셉으로 리뉴얼. Zero-Template 레이아웃 엔진, Hero Tilt + Glow 애니메이션, Masonry Grid + Parallax, Soft Wall 로그인 유도, #eafd67 네온 테마. Mock 데이터 기반 프론트엔드 선행 구현.
 
 **Depends on:** m7-01 (theme system, MagazineRenderer 공유)
-**Plans:** 3 plans
+**Plans:** 2/3 plans complete
 
 Plans:
-- [ ] m7-02-01-PLAN.md — Mock data + types + MainHero (Tilt/Glow/Noise)
-- [ ] m7-02-02-PLAN.md — MasonryGrid + Parallax + PersonalizeBanner (Suction)
+- [x] m7-02-01-PLAN.md — Mock data + types + MainHero (Tilt/Glow/Noise)
+- [x] m7-02-02-PLAN.md — MasonryGrid + Parallax + PersonalizeBanner (Suction)
 - [ ] m7-02-03-PLAN.md — SmartNav + Page assembly + visual checkpoint
 
 ## Progress
@@ -89,10 +89,10 @@ Plans:
 | v2.1 Design System | v2.1-1~6 | 14/14 | Shipped | 2026-02-06 |
 | v3.0 Admin Panel | v3-01~06 | 12/12 | Shipped | 2026-02-19 |
 | v4.0 Spec Overhaul | v4-01~09 | 13/13 | Shipped | 2026-02-20 |
-| M7 AI Magazine | m7-01, m7-02 | 5/8 | In Progress | - |
-| **Total** | **7 milestones** | **88/91** | **Active** | - |
+| M7 AI Magazine | m7-01, m7-02 | 7/8 | In Progress | - |
+| **Total** | **7 milestones** | **90/91** | **Active** | - |
 
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-03-05 (m7-01 phase complete, 5/5 plans shipped)*
+*Last updated: 2026-03-05 (m7-02-02 complete, 2/3 plans shipped)*
