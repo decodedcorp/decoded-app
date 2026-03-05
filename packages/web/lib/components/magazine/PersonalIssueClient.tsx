@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useCallback } from "react";
 import gsap from "gsap";
+import { X } from "lucide-react";
 import { useMagazineStore } from "@/lib/stores/magazineStore";
 import { DecodingRitual } from "./DecodingRitual";
 import { MagazineRenderer } from "./MagazineRenderer";
@@ -11,15 +12,6 @@ interface PersonalIssueClientProps {
   onClose: () => void;
 }
 
-/**
- * Personal Issue generation modal overlay.
- *
- * Implements a 3-state machine:
- *   idle       -> Generate button visible
- *   generating -> Decoding Ritual animation plays
- *   ready      -> MagazineRenderer with personal issue + action buttons
- *   error      -> Error card with retry
- */
 export function PersonalIssueClient({ isOpen, onClose }: PersonalIssueClientProps) {
   const {
     personalStatus,
@@ -30,7 +22,8 @@ export function PersonalIssueClient({ isOpen, onClose }: PersonalIssueClientProp
     clearError,
   } = useMagazineStore();
 
-  const overlayRef = useRef<HTMLDivElement>(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const ritualRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<HTMLDivElement>(null);
   const ctxRef = useRef<gsap.Context | null>(null);
@@ -52,69 +45,56 @@ export function PersonalIssueClient({ isOpen, onClose }: PersonalIssueClientProp
   }, []);
 
   const handleClose = useCallback(() => {
-    const overlay = overlayRef.current;
-    if (!overlay) {
+    const backdrop = backdropRef.current;
+    const panel = panelRef.current;
+
+    if (!backdrop || !panel) {
+      setPersonalStatus("idle");
       onClose();
       return;
     }
 
-    gsap.to(overlay, {
-      opacity: 0,
-      duration: 0.3,
-      ease: "power2.in",
+    const tl = gsap.timeline({
       onComplete: () => {
         setPersonalStatus("idle");
         onClose();
       },
     });
+    tl.to(panel, { y: 40, opacity: 0, duration: 0.25, ease: "power2.in" }, 0);
+    tl.to(backdrop, { opacity: 0, duration: 0.25, ease: "power2.in" }, 0.05);
   }, [onClose, setPersonalStatus]);
 
   // Entrance animation
   useEffect(() => {
     if (!isOpen) return;
-    const overlay = overlayRef.current;
-    if (!overlay) return;
+    const backdrop = backdropRef.current;
+    const panel = panelRef.current;
+    if (!backdrop || !panel) return;
 
+    gsap.fromTo(backdrop, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" });
     gsap.fromTo(
-      overlay,
-      { opacity: 0 },
-      { opacity: 1, duration: 0.3, ease: "power2.out" },
+      panel,
+      { opacity: 0, y: 40 },
+      { opacity: 1, y: 0, duration: 0.35, ease: "power2.out", delay: 0.05 },
     );
   }, [isOpen]);
 
-  // Crossfade animation: ritual out, renderer in
+  // Crossfade: ritual out -> renderer in
   useEffect(() => {
     if (personalStatus !== "ready") return;
-
     const ritual = ritualRef.current;
     const renderer = rendererRef.current;
     if (!renderer) return;
 
-    if (ctxRef.current) {
-      ctxRef.current.revert();
-    }
+    if (ctxRef.current) ctxRef.current.revert();
 
     ctxRef.current = gsap.context(() => {
       const tl = gsap.timeline();
-
       if (ritual) {
-        tl.to(ritual, {
-          opacity: 0,
-          duration: 0.8,
-          ease: "power2.inOut",
-        });
+        tl.to(ritual, { opacity: 0, duration: 0.6, ease: "power2.inOut" });
       }
-
       gsap.set(renderer, { opacity: 0 });
-      tl.to(
-        renderer,
-        {
-          opacity: 1,
-          duration: 0.8,
-          ease: "power2.inOut",
-        },
-        ritual ? "-=0.3" : 0,
-      );
+      tl.to(renderer, { opacity: 1, duration: 0.6, ease: "power2.inOut" }, ritual ? "-=0.2" : 0);
     });
 
     return () => {
@@ -128,105 +108,109 @@ export function PersonalIssueClient({ isOpen, onClose }: PersonalIssueClientProp
   if (!isOpen) return null;
 
   return (
-    <div
-      ref={overlayRef}
-      className="fixed inset-0 z-[70] bg-mag-bg text-mag-text overflow-y-auto"
-      style={{ opacity: 0 }}
-    >
-      {/* Top bar */}
-      <nav className="sticky top-0 z-[80] flex items-center justify-between px-4 py-3 bg-mag-bg/80 backdrop-blur-sm">
-        <button
-          onClick={handleClose}
-          className="text-mag-text hover:text-mag-accent transition-colors text-lg"
-          aria-label="Back to magazine"
+    <>
+      {/* Backdrop */}
+      <div
+        ref={backdropRef}
+        className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm"
+        style={{ opacity: 0 }}
+        onClick={handleClose}
+      />
+
+      {/* Modal Panel */}
+      <div className="fixed inset-0 z-[71] flex items-center justify-center p-4 md:p-8 pointer-events-none">
+        <div
+          ref={panelRef}
+          className="relative w-full max-w-lg max-h-[85vh] overflow-y-auto rounded-2xl border border-mag-accent/20 bg-mag-bg text-mag-text shadow-2xl pointer-events-auto"
+          style={{ opacity: 0 }}
+          onClick={(e) => e.stopPropagation()}
         >
-          &larr;
-        </button>
-        <span className="text-sm text-mag-text/60 uppercase tracking-widest">
-          Personal Edition
-        </span>
-        <button
-          onClick={handleClose}
-          className="text-mag-text hover:text-mag-accent transition-colors text-lg"
-          aria-label="Close"
-        >
-          &times;
-        </button>
-      </nav>
-
-      {/* State: idle */}
-      {personalStatus === "idle" && (
-        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-56px)] gap-6 px-6">
-          <h1 className="text-3xl md:text-4xl font-bold text-mag-accent text-center">
-            Generate My Edition
-          </h1>
-          <p className="text-mag-text/70 text-center max-w-sm">
-            Your personalized magazine crafted from your taste DNA
-          </p>
-          <p className="text-sm text-mag-text/50">Credits: 5 remaining</p>
-          <button
-            onClick={handleGenerate}
-            className="bg-mag-accent text-mag-bg font-bold px-8 py-3 rounded-full text-lg hover:opacity-90 transition-opacity"
-          >
-            Generate
-          </button>
-        </div>
-      )}
-
-      {/* State: generating */}
-      {personalStatus === "generating" && (
-        <div ref={ritualRef}>
-          <DecodingRitual
-            isActive={true}
-            onComplete={handleRitualComplete}
-          />
-        </div>
-      )}
-
-      {/* State: ready */}
-      {personalStatus === "ready" && personalIssue && (
-        <div ref={rendererRef} style={{ opacity: 0 }}>
-          <div className="pt-2">
-            <MagazineRenderer issue={personalIssue} />
-          </div>
-
-          {/* Action buttons */}
-          <div className="flex items-center justify-center gap-4 py-8 px-6">
+          {/* Header */}
+          <div className="sticky top-0 z-10 flex items-center justify-between px-5 py-4 bg-mag-bg/90 backdrop-blur-sm border-b border-mag-text/10 rounded-t-2xl">
+            <span className="text-xs text-mag-text/50 uppercase tracking-widest">
+              Personal Edition
+            </span>
             <button
-              onClick={handleRegenerate}
-              className="border border-mag-accent text-mag-accent px-6 py-2 rounded-full hover:bg-mag-accent/10 transition-colors"
+              onClick={handleClose}
+              className="text-mag-text/60 hover:text-mag-text transition-colors"
+              aria-label="Close"
             >
-              Regenerate
-            </button>
-            <button
-              onClick={handleSave}
-              className="bg-mag-accent text-mag-bg font-bold px-6 py-2 rounded-full hover:opacity-90 transition-opacity"
-            >
-              Save to Collection
+              <X className="h-5 w-5" />
             </button>
           </div>
-        </div>
-      )}
 
-      {/* State: error */}
-      {personalStatus === "error" && (
-        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-56px)] gap-4 px-6">
-          <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-6 max-w-sm text-center">
-            <p className="text-red-400 mb-4">
-              {error || "Something went wrong during generation"}
-            </p>
-            <button
-              onClick={() => {
-                clearError();
-                setPersonalStatus("idle");
-              }}
-              className="bg-mag-accent text-mag-bg font-bold px-6 py-2 rounded-full hover:opacity-90 transition-opacity"
-            >
-              Try Again
-            </button>
+          {/* Body */}
+          <div className="p-5">
+            {/* State: idle */}
+            {personalStatus === "idle" && (
+              <div className="flex flex-col items-center gap-5 py-10">
+                <h2 className="text-2xl md:text-3xl font-bold text-mag-accent text-center">
+                  Generate My Edition
+                </h2>
+                <p className="text-mag-text/60 text-center max-w-xs text-sm">
+                  Your personalized magazine crafted from your taste DNA
+                </p>
+                <p className="text-xs text-mag-text/40">Credits: 5 remaining</p>
+                <button
+                  onClick={handleGenerate}
+                  className="bg-mag-accent text-mag-bg font-bold px-7 py-2.5 rounded-full hover:opacity-90 transition-opacity"
+                >
+                  Generate
+                </button>
+              </div>
+            )}
+
+            {/* State: generating */}
+            {personalStatus === "generating" && (
+              <div ref={ritualRef} className="min-h-[400px] relative">
+                <DecodingRitual isActive={true} onComplete={handleRitualComplete} />
+              </div>
+            )}
+
+            {/* State: ready */}
+            {personalStatus === "ready" && personalIssue && (
+              <div ref={rendererRef} style={{ opacity: 0 }}>
+                <MagazineRenderer issue={personalIssue} />
+
+                <div className="flex items-center justify-center gap-3 pt-6 pb-2">
+                  <button
+                    onClick={handleRegenerate}
+                    className="border border-mag-accent text-mag-accent px-5 py-2 rounded-full text-sm hover:bg-mag-accent/10 transition-colors"
+                  >
+                    Regenerate
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    className="bg-mag-accent text-mag-bg font-bold px-5 py-2 rounded-full text-sm hover:opacity-90 transition-opacity"
+                  >
+                    Save to Collection
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* State: error */}
+            {personalStatus === "error" && (
+              <div className="flex flex-col items-center gap-4 py-10">
+                <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-5 max-w-sm text-center">
+                  <p className="text-red-400 text-sm mb-3">
+                    {error || "Something went wrong during generation"}
+                  </p>
+                  <button
+                    onClick={() => {
+                      clearError();
+                      setPersonalStatus("idle");
+                    }}
+                    className="bg-mag-accent text-mag-bg font-bold px-5 py-2 rounded-full text-sm hover:opacity-90 transition-opacity"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 }
