@@ -180,7 +180,7 @@ export function useInfinitePosts(params: {
 
       let query = supabaseBrowserClient
         .from("posts")
-        .select("*, users!posts_user_id_fkey(username)", { count: "exact" })
+        .select("*", { count: "exact" })
         .eq("status", "active")
         .not("image_url", "is", null);
 
@@ -220,7 +220,7 @@ export function useInfinitePosts(params: {
         imageUrl: post.image_url,
         postId: post.id,
         postSource: "post" as const,
-        postAccount: post.users?.username ?? post.artist_name ?? "",
+        postAccount: post.artist_name ?? post.group_name ?? "",
         postCreatedAt: post.created_at,
         spotCount: 0,
         viewCount: post.view_count,
