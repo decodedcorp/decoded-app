@@ -79,19 +79,18 @@ Plans:
 - [x] m7-02-02-PLAN.md — MasonryGrid + Parallax + PersonalizeBanner (Suction)
 - [ ] m7-02-03-PLAN.md — SmartNav + Page assembly + visual checkpoint
 
-### Phase m7-03: The Decoded Studio — 3D Collection Room
+### Phase m7-03: The Decoded Studio — Spline Pro 3D Collection Room
 
-**Goal:** 컬렉션 페이지(/collection)를 React Three Fiber 기반 3D 스튜디오로 전면 리디자인. 네온 #eafd67 조명의 갤러리 공간에서 매거진을 탐색하는 몰입형 경험. Entry/Browse/Focus 카메라 워크, 프로시저럴 3D 매거진 오브젝트, Bloom 포스트프로세싱, WebGL 미지원 시 CSS 폴백.
+**Goal:** 컬렉션 페이지(/collection)를 Spline Pro 기반 3D 스튜디오로 전면 리디자인. Spline 에디터에서 디자인한 3D 갤러리 룸을 @splinetool/react-spline로 임베드하고, Runtime API로 매거진 데이터 바인딩/카메라 전환/이벤트 처리. Entry/Browse/Focus 카메라 상태, 동적 커버 텍스처, HTML 오버레이 패널, WebGL 미지원 시 CSS 폴백.
 
 **Depends on:** m7-01 (theme system, MagazineIssue types, magazineStore)
-**Specs:** SCR-COL-01 (Studio room), SCR-COL-02 (R3F interactions), SCR-COL-03 (Detail panel + actions)
-**Plans:** 4 plans
+**Specs:** SCR-COL-01 (Studio room — Spline Pro), SCR-COL-02 (Spline interactions), SCR-COL-03 (Detail panel + actions)
+**Plans:** 3 plans
 
 Plans:
-- [ ] m7-03-01-PLAN.md — R3F v8 setup + studioStore + StudioScene Canvas + StudioRoom (Reflector floor, walls) + StudioLighting (neon #eafd67) + CameraRig (entry dolly)
-- [ ] m7-03-02-PLAN.md — MagazineBook (cover UV, spine neon text, cover flip) + MagazineRack (arc layout) + Float bobbing
-- [ ] m7-03-03-PLAN.md — CameraRig interactions (parallax, focus zoom, unfocus, exit) + hover glow + StudioEffects (Bloom/Vignette) + PerformanceMonitor
-- [ ] m7-03-04-PLAN.md — IssueDetailPanel (HTML overlay) + EmptyStudio + StudioLoader + StudioHUD + CollectionClient orchestration + WebGL fallback
+- [ ] m7-03-01-PLAN.md — Spline packages + studioStore + SplineStudio wrapper + useSplineRuntime + StudioLoader + texture swap spike
+- [ ] m7-03-02-PLAN.md — useSplineBridge (data sync) + useSplineEvents (click/hover) + CollectionClient rewrite (WebGL detection) + StudioHUD
+- [ ] m7-03-03-PLAN.md — IssueDetailPanel (Open/Share/Remove) + CollectionShareSheet + EmptyStudio + BookshelfViewFallback + overlay wiring + visual checkpoint
 
 ## Progress
 
@@ -103,10 +102,10 @@ Plans:
 | v2.1 Design System | v2.1-1~6 | 14/14 | Shipped | 2026-02-06 |
 | v3.0 Admin Panel | v3-01~06 | 12/12 | Shipped | 2026-02-19 |
 | v4.0 Spec Overhaul | v4-01~09 | 13/13 | Shipped | 2026-02-20 |
-| M7 AI Magazine | m7-01, m7-02, m7-03 | 7/16 | In Progress | - |
-| **Total** | **7 milestones** | **90/99** | **Active** | - |
+| M7 AI Magazine | m7-01, m7-02, m7-03 | 7/15 | In Progress | - |
+| **Total** | **7 milestones** | **90/98** | **Active** | - |
 
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-03-05 (m7-03 planned, 4 plans created)*
+*Last updated: 2026-03-05 (m7-03 replanned for Spline Pro, 3 plans)*
