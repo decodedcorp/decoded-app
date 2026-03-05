@@ -39,8 +39,9 @@ export interface GridItemSpot {
 
 /** Personalize banner -- soft wall CTA */
 export interface PersonalizeBannerData {
-  headline: string; // "당신의 핀터레스트를 한 권의 잡지로"
+  headline: string; // Generic headline (SNS name is now animated separately)
   subtext?: string;
   ctaLabel: string; // "나만의 매거진 만들기"
   images: string[]; // Rotating images for suction animation
+  snsNames?: string[]; // Optional SNS names for slot machine animation (defaults to built-in list)
 }
