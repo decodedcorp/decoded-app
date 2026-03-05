@@ -79,6 +79,20 @@ Plans:
 - [x] m7-02-02-PLAN.md — MasonryGrid + Parallax + PersonalizeBanner (Suction)
 - [ ] m7-02-03-PLAN.md — SmartNav + Page assembly + visual checkpoint
 
+### Phase m7-03: The Decoded Studio — 3D Collection Room
+
+**Goal:** 컬렉션 페이지(/collection)를 React Three Fiber 기반 3D 스튜디오로 전면 리디자인. 네온 #eafd67 조명의 갤러리 공간에서 매거진을 탐색하는 몰입형 경험. Entry/Browse/Focus 카메라 워크, 프로시저럴 3D 매거진 오브젝트, Bloom 포스트프로세싱, WebGL 미지원 시 CSS 폴백.
+
+**Depends on:** m7-01 (theme system, MagazineIssue types, magazineStore)
+**Specs:** SCR-COL-01 (Studio room), SCR-COL-02 (R3F interactions), SCR-COL-03 (Detail panel + actions)
+**Plans:** 0/? (planning required)
+
+Plans:
+- [ ] m7-03-01-PLAN.md — R3F + Drei + postprocessing setup, StudioScene canvas, StudioRoom (floor reflector, walls), StudioLighting (neon #eafd67), CameraRig (entry animation)
+- [ ] m7-03-02-PLAN.md — MagazineBook procedural geometry (cover UV, spine neon text, open/close animation), MagazineRack layout algorithm, Float idle animation
+- [ ] m7-03-03-PLAN.md — CameraRig interactions (mouse parallax, click-to-focus zoom, deselect), hover glow, performance adaptation, StudioEffects (Bloom/vignette)
+- [ ] m7-03-04-PLAN.md — IssueDetailPanel (HTML overlay), EmptyStudio, StudioLoader, StudioHUD, studioStore, WebGL fallback, action workflows (Open/Share/Remove)
+
 ## Progress
 
 | Milestone | Phases | Plans | Status | Completed |
@@ -89,8 +103,8 @@ Plans:
 | v2.1 Design System | v2.1-1~6 | 14/14 | Shipped | 2026-02-06 |
 | v3.0 Admin Panel | v3-01~06 | 12/12 | Shipped | 2026-02-19 |
 | v4.0 Spec Overhaul | v4-01~09 | 13/13 | Shipped | 2026-02-20 |
-| M7 AI Magazine | m7-01, m7-02 | 7/8 | In Progress | - |
-| **Total** | **7 milestones** | **90/91** | **Active** | - |
+| M7 AI Magazine | m7-01, m7-02, m7-03 | 7/12 | In Progress | - |
+| **Total** | **7 milestones** | **90/95** | **Active** | - |
 
 ---
 

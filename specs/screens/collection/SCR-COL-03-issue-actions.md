@@ -1,167 +1,212 @@
-# [SCR-COL-03] Issue Preview Card and Action Workflows
-> Route: overlay within `/collection` | Status: proposed | Updated: 2026-03-05
-> Milestone: M7 (AI Magazine & Archive Expansion)
-> Parent: SCR-COL-01 — page structure and data loading
+# [SCR-COL-03] Issue Detail Panel and Action Workflows
+> Route: overlay within `/collection` | Status: redesign | Updated: 2026-03-05
+> Milestone: M7 (AI Magazine & Archive Expansion) — Phase m7-03
+> Parent: SCR-COL-01 — page structure, 3D scene setup
 
 ## Purpose
 
-Defines the content shown in `IssuePreviewCard` when a spine is popped out, and the full workflows for Open, Share, and Delete issue actions, plus the filter bar grouping behavior.
+Defines the 2D HTML overlay panel shown when a magazine book is focused in the 3D studio, and the full workflows for Open, Share, and Remove issue actions. Also covers the empty studio state and loading experience.
 
-See: SCR-COL-01 — page layout, data loading, auth gate
-See: SCR-COL-02 — 3D pop-out animation mechanics
+See: SCR-COL-01 — scene setup, room environment, user journey
+See: SCR-COL-02 — 3D camera zoom-in and cover flip mechanics
 
 ## Component Map
 
 | Region | Component | File | Props/Notes |
 |--------|-----------|------|-------------|
-| Preview card | IssuePreviewCard | `packages/web/lib/components/collection/IssuePreviewCard.tsx` | `issue: MagazineIssue`; visible when spine is active |
-| Share sheet | CollectionShareSheet | `packages/web/lib/components/collection/CollectionShareSheet.tsx` | DS BottomSheet; share and export options |
-| Filter bar | CollectionFilterBar | `packages/web/lib/components/collection/CollectionFilterBar.tsx` | `activeFilter`, `onFilterChange`; tabs: All / By Date / By Mood |
-| Delete dialog | Inline or DS Dialog | within `IssuePreviewCard` | Confirmation with issue cover preview |
-
-> All file paths are proposed. Verify against filesystem before implementation.
+| Detail panel | IssueDetailPanel | `lib/components/collection/IssueDetailPanel.tsx` | HTML overlay; visible when camera is focused |
+| Share sheet | CollectionShareSheet | `lib/components/collection/CollectionShareSheet.tsx` | DS BottomSheet; share and export options |
+| Empty studio | EmptyStudio | `lib/components/collection/EmptyStudio.tsx` | Empty 3D room with holographic CTA |
+| Loading | StudioLoader | `lib/components/collection/studio/StudioLoader.tsx` | Suspense fallback with neon progress animation |
+| Remove dialog | Inline in IssueDetailPanel | — | Confirmation with 3D book preview still visible |
 
 ## Layout
 
-### IssuePreviewCard (mobile, spine active)
+### IssueDetailPanel (focused state, HTML overlay)
 
 ```
-+-------------------------------+
-|  [Cover image thumbnail]      |  <- issue.cover_image_url, aspect 2:3
-|  Vol.03  |  2026.03.01        |  <- volume number + generation date
-|  #minimalist #neutral #denim  |  <- theme keywords (up to 3)
-+-------------------------------+
-|  [Open]  [Share]  [Delete]    |  <- action row below card
-+-------------------------------+
++--------------------------------------------------+
+|                                                    |
+|                 (3D book with open cover           |
+|                  visible behind panel)             |
+|                                                    |
+|  +----------------------------------------------+ |
+|  |                                                | |
+|  |  Vol.03 — The Denim Issue                      | |
+|  |  February 7, 2026                              | |
+|  |                                                | |
+|  |  #Denim  #Workwear  #Indigo                    | |
+|  |                                                | |
+|  |  [Open Magazine]  [Share]  [Remove]            | |
+|  |                                                | |
+|  +----------------------------------------------+ |
++--------------------------------------------------+
 ```
 
-### CollectionFilterBar
+- Panel positioned at bottom of viewport (mobile) or bottom-right (desktop)
+- Semi-transparent dark backdrop (bg-black/60 backdrop-blur-md)
+- Entry animation: slide up from bottom, 0.3s
+- #eafd67 accent on volume label and primary action button
+
+### IssueDetailPanel (desktop, right-aligned)
 
 ```
-+-------------------------------+
-| [All]  [By Date]  [By Mood]   |
-+-------------------------------+
-
-Active tab: underline accent (#eafd67), text color primary
-Inactive tab: muted text
++--------------------------------------------------+
+|                                            +-----+|
+|     (3D book open)                         |Vol. ||
+|                                            |03   ||
+|                                            |     ||
+|                                            |Denim||
+|                                            |Issue||
+|                                            |     ||
+|                                            |2026 ||
+|                                            |02.07||
+|                                            |     ||
+|                                            |tags ||
+|                                            |     ||
+|                                            |[Opn]||
+|                                            |[Shr]||
+|                                            |[Rmv]||
+|                                            +-----+|
++--------------------------------------------------+
 ```
 
-### CollectionShareSheet (DS BottomSheet)
+### EmptyStudio
 
 ```
-+-------------------------------+
-|  Share "Vol.03"               |
-|-------------------------------|
-|  [Copy Link]                  |
-|  [Instagram Story]            |
-|  [More options...]            |  <- Web Share API trigger
-+-------------------------------+
++--------------------------------------------------+
+|  [<]                The Decoded Studio         [0]|
+|                                                    |
+|                                                    |
+|                  ╔══════════════╗                  |
+|                 ║  HOLOGRAPHIC  ║                  |  <- Emissive wireframe
+|                ║   MAGAZINE    ║                   |     book outline
+|               ║   OUTLINE     ║                    |     pulsing #eafd67
+|              ╚══════════════╝                      |
+|                                                    |
+|          "Your studio is waiting"                  |
+|          "Generate your first issue"               |
+|                                                    |
+|              [Generate First Issue]                |  <- #eafd67 button
+|                                                    |
+|  ═══════════════════════════════════════════════   |
++--------------------------------------------------+
 ```
 
-### Delete Confirmation Dialog
+- Empty room still has neon lighting and reflective floor
+- Wireframe book outline pulses with #eafd67 emissive glow
+- CTA routes to SCR-MAG-02
+
+### StudioLoader
 
 ```
-+-------------------------------+
-|  Delete Vol.03?               |
-|  [Cover thumbnail]            |
-|  "This issue will be removed  |
-|  from your collection."       |
-|  Credit impact: none          |
-|-------------------------------|
-|  [Cancel]     [Delete]        |
-+-------------------------------+
++--------------------------------------------------+
+|                                                    |
+|                                                    |
+|                                                    |
+|              ████████████░░░░░░░░                  |  <- Neon #eafd67 progress bar
+|                                                    |
+|              Loading your studio...                |
+|                                                    |
+|                                                    |
++--------------------------------------------------+
 ```
+
+- Dark void background, no room geometry yet
+- Thin neon progress bar (actual Suspense progress or indeterminate)
+- "Loading your studio..." text in mag-text/50
 
 ## Requirements
 
-### IssuePreviewCard Content
+### IssueDetailPanel Content
 
-- When a spine is popped out, the system shall render `IssuePreviewCard` showing: cover image (`issue.cover_image_url`), volume label (`Vol.{issue_number}`), generation date formatted as `YYYY.MM.DD`, and up to three theme keywords from `issue.theme_keywords`.
-- When the cover image fails to load, the system shall display a fallback block in `issue.theme_palette.primary` color.
-- When the preview card appears, the system shall animate it with `opacity 0->1` over 0.2s (Motion) synchronized with the spine pop-out.
+- When camera enters focused state, the system shall render `IssueDetailPanel` with: volume label (`Vol.{issue_number}` in #eafd67), issue title (bold, large), generation date formatted as `MMMM D, YYYY`, and up to four theme keywords as pills.
+- When the panel mounts, the system shall animate it sliding up from bottom (translateY 100% -> 0, opacity 0->1, 0.3s, power2.out).
+- When the panel unmounts (deselect), the system shall animate it sliding down (reverse, 0.2s).
 
 ### Open Action
 
-- When the user taps "Open", the system shall navigate to `/magazine/issue/[issue.id]` using the `MagazineRenderer` with `issue.layout_json` read from client cache.
-- When `issue.layout_json` is not cached locally, the system shall show a brief loading indicator while fetching from `GET /api/v1/magazine/collection/[issueId]` before navigating.
+- When the user clicks "Open Magazine", the system shall trigger the exit camera animation, then navigate to `/magazine/issue/[issue.id]` using cached `layout_json`.
+- When `layout_json` is not cached, the system shall show a loading state within the button while fetching.
 
 ### Share Action
 
-- When the user taps "Share", the system shall open `CollectionShareSheet` as a DS BottomSheet with three options: "Copy Link", "Instagram Story", and "More options".
-- When the user selects "Copy Link", the system shall write `https://decoded.kr/magazine/issue/[issue.id]` to the clipboard and display a Sonner toast "Link copied".
-- When the user selects "Instagram Story", the system shall generate a 9:16 canvas from the issue cover image and `Vol.{issue_number}` text overlay, then trigger a browser download of the PNG and display a toast "Saved for Instagram Story".
-- When the user selects "More options" and the browser supports the Web Share API (`navigator.share`), the system shall call `navigator.share({ title, url })` with the issue share URL.
-- When the browser does not support the Web Share API, the system shall hide the "More options" row.
-- When the user long-presses (pointerdown held >500ms) an `IssueSpine` on mobile, the system shall open `CollectionShareSheet` directly without requiring the spine to pop out first.
+- When the user clicks "Share", the system shall open `CollectionShareSheet` as a DS BottomSheet with options: "Copy Link", "Instagram Story", "More options".
+- When "Copy Link" is selected, the system shall copy `https://decoded.kr/magazine/issue/[id]` to clipboard and show Sonner toast "Link copied".
+- When "Instagram Story" is selected, the system shall generate a 9:16 canvas from the 3D book screenshot (via `renderer.domElement.toDataURL()`) with branding overlay, then trigger download. Toast: "Saved for Instagram Story".
+- When "More options" is selected and browser supports Web Share API, the system shall call `navigator.share()`.
+- When Web Share is not supported, the system shall hide "More options".
 
-### Delete Action
+### Remove Action
 
-- When the user taps "Delete", the system shall open a confirmation dialog showing the issue cover thumbnail, volume label, and the message "This issue will be removed from your collection."
-- When credits were consumed to generate the issue, the system shall add "Credit impact: none — credits are not refunded on deletion" to the dialog body.
-- When the user confirms deletion, the system shall call `DELETE /api/v1/magazine/collection/[issue.id]`.
-- When the DELETE request succeeds, the system shall remove the issue from `collectionStore.issues` and trigger the SCR-COL-02 fall-off animation on the spine.
-- When the DELETE request fails, the system shall close the dialog, restore the spine to its active state, and display a Sonner toast "Could not delete. Please try again."
-- When the user taps "Cancel" in the dialog, the system shall close the dialog and leave the spine in its active (popped-out) state.
+- When the user clicks "Remove", the system shall show an inline confirmation within the panel: issue title, "This issue will be removed from your collection.", [Cancel] [Remove] buttons.
+- When confirmed, the system shall:
+  1. Call `DELETE /api/v1/magazine/collection/[issue.id]`
+  2. If success: trigger the 3D dissolve animation (SCR-COL-02), hide panel, remove from store
+  3. If failure: show Sonner toast "Could not remove. Please try again.", keep panel open
+- When cancelled, the system shall return to the normal panel state.
 
-### Filter Bar — All
+### Empty Studio
 
-- When the user selects "All", the system shall display issues sorted by `issue_number` descending with no grouping headers between shelf rows.
-- When `filterMode` is `'all'` on mount (default), the system shall render in this order without waiting for a user action.
+- When no issues exist in collection, the system shall render the 3D room with neon lighting but no magazine objects.
+- When empty, the system shall display a wireframe book outline (EdgesGeometry) with pulsing #eafd67 emissive material.
+- When the user clicks "Generate First Issue", the system shall navigate to `/magazine/personal` (SCR-MAG-02).
 
-### Filter Bar — By Date
+### Studio Loader
 
-- When the user selects "By Date", the system shall group issues by calendar month (derived from `issue.generated_at`) and insert a text label (e.g., "March 2026") as a shelf divider between groups.
-- When a month has more issues than fit on one shelf row, the system shall wrap the overflow to a second row within that month group.
+- When 3D assets are loading (React Suspense boundary), the system shall show `StudioLoader` with a neon progress bar and "Loading your studio..." text.
+- When loading completes, the system shall fade out the loader and begin the entry camera animation.
 
-### Filter Bar — By Mood
+### WebGL Fallback
 
-- When the user selects "By Mood", the system shall cluster issues by `issue.theme_palette.primary` using hue proximity (hue delta < 30 degrees = same cluster) and display each cluster as a shelf group.
-- When a cluster label is shown, the system shall derive a display name from the dominant hue range (e.g., "Warm tones", "Cool tones", "Neutral").
-- When fewer than two mood clusters exist, the system shall fall back to "All" ordering and display a toast "Not enough variety to group by mood yet."
+- When WebGL 2 is not available (checked via `document.createElement('canvas').getContext('webgl2')`), the system shall render `BookshelfViewFallback` — the previous CSS/GSAP bookshelf implementation preserved as a fallback component.
+- When fallback is active, the system shall show a subtle banner: "3D studio requires a modern browser. Showing classic view."
 
 ## State
 
 | Store | Field | Usage |
 |-------|-------|-------|
-| collectionStore (proposed) | `issues: MagazineIssue[]` | Source for filter grouping and deletion removal |
-| collectionStore (proposed) | `activeIssueId: string \| null` | Drives IssuePreviewCard visibility |
-| collectionStore (proposed) | `filterMode: 'all' \| 'by-date' \| 'by-mood'` | Active filter tab; persisted for session |
-| creditStore (proposed) | `selectBalance` | Read to determine credit impact messaging in delete dialog |
-
-> `collectionStore` and `creditStore` are proposed. Files: `packages/web/lib/stores/collectionStore.ts`, `packages/web/lib/stores/creditStore.ts`.
+| magazineStore | `collectionIssues` | Source data for 3D book instances |
+| magazineStore | `activeIssueId` | Synced with focused book |
+| studioStore (new) | `focusedIssueId` | Which book has camera focus |
+| studioStore (new) | `cameraState` | Drives panel visibility |
+| studioStore (new) | `isDetailPanelOpen` | Explicit panel visibility flag |
 
 ## Navigation
 
 | Trigger | Destination | Data Passed |
 |---------|-------------|-------------|
-| "Open" action | `/magazine/issue/[id]` | `issueId`, `layout_json` from cache |
-| "Share" -> Instagram | Browser download (PNG) | Exported 9:16 cover canvas |
-| "Share" -> Web Share | OS share sheet | `{ title: "Vol.N — Decoded", url }` |
-| Delete confirmed | Stays on `/collection` | Spine removed; `collectionStore.issues` updated |
+| "Open Magazine" | `/magazine/issue/[id]` | `issueId`, `layout_json` from cache |
+| "Generate First Issue" | `/magazine/personal` (SCR-MAG-02) | — |
+| Back button | Previous screen (with exit animation) | — |
+| "Instagram Story" | Browser download (PNG) | 3D scene screenshot with branding |
+| "Web Share" | OS share sheet | `{ title, url }` |
 
 ## Error & Empty States
 
 | State | Condition | UI |
 |-------|-----------|-----|
-| Cover image load failure | `cover_image_url` 404 or network error | Solid block in `theme_palette.primary` |
-| Share clipboard blocked | Browser blocks clipboard write | Sonner toast "Could not copy link" |
-| Web Share not supported | `!navigator.share` | "More options" row hidden |
-| Delete API failure | 4xx/5xx from DELETE endpoint | Toast "Could not delete. Please try again."; spine restored |
-| layout_json not cached | Issue opened without cached data | Loading indicator then navigate after fetch |
-| Too few mood clusters | Only one hue cluster | Fall back to "All" ordering + informational toast |
+| Loading | Suspense boundary | StudioLoader with neon progress bar |
+| Empty collection | No issues | EmptyStudio with holographic CTA |
+| Cover texture fail | `cover_image_url` 404 | Solid color face with `theme_palette.accent` |
+| Share clipboard blocked | Browser blocks write | Toast "Could not copy link" |
+| Web Share unsupported | `!navigator.share` | "More options" hidden |
+| Remove API failure | DELETE 4xx/5xx | Toast + panel stays open |
+| WebGL unsupported | No WebGL2 context | CSS fallback bookshelf + banner |
 
 ## Animations
 
 | Trigger | Type | Library | Details |
 |---------|------|---------|---------|
-| Spine active | Preview card appear | Motion | `opacity 0->1`, 0.2s |
-| Spine retract / tap away | Preview card disappear | Motion | `opacity 1->0`, 0.15s |
-| Share sheet open | Slide up | DS BottomSheet default | standard snap-point animation |
-| Delete confirmed | Spine fall-off | GSAP (see SCR-COL-02) | handed off to 3D layer |
-| Filter tab change | Re-group layout | Motion | `opacity 0->1` on row container, 0.3s |
+| Focus arrive | Panel slide up | CSS/Motion | translateY 100%->0, 0.3s |
+| Deselect | Panel slide down | CSS/Motion | translateY 0->100%, 0.2s |
+| Remove confirmed | Book dissolve | R3F/GSAP (SCR-COL-02) | Float up + dissolve, 0.7s |
+| Share sheet | Slide up | DS BottomSheet | Standard snap-point |
+| Empty wireframe | Pulse glow | R3F useFrame | Emissive intensity oscillation |
+| Loader | Progress bar | CSS | Indeterminate neon bar animation |
 
 ---
 
-See: [SCR-COL-01](./SCR-COL-01-bookshelf.md) -- Page structure, data loading, auth gate
-See: [SCR-COL-02](./SCR-COL-02-3d-interaction.md) -- 3D spine animation mechanics
-See: [SCR-MAG-02](../magazine/SCR-MAG-02-personal-issue.md) -- Personal issue generation (collection source)
+See: [SCR-COL-01](./SCR-COL-01-bookshelf.md) -- Scene setup, room environment, user journey
+See: [SCR-COL-02](./SCR-COL-02-3d-interaction.md) -- R3F 3D interaction mechanics
+See: [SCR-MAG-02](../magazine/SCR-MAG-02-personal-issue.md) -- Personal issue generation

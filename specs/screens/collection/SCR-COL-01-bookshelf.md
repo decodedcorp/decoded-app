@@ -1,202 +1,266 @@
-# [SCR-COL-01] My Collection Bookshelf
-> Route: `/collection` | Status: proposed | Updated: 2026-03-05
-> Milestone: M7 (AI Magazine & Archive Expansion)
+# [SCR-COL-01] The Decoded Studio — 3D Collection Room
+> Route: `/collection` | Status: redesign | Updated: 2026-03-05
+> Milestone: M7 (AI Magazine & Archive Expansion) — Phase m7-03
 > Flow: FLW-06 (Magazine Rendering Flow — save destination from SCR-MAG-02)
 
 ## Purpose
 
-User browses their archived personal magazine issues in a 3D bookshelf interface. Each issue is a collectible volume with cover art, creating a "digital library" that rewards continued engagement and triggers re-reading.
+User enters a 3D gallery room ("The Decoded Studio") where their personal magazine issues float in space, illuminated by neon #eafd67 lighting. The experience transforms a flat collection page into an immersive digital showroom that rewards continued engagement and creates a sense of ownership.
 
 ## Design Direction
 
-- **3D Bookshelf:** GSAP `perspective` + `rotateY` renders issues as spines on a shelf. Hover/tap pulls an issue forward on Z-axis with cover half-reveal.
-- **Volume Numbering:** Issues displayed as Vol.01, Vol.02... — evoking periodical collecting behavior.
-- **Ownership Feel:** Dark wood/matte shelf texture background. Accent lighting (#eafd67) on active issue. Subtle dust particle ambient effect.
+- **3D Studio Room:** React Three Fiber (R3F) + Drei renders a dark gallery space with reflective floor, neon accent lighting, and floating magazine objects. User looks into the room with subtle parallax on mouse movement.
+- **Isometric Camera:** Camera positioned at a 30-40deg downward angle, creating an isometric view of the studio. GSAP-driven entry animation simulates "walking into" the space.
+- **Neon Lighting:** #eafd67 linear light sources create bloom glow across the room. `@react-three/postprocessing` Bloom pass for emissive materials.
+- **Magazine Objects:** Each `MagazineIssue` is a 3D book object with UV-mapped cover texture, spine with neon Vol. numbering, and open/close bone animation.
+- **Mannequin Display (Future):** Reserved space for SCR-VTON-01 try-on results displayed on a stylized mannequin prop.
 - **Theme:** Deep Black (#050505) / Neon Chartreuse (#eafd67) — consistent with magazine screens.
+
+## Technology Stack
+
+| Library | Version | Purpose |
+|---------|---------|---------|
+| `@react-three/fiber` | ^9.x | Declarative Three.js in React |
+| `@react-three/drei` | ^10.x | Helpers: OrbitControls, Float, Reflector, Text3D, useGLTF |
+| `@react-three/postprocessing` | ^3.x | Bloom, vignette, chromatic aberration |
+| `three` | 0.167.1 (existing) | 3D engine (already in project) |
+| `gsap` | 3.13.0 (existing) | Camera path animation, entry/exit transitions |
+| `leva` | ^0.10.x (dev only) | Debug panel for tuning lighting/camera in dev |
 
 ## Component Map
 
 | Region | Component | File | Props/Notes |
 |--------|-----------|------|-------------|
-| Page | CollectionPage (server) | `packages/web/app/collection/page.tsx` | async; auth-gated, fetches issue list |
-| Client wrapper | CollectionClient | `packages/web/lib/components/collection/CollectionClient.tsx` | "use client"; 3D bookshelf orchestration |
-| Bookshelf | BookshelfView | `packages/web/lib/components/collection/BookshelfView.tsx` | GSAP perspective container, shelf rows |
-| Shelf row | ShelfRow | `packages/web/lib/components/collection/ShelfRow.tsx` | Single shelf with 4-6 issue spines |
-| Issue spine | IssueSpine | `packages/web/lib/components/collection/IssueSpine.tsx` | 3D rotated spine, hover pop-out, cover peek |
-| Issue preview | IssuePreviewCard | `packages/web/lib/components/collection/IssuePreviewCard.tsx` | Expanded cover with metadata overlay |
-| Filter bar | CollectionFilterBar | `packages/web/lib/components/collection/CollectionFilterBar.tsx` | Date range, mood/theme filter |
-| Empty state | EmptyBookshelf | `packages/web/lib/components/collection/EmptyBookshelf.tsx` | Empty shelf with "Generate your first issue" CTA |
-| Share sheet | CollectionShareSheet | `packages/web/lib/components/collection/CollectionShareSheet.tsx` | DS BottomSheet; share/export options |
-| Bottom nav | NavBar | DS: component-registry | mobile-only; active="profile" or "magazine" |
+| Page | CollectionPage (server) | `app/collection/page.tsx` | async; auth-gated |
+| Client wrapper | CollectionClient | `lib/components/collection/CollectionClient.tsx` | "use client"; orchestrates 3D scene + 2D overlays |
+| 3D Scene | StudioScene | `lib/components/collection/studio/StudioScene.tsx` | R3F Canvas root; camera, lights, postprocessing |
+| Room shell | StudioRoom | `lib/components/collection/studio/StudioRoom.tsx` | Floor (Reflector), walls, ceiling geometry |
+| Lighting | StudioLighting | `lib/components/collection/studio/StudioLighting.tsx` | Neon #eafd67 linear lights, ambient, spot |
+| Magazine rack | MagazineRack | `lib/components/collection/studio/MagazineRack.tsx` | Positions magazine objects in arc/grid layout |
+| Magazine object | MagazineBook | `lib/components/collection/studio/MagazineBook.tsx` | Single 3D book with cover texture, spine, open animation |
+| Camera rig | CameraRig | `lib/components/collection/studio/CameraRig.tsx` | Entry animation, mouse parallax, zoom-to-issue |
+| HUD overlay | StudioHUD | `lib/components/collection/studio/StudioHUD.tsx` | 2D HTML overlay: header, issue count, back button |
+| Issue detail | IssueDetailPanel | `lib/components/collection/IssueDetailPanel.tsx` | 2D overlay panel shown on issue focus |
+| Empty state | EmptyStudio | `lib/components/collection/EmptyStudio.tsx` | Empty room with "Generate First Issue" hologram CTA |
+| Loading | StudioLoader | `lib/components/collection/studio/StudioLoader.tsx` | Suspense fallback with neon loading bar |
 
-> All file paths are proposed (components not yet created). Verify against filesystem before implementation.
+## User Journey
+
+### 1. Entry (진입)
+
+```
+Dark screen -> camera dolly forward through corridor ->
+neon lights flicker on -> studio room revealed ->
+magazines float into position with stagger
+```
+
+- GSAP Timeline drives camera position along a spline curve
+- Duration: 2.5s total (skippable with tap/click)
+- Neon lights animate from 0 to full intensity with flicker
+
+### 2. Browse (탐색)
+
+```
++--------------------------------------------------+
+|  [<]                The Decoded Studio        [5] |  <- StudioHUD (HTML overlay)
+|                                                    |
+|          ╔══════╗  ╔══════╗  ╔══════╗             |
+|         ║Vol.05║  ║Vol.04║  ║Vol.03║              |  <- MagazineBook objects
+|        ║      ║  ║      ║  ║      ║               |     floating with subtle bobbing
+|       ╚══════╝  ╚══════╝  ╚══════╝                |
+|                                                    |
+|              ╔══════╗  ╔══════╗                    |
+|             ║Vol.02║  ║Vol.01║                     |
+|            ║      ║  ║      ║                      |
+|           ╚══════╝  ╚══════╝                       |
+|                                                    |
+|  ═══════════════════════════════════════════════   |  <- Reflector floor
+|  ░░░░░░░ neon glow reflection ░░░░░░░░░░░░░░░░   |
++--------------------------------------------------+
+```
+
+- Mouse movement causes subtle camera parallax (not full orbit)
+- Magazines use Drei `<Float>` for gentle bobbing animation
+- Neon #eafd67 strip lights along walls cast bloom reflections on floor
+
+### 3. Focus (선택)
+
+```
++--------------------------------------------------+
+|  [<]                                          [5] |
+|                                                    |
+|                  ╔════════════╗                    |
+|                 ║            ║                     |  <- Camera zooms to selected
+|                ║  COVER ART  ║                     |     book, cover flips open
+|               ║              ║                     |
+|              ║   Vol.03      ║                     |
+|             ║   Denim Issue  ║                     |
+|            ╚════════════════╝                      |
+|                                                    |
+|  +------------------------------------------+     |
+|  | Vol.03 — The Denim Issue                  |     |  <- IssueDetailPanel (HTML)
+|  | 2026.02.07 | #Denim #Workwear #Indigo     |     |
+|  | [Open Magazine]  [Share]  [Remove]        |     |
+|  +------------------------------------------+     |
++--------------------------------------------------+
+```
+
+- Camera lerps to focused book position over 0.6s
+- Book cover opens with bone/morph animation (30deg flip)
+- Other books fade to 30% opacity
+- IssueDetailPanel slides up as HTML overlay
+
+### 4. Mannequin Display (Future — SCR-VTON-01)
+
+```
++--------------------------------------------------+
+|                                                    |
+|    [Mannequin]         ╔══════╗  ╔══════╗         |
+|    with latest         ║Vol.05║  ║Vol.04║         |
+|    try-on look         ║      ║  ║      ║         |
+|    ▓▓▓▓▓▓▓▓           ╚══════╝  ╚══════╝         |
+|    ▓ LOOK ▓                                       |
+|    ▓▓▓▓▓▓▓▓           ╔══════╗                    |
+|                        ║Vol.03║                    |
+|  ═══════════════════════════════════════════════   |
++--------------------------------------------------+
+```
+
+- Reserved prop position in room layout
+- Texture mapped from VTON result image
+- Neon spot light highlighting mannequin
+- **Deferred to SCR-VTON-01 implementation**
+
+### 5. Exit (퇴장)
+
+- Back button or browser back triggers reverse camera dolly
+- Magazines float away, lights dim, camera retreats through corridor
+- Page transition to previous route after 1.5s animation
 
 ## Layout
 
-### Mobile (default)
+### Mobile (<768px)
 
-**Bookshelf view (issues exist)**
-```
-+-------------------------------+
-| [< Back]  My Collection  [?] |  <- Minimal header with issue count
-+-------------------------------+
-| [All] [By Date] [By Mood]    |  <- CollectionFilterBar
-+-------------------------------+
-|                               |
-| ===== SHELF ROW 1 =====      |  <- ShelfRow with wood/matte texture
-| [Vol.05][Vol.04][Vol.03]      |     IssueSpine: 3D perspective spines
-|  ______ ______ ______         |     rotateY(-15deg), visible spine label
-| ========================      |     shelf edge with shadow
-|                               |
-| ===== SHELF ROW 2 =====      |
-| [Vol.02][Vol.01]              |     Older issues, same 3D treatment
-|  ______ ______                |
-| ========================      |
-|                               |
-+-------------------------------+
-| [NavBar]                      |
-+-------------------------------+
-```
-
-**Issue pop-out (tap/hover on spine)**
-```
-+-------------------------------+
-|                               |
-| ===== SHELF ROW =====        |
-|        [Vol.03]               |  <- Selected spine pops forward
-|        /       \              |     translateZ(60px), rotateY(-5deg)
-|       | COVER   |             |     Cover image half-revealed
-|       | ART     |             |
-|       | Vol.03  |             |
-|       | 2026.03 |             |
-|        \_______/              |
-|                               |
-| [Open] [Share] [Delete]       |  <- Action buttons below pop-out
-|                               |
-+-------------------------------+
-```
-
-**Empty state**
-```
-+-------------------------------+
-| [< Back]  My Collection       |
-+-------------------------------+
-|                               |
-|    ===== EMPTY SHELF =====    |  <- EmptyBookshelf
-|    |                     |    |     Empty wood shelf with subtle shadow
-|    |   (bookshelf icon)  |    |
-|    |                     |    |
-|    =======================    |
-|                               |
-|  "Your bookshelf is empty"    |
-|  Start collecting your        |
-|  personal editions            |
-|                               |
-|  [Generate First Issue]       |  <- Routes to SCR-MAG-02
-|                               |
-+-------------------------------+
-```
+- Canvas fills viewport below sticky header
+- Touch: tap to select issue, swipe not used (conflicts with scroll)
+- Simplified lighting (fewer light sources for performance)
+- Magazine objects slightly larger for touch targets
+- No mouse parallax; gyroscope tilt if available (`DeviceOrientationEvent`)
 
 ### Desktop (>=768px)
 
-Bookshelf expands to wider shelves (5-6 spines per row). Hover reveals cover without tap. DesktopHeader visible; NavBar hidden. Content centered max-w-[1400px].
+- Full viewport Canvas with HUD overlay
+- Mouse parallax camera rig
+- Full bloom postprocessing
+- Richer lighting setup (3+ neon strips)
 
 | Element | Mobile | Desktop |
 |---------|--------|---------|
-| Header | Minimal back bar | DesktopHeader |
-| Spines per row | 3-4 | 5-6 |
-| Pop-out trigger | Tap | Mouse hover (200ms delay) |
-| Cover reveal | Half cover on tap | Full cover peek on hover |
-| Share sheet | DS BottomSheet | Dropdown menu |
-| Bottom nav | NavBar | Hidden |
-| Perspective depth | 800px | 1200px |
+| Camera control | Tap to focus | Mouse parallax + click to focus |
+| Postprocessing | Bloom only | Bloom + vignette + chromatic aberration |
+| Neon lights | 2 strips | 4+ strips with reflections |
+| Magazine size | Larger (touch) | Standard |
+| Entry animation | Shorter (1.5s) | Full (2.5s) |
+| Mannequin | Hidden | Visible (future) |
 
 ## Requirements
 
+### Scene Initialization
+
+- When the page mounts, the system shall render `<Canvas>` with `<Suspense>` wrapping all 3D content, showing `StudioLoader` as fallback.
+- When all assets are loaded, the system shall trigger the entry camera animation via GSAP Timeline.
+- When the user taps/clicks during entry animation, the system shall skip to the final camera position.
+
 ### Data Loading
 
-- When the page mounts, the system shall check `authStore.selectIsLoggedIn`. If not logged in, redirect to `/login` with return URL.
 - When authenticated, the system shall fetch `GET /api/v1/magazine/collection` to retrieve the user's saved issues list.
-- While fetching, the system shall display shelf skeleton placeholders (empty shelf rows with pulsing spine outlines).
-- When fetch succeeds with issues, the system shall render `BookshelfView` with issues sorted by `issue_number` descending (newest first, top shelf).
-- When fetch succeeds with empty array, the system shall render `EmptyBookshelf` with "Generate First Issue" CTA.
-- When fetch fails, the system shall display error state with retry button.
+- When fetch succeeds with issues, the system shall instantiate `MagazineBook` objects positioned by `MagazineRack` layout algorithm.
+- When fetch succeeds with empty array, the system shall render `EmptyStudio` with holographic "Generate First Issue" CTA.
+- When not authenticated, the system shall redirect to `/login` with return URL.
 
-### 3D Bookshelf Rendering
+### 3D Room Environment
 
-- When issues are loaded, the system shall create a GSAP context with `perspective: 800px` (mobile) or `1200px` (desktop) on the bookshelf container.
-- When rendering spines, the system shall apply `rotateY(-15deg)` and `translateZ(0)` as default pose, with `theme_palette.primary` as spine background color.
-- When rendering shelf rows, the system shall distribute 3-4 spines per row (mobile) or 5-6 (desktop), wrapping overflow to next shelf.
-- When the bookshelf first renders, the system shall animate spines appearing with staggered fade-in (0.1s interval per spine, bottom shelf first).
+- When `StudioRoom` renders, the system shall create a dark gallery room (8m x 6m x 4m) with matte black walls and a `<Reflector>` floor plane.
+- When `StudioLighting` renders, the system shall place #eafd67 emissive mesh strip lights along upper walls with `<EffectComposer>` Bloom pass (intensity 1.5, luminanceThreshold 0.6).
+- When ambient light renders, the system shall use low intensity (0.15) warm white to maintain dark mood.
 
-### Issue Pop-out Interaction
+### Magazine Object Rendering
 
-- When the user taps (mobile) or hovers for 200ms (desktop) on an `IssueSpine`, the system shall animate: `translateZ(60px)`, `rotateY(-5deg)`, duration 0.4s, ease "back.out(1.7)".
-- When an issue is popped out, the system shall reveal `IssuePreviewCard` showing: cover image, volume number, generation date, theme keywords.
-- When the user taps away or hovers off, the system shall reverse the pop-out animation to default spine pose.
-- When only one issue can be popped out at a time: selecting a new spine shall retract the previous one first.
+- When a `MagazineBook` renders, the system shall create a box geometry (aspect 2:3, depth 0.15) with UV-mapped cover texture from `issue.cover_image_url`.
+- When the spine face renders, the system shall display `Vol.{issue_number}` in #eafd67 emissive text with glow, plus the issue title vertically.
+- When books are positioned, `MagazineRack` shall arrange them in a gentle arc or staggered grid with 30-40cm spacing.
+- When idle, books shall use Drei `<Float>` with `speed={1.5}` and `floatIntensity={0.3}` for gentle bobbing.
 
-### Issue Actions
+### Camera Interactions
 
-- When an issue is popped out, the system shall display action buttons: "Open", "Share", "Delete".
-- When the user taps "Open", the system shall navigate to the rendered magazine view (reuse `MagazineRenderer` with stored `layout_json`).
-- When the user taps "Share", the system shall open `CollectionShareSheet` with options: Copy Link, Instagram Story (image export), Web Share API.
-- When the user long-presses (mobile) a spine, the system shall open the share sheet directly (shortcut).
-- When the user taps "Delete", the system shall show a confirmation dialog, then call `DELETE /api/v1/magazine/collection/[issueId]` and remove the spine with a GSAP fall-off animation.
+- When the mouse moves (desktop), the system shall apply subtle parallax to camera position (max 5deg rotation, damped with lerp factor 0.05).
+- When the user clicks a `MagazineBook`, the system shall lerp the camera to a position 1m in front of the book over 0.6s with ease "power2.inOut".
+- When focused on a book, the system shall animate the book cover open (rotateY on cover mesh: 0 -> -30deg, 0.5s).
+- When the user clicks away or presses Escape, the system shall reverse the focus animation and return camera to browse position.
 
-### Filtering
+### Performance
 
-- When the user selects "By Date", the system shall group issues by month with month divider labels between shelf rows.
-- When the user selects "By Mood", the system shall group issues by `theme_palette` similarity (clustering by dominant color).
-- When the user selects "All", the system shall return to default volume-number ordering.
-
-### ScrollTrigger Shelf Animation
-
-- When the user scrolls down to reveal lower shelves, the system shall animate each shelf row entry with GSAP ScrollTrigger (translateY 30->0, opacity 0->1, 0.5s).
-- When scrolling back up, shelves remain visible (once: true).
+- When on mobile, the system shall reduce: shadow map resolution, number of lights, postprocessing passes.
+- When frame rate drops below 30fps for 2 consecutive seconds, the system shall disable Bloom and reduce geometry detail.
+- When `MagazineBook` textures load, the system shall use progressive loading (low-res placeholder -> full-res swap).
 
 ## State
 
 | Store | Usage |
 |-------|-------|
-| collectionStore (proposed) | `issues: MagazineIssue[]`, `isLoading`, `activeIssueId`, `filterMode` |
+| magazineStore | `collectionIssues: MagazineIssue[]`, `isLoading`, `activeIssueId`, `loadCollection()` |
 | authStore | `selectIsLoggedIn` for auth gate |
-| magazineStore | Read `personalIssue` for "just generated" badge indicator |
-
-> `collectionStore` is lightweight — may be merged into `magazineStore` if scope stays small.
+| studioStore (new) | `cameraState: 'entry' \| 'browse' \| 'focused'`, `focusedIssueId`, `entryComplete` |
 
 ## Navigation
 
 | Trigger | Destination | Data Passed |
 |---------|-------------|-------------|
-| "Open" action | `/magazine/issue/[id]` (rendered view) | issueId, layout_json from cache |
+| "Open Magazine" action | `/magazine/issue/[id]` | issueId, layout_json from cache |
 | "Generate First Issue" CTA | `/magazine/personal` (SCR-MAG-02) | - |
-| Back button | Previous screen | - |
+| Back button | Previous screen (with exit animation) | - |
 | Share -> Instagram | External (Instagram app) | Exported cover image |
 
 ## Error & Empty States
 
 | State | Condition | UI |
 |-------|-----------|-----|
-| Loading | Initial fetch | Shelf skeleton (empty rows with pulsing outlines) |
-| Empty | No saved issues | EmptyBookshelf with CTA to SCR-MAG-02 |
-| Error | API failure | Error card with retry button |
-| Delete confirm | User taps delete | Confirmation dialog with issue cover preview |
-| Delete animation | Confirmed | Spine falls off shelf (rotateX 90deg, opacity 0, 0.6s) |
+| Loading | Assets + data loading | StudioLoader: neon progress bar in dark void |
+| Empty | No saved issues | EmptyStudio: empty room with holographic CTA |
+| Error | API failure | Error overlay with retry button |
+| WebGL not supported | No WebGL context | Fallback to CSS bookshelf (previous implementation) |
+| Low performance | <30fps sustained | Auto-disable postprocessing, reduce lights |
+
+## 3D Asset Requirements
+
+| Category | Asset | Spec | Notes |
+|----------|-------|------|-------|
+| Room | Procedural geometry | R3F box/plane primitives | No GLB needed; programmatic |
+| Magazine | Procedural geometry | Box geometry with UV faces | Cover texture from API data |
+| Lighting | Emissive mesh strips | BoxGeometry with emissive material | #eafd67 glow |
+| Floor | Drei Reflector | Plane with reflection | Neon reflections |
+| Text | Drei Text/Text3D | Vol. numbering on spines | #eafd67 emissive |
+| Mannequin (future) | `Stylized_Dummy.glb` | Abstract human form | Deferred to VTON |
+
+> Phase 1 uses **procedural geometry only** (no external GLB files). GLB models deferred to future phases when mannequin/props are needed.
 
 ## Animations
 
 | Trigger | Type | Library | Details |
 |---------|------|---------|---------|
-| Page mount | Staggered spine entry | GSAP | opacity 0->1, 0.1s stagger, bottom shelf first |
-| Spine hover/tap | Pop-out | GSAP | translateZ 0->60px, rotateY -15->-5deg, 0.4s, back.out(1.7) |
-| Spine deselect | Retract | GSAP | Reverse pop-out, 0.3s |
-| Scroll to shelf | Shelf reveal | GSAP ScrollTrigger | translateY 30->0, opacity 0->1, 0.5s, once |
-| Delete | Fall off shelf | GSAP | rotateX 0->90deg, opacity 1->0, 0.6s, ease "power2.in" |
-| Page exit | Context revert | GSAP | gsapContext.revert() on unmount |
+| Page mount | Entry camera dolly | GSAP Timeline | Camera along spline, 2.5s, skippable |
+| Entry complete | Magazine float-in | R3F/GSAP | Staggered position from below, 0.8s each |
+| Idle | Magazine bobbing | Drei Float | speed=1.5, floatIntensity=0.3 |
+| Mouse move | Camera parallax | R3F useFrame | Damped lerp, max 5deg |
+| Issue click | Camera zoom-in | GSAP | Lerp to book, 0.6s, power2.inOut |
+| Issue focus | Cover flip open | R3F/GSAP | rotateY 0 -> -30deg, 0.5s |
+| Deselect | Camera zoom-out | GSAP | Reverse to browse pos, 0.5s |
+| Exit | Camera retreat | GSAP Timeline | Reverse entry, 1.5s |
+| Neon lights | Flicker on entry | GSAP | Intensity 0->1 with flicker, 0.8s |
 
 ---
 
+See: [SCR-COL-02](./SCR-COL-02-3d-interaction.md) -- R3F interaction mechanics
+See: [SCR-COL-03](./SCR-COL-03-issue-actions.md) -- Issue actions and detail panel
 See: [SCR-MAG-01](../magazine/SCR-MAG-01-daily-editorial.md) -- Daily editorial (discovery entry)
 See: [SCR-MAG-02](../magazine/SCR-MAG-02-personal-issue.md) -- Personal issue generation (collection source)
-See: [FLW-06](../../flows/FLW-06-magazine-rendering.md) -- Magazine rendering flow

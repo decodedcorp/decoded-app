@@ -1,150 +1,210 @@
-# [SCR-COL-02] 3D Bookshelf Interaction Layer
-> Route: overlay within `/collection` | Status: proposed | Updated: 2026-03-05
-> Milestone: M7 (AI Magazine & Archive Expansion)
-> Parent: SCR-COL-01 — page structure and data loading
+# [SCR-COL-02] R3F 3D Interaction Layer
+> Route: overlay within `/collection` | Status: redesign | Updated: 2026-03-05
+> Milestone: M7 (AI Magazine & Archive Expansion) — Phase m7-03
+> Parent: SCR-COL-01 — page structure, 3D scene setup
 
 ## Purpose
 
-Defines the GSAP 3D perspective mechanics that animate `IssueSpine` components on each `ShelfRow`, including pop-out, retract, delete fall-off, staggered entrance, and ScrollTrigger shelf reveals.
+Defines the React Three Fiber interaction mechanics for the Decoded Studio: camera rig behavior, magazine object interactions (hover glow, click-to-focus, cover flip), mouse parallax, and performance adaptation.
 
-See: SCR-COL-01 — page layout, data fetching, auth gate
-See: SCR-COL-03 — issue preview card and action workflows
+See: SCR-COL-01 — scene setup, room environment, data loading
+See: SCR-COL-03 — issue detail panel and action workflows
 
 ## Component Map
 
 | Region | Component | File | Props/Notes |
 |--------|-----------|------|-------------|
-| 3D container | BookshelfView | `packages/web/lib/components/collection/BookshelfView.tsx` | GSAP context root; sets `perspective` CSS on wrapper ref |
-| Shelf unit | ShelfRow | `packages/web/lib/components/collection/ShelfRow.tsx` | ScrollTrigger target; receives `issues: MagazineIssue[]` slice |
-| Spine element | IssueSpine | `packages/web/lib/components/collection/IssueSpine.tsx` | `issue`, `isActive`, `onSelect`, `onDeselect`; owns hover delay timer |
+| Camera rig | CameraRig | `lib/components/collection/studio/CameraRig.tsx` | `useFrame` for parallax; GSAP for entry/focus/exit |
+| Magazine object | MagazineBook | `lib/components/collection/studio/MagazineBook.tsx` | Hover glow, click handler, cover flip animation |
+| Magazine layout | MagazineRack | `lib/components/collection/studio/MagazineRack.tsx` | Arc/grid positioning algorithm for N issues |
+| Postprocessing | StudioEffects | `lib/components/collection/studio/StudioEffects.tsx` | Bloom, vignette, optional chromatic aberration |
+| Raycaster | Built-in R3F | — | `onPointerOver`, `onPointerOut`, `onClick` on meshes |
 
-> All file paths are proposed. Verify against filesystem before implementation.
+## Camera States & Transitions
 
-## Layout
-
-### Perspective Setup
-
-```
-BookshelfView wrapper
-  perspective: 800px  (mobile <768px)
-  perspective: 1200px (desktop >=768px)
-  transform-style: preserve-3d
-
-  ShelfRow (each)
-    IssueSpine — default pose:
-      rotateY(-15deg)  translateZ(0)  opacity: 1
-
-    IssueSpine — active (pop-out):
-      rotateY(-5deg)   translateZ(60px)
-      (cover half-revealed behind spine)
-```
-
-### Staggered Entrance Sequence
+### State Machine
 
 ```
-Page mount ->
+[entry] ---(animation complete)---> [browse] ---(click book)---> [focused]
+                                       ^                              |
+                                       |-----(click away / ESC)-------|
+[any] ---(back button)---> [exit] ---> navigate away
+```
 
-  ShelfRow (bottom / oldest, last in DOM)
-    IssueSpine[0] -> opacity 0->1  (t=0)
-    IssueSpine[1] -> opacity 0->1  (t=0.1s)
-    ...
-  ShelfRow (top / newest, first in DOM)
-    IssueSpine[0] -> opacity 0->1  (t=Ns)
-    ...
+### Entry Camera Path
 
-Each spine: duration 0.4s, stagger 0.1s, bottom shelf first (reversed DOM order)
+```
+Camera starts at: (0, 1.5, -8)  — behind corridor
+Camera ends at:   (0, 3.0,  6)  — elevated isometric view
+LookAt target:    (0, 0.5,  0)  — center of room, slightly below eye
+
+Timeline:
+  0.0s — Black screen, camera at start
+  0.5s — Corridor ambient light fades in
+  1.0s — Camera begins dolly forward
+  1.8s — Neon lights flicker on (3 quick on/off then steady)
+  2.0s — Camera reaches final browse position
+  2.5s — Magazine float-in stagger begins
+```
+
+### Browse Camera (Parallax)
+
+```
+useFrame callback:
+  target.x = mouse.x * parallaxIntensity  (0.3 default)
+  target.y = base.y + mouse.y * 0.15
+  camera.position.lerp(target, dampFactor)  (0.05)
+  camera.lookAt(roomCenter)
+```
+
+- Desktop: mouse-driven parallax
+- Mobile: optional gyroscope via `DeviceOrientationEvent` (with permission prompt), else static
+
+### Focus Camera (Zoom to Book)
+
+```
+On click MagazineBook:
+  1. Store current browse camera position
+  2. Calculate focus position: book.position + normal * 1.2m
+  3. GSAP tween camera.position to focus position (0.6s, power2.inOut)
+  4. GSAP tween lookAt to book.position (0.6s)
+  5. After camera arrives: trigger cover flip animation on book
+  6. Fade non-focused books to opacity 0.3
+```
+
+### Exit Camera
+
+```
+On back button or page leave:
+  1. If focused: reverse focus first (0.3s)
+  2. Reverse entry path: camera retreats to corridor
+  3. Neon lights dim (intensity 1 -> 0, 1.0s)
+  4. After 1.5s: trigger Next.js page navigation
 ```
 
 ## Requirements
 
-### Perspective Initialization
+### Mouse Parallax (Browse State)
 
-- When `BookshelfView` mounts, the system shall create a GSAP context scoped to the bookshelf container ref.
-- When viewport width is below 768px, the system shall apply `perspective: 800px` to the container.
-- When viewport width is 768px or above, the system shall apply `perspective: 1200px` to the container.
-- When `BookshelfView` unmounts, the system shall call `gsapContext.revert()` to clean up all GSAP tweens and ScrollTriggers.
+- When in browse state on desktop, the system shall track normalized mouse position (-1 to 1) and apply it as camera position offset with lerp damping (factor 0.05).
+- When parallax intensity exceeds 5 degrees from center, the system shall clamp the offset.
+- When on mobile without gyroscope, the system shall keep the camera static at the browse position.
+- When on mobile with gyroscope permission granted, the system shall map device orientation beta/gamma to camera parallax with reduced intensity (0.15).
 
-### Default Spine Pose
+### Magazine Hover Interaction
 
-- When an `IssueSpine` renders without `isActive`, the system shall set `rotateY(-15deg)` and `translateZ(0)` as the resting transform using `gsap.set`.
-- When the spine background color is set, the system shall use `issue.theme_palette.primary` as the spine surface color.
+- When the pointer enters a `MagazineBook` mesh (R3F `onPointerOver`), the system shall:
+  1. Scale the book to 1.08x over 0.2s
+  2. Increase the spine's #eafd67 emissive intensity from 1.0 to 2.5
+  3. Change cursor to pointer (`document.body.style.cursor = 'pointer'`)
+- When the pointer leaves (`onPointerOut`), the system shall reverse all hover effects over 0.2s.
+- When hovering on mobile (touch), the system shall skip hover effects (tap-to-focus only).
 
-### Pop-out Animation (Active State)
+### Click-to-Focus Interaction
 
-- When the user taps an `IssueSpine` on mobile, the system shall animate that spine to `translateZ(60px)` and `rotateY(-5deg)` over 0.4s with ease `back.out(1.7)`.
-- When the user hovers over an `IssueSpine` on desktop for 200ms without leaving, the system shall trigger the same pop-out animation (0.4s, `back.out(1.7)`).
-- When a hover intent timer is active and the pointer leaves before 200ms, the system shall cancel the timer and not trigger pop-out.
-- When a spine is popped out, the system shall set `collectionStore.activeIssueId` to that issue's id.
+- When the user clicks a `MagazineBook` in browse state, the system shall transition camera to focus state targeting that book.
+- When the camera focus animation completes, the system shall:
+  1. Animate the book cover mesh (front face) to `rotateY(-30deg)` over 0.5s, revealing inner pages texture
+  2. Display `IssueDetailPanel` (HTML overlay) with issue metadata and action buttons
+  3. Set `studioStore.focusedIssueId` to the clicked issue's id
+- When another book is clicked while already focused, the system shall first close the current book (0.3s), then transition to the new book.
 
-### Single-Active Constraint
+### Deselect / Unfocus
 
-- When a spine is selected while another spine is already active, the system shall first animate the previously active spine back to default pose (0.3s reverse) before starting the new pop-out.
-- When `collectionStore.activeIssueId` changes to a different id, `BookshelfView` shall trigger the retract tween on the previously active spine ref.
+- When the user clicks on empty space (no mesh hit) while focused, the system shall:
+  1. Close the book cover (reverse rotateY, 0.3s)
+  2. Hide `IssueDetailPanel`
+  3. Return camera to browse position (0.5s)
+  4. Restore all books to full opacity
+- When the user presses Escape while focused, the system shall trigger the same deselect sequence.
 
-### Retract Animation
+### Cover Flip Animation
 
-- When the user taps an active spine again on mobile, the system shall animate it back to `translateZ(0)` and `rotateY(-15deg)` over 0.3s and clear `collectionStore.activeIssueId`.
-- When the user moves the pointer off an active spine on desktop (and no action button is hovered), the system shall retract the spine over 0.3s.
-- When the user taps outside any spine, the system shall retract the active spine if one exists.
+```
+Book mesh structure:
+  Group
+  ├── SpineMesh (box, narrow)  — always visible
+  ├── BackCover (plane)         — always visible
+  ├── FrontCover (plane)        — rotates on Y axis (hinge on left edge)
+  │   └── UV mapped to cover_image_url
+  └── PagesMesh (box, thin)     — visible when cover opens
 
-### Delete Fall-off Animation
+Focus animation:
+  FrontCover.rotation.y: 0 -> -PI/6 (30deg open)
+  duration: 0.5s
+  ease: power2.out
 
-- When a delete action is confirmed (see SCR-COL-03), the system shall animate the target spine: `rotateX(90deg)`, `opacity(0)`, duration 0.6s, ease `power2.in`.
-- When the fall-off animation completes, the system shall remove the spine from the DOM and re-distribute remaining spines within the row.
+Unfocus:
+  FrontCover.rotation.y: -PI/6 -> 0
+  duration: 0.3s
+```
 
-### Staggered Entrance Animation
+### Delete Animation (from SCR-COL-03)
 
-- When `BookshelfView` first renders with issues loaded, the system shall animate all spines from `opacity(0)` to `opacity(1)`, duration 0.4s per spine, stagger 0.1s.
-- When staggering, the system shall start from the bottom shelf (highest `issue_number` index in DOM order) and work upward so older issues appear first.
+- When a delete is confirmed, the system shall animate the `MagazineBook`:
+  1. Float upward 0.5m (0.3s)
+  2. Dissolve with opacity 1->0 and scale 1->0.5 (0.4s)
+  3. Small particle burst in #eafd67 (optional, GPU budget permitting)
+  4. Remove from scene after animation
 
-### ScrollTrigger Shelf Reveals
+### Performance Adaptation
 
-- When a `ShelfRow` enters the viewport during downward scroll, the system shall animate it from `translateY(30px), opacity(0)` to `translateY(0), opacity(1)` over 0.5s.
-- When `once: true` is set on the ScrollTrigger, the system shall not re-animate a shelf that has already been revealed on scroll-up.
-- When the page has fewer than two shelf rows, the system shall skip ScrollTrigger registration (all content visible on mount).
+- When `StudioEffects` mounts, the system shall measure initial frame rate over 60 frames.
+- When average FPS drops below 30 for 2 consecutive seconds:
+  1. Disable Bloom postprocessing
+  2. Reduce Reflector resolution from 1024 to 256
+  3. Disable chromatic aberration and vignette
+  4. Set `studioStore.qualityLevel = 'low'`
+- When on mobile, the system shall default to `qualityLevel: 'medium'` (Bloom only, no vignette/chromatic).
+- When WebGL 2 is not available, the system shall fall back to the CSS/GSAP bookshelf (previous implementation preserved as `BookshelfViewFallback`).
 
 ## State
 
 | Store | Field | Usage |
 |-------|-------|-------|
-| collectionStore (proposed) | `activeIssueId: string \| null` | Tracks which spine is currently popped out; drives single-active constraint |
-| collectionStore (proposed) | `issues: MagazineIssue[]` | Source list for spine rendering and row distribution |
-
-> `collectionStore` is proposed and not yet implemented. File: `packages/web/lib/stores/collectionStore.ts`.
+| studioStore (new) | `cameraState: 'entry' \| 'browse' \| 'focused' \| 'exit'` | Drives camera rig behavior |
+| studioStore (new) | `focusedIssueId: string \| null` | Which book is focused |
+| studioStore (new) | `entryComplete: boolean` | Blocks interaction until entry animation done |
+| studioStore (new) | `qualityLevel: 'high' \| 'medium' \| 'low'` | Performance adaptation level |
+| magazineStore | `activeIssueId` | Synced with `focusedIssueId` for consistency |
 
 ## Interaction States
 
-| State | Transform | Duration | Ease |
-|-------|-----------|----------|------|
-| Default (resting) | `rotateY(-15deg) translateZ(0)` | — | `gsap.set` |
-| Pop-out (active) | `rotateY(-5deg) translateZ(60px)` | 0.4s | `back.out(1.7)` |
-| Retract | reverse to default | 0.3s | default |
-| Delete fall-off | `rotateX(90deg) opacity(0)` | 0.6s | `power2.in` |
-| Entrance | `opacity 0->1` | 0.4s | default, stagger 0.1s |
-| Shelf reveal | `translateY(30->0) opacity(0->1)` | 0.5s | ScrollTrigger |
+| State | Camera | Books | UI Overlay |
+|-------|--------|-------|------------|
+| Entry | Dolly along spline | Not visible -> stagger in | StudioLoader -> HUD |
+| Browse | Parallax on mouse | Float animation, full opacity | HUD (header + count) |
+| Hover (browse) | No change | Hovered: scale 1.08, glow up | Cursor: pointer |
+| Focused | Zoomed to book | Selected: cover open; others: 30% opacity | IssueDetailPanel |
+| Exit | Retreat through corridor | Float away, fade out | HUD fades |
 
 ## Error States
 
 | State | Condition | Handling |
 |-------|-----------|---------|
-| GSAP context missing | Ref not mounted before context creation | Guard with `if (!containerRef.current) return` |
-| Animation interrupted | User taps new spine mid-retract | Kill previous tween; start new pop-out immediately |
-| Single spine in row | Only one issue on a shelf | Normal pop-out; no redistribution needed |
+| WebGL not supported | `!renderer.capabilities.isWebGL2` | Render CSS fallback bookshelf |
+| Texture load failure | `cover_image_url` 404 | Use solid color plane with `theme_palette.accent` |
+| Camera animation interrupted | User clicks during transition | Queue action, execute after current tween completes |
+| Frame drop | Sustained <30fps | Auto-reduce quality level |
+| R3F context lost | GPU memory pressure | Attempt context restore; show error overlay if fails |
 
 ## Animations Summary
 
 | Trigger | Type | Library | Details |
 |---------|------|---------|---------|
-| Component mount | Perspective set | GSAP `gsap.set` | `perspective` CSS on container |
-| Spine render | Default pose | GSAP `gsap.set` | `rotateY(-15deg) translateZ(0)` |
-| Tap / hover 200ms | Pop-out | GSAP `gsap.to` | 0.4s, `back.out(1.7)` |
-| Tap active / hover-off | Retract | GSAP `gsap.to` | 0.3s |
-| Delete confirmed | Fall-off | GSAP `gsap.to` | 0.6s, `power2.in` |
-| Issues loaded | Staggered entrance | GSAP `gsap.fromTo` | stagger 0.1s, bottom-first |
-| Shelf enters viewport | Shelf reveal | GSAP ScrollTrigger | 0.5s, once |
-| Component unmount | Context cleanup | GSAP | `gsapContext.revert()` |
+| Mount | Entry camera dolly | GSAP Timeline | 2.5s spline path, skippable |
+| Entry done | Magazine float-in | GSAP stagger | translateY below->position, 0.8s each, 0.15s stagger |
+| Mouse move | Camera parallax | R3F useFrame | Damped lerp, 0.05 factor |
+| Hover book | Scale + glow | R3F/GSAP | Scale 1->1.08, emissive up, 0.2s |
+| Click book | Camera zoom | GSAP | 0.6s to book, power2.inOut |
+| Focus arrive | Cover flip | GSAP | rotateY 0 -> -30deg, 0.5s |
+| Click away | Unfocus reverse | GSAP | Close cover 0.3s, camera back 0.5s |
+| Delete | Dissolve up | GSAP | Float up + scale down + fade, 0.7s total |
+| Back button | Exit retreat | GSAP Timeline | Reverse entry, 1.5s |
+| Neon entry | Flicker on | GSAP | 3 flickers then steady, 0.8s |
+| Idle | Book bobbing | Drei Float | Continuous, speed 1.5 |
 
 ---
 
-See: [SCR-COL-01](./SCR-COL-01-bookshelf.md) -- Page structure, data loading, auth gate
-See: [SCR-COL-03](./SCR-COL-03-issue-actions.md) -- Issue preview card and action workflows
+See: [SCR-COL-01](./SCR-COL-01-bookshelf.md) -- Scene setup, room environment, data loading
+See: [SCR-COL-03](./SCR-COL-03-issue-actions.md) -- Issue detail panel and action workflows
