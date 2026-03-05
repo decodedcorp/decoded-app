@@ -20,12 +20,10 @@ export default async function Home() {
     fetchPostsServer({ sort: "popular", per_page: 5 }),
     fetchPostsServer({ sort: "popular", per_page: 4 }),
     fetchPostsServer({
-      has_solutions: true,
       sort: "recent",
       per_page: 6,
     }),
     fetchPostsServer({
-      has_solutions: false,
       sort: "recent",
       per_page: 6,
     }),

@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 Phase: None — between milestones
 Plan: Not started
 Status: Ready to plan next milestone
-Last activity: 2026-02-20 — v4.0 milestone archived
+Last activity: 2026-03-05 — Completed quick task 039: fix fetchPostsServer 400 error
 
 Progress: 6 milestones shipped [██████████] 83/83 plans complete
 
@@ -42,10 +42,16 @@ Decisions are logged in PROJECT.md Key Decisions table.
 
 None.
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 039 | Fix fetchPostsServer 400 error (has_solutions param) | 2026-03-05 | e9303d8 | [039-fix-fetchpostsserver-400-has-solutions](./quick/039-fix-fetchpostsserver-400-has-solutions/) |
+
 ## Session Continuity
 
-Last session: 2026-02-20
-Stopped at: v4.0 milestone archived — ready for next milestone
+Last session: 2026-03-05
+Stopped at: Completed quick task 039: fix fetchPostsServer 400 error
 Resume file: None
 
 ---
