@@ -14,10 +14,9 @@ interface EditorialHeroProps {
 }
 
 /**
- * EditorialHero - Cinematic hero with text-behind-image depth layering.
- *
- * Uses a single large cover image overlapping the title to create
- * clean depth illusion without visual noise.
+ * EditorialHero - Two-column cinematic hero.
+ * Left: oversized title + metadata. Right: cover image with accent glow.
+ * Clean separation — no confusing overlap.
  */
 export function EditorialHero({
   title,
@@ -28,10 +27,6 @@ export function EditorialHero({
   const sectionRef = useRef<HTMLElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
 
-  const titleWords = title.split(" ");
-  const frontWords = titleWords.slice(0, Math.ceil(titleWords.length / 2));
-
-  // Parallax scroll on cover image
   useEffect(() => {
     const section = sectionRef.current;
     const img = imageRef.current;
@@ -39,7 +34,7 @@ export function EditorialHero({
 
     const ctx = gsap.context(() => {
       gsap.to(img, {
-        y: -40,
+        y: -30,
         scrollTrigger: {
           trigger: section,
           start: "top top",
@@ -57,71 +52,60 @@ export function EditorialHero({
   return (
     <section
       ref={sectionRef}
-      className="relative overflow-hidden px-6 pb-10 pt-16 md:px-10 md:pt-24"
+      className="relative px-6 pb-10 pt-16 md:px-10 md:pt-24"
     >
-      {/* Label */}
-      <p className="mb-5 text-[10px] font-medium uppercase tracking-[0.3em] text-mag-accent/70">
-        Featured Narrative
-      </p>
+      {/* Two-column grid */}
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:items-end md:gap-12">
+        {/* Left: Text content */}
+        <div className="flex flex-col justify-end">
+          <p className="mb-4 text-[10px] font-medium uppercase tracking-[0.3em] text-mag-accent/70">
+            Featured Narrative
+          </p>
 
-      {/* Two-column layout: Title left, Image right */}
-      <div className="relative mb-8">
-        {/* Back title layer (z-10) — full width, overlaps into image zone */}
-        <h1
-          className="relative z-10 font-bold uppercase leading-[0.9] text-mag-text"
-          style={{ fontSize: "clamp(3rem, 8vw, 5.5rem)" }}
-        >
-          {title}
-        </h1>
+          <h1
+            className="mb-5 font-bold uppercase leading-[0.9] text-mag-text"
+            style={{ fontSize: "clamp(2.5rem, 7vw, 5rem)" }}
+          >
+            {title}
+          </h1>
 
-        {/* Cover image (z-20) — overlaps right portion of title */}
+          {subtitle && (
+            <p className="mb-6 max-w-sm text-sm leading-relaxed text-mag-text/50">
+              {subtitle}
+            </p>
+          )}
+
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] uppercase tracking-[0.2em] text-mag-accent/60">
+              View Editorial
+            </span>
+            <div className="h-px flex-1 bg-mag-accent/20" />
+          </div>
+        </div>
+
+        {/* Right: Cover image with accent glow */}
         <div
           ref={imageRef}
-          className="absolute right-0 top-0 h-full w-[50%] md:w-[45%]"
-          style={{ zIndex: 20 }}
+          className="relative overflow-hidden rounded-sm"
+          style={{
+            boxShadow: "0 0 40px rgba(234,253,103,0.08), -4px 4px 0 rgba(234,253,103,0.15)",
+          }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={heroImage}
             alt=""
-            className="h-full w-full rounded-sm object-cover"
+            className="w-full object-cover"
+            style={{ aspectRatio: "4/5" }}
           />
-          {/* Fade edge into background */}
-          <div className="absolute inset-0 bg-gradient-to-r from-mag-bg via-transparent to-transparent" />
-          {/* Glitch accent line */}
+          {/* Bottom gradient fade */}
+          <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-mag-bg to-transparent" />
+          {/* Accent line */}
           <div
-            className="absolute bottom-4 left-0 h-px w-[60%]"
+            className="absolute bottom-0 left-0 h-[2px] w-1/2"
             style={{ background: "linear-gradient(to right, #eafd67, transparent)" }}
           />
         </div>
-
-        {/* Front title layer (z-30) — first words appear ON TOP of image */}
-        <h1
-          aria-hidden="true"
-          className="pointer-events-none absolute left-0 top-0 z-30 font-bold uppercase leading-[0.9]"
-          style={{
-            fontSize: "clamp(3rem, 8vw, 5.5rem)",
-            color: "transparent",
-            WebkitTextStroke: "1.5px rgba(245,245,245,0.7)",
-          }}
-        >
-          {frontWords.join(" ")}
-        </h1>
-      </div>
-
-      {/* Subtitle */}
-      {subtitle && (
-        <p className="mb-8 max-w-md text-sm leading-relaxed text-mag-text/50">
-          {subtitle}
-        </p>
-      )}
-
-      {/* View Editorial CTA line */}
-      <div className="flex items-center gap-3">
-        <span className="text-[10px] uppercase tracking-[0.2em] text-mag-accent/60">
-          View Editorial
-        </span>
-        <div className="h-px flex-1 bg-mag-accent/20" />
       </div>
     </section>
   );
