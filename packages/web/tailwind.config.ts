@@ -72,6 +72,13 @@ const config: Config = {
           4: withOpacity("--chart-4"),
           5: withOpacity("--chart-5"),
         },
+        // Magazine theme colors (CSS custom properties)
+        mag: {
+          primary: "var(--mag-primary)",
+          accent: "var(--mag-accent)",
+          bg: "var(--mag-bg)",
+          text: "var(--mag-text)",
+        },
         "scanner-green": "#00FF00",
         "neon-orange": "#FF4500",
         // Main page colors

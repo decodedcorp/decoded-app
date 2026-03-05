@@ -104,6 +104,12 @@
     --shadow-2xl: 0px 4px 10px 0px hsl(0 0% 0% / 0.13);
     --tracking-normal: normal;
     --spacing: 0.25rem;
+
+    /* Magazine Theme - Default values, overridden per-issue by JS */
+    --mag-primary: #050505;
+    --mag-accent: #eafd67;
+    --mag-bg: #050505;
+    --mag-text: #f5f5f5;
   }
 
   .dark {
