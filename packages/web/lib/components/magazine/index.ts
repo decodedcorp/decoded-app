@@ -6,6 +6,7 @@ export { MagazineDivider } from "./MagazineDivider";
 export { MagazineQuote } from "./MagazineQuote";
 export { MagazineGallery } from "./MagazineGallery";
 export { MagazineSkeleton } from "./MagazineSkeleton";
+export { GenerateMyEdition } from "./GenerateMyEdition";
 export { componentRegistry, getComponent } from "./componentRegistry";
 export * from "./types";
 export * from "./theme";
