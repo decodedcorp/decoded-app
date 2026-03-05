@@ -126,6 +126,12 @@ const config: Config = {
       animation: {
         "pulse-soft": "pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         "spot-reveal": "spot-reveal 0.4s ease-out forwards",
+        "neon-drift":
+          "neon-drift 10s ease-in-out infinite alternate",
+        "neon-drift-reverse":
+          "neon-drift-reverse 12s ease-in-out infinite alternate",
+        "neon-drift-slow":
+          "neon-drift-slow 8s ease-in-out infinite alternate",
       },
       keyframes: {
         "pulse-soft": {
@@ -151,6 +157,18 @@ const config: Config = {
             opacity: "1",
             transform: "translate(-50%, -50%) scale(1)",
           },
+        },
+        "neon-drift": {
+          "0%": { transform: "translate(0, 0) scale(1)" },
+          "100%": { transform: "translate(3%, 5%) scale(1.05)" },
+        },
+        "neon-drift-reverse": {
+          "0%": { transform: "translate(0, 0) scale(1)" },
+          "100%": { transform: "translate(-4%, -3%) scale(1.08)" },
+        },
+        "neon-drift-slow": {
+          "0%": { transform: "translate(0, 0) scale(1)" },
+          "100%": { transform: "translate(2%, -4%) scale(1.03)" },
         },
       },
     },
