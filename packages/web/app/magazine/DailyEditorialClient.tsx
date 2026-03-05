@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useMagazineStore } from "@/lib/stores/magazineStore";
 import { MagazineSkeleton } from "@/lib/components/magazine";
 import { GenerateMyEdition } from "@/lib/components/magazine/GenerateMyEdition";
+import { PersonalIssueClient } from "@/lib/components/magazine/PersonalIssueClient";
 import { EditorialHero } from "@/lib/components/magazine/EditorialHero";
 import { EditorialItemShowcase } from "@/lib/components/magazine/EditorialItemShowcase";
 import { AmbientParticles } from "@/lib/components/magazine/AmbientParticles";
@@ -21,6 +22,10 @@ export function DailyEditorialClient() {
   const error = useMagazineStore((s) => s.error);
   const loadDailyIssue = useMagazineStore((s) => s.loadDailyIssue);
   const clearError = useMagazineStore((s) => s.clearError);
+
+  const [isPersonalModalOpen, setIsPersonalModalOpen] = useState(false);
+  const handleOpenPersonalModal = useCallback(() => setIsPersonalModalOpen(true), []);
+  const handleClosePersonalModal = useCallback(() => setIsPersonalModalOpen(false), []);
 
   useEffect(() => {
     loadDailyIssue();
@@ -121,8 +126,14 @@ export function DailyEditorialClient() {
         )}
 
         {/* CTA */}
-        <GenerateMyEdition />
+        <GenerateMyEdition onGenerate={handleOpenPersonalModal} />
       </div>
+
+      {/* Personal Edition Modal */}
+      <PersonalIssueClient
+        isOpen={isPersonalModalOpen}
+        onClose={handleClosePersonalModal}
+      />
     </div>
   );
 }

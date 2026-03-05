@@ -1,24 +1,26 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowRight } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
+interface GenerateMyEditionProps {
+  onGenerate: () => void;
+}
+
 /**
  * GenerateMyEdition - CTA with pulsing neon chartreuse glow.
  *
  * Scroll-triggered fade-up on enter, then continuous GSAP box-shadow pulse
  * animation for the neon border glow effect.
- * Links to /magazine/personal for generating a personal edition.
+ * Opens personal edition modal.
  */
-export function GenerateMyEdition() {
+export function GenerateMyEdition({ onGenerate }: GenerateMyEditionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const router = useRouter();
 
   useEffect(() => {
     const container = containerRef.current;
@@ -62,7 +64,7 @@ export function GenerateMyEdition() {
       <button
         ref={buttonRef}
         type="button"
-        onClick={() => router.push("/magazine/personal")}
+        onClick={onGenerate}
         className="group flex w-full items-center justify-between rounded-lg border border-[#eafd67] bg-mag-bg px-6 py-5 transition-colors hover:bg-mag-accent/10"
         style={{ boxShadow: "0 0 10px rgba(234,253,103,0.3)" }}
       >

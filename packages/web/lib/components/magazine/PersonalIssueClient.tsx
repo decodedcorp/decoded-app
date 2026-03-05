@@ -6,8 +6,13 @@ import { useMagazineStore } from "@/lib/stores/magazineStore";
 import { DecodingRitual } from "./DecodingRitual";
 import { MagazineRenderer } from "./MagazineRenderer";
 
+interface PersonalIssueClientProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
 /**
- * Personal Issue generation page client component.
+ * Personal Issue generation modal overlay.
  *
  * Implements a 3-state machine:
  *   idle       -> Generate button visible
@@ -15,7 +20,7 @@ import { MagazineRenderer } from "./MagazineRenderer";
  *   ready      -> MagazineRenderer with personal issue + action buttons
  *   error      -> Error card with retry
  */
-export function PersonalIssueClient() {
+export function PersonalIssueClient({ isOpen, onClose }: PersonalIssueClientProps) {
   const {
     personalStatus,
     personalIssue,
@@ -25,6 +30,7 @@ export function PersonalIssueClient() {
     clearError,
   } = useMagazineStore();
 
+  const overlayRef = useRef<HTMLDivElement>(null);
   const ritualRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<HTMLDivElement>(null);
   const ctxRef = useRef<gsap.Context | null>(null);
@@ -45,6 +51,37 @@ export function PersonalIssueClient() {
     console.log("[PersonalIssue] Save to Collection - intent logged");
   }, []);
 
+  const handleClose = useCallback(() => {
+    const overlay = overlayRef.current;
+    if (!overlay) {
+      onClose();
+      return;
+    }
+
+    gsap.to(overlay, {
+      opacity: 0,
+      duration: 0.3,
+      ease: "power2.in",
+      onComplete: () => {
+        setPersonalStatus("idle");
+        onClose();
+      },
+    });
+  }, [onClose, setPersonalStatus]);
+
+  // Entrance animation
+  useEffect(() => {
+    if (!isOpen) return;
+    const overlay = overlayRef.current;
+    if (!overlay) return;
+
+    gsap.fromTo(
+      overlay,
+      { opacity: 0 },
+      { opacity: 1, duration: 0.3, ease: "power2.out" },
+    );
+  }, [isOpen]);
+
   // Crossfade animation: ritual out, renderer in
   useEffect(() => {
     if (personalStatus !== "ready") return;
@@ -60,7 +97,6 @@ export function PersonalIssueClient() {
     ctxRef.current = gsap.context(() => {
       const tl = gsap.timeline();
 
-      // Fade out ritual overlay if still in DOM
       if (ritual) {
         tl.to(ritual, {
           opacity: 0,
@@ -69,7 +105,6 @@ export function PersonalIssueClient() {
         });
       }
 
-      // Fade in renderer with slight overlap
       gsap.set(renderer, { opacity: 0 });
       tl.to(
         renderer,
@@ -90,32 +125,38 @@ export function PersonalIssueClient() {
     };
   }, [personalStatus]);
 
+  if (!isOpen) return null;
+
   return (
-    <div className="min-h-screen bg-mag-bg text-mag-text">
+    <div
+      ref={overlayRef}
+      className="fixed inset-0 z-[70] bg-mag-bg text-mag-text overflow-y-auto"
+      style={{ opacity: 0 }}
+    >
       {/* Top bar */}
-      <nav className="fixed top-0 left-0 right-0 z-[60] flex items-center justify-between px-4 py-3 bg-mag-bg/80 backdrop-blur-sm">
-        <a
-          href="/magazine"
+      <nav className="sticky top-0 z-[80] flex items-center justify-between px-4 py-3 bg-mag-bg/80 backdrop-blur-sm">
+        <button
+          onClick={handleClose}
           className="text-mag-text hover:text-mag-accent transition-colors text-lg"
           aria-label="Back to magazine"
         >
           &larr;
-        </a>
+        </button>
         <span className="text-sm text-mag-text/60 uppercase tracking-widest">
           Personal Edition
         </span>
-        <a
-          href="/magazine"
+        <button
+          onClick={handleClose}
           className="text-mag-text hover:text-mag-accent transition-colors text-lg"
           aria-label="Close"
         >
           &times;
-        </a>
+        </button>
       </nav>
 
       {/* State: idle */}
       {personalStatus === "idle" && (
-        <div className="flex flex-col items-center justify-center min-h-screen gap-6 px-6">
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-56px)] gap-6 px-6">
           <h1 className="text-3xl md:text-4xl font-bold text-mag-accent text-center">
             Generate My Edition
           </h1>
@@ -145,7 +186,7 @@ export function PersonalIssueClient() {
       {/* State: ready */}
       {personalStatus === "ready" && personalIssue && (
         <div ref={rendererRef} style={{ opacity: 0 }}>
-          <div className="pt-14">
+          <div className="pt-2">
             <MagazineRenderer issue={personalIssue} />
           </div>
 
@@ -169,7 +210,7 @@ export function PersonalIssueClient() {
 
       {/* State: error */}
       {personalStatus === "error" && (
-        <div className="flex flex-col items-center justify-center min-h-screen gap-4 px-6">
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-56px)] gap-4 px-6">
           <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-6 max-w-sm text-center">
             <p className="text-red-400 mb-4">
               {error || "Something went wrong during generation"}

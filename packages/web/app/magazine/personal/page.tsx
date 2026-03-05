@@ -1,5 +1,5 @@
-import { PersonalIssueClient } from "@/lib/components/magazine/PersonalIssueClient";
+import { redirect } from "next/navigation";
 
 export default function PersonalIssuePage() {
-  return <PersonalIssueClient />;
+  redirect("/magazine");
 }
