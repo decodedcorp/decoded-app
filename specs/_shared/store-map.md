@@ -12,7 +12,9 @@
 | searchStore | `packages/shared/stores/searchStore.ts` | Search overlay (`/search`) |
 | filterStore | `packages/shared/stores/filterStore.ts` | Explore (`/explore`) |
 | requestStore | `packages/web/lib/stores/requestStore.ts` | Upload (`/request/upload`), AI Detect (`/request/detect`), Edit/Solution flow |
-| transitionStore | `packages/web/lib/stores/transitionStore.ts` | Image detail FLIP animation (grid → detail transition) |
+| transitionStore | `packages/web/lib/stores/transitionStore.ts` | Image detail FLIP animation (grid -> detail transition) |
+| magazineStore | `packages/web/lib/stores/magazineStore.ts` | Magazine (`/magazine`, `/magazine/personal`) — **PROPOSED** |
+| creditStore | `packages/web/lib/stores/creditStore.ts` | Credit balance across magazine/VTON features — **PROPOSED** |
 | profileStore | `packages/web/lib/stores/profileStore.ts` | Profile (`/profile`) |
 
 ---
@@ -323,3 +325,88 @@ badgeModalMode: null → 'all' (openBadgeModal('all')) → null (closeBadgeModal
 ### Used By
 
 Profile page (`/profile`) — all sections: header, stats, badges grid, rankings, badge modal.
+
+---
+
+## magazineStore (Proposed)
+
+**File:** `packages/web/lib/stores/magazineStore.ts` (not yet created)
+**Import:** `import { useMagazineStore } from '@/lib/stores/magazineStore'`
+
+> STATUS: Proposed for Milestone 7. Store not yet implemented.
+
+### State
+
+| Field | Type | Description |
+|-------|------|-------------|
+| currentIssue | `MagazineIssue \| null` | Currently displayed daily issue |
+| personalIssue | `MagazineIssue \| null` | User's personalized issue |
+| personalStatus | `'idle' \| 'checking' \| 'generating' \| 'ready' \| 'error'` | Personal issue generation state |
+| isLoading | `boolean` | Daily issue fetch in progress |
+| gsapTimeline | `gsap.core.Timeline \| null` | Active GSAP timeline for current layout (client-only, not persisted) |
+
+### Actions
+
+| Action | Signature | Description |
+|--------|-----------|-------------|
+| fetchDailyIssue | `() => Promise<void>` | GET /api/v1/magazine/daily |
+| fetchPersonalIssue | `() => Promise<void>` | GET /api/v1/magazine/personal |
+| requestGeneration | `() => Promise<void>` | POST /api/v1/magazine/personal/generate + start polling |
+| setGsapTimeline | `(timeline: gsap.core.Timeline) => void` | Store reference for cleanup |
+| reset | `() => void` | Clear all state, kill GSAP timeline |
+
+### Transitions
+
+```
+idle -> loading (fetchDailyIssue) -> interactive (issue received + GSAP complete)
+idle -> checking (fetchPersonalIssue) -> ready (issue exists) | generating (no issue)
+generating -> polling (3s interval) -> ready (generation complete)
+any -> error (network/timeout failure)
+```
+
+### Used By
+
+Magazine pages (`/magazine`, `/magazine/personal`), NavBar (magazine tab badge).
+
+---
+
+## creditStore (Proposed)
+
+**File:** `packages/web/lib/stores/creditStore.ts` (not yet created)
+**Import:** `import { useCreditStore } from '@/lib/stores/creditStore'`
+
+> STATUS: Proposed for Milestone 7. Store not yet implemented.
+
+### State
+
+| Field | Type | Description |
+|-------|------|-------------|
+| balance | `number` | Current credit balance |
+| isLoading | `boolean` | Balance fetch in progress |
+| lastFetched | `number \| null` | Timestamp of last balance fetch (stale check) |
+
+### Actions
+
+| Action | Signature | Description |
+|--------|-----------|-------------|
+| fetchBalance | `() => Promise<void>` | GET /api/v1/credits/balance |
+| deductLocally | `(amount: number) => void` | Optimistic deduction before API confirms |
+| refund | `(amount: number) => void` | Rollback on API failure |
+
+### Selectors
+
+| Selector | Returns | Description |
+|----------|---------|-------------|
+| selectBalance | `number` | Current balance |
+| selectCanAfford | `(cost: number) => boolean` | Check if user can afford an action |
+
+### Transitions
+
+```
+unknown -> fetching (fetchBalance) -> known (balance set)
+known -> deducted (deductLocally) -> confirmed (API success) | rolled back (refund on failure)
+```
+
+### Used By
+
+Magazine generation (SCR-MAG-02), VTON submit (SCR-VTON-01), credit display in profile/header.

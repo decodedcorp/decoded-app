@@ -1,10 +1,12 @@
-> STATUS: DRAFT — not approved for implementation
+> STATUS: ACTIVE — promoted to Milestone 7 (AI Magazine & Archive Expansion)
+> Promoted: 2026-03-05 | Original draft: 2026-02-20
 
 # NEXT-03: Dynamic UI Interaction Scenarios
 
-> Direction: 5-stage adaptive UI evolution | Updated: 2026-02-20
+> Direction: 5-stage adaptive UI evolution | Updated: 2026-03-05
 > Audience: Internal decision-making + future AI agent context injection
 > Builds on: NEXT-01 (Service Identity — editorial magazine format)
+> Implementation: FLW-06 (Magazine Rendering Flow), SCR-MAG-01, SCR-MAG-02
 
 ---
 

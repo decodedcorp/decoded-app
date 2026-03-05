@@ -39,6 +39,7 @@ specs/
 │   ├── detail/            # SCR-VIEW-* (detail view screens)
 │   ├── discovery/         # SCR-DISC-* (home, search, feed)
 │   ├── creation/          # SCR-CREA-* (upload, AI tagging)
+│   ├── magazine/          # SCR-MAG-* (AI magazine, personal issue) -- M7
 │   └── user/              # SCR-USER-* (login, profile, settings)
 └── README.md
 ```
@@ -51,6 +52,8 @@ specs/
 | SCR-DISC- | Discovery screens | SCR-DISC-NN | SCR-DISC-01 |
 | SCR-CREA- | Creation screens | SCR-CREA-NN | SCR-CREA-01 |
 | SCR-USER- | User system screens | SCR-USER-NN | SCR-USER-01 |
+| SCR-MAG- | Magazine screens | SCR-MAG-NN | SCR-MAG-01 |
+| SCR-COL- | Collection screens | SCR-COL-NN | SCR-COL-01 |
 | FLW- | User journey flows | FLW-NN | FLW-01 |
 | CMN- | Shared components | CMN-NN | CMN-01 |
 

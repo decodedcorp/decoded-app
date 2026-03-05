@@ -678,6 +678,136 @@ Token retrieved via `getAuthToken()` from `packages/web/lib/api/client.ts`.
 
 ---
 
+## Magazine (Proposed — Frontend-led, pending backend alignment)
+
+> STATUS: Frontend proposal. Endpoints not yet implemented.
+> Share this section with backend team for contract alignment.
+
+### GET /api/v1/magazine/daily
+
+**Client:** TBD (`packages/web/lib/api/magazine.ts`)
+**Auth:** Public
+**Description:** Fetch today's AI-generated editorial magazine issue.
+
+**Response 200:**
+```json
+{
+  "id": "uuid",
+  "issue_number": 1,
+  "title": "Vol.1 — Spring Decoded",
+  "theme_palette": {
+    "primary": "#1A1A2E",
+    "accent": "#E94560",
+    "background": "#F5F5F5",
+    "text": "#16213E"
+  },
+  "layout_json": {
+    "version": 1,
+    "viewport": "mobile",
+    "components": [
+      {
+        "type": "hero-image",
+        "x": 0, "y": 0, "w": 100, "h": 60,
+        "animation_type": "scale-in",
+        "data": { "image_url": "https://...", "post_id": "uuid", "headline": "..." }
+      },
+      {
+        "type": "text-block",
+        "x": 5, "y": 62, "w": 90, "h": 10,
+        "animation_type": "fade-up",
+        "animation_delay": 0.3,
+        "data": { "content": "Editorial copy...", "variant": "body" }
+      }
+    ]
+  },
+  "published_at": "2026-03-05T00:00:00Z",
+  "created_at": "2026-03-05T00:00:00Z"
+}
+```
+
+**Response 404:** `{ "message": "No daily issue available" }`
+
+---
+
+### GET /api/v1/magazine/personal
+
+**Client:** TBD (`packages/web/lib/api/magazine.ts`)
+**Auth:** Required
+**Description:** Fetch the user's personalized magazine issue (taste-based).
+
+**Response 200:** Same shape as daily issue, with `is_personal: true` and user-specific `theme_palette`.
+
+**Response 404:** `{ "message": "No personal issue generated yet" }`
+
+---
+
+### POST /api/v1/magazine/personal/generate
+
+**Client:** TBD (`packages/web/lib/api/magazine.ts`)
+**Auth:** Required
+**Description:** Request generation of a personalized magazine issue. Async — returns immediately with queue status.
+**Credit cost:** 1 magazine credit
+
+**Response 202:**
+```json
+{
+  "status": "queued",
+  "estimated_seconds": 30,
+  "credit_deducted": 1,
+  "remaining_credits": 4
+}
+```
+
+**Response 402:** `{ "message": "Insufficient credits", "required": 1, "available": 0 }`
+
+---
+
+### GET /api/v1/credits/balance
+
+**Client:** TBD (`packages/web/lib/api/credits.ts`)
+**Auth:** Required
+**Description:** Fetch user's current credit balance.
+
+**Response 200:**
+```json
+{
+  "balance": 5,
+  "lifetime_earned": 12,
+  "lifetime_spent": 7
+}
+```
+
+---
+
+### POST /api/v1/credits/deduct
+
+**Client:** TBD (`packages/web/lib/api/credits.ts`)
+**Auth:** Required (internal — called by generation endpoints, not directly by frontend)
+**Description:** Deduct credits for an AI action. Normally called server-side by magazine/vton endpoints.
+
+**Request body:**
+```json
+{
+  "amount": 1,
+  "action_type": "magazine_generate"
+}
+```
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "remaining_balance": 4,
+  "transaction_id": "uuid"
+}
+```
+
+**Response 402:** `{ "message": "Insufficient credits" }`
+
+> **Note:** `action_type` enum values: `"magazine_generate"`, `"vton_apply"`, `"magazine_regenerate"`
+
+---
+
 ## Common Error Responses
 
 All endpoints may return these errors:

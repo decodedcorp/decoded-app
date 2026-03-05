@@ -582,6 +582,70 @@ export interface ConvertAffiliateResponse {
 
 ---
 
+## Magazine Domain (Proposed)
+
+> STATUS: Frontend proposal — types not yet in codebase. Target file: `packages/web/lib/api/types.ts`
+
+### MagazineIssue (API Response)
+
+```typescript
+interface LayoutComponent {
+  type: 'hero-image' | 'text-block' | 'item-card' | 'divider' | 'quote' | 'grid-gallery';
+  x: number;           // 0-100, percentage from left
+  y: number;           // 0-100, percentage from top
+  w: number;           // percentage width
+  h: number;           // percentage height
+  animation_type: 'fade-up' | 'scale-in' | 'slide-left' | 'parallax' | 'none';
+  animation_delay?: number; // seconds
+  data: Record<string, unknown>;
+}
+
+interface LayoutJSON {
+  version: 1;
+  viewport: 'mobile' | 'desktop';
+  components: LayoutComponent[];
+}
+
+interface ThemePalette {
+  primary: string;     // hex color
+  accent: string;
+  background: string;
+  text: string;
+}
+
+interface MagazineIssue {
+  id: string;
+  issue_number: number;
+  title: string;
+  theme_palette: ThemePalette;
+  layout_json: LayoutJSON;
+  is_personal?: boolean;
+  published_at: string;
+  created_at: string;
+}
+```
+
+### CreditBalance (API Response)
+
+```typescript
+interface CreditBalance {
+  balance: number;
+  lifetime_earned: number;
+  lifetime_spent: number;
+}
+
+type CreditActionType = 'magazine_generate' | 'vton_apply' | 'magazine_regenerate';
+
+interface CreditTransaction {
+  id: string;
+  amount: number;
+  action_type: CreditActionType;
+  created_at: string;
+}
+```
+
+---
+
 ## Legacy / Detail View Types
 
 > These types exist for backward compatibility in the detail view. New code should use API types.
