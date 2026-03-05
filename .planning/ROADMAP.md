@@ -85,13 +85,13 @@ Plans:
 
 **Depends on:** m7-01 (theme system, MagazineIssue types, magazineStore)
 **Specs:** SCR-COL-01 (Studio room), SCR-COL-02 (R3F interactions), SCR-COL-03 (Detail panel + actions)
-**Plans:** 0/? (planning required)
+**Plans:** 4 plans
 
 Plans:
-- [ ] m7-03-01-PLAN.md — R3F + Drei + postprocessing setup, StudioScene canvas, StudioRoom (floor reflector, walls), StudioLighting (neon #eafd67), CameraRig (entry animation)
-- [ ] m7-03-02-PLAN.md — MagazineBook procedural geometry (cover UV, spine neon text, open/close animation), MagazineRack layout algorithm, Float idle animation
-- [ ] m7-03-03-PLAN.md — CameraRig interactions (mouse parallax, click-to-focus zoom, deselect), hover glow, performance adaptation, StudioEffects (Bloom/vignette)
-- [ ] m7-03-04-PLAN.md — IssueDetailPanel (HTML overlay), EmptyStudio, StudioLoader, StudioHUD, studioStore, WebGL fallback, action workflows (Open/Share/Remove)
+- [ ] m7-03-01-PLAN.md — R3F v8 setup + studioStore + StudioScene Canvas + StudioRoom (Reflector floor, walls) + StudioLighting (neon #eafd67) + CameraRig (entry dolly)
+- [ ] m7-03-02-PLAN.md — MagazineBook (cover UV, spine neon text, cover flip) + MagazineRack (arc layout) + Float bobbing
+- [ ] m7-03-03-PLAN.md — CameraRig interactions (parallax, focus zoom, unfocus, exit) + hover glow + StudioEffects (Bloom/Vignette) + PerformanceMonitor
+- [ ] m7-03-04-PLAN.md — IssueDetailPanel (HTML overlay) + EmptyStudio + StudioLoader + StudioHUD + CollectionClient orchestration + WebGL fallback
 
 ## Progress
 
@@ -103,10 +103,10 @@ Plans:
 | v2.1 Design System | v2.1-1~6 | 14/14 | Shipped | 2026-02-06 |
 | v3.0 Admin Panel | v3-01~06 | 12/12 | Shipped | 2026-02-19 |
 | v4.0 Spec Overhaul | v4-01~09 | 13/13 | Shipped | 2026-02-20 |
-| M7 AI Magazine | m7-01, m7-02, m7-03 | 7/12 | In Progress | - |
-| **Total** | **7 milestones** | **90/95** | **Active** | - |
+| M7 AI Magazine | m7-01, m7-02, m7-03 | 7/16 | In Progress | - |
+| **Total** | **7 milestones** | **90/99** | **Active** | - |
 
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-03-05 (m7-02-02 complete, 2/3 plans shipped)*
+*Last updated: 2026-03-05 (m7-03 planned, 4 plans created)*
