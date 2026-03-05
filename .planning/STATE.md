@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 Phase: None — between milestones
 Plan: Not started
 Status: Ready to plan next milestone
-Last activity: 2026-03-05 — Completed quick task 039: fix fetchPostsServer 400 error
+Last activity: 2026-03-05 — Completed quick task 040: fix posts proxy error handling
 
 Progress: 6 milestones shipped [██████████] 83/83 plans complete
 
@@ -47,6 +47,7 @@ None.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 039 | Fix fetchPostsServer 400 error (has_solutions param) | 2026-03-05 | e9303d8 | [039-fix-fetchpostsserver-400-has-solutions](./quick/039-fix-fetchpostsserver-400-has-solutions/) |
+| 040 | Fix posts proxy error handling for non-JSON responses | 2026-03-05 | c4e8b34 | [040-fix-explore-posts-fetch-error-handling](./quick/040-fix-explore-posts-fetch-error-handling/) |
 
 ## Session Continuity
 
