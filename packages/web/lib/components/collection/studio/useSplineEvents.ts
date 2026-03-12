@@ -6,27 +6,23 @@ import { useMagazineStore } from "@/lib/stores/magazineStore";
 import { useStudioStore } from "@/lib/stores/studioStore";
 
 /**
- * Maps Spline interaction events to studioStore actions.
- * - mouseDown on Magazine_N -> focusIssue
- * - mouseDown on empty/non-book -> unfocus
+ * Maps Spline interaction events to studioStore semantic actions.
+ * - mouseDown on Magazine_N -> focusIssue(id)
+ * - mouseDown on empty/non-book -> unfocus()
  * - mouseHover -> cursor style
- * - Escape key -> unfocus
+ * - Escape key -> unfocus()
  */
 export function useSplineEvents(onBookClick?: (index: number) => void) {
-  const { cameraState, focusedIssueId, setFocusedIssueId, setCameraState } =
-    useStudioStore();
+  const { focusedIssueId, focusIssue, unfocus } = useStudioStore();
   const collectionIssues = useMagazineStore((s) => s.collectionIssues);
 
   const handleMouseDown = useCallback(
     (e: SplineEvent) => {
       const name = e?.target?.name;
-      console.log("[SplineEvents] mouseDown:", { name, target: e?.target, event: e });
+
       if (!name) {
         // Clicked empty canvas — unfocus if focused
-        if (focusedIssueId) {
-          setFocusedIssueId(null);
-          setCameraState("browse");
-        }
+        if (focusedIssueId) unfocus();
         return;
       }
 
@@ -35,23 +31,15 @@ export function useSplineEvents(onBookClick?: (index: number) => void) {
         const index = parseInt(match[1], 10) - 1;
         const issue = collectionIssues[index];
         if (issue) {
-          setFocusedIssueId(issue.id);
-          setCameraState("focused");
+          focusIssue(issue.id);
           onBookClick?.(index);
         }
       } else if (focusedIssueId) {
         // Clicked non-book object — unfocus
-        setFocusedIssueId(null);
-        setCameraState("browse");
+        unfocus();
       }
     },
-    [
-      collectionIssues,
-      focusedIssueId,
-      setFocusedIssueId,
-      setCameraState,
-      onBookClick,
-    ]
+    [collectionIssues, focusedIssueId, focusIssue, unfocus, onBookClick]
   );
 
   const handleMouseHover = useCallback((e: SplineEvent) => {
@@ -60,18 +48,15 @@ export function useSplineEvents(onBookClick?: (index: number) => void) {
     document.body.style.cursor = isMagazine ? "pointer" : "default";
   }, []);
 
-  // Escape key -> unfocus
+  // Escape key -> unfocus when in focused state
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape" && focusedIssueId) {
-        setFocusedIssueId(null);
-        setCameraState("browse");
-      }
+      if (e.key === "Escape" && focusedIssueId) unfocus();
     }
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [focusedIssueId, setFocusedIssueId, setCameraState]);
+  }, [focusedIssueId, unfocus]);
 
   // Reset cursor on unmount
   useEffect(() => {

@@ -38,8 +38,11 @@ export function useSplineBridge(
       trySetVariable(app, `Title_${idx}`, issue?.title ?? "");
       trySetVariable(app, `Visible_${idx}`, issue !== null);
 
-      // Attempt texture swap
+      // Cover texture: try setVariable first (Spline's official API)
+      // If the scene has a string variable "Cover_Texture_N" bound to a texture, this works directly.
+      // Fallback: swap via material.layers API (see tryTextureSwap below).
       if (issue?.cover_image_url) {
+        trySetVariable(app, `Cover_Texture_${idx}`, issue.cover_image_url);
         tryTextureSwap(app, `Magazine_${idx}`, issue.cover_image_url);
       }
     }
