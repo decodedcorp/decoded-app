@@ -43,6 +43,7 @@ interface MagazineState {
   loadCollection: () => Promise<void>;
   setPersonalStatus: (status: PersonalStatus) => void;
   setActiveIssueId: (id: string | null) => void;
+  removeFromCollection: (id: string) => void;
   clearError: () => void;
 }
 
@@ -127,6 +128,12 @@ export const useMagazineStore = create<MagazineState>((set) => ({
 
   setActiveIssueId: (id: string | null) => {
     set({ activeIssueId: id });
+  },
+
+  removeFromCollection: (id: string) => {
+    set((state) => ({
+      collectionIssues: state.collectionIssues.filter((issue) => issue.id !== id),
+    }));
   },
 
   clearError: () => {

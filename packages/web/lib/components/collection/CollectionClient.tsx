@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useMagazineStore } from "@/lib/stores/magazineStore";
 import { useStudioStore } from "@/lib/stores/studioStore";
 import { StudioLoader } from "./StudioLoader";
-
 import { IssueDetailPanel } from "./IssueDetailPanel";
 import { EmptyBookshelf } from "./EmptyBookshelf";
 import { StudioHUD } from "./StudioHUD";
@@ -34,7 +33,7 @@ function hasWebGL(): boolean {
 
 export function CollectionClient() {
   const { collectionIssues, loadCollection } = useMagazineStore();
-  const { splineLoaded, focusedIssueId, setFocusedIssueId, setCameraState, reset } =
+  const { splineLoaded, focusedIssueId, setFocusedIssueId, reset } =
     useStudioStore();
 
   const [hasLoaded, setHasLoaded] = useState(false);
@@ -45,16 +44,6 @@ export function CollectionClient() {
     loadCollection().then(() => setHasLoaded(true));
     return () => reset();
   }, [loadCollection, reset]);
-
-  const focusedIssue = focusedIssueId
-    ? collectionIssues.find((i) => i.id === focusedIssueId) ?? null
-    : null;
-
-  const handleClose = useCallback(() => {
-    setFocusedIssueId(null);
-    setCameraState("browse");
-  }, [setFocusedIssueId, setCameraState]);
-
 
   // Loading state
   if (!hasLoaded) {
@@ -90,11 +79,10 @@ export function CollectionClient() {
     );
   }
 
-  // Empty state
+  // Empty state — SplineStudio still renders (empty room scene), EmptyBookshelf overlaid
   if (collectionIssues.length === 0) {
     return (
       <div className="min-h-screen bg-[#050505] relative">
-
         <div className="relative w-full h-screen">
           <SplineStudio />
           <div className="absolute inset-0 flex items-center justify-center">
@@ -111,19 +99,14 @@ export function CollectionClient() {
       {/* Studio HUD: sticky header with back button, title, issue count */}
       <StudioHUD />
 
-      {/* Spline 3D scene */}
+      {/* Spline 3D scene — IssueDetailPanel + EmptyStudio are siblings inside SplineStudio */}
       <div className="relative w-full h-screen">
         {!splineLoaded && <StudioLoader />}
         <SplineStudio />
       </div>
 
-      {/* Issue detail panel overlay */}
-      {focusedIssue && (
-        <IssueDetailPanel
-          issue={focusedIssue}
-          onClose={handleClose}
-        />
-      )}
+      {/* Issue detail panel — self-manages visibility via studioStore */}
+      <IssueDetailPanel />
     </div>
   );
 }
