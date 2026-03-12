@@ -8,6 +8,7 @@ import { StudioLoader } from "./StudioLoader";
 
 import { IssueDetailPanel } from "./IssueDetailPanel";
 import { EmptyBookshelf } from "./EmptyBookshelf";
+import { StudioHUD } from "./StudioHUD";
 
 // Dynamic import for Spline — SSR disabled (WebGL)
 const SplineStudio = dynamic(
@@ -107,6 +108,9 @@ export function CollectionClient() {
   // Main 3D Studio view
   return (
     <div className="min-h-screen bg-[#050505] relative">
+      {/* Studio HUD: sticky header with back button, title, issue count */}
+      <StudioHUD />
+
       {/* Spline 3D scene */}
       <div className="relative w-full h-screen">
         {!splineLoaded && <StudioLoader />}
