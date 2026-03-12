@@ -1,115 +1,152 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import Spline from "@splinetool/react-spline";
 import type { Application } from "@splinetool/runtime";
 import { useStudioStore } from "@/lib/stores/studioStore";
 import { useMagazineStore } from "@/lib/stores/magazineStore";
+import { useSplineRuntime } from "./useSplineRuntime";
 import { useSplineBridge } from "./useSplineBridge";
 
-const SCENE_URL =
-  "https://prod.spline.design/o9G6bAmpXYYxRQxh/scene.splinecode";
+// Placeholder path — replace with self-hosted .splinecode once scene is designed in Spline editor
+const SCENE_URL = "/spline/decoded-studio.splinecode";
 
+/**
+ * Spline 3D studio component.
+ * Wraps <Spline> with runtime bridge, store integration, and interaction handlers.
+ *
+ * NOTE: Must be dynamically imported with ssr:false by the consumer (e.g. CollectionClient).
+ */
 export function SplineStudio() {
-  const { splineApp, setSplineLoaded, setSplineApp, setCameraState, setEntryComplete } =
-    useStudioStore();
+  const runtime = useSplineRuntime();
+
+  const {
+    setSplineApp,
+    setSplineLoaded,
+    setCameraState,
+    setEntryComplete,
+    focusIssue,
+    unfocus,
+    focusedIssueId,
+  } = useStudioStore();
+
   const collectionIssues = useMagazineStore((s) => s.collectionIssues);
-  const focusedIssueId = useStudioStore((s) => s.focusedIssueId);
-  const setFocusedIssueId = useStudioStore((s) => s.setFocusedIssueId);
 
-  // Bridge: sync React state -> Spline variables + textures
-  const focusedIndex = focusedIssueId
-    ? collectionIssues.findIndex((i) => i.id === focusedIssueId)
-    : null;
-  useSplineBridge(splineApp, collectionIssues, focusedIndex === -1 ? null : focusedIndex);
+  // Derive focused index for bridge sync
+  const focusedIndex =
+    focusedIssueId !== null
+      ? collectionIssues.findIndex((i) => i.id === focusedIssueId)
+      : null;
 
-  // Register Spline event listeners directly on app instance
-  useEffect(() => {
-    if (!splineApp) return;
+  // Bridge: sync magazineStore issues -> Spline variables + cover textures
+  useSplineBridge(
+    runtime.splineRef.current,
+    collectionIssues,
+    focusedIndex === -1 ? null : focusedIndex
+  );
 
-    const onMouseDown = (e: any) => {
-      const name = e?.target?.name;
-      console.log("[SplineStudio] mouseDown event:", name, e);
+  /** Called when the Spline scene finishes loading */
+  function handleLoad(spline: Application) {
+    // Capture Application ref via runtime hook
+    runtime.onLoad(spline);
 
-      if (!name) {
-        if (focusedIssueId) {
-          setFocusedIssueId(null);
-          setCameraState("browse");
-        }
-        return;
+    // Sync store with loaded app instance
+    setSplineApp(spline);
+    setSplineLoaded(true);
+
+    // Pass initial data variables to Spline scene
+    runtime.setVar("issue_count", collectionIssues.length);
+    runtime.setVar("show_empty_state", collectionIssues.length === 0);
+
+    // Entry animation plays inside Spline; after 2500ms mark browse state
+    setTimeout(() => {
+      setCameraState("browse");
+      setEntryComplete(true);
+    }, 2500);
+
+    // Debug: log magazine objects found in scene
+    try {
+      const allObjects = spline.getAllObjects();
+      const magazineObjects = allObjects
+        .map((o: unknown) => (o as { name?: string }).name ?? "")
+        .filter((n) => n && /magazine/i.test(n));
+      if (magazineObjects.length > 0) {
+        console.log("[SplineStudio] Magazine objects:", magazineObjects);
       }
+    } catch {
+      // getAllObjects not critical — scene still usable
+    }
+  }
 
-      const match = name.match(/Magazine_(\d+)/i);
-      if (match) {
-        const index = parseInt(match[1], 10) - 1;
-        const issue = collectionIssues[index];
-        if (issue) {
-          setFocusedIssueId(issue.id);
-          setCameraState("focused");
+  /** Handle click on 3D objects */
+  function handleMouseDown(e: { target: { name: string } }) {
+    const name = e?.target?.name;
+
+    if (!name) {
+      // Click on empty canvas — unfocus if currently focused
+      if (focusedIssueId) unfocus();
+      return;
+    }
+
+    const match = name.match(/Magazine_(\d+)/i);
+    if (match) {
+      // Magazine_N uses 1-based index in scene naming convention
+      const index = parseInt(match[1], 10) - 1;
+      const issue = collectionIssues[index];
+      if (issue) {
+        focusIssue(issue.id);
+
+        // Compute camera focus position per Pitfall 6 pattern (direct position set, no state)
+        const book = runtime.findObject(name);
+        const camera = runtime.findObject("MainCamera");
+        if (book && camera) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (camera as any).position = {
+            x: book.position.x,
+            y: book.position.y + 0.5,
+            z: book.position.z + 1.5,
+          };
+          runtime.splineRef.current?.requestRender();
         }
-      } else if (focusedIssueId) {
-        setFocusedIssueId(null);
-        setCameraState("browse");
       }
-    };
+    } else if (focusedIssueId) {
+      // Clicked non-book object — unfocus
+      unfocus();
+    }
+  }
 
-    const onMouseHover = (e: any) => {
-      const name = e?.target?.name;
-      const isMagazine = name && /Magazine_\d+/i.test(name);
-      document.body.style.cursor = isMagazine ? "pointer" : "default";
-    };
-
-    splineApp.addEventListener("mouseDown", onMouseDown);
-    splineApp.addEventListener("mouseHover", onMouseHover);
-
-    return () => {
-      splineApp.removeEventListener("mouseDown", onMouseDown);
-      splineApp.removeEventListener("mouseHover", onMouseHover);
-      document.body.style.cursor = "default";
-    };
-  }, [splineApp, focusedIssueId, collectionIssues, setFocusedIssueId, setCameraState]);
+  /** Handle hover for cursor feedback */
+  function handleMouseHover(e: { target: { name: string } }) {
+    const name = e?.target?.name;
+    document.body.style.cursor =
+      name && /Magazine_\d+/i.test(name) ? "pointer" : "default";
+  }
 
   // Escape key -> unfocus
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape" && focusedIssueId) {
-        setFocusedIssueId(null);
-        setCameraState("browse");
-      }
+      if (e.key === "Escape" && focusedIssueId) unfocus();
     }
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [focusedIssueId, setFocusedIssueId, setCameraState]);
+  }, [focusedIssueId, unfocus]);
 
-  const handleLoad = useCallback(
-    (app: Application) => {
-      setSplineApp(app);
-      setSplineLoaded(true);
-      setCameraState("browse");
-      setEntryComplete(true);
-
-      // Ensure event system is active
-      try { app.play(); } catch {}
-
-      // Debug: list magazine objects
-      try {
-        const allObjects = app.getAllObjects();
-        const names = allObjects.map((o: any) => o.name).filter(Boolean);
-        const magazineObjects = names.filter((n: string) => /magazine/i.test(n));
-        console.log("[SplineStudio] Magazine objects:", magazineObjects);
-        console.log("[SplineStudio] Spline events:", app.getSplineEvents());
-      } catch (err) {
-        console.log("[SplineStudio] Init error:", err);
-      }
-    },
-    [setSplineApp, setSplineLoaded, setCameraState, setEntryComplete]
-  );
+  // Reset cursor on unmount
+  useEffect(() => {
+    return () => {
+      document.body.style.cursor = "default";
+    };
+  }, []);
 
   return (
-    <Spline
-      scene={SCENE_URL}
-      onLoad={handleLoad}
-      style={{ width: "100%", height: "100%" }}
-    />
+    <div className="fixed inset-0 bg-[#050505]">
+      <Spline
+        scene={SCENE_URL}
+        onLoad={handleLoad}
+        onSplineMouseDown={handleMouseDown}
+        onSplineMouseHover={handleMouseHover}
+        style={{ width: "100%", height: "100%" }}
+      />
+    </div>
   );
 }
