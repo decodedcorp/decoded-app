@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed m7-03-01-PLAN.md (Spline Foundation: studioStore + useSplineRuntime + SplineStudio + StudioLoader)"
-last_updated: "2026-03-12T06:37:44.035Z"
+stopped_at: "Completed m7-03-02-PLAN.md (Data Bridge + StudioHUD: useSplineBridge + useSplineEvents + StudioHUD)"
+last_updated: "2026-03-12T06:43:39.595Z"
 last_activity: "2026-03-05 - Completed quick task 049: SNS slot machine animation on PersonalizeBanner"
 progress:
   total_phases: 37
   completed_phases: 34
   total_plans: 83
-  completed_plans: 81
+  completed_plans: 82
 ---
 
 # Project State
@@ -50,6 +50,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase m7-02-main-page-renewal]: SmartNav used globally via ConditionalNav with per-route appearance (transparent on /, solid dark on others)
 - [Phase m7-03-the-decoded-studio]: Used local scene URL /spline/decoded-studio.splinecode (self-hosted) instead of Spline CDN URL for CORS-free loading
 - [Phase m7-03-the-decoded-studio]: studioStore has both primitive setters and semantic actions (focusIssue/unfocus) for ergonomic consumer API
+- [Phase m7-03-the-decoded-studio]: useSplineEvents uses focusIssue/unfocus semantic actions (not raw setters) for clean store interface
 
 ### Pending Todos
 
@@ -89,8 +90,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-12T06:37:34.930Z
-Stopped at: Completed m7-03-01-PLAN.md (Spline Foundation: studioStore + useSplineRuntime + SplineStudio + StudioLoader)
+Last session: 2026-03-12T06:43:39.590Z
+Stopped at: Completed m7-03-02-PLAN.md (Data Bridge + StudioHUD: useSplineBridge + useSplineEvents + StudioHUD)
 Resume file: None
 
 ---
