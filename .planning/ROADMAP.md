@@ -85,7 +85,7 @@ Plans:
 
 **Depends on:** m7-01 (theme system, MagazineIssue types, magazineStore)
 **Specs:** SCR-COL-01 (Studio room — Spline Pro), SCR-COL-02 (Spline interactions), SCR-COL-03 (Detail panel + actions)
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 - [ ] m7-03-01-PLAN.md — Spline packages + studioStore + SplineStudio wrapper + useSplineRuntime + StudioLoader + texture swap spike
