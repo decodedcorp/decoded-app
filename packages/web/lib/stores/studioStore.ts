@@ -10,11 +10,17 @@ interface StudioState {
   splineLoaded: boolean;
   splineApp: Application | null;
 
+  // Primitive setters
   setCameraState: (state: CameraState) => void;
   setFocusedIssueId: (id: string | null) => void;
   setEntryComplete: (complete: boolean) => void;
   setSplineLoaded: (loaded: boolean) => void;
   setSplineApp: (app: Application | null) => void;
+
+  // Semantic actions (camera state machine transitions)
+  focusIssue: (id: string) => void;
+  unfocus: () => void;
+
   reset: () => void;
 }
 
@@ -30,6 +36,13 @@ export const useStudioStore = create<StudioState>((set) => ({
   setEntryComplete: (complete) => set({ entryComplete: complete }),
   setSplineLoaded: (loaded) => set({ splineLoaded: loaded }),
   setSplineApp: (app) => set({ splineApp: app }),
+
+  // Focus an issue: set focusedIssueId + transition camera to "focused"
+  focusIssue: (id) => set({ focusedIssueId: id, cameraState: "focused" }),
+
+  // Unfocus: clear focusedIssueId + return camera to "browse"
+  unfocus: () => set({ focusedIssueId: null, cameraState: "browse" }),
+
   reset: () =>
     set({
       cameraState: "loading",
