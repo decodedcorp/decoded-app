@@ -1,5 +1,30 @@
 # Project Milestones: decoded-app
 
+## v5.0 AI Magazine & Archive Expansion (Shipped: 2026-03-12)
+
+**Delivered:** AI 매거진 프론트엔드 풀스택 구현 — LayoutJSON 렌더링 엔진, 3D Bookshelf/Spline Studio 컬렉션, Decoding Ritual 애니메이션, Cinema-to-Action 메인페이지 리뉴얼
+
+**Phases completed:** m7-01, m7-02, m7-03 (3 phases, 11 plans)
+
+**Key accomplishments:**
+- Magazine theme system (#eafd67 neon) + LayoutJSON types + MagazineRenderer layout engine with 6 components and GSAP orchestration
+- 3D Bookshelf collection page with CSS perspective + GSAP spine pop-out interactions
+- Decoding Ritual animation system — particles, style keywords, glow progress, cinematic sequence
+- Main page Cinema-to-Action renewal — MainHero tilt/glow/noise, MasonryGrid parallax, PersonalizeBanner suction, SmartNav
+- Spline Pro 3D Studio — studioStore state machine, useSplineRuntime/Bridge/Events hooks, StudioHUD, self-hosted .splinecode
+- HTML overlay system — IssueDetailPanel (responsive mobile/desktop), CollectionShareSheet, EmptyStudio CTA, BookshelfViewFallback
+
+**Stats:**
+- 200 files changed, +18,997 / -515 lines
+- 3 phases, 11 plans, 53 commits
+- 8 days (2026-03-05 → 2026-03-12)
+
+**Git range:** `fae7bb3` → `94d955a`
+
+**What's next:** Planning next milestone
+
+---
+
 ## v4.0 Spec Overhaul — AI-Ready Documentation (Shipped: 2026-02-20)
 
 **Delivered:** 사용자 화면 중심의 spec/docs를 현재 코드베이스 기준으로 재작성하고, AI 에이전트 컨텍스트 주입에 최적화된 포맷으로 고도화 — 14개 화면 spec, 5개 플로우 문서, 5개 공유 기반 문서, 4개 차기 버전 초안

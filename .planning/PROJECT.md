@@ -2,7 +2,7 @@
 
 ## What This Is
 
-AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패션 아이템을 발견하고 공유하는 서비스. AI 에이전트 최적화 spec 시스템 구축 완료.
+AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패션 아이템을 발견하고 공유하는 서비스. AI 매거진 시스템과 Spline 3D 스튜디오 구축 완료.
 
 **v1.0 (2026-01-29 shipped):** 문서화 최적화
 **v1.1 (2026-01-29 shipped):** 전체 API 연결 — 백엔드 API를 프론트엔드에 연결하여 실제 데이터로 동작
@@ -10,6 +10,7 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 **v2.1 (2026-02-06 shipped):** 디자인 시스템 확장 — 23개 추가 컴포넌트 + Visual QA 자동화
 **v3.0 (2026-02-19 shipped):** Admin Panel — AI Management — 대시보드, AI 감사, 비용 모니터링, 파이프라인/서버 로그 5개 섹션
 **v4.0 (2026-02-20 shipped):** Spec Overhaul — AI-Ready Documentation — 14개 화면 spec, 5개 플로우 문서, 5개 공유 기반 문서
+**v5.0 (2026-03-12 shipped):** AI Magazine — LayoutJSON 매거진 렌더러, 3D Spline Studio 컬렉션, Cinema-to-Action 메인페이지 리뉴얼
 
 ## Core Value
 
@@ -21,7 +22,15 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 - **Tech Stack**: Next.js 16 + React 18 + TypeScript 5.9 + Supabase + Zustand + React Query
 - **Structure**: Monorepo (packages/web, packages/shared)
 - **Design System**: 45+ components in `lib/design-system/` (5,924 LOC)
+- **3D Integration**: Spline Pro (@splinetool/react-spline) for 3D Studio collection
+- **Animation Stack**: GSAP 3.13 + Motion 12 + Lenis smooth scroll
 - **Codebase Map**: `.planning/codebase/` (8 files, 3,250+ lines)
+
+### AI Magazine System (v5.0 shipped)
+- **MagazineRenderer**: LayoutJSON-driven layout engine with 6 component types
+- **Magazine Pages**: /magazine (daily editorial), /magazine/personal (Decoding Ritual), /collection (3D Studio)
+- **3D Studio**: Spline Pro scene with studioStore state machine, data/event bridges, HTML overlays
+- **Main Page**: Cinema-to-Action renewal with Hero tilt/glow, MasonryGrid parallax, SmartNav
 
 ### Spec System (v4.0 shipped)
 - **14 screen specs** across 4 bundles (detail, discovery, creation-AI, user)
@@ -94,6 +103,15 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 - ✓ 4개 차기 버전 초안 (service identity, VTON, dynamic UI, commerce bridge) — v4.0
 - ✓ 기존 번들 spec 파일 retire + clean structure — v4.0
 
+**v5.0 AI Magazine:**
+- ✓ Magazine theme system (#eafd67) + LayoutJSON types + mock data — v5.0
+- ✓ MagazineRenderer layout engine + 6 magazine components (GSAP orchestration) — v5.0
+- ✓ Daily editorial page (/magazine) + NavBar integration — v5.0
+- ✓ 3D Bookshelf collection page (/collection) with CSS perspective — v5.0
+- ✓ Decoding Ritual animation (/magazine/personal) — v5.0
+- ✓ Main page Cinema-to-Action renewal (Hero tilt/glow, MasonryGrid parallax, SmartNav) — v5.0
+- ✓ Spline Pro 3D Studio collection room (studioStore, bridges, overlays, WebGL fallback) — v5.0
+
 ### Active
 
 (None — planning next milestone)
@@ -106,7 +124,7 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 - 실시간 알림 — 별도 마일스톤
 - 컴포넌트 통합 (15 orphaned) — v2.2로 미루기
 - spec 자동 검증 도구 — v4.1로 미루기
-- VTON 기능 구현 — PoC 결과 후 v5.0에서 진행
+- VTON 기능 구현 — PoC 결과 후 별도 마일스톤에서 진행
 
 ## Context
 
@@ -117,7 +135,8 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 - **v2.1 shipped**: 2026-02-06
 - **v3.0 shipped**: 2026-02-19
 - **v4.0 shipped**: 2026-02-20
-- **코드베이스**: Next.js 16 + React 18 + TypeScript 5.9 + Supabase
+- **v5.0 shipped**: 2026-03-12
+- **코드베이스**: Next.js 16 + React 18 + TypeScript 5.9 + Supabase + Spline Pro
 - **백엔드 API**: https://dev.decoded.style (OpenAPI spec 완비)
 
 ## Constraints
@@ -151,7 +170,13 @@ AI 기반 미디어 디스커버리 플랫폼. K-POP 아이돌과 셀럽의 패�
 | injection-guide as SSOT for AI loading | README와 중복 없이 단일 소스 | ✓ Good |
 | NEXT-* DRAFT guardrail | 미승인 spec의 실수 구현 방지 | ✓ Good |
 | Verified file paths in all specs | Stale path 참조 오류 원천 방지 | ✓ Good |
+| LayoutJSON-driven magazine renderer | 데이터로 레이아웃 정의, 컴포넌트 재사용 극대화 | ✓ Good |
+| Self-hosted Spline scene (.splinecode) | CDN CORS 회피, 로딩 안정성 | ✓ Good |
+| studioStore semantic actions (focusIssue/unfocus) | Consumer API 간결화, raw setter 은닉 | ✓ Good |
+| SplineStudio as composition root | 3D 캔버스 + 2D HTML 오버레이 단일 컨테이너 | ✓ Good |
+| Prop-less IssueDetailPanel (studioStore 직접 참조) | Prop drilling 제거, 독립 렌더링 | ✓ Good |
+| SmartNav via ConditionalNav | 라우트별 appearance 분기 (transparent/solid) | ✓ Good |
 
 ---
 
-*Last updated: 2026-02-20 after v4.0 milestone*
+*Last updated: 2026-03-12 after v5.0 milestone*
